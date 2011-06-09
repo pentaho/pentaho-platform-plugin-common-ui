@@ -1,0 +1,132 @@
+<div dojoAttachPoint="dialogContainer" class="filterDialogContainer dialog-content pentaho-padding-sm" dojoAttachPoint="containerNode">
+  <div dojoAttachPoint="typeContainer" class="filterDialogTypeContainer">
+    <div dojoAttachPoint="typePicklistContainer">
+      <input type="radio" value="PICKLIST"
+             name="filterType" dojoAttachPoint="typePicklistInput"
+             dojoAttachEvent="onclick:_filterTypeChanged">
+      <span class="filterDialogTypePicklistText"
+            dojoAttachPoint="typePicklistSpan">!Select from a list!</span>
+      <span class="filterDialogTypePicklistCombinationTypeLinksSpan">(<a href="#" dojoAttachPoint="typePicklistCombinationTypeLinksIncludeLink">!Includes!</a>,&nbsp;<a href="#" dojoAttachPoint="typePicklistCombinationTypeLinksExcludeLink">!Excludes!</a>)</span>
+      <br/>
+    </div>
+    <div dojoAttachPoint="typeMatchContainer">
+      <input type="radio" dojoAttachPoint="typeMatchInput"
+             value="MATCH" name="filterType"
+             dojoAttachEvent="onclick:_filterTypeChanged">
+      <span class="filterDialogTypeMatchText" dojoAttachPoint="typeMatchSpan">!Match a specific string!</span>
+      <br/>
+    </div>
+    <div dojoAttachPoint="typeDateRangeContainer">
+      <input type="radio" dojoAttachPoint="typeDateInput"
+             value="DATERANGE" name="filterType"
+             dojoAttachEvent="onclick:_filterTypeChanged">
+      <span class="filterDialogTypeDateRangeText" dojoAttachPoint="typeDateRangeSpan">!Select a range!</span>
+      <br/>
+    </div>
+    <!--
+    <input type="radio" id="filter-type-picklist" value="FILTER_PICKLIST"
+           name="filterType" onchange="view.updateFilterType(this.value);">
+    Select from a list
+    <br>
+    <input type="radio" id="filter-type-match" value="FILTER_MATCH"
+           name="filterType" onchange="view.updateFilterType(this.value);">
+    Match a specific string
+    -->
+    <p></p>
+  </div>
+  <div dojoAttachPoint="detailsContainer" class="filterDialogDetailsContainer">
+    <div dojoAttachPoint="picklistContainer"
+         class="filterDialogPicklistContainer">
+      <table>
+        <col style="width: 45%">
+        <col style="width: 10%">
+        <col style="width: 45%">
+        <tbody>
+        <tr>
+          <td>
+			      <span class="filterDialogPicklistHeadingText" dojoAttachPoint="picklistHeadingSpan">!Choose values from list:!</span>
+			    <td>
+			    <td></td>
+			    <td></td>
+			  </tr>
+			  <tr>
+			    <td>
+			      <input type="text" class="filterDialogPicklistFindInput" dojoType="dijit.form.TextBox" dojoAttachPoint="picklistFindInput" dojoAttachEvent="onKeyPress:_picklistFindKeyPressed"/>
+			    </td>
+			    <td>
+			      <button dojoType="dijit.form.Button" dojoAttachPoint="picklistFindButton" dojoAttachEvent="onClick:_filterPicklistByFindInput">!Find!</button>
+          </td>
+          <td>
+            <span dojoAttachPoint="picklistCombinationTypeSpan">!Currently!</span>
+            <select dojoAttachPoint="picklistCombinationType">
+              <option value="!AND!" dojoAttachPoint="picklistCombinationTypeIncludeOption">!INCLUDE!</option>
+              <option value="!AND_NOT!" dojoAttachPoint="picklistCombinationTypeExcludeOption">!EXCLUDE!</option>
+            </select>
+            :
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <select dojoType="dijit.form.MultiSelect"
+                    class="filterDialogPicklistSelect"
+                    dojoAttachPoint="picklistAvailableValues" name="available"
+                    dojoAttachEvent="onDblClick:_picklistAddSelected"
+                    size="12"></select>
+          </td>
+          <td valign="middle" align="center">
+            <img dojoAttachEvent="onclick:_picklistAddSelected"
+                 dojoAttachPoint="picklistAddSelected"
+                 class="filterDialogPicklistButton"
+                 src="images/filter_add_selected.png"
+                 title="!Add Selected!"><br>
+            <img dojoAttachEvent="onclick:_picklistRemoveSelected"
+                 dojoAttachPoint="picklistRemoveSelected"
+                 class="filterDialogPicklistButton"
+                 src="images/filter_remove_selected.png"
+                 title="!Remove Selected!"><br>
+            <br><br>
+            <img dojoAttachEvent="onclick:_picklistAddAll"
+                 dojoAttachPoint="picklistAddAll"
+                 class="filterDialogPicklistButton"
+                 src="images/filter_add_all.png"
+                 title="!Add All!"><br>
+            <img dojoAttachEvent="onclick:_picklistRemoveAll"
+                 dojoAttachPoint="picklistRemoveAll"
+                 class="filterDialogPicklistButton"
+                 src="images/filter_remove_all.png"
+                 title="!Remove All!">
+          </td>
+          <td>
+            <select dojoType="dijit.form.MultiSelect"
+                    class="filterDialogPicklistSelect"
+                    dojoAttachPoint="picklistUsedValues" name="used"
+                    dojoAttachEvent="onDblClick:_picklistRemoveSelected"
+                    size="12"></select>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+    <div dojoAttachPoint="matchContainer" class="filterDialogMatchContainer">
+        <span dojoAttachPoint="matchFieldName">!Field name!</span>
+        <select dojoAttachPoint="matchComparator" dojoAttachEvent="onchange:_matchComparatorChanged"></select>
+        <input type="text" dojoAttachPoint="matchValueInput" size="10"/><!--dojoType="dijit.form.TextBox"-->
+        <!-- Date pattern to match what metadata expects. -->
+        <!-- TODO Change this to locale-specific for presentation layer? -->
+        <input type="text" dojoAttachPoint="matchValueInputDate" dojoType="dijit.form.DateTextBox" constraints="{datePattern:'yyyy-MM-dd'}"/>
+      </table>
+    </div>
+    <div dojoAttachPoint="dateRangeContainer" class="filterDialogDateRangeContainer">
+      <span dojoAttachPoint="dateRangeFieldName">!Field name!</span>
+      <select dojoAttachPoint="dateRangeComparator" dojoAttachEvent="onchange:_dateRangeComparatorChanged"></select>
+      <!-- Date pattern to match what metadata expects. -->
+      <!-- TODO Change this to locale-specific for presentation layer? -->
+      <input type="text" dojoAttachPoint="dateRangeValueInputDate1" dojoType="dijit.form.DateTextBox" constraints="{datePattern:'yyyy-MM-dd'}"/>
+      <span dojoAttachPoint="dateRangeBetweenSeparatorSpan">!and!</span>
+      <input type="text" dojoAttachPoint="dateRangeValueInputDate2" dojoType="dijit.form.DateTextBox" constraints="{datePattern:'yyyy-MM-dd'}"/>
+    </div>
+  </div>
+  <div class="filterDialogParameterContainer">
+    <span dojoAttachPoint="parameterNameLabel"></span><input type="text" dojoAttachPoint="parameterNameInput" dojoType="dijit.form.TextBox"/>
+  </div>
+</div>

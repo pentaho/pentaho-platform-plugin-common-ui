@@ -1,0 +1,33 @@
+.filterDialogHidden {
+  display: none !important;
+}
+
+.filterDialogContainer {
+  width: 480px;
+}
+
+.filterDialogDetailsContainer {
+  height: 250px;
+}
+
+.filterDialogPicklistFindInput {
+  width: 100%;
+}
+
+.filterDialogMatchContainer {
+  height: 50px;
+}
+
+.filterDialogPicklistSelect {
+	height: 180px;
+  width: 100%;
+}
+
+.filterDialogPicklistButton {
+  padding: 5px 0px;
+  cursor: pointer;
+}
+
+.filterDialogParameterContainer {
+	padding-top: 2px;
+}

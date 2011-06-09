@@ -1,0 +1,35 @@
+<div class="dialog-content">
+<table class="pentaho-padding-sm" onkeyup="">
+    <tr>
+        <td colspan="3">
+            <span dojoAttachPoint="modelSelectDialogComment" class="label"></span>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="3">
+            <table style="padding:0px; margin:0px; width:100%">
+                <tr>
+                    <td style="width:100%">
+                        <span dojoAttachPoint="datasourcelistlbl" class="label">Data Sources:</span>
+                    </td>
+                    <td>
+                       <img dojoAttachPoint="editdatasourceimg" src="${_editbtn}" title="Edit the selected datasource" style="cursor:pointer"/>
+                    </td>
+                    <td>
+                        <img dojoAttachPoint="adddatasourceimg" src="${_addbtn}" title="Add a new datasource" style="cursor:pointer"/>
+                    </td>
+                    <td>
+                        <img dojoAttachPoint="deletedatasourceimg" src="${_delbtn}" title="Delete the selected datasource" style="cursor:pointer"/>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="3">
+            <select dojoAttachPoint="modelList" name="model" size="6" style="overflow:auto; width:100%">
+            </select>
+        </td>
+    </tr>
+</table>
+</div>

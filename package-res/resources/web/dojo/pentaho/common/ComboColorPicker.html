@@ -1,0 +1,60 @@
+<div class="pentaho-rounded-panel pentaho-tooltip-background pentaho-padding-sm pentaho-shadow" style="width:234px;">
+    <table style="width:100%;heightx:270px" border="0">
+        <tr>
+            <td style="width:100%;">
+            <td>
+            <td style="width:16px; text-align: right">
+                <div dojoAttachPoint="closeBtn" class="cursorPointer closeIcon" onmouseover="dojo.addClass(this,'closeIconHover')" onmouseout="dojo.removeClass(this,'closeIconHover')"/>
+            <td>
+        </tr>
+    </table>
+    <div class="dialog-content pentaho-padding-sm" style="heightx:400px">
+        <table style="width:100%;heightx:270px" border="0">
+            <tr>
+                <td class="label" dojoAttachPoint="currentLbl" style="width:50%">
+                    Current
+                </td>
+                <td style="heightx:15px; width:50%">
+                    <div class="colorboxOuter" style="width:100%">
+                        <div dojoAttachPoint="currentColor" class="colorbox" stylex="width:100%" style="background-color:none">&nbsp;</div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+        <div dojoAttachPoint="tabset" dojoType="pentaho.common.TabSet" style="width:100%;height:23px;display:block">
+        </div> 
+        <div dojoAttachPoint="colorpickertabs" dojoTypex="dijit.layout.StackContainer" class="tabpanel" isLayoutContainer="true" tabStrip="false" style="padding: 0px; height:230px; width: 222px; display:block">
+            <div dojoAttachPoint="palettetab" dojoTypex="dijit.layout.ContentPane" selected="true" style="heightx: 210px; padding: 0px; overflow:hidden; display:block" class="">
+                <div style="height:218px; width:218px; position: absolute; left: 8px">
+                    <table style="width:100%;height:100%">
+                        <tr style="text-align:center">    
+                            <td>
+                                <div dojoAttachPoint="palette" dojoType="dijit.ColorPalette">
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div dojoAttachPoint="customtab" dojoTypex="dijit.layout.ContentPane" selected="false" style="height: 230px; padding: 0px; overflow:hidden;  display:block" class="hidden">
+                <div style="height:230px; width:180px; padding: 4px 20px; position: absolute; left: 15px">
+                    <div dojoType="pentaho.common.CustomColorPicker" dojoAttachPoint="colorPicker" showPreview="false" showHsv="false" webSafe="false" style="height:220px">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <table border="0" cellpadding="0" cellspacing="0" style="padding:0px">
+            <tr>
+                <td style="padding-top: 4px">
+                    <span class="label" dojoAttachPoint="inUseLbl">In Use</span>
+                </td>
+            </tr>
+            <tr>
+                <td style="vertical-align: top; heightx:20px; padding-left: 7px">
+                    <table dojoAttachPoint="colorTable" class="usedColorTable" cellspacing="2">
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>    
