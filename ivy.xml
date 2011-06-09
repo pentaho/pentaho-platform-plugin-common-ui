@@ -46,6 +46,7 @@
 		<dependency org="pentaho" name="pentaho-connections" rev="${dependency.pentaho-connections.revision}" changing="true" transitive="false" conf="default->default"/>
 		<dependency org="pentaho" name="pentaho-metadata" rev="${dependency.pentaho-metadata.revision}" changing="true" transitive="false" conf="default->default" />
 		<dependency org="pentaho" name="pentaho-bi-platform-plugin-actions" rev="${dependency.pentaho-bi-platform.revision}" changing="true" transitive="false" conf="default->default" />
+        <dependency org="pentaho" name="pentaho-modeler" rev="${dependency.pentaho-modeler.revision}" changing="true" transitive="false"/>
 
 		<!-- Testing dependencies -->
 		<dependency org="commons-collections" name="commons-collections" rev="3.2" transitive="false" conf="test->default" />

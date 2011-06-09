@@ -9,16 +9,16 @@
    <webservice
     id="metadataService"
     type="xml,gwt"
-    class="org.pentaho.platform.dataaccess.metadata.service.MetadataService"/>
+    class="org.pentaho.common.ui.metadata.service.MetadataService"/>
 
     <content-generator scope="session" id="reposvc" type="reposvc">
-        <classname>com.pentaho.jimmylabs.solution.SolutionUrlContentGenerator</classname>
+        <classname>org.pentaho.common.ui.services.SolutionUrlContentGenerator</classname>
         <title>RepositoryService</title>
     </content-generator>
 
   <webservice  
     id="RepositoryClientService" 
     type="xml" 
-    class="com.pentaho.jimmylabs.solution.SolutionRepoService"/>
+    class="org.pentaho.common.ui.services.SolutionRepoService"/>
 
 </plugin>

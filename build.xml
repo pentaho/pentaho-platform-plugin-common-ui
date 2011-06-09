@@ -77,7 +77,7 @@
 		<unzip dest="${dojo.root}" src="${lib.dir}/dojo-${dependency.dojo}-src.zip"/>
 	</target>
 	
-	  <target name="assemble" depends="assemble.init,plugin-create-js-variants,instrument-js,assemble-plugin">
+	  <target name="assemble" depends="jar,assemble.init,assemble.copy-libs,plugin-create-js-variants,instrument-js,assemble-plugin">
 	</target>
 	  	
 	  <target name="package-zip">
@@ -95,7 +95,7 @@
 	      <fileset dir="${package.resdir}" />
 	    </copy>
 
-	    <copy todir="${dojo.prod.stage.dir}">
+	    <copy todir="${dojo.prod.stage.dir}/dojo">
 	      <fileset dir="${stage.dir}/javascript">
     		<include name="dojo.js"/>
     		<include name="dojo.js.uncompressed.js"/>
@@ -165,7 +165,7 @@
 		      <fileset dir="jscoverage/web"/>
 	    </copy>	  	
 
-	    <delete dir="${stage.dir}/javascript"/>
+	    <!-- delete dir="${stage.dir}/javascript"/ -->
 
 	  	<property environment="env"/>
 	    <xmltask source="${approot.stage.dir}/settings.xml" 
@@ -195,7 +195,7 @@
     <copy todir="${biserver-root}/pentaho-solutions/system/pentaho-interactive-reporting/resources/web/testres" file="${dev.res}/runner.html"/>
   </target>
 
-  <target name="plugin-create-js-variants" depends="plugin-copy-pentaho-js-to-dojo-build,plugin-build-dojo">
+  <target name="plugin-create-js-variants" depends="plugin-copy-pentaho-js-to-dojo-build,plugin-build-jslibs">
 	</target>
 	
   <target name="plugin-copy-pentaho-js-to-dojo-build"> 
@@ -210,39 +210,75 @@
     </copy>
   </target>
 	
-  <target name="plugin-build-dojo" description="Does the Dojo build of src and compressed js files">
-	<!-- first do the dojo parts we are using -->
-  	<java classname="org.mozilla.javascript.tools.shell.Main" 
-		dir="${dojo.src}/util/buildscripts"
-		fork="true">
-		<arg value="build.js"/>
-		<arg value="action=release"/>
-        <arg value="offlineProfile=true"/>
-        <arg value="copyTests=false"/>
-        <arg value="profileFile=../../../../../build-res/dojo-ext.profile.js"/>
-         <classpath>
-           <pathelement location="${dojo.src}/util/shrinksafe/js.jar"/>
-           <pathelement location="${dojo.src}/util/shrinksafe/shrinksafe.jar"/>
-         </classpath>
-	</java>
-  	<!-- copy the scripts out -->
-    <delete dir="${stage.dir}/javascript"/>
-  	<mkdir dir="${stage.dir}/javascript" />
-    <copy todir="${stage.dir}/javascript">
-      <fileset dir="${dojo.src.release}/dojo">
-		<include name="dojo.js.uncompressed.js"/>
-		<include name="dojo.js"/>
-		<include name="dojo-ext.js.uncompressed.js"/>
-		<include name="dojo-ext.js"/>
-	  </fileset>
-    </copy>	  	
-    <copy todir="${stage.dir}/javascript/nls">
-      <fileset dir="${dojo.src.release}/dojo/nls"/>
-    </copy>	  	
-    <copy todir="${stage.dir}/javascript/cldr/nls">
-      <fileset dir="${dojo.src.release}/dojo/cldr/nls"/>
-    </copy>	  	
-	<!-- now do the PIR scripts -->
+	<target name="plugin-build-jslibs" depends="plugin-build-jslibs.init,plugin-build-js-dojo,plugin-copy-pentaho-js-to-dojo-build,plugin-build-js-pentaho">
+	  	<!-- now concat the js files together -->
+	    <concat destfile="${stage.dir}/javascript/dojo-all.js" force="no">
+	      <filelist dir="${stage.dir}/javascript"
+	           files="dojo.js,dojo-ext.js"/>
+	    </concat>
+	    <concat destfile="${stage.dir}/javascript/dojo-all.js.uncompressed.js" force="no">
+	      <filelist dir="${stage.dir}/javascript"
+	           files="dojo.js.uncompressed.js,dojo-ext.js.uncompressed.js"/>
+	    </concat>
+	    <concat destfile="${stage.dir}/javascript/pentaho-dojo-all.js" force="no">
+	      <filelist dir="${stage.dir}/javascript"
+	           files="dojo.js,dojo-ext.js,pentaho-common.js"/>
+	    </concat>
+	        <concat destfile="${stage.dir}/javascript/pentaho-dojo-all.js.uncompressed.js" force="no">
+	          <filelist dir="${stage.dir}/javascript"
+	               files="dojo.js.uncompressed.js,dojo-ext.js.uncompressed.js,pentaho-common.js.uncompressed.js"/>
+	        </concat>
+
+	    <copy todir="${stage.dir}/javascript">
+	      <fileset dir="${dojo.src.release}/dojo">
+			<include name="pentaho-common.js.uncompressed.js"/>
+			<include name="pentaho-common.js"/>
+		  </fileset>
+	    </copy>	  	
+
+	  	<!-- now delete the temp files -->
+	    <delete dir="${dojo.src}/pentaho"/>
+	    <delete dir="${dojo.src}/release"/>
+	</target>
+
+	<target name="plugin-build-jslibs.init">
+	    <delete dir="${stage.dir}/javascript"/>
+	  	<mkdir dir="${stage.dir}/javascript" />
+	</target>
+
+	  <target name="plugin-build-js-dojo" description="Does the Dojo build of src and compressed js files">
+	  	<java classname="org.mozilla.javascript.tools.shell.Main" 
+			dir="${dojo.src}/util/buildscripts"
+			fork="true">
+			<arg value="build.js"/>
+			<arg value="action=release"/>
+	        <arg value="offlineProfile=true"/>
+	        <arg value="copyTests=false"/>
+	        <arg value="profileFile=../../../../../build-res/dojo-ext.profile.js"/>
+	         <classpath>
+	           <pathelement location="${dojo.src}/util/shrinksafe/js.jar"/>
+	           <pathelement location="${dojo.src}/util/shrinksafe/shrinksafe.jar"/>
+	         </classpath>
+		</java>
+	  	<!-- copy the scripts out -->
+	    <copy todir="${stage.dir}/javascript">
+	      <fileset dir="${dojo.src.release}/dojo">
+			<include name="dojo.js.uncompressed.js"/>
+			<include name="dojo.js"/>
+			<include name="dojo-ext.js.uncompressed.js"/>
+			<include name="dojo-ext.js"/>
+		  </fileset>
+	    </copy>	  	
+	    <copy todir="${stage.dir}/javascript/nls">
+	      <fileset dir="${dojo.src.release}/dojo/nls"/>
+	    </copy>	  	
+	    <copy todir="${stage.dir}/javascript/cldr/nls">
+	      <fileset dir="${dojo.src.release}/dojo/cldr/nls"/>
+	    </copy>	  	
+	</target>
+	  	
+  <target name="plugin-build-js-pentaho" description="Does the Dojo build of src and compressed js files">
+	<!-- do the pentaho scripts -->
 	<java classname="org.mozilla.javascript.tools.shell.Main" 
 		dir="${dojo.src}/util/buildscripts"
 		fork="true">
@@ -256,38 +292,12 @@
            <pathelement location="${dojo.src}/util/shrinksafe/shrinksafe.jar"/>
          </classpath>
 	</java>
-  	<!-- copy the scripts out -->
-    <copy todir="${stage.dir}/javascript/nls">
-      <fileset dir="${dojo.src.release}/dojo/nls"/>
-    </copy>	  	
-  	<!-- now concat the js files together -->
-    <concat destfile="${stage.dir}/javascript/dojo-all.js" force="no">
-      <filelist dir="${stage.dir}/javascript"
-           files="dojo.js,dojo-ext.js"/>
-    </concat>
-    <concat destfile="${stage.dir}/javascript/dojo-all.js.uncompressed.js" force="no">
-      <filelist dir="${stage.dir}/javascript"
-           files="dojo.js.uncompressed.js,dojo-ext.js.uncompressed.js"/>
-    </concat>
-    <concat destfile="${stage.dir}/javascript/pentaho-dojo-all.js" force="no">
-      <filelist dir="${stage.dir}/javascript"
-           files="dojo.js,dojo-ext.js,pentaho-common.js"/>
-    </concat>
-        <concat destfile="${stage.dir}/javascript/pentaho-dojo-all.js.uncompressed.js" force="no">
-          <filelist dir="${stage.dir}/javascript"
-               files="dojo.js.uncompressed.js,dojo-ext.js.uncompressed.js,pentaho-common.js.uncompressed.js"/>
-        </concat>
-
     <copy todir="${stage.dir}/javascript">
       <fileset dir="${dojo.src.release}/dojo">
 		<include name="pentaho-common.js.uncompressed.js"/>
 		<include name="pentaho-common.js"/>
 	  </fileset>
     </copy>	  	
-
-  	<!-- now delete the temp files -->
-    <delete dir="${dojo.src}/pentaho"/>
-    <delete dir="${dojo.src}/release"/>
   	
     </target>
 	
@@ -300,6 +310,12 @@
 	    <copy todir="${approot.stage.dir}/lib">
 	      <fileset file="${dist.dir}/${ivy.artifact.id}-${project.revision}.jar" />
 	    </copy>
+        <copy todir="${approot.stage.dir}/lib">
+          <fileset file="${lib.dir}/flexjson-*.jar" />
+        </copy>
+        <copy todir="${approot.stage.dir}/lib">
+          <fileset file="${lib.dir}/pentaho-modeler-${dependency.pentaho-modeler.revision}.jar"/>
+        </copy>
 	  </target>
 	
 	  <target name="instrument-js" depends="instrument-js-pre,instrument-js-linux,instrument-js-windows,instrument-js-post">
