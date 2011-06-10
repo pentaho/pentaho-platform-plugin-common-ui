@@ -174,4 +174,10 @@ public class MockPluginManager implements IPluginManager {
     
   }
 
+  @Override
+  public List<String> getRegisteredPlugins() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
 }
