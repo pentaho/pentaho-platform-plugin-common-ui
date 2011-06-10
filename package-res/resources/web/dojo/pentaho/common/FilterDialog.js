@@ -191,7 +191,7 @@ dojo.declare(
 
     var parameterName = this.parameterNameInput.get("value");
     if (parameterName) {
-      parameterName = dojo.trim(parameterName);
+      parameterName = dojo.trim(parameterName).replace(/[^a-zA-Z]/g, "");
       if (parameterName.length > 0) {
         this.currentFilter.parameterName = parameterName;
       } else {
@@ -458,7 +458,7 @@ dojo.declare(
           if (values.length > 0) {
             values += ", ";
           }
-          values += value;
+          values += dojox.html.entities.encode(value);
         }, this);
       }
     }
