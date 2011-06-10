@@ -39,7 +39,7 @@
 	      </not>
 	    </condition>
 	  </fail -->		
-	  <taskdef name="xmltask" classname="com.oopsconsultancy.xmltask.ant.XmlTask" classpath="lib/xmltask-1.15.1.jar"/>
+	  <!-- taskdef name="xmltask" classname="com.oopsconsultancy.xmltask.ant.XmlTask" classpath="lib/xmltask-1.15.1.jar"/ -->
 	
 	<property name="dev.res" value="dev-res"/>
 	
@@ -62,9 +62,13 @@
 	  <target name="dist" depends="jar" description="Creates a distribution" />
 	
 	<!-- sets up the project for development/build, you should only need to run this once -->
-	<target name="setup" depends="create-dev.res, resolve, unzip_dojo">
+	<target name="setup" depends="create-dev.res, resolve, unzip_dojo, install-xmltask">
 	</target>
 
+	  <target name="install-xmltask" depends="install-ivy">
+	    <taskdef-with-ivy organisation="oopsconsultancy" module="xmltask" revision="1.15.1" resource="tasks.properties" classname="com.oopsconsultancy.xmltask.ant.XmlTask"/>
+	  </target>
+		    	
 	<target name="resolve-and-classpath" depends="resolve,create-dot-classpath">
 	</target>
 
