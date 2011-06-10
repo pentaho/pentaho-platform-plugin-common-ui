@@ -23,6 +23,7 @@
 	"dojo.parser",
 	"dojo.cldr",
     "dojox.storage",
+    "dojox.html.entities",
 	"dojox.fx.Shadow",
     "dijit._Widget",
     "dijit._Templated",
