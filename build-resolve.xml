@@ -1,18 +1,19 @@
 <!--===========================================================================
-  This is the build file for the Pentaho Interactive Reporting Project
-  
-  This build file will use the subfloor.xml file as the default build
-  process and should only override the tasks that need to differ from
-  the common build file.
+  This is the build file is used to resolve JAR dependencies.
+  It needs to be in a separate build file because the main build file 
+  (build.xml) has custom tasks that require JAR dependencies to be resolved
+  before the build file can be validated.
   
   See subfloor.xml for more details
 ============================================================================-->
-<project name="Pentaho Commons UI" basedir="." default="dist" 
+<project name="Pentaho Common UI" basedir="." default="dist" 
 	xmlns:ivy="antlib:org.apache.ivy.ant" >
 	
 	<description>
-	  This build file is used to create the Interactive Reporting project
-		and works with the subfloor.xml file.
+		This is the build file is used to resolve JAR dependencies.
+		It needs to be in a separate build file because the main build file 
+		(build.xml) has custom tasks that require JAR dependencies to be resolved
+		before the build file can be validated.
 	</description>
 
 	<!-- Import the common_build.xml file which contains all the default tasks -->	
