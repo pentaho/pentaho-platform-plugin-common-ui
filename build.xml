@@ -165,7 +165,7 @@
 		      <fileset dir="jscoverage/web"/>
 	    </copy>	  	
 
-	    <!-- delete dir="${stage.dir}/javascript"/ -->
+	    <delete dir="${stage.dir}/javascript"/>
 
 	  	<property environment="env"/>
 	    <xmltask source="${approot.stage.dir}/settings.xml" 

@@ -19,7 +19,6 @@
     ],
     dependencies:
     [
-    "pentaho.common.Messages",
     "pentaho.common.state",
     "pentaho.common.button",
     "pentaho.common.Dialog",
