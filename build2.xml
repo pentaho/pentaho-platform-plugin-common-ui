@@ -39,7 +39,7 @@
 	      </not>
 	    </condition>
 	  </fail -->		
-	  <taskdef name="xmltask" classname="com.oopsconsultancy.xmltask.ant.XmlTask" classpath="lib/xmltask-v1.15.1.jar"/>
+	  <taskdef name="xmltask" classname="com.oopsconsultancy.xmltask.ant.XmlTask" classpath="lib/xmltask-1.15.1.jar"/>
 	
 	<property name="dev.res" value="dev-res"/>
 	
