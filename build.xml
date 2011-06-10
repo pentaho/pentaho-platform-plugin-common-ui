@@ -39,7 +39,7 @@
 	      </not>
 	    </condition>
 	  </fail -->		
-	  <!-- taskdef name="xmltask" classname="com.oopsconsultancy.xmltask.ant.XmlTask" classpath="lib/xmltask-v1.15.1.jar"/ -->
+	  <taskdef name="xmltask" classname="com.oopsconsultancy.xmltask.ant.XmlTask" classpath="lib/xmltask-1.15.1.jar"/>
 	
 	<property name="dev.res" value="dev-res"/>
 	
@@ -349,7 +349,7 @@
 
 	<target name="instrument-js-linux" if="isLinux">
 		<!-- instrument the scripts -->
-		<exec dir="." executable="jscoverage/bin/jscoverage" os="Linux">
+		<exec dir="." executable="${dev.res}/jscoverage-bin/jscoverage" os="Linux">
 			<arg line="${package.resdir}/resources/web"/>
 			<arg line="${stage.dir}/javascript/instrumented"/>
 		</exec>
@@ -357,7 +357,7 @@
 
 	<target name="instrument-js-windows" if="isWindows">
 		<!-- instrument the scripts -->
-		<exec dir="." executable="jscoverage/bin/jscoverage.exe" os="Windows">
+		<exec dir="." executable="${dev.res}/jscoverage-bin/jscoverage.exe" os="Windows">
 			<arg line="${package.resdir}/resources/web"/>
 			<arg line="${stage.dir}/javascript/instrumented"/>
 		</exec>
