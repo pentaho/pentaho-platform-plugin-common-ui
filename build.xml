@@ -91,7 +91,7 @@
 	  </target>
 
 	  <!-- override the subfloor assemble target to do special assembly -->
-	  <target name="assemble-plugin">
+	  <target name="assemble-plugin" depends="install-xmltask">
 
 	    <property environment="env"/>
 
