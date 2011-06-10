@@ -349,7 +349,7 @@
 
 	<target name="instrument-js-linux" if="isLinux">
 		<!-- instrument the scripts -->
-		<exec dir="." executable="${dev.res}/jscoverage-bin/jscoverage" os="Linux">
+		<exec dir="." executable="jscoverage/bin/jscoverage" os="Linux">
 			<arg line="${package.resdir}/resources/web"/>
 			<arg line="${stage.dir}/javascript/instrumented"/>
 		</exec>
@@ -357,7 +357,7 @@
 
 	<target name="instrument-js-windows" if="isWindows">
 		<!-- instrument the scripts -->
-		<exec dir="." executable="${dev.res}/jscoverage-bin/jscoverage.exe" os="Windows">
+		<exec dir="." executable="jscoverage/bin/jscoverage.exe" os="Windows">
 			<arg line="${package.resdir}/resources/web"/>
 			<arg line="${stage.dir}/javascript/instrumented"/>
 		</exec>
