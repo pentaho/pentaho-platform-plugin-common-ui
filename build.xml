@@ -157,7 +157,7 @@
 			</fileset>
 		</delete>
 	    <copy todir="${dojo.prod.stage.dir}/util/doh">
-		      <fileset dir="${dev.res}">
+		      <fileset dir="build-res">
 		      	<include name="runner.js"/>
 		      </fileset>
 	    </copy>	  	
