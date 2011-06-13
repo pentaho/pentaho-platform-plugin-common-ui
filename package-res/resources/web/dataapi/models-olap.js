@@ -115,7 +115,7 @@ pentaho.pda.model.olap = function(obj) {
 	this.xmlaDatasource = '';
 	this.catalog = '';
 	this.cubeName = '';
-	
+    this.type = 'xmla';
 }
 
 inheritPrototype(pentaho.pda.model.olap, pentaho.pda.model); //borrow the parent's methods
@@ -134,6 +134,7 @@ pentaho.pda.model.olap.prototype.discoverModelDetail = function( forceLoad ) {
 
         // populate the model with the dimensions
 
+        this.categories = [];
         //try {
             this.discoverDimensions( );
         //} catch ( e ) { alert(e.message) };
@@ -182,7 +183,7 @@ pentaho.pda.model.olap.prototype.discoverDimensions = function ( ){
             rowset.next();
         }
     }
-            
+                        
 pentaho.pda.model.olap.prototype.discoverHierarchies = function(dimension ) {
         var properties = {};
         properties[Xmla.PROP_DATASOURCEINFO] = this.xmlaDatasource;
@@ -210,6 +211,7 @@ pentaho.pda.model.olap.prototype.discoverHierarchies = function(dimension ) {
             hierarchy.parent = dimension;
             dimension.addChild( hierarchy );
             this.addElement( hierarchy );
+            this.categories.push(hierarchy);
             
             this.discoverLevels( dimension, hierarchy );
             
@@ -257,6 +259,7 @@ pentaho.pda.model.olap.prototype.discoverLevels = function( dimension, hierarchy
                 this.discoverMeasures( dimension, hierarchy, level );
                 level.isQueryElement = false;
             } else {
+                level.category = hierarchy;
                 level.isQueryElement = true;
             }
 
@@ -348,6 +351,7 @@ pentaho.pda.model.olap.prototype.discoverMeasures = function( dimension, hierarc
             measure.availableAggregations = new Array(measure.defaultAggregation);
             level.addChild( measure );
             measure.isQueryElement = true;
+            measure.category = hierarchy;
             this.addElement( measure );
 
             rowset.next();
@@ -387,64 +391,7 @@ pentaho.pda.model.olap.prototype.submitQuery = function( query, rowLimit ) {
             return results;
         }
         
-        // find a measure to use
-        // TODO use the default measure if available
-        var measures = query.state.measures;
-        var measureAdded = false;
-        if(measures.length == 0) {
-            var column = this.getColumnsByFieldType([pentaho.pda.Column.ELEMENT_TYPES.FACT])[0]
-            var selection = query.createSelection();
-            selection.column = column;
-            measures = [selection];
-            measureAdded = true;
-        }
-        
-        // create the MDX statement for this
-        var mdx = "select ";
-        var mdxFrag = new Array();
-
-        for(var idx=0; idx<query.state.columnSelections.length; idx++) {
-            mdxFrag.push( this.getSelectionMdx(query.state.columnSelections[idx],query.state.conditions) );
-        }
-        mdxFrag.push( this.getMeasuresMdx(measures) );
-        if( mdxFrag.length == 1 ) {
-            mdx += mdxFrag[0];
-        } else {
-            // we need a crossjoin
-            mdx += 'Crossjoin(';
-            for(var idx=0; idx<mdxFrag.length; idx++) {
-                if(idx > 0) {
-                    mdx += ', ';
-                }
-                mdx += mdxFrag[idx];
-            }
-            mdx += ')';
-            
-        }
-        
-        mdx += " ON COLUMNS, ";
-        
-        var mdxFrag = new Array();
-        for(var idx=0; idx<query.state.rowSelections.length; idx++) {
-            mdxFrag.push( this.getSelectionMdx(query.state.rowSelections[idx],query.state.conditions) );
-        }
-        
-        if( mdxFrag.length == 1 ) {
-            mdx += mdxFrag[0];
-        } else {
-            // we need a crossjoin
-            mdx += 'Crossjoin(';
-            for(var idx=0; idx<mdxFrag.length; idx++) {
-                if(idx > 0) {
-                    mdx += ', ';
-                }
-                mdx += mdxFrag[idx];
-            }
-            mdx += ')';
-            
-        }
-        
-        mdx += " ON ROWS from ["+this.cubeName+"]";
+        var mdx = query.serialize();
 
         query.state.mdx = mdx;
 //alert(mdx);
@@ -465,9 +412,8 @@ pentaho.pda.model.olap.prototype.submitQuery = function( query, rowLimit ) {
             ,   restrictions: restrictions
             });
 
-
             var fields = rowset.getFields();
-            var fieldCount = (measureAdded) ? fields.length-1 : fields.length;
+            var fieldCount = (query.state.measures.length == 0) ? fields.length-1 : fields.length;
 
             for( var idx=0; idx<fieldCount; idx++ ) {
                 var id = this.cleanupFieldName(fields[idx].name);
@@ -494,58 +440,6 @@ pentaho.pda.model.olap.prototype.submitQuery = function( query, rowLimit ) {
             alert(e.message);
         }
         return null;
-    }
-
-pentaho.pda.model.olap.prototype.getMeasuresMdx = function(measures) {
-        var mdx = '';
-        if( measures.length > 1 ) {
-            mdx += '{';
-        }
-        for(var idx=0; idx<measures.length; idx++) {
-            if(idx > 0) {
-                mdx += ', ';
-            } 
-            mdx += measures[idx].column.id;
-        }
-        if( measures.length > 1 ) {
-            mdx += '}';
-        }
-        return mdx;
-    }
-    
-pentaho.pda.model.olap.prototype.getSelectionMdx = function(selection, conditions) {
-
-        // see if we have member selections
-        var doneMembers = false;
-        var needBrace = false;
-        var mdxfrag = '';
-        for(var c=0; c<conditions.length; c++ ) {
-            if(conditions[c].column.id == selection.column.id ) {
-                var values = conditions[c].value;
-                for(var v=0; v<values.length; v++) {
-                    if(doneMembers) {
-                        mdxfrag += ', ';
-                    needBrace = true;
-                    }
-                    mdxfrag += selection.column.id;
-                    mdxfrag += '.[';
-                    mdxfrag += values[v];
-                    mdxfrag += ']';
-                    doneMembers = true;
-                }
-            }
-        }
-        if(!doneMembers) {
-            // do all the members
-            mdxfrag += selection.column.id;
-            mdxfrag += '.Members';
-        }
-        
-        if( needBrace ) {
-           return '{'+mdxfrag+'}';
-        } else {
-            return mdxfrag; 
-        }
     }
 
 pentaho.pda.model.olap.prototype.cleanupFieldName = function(name) {
@@ -692,8 +586,12 @@ pentaho.pda.query.olap = function(model) {
 
 inheritPrototype(pentaho.pda.query.olap, pentaho.pda.query); //borrow the parent's methods
 
+pentaho.pda.query.olap.prototype.canQueryReturnData = function() {
+    return this.state.columnSelections.length > 0 || this.state.rowSelections.length > 0 || this.state.measures.length > 0;
+}
+
 pentaho.pda.query.olap.prototype.prepare = function( ) {
-    this.state.mdx = this.getMdx(this);
+    this.state.mdx = this.serialize(this);
     }
 
 pentaho.pda.query.olap.prototype.getQueryStr = function() {
@@ -759,6 +657,10 @@ pentaho.pda.query.olap.prototype.addSelectionById = function( columnId, location
                 else if( location == pentaho.pda.AXIS_LOCATION_DOWN ) {
                     this.state.rowSelections.push(selection);
                 }
+                else {
+                    // default to the down location to produce de-normalized data sets
+                    this.state.rowSelections.push(selection);
+                }
             }
         
             return column;
@@ -767,7 +669,7 @@ pentaho.pda.query.olap.prototype.addSelectionById = function( columnId, location
     }
 
     // submit a new query
-pentaho.pda.query.olap.prototype.getMdx = function( ) {
+pentaho.pda.query.olap.prototype.serialize = function( ) {
 
         if(this.state.measures.length == 0 && this.state.rowSelections.length == 0 && this.state.columnSelections.length == 0 ) {
             // we can't construct a query for this
@@ -777,13 +679,11 @@ pentaho.pda.query.olap.prototype.getMdx = function( ) {
         // find a measure to use
         // TODO use the default measure if available
         var measures = this.state.measures;
-        var measureAdded = false;
         if(measures.length == 0) {
             var column = this.model.getColumnsByFieldType([pentaho.pda.Column.ELEMENT_TYPES.FACT])[0]
             var selection = this.createSelection();
             selection.column = column;
             measures = [selection];
-            measureAdded = true;
         }
  
         // create the MDX statement for this

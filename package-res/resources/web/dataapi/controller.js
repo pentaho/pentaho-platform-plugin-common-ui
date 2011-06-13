@@ -1,6 +1,8 @@
 //= require "oop.js"
 //= require "app.js"
 
+var pentaho = pentaho || {};
+
 pentaho.pda = pentaho.pda || {};
 
 pentaho.pda.SOURCE_TYPE_OLAP = 'olap';
@@ -10,6 +12,8 @@ pentaho.pda.SOURCE_TYPE_ETL = 'etl';
 pentaho.pda.SOURCE_TYPE_CDA = 'cda';
 
 pentaho.pda.modelaccess = {};
+
+Messages.addBundle('dataapi','messages');
 
 /*
           @class pentaho.app.dataaccess
@@ -190,6 +194,11 @@ pentaho.pda.model = function(obj){
 	this.description = obj.description || '';
     this.elements    = obj.elements || [];
     this.capabilities = obj.capabilities || {};
+    this.categories  = [];
+}
+
+pentaho.pda.model.prototype.getCategories = function() {
+    return this.categories;
 }
 
 pentaho.pda.model.prototype.getNodeText = function( node, tag ) {

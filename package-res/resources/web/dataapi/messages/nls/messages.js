@@ -1,7 +1,7 @@
 {
 
     // messagebundleid is the id of this message bundle - do not localize this
-    messagebundleid : 'DATAACCESS', 
+    messagebundleid : 'dataapi', 
     AGG_TYPES_AVERAGE : 'Average',
     AGG_TYPES_MINIMUM : 'Minimum',
     AGG_TYPES_MAXIMUM : 'Maximum',

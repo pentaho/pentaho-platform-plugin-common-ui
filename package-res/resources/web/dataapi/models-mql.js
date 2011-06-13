@@ -176,6 +176,7 @@ pentaho.pda.model.mql = function(obj, handler) {
     this.modelName = obj.modelName || '';
     this.modelDescription = obj.modelDescription || '';
     this.handler = handler;
+    this.type = 'mql';
 }
 
 inheritPrototype(pentaho.pda.model.mql, pentaho.pda.model); //borrow the parent's methods
@@ -188,6 +189,7 @@ pentaho.pda.model.mql.prototype.discoverModelDetail = function() {
 	var result = pentahoGet( url, query );
 	// parse the XML
 	var xml = parseXML( result );
+        this.categories = [];
     
 	var nodes = xml.getElementsByTagName('return');
 	if( nodes && nodes.length> 0 ) {
@@ -202,6 +204,7 @@ pentaho.pda.model.mql.prototype.discoverModelDetail = function() {
 			category.id = this.getNodeText( catnodes[idx], 'id' );
 			category.name = this.getNodeText( catnodes[idx], 'name' );
 			category.isQueryElement = false;
+                        this.categories.push(category);
 			//console.log(category);
 			this.addElement( category );
 			// get the columns
@@ -220,6 +223,7 @@ pentaho.pda.model.mql.prototype.discoverModelDetail = function() {
 				element.defaultAggregation = this.getNodeText( colnodes[idx2], 'defaultAggType' );
 				element.parent = category;
 				element.isQueryElement = true;
+                                element.category = category;
 				category.addChild(element);
 				
 				var aggnodes = colnodes[idx2].getElementsByTagName('aggTypes');
@@ -235,10 +239,6 @@ pentaho.pda.model.mql.prototype.discoverModelDetail = function() {
 		
 	}
 	// return the number of models loaded
-}
-    
-pentaho.pda.model.mql.prototype.getCategories = function() {
-        return this.categories;
 }
     
 pentaho.pda.model.mql.prototype.getAllColumns = function() {
@@ -313,13 +313,13 @@ pentaho.pda.model.mql.prototype.submitQuery = function( queryObject, rowLimit, c
         }
         return null;
         
-//        alert( query.getXML() );
+//        alert( query.serialize() );
 
     }
     
     // get the results of the query by submiting XML
 pentaho.pda.model.mql.prototype.submitXmlQuery = function( queryObject, rowLimit ) {
-        var xml = queryObject.getXML(); 
+        var xml = queryObject.serialize(); 
 //        alert(json);
         if (!rowLimit) {
             rowLimit = -1;
@@ -342,7 +342,7 @@ pentaho.pda.model.mql.prototype.submitXmlQuery = function( queryObject, rowLimit
         }
         return null;
         
-//        alert( query.getXML() );
+//        alert( query.toString() );
 
     }
 
@@ -550,7 +550,7 @@ pentaho.pda.query.mql = function(model) {
 	pentaho.pda.query.call(this,model); //call parent object
 	
     this.state = {
-        "class" : "org.pentaho.platform.dataaccess.metadata.model.impl.Query",
+        "class" : "org.pentaho.common.ui.metadata.model.impl.Query",
         "domainName" : null,
         "modelId" : null,
         "disableDistinct" : false,
@@ -564,6 +564,10 @@ pentaho.pda.query.mql = function(model) {
 }
 
 inheritPrototype(pentaho.pda.query.mql, pentaho.pda.query); //borrow the parent's methods
+
+pentaho.pda.query.mql.prototype.canQueryReturnData = function() {
+    return this.state.columns.length > 0;
+}
 
 pentaho.pda.query.mql.prototype.setDomainId = function(domainName) {
         this.state.domainName = domainName;
@@ -579,7 +583,7 @@ pentaho.pda.query.mql.prototype.prepare = function( ) {
     
 pentaho.pda.query.mql.prototype.createSelection = function() {
         var selection = {
-            "class":"org.pentaho.platform.dataaccess.metadata.model.impl.Column",
+            "class":"org.pentaho.common.ui.metadata.model.impl.Column",
             "aggTypes":[],
             "category":null,
             "defaultAggType":null,
@@ -594,7 +598,7 @@ pentaho.pda.query.mql.prototype.createSelection = function() {
     
 pentaho.pda.query.mql.prototype.createSort = function() {
         var sort = {
-            "class" : "org.pentaho.platform.dataaccess.metadata.model.impl.Order",
+            "class" : "org.pentaho.common.ui.metadata.model.impl.Order",
             "category" : null,
             "column" : null,
             "orderType" : pentaho.pda.Column.SORT_TYPES.ASCENDING
@@ -604,7 +608,7 @@ pentaho.pda.query.mql.prototype.createSort = function() {
     
 pentaho.pda.query.mql.prototype.createCondition = function() {
         var condition = {
-            "class" : "org.pentaho.platform.dataaccess.metadata.model.impl.Condition",
+            "class" : "org.pentaho.common.ui.metadata.model.impl.Condition",
             "category" : null,
             "column" : null,
             "operator" : null,
@@ -616,7 +620,7 @@ pentaho.pda.query.mql.prototype.createCondition = function() {
     
 pentaho.pda.query.mql.prototype.createParameter = function() {
         var parameter = {
-            "class" : "org.pentaho.platform.dataaccess.metadata.model.impl.Parameter",
+            "class" : "org.pentaho.common.ui.metadata.model.impl.Parameter",
             "column": null,
             "name": null,
             "type" : null,
@@ -712,7 +716,7 @@ pentaho.pda.query.mql.prototype.getQueryStr = function() {
         return this.getJson();
     }
     
-pentaho.pda.query.mql.prototype.getXML = function() {
+pentaho.pda.query.mql.prototype.serialize = function() {
         var xml = '';
         xml += '<mql>\n<domain_type>relational</domain_type>\n';
         xml += '<domain_id>'+this.model.domainId+'</domain_id>\n';
