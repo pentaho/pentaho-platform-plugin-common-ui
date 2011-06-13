@@ -206,3 +206,46 @@ function StateObject() {
 }
 
 var pentahoRepositoryClient = new PentahoRepositoryClient();
+
+var pentaho = pentaho || {};
+
+/*
+This is an API that lets clients get and set user settings
+*/
+pentaho.userSettings = function() {
+}
+
+/*
+  Returns an array of settings objects when passed a comma separated list of setting names
+*/
+pentaho.userSettings.prototype.getSettings = function( names, callback, caller ) {
+
+  dojo.xhrGet({
+    url: CONTEXT_PATH + 'content/ws-run/UserSettingService/getUserSettingsJson',
+    content: {
+        settingNames : names
+    },
+    load: dojo.hitch(caller, function(data) { callback(controller.getJsonFromXml(data)); }),
+    error: function(data) {alert(data)}
+  });
+}
+
+/*
+  Sets a user setting.  
+*/
+pentaho.userSettings.prototype.setSetting = function( name, value, callback, caller ) {
+
+  dojo.xhrGet({
+    url: CONTEXT_PATH + 'content/ws-run/UserSettingService/setUserSettingJson',
+    content: {
+        settingName : name,
+        settingValue : value
+    },
+    load: dojo.hitch(caller, function(data) {
+      callback(controller.getJsonFromXml(data));
+    }),
+    error: function(data) {alert(data)}
+  });
+}
+
+pentaho.userSettingsInstance = new pentaho.userSettings();

@@ -1,15 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<plugin title="Pentaho Commons UI">
+<plugin title="Pentaho Common UI">
    <static-paths>
-     <!-- this translates to /pentaho/content/commons-ui/resources/* -->
-     <static-path url="/commons-ui/resources" localFolder="resources"/>
+     <!-- this translates to /pentaho/content/common-ui/resources/* -->
+     <static-path url="/common-ui/resources" localFolder="resources"/>
    </static-paths>
-
-   <webservice
-    id="metadataService"
-    type="xml,gwt"
-    class="org.pentaho.common.ui.metadata.service.MetadataService"/>
 
     <content-generator scope="session" id="reposvc" type="reposvc">
         <classname>org.pentaho.common.ui.services.SolutionUrlContentGenerator</classname>
@@ -20,5 +15,15 @@
     id="RepositoryClientService" 
     type="xml" 
     class="org.pentaho.common.ui.services.SolutionRepoService"/>
+
+  <webservice  
+    id="UserSettingService" 
+    type="xml" 
+    class="org.pentaho.common.ui.services.UserSettingService"/>
+
+   <webservice
+    id="metadataService"
+    type="xml,gwt"
+    class="org.pentaho.common.ui.metadata.service.MetadataService"/>
 
 </plugin>
