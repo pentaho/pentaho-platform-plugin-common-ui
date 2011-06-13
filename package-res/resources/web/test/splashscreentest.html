@@ -1,0 +1,105 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns:pho="http:/www.pentaho.com">
+<head>
+<title>Splash Screen Test</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+    <link rel="stylesheet" type="text/css" href="../dojo/dijit/themes/pentaho/pentaho.css"/>
+    <link href="../PIR.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="/pentaho-style/style/core/mainStyles.css"/>
+
+    <script type="text/javascript" src="webcontext.js?content=pentaho-interactive-reporting"></script>
+
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
+
+    <script type="text/javascript">
+    //<![CDATA[
+
+      var phoConfig = {
+        theme_resources : { core: ["mainStyles.css", "jquery.jscrollpane.js","jquery.mousewheel.js", "mwheelIntent.js"], local: []}
+      };
+
+      //]]>
+    </script>
+
+
+    <script type="text/javascript">
+
+    function doload() {
+  
+        dojo.parser.parse();
+        dlg = dijit.byId('splashscreen');
+
+//        dlg.setLocalizationLookupFunction(null);
+        dlg.setTitle('Pentaho Interactive Reporting');
+        dlg.setText('Drag and Drop Report Creation<br/>Sort Filter and Group Data<br/>Inline Editing<br/>Custom Report Templates<br/>Export as PDF, Excel or HTML');
+        dlg.setButtonText( 'Get Started' );
+        dlg.callbacks = [splashDone];
+        
+        dlg.show();
+    }
+        
+    window.onload = doload;
+        
+    </script>
+
+    <script language="javascript" src="/pentaho-style/style/ThemeResources.js"></script>
+    
+    <script type="text/javascript">
+// <![CDATA[
+
+    var djConfig = { modulePaths: {
+                        pentaho: "../.."
+                    },
+                   parseOnLoad: true,
+                   baseUrl: '../dojo/dojo/'
+                   };
+                  
+
+// ]]>
+</script>
+
+<script language='javascript' type='text/javascript' src='../dojo/dojo/dojo-all.js.uncompressed.js'></script>
+
+<script type="text/javascript">
+	dojo.require("dojo.parser");
+	dojo.require("dojo.dnd.Container");
+	dojo.require("dojo.dnd.Selector");
+	dojo.require("dojo.dnd.Source");
+	dojo.require("dojo.dnd.Avatar");
+	dojo.require("dojo.dnd.Manager");
+	dojo.require("dojo.dnd.move");
+    dojo.require("dijit.Dialog");
+    dojo.require("dijit.form.Button");
+    dojo.require("dijit.form.TextBox");
+    dojo.require("dijit.form.Select");
+    dojo.require("dijit.form.MultiSelect");
+    dojo.require("dijit.Toolbar");
+    dojo.require("dijit.Editor");
+    dojo.require("dijit.ColorPalette");
+    dojo.require("dijit.layout.TabContainer");
+    dojo.require("dijit.layout.ContentPane");
+    dojo.require("dijit.layout.BorderContainer");
+    dojo.require("pentaho.common.button");
+    dojo.require("pentaho.common.SplashScreen");
+    
+    dlg = null;
+    
+    function splashDone() {
+        dlg.hide();
+        alert('done');
+    }
+
+</script>
+
+</head>
+
+
+<body class="tundra body" onload="doload()">
+
+    <div id="splashscreen" dojoType="pentaho.common.SplashScreen" imagePath="../images/pir_getting_started.png" style="width:520px; display:none;">
+    </div>
+
+</body>
+  
+</html>

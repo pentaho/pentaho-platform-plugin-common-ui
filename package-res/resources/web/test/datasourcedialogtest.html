@@ -1,0 +1,223 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns:pho="http:/www.pentaho.com">
+<head>
+<title>Data Source Dialog Test</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+    <link rel="stylesheet" type="text/css" href="../dojo/dijit/themes/pentaho/pentaho.css"/>
+    <link href="../PIR.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="/pentaho-style/style/core/mainStyles.css"/>
+
+    <script type="text/javascript" src="webcontext.js?content=pentaho-interactive-reporting"></script>
+
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
+
+    <script type="text/javascript">
+    //<![CDATA[
+
+      var phoConfig = {
+        theme_resources : { core: ["mainStyles.css", "jquery.jscrollpane.js","jquery.mousewheel.js", "mwheelIntent.js"], local: []}
+      };
+
+      //]]>
+    </script>
+
+    <script type="text/javascript">
+
+    function doload() {
+    
+        dojo.parser.parse();
+        controller = new pentaho.pir.controller();
+        model = new pentaho.pir.model();
+        // create a test view
+        view = new pentaho.pir.view();
+        // init the view and the controller
+        view.init();
+        model.init();
+        controller.init();
+
+        // test with storage off
+        controller.useStorage = false;
+    
+        dlg = dijit.byId('modelSelectDialog');
+        dlg.setLocalizationLookupFunction(view.getLocaleString);
+        dlg.getModel = getModel;
+        dlg.callbacks = [modelSelected];
+        dlg.datasourceEditCallback = afterDatasourceEdit;
+        dlg.datasourceAddCallback = afterDatasourceAdd;
+        dlg.datasourceDeleteCallback = afterDatasourceDelete;
+        
+        dlg.setModelList(controller.datasourceInfos);
+        
+        dlg.execute = modelSelected;
+        dlg.onCancel = cancelled;
+        dlg.setCanDataSourceAdmin(isAdminUser && window.parent != null && window.parent.pho && window.parent.pho.openDatasourceEditor != null);
+        dlg.show();
+    }
+            
+    window.onload = doload;
+        
+    </script>
+    
+    <script language="javascript" src="/pentaho-style/style/ThemeResources.js"></script>
+    
+    <script type="text/javascript">
+// <![CDATA[
+
+    var djConfig = { modulePaths: {
+                        dataaccess: "../../../../../data-access/resources/web/messages",
+                        pentaho: "../.."
+                    },
+                   parseOnLoad: true,
+                   baseUrl: '../dojo/dojo/'
+                   };
+                  
+
+// ]]>
+</script>
+
+<script language='javascript' type='text/javascript' src='../dojo/dojo/dojo-all.js.uncompressed.js'></script>
+
+        <script language="javascript" src="../../../../data-access/resources/web/pentaho-ajax.js" type="text/javascript"></script>
+        <script language="javascript" src="../../../../data-access/resources/web/pentaho-thin-app.js" type="text/javascript"></script>
+        <script language="javascript" src="../../../../data-access/resources/web/messages/Messages.js" type="text/javascript"></script>
+        <script language="javascript" src="../../../../data-access/resources/web/oop.js" type="text/javascript"></script>
+        <script language="javascript" src="../../../../data-access/resources/web/app.js" type="text/javascript"></script>
+        <script language="javascript" src="../../../../data-access/resources/web/controller.js" type="text/javascript"></script>
+        <script language="javascript" src="../../../../data-access/resources/web/xhr.js" type="text/javascript"></script>
+        <script language="javascript" src="../../../../data-access/resources/web/cda.js" type="text/javascript"></script>
+        <script language="javascript" src="../../../../data-access/resources/web/models-mql.js" type="text/javascript"></script>
+
+<script language='javascript' type='text/javascript' src='../pir/Messages.js'></script>
+<script language='javascript' type='text/javascript' src='../pir/controller.js'></script>
+<script language='javascript' type='text/javascript' src='../pir/model.js'></script>
+<script language='javascript' type='text/javascript' src='test-view.js'></script>
+<script language="javascript" src="../../../../data-access/resources/web/pentaho-thin-app.js" type="text/javascript"></script>
+
+<script type='text/javascript' djConfig='isDebug: true' src='../common/state.js'></script>
+
+  <script language='javascript' src='../../../../data-access/resources/gwt/DatasourceEditor.nocache.js'></script>
+
+<script type="text/javascript">
+	dojo.require("dojo.parser");
+	dojo.require("dojo.dnd.Container");
+	dojo.require("dojo.dnd.Selector");
+	dojo.require("dojo.dnd.Source");
+	dojo.require("dojo.dnd.Avatar");
+	dojo.require("dojo.dnd.Manager");
+	dojo.require("dojo.dnd.move");
+    dojo.require("dijit.Dialog");
+    dojo.require("dijit.form.Button");
+    dojo.require("dijit.form.TextBox");
+    dojo.require("dijit.form.Select");
+    dojo.require("dijit.form.MultiSelect");
+    dojo.require("dijit.Toolbar");
+    dojo.require("dijit.Editor");
+    dojo.require("dijit.ColorPalette");
+    dojo.require("dijit.layout.TabContainer");
+    dojo.require("dijit.layout.ContentPane");
+    dojo.require("dijit.layout.BorderContainer");
+    dojo.require("pentaho.common.button");
+    dojo.require("pentaho.common.datasourceselect");
+    
+    view = {};
+    
+    view.bob = function() {
+        alert('bob');
+    }
+    
+    isAdminUser = false;
+    
+    var model;
+    var controller;
+    var view;
+    
+    dlg = null;
+
+    var strIdx = 0;
+    function localize() {
+        strIdx++;
+        return 'str '+strIdx;
+    }
+    
+    function getModel(id) {
+        for(var idx=0; idx<controller.datasourceInfos.length; idx++) {
+            if(controller.datasourceInfos[idx].domainId+':'+controller.datasourceInfos[idx].modelId  == id) {
+                return controller.datasourceInfos[idx];
+            }
+        }
+        return null;
+    }
+    
+    function cancelled() {
+        alert('cancelled')
+    }
+    
+    function modelSelected() {
+        var model = dlg.getSelectedModel();
+        alert('model selected: '+model.modelId);
+
+    }
+    
+    function afterDatasourceAdd(val, transport) {
+        alert('afterDatasourceAdd');
+        controller.initDatasources();
+        controller.loadModels();
+        // now select the newly added one
+        dlg.setModelList(controller.datasourceInfos);
+        // now select the added one
+        var modelList = dojo.byId('model-list');
+        for(var idx=0;idx<controller.datasourceInfos.length; idx++) {
+            if(controller.datasourceInfos[idx].modelId == transport.modelId  && 
+               controller.datasourceInfos[idx].domainId == transport.domainId) {
+               dlg.setSelectedIndex(idx);
+                break;
+            }
+        }
+    }
+    
+    function afterDatasourceEdit(val, transport) {
+        alert('afterDatasourceEdit');
+        controller.initDatasources();
+        controller.loadModels();
+        dlg.setModelList(controller.datasourceInfos);
+        // now select the edited one
+        for(var idx=0;idx<controller.datasourceInfos.length; idx++) {
+            if(controller.datasourceInfos[idx].modelId == transport.modelId  && 
+               controller.datasourceInfos[idx].domainId == transport.domainId) {
+               dlg.setSelectedIndex(idx);
+                break;
+            }
+        }
+    }
+    
+    function afterDatasourceDelete() {
+        alert('afterDatasourceDelete');
+        controller.initDatasources();
+        controller.loadModels();
+        dlg.setModelList(controller.datasourceInfos);
+    }
+    
+    function initDataAccess(hasAccess) {
+        isAdminUser = hasAccess;
+        if(dlg) {
+            dlg.setCanDataSourceAdmin(isAdminUser && window.parent != null && window.parent.pho && window.parent.pho.openDatasourceEditor != null);
+        }
+    }
+        
+</script>
+
+</head>
+
+
+<body class="tundra body" onload="doload()">
+
+    <div id="modelSelectDialog" title="my title" dialoghint="my hint" dojoType="pentaho.common.datasourceselect" style="width:300px; display:none;">
+    </div>
+
+    <div id="messagebox" dojoType="pentaho.common.MessageBox" style="width:250px; display:none;">
+    </div>
+
+</body>
+  
+</html>
