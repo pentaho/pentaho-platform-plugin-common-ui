@@ -190,14 +190,13 @@ dojo.declare(
                 this._attachTemplateNodes(source);
                 this.source = source;
 //                this.popup = new dijit.Dialog();
-                this.popup = new dijit.Dialog({title: this.title, content: this.source.innerHTML, draggable: false});
+                this.popup = new dijit.Dialog({title: this.title, content: this.source.innerHTML});
                 dojo.addClass(this.popup.domNode,'pentaho-dialog');
                 dojo.removeClass(this.popup.domNode,'hidden');
                 dojo.addClass(dojo.query('.dijitDialogTitleBar',this.popup.domNode)[0],'Caption');
             } else {
                 this.templateBased = true;
-                this.popup = new dijit.Dialog({draggable: false});
-//                this.popup = new dijit.Dialog();
+                this.popup = new dijit.Dialog();
 //                this.popup.attr("content", this.domNode);
             }
             this.inherited(arguments);            
