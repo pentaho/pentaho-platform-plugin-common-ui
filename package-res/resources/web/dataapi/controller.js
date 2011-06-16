@@ -16,7 +16,7 @@ pentaho.pda.modelaccess = {};
 Messages.addBundle('dataapi','messages');
 
 /*
-          @class pentaho.app.dataaccess
+          @class pentaho.pda.app
 */
 pentaho.pda.app = function(){
 	pentaho.app.call(this); //call parent object

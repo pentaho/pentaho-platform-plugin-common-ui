@@ -2,6 +2,22 @@
 
     // messagebundleid is the id of this message bundle - do not localize this
     messagebundleid : 'dataapi', 
+    
+    // these strings are for the data source selection dialog
+    // modelSelectDialogComment_content is the comment in the datasource selection dialog
+    modelSelectDialogComment_content: 'Specify which data source you want to report on. This will determine which fields you will have available.',
+    // modelSelectDialog_title is the title of the datasource selection dialog
+    modelSelectDialog_title: 'Select Data Source',
+    // adddatasourceimg_title is the tooltip for the 'add datasource' button on the datasource selection dialog
+    adddatasourceimg_title: 'Add a new datasource',
+    datasourcelistlbl_content: 'Data Sources:',
+    // editdatasourceimg_title is the tooltip for the 'edit datasource' button on the datasource selection dialog
+    editdatasourceimg_title: 'Edit the selected datasource',
+    // deletedatasourceimg_title is the tooltip for the 'delete datasource' button on the datasource selection dialog
+    deletedatasourceimg_title: 'Delete the selected datasource',
+    DeleteDatasourceWarning: 'All content associated with the data source will no longer work.',
+    
+    Ok_txt: 'OK',    
     AGG_TYPES_AVERAGE : 'Average',
     AGG_TYPES_MINIMUM : 'Minimum',
     AGG_TYPES_MAXIMUM : 'Maximum',

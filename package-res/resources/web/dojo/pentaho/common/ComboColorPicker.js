@@ -133,6 +133,7 @@ dojo.declare(
        postCreate: function() {
             this.inherited(arguments);
             this.colorPicker.animatePoint = false;
+            Messages.addBundle('pentaho.common','messages');
             dojo.connect(this.palette, "onChange", this, '_colorChange' );    
             dojo.connect(this.colorPicker, "onChange", this, '_colorChange' );
             dojo.connect(this.closeBtn, "onclick", this, 'closeRequest' );

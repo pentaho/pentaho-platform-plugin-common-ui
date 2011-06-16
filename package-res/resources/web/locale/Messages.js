@@ -23,6 +23,20 @@ Messages = function()
   Messages.messageBundle.push( dojo.i18n.getLocalization(packageName, fileName) );
 };
 
+/*public static*/Messages.addUrlBundle = function( packageName, url )
+{
+    var xml = pentahoGet( url, '' );
+
+    var pos1 = xml.indexOf('<return>');
+    var pos2 = xml.indexOf('</return>');
+
+    if( pos1 != -1 && pos2 != -1 ) {
+        resultJson = xml.substr( pos1+8, pos2-pos1-8 )
+    }
+    var bundle = eval('('+resultJson+')');
+
+    Messages.messageBundle.push( bundle );    
+};
 
 /*private static*/
 Messages.entityDecoder=document.createElement('textarea');

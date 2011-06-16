@@ -30,6 +30,7 @@ dojo.declare(
 
   postCreate: function() {
     this.inherited(arguments);
+    Messages.addBundle('pentaho.common','messages');
     // Capture all attempts to close the dialog and redirect them
     dojo.connect(this.typePicklistCombinationTypeLinksIncludeLink, "onclick", this, function() {
       this._setPicklistCombinationTypeLink(pentaho.pda.Column.OPERATOR_TYPES.AND);
@@ -47,6 +48,7 @@ dojo.declare(
     this.inherited(arguments);
     this.typePicklistSpan.innerHTML = this.getLocaleString("filterDialogTypePicklistSpan_content");
     this.typeMatchSpan.innerHTML = this.getLocaleString("filterDialogTypeMatchSpan_content");
+    this.typeDateRangeSpan.innerHTML = this.getLocaleString("filterDialogTypeDateRangeSpan_content");
     this.picklistHeadingSpan.innerHTML = this.getLocaleString("filterDialogPicklistHeadingSpan_content");
     this.picklistFindButton.containerNode.innerHTML = this.getLocaleString("filterDialogFindButton_content");
     this.picklistAddSelected.title = this.getLocaleString("filterDialogAddSelected_title");
@@ -59,6 +61,9 @@ dojo.declare(
     this.picklistCombinationTypeIncludeOption.text = this.getLocaleString("filterDialogTypePicklistCombinationTypeIncluded_content");
     this.picklistCombinationTypeExcludeOption.text = this.getLocaleString("filterDialogTypePicklistCombinationTypeExcluded_content");
     this.picklistCombinationTypeSpan.innerHTML = this.getLocaleString("filterDialogTypePicklistCombinationType_label");
+    this.matchFieldName.innerHTML = this.getLocaleString("filterDialogFieldName_content");
+    this.dateRangeFieldName.innerHTML = this.getLocaleString("filterDialogFieldName_content");
+    this.dateRangeBetweenSeparatorSpan.innerHTML = this.getLocaleString("dateRangeBetweenSeparatorSpan_content");
   },
 
   _filterTypeChanged: function(event) {

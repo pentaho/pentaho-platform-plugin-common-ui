@@ -1,7 +1,50 @@
 {
 
     // messagebundleid is the id of this message bundle - do not localize this
-    messagebundleid : 'DATAACCESS', 
+    messagebundleid : 'dataapi', 
+    
+    // these strings are for the data source selection dialog
+    // modelSelectDialogComment_content is the comment in the datasource selection dialog
+    modelSelectDialogComment_content: 'Specify which data source you want to report on. This will determine which fields you will have available.',
+    // modelSelectDialog_title is the title of the datasource selection dialog
+    modelSelectDialog_title: 'Select Data Source',
+    // adddatasourceimg_title is the tooltip for the 'add datasource' button on the datasource selection dialog
+    adddatasourceimg_title: 'Add a new datasource',
+    datasourcelistlbl_content: 'Data Sources:',
+    // editdatasourceimg_title is the tooltip for the 'edit datasource' button on the datasource selection dialog
+    editdatasourceimg_title: 'Edit the selected datasource',
+    // deletedatasourceimg_title is the tooltip for the 'delete datasource' button on the datasource selection dialog
+    deletedatasourceimg_title: 'Delete the selected datasource',
+    DeleteDatasourceWarning: 'All content associated with the data source will no longer work.',
+    
+    // these are for the filter dialog
+    FilterDialogTitle: 'Filter on',
+    filterContextMenu_content: 'Filter...',
+    toolbar1FilterToggle_label: 'Filters',
+    RemoveFilter: 'Remove filter',
+    EditFilter: 'Edit filter',
+    filterPanelTitle_content: 'Filters',
+    filterDialogPicklistHeadingSpan_content: 'Choose values from list:',
+    filterDialogFindButton_content: 'Find',
+    filterDialogAddSelected_title: 'Add Selected',
+    filterDialogRemoveSelected_title: 'Remove Selected',
+    filterDialogAddAll_title: 'Add All',
+    filterDialogRemoveAll_title: 'Remove All',
+    filterDialogTypePicklistSpan_content: 'Select from a list',
+    filterDialogTypeMatchSpan_content: 'Match a specific value',
+    filterDialogTypeDateRangeSpan_content: 'Select a range',
+    FilterCombinationTypeIn: 'Includes',
+    FilterCombinationTypeNotIn: 'Excludes',
+    filterDialogParameterName_content: 'Parameter Name:',
+    filterDialogTypePicklistCombinationTypeLinksIncludeLink_content: 'Includes',
+    filterDialogTypePicklistCombinationTypeLinksExcludeLink_content: 'Excludes',
+    filterDialogTypePicklistCombinationType_label: 'Currently',
+    filterDialogTypePicklistCombinationTypeIncluded_content: 'Included',
+    filterDialogTypePicklistCombinationTypeExcluded_content: 'Excluded',
+    filterDialogPicklistLoadingMessage: 'Loading...',    
+    filterDialogFieldName_content: 'Field name',  
+    dateRangeBetweenSeparatorSpan_content: 'and',
+    
     AGG_TYPES_AVERAGE : 'Average',
     AGG_TYPES_MINIMUM : 'Minimum',
     AGG_TYPES_MAXIMUM : 'Maximum',
