@@ -108,13 +108,14 @@ function pentahoService( component, params, func, mimeType ) {
  *     func.obj is the object to call the method func.method on,
  *     e.g. obj.method()
  * @param mimeType String optional, specifies the mime type of the response
+ * @param allowCaching If not true a unique request string will be generated 
  * 
  * @return String containing the server's response if func is not null or undefined,
  * null if the call is asynchronous.
  * 
  * @throws Error when unable to create an XMLHttpRequest object
  */
-function pentahoGet( url, query, func, mimeType ) {
+function pentahoGet( url, query, func, mimeType, allowCaching ) {
 	var async = undefined != func && null != func;
 
 	// submit a 'get' request
@@ -153,7 +154,12 @@ function pentahoGet( url, query, func, mimeType ) {
 	    http_request.onreadystatechange = function() { pentahoResponse(http_request, func); };
 	  }
 	
-	// submit the request
+	  if (allowCaching !== true) {
+	    var time = new Date().getTime();
+	    query = query + (query.length === 0 ? "" : "&") + time + "=" + time;
+	  }
+
+	  // submit the request
     http_request.open('GET', url+"?"+query, async );
     http_request.send(null);
 	if ( !async )
