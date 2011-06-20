@@ -31,7 +31,7 @@ import org.pentaho.common.ui.metadata.model.ICategory;
 public class Category implements ICategory, Serializable {
 
   private static final long serialVersionUID = -454688567483551796L;
-  private String id, name;
+  private String id, name, description;
   private Column[] columns = new Column[0];
 
   /**
@@ -80,6 +80,14 @@ public class Category implements ICategory, Serializable {
    */
   public void setColumns(Column columns[]) {
     this.columns = columns;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
+  }
+
+  public String getDescription() {
+    return description;
   }
   
   

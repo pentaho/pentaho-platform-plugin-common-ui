@@ -33,7 +33,7 @@ import org.pentaho.common.ui.metadata.model.IColumn;
 public class Column implements IColumn {
 
   private static final long serialVersionUID = 3751750093446278893L;
-  private String id, name;
+  private String id, name, description;
   private String type;
   private List<String> aggTypes = new ArrayList<String>();
   private String defaultAggType;
@@ -131,6 +131,14 @@ public class Column implements IColumn {
   @Override
   public String getSelectedAggType(){
     return this.selectedAggType;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
+  }
+
+  public String getDescription() {
+    return description;
   }
   
   

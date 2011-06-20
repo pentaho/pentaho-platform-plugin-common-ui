@@ -138,6 +138,7 @@ public class MetadataServiceUtil extends PentahoBase {
     Category cat = new Category();
     cat.setName(c.getName(getLocale()));
     cat.setId(c.getId());
+    cat.setDescription(c.getDescription(getLocale()));
     List<Column> columns = new ArrayList<Column>();
     for (LogicalColumn col : c.getLogicalColumns()) {
       columns.add(createColumn(m, col, c));
@@ -157,6 +158,7 @@ public class MetadataServiceUtil extends PentahoBase {
     Column col = new Column();
     col.setName(c.getName(getLocale()));
     col.setId(c.getId());
+    col.setDescription(c.getDescription(getLocale()));
     if( c.getFieldType() != null ) {      
       col.setFieldType(c.getFieldType().name());
     } else {
