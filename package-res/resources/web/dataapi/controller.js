@@ -61,7 +61,6 @@ pentaho.pda.app.prototype.getSources = function(filter, callback) {
 		callback = filter;
 		filter = null;
 	}
-
 	if (this.sources.length > 0) {
 //		console.log('using existing sources');
 		if (filter == null ) {
@@ -74,8 +73,8 @@ pentaho.pda.app.prototype.getSources = function(filter, callback) {
 		} else {
 //			console.log('using filter');
 //			console.log(filter);
-			_soruces = [];
-			for (var i=0,j=this.sources.length;i<j;i++) {
+			_sources = [];
+			for (var i=0;i<this.sources.length;i++) {
 				each = this.sources[i];
 				try {
 					if (each[filter.property] == filter.value) {
@@ -88,7 +87,11 @@ pentaho.pda.app.prototype.getSources = function(filter, callback) {
 					//just move on to next
 				}
 			}
-			this.sources = _sources;
+                    if(_sources.length == 1) {
+                        return _sources[0];
+                    } else {
+                        return _sources;
+                    }
 		}
 		if (this.sources.length == 1) {
 			return this.sources[0];

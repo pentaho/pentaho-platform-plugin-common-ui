@@ -1,0 +1,84 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns:pho="http:/www.pentaho.com">
+    <head>
+        <title>Menu Test</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+        <link rel="stylesheet" type="text/css" href="../dojo/dijit/themes/pentaho/pentaho.css"/>
+
+        <script type="text/javascript" src="webcontext.js?content=common-ui"></script>
+
+        <script type="text/javascript">
+            //<![CDATA[
+
+                var djConfig = { modulePaths: {
+                                'pentaho.common': "../pentaho/common"
+                            },
+                           parseOnLoad: true,
+                           baseUrl: '../dojo/dojo/'
+                           };
+
+              //]]>
+        </script>
+
+        <script language='javascript' type='text/javascript' src='../dojo/dojo/dojo.js.uncompressed.js'></script>
+        <script language='javascript' type='text/javascript' src='../dojo/dojo/dojo-ext.js.uncompressed.js'></script>
+
+        <script type="text/javascript">
+
+            dojo.require("dojo.parser");
+            dojo.require("pentaho.common.MenuItem");
+
+            function doload() {
+          
+            }
+                
+            window.onload = doload;
+        
+        </script>
+
+    </head>
+
+    <body class="tundra body" onload="doload()">
+        
+        <div style="padding: 8px; backgorund-color:white">
+        
+            <h3>UI Widgets - Menu Options</h3>
+            This example shows you how create menu options.
+            <p/>
+
+            <div dojoType="pentaho.common.Menu" id="windowContextMenu" contextMenuForWindow="true" style="display: none;">
+                <div dojoType="pentaho.common.MenuItem" iconClass="dijitEditorIcon dijitEditorIconCut"
+                onClick="alert('not actually cutting anything, just a test!')">
+                    Cut
+                </div>
+                <div dojoType="pentaho.common.MenuItem" iconClass="dijitEditorIcon dijitEditorIconCopy"
+                onClick="alert('not actually copying anything, just a test!')">
+                    Copy
+                </div>
+                <div dojoType="pentaho.common.CheckedMenuItem" onClick="alert('not actually pasting anything, just a test!')">
+                    checkable
+                </div>
+                <div dojoType="dijit.MenuSeparator">
+                </div>
+                <div dojoType="pentaho.common.PopupMenuItem">
+                    <span>
+                        Enabled Submenu
+                    </span>
+                    <div dojoType="pentaho.common.Menu" id="submenu1">
+                        <div dojoType="pentaho.common.MenuItem" onClick="alert('Submenu 1!')">
+                            Submenu Item One
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <span>
+                Click anywhere on the page to see this menu.
+            </span>
+            
+        </div>
+
+    </body>
+  
+</html>

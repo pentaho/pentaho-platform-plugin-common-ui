@@ -3,13 +3,21 @@
     <head>
         <title>Pentaho Common UI Test Pages</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+        <!-- this is important, it provides theming and the base url -->
+        <script type="text/javascript" src="webcontext.js?content=common-ui"></script>
+
+        <link rel="stylesheet" type="text/css" href="../dojo/dijit/themes/pentaho/pentaho.css"/>
     </head>
 
-    <body>
+    <body class="tundra body">
 
-        <div style="padding:20px;background-color:white">
+        <div style="padding:8px;background-color:white">
 
+            These test pages are intented to show web and BI developers how to use the
+            APIs and widgets provided by the Pentaho Common UI plug-in.
             <h1>Data API</h1>
+            These show how to use the Data API and data-source-aware UI widgets
             <p/>
             <a href="model-sample.html">Models Test</a>
             <p/>
@@ -19,10 +27,14 @@
             <p/>
             <a href="datasourcedialogtest.html">Data Source Dialog</a>
             <p/>
+            <a href="fieldlisttest.html">Field List</a>
+            <p/>
             <a href="filterdialogtest.html">Filter Dialog</a>
             <p/>
 
             <h1>UI Widgets</h1>
+            These show how to use the Pentaho Dojo UI widgets
+            <p/>
             <a href="messageboxtest.html">Message Box</a>
             <p/>
             <a href="tabsettest.html">Tab Set</a>
@@ -31,6 +43,11 @@
             <p/>
             <a href="splashscreentest.html">Splash Screen</a>
             <p/>
+
+            <h1>UI Style</h1>
+            These show how to use the Pentaho stylesheets
+            <p/>
+            <a href="style-samples.html">Style Samples</a>
 
         </div>
     </body>

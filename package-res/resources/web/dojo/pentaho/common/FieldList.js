@@ -10,24 +10,58 @@ dojo.declare(
   templateString: '<div dojoAttachPoint="containerNode"></div>',
   datasource: undefined,
   connectHandles: [],
+  enableDragDrop: true,
+  singleSelect: false,
   getLocaleString: undefined,
-  /**
-   * Function to handle disabling the selection of text.
-   */
-  textSelectionDisabler: undefined,
+  filters: [],
+  categorize: true,
+  
   /**
    * Function to call when a field's oncontextmenu event is received
+   * The default implementation is provided here. Call registerFieldContextMenuCallback
+   * to override it.
    */
-  fieldContextMenuCallback: undefined,
+  fieldContextMenuCallback: function fieldContextMenuShow(event) {
+        if( !this.fieldContextMenu ) {
+            return;
+        }
+        dojo.stopEvent(event);
+        var x = event.pageX;
+        var y = event.pageY;
+        this.fieldContextMenu._scheduleOpen(event.target, null, {x: x, y: y});
+    },
+    
   /**
    * Function to handle adding a field. Will receive the fieldId as the only parameter.
    */
-  addFieldCallback: undefined,
+  doubleClickCallback: undefined,
 
   /**
    * The dojo.dnd.Source container for the fields
    */
   dndObj: undefined,
+
+  /**
+   * The dojo.dnd.Selector object used if enableDragDrop is false
+   */
+  selector: undefined,
+
+  /**
+   * Function to handle disabling the selection of text.
+   * The default implementation is provided here. Call registerTextSelectionDisabler
+   * to override it.
+   */
+  textSelectionDisabler: function(target){
+    if (typeof target.onselectstart!="undefined") { //IE route
+        target.onselectstart=function(){return false}
+    } 
+    else if (typeof target.style.MozUserSelect!="undefined") { //Firefox route
+        target.style.MozUserSelect="none"
+    } else { //All other route (ie: Opera)
+        target.onmousedown=function(){return false}
+    }
+    target.style.cursor = "default"
+  },
 
   registerLocalizationLookup: function(f) {
     this.getLocaleString = f;
@@ -42,13 +76,41 @@ dojo.declare(
     this.fieldContextMenuCallback = f;
   },
 
-  registerAddFieldCallback: function(f) {
-    this.addFieldCallback = f;
+  registerDoubleClickCallback: function(f) {
+    this.doubleClickCallback = f;
   },
 
   _localize: function() {
   },
 
+  _addItemClass: function(node, type){
+    // summary:
+    //		adds a class with prefix "dojoDndItem"
+    // node: Node
+    //		a node
+    // type: String
+    //		a variable suffix for a class name
+    dojo.addClass(node, "dojoDndItem" + type);
+    if(type == 'Selected' || type == 'Anchor'){
+        dojo.addClass(node, "pentaho-listitem-selected");
+        dojo.removeClass(node, 'pentaho-listitem-hover');
+    }
+  },
+  
+  _removeItemClass: function(node, type){
+    // summary:
+    //		removes a class with prefix "dojoDndItem"
+    // node: Node
+    //		a node
+    // type: String
+    //		a variable suffix for a class name
+    dojo.removeClass(node, "dojoDndItem" + type);
+    if(type == 'Selected' || type == 'Anchor'){
+        dojo.removeClass(node, "pentaho-listitem-selected");
+        dojo.removeClass(node, 'pentaho-listitem-hover');
+    }
+  },
+    
   unload: function() {
     if (this.dndObj) {
       this.dndObj.destroy();
@@ -63,21 +125,48 @@ dojo.declare(
   configureFor: function(datasource) {
     this.unload();
 
-    var addedCategories = [];
-
-    var categories = this.getSortedCategories(datasource);
-
     this.dndObj = new dojo.dnd.Source(this.containerNode, 
       {
         "copyOnly": true,
         "accept": "",
         "selfAccept": false,
+        "singular": this.singleSelect,
         "creator": dojo.hitch(this, this._dndItemCreator)
       });
-    dojo.addClass(this.containerNode, "container");
+
+    if(!this.enableDragDrop) {
+        this.selector = new dojo.dnd.Selector(this.containerNode, 
+        {
+          "copyOnly": true,
+          "accept": "",
+          "selfAccept": false,
+          "singular": this.singleSelect,
+          "creator": dojo.hitch(this, this._dndItemCreator)
+        });
+        this.selector._addItemClass = this._addItemClass;
+        this.selector._removeItemClass = this._removeItemClass;
+    }
+
+    this.dndObj._addItemClass = this._addItemClass;
+    this.dndObj._removeItemClass = this._removeItemClass;
+    
+    if(!this.categorize) {
+      var fields = this.getSortedFields(datasource, null, this.filters);
+      this.addFields( fields, this.containerNode, '' );
+      return;
+    }
+    
+    var addedCategories = [];
+
+    var categories = this.getSortedCategories(datasource);
 
     dojo.forEach(categories, function(category, idx) {
       if (dojo.indexOf(addedCategories, category.id) != -1) {
+        return;
+      }
+      var fields = this.getSortedFields(datasource, category, this.filters);
+      if(fields.length == 0) {
+        // there are no fields for this category with the current filters
         return;
       }
       addedCategories.push(category.id);
@@ -88,11 +177,10 @@ dojo.declare(
         }, this.containerNode);
 
       // create +- expand/collapse indicator
-      var categoryIndicator = dojo.create("img",
+      var categoryIndicator = dojo.create("div",
         {
           "id": category.id + "-indicator",
-          "src": "images/minus.gif",
-          "class": "categoryIndicator",
+          "class": "categoryIndicator treenode-open",
           "categoryId": category.id
         }, categoryDiv);
       this.connectHandles.push(dojo.connect(categoryIndicator, 'onclick', this, this.expandCollapseCategory));
@@ -101,7 +189,7 @@ dojo.declare(
       var categoryNameSpan = dojo.create("span",
         {
           "id": category.id + "-span",
-          "class": "category",
+          "class": "treenode-branch-label",
           "innerHTML": category.name,
           "categoryId": category.id
         }, categoryDiv);
@@ -114,19 +202,45 @@ dojo.declare(
           "id": category.id + "-fields"
         }, categoryDiv);
 
+      this.addFields( fields, categoryFieldsDiv, category.id );
+
+    }, this);
+  },
+
+  addFields: function( fields, parent, parentId ) {
       var items = [];
-      var fields = this.getSortedFields(datasource, category);
       dojo.forEach(fields, function(field) {
-        items.push(
-          {
-            "categoryId": category.id,
+        var item = {
+            "categoryId": parentId,
             "displayName": field.name,
             "fieldId": field.id,
-            "type": ["field"]
-          });
+            "type": ["treenode-leaf-label"]
+          };
+          items.push(item);
+          this.dndObj.setItem("field-" + item.fieldId, { "data": item, "type": "treenode-leaf-label", "fieldId": item.fieldId });
       }, this);
-      this.dndObj.insertNodes(false, items, false, categoryFieldsDiv);
-    }, this);
+      if(this.enableDragDrop) {
+        this.dndObj.insertNodes(false, items, false, parent);
+      } else {
+        // add the fields without the DnD stuff
+        for(var idx=0; idx<items.length; idx++) {
+            var x = this._dndItemCreator(items[idx],'');
+            parent.appendChild(x.node);
+            this.selector.setItem("field-" + items[idx].fieldId, { "data": items[idx], "type": "treenode-leaf-label", "fieldId": items[idx].fieldId });
+            this.connectHandles.push(dojo.connect(x.node, 'onmousedown', this, this.onMouseDown));
+            this.connectHandles.push(dojo.connect(x.node, 'onmouseup', this, this.onMouseUp));
+        }
+      }
+  },
+
+  onMouseDown: function(e) {
+    this.selector.current = e.target;
+    this.selector.onMouseDown(e);
+  },
+
+  onMouseUp: function(e) {
+    this.selector.current = e.target;
+    this.selector.onMouseUp(e);
   },
 
   _dndItemCreator: function(item, hint) {
@@ -139,19 +253,53 @@ dojo.declare(
         "class": item.categoryId
       });
     if (hint === "avatar") {
-      dojo.addClass(div, "dndAvatar");
+      dojo.addClass(div, "dragDropAvatar");
     } else {
-      dojo.addClass(div, "field");
+      dojo.addClass(div, "treenode-leaf-label");
+      dojo.addClass(div, "pentaho-listitem");
       // Wire up interaction
       this.connectHandles.push(dojo.connect(div, "oncontextmenu", this, function(event) {
         this.updateSelectionForContextMenu(item.fieldId);
-        this.fieldContextMenuCallback(event);
+        if(this.fieldContextMenuCallback) {
+            this.fieldContextMenuCallback(event);
+        }
       }));
       this.connectHandles.push(dojo.connect(div, 'ondblclick', this, function(event) {
-        this.addFieldCallback(item.fieldId);
+        if(this.doubleClickCallback) {
+            this.doubleClickCallback(item.fieldId);
+        }
+      }));
+      this.connectHandles.push(dojo.connect(div, 'onmouseover', this, function(event) {
+        this.onFieldMouseOver(event);
+      }));
+      this.connectHandles.push(dojo.connect(div, 'onmouseout', this, function(event) {
+        this.onFieldMouseOut(event);
       }));
     }
-    return {node: div, data: item, type: ["field"]};
+    return {node: div, data: item, type: ["treenode-leaf-label"]};
+  },
+
+  onFieldMouseOver: function(event) {
+    if(this.selector) {
+        this.selector.onMouseOver(event);
+    }
+    if(!dojo.hasClass(event.target,'pentaho-listitem-selected')) {
+        dojo.addClass(event.target, 'pentaho-listitem-hover');
+        dojo.removeClass(event.target, 'pentaho-listitem');
+    }
+  },
+
+  onFieldMouseOut: function(event) {
+    if(this.selector) {
+        this.selector.onMouseOut(event);
+    }
+    if(!dojo.hasClass(event.target,'pentaho-listitem-selected')) {
+        dojo.addClass(event.target, 'pentaho-listitem');
+        dojo.removeClass(event.target, 'pentaho-listitem-hover');
+    } else {
+        dojo.removeClass(event.target, 'pentaho-listitem-hover');
+        dojo.addClass(event.target, 'pentaho-listitem-selected');
+    }
   },
 
   _elementComparator: function(a, b) {
@@ -175,12 +323,35 @@ dojo.declare(
     return categories;
   },
 
-  getSortedFields: function(datasource, category) {
+  getSortedFields: function(datasource, category, filters) {
     var fields = [];
     var elements = datasource.getAllElements();   
     dojo.forEach(datasource.getAllElements(), function(element) {
-      if (element.isQueryElement && element.parent == category && fields[element] == null) {
-        fields.push(element);
+      if (element.isQueryElement && ( category == null || element.parent == category) && fields[element] == null) {
+      
+        if(filters && filters.length > 0) {
+            // apply the filters
+            var ok = true;
+            for(var filterNo=0; filterNo<filters.length; filterNo++) {
+                var values = filters[filterNo].values;
+                var filterOk = false;
+                for(var valueNo=0; valueNo<values.length; valueNo++) {
+                    if(element[filters[filterNo].type] == values[valueNo]) {
+                        filterOk = true;
+                        break;
+                    }
+                }
+                ok = ok && filterOk;
+                if(!ok) {
+                    break;
+                }
+            }
+            if(ok) {
+                fields.push(element);
+            }
+        } else {
+            fields.push(element);
+        }
       }
     });
     fields.sort(this._elementComparator); 
@@ -193,9 +364,11 @@ dojo.declare(
     var indicatorNode = dojo.byId(categoryId + "-indicator");
     var collapsed = dojo.attr(indicatorNode, "collapsed") != "true";
     if (collapsed) {
-      indicatorNode.src="images/plus.gif";
+      dojo.addClass(indicatorNode,'treenode-closed');
+      dojo.removeClass(indicatorNode,'treenode-open');
     } else {
-      indicatorNode.src="images/minus.gif";
+      dojo.addClass(indicatorNode,'treenode-open');
+      dojo.removeClass(indicatorNode,'treenode-closed');
     }
     dojo.attr(indicatorNode, "collapsed", "" + collapsed);
 
@@ -209,7 +382,7 @@ dojo.declare(
 
   updateFilterIndicators: function(filters) {
     // Remove all filter indicators
-    dojo.query(".field", this.containerNode).removeClass("filteredField");
+    dojo.query(".field", this.containerNode).removeClass("fieldlist-filtered-field");
     // Add filter icons to fields that are filtered
     if (!filters) {
       return;
@@ -217,7 +390,7 @@ dojo.declare(
     // For all active filters add the fieldFiltered class to the field list div for the column that's filtered
     dojo.forEach(filters, function(filter) {
       var fieldDiv = dojo.byId("field-" + filter.column);
-      dojo.addClass(fieldDiv, "filteredField");
+      dojo.addClass(fieldDiv, "fieldlist-filtered-field");
     }, this);
   },
 
@@ -237,12 +410,12 @@ dojo.declare(
     if (!selected) {
       this.clearSelection();
       // Logic borrowed from dojo.dnd.Selector.selectAll
-      this.dndObj._addItemClass(node, "Selected")
+      this.dndObj._addItemClass(node, "pentaho-listitem-selected")
       this.dndObj.selection[id] = 1;
     }
     // Update anchor
     if (this.dndObj.anchor) {
-      this.dndObj._addItemClass(this.dndObj.anchor, "Selected");
+      this.dndObj._addItemClass(this.dndObj.anchor, "pentaho-listitem-selected");
     }
     this.dndObj._removeAnchor();
     this.dndObj._addItemClass(node, "Anchor");
@@ -250,18 +423,49 @@ dojo.declare(
   },
 
   getSelectedItems: function() {
-    if (this.dndObj) {
+    if (this.dndObj && this.enableDragDrop) {
       var items = [];
       this.dndObj.forInSelectedItems(function(item) {
-        items.push(item);
+        items.push(item.data);
       });
+      return items;
+    }
+    if (this.selector && !this.enableDragDrop) {
+      var items = [];
+      this.selector.forInSelectedItems(function(item) {
+        items.push(item.data);
+      }, this);
       return items;
     }
   },
 
   clearSelection: function() {
-    if (this.dndObj) {
+    if (this.dndObj && this.enableDragDrop) {
       this.dndObj.selectNone();
     }
+    if(this.selector) {
+      this.selector.selectNone();
+    }
+  },
+  
+  addFilter: function( filter ) {
+    this.filters.push(filter);
+  },
+  
+  clearFilters: function() {
+    this.filters = [];
+  },
+  
+  setCategorized: function( categorize ) {
+    this.categorize = categorize;
+  },
+  
+  setEnableDragDrop: function( enableDragDrop ) {
+    this.enableDragDrop = enableDragDrop;
+  },
+  
+  setContextMenu: function( fieldContextMenu ) {
+    this.fieldContextMenu = fieldContextMenu;
   }
+  
 });

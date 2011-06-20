@@ -1,5 +1,11 @@
 <div dojoAttachPoint="dialogContainer" class="filterDialogContainer dialog-content pentaho-padding-sm" dojoAttachPoint="containerNode">
   <div dojoAttachPoint="typeContainer" class="filterDialogTypeContainer">
+    <div dojoAttachPoint="fieldPicklistContainer" class="filterDialogHidden">
+      <span class="filterDialogFieldPicklistText"
+            dojoAttachPoint="fieldPicklistSpan">!Field:!</span>
+      <select dojoAttachPoint="picklistFields" dojoAttachEvent="onchange:_fieldChanged">
+      </select>
+    </div>
     <div dojoAttachPoint="typePicklistContainer">
       <input type="radio" value="PICKLIST"
              name="filterType" dojoAttachPoint="typePicklistInput"

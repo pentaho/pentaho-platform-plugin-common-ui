@@ -3,6 +3,9 @@
     // messagebundleid is the id of this message bundle - do not localize this
     messagebundleid : 'dataapi', 
     
+    Ok_txt: 'OK',    
+    Cancel_txt: 'Cancel',    
+
     // these strings are for the data source selection dialog
     // modelSelectDialogComment_content is the comment in the datasource selection dialog
     modelSelectDialogComment_content: 'Specify which data source you want to report on. This will determine which fields you will have available.',
@@ -43,6 +46,7 @@
     filterDialogTypePicklistCombinationTypeExcluded_content: 'Excluded',
     filterDialogPicklistLoadingMessage: 'Loading...',    
     filterDialogFieldName_content: 'Field name',  
+    filterDialogFieldPicklistSpan_content: 'Select field:',
     dateRangeBetweenSeparatorSpan_content: 'and',
     
     AGG_TYPES_AVERAGE : 'Average',

@@ -41,6 +41,9 @@ dojo.declare(
     
     dojo.attr(this.picklistCombinationTypeIncludeOption, "value", pentaho.pda.Column.OPERATOR_TYPES.AND);
     dojo.attr(this.picklistCombinationTypeExcludeOption, "value", pentaho.pda.Column.OPERATOR_TYPES.AND_NOT);
+    
+    this.callbacks = [dojo.hitch(this, this.save), dojo.hitch(this, this.cancel)];
+
   },
 
   _localize: function() {
@@ -64,6 +67,7 @@ dojo.declare(
     this.matchFieldName.innerHTML = this.getLocaleString("filterDialogFieldName_content");
     this.dateRangeFieldName.innerHTML = this.getLocaleString("filterDialogFieldName_content");
     this.dateRangeBetweenSeparatorSpan.innerHTML = this.getLocaleString("dateRangeBetweenSeparatorSpan_content");
+    this.fieldPicklistSpan.innerHTML = this.getLocaleString("filterDialogFieldPicklistSpan_content");
   },
 
   _filterTypeChanged: function(event) {
@@ -115,17 +119,66 @@ dojo.declare(
     this.searchListLimit = limit;
   },
   
+  enableFieldSelection: function(enable) {
+    if(enable) {
+        dojo.removeClass(this.fieldPicklistContainer, "filterDialogHidden");
+        this.configureFilterTypesFor(null);
+        this.setFilterType(null);
+        this.title = this.getLocaleString("FilterDialogTitle");
+    } else {
+        dojo.addClass(this.fieldPicklistContainer, "filterDialogHidden");
+    }
+  },
+  
+  setFieldList: function( fields ) {
+        // populate the field list
+        this.picklistFields.length = 0;
+        this.fieldList = fields;
+        var list = this.picklistFields;
+        var opt = new Option( "" );
+        list.options[0] = opt;
+        for(var idx=0; idx<fields.length; idx++) {
+            opt = new Option( fields[idx].name, fields[idx].id );
+			list.options[list.length] = opt;
+        }
+  },
+  
+  _fieldChanged: function() {
+    var idx = this.picklistFields.selectedIndex;
+    var field = this.fieldList[idx-1];
+    this.configureFilterTypesFor(null);
+    this.setFilterType(null);
+
+    var filter = {
+        "column":field.id,
+        "value":null,
+        "combinationType":pentaho.pda.Column.OPERATOR_TYPES.AND,
+        "operator":pentaho.pda.Column.CONDITION_TYPES.EQUAL
+    }
+    this.title = this.getLocaleString("FilterDialogTitle") + " " + field.name;
+    this.setTitle(this.title);
+    filter.value = [];
+    this.configureFor(filter);
+  },
+  
   configureFilterTypesFor: function(dataType) {
     // Hide options not applicable for this data type
     switch (dataType) {
+      case null:
+        dojo.addClass(this.typePicklistContainer, "filterDialogHidden");
+        dojo.addClass(this.typeMatchContainer, "filterDialogHidden");
+        dojo.addClass(this.typeDateRangeContainer, "filterDialogHidden");
+        break;
       case pentaho.pda.Column.DATA_TYPES.UNKNOWN:
       case pentaho.pda.Column.DATA_TYPES.STRING:
         dojo.removeClass(this.typePicklistContainer, "filterDialogHidden");
+        dojo.removeClass(this.typeMatchContainer, "filterDialogHidden");
         dojo.addClass(this.typeDateRangeContainer, "filterDialogHidden");
         break;
       case pentaho.pda.Column.DATA_TYPES.NUMERIC:
       case pentaho.pda.Column.DATA_TYPES.DATE:
         dojo.addClass(this.typePicklistContainer, "filterDialogHidden");
+        dojo.removeClass(this.typeMatchContainer, "filterDialogHidden");
         dojo.addClass(this.typeDateRangeContainer, "filterDialogHidden");
         break;
       case pentaho.pda.Column.DATA_TYPES.BOOLEAN:
@@ -140,6 +193,11 @@ dojo.declare(
 
   setFilterType: function(type) {
     switch (type) {
+      case null:
+        dojo.addClass(this.picklistContainer, "filterDialogHidden");
+        dojo.addClass(this.matchContainer, "filterDialogHidden");
+        dojo.addClass(this.dateRangeContainer, "filterDialogHidden");
+        break;
       case "PICKLIST":
         dojo.attr(this.typePicklistInput, "checked", true);
         dojo.removeClass(this.picklistContainer, "filterDialogHidden");

@@ -52,6 +52,14 @@ dojo.declare(
             }
         },
 
+        show: function() {
+            dojo.removeClass(this.topframe, 'hidden');            
+        },
+
+        hide: function() {
+            dojo.addClass(this.topframe, 'hidden');            
+        },
+
         templatePath: new dojo.moduleUrl('pentaho.common', 'ComboColorPicker.html'),
         
         usedColors: [],

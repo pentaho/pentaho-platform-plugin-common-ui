@@ -1,4 +1,4 @@
-<div class="pentaho-rounded-panel pentaho-tooltip-background pentaho-padding-sm pentaho-shadow" style="width:234px;">
+<div dojoAttachPoint="topframe" class="pentaho-rounded-panel pentaho-tooltip-background pentaho-padding-sm pentaho-shadow" style="width:234px;">
     <table style="width:100%;heightx:270px" border="0">
         <tr>
             <td style="width:100%;">
@@ -23,12 +23,12 @@
         </table>
         <div dojoAttachPoint="tabset" dojoType="pentaho.common.TabSet" style="width:100%;height:23px;display:block">
         </div> 
-        <div dojoAttachPoint="colorpickertabs" dojoTypex="dijit.layout.StackContainer" class="tabpanel" isLayoutContainer="true" tabStrip="true" style="padding: 0px; height:230px; width: 222px; display:block">
+        <div dojoAttachPoint="colorpickertabs" dojoTypex="dijit.layout.StackContainer" class="tabpanel" isLayoutContainer="true" tabStrip="true" style="padding: 0px; height:230px; width: 222px; display:block; border: 1px solid #444444">
             <div dojoAttachPoint="palettetab" dojoTypex="dijit.layout.ContentPane" selected="true" style="heightx: 210px; padding: 0px; overflow:hidden;" class="">
-                <div style="height:218px; width:218px; position: absolute; left: 8px">
+                <div style="height:218px; width:218px;">
                     <table style="width:100%;height:100%">
-                        <tr style="text-align:center">    
-                            <td>
+                        <tr>    
+                            <td style="text-align:center">
                                 <div dojoAttachPoint="palette" dojoType="dijit.ColorPalette">
                                 </div>
                             </td>
@@ -50,7 +50,7 @@
                 </td>
             </tr>
             <tr>
-                <td style="vertical-align: top; heightx:20px; padding-left: 7px">
+                <td style="vertical-align: top; heightx:20px; padding-left: 2px">
                     <table dojoAttachPoint="colorTable" class="usedColorTable" cellspacing="2">
                     </table>
                 </td>

@@ -116,10 +116,15 @@ dojo.declare(
                 }
            },
             
+            setTitle: function( title ) {
+                this.title = title;
+               this.popup.set('title',this.title);
+            },
+            
            show: function(){
                this.domNode.style.display='';
                this.popup.set('title',this.title);
-                        dojo.style(this.popup.domNode, 'display', 'none');
+                dojo.style(this.popup.domNode, 'display', 'none');
                 if(this.templateBased) {
                     if(!this.shown) {
                         this.width = ''+dojo.style(this.domNode,'width')+'px';
