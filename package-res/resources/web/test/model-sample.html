@@ -139,6 +139,8 @@ function loadModel() {
         cell = row.insertCell(-1);
         cell.innerHTML = elements[idx].name;
         cell = row.insertCell(-1);
+        cell.innerHTML = elements[idx].description;
+        cell = row.insertCell(-1);
         cell.innerHTML = elements[idx].elementType;
         cell = row.insertCell(-1);
         cell.innerHTML = elements[idx].dataType;
@@ -250,6 +252,7 @@ function loadModel() {
                     <tr>
                         <th style="border:1px solid #808080;background-color:#cccccc">Id</th>
                         <th style="border:1px solid #808080;background-color:#cccccc">Name</th>
+                        <th style="border:1px solid #808080;background-color:#cccccc">Description</th>
                         <th style="border:1px solid #808080;background-color:#cccccc">Field Type</th>
                         <th style="border:1px solid #808080;background-color:#cccccc">Data Type</th>
                         <th style="border:1px solid #808080;background-color:#cccccc">Query Element?</th>

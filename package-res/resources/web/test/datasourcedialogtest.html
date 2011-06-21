@@ -62,7 +62,7 @@
                 dlg = dijit.byId('modelSelectDialog');
                 dlg.setLocalizationLookupFunction(Messages.getString);
                 dlg.getModel = getModel;
-                dlg.callbacks = [modelSelected];
+                dlg.callbacks = [modelSelected,cancelClick];
                 dlg.datasourceEditCallback = afterDatasourceEdit;
                 dlg.datasourceAddCallback = afterDatasourceAdd;
                 dlg.datasourceDeleteCallback = afterDatasourceDelete;
@@ -75,6 +75,10 @@
                 dlg.show();
             }
                     
+            function cancelClick() {
+                dlg.hide();
+            }
+            
             window.onload = doload;
                 
             </script>
