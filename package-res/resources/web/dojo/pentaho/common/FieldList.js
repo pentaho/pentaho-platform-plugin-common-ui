@@ -214,7 +214,8 @@ dojo.declare(
             "categoryId": parentId,
             "displayName": field.name,
             "fieldId": field.id,
-            "type": ["treenode-leaf-label"]
+            "type": ["treenode-leaf-label"],
+            "description": field.description
           };
           items.push(item);
           this.dndObj.setItem("field-" + item.fieldId, { "data": item, "type": "treenode-leaf-label", "fieldId": item.fieldId });
@@ -244,14 +245,16 @@ dojo.declare(
   },
 
   _dndItemCreator: function(item, hint) {
-    var div = dojo.create("div",
-      {
+    var props = {
         "id": "field-" + item.fieldId,
         "innerHTML": item.displayName,
         "fieldId": item.fieldId,
-        "title": item.fieldId,
         "class": item.categoryId
-      });
+    };
+    if(item.description) {
+        props.title = item.description;
+    }
+    var div = dojo.create("div", props);
     if (hint === "avatar") {
       dojo.addClass(div, "dragDropAvatar");
     } else {

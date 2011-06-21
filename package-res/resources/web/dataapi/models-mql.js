@@ -203,6 +203,7 @@ pentaho.pda.model.mql.prototype.discoverModelDetail = function() {
 			category.elementType = pentaho.pda.Column.ELEMENT_TYPES.CATEGORY;
 			category.id = this.getNodeText( catnodes[idx], 'id' );
 			category.name = this.getNodeText( catnodes[idx], 'name' );
+            category.description = this.getNodeText( catnodes[idx], 'description' );
 			category.isQueryElement = false;
                         this.categories.push(category);
 			//console.log(category);
@@ -215,6 +216,7 @@ pentaho.pda.model.mql.prototype.discoverModelDetail = function() {
 				
 				element.id = this.getNodeText( colnodes[idx2], 'id' );
 				element.name = this.getNodeText( colnodes[idx2], 'name' );
+                element.description = this.getNodeText( colnodes[idx2], 'description' );
 				element.elementType = this.getNodeText( colnodes[idx2], 'fieldType' );
 				element.dataType = this.getNodeText( colnodes[idx2], 'type' );
 				element.horizontalAlignment = this.getNodeText( colnodes[idx2], 'horizontalAlignment' );

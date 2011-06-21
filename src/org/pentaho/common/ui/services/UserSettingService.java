@@ -27,6 +27,8 @@ public class UserSettingService extends PentahoBase {
    */
   private static final long serialVersionUID = 1372909204550846766L;
 
+  public static final String THEME_KEY = "common-ui-user-theme"; //$NON-NLS-1$
+  
   /**
    * Sets a user setting and returns a status message.
    * @param settingName
