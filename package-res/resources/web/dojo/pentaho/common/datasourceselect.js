@@ -17,7 +17,7 @@ dojo.declare(
         datasourceWizardIncluded: false,
         datasourceEditorPath: '',
         models: null,
-        buttons: ['Ok_txt'],
+        buttons: ['Ok_txt','Cancel_txt'],
         
         /* dynamic injection of the wizard does not work currently
         includeDatasourceWizard: function() {
