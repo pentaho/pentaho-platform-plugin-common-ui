@@ -895,11 +895,13 @@ public class MetadataServiceTest  extends BaseTest {
     assertEquals("wrong number of business columns",9,category.getColumns().length);
     assertEquals("category id is wrong","BC_OFFICES_",category.getId());
     assertEquals("category name is wrong","Offices",category.getName());
+    assertEquals("category description is wrong",null,category.getDescription());
 
     IColumn column = category.getColumns()[0];
     assertEquals("column default agg type is wrong","NONE",column.getDefaultAggType().toString());
     assertEquals("column id is wrong","BC_OFFICES_TERRITORY",column.getId());
     assertEquals("column name is wrong","Territory",column.getName());
+    assertEquals("column description is wrong",null,column.getDescription());
     assertEquals("column selected agg type is wrong","NONE",column.getSelectedAggType().toString());
     assertEquals("column type is wrong","STRING",column.getType().toString());
     assertEquals("field type is wrong","DIMENSION",column.getFieldType().toString());
