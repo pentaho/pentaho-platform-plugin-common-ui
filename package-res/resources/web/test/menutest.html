@@ -35,6 +35,13 @@
                 
             window.onload = doload;
         
+            function toggleCheck() {
+                var menuItem = dijit.byId('checkoption');
+                var checked = menuItem.get('checked');
+                alert('Check Option state is now: '+checked);
+                // toggle the check mark
+//                menuItem.set('checked', true);
+            }
         </script>
 
     </head>
@@ -48,24 +55,35 @@
             <p/>
 
             <div dojoType="pentaho.common.Menu" id="windowContextMenu" contextMenuForWindow="true" style="display: none;">
-                <div dojoType="pentaho.common.MenuItem" iconClass="dijitEditorIcon dijitEditorIconCut"
-                onClick="alert('not actually cutting anything, just a test!')">
-                    Cut
+                <div dojoType="pentaho.common.MenuItem" onClick="alert('Option was clicked')">
+                    Enabled Option
                 </div>
-                <div dojoType="pentaho.common.MenuItem" iconClass="dijitEditorIcon dijitEditorIconCopy"
-                onClick="alert('not actually copying anything, just a test!')">
-                    Copy
+                <div dojoType="pentaho.common.MenuItem" onClick="alert('This is disabled')" disabled="true">
+                    Disabled Option
                 </div>
-                <div dojoType="pentaho.common.CheckedMenuItem" onClick="alert('not actually pasting anything, just a test!')">
-                    checkable
+                <div id="checkoption" dojoType="pentaho.common.CheckedMenuItem" onClick="toggleCheck()">
+                    Enabled Check Option
                 </div>
-                <div dojoType="dijit.MenuSeparator">
+                <div id="checkoption2" dojoType="pentaho.common.CheckedMenuItem" onClick="toggleCheck()" checked="true" disabled="true">
+                    Disabled Check Option
+                </div>
+                <div dojoType="pentaho.common.MenuSeparator">
                 </div>
                 <div dojoType="pentaho.common.PopupMenuItem">
                     <span>
                         Enabled Submenu
                     </span>
                     <div dojoType="pentaho.common.Menu" id="submenu1">
+                        <div dojoType="pentaho.common.MenuItem" onClick="alert('Submenu option was clicked')">
+                            Submenu Item One
+                        </div>
+                    </div>
+                </div>
+                <div dojoType="pentaho.common.PopupMenuItem" disabled="true">
+                    <span>
+                        Disabled Submenu
+                    </span>
+                    <div dojoType="pentaho.common.Menu" id="submenu2">
                         <div dojoType="pentaho.common.MenuItem" onClick="alert('Submenu 1!')">
                             Submenu Item One
                         </div>
