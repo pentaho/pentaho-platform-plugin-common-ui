@@ -67,11 +67,13 @@ dojo.declare("pentaho.common.CheckedMenuItem",
 			//		Hook so attr('checked', bool) works.
 			//		Sets the class and state for the check box.
             if(checked) {
-                dojo.addClass(this.iconNode, "pentaho-checkmenuitem-checked"); 
+                dojo.toggleClass(this.iconNode, "menuitem-checked", checked); 
+/*
                 dojo.removeClass(this.iconNode, "pentaho-checkmenuitem"); 
             } else {
                 dojo.removeClass(this.iconNode, "pentaho-checkmenuitem-checked"); 
                 dojo.addClass(this.iconNode, "pentaho-checkmenuitem"); 
+*/
             }
 			dijit.setWaiState(this.domNode, "checked", checked);
 			this._set("checked", checked);

@@ -13,13 +13,16 @@
                         <span dojoAttachPoint="datasourcelistlbl" class="label">Data Sources:</span>
                     </td>
                     <td>
-                       <img dojoAttachPoint="editdatasourceimg" src="${_editbtn}" title="Edit the selected datasource" style="cursor:pointer"/>
+                        <div dojoAttachPoint="editdatasourceimg" dojoType="pentaho.common.SmallImageButton" title="Edit the selected datasource" baseClass="pentaho-editbutton">
+                        </div>
                     </td>
                     <td>
-                        <img dojoAttachPoint="adddatasourceimg" src="${_addbtn}" title="Add a new datasource" style="cursor:pointer"/>
+                        <div dojoAttachPoint="adddatasourceimg" dojoType="pentaho.common.SmallImageButton" title="Add a datasource" baseClass="pentaho-addbutton">
+                        </div>
                     </td>
                     <td>
-                        <img dojoAttachPoint="deletedatasourceimg" src="${_delbtn}" title="Delete the selected datasource" style="cursor:pointer"/>
+                        <div dojoAttachPoint="deletedatasourceimg" dojoType="pentaho.common.SmallImageButton" title="Delete the selected datasource" baseClass="pentaho-deletebutton">
+                        </div>
                     </td>
                 </tr>
             </table>

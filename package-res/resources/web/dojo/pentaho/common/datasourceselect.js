@@ -2,6 +2,7 @@ dojo.provide('pentaho.common.datasourceselect');
 dojo.require('dijit._Widget');
 dojo.require('dijit._Templated');
 dojo.require('pentaho.common.button');
+dojo.require('pentaho.common.SmallImageButton');
 dojo.require('pentaho.common.Dialog');
 dojo.require('pentaho.common.MessageBox');
 dojo.declare(
@@ -88,18 +89,18 @@ dojo.declare(
         enableIconButton: function(button, enabled, func) {
             var e = button;
             var src = e.src;
-            if(this.canDataSourceAdmin && enabled && src.indexOf('_disabled.png') == src.length-'_disabled.png'.length) {
-                e.src = src.substr(0,src.length-'_disabled.png'.length) + '.png';
+            if(this.canDataSourceAdmin && enabled) {
+                button.set('disabled', false);
                 dojo.connect(e, "onClick", this, function () {});
             }
-            else if(!enabled && src.indexOf('_disabled.png') == -1) {
-                e.src = src.substr(0,src.length-'.png'.length) + '_disabled.png';
+            else if(!enabled) {
+                button.set('disabled', true);
                 dojo.connect(e, "onClick", this, func);
             }
         },
 
       _localize: function() {
-               this.inherited(arguments);
+        this.inherited(arguments);
         this.set("title",this.getLocaleString("modelSelectDialog_title"));
         this.modelSelectDialogComment.innerHTML = this.getLocaleString("modelSelectDialogComment_content");
         this.datasourcelistlbl.innerHTML =  this.getLocaleString("datasourcelistlbl_content");
@@ -107,12 +108,6 @@ dojo.declare(
         this.adddatasourceimg.title =  this.getLocaleString("adddatasourceimg_title")
         this.deletedatasourceimg.title =  this.getLocaleString("deletedatasourceimg_title");
       },
-        _editbtn: dojo.moduleUrl("pentaho.common","images/edit.png"),
-        _editdisbtn: dojo.moduleUrl("pentaho.common","images/edit_disabled.png"),
-        _addbtn: dojo.moduleUrl("pentaho.common","images/add.png"),
-        _adddisbtn: dojo.moduleUrl("pentaho.common","images/add_disabled.png"),
-        _delbtn: dojo.moduleUrl("pentaho.common","images/Remove.png"),
-        _deldisbtn: dojo.moduleUrl("pentaho.common","images/Remove_disabled.png"),
 
         templatePath: new dojo.moduleUrl('pentaho.common', 'datasourceselect.html'),
 
