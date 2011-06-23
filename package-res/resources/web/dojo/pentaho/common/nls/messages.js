@@ -7,6 +7,7 @@
 
     // these are general strings
     Ok_txt: 'OK',    
-    Cancel_txt: 'Cancel'
+    Cancel_txt: 'Cancel',
+    CloseIcon_title: 'Close'
 
 }

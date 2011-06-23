@@ -2,6 +2,8 @@ dojo.provide('pentaho.common.Dialog');
 dojo.require('dijit._Widget');
 dojo.require('dijit._Templated');
 dojo.require('pentaho.common.button');
+dojo.require('pentaho.common.SmallImageButton');
+dojo.require('pentaho.common.Messages');
 dojo.declare(
      'pentaho.common.Dialog',
      [dijit._Widget, dijit._Templated],
@@ -9,12 +11,15 @@ dojo.declare(
         popup : null,
         title: "",
         widgetsInTemplate: true,
-        getLocaleString: null,
+        getLocaleString: Messages.getString,
         callbacks: [],
         shown: false,
         buttonsCreated: false,
         hasTitleBar: true,
         hasBorder: true,
+        hasCloseIcon: false,
+        closeIcon: undefined,
+        _onCancelCallback: undefined,
         
         setLocalizationLookupFunction: function(f) {
             this.getLocaleString = f;
@@ -39,6 +44,9 @@ dojo.declare(
                     if(button) {
                         button.innerHTML = this.getLocaleString();
                     }
+                }
+                if (this.hasCloseIcon) {
+                  dojo.attr(this.closeIcon.domNode, "title", this.getLocaleString('CloseIcon_title'));
                 }
             }
         },
@@ -87,6 +95,13 @@ dojo.declare(
                 if(this.hasBorder) {
                     dojo.addClass(this.popup.domNode,'pentaho-dialog');
                 }
+                if(this.hasCloseIcon) {
+                  this.closeIcon = new pentaho.common.SmallImageButton({"baseClass": "pentaho-closebutton"});
+                  dojo.addClass(this.closeIcon.domNode, "pentahoDialogCloseIcon");
+                  dojo.place(this.closeIcon.domNode,
+                    dojo.query('.dijitDialogTitleBar',this.popup.domNode)[0]);
+                  this.closeIcon.callback = dojo.hitch(this, this.onCancel);
+                }
                 
                 dojo.addClass(dojo.query('.dijitDialogTitleBar',this.popup.domNode)[0],'Caption');
                 dojo.connect(this.domNode,'onKeyPress', this, this.keyUp);
@@ -100,6 +115,7 @@ dojo.declare(
                 
                 this.popup.onCancel = dojo.hitch(this, function(){});
                 this.popup.onExecute = dojo.hitch(this, this.okClick);
+                this._localize();
            },
            
            keyup: function(event) {
@@ -205,6 +221,23 @@ dojo.declare(
 //                this.popup.attr("content", this.domNode);
             }
             this.inherited(arguments);            
-		}
+		},
+    
+    registerOnCancelCallback: function(f) {
+      this._onCancelCallback = f;
+    },
+    
+    /*
+     * Called when the close icon is clicked.
+     */
+    onCancel: function() {
+      if (this._onCancelCallback) {
+        try {
+          this._onCancelCallback();
+        } catch (e) {
+          console.warn("error in onCancelCallback: " + e);
+        }
+      }
+      this.hide();
     }
-);
+});

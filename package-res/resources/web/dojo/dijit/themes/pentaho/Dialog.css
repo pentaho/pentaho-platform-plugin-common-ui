@@ -15,6 +15,13 @@
  .dijitDialogCloseIcon {
     display: none;
 }
+
+.pentahoDialogCloseIcon {
+    position: absolute;
+    right: 14px;
+    top: 14px;
+}
+
 .dj_ie6  .dijitDialogCloseIcon {
     display: none;
 

@@ -12,6 +12,7 @@ dojo.declare(
   widgetsInTemplate: true,
   filterType: "PICKLIST",
   currentFilter: null,
+  hasCloseIcon: true,
   // Function for retrieving localized strings
 
   buttons: ['Ok_txt','Cancel_txt'],
@@ -43,7 +44,10 @@ dojo.declare(
     dojo.attr(this.picklistCombinationTypeExcludeOption, "value", pentaho.pda.Column.OPERATOR_TYPES.AND_NOT);
     
     this.callbacks = [dojo.hitch(this, this.save), dojo.hitch(this, this.cancel)];
-
+  },
+  
+  onCancel: function() {
+    this.cancel();
   },
 
   _localize: function() {
