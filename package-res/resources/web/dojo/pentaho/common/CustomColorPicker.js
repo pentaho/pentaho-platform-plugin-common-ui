@@ -67,7 +67,7 @@ dojo.require("dojo.i18n");
 					top: newTop + "px"
 				});
 				this._updateColor(false);
-            }
+			}
 		},
         
         /* we are overriding this because the Dojo 1.6 code does not work in Safari */
@@ -88,7 +88,7 @@ dojo.require("dojo.i18n");
 				d.style(this.hueCursorNode, "top", ypos + "px");
 				this._updateColor(false);
 			}
-		},        
+		}     
 
 	});
 })(dojo);

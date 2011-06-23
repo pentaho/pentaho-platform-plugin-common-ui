@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<themes root-folder="resources/samplestyles">
+  <sample1 system="true">
+    <file>style1.css</file>
+  </sample1>
+  <sample2 system="true">
+    <file>style2.css</file>
+  </sample2>
+</themes>

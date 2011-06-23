@@ -258,6 +258,7 @@ dojo.declare(
     if (hint === "avatar") {
       dojo.addClass(div, "dragDropAvatar");
     } else {
+      dojo.addClass(div, "field");
       dojo.addClass(div, "treenode-leaf-label");
       dojo.addClass(div, "pentaho-listitem");
       // Wire up interaction
@@ -385,7 +386,7 @@ dojo.declare(
 
   updateFilterIndicators: function(filters) {
     // Remove all filter indicators
-    dojo.query(".field", this.containerNode).removeClass("fieldlist-filtered-field");
+    dojo.query(".treenode-leaf-label", this.containerNode).removeClass("fieldlist-filtered-field");
     // Add filter icons to fields that are filtered
     if (!filters) {
       return;

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<plugin title="Pentaho Common UI">
+<plugin title="common-ui">
    <static-paths>
      <!-- this translates to /pentaho/content/common-ui/resources/* -->
      <static-path url="/common-ui/resources" localFolder="resources"/>

@@ -47,3 +47,154 @@
 	background:url('images/warning.png') no-repeat left center;
 	padding-left:25px;
 }
+
+.dijitTooltipBelow {
+	/* leave room for arrow above content */
+	padding-top: 25px;
+}
+
+.dijitTooltipAbove {
+	/* leave room for arrow below content */
+	padding-bottom: 14px;
+}
+
+.dijitTooltipABRight .dijitTooltipConnector {
+	/* above or below tooltip, but the arrow appears on the right,
+		and the right edges of target and tooltip are aligned rather than the left */
+	left: auto !important;
+	right: 3px;
+}
+
+.dijitTooltipBelow .dijitTooltipConnector {
+	/* the arrow piece for tooltips below an element */
+	top: 0;
+	left: 5px;
+	background:url("images/connector_top.png") no-repeat top left;
+	width:36px;
+	height:17px;
+}
+
+.dj_ie  .dijitTooltipBelow .dijitTooltipConnector {
+	/* use gif for IE7 too, due to png rendering problems on fade-in (see http://trac.dojotoolkit.org/ticket/6555) */
+	background-image: url("images/connector_top.gif");
+}
+
+.dijitTooltipAbove .dijitTooltipConnector {
+	/* the arrow piece for tooltips above an element */
+	bottom: 0;
+	left: 5px;
+	background:url("images/connector_bottom.png") no-repeat top left;
+	width:36px;
+	height:17px;
+}
+
+.dj_ie  .dijitTooltipAbove .dijitTooltipConnector {
+	background-image: url("images/connector_bottom.gif");
+}
+
+.dj_ie6  .dijitTooltipAbove .dijitTooltipConnector {
+	bottom: -3px;
+}
+
+.dijitTooltipLeft {
+	padding-right: 14px;
+}
+
+.dijitTooltipLeft .dijitTooltipConnector {
+	/* the arrow piece for tooltips to the left of an element, bottom borders aligned */
+	right: 0;
+	background:url("images/connector_right.png") no-repeat top left;
+	width:17px;
+	height:36px;
+}
+
+.dj_ie  .dijitTooltipLeft .dijitTooltipConnector {
+	background-image: url("images/connector_right.gif");
+}
+
+.dijitTooltipRight {
+	padding-left: 14px;
+}
+
+.dijitTooltipRight .dijitTooltipConnector {
+	/* the arrow piece for tooltips to the right of an element, bottom borders aligned */
+	left: 0;
+	background:url("images/connector_left.png") no-repeat top left;
+	width:17px;
+	height:36px;
+}
+
+.templatePickerImg {
+    width:180px;
+    height:218px;
+    padding-top: 15px;
+}
+
+.fade {
+    background-color: lime;
+    background:url("images/fade.png") no-repeat center top;
+}
+
+.pentaho-selection-dialog-outer {
+    padding:2px 2px 2px 2px;
+    border: 1px solid #000000;
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.pentaho-selection-dialog-inner {
+    
+  background: #30363a;
+  /* Safari/Chrome */
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #30363a), color-stop(1, #575d62));
+  /* Firefox */
+  background: -moz-linear-gradient(#30363a, #575d62 100%) repeat scroll 0 0 transparent;
+
+}
+
+.tundra .dijitTabContainerTopStrip {
+    background: none;
+    border: 0px;
+}
+
+.tundra .dojoxColorPicker {
+    width: 50px;
+    overflow: hidden;
+}
+
+.tundra table.dojoDndAvatar {
+  background: none;
+  border: none;
+}
+
+.tundra .dojoDndAvatarHeader td {
+  height: 0px;
+  padding: 0px 0px 0px 0px;
+}
+
+.tundra.dojoDndCopy .dojoDndAvatarHeader {
+   background: none;
+}
+
+.tundra .dijitTooltipContainer {
+    border: 0px;
+    padding: 0px;
+    background: none;
+}
+
+.tundra .dijitToolbar {
+}
+
+
+.tundra .dijitButtonNode {
+    border-width: 0px;
+    background: none;
+}
+
+.tundra .dijitButtonDisabled .tundra .dijitDropDownButtonDisabled .tundra .dijitToggleButtonDisabled .tundra .dijitComboButtonDisabled {
+    border-width: 0px;
+    background: none;
+}
+
+.tundra .dijitSelect {
+    border: 1px solid #444444;
+}

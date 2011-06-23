@@ -450,6 +450,19 @@
                                     <!-- end next button HTML -->
                                 </td>
                             </tr>
+                            <tr>
+                                <td>
+                                    Trash
+                                </td>
+                                <td colspan="2">
+                                    <!-- HTML markup for a large right button -->
+                                    <img src="images/spacer.gif" class="pentaho-trashbutton" onclick="alert('Trash button clicked')"
+                                        onmouseover="this.className='pentaho-trashbutton pentaho-imagebutton-hover'"
+                                        onmouseout="this.className='pentaho-trashbutton'"
+                                        title="trashcan"/>
+                                    <!-- end right button HTML -->
+                                </td>
+                            </tr>
                         </table>
                     </td>
                     <td>
@@ -706,19 +719,19 @@
                                                 <span class="label contrast-color">Section 3</span>
                                             </td>
                                             <td style="width:16px; text-align: right">
-                                                <img src="images/spacer.gif" id="up-button" title="Move current item up" class="pentaho-upbutton-disabled"/>
+                                                <img src="images/spacer.gif" id="up-button" title="Move current item up" class="pentaho-upbutton pentaho-imagebutton-disabled"/>
                                             <td>                                                                                            
                                             <td style="width:16px; text-align: right">
-                                                <img src="images/spacer.gif" id="down-button" title="Move current item down" class="pentaho-downbutton-disabled"/>
+                                                <img src="images/spacer.gif" id="down-button" title="Move current item down" class="pentaho-downbutton pentaho-imagebutton-disabled"/>
                                             <td>                                                                                            
                                             <td style="width:16px; text-align: right">
-                                                <img src="images/spacer.gif" id="edit-button" title="Edit current item" class="pentaho-editbutton-disabled"/>
+                                                <img src="images/spacer.gif" id="edit-button" title="Edit current item" class="pentaho-editbutton pentaho-imagebutton-disabled"/>
                                             <td>                                                                                            
                                             <td style="width:16px; text-align: right">
                                                 <img src="images/spacer.gif" id="add-button" title="Add a new item" class="pentaho-addbutton"/>
                                             <td>                                                                                            
                                             <td style="width:16px; text-align: right">
-                                                <img src="images/spacer.gif" id="delete-button" title="Delete current item" class="pentaho-deletebutton-disabled"/>
+                                                <img src="images/spacer.gif" id="delete-button" title="Delete current item" class="pentaho-deletebutton pentaho-imagebutton-disabled"/>
                                             <td>                                                                                            
                                         </tr>
                                     </table>
@@ -761,49 +774,41 @@
                     </td>
                 </tr>
                 <tr>
-                    <td style="background-color: white">Tooltip Dialog</td>
                     <td style="background-color: white">Menu Item Rollovers</td>
+                    <td style="background-color: white">Tooltip Dialog</td>
                     <td style="background-color: white">Table</td>
                 </tr>
                 <tr>
                     <td>
                     
                         <!-- HTML markup for menu options and list items -->
-                        <table class="pentaho-menu" cellpadding="0" cellspacing="0">
-                            <tr>
-                                <td class="pentaho-menuitem" onmouseover="this.className='pentaho-menuitem-hover'" onmouseout="this.className='pentaho-menuitem'">
-                                    <span class="pentaho-menuitem-label">Option 1</span>
+                        <table class="pentaho-menu-outer" cellpadding="0" cellspacing="0">
+
+                            <tr class="pentaho-menuitem" onmouseover="this.className='pentaho-menuitem pentaho-menuitem-hover'" onmouseout="this.className='pentaho-menuitem'">
+                                <td role="presentation">
+                                    <img src="images/spacer.gif" alt="" class="pentaho-checkmenuitem"/>
                                 </td>
+                                <td class="dpentaho-menuitem-label" colspan="2">Option 1</td>
+                                <td class="" role="presentation">&nbsp;</td>
+                            </tr>
+                            <tr class="pentaho-menuitem pentaho-menuitem-disabled" onmouseover="this.className='pentaho-menuitem pentaho-menuitem-disabled'" onmouseout="this.className='pentaho-menuitem pentaho-menuitem-disabled'">
+                                <td role="presentation">
+                                    <img src="images/spacer.gif" alt="" class="pentaho-checkmenuitem"/>
+                                </td>
+                                <td class="dpentaho-menuitem-label" colspan="2">Disabled</td>
+                                <td class="" role="presentation">&nbsp;</td>
                             </tr>
                             <tr>
-                                <td class="pentaho-menuitem" onmouseover="this.className='pentaho-menuitem-hover'" onmouseout="this.className='pentaho-menuitem'">
-                                    <table cellpadding="0" cellspacing="0">
-                                        <tr>
-                                            <td>
-                                                <div class="pentaho-checkmenuitem">
-                                                </div>
-                                            </td>
-                                            <td>
-                                                Unchecked
-                                            </td>
-                                        </tr>
-                                    </table>
+                                <td colspan="3" class="pentaho-menu-separator">
+                                    <div class="pentaho-menu-separator-inner"></div>
                                 </td>
-                            </tr>
-                            <tr>
-                                <td class="pentaho-menuitem" onmouseover="this.className='pentaho-menuitem-hover'" onmouseout="this.className='pentaho-menuitem'">
-                                    <table cellpadding="0" cellspacing="0">
-                                        <tr>
-                                            <td>
-                                                <div class="pentaho-checkmenuitem-checked">
-                                                </div>
-                                            </td>
-                                            <td>
-                                                Checked
-                                            </td>
-                                        </tr>
-                                    </table>
+                            </tr>                            
+                            <tr class="pentaho-menuitem" onmouseover="this.className='pentaho-menuitem pentaho-menuitem-hover'" onmouseout="this.className='pentaho-menuitem'">
+                                <td role="presentation">
+                                    <img src="images/spacer.gif" alt="" class="pentaho-checkmenuitem menuitem-checked"/>
                                 </td>
+                                <td class="dijitReset pentaho-menuitem-label" colspan="2">Checked</td>
+                                <td class="dijitReset dijitMenuArrowCell" role="presentation">&nbsp;</td>
                             </tr>
                         </table>
                         <!-- end toolbar HTML -->
@@ -885,7 +890,7 @@
                                 </tr>
                                 <tr>
                                     <td align="left" style="vertical-align: top;">
-                                        <div id="disclosure-panel" class="pentaho-disclose-dropdown">
+                                        <div id="disclosure-panel" class="pentaho-disclosure-panel-dropdown">
                                             <div class="pentaho-rounded-panel-bottom-lr panel-content pentaho-shadow  pentaho-padding-sm">
                                                 Panel contents go here
                                             </div>

@@ -20,16 +20,8 @@ dojo.declare(
         templateSelectedCallback: null,
         
         updatePageArrows: function() {
-            if(this.pageNo == 0) {
-                this.prevSetBtn.src = "images/lg_arrow_left_off.png";
-            } else {
-                this.prevSetBtn.src = "images/lg_arrow_left_on.png";
-            }
-            if((this.pageNo+1)*6>=this.templates.length) {
-                this.nextSetBtn.src = "images/lg_arrow_right_off.png";
-            } else {
-                this.nextSetBtn.src = "images/lg_arrow_right_on.png";
-            }
+            this.prevSetBtn.set('disabled',this.pageNo == 0);
+            this.nextSetBtn.set('disabled',(this.pageNo+1)*6>=this.templates.length);
         },
         
         setTemplates: function(templates) {
@@ -58,9 +50,9 @@ dojo.declare(
       
         postCreate: function() {
             this.inherited(arguments);
-            dojo.connect(this.closeBtn,'onclick', this, this.closeClick);
-            dojo.connect(this.prevSetBtn,'onclick', this, this.prevPage);
-            dojo.connect(this.nextSetBtn,'onclick', this, this.nextPage);
+            this.closeBtn.callback = dojo.hitch(this, this.closeClick);
+            this.prevSetBtn.callback = dojo.hitch(this, this.prevPage);
+            this.nextSetBtn.callback = dojo.hitch(this, this.nextPage);
             dojo.connect(this.templateImg0,'onclick', this, 'imgClick');
             dojo.connect(this.templateImg1,'onclick', this, 'imgClick');
             dojo.connect(this.templateImg2,'onclick', this, 'imgClick');
