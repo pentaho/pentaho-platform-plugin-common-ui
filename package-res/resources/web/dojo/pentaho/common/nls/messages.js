@@ -8,6 +8,7 @@
     // these are general strings
     Ok_txt: 'OK',    
     Cancel_txt: 'Cancel',
-    CloseIcon_title: 'Close'
+    CloseIcon_title: 'Close',
+    ErrorDialog_title: 'Error'
 
 }

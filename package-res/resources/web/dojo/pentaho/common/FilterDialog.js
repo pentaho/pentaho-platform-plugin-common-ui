@@ -3,7 +3,7 @@ dojo.require("dijit._Widget");
 dojo.require("dijit._Templated");
 dojo.require("dijit.form.DateTextBox");
 dojo.require('pentaho.common.Dialog');
-
+dojo.require('pentaho.common.MessageBox');
 dojo.declare(
     "pentaho.common.FilterDialog",
      [pentaho.common.Dialog],
@@ -25,6 +25,8 @@ dojo.declare(
   _onSuccessCallback: undefined,
   _onCancelCallback: undefined,
 
+  errorDialog: undefined,
+
   postMixInProperties: function() {
     this.inherited(arguments);
   },
@@ -44,6 +46,11 @@ dojo.declare(
     dojo.attr(this.picklistCombinationTypeExcludeOption, "value", pentaho.pda.Column.OPERATOR_TYPES.AND_NOT);
     
     this.callbacks = [dojo.hitch(this, this.save), dojo.hitch(this, this.cancel)];
+
+    this.errorDialog.setButtons([this.getLocaleString('Ok_txt')]);
+    this.errorDialog.callbacks = [dojo.hitch(this, function() {
+      this.errorDialog.hide();
+    })];
   },
   
   onCancel: function() {
@@ -188,7 +195,7 @@ dojo.declare(
       case pentaho.pda.Column.DATA_TYPES.BOOLEAN:
         // TODO Add boolean data type filtering
       default:
-        alert("Unknown data type for filter: " + dataType);
+        this.showErrorDialog(this.getLocaleString('filterDialogUnknownDataType') + dataType);
         dojo.addClass(this.typePicklistContainer, "filterDialogHidden");
         dojo.addClass(this.typeMatchContainer, "filterDialogHidden");
         dojo.addClass(this.typeDateRangeContainer, "filterDialogHidden");
@@ -224,7 +231,7 @@ dojo.declare(
 //        this._configureDateRangeContainer();
 //        break;
       default:
-        alert("Unknown filter type: " + type);
+        console.log("Unknown filter type: " + type);
         return;
     }
     this.filterType = type;
@@ -252,7 +259,7 @@ dojo.declare(
         }
         break;
       default:
-        alert("Unknown filter type: " + type);
+        console.log("Unknown filter type: " + type);
         return;
     }
 
@@ -364,7 +371,7 @@ dojo.declare(
       values.push(option.value);
     });
     if (values.length == 0) {
-      alert("Please select a value");
+      this.showErrorDialog(this.getLocaleString('filterDialogMissingValueError_title'), this.getLocaleString('filterDialogMissingValueError_message'));
       return false;
     }
     this.currentFilter.operator = pentaho.pda.Column.CONDITION_TYPES.EQUAL;
@@ -466,7 +473,7 @@ dojo.declare(
 //        }
       }
       if (this.currentFilter.value == "") {
-        alert("Please enter a value");
+        this.showErrorDialog(this.getLocaleString('filterDialogMissingValueError_title'), this.getLocaleString('filterDialogMissingValueError_message'));
         return false;
       }
       this.currentFilter.value = [this.currentFilter.value];
@@ -482,7 +489,7 @@ dojo.declare(
     this.dateRangeValueInputDate2.value = null;
   },
   _dateRangeComparatorChanged: function() {
-    alert("_dateRangeComparatorChanged() Not yet implemented");
+    console.log("_dateRangeComparatorChanged() Not yet implemented");
   },
   
   /**
@@ -530,5 +537,15 @@ dojo.declare(
       }
     }
     return column.name + " " + friendlyOperator + " " + values;
+  },
+
+  showErrorDialog: function(message) {
+    showErrorDialog(this.getLocaleString('ErrorDialog_title'), message);
+  },
+
+  showErrorDialog: function(title, message) {
+    this.errorDialog.setTitle(title);
+    this.errorDialog.setMessage(message);
+    this.errorDialog.show();
   }
 });

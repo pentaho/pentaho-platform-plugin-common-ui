@@ -48,6 +48,9 @@
     filterDialogFieldName_content: 'Field name',  
     filterDialogFieldPicklistSpan_content: 'Select field:',
     dateRangeBetweenSeparatorSpan_content: 'and',
+    filterDialogMissingValueError_title: 'Invalid Entry',
+    filterDialogMissingValueError_message: 'Please select a value',
+    filterDialogUnknownDataType: 'Unknown data type: ',
     
     AGG_TYPES_AVERAGE : 'Average',
     AGG_TYPES_MINIMUM : 'Minimum',
