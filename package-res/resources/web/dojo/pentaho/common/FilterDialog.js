@@ -263,6 +263,8 @@ dojo.declare(
         return;
     }
 
+    this._scrubFilterValues(this.currentFilter);
+
     var parameterName = this.parameterNameInput.get("value");
     if (parameterName) {
       parameterName = dojo.trim(parameterName).replace(/[^a-zA-Z]/g, "");
@@ -479,6 +481,15 @@ dojo.declare(
       this.currentFilter.value = [this.currentFilter.value];
     }
     return true;
+  },
+
+  /*
+   * Remove quotes from the filter's value until MQL editor properly supports parsing values with quotes.
+   */
+  _scrubFilterValues: function(filter) {
+    filter.value = dojo.map(filter.value, function(value) {
+      return value.replace(/["]/g,'');
+    });
   },
 
   // DATERANGE IMPL
