@@ -34,7 +34,7 @@
     filterDialogAddAll_title: 'Add All',
     filterDialogRemoveAll_title: 'Remove All',
     filterDialogTypePicklistSpan_content: 'Select from a list',
-    filterDialogTypeMatchSpan_content: 'Match a specific value',
+    filterDialogTypeMatchSpan_content: 'Specify a condition',
     filterDialogTypeDateRangeSpan_content: 'Select a range',
     FilterCombinationTypeIn: 'Includes',
     FilterCombinationTypeNotIn: 'Excludes',
