@@ -176,6 +176,7 @@
                 str += '\nValue: '+filter.value;
                 str += '\nOperator: '+filter.operator;
                 str += '\nDescription: '+filterDialog.buildFilterText(filter);
+                str += '\nParameter Name: '+filter.parameterName;
                 alert(str);
                 filterDialog.hide();
             }
