@@ -64,7 +64,7 @@ dojo.declare(
     this.typeMatchSpan.innerHTML = this.getLocaleString("filterDialogTypeMatchSpan_content");
     this.typeDateRangeSpan.innerHTML = this.getLocaleString("filterDialogTypeDateRangeSpan_content");
     this.picklistHeadingSpan.innerHTML = this.getLocaleString("filterDialogPicklistHeadingSpan_content");
-    this.picklistFindButton.containerNode.innerHTML = this.getLocaleString("filterDialogFindButton_content");
+    this.picklistFindButton.innerHTML = this.getLocaleString("filterDialogFindButton_content");
     this.picklistAddSelected.title = this.getLocaleString("filterDialogAddSelected_title");
     this.picklistRemoveSelected.title = this.getLocaleString("filterDialogRemoveSelected_title");
     this.picklistAddAll.title = this.getLocaleString("filterDialogAddAll_title");

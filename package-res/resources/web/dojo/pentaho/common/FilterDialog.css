@@ -11,7 +11,7 @@
 }
 
 .filterDialogPicklistFindInput {
-  width: 100%;
+  width: 150px;
 }
 
 .filterDialogMatchContainer {
@@ -20,12 +20,7 @@
 
 .filterDialogPicklistSelect {
 	height: 180px;
-  width: 100%;
-}
-
-.filterDialogPicklistButton {
-  padding: 5px 0px;
-  cursor: pointer;
+  width: 210px;
 }
 
 .filterDialogParameterContainer {

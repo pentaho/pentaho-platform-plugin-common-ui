@@ -44,23 +44,23 @@
     <div dojoAttachPoint="picklistContainer"
          class="filterDialogPicklistContainer">
       <table>
-        <col style="width: 45%">
-        <col style="width: 10%">
-        <col style="width: 45%">
+        <col style="width: 220px">
+        <col style="width: 40px">
+        <col style="width: 220px">
         <tbody>
         <tr>
           <td>
 			      <span class="filterDialogPicklistHeadingText" dojoAttachPoint="picklistHeadingSpan">!Choose values from list:!</span>
-			    <td>
+			    </td>
 			    <td></td>
 			    <td></td>
 			  </tr>
 			  <tr>
 			    <td>
 			      <input type="text" class="filterDialogPicklistFindInput" dojoType="dijit.form.TextBox" dojoAttachPoint="picklistFindInput" dojoAttachEvent="onKeyPress:_picklistFindKeyPressed"/>
+                  <button dojoAttachPoint="picklistFindButton" dojoAttachEvent="onclick:_filterPicklistByFindInput">!Find!</button>
 			    </td>
 			    <td>
-			      <button dojoType="dijit.form.Button" dojoAttachPoint="picklistFindButton" dojoAttachEvent="onClick:_filterPicklistByFindInput">!Find!</button>
           </td>
           <td>
             <span dojoAttachPoint="picklistCombinationTypeSpan">!Currently!</span>
