@@ -45,6 +45,7 @@
     "dijit.ProgressBar",
     "dijit.Tooltip",
     "dijit.layout.TabContainer",
+    "dijit.TitlePane",
     "dojo.dnd.Container",
     "dojo.dnd.Selectors",
 	"dojo.dnd.Source",

@@ -1,7 +1,6 @@
 dojo.provide('pentaho.common.datasourceselect');
 dojo.require('dijit._Widget');
 dojo.require('dijit._Templated');
-dojo.require('pentaho.common.button');
 dojo.require('pentaho.common.SmallImageButton');
 dojo.require('pentaho.common.Dialog');
 dojo.require('pentaho.common.MessageBox');

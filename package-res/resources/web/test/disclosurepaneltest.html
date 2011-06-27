@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns:pho="http:/www.pentaho.com">
     <head>
-        <title>Splash Screen Test</title>
+        <title>Disclosure Panel Test</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
         <link rel="stylesheet" type="text/css" href="../dojo/dijit/themes/pentaho/pentaho.css"/>
@@ -21,47 +21,35 @@
               //]]>
         </script>
 
-        <script language='javascript' type='text/javascript' src='../locale/Messages.js'></script>
         <script language='javascript' type='text/javascript' src='../dojo/dojo/dojo.js.uncompressed.js'></script>
         <script language='javascript' type='text/javascript' src='../dojo/dojo/dojo-ext.js.uncompressed.js'></script>
-        <script language="javascript" src="../repo/pentaho-thin-app.js" type="text/javascript"></script>
 
         <script type="text/javascript">
 
             dojo.require("dojo.parser");
-            dojo.require("pentaho.common.SplashScreen");
+            dojo.require("pentaho.common.DisclosurePanel");
 
             function doload() {
-
-                var userConsole = new PentahoUserConsole();
-                if(!userConsole.console_enabled) {
-                    document.body.className = document.body.className + ' pentaho-page-background';
-                }
-
-                dlg = dijit.byId('splashscreen');
-
-                dlg.setTitle('Pentaho Common UI');
-                dlg.setText('Sample Splash Screen<p/>More text can go here');
-                dlg.setButtonText( 'Ok' );
-                dlg.callbacks = [splashscreenDone];
+            }
                 
-                dlg.show();
-            }
-            
-            function splashscreenDone() {
-                dlg.hide();
-                alert('splashscreenDone() was called');
-            }
-        
             dojo.ready(doload);
-            
+        
         </script>
 
     </head>
 
-    <body class="tundra body" onload="">
+    <body class="tundra body" onload="doload()">
+        
+        <div style="padding: 8px; backgorund-color:white">
+        
+            <h3>UI Widgets - Disclosure Panel</h3>
+            This example shows you how create a disclosure panel.
+            <p/>
 
-        <div id="splashscreen" dojoType="pentaho.common.SplashScreen" imagePath="sample_splash_screen_logo.png" style="width:520px; display:none;">
+            <div id="panel1" dojoType="pentaho.common.DisclosurePanel" title="Collapsable Panel">
+                The contents of the panel go here.
+            </div>
+
         </div>
 
     </body>

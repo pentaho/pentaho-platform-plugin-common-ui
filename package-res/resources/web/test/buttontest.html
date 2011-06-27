@@ -34,8 +34,8 @@
                 enableButtons();
             }
                 
-            window.onload = doload;
-        
+            dojo.ready(doload);
+                
             function buttonClick(id) {
                 alert('Button Clicked: '+id);
             }
@@ -98,6 +98,7 @@
             <p/>
 
             <button id="disableButton" class="pentaho-button" onclick="disableButtons()" disabled="false">Disable Buttons</button>
+            &nbsp;
             <button class="pentaho-button" onclick="enableButtons()">Enable Buttons</button>
 
             <div dojoType="pentaho.common.SmallImageButton" id="addButton" title="Sample Add Button" baseClass="pentaho-addbutton" onclick="buttonClick(this.id)">

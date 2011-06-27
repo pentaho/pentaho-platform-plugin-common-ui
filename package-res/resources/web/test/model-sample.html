@@ -26,7 +26,6 @@
         <script language="javascript" src="../dataapi/app.js" type="text/javascript"></script>
         <script language="javascript" src="../dataapi/controller.js" type="text/javascript"></script>
         <script language="javascript" src="../dataapi/xhr.js" type="text/javascript"></script>
-        <script language="javascript" src="../dataapi/cda.js" type="text/javascript"></script>
         <script language="javascript" src="../dataapi/models-mql.js" type="text/javascript"></script>
         <script language="javascript" src="../dataapi/Xmla.js" type="text/javascript"></script>
         <script language="javascript" src="../dataapi/models-olap.js" type="text/javascript"></script>
@@ -53,7 +52,7 @@ function loadPage() {
 	},
 	da_cda = {
 		name: 'da-cda',
-		objectClass: pentaho.pda.CDAHandler
+		objectClass: pentaho.pda.CdaHandler
 	};
 
 	pentaho.myapp = {
@@ -61,7 +60,7 @@ function loadPage() {
 		prior_idx: -1,
 		source: {}
 	};
-	var moduleArray = [da_mql,da_olap];
+	var moduleArray = [da_mql,da_olap, da_cda];
 	pentaho.myapp.app.init(moduleArray);	
     pentaho.myapp.app.moduleData['da-mql'].instance.METADATA_SERVICE_URL = CONTEXT_PATH + 'content/ws-run/metadataService';
 }
@@ -167,11 +166,13 @@ function loadModel() {
     
 }
 
+dojo.ready(loadPage);
+
 </script>
 
     </head>
 
-    <body onload="loadPage()" class="tnudra body">
+    <body onload="" class="tnudra body">
 
         <div style="padding: 8px; backgorund-color:white">
 

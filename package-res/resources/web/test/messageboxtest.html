@@ -21,7 +21,7 @@
           //]]>
         </script>
 
-        <script language="javascript" src="/pentaho-style/style/ThemeResources.js"></script>
+        <script language='javascript' type='text/javascript' src='../locale/Messages.js'></script>
 
         <script language='javascript' type='text/javascript' src='../dojo/dojo/dojo.js.uncompressed.js'></script>
         <script language='javascript' type='text/javascript' src='../dojo/dojo/dojo-ext.js.uncompressed.js'></script>
@@ -38,6 +38,7 @@
 
                 try {
 
+                    dojo.parser.parse();
                     // configure the message box
                     msgBox = dijit.byId('messagebox');
                     // set the title
@@ -60,7 +61,7 @@
                 }
             }
                 
-            window.onload = doload;
+            dojo.ready(doload);
             
             // this is the function called when the ok button is clicked
             function okFunc() {

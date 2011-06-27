@@ -102,8 +102,12 @@ function loadPage() {
 	pentaho.myapp.app.init(moduleArray);	
     pentaho.myapp.app.moduleData['da-mql'].instance.METADATA_SERVICE_URL = CONTEXT_PATH + 'content/ws-run/metadataService';
 
-    loadModels();
-
+    try {
+        loadModels();
+    } catch(e) {
+        alert(e.message);
+    }
+    
     filterDialog = dijit.byId('filterDialog');
     filterDialog.setLocalizationLookupFunction(Messages.getString);
     filterDialog.setSearchListLimit(200);
@@ -495,7 +499,7 @@ function autoUpdateChanged() {
 
 function showQueryChanged() {
 
-    var e = document.getElementById("querytext");
+    var e = document.getElementById("querySection");
     
     if( document.getElementById("show-query").checked ) {
         e.style.display = 'block';
@@ -504,11 +508,29 @@ function showQueryChanged() {
     }
 
 }
+
+function submitPassThrough() {
+    // submit a passthrough query
+    clearDataDisplay();
+    var statement = document.getElementById("querytext").value;
+    results = model.submit( statement );
+    if( results == null ) {
+        document.getElementById('data-title').innerHTML = 'Data (none)';
+        return;
+    } else {
+        var sorted = pentaho.pda.app.prototype.sortData( results, 0, pentaho.pda.Column.SORT_TYPES.ASCENDING );
+        displayData( sorted );
+    }
+    
+}
+
+dojo.ready(loadPage);
+
         </script>
 
     </head>
 
-    <body onload="loadPage()" class="tundra body">
+    <body onload="" class="tundra body">
 
         <!-- this is the declaration of the filter dialog -->
         <div id="filterDialog" dojoType="pentaho.common.FilterDialog">
@@ -572,7 +594,10 @@ function showQueryChanged() {
                     <td style="vertical-align:top">
                         <input id="show-query" type="checkbox" checked="false" onchange="showQueryChanged()"/>Show Query
                         <br/>
-                        <textarea id="querytext" rows="25" cols="150" style="display:none"></textarea>
+                        <div id="querySection" style="display:none">
+                            <textarea id="querytext" rows="25" cols="150"></textarea>
+                            <button onclick="submitPassThrough()">Submit Query</button>
+                        </div>
                         <br/>
                         <span id="data-title">Data (none)</span>&nbsp;
                         <input id="auto-update" type="checkbox" checked="true" onchange="autoUpdateChanged()"/>Auto-update

@@ -54,7 +54,7 @@
                         title: 'Tab 3',
                         beforeCallback: tabClick,
                         afterCallback: tabChanged
-                    },
+                    }
                 ]);
 
             }
@@ -69,7 +69,7 @@
                 alert('now displaying content for tab id="'+tab.id+'", title="'+tab.title);
             }
             
-            window.onload = doload;
+            dojo.ready(doload);
         
         </script>
 

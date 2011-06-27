@@ -27,20 +27,16 @@
         <script type="text/javascript">
 
             dojo.require("dojo.parser");
+            dojo.require("pentaho.common.Menu");
             dojo.require("pentaho.common.MenuItem");
+            dojo.require("pentaho.common.CheckedMenuItem");
+            dojo.require("pentaho.common.PopupMenuItem");
+            dojo.require("pentaho.common.MenuSeparator");
 
-            function doload() {
-          
-            }
-                
-            window.onload = doload;
-        
             function toggleCheck() {
                 var menuItem = dijit.byId('checkoption');
                 var checked = menuItem.get('checked');
                 alert('Check Option state is now: '+checked);
-                // toggle the check mark
-//                menuItem.set('checked', true);
             }
         </script>
 
