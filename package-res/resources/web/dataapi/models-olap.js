@@ -53,9 +53,14 @@ pentaho.pda.OlapHandler.prototype.getSources = function(filter, callback) {
                     // get the catalogs for this data source
                     var datasource = this.datasourceCache[i];
                     var properties = {};
+                    var url = datasource["URL"]?datasource["URL"]:this.XMLA_SERVICE_URL;
+                    if(url.indexOf('http') == 0) {
+                        // we need a relative URL to avoid cross-domain issues
+                        url = this.XMLA_SERVICE_URL;
+                    }
                     properties[Xmla.PROP_DATASOURCEINFO] = datasource[Xmla.PROP_DATASOURCEINFO];
                     var rowset2 = this.xmla.discoverDBCatalogs({
-                        url: datasource["URL"]?datasource["URL"]:this.XMLA_SERVICE_URL,
+                        url: url,
                         properties: properties
                     });
                     if (rowset2.hasMoreRows()) {
@@ -381,21 +386,28 @@ pentaho.pda.model.olap.prototype.createQuery = function() {
     // submit a new query
 pentaho.pda.model.olap.prototype.submitQuery = function( query, rowLimit ) {
 
+        if(query.state.measures.length == 0 && query.state.rowSelections.length == 0 && query.state.columnSelections.length == 0 ) {
+            // we can't construct a query for this
             var results = {
                 metadata:[],
                 resultset:[]
-            }
-            
-        if(query.state.measures.length == 0 && query.state.rowSelections.length == 0 && query.state.columnSelections.length == 0 ) {
-            // we can't construct a query for this
+            }            
             return results;
         }
         
         var mdx = query.serialize();
-
         query.state.mdx = mdx;
+        return this.submit(mdx, rowLimit);
+}
+
+pentaho.pda.model.olap.prototype.submit = function( mdx, rowLimit ) {
+
 //alert(mdx);
 
+        var results = {
+            metadata:[],
+            resultset:[]
+        }            
         var properties = {};
         properties[Xmla.PROP_DATASOURCEINFO] = this.xmlaDatasource;
         properties[Xmla.PROP_CATALOG] = this.catalog;
@@ -413,7 +425,9 @@ pentaho.pda.model.olap.prototype.submitQuery = function( query, rowLimit ) {
             });
 
             var fields = rowset.getFields();
-            var fieldCount = (query.state.measures.length == 0) ? fields.length-1 : fields.length;
+            
+            var fieldCount = fields.length;
+//            var fieldCount = (query.state.measures.length == 0) ? fields.length-1 : fields.length;
 
             for( var idx=0; idx<fieldCount; idx++ ) {
                 var id = this.cleanupFieldName(fields[idx].name);
@@ -548,7 +562,7 @@ pentaho.pda.model.olap.prototype.getAllValuesForColumn = function( column ) {
         return null;
     }
 
-pentaho.pda.model.olap.prototype.searchColumn = function( column, searchStr ) {
+pentaho.pda.model.olap.prototype.searchColumn = function( column, searchStr, rowLimit, callback ) {
 
         var all = this.getAllValuesForColumn(column);
         
@@ -561,9 +575,16 @@ pentaho.pda.model.olap.prototype.searchColumn = function( column, searchStr ) {
         for(var idx=0; idx<all.resultset.length; idx++) {
             if(all.resultset[idx][0].indexOf(searchStr) != -1) {
                 results.resultset.push(all.resultset[idx]);
+                if(rowLimit > 0 && rowLimit == results.resultset.length) {
+                    break;
+                }
             }
         }
-        return results;
+        if(callback) {
+            callback(results);
+        } else {
+            return results;
+        }
     }
 
 
@@ -601,7 +622,7 @@ pentaho.pda.query.olap.prototype.getQueryStr = function() {
 pentaho.pda.query.olap.prototype.createSelection = function() {
         var selection = {
             column: null,
-            selection:null,
+            selection:null
         };
         return selection;
     }

@@ -285,10 +285,18 @@ pentaho.pda.model.mql.prototype.createQuery = function() {
 pentaho.pda.model.mql.prototype.submitQuery = function( queryObject, rowLimit, callback ) {
         var json = queryObject.getJson(); 
 //        alert(json);
+        return this.submit(json, rowLimit, callback);
+}
+
+pentaho.pda.model.mql.prototype.submit = function( jsonString, rowLimit, callback ) {
+    
+        var results = {
+            metadata:[],
+            resultset:[]
+        }            
         if (!rowLimit) {
             rowLimit = -1;
         }
-    
         var handleResultCallback = dojo.hitch(this, function(resultXml) {
           var result = parseXML( resultXml );
           var nodes = result.getElementsByTagName('return');
@@ -304,7 +312,7 @@ pentaho.pda.model.mql.prototype.submitQuery = function( queryObject, rowLimit, c
         try {
             // get the info about the models from the server
             var url = this.handler.METADATA_SERVICE_URL+'/doJsonQueryToCdaJson';
-            var query = 'json='+escape(json)+'&rowLimit='+rowLimit;
+            var query = 'json='+escape(jsonString)+'&rowLimit='+rowLimit;
 
             var resultXml = pentahoGet( url, query, callback ? handleResultCallback : undefined);
             if (!callback) {

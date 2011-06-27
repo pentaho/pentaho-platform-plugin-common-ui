@@ -1,11 +1,18 @@
 /*
-    Copyright 2009,2010 Roland Bouman 
-    (Roland.Bouman@gmail.com, http://rpbouman.blogspot.com/, http://code.google.com/p/xmla4js)
+    Copyright 2009,2010 Roland Bouman
+    contact: Roland.Bouman@gmail.com ~ http://rpbouman.blogspot.com/ ~ http://code.google.com/p/xmla4js
     
+    This is xmla4js - a stand-alone, cross-browser javascript library for working with "XML for Analysis".
+    XML for Analysis (XML/A) is a vendor-neutral industry-standard protocol for OLAP services over HTTP.
+    xmla4js enables web-browser-based analytical business intelligence applications.
+        
+    This file contains human-readable javascript source along with the YUI Doc compatible annotations.
     Note: some portions of the API documentation were adopted from the original XML/A specification. 
-    I believe that this constitutes fair use, 
-    but if you have reason to believe that the documentation violates any copyright, 
-    or is otherwise incompatible with the LGPL license please contact me.
+    I believe that this constitutes fair use, but if you have reason to believe that the documentation 
+    violates any copyright, or is otherwise incompatible with the LGPL license please contact me.
+
+    Include this in your web-pages for debug and development purposes only.
+    For production purposes, consider using the minified/obfuscated versions in the /js directory.
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as published by
@@ -38,7 +45,7 @@ var _soap = "http://schemas.xmlsoap.org/soap/",
     _xmlnsSchemaInstance = "http://www.w3.org/2001/XMLSchema-instance",
     _xmlnsSchemaInstancePrefix = "xsi", 
     _xmlnsRowset = _xmlnsXmla + ":rowset",
-    _xmlnsResultset = _xmlnsXmla + ":mddataset",
+    _xmlnsDataset = _xmlnsXmla + ":mddataset",
     _useAX = window.ActiveXObject ? true : false
 ;    
 
@@ -98,6 +105,7 @@ function _ajax(options){
         xhr.open("POST", options.url, options.async);
     }
     xhr.onreadystatechange = handler;
+    xhr.setRequestHeader("Accept", "text/xml, application/xml");
     xhr.setRequestHeader("Content-Type", "text/xml");
     xhr.send(options.data);
     if (!options.async && !handlerCalled){
@@ -109,12 +117,11 @@ function _ajax(options){
 function _isUnd(arg){
     return typeof(arg)==="undefined";
 }
-function _xmlEncodeListEntry(value){
-    if( typeof value == "string" ) {
-        return value.replace(/\&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
-    } else {
-        return ""+value;
-    }
+function _isNum(arg){
+    return typeof(arg)==="number";
+}
+function _xmlEncode(value){
+    return value.replace(/\&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
 }
 
 var _getElementsByTagNameNS = document.getElementsByTagNameNS ? function(node, ns, prefix, tagName){
@@ -140,7 +147,36 @@ var _getAttributeNS = document.documentElement.getAttributeNS ? function(element
                                                                         return element.getAttribute(attributeName);
                                                                     }
                                                                 };                                                              
-
+function _getElementText(el){
+    if (el.innerText) {         //ie
+        return el.innerText;
+    }
+    else 
+    if (el.textContent) {       //ff
+        return el.textContent;
+    }
+    else 
+    if (el.normalize){
+        el.normalize();
+        if (el.firstChild){
+            return el.firstChild.data;
+        }
+        else {
+            return null;
+        }
+    }
+    else {                      //generic
+        var text = "",
+            childNodes = el.childNodes,
+            numChildNodes = childNodes.length
+        ;
+        for (var i=0; i<numChildNodes; i += 1){
+            text += childNodes.item(i).data;
+        }
+        return text;
+    }
+}
+                                                                
 function _getXmlaSoapList(container, listType, items, indent){
     if (!indent){
         indent = "";
@@ -155,10 +191,10 @@ function _getXmlaSoapList(container, listType, items, indent){
                 if (typeof(item)==="array"){
                     for (entry, i=0, numItems = item.length; i<numItems; i += 1){
                         entry = item[i];
-                        msg += "<Value>" + _xmlEncodeListEntry(entry) + "</Value>";
+                        msg += "<Value>" + _xmlEncode(entry) + "</Value>";
                     }
                 } else {
-                    msg += _xmlEncodeListEntry(item);
+                    msg += _xmlEncode(item);
                 }
                 msg += "</" + property + ">";
             }
@@ -174,10 +210,13 @@ var _xmlRequestType = "RequestType";
 function _getXmlaSoapMessage(
     options
 ){
-    var msg = "", method = options.method, exception = null;
-    msg += "\n<" + _xmlnsSOAPenvelopePrefix + ":Envelope " + _xmlnsIsSOAPenvelope + " " + _SOAPencodingStyle + ">" + 
-    "\n <" + _xmlnsSOAPenvelopePrefix + ":Body>" + 
-    "\n  <" + method + " " + _xmlnsIsXmla + " " + _SOAPencodingStyle + ">"
+    var method = options.method, exception = null,
+        msg = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+        "\n<" + _xmlnsSOAPenvelopePrefix + ":Envelope" + 
+        " " + _xmlnsIsSOAPenvelope + 
+        " " + _SOAPencodingStyle + ">" + 
+        "\n <" + _xmlnsSOAPenvelopePrefix + ":Body>" + 
+        "\n  <" + method + " " + _xmlnsIsXmla + " " + _SOAPencodingStyle + ">"
     ;
     switch(method){
         case Xmla.METHOD_DISCOVER:
@@ -199,7 +238,7 @@ function _getXmlaSoapMessage(
             if (options.statement){
                 msg += "" + 
                 "\n   <Command>" +
-                "\n    <Statement>" + options.statement + "</Statement>" + 
+                "\n    <Statement>" + _xmlEncode(options.statement) + "</Statement>" + 
                 "\n   </Command>" + 
                 _getXmlaSoapList("Properties", "PropertyList", options.properties, "   ")
                 ;
@@ -1442,6 +1481,7 @@ Xmla.prototype = {
 */
     request: function(options){
         var ex, xmla = this;
+
         this.response = null;
         this.responseText = null;
         this.responseXML = null;
@@ -1462,7 +1502,6 @@ Xmla.prototype = {
 
         options.properties = _applyProps(options.properties, this.options.properties, false);
         options.restrictions = _applyProps(options.restrictions, this.options.restrictions, false);
-
 		if (_isUnd(options.async) && !_isUnd(this.options.async)){
 			options.async = this.options.async;
 		}
@@ -1551,17 +1590,19 @@ Xmla.prototype = {
                     this._fireEvent(Xmla.EVENT_DISCOVER_SUCCESS, request);
                     break;
                 case Xmla.METHOD_EXECUTE:
-                    var resultset;
+                    var response, resultset = null, dataset = null;
                     var format = request.properties[Xmla.PROP_FORMAT];
                     switch(format){
                         case Xmla.PROP_FORMAT_TABULAR:
-                            resultset = new Xmla.Rowset(this.responseXML);
+                            response = resultset = new Xmla.Rowset(this.responseXML);
                             break;
                         case Xmla.PROP_FORMAT_MULTIDIMENSIONAL:
+                            response = dataset = new Xmla.Dataset(this.responseXML);
                             break;
-                    }                    
+                    }             
                     request.resultset = resultset;
-                    this.response = resultset;
+                    request.dataset = dataset;
+                    this.response = response;
                     this._fireEvent(Xmla.EVENT_EXECUTE_SUCCESS, request);
                     break;
             }
@@ -3826,7 +3867,6 @@ The number of members in the level.
 *   Invokes the <code><a href="#method_discover">discover()</a></code> method using 
 *   <code><a href="#property_MDSCHEMA_MEMBERS"></a></code> as value for the <code>requestType</code>, 
 *   and retrieves the <code>MDSCHEMA_MEMBERS</code> schema rowset. 
-*   ...todo...
 *   The rowset has the following columns:
 *   <table border="1" class="schema-rowset">
 *       <tr>
@@ -3835,6 +3875,141 @@ The number of members in the level.
 *           <th>Description</th>
 *           <th>Restriction</th>
 *           <th>Nullable</th>
+*       </tr>
+*       <tr>
+*           <td>CATALOG_NAME</td>
+*           <td>string</td>
+*           <td>The name of the catalog</td>
+*           <td>Yes</td>
+*           <td>No</td>
+*       </tr>
+*       <tr>
+*           <td>SCHEMA_NAME</td>
+*           <td>string</td>
+*           <td>The name of the schema</td>
+*           <td>Yes</td>
+*           <td>No</td>
+*       </tr>
+*       <tr>
+*           <td>CUBE_NAME</td>
+*           <td>string</td>
+*           <td>The name of the cube</td>
+*           <td>Yes</td>
+*           <td>No</td>
+*       </tr>
+*       <tr>
+*           <td>DIMENSION_UNIQUE_NAME</td>
+*           <td>string</td>
+*           <td>The unique name of the dimension</td>
+*           <td>Yes</td>
+*           <td>No</td>
+*       </tr>
+*       <tr>
+*           <td>HIERARCHY_UNIQUE_NAME</td>
+*           <td>string</td>
+*           <td>The unique name of the hierarchy</td>
+*           <td>Yes</td>
+*           <td>No</td>
+*       </tr>
+*       <tr>
+*           <td>LEVEL_UNIQUE_NAME</td>
+*           <td>string</td>
+*           <td>The unique name of the level</td>
+*           <td>Yes</td>
+*           <td>No</td>
+*       </tr>
+*       <tr>
+*           <td>LEVEL_NUMBERr</td>
+*           <td>int</td>
+*           <td>Distance of this level to the root</td>
+*           <td>Yes</td>
+*           <td>No</td>
+*       </tr>
+*       <tr>
+*           <td>MEMBER_ORDINAL</td>
+*           <td>int</td>
+*           <td>Deprecated: always 0</td>
+*           <td>Yes</td>
+*           <td>No</td>
+*       </tr>
+*       <tr>
+*           <td>MEMBER_NAME</td>
+*           <td>string</td>
+*           <td>The name of this member</td>
+*           <td>Yes</td>
+*           <td>No</td>
+*       </tr>
+*       <tr>
+*           <td>MEMBER_UNIQUE_NAME</td>
+*           <td>string</td>
+*           <td>The unique name of this member</td>
+*           <td>Yes</td>
+*           <td>No</td>
+*       </tr>
+*       <tr>
+*           <td>MEMBER_TYPE</td>
+*           <td>int</td>
+*           <td>An integer constant indicating the type of this member. Can take on one of the following values:
+*               <ul>
+*                   <li><a href="Xmla.Rowset.html#property_MDMEMBER_TYPE_REGULAR">MDMEMBER_TYPE_REGULAR</a></li>
+*                   <li><a href="Xmla.Rowset.html#property_MDMEMBER_TYPE_ALL">MDMEMBER_TYPE_ALL</a></li>
+*                   <li><a href="Xmla.Rowset.html#property_MDMEMBER_TYPE_MEASURE">MDMEMBER_TYPE_MEASURE</a></li>
+*                   <li><a href="Xmla.Rowset.html#property_MDMEMBER_TYPE_FORMULA">MDMEMBER_TYPE_FORMULA</a></li>
+*                   <li><a href="Xmla.Rowset.html#property_MDMEMBER_TYPE_UNKNOWN">MDMEMBER_TYPE_UNKNOWN</a></li>
+*                   <li><a href="Xmla.Rowset.html#property_MDMEMBER_TYPE_FORMULA">MDMEMBER_TYPE_FORMULA</a></li>
+*               </ul>
+*           </td>
+*           <td>Yes</td>
+*           <td>No</td>
+*       </tr>
+*       <tr>
+*           <td>MEMBER_GUID</td>
+*           <td>string</td>
+*           <td>The guid of this member</td>
+*           <td>Yes</td>
+*           <td>No</td>
+*       </tr>
+*       <tr>
+*           <td>MEMBER_CAPTION</td>
+*           <td>string</td>
+*           <td>A label or caption associated with the member. Used primarily for display purposes. If a caption does not exist, MEMBER_NAME is returned.</td>
+*           <td>Yes</td>
+*           <td>No</td>
+*       </tr>
+*       <tr>
+*           <td>CHILDREN_CARDINALITY</td>
+*           <td>int</td>
+*           <td>The number of childrend for this member</td>
+*           <td>Yes</td>
+*           <td>No</td>
+*       </tr>
+*       <tr>
+*           <td>PARENT_LEVEL</td>
+*           <td>int</td>
+*           <td>The distance of the member's parent from the root level of the hierarchy. The root level is zero (0).</td>
+*           <td>Yes</td>
+*           <td>No</td>
+*       </tr>
+*       <tr>
+*           <td>DESCRIPTION</td>
+*           <td>string</td>
+*           <td>This column always returns a NULL value. This column exists for backwards compatibility</td>
+*           <td>Yes</td>
+*           <td>No</td>
+*       </tr>
+*       <tr>
+*           <td>EXPRESSION</td>
+*           <td>string</td>
+*           <td>The expression for calculations, if the member is of type MDMEMBER_TYPE_FORMULA.</td>
+*           <td>Yes</td>
+*           <td>No</td>
+*       </tr>
+*       <tr>
+*           <td>MEMBER_KEY</td>
+*           <td>string</td>
+*           <td>The value of the member's key column. Returns NULL if the member has a composite key.</td>
+*           <td>Yes</td>
+*           <td>No</td>
 *       </tr>
 *   </table>
 *   @method discoverMDMembers
@@ -3911,14 +4086,14 @@ The number of members in the level.
     }
 };
 
-function _getRowSchema(xmlDoc){
-    var types = _getElementsByTagNameNS(xmlDoc, _xmlnsSchema, _xmlnsSchemaPrefix, "complexType"), 
-        numTypes = types.length,
-        type,
-        i;
+function _getComplexType(node, name){
+    var types = _getElementsByTagNameNS(
+        node, _xmlnsSchema, _xmlnsSchemaPrefix, "complexType"
+    ),  numTypes = types.length, type, i
+    ;
     for (i=0; i<numTypes; i += 1){
         type = types.item(i);
-        if (type.getAttribute("name")==="row"){
+        if (type.getAttribute("name")===name){
             return type;
         }
     }
@@ -3961,8 +4136,8 @@ Xmla.Rowset = function (node, requestType){
 
 /**
 *   A possible value for the <code>DIMENSION_TYPE</code> column that appears in the 
-*   <code>MDSCHEMA_DIMENSIONS</code> (See: <code><a href="#method_discoverMDDimensions">discoverMDDimensions()</a></code>) and 
-*   <code>MDSCHEMA_HIERARCHIES</code> (See: <code><a href="#method_discoverMDHierarchies">discoverMDHierarchies()</a></code>)rowsets.
+*   <code>MDSCHEMA_DIMENSIONS</code> (See: <code><a href="Xmla.html#method_discoverMDDimensions">discoverMDDimensions()</a></code>) and 
+*   <code>MDSCHEMA_HIERARCHIES</code> (See: <code><a href="Xmla.html#method_discoverMDHierarchies">discoverMDHierarchies()</a></code>)rowsets.
 *
 *   @property MD_DIMTYPE_UNKNOWN
 *   @static
@@ -3973,8 +4148,8 @@ Xmla.Rowset = function (node, requestType){
 Xmla.Rowset.MD_DIMTYPE_UNKNOWN = 0;
 /**
 *   A possible value for the <code>DIMENSION_TYPE</code> column that appears in the 
-*   <code>MDSCHEMA_DIMENSIONS</code> (See: <code><a href="#method_discoverMDDimensions">discoverMDDimensions()</a></code>) and 
-*   <code>MDSCHEMA_HIERARCHIES</code> (See: <code><a href="#method_discoverMDHierarchies">discoverMDHierarchies()</a></code>)rowsets.
+*   <code>MDSCHEMA_DIMENSIONS</code> (See: <code><a href="Xmla.html#method_discoverMDDimensions">discoverMDDimensions()</a></code>) and 
+*   <code>MDSCHEMA_HIERARCHIES</code> (See: <code><a href="Xmla.html#method_discoverMDHierarchies">discoverMDHierarchies()</a></code>)rowsets.
 *
 *   @property MD_DIMTYPE_TIME
 *   @static
@@ -3985,8 +4160,8 @@ Xmla.Rowset.MD_DIMTYPE_UNKNOWN = 0;
 Xmla.Rowset.MD_DIMTYPE_TIME = 1;
 /**
 *   A possible value for the <code>DIMENSION_TYPE</code> column that appears in the 
-*   <code>MDSCHEMA_DIMENSIONS</code> (See: <code><a href="#method_discoverMDDimensions">discoverMDDimensions()</a></code>) and 
-*   <code>MDSCHEMA_HIERARCHIES</code> (See: <code><a href="#method_discoverMDHierarchies">discoverMDHierarchies()</a></code>)rowsets.
+*   <code>MDSCHEMA_DIMENSIONS</code> (See: <code><a href="Xmla.html#method_discoverMDDimensions">discoverMDDimensions()</a></code>) and 
+*   <code>MDSCHEMA_HIERARCHIES</code> (See: <code><a href="Xmla.html#method_discoverMDHierarchies">discoverMDHierarchies()</a></code>)rowsets.
 *
 *   @property MD_DIMTYPE_MEASURE
 *   @static
@@ -3997,8 +4172,8 @@ Xmla.Rowset.MD_DIMTYPE_TIME = 1;
 Xmla.Rowset.MD_DIMTYPE_MEASURE = 2;
 /**
 *   A possible value for the <code>DIMENSION_TYPE</code> column that appears in the 
-*   <code>MDSCHEMA_DIMENSIONS</code> (See: <code><a href="#method_discoverMDDimensions">discoverMDDimensions()</a></code>) and 
-*   <code>MDSCHEMA_HIERARCHIES</code> (See: <code><a href="#method_discoverMDHierarchies">discoverMDHierarchies()</a></code>)rowsets.
+*   <code>MDSCHEMA_DIMENSIONS</code> (See: <code><a href="Xmla.html#method_discoverMDDimensions">discoverMDDimensions()</a></code>) and 
+*   <code>MDSCHEMA_HIERARCHIES</code> (See: <code><a href="Xmla.html#method_discoverMDHierarchies">discoverMDHierarchies()</a></code>)rowsets.
 *
 *   @property MD_DIMTYPE_OTHER
 *   @static
@@ -4009,8 +4184,8 @@ Xmla.Rowset.MD_DIMTYPE_MEASURE = 2;
 Xmla.Rowset.MD_DIMTYPE_OTHER = 3;
 /**
 *   A possible value for the <code>DIMENSION_TYPE</code> column that appears in the 
-*   <code>MDSCHEMA_DIMENSIONS</code> (See: <code><a href="#method_discoverMDDimensions">discoverMDDimensions()</a></code>) and 
-*   <code>MDSCHEMA_HIERARCHIES</code> (See: <code><a href="#method_discoverMDHierarchies">discoverMDHierarchies()</a></code>)rowsets.
+*   <code>MDSCHEMA_DIMENSIONS</code> (See: <code><a href="Xmla.html#method_discoverMDDimensions">discoverMDDimensions()</a></code>) and 
+*   <code>MDSCHEMA_HIERARCHIES</code> (See: <code><a href="Xmla.html#method_discoverMDHierarchies">discoverMDHierarchies()</a></code>)rowsets.
 *
 *   @property MD_DIMTYPE_QUANTITATIVE
 *   @static
@@ -4021,8 +4196,8 @@ Xmla.Rowset.MD_DIMTYPE_OTHER = 3;
 Xmla.Rowset.MD_DIMTYPE_QUANTITATIVE = 5;
 /**
 *   A possible value for the <code>DIMENSION_TYPE</code> column that appears in the 
-*   <code>MDSCHEMA_DIMENSIONS</code> (See: <code><a href="#method_discoverMDDimensions">discoverMDDimensions()</a></code>) and 
-*   <code>MDSCHEMA_HIERARCHIES</code> (See: <code><a href="#method_discoverMDHierarchies">discoverMDHierarchies()</a></code>)rowsets.
+*   <code>MDSCHEMA_DIMENSIONS</code> (See: <code><a href="Xmla.html#method_discoverMDDimensions">discoverMDDimensions()</a></code>) and 
+*   <code>MDSCHEMA_HIERARCHIES</code> (See: <code><a href="Xmla.html#method_discoverMDHierarchies">discoverMDHierarchies()</a></code>)rowsets.
 *
 *   @property MD_DIMTYPE_ACCOUNTS
 *   @static
@@ -4033,8 +4208,8 @@ Xmla.Rowset.MD_DIMTYPE_QUANTITATIVE = 5;
 Xmla.Rowset.MD_DIMTYPE_ACCOUNTS = 6;
 /**
 *   A possible value for the <code>DIMENSION_TYPE</code> column that appears in the 
-*   <code>MDSCHEMA_DIMENSIONS</code> (See: <code><a href="#method_discoverMDDimensions">discoverMDDimensions()</a></code>) and 
-*   <code>MDSCHEMA_HIERARCHIES</code> (See: <code><a href="#method_discoverMDHierarchies">discoverMDHierarchies()</a></code>)rowsets.
+*   <code>MDSCHEMA_DIMENSIONS</code> (See: <code><a href="Xmla.html#method_discoverMDDimensions">discoverMDDimensions()</a></code>) and 
+*   <code>MDSCHEMA_HIERARCHIES</code> (See: <code><a href="Xmla.html#method_discoverMDHierarchies">discoverMDHierarchies()</a></code>)rowsets.
 *
 *   @property MD_DIMTYPE_CUSTOMERS
 *   @static
@@ -4045,8 +4220,8 @@ Xmla.Rowset.MD_DIMTYPE_ACCOUNTS = 6;
 Xmla.Rowset.MD_DIMTYPE_CUSTOMERS = 7;
 /**
 *   A possible value for the <code>DIMENSION_TYPE</code> column that appears in the 
-*   <code>MDSCHEMA_DIMENSIONS</code> (See: <code><a href="#method_discoverMDDimensions">discoverMDDimensions()</a></code>) and 
-*   <code>MDSCHEMA_HIERARCHIES</code> (See: <code><a href="#method_discoverMDHierarchies">discoverMDHierarchies()</a></code>)rowsets.
+*   <code>MDSCHEMA_DIMENSIONS</code> (See: <code><a href="Xmla.html#method_discoverMDDimensions">discoverMDDimensions()</a></code>) and 
+*   <code>MDSCHEMA_HIERARCHIES</code> (See: <code><a href="Xmla.html#method_discoverMDHierarchies">discoverMDHierarchies()</a></code>)rowsets.
 *
 *   @property MD_DIMTYPE_PRODUCTS
 *   @static
@@ -4057,8 +4232,8 @@ Xmla.Rowset.MD_DIMTYPE_CUSTOMERS = 7;
 Xmla.Rowset.MD_DIMTYPE_PRODUCTS = 8;
 /**
 *   A possible value for the <code>DIMENSION_TYPE</code> column that appears in the 
-*   <code>MDSCHEMA_DIMENSIONS</code> (See: <code><a href="#method_discoverMDDimensions">discoverMDDimensions()</a></code>) and 
-*   <code>MDSCHEMA_HIERARCHIES</code> (See: <code><a href="#method_discoverMDHierarchies">discoverMDHierarchies()</a></code>)rowsets.
+*   <code>MDSCHEMA_DIMENSIONS</code> (See: <code><a href="Xmla.html#method_discoverMDDimensions">discoverMDDimensions()</a></code>) and 
+*   <code>MDSCHEMA_HIERARCHIES</code> (See: <code><a href="Xmla.html#method_discoverMDHierarchies">discoverMDHierarchies()</a></code>)rowsets.
 *
 *   @property MD_DIMTYPE_SCENARIO
 *   @static
@@ -4069,8 +4244,8 @@ Xmla.Rowset.MD_DIMTYPE_PRODUCTS = 8;
 Xmla.Rowset.MD_DIMTYPE_SCENARIO = 9;
 /**
 *   A possible value for the <code>DIMENSION_TYPE</code> column that appears in the 
-*   <code>MDSCHEMA_DIMENSIONS</code> (See: <code><a href="#method_discoverMDDimensions">discoverMDDimensions()</a></code>) and 
-*   <code>MDSCHEMA_HIERARCHIES</code> (See: <code><a href="#method_discoverMDHierarchies">discoverMDHierarchies()</a></code>)rowsets.
+*   <code>MDSCHEMA_DIMENSIONS</code> (See: <code><a href="Xmla.html#method_discoverMDDimensions">discoverMDDimensions()</a></code>) and 
+*   <code>MDSCHEMA_HIERARCHIES</code> (See: <code><a href="Xmla.html#method_discoverMDHierarchies">discoverMDHierarchies()</a></code>)rowsets.
 *
 *   @property MD_DIMTYPE_UTILIY
 *   @static
@@ -4081,8 +4256,8 @@ Xmla.Rowset.MD_DIMTYPE_SCENARIO = 9;
 Xmla.Rowset.MD_DIMTYPE_UTILIY = 10;
 /**
 *   A possible value for the <code>DIMENSION_TYPE</code> column that appears in the 
-*   <code>MDSCHEMA_DIMENSIONS</code> (See: <code><a href="#method_discoverMDDimensions">discoverMDDimensions()</a></code>) and 
-*   <code>MDSCHEMA_HIERARCHIES</code> (See: <code><a href="#method_discoverMDHierarchies">discoverMDHierarchies()</a></code>)rowsets.
+*   <code>MDSCHEMA_DIMENSIONS</code> (See: <code><a href="Xmla.html#method_discoverMDDimensions">discoverMDDimensions()</a></code>) and 
+*   <code>MDSCHEMA_HIERARCHIES</code> (See: <code><a href="Xmla.html#method_discoverMDHierarchies">discoverMDHierarchies()</a></code>)rowsets.
 *
 *   @property MD_DIMTYPE_CURRENCY
 *   @static
@@ -4093,8 +4268,8 @@ Xmla.Rowset.MD_DIMTYPE_UTILIY = 10;
 Xmla.Rowset.MD_DIMTYPE_CURRENCY = 11;
 /**
 *   A possible value for the <code>DIMENSION_TYPE</code> column that appears in the 
-*   <code>MDSCHEMA_DIMENSIONS</code> (See: <code><a href="#method_discoverMDDimensions">discoverMDDimensions()</a></code>) and 
-*   <code>MDSCHEMA_HIERARCHIES</code> (See: <code><a href="#method_discoverMDHierarchies">discoverMDHierarchies()</a></code>)rowsets.
+*   <code>MDSCHEMA_DIMENSIONS</code> (See: <code><a href="Xmla.html#method_discoverMDDimensions">discoverMDDimensions()</a></code>) and 
+*   <code>MDSCHEMA_HIERARCHIES</code> (See: <code><a href="Xmla.html#method_discoverMDHierarchies">discoverMDHierarchies()</a></code>)rowsets.
 *
 *   @property MD_DIMTYPE_RATES
 *   @static
@@ -4105,8 +4280,8 @@ Xmla.Rowset.MD_DIMTYPE_CURRENCY = 11;
 Xmla.Rowset.MD_DIMTYPE_RATES = 12;
 /**
 *   A possible value for the <code>DIMENSION_TYPE</code> column that appears in the 
-*   <code>MDSCHEMA_DIMENSIONS</code> (See: <code><a href="#method_discoverMDDimensions">discoverMDDimensions()</a></code>) and 
-*   <code>MDSCHEMA_HIERARCHIES</code> (See: <code><a href="#method_discoverMDHierarchies">discoverMDHierarchies()</a></code>)rowsets.
+*   <code>MDSCHEMA_DIMENSIONS</code> (See: <code><a href="Xmla.html#method_discoverMDDimensions">discoverMDDimensions()</a></code>) and 
+*   <code>MDSCHEMA_HIERARCHIES</code> (See: <code><a href="Xmla.html#method_discoverMDHierarchies">discoverMDHierarchies()</a></code>)rowsets.
 *
 *   @property MD_DIMTYPE_CHANNEL
 *   @static
@@ -4117,8 +4292,8 @@ Xmla.Rowset.MD_DIMTYPE_RATES = 12;
 Xmla.Rowset.MD_DIMTYPE_CHANNEL = 13;
 /**
 *   A possible value for the <code>DIMENSION_TYPE</code> column that appears in the 
-*   <code>MDSCHEMA_DIMENSIONS</code> (See: <code><a href="#method_discoverMDDimensions">discoverMDDimensions()</a></code>) and 
-*   <code>MDSCHEMA_HIERARCHIES</code> (See: <code><a href="#method_discoverMDHierarchies">discoverMDHierarchies()</a></code>)rowsets.
+*   <code>MDSCHEMA_DIMENSIONS</code> (See: <code><a href="Xmla.html#method_discoverMDDimensions">discoverMDDimensions()</a></code>) and 
+*   <code>MDSCHEMA_HIERARCHIES</code> (See: <code><a href="Xmla.html#method_discoverMDHierarchies">discoverMDHierarchies()</a></code>)rowsets.
 *
 *   @property MD_DIMTYPE_PROMOTION
 *   @static
@@ -4129,8 +4304,8 @@ Xmla.Rowset.MD_DIMTYPE_CHANNEL = 13;
 Xmla.Rowset.MD_DIMTYPE_PROMOTION = 14;
 /**
 *   A possible value for the <code>DIMENSION_TYPE</code> column that appears in the 
-*   <code>MDSCHEMA_DIMENSIONS</code> (See: <code><a href="#method_discoverMDDimensions">discoverMDDimensions()</a></code>) and 
-*   <code>MDSCHEMA_HIERARCHIES</code> (See: <code><a href="#method_discoverMDHierarchies">discoverMDHierarchies()</a></code>)rowsets.
+*   <code>MDSCHEMA_DIMENSIONS</code> (See: <code><a href="Xmla.html#method_discoverMDDimensions">discoverMDDimensions()</a></code>) and 
+*   <code>MDSCHEMA_HIERARCHIES</code> (See: <code><a href="Xmla.html#method_discoverMDHierarchies">discoverMDHierarchies()</a></code>)rowsets.
 *
 *   @property MD_DIMTYPE_ORGANIZATION
 *   @static
@@ -4141,8 +4316,8 @@ Xmla.Rowset.MD_DIMTYPE_PROMOTION = 14;
 Xmla.Rowset.MD_DIMTYPE_ORGANIZATION = 15;
 /**
 *   A possible value for the <code>DIMENSION_TYPE</code> column that appears in the 
-*   <code>MDSCHEMA_DIMENSIONS</code> (See: <code><a href="#method_discoverMDDimensions">discoverMDDimensions()</a></code>) and 
-*   <code>MDSCHEMA_HIERARCHIES</code> (See: <code><a href="#method_discoverMDHierarchies">discoverMDHierarchies()</a></code>)rowsets.
+*   <code>MDSCHEMA_DIMENSIONS</code> (See: <code><a href="Xmla.html#method_discoverMDDimensions">discoverMDDimensions()</a></code>) and 
+*   <code>MDSCHEMA_HIERARCHIES</code> (See: <code><a href="Xmla.html#method_discoverMDHierarchies">discoverMDHierarchies()</a></code>)rowsets.
 *
 *   @property MD_DIMTYPE_BILL_OF_MATERIALS
 *   @static
@@ -4153,8 +4328,8 @@ Xmla.Rowset.MD_DIMTYPE_ORGANIZATION = 15;
 Xmla.Rowset.MD_DIMTYPE_BILL_OF_MATERIALS = 16;
 /**
 *   A possible value for the <code>DIMENSION_TYPE</code> column that appears in the 
-*   <code>MDSCHEMA_DIMENSIONS</code> (See: <code><a href="#method_discoverMDDimensions">discoverMDDimensions()</a></code>) and 
-*   <code>MDSCHEMA_HIERARCHIES</code> (See: <code><a href="#method_discoverMDHierarchies">discoverMDHierarchies()</a></code>)rowsets.
+*   <code>MDSCHEMA_DIMENSIONS</code> (See: <code><a href="Xmla.html#method_discoverMDDimensions">discoverMDDimensions()</a></code>) and 
+*   <code>MDSCHEMA_HIERARCHIES</code> (See: <code><a href="Xmla.html#method_discoverMDHierarchies">discoverMDHierarchies()</a></code>)rowsets.
 *
 *   @property MD_DIMTYPE_GEOGRAPHY
 *   @static
@@ -4166,7 +4341,7 @@ Xmla.Rowset.MD_DIMTYPE_GEOGRAPHY = 17;
 
 /**
 *	A possible value for the <code>STRUCTURE</code> column of the 
-*   <code>MDSCHEMA_HIERARCHIES</code> (See: <code><a href="#method_discoverMDHierarchies">discoverMDHierarchies()</a></code>)rowset.
+*   <code>MDSCHEMA_HIERARCHIES</code> (See: <code><a href="Xmla.html#method_discoverMDHierarchies">discoverMDHierarchies()</a></code>)rowset.
 *	@property MD_STRUCTURE_FULLYBALANCED
 *   @static
 *   @final
@@ -4176,7 +4351,7 @@ Xmla.Rowset.MD_DIMTYPE_GEOGRAPHY = 17;
 Xmla.Rowset.MD_STRUCTURE_FULLYBALANCED = 0;
 /**
 *	A possible value for the <code>STRUCTURE</code> column of the 
-*   <code>MDSCHEMA_HIERARCHIES</code> (See: <code><a href="#method_discoverMDHierarchies">discoverMDHierarchies()</a></code>)rowset.
+*   <code>MDSCHEMA_HIERARCHIES</code> (See: <code><a href="Xmla.html#method_discoverMDHierarchies">discoverMDHierarchies()</a></code>)rowset.
 *	@property MD_STRUCTURE_RAGGEDBALANCED
 *   @static
 *   @final
@@ -4186,7 +4361,7 @@ Xmla.Rowset.MD_STRUCTURE_FULLYBALANCED = 0;
 Xmla.Rowset.MD_STRUCTURE_RAGGEDBALANCED = 1;
 /**
 *	A possible value for the <code>STRUCTURE</code> column of the 
-*   <code>MDSCHEMA_HIERARCHIES</code> (See: <code><a href="#method_discoverMDHierarchies">discoverMDHierarchies()</a></code>)rowset.
+*   <code>MDSCHEMA_HIERARCHIES</code> (See: <code><a href="Xmla.html#method_discoverMDHierarchies">discoverMDHierarchies()</a></code>)rowset.
 *	@property MD_STRUCTURE_UNBALANCED
 *   @static
 *   @final
@@ -4196,7 +4371,7 @@ Xmla.Rowset.MD_STRUCTURE_RAGGEDBALANCED = 1;
 Xmla.Rowset.MD_STRUCTURE_UNBALANCED = 2;
 /**
 *	A possible value for the <code>STRUCTURE</code> column of the 
-*   <code>MDSCHEMA_HIERARCHIES</code> (See: <code><a href="#method_discoverMDHierarchies">discoverMDHierarchies()</a></code>)rowset.
+*   <code>MDSCHEMA_HIERARCHIES</code> (See: <code><a href="Xmla.html#method_discoverMDHierarchies">discoverMDHierarchies()</a></code>)rowset.
 *	@property MD_STRUCTURE_NETWORK
 *   @static
 *   @final
@@ -4207,7 +4382,7 @@ Xmla.Rowset.MD_STRUCTURE_NETWORK = 3;
 
 /**
 *	A  bitmap value for the <code>HIERARCHY_ORIGIN</code> column of the 
-*   <code>MDSCHEMA_HIERARCHIES</code> (See: <code><a href="#method_discoverMDHierarchies">discoverMDHierarchies()</a></code>)rowset.
+*   <code>MDSCHEMA_HIERARCHIES</code> (See: <code><a href="Xmla.html#method_discoverMDHierarchies">discoverMDHierarchies()</a></code>)rowset.
 *	Identifies user defined hierarchies.
 *	@property MD_USER_DEFINED
 *   @static
@@ -4218,7 +4393,7 @@ Xmla.Rowset.MD_STRUCTURE_NETWORK = 3;
 Xmla.Rowset.MD_USER_DEFINED = 1
 /**
 *	A  bitmap value for the <code>HIERARCHY_ORIGIN</code> column of the 
-*   <code>MDSCHEMA_HIERARCHIES</code> (See: <code><a href="#method_discoverMDHierarchies">discoverMDHierarchies()</a></code>)rowset.
+*   <code>MDSCHEMA_HIERARCHIES</code> (See: <code><a href="Xmla.html#method_discoverMDHierarchies">discoverMDHierarchies()</a></code>)rowset.
 *	identifies attribute hierarchies.
 *	@property MD_SYSTEM_ENABLED
 *   @static
@@ -4229,7 +4404,7 @@ Xmla.Rowset.MD_USER_DEFINED = 1
 Xmla.Rowset.MD_SYSTEM_ENABLED = 2
 /**
 *	A  bitmap value for the <code>HIERARCHY_ORIGIN</code> column of the 
-*   <code>MDSCHEMA_HIERARCHIES</code> (See: <code><a href="#method_discoverMDHierarchies">discoverMDHierarchies()</a></code>)rowset.
+*   <code>MDSCHEMA_HIERARCHIES</code> (See: <code><a href="Xmla.html#method_discoverMDHierarchies">discoverMDHierarchies()</a></code>)rowset.
 *	identifies attributes with no attribute hierarchies.
 *	@property MD_SYSTEM_INTERNAL
 *   @static
@@ -4238,6 +4413,62 @@ Xmla.Rowset.MD_SYSTEM_ENABLED = 2
 *   @default <code>4</code>
 */
 Xmla.Rowset.MD_SYSTEM_INTERNAL = 4
+
+/**
+*   A possible value for the <code>MEMBER_TYPE</code> column of the 
+*   <code>MDSCHEMA_MEMBERS</code> rowset (see: <code><a href="Xmla.html#method_discoverMDMembers">discoverMDMembers()</a></code>),
+*   indicating a regular member.
+*	@property MDMEMBER_TYPE_REGULAR
+*   @static
+*   @final
+*   @type int
+*   @default <code>1</code>
+*/
+Xmla.Rowset.MDMEMBER_TYPE_REGULAR = 1;
+/**
+*   A possible value for the <code>MEMBER_TYPE</code> column of the 
+*   <code>MDSCHEMA_MEMBERS</code> rowset (see: <code><a href="Xmla.html#method_discoverMDMembers">discoverMDMembers()</a></code>),
+*   indicating an all member.
+*	@property MDMEMBER_TYPE_ALL
+*   @static
+*   @final
+*   @type int
+*   @default <code>2</code>
+*/
+Xmla.Rowset.MDMEMBER_TYPE_ALL = 2;
+/**
+*   A possible value for the <code>MEMBER_TYPE</code> column of the 
+*   <code>MDSCHEMA_MEMBERS</code> rowset (see: <code><a href="Xmla.html#method_discoverMDMembers">discoverMDMembers()</a></code>),
+*   indicating a formula member.
+*	@property MDMEMBER_TYPE_FORMULA
+*   @static
+*   @final
+*   @type int
+*   @default <code>3</code>
+*/
+Xmla.Rowset.MDMEMBER_TYPE_FORMULA = 3;
+/**
+*   A possible value for the <code>MEMBER_TYPE</code> column of the 
+*   <code>MDSCHEMA_MEMBERS</code> rowset (see: <code><a href="Xmla.html#method_discoverMDMembers">discoverMDMembers()</a></code>),
+*   indicating a measure member.
+*	@property MDMEMBER_TYPE_MEASURE
+*   @static
+*   @final
+*   @type int
+*   @default <code>4</code>
+*/
+Xmla.Rowset.MDMEMBER_TYPE_MEASURE = 4;
+/**
+*   A possible value for the <code>MEMBER_TYPE</code> column of the 
+*   <code>MDSCHEMA_MEMBERS</code> rowset (see: <code><a href="Xmla.html#method_discoverMDMembers">discoverMDMembers()</a></code>),
+*   indicating a member of unknown type
+*	@property MDMEMBER_TYPE_UNKNOWN
+*   @static
+*   @final
+*   @type int
+*   @default <code>0</code>
+*/
+Xmla.Rowset.MDMEMBER_TYPE_UNKNOWN = 0;
 
 Xmla.Rowset.KEYS = {};
 Xmla.Rowset.KEYS[Xmla.DBSCHEMA_CATALOGS] = ["CATALOG_NAME"];
@@ -4263,6 +4494,111 @@ Xmla.Rowset.KEYS[Xmla.MDSCHEMA_MEMBERS] = ["CATALOG_NAME","CUBE_NAME","DIMENSION
 Xmla.Rowset.KEYS[Xmla.MDSCHEMA_PROPERTIES] = [];
 Xmla.Rowset.KEYS[Xmla.MDSCHEMA_SETS] = [];
 
+
+function _boolConverter(val){
+    return val==="true"?true:false;
+}
+
+function _intConverter(val){
+    return parseInt(val, 10);
+}
+
+function _floatConverter(val){
+    return parseFloat(val, 10);
+}
+
+function _textConverter (val){
+    return val;
+}
+
+function _dateTimeConverter (val){
+    return Date.parse(val);
+}
+
+function _restrictionsConverter(val){
+    return val;
+}
+
+function _arrayConverter(nodes, valueConverter){
+    var arr = [],
+        numNodes = nodes.length,
+        node
+    ;
+    for (var i=0; i<numNodes; i += 1){
+        node = nodes.item(i);
+        arr.push(valueConverter(_getElementText(node)));
+    }
+    return arr;
+}
+
+function _getValueConverter(type){
+    var valueConverter = {};
+    switch (type){
+        case "xsd:boolean":
+            valueConverter.func = _boolConverter;
+            valueConverter.jsType = "boolean";
+            break;
+        case "xsd:decimal": //FIXME: not sure if you can use parseFloat for this.
+        case "xsd:double":
+        case "xsd:float":
+            valueConverter.func = _floatConverter;
+            valueConverter.jsType = "number";
+            break;
+        case "xsd:int":
+        case "xsd:integer":
+        case "xsd:nonPositiveInteger":
+        case "xsd:negativeInteger":
+        case "xsd:nonNegativeInteger":
+        case "xsd:positiveInteger":
+        case "xsd:short":
+        case "xsd:byte":
+        case "xsd:long":
+        case "xsd:unsignedLong":
+        case "xsd:unsignedInt":
+        case "xsd:unsignedShort":
+        case "xsd:unsignedByte":
+            valueConverter.func = _intConverter;
+            valueConverter.jsType = "number";
+            break;
+        case "xsd:string":
+            valueConverter.func = _textConverter;
+            valueConverter.jsType = "string";
+            break;
+        case "xsd:dateTime":
+            valueConverter.func = _dateTimeConverter;
+            valueConverter.jsType = "object";
+            break;
+        case "Restrictions":
+            valueConverter.func = _restrictionsConverter;
+            valueConverter.jsType = "object";
+            break;
+        default:
+            valueConverter.func = _textConverter;
+            valueConverter.jsType = "object";
+            break;
+    }
+    return valueConverter;
+}
+
+function _getElementValue(el) {
+    var txt = _getElementText(el),
+        type = el.getAttribute("type")
+        converter
+        ;
+    if (type){
+        converter = _getValueConverter(type);
+        if (converter){
+            return converter.func(txt);
+        }
+        else {
+            return txt;
+        }
+    }
+    else {
+        return txt;
+    }
+}
+
 Xmla.Rowset.prototype = {
 	_node:  null,
     _type: null,
@@ -4279,7 +4615,7 @@ Xmla.Rowset.prototype = {
         this.fieldOrder = [];
         this.fields = {};
         this._fieldCount = 0;
-        var rowSchema = _getRowSchema(this._node);
+        var rowSchema = _getComplexType(this._node, "row");
         if (rowSchema){    
             var seq = _getElementsByTagNameNS(rowSchema, _xmlnsSchema, _xmlnsSchemaPrefix, "sequence").item(0),
                 seqChildren = seq.childNodes, numChildren = seqChildren.length, seqChild,
@@ -4325,7 +4661,7 @@ Xmla.Rowset.prototype = {
 				else {
 					maxOccurs = 1;
 				}
-                valueConverter = this._getValueConverter(type);
+                valueConverter = _getValueConverter(type);
                 this.fields[fieldLabel] = {
                     name: fieldName,
                     label: fieldLabel,
@@ -4347,112 +4683,6 @@ Xmla.Rowset.prototype = {
             )._throw();
         }
     },
-    _boolConverter: function(val){
-        return val==="true"?true:false;
-    },
-    _intConverter: function(val){
-        return parseInt(val, 10);
-    },
-    _floatConverter: function(val){
-        return parseFloat(val, 10);
-    },
-    _textConverter: function(val){
-        return val;
-    },
-    _dateTimeConverter: function(val){
-        return Date.parse(val);
-    },
-    _restrictionsConverter: function(val){
-        return val;
-    },
-    _arrayConverter: function(nodes, valueConverter){
-        var arr = [],
-            numNodes = nodes.length,
-            node
-        ;
-        for (var i=0; i<numNodes; i += 1){
-            node = nodes.item(i);
-            arr.push(valueConverter(this._elementText(node)));
-        }
-        return arr;
-    },
-    _elementText: function(el){
-        if (el.innerText) {         //ie
-            return el.innerText;
-        }
-        else 
-        if (el.textContent) {       //ff
-            return el.textContent;
-        }
-		else 
-		if (el.normalize){
-			el.normalize();
-			if (el.firstChild){
-				return el.firstChild.data;
-			}
-			else {
-				return null;
-			}
-		}
-        else {                      //generic
-            var text = "",
-                childNodes = el.childNodes,
-                numChildNodes = childNodes.length
-            ;
-            for (var i=0; i<numChildNodes; i += 1){
-                text += childNodes.item(i).data;
-            }
-            return text;
-        }
-    },
-    _getValueConverter: function(type){
-        var valueConverter = {};
-        switch (type){
-            case "xsd:boolean":
-                valueConverter.func = this._boolConverter;
-                valueConverter.jsType = "boolean";
-                break;
-            case "xsd:decimal": //FIXME: not sure if you can use parseFloat for this.
-            case "xsd:double":
-            case "xsd:float":
-                valueConverter.func = this._floatConverter;
-                valueConverter.jsType = "number";
-                break;
-            case "xsd:int":
-            case "xsd:integer":
-            case "xsd:nonPositiveInteger":
-            case "xsd:negativeInteger":
-            case "xsd:nonNegativeInteger":
-            case "xsd:positiveInteger":
-            case "xsd:short":
-            case "xsd:byte":
-            case "xsd:long":
-            case "xsd:unsignedLong":
-            case "xsd:unsignedInt":
-            case "xsd:unsignedShort":
-            case "xsd:unsignedByte":
-                valueConverter.func = this._intConverter;
-                valueConverter.jsType = "number";
-                break;
-            case "xsd:string":
-                valueConverter.func = this._textConverter;
-                valueConverter.jsType = "string";
-                break;
-            case "xsd:dateTime":
-                valueConverter.func = this._dateTimeConverter;
-                valueConverter.jsType = "object";
-                break;
-            case "Restrictions":
-                valueConverter.func = this._restrictionsConverter;
-                valueConverter.jsType = "object";
-                break;
-            default:
-                valueConverter.func = this._textConverter;
-                valueConverter.jsType = "object";
-                break;
-        }
-        return valueConverter;
-    },
     _createFieldGetter: function(fieldName, valueConverter, minOccurs, maxOccurs){
         var me = this;
         var getter;
@@ -4460,7 +4690,7 @@ Xmla.Rowset.prototype = {
             if(minOccurs===1) {
                 getter = function(){
                     var els = _getElementsByTagNameNS (this._row, _xmlnsRowset, null, fieldName);
-                    return valueConverter(me._elementText(els.item(0)));
+                    return valueConverter(_getElementText(els.item(0)));
                 };
             }
             else 
@@ -4468,7 +4698,7 @@ Xmla.Rowset.prototype = {
                 getter = function(){
                     var els = _getElementsByTagNameNS (this._row, _xmlnsRowset, null, fieldName);
                     if (els.length) {
-                        return valueConverter(me._elementText(els.item(0)));
+                        return valueConverter(_getElementText(els.item(0)));
                     }
                     else {
                         return null;
@@ -4480,7 +4710,7 @@ Xmla.Rowset.prototype = {
         if(minOccurs===1) {
             getter = function(){
                 var els = _getElementsByTagNameNS (this._row, _xmlnsRowset, null, fieldName);
-                return me._arrayConverter(els, valueConverter);
+                return _arrayConverter(els, valueConverter);
             };
         }
         else 
@@ -4488,7 +4718,7 @@ Xmla.Rowset.prototype = {
             getter = function(){
                 var els = _getElementsByTagNameNS (this._row, _xmlnsRowset, null, fieldName);
                 if (els.length) {
-                    return me._arrayConverter(els, valueConverter);
+                    return _arrayConverter(els, valueConverter);
                 }
                 else {
                     return null;
@@ -4535,7 +4765,7 @@ Xmla.Rowset.prototype = {
 */    
     getFieldNames: function(){
         var fieldNames = [];
-        for (var i=0, count = this.fieldCount(); i<count; i += 1){
+        for (var i=0, count = this._fieldCount; i<count; i += 1){
             fieldNames[i] = this.fieldOrder[i];
         }
         return fieldNames;
@@ -4568,6 +4798,7 @@ Xmla.Rowset.prototype = {
     next: function(){
         this.rowIndex += 1;
         this._row = this._rows.item(this.rowIndex);
+        return this.rowIndex;
     },
 /**
 *   Gets the value of the internal row index.
@@ -4634,8 +4865,7 @@ Xmla.Rowset.prototype = {
 *   @return {int} The ordinal position (starting at 0) of the field that matches the argument.
 */    
     fieldIndex: function(name){
-        var fieldDef = this.fieldDef(name);
-        return fieldDef.index;
+        return this.fieldDef(name).index;
     },
 /**
 *   Retrieves the name of a field by field Index.
@@ -4662,11 +4892,10 @@ Xmla.Rowset.prototype = {
 *   @return {array|boolean|float|int|string} From the current row, the value of the field that matches the argument.
 */    
     fieldVal: function(name){
-        if (typeof(name)==="number"){
+        if (_isNum(name)){
             name = this.fieldName(name);
         }
-        var field = this.fieldDef(name);
-        return field.getter.call(this);
+        return this.fieldDef(name).getter.call(this);
     },
 /**
 *   Returns the number of fields in this rowset.
@@ -4698,8 +4927,11 @@ Xmla.Rowset.prototype = {
 *   @method readAsArray
 *   @return {array}
 */    
-    readAsArray: function(){
-        var array = [], fields = this.fields, fieldName, fieldDef;
+    readAsArray: function(array){
+        var fields = this.fields, fieldName, fieldDef;
+        if (!array){
+            array = [];
+        }
         for (fieldName in fields){
             if (fields.hasOwnProperty(fieldName)){
                 fieldDef = fields[fieldName];
@@ -4722,10 +4954,9 @@ while (rowArray = rowset.fetchAsArray()){
 *   @method fetchAsArray 
 *   @return {array}
 */    
-    fetchAsArray: function(){
-        var array;
+    fetchAsArray: function(array){
         if (this.hasMoreRows()) {
-            array = this.readAsArray();
+            array = this.readAsArray(array);
             this.next();
         } else {
             array = false;
@@ -4744,8 +4975,11 @@ while (rowArray = rowset.fetchAsArray()){
 *   @method readAsObject
 *   @return {object}
 */    
-    readAsObject: function(){
-        var object = {}, fields = this.fields, fieldName, fieldDef;
+    readAsObject: function(object){
+        var fields = this.fields, fieldName, fieldDef;
+        if (!object){
+            object = {};
+        }
         for (fieldName in fields){
             if (fields.hasOwnProperty(fieldName)) {
                 fieldDef = fields[fieldName];
@@ -4768,10 +5002,9 @@ while (rowObject = rowset.fetchAsObject()){
 *   @method fetchAsObject 
 *   @return {Object|boolean}
 */    
-    fetchAsObject: function(){
-        var object;
+    fetchAsObject: function(object){
         if (this.hasMoreRows()){
-            object = this.readAsObject();
+            object = this.readAsObject(object);
             this.next();
         } else {
             object = false;
@@ -4914,6 +5147,495 @@ while (rowObject = rowset.fetchAsObject()){
     }
 };
 
+Xmla.Dataset = function(doc){
+    this._initDataset(doc);
+    return this;
+}
+
+Xmla.Dataset.AXIS_COLUMNS = 0;
+Xmla.Dataset.AXIS_ROWS = 1;
+Xmla.Dataset.AXIS_PAGES = 2;
+Xmla.Dataset.AXIS_SECTIONS = 3;
+Xmla.Dataset.AXIS_CHAPTERS = 4;
+Xmla.Dataset.AXIS_SLICER = "SlicerAxis";
+
+Xmla.Dataset.prototype = {
+	_root:  null,
+    _axes: null,
+    _axesOrder: null,
+    _numAxes: null,
+    _slicer: null,
+    _cellset:null,
+    _initDataset: function(doc){
+        this._initRoot(doc);
+        this.cubeName = _getElementText(
+            _getElementsByTagNameNS(
+                this._root, _xmlnsDataset, "", "CubeName"
+            ).item(0)
+        );
+        this._initAxes();
+        this._initCells();
+    },
+    _initRoot: function(doc){
+        var root = _getElementsByTagNameNS(doc, _xmlnsDataset, "", "root");
+        if (root.length){
+            this._root = root.item(0);
+        }
+        else {
+            Xmla.Exception._newError(
+                "ERROR_PARSING_RESPONSE",
+                "Xmla.Dataset._initData",
+                doc
+            )._throw();        
+        }
+    },
+    _initAxes: function(){
+        var i, axis, axisNode, axisName, axisNodes, numAxisNodes, tmpAxes = {};
+
+        this._axes = {};
+        this._axesOrder = [];
+
+        //collect the axisInfo nodes
+        axisNodes = _getElementsByTagNameNS(this._root, _xmlnsDataset, "", "AxisInfo");
+        numAxisNodes = axisNodes.length;
+        for (i=0; i<numAxisNodes; i++){
+            axisNode = axisNodes.item(i);
+            axisName = axisNode.getAttribute("name");
+            tmpAxes[axisName] = axisNode;            
+        }
+        //collect the axis nodes
+        axisNodes = _getElementsByTagNameNS(this._root, _xmlnsDataset, "", "Axis");
+        numAxisNodes = axisNodes.length;
+        for (i=0; i<numAxisNodes; i++){
+            axisNode = axisNodes.item(i);
+            axisName = axisNode.getAttribute("name");
+            axis = new Xmla.Dataset.Axis(tmpAxes[axisName], axisNode);
+            if (axisName==Xmla.Dataset.AXIS_SLICER) {
+                this._slicer = axis;
+            }
+            else {
+                this._axes[axisName] = axis;
+                this._axesOrder.push(axis);
+            }            
+        }
+        this._numAxes = this._axesOrder.length;
+    },
+    _initCells: function(){
+        this._cellset = new Xmla.Dataset.Cellset(this);
+    },
+    getAxisCount: function(){
+        return this._numAxes;
+    },
+    getAxis: function(nameOrIndex){
+        var name, axis;
+        if (isNum(nameOrIndex)){
+            name = this._axesOrder[nameOrIndex];
+            if (_isUnd(nameOrIndex)){
+                Xmla.Exception._newError(
+                    "INVALID_AXIS",
+                    "Xmla.Dataset.getAxis",
+                    name
+                )._throw();            
+            }
+        }
+        else {
+            name = nameOrIndex;
+        }
+        if (name==Xmla.Dataset.AXIS_SLICER) {
+            axis = this._slicer;
+        }
+        else {        
+            axis = this._axes[name];
+        }
+        return axis;
+    },
+    getColumns: function(){
+        return this.getAxis(Xmla.Dataset.AXIS_COLUMNS);
+    },
+    getRows: function(){
+        return this.getAxis(Xmla.Dataset.AXIS_ROWS);
+    },
+    getSlicer: function(){
+        return this._slicer;
+    },
+    close: function(){
+        if (this._slicer){
+            this._slicer.close();
+        }
+        for (var i=0; i<this._namAxes; i++){
+            this.getAxis(i).close();
+        }
+        this._cellset.close();
+        this._root = null;
+        this._axes = null;
+        this._axesOrder = null;
+        this._numAxes = null;
+        this._slicer = null;
+    }
+};
+
+Xmla.Dataset.Axis = function(_axisInfoNode, _axisNode){
+    this._initAxis(_axisInfoNode, _axisNode);
+    return this;
+}
+
+Xmla.Dataset.Axis.MEMBER_UNIQUE_NAME = "UName";
+Xmla.Dataset.Axis.MEMBER_CAPTION = "Caption";
+Xmla.Dataset.Axis.MEMBER_LEVEL_NAME = "LName";
+Xmla.Dataset.Axis.MEMBER_LEVEL_NUMBER = "LNum";
+Xmla.Dataset.Axis.MEMBER_DISPLAY_INFO = "DisplayInfo";
+
+Xmla.Dataset.Axis.prototype = {    
+    _tuples: null,
+    _members: null,
+    numTuples: null,
+    numHierarchies: null,
+    _tupleIndex: null,
+    _hierarchyOrder: null,
+    _hierarchyDefs: null,
+    _initHierarchies: function(_axisInfoNode){
+        var hierarchyInfoNodes = _getElementsByTagNameNS(
+                _axisInfoNode,
+                _xmlnsDataset, 
+                "", 
+                "HierarchyInfo"
+            ),
+            numHierarchies = hierarchyInfoNodes.length, 
+            i, j, hierarchyInfoNode, hierarchyName, hierarchyDef, 
+            properties, numPropertyNodes, propertyNodes, propertyNode
+        ;        
+        this._hierarchyDefs = {};
+        this._hierarchyOrder = [];
+        this.numHierarchies = numHierarchies;
+        for (i=0; i<numHierarchies; i++){
+            hierarchyInfoNode = hierarchyInfoNodes.item(i);
+            hierarchyName = hierarchyInfoNode.getAttribute("name");
+            this._hierarchyOrder[i] = hierarchyName;
+            properties = {};
+            propertyNodes = _getElementsByTagNameNS(
+                _axisInfoNode,
+                _xmlnsDataset, 
+                "", 
+                "*"
+            );
+            numPropertyNodes = propertyNodes.length;
+            for (j=0; j<numPropertyNodes; j++){
+                propertyNode = propertyNodes.item(j);
+                properties[propertyNode.tagName] = null;
+            }
+            hierarchyDef = {
+                index: i,
+                name: hierarchyName,
+                properties: properties
+            };
+            this._hierarchyDefs[hierarchyName] = hierarchyDef;
+        }
+        
+    },
+    _initAxis: function(_axisInfoNode, _axisNode){
+        this.name = _axisNode.getAttribute("name");
+
+        this._initHierarchies(_axisInfoNode);
+        this._tuples = _getElementsByTagNameNS(_axisNode, _xmlnsDataset, "", "Tuple");
+        this.numTuples = this._tuples.length;
+        this.reset();
+    },
+    _getMembers: function(){
+        if (this.tupleIndex < this.numTuples) {
+            return _getElementsByTagNameNS(
+                this._tuples.item(this.tupleIndex), 
+                _xmlnsDataset, "", "Member"
+            );
+        } 
+        else {
+            return null;
+        }
+    },
+    reset: function(){
+        this.tupleIndex = 0;
+        this._members = (this.hasMoreTuples()) ? this._getMembers() : null;
+    },
+    hasMoreTuples: function(){
+        return this.numTuples > this.tupleIndex;
+    },
+    next: function(){
+        this.tupleIndex += 1;
+        this._members = this._getMembers();
+        return this.tupleIndex;
+    },
+    tupleCount: function(){
+        return this.numTuples;
+    },
+    getHierarchyNames: function(){
+        var hierarchyNames = [];
+        for (var i=0, count = this.numHierarchies; i<count; i += 1){
+            hierarchyNames[i] = this._hierarchyOrder[i];
+        }
+        return hierarchyNames;
+    },
+    hierarchyCount: function(){
+        return this.numHierarchies;
+    },
+    hierarchyIndex: function(hierarchyName){
+        return this._hierarchiesNames[hierarchyName];
+    },
+    hierarchyName: function(index){
+        return this._hierarchyOrder[index];
+    },
+    hierarchyDef: function(name){
+        var hierarchyDef = this._hierarchyDefs[name];
+        if (!hierarchyDef){
+            Xmla.Exception._newError(
+                "INVALID_HIERARCHY",
+                "Xmla.Dataset.Axis.hierarchyDef",
+                name
+            )._throw();
+        }
+        return hierarchyDef;
+    },
+    member: function(indexOrHierarchy){
+        var index, hierarchyName, hierarchyDef, properties, property, memberNode, member = {};
+        switch(typeof(indexOrHierarchy)){
+            case "string":
+                index = this.hierarchyIndex(indexOrHierarchy);
+                hierarchyName = indexOrHierarchy;
+                break;
+            case "number":
+                hierarchyName = this.hierarchyName(indexOrHierarchy);
+                index = indexOrHierarchy;
+                break;
+        }
+        hierarchyDef = this.hierarchyDef(hierarchyName);
+        properties = hierarchyDef.properties;
+        memberNode = this._members.item(index);
+        member.hierarchy = hierarchyName; 
+        member.index = index;
+        for (property in properties){
+            el = _getElementsByTagNameNS(memberNode, _xmlnsDataset, "", property);
+            switch (el.length) {
+                case 0: //no element found for property, use the default
+                    member[property] = properties[property]
+                    break;
+                case 1: //this is expected, single element for property, get value
+                    member[property] = _getElementText(el.item(0));
+                    break;
+                default:
+                    Xmla.Exception._newError(
+                        "UNEXPECTED_ERROR_READING_MEMBER",
+                        "Xmla.Dataset.Axis.member",
+                        property
+                    )._throw();
+            }
+        }
+        return member;
+    },
+    readAsArray: function(array){
+        if(!array){
+            array = [];
+        }
+        for (var i=0; i<this.numHierarchies; i++){
+            array[i] = this.member(i);
+        }
+        return array;
+    },
+    readAsObject: function(object){
+        if (!object){
+            object = {};
+        }
+        for (var i=0; i<this.numHierarchies; i++){
+            object[this._hierarchyOrder[i]] = this.member(i);
+        }
+        return object;
+    },
+    fetchAsArray: function(){
+        var array;
+        if (this.hasMoreTuples()) {
+            array = this.readAsArray();
+            this.next();
+        } else {
+            array = false;
+        }
+        return array;
+    },
+    fetchAsObject: function(){
+        var object;
+        if (this.hasMoreTuples()){
+            object = this.readAsObject();
+            this.next();
+        } else {
+            object = false;
+        }
+        return object;
+    },
+    fetchAllAsArray: function(rows){
+        var row;
+        if (!rows){
+            rows = [];
+        }
+        while((row = this.fetchAsArray())){
+            rows.push(row);
+        }
+        return rows;
+    },
+    fetchAllAsObject: function(rows){
+        var row;
+        if (!rows){
+            rows = [];
+        }
+        while((row = this.fetchAsObject())){
+            rows.push(row);
+        }
+        return rows;
+    }
+}
+
+Xmla.Dataset.Cellset = function(dataset){
+    this._dataset = dataset;
+    this._initCellset();
+    return this;
+}
+
+Xmla.Dataset.Cellset.prototype = {
+    _dataset: null,
+    _cellNodes: null,
+    _cellCount: null,
+    _cellNode: null,
+    _cellDefs: null,
+    _idx: null,
+    _ord: null,
+    _cellOrd: null,
+    _initCellset: function(){
+        var root = this._dataset._root,
+            cellSchema, cellSchemaElements, numCellSchemaElements, cellSchemaElement, 
+            cellInfoNodes, cellInfoNode, cellNodes, type, valueConverter, cellDef,
+            propertyNodes, propertyNode, propertyNodeTagName, numPropertyNodes, i, j
+        ;
+        cellSchema = _getComplexType(root, "CellData");
+        if (!cellSchema){
+            Xmla.Exception._newError(
+                "ERROR_PARSING_RESPONSE",
+                "Xmla.Rowset",
+                root
+            )._throw();
+        }        
+        cellSchemaElements = _getElementsByTagNameNS(
+            cellSchema, _xmlnsSchema, _xmlnsSchemaPrefix, "element"
+        );
+        numCellSchemaElements = cellSchemaElements.length;
+        cellInfoNodes = _getElementsByTagNameNS(
+            root, _xmlnsDataset, "", "CellInfo"
+        ); 
+        if (!cellInfoNodes || cellInfoNodes.length==0){
+            Xmla.Exception._newError(
+                "ERROR_PARSING_RESPONSE",
+                "Xmla.Rowset",
+                root
+            )._throw();
+        }
+        cellInfoNode = cellInfoNodes.item(0);
+        propertyNodes = _getElementsByTagNameNS(
+            cellInfoNode, _xmlnsDataset, "", "*"
+        );        
+        this._cellDefs = {};
+        //examine cell property info so we can parse them
+        numPropertyNodes = propertyNodes.length;
+        for(i=0; i<numPropertyNodes; i+=1){
+            propertyNode = propertyNodes.item(i);
+            propertyNodeTagName = propertyNode.tagName;
+            //find the xsd:element node that describes this property
+            for (var j=0; j<numCellSchemaElements; j++){
+                cellSchemaElement = cellSchemaElements.item(j);
+                if (cellSchemaElement.getAttribute("name")!==propertyNodeTagName){
+                    continue;
+                }
+                cellDef = {
+                    name: propertyNodeTagName
+                };
+                this._cellDefs[propertyNodeTagName] = cellDef;
+                type = cellSchemaElement.getAttribute("type");
+                if (type){
+                    cellDef.type = type;
+                    valueConverter = _getValueConverter(type);
+                    if (valueConverter){
+                        cellDef.jsType = valueConverter.jsType;
+                        cellDef.converter = valueConverter.func;
+                    }
+                }
+                break;
+            }            
+        }        
+        this._cellNodes = _getElementsByTagNameNS(
+            root, _xmlnsDataset, "", "Cell"
+        );
+        this._cellCount = this._cellNodes.length;
+    },
+    _getCellNode: function(){
+        this._cellNode = this._cellNodes.item(this._idx);
+        this._cellOrd = parseInt(this._cellNode.getAttribute("CellOrdinal"), 10);
+    },
+    reset: function(){
+        this._idx = 0;
+        this._getCellNode();
+        this._ord = 0;
+    },
+    hasMoreCells: function(){
+        return this._idx < this._cellCount;
+    },
+    next: function(){     
+        this._idx += 1;
+        if (this._cellOrd === this._ord
+        &&  this.hasMoreCells()
+        ) {
+            this._getCellNode();
+        }
+    },
+    curr: function(){
+        return this._idx;
+    },
+    cellValue: function(){
+        return _getElementValue(
+            _getElementsByTagNameNS(
+                this._cellNode, _xmlnsDataset, "", "Value"
+            ).item(0)
+        );
+    },
+    readAsObject: function(){
+        var cell, cellProp, cellDef, converter;
+        if (this._cellOrd === this._ord){
+            cell = {
+                ordinal: this._ord
+            };
+            for (var p in this._cellDefs){
+                cellDef = this._cellDefs[p];
+                cellProp = _getElementsByTagNameNS(
+                    this._cellNode, _xmlnsDataset, "", p
+                ).item(0);
+                if (cellDef.type){
+                    converter = cellDef.converter;
+                    cell[p] = converter(_getElementText(cellProp));
+                }
+                else if (p==="Value"){
+                    cell[p] = _getElementValue(cellProp);
+                }
+                else {
+                }
+                cell[p] = _getElementText(cellProp);
+            }
+        }
+        else 
+        if (this._cellOrd > this._ord){
+            cell = null;
+        }
+        return cell;
+    },
+    close: function(){
+        this._dataset = null;
+        this._cellNodes = null;
+        this._cellNode = null;
+    }
+}
+
+
 /**
 *   <p>
 *   This class is used to indicate an runtime errors occurring in any of the methods of the xmla4js classes.
@@ -4941,13 +5663,14 @@ while (rowObject = rowset.fetchAsObject()){
 *   @class Xmla.Exception
 *   @constructor
 */
-Xmla.Exception = function(type, code, message, helpfile, source, data){
+Xmla.Exception = function(type, code, message, helpfile, source, data, args){
     this.type = type;
     this.code = code;
     this.message = message;
     this.source = source;
     this.helpfile = helpfile;
     this.data = data;
+    this.args = args;
     return this;
 };
 
@@ -5122,6 +5845,37 @@ Xmla.Exception.HTTP_ERROR_HLP = _exceptionHlp +
                                     "#" + Xmla.Exception.HTTP_ERROR_CDE  + 
                                     "_" + Xmla.Exception.HTTP_ERROR_MSG;
 
+/**
+*   Exception code indicating the hierarchy name is not valid.
+*
+*   @property INVALID_HIERARCHY_CDE
+*   @static
+*   @final
+*   @type {int}
+*   @default <code>-11</code>
+*/
+Xmla.Exception.INVALID_HIERARCHY_CDE = -11;
+Xmla.Exception.INVALID_HIERARCHY_MSG = "Invalid_Hierarchy"; 
+Xmla.Exception.INVALID_HIERARCHY_HLP = _exceptionHlp + 
+                                    "#" + Xmla.Exception.INVALID_HIERARCHY_CDE  + 
+                                    "_" + Xmla.Exception.INVALID_HIERARCHY_MSG;
+
+/**
+*   Exception code indicating a problem reading a member property
+*
+*   @property UNEXPECTED_ERROR_READING_MEMBER_CDE
+*   @static
+*   @final
+*   @type {int}
+*   @default <code>-12</code>
+*/
+Xmla.Exception.UNEXPECTED_ERROR_READING_MEMBER_CDE = -12;
+Xmla.Exception.UNEXPECTED_ERROR_READING_MEMBER_MSG = "Error_Reading_Member"; 
+Xmla.Exception.UNEXPECTED_ERROR_READING_MEMBER_HLP = _exceptionHlp + 
+                                    "#" + Xmla.Exception.UNEXPECTED_ERROR_READING_MEMBER_CDE  + 
+                                    "_" + Xmla.Exception.UNEXPECTED_ERROR_READING_MEMBER_MSG;
+
+
 Xmla.Exception._newError = function(codeName, source, data){
     return new Xmla.Exception(
         Xmla.Exception.TYPE_ERROR,
@@ -5182,6 +5936,26 @@ Xmla.Exception.prototype = {
     data: null,
     _throw: function(){
         throw this;
+    },
+/**
+*   A reference to the built-in <code>arguments</code> array of the function that is throwing the exception
+*   This can be used to get a "stack trace" 
+*/    
+    args: null,
+/**
+*   @method getStackTrace
+*   @return an array of objects describing the function on the stack
+*/    
+    getStackTrace: function(){
+        var funcstring, stack = "", regexp = /^\sfunction\s*([^\(]+)?\s*\(\)$/;
+        if (this.args) {
+            var func = this.args.callee;
+            while (func){
+                funcstring = String(func);
+                func = func.caller;
+            }
+        }
+        return stack;
     }
 };
 
