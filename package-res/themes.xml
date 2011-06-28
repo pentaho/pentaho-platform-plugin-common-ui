@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<themes root-folder="resources/styles">
+<themes root-folder="resources/themes">
   <onyx display-name="Onyx" system="true">
     <file>jquery.js</file>
     <file>jquery.jscrollpane.js</file>
