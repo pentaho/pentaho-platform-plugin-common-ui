@@ -119,7 +119,7 @@
         <input type="text" dojoAttachPoint="matchValueInput" size="10"/><!--dojoType="dijit.form.TextBox"-->
         <!-- Date pattern to match what metadata expects. -->
         <!-- TODO Change this to locale-specific for presentation layer? -->
-        <input type="text" dojoAttachPoint="matchValueInputDate" dojoType="dijit.form.DateTextBox" constraints="{datePattern:'yyyy-MM-dd'}"/>
+        <input type="text" dojoAttachPoint="matchValueInputDate" dojoType="pentaho.common.DateTextBox" constraints="{datePattern:'yyyy-MM-dd'}"/>
       </table>
     </div>
     <div dojoAttachPoint="dateRangeContainer" class="filterDialogDateRangeContainer">
@@ -127,9 +127,9 @@
       <select dojoAttachPoint="dateRangeComparator" dojoAttachEvent="onchange:_dateRangeComparatorChanged"></select>
       <!-- Date pattern to match what metadata expects. -->
       <!-- TODO Change this to locale-specific for presentation layer? -->
-      <input type="text" dojoAttachPoint="dateRangeValueInputDate1" dojoType="dijit.form.DateTextBox" constraints="{datePattern:'yyyy-MM-dd'}"/>
+      <input type="text" dojoAttachPoint="dateRangeValueInputDate1" dojoType="pentaho.common.DateTextBox" constraints="{datePattern:'yyyy-MM-dd'}"/>
       <span dojoAttachPoint="dateRangeBetweenSeparatorSpan">!and!</span>
-      <input type="text" dojoAttachPoint="dateRangeValueInputDate2" dojoType="dijit.form.DateTextBox" constraints="{datePattern:'yyyy-MM-dd'}"/>
+      <input type="text" dojoAttachPoint="dateRangeValueInputDate2" dojoType="pentaho.common.DateTextBox" constraints="{datePattern:'yyyy-MM-dd'}"/>
     </div>
   </div>
   <div class="filterDialogParameterContainer">

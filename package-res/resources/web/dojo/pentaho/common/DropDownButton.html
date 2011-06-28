@@ -1,0 +1,31 @@
+<span class="dijit dijitReset dijitInline">
+    <span class='dijitReset dijitInline ' dojoAttachEvent="ondijitclick:_onButtonClick" dojoAttachPoint="_buttonNode">
+        <span class="dijitReset dijitStretch dijitButtonContents pentaho-listbox"
+			dojoAttachPoint="focusNode,titleNode,_arrowWrapperNode"
+			role="button" aria-haspopup="true" aria-labelledby="${id}_label">
+            <table cellpadding="0" cellspacing="0">
+                <tr>
+                    <td>
+                        <span class="dijitReset dijitInline dijitIcon" dojoAttachPoint="iconNode">
+                        </span>
+                    </td>
+                    <td>
+                        <span class="dijitReset dijitInline dijitButtonText"
+                            dojoAttachPoint="containerNode,_popupStateNode"
+                            id="${id}_label">
+                        </span>
+                    </td>
+                    <td>
+                        <div class="pentaho-dropdownbutton-outer">
+                            <div class="pentaho-dropdownbutton-inner">
+                            </div>
+                        </div>
+                        <span class="dijitReset dijitInline dijitArrowButtonChar" style="display:none">&#9660;</span>
+                        <span class="dijitReset dijitInline dijitArrowButtonInner" style="display:none"></span>
+                    </td>
+                </tr>
+            </table>
+        </span>
+    </span>
+    <input ${!nameAttrSetting} type="${type}" value="${value}" class="dijitOffScreen" dojoAttachPoint="valueNode"/>
+</span>
