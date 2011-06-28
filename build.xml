@@ -172,6 +172,13 @@
 
 	    <delete dir="${stage.dir}/javascript"/>
 
+      <property environment="env"/>
+      <xmltask source="${approot.stage.dir}/settings.xml" 
+        dest="${approot.stage.dir}/settings.xml">
+          <insert path="/settings" xml="    &lt;plugin-id&gt;${env.JOB_NAME}&lt;/plugin-id&gt;"/>
+          <insert path="/settings" xml="    &lt;plugin-version&gt;${project.revision}&lt;/plugin-version&gt;"/>
+          <insert path="/settings" xml="    &lt;plugin-build&gt;${env.BUILD_NUMBER}&lt;/plugin-build&gt;"/>
+      </xmltask>
 
       <ant antfile="build-res/subfloor-gwt.xml" target="gwt-compile">
         <property name="gwt-module.path" value="org.pentaho.gwt.widgets.themes.Themes" />
