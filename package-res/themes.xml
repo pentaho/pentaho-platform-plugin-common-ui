@@ -7,6 +7,10 @@
     <file>mwheelIntent.js</file>
     <file>mainStyles.css</file>
   </onyx>
+  <native display-name="Native" system="true" hidden="true">
+    <file>jquery.js</file>
+    <file>mainStyles.css</file>
+  </native>
   <sample1 system="true" hidden="true">
     <file>style1.css</file>
   </sample1>
