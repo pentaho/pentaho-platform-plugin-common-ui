@@ -39,12 +39,9 @@
 	      </not>
 	    </condition>
 	  </fail -->
-
-  <target name="resolve">
-
-      <ant antfile="build-res/subfloor-gwt.xml" target="resolve"/>
-    <taskdef name="xmltask" classname="com.oopsconsultancy.xmltask.ant.XmlTask" classpath="lib/xmltask-1.15.1.jar"/>
-
+	
+  <target name="resolve" depends="subfloor-gwt.resolve">
+  	<taskdef name="xmltask" classname="com.oopsconsultancy.xmltask.ant.XmlTask" classpath="lib/xmltask-1.15.1.jar"/>
   </target>
 
 
