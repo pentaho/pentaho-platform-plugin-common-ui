@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <themes root-folder="resources/styles">
-  <onyx display-name="Onyx">
+  <onyx display-name="Onyx" system="true">
     <file>jquery.js</file>
     <file>jquery.jscrollpane.js</file>
     <file>jquery.mousewheel.js</file>
