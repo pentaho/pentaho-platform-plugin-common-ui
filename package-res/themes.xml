@@ -14,7 +14,8 @@
   <sample1 system="true" hidden="true">
     <file>style1.css</file>
   </sample1>
-  <sample2 system="true" hidden="true">
-    <file>style2.css</file>
+  <replaceable system="true" hidden="true">
+    <file>replaceable.css</file>
+    <file>../web/jquery/jquery.js</file>
   </sample2>
 </themes>
