@@ -50,7 +50,8 @@ dojo.declare("pentaho.common.Calendar",
                 dojo.addClass(cell, 'pentaho-listitem');
             }, this);
             dojo.query(".dijitCalendarCurrentDate", this.domNode).forEach(function(cell){
-                dojo.addClass(cell, 'pentaho-listitem-selected');
+                dojo.removeClass(cell, 'pentaho-listitem');
+                dojo.addClass(cell, 'panel-content');
             }, this);
             dojo.query(".dijitCalendarSelectedDate", this.domNode).forEach(function(cell){
                 dojo.addClass(cell, 'pentaho-listitem-selected');

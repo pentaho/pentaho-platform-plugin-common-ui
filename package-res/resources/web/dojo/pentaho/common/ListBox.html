@@ -1,0 +1,25 @@
+<div style="width: ${width}; height: ${height}" dojoAttachPoint="outerNode">
+    <table class="dijit dijitReset dijitInline dijitLeft"
+        dojoAttachPoint="_buttonNode,tableNode,focusNode" cellspacing='0' cellpadding='0' style="display:none;
+        role="combobox" aria-haspopup="true"
+        ><tbody role="presentation"><tr role="presentation"
+            ><td class="dijitReset dijitStretch dijitButtonContents dijitButtonNode" role="presentation"
+                ><span class="dijitReset dijitInline dijitButtonText"  dojoAttachPoint="containerNode,_popupStateNode"></span
+                ><input type="hidden" ${!nameAttrSetting} dojoAttachPoint="valueNode" value="${value}" aria-hidden="true"
+            /></td><td class="dijitReset dijitRight dijitButtonNode dijitArrowButton dijitDownArrowButton"
+                    dojoAttachPoint="titleNode" role="presentation"
+                >
+                            <div class="pentaho-dropdownbutton-outer">
+                                <div class="pentaho-dropdownbutton-inner">
+                                </div>
+                            </div>
+                <div class="dijitReset dijitArrowButtonInner" style="display:none" role="presentation"></div
+                ><div class="dijitReset dijitArrowButtonChar" style="display:none" role="presentation">&#9660;</div
+            ></td
+        ></tr></tbody
+    ></table>
+    <div dojoAttachPoint="menuOuterNode" style="width:100%;height:100%;" class="pentaho-listbox"
+        ><div dojoAttachPoint="menuNode" dojoType="pentaho.common.Menu" style="width:100%">
+        </div
+    ></div>
+</div>

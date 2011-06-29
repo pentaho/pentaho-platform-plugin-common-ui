@@ -2,6 +2,7 @@ dojo.provide('pentaho.common.datasourceselect');
 dojo.require('dijit._Widget');
 dojo.require('dijit._Templated');
 dojo.require('pentaho.common.SmallImageButton');
+dojo.require('pentaho.common.ListBox');
 dojo.require('pentaho.common.Dialog');
 dojo.require('pentaho.common.MessageBox');
 dojo.declare(
@@ -40,13 +41,14 @@ dojo.declare(
         */
         setModelList: function(list) {
             this.models = list;
-            this.modelList.options.length = 0;			
+
+            this.modelList.clearOptions();			
             for( var idx=0; idx<list.length; idx++ ) {
                 var opt = new Option( list[idx].name, list[idx].id );
-                this.modelList.options[idx] = opt;			
+                this.modelList.addOption(opt);			
             }
             if(list.length>0) {
-                this.modelList.selectedIndex = 0;
+                this.modelList.set('value', list[0].id);
                 this.datasourceSelected();
             }
         },
@@ -61,8 +63,8 @@ dojo.declare(
         },
         
         setSelectedIndex: function(idx) {
-            this.modelList.selectedIndex = idx;
-            this.modelList.focus();
+            this.modelList.set('value',this.models[idx]);
+//            this.modelList.focus();
             this.datasourceSelected();
         },
         
@@ -77,8 +79,8 @@ dojo.declare(
         },
         
         datasourceSelected: function() {
-            var idx = this.modelList.selectedIndex;
-            var model = this.getModel(this.modelList.value);
+            var id = this.modelList.get('value');
+            var model = this.getModel(id);
             var enable = model.modelId == 'MODEL_1' && this.canDataSourceAdmin;
             this.enableIconButton(this.editdatasourceimg, enable, this.editDatasource);
             this.enableIconButton(this.deletedatasourceimg, enable, this.deleteDatasource);
@@ -112,18 +114,20 @@ dojo.declare(
 
            postCreate: function() {
                this.inherited(arguments);
+               /*
                 dojo.connect(this.modelList, "onclick", this, this.datasourceSelected);
                 dojo.connect(this.modelList, "onchange", this, this.datasourceSelected);
                 dojo.connect(this.modelList, "onkeyup", this, this.keyup);
                 dojo.removeAttr(this.modelList, "multiple");
                 dojo.connect(this.modelList, "ondblclick", this, this.onModelDblClick);
+                */
                 dojo.connect(this.adddatasourceimg, "onclick", this, this.addDatasource);
                 dojo.connect(this.editdatasourceimg, "onclick", this, this.editDatasource);
                 dojo.connect(this.deletedatasourceimg, "onclick", this, this.deleteDatasource);
            },
            
             addDatasource: function() {
-            
+                    
                 if(!this.canDataSourceAdmin) {
                     return;
                 }
@@ -146,13 +150,13 @@ dojo.declare(
             },
 
             editDatasource: function() {
-
+        
                 if(this.canDataSourceAdmin && window.parent && window.parent.pho && window.parent.pho.openEditDatasourceEditor) {
                     if( this.modelList.selectedIndex == -1 ) {
                         // nothing is selected
                         return false;  
                     }
-                    var id = this.modelList.value;
+                    var id = this.modelList.get('value');
                     // find the model
                     var callbacks = {
                       onError : function(val) {
@@ -167,13 +171,13 @@ dojo.declare(
 
                     callbacks.onFinish = dojo.hitch(this, this.datasourceEditCallback);
 
-                    var model = this.getModel(this.modelList.value);
+                    var model = this.getModel(this.modelList.get('value'));
                     window.parent.pho.openEditDatasourceEditor(model.domainId, model.modelId, callbacks);
                 }
             },
             
             deleteDatasource: function() {
-
+        
                 if(this.canDataSourceAdmin && window.parent && window.parent.pho && window.parent.pho.openEditDatasourceEditor) {
                     if( this.modelList.selectedIndex == -1 ) {
                         // nothing is selected
@@ -200,7 +204,7 @@ dojo.declare(
             
             
             deleteDatasource2: function() {
-
+        
                 this.msgBox.hide();
                 
                 var callbacks = {
