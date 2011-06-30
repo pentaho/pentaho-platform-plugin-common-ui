@@ -27,6 +27,10 @@ dojo.declare(
 
   errorDialog: undefined,
 
+  // Default numeric format will strip out anything that's not a number or the default decimal separator (a period).
+  // The easiest way to change this is to update setDecimalSeparator().
+  _numericFormatRegex: /[^0-9.]/g,
+
   postMixInProperties: function() {
     this.inherited(arguments);
   },
@@ -52,7 +56,15 @@ dojo.declare(
       this.errorDialog.hide();
     })];
   },
+
+  _createNumericFormatRegex: function(pattern) {
+    return new RegExp(pattern, 'g');
+  },
   
+  setDecimalSeparator: function(s) {
+    this._numericFormatRegex = this._createNumericFormatRegex('[^0-9' + s + ']');
+  },
+
   onCancel: function() {
     this.cancel();
   },
@@ -60,6 +72,10 @@ dojo.declare(
   _localize: function() {
     // TODO replace this with generic code refactored from pir-view.js
     this.inherited(arguments);
+    var decSep = this.getLocaleString("filterDialogDecimalSeparator");
+    if (decSep !== undefined && decSep !== "filterDialogDecimalSeparator") {
+      this.setDecimalSeparator(decSep);
+    }
     this.typePicklistSpan.innerHTML = this.getLocaleString("filterDialogTypePicklistSpan_content");
     this.typeMatchSpan.innerHTML = this.getLocaleString("filterDialogTypeMatchSpan_content");
     this.typeDateRangeSpan.innerHTML = this.getLocaleString("filterDialogTypeDateRangeSpan_content");
@@ -93,7 +109,7 @@ dojo.declare(
 
     this.configureFilterTypesFor(this.currentColumn.dataType);
     
-    if (this.currentFilter.combinationType != pentaho.pda.Column.OPERATOR_TYPES.AND || (dojo.isArray(this.currentFilter.value) && this.currentFilter.value.length > 1)) {
+    if (this.currentColumn.dataType === pentaho.pda.Column.DATA_TYPES.STRING && (this.currentFilter.combinationType != pentaho.pda.Column.OPERATOR_TYPES.AND || (dojo.isArray(this.currentFilter.value) && this.currentFilter.value.length > 1))) {
       this.setFilterType("PICKLIST");
     } else {
       this.setFilterType("MATCH");
@@ -436,14 +452,31 @@ dojo.declare(
   _configureMatchContainer: function() {
     this.matchFieldName.innerHTML = this.currentColumn.name;
     var value = dojo.isArray(this.currentFilter.value) ? this.currentFilter.value[0] : null;
-    if (this._isDateType()) {
-      this.matchValueInputDate.setValue(dojo.date.stamp.fromISOString(value));
-      dojo.removeClass(this.matchValueInputDate.domNode, "filterDialogHidden");
-      dojo.addClass(this.matchValueInput, "filterDialogHidden");
-    } else {
-      this.matchValueInput.value = value == null ? "" : value;
-      dojo.removeClass(this.matchValueInput, "filterDialogHidden");
-      dojo.addClass(this.matchValueInputDate.domNode, "filterDialogHidden");
+    switch(this.currentColumn.dataType) {
+      case pentaho.pda.Column.DATA_TYPES.DATE:
+        this.matchValueInputDate.setValue(dojo.date.stamp.fromISOString(value));
+        dojo.removeClass(this.matchValueInputDate.domNode, "filterDialogHidden");
+        dojo.addClass(this.matchValueInput, "filterDialogHidden");
+        break;
+      case pentaho.pda.Column.DATA_TYPES.NUMERIC:
+        var value = "";
+        dojo.forEach(this.currentFilter.value, function(val) {
+          if (val.length > 0) {
+            if (value.length > 0) {
+              value += "|";
+            }
+            value += val;
+          }
+        });
+        this.matchValueInput.value = value;
+        dojo.removeClass(this.matchValueInput, "filterDialogHidden");
+        dojo.addClass(this.matchValueInputDate.domNode, "filterDialogHidden");
+        break;
+      default:
+        this.matchValueInput.value = value == null ? "" : value;
+        dojo.removeClass(this.matchValueInput, "filterDialogHidden");
+        dojo.addClass(this.matchValueInputDate.domNode, "filterDialogHidden");
+        break;
     }
     dojo.empty(this.matchComparator);
     var dataType = this.currentColumn.dataType === pentaho.pda.Column.DATA_TYPES.UNKNOWN ? pentaho.pda.Column.DATA_TYPES.STRING : this.currentColumn.dataType;
@@ -460,27 +493,56 @@ dojo.declare(
     if (!this._matchOperatorRequiresValue()) {
       this.currentFilter.value = [""];
     } else {
-      if (this._isDateType()) {
-        var date = this.matchValueInputDate.getValue();
-        if (date == null) {
-          this.currentFilter.value = "";
-        } else {
-          // Convert date into format metadata is expecting for dates (ISO8601/RFC3339)
-          this.currentFilter.value = dojo.date.stamp.toISOString(date, {selector: 'date'});
-        }
-      } else {
-        this.currentFilter.value = this.matchValueInput.value;
-//        if (typeof this.currentFilter.value === "string") {
-//          this.currentFilter.value = dojo.string.trim(this.currentFilter.value);
-//        }
+      switch(this.currentColumn.dataType) {
+        case pentaho.pda.Column.DATA_TYPES.DATE:
+          var date = this.matchValueInputDate.getValue();
+          if (date == null) {
+            this.currentFilter.value = [""];
+          } else {
+            // Convert date into format metadata is expecting for dates (ISO8601/RFC3339)
+            this.currentFilter.value = [dojo.date.stamp.toISOString(date, {selector: 'date'})];
+          }
+          break;
+        case pentaho.pda.Column.DATA_TYPES.NUMERIC:
+          if(this.currentFilter.operator === pentaho.pda.Column.CONDITION_TYPES.EQUAL) {
+            var value = [];
+            dojo.forEach(this.matchValueInput.value.split("|"), function(val) {
+              var v = this._scrubNumericValue(val);
+              if (v && v !== "") {
+                value.push(v);
+              }
+            }, this);
+            this.currentFilter.value = value;
+          } else {
+            if (this.matchValueInput.value.indexOf("|") > 0) {
+              this.showErrorDialog(this.getLocaleString('filterDialogMissingValueError_title'), this.getLocaleString('filterDialogInvalidNumericError_message'));
+              return false;
+            }
+            this.currentFilter.value = [this._scrubNumericValue(this.matchValueInput.value)];
+          }
+          break;
+        default:
+          this.currentFilter.value = [this.matchValueInput.value];
+          break;
       }
-      if (this.currentFilter.value == "") {
+      var hasValue = false;
+      dojo.some(this.currentFilter.value, function(val) {
+        if (val !== "") {
+          hasValue = true;
+          return false;
+        }
+      });
+      if (!hasValue) {
         this.showErrorDialog(this.getLocaleString('filterDialogMissingValueError_title'), this.getLocaleString('filterDialogMissingValueError_message'));
         return false;
       }
-      this.currentFilter.value = [this.currentFilter.value];
     }
     return true;
+  },
+
+  _scrubNumericValue: function(val) {
+    // TODO i18n the thousands and decimal characters
+    return dojo.trim(val).replace(this._numericFormatRegex, "");
   },
 
   /*

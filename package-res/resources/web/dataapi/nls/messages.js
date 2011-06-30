@@ -50,7 +50,9 @@
     dateRangeBetweenSeparatorSpan_content: 'and',
     filterDialogMissingValueError_title: 'Invalid Entry',
     filterDialogMissingValueError_message: 'Please select a value',
+    filterDialogInvalidNumericError_message: 'Invalid number entry',
     filterDialogUnknownDataType: 'Unknown data type: ',
+    filterDialogDecimalSeparator: '.',
     
     AGG_TYPES_AVERAGE : 'Average',
     AGG_TYPES_MINIMUM : 'Minimum',
