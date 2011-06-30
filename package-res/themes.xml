@@ -17,5 +17,5 @@
   <replaceable system="true" hidden="true">
     <file>replaceable.css</file>
     <file>../web/jquery/jquery.js</file>
-  </sample2>
+  </replaceable>
 </themes>
