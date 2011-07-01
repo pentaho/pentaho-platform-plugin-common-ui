@@ -28,6 +28,7 @@
 
             dojo.require("dojo.parser");
             dojo.require("pentaho.common.SmallImageButton");
+            dojo.require("pentaho.common.ToggleButton");
 
             function doload() {
 
@@ -40,7 +41,12 @@
                 alert('Button Clicked: '+id);
             }
             
+            function toggleChange(checked) {
+                alert('Toggle Button Checked: '+checked);
+            }
+            
             function disableButtons() {
+                dijit.byId('toggleButton').set('disabled',true);
                 dijit.byId('addButton').set('disabled',true);
                 dijit.byId('editButton').set('disabled',true);
                 dijit.byId('deleteButton').set('disabled',true);
@@ -64,6 +70,7 @@
             }
 
             function enableButtons() {
+                dijit.byId('toggleButton').set('disabled',false);
                 dijit.byId('addButton').set('disabled',false);
                 dijit.byId('editButton').set('disabled',false);
                 dijit.byId('deleteButton').set('disabled',false);
@@ -100,6 +107,9 @@
             <button id="disableButton" class="pentaho-button" onclick="disableButtons()" disabled="false">Disable Buttons</button>
             &nbsp;
             <button class="pentaho-button" onclick="enableButtons()">Enable Buttons</button>
+
+            <div dojoType="pentaho.common.ToggleButton" id="toggleButton" title="Sample toggle Button" label="Toggle Me" onchange="toggleChange">
+            </div>
 
             <div dojoType="pentaho.common.SmallImageButton" id="addButton" title="Sample Add Button" baseClass="pentaho-addbutton" onclick="buttonClick(this.id)">
             </div>
