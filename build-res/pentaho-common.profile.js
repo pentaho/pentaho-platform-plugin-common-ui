@@ -30,11 +30,14 @@
     "pentaho.common.DateTextBox",
     "pentaho.common.Dialog",
     "pentaho.common.DisclosurePanel",
+    "pentaho.common.DropDownBox",
     "pentaho.common.DropDownButton",
     "pentaho.common.FieldList",
     "pentaho.common.FilterDialog",
     "pentaho.common.FilterIndicator",
     "pentaho.common.GlassPane",
+    "pentaho.common.ListBox",
+    "pentaho.common.ListItem",
     "pentaho.common.Menu",
     "pentaho.common.MenuItem",
     "pentaho.common.MenuSeparator",
@@ -42,10 +45,12 @@
     "pentaho.common.Messages",
     "pentaho.common.PopupMenuItem",
     "pentaho.common.SectionHeader",
+    "pentaho.common.Select",
     "pentaho.common.SmallImageButton",
     "pentaho.common.SplashScreen",
     "pentaho.common.TabSet",
-    "pentaho.common.TemplatePicker"
+    "pentaho.common.TemplatePicker",
+    "pentaho.common.ToggleButton"
 
     ]
     }

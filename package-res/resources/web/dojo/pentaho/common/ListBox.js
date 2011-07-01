@@ -3,6 +3,7 @@ dojo.provide("pentaho.common.ListBox");
 dojo.require("pentaho.common.Menu");
 dojo.require("pentaho.common.ListItem");
 dojo.require("pentaho.common.MenuSeparator");
+dojo.require("pentaho.common.Select");
 
 dojo.declare("pentaho.common.ListBox", 
     pentaho.common.Select, {
