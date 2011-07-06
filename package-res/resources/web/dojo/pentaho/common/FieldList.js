@@ -47,6 +47,11 @@ dojo.declare(
   selector: undefined,
 
   /**
+   * A callback function so we can notify someone, if desired, when expand/collapse happens
+   */
+  expandCollapseCategoryCallback: undefined,
+  
+  /**
    * Function to handle disabling the selection of text.
    * The default implementation is provided here. Call registerTextSelectionDisabler
    * to override it.
@@ -78,6 +83,10 @@ dojo.declare(
 
   registerDoubleClickCallback: function(f) {
     this.doubleClickCallback = f;
+  },
+  
+  registerExpandCollapseCategoryCallback: function(f) {
+	this.expandCollapseCategoryCallback = f;  
   },
 
   _localize: function() {
@@ -382,6 +391,8 @@ dojo.declare(
     } else {
       fields.removeClass("hidden");
     }
+    
+    expandCollapseCategoryCallback(collapsed);
   },
 
   updateFilterIndicators: function(filters) {
