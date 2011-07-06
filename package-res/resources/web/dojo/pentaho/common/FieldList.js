@@ -392,7 +392,9 @@ dojo.declare(
       fields.removeClass("hidden");
     }
     
-    expandCollapseCategoryCallback(collapsed);
+    if (this.expandCollapseCategoryCallback) {
+      this.expandCollapseCategoryCallback(collapsed);
+    }
   },
 
   updateFilterIndicators: function(filters) {
