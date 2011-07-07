@@ -215,13 +215,20 @@ This is an API that lets clients get and set user settings
 pentaho.userSettings = function() {
 }
 
+pentaho.userSettings.prototype.generateUniqueUrl = function(url) {
+  // Prevent caching for IE
+  // Remove once BISERVER-6216 is implemented
+  var time = new Date().getTime();
+  return url + (url.indexOf('?') !== -1 ? "&" : "?") + time + "=" + time;
+}
+
 /*
   Returns an array of settings objects when passed a comma separated list of setting names
 */
 pentaho.userSettings.prototype.getSettings = function( names, callback, caller ) {
 
   dojo.xhrGet({
-    url: CONTEXT_PATH + 'content/ws-run/UserSettingService/getUserSettingsJson',
+    url: this.generateUniqueUrl(CONTEXT_PATH + 'content/ws-run/UserSettingService/getUserSettingsJson'),
     content: {
         settingNames : names
     },
@@ -236,7 +243,7 @@ pentaho.userSettings.prototype.getSettings = function( names, callback, caller )
 pentaho.userSettings.prototype.setSetting = function( name, value, callback, caller ) {
 
   dojo.xhrGet({
-    url: CONTEXT_PATH + 'content/ws-run/UserSettingService/setUserSettingJson',
+    url: this.generateUniqueUrl(CONTEXT_PATH + 'content/ws-run/UserSettingService/setUserSettingJson'),
     content: {
         settingName : name,
         settingValue : value
