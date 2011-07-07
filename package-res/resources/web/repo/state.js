@@ -1,7 +1,7 @@
 
 function PentahoRepositoryClient() {
 
-    this.SERVICE_URL = '/pentaho/content/ws-run/RepositoryClientService';
+    this.SERVICE_URL = CONTEXT_PATH + 'content/ws-run/RepositoryClientService';
 
     this.fileType = null;
 
