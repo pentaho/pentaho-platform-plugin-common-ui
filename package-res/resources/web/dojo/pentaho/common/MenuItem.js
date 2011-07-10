@@ -21,17 +21,25 @@ dojo.declare(
 		},
         
 		_setDisabledAttr: function(/*Boolean*/ value){
-			// summary:
-			//		Hook for attr('disabled', ...) to work.
-			//		Enable or disable this menu item.
-
 			dijit.setWaiState(this.focusNode, 'disabled', value ? 'true' : 'false');
 			this._set("disabled", value);
 			dojo.toggleClass(this.domNode, "pentaho-menuitem-disabled", value);
-		}
-                    
-// _setStateClass: function(){
+		},
         
+		_onHover: function(){
+			this.getParent().onItemHover(this);
+            if(!this.disabled) { 
+                dojo.addClass(this.domNode, "pentaho-menuitem-hover");
+            }
+        },
+
+		_onUnhover: function(){
+			this.getParent().onItemUnhover(this);
+			this._set("hovering", false);
+            if(!this.disabled) { 
+                dojo.removeClass(this.domNode, "pentaho-menuitem-hover");
+            }
+		}        
         
 	}
 );

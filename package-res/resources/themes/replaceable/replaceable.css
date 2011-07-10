@@ -23,10 +23,10 @@ Panel and dialog panel: background color - LightBlue
 Panel and dialog panel: border color - DarkSlateBlue
 Panel and dialog frame, Toolbar background: PaleTurquoise, IE=images/wt_transparent.png
 
-Dialog title: background - gradient from MediumBlue/MidnightBlue/Indigo IE=images/bg_title.png
+Dialog title: background - gradient from MediumBlue/CornflowerBlue/MidnightBlue/Indigo IE=images/bg_title.png
 Dialog title, section header: bevel color - LightSteelBlue
 
-Buttons, tabs, dialog titles, table headers: background - gradient from MediumBlue/MidnightBlue/Indigo, IE(buttons) =images/bg_btn.png IE(tabs)=images/tab_on.png
+Buttons, tabs, dialog titles, table headers: background - gradient from MediumBlue/CornflowerBlue/MidnightBlue/Indigo, IE(buttons) =images/bg_btn.png IE(tabs)=images/tab_on.png
 Buttons, tabs, dialog titles: disabled - gradient from Gainsboro/Gray/DimGray, IE=images/bg_btn_disabled.png
 Tabs (not selected): background - gradient from FloralWhite/Gainsboro/LightSkyBlue IE=images/tab_off.png
 Tab panel – background IE=images/tab_panel_bg.png
@@ -84,9 +84,9 @@ font-size: .85em;
   /* fallback color */
   background: MidnightBlue;
   /* Safari/Chrome */
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, MediumBlue ), color-stop(0.55, MidnightBlue), color-stop(0.90, Indigo));
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, MediumBlue ), color-stop(0.50, CornflowerBlue), color-stop(0.51, MidnightBlue), color-stop(0.90, Indigo));
   /* Firefox */
-  background: -moz-linear-gradient(MediumBlue, MidnightBlue 55%, Indigo 90%) repeat scroll 0 0 transparent;
+  background: -moz-linear-gradient(MediumBlue, CornflowerBlue 50%, MidnightBlue 51%, Indigo 90%) repeat scroll 0 0 transparent;
 
   font-size: .75em;
   color: GhostWhite;
@@ -193,9 +193,9 @@ has no buttons add an addition class to your element, pentaho-dialog-buttonless,
   /* fallback color */
   background: MidnightBlue;
   /* Safari/Chrome */
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, MediumBlue ), color-stop(0.55, MidnightBlue), color-stop(0.90, Indigo));
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, MediumBlue ), color-stop(0.50, CornflowerBlue), color-stop(0.51, MidnightBlue),color-stop(0.90, Indigo));
   /* Firefox */
-  background: -moz-linear-gradient(MediumBlue, MidnightBlue 55%, Indigo 90%) repeat scroll 0 0 transparent;
+  background: -moz-linear-gradient(MediumBlue, CornflowerBlue 50%, MidnightBlue 51%, Indigo 90%) repeat scroll 0 0 transparent;
 
   font-size: .75em;
   color: GhostWhite;
@@ -359,9 +359,9 @@ has no buttons add an addition class to your element, pentaho-dialog-buttonless,
 .pentaho-tabWidget-selected {
   background: MidnightBlue;
   /* Safari/Chrome */
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, MediumBlue ), color-stop(0.55, MidnightBlue), color-stop(0.90, Indigo));
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, MediumBlue ), color-stop(0.50, CornflowerBlue), color-stop(0.51, MidnightBlue),color-stop(0.90, Indigo));
   /* Firefox */
-  background: -moz-linear-gradient(MediumBlue, MidnightBlue 55%, Indigo 90%) repeat scroll 0 0 transparent;
+  background: -moz-linear-gradient(MediumBlue, CornflowerBlue 50%, MidnightBlue 51%, Indigo 90%) repeat scroll 0 0 transparent;
   color: GhostWhite;
 }
 
@@ -819,9 +819,9 @@ has no buttons add an addition class to your element, pentaho-dialog-buttonless,
 .pentaho-titled-toolbar {
   background: MidnightBlue;
   /* Safari/Chrome */
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, MediumBlue ), color-stop(0.55, MidnightBlue), color-stop(0.90, Indigo));
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, MediumBlue ), color-stop(0.50, CornflowerBlue), color-stop(0.51, MidnightBlue),color-stop(0.90, Indigo));
   /* Firefox */
-  background: -moz-linear-gradient(MediumBlue, MidnightBlue 55%, Indigo 90%) repeat scroll 0 0 transparent;
+  background: -moz-linear-gradient(MediumBlue, CornflowerBlue 50%, MidnightBlue 51%, Indigo 90%) repeat scroll 0 0 transparent;
 
   background: -webkit-linear-gradient(top, MediumBlue 0%,MidnightBlue 51%,Indigo 100%); /* Chrome10+,Safari5.1+ */
   background: -o-linear-gradient(top, MediumBlue 0%,MidnightBlue 51%,Indigo 100%); /* Opera11.10+ */
@@ -849,9 +849,9 @@ has no buttons add an addition class to your element, pentaho-dialog-buttonless,
 
   background: MidnightBlue;
   /* Safari/Chrome */
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, MediumBlue ), color-stop(0.55, MidnightBlue), color-stop(0.90, Indigo));
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, MediumBlue ), color-stop(0.50, CornflowerBlue), color-stop(0.51, MidnightBlue),color-stop(0.90, Indigo));
   /* Firefox */
-  background: -moz-linear-gradient(MediumBlue, MidnightBlue 55%, Indigo 90%) repeat scroll 0 0 transparent;
+  background: -moz-linear-gradient(MediumBlue, CornflowerBlue 50%, MidnightBlue 51%, Indigo 90%) repeat scroll 0 0 transparent;
 }
 .IE .pentaho-gradient {
   background: url('images/bg_title.png') repeat-x;
@@ -907,9 +907,9 @@ has no buttons add an addition class to your element, pentaho-dialog-buttonless,
 .pentaho-tooltip-background {
   background: MidnightBlue;
   /* Safari/Chrome */
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, MediumBlue ), color-stop(0.55, MidnightBlue), color-stop(0.90, Indigo));
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, MediumBlue ), color-stop(0.50, CornflowerBlue), color-stop(0.51, MidnightBlue),color-stop(0.90, Indigo));
   /* Firefox */
-  background: -moz-linear-gradient(MediumBlue, MidnightBlue 55%, Indigo 90%) repeat scroll 0 0 transparent;
+  background: -moz-linear-gradient(MediumBlue, CornflowerBlue 50%, MidnightBlue 51%, Indigo 90%) repeat scroll 0 0 transparent;
 }
 .IE .pentaho-tooltip-background {
   background: url('images/wt_transparent.png') repeat;
@@ -1035,14 +1035,15 @@ has no buttons add an addition class to your element, pentaho-dialog-buttonless,
   text-decoration: none;
   cursor: pointer;
   cursor: hand;
-  background: black; /* Old browsers */
-  background: -moz-linear-gradient(top, #535a62 0%, #535a64 49%, #535a62 50%, #464e56 51%, #464e56 100%); /* FF3.6+ */
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#535a62), color-stop(49%,#535a64), color-stop(50%,#535a62), color-stop(51%,#464e56), color-stop(100%,#464e56)); /* Chrome,Safari4+ */
-  background: -webkit-linear-gradient(top, #535a62 0%,#535a64 49%,#535a62 50%,#464e56 51%,#464e56 100%); /* Chrome10+,Safari5.1+ */
-  background: -o-linear-gradient(top, #535a62 0%,#535a64 49%,#535a62 50%,#464e56 51%,#464e56 100%); /* Opera11.10+ */
-  background: -ms-linear-gradient(top, #535a62 0%,#535a64 49%,#535a62 50%,#464e56 51%,#464e56 100%); /* IE10+ */
+  
+  background: MidnightBlue; /* Old browsers */
+  background: -moz-linear-gradient(MediumBlue, CornflowerBlue 50%, MidnightBlue 51%, Indigo 90%) repeat scroll 0 0 transparent;
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, MediumBlue ), color-stop(0.50, CornflowerBlue), color-stop(0.51, MidnightBlue), color-stop(0.90, Indigo));
+  background: -webkit-linear-gradient(top, MediumBlue, CornflowerBlue 50%, MidnightBlue 51%, Indigo 90%); /* Chrome10+,Safari5.1+ */
+  background: -o-linear-gradient(top, MediumBlue, CornflowerBlue 50%, MidnightBlue 51%, Indigo 90%); /* Opera11.10+ */
+  background: -ms-linear-gradient(top, MediumBlue, CornflowerBlue 50%, MidnightBlue 51%, Indigo 90%); /* IE10+ */
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr = '#FF464E56', endColorstr = '#FF000000');
-  background: linear-gradient(top, #535a62 0%,#535a64 49%,#535a62 50%,#464e56 51%,#464e56 100%); /* W3C */
+  background: linear-gradient(top, MediumBlue, CornflowerBlue 50%, MidnightBlue 51%, Indigo 90%); /* W3C */
   zoom: 1;  
 
   border: 1px solid rgba(255, 255, 255, 0.59375);
@@ -1573,14 +1574,14 @@ has no buttons add an addition class to your element, pentaho-dialog-buttonless,
  padding: 8px;
  
   background: MidnightBlue; /* Old browsers */
-  background: -moz-linear-gradient(top, MediumBlue 0%, MidnightBlue 51%, Indigo 100%); /* FF3.6+ */
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,MediumBlue), color-stop(51%,MidnightBlue), color-stop(100%,Indigo)); /* Chrome,Safari4+ */
-  background: -webkit-linear-gradient(top, MediumBlue 0%,,MidnightBlue 51%,Indigo 100%); /* Chrome10+,Safari5.1+ */
-  background: -o-linear-gradient(top, MediumBlue 0%,MidnightBlue 51%,Indigo 100%); /* Opera11.10+ */
-  background: -ms-linear-gradient(top, MediumBlue 0%,MidnightBlue 51%,Indigo 100%); /* IE10+ */
+  background: -moz-linear-gradient(top, MediumBlue 0%, CornflowerBlue 50%, MidnightBlue 51%, Indigo 100%); /* FF3.6+ */
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,MediumBlue), color-stop(50%,CornflowerBlue), color-stop(51%,MidnightBlue), color-stop(100%,Indigo)); /* Chrome,Safari4+ */
+  background: -webkit-linear-gradient(top, MediumBlue 0%, CornflowerBlue 50%,MidnightBlue 51%,Indigo 100%); /* Chrome10+,Safari5.1+ */
+  background: -o-linear-gradient(top, MediumBlue 0%,CornflowerBlue 50%, MidnightBlue 51%,Indigo 100%); /* Opera11.10+ */
+  background: -ms-linear-gradient(top, MediumBlue 0%,CornflowerBlue 50%, MidnightBlue 51%,Indigo 100%); /* IE10+ */
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr = '#FF777777', endColorstr = '#FF000000');
   zoom: 1;
-  background: linear-gradient(top, MediumBlue 0%,MidnightBlue 51%,Indigo 100%); /* W3C */	
+  background: linear-gradient(top, MediumBlue 0%,CornflowerBlue 50%, MidnightBlue 51%,Indigo 100%); /* W3C */	
 }
 
 .pentaho-table-header-cell .label {
@@ -1708,7 +1709,7 @@ has no buttons add an addition class to your element, pentaho-dialog-buttonless,
       color-stop(0.55, MidnightBlue),
       color-stop(0.90, Indigo)
   );
-  background: -moz-linear-gradient(MediumBlue, MidnightBlue 55%, Indigo 90%);
+  background: -moz-linear-gradient(MediumBlue, CornflowerBlue 50%, MidnightBlue 51%, Indigo 90%);
   border: 1px outset gray;
   cursor: pointer;
   font-size:0px;

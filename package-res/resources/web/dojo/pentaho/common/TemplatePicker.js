@@ -38,8 +38,10 @@ dojo.declare(
                     this['templateImg'+idx].src = this.templates[idx+start].imagePath;
                     this['templateName'+idx].innerHTML = this.templates[idx+start].name;
                     dojo.removeClass(this['templateImg'+idx], 'hidden');
+                    dojo.addClass(this['templateName'+idx], 'fade');
                 } else {
                     dojo.addClass(this['templateImg'+idx], 'hidden');
+                    dojo.removeClass(this['templateName'+idx], 'fade');
                     this['templateName'+idx].innerHTML = '';
                 }
             }
