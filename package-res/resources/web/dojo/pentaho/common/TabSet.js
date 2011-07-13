@@ -13,8 +13,13 @@ dojo.declare(
         stackContainerId: null,
         
         setTabs: function( tabs ) {
+          
+            if(this.tabSetDiv.childNodes.length>0) {
+                // we already have tabs
+                return;
+            }
+                
             this.tabs = tabs;
-            
             var html = "";
             dojo.addClass(this.tabSetDiv, 'pentaho-tabBar');
             for(var idx=0; idx<this.tabs.length; idx++) {
