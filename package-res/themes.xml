@@ -2,6 +2,8 @@
 <themes root-folder="resources/themes">
   <onyx display-name="Onyx" system="true">
     <file>mainStyles.css</file>
+    <file>jquery.js</file>
+    <file>themeUtils.js</file>
   </onyx>
   <sample1 system="true" hidden="true">
     <file>style1.css</file>
