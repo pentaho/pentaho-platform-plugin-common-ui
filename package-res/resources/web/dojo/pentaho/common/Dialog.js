@@ -116,6 +116,8 @@ dojo.declare(
                 this.popup.onCancel = dojo.hitch(this, function(){});
                 this.popup.onExecute = dojo.hitch(this, this.okClick);
                 this._localize();
+
+                dojo.connect(this.popup, "onHide", dojo.hitch(this, "onHide"));
            },
            
            keyup: function(event) {
@@ -239,5 +241,9 @@ dojo.declare(
         }
       }
       this.hide();
+    },
+
+    onHide: function() {
+      // Callback when popup.onHide() is called
     }
 });
