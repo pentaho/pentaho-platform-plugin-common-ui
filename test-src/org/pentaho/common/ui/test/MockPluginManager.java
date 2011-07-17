@@ -180,4 +180,7 @@ public class MockPluginManager implements IPluginManager {
     return null;
   }
 
+  public List<String> getExternalResourcesForContext(String context) {
+    return Collections.emptyList();
+  }
 }
