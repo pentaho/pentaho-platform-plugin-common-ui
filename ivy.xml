@@ -38,9 +38,9 @@
 		<dependency org="oopsconsultancy" name="xmltask" rev="1.15.1" transitive="false" conf="default->default" />
 
 		<!-- Pentaho dependencies -->
-		<dependency org="pentaho.kettle" name="kettle-engine" rev="${dependency.kettle.revision}" changing="true" transitive="false" conf="default->default" />
-		<dependency org="pentaho.kettle" name="kettle-core" rev="${dependency.kettle.revision}" changing="true" transitive="false" conf="default->default" />
-		<dependency org="pentaho.kettle" name="kettle-db" rev="${dependency.kettle.revision}" changing="true" transitive="false" conf="default->default" />
+		<dependency org="pentaho-kettle" name="kettle-engine" rev="${dependency.kettle.revision}" changing="true" transitive="false" conf="default->default" />
+		<dependency org="pentaho-kettle" name="kettle-core" rev="${dependency.kettle.revision}" changing="true" transitive="false" conf="default->default" />
+		<dependency org="pentaho-kettle" name="kettle-db" rev="${dependency.kettle.revision}" changing="true" transitive="false" conf="default->default" />
         
 		<dependency org="pentaho" name="pentaho-bi-platform-api" rev="${dependency.pentaho-bi-platform.revision}" changing="true" transitive="false" conf="default->default" />
 		<dependency org="pentaho" name="pentaho-bi-platform-engine-core" rev="${dependency.pentaho-bi-platform.revision}" changing="true" transitive="false" conf="default->default" />
