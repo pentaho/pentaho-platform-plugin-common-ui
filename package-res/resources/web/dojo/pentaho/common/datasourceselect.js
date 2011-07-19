@@ -64,6 +64,7 @@ dojo.declare(
         
         setSelectedIndex: function(idx) {
             this.modelList.set('value',this.models[idx]);
+            this.modelList.selectedIndex = idx;
 //            this.modelList.focus();
             this.datasourceSelected();
         },
@@ -92,11 +93,9 @@ dojo.declare(
             var src = e.src;
             if(this.canDataSourceAdmin && enabled) {
                 button.set('disabled', false);
-                dojo.connect(e, "onClick", this, function () {});
             }
             else if(!enabled) {
                 button.set('disabled', true);
-                dojo.connect(e, "onClick", this, func);
             }
         },
 
@@ -114,21 +113,15 @@ dojo.declare(
 
            postCreate: function() {
                this.inherited(arguments);
-               /*
-                dojo.connect(this.modelList, "onclick", this, this.datasourceSelected);
-                dojo.connect(this.modelList, "onchange", this, this.datasourceSelected);
-                dojo.connect(this.modelList, "onkeyup", this, this.keyup);
-                dojo.removeAttr(this.modelList, "multiple");
-                dojo.connect(this.modelList, "ondblclick", this, this.onModelDblClick);
-                */
-                dojo.connect(this.adddatasourceimg, "onclick", this, this.addDatasource);
-                dojo.connect(this.editdatasourceimg, "onclick", this, this.editDatasource);
-                dojo.connect(this.deletedatasourceimg, "onclick", this, this.deleteDatasource);
+               this.modelList.onChange = dojo.hitch(this, this.datasourceSelected);
+               dojo.connect(this.adddatasourceimg.buttonImg, "onclick", this, this.addDatasource);
+               dojo.connect(this.editdatasourceimg.buttonImg, "onclick", this, this.editDatasource);
+               dojo.connect(this.deletedatasourceimg.buttonImg, "onclick", this, this.deleteDatasource);
            },
            
             addDatasource: function() {
                     
-                if(!this.canDataSourceAdmin) {
+                if(this.adddatasourceimg.disabled) {
                     return;
                 }
                 
@@ -150,6 +143,10 @@ dojo.declare(
             },
 
             editDatasource: function() {
+
+ 		        if(this.editdatasourceimg.disabled) {
+                    return;
+                }
         
                 if(this.canDataSourceAdmin && window.parent && window.parent.pho && window.parent.pho.openEditDatasourceEditor) {
                     if( this.modelList.selectedIndex == -1 ) {
@@ -177,6 +174,10 @@ dojo.declare(
             },
             
             deleteDatasource: function() {
+	
+         		if(this.deletedatasourceimg.disabled) {
+                    return;
+                }
         
                 if(this.canDataSourceAdmin && window.parent && window.parent.pho && window.parent.pho.openEditDatasourceEditor) {
                     if( this.modelList.selectedIndex == -1 ) {
@@ -184,7 +185,6 @@ dojo.declare(
                         return false;  
                     }
 
-                    var title = this.modelList.options[this.modelList.selectedIndex].title;
                     if(!this.msgBox) {
                         this.msgBox = dijit.byId('messagebox');
                         this.msgBox.setLocalizationLookupFunction(this.getLocaleString);
