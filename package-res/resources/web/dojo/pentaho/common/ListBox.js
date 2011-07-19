@@ -64,7 +64,7 @@ dojo.declare("pentaho.common.ListBox",
     },
     
     clearOptions: function() {
-		dojo.forEach(this._getChildren(), function(child){
+		dojo.forEach(this.menuNode.getChildren(), function(child){
 			child.destroyRecursive();
 		});
     },
