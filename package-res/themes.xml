@@ -2,9 +2,14 @@
 <themes root-folder="resources/themes">
   <onyx display-name="Onyx" system="true">
     <file>mainStyles.css</file>
-    <file>jquery.js</file>
-    <file>themeUtils.js</file>
+    <file>../jquery.js</file>
+    <file>../themeUtils.js</file>
   </onyx>
+  <slate display-name="Slate" system="true">
+    <file>slateTheme.css</file>
+    <file>../jquery.js</file>
+    <file>../themeUtils.js</file>
+  </slate>
   <sample1 system="true" hidden="true">
     <file>style1.css</file>
   </sample1>
