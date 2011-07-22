@@ -45,6 +45,10 @@ dojo.declare(
                     
 		_onUnhover: function(){
             dojo.removeClass(this.domNode,'pentaho-listitem-hover');
+		},
+		
+		postCreate: function() {
+			dojo.connect(this.domNode, "onkeyup", this, this.onClick);
 		}
                     
 	}
