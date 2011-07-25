@@ -115,7 +115,15 @@ function WaqrProxy() {
 
     this.wiz = new Wiz();
     this.repositoryBrowserController = new RepositoryBrowserControllerProxy();
-    
+
+    // We save files with the extension 'testsample', e.g. myfile.testsample.
+    this.repositoryBrowserController.getPossibleFileExtensions = function() {
+      alert("getPossibleFileExtensions called");
+      // When the save dialog is looking for files that already exist it will append these extensions if no extension is
+      // given by the user
+      return ['.testsample'];
+    }
+
 }
 
 // this is a required object
