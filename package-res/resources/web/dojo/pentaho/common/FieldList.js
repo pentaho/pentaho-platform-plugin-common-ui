@@ -262,6 +262,8 @@ dojo.declare(
     };
     if(item.description) {
         props.title = item.description;
+    } else {
+    	props.title = item.fieldId;
     }
     var div = dojo.create("div", props);
     if (hint === "avatar") {
