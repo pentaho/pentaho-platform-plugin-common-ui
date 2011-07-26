@@ -5,7 +5,7 @@ dojo.require("pentaho.common.DropDownButton");
 dojo.require("dijit.Calendar");
 
 dojo.declare("pentaho.common.Calendar",
-	[dijit.Calendar,],
+	[dijit.Calendar],
 	{
 
 		templateString: dojo.cache("pentaho.common", "Calendar.html"),
@@ -108,7 +108,7 @@ dojo.declare("pentaho.common.Calendar",
 				this.set('value', node.dijitDateValue);
 				dojo.addClass(node, "pentaho-listitem-selected");
 			}
-		},
+		}
 
         
     }
