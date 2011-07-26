@@ -1,6 +1,7 @@
 dojo.provide("pentaho.common.FilterDialog");
 dojo.require("dijit._Widget");
 dojo.require("dijit._Templated");
+dojo.require("pentaho.common.Calendar");
 dojo.require("pentaho.common.DateTextBox");
 dojo.require('pentaho.common.Dialog');
 dojo.require('pentaho.common.MessageBox');
