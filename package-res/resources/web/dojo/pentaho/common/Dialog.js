@@ -15,6 +15,7 @@ dojo.declare(
         callbacks: [],
         shown: false,
         buttonsCreated: false,
+        buttonPanel: null,
         hasTitleBar: true,
         hasBorder: true,
         hasCloseIcon: false,
@@ -60,17 +61,21 @@ dojo.declare(
                this.inherited(arguments);
           },
           
-          _createButtons: function() {
+          _createButtonPanel: function() {
+              this.buttonPanel = dojo.create("TABLE");
+              dojo.style(this.buttonPanel, "width", "100%");
+              dojo.place(this.buttonPanel, this.popup.domNode);
+              dojo.addClass(this.buttonPanel, 'button-panel');
+          },
           
-                var tbl = dojo.create("TABLE");
-                dojo.style(tbl, "width", "100%");
-//                dojo.place(tbl, this.domNode.parentNode);
-                dojo.place(tbl, this.popup.domNode);
-                dojo.addClass(tbl, 'button-panel');
-                var row = tbl.insertRow(-1);
-                var cell = row.insertCell(-1);
-                dojo.style(cell, "align", "right");
-                dojo.style(cell, "width", "100%");
+          _createButtons: function() {
+        	  if (this.buttonPanel.rows.length > 0) {
+        		  this.buttonPanel.deleteRow(-1);
+        	  }
+              var row = this.buttonPanel.insertRow(-1);
+              var cell = row.insertCell(-1);
+              dojo.style(cell, "align", "right");
+              dojo.style(cell, "width", "100%");        	  
                 for(var j=0; j<this.buttons.length; j++) {
                     cell = row.insertCell(-1);
                     dojo.style(cell, "align", "right");
@@ -82,6 +87,8 @@ dojo.declare(
                     btn.onclick = dojo.hitch(this, this.buttonClick, j);
                 }
           },
+          
+          
           
            postCreate: function() {
             if(this.templatePath || this.templateString != '<div></div>') {
@@ -171,8 +178,10 @@ dojo.declare(
                 }
                 
                 if(!this.shown) {
-                    this._createButtons();
+                    this._createButtonPanel();
                 }
+                
+                this._createButtons();
                 
                this.popup.show();
                this.shown = true;
