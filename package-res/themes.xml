@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <themes root-folder="resources/themes">
   <onyx display-name="Onyx" system="true">
-    <file>mainStyles.css</file>
+    <file>globalOnyx.css</file>
     <file>../jquery.js</file>
     <file>../themeUtils.js</file>
   </onyx>
   <slate display-name="Slate" system="true">
-    <file>slateTheme.css</file>
+    <file>globalSlate.css</file>
     <file>../jquery.js</file>
     <file>../themeUtils.js</file>
   </slate>
