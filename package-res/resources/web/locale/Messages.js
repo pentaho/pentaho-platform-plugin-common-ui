@@ -19,7 +19,13 @@ Messages = function()
  */
 /*public static*/Messages.addBundle = function( packageName, fileName )
 {
-  dojo.requireLocalization(packageName, fileName);
+  // Make sure Dojo doesn't try to load message bundles from any other locales than the default (ROOT).
+  // Without the locale override Dojo will attempt to load resources from: ROOT, language, locale (language + variant). 
+  //     e.g. For English in the US: ROOT, en, en-us
+  //          This results in 404s for any message bundle that does not exist as the client has no way of knowing.
+  // We should change this to URL bundles exclusively or run a dojo build for all javascript (dataapi, common, etc)
+  dojo.requireLocalization(packageName, fileName, "ROOT", "ROOT");
+  // dojo.requireLocalization(packageName, fileName);
   Messages.messageBundle.push( dojo.i18n.getLocalization(packageName, fileName) );
 };
 
