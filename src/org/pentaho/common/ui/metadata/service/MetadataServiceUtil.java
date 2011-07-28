@@ -322,13 +322,7 @@ public class MetadataServiceUtil extends PentahoBase {
     for(Condition condition : src.getConditions()) {
       org.pentaho.metadata.query.model.CombinationType combinationType = CombinationType.valueOf(condition.getCombinationType());
       LogicalColumn logicalColumn = logicalModel.findLogicalColumn(condition.getColumn());
-      String paramName = null;
-      for(Parameter parameter : src.getParameters()) {
-        if(parameter.getColumn().equals(condition.getColumn())) {
-          paramName = parameter.getName() == null ? parameter.getColumn() : parameter.getName();
-        }
-      }      
-//      condition.setParameterized(parameterized);
+      String paramName = condition.isParameterized() ? condition.getValue()[0] : null;
       String formula = condition.getCondition(logicalColumn.getDataType().name(), paramName);
       Constraint constraint = new Constraint(combinationType, formula);
       constraints.add(constraint);
@@ -359,7 +353,8 @@ public class MetadataServiceUtil extends PentahoBase {
       LogicalColumn logicalColumn = logicalModel.findLogicalColumn(parameter.getColumn());
       DataType type = logicalColumn.getDataType();
       String value[] = parameter.getValue();
-      org.pentaho.metadata.query.model.Parameter fullParam = new org.pentaho.metadata.query.model.Parameter( parameter.getColumn(), type, value[0]);
+      final String name = parameter.getName() != null ? parameter.getName() : parameter.getColumn();
+      org.pentaho.metadata.query.model.Parameter fullParam = new org.pentaho.metadata.query.model.Parameter( name, type, value[0]);
       parameters.add(fullParam);
     }
     return dest;

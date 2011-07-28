@@ -29,7 +29,7 @@ public class Condition implements ICondition {
   private String operator = Operator.EQUAL.name();
   private String value[];
   private String comboType = CombinationType.AND.name();
-//  private boolean parameterized;
+  private boolean parameterized;
 //  private String defaultValue;
 //  private String selectedAggType;
 
@@ -74,7 +74,7 @@ public class Condition implements ICondition {
   }
 
   public String getCondition(String type) {
-    return getCondition(type, column);
+    return getCondition(type, isParameterized() ? value[0] : null);
   }
 
   public String getCondition(String type, String paramName){
@@ -89,12 +89,14 @@ public class Condition implements ICondition {
       theOperator = Operator.EXACTLY_MATCHES;
     }
 
-    if(type.equalsIgnoreCase(DataType.STRING.getName()) ){
+    boolean enforceParameters = isParameterized() && paramName != null;
+
+    if(!enforceParameters && type.equalsIgnoreCase(DataType.STRING.getName()) ){
       for(int idx=0; idx<val.length; idx++) {
         val[idx] = "\""+val[idx]+"\"";         //$NON-NLS-1$ //$NON-NLS-2$
       }
     }
-    boolean enforceParameters = paramName != null;
+
     String columnName = "["+category+"."+column+"]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$;
     // Date is a special case where we craft a formula function.
     if(type.equals(DataType.DATE.getName())){
@@ -113,7 +115,7 @@ public class Condition implements ICondition {
     }
     return theOperator.formatCondition(columnName, paramName, val, enforceParameters);
   }
-/*
+
   public boolean isParameterized() {
     return parameterized;
   }
@@ -121,7 +123,7 @@ public class Condition implements ICondition {
   public void setParameterized(boolean parameterized) {
    this.parameterized = parameterized;   
   }
-/
+/*
   public void setDefaultValue(String val){
     this.defaultValue = val;
   }

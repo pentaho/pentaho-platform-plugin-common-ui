@@ -485,7 +485,9 @@ public class MetadataServiceTest  extends BaseTest {
     MetadataService svc = new MetadataService();
     
     Query query = getTestQuery();
-    // remove the condition value so that the default value it used
+    // Flag the condition as parameterized
+    query.getConditions()[0].setValue(new String[] {"BC_CUSTOMER_W_TER_COUNTRY"});
+    query.getConditions()[0].setParameterized(true);
     Parameter param = new Parameter();
     param.setDefaultValue(new String[] {"Canada"});
     param.setColumn("BC_CUSTOMER_W_TER_COUNTRY");
@@ -1018,9 +1020,10 @@ public class MetadataServiceTest  extends BaseTest {
     condition.setCombinationType(CombinationType.AND.name());
     condition.setOperator(Operator.EQUAL.name());
     condition.setValue(new String[] {"bingo"});
+    condition.setParameterized(true);
     
     String str = condition.getCondition(DataType.STRING.getName());
-    assertEquals("[cat.column] = [param:column]", str);
+    assertEquals("[cat.column] = [param:bingo]", str);
 
     condition.setValue(new String[] {"bingo"});
     str = condition.getCondition(DataType.STRING.getName(), condition.getColumn());

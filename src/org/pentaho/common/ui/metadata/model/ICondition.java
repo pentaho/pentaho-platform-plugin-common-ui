@@ -75,7 +75,7 @@ public interface ICondition extends Serializable{
    * 
    * @return true if value denotes parameter name rather than a literal value
    */
-//  public boolean isParameterized();
+  public boolean isParameterized();
   
 //  public String getDefaultValue();
 
