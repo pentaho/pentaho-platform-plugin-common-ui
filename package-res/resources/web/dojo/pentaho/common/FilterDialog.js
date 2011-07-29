@@ -290,6 +290,8 @@ dojo.declare(
       } else {
         this.currentFilter.parameterName = null;
       }
+    } else {
+      this.currentFilter.parameterName = null;
     }
 
     if (this._onSuccessCallback) {
