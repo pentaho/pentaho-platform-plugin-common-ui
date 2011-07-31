@@ -765,11 +765,17 @@ pentaho.pda.query.mql.prototype.getParameterXML = function( parameter ) {
         var xml = '';
         var column = this.model.getColumnById(parameter.column);
         xml += '<parameter defaultValue="';
+        var defaultValue;
         if(parameter.value != null) {
-            xml += this.getParameterValueString(column, parameter.value);
+            defaultValue = this.getParameterValueString(column, parameter.value);
         } else {
-            xml += this.getParameterValueString(column, parameter.defaultValue);
+            defaultValue = this.getParameterValueString(column, parameter.defaultValue);
         }
+        if (   column.dataType === pentaho.pda.Column.DATA_TYPES.STRING
+            || column.dataType === pentaho.pda.Column.DATA_TYPES.UNKNOWN) {
+            defaultValue = escape(defaultValue);
+        }
+        xml += defaultValue;
         xml += '" name="'+parameter.name;
         xml += '" type="'+parameter.type+'"/>';
         return xml;
@@ -787,13 +793,16 @@ pentaho.pda.query.mql.prototype.getParameterValueString = function ( column, val
             }
             return str;
         }
+        if( column.dataType == pentaho.pda.Column.DATA_TYPES.DATE ) {
+            return ''+value;
+        }
         if( column.dataType == pentaho.pda.Column.DATA_TYPES.NUMERIC ) {
             return ''+value;
         }
         if( column.dataType == pentaho.pda.Column.DATA_TYPES.BOOLEAN ) {
             return ''+value;
         }
-        return '&quot;'+value+'&quot;';
+        return '"'+value+'"';
 }
 
 pentaho.pda.query.mql.prototype.getSelectionXML = function( selection ) {
