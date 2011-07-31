@@ -210,7 +210,10 @@ dojo.declare(
         dojo.addClass(this.typeDateRangeContainer, "filterDialogHidden");
         break;
       case pentaho.pda.Column.DATA_TYPES.BOOLEAN:
-        // TODO Add boolean data type filtering
+        dojo.addClass(this.typePicklistContainer, "filterDialogHidden");
+        dojo.addClass(this.typeMatchContainer, "filterDialogHidden");
+        dojo.addClass(this.typeDateRangeContainer, "filterDialogHidden");
+        break;
       default:
         this.showErrorDialog(this.getLocaleString('filterDialogUnknownDataType') + dataType);
         dojo.addClass(this.typePicklistContainer, "filterDialogHidden");
