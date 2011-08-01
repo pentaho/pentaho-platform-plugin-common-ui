@@ -570,7 +570,14 @@ pentaho.pda.query.mql = function(model) {
         "orders": [],
         "parameters" : []
     };
-    
+
+    // XML Attribute values must not include: <, & or "   (http://www.w3.org/TR/xml/#NT-AttValue)
+    this.XML_CHARACTER_MAPPING = {
+        '&': '&amp;', 
+        '<': '&lt;', 
+        '"': '&quot;'
+    };
+    this.XML_ILLEGAL_CHARACTERS_PATTERN = /[&<"]/g;
 }
 
 inheritPrototype(pentaho.pda.query.mql, pentaho.pda.query); //borrow the parent's methods
@@ -773,13 +780,22 @@ pentaho.pda.query.mql.prototype.getParameterXML = function( parameter ) {
         }
         if (   column.dataType === pentaho.pda.Column.DATA_TYPES.STRING
             || column.dataType === pentaho.pda.Column.DATA_TYPES.UNKNOWN) {
-            defaultValue = escape(defaultValue);
+            defaultValue = this.encodeXmlAttribute(defaultValue);
         }
         xml += defaultValue;
         xml += '" name="'+parameter.name;
         xml += '" type="'+parameter.type+'"/>';
         return xml;
     }
+
+pentaho.pda.query.mql.prototype.encodeXmlAttribute = function(value) {
+    if (!value) { return; }
+    // XML Attribute values must not include: <, & or "   (http://www.w3.org/TR/xml/#NT-AttValue)
+    var mapping = this.XML_CHARACTER_MAPPING;
+    return value.replace(this.XML_ILLEGAL_CHARACTERS_PATTERN, function(c) {
+        return mapping[c];
+    });
+}
 
 pentaho.pda.query.mql.prototype.getParameterValueString = function ( column, value ) {
         if( value.constructor.toString().indexOf("Array") != -1 ) {
