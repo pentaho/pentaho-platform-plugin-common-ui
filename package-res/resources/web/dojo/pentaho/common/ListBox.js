@@ -30,6 +30,9 @@ dojo.declare("pentaho.common.ListBox",
         dojo.removeClass(this.outerNode,"dijitSelect");
         dojo.removeClass(this.menuNode.domNode,"pentaho-listbox");
         dojo.removeClass(this.menuNode.domNode,"pentaho-menu-outer");
+        this.menuNode._onBlur = function() {
+            // noop to prevent deselection of menu items in our list box
+        };
 	},
 
 	_fillContent: function(){
