@@ -86,7 +86,7 @@ dojo.declare("pentaho.common.ListBox",
                 option: option,
                 label: option.text || option.value,
                 value: option.value ,
-                onClick: click,
+                onMouseDown: click,
                 disabled: option.disabled || false
             });
             dijit.setWaiRole(item.focusNode, "listitem");
