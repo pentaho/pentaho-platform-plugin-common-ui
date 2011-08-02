@@ -261,6 +261,16 @@
 	</target>
 
 	  <target name="plugin-build-js-dojo" description="Does the Dojo build of src and compressed js files">
+	  	
+	  	<!-- make sure the default dojo copyright/build headers are in play -->
+	    <copy verbose="true" todir="${dojo.src}/util/buildscripts" overwrite="true">
+	      <fileset dir="${dev.res}">
+			<include name="dojo_copyright.txt"/>
+			<include name="dojo_build_notice.txt"/>
+		  </fileset>
+		  <mapper type="glob" from="dojo_*" to="*"/>
+	   	</copy>	  	
+	  	
 	  	<java classname="org.mozilla.javascript.tools.shell.Main" 
 			dir="${dojo.src}/util/buildscripts"
 			fork="true">
@@ -292,6 +302,16 @@
 	</target>
 	  	
   <target name="plugin-build-js-pentaho" description="Does the Dojo build of src and compressed js files">
+  	
+  	<!-- use the Pentaho open-source license header -->
+    <copy verbose="true" todir="${dojo.src}/util/buildscripts" overwrite="true">
+      <fileset dir="${dev.res}">
+		<include name="pentaho_copyright.txt"/>
+		<include name="pentaho_build_notice.txt"/>
+	  </fileset>
+	  <mapper type="glob" from="pentaho_*" to="*"/>
+   	</copy>  	
+  	
 	<!-- do the pentaho scripts -->
 	<java classname="org.mozilla.javascript.tools.shell.Main" 
 		dir="${dojo.src}/util/buildscripts"
