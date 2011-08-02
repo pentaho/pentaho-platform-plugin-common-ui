@@ -81,12 +81,13 @@ dojo.declare("pentaho.common.ListBox",
             return new pentaho.common.MenuSeparator();
         }else{
             // Just a regular menu option
-            var click = dojo.hitch(this, "_setValueAttr", option);
+            var setSelected = dojo.hitch(this, "_setValueAttr", option);
             var item = new pentaho.common.ListItem({
                 option: option,
                 label: option.text || option.value,
                 value: option.value ,
-                onMouseDown: click,
+                onMouseDown: setSelected,
+                onKeyUp: setSelected,
                 disabled: option.disabled || false
             });
             dijit.setWaiRole(item.focusNode, "listitem");
