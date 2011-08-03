@@ -116,9 +116,9 @@ dojo.declare(
                 dojo.connect(this.domNode, "onkeyup", this, this.keyup);
                 
                 this.onKeyUp = dojo.hitch(this, this.keyup);
-                this.domNode.onKeyUp = dojo.hitch(this, this.keyup)
-                this.popup.onKeyUp = dojo.hitch(this, this.keyup)
-                this.popup.domNode.onKeyUp = dojo.hitch(this, this.keyup)
+                dojo.connect(this.domNode, 'onKeyUp', this, this.keyup);
+                dojo.connect(this.popup, 'onKeyUp', this, this.keyup);
+                dojo.connect(this.popup.domNode, 'onKeyUp', this, this.keyup);
                 
                 this.popup.onCancel = dojo.hitch(this, function(){});
                 this.popup.onExecute = dojo.hitch(this, this.okClick);
@@ -193,6 +193,11 @@ dojo.declare(
                this.popup.destroy();
             },
             
+            destroyRecursive: function() {
+              this.popup.destroyRecursive();
+              dojo.empty(this.domNode);
+            },
+
             buildRendering: function(){ 
             
             if(this.templatePath) {
