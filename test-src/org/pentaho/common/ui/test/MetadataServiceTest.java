@@ -916,7 +916,7 @@ public class MetadataServiceTest  extends BaseTest {
 
     MetadataService svc = new MetadataService();
     
-    ModelInfo[] models = svc.listBusinessModels(null);
+    ModelInfo[] models = svc.listBusinessModels(null, null);
     assertNotNull(models);
     assertTrue("Wrong nuber of models returned",models.length>2);
     boolean found = false;
@@ -938,7 +938,7 @@ public class MetadataServiceTest  extends BaseTest {
 
     MetadataService svc = new MetadataService();
     
-    ModelInfo[] models = svc.listBusinessModels("steel-wheels/metadata.xmi");
+    ModelInfo[] models = svc.listBusinessModels("steel-wheels/metadata.xmi", null);
     assertNotNull(models);
     assertEquals("Wrong nuber of models returned",3,models.length);
   }
@@ -949,7 +949,7 @@ public class MetadataServiceTest  extends BaseTest {
 
     MetadataService svc = new MetadataService();
     
-    ModelInfo[] models = svc.listBusinessModels("bogus");
+    ModelInfo[] models = svc.listBusinessModels("bogus", null);
     assertNotNull(models);
     assertEquals("Wrong nuber of models returned",0,models.length);
   }
@@ -960,7 +960,7 @@ public class MetadataServiceTest  extends BaseTest {
 
     MetadataService svc = new MetadataService();
     
-    ModelInfo[] models = svc.listBusinessModels(null);
+    ModelInfo[] models = svc.listBusinessModels(null, null);
     assertNotNull(models);
     assertEquals("Wrong nuber of models returned",0,models.length);
   }
@@ -970,7 +970,7 @@ public class MetadataServiceTest  extends BaseTest {
     PentahoSessionHolder.setSession(session);
     MetadataService svc = new MetadataService();
     
-    String json = svc.listBusinessModelsJson(null);
+    String json = svc.listBusinessModelsJson(null, null);
     assertNotNull(json);
 //    System.out.println(json);
     // convert to a list
