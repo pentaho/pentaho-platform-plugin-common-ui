@@ -119,7 +119,7 @@
 
                 var datasourceId = document.getElementById('datasource-list').value;
                 // get the details of the selected data source
-                pentaho.myapp.source = pentaho.myapp.app.getSources({property:'id', value: datasourceId});
+                pentaho.myapp.source = pentaho.myapp.app.getSources(null, {filter : {property:'id', value: datasourceId}});
                 pentaho.myapp.source.discoverModelDetail();
                 
                 // get the queryiable elements (fields)

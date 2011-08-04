@@ -26,12 +26,8 @@ pentaho.pda.app = function(){
 
 inheritPrototype(pentaho.pda.app, pentaho.app); //borrow the parent's methods
 
-pentaho.pda.app.prototype.discoverSources = function(callback) {
+pentaho.pda.app.prototype.discoverSources = function(callback, options) {
 
-	if (typeof callback !== 'function') {
-		callback = false;
-	}
-	
 	//should only be here if we don'thave sources already
 	var md = this.moduleData, src={}, handler, that=this, sources = [];
 	for (src in md) {
@@ -44,7 +40,7 @@ pentaho.pda.app.prototype.discoverSources = function(callback) {
 					if (callback) {
 						callback(source);
 					}
-				}
+				}, options
 			)
 		} else {
 			throw new Error(md[src].name + ' is not an instanceof pentaho.pda.Handler');
@@ -54,13 +50,11 @@ pentaho.pda.app.prototype.discoverSources = function(callback) {
 	return sources;
 }
 
-pentaho.pda.app.prototype.getSources = function(filter, callback) {
+pentaho.pda.app.prototype.getSources = function(callback, options) {
 
 	var i,j,_sources = [], each;
-	if (arguments.length == 1 && typeof filter == 'function' ) {
-		callback = filter;
-		filter = null;
-	}
+  options = options || {};
+	var filter = options['filter'];
 	if (this.sources.length > 0) {
 //		console.log('using existing sources');
 		if (filter == null ) {
@@ -124,7 +118,7 @@ pentaho.pda.app.prototype.getSources = function(filter, callback) {
 //						console.log(e);
 					}
 				}
-			}
+			}, options
 		);
 		if (_sources.length == 1) {
 			return _sources[0];

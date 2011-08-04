@@ -91,7 +91,7 @@ function showModelInfo() {
         return;
     }
 	if (idx !== pentaho.myapp.prior_idx) {
-		pentaho.myapp.source = pentaho.myapp.app.getSources({property:'id', value:document.getElementById('model-list').options[idx].value});
+		pentaho.myapp.source = pentaho.myapp.app.getSources({filter:{property:'id', value:document.getElementById('model-list').options[idx].value}});
 		pentaho.myapp.prior_idx = idx;
 	}
     document.getElementById('model-type').value = pentaho.myapp.source.type;

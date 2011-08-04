@@ -45,6 +45,7 @@ import org.pentaho.platform.engine.core.system.PentahoSystem;
 import org.pentaho.platform.plugin.action.pentahometadata.MetadataQueryComponent;
 import org.pentaho.platform.util.messages.LocaleHelper;
 import org.pentaho.pms.core.exception.PentahoMetadataException;
+import org.apache.commons.lang.StringUtils;
 
 import flexjson.JSONSerializer;
 
@@ -68,10 +69,11 @@ public class MetadataService extends PentahoBase {
   /**
    * Returns a list of the available business models
    * @param domainName optional domain to limit the results
+   * @param context Area to check for model visibility
    * @return list of ModelInfo objects representing the available models
    * @throws IOException
    */
-  public ModelInfo[] listBusinessModels( String domainName ) throws IOException {
+  public ModelInfo[] listBusinessModels( String domainName, String context ) throws IOException {
 
     List<ModelInfo> models = new ArrayList<ModelInfo>();
     
@@ -83,14 +85,14 @@ public class MetadataService extends PentahoBase {
     }
     
     try {
-      if (domainName == null) {
+      if (StringUtils.isEmpty(domainName)) {
         // if no domain has been specified, loop over all of them
         for (String domain : getMetadataRepository().getDomainIds()) {
-          getModelInfos(domain, models);
+          getModelInfos(domain, context, models);
         }
       } else {
         // get the models for the specified domain
-        getModelInfos(domainName, models);
+        getModelInfos(domainName, context, models);
       }
     } catch (Throwable t) {
       error(Messages.getErrorString("MetadataService.ERROR_0002_BAD_MODEL_LIST"), t); //$NON-NLS-1$
@@ -103,12 +105,13 @@ public class MetadataService extends PentahoBase {
   /**
    * Returns a JSON list of the available business models
    * @param domainName optional domain to limit the results
+   * @param context Area to check for model visibility
    * @return JSON string of list of ModelInfo objects representing the available models
    * @throws IOException
    */
-  public String listBusinessModelsJson( String domainName ) throws IOException {
+  public String listBusinessModelsJson( String domainName, String context ) throws IOException {
 
-    ModelInfo[] models = listBusinessModels(domainName);
+    ModelInfo[] models = listBusinessModels(domainName, context);
     JSONSerializer serializer = new JSONSerializer(); 
     String json = serializer.deepSerialize( models );
     return json;
@@ -119,9 +122,10 @@ public class MetadataService extends PentahoBase {
    * and this list is intended to allow a client to provide a list of models to a user
    * so the user can pick which one they want to work with.
    * @param domain
+   * @param context Area to check for model visibility
    * @param models
    */
-  private void getModelInfos(final String domain, List<ModelInfo> models) {
+  private void getModelInfos(final String domain, final String context, List<ModelInfo> models) {
 
     IMetadataDomainRepository repo = getMetadataRepository();
     
@@ -136,6 +140,20 @@ public class MetadataService extends PentahoBase {
 
     // iterate over all of the models in this domain
     for (LogicalModel model : domainObject.getLogicalModels()) {
+      String vis = (String) model.getProperty("visible");
+      if(vis != null){
+        String[] visibleContexts = vis.split(",");
+        boolean visibleToContext = false;
+        for(String c : visibleContexts){
+          if(c.equals(context)){
+            visibleToContext = true;
+            break;
+          }
+        }
+        if(!visibleToContext){
+          continue;
+        }
+      }
       // create a new ModelInfo object and give it the envelope information about the model
       ModelInfo modelInfo = new ModelInfo();
       modelInfo.setDomainId(domain);

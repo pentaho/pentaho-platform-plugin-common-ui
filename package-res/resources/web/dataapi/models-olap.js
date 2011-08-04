@@ -8,12 +8,9 @@ pentaho.pda.OlapHandler = function OlapHandler(sandbox) {
 
 inheritPrototype(pentaho.pda.OlapHandler, pentaho.pda.Handler); //borrow the parent's methods
 
-pentaho.pda.OlapHandler.prototype.getSources = function(filter, callback) {
-    
-    if (arguments.length == 1 && typeof filter == 'function' ) {
-        callback = filter;
-        filter = null;
-    }
+pentaho.pda.OlapHandler.prototype.getSources = function(callback, options) {
+    options = options || {};
+    var filter = options['filter'];
     this.xmla = new Xmla({
             async: false
     });

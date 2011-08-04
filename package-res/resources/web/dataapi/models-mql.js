@@ -9,13 +9,9 @@ pentaho.pda.MqlHandler = function mqlHandler(sandbox) {
 
 inheritPrototype(pentaho.pda.MqlHandler, pentaho.pda.Handler); //borrow the parent's methods
 
-pentaho.pda.MqlHandler.prototype.getSources = function(filter, callback) {
-
-	if (arguments.length == 1 && typeof filter == 'function' ) {
-		callback = filter;
-		filter = null;
-	}
-	
+pentaho.pda.MqlHandler.prototype.getSources = function(callback, options) {
+	options = options || {};
+  var filter = options['filter'];
 	var _sources = [], i=0,j=0, each;
 	if (this.sources.length > 0) {
 		if (filter == null ) {
@@ -39,7 +35,9 @@ pentaho.pda.MqlHandler.prototype.getSources = function(filter, callback) {
         //try {
             // get the info about the models from the server
             var url = this.METADATA_SERVICE_URL+'/listBusinessModels';
-            var result = pentahoGet( url, '' );
+            var contextName = options['context'];
+            var query = "domain=&"+((contextName)? 'context='+contextName : "");
+            var result = pentahoGet( url, query );
 
             // parse the XML
             var xml = parseXML( result ), 
