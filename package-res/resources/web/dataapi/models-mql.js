@@ -36,7 +36,7 @@ pentaho.pda.MqlHandler.prototype.getSources = function(callback, options) {
             // get the info about the models from the server
             var url = this.METADATA_SERVICE_URL+'/listBusinessModels';
             var contextName = options['context'];
-            var query = "domain=&"+((contextName)? 'context='+contextName : "");
+            var query = "domainName=&"+((contextName)? 'context='+contextName : "");
             var result = pentahoGet( url, query );
 
             // parse the XML
