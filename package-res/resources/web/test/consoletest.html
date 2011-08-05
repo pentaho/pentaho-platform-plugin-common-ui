@@ -40,12 +40,11 @@ function doLoad() {
         document.getElementById('disable_save').disabled = false;
         document.getElementById('refresh_browse').disabled = false;
     
-      // register for the edit button toggle events
-      window.parent.registerContentCallback(new function() {
-        this.editContentToggled = function(selected) {
+      // setup toggle event function
+      window.editContentToggled = function(selected) {
             toggleEditMode( selected );
         }
-      });
+      };
 
     }
 

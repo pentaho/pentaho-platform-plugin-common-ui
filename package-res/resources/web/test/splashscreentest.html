@@ -34,6 +34,20 @@
             function doload() {
 
                 var userConsole = new PentahoUserConsole();
+
+                window.editContentToggled = function(selected) {
+                  if( userConsole.toggleEditCallback ) {
+                      userConsole.toggleEditCallback(selected);
+                  }
+                  if( selected ) {
+                      userConsole.enableEditButton();
+                      userConsole.lowerEditButton();
+                  } else {
+                      userConsole.enableEditButton();
+                      userConsole.resetEditButton();
+                  }
+                };
+
                 if(!userConsole.console_enabled) {
                     document.body.className = document.body.className + ' pentaho-page-background';
                 }
