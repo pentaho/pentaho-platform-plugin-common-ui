@@ -77,10 +77,6 @@ PentahoUserConsole = function() {
   
   this.toggleEditCallback = null;
 
-  if( this.console_enabled ) {
-    window.parent.registerContentCallback(this);
-  }
-
   this.enableEditButton = function() {
     // if possible, enable the 'Edit' toolbar button
     if( this.console_enabled && window.parent.enableContentEdit ){
