@@ -5,7 +5,7 @@
     <file>../jquery.js</file>
     <file>../themeUtils.js</file>
   </onyx>
-  <slate display-name="Slate" system="true">
+  <slate display-name="Slate" system="true" hidden="true">
     <file>globalSlate.css</file>
     <file>../jquery.js</file>
     <file>../themeUtils.js</file>
