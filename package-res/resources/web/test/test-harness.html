@@ -193,7 +193,8 @@ function assertEquals(shouldBe, is, idx, comment) {
 // load the Orders model, test that expected columns exist
 function test2() {
 
-    pentaho.myapp.source = pentaho.myapp.app.getSources({filter: {property:'id', value:'steel-wheels/metadata.xmi:BV_ORDERS'}});
+    pentaho.myapp.source = pentaho.myapp.app.getSources(null, {filter: {property:'id',
+    value:'steel-wheels/metadata.xmi:BV_ORDERS'}});
     pentaho.myapp.source.discoverModelDetail();
     var elements = pentaho.myapp.source.getAllElements();
 
@@ -620,7 +621,8 @@ function test33() {
 
 function initModel() {
     if(model == null || model.getAllColumns().length == 0 ) {
-        pentaho.myapp.source = pentaho.myapp.app.getSources({filter: {property:'id', value:'steel-wheels/metadata.xmi:BV_ORDERS'}});
+        pentaho.myapp.source = pentaho.myapp.app.getSources(null, {filter: {property:'id',
+        value:'steel-wheels/metadata.xmi:BV_ORDERS'}});
         pentaho.myapp.source.discoverModelDetail();
         model = pentaho.myapp.source;
     }
