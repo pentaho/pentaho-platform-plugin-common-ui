@@ -148,7 +148,7 @@ try {
     }
 
     // get the model
-    pentaho.myapp.source = pentaho.myapp.app.getSources({filter: {property:'id', value:document.getElementById('model-list').options[idx].value}});
+    pentaho.myapp.source = pentaho.myapp.app.getSources(null, {filter: {property:'id', value:document.getElementById('model-list').options[idx].value}});
   	pentaho.myapp.source.discoverModelDetail();
     model = pentaho.myapp.source; 
 

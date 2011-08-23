@@ -52,7 +52,7 @@ function loadPage() {
 	},
 	da_cda = {
 		name: 'da-cda',
-		objectClass: pentaho.pda.CdaHandler
+		objectClass: pentaho.pda.CDAHandler
 	};
 
 	pentaho.myapp = {
@@ -60,7 +60,7 @@ function loadPage() {
 		prior_idx: -1,
 		source: {}
 	};
-	var moduleArray = [da_mql,da_olap, da_cda];
+	var moduleArray = [da_mql,da_olap];
 	pentaho.myapp.app.init(moduleArray);	
     pentaho.myapp.app.moduleData['da-mql'].instance.METADATA_SERVICE_URL = CONTEXT_PATH + 'content/ws-run/metadataService';
 }
@@ -91,7 +91,7 @@ function showModelInfo() {
         return;
     }
 	if (idx !== pentaho.myapp.prior_idx) {
-		pentaho.myapp.source = pentaho.myapp.app.getSources({filter:{property:'id', value:document.getElementById('model-list').options[idx].value}});
+		pentaho.myapp.source = pentaho.myapp.app.getSources(null, {filter:{property:'id', value:document.getElementById('model-list').options[idx].value}});
 		pentaho.myapp.prior_idx = idx;
 	}
     document.getElementById('model-type').value = pentaho.myapp.source.type;
