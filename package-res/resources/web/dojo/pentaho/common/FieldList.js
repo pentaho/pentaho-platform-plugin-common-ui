@@ -15,6 +15,31 @@ dojo.declare(
   getLocaleString: undefined,
   filters: [],
   categorize: true,
+  categoryClassMap: {},
+  usedCategoryIds: {},
+  
+  sanitizeIdAndClassNames: function(name) {
+    return dojox.html.entities.encode(name).replace(/ /g,"_");
+  },
+
+  generateUniqueClassName: function(categoryId) {
+    var gen = function(){ return Math.round(Math.random() * 100000);};
+    var className = "category" + gen();
+    while(this.usedCategoryIds[className]){
+      className = gen();
+    }
+    this.usedCategoryIds[className] = true;
+    return "" + className;
+  },
+
+  getCategoryClassName: function(categoryId) {
+    var className = this.categoryClassMap[categoryId];
+    if (!className) {
+      className = this.generateUniqueClassName(categoryId);
+      this.categoryClassMap[categoryId] = className;
+    }
+    return className;
+  },
   
   /**
    * Function to call when a field's oncontextmenu event is received
@@ -129,6 +154,9 @@ dojo.declare(
     });
     this.connectHandles = [];
     dojo.empty(this.containerNode);
+    
+    this.categoryClassMap = {};
+    this.usedCategoryIds = {};
   },
 
   configureFor: function(datasource) {
@@ -178,29 +206,30 @@ dojo.declare(
         // there are no fields for this category with the current filters
         return;
       }
+      var catId = this.getCategoryClassName(category.id);
       addedCategories.push(category.id);
       // create div for category
       var categoryDiv = dojo.create("div",
         {
-          "id": category.id
+          "id": catId
         }, this.containerNode);
 
       // create +- expand/collapse indicator
       var categoryIndicator = dojo.create("div",
         {
-          "id": category.id + "-indicator",
+          "id": catId + "-indicator",
           "class": "categoryIndicator treenode-open",
-          "categoryId": category.id
+          "categoryId": catId
         }, categoryDiv);
       this.connectHandles.push(dojo.connect(categoryIndicator, 'onclick', this, this.expandCollapseCategory));
 
       // create span for categoryName to display text
       var categoryNameSpan = dojo.create("span",
         {
-          "id": category.id + "-span",
+          "id": catId + "-span",
           "class": "treenode-branch-label",
           "innerHTML": category.name,
-          "categoryId": category.id
+          "categoryId": catId
         }, categoryDiv);
       this.textSelectionDisabler(categoryNameSpan);
       this.connectHandles.push(dojo.connect(categoryNameSpan, 'ondblclick', this, this.expandCollapseCategory));
@@ -208,10 +237,10 @@ dojo.declare(
       // create DND field list for this category
       var categoryFieldsDiv = dojo.create("div",
         {
-          "id": category.id + "-fields"
+          "id": catId + "-fields"
         }, categoryDiv);
 
-      this.addFields( fields, categoryFieldsDiv, category.id );
+      this.addFields( fields, categoryFieldsDiv, catId );
 
     }, this);
   },
@@ -255,7 +284,7 @@ dojo.declare(
 
   _dndItemCreator: function(item, hint) {
     var props = {
-        "id": "field-" + item.fieldId,
+        "id": "field-" + this.sanitizeIdAndClassNames(item.fieldId),
         "innerHTML": item.displayName,
         "fieldId": item.fieldId,
         "class": item.categoryId
