@@ -165,11 +165,7 @@
 		      <fileset dir="build-res">
 		      	<include name="runner.js"/>
 		      </fileset>
-	    </copy>	  	
-	    <copy todir="${approot.stage.dir}/resources/web/testres/jscoverage">
-		      <fileset dir="jscoverage/web"/>
-	    </copy>	  	
-
+	    </copy>
 	    <delete dir="${stage.dir}/javascript"/>
 
       <property environment="env"/>
