@@ -62,6 +62,11 @@ dojo.declare(
   doubleClickCallback: undefined,
 
   /**
+   * Function to handle adding a field. Will receive the fieldId as the only parameter.
+   */
+  clickCallback: undefined,
+
+  /**
    * The dojo.dnd.Source container for the fields
    */
   dndObj: undefined,
@@ -108,6 +113,10 @@ dojo.declare(
 
   registerDoubleClickCallback: function(f) {
     this.doubleClickCallback = f;
+  },
+  
+  registerClickCallback: function(f) {
+    this.clickCallback = f;
   },
   
   registerExpandCollapseCategoryCallback: function(f) {
@@ -252,6 +261,7 @@ dojo.declare(
             "categoryId": parentId,
             "displayName": field.name,
             "fieldId": field.id,
+            "dataType": field.dataType,
             "type": ["treenode-leaf-label"],
             "description": field.description
           };
@@ -319,8 +329,20 @@ dojo.declare(
       this.connectHandles.push(dojo.connect(div, 'onmouseout', this, function(event) {
         this.onFieldMouseOut(event);
       }));
+      this.connectHandles.push(dojo.connect(div, 'onclick', this, function(event) {
+        this.onFieldClick(event);
+      }));
     }
     return {node: div, data: item, type: ["treenode-leaf-label"]};
+  },
+
+  onFieldClick: function(event) {
+    if(this.selector) {
+        this.selector.onClick(event);
+    }
+    if(this.clickCallback) {
+        this.clickCallback(event);
+    }
   },
 
   onFieldMouseOver: function(event) {
