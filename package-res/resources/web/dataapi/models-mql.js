@@ -709,6 +709,10 @@ pentaho.pda.query.mql.prototype.addParameterById = function(columnId, name, valu
         return parameter;
     }
     
+pentaho.pda.query.mql.prototype.couldReturnData = function() {
+    return this.state.columns.length > 0;
+}
+    
 pentaho.pda.query.mql.prototype.addSelection = function( selection ) {
         this.state.columns.push( selection );
     }

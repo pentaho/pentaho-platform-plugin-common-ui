@@ -624,6 +624,10 @@ pentaho.pda.query.olap.prototype.createSelection = function() {
         return selection;
     }
 
+pentaho.pda.query.olap.prototype.couldReturnData = function() {
+        return this.state.measures.length > 0 || this.state.rowSelections.length > 0 || this.state.columnSelections.length > 0;
+    }
+
 pentaho.pda.query.olap.prototype.createCondition = function() {
         var condition = {
             "column" : null,
