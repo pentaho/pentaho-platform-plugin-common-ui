@@ -13,7 +13,7 @@
   <sample1 system="true" hidden="true">
     <file>style1.css</file>
   </sample1>
-  <replaceable system="true" hidden="true">
+  <replaceable system="true" hidden="false"> <!-- change this to true to enable the replaceable theme -->
     <file>replaceable.css</file>
   </replaceable>
 </themes>
