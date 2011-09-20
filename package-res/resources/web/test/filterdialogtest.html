@@ -152,7 +152,7 @@
                 fields = [];
                 var datasourceId = document.getElementById('datasource-list').value;
                 // set the selected
-                pentaho.myapp.source = pentaho.myapp.app.getSources({filter: {property:'id', value: datasourceId}});
+                pentaho.myapp.source = pentaho.myapp.app.getSources(null, {filter: {property:'id', value: datasourceId}});
                 pentaho.myapp.source.discoverModelDetail();
                 var elements = pentaho.myapp.source.getAllElements();
                 var list = document.getElementById('field-list');
