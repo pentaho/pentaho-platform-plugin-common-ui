@@ -313,11 +313,15 @@ pentaho.ccc.CccChart = function( element ) {
     this.dataTable = null;
     this.vizOptions = null;
     this.series = [];
+    this.selections = [];
+    this.currentChartType = null;
 }
 
 pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
     this.vizOptions = vizOptions;
     this.dataTable = dataTable;
+    
+    this.selections = vizOptions.selections;
     
     var metadata = [];
     var measures = [];
@@ -524,7 +528,6 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
         }
     }
 
-    var chart;
     if( vizOptions.cccClass == 'pvc.BarChart' || vizOptions.cccClass == 'pvc.LineChart') {
 
         opts.extensionPoints = {
@@ -543,11 +546,13 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
         opts.yAxisFullGrid = true
     }
     
-    eval( 'chart = new '+vizOptions.cccClass+'(opts)' );
+    if( this.currentChartType != vizOptions.cccClass ) {
+        eval( 'this.chart = new '+vizOptions.cccClass+'(opts)' );
+        this.currentChartType = vizOptions.cccClass;
+    }
     
-    chart.setData($.extend(true, {}, this.cdaTable),dataOpts);
-
-    chart.render();
+    this.chart.setData($.extend(true, {}, this.cdaTable),dataOpts);
+    this.chart.render();
 
 }
 

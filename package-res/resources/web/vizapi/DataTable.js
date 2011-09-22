@@ -325,6 +325,36 @@ pentaho.DataTable.prototype.getFilteredRows = function(filters) {
     return rows;
 }
 
+/*
+    setColumnProperty
+    Sets a column property
+
+    columnIndex The index of the column to set the property on
+    name        The name of the property
+    value       The value of the property
+*/
+pentaho.DataTable.prototype.setColumnProperty = function(columnIndex, name, value) {
+    if( columnIndex >= 0 && columnIndex < this.jsonTable.cols.length) {
+        this.jsonTable.cols[columnIndex][name] = value;
+    }
+}
+
+/*
+    getColumnProperty
+    Returns a column property
+
+    columnIndex The index of the column to set the property on
+    name        The name of the property
+
+    Return      The value of the property
+*/
+pentaho.DataTable.prototype.getColumnProperty = function(columnIndex, name) {
+    if( columnIndex >= 0 && columnIndex < this.jsonTable.cols.length) {
+        return this.jsonTable.cols[columnIndex][name];
+    }
+    return null;
+}
+
 /****************************************************
     pentaho.DataView
     A client-side data view object.
@@ -609,4 +639,29 @@ pentaho.DataView.prototype.toDataTable = function() {
     var table = new pentaho.DataTable(json);
     return table;
 
+}
+
+/*
+    setColumnProperty
+    Sets a column property
+
+    columnIndex The index of the column to set the property on
+    name        The name of the property
+    value       The value of the property
+*/
+pentaho.DataView.prototype.setColumnProperty = function(columnIndex, name, value) {
+    this.dataTable.setColumnProperty(columnIndex, name, value);
+}
+
+/*
+    getColumnProperty
+    Returns a column property
+
+    columnIndex The index of the column to set the property on
+    name        The name of the property
+
+    Return      The value of the property
+*/
+pentaho.DataView.prototype.getColumnProperty = function(columnIndex, name) {
+    return this.dataTable.getColumnProperty(columnIndex, name);
 }

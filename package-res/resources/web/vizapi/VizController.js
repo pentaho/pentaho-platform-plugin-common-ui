@@ -126,8 +126,8 @@ pentaho.VizController.prototype.getState = function() {
         
         if( this.currentViz ) {
             state.vizId = this.currentViz.id;
-            if( this.currentViz.getState ) {
-                state.vizState = this.currentViz.getState();
+            if( this.chart.getState ) {
+                state.vizState = this.chart.getState();
             }
         }
         return state;
@@ -147,19 +147,22 @@ pentaho.VizController.prototype.getState = function() {
 pentaho.VizController.prototype.setState = function(state) {
     try {
         // find the visualization
-        for( var idx=0; idx<pentaho.visualizations.length; idx++) {
-            if( pentaho.visualizations[idx].id == state.vizId) {
-                // we found a visualization with the specified id
-                this.currentViz = pentaho.visualizations[idx];
-                break;
+        if( !this.currentViz || this.currentViz.id != state.vizId ) {
+            for( var idx=0; idx<pentaho.visualizations.length; idx++) {
+                if( pentaho.visualizations[idx].id == state.vizId) {
+                    // we found a visualization with the specified id
+                    this.currentViz = pentaho.visualizations[idx];
+                    break;
+                }
             }
+            if( !this.currentViz ) {
+                alert('Visualization not found: '+state.vizId);
+            }
+            // set the state of the visualization
+            this.setVisualization(this.currentViz);
         }
-        if( !this.currentViz ) {
-            alert('Visualization not found: '+state.vizId);
-        }
-        // set the state of the visualization
-        if( this.currentViz.setState ) {
-            this.currentViz.setState( state.vizState );
+        if( this.chart && this.chart.setState ) {
+            this.chart.setState( state.vizState );
         }
         return true;
     } catch (e) {
@@ -290,7 +293,9 @@ pentaho.VizController.prototype.doVisualization = function( visualization, vizDa
                      metrics: this.metrics,
                      palette: this.palette,
                      controller: this,
-                     action: this.currentaction};
+                     action: this.currentaction,
+                     selections: this.highlights
+        };
 
         if( visualization.needsColorGradient ) {
             var gradMap = [ [255,0,0],[255,255,0],[0,0,255],[0,255,0] ];
@@ -341,13 +346,19 @@ pentaho.VizController.prototype.doVisualization = function( visualization, vizDa
 
         var id = 'chart_div'+this.id;
                      
-        var chartDiv = this.visualPanelElement;
-        eval( 'this.chart = new '+className+'(chartDiv)');
+        if( this.chart && this.chart.vizId == visualization.id ) {
+            // same control no need to change
+        } else {
+            var chartDiv = this.visualPanelElement;
+            eval( 'this.chart = new '+className+'(chartDiv)');
+        }
+                     
         // Instantiate and draw our chart, passing in some options.
 
         var myself = this;
         this.chart.controller = this;
         this.chart.id = 'viz'+this.id;
+        this.chart.vizId = visualization.id;
         
         pentaho.events.addListener(this.chart, 'select', function(){ return myself.chartSelectHandler.apply(myself,arguments||[]);} );
         pentaho.events.addListener(this.chart, 'onmouseover', function(){ return myself.chartMouseOverHandler.apply(myself,arguments||[]);} );
@@ -358,8 +369,6 @@ pentaho.VizController.prototype.doVisualization = function( visualization, vizDa
             document.getElementById('chart_div').innerHTML = '';
             return;            
         }
-        
-        this.chart.setHighlights(this.highlights);
         
         try {
             this.chart.draw(currentView, options);
