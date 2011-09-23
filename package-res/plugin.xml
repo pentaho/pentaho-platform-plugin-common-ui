@@ -2,7 +2,7 @@
 
 <plugin title="common-ui">
 
-    <!-- uncomment these menu items to access the test pages via the User Console menu
+    <!-- uncomment these menu items to access the test pages via the User Console menu -->
     <!-- menu-items>
         <menu-item id="test-index" anchor="tools-submenu" label="Common UI Tests" command="content/common-ui/resources/web/test/testindex.html" type="MENU_ITEM" how="LAST_CHILD"/>
     </menu-items -->
