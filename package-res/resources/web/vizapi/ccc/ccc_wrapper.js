@@ -5,33 +5,41 @@ pentaho.ccc = pentaho.ccc || {};
 
 pentaho.visualizations = pentaho.visualizations || [];
 
+/*
+    Visualization Metadata
+    These objects describe the visualizations provided by this library.
+*/
 pentaho.visualizations.push({
-    id: 'ccc_bar',
-    type: 'barchart',
-    migrationTypex: 'VERTICAL_BAR',
-    source: 'CCC',
-    name: 'CCC Column',
-    class: 'pentaho.ccc.CccChart',
-    args: {
+    id: 'ccc_bar',                          // unique identifier
+    type: 'barchart',                       // generic type id
+    source: 'CCC',                          // id of the source library
+    name: 'CCC Column',                     // visible name, this will come from a properties file eventually
+    class: 'pentaho.ccc.CccChart',          // type of the Javascript object to instantiate
+    args: {                                 // arguments to provide to the Javascript object
         cccClass: 'pvc.BarChart',
         stacked: false,
-        orientation: 'vertical'
+        orientation: 'vertical',
+        extensionPoints: {
+            xAxisLabel_textAngle: -1,
+            xAxisLabel_textAlign: "right",
+            xAxisLabel_textBaseline: "top",
+        }        
     },
     propMap: [],
-    dataReqs: [
+    dataReqs: [                             // dataReqs describes the data requirements of this visualization
         [
-            {   id: 'category',
-                dataType: 'string',
-                dataStructure: 'column',
-                caption: 'Category',
-                required: true
+            {   id: 'category',             // id of the data element
+                dataType: 'string',         // data type - 'string', 'number', 'date', 'boolean', 'any' or a comma separated list
+                dataStructure: 'column',    // 'column' or 'row' - only 'column' supported so far
+                caption: 'Category',        // visible name
+                required: true              // true or false
             },
             {   id: 'series',
                 dataType: 'number',
                 dataStructure: 'column',
                 caption: 'Values',
                 required: true,
-                allowMultiple: true
+                allowMultiple: true         // true or false
             }
         ]
     ]
@@ -41,14 +49,18 @@ pentaho.visualizations.push({
 pentaho.visualizations.push({
     id: 'ccc_barstacked',
     type: 'barchart',
-    migrationTypex: 'VERTICAL_BAR',
     source: 'CCC',
     name: 'CCC Stacked Column',
     class: 'pentaho.ccc.CccChart',
     args: {
         cccClass: 'pvc.BarChart',
         stacked: true,  
-        orientation: 'vertical'  
+        orientation: 'vertical'  ,
+        extensionPoints: {
+            xAxisLabel_textAngle: -1,
+            xAxisLabel_textAlign: "right",
+            xAxisLabel_textBaseline: "top",
+        }
     },
     propMap: [],
     dataReqs: [
@@ -73,14 +85,18 @@ pentaho.visualizations.push({
 pentaho.visualizations.push({
     id: 'ccc_horzbar',
     type: 'horzbarchart',
-    migrationTypex: 'VERTICAL_BAR',
     source: 'CCC',
     name: 'CCC Bar',
     class: 'pentaho.ccc.CccChart',
     args: {
         cccClass: 'pvc.BarChart',
         stacked: false,
-        orientation: 'horizontal'
+        orientation: 'horizontal',
+        extensionPoints: {
+            xAxisLabel_textAngle: -1,
+            xAxisLabel_textAlign: "right",
+            xAxisLabel_textBaseline: "top",
+        }
     },
     propMap: [],
     dataReqs: [
@@ -105,14 +121,18 @@ pentaho.visualizations.push({
 pentaho.visualizations.push({
     id: 'ccc_horzbarstacked',
     type: 'horzbarchart',
-    migrationTypex: 'VERTICAL_BAR',
     source: 'CCC',
     name: 'CCC Stacked Bar',
     class: 'pentaho.ccc.CccChart',
     args: {
         cccClass: 'pvc.BarChart',
         stacked: true,
-        orientation: 'horizontal'
+        orientation: 'horizontal',
+        extensionPoints: {
+            xAxisLabel_textAngle: -1,
+            xAxisLabel_textAlign: "right",
+            xAxisLabel_textBaseline: "top",
+        }
     },
     propMap: [],
     dataReqs: [
@@ -137,7 +157,6 @@ pentaho.visualizations.push({
 pentaho.visualizations.push({
     id: 'ccc_line',
     type: 'linechart',
-    migrationTypex: 'VERTICAL_BAR',
     source: 'CCC',
     name: 'CCC Line',
     class: 'pentaho.ccc.CccChart',
@@ -145,7 +164,12 @@ pentaho.visualizations.push({
         cccClass: 'pvc.LineChart',
         stacked: false,
         orientation: 'vertical',
-        showDots: true
+        showDots: true,
+        extensionPoints: {
+            xAxisLabel_textAngle: -1,
+            xAxisLabel_textAlign: "right",
+            xAxisLabel_textBaseline: "top",
+        }
     },
     propMap: [],
     dataReqs: [
@@ -170,7 +194,6 @@ pentaho.visualizations.push({
 pentaho.visualizations.push({
     id: 'ccc_area',
     type: 'areachart',
-    migrationTypex: 'VERTICAL_BAR',
     source: 'CCC',
     name: 'CCC Area',
     class: 'pentaho.ccc.CccChart',
@@ -207,7 +230,12 @@ pentaho.visualizations.push({
     name: 'CCC Scatter',
     class: 'pentaho.ccc.CccChart',
     args: {
-        cccClass: 'pvc.MetricDotChart'
+        cccClass: 'pvc.MetricDotChart',
+        showDots: true,
+        yAxisSize: 30,
+        xAxisSize: 30,
+        xAxisFullGrid: true,
+        yAxisFullGrid: true
     },
     propMap: [],
     dataReqs: [
@@ -239,7 +267,6 @@ pentaho.visualizations.push({
 pentaho.visualizations.push({
     id: 'ccc_pie',
     type: 'piechart',
-    migrationType: 'MULTIPLE_PIE',
     source: 'CCC',
     name: 'CCC Pie Chart',
     class: 'pentaho.ccc.CccChart',
@@ -306,6 +333,10 @@ pentaho.visualizations.push({
     ]
 });
 
+/*
+    CccChart constructor
+    This takes an HTML DOM element as a parameter
+*/
 pentaho.ccc.CccChart = function( element ) {
     this.element = element;
     this.elementName = element.id;
@@ -315,20 +346,36 @@ pentaho.ccc.CccChart = function( element ) {
     this.series = [];
     this.selections = [];
     this.currentChartType = null;
+    this.categories = [];
 }
 
+/*
+    draw()
+    
+    dataTable   a pentaho.DataTable object with the data to display
+    vizOptions  the options for the visualization
+*/
 pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
+
+    // store the incoming parameters for later use
     this.vizOptions = vizOptions;
     this.dataTable = dataTable;
     
+    // store the current highlighted selections
     this.selections = vizOptions.selections;
-    
+
+    // local variables
     var metadata = [];
     var measures = [];
     var strings = [];
     var resultset = [];
     var colors = null;
     
+    // store the series count and the categories
+    this.seriesCount = 0;
+    this.categories = [];
+    
+    // inspect the columns of the DataTable
     title = '';
     for( var colNo=0; colNo<dataTable.getNumberOfColumns(); colNo++) {
         if( dataTable.getColumnType(colNo).toUpperCase() == 'NUMBER' ) {
@@ -344,7 +391,9 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
     }
 
     if(vizOptions.cccClass == 'pvc.HeatGridChart' || vizOptions.cccClass == 'pvc.MetricDotChart') {
+        // format the data for a HeatGridChart or MetricDotChart
 
+        // add the category column metadata
         metadata.push({
             colIndex: 0,
             colName: 'Categories',
@@ -352,6 +401,7 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
             colType: 'STRING'
         });
         
+        // add the numeric columns metadata
         for( var measureNo=0; measureNo<measures.length; measureNo++ ) {
             metadata.push({
                 colIndex: measureNo+1,
@@ -361,6 +411,7 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
             });            
         }
         
+        // process the rows
         for(var rowNo=0; rowNo<dataTable.getNumberOfRows(); rowNo++) {
             // concat all of the strings
             var category = '';
@@ -380,12 +431,15 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
 
     } else if(vizOptions.cccClass == 'pvc.BarChart' || vizOptions.cccClass == 'pvc.LineChart' || 
         vizOptions.cccClass == 'pvc.StackedAreaChart' ) {
-        // convert the data into right format
+        // format the data for a BarChart, LineChart, or StackedAreaChart
+
+        this.seriesCount = measures.length;
 
         colors = [];
         for( var measureNo=0; measureNo<measures.length; measureNo++ ) {
             colors.push(vizOptions.palette.colors[measureNo]);
         }        
+        // create the metadata
         metadata.push({
             colIndex: 0,
             colName: 'Series',
@@ -404,7 +458,9 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
             colLabel: 'Value',
             colType: 'NUMERIC'
         });
-        
+
+        // process the rows
+        var catMap = {};
         for(var rowNo=0; rowNo<dataTable.getNumberOfRows(); rowNo++) {
             // concat all of the strings
             var category = '';
@@ -417,13 +473,22 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
                     category += dataTable.getFormattedValue( rowNo, colNo );
                 }
             }
+            if(!catMap[category] ) {
+                catMap[category] = true;
+                this.categories.push(category);
+            }
+            
             for( var measureNo=0; measureNo<measures.length; measureNo++ ) {
                 var row = [ dataTable.getColumnLabel(measures[measureNo]), category, dataTable.getValue( rowNo, measures[measureNo] ) ];
                 resultset.push(row);
             }
         }
     } else if(vizOptions.cccClass == 'pvc.PieChart') { 
+        // format the data for a PieChart
         
+        this.seriesCount = 1;
+
+        // create the metadata
         metadata.push({
             colIndex: 0,
             colName: 'Category',
@@ -438,6 +503,7 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
             colType: 'NUMERIC'
         });
         
+        // process the rows
         for(var rowNo=0; rowNo<dataTable.getNumberOfRows(); rowNo++) {
             // concat all of the strings
             var category = '';
@@ -454,19 +520,15 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
         }
         
     }
-        
-    this.cdaTable = {
-        metadata: metadata,
-        resultset: resultset
-    };
 
     var myself=this;
     
-    var opts = {
+    // create the options for the chart
+    opts = {
       canvas: this.elementName,
       animate:false,
       legend: true,
-      legendPosition:"right",
+      legendPosition:"bottom",
       legendAlign: "middle",
       showTooltips: true,
       showValues: false,
@@ -475,8 +537,10 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
       titlePosition: 'top',
       colors: colors ? colors : this.getColors(),
       clickAction: function(s,c, d){
+        // handle click events
         if(pentaho && pentaho.events && pentaho.events.trigger ) {
             var table = myself.cdaTable;
+            // create a selection object to describe the clicked item
             var selections = [{
                 type: 'cell',
                 rowId: myself.dataTable.getColumnId(0),
@@ -507,6 +571,7 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
                         source: myself,
                         selections: selections
                     };
+                    // trigger the selection event
                     pentaho.events.trigger( myself, "select", args );
                     break;
                 }
@@ -519,43 +584,48 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
         }
     }
     
+    // create the data options for the chart
     var dataOpts = {crosstabMode: vizOptions.crosstabMode ? vizOptions.crosstabMode : false,
         seriesInRows: false};
 
+    // copy options from the visualization metadata to the chart options
     for( x in vizOptions ) {
-        if( x != 'cccClass' && x != 'crosstabMode' ) {
+        if( x != 'cccClass' && x != 'crosstabMode' && x != 'extensionPoints') {
             opts[x] = vizOptions[x];
         }
     }
-
-    if( vizOptions.cccClass == 'pvc.BarChart' || vizOptions.cccClass == 'pvc.LineChart') {
-
-        opts.extensionPoints = {
-            xAxisLabel_textAngle: -1,
-            xAxisLabel_textAlign: "right",
-            xAxisLabel_textBaseline: "top",
-          }
+    if( vizOptions.extensionPoints ) {
+        opts.extensionPoints = {};
+        for( x in vizOptions.extensionPoints ) {
+            opts.extensionPoints[x] = vizOptions.extensionPoints[x];
+        }
     }
-    else if (vizOptions.cccClass == 'pvc.PieChart') {
-    }
-    else if (vizOptions.cccClass == 'pvc.MetricDotChart') {
-        opts.showDots = true,
-        opts.yAxisSize = 30,
-        opts.xAxisSize = 30,
-        opts.xAxisFullGrid = true,
-        opts.yAxisFullGrid = true
+
+    // create the CDA table
+    this.cdaTable = {
+        metadata: metadata,
+        resultset: resultset
+    };    
+
+    while(this.element.firstChild) {
+        this.element.removeChild(this.element.firstChild);
     }
     
-    if( this.currentChartType != vizOptions.cccClass ) {
+    // TODO -if we don't recreate a new chart it does not display new data, fix this...
+//    if( this.currentChartType != vizOptions.cccClass ) {
         eval( 'this.chart = new '+vizOptions.cccClass+'(opts)' );
         this.currentChartType = vizOptions.cccClass;
-    }
+//    }
     
     this.chart.setData($.extend(true, {}, this.cdaTable),dataOpts);
     this.chart.render();
 
 }
 
+/*
+    setHighlights
+    Sets the items on the chart that should be highlighted
+*/
 pentaho.ccc.CccChart.prototype.setHighlights = function( selections ) {
     this.selections = selections;
     if( this.dataTable && this.vizOptions ) {
@@ -563,6 +633,10 @@ pentaho.ccc.CccChart.prototype.setHighlights = function( selections ) {
     }
 }
 
+/*
+    getColors
+    Returns the colors to use. This needs to take into account selected and unselected items.
+*/
 pentaho.ccc.CccChart.prototype.getColors = function() {
 
     var paletteMap = this.vizOptions.metrics[0].paletteMap;
@@ -593,6 +667,10 @@ pentaho.ccc.CccChart.prototype.getColors = function() {
     return colors;
 }
 
+/*
+    getOutputParameters
+    Returns the output parameters of the chart
+*/
 pentaho.ccc.CccChart.prototype.getOutputParameters = function() {
 
     var params = [];
@@ -615,3 +693,4 @@ pentaho.ccc.CccChart.prototype.getOutputParameters = function() {
     return params;
 
 }
+

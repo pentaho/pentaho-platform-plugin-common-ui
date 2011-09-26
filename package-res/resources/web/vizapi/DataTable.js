@@ -182,7 +182,12 @@ pentaho.DataTable.prototype.getFormattedValue = function(rowIdx,columnIdx) {
     else if( this.jsonTable.rows[rowIdx].c[columnIdx].v ) {
         // we have a value field so return it
         return this.jsonTable.rows[rowIdx].c[columnIdx].v;
-    } else {
+    } 
+    else if( this.jsonTable.rows[rowIdx].c[columnIdx].v == null ) {
+        // we have a null value field so return it
+        return null;
+    } 
+    else {
         return this.jsonTable.rows[rowIdx].c[columnIdx];
     }
 }

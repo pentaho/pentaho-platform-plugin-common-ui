@@ -242,7 +242,7 @@ pentaho.VizController.prototype.setVisualization = function(visualization) {
             // remove the old visualization
             this.setDomNode(this.domNode);
         }
-
+        this.currentViz = visualization;
         // dipslay the new visualization
         this.doVisualization(visualization, false);
         return true;
@@ -278,8 +278,11 @@ pentaho.VizController.prototype.updateVisualization = function() {
     
     returns         true if there were no errors
 */
-pentaho.VizController.prototype.doVisualization = function( visualization, vizDataOptChanged ) {
+pentaho.VizController.prototype.doVisualization = function( visualization ) {
 
+    if(!this.dataTable) {
+        return;
+    }
     try {
         currentView = new pentaho.DataView(this.dataTable);
 
@@ -289,7 +292,6 @@ pentaho.VizController.prototype.doVisualization = function( visualization, vizDa
         var options = {'title':this.title,
                      'width':this.visualPanelElement.offsetWidth,
                      'height':this.visualPanelElement.offsetHeight,
-//                     'columnDataReqIds':columnDataReqIds,
                      metrics: this.metrics,
                      palette: this.palette,
                      controller: this,
@@ -530,6 +532,7 @@ pentaho.VizController.prototype.setupTable = function( ) {
         if( this.dataTable.getColumnType(colNo) == 'string' ) {
             var values = this.dataTable.getDistinctValues(colNo);
             var paletteMap = pentaho.VizController.createPaletteMap( values, this.palette );
+            // TODO add longest sting length to the metrics
             this.metrics.push({
                 values: values,
                 paletteMap: paletteMap
