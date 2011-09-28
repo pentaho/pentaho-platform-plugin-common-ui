@@ -1,0 +1,28 @@
+div.prompt-panel {
+  background-color: #a0a0a0;
+}
+
+div.prompt-panel.flow {
+  width: 100%;
+  float: left;
+}
+
+div.prompt-panel .pentaho-toggle-button-horizontal {
+  display: inline;
+  /* For IE 7 */
+  zoom: 1;
+}
+
+div.prompt-panel .pentaho-toggle-button-vertical {
+  padding: 2px 14px;
+}
+
+div.prompt-panel div.parameter {
+  padding: 3px 0 0 18px;
+  max-height: 110px;
+  float: left;
+}
+
+div.prompt-panel div.parameter.error {
+  background-color: red;
+}
