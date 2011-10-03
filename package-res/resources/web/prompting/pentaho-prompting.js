@@ -93,7 +93,8 @@ pentaho.common.prompting = {
             if ('true' != param.attributes['hidden']) {
               value = Dashboards.getParameterValue(param.name);
             }
-            if (value !== null && typeof value != 'undefined' && !$.isArray(value)) {
+            // Empty string is Dashboards' "null"
+            if (value !== '' && typeof value != 'undefined' && !$.isArray(value)) {
               value = [value];
             }
             params[param.name] = value;
@@ -115,10 +116,8 @@ pentaho.common.prompting = {
   Parameter: function() {
     return {
       'name': undefined, // string
-      'group': undefined, // string
       'type': undefined, // string, java class name
       'list': undefined, // boolean
-      'hidden': undefined, // boolean
       'mandatory': undefined, // boolean
       'multiSelect': undefined, // boolean
       'strict': undefined, // boolean
@@ -146,6 +145,20 @@ pentaho.common.prompting = {
           }
         });
         return selected;
+      },
+
+      /**
+       * Determine if any of our values are selected (selected = true)
+       */
+      hasSelection: function() {
+        var s = false;
+        $.each(this.values, function(i, v) {
+          if (v.selected) {
+            s = true;
+            return false; // break
+          }
+        });
+        return s;
       },
 
       getSelectedValues: function() {
@@ -321,7 +334,7 @@ pentaho.common.prompting = {
     param.list = 'true' == node.attr('is-list');
     param.multiSelect = 'true' == node.attr('is-multi-select');
     param.type = node.attr('type');
-    param.timezoneHint = node.attr('timezone-hint');
+    param.timezoneHint = node.attr('timezone-hint'); // TODO Change this to timzone-hint?
 
     // TODO Support namespaces
     $(node).find('attribute').each(function(i, attr) {
@@ -486,7 +499,7 @@ pentaho.common.prompting = {
   /**
    * Sets the parameter value in Dashboards' parameter map and performs any conversion necessary.
    */
-  initializeParameterValue: function(param) {
+  initializeParameterValue: function(paramDefn, param) {
     var value = [];
     $.each(param.values, function(i, v) {
       if (v.selected) {
@@ -494,7 +507,7 @@ pentaho.common.prompting = {
       }
     });
     if (value.length === 0) {
-      value = null;
+      value = ''; // Dashboards' null value is an empty string
     } else if (value.length === 1) {
       value = value[0];
     }

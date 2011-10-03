@@ -54,26 +54,20 @@ pentaho.common.prompting.builders.WidgetBuilder = {
     'parameter-panel': 'pentaho.common.prompting.builders.ParameterPanelBuilder',
     'submit-panel': 'pentaho.common.prompting.builders.SubmitComponentBuilder',
     'label': 'pentaho.common.prompting.builders.LabelBuilder',
-    'dropdown': 'pentaho.common.prompting.builders.SelectBuilder',
-    // function(param) {
-    //     // ReportViewer always uses a select for dropdown (See ParameterControllPanel.buildParameterWidget(..))
-    //     return 'Select';
-    //     // TODO Override this for Report Viewer and restore multiselect functionality
-    //     // return param.multiSelect ? 'SelectMulti' : 'Select';
-    // },
+    'dropdown': 'pentaho.common.prompting.builders.DropDownBuilder',
     'radio': 'pentaho.common.prompting.builders.RadioBuilder',
     'checkbox': 'pentaho.common.prompting.builders.CheckBuilder',
     'togglebutton': 'pentaho.common.prompting.builders.MultiButtonBuilder',
-    'list': 'pentaho.common.prompting.builders.SelectBuilder',
+    'list': 'pentaho.common.prompting.builders.ListBuilder',
     'datepicker': 'pentaho.common.prompting.builders.DateInputBuilder',
-    'multi-line': 'pentaho.common.prompting.builders.TextInputBuilder', // TODO Find/implement multi-line text component
-    'default': 'pentaho.common.prompting.builders.TextInputBuilder' // TODO Reproduce "PlainParameterUI"
+    'multi-line': 'pentaho.common.prompting.builders.TextAreaBuilder',
+    'default': 'pentaho.common.prompting.builders.PlainPromptBuilder'
   },
 
   cache: {}, // Cache of created builders
 
   findBuilderFor: function(args, type) {
-    type = type || (args.attributes ? args.attributes['parameter-render-type'] : null);
+    type = type || (args.param && args.param.attributes ? args.param.attributes['parameter-render-type'] : null);
     return this.createBuilder(this.mapping[type] || this.mapping['default']);
   },
 
@@ -115,16 +109,16 @@ pentaho.common.prompting.builders.SubmitComponentBuilder = Base.extend({
 });
 
 pentaho.common.prompting.builders.ParameterWidgetBuilderBase = Base.extend({
-  build: function(param) {
-    var name = param['name'] + WidgetHelper.generateGUID();
+  build: function(args) {
+    var name = args.param.name + WidgetHelper.generateGUID();
     return {
       promptType: 'prompt',
       executeAtStart: true,
-      param: param,
+      param: args.param,
       name: name,
       htmlObject: name,
       type: undefined, // must be declared in extension class
-      parameter: param.name,
+      parameter: args.param.name,
       postExecution: function() {
         this.base();
         var tooltip = this.param.attributes['tooltip'];
@@ -137,15 +131,15 @@ pentaho.common.prompting.builders.ParameterWidgetBuilderBase = Base.extend({
 });
 
 pentaho.common.prompting.builders.LabelBuilder = pentaho.common.prompting.builders.ParameterWidgetBuilderBase.extend({
-  build: function(param) {
-    var widget = this.base(param);
+  build: function(args) {
+    var widget = this.base(args);
     var name = widget.name + '-label';
     $.extend(widget, {
       promptType: 'label',
       name: name,
       htmlObject: name,
       type: 'TextComponent',
-      expression: function() { return param.attributes['label']; }
+      expression: function() { return args.param.attributes['label']; }
     });
     delete widget.parameter; // labels don't have parameters
     return widget;
@@ -153,8 +147,8 @@ pentaho.common.prompting.builders.LabelBuilder = pentaho.common.prompting.builde
 });
 
 pentaho.common.prompting.builders.TextInputBuilder = pentaho.common.prompting.builders.ParameterWidgetBuilderBase.extend({
-  build: function(param) {
-    var widget = this.base(param);
+  build: function(args) {
+    var widget = this.base(args);
     return $.extend(widget, {
       type: 'TextInputComponent'
     });
@@ -170,30 +164,57 @@ pentaho.common.prompting.builders.ValueBasedParameterWidgetBuilder = pentaho.com
     return valuesArray;
   },
 
-  build: function(param) {
-    var widget = this.base(param);
+  build: function(args) {
+    var widget = this.base(args);
     return $.extend(widget, {
-      valuesArray: this.getCDFValuesArray(param)
+      valuesArray: this.getCDFValuesArray(args.param)
     });
   }
 });
 
-pentaho.common.prompting.builders.SelectBuilder = pentaho.common.prompting.builders.ValueBasedParameterWidgetBuilder.extend({
-  build: function(param) {
-    var widget = this.base(param);
+pentaho.common.prompting.builders.DropDownBuilder = pentaho.common.prompting.builders.ValueBasedParameterWidgetBuilder.extend({
+  build: function(args) {
+    var widget = this.base(args);
+
+    if (args.paramDefn.ignoreBiServer5538 && !args.param.hasSelection()) {
+      // If there is no empty selection, and no value is selected, create one. This way, we can represent
+      // the unselected state.
+      widget.valuesArray = [['', '']].concat(widget.valuesArray);
+    }
+
     return $.extend(widget, {
-      type: param.multiSelect ? 'SelectMultiComponent' : 'SelectComponent',
-      size: param.attributes['parameter-visible-items']
+      type: 'SelectComponent',
+      preExecution: function() {
+        // SelectComponent defines defaultIfEmpty = true for non-multi selects.
+        // We can't override any properties of the component so we must set them just before update() is called. :(
+        // Only select the first item if we have no selection and are not ignoring BISERVER-5538
+        this.defaultIfEmpty = !args.paramDefn.ignoreBiServer5538 && !args.param.hasSelection();
+      }
+    });
+  }
+});
+
+pentaho.common.prompting.builders.ListBuilder = pentaho.common.prompting.builders.ValueBasedParameterWidgetBuilder.extend({
+  build: function(args) {
+    var widget = this.base(args);
+    return $.extend(widget, {
+      type: args.param.multiSelect ? 'SelectMultiComponent' : 'SelectComponent',
+      size: args.param.attributes['parameter-visible-items'] || 5,
+      preExecution: function() {
+        // SelectComponent defines defaultIfEmpty = true for non-multi selects.
+        // We can't override any properties of the component so we must set them just before update() is called. :(
+        this.defaultIfEmpty = false;
+      }
     });
   }
 });
 
 pentaho.common.prompting.builders.MultiButtonBuilder = pentaho.common.prompting.builders.ValueBasedParameterWidgetBuilder.extend({
-  build: function(param) {
-    var widget = this.base(param);
+  build: function(args) {
+    var widget = this.base(args);
     return $.extend(widget, {
       type: 'MultiButtonComponent',
-      verticalOrientation: 'vertical' === param.attributes['parameter-layout'],
+      verticalOrientation: 'vertical' === args.param.attributes['parameter-layout'],
       expression: function() {
         return Dashboards.getParameterValue(this.parameter);
       }
@@ -202,44 +223,34 @@ pentaho.common.prompting.builders.MultiButtonBuilder = pentaho.common.prompting.
 });
 
 pentaho.common.prompting.builders.ToggleButtonBaseBuilder = pentaho.common.prompting.builders.ValueBasedParameterWidgetBuilder.extend({
-  build: function(param) {
-    var widget = this.base(param);
+  build: function(args) {
+    var widget = this.base(args);
     return $.extend(widget, {
       defaultIfEmpty: false, // Do not auto-select anything if no selection exists
-      verticalOrientation: 'vertical' == param.attributes['parameter-layout']
+      verticalOrientation: 'vertical' == args.param.attributes['parameter-layout']
     });
   }
 });
 
 pentaho.common.prompting.builders.CheckBuilder = pentaho.common.prompting.builders.ToggleButtonBaseBuilder.extend({
-  build: function(param) {
-    var widget = this.base(param);
+  build: function(args) {
+    var widget = this.base(args);
     widget.type = 'CheckComponent';
     return widget;
-    // return $.extend(widget, {
-    //   type: 'CheckComponent',
-    //   defaultIfEmpty: false, // Do not auto-select anything if no selection exists
-    //   verticalOrientation: 'vertical' == param.attributes['parameter-layout']
-    // });
   }
 });
 
 pentaho.common.prompting.builders.RadioBuilder = pentaho.common.prompting.builders.ToggleButtonBaseBuilder.extend({
-  build: function(param) {
-    var widget = this.base(param);
+  build: function(args) {
+    var widget = this.base(args);
     widget.type = 'radio'; // Specifically 'radio' instead of 'RadioComponent' because the CoreComponent.js implementation requires it.
     return widget;
-    // return $.extend(widget, {
-    //   type: 'CheckComponent',
-    //   defaultIfEmpty: false, // Do not auto-select anything if no selection exists
-    //   verticalOrientation: 'vertical' == param.attributes['parameter-layout']
-    // });
   }
 });
 
 pentaho.common.prompting.builders.DateInputBuilder = pentaho.common.prompting.builders.ValueBasedParameterWidgetBuilder.extend({
-  build: function(param) {
-    var widget = this.base(param);
+  build: function(args) {
+    var widget = this.base(args);
     return $.extend(widget, {
       name: widget.name + '-date-picker', // Name must differ from htmlObject for JQuery Date Picker to function.
       type: 'RVDateInputComponent'//,
@@ -251,7 +262,7 @@ pentaho.common.prompting.builders.DateInputBuilder = pentaho.common.prompting.bu
 
 pentaho.common.prompting.builders.ParameterPanelBuilder = pentaho.common.prompting.builders.ParameterWidgetBuilderBase.extend({
   build: function(args) {
-    var widget = this.base(args.param);
+    var widget = this.base(args);
     var name =  'panel-' + widget.name;
     return {
       name: name,
@@ -273,5 +284,33 @@ pentaho.common.prompting.builders.RefreshPromptBuilder = Base.extend({
       listeners: args.listeners,
       args: args.args
     }
+  }
+});
+
+pentaho.common.prompting.builders.PlainPromptBuilder = pentaho.common.prompting.builders.ValueBasedParameterWidgetBuilder.extend({
+  build: function(args) {
+    // TODO Create dataformatter based on args.param.attributes['data-format']
+    var convertToAutocompleteValues = function(valuesArray) {
+      return $.map(valuesArray, function(v) {
+        return {
+          value: v[0],
+          label: v[1] || v[0] // Label is key if it doesn't exist
+        }
+      });
+    };
+    var widget = this.base(args);
+    return $.extend(widget, {
+      type: 'StaticAutocompleteBoxComponent',
+      valuesArray: convertToAutocompleteValues(widget.valuesArray)
+    });
+  }
+});
+
+pentaho.common.prompting.builders.TextAreaBuilder = pentaho.common.prompting.builders.ValueBasedParameterWidgetBuilder.extend({
+  build: function(args) {
+    // TODO Create dataformatter based on args.param.attributes['data-format']
+    return $.extend(this.base(args), {
+      type: 'TextAreaComponent'
+    });
   }
 });

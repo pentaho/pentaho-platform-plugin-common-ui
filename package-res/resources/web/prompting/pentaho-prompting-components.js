@@ -105,7 +105,7 @@ var PromptLayoutComponent = CompositeComponent.extend({
     return 'parameter-panel';
   },
 
-  createWidgetForParameter: function(param) {
+  createWidgetForParameter: function(paramDefn, param) {
     if (param.strict && param.values.length === 0) {
       // if the parameter is strict but we have no valid choices for it, it is impossible
       // for the user to give it a value, so we will hide this parameter
@@ -113,7 +113,7 @@ var PromptLayoutComponent = CompositeComponent.extend({
       // doesn't have a value yet, so eventually, we'll show this parameter.. we hope
       return;
     }
-    return pentaho.common.prompting.builders.WidgetBuilder.build(param);
+    return pentaho.common.prompting.builders.WidgetBuilder.build({paramDefn: paramDefn, param: param});
   },
 
   init: function(paramDefn) {
@@ -123,20 +123,21 @@ var PromptLayoutComponent = CompositeComponent.extend({
 
       $.each(group.parameters, function(i, param) {
         // initialize parameter values regardless of whether we're showing the parameter or not
-        pentaho.common.prompting.initializeParameterValue(param);
+        pentaho.common.prompting.initializeParameterValue(paramDefn, param);
 
         if ('true' == param.attributes['hidden']) {
           return; // continue
         }
 
-        var widget = this.createWidgetForParameter(param);
+        var widget = this.createWidgetForParameter(paramDefn, param);
         if (!widget) {
           // No widget created. Do not create a label or parameter panel
           return; // continue
         }
-        var label = pentaho.common.prompting.builders.WidgetBuilder.build(param, 'label');
+        var label = pentaho.common.prompting.builders.WidgetBuilder.build({paramDefn: paramDefn, param: param}, 'label');
 
         var panel = pentaho.common.prompting.builders.WidgetBuilder.build({
+            paramDefn: paramDefn,
             param: param,
             components: [label, widget]
           }, this.getPanelType());
@@ -313,5 +314,105 @@ var RVDateInputComponent = DateInputComponent.extend({
   getValue: function() {
     var picker = $('#' + this.name);
     return picker.val();
+  }
+});
+
+var StaticAutocompleteBoxComponent = BaseComponent.extend({
+  update: function() {
+    // Prepare label-value map
+    if (this.labelValueMap === undefined) {
+      this.labelValueMap = {};
+      $.each(this.valuesArray, function(i, item) {
+        this.labelValueMap[item.label] = item.value;
+      }.bind(this));
+    }
+
+    var ph = $('#' + this.htmlObject);
+    ph.empty();
+
+    var html = '<input type="text" id="' + this.htmlObject + '-input"'
+    if(this.parameter) {
+      var initialValue;
+      $.each(this.param.values, function(i, v) {
+        if (v.selected) {
+          initialValue = v.label;
+        }
+      });
+
+      if (initialValue !== undefined) {
+        html += ' value="' + initialValue + '"';
+      }
+    }
+    html += '></input>';
+    ph.html(html);
+
+    var input = $('input', ph);
+    input.autocomplete({
+      delay: 0,
+      // Filter by starts-with instead of a global match
+      source: function( request, response ) {
+        var term = request.term.toUpperCase();
+        var matches = $.map( this.valuesArray, function(tag) {
+          if ( tag.label.toUpperCase().indexOf(term) === 0 ) {
+            return tag;
+          }
+        });
+        response(matches);
+      }.bind(this),
+      // change() is called on blur
+      change: function(event, ui) {
+        Dashboards.processChange(this.name);
+      }.bind(this),
+      // select() is called when an item from the menu is selected
+      select: function(event, ui) {
+        $('#' + this.htmlObject + '-input').val(ui.item.value);
+        Dashboards.processChange(this.name);
+      }.bind(this)
+    });
+    // Fire a change any time the user presses enter on the field
+    input.keypress(function(e) {
+      if (e.which == 13) {
+        Dashboards.processChange(this.name);
+      }
+    }.bind(this));
+  },
+
+  getValue: function() {
+    var val = $('#' + this.htmlObject + '-input').val();
+    if (this.param.list) {
+      // Return key for value or the value if not found
+      return this.labelValueMap[val] || val;
+    } else if (this.dataFormatter) {
+      // TODO Convert this based on this.param.attributes['data-format']
+      return val;
+    } else {
+      return val;
+    }
+  }
+});
+
+var TextAreaComponent = BaseComponent.extend({
+  update: function() {
+    var value = Dashboards.getParameterValue(this.parameter);
+    var html = '<textarea id="' + this.htmlObject + '-input">';
+    if (value != undefined) {
+      html += Dashboards.escapeHtml(value);
+    }
+    html += '</textarea>';
+    $('#' + this.htmlObject).html(html);
+    var input = $('#' + this.htmlObject + '-input');
+    input.change(function() {
+      Dashboards.processChange(this.name);
+    }.bind(this));
+    input.keypress(function(e) {
+      if (e.which === 13) {
+        Dashboards.processChange(this.name);
+      }
+    }.bind(this));
+  },
+
+  getValue: function() {
+    // TODO Convert this based on this.param.attributes['data-format']
+    return $('#' + this.htmlObject + '-input').val();
   }
 });
