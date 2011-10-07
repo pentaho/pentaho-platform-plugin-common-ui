@@ -179,12 +179,20 @@
       <ant antfile="build-res/subfloor-gwt.xml" target="gwt-compile">
         <property name="gwt-module.path" value="org.pentaho.gwt.widgets.themes.Themes" />
       </ant>
+	    
+      <ant antfile="build-res/subfloor-gwt.xml" target="gwt-compile">
+          <property name="gwt-module.path" value="org.pentaho.gwt.widgets.client.formatter.JSTextFormatter" />
+	  </ant>
 
       <copy todir="${approot.stage.dir}/resources/themes" overwrite="true">
           <fileset dir="${bin.dir}/gwt/output/Themes/themes"/>
       </copy>
 
-	  </target>
+	  <copy todir="${approot.stage.dir}/resources/web/formatter" overwrite="true">
+          <fileset dir="${bin.dir}/gwt/output/formatter"/>
+	  </copy>
+
+  </target>
 	
 	  <target name="package-targz">
 	  </target>
