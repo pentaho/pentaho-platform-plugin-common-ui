@@ -6,7 +6,7 @@ var ScopedPentahoButtonComponent = BaseComponent.extend({
 });
 
 var SubmitPromptComponent = ScopedPentahoButtonComponent.extend({
-  isAutoSubmit: true,
+  autoSubmitParam: 'auto-submit',
   parameter: 'submit',
 
   enable: function(enabled) {
@@ -28,20 +28,25 @@ var SubmitPromptComponent = ScopedPentahoButtonComponent.extend({
 
   update: function() {
     this.base();
-    // var checkboxStr = "<label><input onclick='ToggleButtonBaseComponent.prototype.callAjaxAfterRender(\"" + this.name + "\")'";
-    var checkboxStr = '<label><input onclick=\'SubmitComponent.prototype.updateAutoSubmit("' + this.name + '")\'';
-    if (this.isAutoSubmit) {
-      checkboxStr += ' checked="checked"';
+    // BISERVER-3821 Provide ability to remove Auto-Submit check box from report viewer
+    // only show the UI for the autosubmit checkbox if no preference exists
+    if (this.paramDefn.autoSubmit == undefined) {
+      // var checkboxStr = "<label><input onclick='ToggleButtonBaseComponent.prototype.callAjaxAfterRender(\"" + this.name + "\")'";
+      var checkboxStr = '<label><input onclick=\'SubmitPromptComponent.prototype.updateAutoSubmit("' + this.name + '")\'';
+      if (this.isAutoSubmit) {
+        checkboxStr += ' checked="checked"';
+      }
+      checkboxStr += ' type="checkbox"/>Auto-Submit</label>';
+      $(checkboxStr).appendTo($('#'+ this.htmlObject));
     }
-    checkboxStr += ' type="checkbox"/>Auto-Submit</label>';
-    $(checkboxStr).appendTo($('#'+ this.htmlObject));
   },
 
   postExecution: function() {
     this.enable(true);
-  if (this.isAutoSubmit) {
-    this.expression();
-  }
+    Dashboards.fireChange(this.autoSubmitParam, this.isAutoSubmit + '');
+    if (this.isAutoSubmit) {
+      this.expression();
+    }
   },
 
   expression: function() {
@@ -101,7 +106,7 @@ var PromptLayoutComponent = CompositeComponent.extend({
     }, 'submit-panel');
   },
 
-  getPanelType: function() {
+  getParameterPanelType: function() {
     return 'parameter-panel';
   },
 
@@ -140,7 +145,7 @@ var PromptLayoutComponent = CompositeComponent.extend({
             paramDefn: paramDefn,
             param: param,
             components: [label, widget]
-          }, this.getPanelType());
+          }, this.getParameterPanelType());
 
         this.components.push(panel);
       }.bind(this));
@@ -150,7 +155,10 @@ var PromptLayoutComponent = CompositeComponent.extend({
       if (paramDefn.subscribe) {
         // TODO Create the schedule prompt
       }
-      this.components.push(this.createSubmitPanel(paramDefn, this.components.slice(0)));
+      var submitPanel = this.createSubmitPanel(paramDefn, this.components.slice(0));
+      if (submitPanel) {
+        this.components.push(submitPanel);
+      }
     }
 
     if (paramDefn.promptNeeded) {
@@ -276,10 +284,10 @@ var ParameterPanelComponent = PanelComponent.extend({
 
 var RefreshPromptComponent = BaseComponent.extend({
   update: function() {
-    if (Dashboards.isInitializing) {
-      console.log('Ignoring update during initialization');
-      return;
-    }
+    // if (Dashboards.isInitializing) {
+    //   console.log('Ignoring update during initialization');
+    //   return;
+    // }
     // Stop listening
     // this.listeners = [];
     var newParamDefn;
@@ -335,9 +343,9 @@ var StaticAutocompleteBoxComponent = BaseComponent.extend({
       var initialValue;
       $.each(this.param.values, function(i, v) {
         if (v.selected) {
-          initialValue = v.label;
+          initialValue = this.formatter ? this.formatter.format(v.label) : v.label;
         }
-      });
+      }.bind(this));
 
       if (initialValue !== undefined) {
         html += ' value="' + initialValue + '"';
@@ -371,7 +379,7 @@ var StaticAutocompleteBoxComponent = BaseComponent.extend({
     });
     // Fire a change any time the user presses enter on the field
     input.keypress(function(e) {
-      if (e.which == 13) {
+      if (e.which === 13) {
         Dashboards.processChange(this.name);
       }
     }.bind(this));
@@ -382,9 +390,8 @@ var StaticAutocompleteBoxComponent = BaseComponent.extend({
     if (this.param.list) {
       // Return key for value or the value if not found
       return this.labelValueMap[val] || val;
-    } else if (this.dataFormatter) {
-      // TODO Convert this based on this.param.attributes['data-format']
-      return val;
+    } else if (this.formatter) {
+      return this.formatter.parse(val);
     } else {
       return val;
     }
@@ -412,7 +419,11 @@ var TextAreaComponent = BaseComponent.extend({
   },
 
   getValue: function() {
-    // TODO Convert this based on this.param.attributes['data-format']
-    return $('#' + this.htmlObject + '-input').val();
+    var val = $('#' + this.htmlObject + '-input').val();
+    if (this.formatter) {
+      return this.formatter.parse(val);
+    } else {
+      return val;
+    }
   }
 });

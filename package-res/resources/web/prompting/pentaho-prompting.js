@@ -101,6 +101,15 @@ pentaho.common.prompting = {
           });
         });
         return params;
+      },
+
+      /**
+       * Look up current auto-submit setting for this session.
+       */
+      getAutoSubmitSetting: function(promptId) {
+        // TODO Allow fetching by prompt id so we can have multiple prompt panels on the same page
+        var as = Dashboards.getParameterValue('auto-submit');
+        return as == undefined ? undefined : as == 'true';
       }
     }
   },
@@ -172,7 +181,6 @@ pentaho.common.prompting = {
       }
     }
   },
-
 
   ParameterValue: function() {
     return {
@@ -297,7 +305,7 @@ pentaho.common.prompting = {
       paramDefn.autoSubmit = undefined;
     }
 
-    paramDefn.autoSubmitUI = true == parameters.attr('autoSubmitUI');
+    paramDefn.autoSubmitUI = 'true' == parameters.attr('autoSubmitUI');
 
     this.parseParameters(paramDefn, parameters);
     this.parseErrors(paramDefn, xml);
@@ -342,11 +350,11 @@ pentaho.common.prompting = {
       param.attributes[attr.attr('name')] = attr.attr('value');
     });
 
-    param.values = this.parseParameterXmlValues(node, param);
+    param.values = this.parseParameterValues(node, param);
     return param;
   },
 
-  parseParameterXmlValues: function(paramNode, parameter) {
+  parseParameterValues: function(paramNode, parameter) {
     var values = [];
     $(paramNode).find('values value').each(function(i, value) {
       var pVal = new pentaho.common.prompting.ParameterValue();
@@ -371,45 +379,11 @@ pentaho.common.prompting = {
     return values;
   },
 
+  /**
+   * Called for every parameter value that is parsed. Gives external code an opportunity to update the parameter
+   * value at parse time.
+   */
   normalizeParameterValue: function(parameter, type, value) {
-    if (value == null || type == null) {
-      return null;
-    }
-
-    // Strip out actual type from Java array types
-    var m = type.match('^\\[L([^;]+);$');
-    if (m != null && m.length === 2) {
-      type = m[1];
-    }
-
-    switch(type) {
-      case 'java.util.Date':
-      case 'java.sql.Date':
-      case 'java.sql.Time':
-      case 'java.sql.Timestamp':
-        var timezone = parameter.attributes['timezone'];
-        var timezoneHint = parameter.timezoneHint;
-        if (timezone == null || timezone == 'server') {
-          // TODO Determine new timezone hint
-          // This is required by the GWT datepicker UI. Verify how the CDF datepicker works.
-          return value;
-        }
-
-        if(timezone == 'client') {
-          return value;
-        }
-
-        // for every other mode (fixed timezone modes), translate the time into the specified timezone
-        if ((timezoneHint != undefined && $.trim(timezoneHint).length != 0)
-         && value.match(timezoneHint + '$'))
-        {
-          return value;
-        }
-        // TODO Implement timezone offset conversion
-        // return convertTimestampToTimeZone(value, getTimezoneOffset(timezone));
-    }
-
-    return value;
   },
 
   parseErrors: function(paramDefn, xmlRoot) {
@@ -514,10 +488,29 @@ pentaho.common.prompting = {
     Dashboards.setParameter(param.name, value);
   },
 
+  /**
+   * This should return an object capable of formatting the 'type' to and from text. If no formatter
+   * is required the return value should be undefined.
+   *
+   * A formatter should have two methods:
+   * formatter = {
+   *   format: function(object) {
+   *     return ...; // string
+   *   },
+   *   parse: function(string) {
+   *     return ...; // object
+   *   }
+   * }
+   */
+  createTextFormatter: function(paramDefn, parameter) {
+    if (paramDefn.createTextFormatter) {
+      return paramDefn.createTextFormatter.call(paramDefn, parameter);
+    }
+    return undefined;
+  },
+
   createPromptPanel: function(args) {
     this.prepareCDF();
-
-    // params = params.splice(0, 1); // Temporary to remove the output-type from our sample Parameters XML
 
     var layout = this.builders.WidgetBuilder.build(args, 'prompt-panel');
 

@@ -53,6 +53,8 @@ pentaho.common.prompting.builders.WidgetBuilder = {
     'prompt-panel': 'pentaho.common.prompting.builders.PromptPanelBuilder',
     'parameter-panel': 'pentaho.common.prompting.builders.ParameterPanelBuilder',
     'submit-panel': 'pentaho.common.prompting.builders.SubmitComponentBuilder',
+    // 'submit': 'pentaho.common.prompting.builders.SubmitComponentBuilder',
+    // 'auto-submit': 'pentaho.common.prompting.builders.AutoSubmitBuilder',
     'label': 'pentaho.common.prompting.builders.LabelBuilder',
     'dropdown': 'pentaho.common.prompting.builders.DropDownBuilder',
     'radio': 'pentaho.common.prompting.builders.RadioBuilder',
@@ -90,23 +92,70 @@ pentaho.common.prompting.builders.WidgetBuilder = {
   }
 };
 
+pentaho.common.prompting.builders.SubmitPanelBuilder = Base.extend({
+  build: function(args) {
+    var components = [];
+    var submitComponent = pentaho.common.prompting.builders.WidgetBuilder.build(args, 'submit');
+    var autoSubmitCheck = pentaho.common.prompting.builders.WidgetBuilder.build(args, 'auto-submit');
+    if (submitComponent) { components.push(submitComponent); }
+    if (autoSubmitCheck) { components.push(autoSubmitCheck); }
+    if (components.length > 0) {
+      var name = 'submit-panel-' + WidgetHelper.generateGUID();
+      return {
+        name: name,
+        htmlObject: name,
+        type: 'PanelComponent',
+        components: components
+      }
+    }
+  }
+});
+
 pentaho.common.prompting.builders.SubmitComponentBuilder = Base.extend({
   build: function(args) {
     var listeners = pentaho.common.prompting.gatherParameterNames(args.widgets);
     var name = 'submit-' + WidgetHelper.generateGUID();
-    var submitWidget = {
+    return {
       promptType: 'submit',
       type: 'SubmitPromptComponent',
       name: name,
       htmlObject: name,
       label: 'View Report', // TODO i18n
+      paramDefn: args.paramDefn,
       executeAtStart: true,
-      isAutoSubmit: args.paramDefn.isAutoSubmit,
+      isAutoSubmit: args.paramDefn.allowAutoSubmit(),
       listeners: args.listeners
     };
-    return submitWidget;
   }
 });
+
+pentaho.common.prompting.builders.AutoSubmitBuilder = Base.extend({
+  // This builder only creates a component if the autosubmit flag is NOT set (per BISERVER-3821)
+  build: function(args) {
+    var paramName = 'auto-submit';
+    // BISERVER-3821 Provide ability to remove Auto-Submit check box from report viewer
+    // only show the UI for the autosubmit checkbox if no preference exists
+    if (args.paramDefn.autoSubmit === true) {
+      Dashboards.setParameter(paramName, 'true');
+    } else if (args.paramDefn.autoSubmit === false) {
+      Dashboards.setParameter(paramName, 'false');
+    } else {
+      Dashboards.setParameter(paramName, '' + args.paramDefn.autoSubmitUI);
+      var name = 'auto-submit-' + WidgetHelper.generateGUID();
+      return {
+        name: name,
+        htmlObject: name,
+        type: 'CheckComponent',
+        executeAtStart: true,
+        parameter: paramName,
+        valueArray: [['Auto-Submit']], // TODO i18n
+        postExecution: function() {
+          $('#' + this.htmlObject).attr('title', 'Automatically submit parameters upon selection.'); // TODO i18n
+        }
+      };
+    }
+  }
+})
 
 pentaho.common.prompting.builders.ParameterWidgetBuilderBase = Base.extend({
   build: function(args) {
@@ -289,28 +338,32 @@ pentaho.common.prompting.builders.RefreshPromptBuilder = Base.extend({
 
 pentaho.common.prompting.builders.PlainPromptBuilder = pentaho.common.prompting.builders.ValueBasedParameterWidgetBuilder.extend({
   build: function(args) {
-    // TODO Create dataformatter based on args.param.attributes['data-format']
+    var formatter = pentaho.common.prompting.createTextFormatter(args.paramDefn, args.param);
     var convertToAutocompleteValues = function(valuesArray) {
       return $.map(valuesArray, function(v) {
+        var value = formatter ? formatter.format(v[0]) : v[0];
+        // Label is key if it doesn't exist
+        var label = (formatter ? formatter.format(v[1]) : v[1]) || value;
         return {
-          value: v[0],
-          label: v[1] || v[0] // Label is key if it doesn't exist
+          value: value,
+          label: label
         }
       });
     };
     var widget = this.base(args);
     return $.extend(widget, {
       type: 'StaticAutocompleteBoxComponent',
-      valuesArray: convertToAutocompleteValues(widget.valuesArray)
+      valuesArray: convertToAutocompleteValues(widget.valuesArray),
+      formatter: formatter
     });
   }
 });
 
 pentaho.common.prompting.builders.TextAreaBuilder = pentaho.common.prompting.builders.ValueBasedParameterWidgetBuilder.extend({
   build: function(args) {
-    // TODO Create dataformatter based on args.param.attributes['data-format']
     return $.extend(this.base(args), {
-      type: 'TextAreaComponent'
+      type: 'TextAreaComponent',
+      formatter: pentaho.common.prompting.createTextFormatter(args.paramDefn, args.param)
     });
   }
 });
