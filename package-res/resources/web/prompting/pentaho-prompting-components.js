@@ -6,24 +6,11 @@ var ScopedPentahoButtonComponent = BaseComponent.extend({
 });
 
 var SubmitPromptComponent = ScopedPentahoButtonComponent.extend({
-  autoSubmitParam: 'auto-submit',
-  parameter: 'submit',
-
-  enable: function(enabled) {
-    var fnName = enabled ? 'removeAttr' : 'attr';
-    $('#'+this.htmlObject + ' button')[fnName]('disabled', 'disabled');
-  },
-
   updateAutoSubmit: function(name) {
     setTimeout((function() {
-      this.isAutoSubmit = undefined !== $('#' + this.htmlObject + ' input:checked').val();
+      this.promptPanel.autoSubmit = undefined !== $('#' + this.htmlObject + ' input:checked').val();
       Dashboards.update(this);
     }).bind(Dashboards.getComponentByName(name)));
-  },
-
-  getValue: function() {
-    this.isAutoSubmit = undefined !== $('#'+this.htmlObject + ' input:checked').val();
-    return this.isAutoSubmit;
   },
 
   update: function() {
@@ -31,27 +18,20 @@ var SubmitPromptComponent = ScopedPentahoButtonComponent.extend({
     // BISERVER-3821 Provide ability to remove Auto-Submit check box from report viewer
     // only show the UI for the autosubmit checkbox if no preference exists
     if (this.paramDefn.autoSubmit == undefined) {
-      // var checkboxStr = "<label><input onclick='ToggleButtonBaseComponent.prototype.callAjaxAfterRender(\"" + this.name + "\")'";
       var checkboxStr = '<label><input onclick=\'SubmitPromptComponent.prototype.updateAutoSubmit("' + this.name + '")\'';
-      if (this.isAutoSubmit) {
+      if (this.promptPanel.autoSubmit) {
         checkboxStr += ' checked="checked"';
       }
       checkboxStr += ' type="checkbox"/>Auto-Submit</label>';
       $(checkboxStr).appendTo($('#'+ this.htmlObject));
     }
-  },
-
-  postExecution: function() {
-    this.enable(true);
-    Dashboards.fireChange(this.autoSubmitParam, this.isAutoSubmit + '');
-    if (this.isAutoSubmit) {
+    if (this.promptPanel.autoSubmit) {
       this.expression();
     }
   },
 
   expression: function() {
-    // Fire a new change for this parameter with a unique value so it can never be ignored
-    Dashboards.fireChange(this.parameter, new Date().getTime() + '');
+    this.promptPanel.submit();
   }
 });
 
@@ -101,6 +81,7 @@ var PromptLayoutComponent = CompositeComponent.extend({
 
   createSubmitPanel: function(paramDefn, widgets) {
     return pentaho.common.prompting.builders.WidgetBuilder.build({
+      promptPanel: this.promptPanel,
       paramDefn: paramDefn,
       widgets: widgets
     }, 'submit-panel');
@@ -118,7 +99,11 @@ var PromptLayoutComponent = CompositeComponent.extend({
       // doesn't have a value yet, so eventually, we'll show this parameter.. we hope
       return;
     }
-    return pentaho.common.prompting.builders.WidgetBuilder.build({paramDefn: paramDefn, param: param});
+    return pentaho.common.prompting.builders.WidgetBuilder.build({
+      promptPanel: this.promptPanel,
+      paramDefn: paramDefn, 
+      param: param
+    });
   },
 
   init: function(paramDefn) {
@@ -128,7 +113,7 @@ var PromptLayoutComponent = CompositeComponent.extend({
 
       $.each(group.parameters, function(i, param) {
         // initialize parameter values regardless of whether we're showing the parameter or not
-        pentaho.common.prompting.initializeParameterValue(paramDefn, param);
+        this.promptPanel.initializeParameterValue(paramDefn, param);
 
         if ('true' == param.attributes['hidden']) {
           return; // continue
@@ -139,9 +124,14 @@ var PromptLayoutComponent = CompositeComponent.extend({
           // No widget created. Do not create a label or parameter panel
           return; // continue
         }
-        var label = pentaho.common.prompting.builders.WidgetBuilder.build({paramDefn: paramDefn, param: param}, 'label');
+        var label = pentaho.common.prompting.builders.WidgetBuilder.build({
+            promptPanel: this.promptPanel,
+            paramDefn: paramDefn,
+            param: param
+          }, 'label');
 
         var panel = pentaho.common.prompting.builders.WidgetBuilder.build({
+            promptPanel: this.promptPanel,
             paramDefn: paramDefn,
             param: param,
             components: [label, widget]
@@ -282,46 +272,61 @@ var ParameterPanelComponent = PanelComponent.extend({
   }
 });
 
-var RefreshPromptComponent = BaseComponent.extend({
-  update: function() {
-    // if (Dashboards.isInitializing) {
-    //   console.log('Ignoring update during initialization');
-    //   return;
-    // }
-    // Stop listening
-    // this.listeners = [];
-    var newParamDefn;
-    try {
-      newParamDefn = this.args['refreshParamDefnCallback'].call(this);
-    } catch (e) {
-      alert('Error in refreshParamDefnCallback'); // TODO Add better error message
-    }
-    try {
-      var a = JSON.stringify(this.args.paramDefn);
-      var b = JSON.stringify(newParamDefn);
-    } catch (e) {
-      alert('Error parsing parameter definition'); // TODO Add better error message
-    }
-    if (b != undefined && a != b) {
-      this.args.paramDefn = newParamDefn;
-      pentaho.common.prompting.removeDashboardComponents(this.layoutComponent.components.concat([this, this.layoutComponent]));
-      pentaho.common.prompting.removeDashboardComponents(this.args['extraComponents']);
-      pentaho.common.prompting.createPromptPanel(this.args);
-    }
-  }
-});
-
 var RVDateInputComponent = DateInputComponent.extend({
   update: function() {
     this.base();
-    var picker = $('#' + this.name);
-    picker.datepicker('option', 'autoSize', true); // Automatically resize field to accomodate date format
-    picker.val(Dashboards.getParameterValue(this.parameter));
+    // var val = this.formatter.format(Dashboards.getParameterValue(this.parameter));
+    // var format = this.param.attributes['data-format'];
+
+    // var hiddenInputId = this.htmlObject + '_hidden';
+    // var inputId = this.htmlObject + '_input';
+
+    // var ph = $('#' + this.htmlObject);
+
+    // var html = '<input id="' + inputId + '" value="' + val + '"/>';
+    // html += '<input id="' + hiddenInputId + '"/>';//' style="display:none"/>';
+    // ph.html(html);
+    // ph.html($('<input/>').attr('id', inputId).attr('value', val));
+    // ph.appendTo($('<input/>').attr('id', hiddenInputId));
+// try {
+//     // $(function() {
+//       $('#' + hiddenInputId).datepicker({
+//         dateFormat: 'yy-mm-dd'
+//       });
+//     // });
+// } catch (e) {
+//   alert(e);
+// }
+
+//     $('#' + inputId).click(function() {
+//       alert($('#' + hiddenInputId).datepicker('show').bind($('#' + hiddenInputId)));
+//     });
+
+    // $(function(){
+    //   $("#" + myself.htmlObject + " input").datepicker({
+    //     autoSize: true,
+    //     dateFormat: format,
+    //     changeMonth: true,
+    //     changeYear: true,
+    //     // minDate: startDate,
+    //     // maxDate: endDate,
+    //     onSelect: function(date, input){
+    //       Dashboards.processChange(this.name);
+    //     }.bind(this)
+    //   });
+    // });
+
+    // var picker = $('#' + this.name);
+    // picker.datepicker('option', 'autoSize', true); // Automatically resize field to accomodate date format
+
+    // var val = this.formatter.format(Dashboards.getParameterValue(this.parameter));
+    // console.log('rvdateinput: ' + val);
+    // picker.val(val);
   },
 
   getValue: function() {
     var picker = $('#' + this.name);
-    return picker.val();
+    return this.formatter.parse(picker.val());
   }
 });
 

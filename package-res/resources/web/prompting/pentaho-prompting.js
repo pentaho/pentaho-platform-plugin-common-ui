@@ -20,18 +20,27 @@ if (!Function.prototype.bind) { // check if native implementation available
   };
 }
 
-// Borrowed from Dashboards, modified to prevent clobbering of existing WidgetHelper GUID methods/collections.
-var WidgetHelper = WidgetHelper || {};
-WidgetHelper.assignedGUIDs = WidgetHelper.assignedGUIDs || {};
-WidgetHelper.generateGUID = WidgetHelper.generateGUID || function(){
-  var gen = function(){ return Math.round(Math.random() * 100000);};
-  var guid = gen();
-  while(WidgetHelper.assignedGUIDs[guid]){
-    guid = gen();
+var GUIDHelper = function() {
+  /**
+   * Simple array of used Prompt GUIDs so they and their components can be uniquely identified.
+   */
+  this._assignedGUIDs = {},
+  this._gen = function() { return Math.round(Math.random() * 100000); };
+  this.generateGUID = function() {
+    var guid = this._gen();
+    while(this._assignedGUIDs[guid]) {
+      guid = this._gen();
+    }
+    this._assignedGUIDs[guid] = true;
+    return '' + guid;
+  };
+  /**
+   * Reset the collection of assigned GUIDs
+   */
+  this.reset = function() {
+    this._assignedGUIDs = {};
   }
-  WidgetHelper.assignedGUIDs[guid] = true;
-  return '' + guid;
-}
+};
 
 pentaho.common.prompting = {
   ParameterDefinition: function () {
@@ -83,33 +92,6 @@ pentaho.common.prompting = {
           return true;
         }
         return !showParameters.isSelectedValue('false');
-      },
-
-      getParameterValues: function() {
-        var params = {};
-        $.each(this.parameterGroups, function(i, group) {
-          $.each(group.parameters, function(j, param) {
-            var value;
-            if ('true' != param.attributes['hidden']) {
-              value = Dashboards.getParameterValue(param.name);
-            }
-            // Empty string is Dashboards' "null"
-            if (value !== '' && typeof value != 'undefined' && !$.isArray(value)) {
-              value = [value];
-            }
-            params[param.name] = value;
-          });
-        });
-        return params;
-      },
-
-      /**
-       * Look up current auto-submit setting for this session.
-       */
-      getAutoSubmitSetting: function(promptId) {
-        // TODO Allow fetching by prompt id so we can have multiple prompt panels on the same page
-        var as = Dashboards.getParameterValue('auto-submit');
-        return as == undefined ? undefined : as == 'true';
       }
     }
   },
@@ -190,6 +172,8 @@ pentaho.common.prompting = {
       value: undefined // type defined by parameter this value belongs to
     }
   },
+
+  promptGUIDHelper: new GUIDHelper(),
 
   removeDashboardComponents: function(components) {
     // Create a list of all embedded components to be removed
@@ -273,279 +257,332 @@ pentaho.common.prompting = {
     a.splice.apply(a, [a.length, 0].concat(b));
   },
 
-  parseParameterDefinition: function(xmlString) {
-    var xml = $($.parseXML(xmlString));
-
-    if (xml.find('parsererror').length > 0) {
-      throw xmlString;
-    }
-
-    var paramDefn = new pentaho.common.prompting.ParameterDefinition();
-    var parameters = $(xml.find('parameters')[0]);
-
-    paramDefn.promptNeeded = 'true' == parameters.attr('is-prompt-needed');
-    paramDefn.ignoreBiServer5538 = 'true' == parameters.attr('ignore-biserver-5538');
-    paramDefn.paginate = 'true' == parameters.attr('paginate');
-    paramDefn.subscribe = 'true' == parameters.attr('subscribe');
-    paramDefn.layout = parameters.attr('layout');
-
-    var parseInteger = function(s, def) {
-      var n = parseInt(s);
-      return 'NaN' == n ? def : n;
-    }
-    paramDefn.page = parseInteger(parameters.attr('accepted-page'), 0);
-    paramDefn.totalPages = parseInteger(parameters.attr('page-count'), 0);
-
-    paramDefn.autoSubmit = parameters.attr('autoSubmit');
-    if (paramDefn.autoSubmit == 'true') {
-      paramDefn.autoSubmit = true;
-    } else if (paramDefn.autoSubmit == 'false') {
-      paramDefn.autoSubmit = false;
-    } else {
-      paramDefn.autoSubmit = undefined;
-    }
-
-    paramDefn.autoSubmitUI = 'true' == parameters.attr('autoSubmitUI');
-
-    this.parseParameters(paramDefn, parameters);
-    this.parseErrors(paramDefn, xml);
-
-    return paramDefn;
-  },
-
-  parseParameters: function(paramDefn, parametersNode) {
-    parametersNode.find('parameter').each(function(i, node) {
-      var param = this.parseParameter(node);
-      node = $(node);
-      var groupName = node.attr('parameter-group');
-      if (groupName == undefined || !$.trim(groupName).length) {
-        groupName = 'parameters'; // default group
-      }
-      var group = paramDefn.getParameterGroup(groupName);
-      if (!group) {
-        group = new pentaho.common.prompting.ParameterGroup();
-        group.name = groupName;
-        group.label = node.attr('parameter-group-label');
-        paramDefn.parameterGroups.push(group);
-      }
-      group.parameters.push(param);
-    }.bind(this));
-  },
-
-  parseParameter: function(node) {
-    var param = new pentaho.common.prompting.Parameter();
-
-    node = $(node);
-    param.name = node.attr('name');
-    param.mandatory = 'true' == node.attr('is-mandatory');
-    param.strict = 'true' == node.attr('is-strict');
-    param.list = 'true' == node.attr('is-list');
-    param.multiSelect = 'true' == node.attr('is-multi-select');
-    param.type = node.attr('type');
-    param.timezoneHint = node.attr('timezone-hint'); // TODO Change this to timzone-hint?
-
-    // TODO Support namespaces
-    $(node).find('attribute').each(function(i, attr) {
-      attr = $(attr);
-      param.attributes[attr.attr('name')] = attr.attr('value');
-    });
-
-    param.values = this.parseParameterValues(node, param);
-    return param;
-  },
-
-  parseParameterValues: function(paramNode, parameter) {
-    var values = [];
-    $(paramNode).find('values value').each(function(i, value) {
-      var pVal = new pentaho.common.prompting.ParameterValue();
-
-      value = $(value);
-
-      pVal.label = value.attr('label');
-      if ('true' == value.attr('null')) {
-        pVal.value = null;
-      } else {
-        pVal.value = value.attr('value');
-      }
-      pVal.type = value.attr('type');
-      if (pVal.type == undefined || !$.trim(pVal.type).length) {
-        pVal.type = parameter.type;
-      }
-      pVal.selected = 'true' == value.attr('selected');
-
-      pVal.value = this.normalizeParameterValue(parameter, pVal.type, pVal.value);
-      values.push(pVal);
-    }.bind(this));
-    return values;
-  },
-
-  /**
-   * Called for every parameter value that is parsed. Gives external code an opportunity to update the parameter
-   * value at parse time.
-   */
-  normalizeParameterValue: function(parameter, type, value) {
-  },
-
-  parseErrors: function(paramDefn, xmlRoot) {
-    var addToParameter = function(paramDefn, paramName, message) {
-      var errorList = paramDefn.errors[paramName];
-      if (!errorList) {
-        errorList = [];
-      }
-      errorList.push(message);
-      paramDefn.errors[paramName] = errorList;
-    };
-
-    xmlRoot.find('error').each(function(i, e) {
-      var error = $(e);
-      var paramName = error.attr('parameter');
-      var message = error.attr('message');
-      addToParameter(paramDefn, paramName, message);
-    }.bind(this));
-
-    xmlRoot.find('global-error').each(function(i, e) {
-      var error = $(e);
-      var message = error.attr('message');
-      addToParameter(paramDefn, null, message);
-    }.bind(this));
-  },
-
-  /**
-   * @param paramDefnCallback: Function expected to return a parameter definition object
-   */
-  createRefreshPromptComponent: function(args, layoutComponent) {
-    return new pentaho.common.prompting.builders.RefreshPromptBuilder().build({
-      layoutComponent: layoutComponent,
-      listeners: this.gatherParameterNames(layoutComponent.components),
-      args: Dashboards.clone(args)
-    });
-  },
-
-  gatherParameterNames: function(components) {
-    var params = [];
-    $.each(components, function(i, c) {
-      if (typeof c.getParameters === 'function') {
-        params = params.concat(this.gatherParameterNames(c.getParameters()));
-      } else if (c.components) {
-        params = params.concat(this.gatherParameterNames(c.components));
-      } else {
-        params.push(c.parameter);
-      }
-    }.bind(this));
-    return params;
-  },
-
   prepareCDF: function() {
     if (this.prepared) { return; }
     Dashboards.setGlobalContext(false);
-
-    var fireChange = Dashboards.fireChange;
-    Dashboards.fireChange = function(param, value) {
-      if (Dashboards.getParameterValue(param) === value) {
-        console.log('Ignoring parameter value change: [' + param + ', ' + value + ']');
-        return;
-      }
-      console.log('parameter changed: [' + param + ', ' + value + '] from [' + Dashboards.getParameterValue(param) + ']');
-      fireChange.call(Dashboards, param, value);
-    };
-
-    var init = Dashboards.init;
-    Dashboards.init = function() {
-      Dashboards.isInitializing = true;
-      try {
-        init.apply(Dashboards, arguments);
-      } finally{
-        setTimeout(function() {
-          Dashboards.isInitializing = false;
-        }, Dashboards.renderDelay);
-      }
-    }.bind(Dashboards);
-
-    var setParameter = Dashboards.setParameter;
-    Dashboards.setParameter = function(name, value) {
-        console.log('Setting ' + name + ' = ' + value);
-        setParameter.call(Dashboards, name, value);
-    }
 
     this.prepared = true;
   },
 
   /**
-   * Sets the parameter value in Dashboards' parameter map and performs any conversion necessary.
+   * Parses a Parameter XML into a proper JSON object.
    */
-  initializeParameterValue: function(paramDefn, param) {
-    var value = [];
-    $.each(param.values, function(i, v) {
-      if (v.selected) {
-        value.push(v.value);
+  ParameterXmlParser: function() {
+    this.parseParameterXml = function(xmlString) {
+      var xml = $($.parseXML(xmlString));
+
+      if (xml.find('parsererror').length > 0) {
+        throw xmlString;
       }
-    });
-    if (value.length === 0) {
-      value = ''; // Dashboards' null value is an empty string
-    } else if (value.length === 1) {
-      value = value[0];
-    }
-    Dashboards.setParameter(param.name, value);
+
+      var paramDefn = new pentaho.common.prompting.ParameterDefinition();
+      var parameters = $(xml.find('parameters')[0]);
+
+      paramDefn.promptNeeded = 'true' == parameters.attr('is-prompt-needed');
+      paramDefn.ignoreBiServer5538 = 'true' == parameters.attr('ignore-biserver-5538');
+      paramDefn.paginate = 'true' == parameters.attr('paginate');
+      paramDefn.subscribe = 'true' == parameters.attr('subscribe');
+      paramDefn.layout = parameters.attr('layout');
+
+      var parseInteger = function(s, def) {
+        var n = parseInt(s);
+        return 'NaN' == n ? def : n;
+      }
+      paramDefn.page = parseInteger(parameters.attr('accepted-page'), 0);
+      paramDefn.totalPages = parseInteger(parameters.attr('page-count'), 0);
+
+      paramDefn.autoSubmit = parameters.attr('autoSubmit');
+      if (paramDefn.autoSubmit == 'true') {
+        paramDefn.autoSubmit = true;
+      } else if (paramDefn.autoSubmit == 'false') {
+        paramDefn.autoSubmit = false;
+      } else {
+        paramDefn.autoSubmit = undefined;
+      }
+
+      paramDefn.autoSubmitUI = 'true' == parameters.attr('autoSubmitUI');
+
+      this.parseParameters(paramDefn, parameters);
+      this.parseErrors(paramDefn, xml);
+
+      return paramDefn;
+    };
+
+    this.parseParameters = function(paramDefn, parametersNode) {
+      parametersNode.find('parameter').each(function(i, node) {
+        var param = this.parseParameter(node);
+        node = $(node);
+        var groupName = node.attr('parameter-group');
+        if (groupName == undefined || !$.trim(groupName).length) {
+          groupName = 'parameters'; // default group
+        }
+        var group = paramDefn.getParameterGroup(groupName);
+        if (!group) {
+          group = new pentaho.common.prompting.ParameterGroup();
+          group.name = groupName;
+          group.label = node.attr('parameter-group-label');
+          paramDefn.parameterGroups.push(group);
+        }
+        group.parameters.push(param);
+      }.bind(this));
+    };
+
+    this.parseParameter = function(node) {
+      var param = new pentaho.common.prompting.Parameter();
+
+      node = $(node);
+      param.name = node.attr('name');
+      param.mandatory = 'true' == node.attr('is-mandatory');
+      param.strict = 'true' == node.attr('is-strict');
+      param.list = 'true' == node.attr('is-list');
+      param.multiSelect = 'true' == node.attr('is-multi-select');
+      param.type = node.attr('type');
+      param.timezoneHint = node.attr('timezone-hint'); // TODO Change this to timzone-hint?
+
+      // TODO Support namespaces
+      $(node).find('attribute').each(function(i, attr) {
+        attr = $(attr);
+        param.attributes[attr.attr('name')] = attr.attr('value');
+      });
+
+      param.values = this.parseParameterValues(node, param);
+      return param;
+    };
+
+    this.parseParameterValues = function(paramNode, parameter) {
+      var values = [];
+      $(paramNode).find('values value').each(function(i, value) {
+        var pVal = new pentaho.common.prompting.ParameterValue();
+
+        value = $(value);
+
+        pVal.label = value.attr('label');
+        if ('true' == value.attr('null')) {
+          pVal.value = null;
+        } else {
+          pVal.value = value.attr('value');
+        }
+        pVal.type = value.attr('type');
+        if (pVal.type == undefined || !$.trim(pVal.type).length) {
+          pVal.type = parameter.type;
+        }
+        pVal.selected = 'true' == value.attr('selected');
+
+        pVal.value = this.normalizeParameterValue(parameter, pVal.type, pVal.value);
+        values.push(pVal);
+      }.bind(this));
+      return values;
+    };
+
+    /**
+     * Called for every parameter value that is parsed. Override this to update the parameter
+     * value at parse time.
+     */
+    this.normalizeParameterValue = function(parameter, type, value) {
+      return value;
+    },
+
+    this.parseErrors = function(paramDefn, xmlRoot) {
+      var addToParameter = function(paramDefn, paramName, message) {
+        var errorList = paramDefn.errors[paramName];
+        if (!errorList) {
+          errorList = [];
+        }
+        errorList.push(message);
+        paramDefn.errors[paramName] = errorList;
+      };
+
+      xmlRoot.find('error').each(function(i, e) {
+        var error = $(e);
+        var paramName = error.attr('parameter');
+        var message = error.attr('message');
+        addToParameter(paramDefn, paramName, message);
+      }.bind(this));
+
+      xmlRoot.find('global-error').each(function(i, e) {
+        var error = $(e);
+        var message = error.attr('message');
+        addToParameter(paramDefn, null, message);
+      }.bind(this));
+    };
   },
 
-  /**
-   * This should return an object capable of formatting the 'type' to and from text. If no formatter
-   * is required the return value should be undefined.
-   *
-   * A formatter should have two methods:
-   * formatter = {
-   *   format: function(object) {
-   *     return ...; // string
-   *   },
-   *   parse: function(string) {
-   *     return ...; // object
-   *   }
-   * }
-   */
-  createTextFormatter: function(paramDefn, parameter) {
-    if (paramDefn.createTextFormatter) {
-      return paramDefn.createTextFormatter.call(paramDefn, parameter);
+  PromptPanel: function(destinationId, paramDefn, submitCallback, refreshCallback) {
+    if (!destinationId) {
+      throw 'destinationId is required';
     }
-    return undefined;
-  },
+    this.destinationId = destinationId;
+    if (!paramDefn) {
+      throw 'paramDefn is required';
+    }
+    this.paramDefn = paramDefn;
+    if (!submitCallback) {
+      throw 'submitCallback is required';
+    }
+    this.submitCallback = submitCallback;
+    // Refresh callback is optional to be able to refresh the prompts when a parameter changes
+    this.refreshCallback = refreshCallback;
 
-  createPromptPanel: function(args) {
-    this.prepareCDF();
+    // Initialize the auto submit setting for this panel from the parameter definition
+    this.autoSubmit = paramDefn.allowAutoSubmit();
 
-    var layout = this.builders.WidgetBuilder.build(args, 'prompt-panel');
+    this.guid = pentaho.common.prompting.promptGUIDHelper.generateGUID();
 
-    // TODO Move this to a map so we can support multiple prompt panels within the same page
-    // Example: paramDefns = { <unique prompt group id>: paramDefn, <another prompt group id>: anotherParamDefn };
-    this.paramDefn = args['paramDefn'];
+    /**
+     * Get a localized string for this prompt panel.
+     */
+    this.getString = function(key, defaultString) {
+      return defaultString || '!' + key + '!';
+    }
 
-    var addComponents = function(components, c) {
-      components.push(c);
-      if (c.components) {
-        $.each(c.components, function(i, cc) {
-          addComponents(components, cc);
-        });
+    /**
+     * Get the current auto submit setting for this panel.
+     */
+    this.getAutoSubmitSetting = function() {
+      return this.autoSubmit;
+    }
+
+    /**
+     * Returns a parameter name unique to this parameter panel.
+     */
+    this.getParameterName = function(parameter) {
+      return this.guid + parameter.name;
+    };
+
+    /**
+     * Returns a map of parameter name -> value. This will extract the current parameter value from Dashboards
+     * as necessary.
+     */
+    this.getParameterValues = function() {
+      var params = {};
+      $.each(this.paramDefn.parameterGroups, function(i, group) {
+        $.each(group.parameters, function(j, param) {
+          var value;
+          if ('true' != param.attributes['hidden']) {
+            value = Dashboards.getParameterValue(this.getParameterName(param));
+          }
+          // Empty string is Dashboards' "null"
+          if (value !== '' && typeof value != 'undefined' && !$.isArray(value)) {
+            value = [value];
+          }
+          params[param.name] = value;
+        }.bind(this));
+      }.bind(this));
+      return params;
+    };
+
+    /**
+     * This should return an object capable of formatting the 'type' to and from text. If no formatter
+     * is required the return value should be undefined.
+     *
+     * A formatter should have two methods:
+     * formatter = {
+     *   format: function(object) {
+     *     return ...; // string
+     *   },
+     *   parse: function(string) {
+     *     return ...; // object
+     *   }
+     * }
+     *
+     * @param paramDefn Parameter definition
+     * @param parameter Parameter to create text formatter for
+     * @param pattern Optional pattern to use instead of any the parameter declares
+     */
+    this.createTextFormatter = function(paramDefn, parameter, pattern) {
+      return undefined;
+    };
+
+    this._widgetGUIDHelper = new GUIDHelper();
+    this.generateWidgetGUID = function() {
+      return this._widgetGUIDHelper.generateGUID();
+    };
+
+    /**
+     * Sets the parameter value in Dashboards' parameter map and performs any conversion necessary.
+     */
+    this.initializeParameterValue = function(paramDefn, param) {
+      var value = [];
+      $.each(param.values, function(i, v) {
+        if (v.selected) {
+          value.push(v.value);
+        }
+      });
+      if (value.length === 0) {
+        value = ''; // Dashboards' null value is an empty string
+      } else if (value.length === 1) {
+        value = value[0];
+      }
+      Dashboards.setParameter(this.guid + param.name, value);
+    };
+
+    /**
+     * Called when the prompt panel's submit button is clicked or auto-submit is enabled and a parameter value changes.
+     */
+    this.submit = function() {
+      if (this.submitCallback) {
+        this.submitCallback(this);
       }
     };
 
-    var components = [layout];
-    $.each(layout.components, function(i, c) {
-      addComponents(components, c);
-    });
+    /**
+     * Called when a parameter value changes.
+     */
+    this.parameterChanged = function(name, value) {
+      this.refreshPrompt();
+    };
 
-    if (args['extraComponents']) {
-        $.each(args['extraComponents'], function(i, c) {
-            if (!c.name) {
-                c.name = c.type + WidgetHelper.generateGUID();
-            }
-            components.push(c);
-        })
+    /**
+     * Called to refresh the prompt panel. This will invoke the refreshCallback to get a new parameter definition.
+     * If the new parameter definition is undefined or is the same as the previous no re-initialization is done.
+     */
+    this.refreshPrompt = function() {
+      var newParamDefn;
+      try {
+        newParamDefn = this.refreshCallback(this);
+      } catch (e) {
+        alert('Error in refreshCallback'); // TODO Add better error message
+        return;
+      }
+      try {
+        var a = JSON.stringify(this.paramDefn);
+        var b = JSON.stringify(newParamDefn);
+      } catch (e) {
+        alert('Error parsing parameter definition'); // TODO Add better error message
+        return;
+      }
+      if (b != undefined && a != b) {
+        this.paramDefn = newParamDefn;
+        pentaho.common.prompting.removeDashboardComponents(this.components);
+        this.init();
+      }
+    };
+
+    /**
+     * Initialize this prompt panel. This will create the components and pass them to CDF to be loaded.
+     */
+    this.init = function() {
+      pentaho.common.prompting.prepareCDF();
+
+      var layout = pentaho.common.prompting.builders.WidgetBuilder.build(this, 'prompt-panel');
+
+      var addComponents = function(components, c) {
+        components.push(c);
+        if (c.components) {
+          $.each(c.components, function(i, cc) {
+            addComponents(components, cc);
+          });
+        }
+      };
+
+      var components = [layout];
+      $.each(layout.components, function(i, c) {
+        addComponents(components, c);
+      });
+
+      this.components = components;
+
+      Dashboards.init(components);
     }
-
-    // Create refresh prompt component last so it is the last to receive change events
-    if ($.isFunction(args['refreshParamDefnCallback'])) {
-        components.push(this.createRefreshPromptComponent(args, layout));
-    }
-
-    Dashboards.init(components);
   }
 }
