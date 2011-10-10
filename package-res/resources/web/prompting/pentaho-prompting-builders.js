@@ -16,9 +16,6 @@ Widget Definition Structure:
 
 */
 
-var pentaho = pentaho || {};
-pentaho.common = pentaho.common || {};
-pentaho.common.prompting = pentaho.common.prompting || {};
 pentaho.common.prompting.builders = pentaho.common.prompting.builders || {};
 
 pentaho.common.prompting.builders.PromptPanelBuilder = Base.extend({
@@ -99,12 +96,12 @@ pentaho.common.prompting.builders.WidgetBuilder = {
 
 pentaho.common.prompting.builders.SubmitComponentBuilder = Base.extend({
   build: function(args) {
-    var name = 'submit-' + args.promptPanel.generateWidgetGUID();
+    var guid = args.promptPanel.generateWidgetGUID();
     return {
       promptType: 'submit',
       type: 'SubmitPromptComponent',
-      name: name,
-      htmlObject: name,
+      name: guid,
+      htmlObject: guid,
       label: args.promptPanel.getString('submitButtonText', 'Submit'),
       promptPanel: args.promptPanel,
       paramDefn: args.paramDefn,
@@ -115,13 +112,13 @@ pentaho.common.prompting.builders.SubmitComponentBuilder = Base.extend({
 
 pentaho.common.prompting.builders.ParameterWidgetBuilderBase = Base.extend({
   build: function(args) {
-    var name = args.param.name + args.promptPanel.generateWidgetGUID();
+    var guid = args.promptPanel.generateWidgetGUID();
     return {
       promptType: 'prompt',
       executeAtStart: true,
       param: args.param,
-      name: name,
-      htmlObject: name,
+      name: guid,
+      htmlObject: guid,
       type: undefined, // must be declared in extension class
       parameter: args.promptPanel.getParameterName(args.param),
       postExecution: function() {
@@ -139,12 +136,13 @@ pentaho.common.prompting.builders.LabelBuilder = pentaho.common.prompting.builde
   build: function(args) {
     var widget = this.base(args);
     var name = widget.name + '-label';
+    var label = Dashboards.escapeHtml(args.param.attributes['label'] || args.param.name);
     $.extend(widget, {
       promptType: 'label',
       name: name,
       htmlObject: name,
       type: 'TextComponent',
-      expression: function() { return args.param.attributes['label']; }
+      expression: function() { return label; }
     });
     delete widget.parameter; // labels don't have parameters
     return widget;
