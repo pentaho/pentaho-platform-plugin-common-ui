@@ -125,11 +125,7 @@ pentaho.common.prompting = {
         var selected = false;
         $.each(this.values, function(i, v) {
           if (v.selected) {
-            if (value === null && v.value == null) {
-              selected = true;
-              return false; // break
-            }
-            if (value === null && value === v.value) {
+            if (value === v.value) {
               selected = true;
               return false; // break
             }
@@ -564,25 +560,36 @@ pentaho.common.prompting = {
     this.init = function() {
       pentaho.common.prompting.prepareCDF();
 
-      var layout = pentaho.common.prompting.builders.WidgetBuilder.build(this, 'prompt-panel');
+      if (this.paramDefn.showParameterUI()) {
+        var layout = pentaho.common.prompting.builders.WidgetBuilder.build(this, 'prompt-panel');
 
-      var addComponents = function(components, c) {
-        components.push(c);
-        if (c.components) {
-          $.each(c.components, function(i, cc) {
-            addComponents(components, cc);
-          });
-        }
-      };
+        var addComponents = function(components, c) {
+          components.push(c);
+          if (c.components) {
+            $.each(c.components, function(i, cc) {
+              addComponents(components, cc);
+            });
+          }
+        };
 
-      var components = [layout];
-      $.each(layout.components, function(i, c) {
-        addComponents(components, c);
-      });
+        var components = [layout];
+        $.each(layout.components, function(i, c) {
+          addComponents(components, c);
+        });
 
-      this.components = components;
+        this.components = components;
 
-      Dashboards.init(components);
+        Dashboards.init(components);
+      } else {
+        $.each(paramDefn.parameterGroups, function(i, group) {
+          $.each(group.parameters, function(i, param) {
+            // initialize parameter values regardless of whether we're showing the parameter or not
+            this.initializeParameterValue(paramDefn, param);
+          }.bind(this));
+        }.bind(this));
+        // All parameters are initialized, fire the submit
+        this.submit();
+      }
     },
 
     this.hide = function() {
