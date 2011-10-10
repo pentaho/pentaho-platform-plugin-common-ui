@@ -22,7 +22,7 @@ var SubmitPromptComponent = ScopedPentahoButtonComponent.extend({
       if (this.promptPanel.autoSubmit) {
         checkboxStr += ' checked="checked"';
       }
-      checkboxStr += ' type="checkbox"/>Auto-Submit</label>';
+      checkboxStr += ' type="checkbox"/>' + this.promptPanel.getString('autoSubmitLabel', 'Auto-Submit') + '</label>';
       $(checkboxStr).appendTo($('#'+ this.htmlObject));
     }
     if (this.promptPanel.autoSubmit) {
