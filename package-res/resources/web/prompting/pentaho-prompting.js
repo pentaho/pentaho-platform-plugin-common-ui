@@ -499,7 +499,7 @@ pentaho.common.prompting = {
     };
 
     /**
-     * Sets the parameter value in Dashboards' parameter map and performs any conversion necessary.
+     * Sets the parameter value in Dashboards' parameter map.
      */
     this.initializeParameterValue = function(paramDefn, param) {
       var value = [];
@@ -583,6 +583,10 @@ pentaho.common.prompting = {
       this.components = components;
 
       Dashboards.init(components);
+    },
+
+    this.hide = function() {
+      $('#' + this.destinationId).css('display', 'none');
     }
   }
 }
