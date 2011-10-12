@@ -31,12 +31,18 @@ var SubmitPromptComponent = ScopedPentahoButtonComponent.extend({
   },
 
   expression: function() {
-    this.promptPanel.submit();
+    this.promptPanel._submit();
   }
 });
 
+/**
+ * This is a component that contains other components and can optionally wrap all components in a
+ * <fieldset> to provide a title for the container.
+ */
 var CompositeComponent = BaseComponent.extend({
   components: undefined, // array of components
+
+  executeAtStart: true,
 
   getComponents: function() {
     return this.components;
@@ -65,11 +71,28 @@ var CompositeComponent = BaseComponent.extend({
 
   update: function() {
     var html = '';
+
+    if (this.label !== undefined) {
+      html += '<fieldset><legend>' + Dashboards.escapeHtml(this.label) + '</legend><div>';
+    }
+
+    if (this.components && this.components.length > 0) {
+      html += this.updateInternal();
+    }
+
+    if (this.label !== undefined) {
+      html += '</div></fieldset>';
+    }
+
+    $('#' + this.htmlObject).html(html);
+  },
+
+  updateInternal: function() {
+    var html = '';
     $.each(this.components, function(i, c) {
       html += this.getMarkupFor(c);
     }.bind(this));
-
-    $('#' + this.htmlObject).html(html);
+    return html;
   }
 });
 
@@ -77,88 +100,10 @@ var CompositeComponent = BaseComponent.extend({
  * Base Prompting Component that builds a layout
  */
 var PromptLayoutComponent = CompositeComponent.extend({
-  executeAtStart: true,
-
-  createSubmitPanel: function(paramDefn, widgets) {
-    return pentaho.common.prompting.builders.WidgetBuilder.build({
-      promptPanel: this.promptPanel,
-      paramDefn: paramDefn,
-      widgets: widgets
-    }, 'submit-panel');
-  },
-
-  getParameterPanelType: function() {
-    return 'parameter-panel';
-  },
-
-  createWidgetForParameter: function(paramDefn, param) {
-    if (param.strict && param.values.length === 0) {
-      // if the parameter is strict but we have no valid choices for it, it is impossible
-      // for the user to give it a value, so we will hide this parameter
-      // it is highly likely that the parameter is driven by another parameter which
-      // doesn't have a value yet, so eventually, we'll show this parameter.. we hope
-      return;
-    }
-    return pentaho.common.prompting.builders.WidgetBuilder.build({
-      promptPanel: this.promptPanel,
-      paramDefn: paramDefn, 
-      param: param
-    });
-  },
-
-  init: function(paramDefn) {
-    this.paramDefn = paramDefn;
-    // Create a label and a CDF widget for each parameter
-    $.each(paramDefn.parameterGroups, function(i, group) {
-
-      $.each(group.parameters, function(i, param) {
-        // initialize parameter values regardless of whether we're showing the parameter or not
-        this.promptPanel.initializeParameterValue(paramDefn, param);
-
-        if ('true' == param.attributes['hidden']) {
-          return; // continue
-        }
-
-        var widget = this.createWidgetForParameter(paramDefn, param);
-        if (!widget) {
-          // No widget created. Do not create a label or parameter panel
-          return; // continue
-        }
-        var label = pentaho.common.prompting.builders.WidgetBuilder.build({
-            promptPanel: this.promptPanel,
-            paramDefn: paramDefn,
-            param: param
-          }, 'label');
-
-        var panel = pentaho.common.prompting.builders.WidgetBuilder.build({
-            promptPanel: this.promptPanel,
-            paramDefn: paramDefn,
-            param: param,
-            components: [label, widget]
-          }, this.getParameterPanelType());
-
-        this.components.push(panel);
-      }.bind(this));
-    }.bind(this));
-
-    if (this.components.length > 0) {
-      if (paramDefn.subscribe) {
-        // TODO Create the schedule prompt
-      }
-      var submitPanel = this.createSubmitPanel(paramDefn, this.components.slice(0));
-      if (submitPanel) {
-        this.components.push(submitPanel);
-      }
-    }
-
-    if (paramDefn.promptNeeded) {
-      // TODO Add pagination control
-    }
-  },
 
   getClassFor: function(component) {
     if (!component.param) { return; }
-    var errors = this.paramDefn.errors[component.param.name];
+    var errors = this.promptPanel.paramDefn.errors[component.param.name];
     // TODO Round out the error prompting. Should probably move this to where we create the components (Panel.init()).
     var classes = 'parameter';
     if (errors && errors.length > 0) {
@@ -168,41 +113,27 @@ var PromptLayoutComponent = CompositeComponent.extend({
   },
 
   update: function() {
-    this.base();
     $('#' + this.htmlObject).addClass('prompt-panel');
+    this.base();
   }
 });
 
 var TableBasedPromptLayoutComponent = PromptLayoutComponent.extend({
   buildComponentCell: function(c) {
-    return "<td align='left' align='left' style='vertical-align: top;'><div id='" + c.htmlObject + "'></div></td>";
+    return "<td align='left' style='vertical-align: top;'><div id='" + c.htmlObject + "'></div></td>";
   },
 
   getMarkupFor: function(components) {
     throw 'TableBasedPromptLayoutComponent should not be used directly.';
   },
 
-  update: function() {
-    if (!this.components) { return; }
-    this.base();
-    var html = '<table cellspacing="0" cellpadding="0" class="parameter-container" style="width: 100%">';
-    html += '<tr><td><div class="parameter-wrapper"><table cellspacing="0" cellpadding="0">';
-    // TODO Clean up this layout generation and possibly use CDE to generate it.
+  updateInternal: function() {
+    var html = '<table cellspacing="0" cellpadding="0" class="parameter-container" style="width: 100%;">';
+    html += '<tr><td><div class="parameter-wrapper"><table cellspacing="0" cellpadding="0" style="width: 100%;">';
 
     html += this.getMarkupFor(this.components);
 
-    html += '</table></div></td></tr>';
-
-    html += '<tr><td><div class="parameter-submit-panel"><table cellspacing="0" cellpadding="0" class="parameter"><tr>';
-    $.each(this.components, function(i, c) {
-      if (c.promptType !== 'submit') { return; }
-      html += this.buildComponentCell(c);
-      html +='</tr>'
-    }.bind(this));
-
-    html += '</table></div></td></tr></table>';
-
-    $('#' + this.htmlObject).html(html);
+    return html + '</table></div></td></tr></table>';
   }
 });
 
@@ -210,7 +141,6 @@ var VerticalTableBasedPromptLayoutComponent = TableBasedPromptLayoutComponent.ex
   getMarkupFor: function(components) {
     var html = '';
     $.each(this.components, function(i, c) {
-      if (c.promptType === 'submit') { return; }
       var _class = this.getClassFor(c);
       // Assume components are contained in panels of components
       html += '<tr><td><div id="' + c.htmlObject + '"';
@@ -227,7 +157,6 @@ var HorizontalTableBasedPromptLayoutComponent = TableBasedPromptLayoutComponent.
   getMarkupFor: function(components) {
     var html = '<tr>';
     $.each(this.components, function(i, c) {
-      if (c.promptType === 'submit') { return; }
       var _class = this.getClassFor(c);
       // Assume components are contained in panels of components
       html += '<td align="left" style="vertical-align: top;"><div id="' + c.htmlObject + '"';
@@ -242,8 +171,8 @@ var HorizontalTableBasedPromptLayoutComponent = TableBasedPromptLayoutComponent.
 
 var FlowPromptLayoutComponent = PromptLayoutComponent.extend({
   update: function() {
-    this.base();
     $('#' + this.htmlObject).addClass('flow');
+    this.base();
   }
 });
 

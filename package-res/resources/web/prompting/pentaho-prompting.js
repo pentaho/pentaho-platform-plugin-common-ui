@@ -15,7 +15,7 @@ if (!Function.prototype.bind) { // check if native implementation available
         object = args.shift(); 
     return function(){ 
       return fn.apply(object, 
-        args.concat(Array.prototype.slice.call(arguments))); 
+        args.concat(Array.prototype.slice.call(arguments)));
     }; 
   };
 }
@@ -308,7 +308,7 @@ pentaho.common.prompting = {
       parametersNode.find('parameter').each(function(i, node) {
         var param = this.parseParameter(node);
         node = $(node);
-        var groupName = node.attr('parameter-group');
+        var groupName = param.attributes['parameter-group'];
         if (groupName == undefined || !$.trim(groupName).length) {
           groupName = 'parameters'; // default group
         }
@@ -316,7 +316,7 @@ pentaho.common.prompting = {
         if (!group) {
           group = new pentaho.common.prompting.ParameterGroup();
           group.name = groupName;
-          group.label = node.attr('parameter-group-label');
+          group.label = param.attributes['parameter-group-label'];
           paramDefn.parameterGroups.push(group);
         }
         group.parameters.push(param);
@@ -403,7 +403,7 @@ pentaho.common.prompting = {
     };
   },
 
-  PromptPanel: function(destinationId, paramDefn, submitCallback, refreshCallback) {
+  PromptPanel: function(destinationId, paramDefn) {
     if (!destinationId) {
       throw 'destinationId is required';
     }
@@ -412,12 +412,6 @@ pentaho.common.prompting = {
       throw 'paramDefn is required';
     }
     this.paramDefn = paramDefn;
-    if (!submitCallback) {
-      throw 'submitCallback is required';
-    }
-    this.submitCallback = submitCallback;
-    // Refresh callback is optional to be able to refresh the prompts when a parameter changes
-    this.refreshCallback = refreshCallback;
 
     // Initialize the auto submit setting for this panel from the parameter definition
     this.autoSubmit = paramDefn.allowAutoSubmit();
@@ -512,21 +506,40 @@ pentaho.common.prompting = {
       Dashboards.setParameter(this.guid + param.name, value);
     };
 
+    this._submit = function() {
+      this.submit(this);
+    };
+
     /**
      * Called when the prompt panel's submit button is clicked or auto-submit is enabled and a parameter value changes.
      */
-    this.submit = function() {
-      if (this.submitCallback) {
-        this.submitCallback(this);
-      }
+    this.submit = function(promptPanel) {
+    };
+
+    this._schedule = function() {
+      this.schedule(this);
+    };
+
+    /**
+     * Called when the prompt panel's schedule button is clicked.
+     */
+    this.schedule = function(promptPanel) {
     };
 
     /**
      * Called when a parameter value changes.
      */
-    this.parameterChanged = function(name, value) {
+    this.parameterChanged = function(param, name, value) {
       this.refreshPrompt();
     };
+
+
+    /**
+     * This is called to refresh the prompt panel. It should return a new parameter definition. If it returns undefined no
+     * update will happen.
+     */
+    this.getParameterDefinition = function(promptPanel) {
+    },
 
     /**
      * Called to refresh the prompt panel. This will invoke the refreshCallback to get a new parameter definition.
@@ -535,7 +548,7 @@ pentaho.common.prompting = {
     this.refreshPrompt = function() {
       var newParamDefn;
       try {
-        newParamDefn = this.refreshCallback(this);
+        newParamDefn = this.getParameterDefinition(this);
       } catch (e) {
         alert('Error in refreshCallback'); // TODO Add better error message
         return;
@@ -594,6 +607,82 @@ pentaho.common.prompting = {
 
     this.hide = function() {
       $('#' + this.destinationId).css('display', 'none');
+    }
+
+    this.createSubmitPanel = function(paramDefn) {
+      return pentaho.common.prompting.builders.WidgetBuilder.build({
+        promptPanel: this
+      }, 'submit-panel');
+    },
+
+    this.getParameterPanelType = function() {
+      return 'parameter-panel';
+    },
+
+    this.createWidgetForParameter = function(paramDefn, param) {
+      if (param.strict && param.values.length === 0) {
+        // if the parameter is strict but we have no valid choices for it, it is impossible
+        // for the user to give it a value, so we will hide this parameter
+        // it is highly likely that the parameter is driven by another parameter which
+        // doesn't have a value yet, so eventually, we'll show this parameter.. we hope
+        return;
+      }
+      return pentaho.common.prompting.builders.WidgetBuilder.build({
+        promptPanel: this,
+        param: param
+      });
+    },
+
+    this.buildPanelComponents = function() {
+      var panelComponents = [];
+      // Create a composite panel of the correct layout type for each group
+      $.each(this.paramDefn.parameterGroups, function(i, group) {
+        var components = [];
+        // Create a label and a CDF widget for each parameter
+        $.each(group.parameters, function(i, param) {
+          // initialize parameter values regardless of whether we're showing the parameter or not
+          this.initializeParameterValue(this.paramDefn, param);
+
+          if ('true' == param.attributes['hidden']) {
+            return; // continue
+          }
+
+          var widget = this.createWidgetForParameter(this.paramDefn, param);
+          if (!widget) {
+            // No widget created. Do not create a label or parameter panel
+            return; // continue
+          }
+
+          var label = pentaho.common.prompting.builders.WidgetBuilder.build({
+              promptPanel: this,
+              param: param
+            }, 'label');
+
+          var panel = pentaho.common.prompting.builders.WidgetBuilder.build({
+              promptPanel: this,
+              param: param,
+              components: [label, widget]
+            }, this.getParameterPanelType());
+          components.push(panel);
+        }.bind(this));
+        if (components.length > 0) {
+          var groupPanel = pentaho.common.prompting.builders.WidgetBuilder.build({
+            promptPanel: this,
+            paramGroup: group,
+            components: components
+          }, 'group-panel');
+          panelComponents.push(groupPanel);
+        }
+      }.bind(this));
+
+      if (panelComponents.length > 0) {
+        var submitPanel = this.createSubmitPanel(this.paramDefn);
+        if (submitPanel) {
+          panelComponents.push(submitPanel);
+        }
+      }
+
+      return panelComponents;
     }
   }
 }

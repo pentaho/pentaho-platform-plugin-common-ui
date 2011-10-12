@@ -1,10 +1,18 @@
 /**
 
 To create a widget:
-var widget = pentaho.common.prompting.builders.WidgetBuilder.build(parameter);
+var widget = pentaho.common.prompting.builders.WidgetBuilder.build(arguments);
+
+where arguments generally contain:
+
+{
+  promptPanel: ...,
+  param: the parameter this widget is created for
+}
 
 Widget Definition Structure:
 {
+  promptPanel: the prompt panel this widget belongs to
   promptType: ['prompt', 'submit', 'label'], Used to distinguish types of widgets
   param: The parameter this widget was created for
   name: unique name of widget, usually: param['name'] + GUID
@@ -19,29 +27,15 @@ Widget Definition Structure:
 pentaho.common.prompting.builders = pentaho.common.prompting.builders || {};
 
 pentaho.common.prompting.builders.PromptPanelBuilder = Base.extend({
-  lookupPromptType: function(paramDefn) {
-    switch(paramDefn.layout) {
-      case 'horizontal':
-        return 'HorizontalTableBasedPromptLayoutComponent';
-      case 'flow':
-        return 'FlowPromptLayoutComponent';
-      default:
-        return 'VerticalTableBasedPromptLayoutComponent';
-    }
-  },
-
   build: function(promptPanel) {
     var name = 'prompt' + promptPanel.guid;
     var layout = {
       name: name,
-      type: this.lookupPromptType(promptPanel.paramDefn),
+      type: 'VerticalTableBasedPromptLayoutComponent',
       htmlObject: promptPanel.destinationId,
       promptPanel: promptPanel,
-      // Define instance variable of components so they are not shared
-      components: []
+      components: promptPanel.buildPanelComponents()
     };
-    Dashboards.bindControl(layout);
-    layout.init(promptPanel.paramDefn);
     return layout;
   }
 });
@@ -49,8 +43,10 @@ pentaho.common.prompting.builders.PromptPanelBuilder = Base.extend({
 pentaho.common.prompting.builders.WidgetBuilder = {
   mapping: {
     'prompt-panel': 'pentaho.common.prompting.builders.PromptPanelBuilder',
+    'group-panel': 'pentaho.common.prompting.builders.ParameterGroupPanelBuilder',
     'parameter-panel': 'pentaho.common.prompting.builders.ParameterPanelBuilder',
-    'submit-panel': 'pentaho.common.prompting.builders.SubmitComponentBuilder',
+    'submit-panel': 'pentaho.common.prompting.builders.SubmitPanelBuilder',
+    'submit': 'pentaho.common.prompting.builders.SubmitComponentBuilder',
     'label': 'pentaho.common.prompting.builders.LabelBuilder',
     'dropdown': 'pentaho.common.prompting.builders.DropDownBuilder',
     'radio': 'pentaho.common.prompting.builders.RadioBuilder',
@@ -85,14 +81,45 @@ pentaho.common.prompting.builders.WidgetBuilder = {
 
   build: function(args, typeOverride) {
     var widget = this.findBuilderFor(args, typeOverride).build(args);
-    if (widget.parameter) {
+    if (widget.parameter && widget.param) {
       widget.postChange = function() {
-        args.promptPanel.parameterChanged(this.parameter, this.getValue());
+        args.promptPanel.parameterChanged(this.param, this.parameter, this.getValue());
       }.bind(widget);
     }
     return widget;
   }
 };
+
+pentaho.common.prompting.builders.SubmitPanelBuilder = Base.extend({
+  build: function(args) {
+    var guid = args.promptPanel.generateWidgetGUID();
+
+    var components = [];
+    if (args.promptPanel.paramDefn.subscribe) {
+      var scheduleGuid = args.promptPanel.generateWidgetGUID();
+      components.push({
+        type: 'ScopedPentahoButtonComponent',
+        name: scheduleGuid,
+        htmlObject: scheduleGuid,
+        label: args.promptPanel.getString('scheduleButtonLabel', 'Schedule'),
+        expression: function() {
+          args.promptPanel._schedule();
+        },
+        executeAtStart: true
+      });
+    }
+
+    components.push(pentaho.common.prompting.builders.WidgetBuilder.build(args, 'submit'));
+    return {
+      type: 'FlowPromptLayoutComponent',
+      promptType: 'submit',
+      name: guid,
+      htmlObject: guid,
+      executeAtStart: true,
+      components: components
+    }
+  }
+});
 
 pentaho.common.prompting.builders.SubmitComponentBuilder = Base.extend({
   build: function(args) {
@@ -104,7 +131,7 @@ pentaho.common.prompting.builders.SubmitComponentBuilder = Base.extend({
       htmlObject: guid,
       label: args.promptPanel.getString('submitButtonText', 'Submit'),
       promptPanel: args.promptPanel,
-      paramDefn: args.paramDefn,
+      paramDefn: args.promptPanel.paramDefn,
       executeAtStart: true
     };
   }
@@ -179,7 +206,7 @@ pentaho.common.prompting.builders.DropDownBuilder = pentaho.common.prompting.bui
   build: function(args) {
     var widget = this.base(args);
 
-    if (args.paramDefn.ignoreBiServer5538 && !args.param.hasSelection()) {
+    if (args.promptPanel.paramDefn.ignoreBiServer5538 && !args.param.hasSelection()) {
       // If there is no empty selection, and no value is selected, create one. This way, we can represent
       // the unselected state.
       widget.valuesArray = [['', '']].concat(widget.valuesArray);
@@ -191,7 +218,7 @@ pentaho.common.prompting.builders.DropDownBuilder = pentaho.common.prompting.bui
         // SelectComponent defines defaultIfEmpty = true for non-multi selects.
         // We can't override any properties of the component so we must set them just before update() is called. :(
         // Only select the first item if we have no selection and are not ignoring BISERVER-5538
-        this.defaultIfEmpty = !args.paramDefn.ignoreBiServer5538 && !args.param.hasSelection();
+        this.defaultIfEmpty = !args.promptPanel.paramDefn.ignoreBiServer5538 && !args.param.hasSelection();
       }
     });
   }
@@ -255,7 +282,7 @@ pentaho.common.prompting.builders.DateInputBuilder = pentaho.common.prompting.bu
   build: function(args) {
     var widget = this.base(args);
     var pattern = args.param.attributes['data-format'];
-    var formatter = args.promptPanel.createTextFormatter(args.paramDefn, args.param, pattern);
+    var formatter = args.promptPanel.createTextFormatter(args.promptPanel.paramDefn, args.param, pattern);
 
     // clober JQuery UI DatePicker's parse and format functions
     // $.datepicker.parseDate = function(pattern, date) {
@@ -272,6 +299,31 @@ pentaho.common.prompting.builders.DateInputBuilder = pentaho.common.prompting.bu
       type: 'RVDateInputComponent',
       formatter: formatter
     });
+  }
+});
+
+pentaho.common.prompting.builders.ParameterGroupPanelBuilder = Base.extend({
+  lookupPromptType: function(paramDefn) {
+    switch(paramDefn.layout) {
+      case 'horizontal':
+        return 'HorizontalTableBasedPromptLayoutComponent';
+      case 'flow':
+        return 'FlowPromptLayoutComponent';
+      default:
+        return 'VerticalTableBasedPromptLayoutComponent';
+    }
+  },
+
+  build: function(args) {
+    var guid = args.promptPanel.generateWidgetGUID();
+    return {
+      type: this.lookupPromptType(args.promptPanel.paramDefn),
+      name: args.paramGroup.name,
+      htmlObject: guid,
+      promptPanel: args.promptPanel,
+      label: args.paramGroup.label,
+      components: args.components
+    };
   }
 });
 
@@ -292,7 +344,7 @@ pentaho.common.prompting.builders.ParameterPanelBuilder = pentaho.common.prompti
 
 pentaho.common.prompting.builders.PlainPromptBuilder = pentaho.common.prompting.builders.ValueBasedParameterWidgetBuilder.extend({
   build: function(args) {
-    var formatter = args.promptPanel.createTextFormatter(args.paramDefn, args.param);
+    var formatter = args.promptPanel.createTextFormatter(args.promptPanel.paramDefn, args.param);
     var convertToAutocompleteValues = function(valuesArray) {
       return $.map(valuesArray, function(v) {
         var value = formatter ? formatter.format(v[0]) : v[0];
@@ -317,7 +369,7 @@ pentaho.common.prompting.builders.TextAreaBuilder = pentaho.common.prompting.bui
   build: function(args) {
     return $.extend(this.base(args), {
       type: 'TextAreaComponent',
-      formatter: args.promptPanel.createTextFormatter(args.paramDefn, args.param)
+      formatter: args.promptPanel.createTextFormatter(args.promptPanel.paramDefn, args.param)
     });
   }
 });
