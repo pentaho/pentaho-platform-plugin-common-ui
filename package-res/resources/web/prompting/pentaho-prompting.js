@@ -92,6 +92,22 @@ pentaho.common.prompting = {
           return true;
         }
         return !showParameters.isSelectedValue('false');
+      },
+
+      getParameter: function(name) {
+        var param;
+        $.each(this.parameterGroups, function(i, g) {
+          $.each(this.parameters, function(j, p) {
+            if (p.name === name) {
+              param = p;
+              return false; // break
+            }
+          });
+          if (param) {
+            return false; // break
+          }
+        });
+        return param;
       }
     }
   },
@@ -457,12 +473,15 @@ pentaho.common.prompting = {
       var params = {};
       $.each(this.paramDefn.parameterGroups, function(i, group) {
         $.each(group.parameters, function(j, param) {
-          var value;
-          if ('true' != param.attributes['hidden']) {
-            value = Dashboards.getParameterValue(this.getParameterName(param));
-          }
+          var value = Dashboards.getParameterValue(this.getParameterName(param));
+          // if ((value == '' || value == undefined) && 'true' == param.attributes['hidden']) {
+          //   value = param.values
+          // }
           // Empty string is Dashboards' "null"
-          if (value !== '' && typeof value != 'undefined' && !$.isArray(value)) {
+          if (value === '' || typeof value == 'undefined') {
+            return; // continue
+          }
+          if (!$.isArray(value)) {
             value = [value];
           }
           params[param.name] = value;
@@ -514,7 +533,7 @@ pentaho.common.prompting = {
     };
 
     /**
-     * Sets the parameter value in Dashboards' parameter map.
+     * Sets the parameter value in Dashboards' parameter map to a properly initialized value.
      */
     this.initializeParameterValue = function(paramDefn, param) {
       var value = [];
@@ -528,8 +547,26 @@ pentaho.common.prompting = {
       } else if (value.length === 1) {
         value = value[0];
       }
-      Dashboards.setParameter(this.guid + param.name, value);
+      this.setParameterValue(param, value);
     };
+
+    /**
+     * Sets the parameter value in Dashboards' parameter map.
+     */
+    this.setParameterValue = function(param, value) {
+      Dashboards.setParameter(this.getParameterName(param), value);
+    };
+
+    /**
+     * Gets the parameter value from Dashboards' parameter map.
+     */
+    this.getParameterValue = function(param) {
+      if (typeof param == 'string') {
+        return Dashboards.getParameterValue(param);
+      } else {
+        return Dashboards.getParameterValue(this.getParameterName(param));
+      }
+    }
 
     this._submit = function() {
       this.submit(this);
@@ -644,7 +681,7 @@ pentaho.common.prompting = {
           }.bind(this));
         }.bind(this));
         // All parameters are initialized, fire the submit
-        this.submit();
+        this.submit(this);
       }
     },
 
