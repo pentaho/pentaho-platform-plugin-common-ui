@@ -39,6 +39,7 @@
 @import url("../../icons/editorIcons.css"); /* sprite for editor icons to be used by all themes */
 @import url("ColorPalette.css");
 @import url("tundra_rtl.css");
+@import url("PageControl.css");
 
 .hidden {
     display: none;
