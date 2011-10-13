@@ -245,6 +245,7 @@ pentaho.common.prompting.builders.MultiButtonBuilder = pentaho.common.prompting.
     var widget = this.base(args);
     return $.extend(widget, {
       type: 'MultiButtonComponent',
+      isMultiple: true,
       verticalOrientation: 'vertical' === args.param.attributes['parameter-layout'],
       expression: function() {
         return Dashboards.getParameterValue(this.parameter);
