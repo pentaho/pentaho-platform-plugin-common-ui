@@ -69,6 +69,10 @@ dojo.declare(
       this._resetPageNumber();
       return;
     }
+    if (this.pageNumber === pageNumber) {
+      // Prevent page number updates to the same value
+      return;
+    }
     try {
       this._updateInternalPageNumber(pageNumber);
     } catch (err) {
