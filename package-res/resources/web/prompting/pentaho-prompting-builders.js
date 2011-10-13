@@ -55,6 +55,7 @@ pentaho.common.prompting.builders.WidgetBuilder = {
     'list': 'pentaho.common.prompting.builders.ListBuilder',
     'datepicker': 'pentaho.common.prompting.builders.DateInputBuilder',
     'multi-line': 'pentaho.common.prompting.builders.TextAreaBuilder',
+    'gc': 'pentaho.common.prompting.builders.GarbageCollectorBuilder',
     'default': 'pentaho.common.prompting.builders.PlainPromptBuilder'
   },
 
@@ -280,24 +281,10 @@ pentaho.common.prompting.builders.RadioBuilder = pentaho.common.prompting.builde
 
 pentaho.common.prompting.builders.DateInputBuilder = pentaho.common.prompting.builders.ValueBasedParameterWidgetBuilder.extend({
   build: function(args) {
-    var widget = this.base(args);
-    var pattern = args.param.attributes['data-format'];
-    var formatter = args.promptPanel.createTextFormatter(args.promptPanel.paramDefn, args.param, pattern);
-
-    // clober JQuery UI DatePicker's parse and format functions
-    // $.datepicker.parseDate = function(pattern, date) {
-    //   return formatter.parse(date);
-    // };
-
-    // $.datepicker.formatDate = function(pattern, date) {
-    //   return formatter.format(date);
-    // };
-
-    // TODO Check and see if we can change this 
-    return $.extend(widget, {
-      name: widget.name + '-date-picker', // Name must differ from htmlObject for JQuery Date Picker to function.
-      type: 'RVDateInputComponent',
-      formatter: formatter
+    return $.extend(this.base(args), {
+      type: 'DojoDateTextBoxComponent',
+      transportFormatter: args.promptPanel.createDataTransportFormatter(args.promptPanel.paramDefn, args.param),
+      formatter: args.promptPanel.createFormatter(args.promptPanel.paramDefn, args.param)
     });
   }
 });
@@ -344,12 +331,13 @@ pentaho.common.prompting.builders.ParameterPanelBuilder = pentaho.common.prompti
 
 pentaho.common.prompting.builders.PlainPromptBuilder = pentaho.common.prompting.builders.ValueBasedParameterWidgetBuilder.extend({
   build: function(args) {
-    var formatter = args.promptPanel.createTextFormatter(args.promptPanel.paramDefn, args.param);
+    var transportFormatter = args.promptPanel.createDataTransportFormatter(args.promptPanel.paramDefn, args.param);
+    var formatter = args.promptPanel.createFormatter(args.promptPanel.paramDefn, args.param);
     var convertToAutocompleteValues = function(valuesArray) {
       return $.map(valuesArray, function(v) {
-        var value = formatter ? formatter.format(v[0]) : v[0];
+        var value = formatter ? formatter.format(transportFormatter.parse(v[0])) : v[0];
         // Label is key if it doesn't exist
-        var label = (formatter ? formatter.format(v[1]) : v[1]) || value;
+        var label = (formatter ? formatter.format(transportFormatter.parse(v[1])) : v[1]) || value;
         return {
           value: value,
           label: label
@@ -360,6 +348,7 @@ pentaho.common.prompting.builders.PlainPromptBuilder = pentaho.common.prompting.
     return $.extend(widget, {
       type: 'StaticAutocompleteBoxComponent',
       valuesArray: convertToAutocompleteValues(widget.valuesArray),
+      transportFormatter: transportFormatter,
       formatter: formatter
     });
   }
@@ -369,7 +358,39 @@ pentaho.common.prompting.builders.TextAreaBuilder = pentaho.common.prompting.bui
   build: function(args) {
     return $.extend(this.base(args), {
       type: 'TextAreaComponent',
-      formatter: args.promptPanel.createTextFormatter(args.promptPanel.paramDefn, args.param)
+      transportFormatter: args.promptPanel.createDataTransportFormatter(args.promptPanel.paramDefn, args.param),
+      formatter: args.promptPanel.createFormatter(args.promptPanel.paramDefn, args.param)
     });
+  }
+});
+
+
+/**
+ * Provides a way to execute code within Dashboards' update() loop.
+ * This can be useful to clean up old components in the same execution block and prevent
+ * and partial rendering from being visible to the user.
+ */
+pentaho.common.prompting.builders.GarbageCollectorBuilder = Base.extend({
+  build: function(args) {
+    return {
+      type: 'BaseComponent',
+      name: 'gc' + args.promptPanel.generateWidgetGUID(),
+      executeAtStart: true,
+      preExecution: function() {
+        $.each(args.components, function(i, c) {
+          try {
+            c.clear();
+          } catch (e) {
+            Dashboards.log("Error clearing " + c.name +":",'error');
+            Dashboards.log(e,'exception');  
+          }
+        });
+        setTimeout(function() {
+          // Remove myself from Dashboards.components when we're done updating
+          pentaho.common.prompting.removeDashboardComponents([this]);
+        }.bind(this));
+        return false; // Don't try to update, we're done
+      }
+    }
   }
 });

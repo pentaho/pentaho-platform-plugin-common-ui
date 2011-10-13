@@ -171,7 +171,13 @@ pentaho.common.prompting = {
 
   promptGUIDHelper: new GUIDHelper(),
 
-  removeDashboardComponents: function(components) {
+  /**
+   * Remove components from Dashboards.
+   * 
+   * @param components Components to remove from Dashboards.components.
+   * @param postponeClear If true we'll postpone calling component.clear() on all removed components.
+   */
+  removeDashboardComponents: function(components, postponeClear) {
     // Create a list of all embedded components to be removed
     var toRemove = [];
     var getComponents = function(c) {
@@ -195,8 +201,12 @@ pentaho.common.prompting = {
     // Remove references to each removed components parameter but leave the parameter so it may be reselected if it's reused by
     // another component
     $.each(removed, function(i, component) {
-      // component.clear();
-
+      // It would be wise to always call component.clear() here except that since Dashboards.init() schedules the components
+      // to update() in a setTimeout(). To prevent that, we'll clear the removed components with the GarbageCollectorComponent
+      // when we initialize the next set of components.
+      if (!postponeClear) {
+        component.clear();
+      }
       if (!component.parameter) {
         return;
       }
@@ -462,6 +472,18 @@ pentaho.common.prompting = {
     };
 
     /**
+     * This should return an object capable of formatting an object to the format used to send over the wire 
+     * (the format it is transported in). See PromptPanel.createFormatter() for how a format object should look.
+     *
+     * @param paramDefn Parameter definition
+     * @param parameter Parameter to create text formatter for
+     * @param pattern Optional pattern to use instead of any the parameter declares
+     */
+    this.createDataTransportFormatter = function(paramDefn, parameter, pattern) {
+      return undefined;
+    };
+
+    /**
      * This should return an object capable of formatting the 'type' to and from text. If no formatter
      * is required the return value should be undefined.
      *
@@ -479,13 +501,16 @@ pentaho.common.prompting = {
      * @param parameter Parameter to create text formatter for
      * @param pattern Optional pattern to use instead of any the parameter declares
      */
-    this.createTextFormatter = function(paramDefn, parameter, pattern) {
+    this.createFormatter = function(paramDefn, parameter, pattern) {
       return undefined;
     };
 
     this._widgetGUIDHelper = new GUIDHelper();
+    /**
+     * Generate a unique GUID for a widget of this panel.
+     */
     this.generateWidgetGUID = function() {
-      return this._widgetGUIDHelper.generateGUID();
+      return this.guid + '-' + this._widgetGUIDHelper.generateGUID();
     };
 
     /**
@@ -562,7 +587,9 @@ pentaho.common.prompting = {
       }
       if (b != undefined && a != b) {
         this.paramDefn = newParamDefn;
-        pentaho.common.prompting.removeDashboardComponents(this.components);
+        // Postpone the clearing of removed components if we'll be showing some components.
+        // We'll clear the old components with a special component in front of all other components during init().
+        pentaho.common.prompting.removeDashboardComponents(this.components, this.paramDefn.showParameterUI());
         this.init();
       }
     };
@@ -574,6 +601,7 @@ pentaho.common.prompting = {
       pentaho.common.prompting.prepareCDF();
 
       if (this.paramDefn.showParameterUI()) {
+        this._widgetGUIDHelper.reset(); // Clear the widget helper for this prompt
         var layout = pentaho.common.prompting.builders.WidgetBuilder.build(this, 'prompt-panel');
 
         var addComponents = function(components, c) {
@@ -589,6 +617,21 @@ pentaho.common.prompting = {
         $.each(layout.components, function(i, c) {
           addComponents(components, c);
         });
+
+        if (this.components && this.components.length > 0) {
+          // We have old components we MUST call .clear() on to prevent memory leaks. In order to 
+          // prevent flickering we must do this during the same execution block as when Dashboards
+          // updates the new components. We'll use our aptly named GarbageCollectorComponent to handle this.
+          var gc = pentaho.common.prompting.builders.WidgetBuilder.build({
+            promptPanel: this,
+            components: this.components
+          }, 'gc');
+
+          if (gc === undefined) {
+            throw 'Cannot create garbage collector';
+          }
+          components = [gc].concat(components);
+        }
 
         this.components = components;
 

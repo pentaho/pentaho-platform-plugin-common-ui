@@ -201,61 +201,40 @@ var ParameterPanelComponent = PanelComponent.extend({
   }
 });
 
-var RVDateInputComponent = DateInputComponent.extend({
+var DojoDateTextBoxComponent = BaseComponent.extend({
+  clear: function() {
+    if (this.dijitId) {
+      if (this.onChangeHandle) {
+        dojo.disconnect(this.onChangeHandle);
+      }
+      dijit.byId(this.dijitId).destroyRecursive();
+      delete this.dijitId;
+    }
+  },
   update: function() {
-    this.base();
-    // var val = this.formatter.format(Dashboards.getParameterValue(this.parameter));
-    // var format = this.param.attributes['data-format'];
+    dojo.require("pentaho.common.Calendar");
+    dojo.require("pentaho.common.DateTextBox");
+    var value = this.transportFormatter.parse(Dashboards.getParameterValue(this.parameter));
+    this.dijitId = this.htmlObject + '_input';
+    var input = $('#' + this.htmlObject).html($('<input/>').attr('id', this.dijitId));
+    var dateTextBox = new pentaho.common.DateTextBox({
+      name: this.name,
+      constraints: {
+        datePattern: this.param.attributes['data-format'],
+        selector: 'date',
+        formatLength: 'medium' // Used if datePattern is not defined, locale specific
+      }
+    }, this.dijitId);
 
-    // var hiddenInputId = this.htmlObject + '_hidden';
-    // var inputId = this.htmlObject + '_input';
-
-    // var ph = $('#' + this.htmlObject);
-
-    // var html = '<input id="' + inputId + '" value="' + val + '"/>';
-    // html += '<input id="' + hiddenInputId + '"/>';//' style="display:none"/>';
-    // ph.html(html);
-    // ph.html($('<input/>').attr('id', inputId).attr('value', val));
-    // ph.appendTo($('<input/>').attr('id', hiddenInputId));
-// try {
-//     // $(function() {
-//       $('#' + hiddenInputId).datepicker({
-//         dateFormat: 'yy-mm-dd'
-//       });
-//     // });
-// } catch (e) {
-//   alert(e);
-// }
-
-//     $('#' + inputId).click(function() {
-//       alert($('#' + hiddenInputId).datepicker('show').bind($('#' + hiddenInputId)));
-//     });
-
-    // $(function(){
-    //   $("#" + myself.htmlObject + " input").datepicker({
-    //     autoSize: true,
-    //     dateFormat: format,
-    //     changeMonth: true,
-    //     changeYear: true,
-    //     // minDate: startDate,
-    //     // maxDate: endDate,
-    //     onSelect: function(date, input){
-    //       Dashboards.processChange(this.name);
-    //     }.bind(this)
-    //   });
-    // });
-
-    // var picker = $('#' + this.name);
-    // picker.datepicker('option', 'autoSize', true); // Automatically resize field to accomodate date format
-
-    // var val = this.formatter.format(Dashboards.getParameterValue(this.parameter));
-    // console.log('rvdateinput: ' + val);
-    // picker.val(val);
+    dateTextBox.set('value', value, false);
+    this.onChangeHandle = dojo.connect(dateTextBox, "onChange", function() {
+      Dashboards.processChange(this.name);
+    }.bind(this));
   },
 
   getValue: function() {
-    var picker = $('#' + this.name);
-    return this.formatter.parse(picker.val());
+    var date = dijit.byId(this.dijitId).get('value');
+    return this.transportFormatter.format(date);
   }
 });
 
@@ -277,7 +256,7 @@ var StaticAutocompleteBoxComponent = BaseComponent.extend({
       var initialValue;
       $.each(this.param.values, function(i, v) {
         if (v.selected) {
-          initialValue = this.formatter ? this.formatter.format(v.label) : v.label;
+          initialValue = this.formatter ? this.formatter.format(this.transportFormatter.parse(v.label)) : v.label;
         }
       }.bind(this));
 
@@ -325,7 +304,7 @@ var StaticAutocompleteBoxComponent = BaseComponent.extend({
       // Return key for value or the value if not found
       return this.labelValueMap[val] || val;
     } else if (this.formatter) {
-      return this.formatter.parse(val);
+      return this.transportFormatter.format(this.formatter.parse(val));
     } else {
       return val;
     }
@@ -355,7 +334,7 @@ var TextAreaComponent = BaseComponent.extend({
   getValue: function() {
     var val = $('#' + this.htmlObject + '-input').val();
     if (this.formatter) {
-      return this.formatter.parse(val);
+      return this.transportFormatter.format(this.formatter.parse(val));
     } else {
       return val;
     }
