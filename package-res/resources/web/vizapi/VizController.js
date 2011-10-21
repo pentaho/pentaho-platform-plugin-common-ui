@@ -353,6 +353,10 @@ pentaho.VizController.prototype.doVisualization = function( visualization ) {
         } else {
             var chartDiv = this.visualPanelElement;
             eval( 'this.chart = new '+className+'(chartDiv)');
+            pentaho.events.addListener(this.chart, 'select', function(){ return myself.chartSelectHandler.apply(myself,arguments||[]);} );
+            pentaho.events.addListener(this.chart, 'doubleclick', function(){ return myself.chartDoubleClickHandler.apply(myself,arguments||[]);} );
+            pentaho.events.addListener(this.chart, 'onmouseover', function(){ return myself.chartMouseOverHandler.apply(myself,arguments||[]);} );
+            pentaho.events.addListener(this.chart, 'onmouseout', function(){ return myself.chartMouseOutHandler.apply(myself,arguments||[]);} );
         }
                      
         // Instantiate and draw our chart, passing in some options.
@@ -362,10 +366,6 @@ pentaho.VizController.prototype.doVisualization = function( visualization ) {
         this.chart.id = 'viz'+this.id;
         this.chart.vizId = visualization.id;
         
-        pentaho.events.addListener(this.chart, 'select', function(){ return myself.chartSelectHandler.apply(myself,arguments||[]);} );
-        pentaho.events.addListener(this.chart, 'onmouseover', function(){ return myself.chartMouseOverHandler.apply(myself,arguments||[]);} );
-        pentaho.events.addListener(this.chart, 'onmouseout', function(){ return myself.chartMouseOutHandler.apply(myself,arguments||[]);} );
-
         if( !currentView ) {
             alert('No suitable dataset');
             document.getElementById('chart_div').innerHTML = '';
@@ -390,6 +390,16 @@ pentaho.VizController.prototype.doVisualization = function( visualization ) {
     Called when the user clicks on something in the visualization
 */
 pentaho.VizController.prototype.chartSelectHandler = function(args) {
+    this.processHighlights(args);
+    pentaho.events.trigger( this, "select", args );
+}
+
+pentaho.VizController.prototype.chartDoubleClickHandler = function(args) {
+//    this.processHighlights(args);
+    pentaho.events.trigger( this, "doubleclick", args );
+}
+
+pentaho.VizController.prototype.processHighlights = function(args) {
 
     for (var i = 0; i < args.selections.length; i++) {
         var selectedItem = args.selections[i];
@@ -459,8 +469,6 @@ pentaho.VizController.prototype.chartSelectHandler = function(args) {
         }
     }
     this.updateHighlights();
-    
-    pentaho.events.trigger( this, "select", args );
 }
 
 
