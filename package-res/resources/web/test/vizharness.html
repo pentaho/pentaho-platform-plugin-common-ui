@@ -75,6 +75,7 @@
                 vizController.setDomNode(div);
                 
                 pentaho.events.addListener(vizController, 'select', selectionChange );
+                pentaho.events.addListener(vizController, 'doubleclick', doubleClick );
                 
                 var list = document.getElementById('vizlist');
                 for(var idx=0; idx<pentaho.visualizations.length; idx++) {
@@ -171,6 +172,17 @@
                 
                 var table = new pentaho.DataTable(jsonTable);
                 return table;
+            }
+            
+            function doubleClick() {
+                var selHint = '';
+                for( var idx=0; idx<vizController.highlights.length; idx++ ) {
+                    if(idx) {
+                        selHint += ", ";
+                    }
+                    selHint += vizController.highlights[idx].value;
+                }
+                alert('Double click: '+selHint);
             }
             
             function selectionChange() {
