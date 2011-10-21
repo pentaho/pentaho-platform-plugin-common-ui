@@ -238,7 +238,7 @@ pentaho.VizController.prototype.setTitle = function(title) {
 */
 pentaho.VizController.prototype.setVisualization = function(visualization) {
     try {
-        if( this.currentViz && this.currentViz.class != visualization.class ) {
+        if( this.currentViz && this.currentViz['class'] != visualization['class'] ) {
             // remove the old visualization
             this.setDomNode(this.domNode);
         }
@@ -286,7 +286,7 @@ pentaho.VizController.prototype.doVisualization = function( visualization ) {
     try {
         currentView = new pentaho.DataView(this.dataTable);
 
-        var className = visualization.class;
+        var className = visualization['class'];
 
         // Set chart options
         var options = {'title':this.title,
@@ -365,7 +365,7 @@ pentaho.VizController.prototype.doVisualization = function( visualization ) {
         this.chart.controller = this;
         this.chart.id = 'viz'+this.id;
         this.chart.vizId = visualization.id;
-        
+
         if( !currentView ) {
             alert('No suitable dataset');
             document.getElementById('chart_div').innerHTML = '';

@@ -14,7 +14,7 @@ pentaho.visualizations.push({
     type: 'barchart',                       // generic type id
     source: 'CCC',                          // id of the source library
     name: 'CCC Column',                     // visible name, this will come from a properties file eventually
-    class: 'pentaho.ccc.CccChart',          // type of the Javascript object to instantiate
+    'class': 'pentaho.ccc.CccChart',          // type of the Javascript object to instantiate
     args: {                                 // arguments to provide to the Javascript object
         cccClass: 'pvc.BarChart',
         stacked: false,
@@ -51,7 +51,7 @@ pentaho.visualizations.push({
     type: 'barchart',
     source: 'CCC',
     name: 'CCC Stacked Column',
-    class: 'pentaho.ccc.CccChart',
+    'class': 'pentaho.ccc.CccChart',
     args: {
         cccClass: 'pvc.BarChart',
         stacked: true,  
@@ -87,7 +87,7 @@ pentaho.visualizations.push({
     type: 'horzbarchart',
     source: 'CCC',
     name: 'CCC Bar',
-    class: 'pentaho.ccc.CccChart',
+    'class': 'pentaho.ccc.CccChart',
     args: {
         cccClass: 'pvc.BarChart',
         stacked: false,
@@ -123,7 +123,7 @@ pentaho.visualizations.push({
     type: 'horzbarchart',
     source: 'CCC',
     name: 'CCC Stacked Bar',
-    class: 'pentaho.ccc.CccChart',
+    'class': 'pentaho.ccc.CccChart',
     args: {
         cccClass: 'pvc.BarChart',
         stacked: true,
@@ -159,7 +159,7 @@ pentaho.visualizations.push({
     type: 'linechart',
     source: 'CCC',
     name: 'CCC Line',
-    class: 'pentaho.ccc.CccChart',
+    'class': 'pentaho.ccc.CccChart',
     args: {
         cccClass: 'pvc.LineChart',
         stacked: false,
@@ -196,7 +196,7 @@ pentaho.visualizations.push({
     type: 'areachart',
     source: 'CCC',
     name: 'CCC Area',
-    class: 'pentaho.ccc.CccChart',
+    'class': 'pentaho.ccc.CccChart',
     args: {
         cccClass: 'pvc.StackedAreaChart',
         stacked: true,
@@ -228,7 +228,7 @@ pentaho.visualizations.push({
     type: 'scatter',
     source: 'CCC',
     name: 'CCC Scatter',
-    class: 'pentaho.ccc.CccChart',
+    'class': 'pentaho.ccc.CccChart',
     args: {
         cccClass: 'pvc.MetricDotChart',
         showDots: true,
@@ -269,7 +269,7 @@ pentaho.visualizations.push({
     type: 'piechart',
     source: 'CCC',
     name: 'CCC Pie Chart',
-    class: 'pentaho.ccc.CccChart',
+    'class': 'pentaho.ccc.CccChart',
     args: {
         cccClass: 'pvc.PieChart'
     },
@@ -297,7 +297,7 @@ pentaho.visualizations.push({
     type: 'heatgrid',
     source: 'CCC',
     name: 'CCC Heat Grid',
-    class: 'pentaho.ccc.CccChart',
+    'class': 'pentaho.ccc.CccChart',
     args: {
         cccClass: 'pvc.HeatGridChart',
         crosstabMode: true,
