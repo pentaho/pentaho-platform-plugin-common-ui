@@ -51,7 +51,8 @@
 	"dojo.dnd.move",
     "dojo.dnd.Avatar",
     "dojo.dnd.Manager",
-    "dojox.widget.ColorPicker"
+    "dojox.widget.ColorPicker",
+    "dojox.storage"
     ]
     }
     ],

@@ -32,4 +32,11 @@
     type="xml,gwt"
     class="org.pentaho.common.ui.metadata.service.MetadataService"/>
 
+  <external-resources>
+      <!--<file context="global">content/common-ui/resources/web/dojo/dojo/dojo-all.js</file>-->
+      <!--<file context="global">content/common-ui/resources/web/cache/LocalCache.js</file>-->
+      <file context="global">content/common-ui/resources/web/cache/cache-service.js</file>
+  </external-resources>
+
+
 </plugin>
