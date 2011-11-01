@@ -601,11 +601,11 @@ pentaho.common.prompting = {
      * update will happen.
      */
     this.getParameterDefinition = function(promptPanel) {
-    },
+    };
 
     /**
-     * Called to refresh the prompt panel. This will invoke the refreshCallback to get a new parameter definition.
-     * If the new parameter definition is undefined or is the same as the previous no re-initialization is done.
+     * Called to refresh the prompt panel. This will invoke getParameterDefinition() to get a new parameter definition.
+     * If the new parameter definition is undefined (default impl) no re-initialization will be done.
      */
     this.refreshPrompt = function() {
       var newParamDefn;
@@ -615,15 +615,12 @@ pentaho.common.prompting = {
         alert('Error in refreshCallback'); // TODO Add better error message
         return;
       }
-      try {
-        var a = JSON.stringify(this.paramDefn);
-        var b = JSON.stringify(newParamDefn);
-      } catch (e) {
-        alert('Error parsing parameter definition'); // TODO Add better error message
-        return;
-      }
-      if (b != undefined && a != b) {
-        this.paramDefn = newParamDefn;
+      this.refresh(newParamDefn);
+    };
+
+    this.refresh = function(paramDefn) {
+      if (paramDefn != undefined) {
+        this.paramDefn = paramDefn;
         // Postpone the clearing of removed components if we'll be showing some components.
         // We'll clear the old components with a special component in front of all other components during init().
         pentaho.common.prompting.removeDashboardComponents(this.components, this.paramDefn.showParameterUI());
