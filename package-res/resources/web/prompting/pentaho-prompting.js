@@ -402,7 +402,7 @@ pentaho.common.prompting = {
      */
     this.normalizeParameterValue = function(parameter, type, value) {
       return value;
-    },
+    };
 
     this.parseErrors = function(paramDefn, xmlRoot) {
       var addToParameter = function(paramDefn, paramName, message) {
@@ -449,14 +449,14 @@ pentaho.common.prompting = {
      */
     this.getString = function(key, defaultString) {
       return defaultString || '!' + key + '!';
-    }
+    };
 
     /**
      * Get the current auto submit setting for this panel.
      */
     this.getAutoSubmitSetting = function() {
       return this.autoSubmit;
-    }
+    };
 
     /**
      * Returns a parameter name unique to this parameter panel.
@@ -566,7 +566,7 @@ pentaho.common.prompting = {
       } else {
         return Dashboards.getParameterValue(this.getParameterName(param));
       }
-    }
+    };
 
     this._submit = function() {
       this.submit(this);
@@ -680,21 +680,21 @@ pentaho.common.prompting = {
         // All parameters are initialized, fire the submit
         this.submit(this);
       }
-    },
+    };
 
     this.hide = function() {
       $('#' + this.destinationId).css('display', 'none');
-    }
+    };
 
     this.createSubmitPanel = function(paramDefn) {
       return pentaho.common.prompting.builders.WidgetBuilder.build({
         promptPanel: this
       }, 'submit-panel');
-    },
+    };
 
     this.getParameterPanelType = function() {
       return 'parameter-panel';
-    },
+    };
 
     this.createWidgetForParameter = function(paramDefn, param) {
       if (param.strict && param.values.length === 0) {
@@ -708,7 +708,7 @@ pentaho.common.prompting = {
         promptPanel: this,
         param: param
       });
-    },
+    };
 
     this.buildPanelComponents = function() {
       var panelComponents = [];
