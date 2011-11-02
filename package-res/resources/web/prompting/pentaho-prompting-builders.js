@@ -130,7 +130,8 @@ pentaho.common.prompting.builders.SubmitComponentBuilder = Base.extend({
       type: 'SubmitPromptComponent',
       name: guid,
       htmlObject: guid,
-      label: args.promptPanel.getString('submitButtonText', 'Submit'),
+      label: args.promptPanel.getString('submitButtonLabel', 'Submit'),
+      autoSubmitLabel: args.promptPanel.getString('autoSubmitLabel', 'Auto-Submit'),
       promptPanel: args.promptPanel,
       paramDefn: args.promptPanel.paramDefn,
       executeAtStart: true
@@ -282,10 +283,12 @@ pentaho.common.prompting.builders.RadioBuilder = pentaho.common.prompting.builde
 
 pentaho.common.prompting.builders.DateInputBuilder = pentaho.common.prompting.builders.ValueBasedParameterWidgetBuilder.extend({
   build: function(args) {
+    var formatter = args.promptPanel.createFormatter(args.promptPanel.paramDefn, args.param);
+
     return $.extend(this.base(args), {
       type: 'DojoDateTextBoxComponent',
-      transportFormatter: args.promptPanel.createDataTransportFormatter(args.promptPanel.paramDefn, args.param),
-      formatter: args.promptPanel.createFormatter(args.promptPanel.paramDefn, args.param)
+      transportFormatter: args.promptPanel.createDataTransportFormatter(args.promptPanel.paramDefn, args.param, formatter),
+      formatter: formatter
     });
   }
 });
@@ -332,8 +335,8 @@ pentaho.common.prompting.builders.ParameterPanelBuilder = pentaho.common.prompti
 
 pentaho.common.prompting.builders.PlainPromptBuilder = pentaho.common.prompting.builders.ValueBasedParameterWidgetBuilder.extend({
   build: function(args) {
-    var transportFormatter = args.promptPanel.createDataTransportFormatter(args.promptPanel.paramDefn, args.param);
     var formatter = args.promptPanel.createFormatter(args.promptPanel.paramDefn, args.param);
+    var transportFormatter = args.promptPanel.createDataTransportFormatter(args.promptPanel.paramDefn, args.param, formatter);
     var convertToAutocompleteValues = function(valuesArray) {
       return $.map(valuesArray, function(v) {
         var value = formatter ? formatter.format(transportFormatter.parse(v[0])) : v[0];
@@ -357,10 +360,11 @@ pentaho.common.prompting.builders.PlainPromptBuilder = pentaho.common.prompting.
 
 pentaho.common.prompting.builders.TextAreaBuilder = pentaho.common.prompting.builders.ValueBasedParameterWidgetBuilder.extend({
   build: function(args) {
+    var formatter = args.promptPanel.createFormatter(args.promptPanel.paramDefn, args.param);
     return $.extend(this.base(args), {
       type: 'TextAreaComponent',
-      transportFormatter: args.promptPanel.createDataTransportFormatter(args.promptPanel.paramDefn, args.param),
-      formatter: args.promptPanel.createFormatter(args.promptPanel.paramDefn, args.param)
+      transportFormatter: args.promptPanel.createDataTransportFormatter(args.promptPanel.paramDefn, args.param, formatter),
+      formatter: formatter
     });
   }
 });

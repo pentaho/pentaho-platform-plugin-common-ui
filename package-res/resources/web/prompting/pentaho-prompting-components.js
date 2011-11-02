@@ -18,11 +18,11 @@ var SubmitPromptComponent = ScopedPentahoButtonComponent.extend({
     // BISERVER-3821 Provide ability to remove Auto-Submit check box from report viewer
     // only show the UI for the autosubmit checkbox if no preference exists
     if (this.paramDefn.autoSubmit == undefined) {
-      var checkboxStr = '<label><input onclick=\'SubmitPromptComponent.prototype.updateAutoSubmit("' + this.name + '")\'';
+      var checkboxStr = '<label class="auto-complete-checkbox"><input onclick=\'SubmitPromptComponent.prototype.updateAutoSubmit("' + this.name + '")\'';
       if (this.promptPanel.autoSubmit) {
         checkboxStr += ' checked="checked"';
       }
-      checkboxStr += ' type="checkbox"/>' + this.promptPanel.getString('autoSubmitLabel', 'Auto-Submit') + '</label>';
+      checkboxStr += ' type="checkbox"/>' + this.autoSubmitLabel + '</label>';
       $(checkboxStr).appendTo($('#'+ this.htmlObject));
     }
     if (this.promptPanel.autoSubmit) {

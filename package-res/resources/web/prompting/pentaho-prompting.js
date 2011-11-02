@@ -497,8 +497,9 @@ pentaho.common.prompting = {
      * @param paramDefn Parameter definition
      * @param parameter Parameter to create text formatter for
      * @param pattern Optional pattern to use instead of any the parameter declares
+     * @param formatter Formatter used to format this parameter to display
      */
-    this.createDataTransportFormatter = function(paramDefn, parameter, pattern) {
+    this.createDataTransportFormatter = function(paramDefn, parameter, pattern, formatter) {
       return undefined;
     };
 
