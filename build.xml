@@ -159,6 +159,8 @@
 	  	<delete>
 			  <fileset dir="${dojo.prod.stage.dir}/util/doh">
 	    		<include name="runner.js"/>
+	    		<include name="runner2.js"/>
+				<include name="runner.css"/>
 			  </fileset>
 		  </delete>
 	    <copy todir="${dojo.prod.stage.dir}/util/doh">
