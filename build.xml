@@ -40,11 +40,6 @@
 	    </condition>
 	  </fail -->
 	
-  <target name="resolve" depends="subfloor-gwt.resolve">
-  	<taskdef name="xmltask" classname="com.oopsconsultancy.xmltask.ant.XmlTask" classpath="lib/xmltask-1.15.1.jar"/>
-  </target>
-
-
 	<property name="dev.res" value="dev-res"/>
 	
 	<property name="dojo.root"
@@ -166,11 +161,14 @@
 	    <copy todir="${dojo.prod.stage.dir}/util/doh">
 		      <fileset dir="build-res">
 		      	<include name="runner.js"/>
+	    		<include name="runner2.js"/>
+				<include name="runner.css"/>
 		      </fileset>
 	    </copy>
 	    <delete dir="${stage.dir}/javascript"/>
 
       <property environment="env"/>
+	  <taskdef name="xmltask" classname="com.oopsconsultancy.xmltask.ant.XmlTask" classpath="lib/xmltask-1.15.1.jar"/>
       <xmltask source="${approot.stage.dir}/settings.xml" 
         dest="${approot.stage.dir}/settings.xml">
           <insert path="/settings" xml="    &lt;plugin-id&gt;${env.JOB_NAME}&lt;/plugin-id&gt;"/>
