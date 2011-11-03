@@ -1,10 +1,10 @@
 div.prompt-panel {
-  background-color: #a0a0a0;
+  padding: 4px 0 0 8px;
+  overflow: auto;
 }
 
-div.prompt-panel.flow {
-  width: 100%;
-  float: left;
+div.prompt-panel .pentaho-toggle-button-container {
+  margin: 6px 0;
 }
 
 div.prompt-panel .pentaho-toggle-button-horizontal {
@@ -17,14 +17,40 @@ div.prompt-panel .pentaho-toggle-button-vertical {
   padding: 2px 14px;
 }
 
-div.prompt-panel div.parameter {
-  padding: 3px 0 0 18px;
-  max-height: 110px;
+div.prompt-panel div.parameter-label {
+  font-size: 10pt;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+div.prompt-panel div.parameter-wrapper {
+  overflow: auto;
+  margin: 4px;
+}
+
+div.prompt-panel div.flow div.parameter {
   float: left;
 }
 
+div.prompt-panel div.parameter {
+  margin: 0 10px 0 0;
+}
+
 div.prompt-panel div.parameter.error {
-  background-color: red;
+  border: 1px solid red;
+}
+
+div.submit-panel {
+  padding: 10px 0 8px 8px;
+}
+
+div.submit-panel div.schedule-button-container {
+  float: left;
+  margin: 0 4px 0 0;
+}
+
+div.submit-panel label.auto-complete-checkbox {
+  margin: 0 0 0 4px;
 }
 
 /* General UI styling for Autocomplete Menu

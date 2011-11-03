@@ -31,7 +31,7 @@ pentaho.common.prompting.builders.PromptPanelBuilder = Base.extend({
     var name = 'prompt' + promptPanel.guid;
     var layout = {
       name: name,
-      type: 'VerticalTableBasedPromptLayoutComponent',
+      type: 'ScrollingPromptPanelLayoutComponent',
       htmlObject: promptPanel.destinationId,
       promptPanel: promptPanel,
       components: promptPanel.buildPanelComponents()
@@ -48,6 +48,7 @@ pentaho.common.prompting.builders.WidgetBuilder = {
     'submit-panel': 'pentaho.common.prompting.builders.SubmitPanelBuilder',
     'submit': 'pentaho.common.prompting.builders.SubmitComponentBuilder',
     'label': 'pentaho.common.prompting.builders.LabelBuilder',
+    'error-label': 'pentaho.common.prompting.builders.ErrorLabelBuilder',
     'dropdown': 'pentaho.common.prompting.builders.DropDownBuilder',
     'radio': 'pentaho.common.prompting.builders.RadioBuilder',
     'checkbox': 'pentaho.common.prompting.builders.CheckBuilder',
@@ -105,6 +106,9 @@ pentaho.common.prompting.builders.SubmitPanelBuilder = Base.extend({
         label: args.promptPanel.getString('scheduleButtonLabel', 'Schedule'),
         expression: function() {
           args.promptPanel._schedule();
+        },
+        postExecution: function() {
+          $('#' + this.htmlObject).addClass('schedule-button-container');
         },
         executeAtStart: true
       });
@@ -174,6 +178,15 @@ pentaho.common.prompting.builders.LabelBuilder = pentaho.common.prompting.builde
       expression: function() { return label; }
     });
     delete widget.parameter; // labels don't have parameters
+    return widget;
+  }
+});
+
+pentaho.common.prompting.builders.ErrorLabelBuilder = pentaho.common.prompting.builders.LabelBuilder.extend({
+  build: function(args) {
+    var widget = this.base(args);
+    var label = args.errorMessage;
+    widget.expression = function() { return label; };
     return widget;
   }
 });
@@ -250,6 +263,9 @@ pentaho.common.prompting.builders.MultiButtonBuilder = pentaho.common.prompting.
       verticalOrientation: 'vertical' === args.param.attributes['parameter-layout'],
       expression: function() {
         return Dashboards.getParameterValue(this.parameter);
+      },
+      postExecution: function() {
+        $('#' + this.htmlObject).addClass('pentaho-toggle-button-container');
       }
     });
   }
@@ -307,13 +323,21 @@ pentaho.common.prompting.builders.ParameterGroupPanelBuilder = Base.extend({
 
   build: function(args) {
     var guid = args.promptPanel.generateWidgetGUID();
+
+    // Only provide a parameter group label for subscription groups
+    var label = undefined;
+    if (args.promptPanel.paramDefn.subscribe) {
+      label = args.paramGroup.label || ''; // Empty label will cause the legend to be drawn to outline the section without any text
+    }
+
     return {
       type: this.lookupPromptType(args.promptPanel.paramDefn),
       name: args.paramGroup.name,
       htmlObject: guid,
       promptPanel: args.promptPanel,
-      label: args.paramGroup.label,
-      components: args.components
+      label: label,
+      components: args.components,
+      cssClass: 'parameter-wrapper'
     };
   }
 });

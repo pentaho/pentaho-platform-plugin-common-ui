@@ -56,7 +56,7 @@ var CompositeComponent = BaseComponent.extend({
   },
 
   getClassFor: function(component) {
-    return undefined;
+    return component.cssClass;
   },
 
   getMarkupFor: function(component) {
@@ -73,7 +73,11 @@ var CompositeComponent = BaseComponent.extend({
     var html = '';
 
     if (this.label !== undefined) {
-      html += '<fieldset><legend>' + Dashboards.escapeHtml(this.label) + '</legend><div>';
+      html += '<fieldset>';
+      if (this.label.length > 0) {
+        html += '<legend>' + Dashboards.escapeHtml(this.label) + '</legend>';
+      }
+      html += '<div>';
     }
 
     if (this.components && this.components.length > 0) {
@@ -85,6 +89,10 @@ var CompositeComponent = BaseComponent.extend({
     }
 
     $('#' + this.htmlObject).html(html);
+
+    if (this.cssClass) {
+      $('#' + this.htmlObject).addClass(this.cssClass);
+    }
   },
 
   updateInternal: function() {
@@ -103,17 +111,10 @@ var PromptLayoutComponent = CompositeComponent.extend({
 
   getClassFor: function(component) {
     if (!component.param) { return; }
-    var errors = this.promptPanel.paramDefn.errors[component.param.name];
-    // TODO Round out the error prompting. Should probably move this to where we create the components (Panel.init()).
-    var classes = 'parameter';
-    if (errors && errors.length > 0) {
-      classes += ' error';
-    }
-    return classes;
+    return (component.cssClass || '') + ' parameter';
   },
 
   update: function() {
-    $('#' + this.htmlObject).addClass('prompt-panel');
     this.base();
   }
 });
@@ -129,7 +130,7 @@ var TableBasedPromptLayoutComponent = PromptLayoutComponent.extend({
 
   updateInternal: function() {
     var html = '<table cellspacing="0" cellpadding="0" class="parameter-container" style="width: 100%;">';
-    html += '<tr><td><div class="parameter-wrapper"><table cellspacing="0" cellpadding="0" style="width: 100%;">';
+    html += '<tr><td><div><table cellspacing="0" cellpadding="0">';
 
     html += this.getMarkupFor(this.components);
 
@@ -140,7 +141,7 @@ var TableBasedPromptLayoutComponent = PromptLayoutComponent.extend({
 var VerticalTableBasedPromptLayoutComponent = TableBasedPromptLayoutComponent.extend({
   getMarkupFor: function(components) {
     var html = '';
-    $.each(this.components, function(i, c) {
+    $.each(components, function(i, c) {
       var _class = this.getClassFor(c);
       // Assume components are contained in panels of components
       html += '<tr><td><div id="' + c.htmlObject + '"';
@@ -156,7 +157,7 @@ var VerticalTableBasedPromptLayoutComponent = TableBasedPromptLayoutComponent.ex
 var HorizontalTableBasedPromptLayoutComponent = TableBasedPromptLayoutComponent.extend({
   getMarkupFor: function(components) {
     var html = '<tr>';
-    $.each(this.components, function(i, c) {
+    $.each(components, function(i, c) {
       var _class = this.getClassFor(c);
       // Assume components are contained in panels of components
       html += '<td align="left" style="vertical-align: top;"><div id="' + c.htmlObject + '"';
@@ -176,6 +177,21 @@ var FlowPromptLayoutComponent = PromptLayoutComponent.extend({
   }
 });
 
+var ScrollingPromptPanelLayoutComponent = PromptLayoutComponent.extend({
+  update: function() {
+    var html = '<div class="prompt-panel">';
+    var submitHtml = '<div class="submit-panel">';
+    $.each(this.components, function(i, c) {
+      if (c.promptType === 'submit') {
+        submitHtml += this.getMarkupFor(c);
+      } else {
+        html += this.getMarkupFor(c);
+      }
+    }.bind(this));
+    html += '</div>' + submitHtml + '</div>';
+    $('#' + this.htmlObject).html(html);
+  }
+});
 
 var PanelComponent = CompositeComponent.extend({
   getClassFor: function(component) {

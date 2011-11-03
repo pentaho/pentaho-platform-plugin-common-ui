@@ -736,11 +736,34 @@ pentaho.common.prompting = {
               param: param
             }, 'label');
 
+          var errors = this.paramDefn.errors[param.name];
+          var errorLabels = [];
+          if (errors && errors.length > 0) {
+            $.each(errors, function(i, e) {
+              var l = pentaho.common.prompting.builders.WidgetBuilder.build({
+                promptPanel: this,
+                param: param,
+                errorMessage: e
+              }, 'error-label');
+              if (l) {
+                errorLabels.push(l);
+              }
+            }.bind(this));
+          }
+
+          var c = [label];
+          c = c.concat(errorLabels);
+          c.push(widget);
           var panel = pentaho.common.prompting.builders.WidgetBuilder.build({
               promptPanel: this,
               param: param,
-              components: [label, widget]
+              components: c
             }, this.getParameterPanelType());
+
+          if (errorLabels.length > 0) {
+            panel.cssClass = 'error';
+          }
+
           components.push(panel);
         }.bind(this));
         if (components.length > 0) {
