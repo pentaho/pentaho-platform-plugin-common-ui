@@ -1,0 +1,68 @@
+<html>
+    <head>
+
+        <!-- start customized section -->
+        <title>Pentaho-Geo Client-Side Unit Tests</title>
+        <!-- end customized section -->
+
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+        <!-- start customized section: fixup URLs if necessary -->
+        <link rel="stylesheet" type="text/css" href="../../dojo/util/doh/runner.css"/>    
+        <link rel="stylesheet" type="text/css" href="../../dojo/dijit/themes/pentaho/pentaho.css"/>
+        <script type="text/javascript">
+            //<![CDATA[
+            window.dojoUrl = "../../dojo/dojo/dojo-all.js.uncompressed.js";
+            //]]>
+        </script>
+        <!-- end url fixup section -->
+
+        <!-- start customized section: configure the dojo modules here -->
+        <script type="text/javascript">
+            //<![CDATA[
+                var djConfig = { 
+                    modulePaths: { },
+                    baseUrl: '../../dojo/dojo/',
+                    parseOnLoad: false
+                };
+            //]]>
+        </script>
+        <!-- enddojo section -->
+
+        <!-- start customized section: fixup URLs if necessary -->
+        <script type="text/javascript" src="../../dojo/dojo/dojo-all.js.uncompressed.js"></script>
+        <!-- end url fixup section -->
+
+        <script type="text/javascript">
+            //<![CDATA[
+                dojo.ready(doLoad);
+
+                function doLoad() {
+                    dojo.parser.parse();
+                    setupTestRunner()
+                }
+            //]]>
+        </script>
+
+        <!-- start customized section: reference your dependencies here -->
+        <script type="text/javascript" src="webcontext.js?context=common-ui"></script>
+        <!-- end dependencies -->
+
+        <!-- start customized section: reference your instrumented code or the code you want tested -->
+        <script type='text/javascript' djConfig='isDebug: true' src="../../instrumented/vizapi/DataTable.js"></script>
+        <!-- end instrumented code -->
+
+        <!-- start customized section: fixup URLs if necessary -->
+        <script language="javascript" type="text/javascript" src="../../dojo/util/doh/runner.js"></script>
+        <script language="javascript" type="text/javascript" src="../../dojo/util/doh/runner2.js"></script>
+        <!-- end url fixup section -->
+
+        <!-- start customized section: reference your unit test files here -->
+        <script type='text/javascript' djConfig='isDebug: true' src='vizapi/DataTableTests.js'></script>
+        <!-- end unit tests section -->
+
+    </head>
+    <body style="padding:10px; background-color: white">
+    </body>
+
+</html>
