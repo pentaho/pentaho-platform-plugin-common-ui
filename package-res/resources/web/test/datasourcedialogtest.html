@@ -11,16 +11,16 @@
         <script type="text/javascript">
             //<![CDATA[
 
-                var djConfig = { modulePaths: {
-                                dataapi: "../../dataapi",
-                                'pentaho.common': "../pentaho/common"
-                            },
-                           parseOnLoad: true,
-                           baseUrl: '../dojo/dojo/'
-                           };
-
+                $.extend(djConfig,
+                    { modulePaths: {
+                        'pentaho.common': "../pentaho/common"
+                    },
+                    parseOnLoad: true,
+                    baseUrl: '../dojo/dojo/'
+                });
               //]]>
         </script>
+
 
         <script language='javascript' type='text/javascript' src='../locale/Messages.js'></script>
         <script language='javascript' type='text/javascript' src='../dojo/dojo/dojo.js.uncompressed.js'></script>

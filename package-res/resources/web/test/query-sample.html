@@ -11,13 +11,13 @@
         <script type="text/javascript" src="webcontext.js?content=common-ui"></script>
 
         <script type="text/javascript">
-
-var djConfig = { modulePaths: {
-                        dataapi: "../../dataapi",
-                        'pentaho.common': "../pentaho/common"
-                    },
-                   baseUrl: '../dojo/dojo/'
-                };
+          $.extend(djConfig, { modulePaths: {
+                                  dataapi: "../../dataapi",
+                                  'pentaho.common': "../pentaho/common"
+                              },
+                              parseOnLoad: true,
+                              baseUrl: '../dojo/dojo/'
+                          });
 
         </script>
 

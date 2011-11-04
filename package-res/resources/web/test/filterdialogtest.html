@@ -12,13 +12,14 @@
         <script type="text/javascript">
         //<![CDATA[
 
-            var djConfig =  { modulePaths: {
-                                    dataapi: "../../dataapi",
-                                    'pentaho.common': "../pentaho/common"
-                                },
-                                parseOnLoad: true,
-                                baseUrl: '../dojo/dojo/'
-                            };
+        $.extend(djConfig, { modulePaths: {
+                                dataapi: "../../dataapi",
+                                'pentaho.common': "../pentaho/common"
+                            },
+                            parseOnLoad: true,
+                            baseUrl: '../dojo/dojo/'
+                        });
+
 
         //]]>
         </script>

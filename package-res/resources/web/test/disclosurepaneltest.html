@@ -8,18 +8,19 @@
 
         <script type="text/javascript" src="webcontext.js?content=common-ui"></script>
 
-        <script type="text/javascript">
-            //<![CDATA[
+      <script type="text/javascript">
+          //<![CDATA[
 
-                var djConfig = { modulePaths: {
-                                'pentaho.common': "../pentaho/common"
-                            },
-                           parseOnLoad: true,
-                           baseUrl: '../dojo/dojo/'
-                           };
+              $.extend(djConfig,
+                  { modulePaths: {
+                      'pentaho.common': "../pentaho/common"
+                  },
+                  parseOnLoad: true,
+                  baseUrl: '../dojo/dojo/'
+              });
+            //]]>
+      </script>
 
-              //]]>
-        </script>
 
         <script language='javascript' type='text/javascript' src='../dojo/dojo/dojo.js.uncompressed.js'></script>
         <script language='javascript' type='text/javascript' src='../dojo/dojo/dojo-ext.js.uncompressed.js'></script>
