@@ -393,7 +393,6 @@ pentaho.common.prompting.builders.TextAreaBuilder = pentaho.common.prompting.bui
   }
 });
 
-
 /**
  * Provides a way to execute code within Dashboards' update() loop.
  * This can be useful to clean up old components in the same execution block and prevent
@@ -406,7 +405,11 @@ pentaho.common.prompting.builders.GarbageCollectorBuilder = Base.extend({
       name: 'gc' + args.promptPanel.generateWidgetGUID(),
       executeAtStart: true,
       preExecution: function() {
-        $.each(args.components, function(i, c) {
+        // Clear the components in reverse since we have an exploded list of components.
+        // Clearing them in order would empty the parent container thus removing all
+        // elements from the dom before each individual component has a chance to clean up
+        // after themselves.
+        $.each(args.components.reverse(), function(i, c) {
           try {
             c.clear();
           } catch (e) {

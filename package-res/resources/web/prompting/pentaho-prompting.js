@@ -286,12 +286,31 @@ pentaho.common.prompting = {
     this.prepared = true;
   },
 
+  parseXML: function( data , xml , tmp ) {
+    if ( window.DOMParser ) { // Standard
+      tmp = new DOMParser();
+      xml = tmp.parseFromString( data , "text/xml" );
+    } else { // IE
+      xml = new ActiveXObject( "Microsoft.XMLDOM" );
+      xml.async = "false";
+      xml.loadXML( data );
+    }
+
+    tmp = xml.documentElement;
+
+    if ( ! tmp || ! tmp.nodeName || tmp.nodeName === "parsererror" ) {
+      jQuery.error( "Invalid XML: " + data );
+    }
+
+    return xml;
+  },
+
   /**
    * Parses a Parameter XML into a proper JSON object.
    */
   ParameterXmlParser: function() {
     this.parseParameterXml = function(xmlString) {
-      var xml = $($.parseXML(xmlString));
+      var xml = $(pentaho.common.prompting.parseXML(xmlString));
 
       if (xml.find('parsererror').length > 0) {
         throw xmlString;
@@ -656,7 +675,7 @@ pentaho.common.prompting = {
         if (this.components && this.components.length > 0) {
           // We have old components we MUST call .clear() on to prevent memory leaks. In order to 
           // prevent flickering we must do this during the same execution block as when Dashboards
-          // updates the new components. We'll use our aptly named GarbageCollectorComponent to handle this.
+          // updates the new components. We'll use our aptly named GarbageCollectorBuilder to handle this.
           var gc = pentaho.common.prompting.builders.WidgetBuilder.build({
             promptPanel: this,
             components: this.components
