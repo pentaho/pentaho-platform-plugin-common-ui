@@ -84,7 +84,7 @@ function setupTestRunner() {
 			'<tr valign="top" height="40">'+
 				'<td colspan="2" id="logoBar">'+
 					'<h3 style="margin: 5px 5px 0px 5px; float: left;">D.O.H.: The Dojo Objective Harness</h3>'+
-					'<button style="margin-top: 5px; float: left;" onclick="window.open(\'jscoverage/jscoverage.html\');">Coverage Report</button>'+
+					'<button style="margin-top: 5px; float: left;" onclick="window.open(\''+CONTEXT_PATH+'content/code-coverage/resources/web/jscoverage.html\');">Coverage Report</button>'+
 					'<button style="margin-top: 5px; float: left;" onclick="resetCoverage();">Reset</button>'+
 					'<img src="'+CONTEXT_PATH+'content/common-ui/resources/web/dojo/util/doh/small_logo.png" height="40" style="margin: 0px 5px 0px 5px; float: right;">'+
 					'<span style="margin: 10px 5px 0px 5px; float: right;">'+
