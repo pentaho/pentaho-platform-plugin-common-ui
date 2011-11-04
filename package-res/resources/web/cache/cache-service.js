@@ -9,4 +9,4 @@ getCacheExpirations = function() {
   });
 }
 
-$(document).ready(getCacheExpirations());
+$(document).ready(getCacheExpirations);

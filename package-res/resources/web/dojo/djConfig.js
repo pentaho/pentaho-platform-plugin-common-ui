@@ -28,6 +28,15 @@
       });
     </script>
  */
-var djConfig = {
-  disableFlashStorage: true /* turn off flash storage for client-side caching */
-};
+
+
+// don't overwrite this if they've set djConfig ahead of time
+if(djConfig == 'undefined' || djConfig == undefined) {
+  var djConfig = {
+    disableFlashStorage: true /* turn off flash storage for client-side caching */
+  };
+} else {
+  if(djConfig['disableFlashStorage'] == 'undefined' || djConfig['disableFlashStorage'] == undefined) {
+    djConfig.disableFlashStorage = true;
+  }
+}
