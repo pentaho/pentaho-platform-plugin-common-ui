@@ -22,7 +22,7 @@ pentaho.visualizations.push({
         extensionPoints: {
             xAxisLabel_textAngle: -1,
             xAxisLabel_textAlign: "right",
-            xAxisLabel_textBaseline: "top",
+            xAxisLabel_textBaseline: "top"
         }        
     },
     propMap: [],
@@ -59,7 +59,7 @@ pentaho.visualizations.push({
         extensionPoints: {
             xAxisLabel_textAngle: -1,
             xAxisLabel_textAlign: "right",
-            xAxisLabel_textBaseline: "top",
+            xAxisLabel_textBaseline: "top"
         }
     },
     propMap: [],
@@ -95,7 +95,7 @@ pentaho.visualizations.push({
         extensionPoints: {
             xAxisLabel_textAngle: -1,
             xAxisLabel_textAlign: "right",
-            xAxisLabel_textBaseline: "top",
+            xAxisLabel_textBaseline: "top"
         }
     },
     propMap: [],
