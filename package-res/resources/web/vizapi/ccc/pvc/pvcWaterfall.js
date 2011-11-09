@@ -234,6 +234,10 @@ pvc.WaterfallChartPanel = pvc.BasePanel.extend({
 
 
     getDataSet:  function() {
+        
+        //clear needed to force re-fetch of visible series
+        this.chart.dataEngine.clearDataCache();
+        
         var dataset = null
         // check whether it does not kill the source-data    
         dataset = this.stacked ?  
@@ -308,7 +312,7 @@ pvc.WaterfallChartPanel = pvc.BasePanel.extend({
         /** end fix **/
         var l2Scale = this.chart.getSecondScale(true);
         var oScale = this.chart.getOrdinalScale(true);
-        var bSCale = null;
+        var bScale = null;
 
         // determine barPositionOffset and bScale
         this.DF.maxBarSize = null;
@@ -355,7 +359,7 @@ pvc.WaterfallChartPanel = pvc.BasePanel.extend({
 
         this.DF.catContainerBasePosFunc = (stacked) ? null :
         function(d){
-            return oScale(this.index);
+            return oScale(myself.chart.dataEngine.getVisibleCategories()[d]);
         };
 
         this.DF.catContainerWidth = (stacked) ? null :
@@ -580,9 +584,9 @@ pvc.WaterfallChartPanel = pvc.BasePanel.extend({
         .text(function(d){
             var v = myself.chart.options.valueFormat(d);
             var s = myself.chart.dataEngine
-            .getVisibleSeries()[myself.stacked?this.parent.index:this.index]
+            .getVisibleSeries()[myself.stacked?this.parent.index:this.index];
             var c = myself.chart.dataEngine
-            .getVisibleCategories()[myself.stacked?this.index:this.parent.index]
+            .getVisibleCategories()[myself.stacked?this.index:this.parent.index];
             return myself.chart.options.tooltipFormat.call(myself,s,c,v);
     
         })
@@ -600,10 +604,12 @@ pvc.WaterfallChartPanel = pvc.BasePanel.extend({
             .cursor("pointer")
             .event("click",function(d){
                 var s = myself.chart.dataEngine
-                .getVisibleSeries()[myself.stacked?this.parent.index:this.index]
+                .getSeries()[myself.stacked?this.parent.index:this.index];
                 var c = myself.chart.dataEngine
-                .getVisibleCategories()[myself.stacked?this.index:this.parent.index]
-                return myself.chart.options.clickAction(s,c, d);
+                .getCategories()[myself.stacked?this.index:this.parent.index];
+                var elem = this.scene.$g.childNodes[this.index];
+                return myself.chart.options.clickAction(s,c, d, elem);
+
             });
         }
 

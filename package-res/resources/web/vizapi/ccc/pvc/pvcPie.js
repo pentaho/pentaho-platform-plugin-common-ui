@@ -149,30 +149,20 @@ pvc.PieChartPanel = pvc.BasePanel.extend({
 
     if(this.showTooltips){
       this.extend(this.chart.tipsySettings,"tooltip_");
-    }
-    
-    if(this.showTooltips || this.chart.options.mouseOverAction){
       this.pvPie
-      .event("mouseover", function(a,b,c,d) {
-            
-          if( myself.chart.options.mouseOverAction ) {
-            myself.chart.options.mouseOverAction(a,b,c,d)
-          }
-          if(myself.showTooltips) {
-            pv.Behavior.tipsy(this.chart.tipsySettings)
-          }
-        }
-      );
+      .event("mouseover", pv.Behavior.tipsy(this.chart.tipsySettings));
 
     }
+
 
     if (this.chart.options.clickable){
       this.pvPie
       .cursor("pointer")
       .event("click",function(d){
-        var s = myself.chart.dataEngine.getVisibleSeries()[this.parent.index]
-        var c = myself.chart.dataEngine.getVisibleCategories()[this.index]
-        return myself.chart.options.clickAction(s,c, d);
+        var s = myself.chart.dataEngine.getVisibleSeries()[this.parent.index];
+        var c = myself.chart.dataEngine.getVisibleCategories()[this.index];
+        var elem = this.scene.$g.childNodes[this.index];
+        return myself.chart.options.clickAction(s,c, d,elem);
       });
     }
 
