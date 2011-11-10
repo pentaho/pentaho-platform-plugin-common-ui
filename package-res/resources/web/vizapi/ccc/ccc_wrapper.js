@@ -338,7 +338,13 @@ pentaho.visualizations.push({
                 minColor: "#0EDFF1",
                 maxColor: "#0119F9",
                 isMultiValued: true,
-                useCompositeAxis:true
+                useCompositeAxis:true,
+      sizeValIdx:0,
+  colorValIdx: 1,
+  dataOptions: {
+    categoriesCount: 1,
+    measuresInColumns: true
+  },
 
     },
     propMap: [],
@@ -423,7 +429,29 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
         }
     }
 
-    if(vizOptions.cccClass == 'pvc.HeatGridChart' || vizOptions.cccClass == 'pvc.MetricDotChart') {
+    if(vizOptions.cccClass == 'pvc.HeatGridChart'){
+
+        //direct translation
+        for( var colNo=0; colNo<dataTable.getNumberOfColumns(); colNo++){
+            metadata.push({
+                colIndex: colNo,
+                colName: dataTable.getColumnLabel(colNo),
+                colLabel:dataTable.getColumnLabel(colNo),
+                colType: (dataTable.getColumnType(colNo) == 'number') ? 'NUMERIC' : 'STRING'
+            });
+        }
+        for(var rowNo=0; rowNo<dataTable.getNumberOfRows(); rowNo++) {
+            var row = [];
+            for( var colNo=0; colNo<dataTable.getNumberOfColumns(); colNo++) {
+                var val = (dataTable.getColumnType(colNo) == 'number')?
+                        dataTable.getValue(rowNo, colNo):
+                        dataTable.getFormattedValue(rowNo, colNo);
+                if(val == '-'){ val = null;}
+                row.push(val);
+            }
+            resultset.push(row);
+        }
+    } else if(vizOptions.cccClass == 'pvc.HeatGridChart' || vizOptions.cccClass == 'pvc.MetricDotChart') {
         // format the data for a HeatGridChart or MetricDotChart
 
         // add the category column metadata
