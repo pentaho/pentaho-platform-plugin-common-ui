@@ -131,7 +131,7 @@ pentaho.visualizations.push({
         extensionPoints: {
             xAxisLabel_textAngle: -1,
             xAxisLabel_textAlign: "right",
-            xAxisLabel_textBaseline: "top",
+            xAxisLabel_textBaseline: "top"
         }
     },
     propMap: [],
@@ -168,7 +168,7 @@ pentaho.visualizations.push({
         extensionPoints: {
             xAxisLabel_textAngle: -1,
             xAxisLabel_textAlign: "right",
-            xAxisLabel_textBaseline: "top",
+            xAxisLabel_textBaseline: "top"
         }
     },
     propMap: [],
@@ -293,83 +293,83 @@ pentaho.visualizations.push({
 });
 
 pentaho.visualizations.push({
-    id: 'ccc_heatgrid',
-    type: 'heatgrid',
-    source: 'CCC',
-    name: 'CCC Heat Grid',
-    'class': 'pentaho.ccc.CccChart',
-    args: {
-        cccClass: 'pvc.HeatGridChart',
-        crosstabMode: true,
-        normPerBaseCategory: false,
-        showValues: true,
-        showXScale: true,
-        xAxisPosition: "bottom",
-        showYScale: true,
-        yAxisPosition: "left",
+  id: 'ccc_heatgrid',
+  type: 'heatgrid',
+  source: 'CCC',
+  name: 'CCC Heat Grid',
+  'class': 'pentaho.ccc.CccChart',
+  args: {
+    cccClass: 'pvc.HeatGridChart',
+    crosstabMode: true,
+    normPerBaseCategory: false,
+    showValues: true,
+    showXScale: true,
+    xAxisPosition: "bottom",
+    showYScale: true,
+    yAxisPosition: "left",
 
-		seriesInRows: false,
-		animate: false,
+    seriesInRows: false,
+    animate: false,
 
-		timeSeries: false,
-		timeSeriesFormat: "%Y-%m-%d",
-		panelSizeRatio: 0.8,
-		orientation: "vertical",
-		showValues: false,
-		valuesAnchor: "right",
-		titlePosition: "top",
-		titleSize: 25,
-		showXScale: true,
-		xAxisPosition: "bottom",
-		xAxisSize: 30,
-		showYScale: true,
-		yAxisPosition: "left",
-		yAxisSize: 50,
-		xAxisFullGrid: false,
-		yAxisFullGrid: false,
-		orthoAxisOrdinal: false,
-		scalingType: "linear",
-		numSD: 2,
-		nullColor: "#efc5ad",
-		extensionPoints: [],
-                valuesAnchor: "right",
-                normPerBaseCategory: true,
-                useShapes: true,
-                minColor: "#0EDFF1",
-                maxColor: "#0119F9",
-                isMultiValued: true,
-                useCompositeAxis:true,
-      sizeValIdx:0,
-  colorValIdx: 1,
-  dataOptions: {
-    categoriesCount: 1,
-    measuresInColumns: true
+    timeSeries: false,
+    timeSeriesFormat: "%Y-%m-%d",
+    panelSizeRatio: 0.8,
+    orientation: "vertical",
+    showValues: false,
+    valuesAnchor: "right",
+    titlePosition: "top",
+    titleSize: 25,
+    showXScale: true,
+    xAxisPosition: "bottom",
+    xAxisSize: 30,
+    showYScale: true,
+    yAxisPosition: "left",
+    yAxisSize: 50,
+    xAxisFullGrid: false,
+    yAxisFullGrid: false,
+    orthoAxisOrdinal: false,
+    scalingType: "linear",
+    numSD: 2,
+    nullColor: "#efc5ad",
+    extensionPoints: [],
+    valuesAnchor: "right",
+    normPerBaseCategory: true,
+    useShapes: true,
+    minColor: "#0EDFF1",
+    maxColor: "#0119F9",
+    isMultiValued: true,
+    useCompositeAxis:true,
+    sizeValIdx:0,
+    colorValIdx: 1,
+    dataOptions: {
+      categoriesCount: 1,
+      measuresInColumns: true
+    }
+
   },
-
-    },
-    propMap: [],
-    dataReqs: [
-        [
-            {   id: 'category',
-                dataType: 'string',
-                dataStructure: 'row',
-                caption: 'Across',
-                required: true
-            },
-            {   id: 'category',
-                dataType: 'string',
-                dataStructure: 'column',
-                caption: 'Down',
-                required: true
-            },            
-            {   id: 'series',
-                dataType: 'number',
-                dataStructure: 'column',
-                caption: 'Values',
-                required: true
-            }
-        ]
+  propMap: [],
+  dataReqs: [
+    [
+      {   id: 'category',
+        dataType: 'string',
+        dataStructure: 'row',
+        caption: 'Across',
+        required: true
+      },
+      {   id: 'category',
+        dataType: 'string',
+        dataStructure: 'column',
+        caption: 'Down',
+        required: true
+      },
+      {   id: 'series',
+        dataType: 'number',
+        dataStructure: 'column',
+        caption: 'Values',
+        required: true
+      }
     ]
+  ]
 });
 
 /*
