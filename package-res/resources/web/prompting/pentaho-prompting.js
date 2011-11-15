@@ -378,7 +378,7 @@ pentaho.common.prompting = {
       param.list = 'true' == node.attr('is-list');
       param.multiSelect = 'true' == node.attr('is-multi-select');
       param.type = node.attr('type');
-      param.timezoneHint = node.attr('timezone-hint'); // TODO Change this to timzone-hint?
+      param.timezoneHint = node.attr('timezone-hint');
 
       // TODO Support namespaces
       $(node).find('attribute').each(function(i, attr) {
@@ -619,8 +619,11 @@ pentaho.common.prompting = {
     /**
      * This is called to refresh the prompt panel. It should return a new parameter definition. If it returns undefined no
      * update will happen.
+     * @param promptPanel the panel that needs a new parameter definition
+     * @param callback Function to call when the parameter definition has been fetched. It accepts a single argument: the new parameter definition, or undefined.
      */
-    this.getParameterDefinition = function(promptPanel) {
+    this.getParameterDefinition = function(promptPanel, callback) {
+      callback();
     };
 
     /**
@@ -630,12 +633,11 @@ pentaho.common.prompting = {
     this.refreshPrompt = function() {
       var newParamDefn;
       try {
-        newParamDefn = this.getParameterDefinition(this);
+        newParamDefn = this.getParameterDefinition(this, this.refresh.bind(this));
       } catch (e) {
         alert('Error in refreshCallback'); // TODO Add better error message
         return;
       }
-      this.refresh(newParamDefn);
     };
 
     this.refresh = function(paramDefn) {
