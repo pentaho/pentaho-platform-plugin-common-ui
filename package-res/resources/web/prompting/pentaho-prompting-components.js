@@ -178,6 +178,10 @@ var FlowPromptLayoutComponent = PromptLayoutComponent.extend({
 
 var ScrollingPromptPanelLayoutComponent = PromptLayoutComponent.extend({
   update: function() {
+    if (this.components.length == 0) {
+      $('#' + this.htmlObject).empty();
+      return;
+    }
     var html = '<div class="prompt-panel">';
     var submitHtml = '<div class="submit-panel">';
     $.each(this.components, function(i, c) {
