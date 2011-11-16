@@ -655,7 +655,7 @@ pentaho.common.prompting = {
      */
     this.init = function() {
       pentaho.common.prompting.prepareCDF();
-
+      var fireSubmit = true;
       if (this.paramDefn.showParameterUI()) {
         this._widgetGUIDHelper.reset(); // Clear the widget helper for this prompt
         var layout = pentaho.common.prompting.builders.WidgetBuilder.build(this, 'prompt-panel');
@@ -691,6 +691,13 @@ pentaho.common.prompting = {
 
         this.components = components;
 
+        // Don't fire the submit on load if we have a submit button. It will take care of firing this itself (based on auto-submit)
+        $.each(this.components, function(i, c) {
+          if (c.promptType == 'submit') {
+            fireSubmit = false;
+          }
+        });
+
         Dashboards.init(components);
       } else {
         $.each(paramDefn.parameterGroups, function(i, group) {
@@ -700,6 +707,9 @@ pentaho.common.prompting = {
           }.bind(this));
         }.bind(this));
         // All parameters are initialized, fire the submit
+        fireSubmit = true;
+      }
+      if (fireSubmit) {
         this.submit(this);
       }
     };
@@ -730,6 +740,14 @@ pentaho.common.prompting = {
         promptPanel: this,
         param: param
       });
+    };
+
+    /**
+     * Determines if the submit panel should be built for this panel. Default implementation checks for number of parameters.
+     * @param panelComponents Components being built for this panel.
+     */
+    this.shouldBuildSubmitPanel = function(panelComponents) {
+      return panelComponents.length > 0;
     };
 
     this.buildPanelComponents = function() {
@@ -797,7 +815,7 @@ pentaho.common.prompting = {
         }
       }.bind(this));
 
-      if (panelComponents.length > 0) {
+      if (this.shouldBuildSubmitPanel(panelComponents)) {
         var submitPanel = this.createSubmitPanel(this.paramDefn);
         if (submitPanel) {
           panelComponents.push(submitPanel);
