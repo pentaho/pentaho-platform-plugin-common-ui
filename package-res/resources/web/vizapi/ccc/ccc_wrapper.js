@@ -444,7 +444,7 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
             metadata.push({
                 colIndex: colNo,
                 colName: dataTable.getColumnLabel(colNo),
-                colLabel:dataTable.getColumn¤Label(colNo),
+                colLabel:dataTable.getColumnLabel(colNo),
                 colType: (dataTable.getColumnType(colNo) == 'number') ? 'NUMERIC' : 'STRING'
             });
         }
