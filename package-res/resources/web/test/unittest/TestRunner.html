@@ -2,7 +2,7 @@
     <head>
 
         <!-- start customized section -->
-        <title>Pentaho-Geo Client-Side Unit Tests</title>
+        <title>Pentaho Common UI Client-Side Unit Tests</title>
         <!-- end customized section -->
 
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -46,10 +46,21 @@
 
         <!-- start customized section: reference your dependencies here -->
         <script type="text/javascript" src="webcontext.js?context=common-ui"></script>
+        <!-- start prompting dependencies -->
+        <script language="javascript" type="text/javascript" src="../../../../../pentaho-cdf/js/jquery.ui.js"></script>
+        <script language="javascript" type="text/javascript" src="../../../../../pentaho-cdf/js/jquery.blockUI.js"></script>
+        <script language="javascript" type="text/javascript" src="../../../../../pentaho-cdf/js/Base.js"></script>
+        <script language="javascript" type="text/javascript" src="../../../../../pentaho-cdf/js/Dashboards.js"></script>
+        <script language="javascript" type="text/javascript" src="../../../../../pentaho-cdf/js/CoreComponents.js"></script>
+        <!-- end prompting dependencies -->
         <!-- end dependencies -->
 
         <!-- start customized section: reference your instrumented code or the code you want tested -->
         <script type='text/javascript' djConfig='isDebug: true' src="../../instrumented/vizapi/DataTable.js"></script>
+
+        <script type='text/javascript' djConfig='isDebug: true' src="../../instrumented/prompting/pentaho-prompting.js"></script>
+        <script type='text/javascript' djConfig='isDebug: true' src="../../instrumented/prompting/pentaho-prompting-builders.js"></script>
+        <script type='text/javascript' djConfig='isDebug: true' src="../../instrumented/prompting/pentaho-prompting-components.js"></script>        
         <!-- end instrumented code -->
 
         <!-- start customized section: fixup URLs if necessary -->
@@ -59,6 +70,7 @@
 
         <!-- start customized section: reference your unit test files here -->
         <script type='text/javascript' djConfig='isDebug: true' src='vizapi/DataTableTests.js'></script>
+        <script type='text/javascript' djConfig='isDebug: true' src='prompting/prompting-tests.js'></script>
         <!-- end unit tests section -->
 
     </head>
