@@ -5,6 +5,14 @@ pentaho.ccc = pentaho.ccc || {};
 
 pentaho.visualizations = pentaho.visualizations || [];
 
+pentaho.visualizations.getById = function(id){
+  for(var i=0; i< this.length; i++){
+    if(this[i].id == id){
+      return this[i];
+    }
+  }
+  return null;
+}
 /*
     Visualization Metadata
     These objects describe the visualizations provided by this library.
@@ -436,7 +444,7 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
             metadata.push({
                 colIndex: colNo,
                 colName: dataTable.getColumnLabel(colNo),
-                colLabel:dataTable.getColumnLabel(colNo),
+                colLabel:dataTable.getColumn¤Label(colNo),
                 colType: (dataTable.getColumnType(colNo) == 'number') ? 'NUMERIC' : 'STRING'
             });
         }
