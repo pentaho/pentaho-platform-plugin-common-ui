@@ -304,5 +304,5 @@ doh.register("Prompting Tests", [
 
       doh.assertTrue(submitCalled);
     }
-  },
+  }
 ]);
