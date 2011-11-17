@@ -53,6 +53,13 @@ div.submit-panel label.auto-complete-checkbox {
   margin: 0 0 0 4px;
 }
 
+div.prompt-panel ol,ul {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
 /* General UI styling for Autocomplete Menu
 ----------------------------------*/
  .ui-widget-content .ui-state-hover { border: 1px solid #D0D0D0; background-color: #D0D0D0; font-weight: normal; color: black; }
