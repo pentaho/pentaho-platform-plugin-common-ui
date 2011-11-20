@@ -422,6 +422,9 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
     this.seriesCount = 0;
     this.categories = [];
     
+    //count categories for heatGrid
+    var categoriesCount = 0;
+    
     // inspect the columns of the DataTable
     title = '';
     for( var colNo=0; colNo<dataTable.getNumberOfColumns(); colNo++) {
@@ -436,11 +439,14 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
             strings.push(colNo);
         }
     }
-
+    
     if(vizOptions.cccClass == 'pvc.HeatGridChart'){
-
+        categoriesCount = 0;
         //direct translation
         for( var colNo=0; colNo<dataTable.getNumberOfColumns(); colNo++){
+          if(dataTable.getColumnType(colNo) == 'string' ){
+            categoriesCount++;
+          }
             metadata.push({
                 colIndex: colNo,
                 colName: dataTable.getColumnLabel(colNo),
@@ -459,7 +465,8 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
             }
             resultset.push(row);
         }
-    } else if(vizOptions.cccClass == 'pvc.HeatGridChart' || vizOptions.cccClass == 'pvc.MetricDotChart') {
+        
+    } else if(vizOptions.cccClass == 'pvc.MetricDotChart') {
         // format the data for a HeatGridChart or MetricDotChart
 
         // add the category column metadata
@@ -656,6 +663,14 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
     // create the data options for the chart
     var dataOpts = {crosstabMode: vizOptions.crosstabMode ? vizOptions.crosstabMode : false,
         seriesInRows: false};
+        
+    if(vizOptions.cccClass == 'pvc.HeatGridChart'){
+      //update categories count
+      dataOpts.dataOptions = {
+          categoriesCount : categoriesCount,
+          measuresInColumns: true
+      };
+    }
 
     // copy options from the visualization metadata to the chart options
     for( x in vizOptions ) {
@@ -681,10 +696,10 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
     }
     
     // TODO -if we don't recreate a new chart it does not display new data, fix this...
-//    if( this.currentChartType != vizOptions.cccClass ) {
-        eval( 'this.chart = new '+vizOptions.cccClass+'(opts)' );
-        this.currentChartType = vizOptions.cccClass;
-//    }
+   // if( this.currentChartType != vizOptions.cccClass ) {
+      eval( 'this.chart = new '+vizOptions.cccClass+'(opts)' );
+      this.currentChartType = vizOptions.cccClass;
+   // }
     
     this.chart.setData($.extend(true, {}, this.cdaTable),dataOpts);
     this.chart.render();

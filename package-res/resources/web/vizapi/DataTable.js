@@ -160,6 +160,9 @@ pentaho.DataTable.prototype.getColumnLabel = function(columnIdx) {
     returns     The value of the specified cell
 */
 pentaho.DataTable.prototype.getValue = function(rowIdx,columnIdx) {
+    if(this.jsonTable.rows[rowIdx].c[columnIdx] == null){
+        return null;
+    }
     if( this.jsonTable.rows[rowIdx].c[columnIdx].v ) {
         // we have a value field so return it
         return this.jsonTable.rows[rowIdx].c[columnIdx].v;
