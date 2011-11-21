@@ -585,14 +585,18 @@ pentaho.VizController.createPaletteMap = function( items, palette ) {
     Return  an RGB() color
 */
 pentaho.VizController.getRrbGradient = function(value, min, max, color1, color2) {
-     
-        var inRange = (value-min)/(max-min);
-        var cols = new Array(3);
-        cols[0] = Math.floor( inRange * (color2[0] - color1[0]) + color1[0] );
-        cols[1] = Math.floor( inRange * (color2[1] - color1[1]) + color1[1] );
-        cols[2] = Math.floor( inRange * (color2[2] - color1[2]) + color1[2] );
-        return pentaho.VizController.getRrbColor(cols[0], cols[1], cols[2]);
-    }
+  if (value == max) {
+    return pentaho.VizController.getRrbColor(color2[0], color2[1], color2[2]);
+  } else if (value == min) {
+    return pentaho.VizController.getRrbColor(color1[0], color1[1], color1[2]);
+  }
+  var inRange = (value-min)/(max-min);
+  var cols = new Array(3);
+  cols[0] = Math.floor( inRange * (color2[0] - color1[0]) + color1[0] );
+  cols[1] = Math.floor( inRange * (color2[1] - color1[1]) + color1[1] );
+  cols[2] = Math.floor( inRange * (color2[2] - color1[2]) + color1[2] );
+  return pentaho.VizController.getRrbColor(cols[0], cols[1], cols[2]);
+}
 
 /*
     createPaletteMap
