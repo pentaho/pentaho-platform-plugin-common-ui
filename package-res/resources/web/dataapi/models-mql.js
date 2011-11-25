@@ -917,7 +917,11 @@ pentaho.pda.query.mql.prototype.getFilterValueString = function( column, value, 
           for(var idx=0; idx<parameters.length; idx++) {
               if( parameters[idx].name === value[0] ) {
                   // this has a parameter
-                  return '[param:'+parameters[idx].name+']';
+                  var param = '[param:'+parameters[idx].name+']';
+                  if( column.dataType == pentaho.pda.Column.DATA_TYPES.DATE ) {
+                    param = 'DATEVALUE('+param+')';
+                  }
+                  return param;
               }
           }
           throw new Error("unable to find parameter '" + value + "' for condition on column " + column + ".");
@@ -936,6 +940,9 @@ pentaho.pda.query.mql.prototype.getFilterValueString = function( column, value, 
         }
         if( column.dataType == pentaho.pda.Column.DATA_TYPES.NUMERIC ) {
             return ''+value;
+        }
+        if( column.dataType == pentaho.pda.Column.DATA_TYPES.DATE ) {
+            return 'DATEVALUE("'+value+'")';
         }
         if( column.dataType == pentaho.pda.Column.DATA_TYPES.BOOLEAN ) {
             return ''+value;
