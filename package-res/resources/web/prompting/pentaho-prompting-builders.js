@@ -212,6 +212,7 @@ pentaho.common.prompting.builders.ValueBasedParameterWidgetBuilder = pentaho.com
   build: function(args) {
     var widget = this.base(args);
     return $.extend(widget, {
+      valueAsId: false,
       valuesArray: this.getCDFValuesArray(args.param)
     });
   }
