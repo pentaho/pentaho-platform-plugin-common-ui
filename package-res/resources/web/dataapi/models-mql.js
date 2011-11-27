@@ -782,7 +782,7 @@ pentaho.pda.query.mql.prototype.getParameterXML = function( parameter ) {
         }
         if (   column.dataType === pentaho.pda.Column.DATA_TYPES.STRING
             || column.dataType === pentaho.pda.Column.DATA_TYPES.UNKNOWN) {
-            defaultValue = this.encodeXmlAttribute(defaultValue);
+            defaultValue = this.encodeXmlAttribute(defaultValue) || '';
         }
         xml += defaultValue;
         xml += '" name="'+parameter.name;
@@ -800,6 +800,9 @@ pentaho.pda.query.mql.prototype.encodeXmlAttribute = function(value) {
 }
 
 pentaho.pda.query.mql.prototype.getParameterValueString = function ( column, value ) {
+        if (value == null) {
+            return '';
+        }
         if( value.constructor.toString().indexOf("Array") != -1 ) {
             // we have an array of values
             var str = '';
@@ -910,7 +913,9 @@ pentaho.pda.query.mql.prototype.getFilterConditionString = function( columnId, c
     }
     
 pentaho.pda.query.mql.prototype.getFilterValueString = function( column, value, parameterized, parameters ) {
-
+        if (value == null) {
+            return '';
+        }
         if (parameterized) {
           // If this filter is parameterized it's value is the name of the parameter
           // see if we have parameters
