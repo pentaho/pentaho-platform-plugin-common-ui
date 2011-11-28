@@ -600,7 +600,7 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
     var myself=this;
     
     // create the options for the chart
-    opts = {
+    var opts = {
       canvas: this.elementName,
       animate:false,
       legend: true,
@@ -697,7 +697,8 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
     
     // TODO -if we don't recreate a new chart it does not display new data, fix this...
    // if( this.currentChartType != vizOptions.cccClass ) {
-      eval( 'this.chart = new '+vizOptions.cccClass+'(opts)' );
+      this.chart = eval("new "+vizOptions.cccClass+"(opts)");
+
       this.currentChartType = vizOptions.cccClass;
    // }
     
@@ -776,5 +777,11 @@ pentaho.ccc.CccChart.prototype.getOutputParameters = function() {
     
     return params;
 
+}
+
+pentaho.ccc.CccChart.prototype.resize = function(width, height){
+  this.vizOptions.width = width;
+  this.vizOptions.height = height;
+  this.draw(this.dataTable, this.vizOptions);
 }
 

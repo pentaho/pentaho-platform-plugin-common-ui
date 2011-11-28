@@ -17,19 +17,19 @@ pentaho.palettes = [];
 pentaho.palettes.push( {
     name: 'palette 1',
     colors: [
-		"#336699",
-		"#99CCFF",
-		"#999933",
-		"#666699",
-		"#CC9933",
-		"#006666",
-		"#3399FF",
-		"#993300",
-		"#CCCC99",
-		"#666666",
-		"#FFCC66",
-		"#6699CC",
-		"#663366"]
+        "#336699",
+        "#99CCFF",
+        "#999933",
+        "#666699",
+        "#CC9933",
+        "#006666",
+        "#3399FF",
+        "#993300",
+        "#CCCC99",
+        "#666666",
+        "#FFCC66",
+        "#6699CC",
+        "#663366"]
     }
 );
         
@@ -55,18 +55,18 @@ pentaho.palettes.push( {
     name: 'palette 3',
     colors: [
         "#387179",
-		"#626638",
-		"#A8979A",
-		"#B09A6B",
-		"#772200",
-		"#C52F0D",
-		"#123D82",
-		"#4A0866",
-		"#445500",
-		"#FFAA00",
-		"#1E8AD3",
-		"#AA6611",
-		"#772200"]
+        "#626638",
+        "#A8979A",
+        "#B09A6B",
+        "#772200",
+        "#C52F0D",
+        "#123D82",
+        "#4A0866",
+        "#445500",
+        "#FFAA00",
+        "#1E8AD3",
+        "#AA6611",
+        "#772200"]
     }
 );
 
@@ -605,4 +605,10 @@ pentaho.VizController.getRrbGradient = function(value, min, max, color1, color2)
 */
 pentaho.VizController.getRrbColor = function(r, g, b) {
         return 'RGB('+r+','+g+','+b+')';
+}
+
+pentaho.VizController.prototype.resize = function(width, height) {
+  this.visualPanelElement.style.width = width+"px";
+  this.visualPanelElement.style.height = height+"px";
+        this.chart.resize(width, height);
 }
