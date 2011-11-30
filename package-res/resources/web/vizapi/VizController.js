@@ -236,7 +236,7 @@ pentaho.VizController.prototype.setTitle = function(title) {
     visualization   Visualization metadata
     returns         true if there were no errors
 */
-pentaho.VizController.prototype.setVisualization = function(visualization) {
+pentaho.VizController.prototype.setVisualization = function(visualization, options) {
     try {
         if( this.currentViz && this.currentViz['class'] != visualization['class'] ) {
             // remove the old visualization
@@ -244,7 +244,7 @@ pentaho.VizController.prototype.setVisualization = function(visualization) {
         }
         this.currentViz = visualization;
         // dipslay the new visualization
-        this.doVisualization(visualization, false);
+        this.doVisualization(visualization, options);
         return true;
     } catch (e) {
         this.lastError = e;
@@ -258,13 +258,13 @@ pentaho.VizController.prototype.setVisualization = function(visualization) {
 
     returns         true if there were no errors
 */
-pentaho.VizController.prototype.updateVisualization = function() {
+pentaho.VizController.prototype.updateVisualization = function(options) {
     try {
         // update the current visualization, if possible
         if(!this.currentViz) {
             return;
         }
-        this.doVisualization(this.currentViz, false);
+        this.doVisualization(this.currentViz, options);
         return true;
     } catch (e) {
         this.lastError = e;
@@ -278,7 +278,8 @@ pentaho.VizController.prototype.updateVisualization = function() {
     
     returns         true if there were no errors
 */
-pentaho.VizController.prototype.doVisualization = function( visualization ) {
+pentaho.VizController.prototype.doVisualization = function( visualization, userDefinedOptions ) {
+    this.userDefinedOptions = userDefinedOptions || {};
 
     if(!this.dataTable) {
         return;
@@ -341,10 +342,14 @@ pentaho.VizController.prototype.doVisualization = function( visualization ) {
         }
                      
         if(visualization.args) {
-            for(x in visualization.args) {
+            for(var x in visualization.args) {
                 options[x] = visualization.args[x];
             }
         }
+        for(var x in this.userDefinedOptions) {
+            options[x] = this.userDefinedOptions[x];
+        }
+        
 
         var id = 'chart_div'+this.id;
                      
@@ -585,17 +590,13 @@ pentaho.VizController.createPaletteMap = function( items, palette ) {
     Return  an RGB() color
 */
 pentaho.VizController.getRrbGradient = function(value, min, max, color1, color2) {
-  if (value == max) {
-    return pentaho.VizController.getRrbColor(color2[0], color2[1], color2[2]);
-  } else if (value == min) {
-    return pentaho.VizController.getRrbColor(color1[0], color1[1], color1[2]);
-  }
-  var inRange = (value-min)/(max-min);
-  var cols = new Array(3);
-  cols[0] = Math.floor( inRange * (color2[0] - color1[0]) + color1[0] );
-  cols[1] = Math.floor( inRange * (color2[1] - color1[1]) + color1[1] );
-  cols[2] = Math.floor( inRange * (color2[2] - color1[2]) + color1[2] );
-  return pentaho.VizController.getRrbColor(cols[0], cols[1], cols[2]);
+     
+    var inRange = (value-min)/(max-min);
+    var cols = new Array(3);
+    cols[0] = Math.floor( inRange * (color2[0] - color1[0]) + color1[0] );
+    cols[1] = Math.floor( inRange * (color2[1] - color1[1]) + color1[1] );
+    cols[2] = Math.floor( inRange * (color2[2] - color1[2]) + color1[2] );
+    return pentaho.VizController.getRrbColor(cols[0], cols[1], cols[2]);
 }
 
 /*
@@ -604,11 +605,11 @@ pentaho.VizController.getRrbGradient = function(value, min, max, color1, color2)
     Return  an RGB() color
 */
 pentaho.VizController.getRrbColor = function(r, g, b) {
-        return 'RGB('+r+','+g+','+b+')';
+  return 'RGB('+r+','+g+','+b+')';
 }
 
 pentaho.VizController.prototype.resize = function(width, height) {
   this.visualPanelElement.style.width = width+"px";
   this.visualPanelElement.style.height = height+"px";
-        this.chart.resize(width, height);
+  this.chart.resize(width, height);
 }
