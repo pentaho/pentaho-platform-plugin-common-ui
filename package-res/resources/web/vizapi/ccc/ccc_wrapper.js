@@ -14,290 +14,290 @@ pentaho.visualizations.getById = function(id){
   return null;
 }
 /*
-    Visualization Metadata
-    These objects describe the visualizations provided by this library.
-*/
+ Visualization Metadata
+ These objects describe the visualizations provided by this library.
+ */
 pentaho.visualizations.push({
-    id: 'ccc_bar',                          // unique identifier
-    type: 'barchart',                       // generic type id
-    source: 'CCC',                          // id of the source library
-    name: 'CCC Column',                     // visible name, this will come from a properties file eventually
-    'class': 'pentaho.ccc.CccChart',          // type of the Javascript object to instantiate
-    args: {                                 // arguments to provide to the Javascript object
-        cccClass: 'pvc.BarChart',
-        stacked: false,
-        orientation: 'vertical',
-        extensionPoints: {
-            xAxisLabel_textAngle: -1,
-            xAxisLabel_textAlign: "right",
-            xAxisLabel_textBaseline: "top"
-        }        
-    },
-    propMap: [],
-    dataReqs: [                             // dataReqs describes the data requirements of this visualization
-        [
-            {   id: 'category',             // id of the data element
-                dataType: 'string',         // data type - 'string', 'number', 'date', 'boolean', 'any' or a comma separated list
-                dataStructure: 'column',    // 'column' or 'row' - only 'column' supported so far
-                caption: 'Category',        // visible name
-                required: true              // true or false
-            },
-            {   id: 'series',
-                dataType: 'number',
-                dataStructure: 'column',
-                caption: 'Values',
-                required: true,
-                allowMultiple: true         // true or false
-            }
-        ]
+  id: 'ccc_bar',                          // unique identifier
+  type: 'barchart',                       // generic type id
+  source: 'CCC',                          // id of the source library
+  name: 'CCC Column',                     // visible name, this will come from a properties file eventually
+  'class': 'pentaho.ccc.CccChart',          // type of the Javascript object to instantiate
+  args: {                                 // arguments to provide to the Javascript object
+    cccClass: 'pvc.BarChart',
+    stacked: false,
+    orientation: 'vertical',
+    extensionPoints: {
+      xAxisLabel_textAngle: -1,
+      xAxisLabel_textAlign: "right",
+      xAxisLabel_textBaseline: "top"
+    }
+  },
+  propMap: [],
+  dataReqs: [                             // dataReqs describes the data requirements of this visualization
+    [
+      {   id: 'category',             // id of the data element
+        dataType: 'string',         // data type - 'string', 'number', 'date', 'boolean', 'any' or a comma separated list
+        dataStructure: 'column',    // 'column' or 'row' - only 'column' supported so far
+        caption: 'Category',        // visible name
+        required: true              // true or false
+      },
+      {   id: 'series',
+        dataType: 'number',
+        dataStructure: 'column',
+        caption: 'Values',
+        required: true,
+        allowMultiple: true         // true or false
+      }
     ]
+  ]
 });
 
 
 pentaho.visualizations.push({
-    id: 'ccc_barstacked',
-    type: 'barchart',
-    source: 'CCC',
-    name: 'CCC Stacked Column',
-    'class': 'pentaho.ccc.CccChart',
-    args: {
-        cccClass: 'pvc.BarChart',
-        stacked: true,  
-        orientation: 'vertical'  ,
-        extensionPoints: {
-            xAxisLabel_textAngle: -1,
-            xAxisLabel_textAlign: "right",
-            xAxisLabel_textBaseline: "top"
-        }
-    },
-    propMap: [],
-    dataReqs: [
-        [
-            {   id: 'category',
-                dataType: 'string',
-                dataStructure: 'column',
-                caption: 'Category',
-                required: true
-            },
-            {   id: 'series',
-                dataType: 'number',
-                dataStructure: 'column',
-                caption: 'Values',
-                required: true,
-                allowMultiple: true
-            }
-        ]
+  id: 'ccc_barstacked',
+  type: 'barchart',
+  source: 'CCC',
+  name: 'CCC Stacked Column',
+  'class': 'pentaho.ccc.CccChart',
+  args: {
+    cccClass: 'pvc.BarChart',
+    stacked: true,
+    orientation: 'vertical'  ,
+    extensionPoints: {
+      xAxisLabel_textAngle: -1,
+      xAxisLabel_textAlign: "right",
+      xAxisLabel_textBaseline: "top"
+    }
+  },
+  propMap: [],
+  dataReqs: [
+    [
+      {   id: 'category',
+        dataType: 'string',
+        dataStructure: 'column',
+        caption: 'Category',
+        required: true
+      },
+      {   id: 'series',
+        dataType: 'number',
+        dataStructure: 'column',
+        caption: 'Values',
+        required: true,
+        allowMultiple: true
+      }
     ]
+  ]
 });
 
 pentaho.visualizations.push({
-    id: 'ccc_horzbar',
-    type: 'horzbarchart',
-    source: 'CCC',
-    name: 'CCC Bar',
-    'class': 'pentaho.ccc.CccChart',
-    args: {
-        cccClass: 'pvc.BarChart',
-        stacked: false,
-        orientation: 'horizontal',
-        extensionPoints: {
-            xAxisLabel_textAngle: -1,
-            xAxisLabel_textAlign: "right",
-            xAxisLabel_textBaseline: "top"
-        }
-    },
-    propMap: [],
-    dataReqs: [
-        [
-            {   id: 'category',
-                dataType: 'string',
-                dataStructure: 'column',
-                caption: 'Category',
-                required: true
-            },
-            {   id: 'series',
-                dataType: 'number',
-                dataStructure: 'column',
-                caption: 'Values',
-                required: true,
-                allowMultiple: true
-            }
-        ]
+  id: 'ccc_horzbar',
+  type: 'horzbarchart',
+  source: 'CCC',
+  name: 'CCC Bar',
+  'class': 'pentaho.ccc.CccChart',
+  args: {
+    cccClass: 'pvc.BarChart',
+    stacked: false,
+    orientation: 'horizontal',
+    extensionPoints: {
+      xAxisLabel_textAngle: -1,
+      xAxisLabel_textAlign: "right",
+      xAxisLabel_textBaseline: "top"
+    }
+  },
+  propMap: [],
+  dataReqs: [
+    [
+      {   id: 'category',
+        dataType: 'string',
+        dataStructure: 'column',
+        caption: 'Category',
+        required: true
+      },
+      {   id: 'series',
+        dataType: 'number',
+        dataStructure: 'column',
+        caption: 'Values',
+        required: true,
+        allowMultiple: true
+      }
     ]
+  ]
 });
 
 pentaho.visualizations.push({
-    id: 'ccc_horzbarstacked',
-    type: 'horzbarchart',
-    source: 'CCC',
-    name: 'CCC Stacked Bar',
-    'class': 'pentaho.ccc.CccChart',
-    args: {
-        cccClass: 'pvc.BarChart',
-        stacked: true,
-        orientation: 'horizontal',
-        extensionPoints: {
-            xAxisLabel_textAngle: -1,
-            xAxisLabel_textAlign: "right",
-            xAxisLabel_textBaseline: "top"
-        }
-    },
-    propMap: [],
-    dataReqs: [
-        [
-            {   id: 'category',
-                dataType: 'string',
-                dataStructure: 'column',
-                caption: 'Category',
-                required: true
-            },
-            {   id: 'series',
-                dataType: 'number',
-                dataStructure: 'column',
-                caption: 'Values',
-                required: true,
-                allowMultiple: true
-            }
-        ]
+  id: 'ccc_horzbarstacked',
+  type: 'horzbarchart',
+  source: 'CCC',
+  name: 'CCC Stacked Bar',
+  'class': 'pentaho.ccc.CccChart',
+  args: {
+    cccClass: 'pvc.BarChart',
+    stacked: true,
+    orientation: 'horizontal',
+    extensionPoints: {
+      xAxisLabel_textAngle: -1,
+      xAxisLabel_textAlign: "right",
+      xAxisLabel_textBaseline: "top"
+    }
+  },
+  propMap: [],
+  dataReqs: [
+    [
+      {   id: 'category',
+        dataType: 'string',
+        dataStructure: 'column',
+        caption: 'Category',
+        required: true
+      },
+      {   id: 'series',
+        dataType: 'number',
+        dataStructure: 'column',
+        caption: 'Values',
+        required: true,
+        allowMultiple: true
+      }
     ]
+  ]
 });
 
 pentaho.visualizations.push({
-    id: 'ccc_line',
-    type: 'linechart',
-    source: 'CCC',
-    name: 'CCC Line',
-    'class': 'pentaho.ccc.CccChart',
-    args: {
-        cccClass: 'pvc.LineChart',
-        stacked: false,
-        orientation: 'vertical',
-        showDots: true,
-        extensionPoints: {
-            xAxisLabel_textAngle: -1,
-            xAxisLabel_textAlign: "right",
-            xAxisLabel_textBaseline: "top"
-        }
-    },
-    propMap: [],
-    dataReqs: [
-        [
-            {   id: 'category',
-                dataType: 'string',
-                dataStructure: 'column',
-                caption: 'Category',
-                required: true
-            },
-            {   id: 'series',
-                dataType: 'number',
-                dataStructure: 'column',
-                caption: 'Values',
-                required: true,
-                allowMultiple: true
-            }
-        ]
+  id: 'ccc_line',
+  type: 'linechart',
+  source: 'CCC',
+  name: 'CCC Line',
+  'class': 'pentaho.ccc.CccChart',
+  args: {
+    cccClass: 'pvc.LineChart',
+    stacked: false,
+    orientation: 'vertical',
+    showDots: true,
+    extensionPoints: {
+      xAxisLabel_textAngle: -1,
+      xAxisLabel_textAlign: "right",
+      xAxisLabel_textBaseline: "top"
+    }
+  },
+  propMap: [],
+  dataReqs: [
+    [
+      {   id: 'category',
+        dataType: 'string',
+        dataStructure: 'column',
+        caption: 'Category',
+        required: true
+      },
+      {   id: 'series',
+        dataType: 'number',
+        dataStructure: 'column',
+        caption: 'Values',
+        required: true,
+        allowMultiple: true
+      }
     ]
+  ]
 });
 
 pentaho.visualizations.push({
-    id: 'ccc_area',
-    type: 'areachart',
-    source: 'CCC',
-    name: 'CCC Area',
-    'class': 'pentaho.ccc.CccChart',
-    args: {
-        cccClass: 'pvc.StackedAreaChart',
-        stacked: true,
-        orientation: 'vertical',
-        showDots: false
-    },
-    propMap: [],
-    dataReqs: [
-        [
-            {   id: 'category',
-                dataType: 'string',
-                dataStructure: 'column',
-                caption: 'Category',
-                required: true
-            },
-            {   id: 'series',
-                dataType: 'number',
-                dataStructure: 'column',
-                caption: 'Values',
-                required: true,
-                allowMultiple: true
-            }
-        ]
+  id: 'ccc_area',
+  type: 'areachart',
+  source: 'CCC',
+  name: 'CCC Area',
+  'class': 'pentaho.ccc.CccChart',
+  args: {
+    cccClass: 'pvc.StackedAreaChart',
+    stacked: true,
+    orientation: 'vertical',
+    showDots: false
+  },
+  propMap: [],
+  dataReqs: [
+    [
+      {   id: 'category',
+        dataType: 'string',
+        dataStructure: 'column',
+        caption: 'Category',
+        required: true
+      },
+      {   id: 'series',
+        dataType: 'number',
+        dataStructure: 'column',
+        caption: 'Values',
+        required: true,
+        allowMultiple: true
+      }
     ]
+  ]
 });
 
 pentaho.visualizations.push({
-    id: 'ccc_scatter',
-    type: 'scatter',
-    source: 'CCC',
-    name: 'CCC Scatter',
-    'class': 'pentaho.ccc.CccChart',
-    args: {
-        cccClass: 'pvc.MetricDotChart',
-        showDots: true,
-        yAxisSize: 30,
-        xAxisSize: 30,
-        xAxisFullGrid: true,
-        yAxisFullGrid: true
-    },
-    propMap: [],
-    dataReqs: [
-        [
-            {   id: 'category',
-                dataType: 'string',
-                dataStructure: 'column',
-                caption: 'Category',
-                required: true
-            },
-            {   id: 'series',
-                dataType: 'number',
-                dataStructure: 'column',
-                caption: 'X Axis',
-                required: true,
-                allowMultiple: false
-            },
-            {   id: 'series2',
-                dataType: 'number',
-                dataStructure: 'column',
-                caption: 'Y Axis',
-                required: true,
-                allowMultiple: true
-            }
-        ]
+  id: 'ccc_scatter',
+  type: 'scatter',
+  source: 'CCC',
+  name: 'CCC Scatter',
+  'class': 'pentaho.ccc.CccChart',
+  args: {
+    cccClass: 'pvc.MetricDotChart',
+    showDots: true,
+    yAxisSize: 30,
+    xAxisSize: 30,
+    xAxisFullGrid: true,
+    yAxisFullGrid: true
+  },
+  propMap: [],
+  dataReqs: [
+    [
+      {   id: 'category',
+        dataType: 'string',
+        dataStructure: 'column',
+        caption: 'Category',
+        required: true
+      },
+      {   id: 'series',
+        dataType: 'number',
+        dataStructure: 'column',
+        caption: 'X Axis',
+        required: true,
+        allowMultiple: false
+      },
+      {   id: 'series2',
+        dataType: 'number',
+        dataStructure: 'column',
+        caption: 'Y Axis',
+        required: true,
+        allowMultiple: true
+      }
     ]
+  ]
 });
 
 pentaho.visualizations.push({
-    id: 'ccc_pie',
-    type: 'piechart',
-    source: 'CCC',
-    name: 'CCC Pie Chart',
-    'class': 'pentaho.ccc.CccChart',
-    args: {
-        cccClass: 'pvc.PieChart'
-    },
-    propMap: [],
-    dataReqs: [
-        [
-            {   id: 'category',
-                dataType: 'string',
-                dataStructure: 'column',
-                caption: 'Slices',
-                required: true
-            },
-            {   id: 'series',
-                dataType: 'number',
-                dataStructure: 'column',
-                caption: 'Values',
-                required: true
-            }
-        ]
+  id: 'ccc_pie',
+  type: 'piechart',
+  source: 'CCC',
+  name: 'CCC Pie Chart',
+  'class': 'pentaho.ccc.CccChart',
+  args: {
+    cccClass: 'pvc.PieChart'
+  },
+  propMap: [],
+  dataReqs: [
+    [
+      {   id: 'category',
+        dataType: 'string',
+        dataStructure: 'column',
+        caption: 'Slices',
+        required: true
+      },
+      {   id: 'series',
+        dataType: 'number',
+        dataStructure: 'column',
+        caption: 'Values',
+        required: true
+      }
     ]
+  ]
 });
 
 pentaho.visualizations.push({
@@ -306,10 +306,18 @@ pentaho.visualizations.push({
   source: 'CCC',
   name: 'CCC Heat Grid',
   'class': 'pentaho.ccc.CccChart',
+
+  getDropZoneLabel : function (type) {
+    if (type == 'ROW') return 'Categories';
+    if (type == 'COL') return 'Series';
+    if (type == 'NUM') return 'Color/Size measures';
+    return '?';
+  },
+
   args: {
     cccClass: 'pvc.HeatGridChart',
     crosstabMode: true,
-    normPerBaseCategory: false,
+    normPerBaseCategory: true,
     showValues: true,
     showXScale: true,
     xAxisPosition: "bottom",
@@ -341,14 +349,11 @@ pentaho.visualizations.push({
     nullColor: "#efc5ad",
     extensionPoints: [],
     valuesAnchor: "right",
-    normPerBaseCategory: true,
     useShapes: true,
-    minColor: "#0EDFF1",
-    maxColor: "#0119F9",
     isMultiValued: true,
     useCompositeAxis:true,
-    sizeValIdx:0,
-    colorValIdx: 1,
+    sizeValIdx:1,
+    colorValIdx: 0,
     dataOptions: {
       categoriesCount: 1,
       measuresInColumns: true
@@ -381,401 +386,553 @@ pentaho.visualizations.push({
 });
 
 /*
-    CccChart constructor
-    This takes an HTML DOM element as a parameter
-*/
+ CccChart constructor
+ This takes an HTML DOM element as a parameter
+ */
 pentaho.ccc.CccChart = function( element ) {
-    this.element = element;
-    this.elementName = element.id;
-    this.cdaTable = null;
-    this.dataTable = null;
-    this.vizOptions = null;
-    this.series = [];
-    this.selections = [];
-    this.currentChartType = null;
-    this.categories = [];
+  this.element = element;
+  this.elementName = element.id;
+  this.cdaTable = null;
+  this.dataTable = null;
+  this.vizOptions = null;
+  this.series = [];
+  this.selections = [];
+  this.currentChartType = null;
+  this.categories = [];
 }
 
 /*
-    draw()
-    
-    dataTable   a pentaho.DataTable object with the data to display
-    vizOptions  the options for the visualization
-*/
+ draw()
+
+ dataTable   a pentaho.DataTable object with the data to display
+ vizOptions  the options for the visualization
+ */
 pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
 
-    // store the incoming parameters for later use
-    this.vizOptions = vizOptions;
-    this.dataTable = dataTable;
-    
-    // store the current highlighted selections
-    this.selections = vizOptions.selections;
+  // store the incoming parameters for later use
+  this.vizOptions = vizOptions;
+  this.dataTable = dataTable;
 
-    // local variables
-    var metadata = [];
-    var measures = [];
-    var strings = [];
-    var resultset = [];
-    var colors = null;
-    
-    // store the series count and the categories
-    this.seriesCount = 0;
-    this.categories = [];
-    
-    //count categories for heatGrid
-    var categoriesCount = 0;
-    
-    // inspect the columns of the DataTable
-    title = '';
-    for( var colNo=0; colNo<dataTable.getNumberOfColumns(); colNo++) {
-        if( dataTable.getColumnType(colNo).toUpperCase() == 'NUMBER' ) {
-            measures.push(colNo);
-        }
-        else if( dataTable.getColumnType(colNo).toUpperCase() == 'STRING' ) {
-            if( title ) {
-                title += ' and '; // TODO localize
-            }
-            title += dataTable.getColumnLabel(colNo);
-            strings.push(colNo);
-        }
+  // store the current highlighted selections
+  this.selections = vizOptions.selections;
+
+  // local variables
+  var metadata = [];
+  var measures = [];
+  var strings = [];
+  var resultset = [];
+  var colors = null;
+
+  // store the series count and the categories
+  this.seriesCount = 0;
+  this.categories = [];
+
+  //count categories for heatGrid
+  var categoriesCount = 0;
+
+  // inspect the columns of the DataTable
+  title = '';
+  for( var colNo=0; colNo<dataTable.getNumberOfColumns(); colNo++) {
+    if( dataTable.getColumnType(colNo).toUpperCase() == 'NUMBER' ) {
+      measures.push(colNo);
     }
-    
-    if(vizOptions.cccClass == 'pvc.HeatGridChart'){
-        categoriesCount = 0;
-        //direct translation
-        for( var colNo=0; colNo<dataTable.getNumberOfColumns(); colNo++){
-          if(dataTable.getColumnType(colNo) == 'string' ){
-            categoriesCount++;
+    else if( dataTable.getColumnType(colNo).toUpperCase() == 'STRING' ) {
+      if( title ) {
+        title += ' and '; // TODO localize
+      }
+      title += dataTable.getColumnLabel(colNo);
+      strings.push(colNo);
+    }
+  }
+
+  if(vizOptions.cccClass == 'pvc.HeatGridChart'){
+    categoriesCount = 0;
+    //direct translation
+    for( var colNo=0; colNo<dataTable.getNumberOfColumns(); colNo++){
+      if(dataTable.getColumnType(colNo) == 'string' ){
+        categoriesCount++;
+      }
+      metadata.push({
+        colIndex: colNo,
+        colName: dataTable.getColumnLabel(colNo),
+        colLabel:dataTable.getColumnLabel(colNo),
+        colType: (dataTable.getColumnType(colNo) == 'number') ? 'NUMERIC' : 'STRING'
+      });
+    }
+    for(var rowNo=0; rowNo<dataTable.getNumberOfRows(); rowNo++) {
+      var row = [];
+      for( var colNo=0; colNo<dataTable.getNumberOfColumns(); colNo++) {
+        var val = (dataTable.getColumnType(colNo) == 'number')?
+            dataTable.getValue(rowNo, colNo):
+            dataTable.getFormattedValue(rowNo, colNo);
+        if(val == '-'){ val = null;}
+        row.push(val);
+      }
+      resultset.push(row);
+    }
+
+  } else if(vizOptions.cccClass == 'pvc.MetricDotChart') {
+    // format the data for a HeatGridChart or MetricDotChart
+
+    // add the category column metadata
+    metadata.push({
+      colIndex: 0,
+      colName: 'Categories',
+      colLabel: title,
+      colType: 'STRING'
+    });
+
+    // add the numeric columns metadata
+    for( var measureNo=0; measureNo<measures.length; measureNo++ ) {
+      metadata.push({
+        colIndex: measureNo+1,
+        colName: dataTable.getColumnId(measures[measureNo]),
+        colLabel: dataTable.getColumnLabel(measures[measureNo]),
+        colType: 'NUMERIC'
+      });
+    }
+
+    // process the rows
+    for(var rowNo=0; rowNo<dataTable.getNumberOfRows(); rowNo++) {
+      // concat all of the strings
+      var category = '';
+      var row = [];
+      for( var stringNo=0; stringNo<strings.length; stringNo++ ) {
+        if( category ) {
+          category += ' ~ ';
+        }
+        category += dataTable.getFormattedValue( rowNo, strings[stringNo] );
+      }
+      row.push(category);
+      for( var measureNo=0; measureNo<measures.length; measureNo++ ) {
+        row.push( dataTable.getValue( rowNo, measures[measureNo] ) );
+      }
+      resultset.push(row);
+    }
+
+  } else if(vizOptions.cccClass == 'pvc.BarChart' || vizOptions.cccClass == 'pvc.LineChart' ||
+      vizOptions.cccClass == 'pvc.StackedAreaChart' ) {
+    // format the data for a BarChart, LineChart, or StackedAreaChart
+
+    this.seriesCount = measures.length;
+
+    colors = [];
+    for( var measureNo=0; measureNo<measures.length; measureNo++ ) {
+      colors.push(vizOptions.palette.colors[measureNo]);
+    }
+    // create the metadata
+    metadata.push({
+      colIndex: 0,
+      colName: 'Series',
+      colLabel: 'Series',
+      colType: 'STRING'
+    });
+    metadata.push({
+      colIndex: 1,
+      colName: 'Category',
+      colLabel: 'Category',
+      colType: 'STRING'
+    });
+    metadata.push({
+      colIndex: 2,
+      colName: 'Value',
+      colLabel: 'Value',
+      colType: 'NUMERIC'
+    });
+
+    // process the rows
+    var catMap = {};
+    for(var rowNo=0; rowNo<dataTable.getNumberOfRows(); rowNo++) {
+      // concat all of the strings
+      var category = '';
+      var row = [];
+      for( var colNo=0; colNo<dataTable.getNumberOfColumns(); colNo++) {
+        if( dataTable.getColumnType(colNo).toUpperCase() == 'STRING' ) {
+          if( category ) {
+            category += ' ~ ';
           }
-            metadata.push({
-                colIndex: colNo,
-                colName: dataTable.getColumnLabel(colNo),
-                colLabel:dataTable.getColumnLabel(colNo),
-                colType: (dataTable.getColumnType(colNo) == 'number') ? 'NUMERIC' : 'STRING'
-            });
+          category += dataTable.getFormattedValue( rowNo, colNo );
         }
-        for(var rowNo=0; rowNo<dataTable.getNumberOfRows(); rowNo++) {
-            var row = [];
-            for( var colNo=0; colNo<dataTable.getNumberOfColumns(); colNo++) {
-                var val = (dataTable.getColumnType(colNo) == 'number')?
-                        dataTable.getValue(rowNo, colNo):
-                        dataTable.getFormattedValue(rowNo, colNo);
-                if(val == '-'){ val = null;}
-                row.push(val);
-            }
-            resultset.push(row);
+      }
+      if(!catMap[category] ) {
+        catMap[category] = true;
+        this.categories.push(category);
+      }
+
+      for( var measureNo=0; measureNo<measures.length; measureNo++ ) {
+        var row = [ dataTable.getColumnLabel(measures[measureNo]), category, dataTable.getValue( rowNo, measures[measureNo] ) ];
+        resultset.push(row);
+      }
+    }
+  } else if(vizOptions.cccClass == 'pvc.PieChart') {
+    // format the data for a PieChart
+
+    this.seriesCount = 1;
+
+    // create the metadata
+    metadata.push({
+      colIndex: 0,
+      colName: 'Category',
+      colLabel: title,
+      colType: 'STRING'
+    });
+
+    metadata.push({
+      colIndex: 0,
+      colName: 'Value',
+      colLabel: 'Value',
+      colType: 'NUMERIC'
+    });
+
+    // process the rows
+    for(var rowNo=0; rowNo<dataTable.getNumberOfRows(); rowNo++) {
+      // concat all of the strings
+      var category = '';
+      var row = [];
+      for( var stringNo=0; stringNo<strings.length; stringNo++ ) {
+        if( category ) {
+          category += ' ~ ';
         }
-        
-    } else if(vizOptions.cccClass == 'pvc.MetricDotChart') {
-        // format the data for a HeatGridChart or MetricDotChart
-
-        // add the category column metadata
-        metadata.push({
-            colIndex: 0,
-            colName: 'Categories',
-            colLabel: title,
-            colType: 'STRING'
-        });
-        
-        // add the numeric columns metadata
-        for( var measureNo=0; measureNo<measures.length; measureNo++ ) {
-            metadata.push({
-                colIndex: measureNo+1,
-                colName: dataTable.getColumnId(measures[measureNo]),
-                colLabel: dataTable.getColumnLabel(measures[measureNo]),
-                colType: 'NUMERIC'
-            });            
-        }
-        
-        // process the rows
-        for(var rowNo=0; rowNo<dataTable.getNumberOfRows(); rowNo++) {
-            // concat all of the strings
-            var category = '';
-            var row = [];
-            for( var stringNo=0; stringNo<strings.length; stringNo++ ) {
-                if( category ) {
-                    category += ' ~ ';
-                }
-                category += dataTable.getFormattedValue( rowNo, strings[stringNo] );
-            }
-            row.push(category);
-            for( var measureNo=0; measureNo<measures.length; measureNo++ ) {
-                row.push( dataTable.getValue( rowNo, measures[measureNo] ) );
-            }
-            resultset.push(row);
-        }
-
-    } else if(vizOptions.cccClass == 'pvc.BarChart' || vizOptions.cccClass == 'pvc.LineChart' || 
-        vizOptions.cccClass == 'pvc.StackedAreaChart' ) {
-        // format the data for a BarChart, LineChart, or StackedAreaChart
-
-        this.seriesCount = measures.length;
-
-        colors = [];
-        for( var measureNo=0; measureNo<measures.length; measureNo++ ) {
-            colors.push(vizOptions.palette.colors[measureNo]);
-        }        
-        // create the metadata
-        metadata.push({
-            colIndex: 0,
-            colName: 'Series',
-            colLabel: 'Series',
-            colType: 'STRING'
-        });
-        metadata.push({
-            colIndex: 1,
-            colName: 'Category',
-            colLabel: 'Category',
-            colType: 'STRING'
-        });        
-        metadata.push({
-            colIndex: 2,
-            colName: 'Value',
-            colLabel: 'Value',
-            colType: 'NUMERIC'
-        });
-
-        // process the rows
-        var catMap = {};
-        for(var rowNo=0; rowNo<dataTable.getNumberOfRows(); rowNo++) {
-            // concat all of the strings
-            var category = '';
-            var row = [];
-            for( var colNo=0; colNo<dataTable.getNumberOfColumns(); colNo++) {
-                if( dataTable.getColumnType(colNo).toUpperCase() == 'STRING' ) {
-                    if( category ) {
-                        category += ' ~ ';
-                    }
-                    category += dataTable.getFormattedValue( rowNo, colNo );
-                }
-            }
-            if(!catMap[category] ) {
-                catMap[category] = true;
-                this.categories.push(category);
-            }
-            
-            for( var measureNo=0; measureNo<measures.length; measureNo++ ) {
-                var row = [ dataTable.getColumnLabel(measures[measureNo]), category, dataTable.getValue( rowNo, measures[measureNo] ) ];
-                resultset.push(row);
-            }
-        }
-    } else if(vizOptions.cccClass == 'pvc.PieChart') { 
-        // format the data for a PieChart
-        
-        this.seriesCount = 1;
-
-        // create the metadata
-        metadata.push({
-            colIndex: 0,
-            colName: 'Category',
-            colLabel: title,
-            colType: 'STRING'
-        });
-        
-        metadata.push({
-            colIndex: 0,
-            colName: 'Value',
-            colLabel: 'Value',
-            colType: 'NUMERIC'
-        });
-        
-        // process the rows
-        for(var rowNo=0; rowNo<dataTable.getNumberOfRows(); rowNo++) {
-            // concat all of the strings
-            var category = '';
-            var row = [];
-            for( var stringNo=0; stringNo<strings.length; stringNo++ ) {
-                if( category ) {
-                    category += ' ~ ';
-                }
-                category += dataTable.getFormattedValue( rowNo, strings[stringNo] );
-            }
-            row.push(category);
-            row.push( dataTable.getValue( rowNo, measures[0] ) );
-            resultset.push(row);
-        }
-        
+        category += dataTable.getFormattedValue( rowNo, strings[stringNo] );
+      }
+      row.push(category);
+      row.push( dataTable.getValue( rowNo, measures[0] ) );
+      resultset.push(row);
     }
 
-    var myself=this;
-    
-    // create the options for the chart
-    var opts = {
-      canvas: this.elementName,
-      animate:false,
-      legend: true,
-      legendPosition:"bottom",
-      legendAlign: "middle",
-      showTooltips: true,
-      showValues: false,
-      clickable: true,
-      title: title,
-      titlePosition: 'top',
-      colors: colors ? colors : this.getColors(),
-      clickAction: function(s,c, d){
-        // handle click events
-        if(pentaho && pentaho.events && pentaho.events.trigger ) {
-            var table = myself.cdaTable;
-            // create a selection object to describe the clicked item
-            var selections = [{
-                type: 'cell',
-                rowId: myself.dataTable.getColumnId(0),
-                rowLabel: myself.dataTable.getColumnLabel(0),
-                value: d
-            }];
-            if( myself.vizOptions.cccClass == 'pvc.PieChart' ) {
-                selections[0].type = 'row';
-                selections[0].column = 1;
-                selections[0].columnId = myself.dataTable.getColumnId(1);
-                selections[0].columnLabel = myself.dataTable.getColumnLabel(1);
-            } else {
-                // find the right column
-                for( var colNo=0; colNo<myself.dataTable.getNumberOfColumns(); colNo++) {
-                    if( myself.dataTable.getColumnLabel(colNo) == s ) {
-                        selections[0].column = colNo;
-                        selections[0].columnId = myself.dataTable.getColumnId(colNo);
-                        selections[0].columnLabel = myself.dataTable.getColumnLabel(colNo);
-                        break;
-                    }
-                }
+  }
+
+  var myself=this;
+
+  // create the options for the chart
+  var opts = {
+    canvas: this.elementName,
+    animate:false,
+    legend: true,
+    legendPosition:"bottom",
+    legendAlign: "middle",
+    showTooltips: true,
+    showValues: false,
+    clickable: true,
+    title: title,
+    titlePosition: 'top',
+    colors: colors ? colors : this.getColors(),
+    clickAction: function(s,c, d){
+      // handle click events
+      if(pentaho && pentaho.events && pentaho.events.trigger ) {
+        var table = myself.cdaTable;
+        // create a selection object to describe the clicked item
+        var selections = [{
+          type: 'cell',
+          rowId: myself.dataTable.getColumnId(0),
+          rowLabel: myself.dataTable.getColumnLabel(0),
+          value: d
+        }];
+        if( myself.vizOptions.cccClass == 'pvc.PieChart' ) {
+          selections[0].type = 'row';
+          selections[0].column = 1;
+          selections[0].columnId = myself.dataTable.getColumnId(1);
+          selections[0].columnLabel = myself.dataTable.getColumnLabel(1);
+        } else {
+          // find the right column
+          for( var colNo=0; colNo<myself.dataTable.getNumberOfColumns(); colNo++) {
+            if( myself.dataTable.getColumnLabel(colNo) == s ) {
+              selections[0].column = colNo;
+              selections[0].columnId = myself.dataTable.getColumnId(colNo);
+              selections[0].columnLabel = myself.dataTable.getColumnLabel(colNo);
+              break;
             }
-            for( var rowNo=0; rowNo<myself.dataTable.getNumberOfRows(); rowNo++) {
-                if( myself.dataTable.getValue(rowNo,0) == c ) {
-                    selections[0].row = rowNo;
-                    selections[0].rowItem = myself.dataTable.getValue(rowNo,0);
-                    var args = {
-                        source: myself,
-                        selections: selections
-                    };
-                    // trigger the selection event
-                    pentaho.events.trigger( myself, "select", args );
-                    break;
-                }
-            }
+          }
         }
-      },
-        mouseOverAction: function(a,b,c,d) {
+        for( var rowNo=0; rowNo<myself.dataTable.getNumberOfRows(); rowNo++) {
+          if( myself.dataTable.getValue(rowNo,0) == c ) {
+            selections[0].row = rowNo;
+            selections[0].rowItem = myself.dataTable.getValue(rowNo,0);
+            var args = {
+              source: myself,
+              selections: selections
+            };
+            // trigger the selection event
+            pentaho.events.trigger( myself, "select", args );
+            break;
+          }
+        }
+      }
+    },
+    mouseOverAction: function(a,b,c,d) {
+    },
+    mouseUpAction: function(a,b,c,d) {
+    }
+  }
+
+
+  // create the data options for the chart
+  var dataOpts = {crosstabMode: vizOptions.crosstabMode ? vizOptions.crosstabMode : false,
+    seriesInRows: false};
+
+  if(vizOptions.cccClass == 'pvc.HeatGridChart')
+  {
+    var categoryMatches = function(category, dataTableVal){
+      return pvc.arrayEquals(category, dataTableVal);
+    };
+    var seriesMatches = function(series, dataTableVal){//TODO:
+      var seriesStr = $.isArray(series)?
+          series.join('~'):
+          series;
+      var idx = dataTableVal.lastIndexOf('~');
+      if(idx < 0) {idx = dataTableVal.length;}
+      return dataTableVal.substring(0, idx) == seriesStr;
+    }
+
+    //use selection event handler instead of clickAction
+    opts.clickAction = undefined;
+
+    var doubleClickAction = function(nodePath){
+      pentaho.events.trigger( myself, "select", args );
+    };
+
+    opts.onSelectionChange = function(cccSelections)
+    {
+      var numMeasures = cv.getActiveReport().reportDoc.getReportNode().selectNodes("cv:measures/cv:measure").length;
+      var selections = [];
+      var categoryColNo = 0;
+      var seriesRowNo = 0;
+      var seriesColStart=categoriesCount;
+      for(var i=0; i < cccSelections.length; i++)
+      {//ccc selections work on a category x series basis, translate to VizController selections
+        var c = cccSelections[i].category;
+        var s = cccSelections[i].series;
+        var selection = {
+          type: 'cell',
+          rowLabel: myself.dataTable.getColumnLabel(categoriesCount-1)
+        };
+        for(var rowNo=0; rowNo<myself.dataTable.getNumberOfRows(); rowNo++)
+        {//category -> row
+          var categories = [];
+          for(var j = categoryColNo;j<categoriesCount;j++){
+            categories.push(myself.dataTable.getFormattedValue(rowNo,j));
+          }
+          if(categoryMatches(c, categories))
+          {
+            selection.row = rowNo;
+            var rowItems = [], rowIds = [];
+            for(var j = categoryColNo;j<categoriesCount;j++){
+              rowItems.push(myself.dataTable.getValue(rowNo,j));
+              rowIds.push(myself.dataTable.getColumnId(j));
+            }
+            selection.rowItem = rowItems;// myself.dataTable.getValue(rowNo,categoryColNo);
+            selection.rowId = rowIds;
+            break;
+          }
+        }
+        for(var colNo=seriesColStart; colNo < myself.dataTable.getNumberOfColumns(); colNo+=numMeasures)
+        {//just catch first occurrence
+          if(seriesMatches(s, myself.dataTable.getColumnLabel(colNo))){
+            selection.column = colNo;
+            //get measure out
+            var colId = myself.dataTable.getColumnId(colNo);
+            var endSplitIdx = colId.lastIndexOf('~');
+            if(endSplitIdx < 0) { endSplitIdx = colId.length-1; }
+            selection.columnItem =  colId.substring(0,endSplitIdx).split('~');
+            selection.measureId = colId.substring(endSplitIdx+1, colId.length);
+
+            var columnIds = [];
+            var columnIdNodes = cv.getActiveReport().reportDoc.getReportNode().selectNodes('cv:columnAttributes/cv:attribute/@formula');
+            for(var j = 0;j<columnIdNodes.length;j++){
+              columnIds.push(columnIdNodes[j].firstChild.data);
+            }
+            selection.columnId = columnIds;//columnIds[columnIds.length-1].firstChild.data;// colId[0];//TODO:how?? //myself.dataTable.getColumnId(colNo);
+            selection.columnLabel = myself.dataTable.getColumnLabel(colNo);
+            break;
+          }
+        }
+        if(selection.row != null && selection.column != null){
+          selection.value = myself.dataTable.getValue(selection.row,selection.column);
+        }
+        selections.push(selection);
+      }
+      var args = {
+        source: myself,
+        selections: selections
+      };
+      pentaho.events.trigger( myself, "select", args );
+    };//onSelectionChange
+
+    vizOptions.controller.domNode.style.overflow = 'hidden'; //Hide overflow
+
+    opts.yAxisDoubleClickAction =  function (s, c, d) {
+
+      var ctxArray = [];
+      var rowItems = {};
+
+      $(s).each(function (i, elt) {
+        var formula = cv.getActiveReport().reportDoc.getReportNode().selectNodes('cv:columnAttributes/cv:attribute/@formula')[i].value;
+        var category = formula.split('.')[0];
+        var rowItem = rowItems[category];
+        if (!rowItem) rowItem = category;
+        rowItem = rowItem +  '.[' + elt + ']';
+        rowItems[category] = rowItem;
+      });
+
+      var formula = cv.getActiveReport().reportDoc.getReportNode().selectNodes('cv:columnAttributes/cv:attribute/@formula')[s.length - 1].value;
+      var category = formula.split('.')[0];
+
+      var ctx = {formula:formula, member:rowItems[category],
+        action: "KEEP_AND_DRILL",
+        caption: cv.util.parseMDXExpression(rowItems[category], false)
+      };
+
+      ctxArray.push(ctx);
+      cv.getActiveReport().clickChart(ctxArray, true);
+    },
+
+
+
+        opts.xAxisDoubleClickAction =  function (s, c, d) {
+          var ctxArray = [];
+          var rowItems = {};
+          $(s).each(function (i, elt) {
+            var formula = cv.getActiveReport().reportDoc.getReportNode().selectNodes('cv:rowAttributes/cv:attribute/@formula')[i].value;
+            var category = formula.split('.')[0];
+            var rowItem = rowItems[category];
+            if (!rowItem) rowItem = category;
+            rowItem = rowItem +  '.[' + elt + ']';
+            rowItems[category] = rowItem;
+          });
+          var formula = cv.getActiveReport().reportDoc.getReportNode().selectNodes('cv:rowAttributes/cv:attribute/@formula')[s.length - 1].value;
+          var category = formula.split('.')[0];
+
+          var ctx = {formula:formula, member:rowItems[category],
+            action: "KEEP_AND_DRILL",
+            caption: cv.util.parseMDXExpression(rowItems[category], false)
+          };
+
+          ctxArray.push(ctx);
+          cv.getActiveReport().clickChart(ctxArray, true);
         },
-        mouseUpAction: function(a,b,c,d) {
-        }
-    }
-    
-    // create the data options for the chart
-    var dataOpts = {crosstabMode: vizOptions.crosstabMode ? vizOptions.crosstabMode : false,
-        seriesInRows: false};
-        
-    if(vizOptions.cccClass == 'pvc.HeatGridChart'){
+
+
+
+
       //update categories count
-      dataOpts.dataOptions = {
+        dataOpts.dataOptions = {
           categoriesCount : categoriesCount,
           measuresInColumns: true
-      };
-    }
+        };
 
-    // copy options from the visualization metadata to the chart options
-    for( x in vizOptions ) {
-        if( x != 'cccClass' && x != 'crosstabMode' && x != 'extensionPoints') {
-            opts[x] = vizOptions[x];
-        }
+    var measureCount = cv.getActiveReport().reportDoc.getReportNode().selectNodes("cv:measures/cv:measure").length;
+    if (measureCount < 2) {
+      vizOptions.sizeValIdx = null;
+      if (measureCount == 0){
+        vizOptions.colorValIdx = null;
+      }
     }
-    if( vizOptions.extensionPoints ) {
-        opts.extensionPoints = {};
-        for( x in vizOptions.extensionPoints ) {
-            opts.extensionPoints[x] = vizOptions.extensionPoints[x];
-        }
+  }//heatgrid
+
+  // copy options from the visualization metadata to the chart options
+  for( x in vizOptions ) {
+    if( x != 'cccClass' && x != 'crosstabMode' && x != 'extensionPoints') {
+      opts[x] = vizOptions[x];
     }
-
-    // create the CDA table
-    this.cdaTable = {
-        metadata: metadata,
-        resultset: resultset
-    };    
-
-    while(this.element.firstChild) {
-        this.element.removeChild(this.element.firstChild);
+  }
+  if( vizOptions.extensionPoints ) {
+    opts.extensionPoints = {};
+    for( x in vizOptions.extensionPoints ) {
+      opts.extensionPoints[x] = vizOptions.extensionPoints[x];
     }
-    
-    // TODO -if we don't recreate a new chart it does not display new data, fix this...
-   // if( this.currentChartType != vizOptions.cccClass ) {
-      this.chart = eval("new "+vizOptions.cccClass+"(opts)");
+  }
 
-      this.currentChartType = vizOptions.cccClass;
-   // }
-    
-    this.chart.setData($.extend(true, {}, this.cdaTable),dataOpts);
-    this.chart.render();
+  // create the CDA table
+  this.cdaTable = {
+    metadata: metadata,
+    resultset: resultset
+  };
+
+  while(this.element.firstChild) {
+    this.element.removeChild(this.element.firstChild);
+  }
+
+  // TODO -if we don't recreate a new chart it does not display new data, fix this...
+  // if( this.currentChartType != vizOptions.cccClass ) {
+  this.chart = eval("new "+vizOptions.cccClass+"(opts)");
+
+  this.currentChartType = vizOptions.cccClass;
+  // }
+
+  this.chart.setData($.extend(true, {}, this.cdaTable),dataOpts);
+  this.chart.render();
 
 }
 
 /*
-    setHighlights
-    Sets the items on the chart that should be highlighted
-*/
+ setHighlights
+ Sets the items on the chart that should be highlighted
+ */
 pentaho.ccc.CccChart.prototype.setHighlights = function( selections ) {
-    this.selections = selections;
-    if( this.dataTable && this.vizOptions ) {
-        this.draw(this.dataTable, this.vizOptions);
-    }
+  this.selections = selections;
+  if( this.dataTable && this.vizOptions ) {
+    //disabled   this.draw(this.dataTable, this.vizOptions);
+  }
 }
 
 /*
-    getColors
-    Returns the colors to use. This needs to take into account selected and unselected items.
-*/
+ getColors
+ Returns the colors to use. This needs to take into account selected and unselected items.
+ */
 pentaho.ccc.CccChart.prototype.getColors = function() {
 
-    var paletteMap = this.vizOptions.metrics[0].paletteMap;
-    var colors = null;
-    if(paletteMap) {
-        colors = [];
-        for(var rowNo=0; rowNo<this.dataTable.getNumberOfRows(); rowNo++) {
-            var item = this.dataTable.getValue(rowNo,0);
-            if( this.selections && this.selections.length > 0) {
-                var done = false;
-                for( var selIdx=0; selIdx<this.selections.length; selIdx++) {
-                    if( (this.selections[selIdx].type == 'row' && this.selections[selIdx].rowItem == item) ||
-                        (this.selections[selIdx].type == 'column' && this.selections[selIdx].colId == this.dataTable.getColumnId(1))) {
-                        colors.push( paletteMap[ item ] );
-                        done = true;
-                        break;
-                    }
-                }
-                if(!done) {
-                    // this item is not selected, so make it grey
-                    colors.push( "#bbbbbb" );
-                }
-            } else {
-                colors.push( paletteMap[ item ] );
-            }
+  var paletteMap = this.vizOptions.metrics[0].paletteMap;
+  var colors = null;
+  if(paletteMap) {
+    colors = [];
+    for(var rowNo=0; rowNo<this.dataTable.getNumberOfRows(); rowNo++) {
+      var item = this.dataTable.getValue(rowNo,0);
+      if( this.selections && this.selections.length > 0) {
+        var done = false;
+        for( var selIdx=0; selIdx<this.selections.length; selIdx++) {
+          if( (this.selections[selIdx].type == 'row' && this.selections[selIdx].rowItem == item) ||
+              (this.selections[selIdx].type == 'column' && this.selections[selIdx].colId == this.dataTable.getColumnId(1))) {
+            colors.push( paletteMap[ item ] );
+            done = true;
+            break;
+          }
         }
+        if(!done) {
+          // this item is not selected, so make it grey
+          colors.push( "#bbbbbb" );
+        }
+      } else {
+        colors.push( paletteMap[ item ] );
+      }
     }
-    return colors;
+  }
+  return colors;
 }
 
 /*
-    getOutputParameters
-    Returns the output parameters of the chart
-*/
+ getOutputParameters
+ Returns the output parameters of the chart
+ */
 pentaho.ccc.CccChart.prototype.getOutputParameters = function() {
 
-    var params = [];
-    if (this.vizOptions.cccClass == 'pvc.PieChart') {
-        params.push( [
-            this.dataTable.getColumnId( 0 ),
-            true,
-            this.dataTable.getColumnId( 0 )   
-        ] );
-    } else {
-        for( var colNo=0; colNo<this.dataTable.getNumberOfColumns(); colNo++ ) {
-            params.push( [
-                this.dataTable.getColumnId( colNo ),
-                true,
-                this.dataTable.getColumnId( colNo )                 
-            ] );
-        }
+  var params = [];
+  if (this.vizOptions.cccClass == 'pvc.PieChart') {
+    params.push( [
+      this.dataTable.getColumnId( 0 ),
+      true,
+      this.dataTable.getColumnId( 0 )
+    ] );
+  } else {
+    for( var colNo=0; colNo<this.dataTable.getNumberOfColumns(); colNo++ ) {
+      params.push( [
+        this.dataTable.getColumnId( colNo ),
+        true,
+        this.dataTable.getColumnId( colNo )
+      ] );
     }
-    
-    return params;
+  }
+
+  return params;
 
 }
 
