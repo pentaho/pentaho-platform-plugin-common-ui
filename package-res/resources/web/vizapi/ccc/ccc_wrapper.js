@@ -304,7 +304,7 @@ pentaho.visualizations.push({
   id: 'ccc_heatgrid',
   type: 'heatgrid',
   source: 'CCC',
-  name: 'CCC Heat Grid',
+  name: 'Heat Grid',
   'class': 'pentaho.ccc.CccChart',
 
   getDropZoneLabel : function (type) {
@@ -317,7 +317,7 @@ pentaho.visualizations.push({
   args: {
     cccClass: 'pvc.HeatGridChart',
     crosstabMode: true,
-    normPerBaseCategory: true,
+    normPerBaseCategory: false,
     showValues: true,
     showXScale: true,
     xAxisPosition: "bottom",
@@ -350,6 +350,7 @@ pentaho.visualizations.push({
     extensionPoints: [],
     valuesAnchor: "right",
     useShapes: true,
+    shape: 'circle',
     isMultiValued: true,
     useCompositeAxis:true,
     sizeValIdx:1,
@@ -429,6 +430,8 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
 
   //count categories for heatGrid
   var categoriesCount = 0;
+  var xAxisLabels = {};
+  var yAxisLabels = {};
 
   // inspect the columns of the DataTable
   title = '';
@@ -454,18 +457,32 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
       }
       metadata.push({
         colIndex: colNo,
-        colName: dataTable.getColumnLabel(colNo),
+        colName: dataTable.getColumnId(colNo),//dataTable.getColumnLabel(colNo),
         colLabel:dataTable.getColumnLabel(colNo),
         colType: (dataTable.getColumnType(colNo) == 'number') ? 'NUMERIC' : 'STRING'
       });
+      //axis label names:
+      var id = dataTable.getColumnId(colNo).split('~');
+      var lbl = dataTable.getColumnLabel(colNo).split('~')
+      //id= id.length == 0 ? id[0] : id[id.length-2];
+      //lbl= lbl.length == 1 ? id[0] : lbl[lbl.length-2];
+      for(var i=0;i<id.length;i++){
+        yAxisLabels[id[i]] = lbl[i];
+      }
     }
     for(var rowNo=0; rowNo<dataTable.getNumberOfRows(); rowNo++) {
       var row = [];
       for( var colNo=0; colNo<dataTable.getNumberOfColumns(); colNo++) {
-        var val = (dataTable.getColumnType(colNo) == 'number')?
-            dataTable.getValue(rowNo, colNo):
-            dataTable.getFormattedValue(rowNo, colNo);
+        var val = dataTable.getValue(rowNo, colNo);
+        //(dataTable.getColumnType(colNo) == 'number')?
+        //        dataTable.getValue(rowNo, colNo):
+        //        dataTable.getFormattedValue(rowNo, colNo);
         if(val == '-'){ val = null;}
+
+        if(dataTable.getColumnType(colNo) != 'number'){//axis label names
+          xAxisLabels[dataTable.getValue(rowNo, colNo)] = dataTable.getFormattedValue(rowNo, colNo);
+        }
+
         row.push(val);
       }
       resultset.push(row);
@@ -614,7 +631,9 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
     showTooltips: true,
     showValues: false,
     clickable: true,
-    title: title,
+    height: vizOptions.height,
+    width: vizOptions.width,
+    title: title == "" ? null : title,
     titlePosition: 'top',
     colors: colors ? colors : this.getColors(),
     clickAction: function(s,c, d){
@@ -680,17 +699,21 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
           series.join('~'):
           series;
       var idx = dataTableVal.lastIndexOf('~');
-      if(idx < 0) {idx = dataTableVal.length;}
+      if(idx < 0) {idx = 0;} //dataTableVal.length
       return dataTableVal.substring(0, idx) == seriesStr;
-    }
+    };
 
     //use selection event handler instead of clickAction
     opts.clickAction = undefined;
 
-    var doubleClickAction = function(nodePath){
-      pentaho.events.trigger( myself, "select", args );
+    opts.xAxisGetLabel = function(id){
+      return xAxisLabels[id];
+    };
+    opts.yAxisGetLabel = function(id){
+      return yAxisLabels[id];
     };
 
+    //translate ccc selections to report selections; to be processed by selectTriggered@cv_rptReport3
     opts.onSelectionChange = function(cccSelections)
     {
       var numMeasures = cv.getActiveReport().reportDoc.getReportNode().selectNodes("cv:measures/cv:measure").length;
@@ -710,7 +733,7 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
         {//category -> row
           var categories = [];
           for(var j = categoryColNo;j<categoriesCount;j++){
-            categories.push(myself.dataTable.getFormattedValue(rowNo,j));
+            categories.push(myself.dataTable.getValue(rowNo,j));
           }
           if(categoryMatches(c, categories))
           {
@@ -720,14 +743,14 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
               rowItems.push(myself.dataTable.getValue(rowNo,j));
               rowIds.push(myself.dataTable.getColumnId(j));
             }
-            selection.rowItem = rowItems;// myself.dataTable.getValue(rowNo,categoryColNo);
+            selection.rowItem = rowItems;
             selection.rowId = rowIds;
             break;
           }
         }
         for(var colNo=seriesColStart; colNo < myself.dataTable.getNumberOfColumns(); colNo+=numMeasures)
         {//just catch first occurrence
-          if(seriesMatches(s, myself.dataTable.getColumnLabel(colNo))){
+          if(seriesMatches(s, myself.dataTable.getColumnId(colNo))){
             selection.column = colNo;
             //get measure out
             var colId = myself.dataTable.getColumnId(colNo);
@@ -741,7 +764,7 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
             for(var j = 0;j<columnIdNodes.length;j++){
               columnIds.push(columnIdNodes[j].firstChild.data);
             }
-            selection.columnId = columnIds;//columnIds[columnIds.length-1].firstChild.data;// colId[0];//TODO:how?? //myself.dataTable.getColumnId(colNo);
+            selection.columnId = columnIds;
             selection.columnLabel = myself.dataTable.getColumnLabel(colNo);
             break;
           }
@@ -760,65 +783,87 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
 
     vizOptions.controller.domNode.style.overflow = 'hidden'; //Hide overflow
 
-    opts.yAxisDoubleClickAction =  function (s, c, d) {
+    opts.customTooltip = function(s,c,d){//TODO:
+      var toDrillTitle = yAxisLabels[s[s.length-1]]; // dataTable.getColumnLabel(dataTable.getNumberOfColumns()-1).split('~')[0];
+      var tooltip = "<br> Double-click to show " + toDrillTitle;
+      return tooltip;
+    };
 
+    //drill down on shapes
+    opts.doubleClickAction = function(series, category){
+      //TODO: no series, no categories
+      if(series.length == 0) return;
+      //do a 'keep only' on the selected member from the Rows/Category level(s), and 'show next' (drill-down) on
+      //the selected member from the Columns/Series level. If there are nested levels in Columns/Series, it should
+      //do a 'keep only' on the outer-most member and a 'show next' (drill-down) on the inner-most level.
+      var toDrill = series[series.length-1];
+      var drillFormula = cv.getActiveReport().reportDoc.getReportNode().selectNodes('cv:columnAttributes/cv:attribute/@formula')[series.length - 1].value;
+      var toKeep = null;
+      var keepFormula=null;
+      if(series.length > 1)
+      {
+        toKeep = series[series.length-2];
+        keepFormula = cv.getActiveReport().reportDoc.getReportNode().selectNodes('cv:columnAttributes/cv:attribute/@formula')[series.length - 2].value;
+      }
+      else if(category.length > 0){
+        toKeep = category[category.length-1];
+        keepFormula = cv.getActiveReport().reportDoc.getReportNode().selectNodes('cv:rowAttributes/cv:attribute/@formula')[category.length-1].value;
+      }
+
+      var ctx = [];
+      var drillCtx = {
+        formula: drillFormula,
+        member: toDrill,
+        caption: toDrill
+      };
+      var keepCtx = {
+        formula: keepFormula,
+        member: toKeep,
+        caption: toKeep
+      };
+      if(toKeep != null){
+        ctx.push(keepCtx);
+      }
+      ctx.push(drillCtx);
+
+      cv.getActiveReport().clickChart(ctx, true);
+    };
+
+    //drill down on y axis
+    opts.yAxisDoubleClickAction =  function (path) {
       var ctxArray = [];
       var rowItems = {};
 
-      $(s).each(function (i, elt) {
-        var formula = cv.getActiveReport().reportDoc.getReportNode().selectNodes('cv:columnAttributes/cv:attribute/@formula')[i].value;
-        var category = formula.split('.')[0];
-        var rowItem = rowItems[category];
-        if (!rowItem) rowItem = category;
-        rowItem = rowItem +  '.[' + elt + ']';
-        rowItems[category] = rowItem;
-      });
-
-      var formula = cv.getActiveReport().reportDoc.getReportNode().selectNodes('cv:columnAttributes/cv:attribute/@formula')[s.length - 1].value;
-      var category = formula.split('.')[0];
-
-      var ctx = {formula:formula, member:rowItems[category],
+      var formula = cv.getActiveReport().reportDoc.getReportNode().selectNodes('cv:columnAttributes/cv:attribute/@formula')[path.length - 1].value;
+      var ctx = {formula:formula, member:path[path.length-1],
         action: "KEEP_AND_DRILL",
-        caption: cv.util.parseMDXExpression(rowItems[category], false)
+        caption: cv.util.parseMDXExpression(path[path.length-1], false)
+      };
+      ctxArray.push(ctx);
+      cv.getActiveReport().clickChart(ctxArray, true);
+    };
+
+    //drill down on x axis
+    opts.xAxisDoubleClickAction =  function (path) {
+      var ctxArray = [];
+      var rowItems = {};
+
+      var formula = cv.getActiveReport().reportDoc.getReportNode().selectNodes('cv:rowAttributes/cv:attribute/@formula')[path.length - 1].value;
+
+      var ctx = {formula:formula, member:path[path.length-1],
+        action: "KEEP_AND_DRILL",
+        caption: cv.util.parseMDXExpression(path[path.length-1], false)
       };
 
       ctxArray.push(ctx);
       cv.getActiveReport().clickChart(ctxArray, true);
-    },
+    };
 
-
-
-        opts.xAxisDoubleClickAction =  function (s, c, d) {
-          var ctxArray = [];
-          var rowItems = {};
-          $(s).each(function (i, elt) {
-            var formula = cv.getActiveReport().reportDoc.getReportNode().selectNodes('cv:rowAttributes/cv:attribute/@formula')[i].value;
-            var category = formula.split('.')[0];
-            var rowItem = rowItems[category];
-            if (!rowItem) rowItem = category;
-            rowItem = rowItem +  '.[' + elt + ']';
-            rowItems[category] = rowItem;
-          });
-          var formula = cv.getActiveReport().reportDoc.getReportNode().selectNodes('cv:rowAttributes/cv:attribute/@formula')[s.length - 1].value;
-          var category = formula.split('.')[0];
-
-          var ctx = {formula:formula, member:rowItems[category],
-            action: "KEEP_AND_DRILL",
-            caption: cv.util.parseMDXExpression(rowItems[category], false)
-          };
-
-          ctxArray.push(ctx);
-          cv.getActiveReport().clickChart(ctxArray, true);
-        },
-
-
-
-
-      //update categories count
-        dataOpts.dataOptions = {
-          categoriesCount : categoriesCount,
-          measuresInColumns: true
-        };
+    //update categories count
+    dataOpts.dataOptions = {
+      categoriesCount : categoriesCount,
+      measuresInColumns: true
+    };
 
     var measureCount = cv.getActiveReport().reportDoc.getReportNode().selectNodes("cv:measures/cv:measure").length;
     if (measureCount < 2) {
@@ -827,6 +872,52 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
         vizOptions.colorValIdx = null;
       }
     }
+
+    //resize
+    //fiddle with the axis dimensions
+
+    //get depth and breadth
+    var measureCount = cv.getActiveReport().reportDoc.getReportNode().selectNodes("cv:measures/cv:measure").length;
+    var categoriesDepth = cv.getActiveReport().reportDoc.getReportNode().selectNodes('cv:rowAttributes/cv:attribute').length;
+    var seriesDepth = cv.getActiveReport().reportDoc.getReportNode().selectNodes('cv:columnAttributes/cv:attribute').length;
+    var categoriesBreadth = this.dataTable.getNumberOfRows() - 1;
+    var seriesBreadth = (this.dataTable.getNumberOfColumns() - categoriesDepth)/measureCount;
+
+    var MAX_AXIS_SIZE = 300,
+        MIN_LEVEL_HEIGHT = 30,
+        MAX_LEVEL_HEIGHT = 200,
+        MAX_AXIS_RATIO = 0.35;
+    var width = vizOptions.width,
+        height = vizOptions.height;
+
+    var xyChartRatio = categoriesBreadth / seriesBreadth;
+    var currRatio = width/height;
+
+    //min desirable sizes according to depth
+    var minXAxisSize = Math.min(MAX_AXIS_SIZE, categoriesDepth * MIN_LEVEL_HEIGHT);
+    var minYAxisSize = Math.min(MAX_AXIS_SIZE, seriesDepth * MIN_LEVEL_HEIGHT);
+    var maxXAxisSize = Math.min(MAX_AXIS_SIZE, categoriesDepth * MAX_LEVEL_HEIGHT, height * MAX_AXIS_RATIO);
+    var maxYAxisSize = Math.min(MAX_AXIS_SIZE, seriesDepth * MAX_LEVEL_HEIGHT, width * MAX_AXIS_RATIO);
+
+    var xAxisSize, yAxisSize;
+    if(xyChartRatio > currRatio){//lock width
+      var extraHeight = height - width / xyChartRatio ;
+      yAxisSize = minYAxisSize;
+
+      xAxisSize = Math.min(extraHeight, maxXAxisSize) ;
+      xAxisSize = Math.max(xAxisSize, minXAxisSize);
+    }
+    else if (xyChartRatio < currRatio){//lock height
+      var extraWidth = width - height * xyChartRatio;
+      xAxisSize = minXAxisSize;
+
+      yAxisSize = Math.min(extraWidth, maxYAxisSize);
+      yAxisSize = Math.max(yAxisSize, minYAxisSize);
+    }
+    vizOptions.xAxisSize = xAxisSize;
+    vizOptions.yAxisSize = yAxisSize;
+
+
   }//heatgrid
 
   // copy options from the visualization metadata to the chart options
@@ -939,6 +1030,7 @@ pentaho.ccc.CccChart.prototype.getOutputParameters = function() {
 pentaho.ccc.CccChart.prototype.resize = function(width, height){
   this.vizOptions.width = width;
   this.vizOptions.height = height;
+
   this.draw(this.dataTable, this.vizOptions);
 }
 
