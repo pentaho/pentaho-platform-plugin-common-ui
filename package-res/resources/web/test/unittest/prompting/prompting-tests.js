@@ -212,7 +212,7 @@ doh.register("Prompting Tests", [
 
       var parameterValues = panel.getParameterValues();
       doh.assertEqual(5, sizeOf(parameterValues));
-      doh.assertTrue(parameterValues['::session']);
+      doh.assertTrue(typeof parameterValues['::session'] === 'string' && parameterValues['::session'].length > 12);
       doh.assertEqual('Trains', parameterValues['line']);
       doh.assertEqual('table/html;page-mode=page', parameterValues['output-target']);
       doh.assertEqual('XML', parameterValues['renderMode']);
