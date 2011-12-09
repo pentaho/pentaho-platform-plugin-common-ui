@@ -500,7 +500,7 @@ pentaho.common.prompting = {
           if (value === '' || typeof value == 'undefined') {
             return; // continue
           }
-          if (!$.isArray(value)) {
+          if (param.multiSelect && !$.isArray(value)) {
             value = [value];
           }
           params[param.name] = value;
