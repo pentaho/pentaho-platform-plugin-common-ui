@@ -162,6 +162,7 @@
 		      	<include name="a11y/colors7x10.png"/>
 		      	<include name="dijit_rtl.css"/>
 		      	<include name="dijit.css"/>
+            <include name="claro"/>
 		      </fileset>
 	    </copy>
 	    <copy todir="${approot.stage.dir}/resources/web/testres">

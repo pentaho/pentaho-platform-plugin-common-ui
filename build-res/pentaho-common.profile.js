@@ -50,7 +50,9 @@
     "pentaho.common.SplashScreen",
     "pentaho.common.TabSet",
     "pentaho.common.TemplatePicker",
-    "pentaho.common.ToggleButton"
+    "pentaho.common.ToggleButton",
+    "pentaho.common.propertiesPanel.Panel",
+    "pentaho.common.propertiesPanel.Configuration"
 
     ]
     }
