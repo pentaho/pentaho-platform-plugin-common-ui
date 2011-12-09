@@ -39,7 +39,10 @@
 	      </not>
 	    </condition>
 	  </fail -->
-	
+
+  <property name="dojo.version" value="1.6.1"/>
+  <property name="dojo-artifact" value="dojo-release-${dojo.version}-src"/>
+
 	<property name="dev.res" value="dev-res"/>
 	
 	<property name="dojo.root"
@@ -47,7 +50,7 @@
 	    description="Dojo source folder" />	
 
 	<property name="dojo.src"
-		value="${dojo.root}/dojo-release-${dependency.dojo}-src"
+		value="${dojo.root}/dojo-release-${dojo.version}-src"
 	    description="Dojo source folder" />	
 
 	<property name="dojo.src.release"
@@ -73,8 +76,18 @@
 	</target>
 	
 	<target name="unzip_dojo">
-		<mkdir dir="${dojo.root}"/>
-		<unzip dest="${dojo.root}" src="${lib.dir}/dojo-${dependency.dojo}-src.zip"/>
+    <if>
+    <available file="${dojo.root}/${dojo-artifact}.zip"/><then/>
+    <else>
+      <get src="http://download.dojotoolkit.org/release-${dojo.version}/${dojo-artifact}.zip" dest="${dojo.root}/${dojo-artifact}.zip"/>
+      <mkdir dir="${dojo.root}"/>
+      <unzip src="dev-res/dojo/${dojo-artifact}.zip" dest="${dojo.root}" />
+
+      <!--<get src="http://download.dojotoolkit.org/release-${dojo.version}/${dojo-artifact}-src.zip" dest="${dojo.root}/${dojo-artifact}-src.zip"/>-->
+      <!--<mkdir dir="${dojo.root}"/>-->
+      <!--<unzip src="dev-res/dojo/${dojo-artifact}-src.zip" dest="${dojo.root}" />-->
+    </else>
+    </if>
 	</target>
 	
 	<target name="assemble" depends="jar,assemble.init,assemble.copy-libs,plugin-create-js-variants,instrument-js,assemble-plugin">
@@ -117,7 +130,7 @@
 		      <fileset dir="${stage.dir}/javascript/cldr/nls">
 		      </fileset>
 	    </copy>	  	
-	    <copy todir="${dojo.prod.stage.dir}/dojox/widget/ColorPicker">
+	   <!--  <copy todir="${dojo.prod.stage.dir}/dojox/widget/ColorPicker">
 		      <fileset dir="${dojo.src}/dojox/widget/ColorPicker">
 		      </fileset>
 	    </copy>	  	
@@ -125,7 +138,7 @@
 		      <fileset dir="${dojo.src}/dojox/widget/nls">
 	    		<include name="ColorPicker.js"/>
 		      </fileset>
-	    </copy>	  	
+	    </copy>	  	 -->
 	    <copy todir="${dojo.prod.stage.dir}/dojo/resources">
 		      <fileset dir="${dojo.src}/dojo/resources">
 	    		<include name="blank.gif"/>
@@ -134,6 +147,11 @@
 
 	    <copy todir="${dojo.prod.stage.dir}/util/doh">
 		      <fileset dir="${dojo.src}/util/doh"/>
+	    </copy>	  	
+
+
+	    <copy todir="${dojo.prod.stage.dir}/dojox">
+		      <fileset dir="${dojo.src}/dojox"/>
 	    </copy>	  	
 
 	    <copy todir="${dojo.prod.stage.dir}/dijit/icons">
@@ -145,7 +163,7 @@
 		      	<include name="dijit_rtl.css"/>
 		      	<include name="dijit.css"/>
 		      </fileset>
-	    </copy>	  	
+	    </copy>
 	    <copy todir="${approot.stage.dir}/resources/web/testres">
 		      <fileset dir="${dev.res}">
 		      	<include name="runner.html"/>
@@ -165,16 +183,16 @@
 				<include name="runner.css"/>
 		      </fileset>
 	    </copy>
-	    <delete dir="${stage.dir}/javascript"/>
+	    <!--<delete dir="${stage.dir}/javascript"/>-->
 
       <property environment="env"/>
 	  <taskdef name="xmltask" classname="com.oopsconsultancy.xmltask.ant.XmlTask" classpath="lib/xmltask-1.15.1.jar"/>
-      <xmltask source="${approot.stage.dir}/settings.xml" 
-        dest="${approot.stage.dir}/settings.xml">
-          <insert path="/settings" xml="    &lt;plugin-id&gt;${env.JOB_NAME}&lt;/plugin-id&gt;"/>
-          <insert path="/settings" xml="    &lt;plugin-version&gt;${project.revision}&lt;/plugin-version&gt;"/>
-          <insert path="/settings" xml="    &lt;plugin-build&gt;${env.BUILD_NUMBER}&lt;/plugin-build&gt;"/>
-      </xmltask>
+      <xmltask source="${approot.stage.dir}/settings.xml"
+                          dest="${approot.stage.dir}/settings.xml">
+      <insert path="/settings" xml="    &lt;plugin-id&gt;${env.JOB_NAME}&lt;/plugin-id&gt;"/>
+      <insert path="/settings" xml="    &lt;plugin-version&gt;${project.revision}&lt;/plugin-version&gt;"/>
+      <insert path="/settings" xml="    &lt;plugin-build&gt;${env.BUILD_NUMBER}&lt;/plugin-build&gt;"/>
+    </xmltask>
 
       <ant antfile="build-res/subfloor-gwt.xml" target="gwt-compile">
         <property name="gwt-module.path" value="org.pentaho.gwt.widgets.themes.Themes" />
@@ -227,25 +245,25 @@
     	</fileset>
     </copy>
   </target>
-	
-	<target name="plugin-build-jslibs" depends="plugin-build-jslibs.init,plugin-build-js-dojo,plugin-copy-pentaho-js-to-dojo-build,plugin-build-js-pentaho">
-	  	<!-- now concat the js files together -->
-	    <concat destfile="${stage.dir}/javascript/dojo-all.js" force="no">
-	      <filelist dir="${stage.dir}/javascript"
-	           files="dojo.js,dojo-ext.js"/>
-	    </concat>
-	    <concat destfile="${stage.dir}/javascript/dojo-all.js.uncompressed.js" force="no">
-	      <filelist dir="${stage.dir}/javascript"
-	           files="dojo.js.uncompressed.js,dojo-ext.js.uncompressed.js"/>
-	    </concat>
-	    <concat destfile="${stage.dir}/javascript/pentaho-dojo-all.js" force="no">
-	      <filelist dir="${stage.dir}/javascript"
-	           files="dojo.js,dojo-ext.js,pentaho-common.js"/>
-	    </concat>
-	        <concat destfile="${stage.dir}/javascript/pentaho-dojo-all.js.uncompressed.js" force="no">
-	          <filelist dir="${stage.dir}/javascript"
-	               files="dojo.js.uncompressed.js,dojo-ext.js.uncompressed.js,pentaho-common.js.uncompressed.js"/>
-	        </concat>
+
+  <target name="plugin-build-jslibs" depends="plugin-build-jslibs.init,plugin-build-js-dojo,plugin-copy-pentaho-js-to-dojo-build,plugin-build-js-pentaho">
+    <!-- now concat the js files together -->
+    <concat destfile="${stage.dir}/javascript/dojo-all.js" force="no">
+      <filelist dir="${stage.dir}/javascript"
+                files="dojo.js,dojo-ext.js"/>
+    </concat>
+    <concat destfile="${stage.dir}/javascript/dojo-all.js.uncompressed.js" force="no">
+      <filelist dir="${stage.dir}/javascript"
+                files="dojo.js.uncompressed.js,dojo-ext.js.uncompressed.js"/>
+    </concat>
+    <concat destfile="${stage.dir}/javascript/pentaho-dojo-all.js" force="no">
+      <filelist dir="${stage.dir}/javascript"
+                files="dojo.js,dojo-ext.js,pentaho-common.js"/>
+    </concat>
+    <concat destfile="${stage.dir}/javascript/pentaho-dojo-all.js.uncompressed.js" force="no">
+      <filelist dir="${stage.dir}/javascript"
+                files="dojo.js.uncompressed.js,dojo-ext.js.uncompressed.js,pentaho-common.js.uncompressed.js"/>
+    </concat>
 
 	    <copy todir="${stage.dir}/javascript">
 	      <fileset dir="${dojo.src.release}/dojo">
@@ -278,6 +296,7 @@
 	  	<java classname="org.mozilla.javascript.tools.shell.Main" 
 			dir="${dojo.src}/util/buildscripts"
 			fork="true">
+
 			<arg value="build.js"/>
 			<arg value="action=release"/>
 	        <arg value="offlineProfile=true"/>

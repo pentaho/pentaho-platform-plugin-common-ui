@@ -1,65 +1,73 @@
-    dependencies = {
-    layers:
-    [
-    //This layer is used to discard modules
-    //from the dojo package.
+dependencies = {
+  layers:
+      [
+        //This layer is used to discard modules
+        //from the dojo package.
 
 
 
-    //This layer is used to discard modules
-    //from the dijit package.
+        //This layer is used to discard modules
+        //from the dijit package.
 
-    //Custom layer mydojo.js which
-    // includes our custom Dojo artifacts
-    {
-    //place the file under dojoRootDir
-    name: "dojo-ext.js",
-    layerDependencies:
-    [
-    ],
-    dependencies:
-    [
-    "dojo",
-	"dojo.parser",
-	"dojo.cldr",
-    "dojox.html.entities",
-	"dojox.fx.Shadow",
-    "dijit._Widget",
-    "dijit._Templated",
-    "dijit.common",
-    "dijit.Dialog",
-    "dijit.layout.TabContainer",
-    "dijit.layout.ContentPane",
-    "dijit.layout.BorderContainer",
-    "dijit.form.Button",
-    "dijit.form.CheckBox",
-    "dijit.form.DateTextBox",
-    "dijit.form.NumberTextBox",
-    "dijit.form.TextBox",
-    "dijit.form.Select",
-    "dijit.form.MultiSelect",
-    "dijit.Toolbar",
-    "dijit.Editor",
-    "dijit.ColorPalette",
-    "dijit.ProgressBar",
-    "dijit.Tooltip",
-    "dijit.layout.TabContainer",
-    "dijit.TitlePane",
-    "dojo.dnd.Container",
-    "dojo.dnd.Selectors",
-	"dojo.dnd.Source",
-	"dojo.dnd.move",
-    "dojo.dnd.Avatar",
-    "dojo.dnd.Manager",
-    "dojox.widget.ColorPicker",
-    "dojox.storage"
-    ]
-    }
-    ],
+        //Custom layer mydojo.js which
+        // includes our custom Dojo artifacts
+        {
+          //place the file under dojoRootDir
+          name: "dojo-ext.js",
+          layerDependencies:
+              [
+              ],
+          dependencies:
+              [
+                "dojo",
+                "dijit.dijit-all",
+                "dojo.cldr",
+                "dojo.dnd.Container",
+                "dojo.dnd.Selectors",
+                "dojo.dnd.Source",
+                "dojo.dnd.move",
+                "dojo.dnd.Avatar",
+                "dojo.dnd.Manager",
+                "dojox.html.entities",
+                "dojox.parser",
+                "dojox.fx.Shadow",
+                "dojox.widget.ColorPicker",
+                "dojox.storage",
+                "dojox.xml.parser",
+                  "dojox.fx",
+                  "dojox.collections.Dictionary",
+                  "dojox.collections.Stack",
+                  "dojox.collections.ArrayList",
+                  "dojox.dnd",
+                  "dojox.encoding",
+                  "dojox.color",
+                  "dojox.css3",
+                  "dojox.form",
+                  "dojox.color",
+                  "dojox.gfx",
+                  "dojox.gfx.svg",
+                  "dojox.gfx3d",
+                  "dojox.grid",
+                  "dojox.highlight",
+                  "dojox.lang",
+                  "dojox.layout",
+                  "dojox.math",
+                  "dojox.storage",
+                  "dojox.widget",
+                  "dojox.xml",
+                  "dojox.layout.ResizeHandle",
+                  "dojox.layout.ContentPane",
+                  "dojox.layout.ScrollPane",
+                  "dojox.layout.RadioGroup"
 
-    prefixes: [
+
+              ]
+        }
+      ],
+
+  prefixes: [
     ["dijit", "../dijit"],
     ["dojox", "../dojox"]
-    ]
+  ]
 
-    }
+}

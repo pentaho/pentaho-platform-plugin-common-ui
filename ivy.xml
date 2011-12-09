@@ -30,9 +30,7 @@
 		<dependency org="log4j" name="log4j" rev="1.2.14" transitive="false" conf="default->default" />
 		<dependency org="net.sf.flexjson" name="flexjson" rev="2.1" transitive="false" conf="default->default"/>
 		<dependency org="org.json" name="json" rev="3.1.1" transitive="false" conf="default->default" />
-		<dependency org="org.dojotoolkit" name="dojo" rev="${dependency.dojo}">
-		   <artifact name="dojo" m:classifier="src" ext="zip"/>
-		</dependency>
+
 		<dependency org="org.springframework" name="spring" rev="2.5.6" transitive="false" conf="default->default" />
 
 		<dependency org="oopsconsultancy" name="xmltask" rev="1.15.1" transitive="false" conf="default->default" />
