@@ -800,7 +800,7 @@ pentaho.common.prompting = {
             }, this.getParameterPanelType());
 
           if (errorLabels.length > 0) {
-            panel.cssClass = 'error';
+            panel.cssClass = (panel.cssClass || '') + ' error';
           }
 
           components.push(panel);

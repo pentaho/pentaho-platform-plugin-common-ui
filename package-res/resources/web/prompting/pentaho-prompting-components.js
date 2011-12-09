@@ -110,7 +110,7 @@ var PromptLayoutComponent = CompositeComponent.extend({
 
   getClassFor: function(component) {
     if (!component.param) { return; }
-    return (component.cssClass || '') + ' parameter';
+    return 'parameter' + (component.cssClass ? ' ' + component.cssClass : '');
   },
 
   update: function() {
