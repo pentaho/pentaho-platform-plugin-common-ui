@@ -108,7 +108,11 @@
 	      <fileset dir="${package.resdir}" />
 	    </copy>
 
-	    <copy todir="${dojo.prod.stage.dir}/dojo">
+      <copy todir="${dojo.prod.stage.dir}/dojo">
+        <fileset dir="${dojo.src}/dojo"/>
+      </copy>
+
+      <copy todir="${dojo.prod.stage.dir}/dojo">
 	      <fileset dir="${stage.dir}/javascript">
     		<include name="dojo.js"/>
     		<include name="dojo.js.uncompressed.js"/>
@@ -139,11 +143,11 @@
 	    		<include name="ColorPicker.js"/>
 		      </fileset>
 	    </copy>	  	 -->
-	    <copy todir="${dojo.prod.stage.dir}/dojo/resources">
-		      <fileset dir="${dojo.src}/dojo/resources">
-	    		<include name="blank.gif"/>
-		      </fileset>
-	    </copy>	  	
+	    <!--<copy todir="${dojo.prod.stage.dir}/dojo/resources">-->
+		      <!--<fileset dir="${dojo.src}/dojo/resources">-->
+	    		<!--<include name="blank.gif"/>-->
+		      <!--</fileset>-->
+	    <!--</copy>	  	-->
 
 	    <copy todir="${dojo.prod.stage.dir}/util/doh">
 		      <fileset dir="${dojo.src}/util/doh"/>
@@ -154,20 +158,9 @@
 		      <fileset dir="${dojo.src}/dojox"/>
 	    </copy>	  	
 
-	    <copy todir="${dojo.prod.stage.dir}/dijit/icons">
-		      <fileset dir="${dojo.src}/dijit/icons"/>
+	    <copy todir="${dojo.prod.stage.dir}/dijit">
+		      <fileset dir="${dojo.src}/dijit"/>
 	    </copy>	  	
-	    <copy todir="${dojo.prod.stage.dir}/dijit/themes">
-		      <fileset dir="${dojo.src}/dijit/themes">
-		      	<include name="a11y/colors7x10.png"/>
-		      	<include name="dijit_rtl.css"/>
-		      	<include name="dijit.css"/>
-		      </fileset>
-	    </copy>
-
-      <copy todir="${dojo.prod.stage.dir}/dijit/themes/claro">
-        <fileset dir="${dojo.src}/dijit/themes/claro"/>
-      </copy>
 
 	    <copy todir="${approot.stage.dir}/resources/web/testres">
 		      <fileset dir="${dev.res}">

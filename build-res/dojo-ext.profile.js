@@ -1,16 +1,7 @@
 dependencies = {
   layers:
       [
-        //This layer is used to discard modules
-        //from the dojo package.
-
-
-
-        //This layer is used to discard modules
-        //from the dijit package.
-
-        //Custom layer mydojo.js which
-        // includes our custom Dojo artifacts
+ // includes our custom Dojo artifacts
         {
           //place the file under dojoRootDir
           name: "dojo-ext.js",
@@ -59,8 +50,6 @@ dependencies = {
                   "dojox.layout.ContentPane",
                   "dojox.layout.ScrollPane",
                   "dojox.layout.RadioGroup"
-
-
               ]
         }
       ],
