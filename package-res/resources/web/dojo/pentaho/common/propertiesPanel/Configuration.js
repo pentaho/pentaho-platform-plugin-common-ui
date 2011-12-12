@@ -71,9 +71,15 @@ dojo.declare(
       },
       remove: function(gem){
         this.gems.splice(this.gems.indexOf(gem), 1);
+
+        // fire event
+        this.set("gems", this.gems);
       },
       add: function(gem){
         this.gems.push(gem);
+
+        // fire event
+        this.set("gems", this.gems);
       },
 
       gems: [],
@@ -82,74 +88,10 @@ dojo.declare(
     }
 );
 pentaho.common.propertiesPanel.Configuration.registeredTypes["gemBar"] = pentaho.common.propertiesPanel.GemBar;
-
-
-
-dojo.declare(
-    "pentaho.common.propertiesPanel.Gem",
-    [pentaho.common.propertiesPanel.Property],
-    {
-      constructor: function(item, gembar){
-        this.gemBar = gembar;
-        this.inherited(arguments);
-      },
-      detach: function(){
-        this.gemBar.remove(this);
-      }
-    }
-);
-pentaho.common.propertiesPanel.Configuration.registeredTypes["gem"] = pentaho.common.propertiesPanel.Gem;
-
-
-
-
-dojo.declare(
-    "pentaho.common.propertiesPanel.Combo",
-    [pentaho.common.propertiesPanel.Property],
-    {
-      constructor: function(item){
-        this.inherited(arguments);
-      }
-    }
-);
-pentaho.common.propertiesPanel.Configuration.registeredTypes["combo"] = pentaho.common.propertiesPanel.Combo;
-
-
-dojo.declare(
-    "pentaho.common.propertiesPanel.Slider",
-    [pentaho.common.propertiesPanel.Property],
-    {
-      constructor: function(item){
-        this.inherited(arguments);
-      }
-    }
-);
-pentaho.common.propertiesPanel.Configuration.registeredTypes["slider"] = pentaho.common.propertiesPanel.Slider;
-
-
-dojo.declare(
-    "pentaho.common.propertiesPanel.Textbox",
-    [pentaho.common.propertiesPanel.Property],
-    {
-      constructor: function(item){
-        this.inherited(arguments);
-      }
-    }
-);
-pentaho.common.propertiesPanel.Configuration.registeredTypes["textbox"] = pentaho.common.propertiesPanel.Textbox;
-
-
-
-
-dojo.declare(
-    "pentaho.common.propertiesPanel.CheckBox",
-    [pentaho.common.propertiesPanel.Property],
-    {
-      constructor: function(item){
-        this.inherited(arguments);
-      }
-    }
-);
-pentaho.common.propertiesPanel.Configuration.registeredTypes["checkbox"] = pentaho.common.propertiesPanel.CheckBox;
+pentaho.common.propertiesPanel.Configuration.registeredTypes["gem"] = pentaho.common.propertiesPanel.Property;
+pentaho.common.propertiesPanel.Configuration.registeredTypes["combo"] = pentaho.common.propertiesPanel.Property;
+pentaho.common.propertiesPanel.Configuration.registeredTypes["slider"] = pentaho.common.propertiesPanel.Property;
+pentaho.common.propertiesPanel.Configuration.registeredTypes["textbox"] = pentaho.common.propertiesPanel.Property;
+pentaho.common.propertiesPanel.Configuration.registeredTypes["checkbox"] = pentaho.common.propertiesPanel.Property;
 
 

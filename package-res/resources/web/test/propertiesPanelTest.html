@@ -17,9 +17,10 @@
         { modulePaths: {
           'pentaho.common': "../pentaho/common"
         },
-          //parseOnLoad: true,
-          //baseUrl: '../dojo/dojo/'
-
+          parseOnLoad: true,
+          baseUrl: '../dojo/dojo/',
+          isDebug: true,
+          debugAtAllCosts: true
         });
     //]]>
   </script>
@@ -65,9 +66,7 @@
   </style>
 
 
-  <script language='javascript' type='text/javascript' src='../dojo/dojo/dojo-all.js.uncompressed.js'></script>
-  <script language='javascript' type='text/javascript' src='../dojo/pentaho/common/propertiesPanel/Configuration.js'></script>
-  <script language='javascript' type='text/javascript' src='../dojo/pentaho/common/propertiesPanel/Panel.js'></script>
+  <script language='javascript' type='text/javascript' src='../dojo/dojo/dojo.js'></script>
   <!--script language='javascript' type='text/javascript' src='../dojo/pentaho/common/propertiesPanel/Panel.js'></script-->
 
 
@@ -104,9 +103,8 @@
 
       dojo.connect(config, "onPropertyChange", function(item, propName, prevVal, newVal){
 
-        var output = dojo.byId("output");
-        output.innerHTML = "received property change for: "+item.id+"\n"+
-            "\tevent property:\t"+propName+"\n\told value:\t"+prevVal+"\n\tnew value:\t"+ newVal+"\n\n" + output.innerHTML;
+        log("received property change for: "+item.id+"\n"+
+            "\tevent property:\t"+propName+"\n\told value:\t"+prevVal+"\n\tnew value:\t"+ newVal);
         output.scrollTop = output.scrollHeight;
 
 
@@ -117,6 +115,10 @@
       });
 
     };
+    function log(str){
+      var output = dojo.byId("output");
+      output.innerHTML = str +"\n\n" + output.innerHTML;
+    }
 
     var disabledState = false;
     function disable(){
@@ -157,6 +159,15 @@
       createGemUI:function (gem) {
         return new pentaho.common.propertiesPanel.GemUI(gem, this.className);
       },
+    });
+
+    dojo.addOnLoad(function(){
+
+      var propertiesPanel = dijit.byId('panel');
+      dojo.connect(propertiesPanel, "onPropertyChange",
+          function(item, eventName, eventObj){
+            log("Received UI event: "+eventName+" for: "+item.id);
+          });
     });
 
   </script>
@@ -231,6 +242,8 @@
   <button style="display: block" onClick="ramdomValues()">Random Vals</button>
   <div style="width:100%; clear:both" dojoType="dojo.dnd.Source" >
     <span style="width: 100px; height: 20px; border: 1px solid black" dndType="gem" class="dojoDndItem" id="sourceNode">Test1</span>
+    <span style="width: 100px; height: 20px; border: 1px solid black" dndType="gem" class="dojoDndItem" id="sourceNode2">Test2</span>
+    <span style="width: 100px; height: 20px; border: 1px solid black" dndType="gem" class="dojoDndItem" id="sourceNode3">Test3</span>
   </div>
   <div style="background-color:#FFFFCC; height: 40px; width: 100%" dojoType="GemBarUISource" accept="gem"></div>
 </div>

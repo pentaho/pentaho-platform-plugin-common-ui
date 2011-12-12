@@ -27,13 +27,17 @@ dojo.declare(
         dojo.forEach(this.configuration.items, dojo.hitch(this, "initializeItem"));
       },
       initializeItem:function (item) {
+        // Lookup class impl from map
         var layoutClass = pentaho.common.propertiesPanel.Panel.registeredTypes[item.uiType];
         if (!layoutClass) {
           throw "No Properties Panel UI implementation found for " + item.uiType;
         }
-        var propUi = new layoutClass({model: item});
+
+        // Create UI component
+        var propUi = new layoutClass({model: item, propPanel: this});
         var targetNode = this.domNode;
 
+        // If the property is grouped, create the group or add it to the existing one.
         if(item.group){
           var group = this.groups[item.group];
           if(!group){
@@ -48,13 +52,34 @@ dojo.declare(
           targetNode = group.content;
           this.domNode.appendChild(group.domNode);
         }
+
+        // Items can have a caption. If specified, create and add it before the property UI component
         if(item.caption){
           var cap = dojo._toDom(dojo.string.substitute(this.captionTemplate, item));
           targetNode.appendChild(cap);
         }
 
+        // Route UI events to onPropertyChange
+        this.setupEventHandling(propUi);
+
         this.propUIs.push(propUi);
         targetNode.appendChild(propUi.domNode);
+
+      },
+      setupEventHandling: function(ui){
+
+        this.connect(ui, "onContextMenu", function(e){
+          this.onPropertyChange(ui.model, "onContextMenu", e);
+        });
+        this.connect(ui, "onClick", function(e){
+          this.onPropertyChange(ui.model, "onClick", e);
+        });
+        this.connect(ui, "onDblClick", function(e){
+          this.onPropertyChange(ui.model, "onDblClick", e);
+        });
+      },
+      // to the connected to by outside container.
+      onPropertyChange: function(item, eventName, eventObj){
 
       },
       setConfiguration: function(config){
@@ -87,6 +112,7 @@ dojo.declare(
     {
       constructor: function(options){
         this.model = options.model;
+        this.propPanel = options.propPanel;
         var outterThis = this;
         this.model.watch(function(propName, prevVal, newVal){
           outterThis.set(propName, newVal);
@@ -108,22 +134,24 @@ dojo.declare("pentaho.common.propertiesPanel.GemBarUISource", [dojo.dnd.Source],
     var gem;
     if(gemUI){
       gem = gemUI.model;
-      gemUI.gemBar.remove(gemUI);
+      // gemUI.gemBar.remove(gemUI);
+      gemUI.gemBar = this.gemBar;
+      this.inherited(arguments);
     } else {
       var gem = this.createGemFromNode(nodes[0]);
       gemUI = this.createGemUI(gem);
+      this.gemBar.add(gemUI);
     }
-    this.gemBar.add(gemUI);
     this.sync();
     return true;
 
   },
 
   createGemFromNode:function (sourceNode) {
-    return new pentaho.common.propertiesPanel.Configuration.registeredTypes["gem"]({id: sourceNode.innerHTML, value: sourceNode.innerHTML}, this.gemBar);
+    return new pentaho.common.propertiesPanel.Configuration.registeredTypes["gem"]({id: sourceNode.innerHTML, value: sourceNode.innerHTML, gemBar: this.gemBar.model});
   },
   createGemUI:function (gem) {
-    return new pentaho.common.propertiesPanel.GemUI(gem, this.gemBar);
+    return new pentaho.common.propertiesPanel.GemUI({model: gem, gemBar: this.gemBar});
   }
 });
 
@@ -156,9 +184,13 @@ dojo.declare(
       add: function(gemUI){
         this.model.add(gemUI.model);
         this.domNode.appendChild(gemUI.domNode);
+        this.propPanel.setupEventHandling(gemUI);
       },
       remove: function(gemUI){
         this.domNode.removeChild(gemUI.domNode);
+      },
+      onContextMenu: function(event, gem){
+        // to be overwritten
       },
       createDropIndicator:function () {
 
@@ -202,15 +234,9 @@ dojo.declare(
       },
       createGems:function (gem) {
         var gemUI = createGemUI(gem);
-        this.handles.push[dojo.connect(gemUI, "onClick", dojo.hitch(this, "_selectGem", gem))];
-        this.handles.push[dojo.connect(gemUI, "onClick", dojo.hitch(this, "onSelection", gem))];
-        this.handles.push[dojo.connect(gemUI, "onDblClick", dojo.hitch(this, "_selectGem", gem))];
-        this.handles.push[dojo.connect(gemUI, "onDblClick", dojo.hitch(this, "onExecute", gem))];
-        this.handles.push[dojo.connect(gemUI, "onContextMenu", dojo.hitch(this, "onContextMenu", gem))];
         this.domNode.appendChild(gemUI.domNode);
-      },
-      _selectGem:function (gem) {
-        this.selectedGem = gem;
+
+        this.propPanel.setupEventHandling(gemUI);
       },
 
 
@@ -223,15 +249,6 @@ dojo.declare(
       },
       createGemUI:function (gem) {
         return new pentaho.common.propertiesPanel.GemUI(gem, this.className);
-      },
-      onSelection:function (gem) {
-
-      },
-      onExecute:function (gem) {
-
-      },
-      onContextMenu:function (gem) {
-
       },
       destroyRecursive: function(){
         this.inherited(arguments);
@@ -249,16 +266,25 @@ pentaho.common.propertiesPanel.Panel.registeredTypes["gemBar"] = pentaho.common.
 
 dojo.declare(
     "pentaho.common.propertiesPanel.GemUI",
-    [dijit._Widget, dijit._Templated],
+    [dijit._Widget, dijit._Templated,pentaho.common.propertiesPanel.StatefulUI],
     {
       className: "gem",
-      gem:null,
-      templateString:"<div id='${id}' class='${className} dojoDndItem' dndType='gem'>${gem.value}</div>",
-      constructor:function (gem) {
-        this.gem = gem;
+
+      templateString: "<div id='${id}' class='${className} dojoDndItem' dndType='gem'>${model.value}</div>",
+      constructor:function (options) {
+        this.gemBar = options.gemBar;
       },
       detach: function(){
-        gem.detach();
+        model.detach();
+      },
+      postCreate: function(){
+        dojo.connect(this.domNode, "oncontextmenu", this, "onContextMenu");
+      },
+
+
+      // to be overwritten by container
+      onContextMenu: function(e){
+        console.log("onContextMenu called");
       }
     }
 );
