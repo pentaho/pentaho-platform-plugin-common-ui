@@ -6,15 +6,18 @@ dojo.declare(
     "pentaho.common.propertiesPanel.Configuration",
     dojo.Stateful,
     {
-      constructor: function(items){
+      constructor: function(configuration){
         this.items = [];
-        dojo.forEach(items, this.initializeItem, this);
+        this.rawConfiguration = configuration;
+        if(configuration.properties){
+          dojo.forEach(configuration.properties, this.initializeItem, this);
+        }
       },
       initializeItem: function(item){
 
-        var propertyClass = pentaho.common.propertiesPanel.Configuration.registeredTypes[item.uiType];
+        var propertyClass = pentaho.common.propertiesPanel.Configuration.registeredTypes[item.ui.type];
         if (!propertyClass) {
-          throw "No Properties Panel UI implementation found for " + item.uiType;
+          throw "No Properties Panel UI implementation found for " + item.ui.type;
         }
         var propItem = new propertyClass(item);
         var outterThis = this;
@@ -79,6 +82,9 @@ dojo.declare(
         this.gems.push(gem);
 
         // fire event
+        this.set("gems", this.gems);
+      },
+      reordered: function(){
         this.set("gems", this.gems);
       },
 

@@ -16,21 +16,22 @@ dojo.declare(
     "pentaho.common.propertiesPanel.Panel",
     [dijit.layout.ContentPane],
     {
-      captionTemplate: "<div class='caption'><span class='caption-text'>${caption}</span></div>",
+      captionTemplate: "<div class='caption'><span class='caption-text'>${ui.caption}</span></div>",
       propUIs: [],
       groups: {},
       baseClass: "pentahoPropertiesPanel",
       constructor:function (propertiesConfiguration) {
-        this.configuration = propertiesConfiguration || [];
+        this.configuration = propertiesConfiguration;
       },
       postCreate:function () {
         dojo.forEach(this.configuration.items, dojo.hitch(this, "initializeItem"));
+        this.inherited(arguments);
       },
       initializeItem:function (item) {
         // Lookup class impl from map
-        var layoutClass = pentaho.common.propertiesPanel.Panel.registeredTypes[item.uiType];
+        var layoutClass = pentaho.common.propertiesPanel.Panel.registeredTypes[item.ui.type];
         if (!layoutClass) {
-          throw "No Properties Panel UI implementation found for " + item.uiType;
+          throw "No Properties Panel UI implementation found for " + item.ui.type;
         }
 
         // Create UI component
@@ -38,23 +39,23 @@ dojo.declare(
         var targetNode = this.domNode;
 
         // If the property is grouped, create the group or add it to the existing one.
-        if(item.group){
-          var group = this.groups[item.group];
+        if(item.ui.group){
+          var group = this.groups[item.ui.group];
           if(!group){
             var groupContents = document.createElement("div");
 
             group = new dijit.TitlePane({
-              title: item.groupTitle,
+              title: this.configuration.groups[item.ui.group].title,
               content: groupContents
             });
-            this.groups[item.group] = group;
+            this.groups[item.ui.group] = group;
           }
           targetNode = group.content;
           this.domNode.appendChild(group.domNode);
         }
 
         // Items can have a caption. If specified, create and add it before the property UI component
-        if(item.caption){
+        if(item.ui.caption){
           var cap = dojo._toDom(dojo.string.substitute(this.captionTemplate, item));
           targetNode.appendChild(cap);
         }
@@ -135,7 +136,11 @@ dojo.declare("pentaho.common.propertiesPanel.GemBarUISource", [dojo.dnd.Source],
     if(gemUI){
       gem = gemUI.model;
       // gemUI.gemBar.remove(gemUI);
-      gemUI.gemBar = this.gemBar;
+      if(gemUI.gemBar == this.gemBar){ //Reorder, notify model so it can fire an event
+        gem.gemBar.reordered();
+      } else {
+        gemUI.gemBar = this.gemBar;
+      }
       this.inherited(arguments);
     } else {
       var gem = this.createGemFromNode(nodes[0]);
@@ -171,7 +176,7 @@ dojo.declare(
       },
       postCreate: function(){
 
-        this.dropZone = new pentaho.common.propertiesPanel.GemBarUISource(this.domNode, {accept: [this.model.dndType], gemBar: this});
+        this.dropZone = new pentaho.common.propertiesPanel.GemBarUISource(this.domNode, {accept: [this.model.ui.dndType], gemBar: this});
         // this.handles.push[dojo.connect(this.dropZone, "onDrop", this, "onDrop")];
         this.handles.push[dojo.connect(this.dropZone, "createDropIndicator", this, "createDropIndicator")];
         this.handles.push[dojo.connect(this.dropZone, "placeDropIndicator", this, "placeDropIndicator")];

@@ -186,76 +186,101 @@
 
 <body class="claro body" >
 
-<div data-dojo-type="dijit.layout.BorderContainer" id="borderContainer" style="width: 100%; height: 100%" design="sidebar">
+<div data-dojo-type="dijit.layout.BorderContainer" id="borderContainer" style="width: 100%; height: 100%" design="sidebar" gutters="false">
 
-  <div dojoType="dijit.layout.ContentPane" region="left">
-    <button onclick="collapsePanel()">&lt;&lt;&lt;</button>
+  <div dojoType="dijit.layout.ContentPane" region="left" style="width:18px">
+    <div onclick="collapsePanel()" style="-webkit-transform: rotate(-90deg); -o-transform: rotate(-90deg); transform: rotate(-90deg);
+        -moz-transform: rotate(-90deg); margin-top:28px; background-color: #CCC; cursor: pointer" >Layout</div>
   </div>
-  <div dojoType="pentaho.common.propertiesPanel.Panel" id="panel" region="left" splitter="true"style="width: 300px;">
+  <div dojoType="pentaho.common.propertiesPanel.Panel" id="panel" region="left" splitter="true" style="width: 300px;">
   </div>
   <div dojoType="dijit.layout.ContentPane" region="center">
 
     JSON:<br/>
     <textarea rows="20" id="testJSON" style="width:100%; display: block;" >
-      [
+      {groups: {
+      "testGroup":
+      {
+      id: "testGroup",
+      title: "Test Group 1"
+      },
+      "testGroup2":
+      {
+      id: "testGroup2",
+      title: "Test Group 2"
+      }
+      },
+
+      properties: [
       {   id: 'testGem',
       dataType: 'string',
-      uiType: 'gemBar',
       dataStructure: 'column',
-      dndType: 'gem',
-      caption: 'Gem Bar',
       required: true,
-      group: "testGroup2",
-      groupTitle: "Grouping of Props"
+      ui: {
+      group: "testGroup",
+      type: 'gemBar',
+      dndType: 'gem',
+      caption: 'Gem Bar'
+      }
       },
       {   id: 'testGem2',
       dataType: 'string',
-      uiType: 'gemBar',
       dataStructure: 'column',
-      dndType: 'gem',
-      caption: 'Gem Bar 2',
       required: true,
-      group: "testGroup2",
-      groupTitle: "Grouping of Props"
+      ui: {
+      group: "testGroup",
+      type: 'gemBar',
+      dndType: 'gem',
+      caption: 'Gem Bar 2'
+      }
       },
       {
       id: 'testCombo',
-      caption: "Combo Box",
       dataType: 'string',
-      uiType: 'combo',
       values: ["foo", "bar", "baz"],
       value: "bar",
-      group: "testGroup2"
+      ui: {
+      group: "testGroup2",
+      type: 'combo',
+      caption: "Combo Box"
+      }
       },
       {
       id: 'testSlider',
-      caption: "Slider",
       dataType: 'number',
       uiType: 'slider',
       value: 35,
-      group: "testGroup2"
+      ui: {
+      group: "testGroup2",
+      type: 'slider',
+      caption: "Slider"
+      }
       },
       {
       id: 'testCheckbox',
-      caption: "Checkbox",
       label: "working?",
       dataType: 'boolean',
-      uiType: 'checkbox',
       value: false,
-      group: "testGroup",
-      groupTitle: "Test Group"
+      ui: {
+      group: "testGroup2",
+      type: 'checkbox',
+      caption: "Checkbox"
+      }
       },
       {
       id: 'testTextbox',
-      caption: "Text",
       dataType: 'string',
-      uiType: 'textbox',
       value: "default",
-      group: "testGroup",
-      disabled: true
+      disabled: true,
+      ui: {
+      group: "testGroup2",
+      type: 'textbox',
+      caption: "Text"
+      }
       }
 
       ]
+      }
     </textarea>
     <button onClick="changeConfiguration()" style="margin: auto; ">Parse</button><br/><br/>
     Events:<br/>
