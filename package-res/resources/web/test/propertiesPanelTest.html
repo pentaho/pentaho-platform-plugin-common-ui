@@ -25,6 +25,8 @@
     //]]>
   </script>
   <style>
+    body, html { width:100%; height:100%; margin:0; padding:0; overflow:hidden; }
+
     .propPanel_gemBar{
       height: 25px;
       width: 100%;
@@ -76,21 +78,8 @@
     dojo.require("pentaho.common.propertiesPanel.Panel");
     dojo.require("pentaho.common.propertiesPanel.Configuration");
     dojo.require("dojo.dnd.Source");
-
-  </script>
-
-</head>
-
-<body class="claro body" onload="doload()">
-
-<div dojoType="pentaho.common.propertiesPanel.Panel" id="panel" style="border: 1px solid grey; width:20%; height:100%;position: absolute; left: 0px; top: 0px; padding: 4px">
-
-</div>
-
-<div style="float:right; width: 77%; text-align:center;padding: 20px">
-
-  <script type="text/javascript">
-
+    dojo.require("dijit.layout.BorderContainer");
+    dojo.require("dojo.fx.easing");
 
     function changeConfiguration(){
 
@@ -170,82 +159,119 @@
           });
     });
 
-  </script>
-  JSON:<br/>
-  <textarea rows="20" id="testJSON" style="width:100%; display: block;" >
-    [
-    {   id: 'testGem',
-    dataType: 'string',
-    uiType: 'gemBar',
-    dataStructure: 'column',
-    dndType: 'gem',
-    caption: 'Gem Bar',
-    required: true,
-    group: "testGroup2",
-    groupTitle: "Grouping of Props"
-    },
-    {   id: 'testGem2',
-    dataType: 'string',
-    uiType: 'gemBar',
-    dataStructure: 'column',
-    dndType: 'gem',
-    caption: 'Gem Bar 2',
-    required: true,
-    group: "testGroup2",
-    groupTitle: "Grouping of Props"
-    },
-    {
-    id: 'testCombo',
-    caption: "Combo Box",
-    dataType: 'string',
-    uiType: 'combo',
-    values: ["foo", "bar", "baz"],
-    value: "bar",
-    group: "testGroup2"
-    },
-    {
-    id: 'testSlider',
-    caption: "Slider",
-    dataType: 'number',
-    uiType: 'slider',
-    value: 35,
-    group: "testGroup2"
-    },
-    {
-    id: 'testCheckbox',
-    caption: "Checkbox",
-    label: "working?",
-    dataType: 'boolean',
-    uiType: 'checkbox',
-    value: false,
-    group: "testGroup",
-    groupTitle: "Test Group"
-    },
-    {
-    id: 'testTextbox',
-    caption: "Text",
-    dataType: 'string',
-    uiType: 'textbox',
-    value: "default",
-    group: "testGroup",
-    disabled: true
+    function collapsePanel(){
+      var targetWidth = (parseInt(dojo.byId("panel").style.width) == 0)? 250 : 0;
+
+      dojo.animateProperty({
+
+        node: "panel",
+        // dojo figures out the start value
+        properties: { width: { end: targetWidth } },
+        easing: dojo.fx.easing.quadIn,
+        duration: 300,
+
+        onAnimate: function(node){
+          dijit.byId("borderContainer").layout();
+
+        }, onEnd: function(){
+          dijit.byId("borderContainer").layout();
+        }
+      }).play(); // delay playing half a second
     }
 
-    ]
-  </textarea>
-  <button onClick="changeConfiguration()" style="margin: auto; ">Parse</button><br/><br/>
-  Events:<br/>
-  <div style="border: 1px solid black; width: 100%; height: 200px; overflow-y: auto;text-align:left">
-    <pre id="output"/>
+
+  </script>
+
+</head>
+
+<body class="claro body" >
+
+<div data-dojo-type="dijit.layout.BorderContainer" id="borderContainer" style="width: 100%; height: 100%" design="sidebar">
+
+  <div dojoType="dijit.layout.ContentPane" region="left">
+    <button onclick="collapsePanel()">&lt;&lt;&lt;</button>
   </div>
-  <button style="display: block" onClick="disable()">Toggle Disable</button>
-  <button style="display: block" onClick="ramdomValues()">Random Vals</button>
-  <div style="width:100%; clear:both" dojoType="dojo.dnd.Source" >
-    <span style="width: 100px; height: 20px; border: 1px solid black" dndType="gem" class="dojoDndItem" id="sourceNode">Test1</span>
-    <span style="width: 100px; height: 20px; border: 1px solid black" dndType="gem" class="dojoDndItem" id="sourceNode2">Test2</span>
-    <span style="width: 100px; height: 20px; border: 1px solid black" dndType="gem" class="dojoDndItem" id="sourceNode3">Test3</span>
+  <div dojoType="pentaho.common.propertiesPanel.Panel" id="panel" region="left" splitter="true"style="width: 300px;">
   </div>
-  <div style="background-color:#FFFFCC; height: 40px; width: 100%" dojoType="GemBarUISource" accept="gem"></div>
+  <div dojoType="dijit.layout.ContentPane" region="center">
+
+    JSON:<br/>
+    <textarea rows="20" id="testJSON" style="width:100%; display: block;" >
+      [
+      {   id: 'testGem',
+      dataType: 'string',
+      uiType: 'gemBar',
+      dataStructure: 'column',
+      dndType: 'gem',
+      caption: 'Gem Bar',
+      required: true,
+      group: "testGroup2",
+      groupTitle: "Grouping of Props"
+      },
+      {   id: 'testGem2',
+      dataType: 'string',
+      uiType: 'gemBar',
+      dataStructure: 'column',
+      dndType: 'gem',
+      caption: 'Gem Bar 2',
+      required: true,
+      group: "testGroup2",
+      groupTitle: "Grouping of Props"
+      },
+      {
+      id: 'testCombo',
+      caption: "Combo Box",
+      dataType: 'string',
+      uiType: 'combo',
+      values: ["foo", "bar", "baz"],
+      value: "bar",
+      group: "testGroup2"
+      },
+      {
+      id: 'testSlider',
+      caption: "Slider",
+      dataType: 'number',
+      uiType: 'slider',
+      value: 35,
+      group: "testGroup2"
+      },
+      {
+      id: 'testCheckbox',
+      caption: "Checkbox",
+      label: "working?",
+      dataType: 'boolean',
+      uiType: 'checkbox',
+      value: false,
+      group: "testGroup",
+      groupTitle: "Test Group"
+      },
+      {
+      id: 'testTextbox',
+      caption: "Text",
+      dataType: 'string',
+      uiType: 'textbox',
+      value: "default",
+      group: "testGroup",
+      disabled: true
+      }
+
+      ]
+    </textarea>
+    <button onClick="changeConfiguration()" style="margin: auto; ">Parse</button><br/><br/>
+    Events:<br/>
+    <div style="border: 1px solid black; width: 100%; height: 200px; overflow-y: auto;text-align:left">
+      <pre id="output"/>
+    </div>
+    <button style="display: block" onClick="disable()">Toggle Disable</button>
+    <button style="display: block" onClick="ramdomValues()">Random Vals</button>
+    <div style="width:100%; clear:both" dojoType="dojo.dnd.Source" >
+      <span style="width: 100px; height: 20px; border: 1px solid black" dndType="gem" class="dojoDndItem" id="sourceNode">Test1</span>
+      <span style="width: 100px; height: 20px; border: 1px solid black" dndType="gem" class="dojoDndItem" id="sourceNode2">Test2</span>
+      <span style="width: 100px; height: 20px; border: 1px solid black" dndType="gem" class="dojoDndItem" id="sourceNode3">Test3</span>
+    </div>
+    <div style="background-color:#FFFFCC; height: 40px; width: 100%" dojoType="GemBarUISource" accept="gem"></div>
+  </div>
+
 </div>
 </body>
 
