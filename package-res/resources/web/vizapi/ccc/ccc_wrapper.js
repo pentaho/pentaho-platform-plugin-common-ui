@@ -350,7 +350,7 @@ pentaho.visualizations.push({
     extensionPoints: [],
     valuesAnchor: "right",
     useShapes: true,
-    shape: 'circle',
+    shape: 'square',
     isMultiValued: true,
     useCompositeAxis:true,
     sizeValIdx:1,
@@ -385,6 +385,97 @@ pentaho.visualizations.push({
     ]
   ]
 });
+
+
+pentaho.visualizations.push({
+  id: 'ccc_bulletchart',
+  type: 'bulletchart',
+  source: 'CCC',
+  name: 'Bullet Chart',
+  'class': 'pentaho.ccc.CccChart',
+
+  getDropZoneLabel : function (type) {
+    if (type == 'ROW') return 'Categories';
+    if (type == 'COL') return 'Series';
+    if (type == 'NUM') return 'Color/Size measures';
+  },
+
+  args: {
+    cccClass: 'pvc.BulletChart',
+    crosstabMode: true,
+    normPerBaseCategory: false,
+    showValues: true,
+    showXScale: true,
+    xAxisPosition: "bottom",
+    showYScale: true,
+    yAxisPosition: "left",
+    legendPosition: "bottom",
+    seriesInRows: true,
+    animate: false,
+
+    bulletTitle: 'Test for title',
+    bulletSubtitle: 'Test for subtitle',
+    bulletMeasures: [],
+    bulletMarkers: ["7500"],
+    bulletRanges: ["3000", "6500", "9000"],
+
+    timeSeries: false,
+    timeSeriesFormat: "%Y-%m-%d",
+    panelSizeRatio: 0.8,
+    orientation: "horizontal",
+    valuesAnchor: "right",
+    titlePosition: "top",
+    titleSize: 25,
+    showXScale: true,
+    xAxisPosition: "bottom",
+    xAxisSize: 30,
+    showYScale: true,
+    yAxisPosition: "left",
+    yAxisSize: 50,
+    xAxisFullGrid: false,
+    yAxisFullGrid: false,
+    orthoAxisOrdinal: false,
+    scalingType: "linear",
+    numSD: 2,
+
+    extensionPoints: [["bulletRuleLabel_font","7pt sans"]],
+    valuesAnchor: "right",
+    normPerBaseCategory: true,
+    useShapes: true,
+//    isMultiValued: true,
+    useCompositeAxis:true,
+    dataOptions: {
+      categoriesCount: 1,
+      measuresInColumns: true
+    }
+
+  },
+  propMap: [],
+  dataReqs: [
+    [
+      {   id: 'category',
+        dataType: 'string',
+        dataStructure: 'row',
+        caption: 'Across',
+        required: true
+      },
+      {   id: 'category',
+        dataType: 'string',
+        dataStructure: 'column',
+        caption: 'Down',
+        required: true
+      },
+      {   id: 'series',
+        dataType: 'number',
+        dataStructure: 'column',
+        caption: 'Values',
+        required: true
+      }
+    ]
+  ]
+});
+
+
 
 /*
  CccChart constructor
@@ -797,7 +888,9 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
       //the selected member from the Columns/Series level. If there are nested levels in Columns/Series, it should
       //do a 'keep only' on the outer-most member and a 'show next' (drill-down) on the inner-most level.
       var toDrill = series[series.length-1];
-      var drillFormula = cv.getActiveReport().reportDoc.getReportNode().selectNodes('cv:columnAttributes/cv:attribute/@formula')[series.length - 1].value;
+      var seriesFormulas = cv.getActiveReport().reportDoc.getReportNode().selectNodes('cv:columnAttributes/cv:attribute/@formula');
+      if(seriesFormulas.length < series.length) return;
+      var drillFormula = seriesFormulas[series.length - 1].value;
       var toKeep = null;
       var keepFormula=null;
       if(series.length > 1)
