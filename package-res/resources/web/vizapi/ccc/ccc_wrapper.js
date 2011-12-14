@@ -539,6 +539,12 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
     }
   }
 
+
+  if (vizOptions.cccClass == 'pvc.BulletChart') {
+    if (vizOptions.legendPosition) vizOptions.legendPosition = vizOptions.legendPosition.toLowerCase();
+
+  }
+
   if(vizOptions.cccClass == 'pvc.HeatGridChart'){
     categoriesCount = 0;
     //direct translation
@@ -708,7 +714,108 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
       resultset.push(row);
     }
 
+  } else if (vizOptions.cccClass == 'pvc.BulletChart') {
+    vizOptions.colors = this.getColors();
+
+    metadata.push({
+      colIndex: 0,
+      colName: 'Category',
+      colLabel: 'Category',
+      colType: 'STRING'
+    });
+
+
+
+    // create the metadata
+    metadata.push({
+      colIndex: 1,
+      colName: 'Series',
+      colLabel: 'Series',
+      colType: 'STRING'
+    });
+
+
+
+    metadata.push({
+      colIndex: 2,
+      colName: 'Value',
+      colLabel: 'Value',
+      colType: 'NUMERIC'
+    });
+
+
+
+    metadata.push({
+      colIndex: 3,
+      colName: 'Marker',
+      colLabel: 'Marker',
+      colType: 'NUMERIC'
+    });
+
+
+    if (vizOptions.bulletRanges) {
+      for (var i=0; i < vizOptions.bulletRanges.length; i++) {
+        metadata.push({
+          colIndex: 4+i,
+          colName: 'Range'+i,
+          colLabel: 'Range ' + i,
+          colType: 'NUMERIC'
+        });
+      }
+    }
+
+
+    // process the rows
+    var catMap = {};
+    for(var rowNo=0; rowNo< dataTable.getNumberOfRows(); rowNo++) {
+      // concat all of the strings
+      var category = '';
+      var row = [];
+      for( var colNo=0; colNo<dataTable.getNumberOfColumns(); colNo++) {
+        if( dataTable.getColumnType(colNo).toUpperCase() == 'STRING' ) {
+          if( category ) {
+            category += ' ~ ';
+          }
+          category += dataTable.getFormattedValue( rowNo, colNo );
+        }
+      }
+      if(!catMap[category] ) {
+        catMap[category] = true;
+        this.categories.push(category);
+      }
+
+      for( var measureNo=0; measureNo< measures.length; measureNo++ ) {
+//                var row = [ dataTable.getColumnLabel(measures[measureNo]), category, dataTable.getValue( rowNo, measures[measureNo] ),  dataTable.getValue( rowNo, measures[measureNo] ) ];
+        var row = [category,
+          dataTable.getColumnLabel( measures[measureNo] ),
+          dataTable.getValue( rowNo, measures[measureNo] ),
+          7500
+        ];
+
+        if (vizOptions.bulletRanges)
+          for (var i=0; i < vizOptions.bulletRanges.length; i++) row.push(vizOptions.bulletRanges[i]);
+
+//				var row = [dataTable.getValue( rowNo, measures[measureNo] )];
+        resultset.push(row);
+      }
+
+    }
+
+    if (resultset.length > 20) {
+      vizOptions.bulletSize = 10;
+      vizOptions.bulletSpacing = 20;
+    }else if (resultset.length > 10) {
+      vizOptions.bulletSize = 15;
+      vizOptions.bulletSpacing = 30;
+    }   else {
+      vizOptions.bulletSize = 20;
+      vizOptions.bulletSpacing = 50;
+    }
+
+    categoriesCount = this.categories.length;
   }
+
+
 
   var myself=this;
 
@@ -1012,6 +1119,156 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
 
 
   }//heatgrid
+
+  if(vizOptions.cccClass == 'pvc.BulletChart'){
+
+    var categoryMatches = function(category, dataTableVal){
+      return pvc.arrayEquals(category, dataTableVal);
+    };
+
+    var seriesMatches = function(series, dataTableVal){//TODO:
+      var seriesStr = $.isArray(series)?
+          series.join('~'):
+          series;
+      var idx = dataTableVal.lastIndexOf('~');
+      if(idx < 0) {idx = 0;} //dataTableVal.length
+      return dataTableVal.substring(0, idx) == seriesStr;
+    };
+
+
+    dataOpts.seriesInRows = true;
+
+
+
+    var totalHeight= (2 + vizOptions.bulletSize + vizOptions.bulletSpacing ) * resultset.length;
+
+    if (totalHeight > vizOptions.height) {
+      vizOptions.controller.domNode.style.overflowY = 'auto';
+      vizOptions.controller.domNode.style.overflowX = 'hidden';
+      vizOptions.height = totalHeight;
+    }
+
+
+    //drill down on axis
+    opts.axisDoubleClickAction =  function (d) {
+      var ctxArray = [];
+      var rowItems = {};
+
+      var path = d.title.split(' ~ ');
+      var formula = cv.getActiveReport().reportDoc.getReportNode().selectNodes('cv:rowAttributes/cv:attribute/@formula')[path.length - 1].value;
+
+//		var member = path[path.length-1];
+      /*		var member = formula.split('].[')[0] + ']';
+       for (var xa = 0; xa < path.length; xa++) {
+       var ya = path[xa];
+       member += '.[' + ya + ']';
+       }
+       */
+
+      var member = formula + '.[' + path[path.length-1] + ']';
+      var ctx = {formula:formula, member:member,
+        action: "KEEP_AND_DRILL",
+        caption: cv.util.parseMDXExpression(member, false)
+      };
+      ctxArray.push(ctx);
+
+      path = d.subtitle.split('~');
+      path = path.splice(path.length -1, 1);
+      formula = cv.getActiveReport().reportDoc.getReportNode().selectNodes('cv:columnAttributes/cv:attribute/@formula')[path.length - 1].value;
+
+      ctx = {formula:formula, member:formula + '.[' + path[path.length-1] + ']',
+//        action: "KEEP_AND_DRILL",
+        caption: cv.util.parseMDXExpression(path[path.length-1], false)
+      };
+      //    ctxArray.push(ctx);
+
+
+
+      cv.getActiveReport().clickChart(ctxArray, true);
+    };
+
+
+
+    opts.clickAction = function (c, s, d) {
+      var numMeasures = cv.getActiveReport().reportDoc.getReportNode().selectNodes("cv:measures/cv:measure").length;
+      var selections = [];
+      var categoryColNo = 0;
+      var seriesRowNo = 0;
+      var seriesColStart=categoriesCount;
+
+      var selection = {
+        type: 'cell',
+        rowLabel: myself.dataTable.getColumnLabel(categoriesCount - 1)
+
+      };
+      for (var rowNo = 0; rowNo < myself.dataTable.getNumberOfRows(); rowNo++)
+      {
+        //category -> row
+        var categories = [];
+        for (var j = categoryColNo; j < categoriesCount; j++) {
+          categories.push(myself.dataTable.getFormattedValue(rowNo, j));
+
+        }
+        if (categoryMatches([c], categories))
+        {
+          selection.row = rowNo;
+          var rowItems = [],
+              rowIds = [];
+          for (var j = categoryColNo; j < categoriesCount; j++) {
+            rowItems.push(myself.dataTable.getValue(rowNo, j));
+            rowIds.push(myself.dataTable.getColumnId(j));
+
+          }
+          selection.rowItem = rowItems;
+          selection.rowId = rowIds;
+          break;
+
+        }
+
+      }
+      for (var colNo = seriesColStart; colNo < myself.dataTable.getNumberOfColumns(); colNo += numMeasures)
+      {
+        //just catch first occurrence
+        if (seriesMatches(s, myself.dataTable.getColumnId(colNo))) {
+          selection.column = colNo;
+          //get measure out
+          var colId = myself.dataTable.getColumnId(colNo);
+          var endSplitIdx = colId.lastIndexOf('~');
+          if (endSplitIdx < 0) {
+            endSplitIdx = colId.length - 1;
+          }
+          selection.columnItem = colId.substring(0, endSplitIdx).split('~');
+          selection.measureId = colId.substring(endSplitIdx + 1, colId.length);
+
+          var columnIds = [];
+          var columnIdNodes = cv.getActiveReport().reportDoc.getReportNode().selectNodes('cv:columnAttributes/cv:attribute/@formula');
+          for (var j = 0; j < columnIdNodes.length; j++) {
+            columnIds.push(columnIdNodes[j].firstChild.data);
+
+          }
+          selection.columnId = columnIds;
+          selection.columnLabel = myself.dataTable.getColumnLabel(colNo);
+          break;
+
+        }
+
+      }
+      if (selection.row != null && selection.column != null) {
+        selection.value = myself.dataTable.getValue(selection.row, selection.column);
+
+      }
+      selections.push(selection);
+
+      var args = {
+        source: myself,
+        selections: selections
+
+      };
+      pentaho.events.trigger(myself, "select", args);
+    };
+
+
+  }
 
   // copy options from the visualization metadata to the chart options
   for( x in vizOptions ) {
