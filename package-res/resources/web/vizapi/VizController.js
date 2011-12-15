@@ -405,6 +405,12 @@ pentaho.VizController.prototype.chartDoubleClickHandler = function(args) {
 }
 
 pentaho.VizController.prototype.processHighlights = function(args) {
+    var mode = args.selectionMode || "APPEND";
+
+    if (mode == "REPLACE") {
+        // only use the selections from the arguments passed in
+        this.highlights = [];
+    }
 
     for (var i = 0; i < args.selections.length; i++) {
         var selectedItem = args.selections[i];
@@ -413,7 +419,10 @@ pentaho.VizController.prototype.processHighlights = function(args) {
         var colId;
         var colLabel;
         var value;
-        
+        var colItem;
+        var rowId;
+        var rowLabel;
+
         if(selectedItem.rowItem) {
             rowItem = selectedItem.rowItem;
             rowId = selectedItem.rowId;
@@ -422,6 +431,7 @@ pentaho.VizController.prototype.processHighlights = function(args) {
         if(selectedItem.column || selectedItem.column == 0) {
             colId = selectedItem.columnId;
             colLabel = selectedItem.columnLabel;
+            colItem = selectedItem.columnItem;
         }
         if((selectedItem.row || selectedItem.row == 0) && selectedItem.column) {
             value = selectedItem.value;
@@ -431,30 +441,44 @@ pentaho.VizController.prototype.processHighlights = function(args) {
         // see if this is already highlighted
         var removed = false;
         var modified = false;
-        for( var hNo=0; hNo<this.highlights.length; hNo++) {
-            if( this.highlights[hNo].rowItem && this.highlights[hNo].rowItem == rowItem && this.highlights[hNo].colId && this.highlights[hNo].colId == colId && this.highlights[hNo].type == 'column' && selectedItem.type == 'cell') {
-                // switch this
-                this.highlights[hNo].type = 'row';
-                highlight.id = selectedItem.rowId;
-                highlight.value = rowItem;
-                modified = true;
-                break;
-            }
-            else if( this.highlights[hNo].rowItem && this.highlights[hNo].rowItem == rowItem && this.highlights[hNo].colId && this.highlights[hNo].colId == colId && this.highlights[hNo].type == 'column') {
-                // remove this
-                this.highlights.splice( hNo, 1 );
-                removed = true;
-                break;
-            }
-            else if( this.highlights[hNo].rowItem && this.highlights[hNo].rowItem == rowItem) {
-                // remove this
-                this.highlights.splice( hNo, 1 );
-                removed = true;
-                break;
+
+        if(mode == "APPEND") {
+            // previous selection should be retained or if re-selected should be toggled
+            for( var hNo=0; hNo<this.highlights.length; hNo++) {
+                var highlightRowItem = this.highlights[hNo].rowItem;
+                var highlightColItem = this.highlights[hNo].colItem;
+                var rowItemsSame = highlightRowItem
+                    && (highlightRowItem == rowItem
+                        || (highlightRowItem.join && ( highlightRowItem.join('-') == rowItem.join('-') ) ) );
+
+                var colItemsSame = highlightColItem
+                    && (highlightColItem == colItem
+                    || (highlightColItem.join && ( highlightColItem.join('-') == colItem.join('-') ) ) );
+
+                if( rowItemsSame && colItemsSame && this.highlights[hNo].colId && this.highlights[hNo].colId == colId && this.highlights[hNo].type == 'column' && selectedItem.type == 'cell') {
+                    // switch this
+                    this.highlights[hNo].type = 'row';
+                    highlight.id = selectedItem.rowId;
+                    highlight.value = rowItem;
+                    modified = true;
+                    break;
+                }
+                else if( rowItemsSame && colItemsSame && this.highlights[hNo].colId && this.highlights[hNo].colId == colId && this.highlights[hNo].type == 'column') {
+                    // remove this
+                    this.highlights.splice( hNo, 1 );
+                    removed = true;
+                    break;
+                }
+                else if( rowItemsSame && colItemsSame ) {
+                    // remove this
+                    this.highlights.splice( hNo, 1 );
+                    removed = true;
+                    break;
+                }
             }
         }
         if(!removed && !modified) {
-            highlight = { rowItem: rowItem, colId: colId, colLabel: colLabel, rowId: rowId, rowLabel: rowLabel };
+            highlight = { rowItem: rowItem, colId: colId, colLabel: colLabel, colItem: colItem, rowId: rowId, rowLabel: rowLabel };
             highlight.type = selectedItem.type;
             if( selectedItem.type == 'row' ) {
                 highlight.id = rowId;

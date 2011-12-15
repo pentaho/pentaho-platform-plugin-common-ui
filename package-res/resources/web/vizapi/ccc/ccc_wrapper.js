@@ -970,7 +970,8 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
       }
       var args = {
         source: myself,
-        selections: selections
+        selections: selections,
+        selectionMode: "REPLACE"
       };
       pentaho.events.trigger( myself, "select", args );
     };//onSelectionChange
@@ -1309,8 +1310,8 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
 
       var args = {
         source: myself,
-        selections: selections
-
+        selections: selections,
+        selectionMode: "REPLACE"
       };
       pentaho.events.trigger(myself, "select", args);
     };
