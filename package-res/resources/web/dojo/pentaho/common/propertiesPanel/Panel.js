@@ -34,18 +34,24 @@ dojo.declare(
           throw "No Properties Panel UI implementation found for " + item.ui.type;
         }
 
-        // Create UI component
-        var propUi = new layoutClass({model: item, propPanel: this});
+        var propUi;
+        // check to see if it's a factory class
+        if(layoutClass.create){
+          propUi = layoutClass.create({model: item, propPanel: this});
+        } else {
+          propUi = new layoutClass({model: item, propPanel: this});
+        }
         var targetNode = this.domNode;
 
         // If the property is grouped, create the group or add it to the existing one.
         if(item.ui.group){
           var group = this.groups[item.ui.group];
-          if(!group){
+          var groupConfig = this.configuration.groups[item.ui.group];
+          if(!group && groupConfig){
             var groupContents = document.createElement("div");
 
             group = new dijit.TitlePane({
-              title: this.configuration.groups[item.ui.group].title,
+              title: groupConfig.title,
               content: groupContents
             });
             this.groups[item.ui.group] = group;
@@ -64,25 +70,26 @@ dojo.declare(
         this.setupEventHandling(propUi);
 
         this.propUIs.push(propUi);
+        this.connect(propUi, "onUIEvent", "onUIEvent");
         targetNode.appendChild(propUi.domNode);
 
+      },
+
+      onUIEvent: function(type, args){
       },
       setupEventHandling: function(ui){
 
         this.connect(ui, "onContextMenu", function(e){
-          this.onPropertyChange(ui.model, "onContextMenu", e);
+          this.onUIEvent("onContextMenu", {item: ui, args: [ui, e]});
         });
         this.connect(ui, "onClick", function(e){
-          this.onPropertyChange(ui.model, "onClick", e);
+          this.onUIEvent("onClick", {item: ui, args: [ui, e]});
         });
         this.connect(ui, "onDblClick", function(e){
-          this.onPropertyChange(ui.model, "onDblClick", e);
+          this.onUIEvent("onDblClick", {item: ui, args: [ui, e]});
         });
       },
-      // to the connected to by outside container.
-      onPropertyChange: function(item, eventName, eventObj){
 
-      },
       setConfiguration: function(config){
 
         this.propUIs.forEach(function(widget){
@@ -116,8 +123,17 @@ dojo.declare(
         this.propPanel = options.propPanel;
         var outterThis = this;
         this.model.watch(function(propName, prevVal, newVal){
-          outterThis.set(propName, newVal);
+
+          switch(propName){
+            case "value":
+            case "default":
+              outterThis.set(propName, newVal);
+              break;
+          }
         });
+      },
+      onUIEvent: function(type, args){
+
       }
     }
 );
@@ -127,7 +143,7 @@ dojo.declare("pentaho.common.propertiesPanel.GemBarUISource", [dojo.dnd.Source],
 
   onDrop:function (source, nodes, copy) {
 
-    if (!nodes || nodes.length == 0) {
+    if (!nodes || nodes.length == 0 || !this.gemBar.checkAcceptance(this, nodes)) {
       return false;
     }
     var droppedNode = nodes[0];
@@ -139,24 +155,47 @@ dojo.declare("pentaho.common.propertiesPanel.GemBarUISource", [dojo.dnd.Source],
       if(gemUI.gemBar == this.gemBar){ //Reorder, notify model so it can fire an event
         gem.gemBar.reordered();
       } else {
+        gemUI.gemBar.remove(gemUI);
         gemUI.gemBar = this.gemBar;
+        this.gemBar.add(gemUI);
       }
-      this.inherited(arguments);
     } else {
       var gem = this.createGemFromNode(nodes[0]);
-      gemUI = this.createGemUI(gem);
+      gemUI = this.createGemUI(gem, nodes[0]);
+      nodes[0] = gemUI.domNode;
       this.gemBar.add(gemUI);
     }
+
+    var newId = nodes[0].id;
+    nodes[0].id = droppedNode.id; // need to ensure the original id is used when calling superclass
+    this.inherited(arguments);
+    nodes[0].id = newId;
     this.sync();
+    source.sync();
     return true;
 
   },
 
   createGemFromNode:function (sourceNode) {
-    return new pentaho.common.propertiesPanel.Configuration.registeredTypes["gem"]({id: sourceNode.innerHTML, value: sourceNode.innerHTML, gemBar: this.gemBar.model});
+
+    var modelClass = pentaho.common.propertiesPanel.Configuration.registeredTypes["gem"];
+    var options = {id: sourceNode.id, value: sourceNode.innerHTML, gemBar: this.gemBar.model, sourceNode: sourceNode};
+
+    // check to see if it's a factory class
+    if(modelClass.create){
+      return modelClass.create(options)
+    } else {
+      return new modelClass(options);
+    }
   },
-  createGemUI:function (gem) {
-    return new pentaho.common.propertiesPanel.GemUI({model: gem, gemBar: this.gemBar});
+  createGemUI:function (gem, sourceNode) {
+    var uiClass = pentaho.common.propertiesPanel.Panel.registeredTypes["gem"];
+    var options = {id: gem.id, model: gem, gemBar: this.gemBar, dndType: this.gemBar.model.ui.dndType, sourceNode : sourceNode};
+    if(uiClass.create){
+      return uiClass.create(options);
+    } else {
+      return new uiClass(options);
+    }
   }
 });
 
@@ -176,19 +215,40 @@ dojo.declare(
       },
       postCreate: function(){
 
-        this.dropZone = new pentaho.common.propertiesPanel.GemBarUISource(this.domNode, {accept: [this.model.ui.dndType], gemBar: this});
+        this.dropZone = new pentaho.common.propertiesPanel.GemBarUISource(this.domNode, {accept: this.model.ui.dndType, gemBar: this});
         // this.handles.push[dojo.connect(this.dropZone, "onDrop", this, "onDrop")];
         this.handles.push[dojo.connect(this.dropZone, "createDropIndicator", this, "createDropIndicator")];
         this.handles.push[dojo.connect(this.dropZone, "placeDropIndicator", this, "placeDropIndicator")];
         this.handles.push[dojo.connect(this.dropZone, "onMouseOver", this, "onMouseOver")];
         this.handles.push[dojo.connect(this.dropZone, "onMouseOut", this, "onMouseOut")];
         this.handles.push[dojo.connect(this.dropZone, "onDraggingOver", this, "onDraggingOver")];
+        this.handles.push[dojo.connect(this.dropZone, "onDraggingOver", this, "onDraggingOut")];
         this.handles.push[dojo.connect(this.dropZone, "checkAcceptance", this, "checkAcceptance")];
+        this.handles.push[dojo.connect(this.dropZone, "insertNodes", this, "insertNodes")];
+
+        dojo.forEach(this.model.gems, function(gem){
+          var uiClass = pentaho.common.propertiesPanel.Panel.registeredTypes["gem"];
+          var options = {sourceNode: gem.sourceNode, id: gem.id, model: gem, gemBar: this, dndType: this.model.ui.dndType};
+          var gemUI;
+          if(uiClass.create){
+            gemUI = uiClass.create(options);
+          } else {
+            gemUI = new uiClass(options);
+          }
+          this.domNode.appendChild(gemUI.domNode);
+          this.add(gemUI);
+        }, this);
+        this.dropZone.sync();
 
       },
+      insertNodes: function(addSelected, data, before, anchor) {
+        this.onUIEvent("insertNodes", {item: this, args: arguments});
+      },
       add: function(gemUI){
+        gemUI.model.gemBar = this.model;
         this.model.add(gemUI.model);
-        this.domNode.appendChild(gemUI.domNode);
+        this.gems.push(gemUI);
+        gemUI.gemBar = this;
         this.propPanel.setupEventHandling(gemUI);
       },
       remove: function(gemUI){
@@ -204,36 +264,37 @@ dojo.declare(
 
       },
       onMouseOver:function () {
-        this.mouseMoveHandle = this.connect(window, "onMouseMove", this, "placeDropIndicator");
+        // this.mouseMoveHandle = this.connect(window, "onMouseMove", this, "placeDropIndicator");
       },
       onMouseOut:function () {
-        if (this.mouseMoveHandle) {
-          dojo.disconnect(this.mouseMoveHandle);
-        }
+        // if (this.mouseMoveHandle) {
+        //   dojo.disconnect(this.mouseMoveHandle);
+        // }
       },
       onDraggingOver:function () {
-        var accept = this.checkAcceptance(dojo.dnd.manager().source, dojo.dnd.manager().nodes);
-        if (accept) {
-          return this.inherited(arguments);
-        }
+        return this.inherited(arguments);
+
+      },
+      onDraggingOut: function(){
+
       },
       checkAcceptance: function(source, nodes){
-        var i=0;
-      },
-
-
-      onDrop:function (source, nodes, copy) {
-        if (!nodes || nodes.length == 0) {
-          return false;
-        }
-        var droppedNode = nodes[0];
-        var gem = (droppedNode.isGem) ? droppedNode.gem : this.createGemFromNode(nodes[0]);
-        this.gems.push(gem);
-        var gemUI = (droppedNode.isGem) ? droppedNode : this.createGemUI(gem);
-        this.gems.push(gemUI);
-        this.domNode.appendChild(gemUI.domNode);
         return true;
       },
+
+
+      // onDrop:function (source, nodes, copy) {
+      //   if (!nodes || nodes.length == 0) {
+      //     return false;
+      //   }
+      //   var droppedNode = nodes[0];
+      //   var gem = (droppedNode.isGem) ? droppedNode.gem : this.createGemFromNode(nodes[0]);
+      //   this.gems.push(gem);
+      //   var gemUI = (droppedNode.isGem) ? droppedNode : this.createGemUI(gem);
+      //   this.gems.push(gemUI);
+      //   this.domNode.appendChild(gemUI.domNode);
+      //   return true;
+      // },
       init:function () {
         dojo.forEach(this.model.gems, dojo.hitch(this, "createGems"));
       },
@@ -275,9 +336,10 @@ dojo.declare(
     {
       className: "gem",
 
-      templateString: "<div id='${id}' class='${className} dojoDndItem' dndType='gem'>${model.value}</div>",
+      templateString: "<div id='${id}' class='${className} dojoDndItem' dndType='${dndType}'>${model.value}</div>",
       constructor:function (options) {
         this.gemBar = options.gemBar;
+        this.dndType = options.dndType;
       },
       detach: function(){
         model.detach();
@@ -293,6 +355,8 @@ dojo.declare(
       }
     }
 );
+
+pentaho.common.propertiesPanel.Panel.registeredTypes["gem"] = pentaho.common.propertiesPanel.GemUI;
 
 dojo.declare(
     "pentaho.common.propertiesPanel.ComboUI",

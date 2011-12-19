@@ -9,7 +9,7 @@ dojo.declare(
       constructor: function(configuration){
         this.items = [];
         this.rawConfiguration = configuration;
-        if(configuration.properties){
+        if(configuration && configuration.properties){
           dojo.forEach(configuration.properties, this.initializeItem, this);
         }
       },
@@ -67,7 +67,7 @@ dojo.declare(
       gems: [],
       constructor: function(item){
         this.inherited(arguments);
-        dojo.safeMixin(this, item);
+
       },
       postCreate: function(){
 
