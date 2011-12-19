@@ -405,7 +405,7 @@ pentaho.VizController.prototype.chartDoubleClickHandler = function(args) {
 }
 
 pentaho.VizController.prototype.processHighlights = function(args) {
-    var mode = args.selectionMode || "APPEND";
+    var mode = args.selectionMode || "TOGGLE";
 
     if (mode == "REPLACE") {
         // only use the selections from the arguments passed in
@@ -442,7 +442,7 @@ pentaho.VizController.prototype.processHighlights = function(args) {
         var removed = false;
         var modified = false;
 
-        if(mode == "APPEND") {
+        if(mode == "TOGGLE") {
             // previous selection should be retained or if re-selected should be toggled
             for( var hNo=0; hNo<this.highlights.length; hNo++) {
                 var highlightRowItem = this.highlights[hNo].rowItem;
@@ -454,6 +454,10 @@ pentaho.VizController.prototype.processHighlights = function(args) {
                 var colItemsSame = highlightColItem
                     && (highlightColItem == colItem
                     || (highlightColItem.join && ( highlightColItem.join('-') == colItem.join('-') ) ) );
+
+                if(typeof colItemsSame == 'undefined') {
+                    colItemsSame = true;
+                }
 
                 if( rowItemsSame && colItemsSame && this.highlights[hNo].colId && this.highlights[hNo].colId == colId && this.highlights[hNo].type == 'column' && selectedItem.type == 'cell') {
                     // switch this
