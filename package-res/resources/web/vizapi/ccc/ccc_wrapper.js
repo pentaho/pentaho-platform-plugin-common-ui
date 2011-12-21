@@ -423,7 +423,7 @@ pentaho.visualizations.push({
     timeSeries: false,
     timeSeriesFormat: "%Y-%m-%d",
     panelSizeRatio: 0.8,
-    orientation: "vertical",
+    orientation: "horizontal",
     valuesAnchor: "right",
     titlePosition: "top",
     titleSize: 25,
