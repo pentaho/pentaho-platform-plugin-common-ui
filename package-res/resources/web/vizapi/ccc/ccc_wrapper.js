@@ -981,16 +981,18 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
     opts.customTooltip = function(s,c,d){
       var tooltip = "";
       //series
-      for(var i=0; i < s.length; i++){
-        var sFormula = cv.getActiveReport().reportDoc.getChildMembers("columnAttributes")[i].attributes['formula'].nodeValue;
+      var columnAttributes = cv.getActiveReport().reportDoc.getChildMembers("columnAttributes");
+      for(var i=0; i < s.length && i < columnAttributes.length; i++){
+        var sFormula = columnAttributes[i].attributes.getNamedItem('formula').nodeValue;
         if(!sFormula) continue;
         var sTitle = cv.util.parseMDXExpression(sFormula, true);
         var sVal = yAxisLabels[s[i]];
         tooltip += sTitle + ': ' + cv.util.escapeHtml(sVal)+ '<br>';
       }
       //categories
-      for(var i=0;i<c.length;i++){
-        var cFormula = cv.getActiveReport().reportDoc.getChildMembers("rowAttributes")[i].attributes['formula'].nodeValue;
+      var rowAttributes = cv.getActiveReport().reportDoc.getChildMembers("rowAttributes");
+      for(var i=0;i<c.length && i<rowAttributes.length;i++){
+        var cFormula = rowAttributes[i].attributes.getNamedItem('formula').nodeValue;
         if(!cFormula) continue;
         var cTitle = cv.util.parseMDXExpression(cFormula, true);
         var cVal = xAxisLabels[c[i]];
@@ -1002,7 +1004,7 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
 
       //measures
       for(var i=0; i<d.length;i++){
-        var formula = cv.getActiveReport().reportDoc.getMetrics()[i].attributes['formula'].nodeValue;
+        var formula = cv.getActiveReport().reportDoc.getMetrics()[i].attributes.getNamedItem('formula').nodeValue;
         var measure = cv.util.parseMDXExpression(formula, true);
 
         var formatVal = d[i] == null?
@@ -1010,11 +1012,13 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
             myself.dataTable.getFormattedValue(cIdx, categoriesCount + sIdx * d.length + i);
         tooltip += measure + ': ' + cv.util.escapeHtml(formatVal) + '<br>';
       }
-
-      var toDrillParent = cv.getActiveReport().reportDoc.getChildMembers("columnAttributes")[s.length-1].attributes['formula'].nodeValue;
-      var drillChild = cv.getFieldHelp().getDirectChild(toDrillParent);
-      var toDrillTitle = drillChild? cv.util.parseMDXExpression(drillChild, true) : null;
-      if(toDrillTitle) tooltip += "<div class='tipsy-footer'> Double-click to show " + toDrillTitle + "</div>";
+      if(columnAttributes.length == s.length)
+      {//item to drill
+        var toDrillParent = columnAttributes[s.length-1].attributes.getNamedItem('formula').nodeValue;
+        var drillChild = cv.getFieldHelp().getDirectChild(toDrillParent);
+        var toDrillTitle = drillChild? cv.util.parseMDXExpression(drillChild, true) : null;
+        if(toDrillTitle) tooltip += "<div class='tipsy-footer'> Double-click to show " + toDrillTitle + "</div>";
+      }
       return tooltip;
     };
 
@@ -1359,6 +1363,9 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
  */
 pentaho.ccc.CccChart.prototype.setHighlights = function( selections ) {
   this.selections = selections;
+  if(this.currentChartType == 'pvc.HeatGridChart' && (!selections || selections.length == 0)){
+    this.chart.heatGridChartPanel.clearSelections(true);
+  }
   if( this.dataTable && this.vizOptions ) {
     //disabled   this.draw(this.dataTable, this.vizOptions);
   }
