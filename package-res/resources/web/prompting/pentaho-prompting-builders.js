@@ -186,6 +186,7 @@ pentaho.common.prompting.builders.ErrorLabelBuilder = pentaho.common.prompting.b
   build: function(args) {
     var widget = this.base(args);
     var label = args.errorMessage;
+    widget.isErrorIndicator = true;
     widget.expression = function() { return label; };
     return widget;
   }
