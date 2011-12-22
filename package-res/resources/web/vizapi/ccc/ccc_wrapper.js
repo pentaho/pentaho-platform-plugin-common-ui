@@ -876,7 +876,7 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
     },
     mouseUpAction: function(a,b,c,d) {
     }
-  }
+  };
 
 
   // create the data options for the chart
@@ -906,10 +906,8 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
     opts.yAxisGetLabel = function(id){
       return yAxisLabels[id];
     };
-
-    //translate ccc selections to report selections; to be processed by selectTriggered@cv_rptReport3
-    opts.onSelectionChange = function(cccSelections)
-    {
+    
+    var getReportSelectionsFromCcc = function(cccSelections){
       var numMeasures = cv.getActiveReport().reportDoc.getReportNode().selectNodes("cv:measures/cv:measure").length;
       var selections = [];
       var categoryColNo = 0;
@@ -968,9 +966,15 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
         }
         selections.push(selection);
       }
+      return selections;
+    };
+
+    //translate ccc selections to report selections; to be processed by selectTriggered@cv_rptReport3
+    opts.onSelectionChange = function(cccSelections)
+    {
       var args = {
         source: myself,
-        selections: selections,
+        selections: getReportSelectionsFromCcc(cccSelections),
         selectionMode: "REPLACE"
       };
       pentaho.events.trigger( myself, "select", args );
@@ -987,7 +991,9 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
         if(!sFormula) continue;
         var sTitle = cv.util.parseMDXExpression(sFormula, true);
         var sVal = yAxisLabels[s[i]];
-        tooltip += sTitle + ': ' + cv.util.escapeHtml(sVal)+ '<br>';
+        if(sVal){
+          tooltip += sTitle + ': ' + cv.util.escapeHtml(sVal)+ '<br>';
+        }
       }
       //categories
       var rowAttributes = cv.getActiveReport().reportDoc.getChildMembers("rowAttributes");
@@ -996,7 +1002,9 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
         if(!cFormula) continue;
         var cTitle = cv.util.parseMDXExpression(cFormula, true);
         var cVal = xAxisLabels[c[i]];
-        tooltip += cTitle + ': ' + cv.util.escapeHtml(cVal) + '<br>';
+        if(cVal){
+          tooltip += cTitle + ': ' + cv.util.escapeHtml(cVal) + '<br>';
+        }
       }
 
       var sIdx = myself.chart.dataEngine.getSeries().indexOf(s);
@@ -1031,20 +1039,32 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
       //do a 'keep only' on the outer-most member and a 'show next' (drill-down) on the inner-most level.
       var toDrill = series[series.length-1];
       var seriesFormulas = cv.getActiveReport().reportDoc.getReportNode().selectNodes('cv:columnAttributes/cv:attribute/@formula');
-      if(seriesFormulas.length < series.length) return;
-      var drillFormula = seriesFormulas[series.length - 1].value;
+      var categoriesFormulas = cv.getActiveReport().reportDoc.getReportNode().selectNodes('cv:rowAttributes/cv:attribute/@formula');
+      var drillFormula =null;
+      
+      if(seriesFormulas.length < series.length) {
+        if(categoriesFormulas.length > 0){
+          //no series, use category
+          toDrill = category[category.length-1];
+          drillFormula = categoriesFormulas[category.length-1].value;
+        }
+        else return;
+      }
+      else {
+        drillFormula = seriesFormulas[series.length - 1].value;
+      }
 
       var toKeepSeries = null, toKeepSeriesFormula=null;
       var toKeepCategory = null, toKeepCategoryFormula=null;
 
-      if(series.length > 1)
+      if(series.length > 1 && series.length <= seriesFormulas.length)
       {
         toKeepSeries = series[series.length-2];
-        toKeepSeriesFormula = cv.getActiveReport().reportDoc.getReportNode().selectNodes('cv:columnAttributes/cv:attribute/@formula')[series.length - 2].value;
+        toKeepSeriesFormula = seriesFormulas[series.length - 2].value;
       }
-      if(category.length > 0){
+      if(category.length > 0 && category.length <= categoriesFormulas.length){
         toKeepCategory = category[category.length-1];
-        toKeepCategoryFormula = cv.getActiveReport().reportDoc.getReportNode().selectNodes('cv:rowAttributes/cv:attribute/@formula')[category.length-1].value;
+        toKeepCategoryFormula = categoriesFormulas[category.length-1].value;
       }
 
       var ctx = [];
@@ -1081,6 +1101,14 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
       ctx.push(drillCtx);
 
       cv.getActiveReport().clickChart(ctx, true);
+      //TODO:dlbClick
+      var cccSelections = [{series:series, category:category }];
+      var selections = getReportSelectionsFromCcc(cccSelections);
+      var args = {
+        source: myself,
+        selections: selections
+      };
+      pentaho.events.trigger( myself, "doubleclick", args );
     };
 
     //drill down on y axis
