@@ -942,6 +942,7 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
         }
         for(var colNo=seriesColStart; colNo < myself.dataTable.getNumberOfColumns(); colNo+=numMeasures)
         {//just catch first occurrence
+        //series->columns
           if(seriesMatches(s, myself.dataTable.getColumnId(colNo))){
             selection.column = colNo;
             //get measure out
@@ -961,6 +962,7 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
             break;
           }
         }
+        //value
         if(selection.row != null && selection.column != null){
           selection.value = myself.dataTable.getValue(selection.row,selection.column);
         }
@@ -1011,8 +1013,9 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
       var cIdx = myself.chart.dataEngine.getCategories().indexOf(c);
 
       //measures
-      for(var i=0; i<d.length;i++){
-        var formula = cv.getActiveReport().reportDoc.getMetrics()[i].attributes.getNamedItem('formula').nodeValue;
+      var metrics = cv.getActiveReport().reportDoc.getMetrics();
+      for(var i=0; i<d.length && i<metrics.length;i++){
+        var formula = metrics[i].attributes.getNamedItem('formula').nodeValue;
         var measure = cv.util.parseMDXExpression(formula, true);
 
         var formatVal = d[i] == null?
@@ -1020,8 +1023,10 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
             myself.dataTable.getFormattedValue(cIdx, categoriesCount + sIdx * d.length + i);
         tooltip += measure + ': ' + cv.util.escapeHtml(formatVal) + '<br>';
       }
+      
+      //item to drill
       if(columnAttributes.length == s.length)
-      {//item to drill
+      {
         var toDrillParent = columnAttributes[s.length-1].attributes.getNamedItem('formula').nodeValue;
         var drillChild = cv.getFieldHelp().getDirectChild(toDrillParent);
         var toDrillTitle = drillChild? cv.util.parseMDXExpression(drillChild, true) : null;
@@ -1032,11 +1037,8 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
 
     //drill down on shapes
     opts.doubleClickAction = function(series, category){
-      //TODO: no series, no categories
       if(series.length == 0) return;
-      //do a 'keep only' on the selected member from the Rows/Category level(s), and 'show next' (drill-down) on
-      //the selected member from the Columns/Series level. If there are nested levels in Columns/Series, it should
-      //do a 'keep only' on the outer-most member and a 'show next' (drill-down) on the inner-most level.
+
       var toDrill = series[series.length-1];
       var seriesFormulas = cv.getActiveReport().reportDoc.getReportNode().selectNodes('cv:columnAttributes/cv:attribute/@formula');
       var categoriesFormulas = cv.getActiveReport().reportDoc.getReportNode().selectNodes('cv:rowAttributes/cv:attribute/@formula');
@@ -1101,7 +1103,8 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
       ctx.push(drillCtx);
 
       cv.getActiveReport().clickChart(ctx, true);
-      //TODO:dlbClick
+      
+      //needed for content linking
       var cccSelections = [{series:series, category:category }];
       var selections = getReportSelectionsFromCcc(cccSelections);
       var args = {
@@ -1115,36 +1118,30 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
     opts.yAxisDoubleClickAction =  function (path) {
       var ctxArray = [];
       var rowItems = {};
-
-      var formula = cv.getActiveReport().reportDoc.getReportNode().selectNodes('cv:columnAttributes/cv:attribute/@formula')[path.length - 1].value;
-      var ctx = {formula:formula, member:path[path.length-1],
-        action: "KEEP_AND_DRILL",
-        caption: cv.util.parseMDXExpression(path[path.length-1], true)
+      
+      //needed for content linking
+      var cccSelections = [{series:path, category:null }];
+      var selections = getReportSelectionsFromCcc(cccSelections);
+      var args = {
+        source: myself,
+        selections: selections
       };
-      ctxArray.push(ctx);
-      cv.getActiveReport().clickChart(ctxArray, true);
+      pentaho.events.trigger( myself, "doubleclick", args );
     };
 
     //drill down on x axis
     opts.xAxisDoubleClickAction =  function (path) {
       var ctxArray = [];
       var rowItems = {};
-
-      var formula = cv.getActiveReport().reportDoc.getReportNode().selectNodes('cv:rowAttributes/cv:attribute/@formula')[path.length - 1].value;
-
-      var ctx = {formula:formula, member:path[path.length-1],
-        action: "KEEP_AND_DRILL",
-        caption: cv.util.parseMDXExpression(path[path.length-1], true)
+      
+      //needed for content linking
+      var cccSelections = [{series:null, category:path }];
+      var selections = getReportSelectionsFromCcc(cccSelections);
+      var args = {
+        source: myself,
+        selections: selections
       };
-
-      ctxArray.push(ctx);
-      cv.getActiveReport().clickChart(ctxArray, true);
-    };
-
-    //update categories count
-    dataOpts.dataOptions = {
-      categoriesCount : categoriesCount,
-      measuresInColumns: true
+      pentaho.events.trigger( myself, "doubleclick", args );
     };
 
     var measureCount = cv.getActiveReport().reportDoc.getReportNode().selectNodes("cv:measures/cv:measure").length;
@@ -1154,6 +1151,12 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
         vizOptions.colorValIdx = null;
       }
     }
+    
+    //update categories count, measures count
+    dataOpts.dataOptions = {
+      categoriesCount : categoriesCount,
+      measuresInColumns: measureCount > 0
+    };
 
     //resize
     //fiddle with the axis dimensions
@@ -1163,7 +1166,13 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
     var categoriesDepth = cv.getActiveReport().reportDoc.getReportNode().selectNodes('cv:rowAttributes/cv:attribute').length;
     var seriesDepth = cv.getActiveReport().reportDoc.getReportNode().selectNodes('cv:columnAttributes/cv:attribute').length;
     var categoriesBreadth = this.dataTable.getNumberOfRows() - 1;
-    var seriesBreadth = (this.dataTable.getNumberOfColumns() - categoriesDepth)/measureCount;
+    if(categoriesBreadth <= 0){
+      categoriesBreadth =1;
+    }
+    var seriesBreadth = (this.dataTable.getNumberOfColumns() - categoriesDepth);
+    if(measureCount > 0){
+      seriesBreadth /= measureCount;
+    }
 
     var MAX_AXIS_SIZE = 300,
         MIN_LEVEL_HEIGHT = 30,
