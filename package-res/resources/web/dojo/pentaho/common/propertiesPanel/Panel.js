@@ -147,7 +147,9 @@ dojo.declare("pentaho.common.propertiesPanel.GemBarUISource", [dojo.dnd.Source],
       return false;
     }
     var droppedNode = nodes[0];
-    var gemUI = dijit.byId(droppedNode.id);
+
+    // Look for an existing gem for the same element
+    var gemUI = (droppedNode.id.indexOf("gem-") == 0) ? /*existing gem */ dijit.byId(droppedNode.id) : /* another drop from outside */ dijit.byId("gem-"+droppedNode.id);
     var gem;
     if(gemUI){
       gem = gemUI.model;
@@ -160,8 +162,8 @@ dojo.declare("pentaho.common.propertiesPanel.GemBarUISource", [dojo.dnd.Source],
         this.gemBar.add(gemUI);
       }
     } else {
-      var gem = this.createGemFromNode(nodes[0]);
-      gemUI = this.createGemUI(gem, nodes[0]);
+      var gem = this.createGemFromNode(droppedNode);
+      gemUI = this.createGemUI(gem, droppedNode);
       nodes[0] = gemUI.domNode;
       this.gemBar.add(gemUI);
     }
@@ -179,7 +181,7 @@ dojo.declare("pentaho.common.propertiesPanel.GemBarUISource", [dojo.dnd.Source],
   createGemFromNode:function (sourceNode) {
 
     var modelClass = pentaho.common.propertiesPanel.Configuration.registeredTypes["gem"];
-    var options = {id: sourceNode.id, value: sourceNode.innerHTML, gemBar: this.gemBar.model, sourceNode: sourceNode};
+    var options = {id: "gem-"+sourceNode.id, value: sourceNode.innerHTML, gemBar: this.gemBar.model, sourceNode: sourceNode};
 
     // check to see if it's a factory class
     if(modelClass.create){
@@ -340,6 +342,7 @@ dojo.declare(
       constructor:function (options) {
         this.gemBar = options.gemBar;
         this.dndType = options.dndType;
+        this.id = options.id;
       },
       detach: function(){
         model.detach();
