@@ -1,0 +1,59 @@
+
+
+
+.propPanel_gemBar{
+  height: 25px;
+  border: 1px solid blue;
+  background-color: #FFFFCC;
+}
+.pentahoPropertiesPanel{
+  border: 1px solid #666;
+  background-color: #d3d3d3;
+}
+.pentahoPropertiesPanel .caption{
+
+}
+.pentahoPropertiesPanel .caption-text{
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.pentahoPropertiesPanel>*{
+  margin-bottom : 8px;
+}
+.dijitTitlePaneContentInner>div>*:nth-child(2n){
+  margin-bottom: 8px;
+}
+.gem:hover{
+  border-radius: 5px;
+  /* Firefox */
+  -moz-border-radius: 5px;
+  /* Safari/Chrome */
+  -webkit-border-radius: 5px;
+  border: 1px solid blue;
+  background-color: skyblue;
+  height: 16px;
+  margin: 1px;
+  padding: 2px;
+  display:inline-block;
+}
+
+.pentahoPropertiesPanel .propPanel_gemBar{
+
+  border-radius: 5px;
+  /* Firefox */
+  -moz-border-radius: 5px;
+  /* Safari/Chrome */
+  -webkit-border-radius: 5px;
+  background-color: white;
+  padding: 5px;
+  border: none;
+}
+
+.pentahoPropertiesPanel .dijitTitlePaneContentInner {
+  background-color: #dcdcdc;
+}
+
+.pentahoPropertiesPanel .dijitTitlePaneContentInner {
+  padding: 4px;
+}

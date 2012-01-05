@@ -1,7 +1,6 @@
 /* BorderContainer */
 
 .tundra .dijitBorderContainer {
-	background-color: #fcfcfc;
 	padding: 5px;
 }
 
@@ -31,7 +30,6 @@
 
 .tundra .dijitSplitterH,
 .tundra .dijitGutterH {
-	background:#fcfcfc;
 	border:0;
 	height:5px;
 }
