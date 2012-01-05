@@ -776,7 +776,7 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
         this.categories.push(category);
       }
 
-      var numMeasures = cv.getActiveReport().reportDoc.getReportNode().selectNodes("cv:measures/cv:measure").length;
+      var numMeasures = (cv.getActiveReport !== undefined) ? cv.getActiveReport().reportDoc.getReportNode().selectNodes("cv:measures/cv:measure").length : cv.measureCount;
       for( var measureNo=0; measureNo< measures.length; measureNo+=numMeasures ) {
 
         for (var t = 0; t < numMeasures; t+=2) {
@@ -1144,7 +1144,7 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
       pentaho.events.trigger( myself, "doubleclick", args );
     };
 
-    var measureCount = cv.getActiveReport().reportDoc.getReportNode().selectNodes("cv:measures/cv:measure").length;
+    var measureCount = (cv.getActiveReport !== undefined) ? cv.getActiveReport().reportDoc.getReportNode().selectNodes("cv:measures/cv:measure").length : cv.measureCount;
     if (measureCount < 2) {
       vizOptions.sizeValIdx = null;
       if (measureCount == 0){
@@ -1162,9 +1162,9 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
     //fiddle with the axis dimensions
 
     //get depth and breadth
-    var measureCount = cv.getActiveReport().reportDoc.getReportNode().selectNodes("cv:measures/cv:measure").length;
-    var categoriesDepth = cv.getActiveReport().reportDoc.getReportNode().selectNodes('cv:rowAttributes/cv:attribute').length;
-    var seriesDepth = cv.getActiveReport().reportDoc.getReportNode().selectNodes('cv:columnAttributes/cv:attribute').length;
+    var measureCount = (cv.getActiveReport !== undefined) ? cv.getActiveReport().reportDoc.getReportNode().selectNodes("cv:measures/cv:measure").length : cv.measureCount;
+    var categoriesDepth = (cv.getActiveReport !== undefined) ? cv.getActiveReport().reportDoc.getReportNode().selectNodes('cv:rowAttributes/cv:attribute').length : cv.categoryCount;
+    var seriesDepth = (cv.getActiveReport !== undefined) ? cv.getActiveReport().reportDoc.getReportNode().selectNodes('cv:columnAttributes/cv:attribute').length : cv.seriesCount;
     var categoriesBreadth = this.dataTable.getNumberOfRows() - 1;
     if(categoriesBreadth <= 0){
       categoriesBreadth =1;
