@@ -244,6 +244,7 @@ dojo.declare(
 
       },
       insertNodes: function(addSelected, data, before, anchor) {
+        //this.domNode.appendChild(data[0]);
         this.onUIEvent("insertNodes", {item: this, args: arguments});
       },
       add: function(gemUI){

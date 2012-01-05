@@ -20,6 +20,7 @@ dojo.declare(
           throw "No Properties Panel UI implementation found for " + item.ui.type;
         }
         var propItem = new propertyClass(item);
+        propItem.postCreate();
         var outterThis = this;
         propItem.watch(function(propName, prevVal, newVal){
           outterThis.onPropertyChange(this, propName, prevVal, newVal);
@@ -48,6 +49,7 @@ dojo.declare(
         this.item = item;
         dojo.mixin(this, item);
       },
+      postCreate: function(){},
       value: null,
       setValue: function(value){
         this.value = value;
@@ -66,10 +68,16 @@ dojo.declare(
     {
       gems: [],
       constructor: function(item){
-        this.inherited(arguments);
-
+      },
+      initializeGem: function(gemJson){
+        var gem = new pentaho.common.propertiesPanel.Configuration.registeredTypes["gem"](gemJson);
+        gem.postCreate();
+        this.gems.push(gem);
       },
       postCreate: function(){
+        var originalGems = this.gems;
+        this.gems = [];
+        dojo.forEach(originalGems, this.initializeGem, this);
 
       },
       remove: function(gem){
