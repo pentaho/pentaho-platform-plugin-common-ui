@@ -296,7 +296,7 @@ pentaho.VizController.prototype.doVisualization = function( visualization, userD
                      metrics: this.metrics,
                      palette: this.palette,
                      controller: this,
-                     action: this.currentaction,
+                     action: this.currentAction,
                      selections: this.highlights
         };
 
