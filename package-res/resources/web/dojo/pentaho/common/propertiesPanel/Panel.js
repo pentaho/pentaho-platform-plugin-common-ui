@@ -201,6 +201,15 @@ dojo.declare("pentaho.common.propertiesPanel.GemBarUISource", [dojo.dnd.Source],
   }
 });
 
+dojo.declare("pentaho.common.propertiesPanel.PlaceholderSource", [dojo.dnd.Target], {
+  constructor: function(node, opts){
+    this.dropZone = opts.dropZone;
+  },
+  onDrop:function (source, nodes, copy) {
+    return this.dropZone.onDrop(source, nodes, copy);
+  }
+});
+
 dojo.declare(
     "pentaho.common.propertiesPanel.GemBarUI",
     [dijit._Widget, dijit._Templated, pentaho.common.propertiesPanel.StatefulUI],
@@ -208,16 +217,23 @@ dojo.declare(
       className:"propPanel_gemBar",
       gemLimit:-1,
       widgetsInTemplate: true,
-      templateString:"<div class='${className}'></div>",
+      templateString:"<div class='${className}' data-dojo-type='dijit.layout.BorderContainer' data-dojo-props='gutters:false'><div data-dojo-props='region:center'></div><div class='gemPlaceholder'>${placeholderText}</div></div>",
       gems: [],
       handles: [],
       accept: ["gem"],
+      showPlaceholder: true,
+      placeholderText: "Drop Level Here",
       constructor:function (options) {
         this.id = this.model.id+"_ui";
       },
       postCreate: function(){
 
-        this.dropZone = new pentaho.common.propertiesPanel.GemBarUISource(this.domNode, {accept: this.model.ui.dndType, gemBar: this});
+        this.domNode.lastChild.style.display = (this.showPlaceholder) ? "" : "none";
+
+        this.dropZone = new pentaho.common.propertiesPanel.GemBarUISource(this.domNode.firstChild, {accept: this.model.ui.dndType, gemBar: this});
+        if(this.showPlaceholder){
+          new pentaho.common.propertiesPanel.PlaceholderSource(this.domNode.lastChild, {accept: this.model.ui.dndType, dropZone: this.dropZone});
+        }
         // this.handles.push[dojo.connect(this.dropZone, "onDrop", this, "onDrop")];
         this.handles.push[dojo.connect(this.dropZone, "createDropIndicator", this, "createDropIndicator")];
         this.handles.push[dojo.connect(this.dropZone, "placeDropIndicator", this, "placeDropIndicator")];
@@ -237,7 +253,7 @@ dojo.declare(
           } else {
             gemUI = new uiClass(options);
           }
-          this.domNode.appendChild(gemUI.domNode);
+          this.domNode.firstChild.appendChild(gemUI.domNode);
           this.add(gemUI);
         }, this);
         this.dropZone.sync();

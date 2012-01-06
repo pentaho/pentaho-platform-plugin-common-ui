@@ -2,7 +2,6 @@
 
 
 .propPanel_gemBar{
-  height: 25px;
   border: 1px solid blue;
   background-color: #FFFFCC;
 }
@@ -21,8 +20,8 @@
 .pentahoPropertiesPanel>*{
   margin-bottom : 8px;
 }
-.dijitTitlePaneContentInner>div>*:nth-child(2n){
-  margin-bottom: 8px;
+.dijitTitlePaneContentInner>div>*{
+  margin: 2px;
 }
 .gem:hover{
   border-radius: 5px;
@@ -56,4 +55,34 @@
 
 .pentahoPropertiesPanel .dijitTitlePaneContentInner {
   padding: 4px;
+}
+
+
+.pentahoPropertiesPanel .caption-text {
+  font-size: 1em;
+  margin-left:8px;
+  font-weight: normal;
+
+}
+
+/* Migrate to common-ui*/
+
+.tundra .dijitTitlePaneContentInner {
+  padding:3px;
+}
+
+.gemPlaceholder{
+  clear: both;
+  text-align: center;
+  border: 1px dashed #AAA;
+  border-radius: 7px;
+  padding: 2px;
+  color: #aaa;
+  margin-top: 11px;
+}
+.pentahoPropertiesPanel .propPanel_gemBar{
+  position: relative;
+}
+.pentahoPropertiesPanel .propPanel_gemBar.placeholder{
+  padding-bottom: 23px;
 }
