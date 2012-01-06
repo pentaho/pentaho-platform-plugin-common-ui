@@ -28,6 +28,10 @@
 	padding: 0;
 }
 
+.tundra .dijitSplitter{
+  background-color: transparent;
+}
+
 .tundra .dijitSplitterH,
 .tundra .dijitGutterH {
 	border:0;
