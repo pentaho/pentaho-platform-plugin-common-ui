@@ -90,15 +90,14 @@ dojo.declare(
         });
       },
 
-      setConfiguration: function(config){
-
+      setConfiguration: function(configJson){
         this.propUIs.forEach(function(widget){
           widget.destroyRecursive();
         });
         this.propUIs = [];
         this.groups = {},
             this.domNode.innerHTML = "";
-        this.configuration = config;
+        this.configuration = new pentaho.common.propertiesPanel.Configuration(configJson);
         this.postCreate();
       },
       set: function(property, id, value){
@@ -469,4 +468,3 @@ dojo.declare(
     }
 );
 pentaho.common.propertiesPanel.Panel.registeredTypes["checkbox"] = pentaho.common.propertiesPanel.CheckBoxUI;
-

@@ -107,5 +107,3 @@ pentaho.common.propertiesPanel.Configuration.registeredTypes["combo"] = pentaho.
 pentaho.common.propertiesPanel.Configuration.registeredTypes["slider"] = pentaho.common.propertiesPanel.Property;
 pentaho.common.propertiesPanel.Configuration.registeredTypes["textbox"] = pentaho.common.propertiesPanel.Property;
 pentaho.common.propertiesPanel.Configuration.registeredTypes["checkbox"] = pentaho.common.propertiesPanel.Property;
-
-
