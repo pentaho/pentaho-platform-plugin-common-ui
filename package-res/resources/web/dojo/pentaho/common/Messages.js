@@ -1,5 +1,5 @@
 dojo.provide("pentaho.common.Messages");
-dojo.define("pentaho.common.Messages", null, {});
+dojo.declare("pentaho.common.Messages", null, {});
 
 /*private static*/pentaho.common.Messages.init = function()
 {
