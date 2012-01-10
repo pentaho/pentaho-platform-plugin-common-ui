@@ -24,7 +24,6 @@
         //]]>
         </script>
 
-        <script language='javascript' type='text/javascript' src='../locale/Messages.js'></script>
         <script language='javascript' type='text/javascript' src='../dojo/dojo/dojo.js.uncompressed.js'></script>
         <script language='javascript' type='text/javascript' src='../dojo/dojo/dojo-ext.js.uncompressed.js'></script>
 
@@ -84,7 +83,7 @@
 
                 // configure the filter dialog
                 filterDialog = dijit.byId('filterDialog');
-                filterDialog.setLocalizationLookupFunction(Messages.getString);
+                filterDialog.setLocalizationLookupFunction(pentaho.common.Messages.getString);
                 filterDialog.execute = okFunc;
                 filterDialog.onCancel = cancelFunc;
                 filterDialog.setSearchListLimit(200);

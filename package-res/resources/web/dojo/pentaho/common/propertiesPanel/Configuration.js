@@ -22,12 +22,13 @@ dojo.declare(
         var propItem = new propertyClass(item);
         propItem.postCreate();
         var outterThis = this;
-        propItem.watch(function(propName, prevVal, newVal){
-          outterThis.onPropertyChange(this, propName, prevVal, newVal);
+        dojo.connect(propItem, "onModelEvent", function(eventName, args){
+          outterThis.onModelEvent(propItem, eventName, args);
         });
         this.items.push( propItem );
       },
-      onPropertyChange: function(item, propName, prevVal, newVal){
+
+      onModelEvent: function(item, eventName, args){
 
       },
       byId: function(id){
@@ -55,8 +56,8 @@ dojo.declare(
         this.value = value;
         onValueChange(value);
       },
-      onValueChange: function(val){
-
+      onModelEvent: function(prop, args){
+        // stub which others can connect to to "listen"
       }
     });
 
@@ -85,15 +86,18 @@ dojo.declare(
 
         // fire event
         this.set("gems", this.gems);
+        this.onModelEvent("removeGem", {gem: gem});
       },
       add: function(gem){
         this.gems.push(gem);
 
         // fire event
         this.set("gems", this.gems);
+        this.onModelEvent("appendGem", {gem: gem});
       },
       reordered: function(){
         this.set("gems", this.gems);
+        this.onModelEvent("reorderedGems", {});
       },
 
       gems: [],

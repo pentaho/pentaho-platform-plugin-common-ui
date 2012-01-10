@@ -38,7 +38,7 @@ dojo.declare(
 
   postCreate: function() {
     this.inherited(arguments);
-    Messages.addBundle('pentaho.common','messages');
+    pentaho.common.Messages.addBundle('pentaho.common','messages');
     // Capture all attempts to close the dialog and redirect them
     dojo.connect(this.typePicklistCombinationTypeLinksIncludeLink, "onclick", this, function() {
       this._setPicklistCombinationTypeLink(pentaho.pda.Column.OPERATOR_TYPES.AND);

@@ -11,7 +11,7 @@ dojo.declare(
         popup : null,
         title: "",
         widgetsInTemplate: true,
-        getLocaleString: Messages.getString,
+        getLocaleString: pentaho.common.Messages.getString,
         callbacks: [],
         shown: false,
         buttonsCreated: false,
