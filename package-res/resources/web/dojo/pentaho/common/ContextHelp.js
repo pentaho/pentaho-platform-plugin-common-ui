@@ -1,9 +1,7 @@
 dojo.provide("pentaho.common.ContextHelp");
 dojo.require("dijit.Tooltip");
 
-var pentaho = pentaho || {};
-
-pentaho.common.ContextHelp = {}
+dojo.declare("pentaho.common.ContextHelp", null, {});
 
 // Static suffixes for help properties
 pentaho.common.ContextHelp.REF = "_ref";
