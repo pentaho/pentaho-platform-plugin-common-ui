@@ -11,6 +11,7 @@ dependencies = {
           dependencies:
               [
                 "dojo",
+                "dojo.parser",
                 "dijit.dijit-all",
                 "dojo.cldr",
                 "dojo.dnd.Container",
@@ -50,6 +51,7 @@ dependencies = {
                 "dojox.layout.ContentPane",
                 "dojox.layout.ScrollPane",
                 "dojox.layout.RadioGroup",
+                "dojox.testing.DocTest",
                 "pentaho.common.state",
                 "pentaho.common.button",
                 "pentaho.common.Calendar",

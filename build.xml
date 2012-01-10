@@ -135,20 +135,20 @@
       <fileset dir="${stage.dir}/javascript/cldr/nls">
       </fileset>
     </copy>
-    <!--  <copy todir="${dojo.prod.stage.dir}/dojox/widget/ColorPicker">
-            <fileset dir="${dojo.src}/dojox/widget/ColorPicker">
-            </fileset>
-        </copy>
-        <copy todir="${dojo.prod.stage.dir}/dojox/widget/nls">
-            <fileset dir="${dojo.src}/dojox/widget/nls">
-            <include name="ColorPicker.js"/>
-            </fileset>
-        </copy>	  	 -->
-    <!--<copy todir="${dojo.prod.stage.dir}/dojo/resources">-->
-    <!--<fileset dir="${dojo.src}/dojo/resources">-->
-    <!--<include name="blank.gif"/>-->
-    <!--</fileset>-->
-    <!--</copy>	  	-->
+    <copy todir="${dojo.prod.stage.dir}/dojox/widget/ColorPicker">
+        <fileset dir="${dojo.src}/dojox/widget/ColorPicker">
+        </fileset>
+    </copy>
+    <copy todir="${dojo.prod.stage.dir}/dojox/widget/nls">
+        <fileset dir="${dojo.src}/dojox/widget/nls">
+        <include name="ColorPicker.js"/>
+        </fileset>
+    </copy>
+    <copy todir="${dojo.prod.stage.dir}/dojo/resources">
+      <fileset dir="${dojo.src}/dojo/resources">
+        <include name="blank.gif"/>
+      </fileset>
+    </copy>
 
     <copy todir="${dojo.prod.stage.dir}/util/doh">
       <fileset dir="${dojo.src}/util/doh"/>
@@ -182,7 +182,7 @@
         <include name="runner.css"/>
       </fileset>
     </copy>
-    <!--<delete dir="${stage.dir}/javascript"/>-->
+    <delete dir="${stage.dir}/javascript"/>
 
     <property environment="env"/>
     <taskdef name="xmltask" classname="com.oopsconsultancy.xmltask.ant.XmlTask" classpath="lib/xmltask-1.15.1.jar"/>
@@ -257,6 +257,7 @@
       <filelist dir="${stage.dir}/javascript"
                 files="dojo.js,dojo-ext.js"/>
     </concat>
+
     <concat destfile="${stage.dir}/javascript/dojo-all.js.uncompressed.js" force="no">
       <filelist dir="${stage.dir}/javascript"
                 files="dojo.js.uncompressed.js,dojo-ext.js.uncompressed.js"/>
