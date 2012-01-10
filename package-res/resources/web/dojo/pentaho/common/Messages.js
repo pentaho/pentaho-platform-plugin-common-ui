@@ -23,8 +23,9 @@ dojo.define("pentaho.common.Messages", null, {});
   //     e.g. For English in the US: ROOT, en, en-us
   //          This results in 404s for any message bundle that does not exist as the client has no way of knowing.
   // We should change this to URL bundles exclusively or run a dojo build for all javascript (dataapi, common, etc)
-  dojo.requireLocalization(packageName, fileName, "ROOT", "ROOT");
-  // dojo.requireLocalization(packageName, fileName);
+
+  // Using ambiguated form to defeat dojo parser
+  dojo["requireLocalization"](packageName, fileName, "ROOT", "ROOT");
   pentaho.common.Messages.messageBundle.push( dojo.i18n.getLocalization(packageName, fileName) );
 };
 

@@ -11,6 +11,7 @@ dependencies = {
           dependencies:
               [
                 "dojo",
+                "dojo.parser",
                 "dijit.dijit-all",
                 "dojo.cldr",
                 "dojo.dnd.Container",
