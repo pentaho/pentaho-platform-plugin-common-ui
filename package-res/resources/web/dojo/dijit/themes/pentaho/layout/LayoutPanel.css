@@ -10,7 +10,8 @@
   background-color: #d3d3d3;
 }
 .pentahoPropertiesPanel .caption{
-
+  height: 1.2em;
+  padding: 3px 0px;
 }
 .pentahoPropertiesPanel .caption-text{
   font-size: 12px;
@@ -23,18 +24,29 @@
 .dijitTitlePaneContentInner>div>*{
   margin: 2px;
 }
-.gem:hover{
-  border-radius: 5px;
-  /* Firefox */
-  -moz-border-radius: 5px;
-  /* Safari/Chrome */
-  -webkit-border-radius: 5px;
-  border: 1px solid blue;
-  background-color: skyblue;
+
+.gem{
+  height: 21px;
+  border-radius: 7px;
+  padding: 2px 5px;
+  margin-bottom: 3px;
+  min-width: 120px;
+}
+.gem .gem-label{
+  float: left;
+}
+
+.gem .gemMenuHandle{
+  float: right;
+  background-image: url('../images/gem_dropDown.png');
+  background-position: center right;
+  background-repeat: no-repeat;
+  width: 16px;
   height: 16px;
-  margin: 1px;
-  padding: 2px;
-  display:inline-block;
+}
+
+.gem.dojoDndItemOver{
+  background-color: rgb(192, 239,172);
 }
 
 .pentahoPropertiesPanel .propPanel_gemBar{
@@ -62,8 +74,14 @@
   font-size: 1em;
   margin-left:8px;
   font-weight: normal;
+  float:left;
 
 }
+
+.pentahoPropertiesPanel .captionIcon {
+  float:left;
+}
+
 
 /* Migrate to common-ui*/
 
@@ -78,7 +96,10 @@
   border-radius: 7px;
   padding: 2px;
   color: #aaa;
-  margin-top: 11px;
+}
+
+.gemPlaceholder.over{
+  background-color: #FFFFCC;
 }
 .pentahoPropertiesPanel .propPanel_gemBar{
   position: relative;

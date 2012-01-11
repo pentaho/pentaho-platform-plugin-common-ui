@@ -16,7 +16,7 @@ dojo.declare(
     "pentaho.common.propertiesPanel.Panel",
     [dijit.layout.ContentPane],
     {
-      captionTemplate: "<div class='caption'><span class='caption-text'>${ui.caption}</span></div>",
+      captionTemplate: "<div class='caption'><span class='caption-text'>${ui.caption}&nbsp;</span>&nbsp;<img class='captionIcon'/></div>",
       propUIs: [],
       groups: {},
       baseClass: "pentahoPropertiesPanel",
@@ -63,6 +63,15 @@ dojo.declare(
         // Items can have a caption. If specified, create and add it before the property UI component
         if(item.ui.caption){
           var cap = dojo._toDom(dojo.string.substitute(this.captionTemplate, item));
+
+          var img = dojo.query(" > img", cap);
+          img = img[img.length-1]; //select the last image found
+          if(item.ui.captionIcon){
+            img.src = item.ui.captionIcon;
+          } else {
+            img.style.display = "none";
+          }
+
           targetNode.appendChild(cap);
         }
 
@@ -224,6 +233,9 @@ dojo.declare(
       placeholderText: "Drop Level Here",
       constructor:function (options) {
         this.id = this.model.id+"_ui";
+        this.showPlaceholder = this.model.ui.showPlaceholder;
+        this.placeholderText = this.model.ui.placeholderText;
+
       },
       postCreate: function(){
 
@@ -231,7 +243,21 @@ dojo.declare(
 
         this.dropZone = new pentaho.common.propertiesPanel.GemBarUISource(this.domNode.firstChild, {accept: this.model.ui.dndType, gemBar: this});
         if(this.showPlaceholder){
-          new pentaho.common.propertiesPanel.PlaceholderSource(this.domNode.lastChild, {accept: this.model.ui.dndType, dropZone: this.dropZone});
+          this.placeholder = this.domNode.lastChild;
+          new pentaho.common.propertiesPanel.PlaceholderSource(this.placeholder, {accept: this.model.ui.dndType, dropZone: this.dropZone});
+
+          var outterThis = this;
+          dojo.connect(this.placeholder, "onmouseover", function(event){
+            if(dojo.dnd.manager().source && outterThis.checkAcceptance(dojo.dnd.manager().target, dojo.dnd.manager().nodes)){
+              dojo.addClass(event.target, "over");
+            }
+          });
+          dojo.connect(this.placeholder, "onmouseout", function(event){
+            dojo.removeClass(event.target, "over");
+          });
+          dojo.connect(this.placeholder, "onmouseup", function(event){
+            dojo.removeClass(event.target, "over");
+          });
         }
         // this.handles.push[dojo.connect(this.dropZone, "onDrop", this, "onDrop")];
         this.handles.push[dojo.connect(this.dropZone, "createDropIndicator", this, "createDropIndicator")];
@@ -354,7 +380,7 @@ dojo.declare(
     {
       className: "gem",
 
-      templateString: "<div id='${id}' class='${className} dojoDndItem' dndType='${dndType}'>${model.value}</div>",
+      templateString: "<div id='${id}' class='${className} dojoDndItem' dndType='${dndType}'><div class='gem-label'>${model.value}</div><div class='gemMenuHandle'></div></div>",
       constructor:function (options) {
         this.gemBar = options.gemBar;
         this.dndType = options.dndType;
