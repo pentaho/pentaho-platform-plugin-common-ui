@@ -364,22 +364,22 @@ pentaho.visualizations.push({
   propMap: [],
   dataReqs: [
     [
-      {   id: 'category',
+      {   id: 'x',
         dataType: 'string',
         dataStructure: 'row',
-        caption: 'Across',
+        caption: 'X-Axis',
         required: true
       },
-      {   id: 'category',
+      {   id: 'y',
         dataType: 'string',
         dataStructure: 'column',
-        caption: 'Down',
+        caption: 'Y-Axis',
         required: true
       },
-      {   id: 'series',
+      {   id: 'measures',
         dataType: 'number',
         dataStructure: 'column',
-        caption: 'Values',
+        caption: 'Color/Size',
         required: true
       }
     ]
@@ -454,22 +454,22 @@ pentaho.visualizations.push({
   propMap: [],
   dataReqs: [
     [
-      {   id: 'category',
+      {   id: 'bullets',
         dataType: 'string',
         dataStructure: 'row',
-        caption: 'Across',
-        required: true
-      },
-      {   id: 'category',
-        dataType: 'string',
-        dataStructure: 'column',
-        caption: 'Down',
+        caption: 'Bullets',
         required: true
       },
       {   id: 'series',
+        dataType: 'string',
+        dataStructure: 'column',
+        caption: 'Series',
+        required: true
+      },
+      {   id: 'measures',
         dataType: 'number',
         dataStructure: 'column',
-        caption: 'Values',
+        caption: 'Current/Target',
         required: true
       }
     ]
