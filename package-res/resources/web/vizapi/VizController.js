@@ -501,7 +501,7 @@ pentaho.VizController.prototype.processHighlights = function(args) {
             this.highlights.push( highlight );
         }
     }
-    this.updateHighlights();
+//    this.updateHighlights();
 }
 
 
