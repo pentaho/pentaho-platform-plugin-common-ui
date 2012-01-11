@@ -300,6 +300,7 @@
       <arg value="action=release"/>
       <arg value="offlineProfile=true"/>
       <arg value="copyTests=false"/>
+      <arg value="version=${project.revision}"/>
       <arg value="profileFile=../../../../../build-res/dojo-ext.profile.js"/>
       <classpath>
         <pathelement location="${dojo.src}/util/shrinksafe/js.jar"/>
