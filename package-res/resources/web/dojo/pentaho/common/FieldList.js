@@ -197,20 +197,20 @@ dojo.declare(
     this.dndObj._removeItemClass = this._removeItemClass;
     
     if(!this.categorize) {
-      var fields = this.getSortedFields(datasource, null, this.filters);
+      var fields = this.getFields(datasource, null, this.filters);
       this.addFields( fields, this.containerNode, '' );
       return;
     }
     
     var addedCategories = [];
 
-    var categories = this.getSortedCategories(datasource);
+    var categories = this.getCategories(datasource);
 
     dojo.forEach(categories, function(category, idx) {
       if (dojo.indexOf(addedCategories, category.id) != -1) {
         return;
       }
-      var fields = this.getSortedFields(datasource, category, this.filters);
+      var fields = this.getFields(datasource, category, this.filters);
       if(fields.length == 0) {
         // there are no fields for this category with the current filters
         return;
@@ -378,18 +378,17 @@ dojo.declare(
     }
   },
 
-  getSortedCategories: function(datasource) {
+  getCategories: function(datasource) {
     var categories = [];
     dojo.forEach(datasource.getAllElements(), function(element) {
       if (element.elementType == pentaho.pda.Column.ELEMENT_TYPES.CATEGORY && categories[element] == null) {
         categories.push(element);
       }
     });
-    categories.sort(this._elementComparator);
     return categories;
   },
 
-  getSortedFields: function(datasource, category, filters) {
+  getFields: function(datasource, category, filters) {
     var fields = [];
     var elements = datasource.getAllElements();   
     dojo.forEach(datasource.getAllElements(), function(element) {
@@ -420,7 +419,6 @@ dojo.declare(
         }
       }
     });
-    fields.sort(this._elementComparator); 
     return fields;
   },
 
