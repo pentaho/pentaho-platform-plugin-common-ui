@@ -208,18 +208,17 @@ dojo.declare("pentaho.common.propertiesPanel.GemBarUISource", [dojo.dnd.Source],
       gem = gemUI.model;
       // gemUI.gemBar.remove(gemUI);
       if(gemUI.gemBar == this.gemBar){ //Reorder, notify model so it can fire an event
-        gem.gemBar.reordered();
+        // fire reordered in insertNodes where we know more information
       } else {
         gemUI.gemBar.remove(gemUI);
         gemUI.gemBar = this.gemBar;
-        this.gemBar.add(gemUI);
       }
     } else {
       var gem = this.createGemFromNode(droppedNode);
       gemUI = this.createGemUI(gem, droppedNode);
       nodes[0] = gemUI.domNode;
-      this.gemBar.add(gemUI);
     }
+    this.gemUIbeingInserted = gemUI;
 
     var newId = nodes[0].id;
     nodes[0].id = droppedNode.id; // need to ensure the original id is used when calling superclass
@@ -346,6 +345,25 @@ dojo.declare("pentaho.common.propertiesPanel.GemBarUISource", [dojo.dnd.Source],
     with (cv.util.gravity) {
       return ((mouse.x < nodecenterx ? WEST : EAST) | (mouse.y < nodecentery ? NORTH : SOUTH)); //  integer
     }
+  },
+  insertNodes: function(addSelected, data, before, anchor){
+    // Append : before = true, anchor = null
+    var pos = 0;
+    if(before && anchor == null){
+      // add is fired in onDrop
+      pos = this.gemBar.gems.length
+    } else if(anchor != null){
+      // could be adding to the end, ignore ite
+      for(var i=0; i<this.node.children.length; i++){
+        if(this.node.children[i] == anchor){
+          pos = i;
+        }
+      }
+
+      pos = (before)? pos : pos +1;
+    }
+    this.gemBar.insertAt(this.gemUIbeingInserted, pos);
+    this.inherited(arguments);
   }
 });
 
@@ -434,6 +452,15 @@ dojo.declare(
         this.gems.push(gemUI);
         gemUI.gemBar = this;
         this.propPanel.setupEventHandling(gemUI);
+      },
+      insertAt: function(gem, pos){
+        var currIdx = dojo.indexOf(this.gems, gem);
+        this.gems.splice(pos, 0, gem); // add it to the new pos
+        if(gem.gemBar == this){ //reorder
+          this.gems.slice(currIdx); // remove from old pos
+        }
+        this.model.insertAt(gem.model, pos, currIdx);
+
       },
       remove: function(gemUI){
         this.domNode.removeChild(gemUI.domNode);

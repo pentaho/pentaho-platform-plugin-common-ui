@@ -93,11 +93,18 @@ dojo.declare(
 
         // fire event
         this.set("gems", this.gems);
-        this.onModelEvent("appendGem", {gem: gem});
+        this.onModelEvent("insertAt", {gem: gem, idx: this.gems.length, oldIdx: -1});
       },
-      reordered: function(){
+      reorder: function(){
         this.set("gems", this.gems);
         this.onModelEvent("reorderedGems", {});
+      },
+      insertAt: function(gem, newIdx, oldIdx){
+        this.gems.splice(newIdx, 0, gem); // add it to the new pos
+        if(oldIdx > -1) { //reorder
+          this.gems.slice(oldIdx); // remove from old pos
+        }
+        this.onModelEvent("insertAt", {gem: gem, idx: newIdx, oldIdx: oldIdx});
       },
 
       gems: [],
