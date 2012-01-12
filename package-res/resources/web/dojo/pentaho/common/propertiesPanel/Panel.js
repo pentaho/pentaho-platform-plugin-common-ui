@@ -196,7 +196,7 @@ dojo.declare("pentaho.common.propertiesPanel.GemBarUISource", [dojo.dnd.Source],
   },
   onDrop:function (source, nodes, copy) {
 
-    if (!nodes || nodes.length == 0 || !this.gemBar.checkAcceptance(this, nodes)) {
+    if (!nodes || nodes.length == 0 || !this.gemBar.checkAcceptance(this, nodes,/* showErrors */ true)) {
       return false;
     }
     var droppedNode = nodes[0];
@@ -552,12 +552,12 @@ dojo.declare(
         this.gemBar = options.gemBar;
         this.dndType = options.dndType;
         this.id = options.id;
+        dojo.connect(this.domNode, "oncontextmenu", this, "onContextMenu");
       },
       detach: function(){
         model.detach();
       },
       postCreate: function(){
-        dojo.connect(this.domNode, "oncontextmenu", this, "onContextMenu");
       },
 
 
