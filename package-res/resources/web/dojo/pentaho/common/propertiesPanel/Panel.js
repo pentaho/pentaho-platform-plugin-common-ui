@@ -168,7 +168,7 @@ dojo.declare("pentaho.common.propertiesPanel.GemBarUISource", [dojo.dnd.Source],
       if (document.createEvent) {
         var evt = document.createEvent ("MouseEvent");
         evt.initMouseEvent ("mouseover", true, true, window, 0, e.screenX, e.screenY, e.clientX, e.clientY,
-            .ctrlKey, e.altKey, e.shiftKey, e.metaKey, 0, null);
+            e.ctrlKey, e.altKey, e.shiftKey, e.metaKey, 0, null);
         this.node.children[idx].dispatchEvent(evt);
       } else if (document.createEventObject) {
         var evt = document.createEventObject(window.event);
@@ -185,7 +185,7 @@ dojo.declare("pentaho.common.propertiesPanel.GemBarUISource", [dojo.dnd.Source],
       if (document.createEvent) {
         var evt = document.createEvent ("MouseEvent");
         evt.initMouseEvent ("mouseup", true, true, window, 0, e.screenX, e.screenY, e.clientX, e.clientY,
-            .ctrlKey, e.altKey, e.shiftKey, e.metaKey, 0, null);
+            e.ctrlKey, e.altKey, e.shiftKey, e.metaKey, 0, null);
         this.node.children[idx].dispatchEvent(evt);
       } else if (document.createEventObject) {
         var evt = document.createEventObject(window.event);
