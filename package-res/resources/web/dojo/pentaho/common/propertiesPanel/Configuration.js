@@ -86,7 +86,7 @@ dojo.declare(
 
         // fire event
         this.set("gems", this.gems);
-        this.onModelEvent("removeGem", {gem: gem});
+        this.onModelEvent("removedGem", {gem: gem});
       },
       add: function(gem){
         this.gems.push(gem);

@@ -148,7 +148,52 @@ dojo.declare(
 
 dojo.declare("pentaho.common.propertiesPanel.GemBarUISource", [dojo.dnd.Source],{
 
+  constructor: function(node){
+    this.dropIndicator = document.createElement("div");
+    this.dropIndicator.className = "indicator";
+    this.dropIndicator.id = "propertyPanelIndicator";
+    var line = document.createElement("div");
+    line.className = "indicatorLine";
+    this.dropIndicator.appendChild(line);
+    this.dropIndicator.style.display="none";
+    dojo.connect(this.dropIndicator, "onmouseover", this, "_redirectMouseOver");
+    dojo.connect(this.dropIndicator, "onmouseup", this, "_redirectMouseUp");
+    this.node.appendChild(this.dropIndicator);
 
+  },
+
+  _redirectMouseOver: function(e){
+    var idx = this._getNodeUnderMouse(e);
+    if(idx > -1){
+      if (document.createEvent) {
+        var evt = document.createEvent ("MouseEvent");
+        evt.initMouseEvent ("mouseover", true, true, window, 0, e.screenX, e.screenY, e.clientX, e.clientY,
+            .ctrlKey, e.altKey, e.shiftKey, e.metaKey, 0, null);
+        this.node.children[idx].dispatchEvent(evt);
+      } else if (document.createEventObject) {
+        var evt = document.createEventObject(window.event);
+        evt.button = 1;
+        this.node.children[idx].fireEvent("onmouseover", evt);
+      }
+
+    }
+  },
+
+  _redirectMouseUp: function(e){
+    var idx = this._getNodeUnderMouse(e);
+    if(idx > -1){
+      if (document.createEvent) {
+        var evt = document.createEvent ("MouseEvent");
+        evt.initMouseEvent ("mouseup", true, true, window, 0, e.screenX, e.screenY, e.clientX, e.clientY,
+            .ctrlKey, e.altKey, e.shiftKey, e.metaKey, 0, null);
+        this.node.children[idx].dispatchEvent(evt);
+      } else if (document.createEventObject) {
+        var evt = document.createEventObject(window.event);
+        this.node.children[idx].fireEvent("onmouseup", evt);
+      }
+
+    }
+  },
   onDrop:function (source, nodes, copy) {
 
     if (!nodes || nodes.length == 0 || !this.gemBar.checkAcceptance(this, nodes)) {
@@ -205,6 +250,101 @@ dojo.declare("pentaho.common.propertiesPanel.GemBarUISource", [dojo.dnd.Source],
       return uiClass.create(options);
     } else {
       return new uiClass(options);
+    }
+  },
+
+  onMouseOver: function(e){
+    if(dojo.dnd.manager().source){ // drag in progress
+
+      this.dropIndicator.style.display="";
+      var cancelHandle = dojo.subscribe("dnd/cancel", function(){
+        this.dropIndicator.style.display="none";
+        dojo.unsubscribe(cancelHandle);
+      })
+      var dropHandle = dojo.subscribe("dnd/drop", function(){
+        this.dropIndicator.style.display="none";
+        dojo.unsubscribe(dropHandle);
+      })
+
+      var overNode = this._getNodeUnderMouse(e);
+      console.log("over: "+overNode);
+      var before = this.gravity(this.node.children[overNode], e) & 1;
+      this.placeIndicator(e, overNode, before);
+    }
+    this.inherited(arguments);
+  },
+  onMouseOut: function(e){
+    this.dropIndicator.style.display="none";
+    this.inherited(arguments);
+  },
+  placeIndicator: function(e, boxIndex, before) {
+    var spacing = -5, indicatorHeight = 3;
+    var bbCoords = dojo.coords(this.node, true);
+    with(this.dropIndicator.style){
+      if (boxIndex < 0) {
+        if (this.node.children.length) {
+          var coords = dojo.coords(this.node.children[this.node.children.length - 1], true);
+          left = coords.x -7 -(bbCoords.x -5) + "px";
+
+
+          var coords = dojo.coords(this.node.children[0]);
+          var lastChild = dojo.coords(this.node.children[this.node.children.length - 1]);
+          top = (before ? coords.y - spacing  : lastChild.y + lastChild.h + spacing) -(bbCoords.y -5) + "px";
+          width = coords.w+"px";
+        } else {
+          var pos = dojo.coords(this.node, true);
+          left = pos.x -7 -(bbCoords.x -5) + "px";
+          top = (pos.y + pos.h) -(bbCoords.y -5) + "px";
+          width = pos.w+"px";
+        }
+      } else {
+        var child = dojo.coords(this.node.children[boxIndex], true);
+        left = child.x -7 -(bbCoords.x -5) + "px";
+        top = (before) ? (child.y +spacing ) -(bbCoords.y -5) + "px" : child.y + child.h + spacing - (bbCoords.y -5) + "px";
+        width = child.w + "px";
+      }
+    }
+  },
+  _getNodeUnderMouse: function(e) {
+    // find the child
+    var children = this.node.children;
+    for (var i=0, child; children && i<children.length; ++i) {
+      if(children[i] == this.dropIndicator){
+        continue;
+      }
+      var coords = dojo.coords(children[i], true);
+      if (e.clientX >= coords.x && e.clientX <= coords.x+coords.w &&
+          e.clientY >= coords.y && e.clientY <= coords.y + coords.h) return i;
+    }
+    return -1;
+  },
+  gravity : function(/* HTMLElement */node, /* DOMEvent */e){
+    //  summary
+    //  Calculates the mouse's direction of gravity relative to the centre
+    //  of the given node.
+    //  <p>
+    //  If you wanted to insert a node into a DOM tree based on the mouse
+    //  position you might use the following code:
+    //  <pre>
+    //  if (gravity(node, e) & gravity.NORTH) { [insert before]; }
+    //  else { [insert after]; }
+    //  </pre>
+    //
+    //  @param node The node
+    //  @param e    The event containing the mouse coordinates
+    //  @return    The directions, NORTH or SOUTH and EAST or WEST. These
+    //             are properties of the function.
+    node = dojo.byId(node);
+    var mouse = {y: e.clientY, x: e.clientX};
+
+    with (dojo.html) {
+      var bb = dojo.coords(node);
+      var nodecenterx = bb.x + (bb.w / 2);
+      var nodecentery = bb.y + (bb.h / 2);
+    }
+
+    with (cv.util.gravity) {
+      return ((mouse.x < nodecenterx ? WEST : EAST) | (mouse.y < nodecentery ? NORTH : SOUTH)); //  integer
     }
   }
 });

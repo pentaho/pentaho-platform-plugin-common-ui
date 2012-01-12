@@ -107,3 +107,21 @@
 .pentahoPropertiesPanel .propPanel_gemBar.placeholder{
   padding-bottom: 23px;
 }
+
+.indicator{
+  background-image: url("../images/dropIndicator.png");
+  background-repeat: no-repeat;
+  background-position: left center;
+  position: absolute;
+  height:3px;
+  width:100%;
+  z-index: 1100;
+  padding: 3px;
+  height: 2px;
+}
+.indicator .indicatorLine{
+  margin-left:6px;
+  background-color: rgb(156,228,143);
+  width:100%;
+  height: 2px;
+}
