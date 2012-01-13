@@ -1175,7 +1175,7 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
     }
 
     var MAX_AXIS_SIZE = 300,
-        MIN_LEVEL_HEIGHT = 30,
+        MIN_LEVEL_HEIGHT = 70,
         MAX_LEVEL_HEIGHT = 200,
         MAX_AXIS_RATIO = 0.35;
     var width = vizOptions.width,
