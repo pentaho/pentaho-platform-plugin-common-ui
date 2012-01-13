@@ -408,11 +408,11 @@ dojo.declare(
       },
       postCreate: function(){
         this.gems = [];
-        this.domNode.lastChild.style.display = (this.showPlaceholder) ? "" : "none";
+        this.placeholder = dojo.query(".gemPlaceholder", this.domNode)[0];
+        this.placeholder.style.display = (this.showPlaceholder) ? "" : "none";
 
         this.dropZone = new pentaho.common.propertiesPanel.GemBarUISource(this.domNode.firstChild, {accept: this.model.ui.dndType, gemBar: this});
         if(this.showPlaceholder){
-          this.placeholder = this.domNode.lastChild;
           new pentaho.common.propertiesPanel.PlaceholderSource(this.placeholder, {accept: this.model.ui.dndType, dropZone: this.dropZone});
 
           var outterThis = this;

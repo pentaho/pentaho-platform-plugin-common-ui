@@ -110,6 +110,7 @@
 
 .gemPlaceholder.over{
   background-color: #FFFFCC;
+  white-space: nowrap;
 }
 .pentahoPropertiesPanel .propPanel_gemBar{
   position: relative;
