@@ -158,7 +158,7 @@ dojo.declare("pentaho.common.propertiesPanel.GemBarUISource", [dojo.dnd.Source],
     this.dropIndicator.style.display="none";
     dojo.connect(this.dropIndicator, "onmouseover", this, "_redirectMouseOver");
     dojo.connect(this.dropIndicator, "onmouseup", this, "_redirectMouseUp");
-    this.node.appendChild(this.dropIndicator);
+    this.node.parentNode.appendChild(this.dropIndicator);
 
   },
 
@@ -196,13 +196,20 @@ dojo.declare("pentaho.common.propertiesPanel.GemBarUISource", [dojo.dnd.Source],
   },
   onDrop:function (source, nodes, copy) {
 
-    if (!nodes || nodes.length == 0 || !this.gemBar.checkAcceptance(this, nodes,/* showErrors */ true)) {
+    if (!nodes || nodes.length == 0){
       return false;
     }
     var droppedNode = nodes[0];
 
     // Look for an existing gem for the same element
-    var gemUI = (droppedNode.id.indexOf("gem-") == 0) ? /*existing gem */ dijit.byId(droppedNode.id) : /* another drop from outside */ dijit.byId("gem-"+droppedNode.id);
+    var gemUI = dijit.byId(droppedNode.id);
+    if(!gemUI){
+      dijit.byId("gem-"+droppedNode.id);
+    }
+
+    if(gemUI && gemUI.gemBar != this.gemBar && !this.gemBar.checkAcceptance(this, nodes,/* showErrors */ true)) { //only check if not a reorder
+      return;
+    }
     var gem;
     if(gemUI){
       gem = gemUI.model;
@@ -266,13 +273,17 @@ dojo.declare("pentaho.common.propertiesPanel.GemBarUISource", [dojo.dnd.Source],
       })
 
       var overNode = this._getNodeUnderMouse(e);
-      console.log("over: "+overNode);
+      // console.log("over: "+overNode);
       var before = this.gravity(this.node.children[overNode], e) & 1;
       this.placeIndicator(e, overNode, before);
     }
     this.inherited(arguments);
   },
   onMouseOut: function(e){
+    this.dropIndicator.style.display="none";
+    this.inherited(arguments);
+  },
+  onDraggingOut: function(e){
     this.dropIndicator.style.display="none";
     this.inherited(arguments);
   },
@@ -396,7 +407,7 @@ dojo.declare(
 
       },
       postCreate: function(){
-
+        this.gems = [];
         this.domNode.lastChild.style.display = (this.showPlaceholder) ? "" : "none";
 
         this.dropZone = new pentaho.common.propertiesPanel.GemBarUISource(this.domNode.firstChild, {accept: this.model.ui.dndType, gemBar: this});
@@ -448,16 +459,24 @@ dojo.declare(
       },
       add: function(gemUI){
         gemUI.model.gemBar = this.model;
-        this.model.add(gemUI.model);
         this.gems.push(gemUI);
         gemUI.gemBar = this;
         this.propPanel.setupEventHandling(gemUI);
       },
       insertAt: function(gem, pos){
         var currIdx = dojo.indexOf(this.gems, gem);
+        console.log("inserting at pos: "+pos+" existing pos: "+currIdx);
+
         this.gems.splice(pos, 0, gem); // add it to the new pos
-        if(gem.gemBar == this){ //reorder
-          this.gems.slice(currIdx); // remove from old pos
+        console.log("this.gems now has "+this.gems.length, this.gems);
+        if(currIdx > -1){ //reorder
+          console.log("reorder");
+          if(currIdx >= pos){ // if we just inserted before the old pos, increment the old pos value
+            console.log("adjusting old position up one");
+            currIdx++;
+          }
+          this.gems.splice(currIdx,1); // remove from old pos
+          console.log("new gems collection: ", this.gems);
         }
         this.model.insertAt(gem.model, pos, currIdx);
 
@@ -553,6 +572,15 @@ dojo.declare(
         this.dndType = options.dndType;
         this.id = options.id;
         dojo.connect(this.domNode, "oncontextmenu", this, "onContextMenu");
+        var outterThis = this;
+        dojo.connect(dojo.query("div.gemMenuHandle", this.domNode)[0], "onmouseover", function(e){
+          if(dojo.dnd.manager().source && outterThis.gemBar.checkAcceptance(dojo.dnd.manager().source, dojo.dnd.manager().nodes)){
+            dojo.addClass(e.target, "over");
+          }
+        });
+        dojo.connect(dojo.query("div.gemMenuHandle", this.domNode)[0], "onmouseout", function(e){
+          dojo.removeClass( e.target, "over");
+        });
       },
       detach: function(){
         model.detach();

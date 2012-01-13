@@ -26,14 +26,16 @@
 }
 
 .gem{
-  height: 21px;
+  height: 17px;
   border-radius: 7px;
   padding: 2px 5px;
   margin-bottom: 3px;
   min-width: 120px;
+  /*cursor:pointer;*/
 }
 .gem .gem-label{
   float: left;
+  margin-left: 1px;
 }
 
 .gem .gemMenuHandle{
@@ -43,6 +45,14 @@
   background-repeat: no-repeat;
   width: 16px;
   height: 16px;
+  /*cursor:pointer;*/
+}
+
+.gem.dojoDndItemOver .gemMenuHandle{
+  background-image: url('../images/gem_dropDown_highlighted.png');
+}
+.gem.dojoDndItemOver .gemMenuHandle.over{
+  background-image: url('../images/gem_dropDown_highlighted_over.png');
 }
 
 .gem.dojoDndItemOver{
@@ -121,7 +131,7 @@
 }
 .indicator .indicatorLine{
   margin-left:6px;
-  background-color: rgb(156,228,143);
+  background-color: rgb(165, 228, 130);
   width:100%;
   height: 2px;
 }
