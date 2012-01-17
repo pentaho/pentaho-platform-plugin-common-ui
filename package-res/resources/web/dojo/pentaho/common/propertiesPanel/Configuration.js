@@ -68,6 +68,7 @@ dojo.declare(
     [pentaho.common.propertiesPanel.Property],
     {
       gems: [],
+      allowMultiple: true,
       constructor: function(item){
       },
       initializeGem: function(gemJson){

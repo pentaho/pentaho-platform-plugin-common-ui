@@ -16,6 +16,7 @@
 .pentahoPropertiesPanel .caption-text{
   font-size: 12px;
   font-weight: 600;
+  white-space: nowrap;
 }
 
 .pentahoPropertiesPanel>*{
@@ -105,12 +106,23 @@
   border: 1px dashed #AAA;
   border-radius: 7px;
   padding: 2px;
+  white-space: nowrap;
+}
+
+
+.gemPlaceholder.reqiured>span{
   color: #aaa;
+
+}
+
+.gemPlaceholder.reqiured>span:after{
+  content: " *";
+  color: red;
+
 }
 
 .gemPlaceholder.over{
   background-color: #FFFFCC;
-  white-space: nowrap;
 }
 .pentahoPropertiesPanel .propPanel_gemBar{
   position: relative;
@@ -132,7 +144,7 @@
 }
 .indicator .indicatorLine{
   margin-left:6px;
-  background-color: rgb(165, 228, 130);
+  background-color: green;
   width:100%;
   height: 2px;
 }

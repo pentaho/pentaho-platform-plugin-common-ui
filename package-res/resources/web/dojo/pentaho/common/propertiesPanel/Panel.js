@@ -77,7 +77,6 @@ dojo.declare(
 
         // Route UI events to onPropertyChange
         this.setupEventHandling(propUi);
-
         this.propUIs.push(propUi);
         this.connect(propUi, "onUIEvent", "onUIEvent");
         targetNode.appendChild(propUi.domNode);
@@ -142,6 +141,9 @@ dojo.declare(
       },
       onUIEvent: function(type, args){
 
+      },
+      postCreate: function(){
+
       }
     }
 );
@@ -164,11 +166,13 @@ dojo.declare("pentaho.common.propertiesPanel.GemBarUISource", [dojo.dnd.Source],
 
   _redirectMouseOver: function(e){
     var idx = this._getNodeUnderMouse(e);
+    this.lastItemOver = idx;
     if(idx > -1){
       if (document.createEvent) {
         var evt = document.createEvent ("MouseEvent");
         evt.initMouseEvent ("mouseover", true, true, window, 0, e.screenX, e.screenY, e.clientX, e.clientY,
             e.ctrlKey, e.altKey, e.shiftKey, e.metaKey, 0, null);
+        this.node.dispatchEvent(evt);
         this.node.children[idx].dispatchEvent(evt);
       } else if (document.createEventObject) {
         var evt = document.createEventObject(window.event);
@@ -260,15 +264,17 @@ dojo.declare("pentaho.common.propertiesPanel.GemBarUISource", [dojo.dnd.Source],
   },
 
   onMouseOver: function(e){
-    if(dojo.dnd.manager().source){ // drag in progress
+    if(dojo.dnd.manager().source && this.checkAcceptance(dojo.dnd.manager().target, dojo.dnd.manager().nodes)){ // drag in progress
 
       this.dropIndicator.style.display="";
-      var cancelHandle = dojo.subscribe("dnd/cancel", function(){
-        this.dropIndicator.style.display="none";
+      var indicator = this.dropIndicator;
+
+      var cancelHandle = dojo.subscribe("/dnd/cancel", function(){
+        indicator.style.display="none";
         dojo.unsubscribe(cancelHandle);
       })
-      var dropHandle = dojo.subscribe("dnd/drop", function(){
-        this.dropIndicator.style.display="none";
+      var dropHandle = dojo.subscribe("/dnd/drop", function(){
+        indicator.style.display="none";
         dojo.unsubscribe(dropHandle);
       })
 
@@ -280,7 +286,12 @@ dojo.declare("pentaho.common.propertiesPanel.GemBarUISource", [dojo.dnd.Source],
     this.inherited(arguments);
   },
   onMouseOut: function(e){
+    if(e.target == this.dropIndicator){
+      // moused over the indicator. Ignore
+      return;
+    }
     this.dropIndicator.style.display="none";
+
     this.inherited(arguments);
   },
   onDraggingOut: function(e){
@@ -375,6 +386,12 @@ dojo.declare("pentaho.common.propertiesPanel.GemBarUISource", [dojo.dnd.Source],
     }
     this.gemBar.insertAt(this.gemUIbeingInserted, pos);
     this.inherited(arguments);
+  },
+
+  checkAcceptance:function (source, nodes, silent) {
+    var ok = this.gemBar.checkAcceptance(source, nodes, silent);;
+    console.log("gembarUiSource checking accept: "+ok)
+    return ok;
   }
 });
 
@@ -394,7 +411,7 @@ dojo.declare(
       className:"propPanel_gemBar",
       gemLimit:-1,
       widgetsInTemplate: true,
-      templateString:"<div class='${className}' data-dojo-type='dijit.layout.BorderContainer' data-dojo-props='gutters:false'><div data-dojo-props='region:center'></div><div class='gemPlaceholder'>${placeholderText}</div></div>",
+      templateString:"<div class='${className}' data-dojo-type='dijit.layout.BorderContainer' data-dojo-props='gutters:false'><div data-dojo-props='region:center'></div><div class='gemPlaceholder'><span>${placeholderText}</span></div></div>",
       gems: [],
       handles: [],
       accept: ["gem"],
@@ -410,14 +427,19 @@ dojo.declare(
         this.gems = [];
         this.placeholder = dojo.query(".gemPlaceholder", this.domNode)[0];
         this.placeholder.style.display = (this.showPlaceholder) ? "" : "none";
+        if(this.model.required){
+          dojo.addClass(this.placeholder, "reqiured");
+        }
 
-        this.dropZone = new pentaho.common.propertiesPanel.GemBarUISource(this.domNode.firstChild, {accept: this.model.ui.dndType, gemBar: this});
-        if(this.showPlaceholder){
+        this.dropZoneNode = this.domNode.firstChild;
+
+        this.dropZone = new pentaho.common.propertiesPanel.GemBarUISource(this.dropZoneNode, {accept: this.model.ui.dndType, gemBar: this});
+        if(this.showPlaceholder && (this.model.allowMultiple || this.model.gems.length < 2) ){
           new pentaho.common.propertiesPanel.PlaceholderSource(this.placeholder, {accept: this.model.ui.dndType, dropZone: this.dropZone});
 
           var outterThis = this;
           dojo.connect(this.placeholder, "onmouseover", function(event){
-            if(dojo.dnd.manager().source && outterThis.checkAcceptance(dojo.dnd.manager().target, dojo.dnd.manager().nodes)){
+            if(dojo.dnd.manager().source && outterThis.checkAcceptance(dojo.dnd.manager().source, dojo.dnd.manager().nodes)){
               dojo.addClass(event.target, "over");
             }
           });
@@ -435,7 +457,7 @@ dojo.declare(
         this.handles.push[dojo.connect(this.dropZone, "onMouseOut", this, "onMouseOut")];
         this.handles.push[dojo.connect(this.dropZone, "onDraggingOver", this, "onDraggingOver")];
         this.handles.push[dojo.connect(this.dropZone, "onDraggingOver", this, "onDraggingOut")];
-        this.handles.push[dojo.connect(this.dropZone, "checkAcceptance", this, "checkAcceptance")];
+        // this.handles.push[dojo.connect(this.dropZone, "checkAcceptance", this, "checkAcceptance")];
         this.handles.push[dojo.connect(this.dropZone, "insertNodes", this, "insertNodes")];
 
         dojo.forEach(this.model.gems, function(gem){
@@ -451,6 +473,7 @@ dojo.declare(
           this.add(gemUI);
         }, this);
         this.dropZone.sync();
+        this.inherited(arguments);
 
       },
       insertNodes: function(addSelected, data, before, anchor) {
@@ -480,9 +503,20 @@ dojo.declare(
         }
         this.model.insertAt(gem.model, pos, currIdx);
 
+        if(this.model.allowMultiple == false && this.model.gems.length > 0){
+          this.placeholder.style.display = "none";
+        }
+
       },
       remove: function(gemUI){
-        this.domNode.removeChild(gemUI.domNode);
+        this.dropZoneNode.removeChild(gemUI.domNode);
+        var currIdx = dojo.indexOf(this.gems, gemUI);
+        this.gems.splice(this.currIdx, 1);
+        this.model.remove(gemUI.model);
+
+        if(this.model.allowMultiple == false && this.model.gems.length == 0){
+          this.placeholder.style.display = "";
+        }
       },
       onContextMenu: function(event, gem){
         // to be overwritten
@@ -509,25 +543,10 @@ dojo.declare(
 
       },
       checkAcceptance: function(source, nodes){
-        return true;
+        var ok =  this.model.allowMultiple || (this.model.allowMultiple == false && this.model.gems.length == 0);
+        return ok;
       },
 
-
-      // onDrop:function (source, nodes, copy) {
-      //   if (!nodes || nodes.length == 0) {
-      //     return false;
-      //   }
-      //   var droppedNode = nodes[0];
-      //   var gem = (droppedNode.isGem) ? droppedNode.gem : this.createGemFromNode(nodes[0]);
-      //   this.gems.push(gem);
-      //   var gemUI = (droppedNode.isGem) ? droppedNode : this.createGemUI(gem);
-      //   this.gems.push(gemUI);
-      //   this.domNode.appendChild(gemUI.domNode);
-      //   return true;
-      // },
-      init:function () {
-        dojo.forEach(this.model.gems, dojo.hitch(this, "createGems"));
-      },
       createGems:function (gem) {
         var gemUI = createGemUI(gem);
         this.domNode.appendChild(gemUI.domNode);
@@ -571,27 +590,32 @@ dojo.declare(
         this.gemBar = options.gemBar;
         this.dndType = options.dndType;
         this.id = options.id;
-        dojo.connect(this.domNode, "oncontextmenu", this, "onContextMenu");
-        var outterThis = this;
-        dojo.connect(dojo.query("div.gemMenuHandle", this.domNode)[0], "onmouseover", function(e){
-          if(dojo.dnd.manager().source && outterThis.gemBar.checkAcceptance(dojo.dnd.manager().source, dojo.dnd.manager().nodes)){
-            dojo.addClass(e.target, "over");
-          }
-        });
-        dojo.connect(dojo.query("div.gemMenuHandle", this.domNode)[0], "onmouseout", function(e){
-          dojo.removeClass( e.target, "over");
-        });
+
       },
       detach: function(){
         model.detach();
       },
       postCreate: function(){
+        dojo.connect(this.domNode, "oncontextmenu", this, "onContextMenu");
+        var outterThis = this;
+        this.menuHandle = dojo.query("div.gemMenuHandle", this.domNode)[0];
+
+        dojo.connect(dojo.query("div.gemMenuHandle", this.domNode)[0], "onmouseover", function(e){
+          dojo.addClass(e.target, "over");
+
+        });
+        dojo.connect(dojo.query("div.gemMenuHandle", this.domNode)[0], "onmouseout", function(e){
+          dojo.removeClass( e.target, "over");
+        });
+        dojo.connect(this.menuHandle, "onclick", this, "onContextMenu");
+        this.inherited(arguments);
       },
 
 
       // to be overwritten by container
       onContextMenu: function(e){
-        console.log("onContextMenu called");
+        console.log("inner onContextMenu");
+        //dojo.stopEvent(e);
       }
     }
 );
@@ -676,6 +700,7 @@ dojo.declare(
           outterThis.model.set('value', outterThis.checkbox.checked);
         });
 
+        this.inherited(arguments);
       },
       set: function(prop, newVal){
         if(this.checkbox){
