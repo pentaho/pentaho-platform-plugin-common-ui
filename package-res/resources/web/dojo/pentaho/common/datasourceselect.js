@@ -117,6 +117,7 @@ dojo.declare(
                dojo.connect(this.adddatasourceimg.buttonImg, "onclick", this, this.addDatasource);
                dojo.connect(this.editdatasourceimg.buttonImg, "onclick", this, this.editDatasource);
                dojo.connect(this.deletedatasourceimg.buttonImg, "onclick", this, this.deleteDatasource);
+               dojo.connect(this.modelList.menuNode, "onDblClick", this, this.onModelDblClick); //[PIR-439]
            },
            
             addDatasource: function() {
