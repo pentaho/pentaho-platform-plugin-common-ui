@@ -643,3 +643,6 @@ pentaho.VizController.prototype.resize = function(width, height) {
   this.visualPanelElement.style.height = height+"px";
   this.chart.resize(width, height);
 }
+
+
+pentaho.VizController.dashboardMode = window.parent && typeof(window.parent.PentahoDashboardController) !== "undefined";

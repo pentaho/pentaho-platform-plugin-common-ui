@@ -364,23 +364,68 @@ pentaho.visualizations.push({
   propMap: [],
   dataReqs: [
     [
-      {   id: 'x',
+      {   id: 'across',
         dataType: 'string',
         dataStructure: 'row',
-        caption: 'X-Axis',
+        caption: 'Across',
         required: true
       },
-      {   id: 'y',
+      {   id: 'down',
         dataType: 'string',
         dataStructure: 'column',
-        caption: 'Y-Axis',
+        caption: 'Down',
         required: true
       },
-      {   id: 'measures',
+      {   id: 'values',
         dataType: 'number',
         dataStructure: 'column',
-        caption: 'Color/Size',
+        caption: 'Values',
         required: true
+      },
+      {
+        id: 'pattern',
+        dataType: 'string',
+        values: ["GRADIENT", "3-COLOR", "5-COLOR"],
+        ui: {
+          labels: ["Gradient", "3-Color", "5-Color"],
+          group: "options",
+          type: 'combo',
+          caption: "Pattern"
+        }
+      },
+
+      {
+        id: 'color',
+        dataType: 'string',
+        values: ["ryg", "rgb"],
+        ui: {
+          labels: ["Red-Yellow-Green", "Red-Green-Blue"],
+          group: "options",
+          type: 'combo',
+          caption: "Color"
+        }
+      },
+
+
+      {
+        id: 'reverseColors',
+        dataType: 'boolean',
+        ui: {
+          label: "Reverse Colors",
+          group: "options",
+          type: 'checkbox'
+        }
+      },
+      {
+        id: 'shape',
+        dataType: 'string',
+        values: ["square", "circle"],
+        ui: {
+          labels: ["Square", "Circle"],
+          group: "options",
+          type: 'combo',
+          caption: "Shape"
+        }
       }
     ]
   ]
@@ -454,22 +499,22 @@ pentaho.visualizations.push({
   propMap: [],
   dataReqs: [
     [
-      {   id: 'bullets',
+      {   id: 'category',
         dataType: 'string',
         dataStructure: 'row',
-        caption: 'Bullets',
+        caption: 'Across',
+        required: true
+      },
+      {   id: 'category',
+        dataType: 'string',
+        dataStructure: 'column',
+        caption: 'Down',
         required: true
       },
       {   id: 'series',
-        dataType: 'string',
-        dataStructure: 'column',
-        caption: 'Series',
-        required: true
-      },
-      {   id: 'measures',
         dataType: 'number',
         dataStructure: 'column',
-        caption: 'Current/Target',
+        caption: 'Values',
         required: true
       }
     ]
@@ -906,7 +951,7 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
     opts.yAxisGetLabel = function(id){
       return yAxisLabels[id];
     };
-    
+
     var getReportSelectionsFromCcc = function(cccSelections){
       var numMeasures = cv.getActiveReport().reportDoc.getReportNode().selectNodes("cv:measures/cv:measure").length;
       var selections = [];
@@ -942,7 +987,7 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
         }
         for(var colNo=seriesColStart; colNo < myself.dataTable.getNumberOfColumns(); colNo+=numMeasures)
         {//just catch first occurrence
-        //series->columns
+          //series->columns
           if(seriesMatches(s, myself.dataTable.getColumnId(colNo))){
             selection.column = colNo;
             //get measure out
@@ -1023,7 +1068,7 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
             myself.dataTable.getFormattedValue(cIdx, categoriesCount + sIdx * d.length + i);
         tooltip += measure + ': ' + cv.util.escapeHtml(formatVal) + '<br>';
       }
-      
+
       //item to drill
       if(columnAttributes.length == s.length)
       {
@@ -1043,7 +1088,7 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
       var seriesFormulas = cv.getActiveReport().reportDoc.getReportNode().selectNodes('cv:columnAttributes/cv:attribute/@formula');
       var categoriesFormulas = cv.getActiveReport().reportDoc.getReportNode().selectNodes('cv:rowAttributes/cv:attribute/@formula');
       var drillFormula =null;
-      
+
       if(seriesFormulas.length < series.length) {
         if(categoriesFormulas.length > 0){
           //no series, use category
@@ -1103,7 +1148,7 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
       ctx.push(drillCtx);
 
       cv.getActiveReport().clickChart(ctx, true);
-      
+
       //needed for content linking
       var cccSelections = [{series:series, category:category }];
       var selections = getReportSelectionsFromCcc(cccSelections);
@@ -1118,7 +1163,7 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
     opts.yAxisDoubleClickAction =  function (path) {
       var ctxArray = [];
       var rowItems = {};
-      
+
       //needed for content linking
       var cccSelections = [{series:path, category:null }];
       var selections = getReportSelectionsFromCcc(cccSelections);
@@ -1133,7 +1178,7 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
     opts.xAxisDoubleClickAction =  function (path) {
       var ctxArray = [];
       var rowItems = {};
-      
+
       //needed for content linking
       var cccSelections = [{series:null, category:path }];
       var selections = getReportSelectionsFromCcc(cccSelections);
@@ -1151,7 +1196,7 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
         vizOptions.colorValIdx = null;
       }
     }
-    
+
     //update categories count, measures count
     dataOpts.dataOptions = {
       categoriesCount : categoriesCount,
@@ -1175,7 +1220,7 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
     }
 
     var MAX_AXIS_SIZE = 300,
-        MIN_LEVEL_HEIGHT = 70,
+        MIN_LEVEL_HEIGHT = 30,
         MAX_LEVEL_HEIGHT = 200,
         MAX_AXIS_RATIO = 0.35;
     var width = vizOptions.width,

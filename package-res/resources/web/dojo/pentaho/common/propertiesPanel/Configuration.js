@@ -25,6 +25,9 @@ dojo.declare(
         dojo.connect(propItem, "onModelEvent", function(eventName, args){
           outterThis.onModelEvent(propItem, eventName, args);
         });
+        propItem.watch(function(propName, old, now){
+          outterThis.onModelEvent(propItem, propName, {prevVal: old, newVal: now});
+        });
         this.items.push( propItem );
       },
 
@@ -54,7 +57,6 @@ dojo.declare(
       value: null,
       setValue: function(value){
         this.value = value;
-        onValueChange(value);
       },
       onModelEvent: function(prop, args){
         // stub which others can connect to to "listen"
