@@ -35,21 +35,25 @@ pentaho.visualizations.push({
   },
   propMap: [],
   dataReqs: [                             // dataReqs describes the data requirements of this visualization
-    [
-      {   id: 'category',             // id of the data element
-        dataType: 'string',         // data type - 'string', 'number', 'date', 'boolean', 'any' or a comma separated list
-        dataStructure: 'column',    // 'column' or 'row' - only 'column' supported so far
-        caption: 'Category',        // visible name
-        required: true              // true or false
-      },
-      {   id: 'series',
-        dataType: 'number',
-        dataStructure: 'column',
-        caption: 'Values',
-        required: true,
-        allowMultiple: true         // true or false
-      }
-    ]
+    {
+      name: 'Default',
+      reqs :
+      [
+        {   id: 'category',             // id of the data element
+          dataType: 'string',         // data type - 'string', 'number', 'date', 'boolean', 'any' or a comma separated list
+          dataStructure: 'column',    // 'column' or 'row' - only 'column' supported so far
+          caption: 'Category',        // visible name
+          required: true              // true or false
+        },
+        {   id: 'series',
+          dataType: 'number',
+          dataStructure: 'column',
+          caption: 'Values',
+          required: true,
+          allowMultiple: true         // true or false
+        }
+      ]
+    }
   ]
 });
 
@@ -72,21 +76,24 @@ pentaho.visualizations.push({
   },
   propMap: [],
   dataReqs: [
-    [
-      {   id: 'category',
-        dataType: 'string',
-        dataStructure: 'column',
-        caption: 'Category',
-        required: true
-      },
-      {   id: 'series',
-        dataType: 'number',
-        dataStructure: 'column',
-        caption: 'Values',
-        required: true,
-        allowMultiple: true
-      }
-    ]
+    {
+      name: 'Default',
+      reqs :[
+        {   id: 'category',
+          dataType: 'string',
+          dataStructure: 'column',
+          caption: 'Category',
+          required: true
+        },
+        {   id: 'series',
+          dataType: 'number',
+          dataStructure: 'column',
+          caption: 'Values',
+          required: true,
+          allowMultiple: true
+        }
+      ]
+    }
   ]
 });
 
@@ -108,21 +115,24 @@ pentaho.visualizations.push({
   },
   propMap: [],
   dataReqs: [
-    [
-      {   id: 'category',
-        dataType: 'string',
-        dataStructure: 'column',
-        caption: 'Category',
-        required: true
-      },
-      {   id: 'series',
-        dataType: 'number',
-        dataStructure: 'column',
-        caption: 'Values',
-        required: true,
-        allowMultiple: true
-      }
-    ]
+    {
+      name: 'Default',
+      reqs :[
+        {   id: 'category',
+          dataType: 'string',
+          dataStructure: 'column',
+          caption: 'Category',
+          required: true
+        },
+        {   id: 'series',
+          dataType: 'number',
+          dataStructure: 'column',
+          caption: 'Values',
+          required: true,
+          allowMultiple: true
+        }
+      ]
+    }
   ]
 });
 
@@ -144,21 +154,24 @@ pentaho.visualizations.push({
   },
   propMap: [],
   dataReqs: [
-    [
-      {   id: 'category',
-        dataType: 'string',
-        dataStructure: 'column',
-        caption: 'Category',
-        required: true
-      },
-      {   id: 'series',
-        dataType: 'number',
-        dataStructure: 'column',
-        caption: 'Values',
-        required: true,
-        allowMultiple: true
-      }
-    ]
+    {
+      name: 'Default',
+      reqs :[
+        {   id: 'category',
+          dataType: 'string',
+          dataStructure: 'column',
+          caption: 'Category',
+          required: true
+        },
+        {   id: 'series',
+          dataType: 'number',
+          dataStructure: 'column',
+          caption: 'Values',
+          required: true,
+          allowMultiple: true
+        }
+      ]
+    }
   ]
 });
 
@@ -181,21 +194,24 @@ pentaho.visualizations.push({
   },
   propMap: [],
   dataReqs: [
-    [
-      {   id: 'category',
-        dataType: 'string',
-        dataStructure: 'column',
-        caption: 'Category',
-        required: true
-      },
-      {   id: 'series',
-        dataType: 'number',
-        dataStructure: 'column',
-        caption: 'Values',
-        required: true,
-        allowMultiple: true
-      }
-    ]
+    {
+      name: 'Default',
+      reqs :[
+        {   id: 'category',
+          dataType: 'string',
+          dataStructure: 'column',
+          caption: 'Category',
+          required: true
+        },
+        {   id: 'series',
+          dataType: 'number',
+          dataStructure: 'column',
+          caption: 'Values',
+          required: true,
+          allowMultiple: true
+        }
+      ]
+    }
   ]
 });
 
@@ -213,21 +229,24 @@ pentaho.visualizations.push({
   },
   propMap: [],
   dataReqs: [
-    [
-      {   id: 'category',
-        dataType: 'string',
-        dataStructure: 'column',
-        caption: 'Category',
-        required: true
-      },
-      {   id: 'series',
-        dataType: 'number',
-        dataStructure: 'column',
-        caption: 'Values',
-        required: true,
-        allowMultiple: true
-      }
-    ]
+    {
+      name: 'Default',
+      reqs :[
+        {   id: 'category',
+          dataType: 'string',
+          dataStructure: 'column',
+          caption: 'Category',
+          required: true
+        },
+        {   id: 'series',
+          dataType: 'number',
+          dataStructure: 'column',
+          caption: 'Values',
+          required: true,
+          allowMultiple: true
+        }
+      ]
+    }
   ]
 });
 
@@ -247,28 +266,31 @@ pentaho.visualizations.push({
   },
   propMap: [],
   dataReqs: [
-    [
-      {   id: 'category',
-        dataType: 'string',
-        dataStructure: 'column',
-        caption: 'Category',
-        required: true
-      },
-      {   id: 'series',
-        dataType: 'number',
-        dataStructure: 'column',
-        caption: 'X Axis',
-        required: true,
-        allowMultiple: false
-      },
-      {   id: 'series2',
-        dataType: 'number',
-        dataStructure: 'column',
-        caption: 'Y Axis',
-        required: true,
-        allowMultiple: true
-      }
-    ]
+    {
+      name: 'Default',
+      reqs :[
+        {   id: 'category',
+          dataType: 'string',
+          dataStructure: 'column',
+          caption: 'Category',
+          required: true
+        },
+        {   id: 'series',
+          dataType: 'number',
+          dataStructure: 'column',
+          caption: 'X Axis',
+          required: true,
+          allowMultiple: false
+        },
+        {   id: 'series2',
+          dataType: 'number',
+          dataStructure: 'column',
+          caption: 'Y Axis',
+          required: true,
+          allowMultiple: true
+        }
+      ]
+    }
   ]
 });
 
@@ -283,20 +305,23 @@ pentaho.visualizations.push({
   },
   propMap: [],
   dataReqs: [
-    [
-      {   id: 'category',
-        dataType: 'string',
-        dataStructure: 'column',
-        caption: 'Slices',
-        required: true
-      },
-      {   id: 'series',
-        dataType: 'number',
-        dataStructure: 'column',
-        caption: 'Values',
-        required: true
-      }
-    ]
+    {
+      name: 'Default',
+      reqs :[
+        {   id: 'category',
+          dataType: 'string',
+          dataStructure: 'column',
+          caption: 'Slices',
+          required: true
+        },
+        {   id: 'series',
+          dataType: 'number',
+          dataStructure: 'column',
+          caption: 'Values',
+          required: true
+        }
+      ]
+    }
   ]
 });
 
@@ -363,71 +388,74 @@ pentaho.visualizations.push({
   },
   propMap: [],
   dataReqs: [
-    [
-      {   id: 'across',
-        dataType: 'string',
-        dataStructure: 'row',
-        caption: 'Across',
-        required: true
-      },
-      {   id: 'down',
-        dataType: 'string',
-        dataStructure: 'column',
-        caption: 'Down',
-        required: true
-      },
-      {   id: 'values',
-        dataType: 'number',
-        dataStructure: 'column',
-        caption: 'Values',
-        required: true
-      },
-      {
-        id: 'pattern',
-        dataType: 'string',
-        values: ["GRADIENT", "3-COLOR", "5-COLOR"],
-        ui: {
-          labels: ["Gradient", "3-Color", "5-Color"],
-          group: "options",
-          type: 'combo',
-          caption: "Pattern"
-        }
-      },
+    {
+      name: 'Default',
+      reqs :[
+        {   id: 'across',
+          dataType: 'string',
+          dataStructure: 'row',
+          caption: 'Across',
+          required: true
+        },
+        {   id: 'down',
+          dataType: 'string',
+          dataStructure: 'column',
+          caption: 'Down',
+          required: true
+        },
+        {   id: 'values',
+          dataType: 'number',
+          dataStructure: 'column',
+          caption: 'Values',
+          required: true
+        },
+        {
+          id: 'pattern',
+          dataType: 'string',
+          values: ["GRADIENT", "3-COLOR", "5-COLOR"],
+          ui: {
+            labels: ["Gradient", "3-Color", "5-Color"],
+            group: "options",
+            type: 'combo',
+            caption: "Pattern"
+          }
+        },
 
-      {
-        id: 'colorSet',
-        dataType: 'string',
-        values: ["ryg", "rgb"],
-        ui: {
-          labels: ["Red-Yellow-Green", "Red-Green-Blue"],
-          group: "options",
-          type: 'combo',
-          caption: "Color"
-        }
-      },
+        {
+          id: 'colorSet',
+          dataType: 'string',
+          values: ["ryg", "rgb"],
+          ui: {
+            labels: ["Red-Yellow-Green", "Red-Green-Blue"],
+            group: "options",
+            type: 'combo',
+            caption: "Color"
+          }
+        },
 
 
-      {
-        id: 'reverseColors',
-        dataType: 'boolean',
-        ui: {
-          label: "Reverse Colors",
-          group: "options",
-          type: 'checkbox'
+        {
+          id: 'reverseColors',
+          dataType: 'boolean',
+          ui: {
+            label: "Reverse Colors",
+            group: "options",
+            type: 'checkbox'
+          }
+        },
+        {
+          id: 'shape',
+          dataType: 'string',
+          values: ["square", "circle"],
+          ui: {
+            labels: ["Square", "Circle"],
+            group: "options",
+            type: 'combo',
+            caption: "Shape"
+          }
         }
-      },
-      {
-        id: 'shape',
-        dataType: 'string',
-        values: ["square", "circle"],
-        ui: {
-          labels: ["Square", "Circle"],
-          group: "options",
-          type: 'combo',
-          caption: "Shape"
-        }
-      }
-    ]
+      ]
+    }
   ]
 });
 
@@ -498,26 +526,29 @@ pentaho.visualizations.push({
   },
   propMap: [],
   dataReqs: [
-    [
-      {   id: 'category',
-        dataType: 'string',
-        dataStructure: 'row',
-        caption: 'Across',
-        required: true
-      },
-      {   id: 'category',
-        dataType: 'string',
-        dataStructure: 'column',
-        caption: 'Down',
-        required: true
-      },
-      {   id: 'series',
-        dataType: 'number',
-        dataStructure: 'column',
-        caption: 'Values',
-        required: true
-      }
-    ]
+    {
+      name: 'Default',
+      reqs :[
+        {   id: 'category',
+          dataType: 'string',
+          dataStructure: 'row',
+          caption: 'Across',
+          required: true
+        },
+        {   id: 'category',
+          dataType: 'string',
+          dataStructure: 'column',
+          caption: 'Down',
+          required: true
+        },
+        {   id: 'series',
+          dataType: 'number',
+          dataStructure: 'column',
+          caption: 'Values',
+          required: true
+        }
+      ]
+    }
   ]
 });
 
