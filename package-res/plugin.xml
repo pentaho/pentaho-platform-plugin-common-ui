@@ -35,6 +35,7 @@
   <external-resources>
       <file context="global">content/common-ui/resources/web/dojo/djConfig.js</file>
       <file context="global">content/common-ui/resources/web/cache/cache-service.js</file>
+      <file context="global">content/common-ui/resources/web/loader.js</file>
   </external-resources>
 
 

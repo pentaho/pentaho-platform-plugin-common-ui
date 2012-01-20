@@ -395,7 +395,7 @@ pentaho.visualizations.push({
       },
 
       {
-        id: 'color',
+        id: 'colorSet',
         dataType: 'string',
         values: ["ryg", "rgb"],
         ui: {

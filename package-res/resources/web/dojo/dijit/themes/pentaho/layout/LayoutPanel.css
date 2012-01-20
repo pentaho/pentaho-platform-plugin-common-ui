@@ -105,14 +105,15 @@
   text-align: center;
   border: 1px dashed #AAA;
   border-radius: 7px;
-  padding: 2px;
+  padding: 1px;
   white-space: nowrap;
 }
 
 
 .gemPlaceholder>span{
   color: #aaa;
-
+  cursor: default;
+  font-size: .85em;
 }
 
 .gemPlaceholder.reqiured>span:after{

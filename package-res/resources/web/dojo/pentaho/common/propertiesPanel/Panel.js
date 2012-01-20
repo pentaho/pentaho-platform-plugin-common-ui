@@ -386,9 +386,10 @@ dojo.declare("pentaho.common.propertiesPanel.GemBarUISource", [dojo.dnd.Source],
   insertNodes: function(addSelected, data, before, anchor){
     // Append : before = true, anchor = null
     var pos = 0;
-    if(before && anchor == null){
+    if(anchor == null){
       // add is fired in onDrop
-      pos = this.gemBar.gems.length
+      pos = this.gemBar.gems.length;
+      before = false;
     } else if(anchor != null){
       // could be adding to the end, ignore ite
       for(var i=0; i<this.node.children.length; i++){
