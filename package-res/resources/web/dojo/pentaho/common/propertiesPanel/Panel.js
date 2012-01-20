@@ -550,7 +550,7 @@ dojo.declare(
       remove: function(gemUI){
         this.dropZoneNode.removeChild(gemUI.domNode);
         var currIdx = dojo.indexOf(this.gems, gemUI);
-        this.gems.splice(this.currIdx, 1);
+        this.gems.splice(currIdx, 1);
         this.model.remove(gemUI.model);
 
         if(this.model.allowMultiple == false && this.model.gems.length == 0){
