@@ -15,13 +15,15 @@ dojo.require("dijit.TitlePane");
 
 dojo.declare(
     "pentaho.common.propertiesPanel.Panel",
-    [dijit.layout.ContentPane],
+    [dijit.layout.BorderContainer],
     {
       captionTemplate: "<div class='caption'><span class='caption-text'>${ui.caption}&nbsp;</span>&nbsp;<img class='captionIcon'/></div>",
       propUIs: [],
       groups: {},
-      gutters: false,
+      gutters: true,
       baseClass: "pentahoPropertiesPanel",
+      liveSplitters: false,
+      numGroups: 0,
       constructor:function (propertiesConfiguration) {
         this.configuration = propertiesConfiguration;
       },
@@ -59,13 +61,29 @@ dojo.declare(
               title: groupConfig.title,
               content: groupContents,
               region: 'top',
-              splitter: false,
+              splitter: true,
               layoutPriority: this.groups.size
             });
+            var outterThis = this;
+            dojo.connect(group, "resize", function(){
+              group.titleBarNode;
+              // group.domNode.style.height = ((dojo.coords(outterThis.domNode).h - (10 * outterThis.numGroups)) / outterThis.numGroups) + "px";
+              group.hideNode.style.overflow = "auto";
+              group.hideNode.style.height = group.hideNode.scrollHeight+"px";
+              if(dojo.coords(group.domNode).h > 0)
+                group.hideNode.style.height = Math.min((dojo.coords(group.domNode).h - dojo.coords(group.titleBarNode).h), group.hideNode.scrollHeight) + "px";
+              // group.domNode.style.height = Math.min(dojo.coords(group.titleBarNode).h + dojo.coords(group.hideNode).h, parseInt(group.domNode.style.height)) + "px";
+
+              // setTimeout(function(){
+              //   group._splitterWidget.domNode.style.top = Math.min(parseInt(group._splitterWidget.domNode.style.top), (parseInt(group.domNode.style.top) + parseInt(group.domNode.style.height))) + "px";
+              // });
+
+            })
             this.groups[item.ui.group] = group;
+            this.numGroups++;
           }
           targetNode = group.content;
-          this.domNode.appendChild(group.domNode);
+          this.addChild(group);
         }
 
         // Items can have a caption. If specified, create and add it before the property UI component
@@ -88,6 +106,7 @@ dojo.declare(
         this.propUIs.push(propUi);
         this.connect(propUi, "onUIEvent", "onUIEvent");
         targetNode.appendChild(propUi.domNode);
+        this.resize();
 
       },
 
@@ -111,8 +130,9 @@ dojo.declare(
           widget.destroyRecursive();
         });
         this.propUIs = [];
-        this.groups = {},
-            this.domNode.innerHTML = "";
+        this.groups = {};
+        this.domNode.innerHTML = "";
+        this.numGroups = 0;
         this.configuration = new pentaho.common.propertiesPanel.Configuration(configJson);
         this.postCreate();
       },
@@ -215,6 +235,8 @@ dojo.declare("pentaho.common.propertiesPanel.GemBarUISource", [dojo.dnd.Source],
   },
   onDrop:function (source, nodes, copy) {
 
+    this.dropZone2Zone = false; // flag moves from one gembar to another
+
     if (!nodes || nodes.length == 0){
       return false;
     }
@@ -232,11 +254,13 @@ dojo.declare("pentaho.common.propertiesPanel.GemBarUISource", [dojo.dnd.Source],
     var gem;
     if(gemUI){
       gem = gemUI.model;
-      // gemUI.gemBar.remove(gemUI);
       if(gemUI.gemBar == this.gemBar){ //Reorder, notify model so it can fire an event
         // fire reordered in insertNodes where we know more information
       } else {
-        gemUI.gemBar.remove(gemUI);
+        this.dropZone2Zone = true;
+        gemUI.gemBar.remove(gemUI, /* suppressEvent */ true);
+        // for moves we cache the previous bar in order to add it to the move event
+        gemUI.model.previousGemBar = gemUI.gemBar.model;
         gemUI.gemBar = this.gemBar;
       }
     } else {
@@ -400,7 +424,7 @@ dojo.declare("pentaho.common.propertiesPanel.GemBarUISource", [dojo.dnd.Source],
 
       pos = (before)? pos : pos +1;
     }
-    this.gemBar.insertAt(this.gemUIbeingInserted, pos);
+    this.gemBar.insertAt(this.gemUIbeingInserted, pos, this.dropZone2Zone);
     this.inherited(arguments);
   },
 
@@ -520,7 +544,7 @@ dojo.declare(
           dojo.removeClass(this.placeholder, "reqiured");
         }
       },
-      insertAt: function(gem, pos){
+      insertAt: function(gem, pos, move){
         var currIdx = dojo.indexOf(this.gems, gem);
 
         console.log("inserting at pos: "+pos+" existing pos: "+currIdx);
@@ -536,7 +560,7 @@ dojo.declare(
           this.gems.splice(currIdx,1); // remove from old pos
           console.log("new gems collection: ", this.gems);
         }
-        this.model.insertAt(gem.model, pos, currIdx);
+        this.model.insertAt(gem.model, pos, currIdx, move);
 
         if(this.model.allowMultiple == false && this.model.gems.length > 0){
           this.placeholder.style.display = "none";
@@ -547,11 +571,11 @@ dojo.declare(
         }
 
       },
-      remove: function(gemUI){
+      remove: function(gemUI, suppressEvent){
         this.dropZoneNode.removeChild(gemUI.domNode);
         var currIdx = dojo.indexOf(this.gems, gemUI);
         this.gems.splice(currIdx, 1);
-        this.model.remove(gemUI.model);
+        this.model.remove(gemUI.model, suppressEvent);
 
         if(this.model.allowMultiple == false && this.model.gems.length == 0){
           this.placeholder.style.display = "";

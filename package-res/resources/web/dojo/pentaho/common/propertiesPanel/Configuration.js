@@ -84,10 +84,13 @@ dojo.declare(
         dojo.forEach(originalGems, this.initializeGem, this);
 
       },
-      remove: function(gem){
+      remove: function(gem, suppressEvent){
         this.gems.splice(this.gems.indexOf(gem), 1);
 
         // fire event
+        if(suppressEvent){
+          return;
+        }
         this.set("gems", this.gems);
         this.onModelEvent("removedGem", {gem: gem});
       },
@@ -102,7 +105,7 @@ dojo.declare(
         this.set("gems", this.gems);
         this.onModelEvent("reorderedGems", {});
       },
-      insertAt: function(gem, newIdx, oldIdx){
+      insertAt: function(gem, newIdx, oldIdx, move){
         var currIdx = dojo.indexOf(this.gems, gem);
         this.gems.splice(newIdx, 0, gem); // add it to the new pos
         var oldIdx = currIdx;
@@ -116,7 +119,11 @@ dojo.declare(
         if(currIdx > -1 && currIdx < newIdx){
           newIdx--;
         }
-        this.onModelEvent("insertAt", {gem: gem, idx: newIdx, oldIdx: oldIdx});
+        if(move){
+          this.onModelEvent("move", {gem: gem, idx: newIdx, oldGemBar: gem.previousGemBar});
+        } else {
+          this.onModelEvent("insertAt", {gem: gem, idx: newIdx, oldIdx: oldIdx});
+        }
       },
 
       gems: [],
