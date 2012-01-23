@@ -1,6 +1,7 @@
 /* BorderContainer */
 
 .tundra .dijitBorderContainer {
+	background-color: #fcfcfc;
 	padding: 5px;
 }
 
@@ -9,7 +10,7 @@
 	/* By default put borders on all children of BorderContainer,
 	 *  to give illusion of borders on the splitters themselves.
 	 */
-
+	border: 1px #ccc solid;
 }
 
 .tundra .dijitBorderContainer-dijitTabContainerTop,
@@ -34,6 +35,7 @@
 
 .tundra .dijitSplitterH,
 .tundra .dijitGutterH {
+	background:#fcfcfc;
 	border:0;
 	height:5px;
 }
@@ -47,6 +49,7 @@
 
 .tundra .dijitSplitterV,
 .tundra .dijitGutterV {
+	background:#fcfcfc;
 	border:0;
 	width:5px;
 }
