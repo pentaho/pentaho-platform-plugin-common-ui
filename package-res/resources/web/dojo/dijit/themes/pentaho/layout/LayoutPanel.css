@@ -149,3 +149,10 @@
   width:100%;
   height: 2px;
 }
+.propPanelItem{
+}
+
+.pentaho-button.propPanelItem{
+  text-align:center;
+  display: block !important;
+}

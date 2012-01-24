@@ -13,6 +13,7 @@ dojo.require("dojo.dnd.Source");
 dojo.require("dijit.TitlePane");
 
 
+
 dojo.declare(
     "pentaho.common.propertiesPanel.Panel",
     [dijit.layout.ContentPane],
@@ -77,22 +78,31 @@ dojo.declare(
                 totalGroupHeight +=  dojo.coords(gp.titleBarNode).h + gp.hideNode.scrollHeight;
               }
               dojo.forEach(outterThis.domNode.children, function(node){
-                if(node.className != "dijitTitlePane"){
+                if(!node.className.match(/dijitTitlePane/)){
                   totalNonGroupHeight += dojo.coords(node).h;
                 }
               });
-              var remainderToDivide = dojo.coords(outterThis.domNode).h - totalNonGroupHeight - (totalNumOfGroups * 15);
-
-
-              if(group.open){
-                group.domNode.style.height = Math.min(((dojo.coords(group.titleBarNode).h + group.hideNode.scrollHeight) / totalGroupHeight) * remainderToDivide, dojo.coords(group.titleBarNode).h + group.hideNode.scrollHeight) + "px";
-                group.hideNode.style.overflow = "auto";
-
-                if(dojo.coords(group.domNode).h > 0){
-                  group.hideNode.style.height = Math.min((dojo.coords(group.domNode).h - dojo.coords(group.titleBarNode).h), group.hideNode.scrollHeight) + "px";
-                }
+              var panelHeight = dojo.coords(outterThis.domNode).h;
+              if(totalGroupHeight + totalNonGroupHeight < panelHeight){
+                // plenty of space, make natural size
+                var gHeight = dojo.coords(group.titleBarNode).h + group.hideNode.scrollHeight;
+                group.domNode.style.height = gHeight + "px";
+                group.hideNode.style.height = (gHeight - dojo.coords(group.titleBarNode).h)+ "px";
               } else {
-                group.domNode.style.height = dojo.coords(group.titleBarNode).h + "px"
+                // divide up available room based on relative sizes of panels
+                var remainderToDivide = dojo.coords(outterThis.domNode).h - totalNonGroupHeight - (totalNumOfGroups * 15);
+
+                if(group.open){
+                  group.domNode.style.height = Math.min(((dojo.coords(group.titleBarNode).h + group.hideNode.scrollHeight) / totalGroupHeight) * remainderToDivide, dojo.coords(group.titleBarNode).h + group.hideNode.scrollHeight) + "px";
+                  group.hideNode.style.overflow = "auto";
+
+                  if(dojo.coords(group.domNode).h > 0){
+                    group.hideNode.style.height = Math.min((dojo.coords(group.domNode).h - dojo.coords(group.titleBarNode).h), group.hideNode.scrollHeight) + "px";
+                  }
+                } else {
+                  group.domNode.style.height = dojo.coords(group.titleBarNode).h + "px"
+                }
+
               }
 
               // setTimeout(function(){
@@ -101,7 +111,11 @@ dojo.declare(
 
             });
 
-            dojo.connect(group, "toggle", function(){
+            dojo.connect(group._wipeOut, "onEnd", function(){
+              outterThis.resize();
+            });
+
+            dojo.connect(group._wipeIn, "onEnd", function(){
               outterThis.resize();
             });
             this.groups[groupId] = group;
@@ -129,6 +143,7 @@ dojo.declare(
         this.setupEventHandling(propUi);
         this.propUIs.push(propUi);
         this.connect(propUi, "onUIEvent", "onUIEvent");
+        dojo.addClass(propUi.domNode, "propPanelItem");
         targetNode.appendChild(propUi.domNode);
 
       },
