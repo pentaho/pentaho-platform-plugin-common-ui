@@ -143,8 +143,9 @@ dojo.declare(
         this.setupEventHandling(propUi);
         this.propUIs.push(propUi);
         this.connect(propUi, "onUIEvent", "onUIEvent");
-        dojo.addClass(propUi.domNode, "propPanelItem");
+        dojo.addClass(propUi.domNode, "propPanelItem")
         targetNode.appendChild(propUi.domNode);
+        this.resize();
 
       },
 
@@ -463,6 +464,7 @@ dojo.declare("pentaho.common.propertiesPanel.GemBarUISource", [dojo.dnd.Source],
     }
     this.gemBar.insertAt(this.gemUIbeingInserted, pos, this.dropZone2Zone);
     this.inherited(arguments);
+    this.gemBar.propPanel.resize();
   },
 
   checkAcceptance:function (source, nodes, silent) {
@@ -617,6 +619,7 @@ dojo.declare(
         if(this.model.allowMultiple == false && this.model.gems.length == 0){
           this.placeholder.style.display = "";
         }
+        this.propPanel.resize();
       },
       onContextMenu: function(event, gem){
         // to be overwritten
