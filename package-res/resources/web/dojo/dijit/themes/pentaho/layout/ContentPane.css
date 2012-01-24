@@ -10,12 +10,11 @@
 .tundra .dijitTabContainerBottom-dijitContentPane,
 .tundra .dijitTabContainerRight-dijitContentPane,
 .tundra .dijitAccordionContainer-dijitContentPane {
-	background-color: #fff;
-	padding: 5px;
+	padding: 8px;
 }
 
 .tundra .dijitSplitContainer-dijitContentPane,
 .tundra .dijitBorderContainer-dijitContentPane {
-	background-color: #fff;		/* override background-color setting on parent .dijitBorderContainer */
-	padding: 5px;
+	padding: 8px;
 }
+
