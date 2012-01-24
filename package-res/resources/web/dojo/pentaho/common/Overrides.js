@@ -4,13 +4,6 @@
  */
 dojo.provide("pentaho.common.Overrides");
 
-dojo.extend(dijit.layout._TabButton, {
-  templateString: dojo.cache("analyzer", "custom-templates/tabButton.html")
-});
-
-dojo.extend(dijit.layout._TabContainerBase, {
-  templateString: dojo.cache("analyzer", "custom-templates/tabContainer.html")
-});
 dojo.extend(dijit.layout.TabContainer, {baseClass : "pentahoTabContainer"});
 
 dojo.extend(dijit.DialogUnderlay,
