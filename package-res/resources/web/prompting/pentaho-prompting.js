@@ -399,7 +399,7 @@ pentaho.common.prompting = {
 
         pVal.label = value.attr('label');
         if ('true' == value.attr('null')) {
-          pVal.value = null;
+          pVal.value = ''; // Dashboards doesn't play nicely with null values for parameters
         } else {
           pVal.value = value.attr('value');
         }
