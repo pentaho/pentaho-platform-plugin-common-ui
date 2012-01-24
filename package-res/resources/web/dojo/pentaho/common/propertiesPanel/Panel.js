@@ -62,8 +62,7 @@ dojo.declare(
               title: groupConfig.title,
               content: groupContents,
               region: 'top',
-              splitter: false,
-              layoutPriority: this.groups.size
+              splitter: false
             });
             dojo.connect(group, "resize", function(){
 
@@ -83,14 +82,15 @@ dojo.declare(
                 }
               });
               var panelHeight = dojo.coords(outterThis.domNode).h;
-              if(totalGroupHeight + totalNonGroupHeight < panelHeight){
+              group.domNode.style.width = "";
+              if(totalGroupHeight + totalNonGroupHeight < panelHeight - /*margins*/ 20){
                 // plenty of space, make natural size
                 var gHeight = dojo.coords(group.titleBarNode).h + group.hideNode.scrollHeight;
                 group.domNode.style.height = gHeight + "px";
                 group.hideNode.style.height = (gHeight - dojo.coords(group.titleBarNode).h)+ "px";
               } else {
                 // divide up available room based on relative sizes of panels
-                var remainderToDivide = dojo.coords(outterThis.domNode).h - totalNonGroupHeight - (totalNumOfGroups * 15);
+                var remainderToDivide = dojo.coords(outterThis.domNode).h - totalNonGroupHeight;
 
                 if(group.open){
                   group.domNode.style.height = Math.min(((dojo.coords(group.titleBarNode).h + group.hideNode.scrollHeight) / totalGroupHeight) * remainderToDivide, dojo.coords(group.titleBarNode).h + group.hideNode.scrollHeight) + "px";

@@ -292,6 +292,11 @@
       <mapper type="glob" from="dojo_*" to="*"/>
     </copy>
 
+    <copy verbose="true" todir="${dojo.src}/dijit" overwrite="true">
+      <fileset dir="${package.resdir}/resources/web/dojo/dijit">
+      </fileset>
+    </copy>
+
     <java classname="org.mozilla.javascript.tools.shell.Main"
           dir="${dojo.src}/util/buildscripts"
           fork="true">

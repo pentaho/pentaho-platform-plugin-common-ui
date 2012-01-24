@@ -226,6 +226,23 @@
 }
 
 .tundra .dijitSelect .dijitArrowButton{
-  background-color: #ddd;
-  border: 1px solid white;
+  padding: 4px;
+  background: #888;
+  background: -webkit-gradient(
+    linear,
+    left top,
+    left bottom,
+    color-stop(0, #AAA),
+    color-stop(0.10, #888),
+    color-stop(0.50, #3f3f3f),
+    color-stop(0.55, #000),
+    color-stop(0.90, #121212)
+  );
+  background: -moz-linear-gradient(#AAAAAA, #888888 10%, #3F3F3F 50%, #000000 55%, #121212 90%);
+  border: 1px outset gray;
+  cursor: pointer;
+  font-size:0px;
+
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr = '#888888', endColorstr = '#121212');
+  zoom:1;
 }

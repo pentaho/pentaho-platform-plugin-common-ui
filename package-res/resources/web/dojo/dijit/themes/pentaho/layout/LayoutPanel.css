@@ -6,8 +6,7 @@
   background-color: #FFFFCC;
 }
 .pentahoPropertiesPanel{
-  border: 1px solid #666;
-  background-color: #d3d3d3;
+  background-color: #7f7f7f;
 }
 .pentahoPropertiesPanel .caption{
   height: 1.2em;
@@ -74,7 +73,7 @@
 }
 
 .pentahoPropertiesPanel .dijitTitlePaneContentInner {
-  background-color: #dcdcdc;
+  background-color: #d3d3d3;
 }
 
 .pentahoPropertiesPanel .dijitTitlePaneContentInner {
@@ -155,4 +154,7 @@
 .pentaho-button.propPanelItem{
   text-align:center;
   display: block !important;
+}
+.pentahoPropertiesPanel .dijitTitlePane{
+  margin-bottom: 0px;
 }
