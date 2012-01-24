@@ -99,7 +99,11 @@ dojo.declare(
               //   group._splitterWidget.domNode.style.top = Math.min(parseInt(group._splitterWidget.domNode.style.top), (parseInt(group.domNode.style.top) + parseInt(group.domNode.style.height))) + "px";
               // });
 
-            })
+            });
+
+            dojo.connect(group, "toggle", function(){
+              outterThis.resize();
+            });
             this.groups[groupId] = group;
             this.domNode.appendChild(group.domNode);
           }
