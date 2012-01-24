@@ -37,6 +37,7 @@
 .gem .gem-label{
   float: left;
   margin-left: 1px;
+  font-size:.85em;
 }
 
 .gem .gemMenuHandle{
@@ -82,8 +83,7 @@
 
 
 .pentahoPropertiesPanel .caption-text {
-  font-size: 1em;
-  margin-left:8px;
+  font-size: .85em;
   font-weight: normal;
   float:left;
 

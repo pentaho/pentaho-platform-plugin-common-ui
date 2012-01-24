@@ -38,21 +38,21 @@ pentaho.visualizations.push({
     {
       name: 'Default',
       reqs :
-      [
-        {   id: 'category',             // id of the data element
-          dataType: 'string',         // data type - 'string', 'number', 'date', 'boolean', 'any' or a comma separated list
-          dataStructure: 'column',    // 'column' or 'row' - only 'column' supported so far
-          caption: 'Category',        // visible name
-          required: true              // true or false
-        },
-        {   id: 'series',
-          dataType: 'number',
-          dataStructure: 'column',
-          caption: 'Values',
-          required: true,
-          allowMultiple: true         // true or false
-        }
-      ]
+          [
+            {   id: 'category',             // id of the data element
+              dataType: 'string',         // data type - 'string', 'number', 'date', 'boolean', 'any' or a comma separated list
+              dataStructure: 'column',    // 'column' or 'row' - only 'column' supported so far
+              caption: 'Category',        // visible name
+              required: true              // true or false
+            },
+            {   id: 'series',
+              dataType: 'number',
+              dataStructure: 'column',
+              caption: 'Values',
+              required: true,
+              allowMultiple: true         // true or false
+            }
+          ]
     }
   ]
 });
@@ -394,27 +394,33 @@ pentaho.visualizations.push({
         {   id: 'across',
           dataType: 'string',
           dataStructure: 'row',
-          caption: 'Across',
+          caption: 'X-Axis',
           required: true
         },
         {   id: 'down',
           dataType: 'string',
           dataStructure: 'column',
-          caption: 'Down',
+          caption: 'Y-Axis',
           required: true
         },
         {   id: 'values',
           dataType: 'number',
           dataStructure: 'column',
-          caption: 'Values',
+          caption: 'Color By',
           required: true
+        },
+        {   id: 'sizeBy',
+          dataType: 'number',
+          dataStructure: 'column',
+          caption: 'Size By',
+          required: false
         },
         {
           id: 'pattern',
           dataType: 'string',
           values: ["GRADIENT", "3-COLOR", "5-COLOR"],
           ui: {
-            labels: ["Gradient", "3-Color", "5-Color"],
+            labels: ["Gradient", "3 Steps", "5 Steps"],
             group: "options",
             type: 'combo',
             caption: "Pattern"
@@ -424,9 +430,9 @@ pentaho.visualizations.push({
         {
           id: 'colorSet',
           dataType: 'string',
-          values: ["ryg", "rgb"],
+          values: ["ryg", "ryb", "blue", "gray"],
           ui: {
-            labels: ["Red-Yellow-Green", "Red-Green-Blue"],
+            labels: ["Red, Yellow, Green", "Red, Yellow, Blue", "Blue Scale", "Gray Scale"],
             group: "options",
             type: 'combo',
             caption: "Color"

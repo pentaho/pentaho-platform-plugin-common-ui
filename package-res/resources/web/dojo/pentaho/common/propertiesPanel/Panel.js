@@ -15,23 +15,21 @@ dojo.require("dijit.TitlePane");
 
 dojo.declare(
     "pentaho.common.propertiesPanel.Panel",
-    [dijit.layout.BorderContainer],
+    [dijit.layout.ContentPane],
     {
       captionTemplate: "<div class='caption'><span class='caption-text'>${ui.caption}&nbsp;</span>&nbsp;<img class='captionIcon'/></div>",
       propUIs: [],
       groups: {},
-      gutters: true,
+      gutters: false,
       baseClass: "pentahoPropertiesPanel",
-      liveSplitters: false,
-      numGroups: 0,
       constructor:function (propertiesConfiguration) {
         this.configuration = propertiesConfiguration;
       },
       postCreate:function () {
         dojo.forEach(this.configuration.items, dojo.hitch(this, "initializeItem"));
 
-        var placeholderPanel = new dijit.layout.ContentPane({region: "center", splitter: false});
-        this.domNode.appendChild(placeholderPanel.domNode);
+        //var placeholderPanel = new dijit.layout.ContentPane({region: "center", splitter: false});
+        //this.domNode.appendChild(placeholderPanel.domNode);
         this.inherited(arguments);
       },
       initializeItem:function (item) {
@@ -49,41 +47,63 @@ dojo.declare(
           propUi = new layoutClass({model: item, propPanel: this});
         }
         var targetNode = this.domNode;
+        var groupId = item.ui.group;
 
         // If the property is grouped, create the group or add it to the existing one.
-        if(item.ui.group){
-          var group = this.groups[item.ui.group];
+        if(groupId){
+          var group = this.groups[groupId];
           var groupConfig = this.configuration.groups[item.ui.group];
           if(!group && groupConfig){
             var groupContents = document.createElement("div");
 
+            var outterThis = this;
             group = new dijit.TitlePane({
               title: groupConfig.title,
               content: groupContents,
               region: 'top',
-              splitter: true,
+              splitter: false,
               layoutPriority: this.groups.size
             });
-            var outterThis = this;
             dojo.connect(group, "resize", function(){
-              group.titleBarNode;
-              // group.domNode.style.height = ((dojo.coords(outterThis.domNode).h - (10 * outterThis.numGroups)) / outterThis.numGroups) + "px";
-              group.hideNode.style.overflow = "auto";
-              group.hideNode.style.height = group.hideNode.scrollHeight+"px";
-              if(dojo.coords(group.domNode).h > 0)
-                group.hideNode.style.height = Math.min((dojo.coords(group.domNode).h - dojo.coords(group.titleBarNode).h), group.hideNode.scrollHeight) + "px";
-              // group.domNode.style.height = Math.min(dojo.coords(group.titleBarNode).h + dojo.coords(group.hideNode).h, parseInt(group.domNode.style.height)) + "px";
+
+
+              var lastChild = dojo.coords(outterThis.domNode.children[outterThis.domNode.children.length-1]);
+              var totalNumOfGroups = 0;
+              var totalGroupHeight = 0;
+              var totalNonGroupHeight = 0;
+              for(var g in outterThis.groups){
+                totalNumOfGroups++;
+                var gp = outterThis.groups[g];
+                totalGroupHeight +=  dojo.coords(gp.titleBarNode).h + gp.hideNode.scrollHeight;
+              }
+              dojo.forEach(outterThis.domNode.children, function(node){
+                if(node.className != "dijitTitlePane"){
+                  totalNonGroupHeight += dojo.coords(node).h;
+                }
+              });
+              var remainderToDivide = dojo.coords(outterThis.domNode).h - totalNonGroupHeight - (totalNumOfGroups * 15);
+
+
+              if(group.open){
+                group.domNode.style.height = Math.min(((dojo.coords(group.titleBarNode).h + group.hideNode.scrollHeight) / totalGroupHeight) * remainderToDivide, dojo.coords(group.titleBarNode).h + group.hideNode.scrollHeight) + "px";
+                group.hideNode.style.overflow = "auto";
+
+                if(dojo.coords(group.domNode).h > 0){
+                  group.hideNode.style.height = Math.min((dojo.coords(group.domNode).h - dojo.coords(group.titleBarNode).h), group.hideNode.scrollHeight) + "px";
+                }
+              } else {
+                group.domNode.style.height = dojo.coords(group.titleBarNode).h + "px"
+              }
 
               // setTimeout(function(){
               //   group._splitterWidget.domNode.style.top = Math.min(parseInt(group._splitterWidget.domNode.style.top), (parseInt(group.domNode.style.top) + parseInt(group.domNode.style.height))) + "px";
               // });
 
             })
-            this.groups[item.ui.group] = group;
-            this.numGroups++;
+            this.groups[groupId] = group;
+            this.domNode.appendChild(group.domNode);
           }
           targetNode = group.content;
-          this.addChild(group);
         }
 
         // Items can have a caption. If specified, create and add it before the property UI component
@@ -106,7 +126,6 @@ dojo.declare(
         this.propUIs.push(propUi);
         this.connect(propUi, "onUIEvent", "onUIEvent");
         targetNode.appendChild(propUi.domNode);
-        this.resize();
 
       },
 
@@ -132,7 +151,6 @@ dojo.declare(
         this.propUIs = [];
         this.groups = {};
         this.domNode.innerHTML = "";
-        this.numGroups = 0;
         this.configuration = new pentaho.common.propertiesPanel.Configuration(configJson);
         this.postCreate();
       },
@@ -705,8 +723,9 @@ dojo.declare(
         }, this);
 
         this.value = this.model.value;
-        if(this.value == null){
-          this.value = this.model.values[0];
+        if(typeof(this.value) == "undefined"){
+          this.model.set('value', this.model.values[0]);
+
         }
 
       },
@@ -796,3 +815,22 @@ dojo.declare(
     }
 );
 pentaho.common.propertiesPanel.Panel.registeredTypes["checkbox"] = pentaho.common.propertiesPanel.CheckBoxUI;
+
+
+dojo.declare(
+    "pentaho.common.propertiesPanel.ButtonUI",
+    [dijit.form.Button, pentaho.common.propertiesPanel.StatefulUI],
+    {
+      constructor:function (options) {
+        this.disabled = this.model.disabled;
+        this.label = this.model.ui.label;
+        this.inherited(arguments);
+      },
+      onClick: function(){
+        this.model.set('clicked', true);
+      }
+    }
+);
+pentaho.common.propertiesPanel.Panel.registeredTypes["button"] = pentaho.common.propertiesPanel.ButtonUI;
+
+

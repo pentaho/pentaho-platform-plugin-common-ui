@@ -76,6 +76,7 @@ dependencies = {
                 "pentaho.common.MenuSeparator",
                 "pentaho.common.MessageBox",
                 "pentaho.common.Messages",
+                "pentaho.common.Overrides",
                 "pentaho.common.PopupMenuItem",
                 "pentaho.common.SectionHeader",
                 "pentaho.common.Select",
