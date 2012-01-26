@@ -952,6 +952,7 @@ body .dijitAlignClient { position: absolute; }
 .dijitTitlePane {
 	display: block;
 	overflow: hidden;
+  background-color: lightGrey;
 }
 .dijitTitlePaneTitle {
 	cursor: pointer;

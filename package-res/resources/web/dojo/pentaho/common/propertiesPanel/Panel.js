@@ -23,6 +23,7 @@ dojo.declare(
       groups: {},
       gutters: false,
       baseClass: "pentahoPropertiesPanel",
+      minHeightDeviation: 0,
       constructor:function (propertiesConfiguration) {
         this.configuration = propertiesConfiguration;
       },
@@ -33,7 +34,14 @@ dojo.declare(
         //this.domNode.appendChild(placeholderPanel.domNode);
         this.inherited(arguments);
       },
+      resize: function(){
+        this.minHeightDeviation = 0; // zero out adjustments
+        this.inherited(arguments);
+      },
       initializeItem:function (item) {
+        if(item.hidden){
+          return;
+        }
         // Lookup class impl from map
         var layoutClass = pentaho.common.propertiesPanel.Panel.registeredTypes[item.ui.type];
         if (!layoutClass) {
@@ -71,10 +79,18 @@ dojo.declare(
               var totalNumOfGroups = 0;
               var totalGroupHeight = 0;
               var totalNonGroupHeight = 0;
+
+              var minHeightAdjustment = 0;
               for(var g in outterThis.groups){
                 totalNumOfGroups++;
                 var gp = outterThis.groups[g];
-                totalGroupHeight +=  dojo.coords(gp.titleBarNode).h + gp.hideNode.scrollHeight;
+                var titleBarHeight = dojo.coords(gp.titleBarNode).h
+                totalGroupHeight += (gp.open) ? titleBarHeight + gp.hideNode.scrollHeight : 0;
+                if(gp.open){
+                  minHeightAdjustment += (gp.usingMinHeight) ? gp.heightAdjustment : 0;
+                } else {
+                  minHeightAdjustment += titleBarHeight;
+                }
               }
               dojo.forEach(outterThis.domNode.children, function(node){
                 if(!node.className.match(/dijitTitlePane/)){
@@ -83,27 +99,40 @@ dojo.declare(
               });
               var panelHeight = dojo.coords(outterThis.domNode).h;
               group.domNode.style.width = "";
-              if(totalGroupHeight + totalNonGroupHeight < panelHeight - /*margins*/ 20){
-                // plenty of space, make natural size
-                var gHeight = dojo.coords(group.titleBarNode).h + group.hideNode.scrollHeight;
-                group.domNode.style.height = gHeight + "px";
-                group.hideNode.style.height = (gHeight - dojo.coords(group.titleBarNode).h)+ "px";
-              } else {
-                // divide up available room based on relative sizes of panels
-                var remainderToDivide = dojo.coords(outterThis.domNode).h - totalNonGroupHeight;
+              // if(totalGroupHeight + totalNonGroupHeight < panelHeight - /*margins*/ 20){
+              //   // plenty of space, make natural size
+              //   var gHeight = dojo.coords(group.titleBarNode).h + group.hideNode.scrollHeight;
+              //   group.domNode.style.height = gHeight + "px";
+              //   group.hideNode.style.height = (gHeight - dojo.coords(group.titleBarNode).h)+ "px";
+              // } else {
+              // divide up available room based on relative sizes of panels
+              var remainderToDivide = dojo.coords(outterThis.domNode).h - totalNonGroupHeight - minHeightAdjustment;
 
-                if(group.open){
-                  group.domNode.style.height = Math.min(((dojo.coords(group.titleBarNode).h + group.hideNode.scrollHeight) / totalGroupHeight) * remainderToDivide, dojo.coords(group.titleBarNode).h + group.hideNode.scrollHeight) + "px";
-                  group.hideNode.style.overflow = "auto";
+              var titleBarHeight = dojo.coords(group.titleBarNode).h;
+              if(group.open){
+                var calculatedHeight = ((titleBarHeight + group.hideNode.scrollHeight) / totalGroupHeight) * remainderToDivide;
 
-                  if(dojo.coords(group.domNode).h > 0){
-                    group.hideNode.style.height = Math.min((dojo.coords(group.domNode).h - dojo.coords(group.titleBarNode).h), group.hideNode.scrollHeight) + "px";
-                  }
+                // ensure minimum height
+                if(calculatedHeight < titleBarHeight*2.2){
+                  group.usingMinHeight = true;
+                  group.heightAdjustment = titleBarHeight*2.2 - calculatedHeight;
+                  calculatedHeight = titleBarHeight*2.2;
                 } else {
-                  group.domNode.style.height = dojo.coords(group.titleBarNode).h + "px"
+                  group.usingMinHeight = false;
                 }
 
+                group.domNode.style.height = calculatedHeight + "px";
+                group.hideNode.style.overflow = "auto";
+
+                if(dojo.coords(group.domNode).h > 0){
+                  group.hideNode.style.height = Math.min((dojo.coords(group.domNode).h - titleBarHeight), group.hideNode.scrollHeight) + "px";
+                }
+              } else {
+                group.domNode.style.height = titleBarHeight + "px";
+                group.usingMinHeight = false;
               }
+
+              // }
 
               // setTimeout(function(){
               //   group._splitterWidget.domNode.style.top = Math.min(parseInt(group._splitterWidget.domNode.style.top), (parseInt(group.domNode.style.top) + parseInt(group.domNode.style.height))) + "px";
