@@ -676,9 +676,6 @@ pentaho.VizController.getRgbStepFromMultiColorHex = function(value, min, max, co
 }
 
 pentaho.VizController.convertToRGB = function(hex){
-  if(!hex){
-    debugger;
-  }
   if(hex.indexOf("#") == 0){
     hex = hex.substring(1);
   } else {
@@ -700,9 +697,6 @@ pentaho.VizController.convertToRGB = function(hex){
  Return  an RGB() color
  */
 pentaho.VizController.getRrbColor = function(r, g, b) {
-  if(('RGB('+r+','+g+','+b+')').indexOf("NaN") > 0){
-    debugger;
-  }
   return 'RGB('+r+','+g+','+b+')';
 }
 
