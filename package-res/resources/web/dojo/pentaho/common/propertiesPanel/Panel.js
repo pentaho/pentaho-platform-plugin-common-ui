@@ -98,7 +98,6 @@ dojo.declare(
                 }
               });
               var panelHeight = dojo.coords(outterThis.domNode).h;
-              group.domNode.style.width = "";
               // if(totalGroupHeight + totalNonGroupHeight < panelHeight - /*margins*/ 20){
               //   // plenty of space, make natural size
               //   var gHeight = dojo.coords(group.titleBarNode).h + group.hideNode.scrollHeight;
@@ -108,21 +107,34 @@ dojo.declare(
               // divide up available room based on relative sizes of panels
               var remainderToDivide = dojo.coords(outterThis.domNode).h - totalNonGroupHeight - minHeightAdjustment;
 
-              var titleBarHeight = dojo.coords(group.titleBarNode).h;
+              var titleCoords = dojo.coords(group.titleBarNode);
+              var titleBarHeight = titleCoords.h;
+              var titleBarWidth = titleCoords.w;
               if(group.open){
-                var calculatedHeight = ((titleBarHeight + group.hideNode.scrollHeight) / totalGroupHeight) * remainderToDivide;
+                var naturalHeight = titleBarHeight + group.hideNode.scrollHeight;
+
+                var calculatedHeight = (naturalHeight / totalGroupHeight) * remainderToDivide;
+                if(calculatedHeight > naturalHeight){
+                  // No need to scroll
+                  group.hideNode.style.overflow = "hidden";
+                  //previously scrolling divs don't always relayout when scrolling is disabled. set width to fix
+                  group.wipeNode.style.width = titleBarWidth + "px";
+                } else {
+                  group.hideNode.style.overflow = "auto";
+                  group.wipeNode.style.width = "";
+                }
 
                 // ensure minimum height
-                if(calculatedHeight < titleBarHeight*2.2){
+                var minHeightFactor = 2.2;
+                if(calculatedHeight < titleBarHeight*minHeightFactor){
                   group.usingMinHeight = true;
-                  group.heightAdjustment = titleBarHeight*2.2 - calculatedHeight;
-                  calculatedHeight = titleBarHeight*2.2;
+                  group.heightAdjustment = titleBarHeight*minHeightFactor - calculatedHeight;
+                  calculatedHeight = titleBarHeight*minHeightFactor;
                 } else {
                   group.usingMinHeight = false;
                 }
 
                 group.domNode.style.height = calculatedHeight + "px";
-                group.hideNode.style.overflow = "auto";
 
                 if(dojo.coords(group.domNode).h > 0){
                   group.hideNode.style.height = Math.min((dojo.coords(group.domNode).h - titleBarHeight), group.hideNode.scrollHeight) + "px";
@@ -131,6 +143,7 @@ dojo.declare(
                 group.domNode.style.height = titleBarHeight + "px";
                 group.usingMinHeight = false;
               }
+              group.domNode.style.width = "";
 
               // }
 
@@ -367,7 +380,7 @@ dojo.declare("pentaho.common.propertiesPanel.GemBarUISource", [dojo.dnd.Source],
   },
   createGemUI:function (gem, sourceNode) {
     var uiClass = pentaho.common.propertiesPanel.Panel.registeredTypes["gem"];
-    var options = {id: gem.id, model: gem, gemBar: this.gemBar, dndType: this.gemBar.model.ui.dndType, sourceNode : sourceNode};
+    var options = {id: gem.id, model: gem, gemBar: this.gemBar, dndType: sourceNode.getAttribute("dndType"), sourceNode : sourceNode};
     if(uiClass.create){
       return uiClass.create(options);
     } else {
@@ -555,7 +568,7 @@ dojo.declare(
 
           var outterThis = this;
           dojo.connect(this.placeholder, "onmouseover", function(event){
-            if(dojo.dnd.manager().source && outterThis.checkAcceptance(dojo.dnd.manager().source, dojo.dnd.manager().nodes)){
+            if(dojo.dnd.manager().source && outterThis.checkAcceptance(outterThis.dropZone, dojo.dnd.manager().nodes)){
               dojo.addClass(event.target, "over");
             }
           });
@@ -570,7 +583,7 @@ dojo.declare(
           });
 
           dojo.connect(this.placeholder.firstChild, "onmouseover", function(event){
-            if(dojo.dnd.manager().source && outterThis.checkAcceptance(dojo.dnd.manager().source, dojo.dnd.manager().nodes)){
+            if(dojo.dnd.manager().source && outterThis.checkAcceptance(outterThis.dropZone, dojo.dnd.manager().nodes)){
               dojo.addClass(outterThis.placeholder, "over");
             }
           });
@@ -590,7 +603,7 @@ dojo.declare(
 
         dojo.forEach(this.model.gems, function(gem){
           var uiClass = pentaho.common.propertiesPanel.Panel.registeredTypes["gem"];
-          var options = {sourceNode: gem.sourceNode, id: gem.id, model: gem, gemBar: this, dndType: this.model.ui.dndType};
+          var options = {sourceNode: gem.sourceNode, id: gem.id, model: gem, gemBar: this, dndType: gem.dndType};
           var gemUI;
           if(uiClass.create){
             gemUI = uiClass.create(options);
