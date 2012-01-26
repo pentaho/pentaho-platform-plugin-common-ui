@@ -165,14 +165,20 @@ dojo.declare(
       },
 
       setConfiguration: function(configJson){
+        this._setConfiguration(new pentaho.common.propertiesPanel.Configuration(configJson));
+      },
+      _setConfiguration: function(config){
         this.propUIs.forEach(function(widget){
           widget.destroyRecursive();
         });
         this.propUIs = [];
         this.groups = {};
         this.domNode.innerHTML = "";
-        this.configuration = new pentaho.common.propertiesPanel.Configuration(configJson);
+        this.configuration = config;
         this.postCreate();
+      },
+      reload: function(){
+        this._setConfiguration(this.configuration);
       },
       set: function(property, id, value){
         dojo.forEach(this.propUIs, function(prop){

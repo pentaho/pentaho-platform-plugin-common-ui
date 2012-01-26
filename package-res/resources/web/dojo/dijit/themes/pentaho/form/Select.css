@@ -32,11 +32,6 @@
 }
 
 .tundra .dijitSelectHover .dijitButtonNode {
-	border-color:#a5beda;
-	border-bottom-color:#5c7590;
-	border-right-color:#5c7590;
-	color:#243C5F;
-	background:#fcfdff url("../images/buttonHover.png") repeat-x bottom;
 }
 
 .tundra .dijitSelectActive .dijitButtonNode,
