@@ -287,7 +287,7 @@ dojo.declare(
 
     var parameterName = this.parameterNameInput.get("value");
     if (parameterName) {
-      parameterName = dojo.trim(parameterName).replace(/[^a-zA-Z]/g, "");
+      parameterName = dojo.trim(parameterName).replace(/[^a-zA-Z0-9 ]/g, "");
       if (parameterName.length > 0) {
         this.currentFilter.parameterName = parameterName;
       } else {
