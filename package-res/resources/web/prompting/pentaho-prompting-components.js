@@ -9,7 +9,6 @@ var SubmitPromptComponent = ScopedPentahoButtonComponent.extend({
   updateAutoSubmit: function(name) {
     var c = Dashboards.getComponentByName(name);
     c.promptPanel.autoSubmit = undefined !== $('#' + c.htmlObject + ' input:checked').val();
-    Dashboards.update(c);
   },
 
   update: function() {
