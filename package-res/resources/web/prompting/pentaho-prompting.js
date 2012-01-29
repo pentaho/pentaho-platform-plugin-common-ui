@@ -283,6 +283,9 @@ pentaho.common.prompting = {
     if (this.prepared) { return; }
     Dashboards.setGlobalContext(false);
 
+    // Don't escape parameter values - we want the exactly as they are declared. We'll handle escaping the values if necessary.
+    Dashboards.escapeParameterValues = false;
+
     this.prepared = true;
   },
 
