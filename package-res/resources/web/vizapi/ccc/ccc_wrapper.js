@@ -391,19 +391,19 @@ pentaho.visualizations.push({
     {
       name: 'Default',
       reqs :[
-        {   id: 'across',
+        {   id: 'rows',
           dataType: 'string',
           dataStructure: 'row',
           caption: 'X-Axis',
           required: true
         },
-        {   id: 'down',
+        {   id: 'columns',
           dataType: 'string',
           dataStructure: 'column',
           caption: 'Y-Axis',
           required: true
         },
-        {   id: 'values',
+        {   id: 'color',
           dataType: 'number',
           dataStructure: 'column',
           caption: 'Color By',
@@ -872,7 +872,7 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
           if (vizOptions.bulletRanges)
             for (var i=0; i < vizOptions.bulletRanges.length; i++) row.push(vizOptions.bulletRanges[i]);
 
-          //				var row = [dataTable.getValue( rowNo, measures[measureNo] )];
+          //        var row = [dataTable.getValue( rowNo, measures[measureNo] )];
           resultset.push(row);
         }
       }
