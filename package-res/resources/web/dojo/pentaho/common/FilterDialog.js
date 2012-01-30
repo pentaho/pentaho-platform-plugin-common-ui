@@ -23,6 +23,7 @@ dojo.declare(
 
   _reauthenticateCallback: null,
 
+  _preSaveCallback: undefined,
   _onSuccessCallback: undefined,
   _onCancelCallback: undefined,
 
@@ -116,6 +117,19 @@ dojo.declare(
       this.setFilterType("MATCH");
     }
     this._initParameterUI();
+  },
+
+  /**
+   * Register a callback function for checking if the filter can be saved at all or not.
+   * The function should accept the following parameters: 
+   *   dialog: this filter dialog
+   *   filter: the current filter being edited
+   *   saveCallback: the function to call if this filter should be saved
+   *
+   * The reason this pre-save callback must call the saveCallback instead of returning a result is to allow for prompting of the user
+   */
+  registerPreSaveCallback: function(f) {
+    this._preSaveCallback = f;
   },
 
   // Register a callback function for handling reauthentication which itself takes a callback function when authentication is successful
@@ -267,6 +281,15 @@ dojo.declare(
   },
 
   save: function() {
+    if (this._preSaveCallback) {
+      this._preSaveCallback.call(this, this, this.currentFilter, this._save.bind(this));
+    } else {
+      this._save();
+    }
+  },
+
+  // Internal save function to be called by a preSaveCallback if it exists
+  _save: function() {
     switch (this.filterType) {
       case "PICKLIST":
         if (!this._savePicklistContainer()) {
@@ -285,17 +308,12 @@ dojo.declare(
 
     this._scrubFilterValues(this.currentFilter);
 
-    var parameterName = this.parameterNameInput.get("value");
+    var parameterName = this.getParameterName();
     if (parameterName) {
-      parameterName = dojo.trim(parameterName).replace(/[^a-zA-Z0-9 ]/g, "");
-      if (parameterName.length > 0) {
         this.currentFilter.parameterName = parameterName;
       } else {
         this.currentFilter.parameterName = null;
       }
-    } else {
-      this.currentFilter.parameterName = null;
-    }
 
     if (this._onSuccessCallback) {
       try {
@@ -306,6 +324,14 @@ dojo.declare(
     }
     this.hide();
     return true;
+  },
+
+  getParameterName: function() {
+    var parameterName = this.parameterNameInput.get("value");
+    if (parameterName) {
+      parameterName = dojo.trim(parameterName).replace(/[^a-zA-Z0-9 ]/g, "");
+    }
+    return parameterName.length > 0 ? parameterName : undefined;
   },
 
   cancel: function() {

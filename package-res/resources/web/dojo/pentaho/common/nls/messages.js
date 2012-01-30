@@ -9,6 +9,8 @@
     Ok_txt: 'OK',    
     Cancel_txt: 'Cancel',
     CloseIcon_title: 'Close',
-    ErrorDialog_title: 'Error'
+    ErrorDialog_title: 'Error',
+    Yes_txt: 'Yes',
+    No_txt: 'No'
 
 }
