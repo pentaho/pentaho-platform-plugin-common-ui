@@ -354,7 +354,6 @@ pentaho.visualizations.push({
     animate: false,
 
     timeSeries: false,
-    timeSeriesFormat: "%Y-%m-%d",
     panelSizeRatio: 0.8,
     orientation: "vertical",
     showValues: false,
@@ -489,7 +488,6 @@ pentaho.visualizations.push({
   args: {
     cccClass: 'pvc.BulletChart',
     crosstabMode: true,
-    normPerBaseCategory: false,
     showValues: true,
     showXScale: true,
     xAxisPosition: "bottom",
@@ -513,11 +511,7 @@ pentaho.visualizations.push({
     valuesAnchor: "right",
     titlePosition: "top",
     titleSize: 25,
-    showXScale: true,
-    xAxisPosition: "bottom",
     xAxisSize: 30,
-    showYScale: true,
-    yAxisPosition: "left",
     yAxisSize: 50,
     xAxisFullGrid: false,
     yAxisFullGrid: false,
@@ -526,7 +520,6 @@ pentaho.visualizations.push({
     numSD: 2,
 
     extensionPoints: [["bulletRuleLabel_font","7pt sans"]],
-    valuesAnchor: "right",
     normPerBaseCategory: true,
     useShapes: true,
 //    isMultiValued: true,
@@ -615,7 +608,7 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
   var yAxisLabels = {};
 
   // inspect the columns of the DataTable
-  title = '';
+  var title = '';
   for( var colNo=0; colNo<dataTable.getNumberOfColumns(); colNo++) {
     if( dataTable.getColumnType(colNo).toUpperCase() == 'NUMBER' ) {
       measures.push(colNo);
@@ -709,8 +702,9 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
       resultset.push(row);
     }
 
-  } else if(vizOptions.cccClass == 'pvc.BarChart' || vizOptions.cccClass == 'pvc.LineChart' ||
-      vizOptions.cccClass == 'pvc.StackedAreaChart' ) {
+  } else if(vizOptions.cccClass == 'pvc.BarChart'  ||
+            vizOptions.cccClass == 'pvc.LineChart' ||
+            vizOptions.cccClass == 'pvc.StackedAreaChart') {
     // format the data for a BarChart, LineChart, or StackedAreaChart
 
     this.seriesCount = measures.length;
@@ -968,15 +962,17 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
   };
 
 
-  // create the data options for the chart
-  var dataOpts = {crosstabMode: vizOptions.crosstabMode ? vizOptions.crosstabMode : false,
-    seriesInRows: false};
+  // Create the data options for the chart
+  var dataOpts = {
+      crosstabMode: !!vizOptions.crosstabMode,
+      seriesInRows: false
+  };
 
-  if(vizOptions.cccClass == 'pvc.HeatGridChart')
-  {
+  if(vizOptions.cccClass == 'pvc.HeatGridChart'){
     var categoryMatches = function(category, dataTableVal){
       return pvc.arrayEquals(category, dataTableVal);
     };
+
     var seriesMatches = function(series, dataTableVal){//TODO:
       var seriesStr = $.isArray(series)?
           series.join('~'):
@@ -992,6 +988,7 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
     opts.xAxisGetLabel = function(id){
       return xAxisLabels[id];
     };
+
     opts.yAxisGetLabel = function(id){
       return yAxisLabels[id];
     };
@@ -1195,7 +1192,7 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
       cv.getActiveReport().clickChart(ctx, true);
 
       //needed for content linking
-      var cccSelections = [{series:series, category:category }];
+      var cccSelections = [{keyValues: {series:series, categories:category }}];
       var selections = getReportSelectionsFromCcc(cccSelections);
       var args = {
         source: myself,
@@ -1210,7 +1207,7 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
       var rowItems = {};
 
       //needed for content linking
-      var cccSelections = [{series:path, category:null }];
+      var cccSelections = [{keyValues: {series: path, categories: null}}];
       var selections = getReportSelectionsFromCcc(cccSelections);
       var args = {
         source: myself,
@@ -1225,7 +1222,7 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
       var rowItems = {};
 
       //needed for content linking
-      var cccSelections = [{series:null, category:path }];
+      var cccSelections = [{keyValues: {series: null, categories: path }}];
       var selections = getReportSelectionsFromCcc(cccSelections);
       var args = {
         source: myself,
