@@ -13,6 +13,7 @@ pentaho.visualizations.getById = function(id){
   }
   return null;
 }
+
 /*
  Visualization Metadata
  These objects describe the visualizations provided by this library.
@@ -383,8 +384,14 @@ pentaho.visualizations.push({
     dataOptions: {
       categoriesCount: 1,
       measuresInColumns: true
+    },
+    tipsySettings: {
+        html: true,
+        gravity: "c",
+        fade: false,
+        followMouse:true,
+        opacity: 1
     }
-
   },
   propMap: [],
   dataReqs: [
@@ -997,8 +1004,9 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
       var seriesColStart=categoriesCount;
       for(var i=0; i < cccSelections.length; i++)
       {//ccc selections work on a category x series basis, translate to VizController selections
-        var c = cccSelections[i].category;
-        var s = cccSelections[i].series;
+        var cccSelection = cccSelections[i];
+        var c = cccSelection.keyValues.categories;
+        var s = cccSelection.keyValues.series;
         var selection = {
           type: 'cell',
           rowLabel: myself.dataTable.getColumnLabel(categoriesCount-1)
@@ -1054,7 +1062,7 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
     };
 
     //translate ccc selections to report selections; to be processed by selectTriggered@cv_rptReport3
-    opts.onSelectionChange = function(cccSelections)
+    opts.selectionChangedAction = function(cccSelections)
     {
       var args = {
         source: myself,
@@ -1062,7 +1070,7 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
         selectionMode: "REPLACE"
       };
       pentaho.events.trigger( myself, "select", args );
-    };//onSelectionChange
+    };
 
     vizOptions.controller.domNode.style.overflow = 'hidden'; //Hide overflow
 
@@ -1175,7 +1183,7 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
         ctx.push(keepCtx);
       }
 
-      //drill  
+      //drill
       var drillCtx = {
         action: 'KEEP_AND_DRILL',
         formula: drillFormula,
@@ -1481,13 +1489,22 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
  Sets the items on the chart that should be highlighted
  */
 pentaho.ccc.CccChart.prototype.setHighlights = function( selections ) {
-  this.selections = selections;
-  if(this.currentChartType == 'pvc.HeatGridChart' && (!selections || selections.length == 0)){
-    this.chart.heatGridChartPanel.clearSelections(true);
-  }
-  if( this.dataTable && this.vizOptions ) {
-    //disabled   this.draw(this.dataTable, this.vizOptions);
-  }
+    if(!this._ownChange){ // reentry control
+        this.selections = selections;
+        if(this.chart.clearSelections && (!selections || selections.length == 0)){
+            // will cause selectionChangedAction being called
+            this._ownChange = true;
+            try{
+                this.chart.clearSelections();
+            } finally{
+                this._ownChange = false;
+            }
+        }
+
+        if( this.dataTable && this.vizOptions ) {
+        //disabled   this.draw(this.dataTable, this.vizOptions);
+        }
+    }
 }
 
 /*
