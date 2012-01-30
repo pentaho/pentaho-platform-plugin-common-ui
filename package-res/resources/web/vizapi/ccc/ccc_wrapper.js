@@ -1201,6 +1201,42 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
       pentaho.events.trigger( myself, "doubleclick", args );
     };
 
+    //TODO: replicaton with analyzer's report.selectDoubleClick
+    var drillOnFirstSelection = function(selections){
+      
+      var selectedItem = selections[0];
+    
+      var formula='', member =''; 
+      var formulas = [], members = [];
+      
+      if(selectedItem.columnId && selectedItem.columnId.length >0) {
+        formulas.push(selectedItem.columnId[0]);
+        members.push(selectedItem.columnItem[0]);
+        
+        formula = selectedItem.columnId[0];
+        member = selectedItem.columnItem[0];
+      }
+      
+      if(selectedItem.rowId && selectedItem.rowId.length >0){
+        formulas.push(selectedItem.rowId[0]);
+        members.push(selectedItem.rowItem[0]);
+        
+        formula = selectedItem.rowId[0];
+        member = selectedItem.rowItem[0];
+      }
+      var child = cv.getFieldHelp().getDirectChild(formula);
+      if (child) {
+        // Supported a limited case of drilldown when the clicked on attribute has
+        // a child level.  This drilldown differs from the drilldowns in JFreeChart
+        // in that for the viz double click, we don't do KEEP on the other attribute.
+        var ctxArray = [{formula:formula, member:member,
+          action: "KEEP_AND_DRILL",
+          caption: cv.util.parseMDXExpression(member, false)
+        }];
+        cv.getActiveReport().clickChart(ctxArray, true);
+      }
+    };
+
     //drill down on y axis
     opts.yAxisDoubleClickAction =  function (path) {
       var ctxArray = [];
@@ -1214,6 +1250,7 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
         selections: selections
       };
       pentaho.events.trigger( myself, "doubleclick", args );
+      drillOnFirstSelection(selections);
     };
 
     //drill down on x axis
@@ -1229,6 +1266,7 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
         selections: selections
       };
       pentaho.events.trigger( myself, "doubleclick", args );
+      drillOnFirstSelection(selections);
     };
 
     var measureCount = (cv.getActiveReport !== undefined) ? cv.getActiveReport().reportDoc.getReportNode().selectNodes("cv:measures/cv:measure").length : cv.measureCount;
