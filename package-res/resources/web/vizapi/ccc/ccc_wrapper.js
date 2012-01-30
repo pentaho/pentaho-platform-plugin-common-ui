@@ -352,7 +352,6 @@ pentaho.visualizations.push({
 
     seriesInRows: false,
     animate: false,
-
     timeSeries: false,
     panelSizeRatio: 0.8,
     orientation: "vertical",
@@ -384,6 +383,7 @@ pentaho.visualizations.push({
       categoriesCount: 1,
       measuresInColumns: true
     },
+    ctrlSelectMode: false,
     tipsySettings: {
         html: true,
         gravity: "c",
