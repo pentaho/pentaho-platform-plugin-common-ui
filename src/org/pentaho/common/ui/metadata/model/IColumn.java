@@ -91,4 +91,11 @@ public interface IColumn extends Serializable {
    * @return
    */
   public String getFormatMask();
+  
+  
+  /**
+   * Returns hidden for user flag
+   * @return
+   */
+  public boolean isHiddenForUser();
 }

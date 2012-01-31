@@ -221,6 +221,7 @@ pentaho.pda.model.mql.prototype.discoverModelDetail = function() {
 				element.formatMask = this.getNodeText( colnodes[idx2], 'formatMask' );
 				element.selectedAggregation = this.getNodeText( colnodes[idx2], 'selectedAggType' );
 				element.defaultAggregation = this.getNodeText( colnodes[idx2], 'defaultAggType' );
+				element.hiddenForUser = this.getNodeText( colnodes[idx2], 'hiddenForUser' );
 				element.parent = category;
 				element.isQueryElement = true;
                                 element.category = category;

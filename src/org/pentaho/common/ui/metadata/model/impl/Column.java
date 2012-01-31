@@ -42,6 +42,7 @@ public class Column implements IColumn {
   private String category;
   private String getHorizontalAlignment;
   private String formatMask;
+  private boolean hiddenForUser;
   
   @Override
   public String getHorizontalAlignment() {
@@ -140,6 +141,13 @@ public class Column implements IColumn {
   public String getDescription() {
     return description;
   }
+
+  public void setHiddenForUser(boolean hiddenForUser){
+    this.hiddenForUser = hiddenForUser;
+  }
   
-  
+  @Override
+  public boolean isHiddenForUser() {
+    return hiddenForUser;
+  }
 }
