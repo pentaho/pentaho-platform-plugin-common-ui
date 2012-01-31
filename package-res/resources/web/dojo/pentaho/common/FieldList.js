@@ -265,8 +265,10 @@ dojo.declare(
             "type": ["treenode-leaf-label"],
             "description": field.description
           };
+        if(field.hiddenForUser != "true"){
           items.push(item);
           this.dndObj.setItem("field-" + item.fieldId, { "data": item, "type": "treenode-leaf-label", "fieldId": item.fieldId });
+        }
       }, this);
       if(this.enableDragDrop) {
         this.dndObj.insertNodes(false, items, false, parent);
