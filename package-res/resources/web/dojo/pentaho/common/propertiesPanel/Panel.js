@@ -39,7 +39,7 @@ dojo.declare(
         this.inherited(arguments);
       },
       initializeItem:function (item) {
-        if(item.hidden){
+        if(item.ui.hidden){
           return;
         }
         // Lookup class impl from map
@@ -517,7 +517,6 @@ dojo.declare("pentaho.common.propertiesPanel.GemBarUISource", [dojo.dnd.Source],
 
   checkAcceptance:function (source, nodes, silent) {
     var ok = this.gemBar.checkAcceptance(source, nodes, silent);;
-    console.log("gembarUiSource checking accept: "+ok)
     return ok;
   }
 });
@@ -634,18 +633,14 @@ dojo.declare(
       insertAt: function(gem, pos, move){
         var currIdx = dojo.indexOf(this.gems, gem);
 
-        console.log("inserting at pos: "+pos+" existing pos: "+currIdx);
 
         this.gems.splice(pos, 0, gem); // add it to the new pos
-        console.log("this.gems now has "+this.gems.length, this.gems);
         if(currIdx > -1){ //reorder
-          console.log("reorder");
           if(currIdx >= pos){ // if we just inserted before the old pos, increment the old pos value
-            console.log("adjusting old position up one");
             currIdx++;
           }
           this.gems.splice(currIdx,1); // remove from old pos
-          console.log("new gems collection: ", this.gems);
+
         }
         this.model.insertAt(gem.model, pos, currIdx, move);
 
