@@ -600,8 +600,9 @@ dojo.declare(
   /**
    * Build the textual representation of a filter for display on the Filter Panel.
    * @param filter
+   * @param prompt Is this filter controlled by a prompt? If so the value portion of the filter text will indicate it is controlled by that prompt.
    */
-  buildFilterText: function(filter) {
+  buildFilterText: function(filter, prompt) {
     var column = this.datasource.getColumnById(filter.column);
     var friendlyOperator = filter.operator;
     if (filter.combinationType != pentaho.pda.Column.OPERATOR_TYPES.AND || (filter.operator == pentaho.pda.Column.CONDITION_TYPES.EQUAL && dojo.isArray(filter.value) && filter.value.length > 1)) {
@@ -629,6 +630,10 @@ dojo.declare(
       }
     }
     var values = "";
+
+    if (prompt) {
+      values = this.getLocaleString('FilterTextValueFromPrompt', filter.parameterName);
+    } else {
     if (filter.value != undefined) {
       if (filter.value.length > 10) {
         values = filter.value.length + " values";
@@ -640,6 +645,7 @@ dojo.declare(
           values += dojox.html.entities.encode(value);
         }, this);
       }
+    }
     }
     return column.name + " " + friendlyOperator + " " + values;
   },

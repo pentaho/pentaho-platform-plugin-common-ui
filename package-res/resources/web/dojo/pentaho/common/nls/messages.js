@@ -11,6 +11,8 @@
     CloseIcon_title: 'Close',
     ErrorDialog_title: 'Error',
     Yes_txt: 'Yes',
-    No_txt: 'No'
+    No_txt: 'No',
+
+    FilterTextValueFromPrompt: 'value of Prompt {0}'
 
 }
