@@ -510,6 +510,15 @@ dojo.declare(
         dojo.addClass(this.matchValueInputDate.domNode, "filterDialogHidden");
         break;
     }
+
+    dojo.empty(this.matchAggType);
+    dojo.forEach(this.currentColumn.availableAggregations, function(aggType, idx) {
+      this.options[idx] = new Option(pentaho.pda.Column.AGG_TYPES_STRINGS[aggType], aggType);
+    }, this.matchAggType);
+    if (this.currentFilter.selectedAggType) {
+      this.matchAggType.value = this.currentFilter.selectedAggType;
+    }
+
     dojo.empty(this.matchComparator);
     var dataType = this.currentColumn.dataType === pentaho.pda.Column.DATA_TYPES.UNKNOWN ? pentaho.pda.Column.DATA_TYPES.STRING : this.currentColumn.dataType;
     dojo.forEach(pentaho.pda.Column.COMPARATOR[dataType], function(cArray, idx) {
@@ -521,6 +530,7 @@ dojo.declare(
 
   _saveMatchContainer: function() {
     this.currentFilter.operator = this.matchComparator.value;
+    this.currentFilter.selectedAggType = this.matchAggType.value;
     this.currentFilter.combinationType = pentaho.pda.Column.OPERATOR_TYPES.AND;
     if (!this._matchOperatorRequiresValue()) {
       this.currentFilter.value = [""];

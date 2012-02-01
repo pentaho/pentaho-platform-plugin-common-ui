@@ -125,5 +125,16 @@
   ON_OR_BEFORE: "On or before",
   AFTER: "After",
   BEFORE: "Before",
-  EQUALS: "Equals"
+  EQUALS: "Equals",
+
+  SUM: 'Sum',
+  AVERAGE: 'Average',
+  MINIMUM: 'Minimum',
+  MAXIMUM: 'Maximum',
+  COUNT: 'Count',
+  COUNT_DISTINCT: 'Count Distinct',
+  NONE: 'None',
+  VAR: 'Variance',
+  STDDEV: 'Std Dev',
+  UNKNOWN: 'Unknown'
 }

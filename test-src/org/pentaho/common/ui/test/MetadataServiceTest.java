@@ -41,6 +41,7 @@ import org.pentaho.common.ui.metadata.service.MetadataServiceUtil;
 import org.pentaho.commons.connection.marshal.MarshallableResultSet;
 import org.pentaho.di.core.exception.KettleException;
 import org.pentaho.metadata.model.Domain;
+import org.pentaho.metadata.model.concept.types.AggregationType;
 import org.pentaho.metadata.model.concept.types.DataType;
 import org.pentaho.metadata.query.model.CombinationType;
 import org.pentaho.metadata.query.model.util.QueryXmlHelper;
@@ -1044,6 +1045,22 @@ public class MetadataServiceTest  extends BaseTest {
     str = condition.getCondition(DataType.STRING.getName(), "myparam");
     assertEquals("[cat.column] = [param:myparam]", str);
     
+  }
+  
+  public void testCondition_aggregate() {
+    Condition c = new Condition();
+    c.setCategory("cat");
+    c.setColumn("column");
+    c.setCombinationType(CombinationType.OR.name());
+    c.setValue(new String[] { "testing" });
+    
+    String str = c.getCondition(DataType.STRING.getName(), null);
+    assertEquals("[cat.column] = \"testing\"", str);
+    
+    c.setSelectedAggType(AggregationType.MINIMUM.name());
+    c.setValue(new String[] { "testing" });
+    str = c.getCondition(DataType.STRING.getName(), null);
+    assertEquals("[cat.column.MINIMUM] = \"testing\"", str);
   }
     
 }

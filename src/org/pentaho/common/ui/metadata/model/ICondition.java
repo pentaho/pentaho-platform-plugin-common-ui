@@ -79,5 +79,5 @@ public interface ICondition extends Serializable{
   
 //  public String getDefaultValue();
 
-//  public String getSelectedAggType();
+  public String getSelectedAggType();
 }

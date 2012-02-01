@@ -16,6 +16,7 @@
  */
 package org.pentaho.common.ui.metadata.model.impl;
 
+import org.apache.commons.lang.StringUtils;
 import org.pentaho.metadata.model.concept.types.DataType;
 import org.pentaho.metadata.query.model.CombinationType;
 import org.pentaho.common.ui.metadata.model.ICondition;
@@ -31,7 +32,7 @@ public class Condition implements ICondition {
   private String comboType = CombinationType.AND.name();
   private boolean parameterized;
 //  private String defaultValue;
-//  private String selectedAggType;
+  private String selectedAggType;
 
   public Condition(){
     
@@ -97,7 +98,7 @@ public class Condition implements ICondition {
       }
     }
 
-    String columnName = "["+category+"."+column+"]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$;
+    String columnName = "["+category+"."+column + (StringUtils.isEmpty(selectedAggType) ? "" : "." + selectedAggType) +"]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$;
     // Date is a special case where we craft a formula function.
     if(type.equals(DataType.DATE.getName())){
       if(enforceParameters){
@@ -131,15 +132,15 @@ public class Condition implements ICondition {
   public String getDefaultValue(){
     return this.defaultValue;
   }
-
-  public void setSelectedAggType(String aggType){
+*/
+  public void setSelectedAggType(String aggType) {
     this.selectedAggType = aggType;
   }
   
-  public String getSelectedAggType(){
+  public String getSelectedAggType() {
     return this.selectedAggType;
   }
-*/
+
   public String getCategory() {
     return category;
   }

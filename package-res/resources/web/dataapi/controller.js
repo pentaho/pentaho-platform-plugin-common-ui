@@ -495,6 +495,19 @@ pentaho.pda.Column.AGG_TYPES.STDDEV = 'STDDEV';
 pentaho.pda.Column.AGG_TYPES.CALC = 'CALC';
 pentaho.pda.Column.AGG_TYPES.UNKNOWN = 'UNKNOWN';
 
+pentaho.pda.Column.AGG_TYPES_STRINGS = {}
+pentaho.pda.Column.AGG_TYPES_STRINGS[pentaho.pda.Column.AGG_TYPES.SUM] = pentaho.common.Messages.getString(pentaho.pda.Column.AGG_TYPES.SUM);
+pentaho.pda.Column.AGG_TYPES_STRINGS[pentaho.pda.Column.AGG_TYPES.AVERAGE] = pentaho.common.Messages.getString(pentaho.pda.Column.AGG_TYPES.AVERAGE);
+pentaho.pda.Column.AGG_TYPES_STRINGS[pentaho.pda.Column.AGG_TYPES.MIN] = pentaho.common.Messages.getString(pentaho.pda.Column.AGG_TYPES.MIN);
+pentaho.pda.Column.AGG_TYPES_STRINGS[pentaho.pda.Column.AGG_TYPES.MAX] = pentaho.common.Messages.getString(pentaho.pda.Column.AGG_TYPES.MAX);
+pentaho.pda.Column.AGG_TYPES_STRINGS[pentaho.pda.Column.AGG_TYPES.COUNT] = pentaho.common.Messages.getString(pentaho.pda.Column.AGG_TYPES.COUNT);
+pentaho.pda.Column.AGG_TYPES_STRINGS[pentaho.pda.Column.AGG_TYPES.COUNT_DISTINCT] = pentaho.common.Messages.getString(pentaho.pda.Column.AGG_TYPES.COUNT_DISTINCT);
+pentaho.pda.Column.AGG_TYPES_STRINGS[pentaho.pda.Column.AGG_TYPES.NONE] = pentaho.common.Messages.getString(pentaho.pda.Column.AGG_TYPES.NONE);
+pentaho.pda.Column.AGG_TYPES_STRINGS[pentaho.pda.Column.AGG_TYPES.VAR] = pentaho.common.Messages.getString(pentaho.pda.Column.AGG_TYPES.VAR);
+pentaho.pda.Column.AGG_TYPES_STRINGS[pentaho.pda.Column.AGG_TYPES.STDDEV] = pentaho.common.Messages.getString(pentaho.pda.Column.AGG_TYPES.STDDEV);
+pentaho.pda.Column.AGG_TYPES_STRINGS[pentaho.pda.Column.AGG_TYPES.CALC] = pentaho.common.Messages.getString(pentaho.pda.Column.AGG_TYPES.CALC);
+pentaho.pda.Column.AGG_TYPES_STRINGS[pentaho.pda.Column.AGG_TYPES.UNKNOWN] = pentaho.common.Messages.getString(pentaho.pda.Column.AGG_TYPES.UNKNOWN);
+
 pentaho.pda.Column.AGG_TYPE_MAP = new Object();
 pentaho.pda.Column.AGG_TYPE_MAP[pentaho.pda.Column.AGG_TYPES.NONE] = 'none';
 pentaho.pda.Column.AGG_TYPE_MAP[pentaho.pda.Column.AGG_TYPES.SUM] = 'sum';

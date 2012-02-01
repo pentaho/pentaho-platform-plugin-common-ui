@@ -620,6 +620,19 @@ function test33() {
   var obj = model.submitQuery(query, 1, callback);
 }
 
+function test34() {
+  // Validate we can filter by the aggregate of a field
+  initModel();
+  var query = model.createQuery();
+  query.addSelectionById('BC_CUSTOMER_W_TER_TERRITORY');
+  query.addSelectionById('BC_PRODUCTS_BUYPRICE');
+  query.addSortById('BC_PRODUCTS_BUYPRICE', pentaho.pda.Column.SORT_TYPES.ASCENDING );
+  query.addConditionById('BC_PRODUCTS_BUYPRICE', pentaho.pda.Column.CONDITION_TYPES.EQUAL, ['54.86'], pentaho.pda.Column.OPERATOR_TYPES.OR, undefined, pentaho.pda.Column.AGG_TYPES.AVERAGE);
+
+  var obj = model.submitXmlQuery(query);
+  testResults(obj,['BC_CUSTOMER_W_TER_TERRITORY', 'BC_PRODUCTS_BUYPRICE'],[['NA', '58916.55']],34);
+}
+
 function initModel() {
     if(model == null || model.getAllColumns().length == 0 ) {
         pentaho.myapp.source = pentaho.myapp.app.getSources(null, {filter: {property:'id',
