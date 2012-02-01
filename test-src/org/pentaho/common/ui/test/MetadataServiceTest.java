@@ -818,7 +818,7 @@ public class MetadataServiceTest  extends BaseTest {
     assertEquals("field type is wrong","FACT",column.getFieldType().toString());
     assertEquals("mask is wrong","#,###.##",column.getFormatMask());
     assertEquals("alignment is wrong","RIGHT",column.getHorizontalAlignment().toString());
-    assertEquals("column agg types list is wrong size",5,column.getAggTypes().length);
+    assertEquals("column agg types list is wrong size",4,column.getAggTypes().length);
 
     column = category.getColumns()[8];
     assertEquals("column default agg type is wrong","SUM",column.getDefaultAggType().toString());
@@ -829,7 +829,7 @@ public class MetadataServiceTest  extends BaseTest {
     assertEquals("field type is wrong","FACT",column.getFieldType().toString());
     assertEquals("mask is wrong","$#,##0.00;($#,##0.00)",column.getFormatMask());
     assertEquals("alignment is wrong","RIGHT",column.getHorizontalAlignment().toString());
-    assertEquals("column agg types list is wrong size",5,column.getAggTypes().length);
+    assertEquals("column agg types list is wrong size",4,column.getAggTypes().length);
     
   }
 
