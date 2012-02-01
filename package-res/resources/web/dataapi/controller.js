@@ -27,10 +27,12 @@ pentaho.pda.app = function(){
 inheritPrototype(pentaho.pda.app, pentaho.app); //borrow the parent's methods
 
 pentaho.pda.app.prototype.discoverSources = function(callback, options) {
-
-	//should only be here if we don'thave sources already
-	var md = this.moduleData, src={}, handler, that=this, sources = [];
-	for (src in md) {
+	//should only be here if we don't have sources already
+	var md = this.moduleData, handler, that=this, sources = [];
+	for (var src in md) {
+		if (!this.moduleData.hasOwnProperty(src)) {
+			continue;
+		}
 		var h = md[src].instance;
 		if (h instanceof pentaho.pda.Handler) {
 			h.getSources( //{property:'name', value:'Customers'},

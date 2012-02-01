@@ -108,12 +108,16 @@ pentaho.app.prototype.getModuleData = function() {
 		//if (typeof arguments[0] == 'object') {
 		//}
 		for (mod in this.moduleData) {
-			data[data.length] = this.moduleData[mod].instance;
+			if (this.moduleData.hasOwnProperty(mod)) {
+				data[data.length] = this.moduleData[mod].instance;
+      }
 		}
 		return data;
 	} else {
 		for (mod in this.moduleData) {
-			data[data.length] = this.moduleData[mod].instance;
+			if (this.moduleData.hasOwnProperty(mod)) {
+			  data[data.length] = this.moduleData[mod].instance;
+      }
 		}
 		return data;		
 	}
