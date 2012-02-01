@@ -641,6 +641,11 @@ dojo.declare(
     }
     var values = "";
 
+    var aggregation = ' ';
+    if (filter.selectedAggType) {
+      aggregation = ' (' + pentaho.pda.Column.AGG_TYPES_STRINGS[filter.selectedAggType] + ') ';
+    }
+
     if (prompt) {
       values = this.getLocaleString('FilterTextValueFromPrompt', filter.parameterName);
     } else {
@@ -657,7 +662,7 @@ dojo.declare(
       }
     }
     }
-    return column.name + " " + friendlyOperator + " " + values;
+    return column.name + aggregation + friendlyOperator + " " + values;
   },
 
   showErrorDialog: function(message) {
