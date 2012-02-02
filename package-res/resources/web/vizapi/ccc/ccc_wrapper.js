@@ -40,13 +40,13 @@ pentaho.visualizations.push({
       name: 'Default',
       reqs :
           [
-            {   id: 'category',             // id of the data element
+            {   id: 'rows',             // id of the data element
               dataType: 'string',         // data type - 'string', 'number', 'date', 'boolean', 'any' or a comma separated list
               dataStructure: 'column',    // 'column' or 'row' - only 'column' supported so far
               caption: 'Category',        // visible name
               required: true              // true or false
             },
-            {   id: 'series',
+            {   id: 'measures',
               dataType: 'number',
               dataStructure: 'column',
               caption: 'Values',
@@ -80,13 +80,13 @@ pentaho.visualizations.push({
     {
       name: 'Default',
       reqs :[
-        {   id: 'category',
+        {   id: 'rows',
           dataType: 'string',
           dataStructure: 'column',
           caption: 'Category',
           required: true
         },
-        {   id: 'series',
+        {   id: 'measures',
           dataType: 'number',
           dataStructure: 'column',
           caption: 'Values',
@@ -119,13 +119,13 @@ pentaho.visualizations.push({
     {
       name: 'Default',
       reqs :[
-        {   id: 'category',
+        {   id: 'rows',
           dataType: 'string',
           dataStructure: 'column',
           caption: 'Category',
           required: true
         },
-        {   id: 'series',
+        {   id: 'measures',
           dataType: 'number',
           dataStructure: 'column',
           caption: 'Values',
@@ -158,13 +158,13 @@ pentaho.visualizations.push({
     {
       name: 'Default',
       reqs :[
-        {   id: 'category',
+        {   id: 'rows',
           dataType: 'string',
           dataStructure: 'column',
           caption: 'Category',
           required: true
         },
-        {   id: 'series',
+        {   id: 'measures',
           dataType: 'number',
           dataStructure: 'column',
           caption: 'Values',
@@ -198,13 +198,13 @@ pentaho.visualizations.push({
     {
       name: 'Default',
       reqs :[
-        {   id: 'category',
+        {   id: 'rows',
           dataType: 'string',
           dataStructure: 'column',
           caption: 'Category',
           required: true
         },
-        {   id: 'series',
+        {   id: 'measures',
           dataType: 'number',
           dataStructure: 'column',
           caption: 'Values',
@@ -233,13 +233,13 @@ pentaho.visualizations.push({
     {
       name: 'Default',
       reqs :[
-        {   id: 'category',
+        {   id: 'rows',
           dataType: 'string',
           dataStructure: 'column',
           caption: 'Category',
           required: true
         },
-        {   id: 'series',
+        {   id: 'measures',
           dataType: 'number',
           dataStructure: 'column',
           caption: 'Values',
@@ -270,20 +270,20 @@ pentaho.visualizations.push({
     {
       name: 'Default',
       reqs :[
-        {   id: 'category',
+        {   id: 'rows',
           dataType: 'string',
           dataStructure: 'column',
           caption: 'Category',
           required: true
         },
-        {   id: 'series',
+        {   id: 'x',
           dataType: 'number',
           dataStructure: 'column',
           caption: 'X Axis',
           required: true,
           allowMultiple: false
         },
-        {   id: 'series2',
+        {   id: 'y',
           dataType: 'number',
           dataStructure: 'column',
           caption: 'Y Axis',
@@ -309,13 +309,13 @@ pentaho.visualizations.push({
     {
       name: 'Default',
       reqs :[
-        {   id: 'category',
+        {   id: 'rows',
           dataType: 'string',
           dataStructure: 'column',
           caption: 'Slices',
           required: true
         },
-        {   id: 'series',
+        {   id: 'measures',
           dataType: 'number',
           dataStructure: 'column',
           caption: 'Values',
@@ -413,13 +413,15 @@ pentaho.visualizations.push({
           dataType: 'number',
           dataStructure: 'column',
           caption: 'Color By',
-          required: true
+          required: true,
+          allowMultiple: false
         },
-        {   id: 'sizeBy',
+        {   id: 'size',
           dataType: 'number',
           dataStructure: 'column',
           caption: 'Size By',
-          required: false
+          required: false,
+          allowMultiple: false
         },
         {
           id: 'pattern',
