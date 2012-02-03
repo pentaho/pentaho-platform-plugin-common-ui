@@ -2,40 +2,54 @@
 
 <plugin title="common-ui">
 
-    <!-- uncomment these menu items to access the test pages via the User Console menu -->
-    <!-- menu-items>
-        <menu-item id="test-index" anchor="tools-submenu" label="Common UI Tests" command="content/common-ui/resources/web/test/testindex.html" type="MENU_ITEM" how="LAST_CHILD"/>
-    </menu-items -->
-    
-   <static-paths>
-     <!-- this translates to /pentaho/content/common-ui/resources/* -->
-     <static-path url="/common-ui/resources" localFolder="resources"/>
-   </static-paths>
+  <!-- uncomment these menu items to access the test pages via the User Console menu -->
+  <!-- menu-items>
+     <menu-item id="test-index" anchor="tools-submenu" label="Common UI Tests" command="content/common-ui/resources/web/test/testindex.html" type="MENU_ITEM" how="LAST_CHILD"/>
+ </menu-items -->
 
-    <content-generator scope="session" id="reposvc" type="reposvc">
-        <classname>org.pentaho.common.ui.services.SolutionUrlContentGenerator</classname>
-        <title>RepositoryService</title>
-    </content-generator>
+  <static-paths>
+    <!-- this translates to /pentaho/content/common-ui/resources/* -->
+    <static-path url="/common-ui/resources" localFolder="resources"/>
+  </static-paths>
 
-  <webservice  
-    id="RepositoryClientService" 
-    type="xml" 
-    class="org.pentaho.common.ui.services.SolutionRepoService"/>
+  <content-generator scope="session" id="reposvc" type="reposvc">
+    <classname>org.pentaho.common.ui.services.SolutionUrlContentGenerator</classname>
+    <title>RepositoryService</title>
+  </content-generator>
 
-  <webservice  
-    id="UserSettingService" 
-    type="xml" 
-    class="org.pentaho.common.ui.services.UserSettingService"/>
+  <webservice
+      id="RepositoryClientService"
+      type="xml"
+      class="org.pentaho.common.ui.services.SolutionRepoService"/>
 
-   <webservice
-    id="metadataService"
-    type="xml,gwt"
-    class="org.pentaho.common.ui.metadata.service.MetadataService"/>
+  <webservice
+      id="UserSettingService"
+      type="xml"
+      class="org.pentaho.common.ui.services.UserSettingService"/>
+
+  <webservice
+      id="metadataService"
+      type="xml,gwt"
+      class="org.pentaho.common.ui.metadata.service.MetadataService"/>
 
   <external-resources>
-      <file context="global">content/common-ui/resources/web/dojo/djConfig.js</file>
-      <file context="global">content/common-ui/resources/web/cache/cache-service.js</file>
-      <!--<file context="global">content/common-ui/resources/web/require.js</file>-->
+    <file context="global">content/common-ui/resources/web/dojo/djConfig.js</file>
+    <file context="global">content/common-ui/resources/web/cache/cache-service.js</file>
+    <file context="analyzer">content/common-ui/resources/web/cache/LocalCache.js</file>
+    <file context="analyzer">content/common-ui/resources/web/vizapi/DataTable.js</file>
+    <file context="analyzer">content/common-ui/resources/web/vizapi/Events.js</file>
+    <file context="analyzer">content/common-ui/resources/web/vizapi/VizController.js</file>
+    <file context="analyzer">content/common-ui/resources/web/repo/pentaho-ajax.js</file>
+    <file context="analyzer">content/common-ui/resources/web/locale/Messages.js</file>
+    <file context="analyzer">content/pentaho-cdf/js/Base.js</file>
+    <file context="analyzer">content/pentaho-cdf/js/jquery.js</file>
+    <file context="analyzer">content/pentaho-cdf/js/lib/CCC/protovis.js</file>
+    <file context="analyzer">content/pentaho-cdf/js/lib/CCC/protovis-msie.js</file>
+    <file context="analyzer">content/pentaho-cdf/js/lib/CCC/jquery.tipsy.js</file>
+    <file context="analyzer">content/pentaho-cdf/js/lib/CCC/tipsy.js</file>
+    <file context="analyzer">content/pentaho-cdf/js/lib/CCC/pvc-d1.0.js</file>
+    <file context="analyzer">content/common-ui/resources/web/vizapi/ccc/ccc_wrapper.js</file>
+    <file context="analyzer">content/common-ui/resources/web/vizapi/ccc/ccc_analyzer_plugin.js</file>
   </external-resources>
 
 

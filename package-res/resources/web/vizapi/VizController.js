@@ -149,7 +149,7 @@ pentaho.VizController.prototype.setState = function(state) {
     // find the visualization
     if( !this.currentViz || this.currentViz.id != state.vizId ) {
       for( var idx=0; idx<pentaho.visualizations.length; idx++) {
-        if( pentaho.visualizations[idx].id == state.vizId) {
+        if( pentaho.visualizations[idx].id == state.id) {
           // we found a visualization with the specified id
           this.currentViz = pentaho.visualizations[idx];
           break;
@@ -161,6 +161,9 @@ pentaho.VizController.prototype.setState = function(state) {
       // set the state of the visualization
       this.setVisualization(this.currentViz);
     }
+    delete state.dataReqs;
+    dojo.safeMixin(this.currentViz, state);
+
     if( this.chart && this.chart.setState ) {
       this.chart.setState( state.vizState );
     }
