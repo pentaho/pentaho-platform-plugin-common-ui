@@ -50,6 +50,10 @@
     <file context="analyzer">content/pentaho-cdf/js/lib/CCC/pvc-d1.0.js</file>
     <file context="analyzer">content/common-ui/resources/web/vizapi/ccc/ccc_wrapper.js</file>
     <file context="analyzer">content/common-ui/resources/web/vizapi/ccc/ccc_analyzer_plugin.js</file>
+    <!-- Example Visualizaiton Plugin. Un-comment to test -->
+    <!--file context="analyzer">content/common-ui/resources/web/vizapi/ccc/sample/sampleVisualization.js</file-->
+    <!--file context="analyzer">content/common-ui/resources/web/vizapi/ccc/sample/sampleVisualization_analyzer_plugin.js</file-->
+    <!-- Example Visualizaiton Plugin. Un-comment to test -->
   </external-resources>
 
 
