@@ -225,7 +225,7 @@ public class MetadataServiceUtil extends PentahoBase {
       col.setFormatMask((String)obj);
     }
     
-    Boolean hidden = (Boolean) c.getPhysicalColumn().getProperties().get("hidden");
+    Boolean hidden = (Boolean) c.getProperty("hidden");
     if(hidden != null){
       col.setHiddenForUser(hidden.booleanValue());
     }
