@@ -554,7 +554,7 @@ dojo.declare(
       postCreate: function(){
         this.gems = [];
         this.placeholder = dojo.query(".gemPlaceholder", this.domNode)[0];
-        this.placeholder.style.display = (this.showPlaceholder) ? "" : "none";
+        this.placeholder.style.display = (this.showPlaceholder && (this.allowMultiple || this.model.gems.length == 0)) ? "" : "none";
         if(this.model.required && this.model.gems.length == 0){
           dojo.addClass(this.placeholder, "reqiured");
         }
