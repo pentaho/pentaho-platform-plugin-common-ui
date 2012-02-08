@@ -805,7 +805,7 @@ pentaho.pda.query.mql.prototype.encodeXmlAttribute = function(value) {
 }
 
 pentaho.pda.query.mql.prototype.getParameterValueString = function ( column, value ) {
-        if (value == null) {
+        if (value == null || value == '') {
             return '';
         }
         if( value.constructor.toString().indexOf("Array") != -1 ) {
