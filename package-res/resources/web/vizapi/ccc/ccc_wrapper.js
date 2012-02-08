@@ -401,13 +401,15 @@ pentaho.visualizations.push({
           dataType: 'string',
           dataStructure: 'row',
           caption: 'X-Axis',
-          required: true
+          required: true,
+          zoneId: "rowAttributes"
         },
         {   id: 'columns',
           dataType: 'string',
           dataStructure: 'column',
           caption: 'Y-Axis',
-          required: true
+          required: true,
+          zoneId: "columnAttributes"
         },
         {   id: 'color',
           dataType: 'number',
@@ -606,6 +608,7 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
 
   //count categories for heatGrid
   var categoriesCount = 0;
+  var seriesDepth = 0;
   var xAxisLabels = {};
   var yAxisLabels = {};
 
@@ -632,6 +635,7 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
 
   if(vizOptions.cccClass == 'pvc.HeatGridChart'){
     categoriesCount = 0;
+    seriesDepth = 0;
     //direct translation
     for( var colNo=0; colNo<dataTable.getNumberOfColumns(); colNo++){
       if(dataTable.getColumnType(colNo) == 'string' ){
@@ -645,7 +649,8 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
       });
       //axis label names:
       var id = dataTable.getColumnId(colNo).split('~');
-      var lbl = dataTable.getColumnLabel(colNo).split('~')
+      var lbl = dataTable.getColumnLabel(colNo).split('~');
+      seriesDepth = Math.max(seriesDepth, id.length - 1);
       for(var i=0;i<id.length;i++){
         yAxisLabels[id[i]] = lbl[i];
       }
@@ -983,6 +988,21 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
       if(idx < 0) {idx = 0;} //dataTableVal.length
       return dataTableVal.substring(0, idx) == seriesStr;
     };
+    
+    var getCategoriesAttributesFormulas = function(){
+      return cv.getActiveReport().reportDoc.getReportNode().selectNodes('cv:rowAttributes/cv:attribute/@formula').slice(0,categoriesCount);
+    };
+    
+    var getSeriesAttributesFormulas = function(){
+      var seriesAttr = cv.getActiveReport().reportDoc.getReportNode().selectNodes('cv:columnAttributes/cv:attribute/@formula');
+      if(seriesAttr.length == 0){
+        allAttr = cv.getActiveReport().reportDoc.getReportNode().selectNodes('cv:rowAttributes/cv:attribute/@formula');
+        if (allAttr.length > categoriesCount){
+          return allAttr.slice(categoriesCount);
+        }
+      }
+      return seriesAttr;
+    }
 
     //use selection event handler instead of clickAction
     opts.clickAction = undefined;
@@ -1042,7 +1062,7 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
             selection.measureId = colId.substring(endSplitIdx+1, colId.length);
 
             var columnIds = [];
-            var columnIdNodes = cv.getActiveReport().reportDoc.getReportNode().selectNodes('cv:columnAttributes/cv:attribute/@formula');
+            var columnIdNodes =  getSeriesAttributesFormulas();// cv.getActiveReport().reportDoc.getReportNode().selectNodes('cv:columnAttributes/cv:attribute/@formula');
             for(var j = 0;j<columnIdNodes.length;j++){
               columnIds.push(columnIdNodes[j].firstChild.data);
             }
@@ -1076,9 +1096,9 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
     opts.customTooltip = function(s,c,d){
       var tooltip = "";
       //series
-      var columnAttributes = cv.getActiveReport().reportDoc.getChildMembers("columnAttributes");
+      var columnAttributes = getSeriesAttributesFormulas();// cv.getActiveReport().reportDoc.getChildMembers("columnAttributes");
       for(var i=0; i < s.length && i < columnAttributes.length; i++){
-        var sFormula = columnAttributes[i].attributes.getNamedItem('formula').nodeValue;
+        var sFormula = columnAttributes[i].nodeValue ;//attributes.getNamedItem('formula').nodeValue;
         if(!sFormula) continue;
         var sTitle = cv.util.parseMDXExpression(sFormula, true);
         var sVal = yAxisLabels[s[i]];
@@ -1087,9 +1107,9 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
         }
       }
       //categories
-      var rowAttributes = cv.getActiveReport().reportDoc.getChildMembers("rowAttributes");
+      var rowAttributes = getCategoriesAttributesFormulas();// cv.getActiveReport().reportDoc.getChildMembers("rowAttributes");
       for(var i=0;i<c.length && i<rowAttributes.length;i++){
-        var cFormula = rowAttributes[i].attributes.getNamedItem('formula').nodeValue;
+        var cFormula = rowAttributes[i].nodeValue ;//attributes.getNamedItem('formula').nodeValue;
         if(!cFormula) continue;
         var cTitle = cv.util.parseMDXExpression(cFormula, true);
         var cVal = xAxisLabels[c[i]];
@@ -1116,7 +1136,7 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
       //item to drill
       if(columnAttributes.length == s.length)
       {
-        var toDrillParent = columnAttributes[s.length-1].attributes.getNamedItem('formula').nodeValue;
+        var toDrillParent = columnAttributes[s.length-1].nodeValue ;//.attributes.getNamedItem('formula').nodeValue;
         var drillChild = cv.getFieldHelp().getDirectChild(toDrillParent);
         var toDrillTitle = drillChild? cv.util.parseMDXExpression(drillChild, true) : null;
         if(toDrillTitle) tooltip += "<div class='tipsy-footer'> Double-click to show " + toDrillTitle + "</div>";
@@ -1129,8 +1149,8 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
       if(series.length == 0) return;
 
       var toDrill = series[series.length-1];
-      var seriesFormulas = cv.getActiveReport().reportDoc.getReportNode().selectNodes('cv:columnAttributes/cv:attribute/@formula');
-      var categoriesFormulas = cv.getActiveReport().reportDoc.getReportNode().selectNodes('cv:rowAttributes/cv:attribute/@formula');
+      var seriesFormulas = getSeriesAttributesFormulas();// cv.getActiveReport().reportDoc.getReportNode().selectNodes('cv:columnAttributes/cv:attribute/@formula');
+      var categoriesFormulas = getCategoriesAttributesFormulas();// cv.getActiveReport().reportDoc.getReportNode().selectNodes('cv:rowAttributes/cv:attribute/@formula');
       var drillFormula =null;
 
       if(seriesFormulas.length < series.length) {
@@ -1289,9 +1309,10 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
     //fiddle with the axis dimensions
 
     //get depth and breadth
+    
     var measureCount = (cv.getActiveReport !== undefined) ? cv.getActiveReport().reportDoc.getReportNode().selectNodes("cv:measures/cv:measure").length : cv.measureCount;
-    var categoriesDepth = (cv.getActiveReport !== undefined) ? cv.getActiveReport().reportDoc.getReportNode().selectNodes('cv:rowAttributes/cv:attribute').length : cv.categoryCount;
-    var seriesDepth = (cv.getActiveReport !== undefined) ? cv.getActiveReport().reportDoc.getReportNode().selectNodes('cv:columnAttributes/cv:attribute').length : cv.seriesCount;
+    var categoriesDepth = categoriesCount ;//(cv.getActiveReport !== undefined) ? cv.getActiveReport().reportDoc.getReportNode().selectNodes('cv:rowAttributes/cv:attribute').length : cv.categoryCount;
+    //var seriesDepth = (cv.getActiveReport !== undefined) ? cv.getActiveReport().reportDoc.getReportNode().selectNodes('cv:columnAttributes/cv:attribute').length : cv.seriesCount;
     var categoriesBreadth = this.dataTable.getNumberOfRows() - 1;
     if(categoriesBreadth <= 0){
       categoriesBreadth =1;
@@ -1302,7 +1323,7 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
     }
 
     var MAX_AXIS_SIZE = 300,
-        MIN_LEVEL_HEIGHT = 30,
+        MIN_LEVEL_HEIGHT = 70,
         MAX_LEVEL_HEIGHT = 200,
         MAX_AXIS_RATIO = 0.35;
     var width = vizOptions.width,
@@ -1383,7 +1404,8 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
       var rowItems = {};
 
       var path = d.title.split(' ~ ');
-      var formula = cv.getActiveReport().reportDoc.getReportNode().selectNodes('cv:rowAttributes/cv:attribute/@formula')[path.length - 1].value;
+      var formula = getCategoriesAttributesFormulas()[path.length - 1].value;
+      //cv.getActiveReport().reportDoc.getReportNode().selectNodes('cv:rowAttributes/cv:attribute/@formula')[path.length - 1].value;
 
       var member = formula + '.[' + path[path.length-1] + ']';
       var ctx = {formula:formula, member:member,
@@ -1394,7 +1416,8 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
 
       path = d.subtitle.split('~');
       path = path.splice(path.length -1, 1);
-      formula = cv.getActiveReport().reportDoc.getReportNode().selectNodes('cv:columnAttributes/cv:attribute/@formula')[path.length - 1].value;
+      formula = getSeriesAttributesFormulas()[path.length - 1].value;
+      //cv.getActiveReport().reportDoc.getReportNode().selectNodes('cv:columnAttributes/cv:attribute/@formula')[path.length - 1].value;
 
       ctx = {formula:formula, member:formula + '.[' + path[path.length-1] + ']',
 //        action: "KEEP_AND_DRILL",
@@ -1458,7 +1481,7 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
           selection.measureId = colId.substring(endSplitIdx + 1, colId.length);
 
           var columnIds = [];
-          var columnIdNodes = cv.getActiveReport().reportDoc.getReportNode().selectNodes('cv:columnAttributes/cv:attribute/@formula');
+          var columnIdNodes = getSeriesAttributesFormulas();// cv.getActiveReport().reportDoc.getReportNode().selectNodes('cv:columnAttributes/cv:attribute/@formula');
           for (var j = 0; j < columnIdNodes.length; j++) {
             columnIds.push(columnIdNodes[j].firstChild.data);
 
