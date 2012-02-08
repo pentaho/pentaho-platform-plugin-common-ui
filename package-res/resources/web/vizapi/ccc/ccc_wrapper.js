@@ -915,6 +915,7 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
     showTooltips: true,
     showValues: false,
     clickable: true,
+    selectable: true,
     height: vizOptions.height,
     width: vizOptions.width,
     title: title == "" ? null : title,
@@ -1007,11 +1008,11 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
     //use selection event handler instead of clickAction
     opts.clickAction = undefined;
 
-    opts.xAxisGetLabel = function(id){
+    opts.getCategoryLabel = function(id){
       return xAxisLabels[id];
     };
 
-    opts.yAxisGetLabel = function(id){
+    opts.getSeriesLabel = function(id){
       return yAxisLabels[id];
     };
 
