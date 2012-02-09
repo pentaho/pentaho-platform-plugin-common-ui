@@ -1261,12 +1261,12 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
     };
 
     //drill down on y axis
-    opts.yAxisDoubleClickAction =  function (path) {
+    opts.yAxisDoubleClickAction =  function (node) {
       var ctxArray = [];
       var rowItems = {};
 
       //needed for content linking
-      var cccSelections = [{keyValues: {series: path, categories: null}}];
+      var cccSelections = [{keyValues: {series: node.path, categories: null}}];
       var selections = getReportSelectionsFromCcc(cccSelections);
       var args = {
         source: myself,
@@ -1277,12 +1277,12 @@ pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
     };
 
     //drill down on x axis
-    opts.xAxisDoubleClickAction =  function (path) {
+    opts.xAxisDoubleClickAction =  function (node) {
       var ctxArray = [];
       var rowItems = {};
 
       //needed for content linking
-      var cccSelections = [{keyValues: {series: null, categories: path }}];
+      var cccSelections = [{keyValues: {series: null, categories: node.path }}];
       var selections = getReportSelectionsFromCcc(cccSelections);
       var args = {
         source: myself,
