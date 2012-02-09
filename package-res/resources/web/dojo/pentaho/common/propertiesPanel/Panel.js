@@ -334,7 +334,7 @@ dojo.declare("pentaho.common.propertiesPanel.GemBarUISource", [dojo.dnd.Source],
       dijit.byId("gem-"+droppedNode.id);
     }
 
-    if(gemUI && gemUI.gemBar != this.gemBar && !this.gemBar.checkAcceptance(this, nodes,/* showErrors */ true)) { //only check if not a reorder
+    if((!gemUI || (gemUI && gemUI.gemBar != this.gemBar)) && !this.gemBar.checkAcceptance(this, nodes,/* showErrors */ true)) { //only check if not a reorder
       return;
     }
     var gem;
@@ -554,7 +554,7 @@ dojo.declare(
       postCreate: function(){
         this.gems = [];
         this.placeholder = dojo.query(".gemPlaceholder", this.domNode)[0];
-        this.placeholder.style.display = (this.showPlaceholder && (this.allowMultiple || this.model.gems.length == 0)) ? "" : "none";
+        this.placeholder.style.display = (this.showPlaceholder && (this.model.allowMultiple || this.model.gems.length == 0)) ? "" : "none";
         if(this.model.required && this.model.gems.length == 0){
           dojo.addClass(this.placeholder, "reqiured");
         }
@@ -644,7 +644,7 @@ dojo.declare(
         }
         this.model.insertAt(gem.model, pos, currIdx, move);
 
-        if(this.model.allowMultiple == false && this.model.gems.length > 0){
+        if(this.model.allowMultiple == false){
           this.placeholder.style.display = "none";
         }
 
@@ -659,7 +659,7 @@ dojo.declare(
         this.gems.splice(currIdx, 1);
         this.model.remove(gemUI.model, suppressEvent);
 
-        if(this.model.allowMultiple == false && this.model.gems.length == 0){
+        if(this.model.allowMultiple == true && this.model.gems.length == 0){
           this.placeholder.style.display = "";
         }
         this.propPanel.resize();
