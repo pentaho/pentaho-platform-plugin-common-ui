@@ -459,7 +459,7 @@ dojo.declare(
     }
     // For all active filters add the fieldFiltered class to the field list div for the column that's filtered
     dojo.forEach(filters, function(filter) {
-      var fieldDiv = dojo.byId("field-" + filter.column);
+      var fieldDiv = dojo.byId("field-" + this.sanitizeIdAndClassNames(filter.column));
       dojo.addClass(fieldDiv, "fieldlist-filtered-field");
     }, this);
   },
