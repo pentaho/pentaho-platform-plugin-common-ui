@@ -1,4 +1,4 @@
-var pentaho = pentaho || {};
+pentaho = typeof pentaho == "undefined" ? {} : pentaho;
 pentaho.common = pentaho.common || {};
 
 dojo.require("dojox.storage");
