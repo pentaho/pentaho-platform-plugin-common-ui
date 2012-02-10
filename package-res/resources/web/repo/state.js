@@ -207,7 +207,7 @@ function StateObject() {
 
 var pentahoRepositoryClient = new PentahoRepositoryClient();
 
-var pentaho = pentaho || {};
+pentaho = typeof pentaho == "undefined" ? {} : pentaho;
 
 /*
 This is an API that lets clients get and set user settings

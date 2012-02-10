@@ -1,4 +1,4 @@
-var pentaho = pentaho || {};
+pentaho = typeof pentaho == "undefined" ? {} : pentaho;
 pentaho.common = pentaho.common || {};
 
 // Implementation of the .bind method now included in ECMAScript 5th Edition

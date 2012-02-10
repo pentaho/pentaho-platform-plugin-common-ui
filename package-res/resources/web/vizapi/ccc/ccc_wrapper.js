@@ -1,5 +1,5 @@
 
-var pentaho = pentaho || {};
+pentaho = typeof pentaho == "undefined" ? {} : pentaho;
 
 pentaho.ccc = pentaho.ccc || {};
 

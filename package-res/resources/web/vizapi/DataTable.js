@@ -8,7 +8,7 @@ author: James Dixon
 
 */
 
-var pentaho = pentaho || {};
+pentaho = typeof pentaho == "undefined" ? {} : pentaho;
 
 /****************************************************
     pentaho.DataTable

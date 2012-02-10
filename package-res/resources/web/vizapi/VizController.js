@@ -7,7 +7,7 @@
 
  */
 
-var pentaho = pentaho || {};
+pentaho = typeof pentaho == "undefined" ? {} : pentaho;
 
 /*
  A list of color palettes that can be used by visualizations

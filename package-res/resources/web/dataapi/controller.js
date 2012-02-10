@@ -1,7 +1,7 @@
 //= require "oop.js"
 //= require "app.js"
 
-var pentaho = pentaho || {};
+pentaho = typeof pentaho == "undefined" ? {} : pentaho;
 
 pentaho.pda = pentaho.pda || {};
 
