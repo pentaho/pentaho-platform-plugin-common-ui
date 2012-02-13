@@ -1720,9 +1720,9 @@ pentaho.ccc.CccChart.prototype._notifyCccSelectionChanged = function(cccSelectio
  * A CCC selection is an instance of pvc.Datum.
  * Its relevant part has the structure:
  * {
- *   keyValues: {
- *      series:   ["[Time].[2003]", "[Time].[2003].[QTR4]"]
- *      category: ["[Markets].[EMEA]", "[Order Status].[Resolved]"]
+ *   elem: {
+ *      series:   { value: ["[Time].[2003]", "[Time].[2003].[QTR4]"] }
+ *      category: { value: ["[Markets].[EMEA]", "[Order Status].[Resolved]"] }
  *   }
  *
  *   value: array
@@ -1759,8 +1759,8 @@ pentaho.ccc.CccChart.prototype._convertSelectionsCccToAnalyzer = function(cccSel
 
 pentaho.ccc.CccChart.prototype._convertSelectionCccToAnalyzer = function(cccSelection){
     return this._convertKeysSelectionCccToAnalyzer(
-                        cccSelection.keyValues.series,
-                        cccSelection.keyValues.categories);
+                        cccSelection.elem.series.value,
+                        cccSelection.elem.category.value);
 };
 
 pentaho.ccc.CccChart.prototype._convertKeysSelectionCccToAnalyzer = function(s, c){
