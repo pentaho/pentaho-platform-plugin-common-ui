@@ -1,24 +1,31 @@
+var pentaho = this.pentaho || {};
 
-pentaho = typeof pentaho == "undefined" ? {} : pentaho;
+// BEGIN Private Scope
+(function(){
 
 pentaho.ccc = pentaho.ccc || {};
 
 pentaho.visualizations = pentaho.visualizations || [];
 
+// TODO: this should belong to the base, as 'geo' depends on this too...
 pentaho.visualizations.getById = function(id){
-  for(var i=0; i< this.length; i++){
-    if(this[i].id == id){
-      return this[i];
+    for(var i = 0; i < this.length ; i++){
+        if(this[i].id == id){
+            return this[i];
+        }
     }
-  }
-  return null;
+    return null;
+};
+
+function defVisualization(viz){
+    pentaho.visualizations.push(viz);
 }
 
 /*
  Visualization Metadata
  These objects describe the visualizations provided by this library.
  */
-pentaho.visualizations.push({
+defVisualization({
   id: 'ccc_bar',                          // unique identifier
   type: 'barchart',                       // generic type id
   source: 'CCC',                          // id of the source library
@@ -26,79 +33,121 @@ pentaho.visualizations.push({
   'class': 'pentaho.ccc.CccChart',          // type of the Javascript object to instantiate
   args: {                                 // arguments to provide to the Javascript object
     cccClass: 'pvc.BarChart',
-    stacked: false,
     orientation: 'vertical',
+    stacked: false,
+
+    legend: true,
+    legendPosition: 'bottom',
+
+    panelSizeRatio: 0.8,
+
+    //axisOffset:  0.1,
+
+    yAxisPosition: 'left',
+    yAxisSize:     100,
+    yAxisFullGrid: true,
+    yAxisEndLine:  true,
+    yAxisDomainRoundMode: 'tick',
+    yAxisDesiredTickCount: 10,
+
+    xAxisFullGrid: true,
+    xAxisEndLine:  true,
+    xAxisDesiredTickCount: 10,
+    xAxisDomainRoundMode: 'tick',
+
     extensionPoints: {
-      xAxisLabel_textAngle: -1,
-      xAxisLabel_textAlign: "right",
-      xAxisLabel_textBaseline: "top"
-    }
+        yAxisGrid_strokeWidth: "1px",
+	yAxisGrid_strokeStyle: '#D8D8D8',
+        
+        xAxisGrid_strokeWidth: "1px",
+	xAxisGrid_strokeStyle: '#D8D8D8',
+        
+        xAxisLabel_textAngle:    -1,
+        xAxisLabel_textAlign:    "right",
+        xAxisLabel_textBaseline: "top"
+    },
+
+    tipsySettings: {
+        html: true,
+        gravity: "c",
+        fade: false,
+        followMouse:true
+    },
+    
+    seriesIncludeMeasures: true
   },
   propMap: [],
-  dataReqs: [                             // dataReqs describes the data requirements of this visualization
+  // dataReqs describes the data requirements of this visualization
+  dataReqs: [
     {
       name: 'Default',
-      reqs :
-          [
-            {   id: 'rows',             // id of the data element
-              dataType: 'string',         // data type - 'string', 'number', 'date', 'boolean', 'any' or a comma separated list
-              dataStructure: 'column',    // 'column' or 'row' - only 'column' supported so far
-              caption: 'Category',        // visible name
-              required: true              // true or false
-            },
-            {   id: 'measures',
-              dataType: 'number',
-              dataStructure: 'column',
-              caption: 'Values',
-              required: true,
-              allowMultiple: true         // true or false
-            }
-          ]
+      reqs : createVizDataReq("Category", "Series", "Value")
     }
   ]
 });
 
-
-pentaho.visualizations.push({
+defVisualization({
   id: 'ccc_barstacked',
   type: 'barchart',
   source: 'CCC',
   name: 'CCC Stacked Column',
   'class': 'pentaho.ccc.CccChart',
-  args: {
+  args: {                                 // arguments to provide to the Javascript object
     cccClass: 'pvc.BarChart',
+    orientation: 'vertical',
     stacked: true,
-    orientation: 'vertical'  ,
+
+    legend: true,
+    legendPosition: 'bottom',
+
+    panelSizeRatio: 0.8,
+
+    //axisOffset:  0.1,
+
+    yAxisPosition: 'left',
+    yAxisSize:     100,
+    yAxisFullGrid: true,
+    yAxisEndLine:  true,
+    yAxisDomainRoundMode: 'tick',
+    yAxisDesiredTickCount: 10,
+
+    xAxisFullGrid: true,
+    xAxisEndLine:  true,
+    xAxisDesiredTickCount: 10,
+    xAxisDomainRoundMode: 'tick',
+
     extensionPoints: {
-      xAxisLabel_textAngle: -1,
-      xAxisLabel_textAlign: "right",
-      xAxisLabel_textBaseline: "top"
-    }
+        yAxisGrid_strokeWidth: "1px",
+	yAxisGrid_strokeStyle: '#D8D8D8',
+
+        xAxisGrid_strokeWidth: "1px",
+	xAxisGrid_strokeStyle: '#D8D8D8',
+
+        xAxisLabel_textAngle:    -1,
+        xAxisLabel_textAlign:    "right",
+        xAxisLabel_textBaseline: "top"
+    },
+
+    tipsySettings: {
+        html: true,
+        gravity: "c",
+        fade: false,
+        followMouse:true
+    },
+
+    seriesIncludeMeasures: true
   },
+
   propMap: [],
   dataReqs: [
     {
       name: 'Default',
-      reqs :[
-        {   id: 'rows',
-          dataType: 'string',
-          dataStructure: 'column',
-          caption: 'Category',
-          required: true
-        },
-        {   id: 'measures',
-          dataType: 'number',
-          dataStructure: 'column',
-          caption: 'Values',
-          required: true,
-          allowMultiple: true
-        }
-      ]
+      reqs : createVizDataReq("Category", "Series", "Value")
     }
   ]
 });
 
-pentaho.visualizations.push({
+defVisualization({
   id: 'ccc_horzbar',
   type: 'horzbarchart',
   source: 'CCC',
@@ -106,38 +155,48 @@ pentaho.visualizations.push({
   'class': 'pentaho.ccc.CccChart',
   args: {
     cccClass: 'pvc.BarChart',
-    stacked: false,
+
     orientation: 'horizontal',
+    stacked: false,
+
+    yAxisPosition: 'left',
+    yAxisSize:     100,
+    yAxisFullGrid: true,
+    yAxisEndLine:  true,
+    
+    xAxisPosition: 'bottom',
+    xAxisFullGrid: true,
+    xAxisEndLine:  true,
+    xAxisDesiredTickCount: 10,
+    xAxisDomainRoundMode: 'tick',
+
     extensionPoints: {
-      xAxisLabel_textAngle: -1,
-      xAxisLabel_textAlign: "right",
-      xAxisLabel_textBaseline: "top"
-    }
+        yAxisGrid_strokeWidth: "1px",
+	yAxisGrid_strokeStyle: '#D8D8D8',
+
+        xAxisGrid_strokeWidth: "1px",
+	xAxisGrid_strokeStyle: '#D8D8D8'
+    },
+
+    tipsySettings: {
+        html: true,
+        gravity: "c",
+        fade: false,
+        followMouse:true
+    },
+
+    seriesIncludeMeasures: true
   },
   propMap: [],
   dataReqs: [
     {
       name: 'Default',
-      reqs :[
-        {   id: 'rows',
-          dataType: 'string',
-          dataStructure: 'column',
-          caption: 'Category',
-          required: true
-        },
-        {   id: 'measures',
-          dataType: 'number',
-          dataStructure: 'column',
-          caption: 'Values',
-          required: true,
-          allowMultiple: true
-        }
-      ]
+      reqs : createVizDataReq("Category", "Series", "Value")
     }
   ]
 });
 
-pentaho.visualizations.push({
+defVisualization({
   id: 'ccc_horzbarstacked',
   type: 'horzbarchart',
   source: 'CCC',
@@ -145,38 +204,48 @@ pentaho.visualizations.push({
   'class': 'pentaho.ccc.CccChart',
   args: {
     cccClass: 'pvc.BarChart',
-    stacked: true,
+
     orientation: 'horizontal',
+    stacked: true,
+
+    yAxisPosition: 'left',
+    yAxisSize:     100,
+    yAxisFullGrid: true,
+    yAxisEndLine:  true,
+
+    xAxisPosition: 'bottom',
+    xAxisFullGrid: true,
+    xAxisEndLine:  true,
+    xAxisDesiredTickCount: 10,
+    xAxisDomainRoundMode: 'tick',
+
     extensionPoints: {
-      xAxisLabel_textAngle: -1,
-      xAxisLabel_textAlign: "right",
-      xAxisLabel_textBaseline: "top"
-    }
+        yAxisGrid_strokeWidth: "1px",
+	yAxisGrid_strokeStyle: '#D8D8D8',
+
+        xAxisGrid_strokeWidth: "1px",
+	xAxisGrid_strokeStyle: '#D8D8D8'
+    },
+
+    tipsySettings: {
+        html: true,
+        gravity: "c",
+        fade: false,
+        followMouse:true
+    },
+
+    seriesIncludeMeasures: true
   },
   propMap: [],
   dataReqs: [
     {
       name: 'Default',
-      reqs :[
-        {   id: 'rows',
-          dataType: 'string',
-          dataStructure: 'column',
-          caption: 'Category',
-          required: true
-        },
-        {   id: 'measures',
-          dataType: 'number',
-          dataStructure: 'column',
-          caption: 'Values',
-          required: true,
-          allowMultiple: true
-        }
-      ]
+      reqs : createVizDataReq("Category", "Series", "Value")
     }
   ]
 });
 
-pentaho.visualizations.push({
+defVisualization({
   id: 'ccc_line',
   type: 'linechart',
   source: 'CCC',
@@ -197,7 +266,7 @@ pentaho.visualizations.push({
   dataReqs: [
     {
       name: 'Default',
-      reqs :[
+      reqs:[
         {   id: 'rows',
           dataType: 'string',
           dataStructure: 'column',
@@ -216,7 +285,7 @@ pentaho.visualizations.push({
   ]
 });
 
-pentaho.visualizations.push({
+defVisualization({
   id: 'ccc_area',
   type: 'areachart',
   source: 'CCC',
@@ -251,7 +320,7 @@ pentaho.visualizations.push({
   ]
 });
 
-pentaho.visualizations.push({
+defVisualization({
   id: 'ccc_scatter',
   type: 'scatter',
   source: 'CCC',
@@ -295,7 +364,7 @@ pentaho.visualizations.push({
   ]
 });
 
-pentaho.visualizations.push({
+defVisualization({
   id: 'ccc_pie',
   type: 'piechart',
   source: 'CCC',
@@ -326,32 +395,24 @@ pentaho.visualizations.push({
   ]
 });
 
-pentaho.visualizations.push({
+defVisualization({
   id: 'ccc_heatgrid',
   type: 'heatgrid',
   source: 'CCC',
   name: 'Heat Grid',
   'class': 'pentaho.ccc.CccChart',
 
-  getDropZoneLabel : function (type) {
-    if (type == 'ROW') return 'Categories';
-    if (type == 'COL') return 'Series';
-    if (type == 'NUM') return 'Color/Size measures';
-    return '?';
-  },
-
   args: {
     cccClass: 'pvc.HeatGridChart',
     crosstabMode: true,
     normPerBaseCategory: false,
-    showValues: true,
     showXScale: true,
     xAxisPosition: "bottom",
     showYScale: true,
     yAxisPosition: "left",
 
     seriesInRows: false,
-    animate: false,
+
     timeSeries: false,
     panelSizeRatio: 0.8,
     orientation: "vertical",
@@ -359,11 +420,7 @@ pentaho.visualizations.push({
     valuesAnchor: "right",
     titlePosition: "top",
     titleSize: 25,
-    showXScale: true,
-    xAxisPosition: "bottom",
     xAxisSize: 30,
-    showYScale: true,
-    yAxisPosition: "left",
     yAxisSize: 50,
     xAxisFullGrid: false,
     yAxisFullGrid: false,
@@ -372,13 +429,12 @@ pentaho.visualizations.push({
     numSD: 2,
     nullColor: "#efc5ad",
     extensionPoints: [],
-    valuesAnchor: "right",
     useShapes: true,
     shape: 'square',
     isMultiValued: true,
     useCompositeAxis:true,
-    sizeValIdx:1,
     colorValIdx: 0,
+    sizeValIdx:  1,
     dataOptions: {
       categoriesCount: 1,
       measuresInColumns: true
@@ -397,33 +453,37 @@ pentaho.visualizations.push({
     {
       name: 'Default',
       reqs :[
-        {   id: 'rows',
-          dataType: 'string',
-          dataStructure: 'row',
-          caption: 'X-Axis',
-          required: true,
-          zoneId: "rowAttributes"
+        {
+            id: 'rows',
+            dataType: 'string',
+            dataStructure: 'row',
+            caption: 'X-Axis',
+            required: true,
+            allowMultiple: true
         },
-        {   id: 'columns',
-          dataType: 'string',
-          dataStructure: 'column',
-          caption: 'Y-Axis',
-          required: true,
-          zoneId: "columnAttributes"
+        {
+            id: 'columns',
+            dataType: 'string',
+            dataStructure: 'column',
+            caption: 'Y-Axis',
+            required: true,
+            allowMultiple: true
         },
-        {   id: 'color',
-          dataType: 'number',
-          dataStructure: 'column',
-          caption: 'Color By',
-          required: true,
-          allowMultiple: false
+        {
+            id: 'color',
+            dataType: 'number',
+            dataStructure: 'column',
+            caption: 'Color By',
+            required: true,
+            allowMultiple: false
         },
-        {   id: 'size',
-          dataType: 'number',
-          dataStructure: 'column',
-          caption: 'Size By',
-          required: false,
-          allowMultiple: false
+        {
+            id: 'size',
+            dataType: 'number',
+            dataStructure: 'column',
+            caption: 'Size By',
+            required: false,
+            allowMultiple: false
         },
         {
           id: 'pattern',
@@ -476,18 +536,12 @@ pentaho.visualizations.push({
 });
 
 
-pentaho.visualizations.push({
+defVisualization({
   id: 'ccc_bulletchart',
   type: 'bulletchart',
   source: 'CCC',
   name: 'Bullet Chart',
   'class': 'pentaho.ccc.CccChart',
-
-  getDropZoneLabel : function (type) {
-    if (type == 'ROW') return 'Categories';
-    if (type == 'COL') return 'Series';
-    if (type == 'NUM') return 'Color/Size measures';
-  },
 
   args: {
     cccClass: 'pvc.BulletChart',
@@ -499,13 +553,16 @@ pentaho.visualizations.push({
     yAxisPosition: "left",
     legendPosition: "bottom",
     seriesInRows: true,
-    animate: false,
+    
 
     bulletTitle: 'Test for title',
     bulletSubtitle: 'Test for subtitle',
     bulletMeasures: [],
+
+    // TODO: Constant bullets markers and ranges?
     bulletMarkers: ["7500"],
-    bulletRanges: ["3000", "6500", "9000"],
+    bulletRanges:  ["3000", "6500", "9000"],
+
     bulletMargin: 50,
 
     timeSeries: false,
@@ -539,45 +596,70 @@ pentaho.visualizations.push({
     {
       name: 'Default',
       reqs :[
-        {   id: 'category',
-          dataType: 'string',
-          dataStructure: 'row',
-          caption: 'Across',
-          required: true
+        {
+            id: 'rows',
+            dataType: 'string',
+            dataStructure: 'row',
+            caption: 'Across',
+            required: true
         },
-        {   id: 'category',
-          dataType: 'string',
-          dataStructure: 'column',
-          caption: 'Down',
-          required: true
+        {
+            id: 'columns',
+            dataType: 'string',
+            dataStructure: 'column',
+            caption: 'Down',
+            required: true
         },
-        {   id: 'series',
-          dataType: 'number',
-          dataStructure: 'column',
-          caption: 'Values',
-          required: true
+        {
+            id: 'measures',
+            dataType: 'number',
+            dataStructure: 'column',
+            caption: 'Values',
+            required: true
         }
       ]
     }
   ]
 });
 
-
-
 /*
  CccChart constructor
- This takes an HTML DOM element as a parameter
+ Takes an HTML DOM element as a parameter
  */
-pentaho.ccc.CccChart = function( element ) {
-  this.element = element;
-  this.elementName = element.id;
-  this.cdaTable = null;
-  this.dataTable = null;
-  this.vizOptions = null;
-  this.series = [];
-  this.selections = [];
-  this.currentChartType = null;
-  this.categories = [];
+pentaho.ccc.CccChart = function(element) {
+    /**
+    * The axes' names.
+    * NOTE that they are in the order to be tested
+    * for being chosen as the drilling axis.
+    */
+    this._keyAxes = ['column', 'row'];
+    
+    // _allAxes includes the non-key 'measure' axis
+    this._allAxes = this._keyAxes.slice(0);
+    this._allAxes.push('measure');
+    
+    this._element = element;
+    this._elementName = element.id;
+
+    this._cdaTable = null;  // CDA DataTable
+    this._metadata  = null;
+    this._resultset = null;
+
+    this._dataTable = null; // Analyzer DataTable
+    
+    this._rowDtColIndexes = null;
+    this._otherDtColIndexes = null;
+    
+    this._vizOptions  = null;
+    this._originalVizOptions = null;
+    this._dataOptions = null;
+
+    this._selections = null;
+
+    this._currentChartType = null;
+
+    this._colors = null;
+    this._title = null;
 }
 
 /*
@@ -586,1053 +668,1573 @@ pentaho.ccc.CccChart = function( element ) {
  dataTable   a pentaho.DataTable object with the data to display
  vizOptions  the options for the visualization
  */
-pentaho.ccc.CccChart.prototype.draw = function( dataTable, vizOptions ) {
+pentaho.ccc.CccChart.prototype.draw = function(dataTable, vizOptions) {
 
-  // store the incoming parameters for later use
-  this.vizOptions = vizOptions;
-  this.dataTable = dataTable;
+    // TODO: is this the correct way to access the visualization helper?
+    this._vizHelper = cv.pentahoVisualizationHelpers[vizOptions.customChartType];
 
-  // store the current highlighted selections
-  this.selections = vizOptions.selections;
+    // Reset support fields
+    this._metadata  = [];
+    this._resultset = [];
+    this._cdaTable = null;
 
-  // local variables
-  var metadata = [];
-  var measures = [];
-  var strings = [];
-  var resultset = [];
-  var colors = null;
+    this._colors = null;
 
-  // store the series count and the categories
-  this.seriesCount = 0;
-  this.categories = [];
+    // ----------------------
+    
+    this._dataTable  = dataTable;
+    this._crossTable = null;
+    
+    this._rowDtColIndexes = null;
+    this._otherDtColIndexes = null;
 
-  //count categories for heatGrid
-  var categoriesCount = 0;
-  var seriesDepth = 0;
-  var xAxisLabels = {};
-  var yAxisLabels = {};
+    // ----------------------
 
-  // inspect the columns of the DataTable
-  var title = '';
-  for( var colNo=0; colNo<dataTable.getNumberOfColumns(); colNo++) {
-    if( dataTable.getColumnType(colNo).toUpperCase() == 'NUMBER' ) {
-      measures.push(colNo);
-    }
-    else if( dataTable.getColumnType(colNo).toUpperCase() == 'STRING' ) {
-      if( title ) {
-        title += ' and '; // TODO localize
-      }
-      title += dataTable.getColumnLabel(colNo);
-      strings.push(colNo);
-    }
-  }
+    this._initializeOptions(vizOptions);
+
+    this._initializeAxesMetadata();
+
+    this._buildCrossTable();
+
+    this._readData();
+   
+    this._prepareOptions();
+
+    this._renderChart();
+};
 
 
-  if (vizOptions.cccClass == 'pvc.BulletChart') {
-    if (vizOptions.legendPosition) vizOptions.legendPosition = vizOptions.legendPosition.toLowerCase();
+/*
+ * INIT OPTIONS
+ */
 
-  }
+pentaho.ccc.CccChart.prototype._initializeOptions = function(vizOptions){
+    // Store a copy of the incoming parameters, for later use, in #resize
+    this._originalVizOptions = $.extend({}, vizOptions);
 
-  if(vizOptions.cccClass == 'pvc.HeatGridChart'){
-    categoriesCount = 0;
-    seriesDepth = 0;
-    //direct translation
-    for( var colNo=0; colNo<dataTable.getNumberOfColumns(); colNo++){
-      if(dataTable.getColumnType(colNo) == 'string' ){
-        categoriesCount++;
-      }
-      metadata.push({
-        colIndex: colNo,
-        colName: dataTable.getColumnId(colNo),
-        colLabel:dataTable.getColumnLabel(colNo),
-        colType: (dataTable.getColumnType(colNo) == 'number') ? 'NUMERIC' : 'STRING'
-      });
-      //axis label names:
-      var id = dataTable.getColumnId(colNo).split('~');
-      var lbl = dataTable.getColumnLabel(colNo).split('~');
-      seriesDepth = Math.max(seriesDepth, id.length - 1);
-      for(var i=0;i<id.length;i++){
-        yAxisLabels[id[i]] = lbl[i];
-      }
-    }
-    for(var rowNo=0; rowNo<dataTable.getNumberOfRows(); rowNo++) {
-      var row = [];
-      for( var colNo=0; colNo<dataTable.getNumberOfColumns(); colNo++) {
-        var val = dataTable.getValue(rowNo, colNo);
-        if(val == '-'){ val = null;}
+    // Make a copy
+    vizOptions = this._vizOptions = $.extend({}, vizOptions);
 
-        if(dataTable.getColumnType(colNo) != 'number'){//axis label names
-          xAxisLabels[dataTable.getValue(rowNo, colNo)] = dataTable.getFormattedValue(rowNo, colNo);
-        }
-
-        row.push(val);
-      }
-      resultset.push(row);
+    // Recover non user-overriden chart args extension points
+    // * userDefinedProperties smash chart args' extension points...
+    var chartArgsExtPoints = this.controller.currentViz.args.extensionPoints;
+    if(chartArgsExtPoints){
+        var vizExtPoints = vizOptions.extensionPoints;
+        pvc.forEachOwn(chartArgsExtPoints, function(v, p){
+            if(!vizExtPoints.hasOwnProperty(p)){
+                vizExtPoints[p] = v;
+            }
+        });
     }
 
-  } else if(vizOptions.cccClass == 'pvc.MetricDotChart') {
-    // format the data for MetricDotChart
+    // store the current highlighted selections
+    this._selections = vizOptions.selections;
 
-    // add the category column metadata
-    metadata.push({
-      colIndex: 0,
-      colName: 'Categories',
-      colLabel: title,
-      colType: 'STRING'
+    return vizOptions;
+};
+
+
+/*
+ * INIT METADATA
+ */
+
+// -------------
+// Axis are: row, column and measure.
+function AxisInfo(axis, formulaInfos){
+    this.id = axis;
+
+    this.formulasInfo = formulaInfos;
+    
+    this.depth = this.formulasInfo.length;
+
+    this.formulas = this.formulasInfo.map(function(formInfo){
+        // Ovewrite axis id with corresponding AxisInfo instance
+        formInfo.axis = this;
+
+        return formInfo.formula;
+    }, this);
+
+    /**
+     * Map of axis values to labels.
+     */
+    this.valueLabel = {};
+}
+
+AxisInfo.prototype.getAxisLabel = function(){
+    return this.formulasInfo.map(function(formInfo){ return formInfo.label; }, this)
+                .join(" and "); // TODO localize
+};
+
+pentaho.ccc.CccChart.prototype._initializeAxesMetadata = function(){
+    var myself = this;
+
+    /**
+     * Index of FormulaInfo by formula:
+     *   formula -> formulaInfo
+     *
+     * Filled by #indexFormula declared below.
+     */
+    this._formulasInfo = {};
+    
+    /**
+     * Create an AxisInfo for each axis.
+     *
+     * Index AxisInfo by axis: axis -> AxisInfo.
+     *
+     * Index FormulaInfo by formula and id.
+     *
+     * Create CHART axis field:
+     *   this._rowAxis     = ...
+     *   this._columnAxis  = ...
+     *   this._measureAxis = ...
+     */
+    this._allAxesInfo = pv.dict(this._allAxes, function(axis){
+        var axisInfo = new AxisInfo(axis, myself._vizHelper.getAxisFormulasInfo(axis));
+        
+        myself["_" + axisInfo.id + "Axis"] = axisInfo;
+
+        axisInfo.formulasInfo.forEach(indexFormula, myself);
+
+        return axisInfo;
     });
+    
+    /* @instance */
+    function indexFormula(formInfo){
+        var form = formInfo.formula;
 
-    // add the numeric columns metadata
-    for( var measureNo=0; measureNo<measures.length; measureNo++ ) {
-      metadata.push({
-        colIndex: measureNo+1,
-        colName: dataTable.getColumnId(measures[measureNo]),
-        colLabel: dataTable.getColumnLabel(measures[measureNo]),
-        colType: 'NUMERIC'
-      });
-    }
+        // Index by formula
+        this._formulasInfo[form] = formInfo;
 
-    // process the rows
-    for(var rowNo=0; rowNo<dataTable.getNumberOfRows(); rowNo++) {
-      // concat all of the strings
-      var category = '';
-      var row = [];
-      for( var stringNo=0; stringNo<strings.length; stringNo++ ) {
-        if( category ) {
-          category += ' ~ ';
+        if(form !== formInfo.id){
+            assert(formInfo.axis.id === 'measure', "Must be a measure");
+
+            // Index ALSO by formula id.
+            this._formulasInfo[formInfo.id] = formInfo;
         }
-        category += dataTable.getFormattedValue( rowNo, strings[stringNo] );
-      }
-      row.push(category);
-      for( var measureNo=0; measureNo<measures.length; measureNo++ ) {
-        row.push( dataTable.getValue( rowNo, measures[measureNo] ) );
-      }
-      resultset.push(row);
     }
 
-  } else if(vizOptions.cccClass == 'pvc.BarChart'  ||
-            vizOptions.cccClass == 'pvc.LineChart' ||
-            vizOptions.cccClass == 'pvc.StackedAreaChart') {
+    // The chart title is the conjuction of every row axis formula's label.
+    this._title = this._rowAxis.getAxisLabel();
+};
+
+pentaho.ccc.CccChart.prototype._buildCrossTable = function(){
+    // row := {
+    //   keyValues: row values Array,
+    //   children: [],
+    //   childrenByKey: joinedKeyVals -> {
+    //      keyValues: column values Array,
+    //
+    //      measures: [
+    //          {v: measure 0 value, f: formatted value},
+    //          ...
+    //      ]
+    //   }
+    // };
+    
+    this._crossTable = {
+        children:      [],
+        childrenByKey: {}
+    };
+
+    var dataTable  = this._dataTable,
+        dtColCount = dataTable.getNumberOfColumns(),
+        dtRowCount = dataTable.getNumberOfRows();
+
+    assert(dtColCount > 0, "DataTable must have at least one column");
+
+    if(dtRowCount === 0){
+        return;
+    }
+    
+    // Indexes of DataTable columns with the values of row axis formulas
+    // By construction: the first R columns.
+    this._rowDtColIndexes  = pv.range(this._rowAxis.depth);
+
+    assert(this._rowDtColIndexes.length > 0, "There must exist at least one row axis formula.");
+    
+    // All other columns (!row axis formulas)
+    this._otherDtColIndexes = pv.range(this._rowAxis.depth, dtColCount);
+    
+    var otherDtColsInfo = this._otherDtColIndexes.map(function(tc){
+        var dtColId = this._dataTable.getColumnId(tc),
+            dtColParts = dtColId.split('~'),
+            colValsJoined,
+            meaId;
+
+        if(dtColParts.length > 1){
+            meaId = dtColParts.pop();
+            colValsJoined = dtColParts.join('~');
+        } else {
+            meaId = dtColParts[0];
+            colValsJoined = '';
+        }
+        
+        // Obtain the formula corrsponding to the id.
+        var meaIndex = this._formulasInfo[meaId].index;
+
+        // Store labels for each value of a formula in the columns axis
+        if(colValsJoined){
+            // Includes measure, but we don't use it
+            var joinedLabels = dataTable.getColumnLabel(tc),
+                colLabels = joinedLabels.split("~");
+
+            if(colLabels.length > 1){
+                colLabels.pop();
+            }
+
+            dtColParts.forEach(function(colVal, level){
+                this._columnAxis.valueLabel[colVal] = colLabels[level];
+            }, this);
+
+            // Also allow getting a label for the joined value.
+            // Depending on the chart, the joined value or
+            // the component values are used for obtaining labels.
+            this._columnAxis.valueLabel[colValsJoined] = colLabels.join(" ~ ");
+        }
+
+        return {
+            column: tc,
+            measureIndex: meaIndex,
+            keyValues: dtColParts,
+            key: colValsJoined
+        };
+    }, this);
+
+    // Also, collect the label of each row value
+    for(var tr = 0 ; tr < dtRowCount ; tr++){
+        var rowLabels = [],
+            rowVals = this._rowDtColIndexes.map(function(tc){
+            var rowVal = this._getTableValue(tr, tc),
+                rowLabel = rowVal == null ?
+                            "-" :
+                            dataTable.getFormattedValue(tr, tc);
+
+            this._rowAxis.valueLabel[rowVal] = rowLabel;
+            rowLabels.push(rowLabel);
+            
+            return rowVal;
+        }, this);
+
+        var crossRow = {
+            key:       rowVals.join('~'),
+            keyValues: rowVals,
+            children:      [],
+            childrenByKey: {}
+        };
+
+        // Also allow getting a label for the joined value.
+        // Depending on the chart, the joined value or
+        // the component values are used for obtaining labels.
+        this._rowAxis.valueLabel[crossRow.key] = rowLabels.join(" ~ ");
+
+        this._crossTable.children.push(crossRow);
+        this._crossTable.childrenByKey[crossRow.key] = crossRow;
+        
+        otherDtColsInfo.forEach(function(dtColInfo){
+            var crossCol = crossRow.childrenByKey[dtColInfo.key];
+            if(!crossCol){
+                crossCol = {
+                    key:       dtColInfo.key,
+                    keyValues: dtColInfo.keyValues,
+                    measures:  []
+                };
+
+                crossRow.children.push(crossCol);
+                crossRow.childrenByKey[crossCol.key] = crossCol;
+            }
+
+            var tc = dtColInfo.column,
+                value = this._getTableValue(tr, tc);
+            
+            var measure = {
+                v: value,
+                f: value == null ? "-" : dataTable.getFormattedValue(tr, tc)
+            };
+
+            crossCol.measures[dtColInfo.measureIndex] = measure;
+        }, this);
+    }
+};
+
+pentaho.ccc.CccChart.prototype._getAxisValueLabel = function(axis, value){
+    switch(axis){
+        case 'column':  return this._columnAxis.valueLabel[value];
+        case 'row':     return this._rowAxis.valueLabel[value];
+        case 'measure': return value.f; // Must be a measure cell!
+    }
+    throw new Error("Invalid axis: '" + axis + "'");
+};
+
+/* DataTable related */
+pentaho.ccc.CccChart.prototype._getTableValue = function(tr, tc) {
+    var value = this._dataTable.getValue(tr, tc);
+    return value === '-' ? null : value;
+};
+
+/*
+ * READ DATA
+ */
+
+pentaho.ccc.CccChart.prototype._readData = function() {
+    // Create the data options for the chart
+    this._dataOptions = {
+        crosstabMode: !!this._vizOptions.crosstabMode,
+        seriesInRows: false
+    };
+
+    switch(this._vizOptions.cccClass){
+        case 'pvc.HeatGridChart':
+            this._readDataHeatGrid();
+            break;
+
+        case 'pvc.BarChart':
+        case 'pvc.LineChart':
+        case 'pvc.StackedAreaChart':
+            this._readDataRelational();
+            break;
+
+        case 'pvc.MetricDotChart':
+            // All numeric value columns
+            this._readDataCrosstabSingleCategory();
+            break;
+
+        case 'pvc.PieChart':
+            assert(this._otherDtColIndexes.length === 1, "Only one series supported");
+            // Single numeric value column
+            this._readDataCrosstabSingleCategory();
+            break;
+
+        case 'pvc.BulletChart':
+            this._readDataBullet();
+            break;
+    }
+
+    // Create the CDA table
+    this._cdaTable = {
+        metadata:  this._metadata,
+        resultset: this._resultset
+    };
+};
+
+/**
+ * Creates a CCC resultset in pure CROSSTAB format.
+ *
+ * Data passes through as it comes, being simply translated to CDA format.
+ */
+pentaho.ccc.CccChart.prototype._readDataCrosstab = function() {
+    var dataTable = this._dataTable,
+        colCount = dataTable.getNumberOfColumns(),
+        rowCount = dataTable.getNumberOfRows();
+
+    // Direct translation
+    for(var tc = 0 ; tc < colCount ; tc++){
+        this._addCdaMetadata(
+                dataTable.getColumnId(tc),
+                dataTable.getColumnLabel(tc),
+                writeCccColumnDataType(dataTable.getColumnType(tc)));
+    }
+
+    this._resultset = createTable(rowCount, colCount, this._getTableValue, this);
+};
+
+/**
+ * Creates a CDA resultset in CROSSTAB format
+ * with a single aggregated category column.
+ * 
+ * 1    - Category - aggregated row axis columns
+ * 2..N - Series X - value of 'other' columns
+ */
+pentaho.ccc.CccChart.prototype._readDataCrosstabSingleCategory = function(){
+    var dataTable = this._dataTable,
+        rowCount = dataTable.getNumberOfRows();
+        
+    // Add the aggregate category column metadata
+    this._addCdaMetadata('Categories', this._title, 'STRING');
+
+    // Add the numeric columns metadata
+    this._otherDtColIndexes.forEach(function(tc){
+        //assert(writeCccColumnDataType(dataTable.getColumnType(tc)) === 'NUMERIC');
+
+        this._addCdaMetadata(
+                dataTable.getColumnId(tc),
+                dataTable.getColumnLabel(tc),
+                writeCccColumnDataType(dataTable.getColumnType(tc)));
+    }, this);
+
+    // Build the rows
+    for(var tr = 0 ; tr < rowCount ; tr++){
+
+        var row = [this._aggregateRowAxisForTableRow(tr)];
+
+        // Add other columns' values
+        this._otherDtColIndexes.forEach(function(tc){
+            row.push(this._getTableValue(tr, tc));
+        }, this);
+
+        this._resultset.push(row);
+    }
+};
+
+/**
+ * Creates a CDA resultset in a single-value RELATIONAL format.
+ * Only rows with a non-null value are added to the resultset.
+ * 
+ * 1 - Category - aggregated row axis columns
+ * 2 - Series   - label of 'other' DataTable columns
+ * 3 - Value    - value of corresponding 'other' DataTable column
+ */
+pentaho.ccc.CccChart.prototype._readDataRelational = function() {
     // format the data for a BarChart, LineChart, or StackedAreaChart
 
-    this.seriesCount = measures.length;
+     var dataTable = this._dataTable,
+         rowCount = dataTable.getNumberOfRows();
 
-    colors = [];
-    for( var measureNo=0; measureNo<measures.length; measureNo++ ) {
-      colors.push(vizOptions.palette.colors[measureNo]);
-    }
-    // create the metadata
-    metadata.push({
-      colIndex: 0,
-      colName: 'Series',
-      colLabel: 'Series',
-      colType: 'STRING'
-    });
-    metadata.push({
-      colIndex: 1,
-      colName: 'Category',
-      colLabel: 'Category',
-      colType: 'STRING'
-    });
-    metadata.push({
-      colIndex: 2,
-      colName: 'Value',
-      colLabel: 'Value',
-      colType: 'NUMERIC'
-    });
+    var seriesCount = this._otherDtColIndexes.length;
 
-    // process the rows
-    var catMap = {};
-    for(var rowNo=0; rowNo<dataTable.getNumberOfRows(); rowNo++) {
-      // concat all of the strings
-      var category = '';
-      var row = [];
-      for( var colNo=0; colNo<dataTable.getNumberOfColumns(); colNo++) {
-        if( dataTable.getColumnType(colNo).toUpperCase() == 'STRING' ) {
-          if( category ) {
-            category += ' ~ ';
-          }
-          category += dataTable.getFormattedValue( rowNo, colNo );
+    // Take the first seriesCount colors from the palette
+    this._colors = this._vizOptions.palette.colors.slice(0, seriesCount);
+
+    // Create the metadata
+    this._addCdaMetadata('Series',   'Series',   'STRING');
+    this._addCdaMetadata('Category', 'Category', 'STRING');
+    this._addCdaMetadata('Value',    'Value',    'NUMERIC');
+
+    if(rowCount > 0){
+        var seriesLabels = this._otherDtColIndexes.map(function(tc){
+            return dataTable.getColumnLabel(tc);
+        });
+
+        // process the rows
+        for(var tr = 0; tr < rowCount ; tr++) {
+
+            var category = this._aggregateRowAxisForTableRow(tr);
+
+            for(var i = 0 ; i < seriesCount ; i++){
+                var tc = this._otherDtColIndexes[i];
+
+                var value = this._getTableValue(tr, tc);
+                if(value != null){
+                    this._resultset.push([
+                        seriesLabels[i],
+                        category,
+                        value
+                    ]);
+                }
+            }
         }
-      }
-      if(!catMap[category] ) {
-        catMap[category] = true;
-        this.categories.push(category);
-      }
-
-      for( var measureNo=0; measureNo<measures.length; measureNo++ ) {
-        var row = [ dataTable.getColumnLabel(measures[measureNo]), category, dataTable.getValue( rowNo, measures[measureNo] ) ];
-        resultset.push(row);
-      }
     }
-  } else if(vizOptions.cccClass == 'pvc.PieChart') {
-    // format the data for a PieChart
+};
 
-    this.seriesCount = 1;
+/**
+ * Creates a CCC resultset in pure CROSSTAB format.
+ * Fills data-related options.
+ */
+pentaho.ccc.CccChart.prototype._readDataHeatGrid = function(){
+    this._readDataCrosstab();
 
-    // create the metadata
-    metadata.push({
-      colIndex: 0,
-      colName: 'Category',
-      colLabel: title,
-      colType: 'STRING'
-    });
+    var measureCount = this._measureAxis.depth;
 
-    metadata.push({
-      colIndex: 0,
-      colName: 'Value',
-      colLabel: 'Value',
-      colType: 'NUMERIC'
-    });
-
-    // process the rows
-    for(var rowNo=0; rowNo<dataTable.getNumberOfRows(); rowNo++) {
-      // concat all of the strings
-      var category = '';
-      var row = [];
-      for( var stringNo=0; stringNo<strings.length; stringNo++ ) {
-        if( category ) {
-          category += ' ~ ';
+    // Clear size and color indexes,
+    //  if there aren't enough measures.
+    // TODO
+    if(measureCount < 2){
+        this._vizOptions.sizeValIdx = null;
+        if(measureCount < 1){
+            this._vizOptions.colorValIdx = null;
         }
-        category += dataTable.getFormattedValue( rowNo, strings[stringNo] );
-      }
-      row.push(category);
-      row.push( dataTable.getValue( rowNo, measures[0] ) );
-      resultset.push(row);
     }
+    
+    // Update data options
+    this._dataOptions.dataOptions = {
+        categoriesCount: this._rowAxis.depth,
 
-  } else if (vizOptions.cccClass == 'pvc.BulletChart') {
-    vizOptions.colors = this.getColors();
+        // Whenever there are measures,
+        //  they are mixed in the columns
+        measuresInColumns: measureCount > 0
+    };
+};
 
-    metadata.push({
-      colIndex: 0,
-      colName: 'Category',
-      colLabel: 'Category',
-      colType: 'STRING'
-    });
+/**
+ * Creates a CDA resultset in a custom RELATIONAL format.
+ *
+ * 1    - Category - aggregated row axis columns
+ * 2    - Series   - label of 'other' DataTable columns
+ * 3    - Value    - numeric value of corresponding 'other' DataTable column
+ * 4    - Marker   - marker numeric value of corresponding 'other' DataTable column
+ * 5..R - Range r  - range numeric value, taken from vizOptions.bulletRanges
+ */
+pentaho.ccc.CccChart.prototype._readDataBullet = function() {
+    var dataTable   = this._dataTable,
+        rowCount    = dataTable.getNumberOfRows(),
+        measureCols = this._otherDtColIndexes,
+        seriesCount = this._otherDtColIndexes.length,
+        vizOptions  = this._vizOptions;
 
-    // create the metadata
-    metadata.push({
-      colIndex: 1,
-      colName: 'Series',
-      colLabel: 'Series',
-      colType: 'STRING'
-    });
+    this._dataOptions.seriesInRows = true;
 
-
-    metadata.push({
-      colIndex: 2,
-      colName: 'Value',
-      colLabel: 'Value',
-      colType: 'NUMERIC'
-    });
-
-
-    metadata.push({
-      colIndex: 3,
-      colName: 'Marker',
-      colLabel: 'Marker',
-      colType: 'NUMERIC'
-    });
-
+    this._addCdaMetadata('Category', 'Category', 'STRING' );
+    this._addCdaMetadata('Series',   'Series',   'STRING' );
+    this._addCdaMetadata('Value',    'Value',    'NUMERIC');
+    this._addCdaMetadata('Marker',   'Marker',   'NUMERIC');
 
     if (vizOptions.bulletRanges) {
-      for (var i=0; i < vizOptions.bulletRanges.length; i++) {
-        metadata.push({
-          colIndex: 4+i,
-          colName: 'Range'+i,
-          colLabel: 'Range ' + i,
-          colType: 'NUMERIC'
-        });
-      }
-    }
-
-
-    // process the rows
-    var catMap = {};
-    for(var rowNo=0; rowNo< dataTable.getNumberOfRows(); rowNo++) {
-      // concat all of the strings
-      var category = '';
-      var row = [];
-      for( var colNo=0; colNo<dataTable.getNumberOfColumns(); colNo++) {
-        if( dataTable.getColumnType(colNo).toUpperCase() == 'STRING' ) {
-          if( category ) {
-            category += ' ~ ';
-          }
-          category += dataTable.getFormattedValue( rowNo, colNo );
+        for (var i = 0, R = vizOptions.bulletRanges.length; i < R ; i++){
+            this._addCdaMetadata('Range'  + i, 'Range ' + i, 'NUMERIC');
         }
-      }
-      if(!catMap[category] ) {
-        catMap[category] = true;
-        this.categories.push(category);
-      }
+    }
+    
+    var measuresCount = this._measureAxis.depth;
 
-      var numMeasures = (cv.getActiveReport !== undefined) ? cv.getActiveReport().reportDoc.getReportNode().selectNodes("cv:measures/cv:measure").length : cv.measureCount;
-      for( var measureNo=0; measureNo< measures.length; measureNo+=numMeasures ) {
+    // Process the rvar measuresCount = this._measureAxis.depth;ows
+    for(var tr = 0 ; tr < rowCount ; tr++){
+      
+        var category = this._aggregateRowAxisForTableRow(tr);
 
-        for (var t = 0; t < numMeasures; t+=2) {
-//                var row = [ dataTable.getColumnLabel(measures[measureNo]), category, dataTable.getValue( rowNo, measures[measureNo] ),  dataTable.getValue( rowNo, measures[measureNo] ) ];
-          var row = [category,
-            dataTable.getColumnLabel( measures[measureNo + t] ),
-            dataTable.getValue( rowNo, measures[measureNo + t] ),
-            t+1 < numMeasures ? dataTable.getValue( rowNo, measures[measureNo+t+1] ) : 7500
-          ];
+        for(var s = 0 ; s < seriesCount ; s += measuresCount) {
+            // Measures should be defined in pairs
+            // Each Value measure followed by a Marker measure:
+            //  <ValueMeasure1, MarkerMeasure1>,
+            //  <ValueMeasure2, MarkerMeasure2>,
+            //  ...
+            //  <ValueMeasureN [, MarkerMeasureN]>
+            for(var m = 0 ; m < measuresCount ; m += 2) {
+                var valueColIndex  = s + m,
+                    markerColIndex = valueColIndex + 1,
+                    tc = measureCols[valueColIndex],
+                    dtColParts = dataTable.getColumnId(tc).split('~');
 
-          if (vizOptions.bulletRanges)
-            for (var i=0; i < vizOptions.bulletRanges.length; i++) row.push(vizOptions.bulletRanges[i]);
+                dtColParts.pop();
+                
+                var row = [
+                        // Normal relational part
+                        category, // aggregated category
+                        dtColParts.join('~'), // series label
+                        this._getTableValue(tr, tc),  // series value - may be null...is it ok?
 
-          //        var row = [dataTable.getValue( rowNo, measures[measureNo] )];
-          resultset.push(row);
+                        // Marker - may be missing on the last measure pair
+                        m + 1 < measuresCount ?
+                            this._getTableValue(tr, measureCols[markerColIndex]) :
+                            vizOptions.bulletMarkers[0] // TODO: 7500
+                    ];
+
+                // Dynamic columns
+                var bulletRanges = vizOptions.bulletRanges;
+                if (bulletRanges){
+                    bulletRanges.forEach(function(rangeValue){
+                        row.push(rangeValue);
+                    });
+                }
+
+                this._resultset.push(row);
+            }
         }
-      }
+    }
+};
 
+pentaho.ccc.CccChart.prototype._aggregateRowAxisForTableRow = function(tr) {
+    // Concat all of the string columns
+    var values = this._rowDtColIndexes.map(function(tc){
+        return this._getTableValue(tr, tc);
+    }, this);
+
+    return values.join('~');
+};
+
+pentaho.ccc.CccChart.prototype._addCdaMetadata = function(colName, colLabel, colType) {
+    this._metadata.push({
+        colIndex: this._metadata.length,
+        colName:  colName,
+        colLabel: colLabel,
+        colType:  colType
+    });
+};
+
+
+/*
+ * PREPARE OPTIONS
+ */
+
+pentaho.ccc.CccChart.prototype._prepareOptions = function(){
+    var vizOptions = this._vizOptions;
+
+    var myself = this;
+    var options = this.options = {
+        canvas:  this._elementName,
+        animate: false,
+
+        legend:  true,
+        legendPosition: "bottom",
+        
+        titlePosition:  "top",
+
+        showTooltips: true,
+        showValues:   false,
+
+        clickable:    true,
+        selectable:   true,
+        
+        // TODO: on the server, these come undefined...
+        height: vizOptions.height || 300,
+        width:  vizOptions.width  || 300,
+        
+        title:  this._title == "" ? null : this._title,
+        colors: this.getColors(),
+
+        clickAction: null,
+
+        mouseOverAction: function(){},
+
+        mouseUpAction: function(){},
+
+        getCategoryLabel: function(value){
+            return myself._getAxisValueLabel('row', value);
+        },
+
+        getSeriesLabel: function(value){
+            return myself._getAxisValueLabel('column', value);
+        }
+    };
+
+    switch(this._vizOptions.cccClass){
+        case 'pvc.HeatGridChart':
+            this._prepareOptionsHeatGrid();
+            this._prepareLayoutHeatGrid();
+            break;
+
+        case 'pvc.BulletChart':
+            this._prepareOptionsBullet();
+            this._prepareLayoutBullet();
+            break;
+
+        case 'pvc.BarChart':
+            this._prepareOptionsBar();
+            break;
     }
 
-    if (resultset.length > 20) {
-      vizOptions.bulletSize = 10;
-      vizOptions.bulletSpacing = vizOptions.orientation == 'vertical'? 60 : 20;
-    }else if (resultset.length > 10) {
-      vizOptions.bulletSize = 15;
-      vizOptions.bulletSpacing = vizOptions.orientation == 'vertical'? 80 : 30;
-    }   else {
-      vizOptions.bulletSize = 20;
-      vizOptions.bulletSpacing = vizOptions.orientation == 'vertical'? 120 : 50;
+    // --------------------
+    
+    // Copy options from the visualization metadata to the chart options
+    for(var x in vizOptions){
+        if(!this._shouldSkipVizOption(x)){
+            var v = vizOptions[x];
+
+            // Change 'x' and/or 'v'
+            switch(x){
+                case 'legendPosition':
+                    v = v && v.toLowerCase();
+                    break;
+
+                case 'showLegend':
+                    v = (('' + v) === 'true');
+                    break;
+
+                case 'legendSize':
+                case 'lineWidth':
+                    v = parseFloat(v);
+                    break;
+            }
+
+            options[x] = v;
+        }
     }
 
-    categoriesCount = this.categories.length;
-  }
+    // Assume 'legendAlign' default value
+    if(!('legendAlign' in options)){
+        var legendPosition = options.legendPosition;
 
-
-
-  var myself=this;
-
-  // create the options for the chart
-  var opts = {
-    canvas: this.elementName,
-    animate:false,
-    legend: true,
-    legendPosition:"bottom",
-    legendAlign: "middle",
-    showTooltips: true,
-    showValues: false,
-    clickable: true,
-    selectable: true,
-    height: vizOptions.height,
-    width: vizOptions.width,
-    title: title == "" ? null : title,
-    titlePosition: 'top',
-    colors: colors ? colors : this.getColors(),
-    clickAction: function(s,c, d){
-      // handle click events
-      if(pentaho && pentaho.events && pentaho.events.trigger ) {
-        var table = myself.cdaTable;
-        // create a selection object to describe the clicked item
-        var selections = [{
-          type: 'cell',
-          rowId: myself.dataTable.getColumnId(0),
-          rowLabel: myself.dataTable.getColumnLabel(0),
-          value: d
-        }];
-        if( myself.vizOptions.cccClass == 'pvc.PieChart' ) {
-          selections[0].type = 'row';
-          selections[0].column = 1;
-          selections[0].columnId = myself.dataTable.getColumnId(1);
-          selections[0].columnLabel = myself.dataTable.getColumnLabel(1);
+        if(legendPosition === 'top' || legendPosition === 'bottom'){
+            options.legendAlign = 'center';
         } else {
-          // find the right column
-          for( var colNo=0; colNo<myself.dataTable.getNumberOfColumns(); colNo++) {
-            if( myself.dataTable.getColumnLabel(colNo) == s ) {
-              selections[0].column = colNo;
-              selections[0].columnId = myself.dataTable.getColumnId(colNo);
-              selections[0].columnLabel = myself.dataTable.getColumnLabel(colNo);
-              break;
-            }
-          }
+            options.legendAlign = 'middle';
         }
-        for( var rowNo=0; rowNo<myself.dataTable.getNumberOfRows(); rowNo++) {
-          if( myself.dataTable.getValue(rowNo,0) == c ) {
-            selections[0].row = rowNo;
-            selections[0].rowItem = myself.dataTable.getValue(rowNo,0);
-            var args = {
-              source: myself,
-              selections: selections
-            };
-            // trigger the selection event
-            pentaho.events.trigger( myself, "select", args );
-            break;
-          }
-        }
-      }
-    },
-    mouseOverAction: function(a,b,c,d) {
-    },
-    mouseUpAction: function(a,b,c,d) {
-    }
-  };
-
-
-  // Create the data options for the chart
-  var dataOpts = {
-      crosstabMode: !!vizOptions.crosstabMode,
-      seriesInRows: false
-  };
-
-  if(vizOptions.cccClass == 'pvc.HeatGridChart'){
-    var categoryMatches = function(category, dataTableVal){
-      return pvc.arrayEquals(category, dataTableVal);
-    };
-
-    var seriesMatches = function(series, dataTableVal){//TODO:
-      var seriesStr = $.isArray(series)?
-          series.join('~'):
-          series;
-      var idx = dataTableVal.lastIndexOf('~');
-      if(idx < 0) {idx = 0;} //dataTableVal.length
-      return dataTableVal.substring(0, idx) == seriesStr;
-    };
-    
-    var getCategoriesAttributesFormulas = function(){
-      return cv.getActiveReport().reportDoc.getReportNode().selectNodes('cv:rowAttributes/cv:attribute/@formula').slice(0,categoriesCount);
-    };
-    
-    var getSeriesAttributesFormulas = function(){
-      var seriesAttr = cv.getActiveReport().reportDoc.getReportNode().selectNodes('cv:columnAttributes/cv:attribute/@formula');
-      if(seriesAttr.length == 0){
-        allAttr = cv.getActiveReport().reportDoc.getReportNode().selectNodes('cv:rowAttributes/cv:attribute/@formula');
-        if (allAttr.length > categoriesCount){
-          return allAttr.slice(categoriesCount);
-        }
-      }
-      return seriesAttr;
     }
 
-    //use selection event handler instead of clickAction
-    opts.clickAction = undefined;
-
-    opts.getCategoryLabel = function(id){
-      return xAxisLabels[id];
-    };
-
-    opts.getSeriesLabel = function(id){
-      return yAxisLabels[id];
-    };
-
-    var getReportSelectionsFromCcc = function(cccSelections){
-      var numMeasures = cv.getActiveReport().reportDoc.getReportNode().selectNodes("cv:measures/cv:measure").length;
-      var selections = [];
-      var categoryColNo = 0;
-      var seriesRowNo = 0;
-      var seriesColStart=categoriesCount;
-      for(var i=0; i < cccSelections.length; i++)
-      {//ccc selections work on a category x series basis, translate to VizController selections
-        var cccSelection = cccSelections[i];
-        var c = cccSelection.keyValues.categories;
-        var s = cccSelection.keyValues.series;
-        var selection = {
-          type: 'cell',
-          rowLabel: myself.dataTable.getColumnLabel(categoriesCount-1)
-        };
-        for(var rowNo=0; rowNo<myself.dataTable.getNumberOfRows(); rowNo++)
-        {//category -> row
-          var categories = [];
-          for(var j = categoryColNo;j<categoriesCount;j++){
-            categories.push(myself.dataTable.getValue(rowNo,j));
-          }
-          if(categoryMatches(c, categories))
-          {
-            selection.row = rowNo;
-            var rowItems = [], rowIds = [];
-            for(var j = categoryColNo;j<categoriesCount;j++){
-              rowItems.push(myself.dataTable.getValue(rowNo,j));
-              rowIds.push(myself.dataTable.getColumnId(j));
-            }
-            selection.rowItem = rowItems;
-            selection.rowId = rowIds;
-            break;
-          }
+    var vizExtPoints = vizOptions.extensionPoints;
+    if(vizExtPoints){
+        var extPoints = options.extensionPoints = {};
+        for(var y in vizExtPoints) {
+            extPoints[y] = vizExtPoints[y];
         }
-        for(var colNo=seriesColStart; colNo < myself.dataTable.getNumberOfColumns(); colNo+=numMeasures)
-        {//just catch first occurrence
-          //series->columns
-          if(seriesMatches(s, myself.dataTable.getColumnId(colNo))){
-            selection.column = colNo;
-            //get measure out
-            var colId = myself.dataTable.getColumnId(colNo);
-            var endSplitIdx = colId.lastIndexOf('~');
-            if(endSplitIdx < 0) { endSplitIdx = colId.length-1; }
-            selection.columnItem =  colId.substring(0,endSplitIdx).split('~');
-            selection.measureId = colId.substring(endSplitIdx+1, colId.length);
-
-            var columnIds = [];
-            var columnIdNodes =  getSeriesAttributesFormulas();// cv.getActiveReport().reportDoc.getReportNode().selectNodes('cv:columnAttributes/cv:attribute/@formula');
-            for(var j = 0;j<columnIdNodes.length;j++){
-              columnIds.push(columnIdNodes[j].firstChild.data);
-            }
-            selection.columnId = columnIds;
-            selection.columnLabel = myself.dataTable.getColumnLabel(colNo);
-            break;
-          }
-        }
-        //value
-        if(selection.row != null && selection.column != null){
-          selection.value = myself.dataTable.getValue(selection.row,selection.column);
-        }
-        selections.push(selection);
-      }
-      return selections;
-    };
-
-    //translate ccc selections to report selections; to be processed by selectTriggered@cv_rptReport3
-    opts.selectionChangedAction = function(cccSelections)
-    {
-      var args = {
-        source: myself,
-        selections: getReportSelectionsFromCcc(cccSelections),
-        selectionMode: "REPLACE"
-      };
-      pentaho.events.trigger( myself, "select", args );
-    };
-
-    vizOptions.controller.domNode.style.overflow = 'hidden'; //Hide overflow
-
-    opts.customTooltip = function(s,c,d){
-      var tooltip = "";
-      //series
-      var columnAttributes = getSeriesAttributesFormulas();// cv.getActiveReport().reportDoc.getChildMembers("columnAttributes");
-      for(var i=0; i < s.length && i < columnAttributes.length; i++){
-        var sFormula = columnAttributes[i].nodeValue ;//attributes.getNamedItem('formula').nodeValue;
-        if(!sFormula) continue;
-        var sTitle = cv.util.parseMDXExpression(sFormula, true);
-        var sVal = yAxisLabels[s[i]];
-        if(sVal){
-          tooltip += sTitle + ': ' + cv.util.escapeHtml(sVal)+ '<br>';
-        }
-      }
-      //categories
-      var rowAttributes = getCategoriesAttributesFormulas();// cv.getActiveReport().reportDoc.getChildMembers("rowAttributes");
-      for(var i=0;i<c.length && i<rowAttributes.length;i++){
-        var cFormula = rowAttributes[i].nodeValue ;//attributes.getNamedItem('formula').nodeValue;
-        if(!cFormula) continue;
-        var cTitle = cv.util.parseMDXExpression(cFormula, true);
-        var cVal = xAxisLabels[c[i]];
-        if(cVal){
-          tooltip += cTitle + ': ' + cv.util.escapeHtml(cVal) + '<br>';
-        }
-      }
-
-      var sIdx = myself.chart.dataEngine.getSeries().indexOf(s);
-      var cIdx = myself.chart.dataEngine.getCategories().indexOf(c);
-
-      //measures
-      var metrics = cv.getActiveReport().reportDoc.getMetrics();
-      for(var i=0; i<d.length && i<metrics.length;i++){
-        var formula = metrics[i].attributes.getNamedItem('formula').nodeValue;
-        var measure = cv.util.parseMDXExpression(formula, true);
-
-        var formatVal = d[i] == null?
-            "-" :
-            myself.dataTable.getFormattedValue(cIdx, categoriesCount + sIdx * d.length + i);
-        tooltip += measure + ': ' + cv.util.escapeHtml(formatVal) + '<br>';
-      }
-
-      //item to drill
-      if(columnAttributes.length == s.length)
-      {
-        var toDrillParent = columnAttributes[s.length-1].nodeValue ;//.attributes.getNamedItem('formula').nodeValue;
-        var drillChild = cv.getFieldHelp().getDirectChild(toDrillParent);
-        var toDrillTitle = drillChild? cv.util.parseMDXExpression(drillChild, true) : null;
-        if(toDrillTitle) tooltip += "<div class='tipsy-footer'> Double-click to show " + toDrillTitle + "</div>";
-      }
-      return tooltip;
-    };
-
-    //drill down on shapes
-    opts.doubleClickAction = function(series, category){
-      if(series.length == 0) return;
-
-      var toDrill = series[series.length-1];
-      var seriesFormulas = getSeriesAttributesFormulas();// cv.getActiveReport().reportDoc.getReportNode().selectNodes('cv:columnAttributes/cv:attribute/@formula');
-      var categoriesFormulas = getCategoriesAttributesFormulas();// cv.getActiveReport().reportDoc.getReportNode().selectNodes('cv:rowAttributes/cv:attribute/@formula');
-      var drillFormula =null;
-
-      if(seriesFormulas.length < series.length) {
-        if(categoriesFormulas.length > 0){
-          //no series, use category
-          toDrill = category[category.length-1];
-          drillFormula = categoriesFormulas[category.length-1].value;
-        }
-        else return;
-      }
-      else {
-        drillFormula = seriesFormulas[series.length - 1].value;
-      }
-
-      var toKeepSeries = null, toKeepSeriesFormula=null;
-      var toKeepCategory = null, toKeepCategoryFormula=null;
-
-      if(series.length > 1 && series.length <= seriesFormulas.length)
-      {
-        toKeepSeries = series[series.length-2];
-        toKeepSeriesFormula = seriesFormulas[series.length - 2].value;
-      }
-      if(category.length > 0 && category.length <= categoriesFormulas.length){
-        toKeepCategory = category[category.length-1];
-        toKeepCategoryFormula = categoriesFormulas[category.length-1].value;
-      }
-
-      var ctx = [];
-
-      //keepers
-      if(toKeepSeries)
-      {
-        var keepCtx = {
-          action: 'KEEP',
-          formula: toKeepSeriesFormula,
-          member: toKeepSeries,
-          caption: cv.util.parseMDXExpression(toKeepSeries, true)
-        };
-        ctx.push(keepCtx);
-      }
-      if(toKeepCategory)
-      {
-        var keepCtx = {
-          action: 'KEEP',
-          formula: toKeepCategoryFormula,
-          member: toKeepCategory,
-          caption: cv.util.parseMDXExpression(toKeepCategory, true)
-        };
-        ctx.push(keepCtx);
-      }
-
-      //drill
-      var drillCtx = {
-        action: 'KEEP_AND_DRILL',
-        formula: drillFormula,
-        member: toDrill,
-        caption: cv.util.parseMDXExpression(toDrill,true)
-      };
-      ctx.push(drillCtx);
-
-      cv.getActiveReport().clickChart(ctx, true);
-
-      //needed for content linking
-      var cccSelections = [{keyValues: {series:series, categories:category }}];
-      var selections = getReportSelectionsFromCcc(cccSelections);
-      var args = {
-        source: myself,
-        selections: selections
-      };
-      pentaho.events.trigger( myself, "doubleclick", args );
-    };
-
-    //TODO: replicaton with analyzer's report.selectDoubleClick
-    var drillOnFirstSelection = function(selections){
-      
-      var selectedItem = selections[0];
-    
-      var formula='', member =''; 
-      var formulas = [], members = [];
-      
-      if(selectedItem.columnId && selectedItem.columnId.length >0) {
-        formulas.push(selectedItem.columnId[0]);
-        members.push(selectedItem.columnItem[0]);
-        
-        formula = selectedItem.columnId[0];
-        member = selectedItem.columnItem[0];
-      }
-      
-      if(selectedItem.rowId && selectedItem.rowId.length >0){
-        formulas.push(selectedItem.rowId[0]);
-        members.push(selectedItem.rowItem[0]);
-        
-        formula = selectedItem.rowId[0];
-        member = selectedItem.rowItem[0];
-      }
-      var child = cv.getFieldHelp().getDirectChild(formula);
-      if (child) {
-        // Supported a limited case of drilldown when the clicked on attribute has
-        // a child level.  This drilldown differs from the drilldowns in JFreeChart
-        // in that for the viz double click, we don't do KEEP on the other attribute.
-        var ctxArray = [{formula:formula, member:member,
-          action: "KEEP_AND_DRILL",
-          caption: cv.util.parseMDXExpression(member, false)
-        }];
-        cv.getActiveReport().clickChart(ctxArray, true);
-      }
-    };
-
-    //drill down on y axis
-    opts.yAxisDoubleClickAction =  function (node) {
-      var ctxArray = [];
-      var rowItems = {};
-
-      //needed for content linking
-      var cccSelections = [{keyValues: {series: node.path, categories: null}}];
-      var selections = getReportSelectionsFromCcc(cccSelections);
-      var args = {
-        source: myself,
-        selections: selections
-      };
-      pentaho.events.trigger( myself, "doubleclick", args );
-      drillOnFirstSelection(selections);
-    };
-
-    //drill down on x axis
-    opts.xAxisDoubleClickAction =  function (node) {
-      var ctxArray = [];
-      var rowItems = {};
-
-      //needed for content linking
-      var cccSelections = [{keyValues: {series: null, categories: node.path }}];
-      var selections = getReportSelectionsFromCcc(cccSelections);
-      var args = {
-        source: myself,
-        selections: selections
-      };
-      pentaho.events.trigger( myself, "doubleclick", args );
-      drillOnFirstSelection(selections);
-    };
-
-    var measureCount = (cv.getActiveReport !== undefined) ? cv.getActiveReport().reportDoc.getReportNode().selectNodes("cv:measures/cv:measure").length : cv.measureCount;
-    if (measureCount < 2) {
-      vizOptions.sizeValIdx = null;
-      if (measureCount == 0){
-        vizOptions.colorValIdx = null;
-      }
     }
+};
 
-    //update categories count, measures count
-    dataOpts.dataOptions = {
-      categoriesCount : categoriesCount,
-      measuresInColumns: measureCount > 0
+
+pentaho.ccc.CccChart.prototype._prepareOptionsHeatGrid = function() {
+    var myself = this,
+        options = this.options;
+
+    options.selectionChangedAction = function(cccSelections){
+        myself._notifyCccSelectionChanged(cccSelections);
     };
 
-    //resize
-    //fiddle with the axis dimensions
+    // Drill down on shapes
+    options.doubleClickAction = function(s, c){
+        return myself._drillDown(myself._readCccAxesValues(s, c));
+    };
 
-    //get depth and breadth
+    // Drill down on y axis
+    options.yAxisDoubleClickAction = function (d){
+        return myself._drillDown(myself._readCccAxesValues(d.path, null));
+    };
+
+    // Drill down on x axis
+    options.xAxisDoubleClickAction = function (d) {
+        return myself._drillDown(myself._readCccAxesValues(null, d.path));
+    };
     
-    var measureCount = (cv.getActiveReport !== undefined) ? cv.getActiveReport().reportDoc.getReportNode().selectNodes("cv:measures/cv:measure").length : cv.measureCount;
-    var categoriesDepth = categoriesCount ;//(cv.getActiveReport !== undefined) ? cv.getActiveReport().reportDoc.getReportNode().selectNodes('cv:rowAttributes/cv:attribute').length : cv.categoryCount;
-    //var seriesDepth = (cv.getActiveReport !== undefined) ? cv.getActiveReport().reportDoc.getReportNode().selectNodes('cv:columnAttributes/cv:attribute').length : cv.seriesCount;
-    var categoriesBreadth = this.dataTable.getNumberOfRows() - 1;
-    if(categoriesBreadth <= 0){
-      categoriesBreadth =1;
-    }
-    var seriesBreadth = (this.dataTable.getNumberOfColumns() - categoriesDepth);
+    options.customTooltip = function(s, c){
+        return myself._getTooltipText(myself._readCccAxesValues(s, c));
+    };
+};
+
+pentaho.ccc.CccChart.prototype._prepareLayoutHeatGrid = function() {
+    var options = this.options,
+        vizOptions = this._vizOptions;
+
+    // TODO: is it ok to access "vizOptions.controller.domNode" ?
+    vizOptions.controller.domNode.style.overflow = 'hidden'; // Hide overflow
+
+    var measureCount = this._measureAxis.depth,
+        catsDepth    = this._rowAxis.depth,
+        sersDepth    = this._columnAxis.depth,
+        catsBreadth  = Math.max(1, this._dataTable.getNumberOfRows() - 1),
+        sersBreadth  = this._dataTable.getNumberOfColumns() - catsDepth;
+
     if(measureCount > 0){
-      seriesBreadth /= measureCount;
+        sersBreadth /= measureCount;
     }
 
-    var MAX_AXIS_SIZE = 300,
+    var width  = options.width,
+        height = options.height,
+        currRatio = width / height,
+        xyChartRatio = catsBreadth / sersBreadth;
+
+    // Min desirable sizes according to depth
+    var MAX_AXIS_SIZE    = 300,
         MIN_LEVEL_HEIGHT = 70,
         MAX_LEVEL_HEIGHT = 200,
-        MAX_AXIS_RATIO = 0.35;
-    var width = vizOptions.width,
-        height = vizOptions.height;
+        MAX_AXIS_RATIO   = 0.35;
 
-    var xyChartRatio = categoriesBreadth / seriesBreadth;
-    var currRatio = width/height;
+    var minXAxisSize = Math.min(MAX_AXIS_SIZE, catsDepth * MIN_LEVEL_HEIGHT),
+        minYAxisSize = Math.min(MAX_AXIS_SIZE, sersDepth * MIN_LEVEL_HEIGHT),
+        maxXAxisSize = Math.min(MAX_AXIS_SIZE, catsDepth * MAX_LEVEL_HEIGHT, height * MAX_AXIS_RATIO),
+        maxYAxisSize = Math.min(MAX_AXIS_SIZE, sersDepth * MAX_LEVEL_HEIGHT, width  * MAX_AXIS_RATIO);
 
-    //min desirable sizes according to depth
-    var minXAxisSize = Math.min(MAX_AXIS_SIZE, categoriesDepth * MIN_LEVEL_HEIGHT);
-    var minYAxisSize = Math.min(MAX_AXIS_SIZE, seriesDepth * MIN_LEVEL_HEIGHT);
-    var maxXAxisSize = Math.min(MAX_AXIS_SIZE, categoriesDepth * MAX_LEVEL_HEIGHT, height * MAX_AXIS_RATIO);
-    var maxYAxisSize = Math.min(MAX_AXIS_SIZE, seriesDepth * MAX_LEVEL_HEIGHT, width * MAX_AXIS_RATIO);
+    var xAxisSize,
+        yAxisSize;
+    if(xyChartRatio > currRatio){ // lock width
+        var extraHeight = height - width / xyChartRatio;
 
-    var xAxisSize, yAxisSize;
-    if(xyChartRatio > currRatio){//lock width
-      var extraHeight = height - width / xyChartRatio ;
-      yAxisSize = minYAxisSize;
+        yAxisSize = minYAxisSize;
 
-      xAxisSize = Math.min(extraHeight, maxXAxisSize) ;
-      xAxisSize = Math.max(xAxisSize, minXAxisSize);
+        xAxisSize = Math.min(extraHeight, maxXAxisSize);
+        xAxisSize = Math.max(xAxisSize,   minXAxisSize);
+    } else if (xyChartRatio < currRatio){ // lock height
+        var extraWidth = width - height * xyChartRatio;
+
+        xAxisSize = minXAxisSize;
+
+        yAxisSize = Math.min(extraWidth, maxYAxisSize);
+        yAxisSize = Math.max(yAxisSize,  minYAxisSize);
     }
-    else if (xyChartRatio < currRatio){//lock height
-      var extraWidth = width - height * xyChartRatio;
-      xAxisSize = minXAxisSize;
 
-      yAxisSize = Math.min(extraWidth, maxYAxisSize);
-      yAxisSize = Math.max(yAxisSize, minYAxisSize);
-    }
+    // ------------------
+
+    // Update Axes sizes
     vizOptions.xAxisSize = xAxisSize;
     vizOptions.yAxisSize = yAxisSize;
+};
 
 
-  }//heatgrid
+pentaho.ccc.CccChart.prototype._prepareOptionsBar = function() {
+    var myself = this,
+        options = this.options;
 
-  if(vizOptions.cccClass == 'pvc.BulletChart'){
-
-    var categoryMatches = function(category, dataTableVal){
-      return pvc.arrayEquals(category, dataTableVal);
+    options.customTooltip = function(s, c){
+        return myself._getTooltipText(myself._readCccAxesValues(s, c));
     };
 
-    var seriesMatches = function(series, dataTableVal){//TODO:
-      var seriesStr = $.isArray(series)?
-          series.join('~'):
-          series;
-      var idx = dataTableVal.lastIndexOf('~');
-      if(idx < 0) {idx = 0;} //dataTableVal.length
-      return dataTableVal.substring(0, idx) == seriesStr;
+    // Use selection event handler instead of clickAction
+    options.selectionChangedAction = function(cccSelections){
+        myself._notifyCccSelectionChanged(cccSelections);
     };
+    
+    // Drill down on shapes
+    options.doubleClickAction = function(s, c){
+        if(myself._drillDown(myself._readCccAxesValues(s, c))){
+            // TODO really needed?
+            // needed for content linking
+            // onDoubleClickHeatGrid.call(this, s, c);
+        }
+    };
+};
 
 
-    dataOpts.seriesInRows = true;
+pentaho.ccc.CccChart.prototype._prepareOptionsBullet = function() {
+    var myself = this,
+        options = this.options;
 
+    options.legend = false;
+    
+     // Drill down on shapes
+    options.axisDoubleClickAction = function(d){
+        var c = d.title,
+            s = d.subtitle;
 
+        if(myself._drillDown(myself._readCccAxesValues(s, c))){
+            // TODO really needed?
+            // needed for content linking
+            // onDoubleClickHeatGrid.call(this, s, c);
+        }
+    };
+    
+    options.clickAction = function (c, s) {
+        myself._notifySelectionChanged(
+            [ myself._convertKeysSelectionCccToAnalyzer(s, c) ]);
+    };
+};
 
-    var totalSpace= (2 + vizOptions.bulletSize + vizOptions.bulletSpacing ) * resultset.length;
+pentaho.ccc.CccChart.prototype._prepareLayoutBullet = function(){
+    var vizOptions = this._vizOptions;
 
-    if (vizOptions.orientation == 'horizontal') {
-      if (totalSpace > vizOptions.height) {
-        vizOptions.controller.domNode.style.overflowY = 'auto';
-        vizOptions.controller.domNode.style.overflowX = 'hidden';
-        vizOptions.height = totalSpace;
-      }
+    var isVertical = vizOptions.orientation == 'vertical';
+    if (this._resultset.length > 20) {
+        vizOptions.bulletSize = 10;
+        vizOptions.bulletSpacing = isVertical ? 60 : 20;
+    } else if (this._resultset.length > 10) {
+        vizOptions.bulletSize = 15;
+        vizOptions.bulletSpacing = isVertical ? 80 : 30;
     } else {
-      if (totalSpace > vizOptions.width) {
-        vizOptions.controller.domNode.style.overflowX = 'auto';
-        vizOptions.controller.domNode.style.overflowY = 'hidden';
-        vizOptions.width = totalSpace;
-      }
-
-
+        vizOptions.bulletSize = 20;
+        vizOptions.bulletSpacing = isVertical ? 120 : 50;
     }
 
+    var totalSpace = (2 + vizOptions.bulletSize + vizOptions.bulletSpacing) *
+                     this._resultset.length;
 
-    //drill down on axis
-    opts.axisDoubleClickAction =  function (d) {
-      var ctxArray = [];
-      var rowItems = {};
+    // TODO: vizOptions.controller.domNode
+    if (isVertical) {
+        if (totalSpace > vizOptions.width) {
+            vizOptions.controller.domNode.style.overflowX = 'auto';
+            vizOptions.controller.domNode.style.overflowY = 'hidden';
 
-      var path = d.title.split(' ~ ');
-      var formula = getCategoriesAttributesFormulas()[path.length - 1].value;
-      //cv.getActiveReport().reportDoc.getReportNode().selectNodes('cv:rowAttributes/cv:attribute/@formula')[path.length - 1].value;
+            vizOptions.width = totalSpace;
+        }
+    } else {
+        if (totalSpace > vizOptions.height) {
+            vizOptions.controller.domNode.style.overflowY = 'auto';
+            vizOptions.controller.domNode.style.overflowX = 'hidden';
 
-      var member = formula + '.[' + path[path.length-1] + ']';
-      var ctx = {formula:formula, member:member,
-        action: "KEEP_AND_DRILL",
-        caption: cv.util.parseMDXExpression(member, false)
-      };
-      ctxArray.push(ctx);
+            vizOptions.height = totalSpace;
+        }
+    }
+};
 
-      path = d.subtitle.split('~');
-      path = path.splice(path.length -1, 1);
-      formula = getSeriesAttributesFormulas()[path.length - 1].value;
-      //cv.getActiveReport().reportDoc.getReportNode().selectNodes('cv:columnAttributes/cv:attribute/@formula')[path.length - 1].value;
 
-      ctx = {formula:formula, member:formula + '.[' + path[path.length-1] + ']',
-//        action: "KEEP_AND_DRILL",
-        caption: cv.util.parseMDXExpression(path[path.length-1], false)
-      };
-      //    ctxArray.push(ctx);
-      cv.getActiveReport().clickChart(ctxArray, true);
+// TODO - probably the skip logic should be inverted,
+// this would be specified in terms of inclusion of CCC options.
+pentaho.ccc.CccChart.prototype._shouldSkipVizOption = function(option){
+    return (option in skipVizOtions);
+};
+
+/**
+ * Set of visualization options that
+ * should not be copied to the CCC options.
+ */
+var skipVizOtions = pv.dict([
+        'cccClass',
+        'crosstabMode',
+        'extensionPoints',
+        'action',
+        'autoRange',
+        'backgroundColorEnd',
+        'backgroundFill',
+        'chartType',
+        'controller',
+        'customChartType',
+        'displayUnits',
+
+        'labelSize',
+        'labelStyle',
+
+        'legendBackgroundColor',
+        'legendColor',
+        'legendFontFamily',
+        'legendStyle',
+
+         // NOTE: analyzer's legendSize is more like a "legentFontSize",
+         // while CCC's is the legend panel's size (width or height)
+        'legendSize',
+
+        'lineShape',
+        'maxChartsPerRow',
+        'maxValues',
+        'metrics',
+        'palette',
+        'selections',
+        'seriesIncludeMeasures'
+    ],
+    function(){ return true; });
+
+    
+/*
+ * RENDER
+ */
+
+pentaho.ccc.CccChart.prototype._renderChart = function(){
+    while(this._element.firstChild) {
+        this._element.removeChild(this._element.firstChild);
+    }
+
+    // TODO - if we don't recreate a new chart it does not display new data, fix this...
+    // if( this._currentChartType != vizOptions.cccClass ) {
+    this._currentChartType = this._vizOptions.cccClass;
+
+    var chartClass = eval("(" + this._currentChartType + ")"); // TODO - get rid of eval
+
+    this._chart = new chartClass(this.options);
+    this._chart.setData($.extend(true, {}, this._cdaTable), this._dataOptions);
+    this._chart.render();
+};
+
+// -----------------------------
+// INTERACTIVE / CLIENT-SIDE ONLY
+pentaho.ccc.CccChart.prototype._readCccAxesValues = function(s, c){
+    // Ensure arrays
+    var rowVals = readCccValue(c),
+        colVals = readCccValue(s);
+
+    // TODO: this options is really needed
+    // or can be infered from the way data is sent?
+    if(colVals && this._vizOptions.seriesIncludeMeasures){
+        // Remove the last element from series,
+        // because it's the measure's name
+        colVals.pop();
+    }
+
+    var axesVals = {
+        row:     rowVals,
+        column:  colVals,
+        measure: null // filled below, after "absolutization"
     };
 
-
-
-    opts.clickAction = function (c, s, d) {
-      var numMeasures = cv.getActiveReport().reportDoc.getReportNode().selectNodes("cv:measures/cv:measure").length;
-      var selections = [];
-      var categoryColNo = 0;
-      var seriesRowNo = 0;
-      var seriesColStart=categoriesCount;
-
-      var selection = {
-        type: 'cell',
-        rowLabel: myself.dataTable.getColumnLabel(categoriesCount - 1)
-
-      };
-      for (var rowNo = 0; rowNo < myself.dataTable.getNumberOfRows(); rowNo++)
-      {
-        //category -> row
-        var categories = [];
-        for (var j = categoryColNo; j < categoriesCount; j++) {
-          categories.push(myself.dataTable.getFormattedValue(rowNo, j));
-
+    /**
+     * Ensure key axes values are absolute
+     */
+    this._keyAxes.forEach(function(axis){
+        var vals = axesVals[axis];
+        if(vals){
+            axesVals[axis] = this._buildMdxAbsoluteValues(this._allAxesInfo[axis], vals);
         }
-        if (categoryMatches([c], categories))
-        {
-          selection.row = rowNo;
-          var rowItems = [],
-              rowIds = [];
-          for (var j = categoryColNo; j < categoriesCount; j++) {
-            rowItems.push(myself.dataTable.getValue(rowNo, j));
-            rowIds.push(myself.dataTable.getColumnId(j));
+    }, this);
 
-          }
-          selection.rowItem = rowItems;
-          selection.rowId = rowIds;
-          break;
+    // Array of measure cells: {v:..., f:...}, or null
+    axesVals.measure = this._getCrossCell(axesVals.row, axesVals.column);
 
-        }
+    return axesVals;
+};
 
-      }
-      for (var colNo = seriesColStart; colNo < myself.dataTable.getNumberOfColumns(); colNo += numMeasures)
-      {
-        //just catch first occurrence
-        if (seriesMatches(s, myself.dataTable.getColumnId(colNo))) {
-          selection.column = colNo;
-          //get measure out
-          var colId = myself.dataTable.getColumnId(colNo);
-          var endSplitIdx = colId.lastIndexOf('~');
-          if (endSplitIdx < 0) {
-            endSplitIdx = colId.length - 1;
-          }
-          selection.columnItem = colId.substring(0, endSplitIdx).split('~');
-          selection.measureId = colId.substring(endSplitIdx + 1, colId.length);
+pentaho.ccc.CccChart.prototype._getCrossCell = function(rowVals, colVals){
+    if(!rowVals || !colVals){
+        return null;
+    }
 
-          var columnIds = [];
-          var columnIdNodes = getSeriesAttributesFormulas();// cv.getActiveReport().reportDoc.getReportNode().selectNodes('cv:columnAttributes/cv:attribute/@formula');
-          for (var j = 0; j < columnIdNodes.length; j++) {
-            columnIds.push(columnIdNodes[j].firstChild.data);
+    var result = this._crossTable.childrenByKey[rowVals.join('~')];
+    if(result){
+        result = result.childrenByKey[colVals.join('~')];
+    }
+    
+    return result && result.measures;
+};
 
-          }
-          selection.columnId = columnIds;
-          selection.columnLabel = myself.dataTable.getColumnLabel(colNo);
-          break;
+/*
+ * TOOLTIPS
+ */
 
-        }
+// NOTE: tooltips are NOT rendered on the server,
+//  because showTooltips is set to false.
+pentaho.ccc.CccChart.prototype._getTooltipText = function(axesVals){
+    /**
+     * Array of HTML lines which constitute the tooltip.
+     * @see describeAxis
+     */
+    var tooltipLines = [];
 
-      }
-      if (selection.row != null && selection.column != null) {
-        selection.value = myself.dataTable.getValue(selection.row, selection.column);
+    /**
+     * Add tooltip lines with the pairs "form: value" for each of the roles.
+     */
+    this._allAxes.forEach(function(axis){
+        describeAxis.call(this, this._allAxesInfo[axis], axesVals[axis]);
+    }, this);
 
-      }
-      selections.push(selection);
+    /**
+     * Add drill-down information to the tooltip.
+     */
+    var drillDownInfo = this._getDrillDownInfo(axesVals);
+    if(drillDownInfo){
+        tooltipLines.push(
+            "<div class='tipsy-footer'>Double-click to show " +
+                escapeHtml(this._vizHelper.getFormulaLabel(drillDownInfo.directChild)) +
+            "</div>");
+    }
 
-      var args = {
-        source: myself,
-        selections: selections,
+    /**
+     * Join tooltip lines with HTML line breaks.
+     */
+    return tooltipLines.join('<br />');
+    
+    /** @instance */
+    function describeAxis(axisInfo, values){
+        axisInfo.formulasInfo.forEach(function(formInfo, index){
+            var value = pvc.nullTo(
+                            this._getAxisValueLabel(axisInfo.id, values[index]),
+                            "-");
+            
+            // ex: "Line: Ships"
+            tooltipLines.push(escapeHtml(formInfo.label) + ': ' + escapeHtml(value));
+        }, this);
+    }
+};
+
+
+/*
+ * SELECTION
+ */
+pentaho.ccc.CccChart.prototype._notifySelectionChanged = function(selections){
+    pentaho.events.trigger(this, "select", {
+        source:        this,
+        selections:    selections,
         selectionMode: "REPLACE"
-      };
-      pentaho.events.trigger(myself, "select", args);
-    };
+    });
+};
+
+pentaho.ccc.CccChart.prototype._notifyCccSelectionChanged = function(cccSelections){
+    this._notifySelectionChanged(this._convertSelectionsCccToAnalyzer(cccSelections));
+};
 
 
-  }
+/**
+ * Converts CCC selections to Analyzer selections.
+ * Used on selection changed and on axes' drill down.
+ *
+ * A CCC selection is an instance of pvc.Datum.
+ * Its relevant part has the structure:
+ * {
+ *   keyValues: {
+ *      series:   ["[Time].[2003]", "[Time].[2003].[QTR4]"]
+ *      category: ["[Markets].[EMEA]", "[Order Status].[Resolved]"]
+ *   }
+ *
+ *   value: array
+ * }
+ *
+ * axesVals:
+ * {
+ *     column:  s,
+ *     row:     c,
+ *     measure: v
+ * }
+ * 
+ * A corresponding Analyzer selection would have the
+ * following structure:
+ * {
+ *    type:     'cell',
+ *
+ *    column:      table column index ??
+ *    columnId:    ["[Time].[Years]", "[Time].[Quarters]"   ], // formulas
+ *    columnItem:  ["[Time].[2003]",  "[Time].[2003].[QTR4]"], // values
+ *    columnLabel: "2003~QTR4~Sales",
+ *
+ *    row:          table row index ??
+ *    rowId:       ["[Markets].[Territory]", "[Order Status].[Type]"    ]  // formulas
+ *    rowItem:     ["[Markets].[EMEA]",      "[Order Status].[Resolved]"], // values
+ *    rowLabel:    "Type",
+ *
+ *    value:       28550.59 // formatted joined by ~ ?
+ * }
+ */
+pentaho.ccc.CccChart.prototype._convertSelectionsCccToAnalyzer = function(cccSelections){
+    return cccSelections.map(this._convertSelectionCccToAnalyzer, this);
+};
 
-  // copy options from the visualization metadata to the chart options
-  for( x in vizOptions ) {
-    if( x != 'cccClass' && x != 'crosstabMode' && x != 'extensionPoints') {
-      opts[x] = vizOptions[x];
+pentaho.ccc.CccChart.prototype._convertSelectionCccToAnalyzer = function(cccSelection){
+    return this._convertKeysSelectionCccToAnalyzer(
+                        cccSelection.keyValues.series,
+                        cccSelection.keyValues.categories);
+};
+
+pentaho.ccc.CccChart.prototype._convertKeysSelectionCccToAnalyzer = function(s, c){
+    /**
+     * Values for each axis.
+     * Convert CCC selection to an axesVals.
+     */
+    var axesVals = this._readCccAxesValues(s, c);
+
+    return this._convertAxesValuesToAnalyzerSelection(axesVals);
+};
+
+pentaho.ccc.CccChart.prototype._convertAxesValuesToAnalyzerSelection = function(axesVals){
+    /**
+     * The Analyzer cell-selection object.
+     */
+    var selection = {type: 'cell'};
+
+    /**
+     * Add each key axis info to 'selection'.
+     */
+    this._keyAxes.forEach(addKeyAxisSelectionInfo, this);
+
+    /**
+     * Add a description of the selected values.
+     * Currently, Analyzer discards selection.value
+     */
+    selection.value = axesVals.measure.map(function(cell){ return cell.f; })
+                        .join(" ~ ");
+
+    return selection;
+
+    // --------------
+    // Helper functions
+
+    /** @instance */
+    function addKeyAxisSelectionInfo(axis){
+        var axisInfo = this._allAxesInfo[axis],
+            vals = axesVals[axis];
+
+        if(vals && vals.length){
+            // Dummy property, just to force Analyzer to read the axis info
+            selection[axis] = true;
+            selection[axis + 'Id'] = axisInfo.formulas;
+            selection[axis + 'Item'] = this._buildMdxAbsoluteValues(axisInfo, vals);
+            selection[axis + 'Label'] = this._getAxisValueLabel(axis, vals[vals.length - 1]);
+        }
     }
-  }
-  if( vizOptions.extensionPoints ) {
-    opts.extensionPoints = {};
-    for( x in vizOptions.extensionPoints ) {
-      opts.extensionPoints[x] = vizOptions.extensionPoints[x];
+};
+
+/*
+ * DRILLING
+ */
+pentaho.ccc.CccChart.prototype._drillDown = function(axesVals){
+    /**
+     * Information about the axis and formula to drill on.
+     */
+    var drillInfo = this._getDrillDownInfo(axesVals);
+    if(!drillInfo){
+        // Drilling is disabled OR Nothing to drill on.
+        // A double-click is sent to support "content linking".
+        pentaho.events.trigger(this, "doubleclick", {
+            source:     this,
+            selections: [this._convertAxesValuesToAnalyzerSelection(axesVals)]
+        });
+
+        return false;
     }
-  }
 
-  // create the CDA table
-  this.cdaTable = {
-    metadata: metadata,
-    resultset: resultset
-  };
+    /**
+     * The context for the click action.
+     * Stores 'KEEP' and 'KEEP_AND_DRILL' instructions.
+     * @see useFormula
+     */
+    var actionContext = [];
 
-  while(this.element.firstChild) {
-    this.element.removeChild(this.element.firstChild);
-  }
+    /**
+     * The set of hierarchy names
+     * already included in 'actionContext'.
+     *
+     * Only one instruction per dimension hierarchy is generated.
+     * Each instruction fixes the value of 
+     * the deepest used formula of a hierarchy
+     * to the MDX absolute value present in 'axesVals'.
+     * @see keep
+     * @see useFormula
+     */
+    var usedHierarchiesSet = {};
 
-  // TODO -if we don't recreate a new chart it does not display new data, fix this...
-  // if( this.currentChartType != vizOptions.cccClass ) {
-  this.chart = eval("new "+vizOptions.cccClass+"(opts)");
+    /* Drill on drillInfo.axis */
+    keepAndDrill.call(this, drillInfo);
 
-  this.currentChartType = vizOptions.cccClass;
-  // }
+    /**
+     * Keep values from hierarchies other than the drilled one.
+     */
+    this._keyAxes.forEach(function(axis){
+        var vals = axesVals[axis];
+        if(vals){
+            keep.call(this, this._allAxesInfo[axis].formulasInfo, vals);
+        }
+    }, this);
+    
+    // --------------
 
-  this.chart.setData($.extend(true, {}, this.cdaTable),dataOpts);
-  this.chart.render();
-}
+    // Maintains other existing filters
+    var keepGem = true;
+    this._vizHelper.click(actionContext, keepGem);
+
+    return true;
+
+    // ----------------
+    // Helper methods
+
+    /** @instance */
+    function keepAndDrill(drillInfo){
+        return useFormula.call(this, drillInfo.formulaInfo, drillInfo.values, 'KEEP_AND_DRILL');
+    }
+
+    /** @instance */
+    function keep(formsInfo, vals){
+        formsInfo.forEach(function(formInfo){
+            // Only include formulas of a given hierarchy once
+            if(!(formInfo.hierarchy in usedHierarchiesSet)){
+                // Find the most specific formula in forms, of this hierarchy
+                var deepestInfo = this._getDeepestIncludedLevelOfHierarchy(formInfo, vals.length);
+
+                useFormula.call(this, deepestInfo.formulaInfo, vals, 'KEEP');
+            }
+        }, this);
+    }
+
+    /** @instance */
+    function useFormula(formInfo, vals, action){
+        usedHierarchiesSet[formInfo.hierarchy] = true;
+        
+        var axisInfo = formInfo.axis,
+            hvalue = this._buildMdxAbsoluteValue(axisInfo, formInfo.index, vals);
+
+        actionContext.push({
+            action:  action,
+            formula: formInfo.formula,
+            member:  hvalue,
+            caption: escapeHtml(formInfo.axis.valueLabel[hvalue])
+        });
+    }
+};
+
+pentaho.ccc.CccChart.prototype._getDrillDownInfo = function(axesVals){
+    if(!this._vizHelper.isDrillEnabled()){
+        return null;
+    }
+
+    /**
+     * The axis to drill on.
+     */
+    for(var i = 0 ; i < this._keyAxes.length ; i++){
+        var axis = this._keyAxes[i],
+            vals = axesVals[axis],
+            V;
+
+        if(vals && (V = vals.length)){
+            var axisInfo = this._allAxesInfo[axis];
+            if(axisInfo.depth === V){
+                // Drill on the *hierarchy* of the last form in the axis
+                var formsInfo = axisInfo.formulasInfo,
+                    formInfo  = formsInfo[V - 1];
+
+                // Find the most specific formula of the hierarchy of 'form'
+                // that does not exceed the available values.
+                var drillInfo = this._getDeepestIncludedLevelOfHierarchy(formInfo, V);
+                if(drillInfo && drillInfo.directChild){
+                    // Make deepestInfo into a drillInfo.
+                    drillInfo.values = vals;
+                    return drillInfo;
+                }
+            }
+        }
+    }
+
+    return null;
+};
+
+/**
+ * Finds the formula in 'forms',
+ * that is of the same hierarchy of the form 'hierarchyForm',
+ * and is the deepest.
+ * If 'maxDepth' is specified, then, additionally,
+ * that form must have an index in 'forms' that is less than 'maxDepth'.
+ *
+ * Returns the following information, about the found form, if any:
+ * <pre>
+ * var deepestInfo = {
+ *    formulaInfo: the deepest formula info object
+ *    directChild: "[child formula]" // the direct child formula of .formula, if any
+ * };
+ * </pre>
+ */
+pentaho.ccc.CccChart.prototype._getDeepestIncludedLevelOfHierarchy = function(formInfo, maxDepth){
+    var excludeChildren = false,
+        
+        // All the forms from the hierarchy of 'formInfo'
+        // Some may not be included in 'formInfo.axis.formulas'.
+        hForms  = this._vizHelper.getHierarchyFormulas(formInfo.formula, false, excludeChildren),
+
+        // A map with the index of each form in 'forms'
+        formsIndexes = pv.numerate(formInfo.axis.formulas);
+
+    for(var i = hForms.length - 1 ; i >= 0  ; i--){
+        var hFormIndex = formsIndexes[hForms[i]];
+
+        if(hFormIndex != null && hFormIndex < maxDepth){
+            // Belongs to the axis' forms
+            return {
+                formulaInfo: formInfo.axis.formulasInfo[hFormIndex],
+                directChild: hForms[i + 1] || null
+                //hierarchyFormulas: hForms
+            };
+        }
+    }
+
+    return null;
+};
+
+pentaho.ccc.CccChart.prototype._buildMdxAbsoluteValues = function(axisInfo, vals){
+    return vals.map(function(/** @ignore */val, index){
+        return this._buildMdxAbsoluteValue(axisInfo, index, vals);
+    }, this);
+};
+
+pentaho.ccc.CccChart.prototype._buildMdxAbsoluteValue = function(
+                    axisInfo,
+                    targetIndex,
+                    vals){
+
+    var targetVal = vals[targetIndex];
+
+    // Empty value or
+    // already an MDX absolute value?
+    if(targetVal == null ||
+       targetVal === ''  ||
+       targetVal.charAt(0) === "["){
+        return targetVal;
+    }
+
+    var targetFormInfo = axisInfo.formulasInfo[targetIndex],
+        hierarchy = targetFormInfo.hierarchy,
+        forms  = axisInfo.formulas,
+        // Hierarchy id already comes in brackets
+        mdxVals = [ hierarchy ];
+
+    // Traverse all ascendant formulas up to and including 'targetFormInfo.formula'
+    var excludeChildren = true;
+    this._vizHelper.getHierarchyFormulas(targetFormInfo.formula, false, excludeChildren)
+        .forEach(function(levelForm){
+            var index = forms.indexOf(levelForm);
+            if(index >= 0){
+                mdxVals.push("[" + vals[index] + "]");
+            }
+            // Assume the value is not relevant :-/ ??
+        });
+
+    return mdxVals.join(".");
+};
 
 /*
  setHighlights
  Sets the items on the chart that should be highlighted
  */
-pentaho.ccc.CccChart.prototype.setHighlights = function( selections ) {
+pentaho.ccc.CccChart.prototype.setHighlights = function(selections) {
     if(!this._ownChange){ // reentry control
-        this.selections = selections;
-        if(this.chart.clearSelections && (!selections || selections.length == 0)){
+        this._selections = selections;
+        if(this._chart.clearSelections && (!selections || selections.length == 0)){
             // will cause selectionChangedAction being called
             this._ownChange = true;
             try{
-                this.chart.clearSelections();
+                this._chart.clearSelections();
             } finally{
                 this._ownChange = false;
             }
         }
 
-        if( this.dataTable && this.vizOptions ) {
-        //disabled   this.draw(this.dataTable, this.vizOptions);
-        }
+//        if(this._dataTable && this._vizOptions) {
+//        //disabled   this.draw(this._dataTable, this._vizOptions);
+//        }
     }
-}
+};
 
-/*
- getColors
- Returns the colors to use. This needs to take into account selected and unselected items.
- */
-pentaho.ccc.CccChart.prototype.getColors = function() {
-
-  var paletteMap = this.vizOptions.metrics[0].paletteMap;
-  var colors = null;
-  if(paletteMap) {
-    colors = [];
-    for(var rowNo=0; rowNo<this.dataTable.getNumberOfRows(); rowNo++) {
-      var item = this.dataTable.getValue(rowNo,0);
-      if( this.selections && this.selections.length > 0) {
-        var done = false;
-        for( var selIdx=0; selIdx<this.selections.length; selIdx++) {
-          if( (this.selections[selIdx].type == 'row' && this.selections[selIdx].rowItem == item) ||
-              (this.selections[selIdx].type == 'column' && this.selections[selIdx].colId == this.dataTable.getColumnId(1))) {
-            colors.push( paletteMap[ item ] );
-            done = true;
-            break;
-          }
-        }
-        if(!done) {
-          // this item is not selected, so make it grey
-          colors.push( "#bbbbbb" );
-        }
-      } else {
-        colors.push( paletteMap[ item ] );
-      }
-    }
-  }
-  return colors;
-}
-
+// TODO: what's this for? Column/Bar?
 /*
  getOutputParameters
- Returns the output parameters of the chart
+ Returns the output parameters of the chart.
  */
 pentaho.ccc.CccChart.prototype.getOutputParameters = function() {
 
-  var params = [];
-  if (this.vizOptions.cccClass == 'pvc.PieChart') {
-    params.push( [
-      this.dataTable.getColumnId( 0 ),
-      true,
-      this.dataTable.getColumnId( 0 )
-    ] );
-  } else {
-    for( var colNo=0; colNo<this.dataTable.getNumberOfColumns(); colNo++ ) {
-      params.push( [
-        this.dataTable.getColumnId( colNo ),
-        true,
-        this.dataTable.getColumnId( colNo )
-      ] );
+    var params = [];
+    if (this._vizOptions.cccClass == 'pvc.PieChart') {
+        params.push( [
+            this._dataTable.getColumnId( 0 ),
+            true,
+            this._dataTable.getColumnId( 0 )
+        ]);
+    } else {
+        for(var j = 0 ; j < this._dataTable.getNumberOfColumns() ; j++) {
+            params.push( [
+                this._dataTable.getColumnId(j),
+                true,
+                this._dataTable.getColumnId(j)
+            ]);
+        }
     }
-  }
 
-  return params;
-
-}
+    return params;
+};
 
 pentaho.ccc.CccChart.prototype.resize = function(width, height){
-  this.vizOptions.width = width;
-  this.vizOptions.height = height;
+    var vizOptions = this._originalVizOptions;
 
-  this.draw(this.dataTable, this.vizOptions);
+    vizOptions.width  = width;
+    vizOptions.height = height;
+
+    this.draw(this._dataTable, vizOptions);
+};
+
+// TODO - is the current selection accounting needed?
+/*
+ getColors
+ Returns the colors to use.
+ This needs to take into account selected and unselected items.
+ */
+pentaho.ccc.CccChart.prototype.getColors = function() {
+    if(this._colors){
+        return this._colors;
+    }
+
+    var colors = null;
+
+    var paletteMap = this._vizOptions.metrics[0].paletteMap;
+    if(paletteMap) {
+        colors = [];
+        for(var r = 0 ; r < this._dataTable.getNumberOfRows() ; r++) {
+            var item = this._dataTable.getValue(r,0);
+            if(this._selections && this._selections.length > 0) {
+                var done = false;
+                for(var selIdx = 0 ; selIdx < this._selections.length ; selIdx++) {
+                    var selection = this._selections[selIdx];
+                    if((selection.type == 'row'    && selection.rowItem == item) ||
+                       (selection.type == 'column' && selection.colId == this._dataTable.getColumnId(1))) {
+                        colors.push(paletteMap[item]);
+                        done = true;
+                        break;
+                    }
+                }
+
+                if(!done) {
+                    // this item is not selected, so make it grey
+                    colors.push( "#bbbbbb" );
+                }
+
+            } else {
+                colors.push(paletteMap[item]);
+            }
+        }
+    }
+
+    return colors;
+};
+
+// @private
+// @static
+function readCccValue(v){
+    if(v != null && !(v instanceof Array)){
+        // Ensure grouped values/attributes are correctly turned into arrays
+        v = ('' + v).split('~');
+    }
+
+    return v;
 }
 
+// @private
+// @static
+function writeCccColumnDataType(colType){
+    switch(colType){
+        case 'string': return 'STRING';
+        case 'number': return 'NUMERIC';
+    }
+
+    throw new Error("Unsupported data type");
+}
+
+// @private
+// @static
+function createTable(rowCount, colCount, readCellValue, context){
+    var table = new Array(rowCount);
+    for(var tr = 0; tr < rowCount; tr++) {
+        var row = new Array(colCount);
+
+        for(var tc = 0 ; tc < colCount ; tc++){
+            row[tc] = readCellValue.call(context, tr, tc);
+        }
+
+        table[tr] = row;
+    }
+
+    return table;
+}
+
+// @private
+// @static
+// from cv.util.escapeHtml
+function escapeHtml(str, noSingleQuotes){
+    str = str.replace(/&/gm, "&amp;")
+             .replace(/</gm, "&lt;")
+             .replace(/>/gm, "&gt;").replace(/"/gm, "&quot;");
+
+    if(!noSingleQuotes){
+        str = str.replace(/'/gm, "&#39;");
+    }
+    
+    return str;
+}
+
+// @private
+// @static
+function assert(condition, conditionMessage){
+    if(!condition){
+        var message = "Assertion failed.";
+        if(conditionMessage != null){
+            message += "\n\"" + conditionMessage + "\"";
+        }
+
+        throw new Error(message);
+    }
+}
+
+// from pentaho / cv
+function createVizDataReq(rowLabel, columnLabel, measureLabel, hasMulti) {
+    var json = [
+      { id: 'rows',
+        dataType: 'string',
+        dataStructure: 'column',
+        caption: rowLabel,
+        required: true,
+        allowMultiple: true,
+        zoneId: "rowAttributes",
+        defaultAppend: true
+      },
+      { id: 'columns',
+        dataType: 'string',
+        dataStructure: 'column',
+        caption: columnLabel,
+        required: false,
+        allowMultiple: true,
+        zoneId:"rowAttributes" // Only pivot table should use the columnAttribute zone
+      },
+      { id: 'measures',
+        dataType: 'number',
+        dataStructure: 'column',
+        caption: measureLabel,
+        required: true,
+        allowMultiple: true,
+        zoneId: "measures",
+        defaultAppend: true
+      }
+    ];
+    if (hasMulti)
+      json.push({ id: 'multi',
+        dataType: 'string',
+        dataStructure: 'column',
+        caption: cvCatalog['dropZoneLabels_MULTI_CHART'],
+        allowMultiple: false,
+        required: false,
+        zoneId: "rowAttributes"
+      });
+    return json;
+}
+
+})(); // END Private Scope
