@@ -1,4 +1,4 @@
-var pentaho = this.pentaho || {};
+pentaho = typeof pentaho != "undefined" ? pentaho : {};
 
 // BEGIN Private Scope
 (function(){
