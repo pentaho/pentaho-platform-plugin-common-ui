@@ -6,9 +6,8 @@ analyzerPlugins.push({
 
         dojo.declare("analyzer.CCCVizHelper", null, {
 
-            // TODO: check this condition
             isDrillEnabled: function(){
-                return !(/cl=/).test(window.location.href);
+                return !(/\bcl=/).test(window.location.href);
             },
 
             /**
@@ -172,8 +171,10 @@ analyzerPlugins.push({
                     'ccc_heatgrid',
                     'ccc_bar',
                     'ccc_barstacked',
+                    'ccc_barnormalized',
                     'ccc_horzbar',
                     'ccc_horzbarstacked',
+                    'ccc_horzbarnormalized',
                     'ccc_bulletchart'
                 ];
 

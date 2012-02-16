@@ -25,25 +25,17 @@ function defVisualization(viz){
  Visualization Metadata
  These objects describe the visualizations provided by this library.
  */
-defVisualization({
-  id: 'ccc_bar',                          // unique identifier
-  type: 'barchart',                       // generic type id
-  source: 'CCC',                          // id of the source library
-  name: 'CCC Column',                     // visible name, this will come from a properties file eventually
-  'class': 'pentaho.ccc.CccChart',          // type of the Javascript object to instantiate
-  args: {                                 // arguments to provide to the Javascript object
-    cccClass: 'pvc.BarChart',
-    orientation: 'vertical',
-    stacked: false,
-
+var lineStrokeStyle = '#A0A0A0', // #D8D8D8',// #f0f0f0
+    baseBarChartArgs = {
+    cccClass: 'pvc.BarChart', // Default
+    
     legend: true,
-    legendPosition: 'bottom',
-
-    panelSizeRatio: 0.8,
+    
+    panelSizeRatio: 0.6,
 
     //axisOffset:  0.1,
 
-    yAxisPosition: 'left',
+    //yAxisPosition: 'left',
     yAxisSize:     100,
     yAxisFullGrid: true,
     yAxisEndLine:  true,
@@ -51,20 +43,21 @@ defVisualization({
     yAxisDesiredTickCount: 10,
 
     xAxisFullGrid: true,
+    xAxisSize:     100,
     xAxisEndLine:  true,
     xAxisDesiredTickCount: 10,
     xAxisDomainRoundMode: 'tick',
 
     extensionPoints: {
-        yAxisGrid_strokeWidth: "1px",
-	yAxisGrid_strokeStyle: '#D8D8D8',
-        
-        xAxisGrid_strokeWidth: "1px",
-	xAxisGrid_strokeStyle: '#D8D8D8',
-        
-        xAxisLabel_textAngle:    -1,
-        xAxisLabel_textAlign:    "right",
-        xAxisLabel_textBaseline: "top"
+        yAxisRule_strokeStyle: lineStrokeStyle,
+        yAxisEndLine_strokeStyle: lineStrokeStyle,
+        yAxisGrid_strokeWidth:  "2px",
+        yAxisGrid_strokeStyle:  lineStrokeStyle,
+
+        xAxisRule_strokeStyle: lineStrokeStyle,
+        xAxisEndLine_strokeStyle:  lineStrokeStyle,
+        xAxisGrid_strokeWidth: "2px",
+        xAxisGrid_strokeStyle: lineStrokeStyle
     },
 
     tipsySettings: {
@@ -73,9 +66,57 @@ defVisualization({
         fade: false,
         followMouse:true
     },
-    
+
     seriesIncludeMeasures: true
-  },
+};
+
+var baseVertiBarChartArgs = pvc.create(baseBarChartArgs);
+pvc.mergeOwn(baseVertiBarChartArgs, {
+    legendPosition: 'right',
+    legendAlign: 'top',
+
+    // Inherit extension points also!
+    extensionPoints: pvc.create(baseBarChartArgs.extensionPoints)
+});
+
+pvc.mergeOwn(baseVertiBarChartArgs.extensionPoints, {
+    xAxisLabel_textAngle:    -Math.PI/6,
+    xAxisLabel_textAlign:    "right",
+    xAxisLabel_textBaseline: "top",
+    yAxisTicks_strokeStyle:  lineStrokeStyle
+});
+
+// -----
+
+var baseHorizBarChartArgs = pvc.create(baseBarChartArgs);
+pvc.mergeOwn(baseHorizBarChartArgs, {
+    orientation:   'horizontal',
+    yAxisSize:       150,
+    xAxisSize:       50,
+    xAxisPosition: 'top',
+    legendPosition: 'right',
+    legendAlign:     'middle',
+    
+    // Inherit extension points also!
+    extensionPoints: pvc.create(baseBarChartArgs.extensionPoints)
+});
+
+pvc.mergeOwn(baseHorizBarChartArgs.extensionPoints, {
+    xAxisTicks_strokeStyle: '#D8D8D8'
+});
+
+// ----
+
+defVisualization({
+  id: 'ccc_bar',                          // unique identifier
+  type: 'barchart',                       // generic type id
+  source: 'CCC',                          // id of the source library
+  name: 'CCC Column',                     // visible name, this will come from a properties file eventually
+  'class': 'pentaho.ccc.CccChart',          // type of the Javascript object to instantiate
+  args: pvc.mergeOwn(
+            pvc.create(baseVertiBarChartArgs),
+            {
+            }),
   propMap: [],
   // dataReqs describes the data requirements of this visualization
   dataReqs: [
@@ -92,52 +133,11 @@ defVisualization({
   source: 'CCC',
   name: 'CCC Stacked Column',
   'class': 'pentaho.ccc.CccChart',
-  args: {                                 // arguments to provide to the Javascript object
-    cccClass: 'pvc.BarChart',
-    orientation: 'vertical',
-    stacked: true,
-
-    legend: true,
-    legendPosition: 'bottom',
-
-    panelSizeRatio: 0.8,
-
-    //axisOffset:  0.1,
-
-    yAxisPosition: 'left',
-    yAxisSize:     100,
-    yAxisFullGrid: true,
-    yAxisEndLine:  true,
-    yAxisDomainRoundMode: 'tick',
-    yAxisDesiredTickCount: 10,
-
-    xAxisFullGrid: true,
-    xAxisEndLine:  true,
-    xAxisDesiredTickCount: 10,
-    xAxisDomainRoundMode: 'tick',
-
-    extensionPoints: {
-        yAxisGrid_strokeWidth: "1px",
-	yAxisGrid_strokeStyle: '#D8D8D8',
-
-        xAxisGrid_strokeWidth: "1px",
-	xAxisGrid_strokeStyle: '#D8D8D8',
-
-        xAxisLabel_textAngle:    -1,
-        xAxisLabel_textAlign:    "right",
-        xAxisLabel_textBaseline: "top"
-    },
-
-    tipsySettings: {
-        html: true,
-        gravity: "c",
-        fade: false,
-        followMouse:true
-    },
-
-    seriesIncludeMeasures: true
-  },
-
+  args: pvc.mergeOwn(
+            pvc.create(baseVertiBarChartArgs),
+            {
+                stacked: true
+            }),
   propMap: [],
   dataReqs: [
     {
@@ -153,40 +153,10 @@ defVisualization({
   source: 'CCC',
   name: 'CCC Bar',
   'class': 'pentaho.ccc.CccChart',
-  args: {
-    cccClass: 'pvc.BarChart',
-
-    orientation: 'horizontal',
-    stacked: false,
-
-    yAxisPosition: 'left',
-    yAxisSize:     100,
-    yAxisFullGrid: true,
-    yAxisEndLine:  true,
-    
-    xAxisPosition: 'bottom',
-    xAxisFullGrid: true,
-    xAxisEndLine:  true,
-    xAxisDesiredTickCount: 10,
-    xAxisDomainRoundMode: 'tick',
-
-    extensionPoints: {
-        yAxisGrid_strokeWidth: "1px",
-	yAxisGrid_strokeStyle: '#D8D8D8',
-
-        xAxisGrid_strokeWidth: "1px",
-	xAxisGrid_strokeStyle: '#D8D8D8'
-    },
-
-    tipsySettings: {
-        html: true,
-        gravity: "c",
-        fade: false,
-        followMouse:true
-    },
-
-    seriesIncludeMeasures: true
-  },
+  args:  pvc.mergeOwn(
+            pvc.create(baseHorizBarChartArgs),
+            {
+            }),
   propMap: [],
   dataReqs: [
     {
@@ -202,40 +172,51 @@ defVisualization({
   source: 'CCC',
   name: 'CCC Stacked Bar',
   'class': 'pentaho.ccc.CccChart',
-  args: {
-    cccClass: 'pvc.BarChart',
+  args:  pvc.mergeOwn(
+            pvc.create(baseHorizBarChartArgs),
+            {
+                stacked: true
+            }),
+  propMap: [],
+  dataReqs: [
+    {
+      name: 'Default',
+      reqs : createVizDataReq("Category", "Series", "Value")
+    }
+  ]
+});
 
-    orientation: 'horizontal',
-    stacked: true,
+defVisualization({
+  id: 'ccc_barnormalized',
+  type: 'barchart',
+  source: 'CCC',
+  name: 'CCC 100% Stacked Column',
+  'class': 'pentaho.ccc.CccChart',
+  args: pvc.mergeOwn(
+            pvc.create(baseVertiBarChartArgs),
+            {
+                cccClass: 'pvc.NormalizedBarChart'
+            }),
+  propMap: [],
+  dataReqs: [
+    {
+      name: 'Default',
+      reqs : createVizDataReq("Category", "Series", "Value")
+    }
+  ]
+});
 
-    yAxisPosition: 'left',
-    yAxisSize:     100,
-    yAxisFullGrid: true,
-    yAxisEndLine:  true,
-
-    xAxisPosition: 'bottom',
-    xAxisFullGrid: true,
-    xAxisEndLine:  true,
-    xAxisDesiredTickCount: 10,
-    xAxisDomainRoundMode: 'tick',
-
-    extensionPoints: {
-        yAxisGrid_strokeWidth: "1px",
-	yAxisGrid_strokeStyle: '#D8D8D8',
-
-        xAxisGrid_strokeWidth: "1px",
-	xAxisGrid_strokeStyle: '#D8D8D8'
-    },
-
-    tipsySettings: {
-        html: true,
-        gravity: "c",
-        fade: false,
-        followMouse:true
-    },
-
-    seriesIncludeMeasures: true
-  },
+defVisualization({
+  id: 'ccc_horzbarnormalized',
+  type: 'horzbarchart',
+  source: 'CCC',
+  name: 'CCC 100% Stacked Bar',
+  'class': 'pentaho.ccc.CccChart',
+  args:  pvc.mergeOwn(
+            pvc.create(baseHorizBarChartArgs),
+            {
+                cccClass: 'pvc.NormalizedBarChart'
+            }),
   propMap: [],
   dataReqs: [
     {
@@ -435,10 +416,6 @@ defVisualization({
     useCompositeAxis:true,
     colorValIdx: 0,
     sizeValIdx:  1,
-    dataOptions: {
-      categoriesCount: 1,
-      measuresInColumns: true
-    },
     ctrlSelectMode: false,
     tipsySettings: {
         html: true,
@@ -583,13 +560,7 @@ defVisualization({
     extensionPoints: [["bulletRuleLabel_font","7pt sans"]],
     normPerBaseCategory: true,
     useShapes: true,
-//    isMultiValued: true,
-    useCompositeAxis:true,
-    dataOptions: {
-      categoriesCount: 1,
-      measuresInColumns: true
-    }
-
+    useCompositeAxis:true
   },
   propMap: [],
   dataReqs: [
@@ -670,7 +641,6 @@ pentaho.ccc.CccChart = function(element) {
  */
 pentaho.ccc.CccChart.prototype.draw = function(dataTable, vizOptions) {
 
-    // TODO: is this the correct way to access the visualization helper?
     this._vizHelper = cv.pentahoVisualizationHelpers[vizOptions.customChartType];
 
     // Reset support fields
@@ -720,11 +690,9 @@ pentaho.ccc.CccChart.prototype._initializeOptions = function(vizOptions){
     var chartArgsExtPoints = this.controller.currentViz.args.extensionPoints;
     if(chartArgsExtPoints){
         var vizExtPoints = vizOptions.extensionPoints;
-        pvc.forEachOwn(chartArgsExtPoints, function(v, p){
-            if(!vizExtPoints.hasOwnProperty(p)){
-                vizExtPoints[p] = v;
-            }
-        });
+        vizOptions.extensionPoints = pvc.mergeOwn(
+                                        pvc.create(chartArgsExtPoints),
+                                        vizExtPoints);
     }
 
     // store the current highlighted selections
@@ -988,6 +956,7 @@ pentaho.ccc.CccChart.prototype._readData = function() {
             break;
 
         case 'pvc.BarChart':
+        case 'pvc.NormalizedBarChart':
         case 'pvc.LineChart':
         case 'pvc.StackedAreaChart':
             this._readDataRelational();
@@ -1273,10 +1242,6 @@ pentaho.ccc.CccChart.prototype._prepareOptions = function(){
         clickable:    true,
         selectable:   true,
         
-        // TODO: on the server, these come undefined...
-        height: vizOptions.height || 300,
-        width:  vizOptions.width  || 300,
-        
         title:  this._title == "" ? null : this._title,
         colors: this.getColors(),
 
@@ -1295,6 +1260,19 @@ pentaho.ccc.CccChart.prototype._prepareOptions = function(){
         }
     };
 
+    // NOTE: On the server these come undefined
+    vizOptions.height = vizOptions.height || 300;
+    vizOptions.width  = vizOptions.width  || 300;
+        
+    // ------------
+    
+    // Vertical Margin
+    // @see #_renderChart
+    this._vMargin = Math.round(0.06 * vizOptions.height);
+    vizOptions.height -= this._vMargin;
+
+    // ------------
+
     switch(this._vizOptions.cccClass){
         case 'pvc.HeatGridChart':
             this._prepareOptionsHeatGrid();
@@ -1307,6 +1285,7 @@ pentaho.ccc.CccChart.prototype._prepareOptions = function(){
             break;
 
         case 'pvc.BarChart':
+        case 'pvc.NormalizedBarChart':
             this._prepareOptionsBar();
             break;
     }
@@ -1338,7 +1317,7 @@ pentaho.ccc.CccChart.prototype._prepareOptions = function(){
         }
     }
 
-    // Assume 'legendAlign' default value
+    // Calculate 'legendAlign' default value
     if(!('legendAlign' in options)){
         var legendPosition = options.legendPosition;
 
@@ -1404,8 +1383,8 @@ pentaho.ccc.CccChart.prototype._prepareLayoutHeatGrid = function() {
         sersBreadth /= measureCount;
     }
 
-    var width  = options.width,
-        height = options.height,
+    var width  = vizOptions.width,
+        height = vizOptions.height,
         currRatio = width / height,
         xyChartRatio = catsBreadth / sersBreadth;
 
@@ -1582,6 +1561,7 @@ var skipVizOtions = pv.dict([
  */
 
 pentaho.ccc.CccChart.prototype._renderChart = function(){
+
     while(this._element.firstChild) {
         this._element.removeChild(this._element.firstChild);
     }
@@ -1595,6 +1575,21 @@ pentaho.ccc.CccChart.prototype._renderChart = function(){
     this._chart = new chartClass(this.options);
     this._chart.setData($.extend(true, {}, this._cdaTable), this._dataOptions);
     this._chart.render();
+
+    // NOTE: 'vertical' is default, so can be missing
+    // Change the margin of the svg element
+    // The HG chart comes with another firstChild... (?)
+    var element = this._element.firstChild;
+    while(element && (element.tagName.toLowerCase()) !== 'svg'){
+        element = element.nextSibling;
+    }
+    if(element){
+        if(this.options.orientation === 'horizontal'){
+            element.style.marginBottom = this._vMargin + 'px';
+        } else {
+            element.style.marginTop = this._vMargin + 'px';
+        }
+    }
 };
 
 // -----------------------------
