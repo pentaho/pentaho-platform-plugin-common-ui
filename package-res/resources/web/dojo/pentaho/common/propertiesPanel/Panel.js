@@ -527,6 +527,11 @@ dojo.declare("pentaho.common.propertiesPanel.PlaceholderSource", [dojo.dnd.Targe
   },
   onDrop:function (source, nodes, copy) {
     return this.dropZone.onDrop(source, nodes, copy);
+  },
+
+  checkAcceptance:function (source, nodes, silent) {
+    var ok = this.dropZone.checkAcceptance(source, nodes, silent);;
+    return ok;
   }
 });
 
@@ -659,7 +664,7 @@ dojo.declare(
         this.gems.splice(currIdx, 1);
         this.model.remove(gemUI.model, suppressEvent);
 
-        if(this.model.allowMultiple == true && this.model.gems.length == 0){
+        if(this.model.allowMultiple == true || this.model.gems.length == 0){
           this.placeholder.style.display = "";
         }
         this.propPanel.resize();
