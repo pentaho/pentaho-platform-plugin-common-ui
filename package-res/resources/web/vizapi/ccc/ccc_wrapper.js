@@ -640,9 +640,6 @@ pentaho.ccc.CccChart = function(element) {
  vizOptions  the options for the visualization
  */
 pentaho.ccc.CccChart.prototype.draw = function(dataTable, vizOptions) {
-
-    this._vizHelper = cv.pentahoVisualizationHelpers[vizOptions.customChartType];
-
     // Reset support fields
     this._metadata  = [];
     this._resultset = [];
@@ -659,7 +656,9 @@ pentaho.ccc.CccChart.prototype.draw = function(dataTable, vizOptions) {
     this._otherDtColIndexes = null;
 
     // ----------------------
-
+    
+    this._vizHelper = cv.pentahoVisualizationHelpers[vizOptions.customChartType];
+    
     this._initializeOptions(vizOptions);
 
     this._initializeAxesMetadata();
@@ -667,12 +666,11 @@ pentaho.ccc.CccChart.prototype.draw = function(dataTable, vizOptions) {
     this._buildCrossTable();
 
     this._readData();
-   
+
     this._prepareOptions();
 
     this._renderChart();
 };
-
 
 /*
  * INIT OPTIONS
@@ -700,7 +698,6 @@ pentaho.ccc.CccChart.prototype._initializeOptions = function(vizOptions){
 
     return vizOptions;
 };
-
 
 /*
  * INIT METADATA
@@ -762,22 +759,27 @@ pentaho.ccc.CccChart.prototype._initializeAxesMetadata = function(){
         myself["_" + axisInfo.id + "Axis"] = axisInfo;
 
         axisInfo.formulasInfo.forEach(indexFormula, myself);
-
+        
         return axisInfo;
     });
     
     /* @instance */
     function indexFormula(formInfo){
-        var form = formInfo.formula;
+        var form = formInfo.formula,
+            id   = formInfo.id;
 
+        // NOTE: when interaction is disabled...formula and id aren't available in every axis type...
+        
         // Index by formula
-        this._formulasInfo[form] = formInfo;
+        if(form){
+            this._formulasInfo[form] = formInfo;
+        }
 
-        if(form !== formInfo.id){
+        if(id && form !== id){
             assert(formInfo.axis.id === 'measure', "Must be a measure");
 
             // Index ALSO by formula id.
-            this._formulasInfo[formInfo.id] = formInfo;
+            this._formulasInfo[id] = formInfo;
         }
     }
 
@@ -786,6 +788,7 @@ pentaho.ccc.CccChart.prototype._initializeAxesMetadata = function(){
 };
 
 pentaho.ccc.CccChart.prototype._buildCrossTable = function(){
+    
     // row := {
     //   keyValues: row values Array,
     //   children: [],
@@ -799,36 +802,38 @@ pentaho.ccc.CccChart.prototype._buildCrossTable = function(){
     //   }
     // };
     
-    this._crossTable = {
-        children:      [],
-        childrenByKey: {}
-    };
-
     var dataTable  = this._dataTable,
         dtColCount = dataTable.getNumberOfColumns(),
         dtRowCount = dataTable.getNumberOfRows();
-
+    
     assert(dtColCount > 0, "DataTable must have at least one column");
 
-    if(dtRowCount === 0){
-        return;
-    }
-    
     // Indexes of DataTable columns with the values of row axis formulas
     // By construction: the first R columns.
     this._rowDtColIndexes  = pv.range(this._rowAxis.depth);
 
     assert(this._rowDtColIndexes.length > 0, "There must exist at least one row axis formula.");
-    
+
     // All other columns (!row axis formulas)
     this._otherDtColIndexes = pv.range(this._rowAxis.depth, dtColCount);
+
+    // -------------
+    
+    this._crossTable = {
+        children:      [],
+        childrenByKey: {}
+    };
+    
+    if(dtRowCount === 0){
+        return;
+    }
     
     var otherDtColsInfo = this._otherDtColIndexes.map(function(tc){
         var dtColId = this._dataTable.getColumnId(tc),
             dtColParts = dtColId.split('~'),
             colValsJoined,
             meaId;
-
+            
         if(dtColParts.length > 1){
             meaId = dtColParts.pop();
             colValsJoined = dtColParts.join('~');
@@ -1260,7 +1265,7 @@ pentaho.ccc.CccChart.prototype._prepareOptions = function(){
         }
     };
 
-    // NOTE: On the server these come undefined
+    // NOTE: When interaction is disabled, these come undefined...
     vizOptions.height = vizOptions.height || 300;
     vizOptions.width  = vizOptions.width  || 300;
         
@@ -1317,6 +1322,12 @@ pentaho.ccc.CccChart.prototype._prepareOptions = function(){
         }
     }
 
+    if(!this._vizHelper.isInteractionEnabled()){
+        options.showTooltips = false;
+        options.clickable    = false;
+        options.selectable   = false;
+    }
+
     // Calculate 'legendAlign' default value
     if(!('legendAlign' in options)){
         var legendPosition = options.legendPosition;
@@ -1367,8 +1378,7 @@ pentaho.ccc.CccChart.prototype._prepareOptionsHeatGrid = function() {
 };
 
 pentaho.ccc.CccChart.prototype._prepareLayoutHeatGrid = function() {
-    var options = this.options,
-        vizOptions = this._vizOptions;
+    var vizOptions = this._vizOptions;
 
     // TODO: is it ok to access "vizOptions.controller.domNode" ?
     vizOptions.controller.domNode.style.overflow = 'hidden'; // Hide overflow
@@ -1583,7 +1593,9 @@ pentaho.ccc.CccChart.prototype._renderChart = function(){
     while(element && (element.tagName.toLowerCase()) !== 'svg'){
         element = element.nextSibling;
     }
+
     if(element){
+        // TODO: chart re-render because of series visibility changes looses this...
         if(this.options.orientation === 'horizontal'){
             element.style.marginBottom = this._vMargin + 'px';
         } else {
@@ -1646,7 +1658,7 @@ pentaho.ccc.CccChart.prototype._getCrossCell = function(rowVals, colVals){
  * TOOLTIPS
  */
 
-// NOTE: tooltips are NOT rendered on the server,
+// NOTE: tooltips are NOT rendered when interaction is disabled,
 //  because showTooltips is set to false.
 pentaho.ccc.CccChart.prototype._getTooltipText = function(axesVals){
     /**

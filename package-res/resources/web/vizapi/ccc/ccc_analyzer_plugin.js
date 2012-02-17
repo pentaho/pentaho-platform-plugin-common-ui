@@ -6,12 +6,27 @@ analyzerPlugins.push({
 
         dojo.declare("analyzer.CCCVizHelper", null, {
 
+            /**
+             * Indicates if interaction features are enabled.
+             * When printing, as in a server eenvironment,
+             * interaction features are disabled.
+             */
+            isInteractionEnabled: function(){
+                return true;
+            },
+
+            /**
+             * Indicates if drilling is enabled.
+             * Takes into account whether content-linking is in effect.
+             * Only available when interaction is enabled.
+             */
             isDrillEnabled: function(){
                 return !(/\bcl=/).test(window.location.href);
             },
 
             /**
              * Returns the label of a given formula.
+             * Only available when interaction is enabled.
              */
             getFormulaLabel: function(formula){
                 return cv.util.parseMDXExpression(formula, false);
@@ -21,6 +36,7 @@ analyzerPlugins.push({
              * Returns an array with all the formulas of the hierarchy to which a given formula belongs.
              * The order of the formulas is from root level to leaf level.
              * Any formula, including a hierarchy id. can be specified in argument 'formula'.
+             * Only available when interaction is enabled.
              */
             getHierarchyFormulas: function(formula, includeHidden, excludeChildren){
                 return cv.getFieldHelp().getHierarchy(formula, includeHidden, excludeChildren)
@@ -86,12 +102,14 @@ analyzerPlugins.push({
 
             /**
              * Performs a click action with the specified context.
+             * Only available when interaction is enabled.
              */
             click: function(actionContext, keepGem){
                 cv.getActiveReport().clickChart(actionContext, keepGem);
             },
 
             // set visualization options based on analyzer's state.
+            // Only available when interaction is enabled.
             generateOptionsFromAnalyzerState:function (report) {
                 var userDefinedOpts = {};
                 var chartOptions = report.reportDoc.getChartOptions().attributes;
