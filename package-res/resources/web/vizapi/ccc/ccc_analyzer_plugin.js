@@ -168,7 +168,8 @@ analyzerPlugins.push({
         // Register CCC Visualizations
 
         var vizIds = [
-                    'ccc_heatgrid',
+                    'ccc_heatgrid'
+                    /*
                     'ccc_bar',
                     'ccc_barstacked',
                     'ccc_barnormalized',
@@ -176,6 +177,7 @@ analyzerPlugins.push({
                     'ccc_horzbarstacked',
                     'ccc_horzbarnormalized',
                     'ccc_bulletchart'
+                    */
                 ];
 
         var vizHelper = new analyzer.CCCVizHelper();
