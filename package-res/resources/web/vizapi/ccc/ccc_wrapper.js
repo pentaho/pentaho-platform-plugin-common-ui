@@ -1766,8 +1766,8 @@ pentaho.ccc.CccChart.prototype._convertSelectionsCccToAnalyzer = function(cccSel
 
 pentaho.ccc.CccChart.prototype._convertSelectionCccToAnalyzer = function(cccSelection){
     return this._convertKeysSelectionCccToAnalyzer(
-                        cccSelection.elem.series.value,
-                        cccSelection.elem.category.value);
+                        cccSelection.elem.series.absValue,
+                        cccSelection.elem.category.absValue);
 };
 
 pentaho.ccc.CccChart.prototype._convertKeysSelectionCccToAnalyzer = function(s, c){
