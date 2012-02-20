@@ -69,7 +69,7 @@ analyzerPlugins.push({
 
                 var formulasInfo = [];
 
-                levelElems.forEach(function(levelElem, index){
+                dojo.forEach(levelElems, function(levelElem, index){
                     var formula = levelElem.getAttribute('formula'),
                         gem = cv.getActiveReport().getGem(formula),
                         fieldHelp = cv.getFieldHelp();
