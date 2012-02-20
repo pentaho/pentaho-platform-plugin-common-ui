@@ -1273,8 +1273,8 @@ pentaho.ccc.CccChart.prototype._prepareOptions = function(){
     
     // Vertical Margin
     // @see #_renderChart
-    this._vMargin = Math.round(0.06 * vizOptions.height);
-    vizOptions.height -= this._vMargin;
+    //this._vMargin = Math.round(0.06 * vizOptions.height);
+    //vizOptions.height -= this._vMargin;
 
     // ------------
 
@@ -1589,19 +1589,19 @@ pentaho.ccc.CccChart.prototype._renderChart = function(){
     // NOTE: 'vertical' is default, so can be missing
     // Change the margin of the svg element
     // The HG chart comes with another firstChild... (?)
-    var element = this._element.firstChild;
-    while(element && (element.tagName.toLowerCase()) !== 'svg'){
-        element = element.nextSibling;
-    }
+    //var element = this._element.firstChild;
+    //while(element && (element.tagName.toLowerCase()) !== 'svg'){
+    //    element = element.nextSibling;
+    //}
 
-    if(element){
-        // TODO: chart re-render because of series visibility changes looses this...
-        if(this.options.orientation === 'horizontal'){
-            element.style.marginBottom = this._vMargin + 'px';
-        } else {
-            element.style.marginTop = this._vMargin + 'px';
-        }
-    }
+    //if(element){
+    //    // TODO: chart re-render because of series visibility changes looses this...
+    //    if(this.options.orientation === 'horizontal'){
+    //        element.style.marginBottom = this._vMargin + 'px';
+    //    } else {
+    //        element.style.marginTop = this._vMargin + 'px';
+    //    }
+    //}
 };
 
 // -----------------------------
