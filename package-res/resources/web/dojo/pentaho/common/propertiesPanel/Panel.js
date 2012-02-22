@@ -133,14 +133,17 @@ dojo.declare(
                 } else {
                   group.usingMinHeight = false;
                 }
-
-                group.domNode.style.height = calculatedHeight + "px";
+                if(!isNaN(calculatedHeight)){
+                  group.domNode.style.height = calculatedHeight + "px";
+                }
 
                 if(dojo.coords(group.domNode).h > 0){
                   group.hideNode.style.height = Math.min((dojo.coords(group.domNode).h - titleBarHeight), group.hideNode.scrollHeight) + "px";
                 }
               } else {
-                group.domNode.style.height = titleBarHeight + "px";
+                if(!isNaN(titleBarHeight)){
+                  group.domNode.style.height = titleBarHeight + "px";
+                }
                 group.usingMinHeight = false;
               }
               group.domNode.style.width = "";
@@ -902,5 +905,3 @@ dojo.declare(
     }
 );
 pentaho.common.propertiesPanel.Panel.registeredTypes["button"] = pentaho.common.propertiesPanel.ButtonUI;
-
-
