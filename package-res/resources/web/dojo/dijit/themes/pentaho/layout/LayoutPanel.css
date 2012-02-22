@@ -162,3 +162,7 @@
 .pentahoPropertiesPanel .pentaho-titled-toolbar{
   cursor: pointer;
 }
+
+.pentahoPropertiesPanel .IE .pentaho-button{
+  height:auto
+}
