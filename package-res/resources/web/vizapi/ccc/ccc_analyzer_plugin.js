@@ -71,40 +71,86 @@ analyzerPlugins.push({
 
                 dojo.forEach(levelElems, function(levelElem, index){
                     var formula = levelElem.getAttribute('formula'),
-                        gem = cv.getActiveReport().getGem(formula),
-                        fieldHelp = cv.getFieldHelp();
+                        gem,
+                        id,
+                        label,
+                        role,
+                        hierarchy,
+                        formIndex;
 
-						if (isMeasure && !gem) {
-    	                    formulasInfo.push({
-    	                    	id: "[MEASURE:" + index + "]",
-    	                    	label: "",
-    	                    	axis: axis,
-        	                    index: index 
-            	            });												
-						}
-						
-						// Only formulas that are visible in charts are considered
-    	                if(!isMeasure || (gem && !gem.isHideInChart())){
-	
-    	                    formulasInfo.push({
-        	                    id:        gem.getUniqueId(), // measures have an id != from formula
-            	                formula:   formula,
-                	            label:     gem.getDisplayLabel(true),
-
-                            hierarchy: fieldHelp.get(formula, 'hierarchy'),
-                            axis:      axis,
-
-                            // "Roles" provide more detail for measures
-                            role:  gem.getGembarId(), // rows, columns, ...custom_role...
-
-                            // For measures the relevant order is the report order...
-                            index: isMeasure ? index : parseFloat(gem.getGembarOrdinal())
-                        });
+                    // Only formulas that are visible in charts are considered.
+                    // Only measures can be hidden in charts.
+                    if(levelElem.getAttribute("hideInChart") === 'true'){
+                        return;
                     }
+
+                    if(isMeasure){
+                        var gembarId = levelElem.getAttribute("gembarId");
+                        if(!gembarId ||  gembarId === 'undefined'){
+                            // Unmapped measure
+                            return;
+                        }
+                    }
+                        
+                    if(!formula){
+                        //assert(isMeasure, "Only measures can not have a formula.");
+
+                        id    = levelElem.getAttribute('id');
+                        label = getLevelLabel(levelElem);
+                        role  = axis;
+
+                    } else {
+                        gem = cv.getActiveReport().getGem(formula);
+                        if(!gem){
+                            // !gem => assume not placed for chart consumption
+                            return;
+                        }
+
+                        // measures have an id != from formula
+                        id = gem.getUniqueId();
+                        label = gem.getDisplayLabel(true);
+
+                        // "Roles" provide more detail for measures
+                        // rows, columns, ...custom_role...
+                        role = gem.getGembarId();
+                    }
+                    
+                    if(isMeasure){
+                        hierarchy = '[Measures]';
+                        // For measures the relevant order is the report order...
+                        // But note that this index may not be contiguous
+                        //  because formula may be hidden.
+                        // Belor, after sorting, measure indexes are reassigned.
+                        formIndex = index;
+                    } else {
+                        // !isMeasure => has formula => gem or already excluded
+                        //assert(gem, "Non-measures have gem or were already excluded.");
+
+                        var fieldHelp = cv.getFieldHelp();
+                        hierarchy = fieldHelp.get(formula, 'hierarchy');
+                        formIndex = parseFloat(gem.getGembarOrdinal());
+                    }
+
+                    formulasInfo.push({
+                        id:        id,
+                        formula:   formula,
+                        label:     label,
+                        hierarchy: hierarchy,
+                        axis:      axis,
+                        role:      role,
+                        index:     formIndex
+                    });
                 });
 
                 // Return formulas sorted by index
                 formulasInfo.sort(function(a, b){ return a.index - b.index; });
+
+                if(isMeasure){
+                    // Fix non-contiguous indexes
+                    formulasInfo.forEach(function(formulaInfo, index){
+                        formulaInfo.index = index;
+                    });
+                }
 
                 return formulasInfo;
             },
@@ -158,6 +204,11 @@ analyzerPlugins.push({
                 return userDefinedOpts;
             }
         });
+
+        function getLevelLabel(levelElem){
+            var labelElem = levelElem.selectSingleNode("cv:displayLabels/cv:displayLabel");
+            return (labelElem && labelElem.getAttribute("label")) || "";
+        }
 
         dojo.declare("analyzer.CCCVizConfig", [analyzer.ColorConfiguration], {
 

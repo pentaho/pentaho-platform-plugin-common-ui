@@ -28,9 +28,9 @@ function defVisualization(viz){
 var lineStrokeStyle = '#A0A0A0', // #D8D8D8',// #f0f0f0
     baseBarChartArgs = {
     cccClass: 'pvc.BarChart', // Default
-    
+
     legend: true,
-    
+
     panelSizeRatio: 0.6,
 
     //axisOffset:  0.1,
@@ -96,7 +96,7 @@ pvc.mergeOwn(baseHorizBarChartArgs, {
     xAxisPosition: 'top',
     legendPosition: 'right',
     legendAlign:     'middle',
-    
+
     // Inherit extension points also!
     extensionPoints: pvc.create(baseBarChartArgs.extensionPoints)
 });
@@ -530,7 +530,7 @@ defVisualization({
     yAxisPosition: "left",
     legendPosition: "bottom",
     seriesInRows: true,
-    
+
 
     bulletTitle: 'Test for title',
     bulletSubtitle: 'Test for subtitle',
@@ -604,11 +604,11 @@ pentaho.ccc.CccChart = function(element) {
     * for being chosen as the drilling axis.
     */
     this._keyAxes = ['column', 'row'];
-    
+
     // _allAxes includes the non-key 'measure' axis
     this._allAxes = this._keyAxes.slice(0);
     this._allAxes.push('measure');
-    
+
     this._element = element;
     this._elementName = element.id;
 
@@ -617,10 +617,10 @@ pentaho.ccc.CccChart = function(element) {
     this._resultset = null;
 
     this._dataTable = null; // Analyzer DataTable
-    
+
     this._rowDtColIndexes = null;
     this._otherDtColIndexes = null;
-    
+
     this._vizOptions  = null;
     this._originalVizOptions = null;
     this._dataOptions = null;
@@ -648,17 +648,17 @@ pentaho.ccc.CccChart.prototype.draw = function(dataTable, vizOptions) {
     this._colors = null;
 
     // ----------------------
-    
+
     this._dataTable  = dataTable;
     this._crossTable = null;
-    
+
     this._rowDtColIndexes = null;
     this._otherDtColIndexes = null;
 
     // ----------------------
-    
+
     this._vizHelper = cv.pentahoVisualizationHelpers[vizOptions.customChartType];
-    
+
     this._initializeOptions(vizOptions);
 
     this._initializeAxesMetadata();
@@ -709,7 +709,7 @@ function AxisInfo(axis, formulaInfos){
     this.id = axis;
 
     this.formulasInfo = formulaInfos;
-    
+
     this.depth = this.formulasInfo.length;
 
     this.formulas = this.formulasInfo.map(function(formInfo){
@@ -740,7 +740,7 @@ pentaho.ccc.CccChart.prototype._initializeAxesMetadata = function(){
      * Filled by #indexFormula declared below.
      */
     this._formulasInfo = {};
-    
+
     /**
      * Create an AxisInfo for each axis.
      *
@@ -755,21 +755,21 @@ pentaho.ccc.CccChart.prototype._initializeAxesMetadata = function(){
      */
     this._allAxesInfo = pv.dict(this._allAxes, function(axis){
         var axisInfo = new AxisInfo(axis, myself._vizHelper.getAxisFormulasInfo(axis));
-        
+
         myself["_" + axisInfo.id + "Axis"] = axisInfo;
 
         axisInfo.formulasInfo.forEach(indexFormula, myself);
-        
+
         return axisInfo;
     });
-    
+
     /* @instance */
     function indexFormula(formInfo){
         var form = formInfo.formula,
             id   = formInfo.id;
 
         // NOTE: when interaction is disabled...formula and id aren't available in every axis type...
-        
+
         // Index by formula
         if(form){
             this._formulasInfo[form] = formInfo;
@@ -788,7 +788,7 @@ pentaho.ccc.CccChart.prototype._initializeAxesMetadata = function(){
 };
 
 pentaho.ccc.CccChart.prototype._buildCrossTable = function(){
-    
+
     // row := {
     //   keyValues: row values Array,
     //   children: [],
@@ -801,11 +801,11 @@ pentaho.ccc.CccChart.prototype._buildCrossTable = function(){
     //      ]
     //   }
     // };
-    
+
     var dataTable  = this._dataTable,
         dtColCount = dataTable.getNumberOfColumns(),
         dtRowCount = dataTable.getNumberOfRows();
-    
+
     assert(dtColCount > 0, "DataTable must have at least one column");
 
     // Indexes of DataTable columns with the values of row axis formulas
@@ -818,22 +818,23 @@ pentaho.ccc.CccChart.prototype._buildCrossTable = function(){
     this._otherDtColIndexes = pv.range(this._rowAxis.depth, dtColCount);
 
     // -------------
-    
+
     this._crossTable = {
         children:      [],
         childrenByKey: {}
     };
-    
+
     if(dtRowCount === 0){
         return;
     }
-    
-    var otherDtColsInfo = this._otherDtColIndexes.map(function(tc){
+
+    var otherDtColsInfo = [];
+    this._otherDtColIndexes.forEach(function(tc){
         var dtColId = this._dataTable.getColumnId(tc),
             dtColParts = dtColId.split('~'),
             colValsJoined,
             meaId;
-            
+
         if(dtColParts.length > 1){
             meaId = dtColParts.pop();
             colValsJoined = dtColParts.join('~');
@@ -841,9 +842,15 @@ pentaho.ccc.CccChart.prototype._buildCrossTable = function(){
             meaId = dtColParts[0];
             colValsJoined = '';
         }
-        
+
         // Obtain the formula corrsponding to the id.
-        var meaIndex = this._formulasInfo[meaId].index;
+        var meaInfo = this._formulasInfo[meaId];
+        if(!meaInfo){
+            // unmapped measure
+            return;
+        }
+
+        var meaIndex = meaInfo.index;
 
         // Store labels for each value of a formula in the columns axis
         if(colValsJoined){
@@ -865,12 +872,12 @@ pentaho.ccc.CccChart.prototype._buildCrossTable = function(){
             this._columnAxis.valueLabel[colValsJoined] = colLabels.join(" ~ ");
         }
 
-        return {
+        otherDtColsInfo.push({
             column: tc,
             measureIndex: meaIndex,
             keyValues: dtColParts,
             key: colValsJoined
-        };
+        });
     }, this);
 
     // Also, collect the label of each row value
@@ -884,7 +891,7 @@ pentaho.ccc.CccChart.prototype._buildCrossTable = function(){
 
             this._rowAxis.valueLabel[rowVal] = rowLabel;
             rowLabels.push(rowLabel);
-            
+
             return rowVal;
         }, this);
 
@@ -902,7 +909,7 @@ pentaho.ccc.CccChart.prototype._buildCrossTable = function(){
 
         this._crossTable.children.push(crossRow);
         this._crossTable.childrenByKey[crossRow.key] = crossRow;
-        
+
         otherDtColsInfo.forEach(function(dtColInfo){
             var crossCol = crossRow.childrenByKey[dtColInfo.key];
             if(!crossCol){
@@ -918,7 +925,7 @@ pentaho.ccc.CccChart.prototype._buildCrossTable = function(){
 
             var tc = dtColInfo.column,
                 value = this._getTableValue(tr, tc);
-            
+
             var measure = {
                 v: value,
                 f: value == null ? "-" : dataTable.getFormattedValue(tr, tc)
@@ -1014,14 +1021,14 @@ pentaho.ccc.CccChart.prototype._readDataCrosstab = function() {
 /**
  * Creates a CDA resultset in CROSSTAB format
  * with a single aggregated category column.
- * 
+ *
  * 1    - Category - aggregated row axis columns
  * 2..N - Series X - value of 'other' columns
  */
 pentaho.ccc.CccChart.prototype._readDataCrosstabSingleCategory = function(){
     var dataTable = this._dataTable,
         rowCount = dataTable.getNumberOfRows();
-        
+
     // Add the aggregate category column metadata
     this._addCdaMetadata('Categories', this._title, 'STRING');
 
@@ -1052,7 +1059,7 @@ pentaho.ccc.CccChart.prototype._readDataCrosstabSingleCategory = function(){
 /**
  * Creates a CDA resultset in a single-value RELATIONAL format.
  * Only rows with a non-null value are added to the resultset.
- * 
+ *
  * 1 - Category - aggregated row axis columns
  * 2 - Series   - label of 'other' DataTable columns
  * 3 - Value    - value of corresponding 'other' DataTable column
@@ -1117,7 +1124,7 @@ pentaho.ccc.CccChart.prototype._readDataHeatGrid = function(){
             this._vizOptions.colorValIdx = null;
         }
     }
-    
+
     // Update data options
     this._dataOptions.dataOptions = {
         categoriesCount: this._rowAxis.depth,
@@ -1156,12 +1163,12 @@ pentaho.ccc.CccChart.prototype._readDataBullet = function() {
             this._addCdaMetadata('Range'  + i, 'Range ' + i, 'NUMERIC');
         }
     }
-    
+
     var measuresCount = this._measureAxis.depth;
 
     // Process the rvar measuresCount = this._measureAxis.depth;ows
     for(var tr = 0 ; tr < rowCount ; tr++){
-      
+
         var category = this._aggregateRowAxisForTableRow(tr);
 
         for(var s = 0 ; s < seriesCount ; s += measuresCount) {
@@ -1178,7 +1185,7 @@ pentaho.ccc.CccChart.prototype._readDataBullet = function() {
                     dtColParts = dataTable.getColumnId(tc).split('~');
 
                 dtColParts.pop();
-                
+
                 var row = [
                         // Normal relational part
                         category, // aggregated category
@@ -1238,7 +1245,7 @@ pentaho.ccc.CccChart.prototype._prepareOptions = function(){
 
         legend:  true,
         legendPosition: "bottom",
-        
+
         titlePosition:  "top",
 
         showTooltips: true,
@@ -1246,7 +1253,7 @@ pentaho.ccc.CccChart.prototype._prepareOptions = function(){
 
         clickable:    true,
         selectable:   true,
-        
+
         title:  this._title == "" ? null : this._title,
         colors: this.getColors(),
 
@@ -1268,9 +1275,9 @@ pentaho.ccc.CccChart.prototype._prepareOptions = function(){
     // NOTE: When interaction is disabled, these come undefined...
     vizOptions.height = vizOptions.height || 300;
     vizOptions.width  = vizOptions.width  || 300;
-        
+
     // ------------
-    
+
     // Vertical Margin
     // @see #_renderChart
     //this._vMargin = Math.round(0.06 * vizOptions.height);
@@ -1296,7 +1303,7 @@ pentaho.ccc.CccChart.prototype._prepareOptions = function(){
     }
 
     // --------------------
-    
+
     // Copy options from the visualization metadata to the chart options
     for(var x in vizOptions){
         if(!this._shouldSkipVizOption(x)){
@@ -1358,8 +1365,10 @@ pentaho.ccc.CccChart.prototype._prepareOptionsHeatGrid = function() {
     };
 
     // Drill down on shapes
-    options.doubleClickAction = function(s, c){
-        return myself._drillDown(myself._readCccAxesValues(s, c));
+    options.doubleClickAction = function(s, c, d, ev, datum){
+        return myself._drillDown(myself._readCccAxesValues(
+                    datum.elem.series.path,
+                    datum.elem.category.path));
     };
 
     // Drill down on y axis
@@ -1371,7 +1380,7 @@ pentaho.ccc.CccChart.prototype._prepareOptionsHeatGrid = function() {
     options.xAxisDoubleClickAction = function (d) {
         return myself._drillDown(myself._readCccAxesValues(null, d.path));
     };
-    
+
     options.customTooltip = function(s, c){
         return myself._getTooltipText(myself._readCccAxesValues(s, c));
     };
@@ -1447,7 +1456,7 @@ pentaho.ccc.CccChart.prototype._prepareOptionsBar = function() {
     options.selectionChangedAction = function(cccSelections){
         myself._notifyCccSelectionChanged(cccSelections);
     };
-    
+
     // Drill down on shapes
     options.doubleClickAction = function(s, c){
         if(myself._drillDown(myself._readCccAxesValues(s, c))){
@@ -1464,7 +1473,7 @@ pentaho.ccc.CccChart.prototype._prepareOptionsBullet = function() {
         options = this.options;
 
     options.legend = false;
-    
+
      // Drill down on shapes
     options.axisDoubleClickAction = function(d){
         var c = d.title,
@@ -1476,7 +1485,7 @@ pentaho.ccc.CccChart.prototype._prepareOptionsBullet = function() {
             // onDoubleClickHeatGrid.call(this, s, c);
         }
     };
-    
+
     options.clickAction = function (c, s) {
         myself._notifySelectionChanged(
             [ myself._convertKeysSelectionCccToAnalyzer(s, c) ]);
@@ -1565,7 +1574,7 @@ var skipVizOtions = pv.dict([
     ],
     function(){ return true; });
 
-    
+
 /*
  * RENDER
  */
@@ -1650,7 +1659,7 @@ pentaho.ccc.CccChart.prototype._getCrossCell = function(rowVals, colVals){
     if(result){
         result = result.childrenByKey[colVals.join('~')];
     }
-    
+
     return result && result.measures;
 };
 
@@ -1689,14 +1698,14 @@ pentaho.ccc.CccChart.prototype._getTooltipText = function(axesVals){
      * Join tooltip lines with HTML line breaks.
      */
     return tooltipLines.join('<br />');
-    
+
     /** @instance */
     function describeAxis(axisInfo, values){
         axisInfo.formulasInfo.forEach(function(formInfo, index){
             var value = pvc.nullTo(
                             this._getAxisValueLabel(axisInfo.id, values[index]),
                             "-");
-            
+
             // ex: "Line: Ships"
             tooltipLines.push(escapeHtml(formInfo.label) + ': ' + escapeHtml(value));
         }, this);
@@ -1741,7 +1750,7 @@ pentaho.ccc.CccChart.prototype._notifyCccSelectionChanged = function(cccSelectio
  *     row:     c,
  *     measure: v
  * }
- * 
+ *
  * A corresponding Analyzer selection would have the
  * following structure:
  * {
@@ -1795,8 +1804,11 @@ pentaho.ccc.CccChart.prototype._convertAxesValuesToAnalyzerSelection = function(
      * Add a description of the selected values.
      * Currently, Analyzer discards selection.value
      */
-    selection.value = axesVals.measure.map(function(cell){ return cell.f; })
-                        .join(" ~ ");
+    var measureVals = axesVals.measure;
+    if(measureVals && measureVals.length){
+        selection.value = measureVals.map(function(cell){ return cell.f; })
+                            .join(" ~ ");
+    }
 
     return selection;
 
@@ -1849,7 +1861,7 @@ pentaho.ccc.CccChart.prototype._drillDown = function(axesVals){
      * already included in 'actionContext'.
      *
      * Only one instruction per dimension hierarchy is generated.
-     * Each instruction fixes the value of 
+     * Each instruction fixes the value of
      * the deepest used formula of a hierarchy
      * to the MDX absolute value present in 'axesVals'.
      * @see keep
@@ -1869,7 +1881,7 @@ pentaho.ccc.CccChart.prototype._drillDown = function(axesVals){
             keep.call(this, this._allAxesInfo[axis].formulasInfo, vals);
         }
     }, this);
-    
+
     // --------------
 
     // Maintains other existing filters
@@ -1893,8 +1905,10 @@ pentaho.ccc.CccChart.prototype._drillDown = function(axesVals){
             if(!(formInfo.hierarchy in usedHierarchiesSet)){
                 // Find the most specific formula in forms, of this hierarchy
                 var deepestInfo = this._getDeepestIncludedLevelOfHierarchy(formInfo, vals.length);
-
-                useFormula.call(this, deepestInfo.formulaInfo, vals, 'KEEP');
+                if(deepestInfo){
+                    // TODO: sometimes is null. Check why.
+                    useFormula.call(this, deepestInfo.formulaInfo, vals, 'KEEP');
+                }
             }
         }, this);
     }
@@ -1902,7 +1916,7 @@ pentaho.ccc.CccChart.prototype._drillDown = function(axesVals){
     /** @instance */
     function useFormula(formInfo, vals, action){
         usedHierarchiesSet[formInfo.hierarchy] = true;
-        
+
         var axisInfo = formInfo.axis,
             hvalue = this._buildMdxAbsoluteValue(axisInfo, formInfo.index, vals);
 
@@ -1930,8 +1944,9 @@ pentaho.ccc.CccChart.prototype._getDrillDownInfo = function(axesVals){
 
         if(vals && (V = vals.length)){
             var axisInfo = this._allAxesInfo[axis];
+            // TODO: this test affects drilling on not leaf values of hierarchies...
             if(axisInfo.depth === V){
-                // Drill on the *hierarchy* of the last form in the axis
+                // Drill on the *hierarchy* of the last form in vals
                 var formsInfo = axisInfo.formulasInfo,
                     formInfo  = formsInfo[V - 1];
 
@@ -1967,7 +1982,7 @@ pentaho.ccc.CccChart.prototype._getDrillDownInfo = function(axesVals){
  */
 pentaho.ccc.CccChart.prototype._getDeepestIncludedLevelOfHierarchy = function(formInfo, maxDepth){
     var excludeChildren = false,
-        
+
         // All the forms from the hierarchy of 'formInfo'
         // Some may not be included in 'formInfo.axis.formulas'.
         hForms  = this._vizHelper.getHierarchyFormulas(formInfo.formula, false, excludeChildren),
@@ -2185,7 +2200,7 @@ function escapeHtml(str, noSingleQuotes){
     if(!noSingleQuotes){
         str = str.replace(/'/gm, "&#39;");
     }
-    
+
     return str;
 }
 
