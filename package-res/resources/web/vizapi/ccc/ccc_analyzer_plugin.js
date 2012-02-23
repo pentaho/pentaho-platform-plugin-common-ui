@@ -74,13 +74,22 @@ analyzerPlugins.push({
                         gem = cv.getActiveReport().getGem(formula),
                         fieldHelp = cv.getFieldHelp();
 
-                    // Only formulas that are visible in charts are considered
-                    if(!isMeasure || !gem.isHideInChart()){
-
-                        formulasInfo.push({
-                            id:        gem.getUniqueId(), // measures have an id != from formula
-                            formula:   formula,
-                            label:     gem.getDisplayLabel(true),
+						if (isMeasure && !gem) {
+    	                    formulasInfo.push({
+    	                    	id: "[MEASURE:" + index + "]",
+    	                    	label: "",
+    	                    	axis: axis,
+        	                    index: index 
+            	            });												
+						}
+						
+						// Only formulas that are visible in charts are considered
+    	                if(!isMeasure || (gem && !gem.isHideInChart())){
+	
+    	                    formulasInfo.push({
+        	                    id:        gem.getUniqueId(), // measures have an id != from formula
+            	                formula:   formula,
+                	            label:     gem.getDisplayLabel(true),
 
                             hierarchy: fieldHelp.get(formula, 'hierarchy'),
                             axis:      axis,
