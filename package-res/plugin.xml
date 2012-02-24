@@ -35,6 +35,8 @@
   <external-resources>
     <file context="global">content/common-ui/resources/web/dojo/djConfig.js</file>
     <file context="global">content/common-ui/resources/web/cache/cache-service.js</file>
+    <file context="global">/content/common-ui/resources/themes/jquery.js</file>
+    <file context="global">/content/common-ui/resources/themes/themeUtils.js</file>
     <file context="analyzer">content/common-ui/resources/web/cache/LocalCache.js</file>
     <file context="analyzer">content/common-ui/resources/web/vizapi/DataTable.js</file>
     <file context="analyzer">content/common-ui/resources/web/vizapi/Events.js</file>
