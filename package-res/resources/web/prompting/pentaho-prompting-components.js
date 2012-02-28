@@ -288,11 +288,10 @@ var StaticAutocompleteBoxComponent = BaseComponent.extend({
     var input = $('input', ph);
     input.autocomplete({
       delay: 0,
-      // Filter by starts-with instead of a global match
       source: function( request, response ) {
         var term = request.term.toUpperCase();
         var matches = $.map( this.valuesArray, function(tag) {
-          if ( tag.label.toUpperCase().indexOf(term) === 0 ) {
+          if ( tag.label.toUpperCase().indexOf(term) > 0 ) { // PRD-3745
             return tag;
           }
         });
