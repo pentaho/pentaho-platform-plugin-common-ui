@@ -147,9 +147,9 @@ analyzerPlugins.push({
 
                 if(isMeasure){
                     // Fix non-contiguous indexes
-                    formulasInfo.forEach(function(formulaInfo, index){
+                    dojo.forEach(formulasInfo, function(formulaInfo, index){
                         formulaInfo.index = index;
-                    });
+                    }, this);
                 }
 
                 return formulasInfo;
@@ -260,7 +260,7 @@ analyzerPlugins.push({
 
         var vizHelper = new analyzer.CCCVizHelper();
 
-        vizIds.forEach(function(vizId){
+        dojo.forEach(vizIds, function(vizId){
             
             cv.pentahoVisualizations.push(pentaho.visualizations.getById(vizId));
 
@@ -268,6 +268,6 @@ analyzerPlugins.push({
 
             analyzer.LayoutPanel.configurationManagers['JSON_' + vizId] = analyzer.CCCVizConfig;
             
-        });
+        }, this);
     } // end init method
 });
