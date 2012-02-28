@@ -291,7 +291,7 @@ var StaticAutocompleteBoxComponent = BaseComponent.extend({
       source: function( request, response ) {
         var term = request.term.toUpperCase();
         var matches = $.map( this.valuesArray, function(tag) {
-          if ( tag.label.toUpperCase().indexOf(term) > 0 ) { // PRD-3745
+          if ( tag.label.toUpperCase().indexOf(term) >= 0 ) { // PRD-3745
             return tag;
           }
         });
