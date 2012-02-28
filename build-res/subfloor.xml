@@ -401,7 +401,7 @@ TYPICAL TARGET SEQUENCE
       Runs a typical continuous integration build including project dist,
       test, and coverage artifacts
       ====================================================================-->
-  <target name="continuous" depends="build,publish" />
+  <target name="continuous" depends="build,publish-nojar" />
 
 
   <!--=======================================================================
@@ -410,7 +410,7 @@ TYPICAL TARGET SEQUENCE
       Runs a typical continuous integration build including project dist,
       and coverage artifacts
       ====================================================================-->
-  <target name="continuous-testless" depends="build-testless,publish" />
+  <target name="continuous-testless" depends="build-testless,publish-nojar" />
 
 
   <!--=======================================================================
@@ -480,7 +480,9 @@ TYPICAL TARGET SEQUENCE
       Ensures that all the required directories exist before processing
       a build.
       ====================================================================-->
-  <target name="init">
+  <extension-point name="init" depends="internal.init"/>
+
+  <target name="internal.init">
     <mkdir dir="${classes.dir}" />
     <mkdir dir="${dist.dir}" />
     <mkdir dir="${lib.dir}" />
@@ -641,7 +643,7 @@ TYPICAL TARGET SEQUENCE
       file), this task will retrieve the needed files and place them into 
       the defined directories.
       ====================================================================-->
-  <target name="resolve"
+  <extension-point name="resolve"
           depends="resolve-default, resolve-test, ivy.check-releasable"
           description="Retrieves all the dependent libraries" />
 
@@ -766,7 +768,13 @@ TYPICAL TARGET SEQUENCE
       for download by other projects currently being executed on the user's
       system.
       ====================================================================-->
-  <target name="publish-local-nojar" depends="install-ivy,publish-local-nojar.internal">
+  <extension-point name="publish-local-nojar" depends="install-ivy,publish-local-nojar.internal"/>
+
+  <target name="publish-local-nojar.internal" depends="install-ivy">
+    <ivy:resolve file="${ivy.artifact.ivyfilename}" />
+    <ivy:publish resolver="local" pubrevision="${project.revision}" overwrite="true" forcedeliver="true">
+      <artifacts pattern="${dist.dir}/[artifact]-[revision](-[classifier]).[ext]" />
+    </ivy:publish>
     <if>
       <equals arg1="${tests.publish}" arg2="true" />
       <then>
@@ -775,13 +783,6 @@ TYPICAL TARGET SEQUENCE
         </antcall>
       </then>
     </if>
-  </target>
-
-  <target name="publish-local-nojar.internal" depends="install-ivy">
-    <ivy:resolve file="${ivy.artifact.ivyfilename}" />
-    <ivy:publish resolver="local" pubrevision="${project.revision}" overwrite="true" forcedeliver="true">
-      <artifacts pattern="${dist.dir}/[artifact]-[revision](-[classifier]).[ext]" />
-    </ivy:publish>
   </target>
 
   <!--=======================================================================
@@ -802,8 +803,7 @@ TYPICAL TARGET SEQUENCE
         Creates and publishes the jar file for this project to a Maven2 
         repository. 
         ====================================================================-->
-  <target name="publish" depends="dist, dist-source, publish-nojar">
-  </target>
+  <extension-point name="publish" depends="dist, dist-source, publish-nojar"/>
 
 
   <!--=======================================================================
@@ -811,16 +811,7 @@ TYPICAL TARGET SEQUENCE
       
       Publishes the jar file for this project to a Maven2 repository.
       ====================================================================-->
-  <target name="publish-nojar" depends="install-antcontrib,create-pom,ivy.deliver,publish-nojar.internal">
-    <if>
-      <equals arg1="${tests.publish}" arg2="true" />
-      <then>
-        <antcall target="publish-nojar.internal">
-          <param name="ivy.artifact.id" value="${ivy.artifact.id}-test"/>
-        </antcall>
-      </then>
-    </if>
-  </target>
+  <extension-point name="publish-nojar" depends="install-antcontrib,create-pom,ivy.deliver,publish-nojar.internal"/>
 
   <target name="publish-nojar.internal" depends="install-antcontrib,create-pom,ivy.deliver">
     <antcall target="maven-publish-dependencies">
@@ -841,6 +832,15 @@ TYPICAL TARGET SEQUENCE
       <param name="publish.pomFile" value="${ivy.artifact.pomfile}" />
       <param name="publish.file" value="${dist.dir}/${ivy.artifact.id}-${project.revision}.jar" />
     </antcall>
+
+    <if>
+      <equals arg1="${tests.publish}" arg2="true" />
+      <then>
+        <antcall target="publish-nojar.internal">
+          <param name="ivy.artifact.id" value="${ivy.artifact.id}-test"/>
+        </antcall>
+      </then>
+    </if>
   </target>
 
 
@@ -1014,7 +1014,8 @@ TYPICAL TARGET SEQUENCE
       Removes all the libraries that have been downloaded for this project
       using the ivy dependencies.
       ====================================================================-->
-  <target name="clean-jars">
+  <extension-point name="clean-jars" depends="internal.clean-jars"/>
+  <target name="internal.clean-jars">
     <delete dir="${lib.dir}" />
     <delete dir="${testlib.dir}" />
   </target>
@@ -1025,9 +1026,11 @@ TYPICAL TARGET SEQUENCE
       
       Removes all the files generated from the build process.
       ====================================================================-->
-  <target name="clean"
+  <extension-point name="clean"
           description="Cleans all the files generated from a build with the exception of IVY-downloaded jars (see clean-all)"
-          depends="clean-tests, clean-cobertura, clean-sonar, clean-javadoc, clean-dist">
+          depends="internal.clean, clean-tests, clean-cobertura, clean-sonar, clean-javadoc, clean-dist"/>
+
+  <target name="internal.clean">
     <delete dir="${classes.dir}" />
     <delete dir="${bin.dir}" />
   </target>
@@ -1038,7 +1041,9 @@ TYPICAL TARGET SEQUENCE
       
       Removes all dist artifacts
       ====================================================================-->
-  <target name="clean-dist">
+  <extension-point name="clean-dist" depends="internal.clean-dist"/>
+
+  <target name="internal.clean-dist">
     <delete dir="${dist.dir}" />
   </target>
 
@@ -1050,7 +1055,7 @@ TYPICAL TARGET SEQUENCE
       in the workspace's lib dirs as well as all the files 
       generated from the build process.
       ====================================================================-->
-  <target name="clean-all" depends="clean,clean-jars" description="Cleans all the generated and dependency files" />
+  <extension-point name="clean-all" depends="clean,clean-jars" description="Cleans all the generated and dependency files" />
 
 
   <!--=======================================================================
@@ -1094,7 +1099,7 @@ TYPICAL TARGET SEQUENCE
         - compile.lic_copy : copying the license information into the bin directory
         - compile.post     : anything needed after the compile is done 
       ====================================================================-->
-  <target name="compile"
+  <extension-point name="compile"
           depends="init, compile.pre, compile.compile, compile.src_copy, compile.res_copy, compile.lic_copy, compile.post"
           description="Performs all the steps to prepare the bin directory with a complete compilation" />
 
@@ -1104,7 +1109,7 @@ TYPICAL TARGET SEQUENCE
       
       Prepares to perform the compile.
       ====================================================================-->
-  <target name="compile.pre" />
+  <extension-point name="compile.pre" />
 
 
   <!--=======================================================================
@@ -1194,7 +1199,7 @@ TYPICAL TARGET SEQUENCE
       
       Performs any needed post-compile tasks
       ====================================================================-->
-  <target name="compile.post" />
+  <extension-point name="compile.post" />
 
 
   <!--=======================================================================
@@ -1202,10 +1207,10 @@ TYPICAL TARGET SEQUENCE
       
       Creates a jar file from the bin directory
       ====================================================================-->
-  <target name="jar"
+  <extension-point name="jar"
           depends="jar.main,jar.test"
-          description="Jars up the bin directory after a compile">
-  </target>
+          description="Jars up the bin directory after a compile"/>
+
 
   <!-- jar the tests ONLY IF tests.publish it true -->
   <!-- if the compile-tests target is in the dependency list for this target, -->
@@ -1250,7 +1255,7 @@ TYPICAL TARGET SEQUENCE
       
       Generates zip and targz distributions of the javadoc
       ====================================================================-->
-  <target name="dist-source" depends="source.jar, source.zip, source.targz" />
+  <extension-point name="dist-source" depends="source.jar, source.zip, source.targz" />
 
 
   <!--=======================================================================
@@ -1397,7 +1402,7 @@ TYPICAL TARGET SEQUENCE
       
       Creates a distribution of this project
       ====================================================================-->
-  <target name="dist" depends="jar" description="Creates a distribution" />
+  <extension-point name="dist" depends="jar" description="Creates a distribution" />
 
 
   <!--=======================================================================
