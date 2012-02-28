@@ -70,6 +70,7 @@ div.prompt-panel ol,ul {
 .ui-autocomplete { position: absolute; cursor: default; 
   background-color: #ffffff;
   border: 1px solid black;
+  width: 400px;
 }
 /*.ui-autocomplete-loading { background: white url('images/ui-anim_basic_16x16.gif') right center no-repeat; }*/
 
