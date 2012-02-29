@@ -548,6 +548,7 @@ dojo.declare(
       templateString:"<div class='${className}' data-dojo-type='dijit.layout.BorderContainer' data-dojo-props='gutters:false'><div data-dojo-props='region:center'></div><div class='gemPlaceholder'><span>${placeholderText}</span></div></div>",
       gems: [],
       handles: [],
+      subscriptions: [],
       accept: ["gem"],
       showPlaceholder: true,
       placeholderText: "Drop Level Here",
@@ -560,6 +561,7 @@ dojo.declare(
 
       },
       postCreate: function(){
+        dojo.addClass(this.domNode, this.model.dataType); // add dataType as css class.
         this.gems = [];
         this.placeholder = dojo.query(".gemPlaceholder", this.domNode)[0];
         this.placeholder.style.display = (this.showPlaceholder && (this.model.allowMultiple || this.model.gems.length == 0)) ? "" : "none";
@@ -570,34 +572,52 @@ dojo.declare(
         this.dropZoneNode = this.domNode.firstChild;
 
         this.dropZone = new pentaho.common.propertiesPanel.GemBarUISource(this.dropZoneNode, {accept: this.model.ui.dndType, gemBar: this});
+        new pentaho.common.propertiesPanel.PlaceholderSource(this.domNode, {accept: this.model.ui.dndType, dropZone: this.dropZone});
+
         if(this.showPlaceholder && (this.model.allowMultiple || this.model.gems.length < 2) ){
           new pentaho.common.propertiesPanel.PlaceholderSource(this.placeholder, {accept: this.model.ui.dndType, dropZone: this.dropZone});
 
-          var outterThis = this;
-          dojo.connect(this.placeholder, "onmouseover", function(event){
-            if(dojo.dnd.manager().source && outterThis.checkAcceptance(outterThis.dropZone, dojo.dnd.manager().nodes)){
-              dojo.addClass(event.target, "over");
-            }
-          });
-          dojo.connect(this.placeholder, "onmouseout", function(event){
-            // getting an out event when mousing over the span child, ignore this
-            if(event.target.parentNode != outterThis.placeholder){
-              dojo.removeClass(event.target, "over");
-            }
-          });
-          dojo.connect(this.placeholder, "onmouseup", function(event){
-            dojo.removeClass(event.target, "over");
-          });
 
-          dojo.connect(this.placeholder.firstChild, "onmouseover", function(event){
-            if(dojo.dnd.manager().source && outterThis.checkAcceptance(outterThis.dropZone, dojo.dnd.manager().nodes)){
-              dojo.addClass(outterThis.placeholder, "over");
-            }
-          });
-          dojo.connect(this.placeholder.firstChild, "onmouseup", function(event){
-            dojo.removeClass(outterThis.placeholder, "over");
-          });
+          // dojo.connect(this.placeholder.firstChild, "onmouseover", function(event){
+          //   if(dojo.dnd.manager().source && outterThis.checkAcceptance(outterThis.dropZone, dojo.dnd.manager().nodes)){
+          //     dojo.addClass(outterThis.placeholder, "over");
+          //   }
+          // });
+          // dojo.connect(this.placeholder.firstChild, "onmouseup", function(event){
+          //   dojo.removeClass(outterThis.placeholder, "over");
+          // });
         }
+
+
+        var outterThis = this;
+
+        this.subscriptions.push(dojo.subscribe("/dnd/start", function(){
+          if(!outterThis.checkAcceptance(outterThis.dropZone, dojo.dnd.manager().nodes)){
+            dojo.addClass(outterThis.domNode, "dimished");
+          }
+        }));
+        var unSubscribeFunc = function(){
+          dojo.removeClass(outterThis.domNode, "dimished");
+        };
+        this.subscriptions.push(dojo.subscribe("/dnd/cancel", unSubscribeFunc));
+        this.subscriptions.push(dojo.subscribe("/dnd/drop", unSubscribeFunc));
+
+
+        dojo.connect(this.domNode, "onmouseover", function(event){
+          if(dojo.dnd.manager().source && outterThis.checkAcceptance(outterThis.dropZone, dojo.dnd.manager().nodes)){
+            dojo.addClass(outterThis.domNode, "over");
+          }
+        });
+        dojo.connect(this.domNode, "onmouseout", function(event){
+          dojo.removeClass(outterThis.domNode, "over");
+        });
+        dojo.connect(this.domNode, "onmouseup", function(event){
+          dojo.removeClass(outterThis.domNode, "over");
+        });
+
+
+
+
         // this.handles.push[dojo.connect(this.dropZone, "onDrop", this, "onDrop")];
         this.handles.push[dojo.connect(this.dropZone, "createDropIndicator", this, "createDropIndicator")];
         this.handles.push[dojo.connect(this.dropZone, "placeDropIndicator", this, "placeDropIndicator")];
@@ -727,6 +747,10 @@ dojo.declare(
         });
         this.destroy();
         dojo.forEach(this.handles, dojo.disconnect);
+      },
+      destroy: function(){
+        dojo.forEach(this.subscriptions, dojo.unsubscribe);
+        this.inherited(arguments);
       }
     }
 );
@@ -762,7 +786,18 @@ dojo.declare(
           dojo.removeClass( e.target, "over");
         });
         dojo.connect(this.menuHandle, "onclick", this, "onContextMenu");
+
+        dojo.connect(this.domNode, "onmouseover", this, "onMouseOver");
+        dojo.connect(this.domNode, "onmouseout", this, "onMouseOut");
         this.inherited(arguments);
+      },
+      onMouseOver: function(){
+        if(!dojo.dnd.manager().source){
+          dojo.addClass(this.domNode, "over");
+        }
+      },
+      onMouseOut: function(){
+        dojo.removeClass(this.domNode, "over");
       },
 
 
