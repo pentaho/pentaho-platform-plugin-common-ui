@@ -283,12 +283,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         <include name="*"/>
       </fileset>
     </copy>
+
+    <if>
+    <available file="${stage.dir}/dojo-release"/>
+    <then>
     <mkdir dir="${js.script.package.dest}/dojo"/>
     <copy todir="${js.script.package.dest}/dojo" overwrite="true">
       <fileset dir="${stage.dir}/dojo-release">
         <include name="**/*"/>
       </fileset>
     </copy>
+    </then>
+    <else/>
+    </if>
   </target>
 
 
