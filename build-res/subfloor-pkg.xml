@@ -111,7 +111,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
   <target name="package"
           depends="assemble,package-zip,package-targz"
-          description="Creates packaged distributable artifacts" />
+          description="Creates packaged distributable artifacts" extensionOf="dist"/>
 
   <target name="package-zip">
     <zip destfile="${dist.dir}/${package.basename}.zip">
