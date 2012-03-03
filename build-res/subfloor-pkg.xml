@@ -110,7 +110,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   </target>
 
   <target name="package"
-          depends="assemble,package-zip,package-targz" extensionOf="dist"
+          depends="assemble,package-zip,package-targz"
           description="Creates packaged distributable artifacts" />
 
   <target name="package-zip">
@@ -169,7 +169,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       
       Publishes jar and zip package locally
       ====================================================================-->
-  <target name="pkgpublish-local-nojar" extensionOf="publish-local-nojar">
+  <target name="pkg.publish-local-nojar" extensionOf="publish-local-nojar">
+    <echo message="foool"/>
     <ivy:resolve file="${package.artifact.ivyfile}" />
     <ivy:publish resolver="local" pubrevision="${project.revision}" overwrite="true" forcedeliver="true">
       <artifacts pattern="${dist.dir}/[artifact]-[revision].[ext]" />

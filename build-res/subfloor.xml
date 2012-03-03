@@ -401,7 +401,7 @@ TYPICAL TARGET SEQUENCE
       Runs a typical continuous integration build including project dist,
       test, and coverage artifacts
       ====================================================================-->
-  <target name="continuous" depends="build,publish-nojar" />
+  <target name="continuous" depends="build,publish" />
 
 
   <!--=======================================================================
@@ -410,7 +410,7 @@ TYPICAL TARGET SEQUENCE
       Runs a typical continuous integration build including project dist,
       and coverage artifacts
       ====================================================================-->
-  <target name="continuous-testless" depends="build-testless,publish-nojar" />
+  <target name="continuous-testless" depends="build-testless,publish" />
 
 
   <!--=======================================================================

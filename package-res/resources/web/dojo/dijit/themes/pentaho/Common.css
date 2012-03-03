@@ -84,27 +84,23 @@
   /* the arrow piece for tooltips below an element */
   top: 0;
   left: 5px;
-  background:url("images/connector_top.png") no-repeat top left;
   width:36px;
   height:17px;
 }
 
 .dj_ie  .dijitTooltipBelow .dijitTooltipConnector {
   /* use gif for IE7 too, due to png rendering problems on fade-in (see http://trac.dojotoolkit.org/ticket/6555) */
-  background-image: url("images/connector_top.gif");
 }
 
 .dijitTooltipAbove .dijitTooltipConnector {
   /* the arrow piece for tooltips above an element */
   bottom: 0;
   left: 5px;
-  background:url("images/connector_bottom.png") no-repeat top left;
   width:36px;
   height:17px;
 }
 
 .dj_ie  .dijitTooltipAbove .dijitTooltipConnector {
-  background-image: url("images/connector_bottom.gif");
 }
 
 .dj_ie6  .dijitTooltipAbove .dijitTooltipConnector {
@@ -118,13 +114,11 @@
 .dijitTooltipLeft .dijitTooltipConnector {
   /* the arrow piece for tooltips to the left of an element, bottom borders aligned */
   right: 0;
-  background:url("images/connector_right.png") no-repeat top left;
   width:17px;
   height:36px;
 }
 
 .dj_ie  .dijitTooltipLeft .dijitTooltipConnector {
-  background-image: url("images/connector_right.gif");
 }
 
 .dijitTooltipRight {
@@ -134,7 +128,6 @@
 .dijitTooltipRight .dijitTooltipConnector {
   /* the arrow piece for tooltips to the right of an element, bottom borders aligned */
   left: 0;
-  background:url("images/connector_left.png") no-repeat top left;
   width:17px;
   height:36px;
 }

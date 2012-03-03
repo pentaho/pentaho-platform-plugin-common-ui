@@ -684,9 +684,6 @@ pentaho.VizController.convertToRGB = function(hex){
   } else {
     hex = pentaho.VizController.CSS_Names[hex.toLowerCase()];
   }
-  if(!parseInt(hex.substring(0,2),16) && parseInt(hex.substring(0,2),16) != 0){
-    debugger;
-  }
   return [
     parseInt(hex.substring(0,2),16),
     parseInt(hex.substring(2,4),16),

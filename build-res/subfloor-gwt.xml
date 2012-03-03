@@ -133,7 +133,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   <target name="gwt-compile"
           depends="gwt-compile.check, init"
           unless="gwtBuild.notRequired"
-          description="Perform GWT Compile" extensionOf="assemble">
+          description="Perform GWT Compile" extensionOf="dist">
     <java classname="com.google.gwt.dev.Compiler" fork="true" failonerror="true" maxmemory="${gwt-compile.maxmemory}">
       <classpath refid="codegen.classpath"/>
       <jvmarg value="-Xss${gwt-compile.maxstack}"/>

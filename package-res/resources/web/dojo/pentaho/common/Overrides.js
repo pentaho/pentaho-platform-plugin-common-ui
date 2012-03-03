@@ -3,7 +3,11 @@
  * in the future.
  */
 dojo.provide("pentaho.common.Overrides");
-
+dojo.require("dijit.DialogUnderlay");
+dojo.require("dijit.layout.TabContainer");
+dojo.require("dijit.layout.TabController");
+dojo.require("dijit.form.Button");
+dojo.require("dojo.dnd.Manager");
 dojo.extend(dijit.layout.TabContainer, {baseClass : "pentahoTabContainer"});
 
 dojo.extend(dijit.DialogUnderlay,

@@ -15,9 +15,11 @@
     and works with the subfloor.xml file.
   </description>
 
-  <property name="module.script.dir" value="package-res/resources/web"/>
+  <property name="js.module.script.dir" value="package-res/resources/web"/>
 
   <property name="ivy.repository.publish" value="file:///Users/nbaker/.m2/repository"/>
+
+
   <import file="build-res/subfloor-js.xml"/>
   <import file="build-res/subfloor-gwt.xml"/>
 
@@ -43,10 +45,11 @@
        </condition>
      </fail -->
 
-  <property name="dojo.version" value="1.6.1"/>
-  <property name="dojo-artifact" value="dojo-release-${dojo.version}-src"/>
-
   <property name="dev.res" value="dev-res"/>
+
+  <property name="dojo.version" value="1.6.1"/>
+
+  <property name="dojo-artifact" value="dojo-release-${dojo.version}-src"/>
 
   <property name="dojo.root"
             value="${dev.res}/dojo"
