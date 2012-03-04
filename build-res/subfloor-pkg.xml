@@ -62,25 +62,27 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             value="package-pom.xml"
             description="The Maven pom file defining dependencies of the package" />
 
-  <target name="clean-stage" extensionOf="clean-dist">
+  <target name="dist" depends="jar,package" description="Builds and packages the application" />
+
+  <target name="clean-dist">
     <delete dir="${dist.dir}" />
     <delete dir="${stage.dir}" />
   </target>
 
-  <!-- override of jar target.. this definitely should be moved into common build... looks like this is already done -->
-  <!--<target name="jar"-->
-          <!--depends="compile,set-build.id,create-version-file"-->
-          <!--description="Jars up the bin directory after a compile">-->
-    <!--<jar destfile="${dist.dir}/${ivy.artifact.id}-${project.revision}.jar">-->
-      <!--<manifest>-->
-        <!--<attribute name="Implementation-Title" value="${impl.title}" />-->
-        <!--<attribute name="Implementation-Version" value="${project.revision}.${build.id}" />-->
-        <!--<attribute name="Implementation-Vendor" value="${impl.vendor}" />-->
-        <!--<attribute name="Implementation-ProductID" value="${impl.productID}" />-->
-      <!--</manifest>-->
-      <!--<fileset dir="${classes.dir}" />-->
-    <!--</jar>-->
-  <!--</target>-->
+  <!-- override of jar target.. this definitely should be moved into common build -->
+  <target name="jar"
+          depends="compile,set-build.id,create-version-file"
+          description="Jars up the bin directory after a compile">
+    <jar destfile="${dist.dir}/${ivy.artifact.id}-${project.revision}.jar">
+      <manifest>
+        <attribute name="Implementation-Title" value="${impl.title}" />
+        <attribute name="Implementation-Version" value="${project.revision}.${build.id}" />
+        <attribute name="Implementation-Vendor" value="${impl.vendor}" />
+        <attribute name="Implementation-ProductID" value="${impl.productID}" />
+      </manifest>
+      <fileset dir="${classes.dir}" />
+    </jar>
+  </target>
 
   <target name="create-version-file">
     <propertyfile file="${classes.dir}/version.properties" comment="${impl.title} build information">
@@ -93,9 +95,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     <mkdir dir="${approot.stage.dir}" />
   </target>
 
-  <extension-point name="assemble" depends="assemble.init,assemble.copy-libs, assemble.copy-resources"/>
-
-  <target name="assemble.copy-resources">
+  <target name="assemble" depends="assemble.init,assemble.copy-libs">
     <copy todir="${approot.stage.dir}" overwrite="true">
       <fileset dir="${package.resdir}" />
     </copy>
@@ -111,7 +111,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
   <target name="package"
           depends="assemble,package-zip,package-targz"
-          description="Creates packaged distributable artifacts" extensionOf="dist"/>
+          description="Creates packaged distributable artifacts" />
 
   <target name="package-zip">
     <zip destfile="${dist.dir}/${package.basename}.zip">
@@ -154,9 +154,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   <!--=======================================================================
       publish-nojar (override)
       
-      Publishes the jar and zip package to the Maven repository
+      Publishes the zip package to the Maven repository
       ====================================================================-->
-  <target name="pkg.publish-nojar" extensionOf="publish-nojar">
+  <target name="publish-nojar" depends="install-antcontrib,create-pom,ivy.deliver,subfloor.publish-nojar">
 
     <antcall target="maven-publish-artifact">
       <param name="publish.pomFile" value="${package.artifact.pomfile}" />
@@ -167,14 +167,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   <!--=======================================================================
       publish-local-nojar (override)
       
-      Publishes jar and zip package locally
+      Publishes zip package locally
       ====================================================================-->
-  <target name="pkg.publish-local-nojar" extensionOf="publish-local-nojar">
-    <echo message="foool"/>
-    <ivy:resolve file="${package.artifact.ivyfile}" />
-    <ivy:publish resolver="local" pubrevision="${project.revision}" overwrite="true" forcedeliver="true">
-      <artifacts pattern="${dist.dir}/[artifact]-[revision].[ext]" />
-    </ivy:publish>
-  </target>
+	<target name="publish-local-nojar" depends="install-ivy,subfloor.publish-local-nojar">
+	    <ivy:resolve file="${package.artifact.ivyfile}" />
+	    <ivy:publish resolver="local" pubrevision="${project.revision}" overwrite="true" forcedeliver="true">
+	      <artifacts pattern="${dist.dir}/[artifact]-[revision].[ext]" />
+	    </ivy:publish>
+	</target>
 
 </project>

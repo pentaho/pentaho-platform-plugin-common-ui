@@ -15,13 +15,13 @@
     and works with the subfloor.xml file.
   </description>
 
+  <!-- Import the common_build.xml file which contains all the default tasks -->
+  <import file="build-res/subfloor-gwt.xml"/>
+
   <property name="js.module.script.dir" value="package-res/resources/web"/>
-
-  <property name="ivy.repository.publish" value="file:///Users/nbaker/.m2/repository"/>
-
+  <property name="js.module.script.namespace" value="common-ui"/>
 
   <import file="build-res/subfloor-js.xml"/>
-  <import file="build-res/subfloor-gwt.xml"/>
 
   <path id="test.classpath">
     <fileset dir="${devlib.dir}">
@@ -45,11 +45,10 @@
        </condition>
      </fail -->
 
-  <property name="dev.res" value="dev-res"/>
-
   <property name="dojo.version" value="1.6.1"/>
-
   <property name="dojo-artifact" value="dojo-release-${dojo.version}-src"/>
+
+  <property name="dev.res" value="dev-res"/>
 
   <property name="dojo.root"
             value="${dev.res}/dojo"
@@ -67,6 +66,8 @@
             value="${approot.stage.dir}/resources/web/dojo"
             description="production dojo staging directory"/>
 
+  <target name="dist" depends="jar" description="Creates a distribution">
+  </target>
 
   <!-- sets up the project for development/build, you should only need to run this once -->
   <target name="setup" depends="create-dev.res, resolve, unzip_dojo">
@@ -96,8 +97,8 @@
     </if>
   </target>
 
-  <target name="common-ui.assemble"
-          extensionOf="assemble" depends="plugin-create-js-variants,instrument-js,assemble-plugin">
+  <target name="assemble"
+          depends="jar,assemble.init,assemble.copy-libs,plugin-create-js-variants,instrument-js,assemble-plugin">
   </target>
 
   <target name="package-zip">
@@ -140,13 +141,13 @@
       </fileset>
     </copy>
     <copy todir="${dojo.prod.stage.dir}/dojox/widget/ColorPicker">
-        <fileset dir="${dojo.src}/dojox/widget/ColorPicker">
-        </fileset>
+      <fileset dir="${dojo.src}/dojox/widget/ColorPicker">
+      </fileset>
     </copy>
     <copy todir="${dojo.prod.stage.dir}/dojox/widget/nls">
-        <fileset dir="${dojo.src}/dojox/widget/nls">
+      <fileset dir="${dojo.src}/dojox/widget/nls">
         <include name="ColorPicker.js"/>
-        </fileset>
+      </fileset>
     </copy>
     <copy todir="${dojo.prod.stage.dir}/dojo/resources">
       <fileset dir="${dojo.src}/dojo/resources">
@@ -333,7 +334,7 @@
     </copy>
   </target>
 
-  <target name="plugin-build-js-pentaho" description="Does the Dojo build of src and compressed js files">
+  <target name="plugin-build-js-pentaho" description="Does the Dojo build of src and compressed js files" depends="subfloor-js.dist-js">
 
     <!-- use the Pentaho open-source license header -->
     <copy verbose="true" todir="${dojo.src}/util/buildscripts" overwrite="true">
@@ -346,7 +347,7 @@
 
   </target>
 
-  <target name="assemble.init" depends="setup">
+  <target name="assemble.init">
     <delete dir="${approot.stage.dir}/"/>
     <mkdir dir="${approot.stage.dir}/"/>
   </target>
@@ -407,5 +408,7 @@
       <arg line="${stage.dir}/javascript/instrumented"/>
     </exec>
   </target>
+
+  <target name="publish-nojar" depends="subfloor-js.js.publish-nojar, subfloor-pkg.publish-nojar"/>
 
 </project>

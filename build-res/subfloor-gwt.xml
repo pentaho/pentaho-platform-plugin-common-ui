@@ -58,7 +58,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
   <!-- override this in build.properties to change the copyright -->
   <property name="pentaho-copyright" value="This program is free software; you can redistribute it and/or modify it under the${line.separator}terms of the GNU Lesser General Public License, version 2.1 as published by the Free Software ${line.separator}Foundation.${line.separator}${line.separator}You should have received a copy of the GNU Lesser General Public License along with this ${line.separator}program; if not, you can obtain a copy at http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html ${line.separator}or from the Free Software Foundation, Inc., ${line.separator}51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.${line.separator}${line.separator}This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;${line.separator}without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.${line.separator}See the GNU Lesser General Public License for more details.${line.separator}${line.separator}Copyright 2011 Pentaho Corporation.  All rights reserved.${line.separator}"/>
-	
+  
   <!-- setup the classpath used for gwt-compile -->
   <path id="codegen.classpath">
     <fileset dir="${codegenlib.dir}">
@@ -85,23 +85,30 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   </path>
 
   <!--=======================================================================
-	    init (override)
-	    
-	    ====================================================================-->
-  <target name="gwt.init" extensionOf="init">
-    <echo message="gwt: init"/>
+      init (override)
+      
+      ====================================================================-->
+  <target name="init" depends="subfloor.init">
     <mkdir dir="${codegenlib.dir}" />
   </target>
 
   <!--=======================================================================
-	    clean (override)
-	    
-	    Removes all the files generated from the build process.
-	    ====================================================================-->
-  <target name="gwt.clean" extensionOf="clean"
+      clean (override)
+      
+      Removes all the files generated from the build process.
+      ====================================================================-->
+  <target name="clean" depends="subfloor.clean"
           description="Cleans all the files generated from a build with the exception of IVY-downloaded jars (see clean-all)">
     <delete file="${bin.dir}/.gwtBuild*" />
   </target>
+
+  <!--=======================================================================
+      clean-jars (override)
+      
+      Removes all the libraries that have been downloaded for this project
+      using the ivy dependencies.
+      ====================================================================-->
+  <target name="clean-jars" depends="clean-codegen,subfloor.clean-jars"/>
 
   <!--=======================================================================
       clean-codegen
@@ -109,9 +116,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       Removes all the codegen libraries that have been downloaded for this project
       using the ivy dependencies.
       ====================================================================-->
-  <target name="clean-codegen" extensionOf="clean-jars">
+  <target name="clean-codegen">
     <delete dir="${codegenlib.dir}" />
   </target>
+
+  <!--=======================================================================
+      resolve (override)
+      
+      Override to include resolution of IVY codegen and runtime configurations
+      ====================================================================-->
+  <target name="resolve" depends="resolve-codegen,resolve-runtime,subfloor.resolve" description="Resolves all IVY configurations"/>
 
 
   <!--=======================================================================
@@ -119,9 +133,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       
       Override to use OS-specific IVY configurations
       ====================================================================-->
-  <target name="resolve-codegen" extensionOf="resolve">
+  <target name="resolve-codegen" depends="resolve-init">
     <ivy:resolve file="ivy.xml" conf="codegen" />
-    <ivy:retrieve conf="codegen" pattern="${codegenlib.dir}/[module]-[revision](-[classifier]).[ext]" />
+    <ivy:retrieve conf="codegen" pattern="${codegenlib.dir}/[module]-[revision](-[classifier]).[ext]" symlink="${ivy.use.symlinks.internal}" />
   </target>
 
 
@@ -133,7 +147,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   <target name="gwt-compile"
           depends="gwt-compile.check, init"
           unless="gwtBuild.notRequired"
-          description="Perform GWT Compile" extensionOf="dist">
+          description="Perform GWT Compile">
     <java classname="com.google.gwt.dev.Compiler" fork="true" failonerror="true" maxmemory="${gwt-compile.maxmemory}">
       <classpath refid="codegen.classpath"/>
       <jvmarg value="-Xss${gwt-compile.maxstack}"/>
@@ -153,13 +167,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     <replaceregexp match="^^" replace="&lt;!--${pentaho-copyright}--&gt;${line.separator}">
       <fileset dir="${gwt.output.dir}" includes="**/*.cache.html" />
     </replaceregexp>
-
-    <copy todir="${stage.dir}">
-      <fileset dir="${gwt.output.dir}">
-        <exclude name=".gwt-tmp/" />
-        <exclude name="*-aux/" />
-      </fileset>
-    </copy>
+    
   </target>
 
 
@@ -173,6 +181,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     <uptodate property="gwtBuild.notRequired" targetfile="${bin.dir}/.gwtBuild-${gwt-module.path}">
       <srcfiles dir="${src.dir}" />
     </uptodate>
+  </target>
+
+  <!--=======================================================================
+      assemble (override)
+      
+      Overriden to force gwt javascript compilation
+      ====================================================================-->
+  <target name="assemble" depends="gwt-compile,assemble.init,assemble.copy-libs">
+    <copy todir="${stage.dir}">
+      <fileset dir="${gwt.output.dir}">
+        <exclude name=".gwt-tmp/" />
+        <exclude name="*-aux/" />
+      </fileset>
+    </copy>
   </target>
 
 </project>

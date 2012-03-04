@@ -78,21 +78,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   <property name="js.dojo.module.name" value="dojo-custom"/>
 
 
-  <target name="js.clean" extensionOf="clean"
+  <target name="js.clean"
           description="Cleans all the files generated from a build with the exception of IVY-downloaded jars (see clean-all)">
     <delete dir="${js.module.script.agg.dir}"/>
   </target>
 
-  <target name="resolve-js" extensionOf="resolve">
+  <target name="resolve-js">
     <ivy:resolve file="ivy.xml" conf="js"/>
     <ivy:retrieve conf="js" pattern="${js.lib.dir}/[module]-[revision](-[classifier]).[ext]"/>
   </target>
 
-  <target name="clean-js" extensionOf="clean-jars">
+  <target name="clean-js">
     <delete dir="${js.lib.dir}" />
   </target>
 
-  <target name="build-js" extensionOf="dist" depends="install-antcontrib">
+  <target name="build-js" depends="install-antcontrib">
     <delete dir="${js.build.output.dir}"/>
     <delete dir="${js.module.script.agg.dir}" />
     <echo message="js.module.script.agg.dir: ${js.module.script.agg.dir}"/>
@@ -203,7 +203,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
   </target>
 
-  <target name="dist-js" extensionOf="dist-source">
+  <target name="dist-js" >
     <echo message="dist-js: ${js.module.script.dir}"/>
     <mkdir dir="bin/js-source/${js.module.script.namespace}"/>
     <copy todir="bin/js-source/${js.module.script.namespace}" overwrite="true">
@@ -217,7 +217,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     </zip>
   </target>
 
-  <target name="js.publish-nojar" extensionOf="publish-nojar">
+  <target name="js.publish-nojar">
     <antcall target="maven-publish-js-source">
       <param name="publish.groupId" value="${ivy.artifact.group}" />
       <param name="publish.artifactId" value="${ivy.artifact.id}" />
@@ -272,7 +272,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   </target>
 
 
-  <target name="package-js-output" extensionOf="assemble">
+  <target name="package-js-output">
     <copy todir="${js.script.package.dest}" overwrite="true">
       <fileset dir="${js.module.script.dir}">
         <include name="**/*"/>
