@@ -2,7 +2,7 @@
 var analyzerPlugins = analyzerPlugins || [];
 
 analyzerPlugins.push({
-    init:function (){
+    init: function (){
 
         dojo.declare("analyzer.CCCVizHelper", null, {
 
@@ -120,7 +120,7 @@ analyzerPlugins.push({
                         // For measures the relevant order is the report order...
                         // But note that this index may not be contiguous
                         //  because formula may be hidden.
-                        // Belor, after sorting, measure indexes are reassigned.
+                        // Below, after sorting, measure indexes are reassigned.
                         formIndex = index;
                     } else {
                         // !isMeasure => has formula => gem or already excluded
@@ -128,6 +128,10 @@ analyzerPlugins.push({
 
                         var fieldHelp = cv.getFieldHelp();
                         hierarchy = fieldHelp.get(formula, 'hierarchy');
+
+                        // Indexes of non-measure formulas also have to "fixed"
+                        // because not always they start at 0-gembar-ordinal
+                        // due to addition and removal of formulas from gems.
                         formIndex = parseFloat(gem.getGembarOrdinal());
                     }
 
@@ -145,12 +149,11 @@ analyzerPlugins.push({
                 // Return formulas sorted by index
                 formulasInfo.sort(function(a, b){ return a.index - b.index; });
 
-                if(isMeasure){
-                    // Fix non-contiguous indexes
-                    dojo.forEach(formulasInfo, function(formulaInfo, index){
-                        formulaInfo.index = index;
-                    }, this);
-                }
+                
+                // Fix non-contiguous indexes
+                dojo.forEach(formulasInfo, function(formulaInfo, index){
+                    formulaInfo.index = index;
+                }, this);
 
                 return formulasInfo;
             },
@@ -247,13 +250,15 @@ analyzerPlugins.push({
 
         var vizIds = [
                     'ccc_heatgrid'
-                    /*
+					/*
                     'ccc_bar',
                     'ccc_barstacked',
                     'ccc_barnormalized',
                     'ccc_horzbar',
                     'ccc_horzbarstacked',
                     'ccc_horzbarnormalized',
+                    'ccc_line',
+                    'ccc_area',
                     'ccc_bulletchart'
                     */
                 ];

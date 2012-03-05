@@ -25,17 +25,11 @@ function defVisualization(viz){
  Visualization Metadata
  These objects describe the visualizations provided by this library.
  */
-var lineStrokeStyle = '#A0A0A0', // #D8D8D8',// #f0f0f0
-    baseBarChartArgs = {
-    cccClass: 'pvc.BarChart', // Default
+var lineStrokeStyle = '#A0A0A0'; // #D8D8D8',// #f0f0f0
 
+var baseCategChartArgs = {
     legend: true,
 
-    panelSizeRatio: 0.6,
-
-    //axisOffset:  0.1,
-
-    //yAxisPosition: 'left',
     yAxisSize:     100,
     yAxisFullGrid: true,
     yAxisEndLine:  true,
@@ -47,7 +41,7 @@ var lineStrokeStyle = '#A0A0A0', // #D8D8D8',// #f0f0f0
     xAxisEndLine:  true,
     xAxisDesiredTickCount: 10,
     xAxisDomainRoundMode: 'tick',
-
+    
     extensionPoints: {
         yAxisRule_strokeStyle: lineStrokeStyle,
         yAxisEndLine_strokeStyle: lineStrokeStyle,
@@ -70,235 +64,189 @@ var lineStrokeStyle = '#A0A0A0', // #D8D8D8',// #f0f0f0
     seriesIncludeMeasures: true
 };
 
-var baseVertiBarChartArgs = pvc.create(baseBarChartArgs);
-pvc.mergeOwn(baseVertiBarChartArgs, {
+var baseVertiCategChartArgs = pvc.create(baseCategChartArgs, {
     legendPosition: 'right',
     legendAlign: 'top',
 
-    // Inherit extension points also!
-    extensionPoints: pvc.create(baseBarChartArgs.extensionPoints)
+    extensionPoints: {
+        xAxisLabel_textAngle:    -Math.PI/6,
+        xAxisLabel_textAlign:    "right",
+        xAxisLabel_textBaseline: "top",
+        yAxisTicks_strokeStyle:  lineStrokeStyle
+    }
 });
 
-pvc.mergeOwn(baseVertiBarChartArgs.extensionPoints, {
-    xAxisLabel_textAngle:    -Math.PI/6,
-    xAxisLabel_textAlign:    "right",
-    xAxisLabel_textBaseline: "top",
-    yAxisTicks_strokeStyle:  lineStrokeStyle
-});
-
-// -----
-
-var baseHorizBarChartArgs = pvc.create(baseBarChartArgs);
-pvc.mergeOwn(baseHorizBarChartArgs, {
+var baseHorizCategChartArgs = pvc.create(baseCategChartArgs, {
     orientation:   'horizontal',
-    yAxisSize:       150,
-    xAxisSize:       50,
-    xAxisPosition: 'top',
+    yAxisSize:      150,
+    xAxisSize:      50,
+    xAxisPosition:  'top',
     legendPosition: 'right',
-    legendAlign:     'middle',
+    legendAlign:    'middle',
 
-    // Inherit extension points also!
-    extensionPoints: pvc.create(baseBarChartArgs.extensionPoints)
+    extensionPoints: {
+        xAxisTicks_strokeStyle: lineStrokeStyle
+    }
 });
 
-pvc.mergeOwn(baseHorizBarChartArgs.extensionPoints, {
-    xAxisTicks_strokeStyle: '#D8D8D8'
-});
+var mixinBarChartArgs = {
+        cccClass: 'pvc.BarChart', // Default
+        panelSizeRatio: 0.6
+    },
+    baseVertiBarChartArgs = pvc.create(baseVertiCategChartArgs, mixinBarChartArgs),
+    baseHorizBarChartArgs = pvc.create(baseHorizCategChartArgs, mixinBarChartArgs);
 
 // ----
 
 defVisualization({
-  id: 'ccc_bar',                          // unique identifier
-  type: 'barchart',                       // generic type id
-  source: 'CCC',                          // id of the source library
-  name: 'CCC Column',                     // visible name, this will come from a properties file eventually
-  'class': 'pentaho.ccc.CccChart',          // type of the Javascript object to instantiate
-  args: pvc.mergeOwn(
-            pvc.create(baseVertiBarChartArgs),
-            {
-            }),
-  propMap: [],
-  // dataReqs describes the data requirements of this visualization
-  dataReqs: [
-    {
-      name: 'Default',
-      reqs : createVizDataReq("Category", "Series", "Value")
-    }
-  ]
-});
-
-defVisualization({
-  id: 'ccc_barstacked',
-  type: 'barchart',
-  source: 'CCC',
-  name: 'CCC Stacked Column',
-  'class': 'pentaho.ccc.CccChart',
-  args: pvc.mergeOwn(
-            pvc.create(baseVertiBarChartArgs),
-            {
-                stacked: true
-            }),
-  propMap: [],
-  dataReqs: [
-    {
-      name: 'Default',
-      reqs : createVizDataReq("Category", "Series", "Value")
-    }
-  ]
-});
-
-defVisualization({
-  id: 'ccc_horzbar',
-  type: 'horzbarchart',
-  source: 'CCC',
-  name: 'CCC Bar',
-  'class': 'pentaho.ccc.CccChart',
-  args:  pvc.mergeOwn(
-            pvc.create(baseHorizBarChartArgs),
-            {
-            }),
-  propMap: [],
-  dataReqs: [
-    {
-      name: 'Default',
-      reqs : createVizDataReq("Category", "Series", "Value")
-    }
-  ]
-});
-
-defVisualization({
-  id: 'ccc_horzbarstacked',
-  type: 'horzbarchart',
-  source: 'CCC',
-  name: 'CCC Stacked Bar',
-  'class': 'pentaho.ccc.CccChart',
-  args:  pvc.mergeOwn(
-            pvc.create(baseHorizBarChartArgs),
-            {
-                stacked: true
-            }),
-  propMap: [],
-  dataReqs: [
-    {
-      name: 'Default',
-      reqs : createVizDataReq("Category", "Series", "Value")
-    }
-  ]
-});
-
-defVisualization({
-  id: 'ccc_barnormalized',
-  type: 'barchart',
-  source: 'CCC',
-  name: 'CCC 100% Stacked Column',
-  'class': 'pentaho.ccc.CccChart',
-  args: pvc.mergeOwn(
-            pvc.create(baseVertiBarChartArgs),
-            {
-                cccClass: 'pvc.NormalizedBarChart'
-            }),
-  propMap: [],
-  dataReqs: [
-    {
-      name: 'Default',
-      reqs : createVizDataReq("Category", "Series", "Value")
-    }
-  ]
-});
-
-defVisualization({
-  id: 'ccc_horzbarnormalized',
-  type: 'horzbarchart',
-  source: 'CCC',
-  name: 'CCC 100% Stacked Bar',
-  'class': 'pentaho.ccc.CccChart',
-  args:  pvc.mergeOwn(
-            pvc.create(baseHorizBarChartArgs),
-            {
-                cccClass: 'pvc.NormalizedBarChart'
-            }),
-  propMap: [],
-  dataReqs: [
-    {
-      name: 'Default',
-      reqs : createVizDataReq("Category", "Series", "Value")
-    }
-  ]
-});
-
-defVisualization({
-  id: 'ccc_line',
-  type: 'linechart',
-  source: 'CCC',
-  name: 'CCC Line',
-  'class': 'pentaho.ccc.CccChart',
-  args: {
-    cccClass: 'pvc.LineChart',
-    stacked: false,
-    orientation: 'vertical',
-    showDots: true,
-    extensionPoints: {
-      xAxisLabel_textAngle: -1,
-      xAxisLabel_textAlign: "right",
-      xAxisLabel_textBaseline: "top"
-    }
-  },
-  propMap: [],
-  dataReqs: [
-    {
-      name: 'Default',
-      reqs:[
-        {   id: 'rows',
-          dataType: 'string',
-          dataStructure: 'column',
-          caption: 'Category',
-          required: true
-        },
-        {   id: 'measures',
-          dataType: 'number',
-          dataStructure: 'column',
-          caption: 'Values',
-          required: true,
-          allowMultiple: true
+    id: 'ccc_bar',                          // unique identifier
+    type: 'barchart',                       // generic type id
+    source: 'CCC',                          // id of the source library
+    name: 'CCC Column',                     // visible name, this will come from a properties file eventually
+    'class': 'pentaho.ccc.CccChart',          // type of the Javascript object to instantiate
+    args: pvc.create(baseVertiBarChartArgs),
+    propMap: [],
+    // dataReqs describes the data requirements of this visualization
+    dataReqs: [{
+            name: 'Default',
+            reqs : createVizDataReq("Category", "Series", "Value")
         }
-      ]
-    }
-  ]
+    ]
 });
 
 defVisualization({
-  id: 'ccc_area',
-  type: 'areachart',
-  source: 'CCC',
-  name: 'CCC Area',
-  'class': 'pentaho.ccc.CccChart',
-  args: {
-    cccClass: 'pvc.StackedAreaChart',
-    stacked: true,
-    orientation: 'vertical',
-    showDots: false
-  },
-  propMap: [],
-  dataReqs: [
-    {
-      name: 'Default',
-      reqs :[
-        {   id: 'rows',
-          dataType: 'string',
-          dataStructure: 'column',
-          caption: 'Category',
-          required: true
-        },
-        {   id: 'measures',
-          dataType: 'number',
-          dataStructure: 'column',
-          caption: 'Values',
-          required: true,
-          allowMultiple: true
+    id: 'ccc_barstacked',
+    type: 'barchart',
+    source: 'CCC',
+    name: 'CCC Stacked Column',
+    'class': 'pentaho.ccc.CccChart',
+    args: pvc.create(baseVertiBarChartArgs, {
+            stacked: true
+          }),
+    propMap: [],
+    dataReqs: [{
+            name: 'Default',
+            reqs : createVizDataReq("Category", "Series", "Value")
         }
-      ]
-    }
-  ]
+    ]
+});
+
+defVisualization({
+    id: 'ccc_horzbar',
+    type: 'horzbarchart',
+    source: 'CCC',
+    name: 'CCC Bar',
+    'class': 'pentaho.ccc.CccChart',
+    args:  pvc.create(baseHorizBarChartArgs),
+    propMap: [],
+    dataReqs: [{
+            name: 'Default',
+            reqs : createVizDataReq("Category", "Series", "Value")
+        }
+    ]
+});
+
+defVisualization({
+    id: 'ccc_horzbarstacked',
+    type: 'horzbarchart',
+    source: 'CCC',
+    name: 'CCC Stacked Bar',
+    'class': 'pentaho.ccc.CccChart',
+    args:  pvc.create(baseHorizBarChartArgs, {
+               stacked: true
+           }),
+    propMap: [],
+    dataReqs: [{
+            name: 'Default',
+            reqs : createVizDataReq("Category", "Series", "Value")
+        }
+    ]
+});
+
+defVisualization({
+    id: 'ccc_barnormalized',
+    type: 'barchart',
+    source: 'CCC',
+    name: 'CCC 100% Stacked Column',
+    'class': 'pentaho.ccc.CccChart',
+    args: pvc.create(baseVertiBarChartArgs, {
+            cccClass: 'pvc.NormalizedBarChart'
+          }),
+    propMap: [],
+    dataReqs: [{
+            name: 'Default',
+            reqs : createVizDataReq("Category", "Series", "Value")
+        }
+    ]
+});
+
+defVisualization({
+    id: 'ccc_horzbarnormalized',
+    type: 'horzbarchart',
+    source: 'CCC',
+    name: 'CCC 100% Stacked Bar',
+    'class': 'pentaho.ccc.CccChart',
+    args:  pvc.create(baseHorizBarChartArgs, {
+              cccClass: 'pvc.NormalizedBarChart'
+           }),
+    propMap: [],
+    dataReqs: [{
+            name: 'Default',
+            reqs : createVizDataReq("Category", "Series", "Value")
+        }
+    ]
+});
+
+defVisualization({
+    id: 'ccc_line',
+    type: 'linechart',
+    source: 'CCC',
+    name: 'CCC Line',
+    'class': 'pentaho.ccc.CccChart',
+    args: pvc.create(baseVertiCategChartArgs, {
+              cccClass: 'pvc.LineChart',
+              
+              // Default value for 'shape' data request
+              shape: 'circle'
+          }),
+    propMap: [],
+    dataReqs: [{
+            name: 'Default',
+            reqs: pvc.arrayAppend(
+                createVizDataReq("Category", "Series", "Value"),
+                [
+                    {
+                        id: 'shape',
+                        dataType: 'string',
+                        values: ['none', 'circle', 'cross', 'diamond', 'square', 'triangle'],
+                        ui: {
+                            labels:  ["None", "Circle", "Cross", "Diamond", "Square", "Triangle"],
+                            group:   'options',
+                            type:    'combo',
+                            caption: "Shape"
+                        }
+                    }
+                ])
+        }
+    ]
+});
+
+defVisualization({
+    id: 'ccc_area',
+    type: 'areachart',
+    source: 'CCC',
+    name: 'CCC Area',
+    'class': 'pentaho.ccc.CccChart',
+    args: pvc.create(baseVertiCategChartArgs, {
+              cccClass: 'pvc.StackedAreaChart',
+              showLines: true
+          }),
+    propMap: [],
+    dataReqs: [{
+            name: 'Default',
+            reqs: createVizDataReq("Category", "Series", "Value")
+        }
+    ]
 });
 
 defVisualization({
@@ -377,56 +325,56 @@ defVisualization({
 });
 
 defVisualization({
-  id: 'ccc_heatgrid',
-  type: 'heatgrid',
-  source: 'CCC',
-  name: 'Heat Grid',
-  'class': 'pentaho.ccc.CccChart',
+    id: 'ccc_heatgrid',
+    type: 'heatgrid',
+    source: 'CCC',
+    name: 'Heat Grid',
+    'class': 'pentaho.ccc.CccChart',
 
-  args: {
-    cccClass: 'pvc.HeatGridChart',
-    crosstabMode: true,
-    normPerBaseCategory: false,
-    showXScale: true,
-    xAxisPosition: "bottom",
-    showYScale: true,
-    yAxisPosition: "left",
+    args: {
+        cccClass: 'pvc.HeatGridChart',
+        crosstabMode: true,
+        normPerBaseCategory: false,
+        showXScale: true,
+        xAxisPosition: "bottom",
+        showYScale: true,
+        yAxisPosition: "left",
 
-    seriesInRows: false,
+        seriesInRows: false,
 
-    timeSeries: false,
-    panelSizeRatio: 0.8,
-    orientation: "vertical",
-    showValues: false,
-    valuesAnchor: "right",
-    titlePosition: "top",
-    titleSize: 25,
-    xAxisSize: 30,
-    yAxisSize: 50,
-    xAxisFullGrid: false,
-    yAxisFullGrid: false,
-    orthoAxisOrdinal: false,
-    scalingType: "linear",
-    numSD: 2,
-    nullColor: "#efc5ad",
-    extensionPoints: [],
-    useShapes: true,
-    shape: 'square',
-    isMultiValued: true,
-    useCompositeAxis:true,
-    colorValIdx: 0,
-    sizeValIdx:  1,
-    ctrlSelectMode: false,
-    tipsySettings: {
-        html: true,
-        gravity: "c",
-        fade: false,
-        followMouse:true,
-        opacity: 1
-    }
-  },
-  propMap: [],
-  dataReqs: [
+        timeSeries: false,
+        panelSizeRatio: 0.8,
+        orientation: "vertical",
+        showValues: false,
+        valuesAnchor: "right",
+        titlePosition: "top",
+        titleSize: 25,
+        xAxisSize: 30,
+        yAxisSize: 50,
+        xAxisFullGrid: false,
+        yAxisFullGrid: false,
+        orthoAxisOrdinal: false,
+        scalingType: "linear",
+        numSD: 2,
+        nullColor: "#efc5ad",
+        extensionPoints: [],
+        useShapes: true,
+        shape: 'square',
+        isMultiValued: true,
+        useCompositeAxis:true,
+        colorValIdx: 0,
+        sizeValIdx:  1,
+        ctrlSelectMode: false,
+        tipsySettings: {
+            html: true,
+            gravity: "c",
+            fade: false,
+            followMouse:true,
+            opacity: 1
+        }
+    },
+    propMap: [],
+    dataReqs: [
     {
       name: 'Default',
       reqs :[
@@ -473,7 +421,6 @@ defVisualization({
             caption: "Pattern"
           }
         },
-
         {
           id: 'colorSet',
           dataType: 'string',
@@ -485,8 +432,6 @@ defVisualization({
             caption: "Color"
           }
         },
-
-
         {
           id: 'reverseColors',
           dataType: 'boolean',
@@ -501,9 +446,9 @@ defVisualization({
           dataType: 'string',
           values: ["square", "circle"],
           ui: {
-            labels: ["Square", "Circle"],
-            group: "options",
-            type: 'combo',
+            labels:  ["Square", "Circle"],
+            group:   "options",
+            type:    'combo',
             caption: "Shape"
           }
         }
@@ -604,7 +549,8 @@ pentaho.ccc.CccChart = function(element) {
     * for being chosen as the drilling axis.
     */
     this._keyAxes = ['column', 'row'];
-
+    this._drillAxes = this._keyAxes;
+    
     // _allAxes includes the non-key 'measure' axis
     this._allAxes = this._keyAxes.slice(0);
     this._allAxes.push('measure');
@@ -687,10 +633,7 @@ pentaho.ccc.CccChart.prototype._initializeOptions = function(vizOptions){
     // * userDefinedProperties smash chart args' extension points...
     var chartArgsExtPoints = this.controller.currentViz.args.extensionPoints;
     if(chartArgsExtPoints){
-        var vizExtPoints = vizOptions.extensionPoints;
-        vizOptions.extensionPoints = pvc.mergeOwn(
-                                        pvc.create(chartArgsExtPoints),
-                                        vizExtPoints);
+        vizOptions.extensionPoints = pvc.create(chartArgsExtPoints, vizOptions.extensionPoints);
     }
 
     // store the current highlighted selections
@@ -713,7 +656,7 @@ function AxisInfo(axis, formulaInfos){
     this.depth = this.formulasInfo.length;
 
     this.formulas = this.formulasInfo.map(function(formInfo){
-        // Ovewrite axis id with corresponding AxisInfo instance
+        // Overwrite axis id with corresponding AxisInfo instance
         formInfo.axis = this;
 
         return formInfo.formula;
@@ -728,6 +671,58 @@ function AxisInfo(axis, formulaInfos){
 AxisInfo.prototype.getAxisLabel = function(){
     return this.formulasInfo.map(function(formInfo){ return formInfo.label; }, this)
                 .join(" and "); // TODO localize
+};
+
+pentaho.ccc.CccChart.prototype._calcFilteredAxisFormulasInfo = function(axis){
+    var formulasInfo = this._vizHelper.getAxisFormulasInfo(axis);
+    if(axis !== 'measure'){
+        return formulasInfo;
+    }
+
+    var filtered = [],
+        usedMeasureIds = this._getUsedMeasuresIds();
+
+    formulasInfo.forEach(function(formulaInfo){
+        var meaId = formulaInfo.id;
+        if(meaId && pvc.hasOwn(usedMeasureIds, meaId)){
+            formulaInfo.index = filtered.length;
+            filtered.push(formulaInfo);
+        }
+    });
+    
+    return filtered;
+};
+
+pentaho.ccc.CccChart.prototype._getUsedMeasuresIds = function(){
+    // Data truncation can affect also the structure of data.
+    // If the query returns more than 100x100 rowsxcols,
+    // requested measure formulas may be suppressed.
+    // Filter measures not returned in this._dataTable
+
+    assert(this._rowAxis, "Measure axis must be the last one to be processed.");
+
+    var dataTable = this._dataTable,
+        dtColCount = dataTable.getNumberOfColumns(),
+        seenMeasureIds = {},
+        lastMeasureId;
+
+    for(var tc = this._rowAxis.depth ; tc < dtColCount ; tc++){
+        var dtColId = dataTable.getColumnId(tc),
+            dtColParts = dtColId.split('~'),
+            meaId = dtColParts.length > 1 ? dtColParts.pop() : dtColParts[0];
+
+        if(meaId && (!lastMeasureId || lastMeasureId !== meaId)){
+            if(pvc.hasOwn(seenMeasureIds, meaId)){
+                // Have seen all distinct measures
+                break;
+            }
+
+            seenMeasureIds[meaId] = true;
+            lastMeasureId = meaId;
+        }
+    }
+
+    return seenMeasureIds;
 };
 
 pentaho.ccc.CccChart.prototype._initializeAxesMetadata = function(){
@@ -754,7 +749,7 @@ pentaho.ccc.CccChart.prototype._initializeAxesMetadata = function(){
      *   this._measureAxis = ...
      */
     this._allAxesInfo = pv.dict(this._allAxes, function(axis){
-        var axisInfo = new AxisInfo(axis, myself._vizHelper.getAxisFormulasInfo(axis));
+        var axisInfo = new AxisInfo(axis, myself._calcFilteredAxisFormulasInfo(axis));
 
         myself["_" + axisInfo.id + "Axis"] = axisInfo;
 
@@ -843,7 +838,7 @@ pentaho.ccc.CccChart.prototype._buildCrossTable = function(){
             colValsJoined = '';
         }
 
-        // Obtain the formula corrsponding to the id.
+        // Obtain the formula corresponding to the id.
         var meaInfo = this._formulasInfo[meaId];
         if(!meaInfo){
             // unmapped measure
@@ -1247,12 +1242,15 @@ pentaho.ccc.CccChart.prototype._prepareOptions = function(){
         legendPosition: "bottom",
 
         titlePosition:  "top",
+        
+        margins: 20,
 
         showTooltips: true,
         showValues:   false,
 
         clickable:    true,
         selectable:   true,
+        ctrlSelectMode: false,
 
         title:  this._title == "" ? null : this._title,
         colors: this.getColors(),
@@ -1272,9 +1270,9 @@ pentaho.ccc.CccChart.prototype._prepareOptions = function(){
         }
     };
 
-    // NOTE: When interaction is disabled, these come undefined...
-    vizOptions.height = vizOptions.height || 300;
-    vizOptions.width  = vizOptions.width  || 300;
+    // Just in case
+    vizOptions.height = vizOptions.height || 400;
+    vizOptions.width  = vizOptions.width  || 400;
 
     // ------------
 
@@ -1298,7 +1296,13 @@ pentaho.ccc.CccChart.prototype._prepareOptions = function(){
 
         case 'pvc.BarChart':
         case 'pvc.NormalizedBarChart':
-            this._prepareOptionsBar();
+        case 'pvc.StackedAreaChart':
+            this._prepareOptionsCategNormal();
+            break;
+
+        case 'pvc.LineChart':
+            this._prepareOptionsCategNormal();
+            this._prepareOptionsLine();
             break;
     }
 
@@ -1366,23 +1370,21 @@ pentaho.ccc.CccChart.prototype._prepareOptionsHeatGrid = function() {
 
     // Drill down on shapes
     options.doubleClickAction = function(s, c, d, ev, datum){
-        return myself._drillDown(myself._readCccAxesValues(
-                    datum.elem.series.path,
-                    datum.elem.category.path));
+        return myself._drillDown(myself._readDatum(datum));
     };
 
     // Drill down on y axis
     options.yAxisDoubleClickAction = function (d){
-        return myself._drillDown(myself._readCccAxesValues(d.path, null));
+        return myself._drillDown(myself._readCccAxesValues(d.absValue, null));
     };
 
     // Drill down on x axis
     options.xAxisDoubleClickAction = function (d) {
-        return myself._drillDown(myself._readCccAxesValues(null, d.path));
+        return myself._drillDown(myself._readCccAxesValues(null, d.absValue));
     };
 
-    options.customTooltip = function(s, c){
-        return myself._getTooltipText(myself._readCccAxesValues(s, c));
+    options.customTooltip = function(s, c, v, datum){
+        return myself._getTooltipText(myself._readDatum(datum));
     };
 };
 
@@ -1444,12 +1446,15 @@ pentaho.ccc.CccChart.prototype._prepareLayoutHeatGrid = function() {
 };
 
 
-pentaho.ccc.CccChart.prototype._prepareOptionsBar = function() {
+pentaho.ccc.CccChart.prototype._prepareOptionsCategNormal = function() {
     var myself = this,
         options = this.options;
 
-    options.customTooltip = function(s, c){
-        return myself._getTooltipText(myself._readCccAxesValues(s, c));
+    // Drill on categories first and only then on series
+    this._drillAxes = ['row', 'column'];
+
+    options.customTooltip = function(s, c, v, datum){
+        return myself._getTooltipText(myself._readDatum(datum));
     };
 
     // Use selection event handler instead of clickAction
@@ -1458,13 +1463,21 @@ pentaho.ccc.CccChart.prototype._prepareOptionsBar = function() {
     };
 
     // Drill down on shapes
-    options.doubleClickAction = function(s, c){
-        if(myself._drillDown(myself._readCccAxesValues(s, c))){
-            // TODO really needed?
-            // needed for content linking
-            // onDoubleClickHeatGrid.call(this, s, c);
-        }
+    options.doubleClickAction = function(s, c, v, ev, datum){
+        myself._drillDown(myself._readDatum(datum));
     };
+};
+
+pentaho.ccc.CccChart.prototype._prepareOptionsLine = function() {
+    var vizOptions = this._vizOptions;
+
+    var shape = vizOptions.shape;
+    if(shape && shape === 'none'){
+        vizOptions.showDots = false;
+    } else {
+        vizOptions.showDots = true;
+        vizOptions.extensionPoints.dot_shape = shape;
+    }
 };
 
 
@@ -1479,11 +1492,7 @@ pentaho.ccc.CccChart.prototype._prepareOptionsBullet = function() {
         var c = d.title,
             s = d.subtitle;
 
-        if(myself._drillDown(myself._readCccAxesValues(s, c))){
-            // TODO really needed?
-            // needed for content linking
-            // onDoubleClickHeatGrid.call(this, s, c);
-        }
+        myself._drillDown(myself._readCccAxesValues(s, c));
     };
 
     options.clickAction = function (c, s) {
@@ -1615,6 +1624,13 @@ pentaho.ccc.CccChart.prototype._renderChart = function(){
 
 // -----------------------------
 // INTERACTIVE / CLIENT-SIDE ONLY
+pentaho.ccc.CccChart.prototype._readDatum = function(datum){
+    var dimensions = datum.elem;
+    return this._readCccAxesValues(
+                    dimensions.series.absValue,
+                    dimensions.category.absValue);
+};
+
 pentaho.ccc.CccChart.prototype._readCccAxesValues = function(s, c){
     // Ensure arrays
     var rowVals = readCccValue(c),
@@ -1625,6 +1641,7 @@ pentaho.ccc.CccChart.prototype._readCccAxesValues = function(s, c){
     if(colVals && this._vizOptions.seriesIncludeMeasures){
         // Remove the last element from series,
         // because it's the measure's name
+        colVals = colVals.slice(0);
         colVals.pop();
     }
 
@@ -1840,7 +1857,7 @@ pentaho.ccc.CccChart.prototype._drillDown = function(axesVals){
     var drillInfo = this._getDrillDownInfo(axesVals);
     if(!drillInfo){
         // Drilling is disabled OR Nothing to drill on.
-        // A double-click is sent to support "content linking".
+        // A double-click is triggered to support "content linking".
         pentaho.events.trigger(this, "doubleclick", {
             source:     this,
             selections: [this._convertAxesValuesToAnalyzerSelection(axesVals)]
@@ -1878,7 +1895,7 @@ pentaho.ccc.CccChart.prototype._drillDown = function(axesVals){
     this._keyAxes.forEach(function(axis){
         var vals = axesVals[axis];
         if(vals){
-            keep.call(this, this._allAxesInfo[axis].formulasInfo, vals);
+            keep.call(this, axis, this._allAxesInfo[axis].formulasInfo, vals);
         }
     }, this);
 
@@ -1899,18 +1916,20 @@ pentaho.ccc.CccChart.prototype._drillDown = function(axesVals){
     }
 
     /** @instance */
-    function keep(formsInfo, vals){
-        formsInfo.forEach(function(formInfo){
-            // Only include formulas of a given hierarchy once
-            if(!(formInfo.hierarchy in usedHierarchiesSet)){
-                // Find the most specific formula in forms, of this hierarchy
-                var deepestInfo = this._getDeepestIncludedLevelOfHierarchy(formInfo, vals.length);
-                if(deepestInfo){
-                    // TODO: sometimes is null. Check why.
+    function keep(axis, formsInfo, vals){
+        if(vals){
+            for(var i = 0, V = vals.length ; i < V ; i++){
+                // Only include formulas of a given hierarchy once
+                var formInfo = formsInfo[i];
+                if(!(formInfo.hierarchy in usedHierarchiesSet)){
+                    var deepestInfo = this._getAxisDeepestHierarchyFormula(axis, formInfo.formula, V);
+
+                    assert(deepestInfo, "At least formInfo must be a possibility.");
+
                     useFormula.call(this, deepestInfo.formulaInfo, vals, 'KEEP');
                 }
             }
-        }, this);
+        }
     }
 
     /** @instance */
@@ -1924,7 +1943,7 @@ pentaho.ccc.CccChart.prototype._drillDown = function(axesVals){
             action:  action,
             formula: formInfo.formula,
             member:  hvalue,
-            caption: escapeHtml(formInfo.axis.valueLabel[hvalue])
+            caption: escapeHtml(axisInfo.valueLabel[hvalue])
         });
     }
 };
@@ -1935,33 +1954,67 @@ pentaho.ccc.CccChart.prototype._getDrillDownInfo = function(axesVals){
     }
 
     /**
-     * The axis to drill on.
+     * Find an axis to drill on.
+     * The order of search is that of 'this._keyAxes'.
      */
-    for(var i = 0 ; i < this._keyAxes.length ; i++){
-        var axis = this._keyAxes[i],
-            vals = axesVals[axis],
-            V;
-
-        if(vals && (V = vals.length)){
-            var axisInfo = this._allAxesInfo[axis];
-            // TODO: this test affects drilling on not leaf values of hierarchies...
-            if(axisInfo.depth === V){
-                // Drill on the *hierarchy* of the last form in vals
-                var formsInfo = axisInfo.formulasInfo,
-                    formInfo  = formsInfo[V - 1];
-
-                // Find the most specific formula of the hierarchy of 'form'
-                // that does not exceed the available values.
-                var drillInfo = this._getDeepestIncludedLevelOfHierarchy(formInfo, V);
-                if(drillInfo && drillInfo.directChild){
-                    // Make deepestInfo into a drillInfo.
-                    drillInfo.values = vals;
-                    return drillInfo;
-                }
-            }
+    for(var i = 0 ; i < this._drillAxes.length ; i++){
+        var axis = this._drillAxes[i],
+            drillInfo = this._getAxisDrillDownInfo(
+                                this._allAxesInfo[axis],
+                                axesVals[axis]);
+        
+        if(drillInfo){
+            return drillInfo;
         }
     }
 
+    return null;
+};
+
+ // 1) Take the formula corresponding to
+//     the last specified value in 'vals' of axis - name it: LVF.
+//     That value is the value that the user double-clicked on.
+//
+//     'vals' may contain fewer values than formulas of the axis.
+//     The ones available are matched to formulas by index.
+//     (This happens when a hierarchy node that is not the deepest is double-clicked)
+//
+// 2) Get its hierarchy id - HID
+//
+//    There might be fomulas in this axis,
+//    that are from the same hierarchy - HID - as LVF,
+//    that are descendants of LVF,
+//    but
+//    that are placed above it
+//    (formulas of an axis may be placed in any order...)
+//
+// 3) From the formulas in the axis,
+//    that have the hierarchy HID,
+//    get the one that no other is descendant of - the deepest (it may be LVF).
+//
+//    This is done using meta-information about a formula hierarchy
+//    that provides the hierarchy level of each formula.
+//
+// Suppose that there are N formulas of the desired hierarchy HID.
+//
+// In case the axis contains N formulas of a hierarchy but
+//    the supplied values only
+// Drill on the *hierarchy* of the last form in vals
+pentaho.ccc.CccChart.prototype._getAxisDrillDownInfo = function(axisInfo, vals){
+     // Drilling requires fixing all values in 'vals'.
+     // If there are no values...then there is nothing to drill-on
+    var V;
+    if(vals && (V = vals.length)){
+        var formInfo = axisInfo.formulasInfo[V - 1],
+            drillInfo = this._getAxisDeepestHierarchyFormula(axisInfo.id, formInfo.formula, V);
+        
+        if(drillInfo && drillInfo.directChild){
+            // Make deepestInfo into a drillInfo.
+            drillInfo.values = vals;
+            return drillInfo;
+        }
+    }
+    
     return null;
 };
 
@@ -1980,29 +2033,28 @@ pentaho.ccc.CccChart.prototype._getDrillDownInfo = function(axesVals){
  * };
  * </pre>
  */
-pentaho.ccc.CccChart.prototype._getDeepestIncludedLevelOfHierarchy = function(formInfo, maxDepth){
-    var excludeChildren = false,
+pentaho.ccc.CccChart.prototype._getAxisDeepestHierarchyFormula = function(axis, formulaOfHierarchy, maxDepth){
+    var hForms = this._vizHelper.getHierarchyFormulas(
+                            formulaOfHierarchy,
+                            /* includeHidden:   */ false,
+                            /* excludeChildren: */ false);
+    if(hForms){
+        if(maxDepth == null){
+            maxDepth = Infinity;
+        }
 
-        // All the forms from the hierarchy of 'formInfo'
-        // Some may not be included in 'formInfo.axis.formulas'.
-        hForms  = this._vizHelper.getHierarchyFormulas(formInfo.formula, false, excludeChildren),
-
-        // A map with the index of each form in 'forms'
-        formsIndexes = pv.numerate(formInfo.axis.formulas);
-
-    for(var i = hForms.length - 1 ; i >= 0  ; i--){
-        var hFormIndex = formsIndexes[hForms[i]];
-
-        if(hFormIndex != null && hFormIndex < maxDepth){
-            // Belongs to the axis' forms
-            return {
-                formulaInfo: formInfo.axis.formulasInfo[hFormIndex],
-                directChild: hForms[i + 1] || null
-                //hierarchyFormulas: hForms
-            };
+        for(var i = hForms.length - 1 ; i >= 0  ; i--){
+            var hFormInfo = this._formulasInfo[hForms[i]];
+            if(hFormInfo && hFormInfo.axis.id === axis && hFormInfo.index < maxDepth){
+                // Belongs to the axis' forms and is within allowed depth
+                return {
+                    formulaInfo: hFormInfo,
+                    directChild: hForms[i + 1] || null // undefined -> null conversion
+                };
+            }
         }
     }
-
+    
     return null;
 };
 
@@ -2016,7 +2068,7 @@ pentaho.ccc.CccChart.prototype._buildMdxAbsoluteValue = function(
                     axisInfo,
                     targetIndex,
                     vals){
-
+    
     var targetVal = vals[targetIndex];
 
     // Empty value or
@@ -2026,26 +2078,37 @@ pentaho.ccc.CccChart.prototype._buildMdxAbsoluteValue = function(
        targetVal.charAt(0) === "["){
         return targetVal;
     }
-
+    
     var targetFormInfo = axisInfo.formulasInfo[targetIndex],
-        hierarchy = targetFormInfo.hierarchy,
-        forms  = axisInfo.formulas,
-        // Hierarchy id already comes in brackets
-        mdxVals = [ hierarchy ];
+        mdxVals = [ wrapMdxValue(targetFormInfo.hierarchy) ],
+        L = vals.length;
 
-    // Traverse all ascendant formulas up to and including 'targetFormInfo.formula'
-    var excludeChildren = true;
-    this._vizHelper.getHierarchyFormulas(targetFormInfo.formula, false, excludeChildren)
-        .forEach(function(levelForm){
-            var index = forms.indexOf(levelForm);
-            if(index >= 0){
-                mdxVals.push("[" + vals[index] + "]");
+    // Traverse all ascendant formulas down to (including) 'targetFormInfo.formula'
+    var hForms = this._vizHelper.getHierarchyFormulas(
+                        targetFormInfo.formula,
+                        /* includeHidden:   */ false,
+                        /* excludeChildren: */ true);
+    if(hForms){
+        hForms.forEach(function(levelForm){
+            var formInfo = this._formulasInfo[levelForm];
+            if(formInfo && formInfo.axis === axisInfo && formInfo.index < L){
+                mdxVals.push(wrapMdxValue(vals[formInfo.index]));
             }
             // Assume the value is not relevant :-/ ??
-        });
+        }, this);
+    }
 
     return mdxVals.join(".");
 };
+
+function wrapMdxValue(value){
+    value = '' + pvc.nullTo(value, '');
+    if(!value || value.charAt(0) !== "["){
+        value = '[' + value + ']';
+    }
+
+    return value;
+}
 
 /*
  setHighlights
