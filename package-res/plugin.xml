@@ -37,21 +37,6 @@
     <file context="global">content/common-ui/resources/web/cache/cache-service.js</file>
     <file context="global">content/common-ui/resources/themes/jquery.js</file>
     <file context="global">content/common-ui/resources/themes/themeUtils.js</file>
-    <file context="analyzer">content/common-ui/resources/web/cache/LocalCache.js</file>
-    <file context="analyzer">content/common-ui/resources/web/vizapi/DataTable.js</file>
-    <file context="analyzer">content/common-ui/resources/web/vizapi/Events.js</file>
-    <file context="analyzer">content/common-ui/resources/web/vizapi/VizController.js</file>
-    <file context="analyzer">content/common-ui/resources/web/repo/pentaho-ajax.js</file>
-    <file context="analyzer">content/common-ui/resources/web/locale/Messages.js</file>
-    <file context="analyzer">content/pentaho-cdf/js/Base.js</file>
-    <file context="analyzer">content/pentaho-cdf/js/jquery.js</file>
-    <file context="analyzer">content/pentaho-cdf/js/lib/CCC/protovis.js</file>
-    <file context="analyzer">content/pentaho-cdf/js/lib/CCC/protovis-msie.js</file>
-    <file context="analyzer">content/pentaho-cdf/js/lib/CCC/jquery.tipsy.js</file>
-    <file context="analyzer">content/pentaho-cdf/js/lib/CCC/tipsy.js</file>
-    <file context="analyzer">content/pentaho-cdf/js/lib/CCC/pvc-d1.0.js</file>
-    <file context="analyzer">content/common-ui/resources/web/vizapi/ccc/ccc_wrapper.js</file>
-    <file context="analyzer">content/common-ui/resources/web/vizapi/ccc/ccc_analyzer_plugin.js</file>
     <!-- Example Visualizaiton Plugin. Un-comment to test -->
     <!--file context="analyzer">content/common-ui/resources/web/vizapi/ccc/sample/sampleVisualization.js</file-->
     <!--file context="analyzer">content/common-ui/resources/web/vizapi/ccc/sample/sampleVisualization_analyzer_plugin.js</file-->
