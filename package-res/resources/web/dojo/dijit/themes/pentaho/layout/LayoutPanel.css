@@ -31,9 +31,9 @@
 }
 
 .gem{
-  height: 15px;
+  height: 17px;
   border-radius: 5px;
-  padding: 2px 5px;
+  padding: 1px 5px;
   margin-bottom: 3px;
   min-width: 120px;
   /*cursor:pointer;*/
