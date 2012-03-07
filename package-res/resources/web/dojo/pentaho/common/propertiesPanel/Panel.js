@@ -905,7 +905,7 @@ dojo.declare(
       className: "propPanel_checkbox",
       widgetsInTemplate: true,
       value : false,
-      templateString: "<div class='${className}'><input id='${model.id}_checkbox' name='${model.id}_checkbox' dojoType='dijit.form.CheckBox' checked='${value}'/> <label for='${model.id}_checkbox'>${model.ui.label}</label></div>",
+      templateString: "<div class='${className}'><input id='${model.id}_checkbox' name='${model.id}_checkbox' dojoType='dijit.form.CheckBox' /> <label for='${model.id}_checkbox'>${model.ui.label}</label></div>",
       constructor:function (options) {
         if(typeof(this.model.value) !== "undefined"){
           this.value = this.model.value;
@@ -914,11 +914,13 @@ dojo.declare(
       postCreate: function(){
         this.checkbox = dijit.byId(this.model.id+"_checkbox");
         var outterThis = this;
+
+        // ANALYZER-1040, IE checkbox issues force us to set the checked status here rather than in the templateString
+        this.checkbox.attr('checked', this.value);
+
         this.connect(this.checkbox, "onChange", function(){
           outterThis.model.set('value', outterThis.checkbox.checked);
         });
-
-        this.inherited(arguments);
       },
       set: function(prop, newVal){
         if(this.checkbox){
