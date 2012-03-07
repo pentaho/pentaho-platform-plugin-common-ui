@@ -604,7 +604,9 @@ dojo.declare(
           }
         }));
         var unSubscribeFunc = function(){
-          dojo.removeClass(outterThis.domNode, "dimished");
+          if(outterThis.domNode){ // may have been disposed
+            dojo.removeClass(outterThis.domNode, "dimished");
+          }
         };
         this.subscriptions.push(dojo.subscribe("/dnd/cancel", unSubscribeFunc));
         this.subscriptions.push(dojo.subscribe("/dnd/drop", unSubscribeFunc));
