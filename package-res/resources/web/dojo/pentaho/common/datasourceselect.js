@@ -109,7 +109,7 @@ dojo.declare(
         this.deletedatasourceimg.title =  this.getLocaleString("deletedatasourceimg_title");
       },
 
-        templatePath: new dojo.moduleUrl('pentaho.common', 'datasourceselect.html'),
+        templatePath: dojo.moduleUrl('pentaho.common', 'datasourceselect.html'),
 
            postCreate: function() {
                this.inherited(arguments);

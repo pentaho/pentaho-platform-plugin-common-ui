@@ -26,7 +26,7 @@ dojo.declare(
             dojo.query("#button"+0, this.domNode).innerHTML = text;
         },
     
-        templatePath: new dojo.moduleUrl('pentaho.common', 'SplashScreen.html'),
+        templatePath: dojo.moduleUrl('pentaho.common', 'SplashScreen.html'),
       
        postCreate: function() {
            this.inherited(arguments);

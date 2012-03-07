@@ -9,7 +9,7 @@ dojo.declare(
     "pentaho.common.FilterDialog",
      [pentaho.common.Dialog],
 {
-  templatePath: new dojo.moduleUrl('pentaho.common', 'FilterDialog.html'),
+  templatePath: dojo.moduleUrl('pentaho.common', 'FilterDialog.html'),
   widgetsInTemplate: true,
   filterType: "PICKLIST",
   currentFilter: null,

@@ -21,7 +21,7 @@ dojo.declare(
           
         height: '20px',
           
-        templatePath: new dojo.moduleUrl('pentaho.common', 'SectionHeader.html'),
+        templatePath: dojo.moduleUrl('pentaho.common', 'SectionHeader.html'),
         
         postMixInProperties: function() {
             this.inherited(arguments);

@@ -23,7 +23,7 @@ dojo.declare(
             }
         },
         
-        templatePath: new dojo.moduleUrl('pentaho.common', 'SmallImageButton.html'),
+        templatePath: dojo.moduleUrl('pentaho.common', 'SmallImageButton.html'),
         
         mouseOver: function() {
             if(!this.disabled) {

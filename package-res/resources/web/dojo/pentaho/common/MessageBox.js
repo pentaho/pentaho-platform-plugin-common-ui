@@ -33,7 +33,7 @@ dojo.declare(
             }
         },
 
-        templatePath: new dojo.moduleUrl('pentaho.common', 'MessageBox.html')
+        templatePath: dojo.moduleUrl('pentaho.common', 'MessageBox.html')
            
       }
 );

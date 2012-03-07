@@ -14,7 +14,7 @@ dojo.declare(
         
         callback: null,
 
-        templatePath: new dojo.moduleUrl('pentahocommon', 'button.html'),
+        templatePath: dojo.moduleUrl('pentahocommon', 'button.html'),
         
         postMixInProperties: function() {
             this.inherited(arguments);

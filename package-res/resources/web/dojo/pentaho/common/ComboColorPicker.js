@@ -60,7 +60,7 @@ dojo.declare(
             dojo.addClass(this.topframe, 'hidden');            
         },
 
-        templatePath: new dojo.moduleUrl('pentaho.common', 'ComboColorPicker.html'),
+        templatePath: dojo.moduleUrl('pentaho.common', 'ComboColorPicker.html'),
         
         usedColors: [],
         

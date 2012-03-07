@@ -48,7 +48,7 @@ dojo.declare(
             this.updatePageArrows();
         },
                 
-        templatePath: new dojo.moduleUrl('pentaho.common', 'TemplatePicker.html'),
+        templatePath: dojo.moduleUrl('pentaho.common', 'TemplatePicker.html'),
       
         postCreate: function() {
             this.inherited(arguments);
