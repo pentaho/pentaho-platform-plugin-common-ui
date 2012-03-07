@@ -12,13 +12,14 @@ dojo.require("dijit.form.CheckBox");
 dojo.require("dojo.dnd.Source");
 dojo.require("dijit.TitlePane");
 
+dojo.require("pentaho.common.Messages");
 
-
+pentaho.common.Messages.addBundle
 dojo.declare(
     "pentaho.common.propertiesPanel.Panel",
     [dijit.layout.ContentPane],
     {
-      captionTemplate: "<div class='caption'><span class='caption-text'>${ui.caption}&nbsp;</span>&nbsp;<img class='captionIcon'/></div>",
+      captionTemplate: "<div class='caption'><span class='caption-text'>${ui.caption:i18n}&nbsp;</span>&nbsp;<img class='captionIcon'/></div>",
       propUIs: [],
       groups: {},
       gutters: false,
@@ -171,7 +172,13 @@ dojo.declare(
 
         // Items can have a caption. If specified, create and add it before the property UI component
         if(item.ui.caption){
-          var cap = dojo._toDom(dojo.string.substitute(this.captionTemplate, item));
+
+          var cap = dojo._toDom(dojo.string.substitute(this.captionTemplate, item, null,
+              {
+                i18n: function(value, key){
+                  return pentaho.common.Messages.getString(value, value);
+                }
+              }));
 
           var img = dojo.query(" > img", cap);
           img = img[img.length-1]; //select the last image found
