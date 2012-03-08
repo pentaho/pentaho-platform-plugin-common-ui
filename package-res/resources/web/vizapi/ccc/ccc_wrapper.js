@@ -416,10 +416,10 @@ pen.define(["cdf/lib/CCC/pvc-d1.0"], function(pvc){
               dataType: 'string',
               values: ["GRADIENT", "3-COLOR", "5-COLOR"],
               ui: {
-                labels: ["Gradient", "3 Steps", "5 Steps"],
+                labels: ["gradient", "step_3", "step_5"],
                 group: "options",
                 type: 'combo',
-                caption: "pattern"
+                caption: "Pattern"
               }
             },
             {
@@ -427,10 +427,10 @@ pen.define(["cdf/lib/CCC/pvc-d1.0"], function(pvc){
               dataType: 'string',
               values: ["ryg", "ryb", "blue", "gray"],
               ui: {
-                labels: ["Red, Yellow, Green", "Red, Yellow, Blue", "Blue Scale", "Gray Scale"],
+                labels: ["RYG", "RYB", "blue_scale", "gray_scale"],
                 group: "options",
                 type: 'combo',
-                caption: "color"
+                caption: "Color"
               }
             },
             {
@@ -447,10 +447,10 @@ pen.define(["cdf/lib/CCC/pvc-d1.0"], function(pvc){
               dataType: 'string',
               values: ["square", "circle"],
               ui: {
-                labels:  ["Square", "Circle"],
+                labels:  ["square", "circle"],
                 group:   "options",
                 type:    'combo',
-                caption: "shape"
+                caption: "Shape"
               }
             },
             {
