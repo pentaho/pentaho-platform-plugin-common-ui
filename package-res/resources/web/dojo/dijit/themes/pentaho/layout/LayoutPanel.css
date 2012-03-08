@@ -34,7 +34,7 @@
   height: 17px;
   border-radius: 5px;
   padding: 1px 5px;
-  margin-bottom: 3px;
+  margin-bottom: 4px;
   min-width: 120px;
   /*cursor:pointer;*/
   background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #FDF296), color-stop(15, #FDF296), color-stop(0.50, #FEF8CA), color-stop(0.51, #FDF296), color-stop(0.80, #FCE52D),color-stop(1.0, #FCE52D));
@@ -145,6 +145,8 @@
   text-align: center;
   padding: 1px;
   white-space: nowrap;
+  height:20px
+  line-height: 20px;
 }
 
 
@@ -211,6 +213,9 @@
 
 .pentahoPropertiesPanel .pentaho-titled-toolbar{
   cursor: pointer;
+}
+.pentahoPropertiesPanel .button-wrapper{
+  text-align:center;
 }
 
 .pentahoPropertiesPanel .IE .pentaho-button{

@@ -68,7 +68,7 @@ dojo.declare(
 
             var outterThis = this;
             group = new dijit.TitlePane({
-              title: groupConfig.title,
+              title: pentaho.common.Messages.getString(groupConfig.title, groupConfig.title),
               content: groupContents,
               region: 'top',
               splitter: false
@@ -910,6 +910,7 @@ dojo.declare(
         if(typeof(this.model.value) !== "undefined"){
           this.value = this.model.value;
         }
+        this.label = pentaho.common.Messages.getString(this.model.ui.label,this.model.ui.label);
       },
       postCreate: function(){
         this.checkbox = dijit.byId(this.model.id+"_checkbox");
@@ -941,13 +942,21 @@ pentaho.common.propertiesPanel.Panel.registeredTypes["checkbox"] = pentaho.commo
 
 dojo.declare(
     "pentaho.common.propertiesPanel.ButtonUI",
-    [dijit.form.Button, pentaho.common.propertiesPanel.StatefulUI],
+    [dijit._Widget, dijit._Templated, pentaho.common.propertiesPanel.StatefulUI],
     {
+      widgetsInTemplate: true,
+      templateString: "<div class='button-wrapper'><button id='${model.id}_button' name='${model.id}_button'  data-dojo-type='dijit.form.Button' type='button' >${label}</button></div>",
       constructor:function (options) {
         this.disabled = this.model.disabled;
-        this.label = this.model.ui.label;
+        this.label = pentaho.common.Messages.getString(this.model.ui.label,this.model.ui.label);
         this.inherited(arguments);
       },
+
+      postCreate: function(){
+        this.button = dijit.byId(this.model.id+"_button");
+        this.connect(this.button, "onClick", "onClick");
+      },
+
       onClick: function(){
         this.model.set('clicked', true);
       }

@@ -419,7 +419,7 @@ pen.define(["cdf/lib/CCC/pvc-d1.0"], function(pvc){
                 labels: ["Gradient", "3 Steps", "5 Steps"],
                 group: "options",
                 type: 'combo',
-                caption: "Pattern"
+                caption: "pattern"
               }
             },
             {
@@ -430,14 +430,14 @@ pen.define(["cdf/lib/CCC/pvc-d1.0"], function(pvc){
                 labels: ["Red, Yellow, Green", "Red, Yellow, Blue", "Blue Scale", "Gray Scale"],
                 group: "options",
                 type: 'combo',
-                caption: "Color"
+                caption: "color"
               }
             },
             {
               id: 'reverseColors',
               dataType: 'boolean',
               ui: {
-                label: "Reverse Colors",
+                label: "reverse_colors",
                 group: "options",
                 type: 'checkbox'
               }
@@ -450,7 +450,16 @@ pen.define(["cdf/lib/CCC/pvc-d1.0"], function(pvc){
                 labels:  ["Square", "Circle"],
                 group:   "options",
                 type:    'combo',
-                caption: "Shape"
+                caption: "shape"
+              }
+            },
+            {
+              id: "optionsBtn",
+              dataType: 'none',
+              ui: {
+                group: "options",
+                type: "button",
+                label: "chart_options"
               }
             }
           ]

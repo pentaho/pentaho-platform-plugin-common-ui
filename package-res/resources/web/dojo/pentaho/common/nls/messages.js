@@ -14,11 +14,13 @@
     No_txt: 'No',
 
     FilterTextValueFromPrompt: 'value of Prompt {0}',
-    Pattern: "Pattern:",
-    Color: "Color:",
-    Shape: "Shape:",
+    pattern: "Pattern:",
+    color: "Color:",
+    shape: "Shape:",
     color_by: "Color By",
     size_by: "Size By",
     x_axis: "X Axis",
-    y_axis: "Y Axis"
+    y_axis: "Y Axis",
+    reverse_colors: "Reverse Colors",
+    chart_options: "Chart Options..."
 }
