@@ -916,6 +916,9 @@ dojo.declare(
         var outterThis = this;
 
         // ANALYZER-1040, IE checkbox issues force us to set the checked status here rather than in the templateString
+        if(typeof(this.value) != 'boolean') {
+          this.value = false;
+        }
         this.checkbox.attr('checked', this.value);
 
         this.connect(this.checkbox, "onChange", function(){
