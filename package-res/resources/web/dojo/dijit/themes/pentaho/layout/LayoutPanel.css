@@ -90,10 +90,10 @@
   /*cursor:pointer;*/
 }
 
-.gem.dojoDndItemOver .gemMenuHandle{
+.gem.over .gemMenuHandle{
   background-image: url('../images/gem_dropDown_highlighted.png');
 }
-.gem.dojoDndItemOver .gemMenuHandle.over{
+.gem.over .gemMenuHandle.over{
   background-image: url('../images/gem_dropDown_highlighted_over.png');
 }
 
@@ -219,5 +219,8 @@
 }
 
 .pentahoPropertiesPanel .IE .pentaho-button{
-  height:auto
+  height:auto !important;
+}
+.pentahoPropertiesPanel .IE .button-wrapper{
+  height:auto !important;
 }

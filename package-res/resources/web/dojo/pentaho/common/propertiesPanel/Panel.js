@@ -398,27 +398,35 @@ dojo.declare("pentaho.common.propertiesPanel.GemBarUISource", [dojo.dnd.Source],
     }
   },
 
+  onMouseMove: function(e){
+    this.showIndicatorIfReorder(e);
+    this.inherited(arguments);
+  },
   onMouseOver: function(e){
-    if(dojo.dnd.manager().source && this.checkAcceptance(dojo.dnd.manager().target, dojo.dnd.manager().nodes)){ // drag in progress
+    this.showIndicatorIfReorder(e);
+    this.inherited(arguments);
+  },
+  showIndicatorIfReorder: function(e){
+    if(dojo.dnd.manager().source && this.checkAcceptance(this, dojo.dnd.manager().nodes)){ // drag in progress
 
-      this.dropIndicator.style.display="";
       var indicator = this.dropIndicator;
 
-      var cancelHandle = dojo.subscribe("/dnd/cancel", function(){
+      var tearDown = function(){
         indicator.style.display="none";
         dojo.unsubscribe(cancelHandle);
-      })
-      var dropHandle = dojo.subscribe("/dnd/drop", function(){
-        indicator.style.display="none";
-        dojo.unsubscribe(dropHandle);
-      })
+      };
+      var cancelHandle = dojo.subscribe("/dnd/cancel", tearDown);
+      var dropHandle = dojo.subscribe("/dnd/drop", tearDown);
 
       var overNode = this._getNodeUnderMouse(e);
       // console.log("over: "+overNode);
       var before = this.gravity(this.node.children[overNode], e) & 1;
+      if(this.node.children[overNode] == dojo.dnd.manager().nodes[0] && (before && overNode == 0 || !before && this.node.children.length -1 == overNode)){
+        this.dropIndicator.style.display="none";
+        return;
+      }
       this.placeIndicator(e, overNode, before);
     }
-    this.inherited(arguments);
   },
   onMouseOut: function(e){
     if(e.target == this.dropIndicator){
@@ -460,6 +468,7 @@ dojo.declare("pentaho.common.propertiesPanel.GemBarUISource", [dojo.dnd.Source],
         width = child.w + "px";
       }
     }
+    this.dropIndicator.style.display="";
   },
   _getNodeUnderMouse: function(e) {
     // find the child
@@ -788,11 +797,14 @@ dojo.declare(
         this.menuHandle = dojo.query("div.gemMenuHandle", this.domNode)[0];
 
         dojo.connect(dojo.query("div.gemMenuHandle", this.domNode)[0], "onmouseover", function(e){
-          dojo.addClass(e.target, "over");
-
+          if(!dojo.dnd.manager().source){
+            dojo.addClass(e.target, "over");
+          }
         });
         dojo.connect(dojo.query("div.gemMenuHandle", this.domNode)[0], "onmouseout", function(e){
-          dojo.removeClass( e.target, "over");
+          if(!dojo.dnd.manager().source){
+            dojo.removeClass( e.target, "over");
+          }
         });
         dojo.connect(this.menuHandle, "onclick", this, "onContextMenu");
 
@@ -905,7 +917,7 @@ dojo.declare(
       className: "propPanel_checkbox",
       widgetsInTemplate: true,
       value : false,
-      templateString: "<div class='${className}'><input id='${model.id}_checkbox' name='${model.id}_checkbox' dojoType='dijit.form.CheckBox' /> <label for='${model.id}_checkbox'>${model.ui.label}</label></div>",
+      templateString: "<div class='${className}'><input id='${model.id}_checkbox' name='${model.id}_checkbox' dojoType='dijit.form.CheckBox' checked='${value}'/> <label for='${model.id}_checkbox'>${label}</label></div>",
       constructor:function (options) {
         if(typeof(this.model.value) !== "undefined"){
           this.value = this.model.value;
@@ -915,16 +927,11 @@ dojo.declare(
       postCreate: function(){
         this.checkbox = dijit.byId(this.model.id+"_checkbox");
         var outterThis = this;
-
-        // ANALYZER-1040, IE checkbox issues force us to set the checked status here rather than in the templateString
-        if(typeof(this.value) != 'boolean') {
-          this.value = false;
-        }
-        this.checkbox.attr('checked', this.value);
-
         this.connect(this.checkbox, "onChange", function(){
           outterThis.model.set('value', outterThis.checkbox.checked);
         });
+
+        this.inherited(arguments);
       },
       set: function(prop, newVal){
         if(this.checkbox){
