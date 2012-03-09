@@ -392,7 +392,7 @@ pen.define(["cdf/lib/CCC/pvc-d1.0"], function(pvc){
               dataType: 'string',
               dataStructure: 'column',
               caption: 'y_axis',
-              required: true,
+              required: false,
               allowMultiple: true
             },
             {
