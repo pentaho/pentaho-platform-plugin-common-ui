@@ -37,7 +37,7 @@
   margin-bottom: 4px;
   min-width: 120px;
   /*cursor:pointer;*/
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #FDF296), color-stop(15, #FDF296), color-stop(0.50, #FEF8CA), color-stop(0.51, #FDF296), color-stop(0.80, #FCE52D),color-stop(1.0, #FCE52D));
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #FDF296), color-stop(.15, #FDF296), color-stop(0.50, #FEF8CA), color-stop(0.51, #FDF296), color-stop(0.80, #FCE52D),color-stop(1.0, #FCE52D));
   /* Firefox */
   background: -moz-linear-gradient(#FDF296, #FDF296 15%, #FEF8CA 50%, #FDF296 51%, #FCE52D 80%, #FCE52D 100%) repeat scroll 0 0 transparent;
   border: 1px solid #D6B225;
@@ -54,7 +54,7 @@
 }
 
 .propPanel_gemBar.number .gem {
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #DDF4FC), color-stop(15, #DDF4FC), color-stop(0.50, #EEF9FD), color-stop(0.51, #DDF4FC), color-stop(0.80, #BCE9F9),color-stop(1.0, #BCE9F9));
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #DDF4FC), color-stop(.15, #DDF4FC), color-stop(0.50, #EEF9FD), color-stop(0.51, #DDF4FC), color-stop(0.80, #BCE9F9),color-stop(1.0, #BCE9F9));
   background: -moz-linear-gradient(#DDF4FC, #DDF4FC 15%, #EEF9FD 50%, #DDF4FC 51%, #BCE9F9 80%, #BCE9F9 100%) repeat scroll 0 0 transparent;
   border: 1px solid #7EC9F2;
 }
