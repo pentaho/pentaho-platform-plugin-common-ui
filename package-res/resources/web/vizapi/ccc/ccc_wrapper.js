@@ -1,4 +1,4 @@
-pen.define(["cdf/lib/CCC/pvc-d1.0"], function(pvc){
+pen.define(["cdf/lib/CCC/pvc-d1.0"], function(){
   pentaho = typeof pentaho != "undefined" ? pentaho : {};
 
 // BEGIN Private Scope
