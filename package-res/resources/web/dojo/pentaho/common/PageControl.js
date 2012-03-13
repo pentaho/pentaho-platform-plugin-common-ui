@@ -7,6 +7,7 @@
 dojo.provide("pentaho.common.PageControl");
 dojo.require("dijit._Widget");
 dojo.require("dijit._Templated");
+dojo.require("dijit.form.NumberTextBox");
 
 /**
  * Pentaho Interactive Reporting Page Control Component.
