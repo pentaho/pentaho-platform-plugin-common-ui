@@ -1,5 +1,4 @@
 dojo.require("pentaho.common.Messages");
-pentaho.common.Messages.addBundle("geo", "messages");
 
 var analyzerPlugins = analyzerPlugins || [];
 
