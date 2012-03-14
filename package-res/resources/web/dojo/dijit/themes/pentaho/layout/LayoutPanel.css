@@ -15,8 +15,22 @@
 }
 .pentahoPropertiesPanel .caption{
   height: 1.2em;
-  padding: 3px 0px;
+  padding: 5px 0px 0px 2px;
 }
+
+.propPanel-seperator{
+  border-top: 1px solid #777;
+  margin: 10px 10px 4px;
+}
+
+.propPanel_control{
+  margin-bottom: 3px;
+}
+
+.propPanel_checkbox{
+  padding: 5px 0px 0px;
+}
+
 .pentahoPropertiesPanel .caption-text{
   font-size: 12px;
   font-weight: 600;
@@ -26,10 +40,6 @@
 .pentahoPropertiesPanel>*{
   margin-bottom : 8px;
 }
-.dijitTitlePaneContentInner>div>*{
-  margin: 2px;
-}
-
 .gem{
   height: 17px;
   border-radius: 5px;
@@ -111,6 +121,7 @@
   background-color: white;
   padding: 5px;
   border: none;
+  margin-top: 5px;
 }
 
 .pentahoPropertiesPanel .dijitTitlePaneContentInner {
@@ -137,7 +148,7 @@
 /* Migrate to common-ui*/
 
 .tundra .dijitTitlePaneContentInner {
-  padding:3px;
+  padding:5px !important;
 }
 
 .gemPlaceholder{
@@ -145,8 +156,8 @@
   text-align: center;
   padding: 1px;
   white-space: nowrap;
-  height:20px
-  line-height: 20px;
+  height: 22px;
+  line-height: 22px;
 }
 
 
@@ -215,7 +226,8 @@
   cursor: pointer;
 }
 .pentahoPropertiesPanel .button-wrapper{
-  text-align:center;
+  text-align: center;
+  padding: 8px 0px;
 }
 
 .pentahoPropertiesPanel .IE .pentaho-button{
@@ -224,3 +236,4 @@
 .pentahoPropertiesPanel .IE .button-wrapper{
   height:auto !important;
 }
+

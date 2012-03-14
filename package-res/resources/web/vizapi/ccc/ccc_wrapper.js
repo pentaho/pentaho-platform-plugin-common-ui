@@ -459,7 +459,8 @@ pen.define(["cdf/lib/CCC/pvc-d1.0"], function(){
               ui: {
                 group: "options",
                 type: "button",
-                label: "chart_options"
+                label: "chart_options",
+                seperator: true
               }
             }
           ]

@@ -20,6 +20,7 @@ dojo.declare(
     [dijit.layout.ContentPane],
     {
       captionTemplate: "<div class='caption'><span class='caption-text'>${ui.caption:i18n}&nbsp;</span>&nbsp;<img class='captionIcon'/></div>",
+      seperatorTemplate: "<div class='propPanel-seperator'></div>",
       propUIs: [],
       groups: {},
       gutters: false,
@@ -168,6 +169,12 @@ dojo.declare(
             this.domNode.appendChild(group.domNode);
           }
           targetNode = group.content;
+        }
+
+        // Items can request a separator to be inserted before themselves
+
+        if(item.ui.seperator){
+          targetNode.appendChild(dojo._toDom(this.seperatorTemplate));
         }
 
         // Items can have a caption. If specified, create and add it before the property UI component
@@ -836,7 +843,7 @@ dojo.declare(
     "pentaho.common.propertiesPanel.ComboUI",
     [dijit.form.Select, pentaho.common.propertiesPanel.StatefulUI],
     {
-      className:"propPanel_combobox",
+      className:"propPanel_combobox propPanel_control",
       options: [],
       constructor:function (options) {
 
@@ -846,7 +853,8 @@ dojo.declare(
         dojo.forEach(this.model.values, function(val, idx){
           var opt = {label: val, value: val};
           if(this.model.ui.labels){
-            opt.label = this.model.ui.labels[idx];
+            var lbl = this.model.ui.labels[idx];
+            opt.label = pentaho.common.Messages.getString(lbl,lbl);
           }
           this.options.push(opt);
         }, this);
@@ -860,6 +868,9 @@ dojo.declare(
       },
       onChange: function(){
         this.model.set('value', this.value);
+      },
+      postCreate: function(){
+        dojo.addClass(this.domNode, this.className);
       }
     }
 );
@@ -869,7 +880,7 @@ dojo.declare(
     "pentaho.common.propertiesPanel.SliderUI",
     [dijit.form.HorizontalSlider, pentaho.common.propertiesPanel.StatefulUI],
     {
-      className:"propPanel_slider",
+      className:"propPanel_slider propPanel_control",
       minimum: 0,
       maximum: 100,
       style: "width: 100%",
@@ -898,6 +909,7 @@ dojo.declare(
     "pentaho.common.propertiesPanel.TextboxUI",
     [dijit.form.TextBox, pentaho.common.propertiesPanel.StatefulUI],
     {
+      className:"propPanel_control",
       constructor:function (options) {
         this.disabled = this.model.disabled;
         this.inherited(arguments);
@@ -914,10 +926,10 @@ dojo.declare(
     "pentaho.common.propertiesPanel.CheckBoxUI",
     [dijit._Widget, dijit._Templated, pentaho.common.propertiesPanel.StatefulUI],
     {
-      className: "propPanel_checkbox",
+      className: "propPanel_checkbox propPanel_control",
       widgetsInTemplate: true,
       value : false,
-      templateString: "<div class='${className}'><input id='${model.id}_checkbox' name='${model.id}_checkbox' dojoType='dijit.form.CheckBox' /> <label for='${model.id}_checkbox'>${model.ui.label}</label></div>",
+      templateString: "<div class='${className}'><input id='${model.id}_checkbox' name='${model.id}_checkbox' dojoType='dijit.form.CheckBox' /> <label for='${model.id}_checkbox'>${label}</label></div>",
       constructor:function (options) {
         if(typeof(this.model.value) !== "undefined"){
           this.value = this.model.value;

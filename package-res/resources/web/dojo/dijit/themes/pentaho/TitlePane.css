@@ -25,4 +25,9 @@
 .tundra .dijitTitlePaneTextNode {
   margin-left: 4px;
   margin-right: 4px;
+  font-size: .90em;
+}
+
+.tundra .section-header-inner{
+  height: 1.25em;
 }
