@@ -642,13 +642,15 @@ pentaho.VizController.getRgbGradientFromMultiColorHex = function(value, min, max
   var steps = colors.length-1;
   var range = max-min;
 
-
-  var start = Math.floor(((value-min)/range) * steps);
-  var end = Math.ceil(((value-min)/range) * steps);
-
+  if(range <= 0) {
+    var start = colors.length-1;
+    var end = start;
+  } else {
+    var start = Math.floor(((value-min)/range) * steps);
+    var end = Math.ceil(((value-min)/range) * steps);
+  }
   var color1 = pentaho.VizController.convertToRGB(colors[start]);
   var color2 = pentaho.VizController.convertToRGB(colors[end]);
-
 
   var rangeMin = (start == 0) ? 1 : (start / steps) * max;
   var rangeMax = (end / steps) * max;
