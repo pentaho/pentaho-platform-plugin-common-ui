@@ -7,4 +7,6 @@
     <max-age>0</max-age>
     
     <cache>false</cache>
+    <amd-root-path>content/common-ui/resources/web</amd-root-path>
+    <amd-root-namespace>common-ui</amd-root-namespace>
 </settings>
