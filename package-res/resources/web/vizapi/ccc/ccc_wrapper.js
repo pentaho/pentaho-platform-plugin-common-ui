@@ -400,7 +400,7 @@ pen.define(["cdf/lib/CCC/pvc-d1.0"], function(){
               dataType: 'number',
               dataStructure: 'column',
               caption: 'color_by',
-              required: true,
+              required: false,
               allowMultiple: false
             },
             {
@@ -697,6 +697,7 @@ pen.define(["cdf/lib/CCC/pvc-d1.0"], function(){
         var meaId = formulaInfo.id;
         if(meaId && pvc.hasOwn(usedMeasureIds, meaId)){
           formulaInfo.index = filtered.length;
+          formulaInfo.role  = usedMeasureIds[meaId];
           filtered.push(formulaInfo);
         }
       });
@@ -728,7 +729,15 @@ pen.define(["cdf/lib/CCC/pvc-d1.0"], function(){
             break;
           }
 
-          seenMeasureIds[meaId] = true;
+          var role = 'measure';
+          var dataReq = dataTable.getColumnProperty(tc, 'dataReq');
+          if(dataReq && dataReq.id){
+            // Update measure role
+            role = dataReq.id;
+          }
+
+          seenMeasureIds[meaId] = role;
+
           lastMeasureId = meaId;
         }
       }
@@ -1121,16 +1130,6 @@ pen.define(["cdf/lib/CCC/pvc-d1.0"], function(){
 
       var measureCount = this._measureAxis.depth;
 
-      // Clear size and color indexes,
-      //  if there aren't enough measures.
-      // TODO
-      if(measureCount < 2){
-        this._vizOptions.sizeValIdx = null;
-        if(measureCount < 1){
-          this._vizOptions.colorValIdx = null;
-        }
-      }
-
       // Update data options
       this._dataOptions.dataOptions = {
         categoriesCount: this._rowAxis.depth,
@@ -1373,7 +1372,8 @@ pen.define(["cdf/lib/CCC/pvc-d1.0"], function(){
 
     pentaho.ccc.CccChart.prototype._prepareOptionsHeatGrid = function() {
       var myself = this,
-          options = this.options;
+          options = this.options,
+          vizOptions = this._vizOptions;
 
       options.selectionChangedAction = function(cccSelections){
         myself._notifyCccSelectionChanged(cccSelections);
@@ -1397,6 +1397,33 @@ pen.define(["cdf/lib/CCC/pvc-d1.0"], function(){
       options.customTooltip = function(s, c, v, datum){
         return myself._getTooltipText(myself._readDatum(datum));
       };
+
+      // ----------------
+
+      var freeMeasures   = [],
+          measuresByRole = {};
+
+      this._measureAxis.formulasInfo.forEach(function(formulaInfo){
+        if(formulaInfo.role !== 'measure'){
+          measuresByRole[formulaInfo.role] = formulaInfo;
+        } else {
+          freeMeasures.push(formulaInfo);
+        }
+      });
+
+      // Color role
+      var formulaInfo = measuresByRole['color'] || freeMeasures.shift();
+      vizOptions.colorValIdx = formulaInfo ?  formulaInfo.index : null;
+
+      // Size role
+      formulaInfo = measuresByRole['size'] || freeMeasures.shift();
+      vizOptions.sizeValIdx = formulaInfo ?  formulaInfo.index : null;
+
+      if(vizOptions.colorValIdx == null){
+        // No color; set the nullColor option to the first of the colorRange
+        var nullColor = vizOptions.colorRange && vizOptions.colorRange[0];
+        vizOptions.nullColor = nullColor || 'red';
+      }
     };
 
     pentaho.ccc.CccChart.prototype._prepareLayoutHeatGrid = function() {
