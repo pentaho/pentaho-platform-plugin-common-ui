@@ -88,6 +88,8 @@
   margin-left: 1px;
   font-size:.85em;
   cursor: default;
+  white-space: nowrap;
+  max-width: 87%;
 }
 
 .gem .gemMenuHandle{

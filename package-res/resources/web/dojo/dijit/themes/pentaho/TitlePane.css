@@ -1,19 +1,17 @@
 
 .tundra .pentaho-titled-toolbar .dijitArrowNode {
-  background-image: url('images/spriteArrows.png');
+  background-image: url('images/TitlePanel-opened.png');
   background-repeat: no-repeat;
   background-position: 0 0;
-  height: 7px;
-  width: 7px;
+  height: 12px;
+  width: 12px;
 }
 .dj_ie6 .tundra .pentaho-titled-toolbar .dijitArrowNode {
   background-image: url('images/spriteArrows.gif');
 }
-
 .tundra .pentaho-titled-toolbar.dijitClosed .dijitArrowNode {
-  background-position: -14px 0;
+  background-image: url('images/TitlePanel-closed.png');
 }
-
 .tundra .dijitTitlePaneContentOuter {
   background: lightGrey;
   border-top: 0;
@@ -21,13 +19,11 @@
 .tundra .dijitTitlePaneContentInner {
   padding: 3px;
 }
-
 .tundra .dijitTitlePaneTextNode {
   margin-left: 4px;
   margin-right: 4px;
   font-size: .90em;
 }
-
 .tundra .section-header-inner{
   height: 1.25em;
 }
