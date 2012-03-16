@@ -75,6 +75,16 @@ pentaho.palettes.push( {
  */
 pentaho.visualizations = pentaho.visualizations || [];
 
+pentaho.visualizations.getById = function(id){
+  for(var i = 0; i < this.length ; i++){
+    if(this[i].id == id){
+      return this[i];
+    }
+  }
+  return null;
+};
+
+
 var visualizations = pentaho.visualizations;
 
 /*
@@ -709,7 +719,10 @@ pentaho.VizController.prototype.resize = function(width, height) {
 }
 
 
-pentaho.VizController.dashboardMode = window.parent && typeof(window.parent.PentahoDashboardController) !== "undefined";
+pentaho.VizController.dashboardMode = false;
+try{
+  window.parent && typeof(window.parent.PentahoDashboardController) !== "undefined";
+} catch(ignored){/*XSS*/}
 
 
 

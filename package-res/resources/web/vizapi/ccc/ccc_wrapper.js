@@ -1,4 +1,4 @@
-pen.define(["cdf/lib/CCC/pvc-d1.0"], function(){
+pen.define(["cdf/lib/CCC/pvc-d1.0", "common-ui/vizapi/VizController"], function(){
   pentaho = typeof pentaho != "undefined" ? pentaho : {};
 
 // BEGIN Private Scope
@@ -6,17 +6,6 @@ pen.define(["cdf/lib/CCC/pvc-d1.0"], function(){
 
     pentaho.ccc = pentaho.ccc || {};
 
-    pentaho.visualizations = pentaho.visualizations || [];
-
-// TODO: this should belong to the base, as 'geo' depends on this too...
-    pentaho.visualizations.getById = function(id){
-      for(var i = 0; i < this.length ; i++){
-        if(this[i].id == id){
-          return this[i];
-        }
-      }
-      return null;
-    };
 
     function defVisualization(viz){
       pentaho.visualizations.push(viz);
