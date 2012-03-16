@@ -202,12 +202,7 @@ analyzerPlugins.push({
                         style += ' ';
                     }
 
-                    var labelFontFamily = userDefinedOpts.labelFontFamily;
-                    if(!labelFontFamily || labelFontFamily.toLowerCase() === 'default'){
-                      labelFontFamily = "sans-serif";
-                    }
-                    
-                    userDefinedOpts.axisLabelFont = style + userDefinedOpts.labelSize + 'px ' + labelFontFamily;
+                    userDefinedOpts.axisLabelFont = style + userDefinedOpts.labelSize + 'px ' + userDefinedOpts.labelFontFamily;
                 }
 
                 return userDefinedOpts;

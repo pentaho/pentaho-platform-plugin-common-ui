@@ -1332,6 +1332,13 @@ pen.define(["cdf/lib/CCC/pvc-d1.0", "common-ui/vizapi/VizController"], function(
         }
       }
 
+      var axisLabelFont = options.axisLabelFont;
+      if(!axisLabelFont){
+        options.axisLabelFont = '12px sans-serif';
+      } else {
+        options.axisLabelFont = axisLabelFont.replace(/\bdefault\s*$/i, 'sans-serif');
+      }
+
       if(!this._vizHelper.isInteractionEnabled()){
         options.showTooltips = false;
         options.clickable    = false;
