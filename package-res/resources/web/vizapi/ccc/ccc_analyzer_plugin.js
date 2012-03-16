@@ -198,11 +198,16 @@ analyzerPlugins.push({
                     var style = userDefinedOpts.labelStyle;
                     if (style == null || style == 'PLAIN') {
                         style = '';
-                    }
-                    else {
+                    } else {
                         style += ' ';
                     }
-                    userDefinedOpts.axisLabelFont = style + userDefinedOpts.labelSize + 'px ' + userDefinedOpts.labelFontFamily;
+
+                    var labelFontFamily = userDefinedOpts.labelFontFamily;
+                    if(!labelFontFamily || labelFontFamily.toLowerCase() === 'default'){
+                      labelFontFamily = "sans-serif";
+                    }
+                    
+                    userDefinedOpts.axisLabelFont = style + userDefinedOpts.labelSize + 'px ' + labelFontFamily;
                 }
 
                 return userDefinedOpts;
