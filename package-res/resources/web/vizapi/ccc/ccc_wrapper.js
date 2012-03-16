@@ -2031,14 +2031,15 @@ pen.define(["cdf/lib/CCC/pvc-d1.0", "common-ui/vizapi/VizController"], function(
       // Drilling requires fixing all values in 'vals'.
       // If there are no values...then there is nothing to drill-on
       var V;
-      if(vals && (V = vals.length)){
-        var formInfo = axisInfo.formulasInfo[V - 1],
-            drillInfo = this._getAxisDeepestHierarchyFormula(axisInfo.id, formInfo.formula, V);
-
-        if(drillInfo && drillInfo.directChild){
-          // Make deepestInfo into a drillInfo.
-          drillInfo.values = vals;
-          return drillInfo;
+      if(axisInfo && axisInfo.depth && vals && (V = vals.length)){
+        var formInfo = axisInfo.formulasInfo[V - 1];
+        if(formInfo){
+          var drillInfo = this._getAxisDeepestHierarchyFormula(axisInfo.id, formInfo.formula, V);
+          if(drillInfo && drillInfo.directChild){
+            // Make deepestInfo into a drillInfo.
+            drillInfo.values = vals;
+            return drillInfo;
+          }
         }
       }
 
