@@ -20,8 +20,6 @@ dojo.extend(dijit.DialogUnderlay,
       }
     });
 
-dojo.extend(dijit.form.Button, {baseClass : "pentaho-button"});
-
 dojo.extend(dijit.layout._TabButton, {baseClass : "pentaho-tabWidget"});
 
 // killing the autoscroll of the page when dragging nodes
