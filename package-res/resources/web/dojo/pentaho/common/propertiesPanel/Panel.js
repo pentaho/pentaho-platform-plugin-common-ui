@@ -871,6 +871,7 @@ dojo.declare(
       },
       postCreate: function(){
         dojo.addClass(this.domNode, this.className);
+        this.inherited(arguments);
       }
     }
 );
