@@ -948,12 +948,16 @@ dojo.declare(
         this.checkbox.attr('checked', this.value);
 
         this.connect(this.checkbox, "onChange", function(){
-          outterThis.model.set('value', outterThis.checkbox.checked);
+          if(outterThis.model.value != outterThis.checkbox.checked){
+            outterThis.model.set('value', outterThis.checkbox.checked);
+          }
         });
       },
       set: function(prop, newVal){
         if(this.checkbox){
-          this.checkbox.set(prop, newVal);
+          if(prop == "value" && newVal != this.checkbox.checked){
+            this.checkbox.set(prop, newVal);
+          }
         }
 
       },
