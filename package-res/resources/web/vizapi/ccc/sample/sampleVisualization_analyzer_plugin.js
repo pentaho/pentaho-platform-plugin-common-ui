@@ -14,6 +14,8 @@ analyzerPlugins.push(
          Analyzers current report.
          */
         cv.pentahoVisualizationHelpers["sample_calc"] = {
+          // use one of Analyzer's stock placeholder images
+          placeholderImageSrc: CONTEXT_PATH + "content/analyzer/images/viz/VERTICAL_BAR.png",
           // set visualization options based on analyzer's state.
           generateOptionsFromAnalyzerState:function (report) {
             return {}; // perform no work

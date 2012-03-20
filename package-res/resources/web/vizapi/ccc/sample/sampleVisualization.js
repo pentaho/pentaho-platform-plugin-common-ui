@@ -13,7 +13,8 @@ pentaho.visualizations.push({
       name: 'Default',
       reqs :
           [
-            {   id: 'rows',             // id of the data element
+            {
+              id: 'rows',             // id of the data element
               dataType: 'string',         // data type - 'string', 'number', 'date', 'boolean', 'any' or a comma separated list
               dataStructure: 'column',    // 'column' or 'row' - only 'column' supported so far
               caption: 'Level',        // visible name
