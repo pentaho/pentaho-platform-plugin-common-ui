@@ -43,16 +43,6 @@ pentaho.visualizations.push({
                 type: 'combo',
                 caption: "Calculation"
               }
-            },
-            {
-              id: 'fontSize',
-              dataType: 'string',
-              ui: {
-                labels: ["Minimum", "Maximum", "Average"],
-                group: "options",
-                type: 'combo',
-                caption: "Calculation"
-              }
             }
           ]
     }
