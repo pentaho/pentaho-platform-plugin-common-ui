@@ -127,6 +127,11 @@ this.refreshBrowsePanel = function() {
     }
 }
 
+this.collapseBrowsePanel = function() {
+	if( this.console_enabled){
+        window.parent.executeCommand("CollapseBrowserCommand");
+	}
+}
   
 }
 
