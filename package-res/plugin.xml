@@ -41,6 +41,10 @@
     <!--file context="analyzer">content/common-ui/resources/web/vizapi/ccc/sample/sampleVisualization.js</file-->
     <!--file context="analyzer">content/common-ui/resources/web/vizapi/ccc/sample/sampleVisualization_analyzer_plugin.js</file-->
     <!-- Example Visualizaiton Plugin. Un-comment to test -->
+
+    <!-- Example Prompting Sample Plugin. Used in prompting/sample.html -->
+    <file context="prompting-sample">content/common-ui/resources/web/prompting/pentaho-prompting-sample-component.js</file>
+    <!-- Example Prompting Sample Plugin. Used in prompting/sample.html -->
   </external-resources>
 
 
