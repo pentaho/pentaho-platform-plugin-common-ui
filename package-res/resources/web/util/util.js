@@ -1,7 +1,7 @@
 /**
  * Utility methods designed for general use
  */
-pen.define('common-ui/util/util', function() {
+pen.define(function() {
   return {
     /**
      * Parse the parameters from the current URL.
