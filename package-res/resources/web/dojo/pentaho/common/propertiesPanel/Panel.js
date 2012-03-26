@@ -841,10 +841,13 @@ pentaho.common.propertiesPanel.Panel.registeredTypes["gem"] = pentaho.common.pro
 
 dojo.declare(
     "pentaho.common.propertiesPanel.ComboUI",
-    [dijit.form.Select, pentaho.common.propertiesPanel.StatefulUI],
+    [dijit._Widget, dijit._Templated, pentaho.common.propertiesPanel.StatefulUI],
     {
       className:"propPanel_combobox propPanel_control",
       options: [],
+      widgetsInTemplate: false,
+      templateString: "<div class='${className}' id='${model.id}_wrapper'></div>",
+
       constructor:function (options) {
 
         this.name = options.id;
@@ -866,15 +869,73 @@ dojo.declare(
         }
 
       },
-      onChange: function(){
-        this.model.set('value', this.value);
-      },
+
       postCreate: function(){
-        dojo.addClass(this.domNode, this.className);
+
+          var me = this;
+          var opts = this.options;
+          dojo.forEach(opts, function(val, idx) {
+            if(typeof(me.value) == "undefined") {
+              opts['selected'] = true;
+            } else {
+              if(me.value == val.value) {
+                val['selected'] = true;
+              }
+            }
+          }, this);
+
+          if(this.isMobile()) {
+
+            // create native select widget
+
+            var selectId = this.id+"_select";
+            var selectBox = dojo.create("select", {id: selectId});
+
+            dojo.forEach(opts, function(val, idx) {
+              if(typeof(val.selected) != "undefined" && val.selected == true) {
+                var selOpt = {label: val.label, value: val.value, selected: true};
+              } else {
+                var selOpt = {label: val.label, value: val.value};
+              }
+              dojo.create("option", selOpt, selectBox);
+            }, this);
+
+
+            this.domNode.appendChild(selectBox);
+            dojo.connect(selectBox, "onchange", function() {
+                me.model.set('value', this.value);
+                me.value = this.value;
+            });
+
+          } else {
+
+            // use the styled drop down
+
+            dojo.addClass(this.domNode, this.className);
+            var sel = new dijit.form.Select({
+              options: opts,
+      onChange: function(){
+                me.model.set('value', this.value);
+                me.value = this.value;
+      },
+            });
+            sel.placeAt(this.domNode);
         this.inherited(arguments);
       }
+
+      },
+
+      isMobile: function(){
+        return (cv.isMobileSafari() || window.orientation !== undefined);
+      },
+
+      isMobileSafari: function() {
+        return navigator.userAgent.match(/(iPad|iPod|iPhone)/) != null;
+    }
+
     }
 );
+
 pentaho.common.propertiesPanel.Panel.registeredTypes["combo"] = pentaho.common.propertiesPanel.ComboUI;
 
 dojo.declare(
