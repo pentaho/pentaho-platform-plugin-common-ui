@@ -847,7 +847,7 @@ dojo.declare(
       options: [],
       widgetsInTemplate: false,
       templateString: "<div class='${className}' id='${model.id}_wrapper'></div>",
-
+      handles: [],
       constructor:function (options) {
 
         this.name = options.id;
@@ -902,10 +902,10 @@ dojo.declare(
 
 
             this.domNode.appendChild(selectBox);
-            dojo.connect(selectBox, "onchange", function() {
+            this.handles.push(dojo.connect(selectBox, "onchange", function() {
                 me.model.set('value', this.value);
                 me.value = this.value;
-            });
+              }));
 
           } else {
 
@@ -931,7 +931,12 @@ dojo.declare(
 
       isMobileSafari: function() {
         return navigator.userAgent.match(/(iPad|iPod|iPhone)/) != null;
-    }
+      },
+
+      destroy: function() {
+        dojo.forEach(this.handles, dojo.disconnect);
+        this.inherited(arguments);
+      }
 
     }
 );
@@ -992,6 +997,7 @@ dojo.declare(
       widgetsInTemplate: true,
       value : false,
       templateString: "<div class='${className}'><input id='${model.id}_checkbox' name='${model.id}_checkbox' dojoType='dijit.form.CheckBox' /> <label for='${model.id}_checkbox'>${label}</label></div>",
+      handles: [],
       constructor:function (options) {
         if(typeof(this.model.value) !== "undefined"){
           this.value = this.model.value;
@@ -1008,11 +1014,11 @@ dojo.declare(
         }
         this.checkbox.attr('checked', this.value);
 
-        this.connect(this.checkbox, "onChange", function(){
+        this.handles.push(dojo.connect(this.checkbox, "onChange", function(){
           if(outterThis.model.value != outterThis.checkbox.checked){
             outterThis.model.set('value', outterThis.checkbox.checked);
           }
-        });
+        }));
       },
       set: function(prop, newVal){
         if(this.checkbox){
@@ -1024,6 +1030,10 @@ dojo.declare(
       },
       onChange: function(){
 
+      },
+      destroy: function() {
+        dojo.forEach(this.handles, dojo.disconnect);
+        this.inherited(arguments);
       }
     }
 );
