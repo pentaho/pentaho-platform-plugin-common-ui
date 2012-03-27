@@ -871,62 +871,60 @@ dojo.declare(
       },
 
       postCreate: function(){
-
-          var me = this;
-          var opts = this.options;
-          dojo.forEach(opts, function(val, idx) {
-            if(typeof(me.value) == "undefined") {
-              opts['selected'] = true;
-            } else {
-              if(me.value == val.value) {
-                val['selected'] = true;
-              }
+        var me = this;
+        var opts = this.options;
+        dojo.forEach(opts, function(val, idx) {
+          if(typeof(me.value) == "undefined") {
+            opts['selected'] = true;
+          } else {
+            if(me.value == val.value) {
+              val['selected'] = true;
             }
+          }
+        }, this);
+
+        if(this.isMobile()) {
+
+          // create native select widget
+
+          var selectId = this.id+"_select";
+          var selectBox = dojo.create("select", {id: selectId});
+
+          dojo.forEach(opts, function(val, idx) {
+            if(typeof(val.selected) != "undefined" && val.selected == true) {
+              var selOpt = {label: val.label, value: val.value, selected: true};
+            } else {
+              var selOpt = {label: val.label, value: val.value};
+            }
+            dojo.create("option", selOpt, selectBox);
           }, this);
 
-          if(this.isMobile()) {
 
-            // create native select widget
+          this.domNode.appendChild(selectBox);
+          this.handles.push(dojo.connect(selectBox, "onchange", function() {
+              me.model.set('value', this.value);
+              me.value = this.value;
+            }));
 
-            var selectId = this.id+"_select";
-            var selectBox = dojo.create("select", {id: selectId});
+        } else {
 
-            dojo.forEach(opts, function(val, idx) {
-              if(typeof(val.selected) != "undefined" && val.selected == true) {
-                var selOpt = {label: val.label, value: val.value, selected: true};
-              } else {
-                var selOpt = {label: val.label, value: val.value};
-              }
-              dojo.create("option", selOpt, selectBox);
-            }, this);
+          // use the styled drop down
 
-
-            this.domNode.appendChild(selectBox);
-            this.handles.push(dojo.connect(selectBox, "onchange", function() {
-                me.model.set('value', this.value);
-                me.value = this.value;
-              }));
-
-          } else {
-
-            // use the styled drop down
-
-            dojo.addClass(this.domNode, this.className);
-            var sel = new dijit.form.Select({
-              options: opts,
-      onChange: function(){
-                me.model.set('value', this.value);
-                me.value = this.value;
-      },
-            });
-            sel.placeAt(this.domNode);
+          dojo.addClass(this.domNode, this.className);
+          var sel = new dijit.form.Select({
+            options: opts,
+            onChange: function(){
+              me.model.set('value', this.value);
+              me.value = this.value;
+            },
+          });
+          sel.placeAt(this.domNode);
+        }
         this.inherited(arguments);
-      }
-
       },
 
       isMobile: function(){
-        return (cv.isMobileSafari() || window.orientation !== undefined);
+        return (this.isMobileSafari() || window.orientation !== undefined);
       },
 
       isMobileSafari: function() {
