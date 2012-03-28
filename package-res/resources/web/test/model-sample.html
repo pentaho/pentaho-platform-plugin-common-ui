@@ -1,5 +1,5 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns:pho="http:/www.pentaho.com">
+<html>
     <head>
     <title>Models Sample</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -33,7 +33,7 @@
           
         <script type="text/javascript">
 
-pentaho.common.Messages.addBundle('dataapi','messages');
+          pentaho.common.Messages.addUrlBundle('dataapi',CONTEXT_PATH+'i18n?plugin=common-ui&name=resources/web/dataapi/nls/messages');
 
 function loadPage() {
     // clear out the display

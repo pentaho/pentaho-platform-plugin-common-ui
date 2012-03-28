@@ -13,7 +13,7 @@ pentaho.pda.SOURCE_TYPE_CDA = 'cda';
 
 pentaho.pda.modelaccess = {};
 
-pentaho.common.Messages.addBundle('dataapi','messages');
+pentaho.common.Messages.addUrlBundle('dataapi',CONTEXT_PATH+'i18n?plugin=common-ui&name=resources/web/dataapi/nls/messages');
 
 /*
           @class pentaho.pda.app

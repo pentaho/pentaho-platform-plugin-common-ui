@@ -29,20 +29,6 @@ dojo.declare("pentaho.common.Messages", null, {});
   pentaho.common.Messages.messageBundle.push( dojo.i18n.getLocalization(packageName, fileName) );
 };
 
-/*public static*/pentaho.common.Messages.addUrlBundle = function( packageName, url )
-{
-  var xml = pentahoGet( url, '' );
-
-  var pos1 = xml.indexOf('<return>');
-  var pos2 = xml.indexOf('</return>');
-
-  if( pos1 != -1 && pos2 != -1 ) {
-    resultJson = xml.substr( pos1+8, pos2-pos1-8 )
-  }
-  var bundle = eval('('+resultJson+')');
-
-  pentaho.common.Messages.messageBundle.push( bundle );
-};
 
 /*private static*/
 pentaho.common.Messages.entityDecoder=document.createElement('textarea');
@@ -133,19 +119,29 @@ var cnt = 0;
  */
 /*public static*/pentaho.common.Messages.addUrlBundle = function( packageName, url )
 {
-  var xml = pentahoGet( url, '' );
 
-  var pos1 = xml.indexOf('<return>');
-  var pos2 = xml.indexOf('</return>');
 
-  if( pos1 != -1 && pos2 != -1 ) {
-    resultJson = xml.substr( pos1+8, pos2-pos1-8 )
-  }
-  var bundle = eval('('+resultJson+')');
+  var deferred = dojo.xhrGet(
+      {
+        url: url,
+        handleAs: "json"
+      }
+  );
 
-  pentaho.common.Messages.messageBundle.push( bundle );
+  deferred.then(
+      function(data){
+        pentaho.common.Messages.messageBundle.push( data );
+      },
+
+      function(error){
+        if(typeof(console) != "undefined"){
+          console.log("error loading message bundle at:"+url);
+        }
+      }
+  );
+
 };
 
 /* static init */
 pentaho.common.Messages.init();
-pentaho.common.Messages.addBundle('pentaho.common','messages');
+pentaho.common.Messages.addUrlBundle('pentaho.common',CONTEXT_PATH+'i18n?plugin=common-ui&name=resources/web/dojo/pentaho/common/nls/messages');

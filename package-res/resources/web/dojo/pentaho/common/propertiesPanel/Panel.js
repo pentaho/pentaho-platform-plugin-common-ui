@@ -14,7 +14,6 @@ dojo.require("dijit.TitlePane");
 
 dojo.require("pentaho.common.Messages");
 
-pentaho.common.Messages.addBundle
 dojo.declare(
     "pentaho.common.propertiesPanel.Panel",
     [dijit.layout.ContentPane],
