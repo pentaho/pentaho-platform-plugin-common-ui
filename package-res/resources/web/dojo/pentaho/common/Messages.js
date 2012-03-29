@@ -4,7 +4,7 @@ dojo.declare("pentaho.common.Messages", null, {});
 /*private static*/pentaho.common.Messages.init = function()
 {
   if (pentaho.common.Messages.messageBundle === undefined) {
-    pentaho.common.Messages.messageBundle = new Array();
+    pentaho.common.Messages.messageBundle = {};
   }
 };
 
@@ -26,7 +26,7 @@ dojo.declare("pentaho.common.Messages", null, {});
 
   // Using ambiguated form to defeat dojo parser
   dojo["requireLocalization"](packageName, fileName, "ROOT", "ROOT");
-  pentaho.common.Messages.messageBundle.push( dojo.i18n.getLocalization(packageName, fileName) );
+  pentaho.common.Messages.messageBundle[packageName] = dojo.i18n.getLocalization(packageName, fileName);
 };
 
 
@@ -55,35 +55,39 @@ pentaho.common.Messages.html_entity_decode = function(str)
  */
 /*public static*/pentaho.common.Messages.getString = function( key, substitutionVars )
 {
-  var msg = key; // if we don't find the msg, return the key as the msg
+  var b, bundle,
+      msg = key; // if we don't find the msg, return the key as the msg
   // loop through each message bundle
-  for ( var ii=0; ii<pentaho.common.Messages.messageBundle.length; ++ii ) {
-    // does this bundle have the key we are looking for?
-    if (key in pentaho.common.Messages.messageBundle[ii]) {
-      // yes, it has the key
-      msg = pentaho.common.Messages.messageBundle[ii][key];
-      if ( undefined != substitutionVars )
-      {
-        var subs = {};
-        if(dojo.isString(substitutionVars)) {
-          subs['0'] = substitutionVars;
-        }
-        else if(dojo.isArray(substitutionVars)) {
-          for(var sNo=0; sNo<substitutionVars.length; sNo++) {
-            subs[''+sNo] = substitutionVars[sNo];
+  for (b in pentaho.common.Messages.messageBundle) {
+    if (pentaho.common.Messages.messageBundle.hasOwnProperty(b)) {
+      bundle = pentaho.common.Messages.messageBundle[b];
+      // does this bundle have the key we are looking for?
+      if (bundle.hasOwnProperty(key)) {
+        // yes, it has the key
+        msg = bundle[key];
+        if ( undefined != substitutionVars )
+        {
+          var subs = {};
+          if(dojo.isString(substitutionVars)) {
+            subs['0'] = substitutionVars;
+          }
+          else if(dojo.isArray(substitutionVars)) {
+            for(var sNo=0; sNo<substitutionVars.length; sNo++) {
+              subs[''+sNo] = substitutionVars[sNo];
+            }
+          }
+          else if(dojo.isObject(substitutionVars)) {
+            subs = substitutionVars;
+          }
+          if(dojo.string.substituteParams) {
+            msg = dojo.string.substituteParams(msg, subs);
+          }
+          else if(dojo.replace) {
+            msg = dojo.replace(msg, subs);
           }
         }
-        else if(dojo.isObject(substitutionVars)) {
-          subs = substitutionVars;
-        }
-        if(dojo.string.substituteParams) {
-          msg = dojo.string.substituteParams(msg, subs);
-        }
-        else if(dojo.replace) {
-          msg = dojo.replace(msg, subs);
-        }
+        break;
       }
-      break;
     }
   }
   return pentaho.common.Messages.html_entity_decode(msg);
@@ -116,21 +120,28 @@ var cnt = 0;
  * file with the resource strings.
  * @param fileName String name of the javascript file with the
  * resource strings, without the extention.
+ * @param reload Force the reloading of this package name? If the package name
+ * has already been provided no request will be made to the url. Defaults to false.
  */
-/*public static*/pentaho.common.Messages.addUrlBundle = function( packageName, url )
+/*public static*/pentaho.common.Messages.addUrlBundle = function( packageName, url, reload )
 {
-
+  if (!reload && pentaho.common.Messages.messageBundle.hasOwnProperty(packageName)) {
+    return;
+  }
 
   var deferred = dojo.xhrGet(
       {
         url: url,
-        handleAs: "json"
+        handleAs: "json",
+        // This call must be synchronous so we inject the require message bundle before it needs to be used.  Message bundles
+        // are generally fetched immediately before attempting to look up a localized string.
+        sync: true
       }
   );
 
   deferred.then(
       function(data){
-        pentaho.common.Messages.messageBundle.push( data );
+        pentaho.common.Messages.messageBundle[packageName] = data;
       },
 
       function(error){
