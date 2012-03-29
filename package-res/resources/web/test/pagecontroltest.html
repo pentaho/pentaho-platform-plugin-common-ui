@@ -35,13 +35,12 @@
         <script type="text/javascript">
 
             dojo.require("dojo.parser");
+            dojo.require("pentaho.common.Messages");
             dojo.require("pentaho.common.PageControl");
 
             dojo.ready(function() {
                 var pagecontrol = dijit.byId('pagecontrol');
-                pagecontrol.registerLocalizationLookup(function(key) {
-                    return '!' + key + '!';
-                });
+                pagecontrol.registerLocalizationLookup(pentaho.common.Messages.getString);
                 pagecontrol.registerPageNumberChangeCallback(function(pageNum) {
                     if (console) {
                         console.log("page number updated: " + pageNum);
