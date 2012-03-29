@@ -33,19 +33,6 @@ dojo.declare("pentaho.common.Messages", null, {});
 /*private static*/
 pentaho.common.Messages.entityDecoder=document.createElement('textarea');
 
-/*public static*/
-pentaho.common.Messages.html_entity_decode = function(str)
-{
-  try{
-    pentaho.common.Messages.entityDecoder.innerHTML = str;
-    var value = pentaho.common.Messages.entityDecoder.value;
-    value = unescape(value);
-    return value;
-  } catch (e) {
-    alert('cannot localize message: '+str);
-  }
-}
-
 /**
  * Get the string from a message bundle referenced by <param>key</param>.
  * @param key String the key in the bundle which references the desired string
@@ -90,7 +77,7 @@ pentaho.common.Messages.html_entity_decode = function(str)
       }
     }
   }
-  return pentaho.common.Messages.html_entity_decode(msg);
+  return msg;
 };
 var cnt = 0;
 
