@@ -50,7 +50,7 @@
         modulePaths: {
             'pentaho.common': '../pentaho/common'
         },
-        parseOnLoad: false,
+        parseOnLoad: true,
         baseUrl: '../dojo/dojo/'
       });
 
@@ -61,7 +61,19 @@
     <script language='javascript' type='text/javascript' src='../dojo/dojo/dojo-all.js.uncompressed.js'></script>
 
     <script language="javascript" type="text/javascript">
+      /**
+       * Provide a hook so the AMD module system knows when Dojo has been loaded. With this we can depend on Dojo
+       * with pen.require().
+       */
+      dojo.ready(function() {
+        // Dojo is now available, modules depending on it may now load.
+        pen.require(['local'], function(local) {
+          local.define('dojo');
+        });
+      });
+
       pen.require([
+        'local!dojo',
         'common-ui/repo/pentaho-ajax',
         'common-ui/prompting/pentaho-prompting-components',
         'cdf/Dashboards'
