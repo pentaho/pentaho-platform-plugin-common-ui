@@ -243,6 +243,15 @@ analyzerPlugins.push({
                 }, this);
 
                 return config;
+            },
+            updateConfiguration: function(config){
+              // Reqiured logic, both size and color required by default, turn required off one hen the other is filled.
+              var colorBy = config.byId("color");
+              var sizeBy = config.byId("size");
+              var totalGems =colorBy.gems.length + sizeBy.gems.length;
+              colorBy.required = (totalGems == 0);
+              sizeBy.required = (totalGems == 0);
+              this.inherited(arguments);
             }
         });
 
