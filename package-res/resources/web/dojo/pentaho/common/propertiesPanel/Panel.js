@@ -18,7 +18,7 @@
       "pentaho.common.propertiesPanel.Panel",
       [dijit.layout.ContentPane],
       {
-        captionTemplate: "<div class='caption'><span class='caption-text'>${ui.caption:i18n}&nbsp;</span>&nbsp;<img class='captionIcon'/></div>",
+        captionTemplate: "<div class='caption'><span class='caption-text'>${ui.caption:i18n}&nbsp;&nbsp;</span><img class='captionIcon'/></div>",
         seperatorTemplate: "<div class='propPanel-seperator'></div>",
         propUIs: [],
         groups: {},
@@ -186,7 +186,7 @@
                   }
                 }));
 
-            var img = dojo.query(" > img", cap);
+            var img = dojo.query("img", cap);
             img = img[img.length-1]; //select the last image found
             if(item.ui.captionIcon){
               img.src = item.ui.captionIcon;

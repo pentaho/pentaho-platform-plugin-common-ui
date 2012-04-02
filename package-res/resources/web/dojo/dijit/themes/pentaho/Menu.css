@@ -72,3 +72,8 @@
 .tundra .dijitCheckedMenuItemChecked .dijitCheckedMenuItemIcon {
 	background-position: -64px;
 }
+
+.tundra .dijitMenuItem .dijitMenuItemLabel {
+  /* ANALYZER-1152*/
+  white-space: nowrap;
+}

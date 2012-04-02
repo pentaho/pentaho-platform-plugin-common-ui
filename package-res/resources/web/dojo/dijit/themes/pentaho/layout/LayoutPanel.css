@@ -35,6 +35,7 @@
   font-size: 12px;
   font-weight: 600;
   white-space: nowrap;
+  text-align:center;
 }
 
 .pentahoPropertiesPanel>*{
@@ -139,11 +140,10 @@
   font-size: .85em;
   font-weight: normal;
   float:left;
-
 }
 
 .pentahoPropertiesPanel .captionIcon {
-  float:left;
+  float:none;
 }
 
 
