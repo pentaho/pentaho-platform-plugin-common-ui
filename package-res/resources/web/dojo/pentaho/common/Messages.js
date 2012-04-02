@@ -29,6 +29,15 @@ dojo.declare("pentaho.common.Messages", null, {});
   pentaho.common.Messages.messageBundle[packageName] = dojo.i18n.getLocalization(packageName, fileName);
 };
 
+/**
+ * Finds and returns a registered bundle if it exists.
+ *
+ * @param {String} name Name of a registered bundle
+ * @return {Object} Message bundle as an object of key-value pairs or undefined if not found.
+ */
+/*public static*/pentaho.common.Messages.getBundle = function (name) {
+  return pentaho.common.Messages.messageBundle[name];
+}
 
 /*private static*/
 pentaho.common.Messages.entityDecoder=document.createElement('textarea');
