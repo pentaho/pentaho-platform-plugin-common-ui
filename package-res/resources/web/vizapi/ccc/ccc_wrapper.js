@@ -625,7 +625,9 @@ pen.define(["cdf/lib/CCC/pvc-d1.0", "common-ui/vizapi/VizController"], function(
     pentaho.ccc.CccChart.prototype._initializeOptions = function(vizOptions){
       // Store a copy of the incoming parameters, for later use, in #resize
       this._originalVizOptions = $.extend({}, vizOptions);
-
+      this._isResize = !!vizOptions.isResize;
+      delete vizOptions.isResize;
+      
       // Make a copy
       vizOptions = this._vizOptions = $.extend({}, vizOptions);
 
@@ -1633,7 +1635,24 @@ pen.define(["cdf/lib/CCC/pvc-d1.0", "common-ui/vizapi/VizController"], function(
       this._currentChartType = this._vizOptions.cccClass;
 
       var chartClass = eval("(" + this._currentChartType + ")"); // TODO - get rid of eval
-
+      
+      var selectionsWhereSpec;
+      if(this._isResize && this._chart && this._chart.constructor === chartClass){
+          selectionsWhereSpec = this._buildWhereSpec(this._chart.dataEngine.getSelections());
+          if(selectionsWhereSpec && selectionsWhereSpec.length) {
+              var prevRenderCallback = this.options.renderCallback;
+              this.options.renderCallback = function(){
+                  if(prevRenderCallback) {
+                      prevRenderCallback.call(this);
+                  }
+                  
+                  var datums = this.dataEngine.getWhere(selectionsWhereSpec);
+                  this.dataEngine.setSelections(datums, true);
+              };
+          }
+      }
+      
+      this._isResize = false;
       this._chart = new chartClass(this.options);
       this._chart.setData($.extend(true, {}, this._cdaTable), this._dataOptions);
       this._chart.render();
@@ -1880,7 +1899,32 @@ pen.define(["cdf/lib/CCC/pvc-d1.0", "common-ui/vizapi/VizController"], function(
         }
       }
     };
-
+    
+    pentaho.ccc.CccChart.prototype._buildWhereSpec = function(cccSelections){
+        var whereSpec = [];
+        
+        if(cccSelections.length) {
+            var whereSpec = [];
+            
+            cccSelections.forEach(addDatum);
+            
+            function addDatum(datum) {
+                var datumFilter = {};
+                
+                var elems = datum.elem;
+                for(var dimName in elems) {
+                    if(dimName !== 'value') {
+                        datumFilter[dimName] = [elems[dimName].path];
+                    }
+                }
+                
+                whereSpec.push(datumFilter);
+            }
+        }
+        
+        return whereSpec;
+    };
+    
     /*
      * DRILLING
      */
@@ -2200,7 +2244,7 @@ pen.define(["cdf/lib/CCC/pvc-d1.0", "common-ui/vizapi/VizController"], function(
 
       vizOptions.width  = width;
       vizOptions.height = height;
-
+      vizOptions.isResize = true;
       this.draw(this._dataTable, vizOptions);
     };
 
