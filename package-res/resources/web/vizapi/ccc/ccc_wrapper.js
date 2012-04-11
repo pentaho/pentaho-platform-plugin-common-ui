@@ -1906,9 +1906,7 @@ pen.define(["cdf/lib/CCC/pvc-d1.0", "common-ui/vizapi/VizController"], function(
         if(cccSelections.length) {
             var whereSpec = [];
             
-            cccSelections.forEach(addDatum);
-            
-            function addDatum(datum) {
+            var addDatum = function(datum) {
                 var datumFilter = {};
                 
                 var elems = datum.elem;
@@ -1919,7 +1917,9 @@ pen.define(["cdf/lib/CCC/pvc-d1.0", "common-ui/vizapi/VizController"], function(
                 }
                 
                 whereSpec.push(datumFilter);
-            }
+            };
+            
+            cccSelections.forEach(addDatum);
         }
         
         return whereSpec;
