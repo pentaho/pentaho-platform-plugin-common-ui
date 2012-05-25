@@ -131,7 +131,7 @@ TYPICAL TARGET SEQUENCE
        =================================================================================-->
 
   <!-- Project meta properties -->
-  <property name="impl.vendor" value="Your Company Here" description="Jar file metadata describing the jar's vendor" />
+  <property name="impl.vendor" value="Pentaho Corporation" description="Jar file metadata describing the jar's vendor" />
   <property name="impl.productID"
             value=""
             description="Jar file metadata indicating the product ID (this is not the revision)" />
