@@ -108,15 +108,15 @@ PentahoUserConsole = function() {
 
 this.enableSaveButtons = function() {
     // if possible, enable the 'Save' and 'Save As' toolbar buttons
-    if( this.console_enabled && window.parent.enableAdhocSave ) {
-        window.parent.enableAdhocSave( true );
+    if( this.console_enabled && window.parent.enableSave ) {
+        window.parent.enableSave( true );
     }
 }
 
 this.disableSaveButtons = function() {
     // if possible, disable the 'Save' and 'Save As' toolbar buttons
-    if( this.console_enabled && window.parent.enableAdhocSave ) {
-        window.parent.enableAdhocSave( false );
+    if( this.console_enabled && window.parent.enableSave ) {
+        window.parent.enableSave( false );
     }
 }
 

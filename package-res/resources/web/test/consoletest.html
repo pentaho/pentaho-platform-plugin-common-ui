@@ -87,15 +87,15 @@ function resetEditButton() {
 
 function enableSaveButtons() {
     // if possible, enable the 'Save' and 'Save As' toolbar buttons
-    if( console_enabled && window.parent.enableAdhocSave ) {
-        window.parent.enableAdhocSave( true );
+    if( console_enabled && window.parent.enableSave ) {
+        window.parent.enableSave( true );
     }
 }
 
 function disableSaveButtons() {
     // if possible, disable the 'Save' and 'Save As' toolbar buttons
-    if( console_enabled && window.parent.enableAdhocSave ) {
-        window.parent.enableAdhocSave( false );
+    if( console_enabled && window.parent.enableSave ) {
+        window.parent.enableSave( false );
     }
 }
 
