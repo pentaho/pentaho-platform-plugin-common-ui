@@ -1,0 +1,151 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns:pho="http:/www.pentaho.com">
+    <head>
+        <title>Select List Test</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+        <link rel="stylesheet" type="text/css" href="../dojo/dijit/themes/pentaho/pentaho.css"/>
+
+        <script type="text/javascript" src="webcontext.js?content=common-ui"></script>
+
+        <script type="text/javascript">
+        //<![CDATA[
+
+            $.extend(djConfig, { modulePaths: {
+                                    'pentaho.common': "../pentaho/common"
+                                },
+                                parseOnLoad: true,
+                                baseUrl: '../dojo/dojo/'
+                            });
+
+        //]]>
+        </script>
+
+        <script language='javascript' type='text/javascript' src='../dojo/dojo/dojo.js.uncompressed.js'></script>
+        <script language='javascript' type='text/javascript' src='../dojo/dojo/dojo-ext.js.uncompressed.js'></script>
+
+        <script type="text/javascript">
+
+            dojo.require("dojo.parser");
+            dojo.require("pentaho.common.SelectList");
+            dojo.require("pentaho.common.MenuItem");
+
+            // the list of available fields
+            var items = [];
+            var selectList = null;
+    
+            /* this is the onload function */
+            function doload() {
+
+                dojo.parser.parse();
+
+                // configure the field list
+                selectList = dijit.byId("selectlist");
+                selectList.init();
+                // provide a context-menu 
+                selectList.setContextMenu( dijit.byId('fieldContextMenu') );
+                // register a function to handle double-clicks on a field
+                selectList.registerDoubleClickCallback(doubleClick);
+
+                var items = [
+                    {
+                        "id": "item1",
+                        "label": "Project 1",
+                        "type": ["pentaho-selectlist-item-project"],
+                        hasIcon: true,
+                        children: [
+                            {
+                                "id": "item3",
+                                "label": "Transform 1",
+                                "type": ["pentaho-selectlist-item-transform"],
+                                hasIcon: true                        
+                            },
+                            {
+                                "id": "item2",
+                                "label": "Model 1",
+                                "type": ["pentaho-selectlist-item-model"],
+                                hasIcon: true                      
+                            }
+                        ]                      
+                    },
+                    {
+                        "id": "item4",
+                        "label": "Visual 1",
+                        "type": ["pentaho-selectlist-item-visualize"],
+                        hasIcon: true                        
+                    },
+                    {
+                        "id": "item5",
+                        "label": "Plain item 1"
+                    }
+                ];
+                selectList.addItems(items);
+                
+            }
+
+            /* A callback to handle double-clicking on a field */
+            function doubleClick( field ) {
+                alert('Double-click on '+field);
+            }
+
+            /* A callback to handle choosing an option on the context menu */
+            function optionChosen() {
+
+                var items = selectList.getSelectedItems();
+                var str = 'Option 1 chosen on field(s):\n';
+                for(var idx=0; idx<items.length; idx++) {
+                    str += items[idx].id;
+                    str += '\n';
+                }
+                alert(str);
+            }
+
+            /* Clears out any selected fields in the field list */
+            function clearSelections() {
+                selectList.clearSelection();
+            }
+
+            /* Lists the ids of the fields currently selected */
+            function displaySelectedItems() {
+                var items = selectList.getSelectedItems();
+                var str = '';
+                for(var idx=0; idx<items.length; idx++) {
+                    str += items[idx].id;
+                    str += '\n';
+                }
+                alert(str);
+            }
+            dojo.ready(doload);
+
+        </script>
+
+    </head>
+
+    <body class="tundra body" onload="">
+
+        <div style="padding: 8px; background-color:white">
+        
+            <h3>Data API - Select List</h3>
+            This example shows you how to use the select list.
+            <p/>
+
+            <div class="pentaho-list-box pentaho-padding-sm scroll-panel" style="width:200px; height:200px">
+                <div id="selectlist" dojoType="pentaho.common.SelectList"></div>
+            </div>
+            <p/>
+            Try double-clicking or right-clicking on a field.
+            <p/>
+            <button onclick="displaySelectedItems()">Display Selected Fields</button>
+            <br/>
+            <button onclick="clearSelections()">Clear Selections</button>
+
+            <!-- this is the right-click menu -->
+            <div dojoType="dijit.Menu" id="fieldContextMenu" style="display:none">
+                <div dojoType="pentaho.common.MenuItem" id="fieldAddColumn" label="Option 1" onclick="optionChosen()"></div>
+            </div>
+
+        </div>
+
+    </body>
+  
+</html>

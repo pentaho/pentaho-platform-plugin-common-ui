@@ -143,6 +143,114 @@
   background:url("images/fade.png") no-repeat center top;
 }
 
+.templatePickerImgEmbed {
+    border: 1px solid grey;
+    height: 109px;
+    padding-top: 0;
+    width: 90px;
+}
+
+.fadeEmbed {
+  background:url("images/fadeEmbed.png") no-repeat center top;
+}
+
+.pentaho-selection-dialog-selected {
+    padding:0px;
+    background-color: #444444;
+    color: white;
+    font-size: 1em;
+    cursor: pointer;
+}
+
+.pentaho-selectlist-container {
+    padding-left: 0px;
+    padding-top: 3px;
+    margin-left: 0px;
+    font-size: 1em;
+    cursor: pointer;
+}
+
+.pentaho-selectlist {
+    background-color: white;
+    border: 1px solid #888888;
+    padding-left: 2px;
+}
+
+.pentaho-selectlist-item {
+    height: 20px;
+    padding-left: 0px;
+    padding-top: 3px;
+    margin-left: 0px;
+    font-size: 1em;
+    cursor: pointer;
+}
+
+.pentaho-selectlist-item-icon {
+    height: 20px;
+    padding-left: 22px;
+    padding-top: 3px;
+    margin-left: 0px;
+    font-size: 1em;
+    cursor: pointer;
+}
+
+
+.pentaho-selectlist-item-indent {
+}
+
+.pentaho-selectlist-item-data {
+    background:url("images/data.png") no-repeat left center;    
+}
+
+.pentaho-selectlist-item-project {
+    background:url("images/folder.png") no-repeat left center;    
+}
+
+.pentaho-selectlist-item-transform {
+    background:url("images/transform_icon.png") no-repeat left center;    
+}
+
+.pentaho-selectlist-item-model {
+    background:url("images/model_icon.png") no-repeat left center;    
+}
+
+.pentaho-selectlist-item-visualize {
+    background:url("images/visualize_icon.png") no-repeat left center;    
+}
+
+.pentaho-selectlist-item-wizard {
+    background:url("images/wizard.png") no-repeat left center;    
+}
+
+.folder-open {
+    background: url('images/folder-open.png') no-repeat left top;
+    heightx: 20px;
+    float: left;
+    padding-left: 22px;
+    padding-top: 3px;
+    margin-left: 0px;
+    font-size: 1em;
+    cursor: pointer;
+}
+
+.folder-closed {
+    background: url('images/folder.png') no-repeat left top;
+    heightx: 20px;
+    padding-left: 22px;
+    padding-top: 3px;
+    margin-left: 0px;
+    font-size: 1em;
+    cursor: pointer;
+    float: left;
+}
+
+.pentaho-selection-dialog-unselected {
+    padding:0px;
+    border: 0px;
+    color: black;
+    cursor: pointer;
+}
+
 .pentaho-selection-dialog-outer {
   padding:2px 2px 2px 2px;
   border: 1px solid #000000;
@@ -156,6 +264,10 @@
   background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #30363a), color-stop(1, #575d62));
   /* Firefox */
   background: -moz-linear-gradient(#30363a, #575d62 100%) repeat scroll 0 0 transparent;
+
+}
+
+.pentaho-selection-dialog-inner-embed {
 
 }
 
@@ -230,4 +342,9 @@
 
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr = '#888888', endColorstr = '#121212');
   zoom:1;
+}
+
+.pentaho-input {
+    border: 1px solid #444444;
+    background-color: white;
 }
