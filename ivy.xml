@@ -59,7 +59,7 @@
 		<dependency org="junit" name="junit" rev="4.4" transitive="false" conf="test->default" />
         <dependency org="org.jmock" name="jmock-junit4" rev="2.5.1" conf="test->default" />
 		<dependency org="pentaho" name="pentaho-bi-platform-test-foundation" rev="${dependency.bi-platform.revision}" transitive="false" conf="test->default" />
-		<dependency org="com.thoughtworks.xstream" name="xstream" rev="1.3.1" transitive="false" conf="test->default"/>
+		<dependency org="com.thoughtworks.xstream" name="xstream" rev="1.4.2" transitive="false" conf="test->default"/>
 		<dependency org="simple-jndi" name="simple-jndi" rev="0.11.1" transitive="false" conf="test->default" />
 		<dependency org="hsqldb" name="hsqldb" rev="1.8.0.7" conf="test->default" transitive="false" />
 		<dependency org="pentaho-library" name="libformula" rev="${dependency.libformula.revision}" changing="true" transitive="false" conf="test->default" />
