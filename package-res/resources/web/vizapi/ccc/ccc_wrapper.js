@@ -720,14 +720,10 @@ pen.define(["cdf/lib/CCC/pvc-d1.0", "common-ui/vizapi/VizController"], function(
             break;
           }
 
-          var role = 'measure';
           var dataReq = dataTable.getColumnProperty(tc, 'dataReq');
-          if(dataReq && dataReq.id){
-            // Update measure role
-            role = dataReq.id;
-          }
-
-          seenMeasureIds[meaId] = role;
+          // Update measure role
+          var gembarId = dataReq[dataReq.length-1].id;
+          seenMeasureIds[meaId] = gembarId;
 
           lastMeasureId = meaId;
         }
