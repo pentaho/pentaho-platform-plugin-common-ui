@@ -998,6 +998,8 @@
         constructor:function (options) {
           if(typeof(this.model.value) !== "undefined"){
             this.value = this.model.value;
+          } else {
+            this.model.set('value', this.value);
           }
           this.label = pentaho.common.Messages.getString(this.model.ui.label,this.model.ui.label);
         },
