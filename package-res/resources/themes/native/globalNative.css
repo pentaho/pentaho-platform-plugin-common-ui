@@ -17,7 +17,7 @@
 
 /*
 
-Page: background color - #d3d3d3
+Page: background color - #b6b6b6
 Panel and dialog panel: background color - #ececec
 Panel and dialog panel: border color - #848484
 Panel and dialog frame, Toolbar background: #d7d7d7, IE=images/wt_transparent.png
@@ -76,7 +76,7 @@ label {
 
 .pentaho-page-background {
     background: url('images/bg_pentaho_default.png') repeat-x top left;
-    background-color: #d3d3d3;
+    background-color: #b6b6b6;
 }
 
 .pentaho-selection-dialog-inner {
@@ -1068,11 +1068,12 @@ has no buttons add an addition class to your element, pentaho-dialog-buttonless,
 .pentaho-rounded-panel2 {
     border: 1px solid #848484;
     /* */
-    -moz-border-radius: 5px;
+/*    -moz-border-radius: 5px;
     -webkit-border-radius: 5px;
     border-radius: 5px;
+*/
 
-    -moz-box-shadow: 0 0 1px 1px rgba(255, 255, 255, .6) inset;
+  -moz-box-shadow: 0 0 1px 1px rgba(255, 255, 255, .6) inset;
     -webkit-box-shadow: 0 0 1px 1px rgba(255, 255, 255, .6) inset;
     box-shadow: 0 0 1px 1px rgba(255, 255, 255, .6) inset;
 }
@@ -1080,11 +1081,12 @@ has no buttons add an addition class to your element, pentaho-dialog-buttonless,
 .pentaho-rounded-panel2-shadowed {
     border: 1px solid #848484;
     /* */
-    -moz-border-radius: 5px;
+/*    -moz-border-radius: 5px;
     -webkit-border-radius: 5px;
     border-radius: 5px;
+*/
 
-    -moz-box-shadow: 1px 1px 5px 0px #747474, 0 0 1px 1px rgba(255, 255, 255, .6) inset;
+  -moz-box-shadow: 1px 1px 5px 0px #747474, 0 0 1px 1px rgba(255, 255, 255, .6) inset;
     -webkit-box-shadow: 1px 1px 5px 0px #747474, 0 0 1px 1px rgba(255, 255, 255, .6) inset;
     box-shadow: 1px 1px 5px 0px #747474, 0 0 1px 1px rgba(255, 255, 255, .6) inset;
 }
@@ -1092,9 +1094,10 @@ has no buttons add an addition class to your element, pentaho-dialog-buttonless,
 .pentaho-rounded-panel-bottom-lr {
     border: 1px solid #848484;
     /* */
-    -moz-border-radius: 0px 0px 7px 7px;
+/*    -moz-border-radius: 0px 0px 7px 7px;
     -webkit-border-radius: 0px 0px 7px 7px;
     border-radius: 0px 0px 7px 7px;
+*/
 }
 
 .pentaho-shadow-right-side {
@@ -1109,27 +1112,30 @@ has no buttons add an addition class to your element, pentaho-dialog-buttonless,
     border-right: 1px solid rgba(255, 255, 255, 0.59375);
     border-bottom: 1px solid rgba(255, 255, 255, 0.59375);
     /* */
-    -moz-border-radius: 0px 5px 5px 0px;
+/*    -moz-border-radius: 0px 5px 5px 0px;
     -webkit-border-radius: 0px 5px 5px 0px;
     border-radius: 0px 5px 5px 0px;
+*/
 }
 
 .pentaho-rounded-panel-top-right {
     border-top: 1px solid rgba(255, 255, 255, 0.59375);
     border-right: 1px solid rgba(255, 255, 255, 0.59375);
     /* */
-    -moz-border-radius: 0px 5px 0px 0px;
+/*    -moz-border-radius: 0px 5px 0px 0px;
     -webkit-border-radius: 0px 5px 0px 0px;
     border-radius: 0px 5px 0px 0px;
+*/
 }
 
 .pentaho-rounded-panel-top-left {
     border-top: 1px solid #848484;
     border-left: 1px solid #848484;
     /* */
-    -moz-border-radius: 5px 0px 0px 0px;
+/*    -moz-border-radius: 5px 0px 0px 0px;
     -webkit-border-radius: 5px 0px 0px 0px;
     border-radius: 5px 0px 0px 0px;
+*/
 }
 
 .pentaho-disclosure-panel .header td {
@@ -2162,7 +2168,7 @@ box-shadow: 2px 2px 6px 1px #747474;*/
 
 /* override of puc styles */
 .workspacePanel {
-    background-color: #D3D3D3;
+    background-color: #b6b6b6;
 }
 
 .backgroundContentTable {
@@ -2337,4 +2343,16 @@ body .dojoMenuItem2Hover {
     background-image: url(images/ProgressBarDisabled.png);
     background-color: white;
     background-attachment: scroll;
+}
+
+.tundra .dijitArrowButtonInner {
+  background:url("images/comboArrow.png") no-repeat scroll 0 center;
+  width: 16px;
+  height: 16px;
+  /*margin: 0 4px 0 4px;*/
+}
+
+.dialog-content .dijitComboBox .dijitArrowButton input[type='text'] {
+  border: none;
+  height: 20px !important;
 }

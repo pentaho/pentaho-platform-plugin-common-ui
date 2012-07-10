@@ -62,5 +62,5 @@ dojo.declare(
                 this.callbacks[idx](this.headerButtons[idx].id);
             }
         }
-      }
+    }
 );
