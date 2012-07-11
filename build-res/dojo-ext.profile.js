@@ -12,6 +12,11 @@ dependencies = {
               [
                 "dojo",
                 "dojo.parser",
+                "dojo.store",
+                "dojo.store.Memory",
+                "dojo.store.DataStore",
+                "dojo.data",
+                "dojo.data.ObjectStore",
                 "dijit.dijit-all",
                 "dojo.cldr",
                 "dojo.dnd.Container",
@@ -85,6 +90,7 @@ dependencies = {
                 "pentaho.common.TabSet",
                 "pentaho.common.TemplatePicker",
                 "pentaho.common.ToggleButton",
+                "pentaho.common.GroupToggleButton",
                 "pentaho.common.propertiesPanel.Panel",
                 "pentaho.common.propertiesPanel.Configuration"
 
