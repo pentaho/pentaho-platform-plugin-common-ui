@@ -61,6 +61,7 @@ dojo.declare(
                     dojo.removeClass(this['templateName'+idx], 'fadeEmbed');
                     dojo.addClass(this['templateImgCell'+idx], 'pentaho-selection-dialog-unselected');
                     dojo.removeClass(this['templateImgCell'+idx], 'pentaho-selection-dialog-selected');
+                    dojo.removeClass(this['templateName'+idx], 'pentaho-selection-dialog-selected');
                     this['templateName'+idx].innerHTML = '';
                 }
             }

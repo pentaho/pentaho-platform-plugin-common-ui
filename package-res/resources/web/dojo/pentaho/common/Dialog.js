@@ -88,9 +88,14 @@ dojo.declare(
                 }
           },
           
-          
-          
-           postCreate: function() {
+          setButtonEnabled: function(/*int*/ buttonIndex, /*boolean*/ enabled) {
+            var btn = dojo.byId("button" + buttonIndex);
+            if(typeof(btn) != 'undefined' && btn != null) {
+              btn.disabled = !enabled;
+            }
+          },
+
+          postCreate: function() {
             if(this.templatePath || this.templateString != '<div></div>') {
                 this.popup.attr("content", this.domNode);
             }

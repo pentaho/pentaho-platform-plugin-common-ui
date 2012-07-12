@@ -17,6 +17,7 @@
  * limitations under the License.
  * *****************************************************************************
  */
+
 dojo.provide("pentaho.common.GroupToggleButton");
 dojo.require('pentaho.common.ToggleButton');
 dojo.require('dijit._Templated');
@@ -47,14 +48,14 @@ dojo.declare("pentaho.common.GroupToggleButton", pentaho.common.ToggleButton, {
 
   _applyGroupStyling: function() {
     if(this.orientation != null) {
-      this.outerNode.className = this.outerNode.className + " pentaho-toggle-button-" + this.orientation;
+      dojo.addClass(this.outerNode, "pentaho-toggle-button-" + this.orientation);
 
       if(this.first) {
-        this.outerNode.className = this.outerNode.className + " pentaho-toggle-button-" + this.orientation + "-first";
+        dojo.addClass(this.outerNode, "pentaho-toggle-button-" + this.orientation + "-first");
       }
 
       if(this.last) {
-        this.outerNode.className = this.outerNode.className + " pentaho-toggle-button-" + this.orientation + "-last";
+        dojo.addClass(this.outerNode, "pentaho-toggle-button-" + this.orientation + "-last");
       }
 
     }
@@ -76,18 +77,33 @@ dojo.declare("pentaho.common.GroupToggleButton", pentaho.common.ToggleButton, {
   },
 
   _onClick: function() {
-    this.inherited(arguments);
-    // notify the other members in the group that we've been clicked/selected
-    dojo.publish(this.unselectChannel, [this]);
+    // don't allow unselection by clicking on the selected button
+    if(!this.checked) {
+      this._setChecked(!this.checked);
+      if(this.onChange) {
+        this.onChange(this.checked);
+      }
+      // notify the other members in the group that we've been clicked/selected
+      dojo.publish(this.unselectChannel, [this]);
+    }
   },
 
   _unselect: function(/*Object*/ button) {
     if(button !== this && this.checked) {
-      this.set('checked', false);
-      this._onUnhover();    // to get rid of any styling
+      try {
+        this.set('checked', false);
+        this._onUnhover();    // to get rid of any styling
+      } catch (err) {
+        // couldn't set it
+      }
     }
+  },
 
+  uninitialize: function() {
+    this.inherited(arguments);
+    dojo.unsubscribe(this.unselectChannel, this);
   }
+
 
 });
 

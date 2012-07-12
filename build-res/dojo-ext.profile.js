@@ -56,6 +56,7 @@ dependencies = {
                 "dojox.layout.ContentPane",
                 "dojox.layout.ScrollPane",
                 "dojox.layout.RadioGroup",
+                "dojox.layout.ExpandoPane",
                 "dojox.testing.DocTest",
                 "pentaho.common.state",
                 "pentaho.common.button",
@@ -90,6 +91,7 @@ dependencies = {
                 "pentaho.common.TabSet",
                 "pentaho.common.TemplatePicker",
                 "pentaho.common.ToggleButton",
+                "pentaho.common.TemplatePickerEmbed",
                 "pentaho.common.GroupToggleButton",
                 "pentaho.common.propertiesPanel.Panel",
                 "pentaho.common.propertiesPanel.Configuration"
