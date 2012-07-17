@@ -94,8 +94,8 @@ dependencies = {
                 "pentaho.common.TemplatePickerEmbed",
                 "pentaho.common.GroupToggleButton",
                 "pentaho.common.propertiesPanel.Panel",
-                "pentaho.common.propertiesPanel.Configuration"
-
+                "pentaho.common.propertiesPanel.Configuration",
+                "pentaho.common.FieldsetPane"
               ]
         }
       ],

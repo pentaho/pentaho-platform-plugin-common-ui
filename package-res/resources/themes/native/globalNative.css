@@ -2356,3 +2356,63 @@ body .dojoMenuItem2Hover {
   border: none;
   height: 20px !important;
 }
+
+.pentaho-chart-icon-large {
+  background: url("../images/chart.png") no-repeat;
+  height: 48px;
+  width: 48px;
+}
+.pentaho-settings-icon-large {
+  background: url("../images/settings.png") no-repeat;
+  height: 48px;
+  width: 48px;
+}
+.pentaho-settings-complete-icon-large {
+  background: url("../images/settings_done.png") no-repeat;
+  height: 48px;
+  width: 48px;
+}
+.pentaho-play-icon-large {
+  background: url("../images/play.png") no-repeat;
+  height: 48px;
+  width: 48px;
+}
+.pentaho-play-complete-icon-large {
+  background: url("../images/play_done.png") no-repeat;
+  height: 48px;
+  width: 48px;
+}
+/* FieldsetPane styles - start */
+.pentaho-fieldset-pane {
+
+}
+.pentaho-fieldset-pane-header {
+  border-bottom: 2px #BBB solid;
+  overflow:visible;
+  height: 12px;
+  margin: 5px 0 10px 0;
+}
+.pentaho-fieldset-pane-header .pentaho-fieldset-pane-title {
+  padding: 0 5px;
+  background-color: #d4d6db;
+  font-size: 18px;
+}
+/* pentaho fieldset pane styles - end */
+
+.disabledpane {
+  top: auto;
+  left: auto;
+  position: absolute;
+  /* bg color is the same as panel-content so it will blend in */
+  background-color: white;
+  /* IE8 css hack for opacity */
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(opacity=65)";
+  filter: alpha(opacity = 65);
+  opacity: 0.65;
+  height: 100%;
+  width: 100%;
+  z-index: 300;
+  margin: 0px;
+  padding: 0px;
+  display: none;
+}
