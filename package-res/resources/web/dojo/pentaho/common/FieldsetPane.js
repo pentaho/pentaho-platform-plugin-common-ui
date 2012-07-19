@@ -24,7 +24,7 @@ dojo.require("pentaho.common.Messages");
 
 dojo.declare(
   "pentaho.common.FieldsetPane",
-  [dijit._Widget, dijit._Templated],
+  [dijit.layout.ContentPane, dijit.layout._LayoutWidget, dijit._Templated],
 {
 
   templatePath: dojo.moduleUrl('pentaho.common', 'FieldsetPane.html'),
@@ -69,6 +69,17 @@ dojo.declare(
       display: "none"
     });
     this.disabled = false;
+
+  },
+
+  layout: function() {
+    var box = this._borderBox;
+    var container = this.containerNode;
+    var header = dojo.byId(this.id + "_title");
+
+    dojo.style(container, {
+      height: (box.h - header.offsetHeight) + "px"
+    });
 
   }
 
