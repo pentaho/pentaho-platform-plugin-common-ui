@@ -158,18 +158,18 @@ pen.define(function() {
      * @param bundleName - name of the mesages bundle to use as the source for translations
      */
     localizeDom: function(/*String*/ bundleName) {
-      if(dojo) {
-        dojo.require(["pentaho.common.Messages"], function(messages) {
-          var key;
-          var bundle = pentaho.common.Messages.getBundle(bundleName);
-          if (bundle) {
-            for (key in bundle) {
-              if (bundle.hasOwnProperty(key)) {
-                this.localizeDomCtrl(key, pentaho.common.Messages.getString(key));
-              }
+      var key;
+      if(pentaho && pentaho.common && pentaho.common.Messages) {
+        var bundle = pentaho.common.Messages.getBundle(bundleName);
+        if (bundle) {
+          for (key in bundle) {
+            if (bundle.hasOwnProperty(key)) {
+              this.localizeDomCtrl(key, pentaho.common.Messages.getString(key));
             }
           }
-        });
+        }
+      } else {
+        console.log("pentaho.common.Messages not available for localizing the DOM");
       }
     }
 
