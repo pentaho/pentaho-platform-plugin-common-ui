@@ -1,9 +1,7 @@
 /**
  * Utility methods designed for general use
  */
-pen.define(["local!dojo"], function() {
-  dojo.require("pentaho.common.Messages");
-
+pen.define(function() {
   return {
 
   /**
@@ -160,14 +158,18 @@ pen.define(["local!dojo"], function() {
      * @param bundleName - name of the mesages bundle to use as the source for translations
      */
     localizeDom: function(/*String*/ bundleName) {
-      var key;
-      var bundle = pentaho.common.Messages.getBundle(bundleName);
-      if (bundle) {
-        for (key in bundle) {
-          if (bundle.hasOwnProperty(key)) {
-            this.localizeDomCtrl(key, pentaho.common.Messages.getString(key));
+      if(dojo) {
+        dojo.require(["pentaho.common.Messages"], function(messages) {
+          var key;
+          var bundle = pentaho.common.Messages.getBundle(bundleName);
+          if (bundle) {
+            for (key in bundle) {
+              if (bundle.hasOwnProperty(key)) {
+                this.localizeDomCtrl(key, pentaho.common.Messages.getString(key));
+              }
+            }
           }
-        }
+        });
       }
     }
 
