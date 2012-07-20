@@ -1,7 +1,7 @@
 /**
  * Utility methods designed for general use
  */
-pen.define(function() {
+pen.define(["local!dojo"], function() {
   dojo.require("pentaho.common.Messages");
 
   return {
