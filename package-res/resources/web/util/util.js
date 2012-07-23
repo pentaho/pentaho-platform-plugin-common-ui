@@ -55,6 +55,8 @@ pen.define(function() {
       var prop = null;
       var e = null;
       var id = null;
+      var prefix = idPrefix || "";
+
       if(key.indexOf('_label') == key.length-6 ) {
         id = key.substr(0, key.length-6);
         prop = 'label';
@@ -76,6 +78,7 @@ pen.define(function() {
       }
 
       if(id != null) {
+        id = prefix + id;
         if(this[id]) {
           e = this[id];
         } else {
@@ -120,9 +123,9 @@ pen.define(function() {
           // this is for Dojo menu items
           e.setLabel(text);
         }
-//        else if(prop == 'value' && e.setValue) {
-//          e.setValue(text);
-//        }
+        else if(prop == 'title' && e.setTitle) {
+          e.setTitle(text);
+        }
         else if(e.set) {
           e.set(prop, text);
         }
@@ -156,15 +159,16 @@ pen.define(function() {
      * </ul>
      * </p>
      * @param bundleName - name of the mesages bundle to use as the source for translations
+     * @param prefix - id prefix to match on when getting id's from the dom
      */
-    localizeDom: function(/*String*/ bundleName) {
+    localizeDom: function(/*String*/ bundleName, /*Optional|String*/ prefix) {
       var key;
       if(pentaho && pentaho.common && pentaho.common.Messages) {
         var bundle = pentaho.common.Messages.getBundle(bundleName);
         if (bundle) {
           for (key in bundle) {
             if (bundle.hasOwnProperty(key)) {
-              this.localizeDomCtrl(key, pentaho.common.Messages.getString(key));
+              this.localizeDomCtrl(key, pentaho.common.Messages.getString(key), prefix);
             }
           }
         }
