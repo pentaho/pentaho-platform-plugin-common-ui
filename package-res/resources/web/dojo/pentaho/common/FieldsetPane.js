@@ -89,11 +89,10 @@ dojo.declare(
     var box = this._borderBox;
     var container = this.containerNode;
     var header = dojo.byId(this.id + "_title");
-
+    var padding = 20;
     dojo.style(container, {
-      height: (box.h - header.offsetHeight) + "px"
+      height: (box.h - header.offsetHeight - padding) + "px"
     });
-
   }
 
 });
