@@ -144,7 +144,6 @@
 }
 
 .templatePickerImgEmbed {
-    border: 1px solid grey;
     height: 109px;
     padding-top: 0;
     width: 90px;
@@ -152,6 +151,23 @@
 
 .fadeEmbed {
   background:url("images/fadeEmbed.png") no-repeat center top;
+}
+.pentaho-selection-dialog-inner-embed .fadeEmbed {
+  background: transparent;
+  color: black;
+}
+
+.pentaho-selection-dialog-inner-embed .templatePickerImgEmbed {
+  border: 2px solid #6FDB13;
+}
+.pentaho-selection-dialog-inner-embed .templatePickerImgEmbed {
+  border: 2px solid transparent;
+}
+.pentaho-selection-dialog-inner-embed .pentaho-selection-dialog-selected {
+  padding:0px;
+  color: black;
+  font-size: 1em;
+  cursor: pointer;
 }
 
 .pentaho-selection-dialog-selected {
