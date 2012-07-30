@@ -157,7 +157,7 @@
   color: black;
 }
 
-.pentaho-selection-dialog-inner-embed .templatePickerImgEmbed {
+.pentaho-selection-dialog-inner-embed .pentaho-selection-dialog-selected .templatePickerImgEmbed {
   border: 2px solid #6FDB13;
 }
 .pentaho-selection-dialog-inner-embed .templatePickerImgEmbed {
