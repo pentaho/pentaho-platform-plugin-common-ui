@@ -42,7 +42,10 @@ dojo.declare(
             
                 if(idx+start < this.templates.length) {
                     this['templateImg'+idx].src = this.templates[idx+start].imagePath;
-                    this['templateName'+idx].innerHTML = this.templates[idx+start].name;
+                    if(this.templates[idx+start].description && this.templates[idx+start].description != null) {
+                      this['templateImg'+idx].title = this.templates[idx+start].description;
+                    }
+                  this['templateName'+idx].innerHTML = this.templates[idx+start].name;
                     dojo.removeClass(this['templateImg'+idx], 'hidden');
                     dojo.addClass(this['templateName'+idx], 'fadeEmbed');
                     if(this.templates[idx+start].selected) {
