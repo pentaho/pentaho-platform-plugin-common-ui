@@ -74,6 +74,13 @@ dojo.declare(
       height: "100%",
       width: "100%"
     });
+
+    dojo.query('input', this.containerNode).forEach(
+        function(inputElem){
+          inputElem.disabled = true;
+        }
+    );
+
     this.disabled = true;
   },
 
@@ -81,6 +88,13 @@ dojo.declare(
     dojo.style(this._disablePaneDiv, {
       display: "none"
     });
+
+    dojo.query('input', this.containerNode).forEach(
+        function(inputElem){
+          inputElem.disabled = false;
+        }
+    );
+
     this.disabled = false;
 
   },
