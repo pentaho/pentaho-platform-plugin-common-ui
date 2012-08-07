@@ -285,8 +285,9 @@ pentaho.DataTable.prototype.getColumnRange = function(columnIdx) {
 pentaho.DataTable.prototype.getDistinctValues = function(columnIdx) {
     var values = [];
     var valueMap = {};
+    var isNumber = this.getColumnType(columnIdx) == 'number';
     for( var rowNo=0; rowNo<this.getNumberOfRows(); rowNo++ ) {
-        var value = this.getValue( rowNo, columnIdx );
+        var value = isNumber ? this.getValue( rowNo, columnIdx ) : this.getFormattedValue( rowNo, columnIdx );
         if( !valueMap[value] ) {
             valueMap[value] = true;
             values.push(value);

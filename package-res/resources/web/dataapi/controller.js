@@ -377,14 +377,28 @@ pentaho.pda.model.prototype.populateListFromResults = function( valuesList, resu
                 hasValues = true;
             }
         }
-        for( var idx=0; idx<results.resultset.length; idx++ ) {
-            var option;
-            if( hasValues ) {
-                option = new Option( results.resultset[idx][textColumnNumber], results.resultset[idx][valueColumnNumber] );
-            } else {
-                option = new Option( results.resultset[idx][textColumnNumber] );
+        if( results.resultset ) {
+            // CDA format
+            for( var idx=0; idx<results.resultset.length; idx++ ) {
+                var option;
+                if( hasValues ) {
+                    option = new Option( results.resultset[idx][textColumnNumber], results.resultset[idx][valueColumnNumber] );
+                } else {
+                    option = new Option( results.resultset[idx][textColumnNumber] );
+                }
+                valuesList.options[valuesList.options.length] = option;
             }
-            valuesList.options[valuesList.options.length] = option;
+        } 
+        else if( results.jsonTable ) { // DataTable format
+            for( var idx=0; idx<results.getNumberOfRows(); idx++ ) {
+                var option;
+                if( hasValues ) {
+                    option = new Option( results.getFormattedValue(idx,textColumnNumber ), results.getFormattedValue(idx,valueColumnNumber ) );
+                } else {
+                    option = new Option( results.getFormattedValue(idx,textColumnNumber ) );
+                }
+                valuesList.options[valuesList.options.length] = option;
+            }
         }
     }
         
