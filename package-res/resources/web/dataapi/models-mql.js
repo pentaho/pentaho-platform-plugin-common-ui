@@ -34,7 +34,7 @@ pentaho.pda.MqlHandler.prototype.getSources = function(callback, options) {
     
         //try {
             // get the info about the models from the server
-            var url = this.METADATA_SERVICE_URL+'/listBusinessModels';
+            var url = this.METADATA_SERVICE_URL+'/getModelList';
             var contextName = options['context'];
             var query = "domainName=&"+((contextName)? 'context='+contextName : "");
             var result = pentahoGet( url, query );
@@ -67,12 +67,12 @@ pentaho.pda.MqlHandler.prototype.getSources = function(callback, options) {
 pentaho.pda.MqlHandler.prototype.getModelInfoFromNode = function getModelInfoFromNode(node) {
 
 	var model = {};
-    model.domainId = this.getNodeText( node, 'domainId' ); 
+    model.domainId = this.getNodeText( node, 'id' ); 
     model.modelId  = this.getNodeText( node, 'modelId' );
     model.id       = model.domainId +':'+ model.modelId;
-	model.name     = this.getNodeText( node, 'modelName' );
+	model.name     = this.getNodeText( node, 'name' );
 	model.type     = pentaho.pda.SOURCE_TYPE_MQL,
-    model.description = this.getNodeText( node, 'modelDescription' );
+    model.description = this.getNodeText( node, 'description' );
 		
     return model;
 }
@@ -182,18 +182,16 @@ inheritPrototype(pentaho.pda.model.mql, pentaho.pda.model); //borrow the parent'
 pentaho.pda.model.mql.prototype.discoverModelDetail = function() {
 
 	// get the info about the models from the server
-	var url = this.handler.METADATA_SERVICE_URL+'/loadModel';
-	var query = 'domainId='+escape(this.domainId)+'&modelId='+escape(this.modelId);
+	var url = this.handler.METADATA_SERVICE_URL+'/getModel';
+	var query = 'id='+ escape(this.domainId); 
 	var result = pentahoGet( url, query );
 	// parse the XML
 	var xml = parseXML( result );
         this.categories = [];
     
-	var nodes = xml.getElementsByTagName('return');
-	if( nodes && nodes.length> 0 ) {
-		//return this.getDetailFromNode( nodes[0], modelAccess, datasourceConfig );
-        // get the categories
-        var catnodes = nodes[0].getElementsByTagName('categories');
+	var catnodes = xml.getElementsByTagName('return');
+	if( catnodes && catnodes.length> 0 ) {
+        // get the elements
         for( var idx=0; idx<catnodes.length; idx++ ) {
             //this.addCategoryFromNode( nodes[idx], model );
 			var category = new pentaho.pda.dataelement();
@@ -207,27 +205,27 @@ pentaho.pda.model.mql.prototype.discoverModelDetail = function() {
 			//console.log(category);
 			this.addElement( category );
 			// get the columns
-			var colnodes = catnodes[idx].getElementsByTagName('columns');
-			for( var idx2=0; idx2<colnodes.length; idx2++ ) {
+			var colnodes = catnodes[idx].getElementsByTagName('elements');
+			for( var idx2=1; idx2<colnodes.length; idx2++ ) {
 				//this.addColumnFromNode( nodes[idx], model, category );
 				var element = new pentaho.pda.dataelement();
 				
 				element.id = this.getNodeText( colnodes[idx2], 'id' );
 				element.name = this.getNodeText( colnodes[idx2], 'name' );
                 element.description = this.getNodeText( colnodes[idx2], 'description' );
-				element.elementType = this.getNodeText( colnodes[idx2], 'fieldType' );
-				element.dataType = this.getNodeText( colnodes[idx2], 'type' );
+				element.elementType = this.getNodeText( colnodes[idx2], 'elementType' );
+				element.dataType = this.getNodeText( colnodes[idx2], 'dataType' );
 				element.horizontalAlignment = this.getNodeText( colnodes[idx2], 'horizontalAlignment' );
 				element.formatMask = this.getNodeText( colnodes[idx2], 'formatMask' );
-				element.selectedAggregation = this.getNodeText( colnodes[idx2], 'selectedAggType' );
-				element.defaultAggregation = this.getNodeText( colnodes[idx2], 'defaultAggType' );
+				element.selectedAggregation = this.getNodeText( colnodes[idx2], 'selectedAggregation' );
+				element.defaultAggregation = this.getNodeText( colnodes[idx2], 'defaultAggregation' );
 				element.hiddenForUser = this.getNodeText( colnodes[idx2], 'hiddenForUser' );
 				element.parent = category;
 				element.isQueryElement = true;
                                 element.category = category;
 				category.addChild(element);
 				
-				var aggnodes = colnodes[idx2].getElementsByTagName('aggTypes');
+				var aggnodes = colnodes[idx2].getElementsByTagName('availableAggregations');
 				for( var idx3=0; idx3<aggnodes.length; idx3++ ) {
 					element.availableAggregations.push( this.getText( aggnodes[idx3] ) );
 				}
