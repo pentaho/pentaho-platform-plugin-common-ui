@@ -95,7 +95,8 @@ dependencies = {
                 "pentaho.common.GroupToggleButton",
                 "pentaho.common.propertiesPanel.Panel",
                 "pentaho.common.propertiesPanel.Configuration",
-                "pentaho.common.FieldsetPane"
+                "pentaho.common.FieldsetPane",
+                "pentaho.common.DisableablePanel"
               ]
         }
       ],

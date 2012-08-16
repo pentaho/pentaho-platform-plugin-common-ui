@@ -19,12 +19,16 @@
  */
 
 dojo.provide("pentaho.common.FieldsetPane");
+dojo.require("pentaho.common.Messages");
+dojo.require("pentaho.common.DisableablePanel");
+dojo.require("dijit._Templated");
+dojo.require("dijit.layout._LayoutWidget");
 dojo.require("dijit.layout.ContentPane");
 dojo.require("pentaho.common.Messages");
 
 dojo.declare(
   "pentaho.common.FieldsetPane",
-  [dijit.layout.ContentPane, dijit.layout._LayoutWidget, dijit._Templated],
+  [pentaho.common.DisableablePanel],
 {
 
   templatePath: dojo.moduleUrl('pentaho.common', 'FieldsetPane.html'),
@@ -32,27 +36,9 @@ dojo.declare(
   title: "title",
   width: "100%",
   getLocalString: pentaho.common.Messages.getString,
-  _disablePaneDiv: null,
-  _titleDiv: null,
-  disabled: false,
 
   postCreate: function() {
     this.inherited(arguments);
-    this._disablePaneDiv = dojo.byId(this.id + "_disabledPane");
-
-    if(this._disablePaneDiv == null) {
-      this._disablePaneDiv = dojo.query(".disabledpane", this.domNode)[0];
-    }
-
-    if(this.disabled) {
-      this.disable();
-    }
-
-    this._titleDiv = dojo.byId(this.id + "_title");
-    if(this._titleDiv == null) {
-      this._titleDiv = dojo.query(".pentaho-fieldset-pane-title", this.domNode)[0];
-    }
-
     this._localize();
   },
 
@@ -65,44 +51,13 @@ dojo.declare(
 
   setTitle: function(/*String*/ title) {
     this.title = title;
-    this._titleDiv.innerHTML = title;
-  },
-
-  disable: function() {
-    dojo.style(this._disablePaneDiv, {
-      display: "block",
-      height: "100%",
-      width: "100%"
-    });
-
-    dojo.query('input', this.containerNode).forEach(
-        function(inputElem){
-          inputElem.disabled = true;
-        }
-    );
-
-    this.disabled = true;
-  },
-
-  enable: function() {
-    dojo.style(this._disablePaneDiv, {
-      display: "none"
-    });
-
-    dojo.query('input', this.containerNode).forEach(
-        function(inputElem){
-          inputElem.disabled = false;
-        }
-    );
-
-    this.disabled = false;
-
+    this.titleNode.innerHTML = title;
   },
 
   layout: function() {
     var box = this._borderBox;
     var container = this.containerNode;
-    var header = dojo.byId(this.id + "_title");
+    var header = this.titleNode;
     var padding = 20;
     dojo.style(container, {
       height: (box.h - header.offsetHeight - padding) + "px"

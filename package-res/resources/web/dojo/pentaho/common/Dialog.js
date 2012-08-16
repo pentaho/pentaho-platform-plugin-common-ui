@@ -91,7 +91,11 @@ dojo.declare(
           setButtonEnabled: function(/*int*/ buttonIndex, /*boolean*/ enabled) {
             var btn = dojo.byId("button" + buttonIndex);
             if(typeof(btn) != 'undefined' && btn != null) {
-                btn.set('disabled', !enabled);
+                if(typeof(btn.set) != 'undefined') {
+                  btn.set('disabled', !enabled);
+                } else {
+                  btn.disabled = !enabled;
+                }
             }
           },
 
