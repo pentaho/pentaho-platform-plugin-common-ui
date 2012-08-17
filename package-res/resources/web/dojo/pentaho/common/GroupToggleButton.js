@@ -77,6 +77,9 @@ dojo.declare("pentaho.common.GroupToggleButton", pentaho.common.ToggleButton, {
   },
 
   _onClick: function() {
+    if(this.disabled) {
+      return;
+    }
     // don't allow unselection by clicking on the selected button
     if(!this.checked) {
       this._setChecked(!this.checked);

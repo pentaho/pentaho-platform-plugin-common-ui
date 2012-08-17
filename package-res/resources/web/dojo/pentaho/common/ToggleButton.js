@@ -83,6 +83,9 @@ dojo.declare("pentaho.common.ToggleButton",
         },
         
         _onClick: function() {
+            if(this.disabled) {
+              return;
+            }
             this._setChecked(!this.checked);
             if(this.onChange) {
                 this.onChange(this.checked);
