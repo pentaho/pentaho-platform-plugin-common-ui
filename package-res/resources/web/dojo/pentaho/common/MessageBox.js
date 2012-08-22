@@ -8,9 +8,31 @@ dojo.declare(
      [pentaho.common.Dialog],
      {
         buttons: ['btn1','btn2','btn3'],
-        
+        messageType: null,                         // options are null, ERROR, WARN, INFO
+
         setTitle: function(title) {
             this.set("title",title);
+        },
+
+        postCreate: function() {
+          this.inherited(arguments);
+          this.setMessageType(this.messageType);
+        },
+
+        setMessageType: function(/*String*/ type) {
+          this.messageType = type;
+          if(type != null) {
+            if(type == "ERR" || type == "ERROR") {
+              dojo.replaceClass(this.typeIcon, "error-large-icon", "warning-large-icon info-large-icon");
+            } else if(type == "WARN" || type == "WARNING") {
+              dojo.replaceClass(this.typeIcon, "warning-large-icon", "error-large-icon info-large-icon");
+            } else {
+              dojo.replaceClass(this.typeIcon, "info-large-icon", "error-large-icon warning-large-icon");
+            }
+          } else {
+            // remove the image
+            dojo.removeClass(this.typeIcon, "error-large-icon info-large-icon warning-large-icon");
+          }
         },
 
         setMessage: function(message) {

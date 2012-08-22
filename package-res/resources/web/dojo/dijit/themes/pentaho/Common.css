@@ -364,3 +364,19 @@
     border: 1px solid #444444;
     background-color: white;
 }
+
+.error-large-icon {
+  background-image: url("images/error_48.png");
+  height: 48px;
+  width: 48px;
+}
+.info-large-icon {
+  background-image: url("images/info_48.png");
+  height: 48px;
+  width: 48px;
+}
+.warning-large-icon {
+  background-image: url("images/warning_48.png");
+  height: 48px;
+  width: 48px;
+}
