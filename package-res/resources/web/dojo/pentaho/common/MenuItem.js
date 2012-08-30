@@ -1,4 +1,5 @@
 dojo.provide("pentaho.common.MenuItem");
+dojo.require("dijit.MenuItem");
 
 dojo.declare(
     "pentaho.common.MenuItem",

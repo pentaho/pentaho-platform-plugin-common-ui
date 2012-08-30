@@ -1,4 +1,5 @@
 dojo.provide("pentaho.common.GlassPane");
+dojo.require("dijit._Widget");
 /**
  * Creates a glass pane 
  */

@@ -1,4 +1,6 @@
 dojo.provide("pentaho.common.SelectList");
+dojo.require("dojo.dnd.Selector");
+dojo.require("dojox.html.entities");
 
 /**
  * Creates a list of fields from a 
