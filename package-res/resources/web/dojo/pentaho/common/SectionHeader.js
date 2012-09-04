@@ -61,6 +61,12 @@ dojo.declare(
             if(this.callbacks && idx<this.callbacks.length) {
                 this.callbacks[idx](this.headerButtons[idx].id);
             }
+        },
+
+        setHeader: function(/*String*/ header) {
+          this.header = header;
+          this.headerNode.innerHTML = header;
         }
+
     }
 );
