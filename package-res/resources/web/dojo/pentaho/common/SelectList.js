@@ -233,7 +233,10 @@ dojo.declare(
     if( !props["class"] ) {
         props["class"] = "pentaho-selectlist-item";
     }
-    if(item.label) {
+
+    if(item.title) {
+      props.title = item.title;
+    } else if(item.label) {
         props.title = item.label;
     } else {
     	props.title = item.id;
