@@ -197,7 +197,7 @@ dojo.declare(
                this.shown = true;
             },
             hide: function(){
-               this.popup.hide();
+               return this.popup.hide();
             },
             destroy: function(){
                this.popup.destroy();
