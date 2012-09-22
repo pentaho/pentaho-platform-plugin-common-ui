@@ -160,9 +160,15 @@
 .pentaho-selection-dialog-inner-embed .pentaho-selection-dialog-selected .templatePickerImgEmbed {
   border: 2px solid #6FDB13;
 }
+
 .pentaho-selection-dialog-inner-embed .templatePickerImgEmbed {
-  border: 2px solid transparent;
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255, 255, 255, 1)), color-stop(50%,rgba(241, 241, 241, 1)), color-stop(51%,rgba(225, 225, 225, 1)), color-stop(100%,rgba(246, 246, 246, 1)));
+  border: 2px solid #AEAEAE;
+  border-radius: 4px;
+  padding: 10px;
+  box-shadow: 0 0 1px 1px white inset;
 }
+
 .pentaho-selection-dialog-inner-embed .pentaho-selection-dialog-selected {
   padding:0px;
   color: black;
