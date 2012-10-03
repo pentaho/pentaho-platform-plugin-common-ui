@@ -162,6 +162,7 @@
 }
 
 .pentaho-selection-dialog-inner-embed .templatePickerImgEmbed {
+  background: #F5F5F5;
   background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255, 255, 255, 1)), color-stop(50%,rgba(241, 241, 241, 1)), color-stop(51%,rgba(225, 225, 225, 1)), color-stop(100%,rgba(246, 246, 246, 1)));
   border: 2px solid #AEAEAE;
   border-radius: 4px;
