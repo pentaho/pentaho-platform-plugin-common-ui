@@ -6,6 +6,7 @@ dojo.require("dojox.storage");
 pentaho.common.localcache = {
   keyRegex : new RegExp("[-\\.]", "gi"),
   cacheHasBeenRefreshed : false,
+  lmMap: {},
 
   isAvailable : function() {
     if(dojox.storage.isAvailable()) {
@@ -34,14 +35,17 @@ pentaho.common.localcache = {
       this.refreshCacheExirations();
       key = this.getCacheKey(key);
       var cacheLastModified = this.getLastModified(key);
+      if(typeof(lastModified) == 'undefined') {
+        lastModified = this.lmMap[key];
+      }
       if(cacheLastModified == null) {
         var cachedObj = {
-          lastModified: (lastModified != 'undefined' ? 0 : lastModified),
+          lastModified: (typeof(lastModified) == 'undefined' ? 0 : lastModified),
           value: value
         }
       } else {
         var cachedObj = {
-          lastModified: (lastModified != 'undefined' ? cacheLastModified : lastModified),
+          lastModified: (typeof(lastModified) == 'undefined' ? cacheLastModified : lastModified),
           value: value
         }
       }
@@ -101,12 +105,17 @@ pentaho.common.localcache = {
   },
 
   updateCacheExpiration : function(response) {
+    this.lmMap = {};
+    var lm = this.lmMap;
     $(response)
       .find('cache-item')
       .each(function() {
         var key = $(this).find('key').text();
         key = pentaho.common.localcache.getCacheKey(key);
         var lastModified = $(this).find('last-modified').text();
+
+        lm[key] = lastModified;
+
         //console.log(key + ' --> ' + lastModified);
         var cachedObj = pentaho.common.localcache.getValue(key);
         if(cachedObj != null && pentaho.common.localcache.getLastModified(key) < lastModified) {
