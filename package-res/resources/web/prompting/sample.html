@@ -6,31 +6,7 @@
     <!-- Include CDF styles first to make sure they can be properly overridden -->
     <link rel="stylesheet" href="../../../../../content/pentaho-cdf/js/cdf.css" type="text/css" />
 
-    <script type="text/javascript" src="../../../../../js/require.js"></script>
-    <script type="text/javascript" src="../../../../../js/require-cfg.js"></script>
-
     <script language="javascript" type="text/javascript" src="webcontext.js?context=prompting-sample"></script>
-
-    <!-- CDF Scripts -->
-    <!--
-      Do not load another jquery. We'll rely on the one provided via webcontext.js.
-    <script language="javascript" type="text/javascript" src="../../../../../content/pentaho-cdf/js/jquery.js"></script>
-    -->
-    <script language="javascript" type="text/javascript" src="../../../../../content/pentaho-cdf/js/jquery-impromptu.3.1.js"></script>
-    <script language="javascript" type="text/javascript" src="../../../../../content/pentaho-cdf/js/jquery.ui.js"></script>
-    <script language="javascript" type="text/javascript" src="../../../../../content/pentaho-cdf/js/jquery.bgiframe.js"></script>
-    
-    <!-- Including jquery.dimensions.js breaks the JQuery UI Autocomplete Menu position -->
-    <!--<script language="javascript" type="text/javascript" src="../../../../../content/pentaho-cdf/js/jquery.dimensions.js"></script>-->
-    <script language="javascript" type="text/javascript" src="../../../../../content/pentaho-cdf/js/jquery.jdMenu.js"></script>
-    <script language="javascript" type="text/javascript" src="../../../../../content/pentaho-cdf/js/jquery.positionBy.js"></script>
-    <script language="javascript" type="text/javascript" src="../../../../../content/pentaho-cdf/js/jquery.tooltip.js"></script>
-    <script language="javascript" type="text/javascript" src="../../../../../content/pentaho-cdf/js/jquery.blockUI.js"></script>
-    <script language="javascript" type="text/javascript" src="../../../../../content/pentaho-cdf/js/jquery.eventstack.js"></script>
-
-    <script language="javascript" type="text/javascript" src="../../../../../content/pentaho-cdf/js/Base.js"></script>
-    <script language="javascript" type="text/javascript" src="../../../../../content/pentaho-cdf/js/Dashboards.js"></script>
-    <script language="javascript" type="text/javascript" src="../../../../../content/pentaho-cdf/js/CoreComponents.js"></script>
 
     <link rel="stylesheet" href="../../../../../content/pentaho-cdf/js/jquery.tooltip.css" type="text/css" />
     <link rel="stylesheet" href="../../../../../content/pentaho-cdf/js/jquery.jdMenu.css" type="text/css" />
@@ -39,12 +15,9 @@
 
     <link rel="stylesheet" type="text/css" href="../dojo/dijit/themes/pentaho/pentaho.css"/>
 
-    <script type="text/javascript" src="../repo/pentaho-ajax.js"></script>
-    
-
     <link rel="stylesheet" href="pentaho-prompting.css" type="text/css" />
 
-        <script language="javascript">
+    <script language="javascript">
       // This script element contains required setup and scaffolding
       $.extend(djConfig, {
         modulePaths: {
@@ -59,6 +32,40 @@
     </script>
 
     <script language='javascript' type='text/javascript' src='../dojo/dojo/dojo-all.js.uncompressed.js'></script>
+    <!-- Include the JSTextFormatter GWT Module -->
+    <script type="text/javascript" src="../formatter/formatter.nocache.js"></script>
+
+    <script type="text/javascript">
+      gwtModuleLoaded = function(module) {
+        // Define a local module for every GWT module that's loaded. In our case we're only going to get the formatter
+        pen.require(['local'], function(local) {
+          local.define('gwt-' + module);
+          console.log('defined module gwt-' + module);
+        });
+      }
+      pen.require(['local!gwt-formatter'], function() {
+        var testNumberFormatter = function() {
+          var numberFormatter = jsTextFormatter.createFormatter('number', '$#.0#');
+          var number = 123.45;
+          var formatted = numberFormatter.format(number);
+          alert('Formatted number object: ' + number + ' -> ' + formatted);
+          var parsed = numberFormatter.parse(formatted);
+          alert('Parsed string: ' + formatted + ' -> ' + parsed);
+        };
+        var testDateFormatter = function() {
+          var dateFormatter = jsTextFormatter.createFormatter('date', 'yyyy-MM-dd HH:mm');
+          var date = new Date();
+          var formatted = dateFormatter.format(date);
+          alert('Formatted date object: ' + date + ' -> ' + formatted);
+          var parsed = dateFormatter.parse(formatted);
+          alert('Parsed string: ' + formatted + ' -> ' + new Date(parsed));
+        };
+
+        // Create formatter test UI elements
+        $('<button/>').click(testNumberFormatter).html('Test Number Formatter').appendTo($('#button-container'));
+        $('<button style="margin-left: 4px"/>').click(testDateFormatter).html('Test Date Formatter').appendTo($('#button-container'));
+      });
+    </script>
 
     <script language="javascript" type="text/javascript">
       /**
@@ -71,13 +78,17 @@
           local.define('dojo');
         });
       });
+      
+      // Global declaration for sample debugging purposes
+      var paramDefn;
 
       pen.require([
         'local!dojo',
         'common-ui/repo/pentaho-ajax',
-        'common-ui/prompting/pentaho-prompting-components',
-        'cdf/Dashboards'
+        'common-ui/prompting/pentaho-prompting',
         ], function() {
+            // Set the user to anonymous so Dashboards Storage is never invoked
+            window.Dashboards.context.user = 'anonymousUser';
             window.SimileAjax = {};
             window.Dashboards.blockUIwithDrag = function() {
               $.blockUI.defaults.message = '';
@@ -102,56 +113,53 @@
             }
 
 
-          // This script element contains the sample code to parse the parameter xml and build/refresh the prompt.
-          window.paramParser = new pentaho.common.prompting.ParameterXmlParser();
-          var promptPanel;
-
-          /**
-           * Create or refresh the current prompt with the parameter xml defined in the text area "parameterXml".
-           */
-          window.createPrompt = function() {
-            var paramDefn;
-            try {
-              paramDefn = paramParser.parseParameterXml($('#parameterXml').val());
-            } catch (e) {
-              alert("Error parsing parameter xml: " + e);
-              return;
-            }
-            try {
-              if (!promptPanel) {
-                promptPanel = new pentaho.common.prompting.PromptPanel('promptPanel', paramDefn);
-
-                promptPanel.submit = function() {
-                  alert("submit() called");
-                }
-                promptPanel.schedule = function() {
-                  alert("schedule() called");
-                }
-                promptPanel.getParameterDefinition = function() {
-                  alert("getParameterDefinition() called. This is where you'd build a new parameter definition (or fetch one) to support cascading prompts.");
-                }
-                promptPanel.init();
-              } else {
-                // Refresh existing panel
-                promptPanel.refresh(paramDefn);
+            // This script element contains the sample code to parse the parameter xml and build/refresh the prompt.
+            window.paramParser = new pentaho.common.prompting.ParameterXmlParser();
+            var promptPanel;
+            /**
+             * Create or refresh the current prompt with the parameter xml defined in the text area "parameterXml".
+             */
+            window.createPrompt = function() {
+              try {
+                paramDefn = paramParser.parseParameterXml($('#parameterXml').val());
+              } catch (e) {
+                alert("Error parsing parameter xml: " + e);
+                return;
               }
-            } catch (e) {
-              alert("Error building prompt panel: " + e);
-            }
-          }
+              try {
+                if (!promptPanel) {
+                  promptPanel = new pentaho.common.prompting.PromptPanel('promptPanel', paramDefn);
 
-          /**
-           * Get the parameter values from the current prompt and display them in the element "parameterValues".
-           */
-          window.getParameterValues = function() {
-            var parameterValuesString = '';
-            if (promptPanel) {
-              parameterValuesString = dojo.toJson(promptPanel.getParameterValues());
+                  promptPanel.submit = function() {
+                    alert("submit() called");
+                  }
+                  promptPanel.schedule = function() {
+                    alert("schedule() called");
+                  }
+                  promptPanel.getParameterDefinition = function(paramPanel, callback) {
+                    alert("getParameterDefinition() called. This is where you'd build a new parameter definition (or fetch one) to support cascading prompts.");
+                 }
+                  promptPanel.init();
+                } else {
+                  // Refresh existing panel
+                  promptPanel.refresh(paramDefn);
+                }
+              } catch (e) {
+                alert("Error building prompt panel: " + e);
+              }
             }
-            $('#parameterValues').html(parameterValuesString);
-          }
-        }
-      );
+
+            /**
+             * Get the parameter values from the current prompt and display them in the element "parameterValues".
+             */
+            window.getParameterValues = function() {
+              var parameterValuesString = '';
+              if (promptPanel) {
+                parameterValuesString = dojo.toJson(promptPanel.getParameterValues());
+              }
+              $('#parameterValues').html(parameterValuesString);
+            }
+          });
     </script>
   </head>
   <body class="tundra body">
@@ -471,7 +479,7 @@
         </values>
     </parameter>
 </parameters></textarea>
-    <p>
+    <p id="button-container">
       <button onclick="createPrompt();">Create Prompt</button>
     </p>
 
