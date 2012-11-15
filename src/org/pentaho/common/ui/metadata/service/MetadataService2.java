@@ -23,19 +23,25 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.StringTokenizer;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
 import org.pentaho.common.ui.messages.Messages;
-import org.pentaho.common.ui.metadata.model.impl.Model;
-import org.pentaho.common.ui.metadata.model.impl.ModelInfo;
-import org.pentaho.common.ui.metadata.model.impl.ModelInfoComparator;
-import org.pentaho.common.ui.metadata.model.impl.Query;
+import org.pentaho.common.ui.metadata.service.MetadataServiceUtil2;
 import org.pentaho.commons.connection.IPentahoResultSet;
 import org.pentaho.commons.connection.marshal.MarshallableResultSet;
+import org.pentaho.metadata.datatable.DataTable;
 import org.pentaho.metadata.model.Domain;
 import org.pentaho.metadata.model.LogicalModel;
+import org.pentaho.metadata.model.thin.Model;
+import org.pentaho.metadata.model.thin.ModelInfo;
+import org.pentaho.metadata.model.thin.ModelInfoComparator;
+import org.pentaho.metadata.model.thin.ModelProvider;
+import org.pentaho.metadata.model.thin.Provider;
+import org.pentaho.metadata.model.thin.Query;
 import org.pentaho.metadata.query.model.util.QueryXmlHelper;
 import org.pentaho.metadata.repository.IMetadataDomainRepository;
 import org.pentaho.platform.api.engine.ILogger;
@@ -45,7 +51,6 @@ import org.pentaho.platform.engine.core.system.PentahoSystem;
 import org.pentaho.platform.plugin.action.pentahometadata.MetadataQueryComponent;
 import org.pentaho.platform.util.messages.LocaleHelper;
 import org.pentaho.pms.core.exception.PentahoMetadataException;
-import org.apache.commons.lang.StringUtils;
 
 import flexjson.JSONSerializer;
 
@@ -56,16 +61,23 @@ import flexjson.JSONSerializer;
  * @author jamesdixon
  *
  */
-public class MetadataService extends PentahoBase {
+public class MetadataService2 extends PentahoBase implements ModelProvider {
 
+  public static final String PROVIDER_ID = "MetadataImpl";
+	
   private static final long serialVersionUID = 8481450224870463494L;
 
-  private Log logger = LogFactory.getLog(MetadataService.class);
-
-  public MetadataService() {
+  private Log logger = LogFactory.getLog(MetadataService2.class);
+  
+  private Provider provider;
+  
+  public MetadataService2() {
     setLoggingLevel(ILogger.ERROR);
+    provider = new Provider();
+    provider.setId(PROVIDER_ID);
+    provider.setName("Relational Metadata");
   }
-
+  
   /**
    * Returns a list of the available business models
    * @param domainName optional domain to limit the results
@@ -73,50 +85,39 @@ public class MetadataService extends PentahoBase {
    * @return list of ModelInfo objects representing the available models
    * @throws IOException
    */
-  public ModelInfo[] listBusinessModels( String domainName, String context ) throws IOException {
+  @Override
+  public ModelInfo[] getModelList(String providerId, String domain, String match) {
 
+	  if( providerId != null && !providerId.equals(PROVIDER_ID)) {
+		  return new ModelInfo[0];
+	  }
     List<ModelInfo> models = new ArrayList<ModelInfo>();
-
+    
     // get hold of the metadata repository
     IMetadataDomainRepository repo = getMetadataRepository();
     if( repo == null ) {
       error(Messages.getErrorString("MetadataService.ERROR_0001_BAD_REPO")); //$NON-NLS-1$
       return null;
     }
-
+    
     try {
-      if (StringUtils.isEmpty(domainName)) {
+      if (StringUtils.isEmpty(domain)) {
         // if no domain has been specified, loop over all of them
-        for (String domain : getMetadataRepository().getDomainIds()) {
-          getModelInfos(domain, context, models);
+        for (String aDomain : getMetadataRepository().getDomainIds()) {
+          getModelInfos(match, aDomain, models);
         }
       } else {
         // get the models for the specified domain
-        getModelInfos(domainName, context, models);
+        getModelInfos(match, domain, models);
       }
     } catch (Throwable t) {
       error(Messages.getErrorString("MetadataService.ERROR_0002_BAD_MODEL_LIST"), t); //$NON-NLS-1$
     }
-
+    
     Collections.sort(models, new ModelInfoComparator());
     return models.toArray( new ModelInfo[models.size()]);
   }
-
-  /**
-   * Returns a JSON list of the available business models
-   * @param domainName optional domain to limit the results
-   * @param context Area to check for model visibility
-   * @return JSON string of list of ModelInfo objects representing the available models
-   * @throws IOException
-   */
-  public String listBusinessModelsJson( String domainName, String context ) throws IOException {
-
-    ModelInfo[] models = listBusinessModels(domainName, context);
-    JSONSerializer serializer = new JSONSerializer();
-    String json = serializer.deepSerialize( models );
-    return json;
-  }
-
+  
   /**
    * Returns a list of ModelInfo objects for the specified domain. These objects are small
    * and this list is intended to allow a client to provide a list of models to a user
@@ -125,10 +126,11 @@ public class MetadataService extends PentahoBase {
    * @param context Area to check for model visibility
    * @param models
    */
-  private void getModelInfos(final String domain, final String context, List<ModelInfo> models) {
+  private void getModelInfos(final String match, final String domain, List<ModelInfo> models) {
 
     IMetadataDomainRepository repo = getMetadataRepository();
-
+    
+    String context = null;
     Domain domainObject = repo.getDomain(domain);
     if(domainObject == null) {
       // the domain does not exist
@@ -156,18 +158,19 @@ public class MetadataService extends PentahoBase {
       }
       // create a new ModelInfo object and give it the envelope information about the model
       ModelInfo modelInfo = new ModelInfo();
-      modelInfo.setDomainId(domain);
+      modelInfo.setGroupId(domain);
       modelInfo.setModelId(model.getId());
-      modelInfo.setModelName(model.getName(locale));
+      modelInfo.setName(model.getName(locale));
+      modelInfo.setProvider(provider);
       if (model.getDescription() != null) {
         String modelDescription = model.getDescription(locale);
-        modelInfo.setModelDescription(modelDescription);
+        modelInfo.setDescription(modelDescription);
       }
       models.add(modelInfo);
     }
     return;
   }
-
+  
   /**
    * Returns a Model object for the requested model. The model will include the basic metadata - 
    * categories and columns.
@@ -175,8 +178,27 @@ public class MetadataService extends PentahoBase {
    * @param modelId
    * @return
    */
-  public Model loadModel( String domainId, String modelId ) {
+  @Override
+  public Model getModel(String id) {
 
+	  // parse out the id
+	  StringTokenizer tokenizer = new StringTokenizer( id, "~" );
+	  
+	  String providerId = null;
+	  String domainId = null;
+	  String modelId = null;
+	  while( tokenizer.hasMoreElements() ) {
+		String str = tokenizer.nextToken();  
+		if( providerId == null ) {
+			providerId = str;
+		}
+		else if(domainId == null) {
+			domainId = str;
+		} else {
+			modelId = str;
+		}
+	  }
+	  
     if (domainId == null) {
       // we can't do this without a model
       error(Messages.getErrorString("MetadataService.ERROR_0003_NULL_DOMAIN")); //$NON-NLS-1$
@@ -196,8 +218,8 @@ public class MetadataService extends PentahoBase {
       return null;
     }
 
-    LogicalModel model = domain.findLogicalModel(modelId);
-
+    LogicalModel model = domain.findLogicalModel(modelId); 
+    
     if (model == null) {
       // the model cannot be found or cannot be loaded
       error(Messages.getErrorString("MetadataService.ERROR_0006_MODEL_NOT_FOUND", modelId)); //$NON-NLS-1$
@@ -205,43 +227,37 @@ public class MetadataService extends PentahoBase {
     }
 
     // create the thin metadata model and return it
-    MetadataServiceUtil util = new MetadataServiceUtil();
+    MetadataServiceUtil2 util = new MetadataServiceUtil2();
     util.setDomain(domain);
     Model thinModel = util.createThinModel(model, domainId);
+    thinModel.setProvider(provider);
     return thinModel;
 
   }
-
-  /**
-   * Returns a JSON Model object for the requested model. The model will include the basic metadata - 
-   * categories and columns.
-   * @param domainId
-   * @param modelId
-   * @return JSON string of the model
-   */
-  public String loadModelJson( String domainId, String modelId ) {
-
-    Model model = loadModel( domainId, modelId );
-    JSONSerializer serializer = new JSONSerializer();
-    String json = serializer.deepSerialize( model );
-    return json;
-  }
-
+  
   /**
    * Executes a query model and returns a serializable result set 
    * @param query
    * @param rowLimit An optional row limit, -1 or null means all rows
    * @return
    */
-  public MarshallableResultSet doQuery( Query query, Integer rowLimit ) {
+  @Override
+  public DataTable executeQuery(Query query, int rowLimit ) {
+  	return null;
+  }
 
-    MetadataServiceUtil util = new MetadataServiceUtil();
-    org.pentaho.metadata.query.model.Query fullQuery = util.convertQuery( query );
+  public MarshallableResultSet doQuery( Query query, Integer rowLimit ) {
+    
+    MetadataServiceUtil2 util = new MetadataServiceUtil2();
+    
+    Model model = getModel( query.getSourceId() );
+    
+    org.pentaho.metadata.query.model.Query fullQuery = util.convertQuery( query, model );
     QueryXmlHelper helper = new QueryXmlHelper();
     String xml = helper.toXML(fullQuery);
     return doXmlQuery( xml, rowLimit );
-  }
-
+  }  
+  
   /**
    * Executes a XML query and returns a serializable result set 
    * @param query
@@ -256,8 +272,8 @@ public class MetadataService extends PentahoBase {
     MarshallableResultSet result = new MarshallableResultSet();
     result.setResultSet(resultSet);
     return result;
-  }
-
+  }  
+  
   /**
    * Executes a XML query and returns a JSON serialization of the result set 
    * @param query
@@ -269,11 +285,11 @@ public class MetadataService extends PentahoBase {
     if( resultSet == null ) {
       return null;
     }
-    JSONSerializer serializer = new JSONSerializer();
-    String json = serializer.deepSerialize( resultSet );
+    JSONSerializer serializer = new JSONSerializer(); 
+    String json = serializer.deepSerialize( resultSet );      
     return json;
   }
-
+  
   /**
    * Executes a XML query and returns a CDA compatible JSON serialization of the result set 
    * @param query
@@ -296,10 +312,10 @@ public class MetadataService extends PentahoBase {
       error(Messages.getErrorString("MetadataService.ERROR_0007_JSON_ERROR"),e); //$NON-NLS-1$
     } catch (PentahoMetadataException e) {
       error(Messages.getErrorString("MetadataService.ERROR_0007_BAD_QUERY_DOMAIN"),e); //$NON-NLS-1$
-    }
+    }     
     return json;
   }
-
+  
   /**
    * Executes a XML query and returns a serializable result set 
    * @param query
@@ -307,11 +323,11 @@ public class MetadataService extends PentahoBase {
    * @return
    */
   public MarshallableResultSet doJsonQuery( String json, Integer rowLimit ) {
-
+    
     // return the results
     return doXmlQuery(getQueryXmlFromJson(json), rowLimit);
-  }
-
+  }  
+  
   /**
    * Executes a XML query and returns a JSON serialization of the result set 
    * @param query
@@ -320,9 +336,9 @@ public class MetadataService extends PentahoBase {
    */
   public String doJsonQueryToJson( String json, int rowLimit ) {
     // return the results
-    return doXmlQueryToJson(getQueryXmlFromJson(json), rowLimit);
+    return doXmlQueryToJson(getQueryXmlFromJson(json), rowLimit);  
   }
-
+  
   /**
    * Executes a XML query and returns a CDA compatible JSON serialization of the result set 
    * @param query
@@ -331,10 +347,10 @@ public class MetadataService extends PentahoBase {
    */
   public String doJsonQueryToCdaJson( String json, int rowLimit ) {
     // return the results
-    return doXmlQueryToCdaJson(getQueryXmlFromJson(json), rowLimit);
+    return doXmlQueryToCdaJson(getQueryXmlFromJson(json), rowLimit);  
   }
-
-
+  
+  
   /**
    * Executes a XML query and returns a native result set 
    * @param query
@@ -356,19 +372,20 @@ public class MetadataService extends PentahoBase {
     }
     return null;
   }
-
+  
   /**
    * Converts a JSON query into a full Query object by going via a thin Query object
    * @param json
    * @return
    */
   protected String getQueryXmlFromJson( String json ) {
-    MetadataServiceUtil util = new MetadataServiceUtil();
+    MetadataServiceUtil2 util = new MetadataServiceUtil2();
     Query query = util.deserializeJsonQuery(json);
     try {
       // convert the thin query model into a full one
-      org.pentaho.metadata.query.model.Query fullQuery = util.convertQuery(query);
-
+        Model model = getModel( query.getSourceId() );
+      org.pentaho.metadata.query.model.Query fullQuery = util.convertQuery(query, model);
+      
       // get the XML for the query
       QueryXmlHelper helper = new QueryXmlHelper();
       String xml = helper.toXML(fullQuery);
@@ -378,7 +395,7 @@ public class MetadataService extends PentahoBase {
     }
     return null;
   }
-
+  
   /**
    * Returns a instance of the IMetadataDomainRepository for the current session
    * @return
@@ -395,4 +412,10 @@ public class MetadataService extends PentahoBase {
   public Log getLogger() {
     return logger;
   }
+
+@Override
+public String getId() {
+	return PROVIDER_ID;
+}
+
 }

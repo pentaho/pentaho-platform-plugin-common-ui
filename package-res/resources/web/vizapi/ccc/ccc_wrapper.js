@@ -1,2401 +1,4232 @@
-pen.define(["cdf/lib/CCC/pvc-d1.0", "common-ui/vizapi/VizController"], function(){
-  pentaho = typeof pentaho != "undefined" ? pentaho : {};
-
-// BEGIN Private Scope
-  (function(){
-
-    pentaho.ccc = pentaho.ccc || {};
-
-
-    function defVisualization(viz){
-      pentaho.visualizations.push(viz);
-    }
-
-    /*
-     Visualization Metadata
-     These objects describe the visualizations provided by this library.
-     */
-    var lineStrokeStyle = '#A0A0A0'; // #D8D8D8',// #f0f0f0
-
-    var baseCategChartArgs = {
-      legend: true,
-
-      yAxisSize:     100,
-      yAxisFullGrid: true,
-      yAxisEndLine:  true,
-      yAxisDomainRoundMode: 'tick',
-      yAxisDesiredTickCount: 10,
-
-      xAxisFullGrid: true,
-      xAxisSize:     100,
-      xAxisEndLine:  true,
-      xAxisDesiredTickCount: 10,
-      xAxisDomainRoundMode: 'tick',
-
-      extensionPoints: {
-        yAxisRule_strokeStyle: lineStrokeStyle,
-        yAxisEndLine_strokeStyle: lineStrokeStyle,
-        yAxisGrid_strokeWidth:  "2px",
-        yAxisGrid_strokeStyle:  lineStrokeStyle,
-
-        xAxisRule_strokeStyle: lineStrokeStyle,
-        xAxisEndLine_strokeStyle:  lineStrokeStyle,
-        xAxisGrid_strokeWidth: "2px",
-        xAxisGrid_strokeStyle: lineStrokeStyle
-      },
-
-      tipsySettings: {
-        html: true,
-        gravity: "c",
-        fade: false,
-        followMouse:true
-      },
-
-      seriesIncludeMeasures: true
-    };
-
-    var baseVertiCategChartArgs = pvc.create(baseCategChartArgs, {
-      legendPosition: 'right',
-      legendAlign: 'top',
-
-      extensionPoints: {
-        xAxisLabel_textAngle:    -Math.PI/6,
-        xAxisLabel_textAlign:    "right",
-        xAxisLabel_textBaseline: "top",
-        yAxisTicks_strokeStyle:  lineStrokeStyle
-      }
-    });
-
-    var baseHorizCategChartArgs = pvc.create(baseCategChartArgs, {
-      orientation:   'horizontal',
-      yAxisSize:      150,
-      xAxisSize:      50,
-      xAxisPosition:  'top',
-      legendPosition: 'right',
-      legendAlign:    'middle',
-
-      extensionPoints: {
-        xAxisTicks_strokeStyle: lineStrokeStyle
-      }
-    });
-
-    var mixinBarChartArgs = {
-      cccClass: 'pvc.BarChart', // Default
-      panelSizeRatio: 0.6
-    },
-        baseVertiBarChartArgs = pvc.create(baseVertiCategChartArgs, mixinBarChartArgs),
-        baseHorizBarChartArgs = pvc.create(baseHorizCategChartArgs, mixinBarChartArgs);
-
-// ----
-
-    defVisualization({
-      id: 'ccc_bar',                          // unique identifier
-      type: 'barchart',                       // generic type id
-      source: 'CCC',                          // id of the source library
-      name: 'CCC Column',                     // visible name, this will come from a properties file eventually
-      'class': 'pentaho.ccc.CccChart',          // type of the Javascript object to instantiate
-      args: pvc.create(baseVertiBarChartArgs),
-      propMap: [],
-      // dataReqs describes the data requirements of this visualization
-      dataReqs: [{
-        name: 'Default',
-        reqs : createVizDataReq("Category", "Series", "Value")
-      }
-      ]
-    });
-
-    defVisualization({
-      id: 'ccc_barstacked',
-      type: 'barchart',
-      source: 'CCC',
-      name: 'CCC Stacked Column',
-      'class': 'pentaho.ccc.CccChart',
-      args: pvc.create(baseVertiBarChartArgs, {
-        stacked: true
-      }),
-      propMap: [],
-      dataReqs: [{
-        name: 'Default',
-        reqs : createVizDataReq("Category", "Series", "Value")
-      }
-      ]
-    });
-
-    defVisualization({
-      id: 'ccc_horzbar',
-      type: 'horzbarchart',
-      source: 'CCC',
-      name: 'CCC Bar',
-      'class': 'pentaho.ccc.CccChart',
-      args:  pvc.create(baseHorizBarChartArgs),
-      propMap: [],
-      dataReqs: [{
-        name: 'Default',
-        reqs : createVizDataReq("Category", "Series", "Value")
-      }
-      ]
-    });
-
-    defVisualization({
-      id: 'ccc_horzbarstacked',
-      type: 'horzbarchart',
-      source: 'CCC',
-      name: 'CCC Stacked Bar',
-      'class': 'pentaho.ccc.CccChart',
-      args:  pvc.create(baseHorizBarChartArgs, {
-        stacked: true
-      }),
-      propMap: [],
-      dataReqs: [{
-        name: 'Default',
-        reqs : createVizDataReq("Category", "Series", "Value")
-      }
-      ]
-    });
-
-    defVisualization({
-      id: 'ccc_barnormalized',
-      type: 'barchart',
-      source: 'CCC',
-      name: 'CCC 100% Stacked Column',
-      'class': 'pentaho.ccc.CccChart',
-      args: pvc.create(baseVertiBarChartArgs, {
-        cccClass: 'pvc.NormalizedBarChart'
-      }),
-      propMap: [],
-      dataReqs: [{
-        name: 'Default',
-        reqs : createVizDataReq("Category", "Series", "Value")
-      }
-      ]
-    });
-
-    defVisualization({
-      id: 'ccc_horzbarnormalized',
-      type: 'horzbarchart',
-      source: 'CCC',
-      name: 'CCC 100% Stacked Bar',
-      'class': 'pentaho.ccc.CccChart',
-      args:  pvc.create(baseHorizBarChartArgs, {
-        cccClass: 'pvc.NormalizedBarChart'
-      }),
-      propMap: [],
-      dataReqs: [{
-        name: 'Default',
-        reqs : createVizDataReq("Category", "Series", "Value")
-      }
-      ]
-    });
-
-    defVisualization({
-      id: 'ccc_line',
-      type: 'linechart',
-      source: 'CCC',
-      name: 'CCC Line',
-      'class': 'pentaho.ccc.CccChart',
-      args: pvc.create(baseVertiCategChartArgs, {
-        cccClass: 'pvc.LineChart',
-
-        // Default value for 'shape' data request
-        shape: 'circle'
-      }),
-      propMap: [],
-      dataReqs: [{
-        name: 'Default',
-        reqs: pvc.arrayAppend(
-            createVizDataReq("Category", "Series", "Value"),
-            [
-              {
-                id: 'shape',
-                dataType: 'string',
-                values: ['none', 'circle', 'cross', 'diamond', 'square', 'triangle'],
-                ui: {
-                  labels:  ["None", "Circle", "Cross", "Diamond", "Square", "Triangle"],
-                  group:   'options',
-                  type:    'combo',
-                  caption: "Shape"
-                }
-              }
-            ])
-      }
-      ]
-    });
-
-    defVisualization({
-      id: 'ccc_area',
-      type: 'areachart',
-      source: 'CCC',
-      name: 'CCC Area',
-      'class': 'pentaho.ccc.CccChart',
-      args: pvc.create(baseVertiCategChartArgs, {
-        cccClass: 'pvc.StackedAreaChart',
-        showLines: true
-      }),
-      propMap: [],
-      dataReqs: [{
-        name: 'Default',
-        reqs: createVizDataReq("Category", "Series", "Value")
-      }
-      ]
-    });
-
-    defVisualization({
-      id: 'ccc_scatter',
-      type: 'scatter',
-      source: 'CCC',
-      name: 'CCC Scatter',
-      'class': 'pentaho.ccc.CccChart',
-      args: {
-        cccClass: 'pvc.MetricDotChart',
-        showDots: true,
-        yAxisSize: 30,
-        xAxisSize: 30,
-        xAxisFullGrid: true,
-        yAxisFullGrid: true
-      },
-      propMap: [],
-      dataReqs: [
-        {
-          name: 'Default',
-          reqs :[
-            {   id: 'rows',
-              dataType: 'string',
-              dataStructure: 'column',
-              caption: 'Category',
-              required: true
-            },
-            {   id: 'x',
-              dataType: 'number',
-              dataStructure: 'column',
-              caption: 'X Axis',
-              required: true,
-              allowMultiple: false
-            },
-            {   id: 'y',
-              dataType: 'number',
-              dataStructure: 'column',
-              caption: 'Y Axis',
-              required: true,
-              allowMultiple: true
-            }
-          ]
-        }
-      ]
-    });
-
-    defVisualization({
-      id: 'ccc_pie',
-      type: 'piechart',
-      source: 'CCC',
-      name: 'CCC Pie Chart',
-      'class': 'pentaho.ccc.CccChart',
-      args: {
-        cccClass: 'pvc.PieChart'
-      },
-      propMap: [],
-      dataReqs: [
-        {
-          name: 'Default',
-          reqs :[
-            {   id: 'rows',
-              dataType: 'string',
-              dataStructure: 'column',
-              caption: 'Slices',
-              required: true
-            },
-            {   id: 'measures',
-              dataType: 'number',
-              dataStructure: 'column',
-              caption: 'Values',
-              required: true
-            }
-          ]
-        }
-      ]
-    });
-
-    defVisualization({
-      id: 'ccc_heatgrid',
-      type: 'heatgrid',
-      source: 'CCC',
-      name: 'Heat Grid',
-      'class': 'pentaho.ccc.CccChart',
-
-      args: {
-        cccClass: 'pvc.HeatGridChart',
-        crosstabMode: true,
-        normPerBaseCategory: false,
-        showXScale: true,
-        xAxisPosition: "bottom",
-        showYScale: true,
-        yAxisPosition: "left",
-
-        seriesInRows: false,
-
-        timeSeries: false,
-        panelSizeRatio: 0.8,
-        orientation: "vertical",
-        showValues: false,
-        valuesAnchor: "right",
-        titlePosition: "top",
-        titleSize: 25,
-        xAxisSize: 30,
-        yAxisSize: 50,
-        xAxisFullGrid: false,
-        yAxisFullGrid: false,
-        orthoAxisOrdinal: false,
-        scalingType: "linear",
-        numSD: 2,
-        nullColor: "#efc5ad",
-        extensionPoints: [],
-        useShapes: true,
-        shape: 'square',
-        isMultiValued: true,
-        useCompositeAxis:true,
-        colorValIdx: 0,
-        sizeValIdx:  1,
-        ctrlSelectMode: false,
-        tipsySettings: {
-          html: true,
-          gravity: "c",
-          fade: false,
-          followMouse:true,
-          opacity: 1
-        }
-      },
-      propMap: [],
-      dataReqs: [
-        {
-          name: 'Default',
-          reqs :[
-            {
-              id: 'rows',
-              dataType: 'string',
-              dataStructure: 'row',
-              caption: 'x_axis',
-              required: true,
-              allowMultiple: true
-            },
-            {
-              id: 'columns',
-              dataType: 'string',
-              dataStructure: 'column',
-              caption: 'y_axis',
-              required: false,
-              allowMultiple: true
-            },
-            {
-              id: 'color',
-              dataType: 'number',
-              dataStructure: 'column',
-              caption: 'color_by',
-              required: false,
-              allowMultiple: false
-            },
-            {
-              id: 'size',
-              dataType: 'number',
-              dataStructure: 'column',
-              caption: 'size_by',
-              required: false,
-              allowMultiple: false
-            },
-            {
-              id: 'pattern',
-              dataType: 'string',
-              values: ["GRADIENT", "3-COLOR", "5-COLOR"],
-              ui: {
-                labels: ["gradient", "step_3", "step_5"],
-                group: "options",
-                type: 'combo',
-                caption: "Pattern"
-              }
-            },
-            {
-              id: 'colorSet',
-              dataType: 'string',
-              values: ["ryg", "ryb", "blue", "gray"],
-              ui: {
-                labels: ["RYG", "RYB", "blue_scale", "gray_scale"],
-                group: "options",
-                type: 'combo',
-                caption: "Color"
-              }
-            },
-            {
-              id: 'reverseColors',
-              dataType: 'boolean',
-              ui: {
-                label: "reverse_colors",
-                group: "options",
-                type: 'checkbox'
-              }
-            },
-            {
-              id: 'shape',
-              dataType: 'string',
-              values: ["square", "circle"],
-              ui: {
-                labels:  ["square", "circle"],
-                group:   "options",
-                type:    'combo',
-                caption: "Shape"
-              }
-            },
-            {
-              id: "optionsBtn",
-              dataType: 'none',
-              ui: {
-                group: "options",
-                type: "button",
-                label: "chart_options",
-                seperator: true
-              }
-            }
-          ]
-        }
-      ]
-    });
-
-
-    defVisualization({
-      id: 'ccc_bulletchart',
-      type: 'bulletchart',
-      source: 'CCC',
-      name: 'Bullet Chart',
-      'class': 'pentaho.ccc.CccChart',
-
-      args: {
-        cccClass: 'pvc.BulletChart',
-        crosstabMode: true,
-        showValues: true,
-        showXScale: true,
-        xAxisPosition: "bottom",
-        showYScale: true,
-        yAxisPosition: "left",
-        legendPosition: "bottom",
-        seriesInRows: true,
-
-
-        bulletTitle: 'Test for title',
-        bulletSubtitle: 'Test for subtitle',
-        bulletMeasures: [],
-
-        // TODO: Constant bullets markers and ranges?
-        bulletMarkers: ["7500"],
-        bulletRanges:  ["3000", "6500", "9000"],
-
-        bulletMargin: 50,
-
-        timeSeries: false,
-        timeSeriesFormat: "%Y-%m-%d",
-        panelSizeRatio: 0.8,
-        orientation: "vertical",
-        valuesAnchor: "right",
-        titlePosition: "top",
-        titleSize: 25,
-        xAxisSize: 30,
-        yAxisSize: 50,
-        xAxisFullGrid: false,
-        yAxisFullGrid: false,
-        orthoAxisOrdinal: false,
-        scalingType: "linear",
-        numSD: 2,
-
-        extensionPoints: [["bulletRuleLabel_font","7pt sans"]],
-        normPerBaseCategory: true,
-        useShapes: true,
-        useCompositeAxis:true
-      },
-      propMap: [],
-      dataReqs: [
-        {
-          name: 'Default',
-          reqs :[
-            {
-              id: 'rows',
-              dataType: 'string',
-              dataStructure: 'row',
-              caption: 'Across',
-              required: true
-            },
-            {
-              id: 'columns',
-              dataType: 'string',
-              dataStructure: 'column',
-              caption: 'Down',
-              required: true
-            },
-            {
-              id: 'measures',
-              dataType: 'number',
-              dataStructure: 'column',
-              caption: 'Values',
-              required: true
-            }
-          ]
-        }
-      ]
-    });
-
-    /*
-     CccChart constructor
-     Takes an HTML DOM element as a parameter
-     */
-    pentaho.ccc.CccChart = function(element) {
-      /**
-       * The axes' names.
-       * NOTE that they are in the order to be tested
-       * for being chosen as the drilling axis.
-       */
-      this._keyAxes = ['column', 'row'];
-      this._drillAxes = this._keyAxes;
-
-      // _allAxes includes the non-key 'measure' axis
-      this._allAxes = this._keyAxes.slice(0);
-      this._allAxes.push('measure');
-
-      this._element = element;
-      this._elementName = element.id;
-
-      this._cdaTable = null;  // CDA DataTable
-      this._metadata  = null;
-      this._resultset = null;
-
-      this._dataTable = null; // Analyzer DataTable
-
-      this._rowDtColIndexes = null;
-      this._otherDtColIndexes = null;
-
-      this._vizOptions  = null;
-      this._originalVizOptions = null;
-      this._dataOptions = null;
-
-      this._selections = null;
-
-      this._currentChartType = null;
-
-      this._colors = null;
-      this._title = null;
-    }
-
-    /*
-     draw()
-
-     dataTable   a pentaho.DataTable object with the data to display
-     vizOptions  the options for the visualization
-     */
-    pentaho.ccc.CccChart.prototype.draw = function(dataTable, vizOptions) {
-      // Reset support fields
-      this._metadata  = [];
-      this._resultset = [];
-      this._cdaTable = null;
-
-      this._colors = null;
-
-      // ----------------------
-
-      this._dataTable  = dataTable;
-      this._crossTable = null;
-
-      this._rowDtColIndexes = null;
-      this._otherDtColIndexes = null;
-
-      // ----------------------
-
-      this._vizHelper = cv.pentahoVisualizationHelpers[vizOptions.customChartType];
-
-      this._initializeOptions(vizOptions);
-
-      this._initializeAxesMetadata();
-
-      this._buildCrossTable();
-
-      this._readData();
-
-      this._prepareOptions();
-
-      this._renderChart();
-    };
-
-    /*
-     * INIT OPTIONS
-     */
-
-    pentaho.ccc.CccChart.prototype._initializeOptions = function(vizOptions){
-      // Store a copy of the incoming parameters, for later use, in #resize
-      this._originalVizOptions = $.extend({}, vizOptions);
-      this._isResize = !!vizOptions.isResize;
-      delete vizOptions.isResize;
-      
-      // Make a copy
-      vizOptions = this._vizOptions = $.extend({}, vizOptions);
-
-      // Recover non user-overriden chart args extension points
-      // * userDefinedProperties smash chart args' extension points...
-      var chartArgsExtPoints = this.controller.currentViz.args.extensionPoints;
-      if(chartArgsExtPoints){
-        vizOptions.extensionPoints = pvc.create(chartArgsExtPoints, vizOptions.extensionPoints);
+pen.define([
+  "cdf/lib/CCC/def",
+  "cdf/lib/CCC/pvc-d1.0",
+  "cdf/lib/CCC/protovis",
+  "common-ui/vizapi/VizController",
+  "common-ui/vizapi/ccc/ccc_analyzer_plugin" // TODO: temporary dependency due to debug loading time problems
+],
+    function(def, pvc, pv){
+
+      var _filterSelectionMaxCount = 200; // TODO: Selection count limit is hard-coded
+
+      // Declare **global** pentaho namespace variable
+      pentaho = typeof pentaho != "undefined" ? pentaho : {};
+
+      // This allows def.types below not installing 'pentaho' on the global space...
+      def.globalSpace('pentaho', pentaho);
+
+      pentaho.visualizations || (pentaho.visualizations = {});
+
+      function defVisualization(viz){
+        pentaho.visualizations.push(viz);
       }
 
-      // store the current highlighted selections
-      this._selections = vizOptions.selections;
+      defCCCVisualizations();
 
-      return vizOptions;
-    };
-
-    /*
-     * INIT METADATA
-     */
-
-// -------------
-// Axis are: row, column and measure.
-    function AxisInfo(axis, formulaInfos){
-      this.id = axis;
-
-      this.formulasInfo = formulaInfos;
-
-      this.depth = this.formulasInfo.length;
-
-      this.formulas = this.formulasInfo.map(function(formInfo){
-        // Overwrite axis id with corresponding AxisInfo instance
-        formInfo.axis = this;
-
-        return formInfo.formula;
-      }, this);
-
-      /**
-       * Map of axis values to labels.
-       */
-      this.valueLabel = {};
-    }
-
-    AxisInfo.prototype.getAxisLabel = function(){
-      return this.formulasInfo.map(function(formInfo){ return formInfo.label; }, this)
-          .join(" and "); // TODO localize
-    };
-
-    pentaho.ccc.CccChart.prototype._calcFilteredAxisFormulasInfo = function(axis){
-      var formulasInfo = this._vizHelper.getAxisFormulasInfo(axis);
-      if(axis !== 'measure'){
-        return formulasInfo;
-      }
-
-      var filtered = [],
-          usedMeasureIds = this._getUsedMeasuresIds();
-
-      formulasInfo.forEach(function(formulaInfo){
-        var meaId = formulaInfo.id;
-        if(meaId && pvc.hasOwn(usedMeasureIds, meaId)){
-          formulaInfo.index = filtered.length;
-          formulaInfo.role  = usedMeasureIds[meaId];
-          filtered.push(formulaInfo);
-        }
-      });
-
-      return filtered;
-    };
-
-    pentaho.ccc.CccChart.prototype._getUsedMeasuresIds = function(){
-      // Data truncation can affect also the structure of data.
-      // If the query returns more than 100x100 rowsxcols,
-      // requested measure formulas may be suppressed.
-      // Filter measures not returned in this._dataTable
-
-      assert(this._rowAxis, "Measure axis must be the last one to be processed.");
-
-      var dataTable = this._dataTable,
-          dtColCount = dataTable.getNumberOfColumns(),
-          seenMeasureIds = {},
-          lastMeasureId;
-
-      for(var tc = this._rowAxis.depth ; tc < dtColCount ; tc++){
-        var dtColId = dataTable.getColumnId(tc),
-            dtColParts = dtColId.split('~'),
-            meaId = dtColParts.length > 1 ? dtColParts.pop() : dtColParts[0];
-
-        if(meaId && (!lastMeasureId || lastMeasureId !== meaId)){
-          if(pvc.hasOwn(seenMeasureIds, meaId)){
-            // Have seen all distinct measures
-            break;
+      // TODO: temporary call due to debug loading time problems
+      if(typeof(document.location) !== 'undefined'){
+        try{
+          if((''+document.location).indexOf('debug=true') > -1){
+            analyzerPlugins[analyzerPlugins.length - 1].init();
           }
-
-          var dataReq = dataTable.getColumnProperty(tc, 'dataReq');
-          // Update measure role
-          var gembarId = dataReq[dataReq.length-1].id;
-          seenMeasureIds[meaId] = gembarId;
-
-          lastMeasureId = meaId;
+        } catch(ex) {
+          pvc.logError("CCC ANALYZER PLUGIN: " + ex.message);
         }
       }
 
-      return seenMeasureIds;
-    };
+      function defCCCVisualizations(){
+        /*
+         Visualization Metadata
+         These objects describe the visualizations provided by this library.
+         */
+        var ruleStrokeStyle = "#808285";  // #D8D8D8',  // #f0f0f0
+        var lineStrokeStyle = "#D1D3D4";  // "#D1D3D4"; //'#A0A0A0'; // #D8D8D8',// #f0f0f0
 
-    pentaho.ccc.CccChart.prototype._initializeAxesMetadata = function(){
-      var myself = this;
-
-      /**
-       * Index of FormulaInfo by formula:
-       *   formula -> formulaInfo
-       *
-       * Filled by #indexFormula declared below.
-       */
-      this._formulasInfo = {};
-
-      /**
-       * Create an AxisInfo for each axis.
-       *
-       * Index AxisInfo by axis: axis -> AxisInfo.
-       *
-       * Index FormulaInfo by formula and id.
-       *
-       * Create CHART axis field:
-       *   this._rowAxis     = ...
-       *   this._columnAxis  = ...
-       *   this._measureAxis = ...
-       */
-      this._allAxesInfo = pv.dict(this._allAxes, function(axis){
-        var axisInfo = new AxisInfo(axis, myself._calcFilteredAxisFormulasInfo(axis));
-
-        myself["_" + axisInfo.id + "Axis"] = axisInfo;
-
-        axisInfo.formulasInfo.forEach(indexFormula, myself);
-
-        return axisInfo;
-      });
-
-      /* @instance */
-      function indexFormula(formInfo){
-        var form = formInfo.formula,
-            id   = formInfo.id;
-
-        // NOTE: when interaction is disabled...formula and id aren't available in every axis type...
-
-        // Index by formula
-        if(form){
-          this._formulasInfo[form] = formInfo;
+        function legendShapeColorProp(scene){
+          var color = scene.color;
+          return scene.isOn() ? color : pvc.toGrayScale(color);
         }
 
-        if(id && form !== id){
-          assert(formInfo.axis.id === 'measure', "Must be a measure");
+        var baseChartArgs = {
+          groupedLabelSep: "~",
 
-          // Index ALSO by formula id.
-          this._formulasInfo[id] = formInfo;
-        }
-      }
+          legend: true,
+          multiRole: 'multi',
+          legendPosition: 'right',
+          legendSizeMax:  '60%',
 
-      // The chart title is the conjuction of every row axis formula's label.
-      this._title = this._rowAxis.getAxisLabel();
-    };
+          legendPaddings: 10,
 
-    pentaho.ccc.CccChart.prototype._buildCrossTable = function(){
+          // Item padding
+          legendPadding: {left: 1, right:1, top: 2, bottom: 2},// width: 2, height: 4
 
-      // row := {
-      //   keyValues: row values Array,
-      //   children: [],
-      //   childrenByKey: joinedKeyVals -> {
-      //      keyValues: column values Array,
-      //
-      //      measures: [
-      //          {v: measure 0 value, f: formatted value},
-      //          ...
-      //      ]
-      //   }
-      // };
+          orthoAxisFullGrid: true,
+          axisEndLine:  true,
+          axisSizeMax: '50%',
 
-      var dataTable  = this._dataTable,
-          dtColCount = dataTable.getNumberOfColumns(),
-          dtRowCount = dataTable.getNumberOfRows();
+          /* Continuous axes */
+          //axisDesiredTickCount: 10,
+          axisLabelSpacingMin: 0.6, // em
+          axisDomainRoundMode: 'tick',
+          axisTitleSizeMax: '20%',
 
-      assert(dtColCount > 0, "DataTable must have at least one column");
+          showPlotFrame: false,
 
-      // Indexes of DataTable columns with the values of row axis formulas
-      // By construction: the first R columns.
-      this._rowDtColIndexes  = pv.range(this._rowAxis.depth);
+          /* Discrete axes */
+          axisOverlappedLabelsHide: true,
+          axisOverlappedLabelsMaxPct: 0.05,
 
-      assert(this._rowDtColIndexes.length > 0, "There must exist at least one row axis formula.");
+          extensionPoints: {
+            xAxisRule_strokeStyle:  ruleStrokeStyle,
+            yAxisRule_strokeStyle:  ruleStrokeStyle,
+            secondYAxisRule_strokeStyle: ruleStrokeStyle,
 
-      // All other columns (!row axis formulas)
-      this._otherDtColIndexes = pv.range(this._rowAxis.depth, dtColCount);
+            xAxisTicks_strokeStyle:  lineStrokeStyle,
+            yAxisTicks_strokeStyle:  lineStrokeStyle,
+            secondYAxisTicks_strokeStyle: lineStrokeStyle,
 
-      // -------------
+            legendArea_lineWidth:     1,
+            legendArea_strokeStyle:   "#c0c0c0",
+            legendLabel_textDecoration: null,
+            legendDot_fillStyle: legendShapeColorProp,
+            legendDot_strokeStyle: legendShapeColorProp,
+            legend2Dot_fillStyle: legendShapeColorProp,
+            legend2Dot_strokeStyle: legendShapeColorProp
+          },
 
-      this._crossTable = {
-        children:      [],
-        childrenByKey: {}
-      };
+          tipsySettings: {
+            delayIn: 200,
+            delayOut:80,
+            offset:  2,
+            html:    true,
+            gravity: "nw",
+            fade:    false,
+            followMouse: true,
+            corners: true,
+            arrow:   false,
+            opacity: 1
+          },
 
-      if(dtRowCount === 0){
-        return;
-      }
-
-      var otherDtColsInfo = [];
-      this._otherDtColIndexes.forEach(function(tc){
-        var dtColId = this._dataTable.getColumnId(tc),
-            dtColParts = dtColId.split('~'),
-            colValsJoined,
-            meaId;
-
-        if(dtColParts.length > 1){
-          meaId = dtColParts.pop();
-          colValsJoined = dtColParts.join('~');
-        } else {
-          meaId = dtColParts[0];
-          colValsJoined = '';
-        }
-
-        // Obtain the formula corresponding to the id.
-        var meaInfo = this._formulasInfo[meaId];
-        if(!meaInfo){
-          // unmapped measure
-          return;
-        }
-
-        var meaIndex = meaInfo.index;
-
-        // Store labels for each value of a formula in the columns axis
-        if(colValsJoined){
-          // Includes measure, but we don't use it
-          var joinedLabels = dataTable.getColumnLabel(tc),
-              colLabels = joinedLabels.split("~");
-
-          if(colLabels.length > 1){
-            colLabels.pop();
+          /* Default map */
+          rolesToCccDimensionsMap: {
+            'columns':  'series',
+            'rows':     'category',
+            'multi':    'multiChart',
+            'measures': 'value'
           }
-
-          dtColParts.forEach(function(colVal, level){
-            this._columnAxis.valueLabel[colVal] = colLabels[level];
-          }, this);
-
-          // Also allow getting a label for the joined value.
-          // Depending on the chart, the joined value or
-          // the component values are used for obtaining labels.
-          this._columnAxis.valueLabel[colValsJoined] = colLabels.join(" ~ ");
-        }
-
-        otherDtColsInfo.push({
-          column: tc,
-          measureIndex: meaIndex,
-          keyValues: dtColParts,
-          key: colValsJoined
-        });
-      }, this);
-
-      // Also, collect the label of each row value
-      for(var tr = 0 ; tr < dtRowCount ; tr++){
-        var rowLabels = [],
-            rowVals = this._rowDtColIndexes.map(function(tc){
-              var rowVal = this._getTableValue(tr, tc),
-                  rowLabel = rowVal == null ?
-                      "-" :
-                      dataTable.getFormattedValue(tr, tc);
-
-              this._rowAxis.valueLabel[rowVal] = rowLabel;
-              rowLabels.push(rowLabel);
-
-              return rowVal;
-            }, this);
-
-        var crossRow = {
-          key:       rowVals.join('~'),
-          keyValues: rowVals,
-          children:      [],
-          childrenByKey: {}
         };
 
-        // Also allow getting a label for the joined value.
-        // Depending on the chart, the joined value or
-        // the component values are used for obtaining labels.
-        this._rowAxis.valueLabel[crossRow.key] = rowLabels.join(" ~ ");
+        var mixinVerticalChartArgs = {
+          orientation:    'vertical'
+        };
 
-        this._crossTable.children.push(crossRow);
-        this._crossTable.childrenByKey[crossRow.key] = crossRow;
+        var mixinHorizontalChartArgs = {
+          orientation:    'horizontal',
+          xAxisPosition:  'top'
+        };
 
-        otherDtColsInfo.forEach(function(dtColInfo){
-          var crossCol = crossRow.childrenByKey[dtColInfo.key];
-          if(!crossCol){
-            crossCol = {
-              key:       dtColInfo.key,
-              keyValues: dtColInfo.keyValues,
-              measures:  []
-            };
+        var baseVerticalChartArgs   = def.create(baseChartArgs, mixinVerticalChartArgs  );
+        var baseHorizontalChartArgs = def.create(baseChartArgs, mixinHorizontalChartArgs);
 
-            crossRow.children.push(crossCol);
-            crossRow.childrenByKey[crossCol.key] = crossCol;
+        var baseVerticalCategChartArgs = def.create(baseVerticalChartArgs, {
+          extensionPoints: {
+            xAxisLabel_textAngle:    -Math.PI/4,
+            xAxisLabel_textAlign:    "right",
+            xAxisLabel_textBaseline: "top"
           }
-
-          var tc = dtColInfo.column,
-              value = this._getTableValue(tr, tc);
-
-          var measure = {
-            v: value,
-            f: value == null ? "-" : dataTable.getFormattedValue(tr, tc)
-          };
-
-          crossCol.measures[dtColInfo.measureIndex] = measure;
-        }, this);
-      }
-    };
-
-    pentaho.ccc.CccChart.prototype._getAxisValueLabel = function(axis, value){
-      switch(axis){
-        case 'column':  return this._columnAxis.valueLabel[value];
-        case 'row':     return this._rowAxis.valueLabel[value];
-        case 'measure': return value.f; // Must be a measure cell!
-      }
-      throw new Error("Invalid axis: '" + axis + "'");
-    };
-
-    /* DataTable related */
-    pentaho.ccc.CccChart.prototype._getTableValue = function(tr, tc) {
-      var value = this._dataTable.getValue(tr, tc);
-      return value === '-' ? null : value;
-    };
-
-    /*
-     * READ DATA
-     */
-
-    pentaho.ccc.CccChart.prototype._readData = function() {
-      // Create the data options for the chart
-      this._dataOptions = {
-        crosstabMode: !!this._vizOptions.crosstabMode,
-        seriesInRows: false
-      };
-
-      switch(this._vizOptions.cccClass){
-        case 'pvc.HeatGridChart':
-          this._readDataHeatGrid();
-          break;
-
-        case 'pvc.BarChart':
-        case 'pvc.NormalizedBarChart':
-        case 'pvc.LineChart':
-        case 'pvc.StackedAreaChart':
-          this._readDataRelational();
-          break;
-
-        case 'pvc.MetricDotChart':
-          // All numeric value columns
-          this._readDataCrosstabSingleCategory();
-          break;
-
-        case 'pvc.PieChart':
-          assert(this._otherDtColIndexes.length === 1, "Only one series supported");
-          // Single numeric value column
-          this._readDataCrosstabSingleCategory();
-          break;
-
-        case 'pvc.BulletChart':
-          this._readDataBullet();
-          break;
-      }
-
-      // Create the CDA table
-      this._cdaTable = {
-        metadata:  this._metadata,
-        resultset: this._resultset
-      };
-    };
-
-    /**
-     * Creates a CCC resultset in pure CROSSTAB format.
-     *
-     * Data passes through as it comes, being simply translated to CDA format.
-     */
-    pentaho.ccc.CccChart.prototype._readDataCrosstab = function() {
-      var dataTable = this._dataTable,
-          colCount = dataTable.getNumberOfColumns(),
-          rowCount = dataTable.getNumberOfRows();
-
-      // Direct translation
-      for(var tc = 0 ; tc < colCount ; tc++){
-        this._addCdaMetadata(
-            dataTable.getColumnId(tc),
-            dataTable.getColumnLabel(tc),
-            writeCccColumnDataType(dataTable.getColumnType(tc)));
-      }
-
-      this._resultset = createTable(rowCount, colCount, this._getTableValue, this);
-    };
-
-    /**
-     * Creates a CDA resultset in CROSSTAB format
-     * with a single aggregated category column.
-     *
-     * 1    - Category - aggregated row axis columns
-     * 2..N - Series X - value of 'other' columns
-     */
-    pentaho.ccc.CccChart.prototype._readDataCrosstabSingleCategory = function(){
-      var dataTable = this._dataTable,
-          rowCount = dataTable.getNumberOfRows();
-
-      // Add the aggregate category column metadata
-      this._addCdaMetadata('Categories', this._title, 'STRING');
-
-      // Add the numeric columns metadata
-      this._otherDtColIndexes.forEach(function(tc){
-        //assert(writeCccColumnDataType(dataTable.getColumnType(tc)) === 'NUMERIC');
-
-        this._addCdaMetadata(
-            dataTable.getColumnId(tc),
-            dataTable.getColumnLabel(tc),
-            writeCccColumnDataType(dataTable.getColumnType(tc)));
-      }, this);
-
-      // Build the rows
-      for(var tr = 0 ; tr < rowCount ; tr++){
-
-        var row = [this._aggregateRowAxisForTableRow(tr)];
-
-        // Add other columns' values
-        this._otherDtColIndexes.forEach(function(tc){
-          row.push(this._getTableValue(tr, tc));
-        }, this);
-
-        this._resultset.push(row);
-      }
-    };
-
-    /**
-     * Creates a CDA resultset in a single-value RELATIONAL format.
-     * Only rows with a non-null value are added to the resultset.
-     *
-     * 1 - Category - aggregated row axis columns
-     * 2 - Series   - label of 'other' DataTable columns
-     * 3 - Value    - value of corresponding 'other' DataTable column
-     */
-    pentaho.ccc.CccChart.prototype._readDataRelational = function() {
-      // format the data for a BarChart, LineChart, or StackedAreaChart
-
-      var dataTable = this._dataTable,
-          rowCount = dataTable.getNumberOfRows();
-
-      var seriesCount = this._otherDtColIndexes.length;
-
-      // Take the first seriesCount colors from the palette
-      this._colors = this._vizOptions.palette.colors.slice(0, seriesCount);
-
-      // Create the metadata
-      this._addCdaMetadata('Series',   'Series',   'STRING');
-      this._addCdaMetadata('Category', 'Category', 'STRING');
-      this._addCdaMetadata('Value',    'Value',    'NUMERIC');
-
-      if(rowCount > 0){
-        var seriesLabels = this._otherDtColIndexes.map(function(tc){
-          return dataTable.getColumnLabel(tc);
         });
 
-        // process the rows
-        for(var tr = 0; tr < rowCount ; tr++) {
+        var mixinBarChartArgs = {
+              cccClass: 'pvc.BarChart', // Default
+              panelSizeRatio: 0.8,
+              crosstabMode: true,
+              measuresInColumns: false
+            },
+            baseVerticalBarChartArgs   = def.create(baseVerticalCategChartArgs, mixinBarChartArgs),
+            baseHorizontalBarChartArgs = def.create(baseHorizontalChartArgs,    mixinBarChartArgs);
 
-          var category = this._aggregateRowAxisForTableRow(tr);
+        // ----
 
-          for(var i = 0 ; i < seriesCount ; i++){
-            var tc = this._otherDtColIndexes[i];
-
-            var value = this._getTableValue(tr, tc);
-            if(value != null){
-              this._resultset.push([
-                seriesLabels[i],
-                category,
-                value
-              ]);
-            }
+        defVisualization({
+          id: 'ccc_bar',                          // unique identifier
+          type: 'barchart',                       // generic type id
+          source: 'CCC',                          // id of the source library
+          name: vizLabel('VERTICAL_BAR'),        // visible name, this will come from a properties file eventually
+          'class': 'pentaho.ccc.BarChart',        // type of the Javascript object to instantiate
+          args: def.create(baseVerticalBarChartArgs),
+          propMap: [],
+          // dataReqs describes the data requirements of this visualization
+          dataReqs: [{
+            name: 'Default',
+            reqs : createDataReq('VERTICAL_BAR')
           }
+          ],
+          menuOrdinal: 100
+        });
+
+        defVisualization({
+          id: 'ccc_barstacked',
+          type: 'barchart',
+          source: 'CCC',
+          name: vizLabel('STACKED_VERTICAL_BAR'),
+          'class': 'pentaho.ccc.BarChart',
+          args: def.create(baseVerticalBarChartArgs, {
+            stacked: true
+          }),
+          propMap: [],
+          dataReqs: [{
+            name: 'Default',
+            reqs : createDataReq('STACKED_VERTICAL_BAR')
+          }
+          ],
+          menuOrdinal: 110
+        });
+
+        defVisualization({
+          id: 'ccc_horzbar',
+          type: 'horzbarchart',
+          source: 'CCC',
+          name: vizLabel('HORIZONTAL_BAR'),
+          'class': 'pentaho.ccc.BarChart',
+          args:  def.create(baseHorizontalBarChartArgs),
+          propMap: [],
+          dataReqs: [{
+            name: 'Default',
+            reqs : createDataReq('HORIZONTAL_BAR')
+          }
+          ],
+          menuOrdinal: 130,
+          menuSeparator: true
+        });
+
+        defVisualization({
+          id: 'ccc_horzbarstacked',
+          type: 'horzbarchart',
+          source: 'CCC',
+          name: vizLabel('STACKED_HORIZONTAL_BAR'),
+          'class': 'pentaho.ccc.BarChart',
+          args:  def.create(baseHorizontalBarChartArgs, {
+            stacked: true
+          }),
+          propMap: [],
+          dataReqs: [{
+            name: 'Default',
+            reqs : createDataReq('STACKED_HORIZONTAL_BAR')
+          }
+          ],
+          menuOrdinal: 140
+        });
+
+        defVisualization({
+          id: 'ccc_barnormalized',
+          type: 'barchart',
+          source: 'CCC',
+          name: vizLabel('PCT_STACKED_VERTICAL_BAR'),
+          'class': 'pentaho.ccc.NormalizeBarChart',
+          args: def.create(baseVerticalBarChartArgs, {
+            cccClass: 'pvc.NormalizedBarChart'
+          }),
+          propMap: [],
+          dataReqs: [{
+            name: 'Default',
+            reqs : createDataReq('PCT_STACKED_VERTICAL_BAR')
+          }
+          ],
+          menuOrdinal: 120
+        });
+
+        defVisualization({
+          id: 'ccc_horzbarnormalized',
+          type: 'horzbarchart',
+          source: 'CCC',
+          name: vizLabel('PCT_STACKED_HORIZONTAL_BAR'),
+          'class': 'pentaho.ccc.NormalizeBarChart',
+          args:  def.create(baseHorizontalBarChartArgs, {
+            cccClass: 'pvc.NormalizedBarChart'
+          }),
+          propMap: [],
+          dataReqs: [{
+            name: 'Default',
+            reqs : createDataReq('PCT_STACKED_HORIZONTAL_BAR')
+          }
+          ],
+          menuOrdinal: 150
+        });
+
+        defVisualization({
+          id: 'ccc_line',
+          type: 'linechart',
+          source: 'CCC',
+          name: vizLabel('LINE'),
+          'class': 'pentaho.ccc.LineChart',
+          args: def.create(baseVerticalCategChartArgs, {
+            cccClass: 'pvc.LineChart',
+
+            // Default value for 'shape' data request
+            shape: 'circle',
+            nullInterpolationMode: 'linear',
+            orthoAxisOffset: 0,
+            baseAxisOffset: 0,
+            crosstabMode: true,
+            measuresInColumns: false,
+            tipsySettings: {
+              offset: 15
+            }
+          }),
+          propMap: [],
+          dataReqs: [{
+            name: 'Default',
+            reqs: def.array.append(
+                createDataReq('LINE', {options: false}),
+                [
+                  createShapeDataReq(),
+                  createLineWidthDataReq(),
+                  createChartOptionsDataReq(true)
+                ])
+          }
+          ],
+          menuOrdinal: 160,
+          menuSeparator: true
+        });
+
+        defVisualization({
+          id: 'ccc_area',
+          type: 'areachart',
+          source: 'CCC',
+          name: vizLabel('STACKED_AREA'),
+          'class': 'pentaho.ccc.StackedAreaChart',
+          args: def.create(baseVerticalCategChartArgs, {
+            cccClass: 'pvc.StackedAreaChart',
+            crosstabMode: true,
+            measuresInColumns: false,
+            showLines: true,
+            orthoAxisOffset: 0,
+            baseAxisOffset: 0,
+            tipsySettings: {
+              offset: 15
+            }
+          }),
+          propMap: [],
+          dataReqs: [{
+            name: 'Default',
+            reqs: createDataReq('STACKED_AREA')
+          }
+          ],
+          menuOrdinal: 180
+        });
+
+        defVisualization({
+          id: 'ccc_line_hover',
+          type: 'linechart',
+          source: 'CCC',
+          name: vizLabel('LINE'),
+          'class': 'pentaho.ccc.LineChart',
+          args: def.create(baseVerticalCategChartArgs, {
+            cccClass: 'pvc.LineChart',
+            hoverable: true,
+            showTooltips: false,
+            crosstabMode: true,
+            measuresInColumns: false,
+
+            orthoAxisOffset: 0,
+            baseAxisOffset: 0,
+
+            // Default value for 'shape' data request
+            shape: 'circle',
+            nullInterpolationMode: 'linear',
+            tipsySettings: {
+              offset: 15
+            }
+          }),
+          propMap: [],
+          dataReqs: [{
+            name: 'Default',
+            reqs: def.array.append(
+                createDataReq('LINE', {options: false}),
+                [
+                  createShapeDataReq(),
+                  createLineWidthDataReq(),
+                  createChartOptionsDataReq(true)
+                ])
+          }
+          ]
+        });
+
+        defVisualization({
+          id: 'ccc_area_hover',
+          type: 'areachart',
+          source: 'CCC',
+          name: vizLabel('STACKED_AREA'),
+          'class': 'pentaho.ccc.StackedAreaChart',
+          args: def.create(baseVerticalCategChartArgs, {
+            cccClass: 'pvc.StackedAreaChart',
+            crosstabMode: true,
+            measuresInColumns: false,
+            showLines: true,
+            orthoAxisOffset: 0,
+            baseAxisOffset: 0,
+            hoverable: true,
+            showTooltips: false,
+            tipsySettings: {
+              offset: 15
+            }
+          }),
+          propMap: [],
+          dataReqs: [{
+            name: 'Default',
+            reqs: createDataReq('STACKED_AREA')
+          }
+          ]
+        });
+
+        defVisualization({
+          id: 'ccc_scatter',
+          type: 'scatter',
+          source: 'CCC',
+          name: vizLabel('SCATTER'),
+          'class': 'pentaho.ccc.MetricDotChart',
+          maxValues: [1000, 2500, 5000, 10000],
+          args: def.create(baseVerticalChartArgs, {
+            cccClass:   'pvc.MetricDotChart',
+            crosstabMode: true,
+            measuresInColumns: true,
+            axisFullGrid: true,
+            dotSizeAbs: true,
+            dotSizeRatio:   1/5,
+            dotSizeRatioTo: 'height', // plot area client height
+            autoDotSizePadding: false,
+
+            /* Default map */
+            rolesToCccDimensionsMap: {
+              'columns':  null,
+              'color':    'color',
+              //'rows':     'category',
+              'multi':    'multiChart',
+              'measures': null,
+              'x':        'value',
+              'y':        'value2',
+              'size':     'value4'
+            }
+          }),
+          propMap: [],
+          dataReqs: [
+            {
+              name: 'Default',
+              reqs :[
+                {
+                  id: 'x',
+                  dataType: 'number',
+                  dataStructure: 'column',
+                  caption: dropZoneLabel('SCATTER_X'),
+                  required: true,
+                  allowMultiple: false
+                },
+                {
+                  id: 'y',
+                  dataType: 'number',
+                  dataStructure: 'column',
+                  caption: dropZoneLabel('SCATTER_Y'),
+                  required: true,
+                  allowMultiple: false
+                },
+                {
+                  id: 'rows',
+                  dataType: 'string',
+                  dataStructure: 'column',
+                  caption: dropZoneLabel('SCATTER_ROW'),
+                  required: true,
+                  allowMultiple: true
+                },
+                {
+                  id: 'color',
+                  dataType: 'number, string',
+                  dataStructure: 'column',
+                  caption: dropZoneLabel('SCATTER_COL'),
+                  required: false,
+                  allowMultiple: false
+                },
+                {
+                  id: 'size',
+                  dataType: 'number',
+                  dataStructure: 'column',
+                  caption: dropZoneLabel('SCATTER_Z'),
+                  required: false,
+                  allowMultiple: false
+                },
+                createMultiDataReq(),
+                createPatternDataReq(),
+                createColorSetDataReq(),
+                createReverseColorsDataReq(),
+                createChartOptionsDataReq(true)
+              ]
+            }
+          ],
+          menuOrdinal: 190,
+          menuSeparator: true
+        });
+
+        defVisualization({
+          id: 'ccc_barline',
+          type: 'barchart',
+          source: 'CCC',
+          name: vizLabel('VERTICAL_BAR_LINE'),
+          'class': 'pentaho.ccc.BarLineChart', //
+          args:  def.create(baseVerticalBarChartArgs, {
+            // Default value for 'shape' data request
+            shape: 'circle',
+            nullInterpolationMode: 'linear',
+            secondAxis: true,
+            secondAxisIndependentScale: false,
+            secondAxisSeriesIndexes: null, // prevent default of -1 (which means last series)
+
+            /* Default map */
+            rolesToCccDimensionsMap: {
+              'measuresLine': 'value' // maps to same dim group as 'measures' role
+            }
+          }),
+          propMap: [],
+          // dataReqs describes the data requirements of this visualization
+          dataReqs: [{
+            name: 'Default',
+            reqs : [
+              createRowDataReq('VERTICAL_BAR_LINE_ROW'),
+              createColDataReq('VERTICAL_BAR_LINE_COL'),
+              def.set(
+                  createMeaDataReq('VERTICAL_BAR_LINE_NUMCOL'),
+                  'required', false),
+              def.set(
+                  createMeaDataReq('VERTICAL_BAR_LINE_NUMLINE'),
+                  'id', 'measuresLine',
+                  'required', false),
+              createMultiDataReq(),
+              createShapeDataReq(),
+              createLineWidthDataReq(),
+              createChartOptionsDataReq(true)
+            ]
+          }],
+          menuOrdinal: 125
+        });
+
+        defVisualization({
+          id: 'ccc_waterfall',
+          type: 'waterfallchart',
+          source: 'CCC',
+          name: vizLabel('WATERFALL'),
+          'class': 'pentaho.ccc.WaterfallChart',
+          args: def.create(baseVerticalBarChartArgs, {
+            cccClass: 'pvc.WaterfallChart'
+            //waterDirection: 'up'
+          }),
+          propMap: [],
+          dataReqs: [{
+            name: 'Default',
+            reqs: createDataReq('WATERFALL')
+          }]
+        });
+
+        defVisualization({
+          id: 'ccc_boxplot',
+          type: 'boxplotchart',
+          source: 'CCC',
+          name: vizLabel('BOXPLOT'),
+          'class': 'pentaho.ccc.BoxplotChart',
+          args: def.create(baseVerticalBarChartArgs, {
+            cccClass: 'pvc.BoxplotChart',
+            extensionPoints: {
+              boxVRule_svg: {
+                'stroke-dasharray': '5, 5'
+              }
+            },
+
+            rolesToCccDimensionsMap: {
+              'columns':     null,
+              //'rows':      'category',
+              'multi':       'multiChart',
+              'measures':    'median',
+              'percentil25': 'percentil25',
+              'percentil75': 'percentil75',
+              'percentil5':  'percentil5',
+              'percentil95': 'percentil95'
+            }
+          }),
+          propMap: [],
+          dataReqs: [{
+            name: 'Default',
+            reqs: [
+              createRowDataReq('BOXPLOT_ROW'),
+
+              def.set(createMeaDataReq('BOXPLOT_PCT50'),
+                  'allowMultiple', false,
+                  'required', false),
+              {
+                id: 'percentil25',
+                dataType: 'number',
+                dataStructure: 'column',
+                caption: dropZoneLabel('BOXPLOT_PCT25'),
+                required: false,
+                allowMultiple: false
+              },
+              {
+                id: 'percentil75',
+                dataType: 'number',
+                dataStructure: 'column',
+                caption: dropZoneLabel('BOXPLOT_PCT75'),
+                required: false,
+                allowMultiple: false
+              },
+              {
+                id: 'percentil5',
+                dataType: 'number',
+                dataStructure: 'column',
+                caption: dropZoneLabel('BOXPLOT_PCT05'),
+                required: false,
+                allowMultiple: false
+              },
+              {
+                id: 'percentil95',
+                dataType: 'number',
+                dataStructure: 'column',
+                caption: dropZoneLabel('BOXPLOT_PCT95'),
+                required: false,
+                allowMultiple: false
+              },
+              createMultiDataReq(),
+              createChartOptionsDataReq()
+            ]
+          }]
+        });
+
+        defVisualization({
+          id: 'ccc_pie',
+          type: 'piechart',
+          source: 'CCC',
+          name: vizLabel('MULTIPLE_PIE'),
+          'class': 'pentaho.ccc.PieChart',
+          args: def.create(baseChartArgs, {
+            multiRole: 'columns',
+            cccClass: 'pvc.PieChart',
+            crosstabMode: true,
+            measuresInColumns: false,
+            showValues: true,
+            legendShape: 'circle',
+            //contentPaddings: '5%',
+            rolesToCccDimensionsMap: {
+              'columns':  'multiChart',
+              //'rows':     'category',
+              'multi':    null
+              //'measures': 'value'
+            },
+            titlePosition: 'bottom',
+            extensionPoints: {
+              pie_strokeStyle:'white',
+              pie_lineWidth:   0.8
+            }
+          }),
+          propMap: [],
+          dataReqs: [{
+            name: 'Default',
+            reqs : createDataReq("MULTIPLE_PIE", {multi: false})
+
+          }],
+          menuOrdinal: 180
+        });
+
+        defVisualization({
+          id: 'ccc_heatgrid',
+          type: 'heatgrid',
+          source: 'CCC',
+          name: vizLabel('HEATGRID'),
+          'class': 'pentaho.ccc.HeatGridChart',
+          maxValues: [500, 1000, 2000, 5000],
+          args: def.create(baseChartArgs, {
+            cccClass: 'pvc.HeatGridChart',
+
+            crosstabMode:      true,
+            measuresInColumns: true,
+            useCompositeAxis:  true,
+
+            //colorValIdx: 0,
+            //sizeValIdx:  1,
+
+            panelSizeRatio: 0.8,
+
+            showValues: false,
+            useShapes:  true,
+            shape:      'square',
+
+            nullShape:  null,
+            nullColor: "#efc5ad",
+
+            orthoAxisSize: null,
+            baseAxisSize:  null,
+            xAxisSize:  30,
+            yAxisSize:  50,
+
+            //orthoAxisFullGrid: false,
+            axisFullGrid: false,
+            axisEndLine:  false,
+
+            colorScaleType: "linear",
+            normPerBaseCategory: false,
+            numSD: 2,
+
+            rolesToCccDimensionsMap: {
+              'multi': null,
+              //'columns':  'series',
+              //'rows':     'category',
+              'color': 'value',
+              'size':  'value2'
+            }
+          }),
+          propMap: [],
+          dataReqs: [
+            {
+              name: 'Default',
+              reqs :[
+                {
+                  id: 'rows',
+                  dataType: 'string',
+                  dataStructure: 'row',
+                  caption:  dropZoneLabel('HEATGRID_ROW'),
+                  required: true,
+                  allowMultiple: true
+                },
+                {
+                  id: 'columns',
+                  dataType: 'string',
+                  dataStructure: 'column',
+                  caption: dropZoneLabel('HEATGRID_COL'),
+                  required: false,
+                  allowMultiple: true
+                },
+                {
+                  id: 'color',
+                  dataType: 'number',
+                  dataStructure: 'column',
+                  caption: dropZoneLabel('HEATGRID_COLOR'),
+                  required: false,
+                  allowMultiple: false
+                },
+                {
+                  id: 'size',
+                  dataType: 'number',
+                  dataStructure: 'column',
+                  caption: dropZoneLabel('HEATGRID_SIZE'),
+                  required: false,
+                  allowMultiple: false
+                },
+                createPatternDataReq(),
+                createColorSetDataReq(),
+                createReverseColorsDataReq(),
+                createShapeDataReq({"square": true, "circle": true}),
+                createChartOptionsDataReq(true)
+              ]
+            }
+          ],
+          menuOrdinal: 200
+        });
+
+        defVisualization({
+          id: 'ccc_bulletchart',
+          type: 'bulletchart',
+          source: 'CCC',
+          name: 'Bullet Chart',
+          'class': 'pentaho.ccc.BulletChart',
+
+          args: { // TODO: inherit from baseChartArgs
+            cccClass: 'pvc.BulletChart',
+
+            showValues:   true,
+            valuesAnchor: "right",
+
+            titlePosition: "top",
+            titleSize: 25,
+
+            legendPosition: "bottom",
+
+            crosstabMode: true,
+            measuresInColumns: true,
+
+            bulletTitle:    'Test for title',
+            bulletSubtitle: 'Test for subtitle',
+            bulletMeasures: [],
+            // TODO: Constant bullets markers and ranges?
+            bulletMarkers: ["7500"],
+            bulletRanges:  ["3000", "6500", "9000"],
+
+            bulletMargin: 50,
+            panelSizeRatio: 0.8,
+
+            extensionPoints: {
+              "bulletRuleLabel_font": "7pt sans"
+            },
+
+            rolesToCccDimensionsMap: {
+              'multi':   null,
+              'columns': 'subTitle',
+              'rows':    'title'
+              // The rest is dynamic...
+              // measures:    -> split between value and marker dimensions...
+              // bulletRanges -> range*
+            }
+          },
+          propMap: [],
+          dataReqs: [
+            {
+              name: 'Default',
+              reqs :[
+                {
+                  id: 'rows',
+                  dataType: 'string',
+                  dataStructure: 'row',
+                  caption: 'Across',
+                  required: true
+                },
+                {
+                  id: 'columns',
+                  dataType: 'string',
+                  dataStructure: 'column',
+                  caption: 'Down',
+                  required: true
+                },
+                {
+                  id: 'measures',
+                  dataType: 'number',
+                  dataStructure: 'column',
+                  caption: 'Values',
+                  required: true
+                },
+                createChartOptionsDataReq()
+              ]
+            }
+          ]
+        });
+
+        function label(prefix, id){
+          return (id && cvCatalog[(prefix || "") + id]) || "";
+        }
+
+        function vizLabel(id){
+          return label('VIZ_', id) || id;
+        }
+
+        function dropZoneLabel(id, defaultLabel){
+          return label("dropZoneLabels_", id) ||
+              label("ropZoneLabels_", id) ||
+              defaultLabel || id;
+        }
+
+        function chartPropsLabel(id, defaultLabel){
+          return label("dlgChartProps", id) ||
+              defaultLabel || id;
+        }
+
+        function createRowDataReq(rowLabel){
+          return {
+            id: 'rows',
+            dataType: 'string',
+            dataStructure: 'column',
+            caption: dropZoneLabel(rowLabel),
+            required: false,
+            allowMultiple: true,
+            defaultAppend: true
+          };
+        }
+
+        function createColDataReq(columnLabel){
+          return {
+            id: 'columns',
+            dataType: 'string',
+            dataStructure: 'column',
+            caption: dropZoneLabel(columnLabel),
+            required: false,
+            allowMultiple: true
+          };
+        }
+
+        function createMeaDataReq(measureLabel){
+          return {
+            id: 'measures',
+            dataType: 'number',
+            dataStructure: 'column',
+            caption: dropZoneLabel(measureLabel),
+            required: true,
+            allowMultiple: true,
+            defaultAppend: true
+          };
+        }
+
+        function createMultiDataReq(){
+          return {
+            id: 'multi',
+            dataType: 'string',
+            dataStructure: 'column',
+            caption: dropZoneLabel('MULTI_CHART'),
+            allowMultiple: true,
+            required: false
+          };
+        }
+
+        function createShapeDataReq(valuesSet){
+          var values = ['circle', 'cross', 'diamond', 'square', 'triangle'];
+          if(valuesSet){
+            values = values.filter(function(value){ return def.hasOwn(valuesSet, value); });
+          }
+
+          values.unshift('none');
+
+          return {
+            id: 'shape',
+            dataType: 'string',
+            values: values,
+            ui: {
+              labels:  values.map(function(option){ return dropZoneLabel(option.toUpperCase()); }),
+              group:   'options',
+              type:    'combo',
+              caption: dropZoneLabel('BULLET_STYLE')
+            }
+          };
+        }
+
+        function createLineWidthDataReq(){
+          return {
+            id: 'lineWidth',
+            dataType: 'string',
+            values: ["1", "2", "3", "4", "5", "6", "7", "8"],
+            ui: {
+              labels: ["1", "2", "3", "4", "5", "6", "7", "8"],
+              group: "options",
+              type:  'combo',
+              caption: chartPropsLabel('LineWidth')
+            }
+          };
+        }
+
+        function createPatternDataReq(){
+          return {
+            id: 'pattern',
+            dataType: 'string',
+            values: ["GRADIENT", "3-COLOR", "5-COLOR"],
+            ui: {
+              labels: ["GRADIENT", "3_STEP", "5_STEP"].
+                  map(function(option){ return dropZoneLabel(option); }),
+              group: 'options',
+              type:  'combo',
+              caption: dropZoneLabel('PATTERN')
+            }
+          };
+        }
+
+        function createColorSetDataReq(){
+          return {
+            id: 'colorSet',
+            dataType: 'string',
+            values: ["ryg", "ryb", "blue", "gray"],
+            ui: {
+              labels:  ["RYG", "RYB", "BLUE", "GRAY"].
+                  map(function(option){ return dropZoneLabel("GRAD_" + option); }),
+              group:   'options',
+              type:    'combo',
+              caption: dropZoneLabel('COLORSET')
+            }
+          };
+        }
+
+        function createReverseColorsDataReq(){
+          return {
+            id: 'reverseColors',
+            dataType: 'boolean',
+            ui: {
+              label: dropZoneLabel('COLORSET_REVERSE'),
+              group: 'options',
+              type:  'checkbox'
+            }
+          };
+        }
+
+        function createChartOptionsDataReq(hasSeparator){
+          return {
+            id: "optionsBtn",
+            dataType: 'none',
+            ui: {
+              group:     "options",
+              type:      "button",
+              label:     dropZoneLabel('CHART_OPTIONS'),
+              seperator: hasSeparator || false
+            }
+          };
+        }
+
+        function createDataReq(chartId, options) {
+          var json = [];
+
+          if(def.get(options, 'row', true)){
+            json.push(createRowDataReq(chartId + "_ROW"));
+          }
+
+          if(def.get(options, 'column', true)){
+            json.push(createColDataReq(chartId + "_COL"));
+          }
+
+          if(def.get(options, 'measure', true)){
+            json.push(createMeaDataReq(chartId + "_NUM"));
+          }
+
+          if(def.get(options, 'multi', true)){
+            json.push(createMultiDataReq());
+          }
+
+          if(def.get(options, 'options', true)){
+            json.push(createChartOptionsDataReq(false));
+          }
+
+          return json;
         }
       }
-    };
 
-    /**
-     * Creates a CCC resultset in pure CROSSTAB format.
-     * Fills data-related options.
-     */
-    pentaho.ccc.CccChart.prototype._readDataHeatGrid = function(){
-      this._readDataCrosstab();
+      var colorPalete = [
+        "#0000cc",
+        "#0d8ecf",
+        "#b0de09",
+        "#fcd202",
+        "#ff6600",
+        "#cd0d74",
+        "#cc0000",
+        "#00cc00",
+        "#650cd0",
+        "#3a3a3a",
+        "#7272e3",
+        "#79c1e4",
+        "#d3ed77",
+        "#fde673",
+        "#ffaa72",
+        "#e379b2",
+        "#e37272",
+        "#72e372",
+        "#aa79e5",
+        "#929292",
+        "#00007a",
+        "#07547b",
+        "#698405",
+        "#967c01",
+        "#983b00",
+        "#7a0745",
+        "#7a0000",
+        "#007a00",
+        "#3c077b",
+        "#000000"
+      ];
 
-      var measureCount = this._measureAxis.depth;
+      // -------------
+      // Axes are: row, column and measure.
+      def
+          .type('pentaho.ccc.Axis')
+          .init(function(chart, axisId){
+            this.chart = chart;
+            this.id = axisId;
 
-      // Update data options
-      this._dataOptions.dataOptions = {
-        categoriesCount: this._rowAxis.depth,
+            // Every role, bound or not may have an entry here
+            this.gemsByRole    = {}; // roleId -> [gem, ...]
+            this.indexesByRole = {}; // roleId -> [number, ...]
 
-        // Whenever there are measures,
-        //  they are mixed in the columns
-        measuresInColumns: measureCount > 0
-      };
-    };
+            // Only bound roles will have an entry in this set
+            this.boundRoles = {}; // roleId -> true
 
-    /**
-     * Creates a CDA resultset in a custom RELATIONAL format.
-     *
-     * 1    - Category - aggregated row axis columns
-     * 2    - Series   - label of 'other' DataTable columns
-     * 3    - Value    - numeric value of corresponding 'other' DataTable column
-     * 4    - Marker   - marker numeric value of corresponding 'other' DataTable column
-     * 5..R - Range r  - range numeric value, taken from vizOptions.bulletRanges
-     */
-    pentaho.ccc.CccChart.prototype._readDataBullet = function() {
-      var dataTable   = this._dataTable,
-          rowCount    = dataTable.getNumberOfRows(),
-          measureCols = this._otherDtColIndexes,
-          seriesCount = this._otherDtColIndexes.length,
-          vizOptions  = this._vizOptions;
+            // Bound roles will have an entry here,
+            // in order of appearence in gems.
+            this.boundRolesIdList = []; // [i] -> roleId
 
-      this._dataOptions.seriesInRows = true;
+            this.gems  = this._getGems();
+            this.depth = this.gems.length;
+            this.formulas = [];
 
-      this._addCdaMetadata('Category', 'Category', 'STRING' );
-      this._addCdaMetadata('Series',   'Series',   'STRING' );
-      this._addCdaMetadata('Value',    'Value',    'NUMERIC');
-      this._addCdaMetadata('Marker',   'Marker',   'NUMERIC');
+            this.gems.forEach(initGem, this);
 
-      if (vizOptions.bulletRanges) {
-        for (var i = 0, R = vizOptions.bulletRanges.length; i < R ; i++){
-          this._addCdaMetadata('Range'  + i, 'Range ' + i, 'NUMERIC');
-        }
-      }
+            /** @instance */
+            function initGem(gem, index){
+              // Overwrite axis id with corresponding Axis instance
+              gem.axis  = this;
+              gem.index = index;
 
-      var measuresCount = this._measureAxis.depth;
+              var roleId = gem.role;
+              if(roleId && roleId !== 'undefined'){
+                if(this._ensureRole(roleId)){
+                  /* New role */
+                  this.boundRoles[roleId] = true;
+                  this.boundRolesIdList.push(roleId);
+                }
 
-      // Process the rvar measuresCount = this._measureAxis.depth;ows
-      for(var tr = 0 ; tr < rowCount ; tr++){
+                var roleGems = this.gemsByRole[roleId];
+                gem.roleLevel = roleGems.length;
+                roleGems.push(gem);
 
-        var category = this._aggregateRowAxisForTableRow(tr);
+                this.indexesByRole[roleId].push(index);
+              }
 
-        for(var s = 0 ; s < seriesCount ; s += measuresCount) {
-          // Measures should be defined in pairs
-          // Each Value measure followed by a Marker measure:
-          //  <ValueMeasure1, MarkerMeasure1>,
-          //  <ValueMeasure2, MarkerMeasure2>,
-          //  ...
-          //  <ValueMeasureN [, MarkerMeasureN]>
-          for(var m = 0 ; m < measuresCount ; m += 2) {
-            var valueColIndex  = s + m,
-                markerColIndex = valueColIndex + 1,
-                tc = measureCols[valueColIndex],
-                dtColParts = dataTable.getColumnId(tc).split('~');
+              this.formulas.push(gem.formula);
+            }
+          })
+          .add({
+            defaultRole: null,
 
-            dtColParts.pop();
+            _ensureRole: function(roleId){
+              if(!this.gemsByRole[roleId]){
+                this.gemsByRole[roleId]    = [];
+                this.indexesByRole[roleId] = [];
 
-            var row = [
-              // Normal relational part
-              category, // aggregated category
-              dtColParts.join('~'), // series label
-              this._getTableValue(tr, tc),  // series value - may be null...is it ok?
+                return true;
+              }
+            },
 
-              // Marker - may be missing on the last measure pair
-              m + 1 < measuresCount ?
-                  this._getTableValue(tr, measureCols[markerColIndex]) :
-                  vizOptions.bulletMarkers[0] // TODO: 7500
-            ];
+            configure: function(virtualItemStartIndex, cccDimNamesSet){
+              this.configureDimensionGroups();
+              return this.configureReaders(virtualItemStartIndex, cccDimNamesSet);
+            },
 
-            // Dynamic columns
-            var bulletRanges = vizOptions.bulletRanges;
-            if (bulletRanges){
-              bulletRanges.forEach(function(rangeValue){
-                row.push(rangeValue);
+            configureDimensionGroups: function(){
+            },
+
+            // We need to specify readers with indexes only because of unmapped
+            // gems that reach the dataTable.
+            // Because this is probably an analyzer bug,
+            // we fix this adjusting the readers' indexes,
+            // (and not filtering the table columns, which is more difficult to do).
+            configureReaders: function(virtualItemStartIndex, cccDimNamesSet){
+              var readers = this.chart.options.readers,
+                  index   = virtualItemStartIndex;
+
+              this.cccDimList().forEach(function(dimName){
+                if(!dimName || !def.hasOwn(cccDimNamesSet, dimName)){
+                  if(dimName){
+                    cccDimNamesSet[dimName] = true;
+                  }
+
+                  var reader = {
+                    names:   dimName, // when null, the reader simply consumes the index, and prevents a default reader
+                    indexes: index
+                  };
+
+                  readers.push(reader);
+                  index++;
+                }
               });
+
+              return index;
+            },
+
+            /* Note this is called during base constructor. */
+            _getGems: function(){
+              var gems = this.chart._axesGemsInfo[this.id];
+              var vizHelper = this.chart._vizHelper;
+              if(vizHelper.completeAxisGemsMetadata){ // available on the client
+                vizHelper.completeAxisGemsMetadata(this.id, gems);
+              }
+
+              return gems;
+            },
+
+            getAxisLabel: function(){
+              var labels = def.query(this._getAxisLabelGems())
+                      .where(function(gem){ return gem.cccDimName; })
+                      .select(function(gem){ return gem.label; })
+                      .array(),
+                  last   = labels.pop(),
+                  first  = labels.join(", ");
+
+              if(first && last){
+                return this.chart._message('chartAxisTitleMultipleDimText', [first, last]);
+              }
+
+              return first || last;
+            },
+
+            _getAxisLabelGems: function(){
+              return this.gems;
+            },
+
+            buildHtmlTooltip: function(lines, complex, context){
+              this.gems.forEach(
+                  this._buildGemHtmlTooltip.bind(this, lines, complex, context));
+            },
+
+            _buildGemHtmlTooltip: function(lines, complex, context, gem, index){
+              /*
+               * Multi-chart formulas are not shown in the tooltip
+               * They're on the small chart's title
+               */
+              if(gem.cccDimName && gem.role !== this.chart._vizOptions.multiRole){
+                var atom = complex.atoms[gem.cccDimName];
+                if(!atom.dimension.type.isHidden){
+                  // ex: "Line: Ships"
+                  lines.push(def.html.escape(gem.label) + ': ' + def.html.escape(atom.label));
+                }
+              }
+            },
+
+            /**
+             * Obtains the ccc dimensions that this axis uses,
+             * in the order they are layed out in
+             * the CCC's virtual item.
+             */
+            cccDimList: def.method({isAbstract: true}),
+
+            fillCellSelection: def.method({isAbstract: true}),
+
+            getDrillDownInfo: function(complex){
+              return null;
+            },
+
+            getDeepestInfo: function(complex){
+              return null;
             }
+          });
 
-            this._resultset.push(row);
-          }
+      // --------------------------
+
+      /* Axis static factory method */
+      pentaho.ccc.Axis.create = function(chart, axisId){
+        var funClass;
+
+        switch(axisId){
+          case 'row':     funClass = pentaho.ccc.RowAxis;     break;
+          case 'column':  funClass = pentaho.ccc.ColumnAxis;  break;
+          case 'measure': funClass = pentaho.ccc.MeasureAxis; break;
+          default: throw def.error.argumentInvalid("Undefined axis value '{0}'.", [axisId]);
         }
-      }
-    };
 
-    pentaho.ccc.CccChart.prototype._aggregateRowAxisForTableRow = function(tr) {
-      // Concat all of the string columns
-      var values = this._rowDtColIndexes.map(function(tc){
-        return this._getTableValue(tr, tc);
-      }, this);
-
-      return values.join('~');
-    };
-
-    pentaho.ccc.CccChart.prototype._addCdaMetadata = function(colName, colLabel, colType) {
-      this._metadata.push({
-        colIndex: this._metadata.length,
-        colName:  colName,
-        colLabel: colLabel,
-        colType:  colType
-      });
-    };
-
-
-    /*
-     * PREPARE OPTIONS
-     */
-
-    pentaho.ccc.CccChart.prototype._prepareOptions = function(){
-      var vizOptions = this._vizOptions;
-
-      var myself = this;
-      var options = this.options = {
-        canvas:  this._elementName,
-        animate: false,
-
-        legend:  true,
-        legendPosition: "bottom",
-
-        titlePosition:  "top",
-
-        margins: 20,
-
-        showTooltips: true,
-        showValues:   false,
-
-        clickable:    true,
-        selectable:   true,
-        ctrlSelectMode: false,
-
-        title:  this._title == "" ? null : this._title,
-        colors: this.getColors(),
-
-        clickAction: null,
-
-        mouseOverAction: function(){},
-
-        mouseUpAction: function(){},
-
-        getCategoryLabel: function(value){
-          return myself._getAxisValueLabel('row', value);
-        },
-
-        getSeriesLabel: function(value){
-          return myself._getAxisValueLabel('column', value);
-        }
+        return new funClass(chart);
       };
 
-      // Just in case
-      vizOptions.height = vizOptions.height || 400;
-      vizOptions.width  = vizOptions.width  || 400;
+      // --------------------------
 
-      // ------------
+      def
+          .type('pentaho.ccc.DiscreteAxis', pentaho.ccc.Axis)
+          .init(function(chart, axisId){
 
-      // Vertical Margin
-      // @see #_renderChart
-      //this._vMargin = Math.round(0.06 * vizOptions.height);
-      //vizOptions.height -= this._vMargin;
+            this.base(chart, axisId);
 
-      // ------------
+            var multiGems = this.gemsByRole[this.chart._vizOptions.multiRole];
+            this.hasMulti = !!multiGems &&
+                def.query(multiGems)
+                    .any(function(gem){ return !gem.isMeasureDiscrim; });
+          })
+          .postInit(function(){
+            // Done here just to allow  more specific roles to be ensured first
 
-      switch(this._vizOptions.cccClass){
-        case 'pvc.HeatGridChart':
-          this._prepareOptionsHeatGrid();
-          this._prepareLayoutHeatGrid();
-          break;
+            //this.base.apply(this, arguments);
 
-        case 'pvc.BulletChart':
-          this._prepareOptionsBullet();
-          this._prepareLayoutBullet();
-          break;
+            if(this.hasMulti){
+              this._ensureRole(this.chart._vizOptions.multiRole);
+            }
+          })
+          .add({
+            _nonMultiGemFilter: function(gem){
+              return gem.role !== this.chart._vizOptions.multiRole;
+            },
 
-        case 'pvc.BarChart':
-        case 'pvc.NormalizedBarChart':
-        case 'pvc.StackedAreaChart':
-          this._prepareOptionsCategNormal();
-          break;
+            /**
+             * The union of the ccc dimensions of the roles of this axis.
+             *
+             * CCC dimension names are inferred based on the name of the
+             * dimension group that is assigned to each role (name, name2, name3, ...).
+             */
+            cccDimList: function(){
+              if(!this._cccDimList){
+                // One dimension per gem
+                var cccDimList = this._cccDimList = new Array(this.gems.length);
 
-        case 'pvc.LineChart':
-          this._prepareOptionsCategNormal();
-          this._prepareOptionsLine();
-          break;
-      }
+                // Unmapped gems may appear
+                this.gems.forEach(function(gem){
+                  gem.cccDimName =
+                      cccDimList[gem.index] = this._getGemDimName(gem) || null;
 
-      // --------------------
+                }, this);
+              }
 
-      // Copy options from the visualization metadata to the chart options
-      for(var x in vizOptions){
-        if(!this._shouldSkipVizOption(x)){
-          var v = vizOptions[x];
+              return this._cccDimList;
+            },
 
-          // Change 'x' and/or 'v'
-          switch(x){
-            case 'legendPosition':
-              v = v && v.toLowerCase();
-              break;
+            _getGemDimName: function(gem){
+              var roleToCccDimMap = this.chart._vizOptions.rolesToCccDimensionsMap,
+                  cccDimGroup = roleToCccDimMap[gem.role];
 
-            case 'showLegend':
-              v = (('' + v) === 'true');
-              break;
+              if(typeof cccDimGroup === 'string'){
+                return pvc.data.DimensionType
+                    .dimensionGroupLevelName(cccDimGroup, gem.roleLevel);
+              }
+            },
 
-            case 'legendSize':
-            case 'lineWidth':
-              v = parseFloat(v);
-              break;
-          }
+            _buildGemHtmlTooltip: function(lines, complex, context, gem, index){
+              /*
+               * Multi-chart formulas are not shown in the tooltip
+               * They're on the small chart's title
+               */
+              if(this._nonMultiGemFilter(gem)){
+                this.base.apply(this, arguments);
+              }
+            },
 
-          options[x] = v;
+            _getAxisLabelGems: function(){
+              return def.query(this.gems).where(this._nonMultiGemFilter, this);
+            },
+
+            fillCellSelection: function(selection, complex, selectionExcludesMulti){
+              var forms  = [],
+                  values = [],
+                  label;
+
+              this.getSelectionGems(selectionExcludesMulti)
+                  .each(function(gem){
+                    var atom = complex.atoms[gem.cccDimName];
+                    forms.push(gem.formula);
+                    values.push(atom.value);
+                    label = atom.label; // TODO is this ok?
+                  });
+
+              if(forms.length){
+                var axisId = this.id;
+                // Dummy property, just to force Analyzer to read the axis info
+                selection[axisId] = true;
+
+                selection[axisId + 'Id'   ] = forms;
+                selection[axisId + 'Item' ] = values;
+                selection[axisId + 'Label'] = label;
+              }
+            },
+
+            getSelectionGems: function(selectionExcludesMulti){
+              if(selectionExcludesMulti == null){
+                selectionExcludesMulti = true;
+              }
+
+              return def.query(this.gems)
+                  .where(function(gem, index){
+                    return (!selectionExcludesMulti || this._nonMultiGemFilter(gem)) &&
+                        !gem.isMeasureDiscrim &&
+                        !!gem.cccDimName;
+                  }, this);
+            },
+
+            getKeepOrDrillGems: function(drillGem, selectionExcludesMulti){
+              if(selectionExcludesMulti == null){
+                selectionExcludesMulti = true;
+              }
+
+              return def.query(this.gems)
+                  .where(function(gem, index){
+                    return gem === drillGem ||
+                        ((!selectionExcludesMulti || this._nonMultiGemFilter(gem)) &&
+                            !gem.isMeasureDiscrim &&
+                            !!gem.cccDimName);
+                  }, this);
+            },
+
+            selectGemsWithLink: function(linkType, complex, reverse){
+              var gems = def.query(this.gems);
+              if(reverse){
+                gems = gems.reverse();
+              }
+
+              var isObjectLinkType = def.object.is(linkType);
+              return gems
+                  .where(function(gem){
+                    return gem.hasLink &&
+                        (!linkType || (isObjectLinkType ? def.hasOwn(linkType, gem.linkType) : (gem.linkType === linkType))) &&
+                        (!complex  || (gem.cccDimName && complex.atoms[gem.cccDimName]));
+                  })
+                  ;
+            },
+
+            selectBoundGems: function(complex, reverse){
+              var gems = def.query(this.gems);
+              if(reverse){
+                gems = gems.reverse();
+              }
+
+              return gems
+                  .where(function(gem){
+                    return !gem.isMeasureDiscrim &&
+                        gem.cccDimName &&
+                        complex.atoms[gem.cccDimName];
+                  })
+                  ;
+            },
+
+            getHyperlinkInfo: function(complex){
+              // The last formula of this axis that has a defined hyperlink
+              var lastGem = this
+                      .selectGemsWithLink(this.chart._hyperlinkTypes, complex, /* reverse */ true)
+                      .first()
+                  ;
+
+              if(lastGem){
+                return {
+                  gem:  lastGem,
+                  atom: complex.atoms[lastGem.cccDimName]
+                };
+              }
+            },
+
+            getDrillDownInfo: function(complex){
+              var deepestInfo = this.getDeepestInfo(complex);
+              if(!deepestInfo){
+                return null;
+              }
+
+              /* Get the child formula, if any, in the same hierarchy */
+              var lastForm = deepestInfo.gem.formula,
+                  childForm = this.chart.getChildFormula(lastForm);
+              if(!childForm){
+
+                //Let's try the other gems
+                var gemList = def.query(this.gems).reverse().array();
+                for (var i=1; i < gemList.length; i++) {
+                  var g = gemList[i];
+                  if (!g.isMeasureDiscrim) {
+                    var deepestGem = this.getHierarchyDeepestGem(g.formula),
+                        atom;
+                    if(deepestGem){
+                      if(complex){
+                        atom = complex.atoms[deepestGem.cccDimName];
+                        if(!atom || atom.value == null){
+                          deepestInfo =  null;
+                        }
+                      }
+
+                      deepestInfo =  {
+                        gem:  deepestGem,
+                        atom: atom
+                      };
+                    }
+                  }
+
+                  lastForm = deepestInfo.gem.formula;
+                  childForm = this.chart.getChildFormula(lastForm);
+                  if (childForm)
+                    break;
+                }
+
+                if (!childForm)
+                  return null;
+              }
+
+              /*
+               * If the formula is already included in the chart
+               * (surely in a different axis) then no drilling
+               * (in this axis) is possible.
+               */
+              if(def.hasOwn(this.chart.gemsMap, childForm)){
+                return null;
+              }
+
+              deepestInfo.drillChild = childForm;
+
+              return deepestInfo;
+            },
+
+            getDeepestInfo: function(complex, hierarchy){
+              if(this.depth){
+                var lastGem = this.getLastProperGem(hierarchy);
+                if(lastGem) {
+                  var deepestGem = this.getHierarchyDeepestGem(lastGem.formula),
+                      atom;
+                  if(deepestGem){
+                    if(complex){
+                      atom = complex.atoms[deepestGem.cccDimName];
+                      if(!atom || atom.value == null){
+                        return null;
+                      }
+                    }
+
+                    return {
+                      gem:  deepestGem,
+                      atom: atom
+                    };
+                  }
+                }
+              }
+
+              return null;
+            },
+
+            getLastProperGem: function(hierarchy){
+              /* Get the last gem that is not a measure discrim.
+               * Optionally filter by the given hierarchy argument.
+               */
+
+              /*
+               * NOTE: there's a "problem" with cv.getFieldHelp().getHierarchy:
+               * it must receive a formula of a hierarchy, and not the hierarchy itself.
+               *
+               * Because of that and the use scenarios of this method,
+               * the received argument 'hierarchy' may end up being a formula.
+               * We guard against that extracting the hierarchy of it
+               * so that the hierarchy comparison  does not fail.
+               */
+              var realHierarchy;
+              if(hierarchy){
+                realHierarchy = hierarchy.match(/^(\[.*?\])?.*$/)[1];
+              }
+
+              return def.query(this.gems)
+                  .reverse()
+                  .first(function(gem){
+                    return !gem.isMeasureDiscrim &&
+                        (!realHierarchy || gem.hierarchy === realHierarchy);
+                  });
+            },
+
+            getHierarchyDeepestGem: function(hierarchy){
+              var hForms = this.chart._getHierarchyFormulas(
+                  hierarchy,
+                  /*includeHidden*/false,
+                  /*excludeChildren*/false);
+
+              return def.query(hForms)
+                  .reverse() // deepest first
+                  .select(function(hForm){
+                    var gem = def.getOwn(this.chart.gemsMap, hForm);
+                    return gem && gem.axis === this && gem.cccDimName ? gem : null;
+                  }, this)
+                  .first(def.notNully) || null;
+            }
+          });
+
+      // --------------------------
+
+      def
+          .type('pentaho.ccc.ColumnAxis', pentaho.ccc.DiscreteAxis)
+          .init(function(chart){
+
+            var rolesToCccDimMap = chart._vizOptions.rolesToCccDimensionsMap;
+
+            this.hasMeasureDiscrim = !chart.options.dataOptions.measuresInColumns &&
+                !!(rolesToCccDimMap[this.defaultRole] ||
+                    rolesToCccDimMap[chart.axes.row.defaultRole]);
+
+            this.isHiddenMeasureDiscrim = this.hasMeasureDiscrim &&
+                !(chart.axes.measure.genericMeasuresCount > 1);
+
+            this.base(chart, 'column');
+
+            this._ensureRole(this.defaultRole);
+
+            this.realDepth = this.hasMeasureDiscrim ? (this.depth - 1) : this.depth;
+          })
+          .add({
+            defaultRole: 'columns',
+            hiddenMeasureDiscrimDimName: 'measureDiscrim',
+            measureDiscrimName: null,
+
+            /* Note this is called during base constructor. */
+            _getGems: function(){
+              var gems = this.base();
+
+              if(this.hasMeasureDiscrim){
+                gems.push({
+                  isMeasureDiscrim: true,
+                  id:    '__MeasureDiscrim__',
+                  label: "Measure discriminator",
+                  axis:  this.id,
+                  role:  this.defaultRole
+                });
+              }
+
+              return gems;
+            },
+
+            _getGemDimName: function(gem){
+              if(gem.isMeasureDiscrim && this.isHiddenMeasureDiscrim){
+                // When the measure discriminator should not be seen
+                // it should be mapped to a different and hidden dimension group
+                return this.measureDiscrimName = this.hiddenMeasureDiscrimDimName;
+              }
+
+              var cccDimName = this.base(gem);
+              if(gem.isMeasureDiscrim){
+                if(!cccDimName){
+                  // columns role is not mapped to CCC...
+                  // In this case, the discriminator goes as the last *row* dimension.
+                  // Is the case, at least, in the PieChart, in which there is no "series" concept.
+                  var rolesToCccDimMap = this.chart._vizOptions.rolesToCccDimensionsMap,
+                      rowAxis          = this.chart.axes.row,
+                      rowRole          = rowAxis.defaultRole,
+                      rowCccDimGroup   = rolesToCccDimMap[rowRole],
+                      rowNextLevel     = rowAxis.gemsByRole[rowRole].length;
+
+                  cccDimName = pvc.data.DimensionType
+                      .dimensionGroupLevelName(rowCccDimGroup, rowNextLevel);
+                }
+
+                this.measureDiscrimName = cccDimName;
+              }
+
+              return cccDimName;
+            },
+
+            configureDimensionGroups: function(){
+
+              this.base();
+
+              // Ensure measureDiscrimName is determined
+              this.cccDimList();
+
+              if(this.measureDiscrimName){
+                this.chart.options.dimensions[this.measureDiscrimName] = {
+                  isHidden: true
+                };
+              }
+            }
+          });
+
+      // --------------------------
+
+      def
+          .type('pentaho.ccc.RowAxis', pentaho.ccc.DiscreteAxis)
+          .init(function(chart){
+
+            this.base(chart, 'row');
+
+            this._ensureRole(this.defaultRole);
+          })
+          .add({
+            defaultRole: 'rows'
+          });
+
+      // --------------------------
+
+      def
+          .type('pentaho.ccc.MeasureAxis', pentaho.ccc.Axis)
+          .init(function(chart){
+
+            this.base(chart, 'measure');
+
+            this._ensureRole(this.defaultRole);
+
+            this.genericMeasuresCount = 0;
+            this.genericMeasureRoles = {};
+            def.eachOwn(this.gemsByRole, function(gems, role){
+              if(role.indexOf('measures') === 0){
+                this.genericMeasureRoles[role] = true;
+                this.genericMeasuresCount += gems.length;
+              }
+            }, this);
+          })
+          .add({
+            defaultRole: 'measures',
+
+            /**
+             * Filters the report definition formulas
+             * excluding those not returned in the data table.
+             *
+             * Note this is called during base constructor.
+             */
+            _getGems: function(){
+
+              var gems = this.base();
+
+              var filtered = [];
+
+              gems.forEach(function(gem){
+                var meaId = gem.id,
+                    measureInfo;
+
+                if(meaId && (measureInfo = def.getOwn(this.chart._measuresInfo, meaId))){
+                  gem.role = measureInfo.role;
+
+                  filtered.push(gem);
+                }
+              }, this);
+
+              return filtered;
+            },
+
+            cccDimList: function(){
+              if(!this._cccDimList){
+                this._cccDimList =
+                    this.chart._measureRolesInfoList
+                        .map(function(role){ return role.cccDimName; });
+              }
+
+              return this._cccDimList;
+            },
+
+            _buildGemHtmlTooltip: function(lines, complex, context, gem/*, index*/){
+
+              /*
+               * When using measure discriminator column,
+               * only the "active" measure in 'complex'
+               * is placed in the tooltip.
+               */
+              var colAxis = this.chart.axes.column;
+              if(colAxis.measureDiscrimName    &&
+                  def.hasOwn(this.genericMeasureRoles, gem.role) &&
+                  gem.id !== complex.atoms[colAxis.measureDiscrimName].value) {
+                return;
+              }
+
+              /* Obtain the dimension assigned to the role */
+              var cccDimName = this.chart._measureRolesInfo[gem.role].cccDimName;
+              if(cccDimName){
+                var atom = complex.atoms[cccDimName];
+                if(!atom.dimension.type.isHidden){
+                  // ex: "GemLabel (RoleDesc): 200 (10%)"
+                  var tooltipLine = gem.label;
+
+                  // Role description
+                  if(!def.hasOwn(this.chart._noRoleInTooltipMeasureRoles, gem.role)) {
+                    tooltipLine += " (" + gem.role + ")";
+                  }
+
+                  tooltipLine += ": " + atom.label;
+
+                  if(!this.chart._noPercentInTootltipForPercentGems || gem.measureType !== 'PCTOF'){
+                    var valuePct = this._getAtomPercent(atom, context);
+                    if(valuePct != null){
+                      tooltipLine += " (" + valuePct + "%)";
+                    }
+                  }
+
+                  lines.push(def.html.escape(tooltipLine));
+                }
+              }
+            },
+
+            _getAtomPercent: function(atom, context){
+              if(context) {
+                var cccChart = context.chart,
+                    data = cccChart.data,
+                    playingPercentMap = data.type.getPlayingPercentVisualRoleDimensionMap(),
+                    cccDimName = atom.dimension.name
+                    ;
+
+                if(playingPercentMap.has(cccDimName)){
+                  var group = context.scene.group,
+                      pct;
+                  if(group) {
+                    pct = group.dimensions(cccDimName)
+                        .percentOverParent({ visible: true });
+                  } else {
+                    pct = data.dimensions(cccDimName).percent(atom.value);
+                  }
+
+                  return cccChart.options.valueFormat.call(null, Math.round(pct * 10000) / 100);
+                }
+              }
+            },
+
+            fillCellSelection: function(selection, complex/*, selectionExcludesMulti*/){
+              /*
+               * Add a description of the selected values.
+               * At the time of writing, analyzer discards selection.value
+               */
+              selection.value = def.query(this.gems)
+                  .select(function(gem){
+                    var cccDimName = this.chart._measureRolesInfo[gem.role].cccDimName;
+                    if(cccDimName){
+                      return complex.atoms[cccDimName].label;
+                    }
+                  }, this)
+                  .where(def.truthy)
+                  .array()
+                  .join(" ~ ")
+              ;
+            }
+          });
+
+      // ------------------
+
+      /*
+       * Unhandled mouse events from protovis
+       * bubble up and cause slowing down the UI.
+       * So, we stop propagation of mouse events.
+       * We can't use dojo or jQuery for this,
+       * cause they try to "fix" the event object,
+       * which is generally an expensive operation
+       * that would defeat the initial purpose.
+       */
+      var _cccEventsShieldEvents =  ['mouseover', 'mouseout', 'mousemove'];
+
+      function installCccEventsShield(element){
+        if(!element._cccEventsShield){
+          element._cccEventsShield = true;
+
+          _cccEventsShieldEvents.forEach(function(evName){
+            addListener(element, evName, stopEventPropagation);
+          });
         }
       }
 
-      var axisLabelFont = options.axisLabelFont;
-      if(!axisLabelFont){
-        options.axisLabelFont = '12px sans-serif';
-      } else {
-        options.axisLabelFont = axisLabelFont.replace(/\bdefault\s*$/i, 'sans-serif');
-      }
-
-      if(!this._vizHelper.isInteractionEnabled()){
-        options.showTooltips = false;
-        options.clickable    = false;
-        options.selectable   = false;
-      }
-
-      // Calculate 'legendAlign' default value
-      if(!('legendAlign' in options)){
-        var legendPosition = options.legendPosition;
-
-        if(legendPosition === 'top' || legendPosition === 'bottom'){
-          options.legendAlign = 'center';
+      function stopEventPropagation(ev){
+        if(!ev){ ev = window.event; }
+        if(ev.stopPropagation) {
+          ev.stopPropagation();
         } else {
-          options.legendAlign = 'middle';
+          ev.cancelBubble = true;
         }
       }
 
-      var vizExtPoints = vizOptions.extensionPoints;
-      if(vizExtPoints){
-        var extPoints = options.extensionPoints = {};
-        for(var y in vizExtPoints) {
-          extPoints[y] = vizExtPoints[y];
-        }
-      }
-    };
-
-
-    pentaho.ccc.CccChart.prototype._prepareOptionsHeatGrid = function() {
-      var myself = this,
-          options = this.options,
-          vizOptions = this._vizOptions;
-
-      options.selectionChangedAction = function(cccSelections){
-        myself._notifyCccSelectionChanged(cccSelections);
-      };
-
-      // Drill down on shapes
-      options.doubleClickAction = function(s, c, d, ev, datum){
-        return myself._drillDown(myself._readDatum(datum));
-      };
-
-      // Drill down on y axis
-      options.yAxisDoubleClickAction = function (d){
-        return myself._drillDown(myself._readCccAxesValues(d.absValue, null));
-      };
-
-      // Drill down on x axis
-      options.xAxisDoubleClickAction = function (d) {
-        return myself._drillDown(myself._readCccAxesValues(null, d.absValue));
-      };
-
-      options.customTooltip = function(s, c, v, datum){
-        return myself._getTooltipText(myself._readDatum(datum));
-      };
-
-      // ----------------
-
-      var freeMeasures   = [],
-          measuresByRole = {};
-
-      this._measureAxis.formulasInfo.forEach(function(formulaInfo){
-        if(formulaInfo.role !== 'measure'){
-          measuresByRole[formulaInfo.role] = formulaInfo;
-        } else {
-          freeMeasures.push(formulaInfo);
-        }
-      });
-
-      // Color role
-      var formulaInfo = measuresByRole['color'] || freeMeasures.shift();
-      vizOptions.colorValIdx = formulaInfo ?  formulaInfo.index : null;
-
-      // Size role
-      formulaInfo = measuresByRole['size'] || freeMeasures.shift();
-      vizOptions.sizeValIdx = formulaInfo ?  formulaInfo.index : null;
-
-      if(vizOptions.colorValIdx == null){
-        // No color; set the nullColor option to the first of the colorRange
-        var nullColor = vizOptions.colorRange && vizOptions.colorRange[0];
-        vizOptions.nullColor = nullColor || 'red';
-      }
-    };
-
-    pentaho.ccc.CccChart.prototype._prepareLayoutHeatGrid = function() {
-      var vizOptions = this._vizOptions;
-
-      // TODO: is it ok to access "vizOptions.controller.domNode" ?
-      vizOptions.controller.domNode.style.overflow = 'hidden'; // Hide overflow
-
-      var measureCount = this._measureAxis.depth,
-          catsDepth    = this._rowAxis.depth,
-          sersDepth    = this._columnAxis.depth,
-          catsBreadth  = Math.max(1, this._dataTable.getNumberOfRows() - 1),
-          sersBreadth  = this._dataTable.getNumberOfColumns() - catsDepth;
-
-      if(measureCount > 0){
-        sersBreadth /= measureCount;
-      }
-
-      var width  = vizOptions.width,
-          height = vizOptions.height,
-          currRatio = width / height,
-          xyChartRatio = catsBreadth / sersBreadth;
-
-      // Min desirable sizes according to depth
-      var MAX_AXIS_SIZE    = 300,
-          MIN_LEVEL_HEIGHT = 70,
-          MAX_LEVEL_HEIGHT = 200,
-          MAX_AXIS_RATIO   = 0.35;
-
-      var minXAxisSize = Math.min(MAX_AXIS_SIZE, catsDepth * MIN_LEVEL_HEIGHT),
-          minYAxisSize = Math.min(MAX_AXIS_SIZE, sersDepth * MIN_LEVEL_HEIGHT),
-          maxXAxisSize = Math.min(MAX_AXIS_SIZE, catsDepth * MAX_LEVEL_HEIGHT, height * MAX_AXIS_RATIO),
-          maxYAxisSize = Math.min(MAX_AXIS_SIZE, sersDepth * MAX_LEVEL_HEIGHT, width  * MAX_AXIS_RATIO);
-
-      var xAxisSize,
-          yAxisSize;
-      if(xyChartRatio > currRatio){ // lock width
-        var extraHeight = height - width / xyChartRatio;
-
-        yAxisSize = minYAxisSize;
-
-        xAxisSize = Math.min(extraHeight, maxXAxisSize);
-        xAxisSize = Math.max(xAxisSize,   minXAxisSize);
-      } else if (xyChartRatio < currRatio){ // lock height
-        var extraWidth = width - height * xyChartRatio;
-
-        xAxisSize = minXAxisSize;
-
-        yAxisSize = Math.min(extraWidth, maxYAxisSize);
-        yAxisSize = Math.max(yAxisSize,  minYAxisSize);
+      function addListener(elem, type, listener){
+        elem.addEventListener
+            ? elem.addEventListener(type, listener, false)
+            : elem.attachEvent("on" + type, listener);
       }
 
       // ------------------
 
-      // Update Axes sizes
-      vizOptions.xAxisSize = xAxisSize;
-      vizOptions.yAxisSize = yAxisSize;
-    };
+      def
+          .type('pentaho.ccc.Chart')
+          .init(function(element){
+            this._element = element;
+            this._elementName = element.id;
 
+            installCccEventsShield(element);
+          })
+          .add({
+            _keyAxesIds: ['column', 'row'],
+            _axesIds:    ['column', 'row', 'measure'],
 
-    pentaho.ccc.CccChart.prototype._prepareOptionsCategNormal = function() {
-      var myself = this,
-          options = this.options;
+            /* This takes creation time dependencies into account.
+             * It works right now. If ti doesn't scale,
+             * then some parts of axes initialization must me taken out
+             * of the axes class or split into more initialization phases.
+             */
+            _axesCreateOrderIds: ['row', 'measure', 'column'],
 
-      // Drill on categories first and only then on series
-      this._drillAxes = ['row', 'column'];
+            // This is the order in which fields
+            // are layed out in the CCC's virtual item.
+            // Indexes of readers are relative to this layout.
+            _cccVirtualItemAxesLayout: ['column', 'row', 'measure'],
 
-      options.customTooltip = function(s, c, v, datum){
-        return myself._getTooltipText(myself._readDatum(datum));
-      };
+            /**
+             * The drilling axes.
+             *
+             * In the order to be tested
+             * for being chosen as the drilling axis.
+             */
+            _drillAxesIds: ['column', 'row'],
 
-      // Use selection event handler instead of clickAction
-      options.selectionChangedAction = function(cccSelections){
-        myself._notifyCccSelectionChanged(cccSelections);
-      };
+            /*
+             * Measure roles that do not show the role in the tooltip.
+             */
+            _noRoleInTooltipMeasureRoles: {'measures': true},
 
-      // Drill down on shapes
-      options.doubleClickAction = function(s, c, v, ev, datum){
-        myself._drillDown(myself._readDatum(datum));
-      };
-    };
+            /*
+             * Do not show percent in front of an analyzer "percent measure" gem.
+             */
+            _noPercentInTootltipForPercentGems: false,
 
-    pentaho.ccc.CccChart.prototype._prepareOptionsLine = function() {
-      var vizOptions = this._vizOptions;
+            /* PLUGIN INTERFACE  */
 
-      var shape = vizOptions.shape;
-      if(shape && shape === 'none'){
-        vizOptions.showDots = false;
-      } else {
-        vizOptions.showDots = true;
-        vizOptions.extensionPoints.dot_shape = shape;
-      }
-    };
+            /**
+             * Instructs the visualization to draw itself with
+             * supplied data and options.
+             */
+            draw: function(dataTable, vizOptions){
+              // CDA table
+              this._metadata  = [];
+              this._resultset = null;
 
+              // Pentaho/Google data table
+              this._dataTable = dataTable;
 
-    pentaho.ccc.CccChart.prototype._prepareOptionsBullet = function() {
-      var myself = this,
-          options = this.options;
+              // ---------------
 
-      options.legend = false;
+              this._initOptions(vizOptions);
 
-      // Drill down on shapes
-      options.axisDoubleClickAction = function(d){
-        var c = d.title,
-            s = d.subtitle;
+              this._processDataTable();
 
-        myself._drillDown(myself._readCccAxesValues(s, c));
-      };
+              this._initAxes();
 
-      options.clickAction = function (c, s) {
-        myself._notifySelectionChanged(
-            [ myself._convertKeysSelectionCccToAnalyzer(s, c) ]);
-      };
-    };
+              // ---------------
 
-    pentaho.ccc.CccChart.prototype._prepareLayoutBullet = function(){
-      var vizOptions = this._vizOptions;
+              var rowDepth = this.axes.row.depth;
+              this.options.dataOptions.categoriesCount = rowDepth;
 
-      var isVertical = vizOptions.orientation == 'vertical';
-      if (this._resultset.length > 20) {
-        vizOptions.bulletSize = 10;
-        vizOptions.bulletSpacing = isVertical ? 60 : 20;
-      } else if (this._resultset.length > 10) {
-        vizOptions.bulletSize = 15;
-        vizOptions.bulletSpacing = isVertical ? 80 : 30;
-      } else {
-        vizOptions.bulletSize = 20;
-        vizOptions.bulletSpacing = isVertical ? 120 : 50;
-      }
+              this._hasMultiChartColumns = this.axes.row.hasMulti || this.axes.column.hasMulti;
 
-      var totalSpace = (2 + vizOptions.bulletSize + vizOptions.bulletSpacing) *
-          this._resultset.length;
+              // ---------------
 
-      // TODO: vizOptions.controller.domNode
-      if (isVertical) {
-        if (totalSpace > vizOptions.width) {
-          vizOptions.controller.domNode.style.overflowX = 'auto';
-          vizOptions.controller.domNode.style.overflowY = 'hidden';
+              this._readUserOptions(this.options, vizOptions);
 
-          vizOptions.width = totalSpace;
-        }
-      } else {
-        if (totalSpace > vizOptions.height) {
-          vizOptions.controller.domNode.style.overflowY = 'auto';
-          vizOptions.controller.domNode.style.overflowX = 'hidden';
+              // ---------------
 
-          vizOptions.height = totalSpace;
-        }
-      }
-    };
+              this._readData();
 
+              this._configure();
 
-// TODO - probably the skip logic should be inverted,
-// this would be specified in terms of inclusion of CCC options.
-    pentaho.ccc.CccChart.prototype._shouldSkipVizOption = function(option){
-      return (option in skipVizOtions);
-    };
+              this._prepareLayout(this.options);
 
-    /**
-     * Set of visualization options that
-     * should not be copied to the CCC options.
-     */
-    var skipVizOtions = pv.dict([
-      'cccClass',
-      'crosstabMode',
-      'extensionPoints',
-      'action',
-      'autoRange',
-      'backgroundColorEnd',
-      'backgroundFill',
-      'chartType',
-      'controller',
-      'customChartType',
-      'displayUnits',
+              this._render();
+            },
 
-      'labelSize',
-      'labelStyle',
+            resize: function(width, height){
+              // Resize event throttling
 
-      'legendBackgroundColor',
-      'legendColor',
-      'legendFontFamily',
-      'legendStyle',
+              if(this._lastResizeTimeout != null){
+                clearTimeout(this._lastResizeTimeout);
+              }
 
-      // NOTE: analyzer's legendSize is more like a "legentFontSize",
-      // while CCC's is the legend panel's size (width or height)
-      'legendSize',
+              this._lastResizeTimeout = setTimeout(function(){
+                this._lastResizeTimeout = null;
 
-      'lineShape',
-      'maxChartsPerRow',
-      'maxValues',
-      'metrics',
-      'palette',
-      'selections',
-      'seriesIncludeMeasures'
-    ],
-        function(){ return true; });
+                this._doResize(width, height);
 
+              }.bind(this), 50);
+            },
 
-    /*
-     * RENDER
-     */
+            _doResize: function(width, height){
+              if(this._chart){
+                var options = this._chart.options;
 
-    pentaho.ccc.CccChart.prototype._renderChart = function(){
+                def.set(options, 'width', width, 'height', height);
 
-      while(this._element.firstChild) {
-        this._element.removeChild(this._element.firstChild);
-      }
+                this._prepareLayout(options);
 
-      // TODO - if we don't recreate a new chart it does not display new data, fix this...
-      // if( this._currentChartType != vizOptions.cccClass ) {
-      this._currentChartType = this._vizOptions.cccClass;
+                this._chart.render(true, true, false);
+              }
+            },
 
-      var chartClass = eval("(" + this._currentChartType + ")"); // TODO - get rid of eval
-      
-      var selectionsWhereSpec;
-      if(this._isResize && this._chart && this._chart.constructor === chartClass){
-          selectionsWhereSpec = this._buildWhereSpec(this._chart.dataEngine.getSelections());
-          if(selectionsWhereSpec && selectionsWhereSpec.length) {
-              var prevRenderCallback = this.options.renderCallback;
-              this.options.renderCallback = function(){
-                  if(prevRenderCallback) {
-                      prevRenderCallback.call(this);
+            /* Sets the items on the chart that should be highlighted */
+            setHighlights: function(selections) {
+              this._selections = selections;
+
+              if(!this._ownChange){ // reentry control
+                if(!selections || selections.length == 0){
+                  // will cause selectionChangedAction being called
+                  this._ownChange = true;
+                  try {
+                    this._chart.clearSelections();
+                  } finally {
+                    this._ownChange = false;
                   }
-                  
-                  var datums = this.dataEngine.getWhere(selectionsWhereSpec);
-                  this.dataEngine.setSelections(datums, true);
-              };
-          }
-      }
-      
-      this._isResize = false;
-      this._chart = new chartClass(this.options);
-      this._chart.setData($.extend(true, {}, this._cdaTable), this._dataOptions);
-      this._chart.render();
-
-      // NOTE: 'vertical' is default, so can be missing
-      // Change the margin of the svg element
-      // The HG chart comes with another firstChild... (?)
-      //var element = this._element.firstChild;
-      //while(element && (element.tagName.toLowerCase()) !== 'svg'){
-      //    element = element.nextSibling;
-      //}
-
-      //if(element){
-      //    // TODO: chart re-render because of series visibility changes looses this...
-      //    if(this.options.orientation === 'horizontal'){
-      //        element.style.marginBottom = this._vMargin + 'px';
-      //    } else {
-      //        element.style.marginTop = this._vMargin + 'px';
-      //    }
-      //}
-    };
-
-// -----------------------------
-// INTERACTIVE / CLIENT-SIDE ONLY
-    pentaho.ccc.CccChart.prototype._readDatum = function(datum){
-      var dimensions = datum.elem;
-      return this._readCccAxesValues(
-          dimensions.series.absValue,
-          dimensions.category.absValue);
-    };
-
-    pentaho.ccc.CccChart.prototype._readCccAxesValues = function(s, c){
-      // Ensure arrays
-      var rowVals = readCccValue(c),
-          colVals = readCccValue(s);
-
-      // TODO: this options is really needed
-      // or can be infered from the way data is sent?
-      if(colVals && this._vizOptions.seriesIncludeMeasures){
-        // Remove the last element from series,
-        // because it's the measure's name
-        colVals = colVals.slice(0);
-        colVals.pop();
-      }
-
-      var axesVals = {
-        row:     rowVals,
-        column:  colVals,
-        measure: null // filled below, after "absolutization"
-      };
-
-      /**
-       * Ensure key axes values are absolute
-       */
-      this._keyAxes.forEach(function(axis){
-        var vals = axesVals[axis];
-        if(vals){
-          axesVals[axis] = this._buildMdxAbsoluteValues(this._allAxesInfo[axis], vals);
-        }
-      }, this);
-
-      // Array of measure cells: {v:..., f:...}, or null
-      axesVals.measure = this._getCrossCell(axesVals.row, axesVals.column);
-
-      return axesVals;
-    };
-
-    pentaho.ccc.CccChart.prototype._getCrossCell = function(rowVals, colVals){
-      if(!rowVals || !colVals){
-        return null;
-      }
-
-      var result = this._crossTable.childrenByKey[rowVals.join('~')];
-      if(result){
-        result = result.childrenByKey[colVals.join('~')];
-      }
-
-      return result && result.measures;
-    };
-
-    /*
-     * TOOLTIPS
-     */
-
-// NOTE: tooltips are NOT rendered when interaction is disabled,
-//  because showTooltips is set to false.
-    pentaho.ccc.CccChart.prototype._getTooltipText = function(axesVals){
-      /**
-       * Array of HTML lines which constitute the tooltip.
-       * @see describeAxis
-       */
-      var tooltipLines = [];
-
-      /**
-       * Add tooltip lines with the pairs "form: value" for each of the roles.
-       */
-      this._allAxes.forEach(function(axis){
-        describeAxis.call(this, this._allAxesInfo[axis], axesVals[axis]);
-      }, this);
-
-      /**
-       * Add drill-down information to the tooltip.
-       */
-      var drillDownInfo = this._getDrillDownInfo(axesVals);
-      if(drillDownInfo){
-        tooltipLines.push(
-            "<div class='tipsy-footer'>Double-click to show " +
-                escapeHtml(this._vizHelper.getFormulaLabel(drillDownInfo.directChild)) +
-                "</div>");
-      }
-
-      /**
-       * Join tooltip lines with HTML line breaks.
-       */
-      return tooltipLines.join('<br />');
-
-      /** @instance */
-      function describeAxis(axisInfo, values){
-        axisInfo.formulasInfo.forEach(function(formInfo, index){
-          var value = pvc.nullTo(
-              this._getAxisValueLabel(axisInfo.id, values[index]),
-              "-");
-
-          // ex: "Line: Ships"
-          tooltipLines.push(escapeHtml(formInfo.label) + ': ' + escapeHtml(value));
-        }, this);
-      }
-    };
-
-
-    /*
-     * SELECTION
-     */
-    pentaho.ccc.CccChart.prototype._notifySelectionChanged = function(selections){
-      pentaho.events.trigger(this, "select", {
-        source:        this,
-        selections:    selections,
-        selectionMode: "REPLACE"
-      });
-    };
-
-    pentaho.ccc.CccChart.prototype._notifyCccSelectionChanged = function(cccSelections){
-      this._notifySelectionChanged(this._convertSelectionsCccToAnalyzer(cccSelections));
-    };
-
-
-    /**
-     * Converts CCC selections to Analyzer selections.
-     * Used on selection changed and on axes' drill down.
-     *
-     * A CCC selection is an instance of pvc.Datum.
-     * Its relevant part has the structure:
-     * {
-     *   elem: {
-     *      series:   { value: ["[Time].[2003]", "[Time].[2003].[QTR4]"] }
-     *      category: { value: ["[Markets].[EMEA]", "[Order Status].[Resolved]"] }
-     *   }
-     *
-     *   value: array
-     * }
-     *
-     * axesVals:
-     * {
-     *     column:  s,
-     *     row:     c,
-     *     measure: v
-     * }
-     *
-     * A corresponding Analyzer selection would have the
-     * following structure:
-     * {
-     *    type:     'cell',
-     *
-     *    column:      table column index ??
-     *    columnId:    ["[Time].[Years]", "[Time].[Quarters]"   ], // formulas
-     *    columnItem:  ["[Time].[2003]",  "[Time].[2003].[QTR4]"], // values
-     *    columnLabel: "2003~QTR4~Sales",
-     *
-     *    row:          table row index ??
-     *    rowId:       ["[Markets].[Territory]", "[Order Status].[Type]"    ]  // formulas
-     *    rowItem:     ["[Markets].[EMEA]",      "[Order Status].[Resolved]"], // values
-     *    rowLabel:    "Type",
-     *
-     *    value:       28550.59 // formatted joined by ~ ?
-     * }
-     */
-    pentaho.ccc.CccChart.prototype._convertSelectionsCccToAnalyzer = function(cccSelections){
-      return cccSelections.map(this._convertSelectionCccToAnalyzer, this);
-    };
-
-    pentaho.ccc.CccChart.prototype._convertSelectionCccToAnalyzer = function(cccSelection){
-      return this._convertKeysSelectionCccToAnalyzer(
-          cccSelection.elem.series.absValue,
-          cccSelection.elem.category.absValue);
-    };
-
-    pentaho.ccc.CccChart.prototype._convertKeysSelectionCccToAnalyzer = function(s, c){
-      /**
-       * Values for each axis.
-       * Convert CCC selection to an axesVals.
-       */
-      var axesVals = this._readCccAxesValues(s, c);
-
-      return this._convertAxesValuesToAnalyzerSelection(axesVals);
-    };
-
-    pentaho.ccc.CccChart.prototype._convertAxesValuesToAnalyzerSelection = function(axesVals){
-      /**
-       * The Analyzer cell-selection object.
-       */
-      var selection = {type: 'cell'};
-
-      /**
-       * Add each key axis info to 'selection'.
-       */
-      this._keyAxes.forEach(addKeyAxisSelectionInfo, this);
-
-      /**
-       * Add a description of the selected values.
-       * Currently, Analyzer discards selection.value
-       */
-      var measureVals = axesVals.measure;
-      if(measureVals && measureVals.length){
-        selection.value = measureVals.map(function(cell){ return cell.f; })
-            .join(" ~ ");
-      }
-
-      return selection;
-
-      // --------------
-      // Helper functions
-
-      /** @instance */
-      function addKeyAxisSelectionInfo(axis){
-        var axisInfo = this._allAxesInfo[axis],
-            vals = axesVals[axis];
-
-        if(vals && vals.length){
-          // Dummy property, just to force Analyzer to read the axis info
-          selection[axis] = true;
-          selection[axis + 'Id'] = axisInfo.formulas;
-          selection[axis + 'Item'] = this._buildMdxAbsoluteValues(axisInfo, vals);
-          selection[axis + 'Label'] = this._getAxisValueLabel(axis, vals[vals.length - 1]);
-        }
-      }
-    };
-    
-    pentaho.ccc.CccChart.prototype._buildWhereSpec = function(cccSelections){
-        var whereSpec = [];
-        
-        if(cccSelections.length) {
-            var whereSpec = [];
-            
-            var addDatum = function(datum) {
-                var datumFilter = {};
-                
-                var elems = datum.elem;
-                for(var dimName in elems) {
-                    if(dimName !== 'value') {
-                        datumFilter[dimName] = [elems[dimName].path];
-                    }
                 }
-                
-                whereSpec.push(datumFilter);
-            };
-            
-            cccSelections.forEach(addDatum);
-        }
-        
-        return whereSpec;
-    };
-    
-    /*
-     * DRILLING
-     */
-    pentaho.ccc.CccChart.prototype._drillDown = function(axesVals){
-      /**
-       * Information about the axis and formula to drill on.
-       */
-      var drillInfo = this._getDrillDownInfo(axesVals);
-      if(!drillInfo){
-        // Drilling is disabled OR Nothing to drill on.
-        // A double-click is triggered to support "content linking".
-        pentaho.events.trigger(this, "doubleclick", {
-          source:     this,
-          selections: [this._convertAxesValuesToAnalyzerSelection(axesVals)]
-        });
+              }
+            },
 
-        return false;
-      }
+            // TODO: what's this for? Column/Bar?
+            /* Returns the output parameters of the chart. */
+            getOutputParameters: function() {
+              var params = [];
+              if (this._vizOptions.cccClass == 'pvc.PieChart') {
+                params.push([
+                  this._dataTable.getColumnId( 0 ),
+                  true,
+                  this._dataTable.getColumnId( 0 )
+                ]);
+              } else {
+                for(var j = 0 ; j < this._dataTable.getNumberOfColumns() ; j++) {
+                  params.push([
+                    this._dataTable.getColumnId(j),
+                    true,
+                    this._dataTable.getColumnId(j)
+                  ]);
+                }
+              }
 
-      /**
-       * The context for the click action.
-       * Stores 'KEEP' and 'KEEP_AND_DRILL' instructions.
-       * @see useFormula
-       */
-      var actionContext = [];
+              return params;
+            },
 
-      /**
-       * The set of hierarchy names
-       * already included in 'actionContext'.
-       *
-       * Only one instruction per dimension hierarchy is generated.
-       * Each instruction fixes the value of
-       * the deepest used formula of a hierarchy
-       * to the MDX absolute value present in 'axesVals'.
-       * @see keep
-       * @see useFormula
-       */
-      var usedHierarchiesSet = {};
+            // TODO - is the current selection accounting needed?
+            /* Returns the colors to use.
+             * This needs to take into account selected and unselected items.
+             */
+            getColors: function() {
+              if(this._colors){
+                return this._colors;
+              }
 
-      /* Drill on drillInfo.axis */
-      keepAndDrill.call(this, drillInfo);
+              var colors = null;
 
-      /**
-       * Keep values from hierarchies other than the drilled one.
-       */
-      this._keyAxes.forEach(function(axis){
-        var vals = axesVals[axis];
-        if(vals){
-          keep.call(this, axis, this._allAxesInfo[axis].formulasInfo, vals);
-        }
-      }, this);
+              var paletteMap = this._vizOptions.metrics[0].paletteMap;
+              if(paletteMap) {
+                colors = [];
+                for(var r = 0 ; r < this._dataTable.getNumberOfRows() ; r++) {
+                  var item = this._getTableValue(r, 0);
+                  if(this._selections && this._selections.length > 0) {
+                    var done = false;
+                    for(var selIdx = 0 ; selIdx < this._selections.length ; selIdx++) {
+                      var selection = this._selections[selIdx];
+                      if((selection.type == 'row'    && selection.rowItem == item) ||
+                          (selection.type == 'column' && selection.colId == this._dataTable.getColumnId(1))) {
+                        colors.push(paletteMap[item]);
+                        done = true;
+                        break;
+                      }
+                    }
 
-      // --------------
+                    if(!done) {
+                      // this item is not selected, so make it grey
+                      colors.push( "#bbbbbb" );
+                    }
 
-      // Maintains other existing filters
-      var keepGem = true;
-      this._vizHelper.click(actionContext, keepGem);
+                  } else {
+                    colors.push(paletteMap[item]);
+                  }
+                }
+              }
 
-      return true;
+              return colors;
+            },
 
-      // ----------------
-      // Helper methods
+            /* HELPERS  */
 
-      /** @instance */
-      function keepAndDrill(drillInfo){
-        return useFormula.call(this, drillInfo.formulaInfo, drillInfo.values, 'KEEP_AND_DRILL');
-      }
+            _initOptions: function(vizOptions){
+              // Make a copy
+              vizOptions = this._vizOptions = $.extend({}, vizOptions);
 
-      /** @instance */
-      function keep(axis, formsInfo, vals){
-        if(vals){
-          for(var i = 0, V = vals.length ; i < V ; i++){
-            // Only include formulas of a given hierarchy once
-            var formInfo = formsInfo[i];
-            if(!(formInfo.hierarchy in usedHierarchiesSet)){
-              var deepestInfo = this._getAxisDeepestHierarchyFormula(axis, formInfo.formula, V);
+              // --------------------
 
-              assert(deepestInfo, "At least formInfo must be a possibility.");
+              this._vizHelper = cv.pentahoVisualizationHelpers[vizOptions.customChartType];
 
-              useFormula.call(this, deepestInfo.formulaInfo, vals, 'KEEP');
+              this._hasContentLink = this._vizHelper.isInteractionEnabled() &&
+                  this._vizHelper.hasContentLink();
+
+              // --------------------
+
+              // Store the current selections
+              this._selections = vizOptions.selections;
+
+              this.options = {
+                canvas:     this._elementName,
+                showValues: false,
+
+                legend:  true,
+                legendClickMode:  'toggleSelected',
+                legend2ClickMode: 'toggleSelected', // for data part 2 (lines in column/line combo)
+                titlePosition:    'top',
+
+                paddings: 10,
+
+                animate:      false,
+                showTooltips: true,
+                clickable:    true,
+                selectable:   true,
+                hoverable:    false,
+
+                ctrlSelectMode: false,
+
+                clearSelectionMode: 'manual',
+
+                extensionPoints: {},
+                dimensionGroups: {},
+                dimensions:      {},
+                readers:         [],
+                visualRoles:     {},
+
+                ignoreNulls:   false,
+                crosstabMode: !!vizOptions.crosstabMode,
+                isMultiValued: true,
+                seriesInRows:  false,
+                dataOptions: {
+                  categoriesCount:   1,
+                  measuresInColumns: !!vizOptions.measuresInColumns
+                }
+              };
+
+              /* Copy options */
+              // Just in case
+              vizOptions.height = vizOptions.height || 400;
+              vizOptions.width  = vizOptions.width  || 400;
+
+              for(var x in vizOptions){
+                if(!this._shouldSkipVizOption(x)){
+                  this._configureOption(x, vizOptions[x]);
+                }
+              }
+
+              /* Copy extension points */
+              var vizExtPoints = vizOptions.extensionPoints;
+              if(vizExtPoints){
+                def.copy(this.options.extensionPoints, vizExtPoints);
+              }
+            },
+
+            _message: function(msgId, args){
+              return this._vizHelper.message(msgId, args);
+            },
+
+            _readUserOptions: function(options, vizOptions){
+              // Apply vizOptions to extension points and others
+              var extPoints = options.extensionPoints;
+
+              var value = vizOptions.backgroundFill;
+              if(value && value !== 'NONE'){
+                var fillStyle;
+                if(value === 'GRADIENT'){
+                  if(this._hasMultiChartColumns){
+                    // Use the first color with half of the saturation
+                    var bgColor = pv.color(vizOptions.backgroundColor).rgb();
+                    bgColor = pv.rgb(
+                        ~~((255 + bgColor.r) / 2), // ~~ <=> Math.floor
+                        ~~((255 + bgColor.g) / 2),
+                        ~~((255 + bgColor.b) / 2),
+                        bgColor.a);
+
+                    fillStyle = bgColor;
+                  } else {
+                    fillStyle = 'linear-gradient(to top, ' +
+                        vizOptions.backgroundColor + ', ' +
+                        vizOptions.backgroundColorEnd + ')';
+                  }
+                } else {
+                  fillStyle = vizOptions.backgroundColor;
+                }
+
+                extPoints.base_fillStyle = fillStyle;
+              }
+
+              value = vizOptions.labelColor;
+              if(value !== undefined){
+                extPoints.xAxisLabel_textStyle =
+                    extPoints.yAxisLabel_textStyle =
+                        extPoints.xAxisTitleLabel_textStyle =
+                            extPoints.yAxisTitleLabel_textStyle = value;
+              }
+
+              value = vizOptions.legendColor;
+              if(value !== undefined){
+                extPoints.legendLabel_textStyle = value;
+              }
+
+              // TODO: ignoring white color cause analyzer has no on-off for the legend bg color
+              // and always send white. When the chart bg color is active it
+              // would not show through the legend.
+              value = vizOptions.legendBackgroundColor;
+              if(value && value.toLowerCase() !== "#ffffff"){
+                extPoints.legendArea_fillStyle = value;
+              }
+
+              value = vizOptions.lineWidth;
+              if(value !== undefined){
+                extPoints.line_lineWidth  = +value;      // + -> to number
+                var radius = 3 + 6 * ((+value) / 8); // 1 -> 8 => 3 -> 9,
+                extPoints.dot_shapeSize = radius * radius;
+              }
+
+              value = vizOptions.maxChartsPerRow;
+              if(value !== undefined){
+                options.multiChartMaxColumns = +value; // + -> to number
+              }
+
+              // build style for pv
+              if (vizOptions.labelSize) {
+                var labelFont = readFont(vizOptions, 'label');
+
+                options.axisTitleFont =
+                    options.axisFont = labelFont;
+
+                if(this._hasMultiChartColumns){
+                  var labelFontSize  = readFontSize(vizOptions, 'label');
+                  var labelFontFamily = readFontFamily(vizOptions, 'label');
+                  options.titleFont = (labelFontSize + 2) + "px " + labelFontFamily;
+                }
+              }
+
+              if (vizOptions.legendSize) {
+                options.legendFont = readFont(vizOptions, 'legend');
+              }
+            },
+
+            _processDataTable: function(){
+              // Data truncation can affect also the structure of data.
+              // If the query returns more than 100x100 rowsxcols,
+              // requested measure formulas may be suppressed.
+              // Filter measures not returned in this._dataTable
+              //
+              // Note that there is no guarantee that
+              // when a given measure is not present with a given col value
+              // it will not show up in the next col value
+              // When no row has a value in a given column, the column is omitted...
+              //
+              // Note that measure gems that are in no *chart* gem bar (not mapped)
+              // and that do not have hideInChart=true may appear here as columns.
+              // These are ignored (meaRole === 'undefined').
+              //
+              // Measure columns of the same col values group may come in any order...
+              // and even in different orders across column groups.
+
+              var dataTable = this._dataTable;
+              var dtColCount = dataTable.getNumberOfColumns();
+              var roleToCccDimMap = this._vizOptions.rolesToCccDimensionsMap;
+              var colGroups = [];
+              var colGroupsByColValues = {};
+
+              /*
+               * meaRoleId -> {
+               *   groupIndex: 0, // Global order of measure roles within a column group
+               *   index: 0       // Column index of a measure role's first appearance
+               * }
+               */
+              var measureRolesInfo     = {};
+              var measureRolesInfoList = [];
+
+              /*
+               * id -> { gem info }
+               */
+              var measuresInfo = {};
+              var measuresInfoList = [];
+
+              var rowsInfoList = [];
+              var columnsInfoList = [];
+
+              var tc = 0;
+              var colId, splitColId;
+
+              /*
+               * I - Row gems
+               */
+              while(tc < dtColCount){
+                colId = dataTable.getColumnId(tc);
+                splitColId = splitColGroupAndMeasure(colId);
+
+                if(!processRowColumn.apply(this, splitColId)){
+                  // Found first measure column
+                  break;
+                }
+
+                // next
+                tc++;
+              }
+
+              // First measure column
+              if(tc < dtColCount){
+
+                /*
+                 * II - Column gems
+                 * 
+                 * Collects column gems' roles from the first col~mea column.
+                 */
+                processColumnsInfo.call(this, splitColId[0]);
+
+                /*
+                 * III - Row gems
+                 */
+                while(true){
+                  processMeasureColumn.apply(this, splitColId);
+
+                  // next
+                  if(++tc >= dtColCount){
+                    break;
+                  }
+
+                  colId = dataTable.getColumnId(tc);
+                  splitColId = splitColGroupAndMeasure(colId);
+                }
+              }
+
+              // Sort measure roles
+              measureRolesInfoList.sort(function(infoa, infob){
+                return def.compare(infoa.groupIndex, infob.groupIndex) ||
+                    def.compare(infoa.index,      infob.index) // tie breaker
+                    ;
+              });
+
+              // Reassign role group indexes
+              measureRolesInfoList.forEach(function(roleInfo, index){
+                roleInfo.groupIndex = index;
+              });
+
+              // Publish
+              this._measureRolesInfo = measureRolesInfo;
+              this._measureRolesInfoList = measureRolesInfoList;
+              this._colGroups = colGroups;
+              this._measuresInfo = measuresInfo;
+
+              this._axesGemsInfo = {
+                'measure': measuresInfoList,
+                'row':     rowsInfoList,
+                'column':  columnsInfoList
+              };
+
+
+              /* HELPER functions */
+
+              function processRowColumn(colGroupValues, meaId){
+                if(/\[MEASURE:(\d+)\]$/.test(meaId)){
+                  // Found the first measure column
+                  return false; // It isn't a "row" column
+                }
+
+                // When "Member properties" are shown in a member gem,
+                // additional columns are added to the data table, 
+                // that are to be ignored.
+                // These columns have no column role.
+                // We transform them to 'undefined' role
+                // which is the role value that unmapped measure columns
+                // already have.
+                var roles = getColumnRoles(dataTable, tc);
+
+                // A row gem
+                rowsInfoList.push({
+                  id:      colId,
+                  formula: colId,
+                  label:   dataTable.getColumnLabel(tc),
+                  axis:    'row',
+                  role:    roles ? roles[0] : 'undefined',
+                  index:   rowsInfoList.length
+                });
+
+                return true; // It is a "row" column
+              }
+
+              // Column Roles are the same in every col~measure column.
+              // So we collect them from the first one.
+              function processColumnsInfo(colGroupValues){
+                if(colGroupValues){
+                  var colRoles  = getColumnRoles(dataTable, tc);
+                  var colValues = colGroupValues.split('~');
+                  var meaIndex  = colValues.length - 1;
+
+                  colValues.forEach(function(colValue, index){
+                    columnsInfoList.push({
+                      id:      undefined, // not in data table
+                      formula: undefined, // not in data table
+                      label:   undefined, // not in data table
+                      axis:    'column',
+                      role:    colRoles[index],
+                      index:   index
+                    });
+                  });
+                }
+              }
+
+              function processMeasureColumn(colGroupValues, id){
+
+                var meaInfo = def.getOwn(measuresInfo, id);
+
+                /* New measure? */
+                if(!meaInfo){
+                  var role = getColumnRoles(dataTable, tc).pop(); // TODO - last()
+
+                  meaInfo = {
+                    id:      id,
+                    formula: undefined, // not in data table
+                    label:   splitColGroupAndMeasure(dataTable.getColumnLabel(tc))[1],
+                    axis:    'measure',
+                    role:    role,
+                    index:   measuresInfoList.length,
+                    isUnmapped: role === 'undefined'
+                  };
+
+                  measuresInfo[id] = meaInfo;
+                  measuresInfoList.push(meaInfo);
+                }
+
+                /* New column group? */
+                var colGroup = def.getOwn(colGroupsByColValues, colGroupValues);
+                if(!colGroup){
+                  colGroup = {
+                    index:      tc,
+                    encValues:  colGroupValues,
+                    values:     colGroupValues ? colGroupValues.split('~') : [],
+                    measureIds: [id]
+                  };
+
+                  colGroupsByColValues[colGroupValues] = colGroup;
+                  colGroups.push(colGroup);
+                } else {
+                  colGroup.measureIds.push(id);
+                }
+
+                /* Role */
+                var currMeaIndex = (tc - colGroup.index);
+                var meaRoleInfo  = def.getOwn(measureRolesInfo, meaInfo.role);
+                if(!meaRoleInfo){
+                  meaRoleInfo = {
+                    id:         role,
+                    cccDimName: meaInfo.isUnmapped ?
+                        null :
+                        (roleToCccDimMap[role] ||
+                            def.assert("Must map to CCC all measure roles that the data table contains.")),
+                    groupIndex: currMeaIndex,
+                    index:      tc // first index where role appears (for tie break, see .sort above)
+                  };
+
+                  measureRolesInfo[meaInfo.role] = meaRoleInfo;
+                  measureRolesInfoList.push(meaRoleInfo);
+
+                } else if(currMeaIndex > meaRoleInfo.groupIndex) {
+                  meaRoleInfo.groupIndex = currMeaIndex;
+                }
+              }
+            },
+
+            _initAxes: function(){
+              /* formula, id -> gem */
+              this.gemsMap = {};
+
+              /* axisId -> Axis */
+              this.axes = {};
+
+              this._gemCountColumnReportAxis = 0;
+              this._measureDiscrimGem = null;
+
+              /* Create and configure Axis's */
+              this._axesCreateOrderIds.forEach(createAxis, this);
+
+              var virtualItemIndex = 0;
+              var cccDimNamesSet = {};
+              this._cccVirtualItemAxesLayout.forEach(function(axisId){
+                virtualItemIndex = this.axes[axisId].configure(virtualItemIndex, cccDimNamesSet);
+              }, this);
+
+              /* @instance */
+              function createAxis(axisId){
+
+                var axis = pentaho.ccc.Axis.create(this, axisId);
+
+                axis.gems.forEach(indexGem, this);
+
+                this.axes[axisId] = axis;
+              }
+
+              /* @instance */
+              function indexGem(gem){
+                var form = gem.formula,
+                    id   = gem.id;
+
+                // NOTE: when interaction is disabled...
+                // formula and id aren't available in every axis type...
+
+                // Index by formula
+                if(form){
+                  this.gemsMap[form] = gem;
+                }
+
+                if(id && form !== id){
+                  this.gemsMap[id] = gem;
+                }
+
+                if(gem.reportAxis === 'column'){
+                  this._gemCountColumnReportAxis++;
+                }
+
+                if(gem.isMeasureDiscrim){
+                  this._measureDiscrimGem = gem;
+                }
+              }
+            },
+
+            _readData: function() {
+              this._readDataCrosstab();
+            },
+
+            /**
+             * Creates a CCC resultset in CROSSTAB format.
+             *
+             * Data passes through mostly as it comes;
+             * it's simply translated to CDA format.
+             */
+            _readDataCrosstab: function() {
+              var dataTable = this._dataTable,
+                  colCount = dataTable.getNumberOfColumns(),
+                  rowCount = dataTable.getNumberOfRows();
+
+              // Take the first seriesCount colors from the palette
+              this._colors = colorPalete;//this._vizOptions.palette.colors.slice(0, seriesCount);
+
+              // Direct translation
+              for(var tc = 0 ; tc < colCount ; tc++){
+                this._addCdaMetadata(
+                    dataTable.getColumnId(tc),
+                    dataTable.getColumnLabel(tc),
+                    writeCccColumnDataType(dataTable.getColumnType(tc)));
+              }
+
+              var table = this._resultset = new Array(rowCount);
+              for(var tr = 0; tr < rowCount; tr++) {
+                var row = new Array(colCount);
+
+                for(tc = 0 ; tc < colCount ; tc++){
+                  row[tc] = this._getTableCell(tr, tc);
+                }
+
+                table[tr] = row;
+              }
+            },
+
+            _configure: function(){
+              var options = this.options;
+
+              // By default hide overflow, otherwise,
+              // resizing the window frequently ends up needlessly showing scrollbars.
+              // TODO: is it ok to access "vizOptions.controller.domNode" ?
+              this._vizOptions.controller.domNode.style.overflow = 'hidden'; // Hide overflow
+
+              options.colors = this.getColors();
+
+              if((this.options.legend = this._showLegend())) {
+                this._configureLegend();
+              }
+
+              if(this._hasMultiChartColumns) {
+                this._configureMultiChart();
+              }
+
+              options.axisFont = defaultFont(options.axisFont, 12);
+              options.axisTitleFont = defaultFont(options.axisTitleFont, 12);
+
+              if(!this._vizHelper.isInteractionEnabled()){
+                options.showTooltips = false;
+                options.clickable    = false;
+                options.selectable   = false;
+                options.hoverable    = false;
+              } else {
+                if(options.showTooltips){
+                  this._configureTooltip();
+                }
+
+                if((options.selectable = this._canSelect())){
+                  this._configureSelection();
+                }
+
+                this._configureDoubleClick();
+              }
+            },
+
+            _configureMultiChart: function(){
+              var options = this.options;
+
+              // Let the vertical scrollbar show up if necessary
+              var containerStyle = this._vizOptions.controller.domNode.style;
+              containerStyle.overflowX = 'hidden';
+              containerStyle.overflowY = 'auto';
+
+              options.multiChartMax = 50; // TODO: hardcoded multichart items limit
+
+              // Very small charts can't be dominated by text...
+              //options.axisSizeMax = '30%';
+
+              var titleFont = defaultFont(options.titleFont, 12);
+              if(titleFont && !(/black|(\bbold\b)/i).test(titleFont)){
+                titleFont = "bold " + titleFont;
+              }
+
+              options.titleFont = titleFont;
+            },
+
+            _configureTooltip: function(){
+              var me = this;
+//            this.options.tooltipFormat = function(scene){
+//                return me._getTooltipText(scene.datum, this);
+//            };
+              this.options.tooltipFormat = function(s, c, v, datum){
+                return me._getTooltipText(datum, this);
+              };
+            },
+
+            _canSelect: function(){
+              if(!this.options.selectable){
+                return false;
+              }
+
+              // Selection is disabled if 2 or more reportAxis='column' gems exist
+              if(this._gemCountColumnReportAxis >= 2){
+                return false;
+              }
+
+              return true;
+            },
+
+            _configureSelection: function(){
+              var me = this;
+              this.options.userSelectionAction = function(cccSelections){
+                return me._onUserSelection(cccSelections);
+              };
+              this.options.selectionChangedAction = function(cccSelections){
+                me._onSelectionChanged(cccSelections);
+              };
+            },
+
+            _configureDoubleClick: function(){
+              var me = this;
+//            this.options.doubleClickAction = function(scene){
+//                me._onDoubleClick(scene.datum);
+//            };
+//
+//            this.options.axisDoubleClickAction = function(scene) {
+//                var group = scene.group;
+//                if(group){
+//                    return me._onDoubleClick(group);
+//                }
+//            };
+              this.options.doubleClickAction = function(s, c, v, ev){
+                me._onDoubleClick(this.scene.datum, this);
+              };
+
+              this.options.axisDoubleClickAction = function(group) {
+                if(group instanceof pvc.data.Complex){
+                  return me._onDoubleClick(group);
+                }
+              };
+            },
+
+            _showLegend: function(){
+              if(!this.options.legend){
+                return false;
+              }
+
+              if(this.axes.measure.genericMeasuresCount > 1){
+                return true;
+              }
+
+              var colAxis = this.axes.column,
+                  cccColDimGroup = this._vizOptions.rolesToCccDimensionsMap[colAxis.defaultRole];
+
+              if(!cccColDimGroup || colAxis.realDepth > 0){
+                return true;
+              }
+
+              return false;
+            },
+
+            _configureLegend: function(){
+              var options = this.options;
+
+              options.legendFont = defaultFont(options.legendFont, 10);
+
+              var legendPosition = options.legendPosition,
+                  isTopOrBottom = legendPosition === 'top' || legendPosition === 'bottom';
+
+              if(this._hasMultiChartColumns && !isTopOrBottom){
+                options.legendAlignTo  = 'page-middle';
+                options.legendInBounds = true; // ensure it is not placed off-page
+
+                var legendMargins = options.legendMargins;
+                if(legendMargins){
+                  if(typeof(legendMargins) !== 'object'){
+                    legendMargins = options.legendMargins = {all: legendMargins};
+                  }
+                } else {
+                  legendMargins = options.legendMargins = {};
+                }
+
+                legendMargins.top = 20;
+              }
+
+              if(!('legendAlign' in options)){
+                // Calculate 'legendAlign' default value
+                if(isTopOrBottom){
+                  options.legendAlign = 'center';
+                } else {
+                  options.legendAlign = 'middle';
+                }
+              }
+            },
+
+            // TODO - probably the skip logic should be inverted,
+            // this would be specified in terms of inclusion of CCC options.
+            _shouldSkipVizOption: function(option){
+              return (option in _skipVizOptions);
+            },
+
+            _configureOption: function(x, v){
+              // Change 'x' and/or 'v'
+              switch(x){
+                case 'legendPosition':
+                  v = v && v.toLowerCase();
+                  break;
+
+                case 'showLegend':
+                  x = 'legend';
+                  v = (('' + v) === 'true');
+                  break;
+
+                case 'legendSize':
+                case 'lineWidth':
+                  v = parseFloat(v);
+                  break;
+              }
+
+              this.options[x] = v;
+            },
+
+            // Logic that depends on width and height
+            _prepareLayout: function(options){
+              if(this._hasMultiChartColumns && pv.renderer() !== 'batik'){
+                // Account for the *possible* toolbar width
+                options.width -= 17; // assuming 18px is the minimum value (slight chart overlap)
+              }
+            },
+
+            _render: function(){
+              while(this._element.firstChild) {
+                this._element.removeChild(this._element.firstChild);
+              }
+
+              this._currentChartType = this._vizOptions.cccClass;
+
+              var chartClass = def.getPath({pvc: pvc}, this._currentChartType);
+
+              this._chart = new chartClass(this.options);
+              this._chart.setData({
+                metadata:  this._metadata,
+                resultset: this._resultset
+              });
+
+              this._chart.render();
+            },
+
+            /* INTERACTIVE - TOOLTIPS */
+
+            _getTooltipText: function(complex, context){
+              var tooltipLines = [];
+
+              this._axesIds.forEach(function(axisId){
+                this.axes[axisId].buildHtmlTooltip(tooltipLines, complex, context);
+              }, this);
+
+              if(this._hasContentLink){
+                /* Add content link information to the tooltip. */
+                msg = this._message('chartTooltipFooterContentlink');
+
+                tooltipLines.push(msg);
+              } else {
+                /* Add hyperlink information to the tooltip. */
+                var hyperlinkInfo = this._getHyperlinkInfo(complex);
+                var msg;
+                if(hyperlinkInfo){
+                  msg = this._message(
+                      'chartTooltipFooterHyperlink', [
+                        def.html.escape(hyperlinkInfo.gem.linkLabel || this._message('chartTooltipHyperlinkDefaultTitle'))
+                      ]);
+
+                  tooltipLines.push(msg);
+                } else {
+
+                  /* Add drill-down information to the tooltip. */
+                  var drillDownInfo = this._getDrillDownInfo(complex);
+                  if(drillDownInfo){
+                    msg = this._message(
+                        'chartTooltipFooterDrillDown', [
+                          def.html.escape(this._vizHelper.getFormulaLabel(drillDownInfo.drillChild))
+                        ]);
+
+                    tooltipLines.push(msg);
+                  }
+                }
+              }
+
+              /* Add selection information */
+              // Not the data point count, but the selection count (a single column selection may select many data points).
+              //var selectedCount = this._chart && this._chart.data.selectedCount();
+              var selections = this._vizOptions.controller.highlights;
+              var selectedCount = selections && selections.length;
+              if(selectedCount){
+                var msgId = selectedCount === 1 ?
+                    'chartTooltipFooterSelectedSingle' :
+                    'chartTooltipFooterSelectedMany';
+
+                msg = this._message(msgId, [selectedCount]);
+
+                tooltipLines.push(msg);
+              }
+
+              return tooltipLines.join('<br />');
+            },
+
+            /* INTERACTIVE - SELECTION */
+
+            _onUserSelection: function(selectingDatums){
+              return this._processSelection(selectingDatums);
+            },
+
+            _getSelectionKey: function(selection){
+              var key = selection.__cccKey;
+              if(!key){
+                var keys = [selection.type];
+
+                var ap = def.array.append;
+                if(selection.columnId){
+                  ap(keys, selection.columnId);
+                  ap(keys, selection.columnItem);
+                }
+
+                if(selection.rowId){
+                  ap(keys, selection.rowId);
+                  ap(keys, selection.rowItem);
+                }
+
+                key = selection.__cccKey = keys.join('||');
+              }
+
+              return key;
+            },
+
+            _doesSharedSeriesSelection: function(){
+              return (this._gemCountColumnReportAxis === 1);
+            },
+
+            _onSelectionChanged: function(selectedDatums){
+
+              if(!this.options.selectable){
+                return;
+              }
+
+              // Convert to array of analyzer cell or column selection objects
+              var selectionExcludesMulti = this._selectionExcludesMultiGems();
+
+              var selections = [];
+              var selectionsByKey = {};
+
+              if(this._doesSharedSeriesSelection()){
+                selectedDatums.forEach(function(datum){
+                  var selection = { type: 'column' };
+
+                  this.axes.column.fillCellSelection(selection, datum, selectionExcludesMulti);
+
+                  // Check if there's already a selection with the same key.
+                  // If not, add a new selection to the selections list.
+                  // In the case where the selection max count limit is reached,
+                  // the datums included in each selection must be known (by its index).
+                  // So, add the datum to the new or existing selection's datums list.
+
+                  var key = this._getSelectionKey(selection);
+
+                  var existingSelection = selectionsByKey[key];
+                  if(!existingSelection){
+                    selection.__cccDatums = [datum];
+
+                    selectionsByKey[key] = selection;
+                    selections.push(selection);
+                  } else {
+                    existingSelection.__cccDatums.push(datum);
+                  }
+                }, this);
+
+              } else {
+                // Duplicates may occur due to excluded dimensions like the discriminator
+                selectedDatums.forEach(function(datum){
+                  var selection = this._complexToCellSelection(datum, selectionExcludesMulti);
+
+                  // Check if there's already a selection with the same key.
+                  // If not, add a new selection to the selections list.
+                  var key = this._getSelectionKey(selection);
+                  var existingSelection = selectionsByKey[key];
+                  if(!existingSelection){
+                    selection.__cccDatums = datum;
+
+                    selectionsByKey[key] = selection;
+                    selections.push(selection);
+                  }
+                }, this);
+              }
+
+              selections = this._limitSelection(selections);
+
+              // Launch analyzer select event, even if selection is empty (to clear it)
+              pentaho.events.trigger(this, "select", {
+                source:        this,
+                selections:    selections,
+                selectionMode: "REPLACE"
+              });
+            },
+
+            _limitSelection: function(selections){
+              // limit selection
+              var selections2 = selections;
+              var L = selections.length;
+              var deselectCount = L - _filterSelectionMaxCount;
+              if(deselectCount > 0) {
+                // Build a list of datums to deselect
+                var deselectDatums = [];
+                selections2 = [];
+
+                for(var i = 0 ; i < L ; i++){
+                  var selection = selections[i];
+                  var keep = true;
+                  if(deselectCount){
+                    if(this._previousSelectionKeys){
+                      var key = this._getSelectionKey(selection);
+                      if(!this._previousSelectionKeys[key]){
+                        keep = false;
+                      }
+                    } else if(i >= _filterSelectionMaxCount) {
+                      keep = false;
+                    }
+                  }
+
+                  if(keep){
+                    selections2.push(selection);
+                  } else {
+                    var datums = selection.__cccDatums;
+                    if(datums){
+                      if(def.array.is(datums)){
+                        def.array.append(deselectDatums, datums);
+                      } else {
+                        deselectDatums.push(datums);
+                      }
+                    }
+                    deselectCount--;
+                  }
+                }
+
+                // Deselect datums beyond the max count
+                pvc.data.Data.setSelected(deselectDatums, false);
+
+                // Mark for update UI ASAP
+                this._chart.updateSelections();
+
+                this._vizHelper.showConfirm([
+                  'infoExceededMaxSelectionItems',
+                  _filterSelectionMaxCount
+                ],
+                    'SELECT_ITEM_LIMIT_REACHED');
+              }
+
+              // Index with the keys of previous selections
+              this._previousSelectionKeys =
+                  def.query(selections2)
+                      .object({
+                        name:    function(selection){ return this._getSelectionKey(selection); },
+                        value:   def.retTrue,
+                        context: this
+                      });
+
+              return selections2;
+            },
+
+            /**
+             * By default, the keep only or the exclude menu operations
+             * do not select level gems playing a multi role.
+             *
+             * The same applies to the the drill down operation,
+             * that, by default, does not KEEP level gems playing
+             * a multi role.
+             * Note that a gem playing a multi role
+             * can itself be drilled on.
+             */
+            _selectionExcludesMultiGems: function(){
+              return true;
+            },
+
+            _processSelection: function(selectedDatums){
+              /**
+               * Selection rules.
+               *
+               * -> gems with (chart)axis="measure" are excluded
+               *
+               * -> gems playing a "multi" role are excluded (!except in the pie chart!)
+               *    -> this way, points with common category data in
+               *       different small charts are simultaneously selected
+               *
+               * -> measure discriminator gems are excluded
+               *    this way, selection is always expanded to other series of different measures
+               *
+               * this._gemCountColumnReportAxis :
+               *
+               * -> if there are no gems with reportAxis='column':
+               *    -> that's it. (most granular selection s available)
+               *
+               * -> if there is a single gem with reportAxis='column': (!except in the HG chart!)
+               *    -> gems with (chart)axis="row" are excluded
+               *       (selecting one point selects every other point of the same "series")
+               *
+               * -> if there is more that one gem with reportAxis='column':
+               *    -> selection is disabled as a whole
+               *       (in this case, code doesn't even enter here)
+               *
+               */
+              /**
+               * Example CCC "where" specification:
+               * <pre>
+               * whereSpec = [
+               *     // Datums whose series is 'Europe' or 'Australia',
+               *     // and whose category is 2001 or 2002
+               *     {series: ['Europe', 'Australia'], category: [2001, 2002]},
+               *
+               *     // Union'ed with
+               *
+               *     // Datums whose series is 'America'
+               *     {series: 'America'},
+               * ];
+               * </pre>
+               */
+              var whereSpec;
+
+              if(selectedDatums.length){
+                var selectionExcludesMulti = this._selectionExcludesMultiGems();
+
+                // Include axis="column" dimensions
+                // * Excludes measure discrim dimensions
+                // * Excludes "multi" role dimensions
+                var colDimNames = this.axes.column.getSelectionGems(selectionExcludesMulti)
+                    .select(function(gem){ return gem.cccDimName; })
+                    .array();
+
+                var rowDimNames;
+                if(!this._gemCountColumnReportAxis){
+                  // Include axis="row" dimensions
+                  // * Excludes "multi" role dimensions
+                  rowDimNames = this.axes.row.getSelectionGems(selectionExcludesMulti)
+                      .select(function(gem){ return gem.cccDimName; })
+                      .array();
+                }
+
+                if(!colDimNames.length && (!rowDimNames || !rowDimNames.length)){
+                  selectedDatums = [];
+                } else {
+                  whereSpec = [];
+
+                  selectedDatums.forEach(addDatum);
+
+                  // Replace
+                  selectedDatums = this._chart.data
+                      .datums(whereSpec, {visible: true})
+                      .array();
+                }
+              }
+
+              function addDatum(datum) {
+                if(!datum.isNull){
+
+                  var datumFilter = {};
+
+                  var atoms = datum.atoms;
+
+                  if(colDimNames){
+                    colDimNames.forEach(addDim);
+                  }
+
+                  if(rowDimNames){
+                    rowDimNames.forEach(addDim);
+                  }
+
+                  whereSpec.push(datumFilter);
+                }
+
+                function addDim(dimName) {
+                  // The atom itself may be used as a value condition
+                  datumFilter[dimName] = atoms[dimName];
+                }
+              }
+
+              return selectedDatums;
+            },
+
+            /* INTERACTIVE - DOUBLE-CLICK */
+
+            _onDoubleClick: function(complex){
+              /* A double-click is triggered to support "content linking" */
+              if(this._hasContentLink){
+                this._followContentlink(complex);
+                return true;
+              }
+
+              /* Information about the axis and formula to follow hyperlink. */
+              var hyperlinkInfo = this._getHyperlinkInfo(complex);
+              if(hyperlinkInfo){
+                this._followHyperlink(hyperlinkInfo, complex);
+                return true;
+              }
+
+              /* Information about the axis and formula to drill on. */
+              var drillInfo = this._getDrillDownInfo(complex);
+              if(drillInfo){
+                this._drillDown(drillInfo, complex);
+                return true;
+              }
+
+              return false;
+            },
+
+            _followContentlink: function(complex){
+              // Add every level gem with content link to the action context
+              var actionContext =
+                      def
+                          .query(this._drillAxesIds)
+                          .selectMany(function(axisId){
+                            return this.axes[axisId]
+                                .selectGemsWithLink('DASHBOARD', complex, /* reverse */ false);
+                          }, this)
+                          .select(function(gem){
+                            return {
+                              clickLevel: true,
+                              formula:    gem.formula,
+                              member:     complex.atoms[gem.cccDimName].value
+                            };
+                          })
+                          .array()
+                  ;
+
+              if(actionContext.length){ // J.I.C.
+                this._vizHelper.link(actionContext);
+              }
+            },
+
+            _hyperlinkTypes: {FILE: 1, URL: 1},
+
+            _followHyperlink: function(hyperlinkInfo, complex){
+              var actionContext =
+                      def
+                          .query(this._drillAxesIds)
+                          .selectMany(function(axisId){
+                            return this.axes[axisId].selectBoundGems(complex);
+                          }, this)
+                          .select(function(gem){
+                            return {
+                              clickLevel: (hyperlinkInfo.gem === gem),
+                              formula:    gem.formula,
+                              member:     complex.atoms[gem.cccDimName].value
+                            };
+                          })
+                          .array()
+                  ;
+
+              this._vizHelper.link(actionContext);
+            },
+
+            _drillDown: function(drillInfo, complex){
+              /**
+               * The context for the click action.
+               * Stores 'KEEP' and 'KEEP_AND_DRILL' instructions.
+               *
+               * @see useGem
+               */
+              var actionContext = [];
+
+              var drillGem = drillInfo.gem;
+              var selectionExcludesMulti = this._selectionExcludesMultiGems();
+
+              this._keyAxesIds.forEach(keepAxisHierarchies, this);
+
+              // --------------
+
+              this._vizHelper.click(actionContext, /* keepGem */ true);
+
+              // ----------------
+              // Helper methods
+
+              /** @instance */
+              function keepAxisHierarchies(axisId){
+                // It is possible to KEEP_AND_DRILL on a multi level.
+                // But, otherwise, a multi level is not KEPT.
+                // The exception to the previous rule are 
+                // the levels of the special multi-pie role. 
+                this.axes[axisId]
+                    .getKeepOrDrillGems(drillGem, selectionExcludesMulti)
+                    .each(function(gem){
+                      // KEEP or KEEP_AND_DRILL
+                      if(gem === drillGem){
+                        useGem(gem, drillInfo.atom, 'KEEP_AND_DRILL');
+                      } else if(!gem.isMeasureDiscrim){
+                        var atom = getGemAtom(gem, complex);
+                        if(atom){
+                          useGem(gem, atom, 'KEEP');
+                        }
+                      }
+                    });
+              }
+
+              /** @static */
+              function useGem(gem, atom, action){
+                actionContext.push({
+                  action:  action,
+                  formula: gem.formula,
+                  member:  atom.value,
+                  caption: def.html.escape(atom.label)
+                });
+              }
+
+              /** @static */
+              function getGemAtom(gem, complex){
+                var cccDimName;
+                if(complex && (cccDimName = gem.cccDimName)){
+                  var atom = complex.atoms[cccDimName];
+                  if(atom && atom.value != null){
+                    return atom;
+                  }
+                }
+
+                return null;
+              }
+            },
+
+            _getHyperlinkInfo: function(complex){
+              /* Find an axis to hyperlink on.
+               * The order of search is that of #_drillAxesIds.
+               */
+              return def.query(this._drillAxesIds)
+                  .select(function(axisId){
+                    return this.axes[axisId].getHyperlinkInfo(complex);
+                  }, this)
+                  .where(def.notNully)
+                  .first() || null;
+            },
+
+            _getDrillDownInfo: function(complex){
+              /* Find an axis to drill on.
+               * The order of search is that of #_drillAxesIds.
+               */
+              return def.query(this._drillAxesIds)
+                  .select(function(axisId){
+                    return this.axes[axisId].getDrillDownInfo(complex);
+                  }, this)
+                  .where(def.notNully)
+                  .first() || null;
+            },
+
+            /* UTILITY */
+
+            /**
+             * Converts a complex to an analyzer cell selection.
+             *
+             * An analyzer cell selection has the following structure:
+             * {
+             *    type:     'cell',
+             *
+             *    column:      table column index ??
+             *    columnId:    ["[Time].[Years]", "[Time].[Quarters]"   ], // formulas
+             *    columnItem:  ["[Time].[2003]",  "[Time].[2003].[QTR4]"], // values
+             *    columnLabel: "2003~QTR4~Sales",
+             *
+             *    row:          table row index ??
+             *    rowId:       ["[Markets].[Territory]", "[Order Status].[Type]"    ]  // formulas
+             *    rowItem:     ["[Markets].[EMEA]",      "[Order Status].[Resolved]"], // values
+             *    rowLabel:    "Type",
+             *
+             *    value:       28550.59 // formatted joined by ~ ?
+             * }
+             */
+            _complexToCellSelection: function(complex, selectionExcludesMulti){
+              /* The analyzer cell-selection object */
+              var selection = { type: 'cell' };
+
+              /* Add each axis' formulas to the selection */
+              this._axesIds.forEach(function(axisId){
+                this.axes[axisId].fillCellSelection(selection, complex, selectionExcludesMulti);
+              }, this);
+
+              return selection;
+            },
+
+            /**
+             * Gets the child formula in the given formula's hierarchy.
+             */
+            getChildFormula: function(hForm){
+              var hForms = this._getHierarchyFormulas(hForm,
+                  /* includeHidden:   */ false,
+                  /* excludeChildren: */ false);
+
+              if(hForms){
+                var index = hForms.indexOf(hForm);
+                if(index >= 0){
+                  return hForms[index + 1] || null;
+                }
+              }
+
+              return null;
+            },
+
+            _getHierarchyFormulas: function(formula, includeHidden, excludeChildren){
+              // This was very slow when not cached
+              var hForms;
+              var key = formula + "|" + (!!includeHidden) + "|" + (!!excludeChildren);
+
+              if(!this._hierarchyFormulaCache) {
+                this._hierarchyFormulaCache = {};
+              } else {
+                hForms = this._hierarchyFormulaCache[key];
+              }
+
+              if(!hForms) {
+                hForms = this._vizHelper.getHierarchyFormulas(formula, includeHidden, excludeChildren);
+                this._hierarchyFormulaCache[key] = hForms;
+              }
+
+              return hForms;
+            },
+
+            _addCdaMetadata: function(colName, colLabel, colType) {
+              this._metadata.push({
+                colIndex: this._metadata.length,
+                colName:  colName,
+                colLabel: colLabel,
+                colType:  colType
+              });
+            },
+
+            _getTableCell: function(tr, tc) {
+              var cell = this._dataTable._getCell(tr, tc);
+              if(!cell){
+                return null;
+              }
+
+              var value = cell.v;
+              if(value == null || value === '-') {
+                return null;
+              }
+
+              return {
+                v: value,
+                f: cell.f
+              };
+            },
+
+            _getTableValue: function(tr, tc) {
+              var cell = this._getTableCell(tr, tc);
+              return cell ? cell.v : ceff.f;
             }
-          }
-        }
-      }
+          });
 
-      /** @instance */
-      function useFormula(formInfo, vals, action){
-        usedHierarchiesSet[formInfo.hierarchy] = true;
+      // Cartesian
+      def
+          .type('pentaho.ccc.CartesianChart', pentaho.ccc.Chart)
+          .add({
+            _configure: function(){
 
-        var axisInfo = formInfo.axis,
-            hvalue = this._buildMdxAbsoluteValue(axisInfo, formInfo.index, vals);
+              this.base();
 
-        actionContext.push({
-          action:  action,
-          formula: formInfo.formula,
-          member:  hvalue,
-          caption: escapeHtml(axisInfo.valueLabel[hvalue])
-        });
-      }
-    };
+              this._configureAxesDisplayUnits();
 
-    pentaho.ccc.CccChart.prototype._getDrillDownInfo = function(axesVals){
-      if(!this._vizHelper.isDrillEnabled()){
-        return null;
-      }
+              if(this._showAxisTitle('base')){
+                this._configureAxisTitle('base',  this._getBaseAxisTitle ());
+              }
 
-      /**
-       * Find an axis to drill on.
-       * The order of search is that of 'this._keyAxes'.
-       */
-      for(var i = 0 ; i < this._drillAxes.length ; i++){
-        var axis = this._drillAxes[i],
-            drillInfo = this._getAxisDrillDownInfo(
-                this._allAxesInfo[axis],
-                axesVals[axis]);
+              if(this._showAxisTitle('ortho')){
+                this._configureAxisTitle('ortho', this._getOrthoAxisTitle());
+              }
+            },
 
-        if(drillInfo){
-          return drillInfo;
-        }
-      }
+            _showAxisTitle: def.fun.constant(true),
 
-      return null;
-    };
+            _getOrthoAxisTitle: def.noop,
 
-    // 1) Take the formula corresponding to
-//     the last specified value in 'vals' of axis - name it: LVF.
-//     That value is the value that the user double-clicked on.
-//
-//     'vals' may contain fewer values than formulas of the axis.
-//     The ones available are matched to formulas by index.
-//     (This happens when a hierarchy node that is not the deepest is double-clicked)
-//
-// 2) Get its hierarchy id - HID
-//
-//    There might be fomulas in this axis,
-//    that are from the same hierarchy - HID - as LVF,
-//    that are descendants of LVF,
-//    but
-//    that are placed above it
-//    (formulas of an axis may be placed in any order...)
-//
-// 3) From the formulas in the axis,
-//    that have the hierarchy HID,
-//    get the one that no other is descendant of - the deepest (it may be LVF).
-//
-//    This is done using meta-information about a formula hierarchy
-//    that provides the hierarchy level of each formula.
-//
-// Suppose that there are N formulas of the desired hierarchy HID.
-//
-// In case the axis contains N formulas of a hierarchy but
-//    the supplied values only
-// Drill on the *hierarchy* of the last form in vals
-    pentaho.ccc.CccChart.prototype._getAxisDrillDownInfo = function(axisInfo, vals){
-      // Drilling requires fixing all values in 'vals'.
-      // If there are no values...then there is nothing to drill-on
-      var V;
-      if(axisInfo && axisInfo.depth && vals && (V = vals.length)){
-        var formInfo = axisInfo.formulasInfo[V - 1];
-        if(formInfo){
-          var drillInfo = this._getAxisDeepestHierarchyFormula(axisInfo.id, formInfo.formula, V);
-          if(drillInfo && drillInfo.directChild){
-            // Make deepestInfo into a drillInfo.
-            drillInfo.values = vals;
-            return drillInfo;
-          }
-        }
-      }
+            _getBaseAxisTitle:  def.noop,
 
-      return null;
-    };
+            _configureAxisTitle: function(axisType, title){
+              var unitsSuffix = this._cartesianAxesDisplayUnitsText[axisType];
 
-    /**
-     * Finds the formula in 'forms',
-     * that is of the same hierarchy of the form 'hierarchyForm',
-     * and is the deepest.
-     * If 'maxDepth' is specified, then, additionally,
-     * that form must have an index in 'forms' that is less than 'maxDepth'.
-     *
-     * Returns the following information, about the found form, if any:
-     * <pre>
-     * var deepestInfo = {
-     *    formulaInfo: the deepest formula info object
-     *    directChild: "[child formula]" // the direct child formula of .formula, if any
-     * };
-     * </pre>
-     */
-    pentaho.ccc.CccChart.prototype._getAxisDeepestHierarchyFormula = function(axis, formulaOfHierarchy, maxDepth){
-      var hForms = this._vizHelper.getHierarchyFormulas(
-          formulaOfHierarchy,
-          /* includeHidden:   */ false,
-          /* excludeChildren: */ false);
-      if(hForms){
-        if(maxDepth == null){
-          maxDepth = Infinity;
-        }
+              title = def.string.join(" - ", title, unitsSuffix);
 
-        for(var i = hForms.length - 1 ; i >= 0  ; i--){
-          var hFormInfo = this._formulasInfo[hForms[i]];
-          if(hFormInfo && hFormInfo.axis.id === axis && hFormInfo.index < maxDepth){
-            // Belongs to the axis' forms and is within allowed depth
-            return {
-              formulaInfo: hFormInfo,
-              directChild: hForms[i + 1] || null // undefined -> null conversion
-            };
-          }
-        }
-      }
+              if(title){
+                var options = this.options;
+                options[axisType + 'AxisTitle'] = title;
+              }
+            },
 
-      return null;
-    };
+            _getMeasureRoleTitle: function(measureRole){
+              var title = "";
 
-    pentaho.ccc.CccChart.prototype._buildMdxAbsoluteValues = function(axisInfo, vals){
-      return vals.map(function(/** @ignore */val, index){
-        return this._buildMdxAbsoluteValue(axisInfo, index, vals);
-      }, this);
-    };
+              var measureAxis = this.axes.measure;
+              var singleAxisGem;
+              if(!measureRole){
+                if(this.axes.measure.genericMeasuresCount === 1){
+                  singleAxisGem = measureAxis.gemsByRole[measureAxis.defaultRole][0];
+                }
+              } else {
+                var roleGems = measureAxis.gemsByRole[measureRole];
+                if(roleGems.length === 1){
+                  singleAxisGem = roleGems[0];
+                }
+              }
 
-    pentaho.ccc.CccChart.prototype._buildMdxAbsoluteValue = function(
-        axisInfo,
-        targetIndex,
-        vals){
+              if(singleAxisGem){
+                title += singleAxisGem.label;
+              }
 
-      var targetVal = vals[targetIndex];
+              return title;
+            },
 
-      // Empty value or
-      // already an MDX absolute value?
-      if(targetVal == null ||
-          targetVal === ''  ||
-          targetVal.charAt(0) === "["){
-        return targetVal;
-      }
+            _configureAxisRange: function(primary, axisType){
+              var vizOptions = this._vizOptions,
+                  suffix = primary ? '' : 'Secondary';
 
-      var targetFormInfo = axisInfo.formulasInfo[targetIndex],
-          mdxVals = [ wrapMdxValue(targetFormInfo.hierarchy) ],
-          L = vals.length;
+              if(vizOptions['autoRange' + suffix] !== 'true'){
+                var limit = vizOptions['valueAxisLowerLimit' + suffix];
+                if(limit != null){
+                  this.options[axisType + 'AxisFixedMin'] = limit;
+                  this.options[axisType + 'AxisOriginIsZero'] = false;
+                }
 
-      // Traverse all ascendant formulas down to (including) 'targetFormInfo.formula'
-      var hForms = this._vizHelper.getHierarchyFormulas(
-          targetFormInfo.formula,
-          /* includeHidden:   */ false,
-          /* excludeChildren: */ true);
-      if(hForms){
-        hForms.forEach(function(levelForm){
-          var formInfo = this._formulasInfo[levelForm];
-          if(formInfo && formInfo.axis === axisInfo && formInfo.index < L){
-            mdxVals.push(wrapMdxValue(vals[formInfo.index]));
-          }
-          // Assume the value is not relevant :-/ ??
-        }, this);
-      }
+                limit = vizOptions['valueAxisUpperLimit' + suffix];
+                if(limit != null){
+                  this.options[axisType + 'AxisFixedMax'] = limit;
+                }
+              }
+            },
 
-      return mdxVals.join(".");
-    };
+            _cartesianAxesDisplayUnitsText: null,
 
-    function wrapMdxValue(value){
-      value = '' + pvc.nullTo(value, '');
-      if(!value || value.charAt(0) !== "["){
-        value = '[' + value + ']';
-      }
+            _configureAxesDisplayUnits: function(){
+              this._cartesianAxesDisplayUnitsText = {};
+            },
 
-      return value;
-    }
+            _configureAxisDisplayUnits: function(primary, axisType, allowFractional){
+              if(!allowFractional){
+                this.options[axisType + 'AxisTickExponentMin'] = 0; // 10^0 => 1
+              }
 
-    /*
-     setHighlights
-     Sets the items on the chart that should be highlighted
-     */
-    pentaho.ccc.CccChart.prototype.setHighlights = function(selections) {
-      if(!this._ownChange){ // reentry control
-        this._selections = selections;
-        if(this._chart.clearSelections && (!selections || selections.length == 0)){
-          // will cause selectionChangedAction being called
-          this._ownChange = true;
-          try{
-            this._chart.clearSelections();
-          } finally{
-            this._ownChange = false;
-          }
-        }
+              var text;
+              var displayUnits = this._vizOptions['displayUnits' + (primary ? '' : 'Secondary')];
+              if(displayUnits && displayUnits !== 'UNITS_0'){
 
-//        if(this._dataTable && this._vizOptions) {
-//        //disabled   this.draw(this._dataTable, this._vizOptions);
-//        }
-      }
-    };
+                var match = displayUnits.match(/^UNITS_(\d+)$/) ||
+                    def.fail.argumentInvalid('displayUnits');
+                //var exponent = +match[1]; // + -> to number
 
-// TODO: what's this for? Column/Bar?
-    /*
-     getOutputParameters
-     Returns the output parameters of the chart.
-     */
-    pentaho.ccc.CccChart.prototype.getOutputParameters = function() {
+                text = this._message('dlgChartOption_' + displayUnits);
+              }
 
-      var params = [];
-      if (this._vizOptions.cccClass == 'pvc.PieChart') {
-        params.push( [
-          this._dataTable.getColumnId( 0 ),
-          true,
-          this._dataTable.getColumnId( 0 )
-        ]);
-      } else {
-        for(var j = 0 ; j < this._dataTable.getNumberOfColumns() ; j++) {
-          params.push( [
-            this._dataTable.getColumnId(j),
-            true,
-            this._dataTable.getColumnId(j)
-          ]);
-        }
-      }
+              this._cartesianAxesDisplayUnitsText[axisType] = text || "";
+            }
+          });
 
-      return params;
-    };
+      // Categorical
+      def
+          .type('pentaho.ccc.CategoricalContinuousChart', pentaho.ccc.CartesianChart)
+          .add({
+            _showAxisTitle: function(type){
+              return !this._hasMultiChartColumns || type === 'ortho';
+            },
 
-    pentaho.ccc.CccChart.prototype.resize = function(width, height){
-      var vizOptions = this._originalVizOptions;
+            _getOrthoAxisTitle: function(){
+              return this._getMeasureRoleTitle();
+            },
 
-      vizOptions.width  = width;
-      vizOptions.height = height;
-      vizOptions.isResize = true;
-      this.draw(this._dataTable, vizOptions);
-    };
+            _getBaseAxisTitle: function(){
+              return this.axes.row.getAxisLabel();
+            },
 
-// TODO - is the current selection accounting needed?
-    /*
-     getColors
-     Returns the colors to use.
-     This needs to take into account selected and unselected items.
-     */
-    pentaho.ccc.CccChart.prototype.getColors = function() {
-      if(this._colors){
-        return this._colors;
-      }
+            _configure: function(){
+              this.base();
 
-      var colors = null;
+              this._configureAxisRange(/*isPrimary*/true, 'ortho');
+            },
 
-      var paletteMap = this._vizOptions.metrics[0].paletteMap;
-      if(paletteMap) {
-        colors = [];
-        for(var r = 0 ; r < this._dataTable.getNumberOfRows() ; r++) {
-          var item = this._dataTable.getValue(r,0);
-          if(this._selections && this._selections.length > 0) {
-            var done = false;
-            for(var selIdx = 0 ; selIdx < this._selections.length ; selIdx++) {
-              var selection = this._selections[selIdx];
-              if((selection.type == 'row'    && selection.rowItem == item) ||
-                  (selection.type == 'column' && selection.colId == this._dataTable.getColumnId(1))) {
-                colors.push(paletteMap[item]);
-                done = true;
-                break;
+            _configureAxesDisplayUnits: function(){
+              this.base();
+
+              this._configureAxisDisplayUnits(/*isPrimary*/true, 'ortho');
+            }
+          });
+
+      def
+          .type('pentaho.ccc.BarChart', pentaho.ccc.CategoricalContinuousChart)
+          .add({
+            _configure: function(){
+
+              this.base();
+
+              var options = this.options;
+              var isVertical = options.orientation === 'vertical';
+              if(!isVertical){
+                options.visualRoles.category = { isReversed: true };
               }
             }
+          });
 
-            if(!done) {
-              // this item is not selected, so make it grey
-              colors.push( "#bbbbbb" );
+      def
+          .type('pentaho.ccc.BarLineChart', pentaho.ccc.BarChart)
+          .add({
+            _noRoleInTooltipMeasureRoles: {'measures': true, 'measuresLine': true},
+
+            _initAxes: function(){
+              this.base();
+
+              this._measureDiscrimGem || def.assert("Must exist to distinguish measures.");
+
+              // Find the index in which it goes in the CCC virtual item
+              var readers = this.options.readers;
+              var measureDiscrimCccDimName = this._measureDiscrimGem.cccDimName;
+
+              var virtualItemIndex =
+                      def.query(readers)
+                          .where (function(reader){ return reader.names === measureDiscrimCccDimName; })
+                          .select(function(reader){ return reader.indexes; })
+                          .first(null, null, -1)
+                  ;
+
+              virtualItemIndex >= 0 || def.assert("Must be present in virtual item.");
+
+              var barMeaRole = this.axes.measure.defaultRole;
+              var gemsMap    = this.gemsMap;
+              var dataPartDimension,
+                  part0Atom,
+                  part1Atom;
+
+              /* Create the dataPart dimension reader */
+              readers.push({
+                names:  'dataPart',
+                reader: function(vitem, dataPartDim){
+                  var measureId  = vitem[virtualItemIndex].v; // v/f cell
+                  var measureGem = gemsMap[measureId] || def.assert("Measure must be defined.");
+                  // Data part codes
+                  // 0 -> bars
+                  // 1 -> lines
+                  return measureGem.role === barMeaRole ?
+                    /* First time initializations.
+                     * Done here because *data* isn't available before.
+                     * Also, cannot intern non-existing data part (when lines not configured for example)
+                     */
+                      (part0Atom || (part0Atom = dataPartDim.intern("0"))) :
+                      (part1Atom || (part1Atom = dataPartDim.intern("1")))
+                      ;
+                }
+              });
+            },
+
+
+            _configureAxesDisplayUnits: function(){
+
+              this.base();
+
+              this._configureAxisDisplayUnits(/*isPrimary*/false, 'ortho2');
+            },
+
+
+            _configure: function(){
+
+              var options = this.options;
+              var extPoints = options.extensionPoints;
+              var shape = options.shape;
+              if(shape && shape === 'none'){
+                options.showDots = false;
+              } else {
+                options.showDots = true;
+                options.extensionPoints.dot_shape = shape;
+              }
+
+              this.base();
+
+              this._configureAxisRange(/*isPrimary*/false, 'ortho2');
+
+              this._configureAxisTitle('ortho2',"");
+
+              // If it is not desired to use the same colors as the bars
+              // (and still want names of measures being shown in the legend)
+              options.secondAxisIndependentScale = true;
+              options.secondAxisOwnColors = false;
+              options.secondAxisColor = options.colors.map(function(color){
+                return pv.color(color).brighter(0.5);
+              });
             }
+          });
 
-          } else {
-            colors.push(paletteMap[item]);
+      def
+          .type('pentaho.ccc.NormalizeBarChart', pentaho.ccc.BarChart)
+          .add({
+            _configure: function(){
+              this.base();
+
+              var options = this.options;
+
+              var axisOrient = pvc.visual.CartesianAxis.getOrientation('ortho', options.orientation);
+
+              options.extensionPoints[axisOrient + 'AxisScale_tickFormatter'] = function(v){
+                return v + "%";
+              };
+            }
+          });
+
+      def.type('pentaho.ccc.WaterfallChart', pentaho.ccc.CategoricalContinuousChart);
+
+      def
+          .type('pentaho.ccc.LineChart', pentaho.ccc.CategoricalContinuousChart)
+          .add({
+            _drillAxesIds: ['row'/*, 'column'*/],
+
+            _configure: function() {
+              var options = this.options;
+              var extPoints = options.extensionPoints;
+              var shape = options.shape;
+              if(shape && shape === 'none'){
+                options.showDots = false;
+              } else {
+                options.showDots = true;
+                options.extensionPoints.dot_shape = shape;
+              }
+
+              this.base();
+            },
+
+            _configureLegend: function(){
+
+              this.base();
+
+              var options = this.options;
+              var extPoints = options.extensionPoints;
+
+              var dotSize = extPoints.dot_shapeSize;
+              if(dotSize != null){
+                var dotRadius = Math.sqrt(dotSize);
+                options.legendMarkerSize = Math.max(15, 2 * (dotRadius + 3));
+              }
+            }
+          });
+
+      def
+          .type('pentaho.ccc.StackedAreaChart', pentaho.ccc.CategoricalContinuousChart)
+          .add({
+            _drillAxesIds: ['row'/*, 'column'*/]
+          });
+
+      def
+          .type('pentaho.ccc.BoxplotChart', pentaho.ccc.CategoricalContinuousChart)
+          .add({
+            _readData: function(){
+              // The boxplot data passes-trough, as is.
+              this.base();
+
+              // In CCC, it is read as a custom format (more relational-like)
+              // Where categoriesCount is the number of "category" dimensions,
+              // not including multichart columns...
+              def.set(
+                  this.options.dataOptions,
+                  'categoriesCount', this.axes.row.gemsByRole.rows.length);
+            }
+          });
+
+      def
+          .type('pentaho.ccc.HeatGridChart', pentaho.ccc.CartesianChart)
+          .add({
+            _configure: function(){
+              this.base();
+
+              // NULL COLOR
+              // Set the nullColor option to the first of the colorRange
+              // for the case that no color dimension is mapped
+              var nullColor = this._vizOptions.colorRange && this._vizOptions.colorRange[0];
+              if(nullColor){
+                this.options.nullColor = nullColor;
+              }
+            },
+
+            _prepareLayout: function(options) {
+
+              this.base(options);
+
+              var measureCount = this.axes.measure.depth,
+                  catsDepth    = this.axes.row.depth,
+                  sersDepth    = this.axes.column.depth,
+                  catsBreadth  = Math.max(1, this._dataTable.getNumberOfRows() - 1),
+                  sersBreadth  = this._dataTable.getNumberOfColumns() - catsDepth;
+
+              if(measureCount > 0){
+                sersBreadth /= measureCount;
+              }
+
+              var width  = options.width,
+                  height = options.height,
+                  currRatio = width / height,
+                  xyChartRatio = catsBreadth / sersBreadth;
+
+              // Min desirable sizes according to depth
+              var MAX_AXIS_SIZE    = 300,
+                  MIN_LEVEL_HEIGHT = 70,
+                  MAX_LEVEL_HEIGHT = 200,
+                  MAX_AXIS_RATIO   = 0.35;
+
+              var minXAxisSize = Math.min(MAX_AXIS_SIZE, catsDepth * MIN_LEVEL_HEIGHT),
+                  minYAxisSize = Math.min(MAX_AXIS_SIZE, sersDepth * MIN_LEVEL_HEIGHT),
+                  maxXAxisSize = Math.min(MAX_AXIS_SIZE, catsDepth * MAX_LEVEL_HEIGHT, height * MAX_AXIS_RATIO),
+                  maxYAxisSize = Math.min(MAX_AXIS_SIZE, sersDepth * MAX_LEVEL_HEIGHT, width  * MAX_AXIS_RATIO);
+
+              var xAxisSize,
+                  yAxisSize;
+              if(xyChartRatio > currRatio){ // lock width
+                var extraHeight = height - width / xyChartRatio;
+
+                yAxisSize = minYAxisSize;
+
+                xAxisSize = Math.min(extraHeight, maxXAxisSize);
+                xAxisSize = Math.max(xAxisSize,   minXAxisSize);
+              } else if (xyChartRatio < currRatio){ // lock height
+                var extraWidth = width - height * xyChartRatio;
+
+                xAxisSize = minXAxisSize;
+
+                yAxisSize = Math.min(extraWidth, maxYAxisSize);
+                yAxisSize = Math.max(yAxisSize,  minYAxisSize);
+              }
+
+              // ------------------
+              options.orthoAxisSize = undefined;
+              options.baseAxisSize  = undefined;
+              options.xAxisSize = xAxisSize;
+              options.yAxisSize = yAxisSize;
+            },
+
+            // Ortho axis title is not available on the server, so never show
+//        _getOrthoAxisTitle: function(){
+//            return this.axes.column.getAxisLabel();
+//        },
+//
+//        _getBaseAxisTitle: function(){
+//            return this.axes.row.getAxisLabel();
+//        },
+
+            _doesSharedSeriesSelection: function(){
+              return false;
+            },
+
+            _processSelection: function(selectedDatums){
+              if(selectedDatums.length){
+                var data = this._chart.data;
+
+                var atomsByDim = {};
+
+                // Select Cols OR Rows
+
+                // These are optional in the HG
+                var colDimNames = this.axes.column.getSelectionGems()
+                    .select(function(gem){ return gem.cccDimName; })
+                    .array();
+
+                var rowDimNames = this.axes.row.getSelectionGems()
+                    .select(function(gem){ return gem.cccDimName; })
+                    .array();
+
+                var nonAdditive = selectedDatums.length === 1 && selectedDatums[0].isSelected;
+
+                var whereSpec;
+
+                if(!nonAdditive){
+                  // Now-selecting datums + Already selected datums
+                  var selectDatumsById = def.query(selectedDatums)
+                      .union(data.selectedDatums())
+                      .uniqueIndex(function(datum){ return datum.id; });
+
+                  var rowGrouping = pvc.data.GroupingSpec.parse(rowDimNames, data.type);
+                  var rowGroupedData = data.groupBy(rowGrouping, {
+                    visible:  true,
+                    where:    function(datum){ return def.hasOwn(selectDatumsById, datum.id); },
+                    whereKey: null // prevent caching of groupedData
+                  });
+
+                  var datumFilters = rowGroupedData
+                      .leafs()
+                      .select(function(leafData){
+                        // rowDatumFilter
+                        return def.copyProps(leafData.atoms, rowDimNames);
+                      });
+
+                  if(colDimNames.length){
+                    // Make all combinations of row leafs with col leafs
+
+                    var colGrouping = pvc.data.GroupingSpec.parse(colDimNames, data.type);
+
+                    var colGroupedData = data.groupBy(colGrouping, {
+                      visible:  true,
+                      where:    function(datum){ return def.hasOwn(selectDatumsById, datum.id); },
+                      whereKey: null // prevent caching of groupedData
+                    });
+
+                    datumFilters = datumFilters
+                        .selectMany(function(rowDatumFilter){
+                          return colGroupedData
+                              .leafs()
+                              .select(function(leafData){
+                                // Share the rowDatumFilter object by inheriting from it.
+                                // combined datumFilter
+                                return def.copyProps(Object.create(rowDatumFilter), leafData.atoms, colDimNames);
+                              });
+                        });
+                  }
+
+                  whereSpec = datumFilters.array();
+
+                  selectedDatums = data
+                      .datums(whereSpec, {visible: true})
+                      .array();
+                } else {
+                  // The only clicked datum is selected and
+                  //  thus the user pretends to de-select.
+                  // Expand to the selected datums that have the same series or
+                  // the same categories as the clicked one
+                  // (a cross whose center is the clicked one)
+                  // The result is that all these will be de-selected.
+                  var singleDatum = selectedDatums[0];
+                  whereSpec = [
+                    // Column dimensions datum filter
+                    def.query(colDimNames)
+                        .object({
+                          value: function(cccDimName){ return singleDatum.atoms[cccDimName]; }
+                        }),
+
+                    // OR
+
+                    // Row dimensions datum filter
+                    def.query(rowDimNames)
+                        .object({
+                          value: function(cccDimName){ return singleDatum.atoms[cccDimName]; }
+                        })
+                  ];
+
+                  selectedDatums = data
+                      .datums(whereSpec, {visible: true, selected: true})
+                      .array();
+                }
+              }
+
+              function addDatum(datum) {
+                var atoms = datum.atoms;
+
+                colDimNames.forEach(addDim);
+                rowDimNames.forEach(addDim);
+
+                function addDim(dimName) {
+                  var dimAtomsById = (atomsByDim[dimName] || (atomsByDim[dimName] = {}));
+                  var atom = atoms[dimName];
+                  if(!def.hasOwn(dimAtomsById, atom.id)){
+                    dimAtomsById[atom.id] = atom;
+                  }
+                }
+              }
+
+              function buildWhereSpec() {
+                var datumFilter = {};
+                var whereSpec   = [datumFilter];
+
+                def.eachOwn(atomsByDim, addDim);
+
+                function addDim(dimAtomsById, dimName) {
+                  // The atom itself may be used as a value condition
+                  datumFilter[dimName] = def.own(dimAtomsById);
+                }
+
+                return whereSpec;
+              }
+
+              return selectedDatums;
+            }
+          });
+
+      def
+          .type('pentaho.ccc.MetricDotChart', pentaho.ccc.CartesianChart)
+          .add({
+            // Roles already in the axis' titles
+            _noRoleInTooltipMeasureRoles: {'x': true, 'y': true},
+
+            _configure: function(){
+
+              this.base();
+
+              var options = this.options;
+
+              // NULL COLOR
+              // Set the nullColor option to the first of the colorRange
+              // for the case that no color dimension is mapped
+              var nullColor = this._vizOptions.colorRange && this._vizOptions.colorRange[0];
+              if(nullColor){
+                options.nullColor = nullColor;
+              }
+
+              this._configureAxisRange(/*isPrimary*/true,  'base');
+              this._configureAxisRange(/*isPrimary*/false, 'ortho');
+
+              // DOT SIZE
+              var axisOffset;
+              if(this.axes.measure.boundRoles.size){
+                /* Axis offset like legacy analyzer */
+                axisOffset = 1.1 * options.dotSizeRatio / 2;
+              } else {
+                axisOffset = 0;
+              }
+
+              options.xAxisOffset =
+                  options.yAxisOffset = axisOffset;
+
+              /*
+               * The 'color' role is special in that
+               * it can be discrete or continuous.
+               *
+               * The CCC dimension must be configured accordingly.
+               * Also, the visual role must be mapped to a non-default dimension.
+               */
+              if(this.axes.measure.boundRoles.color){
+                // Color is a single continuous dimension
+                options.dimensionGroups.color = {
+                  valueType: Number
+                };
+
+                options.visualRoles.color = 'color';
+
+              } else if(this.axes.column.boundRoles.color){
+                options.visualRoles.color =
+                    this.axes.column.gemsByRole.color
+                        .map(function(gem, index){
+                          return pvc.data.DimensionType.dimensionGroupLevelName('color', index);
+                        })
+                        .join(', ');
+              }
+            },
+
+            _showLegend: function(){
+
+              // prevent default behavior that hides the legend when no series
+
+              if(this.options.legend && this.axes.column.boundRoles.color){
+                // Hide the legend if there is only one "series"
+                return this._colGroups.length > 1;
+              }
+
+              return this.options.legend;
+            },
+
+            _getOrthoAxisTitle: function(){
+              return this._getMeasureRoleTitle('y');
+            },
+
+            _getBaseAxisTitle: function(){
+              return this._getMeasureRoleTitle('x');
+            },
+
+            _configureAxesDisplayUnits: function(){
+
+              this.base();
+
+              this._configureAxisDisplayUnits(/*isPrimary*/true,  'base' , /*allowFractional*/true);
+              this._configureAxisDisplayUnits(/*isPrimary*/false, 'ortho', /*allowFractional*/true);
+            }
+          });
+
+      // Custom
+      def
+          .type('pentaho.ccc.PieChart', pentaho.ccc.Chart)
+          .add({
+            _noPercentInTootltipForPercentGems: true,
+
+            // Only 'multi' is on column axis, and drilling down on multi is undesired
+            _drillAxesIds: ['row', 'column'],
+
+            _configure: function(){
+
+              this.base();
+
+              // configure value label
+              if(this.options.showValues){
+                this._configureValuesMask();
+              }
+            },
+
+            _showLegend: function(){
+              return this.options.legend && this.axes.row.depth > 0;
+            },
+
+            _readUserOptions: function(options, vizOptions){
+              this.base(options, vizOptions);
+
+              options.valuesLabelFont = defaultFont(null, readFontSize(vizOptions, 'label'));
+            },
+
+            _configureMultiChart: function(){
+              this.base();
+
+              this.options.legendSizeMax = '50%';
+            },
+
+            _configureValuesMask: function(){
+              /*
+               * Change values mask accoring to each category's
+               * discriminated measure being PCTOF or not
+               */
+              var colAxis = this.axes.column;
+              var meaDiscrimName = colAxis.measureDiscrimName;
+              if(meaDiscrimName) {
+                var gemsMap = this.gemsMap;
+
+                this.options.pie = {
+                  scenes: {
+                    category: {
+                      sliceLabelMask: function(){
+                        var meaAtom = this.atoms[meaDiscrimName];
+                        var meaGemId, meaGem;
+                        if(meaAtom && (meaGemId = meaAtom.value) && (meaGem = gemsMap[meaGemId]) && meaGem.measureType === 'PCTOF'){
+                          return "{value}"; // the value is the percentage itself;
+                        }
+
+                        return "{value} ({value.percent})";
+                      }
+                    }
+                  }
+                };
+              }
+            },
+
+            _selectionExcludesMultiGems: function(){
+              // // When row selection is enabled it's ok
+              return false;//(this._gemCountColumnReportAxis === 0);
+            }
+          });
+
+      def
+          .type('pentaho.ccc.BulletChart', pentaho.ccc.Chart)
+          .add({
+            _configure: function(){
+
+              this.base();
+
+              /*
+               var myself = this,
+               options = this.options;
+
+               // Drill down on shapes
+               options.axisDoubleClickAction = function(d){
+               var c = d.title,
+               s = d.subtitle;
+
+               myself._drillDown(myself._readCccAxesValues(s, c));
+               };
+
+               options.clickAction = function (c, s) {
+               myself._notifySelectionChanged(
+               [ myself._convertKeysSelectionCccToAnalyzer(s, c) ]);
+               };
+               */
+            },
+
+            _prepareLayout: function(options){
+
+              this.base(options);
+
+              var vizOptions = this._vizOptions;
+
+              var isVertical = options.orientation === 'vertical';
+              if (this._resultset.length > 20) {
+                options.bulletSize = 10;
+                options.bulletSpacing = isVertical ? 60 : 20;
+              } else if (this._resultset.length > 10) {
+                options.bulletSize = 15;
+                options.bulletSpacing = isVertical ? 80 : 30;
+              } else {
+                options.bulletSize = 20;
+                options.bulletSpacing = isVertical ? 120 : 50;
+              }
+
+              var totalSpace = (2 + options.bulletSize + options.bulletSpacing) *
+                  this._resultset.length;
+
+              // TODO: vizOptions.controller.domNode
+              if (isVertical) {
+                if (totalSpace > options.width) {
+                  vizOptions.controller.domNode.style.overflowX = 'auto';
+                  vizOptions.controller.domNode.style.overflowY = 'hidden';
+
+                  options.width = totalSpace;
+                }
+              } else {
+                if (totalSpace > options.height) {
+                  vizOptions.controller.domNode.style.overflowY = 'auto';
+                  vizOptions.controller.domNode.style.overflowX = 'hidden';
+
+                  options.height = totalSpace;
+                }
+              }
+            }
+          });
+
+      /**
+       * Creates a CDA resultset in a custom RELATIONAL format.
+       *
+       * 1    - Category - aggregated row axis columns
+       * 2    - Series   - label of 'other' DataTable columns
+       * 3    - Value    - numeric value of corresponding 'other' DataTable column
+       * 4    - Marker   - marker numeric value of corresponding 'other' DataTable column
+       * 5..R - Range r  - range numeric value, taken from vizOptions.bulletRanges
+       */
+      var oldCccChart = {};
+      oldCccChart._readDataBullet = function() {
+        var dataTable   = this._dataTable,
+            rowCount    = dataTable.getNumberOfRows(),
+            measureCols = this._otherDtColIndexes,
+            seriesCount = this._otherDtColIndexes.length,
+            vizOptions  = this._vizOptions;
+
+        this.options.seriesInRows = true;
+
+        this._addCdaMetadata('Category', 'Category', 'STRING' );
+        this._addCdaMetadata('Series',   'Series',   'STRING' );
+        this._addCdaMetadata('Value',    'Value',    'NUMERIC');
+        this._addCdaMetadata('Marker',   'Marker',   'NUMERIC');
+
+        if (vizOptions.bulletRanges) {
+          for (var i = 0, R = vizOptions.bulletRanges.length; i < R ; i++){
+            this._addCdaMetadata('Range'  + i, 'Range ' + i, 'NUMERIC');
           }
         }
-      }
 
-      return colors;
-    };
+        var measuresCount = this.axes.measure.depth;
 
-// @private
-// @static
-    function readCccValue(v){
-      if(v != null && !(v instanceof Array)){
-        // Ensure grouped values/attributes are correctly turned into arrays
-        v = ('' + v).split('~');
-      }
+        // Process the rows
+        for(var tr = 0 ; tr < rowCount ; tr++){
 
-      return v;
-    }
+          var category = this._aggregateRowAxisForTableRow(tr);
 
-// @private
-// @static
-    function writeCccColumnDataType(colType){
-      switch(colType){
-        case 'string': return 'STRING';
-        case 'number': return 'NUMERIC';
-      }
+          for(var s = 0 ; s < seriesCount ; s += measuresCount) {
+            // Measures should be defined in pairs
+            // Each Value measure followed by a Marker measure:
+            //  <ValueMeasure1, MarkerMeasure1>,
+            //  <ValueMeasure2, MarkerMeasure2>,
+            //  ...
+            //  <ValueMeasureN [, MarkerMeasureN]>
+            for(var m = 0 ; m < measuresCount ; m += 2) {
+              var valueColIndex  = s + m,
+                  markerColIndex = valueColIndex + 1,
+                  tc = measureCols[valueColIndex],
+                  dtColParts = dataTable.getColumnId(tc).split('~');
 
-      throw new Error("Unsupported data type");
-    }
+              dtColParts.pop();
 
-// @private
-// @static
-    function createTable(rowCount, colCount, readCellValue, context){
-      var table = new Array(rowCount);
-      for(var tr = 0; tr < rowCount; tr++) {
-        var row = new Array(colCount);
+              var row = [
+                // Normal relational part
+                category, // aggregated category
+                dtColParts.join('~'), // series label
+                this._getTableValue(tr, tc),  // series value - may be null...is it ok?
 
-        for(var tc = 0 ; tc < colCount ; tc++){
-          row[tc] = readCellValue.call(context, tr, tc);
+                // Marker - may be missing on the last measure pair
+                m + 1 < measuresCount ?
+                    this._getTableValue(tr, measureCols[markerColIndex]) :
+                    vizOptions.bulletMarkers[0] // TODO: 7500
+              ];
+
+              // Dynamic columns
+              var bulletRanges = vizOptions.bulletRanges;
+              if (bulletRanges){
+                bulletRanges.forEach(function(rangeValue){
+                  row.push(rangeValue);
+                });
+              }
+
+              this._resultset.push(row);
+            }
+          }
+        }
+      };
+
+      oldCccChart._aggregateRowAxisForTableRow = function(tr) {
+        // Concat all of the string columns
+        var values = this._rowNormalDtColIndexes.map(function(tc){
+          return this._getTableValue(tr, tc);
+        }, this);
+
+        return values.join('~');
+      };
+
+      /**
+       * Set of visualization options that
+       * should not be copied to the CCC options.
+       */
+      var _skipVizOptions = pv.dict([
+        'cccClass',
+        'rolesToCccDimensionsMap',
+        'crosstabMode',
+        'measuresInColumns',
+        'extensionPoints',
+        'dimensionGroups',
+        'readers',
+        'dataOptions',
+        'action',
+        'autoRange',
+        'backgroundColor',
+        'backgroundColorEnd',
+        'backgroundFill',
+        'chartType',
+        'controller',
+        'customChartType',
+        'displayUnits',
+        'maxChartsPerRow',
+
+        'labelSize',
+        'labelStyle',
+        'labelFontFamily',
+        'labelColor',
+
+        'legendBackgroundColor',
+        'legendColor',
+        'legendFontFamily',
+        'legendStyle',
+
+        // NOTE: analyzer's legendSize is more like a "legentFontSize",
+        // while CCC's is the legend panel's size (width or height)
+        'legendSize',
+
+        'lineShape',
+        'maxChartsPerRow',
+        'maxValues',
+        'metrics',
+        'palette',
+        'selections'
+      ],
+          function(){ return true; });
+
+      // @private
+      // @static
+      function writeCccColumnDataType(colType){
+        switch(colType){
+          case 'string': return 'STRING';
+          case 'number': return 'NUMERIC';
         }
 
-        table[tr] = row;
+        throw new Error("Unsupported data type");
       }
 
-      return table;
-    }
+      // @private
+      // @static
+      function splitColGroupAndMeasure(colGroupAndMeasure){
+        var sepIndex = colGroupAndMeasure.lastIndexOf('~');
 
-// @private
-// @static
-// from cv.util.escapeHtml
-    function escapeHtml(str, noSingleQuotes){
-      str = str.replace(/&/gm, "&amp;")
-          .replace(/</gm, "&lt;")
-          .replace(/>/gm, "&gt;").replace(/"/gm, "&quot;");
-
-      if(!noSingleQuotes){
-        str = str.replace(/'/gm, "&#39;");
-      }
-
-      return str;
-    }
-
-// @private
-// @static
-    function assert(condition, conditionMessage){
-      if(!condition){
-        var message = "Assertion failed.";
-        if(conditionMessage != null){
-          message += "\n\"" + conditionMessage + "\"";
+        // MeasureName has precedence,
+        // so we may end up with no column group value (and C = 0).
+        if(sepIndex < 0){
+          return ['', colGroupAndMeasure];
         }
 
-        throw new Error(message);
+        return [
+          colGroupAndMeasure.substring(0,  sepIndex),
+          colGroupAndMeasure.substring(sepIndex + 1)
+        ];
       }
-    }
 
-// from pentaho / cv
-    function createVizDataReq(rowLabel, columnLabel, measureLabel, hasMulti) {
-      var json = [
-        { id: 'rows',
-          dataType: 'string',
-          dataStructure: 'column',
-          caption: rowLabel,
-          required: true,
-          allowMultiple: true,
-          zoneId: "rowAttributes",
-          defaultAppend: true
-        },
-        { id: 'columns',
-          dataType: 'string',
-          dataStructure: 'column',
-          caption: columnLabel,
-          required: false,
-          allowMultiple: true,
-          zoneId:"rowAttributes" // Only pivot table should use the columnAttribute zone
-        },
-        { id: 'measures',
-          dataType: 'number',
-          dataStructure: 'column',
-          caption: measureLabel,
-          required: true,
-          allowMultiple: true,
-          zoneId: "measures",
-          defaultAppend: true
+      // @private
+      // @static
+      function defaultFont(font, defaultSize){
+        if(!font){
+          return (defaultSize || 10) + 'px sans-serif';
         }
-      ];
-      if (hasMulti)
-        json.push({ id: 'multi',
-          dataType: 'string',
-          dataStructure: 'column',
-          caption: cvCatalog['dropZoneLabels_MULTI_CHART'],
-          allowMultiple: false,
-          required: false,
-          zoneId: "rowAttributes"
-        });
-      return json;
-    }
 
-  })(); // END Private Scope
-});
+        return font.replace(/\bdefault\s*$/i, 'sans-serif');
+      }
+
+      // @private
+      // @static
+      function readFont(vizOptions, prefix){
+        var size = vizOptions[prefix + "Size"];
+
+        if (size) {
+          var style = vizOptions[prefix + "Style"];
+          if (style == null || style == 'PLAIN') {
+            style = '';
+          } else {
+            style += ' ';
+          }
+
+          return style + size + 'px ' + vizOptions[prefix + "FontFamily"];
+        }
+      }
+
+      function readFontSize(vizOptions, prefix){
+        return +vizOptions[prefix + "Size"];
+      }
+
+      function readFontFamily(vizOptions, prefix){
+        return vizOptions[prefix + "FontFamily"];
+      }
+
+      // @private
+      // @static
+      function getColumnRoles(dataTable, tc){
+        var dataReq = dataTable.getColumnProperty(tc, 'dataReq');
+        if(dataReq){
+          // NOTE: in IE, unbound columns do not come with an "undefined" role id ??
+          if(dataReq instanceof Array){
+            return dataReq.map(function(item){
+              return item.id || 'undefined';
+            });
+          }
+
+          return [dataReq.id || 'undefined'];
+        }
+      }
+    });

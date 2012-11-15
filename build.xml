@@ -116,6 +116,9 @@
       <fileset dir="${package.resdir}"/>
     </copy>
 
+
+    <replace file="${approot.stage.dir}/resources/web/util/local.js" token="define(function" value="pen.define(function"/>
+
     <copy todir="${dojo.prod.stage.dir}/dojo">
       <fileset dir="${dojo.src}/dojo"/>
     </copy>

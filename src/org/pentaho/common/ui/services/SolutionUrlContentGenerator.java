@@ -18,6 +18,7 @@
  */
 package org.pentaho.common.ui.services;
 
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.InvalidParameterException;
@@ -28,13 +29,18 @@ import org.pentaho.common.ui.messages.Messages;
 import org.pentaho.platform.api.engine.IContentGenerator;
 import org.pentaho.platform.api.engine.IParameterProvider;
 import org.pentaho.platform.api.engine.IPluginManager;
+import org.pentaho.platform.api.engine.ISolutionFile;
 import org.pentaho.platform.api.repository.IContentItem;
 import org.pentaho.platform.api.repository.ISolutionRepository;
+import org.pentaho.platform.api.repository2.unified.IUnifiedRepository;
+import org.pentaho.platform.api.repository2.unified.RepositoryFile;
 import org.pentaho.platform.engine.core.solution.ActionInfo;
 import org.pentaho.platform.engine.core.solution.SimpleParameterProvider;
 import org.pentaho.platform.engine.core.system.PentahoSystem;
 import org.pentaho.platform.engine.services.solution.BaseContentGenerator;
+import org.pentaho.platform.repository2.unified.fileio.RepositoryFileInputStream;
 import org.pentaho.platform.util.web.MimeHelper;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 
 /**
  * SolutionUrlContentGenerator. Provides a way of URL addressing content within
@@ -111,7 +117,13 @@ public class SolutionUrlContentGenerator extends BaseContentGenerator {
     if( type == TYPE_UNKNOWN ) {
       IPluginManager pluginManager = PentahoSystem.get( IPluginManager.class, userSession );
       if( pluginManager != null ) {
-        IContentGenerator contentGenerator = pluginManager.getContentGeneratorForType(extension, userSession);
+        IContentGenerator contentGenerator = null;
+        try {
+          contentGenerator = pluginManager.getContentGenerator(extension, null);
+        } catch (NoSuchBeanDefinitionException e) {
+          // could not find a content generator to use for this extension, leave contentGenerator null
+          contentGenerator = null;
+        }
         if( contentGenerator != null ) {
           // set up the path parameters
           IParameterProvider requestParams = parameterProviders.get( IParameterProvider.SCOPE_REQUEST );
@@ -154,7 +166,8 @@ public class SolutionUrlContentGenerator extends BaseContentGenerator {
       warn( Messages.getErrorString("SolutionUrlContentGenerator.ERROR_0002_CANNOT_HANDLE_TYPE", urlPath ) ); //$NON-NLS-1$
       return;
     }
-    IContentItem contentItem = outputHandler.getOutputContentItem( "response", "content", "", instanceId, mimeType ); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
+    IContentItem contentItem = outputHandler.getOutputContentItem( "response", "content", instanceId, mimeType ); //$NON-NLS-1$ //$NON-NLS-2$
     if( contentItem == null ) {
       error( Messages.getErrorString("SolutionUrlContentGenerator.ERROR_0006_NO_OUTPUT_ITEM") ); //$NON-NLS-1$
       throw new InvalidParameterException( Messages.getString("SolutionUrlContentGenerator.ERROR_0006_NO_OUTPUT_ITEM") );  //$NON-NLS-1$
@@ -170,8 +183,10 @@ public class SolutionUrlContentGenerator extends BaseContentGenerator {
     
     // TODO support cache control settings
     
-    ISolutionRepository repo = PentahoSystem.get(ISolutionRepository.class, userSession);
-    InputStream in = repo.getResourceInputStream(urlPath, false, ISolutionRepository.ACTION_EXECUTE);
+    IUnifiedRepository repo = PentahoSystem.get(IUnifiedRepository.class, null);
+    RepositoryFile file = repo.getFile(urlPath, false);
+    InputStream in = new RepositoryFileInputStream(file);
+
     if( in == null ) {
       error( Messages.getErrorString("SolutionUrlContentGenerator.ERROR_0003_RESOURCE_NOT_FOUND", urlPath ) ); //$NON-NLS-1$
       return;

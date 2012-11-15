@@ -1,0 +1,27 @@
+<div data-dojo-attach-point="expressionNode" class="pentaho-expression pentaho-clearfix">
+	<div data-dojo-attach-point="operatorNode" class="pentaho-operator">
+		<div data-dojo-attach-point="operatorSelectNode" class="pentaho-operatorSelect">
+			<div data-dojo-attach-point="operatorSelect" data-dojo-type="dijit.form.Select"
+				data-dojo-attach-event="onChange:onOperatorChange">
+				<span value="${defaultOperator.value}">${defaultOperator.label}</span>
+			</div>
+		</div>
+	</div>
+	<div data-dojo-attach-point="bracketNode" class="pentaho-bracket"></div>
+	<div data-dojo-attach-point="conditionsNode" class="pentaho-conditions">
+		<!--
+		<div class="pentaho-condition">
+      <div class="pentaho-expression pentaho-clearfix">
+			   <div class="pentaho-operator">AND</div>
+			   <div class="pentaho-bracket"></div>
+			   <div class="pentaho-conditions">
+			       <div class="pentaho-condition">A <=> C</div>
+			       <div class="pentaho-condiiton">A >= B</div>
+			   </div>
+			</div>
+    </div>
+	  <div class="pentaho-condition">A <=> C</div>
+	  <div class="pentaho-condition">A >= B</div>
+		-->
+	</div>
+</div>

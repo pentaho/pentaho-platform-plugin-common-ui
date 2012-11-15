@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<plugin title="SolutionUrlContentGeneratorTest">
+<plugin title="SolutionUrlContentGeneratorTest" >
 
     <menu-items>
     </menu-items>
@@ -11,5 +11,5 @@
         <classname>org.pentaho.common.ui.test.MockContentGenerator</classname>
         <title></title>
     </content-generator>
-        
+
 </plugin>

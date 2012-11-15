@@ -24,7 +24,13 @@ Widget Definition Structure:
 
 */
 
-pen.define(['common-ui/prompting/pentaho-prompting-bind', 'common-ui/prompting/pentaho-prompting'], function() {
+pen.define(['cdf/cdf-module', 'common-ui/prompting/pentaho-prompting-bind'], function() {
+  // TODO Refactor so we're not using global objects. This requires an
+  // update to doc for any custom components in addition to code here
+  // and anywhere else prompting is used.
+  pentaho = typeof pentaho == "undefined" ? {} : pentaho;
+  pentaho.common = pentaho.common || {};
+  pentaho.common.prompting = pentaho.common.prompting || {};
   pentaho.common.prompting.builders = pentaho.common.prompting.builders || {};
 
   pentaho.common.prompting.builders.PromptPanelBuilder = Base.extend({

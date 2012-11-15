@@ -35,35 +35,49 @@
 
 		<dependency org="org.springframework" name="spring" rev="2.5.6" transitive="false" conf="default->default" />
 
-		<dependency org="oopsconsultancy" name="xmltask" rev="1.15.1" transitive="false" conf="default->default" />
+
+        <dependency org="oopsconsultancy" name="xmltask" rev="1.15.1" transitive="false" conf="default->default" />
 
 		<!-- Pentaho dependencies -->
 		<dependency org="pentaho-kettle" name="kettle-engine" rev="${dependency.kettle.revision}" changing="true" transitive="false" conf="default->default" />
 		<dependency org="pentaho-kettle" name="kettle-core" rev="${dependency.kettle.revision}" changing="true" transitive="false" conf="default->default" />
 		<dependency org="pentaho-kettle" name="kettle-db" rev="${dependency.kettle.revision}" changing="true" transitive="false" conf="default->default" />
         
-		<dependency org="pentaho" name="pentaho-bi-platform-api" rev="${dependency.bi-platform.revision}" changing="true" transitive="false" conf="default->default" />
-		<dependency org="pentaho" name="pentaho-bi-platform-engine-core" rev="${dependency.bi-platform.revision}" changing="true" transitive="false" conf="default->default" />
-	    <dependency org="pentaho" name="pentaho-bi-platform-engine-services" rev="${dependency.bi-platform.revision}" changing="true" conf="default->default" transitive="false"/>
-		<dependency org="pentaho" name="pentaho-bi-platform-plugin-services" rev="${dependency.bi-platform.revision}" changing="true" transitive="false" conf="default->default" />
-		<dependency org="pentaho" name="pentaho-bi-platform-repository" rev="${dependency.bi-platform.revision}" changing="true" transitive="false" conf="default->default" />
-		<dependency org="pentaho" name="pentaho-bi-platform-util" rev="${dependency.bi-platform.revision}" changing="true" transitive="false" conf="default->default" />
+		<dependency org="pentaho" name="pentaho-platform-api" rev="${dependency.pentaho-platform.revision}" changing="true" transitive="false" conf="default->default" />
+		<dependency org="pentaho" name="pentaho-platform-core" rev="${dependency.pentaho-platform.revision}" changing="true" transitive="false" conf="default->default" />
+        <dependency org="pentaho" name="pentaho-platform-extensions" rev="${dependency.pentaho-platform.revision}" changing="true"
+                    conf="default->default" transitive="false"/>
+
+        <dependency org="pentaho" name="pentaho-platform-repository" rev="${dependency.pentaho-platform.revision}" changing="true"
+                    conf="default->default" transitive="false"/>
 		<dependency org="pentaho" name="pentaho-connections" rev="${dependency.pentaho-connections.revision}" changing="true" transitive="false" conf="default->default"/>
 		<dependency org="pentaho" name="pentaho-metadata" rev="${dependency.pentaho-metadata.revision}" changing="true" transitive="false" conf="default->default" />
-		<dependency org="pentaho" name="pentaho-bi-platform-plugin-actions" rev="${dependency.bi-platform.revision}" changing="true" transitive="false" conf="default->default" />
+
+
         <dependency org="pentaho" name="pentaho-modeler" rev="${dependency.pentaho-modeler.revision}" changing="true" transitive="false"/>
 
 		<!-- Testing dependencies -->
-		<dependency org="commons-collections" name="commons-collections" rev="3.2" transitive="false" conf="test->default" />
-		<dependency org="commons-io" name="commons-io" rev="1.4" transitive="false" conf="test->default"/>
+
+        <dependency org="pentaho" name="pentaho-platform-core-test" rev="${dependency.pentaho-platform.revision}" changing="true" conf="test->default" transitive="false">
+            <artifact name="pentaho-platform-core-test"/>
+            <artifact name="pentaho-platform-core-test" type="source" ext="jar" m:classifier="sources"/>
+        </dependency>
+        <dependency org="pentaho" name="pentaho-platform-repository-test" rev="${dependency.pentaho-platform.revision}" changing="true"
+                    conf="test->default" transitive="false"/>
+
+        <dependency org="org.springframework" name="spring-test" rev="2.5.6" transitive="false" conf="test->default" />
+        <dependency org="org.springframework.security" name="spring-security-core" rev="2.0.5.RELEASE" transitive="false" conf="test->default"/>
+
+        <dependency org="commons-collections" name="commons-collections" rev="3.2" transitive="false" conf="test->default" />
+		<dependency org="commons-io" name="commons-io" rev="2.1" transitive="false" conf="test->default"/>
 		<dependency org="junit" name="junit" rev="4.4" transitive="false" conf="test->default" />
         <dependency org="org.jmock" name="jmock-junit4" rev="2.5.1" conf="test->default" />
-		<dependency org="pentaho" name="pentaho-bi-platform-test-foundation" rev="${dependency.bi-platform.revision}" transitive="false" conf="test->default" />
+
 		<dependency org="com.thoughtworks.xstream" name="xstream" rev="${dependency.xstream.revision}" transitive="false" conf="test->default"/>
 		<dependency org="simple-jndi" name="simple-jndi" rev="0.11.1" transitive="false" conf="test->default" />
 		<dependency org="hsqldb" name="hsqldb" rev="1.8.0.7" conf="test->default" transitive="false" />
-		<dependency org="pentaho-library" name="libformula" rev="${dependency.libformula.revision}" changing="true" transitive="false" conf="test->default" />
-		<dependency org="pentaho-library" name="libbase" rev="${dependency.libbase.revision}" changing="true" transitive="false" conf="test->default" />
+		<dependency org="pentaho-library" name="libformula" rev="${dependency.reporting-library.revision}" changing="true" transitive="false" conf="test->default" />
+		<dependency org="pentaho-library" name="libbase" rev="${dependency.reporting-library.revision}" changing="true" transitive="false" conf="test->default" />
 	    <dependency org="pentaho" name="pentaho-xul-core" rev="${dependency.pentaho-xul.revision}" changing="true" transitive="false" conf="test->default"/>
         <dependency org="org.safehaus.jug" name="jug-lgpl" rev="2.0.0" transitive="false" conf="test->default"/>
 

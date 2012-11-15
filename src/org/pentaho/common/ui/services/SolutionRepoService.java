@@ -140,7 +140,8 @@ public class SolutionRepoService extends PentahoBase {
     // see if we can find a content generator to get the file icon
     IPluginManager pluginManager = PentahoSystem.get( IPluginManager.class, userSession );
     if( pluginManager != null ) {
-      IContentInfo contentInfo = pluginManager.getContentInfoFromExtension(type, userSession);
+//      IContentInfo contentInfo = pluginManager.getContentInfoFromExtension(type, userSession);
+      IContentInfo contentInfo = pluginManager.getContentTypeInfo(type);
       if( contentInfo != null ) {
         String icon = contentInfo.getIconUrl();
         documentation.addElement("icon").addCDATA( icon ); //$NON-NLS-1$
@@ -196,8 +197,9 @@ public class SolutionRepoService extends PentahoBase {
     ISolutionRepository repo = PentahoSystem.get(ISolutionRepository.class, userSession);
 
     // try to get the file from the repository
-    Document doc = repo.getResourceAsDocument(filepath, ISolutionRepository.ACTION_EXECUTE);
-    
+//    Document doc = repo.getResourceAsDocument(filepath, ISolutionRepository.ACTION_EXECUTE);
+    Document doc = repo.getNavigationUIDocument(null, filepath, ISolutionRepository.ACTION_EXECUTE);
+
     if( doc != null ) {
       Element stateNode = (Element) doc.selectSingleNode( "state-file/state-xml" ); //$NON-NLS-1$
       if( stateNode != null ) {

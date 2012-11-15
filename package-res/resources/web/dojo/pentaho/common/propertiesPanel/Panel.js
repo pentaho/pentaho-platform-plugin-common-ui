@@ -521,7 +521,9 @@ dojo.declare("pentaho.common.propertiesPanel.GemBarUISource", [dojo.dnd.Source],
   insertNodes: function(addSelected, data, before, anchor){
     // When called by a frop on the placeholder before will come in false, this need to be corrected by checking the flag
     // set in the onDrop method
+    if(typeof this.dropAtEnd != "undefined"){
     before = ! this.dropAtEnd;
+    }
 
     // Append : before = true, anchor = null
     var pos = 0;
@@ -598,7 +600,7 @@ dojo.declare(
         this.dropZoneNode = this.domNode.firstChild;
 
         this.dropZone = new pentaho.common.propertiesPanel.GemBarUISource(this.dropZoneNode, {accept: this.model.ui.dndType, gemBar: this});
-        new pentaho.common.propertiesPanel.PlaceholderSource(this.domNode, {accept: this.model.ui.dndType, dropZone: this.dropZone});
+        // new pentaho.common.propertiesPanel.PlaceholderSource(this.domNode, {accept: this.model.ui.dndType, dropZone: this.dropZone});
 
         if(this.showPlaceholder && (this.model.allowMultiple || this.model.gems.length < 2) ){
           new pentaho.common.propertiesPanel.PlaceholderSource(this.placeholder, {accept: this.model.ui.dndType, dropZone: this.dropZone});

@@ -50,7 +50,7 @@ pen.define(function() {
      * @param key
      * @param text
      */
-    localizeDomCtrl: function(key, text) {
+    localizeDomCtrl: function(key, text, idPrefix) {
 
       var prop = null;
       var e = null;

@@ -2,7 +2,7 @@ pentaho = typeof pentaho == "undefined" ? {} : pentaho;
 pentaho.common = pentaho.common || {};
 pentaho.common.prompting = pentaho.common.prompting || {};
 
-pen.define(['common-ui/prompting/pentaho-prompting-bind'], function() {
+pen.define(['cdf/cdf-module', 'common-ui/prompting/pentaho-prompting-bind', 'common-ui/prompting/pentaho-prompting-components'], function() {
   var GUIDHelper = function() {
     /**
      * Simple array of used Prompt GUIDs so they and their components can be uniquely identified.

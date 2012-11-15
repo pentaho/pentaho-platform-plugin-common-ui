@@ -1,60 +1,55 @@
 package org.pentaho.common.ui.test;
 
 
-import java.io.ByteArrayOutputStream;
-import java.io.OutputStream;
-import java.security.InvalidParameterException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import junit.framework.TestCase;
-
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.pentaho.common.ui.messages.Messages;
 import org.pentaho.common.ui.services.SolutionUrlContentGenerator;
-import org.pentaho.platform.api.engine.IApplicationContext;
-import org.pentaho.platform.api.engine.IOutputHandler;
-import org.pentaho.platform.api.engine.IParameterProvider;
-import org.pentaho.platform.api.engine.IPentahoPublisher;
-import org.pentaho.platform.api.engine.IPluginManager;
-import org.pentaho.platform.api.engine.IPluginProvider;
-import org.pentaho.platform.api.engine.IServiceManager;
-import org.pentaho.platform.api.engine.ISolutionEngine;
-import org.pentaho.platform.api.engine.IPentahoDefinableObjectFactory.Scope;
+import org.pentaho.platform.api.engine.*;
 import org.pentaho.platform.api.repository.IContentItem;
-import org.pentaho.platform.api.repository.ISolutionRepository;
+import org.pentaho.platform.api.repository2.unified.IUnifiedRepository;
 import org.pentaho.platform.engine.core.output.SimpleOutputHandler;
 import org.pentaho.platform.engine.core.solution.SimpleParameterProvider;
-import org.pentaho.platform.engine.core.system.PentahoSystem;
-import org.pentaho.platform.engine.core.system.StandaloneApplicationContext;
-import org.pentaho.platform.engine.core.system.StandaloneSession;
 import org.pentaho.platform.engine.core.system.boot.PlatformInitializationException;
 import org.pentaho.platform.engine.services.solution.SolutionEngine;
 import org.pentaho.platform.plugin.services.pluginmgr.DefaultPluginManager;
+import org.pentaho.platform.plugin.services.pluginmgr.FileSystemXmlPluginProvider;
 import org.pentaho.platform.plugin.services.pluginmgr.PluginAdapter;
-import org.pentaho.platform.plugin.services.pluginmgr.SystemPathXmlPluginProvider;
-import org.pentaho.platform.plugin.services.pluginmgr.servicemgr.DefaultServiceManager;
-import org.pentaho.platform.repository.solution.filebased.FileBasedSolutionRepository;
+import org.pentaho.platform.repository2.unified.fs.FileSystemBackedUnifiedRepository;
 import org.pentaho.test.platform.engine.core.MicroPlatform;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.OutputStream;
+import java.security.InvalidParameterException;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.junit.Assert.*;
+
 @SuppressWarnings({"all"})
-public class SolutionUrlContentGeneratorTest extends TestCase {
+public class SolutionUrlContentGeneratorTest {
 
   private static MicroPlatform microPlatform = null;
-  
-  public void init()  {
+
+  private static IUnifiedRepository repository;
+
+  @BeforeClass
+  public static void init()  {
+
     if( microPlatform == null || !microPlatform.isInitialized() ) {
       microPlatform = new MicroPlatform("test-res/pentaho-solutions");
-      microPlatform.define(ISolutionEngine.class, SolutionEngine.class);
-      microPlatform.define(IPluginManager.class, DefaultPluginManager.class, Scope.GLOBAL);
-      microPlatform.define(ISolutionRepository.class, FileBasedSolutionRepository.class);
-      microPlatform.define("systemStartupSession", StandaloneSession.class);
-      microPlatform.define(IPluginProvider.class, SystemPathXmlPluginProvider.class);
-      microPlatform.define(IServiceManager.class, DefaultServiceManager.class);
-      
-      PentahoSystem.setObjectFactory(microPlatform.getFactory());
-      List<IPentahoPublisher> administrationPlugins = new ArrayList<IPentahoPublisher>();
+      microPlatform.define(ISolutionEngine.class, SolutionEngine.class, IPentahoDefinableObjectFactory.Scope.GLOBAL);
+
+      repository = new FileSystemBackedUnifiedRepository();
+      ((FileSystemBackedUnifiedRepository)repository).setRootDir(new File("test-res/pentaho-solutions"));
+
+      microPlatform.defineInstance(IUnifiedRepository.class, repository);
+
+      microPlatform.define(IPluginManager.class, DefaultPluginManager.class, IPentahoDefinableObjectFactory.Scope.GLOBAL);
+      microPlatform.define(IPluginProvider.class, FileSystemXmlPluginProvider.class, IPentahoDefinableObjectFactory.Scope.GLOBAL);
+
       microPlatform.addLifecycleListener(new PluginAdapter());
       try {
         microPlatform.start();
@@ -63,25 +58,22 @@ public class SolutionUrlContentGeneratorTest extends TestCase {
       }
     }
   }
-  
+
+  @Test
   public void testLogger() {
-    init();
     SolutionUrlContentGenerator cg = new SolutionUrlContentGenerator();
     assertNotNull( "Logger is null", cg.getLogger() );
   }
-  
-  public void testMessages() {
-    init();
 
+  @Test
+  public void testMessages() {
     assertFalse( Messages.getString("SolutionURLContentGenerator.ERROR_0001_NO_FILEPATH").startsWith("!") );
     assertFalse( Messages.getString("SolutionURLContentGenerator.ERROR_0002_CANNOT_HANDLE_TYPE").startsWith("!") );
     assertFalse( Messages.getString("SolutionURLContentGenerator.ERROR_0003_RESOURCE_NOT_FOUND","").startsWith("!") );
-    
   }
 
+  @Test
   public void testNoOutput() throws Exception {
-    init();
-
     SolutionUrlContentGenerator cg = new SolutionUrlContentGenerator();
     
     ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -104,9 +96,8 @@ public class SolutionUrlContentGeneratorTest extends TestCase {
     
   }
 
+  @Test
   public void testNoStream() throws Exception {
-    init();
-
     SolutionUrlContentGenerator cg = new SolutionUrlContentGenerator();
     
     ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -130,9 +121,8 @@ public class SolutionUrlContentGeneratorTest extends TestCase {
     
   }
 
+  @Test
   public void testNoContentItem() throws Exception {
-    init();
-    
     SolutionUrlContentGenerator cg = new SolutionUrlContentGenerator();
     
     ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -156,9 +146,8 @@ public class SolutionUrlContentGeneratorTest extends TestCase {
     
   }
 
+  @Test
   public void testNoPath() throws Exception {
-    init();
-
     SolutionUrlContentGenerator cg = new SolutionUrlContentGenerator();
     
     ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -176,9 +165,9 @@ public class SolutionUrlContentGeneratorTest extends TestCase {
     assertEquals( "Content is wrong", content, "" );
     
   }
-  
+
+  @Test
   public void testMissingFile() throws Exception {
-    init();
 
     SolutionUrlContentGenerator cg = new SolutionUrlContentGenerator();
     
@@ -201,8 +190,8 @@ public class SolutionUrlContentGeneratorTest extends TestCase {
     
   }
 
+  @Test
   public void testBadStaticType() throws Exception {
-    init();
 
     SolutionUrlContentGenerator cg = new SolutionUrlContentGenerator();
     
@@ -224,9 +213,9 @@ public class SolutionUrlContentGeneratorTest extends TestCase {
     assertEquals( "Content is wrong", content, "" );
     
   }
-  
+
+  @Test
   public void testGoodStaticType() throws Exception {
-    init();
 
     SolutionUrlContentGenerator cg = new SolutionUrlContentGenerator();
     
@@ -247,9 +236,10 @@ public class SolutionUrlContentGeneratorTest extends TestCase {
   
     assertEquals( "Content is wrong", "test content", content );
     
-  }  
+  }
+
+  @Test
   public void testNonWebStaticType() throws Exception {
-    init();
 
     String testContents = "test file contents";
     String filepath = "solution/notweb/test.txt";
@@ -275,9 +265,9 @@ public class SolutionUrlContentGeneratorTest extends TestCase {
     
   }
 
+  @Test
   public void testXactionType() throws Exception {
-    init();
-    
+
     MockSolutionRepository.files.clear();
     String testContents = "test file contents";
     String filepath = "solution/web/test.xaction";
@@ -301,10 +291,10 @@ public class SolutionUrlContentGeneratorTest extends TestCase {
     assertEquals( "Content is wrong", content, "" );
     
   }
-  
 
+
+  @Test
   public void testContentGenerator() throws Exception {
-    init();
 
     String testContents = "test file contents";
     String filepath = "solution/test.testgen";

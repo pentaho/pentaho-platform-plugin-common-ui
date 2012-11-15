@@ -17,6 +17,11 @@
     <title>RepositoryService</title>
   </content-generator>
 
+  <content-generator scope="session" id="MetadataModelsSvc" type="MetadataModelsSvc">
+    <classname>org.pentaho.common.ui.metadata.service.MetadataModelsContentGenerator</classname>
+    <title>MetadataModelsService</title>
+  </content-generator>
+
   <webservice
       id="RepositoryClientService"
       type="xml"
@@ -32,11 +37,17 @@
       type="xml,gwt"
       class="org.pentaho.common.ui.metadata.service.MetadataService"/>
 
+  <webservice
+      id="metadataService2"
+      type="xml,gwt"
+      class="org.pentaho.common.ui.metadata.service.MetadataService2"/>
+
   <external-resources>
     <file context="global">content/common-ui/resources/web/dojo/djConfig.js</file>
     <file context="global">content/common-ui/resources/web/cache/cache-service.js</file>
     <file context="global">content/common-ui/resources/themes/jquery.js</file>
     <file context="global">content/common-ui/resources/themes/themeUtils.js</file>
+    <file context="requirejs">content/common-ui/resources/web/common-ui-require-js-cfg.js</file>
     <!-- Example Visualizaiton Plugin. Un-comment to test -->
     <!--file context="analyzer">content/common-ui/resources/web/vizapi/ccc/sample/sampleVisualization.js</file-->
     <!--file context="analyzer">content/common-ui/resources/web/vizapi/ccc/sample/sampleVisualization_analyzer_plugin.js</file-->
@@ -45,6 +56,11 @@
     <!-- Example Prompting Sample Plugin. Used in prompting/sample.html -->
     <file context="prompting-sample">content/common-ui/resources/web/prompting/pentaho-prompting-sample-component.js</file>
     <!-- Example Prompting Sample Plugin. Used in prompting/sample.html -->
+
+
+    <!-- uncomment to debug CCC charts -->
+    <!--file context="analyzer">content/common-ui/resources/web/vizapi/ccc/ccc_analyzer_plugin_loader.js</file-->
+
   </external-resources>
 
 

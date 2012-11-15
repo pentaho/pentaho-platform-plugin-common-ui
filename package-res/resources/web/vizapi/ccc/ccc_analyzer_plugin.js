@@ -1,36 +1,67 @@
-dojo.require("pentaho.common.Messages");
+pen.define([
+  "cdf/lib/CCC/def",
+  "cdf/lib/CCC/pvc-d1.0",
+  "common-ui/vizapi/VizController"
+],
+        function(def, pvc){
 
-var analyzerPlugins = analyzerPlugins || [];
+      dojo.require("pentaho.common.Messages");
 
-analyzerPlugins.push({
-    init: function (){
+      pentaho = typeof pentaho != "undefined" ? pentaho : {};
+      pentaho.visualizations || (pentaho.visualizations = {});
 
-        dojo.declare("analyzer.CCCVizHelper", null, {
+      // If necessary, declare **global** variable, initializing it with an array
+      analyzerPlugins = typeof analyzerPlugins == "undefined" ? [] : analyzerPlugins;
 
+      // TODO: temporary due to debug loading time problems
+      var registered = false;
+
+      analyzerPlugins.push({
+        init: function (){
+
+          // TODO: temporary due to debug loading time problems
+            if(registered){ return; }
+          registered = true;
+
+          dojo.declare("analyzer.CCCVizHelper", null, {
             /**
              * Indicates if interaction features are enabled.
-             * When printing, as in a server eenvironment,
+             * When printing, as in a server environment,
              * interaction features are disabled.
              */
-            isInteractionEnabled: function(){
-                return true;
+                isInteractionEnabled: function(){
+              return true;
             },
 
             /**
-             * Indicates if drilling is enabled.
-             * Takes into account whether content-linking is in effect.
+             * Indicates if content-linking is enabled.
              * Only available when interaction is enabled.
              */
-            isDrillEnabled: function(){
-                return !(/\bcl=/).test(window.location.href);
+                hasContentLink: function(){
+              return (/\bcl=/).test(window.location.href);
+            },
+
+                showConfirm: function(msg, msgId){
+                    if (!msgId || !cv.prefs.suppressMsg[msgId]){
+                cv.getActiveReport().rptDlg.showConfirm(msg, null, null, null, msgId);
+              }
+            },
+
+                message: function(msgId, args){
+              var msg = cvCatalog[msgId] || "";
+                    if(msg && args){
+                msg = cv.util.substituteParams.apply(cv.util, [msg].concat(args));
+              }
+
+              return msg;
             },
 
             /**
              * Returns the label of a given formula.
              * Only available when interaction is enabled.
              */
-            getFormulaLabel: function(formula){
-                return cv.util.parseMDXExpression(formula, false);
+                getFormulaLabel: function(formula){
+              return cv.util.parseMDXExpression(formula, false);
             },
 
             /**
@@ -39,250 +70,392 @@ analyzerPlugins.push({
              * Any formula, including a hierarchy id. can be specified in argument 'formula'.
              * Only available when interaction is enabled.
              */
-            getHierarchyFormulas: function(formula, includeHidden, excludeChildren){
-                return cv.getFieldHelp().getHierarchy(formula, includeHidden, excludeChildren)
+                getHierarchyFormulas: function(formula, includeHidden, excludeChildren){
+              return cv.getFieldHelp().getHierarchy(formula, includeHidden, excludeChildren)
             },
-            
-            /**
-             * Returns an array of the FormulaInfo of a given axis.
-             * The order of the formulas is significant.
-             * Possible axis values are 'row', 'column' and 'measure'.
-             */
-            getAxisFormulasInfo: function(axis){
-                var reportDoc = cv.getActiveReport().reportDoc,
-                    levelElems,
-                    isMeasure = (axis === 'measure');
 
-                if(isMeasure){
-                    levelElems = reportDoc.getMetrics();
+                completeAxisGemsMetadata: function(axis, gemsInfoList){
+              var reportElem = cv.getActiveReport().reportDoc.getReportNode();
+                    var fieldHelp  = cv.getFieldHelp();
+                    var isMeasure  = (axis === 'measure');
+              var unboundGemElemsByRole = {};
+
+                    function gemElemComparer(a, b){
+                return parseFloat(a.getAttribute("gembarOrdinal")) -
+                    parseFloat(b.getAttribute("gembarOrdinal"));
+              }
+
+                    function getRoleGemElems(role){
+                var xpath = "[@gembarId='" + role + "']";
+                        if(isMeasure){
+                  xpath = "cv:measures/cv:measure" + xpath;
                 } else {
-                    // We care not if an attribute is in the row or col Attributes,
-                    // but if it is in the 'rows' or 'columns' gem -
-                    // it's what is relevant for charts.
-                    levelElems = reportDoc.getReportNode().selectNodes(
-                        // Note the axis plural introduction
-                        "cv:columnAttributes/cv:attribute[@gembarId='" + axis + "s'] | " +
-                        "cv:rowAttributes/cv:attribute[@gembarId='" + axis + "s']"
-                    );
+                  xpath = "cv:columnAttributes/cv:attribute" + xpath +
+                      " | " +
+                      "cv:rowAttributes/cv:attribute" + xpath;
                 }
 
-                // NOTE: levelElems is an Array of elements
+                var unboundGemElems = reportElem.selectNodes(xpath);
 
-                var formulasInfo = [];
+                // Converts array like collection to array
+                unboundGemElems = def.query(unboundGemElems).array();
 
-                dojo.forEach(levelElems, function(levelElem, index){
-                    var formula = levelElem.getAttribute('formula'),
-                        gem,
-                        id,
-                        label,
-                        role,
-                        hierarchy,
-                        formIndex;
+                // Sort by gem bar position
+                unboundGemElems.sort(gemElemComparer);
 
-                    // Only formulas that are visible in charts are considered.
-                    // Only measures can be hidden in charts.
-                    if(levelElem.getAttribute("hideInChart") === 'true'){
-                        return;
-                    }
+                return unboundGemElems;
+              }
 
-                    if(isMeasure){
-                        var gembarId = levelElem.getAttribute("gembarId");
-                        if(!gembarId ||  gembarId === 'undefined'){
-                            // Unmapped measure
-                            return;
-                        }
-                    }
-                        
-                    if(!formula){
-                        //assert(isMeasure, "Only measures can not have a formula.");
+                    function getNextGemElem(role){
+                var gemElems = def.getOwn(unboundGemElemsByRole, role);
+                        if(!gemElems){
+                  gemElems = unboundGemElemsByRole[role] = getRoleGemElems(role);
+                }
 
-                        id    = levelElem.getAttribute('id');
-                        label = getLevelLabel(levelElem);
-                        role  = axis;
+                var gemElem;
+                        while(gemElems.length){
+                  gemElem = gemElems.shift();
+                            if(gemElem.getAttribute("hideInChart") !== 'true'){
+                    break;
+                  }
+                }
 
-                    } else {
-                        gem = cv.getActiveReport().getGem(formula);
-                        if(!gem){
-                            // !gem => assume not placed for chart consumption
-                            return;
-                        }
+                return gemElem;
+              }
 
-                        // measures have an id != from formula
-                        id = gem.getUniqueId();
-                        label = gem.getDisplayLabel(true);
+                    dojo.forEach(gemsInfoList, function(gemInfo){
+                        var role    = gemInfo.role;
+                        if(!role || role === 'undefined'){
+                  // unmapped role
+                  return;
+                }
 
-                        // "Roles" provide more detail for measures
-                        // rows, columns, ...custom_role...
-                        role = gem.getGembarId();
-                    }
-                    
-                    if(isMeasure){
-                        hierarchy = '[Measures]';
-                        // For measures the relevant order is the report order...
-                        // But note that this index may not be contiguous
-                        //  because formula may be hidden.
-                        // Below, after sorting, measure indexes are reassigned.
-                        formIndex = index;
-                    } else {
-                        // !isMeasure => has formula => gem or already excluded
-                        //assert(gem, "Non-measures have gem or were already excluded.");
+                var gemElem = getNextGemElem(gemInfo.role) || def.assert("Undefined gem in document.");
+                var formula = gemElem.getAttribute('formula') || null;
+                var hasLink = false;
+                var id, hierarchy, linkLabel, linkType;
+                var reportAxis;
+                        switch(gemElem.parentNode.tagName){
+                            case 'rowAttributes':    reportAxis = 'row';     break;
+                            case 'columnAttributes': reportAxis = 'column';  break;
+                            case 'measures':         reportAxis = 'measure'; break;
+                }
 
-                        var fieldHelp = cv.getFieldHelp();
-                        hierarchy = fieldHelp.get(formula, 'hierarchy');
+                        if(isMeasure){
+                  hierarchy = '[Measures]';
+                  gemInfo.measureType = gemElem.getAttribute("measureTypeEnum");
+                }
 
-                        // Indexes of non-measure formulas also have to "fixed"
-                        // because not always they start at 0-gembar-ordinal
-                        // due to addition and removal of formulas from gems.
-                        formIndex = parseFloat(gem.getGembarOrdinal());
-                    }
+                        if(isMeasure && gemInfo.measureType !== 'VALUE'){
+                  // Some kind of calculated formula
+                            id      = gemElem.getAttribute('id');
+                  formula = null; // ignore
+                  //label   = getLevelLabel(gemElem);
+                  hasLink = false;
+                } else {
+                  var gem = cv.getActiveReport().getGem(formula) || def.assert("No gem object.");
 
-                    formulasInfo.push({
-                        id:        id,
-                        formula:   formula,
-                        label:     label,
-                        hierarchy: hierarchy,
-                        axis:      axis,
-                        role:      role,
-                        index:     formIndex
-                    });
-                });
+                  // measures have an id != from formula
+                  id = gem.getUniqueId();
 
-                // Return formulas sorted by index
-                formulasInfo.sort(function(a, b){ return a.index - b.index; });
+                  // Column gems need this
+                  gemInfo.label = gem.getDisplayLabel(true);
 
-                
-                // Fix non-contiguous indexes
-                dojo.forEach(formulasInfo, function(formulaInfo, index){
-                    formulaInfo.index = index;
-                }, this);
+                            var link  = gem.getLink && gem.getLink();
+                            hasLink   = !!link;
+                  linkLabel = hasLink ? link.getAttribute('toolTip') : null;
+                            linkType  = hasLink ? link.getAttribute("type") : null;
 
-                return formulasInfo;
+                            if(!isMeasure){
+                    formula || def.assert("Non-measures have formulas.");
+                    hierarchy = fieldHelp.get(formula, 'hierarchy');
+                  }
+                }
+
+                def.set(
+                    gemInfo,
+                            'id',         id,
+                            'formula',    formula,
+                            'hierarchy',  hierarchy,
+                            'hasLink',    hasLink,
+                            'linkLabel',  (linkLabel || ""),
+                            'linkType',   linkType,
+                    'reportAxis', reportAxis);
+              });
             },
 
             /**
              * Performs a click action with the specified context.
              * Only available when interaction is enabled.
              */
-            click: function(actionContext, keepGem){
-                cv.getActiveReport().clickChart(actionContext, keepGem);
+                click: function(actionContext, keepGem){
+              cv.getActiveReport().clickChart(actionContext, keepGem);
             },
 
-            // set visualization options based on analyzer's state.
-            // Only available when interaction is enabled.
-            generateOptionsFromAnalyzerState:function (report) {
-                var userDefinedOpts = {};
-                var chartOptions = report.reportDoc.getChartOptions().attributes;
-                for (var i = 0; i < chartOptions.length; i++) {
-                    var option = chartOptions[i];
-                    var val = option.nodeValue;
+            /**
+             * Follows an hyperlink.
+             * Only available when interaction is enabled.
+             */
+                link: function(actionContext){
+              cv.getActiveReport().linkDlg.performAction(actionContext);
+            },
 
-                    switch (option.nodeName) {
-                        case "backgroundColor":
-                            userDefinedOpts.extensionPoints = userDefinedOpts.extensionPoints || {};
-                            userDefinedOpts.extensionPoints.base_fillStyle = val;
-                            break;
+            // TODO: remove this when analyzer fixes XML document chart options switching bug
+//                syncReportDocXml: function(vizOptions){
+//                    var currentConfig = cv.activeLayoutConfig;
+//                    if(currentConfig){
+//                        var props = {
+//                           'shape': 'shape',
+//                           'reverseColors': 'reverseColors',
+//                           'pattern': 'pattern',
+//                           'colorSet': 'colorSet'
+//                        };
+//
+//                        for(var p in props){
+//                            if(props.hasOwnProperty(p)){
+//                                var value = vizOptions[props[p]];
+//                                if(value !== undefined){
+//                                    currentConfig._processModelValueChange(
+//                                            {id: p},
+//                                            {newVal: value});
+//                                }
+//                            }
+//                        }
+//                    }
+//                },
 
-                        case "labelColor":
-                            userDefinedOpts.extensionPoints = userDefinedOpts.extensionPoints || {};
-                            userDefinedOpts.extensionPoints.xAxisLabel_textStyle = val;
-                            userDefinedOpts.extensionPoints.yAxisLabel_textStyle = val;
-                            break;
+            // Benny: This method should only return the options which would
+            // directly be used by CCC when derived from the input report.
+            generateOptionsFromAnalyzerState: function (report) {
+              var userDefinedOpts = {};
+              var chartOptions = report.reportDoc.getChartOptions().attributes;
+              for (var i = 0; i < chartOptions.length; i++) {
+                var option = chartOptions[i];
+                    switch(option.nodeName){
+                  case 'lineShape':
+                  case 'lineWidth':
+                  case 'scatterPattern':
+                  case 'scatterColorSet':
+                  case 'scatterReverseColors':
+                    break;
 
-                        default:
-                            userDefinedOpts[option.nodeName] = val;
-                    }
+                  default:
+                    userDefinedOpts[option.nodeName] = option.nodeValue;
                 }
+              }
+              return userDefinedOpts;
+            },
 
-                // build style for pv
-                if (userDefinedOpts.labelSize) {
-                    var style = userDefinedOpts.labelStyle;
-                    if (style == null || style == 'PLAIN') {
-                        style = '';
-                    } else {
-                        style += ' ';
-                    }
-
-                    userDefinedOpts.axisLabelFont = style + userDefinedOpts.labelSize + 'px ' + userDefinedOpts.labelFontFamily;
+            // Adpated from cv.Report#isRequiredGembarsFilled
+                canRefreshReport: function(report){
+              var dataReq = report.getVizDataReq();
+                    for(var i = 0; i < dataReq.length ; i++) {
+                      if(dataReq[i].required == true) {
+                        if(report.findGemsByGembarId(dataReq[i].id).length == 0)
+                    return false;
                 }
+              }
 
-                return userDefinedOpts;
+                    switch(report.visualization.id){
+                case 'ccc_heatgrid':
+                  return report.findGemsByGembarId("color").length > 0 ||
+                                   report.findGemsByGembarId("size" ).length > 0;
+                  break;
+
+                case 'ccc_barline':
+                            return report.findGemsByGembarId("measures"    ).length > 0 ||
+                      report.findGemsByGembarId("measuresLine").length > 0;
+                  break;
+              }
+
+              return true;
             }
-        });
+          });
 
-        function getLevelLabel(levelElem){
-            var labelElem = levelElem.selectSingleNode("cv:displayLabels/cv:displayLabel");
-            return (labelElem && labelElem.getAttribute("label")) || "";
-        }
+          //function getLevelLabel(levelElem){
+          //    var labelElem = levelElem.selectSingleNode("cv:displayLabels/cv:displayLabel");
+          //    return (labelElem && labelElem.getAttribute("label")) || "";
+          //}
 
-        dojo.declare("analyzer.CCCVizConfig", [analyzer.ColorConfiguration], {
-
-            onModelEvent:function (config, item, eventName, args) {
-                if (eventName == "value") {
-                    // works by convention where the ids of the data req items match the property names
-                    this.report.visualization.args[item.id] = args.newVal;
-                }
-                this.inherited(arguments); // Let super class handle the insertAt and removedGem events
+          dojo.declare("analyzer.CCCVizConfig", [analyzer.ColorConfiguration], {
+                _processModelValueChange: function(item, args){
+                    if(pvc.debug >= 3){
+                pvc.log("ANALYZER MODEL EVENT " + item.id + ": " + JSON.stringify(args.newVal));
+              }
+              // works by convention where the ids of the data req items match the property names
+              this.report.visualization.args[item.id] = args.newVal;
             },
 
-            _setScalingType:function (scalingType) {
-                this.report.visualization.args.scalingType = scalingType;
+            onModelEvent: function (config, item, eventName, args) {
+              if (eventName == "value") {
+                this._processModelValueChange(item, args);
+              }
+
+              this.inherited(arguments); // Let super class handle the insertAt and removedGem events
             },
 
-            _setColorRange:function (range) {
-                this.report.visualization.args.colorRange = range;
+            _setScalingType: function (colorScaleType) {
+              this.report.visualization.args.colorScaleType = colorScaleType;
             },
 
-            getConfiguration:function () {
-                var config = this.inherited(arguments);
-
-                // set current values.
-                dojo.forEach(config.properties, function (item) {
-                    if (this.report.visualization.args[item.id] !== "undefined") {
-                        item.value = this.report.visualization.args[item.id];
-                    }
-                }, this);
-
-                return config;
+            _setColorRange: function (range) {
+              this.report.visualization.args.colorRange = range;
             },
-            updateConfiguration: function(config){
-              // Reqiured logic, both size and color required by default, turn required off one hen the other is filled.
+
+            getConfiguration: function () {
+              var config = this.inherited(arguments);
+              return config;
+            }
+          });
+
+          dojo.declare("analyzer.CCCHeatgridVizConfig", [analyzer.CCCVizConfig], {
+
+            onModelEvent: function (config, item, eventName, args) {
+                    switch(eventName){
+                case 'insertAt':
+                case 'gems': // move gem
+                  this._updateOptions(config);
+                  break;
+              }
+
+              this.inherited(arguments); // ends up calling updateConfiguration
+            },
+
+                updateConfiguration: function(config){
+              this._updateOptions(config);
+            },
+
+                _updateOptions: function(config){
+              // Required logic, both size and color required by default, turn required off one when the other is filled.
+
               var colorBy = config.byId("color");
-              var sizeBy = config.byId("size");
-              var totalGems =colorBy.gems.length + sizeBy.gems.length;
+                    var sizeBy  = config.byId("size");
+              var totalGems = colorBy.gems.length + sizeBy.gems.length;
               colorBy.required = (totalGems == 0);
               sizeBy.required = (totalGems == 0);
-              this.inherited(arguments);
             }
-        });
+          });
 
-        // ----------------------
-        // Register CCC Visualizations
+          dojo.declare("analyzer.CCCBarLineVizConfig", [analyzer.CCCVizConfig], {
 
-        var vizIds = [
-                    'ccc_heatgrid'
-					/*
-                    'ccc_bar',
-                    'ccc_barstacked',
-                    'ccc_barnormalized',
-                    'ccc_horzbar',
-                    'ccc_horzbarstacked',
-                    'ccc_horzbarnormalized',
-                    'ccc_line',
-                    'ccc_area',
-                    'ccc_bulletchart'
-                    */
-                ];
+            onModelEvent: function (config, item, eventName, args) {
+              // Moving or adding a gem may cause the color options to appear/disappear
+                    switch(eventName){
+                case 'insertAt':
+                case 'gems': // move gem
+                  this._updateMeasuresOptions(config);
+                  break;
+              }
 
-        var vizHelper = new analyzer.CCCVizHelper();
+              this.inherited(arguments); // ends up calling updateConfiguration
+            },
 
-        dojo.forEach(vizIds, function(vizId){
-            
+                updateConfiguration: function(config){
+              this._updateMeasuresOptions(config);
+
+              this.inherited(arguments);
+            },
+
+                _updateMeasuresOptions: function(config){
+              // Required logic, at least one of measuresBar or measuresLine is required by default
+                    var measuresBar  = config.byId("measures");
+              var measuresLine = config.byId("measuresLine");
+              var totalGems = measuresBar.gems.length + measuresLine.gems.length;
+                    measuresBar .required = (totalGems == 0);
+              measuresLine.required = (totalGems == 0);
+
+              // Show/hide line color options
+              var visible = measuresLine.gems.length > 0;
+                    config.byId("shape"    ).ui.hidden = !visible;
+              config.byId("lineWidth").ui.hidden = !visible;
+            }
+          });
+
+          dojo.declare("analyzer.CCCScatterVizConfig", [analyzer.CCCVizConfig], {
+
+            onModelEvent: function (config, item, eventName, args) {
+              // Moving or adding a gem may cause the color options to appear/disappear
+                    switch(eventName){
+                case 'insertAt':
+                case 'gems': // move gem
+                  this._updateColorRoleOptions(config);
+                  break;
+              }
+
+              this.inherited(arguments); // ends up calling updateConfiguration
+            },
+
+                updateConfiguration: function(config){
+              this._updateColorRoleOptions(config);
+            },
+
+                _updateColorRoleOptions: function(config){
+              var colorBy = config.byId("color");
+
+              colorBy.allowMultiple = !colorBy.gems.length ||
+                  colorBy.gems[0].type !== 'measure';
+
+              // Show/hide color options
+              var visible = colorBy.gems.length > 0 && colorBy.gems[0].type === 'measure';
+              config.byId("reverseColors").ui.hidden = !visible;
+              config.byId("colorSet").ui.hidden = !visible;
+              config.byId("pattern").ui.hidden = !visible;
+            }
+          });
+
+          // ----------------------
+          // Register CCC Visualizations
+
+          var vizIds = [
+            'ccc_bar',
+            'ccc_barstacked',
+            'ccc_barnormalized',
+
+            'ccc_horzbar',
+            'ccc_horzbarstacked',
+            'ccc_horzbarnormalized',
+
+            'ccc_pie',
+            'ccc_line',
+            'ccc_area',
+
+            'ccc_scatter',
+            'ccc_barline',
+            'ccc_heatgrid'
+
+            //'ccc_waterfall',
+            //'ccc_boxplot'
+            //'ccc_bulletchart',
+            //'ccc_line_hover',
+            //'ccc_area_hover'
+          ];
+
+          var vizCustomConfigs = {
+            'ccc_heatgrid': analyzer.CCCHeatgridVizConfig,
+                'ccc_scatter':  analyzer.CCCScatterVizConfig,
+                'ccc_barline':  analyzer.CCCBarLineVizConfig
+          };
+
+          var vizHelper = new analyzer.CCCVizHelper();
+
+          if (!cv.pentahoVisualizations) {
+            cv.pentahoVisualizations = [];
+          }
+
+          if (!cv.pentahoVisualizationsHelpers) {
+            cv.pentahoVisualizationsHelpers = {};
+          }
+
+            dojo.forEach(vizIds, function(vizId){
+
             cv.pentahoVisualizations.push(pentaho.visualizations.getById(vizId));
 
             cv.pentahoVisualizationHelpers[vizId] = vizHelper;
 
-            analyzer.LayoutPanel.configurationManagers['JSON_' + vizId] = analyzer.CCCVizConfig;
-            
-        }, this);
-    } // end init method
-});
+            analyzer.LayoutPanel.configurationManagers['JSON_' + vizId] =
+                vizCustomConfigs[vizId] || analyzer.CCCVizConfig;
+
+          }, this);
+        } // end init method
+      });
+    });

@@ -71,8 +71,9 @@ public class SolutionRepoLoadContentGenerator extends SimpleContentGenerator {
     ISolutionRepository repo = PentahoSystem.get(ISolutionRepository.class, userSession);
 
     // try to get the file from the repository
-    Document doc = repo.getResourceAsDocument(fullPath, ISolutionRepository.ACTION_EXECUTE);
-    
+//    Document doc = repo.getResourceAsDocument(fullPath, ISolutionRepository.ACTION_EXECUTE);
+    Document doc = repo.getNavigationUIDocument(null, fullPath, ISolutionRepository.ACTION_EXECUTE);
+
     if( doc != null ) {
       Element stateNode = (Element) doc.selectSingleNode( "state-file/state" ); //$NON-NLS-1$
       if( stateNode != null ) {

@@ -108,7 +108,8 @@ public class SolutionRepoSaveContentGenerator extends SimpleContentGenerator {
     // see if we can find a content generator to get the file icon
     IPluginManager pluginManager = PentahoSystem.get( IPluginManager.class, userSession );
     if( pluginManager != null ) {
-      IContentInfo contentInfo = pluginManager.getContentInfoFromExtension(type, userSession);
+//      IContentInfo contentInfo = pluginManager.getContentInfoFromExtension(type, userSession);
+      IContentInfo contentInfo = pluginManager.getContentTypeInfo(type);
       if( contentInfo != null ) {
         String icon = contentInfo.getIconUrl();
         documentation.addElement("icon").addCDATA( icon ); //$NON-NLS-1$

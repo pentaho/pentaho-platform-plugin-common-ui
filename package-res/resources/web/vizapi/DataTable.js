@@ -191,7 +191,7 @@ pentaho.DataTable.prototype.getValue = function(rowIdx,columnIdx) {
     if(!this.jsonTable.rows[rowIdx].c[columnIdx]){
         return null;
     }
-    if( this.jsonTable.rows[rowIdx].c[columnIdx].v ) {
+    if( this.jsonTable.rows[rowIdx].c[columnIdx].v !== undefined ) {
         // we have a value field so return it
         return this.jsonTable.rows[rowIdx].c[columnIdx].v;
     } else {
@@ -220,11 +220,11 @@ pentaho.DataTable.prototype.getFormattedValue = function(rowIdx,columnIdx) {
     if( !this.jsonTable.rows[rowIdx].c[columnIdx] ) {
         return null;
     }
-    else if( this.jsonTable.rows[rowIdx].c[columnIdx].f ) {
+    else if( this.jsonTable.rows[rowIdx].c[columnIdx].f !== undefined ) {
         // we have a formatted value so return it
         return this.jsonTable.rows[rowIdx].c[columnIdx].f;
     } 
-    else if( this.jsonTable.rows[rowIdx].c[columnIdx].v ) {
+    else if( this.jsonTable.rows[rowIdx].c[columnIdx].v !== undefined ) {
         // we have a value field so return it
         return this.jsonTable.rows[rowIdx].c[columnIdx].v;
     } 

@@ -181,6 +181,7 @@ dojo.declare(
         list.options[0] = opt;
         for(var idx=0; idx<fields.length; idx++) {
             opt = new Option( fields[idx].name, fields[idx].id );
+            opt.title = fields[idx].name;
 			list.options[list.length] = opt;
         }
   },
@@ -356,7 +357,9 @@ dojo.declare(
     var idx = 0;
     dojo.forEach(values, function(value) {
       if (value != null) {
-        this.containerNode.options[idx++] = new Option(value, value);
+        var opt =  new Option(value, value);
+        opt.title = value;
+        this.containerNode.options[idx++] = opt;
       }
     }, this.picklistUsedValues);
 
@@ -377,7 +380,8 @@ dojo.declare(
     dojo.empty(this.picklistAvailableValues.domNode);
     var sel = this.picklistAvailableValues.domNode;
     dojo.forEach(values, function (result, idx) {
-      this.containerNode.options[idx] = new Option(result, result)
+      this.containerNode.options[idx] = new Option(result, result);
+      this.containerNode.options[idx].title = result;
     }, this.picklistAvailableValues);
     this.picklistLoaded = true;
   },
@@ -514,6 +518,7 @@ dojo.declare(
     dojo.empty(this.matchAggType);
     dojo.forEach(this.currentColumn.availableAggregations, function(aggType, idx) {
       this.options[idx] = new Option(pentaho.pda.Column.AGG_TYPES_STRINGS[aggType], aggType);
+      this.options[idx].title = aggType;
     }, this.matchAggType);
     if (this.currentFilter.selectedAggType) {
       this.matchAggType.value = this.currentFilter.selectedAggType;
@@ -523,6 +528,7 @@ dojo.declare(
     var dataType = this.currentColumn.dataType === pentaho.pda.Column.DATA_TYPES.UNKNOWN ? pentaho.pda.Column.DATA_TYPES.STRING : this.currentColumn.dataType;
     dojo.forEach(pentaho.pda.Column.COMPARATOR[dataType], function(cArray, idx) {
       this.options[idx] = new Option(cArray[0], cArray[1]);
+      this.options[idx].title = cArray[0];
     }, this.matchComparator);
     this.matchComparator.value = this.currentFilter.operator;
     this._matchComparatorChanged();

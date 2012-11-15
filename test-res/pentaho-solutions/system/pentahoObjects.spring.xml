@@ -15,9 +15,16 @@ PentahoSystem which is initialized after Spring
   <bean id="IVersionHelper" class="org.pentaho.platform.util.VersionHelper" scope="singleton" />
   <bean id="systemStartupSession" class="org.pentaho.platform.engine.security.session.TrustedSystemStartupSession" scope="prototype" />
   
-  <bean id="ISolutionRepository" class="org.pentaho.platform.repository.solution.filebased.FileBasedSolutionRepository" scope="session" />
+  <!--<bean id="ISolutionRepository" class="org.pentaho.platform.repository.solution.filebased.FileBasedSolutionRepository" scope="session" />-->
+    <bean id="IUnifiedRepository" class="org.pentaho.platform.repository2.unified.fs.FileSystemBackedUnifiedRepository" scope="singleton">
+        <constructor-arg type="java.lang.String">
+            <value>test-res/pentaho-solutions</value>
+        </constructor-arg>
+    </bean>
 
-  <bean id="IMetadataDomainRepository" class="org.pentaho.platform.plugin.services.metadata.MetadataDomainRepository" scope="singleton"/>
+    <bean id="IMetadataDomainRepository" class="org.pentaho.platform.plugin.services.metadata.PentahoMetadataDomainRepository" scope="singleton">
+        <constructor-arg ref="IUnifiedRepository" />
+    </bean>
     
     <!-- Data connections.  Connections objects should be accessed through PentahoConnectionFactory, 
        not directly from the PentahoObjectFactory. -->

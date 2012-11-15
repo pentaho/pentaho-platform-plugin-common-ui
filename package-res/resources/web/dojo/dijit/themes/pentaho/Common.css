@@ -171,7 +171,8 @@
 }
 
 .pentaho-selection-dialog-inner-embed .pentaho-selection-dialog-selected {
-  padding:0px;
+  background-color: transparent;
+  padding: 0px;
   color: black;
   font-size: 1em;
   cursor: pointer;

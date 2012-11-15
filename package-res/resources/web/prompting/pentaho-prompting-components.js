@@ -1,4 +1,4 @@
-pen.define(['common-ui/prompting/pentaho-prompting-bind', 'common-ui/prompting/pentaho-prompting-builders'], function() {
+pen.define(['common-ui/prompting/pentaho-prompting-bind', 'common-ui/prompting/pentaho-prompting-builders', 'cdf/cdf-module'], function() {
   // Executes button.expression() in the scope of the button component (instead of the button)
   window.ScopedPentahoButtonComponent = BaseComponent.extend({
     update : function() {

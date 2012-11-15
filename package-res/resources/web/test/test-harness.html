@@ -175,7 +175,7 @@ function getOrdersModel() {
 		//function to be called for each source as it is added
 		function(source) {	
             models.push(source);	
-            if(source.id == 'steel-wheels/metadata.xmi:BV_ORDERS') {
+            if(source.id == 'steel-wheels:BV_ORDERS') {
                 model = source;
             }		
 		}
@@ -195,7 +195,7 @@ function assertEquals(shouldBe, is, idx, comment) {
 function test2() {
 
     pentaho.myapp.source = pentaho.myapp.app.getSources(null, {filter: {property:'id',
-    value:'steel-wheels/metadata.xmi:BV_ORDERS'}});
+    value:'steel-wheels:BV_ORDERS'}});
     pentaho.myapp.source.discoverModelDetail();
     var elements = pentaho.myapp.source.getAllElements();
 

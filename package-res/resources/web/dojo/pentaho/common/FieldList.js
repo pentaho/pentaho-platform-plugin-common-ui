@@ -19,7 +19,12 @@ dojo.declare(
   usedCategoryIds: {},
   
   sanitizeIdAndClassNames: function(name) {
+    if(name != null){
     return dojox.html.entities.encode(name).replace(/ /g,"_");
+    }
+    else{
+      return '';
+    }
   },
 
   generateUniqueClassName: function(categoryId) {
@@ -460,7 +465,9 @@ dojo.declare(
     // For all active filters add the fieldFiltered class to the field list div for the column that's filtered
     dojo.forEach(filters, function(filter) {
       var fieldDiv = dojo.byId("field-" + this.sanitizeIdAndClassNames(filter.column));
-      dojo.addClass(fieldDiv, "fieldlist-filtered-field");
+      if(fieldDiv != null){
+        dojo.addClass(fieldDiv, "fieldlist-filtered-field");
+      }
     }, this);
   },
 

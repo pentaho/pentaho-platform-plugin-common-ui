@@ -1,0 +1,41 @@
+.pentaho-expression{
+}
+
+.pentaho-operator{
+   float:left;
+   vertical-align: middle;
+}
+
+.pentaho-bracket{
+   float:left;
+   width: 10px;
+   padding: 0px;
+   margin: 0px;
+   border-left: 1px solid rgb(50,135,185);
+   border-top: 1px solid rgb(50,135,185);
+   border-bottom: 1px solid rgb(50,135,185);
+}
+
+.pentaho-conditions{
+  float: left;
+}
+
+/* http://www.positioniseverything.net/easyclearing.html */
+.pentaho-clearfix:after {
+  content: ".";
+  display: block;
+  height: 0;
+  clear: both;
+  visibility: hidden;
+}
+
+.pentaho-clearfix {/*display: inline-table;*/} /* PIR-749 */
+
+
+.pentaho-operator{
+  float: left;
+  vertical-align: middle;
+}
+
+.pentaho-operatorSelect{
+}

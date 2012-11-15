@@ -23,10 +23,12 @@ package org.pentaho.common.ui.test;
 import java.io.OutputStream;
 
 import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.pentaho.platform.engine.services.solution.SimpleContentGenerator;
 
 @SuppressWarnings({"all"})
 public class MockContentGenerator extends SimpleContentGenerator {
+  private static final Log log = LogFactory.getLog(MockContentGenerator.class);
 
   @Override
   public void createContent(OutputStream out) throws Exception {
@@ -42,8 +44,7 @@ public class MockContentGenerator extends SimpleContentGenerator {
 
   @Override
   public Log getLogger() {
-    // TODO Auto-generated method stub
-    return null;
+    return log;
   }
 
 }
