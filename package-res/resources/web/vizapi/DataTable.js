@@ -719,4 +719,349 @@ pentaho.DataView.prototype.setColumnProperty = function(columnIndex, name, value
 */
 pentaho.DataView.prototype.getColumnProperty = function(columnIndex, name) {
     return this.dataTable.getColumnProperty(columnIndex, name);
-}
+};
+
+/* TRENDS */
+
+(function(){
+
+    function argRequired(name){
+        return new Error("Argument '" + name + "' is required.");
+    }
+    
+    function argInvalid(name, text){
+        return new Error("Argument '" + name + "' is invalid." + (text ? (" " + text) : ""));
+    }
+    
+    /* createTrend
+     * Computes a trend of a given type and adds the 
+     * result to a new column in the data table.
+     *  
+     * trendArgs Keyword arguments
+     * trendArgs.type  The type of trend to create; possible values: 'linear'
+     * trendArgs.x     The index of the "x" value column; can be a numeric or string column
+     * trendArgs.y     The index of the "y" value column; must be of a column of type 'number'
+     * trendArgs.name  The name of the new trend column; defaults to the type of trend plus the suffix "Trend"
+     * trendArgs.label The label of the new trend column; defaults to the trend name, if specified, or the default label of the trend type.
+     * 
+     */
+    pentaho.DataView.prototype.createTrend = 
+    pentaho.DataTable.prototype.createTrend = function(trendArgs){
+        
+        // Validate arguments
+        
+        if(!(trendArgs instanceof Object)){
+            throw argRequired('trendArgs');
+        }
+        
+        // ----
+        
+        var trendType = trendArgs.type;
+        if(!trendType){
+            throw argRequired('trendArgs.type');
+        }
+        
+        trendType = '' + trendType; // toString
+        
+        var trendInfo = pentaho.trends.get(trendType, /*assert*/ true);
+        
+        // -----
+        
+        var colCount = this.getNumberOfColumns();
+        
+        var xIndex = trendArgs.x;
+        if(xIndex == null){
+            throw argRequired('trendArgs.x');
+        }
+        
+        xIndex = +xIndex; // toNumber
+        if(isNaN(xIndex)){
+            throw argInvalid('trendArgs.x', "Not a number.");
+        }
+        
+        if(xIndex < 0 || xIndex >= colCount){
+            throw argInvalid('trendArgs.x', "Out of range.");
+        }
+        
+        // can be numeric or string
+        
+        // -----
+        
+        var yIndex = trendArgs.y;
+        if(yIndex == null){
+            throw argRequired('trendArgs.y');
+        }
+        
+        yIndex = +yIndex; // toNumber
+        if(isNaN(yIndex)){
+            throw argInvalid('trendArgs.y', "Not a number.");
+        }
+        
+        if(yIndex < 0 || yIndex >= colCount){
+            throw argInvalid('trendArgs.y', "Out of range.");
+        }
+        
+        if(this.getColumnType(yIndex) !== 'number'){
+            throw argInvalid('trendArgs.y', "Must be a numeric column.");
+        }
+        
+        // xIndex may be equal to yIndex...
+        
+        // ----
+        
+        var trendName  = trendArgs.name  ||
+                         (trendType + "Trend");
+        
+        var trendLabel = trendArgs.label ||
+                         (trendArgs.name ?  trendName : trendInfo.label);
+        
+        // ----
+        
+        var trendOptions = trendArgs.options || {};
+        
+        // ----
+        
+        // Create the trend column. 
+        //   Am I a DataView or a DataTable?
+        var table = (this.dataTable || this).jsonTable;
+        var trendIndex = table.cols.length; 
+        table.cols.push({
+            type:  'number',
+            id:    trendName,
+            label: trendLabel
+        });
+        
+        // ----
+        
+        var isXDiscrete = this.getColumnType(xIndex) !== 'number';
+        
+        var rowIndexesEnumtor = this.getRowIndexEnumerator();
+        
+        var me = this;
+        
+        var funX = isXDiscrete ? 
+            null : // means: "use *index* as X value"
+            function(i){
+                return me.getValue(i, xIndex);
+            };
+        
+        var funY = function(i){
+                return me.getValue(i, yIndex);
+            };
+        
+        var options = Object.create(trendOptions);
+        options.rows = rowIndexesEnumtor;
+        options.x = funX;
+        options.y = funY;
+        
+        var trendModel = trendInfo.model(options);
+        if(!trendModel){
+            // Not enough points to interpolate...
+            // Fill every row's trend column with null
+            dojo.forEach(table.rows, function(row){
+                row.c[trendIndex] = {v: null};
+            });
+            
+            return false;
+        }
+        
+        dojo.forEach(table.rows, function(row, i){
+            var trendX = funX ? funX(i) : i;
+            var trendY = trendX != null ?
+                trendModel.sample(trendX, funY(i), i) : 
+                null;
+            
+            row.c[trendIndex] = {v: trendY};
+        });
+        
+        return true;
+    };
+
+    /* getRowIndexEnumerator
+     * 
+     * Obtains an enumerator for the row index of the data table. 
+     */
+    pentaho.DataView.prototype.getRowIndexEnumerator = 
+    pentaho.DataTable.prototype.getRowIndexEnumerator = function(){
+        var index = -1;
+        var count = this.getNumberOfRows();
+        var enumtor = {
+            item: undefined,
+            next: function(){
+                if(index < count - 1){
+                    enumtor.item = ++index; // the row index
+                    return true;
+                }
+                
+                if(enumtor.item) {
+                    enumtor.item = undefined; 
+                }
+                
+                return false;
+            }
+        };
+        
+        return enumtor;
+    };
+        
+    /* trendType -> trendInfo */
+    var _trends = {};
+    
+    pentaho.trends = {};
+    
+    /* define
+     * Defines a trend type given its specification.
+     * 
+     * type The type of trend to define.
+     * spec The trend specification object.
+     * spec.label A name for the type of trend; defaults to the capitalized trend type with the suffix "Trend".
+     * spec.model A function that given a series of points computes a trend model.
+     * 
+     */
+    pentaho.trends.define = function(type, spec){
+        if(!type){
+            throw argRequired('type');
+        }
+        
+        type = '' + type; // to string
+        
+        if(!spec){
+            throw argRequired('spec');
+        }
+        
+        // ----
+        
+        var model = spec.model;
+        if(!model){
+            throw argRequired('spec.model');
+        }
+        
+        if(typeof model !== 'function'){
+            throw argInvalid('spec.model', "Not a function");
+        }
+        
+        // ----
+        
+        var label = spec.label;
+        if(!label){
+            label = type.chartAt(0).toUpperCase() + type.substr(1) + " Trend";
+        }
+        
+        var trendInfo = {
+           type:  type,
+           label: label,
+           model: model
+        };
+        
+        _trends[type] = trendInfo;
+    };
+    
+    /* get
+     * Obtains the trend info object of a given trend type.
+     * 
+     * type The type of trend desired.
+     * assert If an error should be thrown if the trend type is not defined.
+     */
+    pentaho.trends.get = function(type, assert){
+        if(!type){
+            throw argRequired('type');
+        }
+        
+        var trendInfo = _trends.hasOwnProperty(type) ? _trends[type] : null;
+        if(!trendInfo && assert){
+            throw argInvalid('type', "There is no trend type named '" + type + "'.");
+        }
+        
+        return trendInfo;
+    };
+    
+    /* types
+     * Obtains an array with the names of all defined trend types.
+     */
+    pentaho.trends.types = function(){
+        // TODO: replace with dojo or JavaScript's Object.keys implementation...
+        
+        var ret = [];
+        for(var p in _trends){
+            if(Object.prototype.hasOwnProperty.call(_trends, p)){
+                ret.push(p);
+            }
+        }
+
+        return ret;
+    };
+    
+    // --------------------
+    
+    function parseNum(value){
+        return value != null ? (+value) : NaN;  // to Number works for dates as well
+    }
+  
+    pentaho.trends.define('linear', {
+        label: 'Linear trend',
+        model: function(options){
+            var rowsQuery = options.rows;
+            var funX = options.x;
+            var funY = options.y;
+            
+            var i = 0;
+            var N = 0;
+            var sumX  = 0;
+            var sumY  = 0;
+            var sumXY = 0;
+            var sumXX = 0;
+            
+            while(rowsQuery.next()){
+                var row = rowsQuery.item;
+                
+                // Ignore null && NaN values
+                var x = funX ? parseNum(funX(row)) : i; // use the index itself for discrete stuff
+                if(!isNaN(x)){
+                    var y = parseNum(funY(row));
+                    if(!isNaN(y)){
+                        N++;
+                        
+                        sumX  += x;
+                        sumY  += y;
+                        sumXY += x * y;
+                        sumXX += x * x;
+                    }
+                }
+                
+                i++; // Discrete nulls must still increment the index
+            }
+            
+            // y = alpha + beta * x
+            var alpha, beta;
+            if(N >= 2){
+                var avgX  = sumX  / N;
+                var avgY  = sumY  / N;
+                var avgXY = sumXY / N;
+                var avgXX = sumXX / N;
+            
+                // When N === 1 => den = 0
+                var den = (avgXX - avgX * avgX);
+                if(den === 0){
+                    beta = 0;
+                } else {
+                    beta = (avgXY - (avgX * avgY)) / den;
+                }
+                
+                alpha = avgY - beta * avgX;
+                
+                return {
+                    alpha: alpha,
+                    beta:  beta,
+                    
+                    reset: function(){},
+                    
+                    // y = alpha + beta * x
+                    sample: function(x){
+                        return alpha + beta * (+x);
+                    }
+                };
+            }
+        }
+    });
+    
+}());
