@@ -1614,7 +1614,14 @@ function(def, pvc, pv){
          * for being chosen as the drilling axis.
          */
         _drillAxesIds: ['column', 'row'],
-
+        
+        /* The linking axes.
+        *
+        * In the order to be tested
+        * for being chosen as the link axis.
+        */
+        _linkAxesIds: ['column', 'row'],
+        
         /* Measure roles that do not show the role in the tooltip.
          */
         _noRoleInTooltipMeasureRoles: {'measures': true},
@@ -2877,7 +2884,7 @@ function(def, pvc, pv){
             // Add every level gem with content link to the action context
             var actionContext = 
                 def
-                .query(this._drillAxesIds)
+                .query(this._linkAxesIds)
                 .selectMany(function(axisId){
                     return this.axes[axisId]
                         .selectGemsWithLink('DASHBOARD', complex, /* reverse */ false);
@@ -2902,7 +2909,7 @@ function(def, pvc, pv){
         _followHyperlink: function(hyperlinkInfo, complex){
             var actionContext = 
                 def
-                .query(this._drillAxesIds)
+                .query(this._linkAxesIds)
                 .selectMany(function(axisId){
                     return this.axes[axisId].selectBoundGems(complex);
                 }, this)
@@ -2986,10 +2993,8 @@ function(def, pvc, pv){
         },
         
         _getHyperlinkInfo: function(complex){
-            /* Find an axis to hyperlink on.
-             * The order of search is that of #_drillAxesIds.
-             */
-            return def.query(this._drillAxesIds)
+            /* Find an axis to hyperlink on. */
+            return def.query(this._linkAxesIds)
                         .select(function(axisId){
                             return this.axes[axisId].getHyperlinkInfo(complex);
                         }, this)
@@ -3447,6 +3452,8 @@ function(def, pvc, pv){
         
         _drillAxesIds: ['row'/*, 'column'*/],
         
+        _linkAxesIds: ['row', 'column'],
+        
         _readUserOptions: function(options, vizOptions){
             
             this.base(options, vizOptions);
@@ -3485,6 +3492,8 @@ function(def, pvc, pv){
        _cccClass: 'pvc.StackedAreaChart',
        
        _drillAxesIds: ['row'/*, 'column'*/],
+       
+       _linkAxesIds: ['row', 'column'],
        
        _options: {
            //visibleLines: true, // TODO: check this, was linesVisibleLines ??
@@ -3938,6 +3947,8 @@ function(def, pvc, pv){
         
         // Only 'multi' is on column axis, and drilling down on multi is undesired
         _drillAxesIds: ['row', 'column'],
+        
+        _linkAxesIds: ['row', 'column'],
         
         _configure: function(){
             
