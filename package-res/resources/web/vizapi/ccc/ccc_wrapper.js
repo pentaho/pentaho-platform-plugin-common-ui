@@ -7,8 +7,6 @@ pen.define([
     ],
 function(def, pvc, pv){
 
-    var _filterSelectionMaxCount = 200; // TODO: Selection count limit is hard-coded
-    
     // TODO: with requireJS is this still needed?
     // Declare **global** pentaho namespace variable
     pentaho = typeof pentaho != "undefined" ? pentaho : {};
@@ -677,7 +675,7 @@ function(def, pvc, pv){
         }
     }
 
-    var colorPalete = [
+    var _defaultColorPalete = [
         "#0000cc",
         "#0d8ecf",
         "#b0de09",
@@ -709,6 +707,8 @@ function(def, pvc, pv){
         "#3c077b",
         "#000000"
     ];
+    
+    var _colorPalete; // to be initialized
     
     // -------------
     // Axes are: row, column and measure.
@@ -2304,7 +2304,7 @@ function(def, pvc, pv){
             
             switch(colorScaleKind){
                 case 'discrete':
-                    options.colors = colorPalete; //this._vizOptions.palette.colors.slice(0, seriesCount);
+                    options.colors = this._getColorPalete();
                     break;
                     
                 case 'continuous':
@@ -2312,6 +2312,19 @@ function(def, pvc, pv){
                     options.colors = vizOptions.colors;
                     break;
             }
+        },
+        
+        _getColorPalete: function(){
+            //this._vizOptions.palette.colors.slice(0, seriesCount);
+            if(!_colorPalete){
+                var colorPalete = this._vizHelper.configProperty('chart.series.colors');
+                if(colorPalete){
+                    _colorPalete = colorPalete.split(/\s*,\s*/);
+                } else {
+                    _colorPalete = _defaultColorPalete;
+                }
+            }
+            return _colorPalete;
         },
         
         _configureTrends: function(){
@@ -2663,9 +2676,10 @@ function(def, pvc, pv){
         
         _limitSelection: function(selections){
             // limit selection
+            var filterSelectionMaxCount = this._vizHelper.configProperty('filter.selection.max.count') || 200;
             var selections2 = selections;
             var L = selections.length;
-            var deselectCount = L - _filterSelectionMaxCount;
+            var deselectCount = L - filterSelectionMaxCount;
             if(deselectCount > 0) {
                 // Build a list of datums to deselect
                 var deselectDatums = [];
@@ -2680,7 +2694,7 @@ function(def, pvc, pv){
                             if(!this._previousSelectionKeys[key]){
                                 keep = false;
                             }
-                        } else if(i >= _filterSelectionMaxCount) {
+                        } else if(i >= filterSelectionMaxCount) {
                             keep = false;
                         }
                     }
@@ -2708,7 +2722,7 @@ function(def, pvc, pv){
                 
                 this._vizHelper.showConfirm([
                                  'infoExceededMaxSelectionItems', 
-                                 _filterSelectionMaxCount
+                                 filterSelectionMaxCount
                              ], 
                              'SELECT_ITEM_LIMIT_REACHED');
             }

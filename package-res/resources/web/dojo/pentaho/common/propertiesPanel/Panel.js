@@ -978,6 +978,7 @@ dojo.declare(
       className:"propPanel_control",
       constructor:function (options) {
         this.disabled = this.model.disabled;
+        this.value = this.model.value;
         this.inherited(arguments);
       },
       onChange: function(){
