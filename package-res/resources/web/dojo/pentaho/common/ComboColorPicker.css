@@ -1,0 +1,33 @@
+.colorbox{
+    widthx:106px;
+    height:100%;
+    border:1px solid #ffffff;
+}
+
+.colorboxOuter{
+    widthx:108px;
+    height:100%;
+    border:1px solid #646464;
+    background-color:#ffffff;
+}
+
+.usedColorTable {
+    border:1px solid #84a9d1;
+    widthx:16px;
+    height:14px;
+    padding:2px;
+    background-color:#ffffff;
+}
+
+.usedColorTableCell {
+    border:1px solid #999999;
+    width:14px;
+    height:14px;
+    padding:0px;
+}
+
+.usedColorTableDiv {
+    border:1px solid #ffffff;
+    width:14px;
+    height:12px;
+}

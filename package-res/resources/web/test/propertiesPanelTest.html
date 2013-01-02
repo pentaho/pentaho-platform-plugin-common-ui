@@ -1,0 +1,344 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns:pho="http:/www.pentaho.com">
+<head>
+  <title>Properties Panel Test</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+
+  <link rel="stylesheet" type="text/css" href="../dojo/dijit/themes/pentaho/pentaho.css"/>
+
+  <link rel="stylesheet" type="text/css" href="../dojo/dijit/themes/claro/claro.css"/>
+
+  <script type="text/javascript" src="webcontext.js?content=common-ui"></script>
+
+  <script type="text/javascript">
+    //<![CDATA[
+
+    $.extend(djConfig,
+        { modulePaths:{
+          'pentaho.common':"../pentaho/common"
+        },
+          parseOnLoad:true,
+          baseUrl:'../dojo/dojo/',
+          isDebug:true,
+          debugAtAllCosts:true
+        });
+    //]]>
+  </script>
+  <style>
+    body, html {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .propPanel_gemBar {
+      height: 25px;
+      width: 100%;
+      border: 1px solid blue;
+      background-color: #FFFFCC;
+    }
+
+    .pentahoPropertiesPanel {
+      border: 1px solid #666;
+      background-color: #d3d3d3;
+    }
+
+    .pentahoPropertiesPanel .caption {
+
+    }
+
+    .pentahoPropertiesPanel .caption-text {
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .pentahoPropertiesPanel>* {
+      margin-bottom: 8px;
+    }
+
+    .dijitTitlePaneContentInner>div>*:nth-child(2n) {
+      margin-bottom: 8px;
+    }
+
+    .gem {
+      border-radius: 5px;
+      /* Firefox */
+      -moz-border-radius: 5px;
+      /* Safari/Chrome */
+      -webkit-border-radius: 5px;
+      border: 1px solid blue;
+      background-color: skyblue;
+      height: 16px;
+      margin: 1px;
+      padding: 2px;
+      display: inline-block;
+    }
+
+  </style>
+
+
+  <script language='javascript' type='text/javascript' src='../dojo/dojo/dojo.js'></script>
+  <!--script language='javascript' type='text/javascript' src='../dojo/pentaho/common/propertiesPanel/Panel.js'></script-->
+
+
+  <script type="text/javascript">
+
+    dojo.require("dojo.parser");
+    dojo.require("pentaho.common.propertiesPanel.Panel");
+    dojo.require("pentaho.common.propertiesPanel.Configuration");
+    dojo.require("dojo.dnd.Source");
+    dojo.require("dijit.layout.BorderContainer");
+    dojo.require("dojo.fx.easing");
+
+    function changeConfiguration() {
+
+      var propertiesPanel = dijit.byId('panel');
+
+      var configJson = eval("(" + dojo.byId('testJSON').value + ")");
+      var config = new pentaho.common.propertiesPanel.Configuration(configJson);
+
+      propertiesPanel.setConfiguration(config);
+
+      dojo.connect(config, "onModelEvent", function (item, eventName, args) {
+
+        log("received property change for: " + item.id + "\n" +
+            "\tevent property:\t" + eventName + "\n\told value:\t" + args.prevVal + "\n\tnew value:\t" + args.newVal);
+        output.scrollTop = output.scrollHeight;
+
+
+        // disable/enable item
+        if (item.id == "testCheckbox" && propName == "value") {
+          propertiesPanel.set('disabled', 'testTextbox', !newVal);
+        }
+      });
+
+    }
+    ;
+    function log(str) {
+      var output = dojo.byId("output");
+      output.innerHTML = str + "\n\n" + output.innerHTML;
+    }
+
+    var disabledState = false;
+    function disable() {
+      var propertiesPanel = dijit.byId('panel');
+      disabledState = !disabledState;
+      propertiesPanel.set('disabled', "testCombo", disabledState);
+      propertiesPanel.set('disabled', "testSlider", disabledState);
+      propertiesPanel.set('disabled', "testTextbox", disabledState);
+      propertiesPanel.set('disabled', "testCheckbox", disabledState);
+    }
+
+    function ramdomValues() {
+      var propertiesPanel = dijit.byId('panel');
+
+      var comboVals = propertiesPanel.configuration.byId('testCombo').values;
+
+      propertiesPanel.set('value', "testCombo", comboVals[Math.round(Math.random() * comboVals.length)]);
+      propertiesPanel.set('value', "testSlider", Math.random() * 100);
+      propertiesPanel.set('value', "testTextbox", Math.random());
+      propertiesPanel.set('value', "testCheckbox", !propertiesPanel.configuration.byId("testCheckbox").value);
+    }
+
+
+    dojo.declare("GemBarUISource", [dojo.dnd.Source], {
+
+      creator:function (item, hint) {
+
+        var gem = this.createGemFromNode(item);
+        var ui = this.createGemUI(gem);
+        return { node:ui.domNode, data:gem };
+      },
+      copyOnly:true,
+
+      createGemFromNode:function (sourceNode) {
+        return new pentaho.common.propertiesPanel.Configuration.registeredTypes["gem"]({id:sourceNode.innerHTML});
+      },
+      createGemUI:function (gem) {
+        return new pentaho.common.propertiesPanel.GemUI(gem, this.className);
+      },
+    });
+
+    dojo.addOnLoad(function () {
+
+      var propertiesPanel = dijit.byId('panel');
+      dojo.connect(propertiesPanel, "onUIEvent",
+          function (eventName, args) {
+            log("Received UI event: " + eventName + " for: " + args.item.model.id);
+          });
+    });
+
+    function collapsePanel() {
+      var targetWidth = (parseInt(dojo.byId("panel").style.width) == 0) ? 250 : 0;
+
+      dojo.animateProperty({
+
+        node:"panel",
+        // dojo figures out the start value
+        properties:{ width:{ end:targetWidth } },
+        easing:dojo.fx.easing.quadIn,
+        duration:300,
+
+        onAnimate:function (node) {
+          dijit.byId("borderContainer").layout();
+
+        }, onEnd:function () {
+          dijit.byId("borderContainer").layout();
+        }
+      }).play(); // delay playing half a second
+    }
+
+
+  </script>
+
+</head>
+
+<body class="claro body">
+
+<div data-dojo-type="dijit.layout.BorderContainer" id="borderContainer" style="width: 100%; height: 100%"
+     design="sidebar" gutters="false">
+
+  <div dojoType="dijit.layout.ContentPane" region="left" style="width:18px">
+    <div onclick="collapsePanel()" style="-webkit-transform: rotate(-90deg); -o-transform: rotate(-90deg); transform: rotate(-90deg);
+        -moz-transform: rotate(-90deg); margin-top:28px; background-color: #CCC; cursor: pointer">Layout
+    </div>
+  </div>
+  <div dojoType="pentaho.common.propertiesPanel.Panel" id="panel" region="left" splitter="true" style="width: 300px;">
+  </div>
+  <div dojoType="dijit.layout.ContentPane" region="center">
+
+    JSON:<br/>
+    <textarea rows="20" id="testJSON" style="width:100%; display: block;">
+      {groups: {
+      "testGroup":
+      {
+      id: "testGroup",
+      title: "Test Group 1"
+      },
+      "testGroup2":
+      {
+      id: "testGroup2",
+      title: "Test Group 2"
+      }
+      },
+
+      properties: [
+      { id: 'testGem',
+      dataType: 'string',
+      dataStructure: 'column',
+      required: true,
+      ui: {
+      group: "testGroup",
+      type: 'gemBar',
+      dndType: 'gem',
+      caption: 'Gem Bar'
+      }
+      },
+      { id: 'testGem2',
+      dataType: 'string',
+      dataStructure: 'column',
+      required: true,
+      ui: {
+      group: "testGroup",
+      type: 'gemBar',
+      dndType: 'gem',
+      caption: 'Gem Bar 2'
+      }
+      },
+      {
+      id: 'testCombo',
+      dataType: 'string',
+      values: ["foo", "bar", "baz"],
+      value: "bar",
+      ui: {
+      labels: ["Foo", "Bar", "Baz"],
+      group: "testGroup2",
+      type: 'combo',
+      caption: "Combo Box"
+      }
+      },
+
+      {
+      id: 'testCombo',
+      dataType: 'string',
+      values: ["foos", "bars", "bazs"],
+      value: "bar",
+      ui: {
+      group: "testGroup2",
+      type: 'combo',
+      caption: "Combo Box"
+      }
+      },
+
+      {
+      id: 'testSlider',
+      dataType: 'number',
+      uiType: 'slider',
+      value: 35,
+      ui: {
+      group: "testGroup2",
+      type: 'slider',
+      caption: "Slider"
+      }
+      },
+      {
+      id: 'testCheckbox',
+      dataType: 'boolean',
+      value: false,
+      ui: {
+      group: "testGroup2",
+      type: 'checkbox',
+      label: "working?",
+      caption: "Checkbox"
+      }
+      },
+      {
+      id: 'testTextbox',
+      dataType: 'string',
+      value: "default",
+      ui: {
+      group: "testGroup2",
+      type: 'textbox',
+      caption: "Text"
+      }
+      },
+      {
+      id: "optionsBtn",
+      dataType: 'none',
+      ui: {
+      group: "testGroup2",
+      type: "button",
+      label: "Button"
+      }
+      }
+
+      ]
+      }
+    </textarea>
+    <button onClick="changeConfiguration()" style="margin: auto; ">Parse</button>
+    <br/><br/>
+    Events:<br/>
+
+    <div style="border: 1px solid black; width: 100%; height: 200px; overflow-y: auto;text-align:left">
+      <pre id="output"/>
+    </div>
+    <button style="display: block" onClick="disable()">Toggle Disable</button>
+    <button style="display: block" onClick="ramdomValues()">Random Vals</button>
+    <div style="width:100%; clear:both" dojoType="dojo.dnd.Source">
+      <span style="width: 100px; height: 20px; border: 1px solid black" dndType="gem" class="dojoDndItem"
+            id="sourceNode">Test1</span>
+      <span style="width: 100px; height: 20px; border: 1px solid black" dndType="gem" class="dojoDndItem"
+            id="sourceNode2">Test2</span>
+      <span style="width: 100px; height: 20px; border: 1px solid black" dndType="gem" class="dojoDndItem"
+            id="sourceNode3">Test3</span>
+    </div>
+    <div style="background-color:#FFFFCC; height: 40px; width: 100%" dojoType="GemBarUISource" accept="gem"></div>
+  </div>
+
+</div>
+</body>
+
+</html>

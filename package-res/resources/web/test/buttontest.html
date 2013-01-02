@@ -1,0 +1,174 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns:pho="http:/www.pentaho.com">
+    <head>
+        <title>Button Test</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+        <link rel="stylesheet" type="text/css" href="../dojo/dijit/themes/pentaho/pentaho.css"/>
+
+        <script type="text/javascript" src="webcontext.js?content=common-ui"></script>
+
+        <script type="text/javascript">
+            //<![CDATA[
+
+                $.extend(djConfig,
+                    { modulePaths: {
+                        'pentaho.common': "../pentaho/common"
+                    },
+                    parseOnLoad: true,
+                    baseUrl: '../dojo/dojo/'
+                });
+              //]]>
+        </script>
+
+
+        <script language='javascript' type='text/javascript' src='../dojo/dojo/dojo.js.uncompressed.js'></script>
+        <script language='javascript' type='text/javascript' src='../dojo/dojo/dojo-ext.js.uncompressed.js'></script>
+
+        <script type="text/javascript">
+
+            dojo.require("dojo.parser");
+            dojo.require("pentaho.common.SmallImageButton");
+            dojo.require("pentaho.common.ToggleButton");
+
+            function doload() {
+
+                enableButtons();
+            }
+                
+            dojo.ready(doload);
+                
+            function buttonClick(id) {
+                alert('Button Clicked: '+id);
+            }
+            
+            function toggleChange(checked) {
+                alert('Toggle Button Checked: '+checked);
+            }
+            
+            function disableButtons() {
+                dijit.byId('toggleButton').set('disabled',true);
+                dijit.byId('addButton').set('disabled',true);
+                dijit.byId('editButton').set('disabled',true);
+                dijit.byId('deleteButton').set('disabled',true);
+                dijit.byId('undoButton').set('disabled',true);
+                dijit.byId('redoButton').set('disabled',true);
+                dijit.byId('filterButton').set('disabled',true);
+                dijit.byId('layoutButton').set('disabled',true);
+                dijit.byId('backcolorButton').set('disabled',true);
+                dijit.byId('forecolorButton').set('disabled',true);
+                dijit.byId('downButton').set('disabled',true);
+                dijit.byId('upButton').set('disabled',true);
+                dijit.byId('optionsButton').set('disabled',true);
+                dijit.byId('closeButton').set('disabled',true);
+                dijit.byId('leftButton').set('disabled',true);
+                dijit.byId('rightButton').set('disabled',true);
+                dijit.byId('closeBigButton').set('disabled',true);
+                dijit.byId('pageBackButton').set('disabled',true);
+                dijit.byId('pageNextButton').set('disabled',true);
+                dojo.byId('disableButton').disabled = true;
+                
+            }
+
+            function enableButtons() {
+                dijit.byId('toggleButton').set('disabled',false);
+                dijit.byId('addButton').set('disabled',false);
+                dijit.byId('editButton').set('disabled',false);
+                dijit.byId('deleteButton').set('disabled',false);
+                dijit.byId('undoButton').set('disabled',false);
+                dijit.byId('redoButton').set('disabled',false);
+                dijit.byId('filterButton').set('disabled',false);
+                dijit.byId('layoutButton').set('disabled',false);
+                dijit.byId('backcolorButton').set('disabled',false);
+                dijit.byId('forecolorButton').set('disabled',false);
+                dijit.byId('downButton').set('disabled',false);
+                dijit.byId('upButton').set('disabled',false);
+                dijit.byId('optionsButton').set('disabled',false);
+                dijit.byId('closeButton').set('disabled',false);
+                dijit.byId('leftButton').set('disabled',false);
+                dijit.byId('rightButton').set('disabled',false);
+                dijit.byId('closeBigButton').set('disabled',false);
+                dijit.byId('pageBackButton').set('disabled',false);
+                dijit.byId('pageNextButton').set('disabled',false);
+                dojo.byId('disableButton').disabled = false;
+            }
+
+        </script>
+
+    </head>
+
+    <body class="tundra body" onload="doload()">
+        
+        <div style="padding: 8px; background-color:white">
+        
+            <h3>UI Widgets - Buttons</h3>
+            This example shows you how use buttons.
+            <p/>
+
+            <button id="disableButton" class="pentaho-button" onclick="disableButtons()" disabled="false">Disable Buttons</button>
+            &nbsp;
+            <button class="pentaho-button" onclick="enableButtons()">Enable Buttons</button>
+
+            <div dojoType="pentaho.common.ToggleButton" id="toggleButton" title="Sample toggle Button" label="Toggle Me" onchange="toggleChange">
+            </div>
+
+            <div dojoType="pentaho.common.SmallImageButton" id="addButton" title="Sample Add Button" baseClass="pentaho-addbutton" onclick="buttonClick(this.id)">
+            </div>
+
+            <div dojoType="pentaho.common.SmallImageButton" id="editButton" title="Sample Edit Button" baseClass="pentaho-editbutton" onclick="buttonClick(this.id)">
+            </div>
+
+            <div dojoType="pentaho.common.SmallImageButton" id="deleteButton" title="Sample Delete Button" baseClass="pentaho-deletebutton" onclick="buttonClick(this.id)">
+            </div>
+
+            <div dojoType="pentaho.common.SmallImageButton" id="undoButton" title="Sample Undo Button" baseClass="pentaho-undobutton" onclick="buttonClick(this.id)">
+            </div>
+
+            <div dojoType="pentaho.common.SmallImageButton" id="redoButton" title="Sample Redo Button" baseClass="pentaho-redobutton" onclick="buttonClick(this.id)">
+            </div>
+
+            <div dojoType="pentaho.common.SmallImageButton" id="filterButton" title="Sample Filter Button" baseClass="pentaho-filterbutton" onclick="buttonClick(this.id)">
+            </div>
+
+            <div dojoType="pentaho.common.SmallImageButton" id="layoutButton" title="Sample Layout Button" baseClass="pentaho-layoutbutton" onclick="buttonClick(this.id)">
+            </div>
+
+            <div dojoType="pentaho.common.SmallImageButton" id="backcolorButton" title="Sample Background Color Button" baseClass="pentaho-backcolorbutton" onclick="buttonClick(this.id)">
+            </div>
+
+            <div dojoType="pentaho.common.SmallImageButton" id="forecolorButton" title="Sample Foreground Button" baseClass="pentaho-forecolorbutton" onclick="buttonClick(this.id)">
+            </div>
+
+            <div dojoType="pentaho.common.SmallImageButton" id="downButton" title="Sample Down Button" baseClass="pentaho-downbutton" onclick="buttonClick(this.id)">
+            </div>
+
+            <div dojoType="pentaho.common.SmallImageButton" id="upButton" title="Sample Up Button" baseClass="pentaho-upbutton" onclick="buttonClick(this.id)">
+            </div>
+
+            <div dojoType="pentaho.common.SmallImageButton" id="optionsButton" title="Sample Options Button" baseClass="pentaho-optionsbutton" onclick="buttonClick(this.id)">
+            </div>
+
+            <div dojoType="pentaho.common.SmallImageButton" id="closeButton" title="Sample Close Button" baseClass="pentaho-closebutton" onclick="buttonClick(this.id)">
+            </div>
+
+            <div dojoType="pentaho.common.SmallImageButton" id="leftButton" title="Sample Left Button" baseClass="pentaho-left-lgbutton" onclick="buttonClick(this.id)">
+            </div>                            
+            
+            <div dojoType="pentaho.common.SmallImageButton" id="rightButton" title="Sample Right Button" baseClass="pentaho-right-lgbutton" onclick="buttonClick(this.id)">
+            </div>                            
+
+            <div dojoType="pentaho.common.SmallImageButton" id="closeBigButton" title="Sample Close Button" baseClass="pentaho-closebutton-big" onclick="buttonClick(this.id)">
+            </div>                            
+
+            <div dojoType="pentaho.common.SmallImageButton" id="pageBackButton" title="Sample Previous Button" baseClass="pentaho-pagebackbutton" onclick="buttonClick(this.id)">
+            </div>                            
+
+            <div dojoType="pentaho.common.SmallImageButton" id="pageNextButton" title="Sample Next Button" baseClass="pentaho-pagenextbutton" onclick="buttonClick(this.id)">
+            </div>                            
+                               
+                                                                  
+        </div>
+
+    </body>
+  
+</html>

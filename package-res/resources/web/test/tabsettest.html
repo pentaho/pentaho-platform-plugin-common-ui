@@ -1,0 +1,141 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns:pho="http:/www.pentaho.com">
+    <head>
+        <title>Tab Set Test</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+        <link rel="stylesheet" type="text/css" href="../dojo/dijit/themes/pentaho/pentaho.css"/>
+
+        <script type="text/javascript" src="webcontext.js?content=common-ui"></script>
+
+        <script type="text/javascript">
+            //<![CDATA[
+
+            $.extend(djConfig, { modulePaths: {
+                                    'pentaho.common': "../pentaho/common"
+                                },
+                                parseOnLoad: true,
+                                baseUrl: '../dojo/dojo/'
+                            });
+
+
+              //]]>
+        </script>
+
+        <script language='javascript' type='text/javascript' src='../dojo/dojo/dojo.js.uncompressed.js'></script>
+        <script language='javascript' type='text/javascript' src='../dojo/dojo/dojo-ext.js.uncompressed.js'></script>
+
+        <script type="text/javascript">
+
+            dojo.require("dojo.parser");
+            dojo.require("pentaho.common.TabSet");
+
+            function doload() {
+          
+                // configure the tab set
+                var tabObj = dijit.byId('tabset');
+                // tell the tabset where the tab panels are
+                tabObj.stackContainerId = 'tabspanels';
+                // tell the tabset about the tabs
+                tabObj.setTabs([
+                    {
+                        id: 'tab1div',
+                        title: 'Tab 1',
+                        beforeCallback: tabClick,
+                        afterCallback: tabChanged
+                    },
+                    {
+                        id: 'tab2div',
+                        title: 'Tab 2',
+                        beforeCallback: tabClick,
+                        afterCallback: tabChanged
+                    },
+                    {
+                        id: 'tab3div',
+                        title: 'Tab 3',
+                        beforeCallback: tabClick,
+                        afterCallback: tabChanged
+                    }
+                ]);
+
+            }
+                
+            // this function is called before the contents of the chosen tab are displayed
+            function tabClick(tab) {
+                alert('about to display content for tab id="'+tab.id+'", title="'+tab.title);
+            }
+            
+            // this function is called after the contents of the chosen tab are displayed
+            function tabChanged(tab) {
+                alert('now displaying content for tab id="'+tab.id+'", title="'+tab.title);
+            }
+            
+            dojo.ready(doload);
+        
+        </script>
+
+    </head>
+
+    <body class="tundra body" onload="doload()" style="padding: 8px; background-color:white; height:100%">
+        
+        <div style="padding: 8px; background-color:white; height:100%">
+        
+            <h3>UI Widgets - Tab Set</h3>
+            This example shows you how create a tab set.
+            <p/>
+            
+            <!-- this is the container for the tab set -->
+            <div id="tabset" dojoType="pentaho.common.TabSet" style="width:250px;height:23px; position:absolute; top:90px; left:10px">
+            </div>
+            
+            <!-- these are the panels for the tabs -->
+            <div id="tabspanels" dojoType="dijit.layout.StackContainer" tabStrip="true" isLayoutContainer="true" style="padding: 0px; width:250px; position:absolute; top:114px; left:10px">
+            
+                <div id="tab1div" title="tab1" selected="true" dojoType="dijit.layout.ContentPane" class="dialog-content" style="padding: 0px; overflow:hidden; height:300px;" >
+
+                    <div id="datatabpanel" class="tabpanel" style="height: 100%; overflow:hidden; padding: 0px">
+                        
+                        <!-- this is the HTML for a section header -->
+                        <div class="section-header-outer">
+                            <div class="section-header-middle">
+                                <div class="pentaho-titled-toolbar section-header-inner pentaho-padding-sm" style="heightx: 38px; ">
+                                    <table id="datatabheader" style="width:100%">
+                                        <tr>
+                                            <td>
+                                                <span id="datasourcelbl" class="label contrast-color">Section 1</span>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        This is content for section 1
+
+                        <!-- this is the HTML for a section header -->
+                        <div class="section-header-outer">
+                            <div class="section-header-middle">
+                                <div class="pentaho-titled-toolbar section-header-inner pentaho-padding-sm" style="heightx: 38px; ">
+                                    <table id="datatabheader" style="width:100%">
+                                        <tr>
+                                            <td>
+                                                <span id="datasourcelbl" class="label contrast-color">Section 2</span>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        This is content for section 2
+                    </div>
+
+                </div>
+                
+                <div id="tab2div" title="tab2" dojoType="dijit.layout.ContentPane" class="dialog-content" style="padding: 0px; overflow:hidden; ">tab 2 content</div>
+                <div id="tab3div" title="tab3" dojoType="dijit.layout.ContentPane" class="dialog-content" style="padding: 0px; overflow:hidden; ">tab 3 content</div>
+
+            </div>
+        </div>
+
+    </body>
+  
+</html>

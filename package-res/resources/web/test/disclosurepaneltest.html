@@ -1,0 +1,58 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns:pho="http:/www.pentaho.com">
+    <head>
+        <title>Disclosure Panel Test</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+        <link rel="stylesheet" type="text/css" href="../dojo/dijit/themes/pentaho/pentaho.css"/>
+
+        <script type="text/javascript" src="webcontext.js?content=common-ui"></script>
+
+      <script type="text/javascript">
+          //<![CDATA[
+
+              $.extend(djConfig,
+                  { modulePaths: {
+                      'pentaho.common': "../pentaho/common"
+                  },
+                  parseOnLoad: true,
+                  baseUrl: '../dojo/dojo/'
+              });
+            //]]>
+      </script>
+
+
+        <script language='javascript' type='text/javascript' src='../dojo/dojo/dojo.js.uncompressed.js'></script>
+        <script language='javascript' type='text/javascript' src='../dojo/dojo/dojo-ext.js.uncompressed.js'></script>
+
+        <script type="text/javascript">
+
+            dojo.require("dojo.parser");
+            dojo.require("pentaho.common.DisclosurePanel");
+
+            function doload() {
+            }
+                
+            dojo.ready(doload);
+        
+        </script>
+
+    </head>
+
+    <body class="tundra body" onload="doload()">
+        
+        <div style="padding: 8px; background-color:white">
+        
+            <h3>UI Widgets - Disclosure Panel</h3>
+            This example shows you how create a disclosure panel.
+            <p/>
+
+            <div id="panel1" dojoType="pentaho.common.DisclosurePanel" title="Collapsable Panel">
+                The contents of the panel go here.
+            </div>
+
+        </div>
+
+    </body>
+  
+</html>

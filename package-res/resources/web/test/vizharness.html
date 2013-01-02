@@ -1,0 +1,295 @@
+<html>
+    <head>
+
+        <title>Visualization Harness</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="ccc/svgweb/svg.js" data-path="svgweb/">
+</script><![endif]-->
+
+
+    <meta name="svg.render.forceflash" content="true">
+
+    <script language="javascript" type="text/javascript" src="../vizapi/DataTable.js"></script>
+    <script language="javascript" type="text/javascript" src="../vizapi/Events.js"></script>
+    <script language="javascript" type="text/javascript" src="../vizapi/VizController.js"></script>
+
+    <!-- Add new visualization libraries here -->
+    
+    <!-- start CCC libraries -->
+    <script type="text/javascript" src="../../../../pentaho-cdf/js/jquery.js"></script>
+    <script type="text/javascript" src="../../../../pentaho-cdf/js/jquery.tooltip.js"></script>
+    <script type="text/javascript" src="../../../../pentaho-cdf/js/Base.js"></script>
+    <script type="text/javascript" src="../../../../pentaho-cdf/js/lib/CCC/protovis.js"></script>
+    <script type="text/javascript" src="../../../../pentaho-cdf/js/lib/CCC/pvc-d1.0.js"></script>
+    <script type="text/javascript" src="../../../../pentaho-cdf/js/lib/CCC/tipsy.js"></script>
+    <script type="text/javascript" src="../../../../pentaho-cdf/js/lib/CCC/jquery.tipsy.js"></script>
+    <script language="javascript" src="../vizapi/ccc/ccc_wrapper.js" type="text/javascript" ></script> 
+    <!-- end CCC libraries -->
+
+    <script language="javascript" src="../repo/pentaho-ajax.js" type="text/javascript"></script>
+    <script language="javascript" type="text/javascript" src="webcontext.js?context=common-ui"></script>
+
+        <script type="text/javascript">
+
+                $.extend(djConfig, { modulePaths: {
+                        dataapi: "../../dataapi",
+                        'pentaho.common': "../pentaho/common"
+                    },
+                   baseUrl: '../dojo/dojo/'
+                });
+
+        </script>
+
+        <script language="javascript" src="../dojo/dojo/dojo-all.js" type="text/javascript"></script>
+        <!-- script language="javascript" src="../locale/Messages.js" type="text/javascript"></script -->
+
+        <script type="text/javascript">      
+
+            var includes = {};
+
+            var compatiblityDiv;
+    
+            var vizController = new pentaho.VizController();
+            
+            function loaded() {
+
+                compatiblityDiv = document.getElementById('compat');
+                resetData();
+
+                var div = document.getElementById('vizdiv');
+                vizController.setDomNode(div);
+                
+                pentaho.events.addListener(vizController, 'select', selectionChange );
+                pentaho.events.addListener(vizController, 'doubleclick', doubleClick );
+                
+                var list = document.getElementById('vizlist');
+                for(var idx=0; idx<pentaho.visualizations.length; idx++) {
+                    var opt = new Option(pentaho.visualizations[idx].name);
+                    list.options[idx] = opt;
+                }
+                if(pentaho.visualizations.length == 1) {
+                    list.selectedIndex = 0;
+                    updateDisplay();
+                }
+            }
+            
+            function updateDisplay() {
+                var list = document.getElementById('vizlist');
+                if( list.selectedIndex == -1 ) {
+                    return;
+                }
+                selectionChange();
+                viz = pentaho.visualizations[list.selectedIndex];
+                var table = createData();
+                vizController.setDataTable( table ); 
+                compatiblityDiv.innerHTML = '';
+                if( vizController.setVisualization(viz) ) {
+                    compatiblityDiv.innerHTML = '<span style="color:green">Visualiztion created</span>';
+                    if( vizController.chart.draw ) {
+                        compatiblityDiv.innerHTML += '</br><span style="color:green">draw() supported</span>';
+                    } else {
+                        compatiblityDiv.innerHTML += '</br><span style="color:red">draw() not supported</span>';
+                    }
+                    if( vizController.chart.setHighlights ) {
+                        compatiblityDiv.innerHTML += '</br><span style="color:green">setHighlights() supported</span>';
+                    } else {
+                        compatiblityDiv.innerHTML += '</br><span style="color:red">setHighlights() not supported</span>';
+                    }
+                    if( vizController.chart.getState && vizController.chart.setState ) {
+                        compatiblityDiv.innerHTML += '</br><span style="color:green">getState() and propMapsetState() supported</span>';
+                    } else {
+                        compatiblityDiv.innerHTML += '</br><span style="color:red">getState() and setState() not supported</span>';
+                    }
+                    if( vizController.chart.getOutputParameters ) {
+                        compatiblityDiv.innerHTML += '</br><span style="color:green">getOutputParameters() supported</span>';
+                    } else {
+                        compatiblityDiv.innerHTML += '</br><span style="color:red">getOutputParameters() not supported</span>';
+                    }
+                    if( vizController.chart.getOutputParameters ) {
+                        var output = vizController.chart.getOutputParameters();
+                        var ok = output && output.length > 0;
+                        if( ok ) {
+                            for( var idx=0; idx<output.length; idx++ ) {
+                                if( output[idx][0] != 'COUNTRY_COL' && output[idx][0] != 'SALES_FACT' && output[idx][0] != 'QTY_FACT' ) {
+                                    ok = false;
+                                }
+                            }
+                        }
+                        if( ok ) {
+                            compatiblityDiv.innerHTML += '</br><span style="color:green">getOutputParameters() is valid</span>';
+                        } else {
+                            compatiblityDiv.innerHTML += '</br><span style="color:red">getOutputParameters() not valid</span>';
+                        }
+                    }
+                    compatiblityDiv.innerHTML += '</br><span style="color:blue">Select Sales for Canada</span>';
+
+                } else {
+                    compatiblityDiv.innerHTML = 'Visualiztion creation failed: '+vizController.getError().message;
+                }
+                if( vizController.getError() ) {
+                    compatiblityDiv.innerHTML = 'Error Detected: '+vizController.getError().message;
+                }
+            }
+
+            function createData() {
+                var rows = [];
+                var jsonTable = {};
+                jsonTable = {
+                    cols : [
+                        { type: 'string', id: 'COUNTRY_COL', label: 'Country' },
+                        { type: 'number', id: 'SALES_FACT', label: 'Sales' },
+                        { type: 'number', id: 'QTY_FACT', label: 'Quantity' }
+                    ],
+                    rows: []
+                };
+                rows = [
+                        { c : [ { v: 'United States of America' }, { v: 50000, f: '$50,000'}, { v: 1000, f: '1,000'} ] },
+                        { c : [ { v: 'Canada' }, { v: 20000, f: '$20,000'}, { v: 500, f: '500'} ] },
+                        { c : [ { v: 'France' }, { v: 40000, f: '$40,000'}, { v: 1200, f: '1,200'} ] },
+                        { c : [ { v: 'Japan' }, { v: 30000, f: '$30,000'}, { v: 800, f: '800'} ] }
+                ];
+
+                for( var idx=0; idx<rows.length; idx++ ) {
+                    if( includes[ rows[idx].c[0].v ] ) {
+                        jsonTable.rows.push(rows[idx]);
+                    }
+                }
+                
+                var table = new pentaho.DataTable(jsonTable);
+                return table;
+            }
+            
+            function doubleClick() {
+                var selHint = '';
+                for( var idx=0; idx<vizController.highlights.length; idx++ ) {
+                    if(idx) {
+                        selHint += ", ";
+                    }
+                    selHint += vizController.highlights[idx].value;
+                }
+                alert('Double click: '+selHint);
+            }
+            
+            function selectionChange() {
+                var selHint = '';
+                for( var idx=0; idx<vizController.highlights.length; idx++ ) {
+                    if(idx) {
+                        selHint += ", ";
+                    }
+                    selHint += vizController.highlights[idx].value;
+                   if( vizController.highlights[idx].type == 'row' && vizController.highlights[idx].value == 'Canada' ) {
+                            compatiblityDiv.innerHTML += '</br><span style="color:green">Canada selected</span>';
+                    }
+                    else if( vizController.highlights[idx].type == 'column' && vizController.highlights[idx].value == 'Sales' ) {
+                            compatiblityDiv.innerHTML += '</br><span style="color:green">Sales selected</span>';
+                    }
+                    else if( vizController.highlights[idx].type == 'cell' && vizController.highlights[idx].rowItem == 'Canada' && vizController.highlights[idx].colLabel == 'Sales' ) {
+                            compatiblityDiv.innerHTML += '</br><span style="color:green">Canada Sales selected</span>';
+                    }
+                }
+                document.getElementById('sellist').innerHTML = selHint;
+            }
+            
+            function selectMode() {
+                vizController.currentAction = 'select';
+                updateActionButtons();
+                
+            }
+            
+            function excludeMode() {
+
+                vizController.currentAction = 'exclude';
+                updateActionButtons();
+
+                if(vizController.highlights.length == 0) {
+                    return;
+                }
+
+                for( var idx=0; idx<vizController.highlights.length; idx++) {
+                    includes[vizController.highlights[idx].value] = false;
+                }
+                vizController.highlights = [];
+                updateDisplay();
+
+            }
+            
+            function resetData() {
+                includes = {'United States of America':true, 'Canada': true, 'France': true, 'Japan': true, 'Florida': true, 'Georgia': true, 'South Carolina':true};
+                drillItem = null;
+                vizController.clearSelections();
+                updateDisplay();
+            }
+            
+function updateActionButtons() {
+
+    document.getElementById('cmdSelectAction').style.backgroundColor = ''+(vizController.currentAction == 'select' ? '#aaffaa' : '#ffffff');
+    document.getElementById('cmdExcludeAction').style.backgroundColor = ''+(vizController.currentAction == 'exclude' ? '#aaffaa' : '#ffffff');
+}            
+            
+var state;
+            
+function getState() {
+    state = vizController.getState();
+    alert(dojo.toJson(state));
+}
+
+function setState() {
+    vizController.setState(state);
+}
+
+        </script>
+
+    </head>
+    <body onload="loaded()" style="padding:10px" >
+
+        <h2>Visualization Harness</h2>
+        
+        This harness allows you to test a visualization widget. This is intended for Javascript developers to use during the development of visualization.
+        
+        <table border="1" cellspacing="0" style="border:1px solid #444444; padding:5px">
+            <tr>
+                <th>
+                    Visualizations
+                </th>
+                <th>
+                    Selections
+                </th>
+                <th>
+                    Mode
+                </th>
+                <th>
+                    Compatibility
+                </th>
+            </tr>
+            <tr>
+                <td valign="top" style="vertical-align:top">
+                    <select id="vizlist" onchange="updateDisplay()" size="10"> </select>
+                </td>
+                <td valign="top" style="vertical-align:top">
+                    <span id="sellist"></span>
+                </td>
+                <td style="vertical-align:top">
+                    <button id="cmdResetAction" onclick="resetData()" >Reset</button>
+                    <br/>
+                    <span id="cmdSelectAction" onclick="selectMode()" style="background-color:#aaffaa">Select</span>
+                    <br/>
+                    <span id="cmdExcludeAction" onclick="excludeMode()">Exlude</span>
+                    <br/>
+                    <button id="cmdResetAction" onclick="getState()" >Get State</button>
+                    <br/>
+                    <button id="cmdResetAction" onclick="setState()" >Set State</button>
+                </td>
+                <td>
+                    <div id="compat" style="width:300px; height:150px; overflow: auto; vertical-align:top">
+                    </div> 
+                </td>
+            </tr>
+        </table>
+
+        <div id="vizdiv" style="width:1024px; height:550px; position: absolute; top: 280px; left: 10px">
+        </div>
+
+    </body>
+</html>

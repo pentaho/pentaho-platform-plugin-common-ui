@@ -1,0 +1,233 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+<title>User Console API Test</title>
+<meta http-equiv="content-type" content="text/html; charset=iso-8859-1"/>
+
+<style  TYPE="text/css">
+<!-- 
+
+.document {
+    font-family: Tahoma,Ariel;
+    background-color: white;
+}
+    
+.table {
+    border: 1px solid #808080;
+}
+
+-->
+</style>
+<script language="javascript">
+//<![CDATA[
+
+var console_enabled = false;
+
+function doLoad() {
+
+    // check to see if this page is running inside the user console
+    console_enabled = window.parent != null && window.parent.mantle_initialized == true;
+    
+    // update the display
+    document.getElementById('console-embed-test').innerHTML = ''+console_enabled;
+
+    if( console_enabled ) {
+        // This page is inside the user console - enable the buttons on this page
+        document.getElementById('enable_edit').disabled = false;
+        document.getElementById('disable_edit').disabled = false;
+        document.getElementById('lower_edit').disabled = false;
+        document.getElementById('reset_edit').disabled = false;
+        document.getElementById('enable_save').disabled = false;
+        document.getElementById('disable_save').disabled = false;
+        document.getElementById('refresh_browse').disabled = false;
+    
+      // setup toggle event function
+      window.editContentToggled = function(selected) {
+            toggleEditMode( selected );
+        
+      };
+
+    }
+
+}
+
+function toggleEditMode( mode ) {
+    // announce an edit button toggle event
+    alert( 'edit mode is: '+mode );
+}
+
+function enableEditButton() {
+    // if possible, enable the 'Edit' toolbar button
+    if( console_enabled && window.parent.enableContentEdit ){
+        window.parent.enableContentEdit( true );
+    }
+
+}
+
+function disableEditButton() {
+    // if possible, disable the 'Edit' toolbar button
+    if( console_enabled && window.parent.enableContentEdit ){
+        window.parent.enableContentEdit( false );
+    }
+}
+
+function lowerEditButton() {
+    // if possible, lower/depress the 'Edit' toolbar button
+    if( console_enabled && window.parent.setContentEditSelected ){
+        window.parent.setContentEditSelected( true );
+    }
+}
+
+function resetEditButton() {
+    // if possible, raise/reset the 'Edit' toolbar button
+    if( console_enabled && window.parent.setContentEditSelected ){
+        window.parent.setContentEditSelected( false );
+    }
+}
+
+function enableSaveButtons() {
+    // if possible, enable the 'Save' and 'Save As' toolbar buttons
+    if( console_enabled && window.parent.enableAdhocSave ) {
+        window.parent.enableAdhocSave( true );
+    }
+}
+
+function disableSaveButtons() {
+    // if possible, disable the 'Save' and 'Save As' toolbar buttons
+    if( console_enabled && window.parent.enableAdhocSave ) {
+        window.parent.enableAdhocSave( false );
+    }
+}
+
+function refreshBrowsePanel() {
+    // if possible refresh the solution browser panel
+    if ( console_enabled && window.parent.mantle_refreshRepository ) {
+        window.parent.mantle_refreshRepository();
+    }
+}
+
+// The following code is for Save/Save As functionality
+
+var gCtrlr = new WaqrProxy(); // this is a required variable
+
+// this is a required object
+function WaqrProxy() {
+
+    this.wiz = new Wiz();
+    this.repositoryBrowserController = new RepositoryBrowserControllerProxy();
+
+    // We save files with the extension 'testsample', e.g. myfile.testsample.
+    this.repositoryBrowserController.getPossibleFileExtensions = function() {
+      alert("getPossibleFileExtensions called");
+      // When the save dialog is looking for files that already exist it will append these extensions if no extension is
+      // given by the user
+      return ['.testsample'];
+    }
+
+}
+
+// this is a required object
+function Wiz() {
+    currPgNum = 0;
+}
+
+// this is a required function
+function savePg0() {
+}
+
+// this is a required object
+function RepositoryBrowserControllerProxy() {
+
+    // This function is called after the Save dialog has been used
+    this.remoteSave = function( myFilename, mySolution, myPath, myType, myOverwrite ) {
+
+        // This is where you take action to save the state of this document, via Ajax or form post.
+        // After the save has happened you should call refreshBrowsePanel()
+        
+        var fullpath = mySolution+myPath+'/'+myFilename;
+        document.getElementById('filename').innerHTML = myFilename;
+        document.getElementById('solution').innerHTML = mySolution;
+        document.getElementById('path').innerHTML = myPath;
+        document.getElementById('fullpath').innerHTML = fullpath;
+        document.getElementById('type').innerHTML = myType;
+        document.getElementById('overwrite').innerHTML = myOverwrite;
+        alert( 'Save called' ); 
+        
+    }
+}
+
+//]]>
+</script>
+
+</head>
+
+<body onload="doLoad()" class="document">
+
+<h1>User Console API Test</h1>
+
+<h2>State</h2>
+
+    <table class="table">
+        <tr>
+            <td>Running in console :</td>
+            <td><span id="console-embed-test"></span></td>
+        </tr>
+        <tr>
+            <td>Save Information :</td>
+            <td>Filename - <span id="filename"></span></td>
+        </tr>
+        <tr>
+            <td</td>
+            <td>Solution - <span id="solution"></span></td>
+        </tr>
+        <tr>
+            <td</td>
+            <td>Path - <span id="path"></span></td>
+        </tr>
+        <tr>
+            <td</td>
+            <td>Full File Path - <span id="fullpath"></span></td>
+        </tr>
+        <tr>
+            <td</td>
+            <td>Type - <span id="type"></span></td>
+        </tr>
+        <tr>
+            <td</td>
+            <td>Overwrite - <span id="overwrite"></span></td>
+        </tr>
+    </table>
+
+<h2>Actions</h2>
+
+    <table class="table">
+        <tr>
+            <td>'Edit' Toolbar Button :</td>
+            <td>
+                <button id="enable_edit" disabled="true" onclick="enableEditButton()">Enable 'Edit' Button</button>
+                <button id="disable_edit" disabled="true" onclick="disableEditButton()">Disable 'Edit' Button</button>
+                <button id="lower_edit" disabled="true" onclick="lowerEditButton()">Lower 'Edit' Button</button>
+                <button id="reset_edit" disabled="true" onclick="resetEditButton()">Reset 'Edit' Button</button>
+            <td>
+        </tr>
+        <tr>
+            <td>'Save' Toolbar Buttons :</td>
+            <td>
+                <button id="enable_save" disabled="true" onclick="enableSaveButtons()">Enable 'Save' Buttons</button>
+                <button id="disable_save" disabled="true" onclick="disableSaveButtons()">Disable 'Save' Buttons</button>
+            <td>
+        </tr>
+        <tr>
+            <td>Browse Panel :</td>
+            <td>
+                <button id="refresh_browse" disabled="true" onclick="refreshBrowsePanel()">Refresh</button>
+            <td>
+        </tr>
+        
+    </table>
+
+    <button onclick="gCtrlr.repositoryBrowserController.remoteSave('tmpfile','tmp', '', 'xview', true)">test</button>
+
+</body>
+
+</html>

@@ -1,0 +1,33 @@
+<div>
+    <table class="pentaho-disclosure-panel pentaho-disclosure-panel-open" cellspacing="0" cellpadding="0">
+        <tr>
+            <td class="header" dojoAttachEvent="onclick:_onTitleClick, onkeypress:_onTitleKey" dojoAttachPoint="titleBarNode">
+                <div class="" dojoAttachPoint="focusNode">
+                </div>
+                <table>
+                    <tbody>
+                        <tr>
+                            <td align="center" style="width: 16px;">
+                                <img dojoAttachPoint="arrowNode" src="images/spacer.gif" id="disclosure-panel-icon" class="pentaho-disclosure-panel-openicon"/>
+                            </td>
+                            <td dojoAttachPoint="titleNode" >Panel Title</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <span dojoAttachPoint="arrowNodeInner" style="display:none"></span>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="pentaho-disclosure-panel-dropdown pentaho-shadow-padding" dojoAttachPoint="hideNode" role="presentation">
+                    <div class="dijitReset" dojoAttachPoint="wipeNode" role="presentation">
+                        <div class="pentaho-rounded-panel-bottom-lr panel-content pentaho-shadow  pentaho-padding-sm" dojoAttachPoint="containerNode" role="region" id="${id}_pane">
+                        </div>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    </table>
+</div>
+
+                        

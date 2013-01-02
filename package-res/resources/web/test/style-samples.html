@@ -1,0 +1,990 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns:pho="http:/www.pentaho.com">
+    <head>
+        <title>Style Samples</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+        <link rel="stylesheet" type="text/css" href="../dojo/dijit/themes/pentaho/pentaho.css"/>
+
+        <script type="text/javascript" src="webcontext.js?content=common-ui"></script>
+
+        <script language="javascript" src="../repo/pentaho-thin-app.js" type="text/javascript"></script>
+
+        <script type="text/javascript">
+
+            function pageLoad() {
+
+                // if this page is outside of the user console, display the background image
+                var userConsole = new PentahoUserConsole();
+
+                window.editContentToggled = function(selected) {
+                  if( userConsole.toggleEditCallback ) {
+                      userConsole.toggleEditCallback(selected);
+                  }
+                  if( selected ) {
+                      userConsole.enableEditButton();
+                      userConsole.lowerEditButton();
+                  } else {
+                      userConsole.enableEditButton();
+                      userConsole.resetEditButton();
+                  }
+                };
+
+                if(!userConsole.console_enabled) {
+                    document.body.className = document.body.className + ' pentaho-page-background';
+                }
+                
+                // JQuery required for jScrollPane functionality
+                if(typeof(jQuery) != "undefined" && typeof(jQuery.fn.jScrollPane) != "undefined") {
+                    $(".scroll-panel").jScrollPane({showArrows: true, reinitialiseOnImageLoad: true}); 
+                }
+
+            }
+            window.onload = pageLoad;
+        
+        </script>
+    </head>
+
+    <body class="tundra body">
+        
+        <div style="padding: 8px">
+            <table border="0" style="padding: 5px; border: 1px solid #888888; width:930px">
+                <tr>
+                    <td colspan="3" style="background-color: white;">
+                        <h3>UI Styles</h3>
+                        These example shows the HTML markup to use to create UI objects that support themes.
+                        
+                        If you use the Pentaho Dojo widgets some of this is handled automatically.
+                    </td>
+                </tr>
+                <tr>
+                    <td style="background-color: white; width:300px">Button</td>
+                    <td style="background-color: white; width:300px">Dialog</td>
+                    <td style="background-color: white; width:300px">Glass Pane</td>
+                </tr>
+                <tr>
+                    <td>
+
+                        <!-- HTML markup for a button -->
+                        <button class="pentaho-button">Enabled Button</button>
+                        <!-- end button HTML -->
+
+                        <!-- HTML markup for a button -->
+                        <button class="pentaho-button" disabled="true">Disabled Button</button>
+                        <!-- end button HTML -->
+
+                    </td>
+                    <td style="width:300px;height:180px;">
+
+                        <!-- HTML markup for a dialog -->
+                        <div class="pentaho-dialog" style="top:145px;left:340px;width:250px">
+                            <div class="Caption">
+                                <span>The Title</span>
+                            </div>
+                            <div style="width: auto; height: auto;">
+                                <table style="width: 250px;" class="dialog-content pentaho-padding-sm">
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <span class="label">The dialog contents go here. Clicking 'Ok' or 'Cancel' will make the glass pane go away.</span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <table style="width: 100%;" class="button-panel">
+                                <tbody>
+                                    <tr>
+                                        <td style="width: 100%;">
+                                        </td>
+                                        <td>
+                                            <button class="pentaho-button" onclick="document.getElementById('glasspane').style.display='none'">Ok</button>
+                                        </td>
+                                        <td>
+                                            <button class="pentaho-button" onclick="document.getElementById('glasspane').style.display='none'">Cancel</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- end dialog HTML -->
+
+                    </td>
+                    <td class="panel-content">
+
+                        <span class="label">Click the button to show the glasspane</span>
+                        <button class="pentaho-button" onclick="document.getElementById('glasspane').style.display='block'">Show Glass Pane</button>
+
+                    </td>
+                </tr>
+                <tr>
+                    <td style="background-color: white">Floating Panel</td>
+                    <td style="background-color: white">Drop Panel</td>
+                    <td style="background-color: white">Scroll Bars</td>
+                </tr>
+                <tr>
+                    <td>
+
+                        <!-- HTML markup for a floating panel -->
+                        <div class="pentaho-rounded-panel2-shadowed pentaho-padding-lg pentaho-background">
+                            <div class="panel-content pentaho-padding-sm">
+                            The contents of the panel go here.
+                            The contents of the panel go here.
+                            The contents of the panel go here.
+                            </div>
+                        </div>
+                        <!-- end floating panel HTML -->
+
+                    </td>
+                    <td>
+
+                        <!-- HTML markup for a drop-down panel -->
+                        <div class="pentaho-rounded-panel-bottom-lr pentaho-shadow pentaho-droppanel" syle="height:100px">
+                            <div class="pentaho-rounded-panel-bottom-lr pentaho-padding-sm" id="filterPanel" style="overflow: hidden; padding: 0px; width: 280px; height:100px;">
+                                The contents of the panel go here.
+                            </div>
+                        </div>
+                        <!-- end drop-down panel HTML -->
+            
+            
+                    </td>
+                    <td>
+
+                        <!-- HTML markup for a vertical scrolling panel -->
+                        <div id="scolling" class="scroll-panel" style="width: 200px; height:100px; overflow:auto;">
+                            <div class="panel-content">
+                                line 1 of the content.
+                                <br/>line 2 of the content.
+                                <br/>line 3 of the content.
+                                <br/>line 4 of the content.
+                                <br/>line 5 of the content.
+                                <br/>line 6 of the content.
+                                <br/>line 7 of the content.
+                                <br/>line 8 of the content.
+                                <br/>line 9 of the content.
+                                <br/>line 10 of the content.
+                                <br/>line 11 of the content.
+                                <br/>line 12 of the content.
+                                <br/>line 13 of the content.
+                            </div>
+                        </div>
+                        <!-- end scrolling panel HTML -->
+                        <p/>
+                        <!-- HTML markup for a horizontal scrolling panel -->
+                        <div id="scolling" class="scroll-panel" style="height:40px; width:270px; overflow:auto;">
+                            <div class="panel-content" style="width:700px">
+                                this is a long line of text. this is a long line of text. this is a long line of text. this is a long line of text. 
+                                        </div>
+                        </div>
+                        <!-- end scrolling panel HTML -->
+                          
+                    </td>
+                </tr>
+                <tr>
+                    <td style="background-color: white">Buttons</td>
+                    <td style="background-color: white">Buttons with Rollover</td>
+                    <td style="background-color: white">Toolbar</td>
+                </tr>
+                <tr>
+                    <td>
+                        <table class="panel-content" style="width:100%">
+                            <tr>
+                                <td>
+                                </td>
+                                <td>
+                                    Enabled
+                                </td>
+                                <td>
+                                    Disabled
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    Edit
+                                </td>
+                                <td>
+                                    <!-- HTML markup for an edit button -->
+                                    <img src="images/spacer.gif" class="pentaho-editbutton" title="Edit" onclick="alert('Edit button clicked')"/>
+                                    <!-- end edit button HTML -->
+                                </td>
+                                <td>
+                                    <!-- HTML markup for a disabled edit button -->
+                                    <img src="images/spacer.gif" class="pentaho-editbutton pentaho-imagebutton-disabled"/>
+                                    <!-- end edit button HTML -->
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    Add
+                                </td>
+                                <td>
+                                    <!-- HTML markup for an add button -->
+                                    <img src="images/spacer.gif" class="pentaho-addbutton" title="Add" onclick="alert('Add button clicked')"/>
+                                    <!-- end add button HTML -->
+                                </td>
+                                <td>
+                                    <!-- HTML markup for a disabled add button -->
+                                    <img src="images/spacer.gif" class="pentaho-addbutton pentaho-imagebutton-disabled"/>
+                                    <!-- end add button HTML -->
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    Delete
+                                </td>
+                                <td>
+                                    <!-- HTML markup for a delete button -->
+                                    <img src="images/spacer.gif" class="pentaho-deletebutton" title="Delete" onclick="alert('Delete button clicked')"/>
+                                    <!-- end delete button HTML -->
+                                </td>
+                                <td>
+                                    <!-- HTML markup for a disabled delete button -->
+                                    <img src="images/spacer.gif" class="pentaho-deletebutton pentaho-imagebutton-disabled"/>
+                                    <!-- end delete button HTML -->
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    Undo
+                                </td>
+                                <td>
+                                    <!-- HTML markup for an undo button -->
+                                    <img src="images/spacer.gif" class="pentaho-undobutton" title="Undo" onclick="alert('Undo button clicked')"/>
+                                    <!-- end undo button HTML -->
+                                </td>
+                                <td>
+                                    <!-- HTML markup for a disabled undo button -->
+                                    <img src="images/spacer.gif" class="pentaho-undobutton pentaho-imagebutton-disabled"/>
+                                    <!-- end undo button HTML -->
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    Redo
+                                </td>
+                                <td>
+                                    <!-- HTML markup for a redo button -->
+                                    <img src="images/spacer.gif" class="pentaho-redobutton" title="Redo" onclick="alert('Redo button clicked')"/>
+                                    <!-- end redo button HTML -->
+                                </td>
+                                <td>
+                                    <!-- HTML markup for a disabled redo button -->
+                                    <img src="images/spacer.gif" class="pentaho-redobutton pentaho-imagebutton-disabled"/>
+                                    <!-- end redo button HTML -->
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    Filter
+                                </td>
+                                <td>
+                                    <!-- HTML markup for a redo button -->
+                                    <img src="images/spacer.gif" class="pentaho-filterbutton" title="Filter" onclick="alert('Filter button clicked')"/>
+                                    <!-- end redo button HTML -->
+                                </td>
+                                <td>
+                                    <!-- HTML markup for a disabled redo button -->
+                                    <img src="images/spacer.gif" class="pentaho-filterbutton pentaho-imagebutton-disabled"/>
+                                    <!-- end redo button HTML -->
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    Layout
+                                </td>
+                                <td>
+                                    <!-- HTML markup for a redo button -->
+                                    <img src="images/spacer.gif" class="pentaho-layoutbutton" title="Layout" onclick="alert('Layout button clicked')"/>
+                                    <!-- end redo button HTML -->
+                                </td>
+                                <td>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    Background
+                                </td>
+                                <td>
+                                    <!-- HTML markup for a redo button -->
+                                    <img src="images/spacer.gif" class="pentaho-backcolorbutton" title="Background Color" onclick="alert('Background color button clicked')"/>
+                                    <!-- end redo button HTML -->
+                                </td>
+                                <td>
+                                    <!-- HTML markup for a disabled redo button -->
+                                    <img src="images/spacer.gif" class="pentaho-backcolorbutton pentaho-imagebutton-disabled"/>
+                                    <!-- end redo button HTML -->
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    Foreground
+                                </td>
+                                <td>
+                                    <!-- HTML markup for a redo button -->
+                                    <img src="images/spacer.gif" class="pentaho-forecolorbutton" title="Text Color" onclick="alert('Foreground color button clicked')"/>
+                                    <!-- end redo button HTML -->
+                                </td>
+                                <td>
+                                    <!-- HTML markup for a disabled redo button -->
+                                    <img src="images/spacer.gif" class="pentaho-forecolorbutton pentaho-imagebutton-disabled"/>
+                                    <!-- end redo button HTML -->
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    Down
+                                </td>
+                                <td>
+                                    <!-- HTML markup for a down button -->
+                                    <img src="images/spacer.gif" class="pentaho-downbutton" title="Down" onclick="alert('Down button clicked')"/>
+                                    <!-- end down button HTML -->
+                                </td>
+                                <td>
+                                    <!-- HTML markup for a disabled down button -->
+                                    <img src="images/spacer.gif" class="pentaho-downbutton pentaho-imagebutton-disabled"/>
+                                    <!-- end down button HTML -->
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    Up
+                                </td>
+                                <td>
+                                    <!-- HTML markup for an up button -->
+                                    <img src="images/spacer.gif" class="pentaho-upbutton" title="Up" onclick="alert('Up button clicked')"/>
+                                    <!-- end up button HTML -->
+                                </td>
+                                <td>
+                                    <!-- HTML markup for a disabled up button -->
+                                    <img src="images/spacer.gif" class="pentaho-upbutton pentaho-imagebutton-disabled"/>
+                                    <!-- end up button HTML -->
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    Left
+                                </td>
+                                <td>
+                                    <!-- HTML markup for a large left button -->
+                                    <img src="images/spacer.gif" class="pentaho-left-lgbutton" title="Previous" onclick="alert('Previous button clicked')"/>
+                                    <!-- end left button HTML -->
+                                </td>
+                                <td>
+                                    <!-- HTML markup for a disabled up button -->
+                                    <img src="images/spacer.gif" class="pentaho-left-lgbutton pentaho-imagebutton-disabled"/>
+                                    <!-- end up button HTML -->
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    Right
+                                </td>
+                                <td>
+                                    <!-- HTML markup for a large right button -->
+                                    <img src="images/spacer.gif" class="pentaho-right-lgbutton" title="Next" onclick="alert('Next button clicked')"/>
+                                    <!-- end right button HTML -->
+                                </td>
+                                <td>
+                                    <!-- HTML markup for a disabled right button -->
+                                    <img src="images/spacer.gif" class="pentaho-right-lgbutton pentaho-imagebutton-disabled"/>
+                                    <!-- end right button HTML -->
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td>
+                        <table class="panel-content" style="width:100%">
+                            <tr>
+                                <td>
+                                </td>
+                                <td>
+                                    Enabled
+                                </td>
+                                <td>
+                                    Disabled
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    Close
+                                </td>
+                                <td>
+                                    <!-- HTML markup for an edit button -->
+                                    <img src="images/spacer.gif" class="pentaho-closebutton" onclick="alert('Close button clicked')"
+                                        onmouseover="this.className='pentaho-closebutton pentaho-imagebutton-hover'"
+                                        onmouseout="this.className='pentaho-closebutton'"
+                                        title="Close"/>
+                                    <!-- end edit button HTML -->
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    Close (big)
+                                </td>
+                                <td>
+                                    <!-- HTML markup for an edit button -->
+                                    <img src="images/spacer.gif" class="pentaho-closebutton-big" onclick="alert('Close button clicked')"
+                                        onmouseover="this.className='pentaho-closebutton-big pentaho-imagebutton-hover'"
+                                        onmouseout="this.className='pentaho-closebutton-big'"
+                                        title="Close"/>
+                                    <!-- end edit button HTML -->
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    Previous page
+                                </td>
+                                <td>
+                                    <!-- HTML markup for a back button -->
+                                    <img src="images/spacer.gif" class="pentaho-pagebackbutton" onclick="alert('Back button clicked')"
+                                        onmouseover="this.className='pentaho-pagebackbutton pentaho-imagebutton-hover'"
+                                        onmouseout="this.className='pentaho-pagebackbutton'"
+                                        title="Previous Page"/>
+                                    <!-- end back button HTML -->
+                                </td>
+                                <td>
+                                    <!-- HTML markup for a disabled back button -->
+                                    <img src="images/spacer.gif" class="pentaho-pagebackbutton  pentaho-imagebutton-disabled"/>
+                                    <!-- end edit button HTML -->
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    Next page
+                                </td>
+                                <td>
+                                    <!-- HTML markup for a next button -->
+                                    <img src="images/spacer.gif" class="pentaho-pagenextbutton" onclick="alert('Next button clicked')"
+                                        onmouseover="this.className='pentaho-pagenextbutton pentaho-imagebutton-hover'"
+                                        onmouseout="this.className='pentaho-pagenextbutton'"
+                                        title="Next Page"/>
+                                    <!-- end next button HTML -->
+                                </td>
+                                <td>
+                                    <!-- HTML markup for a disabled next button -->
+                                    <img src="images/spacer.gif" class="pentaho-pagenextbutton pentaho-imagebutton-disabled"/>
+                                    <!-- end next button HTML -->
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    Toggle Up
+                                </td>
+                                <td>
+                                    <!-- HTML markup for a toggle button -->
+                                    <div tabindex="0" class="pentaho-toggle-button pentaho-toggle-button-up" role="button" 
+                                        onmouseover="this.className='pentaho-toggle-button pentaho-toggle-button-up pentaho-toggle-button-up-hovering'"
+                                        onmouseout="this.className='pentaho-toggle-button pentaho-toggle-button-up'"
+                                        title="Toggle This" 
+                                        >
+                                        <div class="html-face">Option</div>
+                                    </div>
+                                    <!-- end toggle button HTML -->
+                                </td>
+                                <td>
+                                    <!-- HTML markup for a disabled toggle button -->
+                                    <div tabindex="0" class="pentaho-toggle-button pentaho-toggle-button-up-disabled" role="button" title="Toggle This" >
+                                        <div class="html-face">Option</div>
+                                    </div>
+                                    <!-- end next button HTML -->
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    Toggle Down
+                                </td>
+                                <td>
+                                    <!-- HTML markup for a toggle button -->
+                                    <div tabindex="0" class="pentaho-toggle-button pentaho-toggle-button-down" role="button" 
+                                        onmouseover="this.className='pentaho-toggle-button pentaho-toggle-button-down pentaho-toggle-button-down-hovering'"
+                                        onmouseout="this.className='pentaho-toggle-button pentaho-toggle-button-down'"
+                                        title="Toggle This" >
+                                        <div class="html-face">Option</div>
+                                    </div>
+                                    <!-- end toggle button HTML -->
+                                </td>
+                                <td>
+                                    <!-- HTML markup for a disabled toggle button -->
+                                    <div tabindex="0" class="pentaho-toggle-button pentaho-toggle-button-down-disabled" role="button" title="Toggle This" >
+                                        <div class="html-face">Option</div>
+                                    </div>
+                                    <!-- end next button HTML -->
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    Trash
+                                </td>
+                                <td colspan="2">
+                                    <!-- HTML markup for a large right button -->
+                                    <img src="images/spacer.gif" class="pentaho-trashbutton" onclick="alert('Trash button clicked')"
+                                        onmouseover="this.className='pentaho-trashbutton pentaho-imagebutton-hover'"
+                                        onmouseout="this.className='pentaho-trashbutton'"
+                                        title="trashcan"/>
+                                    <!-- end right button HTML -->
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td>
+
+                        <!-- HTML markup for a toolbar -->
+                        <div class="pentaho-rounded-panel2-shadowed pentaho-padding-sm pentaho-shine pentaho-toolbar-background" style="height:22px">
+                        </div>
+                        <!-- end toolbar HTML -->
+
+                    </td>
+                </tr>
+                <tr>
+                    <td style="background-color: white">Toolbar Buttons</td>
+                    <td style="background-color: white">Label</td>
+                    <td style="background-color: white">Tab Set</td>
+                </tr>
+                <tr>
+                    <td>
+
+                        <table cellspacing="0" cellpadding="0" class="pentaho-rounded-panel2-shadowed pentaho-shine pentaho-toolbar-background content-toolbar" style="width: 100%;">
+                            <tbody>
+                                <tr>
+                                    <td width="100%" align="left" style="vertical-align: middle;">
+                                        <table cellspacing="1" cellpadding="0" style="width: 100%;height:100%">
+                                            <tbody>
+                                                <tr>
+                                                    <!-- left end of the toolbar --> 
+                                                    <td align="left" style="vertical-align: middle;">
+                                                        <div class="spacer" style="width: 10px;">
+                                                        </div>
+                                                    </td>
+
+                                                    <!-- a regular toolbar button -->
+                                                    <td align="left" style="vertical-align: middle;">
+                                                        <div class="content-toolbar-button">
+                                                            <table cellspacing="0" cellpadding="0" class="toolbar-button"
+                                                                onmouseover="this.className='toolbar-button toolbar-button-hovering'"
+                                                                onmouseout="this.className='toolbar-button'">
+                                                                <tbody>
+                                                                    <tr>
+                                                                        <td width="" height="" align="center" style="vertical-align: middle;">
+                                                                            <!-- HTML markup for a toolbar button -->
+                                                                            <img src="images/spacer.gif" class="pentaho-undobutton" title="Undo"/>
+                                                                            <!-- end toolbar button HTML -->
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </td>
+
+                                                    <!-- a regular toolbar button -->
+                                                    <td align="left" style="vertical-align: middle;">
+                                                        <div class="content-toolbar-button">
+                                                            <table cellspacing="0" cellpadding="0" class="toolbar-button"
+                                                                onmouseover="this.className='toolbar-button toolbar-button-hovering'"
+                                                                onmouseout="this.className='toolbar-button'">
+                                                                <tbody>
+                                                                    <tr>
+                                                                        <td width="" height="" align="center" style="vertical-align: middle;">
+                                                                            <!-- HTML markup for a toolbar button -->
+                                                                            <img src="images/spacer.gif" class="pentaho-redobutton" title="Rodo"/>
+                                                                            <!-- end toolbar button HTML -->
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </td>
+
+                                                    <!-- a toolbar separator -->
+                                                    <td align="left" style="vertical-align: middle;">
+                                                        <div class="content-toolbar-separator">
+                                                            <table cellspacing="0" cellpadding="0" class="toolbar-button">
+                                                                <tbody>
+                                                                    <tr>
+                                                                        <td width="" height="" align="center" style="vertical-align: middle;">
+                                                                            <!-- HTML markup for a toolbar button -->
+                                                                            <img src="images/spacer.gif" class="pentaho-toolbar-separator"/>
+                                                                            <!-- end toolbar button HTML -->
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </td>
+
+                                                    <!-- a toggle toolbar button -->
+                                                    <td align="left" style="vertical-align: middle;">
+                                                        <div class="content-toolbar-button">
+                                                            <table cellspacing="0" cellpadding="0" class="toolbar-toggle-button"
+                                                                onmouseover="if(this.className.indexOf('down') == -1) {this.className='toolbar-toggle-button toolbar-toggle-button-hovering'} else {this.className='toolbar-toggle-button-down toolbar-toggle-button-down-hovering'}"
+                                                                onmouseout="if(this.className.indexOf('down') == -1) {this.className='toolbar-toggle-button'} else {this.className='toolbar-toggle-button-down'}"
+                                                                onclick="if(this.className.indexOf('down') != -1) {this.className='toolbar-toggle-button'} else {this.className='toolbar-toggle-button-down'}">
+                                                                <tbody>
+                                                                    <tr>
+                                                                        <td width="" height="" align="center" style="vertical-align: middle;">
+                                                                            <!-- HTML markup for a toolbar button -->
+                                                                            <img src="images/spacer.gif" class="pentaho-filterbutton" title="Filters"/>
+                                                                            <!-- end toolbar button HTML -->
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </td>
+
+                                                    <!-- a toggle toolbar button -->
+                                                    <td align="left" style="vertical-align: middle;">
+                                                        <div class="content-toolbar-button">
+                                                            <table cellspacing="0" cellpadding="0" class="toolbar-toggle-button"
+                                                                onmouseover="if(this.className.indexOf('down') == -1) {this.className='toolbar-toggle-button toolbar-toggle-button-hovering'} else {this.className='toolbar-toggle-button-down toolbar-toggle-button-down-hovering'}"
+                                                                onmouseout="if(this.className.indexOf('down') == -1) {this.className='toolbar-toggle-button'} else {this.className='toolbar-toggle-button-down'}"
+                                                                onclick="if(this.className.indexOf('down') != -1) {this.className='toolbar-toggle-button'} else {this.className='toolbar-toggle-button-down'}">
+                                                                <tbody>
+                                                                    <tr>
+                                                                        <td width="" height="" align="center" style="vertical-align: middle;">
+                                                                            <!-- HTML markup for a toolbar button -->
+                                                                            <img src="images/spacer.gif" class="pentaho-layoutbutton" title="Layout"/>
+                                                                            <!-- end toolbar button HTML -->
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </td>
+
+                                                    <!-- padding to make all the buttons align to the left -->
+                                                    <td width="100%" align="left" style="vertical-align: middle;">
+                                                        <div flex="1">
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                    </td>
+                    <td class="panel-content">
+                        <span class="label">This is a label</span>
+                        <!-- end toolbar HTML -->
+
+                    </td>
+                    <td>
+
+                        <!-- HTML markup for a tab set -->
+                        <div style="margin-right: 0px; width: 250px; height: 23px;" class="pentaho-tabPanel">
+                            <div class="pentaho-tabWidget pentaho-tabWidget-selected">
+                                <span class="pentaho-tabWidgetLabel">Tab 1</span>
+                            </div>
+                            <div class="pentaho-tabWidget">
+                                <span class="pentaho-tabWidgetLabel">Tab 2</span>
+                            </div>
+                            <div class="pentaho-tabWidget">
+                                <span class="pentaho-tabWidgetLabel">Tab 3</span>
+                            </div>
+                        </div>
+                        <!-- end tab set HTML -->
+
+                    </td>
+                </tr>
+                <tr>
+                    <td style="background-color: white">Default Transparency</td>
+                    <td style="background-color: white">Default Gradient</td>
+                    <td style="background-color: white">Default Shine</td>
+                </tr>
+                <tr>
+                    <td class="pentaho-transparent" style="height:50px"></td>
+                    <td class="pentaho-gradient" style="height:50px"></td>
+                    <td>
+
+                        <!-- HTML markup showing different examples of the shine style -->
+                        <table>
+                            <tr>
+                                <td class="pentaho-shine" style="height:50px; width:30px; background-color: #006600">
+                                </td>
+                                <td class="pentaho-shine" style="height:50px; width:30px; background-color: #660000">
+                                </td>
+                                <td class="pentaho-shine" style="height:50px; width:30px; background-color: #000066">
+                                </td>
+                                <td class="pentaho-shine" style="height:50px; width:30px; background-color: #006666">
+                                </td>
+                                <td class="pentaho-shine" style="height:50px; width:30px; background-color: #ffff88">
+                                </td>
+                                <td class="pentaho-shine" style="height:50px; width:30px; background-color: #88aaff">
+                                </td>
+                                <td class="pentaho-shine" style="height:50px; width:30px; background-color: #ff88aa">
+                                </td>
+                            </tr>
+                        </table>
+                        <!-- end shine examples HTML -->
+
+                    </td>
+                </tr>
+                <tr>
+                    <td style="background-color: white">Section Header</td>
+                    <td style="background-color: white">Section Header with Options</td>
+                    <td style="background-color: white">Section Header with item list management buttons</td>
+                </tr>
+                <tr>
+                    <td>
+                    
+                        <!-- this is the HTML for a section header -->
+                        <div class="section-header-outer">
+                            <div class="section-header-middle">
+                                <div class="pentaho-titled-toolbar section-header-inner pentaho-padding-sm" style="heightx: 38px; ">
+                                    <table id="datatabheader" style="width:100%">
+                                        <tr>
+                                            <td>
+                                                <span class="label contrast-color">Section 1</span>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- end section header HTML -->
+
+                    </td>
+                    <td>
+                    
+                        <!-- this is the HTML for a section header -->
+                        <div class="section-header-outer">
+                            <div class="section-header-middle">
+                                <div class="pentaho-titled-toolbar section-header-inner pentaho-padding-sm" style="heightx: 38px; ">
+                                    <table style="width:100%">
+                                        <tr>
+                                            <td>
+                                                <span class="label contrast-color">Section 2</span>
+                                            </td>
+                                            <td style="width:16px; text-align: right">
+                                                <div title="Options" onclick="alert('Options clicked')" class="pentaho-optionsbutton"/>
+                                            <td>                                                                                            
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- end section header HTML -->
+                        
+                    </td>
+                    <td>
+                    
+                        <!-- this is the HTML for a section header -->
+                        <div class="section-header-outer">
+                            <div class="section-header-middle">
+                                <div class="pentaho-titled-toolbar section-header-inner pentaho-padding-sm" style="heightx: 38px; ">
+                                    <table style="width:100%">
+                                        <tr>
+                                            <td>
+                                                <span class="label contrast-color">Section 3</span>
+                                            </td>
+                                            <td style="width:16px; text-align: right">
+                                                <img src="images/spacer.gif" id="up-button" title="Move current item up" class="pentaho-upbutton pentaho-imagebutton-disabled"/>
+                                            <td>                                                                                            
+                                            <td style="width:16px; text-align: right">
+                                                <img src="images/spacer.gif" id="down-button" title="Move current item down" class="pentaho-downbutton pentaho-imagebutton-disabled"/>
+                                            <td>                                                                                            
+                                            <td style="width:16px; text-align: right">
+                                                <img src="images/spacer.gif" id="edit-button" title="Edit current item" class="pentaho-editbutton pentaho-imagebutton-disabled"/>
+                                            <td>                                                                                            
+                                            <td style="width:16px; text-align: right">
+                                                <img src="images/spacer.gif" id="add-button" title="Add a new item" class="pentaho-addbutton"/>
+                                            <td>                                                                                            
+                                            <td style="width:16px; text-align: right">
+                                                <img src="images/spacer.gif" id="delete-button" title="Delete current item" class="pentaho-deletebutton pentaho-imagebutton-disabled"/>
+                                            <td>                                                                                            
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- end section header HTML -->
+
+                        <!-- HTML markup for list items -->
+                        <table class="pentaho-menu" style="width:100%" cellpadding="0" cellspacing="0">
+                            <tr>
+                                <td class="pentaho-listitem" 
+                                    onmouseover="if(this.className.indexOf('selected') == -1) {this.className='pentaho-listitem pentaho-listitem-hover'}"
+                                    onmouseout="if(this.className.indexOf('selected') == -1) {this.className='pentaho-listitem'} else {this.className='pentaho-listitem-selected'}"
+                                    onclick="enabledListManagementButtons(); this.className='pentaho-listitem-selected'">
+                                    <span class="pentaho-listitem-label">Option 1</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="pentaho-listitem" 
+                                    onmouseover="if(this.className.indexOf('selected') == -1) {this.className='pentaho-listitem pentaho-listitem-hover'}"
+                                    onmouseout="if(this.className.indexOf('selected') == -1) {this.className='pentaho-listitem'} else {this.className='pentaho-listitem-selected'}"
+                                    onclick="enabledListManagementButtons(); this.className='pentaho-listitem-selected'">
+                                    <span class="pentaho-listitem-label">Option 2</span>
+                                </td>
+                            </tr>
+                        </table>
+                        
+                        <script type="text/javascript">
+                        
+                            function enabledListManagementButtons() {
+                                document.getElementById('up-button').className = 'pentaho-upbutton';
+                                document.getElementById('down-button').className = 'pentaho-downbutton';
+                                document.getElementById('edit-button').className = 'pentaho-editbutton';
+                                document.getElementById('delete-button').className = 'pentaho-deletebutton';
+                            }
+                        
+                        </script>
+                        
+                    </td>
+                </tr>
+                <tr>
+                    <td style="background-color: white">Menu Item Rollovers</td>
+                    <td style="background-color: white">Tooltip Dialog</td>
+                    <td style="background-color: white">Table</td>
+                </tr>
+                <tr>
+                    <td>
+                    
+                        <!-- HTML markup for menu options and list items -->
+                        <table class="pentaho-menu-outer" cellpadding="0" cellspacing="0">
+
+                            <tr class="pentaho-menuitem" onmouseover="this.className='pentaho-menuitem pentaho-menuitem-hover'" onmouseout="this.className='pentaho-menuitem'">
+                                <td role="presentation">
+                                    <img src="images/spacer.gif" alt="" class="pentaho-checkmenuitem"/>
+                                </td>
+                                <td class="dpentaho-menuitem-label" colspan="2">Option 1</td>
+                                <td class="" role="presentation">&nbsp;</td>
+                            </tr>
+                            <tr class="pentaho-menuitem pentaho-menuitem-disabled" onmouseover="this.className='pentaho-menuitem pentaho-menuitem-disabled'" onmouseout="this.className='pentaho-menuitem pentaho-menuitem-disabled'">
+                                <td role="presentation">
+                                    <img src="images/spacer.gif" alt="" class="pentaho-checkmenuitem"/>
+                                </td>
+                                <td class="dpentaho-menuitem-label" colspan="2">Disabled</td>
+                                <td class="" role="presentation">&nbsp;</td>
+                            </tr>
+                            <tr>
+                                <td colspan="3" class="pentaho-menu-separator">
+                                    <div class="pentaho-menu-separator-inner"></div>
+                                </td>
+                            </tr>                            
+                            <tr class="pentaho-menuitem" onmouseover="this.className='pentaho-menuitem pentaho-menuitem-hover'" onmouseout="this.className='pentaho-menuitem'">
+                                <td role="presentation">
+                                    <img src="images/spacer.gif" alt="" class="pentaho-checkmenuitem menuitem-checked"/>
+                                </td>
+                                <td class="dijitReset pentaho-menuitem-label" colspan="2">Checked</td>
+                                <td class="dijitReset dijitMenuArrowCell" role="presentation">&nbsp;</td>
+                            </tr>
+                        </table>
+                        <!-- end toolbar HTML -->
+                            
+                    </td>
+                    <td style="padding:10px">
+                    
+                        <!-- this is the HTML for a tooltip -->
+                        <div class="pentaho-shadow-padding" style="width:200px">
+                            <div class="pentaho-rounded-panel pentaho-tooltip-background pentaho-padding-sm pentaho-shadow">
+                                <div class="pentaho-tooltip-contents">
+                                    <span class="label">Tooltip contents</span> 
+                                </div>
+                            </div>
+                        </div>
+                        <!-- end tooltip HTML -->
+
+                    </td>
+                    <td>
+
+                        <!-- this is the HTML for a table -->
+                        <table style="width: 100%;" class="pentaho-table">
+                            <colgroup>
+                                <col>
+                            </colgroup>
+                            <tbody>
+                                <tr>
+                                    <td class="pentaho-table-header-cell">
+                                        <div class="label">Column 1</div>
+                                    </td>
+                                    <td class="pentaho-table-header-cell">
+                                        <div class="label">Column 2</div>
+                                    </td>
+                                    <td class="pentaho-table-header-cell">
+                                        <div class="label">Column 3</div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="pentaho-table-cell">
+                                        <div class="label">Data</div>
+                                    </td>
+                                    <td class="pentaho-table-cell">
+                                        <div class="label">Data</div>
+                                    </td>
+                                    <td class="pentaho-table-cell">
+                                        <div class="label">Data</div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <!-- end table HTML -->
+
+
+                    </td>
+                </tr>
+                <tr>
+                    <td style="background-color: white">Disclosure Panel</td>
+                    <td style="background-color: white">Drag/Drop Target</td>
+                    <td style="background-color: white">Drag Drop Avatar</td>
+                </tr>
+                <tr>
+                    <td style="height:80px; vertical-align:top">
+
+                        <table cellspacing="0" cellpadding="0" class="pentaho-disclosure-panel pentaho-disclosure-panel-open">
+                            <tbody>
+                                <tr>
+                                    <td align="left" style="vertical-align: top;" class="header" onclick="toggleDisclosurePanel('disclosure-panel','disclosure-panel-icon')">
+                                        <table>
+                                            <tbody>
+                                                <tr>
+                                                    <td align="center" style="width: 16px;">
+                                                        <img src="images/spacer.gif" id="disclosure-panel-icon" class="pentaho-disclosure-panel-openicon"/>
+                                                    </td>
+                                                    <td>Panel Title</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td align="left" style="vertical-align: top;">
+                                        <div id="disclosure-panel" class="pentaho-disclosure-panel-dropdown pentaho-shadow-padding">
+                                            <div class="pentaho-rounded-panel-bottom-lr panel-content pentaho-shadow pentaho-padding-sm">
+                                                Panel contents go here
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <script type="text/javascript">
+                        
+                            function toggleDisclosurePanel(panelId, iconId) {
+                                if( document.getElementById(iconId).className == 'pentaho-disclosure-panel-openicon' ) {
+                                    document.getElementById(panelId).style.display = 'none';
+                                    document.getElementById(iconId).className = 'pentaho-disclosure-panel-closeicon';
+                                } else {
+                                    document.getElementById(panelId).style.display = 'block';
+                                    document.getElementById(iconId).className = 'pentaho-disclosure-panel-openicon';
+                                }
+                                return false;
+                            }
+                        
+                        </script>
+
+                    </td>
+                </tr>
+            </table>
+        </div>
+        
+        <div id="glasspane" class="glasspane" style="display:none">
+        </div>
+    </body>
+  
+</html>
+
+

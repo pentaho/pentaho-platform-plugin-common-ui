@@ -1,0 +1,119 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns:pho="http:/www.pentaho.com">
+    <head>
+        <title>Menu Test</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+        <link rel="stylesheet" type="text/css" href="../dojo/dijit/themes/pentaho/pentaho.css"/>
+
+        <script type="text/javascript" src="webcontext.js?content=common-ui"></script>
+
+        <script type="text/javascript">
+            //<![CDATA[
+
+                $.extend(djConfig,
+                    { modulePaths: {
+                        'pentaho.common': "../pentaho/common"
+                    },
+                    parseOnLoad: true,
+                    baseUrl: '../dojo/dojo/'
+                });
+              //]]>
+        </script>
+
+
+        <script language='javascript' type='text/javascript' src='../dojo/dojo/dojo.js.uncompressed.js'></script>
+        <script language='javascript' type='text/javascript' src='../dojo/dojo/dojo-ext.js.uncompressed.js'></script>
+
+        <script type="text/javascript">
+
+
+            dojo.require("dijit.layout.ContentPane");
+            dojo.require("dijit.layout.BorderContainer");
+            dojo.require("dojo.parser");
+
+            dojo.ready(doload);
+
+            var resizeTimer1 = null;
+            var resizeTimer2 = null;
+
+            function doload() {
+                setTimeout('resize()', 1000);
+            }
+                
+            function resize() {
+                if( resizeTimer1 != null ) {
+                    clearTimeout(resizeTimer1);
+                }
+                if( resizeTimer2 != null ) {
+                    clearTimeout(resizeTimer2);
+                }
+                resizeTimer1 = setTimeout('resizeNow()',100);
+                resizeTimer2 = setTimeout('resizeNow()',200);
+            }
+            
+            function resizeNow() {
+                var windowWidth = dojo.dnd.getViewport().w;
+                var windowHeight = dojo.dnd.getViewport().h;
+                document.getElementById('outerbox').style.width=''+windowWidth+'px';
+                document.getElementById('outerbox').style.height=''+windowHeight+'px';
+                dijit.byId('outerbox').resize();
+                dijit.byId('sidePanel').resize();
+                dijit.byId('sidePanel').resize();
+            }
+                
+            function toggleSidePanel() {
+                if( dojo.style(dojo.byId('sidePanel'), 'width' ) > 200 ) {  
+                    dojo.style(dojo.byId('sidePanel'), 'width', '30px' );
+                } else {
+                    dojo.style(dojo.byId('sidePanel'), 'width', '240px' );
+                }
+                resizeNow();
+            }    
+            
+        </script>
+
+    </head>
+
+    <body class="tundra body" onresize="resize()" style="overflow:hidden">
+        
+        <div id="outerbox" dojoType="dijit.layout.BorderContainer" style="height:100%;width:100%;border:0px; padding:0px; margin:0px" splitter="false" gutters="false">
+
+            <div dojoType="dijit.layout.ContentPane" region="center" style="background-color:lime;height:100%;" splitter="false">
+                center
+            </div>
+
+            <div id="sidePanel" dojoType="dijit.layout.ContentPane" region="right" style="width:240px;border:0px; padding:0px; margin:0px;" splitter="false">
+
+                <div id="sidePanellayout" dojoType="dijit.layout.BorderContainer" style="height:100%;width:100%;border:0px; padding:0px; margin:0px; background: yellow" splitter="false" gutters="false">
+
+                    <div id="sidePanelTabs" dojoType="dijit.layout.ContentPane" region="top" style="height:35px;border:0px; padding:0px; margin:0px;background: pink" splitter="false">
+
+                        <div onclick="toggleSidePanel()">
+                            <>
+                        </div>
+                        
+                    </div>
+                    <div id="sidePanelTabPanels" dojoType="dijit.layout.ContentPane" region="center" style="border:0px; padding:0px; margin:0px;background: brown" splitter="false">
+
+                        <div dojoType="dijit.layout.BorderContainer" style="height:100%; border:0px; padding:0px; margin:0px; background: green" splitter="false" gutters="false">
+
+                            <div dojoType="dijit.layout.ContentPane" region="top" style="height:40px;border:0px; padding:0px; margin:0px;background: grey" splitter="false">
+                            </div>
+
+                            <div dojoType="dijit.layout.ContentPane" region="center" style="border:0px; padding:0px; margin:0px;background: blue" splitter="false">
+
+                                
+                            </div>
+
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+
+        </div>        
+        
+    </body>
+  
+</html>

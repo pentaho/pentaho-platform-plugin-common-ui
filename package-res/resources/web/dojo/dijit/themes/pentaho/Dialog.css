@@ -1,0 +1,136 @@
+/* Dialog and Tooltip/TooltipDialog */
+
+ .dijitDialog {
+}
+
+ .dijitDialogPaneContent {
+}
+
+ .dijitDialogTitleBar {
+}
+
+ .dijitDialogTitle {
+}
+
+ .dijitDialogCloseIcon {
+    display: none;
+}
+
+.pentahoDialogCloseIcon {
+    position: absolute;
+    right: 14px;
+    top: 14px;
+}
+
+.dj_ie6  .dijitDialogCloseIcon {
+    display: none;
+
+
+ .dijitDialogCloseIconHover {
+    display: none;
+}
+.dj_ie6  .dijitDialogCloseIconHover {
+    display: none;
+}
+
+/* Tooltip and TooltipDialog */
+
+ .dijitTooltip,
+ .dijitTooltipDialog {
+	/* the outermost dom node, holding the connector and container */
+	background: transparent;	/* make the area on the sides of the arrow transparent */
+}
+
+.dijitTooltipBelow {
+	/* leave room for arrow above content */
+	padding-top: 13px;
+}
+
+.dijitTooltipAbove {
+	/* leave room for arrow below content */
+	padding-bottom: 13px;
+}
+
+ .dijitTooltipContainer {
+	/*
+		The part with the text.
+	*/
+	background: #ffffff url("images/popupMenuBg.gif") repeat-x bottom left;
+	border: 1px solid #7eabcd;
+	padding: 0.45em;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+}
+
+ .dijitTooltipConnector {
+	/* the arrow piece */
+	border:0;
+	z-index: 2;
+}
+ .dijitTooltipABRight .dijitTooltipConnector {
+	/* above or below tooltip, but the arrow appears on the right,
+		and the right edges of target and tooltip are aligned rather than the left */
+	left: auto !important;
+	right: 3px;
+}
+
+.dijitTooltipBelow .dijitTooltipConnector {
+	/* the arrow piece for tooltips below an element */
+	top: 0;
+	left: 3px;
+	background:url("images/tooltipConnectorUp.png") no-repeat top left;
+	width:16px;
+	height:14px;
+}
+
+.dj_ie  .dijitTooltipBelow .dijitTooltipConnector {
+	/* use gif for IE7 too, due to png rendering problems on fade-in (see http://trac.dojotoolkit.org/ticket/6555) */
+	background-image: url("images/tooltipConnectorUp.gif");
+}
+
+ .dijitTooltipAbove .dijitTooltipConnector {
+	/* the arrow piece for tooltips above an element */
+	bottom: 0;
+	left: 3px;
+	background:url("images/tooltipConnectorDown.png") no-repeat top left;
+	width:16px;
+	height:14px;
+}
+.dj_ie  .dijitTooltipAbove .dijitTooltipConnector {
+	background-image: url("images/tooltipConnectorDown.gif");
+}
+.dj_ie6  .dijitTooltipAbove .dijitTooltipConnector {
+	bottom: -3px;
+}
+
+ .dijitTooltipLeft {
+	padding-right: 14px;
+}
+ .dijitTooltipLeft .dijitTooltipConnector {
+	/* the arrow piece for tooltips to the left of an element, bottom borders aligned */
+	right: 0;
+	background:url("images/tooltipConnectorRight.png") no-repeat top left;
+	width:16px;
+	height:14px;
+}
+.dj_ie  .dijitTooltipLeft .dijitTooltipConnector {
+	background-image: url("images/tooltipConnectorRight.gif");
+}
+
+ .dijitTooltipRight {
+	padding-left: 14px;
+}
+ .dijitTooltipRight .dijitTooltipConnector {
+	/* the arrow piece for tooltips to the right of an element, bottom borders aligned */
+	left: 0;
+	background:url("images/tooltipConnectorLeft.png") no-repeat top left;
+	width:16px;
+	height:14px;
+}
+.dj_ie  .dijitTooltipRight .dijitTooltipConnector {
+	background-image: url("images/tooltipConnectorLeft.gif");
+}
+
+.dj_webkit  .dijitTooltipContainer {
+	-webkit-box-shadow: 0 5px 10px #adadad;
+}

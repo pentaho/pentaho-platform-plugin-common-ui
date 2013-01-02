@@ -1,0 +1,185 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns:pho="http:/www.pentaho.com">
+    <head>
+        <title>Data Source Dialog Test</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+        <link rel="stylesheet" type="text/css" href="../dojo/dijit/themes/pentaho/pentaho.css"/>
+
+        <script type="text/javascript" src="webcontext.js?content=common-ui"></script>
+
+        <script type="text/javascript">
+            //<![CDATA[
+
+                $.extend(djConfig,
+                    { modulePaths: {
+                        'pentaho.common': "../pentaho/common"
+                    },
+                    parseOnLoad: true,
+                    baseUrl: '../dojo/dojo/'
+                });
+              //]]>
+        </script>
+
+
+        <script language='javascript' type='text/javascript' src='../dojo/dojo/dojo.js.uncompressed.js'></script>
+        <script language='javascript' type='text/javascript' src='../dojo/dojo/dojo-ext.js.uncompressed.js'></script>
+        <script language="javascript" src="../repo/pentaho-ajax.js" type="text/javascript"></script>
+        <script language="javascript" src="../repo/pentaho-thin-app.js" type="text/javascript"></script>
+        <script language="javascript" src="../dataapi/oop.js" type="text/javascript"></script>
+        <script language="javascript" src="../dataapi/app.js" type="text/javascript"></script>
+        <script language="javascript" src="../dataapi/controller.js" type="text/javascript"></script>
+        <script language="javascript" src="../dataapi/xhr.js" type="text/javascript"></script>
+        <script language="javascript" src="../dataapi/cda.js" type="text/javascript"></script>
+        <script language="javascript" src="../dataapi/models-mql.js" type="text/javascript"></script>
+
+        <script type="text/javascript">
+
+            dojo.require("dojo.parser");
+            dojo.require('pentaho.common.SmallImageButton');
+            dojo.require('pentaho.common.Select');
+            dojo.require('pentaho.common.Dialog');
+            dojo.require('pentaho.common.ListBox');
+            dojo.require('pentaho.common.MessageBox');
+            dojo.require("pentaho.common.datasourceselect");
+
+            var datasourceInfos = [];
+
+            function doload() {
+            
+                var da_mql = {
+                    name: 'da-mql',
+                    objectClass: pentaho.pda.MqlHandler
+                };
+                pentaho.myapp = {
+                    app: new pentaho.pda.app(),
+                    prior_idx: -1,
+                    source: {}
+                };
+                var moduleArray = [da_mql];
+                pentaho.myapp.app.init(moduleArray);	
+                pentaho.myapp.app.moduleData['da-mql'].instance.METADATA_SERVICE_URL = CONTEXT_PATH + 'content/ws-run/metadataService';
+            
+                pentaho.myapp.app.getSources(
+                    //function to be called for each source as it is added
+                    function(source) {	
+                        datasourceInfos.push(source);	
+                    }
+                );
+            
+                dlg = dijit.byId('modelSelectDialog');
+                dlg.setLocalizationLookupFunction(pentaho.common.Messages.getString);
+                dlg.getModel = getModel;
+                dlg.callbacks = [modelSelected,cancelClick];
+                dlg.datasourceEditCallback = afterDatasourceEdit;
+                dlg.datasourceAddCallback = afterDatasourceAdd;
+                dlg.datasourceDeleteCallback = afterDatasourceDelete;
+                
+                dlg.setModelList(datasourceInfos);
+                
+                dlg.execute = modelSelected;
+                dlg.onCancel = cancelled;
+                dlg.setCanDataSourceAdmin(false);
+                dlg.show();
+            }
+                    
+            function cancelClick() {
+                dlg.hide();
+            }
+            
+            </script>
+
+<script type="text/javascript">
+
+    var isAdminUser = false;
+    
+    dlg = null;
+
+    var strIdx = 0;
+    function localize() {
+        strIdx++;
+        return 'str '+strIdx;
+    }
+    
+    function getModel(id) {
+        for(var idx=0; idx<datasourceInfos.length; idx++) {
+            if(datasourceInfos[idx].domainId+':'+datasourceInfos[idx].modelId  == id) {
+                return datasourceInfos[idx];
+            }
+        }
+        return null;
+    }
+    
+    function cancelled() {
+        alert('cancelled')
+    }
+    
+    function modelSelected() {
+        var model = dlg.getSelectedModel();
+        alert('model selected: '+model.modelId);
+
+    }
+    
+    function afterDatasourceAdd(val, transport) {
+        alert('afterDatasourceAdd');
+        controller.initDatasources();
+        controller.loadModels();
+        // now select the newly added one
+        dlg.setModelList(controller.datasourceInfos);
+        // now select the added one
+        var modelList = dojo.byId('model-list');
+        for(var idx=0;idx<controller.datasourceInfos.length; idx++) {
+            if(controller.datasourceInfos[idx].modelId == transport.modelId  && 
+               controller.datasourceInfos[idx].domainId == transport.domainId) {
+               dlg.setSelectedIndex(idx);
+                break;
+            }
+        }
+    }
+    
+    function afterDatasourceEdit(val, transport) {
+        alert('afterDatasourceEdit');
+        controller.initDatasources();
+        controller.loadModels();
+        dlg.setModelList(controller.datasourceInfos);
+        // now select the edited one
+        for(var idx=0;idx<controller.datasourceInfos.length; idx++) {
+            if(controller.datasourceInfos[idx].modelId == transport.modelId  && 
+               controller.datasourceInfos[idx].domainId == transport.domainId) {
+               dlg.setSelectedIndex(idx);
+                break;
+            }
+        }
+    }
+    
+    function afterDatasourceDelete() {
+        alert('afterDatasourceDelete');
+        controller.initDatasources();
+        controller.loadModels();
+        dlg.setModelList(controller.datasourceInfos);
+    }
+    
+    function initDataAccess(hasAccess) {
+        isAdminUser = hasAccess;
+        if(dlg) {
+            dlg.setCanDataSourceAdmin(isAdminUser && window.parent != null && window.parent.pho && window.parent.pho.openDatasourceEditor != null);
+        }
+    }
+        
+    dojo.ready(doload);
+</script>
+
+</head>
+
+
+<body class="tundra body">
+
+    <div id="modelSelectDialog" title="my title" dialoghint="my hint" datasourceEditorPath="../../../data-access/resources/gwt/" dojoType="pentaho.common.datasourceselect">
+    </div>
+
+    <div id="messagebox" dojoType="pentaho.common.MessageBox" style="width:250px; display:none;">
+    </div>
+
+</body>
+  
+</html>

@@ -1,0 +1,60 @@
+<div class="pentaho-rounded-panel pentaho-tooltip-background pentaho-padding-sm pentaho-shadow" style="width:178px;text-align:center">
+    <div class="panel-content" style="width:100%">
+        <div class="pentaho-padding-sm">
+            <center>
+                <table cellspacing="0" cellpadding="0" role="grid" dojoAttachEvent="onkeypress: _onKeyPress" aria-labelledby="${id}_year" >
+                    <thead>
+                        <tr class="" valign="top">
+                            <th class='dijitReset' dojoAttachPoint="decrementMonth">
+                                <div dojoAttachPoint="decreaseArrowNode" dojoType="pentaho.common.SmallImageButton" baseClass="pentaho-pagebackbutton">
+                                </div>
+                            </th>
+                            <th class='dijitReset' colspan="5">
+                                <div dojoType="pentaho.common.DropDownButton" dojoAttachPoint="monthDropDownButton"
+                                    id="${id}_mddb" tabIndex="-1">
+                                </div>
+                            </th>
+                            <th class='dijitReset' dojoAttachPoint="incrementMonth">
+                                <div dojoAttachPoint="increaseArrowNode" dojoType="pentaho.common.SmallImageButton" baseClass="pentaho-pagenextbutton">
+                                </div>                            
+                            </th>
+                        </tr>
+                        <tr>
+                            <th class="dijitReset dijitCalendarDayLabelTemplate" role="columnheader"><span class="dijitCalendarDayLabel"></span></th>
+                        </tr>
+                    </thead>
+                    <tbody class="" dojoAttachEvent="onclick: _onDayClick, onmouseover: _onDayMouseOver, onmouseout: _onDayMouseOut, onmousedown: _onDayMouseDown, onmouseup: _onDayMouseUp" class="dijitReset dijitCalendarBodyContainer">
+                        <tr class="dijitReset dijitCalendarWeekTemplate" role="row">
+                            <td class="dijitReset dijitCalendarDateTemplate" role="gridcell"><span class="dijitCalendarDateLabel"></span></td>
+                        </tr>
+                    </tbody>
+                    <tfoot class="dijitReset">
+                        <tr>
+                            <td class='dijitReset' valign="middle" colspan="7" style="vertical-align:middle">
+                                <center>
+                                    <table>
+                                        <tr>
+                                            <td>
+                                                <div dojoAttachPoint="previousYearBtn" dojoType="pentaho.common.SmallImageButton" baseClass="pentaho-pagebackbutton">
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span dojoAttachPoint="currentYearLabelNode" class="label" id="${id}_year"></span>
+                                            </td>
+                                            <td>
+                                                <div dojoAttachPoint="nextYearBtn" dojoType="pentaho.common.SmallImageButton" baseClass="pentaho-pagenextbutton">
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    <span dojoAttachPoint="nextYearLabelNode" class="dijitInline dijitCalendarNextYear" style="display:none"></span>
+                                    <span dojoAttachPoint="previousYearLabelNode" class="dijitInline dijitCalendarNextYear" style="display:none"></span>
+                                </center>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </center>
+        </div>
+    </div>
+</div>

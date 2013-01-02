@@ -1,0 +1,83 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns:pho="http:/www.pentaho.com">
+    <head>
+        <title>Splash Screen Test</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+        <link rel="stylesheet" type="text/css" href="../dojo/dijit/themes/pentaho/pentaho.css"/>
+
+        <script type="text/javascript" src="webcontext.js?content=common-ui"></script>
+
+        <script type="text/javascript">
+            //<![CDATA[
+
+            $.extend(djConfig, { modulePaths: {
+                                    'pentaho.common': "../pentaho/common"
+                                },
+                                parseOnLoad: true,
+                                baseUrl: '../dojo/dojo/'
+                            });
+
+
+              //]]>
+        </script>
+
+        <script language='javascript' type='text/javascript' src='../dojo/dojo/dojo.js.uncompressed.js'></script>
+        <script language='javascript' type='text/javascript' src='../dojo/dojo/dojo-ext.js.uncompressed.js'></script>
+        <script language="javascript" src="../repo/pentaho-thin-app.js" type="text/javascript"></script>
+
+        <script type="text/javascript">
+
+            dojo.require("dojo.parser");
+            dojo.require("pentaho.common.SplashScreen");
+
+            function doload() {
+
+                var userConsole = new PentahoUserConsole();
+
+                window.editContentToggled = function(selected) {
+                  if( userConsole.toggleEditCallback ) {
+                      userConsole.toggleEditCallback(selected);
+                  }
+                  if( selected ) {
+                      userConsole.enableEditButton();
+                      userConsole.lowerEditButton();
+                  } else {
+                      userConsole.enableEditButton();
+                      userConsole.resetEditButton();
+                  }
+                };
+
+                if(!userConsole.console_enabled) {
+                    document.body.className = document.body.className + ' pentaho-page-background';
+                }
+
+                dlg = dijit.byId('splashscreen');
+
+                dlg.setTitle('Pentaho Common UI');
+                dlg.setText('Sample Splash Screen<p/>More text can go here');
+                dlg.setButtonText( 'Ok' );
+                dlg.callbacks = [splashscreenDone];
+                
+                dlg.show();
+            }
+            
+            function splashscreenDone() {
+                dlg.hide();
+                alert('splashscreenDone() was called');
+            }
+        
+            dojo.ready(doload);
+            
+        </script>
+
+    </head>
+
+    <body class="tundra body" onload="">
+
+        <div id="splashscreen" dojoType="pentaho.common.SplashScreen" imagePath="sample_splash_screen_logo.png" style="width:520px; display:none;">
+        </div>
+
+    </body>
+  
+</html>

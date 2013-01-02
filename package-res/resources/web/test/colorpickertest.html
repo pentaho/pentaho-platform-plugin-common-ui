@@ -1,0 +1,89 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns:pho="http:/www.pentaho.com">
+    <head>
+        <title>Color Picker Test</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+        <link rel="stylesheet" type="text/css" href="../dojo/dijit/themes/pentaho/pentaho.css"/>
+        <link rel="stylesheet" type="text/css" href="../dojo/pentaho/common/CustomColorPicker/CustomColorPicker.css"/>
+
+        <script type="text/javascript" src="webcontext.js?content=common-ui"></script>
+
+        <script type="text/javascript">
+            //<![CDATA[
+
+                $.extend(djConfig,
+                    { modulePaths: {
+                        'pentaho.common': "../pentaho/common"
+                    },
+                    parseOnLoad: true,
+                    baseUrl: '../dojo/dojo/'
+                });
+              //]]>
+        </script>
+
+        <script language='javascript' type='text/javascript' src='../dojo/dojo/dojo.js.uncompressed.js'></script>
+        <script language='javascript' type='text/javascript' src='../dojo/dojo/dojo-ext.js.uncompressed.js'></script>
+
+        <script type="text/javascript">
+
+            dojo.require("dojo.parser");
+            dojo.require("pentaho.common.ComboColorPicker");
+
+            var colorPicker = null;
+
+            function doload() {
+
+                colorPicker = dijit.byId('picker');
+
+                colorPicker.setLocalizationLookupFunction(pentaho.common.Messages.getString);
+                colorPicker.onColorChange = onColorChange;
+                colorPicker.setColor('#4ce8a2');
+                colorPicker.setUsedColors(['#112233','#38cc33','#9955ee','#112233','#88cc33','#9955ee','#112233','#388c33','#9955ee','#112233','#388cc3','#9955ee'])
+            }
+                
+            function onColorChange(color) {
+                dojo.byId('colorcode').innerHTML = color;
+                dojo.byId('colorsample').style.backgroundColor = color;
+            }
+            
+            dojo.ready(doload);
+                
+            </script>
+
+    </head>
+
+    <body class="tundra body" onload="doload()">
+
+        <div style="padding: 8px; background-color:white">
+
+            <h3>UI Widgets - Color Picker</h3>
+            This example shows you how use the color picker.
+            <p/>
+
+            <button onclick="colorPicker.show()">Show</button>
+            <button onclick="colorPicker.hide()">Hide</button>
+
+            <table>
+                <tr>
+                    <td>
+                        Current color: 
+                    </td>
+                    <td>
+                        <span id="colorcode">#4ce8a2</span>
+                    </td>
+                    <td>
+                        <div id="colorsample" style="width:50px;height:20px;border:1px solid black;display:inlineblock;background-color:#4ce8a2">
+                        </div>
+                    </td>
+                </tr>
+            </table>
+
+            <p/>
+            <div id="picker" dojoType="pentaho.common.ComboColorPicker">
+            </div>
+        </div>
+
+    </body>
+  
+</html>

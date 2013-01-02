@@ -1,0 +1,130 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns:pho="http:/www.pentaho.com">
+    <head>
+        <title>Section Header Test</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+        <link rel="stylesheet" type="text/css" href="../dojo/dijit/themes/pentaho/pentaho.css"/>
+
+        <script type="text/javascript" src="webcontext.js?content=common-ui"></script>
+
+        <script type="text/javascript">
+            //<![CDATA[
+
+            $.extend(djConfig, { modulePaths: {
+                                    'pentaho.common': "../pentaho/common"
+                                },
+                                parseOnLoad: true,
+                                baseUrl: '../dojo/dojo/'
+                            });
+
+              //]]>
+        </script>
+
+        <script language='javascript' type='text/javascript' src='../dojo/dojo/dojo.js.uncompressed.js'></script>
+        <script language='javascript' type='text/javascript' src='../dojo/dojo/dojo-ext.js.uncompressed.js'></script>
+
+        <script type="text/javascript">
+
+            dojo.require("dojo.parser");
+            dojo.require("pentaho.common.SectionHeader");
+
+            function doload() {
+            
+                dijit.byId('header2').callbacks = [buttonClicked];
+                
+                dijit.byId('header3').headerButtons[0].set('disabled',true);
+                
+                dijit.byId('header4').callbacks = [editClick,addClick,deleteClick];
+            
+                // add buttons programatically
+                var buttonInfo = [
+                    {
+                        baseClass: 'pentaho-editbutton',
+                        title: 'Edit',
+                        callback: editClick
+                    },
+                    {
+                        baseClass: 'pentaho-addbutton',
+                        title: 'Add',
+                        callback: addClick
+                    },
+                    {
+                        baseClass: 'pentaho-deletebutton',
+                        title: 'Delete',
+                        callback: deleteClick
+                    }
+                ];
+                dijit.byId('header5').setButtons(buttonInfo);
+            
+            }
+                
+            function buttonClicked(id) {
+                alert('Button clicked: '+id);
+            }
+            
+            function editClick() {
+                alert('Edit clicked');
+            }
+            
+            function addClick() {
+                alert('Add clicked');
+            }
+            
+            function deleteClick() {
+                alert('Delete clicked');
+            }
+            
+            dojo.ready(doload);
+
+        </script>
+
+    </head>
+
+    <body class="tundra body" onload="doload()">
+        
+        <div style="padding: 8px; background-color:white">
+        
+            <h3>UI Widgets - Section Headers</h3>
+            This example shows you how use section headers.
+            <p/>
+
+            <div style="width:350px">
+            
+                <div id="header1" dojoType="pentaho.common.SectionHeader" header="Regular Section">
+                </div>
+            
+                This is the content for this section
+
+                <div id="header2" dojoType="pentaho.common.SectionHeader" header="Section With Options" buttonTypes="pentaho-optionsbutton">
+                </div>
+            
+                This is the content for this section
+
+                <div id="header3" dojoType="pentaho.common.SectionHeader" header="Section With Disabled Button" buttonTypes="pentaho-editbutton">
+                </div>
+            
+                This is the content for this section
+
+                <div id="header4" dojoType="pentaho.common.SectionHeader" header="Section With Defined Buttons" buttonTypes="pentaho-runbutton,pentaho-contentbutton,pentaho-editbutton,pentaho-addbutton,pentaho-deletebutton">
+                </div>
+            
+                This is the content for this section
+
+                <div id="header5" dojoType="pentaho.common.SectionHeader" header="Section With Added Buttons">
+                </div>
+            
+                This is the content for this section
+
+                <div id="header6" dojoType="pentaho.common.SectionHeader" header="Tall Section" height="50px">
+                </div>
+            
+                This is the content for this section
+            
+            </div>
+                                                                  
+        </div>
+
+    </body>
+  
+</html>

@@ -1,0 +1,68 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns:pho="http:/www.pentaho.com">
+    <head>
+        <title>Message Box Test</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+        <link rel="stylesheet" type="text/css" href="../dojo/dijit/themes/pentaho/pentaho.css"/>
+
+        <script type="text/javascript" src="webcontext.js?content=common-ui"></script>
+
+        <script type="text/javascript">
+        //<![CDATA[
+
+        $.extend(djConfig, { modulePaths: {
+                                'pentaho.common': "../pentaho/common"
+                            },
+                            parseOnLoad: true,
+                            baseUrl: '../dojo/dojo/'
+                        });
+
+
+          //]]>
+        </script>
+
+        <script language="javascript" src="/pentaho-style/style/ThemeResources.js"></script>
+
+        <script language='javascript' type='text/javascript' src='../dojo/dojo/dojo.js.uncompressed.js'></script>
+        <script language='javascript' type='text/javascript' src='../dojo/dojo/dojo-ext.js.uncompressed.js'></script>
+
+
+        <script type="text/javascript">
+
+            dojo.require("dojo.parser");
+            dojo.require("pentaho.common.GlassPane");
+
+            var glassPane = null;
+
+            function doload() {
+
+                try {
+
+                    // create a message box
+                    glassPane = new pentaho.common.GlassPane();
+                    
+                } catch (e) {
+                    alert(e.message)
+                }
+            }
+                
+            window.onload = doload;
+            
+            function testGlassPane() {
+                glassPane.show();
+                alert('Glass pane showing');
+                glassPane.hide();
+            }
+
+        </script>
+
+    </head>
+
+    <body class="tundra body" onload="doload()">
+
+        <button onclick="testGlassPane()">Show Glass Pane</button>
+
+    </body>
+  
+</html>

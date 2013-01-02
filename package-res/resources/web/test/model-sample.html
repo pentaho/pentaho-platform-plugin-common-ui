@@ -1,0 +1,278 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+    <head>
+    <title>Models Sample</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+        <!-- this is important, it provides theming and the base url -->
+        <script type="text/javascript" src="webcontext.js?content=common-ui"></script>
+
+        <link rel="stylesheet" type="text/css" href="../dojo/dijit/themes/pentaho/pentaho.css"/>
+
+        <script type="text/javascript">
+
+          $.extend(djConfig, { modulePaths: {
+                                  dataapi: "../../dataapi"
+                              },
+                              baseUrl: '../dojo/dojo/'
+                          });
+
+        </script>
+
+        <script language="javascript" src="../dojo/dojo/dojo-all.js" type="text/javascript"></script>
+        <script language="javascript" src="../repo/pentaho-ajax.js" type="text/javascript"></script>
+        <script language="javascript" src="../repo/pentaho-thin-app.js" type="text/javascript"></script>
+        <script language="javascript" src="../dataapi/oop.js" type="text/javascript"></script>
+        <script language="javascript" src="../dataapi/app.js" type="text/javascript"></script>
+        <script language="javascript" src="../dataapi/controller.js" type="text/javascript"></script>
+        <script language="javascript" src="../dataapi/xhr.js" type="text/javascript"></script>
+        <script language="javascript" src="../dataapi/models-mql.js" type="text/javascript"></script>
+        <script language="javascript" src="../dataapi/Xmla.js" type="text/javascript"></script>
+        <script language="javascript" src="../dataapi/models-olap.js" type="text/javascript"></script>
+        <script language="javascript" src="../dataapi/models-cda.js" type="text/javascript"></script>
+        <script language="javascript" src="../dataapi/models-svc.js" type="text/javascript"></script>
+          
+        <script type="text/javascript">
+
+          pentaho.common.Messages.addUrlBundle('dataapi',CONTEXT_PATH+'i18n?plugin=common-ui&name=resources/web/dataapi/nls/messages');
+
+function loadPage() {
+    // clear out the display
+    document.getElementById('model-type').value = '';
+    document.getElementById('model-id').value = '';
+    document.getElementById('model-name').value = '';
+    document.getElementById('model-description').value = '';
+	
+	var da_mql = {
+		name: 'da-mql',
+		objectClass: pentaho.pda.MqlHandler
+	};
+	da_olap = {
+		name: 'da-olap',
+		objectClass: pentaho.pda.OlapHandler
+	};
+	da_cda = {
+		name: 'da-cda',
+		objectClass: pentaho.pda.CDAHandler
+	};
+	da_svc = {
+		name: 'da-svc',
+		objectClass: pentaho.pda.SvcHandler
+	};
+
+	pentaho.myapp = {
+		app: new pentaho.pda.app(),
+		prior_idx: -1,
+		source: {}
+	};
+	var moduleArray = [da_mql,da_olap,da_svc];
+	pentaho.myapp.app.init(moduleArray);	
+    pentaho.myapp.app.moduleData['da-mql'].instance.METADATA_SERVICE_URL = CONTEXT_PATH + 'content/ws-run/metadataService';
+}
+
+function loadModels() {
+    // load the list of datasource models
+    var list = document.getElementById('model-list');
+    list.options.length = 0;
+    
+	pentaho.myapp.app.getSources(
+		//function to be called for each source as it is added
+		function(source) {	
+			//console.log(source);
+			var list = document.getElementById('model-list');
+            var opt = new Option( source.name, source.id );
+			list.options[list.length] = opt;
+			
+		}
+	);    
+    document.getElementById('model-list').selectedIndex=0;
+    showModelInfo();
+}
+
+function showModelInfo() {
+    // display the model info in the text fields
+    var idx = document.getElementById('model-list').selectedIndex;
+    if(idx == -1) {
+        return;
+    }
+	if (idx !== pentaho.myapp.prior_idx) {
+		pentaho.myapp.source = pentaho.myapp.app.getSources(null, {filter:{property:'id', value:document.getElementById('model-list').options[idx].value}});
+		pentaho.myapp.prior_idx = idx;
+	}
+    document.getElementById('model-type').value = pentaho.myapp.source.type;
+    document.getElementById('model-id').value = pentaho.myapp.source.id;
+    document.getElementById('model-name').value = pentaho.myapp.source.name;
+    document.getElementById('model-description').value = pentaho.myapp.source.description;
+}
+
+function loadModel() {
+    var idx = document.getElementById('model-list').selectedIndex;
+    
+	pentaho.myapp.source.discoverModelDetail();
+	//var model = pentaho.myapp.source.discoverElements();
+
+    // clear out the capability table
+    var table = document.getElementById('capability-table');
+    while( table.rows.length > 1 ) {
+        table.deleteRow(1);    
+    }
+    var list = pentaho.myapp.source.getCapabilityNames();
+    
+    for( var idx=0; idx<list.length; idx++ ) {
+        row = table.insertRow(-1);
+        var cell = row.insertCell(-1);
+        cell.innerHTML = list[idx];
+        cell = row.insertCell(-1);
+        cell.innerHTML = pentaho.myapp.source.getCapabilityValue(list[idx]);
+    }
+    
+    // clear out the columns table
+    var table = document.getElementById('columns-table');
+    while( table.rows.length > 1 ) {
+        table.deleteRow(1);    
+    }
+    
+    // add the categories to the table
+    
+    var elements = pentaho.myapp.source.getAllElements();
+	//console.log(elements);
+    for( var idx=0; idx<elements.length; idx++ ) {
+        row = table.insertRow(-1);
+        var cell = row.insertCell(-1);
+        cell.innerHTML = elements[idx].id;
+        cell = row.insertCell(-1);
+        cell.innerHTML = elements[idx].name;
+        cell = row.insertCell(-1);
+        cell.innerHTML = elements[idx].description;
+        cell = row.insertCell(-1);
+        cell.innerHTML = elements[idx].elementType;
+        cell = row.insertCell(-1);
+        cell.innerHTML = elements[idx].dataType;
+        cell = row.insertCell(-1);
+        cell.innerHTML = elements[idx].isQueryElement;
+        cell = row.insertCell(-1);
+        cell.innerHTML = elements[idx].horizontalAlignment;
+        cell = row.insertCell(-1);
+        cell.innerHTML = elements[idx].formatMask;
+        cell = row.insertCell(-1);
+        cell.innerHTML = elements[idx].selectedAggregation;
+        cell = row.insertCell(-1);
+        cell.innerHTML = elements[idx].defaultAggregation;
+        cell = row.insertCell(-1);
+        cell.innerHTML = elements[idx].availableAggregations;
+            
+        cell = row.insertCell(-1);
+        if( elements[idx].parent ) {
+            cell.innerHTML = elements[idx].parent.name;
+        } else {
+            cell.innerHTML = "[root]";
+        }
+    }
+    
+}
+
+dojo.ready(loadPage);
+
+</script>
+
+    </head>
+
+    <body onload="" class="tnudra body">
+
+        <div style="padding: 8px; background-color:white">
+
+            <h3>Data API - Data Sources</h3>
+            This example shows you how to get a list of data sources, and how to get information about the details of a data source.
+            <p/>
+            <table border="0">
+                <tbody>
+                    <tr>
+                        <td style="height:25px">Data Sources:</td>
+                        <td>Data Source Info:</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="8">
+                            <select size="15" id="model-list" style="width:200px" onchange="showModelInfo()">
+                            </select>
+                        </td>
+                        <td>
+                            Id
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <input type="text" disabled="true" id="model-id" style="width:300px" value=""/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            type
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <input type="text" disabled="true" id="model-type" style="width:300px" value=""/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Data Source Name
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <input type="text" disabled="true" id="model-name" style="width:300px" value=""/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Data Source Description
+                        </td>
+                        
+                    </tr>
+                    <tr>
+                        <td>
+                            <input type="text" disabled="true" id="model-description" style="width:300px" value=""/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><button onclick="loadModels()">Load Data Source List</button></td>
+                        <td><button onclick="loadModel()">Load Data Source Details</button></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Data Source Capabilities</h3>
+            <table id="capability-table" cellpadding="3" cellspacing="0" style="border:1px solid #808080" border="0">
+                <tbody>
+                    <tr>
+                        <th style="border:1px solid #808080;background-color:#cccccc">Capability</th>
+                        <th style="border:1px solid #808080;background-color:#cccccc">Value</th>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Columns</h3>
+            <table id="columns-table" widthx="800" cellpadding="3" cellspacing="0" style="border:1px solid #808080" border="0">
+                <tbody>
+                    <tr>
+                        <th style="border:1px solid #808080;background-color:#cccccc">Id</th>
+                        <th style="border:1px solid #808080;background-color:#cccccc">Name</th>
+                        <th style="border:1px solid #808080;background-color:#cccccc">Description</th>
+                        <th style="border:1px solid #808080;background-color:#cccccc">Field Type</th>
+                        <th style="border:1px solid #808080;background-color:#cccccc">Data Type</th>
+                        <th style="border:1px solid #808080;background-color:#cccccc">Query Element?</th>
+                        <th style="border:1px solid #808080;background-color:#cccccc">Alignment</th>
+                        <th style="border:1px solid #808080;background-color:#cccccc">Format</th>
+                        <th style="border:1px solid #808080;background-color:#cccccc">Agg Type</th>
+                        <th style="border:1px solid #808080;background-color:#cccccc">Default Agg Type</th>
+                        <th style="border:1px solid #808080;background-color:#cccccc">Available Agg Types</th>
+                        <th style="border:1px solid #808080;background-color:#cccccc">Child Of</th>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </body>
+  
+</html>

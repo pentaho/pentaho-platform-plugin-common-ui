@@ -1,0 +1,123 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns:pho="http:/www.pentaho.com">
+    <head>
+        <title>Gallery Test</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+        <link rel="stylesheet" type="text/css" href="../dojo/dijit/themes/pentaho/pentaho.css"/>
+
+        <script type="text/javascript" src="webcontext.js?content=common-ui"></script>
+
+        <script type="text/javascript">
+            //<![CDATA[
+
+            $.extend(djConfig, { modulePaths: {
+                                    'pentaho.common': "../pentaho/common"
+                                },
+                                parseOnLoad: true,
+                                baseUrl: '../dojo/dojo/'
+                            });
+
+              //]]>
+        </script>
+
+
+        <script language='javascript' type='text/javascript' src='../dojo/dojo/dojo.js.uncompressed.js'></script>
+        <script language='javascript' type='text/javascript' src='../dojo/dojo/dojo-ext.js.uncompressed.js'></script>
+
+        <script type="text/javascript">
+
+            dojo.require("dojo.parser");
+            dojo.require("pentaho.common.Messages");
+            dojo.require("pentaho.common.Dialog");
+            dojo.require("pentaho.common.TemplatePicker");
+
+            var choices = [];
+            var gallery;
+
+            function doload() {
+
+                gallery = dijit.byId('gallery');
+                
+                choices = [
+                    {
+                        imagePath : 'images/gallery1.png',
+                        name : 'Option 1',
+                        id: 'option1'
+                    },
+                    {
+                        imagePath : 'images/gallery2.png',
+                        name : 'Option 2',
+                        id: 'option2'
+                    },
+                    {
+                        imagePath : 'images/gallery3.png',
+                        name : 'Option 3',
+                        id: 'option3'
+                    },
+                    {
+                        imagePath : 'images/gallery4.png',
+                        name : 'Option 4',
+                        id: 'option4'
+                    },
+                    {
+                        imagePath : 'images/gallery5.png',
+                        name : 'Option 5',
+                        id: 'option5'
+                    },
+                    {
+                        imagePath : 'images/gallery6.png',
+                        name : 'Option 6',
+                        id: 'option6'
+                    },
+                    {
+                        imagePath : 'images/gallery7.png',
+                        name : 'Option 7',
+                        id: 'option7'
+                    },
+                    {
+                        imagePath : 'images/gallery8.png',
+                        name : 'Option 8',
+                        id: 'option8'
+                    }
+                ];
+                
+                gallery.callbacks = [closeTemplatePicker];
+                gallery.setTemplates(choices);
+                gallery.templateSelectedCallback = pickedFunc;
+                gallery.show();
+
+            }
+                
+            function pickedFunc(idx) {
+                alert('Option selected: id='+choices[idx].id);
+                gallery.hide();
+            }
+            
+            function closeTemplatePicker() {
+                gallery.hide();
+            }
+                
+            dojo.ready(doload);
+                
+        </script>
+
+    </head>
+
+    <body class="tundra body" onload="">
+        
+        <div style="padding: 8px; background-color:white">
+        
+            <h3>UI Widgets - Date Picker</h3>
+            This example shows you how use the gallery.
+            <p/>
+            <button onclick="gallery.show()">Show Gallery Again</button>
+
+            <div id="gallery" dojoType="pentaho.common.TemplatePicker">
+            </div> 
+
+        </div>
+
+    </body>
+  
+</html>

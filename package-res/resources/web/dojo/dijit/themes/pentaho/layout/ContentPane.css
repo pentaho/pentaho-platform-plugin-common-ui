@@ -1,0 +1,20 @@
+/* ContentPane */
+
+.tundra .dijitContentPane {
+
+}
+
+/* nested layouts */
+.tundra .dijitTabContainerTop-dijitContentPane,
+.tundra .dijitTabContainerLeft-dijitContentPane,
+.tundra .dijitTabContainerBottom-dijitContentPane,
+.tundra .dijitTabContainerRight-dijitContentPane,
+.tundra .dijitAccordionContainer-dijitContentPane {
+	padding: 8px;
+}
+
+.tundra .dijitSplitContainer-dijitContentPane,
+.tundra .dijitBorderContainer-dijitContentPane {
+	padding: 8px;
+}
+

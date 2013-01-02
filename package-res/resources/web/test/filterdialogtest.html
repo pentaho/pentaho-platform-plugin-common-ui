@@ -1,0 +1,229 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns:pho="http:/www.pentaho.com">
+    <head>
+        <title>Filter Dialog Test</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+        <link rel="stylesheet" type="text/css" href="../dojo/dijit/themes/pentaho/pentaho.css"/>
+        <link rel="stylesheet" type="text/css" href="../dojo/pentaho/common/FilterDialog.css"/>
+
+        <script type="text/javascript" src="webcontext.js?content=common-ui"></script>
+
+        <script type="text/javascript">
+        //<![CDATA[
+
+        $.extend(djConfig, { modulePaths: {
+                                dataapi: "../../dataapi",
+                                'pentaho.common': "../pentaho/common"
+                            },
+                            parseOnLoad: true,
+                            baseUrl: '../dojo/dojo/'
+                        });
+
+
+        //]]>
+        </script>
+
+        <script language='javascript' type='text/javascript' src='../dojo/dojo/dojo.js.uncompressed.js'></script>
+        <script language='javascript' type='text/javascript' src='../dojo/dojo/dojo-ext.js.uncompressed.js'></script>
+
+        <script language="javascript" src="../repo/pentaho-ajax.js" type="text/javascript"></script>
+        <script language="javascript" src="../repo/pentaho-thin-app.js" type="text/javascript"></script>
+        <script language="javascript" src="../dataapi/oop.js" type="text/javascript"></script>
+        <script language="javascript" src="../dataapi/app.js" type="text/javascript"></script>
+        <script language="javascript" src="../dataapi/controller.js" type="text/javascript"></script>
+        <script language="javascript" src="../dataapi/xhr.js" type="text/javascript"></script>
+        <script language="javascript" src="../dataapi/cda.js" type="text/javascript"></script>
+        <script language="javascript" src="../dataapi/models-mql.js" type="text/javascript"></script>
+        <script language="javascript" src="../dataapi/models-olap.js" type="text/javascript"></script>
+        <script language="javascript" src="../dataapi/Xmla.js" type="text/javascript"></script>
+        <script language="javascript" src="../repo/pentaho-thin-app.js" type="text/javascript"></script>
+        <script language="javascript" src="../repo/state.js" type="text/javascript"></script>
+
+        <script type="text/javascript">
+
+            dojo.require("dojo.parser");
+            dojo.require("pentaho.common.Calendar");
+            dojo.require("pentaho.common.FilterDialog");
+
+            // the list of available fields
+            var fields = [];
+    
+            // the filter dialog
+            var filterDialog = null;
+            
+            function doload() {
+
+                dojo.parser.parse();
+            
+                // diable the data source list and field list until they are populated
+                document.getElementById('datasource-list').disabled = true;
+                document.getElementById('field-list').disabled = true;
+
+                // initialize the data api
+                var da_mql = {
+                    name: 'da-mql',
+                    objectClass: pentaho.pda.MqlHandler
+                };
+                var da_olap = {
+                    name: 'da-olap',
+                    objectClass: pentaho.pda.OlapHandler
+                };
+                pentaho.myapp = {
+                    app: new pentaho.pda.app(),
+                    prior_idx: -1,
+                    source: {}
+                };
+                var moduleArray = [da_mql, da_olap];
+                pentaho.myapp.app.init(moduleArray);	
+                pentaho.myapp.app.moduleData['da-mql'].instance.METADATA_SERVICE_URL = CONTEXT_PATH + 'content/ws-run/metadataService';
+
+                // populate the list of available data sources
+                loadDataources();
+
+                // configure the filter dialog
+                filterDialog = dijit.byId('filterDialog');
+                filterDialog.setLocalizationLookupFunction(pentaho.common.Messages.getString);
+                filterDialog.execute = okFunc;
+                filterDialog.onCancel = cancelFunc;
+                filterDialog.setSearchListLimit(200);
+                filterDialog.registerOnSuccessCallback(okFunc);
+                filterDialog.registerOnCancelCallback(cancelFunc);
+
+            }
+
+            /*  Shows the filter dialog in a mode where the user can, 
+                within the filter dialog, select the field they wish to
+                create a filter on
+            */
+            function createFilter() {
+                // enable the field selection controls
+                filterDialog.enableFieldSelection(true);
+                // set the list of available fields
+                filterDialog.setFieldList(fields);
+                // show the dialog
+                filterDialog.show();
+            }
+
+            /* Creates a filter on the current item in the field list control */
+            function createFilterOnField () {
+                // get the id of the selected field
+                var fieldId = document.getElementById('field-list').value;
+
+                // create a filter obejct
+                var filter = {
+                    "column":fieldId,
+                    "value":[],
+                    "combinationType":pentaho.pda.Column.OPERATOR_TYPES.AND,
+                    "operator":pentaho.pda.Column.CONDITION_TYPES.EQUAL
+                    
+                }
+                // turn of the field selection controls
+                filterDialog.enableFieldSelection(false);
+                // initialize the filter dialog for our filter
+                filterDialog.configureFor(filter);
+                // show the dialog
+                filterDialog.show();
+            }
+
+            /* popupate the list of available models */
+            function loadDataources() {
+                // load the list of the available datasources
+                pentaho.myapp.app.getSources(
+                    //function to be called for each source as it is added
+                    function(source) {	
+                        //console.log(source);
+                        var list = document.getElementById('datasource-list');
+                        if(list.disabled) {
+                            // enable the list and remove the 'loading...' entry
+                            list.disabled = false;
+                            list.options.length = 0;
+                        }
+                        var opt = new Option( source.name, source.id );
+                        list.options[list.length] = opt;                        
+                    }
+                );
+                document.getElementById('datasource-list').selectedIndex=-1;
+            }
+            
+            /* displays the list of query elements from the selected data source */
+            function showDatasourceFields() {
+
+                fields = [];
+                var datasourceId = document.getElementById('datasource-list').value;
+                // set the selected
+                pentaho.myapp.source = pentaho.myapp.app.getSources(null, {filter: {property:'id', value: datasourceId}});
+                pentaho.myapp.source.discoverModelDetail();
+                var elements = pentaho.myapp.source.getAllElements();
+                var list = document.getElementById('field-list');
+                // add the queryable elements to the list
+                list.options.length = 0;
+                list.disabled = false;
+                for(var idx=0; idx<elements.length; idx++) {
+                    if(elements[idx].isQueryElement) {
+                        var opt = new Option( elements[idx].name, elements[idx].id );
+                        list.options[list.length] = opt;
+                        fields.push(elements[idx]);
+                    }
+                }
+                filterDialog.setDatasource(pentaho.myapp.source);
+                document.getElementById('addbutton').disabled = false;
+            }
+
+            // The 'Ok' function. Display the details of the filter and hide the dialog.
+            function okFunc(filter) {
+                var str = 'Filter definition:';
+                str += '\nColumn: '+filter.column;
+                str += '\nValue: '+filter.value;
+                str += '\nOperator: '+filter.operator;
+                str += '\nDescription: '+filterDialog.buildFilterText(filter);
+                str += '\nParameter Name: '+filter.parameterName;
+                alert(str);
+                filterDialog.hide();
+            }
+
+            // The cancel function. Hide the dialog.
+            function cancelFunc() {
+                filterDialog.hide();
+            }
+            
+            dojo.ready(doload);
+            
+        </script>
+
+    </head>
+
+    <body class="tundra body" onload="">
+
+        <div style="padding: 8px; background-color:white">
+        
+            <h3>Data API - Filter Dialog</h3>
+            This example shows you how to use the query filter dialog.
+            <p/>
+
+            Data Source:
+            <br/>
+            <select size="5" id="datasource-list" style="width:200px" onchange="showDatasourceFields()" disabled="true">
+                <option>loading...</option>
+            </select>
+            <br>
+            Click on a data source above to see the field list
+            <p/>
+            Fields:
+            <br/>
+            <select size="20" id="field-list" style="width:200px" ondblclick="createFilterOnField()" disabled="true">
+            </select>
+            <br/>
+            Double click on a field above to see the filter dialog for that field, or click on the 'Add Filter' button below to select the field in the dialog.
+            <p/>
+            <button id="addbutton" onclick="createFilter()" disabled="true">Add Filter</button>
+            
+        </div>
+
+        <!-- this is the declaration of the filter dialog -->
+        <div id="filterDialog" dojoType="pentaho.common.FilterDialog">
+        </div>
+
+    </body>
+  
+</html>

@@ -1,0 +1,53 @@
+.pc_pageControlContainer {
+  padding: 0px 1px 0px 1px;
+  height: 16px;
+  vertical-align: middle;
+}
+
+.pc_pagePrev {
+	float: left;
+  background: transparent url(images/page_back.png) no-repeat;
+  height: 18px;
+  width: 18px;
+  white-space: nowrap;
+  padding: 0px 2px 0px 1px;
+  cursor: pointer;   
+}
+
+.pc_pagePrevDisabled {
+  background: transparent url(images/page_back_disabled.png) no-repeat !important;
+  cursor: default !important;
+}
+
+.pc_pagePrev:hover {
+  background: transparent url(images/page_back_over.png) no-repeat;
+}
+
+.pc_pageNext {
+	float: left;
+  background: transparent url(images/page_forward.png) no-repeat;
+  height: 18px;
+	width: 18px;
+	white-space: nowrap;
+	padding: 0px 1px 0px 2px;
+	cursor: pointer;
+}
+
+.pc_pageNextDisabled {
+  background: transparent url(images/page_forward_disabled.png) no-repeat !important;
+  cursor: default !important;
+}
+
+.pc_pageNext:hover {
+  background: transparent url(images/page_forward_over.png) no-repeat;
+}
+
+.pc_pageNumberInput {
+	float: left;
+  width: 2em;
+}
+
+.pc_pageTotal {
+	float: left;
+	padding: 1px 0px 0px 2px;
+}

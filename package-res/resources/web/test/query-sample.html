@@ -1,0 +1,634 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+    <head>
+        <title>Query Sample</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+        <link rel="stylesheet" type="text/css" href="../dojo/dijit/themes/pentaho/pentaho.css"/>
+        <link rel="stylesheet" type="text/css" href="../dojo/pentaho/common/FilterDialog.css"/>
+
+        <!-- this is important, it provides theming and the base url -->
+        <script type="text/javascript" src="webcontext.js?content=common-ui"></script>
+
+        <script type="text/javascript">
+          $.extend(djConfig, { modulePaths: {
+                                  dataapi: "../../dataapi",
+                                  'pentaho.common': "../pentaho/common"
+                              },
+                              parseOnLoad: true,
+                              baseUrl: '../dojo/dojo/'
+                          });
+
+        </script>
+
+        <script language="javascript" src="../dojo/dojo/dojo-all.js" type="text/javascript"></script>
+        <script language="javascript" src="../repo/pentaho-ajax.js" type="text/javascript"></script>
+        <script language="javascript" src="../repo/pentaho-thin-app.js" type="text/javascript"></script>
+        <script language="javascript" src="../dataapi/oop.js" type="text/javascript"></script>
+        <script language="javascript" src="../dataapi/app.js" type="text/javascript"></script>
+        <script language="javascript" src="../dataapi/controller.js" type="text/javascript"></script>
+        <script language="javascript" src="../dataapi/xhr.js" type="text/javascript"></script>
+        <script language="javascript" src="../dataapi/cda.js" type="text/javascript"></script>
+        <script language="javascript" src="../dataapi/models-mql.js" type="text/javascript"></script>
+        <script language="javascript" src="../dataapi/Xmla.js" type="text/javascript"></script>
+        <script language="javascript" src="../dataapi/models-olap.js" type="text/javascript"></script>
+        <script language="javascript" src="../dataapi/models-cda.js" type="text/javascript"></script>
+        <script language="javascript" src="../dataapi/models-svc.js" type="text/javascript"></script>
+        <script language="javascript" src="../vizapi/DataTable.js" type="text/javascript"></script>
+          
+        <script language="javascript" >
+
+        pentaho.common.Messages.addUrlBundle('dataapi',CONTEXT_PATH+'i18n?plugin=common-ui&name=resources/web/dataapi/nls/messages');
+
+dojo.require("dojo.parser");
+dojo.require("pentaho.common.FilterDialog");
+
+var modelInfos = new Array();
+var model;
+var fields = [];
+var column1Id;
+var column2Id;
+var measuresId;
+var headerCellHtml;
+var dataCellHtml;
+var dataTable;
+var results;
+var paramHtmlTemplate;
+var queryParameters = new Array();
+var autoUpdate;
+var filterDialog = null;
+var filterMode = null;
+var filterIndex = -1;
+
+/*
+This handles loading the page. It gets the list of available models from the server and populates a list box with them.
+*/
+function loadPage() {
+
+    dojo.parser.parse();
+
+    document.getElementById('models-title').innerHTML = 'Models (loading)';
+    document.getElementById('show-query').checked = false;
+    headerCellHtml = document.getElementById('headerrow').innerHTML;
+    dataCellHtml = document.getElementById('datarow').innerHTML;
+    dataTable = document.getElementById('datatable');
+    while( dataTable.rows.length > 0 ) {
+        dataTable.deleteRow(0);
+    }
+    
+    var row = document.getElementById('param-template-row');
+    paramHtmlTemplate = row.innerHTML;
+    document.getElementById('data-select-table').deleteRow(9);
+    autoUpdate = document.getElementById('auto-update');
+
+	var da_mql = {
+		name: 'da-mql',
+		objectClass: pentaho.pda.MqlHandler
+	},
+	da_olap = {
+		name: 'da-olap',
+		objectClass: pentaho.pda.OlapHandler
+	},
+	da_cda = {
+		name: 'da-cda',
+		objectClass: pentaho.pda.CDAHandler
+	};
+	da_svc = {
+		name: 'da-svc',
+		objectClass: pentaho.pda.SvcHandler
+	};
+
+	pentaho.myapp = {
+		app: new pentaho.pda.app(),
+		prior_idx: -1,
+		source: {}
+	};
+	var moduleArray = [da_mql,da_olap,da_svc];
+	pentaho.myapp.app.init(moduleArray);	
+    pentaho.myapp.app.moduleData['da-mql'].instance.METADATA_SERVICE_URL = CONTEXT_PATH + 'content/ws-run/metadataService';
+
+    try {
+        loadModels();
+    } catch(e) {
+        alert(e.message);
+    }
+    
+    filterDialog = dijit.byId('filterDialog');
+    filterDialog.setLocalizationLookupFunction(pentaho.common.Messages.getString);
+    filterDialog.setSearchListLimit(200);
+    filterDialog.registerOnSuccessCallback(filterDialogDone);
+    filterDialog.registerOnCancelCallback(cancelFilterDialog);
+
+}
+
+function loadModels() {
+			var list = document.getElementById('model-list');
+            list.options.length = 0;
+            opt = new Option( "" );
+			list.options[list.length] = opt;
+
+    // load the list of datasource models
+	pentaho.myapp.app.getSources(
+		//function to be called for each source as it is added
+		function(source) {	
+			//console.log(source);
+			var list = document.getElementById('model-list');
+            opt = new Option( source.name, source.id );
+			list.options[list.length] = opt;
+		}
+	);    
+    if( document.getElementById('model-list').options.length > 0 ) {
+        document.getElementById('model-list').selectedIndex=0;
+    }
+    document.getElementById('models-title').innerHTML = 'Models (pick one)';
+}
+
+function selectModel() {
+try {
+
+    var idx = document.getElementById('model-list').selectedIndex;
+    if( idx == 0 ) {
+        // the empty option was selected
+        return;
+    }
+
+    // get the model
+    pentaho.myapp.source = pentaho.myapp.app.getSources(null, {filter: {property:'id', value:document.getElementById('model-list').options[idx].value}});
+  	pentaho.myapp.source.discoverModelDetail();
+    model = pentaho.myapp.source; 
+
+    document.getElementById('use-across-location-1').disabled = !model.hasCapability(pentaho.pda.CAPABILITIES.HAS_ACROSS_AXIS);
+    document.getElementById('use-across-location-1').checked = false;
+    document.getElementById('use-across-location-2').disabled = !model.hasCapability(pentaho.pda.CAPABILITIES.HAS_ACROSS_AXIS);
+    document.getElementById('use-across-location-2').checked = false;
+
+    var list1 = document.getElementById('Column1Select');
+    var list2 = document.getElementById('Column2Select');
+    var list3 = document.getElementById('MeasureSelect');
+    list1.options.length = 0;
+    list2.options.length = 0;
+    list3.options.length = 0;
+    
+    // populate the lists of fields
+    var types = new Array( pentaho.pda.Column.ELEMENT_TYPES.LEVEL, 
+        pentaho.pda.Column.ELEMENT_TYPES.DIMENSION, 
+        pentaho.pda.Column.ELEMENT_TYPES.ATTRIBUTE, 
+        pentaho.pda.Column.ELEMENT_TYPES.KEY, 
+        pentaho.pda.Column.ELEMENT_TYPES.UNKNOWN );
+        
+    var columns = model.getColumnsByFieldTypes( types );
+    columns = model.sortColumnsByName( columns );
+    var options = model.createListOptions( columns );
+    
+    list1.options[0] = new Option('');
+    list2.options[0] = new Option('');
+    for( var idx=0; idx<options.length; idx++ ) {
+        list1.options[list1.options.length] = options[idx];
+    }
+
+    var options = model.createListOptions( columns );
+    for( var idx=0; idx<options.length; idx++ ) {
+        list2.options[list2.options.length] = options[idx];
+    }
+
+    types = new Array( pentaho.pda.Column.ELEMENT_TYPES.FACT, pentaho.pda.Column.ELEMENT_TYPES.UNKNOWN );
+    columns = model.getColumnsByFieldTypes( types );
+    columns = model.sortColumnsByName( columns );
+    options = model.createListOptions( columns );
+    
+    for( var idx=0; idx<options.length; idx++ ) {
+        list3.options[list3.options.length] = options[idx];
+    }
+    list3.size = Math.min( columns.length, 10 );
+    
+    // enabled all of the controls now that a model has been selected
+    document.getElementById('Column1Select').disabled = false;
+    document.getElementById('Column1ValuesSelect').disabled = false;
+    document.getElementById('Column2Select').disabled = false;
+    document.getElementById('Column2ValuesSelect').disabled = false;
+    document.getElementById('MeasureSelect').disabled = false;
+    document.getElementById('NewFilterButton').disabled = false;
+
+    var elements = model.getAllElements();
+    for(var idx=0; idx<elements.length; idx++) {
+        if(elements[idx].isQueryElement) {
+            fields.push(elements[idx]);
+        }
+    }
+    filterDialog.setDatasource(pentaho.myapp.source);
+
+    } catch (e) {
+        alert( e.message );
+    }
+    
+}
+
+function changeColumn( selectId, valuesId ) {
+
+    var select = document.getElementById(selectId);
+    var valuesList = document.getElementById(valuesId);
+    valuesList.options.length = 0;
+    if(select.selectedIndex<1) {
+        selectionsChanged();
+        return;
+    }
+    var columnId = select.value;
+    var column = model.getColumnById( columnId );
+    // get the values for the column
+    var results = model.getAllValuesForColumn( column );
+    if( results['className'] != 'pentaho.DataTable' ) {
+        results = new pentaho.DataTable(results);
+    }
+    valuesList.options[0] = new Option('<ALL>');
+    model.populateListFromResults( valuesList, results, 0 );
+    valuesList.size = Math.min( results.resultset ? results.resultset.length+1 : results.getNumberOfRows(), 10 );
+    selectionsChanged();
+}
+
+function selectionsChanged() {
+
+    if( ! autoUpdate.checked ) {
+        return;
+    }
+    // something was added or removed, reload the data
+    var query = model.createQuery();
+    // add item 1
+    var column = model.getColumnById( document.getElementById('Column1Select').value );
+    if( column ) {
+        var list = document.getElementById('Column1ValuesSelect' );
+        handleSelection( column, list, query, document.getElementById('use-across-location-1').checked );
+    }
+    
+    // add item 2
+    var column = model.getColumnById( document.getElementById('Column2Select').value );
+    if( column ) {
+        var list = document.getElementById('Column2ValuesSelect' );
+        handleSelection( column, list, query, document.getElementById('use-across-location-2').checked );
+    }
+    
+    // add measures
+    var list = document.getElementById('MeasureSelect' );
+    for( var idx=0; idx<list.options.length; idx++ ) {
+        if( list.options[idx].selected ) {
+            query.addSelectionById( list.options[idx].value );
+        }
+    }
+    
+    if( queryParameters && queryParameters.length ) {
+        for( var idx=0; idx<queryParameters.length; idx++ ) {
+            query.addConditionById(queryParameters[idx].columnId, 
+                queryParameters[idx].operator,queryParameters[idx].value,queryParameters[idx].condition);
+        }
+    }
+    
+//    alert(query.getJson());
+    query.prepare();
+    document.getElementById('querytext').value = query.getQueryStr();
+    document.getElementById('data-title').innerHTML = 'Data (loading)';
+    clearDataDisplay();
+    if( !query.canQueryReturnData() ) {
+        return;
+    }
+    results = model.submitQuery( query );
+    if( results['className'] != 'pentaho.DataTable' ) {
+        results = new pentaho.DataTable(results);
+    }
+    if( results == null ) {
+        document.getElementById('data-title').innerHTML = 'Data (none)';
+        return;
+    } else {
+//        var sorted = pentaho.pda.app.prototype.sortData( results, 0, pentaho.pda.Column.SORT_TYPES.ASCENDING );
+        displayData( results );
+    }
+}
+
+function handleSelection( column, list, query, useAcross ) {
+        var selection = null;
+        
+        var location = (useAcross) ? pentaho.pda.AXIS_LOCATION_ACROSS : pentaho.pda.AXIS_LOCATION_DOWN;
+        if( list.options[0].selected ) {
+            // the 'ALL' option is selected, so we don't need individual selections
+            selection = query.addSelectionById(column.id, location);
+        } else {
+            // see which options are selected
+            var selectedValues = new Array();
+            for( var idx=0; idx<list.options.length; idx++ ) {
+                if( list.options[idx].selected ) {
+                    selectedValues.push(list.options[idx].value);
+                }
+            }
+            if( selectedValues.length > 0 ) {
+                // add a filter
+                selection = query.addSelectionById(column.id, location);
+                var value = null;
+                if( selectedValues.length == 1 ) {
+                    value = selectedValues[0];
+                } 
+                else if( selectedValues.length > 1 ) {
+                    value = selectedValues;
+                }
+                query.addConditionById(column.id,pentaho.pda.Column.CONDITION_TYPES.EQUAL,value,pentaho.pda.Column.OPERATOR_TYPES.AND);
+            } else {
+                // nothing is selected so don't create a selection
+            }
+        }
+}
+
+function clearDataDisplay() {
+    while( dataTable.rows.length > 0 ) {
+        dataTable.deleteRow(0);
+    }
+}
+
+function displayData( results ) {
+    // display the column headers
+    var rowHtml = '';
+    for( var idx=0; idx<results.getNumberOfColumns();idx++ ) {
+        var headerContent = results.getColumnId(idx)
+        if( results.getColumnLabel(idx)) {
+            headerContent += "<br/>"+results.getColumnLabel(idx);
+        }
+        var html = headerCellHtml.replace( /{contents}/, headerContent );
+        html = html.replace( /{idx}/g, idx );
+        if( results.getColumnType(idx) == pentaho.pda.Column.DATA_TYPES.NUMERIC || 
+            results.getColumnType(idx) == pentaho.pda.Column.DATA_TYPES.BOOLEAN ) {
+            html = html.replace( /text-align: left;/, 'text-align: right;' );
+        }
+        rowHtml += html;
+    }
+    var newRow = dataTable.insertRow(0);
+    addTableCells( newRow, rowHtml );
+
+    // now display the data
+    for( var rowNo=0; rowNo<results.getNumberOfRows(); rowNo++ ) {
+        var rowHtml = '';
+        for( var colNo=0; colNo<results.getNumberOfColumns();colNo++ ) {
+            var html = dataCellHtml.replace( /{contents}/, results.getFormattedValue(rowNo, colNo) );
+            if( results.getColumnType(colNo) == pentaho.pda.Column.DATA_TYPES.NUMERIC || 
+                results.getColumnType(colNo) == pentaho.pda.Column.DATA_TYPES.BOOLEAN ) {
+                html = html.replace( /text-align: left;/, 'text-align: right;' );
+            }            
+            rowHtml += html;
+        }
+        var newRow = dataTable.insertRow(dataTable.rows.length);
+        addTableCells( newRow, rowHtml );
+        if( rowNo > 100 ) {
+            // just show the first 100 rows - this is just a technical code sample
+            break;
+        }
+    }
+    if( results.getNumberOfRows() <= 100 ) {
+        document.getElementById('data-title').innerHTML = 'Data ('+results.getNumberOfRows()+' rows)';
+    } else {
+        document.getElementById('data-title').innerHTML = 'Data ('+results.getNumberOfRows()+' rows, 100 shown)';
+    }
+}
+
+function addTableCells( rowObj, html ) {
+    var tmp = document.createElement("div");
+    tmp.innerHTML = '<table><tr>'+html+'</tr></table>';
+    tmp = tmp.childNodes[0].childNodes[0].childNodes[0].childNodes;
+    while(tmp.length > 0 ) {
+        rowObj.appendChild(tmp[0]);
+    }
+}
+
+function sort( columnIdx, direction ) {
+
+    var sorted = pentaho.pda.app.prototype.sortData( results, columnIdx, direction );
+    clearDataDisplay();
+    displayData(sorted);
+}
+
+/* Creates a filter on the current item */
+function createFilter () {
+    var fieldId = document.getElementById('field-list').value;
+
+    var filter = {
+        "column":fieldId,
+        "value":null,
+        "combinationType":pentaho.pda.Column.OPERATOR_TYPES.AND,
+        "operator":pentaho.pda.Column.CONDITION_TYPES.EQUAL
+    }
+
+    filter.value = ["Testing"];
+    dialog.configureFor(filter);
+    
+    dialog.show();
+
+}
+
+function addParameter() {
+
+    filterMode = 'add';
+    // enable the field selection controls
+    filterDialog.enableFieldSelection(true);
+    // set the list of available fields
+    filterDialog.setFieldList(fields);
+    // show the dialog
+    filterDialog.show();
+}
+
+function filterDialogDone(filter) {
+
+    // create a parameter object and add it to the state
+    if( model == null ) {
+        return;
+    }
+    var param = {};
+    param.columnId = filter.column;
+    param.columnName = '';
+    param.operator = filter.operator;
+    param.condition = filter.combinationType;
+    param.value = filter.value;
+    param.defaultValue = '';
+    param.description = filterDialog.buildFilterText(filter);
+    if(filterMode == 'add') {
+        queryParameters.push( param );
+    } else {
+        queryParameters[filterIndex] = param;
+    }
+    // update the display
+    updateParametersList();
+    selectionsChanged();
+
+}
+
+function cancelFilterDialog() {
+    filterDialog.hide();
+}
+
+function updateParametersList() {
+    // remove all of the parameters
+    var table = document.getElementById('data-select-table');
+    while( table.rows.length > 9 ) {
+        table.deleteRow( 9 );
+    }
+    // now add them in
+    for( var idx=0; idx<queryParameters.length; idx++ ) {
+        var param = queryParameters[idx];
+        var html = paramHtmlTemplate;
+        html = html.replace( /{idx}/g, ''+idx );   
+        html = html.replace( /{desc}/g, param.description );   
+        var newRow = table.insertRow(9+idx);
+        addTableCells( newRow, html );
+
+    }
+}
+
+function editParameter( idx ) {
+    var param = queryParameters[idx];
+    // create a filter obejct
+    var filter = {
+        "column":param.columnId,
+        "value":param.value,
+        "combinationType":param.condition,
+        "operator":param.operator
+    }
+    // turn of the field selection controls
+    filterDialog.enableFieldSelection(false);
+    // initialize the filter dialog for our filter
+    filterDialog.configureFor(filter);
+    filterMode = 'edit';
+    filterIndex = idx;
+    // show the dialog
+    filterDialog.show();
+}
+
+function deleteParameter ( idx ) {
+    queryParameters.splice( idx, 1 );
+    updateParametersList();
+    selectionsChanged();
+}
+
+
+function autoUpdateChanged() {
+    if( autoUpdate.checked ) {
+        selectionsChanged();
+    }
+}
+
+function showQueryChanged() {
+
+    var e = document.getElementById("querySection");
+    
+    if( document.getElementById("show-query").checked ) {
+        e.style.display = 'block';
+    } else {
+        e.style.display = 'none';
+    }
+
+}
+
+function submitPassThrough() {
+    // submit a passthrough query
+    clearDataDisplay();
+    var statement = document.getElementById("querytext").value;
+    results = model.submit( statement );
+    if( results == null ) {
+        document.getElementById('data-title').innerHTML = 'Data (none)';
+        return;
+    } else {
+        var sorted = pentaho.pda.app.prototype.sortData( results, 0, pentaho.pda.Column.SORT_TYPES.ASCENDING );
+        displayData( sorted );
+    }
+    
+}
+
+dojo.ready(loadPage);
+
+        </script>
+
+    </head>
+
+    <body onload="" class="tundra body">
+
+        <!-- this is the declaration of the filter dialog -->
+        <div id="filterDialog" dojoType="pentaho.common.FilterDialog">
+        </div>
+
+        <div style="padding: 8px; background-color:white">
+        
+            <h3>Data API - Queries</h3>
+            This example shows you how to create and execute a query against a data source.
+            <p/>
+
+            <table>
+                <tr>
+                    <td style="vertical-align:top">
+                        <span id="models-title">&nbsp;</span><br/>
+                        <select size="1" id="model-list" style="width:200px" onchange="selectModel()"></select>
+
+                        <table id="data-select-table" border="0">
+                            <tbody>
+                                <tr>
+                                    <td>Item 1 (select one)
+                                        <input id="use-across-location-1" type="checkbox" checked="false" onchange="selectionsChanged()"/>Across
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><select id="Column1Select" onchange="changeColumn('Column1Select', 'Column1ValuesSelect')" style="width:200px" disabled="true"></select></td>
+                                </tr>
+                                <tr>
+                                    <td><select size="10" multiple="true" id="Column1ValuesSelect" onchange="selectionsChanged()" style="width:200px" disabled="true"></select></td>
+                                </tr>
+                                <tr>
+                                    <td>Item 2 
+                                        <input id="use-across-location-2" type="checkbox" checked="false" onchange="selectionsChanged()"/>Across
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><select id="Column2Select" onchange="changeColumn('Column2Select', 'Column2ValuesSelect')" style="width:200px" disabled="true"></select></td>
+                                </tr>
+                                <tr>
+                                    <td><select size="10" multiple="true" id="Column2ValuesSelect" onchange="selectionsChanged()" style="width:200px" disabled="true"></select></td>
+                                </tr>
+                                <tr>
+                                    <td>Measures (select 1 or more)</td>
+                                </tr>
+                                <tr>
+                                    <td><select size="10" multiple="true" id="MeasureSelect" onchange="selectionsChanged()" style="width:200px" disabled="true"></select></td>
+                                </tr>
+                                <tr>
+                                    <td>Filters&nbsp;<button onclick="addParameter()" id="NewFilterButton" disabled="true">+</button></td>
+                                </tr>
+                                <tr id="param-template-row">
+                                    <td>
+                                        <img id="filter-del-{idx}" src="../dojo/pentaho/common/images/Remove.png" onclick="deleteParameter('{idx}')"/>
+                                        <img id="filter-edit-{idx}" src="../dojo/pentaho/common/images/edit.png" onclick="editParameter('{idx}')"/>
+                                        <span>{desc}</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                    <td style="vertical-align:top">
+                        <input id="show-query" type="checkbox" checked="false" onchange="showQueryChanged()"/>Show Query
+                        <br/>
+                        <div id="querySection" style="display:none">
+                            <textarea id="querytext" rows="25" cols="150"></textarea>
+                            <button onclick="submitPassThrough()">Submit Query</button>
+                        </div>
+                        <br/>
+                        <span id="data-title">Data (none)</span>&nbsp;
+                        <input id="auto-update" type="checkbox" checked="true" onchange="autoUpdateChanged()"/>Auto-update
+                        <button onclick="selectionsChanged()">Reload</button>
+
+                        <table id="datatable">
+                            <tr id="headerrow">
+                                <td id="headercell" style="text-align:left;background-color:#dddddd;border-bottom:1px solid #888888">{contents}&nbsp;<button onclick="sort('{idx}',pentaho.pda.Column.SORT_TYPES.ASCENDING)">/\</button>&nbsp;<button onclick="sort('{idx}',pentaho.pda.Column.SORT_TYPES.DESCENDING)">\/</button></td>
+                            </tr>
+                            <tr id="datarow">
+                                <td id="datacell" style="text-align:left;background-color:#ffffff;border-bottom:1px solid #888888">{contents}</td>
+                            </tr>
+                        </table>
+
+                    </td>
+                </tr>
+            </table>
+
+        </div>
+        
+    </body>
+  
+</html>

@@ -1,0 +1,92 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns:pho="http:/www.pentaho.com">
+    <head>
+        <title>Page Control Test</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+        <link rel="stylesheet" type="text/css" href="../dojo/dijit/themes/pentaho/pentaho.css"/>
+
+        <script type="text/javascript" src="webcontext.js?content=common-ui"></script>
+
+        <style type="text/css">
+            /* Set the contrast color to black so we can see the total page count */
+            .contrast-color {
+                color: black;
+            }
+        </style>
+
+        <script type="text/javascript">
+            //<![CDATA[
+
+            $.extend(djConfig, { modulePaths: {
+                                    'pentaho.common': "../pentaho/common"
+                                },
+                                parseOnLoad: true,
+                                baseUrl: '../dojo/dojo/'
+                            });
+
+
+              //]]>
+        </script>
+
+        <script language='javascript' type='text/javascript' src='../dojo/dojo/dojo.js.uncompressed.js'></script>
+        <script language='javascript' type='text/javascript' src='../dojo/dojo/dojo-ext.js.uncompressed.js'></script>
+
+        <script type="text/javascript">
+
+            dojo.require("dojo.parser");
+            dojo.require("pentaho.common.Messages");
+            dojo.require("pentaho.common.PageControl");
+
+            dojo.ready(function() {
+                var pagecontrol = dijit.byId('pagecontrol');
+                pagecontrol.registerLocalizationLookup(pentaho.common.Messages.getString);
+                pagecontrol.registerPageNumberChangeCallback(function(pageNum) {
+                    if (console) {
+                        console.log("page number updated: " + pageNum);
+                    }
+                    dojo.byId('pageNumberMessage').innerHTML = pageNum;
+                });
+                pagecontrol.setPageCount(5);
+            });
+
+            function changePageCount(totalPages) {
+                dijit.byId('pagecontrol').setPageCount(totalPages);
+            }
+
+            function changePage(page) {
+                dijit.byId('pagecontrol').setPageNumber(page);
+            }
+
+            function setToInvalidPage() {
+                var pagecontrol = dijit.byId('pagecontrol');
+                pagecontrol.setPageNumber(pagecontrol.getPageTotal() + 1);
+            }
+        </script>
+    </head>
+
+    <body class="tundra body">
+        
+        <div style="padding: 8px; background-color:white">
+        
+            <h3>UI Widgets - Page Control</h3>
+            This example shows you how use the page control.
+            <p/>
+
+            <div id="pagecontrol" dojoType="pentaho.common.PageControl">
+            </div> 
+
+
+            <p>Current page number: <span id="pageNumberMessage"></span></p>
+
+            <p><button onclick="changePageCount(10);">Update page count to 10</button></p>
+
+            <p><button onclick="changePage(3);">Set page to 3</button></p>
+
+            <p><button onclick="setToInvalidPage();">Set page an invalid page number</button></p>
+                                                                  
+        </div>
+
+    </body>
+  
+</html>

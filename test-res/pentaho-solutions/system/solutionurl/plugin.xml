@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin title="SolutionUrlContentGeneratorTest">
+
+    <menu-items>
+    </menu-items>
+
+   <static-paths>
+   </static-paths>
+
+    <content-generator scope="session" id="testgen" type="testgen">
+        <classname>org.pentaho.common.ui.test.MockContentGenerator</classname>
+        <title></title>
+    </content-generator>
+        
+</plugin>

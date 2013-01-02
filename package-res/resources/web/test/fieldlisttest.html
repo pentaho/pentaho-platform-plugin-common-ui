@@ -1,0 +1,333 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns:pho="http:/www.pentaho.com">
+    <head>
+        <title>Field List Test</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+        <link rel="stylesheet" type="text/css" href="../dojo/dijit/themes/pentaho/pentaho.css"/>
+
+        <script type="text/javascript" src="webcontext.js?content=common-ui"></script>
+
+        <script type="text/javascript">
+        //<![CDATA[
+
+            $.extend(djConfig, { modulePaths: {
+                                    dataapi: "../../dataapi",
+                                    'pentaho.common': "../pentaho/common"
+                                },
+                                parseOnLoad: true,
+                                baseUrl: '../dojo/dojo/'
+                            });
+
+        //]]>
+        </script>
+
+        <script language='javascript' type='text/javascript' src='../dojo/dojo/dojo.js.uncompressed.js'></script>
+        <script language='javascript' type='text/javascript' src='../dojo/dojo/dojo-ext.js.uncompressed.js'></script>
+
+        <script language="javascript" src="../repo/pentaho-ajax.js" type="text/javascript"></script>
+        <script language="javascript" src="../repo/pentaho-thin-app.js" type="text/javascript"></script>
+        <script language="javascript" src="../dataapi/oop.js" type="text/javascript"></script>
+        <script language="javascript" src="../dataapi/app.js" type="text/javascript"></script>
+        <script language="javascript" src="../dataapi/controller.js" type="text/javascript"></script>
+        <script language="javascript" src="../dataapi/xhr.js" type="text/javascript"></script>
+        <script language="javascript" src="../dataapi/cda.js" type="text/javascript"></script>
+        <script language="javascript" src="../dataapi/models-mql.js" type="text/javascript"></script>
+        <script language="javascript" src="../dataapi/models-olap.js" type="text/javascript"></script>
+        <script language="javascript" src="../dataapi/Xmla.js" type="text/javascript"></script>
+        <script language="javascript" src="../repo/pentaho-thin-app.js" type="text/javascript"></script>
+        <script language="javascript" src="../repo/state.js" type="text/javascript"></script>
+
+        <script type="text/javascript">
+
+            dojo.require("dojo.parser");
+            dojo.require("pentaho.common.FieldList");
+            dojo.require("pentaho.common.MenuItem");
+
+            // the list of available fields
+            var fields = [];
+            var fieldList = null;
+    
+            /* this is the onload function */
+            function doload() {
+
+                dojo.parser.parse();
+
+                // configure the field list
+                fieldList = dijit.byId("fieldlist");
+                // default to a categorized display
+                fieldList.setCategorized(true); 
+                // default to allow drag-drop
+                fieldList.setEnableDragDrop(true);
+                // provide a context-menu 
+                fieldList.setContextMenu( dijit.byId('fieldContextMenu') );
+                // register a function to handle double-clicks on a field
+                fieldList.registerDoubleClickCallback(doubleClick);
+            
+                // initialize the options to the default values
+                document.getElementById('datasource-list').disabled = true;
+                document.getElementById('categorizeCheck').checked = true;
+                document.getElementById('dragDropCheck').checked = true;
+                document.getElementById('fieldTypeSelect').selectedIndex = 0;
+                document.getElementById('dataTypeSelect').selectedIndex = 0;
+
+                // initialize the data api
+                var da_mql = {
+                    name: 'da-mql',
+                    objectClass: pentaho.pda.MqlHandler
+                };
+                var da_olap = {
+                    name: 'da-olap',
+                    objectClass: pentaho.pda.OlapHandler
+                };
+                pentaho.myapp = {
+                    app: new pentaho.pda.app(),
+                    prior_idx: -1,
+                    source: {}
+                };
+                var moduleArray = [da_mql, da_olap];
+                pentaho.myapp.app.init(moduleArray);	
+                pentaho.myapp.app.moduleData['da-mql'].instance.METADATA_SERVICE_URL = CONTEXT_PATH + 'content/ws-run/metadataService';
+
+                // populate the list of available data sources
+                loadDataources();
+            }
+
+            /* popupate the list of available models */
+            function loadDataources() {
+                // load the list of the available datasources
+                pentaho.myapp.app.getSources(
+                    //function to be called for each source as it is added
+                    function(source) {	
+                        //console.log(source);
+                        var list = document.getElementById('datasource-list');
+                        if(list.disabled) {
+                            // enable the list and remove the 'loading...' entry
+                            list.disabled = false;
+                            list.options.length = 0;
+                        }
+                        var opt = new Option( source.name, source.id );
+                        list.options[list.length] = opt;                        
+                    }
+                );
+                document.getElementById('datasource-list').selectedIndex=-1;
+            }
+            
+            /* displays the list of query elements from the selected data source */
+            function showDatasourceFields() {
+
+                var datasourceId = document.getElementById('datasource-list').value;
+                // get the details of the selected data source
+                pentaho.myapp.source = pentaho.myapp.app.getSources(null, {filter : {property:'id', value: datasourceId}});
+                pentaho.myapp.source.discoverModelDetail();
+                
+                // get the queryiable elements (fields)
+                fields = [];
+                var elements = pentaho.myapp.source.getAllElements();
+                for(var idx=0; idx<elements.length; idx++) {
+                    if(elements[idx].isQueryElement) {
+                        fields.push(elements[idx]);
+                    }
+                }
+                // update the field list with the fields
+                fieldList.configureFor(pentaho.myapp.source);
+            }
+
+            /* Clears out any selected fields in the field list */
+            function clearSelections() {
+                fieldList.clearSelection();
+            }
+
+            /* Lists the ids of the fields currently selected */
+            function displaySelectedItems() {
+                var items = fieldList.getSelectedItems();
+                var str = '';
+                for(var idx=0; idx<items.length; idx++) {
+                    str += items[idx].fieldId;
+                    str += '\n';
+                }
+                alert(str);
+            }
+
+            /* Updates the field list setting for drag/drop */
+            function updateDragDrop() {
+                var allow = document.getElementById('dragDropCheck').checked;
+                fieldList.setEnableDragDrop( allow );
+            }
+
+            /* Updates the field list with the current categorization setting */
+            function updateCategorize() {
+                var categorize = document.getElementById('categorizeCheck').checked;
+                fieldList.setCategorized(categorize);
+            }
+
+            /* Updates the field list with all the current options and then refreshes the field list display */
+            function refreshFieldList() {
+                // clear out all the filters 
+                fieldList.clearFilters();
+                // update the options
+                updateCategorize();
+                updateDragDrop();
+                updateFieldTypeFilter();
+                updateDataTypeFilter();
+                // update the field list
+                fieldList.configureFor(pentaho.myapp.source);
+            }
+            
+            /* Creates a filter on the element type. You can use this to make the field list
+               only display fields of a certain type, e.g. those that make sense to put on a chart series
+            */
+            function updateFieldTypeFilter() {
+                var type = document.getElementById('fieldTypeSelect').value;
+                var typeFilter = null;
+                if( type == 'dimension' ) {
+                    // create a list of dimension types
+                    typeFilter = {
+                        type: 'elementType',
+                        values: [pentaho.pda.Column.ELEMENT_TYPES.DIMENSION, 
+                                 pentaho.pda.Column.ELEMENT_TYPES.HIERARCHY, 
+                                 pentaho.pda.Column.ELEMENT_TYPES.LEVEL, 
+                                 pentaho.pda.Column.ELEMENT_TYPES.MEMBER]
+                    }
+                }
+                else if( type == 'fact' ) {
+                    // create a list of dimension types
+                    typeFilter = {
+                        type: 'elementType',
+                        values: [pentaho.pda.Column.ELEMENT_TYPES.FACT]
+                    }
+                }
+                if(typeFilter) {
+                    // add the filter to the field list
+                    fieldList.addFilter( typeFilter );
+                }
+            }         
+               
+            /* Creates a filter on the dta type. You can use this to make the field list
+               only display fields of a certain data type, e.g. those that make sense to put on a chart series
+            */
+            function updateDataTypeFilter() {
+                var type = document.getElementById('dataTypeSelect').value;
+                var typeFilter = null;
+                if( type == 'numeric' ) {
+                    // create a list of numeric types
+                    typeFilter = {
+                        type: 'dataType',
+                        values: [pentaho.pda.Column.DATA_TYPES.NUMERIC]
+                    }
+                }
+                else if( type == 'string' ) {
+                    // create a list of string types
+                    typeFilter = {
+                        type: 'dataType',
+                        values: [pentaho.pda.Column.DATA_TYPES.STRING]
+                    }
+                }
+                else if( type == 'date' ) {
+                    // create a list of date types
+                    typeFilter = {
+                        type: 'dataType',
+                        values: [pentaho.pda.Column.DATA_TYPES.DATE]
+                    }
+                }
+                if(typeFilter) {
+                    // add the filter to the field list
+                    fieldList.addFilter( typeFilter );
+                }
+            }
+
+            /* A callback to handle double-clicking on a field */
+            function doubleClick( field ) {
+                alert('Double-click on '+field);
+            }
+
+            /* A callback to handle choosing an option on the context menu */
+            function optionChosen() {
+
+                var items = fieldList.getSelectedItems();
+                var str = 'Option 1 chosen on field(s):\n';
+                for(var idx=0; idx<items.length; idx++) {
+                    str += items[idx].fieldId;
+                    str += '\n';
+                }
+                alert(str);
+            }
+
+            dojo.ready(doload);
+
+        </script>
+
+    </head>
+
+    <body class="tundra body" onload="">
+
+        <div style="padding: 8px; background-color:white">
+        
+            <h3>Data API - Field List</h3>
+            This example shows you how to use the field list.
+            <p/>
+
+            <table>
+                <tr>
+                    <td style="width:220px">
+                        Data Source:
+                        <p/>
+                        Click on a data source to see the field list      
+                    </td>
+                    <td style="vertical-align:top">
+                        Options:
+                        <p/>
+                        Use these options to change how the fields are filtered and displayed
+                    </td>
+                </tr>
+                <tr>
+                    <td style="vertical-align:top">
+                        <select size="5" id="datasource-list" style="width:200px" onchange="showDatasourceFields()" disabled="true">
+                            <option>loading...</option>
+                        </select>
+                    </td>
+                    <td style="vertical-align:top">
+
+                        <input type="checkbox" id="categorizeCheck" onclick="refreshFieldList()"/>Categorize 
+                        <br><input type="checkbox" id="dragDropCheck" onclick="refreshFieldList()"/>Enable Drag Drop 
+                        <br>
+                        Show Field Types: 
+                        <select id="fieldTypeSelect" onchange="refreshFieldList()">
+                            <option value="all">All</option>
+                            <option value="dimension">Dimension</option>
+                            <option value="fact">Fact/Measure</option>
+                        </select>
+                        <br>
+                        Show Data Types: 
+                        <select id="dataTypeSelect" onchange="refreshFieldList()">
+                            <option value="all">All</option>
+                            <option value="numeric">Numeric</option>
+                            <option value="string">String</option>
+                            <option value="date">Date</option>
+                        </select>
+                    </td>
+                </tr>
+            </table>
+            <p/>
+            Fields:
+
+            <div class="pentaho-list-box pentaho-padding-sm scroll-panel" style="width:200px; height:400px">
+                <div id="fieldlist" dojoType="pentaho.common.FieldList"></div>
+            </div>
+            <p/>
+            Try double-clicking or right-clicking on a field.
+            <p/>
+            <button onclick="displaySelectedItems()">Display Selected Fields</button>
+            <br/>
+            <button onclick="clearSelections()">Clear Selections</button>
+
+            <!-- this is the right-click menu -->
+            <div dojoType="dijit.Menu" id="fieldContextMenu" style="display:none">
+                <div dojoType="pentaho.common.MenuItem" id="fieldAddColumn" label="Option 1" onclick="optionChosen()"></div>
+            </div>
+
+        </div>
+
+    </body>
+  
+</html>

@@ -1,0 +1,78 @@
+<html>
+    <head>
+
+        <!-- start customized section -->
+        <title>Pentaho Common UI Client-Side Unit Tests</title>
+        <!-- end customized section -->
+
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+        <!-- start customized section: fixup URLs if necessary -->
+        <link rel="stylesheet" type="text/css" href="../../dojo/util/doh/runner.css"/>    
+        <link rel="stylesheet" type="text/css" href="../../dojo/dijit/themes/pentaho/pentaho.css"/>
+        <script type="text/javascript">
+            //<![CDATA[
+            window.dojoUrl = "../../dojo/dojo/dojo-all.js.uncompressed.js";
+            //]]>
+        </script>
+        <!-- end url fixup section -->
+
+        <!-- start customized section: configure the dojo modules here -->
+        <script type="text/javascript">
+            //<![CDATA[
+                var djConfig = { 
+                    modulePaths: { },
+                    baseUrl: '../../dojo/dojo/',
+                    parseOnLoad: false
+                };
+            //]]>
+        </script>
+        <!-- enddojo section -->
+
+        <!-- start customized section: fixup URLs if necessary -->
+        <script type="text/javascript" src="../../dojo/dojo/dojo-all.js.uncompressed.js"></script>
+        <!-- end url fixup section -->
+
+        <!-- start RequireJS scripts -->
+        <script type="text/javascript" src="../../../../../../js/require.js"></script>
+        <script type="text/javascript" src="../../../../../../js/require-cfg.js"></script>
+        <!-- end RequireJS scripts -->
+
+        <script type="text/javascript">
+            //<![CDATA[
+                dojo.ready(doLoad);
+
+                function doLoad() {
+                    dojo.parser.parse();
+                    setupTestRunner();
+
+                    // Load the tests
+                    pen.require([
+                        'common-ui/test/unittest/vizapi/DataTableTests',
+                        'common-ui/test/unittest/prompting/prompting-tests'
+                        ]);
+                }
+            //]]>
+        </script>
+
+        <!-- start customized section: reference your dependencies here -->
+        <script type="text/javascript" src="webcontext.js?context=common-ui"></script>
+        <!-- start prompting dependencies -->
+        <script language="javascript" type="text/javascript" src="../../../../../pentaho-cdf/js/jquery.ui.js"></script>
+        <script language="javascript" type="text/javascript" src="../../../../../pentaho-cdf/js/jquery.blockUI.js"></script>
+        <script language="javascript" type="text/javascript" src="../../../../../pentaho-cdf/js/Base.js"></script>
+        <script language="javascript" type="text/javascript" src="../../../../../pentaho-cdf/js/Dashboards.js"></script>
+        <script language="javascript" type="text/javascript" src="../../../../../pentaho-cdf/js/CoreComponents.js"></script>
+        <!-- end prompting dependencies -->
+        <!-- end dependencies -->
+
+        <!-- start customized section: fixup URLs if necessary -->
+        <script language="javascript" type="text/javascript" src="../../dojo/util/doh/runner.js"></script>
+        <script language="javascript" type="text/javascript" src="../../dojo/util/doh/runner2.js"></script>
+        <!-- end url fixup section -->
+
+    </head>
+    <body style="padding:10px; background-color: white">
+    </body>
+
+</html>
