@@ -2317,12 +2317,12 @@ function(def, pvc, pv){
         _getColorPalete: function(){
             //this._vizOptions.palette.colors.slice(0, seriesCount);
             if(!_colorPalete){
-                var colorPalete = this._vizHelper.configProperty('chart.series.colors');
-                if(colorPalete){
-                    _colorPalete = colorPalete.split(/\s*,\s*/);
-                } else {
-                    _colorPalete = _defaultColorPalete;
-                }
+//                var colorPalete = this._vizOptions['chart.series.colors'];
+//                if(colorPalete){
+//                    _colorPalete = colorPalete.split(/\s*,\s*/);
+//                } else {
+                  _colorPalete = _defaultColorPalete;
+//                }
             }
             return _colorPalete;
         },
@@ -2676,7 +2676,7 @@ function(def, pvc, pv){
         
         _limitSelection: function(selections){
             // limit selection
-            var filterSelectionMaxCount = this._vizHelper.configProperty('filter.selection.max.count') || 200;
+            var filterSelectionMaxCount = this._vizOptions['filter.selection.max.count'] || 200;
             var selections2 = selections;
             var L = selections.length;
             var deselectCount = L - filterSelectionMaxCount;

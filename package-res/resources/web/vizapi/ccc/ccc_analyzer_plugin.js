@@ -56,10 +56,6 @@ pen.define([
                     return msg;
                 },
                 
-                configProperty: function(name){
-                    return cv.analyzerProperties[name];
-                },
-                
                 /**
                  * Returns the label of a given formula.
                  * Only available when interaction is enabled.
