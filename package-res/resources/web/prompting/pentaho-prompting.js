@@ -182,7 +182,7 @@ pen.define(['cdf/cdf-module', 'common-ui/prompting/pentaho-prompting-bind', 'com
       var getComponents = function(c) {
         var comps = [];
         comps.push(c);
-        if (c.getComponents) {
+        if (c.getComponents && c.getComponents()) {
           $.each(c.getComponents(), function(i, cc) {
             comps = comps.concat(getComponents(cc));
           });

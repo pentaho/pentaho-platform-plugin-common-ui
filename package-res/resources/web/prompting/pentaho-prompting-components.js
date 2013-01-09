@@ -48,9 +48,11 @@ pen.define(['common-ui/prompting/pentaho-prompting-bind', 'common-ui/prompting/p
     },
 
     clear: function() {
-      $.each(this.components, function(i, c) {
-        c.clear();
-      });
+      if(this.components){
+        $.each(this.components, function(i, c) {
+          c.clear();
+        });  
+      }
       this.base();
     },
 
@@ -178,21 +180,23 @@ pen.define(['common-ui/prompting/pentaho-prompting-bind', 'common-ui/prompting/p
 
   window.ScrollingPromptPanelLayoutComponent = PromptLayoutComponent.extend({
     update: function() {
-      if (this.components.length == 0) {
-        $('#' + this.htmlObject).empty();
-        return;
-      }
-      var html = '<div class="prompt-panel">';
-      var submitHtml = '<div class="submit-panel">';
-      $.each(this.components, function(i, c) {
-        if (c.promptType === 'submit') {
-          submitHtml += this.getMarkupFor(c);
-        } else {
-          html += this.getMarkupFor(c);
+      if(this.components){
+        if (this.components.length == 0) {
+          $('#' + this.htmlObject).empty();
+          return;
         }
-      }.bind(this));
-      html += '</div>' + submitHtml + '</div>';
-      $('#' + this.htmlObject).html(html);
+        var html = '<div class="prompt-panel">';
+        var submitHtml = '<div class="submit-panel">';
+        $.each(this.components, function(i, c) {
+          if (c.promptType === 'submit') {
+            submitHtml += this.getMarkupFor(c);
+          } else {
+            html += this.getMarkupFor(c);
+          }
+        }.bind(this));
+        html += '</div>' + submitHtml + '</div>';
+        $('#' + this.htmlObject).html(html);
+      }
     }
   });
 
