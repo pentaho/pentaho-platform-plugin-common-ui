@@ -1,5 +1,7 @@
 
 // workaround for bug in Safari 3.  See #7189
+
+/* This is causing a bug in Chrome. Removing because it's no longer required - http://bugs.dojotoolkit.org/changeset/29130/dojo
 if (/3[\.0-9]+ Safari/.test(navigator.appVersion))
 {
     window.console = {
@@ -18,6 +20,7 @@ if (/3[\.0-9]+ Safari/.test(navigator.appVersion))
         }
     };
 }
+*/
 
 window.testUrl = "";
 window.testModule = "";
