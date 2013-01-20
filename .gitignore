@@ -1,0 +1,10 @@
+bin/
+dist/
+js-lib/
+lib/
+codegen-lib/
+test-lib/
+eclipse-bin/
+override.properties
+.classpath
+.project
