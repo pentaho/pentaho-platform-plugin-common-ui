@@ -112,6 +112,7 @@ pentaho.VizController = function(id) {
   this.chart = null;
   this.palette = pentaho.palettes[0];
   this.lastError = null;
+  this.memberPalette = null;  
 }
 
 /*
@@ -230,6 +231,16 @@ pentaho.VizController.prototype.setDataTable = function(table) {
     this.lastError = e;
     return false;
   }
+}
+
+/*
+setMemberPalette
+Sets the color mappings for members in the current data table
+
+colors     Map of attributes/measures in the table to a map of member to color mappings
+*/
+pentaho.VizController.prototype.setMemberPalette = function(colors) {
+ this.memberPalette = colors;
 }
 
 /*
@@ -363,7 +374,8 @@ pentaho.VizController.prototype.doVisualization = function( visualization, userD
       options[x] = this.userDefinedOptions[x];
     }
 
-
+    options.memberPalette = this.memberPalette ? this.memberPalette : {};
+    
     var id = 'chart_div'+this.id;
 
     if( this.chart && this.chart.vizId == visualization.id ) {
