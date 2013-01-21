@@ -675,7 +675,7 @@ function(def, pvc, pv){
         }
     }
 
-    var _defaultColorPalete = [
+    var _defaultColorPalette = [
         "#0000cc",
         "#0d8ecf",
         "#b0de09",
@@ -707,8 +707,6 @@ function(def, pvc, pv){
         "#3c077b",
         "#000000"
     ];
-    
-    var _colorPalete; // to be initialized
     
     // -------------
     // Axes are: row, column and measure.
@@ -792,13 +790,13 @@ function(def, pvc, pv){
                 if(!def.hasOwn(cccDimNamesSet, dimName)){
                     cccDimNamesSet[dimName] = true;
                     
-                var reader = {
-                    names:   dimName, // when null, the reader simply consumes the index, and prevents a default reader
-                    indexes: index
-                };
-                
-                readers.push(reader);
-                index++;
+                    var reader = {
+                        names:   dimName, // when null, the reader simply consumes the index, and prevents a default reader
+                        indexes: index
+                    };
+                    
+                    readers.push(reader);
+                    index++;
                 }
             });
 
@@ -941,8 +939,7 @@ function(def, pvc, pv){
                 cccDimGroup = roleToCccDimMap[gem.role];
             
             if(typeof cccDimGroup === 'string'){
-                 return pvc.data.DimensionType
-                           .dimensionGroupLevelName(cccDimGroup, gem.roleLevel);
+                 return pvc.buildIndexedId(cccDimGroup, gem.roleLevel);
             }
         },
         
@@ -1247,8 +1244,7 @@ function(def, pvc, pv){
                         rowCccDimGroup   = rolesToCccDimMap[rowRole],
                         rowNextLevel     = rowAxis.gemsByRole[rowRole].length;
 
-                    cccDimName = pvc.data.DimensionType
-                                         .dimensionGroupLevelName(rowCccDimGroup, rowNextLevel);
+                    cccDimName = pvc.buildIndexedId(rowCccDimGroup, rowNextLevel);
                 }
 
                 this.measureDiscrimName = cccDimName;
@@ -1632,6 +1628,8 @@ function(def, pvc, pv){
         
         _multiRole: 'multi',
         
+        _discreteColorRole: 'columns',
+        
         /* PLUGIN INTERFACE  */
 
         /**
@@ -1642,9 +1640,27 @@ function(def, pvc, pv){
             // CDA table
             this._metadata  = [];
             this._resultset = null;
-
+            
             // Pentaho/Google data table
             this._dataTable = dataTable;
+            
+            /*
+            if(!vizOptions.memberPalette){
+                vizOptions.memberPalette = {
+                    "[Markets].[Territory]": {
+                        "[Markets].[APAC]":   "red",
+                        "[Markets].[EMEA]":   "green",
+                        "[Markets].[Japan]":  "blue",
+                        "[Markets].[NA]":     "pink"
+                    },
+                    
+                    "[Measures].[MeasuresLevel]": {
+                        "[MEASURE:0]": "violet",
+                        "[MEASURE:1]": "orange"
+                    }
+                };
+            }
+            */
             
             // ---------------
             
@@ -2082,7 +2098,6 @@ function(def, pvc, pv){
                 if(colGroupValues){
                     var colRoles  = getColumnRoles(dataTable, tc);
                     var colValues = colGroupValues.split('~');
-                    var meaIndex  = colValues.length - 1;
                     
                     colValues.forEach(function(colValue, index){
                         columnsInfoList.push({
@@ -2162,6 +2177,9 @@ function(def, pvc, pv){
             /* formula, id -> gem */
             this.gemsMap = {};
         
+            /* roleId -> axis */
+            this.axisByRole = {};
+            
             /* axisId -> Axis */
             this.axes = {};
             
@@ -2183,8 +2201,16 @@ function(def, pvc, pv){
                 var axis = pentaho.ccc.Axis.create(this, axisId);
 
                 axis.gems.forEach(indexGem, this);
-
+                
                 this.axes[axisId] = axis;
+                
+                var boundRoleList = axis.boundRolesIdList;
+                if(boundRoleList){
+                    boundRoleList.forEach(function(roleId){
+                        !def.hasOwn(this.axisByRole, roleId) || def.assert("A role cannot be in more than one axis");
+                        this.axisByRole[roleId] = axis;
+                    }, this);
+                }
             }
 
             /* @instance */
@@ -2304,7 +2330,7 @@ function(def, pvc, pv){
             
             switch(colorScaleKind){
                 case 'discrete':
-                    options.colors = this._getColorPalete();
+                    options.colors = this._getColorScale();
                     break;
                     
                 case 'continuous':
@@ -2314,19 +2340,90 @@ function(def, pvc, pv){
             }
         },
         
-        _getColorPalete: function(){
-            //this._vizOptions.palette.colors.slice(0, seriesCount);
-            if(!_colorPalete){
-//                var colorPalete = this._vizOptions['chart.series.colors'];
-//                if(colorPalete){
-//                    _colorPalete = colorPalete.split(/\s*,\s*/);
-//                } else {
-                  _colorPalete = _defaultColorPalete;
-//                }
+        _getColorScale: function(){
+            var memberPalette = this._vizOptions.memberPalette;
+            if(memberPalette){
+                return this._getColorScaleCore(memberPalette) ||
+                       _defaultColorPalette;
             }
-            return _colorPalete;
+            
+            return _defaultColorPalette;
         },
         
+        _getColorScaleCore: function(memberPalette){
+            var colorRoleId = this._discreteColorRole;
+            if(colorRoleId){
+                // 1 - The CCC color role is not being explicitly set, so whatever goes to the series role is used by the color role
+                // 2 - When a measure discrim is used and there is only one measure, the CCC dim name of the discriminator is
+                //      not of the "series" group; so in this case, there's no discriminator in the key
+                
+                var colorAxis = this.axisByRole[colorRoleId];
+                var colorGems = colorAxis ? // No gems?
+                                colorAxis.gemsByRole[colorRoleId].filter(function(gem){ return !gem.isMeasureDiscrim; }) :
+                                [];
+                        
+                var C = colorGems.length;
+                var M;
+                
+                if(this._cccClass == 'pvc.PieChart'){
+                    // When multiple measures exist, 
+                    // the pie chart shows them as multiple charts
+                    // and if these would affect color, 
+                    // each small chart would have a single color.
+                    M = 0;
+                } else {
+                    M = this.axes.measure.genericMeasuresCount;
+                }
+                
+                var keyIncludesDiscrim = (M > 1);
+                if(C > 0 || M > 0){
+                    var colorMap;
+                    var lastIndex;
+                    // var useMeasureGems = !C || keyIncludesDiscrim;
+                    if(M <= 1){
+                        if(C > 0){
+                            // Use colors
+                            colorMap = memberPalette[colorGems[C - 1].formula];
+                        } else {
+                            // Use measures (M === 1)
+                            colorMap = memberPalette['[Measures].[MeasuresLevel]'];
+                            var c = colorMap && colorMap[this.axes.measure.gems[0].id];
+                            return c ? pv.colors([colorFromAnalyzer(c)]) : null;
+                        }
+                    } else {
+                        // Use measures
+                        // keyIncludesDiscrim ; assume discrim is always placed at the end
+                        lastIndex = 0;
+                        colorMap  = memberPalette['[Measures].[MeasuresLevel]'];
+                    }
+                    
+                    // Is there a color map for the chosen hierarchy?
+                    if(colorMap){
+                        colorMap = def.query(def.ownKeys(colorMap))
+                                      .object({ 
+                                        value: function(k) {
+                                            return colorFromAnalyzer(colorMap[k]); 
+                                        }
+                                      });
+                        
+                        var defaultScale = pv.colors(_defaultColorPalette);
+                        return function(){
+                            var scale = function(compKey){
+                                if(compKey){
+                                    var comps = compKey.split(/\s*,\s*/);
+                                    var key   = comps[comps.length - 1];
+                                    return colorMap[key] || defaultScale(key);
+                                }
+                            };
+                            
+                            def.copy(scale, defaultScale);
+                            return scale;
+                        };
+                    }
+                }
+            }
+        },
+
         _configureTrends: function(){
             var options = this.options;
             var vizOptions = this._vizOptions;
@@ -3373,7 +3470,7 @@ function(def, pvc, pv){
         _options: {
             plot2: true,
             secondAxisIndependentScale: false,
-            secondAxisSeriesIndexes: null, // prevent default of -1 (which means last series) // TODO: is this needed??
+            secondAxisSeriesIndexes: null // prevent default of -1 (which means last series) // TODO: is this needed??
         },
         
         _noRoleInTooltipMeasureRoles: {'measures': true, 'measuresLine': true},
@@ -3838,6 +3935,8 @@ function(def, pvc, pv){
             'size':     'size'
         },
         
+        _discreteColorRole: 'color',
+        
         // Roles already in the axis' titles
         _noRoleInTooltipMeasureRoles: {'x': true, 'y': true, 'measures': false},
         
@@ -3880,7 +3979,7 @@ function(def, pvc, pv){
 //              options.visualRoles.color = 
 //              this.axes.column.gemsByRole.color
 //                   .map(function(gem, index){ 
-//                      return pvc.data.DimensionType.dimensionGroupLevelName('color', index);
+//                      return pvc.buildIndexedId('color', index);
 //                   })
 //                   .join(', ');
             }
@@ -3945,8 +4044,6 @@ function(def, pvc, pv){
             
             titlePosition: 'bottom',
             
-            crosstabMode: true,
-            
             dataOptions: {
                 measuresInColumns: false
             },
@@ -3958,6 +4055,8 @@ function(def, pvc, pv){
         },
         
         _multiRole: 'columns',
+        
+        _discreteColorRole: 'rows',
         
         // Only 'multi' is on column axis, and drilling down on multi is undesired
         _drillAxesIds: ['row', 'column'],
@@ -4310,6 +4409,20 @@ function(def, pvc, pv){
     
     function readFontFamily(vizOptions, prefix){
         return vizOptions[prefix + "FontFamily"];
+    }
+    
+    // FIX Analyzer's colors
+    function colorFromAnalyzer(color){
+        var L = color.length;
+        if(L > 4 && L < 7 && color.charAt(0) === '#'){
+            color = color.substr(1);
+            if(L === 6){
+                color = "#0" + color;
+            } else { //if(color === 5){
+                color = "#00" + color;
+            }
+        }
+        return pv.color(color);
     }
     
     // @private
