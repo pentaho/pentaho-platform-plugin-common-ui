@@ -1485,6 +1485,8 @@ function(def, pvc, pv){
        
     var baseOptions = {
         /* Chart */
+        compatVersion: 2, // use CCCv2
+        
         margins:  0,
         paddings: 10,
         plotFrameVisible: false,
@@ -2077,7 +2079,7 @@ function(def, pvc, pv){
                 // We transform them to 'undefined' role
                 // which is the role value that unmapped measure columns
                 // already have.
-                var roles = getColumnRoles(dataTable, tc);
+                var rolesAndLevels = getColumnRolesAndLevels(dataTable, tc);
                 
                 // A row gem
                 rowsInfoList.push({
@@ -2085,7 +2087,7 @@ function(def, pvc, pv){
                     formula: colId,
                     label:   dataTable.getColumnLabel(tc),
                     axis:    'row',
-                    role:    roles ? roles[0] : 'undefined',
+                    role:    rolesAndLevels ? rolesAndLevels[0].id : 'undefined',
                     index:   rowsInfoList.length
                 });
                 
@@ -2096,16 +2098,17 @@ function(def, pvc, pv){
             // So we collect them from the first one.
             function processColumnsInfo(colGroupValues){
                 if(colGroupValues){
-                    var colRoles  = getColumnRoles(dataTable, tc);
+                    var rolesAndLevels = getColumnRolesAndLevels(dataTable, tc);
                     var colValues = colGroupValues.split('~');
                     
                     colValues.forEach(function(colValue, index){
+                        var roleAndLevel = rolesAndLevels[index];
                         columnsInfoList.push({
-                            id:      undefined, // not in data table
-                            formula: undefined, // not in data table
+                            id:      roleAndLevel.level,
+                            formula: roleAndLevel.level,
                             label:   undefined, // not in data table
                             axis:    'column',
-                            role:    colRoles[index],
+                            role:    roleAndLevel.id,
                             index:   index
                         });
                     });
@@ -2118,16 +2121,19 @@ function(def, pvc, pv){
                 
                 /* New measure? */
                 if(!meaInfo){
-                    var role = getColumnRoles(dataTable, tc).pop(); // TODO - last()
-
+                    // TODO - last() ?
+                    var roleAndLevel = getColumnRolesAndLevels(dataTable, tc).pop();
+                    
+                    // NOTE: roleAndLevel.level == [Measures].[MeasuresLevel],
+                    // which is not the formula...
                     meaInfo = {  
                         id:      id,
-                        formula: undefined, // not in data table
+                        formula: undefined, // not in data table 
                         label:   splitColGroupAndMeasure(dataTable.getColumnLabel(tc))[1],
                         axis:    'measure',
-                        role:    role,
+                        role:    roleAndLevel.id,
                         index:   measuresInfoList.length,
-                        isUnmapped: role === 'undefined'
+                        isUnmapped: roleAndLevel.id === 'undefined'
                     };
                     
                     measuresInfo[id] = meaInfo;
@@ -2155,10 +2161,10 @@ function(def, pvc, pv){
                 var meaRoleInfo  = def.getOwn(measureRolesInfo, meaInfo.role);
                 if(!meaRoleInfo){
                     meaRoleInfo = {
-                        id:         role,
+                        id:         roleAndLevel.id,
                         cccDimName: meaInfo.isUnmapped ?
                                         null :
-                                        (roleToCccDimMap[role] ||
+                                        (roleToCccDimMap[roleAndLevel.id] ||
                                          def.assert("Must map to CCC all measure roles that the data table contains.")),
                         groupIndex: currMeaIndex,
                         index:      tc // first index where role appears (for tie break, see .sort above)
@@ -4427,17 +4433,14 @@ function(def, pvc, pv){
     
     // @private
     // @static
-    function getColumnRoles(dataTable, tc){
+    function getColumnRolesAndLevels(dataTable, tc){
         var dataReq = dataTable.getColumnProperty(tc, 'dataReq');
         if(dataReq){
-            // NOTE: in IE, unbound columns do not come with an "undefined" role id ??
-            if(dataReq instanceof Array){
-                return dataReq.map(function(item){ 
-                    return item.id || 'undefined'; 
-                });
-            }
-            
-            return [dataReq.id || 'undefined'];
+            return def.array.to(dataReq).map(function(item){
+             // NOTE: in IE, unbound columns do not come with an "undefined" role id ??
+                if(!item.id){ item.id = 'undefined'; }
+                return item; 
+            });
         }
     }
 });
