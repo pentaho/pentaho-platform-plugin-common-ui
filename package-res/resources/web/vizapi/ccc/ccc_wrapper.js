@@ -984,39 +984,6 @@ function(def, pvc, pv){
         }
     }
 
-    var colorPalete = [
-        "#0000cc",
-        "#0d8ecf",
-        "#b0de09",
-        "#fcd202",
-        "#ff6600",
-        "#cd0d74",
-        "#cc0000",
-        "#00cc00",
-        "#650cd0",
-        "#3a3a3a",
-        "#7272e3",
-        "#79c1e4",
-        "#d3ed77",
-        "#fde673",
-        "#ffaa72",
-        "#e379b2",
-        "#e37272",
-        "#72e372",
-        "#aa79e5",
-        "#929292",
-        "#00007a",
-        "#07547b",
-        "#698405",
-        "#967c01",
-        "#983b00",
-        "#7a0745",
-        "#7a0000",
-        "#007a00",
-        "#3c077b",
-        "#000000"
-    ];
-    
     // -------------
     // Axes are: row, column and measure.
     def
@@ -2423,8 +2390,8 @@ function(def, pvc, pv){
                 colCount = dataTable.getNumberOfColumns(),
                 rowCount = dataTable.getNumberOfRows();
 
-            // Take the first seriesCount colors from the palette
-            this._colors = colorPalete;//this._vizOptions.palette.colors.slice(0, seriesCount);
+            // Take all the colors from the palette
+            this._colors = this._vizOptions.palette.colors.slice();
             
             // Direct translation
             for(var tc = 0 ; tc < colCount ; tc++){
