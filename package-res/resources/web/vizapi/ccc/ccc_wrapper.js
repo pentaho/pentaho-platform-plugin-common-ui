@@ -232,6 +232,7 @@ function(def, pvc, pv){
                         required: false,
                         allowMultiple: false
                     },
+                    createSizeByNegativeModeDataReq(),
                     createMultiDataReq(),
                     createPatternDataReq(),
                     createColorSetDataReq(),
@@ -408,6 +409,7 @@ function(def, pvc, pv){
                         required: false,
                         allowMultiple: false
                     },
+                    createSizeByNegativeModeDataReq(),
                     createPatternDataReq(),
                     createColorSetDataReq(),
                     createReverseColorsDataReq(),
@@ -593,6 +595,23 @@ function(def, pvc, pv){
                 }];
         }
         
+        function createSizeByNegativeModeDataReq(){
+            var values = ['USE_ABS', 'NEG_IS_LOWEST'];
+            return {
+                id: 'sizeByNegativeMode',
+                dataType: 'string',
+                values: values,
+                ui: {
+                    labels: values.map(function(option){ 
+                        return dropZoneLabel('SIZE_BY_NEGATIVE_MODE_' + option); 
+                    }),
+                    group: 'options',
+                    type:  'combo',
+                    caption: dropZoneLabel('SIZE_BY_NEGATIVE_MODE')
+                }
+            };
+        }
+        
         function createPatternDataReq(){
             return {
                 id: 'pattern',
@@ -675,39 +694,6 @@ function(def, pvc, pv){
         }
     }
 
-    var _defaultColorPalette = [
-        "#0000cc",
-        "#0d8ecf",
-        "#b0de09",
-        "#fcd202",
-        "#ff6600",
-        "#cd0d74",
-        "#cc0000",
-        "#00cc00",
-        "#650cd0",
-        "#3a3a3a",
-        "#7272e3",
-        "#79c1e4",
-        "#d3ed77",
-        "#fde673",
-        "#ffaa72",
-        "#e379b2",
-        "#e37272",
-        "#72e372",
-        "#aa79e5",
-        "#929292",
-        "#00007a",
-        "#07547b",
-        "#698405",
-        "#967c01",
-        "#983b00",
-        "#7a0745",
-        "#7a0000",
-        "#007a00",
-        "#3c077b",
-        "#000000"
-    ];
-    
     // -------------
     // Axes are: row, column and measure.
     def
@@ -1445,7 +1431,10 @@ function(def, pvc, pv){
      * We can't use dojo or jQuery for this, 
      * cause they try to "fix" the event object, 
      * which is generally an expensive operation
-     * that would defeat the initial purpose. 
+     * that would defeat the initial purpose.
+     * An unwanted side effect is that dragging 
+     * gems over the chart does not work.
+     * TODO: We could do this for IE only...
      */
     var _cccEventsShieldEvents =  ['mouseover', 'mouseout', 'mousemove'];
     
@@ -1507,7 +1496,7 @@ function(def, pvc, pv){
         orthoAxisGrid: true,
         
         /* Continuous axes */
-        continuousAxisLabelSpacingMin: 0.6, // em
+        continuousAxisLabelSpacingMin: 1, // em
         
         /* Title */
         titlePosition: 'top',
@@ -1646,7 +1635,7 @@ function(def, pvc, pv){
             // Pentaho/Google data table
             this._dataTable = dataTable;
             
-            /*
+            /* TEST
             if(!vizOptions.memberPalette){
                 vizOptions.memberPalette = {
                     "[Markets].[Territory]": {
@@ -1950,6 +1939,9 @@ function(def, pvc, pv){
                     options.titleFont = (labelFontSize + 2) + "px " + labelFontFamily;
                 }
             }
+            
+            var sizeByNegativeMode = vizOptions.sizeByNegativeMode;
+            options.sizeAxisUseAbs = (!sizeByNegativeMode || sizeByNegativeMode === 'USE_ABS')
         },
         
         _processDataTable: function(){
@@ -2350,10 +2342,14 @@ function(def, pvc, pv){
             var memberPalette = this._vizOptions.memberPalette;
             if(memberPalette){
                 return this._getColorScaleCore(memberPalette) ||
-                       _defaultColorPalette;
+                       this._getDefaultColorScale();
             }
             
-            return _defaultColorPalette;
+            return this._getDefaultColorScale();
+        },
+        
+        _getDefaultColorScale: function(){
+            return this._vizOptions.palette.colors.slice();
         },
         
         _getColorScaleCore: function(memberPalette){
@@ -2412,7 +2408,7 @@ function(def, pvc, pv){
                                         }
                                       });
                         
-                        var defaultScale = pv.colors(_defaultColorPalette);
+                        var defaultScale = pv.colors(this._getDefaultColorScale());
                         return function(){
                             var scale = function(compKey){
                                 if(compKey){
@@ -2481,7 +2477,7 @@ function(def, pvc, pv){
                 titleFont = "bold " + titleFont;
             }
             
-            options.titleFont = titleFont;
+            options.smallTitleFont = titleFont;
         },
 
         _configureTooltip: function(){
@@ -2603,6 +2599,7 @@ function(def, pvc, pv){
             });
             
             this._chart.render();
+            this.hasNegativeSizeByValues = this._calcHasNegativeSizeByValues();
         },
 
         /* INTERACTIVE - TOOLTIPS */
@@ -3131,6 +3128,31 @@ function(def, pvc, pv){
                         .first() || null;
         },
 
+        _calcHasNegativeSizeByValues: function(){
+//            var sizeAxis = this.axisByRole.size;
+//            if(sizeAxis){
+//                var sizeGems = sizeAxis.gemsByRole.size;
+//                if(sizeGems && sizeGems.length === 1){
+//                    var sizeGem = sizeGems[0];
+//                    if(sizeGem.cccDimName){
+//                        
+//                    }
+//                }
+//            }
+            
+            var sizeRole = this._chart.visualRoles('size', {assertExists: false});
+            if(sizeRole && !sizeRole.isDiscrete() && sizeRole.isBound()){
+                var sizeDimName = sizeRole.firstDimensionName();
+                var sizeDim = this._chart.data.dimensions(sizeDimName);
+                var extent = sizeDim.extent();
+                if(extent){
+                    return extent.min.value < 0;
+                }
+                
+            }
+            return false;
+        },
+        
         /* UTILITY */
         
         /**
@@ -3675,14 +3697,14 @@ function(def, pvc, pv){
             valuesVisible: false,
             useShapes:     true,
             shape:         'square',
-            nullShape:     null,
+            //nullShape:     null,
             
             xAxisSize: 30,
             yAxisSize: 50,
             axisComposite: true,
             orthoAxisGrid: false, // clear inherited property
             
-            colorMissing:   '#efc5ad',
+            //colorMissing:   'lightgray',
             colorScaleType: 'linear',
             colorNormByCategory: false
         },
@@ -3696,21 +3718,6 @@ function(def, pvc, pv){
         
         _getColorScaleKind: function(){
             return 'continuous';
-        },
-        
-        _configureColor: function(colorScaleKind){
-            
-            this.base(colorScaleKind);
-            
-            // MISSING COLOR
-            // Set the colorMissing option to the first of the colorRange
-            // for the case that no color dimension is mapped
-            var options = this.options;
-            var colors = options.colors;
-            var colorMissing  = colors && colors[0];
-            if(colorMissing){
-                options.colorMissing = colorMissing;
-            }
         },
         
         _prepareLayout: function(options) {
@@ -3923,6 +3930,7 @@ function(def, pvc, pv){
             axisGrid: true,
             
             sizeAxisUseAbs:  true,
+            sizeAxisOriginIsZero: true,
             sizeAxisRatio:   1/5,
             sizeAxisRatioTo: 'height', // plot area client height
             
@@ -3988,15 +3996,6 @@ function(def, pvc, pv){
 //                      return pvc.buildIndexedId('color', index);
 //                   })
 //                   .join(', ');
-            }
-            
-            // MISSING COLOR
-            // Set the colorMissing option to the first of the colors
-            // for the case that no color dimension is mapped
-            var colors = options.colors;
-            var colorMissing  = colors && colors[0];
-            if(colorMissing){
-                options.colorMissing = colorMissing;
             }
         },
 

@@ -382,6 +382,14 @@ pen.define([
                     var totalGems = colorBy.gems.length + sizeBy.gems.length;
                     colorBy.required = (totalGems == 0);
                     sizeBy.required = (totalGems == 0);
+                    
+                    var visible = sizeBy.gems.length > 0; // TODO < 0 exists?
+//                    if(visible){
+//                        var vizController = this.report.visualizationController;
+//                        var chart = vizController && vizController.chart;
+//                        visible = !!chart && chart.hasNegativeSizeByValues;
+//                    }
+                    config.byId("sizeByNegativeMode").ui.hidden = !visible;
                 }
             });
             
@@ -447,7 +455,7 @@ pen.define([
                 
                 updateConfiguration: function(config){
                     this._updateColorRoleOptions(config);
-                    
+                    this._updateSizeRoleOptions(config);
                     this.inherited(arguments);
                 },
                 
@@ -462,6 +470,20 @@ pen.define([
                     config.byId("reverseColors").ui.hidden = !visible;
                     config.byId("colorSet").ui.hidden = !visible;
                     config.byId("pattern").ui.hidden = !visible;
+                },
+                
+                _updateSizeRoleOptions: function(config){
+                    var sizeBy = config.byId("size");
+                    
+                    // Show/hide size option
+                    var visible = sizeBy.gems.length > 0; // TODO < 0 exists?
+//                    if(visible){
+//                        var vizController = this.report.visualizationController;
+//                        var chart = vizController && vizController.chart;
+//                        visible = !!chart && chart.hasNegativeSizeByValues;
+//                    }
+                    
+                    config.byId("sizeByNegativeMode").ui.hidden = !visible;
                 }
             });
     
