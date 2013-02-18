@@ -224,6 +224,74 @@ pen.define(['common-ui/prompting/pentaho-prompting-bind', 'common-ui/prompting/p
     }
   });
 
+  window.ExternalInputComponent = BaseComponent.extend({
+    clear: function() {
+      if (this.dijitId) {
+        if (this.onChangeHandle) {
+          dojo.disconnect(this.onChangeHandle);
+        }
+        dijit.byId(this.dijitId).destroyRecursive();
+        delete this.dijitId;
+      }
+    },
+    update: function() {
+
+      dojo.require("dijit.form.TextBox");
+      dojo.require("pentaho.common.button");
+      var parameterValue = Dashboards.getParameterValue(this.parameter);
+
+      var container = $('#' + this.htmlObject);
+      container.empty();
+
+      // build text input element
+      var textInputId = this.htmlObject + '-textInput';
+      var textInputElement = '<input type="text" id="' + textInputId + '"></input>';
+      container.append(textInputElement);
+      var textInput = new dijit.form.TextBox({
+        name: textInputId,
+        value: parameterValue || "",
+        placeHolder: "file path"
+      }, textInputId);
+      this.dijitId = textInputId;
+
+      // get button label
+      var buttonLabel = this.param.attributes['button-label'];
+      if(buttonLabel == undefined || buttonLabel == null){
+        buttonLabel = 'Get Value';
+      }
+
+      // build button element
+      var buttonId = this.htmlObject + '-button';
+      var buttonElement = '<input type="button" id="' + buttonId + '"></input>';
+      container.append(buttonElement);
+
+      var that = this; // trap scope
+      var button = new pentaho.common.button({
+        label: buttonLabel,
+        callback: function(){
+          try{
+            var c = Dashboards.getComponentByName(that.name);
+            var externalValue = c.promptPanel.getExternalValueForParam(c.param); // request value from prompt panel
+            textInput.set('value', externalValue, false);
+            Dashboards.processChange(this.name);
+          }
+          catch(error){
+            console.error(error);   
+          }
+        }
+      }, buttonId);
+
+      this.onChangeHandle = dojo.connect(textInput, "onChange", function() {
+        Dashboards.processChange(this.name);
+      }.bind(this));
+
+    },
+
+    getValue: function() {
+      return dijit.byId(this.dijitId).get('value');
+    }
+  });
+
   window.DojoDateTextBoxComponent = BaseComponent.extend({
     clear: function() {
       if (this.dijitId) {

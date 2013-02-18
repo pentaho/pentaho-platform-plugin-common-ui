@@ -62,6 +62,8 @@ pen.define(['cdf/cdf-module', 'common-ui/prompting/pentaho-prompting-bind'], fun
       'togglebutton': 'pentaho.common.prompting.builders.MultiButtonBuilder',
       'list': 'pentaho.common.prompting.builders.ListBuilder',
       'datepicker': 'pentaho.common.prompting.builders.DateInputBuilder',
+      'filebrowser': 'pentaho.common.prompting.builders.ExternalInputBuilder',
+      'external-input': 'pentaho.common.prompting.builders.ExternalInputBuilder',
       'multi-line': 'pentaho.common.prompting.builders.TextAreaBuilder',
       'gc': 'pentaho.common.prompting.builders.GarbageCollectorBuilder',
       'default': 'pentaho.common.prompting.builders.PlainPromptBuilder'
@@ -303,6 +305,20 @@ pen.define(['cdf/cdf-module', 'common-ui/prompting/pentaho-prompting-bind'], fun
       var widget = this.base(args);
       widget.type = 'radio'; // Specifically 'radio' instead of 'RadioComponent' because the CoreComponent.js implementation requires it.
       return widget;
+    }
+  });
+
+  pentaho.common.prompting.builders.ExternalInputBuilder = pentaho.common.prompting.builders.ValueBasedParameterWidgetBuilder.extend({
+    build: function(args) {
+      var formatter = args.promptPanel.createFormatter(args.promptPanel.paramDefn, args.param);
+
+      return $.extend(this.base(args), {
+        type: 'ExternalInputComponent',
+        transportFormatter: args.promptPanel.createDataTransportFormatter(args.promptPanel.paramDefn, args.param, formatter),
+        formatter: formatter,
+        promptPanel: args.promptPanel,
+        paramDefn: args.promptPanel.paramDefn
+      });
     }
   });
 

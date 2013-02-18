@@ -141,6 +141,16 @@
                     alert("getParameterDefinition() called. This is where you'd build a new parameter definition (or fetch one) to support cascading prompts.");
                  }
 
+                promptPanel.getExternalValueForParam = function(param) {
+                  if(param.attributes['parameter-render-type'] == 'filebrowser'){
+                    return prompt("Please enter the file path"); 
+                  } 
+
+                  if(param.attributes['parameter-render-type'] == 'external-input'){
+                    return prompt("Please enter a value"); 
+                  }                     
+                }
+
                   promptPanel.createDataTransportFormatter = ReportFormatUtil.createDataTransportFormatter.bind(ReportFormatUtil);
                   promptPanel.createFormatter = ReportFormatUtil.createFormatter.bind(ReportFormatUtil);
 
