@@ -271,9 +271,11 @@ pen.define(['common-ui/prompting/pentaho-prompting-bind', 'common-ui/prompting/p
         callback: function(){
           try{
             var c = Dashboards.getComponentByName(that.name);
-            var externalValue = c.promptPanel.getExternalValueForParam(c.param); // request value from prompt panel
-            textInput.set('value', externalValue, false);
-            Dashboards.processChange(this.name);
+            var resultCallback = function(externalValue){
+              textInput.set('value', externalValue, false);
+              Dashboards.processChange(this.name);
+            };
+            c.promptPanel.getExternalValueForParam(c.param, resultCallback); // request value from prompt panel
           }
           catch(error){
             console.error(error);   
