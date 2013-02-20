@@ -275,7 +275,8 @@ pen.define(['common-ui/prompting/pentaho-prompting-bind', 'common-ui/prompting/p
               textInput.set('value', externalValue, false);
               Dashboards.processChange(this.name);
             };
-            c.promptPanel.getExternalValueForParam(c.param, resultCallback); // request value from prompt panel
+            c.param.values = [c.getValue()]; // insert current value
+            c.promptPanel.getExternalValueForParam(c.param, resultCallback); // request new value from prompt panel
           }
           catch(error){
             console.error(error);   
