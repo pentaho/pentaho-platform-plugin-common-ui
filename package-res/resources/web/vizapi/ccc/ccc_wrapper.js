@@ -232,7 +232,6 @@ function(def, pvc, pv){
                         required: false,
                         allowMultiple: false
                     },
-                    createSizeByNegativeModeDataReq(),
                     createMultiDataReq(),
                     createPatternDataReq(),
                     createColorSetDataReq(),
@@ -409,7 +408,6 @@ function(def, pvc, pv){
                         required: false,
                         allowMultiple: false
                     },
-                    createSizeByNegativeModeDataReq(),
                     createPatternDataReq(),
                     createColorSetDataReq(),
                     createReverseColorsDataReq(),
@@ -593,23 +591,6 @@ function(def, pvc, pv){
                         caption: dropZoneLabel('TREND_LINEWIDTH')
                     }
                 }];
-        }
-        
-        function createSizeByNegativeModeDataReq(){
-            var values = ['USE_ABS', 'NEG_IS_LOWEST'];
-            return {
-                id: 'sizeByNegativeMode',
-                dataType: 'string',
-                values: values,
-                ui: {
-                    labels: values.map(function(option){ 
-                        return dropZoneLabel('SIZE_BY_NEGATIVE_MODE_' + option); 
-                    }),
-                    group: 'options',
-                    type:  'combo',
-                    caption: dropZoneLabel('SIZE_BY_NEGATIVE_MODE')
-                }
-            };
         }
         
         function createPatternDataReq(){
@@ -1940,8 +1921,8 @@ function(def, pvc, pv){
                 }
             }
             
-            var sizeByNegativeMode = vizOptions.sizeByNegativeMode;
-            options.sizeAxisUseAbs = (!sizeByNegativeMode || sizeByNegativeMode === 'USE_ABS')
+            var sizeByNegativesMode = vizOptions.sizeByNegativesMode;
+            options.sizeAxisUseAbs = sizeByNegativesMode === 'USE_ABS';
         },
         
         _processDataTable: function(){
@@ -2599,7 +2580,6 @@ function(def, pvc, pv){
             });
             
             this._chart.render();
-            this.hasNegativeSizeByValues = this._calcHasNegativeSizeByValues();
         },
 
         /* INTERACTIVE - TOOLTIPS */
@@ -3128,31 +3108,6 @@ function(def, pvc, pv){
                         .first() || null;
         },
 
-        _calcHasNegativeSizeByValues: function(){
-//            var sizeAxis = this.axisByRole.size;
-//            if(sizeAxis){
-//                var sizeGems = sizeAxis.gemsByRole.size;
-//                if(sizeGems && sizeGems.length === 1){
-//                    var sizeGem = sizeGems[0];
-//                    if(sizeGem.cccDimName){
-//                        
-//                    }
-//                }
-//            }
-            
-            var sizeRole = this._chart.visualRoles('size', {assertExists: false});
-            if(sizeRole && !sizeRole.isDiscrete() && sizeRole.isBound()){
-                var sizeDimName = sizeRole.firstDimensionName();
-                var sizeDim = this._chart.data.dimensions(sizeDimName);
-                var extent = sizeDim.extent();
-                if(extent){
-                    return extent.min.value < 0;
-                }
-                
-            }
-            return false;
-        },
-        
         /* UTILITY */
         
         /**
@@ -3635,7 +3590,6 @@ function(def, pvc, pv){
        _linkAxesIds: ['row', 'column'],
        
        _options: {
-           //visibleLines: true, // TODO: check this, was linesVisibleLines ??
            axisOffset:    0,
            tooltipOffset: 15
        },
@@ -3697,7 +3651,6 @@ function(def, pvc, pv){
             valuesVisible: false,
             useShapes:     true,
             shape:         'square',
-            //nullShape:     null,
             
             xAxisSize: 30,
             yAxisSize: 50,
@@ -3929,7 +3882,7 @@ function(def, pvc, pv){
         _options: {
             axisGrid: true,
             
-            sizeAxisUseAbs:  true,
+            sizeAxisUseAbs:  false,
             sizeAxisOriginIsZero: true,
             sizeAxisRatio:   1/5,
             sizeAxisRatioTo: 'height', // plot area client height
@@ -4423,7 +4376,7 @@ function(def, pvc, pv){
             color = color.substr(1);
             if(L === 6){
                 color = "#0" + color;
-            } else { //if(color === 5){
+            } else { //if(L === 5){
                 color = "#00" + color;
             }
         }
