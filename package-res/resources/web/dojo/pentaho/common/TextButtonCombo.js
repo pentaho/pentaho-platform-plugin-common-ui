@@ -1,7 +1,7 @@
 dojo.require("dijit.form.TextBox");
-dojo.require("pentaho.common.button");
 dojo.require('dijit._Widget');
 dojo.require('dijit._Templated');
+dojo.require("pentaho.common.button");
 
 dojo.declare("pentaho.common.TextButtonCombo",
   [dijit._Widget, dijit._Templated],  {
