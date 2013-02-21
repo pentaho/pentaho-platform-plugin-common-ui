@@ -236,58 +236,46 @@ pen.define(['common-ui/prompting/pentaho-prompting-bind', 'common-ui/prompting/p
     },
     update: function() {
 
-      dojo.require("dijit.form.TextBox");
-      dojo.require("pentaho.common.button");
+      dojo.require("pentaho.common.TextButtonCombo");
       var parameterValue = Dashboards.getParameterValue(this.parameter);
 
       var container = $('#' + this.htmlObject);
       container.empty();
 
-      // build text input element
-      var textInputId = this.htmlObject + '-textInput';
-      var textInputElement = '<input type="text" id="' + textInputId + '"></input>';
-      container.append(textInputElement);
-      var textInput = new dijit.form.TextBox({
-        name: textInputId,
-        value: parameterValue || "",
-        placeHolder: "file path"
-      }, textInputId);
-      this.dijitId = textInputId;
-
+      var textInputComboId = this.htmlObject + '-textButtonCombo';
+      var textInputComboElement = '<div id="' + textInputComboId + '"></div>';
+      container.append(textInputComboElement);
+      var textInputCombo = new pentaho.common.TextButtonCombo({}, textInputComboId);
+      textInputCombo.set('textPlaceHolder', 'file path...');
+      
       // get button label
       var buttonLabel = this.param.attributes['button-label'];
       if(buttonLabel == undefined || buttonLabel == null){
-        buttonLabel = 'Get Value';
+        textInputCombo.set('buttonLabel', buttonLabel);
       }
-
-      // build button element
-      var buttonId = this.htmlObject + '-button';
-      var buttonElement = '<input type="button" id="' + buttonId + '"></input>';
-      container.append(buttonElement);
-
-      var that = this; // trap scope
-      var button = new pentaho.common.button({
-        label: buttonLabel,
-        callback: function(){
-          try{
-            var c = Dashboards.getComponentByName(that.name);
-            var resultCallback = function(externalValue){
-              textInput.set('value', externalValue, false);
-              Dashboards.processChange(this.name);
-            };
-            c.param.values = [c.getValue()]; // insert current value
-            c.promptPanel.getExternalValueForParam(c.param, resultCallback); // request new value from prompt panel
-          }
-          catch(error){
-            console.error(error);   
-          }
+      
+      // override onClickCallback
+      textInputCombo.onClickCallback = dojo.hitch(this, function(currentValue){
+        try{
+          var c = Dashboards.getComponentByName(this.name);
+          var resultCallback = function(externalValue){
+            textInputCombo.set('text', externalValue);
+            Dashboards.processChange(this.name);
+          };
+          c.param.values = [currentValue]; // insert current value
+          c.promptPanel.getExternalValueForParam(c.param, resultCallback); // request new value from prompt panel
         }
-      }, buttonId);
+        catch(error){
+          console.error(error);   
+        }
+      });
+      this.dijitId = textInputComboId;
 
-      this.onChangeHandle = dojo.connect(textInput, "onChange", function() {
-        Dashboards.processChange(this.name);
-      }.bind(this));
-
+      // override onChangeCallback
+      textInputCombo.onChangeCallback = dojo.hitch(this, function(newValue){
+        console.log(newValue);
+        Dashboards.processChange(this.name);  
+      });
     },
 
     getValue: function() {
