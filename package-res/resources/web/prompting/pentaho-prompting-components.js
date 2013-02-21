@@ -250,7 +250,7 @@ pen.define(['common-ui/prompting/pentaho-prompting-bind', 'common-ui/prompting/p
       
       // get button label
       var buttonLabel = this.param.attributes['button-label'];
-      if(buttonLabel == undefined || buttonLabel == null){
+      if(buttonLabel != null && buttonLabel != ''){
         textInputCombo.set('buttonLabel', buttonLabel);
       }
       
@@ -273,7 +273,6 @@ pen.define(['common-ui/prompting/pentaho-prompting-bind', 'common-ui/prompting/p
 
       // override onChangeCallback
       textInputCombo.onChangeCallback = dojo.hitch(this, function(newValue){
-        console.log(newValue);
         Dashboards.processChange(this.name);  
       });
     },
