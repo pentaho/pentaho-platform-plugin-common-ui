@@ -1,5 +1,7 @@
 <div data-dojo-attach-point="textButtonCombo">
-	<div data-dojo-attach-point="textInput" data-dojo-type="dijit.form.TextBox" />
-	<div data-dojo-attach-point="submitButton" data-dojo-type="pentaho.common.button"
+	<input data-dojo-attach-point="textInput" data-dojo-type="dijit.form.TextBox" 
+		data-dojo-attach-event="onChange:_onTextInputChange"/>
+	<button type="button" class="pentaho-button"
+		data-dojo-attach-point="submitButton" data-dojo-type="dijit.form.Button"
 		data-dojo-attach-event="onClick:_onSubmitButtonClick"/>
 </div>
