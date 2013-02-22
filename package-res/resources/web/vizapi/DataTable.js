@@ -241,32 +241,43 @@ pentaho.DataTable.prototype.getFormattedValue = function(rowIdx,columnIdx) {
     getColumnRange
     Returns a range object describing the minimum and maximum values from the specified column
     columnIdx   The column number (zero based)
-    returns     A range object - { min: 123, max: 456 }
+    options      A keyword arguments object.
+    options.key  A function that extracts the values from the column data.
+    returns      A range object - { min: 123, max: 456 }.
+                 When there is no data, or all data is null or NaN, the returned
+                 range object will have both its properties, 'min' and 'max', 
+                 with the value undefined.
 */
-pentaho.DataTable.prototype.getColumnRange = function(columnIdx) {
+pentaho.DataTable.prototype.getColumnRange = function(columnIdx, options) {
 
     var min;
     var max;
     var set = false;
+    var key = options && options.key;
+    
     for( var rowNo=0; rowNo<this.getNumberOfRows(); rowNo++ ) {
         // get the value from this row
         var value = this.getValue( rowNo, columnIdx );
-        if( !set && (value || value == 0) ) {
-            // we have found our first value, set the min and max
-            min = value;
-            max = value;
-            set = true;
-        } else {
-            if( value < min ) {
-                // adjust the minimum
-                min = value;
+        if(value != null) {
+            if(key){
+                value = key(value);
             }
-            if( value > max ) {
-                // adjust the maximum
+            
+            if(!set) {
+                min = value;
                 max = value;
+                set = true;
+            } else {
+                if( value < min ) {
+                    min = value;
+                }
+                if( value > max ) {
+                    max = value;
+                }
             }
         }
     }
+    
     // return the range 
     var range = {
         min: min,
@@ -461,25 +472,38 @@ pentaho.DataView.prototype.setColumns = function(columns) {
     getColumnRange
     Returns a range object describing the minimum and maximum values from the specified column
     columnIdx   The column number (zero based)
-    returns     A range object - { min: 123, max: 456 }
+    options      A keyword arguments object.
+    options.key  A function that extracts the values from the column data.
+    returns      A range object - { min: 123, max: 456 }.
+                 When there is no data, or all data is null or NaN, the returned
+                 range object will have both its properties, 'min' and 'max', 
+                 with the value undefined.
 */
-pentaho.DataView.prototype.getColumnRange = function(columnIdx) {
+pentaho.DataView.prototype.getColumnRange = function(columnIdx, options) {
 
     var min;
     var max;
     var set = false;
+    var key = options && options.key;
+    
     for( var rowNo=0; rowNo<this.getNumberOfRows(); rowNo++ ) {
         var value = this.getValue( rowNo, columnIdx );
-        if( !set && (value || value == 0) ) {
-            min = value;
-            max = value;
-            set = true;
-        } else {
-            if( value < min ) {
-                min = value;
+        if(value != null) {
+            if(key){
+                value = key(value);
             }
-            if( value > max ) {
+            
+            if(!set) {
+                min = value;
                 max = value;
+                set = true;
+            } else {
+                if( value < min ) {
+                    min = value;
+                }
+                if( value > max ) {
+                    max = value;
+                }
             }
         }
     }

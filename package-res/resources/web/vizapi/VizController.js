@@ -690,6 +690,16 @@ pentaho.VizController.getRgbGradientFromMultiColorHex = function(value, min, max
   return pentaho.VizController.getRrbColor(cols[0], cols[1], cols[2]);
 }
 
+// Adapted from protovis
+pentaho.VizController.getDarkerFromColorHex = function(color, k) {
+  var comps = pentaho.VizController.convertToRGB(color);
+  k = Math.pow(0.7, k != null ? k : 1);
+  return pentaho.VizController.getRrbColor(
+        Math.max(0, Math.floor(k * comps[0])),
+        Math.max(0, Math.floor(k * comps[1])),
+        Math.max(0, Math.floor(k * comps[2])));
+};
+
 pentaho.VizController.getRgbStepFromMultiColorHex = function(value, min, max, colors) {
 
   var steps = colors.length-1;

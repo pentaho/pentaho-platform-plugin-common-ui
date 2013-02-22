@@ -1508,7 +1508,7 @@ function(def, pvc, pv){
         extensionPoints: {
             axisRule_strokeStyle:   ruleStrokeStyle,
             axisTicks_strokeStyle:  lineStrokeStyle,
-            
+            dot_lineWidth: 1.5,
             legendArea_lineWidth:       1,
             legendArea_strokeStyle:     '#c0c0c0',
             legendLabel_textDecoration: null,
