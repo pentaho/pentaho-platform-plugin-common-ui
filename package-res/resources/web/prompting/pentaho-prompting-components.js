@@ -247,6 +247,7 @@ pen.define(['common-ui/prompting/pentaho-prompting-bind', 'common-ui/prompting/p
       container.append(textInputComboElement);
       var textInputCombo = new pentaho.common.TextButtonCombo({}, textInputComboId);
       textInputCombo.set('textPlaceHolder', 'file path...');
+      textInputCombo.set('value', parameterValue); // set initial value
       
       // get button label
       var buttonLabel = this.param.attributes['button-label'];
