@@ -22,6 +22,11 @@
     <title>MetadataModelsService</title>
   </content-generator>
 
+  <content-generator scope="session" id="ChartSeriesColorSvc" type="ChartSeriesColorSvc">
+    <classname>org.pentaho.common.ui.services.ChartSeriesColorContentGenerator</classname>
+    <title>ChartSeriesColorService</title>
+  </content-generator>
+  
   <webservice
       id="RepositoryClientService"
       type="xml"
