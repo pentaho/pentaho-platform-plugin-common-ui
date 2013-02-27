@@ -363,7 +363,9 @@ pen.define(['common-ui/prompting/pentaho-prompting-bind', 'common-ui/prompting/p
         }.bind(this),
         // change() is called on blur
         change: function(event, ui) {
-          Dashboards.processChange(this.name);
+          // blur wasn't good enough. clicking of the submit button without clicking out of the text component
+          // doesn't trigger blur. so modified text fields can have a stale value.
+          // we now use the jQuery ui focusout event on the input.
         }.bind(this),
         // select() is called when an item from the menu is selected
         select: function(event, ui) {
@@ -376,6 +378,10 @@ pen.define(['common-ui/prompting/pentaho-prompting-bind', 'common-ui/prompting/p
         if (e.which === 13) {
           Dashboards.processChange(this.name);
         }
+      }.bind(this));
+
+      input.focusout(function() {
+        Dashboards.processChange(this.name);
       }.bind(this));
     },
 
@@ -402,13 +408,20 @@ pen.define(['common-ui/prompting/pentaho-prompting-bind', 'common-ui/prompting/p
       html += '</textarea>';
       $('#' + this.htmlObject).html(html);
       var input = $('#' + this.htmlObject + '-input');
+      //change() is called on blur
       input.change(function() {
-        Dashboards.processChange(this.name);
+        // blur wasn't good enough. clicking of the submit button without clicking out of the text component
+        // doesn't trigger blur. so modified text fields can have a stale value.
+        // we now use the jQuery ui focusout event on the input.
       }.bind(this));
       input.keypress(function(e) {
         if (e.which === 13) {
           Dashboards.processChange(this.name);
         }
+      }.bind(this));
+
+      input.focusout(function() {
+        Dashboards.processChange(this.name);
       }.bind(this));
     },
 
