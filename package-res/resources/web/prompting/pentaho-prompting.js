@@ -598,7 +598,11 @@ pen.define(['cdf/cdf-module', 'common-ui/prompting/pentaho-prompting-bind', 'com
        * Called when a parameter value changes.
        */
       this.parameterChanged = function(param, name, value) {
-        this.refreshPrompt();
+        // Only refresh the report if the 'Auto Submit' checkbox is set.
+        if (this.getAutoSubmitSetting() == true)
+        {
+          this.refreshPrompt();
+        }
       };
 
 
