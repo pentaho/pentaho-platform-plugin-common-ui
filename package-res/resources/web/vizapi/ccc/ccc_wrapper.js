@@ -22,17 +22,6 @@ function(def, pvc, pv){
     
     defCCCVisualizations();
     
-    // TODO: temporary call due to debug loading time problems
-    if(typeof(document.location) !== 'undefined'){
-        try{
-            if((''+document.location).indexOf('debug=true') > -1){
-                analyzerPlugins[analyzerPlugins.length - 1].init();
-            }
-        } catch(ex) {
-            pvc.logError("CCC ANALYZER PLUGIN: " + ex.message);
-        }
-    }
-    
     // --------------
     
     // Install pentaho trends on CCC trends
@@ -417,7 +406,33 @@ function(def, pvc, pv){
             }],
             menuOrdinal: 200
         });
-
+        
+        defVisualization({
+            id: 'ccc_treemap',
+            type: 'treemapchart',
+            source: 'CCC',
+            name: vizLabel('TREEMAP'),
+            'class': 'pentaho.ccc.TreemapChart',
+            args:     {},
+            propMap:  [],
+            dataReqs: [{
+                name: 'Default',
+                reqs: [ 
+                    def.set(createRowDataReq("TREEMAP_ROW"), 'required', true),
+                    {
+                        id: 'size',
+                        dataType: 'number',
+                        dataStructure: 'column',
+                        caption: dropZoneLabel('TREEMAP_SIZE'),
+                        required: false,
+                        allowMultiple: false
+                    },
+                    createMultiDataReq(),
+                    createChartOptionsDataReq(false)
+                ]
+            }]
+        });
+        
         defVisualization({
             id: 'ccc_bulletchart',
             type: 'bulletchart',
@@ -458,23 +473,18 @@ function(def, pvc, pv){
             ]
         });
         
-        function label(prefix, id){
-            return (id && cvCatalog[(prefix || "") + id]) || "";
-        }
+        function label(prefix, id) { return (id && cvCatalog[(prefix || "") + id]) || ""; }
         
-        function vizLabel(id){
-            return label('VIZ_', id) || id;
-        }
+        function vizLabel(id) { return label('VIZ_', id) || id; }
 
-        function dropZoneLabel(id, defaultLabel){
+        function dropZoneLabel(id, defaultLabel) {
             return label("dropZoneLabels_", id) ||
                    label("ropZoneLabels_", id) || 
                    defaultLabel || id;
         }
         
-        function chartPropsLabel(id, defaultLabel){
-            return label("dlgChartProps", id) || 
-                   defaultLabel || id;
+        function chartPropsLabel(id, defaultLabel) {
+            return label("dlgChartProps", id) || defaultLabel || id;
         }
         
         function createRowDataReq(rowLabel){
@@ -1405,44 +1415,47 @@ function(def, pvc, pv){
 
     // ------------------
     
-    /*
-     * Unhandled mouse events from protovis
-     * bubble up and cause slowing down the UI.
-     * So, we stop propagation of mouse events. 
-     * We can't use dojo or jQuery for this, 
-     * cause they try to "fix" the event object, 
-     * which is generally an expensive operation
-     * that would defeat the initial purpose.
-     * An unwanted side effect is that dragging 
-     * gems over the chart does not work.
-     * TODO: We could do this for IE only...
-     */
-    var _cccEventsShieldEvents =  ['mouseover', 'mouseout', 'mousemove'];
-    
-    function installCccEventsShield(element){
-        if(!element._cccEventsShield){
-            element._cccEventsShield = true;
-            
-            _cccEventsShieldEvents.forEach(function(evName){
-                addListener(element, evName, stopEventPropagation);
-            });
-        }
+    var installCccEventsShield;
+    if(pv.renderer() === 'vml') {
+        /*
+         * Unhandled mouse events from protovis
+         * bubble up and cause slowing down the UI.
+         * So, we stop propagation of mouse events. 
+         * We can't use dojo or jQuery for this, 
+         * cause they try to "fix" the event object, 
+         * which is generally an expensive operation
+         * that would defeat the initial purpose.
+         * An unwanted side effect is that dragging 
+         * gems over the chart does not work.
+         */
+        var _cccEventsShieldEvents =  ['mouseover', 'mouseout', 'mousemove'];
+        
+        installCccEventsShield = function (element){
+            if(!element._cccEventsShield){
+                element._cccEventsShield = true;
+                
+                _cccEventsShieldEvents.forEach(function(evName){
+                    addListener(element, evName, stopEventPropagation);
+                });
+            }
+        };
+        
+        var stopEventPropagation = function (ev){
+            if(!ev){ ev = window.event; }
+            if(ev.stopPropagation) {
+                ev.stopPropagation();
+            } else {
+                ev.cancelBubble = true;
+            }
+        };
+        
+        var addListener = function (elem, type, listener){
+            elem.addEventListener
+                ? elem.addEventListener(type, listener, false)
+                : elem.attachEvent("on" + type, listener);
+        };
     }
     
-    function stopEventPropagation(ev){
-        if(!ev){ ev = window.event; }
-        if(ev.stopPropagation) {
-            ev.stopPropagation();
-        } else {
-            ev.cancelBubble = true;
-        }
-    }
-    
-    function addListener(elem, type, listener){
-        elem.addEventListener
-            ? elem.addEventListener(type, listener, false)
-            : elem.attachEvent("on" + type, listener);
-    }
     
     /* CCC Charts Options */
     var ruleStrokeStyle = "#808285";  // #D8D8D8',  // #f0f0f0
@@ -1461,12 +1474,15 @@ function(def, pvc, pv){
         paddings: 10,
         plotFrameVisible: false,
         
+        /* Multichart */
+        multiChartMax: 50,
+    
         /* Legend */
         legend:  true,
         legendPosition:  'right',
         legendSizeMax:   '60%',
         legendPaddings:  10,
-        legendItemPadding: {left: 1, right:1, top: 2, bottom: 2},// width: 2, height: 4
+        legendItemPadding: {left: 1, right: 1, top: 2, bottom: 2},// width: 2, height: 4
         legendClickMode: 'toggleSelected',
         color2AxisLegendClickMode: 'toggleSelected', // for data part 2 (lines in column/line combo)
         color3AxisLegendClickMode: 'toggleSelected', // for trends
@@ -1483,6 +1499,7 @@ function(def, pvc, pv){
         titlePosition: 'top',
 
         /* Interactivity */
+        interactive:    true,
         animate:        false,
         tooltipEnabled: true,
         clickable:      true,
@@ -1548,7 +1565,7 @@ function(def, pvc, pv){
         this._element = element;
         this._elementName = element.id;
         
-        installCccEventsShield(element);
+        if(installCccEventsShield) { installCccEventsShield(element); }
     })
     .add({
         _options: baseOptions,
@@ -1564,7 +1581,7 @@ function(def, pvc, pv){
         _axesIds:    ['column', 'row', 'measure'],
 
         /* This takes creation time dependencies into account.
-         * It works right now. If ti doesn't scale,
+         * It works right now. If it doesn't scale,
          * then some parts of axes initialization must me taken out
          * of the axes class or split into more initialization phases.
          */
@@ -1731,48 +1748,6 @@ function(def, pvc, pv){
             return params;
         },
 
-        // TODO - is the current selection accounting needed?
-        /* Returns the colors to use.
-         * This needs to take into account selected and unselected items.
-        getColors: function() {
-            if(this._colors){
-                return this._colors;
-            }
-
-            var colors = null;
-
-            var paletteMap = this._vizOptions.metrics[0].paletteMap;
-            if(paletteMap) {
-                colors = [];
-                for(var r = 0 ; r < this._dataTable.getNumberOfRows() ; r++) {
-                    var item = this._getTableValue(r, 0);
-                    if(this._selections && this._selections.length > 0) {
-                        var done = false;
-                        for(var selIdx = 0 ; selIdx < this._selections.length ; selIdx++) {
-                            var selection = this._selections[selIdx];
-                            if((selection.type == 'row'    && selection.rowItem == item) ||
-                               (selection.type == 'column' && selection.colId == this._dataTable.getColumnId(1))) {
-                                colors.push(paletteMap[item]);
-                                done = true;
-                                break;
-                            }
-                        }
-
-                        if(!done) {
-                            // this item is not selected, so make it grey
-                            colors.push( "#bbbbbb" );
-                        }
-
-                    } else {
-                        colors.push(paletteMap[item]);
-                    }
-                }
-            }
-
-            return colors;
-        },
-        */
-
         /* HELPERS  */
 
         _initOptions: function(vizOptions){
@@ -1801,12 +1776,9 @@ function(def, pvc, pv){
                 'calculations',    []);
         },
        
-        _message: function(msgId, args){
-            return this._vizHelper.message(msgId, args);
-        },
+        _message: function(msgId, args) { return this._vizHelper.message(msgId, args); },
         
-        _setNullInterpolationMode: function(options, value){
-        },
+        _setNullInterpolationMode: function(options, value){ },
         
         _readUserOptions: function(options, vizOptions){
             // Apply vizOptions to extension points and others
@@ -2219,9 +2191,7 @@ function(def, pvc, pv){
             }
         },
 
-        _readData: function() {
-            this._readDataCrosstab();
-        },
+        _readData: function() { this._readDataCrosstab(); },
 
         /**
          * Creates a CCC resultset in CROSSTAB format.
@@ -2282,10 +2252,7 @@ function(def, pvc, pv){
             options.axisTitleFont = defaultFont(options.axisTitleFont, 12);
 
             if(!this._vizHelper.isInteractionEnabled()){
-                options.tooltipEnabled = false;
-                options.clickable    = false;
-                options.selectable   = false;
-                options.hoverable    = false;
+                options.interactive = false;
             } else {
                 if(options.tooltipEnabled){
                     this._configureTooltip();
@@ -2299,9 +2266,7 @@ function(def, pvc, pv){
             }
         },
         
-        _getColorScaleKind: function(){
-            return 'discrete';
-        },
+        _getColorScaleKind: function() { return 'discrete'; },
         
         _configureColor: function(colorScaleKind){
             var options = this.options;
@@ -2329,9 +2294,7 @@ function(def, pvc, pv){
             return this._getDefaultColorScale();
         },
         
-        _getDefaultColorScale: function(){
-            return this._vizOptions.palette.colors.slice();
-        },
+        _getDefaultColorScale: function() { return this._vizOptions.palette.colors.slice(); },
         
         _getColorScaleCore: function(memberPalette){
             var colorRoleId = this._discreteColorRole;
@@ -2448,8 +2411,6 @@ function(def, pvc, pv){
             containerStyle.overflowX = 'hidden';
             containerStyle.overflowY = 'auto';
             
-            options.multiChartMax = 50; // TODO: hardcoded multichart items limit
-            
             // Very small charts can't be dominated by text...
             //options.axisSizeMax = '30%';
             
@@ -2536,6 +2497,10 @@ function(def, pvc, pv){
                 options.legendAlignTo  = 'page-middle';
                 options.legendKeepInBounds = true; // ensure it is not placed off-page
                 
+                // Ensure that legend margins is an object.
+                // Preseve already specifed margins.
+                // CCC's default adds a left or right 5 px margin,
+                // to separate the legend from the content area.
                 var legendMargins = options.legendMargins;
                 if(legendMargins){
                     if(typeof(legendMargins) !== 'object'){
@@ -2543,6 +2508,8 @@ function(def, pvc, pv){
                     }
                 } else {
                     legendMargins = options.legendMargins = {};
+                    var oppositeSide = pvc.BasePanel.oppositeAnchor[legendPosition];
+                    legendMargins[oppositeSide] = 5;
                 }
                 
                 legendMargins.top = 20;
@@ -2561,8 +2528,8 @@ function(def, pvc, pv){
         // Logic that depends on width and height
         _prepareLayout: function(options){
             if(this._hasMultiChartColumns && pv.renderer() !== 'batik'){
-                // Account for the *possible* toolbar width
-                options.width -= 17; // assuming 18px is the minimum value (slight chart overlap)
+                // Account for the width of the *possible* scrollbar
+                options.width -= 17;
             }
         },
     
@@ -4035,10 +4002,10 @@ function(def, pvc, pv){
             return this.options.legend && this.axes.row.depth > 0;
         },
         
-        _readUserOptions: function(options, vizOptions){
+        _readUserOptions: function(options, vizOptions) {
             this.base(options, vizOptions);
             
-            options.valuesLabelFont = defaultFont(null, readFontSize(vizOptions, 'label'));
+            options.valuesFont = defaultFont(null, readFontSize(vizOptions, 'label'));
         },
         
         _configureMultiChart: function(){
@@ -4049,7 +4016,7 @@ function(def, pvc, pv){
         
         _configureValuesMask: function(){
             /* 
-             * Change values mask accoring to each category's
+             * Change values mask according to each category's
              * discriminated measure being PCTOF or not
              */
             var colAxis = this.axes.column;
@@ -4075,12 +4042,43 @@ function(def, pvc, pv){
             }
         },
         
-        _selectionExcludesMultiGems: function(){
-            // // When row selection is enabled it's ok
-            return false;//(this._gemCountColumnReportAxis === 0);
-        }
+        _selectionExcludesMultiGems: def.fun.constant(false)
     });
 
+    def
+    .type('pentaho.ccc.TreemapChart', pentaho.ccc.Chart)
+    .add({
+        _cccClass: 'pvc.TreemapChart',
+        
+        _rolesToCccDimensionsMap: {
+            'columns':  null,
+            'measures': null,
+            'size':     'size'
+        },
+        
+        _options: {
+            //rootCategoryLabel:  Set in configure
+            valuesVisible: true
+            //valuesOptimizeLegibility: true
+        },
+        
+        _discreteColorRole: 'rows',
+        
+        _configure: function() {
+            
+            this.base();
+            
+            this.options.rootCategoryLabel = this._message('chartTreeMapRootCategoryLabel');
+        },
+        
+        _readUserOptions: function(options, vizOptions) {
+            
+            this.base(options, vizOptions);
+            
+            options.valuesFont = defaultFont(null, readFontSize(vizOptions, 'label'));
+        }
+    });
+    
     def
     .type('pentaho.ccc.BulletChart', pentaho.ccc.Chart)
     .add({
