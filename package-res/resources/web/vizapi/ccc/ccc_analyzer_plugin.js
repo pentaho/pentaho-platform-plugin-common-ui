@@ -12,16 +12,10 @@ pen.define([
     
     // If necessary, declare **global** variable, initializing it with an array
     analyzerPlugins = typeof analyzerPlugins == "undefined" ? [] : analyzerPlugins;
-    
-    // TODO: temporary due to debug loading time problems
-    var registered = false;
+
     
     analyzerPlugins.push({
         init: function (){
-            
-            // TODO: temporary due to debug loading time problems
-            if(registered){ return; }
-            registered = true;
             
             dojo.declare("analyzer.CCCVizHelper", null, {
                 /**
@@ -473,7 +467,9 @@ pen.define([
                 
                 'ccc_scatter',
                 'ccc_barline',
-                'ccc_heatgrid'
+                'ccc_heatgrid',
+                
+                'ccc_treemap'
                 
                 //'ccc_waterfall',
                 //'ccc_boxplot'
