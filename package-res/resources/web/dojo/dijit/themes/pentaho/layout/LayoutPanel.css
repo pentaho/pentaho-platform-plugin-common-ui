@@ -135,6 +135,9 @@
   padding: 4px;
 }
 
+.pentahoPropertiesPanel .dijitTextBox {
+  width: 14em;
+}
 
 .pentahoPropertiesPanel .caption-text {
   font-size: .85em;
