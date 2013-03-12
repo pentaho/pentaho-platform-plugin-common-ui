@@ -2274,7 +2274,7 @@ function(def, pvc, pv){
             
             switch(colorScaleKind){
                 case 'discrete':
-                    options.colors = this._getColorScale();
+                    options.colors = this._getDiscreteColorScale();
                     break;
                     
                 case 'continuous':
@@ -2284,19 +2284,15 @@ function(def, pvc, pv){
             }
         },
         
-        _getColorScale: function(){
+        _getDiscreteColorScale: function(){
             var memberPalette = this._vizOptions.memberPalette;
-            if(memberPalette){
-                return this._getColorScaleCore(memberPalette) ||
-                       this._getDefaultColorScale();
-            }
-            
-            return this._getDefaultColorScale();
+            var colorScale = memberPalette && this._getDiscreteColorScaleCore(memberPalette);
+            return colorScale || this._getDefaultDiscreteColorScale();
         },
         
-        _getDefaultColorScale: function() { return this._vizOptions.palette.colors.slice(); },
+        _getDefaultDiscreteColorScale: function() { return this._vizOptions.palette.colors.slice(); },
         
-        _getColorScaleCore: function(memberPalette){
+        _getDiscreteColorScaleCore: function(memberPalette){
             var colorRoleId = this._discreteColorRole;
             if(colorRoleId){
                 // 1 - The CCC color role is not being explicitly set, so whatever goes to the series role is used by the color role
@@ -2352,7 +2348,7 @@ function(def, pvc, pv){
                                         }
                                       });
                         
-                        var defaultScale = pv.colors(this._getDefaultColorScale());
+                        var defaultScale = pv.colors(this._getDefaultDiscreteColorScale());
                         return function(){
                             var scale = function(compKey){
                                 if(compKey){
@@ -3636,9 +3632,7 @@ function(def, pvc, pv){
             this.options.shape = this._vizOptions.shape;
         },
         
-        _getColorScaleKind: function(){
-            return 'continuous';
-        },
+        _getColorScaleKind: function() { return 'continuous'; },
         
         _prepareLayout: function(options) {
             
@@ -4069,6 +4063,13 @@ function(def, pvc, pv){
             this.base();
             
             this.options.rootCategoryLabel = this._message('chartTreeMapRootCategoryLabel');
+        },
+        
+        _getDiscreteColorScale: function() {
+            // Don't use memberPalette for now
+            // as the given colors don't match the members that 
+            // are actually colored in this visualization type.
+            return this._getDefaultDiscreteColorScale();
         },
         
         _readUserOptions: function(options, vizOptions) {
