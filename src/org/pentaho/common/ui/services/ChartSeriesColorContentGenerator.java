@@ -36,7 +36,7 @@ import org.pentaho.platform.engine.services.solution.SimpleContentGenerator;
  * Mappings are defined in a JSON file.  Since we support two models today in Pentaho, then
  * there is a relational.json and mdx.json to store color mappings for the respective model type.
  * 
- * The MDX type JSON structure is Level->Member->Color
+ * The MDX type JSON structure is Catalog->Level->Member->Color
  * 
  * This information is provided to a visualization and it is up to to the visualization
  * to implement the rules on how the color information is used.  For example, a single
