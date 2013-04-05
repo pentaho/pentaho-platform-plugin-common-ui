@@ -2,8 +2,12 @@ pen.define(['common-ui/prompting/pentaho-prompting-bind', 'common-ui/prompting/p
   // Executes button.expression() in the scope of the button component (instead of the button)
   window.ScopedPentahoButtonComponent = BaseComponent.extend({
     update : function() {
-      $("<button type='button' class='pentaho-button'/>").text(this.label).unbind("click").bind("click", this.expression.bind(this)).button().appendTo($("#"+ this.htmlObject).empty());
-    }
+      this.registerSubmitClickEvent();
+    },
+
+     registerSubmitClickEvent: function() {
+        $("<button type='button' class='pentaho-button'/>").text(this.label).unbind("click").bind("click", this.expression.bind(this)).button().appendTo($("#"+ this.htmlObject).empty());
+     }
   });
 
   window.SubmitPromptComponent = ScopedPentahoButtonComponent.extend({
@@ -14,6 +18,10 @@ pen.define(['common-ui/prompting/pentaho-prompting-bind', 'common-ui/prompting/p
 
     update: function() {
       this.base();
+
+      // Register the click event for the parameter 'View Report' button to invoke panel's submit to update report
+      this.registerSubmitClickEvent();
+
       // BISERVER-3821 Provide ability to remove Auto-Submit check box from report viewer
       // only show the UI for the autosubmit checkbox if no preference exists
       if (this.paramDefn.autoSubmit == undefined) {
