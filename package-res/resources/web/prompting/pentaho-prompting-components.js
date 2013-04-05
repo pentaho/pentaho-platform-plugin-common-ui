@@ -1,8 +1,19 @@
 pen.define(['common-ui/prompting/pentaho-prompting-bind', 'common-ui/prompting/pentaho-prompting-builders', 'cdf/cdf-module'], function() {
   // Executes button.expression() in the scope of the button component (instead of the button)
   window.ScopedPentahoButtonComponent = BaseComponent.extend({
+    viewReportButtonRegistered: false,
+
     update : function() {
-      $("<button type='button' class='pentaho-button'/>").text(this.label).unbind("click").bind("click", this.expression.bind(this)).button().appendTo($("#"+ this.htmlObject).empty());
+        if (!this.viewReportButtonRegistered) {
+            this.registerSubmitClickEvent();
+        }
+    },
+
+    registerSubmitClickEvent: function() {
+        if (!this.viewReportButtonRegistered) {
+            $("<button type='button' class='pentaho-button'/>").text(this.label).unbind("click").bind("click", this.expression.bind(this)).button().appendTo($("#"+ this.htmlObject).empty());
+            this.viewReportButtonRegistered = true;
+        }
     }
   });
 
@@ -14,7 +25,12 @@ pen.define(['common-ui/prompting/pentaho-prompting-bind', 'common-ui/prompting/p
 
     update: function() {
       this.base();
-      // BISERVER-3821 Provide ability to remove Auto-Submit check box from report viewer
+
+      // Register the click event for the parameter 'Submit' button to invoke panel's submit to update report.  Don't wait
+      // for base class to register it because it would be too late (PRD-4101)
+      this.registerSubmitClickEvent();
+
+        // BISERVER-3821 Provide ability to remove Auto-Submit check box from report viewer
       // only show the UI for the autosubmit checkbox if no preference exists
       if (this.paramDefn.autoSubmit == undefined) {
         var checkboxStr = '<label class="auto-complete-checkbox"><input onclick=\'SubmitPromptComponent.prototype.updateAutoSubmit("' + this.name + '")\'';
@@ -314,6 +330,10 @@ pen.define(['common-ui/prompting/pentaho-prompting-bind', 'common-ui/prompting/p
           Dashboards.processChange(this.name);
         }
       }.bind(this));
+
+      input.focusout(function(e) {
+        Dashboards.processChange(this.name);
+       }.bind(this));
     },
 
     getValue: function() {
