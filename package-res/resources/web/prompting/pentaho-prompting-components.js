@@ -1,13 +1,20 @@
 pen.define(['common-ui/prompting/pentaho-prompting-bind', 'common-ui/prompting/pentaho-prompting-builders', 'cdf/cdf-module'], function() {
   // Executes button.expression() in the scope of the button component (instead of the button)
   window.ScopedPentahoButtonComponent = BaseComponent.extend({
+    viewReportButtonRegistered: false,
+
     update : function() {
-      this.registerSubmitClickEvent();
+        if (!this.viewReportButtonRegistered) {
+            this.registerSubmitClickEvent();
+        }
     },
 
-     registerSubmitClickEvent: function() {
-        $("<button type='button' class='pentaho-button'/>").text(this.label).unbind("click").bind("click", this.expression.bind(this)).button().appendTo($("#"+ this.htmlObject).empty());
-     }
+    registerSubmitClickEvent: function() {
+        if (!this.viewReportButtonRegistered) {
+            $("<button type='button' class='pentaho-button'/>").text(this.label).unbind("click").bind("click", this.expression.bind(this)).button().appendTo($("#"+ this.htmlObject).empty());
+            this.viewReportButtonRegistered = true;
+        }
+    }
   });
 
   window.SubmitPromptComponent = ScopedPentahoButtonComponent.extend({
