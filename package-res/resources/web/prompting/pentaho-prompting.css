@@ -25,7 +25,11 @@ div.prompt-panel div.parameter-label {
 
 div.prompt-panel div.parameter-wrapper {
   overflow: auto;
-  margin: 4px;
+
+  /* [BISERVER-8807] - Fix IE9 bug with tables growing when css styles added dynamically
+   * http://stackoverflow.com/questions/5788726/add-remove-css-will-cause-ie9-to-increase-the-tables-height
+   */
+  margin: auto 4px 4px 4px;
 }
 
 div.prompt-panel div.flow div.parameter {
