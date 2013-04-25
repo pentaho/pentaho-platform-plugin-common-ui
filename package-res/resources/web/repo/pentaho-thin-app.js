@@ -132,6 +132,12 @@ this.collapseBrowsePanel = function() {
         window.parent.executeCommand("CollapseBrowserCommand");
 	}
 }
+
+this.showBrowsePanel = function() {
+  if( this.console_enabled){
+        window.parent.executeCommand("ShowBrowserCommand");
+  }
+}
   
 }
 
