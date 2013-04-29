@@ -64,7 +64,7 @@ img {
 }
 
 label {
-    font-size: .85em;
+    font-size: 13px;
 }
 
 .scroll-panel {
@@ -188,7 +188,7 @@ has no buttons add an addition class to your element, pentaho-dialog-buttonless,
 .dialog-content {
     border: 1px solid #848484;
     background: white;
-    font-size: .85em;
+    font-size: 13px;
 }
 
 .dialog-content fieldset {
@@ -302,7 +302,7 @@ has no buttons add an addition class to your element, pentaho-dialog-buttonless,
 .pentaho-tabWidget .pentaho-tabWidgetLabel {
     margin: 0px;
     padding-bottom: 0px;
-    font-size: .8em;
+    font-size: 13px;
     white-space: nowrap;
 }
 
@@ -327,7 +327,7 @@ has no buttons add an addition class to your element, pentaho-dialog-buttonless,
 .pentaho-tabWidget-selected .pentaho-tabWidgetLabel {
     margin: 0px;
     padding-bottom: 0px;
-    font-size: .8em;
+    font-size: 13px;
     white-space: nowrap;
     color: #000;
 }
@@ -777,7 +777,7 @@ has no buttons add an addition class to your element, pentaho-dialog-buttonless,
     /* Firefox */
     background: -moz-linear-gradient(#eceeee, #f4f5f5 10%, #e3ebed 50%, #d4dee0 55%, #d1d5d6 90%) repeat scroll 0 0 transparent;
 
-    font-size: .75em;
+    font-size: 12px;
     color: #000;
     padding: 5px 14px;
     border: 1px solid #666;
@@ -948,7 +948,7 @@ has no buttons add an addition class to your element, pentaho-dialog-buttonless,
 
 .pentaho-titled-toolbar .pentaho-titled-toolbar-label {
     color: #000;
-    font-size: 0.8em;
+    font-size: 13px;
 }
 
 .pentaho-transparent {
@@ -1141,7 +1141,7 @@ has no buttons add an addition class to your element, pentaho-dialog-buttonless,
 .pentaho-disclosure-panel .header td {
     /* text-shadow: 1px 2px 2px rgba(22, 24, 27, 0.5);*/
     color: #000;
-    font-size: 0.8em;
+    font-size: 13px;
 }
 
 .pentaho-disclosure-panel-openicon {
@@ -1472,13 +1472,13 @@ box-shadow: 2px 2px 6px 1px #747474;*/
 .login-panel {
     height: 100%;
     width: 100%;
-    font-size: 0.85em;
+    font-size: 13px;
     /* text-shadow: rgba(255, 255, 255, 0.398438) 0px 1px 0px;*/
     padding: 5px;
 }
 
 .login-panel-label {
-    font-size: 0.85em;
+    font-size: 13px;
     /* text-shadow: rgba(255, 255, 255, 0.398438) 0px 1px 0px;*/
 }
 
@@ -2025,7 +2025,7 @@ box-shadow: 2px 2px 6px 1px #747474;*/
 
 .dragDropTargetAreaHint {
     color: #898b8f;
-    font-size: 1.2em;
+    font-size: 16px;
     text-align: center;
 }
 
@@ -2049,7 +2049,7 @@ box-shadow: 2px 2px 6px 1px #747474;*/
 .splashtitle {
     padding-top: 25px;
     color: white;
-    font-size: 1.3em;
+    font-size: 18px;
     vertical-align: top;
     heightx: 60px;
 }
@@ -2127,7 +2127,7 @@ box-shadow: 2px 2px 6px 1px #747474;*/
 }
 
 .gwt-ScrollTable .headerTable td {
-    font-size: .8em;
+    font-size: 13px;
     color: #000;
     background: #c7c8c9;
     /* Safari/Chrome */
