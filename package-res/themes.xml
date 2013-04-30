@@ -2,6 +2,7 @@
 <themes root-folder="resources/themes">
   <onyx display-name="Onyx" system="true">
     <file>globalOnyx.css</file>
+    <file>bootstrap/css/bootstrap-namespaced.css</file>
   </onyx>
   <slate display-name="Slate" system="true" hidden="true">
     <file>globalSlate.css</file>
