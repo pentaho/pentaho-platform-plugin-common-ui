@@ -1,20 +1,26 @@
-pen.define(["common-ui/util/Glasspane", "common-ui/util/PentahoSpinner"], function(glasspane, spin) {
+pen.define(["common-ui/util/Glasspane", "common-ui/util/PentahoSpinner"], function(Glasspane, spin) {
 
-  var busy = function() {};
-  busy.prototype = {
-
+  var busy = {
     id: "pentaho-busy-indicator",
-    fadeInDuration: 200,
+    fadeInDuration: 0,
     fadeOutDuration: 500,
     spinner: null,
-    message: "",
-    title: "",
+    glasspane: undefined,
+    $busyIndicator: undefined,
+    isShowing: false,
 
     show: function(/*String*/ title, /*String*/ message) {
-      this.message = message;
-      this.title = title;
-      glasspane.show();
-      var widget = this.getContainer();
+      if(this.isShowing) {
+        console.log("still showing spinner, don't need another");
+        return;
+      }
+      this.isShowing = true;
+
+      this.glasspane = new Glasspane();
+
+      // if we are busy, no one is above us except the waitPopup (it has zIndex of 20001 by default)
+      var zIndex = 20000;
+      this.glasspane.show(zIndex);
 
       if(this.spinner == null) {
         var config = spin.getLargeConfig();
@@ -22,28 +28,22 @@ pen.define(["common-ui/util/Glasspane", "common-ui/util/PentahoSpinner"], functi
       }
 
       // only create the DOM element if it's not already there
-      if(!widget.get(0)) {
-        var html = "<div id='" + this.id + "' class='busy-indicator-container waitPopup'>" +
-            "  <div id='pentaho-busy-indicator-spinner' class='pentaho-busy-indicator-spinner'></div>" +
-            "  <div id='pentaho-busy-indicator-msg-container' class='pentaho-busy-indicator-msg-contianer'>" +
-            "    <div id='pentaho-busy-indicator-title' class='pentaho-busy-indicator-title waitPopup_title'></div>" +
-            "    <div id='pentaho-busy-indicator-message' class='pentaho-busy-indicator-message waitPopup_msg'></div>" +
-            "  </div>" +
-            "</div>";
-        $(window.top.document.body).append(html);
-      } else {
-        // it's already available to use, just show it
-      }
+      this.$busyIndicator = $(
+          "<div class='busy-indicator-container waitPopup'>" +
+          "  <div class='pentaho-busy-indicator-spinner'></div>" +
+          "  <div class='pentaho-busy-indicator-msg-contianer'>" +
+          "    <div class='pentaho-busy-indicator-title waitPopup_title'>" + title + "</div>" +
+          "    <div class='pentaho-busy-indicator-message waitPopup_msg'>" + message + "</div>" +
+          "  </div>" +
+          "</div>"
+      );
+      $(window.top.document.body).append(this.$busyIndicator);
 
-      var msg = $(window.top.document).find("#pentaho-busy-indicator-message");
-      msg.html(this.message);
-
-      var title = $(window.top.document).find("#pentaho-busy-indicator-title");
-      title.html(this.title);
-
-      this.getContainer().fadeIn(this.fadeInDuration);
-      var container = $(window.top.document).find("#pentaho-busy-indicator-spinner");
-      this.spinner.spin(container.get(0));
+      var that = this;
+      this.$busyIndicator.fadeIn(this.fadeInDuration, function() {
+        var container = $(window.top.document).find(".busy-indicator-container > .pentaho-busy-indicator-spinner");
+        that.spinner.spin(container.get(0));
+      });
 
     },
 
@@ -51,18 +51,28 @@ pen.define(["common-ui/util/Glasspane", "common-ui/util/PentahoSpinner"], functi
      * hide it
      */
     hide: function() {
-      this.spinner.stop();
-      this.getContainer().fadeOut(this.fadeOutDuration);
-      glasspane.hide();
-    },
+      if(this.isShowing) {
+        if(this.$busyIndicator) {
+          var that = this;
+          this.$busyIndicator.fadeOut(this.fadeOutDuration, function() {
+            that.spinner.stop();
+            if(that.$busyIndicator) {
+              that.$busyIndicator.remove();
+              that.$busyIndicator = undefined;
+            }
+            that.isShowing = false;
+          });
+        }
+        if(this.glasspane) {
+          this.glasspane.hide();
+          this.glasspane = undefined;
+        }
 
-    getContainer: function() {
-      // no matter where this is called from, it goes all the way to the top
-      return $(window.top.document).find("#" + this.id);
+      }
     }
 
-
   };
+
   return busy;
 
 });
