@@ -38,6 +38,12 @@ pen.define(["common-ui/util/Glasspane", "common-ui/util/PentahoSpinner"], functi
           "</div>"
       );
       $(window.top.document.body).append(this.$busyIndicator);
+      // adding the styles after the elements are added to the DOM due to an obscure chrome/safari issue where
+      // styles weren't getting applied when added in the html declaration
+      this.$busyIndicator.addClass('waitPopup');
+      this.$busyIndicator.find('.pentaho-busy-indicator-title').addClass('waitPopup_title');
+      this.$busyIndicator.find('.pentaho-busy-indicator-message').addClass('waitPopup_msg');
+
 
       var that = this;
       this.$busyIndicator.fadeIn(this.fadeInDuration, function() {
