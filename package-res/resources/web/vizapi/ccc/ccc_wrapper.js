@@ -1493,7 +1493,7 @@ function(def, pvc, pv){
         orthoAxisGrid: true,
         
         /* Continuous axes */
-        continuousAxisLabelSpacingMin: 1, // em
+        continuousAxisLabelSpacingMin: 1.1, // em
         
         /* Title */
         titlePosition: 'top',
