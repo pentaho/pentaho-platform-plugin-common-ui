@@ -4,6 +4,10 @@
     <file>globalOnyx.css</file>
     <file>bootstrap/css/bootstrap-namespaced.css</file>
   </onyx>
+  <clean display-name="Clean" system="true">
+    <file>globalClean.css</file>
+    <file>bootstrap/css/bootstrap-namespaced.css</file>
+  </clean>
   <slate display-name="Slate" system="true" hidden="true">
     <file>globalSlate.css</file>
   </slate>
