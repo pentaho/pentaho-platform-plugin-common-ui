@@ -4,10 +4,10 @@
     <file>globalOnyx.css</file>
     <file>bootstrap/css/bootstrap-namespaced.css</file>
   </onyx>
-  <clean display-name="Clean" system="true">
-    <file>globalClean.css</file>
+  <crystal display-name="Crystal" system="true">
+    <file>globalCrystal.css</file>
     <file>bootstrap/css/bootstrap-namespaced.css</file>
-  </clean>
+  </crystal>
   <slate display-name="Slate" system="true" hidden="true">
     <file>globalSlate.css</file>
   </slate>
