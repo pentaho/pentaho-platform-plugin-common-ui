@@ -4,54 +4,75 @@ pen.define(['common-ui/prompting/pentaho-prompting-bind', 'common-ui/prompting/p
     viewReportButtonRegistered: false,
 
     update : function() {
-        if (!this.viewReportButtonRegistered) {
-            this.registerSubmitClickEvent();
-        }
+      this.registerSubmitClickEvent();
     },
 
+    // Registers the click event for the parameter 'View Report' button
+    // to invoke panel's submit to update report
     registerSubmitClickEvent: function() {
-        if (!this.viewReportButtonRegistered) {
-            $("<button type='button' class='pentaho-button'/>").text(this.label).unbind("click").bind("click", this.expression.bind(this)).button().appendTo($("#"+ this.htmlObject).empty());
-            this.viewReportButtonRegistered = true;
-        }
-    }
+      if (!this.viewReportButtonRegistered) {
+
+        var $container = $("#" + this.htmlObject)
+          .empty();
+
+        $("<button type='button' class='pentaho-button'/>")
+          .text(this.label)
+          .bind("mousedown", this.expressionStart.bind(this))
+          .bind("click", function(){
+            // Don't let click-event go as first argument.
+            this.expression(false);
+           }.bind(this))
+          .button()
+          .appendTo($container);
+
+        this.viewReportButtonRegistered = true;
+      }
+    },
+
+    expressionStart: function(){}
   });
 
   window.SubmitPromptComponent = ScopedPentahoButtonComponent.extend({
-    updateAutoSubmit: function(name) {
-      var c = Dashboards.getComponentByName(name);
-      c.promptPanel.autoSubmit = undefined !== $('#' + c.htmlObject + ' input:checked').val();
-    },
-
     update: function() {
+
       this.base();
 
-      // Register the click event for the parameter 'View Report' button to invoke panel's submit to update report
-      this.registerSubmitClickEvent();
+      var promptPanel = this.promptPanel;
 
       // BISERVER-3821 Provide ability to remove Auto-Submit check box from report viewer
-      // only show the UI for the autosubmit checkbox if no preference exists
+      // only show the UI for the auto-submit check-box if no preference exists
+      // TODO: true/false is irrelevant?
       if (this.paramDefn.autoSubmit == undefined) {
-        var checkboxStr = '<label class="auto-complete-checkbox"><input onclick=\'SubmitPromptComponent.prototype.updateAutoSubmit("' + this.name + '")\'';
-        if (this.promptPanel.autoSubmit) {
-          checkboxStr += ' checked="checked"';
-        }
-        checkboxStr += ' type="checkbox"/>' + this.autoSubmitLabel + '</label>';
-        $(checkboxStr).appendTo($('#'+ this.htmlObject));
+        var checkboxStr = '<label class="auto-complete-checkbox">' +
+                            '<input type="checkbox"' +
+                              (promptPanel.autoSubmit ? ' checked="checked"' : '') +
+                            ' />' +
+                            this.autoSubmitLabel +
+                          '</label>';
+
+        $(checkboxStr)
+          .appendTo($('#' + this.htmlObject))
+          .bind('click', function(ev) { promptPanel.autoSubmit = ev.target.checked; });
       }
-      if (this.promptPanel.autoSubmit) {
-        this.expression();
+
+      // BISERVER-6915 Should not request pagination when auto-submit is set to false
+      if (promptPanel.forceAutoSubmit || promptPanel.autoSubmit) {
+        this.expression(/*isInit*/true);
       }
     },
 
-    expression: function() {
-      this.promptPanel._submit();
+    expression: function(isInit) {
+      this.promptPanel._submit({isInit: isInit});
+    },
+
+    expressionStart: function() {
+      this.promptPanel._submitStart();
     }
   });
 
   /**
    * This is a component that contains other components and can optionally wrap all components in a
-   * <fieldset> to provide a title for the container.
+   * &lt;fieldset&gt; to provide a title for the container.
    */
   window.CompositeComponent = BaseComponent.extend({
     components: undefined, // array of components
@@ -66,7 +87,7 @@ pen.define(['common-ui/prompting/pentaho-prompting-bind', 'common-ui/prompting/p
       if(this.components){
         $.each(this.components, function(i, c) {
           c.clear();
-        });  
+        });
       }
       this.base();
     },
@@ -119,19 +140,32 @@ pen.define(['common-ui/prompting/pentaho-prompting-bind', 'common-ui/prompting/p
       return html;
     }
   });
-
+  
+  /**
+   * Pre-order traversal of a component and its descendants.
+   */
+  window.CompositeComponent.mapComponents = function(c, f, x) {
+      f.call(x, c);
+      if (c.components) { window.CompositeComponent.mapComponentsList(c.components, f, x); }
+      return c;
+  };
+  
+  /**
+   * Pre-order traversal of components given a list of root components.
+   */
+  window.CompositeComponent.mapComponentsList = function(comps, f, x) {
+    var me = this;
+    $.each(comps, function(i, c) { me.mapComponents(c, f, x); });
+    return me;
+  };
+  
   /**
    * Base Prompting Component that builds a layout
    */
   window.PromptLayoutComponent = CompositeComponent.extend({
-
     getClassFor: function(component) {
       if (!component.param) { return; }
       return 'parameter' + (component.cssClass ? ' ' + component.cssClass : '');
-    },
-
-    update: function() {
-      this.base();
     }
   });
 
@@ -254,8 +288,8 @@ pen.define(['common-ui/prompting/pentaho-prompting-bind', 'common-ui/prompting/p
       dojo.require("pentaho.common.TextButtonCombo");
       var parameterValue = Dashboards.getParameterValue(this.parameter);
 
-      var container = $('#' + this.htmlObject);
-      container.empty();
+      var container = $('#' + this.htmlObject)
+        .empty();
 
       var textInputComboId = this.htmlObject + '-textButtonCombo';
       var textInputComboElement = '<div id="' + textInputComboId + '"></div>';
@@ -263,13 +297,13 @@ pen.define(['common-ui/prompting/pentaho-prompting-bind', 'common-ui/prompting/p
       var textInputCombo = new pentaho.common.TextButtonCombo({}, textInputComboId);
       textInputCombo.set('textPlaceHolder', 'file path...');
       textInputCombo.set('value', parameterValue); // set initial value
-      
+
       // get button label
       var buttonLabel = this.param.attributes['button-label'];
       if(buttonLabel != null && buttonLabel != ''){
         textInputCombo.set('buttonLabel', buttonLabel);
       }
-      
+
       // override onClickCallback
       textInputCombo.onClickCallback = dojo.hitch(this, function(currentValue){
         try{
@@ -280,16 +314,15 @@ pen.define(['common-ui/prompting/pentaho-prompting-bind', 'common-ui/prompting/p
           };
           c.param.values = [currentValue]; // insert current value
           c.promptPanel.getExternalValueForParam(c.param, resultCallback); // request new value from prompt panel
-        }
-        catch(error){
-          console.error(error);   
+        } catch(error) {
+          if(typeof console !== 'undefined' && console.error) { console.error(error); }
         }
       });
       this.dijitId = textInputComboId;
 
       // override onChangeCallback
       textInputCombo.onChangeCallback = dojo.hitch(this, function(newValue){
-        Dashboards.processChange(this.name);  
+        Dashboards.processChange(this.name);
       });
     },
 
@@ -376,18 +409,23 @@ pen.define(['common-ui/prompting/pentaho-prompting-bind', 'common-ui/prompting/p
           });
           response(matches);
         }.bind(this),
+
         // change() is called on blur
-        change: function(event, ui) {
-          // blur wasn't good enough. clicking of the submit button without clicking out of the text component
-          // doesn't trigger blur. so modified text fields can have a stale value.
-          // we now use the jQuery ui focusout event on the input.
-        }.bind(this),
+        //change: function(event, ui) {
+        // blur wasn't good enough.
+        // clicking on the submit button without previously moving out of the text component
+        // doesn't trigger blur on time, because jQuery.autocomplete fires changing on a setTimeout,
+        // Causing the click to be processed before the change.
+        // We now use the jQuery ui focusout event on the input.
+        //}.bind(this),
+
         // select() is called when an item from the menu is selected
         select: function(event, ui) {
           $('#' + this.htmlObject + '-input').val(ui.item.value);
           Dashboards.processChange(this.name);
         }.bind(this)
       });
+
       // Fire a change any time the user presses enter on the field
       input.keypress(function(e) {
         if (e.which === 13) {
@@ -395,8 +433,15 @@ pen.define(['common-ui/prompting/pentaho-prompting-bind', 'common-ui/prompting/p
         }
       }.bind(this));
 
+      var _inValue;
+      input.focus(function() {
+        _inValue = this.getValue();
+      }.bind(this));
+
       input.focusout(function() {
-        Dashboards.processChange(this.name);
+      if(_inValue !== this.getValue()) {
+          Dashboards.processChange(this.name);
+        }
       }.bind(this));
     },
 
