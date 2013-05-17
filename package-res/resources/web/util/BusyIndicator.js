@@ -11,7 +11,7 @@ pen.define(["common-ui/util/Glasspane", "common-ui/util/PentahoSpinner"], functi
 
     show: function(/*String*/ title, /*String*/ message) {
       if(this.isShowing) {
-        console.log("still showing spinner, don't need another");
+        if(typeof console !== 'undefined' && console.log) { console.log("still showing spinner, don't need another"); }
         return;
       }
       this.isShowing = true;
