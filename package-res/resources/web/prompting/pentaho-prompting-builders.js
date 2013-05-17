@@ -39,9 +39,12 @@ pen.define(['cdf/cdf-module', 'common-ui/prompting/pentaho-prompting-bind'], fun
       var layout = {
         name: name,
         type: 'ScrollingPromptPanelLayoutComponent',
-        htmlObject: promptPanel.destinationId,
+        htmlObject:  promptPanel.destinationId,
         promptPanel: promptPanel,
-        components: promptPanel.buildPanelComponents()
+        components:  promptPanel.buildPanelComponents(),
+        postExecution: function() {
+          promptPanel._ready();
+        }
       };
       return layout;
     }
@@ -83,7 +86,7 @@ pen.define(['cdf/cdf-module', 'common-ui/prompting/pentaho-prompting-bind'], fun
           builder = eval('new ' + name + '()');
           this.cache[name] = builder;
         } catch (e) {
-          console.log('Unable to create widget builder of type "' + name + '"');
+          if(typeof console !== 'undefined' && console.log) { console.log('Unable to create widget builder of type "' + name + '"'); }
           throw e;
         }
       }
@@ -105,32 +108,15 @@ pen.define(['cdf/cdf-module', 'common-ui/prompting/pentaho-prompting-bind'], fun
     build: function(args) {
       var guid = args.promptPanel.generateWidgetGUID();
 
-      var components = [];
-      if (args.promptPanel.paramDefn.subscribe) {
-        var scheduleGuid = args.promptPanel.generateWidgetGUID();
-        components.push({
-          type: 'ScopedPentahoButtonComponent',
-          name: scheduleGuid,
-          htmlObject: scheduleGuid,
-          label: args.promptPanel.getString('scheduleButtonLabel', 'Schedule'),
-          expression: function() {
-            args.promptPanel._schedule();
-          },
-          postExecution: function() {
-            $('#' + this.htmlObject).addClass('schedule-button-container');
-          },
-          executeAtStart: true
-        });
-      }
-
-      components.push(pentaho.common.prompting.builders.WidgetBuilder.build(args, 'submit'));
       return {
         type: 'FlowPromptLayoutComponent',
         promptType: 'submit',
         name: guid,
         htmlObject: guid,
         executeAtStart: true,
-        components: components
+        components: [
+          pentaho.common.prompting.builders.WidgetBuilder.build(args, 'submit')
+        ]
       }
     }
   });
@@ -348,12 +334,7 @@ pen.define(['cdf/cdf-module', 'common-ui/prompting/pentaho-prompting-bind'], fun
 
     build: function(args) {
       var guid = args.promptPanel.generateWidgetGUID();
-
-      // Only provide a parameter group label for subscription groups
       var label = undefined;
-      if (args.promptPanel.paramDefn.subscribe) {
-        label = args.paramGroup.label || ''; // Empty label will cause the legend to be drawn to outline the section without any text
-      }
 
       return {
         type: this.lookupPromptType(args.promptPanel.paramDefn),
