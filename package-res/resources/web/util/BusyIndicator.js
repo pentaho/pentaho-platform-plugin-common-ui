@@ -17,7 +17,7 @@ pen.define(["common-ui/util/Glasspane", "common-ui/util/PentahoSpinner"], functi
          ********************************************/
         show: function(/*String*/ title, /*String*/ message, /*String*/ indicatorId) {
 
-            if(indicatorId != null){
+            if( ( indicatorId != null ) && ( typeof indicatorId != 'undefined' ) ){
                 this.indicators.push(indicatorId);
             }
 
@@ -70,7 +70,7 @@ pen.define(["common-ui/util/Glasspane", "common-ui/util/PentahoSpinner"], functi
          */
         hide: function(/*String*/ indicatorId) {
             // if passed an id, delete from the array
-            if(indicatorId != null){
+            if( ( indicatorId != null ) && ( typeof indicatorId != 'undefined' ) ){
                 if (this.indicators.length > 0) {
                     this.indicators.splice(this.indicators.lastIndexOf(indicatorId),1);
                 }
