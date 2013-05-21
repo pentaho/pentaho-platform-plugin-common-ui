@@ -71,8 +71,14 @@ pen.define(["common-ui/util/Glasspane", "common-ui/util/PentahoSpinner"], functi
         hide: function(/*String*/ indicatorId) {
             // if passed an id, delete from the array
             if( ( indicatorId != null ) && ( typeof indicatorId != 'undefined' ) ){
-                if (this.indicators.length > 0) {
-                    this.indicators.splice(this.indicators.lastIndexOf(indicatorId),1);
+                var L = this.indicators.length;
+                if (L) {
+                    for(var i = L - 1 ; i >= 0; i--) {
+                        if(this.indicators[i] === indicatorId) {
+                            this.indicators.splice(i, 1);
+                            break;
+                        }
+                    }
                 }
             }
 
