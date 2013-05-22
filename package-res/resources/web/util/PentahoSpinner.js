@@ -6,9 +6,9 @@
 
 
 /**
-  Example Usage:
+ Example Usage:
 
-    pen.require(['common-ui/util/PentahoSpinner'], function(spin) {
+ pen.require(['common-ui/util/PentahoSpinner'], function(spin) {
       var config = spin.getMediumConfig();
 
       // override the color
@@ -29,7 +29,7 @@
       spinner.stop();
 
     });
-*/
+ */
 
 pen.define(['common-ui/util/spin.min', 'common-ui/util/Glasspane'], function(spinJs, glasspane) {
 
@@ -38,16 +38,16 @@ pen.define(['common-ui/util/spin.min', 'common-ui/util/Glasspane'], function(spi
     /* 16x16 */
     getSmallConfig: function() {
       return {
-        lines: 9, // The number of lines to draw
+        lines: 5, // The number of lines to draw
         length: 3, // The length of each line
-        width: 2, // The line thickness
+        width: 3, // The line thickness
         radius: 3, // The radius of the inner circle
         corners: 1, // Corner roundness (0..1)
-        rotate: 0, // The rotation offset
+        rotate: 90, // The rotation offset
         // color will be overriden by themed css (globalOnyx.css for example) -- .spinner div > div{...}
         color: '#FFF', // #rgb or #rrggbb
         speed: 1, // Rounds per second
-        trail: 60, // Afterglow percentage
+        trail: 100, // Afterglow percentage
         shadow: false, // Whether to render a shadow
         hwaccel: false, // Whether to use hardware acceleration
         className: 'spinner small-spinner', // The CSS class to assign to the spinner
@@ -60,16 +60,16 @@ pen.define(['common-ui/util/spin.min', 'common-ui/util/Glasspane'], function(spi
     /* 32x32 */
     getMediumConfig: function() {
       return {
-        lines: 11, // The number of lines to draw
+        lines: 7, // The number of lines to draw
         length: 7, // The length of each line
-        width: 3, // The line thickness
+        width: 4, // The line thickness
         radius: 6, // The radius of the inner circle
         corners: 1, // Corner roundness (0..1)
-        rotate: 0, // The rotation offset
+        rotate: 90, // The rotation offset
         // color will be overriden by themed css (globalOnyx.css for example) -- .spinner div > div{...}
         color: '#FFF', // #rgb or #rrggbb
         speed: 1, // Rounds per second
-        trail: 60, // Afterglow percentage
+        trail: 100, // Afterglow percentage
         shadow: false, // Whether to render a shadow
         hwaccel: false, // Whether to use hardware acceleration
         className: 'spinner medium-spinner', // The CSS class to assign to the spinner
@@ -82,16 +82,16 @@ pen.define(['common-ui/util/spin.min', 'common-ui/util/Glasspane'], function(spi
     /* 48x48 */
     getLargeConfig: function() {
       return {
-        lines: 13, // The number of lines to draw
-        length: 10, // The length of each line
-        width: 4, // The line thickness
-        radius: 10, // The radius of the inner circle
+        lines: 9, // The number of lines to draw
+        length: 9, // The length of each line
+        width: 5, // The line thickness
+        radius: 7, // The radius of the inner circle
         corners: 1, // Corner roundness (0..1)
-        rotate: 0, // The rotation offset
+        rotate: 90, // The rotation offset
         // color will be overriden by themed css (globalOnyx.css for example) -- .spinner div > div{...}
         color: '#FFF', // #rgb or #rrggbb
         speed: 1, // Rounds per second
-        trail: 60, // Afterglow percentage
+        trail: 100, // Afterglow percentage
         shadow: false, // Whether to render a shadow
         hwaccel: false, // Whether to use hardware acceleration
         className: 'spinner large-spinner', // The CSS class to assign to the spinner
