@@ -41,12 +41,14 @@ pen.define(["common-ui/util/Glasspane", "common-ui/util/PentahoSpinner"], functi
             // only create the DOM element if it's not already there
             this.$busyIndicator = $(
                 "<div class='busy-indicator-container waitPopup'>" +
-                    "  <div class='pentaho-busy-indicator-spinner'></div>" +
-                    "  <div class='pentaho-busy-indicator-msg-contianer'>" +
-                    "    <div class='pentaho-busy-indicator-title waitPopup_title'>" + title + "</div>" +
-                    "    <div class='pentaho-busy-indicator-message waitPopup_msg'>" + message + "</div>" +
-                    "  </div>" +
-                    "</div>"
+                "  <div class='busy-indicator-container-wrapper'>" +
+                "    <div class='pentaho-busy-indicator-spinner'></div>" +
+                "    <div class='pentaho-busy-indicator-msg-contianer'>" +
+                "      <div class='pentaho-busy-indicator-title waitPopup_title'>" + title + "</div>" +
+                "      <div class='pentaho-busy-indicator-message waitPopup_msg'>" + message + "</div>" +
+                "    </div>" +
+                "  </div>" +
+                "</div>"
             );
 
             $(window.top.document.body).append(this.$busyIndicator);
@@ -59,7 +61,7 @@ pen.define(["common-ui/util/Glasspane", "common-ui/util/PentahoSpinner"], functi
 
             var that = this;
             this.$busyIndicator.fadeIn(this.fadeInDuration, function() {
-                var container = $(window.top.document).find(".busy-indicator-container > .pentaho-busy-indicator-spinner");
+                var container = $(window.top.document).find(".busy-indicator-container-wrapper > .pentaho-busy-indicator-spinner");
                 that.spinner.spin(container.get(0));
             });
         },
