@@ -45,7 +45,7 @@ pen.define(['common-ui/util/spin.min', 'common-ui/util/Glasspane'], function(spi
         corners: 1, // Corner roundness (0..1)
         rotate: 90, // The rotation offset
         // color will be overriden by themed css (globalOnyx.css for example) -- .spinner div > div{...}
-        color: '#FFF', // #rgb or #rrggbb
+        color: '#999', // #rgb or #rrggbb
         speed: 1, // Rounds per second
         trail: 100, // Afterglow percentage
         shadow: false, // Whether to render a shadow
@@ -67,7 +67,7 @@ pen.define(['common-ui/util/spin.min', 'common-ui/util/Glasspane'], function(spi
         corners: 1, // Corner roundness (0..1)
         rotate: 90, // The rotation offset
         // color will be overriden by themed css (globalOnyx.css for example) -- .spinner div > div{...}
-        color: '#FFF', // #rgb or #rrggbb
+        color: '#999', // #rgb or #rrggbb
         speed: 1, // Rounds per second
         trail: 100, // Afterglow percentage
         shadow: false, // Whether to render a shadow
@@ -89,7 +89,7 @@ pen.define(['common-ui/util/spin.min', 'common-ui/util/Glasspane'], function(spi
         corners: 1, // Corner roundness (0..1)
         rotate: 90, // The rotation offset
         // color will be overriden by themed css (globalOnyx.css for example) -- .spinner div > div{...}
-        color: '#FFF', // #rgb or #rrggbb
+        color: '#999', // #rgb or #rrggbb
         speed: 1, // Rounds per second
         trail: 100, // Afterglow percentage
         shadow: false, // Whether to render a shadow
