@@ -854,6 +854,7 @@ body .dijitAlignClient { position: absolute; }
 .dj_ie .dijitSplitterCover {
 	background: white;
 	filter: alpha(opacity=0);
+	opacity: 0;
 }
 
 .dijitSplitterH {
