@@ -18,7 +18,7 @@ dojo.declare(
     "pentaho.common.propertiesPanel.Panel",
     [dijit.layout.ContentPane],
     {
-      captionTemplate: "<div class='caption'><span class='caption-text'>${ui.caption:i18n}&nbsp;&nbsp;</span><img class='captionIcon'/></div>",
+      captionTemplate: "<div class='caption'><span class='caption-text'>${ui.caption:i18n}&nbsp;&nbsp;</span><i class='captionIcon'></i></div>",
       seperatorTemplate: "<div class='propPanel-seperator'></div>",
       propUIs: [],
       groups: {},
@@ -186,12 +186,15 @@ dojo.declare(
                 }
               }));
 
-          var img = dojo.query("img", cap);
-          img = img[img.length-1]; //select the last image found
-          if(item.ui.captionIcon){
-            img.src = item.ui.captionIcon;
-          } else {
-            img.style.display = "none";
+          // support the new Themeable way
+          var img = dojo.query("i", cap);
+          if(img && img != null && img.length > 0) {
+            img = img[img.length-1]; //select the last i tag found
+            if(item.ui.captionIcon){
+              dojo.addClass(img, item.ui.captionIcon);
+            } else {
+              img.style.display = "none";
+            }
           }
 
           targetNode.appendChild(cap);
