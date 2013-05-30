@@ -61,8 +61,17 @@ pen.define(["common-ui/util/Glasspane", "common-ui/util/PentahoSpinner"], functi
 
             var that = this;
             this.$busyIndicator.fadeIn(this.fadeInDuration, function() {
-                var container = $(window.top.document).find(".busy-indicator-container-wrapper > .pentaho-busy-indicator-spinner");
+              var container = that.$busyIndicator.find(".pentaho-busy-indicator-spinner");
+              if(container.width() > 48) {
+                  // BISERVER-9223 - give the css time to finish loading
+                  setTimeout(function() {
+                    // force the css class onto this dom element
+                    container.addClass("busy-indicator-spinner");
+                    that.spinner.spin(container.get(0));
+                  }, 200);
+              } else {
                 that.spinner.spin(container.get(0));
+              }
             });
         },
 
