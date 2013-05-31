@@ -1,4 +1,4 @@
-pen.define(["common-ui/util/Glasspane", "common-ui/util/PentahoSpinner"], function(Glasspane, spin) {
+pen.define(["common-ui/util/Glasspane", "common-ui/util/PentahoSpinner", "common-ui/util/tripleclick"], function(Glasspane, spin, tripleclick) {
 
     var busy = {
         id: "pentaho-busy-indicator",
@@ -33,6 +33,12 @@ pen.define(["common-ui/util/Glasspane", "common-ui/util/PentahoSpinner"], functi
             var zIndex = 20000;
             this.glasspane.show(zIndex);
 
+            var that = this;
+            $(this.glasspane.$glasspane).bind('tripleclick', function() {
+              // allow triple-click to forcibly get rid of the busy indicator/glasspane
+              that.hide(indicatorId);
+            });
+
             if(this.spinner == null) {
                 var config = spin.getLargeConfig();
                 this.spinner = new Spinner(config);
@@ -62,16 +68,7 @@ pen.define(["common-ui/util/Glasspane", "common-ui/util/PentahoSpinner"], functi
             var that = this;
             this.$busyIndicator.fadeIn(this.fadeInDuration, function() {
               var container = that.$busyIndicator.find(".pentaho-busy-indicator-spinner");
-              if(container.width() > 48) {
-                  // BISERVER-9223 - give the css time to finish loading
-                  setTimeout(function() {
-                    // force the css class onto this dom element
-                    container.addClass("busy-indicator-spinner");
-                    that.spinner.spin(container.get(0));
-                  }, 200);
-              } else {
-                that.spinner.spin(container.get(0));
-              }
+              that.spinner.spin(container.get(0));
             });
         },
 
