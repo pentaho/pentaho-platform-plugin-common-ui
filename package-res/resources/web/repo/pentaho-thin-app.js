@@ -138,6 +138,18 @@ this.showBrowsePanel = function() {
         window.parent.executeCommand("ShowBrowserCommand");
   }
 }
+
+this.refreshBrowsePerspective = function() {
+  if(this.console_enabled && window.top.mantle_fireEvent){
+    window.top.mantle_fireEvent('GenericEvent', {"eventSubType": "RefreshBrowsePerspectiveEvent"});
+  }
+}
+
+this.refreshCurrentFolder = function() {
+  if(this.console_enabled && window.top.mantle_fireEvent){
+    window.top.mantle_fireEvent('GenericEvent', {"eventSubType": "RefreshCurrentFolderEvent"});
+  }
+}
   
 }
 
