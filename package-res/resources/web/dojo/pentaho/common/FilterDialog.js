@@ -590,7 +590,8 @@ dojo.declare(
 
   _scrubNumericValue: function(val) {
     // TODO i18n the thousands and decimal characters
-    return dojo.trim(val).replace(this._numericFormatRegex, "");
+    var sign = (val < 0) ? '-' : ''; // PIR-856/SP-285/SP-286 retain numeric sign
+    return sign + dojo.trim(val).replace(this._numericFormatRegex, "");
   },
 
   /*
