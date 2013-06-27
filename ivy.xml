@@ -77,6 +77,12 @@
 	    <dependency org="pentaho" name="pentaho-xul-core" rev="${dependency.pentaho-xul.revision}" changing="true" transitive="false" conf="test->default"/>
         <dependency org="org.safehaus.jug" name="jug-lgpl" rev="2.0.0" transitive="false" conf="test->default"/>
 
+
+    <dependency org="org.slf4j" name="slf4j-api" rev="1.7.3" conf="test->default"/>
+    <dependency org="org.slf4j" name="slf4j-log4j12" rev="1.7.3" conf="test->default"/>
+    <dependency org="org.slf4j" name="jcl-over-slf4j" rev="1.6.1" conf="test->default"/>
+
+
     <!--  Codegen dependencies -->
     
         <dependency org="pentaho" name="pentaho-gwt-widgets" rev="${dependency.pentaho-gwt-widgets.revision}" conf="codegen->default" changing="true">
