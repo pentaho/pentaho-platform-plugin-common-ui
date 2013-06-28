@@ -31,6 +31,7 @@ import org.jmock.Mockery;
 import org.jmock.integration.junit4.JUnit4Mockery;
 import org.json.JSONException;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.pentaho.common.ui.messages.Messages;
 import org.pentaho.common.ui.metadata.service.MetadataService2;
@@ -711,6 +712,7 @@ public class MetadataService2Test {
     assertNull("results are not null", results);
   }
 
+  @Ignore
   @Test
   public void testXmlQueryToJson1() throws KettleException {
 
@@ -729,6 +731,7 @@ public class MetadataService2Test {
     assertTrue("wrong value",json.indexOf("Classic Cars") != -1);
   }
 
+  @Ignore
   @Test
   public void testJsonQueryToJson1() throws KettleException {
 
@@ -751,6 +754,7 @@ public class MetadataService2Test {
     assertTrue("wrong value",json.indexOf("Classic Cars") != -1);
   }
 
+  @Ignore
   @Test
   public void testJsonQueryToJson2() throws KettleException {
     
