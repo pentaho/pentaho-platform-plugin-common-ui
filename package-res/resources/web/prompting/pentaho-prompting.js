@@ -60,37 +60,41 @@ pen.define(['cdf/cdf-module', 'common-ui/prompting/pentaho-prompting-bind', 'com
 
         showParameterUI: function() {
           var showParameters;
-          $.each(this.parameterGroups, function(i, g) {
-            $.each(g.parameters, function(i, p) {
+          this.mapParameters(function(p) {
               if (p.name == 'showParameters') {
                 showParameters = p;
                 return false; // break
               }
             });
-            if (showParameters) {
-              return false; // break
-            }
-          });
-          if (!showParameters) {
-            return true;
-          }
-          return !showParameters.isSelectedValue('false');
+
+          return !showParameters || !showParameters.isSelectedValue('false');
         },
 
         getParameter: function(name) {
           var param;
-          $.each(this.parameterGroups, function(i, g) {
-            $.each(this.parameters, function(j, p) {
+          this.mapParameters(function(p) {
               if (p.name === name) {
                 param = p;
                 return false; // break
               }
             });
-            if (param) {
+          return param;
+        },
+
+        mapParameters: function(f, x) {
+          var d = this;
+          var breaking = false;
+          $.each(this.parameterGroups, function(i, g) {
+            $.each(this.parameters, function(j, p) {
+              if (f.call(x, p, g, d) === false) {
+                breaking = true;
               return false; // break
             }
           });
-          return param;
+            if (breaking) { return false; }
+          });
+
+          return !breaking;
         }
       }
     },
@@ -147,11 +151,27 @@ pen.define(['cdf/cdf-module', 'common-ui/prompting/pentaho-prompting-bind', 'com
           return s;
         },
 
+        /**
+         * Obtains an array with the selected ParameterValue objects.
+         */
         getSelectedValues: function() {
           var selected = [];
           $.each(this.values, function(i, val) {
             if (val.selected) {
               selected.push(val);
+            }
+          });
+          return selected;
+        },
+
+        /**
+         * Obtains an array with the values of the selected ParameterValue objects.
+         */
+        getSelectedValuesValue: function() {
+          var selected = [];
+          $.each(this.values, function(i, val) {
+            if (val.selected) {
+              selected.push(val.value);
             }
           });
           return selected;
@@ -177,24 +197,12 @@ pen.define(['cdf/cdf-module', 'common-ui/prompting/pentaho-prompting-bind', 'com
      * @param postponeClear If true we'll postpone calling component.clear() on all removed components.
      */
     removeDashboardComponents: function(components, postponeClear) {
-      // Create a list of all embedded components to be removed
-      var toRemove = [];
-      var getComponents = function(c) {
-        var comps = [];
-        comps.push(c);
-        if (c.getComponents) {
-          $.each(c.getComponents(), function(i, cc) {
-            comps = comps.concat(getComponents(cc));
-          });
-        }
-        return comps;
-      };
-      $.each(components, function(i, c) {
-        toRemove = toRemove.concat(getComponents(c));
-      });
+      // Traverse all embedded components to remove them
 
-      var removed = this.removeFromArray(Dashboards.components, toRemove, function(original, itemToRemove) {
-        return original.name === itemToRemove.name || original === itemToRemove;
+      var removed = [];
+      window.CompositeComponent.mapComponentsList(components, function(c) {
+        var rc = Dashboards.removeComponent(c.name);
+        if(rc) { removed.push(rc); }
       });
 
       // Remove references to each removed components parameter but leave the parameter so it may be reselected if it's reused by
@@ -203,56 +211,36 @@ pen.define(['cdf/cdf-module', 'common-ui/prompting/pentaho-prompting-bind', 'com
         // It would be wise to always call component.clear() here except that since Dashboards.init() schedules the components
         // to update() in a setTimeout(). To prevent that, we'll clear the removed components with the GarbageCollectorComponent
         // when we initialize the next set of components.
-        if (!postponeClear) {
-          component.clear();
-        }
-        if (!component.parameter) {
-          return;
-        }
+        if (!postponeClear) { component.clear(); }
 
-        // Remove our parameter from any listening component
-        $.each(Dashboards.components, function(i, c) {
-          if ($.isArray(c.listeners)) {
+        if (component.parameter) {
+          // Remove our parameter from any other listening components
+          $.each(Dashboards.components, function(i, c) {
+            if ($.isArray(c.listeners)) {
               c.listeners = $.grep(c.listeners, function(l) {
                   return l !== component.parameter;
               });
-          };
-        });
+            };
+          });
 
-        // Remove our parameter from any component's dynamic parameters list
-        $.each(Dashboards.components, function(i, c) {
-          if ($.isArray(c.parameters)) {
-              c.parameters = $.each(c.parameters, function(j, p) {
+          // Remove our parameter from any other component's dynamic parameters list
+          $.each(Dashboards.components, function(i, c) {
+            if ($.isArray(c.parameters)) {
+                // TODO: I'm afraid that the following code does nothing...
+                // The return value of the $.each callback function is only taken account when === false,
+                // meaning to break the loop. Otherwise, it is ignored.
+                // The return value of $.each is the first argument: c.parameters .
+                c.parameters = $.each(c.parameters, function(j, p) {
                   if (p[1] === component.parameter) {
                       return [p[0], '', ''];
                   } else {
                       return p;
                   }
               });
-          };
-        });
+            };
+          });
+        }
       });
-    },
-
-    /**
-     * Remove all components from the first array by the objects in the second.
-     * @param components: [{name: 'mycomponent'}, {name: 'secondcomponent'}, ..]
-     * @param itemsToRemove: [{name: 'secondcomponent'}]
-     * @param comparator: function to compare original and itemsToRemove items
-     * @return removed items
-     */
-    removeFromArray: function(original, itemsToRemove, comparator) {
-      var removed = [];
-      var n = $.grep(original, function(orig, idx) {
-        var keep;
-        $.each(itemsToRemove, function(idx, itemToRemove) {
-          return (keep = !comparator.call(this, orig, itemToRemove));
-        });
-        if (!keep) { removed.push(orig);}
-        return keep;
-      });
-      original.splice.apply(original, [0, original.length].concat(n));
-      return removed;
     },
 
     /**
@@ -366,7 +354,7 @@ pen.define(['cdf/cdf-module', 'common-ui/prompting/pentaho-prompting-bind', 'com
         param.type = node.attr('type');
         param.timezoneHint = node.attr('timezone-hint');
 
-        // TODO Support namespaces
+        // TODO: Support namespaces
         $(node).find('attribute').each(function(i, attr) {
           attr = $(attr);
           param.attributes[attr.attr('name')] = attr.attr('value');
@@ -435,13 +423,11 @@ pen.define(['cdf/cdf-module', 'common-ui/prompting/pentaho-prompting-bind', 'com
     },
 
     PromptPanel: function(destinationId, paramDefn) {
-      if (!destinationId) {
-        throw 'destinationId is required';
-      }
+      if (!destinationId) { throw 'destinationId is required'; }
+
       this.destinationId = destinationId;
-      if (!paramDefn) {
-        throw 'paramDefn is required';
-      }
+
+      if (!paramDefn) { throw 'paramDefn is required'; }
       this.paramDefn = paramDefn;
 
       // Initialize the auto submit setting for this panel from the parameter definition
@@ -476,8 +462,7 @@ pen.define(['cdf/cdf-module', 'common-ui/prompting/pentaho-prompting-bind', 'com
        */
       this.getParameterValues = function() {
         var params = {};
-        $.each(this.paramDefn.parameterGroups, function(i, group) {
-          $.each(group.parameters, function(j, param) {
+        this.paramDefn.mapParameters(function(param) {
             var value = Dashboards.getParameterValue(this.getParameterName(param));
             // if ((value == '' || value == undefined) && 'true' == param.attributes['hidden']) {
             //   value = param.values
@@ -490,8 +475,7 @@ pen.define(['cdf/cdf-module', 'common-ui/prompting/pentaho-prompting-bind', 'com
               value = [value];
             }
             params[param.name] = value;
-          }.bind(this));
-        }.bind(this));
+        }, this);
         return params;
       };
 
@@ -505,7 +489,7 @@ pen.define(['cdf/cdf-module', 'common-ui/prompting/pentaho-prompting-bind', 'com
        * @param formatter Formatter used to format this parameter to display
        */
       this.createDataTransportFormatter = function(paramDefn, parameter, pattern, formatter) {
-        return undefined;
+        //return undefined;
       };
 
       /**
@@ -527,7 +511,7 @@ pen.define(['cdf/cdf-module', 'common-ui/prompting/pentaho-prompting-bind', 'com
        * @param pattern Optional pattern to use instead of any the parameter declares
        */
       this.createFormatter = function(paramDefn, parameter, pattern) {
-        return undefined;
+        //return undefined;
       };
 
       this._widgetGUIDHelper = new GUIDHelper();
@@ -542,12 +526,7 @@ pen.define(['cdf/cdf-module', 'common-ui/prompting/pentaho-prompting-bind', 'com
        * Sets the parameter value in Dashboards' parameter map to a properly initialized value.
        */
       this.initializeParameterValue = function(paramDefn, param) {
-        var value = [];
-        $.each(param.values, function(i, v) {
-          if (v.selected) {
-            value.push(v.value);
-          }
-        });
+        var value = param.getSelectedValuesValue();
         if (value.length === 0) {
           value = ''; // Dashboards' null value is an empty string
         } else if (value.length === 1) {
@@ -567,23 +546,42 @@ pen.define(['cdf/cdf-module', 'common-ui/prompting/pentaho-prompting-bind', 'com
        * Gets the parameter value from Dashboards' parameter map.
        */
       this.getParameterValue = function(param) {
-        if (typeof param == 'string') {
-          return Dashboards.getParameterValue(param);
-        } else {
-          return Dashboards.getParameterValue(this.getParameterName(param));
+        if (typeof param !== 'string') {
+          param = this.getParameterName(param);
         }
+        
+        return Dashboards.getParameterValue(param);
       };
 
-      this._submit = function() {
-        this.submit(this);
+      this._ready = function() {
+        this.ready(this);
+      };
+
+      this._submit = function(options) {
+        this.submit(this, options);
+      };
+
+      this._submitStart = function() {
+        this.submitStart(this);
       };
 
       /**
-       * Called when the prompt panel's submit button is clicked or auto-submit is enabled and a parameter value changes.
+       * Called by the prompt-panel component when the CDE components have been updated.
        */
-      this.submit = function(promptPanel) {
+      this.ready = function(promptPanel) {};
+
+      /**
+       * Called when the prompt-panel component's submit button is clicked or auto-submit is enabled and a parameter value changes.
+       */
+      this.submit = function(promptPanel, options) {
+          this.forceAutoSubmit = false;
       };
 
+      /**
+       * Called when the prompt-panel component's submit button is pressed (mouse-down only).
+       */
+      this.submitStart = function(promptPanel) {};
+      
       this._schedule = function() {
         this.schedule(this);
       };
@@ -596,6 +594,11 @@ pen.define(['cdf/cdf-module', 'common-ui/prompting/pentaho-prompting-bind', 'com
 
       /**
        * Called when a parameter value changes.
+       *
+       * The current implementation of  WidgetBuilder#build hooks
+       * a method to the "postChange" CDF method of just built widgets
+       * that have a "parameter".
+       * This method calls its PromptPanel's "parameterChanged" method.
        */
       this.parameterChanged = function(param, name, value) {
         this.refreshPrompt();
@@ -603,10 +606,17 @@ pen.define(['cdf/cdf-module', 'common-ui/prompting/pentaho-prompting-bind', 'com
 
 
       /**
-       * This is called to refresh the prompt panel. It should return a new parameter definition. If it returns undefined no
-       * update will happen.
+       * This is called to refresh the prompt panel.
+       * It should return a new parameter definition.
+       * If it returns undefined no update will happen.
+       *
+       * This method should be overriden.
+       * The default implementation simply calls the provided callback with no parameter definition.
+       *
        * @param promptPanel the panel that needs a new parameter definition
-       * @param callback Function to call when the parameter definition has been fetched. It accepts a single argument: the new parameter definition, or undefined.
+       * @param callback function to call when the parameter definition has been fetched.
+       *
+       * The callback signature is: <pre>void function([newParamDef=undefined])</pre> and is called in the global context.
        */
       this.getParameterDefinition = function(promptPanel, callback) {
         callback();
@@ -617,47 +627,56 @@ pen.define(['cdf/cdf-module', 'common-ui/prompting/pentaho-prompting-bind', 'com
        * If the new parameter definition is undefined (default impl) no re-initialization will be done.
        */
       this.refreshPrompt = function() {
-        var newParamDefn;
         try {
-          newParamDefn = this.getParameterDefinition(this, this.refresh.bind(this));
+          this.getParameterDefinition(this, this.refresh.bind(this));
         } catch (e) {
           alert('Error in refreshCallback'); // TODO Add better error message
-          return;
         }
       };
 
+      /**
+       * Refreshes the prompt panel with a given parameter definition.
+       *
+       * @param {ParameterDefinition} [paramDefn] the parameter definition used to refresh the prompt panel.
+       * When unspecified, nothing is done.
+       */
       this.refresh = function(paramDefn) {
-        if (paramDefn != undefined) {
+        if (paramDefn) {
           this.paramDefn = paramDefn;
+
+          // Remove this `PromptPanel`'s components from `Dashboards`.
+
           // Postpone the clearing of removed components if we'll be showing some components.
           // We'll clear the old components with a special component in front of all other components during init().
-          pentaho.common.prompting.removeDashboardComponents(this.components, this.paramDefn.showParameterUI());
+          var postponeClear = this.paramDefn.showParameterUI();
+          pentaho.common.prompting.removeDashboardComponents(this.components, postponeClear);
+
           this.init();
         }
       };
 
       /**
-       * Initialize this prompt panel. This will create the components and pass them to CDF to be loaded.
+       * Initialize this prompt panel.
+       * This will create the components and pass them to CDF to be loaded.
        */
       this.init = function() {
         pentaho.common.prompting.prepareCDF();
         var fireSubmit = true;
         if (this.paramDefn.showParameterUI()) {
           this._widgetGUIDHelper.reset(); // Clear the widget helper for this prompt
+          
+          var components = [];
+          
           var layout = pentaho.common.prompting.builders.WidgetBuilder.build(this, 'prompt-panel');
 
-          var addComponents = function(components, c) {
+          window.CompositeComponent.mapComponents(layout, function(c) { 
             components.push(c);
-            if (c.components) {
-              $.each(c.components, function(i, cc) {
-                addComponents(components, cc);
-              });
-            }
-          };
 
-          var components = [layout];
-          $.each(layout.components, function(i, c) {
-            addComponents(components, c);
+            // Don't fire the submit on load if we have a submit button. 
+            // It will take care of firing this itself (based on auto-submit)
+            if (fireSubmit && c.promptType == 'submit') {
+              fireSubmit = false;
+            }
           });
 
           if (this.components && this.components.length > 0) {
@@ -669,35 +688,25 @@ pen.define(['cdf/cdf-module', 'common-ui/prompting/pentaho-prompting-bind', 'com
               components: this.components
             }, 'gc');
 
-            if (gc === undefined) {
-              throw 'Cannot create garbage collector';
-            }
+            if (!gc) { throw 'Cannot create garbage collector'; }
+            
             components = [gc].concat(components);
           }
 
           this.components = components;
 
-          // Don't fire the submit on load if we have a submit button. It will take care of firing this itself (based on auto-submit)
-          $.each(this.components, function(i, c) {
-            if (c.promptType == 'submit') {
-              fireSubmit = false;
-            }
-          });
-
           Dashboards.init(components);
         } else {
-          $.each(paramDefn.parameterGroups, function(i, group) {
-            $.each(group.parameters, function(i, param) {
+          this.paramDefn.mapParameters(function(param) {
               // initialize parameter values regardless of whether we're showing the parameter or not
               this.initializeParameterValue(paramDefn, param);
-            }.bind(this));
-          }.bind(this));
+          }, this);
+
           // All parameters are initialized, fire the submit
           fireSubmit = true;
         }
-        if (fireSubmit) {
-          this.submit(this);
-        }
+
+        if (fireSubmit) { this.submit(this, {isInit: true}); }
       };
 
       this.hide = function() {
@@ -722,6 +731,7 @@ pen.define(['cdf/cdf-module', 'common-ui/prompting/pentaho-prompting-bind', 'com
           // doesn't have a value yet, so eventually, we'll show this parameter.. we hope
           return;
         }
+        
         return pentaho.common.prompting.builders.WidgetBuilder.build({
           promptPanel: this,
           param: param
@@ -791,6 +801,7 @@ pen.define(['cdf/cdf-module', 'common-ui/prompting/pentaho-prompting-bind', 'com
 
             components.push(panel);
           }.bind(this));
+          
           if (components.length > 0) {
             var groupPanel = pentaho.common.prompting.builders.WidgetBuilder.build({
               promptPanel: this,

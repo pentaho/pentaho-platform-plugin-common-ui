@@ -86,7 +86,8 @@
         'local!dojo',
         'common-ui/repo/pentaho-ajax',
         'common-ui/prompting/pentaho-prompting',
-        ], function() {
+        'common-ui/util/formatting',
+        ], function(localDojo, pentahoAjax, pentahoPrompting, ReportFormatUtil) {
             // Set the user to anonymous so Dashboards Storage is never invoked
             window.Dashboards.context.user = 'anonymousUser';
             window.SimileAjax = {};
@@ -139,6 +140,20 @@
                   promptPanel.getParameterDefinition = function(paramPanel, callback) {
                     alert("getParameterDefinition() called. This is where you'd build a new parameter definition (or fetch one) to support cascading prompts.");
                  }
+
+                promptPanel.getExternalValueForParam = function(param) {
+                  if(param.attributes['parameter-render-type'] == 'filebrowser'){
+                    return prompt("Please enter the file path"); 
+                  } 
+
+                  if(param.attributes['parameter-render-type'] == 'external-input'){
+                    return prompt("Please enter a value"); 
+                  }                     
+                }
+
+                  promptPanel.createDataTransportFormatter = ReportFormatUtil.createDataTransportFormatter.bind(ReportFormatUtil);
+                  promptPanel.createFormatter = ReportFormatUtil.createFormatter.bind(ReportFormatUtil);
+
                   promptPanel.init();
                 } else {
                   // Refresh existing panel

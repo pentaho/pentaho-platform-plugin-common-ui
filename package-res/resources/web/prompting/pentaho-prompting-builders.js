@@ -26,7 +26,7 @@ Widget Definition Structure:
 
 pen.define(['cdf/cdf-module', 'common-ui/prompting/pentaho-prompting-bind'], function() {
   // TODO Refactor so we're not using global objects. This requires an
-  // update to doc for any custom components in addition to code here 
+  // update to doc for any custom components in addition to code here
   // and anywhere else prompting is used.
   pentaho = typeof pentaho == "undefined" ? {} : pentaho;
   pentaho.common = pentaho.common || {};
@@ -41,7 +41,10 @@ pen.define(['cdf/cdf-module', 'common-ui/prompting/pentaho-prompting-bind'], fun
         type: 'ScrollingPromptPanelLayoutComponent',
         htmlObject: promptPanel.destinationId,
         promptPanel: promptPanel,
-        components: promptPanel.buildPanelComponents()
+        components:  promptPanel.buildPanelComponents(),
+        postExecution: function() {
+          promptPanel._ready();
+        }
       };
       return layout;
     }
@@ -62,6 +65,8 @@ pen.define(['cdf/cdf-module', 'common-ui/prompting/pentaho-prompting-bind'], fun
       'togglebutton': 'pentaho.common.prompting.builders.MultiButtonBuilder',
       'list': 'pentaho.common.prompting.builders.ListBuilder',
       'datepicker': 'pentaho.common.prompting.builders.DateInputBuilder',
+      'filebrowser': 'pentaho.common.prompting.builders.ExternalInputBuilder',
+      'external-input': 'pentaho.common.prompting.builders.ExternalInputBuilder',
       'multi-line': 'pentaho.common.prompting.builders.TextAreaBuilder',
       'gc': 'pentaho.common.prompting.builders.GarbageCollectorBuilder',
       'default': 'pentaho.common.prompting.builders.PlainPromptBuilder'
@@ -81,7 +86,7 @@ pen.define(['cdf/cdf-module', 'common-ui/prompting/pentaho-prompting-bind'], fun
           builder = eval('new ' + name + '()');
           this.cache[name] = builder;
         } catch (e) {
-          console.log('Unable to create widget builder of type "' + name + '"');
+          if(typeof console !== 'undefined' && console.log) { console.log('Unable to create widget builder of type "' + name + '"'); }
           throw e;
         }
       }
@@ -111,8 +116,8 @@ pen.define(['cdf/cdf-module', 'common-ui/prompting/pentaho-prompting-bind'], fun
           name: scheduleGuid,
           htmlObject: scheduleGuid,
           label: args.promptPanel.getString('scheduleButtonLabel', 'Schedule'),
-          expression: function() {
-            args.promptPanel._schedule();
+          expression: function(isInit) {
+            args.promptPanel._schedule({isInit: isInit});
           },
           postExecution: function() {
             $('#' + this.htmlObject).addClass('schedule-button-container');
@@ -254,7 +259,7 @@ pen.define(['cdf/cdf-module', 'common-ui/prompting/pentaho-prompting-bind'], fun
       return $.extend(widget, {
         type: args.param.multiSelect ? 'SelectMultiComponent' : 'SelectComponent',
         size: args.param.attributes['parameter-visible-items'] || 5,
-        changeMode: 'timeout-focus',  // PRD-3687
+        changeMode: args.param.multiSelect ? 'timeout-focus' : 'immediate',  // PRD-3687
         preExecution: function() {
           // SelectComponent defines defaultIfEmpty = true for non-multi selects.
           // We can't override any properties of the component so we must set them just before update() is called. :(
@@ -304,6 +309,20 @@ pen.define(['cdf/cdf-module', 'common-ui/prompting/pentaho-prompting-bind'], fun
       var widget = this.base(args);
       widget.type = 'radio'; // Specifically 'radio' instead of 'RadioComponent' because the CoreComponent.js implementation requires it.
       return widget;
+    }
+  });
+
+  pentaho.common.prompting.builders.ExternalInputBuilder = pentaho.common.prompting.builders.ValueBasedParameterWidgetBuilder.extend({
+    build: function(args) {
+      var formatter = args.promptPanel.createFormatter(args.promptPanel.paramDefn, args.param);
+
+      return $.extend(this.base(args), {
+        type: 'ExternalInputComponent',
+        transportFormatter: args.promptPanel.createDataTransportFormatter(args.promptPanel.paramDefn, args.param, formatter),
+        formatter: formatter,
+        promptPanel: args.promptPanel,
+        paramDefn: args.promptPanel.paramDefn
+      });
     }
   });
 
