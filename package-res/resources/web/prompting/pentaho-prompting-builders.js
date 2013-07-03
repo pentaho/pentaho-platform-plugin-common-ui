@@ -242,7 +242,7 @@ pen.define(['cdf/cdf-module', 'common-ui/prompting/pentaho-prompting-bind'], fun
       return $.extend(widget, {
         type: args.param.multiSelect ? 'SelectMultiComponent' : 'SelectComponent',
         size: args.param.attributes['parameter-visible-items'] || 5,
-        changeMode: 'timeout-focus',
+        changeMode: args.param.multiSelect ? 'timeout-focus' : 'immediate',  // PRD-3687
         preExecution: function() {
           // SelectComponent defines defaultIfEmpty = true for non-multi selects.
           // We can't override any properties of the component so we must set them just before update() is called. :(
