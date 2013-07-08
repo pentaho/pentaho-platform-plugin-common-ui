@@ -382,7 +382,7 @@ TYPICAL TARGET SEQUENCE
     </fileset>
     <fileset dir="${testlib.dir}">
       <include name="**/*.jar" />
-      <include name="**/gwt-dev*.jar" />
+      <exclude name="**/gwt-dev*.jar" />
     </fileset>
     <fileset dir="${lib.dir}">
       <include name="**/*.jar" />
