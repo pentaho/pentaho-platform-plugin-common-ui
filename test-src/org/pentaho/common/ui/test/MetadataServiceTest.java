@@ -740,7 +740,7 @@ public class MetadataServiceTest {
 //    System.out.println(json);
     assertTrue("wrong column name",json.indexOf("BC_PRODUCTS_PRODUCTLINE") != -1);
     assertTrue("wrong column type",json.indexOf("\"string\"") != -1);
-    assertTrue("wrong value",json.indexOf("Classic Cars") != -1);
+    assertTrue("wrong value: " + json, json.indexOf("Classic Cars") != -1);
   }
 
   public void testJsonQueryToJson2() throws KettleException {
