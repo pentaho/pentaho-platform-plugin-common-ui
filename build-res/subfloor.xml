@@ -382,6 +382,7 @@ TYPICAL TARGET SEQUENCE
     </fileset>
     <fileset dir="${testlib.dir}">
       <include name="**/*.jar" />
+      <include name="**/gwt-dev*.jar" />
     </fileset>
     <fileset dir="${lib.dir}">
       <include name="**/*.jar" />
@@ -1674,12 +1675,7 @@ TYPICAL TARGET SEQUENCE
       </batchtest>
     </junit>
 
-    <junitreport todir="${testreports.html.dir}">
-      <fileset dir="${testreports.xml.dir}">
-        <include name="TEST-*.xml" />
-      </fileset>
-      <report format="frames" todir="${testreports.html.dir}" />
-    </junitreport>
+
   </target>
 
 
