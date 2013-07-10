@@ -243,7 +243,6 @@ public class SolutionUrlContentGeneratorTest {
 
     String testContents = "test file contents";
     String filepath = "solution/notweb/test.txt";
-    MockSolutionRepository.files.put( filepath, testContents);
     SolutionUrlContentGenerator cg = new SolutionUrlContentGenerator();
     
     ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -268,7 +267,6 @@ public class SolutionUrlContentGeneratorTest {
   @Test
   public void testXactionType() throws Exception {
 
-    MockSolutionRepository.files.clear();
     String testContents = "test file contents";
     String filepath = "solution/web/test.xaction";
     SolutionUrlContentGenerator cg = new SolutionUrlContentGenerator();

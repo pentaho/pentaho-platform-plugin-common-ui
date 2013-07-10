@@ -31,7 +31,6 @@ import org.pentaho.common.ui.messages.Messages;
 import org.pentaho.platform.api.engine.IContentInfo;
 import org.pentaho.platform.api.engine.IPentahoSession;
 import org.pentaho.platform.api.engine.IPluginManager;
-import org.pentaho.platform.api.repository.ISolutionRepository;
 import org.pentaho.platform.engine.core.solution.ActionInfo;
 import org.pentaho.platform.engine.core.system.PentahoBase;
 import org.pentaho.platform.engine.core.system.PentahoSessionHolder;
@@ -104,6 +103,11 @@ public class SolutionRepoService extends PentahoBase {
     }
 
     IPentahoSession userSession = PentahoSessionHolder.getSession();
+    /* 
+
+    // Leaving this commented out so that when we do port it to IUnifiedRepository we still have the business logic.
+
+
     ISolutionRepository repo = PentahoSystem.get(ISolutionRepository.class, userSession);
     
     // create the state file to save
@@ -172,6 +176,8 @@ public class SolutionRepoService extends PentahoBase {
     result.setStatus(StateMessage.STATUS_SUCCESS);
     result.setMessage(Messages.getString("SolutionRepo.USER_FILE_SAVE") ); //$NON-NLS-1$
     return result;
+    */
+    return null;
   }
 
   public StateMessage loadState(String filepath) throws Exception {
@@ -194,6 +200,10 @@ public class SolutionRepoService extends PentahoBase {
     }
 
     IPentahoSession userSession = PentahoSessionHolder.getSession();    
+    /*
+
+    // Leaving this commented out so that when we do port it to IUnifiedRepository we still have the business logic.
+
     ISolutionRepository repo = PentahoSystem.get(ISolutionRepository.class, userSession);
 
     // try to get the file from the repository
@@ -219,6 +229,8 @@ public class SolutionRepoService extends PentahoBase {
     }
     result.setMessage(Messages.getErrorString("SolutionRepo.ERROR_0001_LOAD_FAILED", filepath) ); //$NON-NLS-1$
     return result;
+    */
+    return null;
   }
   
   @Override
