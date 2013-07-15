@@ -40,7 +40,7 @@ dojo.declare("pentaho.common.TextAreaInput",
         type: 'innerHTML'
       },
       titleText: {
-        node: 'title',
+        node: 'titleNode',
         type: 'innerHTML'
       },
       text: {
@@ -57,7 +57,7 @@ dojo.declare("pentaho.common.TextAreaInput",
     },
     
     postCreate: function() {
-      this.container.title = '';
+      this.container.titleNode = '';
     },
 
     _setWidthAttr : function(newWidth) {
