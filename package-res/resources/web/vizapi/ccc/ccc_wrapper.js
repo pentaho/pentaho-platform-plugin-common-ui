@@ -2416,6 +2416,11 @@ function(def, pvc, pv){
             }
             
             options.smallTitleFont = titleFont;
+
+            var multiChartOverflow = this._vizOptions.multiChartOverflow;
+            if(multiChartOverflow) {
+                options.multiChartOverflow = multiChartOverflow.toLowerCase();
+            }
         },
 
         _configureTooltip: function(){
