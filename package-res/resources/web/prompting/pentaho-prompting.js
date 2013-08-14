@@ -2,7 +2,7 @@ pentaho = typeof pentaho == "undefined" ? {} : pentaho;
 pentaho.common = pentaho.common || {};
 pentaho.common.prompting = pentaho.common.prompting || {};
 
-pen.define(['cdf/cdf-module', 'common-ui/prompting/pentaho-prompting-bind', 'common-ui/prompting/pentaho-prompting-components'], function() {
+pen.define([ 'cdf/cdf-module', 'common-ui/prompting/pentaho-prompting-bind', 'common-ui/prompting/pentaho-prompting-components', 'common-ui/util/base64' ], function() {
   var GUIDHelper = function() {
     /**
      * Simple array of used Prompt GUIDs so they and their components can be uniquely identified.
@@ -365,13 +365,19 @@ pen.define(['cdf/cdf-module', 'common-ui/prompting/pentaho-prompting-bind', 'com
       this.parseParameterValues = function(paramNode, parameter) {
         var values = [];
         $(paramNode).find('values value').each(function(i, value) {
-          var pVal = new pentaho.common.prompting.ParameterValue();
+          var pVal = new pentaho.common.prompting.ParameterValue()  ;
 
           value = $(value);
 
-          pVal.label = value.attr('label');
+          if ('true' == value.attr('encoded')) {
+            pVal.label = base64Decode(value.attr('label'));
+          } else {
+            pVal.label = value.attr('label');
+          }
           if ('true' == value.attr('null')) {
             pVal.value = ''; // Dashboards doesn't play nicely with null values for parameters
+          } else if ('true' == value.attr('encoded')) {
+            pVal.value = base64Decode(value.attr('value'));
           } else {
             pVal.value = value.attr('value');
           }
