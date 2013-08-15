@@ -2326,25 +2326,6 @@ body .dojoMenuItem2Hover {
     border: 0px solid #848484;
 }
 
-.dijitProgressBarTile {
-	/* animated gif for 'indeterminate' mode */
-    background-image: url(images/ProgressBar.gif);
-    background-color: white;
-    background-attachment: scroll;
-    height:22px;
-}
-
-.dijitProgressBarFull {
-    height:22px;
-}
-
-.dijitProgressBarEmpty {
-    border: 0px;
-    background-image: url(images/ProgressBarDisabled.png);
-    background-color: white;
-    background-attachment: scroll;
-}
-
 .tundra .dijitArrowButtonInner {
   background:url("images/comboArrow.png") no-repeat scroll 0 center;
   width: 16px;
