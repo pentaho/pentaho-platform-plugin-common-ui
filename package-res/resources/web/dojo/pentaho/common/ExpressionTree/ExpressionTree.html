@@ -1,10 +1,8 @@
 <div data-dojo-attach-point="expressionNode" class="pentaho-expression pentaho-clearfix">
 	<div data-dojo-attach-point="operatorNode" class="pentaho-operator">
 		<div data-dojo-attach-point="operatorSelectNode" class="pentaho-operatorSelect">
-			<div data-dojo-attach-point="operatorSelect" data-dojo-type="dijit.form.Select"
-				data-dojo-attach-event="onChange:onOperatorChange">
-				<span value="${defaultOperator.value}">${defaultOperator.label}</span>
-			</div>
+      <!-- Chrome 29 can't handle whitespace between element tags of anything translated into a SELECT -->
+			<div data-dojo-attach-point="operatorSelect" data-dojo-type="dijit.form.Select" data-dojo-attach-event="onChange:onOperatorChange"><span value="${defaultOperator.value}">${defaultOperator.label}</span></div>
 		</div>
 	</div>
 	<div data-dojo-attach-point="bracketNode" class="pentaho-bracket"></div>
