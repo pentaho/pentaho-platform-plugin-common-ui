@@ -31,8 +31,7 @@ requireCfg['paths']['common-ui/jquery'] = CONTEXT_PATH+'api/repos/common-ui/reso
 requireCfg['paths']['common-ui/handlebars'] = CONTEXT_PATH+'api/repos/common-ui/resources/web/handlebars/handlebars';
 requireCfg['paths']['common-ui/jquery-i18n'] = CONTEXT_PATH+'api/repos/common-ui/resources/web/jquery/jquery.i18n.properties-min';
 requireCfg['paths']['common-ui/bootstrap'] = CONTEXT_PATH+'api/repos/common-ui/resources/web/bootstrap/bootstrap.min';
-requireCfg['paths']['common-ui/bootstrap-widgets'] = CONTEXT_PATH+'api/repos/common-ui/resources/web/bootstrap/widgets';
 
-requireCfg['shim']['common-ui/bootstrap'] = ['common-ui/jquery', 'common-ui/bootstrap-widgets'];
+requireCfg['shim']['common-ui/bootstrap'] = ['common-ui/jquery'];
 requireCfg['shim']['common-ui/jquery-i18n'] = ['common-ui/jquery'];
 requireCfg['shim']['common-ui/handlebars'] = ['common-ui/jquery'];
