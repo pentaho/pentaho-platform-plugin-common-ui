@@ -2638,29 +2638,8 @@ function(def, pvc, pv){
             return key;
         },
         
-        _doesSharedSeriesSelection: function() {
-            var countColReportAxis = this._gemCountColumnReportAxis;
-
-            // When there's a single level in the report column axis
-            // Then, use a 'column' typed selection.
-            if(countColReportAxis === 1) { return true; }
-
-            // When there's more than one level, 
-            // Then 'column' typed selections are not possible, 
-            // due to limitations in the MDX/query generation.
-
-            // When no levels in the report column axis
-            // And the legend is visible
-            // And there's a single level in the legend/series role
-            // Then, also, use a 'column' typed selection.
-            if(countColReportAxis === 0 && 
-               this.options.legend &&
-               this._rolesToCccDimensionsMap[this.axes.column.defaultRole] &&
-               this.axes.column.realDepth === 1) {
-                return true;
-            }
-
-            return false;
+        _doesSharedSeriesSelection: function(){
+            return (this._gemCountColumnReportAxis === 1);
         },
         
         _onSelectionChanged: function(selectedDatums){
