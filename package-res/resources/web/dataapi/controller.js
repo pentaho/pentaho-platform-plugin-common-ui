@@ -1,5 +1,6 @@
 //= require "oop.js"
 //= require "app.js"
+dojo.require("pentaho.common.Messages");
 
 pentaho = typeof pentaho == "undefined" ? {} : pentaho;
 
