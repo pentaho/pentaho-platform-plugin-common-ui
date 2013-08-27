@@ -46,7 +46,7 @@
      </fail -->
 
   <property name="dojo.version" value="1.6.1.p"/>
-  <property name="dojo-artifact" value="dojo-release-${dojo.version}-src"/>
+  <property name="dojo-artifact" value="dojo-${dojo.version}-src"/>
 
   <property name="dev.res" value="dev-res"/>
 
