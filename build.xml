@@ -45,7 +45,7 @@
        </condition>
      </fail -->
 
-  <property name="dojo.version" value="1.6.1"/>
+  <property name="dojo.version" value="1.6.1.p"/>
   <property name="dojo-artifact" value="dojo-release-${dojo.version}-src"/>
 
   <property name="dev.res" value="dev-res"/>
@@ -85,8 +85,11 @@
       <available file="${dojo.root}/${dojo-artifact}.zip"/>
       <then/>
       <else>
-        <get src="http://download.dojotoolkit.org/release-${dojo.version}/${dojo-artifact}.zip"
-             dest="${dojo.root}/${dojo-artifact}.zip"/>
+<!--
+       <get src="http://download.dojotoolkit.org/release-${dojo.version}/${dojo-artifact}.zip"
+             dest="${dojo.root}/${dojo-artifact}.zip"/> -->
+       <get src="http://repository.pentaho.org/artifactory/third-party/org/dojotoolkit/dojo/${dojo.version}/${dojo-artifact}.zip"
+             dest="${dojo.root}/${dojo-artifact}.zip"/>             
         <mkdir dir="${dojo.root}"/>
         <unzip src="dev-res/dojo/${dojo-artifact}.zip" dest="${dojo.root}"/>
 
