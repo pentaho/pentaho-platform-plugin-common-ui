@@ -23,8 +23,6 @@
 * THE SOFTWARE.
 */
 
-/* jsLint stuff */
-/*global exports */
 /*members apply, arrayToCsv, charAt, csvToArray, length, prototype, push,
  replace, substring, test, toString, trim
 */
@@ -33,6 +31,7 @@
  * Namespace for CSV functions
  * @namespace
  */
+
 pen.define(	function(){
  
 	var CSV = (function () {

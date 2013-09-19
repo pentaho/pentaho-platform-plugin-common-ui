@@ -1,50 +1,19 @@
-/* EventTarget from N Zakas Professsional Javascript book */
-function EventTarget(){
-    this.handlers = {};    
-}
-
-EventTarget.prototype = {
-    constructor: EventTarget,
-
-    listen: function(type, handler){
-        if (typeof this.handlers[type] == "undefined"){
-            this.handlers[type] = [];
-        }
-
-        this.handlers[type].push(handler);
-    },
-    
-    notify: function(event){
-        if (!event.target){
-            event.target = this;
-        }
-        if (this.handlers[event.type] instanceof Array){
-            var handlers = this.handlers[event.type];
-            for (var i=0, len=handlers.length; i < len; i++){
-                handlers[i](event);
-            }
-        }            
-    },
-
-    ignore: function(type, handler){
-        if (this.handlers[type] instanceof Array){
-            var handlers = this.handlers[type];
-            for (var i=0, len=handlers.length; i < len; i++){
-                if (handlers[i] === handler){
-                    break;
-                }
-            }
-            
-            handlers.splice(i, 1);
-        }            
-    }
-};
-
-
-//= require "oop.js"
-
-/* define the pentaho namespace if it is not already defined. */
-pentaho = typeof pentaho == "undefined" ? {} : pentaho;
+/*!
+* Copyright 2010 - 2013 Pentaho Corporation.  All rights reserved.
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*
+*/
 
 /*
 pentaho.app concept is taken from Nicholas Zakas, Scalable JavaScript Architecture

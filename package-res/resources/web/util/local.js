@@ -1,24 +1,19 @@
-/**
- * local.js: A RequireJS plugin that enables coordinating other framework's asynchronous loading mechanisms with "local" modules.
- *
- * For more information see https://github.com/jganoff/localjs
- *
- * Licensed under the Apache License 2.0 (http://www.apache.org/licenses/LICENSE-2.0.txt)
- *
- * This is a slight modification from the one found on Github. We use pen.define here (instead of define) so it can be
- * used outside of our build process.
- */
-/*jslint regexp: false, nomen: false, plusplus: true, sloppy: true */
-/*global require: false, define: false */
-
-define(function () {
-  var local, addCallback, invokeCallbacks, isDefined, registerLocal,
-    defined = {}, required = {};
+/*! *
+* local.js: A RequireJS plugin that enables coordinating other framework's asynchronous loading mechanisms with "local" modules.
+*
+* For more information see https://github.com/jganoff/localjs
+*
+* Licensed under the Apache License 2.0 (http://www.apache.org/licenses/LICENSE-2.0.txt)
+*
+* This is a slight modification from the one found on Github. We use pen.define here (instead of define) so it can be
+* used outside of our build process.
+*/
 
   /**
    * Register a local module object
    * @param {String} name Name of the local module
    */
+
   registerLocal = function (name, module) {
     defined[name] = [module];
     // Call any callbacks waiting for this local to be defined and remove them from our cache

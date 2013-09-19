@@ -1,8 +1,7 @@
-/**
- * @license r.js 1.0.6 Copyright (c) 2010-2012, The Dojo Foundation All Rights Reserved.
- * Available via the MIT or new BSD license.
- * see: http://github.com/jrburke/requirejs for details
- */
+/*! *
+* Available via the MIT or new BSD license.
+* see: http://github.com/jrburke/requirejs for details
+*/
 
 /*
  * This is a bootstrap script to allow running RequireJS in the command line
@@ -11,7 +10,6 @@
  * the shell of the r.js file.
  */
 
-/*jslint strict: false, evil: true, nomen: false */
 /*global readFile: true, process: false, Packages: false, print: false,
 console: false, java: false, module: false */
 
@@ -3175,7 +3173,7 @@ define('uglifyjs/parse-js', ["require", "exports", "module"], function(require, 
           disclaimer in the documentation and/or other materials
           provided with the distribution.
 
-    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDER “AS IS” AND ANY
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDER “AS IS�? AND ANY
     EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
     IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
     PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER BE
@@ -4591,7 +4589,7 @@ exports.ast_squeeze_more = ast_squeeze_more;
           disclaimer in the documentation and/or other materials
           provided with the distribution.
 
-    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDER “AS IS” AND ANY
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDER “AS IS�? AND ANY
     EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
     IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
     PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER BE
