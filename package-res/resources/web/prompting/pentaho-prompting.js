@@ -633,27 +633,32 @@ pen.define([ 'cdf/cdf-module', 'common-ui/prompting/pentaho-prompting-bind', 'co
        *
        * @param {ParameterDefinition} [paramDefn] the parameter definition used to refresh the prompt panel.
        * When unspecified, nothing is done.
+       * @param {boolean} [noAutoAutoSubmit=false] prevents auto-submiting, even when auto-submit is false,
+       * in the case the the parameter UI is not shown.
        */
-      this.refresh = function(paramDefn) {
+      this.refresh = function(paramDefn, noAutoAutoSubmit) {
         if (paramDefn) {
           this.paramDefn = paramDefn;
 
           // Remove this `PromptPanel`'s components from `Dashboards`.
+          if(this.components) {
+            // Postpone the clearing of removed components if we'll be showing some components.
+            // We'll clear the old components with a special component in front of all other components during init().
+            var postponeClear = this.paramDefn.showParameterUI();
+            pentaho.common.prompting.removeDashboardComponents(this.components, postponeClear);
+          }
 
-          // Postpone the clearing of removed components if we'll be showing some components.
-          // We'll clear the old components with a special component in front of all other components during init().
-          var postponeClear = this.paramDefn.showParameterUI();
-          pentaho.common.prompting.removeDashboardComponents(this.components, postponeClear);
-
-          this.init();
+          this.init(noAutoAutoSubmit);
         }
       };
 
       /**
        * Initialize this prompt panel.
        * This will create the components and pass them to CDF to be loaded.
+       * @param {boolean} [noAutoAutoSubmit=false] prevents auto-submiting, even when auto-submit is false,
+       * in the case the the parameter UI is not shown.
        */
-      this.init = function() {
+      this.init = function(noAutoAutoSubmit) {
         pentaho.common.prompting.prepareCDF();
         var fireSubmit = true;
         if (this.paramDefn.showParameterUI()) {
@@ -696,8 +701,9 @@ pen.define([ 'cdf/cdf-module', 'common-ui/prompting/pentaho-prompting-bind', 'co
             this.initializeParameterValue(paramDefn, param);
           }, this);
 
+          // Must submit, independently of auto-submit value.
           // All parameters are initialized, fire the submit
-          fireSubmit = true;
+          fireSubmit = !noAutoAutoSubmit;
         }
 
         if (fireSubmit) { this.submit(this, {isInit: true}); }
