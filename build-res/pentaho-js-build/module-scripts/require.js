@@ -1,7 +1,55 @@
-/*! * vim: et:ts=4:sw=4:sts=4
-* Available via the MIT or new BSD license.
-* see: http://github.com/jrburke/requirejs for details
-*/
+/** vim: et:ts=4:sw=4:sts=4
+ * @license RequireJS 1.0.7 Copyright (c) 2010-2012, The Dojo Foundation All Rights Reserved.
+ * Available via the MIT or new BSD license.
+ * see: http://github.com/jrburke/requirejs for details
+ */
+/*jslint strict: false, plusplus: false, sub: true */
+/*global window, navigator, document, importScripts, jQuery, setTimeout, opera */
+
+var requirejs, require, define;
+(function () {
+  //Change this version number for each release.
+  var version = "1.0.7",
+      commentRegExp = /(\/\*([\s\S]*?)\*\/|([^:]|^)\/\/(.*)$)/mg,
+      cjsRequireRegExp = /require\(\s*["']([^'"\s]+)["']\s*\)/g,
+      currDirRegExp = /^\.\//,
+      jsSuffixRegExp = /\.js$/,
+      ostring = Object.prototype.toString,
+      ap = Array.prototype,
+      aps = ap.slice,
+      apsp = ap.splice,
+      isBrowser = !!(typeof window !== "undefined" && navigator && document),
+      isWebWorker = !isBrowser && typeof importScripts !== "undefined",
+    //PS3 indicates loaded and complete, but need to wait for complete
+    //specifically. Sequence is "loading", "loaded", execution,
+    // then "complete". The UA check is unfortunate, but not sure how
+    //to feature test w/o causing perf issues.
+      readyRegExp = isBrowser && navigator.platform === 'PLAYSTATION 3' ?
+          /^complete$/ : /^(complete|loaded)$/,
+      defContextName = "_",
+    //Oh the tragedy, detecting opera. See the usage of isOpera for reason.
+      isOpera = typeof opera !== "undefined" && opera.toString() === "[object Opera]",
+      empty = {},
+      contexts = {},
+      globalDefQueue = [],
+      interactiveScript = null,
+      checkLoadedDepth = 0,
+      useInteractive = false,
+      reservedDependencies = {
+        require: true,
+        module: true,
+        exports: true
+      },
+      req, cfg = {}, currentlyAddingScript, s, head, baseElement, scripts, script,
+      src, subPath, mainScript, dataMain, globalI, ctx, jQueryCheck, checkLoadedTimeoutId;
+
+  function isFunction(it) {
+    return ostring.call(it) === "[object Function]";
+  }
+
+  function isArray(it) {
+    return ostring.call(it) === "[object Array]";
+  }
 
   /**
    * Simple function to mix in properties from source into target,
@@ -10,7 +58,6 @@
    * Object.prototype names, but the uses of mixin here seem unlikely to
    * trigger a problem related to that.
    */
-
   function mixin(target, source, force) {
     for (var prop in source) {
       if (!(prop in empty) && (!(prop in target) || force)) {
