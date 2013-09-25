@@ -218,7 +218,7 @@ dojo.declare(
     }
     parent.appendChild(x.node);
     this.idMap[this.sanitizeIdAndClassNames(item.id)]= item.id;
-    this.selector.setItem(this.sanitizeIdAndClassNames(item.id), { "data": item, "type": item.type, "itemId": item.itemId });
+    this.selector.setItem(this.sanitizeIdAndClassNames(item.id), { "data": item, "type": item.type, "itemId": this.sanitizeIdAndClassNames(item.itemId) });
     this.connectHandles.push(dojo.connect(x.node, 'onmousedown', this, this.onMouseDown));
     this.connectHandles.push(dojo.connect(x.node, 'onmouseup', this, this.onMouseUp));
   },
@@ -227,7 +227,7 @@ dojo.declare(
     var props = {
         "id": this.sanitizeIdAndClassNames(item.id),
         "innerHTML": item.label,
-        "itemId": item.id,
+        "itemId": this.sanitizeIdAndClassNames(item.id),
         "class": item.type
     };
     if( !props["class"] ) {
@@ -235,11 +235,11 @@ dojo.declare(
     }
 
     if(item.title) {
-      props.title = item.title;
+      props.title = this.sanitizeIdAndClassNames(item.title);
     } else if(item.label) {
-        props.title = item.label;
+        props.title = this.sanitizeIdAndClassNames(item.label);
     } else {
-    	props.title = item.id;
+    	props.title = props.id;
     }
     var div = dojo.create("div", props);
     if (hint === "avatar") {
