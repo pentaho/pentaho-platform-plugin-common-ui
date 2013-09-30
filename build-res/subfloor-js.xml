@@ -306,8 +306,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       <then/>
       <else>
         <mkdir dir="${js.dojo.root}"/>
-      	<get src="http://repository.pentaho.org/artifactory/third-party/org/dojotoolkit/dojo/${dojo.version}/${dojo-artifact}.zip"
-      	             dest="${dojo.root}/${dojo-artifact}.zip"/>
+      	<get src="http://repository.pentaho.org/artifactory/third-party/org/dojotoolkit/dojo/${js.dojo.version}/${js.dojo-artifact}.zip"
+      	             dest="${js.dojo.root}/${js.dojo-artifact}.zip"/>
         <unzip src="${js.dojo.root}/${js.dojo-artifact}.zip" dest="${js.dojo.root}"/>
 
         <copy verbose="true" todir="${js.dojo.src}/util/buildscripts" overwrite="true">
