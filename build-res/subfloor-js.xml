@@ -60,8 +60,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   <property name="js.dojo.agg.dir" value="build-res/dojo"/>
 
 
-  <property name="js.dojo.version" value="1.6.1"/>
-  <property name="js.dojo-artifact" value="dojo-release-${js.dojo.version}-src"/>
+  <property name="js.dojo.version" value="1.6.1.p"/>
+	<property name="js.dojo-artifact" value="dojo-${js.dojo.version}-src"/>
   <property name="js.dojo.root" value="build-res"/>
   <property name="js.dojo.src"
             value="${js.dojo.root}/dojo-release-${js.dojo.version}-src"
@@ -306,9 +306,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       <then/>
       <else>
         <mkdir dir="${js.dojo.root}"/>
-        <get src="http://download.dojotoolkit.org/release-${js.dojo.version}/${js.dojo-artifact}.zip"
-             dest="${js.dojo.root}/${js.dojo-artifact}.zip"/>
-
+      	<get src="http://repository.pentaho.org/artifactory/third-party/org/dojotoolkit/dojo/${dojo.version}/${dojo-artifact}.zip"
+      	             dest="${dojo.root}/${dojo-artifact}.zip"/>
         <unzip src="${js.dojo.root}/${js.dojo-artifact}.zip" dest="${js.dojo.root}"/>
 
         <copy verbose="true" todir="${js.dojo.src}/util/buildscripts" overwrite="true">
