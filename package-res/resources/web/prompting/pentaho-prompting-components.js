@@ -360,6 +360,8 @@ pen.define(['common-ui/prompting/pentaho-prompting-bind', 'common-ui/prompting/p
       this.onChangeHandle = dojo.connect(dateTextBox, "onChange", function() {
         Dashboards.processChange(this.name);
       }.bind(this));
+
+      this._doAutoFocus();
     },
 
     getValue: function() {
@@ -441,6 +443,8 @@ pen.define(['common-ui/prompting/pentaho-prompting-bind', 'common-ui/prompting/p
         Dashboards.processChange(this.name);
         }
        }.bind(this));
+
+      this._doAutoFocus();
     },
 
     getValue: function() {
@@ -481,6 +485,8 @@ pen.define(['common-ui/prompting/pentaho-prompting-bind', 'common-ui/prompting/p
       input.focusout(function() {
         Dashboards.processChange(this.name);
       }.bind(this));
+
+      this._doAutoFocus();
     },
 
     getValue: function() {
