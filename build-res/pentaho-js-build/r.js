@@ -1,8 +1,8 @@
-/**
- * @license r.js 1.0.6 Copyright (c) 2010-2012, The Dojo Foundation All Rights Reserved.
- * Available via the MIT or new BSD license.
- * see: http://github.com/jrburke/requirejs for details
- */
+/*! *
+* @license r.js 1.0.6 Copyright (c) 2010-2012, The Dojo Foundation All Rights Reserved.
+* Available via the MIT or new BSD license.
+* see: http://github.com/jrburke/requirejs for details
+*/
 
 /*
  * This is a bootstrap script to allow running RequireJS in the command line
@@ -12,6 +12,7 @@
  */
 
 /*jslint strict: false, evil: true, nomen: false */
+
 /*global readFile: true, process: false, Packages: false, print: false,
 console: false, java: false, module: false */
 
