@@ -633,27 +633,60 @@ pen.define([ 'cdf/cdf-module', 'common-ui/prompting/pentaho-prompting-bind', 'co
        *
        * @param {ParameterDefinition} [paramDefn] the parameter definition used to refresh the prompt panel.
        * When unspecified, nothing is done.
+       * @param {boolean} [noAutoAutoSubmit=false] prevents auto-submiting, even when auto-submit is false,
+       * in the case the the parameter UI is not shown.
        */
-      this.refresh = function(paramDefn) {
+      this.refresh = function(paramDefn, noAutoAutoSubmit) {
         if (paramDefn) {
           this.paramDefn = paramDefn;
 
           // Remove this `PromptPanel`'s components from `Dashboards`.
+          if(this.components) {
+            // Postpone the clearing of removed components if we'll be showing some components.
+            // We'll clear the old components with a special component in front of all other components during init().
+            var postponeClear = this.paramDefn.showParameterUI();
+            pentaho.common.prompting.removeDashboardComponents(this.components, postponeClear);
 
-          // Postpone the clearing of removed components if we'll be showing some components.
-          // We'll clear the old components with a special component in front of all other components during init().
-          var postponeClear = this.paramDefn.showParameterUI();
-          pentaho.common.prompting.removeDashboardComponents(this.components, postponeClear);
+            // Create dictionary by parameter name, of topValue of multi-select listboxes, for restoring later, when possible.
+            // But not for mobile, cause the UIs vary. Would need more time to check each.
+            var topValuesByParam;
+            if(!(/android|ipad|iphone/i).test(navigator.userAgent)) {
+              topValuesByParam = this._multiListBoxTopValuesByParam = {};
+            }
+            
+            var focusedParam;
+            window.CompositeComponent.mapComponentsList(this.components, function(c) {
+              if(!c.components && c.param && c.promptType === 'prompt') {
+                if(!focusedParam) {
+                  var ph = c.placeholder();
+                  if($(":focus", ph).length) {
+                    focusedParam = c.param.name;
+                  }
+                }
+                
+                if(topValuesByParam && c.type === 'SelectMultiComponent') {
+                  var topValue = c.topValue();
+                  if(topValue != null) {
+                    topValuesByParam['_' + c.param.name] = topValue;
+                  }
+                }
+              }
+            });
+            
+            this._focusedParam = focusedParam;
+          }
 
-          this.init();
+          this.init(noAutoAutoSubmit);
         }
       };
 
       /**
        * Initialize this prompt panel.
        * This will create the components and pass them to CDF to be loaded.
+       * @param {boolean} [noAutoAutoSubmit=false] prevents auto-submiting, even when auto-submit is false,
+       * in the case the the parameter UI is not shown.
        */
-      this.init = function() {
+      this.init = function(noAutoAutoSubmit) {
         pentaho.common.prompting.prepareCDF();
         var fireSubmit = true;
         if (this.paramDefn.showParameterUI()) {
@@ -663,6 +696,12 @@ pen.define([ 'cdf/cdf-module', 'common-ui/prompting/pentaho-prompting-bind', 'co
           
           var layout = pentaho.common.prompting.builders.WidgetBuilder.build(this, 'prompt-panel');
           
+          var topValuesByParam = this._multiListBoxTopValuesByParam;
+          if(topValuesByParam) { delete this._multiListBoxTopValuesByParam; }
+
+          var focusedParam = this._focusedParam;
+          if(focusedParam) { delete this._focusedParam; }
+
           window.CompositeComponent.mapComponents(layout, function(c) { 
             components.push(c);
            
@@ -670,6 +709,21 @@ pen.define([ 'cdf/cdf-module', 'common-ui/prompting/pentaho-prompting-bind', 'co
             // It will take care of firing this itself (based on auto-submit)
             if (fireSubmit && c.promptType == 'submit') {
               fireSubmit = false;
+            }
+
+            if(!c.components && c.param && c.promptType === 'prompt') {
+              var name = c.param.name;
+              if(focusedParam && focusedParam === name) {
+                focusedParam = null;
+                c.autoFocus = true;
+              }
+
+              if(topValuesByParam && c.type === 'SelectMultiComponent') {
+                var topValue = topValuesByParam['_' + name];
+                if(topValue != null) {
+                  c.autoTopValue = topValue;
+                }
+              }
             }
           });
           
@@ -696,8 +750,9 @@ pen.define([ 'cdf/cdf-module', 'common-ui/prompting/pentaho-prompting-bind', 'co
             this.initializeParameterValue(paramDefn, param);
           }, this);
 
+          // Must submit, independently of auto-submit value.
           // All parameters are initialized, fire the submit
-          fireSubmit = true;
+          fireSubmit = !noAutoAutoSubmit;
         }
 
         if (fireSubmit) { this.submit(this, {isInit: true}); }
