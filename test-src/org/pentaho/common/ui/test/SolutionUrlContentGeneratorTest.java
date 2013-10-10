@@ -1,22 +1,21 @@
 /*!
-* This program is free software; you can redistribute it and/or modify it under the
-* terms of the GNU Lesser General Public License, version 2.1 as published by the Free Software
-* Foundation.
-*
-* You should have received a copy of the GNU Lesser General Public License along with this
-* program; if not, you can obtain a copy at http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html
-* or from the Free Software Foundation, Inc.,
-* 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*
-* This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-* without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-* See the GNU Lesser General Public License for more details.
-*
-* Copyright (c) 2002-2013 Pentaho Corporation..  All rights reserved.
-*/
+ * This program is free software; you can redistribute it and/or modify it under the
+ * terms of the GNU Lesser General Public License, version 2.1 as published by the Free Software
+ * Foundation.
+ *
+ * You should have received a copy of the GNU Lesser General Public License along with this
+ * program; if not, you can obtain a copy at http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html
+ * or from the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ *
+ * Copyright (c) 2002-2013 Pentaho Corporation..  All rights reserved.
+ */
 
 package org.pentaho.common.ui.test;
-
 
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -45,7 +44,7 @@ import java.util.Map;
 
 import static org.junit.Assert.*;
 
-@SuppressWarnings({"all"})
+@SuppressWarnings( { "all" } )
 public class SolutionUrlContentGeneratorTest {
 
   private static MicroPlatform microPlatform = null;
@@ -53,24 +52,26 @@ public class SolutionUrlContentGeneratorTest {
   private static IUnifiedRepository repository;
 
   @BeforeClass
-  public static void init()  {
+  public static void init() {
 
-    if( microPlatform == null || !microPlatform.isInitialized() ) {
-      microPlatform = new MicroPlatform("test-res/pentaho-solutions");
-      microPlatform.define(ISolutionEngine.class, SolutionEngine.class, IPentahoDefinableObjectFactory.Scope.GLOBAL);
+    if ( microPlatform == null || !microPlatform.isInitialized() ) {
+      microPlatform = new MicroPlatform( "test-res/pentaho-solutions" );
+      microPlatform.define( ISolutionEngine.class, SolutionEngine.class, IPentahoDefinableObjectFactory.Scope.GLOBAL );
 
       repository = new FileSystemBackedUnifiedRepository();
-      ((FileSystemBackedUnifiedRepository)repository).setRootDir(new File("test-res/pentaho-solutions"));
+      ( (FileSystemBackedUnifiedRepository) repository ).setRootDir( new File( "test-res/pentaho-solutions" ) );
 
-      microPlatform.defineInstance(IUnifiedRepository.class, repository);
+      microPlatform.defineInstance( IUnifiedRepository.class, repository );
 
-      microPlatform.define(IPluginManager.class, DefaultPluginManager.class, IPentahoDefinableObjectFactory.Scope.GLOBAL);
-      microPlatform.define(IPluginProvider.class, FileSystemXmlPluginProvider.class, IPentahoDefinableObjectFactory.Scope.GLOBAL);
+      microPlatform.define( IPluginManager.class, DefaultPluginManager.class,
+          IPentahoDefinableObjectFactory.Scope.GLOBAL );
+      microPlatform.define( IPluginProvider.class, FileSystemXmlPluginProvider.class,
+          IPentahoDefinableObjectFactory.Scope.GLOBAL );
 
-      microPlatform.addLifecycleListener(new PluginAdapter());
+      microPlatform.addLifecycleListener( new PluginAdapter() );
       try {
         microPlatform.start();
-      } catch (PlatformInitializationException e) {
+      } catch ( PlatformInitializationException e ) {
         e.printStackTrace();
       }
     }
@@ -84,175 +85,175 @@ public class SolutionUrlContentGeneratorTest {
 
   @Test
   public void testMessages() {
-    assertFalse( Messages.getString("SolutionURLContentGenerator.ERROR_0001_NO_FILEPATH").startsWith("!") );
-    assertFalse( Messages.getString("SolutionURLContentGenerator.ERROR_0002_CANNOT_HANDLE_TYPE").startsWith("!") );
-    assertFalse( Messages.getString("SolutionURLContentGenerator.ERROR_0003_RESOURCE_NOT_FOUND","").startsWith("!") );
+    assertFalse( Messages.getString( "SolutionURLContentGenerator.ERROR_0001_NO_FILEPATH" ).startsWith( "!" ) );
+    assertFalse( Messages.getString( "SolutionURLContentGenerator.ERROR_0002_CANNOT_HANDLE_TYPE" ).startsWith( "!" ) );
+    assertFalse( Messages.getString( "SolutionURLContentGenerator.ERROR_0003_RESOURCE_NOT_FOUND", "" ).startsWith( "!" ) );
   }
 
   @Test
   public void testNoOutput() throws Exception {
     SolutionUrlContentGenerator cg = new SolutionUrlContentGenerator();
-    
+
     ByteArrayOutputStream out = new ByteArrayOutputStream();
-    
+
     SimpleParameterProvider pathParams = new SimpleParameterProvider();
-    Map<String,IParameterProvider> parameterProviders = new HashMap<String,IParameterProvider>();
-    parameterProviders.put( "path" , pathParams ); //$NON-NLS-1$
-    pathParams.setParameter( "path" , "solution/web/test.txt");
-    cg.setOutputHandler(null);
-    cg.setParameterProviders(parameterProviders);
+    Map<String, IParameterProvider> parameterProviders = new HashMap<String, IParameterProvider>();
+    parameterProviders.put( "path", pathParams ); //$NON-NLS-1$
+    pathParams.setParameter( "path", "solution/web/test.txt" );
+    cg.setOutputHandler( null );
+    cg.setParameterProviders( parameterProviders );
     try {
       cg.createContent();
-      assertFalse("Expected exception did not happen",true);
-    } catch (InvalidParameterException e) {
-      assertTrue(true);
+      assertFalse( "Expected exception did not happen", true );
+    } catch ( InvalidParameterException e ) {
+      assertTrue( true );
     }
 
     String content = new String( out.toByteArray() );
     assertEquals( "Content is wrong", content, "" );
-    
+
   }
 
   @Test
   public void testNoStream() throws Exception {
     SolutionUrlContentGenerator cg = new SolutionUrlContentGenerator();
-    
+
     ByteArrayOutputStream out = new ByteArrayOutputStream();
-    
+
     SimpleParameterProvider pathParams = new SimpleParameterProvider();
-    Map<String,IParameterProvider> parameterProviders = new HashMap<String,IParameterProvider>();
-    parameterProviders.put( "path" , pathParams ); //$NON-NLS-1$
-    pathParams.setParameter( "path" , "solution1/resources/web/test.txt");
-    IOutputHandler handler = new SimpleOutputHandler((OutputStream) null, false);
-    cg.setOutputHandler(handler);
-    cg.setParameterProviders(parameterProviders);
+    Map<String, IParameterProvider> parameterProviders = new HashMap<String, IParameterProvider>();
+    parameterProviders.put( "path", pathParams ); //$NON-NLS-1$
+    pathParams.setParameter( "path", "solution1/resources/web/test.txt" );
+    IOutputHandler handler = new SimpleOutputHandler( (OutputStream) null, false );
+    cg.setOutputHandler( handler );
+    cg.setParameterProviders( parameterProviders );
     try {
       cg.createContent();
-      assertFalse("Expected exception did not happen",true);
-    } catch (InvalidParameterException e) {
-      assertTrue(true);
+      assertFalse( "Expected exception did not happen", true );
+    } catch ( InvalidParameterException e ) {
+      assertTrue( true );
     }
 
     String content = new String( out.toByteArray() );
     assertEquals( "Content is wrong", content, "" );
-    
+
   }
 
   @Test
   public void testNoContentItem() throws Exception {
     SolutionUrlContentGenerator cg = new SolutionUrlContentGenerator();
-    
+
     ByteArrayOutputStream out = new ByteArrayOutputStream();
-    
+
     SimpleParameterProvider pathParams = new SimpleParameterProvider();
-    Map<String,IParameterProvider> parameterProviders = new HashMap<String,IParameterProvider>();
-    parameterProviders.put( "path" , pathParams ); //$NON-NLS-1$
-    pathParams.setParameter( "path" , "solution1/resources/web/test.txt");
-    IOutputHandler handler = new SimpleOutputHandler((IContentItem) null, false);
-    cg.setOutputHandler(handler);
-    cg.setParameterProviders(parameterProviders);
+    Map<String, IParameterProvider> parameterProviders = new HashMap<String, IParameterProvider>();
+    parameterProviders.put( "path", pathParams ); //$NON-NLS-1$
+    pathParams.setParameter( "path", "solution1/resources/web/test.txt" );
+    IOutputHandler handler = new SimpleOutputHandler( (IContentItem) null, false );
+    cg.setOutputHandler( handler );
+    cg.setParameterProviders( parameterProviders );
     try {
       cg.createContent();
-      assertFalse("Expected exception did not happen",true);
-    } catch (InvalidParameterException e) {
-      assertTrue(true);
+      assertFalse( "Expected exception did not happen", true );
+    } catch ( InvalidParameterException e ) {
+      assertTrue( true );
     }
 
     String content = new String( out.toByteArray() );
     assertEquals( "Content is wrong", content, "" );
-    
+
   }
 
   @Test
   public void testNoPath() throws Exception {
     SolutionUrlContentGenerator cg = new SolutionUrlContentGenerator();
-    
+
     ByteArrayOutputStream out = new ByteArrayOutputStream();
-    
+
     SimpleParameterProvider pathParams = new SimpleParameterProvider();
-    Map<String,IParameterProvider> parameterProviders = new HashMap<String,IParameterProvider>();
-    parameterProviders.put( "path" , pathParams ); //$NON-NLS-1$
-    
-    IOutputHandler handler = new SimpleOutputHandler(out, false);
-    cg.setOutputHandler(handler);
-    cg.setParameterProviders(parameterProviders);
+    Map<String, IParameterProvider> parameterProviders = new HashMap<String, IParameterProvider>();
+    parameterProviders.put( "path", pathParams ); //$NON-NLS-1$
+
+    IOutputHandler handler = new SimpleOutputHandler( out, false );
+    cg.setOutputHandler( handler );
+    cg.setParameterProviders( parameterProviders );
     cg.createContent();
 
     String content = new String( out.toByteArray() );
     assertEquals( "Content is wrong", content, "" );
-    
+
   }
 
   @Test
   public void testMissingFile() throws Exception {
 
     SolutionUrlContentGenerator cg = new SolutionUrlContentGenerator();
-    
+
     ByteArrayOutputStream out = new ByteArrayOutputStream();
-    
+
     SimpleParameterProvider pathParams = new SimpleParameterProvider();
-    Map<String,IParameterProvider> parameterProviders = new HashMap<String,IParameterProvider>();
-    parameterProviders.put( "path" , pathParams ); //$NON-NLS-1$
-    
-    pathParams.setParameter( "path" , "/web/badpath/img.png");
-    
-    IOutputHandler handler = new SimpleOutputHandler(out, false);
-    cg.setOutputHandler(handler);
-    cg.setParameterProviders(parameterProviders);
+    Map<String, IParameterProvider> parameterProviders = new HashMap<String, IParameterProvider>();
+    parameterProviders.put( "path", pathParams ); //$NON-NLS-1$
+
+    pathParams.setParameter( "path", "/web/badpath/img.png" );
+
+    IOutputHandler handler = new SimpleOutputHandler( out, false );
+    cg.setOutputHandler( handler );
+    cg.setParameterProviders( parameterProviders );
     cg.createContent();
-    
+
     String content = new String( out.toByteArray() );
-  
+
     assertEquals( "Content is wrong", content, "" );
-    
+
   }
 
   @Test
   public void testBadStaticType() throws Exception {
 
     SolutionUrlContentGenerator cg = new SolutionUrlContentGenerator();
-    
+
     ByteArrayOutputStream out = new ByteArrayOutputStream();
-    
+
     SimpleParameterProvider pathParams = new SimpleParameterProvider();
-    Map<String,IParameterProvider> parameterProviders = new HashMap<String,IParameterProvider>();
-    parameterProviders.put( "path" , pathParams ); //$NON-NLS-1$
-    
-    pathParams.setParameter( "path" , "/web/badpath/file");
-    
-    IOutputHandler handler = new SimpleOutputHandler(out, false);
-    cg.setOutputHandler(handler);
-    cg.setParameterProviders(parameterProviders);
+    Map<String, IParameterProvider> parameterProviders = new HashMap<String, IParameterProvider>();
+    parameterProviders.put( "path", pathParams ); //$NON-NLS-1$
+
+    pathParams.setParameter( "path", "/web/badpath/file" );
+
+    IOutputHandler handler = new SimpleOutputHandler( out, false );
+    cg.setOutputHandler( handler );
+    cg.setParameterProviders( parameterProviders );
     cg.createContent();
-    
+
     String content = new String( out.toByteArray() );
-  
+
     assertEquals( "Content is wrong", content, "" );
-    
+
   }
 
   @Test
   public void testGoodStaticType() throws Exception {
 
     SolutionUrlContentGenerator cg = new SolutionUrlContentGenerator();
-    
+
     ByteArrayOutputStream out = new ByteArrayOutputStream();
-    
+
     SimpleParameterProvider pathParams = new SimpleParameterProvider();
-    Map<String,IParameterProvider> parameterProviders = new HashMap<String,IParameterProvider>();
-    parameterProviders.put( "path" , pathParams ); //$NON-NLS-1$
-    
-    pathParams.setParameter( "path" , "solution1/resources/web/test.txt");
-    
-    IOutputHandler handler = new SimpleOutputHandler(out, false);
-    cg.setOutputHandler(handler);
-    cg.setParameterProviders(parameterProviders);
+    Map<String, IParameterProvider> parameterProviders = new HashMap<String, IParameterProvider>();
+    parameterProviders.put( "path", pathParams ); //$NON-NLS-1$
+
+    pathParams.setParameter( "path", "solution1/resources/web/test.txt" );
+
+    IOutputHandler handler = new SimpleOutputHandler( out, false );
+    cg.setOutputHandler( handler );
+    cg.setParameterProviders( parameterProviders );
     cg.createContent();
-    
+
     String content = new String( out.toByteArray() );
-  
+
     assertEquals( "Content is wrong", "test content", content );
-    
+
   }
 
   @Test
@@ -261,24 +262,24 @@ public class SolutionUrlContentGeneratorTest {
     String testContents = "test file contents";
     String filepath = "solution/notweb/test.txt";
     SolutionUrlContentGenerator cg = new SolutionUrlContentGenerator();
-    
+
     ByteArrayOutputStream out = new ByteArrayOutputStream();
-    
+
     SimpleParameterProvider pathParams = new SimpleParameterProvider();
-    Map<String,IParameterProvider> parameterProviders = new HashMap<String,IParameterProvider>();
-    parameterProviders.put( "path" , pathParams ); //$NON-NLS-1$
-    
-    pathParams.setParameter( "path" , filepath);
-    
-    IOutputHandler handler = new SimpleOutputHandler(out, false);
-    cg.setOutputHandler(handler);
-    cg.setParameterProviders(parameterProviders);
+    Map<String, IParameterProvider> parameterProviders = new HashMap<String, IParameterProvider>();
+    parameterProviders.put( "path", pathParams ); //$NON-NLS-1$
+
+    pathParams.setParameter( "path", filepath );
+
+    IOutputHandler handler = new SimpleOutputHandler( out, false );
+    cg.setOutputHandler( handler );
+    cg.setParameterProviders( parameterProviders );
     cg.createContent();
-    
+
     String content = new String( out.toByteArray() );
-  
+
     assertEquals( "Content is wrong", content, "" );
-    
+
   }
 
   @Test
@@ -287,26 +288,25 @@ public class SolutionUrlContentGeneratorTest {
     String testContents = "test file contents";
     String filepath = "solution/web/test.xaction";
     SolutionUrlContentGenerator cg = new SolutionUrlContentGenerator();
-    
-    ByteArrayOutputStream out = new ByteArrayOutputStream();
-    
-    SimpleParameterProvider pathParams = new SimpleParameterProvider();
-    Map<String,IParameterProvider> parameterProviders = new HashMap<String,IParameterProvider>();
-    parameterProviders.put( "path" , pathParams ); //$NON-NLS-1$
-    
-    pathParams.setParameter( "path" , filepath);
-    
-    IOutputHandler handler = new SimpleOutputHandler(out, false);
-    cg.setOutputHandler(handler);
-    cg.setParameterProviders(parameterProviders);
-    cg.createContent();
-    
-    String content = new String( out.toByteArray() );
-  
-    assertEquals( "Content is wrong", content, "" );
-    
-  }
 
+    ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+    SimpleParameterProvider pathParams = new SimpleParameterProvider();
+    Map<String, IParameterProvider> parameterProviders = new HashMap<String, IParameterProvider>();
+    parameterProviders.put( "path", pathParams ); //$NON-NLS-1$
+
+    pathParams.setParameter( "path", filepath );
+
+    IOutputHandler handler = new SimpleOutputHandler( out, false );
+    cg.setOutputHandler( handler );
+    cg.setParameterProviders( parameterProviders );
+    cg.createContent();
+
+    String content = new String( out.toByteArray() );
+
+    assertEquals( "Content is wrong", content, "" );
+
+  }
 
   @Test
   public void testContentGenerator() throws Exception {
@@ -314,24 +314,24 @@ public class SolutionUrlContentGeneratorTest {
     String testContents = "test file contents";
     String filepath = "solution/test.testgen";
     SolutionUrlContentGenerator cg = new SolutionUrlContentGenerator();
-    
+
     ByteArrayOutputStream out = new ByteArrayOutputStream();
-    
+
     SimpleParameterProvider pathParams = new SimpleParameterProvider();
     SimpleParameterProvider requestParams = new SimpleParameterProvider();
-    Map<String,IParameterProvider> parameterProviders = new HashMap<String,IParameterProvider>();
-    parameterProviders.put( "path" , pathParams ); //$NON-NLS-1$
-    parameterProviders.put( "request" , requestParams ); //$NON-NLS-1$
-    pathParams.setParameter( "path" , filepath);
-    
-    IOutputHandler handler = new SimpleOutputHandler(out, false);
-    cg.setOutputHandler(handler);
-    cg.setParameterProviders(parameterProviders);
+    Map<String, IParameterProvider> parameterProviders = new HashMap<String, IParameterProvider>();
+    parameterProviders.put( "path", pathParams ); //$NON-NLS-1$
+    parameterProviders.put( "request", requestParams ); //$NON-NLS-1$
+    pathParams.setParameter( "path", filepath );
+
+    IOutputHandler handler = new SimpleOutputHandler( out, false );
+    cg.setOutputHandler( handler );
+    cg.setParameterProviders( parameterProviders );
     cg.createContent();
-    
+
     String content = new String( out.toByteArray() );
-  
+
     assertEquals( "Content is wrong", "MockContentGenerator content", content );
-    
+
   }
 }
