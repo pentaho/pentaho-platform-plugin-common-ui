@@ -19,7 +19,12 @@ dojo.declare(
   fieldContextMenuCallback: null,
   
   sanitizeIdAndClassNames: function(name) {
-    return dojox.html.entities.encode(name).replace(/ /g,"_");
+    var escapedName = dojox.html.entities.encode(name);
+    if (escapedName) {
+      return escapedName.replace(/ /g,"_");
+    } else {
+      return name;
+    }
   },
 
   clear: function() {
