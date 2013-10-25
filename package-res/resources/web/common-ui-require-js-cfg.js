@@ -53,4 +53,3 @@ requireCfg['paths']['common-ui/angular'] = CONTEXT_PATH+'api/repos/common-ui/res
 requireCfg['shim']['common-ui/bootstrap'] = ['common-ui/jquery'];
 requireCfg['shim']['common-ui/jquery-i18n'] = ['common-ui/jquery'];
 requireCfg['shim']['common-ui/handlebars'] = ['common-ui/jquery'];
-requireCfg['shim']['common-ui/angular'] = ['common-ui/jquery'];
