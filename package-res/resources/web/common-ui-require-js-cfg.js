@@ -60,3 +60,8 @@ requireCfg['paths']['common-ui/angular-route'] = CONTEXT_PATH+'api/repos/common-
 requireCfg['shim']['common-ui/angular'] = {deps: ['common-ui/jquery'], exports: 'angular'};
 requireCfg['shim']['common-ui/angular-resource'] = ['common-ui/angular'];
 requireCfg['shim']['common-ui/angular-route'] = ['common-ui/angular'];
+
+/* UI-Bootstrap configuration */
+requireCfg['paths']['common-ui/angular-ui-bootstrap'] = CONTEXT_PATH+'api/repos/common-ui/resources/web/bootstrap/ui-bootstrap-tpls-0.6.0.min';
+requireCfg['shim']['common-ui/angular-ui-bootstrap'] = ['common-ui/angular'];
+
