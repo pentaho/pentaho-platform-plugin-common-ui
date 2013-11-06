@@ -56,12 +56,20 @@ requireCfg['shim']['common-ui/handlebars'] = ['common-ui/jquery'];
 requireCfg['paths']['common-ui/angular'] = CONTEXT_PATH+'api/repos/common-ui/resources/web/angular/angular.min';
 requireCfg['paths']['common-ui/angular-resource'] = CONTEXT_PATH+'api/repos/common-ui/resources/web/angular/angular-resource.min';
 requireCfg['paths']['common-ui/angular-route'] = CONTEXT_PATH+'api/repos/common-ui/resources/web/angular/angular-route.min';
+requireCfg['paths']['common-ui/angular-animate'] = CONTEXT_PATH+'api/repos/common-ui/resources/web/angular/angular-animate.min';
 
 requireCfg['shim']['common-ui/angular'] = {deps: ['common-ui/jquery'], exports: 'angular'};
 requireCfg['shim']['common-ui/angular-resource'] = ['common-ui/angular'];
 requireCfg['shim']['common-ui/angular-route'] = ['common-ui/angular'];
+requireCfg['shim']['common-ui/angular-animate'] = ['common-ui/angular'];
 
 /* UI-Bootstrap configuration */
 requireCfg['paths']['common-ui/angular-ui-bootstrap'] = CONTEXT_PATH+'api/repos/common-ui/resources/web/bootstrap/ui-bootstrap-tpls-0.6.0.min';
 requireCfg['shim']['common-ui/angular-ui-bootstrap'] = ['common-ui/angular'];
 
+
+// Plugin Handlers
+requireCfg['paths']['common-ui/PluginHandler'] = CONTEXT_PATH+'api/repos/common-ui/resources/web/plugin-handler/pluginHandler';
+requireCfg['paths']['common-ui/AngularPluginHandler'] = CONTEXT_PATH+'api/repos/common-ui/resources/web/plugin-handler/angularPluginHandler';
+
+requireCfg['shim']['common-ui/PluginHandler'] = ['common-ui/jquery'];
