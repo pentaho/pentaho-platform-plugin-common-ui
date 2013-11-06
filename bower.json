@@ -1,0 +1,34 @@
+{
+  "name": "pentaho-common-ui",
+  "version": "0.0.1",
+  "homepage": "https://github.com/rfellows/pentaho-platform-plugin-common-ui",
+  "authors": [
+    "Rob Fellows <rfellows@pentaho.com>"
+  ],
+  "main": "package-res/resources/web/require.js",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "build-res",
+    "dev-res",
+    "jscoverage",
+    "test-src",
+    "src",
+    "bin",
+    "build*",
+    "codegen-lib",
+    "dist",
+    "ivy*",
+    "js-test",
+    "lib",
+    "package-ivy.xml",
+    "package.json",
+    "karma*",
+    "test-*",
+    "package-res/*.xml",
+    "package-res/resources/chartseriescolor",
+    "package-res/resources/themes",
+    "package-res/resources/web/test"
+  ]
+}
