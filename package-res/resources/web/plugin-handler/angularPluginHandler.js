@@ -36,7 +36,7 @@ pen.define(['common-ui/PluginHandler', 'common-ui/jquery', 'common-ui/angular', 
 		this.routes = routes;
 		this.controllers = controllers;
 		this.services = services;
-	};
+	};	
 
 	var docBootstrapped = false;
 
@@ -45,6 +45,11 @@ pen.define(['common-ui/PluginHandler', 'common-ui/jquery', 'common-ui/angular', 
 
 		// Retrieve module
 		var module = angular.module(plugin.moduleName);	
+
+		// Verify the module has been made pluggable
+		if (!module.isPluggable) {
+			throw "Module '" + plugin.moduleName + "' has not been made pluggable";
+		}
 
 		// Create controllers
 		$(plugin.controllers).each(function(i, controller) {
@@ -104,7 +109,7 @@ pen.define(['common-ui/PluginHandler', 'common-ui/jquery', 'common-ui/angular', 
 			module.$routeProvider
 				.when(route.url, {
 					// TODO : find way to retrieve default location of otherwise binding
-					redirectTo : "/"				
+					redirectTo : "/"
 				});
 			});
 	}
@@ -112,6 +117,8 @@ pen.define(['common-ui/PluginHandler', 'common-ui/jquery', 'common-ui/angular', 
 	// This attaches the appropriate methods and objects directly to the module to allow the module
 	// to be pluggable later
 	var makePluggable = function(module) {
+		module.isPluggable = true;
+
 		module.config(['$routeProvider', '$controllerProvider', '$compileProvider', '$filterProvider', '$provide',
 			function ($routeProvider, $controllerProvider, $compileProvider, $filterProvider, $provide) {
 				module.$controllerProvider = $controllerProvider;
@@ -124,8 +131,21 @@ pen.define(['common-ui/PluginHandler', 'common-ui/jquery', 'common-ui/angular', 
 		    }]);
 	}
 
-	return {
-		AngularPlugin : AngularPlugin,
-		makePluggable : makePluggable
+	// Navigates to a location in the browsers
+	var goto = function(hashUrl) {
+
+		var firstChar = hashUrl.charAt(0);
+		while (firstChar == "#" || firstChar == "/") {
+			hashUrl = hashUrl.slice(1);
+			firstChar = hashUrl.charAt(0)
+ 		}
+		
+		window.location.hash = "#/" + hashUrl;
 	}
+
+	return $.extend({
+		AngularPlugin : AngularPlugin,
+		makePluggable : makePluggable,
+		goto : goto
+	}, PluginHandler)
 });
