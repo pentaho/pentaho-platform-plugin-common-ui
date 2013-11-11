@@ -19,10 +19,10 @@ pen.define(['common-ui/jquery'], function() {
 		this.id = _guid();
 		this.type = PLUGIN_TYPE;
 		this.register = function() {
-			register.call(this, this);
+			return register.call(this, this);
 		}
 		this.unregister = function() {
-			unregister.call(this, this);
+			return unregister.call(this, this);
 		}
 		this.onRegister = function() {
 			_loopExec.call(this, onRegister);
@@ -92,6 +92,8 @@ pen.define(['common-ui/jquery'], function() {
 		}
 		console.log(plugin + " has been registered");
 		plugin.onRegister.call(plugin);
+
+		return plugin;
 	}
 
 	// Unregister a single plugin
@@ -102,7 +104,7 @@ pen.define(['common-ui/jquery'], function() {
 			_throwExcpetion(plugin + " is not registered");
 		}
 
-		unregisterById(plugin.id)
+		return unregisterById(plugin.id)
 	}
 
 	// Unregisters a singly plugin by its id
@@ -121,6 +123,8 @@ pen.define(['common-ui/jquery'], function() {
 		}
 
 		plugin.onUnregister.call(plugin);
+
+		return plugin;
 	}
 
 	return {
