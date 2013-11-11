@@ -45,6 +45,8 @@ requireCfg['shim']['common-data/models-mql'] = ['common-data/oop', 'common-data/
 
 
 requireCfg['paths']['common-ui/jquery'] = CONTEXT_PATH+'api/repos/common-ui/resources/web/jquery/jquery-1.9.1.min';
+requireCfg['shim']['common-ui/jquery'] = { exports: '$' };
+
 requireCfg['paths']['common-ui/handlebars'] = CONTEXT_PATH+'api/repos/common-ui/resources/web/handlebars/handlebars';
 requireCfg['paths']['common-ui/jquery-i18n'] = CONTEXT_PATH+'api/repos/common-ui/resources/web/jquery/jquery.i18n.properties-min';
 requireCfg['paths']['common-ui/bootstrap'] = CONTEXT_PATH+'api/repos/common-ui/resources/web/bootstrap/bootstrap.min';
