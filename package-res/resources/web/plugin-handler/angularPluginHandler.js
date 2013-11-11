@@ -19,23 +19,20 @@
  *			// APPLICATION CONFIGURATION //
  *			///////////////////////////////
  *		}]);
- * 
- * EXAMPLE Route 		{ url : 'String', templateUrl : 'String' | template : 'String', controller : 'String' }
- * EXAMPLE Controller 	{ name : 'String', def : 'Function or Array' }
- * EXAMPLE Service 		{ name : 'String', def : 'Function or Array' }
- *
- * Route, Controller, and Service can be an array of their respective objects
  */
 
 pen.define(['common-ui/PluginHandler', 'common-ui/jquery', 'common-ui/angular', 'common-ui/angular-route'], function(PluginHandler) {
 	// Define an extended plugin of PluginHandler.Plugin
-	var AngularPlugin = function(moduleName, routes, controllers, services, onRegister, onUnregister) {
+	var AngularPlugin = function(moduleName, routerCallback, controllerCallback, serviceCallback, onRegister, onUnregister) {
 		$.extend(this, new PluginHandler.Plugin([_onRegister, onRegister], [_onUnregister, onUnregister]));		
 
 		this.moduleName = moduleName;		
-		this.routes = routes;
-		this.controllers = controllers;
-		this.services = services;
+		this.routerCallback = routerCallback;
+		this.controllerCallback = controllerCallback;
+		this.serviceCallback = serviceCallback;
+		this.routes = [];
+		this.controllers = [];
+		this.services = [];
 	};	
 
 	var docBootstrapped = false;
@@ -51,42 +48,57 @@ pen.define(['common-ui/PluginHandler', 'common-ui/jquery', 'common-ui/angular', 
 			throw "Module '" + plugin.moduleName + "' has not been made pluggable";
 		}
 
-		// Create controllers
-		$(plugin.controllers).each(function(i, controller) {
-			docBootstrapped ? 
-				module.$controllerProvider.register(controller.name, controller.def) : 
-				module.controller(controller.name, controller.def);	
-		});		
+		// Define custom RouteProvider
+		var RouteProvider = {
+			when : function(url, properties) {
+				url = getNamespacedUrl(url, plugin.moduleName);
 
-		// Create Services
-		$(plugin.services).each(function(i, service) {
-			docBootstrapped ? 
-				module.$provide.service(service.name, service.def) : 
-				module.service(service.name, service.def);	
-		});
-		
-		// Append routes
-		$(plugin.routes).each(function(i, route) {
+				plugin.routes.push(url);
 
-			if (docBootstrapped) {
-				module.$routeProvider
-					.when(route.url, {
-						template : route.template,
-						templateUrl : route.templateUrl,
-						controller : route.controller
-					});					
-			} else {
-				module.config(['$routeProvider', function($routeProvider) {
-					$routeProvider
-						.when(route.url, {
-							template : route.template,
-							templateUrl : route.templateUrl,
-							controller : route.controller
-						});
-				}])
+				if (docBootstrapped) {
+					module.$routeProvider.when(url, properties)					
+				} else {
+					module.config(['$routeProvider', function($routeProvider) {
+						$routeProvider.when(url, properties);
+					}])
+				}				
+
+				return RouteProvider;
 			}
-			
-		});		
+		}
+
+		// Define custom Controller
+		var Controller = function(name, def) {
+			plugin.controllers.push(name);
+
+			docBootstrapped ? 
+				module.$controllerProvider.register(name, def) :
+				module.controller(name, def);			
+		}
+
+		// Define custom Service
+		var Service = function(name, def) {			
+			plugin.services.push(name);
+
+			docBootstrapped ?
+				module.$provide.service(name, def) :
+				module.service(name, def);
+		}
+
+		// Create routes			
+		if (plugin.routerCallback) {
+			plugin.routerCallback.call(this, RouteProvider);
+		}
+
+		// Call controller callback
+		if (plugin.controllerCallback) {
+			plugin.controllerCallback.call(this, Controller);	
+		}
+		
+		// Call service callback
+		if (plugin.serviceCallback) {
+			plugin.serviceCallback.call(this, Service);	
+		}
 	}
 
 	// Provide function for onUnregister
@@ -130,22 +142,42 @@ pen.define(['common-ui/PluginHandler', 'common-ui/jquery', 'common-ui/angular', 
 		        docBootstrapped = true;
 		    }]);
 	}
-
+	
 	// Navigates to a location in the browsers
-	var goto = function(hashUrl) {
+	var gotoDirect = function(hashUrl) {		
+		window.location.hash = "#/" + cleanHashUrl(hashUrl);
+	}	
 
+	// Returns a namespaced url
+	var getNamespacedUrl = function(hashUrl, moduleName) {
+		return "/" + moduleName + "/" + cleanHashUrl(hashUrl);
+	}
+
+	// Strips all leading elements from the hash url
+	var cleanHashUrl = function(hashUrl) {
 		var firstChar = hashUrl.charAt(0);
 		while (firstChar == "#" || firstChar == "/") {
 			hashUrl = hashUrl.slice(1);
 			firstChar = hashUrl.charAt(0)
  		}
-		
-		window.location.hash = "#/" + hashUrl;
+
+ 		return hashUrl;
+	}
+
+	// Requires a module name as a namespace
+	var goto = function(hashUrl, moduleName) {
+		gotoDirect(getNamespacedUrl(hashUrl, moduleName));
+	}
+
+	// Goes directly back to the root;
+	var goHome = function() {
+		gotoDirect("/");
 	}
 
 	return $.extend({
 		AngularPlugin : AngularPlugin,
 		makePluggable : makePluggable,
-		goto : goto
+		goto : goto,
+		goHome : goHome
 	}, PluginHandler)
 });
