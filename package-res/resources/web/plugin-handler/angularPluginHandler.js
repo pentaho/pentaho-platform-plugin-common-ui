@@ -1,10 +1,11 @@
 /*
  * An implementation of the plugin handler for use with AngularJS. Also requires jQuery
  *
+ * THIS MUST BE RUN BEFORE THE DOCUMENT IS BOOTSTRAPPED
  * To allow for lazy loading of plugins, when configuring the module where the plugin will be stored,
  * the module must have specific providers attached to the module. You must use the convenience 
  * function "makePluggable" to do this work for you. Your own configuration can also be provided
- * and not conflict with the actions performed in "makePluggable"
+ * and not conflict with the actions performed in "makePluggable".
  *
  * RouterCallback : This is a function that recieves a $routeProvider as its only parameter
  * EXAMPLE: var routerCallback = function($routeProvider) {
@@ -140,7 +141,7 @@ pen.define(['common-ui/PluginHandler', 'common-ui/jquery', 'common-ui/angular', 
 	var makePluggable = function(module) {
 		module.isPluggable = true;
 
-		module.config(['$routeProvider', '$controllerProvider', '$compileProvider', '$filterProvider', '$provide',
+		module.config(['$routeProvider', '$controllerProvider', '$compileProvider', '$filterProvider', '$provide', 
 			function ($routeProvider, $controllerProvider, $compileProvider, $filterProvider, $provide) {
 				module.$controllerProvider = $controllerProvider;
 		        module.$compileProvider    = $compileProvider;
@@ -152,15 +153,19 @@ pen.define(['common-ui/PluginHandler', 'common-ui/jquery', 'common-ui/angular', 
 		    }]);
 
 		// Add location to any module for $location navigation
-		module.run(["$location", function($location) {
+		module.run(["$location", "$rootScope", function($location, $rootScope) {
 			module.$location = $location;
+			module.$rootScope = $rootScope;
 		}])
 	}
 	
 	// Navigates to a location in the browsers
 	var gotoDirect = function(hashUrl, module) {
 		module.$location.path(cleanHashUrl(hashUrl));
-		module.$rootScope.$apply();
+
+		if(!module.$rootScope.$$phase) {
+			module.$rootScope.$apply();
+		}
 	}
 
 	// Returns a namespaced url

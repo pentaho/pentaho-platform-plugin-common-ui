@@ -69,9 +69,9 @@ requireCfg['shim']['common-ui/angular-animate'] = ['common-ui/angular'];
 requireCfg['paths']['common-ui/angular-ui-bootstrap'] = CONTEXT_PATH+'api/repos/common-ui/resources/web/bootstrap/ui-bootstrap-tpls-0.6.0.min';
 requireCfg['shim']['common-ui/angular-ui-bootstrap'] = ['common-ui/angular'];
 
-
 // Plugin Handlers
 requireCfg['paths']['common-ui/PluginHandler'] = CONTEXT_PATH+'api/repos/common-ui/resources/web/plugin-handler/pluginHandler';
 requireCfg['paths']['common-ui/AngularPluginHandler'] = CONTEXT_PATH+'api/repos/common-ui/resources/web/plugin-handler/angularPluginHandler';
+requireCfg['paths']['common-ui/AnimatedAngularPluginHandler'] = CONTEXT_PATH+'api/repos/common-ui/resources/web/plugin-handler/animatedAngularPluginHandler';
 
 requireCfg['shim']['common-ui/PluginHandler'] = ['common-ui/jquery'];
