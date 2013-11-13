@@ -2,23 +2,29 @@
  * An implementation of the plugin handler for use with AngularJS. Also requires jQuery
  *
  * To allow for lazy loading of plugins, when configuring the module where the plugin will be stored,
- * the module must define the following as part of the module's data. You can also use the convenience 
- * function "makeModulePluggable" to do this work for you. Your own configuration can also be provided
- * and not conflict with the actions performed in "makeModulePluggable"
- * 
- * EXAMPLE
- * 	var app = angular.module('app-module-name', ['dependancy1', 'dependancy2', ...]);
- *	
- * 	app.config(['$routeProvider', '$controllerProvider', '$provide',
- * 		function ($routeProvider, $controllerProvider, $provide) {
- * 			app.controllerProvider = $controllerProvider;
- * 			app.routeProvider      = $routeProvider;
- * 			app.provide            = $provide;
+ * the module must have specific providers attached to the module. You must use the convenience 
+ * function "makePluggable" to do this work for you. Your own configuration can also be provided
+ * and not conflict with the actions performed in "makePluggable"
  *
- *			///////////////////////////////
- *			// APPLICATION CONFIGURATION //
- *			///////////////////////////////
- *		}]);
+ * RouterCallback : This is a function that recieves a $routeProvider as its only parameter
+ * EXAMPLE: var routerCallback = function($routeProvider) {
+ * 		$routeProvider
+ *			.when(##url##, ##properties##)
+ *			.when(##url##, ##properties##);
+ * }
+ * NOTE: Due to support for multiple views, .otherwise is not supported
+ *
+ * ControllerCallback : This is a function that receives the controller provider as its only parameter
+ * EXAMPLE: var controllerCallback = function($controller) {
+ *		$controller(##controller-name##, ##controller-definition##)
+ *		$controller(##controller-name##, ##controller-definition##)
+ * }
+ *
+ * ServiceCallback : This is a function that receives the service provider as its only parameter
+ * EXAMPLE: var serviceCallback = function($service) {
+ *		$service(##service-name##, ##service-definition##)
+ *		$service(##service-name##, ##service-definition##)
+ * }
  */
 
 pen.define(['common-ui/PluginHandler', 'common-ui/jquery', 'common-ui/angular', 'common-ui/angular-route'], function(PluginHandler) {
@@ -64,6 +70,9 @@ pen.define(['common-ui/PluginHandler', 'common-ui/jquery', 'common-ui/angular', 
 				}				
 
 				return RouteProvider;
+			},
+			otherwise : function() {
+				console.log("Angular's OTHERWISE property is not allowed to be used");
 			}
 		}
 
@@ -141,12 +150,18 @@ pen.define(['common-ui/PluginHandler', 'common-ui/jquery', 'common-ui/angular', 
 
 		        docBootstrapped = true;
 		    }]);
+
+		// Add location to any module for $location navigation
+		module.run(["$location", function($location) {
+			module.$location = $location;
+		}])
 	}
 	
 	// Navigates to a location in the browsers
-	var gotoDirect = function(hashUrl) {		
-		window.location.hash = "#/" + cleanHashUrl(hashUrl);
-	}	
+	var gotoDirect = function(hashUrl, module) {
+		module.$location.path(cleanHashUrl(hashUrl));
+		module.$rootScope.$apply();
+	}
 
 	// Returns a namespaced url
 	var getNamespacedUrl = function(hashUrl, moduleName) {
@@ -166,12 +181,12 @@ pen.define(['common-ui/PluginHandler', 'common-ui/jquery', 'common-ui/angular', 
 
 	// Requires a module name as a namespace
 	var goto = function(hashUrl, moduleName) {
-		gotoDirect(getNamespacedUrl(hashUrl, moduleName));
+		gotoDirect(getNamespacedUrl(hashUrl, moduleName), angular.module(moduleName));
 	}
 
 	// Goes directly back to the root;
-	var goHome = function() {
-		gotoDirect("/");
+	var goHome = function(moduleName) {
+		gotoDirect("/", angular.module(moduleName));
 	}
 
 	return $.extend({
