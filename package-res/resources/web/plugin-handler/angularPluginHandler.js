@@ -7,39 +7,46 @@
  * function "makePluggable" to do this work for you. Your own configuration can also be provided
  * and not conflict with the actions performed in "makePluggable".
  *
- * RouterCallback : This is a function that recieves a $routeProvider as its only parameter
- * EXAMPLE: var routerCallback = function($routeProvider) {
- * 		$routeProvider
- *			.when(##url##, ##properties##)
- *			.when(##url##, ##properties##);
- * }
- * NOTE: Due to support for multiple views, .otherwise is not supported
- *
- * ControllerCallback : This is a function that receives the controller provider as its only parameter
- * EXAMPLE: var controllerCallback = function($controller) {
- *		$controller(##controller-name##, ##controller-definition##)
- *		$controller(##controller-name##, ##controller-definition##)
- * }
- *
- * ServiceCallback : This is a function that receives the service provider as its only parameter
- * EXAMPLE: var serviceCallback = function($service) {
- *		$service(##service-name##, ##service-definition##)
- *		$service(##service-name##, ##service-definition##)
+ * CONFIG for Plugin
+ * {
+ *			routerCallback : function($routeProvider) {},
+ *			controllerCallback : function($controllerProvider) {},
+ *			serviceCallback : function($serviceProvider) {},
+ *			factoryCallback : function($factoryProvider) {},
+ *			filterCallback : function($filterProvider) {}
+ *		}
  * }
  */
 
-pen.define(['common-ui/PluginHandler', 'common-ui/jquery', 'common-ui/angular', 'common-ui/angular-route'], function(PluginHandler) {
+var deps = [
+	'common-ui/PluginHandler', 
+	'common-ui/angular', 
+	'common-ui/angular-route'
+];
+
+pen.define(deps, function(PluginHandler) {
+	
 	// Define an extended plugin of PluginHandler.Plugin
-	var AngularPlugin = function(moduleName, routerCallback, controllerCallback, serviceCallback, onRegister, onUnregister) {
+	var Plugin = function(moduleName, config, onRegister, onUnregister) {
 		$.extend(this, new PluginHandler.Plugin([_onRegister, onRegister], [_onUnregister, onUnregister]));		
 
-		this.moduleName = moduleName;		
-		this.routerCallback = routerCallback;
-		this.controllerCallback = controllerCallback;
-		this.serviceCallback = serviceCallback;
-		this.routes = [];
-		this.controllers = [];
-		this.services = [];
+		this.moduleName 	= moduleName;		
+		this.config 		= config;
+		this.routes 		= [];
+		this.controllers 	= [];
+		this.services 		= [];
+		this.factories 		= [];
+		this.filters 		= [];
+
+		this.goto = function(url) {
+			goto(url, this.moduleName);
+		}
+
+
+		var baseToString = this.toString;
+		this.toString = function() {
+			return "ANGULAR_PLUGIN[" + moduleName + "] -- " + baseToString.call(this);
+		}
 	};	
 
 	var docBootstrapped = false;
@@ -95,19 +102,44 @@ pen.define(['common-ui/PluginHandler', 'common-ui/jquery', 'common-ui/angular', 
 				module.service(name, def);
 		}
 
+		// Define custom Factory provider
+		var Factory = function(name, def) {
+			plugin.factories.push(name);
+
+			docBootstrapped ? 
+				module.$provide.factory(name, def) :
+				module.factory(name, def);
+		}
+
+		var Filter = function(name, def) {
+			plugin.filters.push(name);
+
+			docBootstrapped ? 
+				module.$filterProvider.register(name, def) :
+				module.filter(name, def);
+		}
+
 		// Create routes			
-		if (plugin.routerCallback) {
-			plugin.routerCallback.call(this, RouteProvider);
+		if (plugin.config.routerCallback) {
+			plugin.config.routerCallback.call(this, RouteProvider);
 		}
 
 		// Call controller callback
-		if (plugin.controllerCallback) {
-			plugin.controllerCallback.call(this, Controller);	
+		if (plugin.config.controllerCallback) {
+			plugin.config.controllerCallback.call(this, Controller);	
 		}
 		
 		// Call service callback
-		if (plugin.serviceCallback) {
-			plugin.serviceCallback.call(this, Service);	
+		if (plugin.config.serviceCallback) {
+			plugin.config.serviceCallback.call(this, Service);	
+		}
+
+		if (plugin.config.factoryCallback) {
+			plugin.config.factoryCallback.call(this, Factory)
+		}
+
+		if (plugin.config.filterCallback) {
+			plugin.config.filterCallback.call(this, Filter);
 		}
 	}
 
@@ -118,22 +150,32 @@ pen.define(['common-ui/PluginHandler', 'common-ui/jquery', 'common-ui/angular', 
 
 		// Unbind Controllers
 		$(plugin.controllers).each(function(i, controller) {
-			module.$controllerProvider.register(controller.name, null);
+			module.$controllerProvider.register(controller, null);
 		})
 
 		// Unbind Services
 		$(plugin.services).each(function(i, service) {
-			module.$provide.service(service.name, null);
+			module.$provide.service(service, null);
 		})
 		
 		// Unbind routes
 		$(plugin.routes).each(function(i, route) {
 			module.$routeProvider
-				.when(route.url, {
+				.when(route, {
 					// TODO : find way to retrieve default location of otherwise binding
 					redirectTo : "/"
 				});
 			});
+
+		// Unbind factories
+		$(plugin.factories).each(function(i, factory) {
+			module.$provide.factory(factory, null);
+		})
+
+		// Unbind filters
+		$(plugin.filters).each(function(i, filter) {
+			module.$filterProvider.register(filter, null);
+		})
 	}
 
 	// This attaches the appropriate methods and objects directly to the module to allow the module
@@ -156,6 +198,14 @@ pen.define(['common-ui/PluginHandler', 'common-ui/jquery', 'common-ui/angular', 
 		module.run(["$location", "$rootScope", function($location, $rootScope) {
 			module.$location = $location;
 			module.$rootScope = $rootScope;
+
+			// Provide goto and goHome at the root scope
+			$rootScope.goto = function(url) {
+				goto(url, module.name);
+			}
+			$rootScope.goHome = function() {
+				goHome(module.name);
+			}
 		}])
 	}
 	
@@ -194,10 +244,17 @@ pen.define(['common-ui/PluginHandler', 'common-ui/jquery', 'common-ui/angular', 
 		gotoDirect("/", angular.module(moduleName));
 	}
 
-	return $.extend({
-		AngularPlugin : AngularPlugin,
+
+	// Extend the PluginHandler into a new object
+	var returnObj = $.extend({
+		Plugin : Plugin,
 		makePluggable : makePluggable,
 		goto : goto,
 		goHome : goHome
-	}, PluginHandler)
+	}, PluginHandler);
+
+	// Override plugin from PluginHandler with current instance
+	returnObj.Plugin = Plugin;
+
+	return returnObj;
 });
