@@ -4,8 +4,8 @@
  * THIS MUST BE RUN BEFORE THE DOCUMENT IS BOOTSTRAPPED
  * To allow for lazy loading of plugins, when configuring the module where the plugin will be stored,
  * the module must have specific providers attached to the module. You must use the convenience 
- * function "makePluggable" to do this work for you. Your own configuration can also be provided
- * and not conflict with the actions performed in "makePluggable".
+ * function "module" to create the module to do this work for you. Your own configurations can also be provided
+ * and not conflict with the actions performed in "makePluggable" called from "module".
  *
  * CONFIG for Plugin
  * {
@@ -39,9 +39,12 @@ pen.define(deps, function(PluginHandler) {
 		this.filters 		= [];
 
 		this.goto = function(url) {
-			goto(url, this.moduleName);
+			goto(url, moduleName);
 		}
 
+		this.goHome = function() {
+			goHome(moduleName);
+		}
 
 		var baseToString = this.toString;
 		this.toString = function() {
@@ -178,6 +181,21 @@ pen.define(deps, function(PluginHandler) {
 		})
 	}
 
+	// Provide a method for creating the angular module and adding the necessary dependencies
+	var module = function(moduleName, deps, config) {
+
+		// Include ngRoute
+		deps.push('ngRoute');
+
+		// Create module
+		var module = angular.module(moduleName, deps, config);
+
+		// Provide the ability to plug in to the module post bootstrap
+		this.makePluggable(module);
+
+		return module;
+	}
+
 	// This attaches the appropriate methods and objects directly to the module to allow the module
 	// to be pluggable later
 	var makePluggable = function(module) {
@@ -248,6 +266,7 @@ pen.define(deps, function(PluginHandler) {
 	// Extend the PluginHandler into a new object
 	var returnObj = $.extend({
 		Plugin : Plugin,
+		module : module,
 		makePluggable : makePluggable,
 		goto : goto,
 		goHome : goHome
