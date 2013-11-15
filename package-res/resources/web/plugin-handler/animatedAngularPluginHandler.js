@@ -9,9 +9,8 @@
  * REQUIREMENTS
  * 1) Add "ng-app-element" class to animatable angular container
  * 		EXAMPLE: <div ng-view class='ng-app-element'></div>
- * 2) "makePluggable" must be called before the document is bootstrapped
+ * 2) "module" must be called before the document is bootstrapped
  * 3) Include "angular-animations.css" in your document, located in 'common-ui/resources/themes/css/angular-animations.css'
- * 4) Include 'ngAnimate' in your module 
  *
  * TO FORCE STATIC ANIMATIONS (use the same animation all the time)
  * 1) Add "animate" attribute to animatable angular container and set it equal to one of the preset animation styles
@@ -90,6 +89,16 @@ pen.define(deps, function(AngularPluginHandler) {
 	var open = function(url, moduleName) {
 		setAnimation("fade");
 		AngularPluginHandler.goto(url, moduleName);
+	}
+
+	// Provide and override function for creating the module
+	var module = function(moduleName, deps, config) {
+		
+		// Include 'ngAnimate' as part of the configuration
+		deps.push('ngAnimate');
+
+		// Create the module
+		return AngularPluginHandler.module.call(this, moduleName, deps, config);
 	}
 
 	// Provides additional functionality
@@ -172,6 +181,9 @@ pen.define(deps, function(AngularPluginHandler) {
 
 	// Override Plugin from AngularPluginHandler
 	returnObj.Plugin = Plugin;
+
+	// Override module definition in AngularPluginHandler
+	returnObj.module = module;
 
 	return returnObj;
 });
