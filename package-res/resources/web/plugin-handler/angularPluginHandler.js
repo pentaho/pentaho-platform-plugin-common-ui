@@ -265,7 +265,6 @@ pen.define(deps, function(PluginHandler) {
 
 	// Extend the PluginHandler into a new object
 	var returnObj = $.extend({
-		Plugin : Plugin,
 		module : module,
 		makePluggable : makePluggable,
 		goto : goto,
