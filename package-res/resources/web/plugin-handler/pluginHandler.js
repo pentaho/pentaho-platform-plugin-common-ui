@@ -6,6 +6,11 @@
  * 
  * For a given plugin, the onRegister and onUnregister parameters can either be single functions
  * or an array of functions, which can also be nested within arrays.
+ *
+ * CONFIG = {
+ *		onRegister: function(plugin) {},
+ *		onUnregister: function(plugin) {}
+ * }
  */
 
 pen.define(['common-ui/jquery'], function() {
@@ -15,7 +20,7 @@ pen.define(['common-ui/jquery'], function() {
 	var PLUGIN_TYPE = "PLUGIN";
 
 	// Define Plugin Object
-	var Plugin = function(onRegister, onUnregister) {
+	var Plugin = function(config) {
 	 	/**
          * GUID id
          */		
@@ -52,14 +57,14 @@ pen.define(['common-ui/jquery'], function() {
          * Performs any onRegister functionality defined when creating this object
          */
 		this.onRegister = function() {
-			_loopExec.call(this, onRegister);
+			_loopExec.call(this, config.onRegister);
 		}
 
 		/**
          * Performs any onUnregister functionality defined when creating this object
          */
 		this.onUnregister = function() {
-			_loopExec.call(this, onUnregister);
+			_loopExec.call(this, config.onUnregister);
 		}
 
 		/**

@@ -9,12 +9,13 @@
  *
  * CONFIG for Plugin
  * {
- *			routerCallback : function($routeProvider) {},
- *			controllerCallback : function($controllerProvider) {},
- *			serviceCallback : function($serviceProvider) {},
- *			factoryCallback : function($factoryProvider) {},
- *			filterCallback : function($filterProvider) {}
- *		}
+ *		moduleName : String
+ *		routerCallback : function($routeProvider) {},
+ *		controllerCallback : function($controllerProvider) {},
+ *		serviceCallback : function($serviceProvider) {},
+ *		factoryCallback : function($factoryProvider) {},
+ *		filterCallback : function($filterProvider) {},
+ *		directiveCallback : function($directiveProvider) {}
  * }
  */
 
@@ -27,28 +28,32 @@ var deps = [
 pen.define(deps, function(PluginHandler) {
 	
 	// Define an extended plugin of PluginHandler.Plugin
-	var Plugin = function(moduleName, config, onRegister, onUnregister) {
-		$.extend(this, new PluginHandler.Plugin([_onRegister, onRegister], [_onUnregister, onUnregister]));		
+	var Plugin = function(config) {
+		$.extend(this, new PluginHandler.Plugin({
+			onRegister : [_onRegister, config.onRegister],
+			onUnregister : [_onUnregister, config.onUnregister]
+		}));		
 
-		this.moduleName 	= moduleName;		
-		this.config 		= config;
-		this.routes 		= [];
-		this.controllers 	= [];
-		this.services 		= [];
-		this.factories 		= [];
-		this.filters 		= [];
+		this.moduleName     = config.moduleName;		
+		this.config         = config;
+		this.routes         = [];
+		this.controllers    = [];
+		this.services       = [];
+		this.factories      = [];
+		this.filters        = [];
+		this.directives     = [];
 
 		this.goto = function(url) {
-			goto(url, moduleName);
+			goto(url, config.moduleName);
 		}
 
 		this.goHome = function() {
-			goHome(moduleName);
+			goHome(config.moduleName);
 		}
 
 		var baseToString = this.toString;
 		this.toString = function() {
-			return "ANGULAR_PLUGIN[" + moduleName + "] -- " + baseToString.call(this);
+			return "ANGULAR_PLUGIN[" + config.moduleName + "] -- " + baseToString.call(this);
 		}
 	};	
 
@@ -122,6 +127,14 @@ pen.define(deps, function(PluginHandler) {
 				module.filter(name, def);
 		}
 
+		var Directive = function(name, def) {
+			plugin.directives.push(name);
+
+			docBootstrapped ? 
+				module.$compileProvider.directive(name, def) :
+				module.directive(name, def)
+		}
+
 		// Create routes			
 		if (plugin.config.routerCallback) {
 			plugin.config.routerCallback.call(this, RouteProvider);
@@ -143,6 +156,10 @@ pen.define(deps, function(PluginHandler) {
 
 		if (plugin.config.filterCallback) {
 			plugin.config.filterCallback.call(this, Filter);
+		}
+
+		if (plugin.config.directiveCallback) {
+			plugin.config.directiveCallback.call(this, Directive);
 		}
 	}
 
@@ -178,6 +195,11 @@ pen.define(deps, function(PluginHandler) {
 		// Unbind filters
 		$(plugin.filters).each(function(i, filter) {
 			module.$filterProvider.register(filter, null);
+		})
+
+		// Unbind directives
+		$(plugin.directives).each(function(i, directive) {
+			module.$compileProvider.directive(name, null);
 		})
 	}
 
