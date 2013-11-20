@@ -24,8 +24,8 @@ var deps = [
 ];
 pen.define(deps, function(AngularPluginHandler) {
 
-	var Plugin = function(moduleName, config, onRegister, onUnregister) {
-		$.extend(this, new AngularPluginHandler.Plugin(moduleName, config, onRegister, onUnregister));
+	var Plugin = function(config) {
+		$.extend(this, new AngularPluginHandler.Plugin(config));
 
 		// Provide url linking directly on the plugin, which provides the modulename necessary
 		// for namespace navigation 
