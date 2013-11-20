@@ -15,21 +15,58 @@ pen.define(['common-ui/jquery'], function() {
 	var PLUGIN_TYPE = "PLUGIN";
 
 	// Define Plugin Object
-	var Plugin = function(onRegister, onUnregister) {		
+	var Plugin = function(onRegister, onUnregister) {
+	 	/**
+         * GUID id
+         */		
 		this.id = _guid();
+		
+		/**
+         * TYPE PLUGIN, used for Plugin verification
+         */
 		this.type = PLUGIN_TYPE;
+		
+		/**
+         * Registers this Plugin with the PentahoPluginHandler
+         *
+         * @return PentahoPluginHandler.Plugin
+         * @throws Exception
+         *        As defined in the register function for PentahoPluginHandler
+         */
 		this.register = function() {
 			return register.call(this, this);
 		}
+
+		/**
+         * Unregisters this Plugin with the PentahoPluginHandler
+         *
+         * @return PentahoPluginHandler.Plugin
+         * @throws Exception
+         *        As defined in the register function for PentahoPluginHandler
+         */
 		this.unregister = function() {
 			return unregister.call(this, this);
 		}
+
+		/**
+         * Performs any onRegister functionality defined when creating this object
+         */
 		this.onRegister = function() {
 			_loopExec.call(this, onRegister);
 		}
+
+		/**
+         * Performs any onUnregister functionality defined when creating this object
+         */
 		this.onUnregister = function() {
 			_loopExec.call(this, onUnregister);
 		}
+
+		/**
+         * Performs a toString operation for this object
+         *
+         * @return String
+         */
 		this.toString = function() {
 			return this.type + "[" + this.id + "]";
 		}
@@ -76,7 +113,20 @@ pen.define(['common-ui/jquery'], function() {
 		throw msg;
 	}
 
-	// Register a single plugin
+	/**
+     * Register a single plugin and stores the plugin in the plugin object container. Once the
+     * registration has occurred successfully, the onRegister function defined on the Plugin
+     * is called
+     *
+     * @param plugin
+     *         A plugin defined by PentahoPluginHandler.Plugin
+     *
+     * @return PentahoPluginHandler.Plugin
+     * @throws Exception
+     *        When the plugin is not a type of PentahoPluginHandler.Plugin
+     *        When the plugin is already registered
+     *        When the plugin has not been registered successfully after attempting to register it
+     */
 	var register = function(plugin) {
 		_verifyPlugin(plugin);
 
@@ -96,7 +146,17 @@ pen.define(['common-ui/jquery'], function() {
 		return plugin;
 	}
 
-	// Unregister a single plugin
+	/**
+     * Unregisters a single plugin and removes it from the plugin object container. Once the
+     * unregistration occurrs successfully, the onUnregister function is called
+     *
+     * @param plugin
+     *         A plugin defined by PentahoPluginHandler.Plugin
+     *
+     * @return PentahoPluginHandler.Plugin
+     * @throws Exception
+     *        When the plugin is not a type of PentahoPluginHandler.Plugin
+     */
 	var unregister = function(plugin) {
 		_verifyPlugin(plugin);
 
@@ -107,7 +167,17 @@ pen.define(['common-ui/jquery'], function() {
 		return unregisterById(plugin.id)
 	}
 
-	// Unregisters a singly plugin by its id
+	/**
+     * Unregisters a singly plugin by its id
+     *
+     * @param id
+     *         A String representing the id of a PentahoPluginHandler.Plugin
+     *
+     * @return PentahoPluginHandler.Plugin
+     * @throws Exception
+     *        If a plugin is being unregistered and does not exist or if the plugin
+     *        was not unregistered successfully
+     */
 	var unregisterById = function(id) {
 		// Verify that plugin is present in list of plugins
 		if (!plugins[id]) {
