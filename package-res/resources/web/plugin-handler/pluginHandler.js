@@ -5,10 +5,6 @@
  * registering/unregistering the plugin's repsective methods are called. This is not 
  * intended to function on its own, but to be extended via a framework specific implementation 
  * of the plugin object
- * 
- * For a given plugin, the onRegister and onUnregister parameters can either be single functions
- * or an array of functions, which can also be nested within arrays.
- *
  */
 
 var deps = [

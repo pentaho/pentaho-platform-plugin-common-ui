@@ -1,9 +1,20 @@
 /**
  * Pentaho Plugin
+ *
+ * A base class implementation for a PentahoPlugin. This is to be used in accordance with, at least, an implementation
+ * of a PentahoAngularPluginHandler. Though the register and unregister functionst are convenience methods, the pluginHandler
+ * is a required property on the plugin configuration to provide a better experience using plugins.  This does not inhibit 
+ * you from using the PentahoPluginHandler directly to register and unregister plugins, but it is a better experience to simply 
+ * register a plugin directly from the plugin itself.
+ *
  * CONFIG = {
+ *		// REQUIRED
+ *		pluginHandler : PluginHandlerInstance,
+ *
+ * 		//OPTIONAL
  *		onRegister : function(plugin) {},
  *		onUnregister : function(plugin) {}
- *		pluginHandler : PluginHandlerInstance
+ *		
  * }
  */
 
