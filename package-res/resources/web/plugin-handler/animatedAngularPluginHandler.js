@@ -24,166 +24,134 @@ var deps = [
 ];
 pen.define(deps, function(AngularPluginHandler) {
 
-	var Plugin = function(config) {
-		$.extend(this, new AngularPluginHandler.Plugin(config));
+	var AnimatedAngularPluginHandler = ring.create([AngularPluginHandler], {
 
-		// Provide url linking directly on the plugin, which provides the modulename necessary
-		// for namespace navigation 
-		this.goto = function(url) {
-			goto(url, this.moduleName);
-		}
-		this.goHome = function() {
-			goHome(this.moduleName);
-		}
-		this.goNext = function(url) {
-			goNext(url, this.moduleName);
-		}
-		this.goPrevious = function(url) {
-			goPrevious(url, this.moduleName);		
-		}
-		this.open = function(url) {
-			open(url, this.moduleName);
-		}
-		this.close = function() {
-			close(this.moduleName);
-		}
-	}
-	
-	// Sets the animation to be performed on animation transitions
-	var animation = "slide-left";
-	var setAnimation = function(anim) {			
-		animation = anim;
-	}
+		init : function() {
+			this.$super();
 
-	// Provide of means of switching views without animation
-	var goto = function(url, moduleName) {
-		setAnimation("none");
-		AngularPluginHandler.goto(url, moduleName);
-	}
-
-	// Provide and override to goHome in AngularPluginHandler where there is no animation
-	var goHome = function(moduleName) {
-		setAnimation("none");
-		AngularPluginHandler.goHome(moduleName);
-	}
-
-	// Sets the animation as slide left and goes to the url
-	var goNext = function(url, moduleName) {
-		setAnimation("slide-left");
-		AngularPluginHandler.goto(url, moduleName);
-	}
-
-	// Sets the animation as slide right and goes to the url
-	var goPrevious = function(url, moduleName) {
-		setAnimation("slide-right");
-		AngularPluginHandler.goto(url, moduleName);
-	}
-
-	// Sets the animatione to fade and goes back to the root application
-	var close = function(moduleName) {
-		setAnimation("fade");
-		AngularPluginHandler.goHome(moduleName);
-	}
-
-	// Sets the animation to fade and goes to a url, providing an "open" feel
-	var open = function(url, moduleName) {
-		setAnimation("fade");
-		AngularPluginHandler.goto(url, moduleName);
-	}
-
-	// Provide and override function for creating the module
-	var module = function(moduleName, deps, config) {
+			this.animation = "slide-left";
+		},
 		
-		// Include 'ngAnimate' as part of the configuration
-		deps.push('ngAnimate');
+		// Sets the animation to be performed on animation transitions
+		_setAnimation : function(anim) {			
+			this.animation = anim;
+		},
 
-		// Create the module
-		return AngularPluginHandler.module.call(this, moduleName, deps, config);
-	}
+		// Provide of means of switching views without animation
+		goto : function(url, moduleName, allowAnimation) {
+			if (!allowAnimation) {
+				this._setAnimation("none");	
+			}
+			
+			this.$super(url, moduleName);
+		},
 
-	// Provides additional functionality
-	var makePluggable = function(module) {
-		AngularPluginHandler.makePluggable(module);
+		// Provide and override to goHome in AngularPluginHandler where there is no animation
+		goHome : function(moduleName, allowAnimation) {
+			if (!allowAnimation){
+				this._setAnimation("none");	
+			} 
+			this.$super(moduleName);
+		},
 
-		// Set animation actions	
-		module.animation(".ng-app-element", function() {
-			var $body = $("body");
+		// Sets the animation as slide left and goes to the url
+		goNext : function(url, moduleName) {
+			this._setAnimation("slide-left");
+			this.goto(url, moduleName, true);
+		},
 
-			if ($body.hasClass("IE8") || $body.hasClass("IE9")) {
-				return {
-					enter : function(element, done) {
-						$(element)
-							.css("left", "100%")
-							.animate({ left: "0" }, done);
-					},
-					leave : function(element, done) {
-						$(element)
-							.css("left", "0")
-							.animate({ left: "-100%" }, done);
-					}
-				}	
-			} else {
-				return {
-				    enter: function(element, done) {
+		// Sets the animation as slide right and goes to the url
+		goPrevious : function(url, moduleName) {
+			this._setAnimation("slide-right");
+			this.goto(url, moduleName, true);
+		},
 
-				    	// On enter, find elements
-				    	$(".ng-app-element:not(.deny-animation-change)").attr("animate", animation);
-				    	
-						return function(cancelled) {
+		// Sets the animatione to fade and goes back to the root application
+		close : function(moduleName) {
+			this._setAnimation("fade");
+			this.goHome(moduleName, true);
+		},
 
-							// Once completed, set the container styles
-							$(".ng-app-element:not(.deny-animation-change)").attr("animate", animation);
+		// Sets the animation to fade and goes to a url, providing an "open" feel
+		open : function(url, moduleName) {
+			this._setAnimation("fade");
+			this.goto(url, moduleName, true);
+		},
+
+		// Provide and override function for creating the module
+		module : function(moduleName, deps, config) {
+			
+			// Include 'ngAnimate' as part of the configuration
+			deps.push('ngAnimate');
+
+			// Create the module
+			return this.$super.call(this, moduleName, deps, config);
+		},
+
+		// Provides additional functionality
+		_makePluggable : function(module) {
+			this.$super(module);
+
+			var self = this;
+
+			// Set animation actions	
+			module.animation(".ng-app-element", function() {
+				var $body = $("body");
+
+				if ($body.hasClass("IE8") || $body.hasClass("IE9")) {
+					return {
+						enter : function(element, done) {
+							$(element)
+								.css("left", "100%")
+								.animate({ left: "0" }, done);
+						},
+						leave : function(element, done) {
+							$(element)
+								.css("left", "0")
+								.animate({ left: "-100%" }, done);
 						}
-					}
-			    }	
-			}
-		});
+					}	
+				} else {
+					return {
+					    enter: function(element, done) {
 
-		// Set default actions for root scope and animations
-		module.run(['$rootScope', function($rootScope) {
-			// Provides the navigation controls to any template
-			$rootScope.goNext = function(url) {
-				goNext(url, module.name);
-			}				
-			$rootScope.goPrevious = function(url){
-				goPrevious(url, module.name);
-			}
-			$rootScope.close = function() {
-				close(module.name);
-			}
-			$rootScope.open = function(url) {
-				open(url, module.name);
-			}
-			$rootScope.goto = function(url) {
-				goto(url, module.name);
-			}
-			$rootScope.goHome = function() {
-				goHome(module.name)
-			}
-		}]);
-	}
+					    	// On enter, find elements
+					    	$(".ng-app-element:not(.deny-animation-change)").attr("animate", self.animation);
+					    	
+							return function(cancelled) {
 
-	var returnObj = $.extend({
-		goNext : goNext,
-		goPrevious : goPrevious,
-		close : close,
-		open : open
-	}, AngularPluginHandler);
+								// Once completed, set the container styles
+								$(".ng-app-element:not(.deny-animation-change)").attr("animate", self.animation);
+							}
+						}
+				    }	
+				}
+			})
 
-	// Override makePluggable from AngularPluginHandler
-	returnObj.makePluggable = makePluggable;
+			// Set default actions for root scope and animations			
+			module.run(['$rootScope', function($rootScope) {
+				// Provides the navigation controls to any template
+				$rootScope.goNext = function(url) {
+					self.goNext(url, module.name);
+				}				
+				$rootScope.goPrevious = function(url){
+					self.goPrevious(url, module.name);
+				}
+				$rootScope.close = function() {
+					self.close(module.name);
+				}
+				$rootScope.open = function(url) {
+					self.open(url, module.name);
+				}
+				$rootScope.goto = function(url) {
+					self.goto(url, module.name);
+				}
+				$rootScope.goHome = function() {
+					self.goHome(module.name)
+				}
+			}]);
+		}
+	})
 
-	// Override goto from AngularPluginHandler
-	returnObj.goto = goto;
-
-	// Override goHome from AgnularPluginHandler
-	returnObj.goHome = goHome;
-
-	// Override Plugin from AngularPluginHandler
-	returnObj.Plugin = Plugin;
-
-	// Override module definition in AngularPluginHandler
-	returnObj.module = module;
-
-	return returnObj;
+	return AnimatedAngularPluginHandler;
 });
