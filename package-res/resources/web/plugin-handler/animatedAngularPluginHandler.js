@@ -30,22 +30,22 @@ pen.define(deps, function(AngularPluginHandler) {
 		// Provide url linking directly on the plugin, which provides the modulename necessary
 		// for namespace navigation 
 		this.goto = function(url) {
-			goto(url, moduleName);
+			goto(url, this.moduleName);
 		}
 		this.goHome = function() {
-			goHome(moduleName);
+			goHome(this.moduleName);
 		}
 		this.goNext = function(url) {
-			goNext(url, moduleName);
+			goNext(url, this.moduleName);
 		}
 		this.goPrevious = function(url) {
-			goPrevious(url, moduleName);		
+			goPrevious(url, this.moduleName);		
 		}
 		this.open = function(url) {
-			open(url, moduleName);
+			open(url, this.moduleName);
 		}
 		this.close = function() {
-			close(moduleName);
+			close(this.moduleName);
 		}
 	}
 	
