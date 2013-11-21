@@ -50,10 +50,13 @@ requireCfg['shim']['common-ui/jquery'] = { exports: '$' };
 requireCfg['paths']['common-ui/handlebars'] = CONTEXT_PATH+'api/repos/common-ui/resources/web/handlebars/handlebars';
 requireCfg['paths']['common-ui/jquery-i18n'] = CONTEXT_PATH+'api/repos/common-ui/resources/web/jquery/jquery.i18n.properties-min';
 requireCfg['paths']['common-ui/bootstrap'] = CONTEXT_PATH+'api/repos/common-ui/resources/web/bootstrap/bootstrap.min';
+requireCfg['paths']['common-ui/ring'] = CONTEXT_PATH+'api/repos/common-ui/resources/web/ring/ring';
+requireCfg['paths']['common-ui/underscore'] = CONTEXT_PATH+'api/repos/common-ui/resources/web/underscore/underscore';
 
 requireCfg['shim']['common-ui/bootstrap'] = ['common-ui/jquery'];
 requireCfg['shim']['common-ui/jquery-i18n'] = ['common-ui/jquery'];
 requireCfg['shim']['common-ui/handlebars'] = ['common-ui/jquery'];
+requireCfg['shim']['common-ui/ring'] = ['common-ui/underscore'];
 
 requireCfg['paths']['common-ui/angular'] = CONTEXT_PATH+'api/repos/common-ui/resources/web/angular/angular.min';
 requireCfg['paths']['common-ui/angular-resource'] = CONTEXT_PATH+'api/repos/common-ui/resources/web/angular/angular-resource.min';
@@ -71,7 +74,10 @@ requireCfg['shim']['common-ui/angular-ui-bootstrap'] = ['common-ui/angular'];
 
 // Plugin Handlers
 requireCfg['paths']['common-ui/PluginHandler'] = CONTEXT_PATH+'api/repos/common-ui/resources/web/plugin-handler/pluginHandler';
+requireCfg['paths']['common-ui/Plugin'] = CONTEXT_PATH+'api/repos/common-ui/resources/web/plugin-handler/plugin';
 requireCfg['paths']['common-ui/AngularPluginHandler'] = CONTEXT_PATH+'api/repos/common-ui/resources/web/plugin-handler/angularPluginHandler';
+requireCfg['paths']['common-ui/AngularPlugin'] = CONTEXT_PATH+'api/repos/common-ui/resources/web/plugin-handler/angularPlugin';
 requireCfg['paths']['common-ui/AnimatedAngularPluginHandler'] = CONTEXT_PATH+'api/repos/common-ui/resources/web/plugin-handler/animatedAngularPluginHandler';
+requireCfg['paths']['common-ui/AnimatedAngularPlugin'] = CONTEXT_PATH+'api/repos/common-ui/resources/web/plugin-handler/animatedAngularPlugin';
 
 requireCfg['shim']['common-ui/PluginHandler'] = ['common-ui/jquery'];
