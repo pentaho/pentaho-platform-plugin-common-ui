@@ -105,7 +105,6 @@ dojo.declare("pentaho.common.Calendar",
 			dojo.stopEvent(evt);
 			for(var node = evt.target; node && !node.dijitDateValue; node = node.parentNode);
 			if(node && !dojo.hasClass(node, "dijitCalendarDisabledDate")){
-				this.set('value', node.dijitDateValue);
 				dojo.addClass(node, "pentaho-listitem-selected");
 			}
 		}
