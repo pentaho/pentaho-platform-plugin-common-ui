@@ -7,30 +7,36 @@
  * of the plugin object
  */
 
-var deps = [
+var deps = [	
 	'common-ui/ring'
 ]
-pen.define(deps, function() {
+pen.define(deps, function(ring) {
+	
+	var PentahoPlugin;
+	
+	// Verifies if the plugin is a PentahoPlugin type
+	var _verifyPlugin = function(plugin) {
+
+		// Necessary to mitigate circular dependency
+		if (!PentahoPlugin) {
+			PentahoPlugin = pen.require("common-ui/Plugin");
+		}
+		
+		if (!ring.instance(plugin, PentahoPlugin)) {
+			_throwException("Incompatible object Exception");
+		}	
+	};
+
+	// Throws an exception and logs it to the console
+	var _throwException = function(msg) {
+		console.log(msg);
+		throw msg;
+	};
 
 	var PentahoPluginHandler = ring.create({
 		init : function() {
 			this.plugins = {};
 		}, 
-
-		// Verifies if the plugin is a hard type
-		_verifyPlugin : function(plugin) {
-			pen.require(['common-ui/Plugin'], function(PentahoPlugin) {
-				if (!ring.instance(plugin, PentahoPlugin)) {
-					_throwExcpetion("Incompatible object Exception");
-				}	
-			})	
-		},
-
-		// Throws an exception and logs it to the console
-		_throwExcpetion : function(msg) {
-			console.log(msg);
-			throw msg;
-		},
 
 		/**
 	     * Register a single plugin and stores the plugin in the plugin object container. Once the
@@ -47,22 +53,22 @@ pen.define(deps, function() {
 	     *        When the plugin has not been registered successfully after attempting to register it
 	     */
 		register : function(plugin) {
-			this._verifyPlugin(plugin);
+			_verifyPlugin(plugin);
 
 			if (this.plugins[plugin.id]) {
-				this._throwExcpetion("WARNING: " + plugin + " is already registered");
+				_throwException("WARNING: " + plugin + " is already registered");
 				return;
 			}
 
 			this.plugins[plugin.id] = plugin;		
 
 			if (!this.plugins[plugin.id]) {
-				this._throwExcpetion(plugin + " was not added successfully");
+				_throwException(plugin + " was not added successfully");
 			}
 			console.log(plugin + " has been registered");
 
 			// Call onRegister if it exists
-			plugin.onRegister.call(plugin, plugin);	
+			plugin.onRegister(plugin);	
 
 			return plugin;
 		},
@@ -79,10 +85,10 @@ pen.define(deps, function() {
 	     *        When the plugin is not a type of PentahoPluginHandler.Plugin
 	     */
 		unregister : function(plugin) {
-			this._verifyPlugin(plugin);
+			_verifyPlugin(plugin);
 
 			if (!this.plugins[plugin.id]) {
-				this._throwExcpetion(plugin + " is not registered");
+				_throwException(plugin + " is not registered");
 			}
 
 			return this.unregisterById(plugin.id)
@@ -102,7 +108,7 @@ pen.define(deps, function() {
 		unregisterById : function(id) {
 			// Verify that plugin is present in list of plugins
 			if (!this.plugins[id]) {
-				this._throwExcpetion("Plugin by id '" + id + "' is not registered");				
+				_throwException("Plugin by id '" + id + "' is not registered");				
 			}
 
 			var plugin = this.plugins[id];
@@ -110,13 +116,22 @@ pen.define(deps, function() {
 			
 			// Verify that plugin was successfully removed
 			if (this.plugins[id]) {
-				this._throwExcpetion(plugin + " was not removed successfully");
+				_throwException(plugin + " was not removed successfully");
 			}
 
 			// Call onUnregister if exists
-			plugin.onUnregister.call(plugin, plugin);	
+			plugin.onUnregister(plugin);	
 
 			return plugin;
+		},
+		
+		/**
+		 * Retrieves an already registered plugin
+		 * 
+		 * @return PentahoPlugin
+		 */
+		get : function(id) {
+			return this.plugins[id];
 		}
 	});
 

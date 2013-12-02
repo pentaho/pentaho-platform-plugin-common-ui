@@ -21,12 +21,13 @@
 
 var deps = [
 	'common-ui/Plugin',
-	'common-ui/PluginHandler', 
+	'common-ui/PluginHandler',
+	'common-ui/ring',
 	'common-ui/angular', 
 	'common-ui/angular-route'
 ];
 
-pen.define(deps, function(PentahoPlugin, PentahoPluginHandler) {
+pen.define(deps, function(PentahoPlugin, PentahoPluginHandler, ring, angular) {
 
 	var AngularPluginHandler = ring.create([PentahoPluginHandler], {
 
@@ -40,12 +41,14 @@ pen.define(deps, function(PentahoPlugin, PentahoPluginHandler) {
 		_onRegister : function(plugin) {
 
 			// Retrieve module
-			var module = angular.module(plugin.moduleName);	
+			var module = angular.module(plugin.moduleName);
 
 			// Verify the module has been made pluggable
 			if (!module.isPluggable) {
 				throw "Module '" + plugin.moduleName + "' has not been made pluggable";
 			}
+
+			var self = this;
 
 			// Define custom RouteProvider
 			var RouteProvider = {
@@ -54,8 +57,8 @@ pen.define(deps, function(PentahoPlugin, PentahoPluginHandler) {
 
 					plugin.routes.push(url);
 
-					if (this.docBootstrapped) {
-						module.$routeProvider.when(url, properties)					
+					if (self.docBootstrapped) {
+						module.$routeProvider.when(url, properties);
 					} else {
 						module.config(['$routeProvider', function($routeProvider) {
 							$routeProvider.when(url, properties);
@@ -73,7 +76,7 @@ pen.define(deps, function(PentahoPlugin, PentahoPluginHandler) {
 			var Controller = function(name, def) {
 				plugin.controllers.push(name);
 
-				this.docBootstrapped ? 
+				self.docBootstrapped ? 
 					module.$controllerProvider.register(name, def) :
 					module.controller(name, def);			
 			}
@@ -82,7 +85,7 @@ pen.define(deps, function(PentahoPlugin, PentahoPluginHandler) {
 			var Service = function(name, def) {			
 				plugin.services.push(name);
 
-				this.docBootstrapped ?
+				self.docBootstrapped ?
 					module.$provide.service(name, def) :
 					module.service(name, def);
 			}
@@ -91,7 +94,7 @@ pen.define(deps, function(PentahoPlugin, PentahoPluginHandler) {
 			var Factory = function(name, def) {
 				plugin.factories.push(name);
 
-				this.docBootstrapped ? 
+				self.docBootstrapped ? 
 					module.$provide.factory(name, def) :
 					module.factory(name, def);
 			}
@@ -99,7 +102,7 @@ pen.define(deps, function(PentahoPlugin, PentahoPluginHandler) {
 			var Filter = function(name, def) {
 				plugin.filters.push(name);
 
-				this.docBootstrapped ? 
+				self.docBootstrapped ? 
 					module.$filterProvider.register(name, def) :
 					module.filter(name, def);
 			}
@@ -107,7 +110,7 @@ pen.define(deps, function(PentahoPlugin, PentahoPluginHandler) {
 			var Directive = function(name, def) {
 				plugin.directives.push(name);
 
-				this.docBootstrapped ? 
+				self.docBootstrapped ? 
 					module.$compileProvider.directive(name, def) :
 					module.directive(name, def)
 			}
@@ -145,43 +148,67 @@ pen.define(deps, function(PentahoPlugin, PentahoPluginHandler) {
 			// Retrieve module
 			var module = angular.module(plugin.moduleName);
 
+			var self = this;
+
 			// Unbind Controllers
 			$(plugin.controllers).each(function(i, controller) {
-				module.$controllerProvider.register(controller, null);
+				self.docBootstrapped ? 
+					module.$controllerProvider.register(controller, null) :
+					module.controller(controller, null);
 			})
 
 			// Unbind Services
 			$(plugin.services).each(function(i, service) {
-				module.$provide.service(service, null);
+				self.docBootstrapped ?
+					module.$provide.service(service, null) :
+					module.service(service, null);
 			})
 			
 			// Unbind routes
 			$(plugin.routes).each(function(i, route) {
-				module.$routeProvider
-					.when(route, {
-						// TODO : find way to retrieve default location of otherwise binding
-						redirectTo : "/"
-					});
-				});
+				if (self.docBootstrapped) {
+					module.$routeProvider
+						.when(route, {
+							// TODO : find way to retrieve default location of otherwise binding
+							redirectTo : "/"
+						});
+				} else {
+					module.config(['$routeProvider', function($routeProvider) {
+						$routeProvider.when(route, {
+							redirectTo : "/"
+						});
+					}]);
+				}
+			});
 
 			// Unbind factories
 			$(plugin.factories).each(function(i, factory) {
-				module.$provide.factory(factory, null);
+				self.docBootstrapped ? 
+					module.$provide.factory(factory, null) :
+					module.factory(factory, null);
 			})
 
 			// Unbind filters
 			$(plugin.filters).each(function(i, filter) {
-				module.$filterProvider.register(filter, null);
+				self.docBootstrapped ? 
+					module.$filterProvider.register(filter, null) :
+					module.filter(filter, null);
 			})
 
 			// Unbind directives
 			$(plugin.directives).each(function(i, directive) {
-				module.$compileProvider.directive(name, null);
-			})
+				self.docBootstrapped ? 
+					module.$compileProvider.directive(directive, null) :
+					module.directive(directive, null);
+			});
 		},
 
 		// Provide a method for creating the angular module and adding the necessary dependencies
 		module : function(moduleName, deps, config) {
+
+			if (!deps) {
+				deps = [];
+			}
 
 			// Include ngRoute
 			deps.push('ngRoute');
@@ -198,6 +225,7 @@ pen.define(deps, function(PentahoPlugin, PentahoPluginHandler) {
 		// This attaches the appropriate methods and objects directly to the module to allow the module
 		// to be pluggable later
 		_makePluggable : function(module) {
+			var self = this;
 			module.isPluggable = true;
 
 			module.config(['$routeProvider', '$controllerProvider', '$compileProvider', '$filterProvider', '$provide', 
@@ -208,11 +236,10 @@ pen.define(deps, function(PentahoPlugin, PentahoPluginHandler) {
 			        module.$filterProvider     = $filterProvider;
 			        module.$provide            = $provide;
 
-			        this.docBootstrapped = true;
+			        self.docBootstrapped = true;
 			    }]);
 
 			// Add location to any module for $location navigation
-			var self = this;
 			module.run(["$location", "$rootScope", function($location, $rootScope) {
 				module.$location = $location;
 				module.$rootScope = $rootScope;

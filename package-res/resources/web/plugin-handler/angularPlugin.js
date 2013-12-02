@@ -21,7 +21,7 @@ var deps = [
 	'common-ui/ring'
 ];
 
-pen.define(deps, function(PentahoPlugin, AngularPluginHandler) {
+pen.define(deps, function(PentahoPlugin, AngularPluginHandler, ring) {
 
 	// Define an extended plugin of PluginHandler.Plugin
 	var AngularPlugin = ring.create([PentahoPlugin], {
@@ -71,20 +71,20 @@ pen.define(deps, function(PentahoPlugin, AngularPluginHandler) {
 		 * see #PentahoPlugin.onRegister
 		 */
 		onRegister : function(plugin) {
-			this.config.pluginHandler._onRegister.call(plugin, plugin);
+			this.config.pluginHandler._onRegister(plugin);
 
 			// Call super onRegister
-			this.$super.call(plugin, plugin);
+			this.$super(plugin);
 		},
 
 		/**
 		 * see #PentahoPlugin.onUnregister
 		 */
 		onUnregister : function(plugin) {
-			this.config.pluginHandler._onUnregister.call(plugin, plugin);
+			this.config.pluginHandler._onUnregister(plugin);
 
 			// Call super onUnregister
-			this.$super.call(plugin, plugin);
+			this.$super(plugin);
 		},
 
 		/**
