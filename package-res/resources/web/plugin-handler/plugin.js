@@ -23,7 +23,7 @@ var deps = [
 	'common-ui/ring'
 ]
 
-pen.define(deps, function(PentahoPluginHandler) {
+pen.define(deps, function(PentahoPluginHandler, ring) {
 	// Generates a guid for use with plugins
 	function _guid() {
 		function S4() {

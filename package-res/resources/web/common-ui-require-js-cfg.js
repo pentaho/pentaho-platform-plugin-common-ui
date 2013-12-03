@@ -56,7 +56,7 @@ requireCfg['paths']['common-ui/underscore'] = CONTEXT_PATH+'api/repos/common-ui/
 requireCfg['shim']['common-ui/bootstrap'] = ['common-ui/jquery'];
 requireCfg['shim']['common-ui/jquery-i18n'] = ['common-ui/jquery'];
 requireCfg['shim']['common-ui/handlebars'] = ['common-ui/jquery'];
-requireCfg['shim']['common-ui/ring'] = ['common-ui/underscore'];
+requireCfg['shim']['common-ui/ring'] = {deps: ['common-ui/underscore'], exports: "ring"};
 
 requireCfg['paths']['common-ui/angular'] = CONTEXT_PATH+'api/repos/common-ui/resources/web/angular/angular.min';
 requireCfg['paths']['common-ui/angular-resource'] = CONTEXT_PATH+'api/repos/common-ui/resources/web/angular/angular-resource.min';
