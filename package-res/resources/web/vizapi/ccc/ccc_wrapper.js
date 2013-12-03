@@ -1,28 +1,31 @@
 pen.define([
-        "cdf/lib/CCC/def", 
-        "cdf/lib/CCC/pvc-d1.0", 
+        "cdf/lib/CCC/def",
+        "cdf/lib/CCC/pvc-d1.0",
         "cdf/lib/CCC/protovis",
         "common-ui/vizapi/VizController",
         "common-ui/vizapi/ccc/ccc_analyzer_plugin" // TODO: temporary dependency due to debug loading time problems
     ],
-function(def, pvc, pv){
+function(def, pvc, pv) {
 
-    var _filterSelectionMaxCount = 200; // TODO: Selection count limit is hard-coded
-    
+    // Publish on global scope, as there's legacy code out there depending on this.
+    def.global.def = def;
+    def.global.pvc = pvc;
+    def.global.pv  = pv ;
+
     // Declare **global** pentaho namespace variable
     pentaho = typeof pentaho != "undefined" ? pentaho : {};
-    
+
     // This allows def.types below not installing 'pentaho' on the global space...
     def.globalSpace('pentaho', pentaho);
-    
+
     pentaho.visualizations || (pentaho.visualizations = {});
-    
+
     function defVisualization(viz){
         pentaho.visualizations.push(viz);
     }
-    
+
     defCCCVisualizations();
-    
+
     // TODO: temporary call due to debug loading time problems
     if(typeof(document.location) !== 'undefined'){
         try{
@@ -33,134 +36,20 @@ function(def, pvc, pv){
             pvc.logError("CCC ANALYZER PLUGIN: " + ex.message);
         }
     }
-    
+
     function defCCCVisualizations(){
-        /*
-         Visualization Metadata
-         These objects describe the visualizations provided by this library.
-         */
-        var ruleStrokeStyle = "#808285";  // #D8D8D8',  // #f0f0f0
-        var lineStrokeStyle = "#D1D3D4";  // "#D1D3D4"; //'#A0A0A0'; // #D8D8D8',// #f0f0f0
-        
-        function legendShapeColorProp(scene){
-            var color = scene.color;
-            return scene.isOn() ? color : pvc.toGrayScale(color);
-        }
-        
-        var baseChartArgs = {
-            groupedLabelSep: "~",
-            
-            legend: true,
-            multiRole: 'multi',
-            legendPosition: 'right',
-            legendSizeMax:  '60%',
-            
-            legendPaddings: 10,
-            
-            // Item padding
-            legendPadding: {left: 1, right:1, top: 2, bottom: 2},// width: 2, height: 4
-            
-            orthoAxisFullGrid: true,
-            axisEndLine:  true,
-            axisSizeMax: '50%',
-            
-            /* Continuous axes */
-            //axisDesiredTickCount: 10,
-            axisLabelSpacingMin: 0.6, // em
-            axisDomainRoundMode: 'tick',
-            axisTitleSizeMax: '20%',
-            
-            showPlotFrame: false,
-            
-            /* Discrete axes */
-            axisOverlappedLabelsHide: true,
-            axisOverlappedLabelsMaxPct: 0.05,
-
-            extensionPoints: {
-                xAxisRule_strokeStyle:  ruleStrokeStyle,
-                yAxisRule_strokeStyle:  ruleStrokeStyle,
-                secondYAxisRule_strokeStyle: ruleStrokeStyle,
-                
-                xAxisTicks_strokeStyle:  lineStrokeStyle,
-                yAxisTicks_strokeStyle:  lineStrokeStyle,
-                secondYAxisTicks_strokeStyle: lineStrokeStyle,
-                
-                legendArea_lineWidth:     1,
-                legendArea_strokeStyle:   "#c0c0c0",
-                legendLabel_textDecoration: null,
-                legendDot_fillStyle: legendShapeColorProp,
-                legendDot_strokeStyle: legendShapeColorProp,
-                legend2Dot_fillStyle: legendShapeColorProp,
-                legend2Dot_strokeStyle: legendShapeColorProp
-            },
-
-            tipsySettings: {
-                delayIn: 200,
-                delayOut:80,
-                offset:  2,
-                html:    true,
-                gravity: "nw",
-                fade:    false,
-                followMouse: true,
-                corners: true,
-                arrow:   false,
-                opacity: 1
-            },
-
-            /* Default map */
-            rolesToCccDimensionsMap: {
-                'columns':  'series',
-                'rows':     'category',
-                'multi':    'multiChart',
-                'measures': 'value'
-            }
-        };
-
-        var mixinVerticalChartArgs = {
-            orientation:    'vertical'
-        };
-
-        var mixinHorizontalChartArgs = {
-            orientation:    'horizontal',
-            xAxisPosition:  'top'
-        };
-
-        var baseVerticalChartArgs   = def.create(baseChartArgs, mixinVerticalChartArgs  );
-        var baseHorizontalChartArgs = def.create(baseChartArgs, mixinHorizontalChartArgs);
-
-        var baseVerticalCategChartArgs = def.create(baseVerticalChartArgs, {
-            extensionPoints: {
-                xAxisLabel_textAngle:    -Math.PI/4,
-                xAxisLabel_textAlign:    "right",
-                xAxisLabel_textBaseline: "top"
-            }
-        });
-
-        var mixinBarChartArgs = {
-            cccClass: 'pvc.BarChart', // Default
-            panelSizeRatio: 0.8,
-            crosstabMode: true,
-            measuresInColumns: false
-        },
-        baseVerticalBarChartArgs   = def.create(baseVerticalCategChartArgs, mixinBarChartArgs),
-        baseHorizontalBarChartArgs = def.create(baseHorizontalChartArgs,    mixinBarChartArgs);
-
-        // ----
-
         defVisualization({
-            id: 'ccc_bar',                          // unique identifier
-            type: 'barchart',                       // generic type id
-            source: 'CCC',                          // id of the source library
-            name: vizLabel('VERTICAL_BAR'),        // visible name, this will come from a properties file eventually
-            'class': 'pentaho.ccc.BarChart',        // type of the Javascript object to instantiate
-            args: def.create(baseVerticalBarChartArgs),
+            id:       'ccc_bar',
+            type:     'barchart',
+            source:   'CCC',
+            name:     vizLabel('VERTICAL_BAR'),
+            'class':  'pentaho.ccc.BarChart',
+            args:     {},
             propMap: [],
-            // dataReqs describes the data requirements of this visualization
             dataReqs: [{
                 name: 'Default',
                 reqs : createDataReq('VERTICAL_BAR')
-            }
-            ],
+            }],
             menuOrdinal: 100
         });
 
@@ -169,16 +58,13 @@ function(def, pvc, pv){
             type: 'barchart',
             source: 'CCC',
             name: vizLabel('STACKED_VERTICAL_BAR'),
-            'class': 'pentaho.ccc.BarChart',
-            args: def.create(baseVerticalBarChartArgs, {
-                stacked: true
-            }),
+            'class':  'pentaho.ccc.StackedBarChart',
+            args:     {},
             propMap: [],
             dataReqs: [{
                 name: 'Default',
                 reqs : createDataReq('STACKED_VERTICAL_BAR')
-            }
-            ],
+            }],
             menuOrdinal: 110
         });
 
@@ -187,14 +73,13 @@ function(def, pvc, pv){
             type: 'horzbarchart',
             source: 'CCC',
             name: vizLabel('HORIZONTAL_BAR'),
-            'class': 'pentaho.ccc.BarChart',
-            args:  def.create(baseHorizontalBarChartArgs),
+            'class':  'pentaho.ccc.HorizontalBarChart',
+            args:     {},
             propMap: [],
             dataReqs: [{
                 name: 'Default',
                 reqs : createDataReq('HORIZONTAL_BAR')
-            }
-            ],
+            }],
             menuOrdinal: 130,
             menuSeparator: true
         });
@@ -204,16 +89,13 @@ function(def, pvc, pv){
             type: 'horzbarchart',
             source: 'CCC',
             name: vizLabel('STACKED_HORIZONTAL_BAR'),
-            'class': 'pentaho.ccc.BarChart',
-            args:  def.create(baseHorizontalBarChartArgs, {
-                stacked: true
-            }),
+            'class':  'pentaho.ccc.HorizontalStackedBarChart',
+            args:     {},
             propMap: [],
             dataReqs: [{
                 name: 'Default',
                 reqs : createDataReq('STACKED_HORIZONTAL_BAR')
-            }
-            ],
+            }],
             menuOrdinal: 140
         });
 
@@ -222,16 +104,13 @@ function(def, pvc, pv){
             type: 'barchart',
             source: 'CCC',
             name: vizLabel('PCT_STACKED_VERTICAL_BAR'),
-            'class': 'pentaho.ccc.NormalizeBarChart',
-            args: def.create(baseVerticalBarChartArgs, {
-                cccClass: 'pvc.NormalizedBarChart'
-            }),
+            'class':  'pentaho.ccc.NormalizedBarChart',
+            args:     {},
             propMap: [],
             dataReqs: [{
                 name: 'Default',
                 reqs : createDataReq('PCT_STACKED_VERTICAL_BAR')
-            }
-            ],
+            }],
             menuOrdinal: 120
         });
 
@@ -240,16 +119,13 @@ function(def, pvc, pv){
             type: 'horzbarchart',
             source: 'CCC',
             name: vizLabel('PCT_STACKED_HORIZONTAL_BAR'),
-            'class': 'pentaho.ccc.NormalizeBarChart',
-            args:  def.create(baseHorizontalBarChartArgs, {
-                cccClass: 'pvc.NormalizedBarChart'
-            }),
+            'class':  'pentaho.ccc.HorizontalNormalizedBarChart',
+            args:     {},
             propMap: [],
             dataReqs: [{
                 name: 'Default',
                 reqs : createDataReq('PCT_STACKED_HORIZONTAL_BAR')
-            }
-            ],
+            }],
             menuOrdinal: 150
         });
 
@@ -259,20 +135,10 @@ function(def, pvc, pv){
             source: 'CCC',
             name: vizLabel('LINE'),
             'class': 'pentaho.ccc.LineChart',
-            args: def.create(baseVerticalCategChartArgs, {
-                cccClass: 'pvc.LineChart',
-
+            args: {
                 // Default value for 'shape' data request
-                shape: 'circle',
-                nullInterpolationMode: 'linear',
-                orthoAxisOffset: 0,
-                baseAxisOffset: 0,
-                crosstabMode: true,
-                measuresInColumns: false,
-                tipsySettings: {
-                    offset: 15
-                }
-            }),
+                shape: 'circle'
+            },
             propMap: [],
             dataReqs: [{
                 name: 'Default',
@@ -283,8 +149,7 @@ function(def, pvc, pv){
                      createLineWidthDataReq(),
                      createChartOptionsDataReq(true)
                     ])
-            }
-            ],
+            }],
             menuOrdinal: 160,
             menuSeparator: true
         });
@@ -295,88 +160,13 @@ function(def, pvc, pv){
             source: 'CCC',
             name: vizLabel('STACKED_AREA'),
             'class': 'pentaho.ccc.StackedAreaChart',
-            args: def.create(baseVerticalCategChartArgs, {
-                cccClass: 'pvc.StackedAreaChart',
-                crosstabMode: true,
-                measuresInColumns: false,
-                showLines: true,
-                orthoAxisOffset: 0,
-                baseAxisOffset: 0,
-                tipsySettings: {
-                    offset: 15
-                }
-            }),
+            args:     {},
             propMap: [],
             dataReqs: [{
                 name: 'Default',
                 reqs: createDataReq('STACKED_AREA')
-            }
-            ],
+            }],
             menuOrdinal: 180
-        });
-
-        defVisualization({
-            id: 'ccc_line_hover',
-            type: 'linechart',
-            source: 'CCC',
-            name: vizLabel('LINE'),
-            'class': 'pentaho.ccc.LineChart',
-            args: def.create(baseVerticalCategChartArgs, {
-                cccClass: 'pvc.LineChart',
-                hoverable: true,
-                showTooltips: false,
-                crosstabMode: true,
-                measuresInColumns: false,
-                
-                orthoAxisOffset: 0,
-                baseAxisOffset: 0,
-                
-                // Default value for 'shape' data request
-                shape: 'circle',
-                nullInterpolationMode: 'linear',
-                tipsySettings: {
-                    offset: 15
-                }
-            }),
-            propMap: [],
-            dataReqs: [{
-                name: 'Default',
-                reqs: def.array.append(
-                    createDataReq('LINE', {options: false}),
-                    [
-                     createShapeDataReq(),
-                     createLineWidthDataReq(),
-                     createChartOptionsDataReq(true)
-                    ])
-            }
-            ]
-        });
-
-        defVisualization({
-            id: 'ccc_area_hover',
-            type: 'areachart',
-            source: 'CCC',
-            name: vizLabel('STACKED_AREA'),
-            'class': 'pentaho.ccc.StackedAreaChart',
-            args: def.create(baseVerticalCategChartArgs, {
-                cccClass: 'pvc.StackedAreaChart',
-                crosstabMode: true,
-                measuresInColumns: false,
-                showLines: true,
-                orthoAxisOffset: 0,
-                baseAxisOffset: 0,
-                hoverable: true,
-                showTooltips: false,
-                tipsySettings: {
-                    offset: 15
-                }
-            }),
-            propMap: [],
-            dataReqs: [{
-                name: 'Default',
-                reqs: createDataReq('STACKED_AREA')
-            }
-            ]
         });
 
         defVisualization({
@@ -386,33 +176,11 @@ function(def, pvc, pv){
             name: vizLabel('SCATTER'),
             'class': 'pentaho.ccc.MetricDotChart',
             maxValues: [1000, 2500, 5000, 10000],
-            args: def.create(baseVerticalChartArgs, {
-                cccClass:   'pvc.MetricDotChart',
-                crosstabMode: true,
-                measuresInColumns: true,
-                axisFullGrid: true,
-                dotSizeAbs: true,
-                dotSizeRatio:   1/5,
-                dotSizeRatioTo: 'height', // plot area client height
-                autoDotSizePadding: false,
-                
-                /* Default map */
-                rolesToCccDimensionsMap: {
-                    'columns':  null,
-                    'color':    'color',
-                    //'rows':     'category',
-                    'multi':    'multiChart',
-                    'measures': null,
-                    'x':        'value',
-                    'y':        'value2',
-                    'size':     'value4'
-                }
-            }),
+            args:      {},
             propMap: [],
-            dataReqs: [
-            {
+            dataReqs:  [{
                 name: 'Default',
-                reqs :[
+                reqs: [
                 {
                     id: 'x',
                     dataType: 'number',
@@ -459,8 +227,7 @@ function(def, pvc, pv){
                 createReverseColorsDataReq(),
                 createChartOptionsDataReq(true)
                 ]
-            }
-            ],
+            }],
             menuOrdinal: 190,
             menuSeparator: true
         });
@@ -470,20 +237,11 @@ function(def, pvc, pv){
             type: 'barchart',
             source: 'CCC',
             name: vizLabel('VERTICAL_BAR_LINE'),
-            'class': 'pentaho.ccc.BarLineChart', // 
-            args:  def.create(baseVerticalBarChartArgs, {
+            'class': 'pentaho.ccc.BarLineChart', //
+            args:  {
                 // Default value for 'shape' data request
-                shape: 'circle',
-                nullInterpolationMode: 'linear',
-                secondAxis: true,
-                secondAxisIndependentScale: false,
-                secondAxisSeriesIndexes: null, // prevent default of -1 (which means last series)
-                
-                /* Default map */
-                rolesToCccDimensionsMap: {
-                    'measuresLine': 'value' // maps to same dim group as 'measures' role
-                }
-            }),
+                shape: 'circle'
+            },
             propMap: [],
             // dataReqs describes the data requirements of this visualization
             dataReqs: [{
@@ -492,7 +250,7 @@ function(def, pvc, pv){
                     createRowDataReq('VERTICAL_BAR_LINE_ROW'),
                     createColDataReq('VERTICAL_BAR_LINE_COL'),
                     def.set(
-                        createMeaDataReq('VERTICAL_BAR_LINE_NUMCOL'), 
+                        createMeaDataReq('VERTICAL_BAR_LINE_NUMCOL'),
                         'required', false),
                     def.set(
                          createMeaDataReq('VERTICAL_BAR_LINE_NUMLINE'),
@@ -506,18 +264,15 @@ function(def, pvc, pv){
             }],
             menuOrdinal: 125
         });
-        
+
         defVisualization({
             id: 'ccc_waterfall',
             type: 'waterfallchart',
             source: 'CCC',
             name: vizLabel('WATERFALL'),
             'class': 'pentaho.ccc.WaterfallChart',
-            args: def.create(baseVerticalBarChartArgs, {
-                cccClass: 'pvc.WaterfallChart'
-                //waterDirection: 'up'
-            }),
-            propMap: [],
+            args:     {},
+            propMap:  [],
             dataReqs: [{
                 name: 'Default',
                 reqs: createDataReq('WATERFALL')
@@ -530,32 +285,14 @@ function(def, pvc, pv){
             source: 'CCC',
             name: vizLabel('BOXPLOT'),
             'class': 'pentaho.ccc.BoxplotChart',
-            args: def.create(baseVerticalBarChartArgs, {
-                cccClass: 'pvc.BoxplotChart',
-                extensionPoints: {
-                    boxVRule_svg: {
-                        'stroke-dasharray': '5, 5'
-                    }
-                },
-
-                rolesToCccDimensionsMap: {
-                    'columns':     null,
-                    //'rows':      'category',
-                    'multi':       'multiChart',
-                    'measures':    'median',
-                    'percentil25': 'percentil25',
-                    'percentil75': 'percentil75',
-                    'percentil5':  'percentil5',
-                    'percentil95': 'percentil95'
-                }
-            }),
+            args:     {},
             propMap: [],
             dataReqs: [{
                 name: 'Default',
                 reqs: [
                     createRowDataReq('BOXPLOT_ROW'),
-                    
-                    def.set(createMeaDataReq('BOXPLOT_PCT50'), 
+
+                    def.set(createMeaDataReq('BOXPLOT_PCT50'),
                                 'allowMultiple', false,
                                 'required', false),
                     {
@@ -602,31 +339,12 @@ function(def, pvc, pv){
             source: 'CCC',
             name: vizLabel('MULTIPLE_PIE'),
             'class': 'pentaho.ccc.PieChart',
-            args: def.create(baseChartArgs, {
-                multiRole: 'columns',
-                cccClass: 'pvc.PieChart',
-                crosstabMode: true,
-                measuresInColumns: false,
-                showValues: true,
-                legendShape: 'circle',
-                //contentPaddings: '5%',
-                rolesToCccDimensionsMap: {
-                    'columns':  'multiChart',
-                    //'rows':     'category',
-                    'multi':    null
-                    //'measures': 'value'
-                },
-                titlePosition: 'bottom',
-                extensionPoints: {
-                    pie_strokeStyle:'white',
-                    pie_lineWidth:   0.8
-                }
-            }),
+            args:     {},
             propMap: [],
             dataReqs: [{
                 name: 'Default',
                 reqs : createDataReq("MULTIPLE_PIE", {multi: false})
-                   
+
             }],
             menuOrdinal: 180
         });
@@ -638,49 +356,12 @@ function(def, pvc, pv){
             name: vizLabel('HEATGRID'),
             'class': 'pentaho.ccc.HeatGridChart',
             maxValues: [500, 1000, 2000, 5000],
-            args: def.create(baseChartArgs, {
-                cccClass: 'pvc.HeatGridChart',
-
-                crosstabMode:      true,
-                measuresInColumns: true,
-                useCompositeAxis:  true,
-
-                //colorValIdx: 0,
-                //sizeValIdx:  1,
-                
-                panelSizeRatio: 0.8,
-
-                showValues: false,
-                useShapes:  true,
-                shape:      'square',
-                
-                nullShape:  null,
-                nullColor: "#efc5ad",
-                
-                orthoAxisSize: null,
-                baseAxisSize:  null,
-                xAxisSize:  30,
-                yAxisSize:  50,
-                
-                //orthoAxisFullGrid: false,
-                axisFullGrid: false,
-                axisEndLine:  false,
-                
-                colorScaleType: "linear",
-                normPerBaseCategory: false,
-                numSD: 2,
-                
-                rolesToCccDimensionsMap: {
-                    'multi': null,
-                    //'columns':  'series',
-                    //'rows':     'category',
-                    'color': 'value',
-                    'size':  'value2'
-                }
-            }),
+            args:      {
+                // Default value for 'shape' data request
+                shape:'square'
+            },
             propMap: [],
-            dataReqs: [
-            {
+            dataReqs:  [{
                 name: 'Default',
                 reqs :[
                 {
@@ -721,8 +402,7 @@ function(def, pvc, pv){
                 createShapeDataReq({"square": true, "circle": true}),
                 createChartOptionsDataReq(true)
                 ]
-            }
-            ],
+            }],
             menuOrdinal: 200
         });
 
@@ -733,43 +413,7 @@ function(def, pvc, pv){
             name: 'Bullet Chart',
             'class': 'pentaho.ccc.BulletChart',
 
-            args: { // TODO: inherit from baseChartArgs
-                cccClass: 'pvc.BulletChart',
-
-                showValues:   true,
-                valuesAnchor: "right",
-
-                titlePosition: "top",
-                titleSize: 25,
-
-                legendPosition: "bottom",
-
-                crosstabMode: true,
-                measuresInColumns: true,
-
-                bulletTitle:    'Test for title',
-                bulletSubtitle: 'Test for subtitle',
-                bulletMeasures: [],
-                // TODO: Constant bullets markers and ranges?
-                bulletMarkers: ["7500"],
-                bulletRanges:  ["3000", "6500", "9000"],
-
-                bulletMargin: 50,
-                panelSizeRatio: 0.8,
-
-                extensionPoints: {
-                    "bulletRuleLabel_font": "7pt sans"
-                },
-
-                rolesToCccDimensionsMap: {
-                    'multi':   null,
-                    'columns': 'subTitle',
-                    'rows':    'title'
-                // The rest is dynamic...
-                // measures:    -> split between value and marker dimensions...
-                // bulletRanges -> range*
-                }
-            },
+            args:     {},
             propMap: [],
             dataReqs: [
             {
@@ -801,26 +445,21 @@ function(def, pvc, pv){
             }
             ]
         });
-        
-        function label(prefix, id){
-            return (id && cvCatalog[(prefix || "") + id]) || "";
-        }
-        
-        function vizLabel(id){
-            return label('VIZ_', id) || id;
-        }
+
+        function label(prefix, id) { return (id && cvCatalog[(prefix || "") + id]) || ""; }
+
+        function vizLabel(id) { return label('VIZ_', id) || id; }
 
         function dropZoneLabel(id, defaultLabel){
             return label("dropZoneLabels_", id) ||
-                   label("ropZoneLabels_", id) || 
+                   label("ropZoneLabels_", id) ||
                    defaultLabel || id;
         }
-        
+
         function chartPropsLabel(id, defaultLabel){
-            return label("dlgChartProps", id) || 
-                   defaultLabel || id;
+            return label("dlgChartProps", id) || defaultLabel || id;
         }
-        
+
         function createRowDataReq(rowLabel){
             return {
                 id: 'rows',
@@ -866,15 +505,15 @@ function(def, pvc, pv){
                 required: false
             };
         }
-        
+
         function createShapeDataReq(valuesSet){
             var values = ['circle', 'cross', 'diamond', 'square', 'triangle'];
             if(valuesSet){
                 values = values.filter(function(value){ return def.hasOwn(valuesSet, value); });
             }
-            
+
             values.unshift('none');
-            
+
             return {
                 id: 'shape',
                 dataType: 'string',
@@ -887,7 +526,7 @@ function(def, pvc, pv){
                 }
             };
         }
-        
+
         function createLineWidthDataReq(){
             return {
                 id: 'lineWidth',
@@ -901,7 +540,7 @@ function(def, pvc, pv){
                 }
             };
         }
-        
+
         function createPatternDataReq(){
             return {
                 id: 'pattern',
@@ -914,9 +553,9 @@ function(def, pvc, pv){
                     type:  'combo',
                     caption: dropZoneLabel('PATTERN')
                 }
-            }; 
+            };
         }
-        
+
         function createColorSetDataReq(){
             return {
                 id: 'colorSet',
@@ -929,9 +568,9 @@ function(def, pvc, pv){
                     type:    'combo',
                     caption: dropZoneLabel('COLORSET')
                 }
-            }; 
+            };
         }
-        
+
         function createReverseColorsDataReq(){
             return {
                 id: 'reverseColors',
@@ -941,9 +580,9 @@ function(def, pvc, pv){
                     group: 'options',
                     type:  'checkbox'
                 }
-            }; 
+            };
         }
-        
+
         function createChartOptionsDataReq(hasSeparator){
             return {
                 id: "optionsBtn",
@@ -956,10 +595,10 @@ function(def, pvc, pv){
                 }
             };
         }
-        
+
         function createDataReq(chartId, options) {
             var json = [];
-            
+
             if(def.get(options, 'row', true)){
                 json.push(createRowDataReq(chartId + "_ROW"));
             }
@@ -967,7 +606,7 @@ function(def, pvc, pv){
             if(def.get(options, 'column', true)){
                 json.push(createColDataReq(chartId + "_COL"));
             }
-            
+
             if(def.get(options, 'measure', true)){
                 json.push(createMeaDataReq(chartId + "_NUM"));
             }
@@ -979,7 +618,7 @@ function(def, pvc, pv){
             if(def.get(options, 'options', true)){
                 json.push(createChartOptionsDataReq(false));
             }
-            
+
             return json;
         }
     }
@@ -995,7 +634,7 @@ function(def, pvc, pv){
         // Every role, bound or not may have an entry here
         this.gemsByRole    = {}; // roleId -> [gem, ...]
         this.indexesByRole = {}; // roleId -> [number, ...]
-        
+
         // Only bound roles will have an entry in this set
         this.boundRoles = {}; // roleId -> true
 
@@ -1006,7 +645,7 @@ function(def, pvc, pv){
         this.gems  = this._getGems();
         this.depth = this.gems.length;
         this.formulas = [];
-        
+
         this.gems.forEach(initGem, this);
 
         /** @instance */
@@ -1022,14 +661,14 @@ function(def, pvc, pv){
                     this.boundRoles[roleId] = true;
                     this.boundRolesIdList.push(roleId);
                 }
-    
+
                 var roleGems = this.gemsByRole[roleId];
                 gem.roleLevel = roleGems.length;
                 roleGems.push(gem);
-    
+
                 this.indexesByRole[roleId].push(index);
             }
-            
+
             this.formulas.push(gem.formula);
         }
     })
@@ -1044,12 +683,12 @@ function(def, pvc, pv){
                 return true;
             }
         },
-        
+
         configure: function(virtualItemStartIndex, cccDimNamesSet){
             this.configureDimensionGroups();
             return this.configureReaders(virtualItemStartIndex, cccDimNamesSet);
         },
-        
+
         configureDimensionGroups: function(){
         },
 
@@ -1063,16 +702,14 @@ function(def, pvc, pv){
                 index   = virtualItemStartIndex;
 
             this.cccDimList().forEach(function(dimName){
-                if(!dimName || !def.hasOwn(cccDimNamesSet, dimName)){
-                    if(dimName){
-                        cccDimNamesSet[dimName] = true;
-                    }
-                    
+                if(!def.hasOwn(cccDimNamesSet, dimName)){
+                    cccDimNamesSet[dimName] = true;
+
                     var reader = {
                         names:   dimName, // when null, the reader simply consumes the index, and prevents a default reader
                         indexes: index
                     };
-                    
+
                     readers.push(reader);
                     index++;
                 }
@@ -1080,7 +717,7 @@ function(def, pvc, pv){
 
             return index;
         },
-        
+
         /* Note this is called during base constructor. */
         _getGems: function(){
             var gems = this.chart._axesGemsInfo[this.id];
@@ -1088,7 +725,7 @@ function(def, pvc, pv){
             if(vizHelper.completeAxisGemsMetadata){ // available on the client
                 vizHelper.completeAxisGemsMetadata(this.id, gems);
             }
-            
+
             return gems;
         },
 
@@ -1099,14 +736,14 @@ function(def, pvc, pv){
                             .array(),
                 last   = labels.pop(),
                 first  = labels.join(", ");
-            
+
             if(first && last){
                 return this.chart._message('chartAxisTitleMultipleDimText', [first, last]);
             }
-            
+
             return first || last;
         },
-        
+
         _getAxisLabelGems: function(){
             return this.gems;
         },
@@ -1121,7 +758,7 @@ function(def, pvc, pv){
              * Multi-chart formulas are not shown in the tooltip
              * They're on the small chart's title
              */
-            if(gem.cccDimName && gem.role !== this.chart._vizOptions.multiRole){
+            if(gem.cccDimName && gem.role !== this.chart._multiRole){
                 var atom = complex.atoms[gem.cccDimName];
                 if(!atom.dimension.type.isHidden){
                     // ex: "Line: Ships"
@@ -1132,7 +769,7 @@ function(def, pvc, pv){
 
         /**
          * Obtains the ccc dimensions that this axis uses,
-         * in the order they are layed out in
+         * in the order they are laid out in
          * the CCC's virtual item.
          */
        cccDimList: def.method({isAbstract: true}),
@@ -1160,7 +797,7 @@ function(def, pvc, pv){
             case 'measure': funClass = pentaho.ccc.MeasureAxis; break;
             default: throw def.error.argumentInvalid("Undefined axis value '{0}'.", [axisId]);
         }
-        
+
         return new funClass(chart);
     };
 
@@ -1169,28 +806,28 @@ function(def, pvc, pv){
     def
     .type('pentaho.ccc.DiscreteAxis', pentaho.ccc.Axis)
     .init(function(chart, axisId){
-        
+
         this.base(chart, axisId);
-        
-        var multiGems = this.gemsByRole[this.chart._vizOptions.multiRole];
-        this.hasMulti = !!multiGems && 
+
+        var multiGems = this.gemsByRole[this.chart._multiRole];
+        this.hasMulti = !!multiGems &&
                         def.query(multiGems)
                            .any(function(gem){ return !gem.isMeasureDiscrim; });
     })
     .postInit(function(){
         // Done here just to allow  more specific roles to be ensured first
-        
+
         //this.base.apply(this, arguments);
-        
+
         if(this.hasMulti){
-            this._ensureRole(this.chart._vizOptions.multiRole);
+            this._ensureRole(this.chart._multiRole);
         }
     })
     .add({
-        _nonMultiGemFilter: function(gem){ 
-            return gem.role !== this.chart._vizOptions.multiRole; 
+        _nonMultiGemFilter: function(gem){
+            return gem.role !== this.chart._multiRole;
         },
-        
+
         /**
          * The union of the ccc dimensions of the roles of this axis.
          *
@@ -1206,7 +843,6 @@ function(def, pvc, pv){
                 this.gems.forEach(function(gem){
                     gem.cccDimName =
                     cccDimList[gem.index] = this._getGemDimName(gem) || null;
-                    
                 }, this);
             }
 
@@ -1214,15 +850,14 @@ function(def, pvc, pv){
         },
 
         _getGemDimName: function(gem){
-            var roleToCccDimMap = this.chart._vizOptions.rolesToCccDimensionsMap,
+            var roleToCccDimMap = this.chart._rolesToCccDimensionsMap,
                 cccDimGroup = roleToCccDimMap[gem.role];
-            
+
             if(typeof cccDimGroup === 'string'){
-                 return pvc.data.DimensionType
-                           .dimensionGroupLevelName(cccDimGroup, gem.roleLevel);
+                 return pvc.buildIndexedId(cccDimGroup, gem.roleLevel);
             }
         },
-        
+
         _buildGemHtmlTooltip: function(lines, complex, context, gem, index){
             /*
              * Multi-chart formulas are not shown in the tooltip
@@ -1232,16 +867,16 @@ function(def, pvc, pv){
                 this.base.apply(this, arguments);
             }
         },
-        
+
         _getAxisLabelGems: function(){
             return def.query(this.gems).where(this._nonMultiGemFilter, this);
         },
-        
+
         fillCellSelection: function(selection, complex, selectionExcludesMulti){
             var forms  = [],
                 values = [],
                 label;
-            
+
             this.getSelectionGems(selectionExcludesMulti)
                 .each(function(gem){
                     var atom = complex.atoms[gem.cccDimName];
@@ -1249,76 +884,77 @@ function(def, pvc, pv){
                     values.push(atom.value);
                     label = atom.label; // TODO is this ok?
                 });
-            
+
             if(forms.length){
                 var axisId = this.id;
                 // Dummy property, just to force Analyzer to read the axis info
                 selection[axisId] = true;
-                
+
                 selection[axisId + 'Id'   ] = forms;
                 selection[axisId + 'Item' ] = values;
                 selection[axisId + 'Label'] = label;
             }
         },
-        
+
         getSelectionGems: function(selectionExcludesMulti){
             if(selectionExcludesMulti == null){
                 selectionExcludesMulti = true;
             }
-            
+
             return def.query(this.gems)
                      .where(function(gem, index){
-                        return (!selectionExcludesMulti || this._nonMultiGemFilter(gem)) && 
-                               !gem.isMeasureDiscrim && 
+                        return (!selectionExcludesMulti || this._nonMultiGemFilter(gem)) &&
+                               !gem.isMeasureDiscrim &&
                                !!gem.cccDimName;
                      }, this);
         },
-        
+
         getKeepOrDrillGems: function(drillGem, selectionExcludesMulti){
             if(selectionExcludesMulti == null){
                 selectionExcludesMulti = true;
             }
-            
+
             return def.query(this.gems)
                      .where(function(gem, index){
                         return gem === drillGem ||
-                               ((!selectionExcludesMulti || this._nonMultiGemFilter(gem)) && 
-                                !gem.isMeasureDiscrim && 
+                               ((!selectionExcludesMulti || this._nonMultiGemFilter(gem)) &&
+                                !gem.isMeasureDiscrim &&
                                 !!gem.cccDimName);
                      }, this);
         },
-        
+
         selectGemsWithLink: function(linkType, complex, reverse){
             var gems = def.query(this.gems);
             if(reverse){
-               gems = gems.reverse(); 
+               gems = gems.reverse();
             }
-            
+
             var isObjectLinkType = def.object.is(linkType);
             return gems
-                .where(function(gem){ 
+                .where(function(gem){
+                    var atom;
                    return gem.hasLink &&
                           (!linkType || (isObjectLinkType ? def.hasOwn(linkType, gem.linkType) : (gem.linkType === linkType))) &&
-                          (!complex  || (gem.cccDimName && complex.atoms[gem.cccDimName])); 
+                          (!complex  || (gem.cccDimName && (atom = complex.atoms[gem.cccDimName]) && atom.value != null));
                 })
                 ;
         },
-        
+
         selectBoundGems: function(complex, reverse){
             var gems = def.query(this.gems);
             if(reverse){
-               gems = gems.reverse(); 
+               gems = gems.reverse();
             }
-            
+
             return gems
-                .where(function(gem){ 
-                    return !gem.isMeasureDiscrim && 
-                           gem.cccDimName && 
-                           complex.atoms[gem.cccDimName]; 
+                .where(function(gem){
+                    return !gem.isMeasureDiscrim &&
+                           gem.cccDimName &&
+                           complex.atoms[gem.cccDimName];
                  })
                 ;
         },
-        
+
         getHyperlinkInfo: function(complex){
             // The last formula of this axis that has a defined hyperlink
             var lastGem = this
@@ -1333,18 +969,18 @@ function(def, pvc, pv){
                 };
             }
         },
-        
+
         getDrillDownInfo: function(complex){
             var deepestInfo = this.getDeepestInfo(complex);
             if(!deepestInfo){
                 return null;
             }
-            
-            /* Get the child formula, if any, in the same hierarchy */
+
+            // Get the child formula, if any, in the same hierarchy
             var lastForm = deepestInfo.gem.formula,
                 childForm = this.chart.getChildFormula(lastForm);
             if(!childForm){
-            
+
                 //Let's try the other gems
                 var gemList = def.query(this.gems).reverse().array();
                 for (var i=1; i < gemList.length; i++) {
@@ -1364,15 +1000,15 @@ function(def, pvc, pv){
                                 gem:  deepestGem,
                                 atom: atom
                             };
-                        }                    
+                        }
                     }
-                
+
                     lastForm = deepestInfo.gem.formula;
                     childForm = this.chart.getChildFormula(lastForm);
                     if (childForm)
-                        break;                
+                        break;
                 }
-    
+
                 if (!childForm)
                     return null;
             }
@@ -1387,13 +1023,13 @@ function(def, pvc, pv){
             }
 
             deepestInfo.drillChild = childForm;
-            
+
             return deepestInfo;
         },
 
         getDeepestInfo: function(complex, hierarchy){
             if(this.depth){
-                var lastGem = this.getLastProperGem(hierarchy);
+                var lastGem = this.getLastProperGem(complex, hierarchy);
                 if(lastGem) {
                     var deepestGem = this.getHierarchyDeepestGem(lastGem.formula),
                         atom;
@@ -1416,7 +1052,7 @@ function(def, pvc, pv){
             return null;
         },
 
-        getLastProperGem: function(hierarchy){
+        getLastProperGem: function(complex, hierarchy){
             /* Get the last gem that is not a measure discrim.
              * Optionally filter by the given hierarchy argument.
              */
@@ -1438,8 +1074,10 @@ function(def, pvc, pv){
             return def.query(this.gems)
                         .reverse()
                         .first(function(gem){
+                            var atom;
                             return !gem.isMeasureDiscrim &&
-                                   (!realHierarchy || gem.hierarchy === realHierarchy);
+                                   (!realHierarchy || gem.hierarchy === realHierarchy) &&
+                                   (!complex || (gem.cccDimName && (atom = complex.atoms[gem.cccDimName]) && atom.value != null));
                         });
         },
 
@@ -1458,14 +1096,14 @@ function(def, pvc, pv){
                       .first(def.notNully) || null;
         }
     });
-    
+
     // --------------------------
 
     def
     .type('pentaho.ccc.ColumnAxis', pentaho.ccc.DiscreteAxis)
     .init(function(chart){
 
-        var rolesToCccDimMap = chart._vizOptions.rolesToCccDimensionsMap;
+        var rolesToCccDimMap = chart._rolesToCccDimensionsMap;
 
         this.hasMeasureDiscrim = !chart.options.dataOptions.measuresInColumns &&
                                  !!(rolesToCccDimMap[this.defaultRole] ||
@@ -1515,19 +1153,18 @@ function(def, pvc, pv){
                     // columns role is not mapped to CCC...
                     // In this case, the discriminator goes as the last *row* dimension.
                     // Is the case, at least, in the PieChart, in which there is no "series" concept.
-                    var rolesToCccDimMap = this.chart._vizOptions.rolesToCccDimensionsMap,
+                    var rolesToCccDimMap = this.chart._rolesToCccDimensionsMap,
                         rowAxis          = this.chart.axes.row,
                         rowRole          = rowAxis.defaultRole,
                         rowCccDimGroup   = rolesToCccDimMap[rowRole],
                         rowNextLevel     = rowAxis.gemsByRole[rowRole].length;
 
-                    cccDimName = pvc.data.DimensionType
-                                         .dimensionGroupLevelName(rowCccDimGroup, rowNextLevel);
+                    cccDimName = pvc.buildIndexedId(rowCccDimGroup, rowNextLevel);
                 }
 
                 this.measureDiscrimName = cccDimName;
             }
-            
+
             return cccDimName;
         },
 
@@ -1537,7 +1174,7 @@ function(def, pvc, pv){
 
             // Ensure measureDiscrimName is determined
             this.cccDimList();
-            
+
             if(this.measureDiscrimName){
                 this.chart.options.dimensions[this.measureDiscrimName] = {
                     isHidden: true
@@ -1551,7 +1188,7 @@ function(def, pvc, pv){
     def
     .type('pentaho.ccc.RowAxis', pentaho.ccc.DiscreteAxis)
     .init(function(chart){
-        
+
         this.base(chart, 'row');
 
         this._ensureRole(this.defaultRole);
@@ -1559,17 +1196,17 @@ function(def, pvc, pv){
     .add({
         defaultRole: 'rows'
     });
-    
+
     // --------------------------
 
     def
     .type('pentaho.ccc.MeasureAxis', pentaho.ccc.Axis)
     .init(function(chart){
-        
+
         this.base(chart, 'measure');
-        
+
         this._ensureRole(this.defaultRole);
-        
+
         this.genericMeasuresCount = 0;
         this.genericMeasureRoles = {};
         def.eachOwn(this.gemsByRole, function(gems, role){
@@ -1591,20 +1228,20 @@ function(def, pvc, pv){
         _getGems: function(){
 
             var gems = this.base();
-            
+
             var filtered = [];
-            
+
             gems.forEach(function(gem){
                 var meaId = gem.id,
                     measureInfo;
-                
+
                 if(meaId && (measureInfo = def.getOwn(this.chart._measuresInfo, meaId))){
                     gem.role = measureInfo.role;
 
                     filtered.push(gem);
                 }
             }, this);
-            
+
             return filtered;
         },
 
@@ -1638,27 +1275,27 @@ function(def, pvc, pv){
                 var atom = complex.atoms[cccDimName];
                 if(!atom.dimension.type.isHidden){
                     // ex: "GemLabel (RoleDesc): 200 (10%)"
-                    var tooltipLine = gem.label;
+                    var tooltipLine = def.html.escape(gem.label);
 
                     // Role description
-                    if(!def.hasOwn(this.chart._noRoleInTooltipMeasureRoles, gem.role)) {
-                        tooltipLine += " (" + gem.role + ")";
+                    if(this.chart._noRoleInTooltipMeasureRoles[gem.role] !== true) {
+                        tooltipLine += " (" + def.html.escape(gem.role) + ")";
                     }
 
-                    tooltipLine += ": " + atom.label;
+                    tooltipLine += ": " + def.html.escape(atom.label);
 
                     if(!this.chart._noPercentInTootltipForPercentGems || gem.measureType !== 'PCTOF'){
                         var valuePct = this._getAtomPercent(atom, context);
                         if(valuePct != null){
-                            tooltipLine += " (" + valuePct + "%)";
+                            tooltipLine += " (" + def.html.escape(''+valuePct) + "%)";
                         }
                     }
 
-                    lines.push(def.html.escape(tooltipLine));
+                    lines.push(tooltipLine);
                 }
             }
         },
-        
+
         _getAtomPercent: function(atom, context){
             if(context) {
                 var cccChart = context.chart,
@@ -1702,87 +1339,211 @@ function(def, pvc, pv){
     });
 
     // ------------------
-    
-    /*
-     * Unhandled mouse events from protovis
-     * bubble up and cause slowing down the UI.
-     * So, we stop propagation of mouse events. 
-     * We can't use dojo or jQuery for this, 
-     * cause they try to "fix" the event object, 
-     * which is generally an expensive operation
-     * that would defeat the initial purpose. 
-     */
-    var _cccEventsShieldEvents =  ['mouseover', 'mouseout', 'mousemove'];
-    
-    function installCccEventsShield(element){
-        if(!element._cccEventsShield){
-            element._cccEventsShield = true;
-            
-            _cccEventsShieldEvents.forEach(function(evName){
-                addListener(element, evName, stopEventPropagation);
-            });
+
+    var installCccEventsShield;
+    if(pv.renderer() === 'vml') {
+        /*
+         * Unhandled mouse events from protovis
+         * bubble up and cause slowing down the UI.
+         * So, we stop propagation of mouse events.
+         * We can't use dojo or jQuery for this,
+         * cause they try to "fix" the event object,
+         * which is generally an expensive operation
+         * that would defeat the initial purpose.
+         * An unwanted side effect is that dragging
+         * gems over the chart does not work.
+         */
+        var _cccEventsShieldEvents =  ['mouseover', 'mouseout', 'mousemove'];
+
+        installCccEventsShield = function (element){
+            if(!element._cccEventsShield){
+                element._cccEventsShield = true;
+
+                _cccEventsShieldEvents.forEach(function(evName){
+                    addListener(element, evName, stopEventPropagation);
+                });
+            }
+        };
+
+        var stopEventPropagation = function (ev){
+            if(!ev){ ev = window.event; }
+            if(ev.stopPropagation) {
+                ev.stopPropagation();
+            } else {
+                ev.cancelBubble = true;
+            }
+        };
+
+        var addListener = function (elem, type, listener){
+            elem.addEventListener
+                ? elem.addEventListener(type, listener, false)
+                : elem.attachEvent("on" + type, listener);
+        };
+    }
+
+
+    /* CCC Charts Options */
+    var ruleStrokeStyle = "#808285";  // #D8D8D8',  // #f0f0f0
+    var lineStrokeStyle = "#D1D3D4";  // "#D1D3D4"; //'#A0A0A0'; // #D8D8D8',// #f0f0f0
+
+    function legendShapeColorProp(scene){
+       var color = scene.color;
+       return scene.isOn() ? color : pvc.toGrayScale(color);
+    }
+
+    var baseOptions = {
+        /* Chart */
+        compatVersion: 2, // use CCCv2
+
+        margins:  0,
+        paddings: 10,
+        plotFrameVisible: false,
+
+        /* Multichart */
+        multiChartMax: 50,
+
+        /* Legend */
+        legend:  true,
+        legendPosition:  'right',
+        legendSizeMax:   '60%',
+        legendPaddings:  10,
+        legendItemPadding: {left: 1, right: 1, top: 2, bottom: 2},// width: 2, height: 4
+        legendClickMode: 'toggleSelected',
+        color2AxisLegendClickMode: 'toggleSelected', // for data part 2 (lines in column/line combo)
+        color3AxisLegendClickMode: 'toggleSelected', // for trends
+
+        /* Axes */
+        axisSizeMax:      '50%',
+        axisTitleSizeMax: '20%',
+        orthoAxisGrid: true,
+
+        /* Continuous axes */
+        continuousAxisLabelSpacingMin: 1.1, // em
+
+        /* Title */
+        titlePosition: 'top',
+
+        /* Interactivity */
+        interactive:    true,
+        animate:        false,
+        tooltipEnabled: true,
+        clickable:      true,
+        selectable:     true,
+        hoverable:      false,
+        ctrlSelectMode: false,
+        clearSelectionMode: 'manual',
+
+        /* Plot */
+        valuesVisible:  false,
+
+        ignoreNulls:   false,
+        groupedLabelSep: "~",
+
+        crosstabMode:  true,
+        isMultiValued: true,
+        seriesInRows:  false,
+        dataOptions: {
+            //categoriesCount:   1, set in code
+            measuresInColumns: true
+        },
+
+        extensionPoints: {
+            axisRule_strokeStyle:   ruleStrokeStyle,
+            axisTicks_strokeStyle:  lineStrokeStyle,
+            dot_lineWidth: 1.5,
+            legendArea_lineWidth:       1,
+            legendArea_strokeStyle:     '#c0c0c0',
+            legendLabel_textDecoration: null,
+            legendDot_fillStyle:    legendShapeColorProp,
+            legendDot_strokeStyle:  legendShapeColorProp,
+            legend2Dot_fillStyle:   legendShapeColorProp,
+            legend2Dot_strokeStyle: legendShapeColorProp
+        },
+
+        tooltip: {
+            delayIn:      200,
+            delayOut:     80,
+            offset:       2,
+            html:         true,
+            gravity:      'nw',
+            fade:         false,
+            followMouse:  true,
+            useCorners:   true,
+            arrowVisible: false,
+            opacity:      1
         }
-    }
-    
-    function stopEventPropagation(ev){
-        if(!ev){ ev = window.event; }
-        if(ev.stopPropagation) {
-            ev.stopPropagation();
-        } else {
-            ev.cancelBubble = true;
+    };
+
+    var mixinDiscreteXOptions = {
+        extensionPoints: {
+            xAxisLabel_textAngle:    -Math.PI/4,
+            xAxisLabel_textAlign:    'right',
+            xAxisLabel_textBaseline: 'top'
         }
-    }
-    
-    function addListener(elem, type, listener){
-        elem.addEventListener
-            ? elem.addEventListener(type, listener, false)
-            : elem.attachEvent("on" + type, listener);
-    }
-    
+    };
+
     // ------------------
-    
+
     def
     .type('pentaho.ccc.Chart')
     .init(function(element){
         this._element = element;
         this._elementName = element.id;
-        
-        installCccEventsShield(element);
+
+        if(installCccEventsShield) { installCccEventsShield(element); }
     })
     .add({
+        _options: baseOptions,
+
+        _rolesToCccDimensionsMap: {
+            'columns':  'series',
+            'rows':     'category',
+            'multi':    'multiChart',
+            'measures': 'value'
+        },
+
         _keyAxesIds: ['column', 'row'],
         _axesIds:    ['column', 'row', 'measure'],
 
         /* This takes creation time dependencies into account.
-         * It works right now. If ti doesn't scale,
+         * It works right now. If it doesn't scale,
          * then some parts of axes initialization must me taken out
          * of the axes class or split into more initialization phases.
          */
         _axesCreateOrderIds: ['row', 'measure', 'column'],
 
-        // This is the order in which fields
-        // are layed out in the CCC's virtual item.
-        // Indexes of readers are relative to this layout.
+        /* This is the order in which fields
+         * are laid out in the CCC's virtual item.
+         * Indexes of readers are relative to this layout.
+         */
         _cccVirtualItemAxesLayout: ['column', 'row', 'measure'],
-      
-        /**
-         * The drilling axes.
+
+        /* The drilling axes.
          *
          * In the order to be tested
          * for being chosen as the drilling axis.
          */
         _drillAxesIds: ['column', 'row'],
 
-        /*
-         * Measure roles that do not show the role in the tooltip.
+        /* The linking axes.
+         *
+         * In the order to be tested
+         * for being chosen as the link axis.
+         */
+        _linkAxesIds: ['column', 'row'],
+
+        /* Measure roles that do not show the role in the tooltip.
          */
         _noRoleInTooltipMeasureRoles: {'measures': true},
 
-        /*
-         * Do not show percent in front of an analyzer "percent measure" gem.
+        /* Do not show percent in front of an analyzer "percent measure" gem.
          */
         _noPercentInTootltipForPercentGems: false,
-        
+
+        _multiRole: 'multi',
+
+        _discreteColorRole: 'columns',
+
         /* PLUGIN INTERFACE  */
 
         /**
@@ -1796,13 +1557,13 @@ function(def, pvc, pv){
 
             // Pentaho/Google data table
             this._dataTable = dataTable;
-            
+
             // ---------------
-            
+
             this._initOptions(vizOptions);
-            
+
             this._processDataTable();
-            
+
             this._initAxes();
 
             // ---------------
@@ -1813,51 +1574,51 @@ function(def, pvc, pv){
             this._hasMultiChartColumns = this.axes.row.hasMulti || this.axes.column.hasMulti;
 
             // ---------------
-            
+
             this._readUserOptions(this.options, vizOptions);
-            
+
             // ---------------
-            
+
             this._readData();
 
             this._configure();
-            
+
             this._prepareLayout(this.options);
-            
+
             this._render();
         },
 
         resize: function(width, height){
             // Resize event throttling
-            
+
             if(this._lastResizeTimeout != null){
                 clearTimeout(this._lastResizeTimeout);
             }
-            
+
             this._lastResizeTimeout = setTimeout(function(){
                 this._lastResizeTimeout = null;
-                
+
                 this._doResize(width, height);
-                
+
             }.bind(this), 50);
         },
-        
+
         _doResize: function(width, height){
             if(this._chart){
-                var options = this._chart.options; 
-                
+                var options = this._chart.options;
+
                 def.set(options, 'width', width, 'height', height);
-                
+
                 this._prepareLayout(options);
-                
+
                 this._chart.render(true, true, false);
             }
         },
-        
+
         /* Sets the items on the chart that should be highlighted */
         setHighlights: function(selections) {
             this._selections = selections;
-            
+
             if(!this._ownChange){ // reentry control
                 if(!selections || selections.length == 0){
                     // will cause selectionChangedAction being called
@@ -1875,7 +1636,7 @@ function(def, pvc, pv){
         /* Returns the output parameters of the chart. */
         getOutputParameters: function() {
             var params = [];
-            if (this._vizOptions.cccClass == 'pvc.PieChart') {
+            if (this._cccClass == 'pvc.PieChart') {
                 params.push([
                         this._dataTable.getColumnId( 0 ),
                         true,
@@ -1894,129 +1655,40 @@ function(def, pvc, pv){
             return params;
         },
 
-        // TODO - is the current selection accounting needed?
-        /* Returns the colors to use.
-         * This needs to take into account selected and unselected items.
-         */
-        getColors: function() {
-            if(this._colors){
-                return this._colors;
-            }
-
-            var colors = null;
-
-            var paletteMap = this._vizOptions.metrics[0].paletteMap;
-            if(paletteMap) {
-                colors = [];
-                for(var r = 0 ; r < this._dataTable.getNumberOfRows() ; r++) {
-                    var item = this._getTableValue(r, 0);
-                    if(this._selections && this._selections.length > 0) {
-                        var done = false;
-                        for(var selIdx = 0 ; selIdx < this._selections.length ; selIdx++) {
-                            var selection = this._selections[selIdx];
-                            if((selection.type == 'row'    && selection.rowItem == item) ||
-                               (selection.type == 'column' && selection.colId == this._dataTable.getColumnId(1))) {
-                                colors.push(paletteMap[item]);
-                                done = true;
-                                break;
-                            }
-                        }
-
-                        if(!done) {
-                            // this item is not selected, so make it grey
-                            colors.push( "#bbbbbb" );
-                        }
-
-                    } else {
-                        colors.push(paletteMap[item]);
-                    }
-                }
-            }
-
-            return colors;
-        },
-
         /* HELPERS  */
 
         _initOptions: function(vizOptions){
             // Make a copy
             vizOptions = this._vizOptions = $.extend({}, vizOptions);
 
-            // --------------------
-            
             this._vizHelper = cv.pentahoVisualizationHelpers[vizOptions.customChartType];
-            
-            this._hasContentLink = this._vizHelper.isInteractionEnabled() && 
-                                   this._vizHelper.hasContentLink();
 
-            // --------------------
+            this._hasContentLink = this._vizHelper.isInteractionEnabled() &&
+                                   this._vizHelper.hasContentLink();
 
             // Store the current selections
             this._selections = vizOptions.selections;
 
-            this.options = {
-                canvas:     this._elementName,
-                showValues: false,
-
-                legend:  true,
-                legendClickMode:  'toggleSelected',
-                legend2ClickMode: 'toggleSelected', // for data part 2 (lines in column/line combo)
-                titlePosition:    'top',
-
-                paddings: 10,
-
-                animate:      false,
-                showTooltips: true,
-                clickable:    true,
-                selectable:   true,
-                hoverable:    false,
-          
-                ctrlSelectMode: false,
-                
-                clearSelectionMode: 'manual',
-                
-                extensionPoints: {},
-                dimensionGroups: {},
-                dimensions:      {},
-                readers:         [],
-                visualRoles:     {},
-                
-                ignoreNulls:   false,
-                crosstabMode: !!vizOptions.crosstabMode,
-                isMultiValued: true,
-                seriesInRows:  false,
-                dataOptions: {
-                    categoriesCount:   1,
-                    measuresInColumns: !!vizOptions.measuresInColumns
-                }
-            };
-            
-            /* Copy options */
-            // Just in case
-            vizOptions.height = vizOptions.height || 400;
-            vizOptions.width  = vizOptions.width  || 400;
-            
-            for(var x in vizOptions){
-                if(!this._shouldSkipVizOption(x)){
-                    this._configureOption(x, vizOptions[x]);
-                }
-            }
-            
-            /* Copy extension points */
-            var vizExtPoints = vizOptions.extensionPoints;
-            if(vizExtPoints){
-                def.copy(this.options.extensionPoints, vizExtPoints);
-            }
+            // Recursively inherit this class' shared options
+            var options = this.options = def.create(this._options);
+            def.set(
+                options,
+                'canvas',          this._elementName,
+                'height',          vizOptions.height || 400,
+                'width',           vizOptions.width  || 400,
+                'dimensionGroups', {},
+                'dimensions',      {},
+                'visualRoles',     {},
+                'readers',         [],
+                'calculations',    []);
         },
-        
-        _message: function(msgId, args){
-            return this._vizHelper.message(msgId, args);
-        },
-        
+
+        _message: function(msgId, args) { return this._vizHelper.message(msgId, args); },
+
         _readUserOptions: function(options, vizOptions){
             // Apply vizOptions to extension points and others
             var extPoints = options.extensionPoints;
-            
+
             var value = vizOptions.backgroundFill;
             if(value && value !== 'NONE'){
                 var fillStyle;
@@ -2029,72 +1701,85 @@ function(def, pvc, pv){
                                 ~~((255 + bgColor.g) / 2),
                                 ~~((255 + bgColor.b) / 2),
                                 bgColor.a);
-                        
+
                         fillStyle = bgColor;
                     } else {
-                        fillStyle = 'linear-gradient(to top, ' + 
-                                    vizOptions.backgroundColor + ', ' + 
+                        fillStyle = 'linear-gradient(to top, ' +
+                                    vizOptions.backgroundColor + ', ' +
                                     vizOptions.backgroundColorEnd + ')';
                     }
                 } else {
                     fillStyle = vizOptions.backgroundColor;
                 }
-                
+
                 extPoints.base_fillStyle = fillStyle;
             }
-            
+
             value = vizOptions.labelColor;
             if(value !== undefined){
-                extPoints.xAxisLabel_textStyle = 
-                extPoints.yAxisLabel_textStyle = 
-                extPoints.xAxisTitleLabel_textStyle =
-                extPoints.yAxisTitleLabel_textStyle = value;
+                extPoints.axisLabel_textStyle =
+                extPoints.axisTitleLabel_textStyle = value;
             }
-            
-            value = vizOptions.legendColor;
-            if(value !== undefined){
-                extPoints.legendLabel_textStyle = value;
+
+            value = ('' + vizOptions.showLegend) === 'true';
+            options.legend = value;
+            if(value){
+                value = vizOptions.legendColor;
+                if(value !== undefined){
+                    extPoints.legendLabel_textStyle = value;
+                }
+
+                // TODO: ignoring white color cause analyzer has no on-off for the legend bg color
+                // and always send white. When the chart bg color is active it
+                // would not show through the legend.
+                value = vizOptions.legendBackgroundColor;
+                if(value && value.toLowerCase() !== "#ffffff"){
+                    extPoints.legendArea_fillStyle = value;
+                }
+
+                value = vizOptions.legendPosition;
+                if(value){
+                    options.legendPosition = value.toLowerCase();
+                }
+
+
+                if(vizOptions.legendSize){
+                    options.legendFont = readFont(vizOptions, 'legend');
+                }
             }
-            
-            // TODO: ignoring white color cause analyzer has no on-off for the legend bg color
-            // and always send white. When the chart bg color is active it
-            // would not show through the legend.
-            value = vizOptions.legendBackgroundColor;
-            if(value && value.toLowerCase() !== "#ffffff"){
-                extPoints.legendArea_fillStyle = value;
-            }
-            
+
             value = vizOptions.lineWidth;
             if(value !== undefined){
                 extPoints.line_lineWidth  = +value;      // + -> to number
                 var radius = 3 + 6 * ((+value) / 8); // 1 -> 8 => 3 -> 9,
                 extPoints.dot_shapeSize = radius * radius;
+
+                extPoints.plot2Line_lineWidth = extPoints.line_lineWidth;
+                extPoints.plot2Dot_shapeSize  = extPoints.dot_shapeSize;
             }
-            
+
             value = vizOptions.maxChartsPerRow;
             if(value !== undefined){
-                options.multiChartMaxColumns = +value; // + -> to number
+                options.multiChartColumnsMax = +value; // + -> to number
             }
-            
+
+            // Default domain scope is global
+            options.numericAxisDomainScope = 'cell';
             // build style for pv
             if (vizOptions.labelSize) {
                 var labelFont = readFont(vizOptions, 'label');
-                
-                options.axisTitleFont = 
+
+                options.axisTitleFont =
                 options.axisFont = labelFont;
-                
+
                 if(this._hasMultiChartColumns){
                     var labelFontSize  = readFontSize(vizOptions, 'label');
                     var labelFontFamily = readFontFamily(vizOptions, 'label');
                     options.titleFont = (labelFontSize + 2) + "px " + labelFontFamily;
                 }
             }
-            
-            if (vizOptions.legendSize) {
-                options.legendFont = readFont(vizOptions, 'legend');
-            }
         },
-        
+
         _processDataTable: function(){
             // Data truncation can affect also the structure of data.
             // If the query returns more than 100x100 rowsxcols,
@@ -2109,17 +1794,17 @@ function(def, pvc, pv){
             // Note that measure gems that are in no *chart* gem bar (not mapped)
             // and that do not have hideInChart=true may appear here as columns.
             // These are ignored (meaRole === 'undefined').
-            // 
+            //
             // Measure columns of the same col values group may come in any order...
             // and even in different orders across column groups.
 
             var dataTable = this._dataTable;
             var dtColCount = dataTable.getNumberOfColumns();
-            var roleToCccDimMap = this._vizOptions.rolesToCccDimensionsMap;
+            var roleToCccDimMap = this._rolesToCccDimensionsMap;
             var colGroups = [];
             var colGroupsByColValues = {};
 
-            /* 
+            /*
              * meaRoleId -> {
              *   groupIndex: 0, // Global order of measure roles within a column group
              *   index: 0       // Column index of a measure role's first appearance
@@ -2127,61 +1812,61 @@ function(def, pvc, pv){
              */
             var measureRolesInfo     = {};
             var measureRolesInfoList = [];
-            
+
             /*
              * id -> { gem info }
              */
             var measuresInfo = {};
             var measuresInfoList = [];
-                        
+
             var rowsInfoList = [];
             var columnsInfoList = [];
-            
+
             var tc = 0;
             var colId, splitColId;
-            
+
             /*
              * I - Row gems
              */
             while(tc < dtColCount){
                 colId = dataTable.getColumnId(tc);
                 splitColId = splitColGroupAndMeasure(colId);
-                
+
                 if(!processRowColumn.apply(this, splitColId)){
                     // Found first measure column
                     break;
                 }
-                
+
                 // next
                 tc++;
             }
-            
+
             // First measure column
             if(tc < dtColCount){
-                
+
                 /*
                  * II - Column gems
-                 * 
+                 *
                  * Collects column gems' roles from the first col~mea column.
                  */
                 processColumnsInfo.call(this, splitColId[0]);
-                
+
                 /*
                  * III - Row gems
                  */
                 while(true){
                     processMeasureColumn.apply(this, splitColId);
-                    
+
                     // next
                     if(++tc >= dtColCount){
                         break;
                     }
-                    
+
                     colId = dataTable.getColumnId(tc);
                     splitColId = splitColGroupAndMeasure(colId);
                 }
             }
-            
+
             // Sort measure roles
             measureRolesInfoList.sort(function(infoa, infob){
                 return def.compare(infoa.groupIndex, infob.groupIndex) ||
@@ -2199,87 +1884,90 @@ function(def, pvc, pv){
             this._measureRolesInfoList = measureRolesInfoList;
             this._colGroups = colGroups;
             this._measuresInfo = measuresInfo;
-            
+
             this._axesGemsInfo = {
                 'measure': measuresInfoList,
                 'row':     rowsInfoList,
                 'column':  columnsInfoList
             };
-            
-            
+
+
             /* HELPER functions */
-            
+
             function processRowColumn(colGroupValues, meaId){
                 if(/\[MEASURE:(\d+)\]$/.test(meaId)){
                     // Found the first measure column
                     return false; // It isn't a "row" column
                 }
-                
+
                 // When "Member properties" are shown in a member gem,
-                // additional columns are added to the data table, 
+                // additional columns are added to the data table,
                 // that are to be ignored.
                 // These columns have no column role.
                 // We transform them to 'undefined' role
                 // which is the role value that unmapped measure columns
                 // already have.
-                var roles = getColumnRoles(dataTable, tc);
-                
+                var rolesAndLevels = getColumnRolesAndLevels(dataTable, tc);
+
                 // A row gem
                 rowsInfoList.push({
                     id:      colId,
                     formula: colId,
                     label:   dataTable.getColumnLabel(tc),
                     axis:    'row',
-                    role:    roles ? roles[0] : 'undefined',
+                    role:    rolesAndLevels ? rolesAndLevels[0].id : 'undefined',
                     index:   rowsInfoList.length
                 });
-                
+
                 return true; // It is a "row" column
             }
-            
+
             // Column Roles are the same in every col~measure column.
             // So we collect them from the first one.
             function processColumnsInfo(colGroupValues){
                 if(colGroupValues){
-                    var colRoles  = getColumnRoles(dataTable, tc);
+                    var rolesAndLevels = getColumnRolesAndLevels(dataTable, tc);
                     var colValues = colGroupValues.split('~');
-                    var meaIndex  = colValues.length - 1;
-                    
+
                     colValues.forEach(function(colValue, index){
+                        var roleAndLevel = rolesAndLevels[index];
                         columnsInfoList.push({
-                            id:      undefined, // not in data table
-                            formula: undefined, // not in data table
+                            id:      roleAndLevel.level,
+                            formula: roleAndLevel.level,
                             label:   undefined, // not in data table
                             axis:    'column',
-                            role:    colRoles[index],
+                            role:    roleAndLevel.id,
                             index:   index
                         });
                     });
                 }
             }
-            
+
             function processMeasureColumn(colGroupValues, id){
-                
+
                 var meaInfo = def.getOwn(measuresInfo, id);
-                
+
                 /* New measure? */
                 if(!meaInfo){
-                    var role = getColumnRoles(dataTable, tc).pop(); // TODO - last()
+                    // TODO - last() ?
+                    var roleAndLevel = getColumnRolesAndLevels(dataTable, tc).pop();
 
-                    meaInfo = {  
+                    // NOTE: roleAndLevel.level == [Measures].[MeasuresLevel],
+                    // which is not the formula...
+                    meaInfo = {
                         id:      id,
                         formula: undefined, // not in data table
                         label:   splitColGroupAndMeasure(dataTable.getColumnLabel(tc))[1],
                         axis:    'measure',
-                        role:    role,
+                        role:    roleAndLevel.id,
                         index:   measuresInfoList.length,
-                        isUnmapped: role === 'undefined'
+                        isUnmapped: roleAndLevel.id === 'undefined'
                     };
-                    
+
                     measuresInfo[id] = meaInfo;
                     measuresInfoList.push(meaInfo);
                 }
-                
+
                 /* New column group? */
                 var colGroup = def.getOwn(colGroupsByColValues, colGroupValues);
                 if(!colGroup){
@@ -2295,21 +1983,21 @@ function(def, pvc, pv){
                 } else {
                     colGroup.measureIds.push(id);
                 }
-                
+
                 /* Role */
                 var currMeaIndex = (tc - colGroup.index);
                 var meaRoleInfo  = def.getOwn(measureRolesInfo, meaInfo.role);
                 if(!meaRoleInfo){
                     meaRoleInfo = {
-                        id:         role,
+                        id:         roleAndLevel.id,
                         cccDimName: meaInfo.isUnmapped ?
                                         null :
-                                        (roleToCccDimMap[role] ||
+                                        (roleToCccDimMap[roleAndLevel.id] ||
                                          def.assert("Must map to CCC all measure roles that the data table contains.")),
                         groupIndex: currMeaIndex,
                         index:      tc // first index where role appears (for tie break, see .sort above)
                     };
-                    
+
                     measureRolesInfo[meaInfo.role] = meaRoleInfo;
                     measureRolesInfoList.push(meaRoleInfo);
 
@@ -2318,17 +2006,20 @@ function(def, pvc, pv){
                 }
             }
         },
-        
+
         _initAxes: function(){
             /* formula, id -> gem */
             this.gemsMap = {};
-        
+
+            /* roleId -> axis */
+            this.axisByRole = {};
+
             /* axisId -> Axis */
             this.axes = {};
-            
+
             this._gemCountColumnReportAxis = 0;
             this._measureDiscrimGem = null;
-            
+
             /* Create and configure Axis's */
             this._axesCreateOrderIds.forEach(createAxis, this);
 
@@ -2337,7 +2028,7 @@ function(def, pvc, pv){
             this._cccVirtualItemAxesLayout.forEach(function(axisId){
                 virtualItemIndex = this.axes[axisId].configure(virtualItemIndex, cccDimNamesSet);
             }, this);
-            
+
             /* @instance */
             function createAxis(axisId){
 
@@ -2346,6 +2037,14 @@ function(def, pvc, pv){
                 axis.gems.forEach(indexGem, this);
 
                 this.axes[axisId] = axis;
+
+                var boundRoleList = axis.boundRolesIdList;
+                if(boundRoleList){
+                    boundRoleList.forEach(function(roleId){
+                        !def.hasOwn(this.axisByRole, roleId) || def.assert("A role cannot be in more than one axis");
+                        this.axisByRole[roleId] = axis;
+                    }, this);
+                }
             }
 
             /* @instance */
@@ -2355,7 +2054,7 @@ function(def, pvc, pv){
 
                 // NOTE: when interaction is disabled...
                 // formula and id aren't available in every axis type...
-          
+
                 // Index by formula
                 if(form){
                     this.gemsMap[form] = gem;
@@ -2364,20 +2063,18 @@ function(def, pvc, pv){
                 if(id && form !== id){
                     this.gemsMap[id] = gem;
                 }
-                
+
                 if(gem.reportAxis === 'column'){
                     this._gemCountColumnReportAxis++;
                 }
-                
+
                 if(gem.isMeasureDiscrim){
                     this._measureDiscrimGem = gem;
                 }
             }
         },
 
-        _readData: function() {
-            this._readDataCrosstab();
-        },
+        _readData: function() { this._readDataCrosstab(); },
 
         /**
          * Creates a CCC resultset in CROSSTAB format.
@@ -2390,9 +2087,6 @@ function(def, pvc, pv){
                 colCount = dataTable.getNumberOfColumns(),
                 rowCount = dataTable.getNumberOfRows();
 
-            // Take all the colors from the palette
-            this._colors = this._vizOptions.palette.colors.slice();
-            
             // Direct translation
             for(var tc = 0 ; tc < colCount ; tc++){
                 this._addCdaMetadata(
@@ -2415,13 +2109,17 @@ function(def, pvc, pv){
 
         _configure: function(){
             var options = this.options;
-            
-            // By default hide overflow, otherwise, 
-            // resizing the window frequently ends up needlessly showing scrollbars. 
+            var vizOptions = this._vizOptions;
+
+            // By default hide overflow, otherwise,
+            // resizing the window frequently ends up needlessly showing scrollbars.
             // TODO: is it ok to access "vizOptions.controller.domNode" ?
-            this._vizOptions.controller.domNode.style.overflow = 'hidden'; // Hide overflow
-            
-            options.colors = this.getColors();
+            vizOptions.controller.domNode.style.overflow = 'hidden'; // Hide overflow
+
+            var colorScaleKind = this._getColorScaleKind();
+            if(colorScaleKind){
+                this._configureColor(colorScaleKind);
+            }
 
             if((this.options.legend = this._showLegend())) {
                 this._configureLegend();
@@ -2435,23 +2133,43 @@ function(def, pvc, pv){
             options.axisTitleFont = defaultFont(options.axisTitleFont, 12);
 
             if(!this._vizHelper.isInteractionEnabled()){
-                options.showTooltips = false;
-                options.clickable    = false;
-                options.selectable   = false;
-                options.hoverable    = false;
+                options.interactive = false;
             } else {
-                if(options.showTooltips){
+                if(options.tooltipEnabled){
                     this._configureTooltip();
                 }
-                
+
                 if((options.selectable = this._canSelect())){
                     this._configureSelection();
                 }
-                
+
                 this._configureDoubleClick();
             }
         },
-        
+
+        _getColorScaleKind: function() { return 'discrete'; },
+
+        _configureColor: function(colorScaleKind){
+            var options = this.options;
+            var vizOptions = this._vizOptions;
+
+            switch(colorScaleKind){
+                case 'discrete':
+                    options.colors = this._getDiscreteColorScale();
+                    break;
+
+                case 'continuous':
+                    options.colorScaleType = vizOptions.colorScaleType;
+                    options.colors = vizOptions.colors;
+                    break;
+            }
+        },
+
+        _getDiscreteColorScale: function(){
+            return this._getDefaultDiscreteColorScale();
+        },
+
+        _getDefaultDiscreteColorScale: function() { return this._vizOptions.palette.colors.slice(); },
         _configureMultiChart: function(){
             var options = this.options;
 
@@ -2459,18 +2177,16 @@ function(def, pvc, pv){
             var containerStyle = this._vizOptions.controller.domNode.style;
             containerStyle.overflowX = 'hidden';
             containerStyle.overflowY = 'auto';
-            
-            options.multiChartMax = 50; // TODO: hardcoded multichart items limit
-            
+
             // Very small charts can't be dominated by text...
             //options.axisSizeMax = '30%';
-            
+
             var titleFont = defaultFont(options.titleFont, 12);
             if(titleFont && !(/black|(\bbold\b)/i).test(titleFont)){
                 titleFont = "bold " + titleFont;
             }
-            
-            options.titleFont = titleFont;
+
+            options.smallTitleFont = titleFont;
 
             var multiChartOverflow = this._vizOptions.multiChartOverflow;
             if(multiChartOverflow) {
@@ -2480,11 +2196,8 @@ function(def, pvc, pv){
 
         _configureTooltip: function(){
             var me = this;
-//            this.options.tooltipFormat = function(scene){
-//                return me._getTooltipText(scene.datum, this);
-//            };
-            this.options.tooltipFormat = function(s, c, v, datum){
-                return me._getTooltipText(datum, this);
+            this.options.tooltipFormat = function(scene){
+                return me._getTooltipText(scene.datum, this);
             };
         },
 
@@ -2492,15 +2205,15 @@ function(def, pvc, pv){
             if(!this.options.selectable){
                 return false;
             }
-            
+
             // Selection is disabled if 2 or more reportAxis='column' gems exist
             if(this._gemCountColumnReportAxis >= 2){
                 return false;
             }
-            
+
             return true;
         },
-        
+
         _configureSelection: function(){
             var me = this;
             this.options.userSelectionAction = function(cccSelections){
@@ -2513,43 +2226,34 @@ function(def, pvc, pv){
 
         _configureDoubleClick: function(){
             var me = this;
-//            this.options.doubleClickAction = function(scene){
-//                me._onDoubleClick(scene.datum);
-//            };
-//
-//            this.options.axisDoubleClickAction = function(scene) {
-//                var group = scene.group;
-//                if(group){
-//                    return me._onDoubleClick(group);
-//                }
-//            };
-            this.options.doubleClickAction = function(s, c, v, ev){
-                me._onDoubleClick(this.scene.datum, this);
+            this.options.doubleClickAction = function(scene){
+                me._onDoubleClick(scene.datum);
             };
 
-            this.options.axisDoubleClickAction = function(group) {
-                if(group instanceof pvc.data.Complex){
+            this.options.axisDoubleClickAction = function(scene) {
+                var group = scene.group;
+                if(group){
                     return me._onDoubleClick(group);
                 }
             };
         },
-        
+
         _showLegend: function(){
             if(!this.options.legend){
                 return false;
             }
-            
+
             if(this.axes.measure.genericMeasuresCount > 1){
                 return true;
             }
 
             var colAxis = this.axes.column,
-                cccColDimGroup = this._vizOptions.rolesToCccDimensionsMap[colAxis.defaultRole];
+                cccColDimGroup = this._rolesToCccDimensionsMap[colAxis.defaultRole];
 
             if(!cccColDimGroup || colAxis.realDepth > 0){
                 return true;
             }
-            
+
             return false;
         },
 
@@ -2557,14 +2261,18 @@ function(def, pvc, pv){
             var options = this.options;
 
             options.legendFont = defaultFont(options.legendFont, 10);
-            
+
             var legendPosition = options.legendPosition,
                 isTopOrBottom = legendPosition === 'top' || legendPosition === 'bottom';
-            
+
             if(this._hasMultiChartColumns && !isTopOrBottom){
                 options.legendAlignTo  = 'page-middle';
-                options.legendInBounds = true; // ensure it is not placed off-page
-                
+                options.legendKeepInBounds = true; // ensure it is not placed off-page
+
+                // Ensure that legend margins is an object.
+                // Preseve already specifed margins.
+                // CCC's default adds a left or right 5 px margin,
+                // to separate the legend from the content area.
                 var legendMargins = options.legendMargins;
                 if(legendMargins){
                     if(typeof(legendMargins) !== 'object'){
@@ -2572,11 +2280,13 @@ function(def, pvc, pv){
                     }
                 } else {
                     legendMargins = options.legendMargins = {};
+                    var oppositeSide = pvc.BasePanel.oppositeAnchor[legendPosition];
+                    legendMargins[oppositeSide] = 5;
                 }
-                
+
                 legendMargins.top = 20;
-            } 
-            
+            }
+
             if(!('legendAlign' in options)){
                 // Calculate 'legendAlign' default value
                 if(isTopOrBottom){
@@ -2586,57 +2296,28 @@ function(def, pvc, pv){
                 }
             }
         },
-        
-        // TODO - probably the skip logic should be inverted,
-        // this would be specified in terms of inclusion of CCC options.
-        _shouldSkipVizOption: function(option){
-            return (option in _skipVizOptions);
-        },
 
-        _configureOption: function(x, v){
-             // Change 'x' and/or 'v'
-            switch(x){
-                case 'legendPosition':
-                    v = v && v.toLowerCase();
-                    break;
-
-                case 'showLegend':
-                    x = 'legend';
-                    v = (('' + v) === 'true');
-                    break;
-
-                case 'legendSize':
-                case 'lineWidth':
-                    v = parseFloat(v);
-                    break;
-            }
-
-            this.options[x] = v;
-        },
-        
         // Logic that depends on width and height
         _prepareLayout: function(options){
             if(this._hasMultiChartColumns && pv.renderer() !== 'batik'){
-                // Account for the *possible* toolbar width
-                options.width -= 17; // assuming 18px is the minimum value (slight chart overlap)
+                // Account for the width of the *possible* scrollbar
+                options.width -= 17;
             }
         },
-    
+
         _render: function(){
             while(this._element.firstChild) {
                 this._element.removeChild(this._element.firstChild);
             }
 
-            this._currentChartType = this._vizOptions.cccClass;
+            var chartClass = def.getPath({pvc: pvc}, this._cccClass);
 
-            var chartClass = def.getPath({pvc: pvc}, this._currentChartType);
-            
             this._chart = new chartClass(this.options);
             this._chart.setData({
                 metadata:  this._metadata,
                 resultset: this._resultset
             });
-            
+
             this._chart.render();
         },
 
@@ -2648,163 +2329,181 @@ function(def, pvc, pv){
             this._axesIds.forEach(function(axisId){
                 this.axes[axisId].buildHtmlTooltip(tooltipLines, complex, context);
             }, this);
-            
-            if(this._hasContentLink){
-                /* Add content link information to the tooltip. */
-                msg = this._message('chartTooltipFooterContentlink');
-                
-                tooltipLines.push(msg);
-            } else {
-                /* Add hyperlink information to the tooltip. */
-                var hyperlinkInfo = this._getHyperlinkInfo(complex);
-                var msg;
-                if(hyperlinkInfo){
-                    msg = this._message(
-                            'chartTooltipFooterHyperlink', [
-                                def.html.escape(hyperlinkInfo.gem.linkLabel || this._message('chartTooltipHyperlinkDefaultTitle'))
-                            ]);
-                    
+
+            if(!complex.isVirtual){
+                if(this._hasContentLink){
+                    /* Add content link information to the tooltip. */
+                    msg = this._message('chartTooltipFooterContentlink');
+
                     tooltipLines.push(msg);
                 } else {
-                    
-                    /* Add drill-down information to the tooltip. */
-                    var drillDownInfo = this._getDrillDownInfo(complex);
-                    if(drillDownInfo){
+                    /* Add hyperlink information to the tooltip. */
+                    var hyperlinkInfo = this._getHyperlinkInfo(complex);
+                    var msg;
+                    if(hyperlinkInfo){
                         msg = this._message(
-                                    'chartTooltipFooterDrillDown', [
-                                        def.html.escape(this._vizHelper.getFormulaLabel(drillDownInfo.drillChild))
-                                     ]);
-                        
+                                'chartTooltipFooterHyperlink', [
+                                    def.html.escape(hyperlinkInfo.gem.linkLabel || this._message('chartTooltipHyperlinkDefaultTitle'))
+                                ]);
+
                         tooltipLines.push(msg);
+                    } else {
+
+                        /* Add drill-down information to the tooltip. */
+                        var drillDownInfo = this._getDrillDownInfo(complex);
+                        if(drillDownInfo){
+                            msg = this._message(
+                                        'chartTooltipFooterDrillDown', [
+                                            def.html.escape(this._vizHelper.getFormulaLabel(drillDownInfo.drillChild))
+                                         ]);
+
+                            tooltipLines.push(msg);
+                        }
                     }
                 }
             }
-            
+
             /* Add selection information */
             // Not the data point count, but the selection count (a single column selection may select many data points).
             //var selectedCount = this._chart && this._chart.data.selectedCount();
             var selections = this._vizOptions.controller.highlights;
             var selectedCount = selections && selections.length;
             if(selectedCount){
-                var msgId = selectedCount === 1 ? 
-                            'chartTooltipFooterSelectedSingle' : 
+                var msgId = selectedCount === 1 ?
+                            'chartTooltipFooterSelectedSingle' :
                             'chartTooltipFooterSelectedMany';
-                
+
                 msg = this._message(msgId, [selectedCount]);
-                
+
                 tooltipLines.push(msg);
             }
-            
+
             return tooltipLines.join('<br />');
         },
 
         /* INTERACTIVE - SELECTION */
-        
+
         _onUserSelection: function(selectingDatums){
             return this._processSelection(selectingDatums);
         },
-        
+
         _getSelectionKey: function(selection){
             var key = selection.__cccKey;
             if(!key){
                 var keys = [selection.type];
-                
+
                 var ap = def.array.append;
                 if(selection.columnId){
                     ap(keys, selection.columnId);
                     ap(keys, selection.columnItem);
                 }
-                
+
                 if(selection.rowId){
                     ap(keys, selection.rowId);
                     ap(keys, selection.rowItem);
                 }
-                
+
                 key = selection.__cccKey = keys.join('||');
             }
-            
+
             return key;
         },
-        
+
         _doesSharedSeriesSelection: function(){
             return (this._gemCountColumnReportAxis === 1);
         },
-        
+
         _onSelectionChanged: function(selectedDatums){
-            
+
             if(!this.options.selectable){
                 return;
             }
-            
+
             // Convert to array of analyzer cell or column selection objects
             var selectionExcludesMulti = this._selectionExcludesMultiGems();
-            
+
             var selections = [];
             var selectionsByKey = {};
-            
+
             if(this._doesSharedSeriesSelection()){
                 selectedDatums.forEach(function(datum){
-                    var selection = { type: 'column' };
-                    
-                    this.axes.column.fillCellSelection(selection, datum, selectionExcludesMulti);
-                    
-                    // Check if there's already a selection with the same key.
-                    // If not, add a new selection to the selections list.
-                    // In the case where the selection max count limit is reached, 
-                    // the datums included in each selection must be known (by its index).
-                    // So, add the datum to the new or existing selection's datums list.
-                    
-                    var key = this._getSelectionKey(selection);
-                    
-                    var existingSelection = selectionsByKey[key];
-                    if(!existingSelection){
-                        selection.__cccDatums = [datum];
-                        
-                        selectionsByKey[key] = selection;
-                        selections.push(selection);
-                    } else {
-                        existingSelection.__cccDatums.push(datum);
+                    if(!datum.isVirtual){
+                        var selection = { type: 'column' };
+
+                        this.axes.column.fillCellSelection(selection, datum, selectionExcludesMulti);
+
+                        // Check if there's already a selection with the same key.
+                        // If not, add a new selection to the selections list.
+                        // In the case where the selection max count limit is reached,
+                        // the datums included in each selection must be known (by its index).
+                        // So, add the datum to the new or existing selection's datums list.
+
+                        var key = this._getSelectionKey(selection);
+
+                        var existingSelection = selectionsByKey[key];
+                        if(!existingSelection){
+                            selection.__cccDatums = [datum];
+
+                            selectionsByKey[key] = selection;
+                            selections.push(selection);
+                        } else {
+                            existingSelection.__cccDatums.push(datum);
+                        }
                     }
                 }, this);
-                
+
             } else {
                 // Duplicates may occur due to excluded dimensions like the discriminator
                 selectedDatums.forEach(function(datum){
-                    var selection = this._complexToCellSelection(datum, selectionExcludesMulti);
-                    
-                    // Check if there's already a selection with the same key.
-                    // If not, add a new selection to the selections list.
-                    var key = this._getSelectionKey(selection);
-                    var existingSelection = selectionsByKey[key];
-                    if(!existingSelection){
-                        selection.__cccDatums = datum;
-                        
-                        selectionsByKey[key] = selection;
-                        selections.push(selection);
+                    if(!datum.isVirtual){
+                        var selection = this._complexToCellSelection(datum, selectionExcludesMulti);
+
+                        // Check if there's already a selection with the same key.
+                        // If not, add a new selection to the selections list.
+                        var key = this._getSelectionKey(selection);
+                        var existingSelection = selectionsByKey[key];
+                        if(!existingSelection){
+                            selection.__cccDatums = datum;
+
+                            selectionsByKey[key] = selection;
+                            selections.push(selection);
+                        }
                     }
                 }, this);
             }
-            
+
             selections = this._limitSelection(selections);
-            
-            // Launch analyzer select event, even if selection is empty (to clear it)
-            pentaho.events.trigger(this, "select", {
-                source:        this,
-                selections:    selections,
-                selectionMode: "REPLACE"
-            });
+
+            // Wrap the event trigger with _ownChange=true,
+            // cause otherwise, when the #setHighlights method is called,
+            // in response to selection changing,
+            // and if only interpolated dots had beed selected,
+            // resulting in selections.length === 0,
+            // then the chart selections would be reset...
+            this._ownChange = true;
+            try {
+                // Launch analyzer select event, even if selection is empty (to clear it)
+                pentaho.events.trigger(this, "select", {
+                    source:        this,
+                    selections:    selections,
+                    selectionMode: "REPLACE"
+                });
+            } finally {
+                this._ownChange = false;
+            }
         },
-        
+
         _limitSelection: function(selections){
             // limit selection
+            var filterSelectionMaxCount = this._vizOptions['filter.selection.max.count'] || 200;
             var selections2 = selections;
             var L = selections.length;
-            var deselectCount = L - _filterSelectionMaxCount;
+            var deselectCount = L - filterSelectionMaxCount;
             if(deselectCount > 0) {
                 // Build a list of datums to deselect
                 var deselectDatums = [];
                 selections2 = [];
-                
+
                 for(var i = 0 ; i < L ; i++){
                     var selection = selections[i];
                     var keep = true;
@@ -2814,11 +2513,11 @@ function(def, pvc, pv){
                             if(!this._previousSelectionKeys[key]){
                                 keep = false;
                             }
-                        } else if(i >= _filterSelectionMaxCount) {
+                        } else if(i >= filterSelectionMaxCount) {
                             keep = false;
                         }
                     }
-                    
+
                     if(keep){
                         selections2.push(selection);
                     } else {
@@ -2833,36 +2532,36 @@ function(def, pvc, pv){
                         deselectCount--;
                     }
                 }
-                
+
                 // Deselect datums beyond the max count
                 pvc.data.Data.setSelected(deselectDatums, false);
-                
+
                 // Mark for update UI ASAP
                 this._chart.updateSelections();
-                
+
                 this._vizHelper.showConfirm([
-                                 'infoExceededMaxSelectionItems', 
-                                 _filterSelectionMaxCount
-                             ], 
+                                 'infoExceededMaxSelectionItems',
+                                 filterSelectionMaxCount
+                             ],
                              'SELECT_ITEM_LIMIT_REACHED');
             }
-            
+
             // Index with the keys of previous selections
-            this._previousSelectionKeys = 
+            this._previousSelectionKeys =
                     def.query(selections2)
                         .object({
                             name:    function(selection){ return this._getSelectionKey(selection); },
                             value:   def.retTrue,
                             context: this
                         });
-            
+
             return selections2;
         },
-        
+
         /**
          * By default, the keep only or the exclude menu operations
          * do not select level gems playing a multi role.
-         * 
+         *
          * The same applies to the the drill down operation,
          * that, by default, does not KEEP level gems playing
          * a multi role.
@@ -2872,33 +2571,33 @@ function(def, pvc, pv){
         _selectionExcludesMultiGems: function(){
             return true;
         },
-        
+
         _processSelection: function(selectedDatums){
             /**
              * Selection rules.
-             * 
+             *
              * -> gems with (chart)axis="measure" are excluded
-             * 
+             *
              * -> gems playing a "multi" role are excluded (!except in the pie chart!)
-             *    -> this way, points with common category data in 
+             *    -> this way, points with common category data in
              *       different small charts are simultaneously selected
-             * 
+             *
              * -> measure discriminator gems are excluded
              *    this way, selection is always expanded to other series of different measures
-             * 
+             *
              * this._gemCountColumnReportAxis :
-             * 
+             *
              * -> if there are no gems with reportAxis='column':
              *    -> that's it. (most granular selection s available)
-             * 
+             *
              * -> if there is a single gem with reportAxis='column': (!except in the HG chart!)
              *    -> gems with (chart)axis="row" are excluded
              *       (selecting one point selects every other point of the same "series")
-             *     
+             *
              * -> if there is more that one gem with reportAxis='column':
-             *    -> selection is disabled as a whole 
+             *    -> selection is disabled as a whole
              *       (in this case, code doesn't even enter here)
-             * 
+             *
              */
             /**
              * Example CCC "where" specification:
@@ -2916,67 +2615,71 @@ function(def, pvc, pv){
              * </pre>
              */
             var whereSpec;
-            
+            var outDatums = [];
+
             if(selectedDatums.length){
                 var selectionExcludesMulti = this._selectionExcludesMultiGems();
-                
+
                 // Include axis="column" dimensions
                 // * Excludes measure discrim dimensions
                 // * Excludes "multi" role dimensions
                 var colDimNames = this.axes.column.getSelectionGems(selectionExcludesMulti)
                                   .select(function(gem){ return gem.cccDimName; })
                                   .array();
-                
+
                 var rowDimNames;
                 if(!this._gemCountColumnReportAxis){
                     // Include axis="row" dimensions
                     // * Excludes "multi" role dimensions
                     rowDimNames = this.axes.row.getSelectionGems(selectionExcludesMulti)
                                       .select(function(gem){ return gem.cccDimName; })
-                                      .array(); 
+                                      .array();
                 }
-                
+
                 if(!colDimNames.length && (!rowDimNames || !rowDimNames.length)){
                     selectedDatums = [];
                 } else {
                     whereSpec = [];
-                    
+
                     selectedDatums.forEach(addDatum);
-                    
-                    // Replace
-                    selectedDatums = this._chart.data
+
+                    this._chart.data
                                          .datums(whereSpec, {visible: true})
-                                         .array();
+                        .each(function(datum){
+                            outDatums.push(datum);
+                        });
+
+                    // Replace
+                    selectedDatums = outDatums;
                 }
             }
-            
+
             function addDatum(datum) {
                 if(!datum.isNull){
-                        
                     var datumFilter = {};
 
                     var atoms = datum.atoms;
-                    
+
                     if(colDimNames){
                         colDimNames.forEach(addDim);
                     }
-                    
+
                     if(rowDimNames){
                         rowDimNames.forEach(addDim);
                     }
-                    
+
                     whereSpec.push(datumFilter);
                 }
-                
+
                 function addDim(dimName) {
                     // The atom itself may be used as a value condition
                     datumFilter[dimName] = atoms[dimName];
                 }
             }
-            
+
             return selectedDatums;
         },
-        
+
         /* INTERACTIVE - DOUBLE-CLICK */
 
         _onDoubleClick: function(complex){
@@ -2985,29 +2688,29 @@ function(def, pvc, pv){
                 this._followContentlink(complex);
                 return true;
             }
-            
+
             /* Information about the axis and formula to follow hyperlink. */
             var hyperlinkInfo = this._getHyperlinkInfo(complex);
             if(hyperlinkInfo){
                 this._followHyperlink(hyperlinkInfo, complex);
                 return true;
             }
-            
+
             /* Information about the axis and formula to drill on. */
             var drillInfo = this._getDrillDownInfo(complex);
             if(drillInfo){
                 this._drillDown(drillInfo, complex);
                 return true;
             }
-            
+
             return false;
         },
-        
+
         _followContentlink: function(complex){
             // Add every level gem with content link to the action context
-            var actionContext = 
+            var actionContext =
                 def
-                .query(this._drillAxesIds)
+                .query(this._linkAxesIds)
                 .selectMany(function(axisId){
                     return this.axes[axisId]
                         .selectGemsWithLink('DASHBOARD', complex, /* reverse */ false);
@@ -3021,18 +2724,18 @@ function(def, pvc, pv){
                 })
                 .array()
                 ;
-            
+
             if(actionContext.length){ // J.I.C.
                 this._vizHelper.link(actionContext);
             }
         },
-        
+
         _hyperlinkTypes: {FILE: 1, URL: 1},
-        
+
         _followHyperlink: function(hyperlinkInfo, complex){
-            var actionContext = 
+            var actionContext =
                 def
-                .query(this._drillAxesIds)
+                .query(this._linkAxesIds)
                 .selectMany(function(axisId){
                     return this.axes[axisId].selectBoundGems(complex);
                 }, this)
@@ -3045,10 +2748,10 @@ function(def, pvc, pv){
                 })
                 .array()
                 ;
-            
+
             this._vizHelper.link(actionContext);
         },
-        
+
         _drillDown: function(drillInfo, complex){
             /**
              * The context for the click action.
@@ -3057,10 +2760,10 @@ function(def, pvc, pv){
              * @see useGem
              */
             var actionContext = [];
-            
+
             var drillGem = drillInfo.gem;
             var selectionExcludesMulti = this._selectionExcludesMultiGems();
-            
+
             this._keyAxesIds.forEach(keepAxisHierarchies, this);
 
             // --------------
@@ -3069,13 +2772,13 @@ function(def, pvc, pv){
 
             // ----------------
             // Helper methods
-            
+
             /** @instance */
             function keepAxisHierarchies(axisId){
                 // It is possible to KEEP_AND_DRILL on a multi level.
                 // But, otherwise, a multi level is not KEPT.
-                // The exception to the previous rule are 
-                // the levels of the special multi-pie role. 
+                // The exception to the previous rule are
+                // the levels of the special multi-pie role.
                 this.axes[axisId]
                     .getKeepOrDrillGems(drillGem, selectionExcludesMulti)
                     .each(function(gem){
@@ -3090,7 +2793,7 @@ function(def, pvc, pv){
                         }
                     });
             }
-            
+
             /** @static */
             function useGem(gem, atom, action){
                 actionContext.push({
@@ -3100,7 +2803,7 @@ function(def, pvc, pv){
                     caption: def.html.escape(atom.label)
                 });
             }
-            
+
             /** @static */
             function getGemAtom(gem, complex){
                 var cccDimName;
@@ -3110,23 +2813,21 @@ function(def, pvc, pv){
                         return atom;
                     }
                 }
-                
+
                 return null;
             }
         },
-        
+
         _getHyperlinkInfo: function(complex){
-            /* Find an axis to hyperlink on.
-             * The order of search is that of #_drillAxesIds.
-             */
-            return def.query(this._drillAxesIds)
+            /* Find an axis to hyperlink on. */
+            return def.query(this._linkAxesIds)
                         .select(function(axisId){
                             return this.axes[axisId].getHyperlinkInfo(complex);
                         }, this)
                         .where(def.notNully)
                         .first() || null;
         },
-        
+
         _getDrillDownInfo: function(complex){
             /* Find an axis to drill on.
              * The order of search is that of #_drillAxesIds.
@@ -3140,7 +2841,7 @@ function(def, pvc, pv){
         },
 
         /* UTILITY */
-        
+
         /**
          * Converts a complex to an analyzer cell selection.
          *
@@ -3164,7 +2865,7 @@ function(def, pvc, pv){
         _complexToCellSelection: function(complex, selectionExcludesMulti){
             /* The analyzer cell-selection object */
             var selection = { type: 'cell' };
-            
+
             /* Add each axis' formulas to the selection */
             this._axesIds.forEach(function(axisId){
                 this.axes[axisId].fillCellSelection(selection, complex, selectionExcludesMulti);
@@ -3224,7 +2925,7 @@ function(def, pvc, pv){
             if(!cell){
                 return null;
             }
-            
+
             var value = cell.v;
             if(value == null || value === '-') {
                 return null;
@@ -3235,34 +2936,37 @@ function(def, pvc, pv){
                 f: cell.f
             };
         },
-        
+
         _getTableValue: function(tr, tc) {
             var cell = this._getTableCell(tr, tc);
             return cell ? cell.v : ceff.f;
         }
     });
 
-    // Cartesian
     def
     .type('pentaho.ccc.CartesianChart', pentaho.ccc.Chart)
     .add({
+        _options: {
+            orientation: 'vertical'
+        },
+
         _configure: function(){
 
             this.base();
 
             this._configureAxesDisplayUnits();
-            
+
             if(this._showAxisTitle('base')){
                 this._configureAxisTitle('base',  this._getBaseAxisTitle ());
             }
-            
+
             if(this._showAxisTitle('ortho')){
                 this._configureAxisTitle('ortho', this._getOrthoAxisTitle());
             }
         },
-        
+
         _showAxisTitle: def.fun.constant(true),
-        
+
         _getOrthoAxisTitle: def.noop,
 
         _getBaseAxisTitle:  def.noop,
@@ -3293,7 +2997,7 @@ function(def, pvc, pv){
                     singleAxisGem = roleGems[0];
                 }
             }
-                
+
             if(singleAxisGem){
                 title += singleAxisGem.label;
             }
@@ -3304,7 +3008,7 @@ function(def, pvc, pv){
         _configureAxisRange: function(primary, axisType){
             var vizOptions = this._vizOptions,
                 suffix = primary ? '' : 'Secondary';
-                
+
             if(vizOptions['autoRange' + suffix] !== 'true'){
                 var limit = vizOptions['valueAxisLowerLimit' + suffix];
                 if(limit != null){
@@ -3318,9 +3022,9 @@ function(def, pvc, pv){
                 }
             }
         },
-        
+
         _cartesianAxesDisplayUnitsText: null,
-        
+
         _configureAxesDisplayUnits: function(){
             this._cartesianAxesDisplayUnitsText = {};
         },
@@ -3329,18 +3033,18 @@ function(def, pvc, pv){
             if(!allowFractional){
                 this.options[axisType + 'AxisTickExponentMin'] = 0; // 10^0 => 1
             }
-            
+
             var text;
             var displayUnits = this._vizOptions['displayUnits' + (primary ? '' : 'Secondary')];
             if(displayUnits && displayUnits !== 'UNITS_0'){
-                
+
                 var match = displayUnits.match(/^UNITS_(\d+)$/) ||
                             def.fail.argumentInvalid('displayUnits');
                 //var exponent = +match[1]; // + -> to number
-                
+
                 text = this._message('dlgChartOption_' + displayUnits);
             }
-            
+
             this._cartesianAxesDisplayUnitsText[axisType] = text || "";
         }
     });
@@ -3349,10 +3053,17 @@ function(def, pvc, pv){
     def
     .type('pentaho.ccc.CategoricalContinuousChart', pentaho.ccc.CartesianChart)
     .add({
+        _options: {
+            panelSizeRatio: 0.8,
+            dataOptions: {
+                measuresInColumns: false
+            }
+        },
+
         _showAxisTitle: function(type){
             return !this._hasMultiChartColumns || type === 'ortho';
         },
-        
+
         _getOrthoAxisTitle: function(){
             return this._getMeasureRoleTitle();
         },
@@ -3365,161 +3076,227 @@ function(def, pvc, pv){
             this.base();
 
             this._configureAxisRange(/*isPrimary*/true, 'ortho');
+
+            if(this.options.orientation === 'vertical'){
+                def.mixin(this.options, mixinDiscreteXOptions);
+            } else {
+                this.options.xAxisPosition = 'top';
+            }
         },
 
         _configureAxesDisplayUnits: function(){
             this.base();
-            
+
             this._configureAxisDisplayUnits(/*isPrimary*/true, 'ortho');
         }
     });
-    
+
+    // ---------------
+
     def
-    .type('pentaho.ccc.BarChart', pentaho.ccc.CategoricalContinuousChart)
+    .type('pentaho.ccc.BarChartAbstract', pentaho.ccc.CategoricalContinuousChart)
     .add({
+        _cccClass: 'pvc.BarChart', // default class
+
+        _options: {
+            barOrthoSizeMin: 0
+        },
+
         _configure: function(){
-            
+
             this.base();
-            
+
             var options = this.options;
-            var isVertical = options.orientation === 'vertical';
-            if(!isVertical){
+            if(options.orientation !== 'vertical'){
                 options.visualRoles.category = { isReversed: true };
             }
         }
     });
-    
+
+    // -------------------
+
     def
-    .type('pentaho.ccc.BarLineChart', pentaho.ccc.BarChart)
+    .type('pentaho.ccc.BarChart', pentaho.ccc.BarChartAbstract)
     .add({
+        _supportsTrends: true
+    });
+
+    def
+    .type('pentaho.ccc.HorizontalBarChart', pentaho.ccc.BarChartAbstract)
+    .add({
+        _options: {
+            orientation: 'horizontal'
+        }
+    });
+
+    // -------------------
+
+    def
+    .type('pentaho.ccc.StackedBarChart', pentaho.ccc.BarChartAbstract)
+    .add({
+        _options: {
+            stacked: true
+        }
+    });
+
+    def
+    .type('pentaho.ccc.HorizontalStackedBarChart', pentaho.ccc.BarChartAbstract)
+    .add({
+        _options: {
+            orientation: 'horizontal',
+            stacked: true
+        }
+    });
+
+    // ---------------
+
+    def
+    .type('pentaho.ccc.NormalizedBarChartAbstract', pentaho.ccc.BarChartAbstract)
+    .add({
+        _cccClass: 'pvc.NormalizedBarChart',
+
+        _configure: function(){
+
+            this.base();
+
+            this.options.orthoAxisTickFormatter = function(v){ return v + "%"; };
+        }
+    });
+
+
+    def
+    .type('pentaho.ccc.NormalizedBarChart', pentaho.ccc.NormalizedBarChartAbstract);
+
+    def
+    .type('pentaho.ccc.HorizontalNormalizedBarChart', pentaho.ccc.NormalizedBarChartAbstract)
+    .add({
+        _options: {
+            orientation: 'horizontal'
+        }
+    });
+
+    // ---------------
+
+    def
+    .type('pentaho.ccc.BarLineChart', pentaho.ccc.BarChartAbstract)
+    .add({
+        /* Override default map */
+        _rolesToCccDimensionsMap: {
+            'measuresLine': 'value' // maps to same dim group as 'measures' role
+        },
+
+        _options: {
+            plot2: true,
+            secondAxisIndependentScale: false,
+            secondAxisSeriesIndexes: null // prevent default of -1 (which means last series) // TODO: is this needed??
+        },
+
         _noRoleInTooltipMeasureRoles: {'measures': true, 'measuresLine': true},
-        
+
         _initAxes: function(){
             this.base();
-            
+
             this._measureDiscrimGem || def.assert("Must exist to distinguish measures.");
-            
-            // Find the index in which it goes in the CCC virtual item
-            var readers = this.options.readers;
+
             var measureDiscrimCccDimName = this._measureDiscrimGem.cccDimName;
-            
-            var virtualItemIndex = 
-                def.query(readers)
-                   .where (function(reader){ return reader.names === measureDiscrimCccDimName; })
-                   .select(function(reader){ return reader.indexes; })
-                   .first(null, null, -1)
-                   ;
-            
-            virtualItemIndex >= 0 || def.assert("Must be present in virtual item.");
-            
-            var barMeaRole = this.axes.measure.defaultRole;
-            var gemsMap    = this.gemsMap;
-            var dataPartDimension,
-                part0Atom,
-                part1Atom;
-            
-            /* Create the dataPart dimension reader */
-            readers.push({
+            var meaAxis = this.axes.measure;
+            var barGems = meaAxis.gemsByRole[meaAxis.defaultRole];
+            var barGemsById =
+                def
+                .query(barGems) // bar: measures, line: measuresLine
+                .uniqueIndex(function(gem){ return gem.id; });
+
+            /* Create the dataPart dimension calculation */
+            this.options.calculations.push({
                 names:  'dataPart',
-                reader: function(vitem, dataPartDim){
-                    var measureId  = vitem[virtualItemIndex].v; // v/f cell
-                    var measureGem = gemsMap[measureId] || def.assert("Measure must be defined.");
+                calculation: function(datum, atoms){
+                    var meaGemId = datum.atoms[measureDiscrimCccDimName].value;
                     // Data part codes
                     // 0 -> bars
                     // 1 -> lines
-                    return measureGem.role === barMeaRole ?
-                            /* First time initializations.
-                             * Done here because *data* isn't available before.
-                             * Also, cannot intern non-existing data part (when lines not configured for example)
-                             */
-                            (part0Atom || (part0Atom = dataPartDim.intern("0"))) :
-                            (part1Atom || (part1Atom = dataPartDim.intern("1")))
-                            ;
+                    atoms.dataPart = def.hasOwn(barGemsById, meaGemId) ? '0' :'1';
                 }
             });
         },
-        
-        
+
+        _readUserOptions: function(options, vizOptions){
+
+            this.base(options, vizOptions);
+
+            var shape = vizOptions.shape;
+            if(shape && shape === 'none'){
+                options.pointDotsVisible = false;
+            } else {
+                options.pointDotsVisible = true;
+                options.extensionPoints.pointDot_shape = shape;
+            }
+        },
+
        _configureAxesDisplayUnits: function(){
 
             this.base();
 
             this._configureAxisDisplayUnits(/*isPrimary*/false, 'ortho2');
         },
-        
-        
+
         _configure: function(){
-            
-            var options = this.options;
-            var extPoints = options.extensionPoints;
-            var shape = options.shape;
-            if(shape && shape === 'none'){
-                options.showDots = false;
-            } else {
-                options.showDots = true;
-                options.extensionPoints.dot_shape = shape;
-            }
-            
+
             this.base();
-            
+
             this._configureAxisRange(/*isPrimary*/false, 'ortho2');
 
              this._configureAxisTitle('ortho2',"");
-            
-            // If it is not desired to use the same colors as the bars 
-            // (and still want names of measures being shown in the legend)
-            options.secondAxisIndependentScale = true;
-            options.secondAxisOwnColors = false;
-            options.secondAxisColor = options.colors.map(function(color){ 
-                return pv.color(color).brighter(0.5); 
-            });
-        }
-    });
-    
-    def
-    .type('pentaho.ccc.NormalizeBarChart', pentaho.ccc.BarChart)
-    .add({
-        _configure: function(){
-            this.base();
 
-            var options = this.options;
-            
-            var axisOrient = pvc.visual.CartesianAxis.getOrientation('ortho', options.orientation);
-            
-            options.extensionPoints[axisOrient + 'AxisScale_tickFormatter'] = function(v){
-                return v + "%";
-            };
+            this.options.plot2OrthoAxis = 2;
+
+            // Plot2 uses same color scale
+            // options.plot2ColorAxis = 2;
+            // options.color2AxisTransform = null;
         }
     });
-    
-    def.type('pentaho.ccc.WaterfallChart', pentaho.ccc.CategoricalContinuousChart);
-    
+
+    def
+    .type('pentaho.ccc.WaterfallChart', pentaho.ccc.CategoricalContinuousChart)
+    .add({
+        _cccClass: 'pvc.WaterfallChart'
+    })
+
+    // ---------------
+
     def
     .type('pentaho.ccc.LineChart', pentaho.ccc.CategoricalContinuousChart)
     .add({
+        _cccClass: 'pvc.LineChart',
+
+        _options: {
+            axisOffset:    0,
+            tooltipOffset: 15
+        },
+
         _drillAxesIds: ['row'/*, 'column'*/],
-        
-        _configure: function() {
-            var options = this.options;
-            var extPoints = options.extensionPoints;
-            var shape = options.shape;
+
+        _linkAxesIds: ['row', 'column'],
+
+        _readUserOptions: function(options, vizOptions){
+
+            this.base(options, vizOptions);
+
+            var shape = vizOptions.shape;
             if(shape && shape === 'none'){
-                options.showDots = false;
+                options.dotsVisible = false;
             } else {
-                options.showDots = true;
+                options.dotsVisible = true;
                 options.extensionPoints.dot_shape = shape;
             }
-            
-            this.base();
         },
-        
+
         _configureLegend: function(){
-            
+
             this.base();
-            
+
             var options = this.options;
             var extPoints = options.extensionPoints;
-            
+
             var dotSize = extPoints.dot_shapeSize;
             if(dotSize != null){
                 var dotRadius = Math.sqrt(dotSize);
@@ -3527,16 +3304,44 @@ function(def, pvc, pv){
                 }
             }
     });
-    
+
     def
     .type('pentaho.ccc.StackedAreaChart', pentaho.ccc.CategoricalContinuousChart)
     .add({
-       _drillAxesIds: ['row'/*, 'column'*/]
+       _cccClass: 'pvc.StackedAreaChart',
+
+       _drillAxesIds: ['row'/*, 'column'*/],
+
+       _linkAxesIds: ['row', 'column'],
+
+       _options: {
+           axisOffset:    0,
+           tooltipOffset: 15
+       }
     });
-    
+
     def
     .type('pentaho.ccc.BoxplotChart', pentaho.ccc.CategoricalContinuousChart)
     .add({
+        _cccClass: 'pvc.BoxplotChart',
+
+        _rolesToCccDimensionsMap: {
+            'columns':     null,
+            //'rows':      'category',
+            'multi':       'multiChart',
+            'measures':    'median',
+            'percentil25': 'percentil25',
+            'percentil75': 'percentil75',
+            'percentil5':  'percentil5',
+            'percentil95': 'percentil95'
+        },
+
+        _options: {
+            extensionPoints: {
+                boxRuleWhisker_strokeDasharray: '- '
+            }
+        },
+
         _readData: function(){
             // The boxplot data passes-trough, as is.
             this.base();
@@ -3549,26 +3354,48 @@ function(def, pvc, pv){
                 'categoriesCount', this.axes.row.gemsByRole.rows.length);
         }
     });
-    
+
     def
     .type('pentaho.ccc.HeatGridChart', pentaho.ccc.CartesianChart)
     .add({
-        _configure: function(){
-            this.base();
+        _cccClass: 'pvc.HeatGridChart',
 
-            // NULL COLOR
-            // Set the nullColor option to the first of the colorRange
-            // for the case that no color dimension is mapped
-            var nullColor = this._vizOptions.colorRange && this._vizOptions.colorRange[0];
-            if(nullColor){
-                this.options.nullColor = nullColor;
-            }
+        _rolesToCccDimensionsMap: {
+            'multi': null,
+            //'columns':  'series',
+            //'rows':     'category',
+            'color': 'value',
+            'size':  'value2'
         },
 
+        _options: {
+            valuesVisible: false,
+            useShapes:     true,
+            shape:         'square',
+
+            xAxisSize: 30,
+            yAxisSize: 50,
+            axisComposite: true,
+            orthoAxisGrid: false, // clear inherited property
+
+            //colorMissing:   'lightgray',
+            colorScaleType: 'linear',
+            colorNormByCategory: false
+        },
+
+        _configure: function(){
+
+            this.base();
+
+            this.options.shape = this._vizOptions.shape;
+        },
+
+        _getColorScaleKind: function() { return 'continuous'; },
+
         _prepareLayout: function(options) {
-            
+
             this.base(options);
-            
+
             var measureCount = this.axes.measure.depth,
                 catsDepth    = this.axes.row.depth,
                 sersDepth    = this.axes.column.depth,
@@ -3614,8 +3441,7 @@ function(def, pvc, pv){
             }
 
             // ------------------
-            options.orthoAxisSize = undefined;
-            options.baseAxisSize  = undefined;
+
             options.xAxisSize = xAxisSize;
             options.yAxisSize = yAxisSize;
         },
@@ -3628,63 +3454,63 @@ function(def, pvc, pv){
 //        _getBaseAxisTitle: function(){
 //            return this.axes.row.getAxisLabel();
 //        },
-        
+
         _doesSharedSeriesSelection: function(){
             return false;
         },
-        
+
         _processSelection: function(selectedDatums){
             if(selectedDatums.length){
                 var data = this._chart.data;
-                
+
                 var atomsByDim = {};
-                
+
                 // Select Cols OR Rows
-                
+
                 // These are optional in the HG
                 var colDimNames = this.axes.column.getSelectionGems()
                                       .select(function(gem){ return gem.cccDimName; })
                                       .array();
-                
+
                 var rowDimNames = this.axes.row.getSelectionGems()
                                       .select(function(gem){ return gem.cccDimName; })
                                       .array();
-                
+
                 var nonAdditive = selectedDatums.length === 1 && selectedDatums[0].isSelected;
-                
+
                 var whereSpec;
-                
+
                 if(!nonAdditive){
                     // Now-selecting datums + Already selected datums
                     var selectDatumsById = def.query(selectedDatums)
                             .union(data.selectedDatums())
                             .uniqueIndex(function(datum){ return datum.id; });
-                    
+
                     var rowGrouping = pvc.data.GroupingSpec.parse(rowDimNames, data.type);
                     var rowGroupedData = data.groupBy(rowGrouping, {
                         visible:  true,
                         where:    function(datum){ return def.hasOwn(selectDatumsById, datum.id); },
                         whereKey: null // prevent caching of groupedData
                     });
-                    
+
                     var datumFilters = rowGroupedData
                         .leafs()
                         .select(function(leafData){
                             // rowDatumFilter
                             return def.copyProps(leafData.atoms, rowDimNames);
                         });
-                    
+
                     if(colDimNames.length){
                         // Make all combinations of row leafs with col leafs
-                        
+
                         var colGrouping = pvc.data.GroupingSpec.parse(colDimNames, data.type);
-                        
+
                         var colGroupedData = data.groupBy(colGrouping, {
                             visible:  true,
                             where:    function(datum){ return def.hasOwn(selectDatumsById, datum.id); },
                             whereKey: null // prevent caching of groupedData
                         });
-                        
+
                         datumFilters = datumFilters
                             .selectMany(function(rowDatumFilter){
                                 return colGroupedData
@@ -3696,19 +3522,19 @@ function(def, pvc, pv){
                                     });
                             });
                     }
-                    
+
                     whereSpec = datumFilters.array();
-                    
+
                     selectedDatums = data
                         .datums(whereSpec, {visible: true})
                         .array();
                 } else {
                     // The only clicked datum is selected and
                     //  thus the user pretends to de-select.
-                    // Expand to the selected datums that have the same series or 
+                    // Expand to the selected datums that have the same series or
                     // the same categories as the clicked one
                     // (a cross whose center is the clicked one)
-                    // The result is that all these will be de-selected. 
+                    // The result is that all these will be de-selected.
                     var singleDatum = selectedDatums[0];
                     whereSpec = [
                         // Column dimensions datum filter
@@ -3716,25 +3542,25 @@ function(def, pvc, pv){
                            .object({
                                value: function(cccDimName){ return singleDatum.atoms[cccDimName]; }
                            }),
-                        
+
                         // OR
-                        
+
                         // Row dimensions datum filter
                         def.query(rowDimNames)
                             .object({
                                 value: function(cccDimName){ return singleDatum.atoms[cccDimName]; }
                             })
                     ];
-                    
+
                     selectedDatums = data
                                         .datums(whereSpec, {visible: true, selected: true})
                                         .array();
                 }
             }
-            
+
             function addDatum(datum) {
                 var atoms = datum.atoms;
-                
+
                 colDimNames.forEach(addDim);
                 rowDimNames.forEach(addDim);
 
@@ -3746,94 +3572,114 @@ function(def, pvc, pv){
                     }
                 }
             }
-            
+
             function buildWhereSpec() {
                 var datumFilter = {};
                 var whereSpec   = [datumFilter];
-                
+
                 def.eachOwn(atomsByDim, addDim);
-                
+
                 function addDim(dimAtomsById, dimName) {
                     // The atom itself may be used as a value condition
                     datumFilter[dimName] = def.own(dimAtomsById);
                 }
-                
+
                 return whereSpec;
             }
-            
+
             return selectedDatums;
         }
     });
-    
+
     def
     .type('pentaho.ccc.MetricDotChart', pentaho.ccc.CartesianChart)
     .add({
+        _cccClass: 'pvc.MetricDotChart',
+
+        _supportsTrends: true,
+
+        _options: {
+            axisGrid: true,
+
+            sizeAxisUseAbs:  false,
+            sizeAxisOriginIsZero: true,
+            sizeAxisRatio:   1/5,
+            sizeAxisRatioTo: 'height', // plot area client height
+
+            autoPaddingByDotSize: false
+        },
+
+        /* Override Default map */
+        _rolesToCccDimensionsMap: {
+            'columns':  null,
+            'color':    'color',
+            //'rows':     'category',
+            'multi':    'multiChart',
+            'measures': null,
+            'x':        'x',
+            'y':        'y',
+            'size':     'size'
+        },
+
+        _discreteColorRole: 'color',
+
         // Roles already in the axis' titles
-        _noRoleInTooltipMeasureRoles: {'x': true, 'y': true},
+        _noRoleInTooltipMeasureRoles: {'x': true, 'y': true, 'measures': false},
+
+        _getColorScaleKind: function(){
+            return this.axes.measure.boundRoles.color ? 'continuous' :
+                   this.axes.column.boundRoles.color  ? 'discrete'   :
+                   undefined;
+        },
 
         _configure: function(){
 
             this.base();
 
             var options = this.options;
-            
-            // NULL COLOR
-            // Set the nullColor option to the first of the colorRange
-            // for the case that no color dimension is mapped
-            var nullColor = this._vizOptions.colorRange && this._vizOptions.colorRange[0];
-            if(nullColor){
-                options.nullColor = nullColor;
-            }
 
             this._configureAxisRange(/*isPrimary*/true,  'base');
             this._configureAxisRange(/*isPrimary*/false, 'ortho');
-            
+
             // DOT SIZE
-            var axisOffset;
             if(this.axes.measure.boundRoles.size){
                 /* Axis offset like legacy analyzer */
-                axisOffset = 1.1 * options.dotSizeRatio / 2;
+                options.axisOffset = 1.1 * options.sizeAxisRatio / 2;
             } else {
-                axisOffset = 0;
+                options.axisOffset = 0;
             }
-            
-            options.xAxisOffset = 
-            options.yAxisOffset = axisOffset;
+        },
 
-            /*
-             * The 'color' role is special in that
-             * it can be discrete or continuous.
-             * 
-             * The CCC dimension must be configured accordingly.
-             * Also, the visual role must be mapped to a non-default dimension.
-             */
-            if(this.axes.measure.boundRoles.color){
-                // Color is a single continuous dimension
+        _configureColor: function(colorScaleKind){
+
+            this.base(colorScaleKind);
+
+            var options = this.options;
+
+            if(colorScaleKind === 'discrete'){
+                // Must force the discrete type
                 options.dimensionGroups.color = {
-                    valueType: Number
+                    valueType: String
                 };
-                
-                options.visualRoles.color = 'color'; 
-                
-            } else if(this.axes.column.boundRoles.color){
-                options.visualRoles.color = 
-                    this.axes.column.gemsByRole.color
-                         .map(function(gem, index){ 
-                            return pvc.data.DimensionType.dimensionGroupLevelName('color', index);
-                         })
-                         .join(', ');
+
+//              options.visualRoles.color =
+//              this.axes.column.gemsByRole.color
+//                   .map(function(gem, index){
+//                      return pvc.buildIndexedId('color', index);
+//                   })
+//                   .join(', ');
             }
         },
 
         _showLegend: function(){
-            
+
             // prevent default behavior that hides the legend when no series
-            
+
             if(this.options.legend && this.axes.column.boundRoles.color){
                 // Hide the legend if there is only one "series"
                 return this._colGroups.length > 1;
             }
-            
+
             return this.options.legend;
         },
 
@@ -3844,7 +3690,7 @@ function(def, pvc, pv){
         _getBaseAxisTitle: function(){
             return this._getMeasureRoleTitle('x');
         },
-        
+
         _configureAxesDisplayUnits: function(){
 
             this.base();
@@ -3853,52 +3699,83 @@ function(def, pvc, pv){
             this._configureAxisDisplayUnits(/*isPrimary*/false, 'ortho', /*allowFractional*/true);
         }
     });
-    
+
     // Custom
     def
     .type('pentaho.ccc.PieChart', pentaho.ccc.Chart)
     .add({
+        _cccClass: 'pvc.PieChart',
+
         _noPercentInTootltipForPercentGems: true,
-        
+
+        _rolesToCccDimensionsMap: {
+            'columns':  'multiChart',
+            //'rows':     'category',
+            'multi':    null
+            //'measures': 'value'
+        },
+
+        _options: {
+            valuesVisible: true,
+            legendShape: 'circle',
+
+            titlePosition: 'bottom',
+
+            dataOptions: {
+                measuresInColumns: false
+            },
+
+            extensionPoints: {
+                slice_strokeStyle:'white',
+                slice_lineWidth:   0.8
+            }
+        },
+
+        _multiRole: 'columns',
+
+        _discreteColorRole: 'rows',
+
         // Only 'multi' is on column axis, and drilling down on multi is undesired
         _drillAxesIds: ['row', 'column'],
-        
+
+        _linkAxesIds: ['row', 'column'],
+
         _configure: function(){
-            
+
             this.base();
-            
+
             // configure value label
-            if(this.options.showValues){
+            if(this.options.valuesVisible){
                 this._configureValuesMask();
             }
         },
-        
+
         _showLegend: function(){
             return this.options.legend && this.axes.row.depth > 0;
         },
-        
+
         _readUserOptions: function(options, vizOptions){
             this.base(options, vizOptions);
-            
-            options.valuesLabelFont = defaultFont(null, readFontSize(vizOptions, 'label'));
+
+            options.valuesFont = defaultFont(null, readFontSize(vizOptions, 'label'));
         },
-        
+
         _configureMultiChart: function(){
             this.base();
-            
+
             this.options.legendSizeMax = '50%';
         },
-        
+
         _configureValuesMask: function(){
-            /* 
-             * Change values mask accoring to each category's
+            /*
+             * Change values mask according to each category's
              * discriminated measure being PCTOF or not
              */
             var colAxis = this.axes.column;
             var meaDiscrimName = colAxis.measureDiscrimName;
             if(meaDiscrimName) {
                 var gemsMap = this.gemsMap;
-                
+
                 this.options.pie = {
                     scenes: {
                         category: {
@@ -3908,7 +3785,7 @@ function(def, pvc, pv){
                                 if(meaAtom && (meaGemId = meaAtom.value) && (meaGem = gemsMap[meaGemId]) && meaGem.measureType === 'PCTOF'){
                                     return "{value}"; // the value is the percentage itself;
                                 }
-                                
+
                                 return "{value} ({value.percent})";
                             }
                         }
@@ -3916,16 +3793,46 @@ function(def, pvc, pv){
                 };
             }
         },
-        
-        _selectionExcludesMultiGems: function(){
-            // // When row selection is enabled it's ok
-            return false;//(this._gemCountColumnReportAxis === 0);
-        }
+
+        _selectionExcludesMultiGems: def.fun.constant(false)
     });
 
     def
     .type('pentaho.ccc.BulletChart', pentaho.ccc.Chart)
     .add({
+        _cccClass: 'pvc.BulletChart',
+
+        _rolesToCccDimensionsMap: {
+            'multi':   null,
+            'columns': 'subTitle',
+            'rows':    'title'
+            // The rest is dynamic...
+            // measures:    -> split between value and marker dimensions...
+            // bulletRanges -> range*
+        },
+
+        _options: {
+            valuesVisible: true,
+            valuesAnchor:  'right',
+
+            titlePosition: 'top',
+            titleSize: 25,
+
+            bulletTitle:    "Test for title",
+            bulletSubtitle: "Test for subtitle",
+            bulletMeasures: [],
+            // TODO: Constant bullets markers and ranges?
+            bulletMarkers:  ["7500"],
+            bulletRanges:   ["3000", "6500", "9000"],
+
+            bulletMargin:   50,
+            panelSizeRatio: 0.8,
+
+            extensionPoints: {
+                "bulletRuleLabel_font": "7pt sans"
+            }
+        },
+
         _configure: function(){
 
             this.base();
@@ -3950,9 +3857,9 @@ function(def, pvc, pv){
         },
 
         _prepareLayout: function(options){
-            
+
             this.base(options);
-            
+
             var vizOptions = this._vizOptions;
 
             var isVertical = options.orientation === 'vertical';
@@ -4007,7 +3914,7 @@ function(def, pvc, pv){
             vizOptions  = this._vizOptions;
 
         this.options.seriesInRows = true;
-        
+
         this._addCdaMetadata('Category', 'Category', 'STRING' );
         this._addCdaMetadata('Series',   'Series',   'STRING' );
         this._addCdaMetadata('Value',    'Value',    'NUMERIC');
@@ -4075,53 +3982,6 @@ function(def, pvc, pv){
 
         return values.join('~');
     };
-    
-    /**
-     * Set of visualization options that
-     * should not be copied to the CCC options.
-     */
-    var _skipVizOptions = pv.dict([
-        'cccClass',
-        'rolesToCccDimensionsMap',
-        'crosstabMode',
-        'measuresInColumns',
-        'extensionPoints',
-        'dimensionGroups',
-        'readers',
-        'dataOptions',
-        'action',
-        'autoRange',
-        'backgroundColor',
-        'backgroundColorEnd',
-        'backgroundFill',
-        'chartType',
-        'controller',
-        'customChartType',
-        'displayUnits',
-        'maxChartsPerRow',
-        
-        'labelSize',
-        'labelStyle',
-        'labelFontFamily',
-        'labelColor',
-        
-        'legendBackgroundColor',
-        'legendColor',
-        'legendFontFamily',
-        'legendStyle',
-
-        // NOTE: analyzer's legendSize is more like a "legentFontSize",
-        // while CCC's is the legend panel's size (width or height)
-        'legendSize',
-
-        'lineShape',
-        'maxChartsPerRow',
-        'maxValues',
-        'metrics',
-        'palette',
-        'selections'
-    ],
-    function(){ return true; });
 
     // @private
     // @static
@@ -4144,7 +4004,7 @@ function(def, pvc, pv){
         if(sepIndex < 0){
             return ['', colGroupAndMeasure];
         }
-      
+
         return [
             colGroupAndMeasure.substring(0,  sepIndex),
             colGroupAndMeasure.substring(sepIndex + 1)
@@ -4160,12 +4020,12 @@ function(def, pvc, pv){
 
         return font.replace(/\bdefault\s*$/i, 'sans-serif');
     }
-    
+
     // @private
     // @static
     function readFont(vizOptions, prefix){
         var size = vizOptions[prefix + "Size"];
-        
+
         if (size) {
             var style = vizOptions[prefix + "Style"];
             if (style == null || style == 'PLAIN') {
@@ -4177,28 +4037,25 @@ function(def, pvc, pv){
             return style + size + 'px ' + vizOptions[prefix + "FontFamily"];
         }
     }
-    
+
     function readFontSize(vizOptions, prefix){
         return +vizOptions[prefix + "Size"];
     }
-    
+
     function readFontFamily(vizOptions, prefix){
         return vizOptions[prefix + "FontFamily"];
     }
-    
+
     // @private
     // @static
-    function getColumnRoles(dataTable, tc){
+    function getColumnRolesAndLevels(dataTable, tc){
         var dataReq = dataTable.getColumnProperty(tc, 'dataReq');
         if(dataReq){
+            return def.array.to(dataReq).map(function(item){
             // NOTE: in IE, unbound columns do not come with an "undefined" role id ??
-            if(dataReq instanceof Array){
-                return dataReq.map(function(item){ 
-                    return item.id || 'undefined'; 
+                if(!item.id){ item.id = 'undefined'; }
+                return item;
                 });
-            }
-            
-            return [dataReq.id || 'undefined'];
         }
     }
 });
