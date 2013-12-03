@@ -29,7 +29,7 @@ pen.define(deps, function(PentahoPlugin, AngularPluginHandler, ring) {
 			this.$super(config);
 
 			if(!config.moduleName) {
-				throw "Module name required";
+				throw AngularPlugin.errMsgs.moduleNameNotDefined;
 			}
 
 			// Store moduleName
@@ -46,7 +46,7 @@ pen.define(deps, function(PentahoPlugin, AngularPluginHandler, ring) {
 			this.directives     = [];
 
 			if (!ring.instance(this.config.pluginHandler, AngularPluginHandler)) {
-				throw "The attached plugin handler is not an Angular Plugin Handler"
+				throw AngularPlugin.errMsgs.notAnAngularPluginHandler;
 			}
 		},
 
@@ -94,6 +94,10 @@ pen.define(deps, function(PentahoPlugin, AngularPluginHandler, ring) {
 			return "ANGULAR_PLUGIN[" + this.moduleName + "] -- " + this.$super();
 		}
 	})
+	
+	AngularPlugin.errMsgs = {};
+	AngularPlugin.errMsgs.moduleNameNotDefined = "Module name required";
+	AngularPlugin.errMsgs.notAnAngularPluginHandler = "The attached plugin handler is not an Angular Plugin Handler";
 
 	return AngularPlugin;
 })

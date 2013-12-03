@@ -23,7 +23,7 @@ pen.define(deps, function(ring) {
 		}
 		
 		if (!ring.instance(plugin, PentahoPlugin)) {
-			_throwException("Incompatible object Exception");
+			_throwException(PentahoPluginHandler.errMsgs.invalidObject);
 		}	
 	};
 
@@ -56,14 +56,14 @@ pen.define(deps, function(ring) {
 			_verifyPlugin(plugin);
 
 			if (this.plugins[plugin.id]) {
-				_throwException("WARNING: " + plugin + " is already registered");
+				_throwException(plugin + PentahoPluginHandler.errMsgs.alreadyRegistered);
 				return;
 			}
 
 			this.plugins[plugin.id] = plugin;		
 
 			if (!this.plugins[plugin.id]) {
-				_throwException(plugin + " was not added successfully");
+				_throwException(plugin + PentahoPluginHandler.errMsgs.wasNotRegistered);
 			}
 			console.log(plugin + " has been registered");
 
@@ -88,7 +88,7 @@ pen.define(deps, function(ring) {
 			_verifyPlugin(plugin);
 
 			if (!this.plugins[plugin.id]) {
-				_throwException(plugin + " is not registered");
+				_throwException(plugin + PentahoPluginHandler.errMsgs.isNotRegistered);
 			}
 
 			return this.unregisterById(plugin.id)
@@ -108,7 +108,7 @@ pen.define(deps, function(ring) {
 		unregisterById : function(id) {
 			// Verify that plugin is present in list of plugins
 			if (!this.plugins[id]) {
-				_throwException("Plugin by id '" + id + "' is not registered");				
+				_throwException("Plugin by id '" + id + "'" + PentahoPluginHandler.errMsgs.isNotRegistered);				
 			}
 
 			var plugin = this.plugins[id];
@@ -116,7 +116,7 @@ pen.define(deps, function(ring) {
 			
 			// Verify that plugin was successfully removed
 			if (this.plugins[id]) {
-				_throwException(plugin + " was not removed successfully");
+				_throwException(plugin + PentahoPluginHandler.errMsgs.wasNotRemoved);
 			}
 
 			// Call onUnregister if exists
@@ -134,6 +134,14 @@ pen.define(deps, function(ring) {
 			return this.plugins[id];
 		}
 	});
+
+	PentahoPluginHandler.errMsgs = {};
+	PentahoPluginHandler.errMsgs.invalidObject = "Incompatible object Exception";
+	PentahoPluginHandler.errMsgs.alreadyRegistered = " is already registered";
+	PentahoPluginHandler.errMsgs.wasNotRegistered = " was not added successfully";
+	PentahoPluginHandler.errMsgs.isNotRegistered = " is not registered";
+	PentahoPluginHandler.errMsgs.wasNotRemoved = " was not removed successfully";
+
 
 	return PentahoPluginHandler;
 });

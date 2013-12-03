@@ -15,7 +15,7 @@ pen.define(deps, function(PentahoPluginHandler, PentahoPlugin) {
 			// Create a new plugin
 			plugin = new PentahoPlugin({
 				pluginHandler : pluginHandler,
-				onRegister : function() { },
+				onRegister : function() {},
 				onUnregister : function() {}
 			});
 			
@@ -32,29 +32,17 @@ pen.define(deps, function(PentahoPluginHandler, PentahoPlugin) {
 		});
 		
 		it("should try to register an object and fail", function() {
-			var notAPlugin = new Object();
-			
-			var exception = false;
-			try {
-				pluginHandler.register(notAPlugin);	
-			} catch (e) {
-				exception = true;
-			}
-			
-			expect(exception).toBe(true);
+			expect(function(){
+				pluginHandler.register(new Object());	
+			}).toThrow(PentahoPluginHandler.errMsgs.invalidObject);
 		});
 		
 		it("should try to register the same plugin and fail", function() {
 			pluginHandler.register(plugin);
 			
-			var exception = false;
-			try {
-				pluginHandler.register(plugin)
-			} catch(e) {
-				exception = true;
-			}
-			
-			expect(exception).toBe(true);
+			expect(function(){
+				pluginHandler.register(plugin);
+			}).toThrow(plugin + PentahoPluginHandler.errMsgs.alreadyRegistered);
 		});
 		
 		it("should register the unregister the plugin, using the plugin instance, then call onUnregister", function() {
