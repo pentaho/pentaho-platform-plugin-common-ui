@@ -200,30 +200,6 @@ pen.define([
                     cv.getActiveReport().linkDlg.performAction(actionContext);
                 },
                 
-                // TODO: remove this when analyzer fixes XML document chart options switching bug
-//                syncReportDocXml: function(vizOptions){
-//                    var currentConfig = cv.activeLayoutConfig;
-//                    if(currentConfig){
-//                        var props = {
-//                           'shape': 'shape', 
-//                           'reverseColors': 'reverseColors', 
-//                           'pattern': 'pattern', 
-//                           'colorSet': 'colorSet'
-//                        };
-//                        
-//                        for(var p in props){
-//                            if(props.hasOwnProperty(p)){
-//                                var value = vizOptions[props[p]];
-//                                if(value !== undefined){
-//                                    currentConfig._processModelValueChange(
-//                                            {id: p},
-//                                            {newVal: value});
-//                                }
-//                            }
-//                        }
-//                    }
-//                },
-                
                 // Benny: This method should only return the options which would
                 // directly be used by CCC when derived from the input report.
                 generateOptionsFromAnalyzerState: function (report) {
@@ -246,7 +222,7 @@ pen.define([
                   return userDefinedOpts;
                 },
                 
-                // Adpated from cv.Report#isRequiredGembarsFilled
+                // Adapted from cv.Report#isRequiredGembarsFilled
                 canRefreshReport: function(report){
                     var dataReq = report.getVizDataReq();
                     for(var i = 0; i < dataReq.length ; i++) {
@@ -272,16 +248,9 @@ pen.define([
                 }
             });
 
-            //function getLevelLabel(levelElem){
-            //    var labelElem = levelElem.selectSingleNode("cv:displayLabels/cv:displayLabel");
-            //    return (labelElem && labelElem.getAttribute("label")) || "";
-            //}
-
             dojo.declare("analyzer.CCCVizConfig", [analyzer.ColorConfiguration], {
+                
                 _processModelValueChange: function(item, args){
-                    if(pvc.debug >= 3){
-                        pvc.log("ANALYZER MODEL EVENT " + item.id + ": " + JSON.stringify(args.newVal));
-                    }
                     // works by convention where the ids of the data req items match the property names
                     this.report.visualization.args[item.id] = args.newVal;
                 },
@@ -294,17 +263,82 @@ pen.define([
                     this.inherited(arguments); // Let super class handle the insertAt and removedGem events
                 },
     
+                updateConfiguration: function(config){
+                    
+                    this.inherited(arguments);
+                    
+                    // Make sure that every dataReq value is passed as a report arg. 
+                    // This is not the case on a new report...
+                    var reportArgs = this.report.visualization.args;
+                    dojo.forEach(config.properties, function(item) {
+                        if(!item.dataStructure){
+                            var value = item.value;
+                            if(value === undefined){
+                                var values = item.values;
+                                if(values && values.length){
+                                    value = /*item.value = */values[0]; 
+                                }
+                            }
+                            
+                            if(value !== undefined){
+                                reportArgs[item.id] = value;
+                            }
+                        }
+                    }, this);
+                    
+                    // TODO: On a new report onModelEvent is not fired
+                    // and thus _setScalingType and _setColorRange
+                    // are not called to set default values.
+                    // We detect an empty colorScaleType and 
+                    // calculate the missing values.
+                    // When the report is saved, those 
+                    // properties will be saved with the report args
+                    // and will no longer be empty.
+                    if(!reportArgs.colorScaleType){
+                        var patternConfig = config.byId('pattern');
+                        if(patternConfig){
+                            this._updateColorConfiguration(config);
+                        }
+                    }
+                },
+                
+                // TODO: Taken from analyzer.ColorConfiguration#onModelEvent 
+                _updateColorConfiguration: function(config){
+                    var pattern = config.byId("pattern" ).value;
+                    var colors  = config.byId("colorSet").value;
+                    var suffix = "";
+                    var scalingType;
+                    // compute an array
+                    if(pattern == "GRADIENT"){
+                      //smooth gradient based on range
+                      scalingType = "linear";
+                      suffix = "-5";
+                    } else {
+                      suffix = (pattern == "3-COLOR") ? "-3": "-5";
+                      scalingType = "discrete";
+                    }
+                    
+                    this._setScalingType(scalingType);
+                    
+                    var reverse = config.byId("reverseColors").value;
+                    var palette = this.palettes[colors+suffix];
+                    if(reverse){
+                      var newPalette = [];
+                      for(var i = palette.length-1; i >= 0; i--){
+                        newPalette.push(palette[i]);
+                      }
+                      palette = newPalette;
+                    }
+                    
+                    this._setColorRange(palette);
+                },
+                
                 _setScalingType: function (colorScaleType) {
                     this.report.visualization.args.colorScaleType = colorScaleType;
                 },
     
                 _setColorRange: function (range) {
-                    this.report.visualization.args.colorRange = range;
-                },
-    
-                getConfiguration: function () {
-                    var config = this.inherited(arguments);
-                    return config;
+                    this.report.visualization.args.colors = range;
                 }
             });
         
@@ -323,6 +357,8 @@ pen.define([
                 
                 updateConfiguration: function(config){
                     this._updateOptions(config);
+                    
+                    this.inherited(arguments);
                 },
                 
                 _updateOptions: function(config){
@@ -366,8 +402,10 @@ pen.define([
                     
                     // Show/hide line color options
                     var visible = measuresLine.gems.length > 0;
-                    config.byId("shape"    ).ui.hidden = !visible;
-                    config.byId("lineWidth").ui.hidden = !visible;
+                    ["shape", "lineWidth"]
+                    .forEach(function(id){
+                        config.byId(id).ui.hidden = !visible;
+                    })
                 }
             });
             
@@ -387,6 +425,7 @@ pen.define([
                 
                 updateConfiguration: function(config){
                     this._updateColorRoleOptions(config);
+                    this.inherited(arguments);
                 },
                 
                 _updateColorRoleOptions: function(config){
@@ -425,9 +464,7 @@ pen.define([
                 
                 //'ccc_waterfall',
                 //'ccc_boxplot'
-                //'ccc_bulletchart',
-                //'ccc_line_hover',
-                //'ccc_area_hover'
+                //'ccc_bulletchart'
             ];
             
             var vizCustomConfigs = {
