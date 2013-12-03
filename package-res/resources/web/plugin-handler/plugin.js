@@ -39,11 +39,11 @@ pen.define(deps, function(PentahoPluginHandler, ring) {
 			this.config = config;
 
 			if (!this.config.pluginHandler) { 
-				throw "There is not a pluginHandler provided in the configuration"
+				throw PentahoPlugin.errMsgs.noPluginHandler;
 			}
 
 			if (!ring.instance(this.config.pluginHandler, PentahoPluginHandler)) {
-				throw "The attached plugin handler is not a Pentaho Plugin Handler"
+				throw PentahoPlugin.errMsgs.notAPluginHandler;
 			}
 		},
 		
@@ -74,16 +74,16 @@ pen.define(deps, function(PentahoPluginHandler, ring) {
          */
 		onRegister : function(plugin) {
 			if (this.config.onRegister) {
-				this.config.onRegister.call(plugin, plugin);
+				this.config.onRegister(plugin);
 			}
 		},
 
 		/**
          * Performs any onUnregister functionality defined when creating this object
          */
-		onUnregister : function() {
+		onUnregister : function(plugin) {
 			if (this.config.onUnregister) {
-				this.config.onUnregister.call(plugin, plugin);
+				this.config.onUnregister(plugin);
 			}
 		},
 
@@ -96,6 +96,11 @@ pen.define(deps, function(PentahoPluginHandler, ring) {
 			return "PLUGIN[" + this.id + "]";
 		}
 	});
+
+            
+    PentahoPlugin.errMsgs = {};
+    PentahoPlugin.errMsgs.noPluginHandler = "There is not a pluginHandler provided in the configuration";
+    PentahoPlugin.errMsgs.notAPluginHandler = "The attached plugin handler is not a Pentaho Plugin Handler";
 
 	return PentahoPlugin;
 })
