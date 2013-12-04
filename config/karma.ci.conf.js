@@ -1,20 +1,18 @@
 module.exports = function (config) {
   config.set({
-    basePath: '../',
+    basePath: '../package-res/resources/web',
 
     frameworks: ['jasmine', 'requirejs'],
 
     files: [
-      {pattern: 'app/lib/**/*.js', included: false},
-      {pattern: 'app/js/*.js', included: false},
-      {pattern: 'app/js/**/*.js', included: false},
-      {pattern: 'test/unit/**/*.js', included: false},
-      {pattern: 'app/standalone/*.js'},
-      '../require-cfg.js'
-    ],
-
-    exclude: [
-      'app/js/main.js'
+      {pattern: 'angular/**/*.js', included: false},
+      {pattern: 'bootstrap/**/*.js', included: false},
+      {pattern: 'plugin-handler/**/*.js', included: false},
+      {pattern: 'jquery/**/*.js', included: false},
+      {pattern: 'ring/**/*.js', included: false},
+      {pattern: 'underscore/**/*.js', included: false},
+      {pattern: 'test/karma/unit/**/*.js', included: false},
+      'test/karma/require-config.js'
     ],
 
     // auto run tests when files change
@@ -27,7 +25,7 @@ module.exports = function (config) {
     reporters: ['progress', 'junit', 'coverage'],
 
     junitReporter: {
-      outputFile: '../../../../bin/reports/test/js/test-results.xml',
+      outputFile: '../../../bin/reports/test/js/test-results.xml',
       suite: 'unit'
     },
 
@@ -35,7 +33,7 @@ module.exports = function (config) {
       // source files, that you wanna generate coverage for
       // do not include tests or libraries
       // (these files will be instrumented by Istanbul)
-      'app/js/**/*.js': ['coverage']
+      'plugin-handler/**/*.js': ['coverage']
     },
 
     // optionally, configure the reporter

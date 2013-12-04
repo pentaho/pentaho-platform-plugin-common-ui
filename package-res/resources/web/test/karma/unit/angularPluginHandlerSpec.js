@@ -24,7 +24,7 @@ pen.define(deps, function(AngularPluginHandler, AngularPlugin) {
                 directiveCallback : function($directiveProvider) { $directiveProvider("test", null); }
             });
 
-            module = pluginHandler.module(moduleName);
+            module = pluginHandler.module(moduleName, []);
 
             spyOn(pluginHandler, "_onRegister").andCallThrough();
             spyOn(pluginHandler, "_onUnregister").andCallThrough();

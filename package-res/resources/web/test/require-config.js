@@ -13,7 +13,7 @@ pen.define = function() {
 
 requirejs.config({
 
-  baseUrl: 'base/web/',
+  baseUrl: 'base/',
   paths: {
     'common-ui/angular': 'angular/angular',
     'common-ui/angular-resource': 'angular/angular-resource',

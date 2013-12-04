@@ -206,10 +206,6 @@ pen.define(deps, function(PentahoPlugin, PentahoPluginHandler, ring, angular) {
 		// Provide a method for creating the angular module and adding the necessary dependencies
 		module : function(moduleName, deps, config) {
 
-			if (!deps) {
-				deps = [];
-			}
-
 			// Include ngRoute
 			deps.push('ngRoute');
 
