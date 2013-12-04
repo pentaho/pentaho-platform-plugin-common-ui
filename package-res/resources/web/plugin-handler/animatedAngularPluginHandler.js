@@ -97,36 +97,19 @@ pen.define(deps, function(AngularPluginHandler, ring) {
 
 			// Set animation actions	
 			module.animation(".ng-app-element", function() {
-				var $body = $("body");
+				return {
+				    enter: function(element, done) {
 
-				if ($body.hasClass("IE8") || $body.hasClass("IE9")) {
-					return {
-						enter : function(element, done) {
-							$(element)
-								.css("left", "100%")
-								.animate({ left: "0" }, done);
-						},
-						leave : function(element, done) {
-							$(element)
-								.css("left", "0")
-								.animate({ left: "-100%" }, done);
+				    	// On enter, find elements
+				    	$(".ng-app-element:not(.deny-animation-change)").attr("animate", self.animation);
+				    	
+						return function(cancelled) {
+
+							// Once completed, set the container styles
+							$(".ng-app-element:not(.deny-animation-change)").attr("animate", self.animation);
 						}
-					}	
-				} else {
-					return {
-					    enter: function(element, done) {
-
-					    	// On enter, find elements
-					    	$(".ng-app-element:not(.deny-animation-change)").attr("animate", self.animation);
-					    	
-							return function(cancelled) {
-
-								// Once completed, set the container styles
-								$(".ng-app-element:not(.deny-animation-change)").attr("animate", self.animation);
-							}
-						}
-				    }	
-				}
+					}
+			    }	
 			})
 
 			// Set default actions for root scope and animations			

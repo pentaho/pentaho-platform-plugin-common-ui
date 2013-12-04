@@ -20,7 +20,7 @@ pen.define(deps, function(AngularPlugin, AnimatedAngularPluginHandler, ring) {
 			this.$super(config);
 
 			if (!ring.instance(this.config.pluginHandler, AnimatedAngularPluginHandler)) {
-				throw "The attached plugin handler is not an Animated Angular Plugin Handler";
+				throw AnimatedAngularPlugin.errMsgs.notAnAnimatedAngularPluginHandler;
 			}
 		},
 
@@ -83,6 +83,9 @@ pen.define(deps, function(AngularPlugin, AnimatedAngularPluginHandler, ring) {
 			return this.$super();
 		}
 	});
+
+	AnimatedAngularPlugin.errMsgs = {};
+	AnimatedAngularPlugin.errMsgs.notAnAnimatedAngularPluginHandler = "The attached plugin handler is not an Animated Angular Plugin Handler";
 
 	return AnimatedAngularPlugin;
 });

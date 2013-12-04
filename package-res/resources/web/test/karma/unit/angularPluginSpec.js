@@ -9,7 +9,7 @@ pen.define(deps, function(AngularPlugin, AngularPluginHandler, PluginHandler, an
 
     describe("Angular Plugin", function() {
 
-        describe("Constructor Tests", function() {
+        describe("Constructor", function() {
             it("should fail when creating a plugin without a module name", function() {
                 expect(function(){
                     new AngularPlugin({ pluginHandler : new PluginHandler() });
@@ -26,13 +26,13 @@ pen.define(deps, function(AngularPlugin, AngularPluginHandler, PluginHandler, an
             })
         })
 
-        describe("Function Tests", function() {
+        describe("Function", function() {
             var plugin, module;
             var moduleName = "test";
 
             beforeEach(function() {
                 var pluginHandler = new AngularPluginHandler();
-                module = pluginHandler.module(moduleName);
+                module = pluginHandler.module(moduleName, []);
 
                 plugin = new AngularPlugin({
                     moduleName : moduleName,
@@ -61,14 +61,12 @@ pen.define(deps, function(AngularPlugin, AngularPluginHandler, PluginHandler, an
                 expect(plugin.config.onUnregister).toHaveBeenCalled();
             })
 
-            var testGoHome = function() {
+            var runTests = function() {
                 it("should goHome", function() {
                     plugin.goHome();
                     expect(module.$location.path()).toMatch('/');
                 });
-            }
 
-            var testGoto = function() {
                 it("should goto a specific url, namespaced with the moduleName", function() {
                     var path = "/test";
                     plugin.goto(path);
@@ -82,8 +80,7 @@ pen.define(deps, function(AngularPlugin, AngularPluginHandler, PluginHandler, an
                     angular.bootstrap(null, [moduleName]);
                 })
 
-                testGoto();
-                testGoHome();
+                runTests();
             });
 
             describe("registering a plugin after bootstrapping", function() {
@@ -92,8 +89,7 @@ pen.define(deps, function(AngularPlugin, AngularPluginHandler, PluginHandler, an
                     plugin.register();
                 })
 
-                testGoto();
-                testGoHome();
+                runTests();
             })
 
         })
