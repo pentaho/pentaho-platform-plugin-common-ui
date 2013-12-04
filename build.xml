@@ -27,9 +27,6 @@
   <property name="js.module.script.dir" value="package-res/resources/web/app/js"/>
   <!-- end property overrides -->
 
-  <!-- location to expand the zipped contents of js dependencies (to be available for testing) -->
-  <property name="js.expanded.lib.dir" value="package-res/resources/web/app/lib/provided"/>
-
   <property name="js.requires.node" value="true"/>
   <property name="js.requires.karma" value="true"/>
   <property name="js.karma.config" value="config/karma.ci.conf.js"/>
