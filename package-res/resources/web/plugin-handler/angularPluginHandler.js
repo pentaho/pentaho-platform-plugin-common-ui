@@ -45,7 +45,7 @@ pen.define(deps, function(PentahoPlugin, PentahoPluginHandler, ring, angular) {
 
 			// Verify the module has been made pluggable
 			if (!module.isPluggable) {
-				throw "Module '" + plugin.moduleName + "' has not been made pluggable";
+				throw AngularPluginHandler.errMsgs.moduleNotPluggable;
 			}
 
 			var self = this;
@@ -61,6 +61,10 @@ pen.define(deps, function(PentahoPlugin, PentahoPluginHandler, ring, angular) {
 						module.$routeProvider.when(url, properties);
 					} else {
 						module.config(['$routeProvider', function($routeProvider) {
+							if (!plugin.isRegistered) {
+								return;
+							}
+
 							$routeProvider.when(url, properties);
 						}])
 					}				
@@ -68,7 +72,7 @@ pen.define(deps, function(PentahoPlugin, PentahoPluginHandler, ring, angular) {
 					return RouteProvider;
 				},
 				otherwise : function() {
-					console.log("Angular's OTHERWISE property is not allowed to be used");
+					throw AngularPluginHandler.errMsgs.otherwiseNotAllowed;
 				}
 			}
 
@@ -172,12 +176,6 @@ pen.define(deps, function(PentahoPlugin, PentahoPluginHandler, ring, angular) {
 							// TODO : find way to retrieve default location of otherwise binding
 							redirectTo : "/"
 						});
-				} else {
-					module.config(['$routeProvider', function($routeProvider) {
-						$routeProvider.when(route, {
-							redirectTo : "/"
-						});
-					}]);
 				}
 			});
 
@@ -285,6 +283,10 @@ pen.define(deps, function(PentahoPlugin, PentahoPluginHandler, ring, angular) {
 
  		return hashUrl;
 	}
+
+	AngularPluginHandler.errMsgs = {};
+	AngularPluginHandler.errMsgs.otherwiseNotAllowed = "Angular's OTHERWISE property is not allowed to be used";
+	AngularPluginHandler.errMsgs.moduleNotPluggable = "Module has not been made pluggable";
 
 	return AngularPluginHandler;
 });

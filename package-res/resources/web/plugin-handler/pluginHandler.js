@@ -57,7 +57,6 @@ pen.define(deps, function(ring) {
 
 			if (this.plugins[plugin.id]) {
 				_throwException(plugin + PentahoPluginHandler.errMsgs.alreadyRegistered);
-				return;
 			}
 
 			this.plugins[plugin.id] = plugin;		
@@ -108,7 +107,7 @@ pen.define(deps, function(ring) {
 		unregisterById : function(id) {
 			// Verify that plugin is present in list of plugins
 			if (!this.plugins[id]) {
-				_throwException("Plugin by id '" + id + "'" + PentahoPluginHandler.errMsgs.isNotRegistered);				
+				_throwException(id + PentahoPluginHandler.errMsgs.isNotRegistered);				
 			}
 
 			var plugin = this.plugins[id];

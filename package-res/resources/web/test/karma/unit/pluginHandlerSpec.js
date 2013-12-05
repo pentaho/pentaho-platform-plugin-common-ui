@@ -60,6 +60,17 @@ pen.define(deps, function(PentahoPluginHandler, PentahoPlugin) {
 			expect(pluginHandler.get(plugin.id)).not.toBeDefined();
 			expect(plugin.onUnregister).toHaveBeenCalled();
 		});
+
+		it("should fail to unregister a plugin that has not been registered", function() {
+			expect(function() {
+				pluginHandler.unregister(plugin)
+			}).toThrow(plugin + PentahoPluginHandler.errMsgs.isNotRegistered);
+
+			expect(function() {
+				pluginHandler.unregisterById(plugin.id);
+			}).toThrow(plugin.id + PentahoPluginHandler.errMsgs.isNotRegistered);
+		});
+
 	});	
 })
 
