@@ -37,6 +37,7 @@ pen.define(deps, function(PentahoPluginHandler, ring) {
 		init : function(config) {
 			this.id = _guid();
 			this.config = config;
+            this.isRegistered = false;
 
 			if (!this.config.pluginHandler) { 
 				throw PentahoPlugin.errMsgs.noPluginHandler;
@@ -73,6 +74,7 @@ pen.define(deps, function(PentahoPluginHandler, ring) {
          * Performs any onRegister functionality defined when creating this object
          */
 		onRegister : function(plugin) {
+            this.isRegistered = true;
 			if (this.config.onRegister) {
 				this.config.onRegister(plugin);
 			}
@@ -82,6 +84,7 @@ pen.define(deps, function(PentahoPluginHandler, ring) {
          * Performs any onUnregister functionality defined when creating this object
          */
 		onUnregister : function(plugin) {
+            this.isRegistered = false;
 			if (this.config.onUnregister) {
 				this.config.onUnregister(plugin);
 			}

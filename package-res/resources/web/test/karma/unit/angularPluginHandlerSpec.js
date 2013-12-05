@@ -67,6 +67,11 @@ pen.define(deps, function(AngularPluginHandler, AngularPlugin) {
                 pluginHandler.register(plugin);
                 pluginHandler.unregister(plugin);
                 expect(pluginHandler._onUnregister).toHaveBeenCalled();
+
+                angular.bootstrap(null, [moduleName]);
+
+                // Should not be called since it got unregistered before bootrstrap occurred
+                expect(routeProvider.when).not.toHaveBeenCalled();
             });
 
             it("should call all of the pre-bootstrap angular services after registering the plugin", function() {
@@ -82,6 +87,31 @@ pen.define(deps, function(AngularPluginHandler, AngularPlugin) {
                 angular.bootstrap(null, [moduleName]);
                 expect(routeProvider.when).toHaveBeenCalled();
             });
+
+            it("should throw an exception when trying to use the 'otherwise' property of the routing is used", function() {
+                var plugin = new AngularPlugin({
+                    moduleName : moduleName,
+                    pluginHandler : pluginHandler,
+                    routerCallback : function($routeProvider) {
+                        $routeProvider
+                            .otherwise();
+                    }
+                })
+
+                expect(function(){
+                    pluginHandler.register(plugin);
+                }).toThrow(AngularPluginHandler.errMsgs.otherwiseNotAllowed);
+            });
+
+            it("should fail when registering a plugin that uses a module that was not made pluggable", function() {
+                var moduleName = "test1";
+                angular.module(moduleName, []);
+                plugin.moduleName = moduleName;
+
+                expect(function(){
+                    pluginHandler.register(plugin);
+                }).toThrow(AngularPluginHandler.errMsgs.moduleNotPluggable);
+            })
         });
 
         describe("post-bootstrap tests", function() {
@@ -118,9 +148,27 @@ pen.define(deps, function(AngularPluginHandler, AngularPlugin) {
                 expect(module.$compileProvider.directive).toHaveBeenCalled();
             });
 
+            it("should call all of the post-bootstrap angular services twice after registering then unregistering the plugin", function() {
+                pluginHandler.register(plugin);
+                pluginHandler.unregister(plugin);
+
+                expect(module.$routeProvider.when.calls.length).toEqual(2);
+                expect(module.$controllerProvider.register.calls.length).toEqual(2);
+                expect(module.$provide.service.calls.length).toEqual(2);
+                expect(module.$provide.factory.calls.length).toEqual(2);
+                expect(module.$filterProvider.register.calls.length).toEqual(2);
+                expect(module.$compileProvider.directive.calls.length).toEqual(2);
+            });
+
+
+            var path = "test";
             it("should goto a desired path", function() {
-                var path = "test";
                 pluginHandler.goto(path, moduleName);
+                expect(module.$location.path()).toMatch(moduleName + '/' + path);
+            })
+
+            it("should perform the goto function from the rootscope", function() {
+                module.$rootScope.goto(path, moduleName);
                 expect(module.$location.path()).toMatch(moduleName + '/' + path);
             })
 
@@ -128,6 +176,11 @@ pen.define(deps, function(AngularPluginHandler, AngularPlugin) {
                 pluginHandler.goHome(moduleName);
                 expect(module.$location.path()).toMatch('/');
             });
+
+            it("should goHome goHome in the browser", function() {
+                module.$rootScope.goHome(moduleName);
+                expect(module.$location.path()).toMatch('/');
+            });            
         });
     })
 })
