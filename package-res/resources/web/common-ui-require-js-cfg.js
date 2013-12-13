@@ -14,12 +14,13 @@
 * limitations under the License.
 *
 */
+var prefix = CONTEXT_PATH + 'content/';
 
-requireCfg['paths']['common-ui'] = CONTEXT_PATH+'content/common-ui/resources/web';
-requireCfg['paths']['local'] = CONTEXT_PATH+'content/common-ui/resources/web/util/local';
+requireCfg['paths']['common-ui'] = prefix+'common-ui/resources/web';
+requireCfg['paths']['local'] = prefix+'common-ui/resources/web/util/local';
 
-requireCfg['paths']['common-repo'] = CONTEXT_PATH+'api/repos/common-ui/resources/web/repo';
-requireCfg['paths']['common-data'] = CONTEXT_PATH+'api/repos/common-ui/resources/web/dataapi';
+requireCfg['paths']['common-repo'] = prefix + 'common-ui/resources/web/repo';
+requireCfg['paths']['common-data'] = prefix + 'common-ui/resources/web/dataapi';
 
 requireCfg['shim']['common-repo/module'] = [
   'common-repo/state',
@@ -44,24 +45,24 @@ requireCfg['shim']['common-data/cda'] = ['common-data/oop'];
 requireCfg['shim']['common-data/models-mql'] = ['common-data/oop', 'common-data/controller'];
 
 
-requireCfg['paths']['common-ui/jquery'] = CONTEXT_PATH+'api/repos/common-ui/resources/web/jquery/jquery-1.9.1.min';
+requireCfg['paths']['common-ui/jquery'] = prefix + 'common-ui/resources/web/jquery/jquery-1.9.1.min';
 requireCfg['shim']['common-ui/jquery'] = { exports: '$' };
 
-requireCfg['paths']['common-ui/handlebars'] = CONTEXT_PATH+'api/repos/common-ui/resources/web/handlebars/handlebars';
-requireCfg['paths']['common-ui/jquery-i18n'] = CONTEXT_PATH+'api/repos/common-ui/resources/web/jquery/jquery.i18n.properties-min';
-requireCfg['paths']['common-ui/bootstrap'] = CONTEXT_PATH+'api/repos/common-ui/resources/web/bootstrap/bootstrap.min';
-requireCfg['paths']['common-ui/ring'] = CONTEXT_PATH+'api/repos/common-ui/resources/web/ring/ring';
-requireCfg['paths']['common-ui/underscore'] = CONTEXT_PATH+'api/repos/common-ui/resources/web/underscore/underscore';
+requireCfg['paths']['common-ui/handlebars'] = prefix + 'common-ui/resources/web/handlebars/handlebars';
+requireCfg['paths']['common-ui/jquery-i18n'] = prefix + 'common-ui/resources/web/jquery/jquery.i18n.properties-min';
+requireCfg['paths']['common-ui/bootstrap'] = prefix + 'common-ui/resources/web/bootstrap/bootstrap.min';
+requireCfg['paths']['common-ui/ring'] = prefix + 'common-ui/resources/web/ring/ring';
+requireCfg['paths']['common-ui/underscore'] = prefix + 'common-ui/resources/web/underscore/underscore';
 
 requireCfg['shim']['common-ui/bootstrap'] = ['common-ui/jquery'];
 requireCfg['shim']['common-ui/jquery-i18n'] = ['common-ui/jquery'];
 requireCfg['shim']['common-ui/handlebars'] = ['common-ui/jquery'];
 requireCfg['shim']['common-ui/ring'] = {deps: ['common-ui/underscore'], exports: "ring"};
 
-requireCfg['paths']['common-ui/angular'] = CONTEXT_PATH+'api/repos/common-ui/resources/web/angular/angular.min';
-requireCfg['paths']['common-ui/angular-resource'] = CONTEXT_PATH+'api/repos/common-ui/resources/web/angular/angular-resource.min';
-requireCfg['paths']['common-ui/angular-route'] = CONTEXT_PATH+'api/repos/common-ui/resources/web/angular/angular-route.min';
-requireCfg['paths']['common-ui/angular-animate'] = CONTEXT_PATH+'api/repos/common-ui/resources/web/angular/angular-animate.min';
+requireCfg['paths']['common-ui/angular'] = prefix + 'common-ui/resources/web/angular/angular.min';
+requireCfg['paths']['common-ui/angular-resource'] = prefix + 'common-ui/resources/web/angular/angular-resource.min';
+requireCfg['paths']['common-ui/angular-route'] = prefix + 'common-ui/resources/web/angular/angular-route.min';
+requireCfg['paths']['common-ui/angular-animate'] = prefix + 'common-ui/resources/web/angular/angular-animate.min';
 
 requireCfg['shim']['common-ui/angular'] = {deps: ['common-ui/jquery'], exports: 'angular'};
 requireCfg['shim']['common-ui/angular-resource'] = ['common-ui/angular'];
@@ -69,15 +70,15 @@ requireCfg['shim']['common-ui/angular-route'] = ['common-ui/angular'];
 requireCfg['shim']['common-ui/angular-animate'] = ['common-ui/angular'];
 
 /* UI-Bootstrap configuration */
-requireCfg['paths']['common-ui/angular-ui-bootstrap'] = CONTEXT_PATH+'api/repos/common-ui/resources/web/bootstrap/ui-bootstrap-tpls-0.6.0.min';
+requireCfg['paths']['common-ui/angular-ui-bootstrap'] = prefix + 'common-ui/resources/web/bootstrap/ui-bootstrap-tpls-0.6.0.min';
 requireCfg['shim']['common-ui/angular-ui-bootstrap'] = ['common-ui/angular'];
 
 // Plugin Handlers
-requireCfg['paths']['common-ui/PluginHandler'] = CONTEXT_PATH+'api/repos/common-ui/resources/web/plugin-handler/pluginHandler';
-requireCfg['paths']['common-ui/Plugin'] = CONTEXT_PATH+'api/repos/common-ui/resources/web/plugin-handler/plugin';
-requireCfg['paths']['common-ui/AngularPluginHandler'] = CONTEXT_PATH+'api/repos/common-ui/resources/web/plugin-handler/angularPluginHandler';
-requireCfg['paths']['common-ui/AngularPlugin'] = CONTEXT_PATH+'api/repos/common-ui/resources/web/plugin-handler/angularPlugin';
-requireCfg['paths']['common-ui/AnimatedAngularPluginHandler'] = CONTEXT_PATH+'api/repos/common-ui/resources/web/plugin-handler/animatedAngularPluginHandler';
-requireCfg['paths']['common-ui/AnimatedAngularPlugin'] = CONTEXT_PATH+'api/repos/common-ui/resources/web/plugin-handler/animatedAngularPlugin';
+requireCfg['paths']['common-ui/PluginHandler'] = prefix + 'common-ui/resources/web/plugin-handler/pluginHandler';
+requireCfg['paths']['common-ui/Plugin'] = prefix + 'common-ui/resources/web/plugin-handler/plugin';
+requireCfg['paths']['common-ui/AngularPluginHandler'] = prefix + 'common-ui/resources/web/plugin-handler/angularPluginHandler';
+requireCfg['paths']['common-ui/AngularPlugin'] = prefix + 'common-ui/resources/web/plugin-handler/angularPlugin';
+requireCfg['paths']['common-ui/AnimatedAngularPluginHandler'] = prefix + 'common-ui/resources/web/plugin-handler/animatedAngularPluginHandler';
+requireCfg['paths']['common-ui/AnimatedAngularPlugin'] = prefix + 'common-ui/resources/web/plugin-handler/animatedAngularPlugin';
 
 requireCfg['shim']['common-ui/PluginHandler'] = ['common-ui/jquery'];
