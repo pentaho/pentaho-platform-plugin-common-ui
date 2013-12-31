@@ -19,7 +19,7 @@ var prefix = CONTEXT_PATH + 'content/';
 requireCfg['paths']['common-ui'] = prefix+'common-ui/resources/web';
 requireCfg['paths']['local'] = prefix+'common-ui/resources/web/util/local';
 
-requireCfg['paths']['common-repo'] = prefix + 'common-ui/resources/web/repo';
+requireCfg['paths']['common-repo'] = CONTEXT_PATH + 'api/repos/common-ui/resources/web/repo';
 requireCfg['paths']['common-data'] = prefix + 'common-ui/resources/web/dataapi';
 
 requireCfg['shim']['common-repo/module'] = [
