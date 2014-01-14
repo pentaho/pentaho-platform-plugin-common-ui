@@ -490,6 +490,32 @@ function(def, pvc, pv){
             ]
         });
         
+        defVisualization({
+            id: 'ccc_sunburst',
+            type: 'treemapchart',
+            source: 'CCC',
+            name: vizLabel('SUNBURST'),
+            'class': 'pentaho.ccc.SunburstChart',
+            args:     {},
+            propMap:  [],
+            dataReqs: [{
+                name: 'Default',
+                  reqs: [ 
+                      def.set(createRowDataReq("TREEMAP_ROW"), 'required', true),
+                      {
+                          id: 'size',
+                          dataType: 'number',
+                          dataStructure: 'column',
+                          caption: dropZoneLabel('TREEMAP_SIZE'),
+                          required: false,
+                          allowMultiple: false
+                      },
+                      createMultiDataReq(),
+                      createChartOptionsDataReq(false)
+                  ]
+            }]
+        });
+        
         function label(prefix, id) { return (id && cvCatalog[(prefix || "") + id]) || ""; }
         
         function vizLabel(id) { return label('VIZ_', id) || id; }
@@ -4198,6 +4224,38 @@ function(def, pvc, pv){
                     options.height = totalSpace;
                 }
             }
+        }
+    });
+    
+    def
+    .type('pentaho.ccc.SunburstChart', pentaho.ccc.Chart)
+    .add({
+        _cccClass: 'pvc.SunburstChart',
+        
+        _rolesToCccDimensionsMap: {
+            'columns':  null,
+            'measures': null,
+            'size':     'size'
+        },
+        
+        _options: {
+            valuesVisible: true
+        },
+        
+        _discreteColorRole: 'rows',
+        
+        _configure: function() {
+            this.base();
+            this.options.rootCategoryLabel = this._message('chartTreeMapRootCategoryLabel');
+        },
+        
+        _getDiscreteColorScale: function() {
+            return this._getDefaultDiscreteColorScale();
+        },
+        
+        _readUserOptions: function(options, vizOptions) {
+            this.base(options, vizOptions);
+            options.valuesFont = defaultFont(null, readFontSize(vizOptions, 'label'));
         }
     });
 
