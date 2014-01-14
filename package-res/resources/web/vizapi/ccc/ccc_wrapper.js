@@ -501,12 +501,12 @@ function(def, pvc, pv){
             dataReqs: [{
                 name: 'Default',
                   reqs: [ 
-                      def.set(createRowDataReq("TREEMAP_ROW"), 'required', true),
+                      def.set(createRowDataReq("SUNBURST_ROW"), 'required', true),
                       {
                           id: 'size',
                           dataType: 'number',
                           dataStructure: 'column',
-                          caption: dropZoneLabel('TREEMAP_SIZE'),
+                          caption: dropZoneLabel('SUNBURST_SIZE'),
                           required: false,
                           allowMultiple: false
                       },
@@ -4246,7 +4246,7 @@ function(def, pvc, pv){
         
         _configure: function() {
             this.base();
-            this.options.rootCategoryLabel = this._message('chartTreeMapRootCategoryLabel');
+            this.options.rootCategoryLabel = this._message('chartSunburstRootCategoryLabel');
         },
         
         _getDiscreteColorScale: function() {
