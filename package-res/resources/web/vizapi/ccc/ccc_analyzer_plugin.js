@@ -484,7 +484,8 @@ pen.define([
                 
                 'ccc_scatter',
                 'ccc_barline',
-                'ccc_heatgrid'
+                'ccc_heatgrid',
+                'ccc_sunburst'
                 
                 //'ccc_treemap' - See ANALYZER-1983
                 
