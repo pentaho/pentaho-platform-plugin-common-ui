@@ -511,7 +511,7 @@ function(def, pvc, pv){
                           allowMultiple: false
                       },
                       createMultiDataReq()],
-                      createTrendsDataReqs(),
+                      createSortDataReqs(),
                       [createChartOptionsDataReq(false)]
                   )
             }]
