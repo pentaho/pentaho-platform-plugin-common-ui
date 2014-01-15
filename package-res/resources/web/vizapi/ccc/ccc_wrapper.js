@@ -500,7 +500,7 @@ function(def, pvc, pv){
             propMap:  [],
             dataReqs: [{
                 name: 'Default',
-                  reqs: [ 
+                  reqs: def.array.appendMany([ 
                       def.set(createRowDataReq("SUNBURST_ROW"), 'required', true),
                       {
                           id: 'size',
@@ -510,9 +510,10 @@ function(def, pvc, pv){
                           required: false,
                           allowMultiple: false
                       },
-                      createMultiDataReq(),
-                      createChartOptionsDataReq(false)
-                  ]
+                      createMultiDataReq()],
+                      createSortDataReqs(),
+                      [createChartOptionsDataReq(false)]
+                  )
             }]
         });
         
@@ -642,6 +643,22 @@ function(def, pvc, pv){
                         group: "options",
                         type:  'combo',
                         caption: dropZoneLabel('TREND_LINEWIDTH')
+                    }
+                }];
+        }
+
+        function createSortDataReqs(){
+            var types = ['ascending', 'descending', 'layout'];
+            return [
+                {
+                    id: 'sortType',
+                    dataType: 'string',
+                    values: types,
+                    ui: {
+                        labels:  types.map(function(option){ return dropZoneLabel('SORT_TYPE_' + option.toUpperCase()); }),
+                        group: 'options',
+                        type:  'combo',
+                        caption: dropZoneLabel('SORT_TYPE')
                     }
                 }];
         }
