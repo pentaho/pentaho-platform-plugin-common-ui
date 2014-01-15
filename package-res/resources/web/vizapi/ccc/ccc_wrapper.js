@@ -2307,6 +2307,7 @@ function(def, pvc, pv){
             }
             
             this._configureTrends();
+            this._configureSorts();
             
             options.axisFont = defaultFont(options.axisFont, 12);
             options.axisTitleFont = defaultFont(options.axisTitleFont, 12);
@@ -2456,6 +2457,13 @@ function(def, pvc, pv){
                     var radius = 3 + 6 * ((+value) / 8); // 1 -> 8 => 3 -> 9,
                     extPoints.trendDot_shapeSize = radius * radius;
                 }
+            }
+        },
+
+        _configureSorts: function(){
+            var sortType = this._vizOptions.sortType;
+            if(sortType){
+                this.options.sortType = sortType;
             }
         },
         
