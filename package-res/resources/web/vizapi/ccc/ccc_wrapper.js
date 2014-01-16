@@ -654,10 +654,10 @@ function(def, pvc, pv){
         }
 
         function createSortDataReqs(){
-            var types = ['ascending', 'descending', 'layout'];
+            var types = ['bySizeAscending', 'bySizeDescending', 'none'];
             return [
                 {
-                    id: 'sortType',
+                    id: 'sliceOrder',
                     dataType: 'string',
                     values: types,
                     ui: {
@@ -2260,9 +2260,9 @@ function(def, pvc, pv){
         },
 
         _configureSorts: function(){
-            var sortType = this._vizOptions.sortType;
-            if(sortType){
-                this.options.sortType = sortType;
+            var sliceOrder = this._vizOptions.sliceOrder;
+            if(sliceOrder){
+                this.options.sliceOrder = sliceOrder;
             }
         },
         
