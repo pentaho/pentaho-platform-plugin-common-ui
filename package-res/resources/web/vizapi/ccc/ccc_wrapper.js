@@ -158,6 +158,8 @@ function(def, pvc, pv){
             propMap:  [],
             dataReqs: [{
                 name: 'Default',
+                drillOrder: ['rows'],
+                hyperlinkOrder: ['rows','columns'],
                 reqs: def.array.appendMany(
                     createDataReq('LINE', {options: false}),
                     [
@@ -181,6 +183,8 @@ function(def, pvc, pv){
             propMap:  [],
             dataReqs: [{
                 name: 'Default',
+                drillOrder: ['rows'],
+                hyperlinkOrder: ['rows','columns'],
                 reqs: createDataReq('STACKED_AREA')
             }],
             menuOrdinal: 180
@@ -361,6 +365,8 @@ function(def, pvc, pv){
             propMap:  [],
             dataReqs: [{
                 name: 'Default',
+                drillOrder: ['rows','columns'],
+                hyperlinkOrder: ['rows','columns'],
                 reqs : createDataReq("MULTIPLE_PIE", {multi: false})
                    
             }],
@@ -896,15 +902,8 @@ function(def, pvc, pv){
          */
        cccDimList: def.method({isAbstract: true}),
 
-       fillCellSelection: def.method({isAbstract: true}),
-
-       getDrillDownInfo: function(complex){
-            return null;
-       },
-
-       getDeepestInfo: function(complex){
-            return null;
-       }
+       fillCellSelection: def.method({isAbstract: true})
+       
     });
 
     // --------------------------
@@ -1029,194 +1028,8 @@ function(def, pvc, pv){
                                !gem.isMeasureDiscrim && 
                                !!gem.cccDimName;
                      }, this);
-        },
-        
-        getKeepOrDrillGems: function(drillGem, selectionExcludesMulti){
-            if(selectionExcludesMulti == null){
-                selectionExcludesMulti = true;
-            }
-            
-            return def.query(this.gems)
-                     .where(function(gem, index){
-                        return gem === drillGem ||
-                               ((!selectionExcludesMulti || this._nonMultiGemFilter(gem)) && 
-                                !gem.isMeasureDiscrim && 
-                                !!gem.cccDimName);
-                     }, this);
-        },
-        
-        selectGemsWithLink: function(linkType, complex, reverse){
-            var gems = def.query(this.gems);
-            if(reverse){
-               gems = gems.reverse(); 
-            }
-            
-            var isObjectLinkType = def.object.is(linkType);
-            return gems
-                .where(function(gem){ 
-                    var atom;
-                    return gem.hasLink &&
-                          (!linkType || (isObjectLinkType ? def.hasOwn(linkType, gem.linkType) : (gem.linkType === linkType))) &&
-                          (!complex  || (gem.cccDimName && (atom = complex.atoms[gem.cccDimName]) && atom.value != null));
-                })
-                ;
-        },
-        
-        selectBoundGems: function(complex, reverse){
-            var gems = def.query(this.gems);
-            if(reverse){
-               gems = gems.reverse(); 
-            }
-            
-            return gems
-                .where(function(gem){ 
-                    return !gem.isMeasureDiscrim && 
-                           gem.cccDimName && 
-                           complex.atoms[gem.cccDimName]; 
-                 })
-                ;
-        },
-        
-        getHyperlinkInfo: function(complex){
-            // The last formula of this axis that has a defined hyperlink
-            var lastGem = this
-                .selectGemsWithLink(this.chart._hyperlinkTypes, complex, /* reverse */ true)
-                .first()
-                ;
-
-            if(lastGem){
-                return {
-                    gem:  lastGem,
-                    atom: complex.atoms[lastGem.cccDimName]
-                };
-            }
-        },
-        
-        getDrillDownInfo: function(complex){
-            var deepestInfo = this.getDeepestInfo(complex);
-            if(!deepestInfo){
-                return null;
-            }
-            
-            // Get the child formula, if any, in the same hierarchy
-            var lastForm = deepestInfo.gem.formula,
-                childForm = this.chart.getChildFormula(lastForm);
-            if(!childForm){
-            
-                // Let's try the other gems
-                var gemList = def.query(this.gems).reverse().array();
-                for (var i=1; i < gemList.length; i++) {
-                    var g = gemList[i];
-                    if (!g.isMeasureDiscrim) {
-                        var deepestGem = this.getHierarchyDeepestGem(g.formula),
-                        atom;
-                        if(deepestGem){
-                            if(complex){
-                                atom = complex.atoms[deepestGem.cccDimName];
-                                if(!atom || atom.value == null){
-                                    deepestInfo =  null;
-                                }
-                            }
-
-                            deepestInfo =  {
-                                gem:  deepestGem,
-                                atom: atom
-                            };
-                        }                    
-                    }
-                
-                    lastForm = deepestInfo.gem.formula;
-                    childForm = this.chart.getChildFormula(lastForm);
-                    if (childForm)
-                        break;                
-                }
-    
-                if (!childForm)
-                    return null;
-            }
-
-            /*
-             * If the formula is already included in the chart
-             * (surely in a different axis) then no drilling
-             * (in this axis) is possible.
-             */
-            if(def.hasOwn(this.chart.gemsMap, childForm)){
-                return null;
-            }
-
-            deepestInfo.drillChild = childForm;
-            
-            return deepestInfo;
-        },
-
-        getDeepestInfo: function(complex, hierarchy){
-            if(this.depth){
-                var lastGem = this.getLastProperGem(complex, hierarchy);
-                if(lastGem) {
-                    var deepestGem = this.getHierarchyDeepestGem(lastGem.formula),
-                        atom;
-                    if(deepestGem){
-                        if(complex){
-                            atom = complex.atoms[deepestGem.cccDimName];
-                            if(!atom || atom.value == null){
-                                return null;
-                            }
-                        }
-
-                        return {
-                            gem:  deepestGem,
-                            atom: atom
-                        };
-                    }
-                }
-            }
-
-            return null;
-        },
-
-        getLastProperGem: function(complex, hierarchy){
-            /* Get the last gem that is not a measure discrim.
-             * Optionally filter by the given hierarchy argument.
-             */
-
-            /*
-             * NOTE: there's a "problem" with cv.getFieldHelp().getHierarchy:
-             * it must receive a formula of a hierarchy, and not the hierarchy itself.
-             *
-             * Because of that and the use scenarios of this method,
-             * the received argument 'hierarchy' may end up being a formula.
-             * We guard against that extracting the hierarchy of it
-             * so that the hierarchy comparison  does not fail.
-             */
-            var realHierarchy;
-            if(hierarchy){
-                realHierarchy = hierarchy.match(/^(\[.*?\])?.*$/)[1];
-            }
-
-            return def.query(this.gems)
-                        .reverse()
-                        .first(function(gem){
-                            var atom;
-                            return !gem.isMeasureDiscrim &&
-                                   (!realHierarchy || gem.hierarchy === realHierarchy) &&
-                                   (!complex || (gem.cccDimName && (atom = complex.atoms[gem.cccDimName]) && atom.value != null));
-                        });
-        },
-
-        getHierarchyDeepestGem: function(hierarchy){
-            var hForms = this.chart._getHierarchyFormulas(
-                                    hierarchy,
-                                    /*includeHidden*/false,
-                                    /*excludeChildren*/false);
-
-            return def.query(hForms)
-                      .reverse() // deepest first
-                      .select(function(hForm){
-                          var gem = def.getOwn(this.chart.gemsMap, hForm);
-                          return gem && gem.axis === this && gem.cccDimName ? gem : null;
-                      }, this)
-                      .first(def.notNully) || null;
         }
+        
     });
     
     // --------------------------
@@ -1652,20 +1465,6 @@ function(def, pvc, pv){
          * Indexes of readers are relative to this layout.
          */
         _cccVirtualItemAxesLayout: ['column', 'row', 'measure'],
-      
-        /* The drilling axes.
-         *
-         * In the order to be tested
-         * for being chosen as the drilling axis.
-         */
-        _drillAxesIds: ['column', 'row'],
-        
-        /* The linking axes.
-        *
-        * In the order to be tested
-        * for being chosen as the link axis.
-        */
-        _linkAxesIds: ['column', 'row'],
         
         /* Measure roles that do not show the role in the tooltip.
          */
@@ -2627,37 +2426,10 @@ function(def, pvc, pv){
                 this.axes[axisId].buildHtmlTooltip(tooltipLines, complex, context);
             }, this);
             
-            if(!complex.isVirtual){ 
-                if(this._hasContentLink){
-                    /* Add content link information to the tooltip. */
-                    msg = this._message('chartTooltipFooterContentlink');
-                    
+            if(!complex.isVirtual){
+                msg = this._vizHelper.getDoubleClickTooltip();
+                if (msg)
                     tooltipLines.push(msg);
-                } else {
-                    /* Add hyperlink information to the tooltip. */
-                    var hyperlinkInfo = this._getHyperlinkInfo(complex);
-                    var msg;
-                    if(hyperlinkInfo){
-                        msg = this._message(
-                                'chartTooltipFooterHyperlink', [
-                                    def.html.escape(hyperlinkInfo.gem.linkLabel || this._message('chartTooltipHyperlinkDefaultTitle'))
-                                ]);
-                        
-                        tooltipLines.push(msg);
-                    } else {
-                        
-                        /* Add drill-down information to the tooltip. */
-                        var drillDownInfo = this._getDrillDownInfo(complex);
-                        if(drillDownInfo){
-                            msg = this._message(
-                                        'chartTooltipFooterDrillDown', [
-                                            def.html.escape(this._vizHelper.getFormulaLabel(drillDownInfo.drillChild))
-                                         ]);
-                            
-                            tooltipLines.push(msg);
-                        }
-                    }
-                }
             }
             
             /* Add selection information */
@@ -2987,161 +2759,16 @@ function(def, pvc, pv){
         /* INTERACTIVE - DOUBLE-CLICK */
 
         _onDoubleClick: function(complex){
-            /* A double-click is triggered to support "content linking" */
-            if(this._hasContentLink){
-                this._followContentlink(complex);
-                return true;
-            }
-            
-            /* Information about the axis and formula to follow hyperlink. */
-            var hyperlinkInfo = this._getHyperlinkInfo(complex);
-            if(hyperlinkInfo){
-                this._followHyperlink(hyperlinkInfo, complex);
-                return true;
-            }
-            
-            /* Information about the axis and formula to drill on. */
-            var drillInfo = this._getDrillDownInfo(complex);
-            if(drillInfo){
-                this._drillDown(drillInfo, complex);
-                return true;
-            }
-            
-            return false;
-        },
-        
-        _followContentlink: function(complex){
-            // Add every level gem with content link to the action context
-            var actionContext = 
-                def
-                .query(this._linkAxesIds)
-                .selectMany(function(axisId){
-                    return this.axes[axisId]
-                        .selectGemsWithLink('DASHBOARD', complex, /* reverse */ false);
-                }, this)
-                .select(function(gem){
-                    return {
-                        clickLevel: true,
-                        formula:    gem.formula,
-                        member:     complex.atoms[gem.cccDimName].value
-                    };
-                })
-                .array()
-                ;
-            
-            if(actionContext.length){ // J.I.C.
-                this._vizHelper.link(actionContext);
-            }
-        },
-        
-        _hyperlinkTypes: {FILE: 1, URL: 1},
-        
-        _followHyperlink: function(hyperlinkInfo, complex){
-            var actionContext = 
-                def
-                .query(this._linkAxesIds)
-                .selectMany(function(axisId){
-                    return this.axes[axisId].selectBoundGems(complex);
-                }, this)
-                .select(function(gem){
-                    return {
-                        clickLevel: (hyperlinkInfo.gem === gem),
-                        formula:    gem.formula,
-                        member:     complex.atoms[gem.cccDimName].value
-                    };
-                })
-                .array()
-                ;
-            
-            this._vizHelper.link(actionContext);
-        },
-        
-        _drillDown: function(drillInfo, complex){
-            /**
-             * The context for the click action.
-             * Stores 'KEEP' and 'KEEP_AND_DRILL' instructions.
-             *
-             * @see useGem
-             */
-            var actionContext = [];
-            
-            var drillGem = drillInfo.gem;
-            var selectionExcludesMulti = this._selectionExcludesMultiGems();
-            
-            this._keyAxesIds.forEach(keepAxisHierarchies, this);
-
-            // --------------
-
-            this._vizHelper.click(actionContext, /* keepGem */ true);
-
-            // ----------------
-            // Helper methods
-            
-            /** @instance */
-            function keepAxisHierarchies(axisId){
-                // It is possible to KEEP_AND_DRILL on a multi level.
-                // But, otherwise, a multi level is not KEPT.
-                // The exception to the previous rule are 
-                // the levels of the special multi-pie role. 
-                this.axes[axisId]
-                    .getKeepOrDrillGems(drillGem, selectionExcludesMulti)
-                    .each(function(gem){
-                        // KEEP or KEEP_AND_DRILL
-                        if(gem === drillGem){
-                            useGem(gem, drillInfo.atom, 'KEEP_AND_DRILL');
-                        } else if(!gem.isMeasureDiscrim){
-                            var atom = getGemAtom(gem, complex);
-                            if(atom){
-                                useGem(gem, atom, 'KEEP');
-                            }
-                        }
-                    });
-            }
-            
-            /** @static */
-            function useGem(gem, atom, action){
-                actionContext.push({
-                    action:  action,
-                    formula: gem.formula,
-                    member:  atom.value,
-                    caption: def.html.escape(atom.label)
-                });
-            }
-            
-            /** @static */
-            function getGemAtom(gem, complex){
-                var cccDimName;
-                if(complex && (cccDimName = gem.cccDimName)){
-                    var atom = complex.atoms[cccDimName];
-                    if(atom && atom.value != null){
-                        return atom;
-                    }
-                }
-                
-                return null;
-            }
-        },
-        
-        _getHyperlinkInfo: function(complex){
-            /* Find an axis to hyperlink on. */
-            return def.query(this._linkAxesIds)
-                        .select(function(axisId){
-                            return this.axes[axisId].getHyperlinkInfo(complex);
-                        }, this)
-                        .where(def.notNully)
-                        .first() || null;
-        },
-        
-        _getDrillDownInfo: function(complex){
-            /* Find an axis to drill on.
-             * The order of search is that of #_drillAxesIds.
-             */
-            return def.query(this._drillAxesIds)
-                        .select(function(axisId){
-                            return this.axes[axisId].getDrillDownInfo(complex);
-                        }, this)
-                        .where(def.notNully)
-                        .first() || null;
+            var selection = this._complexToCellSelection(complex, this._selectionExcludesMultiGems());
+            pentaho.events.trigger(this, "doubleclick", {
+                source:        this,
+                selections:    [selection]
+                // TODO: Analyzer needs to know whether this double click is coming from a chart data point or an axis.
+                // For axis use case, please identify the gembar and include only those gems that are in this gembar into the selection.
+                // For chart data point use case, please pass all gems across gembars into the selection
+                // gembar: rows
+            });
+            return true;
         },
 
         /* UTILITY */
@@ -3176,43 +2803,6 @@ function(def, pvc, pv){
             }, this);
 
             return selection;
-        },
-
-        /**
-         * Gets the child formula in the given formula's hierarchy.
-         */
-        getChildFormula: function(hForm){
-            var hForms = this._getHierarchyFormulas(hForm,
-                                /* includeHidden:   */ false,
-                                /* excludeChildren: */ false);
-
-            if(hForms){
-                var index = hForms.indexOf(hForm);
-                if(index >= 0){
-                    return hForms[index + 1] || null;
-                }
-            }
-
-            return null;
-        },
-
-        _getHierarchyFormulas: function(formula, includeHidden, excludeChildren){
-            // This was very slow when not cached
-            var hForms;
-            var key = formula + "|" + (!!includeHidden) + "|" + (!!excludeChildren);
-
-            if(!this._hierarchyFormulaCache) {
-                this._hierarchyFormulaCache = {};
-            } else {
-                hForms = this._hierarchyFormulaCache[key];
-            }
-
-            if(!hForms) {
-                hForms = this._vizHelper.getHierarchyFormulas(formula, includeHidden, excludeChildren);
-                this._hierarchyFormulaCache[key] = hForms;
-            }
-
-            return hForms;
         },
 
         _addCdaMetadata: function(colName, colLabel, colType) {
@@ -3580,10 +3170,6 @@ function(def, pvc, pv){
             tooltipOffset: 15
         },
         
-        _drillAxesIds: ['row'/*, 'column'*/],
-        
-        _linkAxesIds: ['row', 'column'],
-        
         _readUserOptions: function(options, vizOptions){
             
             this.base(options, vizOptions);
@@ -3620,11 +3206,7 @@ function(def, pvc, pv){
     .type('pentaho.ccc.StackedAreaChart', pentaho.ccc.CategoricalContinuousChart)
     .add({
        _cccClass: 'pvc.StackedAreaChart',
-       
-       _drillAxesIds: ['row'/*, 'column'*/],
-       
-       _linkAxesIds: ['row', 'column'],
-       
+
        _options: {
            axisOffset:    0,
            tooltipOffset: 15
@@ -4050,11 +3632,6 @@ function(def, pvc, pv){
         
         _discreteColorRole: 'rows',
         
-        // Only 'multi' is on column axis, and drilling down on multi is undesired
-        _drillAxesIds: ['row', 'column'],
-        
-        _linkAxesIds: ['row', 'column'],
-        
         _configure: function(){
             
             this.base();
@@ -4193,23 +3770,6 @@ function(def, pvc, pv){
 
             this.base();
 
-            /*
-            var myself = this,
-                options = this.options;
-
-            // Drill down on shapes
-            options.axisDoubleClickAction = function(d){
-                var c = d.title,
-                s = d.subtitle;
-
-                myself._drillDown(myself._readCccAxesValues(s, c));
-            };
-
-            options.clickAction = function (c, s) {
-                myself._notifySelectionChanged(
-                    [ myself._convertKeysSelectionCccToAnalyzer(s, c) ]);
-            };
-            */
         },
 
         _prepareLayout: function(options){

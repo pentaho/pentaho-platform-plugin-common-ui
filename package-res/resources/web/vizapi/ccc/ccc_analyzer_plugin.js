@@ -67,22 +67,8 @@ pen.define([
                     return msg;
                 },
                 
-                /**
-                 * Returns the label of a given formula.
-                 * Only available when interaction is enabled.
-                 */
-                getFormulaLabel: function(formula){
-                    return cv.util.parseMDXExpression(formula, false);
-                },
-    
-                /**
-                 * Returns an array with all the formulas of the hierarchy to which a given formula belongs.
-                 * The order of the formulas is from root level to leaf level.
-                 * Any formula, including a hierarchy id. can be specified in argument 'formula'.
-                 * Only available when interaction is enabled.
-                 */
-                getHierarchyFormulas: function(formula, includeHidden, excludeChildren){
-                    return cv.getFieldHelp().getHierarchy(formula, includeHidden, excludeChildren)
+                getDoubleClickTooltip: function(){
+                    return cv.getActiveReport().getDoubleClickTooltip();
                 },
                 
                 completeAxisGemsMetadata: function(axis, gemsInfoList){
@@ -193,22 +179,6 @@ pen.define([
                             'linkType',   linkType,
                             'reportAxis', reportAxis);
                     });
-                },
-                
-                /**
-                 * Performs a click action with the specified context.
-                 * Only available when interaction is enabled.
-                 */
-                click: function(actionContext, keepGem){
-                    cv.getActiveReport().clickChart(actionContext, keepGem);
-                },
-                
-                /**
-                 * Follows an hyperlink.
-                 * Only available when interaction is enabled.
-                 */
-                link: function(actionContext){
-                    cv.getActiveReport().linkDlg.performAction(actionContext);
                 },
                 
                 // Benny: This method should only return the options which would
