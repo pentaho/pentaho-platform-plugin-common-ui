@@ -37,6 +37,8 @@ function(def, pvc, pv){
         pentaho.visualizations.push(viz);
     }
     
+    var _nullMemberRe = /\[#null\]$/;
+
     defCCCVisualizations();
     
     // --------------
@@ -994,13 +996,25 @@ function(def, pvc, pv){
                  return pvc.buildIndexedId(cccDimGroup, gem.roleLevel);
             }
         },
+        
+        _isNullMember: function(complex, gem) {
+            var atom = complex.atoms[gem.cccDimName];
+            var value = atom.value;
+            return value == null || _nullMemberRe.test(value);
+        },
 
         _buildGemHtmlTooltip: function(lines, complex, context, gem, index){
             /*
              * Multi-chart formulas are not shown in the tooltip
-             * They're on the small chart's title
+             * They're on the small chart's title.
+             *
+             * Also, if the chart hides null members,
+             * don't show them in the tooltip.
+             * Using the scene's group, preferably, because the datum (here the complex) may have dimensions
+             * that are null in the groups' own atoms.
              */
-            if(this._nonMultiGemFilter(gem)){
+            if(this._nonMultiGemFilter(gem) && 
+               !(this.chart._hideNullMembers && this._isNullMember(context.scene.group || complex, gem))) {
                 this.base.apply(this, arguments);
             }
         },
@@ -1216,7 +1230,7 @@ function(def, pvc, pv){
              * is placed in the tooltip.
              */
             var colAxis = this.chart.axes.column;
-            if(colAxis.measureDiscrimName    &&
+            if(colAxis.measureDiscrimName &&
                def.hasOwn(this.genericMeasureRoles, gem.role) &&
                gem.id !== complex.atoms[colAxis.measureDiscrimName].value) {
                return;
@@ -1235,7 +1249,7 @@ function(def, pvc, pv){
                         tooltipLine += " (" + def.html.escape(gem.role) + ")";
                     }
 
-                    tooltipLine += ": " + def.html.escape(atom.label);
+                    tooltipLine += ": " + def.html.escape(this._getAtomLabel(atom, context));
 
                     if(!this.chart._noPercentInTootltipForPercentGems || gem.measureType !== 'PCTOF'){
                         var valuePct = this._getAtomPercent(atom, context);
@@ -1262,7 +1276,21 @@ function(def, pvc, pv){
             }
         },
         
-        _getAtomPercent: function(atom, context){
+        _getAtomLabel: function(atom, context) {
+            var group;
+            if(context && (group = context.scene.group)) {
+                var isMultiDatumGroup = group && group.count() > 1;
+                if(isMultiDatumGroup) {
+                    var dim = group.dimensions(atom.dimension.name);
+                    return dim.format(dim.sum({visible: true}));
+                }
+            }
+            
+            // Default, for scenes of single datums.
+            return atom.label;
+        },
+
+        _getAtomPercent: function(atom, context) {
             if(context) {
                 var cccChart = context.chart,
                     data = cccChart.data,
@@ -1461,6 +1489,8 @@ function(def, pvc, pv){
     .add({
         _options: baseOptions,
         
+        _hideNullMembers: false,
+
         _rolesToCccDimensionsMap: {
             'columns':  'series',
             'rows':     'category',
@@ -2308,9 +2338,9 @@ function(def, pvc, pv){
             }
         },
 
-        _configureTooltip: function(){
+        _configureTooltip: function() {
             var me = this;
-            this.options.tooltipFormat = function(scene){
+            this.options.tooltipFormat = function(scene) {
                 return me._getTooltipText(scene.datum, this);
             };
         },
@@ -3835,8 +3865,6 @@ function(def, pvc, pv){
     .add({
         _cccClass: 'pvc.SunburstChart',
         
-        _nullMemberRe: /\[#null\]$/,
-
         _rolesToCccDimensionsMap: {
             'columns':  null,
             'measures': null,
@@ -3861,31 +3889,16 @@ function(def, pvc, pv){
         _readUserOptions: function(options, vizOptions) {
             this.base(options, vizOptions);
             
-            //this._wantsNullMembers = vizOptions.emptySlicesHidden;
-
-            //options.emptySlicesVisible = !vizOptions.emptySlicesHidden; // Show as Gaps <=> hidden
-            
-            //options.emptySlicesLabel  = options.emptySlicesVisible ? this._message("attributeNullValue") : "";
+            this._hideNullMembers = vizOptions.emptySlicesHidden;
 
             options.valuesFont = defaultFont(null, readFontSize(vizOptions, 'label'));
 
             if(vizOptions.emptySlicesHidden) {
-                var nullMemberRe = this._nullMemberRe;
-                //reader.reader = function(vitem, out) {
-                //    var cell = vitem[index];
-                //    var value = cell && cell.v;
-                //    out[dimName] = value != null && nullMemberRe.test(value) ? null : cell;
-                //};
-                //options.dimensionGroups.category = {
-                //    converter: function(value) {
-                //        return value != null && nullMemberRe.test(value) ? null : value;
-                //    }
-                //};
                 options.extensionPoints.slice_visible = 
-                options.extensionPoints.label_visible =
+                options.extensionPoints.label_visible = 
                 function(scene) {
                     var value = scene.vars.category.value;
-                    return !!value && !nullMemberRe.test(value);
+                    return !!value && !_nullMemberRe.test(value);
                 };
             }
         }
