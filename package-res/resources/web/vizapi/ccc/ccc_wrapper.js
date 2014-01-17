@@ -714,8 +714,9 @@ function(def, pvc, pv){
         
         function createEmptySlicesDataReq(){
             return {
-                id: 'emptySlicesVisible',
+                id: 'emptySlicesHidden',
                 dataType: 'boolean',
+                value: true,
                 ui: {
                      label: dropZoneLabel('SHOW_AS_GAPS'),
                      group: 'options',
@@ -843,21 +844,22 @@ function(def, pvc, pv){
             var readers = this.chart.options.readers,
                 index   = virtualItemStartIndex;
 
-            this.cccDimList().forEach(function(dimName){
-                if(!def.hasOwn(cccDimNamesSet, dimName)){
+            this.cccDimList().forEach(function(dimName) {
+                if(!def.hasOwn(cccDimNamesSet, dimName)) {
                     cccDimNamesSet[dimName] = true;
-                    
-                    var reader = {
-                        names:   dimName, // when null, the reader simply consumes the index, and prevents a default reader
-                        indexes: index
-                    };
-                    
-                    readers.push(reader);
+                    readers.push(this._createReader(dimName, index));
                     index++;
                 }
-            });
+            }, this);
 
             return index;
+        },
+
+        _createReader: function(dimName, index) {
+            return {
+                names:   dimName, // when null, the reader simply consumes the index, and prevents a default reader
+                indexes: index
+            };
         },
         
         /* Note this is called during base constructor. */
@@ -992,7 +994,7 @@ function(def, pvc, pv){
                  return pvc.buildIndexedId(cccDimGroup, gem.roleLevel);
             }
         },
-        
+
         _buildGemHtmlTooltip: function(lines, complex, context, gem, index){
             /*
              * Multi-chart formulas are not shown in the tooltip
@@ -1016,7 +1018,9 @@ function(def, pvc, pv){
                 .each(function(gem){
                     var atom = complex.atoms[gem.cccDimName];
                     forms.push(gem.formula);
-                    values.push(atom.value);
+                    // Translate back null member values to the original member value,
+                    // which is accessible in rawValue.
+                    values.push(atom.value == null ? atom.rawValue : atom.value);
                     label = atom.label; // TODO is this ok?
                 });
             
@@ -1768,12 +1772,6 @@ function(def, pvc, pv){
             
             var sizeByNegativesMode = vizOptions.sizeByNegativesMode;
             options.sizeAxisUseAbs = sizeByNegativesMode === 'USE_ABS';
-            
-            if(vizOptions.emptySlicesVisible) {
-              options.emptySlicesVisible = vizOptions.emptySlicesVisible;
-            } else {
-              options.emptySlicesVisible = false;
-            }
         },
         
         _processDataTable: function(){
@@ -3837,6 +3835,8 @@ function(def, pvc, pv){
     .add({
         _cccClass: 'pvc.SunburstChart',
         
+        _nullMemberRe: /\[#null\]$/,
+
         _rolesToCccDimensionsMap: {
             'columns':  null,
             'measures': null,
@@ -3848,7 +3848,7 @@ function(def, pvc, pv){
         },
         
         _discreteColorRole: 'rows',
-        
+
         _configure: function() {
             this.base();
             this.options.rootCategoryLabel = this._message('chartSunburstRootCategoryLabel');
@@ -3857,10 +3857,37 @@ function(def, pvc, pv){
         _getDiscreteColorScale: function() {
             return this._getDefaultDiscreteColorScale();
         },
-        
+
         _readUserOptions: function(options, vizOptions) {
             this.base(options, vizOptions);
+            
+            //this._wantsNullMembers = vizOptions.emptySlicesHidden;
+
+            //options.emptySlicesVisible = !vizOptions.emptySlicesHidden; // Show as Gaps <=> hidden
+            
+            //options.emptySlicesLabel  = options.emptySlicesVisible ? this._message("attributeNullValue") : "";
+
             options.valuesFont = defaultFont(null, readFontSize(vizOptions, 'label'));
+
+            if(vizOptions.emptySlicesHidden) {
+                var nullMemberRe = this._nullMemberRe;
+                //reader.reader = function(vitem, out) {
+                //    var cell = vitem[index];
+                //    var value = cell && cell.v;
+                //    out[dimName] = value != null && nullMemberRe.test(value) ? null : cell;
+                //};
+                //options.dimensionGroups.category = {
+                //    converter: function(value) {
+                //        return value != null && nullMemberRe.test(value) ? null : value;
+                //    }
+                //};
+                options.extensionPoints.slice_visible = 
+                options.extensionPoints.label_visible =
+                function(scene) {
+                    var value = scene.vars.category.value;
+                    return !!value && !nullMemberRe.test(value);
+                };
+            }
         }
     });
 
