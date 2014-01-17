@@ -655,7 +655,7 @@ function(def, pvc, pv){
         }
 
         function createSortDataReqs(){
-            var types = ['bySizeAscending', 'bySizeDescending', 'none'];
+            var types = ['bySizeDescending', 'bySizeAscending', 'none'];
             return [
                 {
                     id: 'sliceOrder',
