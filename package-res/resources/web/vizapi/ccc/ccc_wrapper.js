@@ -521,7 +521,8 @@ function(def, pvc, pv){
                       [createEmptySlicesDataReq()],
                       [createChartOptionsDataReq(false)]
                   )
-            }]
+            }],
+            menuOrdinal: 185
         });
         
         function label(prefix, id) { return (id && cvCatalog[(prefix || "") + id]) || ""; }
