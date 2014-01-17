@@ -518,6 +518,7 @@ function(def, pvc, pv){
                       },
                       createMultiDataReq()],
                       createSortDataReqs(),
+                      [createEmptySlicesDataReq()],
                       [createChartOptionsDataReq(false)]
                   )
             }]
@@ -707,6 +708,19 @@ function(def, pvc, pv){
                     label: dropZoneLabel('COLORSET_REVERSE'),
                     group: 'options',
                     type:  'checkbox'
+                }
+            }; 
+        }
+        
+        function createEmptySlicesDataReq(){
+            return {
+                id: 'emptySlicesVisible',
+                dataType: 'boolean',
+                ui: {
+                     label: dropZoneLabel('SHOW_AS_GAPS'),
+                     group: 'options',
+                     type:  'checkbox',
+                     caption: dropZoneLabel('EMPTY_SLICES')
                 }
             }; 
         }
@@ -1754,6 +1768,12 @@ function(def, pvc, pv){
             
             var sizeByNegativesMode = vizOptions.sizeByNegativesMode;
             options.sizeAxisUseAbs = sizeByNegativesMode === 'USE_ABS';
+            
+            if(vizOptions.emptySlicesVisible) {
+              options.emptySlicesVisible = vizOptions.emptySlicesVisible;
+            } else {
+              options.emptySlicesVisible = false;
+            }
         },
         
         _processDataTable: function(){
