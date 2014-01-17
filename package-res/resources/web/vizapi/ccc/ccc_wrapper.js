@@ -3902,6 +3902,8 @@ function(def, pvc, pv){
                     return !!value && !_nullMemberRe.test(value);
                 };
             }
+
+            options.extensionPoints.label_textStyle = vizOptions.labelColor;
         }
     });
 
