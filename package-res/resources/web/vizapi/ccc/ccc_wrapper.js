@@ -3873,7 +3873,8 @@ function(def, pvc, pv){
         },
         
         _options: {
-            valuesVisible: true
+            valuesVisible: true,
+            valuesOptimizeLegibility: false
         },
         
         _discreteColorRole: 'rows',
