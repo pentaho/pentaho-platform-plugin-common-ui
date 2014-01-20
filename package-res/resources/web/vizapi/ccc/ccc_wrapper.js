@@ -16,8 +16,8 @@
 */
 
 pen.define([
-        "cdf/lib/CCC/def", 
-        "cdf/lib/CCC/pvc-d1.0", 
+        "cdf/lib/CCC/def",
+        "cdf/lib/CCC/pvc-d1.0",
         "cdf/lib/CCC/protovis",
         "common-ui/vizapi/VizController",
         "common-ui/vizapi/ccc/ccc_analyzer_plugin" // TODO: temporary dependency due to debug loading time problems
@@ -27,31 +27,31 @@ function(def, pvc, pv){
     // TODO: with requireJS is this still needed?
     // Declare **global** pentaho namespace variable
     pentaho = typeof pentaho != "undefined" ? pentaho : {};
-    
+
     // This allows def.types below not installing 'pentaho' on the global space...
     def.globalSpace('pentaho', pentaho);
-    
+
     pentaho.visualizations || (pentaho.visualizations = {});
-    
+
     function defVisualization(viz){
         pentaho.visualizations.push(viz);
     }
-    
+
     var _nullMemberRe = /\[#null\]$/;
 
     defCCCVisualizations();
-    
+
     // --------------
-    
+
     // Install pentaho trends on CCC trends
     pentaho.trends.types().forEach(function(trendType){
         var trendInfo = pentaho.trends.get(trendType);
-        
+
         pvc.trends.define(trendType, trendInfo);
     });
-    
+
     // --------------
-    
+
     function defCCCVisualizations(){
         defVisualization({
             id:       'ccc_bar',
@@ -261,7 +261,7 @@ function(def, pvc, pv){
             type: 'barchart',
             source: 'CCC',
             name: vizLabel('VERTICAL_BAR_LINE'),
-            'class': 'pentaho.ccc.BarLineChart', // 
+            'class': 'pentaho.ccc.BarLineChart', //
             args:  {
                 // Default value for 'shape' data request
                 shape: 'circle'
@@ -274,7 +274,7 @@ function(def, pvc, pv){
                     createRowDataReq('VERTICAL_BAR_LINE_ROW'),
                     createColDataReq('VERTICAL_BAR_LINE_COL'),
                     def.set(
-                        createMeaDataReq('VERTICAL_BAR_LINE_NUMCOL'), 
+                        createMeaDataReq('VERTICAL_BAR_LINE_NUMCOL'),
                         'required', false),
                     def.set(
                          createMeaDataReq('VERTICAL_BAR_LINE_NUMLINE'),
@@ -288,7 +288,7 @@ function(def, pvc, pv){
             }],
             menuOrdinal: 125
         });
-        
+
         defVisualization({
             id: 'ccc_waterfall',
             type: 'waterfallchart',
@@ -315,8 +315,8 @@ function(def, pvc, pv){
                 name: 'Default',
                 reqs: [
                     createRowDataReq('BOXPLOT_ROW'),
-                    
-                    def.set(createMeaDataReq('BOXPLOT_PCT50'), 
+
+                    def.set(createMeaDataReq('BOXPLOT_PCT50'),
                                 'allowMultiple', false,
                                 'required', false),
                     {
@@ -370,7 +370,7 @@ function(def, pvc, pv){
                 drillOrder: ['rows','columns'],
                 hyperlinkOrder: ['rows','columns'],
                 reqs : createDataReq("MULTIPLE_PIE", {multi: false})
-                   
+
             }],
             menuOrdinal: 180
         });
@@ -431,7 +431,7 @@ function(def, pvc, pv){
             }],
             menuOrdinal: 200
         });
-        
+
         defVisualization({
             id: 'ccc_treemap',
             type: 'treemapchart',
@@ -442,7 +442,7 @@ function(def, pvc, pv){
             propMap:  [],
             dataReqs: [{
                 name: 'Default',
-                reqs: [ 
+                reqs: [
                     def.set(createRowDataReq("TREEMAP_ROW"), 'required', true),
                     {
                         id: 'size',
@@ -457,7 +457,7 @@ function(def, pvc, pv){
                 ]
             }]
         });
-        
+
         defVisualization({
             id: 'ccc_bulletchart',
             type: 'bulletchart',
@@ -497,7 +497,7 @@ function(def, pvc, pv){
             }
             ]
         });
-        
+
         defVisualization({
             id: 'ccc_sunburst',
             type: 'treemapchart',
@@ -508,7 +508,7 @@ function(def, pvc, pv){
             propMap:  [],
             dataReqs: [{
                 name: 'Default',
-                  reqs: def.array.appendMany([ 
+                  reqs: def.array.appendMany([
                       def.set(createRowDataReq("SUNBURST_ROW"), 'required', true),
                       {
                           id: 'size',
@@ -526,21 +526,21 @@ function(def, pvc, pv){
             }],
             menuOrdinal: 185
         });
-        
+
         function label(prefix, id) { return (id && cvCatalog[(prefix || "") + id]) || ""; }
-        
+
         function vizLabel(id) { return label('VIZ_', id) || id; }
 
         function dropZoneLabel(id, defaultLabel) {
             return label("dropZoneLabels_", id) ||
-                   label("ropZoneLabels_", id) || 
+                   label("ropZoneLabels_", id) ||
                    defaultLabel || id;
         }
-        
+
         function chartPropsLabel(id, defaultLabel) {
             return label("dlgChartProps", id) || defaultLabel || id;
         }
-        
+
         function createRowDataReq(rowLabel){
             return {
                 id: 'rows',
@@ -586,15 +586,15 @@ function(def, pvc, pv){
                 required: false
             };
         }
-        
+
         function createShapeDataReq(valuesSet){
             var values = ['circle', 'cross', 'diamond', 'square', 'triangle'];
             if(valuesSet){
                 values = values.filter(function(value){ return def.hasOwn(valuesSet, value); });
             }
-            
+
             values.unshift('none');
-            
+
             return {
                 id: 'shape',
                 dataType: 'string',
@@ -607,7 +607,7 @@ function(def, pvc, pv){
                 }
             };
         }
-        
+
         function createLineWidthDataReq(){
             return {
                 id: 'lineWidth',
@@ -621,7 +621,7 @@ function(def, pvc, pv){
                 }
             };
         }
-        
+
         function createTrendsDataReqs(keyArgs){
             var types = ['none', 'linear'];
             return [
@@ -672,7 +672,7 @@ function(def, pvc, pv){
                     }
                 }];
         }
-        
+
         function createPatternDataReq(){
             return {
                 id: 'pattern',
@@ -685,9 +685,9 @@ function(def, pvc, pv){
                     type:  'combo',
                     caption: dropZoneLabel('PATTERN')
                 }
-            }; 
+            };
         }
-        
+
         function createColorSetDataReq(){
             return {
                 id: 'colorSet',
@@ -700,9 +700,9 @@ function(def, pvc, pv){
                     type:    'combo',
                     caption: dropZoneLabel('COLORSET')
                 }
-            }; 
+            };
         }
-        
+
         function createReverseColorsDataReq(){
             return {
                 id: 'reverseColors',
@@ -712,9 +712,9 @@ function(def, pvc, pv){
                     group: 'options',
                     type:  'checkbox'
                 }
-            }; 
+            };
         }
-        
+
         function createEmptySlicesDataReq(){
             return {
                 id: 'emptySlicesHidden',
@@ -726,9 +726,9 @@ function(def, pvc, pv){
                      type:  'checkbox',
                      caption: dropZoneLabel('EMPTY_SLICES')
                 }
-            }; 
+            };
         }
-        
+
         function createChartOptionsDataReq(hasSeparator){
             return {
                 id: "optionsBtn",
@@ -741,10 +741,10 @@ function(def, pvc, pv){
                 }
             };
         }
-        
+
         function createDataReq(chartId, options) {
             var json = [];
-            
+
             if(def.get(options, 'row', true)){
                 json.push(createRowDataReq(chartId + "_ROW"));
             }
@@ -752,7 +752,7 @@ function(def, pvc, pv){
             if(def.get(options, 'column', true)){
                 json.push(createColDataReq(chartId + "_COL"));
             }
-            
+
             if(def.get(options, 'measure', true)){
                 json.push(createMeaDataReq(chartId + "_NUM"));
             }
@@ -764,7 +764,7 @@ function(def, pvc, pv){
             if(def.get(options, 'options', true)){
                 json.push(createChartOptionsDataReq(false));
             }
-            
+
             return json;
         }
     }
@@ -780,7 +780,7 @@ function(def, pvc, pv){
         // Every role, bound or not may have an entry here
         this.gemsByRole    = {}; // roleId -> [gem, ...]
         this.indexesByRole = {}; // roleId -> [number, ...]
-        
+
         // Only bound roles will have an entry in this set
         this.boundRoles = {}; // roleId -> true
 
@@ -791,7 +791,7 @@ function(def, pvc, pv){
         this.gems  = this._getGems();
         this.depth = this.gems.length;
         this.formulas = [];
-        
+
         this.gems.forEach(initGem, this);
 
         /** @instance */
@@ -807,14 +807,14 @@ function(def, pvc, pv){
                     this.boundRoles[roleId] = true;
                     this.boundRolesIdList.push(roleId);
                 }
-    
+
                 var roleGems = this.gemsByRole[roleId];
                 gem.roleLevel = roleGems.length;
                 roleGems.push(gem);
-    
+
                 this.indexesByRole[roleId].push(index);
             }
-            
+
             this.formulas.push(gem.formula);
         }
     })
@@ -829,12 +829,12 @@ function(def, pvc, pv){
                 return true;
             }
         },
-        
+
         configure: function(virtualItemStartIndex, cccDimNamesSet){
             this.configureDimensionGroups();
             return this.configureReaders(virtualItemStartIndex, cccDimNamesSet);
         },
-        
+
         configureDimensionGroups: function(){
         },
 
@@ -864,7 +864,7 @@ function(def, pvc, pv){
                 indexes: index
             };
         },
-        
+
         /* Note this is called during base constructor. */
         _getGems: function(){
             var gems = this.chart._axesGemsInfo[this.id];
@@ -872,7 +872,7 @@ function(def, pvc, pv){
             if(vizHelper.completeAxisGemsMetadata){ // available on the client
                 vizHelper.completeAxisGemsMetadata(this.id, gems);
             }
-            
+
             return gems;
         },
 
@@ -883,14 +883,14 @@ function(def, pvc, pv){
                             .array(),
                 last   = labels.pop(),
                 first  = labels.join(", ");
-            
+
             if(first && last){
                 return this.chart._message('chartAxisTitleMultipleDimText', [first, last]);
             }
-            
+
             return first || last;
         },
-        
+
         _getAxisLabelGems: function(){
             return this.gems;
         },
@@ -922,7 +922,7 @@ function(def, pvc, pv){
        cccDimList: def.method({isAbstract: true}),
 
        fillCellSelection: def.method({isAbstract: true})
-       
+
     });
 
     // --------------------------
@@ -937,7 +937,7 @@ function(def, pvc, pv){
             case 'measure': funClass = pentaho.ccc.MeasureAxis; break;
             default: throw def.error.argumentInvalid("Undefined axis value '{0}'.", [axisId]);
         }
-        
+
         return new funClass(chart);
     };
 
@@ -946,28 +946,28 @@ function(def, pvc, pv){
     def
     .type('pentaho.ccc.DiscreteAxis', pentaho.ccc.Axis)
     .init(function(chart, axisId){
-        
+
         this.base(chart, axisId);
-        
+
         var multiGems = this.gemsByRole[this.chart._multiRole];
-        this.hasMulti = !!multiGems && 
+        this.hasMulti = !!multiGems &&
                         def.query(multiGems)
                            .any(function(gem){ return !gem.isMeasureDiscrim; });
     })
     .postInit(function(){
         // Done here just to allow  more specific roles to be ensured first
-        
+
         //this.base.apply(this, arguments);
-        
+
         if(this.hasMulti){
             this._ensureRole(this.chart._multiRole);
         }
     })
     .add({
-        _nonMultiGemFilter: function(gem){ 
-            return gem.role !== this.chart._multiRole; 
+        _nonMultiGemFilter: function(gem){
+            return gem.role !== this.chart._multiRole;
         },
-        
+
         /**
          * The union of the ccc dimensions of the roles of this axis.
          *
@@ -992,12 +992,12 @@ function(def, pvc, pv){
         _getGemDimName: function(gem){
             var roleToCccDimMap = this.chart._rolesToCccDimensionsMap,
                 cccDimGroup = roleToCccDimMap[gem.role];
-            
+
             if(typeof cccDimGroup === 'string'){
                  return pvc.buildIndexedId(cccDimGroup, gem.roleLevel);
             }
         },
-        
+
         _isNullMember: function(complex, gem) {
             var atom = complex.atoms[gem.cccDimName];
             var value = atom.value;
@@ -1014,21 +1014,21 @@ function(def, pvc, pv){
              * Using the scene's group, preferably, because the datum (here the complex) may have dimensions
              * that are null in the groups' own atoms.
              */
-            if(this._nonMultiGemFilter(gem) && 
+            if(this._nonMultiGemFilter(gem) &&
                !(this.chart._hideNullMembers && this._isNullMember(context.scene.group || complex, gem))) {
                 this.base.apply(this, arguments);
             }
         },
-        
+
         _getAxisLabelGems: function(){
             return def.query(this.gems).where(this._nonMultiGemFilter, this);
         },
-        
+
         fillCellSelection: function(selection, complex, selectionExcludesMulti){
             var forms  = [],
                 values = [],
                 label;
-            
+
             this.getSelectionGems(selectionExcludesMulti)
                 .each(function(gem){
                     var atom = complex.atoms[gem.cccDimName];
@@ -1038,33 +1038,33 @@ function(def, pvc, pv){
                     values.push(atom.value == null ? atom.rawValue : atom.value);
                     label = atom.label; // TODO is this ok?
                 });
-            
+
             if(forms.length){
                 var axisId = this.id;
                 // Dummy property, just to force Analyzer to read the axis info
                 selection[axisId] = true;
-                
+
                 selection[axisId + 'Id'   ] = forms;
                 selection[axisId + 'Item' ] = values;
                 selection[axisId + 'Label'] = label;
             }
         },
-        
+
         getSelectionGems: function(selectionExcludesMulti){
             if(selectionExcludesMulti == null){
                 selectionExcludesMulti = true;
             }
-            
+
             return def.query(this.gems)
                      .where(function(gem, index){
-                        return (!selectionExcludesMulti || this._nonMultiGemFilter(gem)) && 
-                               !gem.isMeasureDiscrim && 
+                        return (!selectionExcludesMulti || this._nonMultiGemFilter(gem)) &&
+                               !gem.isMeasureDiscrim &&
                                !!gem.cccDimName;
                      }, this);
         }
-        
+
     });
-    
+
     // --------------------------
 
     def
@@ -1132,7 +1132,7 @@ function(def, pvc, pv){
 
                 this.measureDiscrimName = cccDimName;
             }
-            
+
             return cccDimName;
         },
 
@@ -1142,7 +1142,7 @@ function(def, pvc, pv){
 
             // Ensure measureDiscrimName is determined
             this.cccDimList();
-            
+
             if(this.measureDiscrimName){
                 this.chart.options.dimensions[this.measureDiscrimName] = {
                     isHidden: true
@@ -1156,7 +1156,7 @@ function(def, pvc, pv){
     def
     .type('pentaho.ccc.RowAxis', pentaho.ccc.DiscreteAxis)
     .init(function(chart){
-        
+
         this.base(chart, 'row');
 
         this._ensureRole(this.defaultRole);
@@ -1164,17 +1164,17 @@ function(def, pvc, pv){
     .add({
         defaultRole: 'rows'
     });
-    
+
     // --------------------------
 
     def
     .type('pentaho.ccc.MeasureAxis', pentaho.ccc.Axis)
     .init(function(chart){
-        
+
         this.base(chart, 'measure');
-        
+
         this._ensureRole(this.defaultRole);
-        
+
         this.genericMeasuresCount = 0;
         this.genericMeasureRoles = {};
         def.eachOwn(this.gemsByRole, function(gems, role){
@@ -1196,20 +1196,20 @@ function(def, pvc, pv){
         _getGems: function(){
 
             var gems = this.base();
-            
+
             var filtered = [];
-            
+
             gems.forEach(function(gem){
                 var meaId = gem.id,
                     measureInfo;
-                
+
                 if(meaId && (measureInfo = def.getOwn(this.chart._measuresInfo, meaId))){
                     gem.role = measureInfo.role;
 
                     filtered.push(gem);
                 }
             }, this);
-            
+
             return filtered;
         },
 
@@ -1258,25 +1258,25 @@ function(def, pvc, pv){
                             tooltipLine += " (" + def.html.escape(''+valuePct) + "%)";
                         }
                     }
-                    
+
                     var suffix;
                     if(complex.isInterpolated){
                         suffix = this.chart._message('chartTooltipGemInterp_' + complex.interpolation);
                     } else if(complex.isTrend/* && atom.label*/){
-                        // TODO: "atom.label" -- is a weak test for trended measures, 
+                        // TODO: "atom.label" -- is a weak test for trended measures,
                         // that relies on the fact that non-trended measures are left null
                         suffix = "(" + this.chart.options.trendLabel + ")"; //this.chart._message('chartTooltipGemTrend_' + complex.trendType);
                     }
-                    
+
                     if(suffix){
                         tooltipLine += " " + suffix;
                     }
-                    
+
                     lines.push(tooltipLine);
                 }
             }
         },
-        
+
         _getAtomLabel: function(atom, context) {
             var group;
             if(context && (group = context.scene.group)) {
@@ -1286,7 +1286,7 @@ function(def, pvc, pv){
                     return dim.format(dim.sum({visible: true}));
                 }
             }
-            
+
             // Default, for scenes of single datums.
             return atom.label;
         },
@@ -1334,32 +1334,32 @@ function(def, pvc, pv){
     });
 
     // ------------------
-    
+
     var installCccEventsShield;
     if(pv.renderer() === 'vml') {
         /*
          * Unhandled mouse events from protovis
          * bubble up and cause slowing down the UI.
-         * So, we stop propagation of mouse events. 
-         * We can't use dojo or jQuery for this, 
-         * cause they try to "fix" the event object, 
+         * So, we stop propagation of mouse events.
+         * We can't use dojo or jQuery for this,
+         * cause they try to "fix" the event object,
          * which is generally an expensive operation
          * that would defeat the initial purpose.
-         * An unwanted side effect is that dragging 
+         * An unwanted side effect is that dragging
          * gems over the chart does not work.
          */
         var _cccEventsShieldEvents =  ['mouseover', 'mouseout', 'mousemove'];
-        
+
         installCccEventsShield = function (element){
             if(!element._cccEventsShield){
                 element._cccEventsShield = true;
-                
+
                 _cccEventsShieldEvents.forEach(function(evName){
                     addListener(element, evName, stopEventPropagation);
                 });
             }
         };
-        
+
         var stopEventPropagation = function (ev){
             if(!ev){ ev = window.event; }
             if(ev.stopPropagation) {
@@ -1368,35 +1368,35 @@ function(def, pvc, pv){
                 ev.cancelBubble = true;
             }
         };
-        
+
         var addListener = function (elem, type, listener){
             elem.addEventListener
                 ? elem.addEventListener(type, listener, false)
                 : elem.attachEvent("on" + type, listener);
         };
     }
-    
-    
+
+
     /* CCC Charts Options */
     var ruleStrokeStyle = "#808285";  // #D8D8D8',  // #f0f0f0
     var lineStrokeStyle = "#D1D3D4";  // "#D1D3D4"; //'#A0A0A0'; // #D8D8D8',// #f0f0f0
-       
+
     function legendShapeColorProp(scene){
        var color = scene.color;
        return scene.isOn() ? color : pvc.toGrayScale(color);
     }
-       
+
     var baseOptions = {
         /* Chart */
         compatVersion: 2, // use CCCv2
-        
+
         margins:  0,
         paddings: 10,
         plotFrameVisible: false,
-        
+
         /* Multichart */
         multiChartMax: 50,
-    
+
         /* Legend */
         legend:  true,
         legendPosition:  'right',
@@ -1406,15 +1406,15 @@ function(def, pvc, pv){
         legendClickMode: 'toggleSelected',
         color2AxisLegendClickMode: 'toggleSelected', // for data part 2 (lines in column/line combo)
         color3AxisLegendClickMode: 'toggleSelected', // for trends
-        
+
         /* Axes */
         axisSizeMax:      '50%',
         axisTitleSizeMax: '20%',
         orthoAxisGrid: true,
-        
+
         /* Continuous axes */
         continuousAxisLabelSpacingMin: 1.1, // em
-        
+
         /* Title */
         titlePosition: 'top',
 
@@ -1427,13 +1427,13 @@ function(def, pvc, pv){
         hoverable:      false,
         ctrlSelectMode: false,
         clearSelectionMode: 'manual',
-        
+
         /* Plot */
         valuesVisible:  false,
-        
+
         ignoreNulls:   false,
         groupedLabelSep: "~",
-        
+
         crosstabMode:  true,
         isMultiValued: true,
         seriesInRows:  false,
@@ -1441,7 +1441,7 @@ function(def, pvc, pv){
             //categoriesCount:   1, set in code
             measuresInColumns: true
         },
-        
+
         extensionPoints: {
             axisRule_strokeStyle:   ruleStrokeStyle,
             axisTicks_strokeStyle:  lineStrokeStyle,
@@ -1454,7 +1454,7 @@ function(def, pvc, pv){
             legend2Dot_fillStyle:   legendShapeColorProp,
             legend2Dot_strokeStyle: legendShapeColorProp
         },
-        
+
         tooltip: {
             delayIn:      200,
             delayOut:     80,
@@ -1468,7 +1468,7 @@ function(def, pvc, pv){
             opacity:      1
         }
     };
-    
+
     var mixinDiscreteXOptions = {
         extensionPoints: {
             xAxisLabel_textAngle:    -Math.PI/4,
@@ -1476,20 +1476,20 @@ function(def, pvc, pv){
             xAxisLabel_textBaseline: 'top'
         }
     };
-    
+
     // ------------------
-    
+
     def
     .type('pentaho.ccc.Chart')
     .init(function(element){
         this._element = element;
         this._elementName = element.id;
-        
+
         if(installCccEventsShield) { installCccEventsShield(element); }
     })
     .add({
         _options: baseOptions,
-        
+
         _hideNullMembers: false,
 
         _rolesToCccDimensionsMap: {
@@ -1498,7 +1498,7 @@ function(def, pvc, pv){
             'multi':    'multiChart',
             'measures': 'value'
         },
-        
+
         _keyAxesIds: ['column', 'row'],
         _axesIds:    ['column', 'row', 'measure'],
 
@@ -1514,7 +1514,7 @@ function(def, pvc, pv){
          * Indexes of readers are relative to this layout.
          */
         _cccVirtualItemAxesLayout: ['column', 'row', 'measure'],
-        
+
         /* Measure roles that do not show the role in the tooltip.
          */
         _noRoleInTooltipMeasureRoles: {'measures': true},
@@ -1522,11 +1522,11 @@ function(def, pvc, pv){
         /* Do not show percent in front of an analyzer "percent measure" gem.
          */
         _noPercentInTootltipForPercentGems: false,
-        
+
         _multiRole: 'multi',
-        
+
         _discreteColorRole: 'columns',
-        
+
         /* PLUGIN INTERFACE  */
 
         /**
@@ -1537,10 +1537,10 @@ function(def, pvc, pv){
             // CDA table
             this._metadata  = [];
             this._resultset = null;
-            
+
             // Pentaho/Google data table
             this._dataTable = dataTable;
-            
+
             /* TEST
             if(!vizOptions.memberPalette){
                 vizOptions.memberPalette = {
@@ -1550,7 +1550,7 @@ function(def, pvc, pv){
                         "[Markets].[Japan]":  "blue",
                         "[Markets].[NA]":     "pink"
                     },
-                    
+
                     "[Measures].[MeasuresLevel]": {
                         "[MEASURE:0]": "violet",
                         "[MEASURE:1]": "orange"
@@ -1558,13 +1558,13 @@ function(def, pvc, pv){
                 };
             }
             */
-            
+
             // ---------------
-            
+
             this._initOptions(vizOptions);
-            
+
             this._processDataTable();
-            
+
             this._initAxes();
 
             // ---------------
@@ -1575,51 +1575,51 @@ function(def, pvc, pv){
             this._hasMultiChartColumns = this.axes.row.hasMulti || this.axes.column.hasMulti;
 
             // ---------------
-            
+
             this._readUserOptions(this.options, vizOptions);
-            
+
             // ---------------
-            
+
             this._readData();
 
             this._configure();
-            
+
             this._prepareLayout(this.options);
-            
+
             this._render();
         },
 
         resize: function(width, height){
             // Resize event throttling
-            
+
             if(this._lastResizeTimeout != null){
                 clearTimeout(this._lastResizeTimeout);
             }
-            
+
             this._lastResizeTimeout = setTimeout(function(){
                 this._lastResizeTimeout = null;
-                
+
                 this._doResize(width, height);
-                
+
             }.bind(this), 50);
         },
-        
+
         _doResize: function(width, height){
             if(this._chart){
-                var options = this._chart.options; 
-                
+                var options = this._chart.options;
+
                 def.set(options, 'width', width, 'height', height);
-                
+
                 this._prepareLayout(options);
-                
+
                 this._chart.render(true, true, false);
             }
         },
-        
+
         /* Sets the items on the chart that should be highlighted */
         setHighlights: function(selections) {
             this._selections = selections;
-            
+
             if(!this._ownChange){ // reentry control
                 if(!selections || selections.length == 0){
                     // will cause selectionChangedAction being called
@@ -1663,13 +1663,13 @@ function(def, pvc, pv){
             vizOptions = this._vizOptions = $.extend({}, vizOptions);
 
             this._vizHelper = cv.pentahoVisualizationHelpers[vizOptions.customChartType];
-            
-            this._hasContentLink = this._vizHelper.isInteractionEnabled() && 
+
+            this._hasContentLink = this._vizHelper.isInteractionEnabled() &&
                                    this._vizHelper.hasContentLink();
 
             // Store the current selections
             this._selections = vizOptions.selections;
-            
+
             // Recursively inherit this class' shared options
             var options = this.options = def.create(this._options);
             def.set(
@@ -1680,18 +1680,18 @@ function(def, pvc, pv){
                 'dimensionGroups', {},
                 'dimensions',      {},
                 'visualRoles',     {},
-                'readers',         [], 
+                'readers',         [],
                 'calculations',    []);
         },
-       
+
         _message: function(msgId, args) { return this._vizHelper.message(msgId, args); },
-        
+
         _setNullInterpolationMode: function(options, value){ },
-        
+
         _readUserOptions: function(options, vizOptions){
             // Apply vizOptions to extension points and others
             var extPoints = options.extensionPoints;
-            
+
             var value = vizOptions.backgroundFill;
             if(value && value !== 'NONE'){
                 var fillStyle;
@@ -1704,26 +1704,26 @@ function(def, pvc, pv){
                                 ~~((255 + bgColor.g) / 2),
                                 ~~((255 + bgColor.b) / 2),
                                 bgColor.a);
-                        
+
                         fillStyle = bgColor;
                     } else {
-                        fillStyle = 'linear-gradient(to top, ' + 
-                                    vizOptions.backgroundColor + ', ' + 
+                        fillStyle = 'linear-gradient(to top, ' +
+                                    vizOptions.backgroundColor + ', ' +
                                     vizOptions.backgroundColorEnd + ')';
                     }
                 } else {
                     fillStyle = vizOptions.backgroundColor;
                 }
-                
+
                 extPoints.base_fillStyle = fillStyle;
             }
-            
+
             value = vizOptions.labelColor;
             if(value !== undefined){
-                extPoints.axisLabel_textStyle =  
+                extPoints.axisLabel_textStyle =
                 extPoints.axisTitleLabel_textStyle = value;
             }
-            
+
             value = ('' + vizOptions.showLegend) === 'true';
             options.legend = value;
             if(value){
@@ -1731,7 +1731,7 @@ function(def, pvc, pv){
                 if(value !== undefined){
                     extPoints.legendLabel_textStyle = value;
                 }
-                
+
                 // TODO: ignoring white color cause analyzer has no on-off for the legend bg color
                 // and always send white. When the chart bg color is active it
                 // would not show through the legend.
@@ -1739,33 +1739,33 @@ function(def, pvc, pv){
                 if(value && value.toLowerCase() !== "#ffffff"){
                     extPoints.legendArea_fillStyle = value;
                 }
-                
+
                 value = vizOptions.legendPosition;
                 if(value){
                     options.legendPosition = value.toLowerCase();
                 }
-                
-                
+
+
                 if(vizOptions.legendSize){
                     options.legendFont = readFont(vizOptions, 'legend');
                 }
             }
-            
+
             value = vizOptions.lineWidth;
             if(value !== undefined){
                 extPoints.line_lineWidth  = +value;      // + -> to number
                 var radius = 3 + 6 * ((+value) / 8); // 1 -> 8 => 3 -> 9,
                 extPoints.dot_shapeSize = radius * radius;
-                
-                extPoints.plot2Line_lineWidth = extPoints.line_lineWidth; 
+
+                extPoints.plot2Line_lineWidth = extPoints.line_lineWidth;
                 extPoints.plot2Dot_shapeSize  = extPoints.dot_shapeSize;
             }
-            
+
             value = vizOptions.maxChartsPerRow;
             if(value !== undefined){
                 options.multiChartColumnsMax = +value; // + -> to number
             }
-            
+
             value = vizOptions.emptyCellMode;
             if(value){
                 switch(value){
@@ -1773,38 +1773,38 @@ function(def, pvc, pv){
                     case 'ZERO':   value = 'zero';   break;
                     case 'LINEAR': value = 'linear'; break;
                 }
-                
+
                 this._setNullInterpolationMode(options, value);
             }
-            
+
             value = vizOptions.multiChartRangeScope;
             if(value){
                 switch(value){
                     case 'GLOBAL': value = 'global'; break;
                     case 'CELL':   value = 'cell';   break;
                 }
-                
+
                 options.numericAxisDomainScope = value;
             }
-            
+
             // build style for pv
             if (vizOptions.labelSize){
                 var labelFont = readFont(vizOptions, 'label');
-                
-                options.axisTitleFont = 
+
+                options.axisTitleFont =
                 options.axisFont = labelFont;
-                
+
                 if(this._hasMultiChartColumns){
                     var labelFontSize   = readFontSize(vizOptions, 'label');
                     var labelFontFamily = readFontFamily(vizOptions, 'label');
                     options.titleFont = (labelFontSize + 2) + "px " + labelFontFamily;
                 }
             }
-            
+
             var sizeByNegativesMode = vizOptions.sizeByNegativesMode;
             options.sizeAxisUseAbs = sizeByNegativesMode === 'USE_ABS';
         },
-        
+
         _processDataTable: function(){
             // Data truncation can affect also the structure of data.
             // If the query returns more than 100x100 rowsxcols,
@@ -1819,7 +1819,7 @@ function(def, pvc, pv){
             // Note that measure gems that are in no *chart* gem bar (not mapped)
             // and that do not have hideInChart=true may appear here as columns.
             // These are ignored (meaRole === 'undefined').
-            // 
+            //
             // Measure columns of the same col values group may come in any order...
             // and even in different orders across column groups.
 
@@ -1829,7 +1829,7 @@ function(def, pvc, pv){
             var colGroups = [];
             var colGroupsByColValues = {};
 
-            /* 
+            /*
              * meaRoleId -> {
              *   groupIndex: 0, // Global order of measure roles within a column group
              *   index: 0       // Column index of a measure role's first appearance
@@ -1837,61 +1837,61 @@ function(def, pvc, pv){
              */
             var measureRolesInfo     = {};
             var measureRolesInfoList = [];
-            
+
             /*
              * id -> { gem info }
              */
             var measuresInfo = {};
             var measuresInfoList = [];
-                        
+
             var rowsInfoList = [];
             var columnsInfoList = [];
-            
+
             var tc = 0;
             var colId, splitColId;
-            
+
             /*
              * I - Row gems
              */
             while(tc < dtColCount){
                 colId = dataTable.getColumnId(tc);
                 splitColId = splitColGroupAndMeasure(colId);
-                
+
                 if(!processRowColumn.apply(this, splitColId)){
                     // Found first measure column
                     break;
                 }
-                
+
                 // next
                 tc++;
             }
-            
+
             // First measure column
             if(tc < dtColCount){
-                
+
                 /*
                  * II - Column gems
-                 * 
+                 *
                  * Collects column gems' roles from the first col~mea column.
                  */
                 processColumnsInfo.call(this, splitColId[0]);
-                
+
                 /*
                  * III - Row gems
                  */
                 while(true){
                     processMeasureColumn.apply(this, splitColId);
-                    
+
                     // next
                     if(++tc >= dtColCount){
                         break;
                     }
-                    
+
                     colId = dataTable.getColumnId(tc);
                     splitColId = splitColGroupAndMeasure(colId);
                 }
             }
-            
+
             // Sort measure roles
             measureRolesInfoList.sort(function(infoa, infob){
                 return def.compare(infoa.groupIndex, infob.groupIndex) ||
@@ -1909,31 +1909,31 @@ function(def, pvc, pv){
             this._measureRolesInfoList = measureRolesInfoList;
             this._colGroups = colGroups;
             this._measuresInfo = measuresInfo;
-            
+
             this._axesGemsInfo = {
                 'measure': measuresInfoList,
                 'row':     rowsInfoList,
                 'column':  columnsInfoList
             };
-            
-            
+
+
             /* HELPER functions */
-            
+
             function processRowColumn(colGroupValues, meaId){
                 if(/\[MEASURE:(\d+)\]$/.test(meaId)){
                     // Found the first measure column
                     return false; // It isn't a "row" column
                 }
-                
+
                 // When "Member properties" are shown in a member gem,
-                // additional columns are added to the data table, 
+                // additional columns are added to the data table,
                 // that are to be ignored.
                 // These columns have no column role.
                 // We transform them to 'undefined' role
                 // which is the role value that unmapped measure columns
                 // already have.
                 var rolesAndLevels = getColumnRolesAndLevels(dataTable, tc);
-                
+
                 // A row gem
                 rowsInfoList.push({
                     id:      colId,
@@ -1943,17 +1943,17 @@ function(def, pvc, pv){
                     role:    rolesAndLevels ? rolesAndLevels[0].id : 'undefined',
                     index:   rowsInfoList.length
                 });
-                
+
                 return true; // It is a "row" column
             }
-            
+
             // Column Roles are the same in every col~measure column.
             // So we collect them from the first one.
             function processColumnsInfo(colGroupValues){
                 if(colGroupValues){
                     var rolesAndLevels = getColumnRolesAndLevels(dataTable, tc);
                     var colValues = colGroupValues.split('~');
-                    
+
                     colValues.forEach(function(colValue, index){
                         var roleAndLevel = rolesAndLevels[index];
                         columnsInfoList.push({
@@ -1967,32 +1967,32 @@ function(def, pvc, pv){
                     });
                 }
             }
-            
+
             function processMeasureColumn(colGroupValues, id){
-                
+
                 var meaInfo = def.getOwn(measuresInfo, id);
-                
+
                 /* New measure? */
                 if(!meaInfo){
                     // TODO - last() ?
                     var roleAndLevel = getColumnRolesAndLevels(dataTable, tc).pop();
-                    
+
                     // NOTE: roleAndLevel.level == [Measures].[MeasuresLevel],
                     // which is not the formula...
-                    meaInfo = {  
+                    meaInfo = {
                         id:      id,
-                        formula: undefined, // not in data table 
+                        formula: undefined, // not in data table
                         label:   splitColGroupAndMeasure(dataTable.getColumnLabel(tc))[1],
                         axis:    'measure',
                         role:    roleAndLevel.id,
                         index:   measuresInfoList.length,
                         isUnmapped: roleAndLevel.id === 'undefined'
                     };
-                    
+
                     measuresInfo[id] = meaInfo;
                     measuresInfoList.push(meaInfo);
                 }
-                
+
                 /* New column group? */
                 var colGroup = def.getOwn(colGroupsByColValues, colGroupValues);
                 if(!colGroup){
@@ -2008,7 +2008,7 @@ function(def, pvc, pv){
                 } else {
                     colGroup.measureIds.push(id);
                 }
-                
+
                 /* Role */
                 var currMeaIndex = (tc - colGroup.index);
                 var meaRoleInfo  = def.getOwn(measureRolesInfo, meaInfo.role);
@@ -2022,7 +2022,7 @@ function(def, pvc, pv){
                         groupIndex: currMeaIndex,
                         index:      tc // first index where role appears (for tie break, see .sort above)
                     };
-                    
+
                     measureRolesInfo[meaInfo.role] = meaRoleInfo;
                     measureRolesInfoList.push(meaRoleInfo);
 
@@ -2031,20 +2031,20 @@ function(def, pvc, pv){
                 }
             }
         },
-        
+
         _initAxes: function(){
             /* formula, id -> gem */
             this.gemsMap = {};
-        
+
             /* roleId -> axis */
             this.axisByRole = {};
-            
+
             /* axisId -> Axis */
             this.axes = {};
-            
+
             this._gemCountColumnReportAxis = 0;
             this._measureDiscrimGem = null;
-            
+
             /* Create and configure Axis's */
             this._axesCreateOrderIds.forEach(createAxis, this);
 
@@ -2053,16 +2053,16 @@ function(def, pvc, pv){
             this._cccVirtualItemAxesLayout.forEach(function(axisId){
                 virtualItemIndex = this.axes[axisId].configure(virtualItemIndex, cccDimNamesSet);
             }, this);
-            
+
             /* @instance */
             function createAxis(axisId){
 
                 var axis = pentaho.ccc.Axis.create(this, axisId);
 
                 axis.gems.forEach(indexGem, this);
-                
+
                 this.axes[axisId] = axis;
-                
+
                 var boundRoleList = axis.boundRolesIdList;
                 if(boundRoleList){
                     boundRoleList.forEach(function(roleId){
@@ -2079,7 +2079,7 @@ function(def, pvc, pv){
 
                 // NOTE: when interaction is disabled...
                 // formula and id aren't available in every axis type...
-          
+
                 // Index by formula
                 if(form){
                     this.gemsMap[form] = gem;
@@ -2088,11 +2088,11 @@ function(def, pvc, pv){
                 if(id && form !== id){
                     this.gemsMap[id] = gem;
                 }
-                
+
                 if(gem.reportAxis === 'column'){
                     this._gemCountColumnReportAxis++;
                 }
-                
+
                 if(gem.isMeasureDiscrim){
                     this._measureDiscrimGem = gem;
                 }
@@ -2135,17 +2135,17 @@ function(def, pvc, pv){
         _configure: function(){
             var options = this.options;
             var vizOptions = this._vizOptions;
-            
-            // By default hide overflow, otherwise, 
-            // resizing the window frequently ends up needlessly showing scrollbars. 
+
+            // By default hide overflow, otherwise,
+            // resizing the window frequently ends up needlessly showing scrollbars.
             // TODO: is it ok to access "vizOptions.controller.domNode" ?
             vizOptions.controller.domNode.style.overflow = 'hidden'; // Hide overflow
-            
+
             var colorScaleKind = this._getColorScaleKind();
             if(colorScaleKind){
                 this._configureColor(colorScaleKind);
             }
-            
+
             if((this.options.legend = this._showLegend())) {
                 this._configureLegend();
             }
@@ -2153,10 +2153,10 @@ function(def, pvc, pv){
             if(this._hasMultiChartColumns) {
                this._configureMultiChart();
             }
-            
+
             this._configureTrends();
             this._configureSorts();
-            
+
             options.axisFont = defaultFont(options.axisFont, 12);
             options.axisTitleFont = defaultFont(options.axisTitleFont, 12);
 
@@ -2166,66 +2166,66 @@ function(def, pvc, pv){
                 if(options.tooltipEnabled){
                     this._configureTooltip();
                 }
-                
+
                 if((options.selectable = this._canSelect())){
                     this._configureSelection();
                 }
-                
+
                 this._configureDoubleClick();
             }
         },
-        
+
         _getColorScaleKind: function() { return 'discrete'; },
-        
+
         _configureColor: function(colorScaleKind){
             var options = this.options;
             var vizOptions = this._vizOptions;
-            
+
             switch(colorScaleKind){
                 case 'discrete':
                     options.colors = this._getDiscreteColorScale();
                     break;
-                    
+
                 case 'continuous':
                     options.colorScaleType = vizOptions.colorScaleType;
                     options.colors = vizOptions.colors;
                     break;
             }
         },
-        
+
         _getDiscreteColorScale: function(){
             var memberPalette = this._vizOptions.memberPalette;
             var colorScale = memberPalette && this._getDiscreteColorScaleCore(memberPalette);
             return colorScale || this._getDefaultDiscreteColorScale();
         },
-        
+
         _getDefaultDiscreteColorScale: function() { return this._vizOptions.palette.colors.slice(); },
-        
+
         _getDiscreteColorScaleCore: function(memberPalette){
             var colorRoleId = this._discreteColorRole;
             if(colorRoleId){
                 // 1 - The CCC color role is not being explicitly set, so whatever goes to the series role is used by the color role
                 // 2 - When a measure discrim is used and there is only one measure, the CCC dim name of the discriminator is
                 //      not of the "series" group; so in this case, there's no discriminator in the key
-                
+
                 var colorAxis = this.axisByRole[colorRoleId];
                 var colorGems = colorAxis ? // No gems?
                                 colorAxis.gemsByRole[colorRoleId].filter(function(gem){ return !gem.isMeasureDiscrim; }) :
                                 [];
-                        
+
                 var C = colorGems.length;
                 var M;
-                
+
                 if(this._cccClass == 'pvc.PieChart'){
-                    // When multiple measures exist, 
+                    // When multiple measures exist,
                     // the pie chart shows them as multiple charts
-                    // and if these would affect color, 
+                    // and if these would affect color,
                     // each small chart would have a single color.
                     M = 0;
                 } else {
                     M = this.axes.measure.genericMeasuresCount;
                 }
-                
+
                 var keyIncludesDiscrim = (M > 1);
                 if(C > 0 || M > 0){
                     var colorMap;
@@ -2247,16 +2247,16 @@ function(def, pvc, pv){
                         lastIndex = 0;
                         colorMap  = memberPalette['[Measures].[MeasuresLevel]'];
                     }
-                    
+
                     // Is there a color map for the chosen hierarchy?
                     if(colorMap){
                         colorMap = def.query(def.ownKeys(colorMap))
-                                      .object({ 
+                                      .object({
                                         value: function(k) {
-                                            return colorFromAnalyzer(colorMap[k]); 
+                                            return colorFromAnalyzer(colorMap[k]);
                                         }
                                       });
-                        
+
                         var defaultScale = pv.colors(this._getDefaultDiscreteColorScale());
                         return function(){
                             var scale = function(compKey){
@@ -2266,7 +2266,7 @@ function(def, pvc, pv){
                                     return colorMap[key] || defaultScale(key);
                                 }
                             };
-                            
+
                             def.copy(scale, defaultScale);
                             return scale;
                         };
@@ -2278,29 +2278,29 @@ function(def, pvc, pv){
         _configureTrends: function(){
             var options = this.options;
             var vizOptions = this._vizOptions;
-            
+
             var trendType = (this._supportsTrends ? vizOptions.trendType : null) || 'none';
             switch(trendType){
                 case 'none':
                 case 'linear':
                     break;
-                default: 
+                default:
                     trendType = 'none';
             }
-            
+
             options.trendType = trendType;
             if(trendType !== 'none'){
                 var trendName = vizOptions.trendName;
                 if(!trendName){
                     trendName = this._message('dropZoneLabels_TREND_NAME_' + trendType.toUpperCase());
                 }
-                
+
                 options.trendLabel = trendName;
-                
+
                 var value = vizOptions.trendLineWidth;
                 if(value !== undefined){
                     var extPoints = options.extensionPoints;
-                    
+
                     extPoints.trendLine_lineWidth  = +value;      // + -> to number
                     var radius = 3 + 6 * ((+value) / 8); // 1 -> 8 => 3 -> 9,
                     extPoints.trendDot_shapeSize = radius * radius;
@@ -2314,7 +2314,7 @@ function(def, pvc, pv){
                 this.options.sliceOrder = sliceOrder;
             }
         },
-        
+
         _configureMultiChart: function(){
             var options = this.options;
 
@@ -2322,15 +2322,15 @@ function(def, pvc, pv){
             var containerStyle = this._vizOptions.controller.domNode.style;
             containerStyle.overflowX = 'hidden';
             containerStyle.overflowY = 'auto';
-            
+
             // Very small charts can't be dominated by text...
             //options.axisSizeMax = '30%';
-            
+
             var titleFont = defaultFont(options.titleFont, 12);
             if(titleFont && !(/black|(\bbold\b)/i).test(titleFont)){
                 titleFont = "bold " + titleFont;
             }
-            
+
             options.smallTitleFont = titleFont;
 
             var multiChartOverflow = this._vizOptions.multiChartOverflow;
@@ -2350,15 +2350,15 @@ function(def, pvc, pv){
             if(!this.options.selectable){
                 return false;
             }
-            
+
             // Selection is disabled if 2 or more reportAxis='column' gems exist
             if(this._gemCountColumnReportAxis >= 2){
                 return false;
             }
-            
+
             return true;
         },
-        
+
         _configureSelection: function(){
             var me = this;
             this.options.userSelectionAction = function(cccSelections){
@@ -2382,12 +2382,12 @@ function(def, pvc, pv){
                 }
             };
         },
-        
+
         _showLegend: function(){
             if(!this.options.legend){
                 return false;
             }
-            
+
             if(this.axes.measure.genericMeasuresCount > 1){
                 return true;
             }
@@ -2398,7 +2398,7 @@ function(def, pvc, pv){
             if(!cccColDimGroup || colAxis.realDepth > 0){
                 return true;
             }
-            
+
             return false;
         },
 
@@ -2406,14 +2406,14 @@ function(def, pvc, pv){
             var options = this.options;
 
             options.legendFont = defaultFont(options.legendFont, 10);
-            
+
             var legendPosition = options.legendPosition,
                 isTopOrBottom = legendPosition === 'top' || legendPosition === 'bottom';
-            
+
             if(this._hasMultiChartColumns && !isTopOrBottom){
                 options.legendAlignTo  = 'page-middle';
                 options.legendKeepInBounds = true; // ensure it is not placed off-page
-                
+
                 // Ensure that legend margins is an object.
                 // Preseve already specifed margins.
                 // CCC's default adds a left or right 5 px margin,
@@ -2428,10 +2428,10 @@ function(def, pvc, pv){
                     var oppositeSide = pvc.BasePanel.oppositeAnchor[legendPosition];
                     legendMargins[oppositeSide] = 5;
                 }
-                
+
                 legendMargins.top = 20;
-            } 
-            
+            }
+
             if(!('legendAlign' in options)){
                 // Calculate 'legendAlign' default value
                 if(isTopOrBottom){
@@ -2441,7 +2441,7 @@ function(def, pvc, pv){
                 }
             }
         },
-        
+
         // Logic that depends on width and height
         _prepareLayout: function(options){
             if(this._hasMultiChartColumns && pv.renderer() !== 'batik'){
@@ -2449,20 +2449,20 @@ function(def, pvc, pv){
                 options.width -= 17;
             }
         },
-    
+
         _render: function(){
             while(this._element.firstChild) {
                 this._element.removeChild(this._element.firstChild);
             }
 
             var chartClass = def.getPath({pvc: pvc}, this._cccClass);
-            
+
             this._chart = new chartClass(this.options);
             this._chart.setData({
                 metadata:  this._metadata,
                 resultset: this._resultset
             });
-            
+
             this._chart.render();
         },
 
@@ -2474,94 +2474,94 @@ function(def, pvc, pv){
             this._axesIds.forEach(function(axisId){
                 this.axes[axisId].buildHtmlTooltip(tooltipLines, complex, context);
             }, this);
-            
+
             if(!complex.isVirtual){
                 msg = this._vizHelper.getDoubleClickTooltip();
                 if (msg)
                     tooltipLines.push(msg);
             }
-            
+
             /* Add selection information */
             // Not the data point count, but the selection count (a single column selection may select many data points).
             //var selectedCount = this._chart && this._chart.data.selectedCount();
             var selections = this._vizOptions.controller.highlights;
             var selectedCount = selections && selections.length;
             if(selectedCount){
-                var msgId = selectedCount === 1 ? 
-                            'chartTooltipFooterSelectedSingle' : 
+                var msgId = selectedCount === 1 ?
+                            'chartTooltipFooterSelectedSingle' :
                             'chartTooltipFooterSelectedMany';
-                
+
                 msg = this._message(msgId, [selectedCount]);
-                
+
                 tooltipLines.push(msg);
             }
-            
+
             return tooltipLines.join('<br />');
         },
 
         /* INTERACTIVE - SELECTION */
-        
+
         _onUserSelection: function(selectingDatums){
             return this._processSelection(selectingDatums);
         },
-        
+
         _getSelectionKey: function(selection){
             var key = selection.__cccKey;
             if(!key){
                 var keys = [selection.type];
-                
+
                 var ap = def.array.append;
                 if(selection.columnId){
                     ap(keys, selection.columnId);
                     ap(keys, selection.columnItem);
                 }
-                
+
                 if(selection.rowId){
                     ap(keys, selection.rowId);
                     ap(keys, selection.rowItem);
                 }
-                
+
                 key = selection.__cccKey = keys.join('||');
             }
-            
+
             return key;
         },
-        
+
         _doesSharedSeriesSelection: function(){
             return (this._gemCountColumnReportAxis === 1);
         },
-        
+
         _onSelectionChanged: function(selectedDatums){
-            
+
             if(!this.options.selectable){
                 return;
             }
-            
+
             // Convert to array of analyzer cell or column selection objects
             var selectionExcludesMulti = this._selectionExcludesMultiGems();
-            
+
             var selections = [];
             var selectionsByKey = {};
-            
+
             if(this._doesSharedSeriesSelection()){
                 selectedDatums.forEach(function(datum){
                     if(!datum.isVirtual){
                         var selection = { type: 'column' };
-                        
+
                         this.axes.column.fillCellSelection(selection, datum, selectionExcludesMulti);
-                        
+
                         // Check if there's already a selection with the same key.
                         // If not, add a new selection to the selections list.
-                        // In the case where the selection max count limit is reached, 
+                        // In the case where the selection max count limit is reached,
                         // the datums included in each selection must be known (by its index).
                         // So, add the datum to the new or existing selection's datums list.
-                        
+
                         var key = this._getSelectionKey(selection);
-                        
+
                         var existingSelection = selectionsByKey[key];
                         if(!existingSelection){
                             selection.__cccDatums = [datum];
-                            
+
                             selectionsByKey[key] = selection;
                             selections.push(selection);
                         } else {
@@ -2569,30 +2569,30 @@ function(def, pvc, pv){
                         }
                     }
                 }, this);
-                
+
             } else {
                 // Duplicates may occur due to excluded dimensions like the discriminator
                 selectedDatums.forEach(function(datum){
                     if(!datum.isVirtual){
                         var selection = this._complexToCellSelection(datum, selectionExcludesMulti);
-                        
+
                         // Check if there's already a selection with the same key.
                         // If not, add a new selection to the selections list.
                         var key = this._getSelectionKey(selection);
                         var existingSelection = selectionsByKey[key];
                         if(!existingSelection){
                             selection.__cccDatums = datum;
-                            
+
                             selectionsByKey[key] = selection;
                             selections.push(selection);
                         }
                     }
                 }, this);
             }
-            
+
             selections = this._limitSelection(selections);
-            
-            // Wrap the event trigger with _ownChange=true, 
+
+            // Wrap the event trigger with _ownChange=true,
             // cause otherwise, when the #setHighlights method is called,
             // in response to selection changing,
             // and if only interpolated dots had beed selected,
@@ -2610,7 +2610,7 @@ function(def, pvc, pv){
                 this._ownChange = false;
             }
         },
-        
+
         _limitSelection: function(selections){
             // limit selection
             var filterSelectionMaxCount = this._vizOptions['filter.selection.max.count'] || 200;
@@ -2621,7 +2621,7 @@ function(def, pvc, pv){
                 // Build a list of datums to deselect
                 var deselectDatums = [];
                 selections2 = [];
-                
+
                 for(var i = 0 ; i < L ; i++){
                     var selection = selections[i];
                     var keep = true;
@@ -2635,7 +2635,7 @@ function(def, pvc, pv){
                             keep = false;
                         }
                     }
-                    
+
                     if(keep){
                         selections2.push(selection);
                     } else {
@@ -2650,36 +2650,36 @@ function(def, pvc, pv){
                         deselectCount--;
                     }
                 }
-                
+
                 // Deselect datums beyond the max count
                 pvc.data.Data.setSelected(deselectDatums, false);
-                
+
                 // Mark for update UI ASAP
                 this._chart.updateSelections();
-                
+
                 this._vizHelper.showConfirm([
-                                 'infoExceededMaxSelectionItems', 
+                                 'infoExceededMaxSelectionItems',
                                  filterSelectionMaxCount
-                             ], 
+                             ],
                              'SELECT_ITEM_LIMIT_REACHED');
             }
-            
+
             // Index with the keys of previous selections
-            this._previousSelectionKeys = 
+            this._previousSelectionKeys =
                     def.query(selections2)
                         .object({
                             name:    function(selection){ return this._getSelectionKey(selection); },
                             value:   def.retTrue,
                             context: this
                         });
-            
+
             return selections2;
         },
-        
+
         /**
          * By default, the keep only or the exclude menu operations
          * do not select level gems playing a multi role.
-         * 
+         *
          * The same applies to the the drill down operation,
          * that, by default, does not KEEP level gems playing
          * a multi role.
@@ -2689,33 +2689,33 @@ function(def, pvc, pv){
         _selectionExcludesMultiGems: function(){
             return true;
         },
-        
+
         _processSelection: function(selectedDatums){
             /**
              * Selection rules.
-             * 
+             *
              * -> gems with (chart)axis="measure" are excluded
-             * 
+             *
              * -> gems playing a "multi" role are excluded (!except in the pie chart!)
-             *    -> this way, points with common category data in 
+             *    -> this way, points with common category data in
              *       different small charts are simultaneously selected
-             * 
+             *
              * -> measure discriminator gems are excluded
              *    this way, selection is always expanded to other series of different measures
-             * 
+             *
              * this._gemCountColumnReportAxis :
-             * 
+             *
              * -> if there are no gems with reportAxis='column':
              *    -> that's it. (most granular selection s available)
-             * 
+             *
              * -> if there is a single gem with reportAxis='column': (!except in the HG chart!)
              *    -> gems with (chart)axis="row" are excluded
              *       (selecting one point selects every other point of the same "series")
-             *     
+             *
              * -> if there is more that one gem with reportAxis='column':
-             *    -> selection is disabled as a whole 
+             *    -> selection is disabled as a whole
              *       (in this case, code doesn't even enter here)
-             * 
+             *
              */
             /**
              * Example CCC "where" specification:
@@ -2734,44 +2734,44 @@ function(def, pvc, pv){
              */
             var whereSpec;
             var outDatums = [];
-            
+
             if(selectedDatums.length){
                 var selectionExcludesMulti = this._selectionExcludesMultiGems();
-                
+
                 // Include axis="column" dimensions
                 // * Excludes measure discrim dimensions
                 // * Excludes "multi" role dimensions
                 var colDimNames = this.axes.column.getSelectionGems(selectionExcludesMulti)
                                   .select(function(gem){ return gem.cccDimName; })
                                   .array();
-                
+
                 var rowDimNames;
                 if(!this._gemCountColumnReportAxis){
                     // Include axis="row" dimensions
                     // * Excludes "multi" role dimensions
                     rowDimNames = this.axes.row.getSelectionGems(selectionExcludesMulti)
                                       .select(function(gem){ return gem.cccDimName; })
-                                      .array(); 
+                                      .array();
                 }
-                
+
                 if(!colDimNames.length && (!rowDimNames || !rowDimNames.length)){
                     selectedDatums = [];
                 } else {
                     whereSpec = [];
-                    
+
                     selectedDatums.forEach(addDatum);
-                    
+
                     this._chart.data
                         .datums(whereSpec, {visible: true})
                         .each(function(datum){
                             outDatums.push(datum);
                         });
-                    
+
                     // Replace
                     selectedDatums = outDatums;
                 }
             }
-            
+
             function addDatum(datum) {
                 if(!datum.isNull){
                     if(datum.isTrend){
@@ -2780,31 +2780,31 @@ function(def, pvc, pv){
                         // so we need to explicitly add them to the output.
                         outDatums.push(datum);
                     }
-                    
+
                     var datumFilter = {};
 
                     var atoms = datum.atoms;
-                    
+
                     if(colDimNames){
                         colDimNames.forEach(addDim);
                     }
-                    
+
                     if(rowDimNames){
                         rowDimNames.forEach(addDim);
                     }
-                    
+
                     whereSpec.push(datumFilter);
                 }
-                
+
                 function addDim(dimName) {
                     // The atom itself may be used as a value condition
                     datumFilter[dimName] = atoms[dimName];
                 }
             }
-            
+
             return selectedDatums;
         },
-        
+
         /* INTERACTIVE - DOUBLE-CLICK */
 
         _onDoubleClick: function(complex){
@@ -2821,7 +2821,7 @@ function(def, pvc, pv){
         },
 
         /* UTILITY */
-        
+
         /**
          * Converts a complex to an analyzer cell selection.
          *
@@ -2845,7 +2845,7 @@ function(def, pvc, pv){
         _complexToCellSelection: function(complex, selectionExcludesMulti){
             /* The analyzer cell-selection object */
             var selection = { type: 'cell' };
-            
+
             /* Add each axis' formulas to the selection */
             this._axesIds.forEach(function(axisId){
                 this.axes[axisId].fillCellSelection(selection, complex, selectionExcludesMulti);
@@ -2868,7 +2868,7 @@ function(def, pvc, pv){
             if(!cell){
                 return null;
             }
-            
+
             var value = cell.v;
             if(value == null || value === '-') {
                 return null;
@@ -2879,7 +2879,7 @@ function(def, pvc, pv){
                 f: cell.f
             };
         },
-        
+
         _getTableValue: function(tr, tc) {
             var cell = this._getTableCell(tr, tc);
             return cell ? cell.v : ceff.f;
@@ -2892,24 +2892,24 @@ function(def, pvc, pv){
         _options: {
             orientation: 'vertical'
         },
-        
+
         _configure: function(){
 
             this.base();
 
             this._configureAxesDisplayUnits();
-            
+
             if(this._showAxisTitle('base')){
                 this._configureAxisTitle('base',  this._getBaseAxisTitle ());
             }
-            
+
             if(this._showAxisTitle('ortho')){
                 this._configureAxisTitle('ortho', this._getOrthoAxisTitle());
             }
         },
-        
+
         _showAxisTitle: def.fun.constant(true),
-        
+
         _getOrthoAxisTitle: def.noop,
 
         _getBaseAxisTitle:  def.noop,
@@ -2940,7 +2940,7 @@ function(def, pvc, pv){
                     singleAxisGem = roleGems[0];
                 }
             }
-                
+
             if(singleAxisGem){
                 title += singleAxisGem.label;
             }
@@ -2951,7 +2951,7 @@ function(def, pvc, pv){
         _configureAxisRange: function(primary, axisType){
             var vizOptions = this._vizOptions,
                 suffix = primary ? '' : 'Secondary';
-                
+
             if(vizOptions['autoRange' + suffix] !== 'true'){
                 var limit = vizOptions['valueAxisLowerLimit' + suffix];
                 if(limit != null){
@@ -2965,9 +2965,9 @@ function(def, pvc, pv){
                 }
             }
         },
-        
+
         _cartesianAxesDisplayUnitsText: null,
-        
+
         _configureAxesDisplayUnits: function(){
             this._cartesianAxesDisplayUnitsText = {};
         },
@@ -2976,18 +2976,18 @@ function(def, pvc, pv){
             if(!allowFractional){
                 this.options[axisType + 'AxisTickExponentMin'] = 0; // 10^0 => 1
             }
-            
+
             var text;
             var displayUnits = this._vizOptions['displayUnits' + (primary ? '' : 'Secondary')];
             if(displayUnits && displayUnits !== 'UNITS_0'){
-                
+
                 var match = displayUnits.match(/^UNITS_(\d+)$/) ||
                             def.fail.argumentInvalid('displayUnits');
                 //var exponent = +match[1]; // + -> to number
-                
+
                 text = this._message('dlgChartOption_' + displayUnits);
             }
-            
+
             this._cartesianAxesDisplayUnitsText[axisType] = text || "";
         }
     });
@@ -3002,11 +3002,11 @@ function(def, pvc, pv){
                 measuresInColumns: false
             }
         },
-        
+
         _showAxisTitle: function(type){
             return !this._hasMultiChartColumns || type === 'ortho';
         },
-        
+
         _getOrthoAxisTitle: function(){
             return this._getMeasureRoleTitle();
         },
@@ -3019,7 +3019,7 @@ function(def, pvc, pv){
             this.base();
 
             this._configureAxisRange(/*isPrimary*/true, 'ortho');
-            
+
             if(this.options.orientation === 'vertical'){
                 def.mixin(this.options, mixinDiscreteXOptions);
             } else {
@@ -3029,37 +3029,37 @@ function(def, pvc, pv){
 
         _configureAxesDisplayUnits: function(){
             this.base();
-            
+
             this._configureAxisDisplayUnits(/*isPrimary*/true, 'ortho');
         }
     });
-    
+
     // ---------------
-    
+
     def
     .type('pentaho.ccc.BarChartAbstract', pentaho.ccc.CategoricalContinuousChart)
     .add({
         _cccClass: 'pvc.BarChart', // default class
-        
+
         _configure: function(){
-            
+
             this.base();
-            
+
             var options = this.options;
             if(options.orientation !== 'vertical'){
                 options.visualRoles.category = { isReversed: true };
             }
         }
     });
-    
+
     // -------------------
-    
+
     def
     .type('pentaho.ccc.BarChart', pentaho.ccc.BarChartAbstract)
     .add({
         _supportsTrends: true
     });
-    
+
     def
     .type('pentaho.ccc.HorizontalBarChart', pentaho.ccc.BarChartAbstract)
     .add({
@@ -3067,9 +3067,9 @@ function(def, pvc, pv){
             orientation: 'horizontal'
         }
     });
-    
+
     // -------------------
-    
+
     def
     .type('pentaho.ccc.StackedBarChart', pentaho.ccc.BarChartAbstract)
     .add({
@@ -3077,7 +3077,7 @@ function(def, pvc, pv){
             stacked: true
         }
     });
-    
+
     def
     .type('pentaho.ccc.HorizontalStackedBarChart', pentaho.ccc.BarChartAbstract)
     .add({
@@ -3086,26 +3086,26 @@ function(def, pvc, pv){
             stacked: true
         }
     });
-    
+
     // ---------------
-    
+
     def
     .type('pentaho.ccc.NormalizedBarChartAbstract', pentaho.ccc.BarChartAbstract)
     .add({
         _cccClass: 'pvc.NormalizedBarChart',
-        
+
         _configure: function(){
-            
+
             this.base();
 
             this.options.orthoAxisTickFormatter = function(v){ return v + "%"; };
         }
     });
-    
-    
+
+
     def
     .type('pentaho.ccc.NormalizedBarChart', pentaho.ccc.NormalizedBarChartAbstract);
-    
+
     def
     .type('pentaho.ccc.HorizontalNormalizedBarChart', pentaho.ccc.NormalizedBarChartAbstract)
     .add({
@@ -3113,10 +3113,10 @@ function(def, pvc, pv){
             orientation: 'horizontal'
         }
     });
-    
+
 
     // ---------------
-    
+
     def
     .type('pentaho.ccc.BarLineChart', pentaho.ccc.BarChartAbstract)
     .add({
@@ -3124,32 +3124,32 @@ function(def, pvc, pv){
         _rolesToCccDimensionsMap: {
             'measuresLine': 'value' // maps to same dim group as 'measures' role
         },
-    
+
         _options: {
             plot2: true,
             secondAxisIndependentScale: false,
             secondAxisSeriesIndexes: null // prevent default of -1 (which means last series) // TODO: is this needed??
         },
-        
+
         _noRoleInTooltipMeasureRoles: {'measures': true, 'measuresLine': true},
-        
+
         _setNullInterpolationMode: function(options, value){
             options.plot2NullInterpolationMode = value;
         },
-        
+
         _initAxes: function(){
             this.base();
-            
+
             this._measureDiscrimGem || def.assert("Must exist to distinguish measures.");
-            
+
             var measureDiscrimCccDimName = this._measureDiscrimGem.cccDimName;
             var meaAxis = this.axes.measure;
             var barGems = meaAxis.gemsByRole[meaAxis.defaultRole];
-            var barGemsById = 
+            var barGemsById =
                 def
                 .query(barGems) // bar: measures, line: measuresLine
                 .uniqueIndex(function(gem){ return gem.id; });
-            
+
             /* Create the dataPart dimension calculation */
             this.options.calculations.push({
                 names: 'dataPart',
@@ -3162,11 +3162,11 @@ function(def, pvc, pv){
                 }
             });
         },
-        
+
         _readUserOptions: function(options, vizOptions){
-            
+
             this.base(options, vizOptions);
-            
+
             var shape = vizOptions.shape;
             if(shape && shape === 'none'){
                 options.pointDotsVisible = false;
@@ -3175,54 +3175,54 @@ function(def, pvc, pv){
                 options.extensionPoints.pointDot_shape = shape;
             }
         },
-        
+
        _configureAxesDisplayUnits: function(){
 
             this.base();
 
             this._configureAxisDisplayUnits(/*isPrimary*/false, 'ortho2');
         },
-        
+
         _configure: function(){
-            
+
             this.base();
-            
+
             this._configureAxisRange(/*isPrimary*/false, 'ortho2');
 
             this._configureAxisTitle('ortho2',"");
-            
+
             this.options.plot2OrthoAxis = 2;
-             
+
             // Plot2 uses same color scale
             // options.plot2ColorAxis = 2;
             // options.color2AxisTransform = null;
         }
     });
-    
+
     def
     .type('pentaho.ccc.WaterfallChart', pentaho.ccc.CategoricalContinuousChart)
     .add({
         _cccClass: 'pvc.WaterfallChart'
     })
-    
+
     // ---------------
-    
+
     def
     .type('pentaho.ccc.LineChart', pentaho.ccc.CategoricalContinuousChart)
     .add({
         _cccClass: 'pvc.LineChart',
-        
+
         _supportsTrends: true,
-        
+
         _options: {
             axisOffset:    0,
             tooltipOffset: 15
         },
-        
+
         _readUserOptions: function(options, vizOptions){
-            
+
             this.base(options, vizOptions);
-            
+
             var shape = vizOptions.shape;
             if(shape && shape === 'none'){
                 options.dotsVisible = false;
@@ -3231,18 +3231,18 @@ function(def, pvc, pv){
                 options.extensionPoints.dot_shape = shape;
             }
         },
-        
+
         _setNullInterpolationMode: function(options, value){
             options.nullInterpolationMode = value;
         },
-        
+
         _configureLegend: function(){
-            
+
             this.base();
-            
+
             var options = this.options;
             var extPoints = options.extensionPoints;
-            
+
             var dotSize = extPoints.dot_shapeSize;
             if(dotSize != null){
                 var dotRadius = Math.sqrt(dotSize);
@@ -3250,7 +3250,7 @@ function(def, pvc, pv){
                 }
             }
     });
-    
+
     def
     .type('pentaho.ccc.StackedAreaChart', pentaho.ccc.CategoricalContinuousChart)
     .add({
@@ -3260,17 +3260,17 @@ function(def, pvc, pv){
            axisOffset:    0,
            tooltipOffset: 15
        },
-    
+
        _setNullInterpolationMode: function(options, value){
            options.nullInterpolationMode = value;
        }
     });
-    
+
     def
     .type('pentaho.ccc.BoxplotChart', pentaho.ccc.CategoricalContinuousChart)
     .add({
         _cccClass: 'pvc.BoxplotChart',
-        
+
         _rolesToCccDimensionsMap: {
             'columns':     null,
             //'rows':      'category',
@@ -3281,13 +3281,13 @@ function(def, pvc, pv){
             'percentil5':  'percentil5',
             'percentil95': 'percentil95'
         },
-    
+
         _options: {
             extensionPoints: {
                 boxRuleWhisker_strokeDasharray: '- '
             }
         },
-        
+
         _readData: function(){
             // The boxplot data passes-trough, as is.
             this.base();
@@ -3300,12 +3300,12 @@ function(def, pvc, pv){
                 'categoriesCount', this.axes.row.gemsByRole.rows.length);
         }
     });
-    
+
     def
     .type('pentaho.ccc.HeatGridChart', pentaho.ccc.CartesianChart)
     .add({
         _cccClass: 'pvc.HeatGridChart',
-        
+
         _rolesToCccDimensionsMap: {
             'multi': null,
             //'columns':  'series',
@@ -3313,35 +3313,35 @@ function(def, pvc, pv){
             'color': 'value',
             'size':  'value2'
         },
-        
+
         _options: {
             valuesVisible: false,
             useShapes:     true,
             shape:         'square',
-            
+
             xAxisSize: 30,
             yAxisSize: 50,
             axisComposite: true,
             orthoAxisGrid: false, // clear inherited property
-            
+
             //colorMissing:   'lightgray',
             colorScaleType: 'linear',
             colorNormByCategory: false
         },
-        
+
         _configure: function(){
-            
+
             this.base();
-            
+
             this.options.shape = this._vizOptions.shape;
         },
-        
+
         _getColorScaleKind: function() { return 'continuous'; },
-        
+
         _prepareLayout: function(options) {
-            
+
             this.base(options);
-            
+
             var measureCount = this.axes.measure.depth,
                 catsDepth    = this.axes.row.depth,
                 sersDepth    = this.axes.column.depth,
@@ -3387,7 +3387,7 @@ function(def, pvc, pv){
             }
 
             // ------------------
-            
+
             options.xAxisSize = xAxisSize;
             options.yAxisSize = yAxisSize;
         },
@@ -3400,63 +3400,63 @@ function(def, pvc, pv){
 //        _getBaseAxisTitle: function(){
 //            return this.axes.row.getAxisLabel();
 //        },
-        
+
         _doesSharedSeriesSelection: function(){
             return false;
         },
-        
+
         _processSelection: function(selectedDatums){
             if(selectedDatums.length){
                 var data = this._chart.data;
-                
+
                 var atomsByDim = {};
-                
+
                 // Select Cols OR Rows
-                
+
                 // These are optional in the HG
                 var colDimNames = this.axes.column.getSelectionGems()
                                       .select(function(gem){ return gem.cccDimName; })
                                       .array();
-                
+
                 var rowDimNames = this.axes.row.getSelectionGems()
                                       .select(function(gem){ return gem.cccDimName; })
                                       .array();
-                
+
                 var nonAdditive = selectedDatums.length === 1 && selectedDatums[0].isSelected;
-                
+
                 var whereSpec;
-                
+
                 if(!nonAdditive){
                     // Now-selecting datums + Already selected datums
                     var selectDatumsById = def.query(selectedDatums)
                             .union(data.selectedDatums())
                             .uniqueIndex(function(datum){ return datum.id; });
-                    
+
                     var rowGrouping = pvc.data.GroupingSpec.parse(rowDimNames, data.type);
                     var rowGroupedData = data.groupBy(rowGrouping, {
                         visible:  true,
                         where:    function(datum){ return def.hasOwn(selectDatumsById, datum.id); },
                         whereKey: null // prevent caching of groupedData
                     });
-                    
+
                     var datumFilters = rowGroupedData
                         .leafs()
                         .select(function(leafData){
                             // rowDatumFilter
                             return def.copyProps(leafData.atoms, rowDimNames);
                         });
-                    
+
                     if(colDimNames.length){
                         // Make all combinations of row leafs with col leafs
-                        
+
                         var colGrouping = pvc.data.GroupingSpec.parse(colDimNames, data.type);
-                        
+
                         var colGroupedData = data.groupBy(colGrouping, {
                             visible:  true,
                             where:    function(datum){ return def.hasOwn(selectDatumsById, datum.id); },
                             whereKey: null // prevent caching of groupedData
                         });
-                        
+
                         datumFilters = datumFilters
                             .selectMany(function(rowDatumFilter){
                                 return colGroupedData
@@ -3468,19 +3468,19 @@ function(def, pvc, pv){
                                     });
                             });
                     }
-                    
+
                     whereSpec = datumFilters.array();
-                    
+
                     selectedDatums = data
                         .datums(whereSpec, {visible: true})
                         .array();
                 } else {
                     // The only clicked datum is selected and
                     //  thus the user pretends to de-select.
-                    // Expand to the selected datums that have the same series or 
+                    // Expand to the selected datums that have the same series or
                     // the same categories as the clicked one
                     // (a cross whose center is the clicked one)
-                    // The result is that all these will be de-selected. 
+                    // The result is that all these will be de-selected.
                     var singleDatum = selectedDatums[0];
                     whereSpec = [
                         // Column dimensions datum filter
@@ -3488,25 +3488,25 @@ function(def, pvc, pv){
                            .object({
                                value: function(cccDimName){ return singleDatum.atoms[cccDimName]; }
                            }),
-                        
+
                         // OR
-                        
+
                         // Row dimensions datum filter
                         def.query(rowDimNames)
                             .object({
                                 value: function(cccDimName){ return singleDatum.atoms[cccDimName]; }
                             })
                     ];
-                    
+
                     selectedDatums = data
                                         .datums(whereSpec, {visible: true, selected: true})
                                         .array();
                 }
             }
-            
+
             function addDatum(datum) {
                 var atoms = datum.atoms;
-                
+
                 colDimNames.forEach(addDim);
                 rowDimNames.forEach(addDim);
 
@@ -3518,43 +3518,43 @@ function(def, pvc, pv){
                     }
                 }
             }
-            
+
             function buildWhereSpec() {
                 var datumFilter = {};
                 var whereSpec   = [datumFilter];
-                
+
                 def.eachOwn(atomsByDim, addDim);
-                
+
                 function addDim(dimAtomsById, dimName) {
                     // The atom itself may be used as a value condition
                     datumFilter[dimName] = def.own(dimAtomsById);
                 }
-                
+
                 return whereSpec;
             }
-            
+
             return selectedDatums;
         }
     });
-    
+
     def
     .type('pentaho.ccc.MetricDotChart', pentaho.ccc.CartesianChart)
     .add({
         _cccClass: 'pvc.MetricDotChart',
-        
+
         _supportsTrends: true,
-        
+
         _options: {
             axisGrid: true,
-            
+
             sizeAxisUseAbs:  false,
             sizeAxisOriginIsZero: true,
             sizeAxisRatio:   1/5,
             sizeAxisRatioTo: 'height', // plot area client height
-            
+
             autoPaddingByDotSize: false
         },
-        
+
         /* Override Default map */
         _rolesToCccDimensionsMap: {
             'columns':  null,
@@ -3566,27 +3566,27 @@ function(def, pvc, pv){
             'y':        'y',
             'size':     'size'
         },
-        
+
         _discreteColorRole: 'color',
-        
+
         // Roles already in the axis' titles
         _noRoleInTooltipMeasureRoles: {'x': true, 'y': true, 'measures': false},
-        
+
         _getColorScaleKind: function(){
-            return this.axes.measure.boundRoles.color ? 'continuous' : 
+            return this.axes.measure.boundRoles.color ? 'continuous' :
                    this.axes.column.boundRoles.color  ? 'discrete'   :
                    undefined;
         },
-        
+
         _configure: function(){
 
             this.base();
 
             var options = this.options;
-            
+
             this._configureAxisRange(/*isPrimary*/true,  'base');
             this._configureAxisRange(/*isPrimary*/false, 'ortho');
-            
+
             // DOT SIZE
             if(this.axes.measure.boundRoles.size){
                 /* Axis offset like legacy analyzer */
@@ -3595,22 +3595,22 @@ function(def, pvc, pv){
                 options.axisOffset = 0;
             }
         },
-        
+
         _configureColor: function(colorScaleKind){
-            
+
             this.base(colorScaleKind);
-            
+
             var options = this.options;
-            
+
             if(colorScaleKind === 'discrete'){
                 // Must force the discrete type
                 options.dimensionGroups.color = {
                     valueType: String
                 };
-                
-//              options.visualRoles.color = 
+
+//              options.visualRoles.color =
 //              this.axes.column.gemsByRole.color
-//                   .map(function(gem, index){ 
+//                   .map(function(gem, index){
 //                      return pvc.buildIndexedId('color', index);
 //                   })
 //                   .join(', ');
@@ -3618,14 +3618,14 @@ function(def, pvc, pv){
         },
 
         _showLegend: function(){
-            
+
             // prevent default behavior that hides the legend when no series
-            
+
             if(this.options.legend && this.axes.column.boundRoles.color){
                 // Hide the legend if there is only one "series"
                 return this._colGroups.length > 1;
             }
-            
+
             return this.options.legend;
         },
 
@@ -3636,7 +3636,7 @@ function(def, pvc, pv){
         _getBaseAxisTitle: function(){
             return this._getMeasureRoleTitle('x');
         },
-        
+
         _configureAxesDisplayUnits: function(){
 
             this.base();
@@ -3645,70 +3645,70 @@ function(def, pvc, pv){
             this._configureAxisDisplayUnits(/*isPrimary*/false, 'ortho', /*allowFractional*/true);
         }
     });
-    
+
     // Custom
     def
     .type('pentaho.ccc.PieChart', pentaho.ccc.Chart)
     .add({
         _cccClass: 'pvc.PieChart',
-        
+
         _noPercentInTootltipForPercentGems: true,
-        
+
         _rolesToCccDimensionsMap: {
             'columns':  'multiChart',
             //'rows':     'category',
             'multi':    null
             //'measures': 'value'
         },
-        
+
         _options: {
             valuesVisible: true,
             legendShape: 'circle',
-            
+
             titlePosition: 'bottom',
-            
+
             dataOptions: {
                 measuresInColumns: false
             },
-            
+
             extensionPoints: {
                 slice_strokeStyle:'white',
                 slice_lineWidth:   0.8
             }
         },
-        
+
         _multiRole: 'columns',
-        
+
         _discreteColorRole: 'rows',
-        
+
         _configure: function(){
-            
+
             this.base();
-            
+
             // configure value label
             if(this.options.valuesVisible){
                 this._configureValuesMask();
             }
         },
-        
+
         _showLegend: function(){
             return this.options.legend && this.axes.row.depth > 0;
         },
-        
+
         _readUserOptions: function(options, vizOptions) {
             this.base(options, vizOptions);
-            
+
             options.valuesFont = defaultFont(null, readFontSize(vizOptions, 'label'));
         },
-        
+
         _configureMultiChart: function(){
             this.base();
-            
+
             this.options.legendSizeMax = '50%';
         },
-        
+
         _configureValuesMask: function(){
-            /* 
+            /*
              * Change values mask according to each category's
              * discriminated measure being PCTOF or not
              */
@@ -3716,7 +3716,7 @@ function(def, pvc, pv){
             var meaDiscrimName = colAxis.measureDiscrimName;
             if(meaDiscrimName) {
                 var gemsMap = this.gemsMap;
-                
+
                 this.options.pie = {
                     scenes: {
                         category: {
@@ -3726,7 +3726,7 @@ function(def, pvc, pv){
                                 if(meaAtom && (meaGemId = meaAtom.value) && (meaGem = gemsMap[meaGemId]) && meaGem.measureType === 'PCTOF'){
                                     return "{value}"; // the value is the percentage itself;
                                 }
-                                
+
                                 return "{value} ({value.percent})";
                             }
                         }
@@ -3734,7 +3734,7 @@ function(def, pvc, pv){
                 };
             }
         },
-        
+
         _selectionExcludesMultiGems: def.fun.constant(false)
     });
 
@@ -3742,48 +3742,48 @@ function(def, pvc, pv){
     .type('pentaho.ccc.TreemapChart', pentaho.ccc.Chart)
     .add({
         _cccClass: 'pvc.TreemapChart',
-        
+
         _rolesToCccDimensionsMap: {
             'columns':  null,
             'measures': null,
             'size':     'size'
         },
-        
+
         _options: {
             //rootCategoryLabel:  Set in configure
             valuesVisible: true
             //valuesOptimizeLegibility: true
         },
-        
+
         _discreteColorRole: 'rows',
-        
+
         _configure: function() {
-            
+
             this.base();
-            
+
             this.options.rootCategoryLabel = this._message('chartTreeMapRootCategoryLabel');
         },
-        
+
         _getDiscreteColorScale: function() {
             // Don't use memberPalette for now
-            // as the given colors don't match the members that 
+            // as the given colors don't match the members that
             // are actually colored in this visualization type.
             return this._getDefaultDiscreteColorScale();
         },
-        
+
         _readUserOptions: function(options, vizOptions) {
-            
+
             this.base(options, vizOptions);
-            
+
             options.valuesFont = defaultFont(null, readFontSize(vizOptions, 'label'));
         }
     });
-    
+
     def
     .type('pentaho.ccc.BulletChart', pentaho.ccc.Chart)
     .add({
         _cccClass: 'pvc.BulletChart',
-        
+
         _rolesToCccDimensionsMap: {
             'multi':   null,
             'columns': 'subTitle',
@@ -3792,14 +3792,14 @@ function(def, pvc, pv){
             // measures:    -> split between value and marker dimensions...
             // bulletRanges -> range*
         },
-        
+
         _options: {
             valuesVisible: true,
             valuesAnchor:  'right',
 
             titlePosition: 'top',
             titleSize: 25,
-            
+
             bulletTitle:    "Test for title",
             bulletSubtitle: "Test for subtitle",
             bulletMeasures: [],
@@ -3814,7 +3814,7 @@ function(def, pvc, pv){
                 "bulletRuleLabel_font": "7pt sans"
             }
         },
-        
+
         _configure: function(){
 
             this.base();
@@ -3822,9 +3822,9 @@ function(def, pvc, pv){
         },
 
         _prepareLayout: function(options){
-            
+
             this.base(options);
-            
+
             var vizOptions = this._vizOptions;
 
             var isVertical = options.orientation === 'vertical';
@@ -3860,44 +3860,44 @@ function(def, pvc, pv){
             }
         }
     });
-    
+
     def
     .type('pentaho.ccc.SunburstChart', pentaho.ccc.Chart)
     .add({
         _cccClass: 'pvc.SunburstChart',
-        
+
         _rolesToCccDimensionsMap: {
             'columns':  null,
             'measures': null,
             'size':     'size'
         },
-        
+
         _options: {
             valuesVisible: true,
             valuesOptimizeLegibility: false
         },
-        
+
         _discreteColorRole: 'rows',
 
         _configure: function() {
             this.base();
             this.options.rootCategoryLabel = this._message('chartSunburstRootCategoryLabel');
         },
-        
+
         _getDiscreteColorScale: function() {
             return this._getDefaultDiscreteColorScale();
         },
 
         _readUserOptions: function(options, vizOptions) {
             this.base(options, vizOptions);
-            
+
             this._hideNullMembers = vizOptions.emptySlicesHidden;
 
-            options.valuesFont = defaultFont(null, readFontSize(vizOptions, 'label'));
+            options.valuesFont = readFont(vizOptions, 'label');
 
             if(vizOptions.emptySlicesHidden) {
-                options.extensionPoints.slice_visible = 
-                options.extensionPoints.label_visible = 
+                options.extensionPoints.slice_visible =
+                options.extensionPoints.label_visible =
                 function(scene) {
                     var value = scene.vars.category.value;
                     return !!value && !_nullMemberRe.test(value);
@@ -3926,7 +3926,7 @@ function(def, pvc, pv){
             vizOptions  = this._vizOptions;
 
         this.options.seriesInRows = true;
-        
+
         this._addCdaMetadata('Category', 'Category', 'STRING' );
         this._addCdaMetadata('Series',   'Series',   'STRING' );
         this._addCdaMetadata('Value',    'Value',    'NUMERIC');
@@ -3994,7 +3994,7 @@ function(def, pvc, pv){
 
         return values.join('~');
     };
-    
+
     /**
      * Set of visualization options that
      * should not be copied to the CCC options.
@@ -4011,12 +4011,12 @@ function(def, pvc, pv){
         'displayUnits',
         'maxChartsPerRow',
         'emptyCellsMode',
-        
+
         'labelSize',
         'labelStyle',
         'labelFontFamily',
         'labelColor',
-        
+
         'legendBackgroundColor',
         'legendColor',
         'legendFontFamily',
@@ -4055,7 +4055,7 @@ function(def, pvc, pv){
         if(sepIndex < 0){
             return ['', colGroupAndMeasure];
         }
-      
+
         return [
             colGroupAndMeasure.substring(0,  sepIndex),
             colGroupAndMeasure.substring(sepIndex + 1)
@@ -4071,12 +4071,12 @@ function(def, pvc, pv){
 
         return font.replace(/\bdefault\s*$/i, 'sans-serif');
     }
-    
+
     // @private
     // @static
     function readFont(vizOptions, prefix){
         var size = vizOptions[prefix + "Size"];
-        
+
         if (size) {
             var style = vizOptions[prefix + "Style"];
             if (style == null || style == 'PLAIN') {
@@ -4088,15 +4088,15 @@ function(def, pvc, pv){
             return style + size + 'px ' + vizOptions[prefix + "FontFamily"];
         }
     }
-    
+
     function readFontSize(vizOptions, prefix){
         return +vizOptions[prefix + "Size"];
     }
-    
+
     function readFontFamily(vizOptions, prefix){
         return vizOptions[prefix + "FontFamily"];
     }
-    
+
     // FIX Analyzer's colors
     function colorFromAnalyzer(color){
         var L = color.length;
@@ -4110,7 +4110,7 @@ function(def, pvc, pv){
         }
         return pv.color(color);
     }
-    
+
     // @private
     // @static
     function getColumnRolesAndLevels(dataTable, tc){
@@ -4119,7 +4119,7 @@ function(def, pvc, pv){
             return def.array.to(dataReq).map(function(item){
              // NOTE: in IE, unbound columns do not come with an "undefined" role id ??
                 if(!item.id){ item.id = 'undefined'; }
-                return item; 
+                return item;
             });
         }
     }
