@@ -41,7 +41,7 @@
     });
  */
 
-pen.define(['common-ui/util/spin.min', 'common-ui/util/Glasspane'], function(spinJs, glasspane) {
+define(['common-ui/util/spin.min', 'common-ui/util/Glasspane'], function(spinJs, glasspane) {
 
   var local = {
 

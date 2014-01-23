@@ -14,8 +14,8 @@
 * limitations under the License.
 *
 */
-
-function PentahoRepositoryClient() {
+define(["dojo/request"], function(request){
+window.PentahoRepositoryClient = function() {
 
     this.SERVICE_URL = CONTEXT_PATH + 'content/ws-run/RepositoryClientService';
 
@@ -95,13 +95,23 @@ this.loadStateString = function( solution, path, filename ) {
     } else {
         query = 'filepath='+solution+'/'+filename;
     }
-    var resultStr = pentahoGet( this.SERVICE_URL+'/loadState', query, null, 'text/text' );
-    
-    // pull the state, status, and message out
-    if( !resultStr ) {
-        return null;
-    }
-    var stateObject = this.getResultMessage(resultStr);
+
+    var stateObject;
+    request(this.SERVICE_URL+'/loadState',{
+      query : query,
+      sync: true,
+      handleAs: "text"
+    }).then(function(data){
+
+        // pull the state, status, and message out
+        if( !resultStr ) {
+          return null;
+        }
+        stateObject = this.getResultMessage(resultStr);
+
+      });
+
+
     return stateObject;
     
 }
@@ -183,19 +193,28 @@ this.parseXML = function(sText){
             + '&replace=' + myOverwrite
             
         // TODO get this working with POST instead of GET
-        var result = pentahoGet( this.SERVICE_URL+'/'+((isXml)?'saveStateXml':'saveStateString'), query, null, 'text/text' );
-        var stateObject = this.getResultMessage(result);
-        
-        alert(stateObject.message);
-        
-        if( stateObject.status == 'SUCCESS' ) {
-        
-            var userConsole = new PentahoUserConsole();
-            if ( userConsole.console_enabled && window.parent.mantle_refreshRepository ) {
-                window.parent.mantle_refreshRepository();
-            }
-        }
-        
+        var stateObject;
+
+        request(this.SERVICE_URL+'/'+((isXml)?'saveStateXml':'saveStateString'),{
+          query : query,
+          sync: true,
+          handleAs: "text"
+        }).then(function(data){
+
+              stateObject = this.getResultMessage(data);
+
+              alert(stateObject.message);
+
+              if( stateObject.status == 'SUCCESS' ) {
+
+                var userConsole = new PentahoUserConsole();
+                if ( userConsole.console_enabled && window.parent.mantle_refreshRepository ) {
+                  window.parent.mantle_refreshRepository();
+                }
+              }
+
+            });
+
         return stateObject;
         
     }
@@ -221,7 +240,7 @@ function StateObject() {
     this.message = null;
 }
 
-var pentahoRepositoryClient = new PentahoRepositoryClient();
+window.pentahoRepositoryClient = new PentahoRepositoryClient();
 
 pentaho = typeof pentaho == "undefined" ? {} : pentaho;
 
@@ -272,3 +291,4 @@ pentaho.userSettings.prototype.setSetting = function( name, value, callback, cal
 }
 
 pentaho.userSettingsInstance = new pentaho.userSettings();
+});

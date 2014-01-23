@@ -3,6 +3,7 @@
 //     (c) 2009-2013 Jeremy Ashkenas, DocumentCloud Inc.
 //     Underscore may be freely distributed under the MIT license.
 
+define([], function(){
 (function() {
 
   // Baseline setup
@@ -1224,3 +1225,5 @@
   });
 
 }).call(this);
+return _;
+})

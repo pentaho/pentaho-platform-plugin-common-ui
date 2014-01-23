@@ -2,7 +2,7 @@
 <table class="pentaho-padding-sm" onkeyup="">
     <tr>
         <td colspan="3">
-            <span dojoAttachPoint="modelSelectDialogComment" class="label"></span>
+            <span data-dojo-attach-point="modelSelectDialogComment" class="label"></span>
         </td>
     </tr>
     <tr>
@@ -10,18 +10,18 @@
             <table style="padding:0px; margin:0px; width:100%">
                 <tr>
                     <td style="width:100%">
-                        <span dojoAttachPoint="datasourcelistlbl" class="label">Data Sources:</span>
+                        <span data-dojo-attach-point="datasourcelistlbl" class="label">Data Sources:</span>
                     </td>
                     <td>
-                        <div dojoAttachPoint="editdatasourceimg" dojoType="pentaho.common.SmallImageButton" title="Edit the selected datasource" baseClass="pentaho-editbutton">
+                        <div data-dojo-attach-point="editdatasourceimg" data-dojo-type="pentaho.common.SmallImageButton" title="Edit the selected datasource" baseClass="pentaho-editbutton">
                         </div>
                     </td>
                     <td>
-                        <div dojoAttachPoint="adddatasourceimg" dojoType="pentaho.common.SmallImageButton" title="Add a datasource" baseClass="pentaho-addbutton">
+                        <div data-dojo-attach-point="adddatasourceimg" data-dojo-type="pentaho.common.SmallImageButton" title="Add a datasource" baseClass="pentaho-addbutton">
                         </div>
                     </td>
                     <td>
-                        <div dojoAttachPoint="deletedatasourceimg" dojoType="pentaho.common.SmallImageButton" title="Delete the selected datasource" baseClass="pentaho-deletebutton">
+                        <div data-dojo-attach-point="deletedatasourceimg" data-dojo-type="pentaho.common.SmallImageButton" title="Delete the selected datasource" baseClass="pentaho-deletebutton">
                         </div>
                     </td>
                 </tr>
@@ -31,7 +31,7 @@
     <tr>
         <td colspan="3">
           <!-- Chrome 29 can't handle whitespace between element tags of anything translated into a SELECT -->
-          <div dojoType="pentaho.common.ListBox" dojoAttachPoint="modelList" name="model" size="6" class="listbox" width="100%" height="100px" style="overflow:auto;width:100%"></div>
+          <div data-dojo-type="pentaho.common.ListBox" data-dojo-attach-point="modelList" id="model-list" name="model" size="6" class="listbox" width="100%" height="100px" style="overflow:auto;width:100%"></div>
         </td>
     </tr>
 </table>

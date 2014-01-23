@@ -15,10 +15,11 @@
 *
 */
 
+require([], function(storage){
+
 pentaho = typeof pentaho == "undefined" ? {} : pentaho;
 pentaho.common = pentaho.common || {};
 
-dojo.require("dojox.storage");
 
 pentaho.common.localcache = {
   keyRegex : new RegExp("[-\\.]", "gi"),
@@ -26,16 +27,17 @@ pentaho.common.localcache = {
   lmMap: {},
 
   isAvailable : function() {
-    if(dojox.storage.isAvailable()) {
-      if (dojox.storage.manager.getProvider().declaredClass == "dojox.storage.FlashStorageProvider") {
-        var installer = new dojox.flash.Install();
-        var available = !installer.needed();
-        return available;
-      } else {
-        return true;
-      }
-    }
-    return false;
+//    if(dojox.storage.isAvailable()) {
+//      if (dojox.storage.manager.getProvider().declaredClass == "dojox.storage.FlashStorageProvider") {
+//        var installer = new dojox.flash.Install();
+//        var available = !installer.needed();
+//        return available;
+//      } else {
+//        return true;
+//      }
+//    }
+//    return false;
+    return true;
   },
 
   /**
@@ -66,7 +68,7 @@ pentaho.common.localcache = {
           value: value
         }
       }
-      dojox.storage.put(key, cachedObj);
+//      dojox.storage.put(key, cachedObj);
     }
   },
 
@@ -110,14 +112,14 @@ pentaho.common.localcache = {
           value: null
         }
       }
-      dojox.storage.put(key, cachedObj);
+      //dojox.storage.put(key, cachedObj);
     }
   },
 
   clear : function(key) {
     if(this.isAvailable()) {
       key = this.getCacheKey(key);
-      dojox.storage.remove(key);
+      //dojox.storage.remove(key);
     }
   },
 
@@ -162,3 +164,4 @@ pentaho.common.localcache = {
   }
 }
 
+});

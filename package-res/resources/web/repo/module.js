@@ -16,3 +16,5 @@
 */
 
 // repo main module
+define(["./pentaho-thin-app", "./state"], function(){
+});

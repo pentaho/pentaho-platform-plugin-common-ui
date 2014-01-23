@@ -15,14 +15,11 @@
 *
 */
 
-dojo.provide("pentaho.common.DisclosurePanel");
-
-dojo.require("dijit.TitlePane");
-
-dojo.declare("pentaho.common.DisclosurePanel",
-	dijit.TitlePane,
-	{
-        templateString: dojo.cache("pentaho.common", "DisclosurePanel.html"),
+define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on", "dojo/query", "dijit/TitlePane", "dojo/text!pentaho/common/DisclosurePanel.html"],
+    function(declare, _WidgetBase, _Templated, on, query, TitlePane, templateStr){
+      return declare("pentaho.common.DisclosurePanel" ,[dijit.TitlePane],
+	    {
+        templateString: templateStr,
 
         baseClass: "",
         
@@ -45,6 +42,6 @@ dojo.declare("pentaho.common.DisclosurePanel",
             
         }
     
-    }
-);
+      });
+    });
 

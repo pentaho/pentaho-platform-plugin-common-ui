@@ -1,118 +1,114 @@
 /*!
-* Copyright 2010 - 2013 Pentaho Corporation.  All rights reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*
-*/
+ * Copyright 2010 - 2013 Pentaho Corporation.  All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on", "dojo/query", 'pentaho/common/button'
+  , 'pentaho/common/Dialog', "dojo/dom-class", "dojo/_base/lang", 'dojo/text!pentaho/common/TemplatePicker.html'],
+    function (declare, _WidgetBase, _Templated, on, query, button, Dialog, domClass, lang, templateStr) {
+      return declare("pentaho.common.TemplatePicker",
+          [Dialog],
+          {
+            buttons: [],
 
-dojo.provide('pentaho.common.TemplatePicker');
-dojo.require('dijit._Widget');
-dojo.require('dijit._Templated');
-dojo.require('pentaho.common.button');
-dojo.require('pentaho.common.Dialog');
-dojo.declare(
-     'pentaho.common.TemplatePicker',
-     [pentaho.common.Dialog],
-     {
-        buttons: [],
-        
-        templates: [],
-        
-        pageNo: 0,
-        
-        hasTitleBar: false,
+            templates: [],
 
-        hasBorder: false,
-        
-        templateSelectedCallback: null,
-        
-        updatePageArrows: function() {
-            this.prevSetBtn.set('disabled',this.pageNo == 0);
-            this.nextSetBtn.set('disabled',(this.pageNo+1)*6>=this.templates.length);
-        },
-        
-        setTemplates: function(templates) {
-            this.templates = templates;
-            this.showPage();
-            this.updatePageArrows();
-        },
-        
-        showPage: function() {
-            var start = this.pageNo * 6;
-            for(var idx=0; idx<6; idx++) {
-            
-                if(idx+start < this.templates.length) {
-                    this['templateImg'+idx].src = this.templates[idx+start].imagePath;
-                    this['templateName'+idx].innerHTML = this.templates[idx+start].name;
-                    dojo.removeClass(this['templateImg'+idx], 'hidden');
-                    dojo.addClass(this['templateName'+idx], 'fade');
+            pageNo: 0,
+
+            hasTitleBar: false,
+
+            hasBorder: false,
+
+            templateSelectedCallback: null,
+
+            updatePageArrows: function () {
+              this.prevSetBtn.set('disabled', this.pageNo == 0);
+              this.nextSetBtn.set('disabled', (this.pageNo + 1) * 6 >= this.templates.length);
+            },
+
+            setTemplates: function (templates) {
+              this.templates = templates;
+              this.showPage();
+              this.updatePageArrows();
+            },
+
+            showPage: function () {
+              var start = this.pageNo * 6;
+              for (var idx = 0; idx < 6; idx++) {
+
+                if (idx + start < this.templates.length) {
+                  this['templateImg' + idx].src = this.templates[idx + start].imagePath;
+                  this['templateName' + idx].innerHTML = this.templates[idx + start].name;
+                  domClass.remove(this['templateImg' + idx], 'hidden');
+                  domClass.add(this['templateName' + idx], 'fade');
                 } else {
-                    dojo.addClass(this['templateImg'+idx], 'hidden');
-                    dojo.removeClass(this['templateName'+idx], 'fade');
-                    this['templateName'+idx].innerHTML = '';
+                  domClass.add(this['templateImg' + idx], 'hidden');
+                  domClass.remove(this['templateName' + idx], 'fade');
+                  this['templateName' + idx].innerHTML = '';
                 }
-            }
-            this.updatePageArrows();
-        },
-                
-        templatePath: dojo.moduleUrl('pentaho.common', 'TemplatePicker.html'),
-      
-        postCreate: function() {
-            this.inherited(arguments);
-            this.closeBtn.callback = dojo.hitch(this, this.closeClick);
-            this.prevSetBtn.callback = dojo.hitch(this, this.prevPage);
-            this.nextSetBtn.callback = dojo.hitch(this, this.nextPage);
-            dojo.connect(this.templateImg0,'onclick', this, 'imgClick');
-            dojo.connect(this.templateImg1,'onclick', this, 'imgClick');
-            dojo.connect(this.templateImg2,'onclick', this, 'imgClick');
-            dojo.connect(this.templateImg3,'onclick', this, 'imgClick');
-            dojo.connect(this.templateImg4,'onclick', this, 'imgClick');
-            dojo.connect(this.templateImg5,'onclick', this, 'imgClick');
-            dojo.connect(this.templateName0,'onclick', this, 'imgClick');
-            dojo.connect(this.templateName1,'onclick', this, 'imgClick');
-            dojo.connect(this.templateName2,'onclick', this, 'imgClick');
-            dojo.connect(this.templateName3,'onclick', this, 'imgClick');
-            dojo.connect(this.templateName4,'onclick', this, 'imgClick');
-            dojo.connect(this.templateName5,'onclick', this, 'imgClick');
-        },
-       
-        imgClick: function(event) {
-            var idx = parseInt(dojo.attr(event.target, 'idx'));
-            var idx = this.pageNo * 6 + idx;
-            if(this.templateSelectedCallback) {
+              }
+              this.updatePageArrows();
+            },
+
+            templateString: templateStr,
+
+            postCreate: function () {
+              this.inherited(arguments);
+              this.closeBtn.callback = lang.hitch(this, this.closeClick);
+              this.prevSetBtn.callback = lang.hitch(this, this.prevPage);
+              this.nextSetBtn.callback = lang.hitch(this, this.nextPage);
+              on(this.templateImg0, 'click', lang.hitch(this, 'imgClick'));
+              on(this.templateImg1, 'click', lang.hitch(this, 'imgClick'));
+              on(this.templateImg2, 'click', lang.hitch(this, 'imgClick'));
+              on(this.templateImg3, 'click', lang.hitch(this, 'imgClick'));
+              on(this.templateImg4, 'click', lang.hitch(this, 'imgClick'));
+              on(this.templateImg5, 'click', lang.hitch(this, 'imgClick'));
+              on(this.templateName0, 'click',lang.hitch( this, 'imgClick'));
+              on(this.templateName1, 'click',lang.hitch( this, 'imgClick'));
+              on(this.templateName2, 'click',lang.hitch( this, 'imgClick'));
+              on(this.templateName3, 'click',lang.hitch( this, 'imgClick'));
+              on(this.templateName4, 'click',lang.hitch( this, 'imgClick'));
+              on(this.templateName5, 'click',lang.hitch( this, 'imgClick'));
+            },
+
+            imgClick: function (event) {
+              var idx = parseInt(dojo.attr(event.target, 'idx'));
+              var idx = this.pageNo * 6 + idx;
+              if (this.templateSelectedCallback) {
                 this.templateSelectedCallback(idx);
-            }
-        },
-       
-        closeClick: function() {
-            this.buttonClick(0);
-        },
-       
-        prevPage: function() {
-            if(this.pageNo == 0) {
+              }
+            },
+
+            closeClick: function () {
+              this.buttonClick(0);
+            },
+
+            prevPage: function () {
+              if (this.pageNo == 0) {
                 return;
-            }
-            this.pageNo--;
-            this.showPage();
-        },
-       
-        nextPage: function() {
-            if((this.pageNo+1)*6>=this.templates.length) {
+              }
+              this.pageNo--;
+              this.showPage();
+            },
+
+            nextPage: function () {
+              if ((this.pageNo + 1) * 6 >= this.templates.length) {
                 return;
+              }
+              this.pageNo++;
+              this.showPage();
             }
-            this.pageNo++;
-            this.showPage();
-        }
-       
-    }
-);
+
+          });
+    });

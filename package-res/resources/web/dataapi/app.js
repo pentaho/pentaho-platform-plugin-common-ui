@@ -16,6 +16,8 @@
 */
 
 /* EventTarget from N Zakas Professsional Javascript book */
+define(['common-data/oop'], function(_oop){
+
 
 function EventTarget(){
     this.handlers = {};    
@@ -140,3 +142,6 @@ pentaho.app.prototype.getModuleData = function() {
 		return data;		
 	}
 }
+
+  return pentaho.app;
+});

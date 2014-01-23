@@ -46,12 +46,13 @@
 */
 
  pen.define([
- 	"common-ui/util/PentahoSpinner", 
+ 	"common-ui/util/PentahoSpinner",
+     "common-ui/util/spin.min",
  	"common-ui/util/ContextProvider",
  	"common-ui/util/HandlebarsCompiler",
  	"common-ui/bootstrap"
 
- ], function(spinConfigs, ContextProvider, HandlebarsCompiler) {	
+ ], function(spinConfigs, Spinner, ContextProvider, HandlebarsCompiler) {
 
 	var spinner;
 

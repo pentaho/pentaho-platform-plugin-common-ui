@@ -15,7 +15,9 @@
 *
 */
 
-pen.define(['common-ui/prompting/pentaho-prompting-bind', 'common-ui/prompting/pentaho-prompting-builders', 'cdf/cdf-module'], function() {
+define(['common-ui/prompting/pentaho-prompting-bind', 'common-ui/prompting/pentaho-prompting-builders', 'cdf/cdf-module', "pentaho/common/TextButtonCombo", "dijit/registry", "dojo/on", "dojo/_base/lang",
+  "pentaho/common/Calendar","pentaho/common/DateTextBox"],
+    function(_promptBind, _promptBuilders, _cdfModule, _TextButtonCombo, registry, on, lang, Calendar, DateTextBox) {
   // Executes button.expression() in the scope of the button component (instead of the button)
   window.ScopedPentahoButtonComponent = BaseComponent.extend({
     viewReportButtonRegistered: false,
@@ -294,15 +296,14 @@ pen.define(['common-ui/prompting/pentaho-prompting-bind', 'common-ui/prompting/p
     clear: function() {
       if (this.dijitId) {
         if (this.onChangeHandle) {
-          dojo.disconnect(this.onChangeHandle);
+          this.onChangeHandle.remove();
         }
-        dijit.byId(this.dijitId).destroyRecursive();
+        registry.byId(this.dijitId).destroyRecursive();
         delete this.dijitId;
       }
     },
     update: function() {
 
-      dojo.require("pentaho.common.TextButtonCombo");
       var parameterValue = Dashboards.getParameterValue(this.parameter);
 
       var container = $('#' + this.htmlObject)
@@ -322,7 +323,7 @@ pen.define(['common-ui/prompting/pentaho-prompting-bind', 'common-ui/prompting/p
       }
 
       // override onClickCallback
-      textInputCombo.onClickCallback = dojo.hitch(this, function(currentValue){
+      textInputCombo.onClickCallback = lang.hitch(this, function(currentValue){
         try{
           var c = Dashboards.getComponentByName(this.name);
           var resultCallback = function(externalValue){
@@ -338,13 +339,13 @@ pen.define(['common-ui/prompting/pentaho-prompting-bind', 'common-ui/prompting/p
       this.dijitId = textInputComboId;
 
       // override onChangeCallback
-      textInputCombo.onChangeCallback = dojo.hitch(this, function(newValue){
+      textInputCombo.onChangeCallback = lang.hitch(this, function(newValue){
         Dashboards.processChange(this.name);
       });
     },
 
     getValue: function() {
-      return dijit.byId(this.dijitId).get('value');
+      return registry.byId(this.dijitId).get('value');
     }
   });
 
@@ -352,15 +353,14 @@ pen.define(['common-ui/prompting/pentaho-prompting-bind', 'common-ui/prompting/p
     clear: function() {
       if (this.dijitId) {
         if (this.onChangeHandle) {
-          dojo.disconnect(this.onChangeHandle);
+          this.onChangeHandle.remove();
         }
-        dijit.byId(this.dijitId).destroyRecursive();
+        registry.byId(this.dijitId).destroyRecursive();
         delete this.dijitId;
       }
     },
     update: function() {
-      dojo.require("pentaho.common.Calendar");
-      dojo.require("pentaho.common.DateTextBox");
+
       var value = this.transportFormatter.parse(Dashboards.getParameterValue(this.parameter));
       this.dijitId = this.htmlObject + '_input';
       var input = $('#' + this.htmlObject).html($('<input/>').attr('id', this.dijitId));
@@ -374,7 +374,7 @@ pen.define(['common-ui/prompting/pentaho-prompting-bind', 'common-ui/prompting/p
       }, this.dijitId);
 
       dateTextBox.set('value', value, false);
-      this.onChangeHandle = dojo.connect(dateTextBox, "onChange", function() {
+      this.onChangeHandle = on(dateTextBox, "change", function() {
         Dashboards.processChange(this.name);
       }.bind(this));
 
@@ -382,7 +382,7 @@ pen.define(['common-ui/prompting/pentaho-prompting-bind', 'common-ui/prompting/p
     },
 
     getValue: function() {
-      var date = dijit.byId(this.dijitId).get('value');
+      var date = registry.byId(this.dijitId).get('value');
       return this.transportFormatter.format(date);
     }
   });
