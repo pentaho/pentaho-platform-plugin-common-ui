@@ -14,7 +14,7 @@
 * limitations under the License.
 *
 */
-
+define("common-data/models-olap", ['common-data.Xmla','common-data/oop', 'common-data/controller'], function(Xmla){
 pentaho.pda.OlapHandler = function OlapHandler(sandbox) {
 	pentaho.pda.Handler.call(this, sandbox);
     this.type = pentaho.pda.SOURCE_TYPE_OLAP;
@@ -874,3 +874,5 @@ pentaho.pda.query.olap.prototype.getSelectionMdx = function(selection, condition
             return mdxfrag; 
         }
     }
+return pentaho.pda.OlapHandler;
+});

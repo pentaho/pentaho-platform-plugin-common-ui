@@ -14,32 +14,29 @@
 * limitations under the License.
 *
 */
+define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/_base/lang", "dojo/text!pentaho/common/button.html", "dojo/on"],
+  function(declare, _WidgetBase, _Templated, lang, templateStr, on){
+    return declare("pentaho.common.button",
+      [_WidgetBase, _Templated],
+      {
+          label : 'a button',
 
-dojo.provide('pentaho.common.button');
+          onClick: function() {
+              this.callback();
+          },
 
-// TODO support disabled mode and rollover effects
+          callback: null,
 
-dojo.declare(
-    'pentaho.common.button',
-    [dijit._Widget, dijit._Templated],
-    {
-        label : 'a button',
-          
-        onClick: function() {
-            this.callback();
-        },
-        
-        callback: null,
+          templateString: templateStr,
 
-        templatePath: dojo.moduleUrl('pentahocommon', 'button.html'),
-        
-        postMixInProperties: function() {
-            this.inherited(arguments);
-        },
-        
-        postCreate: function() {
-            this.inherited(arguments);
-            dojo.connect(this.button, "onclick", this, this.onClick);
+          postMixInProperties: function() {
+              this.inherited(arguments);
+          },
+
+          postCreate: function() {
+              this.inherited(arguments);
+              on(this.button, "click", lang.hitch( this,  this.onClick));
+          }
         }
-      }
-);
+    );
+});

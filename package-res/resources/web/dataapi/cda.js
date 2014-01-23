@@ -14,6 +14,7 @@
 * limitations under the License.
 *
 */
+define("common-data/cda", ['common-data/oop'], function(){
 
 pentaho = typeof pentaho == "undefined" ? {} : pentaho;
 pentaho.cda = {
@@ -272,3 +273,5 @@ pentaho.cda.Query.prototype = {
 	}
 
 } // end pentaho.cda.Query.prototype
+ return pentaho.cda;
+})

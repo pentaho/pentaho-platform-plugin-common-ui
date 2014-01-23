@@ -10,7 +10,7 @@
 var deps = [	
 	'common-ui/ring'
 ]
-pen.define(deps, function(ring) {
+define(deps, function(ring) {
 	
 	var PentahoPlugin;
 	
@@ -25,7 +25,7 @@ pen.define(deps, function(ring) {
 
 		// Necessary to mitigate circular dependency
 		if (!PentahoPlugin) {
-			PentahoPlugin = pen.require("common-ui/Plugin");
+			PentahoPlugin = require("common-ui/Plugin");
 		}
 		
 		if (!ring.instance(plugin, PentahoPlugin)) {

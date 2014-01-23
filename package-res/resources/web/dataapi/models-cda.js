@@ -14,7 +14,7 @@
 * limitations under the License.
 *
 */
-
+define("common-data/models-cda", ['common-data/oop', 'common-data/controller'], function(){
 pentaho.pda.CDAHandler = function CDAHandler(sandbox) {
 	pentaho.pda.Handler.call(this, sandbox);
     this.type = pentaho.pda.SOURCE_TYPE_CDA;
@@ -75,3 +75,5 @@ pentaho.pda.model.cda.prototype.discoverModelDetail = function( forceLoad ) {
 		};
 	});
 }
+return pentaho.pda.CDAHandler;
+});

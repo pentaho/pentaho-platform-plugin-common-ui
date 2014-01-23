@@ -18,7 +18,7 @@
 /*
                          pentaho.pda.SvcHandler
 */
-
+define("common-data/models-svc", ['common-data/oop', 'common-data/controller'], function(){
 pentaho.pda.SvcHandler = function svcHandler(sandbox) {
 	pentaho.pda.Handler.call(this, sandbox);
     this.type = pentaho.pda.SOURCE_TYPE_SVC;
@@ -635,3 +635,5 @@ pentaho.pda.query.svc.prototype.getFilterValueString = function( column, value, 
         }
         return '"'+value+'"';
     }
+return pentaho.pda.SvcHandler;
+});

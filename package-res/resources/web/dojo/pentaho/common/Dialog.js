@@ -14,21 +14,13 @@
 * limitations under the License.
 *
 */
-
-dojo.provide('pentaho.common.Dialog');
-dojo.require('dijit._Widget');
-dojo.require('dijit._Templated');
-dojo.require('dijit.Dialog');
-dojo.require('pentaho.common.button');
-dojo.require('pentaho.common.SmallImageButton');
-dojo.require('pentaho.common.Messages');
-dojo.declare(
-     'pentaho.common.Dialog',
-     [dijit._Widget, dijit._Templated],
+define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dijit/_WidgetsInTemplateMixin", "dojo/on", "dojo/dom", "dojo/query", "dojo/dom-construct", "dojo/dom-style", "dijit/Dialog", "pentaho/common/button", "pentaho/common/SmallImageButton", "pentaho/common/Messages", "dojo/dom-class",
+   "dojo/_base/lang"],
+    function(declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, on, dom, query, construct, style, Dialog, Button, SmallImageButton, Messages, domClass, lang){
+      return declare("pentaho.common.Dialog",[_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],
      {
         popup : null,
         title: "",
-        widgetsInTemplate: true,
         getLocaleString: pentaho.common.Messages.getString,
         callbacks: [],
         shown: false,
@@ -58,14 +50,14 @@ dojo.declare(
         _localize: function() {
             if(this.getLocaleString) {
                 for(var i=0; i<this.buttons.length; i++) {
-                    var button = dojo.query("button"+i, this.popup.domNode);
+                    var button = query("button"+i, this.popup.domNode);
                     this.buttons[i] = this.getLocaleString(this.buttons[i]);
                     if(button) {
                         button.innerHTML = this.getLocaleString();
                     }
                 }
                 if (this.hasCloseIcon) {
-                  dojo.attr(this.closeIcon.domNode, "title", this.getLocaleString('CloseIcon_title'));
+                  this.closeIcon.domNode.setAttribute("title", this.getLocaleString('CloseIcon_title'));
                 }
             }
         },
@@ -80,10 +72,10 @@ dojo.declare(
           },
           
           _createButtonPanel: function() {
-              this.buttonPanel = dojo.create("TABLE");
-              dojo.style(this.buttonPanel, "width", "100%");
-              dojo.place(this.buttonPanel, this.popup.domNode);
-              dojo.addClass(this.buttonPanel, 'button-panel');
+              this.buttonPanel = construct.create("TABLE");
+              style.set(this.buttonPanel, "width", "100%");
+              construct.place(this.buttonPanel, this.popup.domNode);
+              domClass.add(this.buttonPanel, 'button-panel');
           },
           
           _createButtons: function() {
@@ -92,22 +84,22 @@ dojo.declare(
         	  }
               var row = this.buttonPanel.insertRow(-1);
               var cell = row.insertCell(-1);
-              dojo.style(cell, "align", "right");
-              dojo.style(cell, "width", "100%");        	  
+              style.set(cell, "align", "right");
+              style.set(cell, "width", "100%");
                 for(var j=0; j<this.buttons.length; j++) {
                     cell = row.insertCell(-1);
-                    dojo.style(cell, "align", "right");
+                    style.set(cell, "align", "right");
                     var btn = document.createElement("BUTTON");
-                    dojo.addClass(btn, "pentaho-button");
+                    domClass.add(btn, "pentaho-button");
                     dojo.attr(btn, "id", "button"+j);
                     btn.innerHTML = this.buttons[j];
                     cell.appendChild(btn);
-                    btn.onclick = dojo.hitch(this, this.buttonClick, j);
+                    btn.onclick = lang.hitch(this, this.buttonClick, j);
                 }
           },
           
           setButtonEnabled: function(/*int*/ buttonIndex, /*boolean*/ enabled) {
-            var btn = dojo.byId("button" + buttonIndex);
+            var btn = dom.byId("button" + buttonIndex);
             if(typeof(btn) != 'undefined' && btn != null) {
                 if(typeof(btn.set) != 'undefined') {
                   btn.set('disabled', !enabled);
@@ -124,44 +116,45 @@ dojo.declare(
                this.inherited(arguments);
                
                if(!this.hasTitleBar) {
-                    dojo.addClass(dojo.query('.dijitDialogTitleBar',this.popup.domNode)[0],'hidden');
+                    domClass.add(query('.dijitDialogTitleBar',this.popup.domNode)[0],'hidden');
                 }
                 if(this.hasBorder) {
-                    dojo.addClass(this.popup.domNode,'pentaho-dialog');
+                    domClass.add(this.popup.domNode,'pentaho-dialog');
                 }
                 if(this.hasCloseIcon) {
                   this.closeIcon = new pentaho.common.SmallImageButton({"baseClass": "pentaho-closebutton"});
-                  dojo.addClass(this.closeIcon.domNode, "pentahoDialogCloseIcon");
-                  dojo.place(this.closeIcon.domNode,
-                    dojo.query('.dijitDialogTitleBar',this.popup.domNode)[0]);
-                  this.closeIcon.callback = dojo.hitch(this, this.onCancel);
+                  domClass.add(this.closeIcon.domNode, "pentahoDialogCloseIcon");
+                  construct.place(this.closeIcon.domNode,
+                    query('.dijitDialogTitleBar',this.popup.domNode)[0]);
+                  this.closeIcon.callback = lang.hitch(this, this.onCancel);
                 }
                 
-                dojo.addClass(dojo.query('.dijitDialogTitleBar',this.popup.domNode)[0],'Caption');
-                dojo.connect(this.domNode,'onKeyPress', this, this.keyUp);
-                dojo.connect(this.popup.domNode,'onKeyPress', this, this.keyUp);
-                dojo.connect(this.domNode, "onkeyup", this, this.keyup);
+                domClass.add(query('.dijitDialogTitleBar',this.popup.domNode)[0],'Caption');
+                on(this.domNode, 'onKeyPress', lang.hitch( this,  this.keyUp));
+                on(this.popup.domNode, 'onKeyPress', lang.hitch( this,  this.keyUp));
+
+                on(this.popup, "Hide", lang.hitch( this,  this.keyup));
                 
-                this.onKeyUp = dojo.hitch(this, this.keyup);
-                dojo.connect(this.domNode, 'onKeyUp', this, this.keyup);
-                dojo.connect(this.popup, 'onKeyUp', this, this.keyup);
-                dojo.connect(this.popup.domNode, 'onKeyUp', this, this.keyup);
+                this.onKeyUp = lang.hitch(this, this.keyup);
+                on(this.domNode,  'onKeyUp', lang.hitch( this,  this.keyup));
+                on(this.popup,  'onKeyUp', lang.hitch( this,  this.keyup));
+                on(this.popup.domNode,  'onKeyUp', lang.hitch( this,  this.keyup));
                 
-                this.popup.onCancel = dojo.hitch(this, function(){});
-                this.popup.onExecute = dojo.hitch(this, this.okClick);
+                this.popup.onCancel = lang.hitch(this, function(){});
+                this.popup.onExecute = lang.hitch(this, this.okClick);
                 this._localize();
 
-                dojo.connect(this.popup, "onHide", dojo.hitch(this, "onHide"));
+                on(this.popup, "Hide", lang.hitch( lang.hitch(this,  "onHide")));
            },
            
            keyup: function(event) {
-               dojo.stopEvent(event);
-                if(event.keyCode == dojo.keys.ENTER) {
+               event.stop(event);
+                if(event.keyCode == keys.ENTER) {
                     if(this.execute) {
                         this.execute();
                     }
                 }
-                if(event.keyCode == dojo.keys.ESCAPE) {
+                if(event.keyCode == keys.ESCAPE) {
                     if(this.onCancel) {
                         this.onCancel();
                     }
@@ -176,31 +169,31 @@ dojo.declare(
            show: function(){
                this.domNode.style.display='';
                this.popup.set('title',this.title);
-                dojo.style(this.popup.domNode, 'display', 'none');
+                style.set(this.popup.domNode, 'display', 'none');
                 if(this.templateBased) {
                     if(!this.shown) {
-                        this.width = ''+dojo.style(this.domNode,'width')+'px';
-                        if (dojo.style(this.domNode, 'display') === 'block') {
-                          this.width = (dojo.style(this.domNode,'width') +
-                                        dojo.style(this.domNode, 'paddingLeft') +
-                                        dojo.style(this.domNode, 'paddingRight') +
-                                        dojo.style(this.domNode, 'borderLeftWidth') +
-                                        dojo.style(this.domNode, 'borderRightWidth')) +'px';
+                        this.width = ''+style.get(this.domNode,'width')+'px';
+                        if (style.get(this.domNode, 'display') === 'block') {
+                          this.width = (style.get(this.domNode,'width') +
+                                        style.get(this.domNode, 'paddingLeft') +
+                                        style.get(this.domNode, 'paddingRight') +
+                                        style.get(this.domNode, 'borderLeftWidth') +
+                                        style.get(this.domNode, 'borderRightWidth')) +'px';
                         }
-                        dojo.style(this.popup.domNode, 'width', this.width);
-                        dojo.style(dojo.query('.dijitDialogPaneContent',this.popup.domNode),'width', this.width);
-                        dojo.style(dojo.query('.dijitDialogPaneContent',this.domNode),'width', this.width);
+                        style.set(this.popup.domNode, 'width', this.width);
+                        style.set(query('.dijitDialogPaneContent',this.popup.domNode),'width', this.width);
+                        style.set(query('.dijitDialogPaneContent',this.domNode),'width', this.width);
                     }
                 } else {
                     if(!this.shown) {
-                        dojo.style(this.domNode, 'width', this.width);
-                        dojo.style(this.popup.domNode, 'width', this.width);
-                        dojo.style(dojo.query('.dijitDialogPaneContent',this.popup.domNode),'width', this.width);
-                        dojo.style(dojo.query('.dijitDialogPaneContent',this.domNode),'width', this.width);
-                        dojo.style(this.domNode, 'height', this.height);
-                        dojo.style(this.popup.domNode, 'height', this.height);
-                        dojo.style(dojo.query('.dijitDialogPaneContent',this.popup.domNode),'height', this.height);
-                        dojo.style(dojo.query('.dijitDialogPaneContent',this.domNode),'height', this.height);
+                        style.set(this.domNode, 'width', this.width);
+                        style.set(this.popup.domNode, 'width', this.width);
+                        style.set(query('.dijitDialogPaneContent',this.popup.domNode),'width', this.width);
+                        style.set(query('.dijitDialogPaneContent',this.domNode),'width', this.width);
+                        style.set(this.domNode, 'height', this.height);
+                        style.set(this.popup.domNode, 'height', this.height);
+                        style.set(query('.dijitDialogPaneContent',this.popup.domNode),'height', this.height);
+                        style.set(query('.dijitDialogPaneContent',this.domNode),'height', this.height);
                     }
                 }
                 
@@ -222,7 +215,7 @@ dojo.declare(
             
             destroyRecursive: function() {
               this.popup.destroyRecursive();
-              dojo.empty(this.domNode);
+              construct.empty(this.domNode);
             },
 
             buildRendering: function(){ 
@@ -245,22 +238,22 @@ dojo.declare(
 
             if(!this.templatePath && this.templateString == '<div></div>') {
                 this.templateBased = false;
-                this.width = ''+dojo.style(source, 'width')+'px';
-                this.height = ''+dojo.style(source, 'height')+'px';
-                if(dojo.hasClass(source, 'hidden' )) {
-                    dojo.removeClass(source,'hidden');
+                this.width = ''+style.get(source, 'width')+'px';
+                this.height = ''+style.get(source, 'height')+'px';
+                if(domClass.contains(source, 'hidden' )) {
+                    domClass.remove(source,'hidden');
                 }
 //                this.templateString = source.innerHTML;
                 this._attachTemplateNodes(source);
                 this.source = source;
 //                this.popup = new dijit.Dialog();
-                this.popup = new dijit.Dialog({title: this.title, content: this.source.innerHTML});
-                dojo.addClass(this.popup.domNode,'pentaho-dialog');
-                dojo.removeClass(this.popup.domNode,'hidden');
-                dojo.addClass(dojo.query('.dijitDialogTitleBar',this.popup.domNode)[0],'Caption');
+                this.popup = new Dialog({title: this.title, content: this.source.innerHTML});
+                domClass.add(this.popup.domNode,'pentaho-dialog');
+                domClass.remove(this.popup.domNode,'hidden');
+                domClass.add(query('.dijitDialogTitleBar',this.popup.domNode)[0],'Caption');
             } else {
                 this.templateBased = true;
-                this.popup = new dijit.Dialog();
+                this.popup = new Dialog();
 //                this.popup.attr("content", this.domNode);
             }
             this.inherited(arguments);            
@@ -287,4 +280,5 @@ dojo.declare(
     onHide: function() {
       // Callback when popup.onHide() is called
     }
+  });
 });

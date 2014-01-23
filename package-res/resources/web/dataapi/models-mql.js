@@ -18,7 +18,7 @@
 /*
  pentaho.pda.MqlHandler
  */
-
+define("common-data/models-mql", ['common-data/oop', 'common-data/controller', 'common-repo/pentaho-ajax'], function(){
 pentaho.pda.MqlHandler = function mqlHandler(sandbox) {
   pentaho.pda.Handler.call(this, sandbox);
   this.type = pentaho.pda.SOURCE_TYPE_MQL;
@@ -993,3 +993,5 @@ pentaho.pda.query.mql.prototype.getFilterValueString = function( column, value, 
   }
   return '"'+value+'"';
 }
+  return pentaho.pda.MqlHandler;
+})

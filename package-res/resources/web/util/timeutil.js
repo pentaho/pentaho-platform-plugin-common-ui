@@ -19,7 +19,7 @@
  * Timezone Utility to generate a timezone offset string from a given timezone.
  */
 
-pen.define(function() {
+define("common-ui/util/timeutil", [], function() {
   return {
     offsets: {
       "ACT": 570,

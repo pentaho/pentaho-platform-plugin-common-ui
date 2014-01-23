@@ -5,17 +5,17 @@
                 <table cellspacing="0" cellpadding="0" role="grid" dojoAttachEvent="onkeypress: _onKeyPress" aria-labelledby="${id}_year" >
                     <thead>
                         <tr class="" valign="top">
-                            <th class='dijitReset' dojoAttachPoint="decrementMonth">
-                                <div dojoAttachPoint="decreaseArrowNode" dojoType="pentaho.common.SmallImageButton" baseClass="pentaho-pagebackbutton">
+                            <th class='dijitReset' data-dojo-attach-point="decrementMonth">
+                                <div data-dojo-attach-point="decreaseArrowNode" data-dojo-type="pentaho.common.SmallImageButton" baseClass="pentaho-pagebackbutton">
                                 </div>
                             </th>
                             <th class='dijitReset' colspan="5">
-                                <div dojoType="pentaho.common.DropDownButton" dojoAttachPoint="monthDropDownButton"
+                                <div data-dojo-type="pentaho.common.DropDownButton" data-dojo-attach-point="monthDropDownButton"
                                     id="${id}_mddb" tabIndex="-1">
                                 </div>
                             </th>
-                            <th class='dijitReset' dojoAttachPoint="incrementMonth">
-                                <div dojoAttachPoint="increaseArrowNode" dojoType="pentaho.common.SmallImageButton" baseClass="pentaho-pagenextbutton">
+                            <th class='dijitReset' data-dojo-attach-point="incrementMonth">
+                                <div data-dojo-attach-point="increaseArrowNode" data-dojo-type="pentaho.common.SmallImageButton" baseClass="pentaho-pagenextbutton">
                                 </div>                            
                             </th>
                         </tr>
@@ -35,20 +35,20 @@
                                     <table>
                                         <tr>
                                             <td>
-                                                <div dojoAttachPoint="previousYearBtn" dojoType="pentaho.common.SmallImageButton" baseClass="pentaho-pagebackbutton">
+                                                <div data-dojo-attach-point="previousYearBtn" data-dojo-type="pentaho.common.SmallImageButton" baseClass="pentaho-pagebackbutton">
                                                 </div>
                                             </td>
                                             <td>
-                                                <span dojoAttachPoint="currentYearLabelNode" class="label" id="${id}_year"></span>
+                                                <span data-dojo-attach-point="currentYearLabelNode" class="label" id="${id}_year"></span>
                                             </td>
                                             <td>
-                                                <div dojoAttachPoint="nextYearBtn" dojoType="pentaho.common.SmallImageButton" baseClass="pentaho-pagenextbutton">
+                                                <div data-dojo-attach-point="nextYearBtn" data-dojo-type="pentaho.common.SmallImageButton" baseClass="pentaho-pagenextbutton">
                                                 </div>
                                             </td>
                                         </tr>
                                     </table>
-                                    <span dojoAttachPoint="nextYearLabelNode" class="dijitInline dijitCalendarNextYear" style="display:none"></span>
-                                    <span dojoAttachPoint="previousYearLabelNode" class="dijitInline dijitCalendarNextYear" style="display:none"></span>
+                                    <span data-dojo-attach-point="nextYearLabelNode" class="dijitInline dijitCalendarNextYear" style="display:none"></span>
+                                    <span data-dojo-attach-point="previousYearLabelNode" class="dijitInline dijitCalendarNextYear" style="display:none"></span>
                                 </center>
                             </td>
                         </tr>

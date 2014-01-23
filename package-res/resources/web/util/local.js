@@ -5,7 +5,7 @@
 *
 * Licensed under the Apache License 2.0 (http://www.apache.org/licenses/LICENSE-2.0.txt)
 *
-* This is a slight modification from the one found on Github. We use pen.define here (instead of define) so it can be
+* This is a slight modification from the one found on Github. We use define here (instead of define) so it can be
 * used outside of our build process.
 */
 
@@ -13,7 +13,7 @@
 
 /*global require: false, define: false */
 
-define(function () {
+define( [], function () {
   var local, addCallback, invokeCallbacks, isDefined, registerLocal,
     defined = {}, required = {};
 
@@ -92,7 +92,10 @@ define(function () {
       var module;
       // Only allow a local module to be defined once
       if (isDefined(name)) {
-        throw "local module is already defined: " + name;
+        if(typeof console !== "undefined"){
+          console.warn("local module is already defined: " + name);
+        }
+        return;
       }
 
       // Evaluate the function to get the module's value

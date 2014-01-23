@@ -15,28 +15,29 @@
 *
 */
 
-dojo.provide("pentaho.common.CheckedMenuItem");
 
-dojo.declare("pentaho.common.CheckedMenuItem",
-    dijit.CheckedMenuItem,
-    {
+define(["dojo/_base/declare", "dijit/CheckedMenuItem","dojo/text!pentaho/common/CheckedMenuItem.html","dojo/dom-class"],
+  function(declare, CheckedMenuItem, templateStr, domClass){
+    return declare("pentaho.common.CheckedMenuItem",[CheckedMenuItem],
+      {
 
-		templateString: dojo.cache("pentaho.common", "CheckedMenuItem.html"),
+        templateString: templateStr,
 
-		_setCheckedAttr: function(/*Boolean*/ checked){
-			// summary:
-			//		Hook so attr('checked', bool) works.
-			//		Sets the class and state for the check box.
-            dojo.toggleClass(this.iconNode, "menuitem-checked", checked); 
-			dijit.setWaiState(this.domNode, "checked", checked);
-			this._set("checked", checked);
-		},
+        _setCheckedAttr: function(/*Boolean*/ checked){
+          // summary:
+          //		Hook so attr('checked', bool) works.
+          //		Sets the class and state for the check box.
+          domClass.toggle(this.iconNode, "menuitem-checked", checked);
+          this.domNode.setAttribute("checked", checked);
+          this._set("checked", checked);
+        },
 
-		_setSelected: function(selected){
-            if(!this.disabled) { 
-                dojo.toggleClass(this.domNode, "pentaho-menuitem-hover", selected);
+        _setSelected: function(selected){
+            if(!this.disabled) {
+                domClass.toggle(this.domNode, "pentaho-menuitem-hover", selected);
             }
         }
 
-    }
-);
+      }
+    );
+  });

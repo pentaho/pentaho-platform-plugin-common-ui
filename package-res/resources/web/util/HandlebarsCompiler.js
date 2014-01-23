@@ -15,7 +15,7 @@
 *
 */
 
- pen.define([
+ define("common-ui/util/HandlebarsCompiler", [
  	"common-ui/handlebars", 
  	"common-ui/jquery"
  ], function() {

@@ -27,7 +27,7 @@ var deps = [
 	'common-ui/angular-route'
 ];
 
-pen.define(deps, function(PentahoPlugin, PentahoPluginHandler, ring, angular) {
+define(deps, function(PentahoPlugin, PentahoPluginHandler, ring, angular) {
 
 	var AngularPluginHandler = ring.create([PentahoPluginHandler], {
 

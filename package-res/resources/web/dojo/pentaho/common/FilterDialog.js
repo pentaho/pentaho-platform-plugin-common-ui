@@ -14,20 +14,17 @@
 * limitations under the License.
 *
 */
-
-dojo.provide("pentaho.common.FilterDialog");
-dojo.require("dijit._Widget");
-dojo.require("dijit._Templated");
-dojo.require("pentaho.common.Calendar");
-dojo.require("pentaho.common.DateTextBox");
-dojo.require('pentaho.common.Dialog');
-dojo.require('pentaho.common.MessageBox');
-dojo.declare(
-    "pentaho.common.FilterDialog",
-     [pentaho.common.Dialog],
+define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dijit/_WidgetsInTemplateMixin", "dojo/dom-construct", "dojo/on", "dojo/query", "dojo/_base/lang", "dojo/dom-class", "dojo/_base/array",
+  "pentaho/common/Calendar",
+  "pentaho/common/DateTextBox",
+  'pentaho/common/Dialog',
+  'pentaho/common/MessageBox', "dojo/text!pentaho/common/FilterDialog.html", "pentaho/common/Messages", "dojo/date/stamp",
+"dijit/form/MultiSelect"],
+    function(declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, construct, on, query, lang, domClass, array, Calendar, DateTextBox, Dialog, MessageBox, templateStr, Messages, stamp,
+             MultiSelect){
+      return declare("pentaho.common.FilterDialog",[Dialog,_TemplatedMixin, _WidgetsInTemplateMixin],
 {
-  templatePath: dojo.moduleUrl('pentaho.common', 'FilterDialog.html'),
-  widgetsInTemplate: true,
+  templateString: templateStr,
   filterType: "PICKLIST",
   currentFilter: null,
   hasCloseIcon: true,
@@ -56,22 +53,22 @@ dojo.declare(
 
   postCreate: function() {
     this.inherited(arguments);
-    pentaho.common.Messages.addUrlBundle('pentaho.common',CONTEXT_PATH+'i18n?plugin=common-ui&name=resources/web/dojo/pentaho/common/nls/messages');
+    Messages.addUrlBundle('pentaho.common',CONTEXT_PATH+'i18n?plugin=common-ui&name=resources/web/dojo/pentaho/common/nls/messages');
     // Capture all attempts to close the dialog and redirect them
-    dojo.connect(this.typePicklistCombinationTypeLinksIncludeLink, "onclick", this, function() {
+    on(this.typePicklistCombinationTypeLinksIncludeLink, "click", this, function() {
       this._setPicklistCombinationTypeLink(pentaho.pda.Column.OPERATOR_TYPES.AND);
     });
-    dojo.connect(this.typePicklistCombinationTypeLinksExcludeLink, "onclick", this, function() {
+    on(this.typePicklistCombinationTypeLinksExcludeLink, "click", this, function() {
       this._setPicklistCombinationTypeLink(pentaho.pda.Column.OPERATOR_TYPES.AND_NOT);
     });
     
-    dojo.attr(this.picklistCombinationTypeIncludeOption, "value", pentaho.pda.Column.OPERATOR_TYPES.AND);
-    dojo.attr(this.picklistCombinationTypeExcludeOption, "value", pentaho.pda.Column.OPERATOR_TYPES.AND_NOT);
+    this.picklistCombinationTypeIncludeOption.setAttribute("value", pentaho.pda.Column.OPERATOR_TYPES.AND);
+    this.picklistCombinationTypeExcludeOption.setAttribute("value", pentaho.pda.Column.OPERATOR_TYPES.AND_NOT);
     
-    this.callbacks = [dojo.hitch(this, this.save), dojo.hitch(this, this.cancel)];
+    this.callbacks = [lang.hitch(this, this.save), lang.hitch(this, this.cancel)];
 
     this.errorDialog.setButtons([this.getLocaleString('Ok_txt')]);
-    this.errorDialog.callbacks = [dojo.hitch(this, function() {
+    this.errorDialog.callbacks = [lang.hitch(this, function() {
       this.errorDialog.hide();
     })];
   },
@@ -128,7 +125,7 @@ dojo.declare(
 
     this.configureFilterTypesFor(this.currentColumn.dataType);
     
-    if (this.currentColumn.dataType === pentaho.pda.Column.DATA_TYPES.STRING && (this.currentFilter.combinationType != pentaho.pda.Column.OPERATOR_TYPES.AND || (dojo.isArray(this.currentFilter.value) && this.currentFilter.value.length > 1))) {
+    if (this.currentColumn.dataType === pentaho.pda.Column.DATA_TYPES.STRING && (this.currentFilter.combinationType != pentaho.pda.Column.OPERATOR_TYPES.AND || (this.currentFilter.value instanceof Array && this.currentFilter.value.length > 1))) {
       this.setFilterType("PICKLIST");
     } else {
       this.setFilterType("MATCH");
@@ -180,12 +177,12 @@ dojo.declare(
   
   enableFieldSelection: function(enable) {
     if(enable) {
-        dojo.removeClass(this.fieldPicklistContainer, "filterDialogHidden");
+        domClass.remove(this.fieldPicklistContainer, "filterDialogHidden");
         this.configureFilterTypesFor(null);
         this.setFilterType(null);
         this.title = this.getLocaleString("FilterDialogTitle");
     } else {
-        dojo.addClass(this.fieldPicklistContainer, "filterDialogHidden");
+        domClass.add(this.fieldPicklistContainer, "filterDialogHidden");
     }
   },
   
@@ -225,61 +222,61 @@ dojo.declare(
     // Hide options not applicable for this data type
     switch (dataType) {
       case null:
-        dojo.addClass(this.typePicklistContainer, "filterDialogHidden");
-        dojo.addClass(this.typeMatchContainer, "filterDialogHidden");
-        dojo.addClass(this.typeDateRangeContainer, "filterDialogHidden");
+        domClass.add(this.typePicklistContainer, "filterDialogHidden");
+        domClass.add(this.typeMatchContainer, "filterDialogHidden");
+        domClass.add(this.typeDateRangeContainer, "filterDialogHidden");
         break;
       case pentaho.pda.Column.DATA_TYPES.UNKNOWN:
       case pentaho.pda.Column.DATA_TYPES.STRING:
-        dojo.removeClass(this.typePicklistContainer, "filterDialogHidden");
-        dojo.removeClass(this.typeMatchContainer, "filterDialogHidden");
-        dojo.addClass(this.typeDateRangeContainer, "filterDialogHidden");
+        domClass.remove(this.typePicklistContainer, "filterDialogHidden");
+        domClass.remove(this.typeMatchContainer, "filterDialogHidden");
+        domClass.add(this.typeDateRangeContainer, "filterDialogHidden");
         break;
       case pentaho.pda.Column.DATA_TYPES.NUMERIC:
       case pentaho.pda.Column.DATA_TYPES.DATE:
-        dojo.addClass(this.typePicklistContainer, "filterDialogHidden");
-        dojo.removeClass(this.typeMatchContainer, "filterDialogHidden");
-        dojo.addClass(this.typeDateRangeContainer, "filterDialogHidden");
+        domClass.add(this.typePicklistContainer, "filterDialogHidden");
+        domClass.remove(this.typeMatchContainer, "filterDialogHidden");
+        domClass.add(this.typeDateRangeContainer, "filterDialogHidden");
         break;
       case pentaho.pda.Column.DATA_TYPES.BOOLEAN:
-        dojo.addClass(this.typePicklistContainer, "filterDialogHidden");
-        dojo.addClass(this.typeMatchContainer, "filterDialogHidden");
-        dojo.addClass(this.typeDateRangeContainer, "filterDialogHidden");
+        domClass.add(this.typePicklistContainer, "filterDialogHidden");
+        domClass.add(this.typeMatchContainer, "filterDialogHidden");
+        domClass.add(this.typeDateRangeContainer, "filterDialogHidden");
         break;
       default:
         this.showErrorDialog(this.getLocaleString('filterDialogUnknownDataType') + dataType);
-        dojo.addClass(this.typePicklistContainer, "filterDialogHidden");
-        dojo.addClass(this.typeMatchContainer, "filterDialogHidden");
-        dojo.addClass(this.typeDateRangeContainer, "filterDialogHidden");
+        domClass.add(this.typePicklistContainer, "filterDialogHidden");
+        domClass.add(this.typeMatchContainer, "filterDialogHidden");
+        domClass.add(this.typeDateRangeContainer, "filterDialogHidden");
     }
   },
 
   setFilterType: function(type) {
     switch (type) {
       case null:
-        dojo.addClass(this.picklistContainer, "filterDialogHidden");
-        dojo.addClass(this.matchContainer, "filterDialogHidden");
-        dojo.addClass(this.dateRangeContainer, "filterDialogHidden");
+        domClass.add(this.picklistContainer, "filterDialogHidden");
+        domClass.add(this.matchContainer, "filterDialogHidden");
+        domClass.add(this.dateRangeContainer, "filterDialogHidden");
         break;
       case "PICKLIST":
         dojo.attr(this.typePicklistInput, "checked", true);
-        dojo.removeClass(this.picklistContainer, "filterDialogHidden");
-        dojo.addClass(this.matchContainer, "filterDialogHidden");
-        dojo.addClass(this.dateRangeContainer, "filterDialogHidden");
+        domClass.remove(this.picklistContainer, "filterDialogHidden");
+        domClass.add(this.matchContainer, "filterDialogHidden");
+        domClass.add(this.dateRangeContainer, "filterDialogHidden");
         this._configurePicklistContainer();
         break;
       case "MATCH":
         dojo.attr(this.typeMatchInput, "checked", true);
-        dojo.addClass(this.picklistContainer, "filterDialogHidden");
-        dojo.removeClass(this.matchContainer, "filterDialogHidden");
-        dojo.addClass(this.dateRangeContainer, "filterDialogHidden");
+        domClass.add(this.picklistContainer, "filterDialogHidden");
+        domClass.remove(this.matchContainer, "filterDialogHidden");
+        domClass.add(this.dateRangeContainer, "filterDialogHidden");
         this._configureMatchContainer();
         break;
 //      case "DATERANGE":
 //        dojo.attr(this.typeDateInput, "checked", true);
-//        dojo.addClass(this.picklistContainer, "filterDialogHidden");
-//        dojo.addClass(this.matchContainer, "filterDialogHidden");
-//        dojo.removeClass(this.dateRangeContainer, "filterDialogHidden");
+//        domClass.add(this.picklistContainer, "filterDialogHidden");
+//        domClass.add(this.matchContainer, "filterDialogHidden");
+//        domClass.remove(this.dateRangeContainer, "filterDialogHidden");
 //        this._configureDateRangeContainer();
 //        break;
       default:
@@ -347,7 +344,7 @@ dojo.declare(
   getParameterName: function() {
     var parameterName = this.parameterNameInput.get("value");
     if (parameterName) {
-      parameterName = dojo.trim(parameterName).replace(/[^a-zA-Z0-9 ]/g, "");
+      parameterName = lang.trim(parameterName).replace(/[^a-zA-Z0-9 ]/g, "");
     }
     return parameterName.length > 0 ? parameterName : undefined;
   },
@@ -365,14 +362,14 @@ dojo.declare(
 
   // PICKLIST IMPL
   _configurePicklistContainer: function() {
-    dojo.empty(this.picklistUsedValues.domNode);
+    construct.empty(this.picklistUsedValues.domNode);
 
-    dojo.attr(this.picklistCombinationType, "value", this.currentFilter.combinationType);
+    this.picklistCombinationType.setAttribute( "value", this.currentFilter.combinationType);
 
     // Set the used values
-    var values = dojo.isArray(this.currentFilter.value) ? this.currentFilter.value : [this.currentFilter.value];
+    var values = this.currentFilter.value instanceof Array ? this.currentFilter.value : [this.currentFilter.value];
     var idx = 0;
-    dojo.forEach(values, function(value) {
+    array.forEach(values, function(value) {
       if (value != null) {
         var opt =  new Option(value, value);
         opt.title = value;
@@ -380,7 +377,7 @@ dojo.declare(
       }
     }, this.picklistUsedValues);
 
-    // Load all values
+    // Load all valuesz
     if (this.picklistLoaded != true) {
       this.picklistFindInput.set("value", "");
       this.filterPicklist("");
@@ -388,15 +385,14 @@ dojo.declare(
   },
 
   _flagPicklistAvailableValuesLoading: function() {
-    dojo.empty(this.picklistAvailableValues.domNode);
+    construct.empty(this.picklistAvailableValues.domNode);
     var loadingMsg = this.getLocaleString("filterDialogPicklistLoadingMessage");
     this.picklistAvailableValues.containerNode.options[0] = new Option(loadingMsg, loadingMsg);
   },
   
   _updatePicklistAvailableValues: function(values) {
-    dojo.empty(this.picklistAvailableValues.domNode);
-    var sel = this.picklistAvailableValues.domNode;
-    dojo.forEach(values, function (result, idx) {
+    construct.empty(this.picklistAvailableValues.domNode);
+    array.forEach(values, function (result, idx) {
       this.containerNode.options[idx] = new Option(result, result);
       this.containerNode.options[idx].title = result;
     }, this.picklistAvailableValues);
@@ -404,41 +400,41 @@ dojo.declare(
   },
 
   _picklistAddSelected: function() {
-    dojo.forEach(this.picklistAvailableValues.getSelected(), function(option) {
+    array.forEach(this.picklistAvailableValues.getSelected(), function(option) {
       var found = false;
       // Check if we already have the value in the used list
-      dojo.some(this.domNode.options, function(usedOption) {
+      array.some(this.domNode.options, function(usedOption) {
         if (usedOption.value === option.value) {
           found = true;
           return true;
         }
       });
       if (!found) {
-        this.containerNode.appendChild(dojo.clone(option));
+        this.containerNode.appendChild(lang.clone(option));
       }
     }, this.picklistUsedValues);
   },
 
   _picklistRemoveSelected: function() {
-    dojo.forEach(this.picklistUsedValues.getSelected(), function(option) {
+    array.forEach(this.picklistUsedValues.getSelected(), function(option) {
       this.containerNode.removeChild(option);
     }, this.picklistUsedValues);
   },
 
   _picklistAddAll: function() {
     this._picklistRemoveAll();
-    dojo.forEach(this.picklistAvailableValues.containerNode.options, function(option) {
-      this.containerNode.appendChild(dojo.clone(option));
+    array.forEach(this.picklistAvailableValues.containerNode.options, function(option) {
+      this.containerNode.appendChild(lang.clone(option));
     }, this.picklistUsedValues);
   },
 
   _picklistRemoveAll: function() {
-    dojo.empty(this.picklistUsedValues.domNode);
+    construct.empty(this.picklistUsedValues.domNode);
   },
 
   _savePicklistContainer: function() {
     var values = [];
-    dojo.forEach(this.picklistUsedValues.domNode.options, function(option) {
+    array.forEach(this.picklistUsedValues.domNode.options, function(option) {
       values.push(option.value);
     });
     if (values.length == 0) {
@@ -452,7 +448,7 @@ dojo.declare(
   },
   
   _picklistFindKeyPressed: function(event) {
-    if (event.keyCode === dojo.keys.ENTER) {
+    if (event.keyCode === keys.ENTER) {
       this._filterPicklistByFindInput();
     }
   },
@@ -467,10 +463,10 @@ dojo.declare(
 
   filterPicklist: function(value) {
     this._flagPicklistAvailableValuesLoading();
-    this.datasource.searchColumn(this.currentColumn, value, this.searchListLimit, dojo.hitch(this, function(values) {
+    this.datasource.searchColumn(this.currentColumn, value, this.searchListLimit, lang.hitch(this, function(values) {
       this._updatePicklistAvailableValues(values == null ? [] : values.resultset);
       if (values == null && this._reauthenticateCallback) {
-        this._reauthenticateCallback(dojo.hitch(this, function() {
+        this._reauthenticateCallback(lang.hitch(this, function() {
           this.filterPicklist(value);
         }));
       }
@@ -481,7 +477,7 @@ dojo.declare(
     if (this.filterType != "PICKLIST") {
       this.setFilterType("PICKLIST");
     }
-    dojo.attr(this.picklistCombinationType, "value", combinationType);
+    this.picklistCombinationType.setAttribute("value", combinationType);
   },
   
   // MATCH IMPL
@@ -492,9 +488,9 @@ dojo.declare(
   _matchComparatorChanged: function() {
     var node = this._isDateType() ? this.matchValueInputDate.domNode : this.matchValueInput;
     if (this._matchOperatorRequiresValue()) {
-      dojo.removeClass(node, "filterDialogHidden");
+      domClass.remove(node, "filterDialogHidden");
     } else {
-      dojo.addClass(node, "filterDialogHidden");
+      domClass.add(node, "filterDialogHidden");
     }
   },
 
@@ -504,16 +500,16 @@ dojo.declare(
 
   _configureMatchContainer: function() {
     this.matchFieldName.innerHTML = this.currentColumn.name;
-    var value = dojo.isArray(this.currentFilter.value) ? this.currentFilter.value[0] : null;
+    var value = this.currentFilter.value instanceof Array ? this.currentFilter.value[0] : null;
     switch(this.currentColumn.dataType) {
       case pentaho.pda.Column.DATA_TYPES.DATE:
-        this.matchValueInputDate.setValue(dojo.date.stamp.fromISOString(value));
-        dojo.removeClass(this.matchValueInputDate.domNode, "filterDialogHidden");
-        dojo.addClass(this.matchValueInput, "filterDialogHidden");
+        this.matchValueInputDate.setValue(stamp.fromISOString(value));
+        domClass.remove(this.matchValueInputDate.domNode, "filterDialogHidden");
+        domClass.add(this.matchValueInput, "filterDialogHidden");
         break;
       case pentaho.pda.Column.DATA_TYPES.NUMERIC:
         var value = "";
-        dojo.forEach(this.currentFilter.value, function(val) {
+        array.forEach(this.currentFilter.value, function(val) {
           if (val.length > 0) {
             if (value.length > 0) {
               value += "|";
@@ -522,18 +518,18 @@ dojo.declare(
           }
         });
         this.matchValueInput.value = value;
-        dojo.removeClass(this.matchValueInput, "filterDialogHidden");
-        dojo.addClass(this.matchValueInputDate.domNode, "filterDialogHidden");
+        domClass.remove(this.matchValueInput, "filterDialogHidden");
+        domClass.add(this.matchValueInputDate.domNode, "filterDialogHidden");
         break;
       default:
         this.matchValueInput.value = value == null ? "" : value;
-        dojo.removeClass(this.matchValueInput, "filterDialogHidden");
-        dojo.addClass(this.matchValueInputDate.domNode, "filterDialogHidden");
+        domClass.remove(this.matchValueInput, "filterDialogHidden");
+        domClass.add(this.matchValueInputDate.domNode, "filterDialogHidden");
         break;
     }
 
-    dojo.empty(this.matchAggType);
-    dojo.forEach(this.currentColumn.availableAggregations, function(aggType, idx) {
+    construct.empty(this.matchAggType);
+    array.forEach(this.currentColumn.availableAggregations, function(aggType, idx) {
       this.options[idx] = new Option(pentaho.pda.Column.AGG_TYPES_STRINGS[aggType], aggType);
       this.options[idx].title = aggType;
     }, this.matchAggType);
@@ -541,9 +537,9 @@ dojo.declare(
       this.matchAggType.value = this.currentFilter.selectedAggType;
     }
 
-    dojo.empty(this.matchComparator);
+    construct.empty(this.matchComparator);
     var dataType = this.currentColumn.dataType === pentaho.pda.Column.DATA_TYPES.UNKNOWN ? pentaho.pda.Column.DATA_TYPES.STRING : this.currentColumn.dataType;
-    dojo.forEach(pentaho.pda.Column.COMPARATOR[dataType], function(cArray, idx) {
+    array.forEach(pentaho.pda.Column.COMPARATOR[dataType], function(cArray, idx) {
       this.options[idx] = new Option(cArray[0], cArray[1]);
       this.options[idx].title = cArray[0];
     }, this.matchComparator);
@@ -565,13 +561,13 @@ dojo.declare(
             this.currentFilter.value = [""];
           } else {
             // Convert date into format metadata is expecting for dates (ISO8601/RFC3339)
-            this.currentFilter.value = [dojo.date.stamp.toISOString(date, {selector: 'date'})];
+            this.currentFilter.value = [stamp.toISOString(date, {selector: 'date'})];
           }
           break;
         case pentaho.pda.Column.DATA_TYPES.NUMERIC:
           if(this.currentFilter.operator === pentaho.pda.Column.CONDITION_TYPES.EQUAL) {
             var value = [];
-            dojo.forEach(this.matchValueInput.value.split("|"), function(val) {
+            array.forEach(this.matchValueInput.value.split("|"), function(val) {
               var v = this._scrubNumericValue(val);
               if (v && v !== "") {
                 value.push(v);
@@ -591,7 +587,7 @@ dojo.declare(
           break;
       }
       var hasValue = false;
-      dojo.some(this.currentFilter.value, function(val) {
+      array.some(this.currentFilter.value, function(val) {
         if (val !== "") {
           hasValue = true;
           return false;
@@ -608,14 +604,14 @@ dojo.declare(
   _scrubNumericValue: function(val) {
     // TODO i18n the thousands and decimal characters
     var sign = (val < 0) ? '-' : ''; // PIR-856 retain numeric sign
-    return sign + dojo.trim(val).replace(this._numericFormatRegex, "");
+    return sign + lang.trim(val).replace(this._numericFormatRegex, "");
   },
 
   /*
    * Remove quotes from the filter's value until MQL editor properly supports parsing values with quotes.
    */
   _scrubFilterValues: function(filter) {
-    filter.value = dojo.map(filter.value, function(value) {
+    filter.value = array.map(filter.value, function(value) {
       return value.replace(/["]/g,'');
     });
   },
@@ -624,7 +620,7 @@ dojo.declare(
   _configureDateRangeContainer: function() {
     this.dateRangeFieldName.innerHTML = this.currentColumn.name;
 
-    this.dateRangeValueInputDate1.value = dojo.date.stamp.fromISOString(this.currentFilter.value);
+    this.dateRangeValueInputDate1.value = stamp.fromISOString(this.currentFilter.value);
     this.dateRangeValueInputDate2.value = null;
   },
   _dateRangeComparatorChanged: function() {
@@ -639,7 +635,7 @@ dojo.declare(
   buildFilterText: function(filter, prompt) {
     var column = this.datasource.getColumnById(filter.column);
     var friendlyOperator = filter.operator;
-    if (filter.combinationType != pentaho.pda.Column.OPERATOR_TYPES.AND || (filter.operator == pentaho.pda.Column.CONDITION_TYPES.EQUAL && dojo.isArray(filter.value) && filter.value.length > 1)) {
+    if (filter.combinationType != pentaho.pda.Column.OPERATOR_TYPES.AND || (filter.operator == pentaho.pda.Column.CONDITION_TYPES.EQUAL && filter.value instanceof Array && filter.value.length > 1)) {
       switch (filter.combinationType) {
         case pentaho.pda.Column.OPERATOR_TYPES.AND:
           friendlyOperator = this.getLocaleString("FilterCombinationTypeIn");
@@ -652,10 +648,10 @@ dojo.declare(
       }
     } else {
       // Treat pentaho.pda.Column.DATA_TYPES.UNKNOWN as pentaho.pda.Column.DATA_TYPES.STRING
-      var dataType = column.dataType == pentaho.pda.Column.DATA_TYPES.UNKNOWN ? pentaho.pda.Column.DATA_TYPES.STRING : column.dataType;
+      var dataType = pentaho.pda.Column.dataType == pentaho.pda.Column.DATA_TYPES.UNKNOWN ? pentaho.pda.Column.DATA_TYPES.STRING : pentaho.pda.Column.dataType;
       var comparatorMapping = pentaho.pda.Column.COMPARATOR[dataType];
       if (comparatorMapping) {
-        dojo.some(comparatorMapping, function(cArray) {
+        array.some(comparatorMapping, function(cArray) {
           if (cArray[1] === filter.operator) {
             friendlyOperator = cArray[0];
             return true;
@@ -677,7 +673,7 @@ dojo.declare(
       if (filter.value.length > 10) {
         values = filter.value.length + " values";
       } else {
-        dojo.forEach(filter.value, function(value) {
+        array.forEach(filter.value, function(value) {
           if (values.length > 0) {
             values += ", ";
           }
@@ -689,6 +685,8 @@ dojo.declare(
     return column.name + aggregation + friendlyOperator + " " + values;
   },
 
+  // This is broken. You cannot overload functions in Javascript. Further this method is trying to call the second
+  // without "this."
   showErrorDialog: function(message) {
     showErrorDialog(this.getLocaleString('ErrorDialog_title'), message);
   },
@@ -699,3 +697,4 @@ dojo.declare(
     this.errorDialog.show();
   }
 });
+    });

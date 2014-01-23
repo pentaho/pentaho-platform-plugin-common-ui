@@ -1,14 +1,13 @@
-<tr class="dijitReset dijitMenuItem pentaho-menuitem" dojoAttachPoint="focusNode" role="menuitem" tabIndex="-1"
-		dojoAttachEvent="onmouseenter:_onHover,onmouseleave:_onUnhover,ondijitclick:_onClick">
+<tr class="dijitReset dijitMenuItem pentaho-menuitem" data-dojo-attach-point="focusNode" role="menuitem" tabIndex="-1">
 	<td class="dijitReset dijitMenuItemIconCell" role="presentation">
-		<img src="${_blankGif}" alt="" class="dijitIcon dijitMenuItemIcon" dojoAttachPoint="iconNode"/>
+		<span role="presentation" class="dijitInline dijitIcon dijitMenuItemIcon" data-dojo-attach-point="iconNode"></span>
 	</td>
-	<td class="dijitReset dijitMenuItemLabel" colspan="2" dojoAttachPoint="containerNode"></td>
-	<td class="dijitReset dijitMenuItemAccelKey" style="display: none" dojoAttachPoint="accelKeyNode"></td>
+	<td class="dijitReset dijitMenuItemLabel" colspan="2" data-dojo-attach-point="containerNode,textDirNode"></td>
+	<td class="dijitReset dijitMenuItemAccelKey" style="display: none" data-dojo-attach-point="accelKeyNode"></td>
 	<td class="dijitReset dijitMenuArrowCell" role="presentation">
-		<div dojoAttachPoint="arrowWrapper" style="visibility: hidden">
-			<img src="${_blankGif}" alt="" class="dijitMenuExpand" dojoAttachPoint="arrowIconNode"/>
+		<span data-dojo-attach-point="arrowWrapper" style="visibility: hidden">
+			<span class="dijitInline dijitIcon dijitMenuExpand"></span>
 			<span class="dijitMenuExpandA11y">+</span>
-		</div>
+		</span>
 	</td>
 </tr>

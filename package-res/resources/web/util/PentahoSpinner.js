@@ -18,7 +18,7 @@
 /**
  Example Usage:
 
- pen.require(['common-ui/util/PentahoSpinner'], function(spin) {
+ require(['common-ui/util/PentahoSpinner'], function(spin) {
       var config = spin.getMediumConfig();
 
       // override the color
@@ -27,7 +27,7 @@
       // override the starting top location
       config.top = "-8px"
 
-      // spin.js's Spinner object has been included for us by the pen.require call to PentahoSpinner above
+      // spin.js's Spinner object has been included for us by the require call to PentahoSpinner above
       var spinner = new Spinner(config);
 
       // show the spinner in your div
@@ -41,7 +41,7 @@
     });
  */
 
-pen.define(['common-ui/util/spin.min', 'common-ui/util/Glasspane'], function(spinJs, glasspane) {
+define("common-ui/util/PentahoSpinner", ['common-ui/util/spin.min', 'common-ui/util/Glasspane'], function(spinJs, glasspane) {
 
   var local = {
 
