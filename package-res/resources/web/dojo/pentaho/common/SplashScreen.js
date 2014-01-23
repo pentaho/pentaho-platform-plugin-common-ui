@@ -14,15 +14,10 @@
 * limitations under the License.
 *
 */
-
-dojo.provide('pentaho.common.SplashScreen');
-dojo.require('dijit._Widget');
-dojo.require('dijit._Templated');
-dojo.require('pentaho.common.button');
-dojo.require('pentaho.common.Dialog');
-dojo.declare(
-     'pentaho.common.SplashScreen',
-     [pentaho.common.Dialog],
+define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on", "dojo/query",
+"pentaho/common/button", "pentaho/common/Dialog", "dojo/text!pentaho/common/SplashScreen.html"],
+    function(declare, _WidgetBase, _Templated, on, query, button, Dialog, templateStr){
+      return declare("pentaho.common.SplashScreen", [Dialog],
      {
         buttons: ['ok'],
         
@@ -40,10 +35,10 @@ dojo.declare(
     
         setButtonText: function(text) {
             this.buttons[0] = text;
-            dojo.query("#button"+0, this.domNode).innerHTML = text;
+            query("#button"+0, this.domNode).innerHTML = text;
         },
     
-        templatePath: dojo.moduleUrl('pentaho.common', 'SplashScreen.html'),
+        templateString: templateStr,
       
        postCreate: function() {
            this.inherited(arguments);
@@ -51,3 +46,4 @@ dojo.declare(
        
     }
 );
+    });

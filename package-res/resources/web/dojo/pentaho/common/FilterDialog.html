@@ -1,32 +1,32 @@
-<div dojoAttachPoint="dialogContainer" class="filterDialogContainer dialog-content pentaho-padding-sm" dojoAttachPoint="containerNode">
-  <div dojoAttachPoint="typeContainer" class="filterDialogTypeContainer">
-    <div dojoAttachPoint="fieldPicklistContainer" class="filterDialogHidden">
+<div data-dojo-attach-point="dialogContainer" class="filterDialogContainer dialog-content pentaho-padding-sm" data-dojo-attach-point="containerNode">
+  <div data-dojo-attach-point="typeContainer" class="filterDialogTypeContainer">
+    <div data-dojo-attach-point="fieldPicklistContainer" class="filterDialogHidden">
       <span class="filterDialogFieldPicklistText"
-            dojoAttachPoint="fieldPicklistSpan">!Field:!</span>
-      <select dojoAttachPoint="picklistFields" dojoAttachEvent="onchange:_fieldChanged">
+            data-dojo-attach-point="fieldPicklistSpan">!Field:!</span>
+      <select data-dojo-attach-point="picklistFields" dojoAttachEvent="onchange:_fieldChanged">
       </select>
     </div>
-    <div dojoAttachPoint="typePicklistContainer">
+    <div data-dojo-attach-point="typePicklistContainer">
       <input type="radio" value="PICKLIST"
-             name="filterType" dojoAttachPoint="typePicklistInput"
+             name="filterType" data-dojo-attach-point="typePicklistInput"
              dojoAttachEvent="onclick:_filterTypeChanged">
       <span class="filterDialogTypePicklistText"
-            dojoAttachPoint="typePicklistSpan">!Select from a list!</span>
-      <span class="filterDialogTypePicklistCombinationTypeLinksSpan">(<a href="#" onclick="return false;" dojoAttachPoint="typePicklistCombinationTypeLinksIncludeLink">!Includes!</a>,&nbsp;<a href="#" onclick="return false;" dojoAttachPoint="typePicklistCombinationTypeLinksExcludeLink">!Excludes!</a>)</span>
+            data-dojo-attach-point="typePicklistSpan">!Select from a list!</span>
+      <span class="filterDialogTypePicklistCombinationTypeLinksSpan">(<a href="#" onclick="return false;" data-dojo-attach-point="typePicklistCombinationTypeLinksIncludeLink">!Includes!</a>,&nbsp;<a href="#" onclick="return false;" data-dojo-attach-point="typePicklistCombinationTypeLinksExcludeLink">!Excludes!</a>)</span>
       <br/>
     </div>
-    <div dojoAttachPoint="typeMatchContainer">
-      <input type="radio" dojoAttachPoint="typeMatchInput"
+    <div data-dojo-attach-point="typeMatchContainer">
+      <input type="radio" data-dojo-attach-point="typeMatchInput"
              value="MATCH" name="filterType"
              dojoAttachEvent="onclick:_filterTypeChanged">
-      <span class="filterDialogTypeMatchText" dojoAttachPoint="typeMatchSpan">!Match a specific string!</span>
+      <span class="filterDialogTypeMatchText" data-dojo-attach-point="typeMatchSpan">!Match a specific string!</span>
       <br/>
     </div>
-    <div dojoAttachPoint="typeDateRangeContainer">
-      <input type="radio" dojoAttachPoint="typeDateInput"
+    <div data-dojo-attach-point="typeDateRangeContainer">
+      <input type="radio" data-dojo-attach-point="typeDateInput"
              value="DATERANGE" name="filterType"
              dojoAttachEvent="onclick:_filterTypeChanged">
-      <span class="filterDialogTypeDateRangeText" dojoAttachPoint="typeDateRangeSpan">!Select a range!</span>
+      <span class="filterDialogTypeDateRangeText" data-dojo-attach-point="typeDateRangeSpan">!Select a range!</span>
       <br/>
     </div>
     <!--
@@ -40,8 +40,8 @@
     -->
     <p></p>
   </div>
-  <div dojoAttachPoint="detailsContainer" class="filterDialogDetailsContainer">
-    <div dojoAttachPoint="picklistContainer"
+  <div data-dojo-attach-point="detailsContainer" class="filterDialogDetailsContainer">
+    <div data-dojo-attach-point="picklistContainer"
          class="filterDialogPicklistContainer">
       <table>
         <col style="width: 220px">
@@ -50,62 +50,62 @@
         <tbody>
         <tr>
           <td>
-			      <span class="filterDialogPicklistHeadingText" dojoAttachPoint="picklistHeadingSpan">!Choose values from list:!</span>
+			      <span class="filterDialogPicklistHeadingText" data-dojo-attach-point="picklistHeadingSpan">!Choose values from list:!</span>
 			    </td>
 			    <td></td>
 			    <td></td>
 			  </tr>
 			  <tr>
 			    <td>
-			      <input type="text" class="filterDialogPicklistFindInput" dojoType="dijit.form.TextBox" dojoAttachPoint="picklistFindInput" dojoAttachEvent="onKeyPress:_picklistFindKeyPressed"/>
-                  <button dojoAttachPoint="picklistFindButton" dojoAttachEvent="onclick:_filterPicklistByFindInput">!Find!</button>
+			      <input type="text" class="filterDialogPicklistFindInput" data-dojo-type="dijit.form.TextBox" data-dojo-attach-point="picklistFindInput" dojoAttachEvent="onKeyPress:_picklistFindKeyPressed"/>
+                  <button data-dojo-attach-point="picklistFindButton" dojoAttachEvent="onclick:_filterPicklistByFindInput">!Find!</button>
 			    </td>
 			    <td>
           </td>
           <td>
-            <span dojoAttachPoint="picklistCombinationTypeSpan">!Currently!</span>
-            <select dojoAttachPoint="picklistCombinationType">
-              <option value="!AND!" dojoAttachPoint="picklistCombinationTypeIncludeOption">!INCLUDE!</option>
-              <option value="!AND_NOT!" dojoAttachPoint="picklistCombinationTypeExcludeOption">!EXCLUDE!</option>
+            <span data-dojo-attach-point="picklistCombinationTypeSpan">!Currently!</span>
+            <select data-dojo-attach-point="picklistCombinationType">
+              <option value="!AND!" data-dojo-attach-point="picklistCombinationTypeIncludeOption">!INCLUDE!</option>
+              <option value="!AND_NOT!" data-dojo-attach-point="picklistCombinationTypeExcludeOption">!EXCLUDE!</option>
             </select>
             :
           </td>
         </tr>
         <tr>
           <td>
-            <select dojoType="dijit.form.MultiSelect"
+            <select data-dojo-type="dijit.form.MultiSelect"
                     class="filterDialogPicklistSelect"
-                    dojoAttachPoint="picklistAvailableValues" name="available"
+                    data-dojo-attach-point="picklistAvailableValues" name="available"
                     dojoAttachEvent="onDblClick:_picklistAddSelected"
                     size="12"></select>
           </td>
           <td valign="middle" align="center">
             <img dojoAttachEvent="onclick:_picklistAddSelected"
-                 dojoAttachPoint="picklistAddSelected"
+                 data-dojo-attach-point="picklistAddSelected"
                  class="filterDialogPicklistButton"
                  src="resources/web/images/filter_add_selected.png"
                  title="!Add Selected!"><br>
             <img dojoAttachEvent="onclick:_picklistRemoveSelected"
-                 dojoAttachPoint="picklistRemoveSelected"
+                 data-dojo-attach-point="picklistRemoveSelected"
                  class="filterDialogPicklistButton"
                  src="resources/web/images/filter_remove_selected.png"
                  title="!Remove Selected!"><br>
             <br><br>
             <img dojoAttachEvent="onclick:_picklistAddAll"
-                 dojoAttachPoint="picklistAddAll"
+                 data-dojo-attach-point="picklistAddAll"
                  class="filterDialogPicklistButton"
                  src="resources/web/images/filter_add_all.png"
                  title="!Add All!"><br>
             <img dojoAttachEvent="onclick:_picklistRemoveAll"
-                 dojoAttachPoint="picklistRemoveAll"
+                 data-dojo-attach-point="picklistRemoveAll"
                  class="filterDialogPicklistButton"
                  src="resources/web/images/filter_remove_all.png"
                  title="!Remove All!">
           </td>
           <td>
-            <select dojoType="dijit.form.MultiSelect"
+            <select data-dojo-type="dijit.form.MultiSelect"
                     class="filterDialogPicklistSelect"
-                    dojoAttachPoint="picklistUsedValues" name="used"
+                    data-dojo-attach-point="picklistUsedValues" name="used"
                     dojoAttachEvent="onDblClick:_picklistRemoveSelected"
                     size="12"></select>
           </td>
@@ -113,28 +113,28 @@
         </tbody>
       </table>
     </div>
-    <div dojoAttachPoint="matchContainer" class="filterDialogMatchContainer">
-        <span dojoAttachPoint="matchFieldName">!Field name!</span>
-        <select dojoAttachPoint="matchAggType"></select>
-        <select dojoAttachPoint="matchComparator" dojoAttachEvent="onchange:_matchComparatorChanged"></select>
-        <input type="text" dojoAttachPoint="matchValueInput" size="10"/><!--dojoType="dijit.form.TextBox"-->
+    <div data-dojo-attach-point="matchContainer" class="filterDialogMatchContainer">
+        <span data-dojo-attach-point="matchFieldName">!Field name!</span>
+        <select data-dojo-attach-point="matchAggType"></select>
+        <select data-dojo-attach-point="matchComparator" dojoAttachEvent="onchange:_matchComparatorChanged"></select>
+        <input type="text" data-dojo-attach-point="matchValueInput" size="10"/><!--data-dojo-type="dijit.form.TextBox"-->
         <!-- Date pattern to match what metadata expects. -->
         <!-- TODO Change this to locale-specific for presentation layer? -->
-        <input type="text" dojoAttachPoint="matchValueInputDate" dojoType="pentaho.common.DateTextBox" constraints="{datePattern:'yyyy-MM-dd'}"/>
+        <input type="text" data-dojo-attach-point="matchValueInputDate" data-dojo-type="pentaho.common.DateTextBox" constraints="{datePattern:'yyyy-MM-dd'}"/>
       </table>
     </div>
-    <div dojoAttachPoint="dateRangeContainer" class="filterDialogDateRangeContainer">
-      <span dojoAttachPoint="dateRangeFieldName">!Field name!</span>
-      <select dojoAttachPoint="dateRangeComparator" dojoAttachEvent="onchange:_dateRangeComparatorChanged"></select>
+    <div data-dojo-attach-point="dateRangeContainer" class="filterDialogDateRangeContainer">
+      <span data-dojo-attach-point="dateRangeFieldName">!Field name!</span>
+      <select data-dojo-attach-point="dateRangeComparator" dojoAttachEvent="onchange:_dateRangeComparatorChanged"></select>
       <!-- Date pattern to match what metadata expects. -->
       <!-- TODO Change this to locale-specific for presentation layer? -->
-      <input type="text" dojoAttachPoint="dateRangeValueInputDate1" dojoType="pentaho.common.DateTextBox" constraints="{datePattern:'yyyy-MM-dd'}"/>
-      <span dojoAttachPoint="dateRangeBetweenSeparatorSpan">!and!</span>
-      <input type="text" dojoAttachPoint="dateRangeValueInputDate2" dojoType="pentaho.common.DateTextBox" constraints="{datePattern:'yyyy-MM-dd'}"/>
+      <input type="text" data-dojo-attach-point="dateRangeValueInputDate1" data-dojo-type="pentaho.common.DateTextBox" constraints="{datePattern:'yyyy-MM-dd'}"/>
+      <span data-dojo-attach-point="dateRangeBetweenSeparatorSpan">!and!</span>
+      <input type="text" data-dojo-attach-point="dateRangeValueInputDate2" data-dojo-type="pentaho.common.DateTextBox" constraints="{datePattern:'yyyy-MM-dd'}"/>
     </div>
   </div>
   <div class="filterDialogParameterContainer">
-    <span dojoAttachPoint="parameterNameLabel"></span><input type="text" dojoAttachPoint="parameterNameInput" dojoType="dijit.form.TextBox"/>
+    <span data-dojo-attach-point="parameterNameLabel"></span><input type="text" data-dojo-attach-point="parameterNameInput" data-dojo-type="dijit.form.TextBox"/>
   </div>
-  <div dojoAttachPoint="errorDialog" dojoType="pentaho.common.MessageBox" style="width: 300px"/>
+  <div data-dojo-attach-point="errorDialog" data-dojo-type="pentaho.common.MessageBox" style="width: 300px"/>
 </div>

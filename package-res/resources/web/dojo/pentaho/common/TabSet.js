@@ -14,16 +14,13 @@
 * limitations under the License.
 *
 */
-
-dojo.provide("pentaho.common.TabSet");
-/**
- * Creates a list of fields from a 
- */
-dojo.declare(
-    "pentaho.common.TabSet",
-    [dijit._Widget, dijit._Templated],
+define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on", "dojo/query", "dojo/dom-class", "dijit/registry", "dojo/dom-construct",
+"dojo/_base/lang"],
+    function(declare, _WidgetBase, _Templated, on, query, domClass, registry, construct, lang){
+      return declare("pentaho.common.TabSet",
+    [_WidgetBase, _Templated],
     {
-        templateString: '<div dojoAttachPoint="tabSetDiv" style="margin-right: 0px"></div>',
+        templateString: '<div data-dojo-attach-point="tabSetDiv" style="margin-right: 0px"></div>',
         
         tabs: [],
         
@@ -38,25 +35,25 @@ dojo.declare(
                 
             this.tabs = tabs;
             var html = "";
-            dojo.addClass(this.tabSetDiv, 'pentaho-tabBar');
+            domClass.add(this.tabSetDiv, 'pentaho-tabBar');
             for(var idx=0; idx<this.tabs.length; idx++) {
-                var div = dojo.create('div', {}, this.tabSetDiv);
-                dojo.attr( div, 'tabId', this.tabs[idx].id);
+                var div = construct.create('div', {}, this.tabSetDiv);
+                div.setAttribute( 'tabId', this.tabs[idx].id);
                 this.tabs[idx].element = div;
-                dojo.addClass(div, 'pentaho-tabWidget');
+                domClass.add(div, 'pentaho-tabWidget');
                 if(idx == 0) {
-                    dojo.addClass(div, 'pentaho-tabWidget-selected');
+                    domClass.add(div, 'pentaho-tabWidget-selected');
                 }
-                var span = dojo.create('span', {}, div);
-                dojo.addClass(span, 'pentaho-tabWidgetLabel', div);
-                dojo.attr( span, 'tabId', this.tabs[idx].id);
+                var span = construct.create('span', {}, div);
+                domClass.add(span, 'pentaho-tabWidgetLabel', div);
+                span.setAttribute( 'tabId', this.tabs[idx].id);
                 span.innerHTML = this.tabs[idx].title;
-                dojo.connect(div, 'onclick', this, this.tabClicked);
+                on(div, 'click', lang.hitch(this, this.tabClicked));
             }
         },
 
         tabClicked: function(event) {
-            var tabId = dojo.attr( event.target, 'tabId');
+            var tabId = event.target.getAttribute( 'tabId');
             this.setSelectedTab(tabId);
         },
 
@@ -74,21 +71,21 @@ dojo.declare(
             var panelId = this.tabs[tabIdx].id;
             for(var idx=0; idx<this.tabs.length; idx++) {
                 if(tabIdx == idx) {
-                    dojo.addClass(this.tabs[idx].element, 'pentaho-tabWidget-selected');
+                    domClass.add(this.tabs[idx].element, 'pentaho-tabWidget-selected');
                 } else {
-                    dojo.removeClass(this.tabs[idx].element, 'pentaho-tabWidget-selected');
+                    domClass.remove(this.tabs[idx].element, 'pentaho-tabWidget-selected');
                 }
             }
             if(this.tabs[tabIdx].beforeCallback) {
               this.tabs[tabIdx].beforeCallback(this.tabs[tabIdx]);
             }
             if(this.stackContainerId) {               
-                dijit.byId(this.stackContainerId).selectChild(panelId, false);
+                registry.byId(this.stackContainerId).selectChild(panelId, false);
             }
             if(this.tabs[tabIdx].afterCallback) {
               this.tabs[tabIdx].afterCallback(this.tabs[tabIdx]);
             }
         }
         
-    }
-);
+    });
+    });

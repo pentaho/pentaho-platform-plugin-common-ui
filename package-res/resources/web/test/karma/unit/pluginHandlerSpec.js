@@ -3,7 +3,7 @@ var deps = [
 	'common-ui/Plugin',
 ];
 
-pen.define(deps, function(PentahoPluginHandler, PentahoPlugin) {
+define(deps, function(PentahoPluginHandler, PentahoPlugin) {
 	
 	describe("Pentaho Plugin Handler Test", function() {
 				

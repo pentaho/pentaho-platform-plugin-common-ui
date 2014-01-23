@@ -23634,7 +23634,7 @@ var htmlAnchorDirective = valueFn({
  *
  * @description
  * The HTML specification does not require browsers to preserve the values of boolean attributes
- * such as open. (Their presence means true and their absence means false.)
+ * such as odefine (Their presence means true and their absence means false.)
  * This prevents the Angular compiler from retrieving the binding expression.
  * The `ngOpen` directive solves this problem for the `open` attribute.
  *

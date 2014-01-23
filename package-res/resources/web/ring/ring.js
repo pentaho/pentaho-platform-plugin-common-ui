@@ -29,7 +29,7 @@ if (typeof(exports) !== "undefined") { // nodejs
     var underscore = require("underscore");
     underscore.extend(exports, declare(underscore));
 } else if (typeof(define) !== "undefined") { // amd
-    define(["underscore"], declare);
+    define(["common-ui/underscore"], declare);
 } else { // define global variable
     ring = declare(_);
 }

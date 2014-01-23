@@ -19,18 +19,21 @@
  * This is a collection of extentions to built-in types. This in in leu of creating subclasses which we should do
  * in the future.
  */
+define(
+["dijit/DialogUnderlay",
+"dijit/layout/TabContainer",
+"dijit/layout/TabController",
+"dijit/form/Button",
+"dojo/dnd/Manager","dojo/_base/lang", "dijit/layout/TabController", "dojo/dnd/common", "dojo/dom-style", "dojo/dom-geometry", "dojo/has", "dojo/sniff",
+"dojo/_base/window"],
+    function(DialogUnderlay, TabContainer, TabController, Button, Manager,lang, _TabButton, dnd, style, geometry, has, sniff, baseWin){
 
-dojo.provide("pentaho.common.Overrides");
-dojo.require("dijit.DialogUnderlay");
-dojo.require("dijit.layout.TabContainer");
-dojo.require("dijit.layout.TabController");
-dojo.require("dijit.form.Button");
-dojo.require("dojo.dnd.Manager");
-dojo.extend(dijit.layout.TabContainer, {baseClass : "pentahoTabContainer"});
 
-dojo.extend(dijit.DialogUnderlay,
+lang.extend(TabContainer, {baseClass : "pentahoTabContainer"});
+
+lang.extend(DialogUnderlay,
     {
-      templateString: "<div class='glasspane'><div class='' dojoAttachPoint='node'></div></div>",
+      templateString: "<div class='glasspane'><div class='' data-dojo-attach-point='node'></div></div>",
 
       _setClassAttr: function(clazz){
         this.node.className = clazz;
@@ -38,13 +41,13 @@ dojo.extend(dijit.DialogUnderlay,
       }
     });
 
-dojo.extend(dijit.layout._TabButton, {baseClass : "pentaho-tabWidget"});
+lang.extend(_TabButton, {baseClass : "pentaho-tabWidget"});
 
 // killing the autoscroll of the page when dragging nodes
-dojo.dnd.autoScroll = function(e){};
+dnd.autoScroll = function(e){};
 
 // Custom version which allows overflowdivs to be ignored if marked with preventAutoScroll="true"
-dojo.dnd.autoScrollNodes = function(e){
+dnd.autoScrollNodes = function(e){
   // summary:
   //    a handler for onmousemove event, which scrolls the first avaialble
   //    Dom element, it falls back to dojo.dnd.autoScroll()
@@ -53,19 +56,19 @@ dojo.dnd.autoScrollNodes = function(e){
 
   // FIXME: needs more docs!
   for(var n = e.target; n;){
-    if((!n.getAttribute || !n.getAttribute('preventAutoScroll') || n.getAttribute('preventAutoScroll') == "false") && n.nodeType == 1 && (n.tagName.toLowerCase() in dojo.dnd._validNodes)){
-      var s = dojo.getComputedStyle(n);
-      if(s.overflow.toLowerCase() in dojo.dnd._validOverflow){
-        var b = dojo._getContentBox(n, s), t = dojo.position(n, true);
+    if((!n.getAttribute || !n.getAttribute('preventAutoScroll') || n.getAttribute('preventAutoScroll') == "false") && n.nodeType == 1 && (n.tagName.toLowerCase() in dnd._validNodes)){
+      var s = style.getComputedStyle(n);
+      if(s.overflow.toLowerCase() in dnd._validOverflow){
+        var b = geometry.getContentBox(n, s), t = geometry.position(n, true);
         //console.log(b.l, b.t, t.x, t.y, n.scrollLeft, n.scrollTop);
-        var w = Math.min(dojo.dnd.H_TRIGGER_AUTOSCROLL, b.w / 2),
-            h = Math.min(dojo.dnd.V_TRIGGER_AUTOSCROLL, b.h / 2),
+        var w = Math.min(dnd.H_TRIGGER_AUTOSCROLL, b.w / 2),
+            h = Math.min(dnd.V_TRIGGER_AUTOSCROLL, b.h / 2),
             rx = e.pageX - t.x, ry = e.pageY - t.y, dx = 0, dy = 0;
-        if(dojo.isWebKit || dojo.isOpera){
+        if(has("webkit")){
           // FIXME: this code should not be here, it should be taken into account
-          // either by the event fixing code, or the dojo.position()
+          // either by the event fixing code, or the geometry.position()
           // FIXME: this code doesn't work on Opera 9.5 Beta
-          rx += dojo.body().scrollLeft;
+          rx += baseWin.body.scrollLeft;
           ry += dojo.body().scrollTop;
         }
         if(rx > 0 && rx < b.w){
@@ -95,5 +98,7 @@ dojo.dnd.autoScrollNodes = function(e){
       n = null;
     }
   }
-  dojo.dnd.autoScroll(e);
+  dnd.autoScroll(e);
 };
+
+});

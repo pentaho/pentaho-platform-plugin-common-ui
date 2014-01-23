@@ -3,13 +3,19 @@
   <properties environment="env" />
   <property name="ivy.local.default.root" value="${ivy.default.ivy.user.dir}/local" override="true" />
   <property name="ivy.local.default.artifact.pattern" value="[organisation]/[module]/[revision]/[type]s/[artifact]-[revision].[ext]"
-    override="false" />
+            override="false" />
+
 
   <settings defaultResolver="pentaho-chained-resolver" />
   <include url="${ivy.default.settings.dir}/ivysettings-public.xml" />
   <include url="${ivy.default.settings.dir}/ivysettings-local.xml" />
   <resolvers>
     <chain name="pentaho-chained-resolver">
+      <ibiblio name="local-maven2"
+               m2compatible="true"
+               checkmodified="true" changingPattern=".*SNAPSHOT"
+               pattern="[organisation]/[module]/[revision]/[artifact]-[revision](-[classifier]).[ext]"
+               root="file:${user.home}/.m2/local/"/>
       <resolver ref="local" />
       <dual name="pentaho">
         <url name="pentaho-ivy">

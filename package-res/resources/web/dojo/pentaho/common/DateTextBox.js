@@ -14,20 +14,15 @@
 * limitations under the License.
 *
 */
+define(["dojo/_base/declare", "dijit/form/DateTextBox", "dijit/Calendar", "dojo/text!pentaho/common/DropDownBox.html"],
+  function(declare, DateTextBox, Calendar, templateStr){
+    return declare("pentaho.common.DateTextBox", [DateTextBox], {
 
-dojo.provide("pentaho.common.DateTextBox");
+      templateString: templateStr,
 
-dojo.require("dijit.form.DateTextBox");
-dojo.require("dijit.Calendar");
-
-dojo.declare("pentaho.common.DateTextBox",
-	[dijit.form.DateTextBox],
-	{
-
-		templateString: dojo.cache("pentaho.common", "DropDownBox.html"),
-
-		popupClass: "pentaho.common.Calendar"
+      popupClass: "pentaho.common.Calendar"
 
     }
-);
+  );
+});
 

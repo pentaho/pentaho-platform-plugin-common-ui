@@ -21,7 +21,7 @@ var deps = [
 	'common-ui/ring'
 ];
 
-pen.define(deps, function(PentahoPlugin, AngularPluginHandler, ring) {
+define(deps, function(PentahoPlugin, AngularPluginHandler, ring) {
 
 	// Define an extended plugin of PluginHandler.Plugin
 	var AngularPlugin = ring.create([PentahoPlugin], {

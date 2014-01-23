@@ -4,10 +4,10 @@ var tests = Object.keys(window.__karma__.files).filter(function (file) {
 });
 
 pen = {};
-pen.require = function() {
+require = function() {
   return require.apply(this, arguments);
 } 
-pen.define = function() {
+define = function() {
   return define.apply(this, arguments);
 }
 

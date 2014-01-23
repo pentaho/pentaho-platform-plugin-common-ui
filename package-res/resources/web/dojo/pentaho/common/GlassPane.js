@@ -1,49 +1,44 @@
 /*!
-* Copyright 2010 - 2013 Pentaho Corporation.  All rights reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*
-*/
-
-dojo.provide("pentaho.common.GlassPane");
-dojo.require("dijit._Widget");
-/**
- * Creates a glass pane 
+ * Copyright 2010 - 2013 Pentaho Corporation.  All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
  */
-dojo.declare(
-    "pentaho.common.GlassPane",
-    [dijit._Widget],
-    {
-        
-        _glassPaneDiv: null,
-        
-        create: function(/*Object?*/params, /*DomNode|String?*/srcNodeRef) {
-            this.inherited(arguments);
-            this._glassPaneDiv = dojo.create('div', {
+define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on", "dojo/query", "dojo/dom-construct", "dojo/dom-style"],
+    function (declare, _WidgetBase, _Templated, on, query, construct, style) {
+      return declare("pentaho.common.GlassPane",[_WidgetBase],
+          {
+
+            _glassPaneDiv: null,
+
+            create: function (/*Object?*/params, /*DomNode|String?*/srcNodeRef) {
+              this.inherited(arguments);
+              this._glassPaneDiv = construct.create('div', {
                 id: 'glasspane',
                 className: 'glasspane'
-            });
-            document.body.appendChild(this._glassPaneDiv);
-        },
-        
-        show: function() {
-            dojo.style(this._glassPaneDiv,"display","block")
-        },
-        
-        hide: function() {
-            dojo.style(this._glassPaneDiv,"display","none")
-        }
+              });
+              document.body.appendChild(this._glassPaneDiv);
+            },
 
-    }
-);
+            show: function () {
+              style.set(this._glassPaneDiv, "display", "block")
+            },
+
+            hide: function () {
+              style.set(this._glassPaneDiv, "display", "none")
+            }
+
+          }
+      );
+    });
 

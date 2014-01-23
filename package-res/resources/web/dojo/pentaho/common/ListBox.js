@@ -14,21 +14,17 @@
 * limitations under the License.
 *
 */
+define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dijit/_WidgetsInTemplateMixin", "dojo/on", "dojo/query", "pentaho/common/Menu",
+  "pentaho/common/ListItem",
+  "pentaho/common/MenuSeparator",
+  "pentaho/common/Select", "dojo/text!pentaho/common/ListBox.html", "dojo/dom-class",
+"dojo/_base/array", "dojo/_base/lang"],
+    function(declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, on, query, Menu, ListItem, MenuSeparator, Select, templateStr, domClass,
+             array, lang, Stateful){
+      return declare("pentaho.common.ListBox", [Select, _TemplatedMixin, _WidgetsInTemplateMixin], {
 
-dojo.provide("pentaho.common.ListBox");
+    templateString: templateStr,
 
-dojo.require("pentaho.common.Menu");
-dojo.require("pentaho.common.ListItem");
-dojo.require("pentaho.common.MenuSeparator");
-dojo.require("pentaho.common.Select");
-
-dojo.declare("pentaho.common.ListBox", 
-    pentaho.common.Select, {
-
-    templateString: dojo.cache("pentaho.common", "ListBox.html"),
-
-    widgetsInTemplate: true,
-    
     width: "150px",
     
     height: "75px",
@@ -44,10 +40,10 @@ dojo.declare("pentaho.common.ListBox",
 	postCreate: function(){
 		this.inherited(arguments);
         this.loadDropDown(function(){});
-        dojo.removeClass(this.outerNode,"dijitSelect");
-        dojo.removeClass(this.menuNode.domNode,"pentaho-listbox");
-        dojo.removeClass(this.menuNode.domNode,"pentaho-menu-outer");
-        this.menuNode._onBlur = function() {
+        domClass.remove(this.outerNode,"dijitSelect");
+        domClass.remove(this.menuNode.domNode,"pentaho-listbox");
+        domClass.remove(this.menuNode.domNode,"pentaho-menu-outer");
+        this.dropDown._onBlur = function() {
             // noop to prevent deselection of menu items in our list box
         };
 	},
@@ -56,7 +52,7 @@ dojo.declare("pentaho.common.ListBox",
 		this.inherited(arguments);
         this.value = {};
 	},
-        
+
 	_addOptionItem: function(/*dijit.form.__SelectOption*/ option){
 		// summary:
 		//		For the given option, add an option to our dropdown.
@@ -71,35 +67,35 @@ dojo.declare("pentaho.common.ListBox",
         this.ignoreChange = true;
 		this.inherited(arguments);
     },
-    
+
     addOption: function(htmlOption) {
-        this._addOptionItem(htmlOption);
+      this._addOptionItem(htmlOption);
     },
-    
+
     setOptions: function(htmlOptions) {
         this.clearOptions();
         for(var idx=0; idx<htmlOptions.length; idx++) {
             this.addOption(htmlOptions[idx]);
         }
     },
-    
+
     clearOptions: function() {
-		dojo.forEach(this.menuNode.getChildren(), function(child){
-			child.destroyRecursive();
-		});
+      array.forEach(this.menuNode.getChildren(), function(child){
+			  child.destroyRecursive();
+		  });
     },
-    
+
     _getMenuItemForOption: function(/*dijit.form.__SelectOption*/ option){
         // summary:
         //		For the given option, return the menu item that should be
         //		used to display it.  This can be overridden as needed
         if(!option.value && !option.label){
             // We are a separator (no label set for it)
-            return new pentaho.common.MenuSeparator();
+            return new MenuSeparator();
         }else{
             // Just a regular menu option
-            var setSelected = dojo.hitch(this, "_setValueAttr", option);
-            var item = new pentaho.common.ListItem({
+            var setSelected = lang.hitch(this, "_setValueAttr", option);
+            var item = new ListItem({
                 option: option,
                 label: option.text || option.value,
                 value: option.value ,
@@ -107,11 +103,11 @@ dojo.declare("pentaho.common.ListBox",
                 onKeyUp: setSelected,
                 disabled: option.disabled || false
             });
-            dijit.setWaiRole(item.focusNode, "listitem");
+            item.focusNode.setAttribute("role", "listitem");
             return item;
         }
     },
-    
+
     set: function( property, value ) {
         if(property == 'value') {
             // cancel the callback
@@ -119,7 +115,7 @@ dojo.declare("pentaho.common.ListBox",
         }
 		this.inherited(arguments);
     },
-    
+
 	_getValueAttr: function(){
         this.inherited(arguments);
         if(this.value) {
@@ -128,7 +124,7 @@ dojo.declare("pentaho.common.ListBox",
             return null;
         }
     },
-        
+
     _setValueAttr: function(value) {
         // set the selection style on the right item
         var valueStr = value.value ? value.value : value;
@@ -162,18 +158,19 @@ dojo.declare("pentaho.common.ListBox",
         this.inherited(arguments);
 
 		var val = this.value;
-		if(!dojo.isArray(val)){
+		if(! val instanceof Array){
 			val = [val];
 		}
 		if(val && val[0]){
-			dojo.forEach(this._getChildren(), function(child){
-				var isSelected = dojo.some(val, function(v){
+			array.forEach(this._getChildren(), function(child){
+				var isSelected = array.some(val, function(v){
 					return child.option && (v === child.option.value);
 				});
-				dojo.removeClass(child.domNode, this.baseClass + "SelectedOption");
-				dojo.addClass(child.domNode, "pentaho-listitem-selected");
+				domClass.remove(child.domNode, this.baseClass + "SelectedOption");
+				domClass.add(child.domNode, "pentaho-listitem-selected");
 			}, this);
 		}
 	}
     
+});
 });

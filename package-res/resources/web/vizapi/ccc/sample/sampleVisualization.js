@@ -15,7 +15,7 @@
 *
 */
 
-pen.require(["common-ui/vizapi/VizController"], function(){
+require(["common-ui/vizapi/VizController"], function(){
 
   pentaho.visualizations.push({
     id: 'sample_calc',                          // unique identifier
