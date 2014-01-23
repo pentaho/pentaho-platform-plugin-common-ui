@@ -62,6 +62,7 @@
 	/* prevent height change when widget goes from valid to invalid state */
 	width: 16px;
 	background: transparent url('../images/warning.png') no-repeat center center;
+    display:none;
 }
 
 /* The highlight is shown in the ComboBox menu. */

@@ -14,23 +14,16 @@
 * limitations under the License.
 *
 */
+ define(["dojo/_base/declare", "dijit/PopupMenuItem","pentaho/common/MenuItem", "dojo/dom-class"],
+  function(declare, PopupMenuItem, MenuItem, domClass){
+    return declare("pentaho.common.PopupMenuItem",[PopupMenuItem, MenuItem], {
+      baseClass: "pentaho-menuitem",
 
-dojo.provide("pentaho.common.PopupMenuItem");
-
-dojo.require("pentaho.common.MenuItem");
-
-dojo.declare(
-    "pentaho.common.PopupMenuItem",
-    [dijit.PopupMenuItem, pentaho.common.MenuItem],
-    {
-    
-        baseClass: "pentaho-menuitem",
-
-		_setSelected: function(selected){
-            if(!this.disabled) { 
-                dojo.toggleClass(this.domNode, "pentaho-menuitem-hover", selected);
-            }
-        }
-        
-	}
-);
+      _setSelected: function(selected){
+          if(!this.disabled) {
+              domClass.toggle(this.domNode, "pentaho-menuitem-hover", selected);
+          }
+      }
+    }
+   )
+ });

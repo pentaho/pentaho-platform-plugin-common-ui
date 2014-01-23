@@ -14,7 +14,7 @@
 * limitations under the License.
 *
 */
-
+define([], function(){});
 var console_enabled = false;
   
 function pentaho_client_onload() {

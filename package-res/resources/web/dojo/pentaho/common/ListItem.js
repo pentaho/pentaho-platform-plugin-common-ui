@@ -14,31 +14,29 @@
 * limitations under the License.
 *
 */
-
-dojo.provide("pentaho.common.ListItem");
-
-dojo.declare(
-    "pentaho.common.ListItem",
-    [dijit.MenuItem],
+define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on", "dojo/query", "dijit/MenuItem",
+  "dojo/text!pentaho/common/ListItem.html", "dojo/dom-class"],
+    function(declare, _WidgetBase, _Templated, on, query, MenuItem, templateStr, domClass){
+      return declare("pentaho.common.ListItem", [MenuItem],
     {
     
         baseClass: "pentaho-listitem",
 
-		templateString: dojo.cache("pentaho.common", "ListItem.html"),
+		templateString: templateStr,
 
         selected: false,
 
 		_setSelected: function(selected){
             if(!this.disabled) { 
-                dojo.toggleClass(this.domNode, "pentaho-listitem-selected", selected);
-                dojo.removeClass(this.domNode,'pentaho-listitem-hover');
+                domClass.toggle(this.domNode, "pentaho-listitem-selected", selected);
+                domClass.remove(this.domNode,'pentaho-listitem-hover');
                 this.selected = selected;
             }
         },
 
 		setDisabled: function(/*Boolean*/ disabled){
 			this.set('disabled', disabled);
-			dojo.toggleClass(this.domNode, "pentaho-listitem-disabled", disabled);
+			domClass.toggle(this.domNode, "pentaho-listitem-disabled", disabled);
 		},
         
 		_setDisabledAttr: function(/*Boolean*/ value){
@@ -46,24 +44,23 @@ dojo.declare(
 			//		Hook for attr('disabled', ...) to work.
 			//		Enable or disable this menu item.
 
-			dijit.setWaiState(this.focusNode, 'disabled', value ? 'true' : 'false');
+			this.focusNode.setAttribute("aria-disabled", value ? 'true' : 'false');
 			this._set("disabled", value);
-			dojo.toggleClass(this.domNode, "pentaho-listitem-disabled", value);
+			domClass.toggle(this.domNode, "pentaho-listitem-disabled", value);
 		},
 
 		_onHover: function(){
             if(!this.disabled && !this.selected) {
-                dojo.addClass(this.domNode,'pentaho-listitem-hover');
+                domClass.add(this.domNode,'pentaho-listitem-hover');
             }
             else if(this.selected) {
-                dojo.addClass(this.domNode, "pentaho-listitem-selected");
+                domClass.add(this.domNode, "pentaho-listitem-selected");
             }
         },
                     
 		_onUnhover: function(){
-            dojo.removeClass(this.domNode,'pentaho-listitem-hover');
+            domClass.remove(this.domNode,'pentaho-listitem-hover');
 		}
                     
-	}
-);
-
+	});
+});

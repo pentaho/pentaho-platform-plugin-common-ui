@@ -15,45 +15,48 @@
 *
 */
 
-dojo.provide("pentaho.common.CustomColorPicker");
-dojo.require("dijit.form._FormWidget");
-dojo.require("dojo.dnd.move");
-dojo.require("dojo.fx");
-dojo.require("dojox.color");
-dojo.require("dojo.i18n");
-
-(function(d){
-	
-	dojo.declare("pentaho.common.CustomColorPicker",
-		dojox.widget.ColorPicker,
+define(["dojo/_base/declare", "dojo/_base/lang", "dijit/form/_FormWidget", "dojox/widget/ColorPicker", "dojo/text!pentaho/common/CustomColorPicker/CustomColorPicker.html",
+        "dojo/dom-class",
+        "dojo/dom-style",
+        "dojo/dom-geometry",
+        "dojo/dom-style",
+        "dojo/fx",
+        "dijit/focus",
+        "dojo/dnd/move",
+        "dojo/fx",
+        "dojox/color",
+        "dojo/i18n",
+  "dijit/ColorPalette"],
+  function(declare, lang, _FormWidget, ColorPicker, templateStr, domClass, style, geometry, domStyle, baseFx, focus){
+    return declare("pentaho.common.CustomColorPicker",[ColorPicker],
 		{
-        
+
             showPreview: true,
-            
-            templateString: dojo.cache("pentaho.common","CustomColorPicker/CustomColorPicker.html"),
+
+            templateString: templateStr,
 
 		postCreate: function(){
 			this.inherited(arguments);
 			if(!this.showPreview){ this.previewNode.style.visibility = "hidden"; }
-			if(!this.showHsv){ dojo.style( this.hsvRow, 'display', "none"); }
+			if(!this.showHsv){ style.set( this.hsvRow, 'display', "none"); }
             if(!this.showPreview && !this.webSafe) {
-                if(!this.showPreview){ dojo.style( this.previewNodes, 'display', "none"); }
+                if(!this.showPreview){ domStyle.set( this.previewNodes, 'display', "none"); }
             }
 		},
-            
+
             _setTimer: function(mover){
-                if (!dojo.hasClass(mover.node, "dojoxHuePickerPoint") && !dojo.hasClass(mover.node, "dojoxColorPickerPoint")) {
+                if (!domClass.contains(mover.node, "dojoxHuePickerPoint") && !domClass.contains(mover.node, "dojoxColorPickerPoint")) {
                     // Not a dnd move event from the color picker - ignore it
                     return;
-                }                
+                }
                 this.inherited(arguments);
             },
 
             _clearTimer: function(mover){
-                if (!dojo.hasClass(mover.node, "dojoxHuePickerPoint") && !dojo.hasClass(mover.node, "dojoxColorPickerPoint")) {
+                if (!domClass.contains(mover.node, "dojoxHuePickerPoint") && !domClass.contains(mover.node, "dojoxColorPickerPoint")) {
                     // Not a dnd move event from the color picker - ignore it
                     return;
-                }                
+                }
                 this.inherited(arguments);
             },
 
@@ -64,48 +67,48 @@ dojo.require("dojo.i18n");
 			var satSelCenterH = this.PICKER_SAT_SELECTOR_H/2;
 			var satSelCenterW = this.PICKER_SAT_SELECTOR_W/2;
 
-            var root = dojo.position(this.colorUnderlay, true);
+            var root = geometry.position(this.colorUnderlay, true);
             var newTop = evt.pageY - root.y - satSelCenterH;
             var newLeft = evt.pageX - root.x - satSelCenterW;
 
-			if(evt){ dijit.focus(evt.target); }
+			if(evt){ focus.focus(evt.target); }
 
 			if(this.animatePoint){
-				d.fx.slideTo({
+				fx.slideTo({
 					node: this.cursorNode,
 					duration: this.slideDuration,
 					top: newTop,
 					left: newLeft,
-					onEnd: d.hitch(this, function() {this._updateColor(true); dijit.focus(this.cursorNode);})
+					onEnd: d.hitch(this, function() {this._updateColor(true); focus.focus(this.cursorNode);})
 				}).play();
 			}else{
-				d.style(this.cursorNode, {
+				domStyle.set(this.cursorNode, {
 					left: newLeft + "px",
 					top: newTop + "px"
 				});
 				this._updateColor(false);
 			}
 		},
-        
+
         /* we are overriding this because the Dojo 1.6 code does not work in Safari */
 		_setHuePoint: function(/* Event */evt){
 			// summary: set the hue picker handle on relative y coordinates
 			var selCenter = (this.PICKER_HUE_SELECTOR_H/2);
-            var root = dojo.position(this.colorUnderlay, true);
+            var root = geometry.position(this.colorUnderlay, true);
             var ypos = evt.pageY - root.y - selCenter;
 			if(this.animatePoint){
-				d.fx.slideTo({
+				baseFx.slideTo({
 					node: this.hueCursorNode,
 					duration:this.slideDuration,
 					top: ypos,
 					left: 0,
-					onEnd: d.hitch(this, function() {this._updateColor(true); dijit.focus(this.hueCursorNode);})
+					onEnd: lang.hitch(this, function() {this._updateColor(true); focus.focus(this.hueCursorNode);})
 				}).play();
 			}else{
-				d.style(this.hueCursorNode, "top", ypos + "px");
+				domStyle.set(this.hueCursorNode, "top", ypos + "px");
 				this._updateColor(false);
 			}
-		}     
+		}
 
 	});
-})(dojo);
+});

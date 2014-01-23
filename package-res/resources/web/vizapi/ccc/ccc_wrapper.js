@@ -15,7 +15,7 @@
 *
 */
 
-pen.define([
+define([
         "cdf/lib/CCC/def",
         "cdf/lib/CCC/pvc-d1.0",
         "cdf/lib/CCC/protovis",

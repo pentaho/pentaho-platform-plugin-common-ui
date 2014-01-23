@@ -14,7 +14,7 @@
 * limitations under the License.
 *
 */
-
+define([], function(){});
 // see http://developer.mozilla.org/en/docs/AJAX:Getting_Started for other values
 var COMPLETE = 4;
 // see http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html for other values

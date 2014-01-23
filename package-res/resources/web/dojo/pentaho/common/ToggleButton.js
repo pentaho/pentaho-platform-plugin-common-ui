@@ -15,12 +15,8 @@
 *
 */
 
-dojo.provide("pentaho.common.ToggleButton");
-dojo.require('dijit._Widget');
-dojo.require('dijit._Templated');
-
-dojo.declare("pentaho.common.ToggleButton",
-    [dijit._Widget, dijit._Templated],	{
+define(["dojo/_base/declare", 'dijit/_WidgetBase','dijit/_TemplatedMixin', "dojo/text!pentaho/common/ToggleButton.html"], function(declare, _WidgetBase, _TemplatedMixin, templateStr){
+    return declare("pentaho.common.ToggleButton", [_WidgetBase, _TemplatedMixin], {
         
         title: '',
         
@@ -28,7 +24,7 @@ dojo.declare("pentaho.common.ToggleButton",
         
         width: '80px',
         
-        templateString: dojo.cache("pentaho.common", "ToggleButton.html"),
+        templateString: templateStr,
 
         checked: false,
         
@@ -109,6 +105,6 @@ dojo.declare("pentaho.common.ToggleButton",
             }
         }
         
-    }
-);
+    })
+});
 

@@ -15,14 +15,15 @@
 *
 */
 
-pen.define([ 
+define([ 
             "cdf/lib/CCC/def", 
             "cdf/lib/CCC/pvc-d1.0",
-            "common-ui/vizapi/VizController"
+            "common-ui/vizapi/VizController",
+            "pentaho/common/Messages",
+            "dojo/_base/declare", "dojo/_base/array"
         ],
-        function(def, pvc){
+        function(def, pvc, VizController, Messages, declare, array){
     
-    dojo.require("pentaho.common.Messages");
     
     pentaho = typeof pentaho != "undefined" ? pentaho : {};
     pentaho.visualizations || (pentaho.visualizations = {});
@@ -34,7 +35,7 @@ pen.define([
     analyzerPlugins.push({
         init: function (){
             
-            dojo.declare("analyzer.CCCVizHelper", null, {
+            declare("analyzer.CCCVizHelper", null, {
                 /**
                  * Indicates if interaction features are enabled.
                  * When printing, as in a server environment,
@@ -120,7 +121,7 @@ pen.define([
                         return gemElem;
                     }
                     
-                    dojo.forEach(gemsInfoList, function(gemInfo){
+                    array.forEach(gemsInfoList, function(gemInfo){
                         var role    = gemInfo.role;
                         if(!role || role === 'undefined'){
                             // unmapped role
@@ -229,7 +230,7 @@ pen.define([
                 }
             });
 
-            dojo.declare("analyzer.CCCVizConfig", [analyzer.ColorConfiguration], {
+            declare("analyzer.CCCVizConfig", [analyzer.ColorConfiguration], {
                 
                 _processModelValueChange: function(item, args){
                     // works by convention where the ids of the data req items match the property names
@@ -251,7 +252,7 @@ pen.define([
                     // Make sure that every dataReq value is passed as a report arg. 
                     // This is not the case on a new report...
                     var reportArgs = this.report.visualization.args;
-                    dojo.forEach(config.properties, function(item) {
+                    array.forEach(config.properties, function(item) {
                         if(!item.dataStructure){
                             var value = item.value;
                             if(value === undefined){
@@ -335,7 +336,7 @@ pen.define([
                 }
             });
         
-            dojo.declare("analyzer.CCCHeatgridVizConfig", [analyzer.CCCVizConfig], {
+            declare("analyzer.CCCHeatgridVizConfig", [analyzer.CCCVizConfig], {
     
                 onModelEvent: function (config, item, eventName, args) {
                     switch(eventName){ 
@@ -365,7 +366,7 @@ pen.define([
                 }
             });
             
-            dojo.declare("analyzer.CCCBarLineVizConfig", [analyzer.CCCVizConfig], {
+            declare("analyzer.CCCBarLineVizConfig", [analyzer.CCCVizConfig], {
                 
                 onModelEvent: function (config, item, eventName, args) {
                     // Moving or adding a gem may cause the color options to appear/disappear
@@ -402,7 +403,7 @@ pen.define([
                 }
             });
             
-            dojo.declare("analyzer.CCCScatterVizConfig", [analyzer.CCCVizConfig], {
+            declare("analyzer.CCCScatterVizConfig", [analyzer.CCCVizConfig], {
                 
                 onModelEvent: function (config, item, eventName, args) {
                     // Moving or adding a gem may cause the color options to appear/disappear
@@ -453,8 +454,7 @@ pen.define([
                 
                 'ccc_scatter',
                 'ccc_barline',
-                'ccc_heatgrid',
-                'ccc_sunburst'
+                'ccc_heatgrid'
                 
                 //'ccc_treemap' - See ANALYZER-1983
                 
@@ -479,7 +479,7 @@ pen.define([
                 cv.pentahoVisualizationsHelpers = {};
             }
             
-            dojo.forEach(vizIds, function(vizId){
+            array.forEach(vizIds, function(vizId){
                 
                 cv.pentahoVisualizations.push(pentaho.visualizations.getById(vizId));
     

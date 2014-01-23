@@ -54,8 +54,8 @@
        </condition>
      </fail -->
 
-  <property name="dojo.version" value="1.6.1.p"/>
-  <property name="dojo-artifact" value="dojo-${dojo.version}-src"/>
+  <property name="dojo.version" value="1.9.2"/>
+  <property name="dojo-artifact" value="dojo-release-${dojo.version}-src"/>
 
   <property name="dev.res" value="dev-res"/>
 
@@ -97,8 +97,8 @@
 <!--
        <get src="http://download.dojotoolkit.org/release-${dojo.version}/${dojo-artifact}.zip"
              dest="${dojo.root}/${dojo-artifact}.zip"/> -->
-       <get src="http://repository.pentaho.org/artifactory/third-party/org/dojotoolkit/dojo/${dojo.version}/${dojo-artifact}.zip"
-             dest="${dojo.root}/${dojo-artifact}.zip"/>             
+       <get src="http://repository.pentaho.org/artifactory/third-party/org/dojotoolkit/dojo/dojo-release/${dojo.version}/${dojo-artifact}.zip"
+             dest="${dojo.root}/${dojo-artifact}.zip"/>
         <mkdir dir="${dojo.root}"/>
         <unzip src="dev-res/dojo/${dojo-artifact}.zip" dest="${dojo.root}"/>
 
@@ -128,80 +128,73 @@
       <fileset dir="${package.resdir}"/>
     </copy>
 
-
-    <replace file="${approot.stage.dir}/resources/web/util/local.js" token="define(function" value="pen.define(function"/>
-
     <copy todir="${dojo.prod.stage.dir}/dojo">
       <fileset dir="${dojo.src}/dojo"/>
     </copy>
 
     <copy todir="${dojo.prod.stage.dir}/dojo">
-      <fileset dir="${stage.dir}/javascript">
-        <include name="dojo.js"/>
-        <include name="dojo.js.uncompressed.js"/>
-        <include name="dojo-ext.js"/>
-        <include name="dojo-ext.js.uncompressed.js"/>
-        <include name="dojo-all.js"/>
-        <include name="dojo-all.js.uncompressed.js"/>
-      </fileset>
+      <fileset dir="${dojo.src}/dijit"/>
     </copy>
-
-    <copy todir="${dojo.prod.stage.dir}/dojo/nls">
-      <fileset dir="${stage.dir}/javascript/nls">
-        <include name="*.js"/>
-      </fileset>
-    </copy>
-    <copy todir="${dojo.prod.stage.dir}/dojo/cldr/nls">
-      <fileset dir="${stage.dir}/javascript/cldr/nls">
-      </fileset>
-    </copy>
-    <copy todir="${dojo.prod.stage.dir}/dojox/widget/ColorPicker">
-      <fileset dir="${dojo.src}/dojox/widget/ColorPicker">
-      </fileset>
-    </copy>
-    <copy todir="${dojo.prod.stage.dir}/dojox/widget/nls">
-      <fileset dir="${dojo.src}/dojox/widget/nls">
-        <include name="ColorPicker.js"/>
-      </fileset>
-    </copy>
-    <copy todir="${dojo.prod.stage.dir}/dojo/resources">
-      <fileset dir="${dojo.src}/dojo/resources">
-        <include name="blank.gif"/>
-      </fileset>
-    </copy>
-
-    <copy todir="${dojo.prod.stage.dir}/util/doh">
-      <fileset dir="${dojo.src}/util/doh"/>
-    </copy>
-
-
-    <copy todir="${dojo.prod.stage.dir}/dojox">
+    <copy todir="${dojo.prod.stage.dir}/dojo">
       <fileset dir="${dojo.src}/dojox"/>
     </copy>
 
-    <copy todir="${dojo.prod.stage.dir}/dijit">
-      <fileset dir="${dojo.src}/dijit"/>
-    </copy>
+    <!--<copy todir="${dojo.prod.stage.dir}/dojo/nls">-->
+      <!--<fileset dir="${stage.dir}/javascript/nls">-->
+        <!--<include name="*.js"/>-->
+      <!--</fileset>-->
+    <!--</copy>-->
+    <!--<copy todir="${dojo.prod.stage.dir}/dojo/cldr/nls">-->
+      <!--<fileset dir="${stage.dir}/javascript/cldr/nls">-->
+      <!--</fileset>-->
+    <!--</copy>-->
+    <!--<copy todir="${dojo.prod.stage.dir}/dojox/widget/ColorPicker">-->
+      <!--<fileset dir="${dojo.src}/dojox/widget/ColorPicker">-->
+      <!--</fileset>-->
+    <!--</copy>-->
+    <!--<copy todir="${dojo.prod.stage.dir}/dojox/widget/nls">-->
+      <!--<fileset dir="${dojo.src}/dojox/widget/nls">-->
+        <!--<include name="ColorPicker.js"/>-->
+      <!--</fileset>-->
+    <!--</copy>-->
+    <!--<copy todir="${dojo.prod.stage.dir}/dojo/resources">-->
+      <!--<fileset dir="${dojo.src}/dojo/resources">-->
+        <!--<include name="blank.gif"/>-->
+      <!--</fileset>-->
+    <!--</copy>-->
 
-    <copy todir="${approot.stage.dir}/resources/web/testres">
-      <fileset dir="${dev.res}">
-        <include name="runner.html"/>
-      </fileset>
-    </copy>
-    <delete>
-      <fileset dir="${dojo.prod.stage.dir}/util/doh">
-        <include name="runner.js"/>
-        <include name="runner2.js"/>
-        <include name="runner.css"/>
-      </fileset>
-    </delete>
-    <copy todir="${dojo.prod.stage.dir}/util/doh">
-      <fileset dir="build-res">
-        <include name="runner.js"/>
-        <include name="runner2.js"/>
-        <include name="runner.css"/>
-      </fileset>
-    </copy>
+    <!--<copy todir="${dojo.prod.stage.dir}/util/doh">-->
+      <!--<fileset dir="${dojo.src}/util/doh"/>-->
+    <!--</copy>-->
+
+
+    <!--<copy todir="${dojo.prod.stage.dir}/dojox">-->
+      <!--<fileset dir="${dojo.src}/dojox"/>-->
+    <!--</copy>-->
+
+    <!--<copy todir="${dojo.prod.stage.dir}/dijit">-->
+      <!--<fileset dir="${dojo.src}/dijit"/>-->
+    <!--</copy>-->
+
+    <!--<copy todir="${approot.stage.dir}/resources/web/testres">-->
+      <!--<fileset dir="${dev.res}">-->
+        <!--<include name="runner.html"/>-->
+      <!--</fileset>-->
+    <!--</copy>-->
+    <!--<delete>-->
+      <!--<fileset dir="${dojo.prod.stage.dir}/util/doh">-->
+        <!--<include name="runner.js"/>-->
+        <!--<include name="runner2.js"/>-->
+        <!--<include name="runner.css"/>-->
+      <!--</fileset>-->
+    <!--</delete>-->
+    <!--<copy todir="${dojo.prod.stage.dir}/util/doh">-->
+      <!--<fileset dir="build-res">-->
+        <!--<include name="runner.js"/>-->
+        <!--<include name="runner2.js"/>-->
+        <!--<include name="runner.css"/>-->
+      <!--</fileset>-->
+    <!--</copy>-->
     <delete dir="${stage.dir}/javascript"/>
 
     <property environment="env"/>
@@ -248,98 +241,18 @@
           file="${dev.res}/runner.html"/>
   </target>
 
-  <target name="plugin-create-js-variants" depends="plugin-copy-pentaho-js-to-dojo-build,plugin-build-jslibs">
-  </target>
-
-  <target name="plugin-copy-pentaho-js-to-dojo-build">
-    <delete dir="${dojo.src}/pentaho"/>
-    <mkdir dir="${dojo.src}/pentaho"/>
-    <copy todir="${dojo.src}/pentaho/common">
-      <fileset dir="package-res/resources/web/dojo/pentaho/common">
-        <include name="**/*.js"/>
-        <include name="**/*.html"/>
-        <include name="**/*.css"/>
-      </fileset>
-    </copy>
+  <target name="plugin-create-js-variants" depends="plugin-build-jslibs">
   </target>
 
   <target name="plugin-build-jslibs"
-          depends="plugin-build-jslibs.init,plugin-build-js-dojo,plugin-copy-pentaho-js-to-dojo-build,plugin-build-js-pentaho">
-    <!-- now concat the js files together -->
-    <concat destfile="${stage.dir}/javascript/dojo-all.js" force="no">
-      <filelist dir="${stage.dir}/javascript"
-                files="dojo.js,dojo-ext.js"/>
-    </concat>
+          depends="plugin-build-jslibs.init,plugin-build-js-pentaho">
 
-    <concat destfile="${stage.dir}/javascript/dojo-all.js.uncompressed.js" force="no">
-      <filelist dir="${stage.dir}/javascript"
-                files="dojo.js.uncompressed.js,dojo-ext.js.uncompressed.js"/>
-    </concat>
-    <concat destfile="${stage.dir}/javascript/pentaho-dojo-all.js" force="no">
-      <filelist dir="${stage.dir}/javascript"
-                files="dojo.js,dojo-ext.js"/>
-    </concat>
-    <concat destfile="${stage.dir}/javascript/pentaho-dojo-all.js.uncompressed.js" force="no">
-      <filelist dir="${stage.dir}/javascript"
-                files="dojo.js.uncompressed.js,dojo-ext.js.uncompressed.js"/>
-    </concat>
 
-    <!-- now delete the temp files -->
-    <delete dir="${dojo.src}/pentaho"/>
-    <delete dir="${dojo.src}/release"/>
   </target>
 
   <target name="plugin-build-jslibs.init">
     <delete dir="${stage.dir}/javascript"/>
     <mkdir dir="${stage.dir}/javascript"/>
-  </target>
-
-  <target name="plugin-build-js-dojo" description="Does the Dojo build of src and compressed js files">
-
-    <!-- make sure the default dojo copyright/build headers are in play -->
-    <copy verbose="true" todir="${dojo.src}/util/buildscripts" overwrite="true">
-      <fileset dir="${dev.res}">
-        <include name="dojo_copyright.txt"/>
-        <include name="dojo_build_notice.txt"/>
-      </fileset>
-      <mapper type="glob" from="dojo_*" to="*"/>
-    </copy>
-
-    <copy verbose="true" todir="${dojo.src}/dijit" overwrite="true">
-      <fileset dir="${package.resdir}/resources/web/dojo/dijit">
-      </fileset>
-    </copy>
-
-    <java classname="org.mozilla.javascript.tools.shell.Main"
-          dir="${dojo.src}/util/buildscripts"
-          fork="true">
-
-      <arg value="build.js"/>
-      <arg value="action=release"/>
-      <arg value="offlineProfile=true"/>
-      <arg value="copyTests=false"/>
-      <arg value="version=${project.revision}"/>
-      <arg value="profileFile=../../../../../build-res/dojo-ext.profile.js"/>
-      <classpath>
-        <pathelement location="${dojo.src}/util/shrinksafe/js.jar"/>
-        <pathelement location="${dojo.src}/util/shrinksafe/shrinksafe.jar"/>
-      </classpath>
-    </java>
-    <!-- copy the scripts out -->
-    <copy todir="${stage.dir}/javascript">
-      <fileset dir="${dojo.src.release}/dojo">
-        <include name="dojo.js.uncompressed.js"/>
-        <include name="dojo.js"/>
-        <include name="dojo-ext.js.uncompressed.js"/>
-        <include name="dojo-ext.js"/>
-      </fileset>
-    </copy>
-    <copy todir="${stage.dir}/javascript/nls">
-      <fileset dir="${dojo.src.release}/dojo/nls"/>
-    </copy>
-    <copy todir="${stage.dir}/javascript/cldr/nls">
-      <fileset dir="${dojo.src.release}/dojo/cldr/nls"/>
-    </copy>
   </target>
 
   <target name="plugin-build-js-pentaho" description="Does the Dojo build of src and compressed js files" depends="subfloor-js.dist-js">

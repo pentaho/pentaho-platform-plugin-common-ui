@@ -14,17 +14,13 @@
 * limitations under the License.
 *
 */
-
-dojo.provide("pentaho.common.FieldList");
-
-/**
- * Creates a list of fields from a 
- */
-dojo.declare(
-    "pentaho.common.FieldList",
-    [dijit._Widget, dijit._Templated],
+define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on", "dojo/query", "dojox/html/entities", "dojo/dom-class", "dojo/_base/array",
+"dojo/dom-construct", "dojo/dnd/Source", "dojo/dnd/Selector", "dojo/_base/lang", "dojo/dom"],
+    function(declare, _WidgetBase, _Templated, on, query, entities, domClass, array, construct, Source, Selector, lang, dom){
+      return declare("pentaho.common.FieldList",
+    [_WidgetBase, _Templated],
 {
-  templateString: '<div dojoAttachPoint="containerNode"></div>',
+  templateString: '<div data-dojo-attach-point="containerNode"></div>',
   datasource: undefined,
   connectHandles: [],
   enableDragDrop: true,
@@ -37,7 +33,7 @@ dojo.declare(
   
   sanitizeIdAndClassNames: function(name) {
     if(name != null){
-    return dojox.html.entities.encode(name).replace(/ /g,"_");
+      return entities.encode(name).replace(/ /g,"_");
     }
     else{
       return '';
@@ -72,7 +68,7 @@ dojo.declare(
         if( !this.fieldContextMenu ) {
             return;
         }
-        dojo.stopEvent(event);
+        event.stop(event);
         var x = event.pageX;
         var y = event.pageY;
         this.fieldContextMenu._scheduleOpen(event.target, null, {x: x, y: y});
@@ -110,12 +106,12 @@ dojo.declare(
    */
   textSelectionDisabler: function(target){
     if (typeof target.onselectstart!="undefined") { //IE route
-        this.connectHandles.push(dojo.connect(target, "onselectstart", function() { return false; }));
+        this.connectHandles.push(on(target, "selectstart", function() { return false; }));
     } 
     else if (typeof target.style.MozUserSelect!="undefined") { //Firefox route
         target.style.MozUserSelect="none"
     } else { //All other route (ie: Opera)
-        this.connectHandles.push(this.connect(target, "onmousedown", function() { return false; }));
+        this.connectHandles.push(on(target, "mousedown", function() { return false; }));
     }
     target.style.cursor = "default"
   },
@@ -155,10 +151,10 @@ dojo.declare(
     //		a node
     // type: String
     //		a variable suffix for a class name
-    dojo.addClass(node, "dojoDndItem" + type);
+    domClass.add(node, "dojoDndItem" + type);
     if(type == 'Selected' || type == 'Anchor'){
-        dojo.addClass(node, "pentaho-listitem-selected");
-        dojo.removeClass(node, 'pentaho-listitem-hover');
+        domClass.add(node, "pentaho-listitem-selected");
+        domClass.remove(node, 'pentaho-listitem-hover');
     }
   },
   
@@ -169,10 +165,10 @@ dojo.declare(
     //		a node
     // type: String
     //		a variable suffix for a class name
-    dojo.removeClass(node, "dojoDndItem" + type);
+    domClass.remove(node, "dojoDndItem" + type);
     if(type == 'Selected' || type == 'Anchor'){
-        dojo.removeClass(node, "pentaho-listitem-selected");
-        dojo.removeClass(node, 'pentaho-listitem-hover');
+        domClass.remove(node, "pentaho-listitem-selected");
+        domClass.remove(node, 'pentaho-listitem-hover');
     }
   },
     
@@ -180,11 +176,11 @@ dojo.declare(
     if (this.dndObj) {
       this.dndObj.destroy();
     }
-    dojo.forEach(this.connectHandles, function(handle) {
-      dojo.disconnect(handle);
+    array.forEach(this.connectHandles, function(handle) {
+      handle.remove();
     });
     this.connectHandles = [];
-    dojo.empty(this.containerNode);
+    construct.empty(this.containerNode);
     
     this.categoryClassMap = {};
     this.usedCategoryIds = {};
@@ -193,23 +189,23 @@ dojo.declare(
   configureFor: function(datasource) {
     this.unload();
 
-    this.dndObj = new dojo.dnd.Source(this.containerNode, 
+    this.dndObj = new Source(this.containerNode,
       {
         "copyOnly": true,
         "accept": "",
         "selfAccept": false,
         "singular": this.singleSelect,
-        "creator": dojo.hitch(this, this._dndItemCreator)
+        "creator": lang.hitch(this, this._dndItemCreator)
       });
 
     if(!this.enableDragDrop) {
-        this.selector = new dojo.dnd.Selector(this.containerNode, 
+        this.selector = new Selector(this.containerNode,
         {
           "copyOnly": true,
           "accept": "",
           "selfAccept": false,
           "singular": this.singleSelect,
-          "creator": dojo.hitch(this, this._dndItemCreator)
+          "creator": lang.hitch(this, this._dndItemCreator)
         });
         this.selector._addItemClass = this._addItemClass;
         this.selector._removeItemClass = this._removeItemClass;
@@ -228,8 +224,8 @@ dojo.declare(
 
     var categories = this.getCategories(datasource);
 
-    dojo.forEach(categories, function(category, idx) {
-      if (dojo.indexOf(addedCategories, category.id) != -1) {
+    array.forEach(categories, function(category, idx) {
+      if (array.indexOf(addedCategories, category.id) != -1) {
         return;
       }
       var fields = this.getFields(datasource, category, this.filters);
@@ -240,22 +236,22 @@ dojo.declare(
       var catId = this.getCategoryClassName(category.id);
       addedCategories.push(category.id);
       // create div for category
-      var categoryDiv = dojo.create("div",
+      var categoryDiv = construct.create("div",
         {
           "id": catId
         }, this.containerNode);
 
       // create +- expand/collapse indicator
-      var categoryIndicator = dojo.create("div",
+      var categoryIndicator = construct.create("div",
         {
           "id": catId + "-indicator",
           "class": "categoryIndicator treenode-open",
           "categoryId": catId
         }, categoryDiv);
-      this.connectHandles.push(dojo.connect(categoryIndicator, 'onclick', this, this.expandCollapseCategory));
+      this.connectHandles.push(on(categoryIndicator,  'click', lang.hitch( this,  this.expandCollapseCategory)));
 
       // create span for categoryName to display text
-      var categoryNameSpan = dojo.create("span",
+      var categoryNameSpan = construct.create("span",
         {
           "id": catId + "-span",
           "class": "treenode-branch-label",
@@ -263,10 +259,10 @@ dojo.declare(
           "categoryId": catId
         }, categoryDiv);
       this.textSelectionDisabler(categoryNameSpan);
-      this.connectHandles.push(dojo.connect(categoryNameSpan, 'ondblclick', this, this.expandCollapseCategory));
+      this.connectHandles.push(on(categoryNameSpan,  'dblclick', lang.hitch( this,  this.expandCollapseCategory)));
 
       // create DND field list for this category
-      var categoryFieldsDiv = dojo.create("div",
+      var categoryFieldsDiv = construct.create("div",
         {
           "id": catId + "-fields"
         }, categoryDiv);
@@ -278,7 +274,7 @@ dojo.declare(
 
   addFields: function( fields, parent, parentId ) {
       var items = [];
-      dojo.forEach(fields, function(field) {
+      array.forEach(fields, function(field) {
         var item = {
             "categoryId": parentId,
             "displayName": field.name,
@@ -300,8 +296,8 @@ dojo.declare(
             var x = this._dndItemCreator(items[idx],'');
             parent.appendChild(x.node);
             this.selector.setItem("field-" + items[idx].fieldId, { "data": items[idx], "type": "treenode-leaf-label", "fieldId": items[idx].fieldId });
-            this.connectHandles.push(dojo.connect(x.node, 'onmousedown', this, this.onMouseDown));
-            this.connectHandles.push(dojo.connect(x.node, 'onmouseup', this, this.onMouseUp));
+            this.connectHandles.push(on(x.node,  'mousedown', lang.hitch( this,  this.onMouseDown)));
+            this.connectHandles.push(on(x.node,  'mouseup', lang.hitch( this,  this.onMouseUp)));
         }
       }
   },
@@ -328,34 +324,34 @@ dojo.declare(
     } else {
     	props.title = item.fieldId;
     }
-    var div = dojo.create("div", props);
+    var div = construct.create("div", props);
     if (hint === "avatar") {
-      dojo.addClass(div, "dragDropAvatar");
+      domClass.add(div, "dragDropAvatar");
     } else {
-      dojo.addClass(div, "field");
-      dojo.addClass(div, "treenode-leaf-label");
-      dojo.addClass(div, "pentaho-listitem");
+      domClass.add(div, "field");
+      domClass.add(div, "treenode-leaf-label");
+      domClass.add(div, "pentaho-listitem");
       // Wire up interaction
-      this.connectHandles.push(dojo.connect(div, "oncontextmenu", this, function(event) {
+      this.connectHandles.push(on(div,  "contextmenu", lang.hitch( this,  function(event) {
         this.updateSelectionForContextMenu(item.fieldId);
         if(this.fieldContextMenuCallback) {
             this.fieldContextMenuCallback(event);
         }
-      }));
-      this.connectHandles.push(dojo.connect(div, 'ondblclick', this, function(event) {
+      })));
+      this.connectHandles.push(on(div,  'dblclick', lang.hitch( this,  function(event) {
         if(this.doubleClickCallback) {
             this.doubleClickCallback(item.fieldId);
         }
-      }));
-      this.connectHandles.push(dojo.connect(div, 'onmouseover', this, function(event) {
+      })));
+      this.connectHandles.push(on(div,  'mouseover', lang.hitch( this,  function(event) {
         this.onFieldMouseOver(event);
-      }));
-      this.connectHandles.push(dojo.connect(div, 'onmouseout', this, function(event) {
+      })));
+      this.connectHandles.push(on(div,  'mouseout', lang.hitch( this,  function(event) {
         this.onFieldMouseOut(event);
-      }));
-      this.connectHandles.push(dojo.connect(div, 'onclick', this, function(event) {
+      })));
+      this.connectHandles.push(on(div,  'click', lang.hitch( this,  function(event) {
         this.onFieldClick(event);
-      }));
+      })));
     }
     return {node: div, data: item, type: ["treenode-leaf-label"]};
   },
@@ -373,9 +369,9 @@ dojo.declare(
     if(this.selector) {
         this.selector.onMouseOver(event);
     }
-    if(!dojo.hasClass(event.target,'pentaho-listitem-selected')) {
-        dojo.addClass(event.target, 'pentaho-listitem-hover');
-        dojo.removeClass(event.target, 'pentaho-listitem');
+    if(!domClass.contains(event.target,'pentaho-listitem-selected')) {
+        domClass.add(event.target, 'pentaho-listitem-hover');
+        domClass.remove(event.target, 'pentaho-listitem');
     }
   },
 
@@ -383,12 +379,12 @@ dojo.declare(
     if(this.selector) {
         this.selector.onMouseOut(event);
     }
-    if(!dojo.hasClass(event.target,'pentaho-listitem-selected')) {
-        dojo.addClass(event.target, 'pentaho-listitem');
-        dojo.removeClass(event.target, 'pentaho-listitem-hover');
+    if(!domClass.contains(event.target,'pentaho-listitem-selected')) {
+        domClass.add(event.target, 'pentaho-listitem');
+        domClass.remove(event.target, 'pentaho-listitem-hover');
     } else {
-        dojo.removeClass(event.target, 'pentaho-listitem-hover');
-        dojo.addClass(event.target, 'pentaho-listitem-selected');
+        domClass.remove(event.target, 'pentaho-listitem-hover');
+        domClass.add(event.target, 'pentaho-listitem-selected');
     }
   },
 
@@ -404,7 +400,7 @@ dojo.declare(
 
   getCategories: function(datasource) {
     var categories = [];
-    dojo.forEach(datasource.getAllElements(), function(element) {
+    array.forEach(datasource.getAllElements(), function(element) {
       if (element.elementType == pentaho.pda.Column.ELEMENT_TYPES.CATEGORY && categories[element] == null) {
         categories.push(element);
       }
@@ -415,7 +411,7 @@ dojo.declare(
   getFields: function(datasource, category, filters) {
     var fields = [];
     var elements = datasource.getAllElements();   
-    dojo.forEach(datasource.getAllElements(), function(element) {
+    array.forEach(datasource.getAllElements(), function(element) {
       if (element.isQueryElement && ( category == null || element.parent == category) && fields[element] == null) {
       
         if(filters && filters.length > 0) {
@@ -448,19 +444,19 @@ dojo.declare(
 
   expandCollapseCategory: function (eventElement) {
     var categoryId = dojo.attr(eventElement.target, "categoryId");
-    var node = dojo.byId(categoryId + "-fields");
-    var indicatorNode = dojo.byId(categoryId + "-indicator");
+    var node = dom.byId(categoryId + "-fields");
+    var indicatorNode = dom.byId(categoryId + "-indicator");
     var collapsed = dojo.attr(indicatorNode, "collapsed") != "true";
     if (collapsed) {
-      dojo.addClass(indicatorNode,'treenode-closed');
-      dojo.removeClass(indicatorNode,'treenode-open');
+      domClass.add(indicatorNode,'treenode-closed');
+      domClass.remove(indicatorNode,'treenode-open');
     } else {
-      dojo.addClass(indicatorNode,'treenode-open');
-      dojo.removeClass(indicatorNode,'treenode-closed');
+      domClass.add(indicatorNode,'treenode-open');
+      domClass.remove(indicatorNode,'treenode-closed');
     }
     dojo.attr(indicatorNode, "collapsed", "" + collapsed);
 
-    var fields = dojo.query("." + categoryId, this.containerNode);
+    var fields = query("." + categoryId, this.containerNode);
     if (collapsed) {
       fields.addClass("hidden")
     } else {
@@ -474,16 +470,16 @@ dojo.declare(
 
   updateFilterIndicators: function(filters) {
     // Remove all filter indicators
-    dojo.query(".treenode-leaf-label", this.containerNode).removeClass("fieldlist-filtered-field");
+    query(".treenode-leaf-label", this.containerNode).removeClass("fieldlist-filtered-field");
     // Add filter icons to fields that are filtered
     if (!filters) {
       return;
     }
     // For all active filters add the fieldFiltered class to the field list div for the column that's filtered
-    dojo.forEach(filters, function(filter) {
-      var fieldDiv = dojo.byId("field-" + this.sanitizeIdAndClassNames(filter.column));
+    array.forEach(filters, function(filter) {
+      var fieldDiv = dom.byId("field-" + this.sanitizeIdAndClassNames(filter.column));
       if(fieldDiv != null){
-        dojo.addClass(fieldDiv, "fieldlist-filtered-field");
+        domClass.add(fieldDiv, "fieldlist-filtered-field");
       }
     }, this);
   },
@@ -500,7 +496,7 @@ dojo.declare(
     });
 
     var id = "field-" + fieldId;
-    var node = dojo.byId(id);
+    var node = dom.byId(id);
     if (!selected) {
       this.clearSelection();
       // Logic borrowed from dojo.dnd.Selector.selectAll
@@ -562,4 +558,5 @@ dojo.declare(
     this.fieldContextMenu = fieldContextMenu;
   }
   
+});
 });

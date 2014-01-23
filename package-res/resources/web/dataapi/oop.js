@@ -18,7 +18,9 @@
 /*
 concepts taken from Nicholas Zakas Professional Javascript
 */
+define([], function(){
 
+});
 function object(o){
 	function F(){}
 	F.prototype = o;

@@ -16,3 +16,14 @@
 */
 
 // dataapi main module
+define([
+  'common-repo/module',
+  'common-data/oop',
+  'common-data/app',
+  'common-data/controller',
+  'common-data/xhr',
+  'common-data/cda',
+  'common-data/models-mql'
+], function(){
+
+})

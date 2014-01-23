@@ -13,7 +13,7 @@
 
 /*global require: false, define: false */
 
-define(function () {
+pen.define(function () {
   var local, addCallback, invokeCallbacks, isDefined, registerLocal,
     defined = {}, required = {};
 

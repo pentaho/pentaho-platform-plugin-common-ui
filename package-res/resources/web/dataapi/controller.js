@@ -17,8 +17,8 @@
 
 //= require "oop.js"
 //= require "app.js"
-dojo.require("pentaho.common.Messages");
 
+define(["pentaho/common/Messages", 'common-data/oop', 'common-data/app'], function(Messages, _oop, _app){
 pentaho = typeof pentaho == "undefined" ? {} : pentaho;
 
 pentaho.pda = pentaho.pda || {};
@@ -31,7 +31,7 @@ pentaho.pda.SOURCE_TYPE_CDA = 'cda';
 
 pentaho.pda.modelaccess = {};
 
-pentaho.common.Messages.addUrlBundle('dataapi',CONTEXT_PATH+'i18n?plugin=common-ui&name=resources/web/dataapi/nls/messages');
+  pentaho.common.Messages.addUrlBundle('dataapi',CONTEXT_PATH+'i18n?plugin=common-ui&name=resources/web/dataapi/nls/messages');
 
 /*
           @class pentaho.pda.app
@@ -681,5 +681,5 @@ pentaho.pda.model.prototype.populateListControl = function( list, fieldTypes, so
         list.selectedIndex = selectedIdx;
 
     }
-    
 
+});

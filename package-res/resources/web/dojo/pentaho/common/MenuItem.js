@@ -14,40 +14,37 @@
 * limitations under the License.
 *
 */
-
-dojo.provide("pentaho.common.MenuItem");
-dojo.require("dijit.MenuItem");
-
-dojo.declare(
-    "pentaho.common.MenuItem",
-    [dijit.MenuItem],
+define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on", "dojo/query", "dijit/MenuItem",
+"dojo/text!pentaho/common/MenuItem.html", "dojo/dom-class"],
+    function(declare, _WidgetBase, _Templated, on, query, MenuItem, templateStr, domClass){
+      return declare("pentaho.common.MenuItem",[MenuItem],
     {
     
         baseClass: "pentaho-menuitem",
 
-		templateString: dojo.cache("pentaho.common", "MenuItem.html"),
+		templateString: templateStr,
 
 		_setSelected: function(selected){
             if(!this.disabled) { 
-                dojo.toggleClass(this.domNode, "pentaho-menuitem-hover", selected);
+                domClass.toggle(this.domNode, "pentaho-menuitem-hover", selected);
             }
         },
 
 		setDisabled: function(/*Boolean*/ disabled){
 			this.set('disabled', disabled);
-			dojo.toggleClass(this.domNode, "pentaho-menuitem-disabled", disabled);
+			domClass.toggle(this.domNode, "pentaho-menuitem-disabled", disabled);
 		},
         
 		_setDisabledAttr: function(/*Boolean*/ value){
-			dijit.setWaiState(this.focusNode, 'disabled', value ? 'true' : 'false');
+			this.focusNode.setAttribute("aria-disabled", value ? 'true' : 'false');
 			this._set("disabled", value);
-			dojo.toggleClass(this.domNode, "pentaho-menuitem-disabled", value);
+			domClass.toggle(this.domNode, "pentaho-menuitem-disabled", value);
 		},
         
 		_onHover: function(){
 			this.getParent().onItemHover(this);
             if(!this.disabled) { 
-                dojo.addClass(this.domNode, "pentaho-menuitem-hover");
+                domClass.add(this.domNode, "pentaho-menuitem-hover");
             }
         },
 
@@ -55,10 +52,11 @@ dojo.declare(
 			this.getParent().onItemUnhover(this);
 			this._set("hovering", false);
             if(!this.disabled) { 
-                dojo.removeClass(this.domNode, "pentaho-menuitem-hover");
+                domClass.remove(this.domNode, "pentaho-menuitem-hover");
             }
 		}        
         
 	}
 );
+    });
 
