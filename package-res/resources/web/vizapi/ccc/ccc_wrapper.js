@@ -3893,7 +3893,7 @@ function(def, pvc, pv){
 
             this._hideNullMembers = vizOptions.emptySlicesHidden;
 
-            options.valuesFont = readFont(vizOptions, 'label');
+            options.valuesFont = defaultFont(readFont(vizOptions, 'label'));
 
             if(vizOptions.emptySlicesHidden) {
                 options.extensionPoints.slice_visible =
