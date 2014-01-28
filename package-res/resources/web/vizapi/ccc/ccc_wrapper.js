@@ -66,6 +66,7 @@ function(def, pvc, pv){
                 reqs: def.array.appendMany(
                     createDataReq('VERTICAL_BAR', {options: false}),
                     createTrendsDataReqs({separator: false}),
+                    [ createLabelsVisibleDataReq() ],
                     [ createChartOptionsDataReq(true) ])
             }],
             menuOrdinal: 100
@@ -81,7 +82,9 @@ function(def, pvc, pv){
             propMap:  [],
             dataReqs: [{
                 name: 'Default',
-                reqs: createDataReq('STACKED_VERTICAL_BAR')
+                reqs: def.array.appendMany(
+                	  createDataReq('STACKED_VERTICAL_BAR'),
+                	  [ createLabelsVisibleDataReq() ])
             }],
             menuOrdinal: 110
         });
@@ -725,6 +728,19 @@ function(def, pvc, pv){
                      group: 'options',
                      type:  'checkbox',
                      caption: dropZoneLabel('EMPTY_SLICES')
+                }
+            };
+        }
+
+        function createLabelsVisibleDataReq(){
+            return {
+                id: 'labelsVisible',
+                dataType: 'boolean',
+                value: false,
+                ui: {
+                     label: dropZoneLabel('SHOW_LABELS'),
+                     group: 'options',
+                     type:  'checkbox'
                 }
             };
         }
@@ -3049,6 +3065,8 @@ function(def, pvc, pv){
             if(options.orientation !== 'vertical'){
                 options.visualRoles.category = { isReversed: true };
             }
+
+            this.options.valuesVisible = this._vizOptions.labelsVisible;
         }
     });
 
