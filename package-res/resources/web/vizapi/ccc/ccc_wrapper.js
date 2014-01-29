@@ -172,8 +172,13 @@ function(def, pvc, pv){
                      createLineWidthDataReq()
                     ],
                     createTrendsDataReqs(),
-                    createLabelDataReqs(),
-                    [ createChartOptionsDataReq(true) ])
+                    [
+                     createLabelsVisibleDataReq(),
+                     createLabelsAnchorDataReq(),
+                     createLabelsTextAlignDataReq(),
+                     createChartOptionsDataReq(true) 
+                    ]
+                )
             }],
             menuOrdinal: 160,
             menuSeparator: true
@@ -677,47 +682,6 @@ function(def, pvc, pv){
                 }];
         }
 
-        function createLabelDataReqs(keyArgs){
-            var anchors = ['top', 'center', 'bottom', 'left', 'right'],
-                textAligns = ['right', 'left', 'center'];
-
-            return [
-                {
-                    id: 'labelsVisible',
-                    dataType: 'boolean',
-                    ui: {
-                        label: dropZoneLabel('SHOW_LABELS'),
-                        group: 'options',
-                        type:  'checkbox',
-                        seperator: def.get(keyArgs, 'separator', true),
-                        caption: "Labels"
-                    }
-                },
-                {
-                    id: 'labelsAnchor',
-                    dataType: 'string',
-                    values: anchors,
-                    ui: {
-                        labels:  anchors.map(function(option){ return option; }),
-                        group: 'options',
-                        type:  'combo',
-                        caption: "Anchor"
-                    }
-                },
-                {
-                    id: 'labelsTextAlign',
-                    dataType: 'string',
-                    values: textAligns,
-                    ui: {
-                        labels:  textAligns.map(function(option){ return option; }),
-                        group: 'options',
-                        type:  'combo',
-                        caption: "Align"
-                    }
-                }
-            ];
-        }
-
         function createPatternDataReq(){
             return {
                 id: 'pattern',
@@ -774,15 +738,46 @@ function(def, pvc, pv){
             };
         }
 
-        function createLabelsVisibleDataReq(){
+        function createLabelsVisibleDataReq(keyArgs){
             return {
                 id: 'labelsVisible',
                 dataType: 'boolean',
-                value: false,
                 ui: {
-                     label: dropZoneLabel('SHOW_LABELS'),
-                     group: 'options',
-                     type:  'checkbox'
+                    label: dropZoneLabel('SHOW_LABELS'),
+                    group: 'options',
+                    type:  'checkbox',
+                    seperator: def.get(keyArgs, 'separator', true),
+                    caption: 'Labels' // TODO i18n pending....                
+                }
+            };
+        }
+        
+        function createLabelsAnchorDataReq(keyArgs){
+            var anchors = ['top', 'center', 'bottom', 'left', 'right'];
+            return {
+                id: 'labelsAnchor',
+                dataType: 'string',
+                values: anchors,
+                ui: {
+                    labels:  anchors.map(function(option){ return option; }),
+                    group: 'options',
+                    type:  'combo',
+                    caption: 'Anchor' // TODO i18n pending....  
+                }
+            };
+        }
+        
+        function createLabelsTextAlignDataReq(keyArgs){
+            var textAligns = ['right', 'left', 'center']; 
+            return {
+                id: 'labelsTextAlign',
+                dataType: 'string',
+                values: textAligns,
+                ui: {
+                    labels:  textAligns.map(function(option){ return option; }),
+                    group: 'options',
+                    type:  'combo',
+                    caption: 'Align' // TODO i18n pending....  
                 }
             };
         }

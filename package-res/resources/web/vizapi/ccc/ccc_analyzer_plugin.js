@@ -331,8 +331,12 @@ pen.define([
                 _updateLabelsUI: function(config){
                     var labelsVisibleConfig = config.byId('labelsVisible');
                     if(labelsVisibleConfig){
-                        config.byId("labelsAnchor").ui.hidden = !labelsVisibleConfig.value;
-                        config.byId("labelsTextAlign").ui.hidden = !labelsVisibleConfig.value;
+                        if(config.byId("labelsAnchor")){
+                            config.byId("labelsAnchor").ui.hidden = !labelsVisibleConfig.value;
+                        }
+                        if(config.byId("labelsTextAlign")){
+                            config.byId("labelsTextAlign").ui.hidden = !labelsVisibleConfig.value;
+                        }
                     }
                 },
                 
