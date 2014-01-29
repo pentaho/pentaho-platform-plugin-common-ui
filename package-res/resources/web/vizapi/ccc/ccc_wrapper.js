@@ -169,9 +169,10 @@ function(def, pvc, pv){
                     createDataReq('LINE', {options: false}),
                     [
                      createShapeDataReq(),
-                     createLineWidthDataReq(),
+                     createLineWidthDataReq()
                     ],
                     createTrendsDataReqs(),
+                    createLabelDataReqs(),
                     [ createChartOptionsDataReq(true) ])
             }],
             menuOrdinal: 160,
@@ -674,6 +675,47 @@ function(def, pvc, pv){
                         caption: dropZoneLabel('SORT_TYPE')
                     }
                 }];
+        }
+
+        function createLabelDataReqs(keyArgs){
+            var anchors = ['top', 'center', 'bottom', 'left', 'right'],
+                textAligns = ['right', 'left', 'center'];
+
+            return [
+                {
+                    id: 'labelsVisible',
+                    dataType: 'boolean',
+                    ui: {
+                        label: dropZoneLabel('SHOW_LABELS'),
+                        group: 'options',
+                        type:  'checkbox',
+                        seperator: def.get(keyArgs, 'separator', true),
+                        caption: "Labels"
+                    }
+                },
+                {
+                    id: 'labelsAnchor',
+                    dataType: 'string',
+                    values: anchors,
+                    ui: {
+                        labels:  anchors.map(function(option){ return option; }),
+                        group: 'options',
+                        type:  'combo',
+                        caption: "Anchor"
+                    }
+                },
+                {
+                    id: 'labelsTextAlign',
+                    dataType: 'string',
+                    values: textAligns,
+                    ui: {
+                        labels:  textAligns.map(function(option){ return option; }),
+                        group: 'options',
+                        type:  'combo',
+                        caption: "Align"
+                    }
+                }
+            ];
         }
 
         function createPatternDataReq(){
@@ -3192,6 +3234,11 @@ function(def, pvc, pv){
                 options.pointDotsVisible = true;
                 options.extensionPoints.pointDot_shape = shape;
             }
+
+            options.valuesVisible = vizOptions.labelsVisible;
+            options.valuesAnchor = vizOptions.labelsAnchor;
+
+            options.extensionPoints.label_textAlign = vizOptions.labelsTextAlign;
         },
 
        _configureAxesDisplayUnits: function(){

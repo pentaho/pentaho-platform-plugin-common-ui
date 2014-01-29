@@ -283,6 +283,7 @@ pen.define([
                     }
                     
                     this._updateTrendUI(config);
+                    this._updateLabelsUI(config);
                 },
                 
                 // TODO: Taken from analyzer.ColorConfiguration#onModelEvent 
@@ -324,6 +325,14 @@ pen.define([
                         
                         config.byId("trendLineWidth").ui.hidden = hidden;
                         config.byId("trendName").ui.hidden = hidden;
+                    }
+                },
+
+                _updateLabelsUI: function(config){
+                    var labelsVisibleConfig = config.byId('labelsVisible');
+                    if(labelsVisibleConfig){
+                        config.byId("labelsAnchor").ui.hidden = !labelsVisibleConfig.value;
+                        config.byId("labelsTextAlign").ui.hidden = !labelsVisibleConfig.value;
                     }
                 },
                 
