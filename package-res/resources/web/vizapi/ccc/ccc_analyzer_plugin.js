@@ -283,7 +283,6 @@ pen.define([
                     }
                     
                     this._updateTrendUI(config);
-                    this._updateLabelsUI(config);
                 },
                 
                 // TODO: Taken from analyzer.ColorConfiguration#onModelEvent 
@@ -327,19 +326,6 @@ pen.define([
                         config.byId("trendName").ui.hidden = hidden;
                     }
                 },
-
-                _updateLabelsUI: function(config){
-                    var labelsVisibleConfig = config.byId('labelsVisible');
-                    if(labelsVisibleConfig){
-                        if(config.byId("labelsAnchor")){
-                            config.byId("labelsAnchor").ui.hidden = !labelsVisibleConfig.value;
-                        }
-                        if(config.byId("labelsTextAlign")){
-                            config.byId("labelsTextAlign").ui.hidden = !labelsVisibleConfig.value;
-                        }
-                    }
-                },
-                
                 _setScalingType: function (colorScaleType) {
                     this.report.visualization.args.colorScaleType = colorScaleType;
                 },
