@@ -172,9 +172,9 @@ function(def, pvc, pv){
                      createLineWidthDataReq()
                     ],
                     createTrendsDataReqs(),
-                    [ 
-                     createChartOptionsDataReq(true) 
                     createDotLabelDataReqs(),
+                    [ 
+                     createChartOptionsDataReq(true)
                     ]
                 )
             }],
