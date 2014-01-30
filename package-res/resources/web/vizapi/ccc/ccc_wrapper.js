@@ -172,9 +172,9 @@ function(def, pvc, pv){
                      createLineWidthDataReq()
                     ],
                     createTrendsDataReqs(),
-                    createLabelDataReqs(),
                     [ 
                      createChartOptionsDataReq(true) 
+                    createDotLabelDataReqs(),
                     ]
                 )
             }],
@@ -194,7 +194,13 @@ function(def, pvc, pv){
                 name: 'Default',
                 drillOrder: ['rows'],
                 hyperlinkOrder: ['rows','columns'],
-                reqs: createDataReq('STACKED_AREA')
+                reqs: def.array.appendMany(
+                    createDataReq('STACKED_AREA',{options: false}),
+                    createDotLabelDataReqs(),
+                    [
+                     createChartOptionsDataReq(true)
+                    ]
+                )
             }],
             menuOrdinal: 180
         });
@@ -257,6 +263,7 @@ function(def, pvc, pv){
                     createReverseColorsDataReq()
                 ],
                 createTrendsDataReqs(),
+                createDotLabelDataReqs(),
                 [ createChartOptionsDataReq(true)])
             }],
             menuOrdinal: 190,
@@ -739,12 +746,35 @@ function(def, pvc, pv){
             };
         }
 
+        function createDotLabelDataReqs(keyArgs) {
+            return [
+                createLabelsVisibleAnchorDataReq(keyArgs)
+            ];
+        }
+
         function createLabelDataReqs(keyArgs) {
             return [
                 createLabelsVisibleDataReq(keyArgs),
                 createLabelsAnchorDataReq(keyArgs),
                 createLabelsTextAlignDataReq(keyArgs)
             ];
+        }
+
+        function createLabelsVisibleAnchorDataReq(keyArgs){
+            var anchors = ['none', 'center', 'left', 'right', 'top', 'bottom'];
+
+            return {
+                    id: 'labelsOption',
+                    dataType: 'string',
+                    values: anchors,
+                    ui: {
+                        labels: anchors.map(function(option){ return dropZoneLabel('VALUE_ANCHOR_DOTS_' + option.toUpperCase()); }),
+                        group: 'options',
+                        type:  'combo',
+                        seperator: def.get(keyArgs, 'separator', true),
+                        caption: dropZoneLabel('VALUE_ANCHOR')
+                    }
+                };
         }
 
         function createLabelsVisibleDataReq(keyArgs){
@@ -3297,7 +3327,7 @@ function(def, pvc, pv){
                 options.extensionPoints.dot_shape = shape;
             }
 
-            configureLabelsOptions.call(this);
+            configureDotLabelsOptions.call(this);
         },
 
         _setNullInterpolationMode: function(options, value){
@@ -3331,6 +3361,12 @@ function(def, pvc, pv){
 
        _setNullInterpolationMode: function(options, value){
            options.nullInterpolationMode = value;
+       },
+
+       _readUserOptions: function(options, vizOptions){
+           this.base(options, vizOptions);
+
+           configureDotLabelsOptions.call(this);
        }
     });
 
@@ -3713,6 +3749,12 @@ function(def, pvc, pv){
 
             this._configureAxisDisplayUnits(/*isPrimary*/true,  'base' , /*allowFractional*/true);
             this._configureAxisDisplayUnits(/*isPrimary*/false, 'ortho', /*allowFractional*/true);
+        },
+
+        _readUserOptions: function(options, vizOptions){
+            this.base(options, vizOptions);
+
+            configureDotLabelsOptions.call(this);
         }
     });
 
@@ -4215,6 +4257,20 @@ function(def, pvc, pv){
             }
 
             this.options.extensionPoints.label_textAlign = this._vizOptions.labelsTextAlign;
+        }
+    }
+
+
+    function configureDotLabelsOptions(){
+        if(!this.options) {
+            this.options = {};
+        }
+
+        if(this._vizOptions.labelsOption == 'none'){
+            this.options.valuesVisible = false;
+        } else {
+            this.options.valuesVisible = true;
+            this.options.valuesAnchor = this._vizOptions.labelsOption;
         }
     }
 });
