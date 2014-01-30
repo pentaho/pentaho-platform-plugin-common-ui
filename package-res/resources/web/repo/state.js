@@ -14,7 +14,7 @@
 * limitations under the License.
 *
 */
-define(["dojo/request"], function(request){
+define("common-repo/state", ["dojo/request"], function(request){
 window.PentahoRepositoryClient = function() {
 
     this.SERVICE_URL = CONTEXT_PATH + 'content/ws-run/RepositoryClientService';

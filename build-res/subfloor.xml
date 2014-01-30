@@ -117,6 +117,7 @@ TYPICAL TARGET SEQUENCE
     sufficient.
     
   </description>
+  <property name="ivy.repository.id" value="repository"/>
 
   <!-- Load the properties files in the proper order -->
   <property file="override.properties"
@@ -275,7 +276,7 @@ TYPICAL TARGET SEQUENCE
             value="ivy.xml"
             description="The name of the IVY xml file to deploy with the artifact" />
   <property name="ivy.artifact.ivypathname"
-            value="${dist.dir}/ivy.xml"
+            value="${dist.dir}/ivy-${project.revision}.xml"
             description="The full path to the IVY xml file to deploy with the artifact" />
   <property name="ivy.reports.dir"
             value="${bin.dir}/reports/ivy"
@@ -818,6 +819,38 @@ TYPICAL TARGET SEQUENCE
     <ivy:publish resolver="local" pubrevision="${project.revision}" overwrite="true" forcedeliver="true" warnonmissing="yes" haltonmissing="no">
       <artifacts pattern="${dist.dir}/[artifact]-[revision](-[classifier]).[ext]" />
     </ivy:publish>
+
+    <antcall target="maven-publish-dependencies">
+      <param name="publish.groupId" value="${ivy.artifact.group}" />
+      <param name="publish.artifactId" value="${ivy.artifact.id}" />
+      <param name="publish.version" value="${project.revision}" />
+      <param name="publish.file" value="${ivy.artifact.ivypathname}" />
+      <param name="install" value="true" />
+      <param name="ivy.repository.publish" value="file:${user.home}/.m2/local"/>
+    </antcall>
+
+    <if>
+      <equals arg1="${source.publish}" arg2="true" />
+      <then>
+        <antcall target="maven-publish-sources">
+          <param name="publish.groupId" value="${ivy.artifact.group}" />
+          <param name="publish.artifactId" value="${ivy.artifact.id}" />
+          <param name="publish.version" value="${project.revision}" />
+          <param name="publish.file" value="${dist.dir}/${ivy.artifact.id}-${project.revision}-sources.jar" />
+          <param name="install" value="true" />
+          <param name="ivy.repository.publish" value="file:${user.home}/.m2/local"/>
+        </antcall>
+      </then>
+    </if>
+
+    <antcall target="maven-publish-artifact">
+      <param name="publish.pomFile" value="${ivy.artifact.pomfile}" />
+      <param name="publish.file" value="${dist.dir}/${ivy.artifact.id}-${project.revision}.jar" />
+      <param name="install" value="true" />
+      <param name="ivy.repository.publish" value="file:${user.home}/.m2/local"/>
+    </antcall>
+
+    <antcall target="maven-publish.post"/>
   </target>
 
   <!--=======================================================================
@@ -991,6 +1024,37 @@ TYPICAL TARGET SEQUENCE
     </sequential>
   </target>
 
+  <target name="maven-install-artifact" depends="install-antcontrib">
+    <sequential>
+      <fail message="No file found at: ${publish.file}">
+        <condition>
+          <not>
+            <available file="${publish.file}" />
+          </not>
+        </condition>
+      </fail>
+      <echo message="Installing ${publish.file} to maven" />
+      <if>
+        <isset property="isWindows" />
+        <then>
+          <exec executable="cmd" failonerror="true">
+            <arg value="/c" />
+            <arg value="mvn.bat" />
+            <arg value="install:install-file" />
+            <arg value="-DpomFile=${publish.pomFile}" />
+            <arg value="-Dfile=${publish.file}" />
+          </exec>
+        </then>
+        <else>
+          <exec executable="mvn" failonerror="true">
+            <arg value="install:install-file" />
+            <arg value="-DpomFile=${publish.pomFile}" />
+            <arg value="-Dfile=${publish.file}" />
+          </exec>
+        </else>
+      </if>
+    </sequential>
+  </target>
 
   <!--=======================================================================
       maven-publish-sources

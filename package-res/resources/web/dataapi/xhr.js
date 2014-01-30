@@ -21,7 +21,7 @@
 @description Utility container for XHR events indepentdent of JS library
 Currently uses pentaho-ajax.js to minimize dependencies, but could be any library
 */
-define(['common-data/oop'], function(){
+define("common-data/xhr", ['common-data/oop'], function(){
 pentaho = typeof pentaho == "undefined" ? {} : pentaho;
 pentaho.xhr = {
 		/*

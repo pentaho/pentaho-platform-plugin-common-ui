@@ -5,7 +5,7 @@ var deps = [
     'common-ui/AngularPluginHandler'
 ];
 
-pen.define(deps, function(AnimatedAngularPlugin, AnimatedAngularPluginHandler, angular, AngularPluginHandler) {
+define(deps, function(AnimatedAngularPlugin, AnimatedAngularPluginHandler, angular, AngularPluginHandler) {
 
     describe("Animated Angular Plugin", function() {
         var moduleName = "test";

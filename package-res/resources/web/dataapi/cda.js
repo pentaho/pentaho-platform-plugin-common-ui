@@ -14,7 +14,7 @@
 * limitations under the License.
 *
 */
-define(['common-data/oop'], function(){
+define("common-data/cda", ['common-data/oop'], function(){
 
 pentaho = typeof pentaho == "undefined" ? {} : pentaho;
 pentaho.cda = {

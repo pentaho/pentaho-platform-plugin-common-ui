@@ -10,7 +10,7 @@ var deps = [
 	'common-ui/ring',
 	'common-ui/angular-animate',
 ];
-pen.define(deps, function(AngularPlugin, AnimatedAngularPluginHandler, ring) {
+define(deps, function(AngularPlugin, AnimatedAngularPluginHandler, ring) {
 
 
 	// Extend Angular PluginHandler Plugin

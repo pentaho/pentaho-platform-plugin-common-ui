@@ -17,7 +17,7 @@
 
 define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on", "dojo/query", "dijit/TitlePane", "dojo/text!pentaho/common/DisclosurePanel.html"],
     function(declare, _WidgetBase, _Templated, on, query, TitlePane, templateStr){
-      return declare("pentaho.common.DisclosurePanel" ,[dijit.TitlePane],
+      return declare("pentaho.common.DisclosurePanel" ,[TitlePane],
 	    {
         templateString: templateStr,
 

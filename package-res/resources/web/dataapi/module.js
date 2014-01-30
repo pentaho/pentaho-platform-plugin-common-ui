@@ -16,7 +16,7 @@
 */
 
 // dataapi main module
-define([
+define("common-data/module", [
   'common-repo/module',
   'common-data/oop',
   'common-data/app',

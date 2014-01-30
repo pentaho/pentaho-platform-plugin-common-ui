@@ -24,6 +24,10 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
         }
       };
 
+      pentaho = typeof pentaho == "undefined" ? {} : pentaho;
+      pentaho.common = pentaho.common || {};
+      pentaho.common.Messages = pentaho.common.Messages || moduleDef;
+
       /**
        * Add a resource bundle to the set of resource bundles.
        *

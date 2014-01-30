@@ -36,7 +36,7 @@
  * @namespace
  */
 
-pen.define(	function(){
+define("common-ui/util/ucsv", [],	function(){
  
 	var CSV = (function () {
 		"use strict";

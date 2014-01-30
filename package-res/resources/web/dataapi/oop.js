@@ -18,7 +18,7 @@
 /*
 concepts taken from Nicholas Zakas Professional Javascript
 */
-define([], function(){
+define("common-data/oop", [], function(){
 
 });
 function object(o){

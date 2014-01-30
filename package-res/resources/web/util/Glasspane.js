@@ -15,7 +15,7 @@
 *
 */
 
-pen.define([], function() {
+define("common-ui/util/Glasspane", [], function() {
 
   var gp = {
     fadeInDuration: 0,

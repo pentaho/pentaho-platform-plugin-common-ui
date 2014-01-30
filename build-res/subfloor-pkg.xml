@@ -357,7 +357,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       publish-local-nojar (override)
       Publishes jar and zip package locally
       ====================================================================-->
-  <target name="publish-local-nojar" depends="install-ivy,subfloor.publish-local-nojar">
+  <target name="publish-local-nojar" depends="install-ivy,create-pom,subfloor.publish-local-nojar">
     <ivy:resolve file="${package.artifact.ivyfile}" />
     <ivy:publish resolver="local" pubrevision="${project.revision}" overwrite="true" forcedeliver="true">
       <artifacts pattern="${dist.dir}/[artifact]-[revision].[ext]" />

@@ -21,7 +21,7 @@
  * See http://requirejs.org/docs/api.html#modulename for more information.
  */
 
-pen.require(
+define("common-ui/prompting/pentaho-prompting-sample-components",
   // We require the Prompting Builder API to be loaded as we'll replace the existing label builder with ours
   ['common-ui/prompting/pentaho-prompting-builders'], function() {
   window.MySimpleComponent = BaseComponent.extend({
