@@ -700,8 +700,8 @@ Handlebars.print = function(ast) {
   };
 
   var verifyMatch = function(open, close) {
-    if(odefineoriginal !== close.original) {
-      throw new Handlebars.Exception(odefineoriginal + " doesn't match " + close.original);
+    if(open.original !== close.original) {
+      throw new Handlebars.Exception(open.original + " doesn't match " + close.original);
     }
   };
 
