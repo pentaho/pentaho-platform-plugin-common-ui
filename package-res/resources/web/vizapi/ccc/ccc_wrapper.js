@@ -83,8 +83,8 @@ function(def, pvc, pv){
             dataReqs: [{
                 name: 'Default',
                 reqs: def.array.appendMany(
-                	  createDataReq('STACKED_VERTICAL_BAR'),
-                	  [ createLabelsVisibleDataReq() ])
+                      createDataReq('STACKED_VERTICAL_BAR'),
+                      [ createLabelsVisibleDataReq() ])
             }],
             menuOrdinal: 110
         });
@@ -172,10 +172,8 @@ function(def, pvc, pv){
                      createLineWidthDataReq()
                     ],
                     createTrendsDataReqs(),
-                    [
-                     createLabelsVisibleDataReq(),
-                     createLabelsAnchorDataReq(),
-                     createLabelsTextAlignDataReq(),
+                    createLabelDataReqs(),
+                    [ 
                      createChartOptionsDataReq(true) 
                     ]
                 )
@@ -435,6 +433,9 @@ function(def, pvc, pv){
                     createColorSetDataReq(),
                     createReverseColorsDataReq(),
                     createShapeDataReq({"square": true, "circle": true}),
+                    createLabelsVisibleDataReq(),
+                    createLabelsAnchorDataReq(),
+                    createLabelsTextAlignDataReq(),
                     createChartOptionsDataReq(true)
                 ]
             }],
@@ -738,6 +739,14 @@ function(def, pvc, pv){
             };
         }
 
+        function createLabelDataReqs(keyArgs) {
+            return [
+                createLabelsVisibleDataReq(keyArgs),
+                createLabelsAnchorDataReq(keyArgs),
+                createLabelsTextAlignDataReq(keyArgs)
+            ];
+        }
+
         function createLabelsVisibleDataReq(keyArgs){
             return {
                 id: 'labelsVisible',
@@ -753,7 +762,7 @@ function(def, pvc, pv){
         }
         
         function createLabelsAnchorDataReq(keyArgs){
-            var anchors = ['top', 'center', 'bottom', 'left', 'right'];
+            var anchors = ['center', 'top', 'bottom', 'left', 'right'];
             return {
                 id: 'labelsAnchor',
                 dataType: 'string',
@@ -768,7 +777,7 @@ function(def, pvc, pv){
         }
         
         function createLabelsTextAlignDataReq(keyArgs){
-            var textAligns = ['right', 'left', 'center']; 
+            var textAligns = ['center', 'right', 'left']; 
             return {
                 id: 'labelsTextAlign',
                 dataType: 'string',
@@ -3103,7 +3112,7 @@ function(def, pvc, pv){
                 options.visualRoles.category = { isReversed: true };
             }
 
-            this.options.valuesVisible = this._vizOptions.labelsVisible;
+            configureLabelsOptions.call(this);
         }
     });
 
@@ -3230,10 +3239,7 @@ function(def, pvc, pv){
                 options.extensionPoints.pointDot_shape = shape;
             }
 
-            options.valuesVisible = vizOptions.labelsVisible;
-            options.valuesAnchor = vizOptions.labelsAnchor;
-
-            options.extensionPoints.label_textAlign = vizOptions.labelsTextAlign;
+            configureLabelsOptions.call(this);
         },
 
        _configureAxesDisplayUnits: function(){
@@ -3290,6 +3296,8 @@ function(def, pvc, pv){
                 options.dotsVisible = true;
                 options.extensionPoints.dot_shape = shape;
             }
+
+            configureLabelsOptions.call(this);
         },
 
         _setNullInterpolationMode: function(options, value){
@@ -3394,6 +3402,8 @@ function(def, pvc, pv){
             this.base();
 
             this.options.shape = this._vizOptions.shape;
+
+            configureLabelsOptions.call(this);
         },
 
         _getColorScaleKind: function() { return 'continuous'; },
@@ -4181,6 +4191,30 @@ function(def, pvc, pv){
                 if(!item.id){ item.id = 'undefined'; }
                 return item;
             });
+        }
+    }
+
+    // Call with ccc object in configure
+    function configureLabelsOptions() {
+        if(!this.options) {
+            this.options = {};
+        }
+
+        // Set Values Visible
+        if(this._vizOptions.labelsVisible) {
+            this.options.valuesVisible = this._vizOptions.labelsVisible;    
+        }
+
+        if (this._vizOptions.labelsAnchor) {
+            this.options.valuesAnchor = this._vizOptions.labelsAnchor;    
+        }
+        
+        if (this._vizOptions.labelsTextAlign) {
+             if (!this.options.extensionPoints) {
+                this.options.extensionPoints = {};
+            }
+
+            this.options.extensionPoints.label_textAlign = this._vizOptions.labelsTextAlign;
         }
     }
 });
