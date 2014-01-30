@@ -291,14 +291,16 @@ function(def, pvc, pv){
                         createMeaDataReq('VERTICAL_BAR_LINE_NUMCOL'),
                         'required', false),
                     def.set(
-                         createMeaDataReq('VERTICAL_BAR_LINE_NUMLINE'),
-                         'id', 'measuresLine',
-                         'required', false),
+                        createMeaDataReq('VERTICAL_BAR_LINE_NUMLINE'),
+                        'id', 'measuresLine',
+                        'required', false),
                     createMultiDataReq(),
                     createShapeDataReq(),
                     createLineWidthDataReq(),
-                    createChartOptionsDataReq(true)
-               ]
+                    createChartOptionsDataReq(true),
+                    createLabelsVisibleDataReq(),
+                    createLabelsVisibleAnchorDataReq()
+                ],
             }],
             menuOrdinal: 125
         });
@@ -3288,6 +3290,10 @@ function(def, pvc, pv){
             this._configureAxisTitle('ortho2',"");
 
             this.options.plot2OrthoAxis = 2;
+            
+            this.options.plot2ValuesVisible = this._vizOptions.labelsVisible;
+            
+            this.options.plot2ValuesAnchor = this._vizOptions.labelsOption;           
 
             // Plot2 uses same color scale
             // options.plot2ColorAxis = 2;
