@@ -15,7 +15,7 @@
 *
 */
 
-define(['common-ui/prompting/pentaho-prompting-bind', 'common-ui/prompting/pentaho-prompting-builders', 'cdf/cdf-module', "pentaho/common/TextButtonCombo", "dijit/registry", "dojo/on", "dojo/_base/lang",
+define("common-ui/prompting/pentaho-prompting-components", ['common-ui/prompting/pentaho-prompting-bind', 'common-ui/prompting/pentaho-prompting-builders', 'cdf/cdf-module', "pentaho/common/TextButtonCombo", "dijit/registry", "dojo/on", "dojo/_base/lang",
   "pentaho/common/Calendar","pentaho/common/DateTextBox"],
     function(_promptBind, _promptBuilders, _cdfModule, _TextButtonCombo, registry, on, lang, Calendar, DateTextBox) {
   // Executes button.expression() in the scope of the button component (instead of the button)

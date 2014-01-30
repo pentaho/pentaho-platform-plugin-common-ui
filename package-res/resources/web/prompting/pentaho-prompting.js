@@ -19,7 +19,7 @@ pentaho = typeof pentaho == "undefined" ? {} : pentaho;
 pentaho.common = pentaho.common || {};
 pentaho.common.prompting = pentaho.common.prompting || {};
 
-pen.define([ 'cdf/cdf-module', 'common-ui/prompting/pentaho-prompting-bind', 'common-ui/prompting/pentaho-prompting-components', 'common-ui/util/base64' ], function() {
+define("common-ui/prompting/pentaho-prompting", [ 'cdf/cdf-module', 'common-ui/prompting/pentaho-prompting-bind', 'common-ui/prompting/pentaho-prompting-components', 'common-ui/util/base64' ], function() {
   var GUIDHelper = function() {
     /**
      * Simple array of used Prompt GUIDs so they and their components can be uniquely identified.
@@ -619,7 +619,7 @@ pen.define([ 'cdf/cdf-module', 'common-ui/prompting/pentaho-prompting-bind', 'co
       /**
        * This is called to refresh the prompt panel.
        * It should return a new parameter definition.
-       * If it returns undefined no update will happen.
+       * If it returns undefined no update will hapdefine
        *
        * This method should be overriden.
        * The default implementation simply calls the provided callback with no parameter definition.

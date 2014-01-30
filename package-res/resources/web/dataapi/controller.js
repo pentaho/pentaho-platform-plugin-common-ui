@@ -18,7 +18,7 @@
 //= require "oop.js"
 //= require "app.js"
 
-define(["pentaho/common/Messages", 'common-data/oop', 'common-data/app'], function(Messages, _oop, _app){
+define("common-data/controller", ["pentaho/common/Messages", 'common-data/oop', 'common-data/app'], function(Messages, _oop, _app){
 pentaho = typeof pentaho == "undefined" ? {} : pentaho;
 
 pentaho.pda = pentaho.pda || {};

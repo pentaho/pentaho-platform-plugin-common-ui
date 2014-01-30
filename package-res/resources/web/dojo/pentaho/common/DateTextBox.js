@@ -16,7 +16,7 @@
 */
 define(["dojo/_base/declare", "dijit/form/DateTextBox", "dijit/Calendar", "dojo/text!pentaho/common/DropDownBox.html"],
   function(declare, DateTextBox, Calendar, templateStr){
-    return declare("pentaho.common.DateTextBox", [dijit.form.DateTextBox], {
+    return declare("pentaho.common.DateTextBox", [DateTextBox], {
 
       templateString: templateStr,
 

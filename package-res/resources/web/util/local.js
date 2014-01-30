@@ -5,7 +5,7 @@
 *
 * Licensed under the Apache License 2.0 (http://www.apache.org/licenses/LICENSE-2.0.txt)
 *
-* This is a slight modification from the one found on Github. We use pen.define here (instead of define) so it can be
+* This is a slight modification from the one found on Github. We use define here (instead of define) so it can be
 * used outside of our build process.
 */
 
@@ -13,7 +13,7 @@
 
 /*global require: false, define: false */
 
-pen.define(function () {
+define( [], function () {
   var local, addCallback, invokeCallbacks, isDefined, registerLocal,
     defined = {}, required = {};
 

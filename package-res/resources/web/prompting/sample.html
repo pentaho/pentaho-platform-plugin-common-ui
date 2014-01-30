@@ -38,12 +38,12 @@
     <script type="text/javascript">
       gwtModuleLoaded = function(module) {
         // Define a local module for every GWT module that's loaded. In our case we're only going to get the formatter
-        pen.require(['local'], function(local) {
+        definerequire(['local'], function(local) {
           local.define('gwt-' + module);
           console.log('defined module gwt-' + module);
         });
       }
-      pen.require(['local!gwt-formatter'], function() {
+      definerequire(['local!gwt-formatter'], function() {
         var testNumberFormatter = function() {
           var numberFormatter = jsTextFormatter.createFormatter('number', '$#.0#');
           var number = 123.45;
@@ -70,11 +70,11 @@
     <script language="javascript" type="text/javascript">
       /**
        * Provide a hook so the AMD module system knows when Dojo has been loaded. With this we can depend on Dojo
-       * with pen.require().
+       * with definerequire().
        */
       dojo.ready(function() {
         // Dojo is now available, modules depending on it may now load.
-        pen.require(['local'], function(local) {
+        definerequire(['local'], function(local) {
           local.define('dojo');
         });
       });
@@ -82,7 +82,7 @@
       // Global declaration for sample debugging purposes
       var paramDefn;
 
-      pen.require([
+      definerequire([
         'local!dojo',
         'common-ui/repo/pentaho-ajax',
         'common-ui/prompting/pentaho-prompting',

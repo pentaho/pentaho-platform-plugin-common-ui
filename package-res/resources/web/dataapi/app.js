@@ -16,7 +16,7 @@
 */
 
 /* EventTarget from N Zakas Professsional Javascript book */
-define(['common-data/oop'], function(_oop){
+define("common-data/app", ['common-data/oop'], function(_oop){
 
 
 function EventTarget(){

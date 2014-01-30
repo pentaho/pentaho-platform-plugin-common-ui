@@ -19,7 +19,7 @@
  * Utility methods designed for general use
  */
 
-pen.define(function() {
+define("common-ui/util/util", ["dijit/registry", "dojo/dom"], function(registry, dom) {
   return {
 
   /**
@@ -100,9 +100,9 @@ pen.define(function() {
         if(this[id]) {
           e = this[id];
         } else {
-          e = dijit.byId(id);
+          e = registry.byId(id);
           if(!e) {
-            e = dojo.byId(id);
+            e = dom.byId(id);
           }
         }
       }

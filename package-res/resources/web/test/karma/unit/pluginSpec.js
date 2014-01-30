@@ -3,7 +3,7 @@ var deps = [
     "common-ui/PluginHandler"
 ];
 
-pen.require(deps, function(PentahoPlugin, PentahoPluginHandler) {
+require(deps, function(PentahoPlugin, PentahoPluginHandler) {
 	
 	describe("Pentaho Plugin", function(){
 		

@@ -45,7 +45,7 @@
 	};
 */
 
- pen.define([
+ define("common-ui/util/BootstrappedTabLoader", [
  	"common-ui/util/PentahoSpinner",
      "common-ui/util/spin.min",
  	"common-ui/util/ContextProvider",

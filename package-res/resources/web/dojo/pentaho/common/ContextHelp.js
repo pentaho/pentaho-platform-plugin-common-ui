@@ -84,7 +84,7 @@ define(["dojo/_base/declare", "dijit/Tooltip", "dojo/dom", "dojo/dom-construct",
       label: help.content,
       position: help.position
     };
-    help.widget = new dijit.Tooltip(t);
+    help.widget = new Tooltip(t);
     help.widget.domNode.id = "tt_" + help.target;
     construct.place(help.widget.domNode, container);
   }
@@ -100,7 +100,7 @@ define(["dojo/_base/declare", "dijit/Tooltip", "dojo/dom", "dojo/dom-construct",
    */
   pentaho.common.ContextHelp.helpContext.prototype.installAll = function(container) {
     if (this.context.defaultPosition) {
-      dijit.Tooltip.defaultPosition = this.context.defaultPosition;
+      Tooltip.defaultPosition = this.context.defaultPosition;
     }
     if (container == undefined) {
       container = pentaho.common.ContextHelp.createHelpContainer();

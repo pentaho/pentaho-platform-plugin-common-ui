@@ -189,7 +189,7 @@ function(def, pvc, pv){
                     ],
                     createTrendsDataReqs(),
                     [ 
-                     createChartOptionsDataReq(true)
+                     createChartOptionsDataReq(true) 
                     ]
                 )
             }],
@@ -310,9 +310,9 @@ function(def, pvc, pv){
                         createMeaDataReq('VERTICAL_BAR_LINE_NUMCOL'),
                         'required', false),
                     def.set(
-                        createMeaDataReq('VERTICAL_BAR_LINE_NUMLINE'),
-                        'id', 'measuresLine',
-                        'required', false),
+                         createMeaDataReq('VERTICAL_BAR_LINE_NUMLINE'),
+                         'id', 'measuresLine',
+                         'required', false),
                     
                     createColumnDataLabelsReq({value_anchor: 'VALUE_COLUMN_ANCHOR',   separator: false, anchors:['none', 'center', 'inside_end', 'inside_base', 'outside_end']}),
                     createLabelsVisibleAnchorDataReq({labels_option: 'lineLabelsOption', value_anchor: 'VALUE_LINE_ANCHOR'}),
@@ -320,7 +320,7 @@ function(def, pvc, pv){
                     createShapeDataReq({separator: true}),
                     createLineWidthDataReq(),
                     createChartOptionsDataReq(true)
-                ]
+               ]
             }],
             menuOrdinal: 125
         });
@@ -561,7 +561,7 @@ function(def, pvc, pv){
                           caption: dropZoneLabel('SUNBURST_SIZE'),
                           required: false,
                           allowMultiple: false
-                      },                      
+                      },
                       createMultiDataReq()],
                       [createLabelsVisibleAnchorDataReq({ hideOptions : ['left', 'right', 'top', 'bottom'] })],
                       createSortDataReqs(true),
@@ -790,7 +790,7 @@ function(def, pvc, pv){
                         group: 'options',
                         type:  'combo',
                         caption: dropZoneLabel('VALUE_POSITION')
-                    }
+        }
                 };
         }
 
@@ -820,11 +820,11 @@ function(def, pvc, pv){
                     }
                 };
         }
-        
+
         function createColumnDataLabelsReq(keyArgs){
           
             var anchors = def.get(keyArgs, 'anchors');
-          
+        
             return {
                 id: 'labelsOption',
                 dataType: 'string',
@@ -838,7 +838,7 @@ function(def, pvc, pv){
                 }
             };
         }
-
+        
         function createLabelsVisibleDataReq(keyArgs){
             return {
                 id: 'labelsVisible',
@@ -852,7 +852,7 @@ function(def, pvc, pv){
                 }
             };
         }
-        
+
         function createChartOptionsDataReq(hasSeparator){
             return {
                 id: "optionsBtn",
@@ -2379,7 +2379,7 @@ function(def, pvc, pv){
                                     }
                                 }
                             } else {
-                                colorMap = memberPalette[colorGems[C - 1].formula];    
+                            colorMap = memberPalette[colorGems[C - 1].formula];
                             }
                         } else {
                             // Use measures (M === 1)
@@ -3227,7 +3227,7 @@ function(def, pvc, pv){
             this.base(options, vizOptions);
             options.valuesFont = defaultFont(readFont(vizOptions, 'label'));
             options.extensionPoints.label_textStyle = vizOptions.labelColor;
-        }        
+        }
     });
 
     // -------------------
@@ -3375,7 +3375,7 @@ function(def, pvc, pv){
             this._configureAxisTitle('ortho2',"");
 
             this.options.plot2OrthoAxis = 2;
-            
+
             configureColumnLabelsAlignmentOptions.call(this);
             
             configureLineLabelsAlignmentOptions.call(this);
@@ -3417,7 +3417,7 @@ function(def, pvc, pv){
                 options.dotsVisible = true;
                 options.extensionPoints.dot_shape = shape;
             }
-            
+
             options.valuesFont = defaultFont(readFont(vizOptions, 'label'));
             options.extensionPoints.label_textStyle = vizOptions.labelColor;
 
@@ -3905,7 +3905,7 @@ function(def, pvc, pv){
             // configure value label
             if(this.options.valuesVisible){
                 this._configureValuesMask();
-            }            
+            }
         },
 
         _showLegend: function(){
@@ -4431,7 +4431,7 @@ function(def, pvc, pv){
             if(labelsOption == 'inside_end') {
                 if(this.options.orientation == 'horizontal') {
                     this.options.valuesAnchor = 'right';
-                } else {
+        } else {
                     this.options.valuesAnchor = 'top';
                 }
             }

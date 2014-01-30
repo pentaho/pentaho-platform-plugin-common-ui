@@ -110,7 +110,7 @@
   </target>
 
   <target name="assemble"
-          depends="jar,assemble.init,assemble.copy-libs,plugin-create-js-variants,instrument-js,assemble-plugin">
+          depends="jar,assemble.init,assemble.copy-libs,assemble-plugin">
   </target>
 
   <target name="package-zip">
@@ -128,14 +128,14 @@
       <fileset dir="${package.resdir}"/>
     </copy>
 
-    <copy todir="${dojo.prod.stage.dir}/dojo">
+    <copy todir="${approot.stage.dir}/resources/web/dojo/dojo" overwrite="true">
       <fileset dir="${dojo.src}/dojo"/>
     </copy>
 
-    <copy todir="${dojo.prod.stage.dir}/dojo">
+    <copy todir="${approot.stage.dir}/resources/web/dojo/dijit" overwrite="true">
       <fileset dir="${dojo.src}/dijit"/>
     </copy>
-    <copy todir="${dojo.prod.stage.dir}/dojo">
+    <copy todir="${approot.stage.dir}/resources/web/dojo/dojox" overwrite="true">
       <fileset dir="${dojo.src}/dojox"/>
     </copy>
 
@@ -195,7 +195,6 @@
         <!--<include name="runner.css"/>-->
       <!--</fileset>-->
     <!--</copy>-->
-    <delete dir="${stage.dir}/javascript"/>
 
     <property environment="env"/>
    
@@ -226,7 +225,7 @@
   </target>
 
   <target name="update-server" if="biserver-root"
-          depends="clean,dist,assemble.init,plugin-create-js-variants,instrument-js,package-zip,clean-server"
+          depends="clean,dist,assemble.init,package-zip,clean-server"
           description="Update your BIServer with with a full archive build">
     <unzip dest="${biserver-root}/pentaho-solutions/system"
            src="${dist.dir}/${ivy.artifact.id}-${project.revision}-dev.zip"/>
@@ -241,32 +240,12 @@
           file="${dev.res}/runner.html"/>
   </target>
 
-  <target name="plugin-create-js-variants" depends="plugin-build-jslibs">
-  </target>
-
-  <target name="plugin-build-jslibs"
-          depends="plugin-build-jslibs.init,plugin-build-js-pentaho">
-
-
-  </target>
 
   <target name="plugin-build-jslibs.init">
     <delete dir="${stage.dir}/javascript"/>
     <mkdir dir="${stage.dir}/javascript"/>
   </target>
 
-  <target name="plugin-build-js-pentaho" description="Does the Dojo build of src and compressed js files" depends="subfloor-js.dist-js">
-
-    <!-- use the Pentaho open-source license header -->
-    <copy verbose="true" todir="${dojo.src}/util/buildscripts" overwrite="true">
-      <fileset dir="${dev.res}">
-        <include name="pentaho_copyright.txt"/>
-        <include name="pentaho_build_notice.txt"/>
-      </fileset>
-      <mapper type="glob" from="pentaho_*" to="*"/>
-    </copy>
-
-  </target>
 
   <target name="assemble.init">
     <delete dir="${approot.stage.dir}/"/>
@@ -331,5 +310,20 @@
   </target>
 
   <target name="publish-nojar" depends="subfloor-js.js.publish-nojar, subfloor-pkg.publish-nojar"/>
+
+  <target name="publish-local-nojar" depends="subfloor-js.js.publish-local-nojar"/>
+
+
+  <target name="dist-js">
+    <delete dir="bin/js-source"/>
+    <copy todir="bin/js-source/${js.module.script.namespace}/dojo">
+      <fileset dir="${dojo.src}">
+        <include name="**/*"/>
+        <exclude name="util/"/>
+      </fileset>
+    </copy>
+
+    <antcall target="subfloor-js.dist-js"/>
+  </target>
 
 </project>

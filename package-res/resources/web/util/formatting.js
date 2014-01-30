@@ -15,7 +15,7 @@
 *
 */
 
-pen.define(['common-ui/prompting/pentaho-prompting','common-ui/util/timeutil'], function(p, ReportTimeUtil) {
+define("common-ui/util/formatting", ['common-ui/prompting/pentaho-prompting','common-ui/util/timeutil'], function(p, ReportTimeUtil) {
   return {
     /**
      * Create a text formatter that formats to/from text. This is designed to convert between data formatted as a string
