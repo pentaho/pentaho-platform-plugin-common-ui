@@ -385,8 +385,13 @@ function(def, pvc, pv){
                 name: 'Default',
                 drillOrder: ['rows','columns'],
                 hyperlinkOrder: ['rows','columns'],
-                reqs : createDataReq("MULTIPLE_PIE", {multi: false})
-
+                reqs : def.array.appendMany(                    
+                    createDataReq("MULTIPLE_PIE", {multi: false, options: false}),
+                    [
+                        createLabelsVisiblePositionDataReq(),
+                        createChartOptionsDataReq(false)
+                    ]
+                )
             }],
             menuOrdinal: 180
         });
@@ -442,9 +447,7 @@ function(def, pvc, pv){
                     createColorSetDataReq(),
                     createReverseColorsDataReq(),
                     createShapeDataReq({"square": true, "circle": true}),
-                    createLabelsVisibleDataReq(),
-                    createLabelsAnchorDataReq(),
-                    createLabelsTextAlignDataReq(),
+                    createLabelsVisibleAnchorDataReq(),
                     createChartOptionsDataReq(true)
                 ]
             }],
@@ -747,6 +750,24 @@ function(def, pvc, pv){
                 }
             };
         }
+
+        function createLabelsVisiblePositionDataReq(keyArgs){
+            var positions = ['none', 'inside', 'outside'];
+
+            return {
+                    id: 'labelsOption',
+                    dataType: 'string',
+                    values: positions,
+                    ui: {
+                        labels: positions.map(function(option){ return dropZoneLabel('VALUE_POSITION_' + option.toUpperCase()); }),
+                        group: 'options',
+                        type:  'combo',
+                        seperator: def.get(keyArgs, 'separator', true),
+                        caption: dropZoneLabel('VALUE_POSITION')
+                    }
+                };
+        }
+
 
         function createDotLabelDataReqs(keyArgs) {
             return [
@@ -3333,7 +3354,7 @@ function(def, pvc, pv){
                 options.extensionPoints.dot_shape = shape;
             }
 
-            configureDotLabelsOptions.call(this);
+            configureLabelsAnchorOptions.call(this);
         },
 
         _setNullInterpolationMode: function(options, value){
@@ -3372,7 +3393,7 @@ function(def, pvc, pv){
        _readUserOptions: function(options, vizOptions){
            this.base(options, vizOptions);
 
-           configureDotLabelsOptions.call(this);
+           configureLabelsAnchorOptions.call(this);
        }
     });
 
@@ -3445,7 +3466,7 @@ function(def, pvc, pv){
 
             this.options.shape = this._vizOptions.shape;
 
-            configureLabelsOptions.call(this);
+            configureLabelsAnchorOptions.call(this);
         },
 
         _getColorScaleKind: function() { return 'continuous'; },
@@ -3760,7 +3781,7 @@ function(def, pvc, pv){
         _readUserOptions: function(options, vizOptions){
             this.base(options, vizOptions);
 
-            configureDotLabelsOptions.call(this);
+            configureLabelsAnchorOptions.call(this);
         }
     });
 
@@ -3780,7 +3801,6 @@ function(def, pvc, pv){
         },
 
         _options: {
-            valuesVisible: true,
             legendShape: 'circle',
 
             titlePosition: 'bottom',
@@ -3806,7 +3826,7 @@ function(def, pvc, pv){
             // configure value label
             if(this.options.valuesVisible){
                 this._configureValuesMask();
-            }
+            }            
         },
 
         _showLegend: function(){
@@ -3817,6 +3837,8 @@ function(def, pvc, pv){
             this.base(options, vizOptions);
 
             options.valuesFont = defaultFont(null, readFontSize(vizOptions, 'label'));
+
+            configureLabelsPositionOptions.call(this);
         },
 
         _configureMultiChart: function(){
@@ -4243,6 +4265,7 @@ function(def, pvc, pv){
     }
 
     // Call with ccc object in configure
+    // @deprecated
     function configureLabelsOptions() {
         if(!this.options) {
             this.options = {};
@@ -4266,17 +4289,44 @@ function(def, pvc, pv){
         }
     }
 
-
-    function configureDotLabelsOptions(){
+    function configureLabelsVisibilityOptions() {
         if(!this.options) {
             this.options = {};
         }
 
-        if(this._vizOptions.labelsOption == 'none'){
-            this.options.valuesVisible = false;
-        } else {
-            this.options.valuesVisible = true;
+        if(this._vizOptions.labelsOption == 'none') {
+            return this.options.valuesVisible = false;
+        } 
+
+        return this.options.valuesVisible = true;
+    }
+
+
+    function configureLabelsAnchorOptions(){
+        if(configureLabelsVisibilityOptions.call(this)) {
             this.options.valuesAnchor = this._vizOptions.labelsOption;
+        }
+    }
+
+    function configureLabelsAlignmentOptions() {
+        if (configureLabelsVisibilityOptions.call(this)) {
+             if (!this.options.extensionPoints) {
+                this.options.extensionPoints = {};
+            }
+
+            var labelsOption = this._vizOptions.labelsOption;
+
+            if (labelsOption == 'top' || labelsOption == 'bottom') {
+                this.options.extensionPoints.label_textBaseline = labelsOption == 'top' ? 'bottom' : 'top';
+            } else if (labelsOption == 'left' || labelsOption == 'right') {
+                this.options.extensionPoints.label_textAlign = labelsOption == 'left' ? 'right' : 'left';
+            }
+        }
+    }
+
+    function configureLabelsPositionOptions() {
+        if(configureLabelsVisibilityOptions.call(this)) {
+            this.options.valuesLabelStyle = this._vizOptions.labelsOption;
         }
     }
 });
