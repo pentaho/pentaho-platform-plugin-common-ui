@@ -84,7 +84,7 @@ function(def, pvc, pv){
                 name: 'Default',
                 reqs: def.array.appendMany(
                       createDataReq('STACKED_VERTICAL_BAR'),
-                      [ createLabelsVisibleDataReq() ])
+                      [ createColumnDataLabelsReq('ccc_barstacked') ])
             }],
             menuOrdinal: 110
         });
@@ -801,7 +801,10 @@ function(def, pvc, pv){
         }
         
         function createColumnDataLabelsReq(keyArgs){
-            var anchors = ['none', 'center', 'inside_end', 'inside_base', 'outside_end'];
+          
+            var anchors = (keyArgs == 'ccc_barstacked') ? 
+                ['none', 'center', 'inside_end', 'inside_base'] : 
+                    ['none', 'center', 'inside_end', 'inside_base', 'outside_end'];
 
             return {
                 id: 'labelsOption',
