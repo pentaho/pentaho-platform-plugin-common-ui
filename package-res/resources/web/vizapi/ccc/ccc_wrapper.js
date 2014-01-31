@@ -3355,6 +3355,7 @@ function(def, pvc, pv){
             }
 
             configureLabelsAnchorOptions.call(this);
+            configureLabelPositionImprovement.call(this);
         },
 
         _setNullInterpolationMode: function(options, value){
@@ -4327,6 +4328,101 @@ function(def, pvc, pv){
     function configureLabelsPositionOptions() {
         if(configureLabelsVisibilityOptions.call(this)) {
             this.options.valuesLabelStyle = this._vizOptions.labelsOption;
+        }
+    }
+
+    function configureLabelPositionImprovement() {
+        if(!this.options) {
+            this.options = {};
+        }
+
+        if(!this.options.extensionPoints) {
+            this.options.extensionPoints = {};
+        }
+
+        this.options.extensionPoints.label_top = function(scene){
+            var pvMark = this.pvMark,
+                cousinPvMark = pvMark.cousin(),
+                anchor = pvMark.name();
+
+            if(anchor == 'top') return this.delegate();
+
+            if(pvMark.parent.index > 0 && pvMark != undefined && cousinPvMark != undefined){
+                var top = this.delegate(),
+                    previousTop = cousinPvMark.top,
+                    cousinHW = pv.Text.measure(cousinPvMark.text, cousinPvMark.font);
+
+                if(Math.abs(top - previousTop) < cousinHW.height/2){
+                    pvMark.cousin().textBaseline = 'bottom';
+                    if(anchor == 'left' || anchor == 'right' || anchor == 'center'){
+                        return top+cousinHW.height/2;
+                    } else {
+                        pvMark.cousin().textMargin = cousinHW.height;
+                        return top+cousinHW.height/4;
+                    }
+                }
+            }
+            return this.delegate();
+        }
+
+        this.options.extensionPoints.label_bottom = function(scene){
+            var pvMark = this.pvMark,
+                cousinPvMark = pvMark.cousin(),
+                anchor = pvMark.name();
+
+            if(anchor == 'bottom') return this.delegate();
+
+            if(pvMark.parent.index > 0 && pvMark != undefined && cousinPvMark != undefined){
+                var bottom = this.delegate(),
+                    previousBottom = cousinPvMark.bottom,
+                    cousinHW = pv.Text.measure(cousinPvMark.text, cousinPvMark.font);
+
+                if(Math.abs(bottom - previousBottom) < cousinHW.height/2){
+                    pvMark.cousin().textBaseline = 'bottom';
+                    return bottom-cousinHW.height*2;
+                }
+            }
+            return this.delegate();
+        }
+
+        this.options.extensionPoints.label_left = function(scene){
+            var pvMark = this.pvMark,
+                siblingPvMark = pvMark.scene[this.index-2],
+                anchor = pvMark.name();
+
+            if(pvMark.index > 0 && pvMark != undefined && siblingPvMark != undefined){
+                var left = this.delegate(),
+                    previousLeft = siblingPvMark.left,
+                    topBot = (anchor == 'top' ? pvMark.bottom() : pvMark.top()),
+                    previousTopBot = (anchor == 'top' ? siblingPvMark.bottom : siblingPvMark.top),
+                    siblingHW = pv.Text.measure(siblingPvMark.text, siblingPvMark.font);
+
+                if(Math.abs(previousLeft + siblingHW.width) > left &&
+                    Math.abs(topBot - previousTopBot) < siblingHW.height/2 ){
+                    return left + Math.abs(previousLeft + siblingHW.width - left);
+                }
+            }
+            return this.delegate();
+        }
+
+        this.options.extensionPoints.label_right = function(scene){
+            var pvMark = this.pvMark,
+                siblingPvMark = pvMark.scene[this.index-2],
+                anchor = pvMark.name();
+
+            if(pvMark.index > 0 && pvMark != undefined && siblingPvMark != undefined){
+                var right = this.delegate(),
+                    previousRight = siblingPvMark.right,
+                    topBot = (anchor == 'top' ? pvMark.bottom() : pvMark.top()),
+                    previousTopBot = (anchor == 'top' ? siblingPvMark.bottom : siblingPvMark.top),
+                    siblingHW = pv.Text.measure(siblingPvMark.text, siblingPvMark.font);
+
+                if(Math.abs(previousRight + siblingHW.width) > right &&
+                    Math.abs(topBot - previousTopBot) < siblingHW.height/2 ){
+                    return right + Math.abs(previousRight + siblingHW.width - right);
+                }
+            }
+            return this.delegate();
         }
     }
 });
