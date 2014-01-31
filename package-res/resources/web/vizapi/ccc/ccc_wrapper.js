@@ -379,7 +379,9 @@ function(def, pvc, pv){
             source:   'CCC',
             name:     vizLabel('MULTIPLE_PIE'),
             'class':  'pentaho.ccc.PieChart',
-            args:     {},
+            args:     {
+                labelsOption: 'outside'
+            },
             propMap:  [],
             dataReqs: [{
                 name: 'Default',
@@ -443,11 +445,11 @@ function(def, pvc, pv){
                         required: false,
                         allowMultiple: false
                     },
+                    createLabelsVisibleAnchorDataReq({ hideOptions : ['left', 'right', 'top', 'bottom'] }),
                     createPatternDataReq(),
                     createColorSetDataReq(),
                     createReverseColorsDataReq(),
                     createShapeDataReq({"square": true, "circle": true}),
-                    createLabelsVisibleAnchorDataReq(),
                     createChartOptionsDataReq(true)
                 ]
             }],
@@ -752,12 +754,13 @@ function(def, pvc, pv){
         }
 
         function createLabelsVisiblePositionDataReq(keyArgs){
-            var positions = ['none', 'inside', 'outside'];
+            var positions = ['none', 'outside', 'inside'];
 
             return {
                     id: 'labelsOption',
                     dataType: 'string',
                     values: positions,
+                    // value: 'outside',
                     ui: {
                         labels: positions.map(function(option){ return dropZoneLabel('VALUE_POSITION_' + option.toUpperCase()); }),
                         group: 'options',
@@ -775,17 +778,20 @@ function(def, pvc, pv){
             ];
         }
 
-        function createLabelDataReqs(keyArgs) {
-            return [
-                createLabelsVisibleDataReq(keyArgs),
-                createLabelsAnchorDataReq(keyArgs),
-                createLabelsTextAlignDataReq(keyArgs)
-            ];
-        }
-
         function createLabelsVisibleAnchorDataReq(keyArgs){
             var anchors = ['none', 'center', 'left', 'right', 'top', 'bottom'];
 
+            if (keyArgs) {
+                for (i in keyArgs.hideOptions) {
+                    for (j in anchors) {
+                        if (anchors[j] === keyArgs.hideOptions[i]) {
+                            anchors.splice(j, 1);
+                            break;
+                        }
+                    }
+                }
+            }
+            
             return {
                     id: 'labelsOption',
                     dataType: 'string',
@@ -794,7 +800,6 @@ function(def, pvc, pv){
                         labels: anchors.map(function(option){ return dropZoneLabel('VALUE_ANCHOR_DOTS_' + option.toUpperCase()); }),
                         group: 'options',
                         type:  'combo',
-                        seperator: def.get(keyArgs, 'separator', true),
                         caption: dropZoneLabel('VALUE_ANCHOR')
                     }
                 };
@@ -834,36 +839,6 @@ function(def, pvc, pv){
             };
         }
         
-        function createLabelsAnchorDataReq(keyArgs){
-            var anchors = ['center', 'top', 'bottom', 'left', 'right'];
-            return {
-                id: 'labelsAnchor',
-                dataType: 'string',
-                values: anchors,
-                ui: {
-                    labels:  anchors.map(function(option){ return option; }),
-                    group: 'options',
-                    type:  'combo',
-                    caption: 'Anchor' // TODO i18n pending....  
-                }
-            };
-        }
-        
-        function createLabelsTextAlignDataReq(keyArgs){
-            var textAligns = ['center', 'right', 'left']; 
-            return {
-                id: 'labelsTextAlign',
-                dataType: 'string',
-                values: textAligns,
-                ui: {
-                    labels:  textAligns.map(function(option){ return option; }),
-                    group: 'options',
-                    type:  'combo',
-                    caption: 'Align' // TODO i18n pending....  
-                }
-            };
-        }
-
         function createChartOptionsDataReq(hasSeparator){
             return {
                 id: "optionsBtn",
