@@ -66,7 +66,7 @@ function(def, pvc, pv){
                 reqs: def.array.appendMany(
                     createDataReq('VERTICAL_BAR', {options: false}),
                     createTrendsDataReqs({separator: false}),
-                    [ createLabelsVisibleDataReq() ],
+                    [ createColumnDataLabelsReq() ],
                     [ createChartOptionsDataReq(true) ])
             }],
             menuOrdinal: 100
@@ -798,6 +798,23 @@ function(def, pvc, pv){
                         caption: dropZoneLabel('VALUE_ANCHOR')
                     }
                 };
+        }
+        
+        function createColumnDataLabelsReq(keyArgs){
+            var anchors = ['none', 'center', 'inside_end', 'inside_base', 'outside_end'];
+
+            return {
+                id: 'labelsOption',
+                dataType: 'string',
+                values: anchors,
+                ui: {
+                    labels: anchors.map(function(option){ return dropZoneLabel('COLUMN_LABEL_ANCHOR_' + option.toUpperCase()); }),
+                    group: 'options',
+                    type:  'combo',
+                    seperator: def.get(keyArgs, 'separator', true),
+                    caption: dropZoneLabel('VALUE_ANCHOR')
+                }
+            };
         }
 
         function createLabelsVisibleDataReq(keyArgs){
@@ -3165,7 +3182,7 @@ function(def, pvc, pv){
                 options.visualRoles.category = { isReversed: true };
             }
 
-            configureLabelsOptions.call(this);
+            configureColumnLabelsAlignmentOptions.call(this);
         }
     });
 
@@ -4321,6 +4338,29 @@ function(def, pvc, pv){
                 this.options.extensionPoints.label_textBaseline = labelsOption == 'top' ? 'bottom' : 'top';
             } else if (labelsOption == 'left' || labelsOption == 'right') {
                 this.options.extensionPoints.label_textAlign = labelsOption == 'left' ? 'right' : 'left';
+            }
+        }
+    }
+    
+    function configureColumnLabelsAlignmentOptions() {
+        if (configureLabelsVisibilityOptions.call(this)) {
+            if (!this.options.extensionPoints) {
+                this.options.extensionPoints = {};
+            }
+
+            var labelsOption = this._vizOptions.labelsOption;
+
+            if(labelsOption == 'center') {
+                this.options.valuesAnchor = 'center';
+            }
+            if(labelsOption == 'inside_end' || labelsOption == 'outside_end') {
+                this.options.valuesAnchor = 'top';
+            }
+            if(labelsOption == 'inside_base') {
+                this.options.valuesAnchor = 'bottom';
+            }
+            if(labelsOption == 'outside_end') {
+                this.options.extensionPoints.label_textBaseline = 'bottom';
             }
         }
     }
