@@ -404,7 +404,7 @@ function(def, pvc, pv){
                     createDataReq("MULTIPLE_PIE", {multi: false, options: false}),
                     [
                         createLabelsVisiblePositionDataReq(),
-                        createChartOptionsDataReq(false)
+                        createChartOptionsDataReq(true)
                     ]
                 )
             }],
@@ -459,7 +459,7 @@ function(def, pvc, pv){
                         allowMultiple: false
                     },
                     createLabelsVisibleAnchorDataReq({ hideOptions : ['left', 'right', 'top', 'bottom'] }),
-                    createPatternDataReq(),
+                    createPatternDataReq({separator : true }),
                     createColorSetDataReq(),
                     createReverseColorsDataReq(),
                     createShapeDataReq({"square": true, "circle": true}),
@@ -710,7 +710,7 @@ function(def, pvc, pv){
                 }];
         }
 
-        function createPatternDataReq(){
+        function createPatternDataReq(keyArgs){
             return {
                 id: 'pattern',
                 dataType: 'string',
@@ -720,7 +720,8 @@ function(def, pvc, pv){
                             map(function(option){ return dropZoneLabel(option); }),
                     group: 'options',
                     type:  'combo',
-                    caption: dropZoneLabel('PATTERN')
+                    caption: dropZoneLabel('PATTERN'),
+                    seperator: def.get(keyArgs, "separator", false)
                 }
             };
         }
@@ -778,7 +779,6 @@ function(def, pvc, pv){
                         labels: positions.map(function(option){ return dropZoneLabel('VALUE_POSITION_' + option.toUpperCase()); }),
                         group: 'options',
                         type:  'combo',
-                        seperator: def.get(keyArgs, 'separator', true),
                         caption: dropZoneLabel('VALUE_POSITION')
                     }
                 };
