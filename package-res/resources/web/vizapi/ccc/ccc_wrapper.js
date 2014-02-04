@@ -66,7 +66,7 @@ function(def, pvc, pv){
                 reqs: def.array.appendMany(
                     createDataReq('VERTICAL_BAR', {options: false}),
                     createTrendsDataReqs({separator: false}),
-                    [ createColumnDataLabelsReq() ],
+                    [ createColumnDataLabelsReq(['none', 'center', 'inside_end', 'inside_base', 'outside_end']) ],
                     [ createChartOptionsDataReq(true) ])
             }],
             menuOrdinal: 100
@@ -84,7 +84,7 @@ function(def, pvc, pv){
                 name: 'Default',
                 reqs: def.array.appendMany(
                       createDataReq('STACKED_VERTICAL_BAR'),
-                      [ createColumnDataLabelsReq('ccc_barstacked') ])
+                      [ createColumnDataLabelsReq(['none', 'center', 'inside_end', 'inside_base']) ])
             }],
             menuOrdinal: 110
         });
@@ -130,7 +130,9 @@ function(def, pvc, pv){
             propMap:  [],
             dataReqs: [{
                 name: 'Default',
-                reqs : createDataReq('PCT_STACKED_VERTICAL_BAR')
+                reqs: def.array.appendMany(
+                    createDataReq('PCT_STACKED_VERTICAL_BAR'),
+                    [ createColumnDataLabelsReq(['none', 'center', 'inside_end', 'inside_base']) ])
             }],
             menuOrdinal: 120
         });
@@ -805,12 +807,8 @@ function(def, pvc, pv){
                 };
         }
         
-        function createColumnDataLabelsReq(keyArgs){
+        function createColumnDataLabelsReq(anchors){
           
-            var anchors = (keyArgs == 'ccc_barstacked') ? 
-                ['none', 'center', 'inside_end', 'inside_base'] : 
-                    ['none', 'center', 'inside_end', 'inside_base', 'outside_end'];
-
             return {
                 id: 'labelsOption',
                 dataType: 'string',
@@ -819,7 +817,6 @@ function(def, pvc, pv){
                     labels: anchors.map(function(option){ return dropZoneLabel('COLUMN_LABEL_ANCHOR_' + option.toUpperCase()); }),
                     group: 'options',
                     type:  'combo',
-                    seperator: def.get(keyArgs, 'separator', true),
                     caption: dropZoneLabel('VALUE_ANCHOR')
                 }
             };
@@ -4290,7 +4287,7 @@ function(def, pvc, pv){
             this.options = {};
         }
 
-        if(this._vizOptions.labelsOption == 'none') {
+        if(!this._vizOptions.labelsOption || this._vizOptions.labelsOption == 'none') {
             return this.options.valuesVisible = false;
         } 
 
