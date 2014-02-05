@@ -65,8 +65,8 @@ function(def, pvc, pv){
                 name: 'Default',
                 reqs: def.array.appendMany(
                     createDataReq('VERTICAL_BAR', {options: false}),
-                    createTrendsDataReqs({separator: false}),
-                    [ createColumnDataLabelsReq(['none', 'center', 'inside_end', 'inside_base', 'outside_end']) ],
+                    [ createColumnDataLabelsReq({separator: false, anchors:['none', 'center', 'inside_end', 'inside_base', 'outside_end']}) ],                    
+                    createTrendsDataReqs({separator: true}),
                     [ createChartOptionsDataReq(true) ])
             }],
             menuOrdinal: 100
@@ -83,8 +83,9 @@ function(def, pvc, pv){
             dataReqs: [{
                 name: 'Default',
                 reqs: def.array.appendMany(
-                      createDataReq('STACKED_VERTICAL_BAR'),
-                      [ createColumnDataLabelsReq(['none', 'center', 'inside_end', 'inside_base']) ])
+                    createDataReq('STACKED_VERTICAL_BAR', {options: false}),
+                    [ createColumnDataLabelsReq({separator: false, anchors: ['none', 'center', 'inside_end', 'inside_base']}) ],
+                    [ createChartOptionsDataReq(true)])
             }],
             menuOrdinal: 110
         });
@@ -99,7 +100,10 @@ function(def, pvc, pv){
             propMap:  [],
             dataReqs: [{
                 name: 'Default',
-                reqs: createDataReq('HORIZONTAL_BAR')
+                reqs: def.array.appendMany(
+                    createDataReq('HORIZONTAL_BAR', {options: false}),
+                    [ createColumnDataLabelsReq({separator: false, anchors:['none', 'center', 'inside_end', 'inside_base', 'outside_end']}) ],                    
+                    [ createChartOptionsDataReq(true) ])
             }],
             menuOrdinal: 130,
             menuSeparator: true
@@ -115,7 +119,10 @@ function(def, pvc, pv){
             propMap:  [],
             dataReqs: [{
                 name: 'Default',
-                reqs : createDataReq('STACKED_HORIZONTAL_BAR')
+                reqs: def.array.appendMany(
+                    createDataReq('STACKED_HORIZONTAL_BAR', {options: false}),
+                    [ createColumnDataLabelsReq({separator: false, anchors: ['none', 'center', 'inside_end', 'inside_base']}) ],
+                    [ createChartOptionsDataReq(true)])
             }],
             menuOrdinal: 140
         });
@@ -131,8 +138,9 @@ function(def, pvc, pv){
             dataReqs: [{
                 name: 'Default',
                 reqs: def.array.appendMany(
-                    createDataReq('PCT_STACKED_VERTICAL_BAR'),
-                    [ createColumnDataLabelsReq(['none', 'center', 'inside_end', 'inside_base']) ])
+                    createDataReq('PCT_STACKED_VERTICAL_BAR', {options: false}),
+                    [ createColumnDataLabelsReq({separator: false, anchors: ['none', 'center', 'inside_end', 'inside_base']}) ],
+                    [ createChartOptionsDataReq(true)])
             }],
             menuOrdinal: 120
         });
@@ -147,7 +155,10 @@ function(def, pvc, pv){
             propMap:  [],
             dataReqs: [{
                 name: 'Default',
-                reqs : createDataReq('PCT_STACKED_HORIZONTAL_BAR')
+                reqs: def.array.appendMany(
+                    createDataReq('PCT_STACKED_HORIZONTAL_BAR', {options: false}),
+                    [ createColumnDataLabelsReq({separator: false, anchors: ['none', 'center', 'inside_end', 'inside_base']}) ],
+                    [ createChartOptionsDataReq(true)])
             }],
             menuOrdinal: 150
         });
@@ -807,7 +818,9 @@ function(def, pvc, pv){
                 };
         }
         
-        function createColumnDataLabelsReq(anchors){
+        function createColumnDataLabelsReq(keyArgs){
+          
+            var anchors = def.get(keyArgs, 'anchors');
           
             return {
                 id: 'labelsOption',
@@ -817,6 +830,7 @@ function(def, pvc, pv){
                     labels: anchors.map(function(option){ return dropZoneLabel('COLUMN_LABEL_ANCHOR_' + option.toUpperCase()); }),
                     group: 'options',
                     type:  'combo',
+                    seperator: def.get(keyArgs, 'separator', true),
                     caption: dropZoneLabel('VALUE_ANCHOR')
                 }
             };
