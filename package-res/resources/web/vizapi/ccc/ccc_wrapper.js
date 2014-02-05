@@ -4339,17 +4339,33 @@ function(def, pvc, pv){
 
             var labelsOption = this._vizOptions.labelsOption;
 
+            this.options.extensionPoints.label_textMargin = 10;
+            
             if(labelsOption == 'center') {
                 this.options.valuesAnchor = 'center';
             }
-            if(labelsOption == 'inside_end' || labelsOption == 'outside_end') {
-                this.options.valuesAnchor = 'top';
+            if(labelsOption == 'inside_end') {
+                if(this.options.orientation == 'horizontal') {
+                    this.options.valuesAnchor = 'right';
+                } else {
+                    this.options.valuesAnchor = 'top';
+                }
             }
             if(labelsOption == 'inside_base') {
-                this.options.valuesAnchor = 'bottom';
+                if(this.options.orientation == 'horizontal') {
+                    this.options.valuesAnchor = 'left';
+                } else {
+                    this.options.valuesAnchor = 'bottom';
+                }
             }
             if(labelsOption == 'outside_end') {
-                this.options.extensionPoints.label_textBaseline = 'bottom';
+                if(this.options.orientation == 'horizontal') {
+                    this.options.valuesAnchor = 'right';
+                    this.options.extensionPoints.label_textAlign ='left';
+                } else {
+                    this.options.valuesAnchor = 'top';
+                    this.options.extensionPoints.label_textBaseline = 'bottom';
+                }
             }
         }
     }
