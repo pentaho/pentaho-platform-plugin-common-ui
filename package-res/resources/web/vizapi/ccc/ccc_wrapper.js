@@ -554,9 +554,10 @@ function(def, pvc, pv){
                           caption: dropZoneLabel('SUNBURST_SIZE'),
                           required: false,
                           allowMultiple: false
-                      },
+                      },                      
                       createMultiDataReq()],
-                      createSortDataReqs(),
+                      [createLabelsVisibleAnchorDataReq({ hideOptions : ['left', 'right', 'top', 'bottom'] })],
+                      createSortDataReqs(true),
                       [createEmptySlicesDataReq()],
                       [createChartOptionsDataReq(false)]
                   )
@@ -694,7 +695,7 @@ function(def, pvc, pv){
                 }];
         }
 
-        function createSortDataReqs(){
+        function createSortDataReqs(addSeparator){
             var types = ['bySizeDescending', 'bySizeAscending', 'none'];
             return [
                 {
@@ -705,7 +706,8 @@ function(def, pvc, pv){
                         labels:  types.map(function(option){ return dropZoneLabel('SORT_TYPE_' + option.toUpperCase()); }),
                         group: 'options',
                         type:  'combo',
-                        caption: dropZoneLabel('SORT_TYPE')
+                        caption: dropZoneLabel('SORT_TYPE'),
+                        seperator : addSeparator
                     }
                 }];
         }
@@ -4052,6 +4054,27 @@ function(def, pvc, pv){
             }
 
             options.extensionPoints.label_textStyle = vizOptions.labelColor;
+
+            // Determine whether to show values label
+            if (vizOptions.labelsOption != "none") {
+                options.subValuesVisible = true;
+                
+                options.extensionPoints.label_textBaseline = "bottom";
+                options.extensionPoints.label_textMargin = 2;
+                options.extensionPoints.label_add = function() {
+                    return new pv.Label()
+                        .text(function(scene) {
+                            if(this.proto.text() == "") {
+                                return "";
+                            }
+                            
+                            var text = scene.vars.size.label;
+                            var maxWidth = scene.outerRadius - scene.innerRadius;                
+                            return pvc.text.trimToWidthB(maxWidth*.7, text, scene.vars.font, "..");;
+                        })                
+                        .textBaseline("top")
+                }    
+            }
         }
     });
 
