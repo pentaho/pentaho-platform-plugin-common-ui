@@ -307,12 +307,13 @@ function(def, pvc, pv){
                         createMeaDataReq('VERTICAL_BAR_LINE_NUMLINE'),
                         'id', 'measuresLine',
                         'required', false),
+                    
+                    createColumnDataLabelsReq({value_anchor: 'VALUE_COLUMN_ANCHOR',   separator: false, anchors:['none', 'center', 'inside_end', 'inside_base', 'outside_end']}),
+                    createLineLabelsVisibleAnchorDataReq(),  
                     createMultiDataReq(),
-                    createShapeDataReq(),
+                    createShapeDataReq({separator: true}),
                     createLineWidthDataReq(),
-                    createChartOptionsDataReq(true),
-                    createLabelsVisibleDataReq(),
-                    createLabelsVisibleAnchorDataReq()
+                    createChartOptionsDataReq(true)
                 ],
             }],
             menuOrdinal: 125
@@ -641,6 +642,7 @@ function(def, pvc, pv){
                     labels:  values.map(function(option){ return dropZoneLabel(option.toUpperCase()); }),
                     group:   'options',
                     type:    'combo',
+                    seperator: def.get(valuesSet, 'separator', false),
                     caption: dropZoneLabel('BULLET_STYLE')
                 }
             };
@@ -820,6 +822,22 @@ function(def, pvc, pv){
                 };
         }
         
+        function createLineLabelsVisibleAnchorDataReq(){
+            var anchors = ['none', 'center', 'left', 'right', 'top', 'bottom'];
+
+            return {
+                    id: 'lineLabelsOption',
+                    dataType: 'string',
+                    values: anchors,
+                    ui: {
+                        labels: anchors.map(function(option){ return dropZoneLabel('VALUE_ANCHOR_DOTS_' + option.toUpperCase()); }),
+                        group: 'options',
+                        type:  'combo',
+                        caption: dropZoneLabel('VALUE_LINE_ANCHOR')
+                    }
+                };
+        }        
+        
         function createColumnDataLabelsReq(keyArgs){
           
             var anchors = def.get(keyArgs, 'anchors');
@@ -833,7 +851,7 @@ function(def, pvc, pv){
                     group: 'options',
                     type:  'combo',
                     seperator: def.get(keyArgs, 'separator', true),
-                    caption: dropZoneLabel('VALUE_ANCHOR')
+                    caption: dropZoneLabel(def.get(keyArgs, 'value_anchor', 'VALUE_ANCHOR'))
                 }
             };
         }
@@ -3320,9 +3338,9 @@ function(def, pvc, pv){
 
             this.options.plot2OrthoAxis = 2;
             
-            this.options.plot2ValuesVisible = this._vizOptions.labelsVisible;
+            configureColumnLabelsAlignmentOptions.call(this);
             
-            this.options.plot2ValuesAnchor = this._vizOptions.labelsOption;           
+            configureLineLabelsAlignmentOptions.call(this);
 
             // Plot2 uses same color scale
             // options.plot2ColorAxis = 2;
@@ -4390,6 +4408,14 @@ function(def, pvc, pv){
                     this.options.extensionPoints.label_textBaseline = 'bottom';
                 }
             }
+        }
+    }
+    
+    function configureLineLabelsAlignmentOptions() {
+        var lineLabelsOption = this._vizOptions.lineLabelsOption;
+        if(lineLabelsOption && lineLabelsOption != 'none') {
+          this.options.plot2ValuesVisible = true;
+          this.options.plot2ValuesAnchor = lineLabelsOption;
         }
     }
 
