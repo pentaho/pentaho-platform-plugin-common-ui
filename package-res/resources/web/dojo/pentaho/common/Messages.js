@@ -92,7 +92,7 @@ pentaho.common.Messages.entityDecoder=document.createElement('textarea');
           else if(dojo.isObject(substitutionVars)) {
             subs = substitutionVars;
           }
-          if(dojo.string.substituteParams) {
+          if(dojo.string && dojo.string.substituteParams) {
             msg = dojo.string.substituteParams(msg, subs);
           }
           else if(dojo.replace) {
