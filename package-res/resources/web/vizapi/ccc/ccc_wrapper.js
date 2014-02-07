@@ -309,7 +309,7 @@ function(def, pvc, pv){
                         'required', false),
                     
                     createColumnDataLabelsReq({value_anchor: 'VALUE_COLUMN_ANCHOR',   separator: false, anchors:['none', 'center', 'inside_end', 'inside_base', 'outside_end']}),
-                    createLineLabelsVisibleAnchorDataReq(),  
+                    createLabelsVisibleAnchorDataReq({labels_option: 'lineLabelsOption', value_anchor: 'VALUE_LINE_ANCHOR'}),
                     createMultiDataReq(),
                     createShapeDataReq({separator: true}),
                     createLineWidthDataReq(),
@@ -810,33 +810,17 @@ function(def, pvc, pv){
             }
             
             return {
-                    id: 'labelsOption',
+                    id: def.get(keyArgs, 'labels_option', 'labelsOption'),
                     dataType: 'string',
                     values: anchors,
                     ui: {
                         labels: anchors.map(function(option){ return dropZoneLabel('VALUE_ANCHOR_DOTS_' + option.toUpperCase()); }),
                         group: 'options',
                         type:  'combo',
-                        caption: dropZoneLabel('VALUE_ANCHOR')
+                        caption: dropZoneLabel(def.get(keyArgs, 'value_anchor', 'VALUE_ANCHOR'))
                     }
                 };
         }
-        
-        function createLineLabelsVisibleAnchorDataReq(){
-            var anchors = ['none', 'center', 'left', 'right', 'top', 'bottom'];
-
-            return {
-                    id: 'lineLabelsOption',
-                    dataType: 'string',
-                    values: anchors,
-                    ui: {
-                        labels: anchors.map(function(option){ return dropZoneLabel('VALUE_ANCHOR_DOTS_' + option.toUpperCase()); }),
-                        group: 'options',
-                        type:  'combo',
-                        caption: dropZoneLabel('VALUE_LINE_ANCHOR')
-                    }
-                };
-        }        
         
         function createColumnDataLabelsReq(keyArgs){
           
