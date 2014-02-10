@@ -3479,6 +3479,12 @@ function(def, pvc, pv){
 
             configureLabelsAnchorOptions.call(this);
         },
+        
+        _readUserOptions: function(options, vizOptions) {
+            this.base(options, vizOptions);
+            options.valuesFont = defaultFont(readFont(vizOptions, 'label'));
+            options.extensionPoints.label_textStyle = vizOptions.labelColor;
+        },
 
         _getColorScaleKind: function() { return 'continuous'; },
 
@@ -3847,7 +3853,8 @@ function(def, pvc, pv){
         _readUserOptions: function(options, vizOptions) {
             this.base(options, vizOptions);
 
-            options.valuesFont = defaultFont(null, readFontSize(vizOptions, 'label'));
+            options.valuesFont = defaultFont(readFont(vizOptions, 'label'));
+            options.extensionPoints.label_textStyle = vizOptions.labelColor;
 
             configureLabelsPositionOptions.call(this);
         },
