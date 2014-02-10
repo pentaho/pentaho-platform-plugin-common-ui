@@ -139,63 +139,6 @@
       <fileset dir="${dojo.src}/dojox"/>
     </copy>
 
-    <!--<copy todir="${dojo.prod.stage.dir}/dojo/nls">-->
-      <!--<fileset dir="${stage.dir}/javascript/nls">-->
-        <!--<include name="*.js"/>-->
-      <!--</fileset>-->
-    <!--</copy>-->
-    <!--<copy todir="${dojo.prod.stage.dir}/dojo/cldr/nls">-->
-      <!--<fileset dir="${stage.dir}/javascript/cldr/nls">-->
-      <!--</fileset>-->
-    <!--</copy>-->
-    <!--<copy todir="${dojo.prod.stage.dir}/dojox/widget/ColorPicker">-->
-      <!--<fileset dir="${dojo.src}/dojox/widget/ColorPicker">-->
-      <!--</fileset>-->
-    <!--</copy>-->
-    <!--<copy todir="${dojo.prod.stage.dir}/dojox/widget/nls">-->
-      <!--<fileset dir="${dojo.src}/dojox/widget/nls">-->
-        <!--<include name="ColorPicker.js"/>-->
-      <!--</fileset>-->
-    <!--</copy>-->
-    <!--<copy todir="${dojo.prod.stage.dir}/dojo/resources">-->
-      <!--<fileset dir="${dojo.src}/dojo/resources">-->
-        <!--<include name="blank.gif"/>-->
-      <!--</fileset>-->
-    <!--</copy>-->
-
-    <!--<copy todir="${dojo.prod.stage.dir}/util/doh">-->
-      <!--<fileset dir="${dojo.src}/util/doh"/>-->
-    <!--</copy>-->
-
-
-    <!--<copy todir="${dojo.prod.stage.dir}/dojox">-->
-      <!--<fileset dir="${dojo.src}/dojox"/>-->
-    <!--</copy>-->
-
-    <!--<copy todir="${dojo.prod.stage.dir}/dijit">-->
-      <!--<fileset dir="${dojo.src}/dijit"/>-->
-    <!--</copy>-->
-
-    <!--<copy todir="${approot.stage.dir}/resources/web/testres">-->
-      <!--<fileset dir="${dev.res}">-->
-        <!--<include name="runner.html"/>-->
-      <!--</fileset>-->
-    <!--</copy>-->
-    <!--<delete>-->
-      <!--<fileset dir="${dojo.prod.stage.dir}/util/doh">-->
-        <!--<include name="runner.js"/>-->
-        <!--<include name="runner2.js"/>-->
-        <!--<include name="runner.css"/>-->
-      <!--</fileset>-->
-    <!--</delete>-->
-    <!--<copy todir="${dojo.prod.stage.dir}/util/doh">-->
-      <!--<fileset dir="build-res">-->
-        <!--<include name="runner.js"/>-->
-        <!--<include name="runner2.js"/>-->
-        <!--<include name="runner.css"/>-->
-      <!--</fileset>-->
-    <!--</copy>-->
-
     <property environment="env"/>
    
     <ant antfile="build-res/subfloor-gwt.xml" target="gwt-compile">

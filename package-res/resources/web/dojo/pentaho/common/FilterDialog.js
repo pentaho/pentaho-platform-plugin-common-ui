@@ -682,7 +682,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
       }
     }
     }
-    return pentaho.pda.Column.name + aggregation + friendlyOperator + " " + values;
+    return column.name + aggregation + friendlyOperator + " " + values;
   },
 
   // This is broken. You cannot overload functions in Javascript. Further this method is trying to call the second

@@ -31,6 +31,8 @@ requireCfg['paths']['common-repo'] = prefix+'/repo';
 
 requireCfg['paths']['common-data'] = prefix+'/dataapi';
 
+requireCfg['paths']['dojox/layout/ResizeHandle'] = prefix+'/dojo/pentaho/common/overrides/ResizeHandle';
+
 
 // Plugin Handlers
 requireCfg['paths']['common-ui/PluginHandler'] = prefix+'/plugin-handler/pluginHandler';
