@@ -4383,7 +4383,7 @@ function(def, pvc, pv){
 
             var labelsOption = this._vizOptions.labelsOption;
 
-            this.options.extensionPoints.label_textMargin = 10;
+            this.options.extensionPoints.label_textMargin = 7;
             
             if(labelsOption == 'center') {
                 this.options.valuesAnchor = 'center';
