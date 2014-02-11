@@ -3176,7 +3176,13 @@ function(def, pvc, pv){
             }
 
             configureColumnLabelsAlignmentOptions.call(this);
-        }
+        },
+        
+        _readUserOptions: function(options, vizOptions) {
+            this.base(options, vizOptions);
+            options.valuesFont = defaultFont(readFont(vizOptions, 'label'));
+            options.extensionPoints.label_textStyle = vizOptions.labelColor;
+        }        
     });
 
     // -------------------
@@ -3302,6 +3308,9 @@ function(def, pvc, pv){
                 options.extensionPoints.pointDot_shape = shape;
             }
 
+            options.plot2ValuesFont = defaultFont(readFont(vizOptions, 'label'));
+            options.extensionPoints.plot2Label_textStyle = vizOptions.labelColor;
+            
             configureLabelsOptions.call(this);
         },
 
@@ -3363,6 +3372,9 @@ function(def, pvc, pv){
                 options.dotsVisible = true;
                 options.extensionPoints.dot_shape = shape;
             }
+            
+            options.valuesFont = defaultFont(readFont(vizOptions, 'label'));
+            options.extensionPoints.label_textStyle = vizOptions.labelColor;
 
             configureLabelsAnchorOptions.call(this);
             configureLabelPositionImprovement.call(this);
