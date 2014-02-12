@@ -31,7 +31,12 @@ requireCfg['paths']['common-repo'] = prefix+'/repo';
 
 requireCfg['paths']['common-data'] = prefix+'/dataapi';
 
-requireCfg['paths']['dojox/layout/ResizeHandle'] = prefix+'/dojo/pentaho/common/overrides/ResizeHandle';
+requireCfg['paths']['dojox/layout/ResizeHandle'] = prefix+'/dojo/pentaho/common/overrides/dojox/layout/ResizeHandle';
+requireCfg['paths']['dojox/grid/_View'] = prefix+'/dojo/pentaho/common/overrides/dojox/grid/_View';
+requireCfg['paths']['dojox/xml/parser'] = prefix+'/dojo/pentaho/common/overrides/dojox/xml/parser';
+requireCfg['paths']['dojox/grid/Selection'] = prefix+'/dojo/pentaho/common/overrides/dojox/grid/Selection';
+requireCfg['paths']['dojox/grid/_FocusManager'] = prefix+'/dojo/pentaho/common/overrides/dojox/grid/_FocusManager';
+requireCfg['paths']['dojox/grid/_Scroller'] = prefix+'/dojo/pentaho/common/overrides/dojox/grid/_Scroller';
 
 
 // Plugin Handlers

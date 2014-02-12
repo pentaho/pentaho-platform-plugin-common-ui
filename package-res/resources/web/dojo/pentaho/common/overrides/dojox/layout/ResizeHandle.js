@@ -1,6 +1,3 @@
-/**
- * Copied from Dojo to correct non-AMD compliant line 367
- */
 define(["dojo/_base/kernel","dojo/_base/lang","dojo/_base/connect","dojo/_base/array","dojo/_base/event",
 	"dojo/_base/fx","dojo/_base/window","dojo/fx","dojo/window","dojo/dom","dojo/dom-class",
 	"dojo/dom-geometry","dojo/dom-style","dijit/_base/manager","dijit/_Widget","dijit/_TemplatedMixin",
@@ -363,7 +360,6 @@ var ResizeHandle = declare("dojox.layout.ResizeHandle",[Widget, TemplatedMixin],
 	
 });
 
-/** Following line modified from Dojo source to change dojo.declare to plain declare */
 var _ResizeHelper = declare("dojox.layout._ResizeHelper", Widget, {
 	// summary:
 	//		A global private resize helper shared between any
