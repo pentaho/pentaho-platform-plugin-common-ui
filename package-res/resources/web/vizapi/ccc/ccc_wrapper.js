@@ -181,11 +181,13 @@ function(def, pvc, pv){
                 reqs: def.array.appendMany(
                     createDataReq('LINE', {options: false}),
                     [
-                     createShapeDataReq(),
+                     createLabelsVisibleAnchorDataReq(true)
+                    ],
+                    [
+                     createShapeDataReq({separator: true}),
                      createLineWidthDataReq()
                     ],
                     createTrendsDataReqs(),
-                    createDotLabelDataReqs(),
                     [ 
                      createChartOptionsDataReq(true)
                     ]
@@ -209,7 +211,9 @@ function(def, pvc, pv){
                 hyperlinkOrder: ['rows','columns'],
                 reqs: def.array.appendMany(
                     createDataReq('STACKED_AREA',{options: false}),
-                    createDotLabelDataReqs(),
+                    [
+                     createLabelsVisibleAnchorDataReq(true)
+                    ],
                     [
                      createChartOptionsDataReq(true)
                     ]
@@ -275,8 +279,10 @@ function(def, pvc, pv){
                     createColorSetDataReq(),
                     createReverseColorsDataReq()
                 ],
+                [
+                 createLabelsVisibleAnchorDataReq()
+                ],
                 createTrendsDataReqs(),
-                createDotLabelDataReqs(),
                 [ createChartOptionsDataReq(true)])
             }],
             menuOrdinal: 190,
@@ -786,13 +792,6 @@ function(def, pvc, pv){
                         caption: dropZoneLabel('VALUE_POSITION')
                     }
                 };
-        }
-
-
-        function createDotLabelDataReqs(keyArgs) {
-            return [
-                createLabelsVisibleAnchorDataReq(keyArgs)
-            ];
         }
 
         function createLabelsVisibleAnchorDataReq(keyArgs){
@@ -3416,6 +3415,9 @@ function(def, pvc, pv){
        _readUserOptions: function(options, vizOptions){
            this.base(options, vizOptions);
 
+           options.valuesFont = defaultFont(readFont(vizOptions, 'label'));
+           options.extensionPoints.label_textStyle = vizOptions.labelColor;
+
            configureLabelsAnchorOptions.call(this);
        }
     });
@@ -3809,6 +3811,9 @@ function(def, pvc, pv){
 
         _readUserOptions: function(options, vizOptions){
             this.base(options, vizOptions);
+
+            options.valuesFont = defaultFont(readFont(vizOptions, 'label'));
+            options.extensionPoints.label_textStyle = vizOptions.labelColor;
 
             configureLabelsAnchorOptions.call(this);
         }
