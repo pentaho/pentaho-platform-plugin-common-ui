@@ -415,7 +415,7 @@ function(def, pvc, pv){
                     ]
                 )
             }],
-            menuOrdinal: 180
+            menuOrdinal: 183
         });
 
         defVisualization({
@@ -566,7 +566,7 @@ function(def, pvc, pv){
                       [createLabelsVisibleAnchorDataReq({ hideOptions : ['left', 'right', 'top', 'bottom'] })],
                       createSortDataReqs(true),
                       [createEmptySlicesDataReq()],
-                      [createChartOptionsDataReq(false)]
+                      [createChartOptionsDataReq(true)]
                   )
             }],
             menuOrdinal: 185
@@ -2352,13 +2352,35 @@ function(def, pvc, pv){
 
                 var keyIncludesDiscrim = (M > 1);
                 if(C > 0 || M > 0){
+                    var isSunburst = this._cccClass === "pvc.SunburstChart";
                     var colorMap;
                     var lastIndex;
                     // var useMeasureGems = !C || keyIncludesDiscrim;
                     if(M <= 1){
                         if(C > 0){
                             // Use colors
-                            colorMap = memberPalette[colorGems[C - 1].formula];
+                            if (isSunburst) {
+                                for (var i in colorGems) {
+                                    var map = memberPalette[colorGems[i].formula];
+                                    if (map) {
+
+                                        // Instantiate ColorMap
+                                        if (!colorMap) {
+                                            colorMap = {};
+                                        }
+
+                                        // Copy map values to ColorMap
+                                        // All color maps are joined together and there will be no 
+                                        // value collisions because the key is prefixed with the name 
+                                        // of the category
+                                        for (var j in map) {
+                                            colorMap[j] = map[j];
+                                        }
+                                    }
+                                }
+                            } else {
+                                colorMap = memberPalette[colorGems[C - 1].formula];    
+                            }
                         } else {
                             // Use measures (M === 1)
                             colorMap = memberPalette['[Measures].[MeasuresLevel]'];
@@ -2387,7 +2409,31 @@ function(def, pvc, pv){
                                 if(compKey){
                                     var comps = compKey.split(/\s*,\s*/);
                                     var key   = comps[comps.length - 1];
-                                    return colorMap[key] || defaultScale(key);
+
+                                    var color = colorMap[key];
+
+                                    if (isSunburst && !color) {
+                                        // Sunburst Level 1 Key - [Department].[VAL]
+                                        // Sunburst Level 2 Key - [Department].[VAL]~[Region].[USA]
+                                        // colorMap= {
+                                        //  "[Region].[USA]" : "#FF00FF"
+                                        //  "[Department].[USA]" : "#AAFF00"
+                                        // }
+                                        var keyArr = key.split("~");
+
+                                        // Use last index key instead of whole key to look up color
+                                        color = colorMap[keyArr[keyArr.length - 1]];
+                                    }
+
+                                    // Still no color in ColorMap
+                                    if (!color) {
+                                        color = defaultScale(key);
+                                    } else {
+                                        color = new pv.FillStyle.Solid(color);
+                                        color.isFixedColor = true;    
+                                    }                                        
+
+                                    return color;
                                 }
                             };
 
@@ -4059,10 +4105,6 @@ function(def, pvc, pv){
             this.options.rootCategoryLabel = this._message('chartSunburstRootCategoryLabel');
         },
 
-        _getDiscreteColorScale: function() {
-            return this._getDefaultDiscreteColorScale();
-        },
-
         _readUserOptions: function(options, vizOptions) {
             this.base(options, vizOptions);
 
@@ -4090,13 +4132,7 @@ function(def, pvc, pv){
                 options.extensionPoints.label_add = function() {
                     return new pv.Label()
                         .text(function(scene) {
-                            if(this.proto.text() == "") {
-                                return "";
-                            }
-                            
-                            var text = scene.vars.size.label;
-                            var maxWidth = scene.outerRadius - scene.innerRadius;                
-                            return pvc.text.trimToWidthB(maxWidth*.7, text, scene.vars.font, "..");;
+                            return this.proto.text() === "" ? "" : scene.vars.size.label;
                         })                
                         .textBaseline("top")
                 }    
