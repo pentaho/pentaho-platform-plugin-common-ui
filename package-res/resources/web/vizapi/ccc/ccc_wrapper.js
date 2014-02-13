@@ -415,7 +415,7 @@ function(def, pvc, pv){
                     ]
                 )
             }],
-            menuOrdinal: 180
+            menuOrdinal: 183
         });
 
         defVisualization({
@@ -2370,6 +2370,9 @@ function(def, pvc, pv){
                                         }
 
                                         // Copy map values to ColorMap
+                                        // All color maps are joined together and there will be no 
+                                        // value collisions because the key is prefixed with the name 
+                                        // of the category
                                         for (var j in map) {
                                             colorMap[j] = map[j];
                                         }
@@ -2407,24 +2410,30 @@ function(def, pvc, pv){
                                     var comps = compKey.split(/\s*,\s*/);
                                     var key   = comps[comps.length - 1];
 
-                                    var scale = colorMap[key];
+                                    var color = colorMap[key];
 
-                                    if (!scale) {
-                                        if (isSunburst) {
-                                            var keyArr = key.split("~");
+                                    if (isSunburst && !color) {
+                                        // Sunburst Level 1 Key - [Department].[VAL]
+                                        // Sunburst Level 2 Key - [Department].[VAL]~[Region].[USA]
+                                        // colorMap= {
+                                        //  "[Region].[USA]" : "#FF00FF"
+                                        //  "[Department].[USA]" : "#AAFF00"
+                                        // }
+                                        var keyArr = key.split("~");
 
-                                            // Use last index key instead of whole key to look up color
-                                            scale = colorMap[keyArr[keyArr.length - 1]];
-                                        }
-
-                                        // Still no color in ColorMap
-                                        if (!scale) {
-                                            scale = defaultScale(key);
-                                            scale.isDefault = true;    
-                                        }
+                                        // Use last index key instead of whole key to look up color
+                                        color = colorMap[keyArr[keyArr.length - 1]];
                                     }
 
-                                    return scale;
+                                    // Still no color in ColorMap
+                                    if (!color) {
+                                        color = defaultScale(key);
+                                    } else {
+                                        color = new pv.FillStyle.Solid(color);
+                                        color.isFixedColor = true;    
+                                    }                                        
+
+                                    return color;
                                 }
                             };
 
