@@ -14,6 +14,12 @@ pen.define(deps, function(ring) {
 	
 	var PentahoPlugin;
 	
+	if( !window.console ){
+		window.console = {};
+		window.console.log = function() {};
+	}
+	
+	
 	// Verifies if the plugin is a PentahoPlugin type
 	var _verifyPlugin = function(plugin) {
 
