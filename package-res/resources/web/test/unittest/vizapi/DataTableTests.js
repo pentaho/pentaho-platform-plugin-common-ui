@@ -15,7 +15,7 @@
 *
 */
 
-pen.require(['common-ui/instrumented/vizapi/DataTable'], function() {
+pen.require(['common-ui/vizapi/DataTable'], function() {
     doh.register("Data Table Tests", [
 
         {  name: "1. Test Package",
