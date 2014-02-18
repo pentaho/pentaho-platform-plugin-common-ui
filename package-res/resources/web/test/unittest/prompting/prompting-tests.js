@@ -15,7 +15,7 @@
 *
 */
 
-pen.require(['common-ui/instrumented/prompting/pentaho-prompting', 'common-ui/instrumented/prompting/pentaho-prompting-builders', 'common-ui/instrumented/prompting/pentaho-prompting-components'], function() {
+pen.require(['common-ui/prompting/pentaho-prompting', 'common-ui/prompting/pentaho-prompting-builders', 'common-ui/prompting/pentaho-prompting-components'], function() {
   // Determine the size of an object (# of properties)
   var sizeOf = function(obj) {
     var size = 0, key;
