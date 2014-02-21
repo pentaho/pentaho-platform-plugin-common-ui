@@ -797,9 +797,9 @@ function(def, pvc, pv){
         function createLabelsVisibleAnchorDataReq(keyArgs){
             var anchors = ['none', 'center', 'left', 'right', 'top', 'bottom'];
 
-            if (keyArgs) {
-                for (i in keyArgs.hideOptions) {
-                    for (j in anchors) {
+            if (keyArgs && keyArgs.hideOptions) {
+                for (var i = 0; i < keyArgs.hideOptions.length; i++) {
+                    for (var j = 0; j < anchors.length; j++) {
                         if (anchors[j] === keyArgs.hideOptions[i]) {
                             anchors.splice(j, 1);
                             break;
