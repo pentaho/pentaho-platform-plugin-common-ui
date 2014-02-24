@@ -211,8 +211,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         </zip>
     </target>
 
-    <target name="js.publish-nojar" depends="create-pom">
-        <antcall target="maven-publish">
+  <target name="js.publish-nojar">
+    <antcall target="maven-publish-js-source">
             <param name="publish.groupId" value="${ivy.artifact.group}" />
             <param name="publish.artifactId" value="${ivy.artifact.id}" />
             <param name="publish.version" value="${project.revision}" />
@@ -220,30 +220,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         </antcall>
     </target>
 
-    <target name="js.publish-local-nojar" depends="create-pom">
-
-        <ivy:resolve organisation="org.apache.maven" module="maven-ant-tasks" revision="2.1.3" inline="true" transitive="false"/>
-        <ivy:retrieve organisation="org.apache.maven" module="maven-ant-tasks" revision="2.1.3" inline="true" transitive="false" pattern="build-res/[artifact]-[type]-[revision].[ext]"/>
-
-
-        <path id="maven-ant-tasks.classpath" path="build-res/maven-ant-tasks-jar-2.1.3.jar" />
-        <typedef resource="org/apache/maven/artifact/ant/antlib.xml"
-                 uri="antlib:org.apache.maven.artifact.ant"
-                 classpathref="maven-ant-tasks.classpath" />
-        <artifact:pom id="mypom" file="${dist.dir}/pom.xml" />
-
-        <artifact:deploy file="${dist.dir}/${ivy.artifact.id}-${project.revision}.jar">
-            <remoteRepository url="file:${user.home}/.m2/local"/>
-            <pom refid="mypom"/>
-            <attach file="${dist.dir}/${ivy.artifact.id}-${project.revision}-js.zip" type="zip" classifier="js"/>
-            <attach file="${dist.dir}/${ivy.artifact.id}-${project.revision}-sources.zip" type="jar" classifier="sources"/>
-            <attach file="${dist.dir}/${package.id}-${project.revision}.zip" type="zip" classifier=""/>
-
-        </artifact:deploy>
-
-    </target>
-
-    <target name="maven-publish" depends="install-antcontrib">
+  <target name="maven-publish-js-source" depends="install-antcontrib">
         <sequential>
             <fail message="No file found at: ${publish.file}">
                 <condition>
