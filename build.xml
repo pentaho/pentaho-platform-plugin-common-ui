@@ -124,10 +124,6 @@
 
     <property environment="env"/>
 
-    <copy todir="${approot.stage.dir}">
-      <fileset dir="${package.resdir}"/>
-    </copy>
-
     <copy todir="${approot.stage.dir}/resources/web/dojo/dojo" overwrite="true">
       <fileset dir="${dojo.src}/dojo"/>
     </copy>
@@ -137,6 +133,10 @@
     </copy>
     <copy todir="${approot.stage.dir}/resources/web/dojo/dojox" overwrite="true">
       <fileset dir="${dojo.src}/dojox"/>
+    </copy>
+
+    <copy todir="${approot.stage.dir}" overwrite="true">
+      <fileset dir="${package.resdir}"/>
     </copy>
 
     <property environment="env"/>
