@@ -655,7 +655,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
               this.subscriptions.push(topic.subscribe("/dnd/drop", unSubscribeFunc));
 
 
-              on(this.domNode,  "onmouseover", function (event) {
+              on(this.domNode,  "mouseover", function (event) {
                 if (Manager.source && outterThis.checkAcceptance(outterThis.dropZone,  Manager.nodes)) {
                   domClass.add(outterThis.domNode, "over");
                 }
