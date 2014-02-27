@@ -114,7 +114,6 @@ define("common-ui/prompting/pentaho-prompting-builders", ['cdf/cdf-module', 'com
       var widget = this.findBuilderFor(args, typeOverride).build(args);
       if (widget.parameter && widget.param) {
         widget.postChange = function() {
-          debugger;
           args.promptPanel.parameterChanged(this.param, this.parameter, this.getValue());
         }.bind(widget);
       }
