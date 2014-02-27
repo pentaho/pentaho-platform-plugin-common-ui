@@ -18,8 +18,8 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
   , "pentaho/common/Menu"
   , "pentaho/common/ListItem"
   , "pentaho/common/MenuSeparator", "dojo/dom-class", "dojo/dom-geometry", "dojo/text!pentaho/common/Select.html",
-  "dojo/_base/lang", "dojo/dom-construct"],
-    function (declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, on, query, Select, Menu, ListItem, MenuSeparator, domClass, geometry, templateStr, lang, construct) {
+  "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/event"],
+    function (declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, on, query, Select, Menu, ListItem, MenuSeparator, domClass, geometry, templateStr, lang, construct, event) {
       var _SelectMenu = declare("pentaho.common.Select",[Menu, _TemplatedMixin, _WidgetsInTemplateMixin], {
         // summary:
         //		An internally-used menu for dropdown that allows us a vertical scrollbar
@@ -48,7 +48,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
 
           this.inherited(arguments);
 
-          this.connect(this.domNode, "onmousemove", event.stop);
+          this.own(on(this.domNode, "mousemove", event.stop));
 
         },
 
@@ -127,5 +127,3 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
           }
       );
     });
-
-
