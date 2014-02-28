@@ -92,7 +92,10 @@ define( [], function () {
       var module;
       // Only allow a local module to be defined once
       if (isDefined(name)) {
-        throw "local module is already defined: " + name;
+        if(typeof console !== "undefined"){
+          console.warn("local module is already defined: " + name);
+        }
+        return;
       }
 
       // Evaluate the function to get the module's value
