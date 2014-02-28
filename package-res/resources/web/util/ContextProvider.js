@@ -50,10 +50,11 @@ pen.define(["common-ui/jquery-i18n"], function() {
 	 * Loads a single file and provides a post function for after the context has been loaded. 
 	 */
 	function loadFile(path, postFileLoad, addToContext) {	
-
+		var locale = getUrlVars()["locale"];
 		jQuery.i18n.properties({
 	  		name: path,
 	  		mode: 'map',
+	  		language: locale,
 	  		callback: function () {
 
 	  			var copiedMap = {};
@@ -78,6 +79,15 @@ pen.define(["common-ui/jquery-i18n"], function() {
 	  		}
 	  	});
 	}
+
+	function getUrlVars() {
+	    var vars = {};
+	    var parts = window.top.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+	        vars[key] = value;
+	    });
+	    return vars;
+	}
+
 
 	/**
 	 * Retrieve the context, accepting a post load method for the context and a configuration array.
