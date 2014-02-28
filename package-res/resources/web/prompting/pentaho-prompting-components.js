@@ -438,9 +438,23 @@ pen.define(['common-ui/prompting/pentaho-prompting-bind', 'common-ui/prompting/p
         _inValue = this.getValue();
       }.bind(this));
 
+      function getActiveAutoCompleteValue() {
+        var $menu = input.autocomplete('widget');
+        if($menu.is(":visible")) {
+            var menuData = $menu.data('menu');
+            if(menuData && menuData.active) {
+                var itemData = menuData.active.data('item.autocomplete');
+                if(itemData) return itemData.value;
+            }
+        }
+      }
+
       input.focusout(function() {
-      if(_inValue !== this.getValue()) {
-        Dashboards.processChange(this.name);
+        var value = getActiveAutoCompleteValue();
+        if(value != null) { input.val(value); }
+        
+        if(_inValue !== this.getValue()) {
+          Dashboards.processChange(this.name);
         }
        }.bind(this));
 
