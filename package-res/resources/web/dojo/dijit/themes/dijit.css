@@ -742,6 +742,13 @@ DIV.dijitArrowButton {
 	left: 0;
 	top: -10000px;
 	overflow: visible;
+	background: none repeat scroll 0 0 #FEFDE7;
+  border: 1px solid #CACACB;
+  color: #26363D;
+  padding: 10px;
+  font-size: 13px;
+  margin-left:8px;
+  box-shadow: 1px 1px 2px #323232;
 }
 
 .dijitTooltipContainer {
