@@ -37,6 +37,7 @@ requireCfg['paths']['dojox/xml/parser'] = prefix+'/dojo/pentaho/common/overrides
 requireCfg['paths']['dojox/grid/Selection'] = prefix+'/dojo/pentaho/common/overrides/dojox/grid/Selection';
 requireCfg['paths']['dojox/grid/_FocusManager'] = prefix+'/dojo/pentaho/common/overrides/dojox/grid/_FocusManager';
 requireCfg['paths']['dojox/grid/_Scroller'] = prefix+'/dojo/pentaho/common/overrides/dojox/grid/_Scroller';
+requireCfg['paths']['dojox/storage'] = prefix+'/dojo/pentaho/common/overrides/dojox/storage';
 
 
 // Plugin Handlers
