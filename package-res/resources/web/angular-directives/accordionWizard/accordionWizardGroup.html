@@ -1,0 +1,26 @@
+<div class="accordion-group">
+  <div class="accordion-heading">
+    <div class="accordion-title" ng-class="{'panel-disabled': isDisabled}">
+      <h4>
+        <div class="row">
+          <div class="accordion-heading-content span4" accordion-wizard-transclude="heading">{{heading}}</div>
+          <div class="offset6 span2">
+            <a class="accordion-toggle" ng-click="toggleOpen()">
+              <span class="accordion-toggle-text" ng-hide="isOpen">{{editText}}</span>
+            </a>
+          </div>
+        </div>
+      </h4>
+      <div class="summary-panel">
+        <div class="summary-label" ng-hide="isOpen">{{summary}}</div>
+      </div>
+    </div>
+  </div>
+  <div class="accordion-collapse" collapse="!isOpen">
+    <div class="accordion-inner" ng-transclude></div>
+    <div class="accordion-footing">
+      <button class="pentaho-button accordion-save-button" ng-disabled="!canSave()" ng-click="saveSettings()">{{saveText}}</button>
+      <button class="pentaho-button accordion-cancel-button" ng-click="cancelSettings()">{{cancelText}}</button>
+    </div>
+  </div>
+</div>

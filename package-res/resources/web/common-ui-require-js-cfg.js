@@ -82,3 +82,5 @@ requireCfg['paths']['common-ui/AnimatedAngularPluginHandler'] = prefix + 'common
 requireCfg['paths']['common-ui/AnimatedAngularPlugin'] = prefix + 'common-ui/resources/web/plugin-handler/animatedAngularPlugin';
 
 requireCfg['shim']['common-ui/PluginHandler'] = ['common-ui/jquery'];
+
+requireCfg['paths']['common-ui/angular-directives'] = prefix + 'common-ui/resources/web/angular-directives';

@@ -16,7 +16,25 @@
 */
 
 ({
-//  appDir: "../resource/script",
-  baseUrl: "NOOP",
+  appDir: "./module-scripts",
+  baseUrl: ".",
+  dir: "../bin/scriptOutput",
+  optimizeCss: "false",
+  //Put in a mapping so that 'requireLib' in the
+  //modules section below will refer to the require.js
+  //contents.
+  paths: {
+    requireLib: 'require'
+  },
 
+  //Indicates the namespace to use for require/requirejs/define.
+  namespace: "pen",
+
+  modules: [
+    {
+      name: "angular-directives",
+      include: ["common-ui/angular-directives/angular-directives"],
+      create: true
+    }
+  ]
 })

@@ -31,7 +31,9 @@ requirejs.config({
     'common-ui/angular-animate': 'angular/angular-animate',
     'common-ui/jquery': 'jquery/jquery-1.9.1.min',
     'common-ui/AnimatedAngularPlugin': 'plugin-handler/animatedAngularPlugin',
-    'common-ui/AnimatedAngularPluginHandler': 'plugin-handler/animatedAngularPluginHandler'
+    'common-ui/AnimatedAngularPluginHandler': 'plugin-handler/animatedAngularPluginHandler',
+
+    'common-ui/angular-directives': 'angular-directives'
   },
 
   shim: {
@@ -45,7 +47,7 @@ requirejs.config({
     'common-ui/PluginHandler': { deps: ['common-ui/jquery'] },
     'common-ui/angular-animate': { deps: ['common-ui/angular'] },
     'common-ui/ring' : {exports: 'ring', deps : ['underscore']},
-    'underscore': { exports: '_' },
+    'underscore': { exports: '_' }
   },
 
   // ask Require.js to load these files (all our tests)
