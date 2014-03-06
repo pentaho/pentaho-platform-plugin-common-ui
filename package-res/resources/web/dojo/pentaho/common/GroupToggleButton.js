@@ -82,7 +82,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
               this.onChange(this.checked);
             }
             // notify the other members in the group that we've been clicked/selected
-            dojo.publish(this.unselectChannel, [this]);
+            topic.publish(this.unselectChannel, this);
           }
         },
 
