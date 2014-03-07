@@ -48,9 +48,6 @@ public class TreeBrowserMapper {
 
   private Locale locale = Locale.getDefault();
 
-  public TreeBrowserMapper() {
-  }
-
   public TreeBrowserMapper( Locale locale ) {
     this.locale = locale;
   }
@@ -130,15 +127,12 @@ public class TreeBrowserMapper {
     return false;
   }
 
-  public String getLocalizedName( Locale locale, RepositoryFileDto repositoryDto, String propertyName,
-                                  String defaultValue ) {
+  public Map<String, Properties> toPropertiesMap( List<LocaleMapDto> propertiesMapEntries ) {
 
-    Map<String, Properties> localePropertiesMap = new HashMap<String, Properties>();
+    Map<String, Properties> propertiesMap = new HashMap<String, Properties>();
 
-    // convert List<LocaleMapDto> to Map<String, Properties>
-    List<LocaleMapDto> localePropertiesMapEntries = repositoryDto.getLocalePropertiesMapEntries();
-    if ( localePropertiesMapEntries != null ) {
-      for ( LocaleMapDto localeMapDto : localePropertiesMapEntries ) {
+    if ( propertiesMapEntries != null ) {
+      for ( LocaleMapDto localeMapDto : propertiesMapEntries ) {
         Properties props = new Properties();
         List<StringKeyStringValueDto> properties = localeMapDto.getProperties();
         if ( properties != null ) {
@@ -146,9 +140,18 @@ public class TreeBrowserMapper {
             props.put( stringKeyStringValueDto.getKey(), stringKeyStringValueDto.getValue() );
           }
         }
-        localePropertiesMap.put( localeMapDto.getLocale(), props );
+        propertiesMap.put( localeMapDto.getLocale(), props );
       }
     }
+
+    return propertiesMap;
+  }
+
+  public String getLocalizedName( Locale locale, RepositoryFileDto repositoryDto, String propertyName,
+                                  String defaultValue ) {
+
+    // convert List<LocaleMapDto> to Map<String, Properties>
+    Map<String, Properties> localePropertiesMap = toPropertiesMap( repositoryDto.getLocalePropertiesMapEntries() );
 
     LocalizationUtil localizationUtil = new LocalizationUtil( localePropertiesMap, locale );
     return localizationUtil.resolveLocalizedString( propertyName, defaultValue );

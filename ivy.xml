@@ -69,6 +69,7 @@
 		<dependency org="commons-io" name="commons-io" rev="2.1" transitive="false" conf="test->default"/>
 		<dependency org="junit" name="junit" rev="4.4" transitive="false" conf="test->default" />
         <dependency org="org.jmock" name="jmock-junit4" rev="2.5.1" conf="test->default" />
+    <dependency org="org.mockito" name="mockito-all" rev="1.8.4" transitive="false" conf="test->default"/>
 
 		<dependency org="com.thoughtworks.xstream" name="xstream" rev="${dependency.xstream.revision}" transitive="false" conf="test->default"/>
 		<dependency org="simple-jndi" name="simple-jndi" rev="0.11.1" transitive="false" conf="test->default" />
