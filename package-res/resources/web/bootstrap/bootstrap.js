@@ -1452,6 +1452,7 @@
       $tip.find('.popover-content')[this.options.html ? 'html' : 'text'](content)
 
       $tip.removeClass('fade top bottom left right in')
+      if(!$tip.find('.popover-title').html()) $tip.find('.popover-title').hide();
     }
 
   , hasContent: function () {
