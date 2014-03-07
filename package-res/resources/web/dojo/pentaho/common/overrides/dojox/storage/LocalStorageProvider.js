@@ -3,7 +3,7 @@ define( ["dojo/_base/declare", "dojo/on", "dojo/query", "dojo/_base/array", "doj
 
 
 
-var moduleDef = dojo.declare(
+var moduleDef = declare(
 	"dojox.storage.LocalStorageProvider",
 	[Provider],
 	{
