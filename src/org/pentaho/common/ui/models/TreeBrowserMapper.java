@@ -106,22 +106,20 @@ public class TreeBrowserMapper {
 
   public boolean hasAccess( RepositoryFileDto repositoryDto, RepositoryFilePermission permission ) {
 
-    if ( repositoryDto != null && permission != null ) {
+    try {
       RepositoryFileAclDto aclDto = repositoryDto.getRepositoryFileAclDto();
-      if ( aclDto != null ) {
-        List<RepositoryFileAclAceDto> aces = aclDto.getAces();
-        if ( aces != null ) {
-          for ( RepositoryFileAclAceDto aclAceDto : aces ) {
-            for ( Integer integer : aclAceDto.getPermissions() ) {
-              if ( integer == RepositoryFilePermission.ACL_MANAGEMENT.ordinal() ||
-                integer == RepositoryFilePermission.ALL.ordinal() ||
-                integer == permission.ordinal() ) {
-                return true;
-              }
-            }
+      List<RepositoryFileAclAceDto> aces = aclDto.getAces();
+      for ( RepositoryFileAclAceDto aclAceDto : aces ) {
+        for ( Integer integer : aclAceDto.getPermissions() ) {
+          if ( integer == RepositoryFilePermission.ACL_MANAGEMENT.ordinal() ||
+            integer == RepositoryFilePermission.ALL.ordinal() ||
+            integer == permission.ordinal() ) {
+            return true;
           }
         }
       }
+    } catch ( Exception e ) {
+      logger.warn( ExceptionUtils.getMessage( e ) );
     }
 
     return false;
