@@ -1,0 +1,354 @@
+{
+   "id":"9ef16838-47ca-430a-a488-e3f96f672fa0",
+   "name":"",
+   "localizedName":"",
+   "isFolder":"true",
+   "path":"/",
+   "children":[
+      {
+         "id":"9dd17eec-cc5f-4a43-bf6c-f92c0439803f",
+         "name":"home",
+         "localizedName":"Home",
+         "isFolder":"true",
+         "path":"/home",
+         "children":{
+            "id":"5800e8de-45a5-4fa7-b55a-9b4cfec2f2d4",
+            "name":"suzy",
+            "localizedName":"suzy",
+            "isFolder":"true",
+            "path":"/home/suzy",
+            "permissions":{
+               "read":"true",
+               "write":"true",
+               "execute":"true"
+            }
+         },
+         "permissions":{
+            "read":"true",
+            "write":"false",
+            "execute":"false"
+         }
+      },
+      {
+         "id":"56b11078-c872-4316-83b3-1fbcf0393472",
+         "name":"public",
+         "localizedName":"Public",
+         "isFolder":"true",
+         "path":"/public",
+         "children":[
+            {
+               "id":"31fcc239-3dfe-460a-a980-2f7accec5259",
+               "name":"bi-developers",
+               "description":"A collection of examples for BI Developers as a reference to create solutions.",
+               "localizedName":"BI Developer Examples",
+               "isFolder":"true",
+               "path":"/public/bi-developers",
+               "children":[
+                  {
+                     "id":"502ad3d8-39c1-43c5-be99-d5c7951722a1",
+                     "name":"Analysis",
+                     "localizedName":"Analysis",
+                     "isFolder":"true",
+                     "path":"/public/bi-developers/Analysis",
+                     "permissions":{
+                        "read":"true",
+                        "write":"false",
+                        "execute":"false"
+                     }
+                  },
+                  {
+                     "id":"08b2500d-c959-432a-bd1f-92c4d4ed28b0",
+                     "name":"rules",
+                     "description":"Examples of business rules using scripting and database tables.<br/>Rules are used as part of business intelligence process, but here you can run them individually",
+                     "localizedName":"Business Rules",
+                     "isFolder":"true",
+                     "path":"/public/bi-developers/rules",
+                     "permissions":{
+                        "read":"true",
+                        "write":"false",
+                        "execute":"false"
+                     }
+                  },
+                  {
+                     "id":"127ee7a0-40a3-4b2d-92f6-9448f229ce32",
+                     "name":"charts",
+                     "description":"Sample action sequences using ChartBeans and other approaches for chart generation.",
+                     "localizedName":"Chart Examples",
+                     "isFolder":"true",
+                     "path":"/public/bi-developers/charts",
+                     "permissions":{
+                        "read":"true",
+                        "write":"false",
+                        "execute":"false"
+                     }
+                  },
+                  {
+                     "id":"d13cb453-782f-4560-82c4-0075e84a0644",
+                     "name":"etl",
+                     "description":"A collection of examples demonstrating the Kettle ETL Component.",
+                     "localizedName":"Data Integration with Kettle",
+                     "isFolder":"true",
+                     "path":"/public/bi-developers/etl",
+                     "permissions":{
+                        "read":"true",
+                        "write":"false",
+                        "execute":"false"
+                     }
+                  },
+                  {
+                     "id":"e5a91d2f-d21d-4966-a0f0-5b89fd6a58df",
+                     "name":"datasources",
+                     "description":"Examples of data sets being returned from different OLAP and RDBMS data sources.",
+                     "localizedName":"Data Source",
+                     "isFolder":"true",
+                     "path":"/public/bi-developers/datasources",
+                     "permissions":{
+                        "read":"true",
+                        "write":"false",
+                        "execute":"false"
+                     }
+                  },
+                  {
+                     "id":"56552a6c-7430-4451-b50b-341332edf423",
+                     "name":"Getting Started",
+                     "localizedName":"Getting Started",
+                     "isFolder":"true",
+                     "path":"/public/bi-developers/Getting Started",
+                     "permissions":{
+                        "read":"true",
+                        "write":"false",
+                        "execute":"false"
+                     }
+                  },
+                  {
+                     "id":"84a47eef-7c2b-46fa-8e00-8a67e03d221b",
+                     "name":"printing",
+                     "description":"Examples of content sent to printers. Content -> Printer. Got it?",
+                     "localizedName":"Printing",
+                     "isFolder":"true",
+                     "path":"/public/bi-developers/printing",
+                     "permissions":{
+                        "read":"true",
+                        "write":"false",
+                        "execute":"false"
+                     }
+                  },
+                  {
+                     "id":"b55e274b-3644-4314-b2d8-76483c6e8f9a",
+                     "name":"reporting",
+                     "description":"Examples of HTML and PDF reports",
+                     "localizedName":"Reporting",
+                     "isFolder":"true",
+                     "path":"/public/bi-developers/reporting",
+                     "children":[
+                        {
+                           "id":"acfcb7c9-d112-43af-a241-d542191a1513",
+                           "name":"report-charts",
+                           "description":"Examples of Reports With Charts",
+                           "localizedName":"Charting in Reports",
+                           "isFolder":"true",
+                           "path":"/public/bi-developers/reporting/report-charts",
+                           "permissions":{
+                              "read":"true",
+                              "write":"false",
+                              "execute":"false"
+                           }
+                        },
+                        {
+                           "id":"983b2a5d-1aea-445d-9b67-572d568a98b7",
+                           "name":"dep-param",
+                           "description":"Dynamic Dependent Parameter Examples using AJAX",
+                           "localizedName":"Dependent Parameter Examples",
+                           "isFolder":"true",
+                           "path":"/public/bi-developers/reporting/dep-param",
+                           "permissions":{
+                              "read":"true",
+                              "write":"false",
+                              "execute":"false"
+                           }
+                        },
+                        {
+                           "id":"10b5463e-fdf4-4ef9-9615-f4d9d28cef84",
+                           "name":"dynamic-reports",
+                           "description":"Dynamic Reporting Examples",
+                           "localizedName":"Dynamic Reporting",
+                           "isFolder":"true",
+                           "path":"/public/bi-developers/reporting/dynamic-reports",
+                           "permissions":{
+                              "read":"true",
+                              "write":"false",
+                              "execute":"false"
+                           }
+                        },
+                        {
+                           "id":"07464a24-5e48-4d4f-adfd-a09b9785bd47",
+                           "name":"prompting",
+                           "localizedName":"prompting",
+                           "isFolder":"true",
+                           "path":"/public/bi-developers/reporting/prompting",
+                           "permissions":{
+                              "read":"true",
+                              "write":"false",
+                              "execute":"false"
+                           }
+                        },
+                        {
+                           "id":"18aea2be-6595-492b-8fd4-98015d9f60c9",
+                           "name":"unified-file-format",
+                           "description":"Examples of PRPT (Unified File-Format) Reporting Files",
+                           "localizedName":"PRPT Samples",
+                           "isFolder":"true",
+                           "path":"/public/bi-developers/reporting/unified-file-format",
+                           "permissions":{
+                              "read":"true",
+                              "write":"false",
+                              "execute":"false"
+                           }
+                        }
+                     ],
+                     "permissions":{
+                        "read":"true",
+                        "write":"false",
+                        "execute":"false"
+                     }
+                  },
+                  {
+                     "id":"32d8c0f7-97f3-43b8-bf4e-642821d71e6d",
+                     "name":"Secure",
+                     "localizedName":"Secure",
+                     "isFolder":"true",
+                     "path":"/public/bi-developers/Secure",
+                     "permissions":{
+                        "read":"true",
+                        "write":"false",
+                        "execute":"false"
+                     }
+                  },
+                  {
+                     "id":"8fc12eaa-5212-4d84-81c3-4f86a62270ee",
+                     "name":"legacy-steel-wheels",
+                     "description":"Reporting, Analysis, and Dashboarding Samples for Steel Wheels, Inc.",
+                     "localizedName":"Steel Wheels (Legacy)",
+                     "isFolder":"true",
+                     "path":"/public/bi-developers/legacy-steel-wheels",
+                     "children":[
+                        {
+                           "id":"dd4483d4-ccbf-4ce4-b7c1-1f57d9648899",
+                           "name":"steel-wheels-3.0",
+                           "description":"Steel Wheels Reporting Samples",
+                           "localizedName":"Steel Wheels (3.0)",
+                           "isFolder":"true",
+                           "path":"/public/bi-developers/legacy-steel-wheels/steel-wheels-3.0",
+                           "permissions":{
+                              "read":"true",
+                              "write":"false",
+                              "execute":"false"
+                           }
+                        },
+                        {
+                           "id":"c2ef9f06-0229-4090-bfac-80bb8b193c4b",
+                           "name":"steel-wheels-4.8",
+                           "description":"Reporting, Analysis, and Dashboarding Samples for Steel Wheels, Inc.",
+                           "localizedName":"Steel Wheels (4.8)",
+                           "isFolder":"true",
+                           "path":"/public/bi-developers/legacy-steel-wheels/steel-wheels-4.8",
+                           "children":[
+                              {
+                                 "id":"ea3b1c81-40ac-4abc-93a0-fcd68a3fa5f7",
+                                 "name":"analysis",
+                                 "description":"Steel Wheels Analysis Samples",
+                                 "localizedName":"Analysis",
+                                 "isFolder":"true",
+                                 "path":"/public/bi-developers/legacy-steel-wheels/steel-wheels-4.8/analysis",
+                                 "permissions":{
+                                    "read":"true",
+                                    "write":"false",
+                                    "execute":"false"
+                                 }
+                              },
+                              {
+                                 "id":"e750f926-5e57-4239-aea5-57d822abd57a",
+                                 "name":"dashboards",
+                                 "description":"Steel Wheels Dashboard Samples",
+                                 "localizedName":"Dashboards",
+                                 "isFolder":"true",
+                                 "path":"/public/bi-developers/legacy-steel-wheels/steel-wheels-4.8/dashboards",
+                                 "permissions":{
+                                    "read":"true",
+                                    "write":"false",
+                                    "execute":"false"
+                                 }
+                              },
+                              {
+                                 "id":"6a2899c8-8043-44c9-8ceb-b7839105c909",
+                                 "name":"reports",
+                                 "description":"Steel Wheels Reporting Samples",
+                                 "localizedName":"Reporting",
+                                 "isFolder":"true",
+                                 "path":"/public/bi-developers/legacy-steel-wheels/steel-wheels-4.8/reports",
+                                 "permissions":{
+                                    "read":"true",
+                                    "write":"false",
+                                    "execute":"false"
+                                 }
+                              }
+                           ],
+                           "permissions":{
+                              "read":"true",
+                              "write":"false",
+                              "execute":"false"
+                           }
+                        }
+                     ],
+                     "permissions":{
+                        "read":"true",
+                        "write":"false",
+                        "execute":"false"
+                     }
+                  },
+                  {
+                     "id":"97d0f643-093d-4bd1-a445-6a62753df2b9",
+                     "name":"SVG",
+                     "localizedName":"SVG",
+                     "isFolder":"true",
+                     "path":"/public/bi-developers/SVG",
+                     "permissions":{
+                        "read":"true",
+                        "write":"false",
+                        "execute":"false"
+                     }
+                  }
+               ],
+               "permissions":{
+                  "read":"true",
+                  "write":"false",
+                  "execute":"false"
+               }
+            },
+            {
+               "id":"f8c5e595-3000-45c3-b720-dd73edfd61b4",
+               "name":"Steel Wheels",
+               "description":"Reporting, Analysis, and Dashboarding Samples for Steel Wheels, Inc.",
+               "localizedName":"Steel Wheels",
+               "isFolder":"true",
+               "path":"/public/Steel Wheels",
+               "permissions":{
+                  "read":"true",
+                  "write":"false",
+                  "execute":"false"
+               }
+            }
+         ],
+         "permissions":{
+            "read":"true",
+            "write":"false",
+            "execute":"false"
+         }
+      }
+   ],
+   "permissions":{
+      "read":"true",
+      "write":"true",
+      "execute":"true"
+   }
+}
