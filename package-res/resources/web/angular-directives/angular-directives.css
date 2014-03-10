@@ -1,0 +1,35 @@
+.bootstrap .accordion-wizard .accordion-heading-content {
+  font-size: 18px;
+}
+
+.bootstrap .accordion-wizard .accordion-group {
+  padding: 10px 15px;
+  position: relative;
+  overflow: hidden;
+}
+
+.bootstrap .accordion-wizard .accordion-heading {
+
+}
+
+.bootstrap .accordion-wizard .accordion-group {
+  border-radius: 0px;
+  -webkit-border-radius: 0px;
+  -moz-border-radius: 0px;
+  margin-bottom: 10px;
+}
+
+.bootstrap .accordion-wizard .accordion-inner {
+  padding: 10px 0px;
+}
+
+.bootstrap .accordion-wizard .disabled-accordion-panel {
+  position: absolute;
+  display: block;
+  top: 0px;
+  bottom: 0px;
+  left: 0px;
+  width: 100%;
+  background-color: #EEE;
+  opacity: 0.4;
+}

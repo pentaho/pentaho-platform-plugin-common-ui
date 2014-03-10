@@ -1,18 +1,17 @@
 <div class="accordion-group">
+  <div class="disabled-accordion-panel" ng-show="isDisabled" ></div>
   <div class="accordion-heading">
-    <div class="accordion-title" ng-class="{'panel-disabled': isDisabled}">
-      <h4>
-        <div class="row">
-          <div class="accordion-heading-content span4" accordion-wizard-transclude="heading">{{heading}}</div>
-          <div class="offset6 span2">
-            <a class="accordion-toggle" ng-click="toggleOpen()">
-              <span class="accordion-toggle-text" ng-hide="isOpen">{{editText}}</span>
-            </a>
-          </div>
+    <div class="accordion-title row-fluid" ng-class="{'panel-disabled': isDisabled}">
+      <div class="span8">
+        <div class="accordion-heading-content" accordion-wizard-transclude="heading">{{heading}}</div>
+        <div class="summary-panel">
+          <div class="summary-label" ng-hide="isOpen">{{summary}}</div>
         </div>
-      </h4>
-      <div class="summary-panel">
-        <div class="summary-label" ng-hide="isOpen">{{summary}}</div>
+      </div>
+      <div class="span4">
+        <a class="accordion-toggle" ng-click="toggleOpen()">
+          <span class="accordion-toggle-text pull-right" ng-hide="isOpen">{{editText}}</span>
+        </a>
       </div>
     </div>
   </div>
