@@ -15,8 +15,8 @@
 *
 */
 define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on", "dojo/query", "dojox/html/entities", "dojo/dom-class", "dojo/_base/array",
-"dojo/dom-construct", "dojo/dnd/Source", "dojo/dnd/Selector", "dojo/_base/lang", "dojo/dom"],
-    function(declare, _WidgetBase, _Templated, on, query, entities, domClass, array, construct, Source, Selector, lang, dom){
+"dojo/dom-construct", "dojo/dnd/Source", "dojo/dnd/Selector", "dojo/_base/lang", "dojo/dom", "dojo/_base/event"],
+    function(declare, _WidgetBase, _Templated, on, query, entities, domClass, array, construct, Source, Selector, lang, dom, event){
       return declare("pentaho.common.FieldList",
     [_WidgetBase, _Templated],
 {
@@ -30,7 +30,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
   categorize: true,
   categoryClassMap: {},
   usedCategoryIds: {},
-  
+
   sanitizeIdAndClassNames: function(name) {
     if(name != null){
       return entities.encode(name).replace(/ /g,"_");
@@ -58,22 +58,22 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
     }
     return className;
   },
-  
+
   /**
    * Function to call when a field's oncontextmenu event is received
    * The default implementation is provided here. Call registerFieldContextMenuCallback
    * to override it.
    */
-  fieldContextMenuCallback: function fieldContextMenuShow(event) {
+  fieldContextMenuCallback: function fieldContextMenuShow(evt) {
         if( !this.fieldContextMenu ) {
             return;
         }
-        event.stop(event);
-        var x = event.pageX;
-        var y = event.pageY;
-        this.fieldContextMenu._scheduleOpen(event.target, null, {x: x, y: y});
+        event.stop(evt);
+        var x = evt.pageX;
+        var y = evt.pageY;
+        this.fieldContextMenu._scheduleOpen(evt.target, null, {x: x, y: y});
     },
-    
+
   /**
    * Function to handle adding a field. Will receive the fieldId as the only parameter.
    */
@@ -98,7 +98,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
    * A callback function so we can notify someone, if desired, when expand/collapse happens
    */
   expandCollapseCategoryCallback: undefined,
-  
+
   /**
    * Function to handle disabling the selection of text.
    * The default implementation is provided here. Call registerTextSelectionDisabler
@@ -107,7 +107,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
   textSelectionDisabler: function(target){
     if (typeof target.onselectstart!="undefined") { //IE route
         this.connectHandles.push(on(target, "selectstart", function() { return false; }));
-    } 
+    }
     else if (typeof target.style.MozUserSelect!="undefined") { //Firefox route
         target.style.MozUserSelect="none"
     } else { //All other route (ie: Opera)
@@ -132,13 +132,13 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
   registerDoubleClickCallback: function(f) {
     this.doubleClickCallback = f;
   },
-  
+
   registerClickCallback: function(f) {
     this.clickCallback = f;
   },
-  
+
   registerExpandCollapseCategoryCallback: function(f) {
-	this.expandCollapseCategoryCallback = f;  
+	this.expandCollapseCategoryCallback = f;
   },
 
   _localize: function() {
@@ -157,7 +157,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
         domClass.remove(node, 'pentaho-listitem-hover');
     }
   },
-  
+
   _removeItemClass: function(node, type){
     // summary:
     //		removes a class with prefix "dojoDndItem"
@@ -171,7 +171,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
         domClass.remove(node, 'pentaho-listitem-hover');
     }
   },
-    
+
   unload: function() {
     if (this.dndObj) {
       this.dndObj.destroy();
@@ -181,7 +181,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
     });
     this.connectHandles = [];
     construct.empty(this.containerNode);
-    
+
     this.categoryClassMap = {};
     this.usedCategoryIds = {};
   },
@@ -213,13 +213,13 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
 
     this.dndObj._addItemClass = this._addItemClass;
     this.dndObj._removeItemClass = this._removeItemClass;
-    
+
     if(!this.categorize) {
       var fields = this.getFields(datasource, null, this.filters);
       this.addFields( fields, this.containerNode, '' );
       return;
     }
-    
+
     var addedCategories = [];
 
     var categories = this.getCategories(datasource);
@@ -410,10 +410,10 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
 
   getFields: function(datasource, category, filters) {
     var fields = [];
-    var elements = datasource.getAllElements();   
+    var elements = datasource.getAllElements();
     array.forEach(datasource.getAllElements(), function(element) {
       if (element.isQueryElement && ( category == null || element.parent == category) && fields[element] == null) {
-      
+
         if(filters && filters.length > 0) {
             // apply the filters
             var ok = true;
@@ -462,7 +462,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
     } else {
       fields.removeClass("hidden");
     }
-    
+
     if (this.expandCollapseCategoryCallback) {
       this.expandCollapseCategoryCallback(collapsed);
     }
@@ -537,26 +537,26 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
       this.selector.selectNone();
     }
   },
-  
+
   addFilter: function( filter ) {
     this.filters.push(filter);
   },
-  
+
   clearFilters: function() {
     this.filters = [];
   },
-  
+
   setCategorized: function( categorize ) {
     this.categorize = categorize;
   },
-  
+
   setEnableDragDrop: function( enableDragDrop ) {
     this.enableDragDrop = enableDragDrop;
   },
-  
+
   setContextMenu: function( fieldContextMenu ) {
     this.fieldContextMenu = fieldContextMenu;
   }
-  
+
 });
 });
