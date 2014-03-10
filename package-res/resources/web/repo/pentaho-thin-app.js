@@ -89,7 +89,11 @@ function parseXML(sText){
    
 PentahoUserConsole = function() {
 
-  this.console_enabled = window.parent != null && window.parent.mantle_initialized == true;
+  try{ 
+    this.console_enabled = window.parent != null && window.parent.mantle_initialized == true;
+  } catch(e) { //XSS
+    this.console_enabled = false;
+  } 
   
   this.toggleEditCallback = null;
 
