@@ -71,9 +71,15 @@
             value="${dojo.src}/release/dojo"
             description="Dojo source folder"/>
 
+  <property name="web.prod.stage.dir"
+            value="${approot.stage.dir}/resources/web"
+            description="production web staging directory"/>
+
   <property name="dojo.prod.stage.dir"
-            value="${approot.stage.dir}/resources/web/dojo"
+            value="${web.prod.stage.dir}/dojo"
             description="production dojo staging directory"/>
+
+
 
   <target name="dist" depends="jar" description="Creates a distribution">
   </target>
@@ -128,6 +134,12 @@
       <fileset dir="${package.resdir}"/>
     </copy>
 
+    <!-- overlay the built angular-directives js module -->
+    <copy todir="${web.prod.stage.dir}/angular-directives" overwrite="true">
+      <fileset dir="${js.build.output.dir}">
+        <include name="angular-directives.js"/>
+      </fileset>
+    </copy>
 
     <replace file="${approot.stage.dir}/resources/web/util/local.js" token="define(function" value="pen.define(function"/>
 
@@ -248,7 +260,7 @@
           file="${dev.res}/runner.html"/>
   </target>
 
-  <target name="plugin-create-js-variants" depends="plugin-copy-pentaho-js-to-dojo-build,plugin-build-jslibs">
+  <target name="plugin-create-js-variants" depends="plugin-copy-pentaho-js-to-dojo-build,plugin-build-jslibs,build-js">
   </target>
 
   <target name="plugin-copy-pentaho-js-to-dojo-build">
@@ -418,5 +430,13 @@
   </target>
 
   <target name="publish-nojar" depends="subfloor-js.js.publish-nojar, subfloor-pkg.publish-nojar"/>
+
+  <target name="build-js" depends="cleanup-js-build-dir, subfloor-js.build-js" description="Build the JavaScript builds into the compressed and uncompressed versions">
+  </target>
+
+  <target name="cleanup-js-build-dir">
+    <!-- clean up the output dir for this to avoid pen.define killing the dependency tracing -->
+    <delete dir="${js.build.output.dir}/common-ui" />
+  </target>
 
 </project>
