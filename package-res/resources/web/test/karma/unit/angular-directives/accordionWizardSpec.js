@@ -12,10 +12,10 @@ pen.define(deps, function(angular, templateUtil) {
     var $scope, httpBackend, templateCache;
 
     var DEFAULTS = {
-      EDIT_LINK_TEXT: "_Edit",
-      SAVE_BUTTON_TEXT: "_Save",
-      CANCEL_BUTTON_TEXT: "_Cancel",
-      SUMMARY_TEXT: "_Nothing selected"
+      EDIT_LINK_TEXT: "edit",
+      SAVE_BUTTON_TEXT: "save",
+      CANCEL_BUTTON_TEXT: "cancel",
+      SUMMARY_TEXT: ""
     }
 
     beforeEach(module('accordionWizard'));
@@ -487,11 +487,11 @@ pen.define(deps, function(angular, templateUtil) {
       });
 
       // buildSummary
-      describe('buildSummary', function() {
+      describe('onSave & onCancel', function() {
         beforeEach(function () {
           var tpl =
               '<accordion-wizard>' +
-                  '<accordion-wizard-group heading="title 1" can-save="panel1.canSave()" summary="do something" build-summary="panel1.buildSummary()">Content 1</accordion-wizard-group>' +
+                  '<accordion-wizard-group heading="title 1" can-save="panel1.canSave()" summary="{{panel1.summary}}" on-save="panel1.onSave()" on-cancel="panel1.onCancel()">Content 1</accordion-wizard-group>' +
                   '<accordion-wizard-group heading="title 2" >Content 2</accordion-wizard-group>' +
                   '</accordion-wizard>'
 
@@ -500,9 +500,13 @@ pen.define(deps, function(angular, templateUtil) {
             canSave: function() {
               return true;
             },
-            buildSummary: function() {
-              return "Summary has been built";
-            }
+            onSave: function() {
+              scope.panel1.summary = "Saved";
+            },
+            onCancel: function() {
+              scope.panel1.summary = "Canceled";
+            },
+            summary: "Nothing yet"
           };
 
           $compile(element)(scope);
@@ -513,13 +517,19 @@ pen.define(deps, function(angular, templateUtil) {
           element.remove();
         });
 
-        it('should set the summary text by calling buildSummary when Save button clicked', function() {
+        it('should set call onSave when Save button clicked', function() {
           expect(findGroupSaveButton(0).attr('disabled')).toBeUndefined();
-          expect(findGroupSummary(0).text()).toBe("do something");
+          expect(findGroupSummary(0).text()).toBe("Nothing yet");
           findGroupSaveButton(0).click();
-          expect(findGroupSummary(0).text()).toBe("Summary has been built");
+          expect(findGroupSummary(0).text()).toBe("Saved");
         });
 
+        it('should set call onCancel when Cancel button clicked', function() {
+          expect(findGroupCancelButton(0).attr('disabled')).toBeUndefined();
+          expect(findGroupSummary(0).text()).toBe("Nothing yet");
+          findGroupCancelButton(0).click();
+          expect(findGroupSummary(0).text()).toBe("Canceled");
+        });
       });
 
       // canSave

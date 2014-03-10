@@ -42,12 +42,13 @@ requirejs.config({
     'common-ui/angular-route': { deps: ['common-ui/angular'], exports: 'Route' },
     'common-ui/angular-ui-bootstrap': { deps: ['common-ui/angular'] },
     'angular-mocks': { deps: ['common-ui/angular-resource'] },
-    
+
     'common-ui/jquery': { exports: '$' },
     'common-ui/PluginHandler': { deps: ['common-ui/jquery'] },
     'common-ui/angular-animate': { deps: ['common-ui/angular'] },
     'common-ui/ring' : {exports: 'ring', deps : ['underscore']},
-    'underscore': { exports: '_' }
+    'underscore': { exports: '_' },
+    'common-ui/angular-directives': { deps: ['common-ui/angular-ui-bootstrap'] }
   },
 
   // ask Require.js to load these files (all our tests)

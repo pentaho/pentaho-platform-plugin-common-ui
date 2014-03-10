@@ -25,8 +25,7 @@
 /* Based on https://github.com/angular-ui/bootstrap/tree/master/src/accordion */
 
 pen.define([
-  'common-ui/angular',
-  'common-ui/angular-ui-bootstrap'
+  'common-ui/angular'
 ],
     function (angular) {
       var templatePath = "";
@@ -106,7 +105,8 @@ pen.define([
                 cancelText: "@",
                 editText: "@",
                 summary: "@",
-                _buildSummary: "&buildSummary",
+                _onSave: "&onSave",
+                _onCancel: "&onCancel",
                 canSave: "&canSave"
               },
               controller: function ($scope, $attrs) {
@@ -116,16 +116,16 @@ pen.define([
 
                 // set our labels from attributes or defaults if none provided
                 $attrs.$observe( 'saveText', function( val ) {
-                  $scope.saveText = angular.isDefined( val ) ? val : '_Save';
+                  $scope.saveText = angular.isDefined( val ) ? val : 'save';
                 });
                 $attrs.$observe( 'cancelText', function( val ) {
-                  $scope.cancelText = angular.isDefined( val ) ? val : '_Cancel';
+                  $scope.cancelText = angular.isDefined( val ) ? val : 'cancel';
                 });
                 $attrs.$observe( 'editText', function( val ) {
-                  $scope.editText = angular.isDefined( val ) ? val : '_Edit';
+                  $scope.editText = angular.isDefined( val ) ? val : 'edit';
                 });
                 $attrs.$observe( 'summary', function( val ) {
-                  $scope.summary = angular.isDefined( val ) ? val : '_Nothing selected';
+                  $scope.summary = angular.isDefined( val ) ? val : '';
                 });
 
               },
@@ -149,12 +149,15 @@ pen.define([
                 };
 
                 scope.saveSettings = function () {
-                  if (scope._buildSummary) {
-                    scope.setSummary(scope._buildSummary());
+                  if (scope._onSave) {
+                    scope._onSave();
                   }
                   scope.isOpen = false;
                 };
                 scope.cancelSettings = function () {
+                  if(scope._onCancel) {
+                    scope._onCancel();
+                  }
                   scope.isOpen = false;
                 };
               }
