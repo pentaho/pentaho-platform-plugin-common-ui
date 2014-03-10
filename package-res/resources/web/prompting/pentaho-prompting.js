@@ -654,6 +654,16 @@ define("common-ui/prompting/pentaho-prompting", [ 'cdf/cdf-module', 'common-ui/p
        * in the case the the parameter UI is not shown.
        */
       this.refresh = function(paramDefn, noAutoAutoSubmit) {
+        var myself = this;
+        // Should really throw an error? Or return?
+        if(Dashboards.waitingForInit && Dashboards.waitingForInit.length) {
+          Dashboards.log("Overlapping refresh!", 'warn');
+          setTimeout(function(){
+              myself.refresh(paramDefn, noAutoAutoSubmit);
+          }, 0);
+          return;
+        }
+
         if (paramDefn) {
           this.paramDefn = paramDefn;
 
