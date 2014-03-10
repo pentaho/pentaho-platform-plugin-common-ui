@@ -102,7 +102,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
                     for (var g in outterThis.groups) {
                       totalNumOfGroups++;
                       var gp = outterThis.groups[g];
-                      var titleBarHeight = geometry.getContentBox(gp.titleBarNode).h
+                      var titleBarHeight = geometry.position(gp.titleBarNode).h
                       totalGroupHeight += (gp.open) ? titleBarHeight + gp.hideNode.scrollHeight : 0;
                       if (gp.open) {
                         minHeightAdjustment += (gp.usingMinHeight) ? gp.heightAdjustment : 0;
@@ -115,7 +115,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
                         totalNonGroupHeight += geometry.position(node).h;
                       }
                     });
-                    var panelHeight = geometry.getMarginBox(outterThis.domNode).h;
+                    var panelHeight = geometry.position(outterThis.domNode).h;
                     // if(totalGroupHeight + totalNonGroupHeight < panelHeight - /*margins*/ 20){
                     //   // plenty of space, make natural size
                     //   var gHeight = geometry.position(group.titleBarNode).h + group.hideNode.scrollHeight;
