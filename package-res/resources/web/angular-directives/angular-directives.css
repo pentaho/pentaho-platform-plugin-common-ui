@@ -1,11 +1,11 @@
 .bootstrap .accordion-wizard .accordion-heading-content {
-  font-size: 18px;
+    font-size: 18px;
 }
 
 .bootstrap .accordion-wizard .accordion-group {
-  padding: 10px 15px;
-  position: relative;
-  overflow: hidden;
+    padding: 10px 15px;
+    position: relative;
+    overflow: hidden;
 }
 
 .bootstrap .accordion-wizard .accordion-heading {
@@ -13,23 +13,107 @@
 }
 
 .bootstrap .accordion-wizard .accordion-group {
-  border-radius: 0px;
-  -webkit-border-radius: 0px;
-  -moz-border-radius: 0px;
-  margin-bottom: 10px;
+    border-radius: 0px;
+    -webkit-border-radius: 0px;
+    -moz-border-radius: 0px;
+    margin-bottom: 10px;
 }
 
 .bootstrap .accordion-wizard .accordion-inner {
-  padding: 10px 0px;
+    padding: 10px 0px;
 }
 
 .bootstrap .accordion-wizard .disabled-accordion-panel {
-  position: absolute;
-  display: block;
-  top: 0px;
-  bottom: 0px;
-  left: 0px;
-  width: 100%;
-  background-color: #EEE;
-  opacity: 0.4;
+    position: absolute;
+    display: block;
+    top: 0px;
+    bottom: 0px;
+    left: 0px;
+    width: 100%;
+    background-color: #EEE;
+    opacity: 0.4;
 }
+
+/* general tree css */
+
+
+treecontrol {
+    /* prevent user selection */
+    -moz-user-select: -moz-none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
+    /* default */
+    font-family: Verdana, Helvetica, Arial, sans-serif;
+    font-size:13px;
+    color: #555;
+    text-decoration: none;
+    height:1000px;
+}
+
+treecontrol ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border: none;
+    overflow: hidden;
+}
+
+treecontrol li {
+    position: relative;
+    padding: 0 0 0 20px;
+    line-height: 20px;
+}
+
+treecontrol li.tree-expanded i.tree-normal, treecontrol li.tree-collapsed i.tree-normal {display:none;}
+treecontrol li.tree-expanded i.tree-has-children, treecontrol li.tree-collapsed i.tree-has-children {display:inline;}
+treecontrol li.tree-normal i.tree-has-children {display:none;}
+treecontrol li.tree-normal i.tree-normal {display:inline;}
+
+treecontrol li i {
+    cursor: pointer;
+}
+
+treecontrol li .tree-label {
+    cursor: pointer;
+    display: inline;
+}
+
+treecontrol .arrow-expanded {
+    padding: 1px 10px;
+    background: url("../../themes/crystal/images/arrow_open.png") no-repeat;
+
+}
+
+treecontrol .arrow-collapsed {
+    padding: 1px 10px;
+    background: url("../../themes/crystal/images/arrow_closed.png") no-repeat;
+}
+
+treecontrol .blank {
+    padding: 1px 10px;
+}
+
+/* classic tree css */
+
+treecontrol.tree-classic li.tree-expanded i {
+    padding: 1px 10px;
+    background: url("../../themes/crystal/images/folder_open.png") no-repeat;
+}
+
+treecontrol.tree-classic li.tree-collapsed i {
+    padding: 1px 10px;
+    background: url("../../themes/crystal/images/folder_closed.png") no-repeat;
+}
+
+treecontrol.tree-classic li.tree-normal i {
+    padding: 1px 10px;
+    background: url("../../themes/crystal/images/file_generic.png") no-repeat;
+}
+
+treecontrol.tree-classic li .tree-selected {
+    background-color: #aaddff;
+}
+
