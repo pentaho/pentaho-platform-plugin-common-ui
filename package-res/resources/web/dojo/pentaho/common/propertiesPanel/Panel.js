@@ -29,9 +29,8 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
   "dojo/string", "dojo/dom-class", "pentaho/common/propertiesPanel/Configuration", "dijit/registry", "dojo/dnd/Target",
   "dojo/dnd/Source", "dojo/Evented", "dojo/topic", "dojo/dnd/Manager", "dojo/dom", "dojo/dom-geometry", "dojo/aspect"],
     function (declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, on, query, ContentPane, BorderContainer, HorizontalSlider, TextBox, ComboBox, ItemFileReadStore, Select, CheckBox, Source, TitlePane, Messages, array, lang, html, construct, string, domClass, Configuration, registry, Target, Source, Evented, topic, ManagerClass,
-        dom, geometry, aspect) {
-      
-      var Manager = ManagerClass.manager();
+              dom, geometry, aspect) {
+
       var Panel = declare("pentaho.common.propertiesPanel.Panel",
           [ContentPane, Evented],
           {
@@ -432,7 +431,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
           this.inherited(arguments);
         },
         showIndicatorIfReorder: function (e) {
-          if (Manager.source && this.checkAcceptance(this, Manager.nodes)) { // drag in progress
+          if (ManagerClass.manager().source && this.checkAcceptance(this, ManagerClass.manager().nodes)) { // drag in progress
 
             var indicator = this.dropIndicator;
 
@@ -449,7 +448,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
               return;
             }
             var before = this.gravity(this.node.children[overNode], e) & 1;
-            if (this.node.children[overNode] == Manager.nodes[0] && (before && overNode == 0 || !before && this.node.children.length - 1 == overNode)) {
+            if (this.node.children[overNode] == ManagerClass.manager().nodes[0] && (before && overNode == 0 || !before && this.node.children.length - 1 == overNode)) {
               this.dropIndicator.style.display = "none";
               return;
             }
@@ -642,7 +641,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
               var outterThis = this;
 
               this.subscriptions.push(topic.subscribe("/dnd/start", function () {
-                if (!outterThis.checkAcceptance(outterThis.dropZone, Manager.nodes)) {
+                if (!outterThis.checkAcceptance(outterThis.dropZone, ManagerClass.manager().nodes)) {
                   domClass.add(outterThis.domNode, "dimished");
                 }
               }));
@@ -656,7 +655,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
 
 
               on(this.domNode,  "mouseover", function (event) {
-                if (Manager.source && outterThis.checkAcceptance(outterThis.dropZone,  Manager.nodes)) {
+                if (ManagerClass.manager().source && outterThis.checkAcceptance(outterThis.dropZone,  ManagerClass.manager().nodes)) {
                   domClass.add(outterThis.domNode, "over");
                 }
               });
@@ -828,12 +827,12 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
               this.menuHandle = query("div.gemMenuHandle", this.domNode)[0];
 
               on(query("div.gemMenuHandle",  this.domNode)[0], "mouseover",  function (e) {
-                if (!Manager.source) {
+                if (!ManagerClass.manager().source) {
                   domClass.add(e.target, "over");
                 }
               });
               on(query("div.gemMenuHandle", this.domNode)[0], "mouseout", function (e) {
-                if (!Manager.source) {
+                if (!ManagerClass.manager().source) {
                   domClass.remove(e.target, "over");
                 }
               });
@@ -844,7 +843,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
               this.inherited(arguments);
             },
             onMouseOver: function () {
-              if (!Manager.source) {
+              if (!ManagerClass.manager().source) {
                 domClass.add(this.domNode, "over");
               }
             },
