@@ -155,10 +155,14 @@ pen.define([
                   scope.isOpen = false;
                 };
                 scope.cancelSettings = function () {
+                  var closeOnCancel = true;
                   if(scope._onCancel) {
-                    scope._onCancel();
+                    var ret = scope._onCancel();
+                    if( typeof(ret) != 'undefined' ) {
+                      closeOnCancel = ret;
+                    }
                   }
-                  scope.isOpen = false;
+                  scope.isOpen = !closeOnCancel;
                 };
               }
             };
