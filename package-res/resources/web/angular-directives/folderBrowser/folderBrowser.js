@@ -31,10 +31,9 @@ pen.define([
 
                             $scope.nodeChildren = $scope.nodeChildren || 'children';
                             $scope.expandedNodes = {};
-                            $scope.siblingIds = [];
 
                             $scope.headClass = function (node) {
-                                var style = "";
+
                                 if (node[$scope.nodeChildren] && !$scope.expandedNodes[node.path])
                                     style = "tree-collapsed";
                                 else if (node[$scope.nodeChildren] && $scope.expandedNodes[node.path])
@@ -137,20 +136,27 @@ pen.define([
                                     $scope.onSelection({
                                         node: selectedNode
                                     });
+                                $('.tree-selected').removeClass('tree-selected');
+                                var divId = "#"+selectedNode.id;
+                                $( divId ).addClass("tree-selected");
                             };
 
                             $scope.selectedClass = function (node) {
+
                                 return (node.path == $scope.selectedScope) ? "tree-selected" : "";
+
                             };
 
                             //tree template
                             var template =
                                 '<ul>' +
                                     '<li ng-repeat="node in node.' + $scope.nodeChildren + '" ng-class="headClass(node)">' +
+                                    '<div id="{{node.id}}">' +
                                     '<span ng-class="selectorClass(node)" ng-click="selectNodeHead(node)"></span>' +
-                                    '<i class="tree-has-children" ng-click="selectNodeLabel(node)"></i>' +
+                                    '<i class="tree-has-children" ng-click="selectNodeLabel(node)" ng-dblclick="selectNodeHead(node)"></i>' +
                                     '<i class="tree-normal"></i>' +
-                                    '<div class="tree-label" ng-class="selectedClass(node)" ng-click="selectNodeLabel(node)" tree-transclude></div>' +
+                                    '<div class="tree-label" ng-class="selectedClass(node)" ng-click="selectNodeLabel(node)" ng-dblclick="selectNodeHead(node)" tree-transclude></div>' +
+                                    '</div>' +
                                     '<treeitem ng-if="nodeExpanded(node)"></treeitem>' +
                                     '</li>' +
                                     '</ul>';
@@ -199,10 +205,12 @@ pen.define([
                                         else{
                                           nodePath=scope.selectedNode.path + "/" + scope.addFolder.name;
                                         }
+                                        //give new folders a temp unique id for styling
+                                        var newFolderId = nodePath.replace("/",":");
 
                                         var newFolder =
                                         {
-                                          id: scope.addFolder.name,
+                                          id: newFolderId,
                                           name: scope.addFolder.name,
                                           localizedName:scope.addFolder.name,
                                           isFolder: true,

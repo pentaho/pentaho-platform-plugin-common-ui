@@ -45,12 +45,6 @@ treecontrol {
     -ms-user-select: none;
     user-select: none;
 
-    /* default */
-    font-family: Verdana, Helvetica, Arial, sans-serif;
-    font-size:13px;
-    color: #555;
-    text-decoration: none;
-    height:1000px;
 }
 
 treecontrol ul {
@@ -114,6 +108,5 @@ treecontrol.tree-classic li.tree-normal i {
 }
 
 treecontrol.tree-classic li .tree-selected {
-    background-color: #aaddff;
+  background-color: #d7e9cd;
 }
-
