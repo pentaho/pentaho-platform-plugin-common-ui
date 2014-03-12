@@ -34,9 +34,9 @@ pen.define([
 
                             $scope.headClass = function (node) {
 
-                                if (node[$scope.nodeChildren] && !$scope.expandedNodes[node.path])
+                                if (angular.isArray(node[$scope.nodeChildren]) && node[$scope.nodeChildren].length > 0 && !$scope.expandedNodes[node.path])
                                     style = "tree-collapsed";
-                                else if (node[$scope.nodeChildren] && $scope.expandedNodes[node.path])
+                                else if (angular.isArray(node[$scope.nodeChildren]) && node[$scope.nodeChildren].length > 0 && $scope.expandedNodes[node.path])
                                     style = "tree-expanded";
                                 else
                                     style = "tree-collapsed";
@@ -45,9 +45,9 @@ pen.define([
 
                             $scope.selectorClass = function (node) {
                                 var style = "";
-                                if (node[$scope.nodeChildren] && !$scope.expandedNodes[node.path])
+                                if (angular.isArray(node[$scope.nodeChildren]) && node[$scope.nodeChildren].length > 0  && !$scope.expandedNodes[node.path])
                                     style = "arrow-collapsed";
-                                else if (node[$scope.nodeChildren] && $scope.expandedNodes[node.path])
+                                else if (angular.isArray(node[$scope.nodeChildren]) && node[$scope.nodeChildren].length > 0 && $scope.expandedNodes[node.path])
                                     style = "arrow-expanded";
                                 else
                                     style = "blank"
@@ -71,7 +71,7 @@ pen.define([
                                                 nodeWithAttr = children[i];
 
                                             } else {
-                                                if (children[i].children) {
+                                                if (children[i].children.length > 0) {
 
                                                     recurseChildren(children[i].children);
 
@@ -194,9 +194,6 @@ pen.define([
                                 function addFolderEvent() {
                                     //make sure that addFolder is populated and we have a node selected
                                     if (scope.addFolder && scope.selectedNode) {
-                                        if(!scope.selectedNode.children){
-                                            scope.selectedNode.children=[];
-                                        }
 
                                         var nodePath="";
                                         if(scope.addFolder.path){
