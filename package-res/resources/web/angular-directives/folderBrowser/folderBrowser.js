@@ -11,8 +11,8 @@ pen.define([
         }
 
         angular.module('folderBrowser', [])
-            .directive('treecontrol', ['$compile',
-                function ($compile) {
+            .directive('treecontrol', ['$compile', '$location', '$anchorScroll',
+                function ($compile, $location, $anchorScroll) {
                     return {
                         restrict: 'EA',
                         require: "treecontrol",
@@ -136,20 +136,34 @@ pen.define([
                                     $scope.onSelection({
                                         node: selectedNode
                                     });
-                                $('.tree-selected').removeClass('tree-selected');
-                                var divId = "#"+selectedNode.id;
-                                $( divId ).addClass("tree-selected");
+
                             };
 
                             $scope.selectedClass = function (node) {
 
-                                return (node.path == $scope.selectedScope) ? "tree-selected" : "";
+                                var style = ""
+                                if($scope.selectedScope == node.path){
+                                  angular.element(".tree-selected").removeClass('tree-selected');
+                                  angular.element("#"+node.id).addClass("tree-selected");
+                                  style="tree-selected";
+                                if(node.path == $scope.extSelect.val){
+                                  //Scroll to div
+                                  var locationHash=$location.hash();
+                                  if(locationHash != node.id){
+                                  $location.hash(node.id);
+                                  $anchorScroll();
 
+                                  }
+                                }
+
+                                }
+
+                                return style;
                             };
 
                             //tree template
                             var template =
-                                '<ul>' +
+                                '<ul class="treecontrol">' +
                                     '<li ng-repeat="node in node.' + $scope.nodeChildren + '" ng-class="headClass(node)">' +
                                     '<div id="{{node.id}}">' +
                                     '<span ng-class="selectorClass(node)" ng-click="selectNodeHead(node)"></span>' +
@@ -202,16 +216,15 @@ pen.define([
                                         else{
                                           nodePath=scope.selectedNode.path + "/" + scope.addFolder.name;
                                         }
-                                        //give new folders a temp unique id for styling
-                                        var newFolderId = nodePath.replace("/",":");
 
                                         var newFolder =
                                         {
-                                          id: newFolderId,
+                                          id: scope.addFolder.id,
                                           name: scope.addFolder.name,
                                           localizedName:scope.addFolder.name,
                                           isFolder: true,
-                                          path: nodePath
+                                          path: nodePath,
+                                          children:scope.addFolder.children
                                         }
                                         //push new folder onto root of current selection
                                         scope.selectedNode.children.push(newFolder);

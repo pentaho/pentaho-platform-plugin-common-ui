@@ -1,11 +1,11 @@
 .bootstrap .accordion-wizard .accordion-heading-content {
-  font-size: 18px;
+    font-size: 18px;
 }
 
 .bootstrap .accordion-wizard .accordion-group {
-  padding: 10px 15px;
-  position: relative;
-  overflow: hidden;
+    padding: 10px 15px;
+    position: relative;
+    overflow: hidden;
 }
 
 .bootstrap .accordion-wizard .accordion-heading {
@@ -13,25 +13,25 @@
 }
 
 .bootstrap .accordion-wizard .accordion-group {
-  border-radius: 0px;
-  -webkit-border-radius: 0px;
-  -moz-border-radius: 0px;
-  margin-bottom: 10px;
+    border-radius: 0px;
+    -webkit-border-radius: 0px;
+    -moz-border-radius: 0px;
+    margin-bottom: 10px;
 }
 
 .bootstrap .accordion-wizard .accordion-inner {
-  padding: 10px 0px;
+    padding: 10px 0px;
 }
 
 .bootstrap .accordion-wizard .disabled-accordion-panel {
-  position: absolute;
-  display: block;
-  top: 0px;
-  bottom: 0px;
-  left: 0px;
-  width: 100%;
-  background-color: #EEE;
-  opacity: 0.7;
+    position: absolute;
+    display: block;
+    top: 0px;
+    bottom: 0px;
+    left: 0px;
+    width:auto;
+    background-color: #EEE;
+    opacity: 0.7;
 }
 
 /* general tree css */
@@ -44,15 +44,14 @@ treecontrol {
     -webkit-user-select: none;
     -ms-user-select: none;
     user-select: none;
-
 }
 
-treecontrol ul {
+treecontrol ul.treecontrol {
     margin: 0;
     padding: 0;
     list-style: none;
     border: none;
-    overflow: hidden;
+
 }
 
 treecontrol li {
@@ -108,5 +107,5 @@ treecontrol.tree-classic li.tree-normal i {
 }
 
 treecontrol.tree-classic li .tree-selected {
-  background-color: #d7e9cd;
+    background-color: #d7e9cd;
 }
