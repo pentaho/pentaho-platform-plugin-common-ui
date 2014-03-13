@@ -1,0 +1,46 @@
+
+<div style="width: 600px" ng-controller="AccordionWizardSampleController">
+  <accordion-wizard close-others="true">
+    <accordion-wizard-group
+      save-text="{{ sample.data.saveText }}"
+      cancel-text="Cancel"
+      edit-text="Edit"
+      heading="Simple"
+      summary="Basic usage of the accordion-wizard-group"
+      can-save="true">
+
+      Whatever you want to do goes in here
+    </accordion-wizard-group>
+
+    <accordion-wizard-group 
+      save-text="Save" 
+      cancel-text="Cancel" 
+      on-save="sample.custom.onSave()" 
+      summary="{{sample.custom.summary}}" 
+      can-save="sample.custom.isSaveable()" edit-text="Edit">
+        <accordion-wizard-heading>
+            <div>Custom Header</div>
+            <h5>with validating form content</h5>
+        </accordion-wizard-heading>
+        
+        <div>
+          The save button will not be enabled until the form is valid. 
+          Save will then set the summary field to a greeting with your name in it.
+          <br/><br/>
+          <form name="sample.custom.form" novalidate>
+            <label>What is your name?</label><input type="text" ng-model="sample.custom.name" required>
+          </form>
+
+        </div>
+        
+    </accordion-wizard-group>
+
+    <accordion-wizard-group heading="Disabled group" is-disabled="sample.disabledGroup.isDisabled" edit-text="Edit" summary="This panel is disabled">
+      You can not get here until this panel is enabled (isDisabled=false).
+    </accordion-wizard-group>
+
+    <accordion-wizard-group heading="Toggle enabled" can-save="true" on-save="sample.enableIt.toggleDisabledGroup()" summary="Toggle the Enabled state of the Disabled group (above) when you save" save-text="Toggle It" edit-text="Edit">
+        Enable the Disabled group
+    </accordion-wizard-group>
+  </accordion-wizard>    
+</div>
