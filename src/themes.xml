@@ -9,9 +9,11 @@
     <file>../themeUtils.js</file>
   </slate>
   <sample1 system="true" hidden="true">
-    <file>style1.css</file>
+    <file>style1_ltr.css</file>
+    <file>style1_rtl.css</file>
   </sample1>
   <replaceable system="true" hidden="true">
-    <file>replaceable.css</file>
+    <file>replaceable_ltr.css</file>
+    <file>replaceable_rtl.css</file>
   </replaceable>
 </themes>
