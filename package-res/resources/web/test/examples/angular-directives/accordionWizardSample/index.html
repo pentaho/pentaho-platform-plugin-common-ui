@@ -1,0 +1,48 @@
+<h3>Accordion Wizard</h3>
+  <p>
+    <label class="label">Module name:</label>accordionWizard
+    
+    <div>
+      Directives:
+      <ul>
+        <li><strong>accordion-wizard</strong> - Main container</li>
+        <li><strong>accordion-wizard-heading</strong> - Optional custom heading html. Either use this or the heading attribute on the accordion-wizard-group</li>
+        <li><strong>accordion-wizard-group</strong> - Panel definition in the accordion wizard</li>
+      </ul>
+    </div>
+
+    <h5>accordion-wizard-group supported attributes</h5>
+    <table cellpadding="5" border="1">
+      <thead style="background-color: #DDD">
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Options</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="option in accordionWizard.options" style="font-family: monospace">
+          <td style="white-space: nowrap;">{{option.name}}</td>
+          <td>{{option.type}}</td>
+          <td style="white-space: nowrap;">{{option.typeOptions}}</td>
+          <td>{{option.description}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </p>
+  <br/>
+  <h5>Example Usage:</h5>
+
+  <button class="pentaho-button" ng-click="accordionWizard.showCode('html')">Show HTML</button>
+  <button class="pentaho-button" ng-click="accordionWizard.showCode('javascript')">Show Javascript</button>
+  <button class="pentaho-button" ng-click="accordionWizard.showCode('none')" ng-disabled="!accordionWizard.showHtml && !accordionWizard.showJs">Hide code</button>
+  <br/><br/>
+  <pre ng-show="accordionWizard.showHtml" id='accordionWizardSampleHtml' class="prettyprint">
+    <code class="lang-html">{{accordionWizard.html}}</code>
+  </pre>
+  <pre ng-show="accordionWizard.showJs" id='accordionWizardSampleJs' class="prettyprint">
+    <code class="lang-js">{{accordionWizard.json}}</code>
+  </pre>
+
+  <div ng-include="'accordionWizardSample/accordionWizardSample.html'"></div>
