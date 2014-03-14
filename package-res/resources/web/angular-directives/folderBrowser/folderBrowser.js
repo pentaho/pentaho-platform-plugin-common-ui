@@ -72,12 +72,9 @@ pen.define([
                                                 nodeWithAttr = children[i];
 
                                             } else {
-                                                if (children[i].children.length > 0) {
-
+                                                if (angular.isArray(children[i].children) && children[i].children.length > 0) {
                                                     recurseChildren(children[i].children);
-
                                                 }
-
                                             }
                                             if (foundNode == true) {
                                                 break;

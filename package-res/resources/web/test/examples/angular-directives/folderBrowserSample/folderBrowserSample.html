@@ -1,11 +1,10 @@
-
 <div style="width: 600px" ng-controller="FolderBrowserSampleController">
 
   <div class="row-fluid">
     <div class="pull-left" for="selectedPathText">Selected path: </div>
     <div class="span6" id="selectedPathText">{{sample.selectedNode.path || 'None'}}</div>
   </div>
-  <div class="span5" style="height: 200px">
+  <div class="span5" style="height: 200px; margin-bottom: 10px;">
     <treecontrol 
       class="tree-classic" 
       add-folder="sample.addFolder" 
