@@ -1,10 +1,11 @@
 
 pen.require([
   'common-ui/angular',
-  './accordionWizardSample/accordionWizardSample'
+  './accordionWizardSample/accordionWizardSample',
+  './folderBrowserSample/folderBrowserSample'
   ],
   function(angular) {
-    var app = angular.module('example', ['accordionWizardSample']);
+    var app = angular.module('example', ['accordionWizardSample', 'folderBrowserSample']);
 
     app.controller('MainCtrl', ["$scope", "$http", function($scope, $http) {
 
@@ -39,6 +40,36 @@ pen.require([
         showJs: false
       };
 
+      $scope.folderBrowser = {
+        options: [
+          {name: 'tree-model', type: '=', typeOptions: 'scopeProperty', description: 'Property containing the model to bind to the tree for content' },
+          {name: 'add-folder', type: '=', typeOptions: 'scopeProperty', description: 'Property bound from scope to be used to add a folder to the tree' },
+          {name: 'ext-select', type: '=', typeOptions: 'scopeProperty', description: 'Property used to externally set the selected node. Should be in the form: { attr: attribute, val: value }. attribute can be path, id, ...' },
+          {name: 'selected-node', type: '=', typeOptions: 'scopeProperty', description: 'Property bound to the currently selected node' },
+          {name: 'on-selection', type: '&', typeOptions: 'scopeFunctionCall()', description: 'Called when the selected node changes' },
+          {name: 'node-children', type: '@', typeOptions: '{{scopeVariable}} or "Text"', description: 'Name mapping for the attribute containing child nodes in the tree model' }
+        ],
+        html: "",
+        json: "",
+        treeModel: {},
+        showCode: function(codeType) {
+          if(codeType == 'html') {
+            $scope.folderBrowser.showHtml = true;
+            $scope.folderBrowser.showJs = false;
+          } else if(codeType == 'javascript') {
+            $scope.folderBrowser.showHtml = false;
+            $scope.folderBrowser.showJs = true;
+          } else {
+            // hide them both
+            $scope.folderBrowser.showHtml = false;
+            $scope.folderBrowser.showJs = false;
+          }
+        },
+        showHtml: false,
+        showJs: false,
+      };
+
+
       $scope.init = function() {
         $http.get('accordionWizardSample/accordionWizardSample.html').then(function(response) {
           $scope.accordionWizard.html = response.data;
@@ -50,6 +81,18 @@ pen.require([
           // run the pretty-printer now to make the code we just got look nice
           makePretty();
         });
+
+        $http.get('folderBrowserSample/folderBrowserSample.html').then(function(response) {
+          $scope.folderBrowser.html = response.data;
+          // run the pretty-printer now to make the code we just got look nice
+          makePretty();
+        });
+        $http.get('folderBrowserSample/folderBrowserSample.js', { responseType: 'text' }).then(function(response) {
+          $scope.folderBrowser.json = response.data;
+          // run the pretty-printer now to make the code we just got look nice
+          makePretty();
+        });
+
       };
 
       $scope.init();
