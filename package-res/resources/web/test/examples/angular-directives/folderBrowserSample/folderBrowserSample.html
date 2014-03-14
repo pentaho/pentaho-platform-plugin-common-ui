@@ -1,0 +1,33 @@
+
+<div style="width: 600px" ng-controller="FolderBrowserSampleController">
+
+  <div class="row-fluid">
+    <div class="pull-left" for="selectedPathText">Selected path: </div>
+    <div class="span6" id="selectedPathText">{{sample.selectedNode.path || 'None'}}</div>
+  </div>
+  <div class="span5" style="height: 200px">
+    <treecontrol 
+      class="tree-classic" 
+      add-folder="sample.addFolder" 
+      ext-select="sample.externalSelect" 
+      tree-model="sample.treeModel" 
+      node-children="children" 
+      on-selection="sample.onSelect(node)"
+      selected-node="sample.selectedNode"> 
+
+        <!-- the content of this element is what is displayed as the label for each node in the tree -->
+        {{node.localizedName}}
+
+    </treecontrol>
+  </div>
+
+  <div class="form-inline span12">
+    <div class="input-append">
+      <input id="addNewFolderTextBox" name="folder" type="text" placeholder="Add a folder" ng-model="sample.newFolder">
+      <button class="btn" ng-click="sample.addNewFolder()" ng-disabled="!sample.selectedNode || !sample.newFolder">+</button>
+    </div>
+    <button class="btn" ng-click="sample.refreshTree()">Reset Tree Model</button>
+    <button class="btn" ng-click="sample.selectThis('/public/bi-developers/Analysis')">External Selection</button>
+  </div>
+<br/><br/><br/>
+</div>
