@@ -31,6 +31,7 @@ pen.define([
 
                             $scope.nodeChildren = $scope.nodeChildren || 'children';
                             $scope.expandedNodes = {};
+                            $location.hash("");
 
                             $scope.headClass = function (node) {
 
@@ -45,7 +46,7 @@ pen.define([
 
                             $scope.selectorClass = function (node) {
                                 var style = "";
-                                if (angular.isArray(node[$scope.nodeChildren]) && node[$scope.nodeChildren].length > 0  && !$scope.expandedNodes[node.path])
+                                if (angular.isArray(node[$scope.nodeChildren]) && node[$scope.nodeChildren].length > 0 && !$scope.expandedNodes[node.path])
                                     style = "arrow-collapsed";
                                 else if (angular.isArray(node[$scope.nodeChildren]) && node[$scope.nodeChildren].length > 0 && $scope.expandedNodes[node.path])
                                     style = "arrow-expanded";
@@ -142,27 +143,28 @@ pen.define([
                             $scope.selectedClass = function (node) {
 
                                 var style = ""
-                                if($scope.selectedScope == node.path){
-                                  angular.element(".tree-selected").removeClass('tree-selected');
-                                  angular.element("#"+node.id).addClass("tree-selected");
-                                  style="tree-selected";
-                                if(node.path == $scope.extSelect.val){
-                                  //Scroll to div
-                                  var locationHash=$location.hash();
-                                  if(locationHash != node.id){
-                                  $location.hash(node.id);
-                                  $anchorScroll();
+                                if ($scope.selectedScope == node.path) {
+                                    angular.element(".tree-selected").removeClass('tree-selected');
+                                    angular.element("#" + node.id).addClass("tree-selected");
+                                    style = "tree-selected";
+                                    if ($scope.extSelect && node.path == $scope.extSelect.val) {
+                                        //Scroll to div
+                                        var locationHash = $location.hash();
+                                        if (locationHash != node.id) {
+                                            $location.hash(node.id);
+                                            $anchorScroll();
 
-                                  }
-                                }
+                                        }
+                                    }
 
                                 }
 
                                 return style;
                             };
 
-                            //tree template
-                            var template =
+
+                            //tree templates
+                            var childTemplate =
                                 '<ul class="treecontrol">' +
                                     '<li ng-repeat="node in node.' + $scope.nodeChildren + '" ng-class="headClass(node)">' +
                                     '<div id="{{node.id}}">' +
@@ -175,9 +177,15 @@ pen.define([
                                     '</li>' +
                                     '</ul>';
 
+                            var rootTemplate =
+                                '<div class="treeControlView">' +
+                                    childTemplate +
+                                    '</div>';
+
+
                             return {
-                                templateRoot: $compile(template),
-                                templateChild: $compile(template)
+                                templateRoot: $compile(rootTemplate),
+                                templateChild: $compile(childTemplate)
                             }
 
                         },
@@ -209,22 +217,22 @@ pen.define([
                                     //make sure that addFolder is populated and we have a node selected
                                     if (scope.addFolder && scope.selectedNode) {
 
-                                        var nodePath="";
-                                        if(scope.addFolder.path){
-                                          nodePath = scope.addFolder.path;
+                                        var nodePath = "";
+                                        if (scope.addFolder.path) {
+                                            nodePath = scope.addFolder.path;
                                         }
-                                        else{
-                                          nodePath=scope.selectedNode.path + "/" + scope.addFolder.name;
+                                        else {
+                                            nodePath = scope.selectedNode.path + "/" + scope.addFolder.name;
                                         }
 
                                         var newFolder =
                                         {
-                                          id: scope.addFolder.id,
-                                          name: scope.addFolder.name,
-                                          localizedName:scope.addFolder.name,
-                                          isFolder: true,
-                                          path: nodePath,
-                                          children:scope.addFolder.children
+                                            id: scope.addFolder.id,
+                                            name: scope.addFolder.name,
+                                            localizedName: scope.addFolder.name,
+                                            isFolder: true,
+                                            path: nodePath,
+                                            children: scope.addFolder.children
                                         }
                                         //push new folder onto root of current selection
                                         scope.selectedNode.children.push(newFolder);
