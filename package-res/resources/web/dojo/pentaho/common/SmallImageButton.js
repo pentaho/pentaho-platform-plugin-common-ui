@@ -22,7 +22,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
             title: '',
 
             baseClass: '',
-            _imageSrc : '',
+            _imageSrc : require.toUrl("pentaho/common/images/spacer.gif"),
 
             callback: function () {
             },
