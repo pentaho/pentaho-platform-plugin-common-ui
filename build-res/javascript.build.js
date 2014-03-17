@@ -20,12 +20,15 @@
   baseUrl: ".",
   dir: "../bin/scriptOutput",
   optimizeCss: "false",
+  skipDirOptimize: true,
+
   //Put in a mapping so that 'requireLib' in the
   //modules section below will refer to the require.js
   //contents.
   paths: {
     requireLib: 'require'
   },
+  mainConfigFile: 'requireCfg.js',
 
   //Indicates the namespace to use for require/requirejs/define.
   namespace: "pen",
