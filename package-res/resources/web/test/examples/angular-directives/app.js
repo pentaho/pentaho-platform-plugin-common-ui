@@ -47,7 +47,8 @@ pen.require([
           {name: 'ext-select', type: '=', typeOptions: 'scopeProperty', description: 'Property used to externally set the selected node. Should be in the form: { attr: attribute, val: value }. attribute can be path, id, ...' },
           {name: 'selected-node', type: '=', typeOptions: 'scopeProperty', description: 'Property bound to the currently selected node' },
           {name: 'on-selection', type: '&', typeOptions: 'scopeFunctionCall()', description: 'Called when the selected node changes' },
-          {name: 'node-children', type: '@', typeOptions: '{{scopeVariable}} or "Text"', description: 'Name mapping for the attribute containing child nodes in the tree model' }
+          {name: 'node-children', type: '@', typeOptions: '{{scopeVariable}} or "Text"', description: 'Name mapping for the attribute containing child nodes in the tree model' },
+          {name: "loading", type: '=?', typeOptions: 'Optional scopeProperty', description: 'Boolean property that controls showing of the spinner or the tree'}
         ],
         html: "",
         json: "",
@@ -66,7 +67,7 @@ pen.require([
           }
         },
         showHtml: false,
-        showJs: false,
+        showJs: false
       };
 
 
