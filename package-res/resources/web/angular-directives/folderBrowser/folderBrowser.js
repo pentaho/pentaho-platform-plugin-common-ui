@@ -1,8 +1,9 @@
 pen.define([
-    'common-ui/angular'
+  'common-ui/angular',
+  'common-ui/util/PentahoSpinner'
 ],
 
-    function (angular) {
+    function (angular, spin) {
         var templatePath = "";
         if (typeof(CONTEXT_PATH) != "undefined") {
             templatePath = CONTEXT_PATH + 'content/common-ui/resources/web/angular-directives/folderBrowser/';
@@ -24,7 +25,8 @@ pen.define([
                             addFolder: "=",
                             selectedNode: "=",
                             onSelection: "&",
-                            nodeChildren: "@"
+                            nodeChildren: "@",
+                            loading: "=?"
                         },
 
                         controller: function ($scope) {
@@ -175,10 +177,10 @@ pen.define([
                                     '</ul>';
 
                             var rootTemplate =
-                                '<div class="treeControlView">' +
-                                    childTemplate +
-                                    '</div>';
-
+                                '<div class="treeControlView treeControlLoading" ng-show="loading"><div class="spin"></div></div>' +
+                                '<div class="treeControlView" ng-hide="loading">' +
+                                  childTemplate +
+                                '</div>';
 
                             return {
                                 templateRoot: $compile(rootTemplate),
@@ -257,6 +259,16 @@ pen.define([
                                 // we can fix this to work with the link transclude function with angular 1.2.6. as for angular 1.2.0 we need
                                 // to keep using the compile function
                                 scope.$treeTransclude = childTranscludeFn;
+
+                                function initSpinner() {
+                                  var config = spin.getLargeConfig();
+                                  var spinContainer = element.find(".treeControlLoading .spin")[0];
+                                  var spinner = new Spinner(config);
+                                  spinner.spin(spinContainer);
+                                };
+
+                                // load the spinner
+                                initSpinner();
                             }
                         }
                     };

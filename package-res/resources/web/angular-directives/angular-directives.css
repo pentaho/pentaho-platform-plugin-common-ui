@@ -73,3 +73,13 @@ treecontrol li .tree-label {
     cursor: pointer;
     display: inline;
 }
+
+treecontrol .treeControlLoading {
+  height: 100%;
+  width: 100%;
+}
+treecontrol .treeControlLoading .spin {
+  top: 60px;
+  left: 50%;
+  position: absolute;
+}
