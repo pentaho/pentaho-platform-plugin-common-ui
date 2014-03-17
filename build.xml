@@ -81,7 +81,7 @@
             description="production dojo staging directory"/>
 
 
-  <target name="dist" depends="jar, dist-js" description="Creates a distribution">
+  <target name="dist" depends="jar, build-js, dist-js" description="Creates a distribution">
   </target>
 
   <!-- sets up the project for development/build, you should only need to run this once -->
@@ -116,7 +116,7 @@
   </target>
 
   <target name="assemble"
-          depends="jar,assemble.init,assemble.copy-libs,assemble-plugin">
+          depends="dist,assemble.init,assemble.copy-libs,assemble-plugin">
   </target>
 
   <target name="package-zip">
