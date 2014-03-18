@@ -228,10 +228,11 @@ pen.define([
                                         {
                                             id: scope.addFolder.id,
                                             name: scope.addFolder.name,
-                                            localizedName: scope.addFolder.name,
+                                            localizedName: scope.addFolder.localizedName,
                                             isFolder: true,
                                             path: nodePath,
-                                            children: scope.addFolder.children
+                                            children: scope.addFolder.children,
+                                            permissions:scope.addFolder.permissions,
                                         }
                                         //push new folder onto root of current selection
                                         scope.selectedNode.children.push(newFolder);
