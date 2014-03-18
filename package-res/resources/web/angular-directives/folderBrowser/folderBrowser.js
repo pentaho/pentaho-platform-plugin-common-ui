@@ -4,21 +4,14 @@ pen.define([
 ],
 
     function (angular, spin) {
-        var templatePath = "";
-        if (typeof(CONTEXT_PATH) != "undefined") {
-            templatePath = CONTEXT_PATH + 'content/common-ui/resources/web/angular-directives/folderBrowser/';
-        } else {
-            templatePath = 'angular-directives/folderBrowser/';
-        }
 
-        angular.module('folderBrowser', [])
+         angular.module('folderBrowser', [])
             .directive('treecontrol', ['$compile', '$location', '$anchorScroll',
                 function ($compile, $location, $anchorScroll) {
                     return {
                         restrict: 'EA',
                         require: "treecontrol",
                         transclude: true,
-                        templateUrl: templatePath + 'folderBrowser.html',
                         scope: {
                             treeModel: "=",
                             extSelect: "=",
@@ -214,7 +207,7 @@ pen.define([
 
                                 function addFolderEvent() {
                                     //make sure that addFolder is populated and we have a node selected
-                                    if (scope.addFolder && scope.selectedNode) {
+                                    if (scope.addFolder && scope.addFolder.id && scope.addFolder.name && scope.selectedNode) {
 
                                         var nodePath = "";
                                         if (scope.addFolder.path) {
@@ -222,6 +215,19 @@ pen.define([
                                         }
                                         else {
                                             nodePath = scope.selectedNode.path + "/" + scope.addFolder.name;
+                                        }
+
+                                        //Clean up optional attributes of the node
+                                        if(!scope.addFolder.children){
+                                            scope.addFolder.children = [];
+                                        }
+
+                                        if(!scope.addFolder.permissions){
+                                            scope.addFolder.permissions = scope.selectedNode.permissions;
+                                        }
+
+                                        if(!scope.addFolder.localizedName){
+                                            scope.addFolder.localizedName = scope.addFolder.name;
                                         }
 
                                         var newFolder =
@@ -232,7 +238,7 @@ pen.define([
                                             isFolder: true,
                                             path: nodePath,
                                             children: scope.addFolder.children,
-                                            permissions:scope.addFolder.permissions,
+                                            permissions:scope.addFolder.permissions
                                         }
                                         //push new folder onto root of current selection
                                         scope.selectedNode.children.push(newFolder);
