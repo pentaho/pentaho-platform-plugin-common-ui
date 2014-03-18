@@ -72,8 +72,12 @@ function parseXML(sText){
 }
    
 PentahoUserConsole = function() {
-
-  this.console_enabled = window.parent != null && window.parent.mantle_initialized == true;
+  
+  try{ 
+    this.console_enabled = window.parent != null && window.parent.mantle_initialized == true;
+  } catch(e) { // Ignore "Same-origin policy" violation in embedded IFrame
+    this.console_enabled = false;
+  } 
   
   this.toggleEditCallback = null;
 
