@@ -2409,6 +2409,7 @@ function(def, pvc, pv){
                                 if(compKey){
                                     var comps = compKey.split(/\s*,\s*/);
                                     var key   = comps[comps.length - 1];
+                                    var keyArr = key.split("~");
 
                                     var color = colorMap[key];
 
@@ -2419,7 +2420,6 @@ function(def, pvc, pv){
                                         //  "[Region].[USA]" : "#FF00FF"
                                         //  "[Department].[USA]" : "#AAFF00"
                                         // }
-                                        var keyArr = key.split("~");
 
                                         // Use last index key instead of whole key to look up color
                                         color = colorMap[keyArr[keyArr.length - 1]];
@@ -2427,7 +2427,9 @@ function(def, pvc, pv){
 
                                     // Still no color in ColorMap
                                     if (!color) {
-                                        color = defaultScale(key);
+
+                                        // Only assign colors for the innermost ring if it is a sunburst
+                                        color = defaultScale(isSunburst ? keyArr[0] : key);
                                     } else {
                                         color = new pv.FillStyle.Solid(color);
                                         color.isFixedColor = true;    
