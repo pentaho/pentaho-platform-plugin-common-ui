@@ -195,13 +195,16 @@ pen.define([
                                 }
 
                                 function extSelectEvent() {
-                                    if (scope.extSelect) {
-                                        var obj = scope.findNodeByAttr(scope.extSelect.attr, scope.extSelect.val);
-                                        scope.selectedNode = obj.node;
-                                        scope.expandParents(scope.selectedNode);
-                                        scope.selectNodeHeadExt(scope.selectedNode);
-                                        scope.selectNodeLabel(scope.selectedNode);
-                                    }
+                                  if (scope.extSelect && scope.extSelect.attr) {
+                                    var obj = scope.findNodeByAttr(scope.extSelect.attr, scope.extSelect.val);
+                                    scope.selectedNode = obj.node;
+                                    scope.expandParents(scope.selectedNode);
+                                    scope.selectNodeHeadExt(scope.selectedNode);
+                                    scope.selectNodeLabel(scope.selectedNode);
+                                  } else {
+                                    scope.expandedNodes = {};
+                                    scope.selectedNode = {};
+                                  }
                                 }
 
 

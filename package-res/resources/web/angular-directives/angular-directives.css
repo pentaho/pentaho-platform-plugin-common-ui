@@ -76,10 +76,10 @@ treecontrol li .tree-label {
 
 treecontrol .treeControlLoading {
   height: 100%;
-  width: 100%;
+  position: relative;
 }
 treecontrol .treeControlLoading .spin {
-  top: 60px;
+  top: 32px;
   left: 50%;
   position: absolute;
 }
