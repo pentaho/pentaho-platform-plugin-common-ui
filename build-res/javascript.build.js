@@ -30,8 +30,6 @@
   },
   mainConfigFile: 'requireCfg.js',
 
-  //Indicates the namespace to use for require/requirejs/define.
-  namespace: "pen",
 
   modules: [
     {

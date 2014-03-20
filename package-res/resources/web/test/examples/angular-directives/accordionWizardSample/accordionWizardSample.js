@@ -1,5 +1,4 @@
-
-pen.require([
+require([
   'common-ui/angular',
   'common-ui/angular-ui-bootstrap',
   'common-ui/angular-directives/angular-directives'

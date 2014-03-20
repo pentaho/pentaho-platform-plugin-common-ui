@@ -1,4 +1,4 @@
-pen.define([
+define([
   'common-ui/angular',
   'common-ui/util/spin.min',
   'common-ui/util/PentahoSpinner'

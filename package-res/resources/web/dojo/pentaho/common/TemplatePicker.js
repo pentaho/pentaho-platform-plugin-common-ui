@@ -83,7 +83,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
             },
 
             imgClick: function (event) {
-              var idx = parseInt(dojo.attr(event.target, 'idx'));
+              var idx = parseInt(event.target.getAttribute('idx'));
               var idx = this.pageNo * 6 + idx;
               if (this.templateSelectedCallback) {
                 this.templateSelectedCallback(idx);

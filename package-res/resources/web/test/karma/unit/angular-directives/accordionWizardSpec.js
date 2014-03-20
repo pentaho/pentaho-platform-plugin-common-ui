@@ -6,7 +6,7 @@ var deps = [
   'common-ui/angular-directives/accordionWizard/accordionWizard'
 ];
 
-pen.define(deps, function(angular, templateUtil) {
+define(deps, function(angular, templateUtil) {
 
   describe('accordionWizard', function () {
     var $scope, httpBackend, templateCache;

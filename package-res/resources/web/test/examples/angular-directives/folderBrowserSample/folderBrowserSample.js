@@ -16,7 +16,7 @@
  * Copyright 2014 Pentaho Corporation.  All rights reserved.
  */
 
-pen.require([
+require([
   'common-ui/angular',
   'common-ui/angular-directives/angular-directives'
   ],
