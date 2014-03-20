@@ -109,7 +109,7 @@ define("common-ui/util/util", ["dijit/registry", "dojo/dom"], function(registry,
       var index = -1;
       if(!e) {
         // see if there are indexed items
-        e = dojo.byId(id+'1');
+        e = dom.byId(id+'1');
         if(e) {
           index = 1;
         }

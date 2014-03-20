@@ -15,7 +15,7 @@
  * Copyright 2014 Pentaho Corporation.  All rights reserved.
  */
 
-pen.define( [], function() {
+define( [], function() {
 
   function _preFetchTemplate(path, templateCache) {
     var req = new XMLHttpRequest();

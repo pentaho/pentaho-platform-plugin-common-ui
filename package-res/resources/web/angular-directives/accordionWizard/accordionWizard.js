@@ -24,7 +24,7 @@
 
 /* Based on https://github.com/angular-ui/bootstrap/tree/master/src/accordion */
 
-pen.define([
+define([
   'common-ui/angular'
 ],
     function (angular) {

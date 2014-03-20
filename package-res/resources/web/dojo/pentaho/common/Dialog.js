@@ -91,7 +91,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
                     style.set(cell, "align", "right");
                     var btn = document.createElement("BUTTON");
                     domClass.add(btn, "pentaho-button");
-                    dojo.attr(btn, "id", "button"+j);
+                    btn.setAttribute( "id", "button"+j);
                     btn.innerHTML = this.buttons[j];
                     cell.appendChild(btn);
                     btn.onclick = lang.hitch(this, this.buttonClick, j);

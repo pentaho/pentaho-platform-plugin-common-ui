@@ -85,5 +85,5 @@ requireCfg['shim']['common-ui/angular-animate'] = ['common-ui/angular'];
 requireCfg['shim']['common-ui/angular-ui-bootstrap'] = ['common-ui/angular'];
 
 requireCfg['shim']['common-ui/PluginHandler'] = ['common-ui/jquery'];
-requireCfg['paths']['common-ui/angular-directives'] = prefix + 'common-ui/resources/web/angular-directives';
+requireCfg['paths']['common-ui/angular-directives'] = prefix + '/angular-directives';
 requireCfg['shim']['common-ui/angular-directives'] = ['common-ui/angular-ui-bootstrap'];

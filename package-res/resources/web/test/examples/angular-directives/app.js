@@ -1,5 +1,4 @@
-
-pen.require([
+require([
   'common-ui/angular',
   './accordionWizardSample/accordionWizardSample',
   './folderBrowserSample/folderBrowserSample'
