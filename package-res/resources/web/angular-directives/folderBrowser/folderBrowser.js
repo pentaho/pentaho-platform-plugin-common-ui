@@ -1,9 +1,10 @@
 pen.define([
   'common-ui/angular',
+  'common-ui/util/spin.min',
   'common-ui/util/PentahoSpinner'
 ],
 
-    function (angular, spin) {
+    function (angular, spinjs, spin) {
 
          angular.module('folderBrowser', [])
             .directive('treecontrol', ['$compile', '$location', '$anchorScroll',
@@ -27,6 +28,7 @@ pen.define([
                             $scope.nodeChildren = $scope.nodeChildren || 'children';
                             $scope.expandedNodes = {};
                             $location.hash("");
+                            $scope.spinner=undefined;
 
                             $scope.headClass = function (node) {
 
@@ -254,12 +256,24 @@ pen.define([
                                     }
                                 }
 
+                                initSpinner=function(){
+                                    if(spin.getLargeConfig && !scope.spinner){
+                                        var config = spin.getLargeConfig();
+                                        var spinContainer = angular.element("treecontrol .treeControlLoading .spin")[0];
+                                        var spinnage= new Spinner(config);
+                                        spinnage.spin(spinContainer);
+                                        scope.spinner=spinnage;
+                                    }
+                                }
+
                                 scope.$watch("treeModel", updateNodeOnRootScope);
                                 updateNodeOnRootScope(scope.treeModel);
 
                                 scope.$watch("extSelect", extSelectEvent);
 
                                 scope.$watch("addFolder", addFolderEvent);
+
+                                scope.$watch("loading", initSpinner);
 
                                 //Rendering template for a root node
                                 treemodelCntr.templateRoot(scope, function (clone) {
@@ -270,15 +284,6 @@ pen.define([
                                 // to keep using the compile function
                                 scope.$treeTransclude = childTranscludeFn;
 
-                                function initSpinner() {
-                                  var config = spin.getLargeConfig();
-                                  var spinContainer = element.find(".treeControlLoading .spin")[0];
-                                  var spinner = new Spinner(config);
-                                  spinner.spin(spinContainer);
-                                };
-
-                                // load the spinner
-                                initSpinner();
                             }
                         }
                     };
