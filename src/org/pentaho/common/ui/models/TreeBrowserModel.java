@@ -51,6 +51,9 @@ public class TreeBrowserModel {
   private String path;
 
   @XmlElement
+  private String owner;
+
+  @XmlElement
   private List<TreeBrowserModel> children = new ArrayList<TreeBrowserModel>();
 
   @XmlElement
@@ -118,5 +121,13 @@ public class TreeBrowserModel {
 
   public void setPermissions( PermissionsModel permissions ) {
     this.permissions = permissions;
+  }
+
+  public String getOwner() {
+    return owner;
+  }
+
+  public void setOwner( String owner ) {
+    this.owner = owner;
   }
 }
