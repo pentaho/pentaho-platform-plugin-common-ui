@@ -38,7 +38,7 @@ pen.require([
               $http.get('folderBrowserSample/treeModel.json')
                 .then(function(response){
                   $scope.sample.treeModel = response.data;
-                }).finally( function() {
+                })["finally"]( function() {
                   $scope.sample.isLoading = false;
                 });
             },

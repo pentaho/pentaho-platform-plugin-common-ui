@@ -1,11 +1,11 @@
 .bootstrap .accordion-wizard .accordion-heading-content {
-    font-size: 18px;
+  font-size: 18px;
 }
 
 .bootstrap .accordion-wizard .accordion-group {
-    padding: 10px 15px;
-    position: relative;
-    overflow: hidden;
+  padding: 10px 15px;
+  position: relative;
+  overflow: hidden;
 }
 
 .bootstrap .accordion-wizard .accordion-heading {
@@ -13,71 +13,91 @@
 }
 
 .bootstrap .accordion-wizard .accordion-group {
-    border-radius: 0px;
-    -webkit-border-radius: 0px;
-    -moz-border-radius: 0px;
-    margin-bottom: 10px;
+  border-radius: 0px;
+  -webkit-border-radius: 0px;
+  -moz-border-radius: 0px;
+  margin-bottom: 10px;
 }
 
 .bootstrap .accordion-wizard .accordion-inner {
-    padding: 10px 0px;
+  padding: 10px 0px;
 }
 
 .bootstrap .accordion-wizard .disabled-accordion-panel {
-    position: absolute;
-    display: block;
-    top: 0px;
-    bottom: 0px;
-    left: 0px;
-    width:auto;
-    background-color: #EEE;
-    opacity: 0.7;
+  position: absolute;
+  display: block;
+  top: 0px;
+  bottom: 0px;
+  left: 0px;
+  width:auto;
+  background-color: #EEE;
+  opacity: 0.7;
 }
 
 /* general tree css */
 
-
+[treecontrol],
 treecontrol {
-    /* prevent user selection */
-    -moz-user-select: -moz-none;
-    -khtml-user-select: none;
-    -webkit-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
+  /* prevent user selection */
+  -moz-user-select: -moz-none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  height: 100%;
 }
 
+[treecontrol] ul.treecontrol,
 treecontrol ul.treecontrol {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    border: none;
-
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border: none;
 }
 
+[treecontrol] li,
 treecontrol li {
-    position: relative;
-    padding: 0 0 0 20px;
-    line-height: 20px;
+  position: relative;
+  padding: 0 0 0 20px;
+  line-height: 20px;
 }
 
-treecontrol li.tree-expanded i.tree-normal, treecontrol li.tree-collapsed i.tree-normal {display:none;}
-treecontrol li.tree-expanded i.tree-has-children, treecontrol li.tree-collapsed i.tree-has-children {display:inline;}
-treecontrol li.tree-normal i.tree-has-children {display:none;}
+[treecontrol] li.tree-expanded i.tree-normal, [treecontrol] li.tree-collapsed i.tree-normal,
+treecontrol li.tree-expanded i.tree-normal, treecontrol li.tree-collapsed i.tree-normal {
+  display:none;
+}
+
+[treecontrol] li.tree-expanded i.tree-has-children, [treecontrol] li.tree-collapsed i.tree-has-children,
+treecontrol li.tree-expanded i.tree-has-children, treecontrol li.tree-collapsed i.tree-has-children {
+  display:inline;
+}
+
+[treecontrol] li.tree-normal i.tree-has-children,
+treecontrol li.tree-normal i.tree-has-children {
+  display:none;
+}
+
+[treecontrol] li.tree-normal i.tree-normal,
 treecontrol li.tree-normal i.tree-normal {display:inline;}
 
+[treecontrol] li i,
 treecontrol li i {
     cursor: pointer;
 }
 
+[treecontrol] li .tree-label,
 treecontrol li .tree-label {
-    cursor: pointer;
-    display: inline;
+  cursor: pointer;
+  display: inline;
 }
 
+[treecontrol] .treeControlLoading,
 treecontrol .treeControlLoading {
   height: 100%;
   position: relative;
 }
+
+[treecontrol] .treeControlLoading .spin,
 treecontrol .treeControlLoading .spin {
   top: 32px;
   left: 50%;
