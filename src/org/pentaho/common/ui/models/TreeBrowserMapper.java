@@ -58,6 +58,9 @@ public class TreeBrowserMapper {
 
     try {
       BeanUtils.copyProperties( treeBrowserModel, repositoryDto );
+
+      // Map owner
+      treeBrowserModel.setOwner( repositoryDto.getRepositoryFileAclDto().getOwner() );
     } catch ( Exception e ) {
       logger.warn( ExceptionUtils.getFullStackTrace( e ) );
     }
