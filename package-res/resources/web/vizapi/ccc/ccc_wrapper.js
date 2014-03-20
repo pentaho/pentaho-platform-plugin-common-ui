@@ -181,10 +181,8 @@ function(def, pvc, pv){
                 reqs: def.array.appendMany(
                     createDataReq('LINE', {options: false}),
                     [
-                     createLabelsVisibleAnchorDataReq(true)
-                    ],
-                    [
-                     createShapeDataReq({separator: true}),
+                     createLabelsVisibleAnchorDataReq(true),
+                     createShapeDataReq(null, {separator: true}),
                      createLineWidthDataReq()
                     ],
                     createTrendsDataReqs(),
@@ -317,7 +315,7 @@ function(def, pvc, pv){
                     createColumnDataLabelsReq({value_anchor: 'VALUE_COLUMN_ANCHOR',   separator: false, anchors:['none', 'center', 'inside_end', 'inside_base', 'outside_end']}),
                     createLabelsVisibleAnchorDataReq({labels_option: 'lineLabelsOption', value_anchor: 'VALUE_LINE_ANCHOR'}),
                     createMultiDataReq(),
-                    createShapeDataReq({separator: true}),
+                    createShapeDataReq(null, {separator: true}),
                     createLineWidthDataReq(),
                     createChartOptionsDataReq(true)
                 ]
@@ -632,7 +630,7 @@ function(def, pvc, pv){
             };
         }
 
-        function createShapeDataReq(valuesSet){
+        function createShapeDataReq(valuesSet, options){
             var values = ['circle', 'cross', 'diamond', 'square', 'triangle'];
             if(valuesSet){
                 values = values.filter(function(value){ return def.hasOwn(valuesSet, value); });
@@ -648,7 +646,7 @@ function(def, pvc, pv){
                     labels:  values.map(function(option){ return dropZoneLabel(option.toUpperCase()); }),
                     group:   'options',
                     type:    'combo',
-                    seperator: def.get(valuesSet, 'separator', false),
+                    seperator: options ? def.get(options, 'separator', false) : false,
                     caption: dropZoneLabel('BULLET_STYLE')
                 }
             };
