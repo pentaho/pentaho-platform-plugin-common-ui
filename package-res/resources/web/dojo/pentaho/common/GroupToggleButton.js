@@ -15,7 +15,7 @@
  *
  */
 define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on", "dojo/query", "dojo/topic", 'pentaho/common/ToggleButton', "dojo/dom-class",
-"dojo/_base/lang"],
+  "dojo/_base/lang"],
     function (declare, _WidgetBase, _Templated, on, query, topic, ToggleButton, domClass, lang) {
       return declare("pentaho.common.GroupToggleButton",[ToggleButton], {
 
@@ -34,7 +34,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
           this.unselectChannel = '/ButtonGroup/' + this.groupName;
 
           // listen for related buttons publishing on the unselectChannel. deselect ourselves in that case.
-          topic.subscribe(this.unselectChannel, lang.hitch(this, '_unselect'));
+          this.subscription = topic.subscribe(this.unselectChannel, lang.hitch(this, '_unselect'));
         },
 
         init: function () {
@@ -99,7 +99,9 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
 
         uninitialize: function () {
           this.inherited(arguments);
-          dojo.unsubscribe(this.unselectChannel, this);
+          if(this.subscription){
+            this.subscription.remove();
+          }
         }
 
 
