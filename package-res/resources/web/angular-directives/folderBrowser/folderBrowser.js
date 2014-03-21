@@ -4,7 +4,7 @@ define([
   'common-ui/util/PentahoSpinner'
 ],
 
-    function (angular, spinjs, spin) {
+    function (angular, Spinner, spin) {
 
          angular.module('folderBrowser', [])
             .directive('treecontrol', ['$compile', '$location', '$anchorScroll',
