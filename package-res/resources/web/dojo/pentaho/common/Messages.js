@@ -95,12 +95,9 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
                 else if (lang.isObject(substitutionVars)) {
                   subs = substitutionVars;
                 }
-                if (string.substitute) {
-                  msg = string.substitute(msg, subs);
-                }
-                else if (lang.replace) {
-                  msg = lang.replace(msg, subs);
-                }
+
+                msg = lang.replace(msg, subs);
+
               }
               break;
             }
