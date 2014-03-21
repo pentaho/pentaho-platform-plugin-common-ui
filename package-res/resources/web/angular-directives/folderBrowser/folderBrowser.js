@@ -167,7 +167,7 @@ pen.define([
                                     '<i class="tree-normal"></i>' +
                                     '<div class="tree-label" ng-class="selectedClass(node)" ng-click="selectNodeLabel(node)" ng-dblclick="selectNodeHead(node)" tree-transclude></div>' +
                                     '</div>' +
-                                    '<treeitem ng-if="nodeExpanded(node)"></treeitem>' +
+                                    '<div treeitem class="treeitem" ng-if="nodeExpanded(node)"></>' +
                                     '</li>' +
                                     '</ul>';
 
@@ -259,7 +259,7 @@ pen.define([
                                 initSpinner=function(){
                                     if(spin.getLargeConfig && !scope.spinner){
                                         var config = spin.getLargeConfig();
-                                        var spinContainer = angular.element("treecontrol .treeControlLoading .spin")[0];
+                                        var spinContainer = angular.element(".treeControlView.treeControlLoading .spin")[0];
                                         var spinnage= new Spinner(config);
                                         spinnage.spin(spinContainer);
                                         scope.spinner=spinnage;
@@ -291,7 +291,7 @@ pen.define([
             ])
             .directive("treeitem", function () {
                 return {
-                    restrict: 'E',
+                    restrict: 'EA',
                     require: "^treecontrol",
                     link: function (scope, element, attrs, treemodelCntr) {
 

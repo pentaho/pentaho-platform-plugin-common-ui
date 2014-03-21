@@ -22,37 +22,39 @@
 
   </head>
 
-  <body class="bootstrap" id="ng-app" ng-controller="MainCtrl" onload="prettyPrint()">
-    <div style="padding:10px;" >
-      <h2>Example usage of angular-directives</h2>
-      <p>
-        All directives have a few common requirements for use. <br/>
-        You need to make the javascript available to your application and then you will 
-        need to inject the desired module into your AngularJS app. Like this:
-        <br/><br/>
-        <pre class="prettyprint">      
-          <code class="lang-js">
+  <body class="bootstrap" onload="prettyPrint()">
+    <div ng-app="example" id="ng-app" ng-controller="MainCtrl">
+      <div style="padding:10px;" >
+        <h2>Example usage of angular-directives</h2>
+        <p>
+          All directives have a few common requirements for use. <br/>
+          <em>Be sure to use directives as attributes on DIVs rather than element names to support IE8</em>
+          You need to make the javascript available to your application and then you will
+          need to inject the desired module into your AngularJS app. Like this:
+          <br/><br/>
+          <pre class="prettyprint">
+            <code class="lang-js">
 pen.require([
   'common-ui/angular',
   'common-ui/angular-ui-bootstrap',
   'common-ui/angular-directives/angular-directives'
 ], function(angular) {
   // code here
-});          
+});
 
 // inject the module that you want by name
 var app = angular.module('example', ['accordionWizard', 'folderBrowser']);
-          </code>
-        </pre>
-      </p>
-      <br/><br/>
+            </code>
+          </pre>
+        </p>
+        <br/><br/>
 
-      <div id="accordionWizard" ng-include="'accordionWizardSample/index.html'"></div>
-      <br/><br/><br/>
-      <div id="folderBrowser" ng-include="'folderBrowserSample/index.html'"></div>
+        <div id="accordionWizard" ng-include="'accordionWizardSample/index.html'"></div>
+        <br/><br/><br/>
+        <div id="folderBrowser" ng-include="'folderBrowserSample/index.html'"></div>
 
-    </div> 
-
+      </div>
+    </div>
   </body>
 
 </html>

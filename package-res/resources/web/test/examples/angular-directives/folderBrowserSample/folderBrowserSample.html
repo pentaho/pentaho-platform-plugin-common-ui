@@ -5,7 +5,7 @@
     <div class="span6" id="selectedPathText">{{sample.selectedNode.path || 'None'}}</div>
   </div>
   <div class="span5" style="height: 200px; margin-bottom: 10px;">
-    <treecontrol 
+    <div treecontrol
       class="tree-classic" 
       add-folder="sample.addFolder" 
       ext-select="sample.externalSelect" 
@@ -18,7 +18,7 @@
         <!-- the content of this element is what is displayed as the label for each node in the tree -->
         {{node.localizedName}}
 
-    </treecontrol>
+    </div>
   </div>
 
   <div class="form-inline span12">
