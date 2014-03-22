@@ -21,6 +21,7 @@ import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.pentaho.common.ui.models.PermissionsModel;
+import org.pentaho.common.ui.models.PermissionsModelMapper;
 import org.pentaho.common.ui.models.TreeBrowserMapper;
 import org.pentaho.common.ui.models.TreeBrowserModel;
 import org.pentaho.platform.repository2.unified.webservices.RepositoryFileDto;
@@ -33,9 +34,7 @@ import java.io.StringReader;
 import java.util.List;
 import java.util.Locale;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 /**
  * @author Rowell Belen
@@ -69,6 +68,35 @@ public class TreeBrowserMapperTest {
     validate( repositoryFileTreeDto.getFile(), treeBrowserModel );
 
     validate( repositoryFileTreeDto, treeBrowserModel );
+
+    // test with permissions mapper
+    treeBrowserMapper.setPermissionsModelMapper( new PermissionsModelMapper() {
+      @Override public PermissionsModel map( TreeBrowserModel treeBrowserModel ) {
+        return null;
+      }
+    } );
+    treeBrowserModel = treeBrowserMapper.convert( repositoryFileTreeDto );
+    assertNotNull( treeBrowserModel );
+    assertNull( treeBrowserModel.getPermissions() );
+
+    // test with permissions mapper
+    treeBrowserMapper.setPermissionsModelMapper( new PermissionsModelMapper() {
+      @Override public PermissionsModel map( TreeBrowserModel treeBrowserModel ) {
+        PermissionsModel permissionsModel = new PermissionsModel();
+        if ( treeBrowserModel.getOwner() != null ) { // some random logic
+          permissionsModel.setRead( true );
+          permissionsModel.setWrite( true );
+          permissionsModel.setExecute( false );
+        }
+        return permissionsModel;
+      }
+    } );
+    treeBrowserModel = treeBrowserMapper.convert( repositoryFileTreeDto );
+    assertNotNull( treeBrowserModel );
+    assertNotNull( treeBrowserModel.getPermissions() );
+    assertTrue( treeBrowserModel.getPermissions().isRead() );
+    assertTrue( treeBrowserModel.getPermissions().isWrite() );
+    assertFalse( treeBrowserModel.getPermissions().isExecute() );
   }
 
   private void validate( RepositoryFileTreeDto repositoryFileTreeDto, TreeBrowserModel treeBrowserModel ) {
