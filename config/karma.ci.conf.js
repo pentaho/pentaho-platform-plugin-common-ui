@@ -13,7 +13,9 @@ module.exports = function (config) {
       {pattern: 'ring/**/*.js', included: false},
       {pattern: 'underscore/**/*.js', included: false},
       {pattern: 'test/karma/unit/**/*.js', included: false},
-      'test/karma/require-config.js',
+      '../../../config/initEnv.js',
+      '../../../build-res/requireCfg-raw.js',
+      '../../../config/karma-require-js-cfg.js',
       {pattern: 'angular-directives/**/*.html', included: false}
     ],
 
