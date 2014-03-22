@@ -46,10 +46,16 @@ public class TreeBrowserMapper {
 
   private static String FILE_NAME_KEY = "file.title";
 
+  private PermissionsModelMapper permissionsModelMapper;
+
   private Locale locale = Locale.getDefault();
 
   public TreeBrowserMapper( Locale locale ) {
     this.locale = locale;
+  }
+
+  public void setPermissionsModelMapper( PermissionsModelMapper permissionsModelMapper ) {
+    this.permissionsModelMapper = permissionsModelMapper;
   }
 
   public TreeBrowserModel convert( RepositoryFileDto repositoryDto ) {
@@ -71,6 +77,9 @@ public class TreeBrowserMapper {
 
     // Initialize permissions
     PermissionsModel permissionsModel = new PermissionsModel();
+    if ( permissionsModelMapper != null ) {
+      permissionsModel = permissionsModelMapper.map( treeBrowserModel );
+    }
     treeBrowserModel.setPermissions( permissionsModel );
 
     return treeBrowserModel;
