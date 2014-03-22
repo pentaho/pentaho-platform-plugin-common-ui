@@ -49,11 +49,6 @@ public class TreeBrowserMapperTest {
     treeBrowserMapper = new TreeBrowserMapper( Locale.getDefault() );
   }
 
-  @Test
-  public void testHasAccess() {
-    assertFalse( treeBrowserMapper.hasAccess( null, null ) );
-  }
-
   @Test( expected = Exception.class )
   public void testConvertError() {
     treeBrowserMapper.convert( (RepositoryFileDto) null );

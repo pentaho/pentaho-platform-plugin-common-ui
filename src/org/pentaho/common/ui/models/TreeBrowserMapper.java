@@ -69,11 +69,8 @@ public class TreeBrowserMapper {
     treeBrowserModel
       .setLocalizedName( getLocalizedName( this.locale, repositoryDto, FILE_NAME_KEY, repositoryDto.getName() ) );
 
-    // Map permissions
+    // Initialize permissions
     PermissionsModel permissionsModel = new PermissionsModel();
-    permissionsModel.setRead( hasAccess( repositoryDto, RepositoryFilePermission.READ ) );
-    permissionsModel.setWrite( hasAccess( repositoryDto, RepositoryFilePermission.WRITE ) );
-    permissionsModel.setExecute( hasAccess( repositoryDto, RepositoryFilePermission.ALL ) );
     treeBrowserModel.setPermissions( permissionsModel );
 
     return treeBrowserModel;
@@ -105,27 +102,6 @@ public class TreeBrowserMapper {
     }
 
     treeBrowserModel.setChildren( models );
-  }
-
-  public boolean hasAccess( RepositoryFileDto repositoryDto, RepositoryFilePermission permission ) {
-
-    try {
-      RepositoryFileAclDto aclDto = repositoryDto.getRepositoryFileAclDto();
-      List<RepositoryFileAclAceDto> aces = aclDto.getAces();
-      for ( RepositoryFileAclAceDto aclAceDto : aces ) {
-        for ( Integer integer : aclAceDto.getPermissions() ) {
-          if ( integer == RepositoryFilePermission.ACL_MANAGEMENT.ordinal() ||
-            integer == RepositoryFilePermission.ALL.ordinal() ||
-            integer == permission.ordinal() ) {
-            return true;
-          }
-        }
-      }
-    } catch ( Exception e ) {
-      logger.warn( ExceptionUtils.getMessage( e ) );
-    }
-
-    return false;
   }
 
   public Map<String, Properties> toPropertiesMap( List<LocaleMapDto> propertiesMapEntries ) {
