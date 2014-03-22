@@ -149,10 +149,14 @@ define([
                 };
 
                 scope.saveSettings = function () {
+                  var closeOnSave = true;
                   if (scope._onSave) {
-                    scope._onSave();
+                    var ret = scope._onSave();
+                    if( typeof(ret) != 'undefined' ) {
+                      closeOnSave = ret;
+                    }
                   }
-                  scope.isOpen = false;
+                  scope.isOpen = !closeOnSave;
                 };
                 scope.cancelSettings = function () {
                   var closeOnCancel = true;
