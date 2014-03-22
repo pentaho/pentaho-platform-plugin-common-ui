@@ -14,7 +14,12 @@
  * limitations under the License.
  *
  */
-var prefix = (typeof CONTEXT_PATH != "undefined") ? CONTEXT_PATH + 'content/common-ui/resources/web' : "common-ui"; //prod vs build
+if(typeof REQUIRE_JS_PREFIX != "undefined") {
+  // allows for karma/requirejs configuration for unit tests
+  var prefix = REQUIRE_JS_PREFIX;
+} else {
+  var prefix = (typeof CONTEXT_PATH != "undefined") ? CONTEXT_PATH + 'content/common-ui/resources/web' : "common-ui"; //prod vs build
+}
 
 requireCfg['paths']['common-ui'] = prefix;
 
