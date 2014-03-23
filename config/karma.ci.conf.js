@@ -41,10 +41,18 @@ module.exports = function (config) {
       'angular-directives/**/*.js': ['coverage']
     },
 
-    // optionally, configure the reporter
     coverageReporter: {
-      type : 'cobertura',
-      dir : '../../../bin/reports/cobertura/xml/'
+      reporters: [
+        {
+          type: 'html',
+          dir: '../../../bin/reports/jscoverage/html/'
+        },
+        {
+          type : 'cobertura',
+          dir : '../../../bin/reports/cobertura/xml/'
+        }
+      ],
+      dir: '../../../bin/reports/'
     },
 
     // level of logging
