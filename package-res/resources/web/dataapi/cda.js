@@ -32,7 +32,7 @@ pentaho.cda = {
 		}
 		else {
 				//call BI server for all CDA files.
-				pentaho.xhr.execute(CONTEXT_PATH + "content/cda/getCdaList", {
+				pentaho.xhr.execute(CONTEXT_PATH + "/plugin/cda/api/getCdaList", {
 					async: true,
 					dataType: "json",
 					type: "GET",
@@ -122,7 +122,7 @@ pentaho.cda.Descriptor.prototype = {
     		var that = this;
 		
 		if (that.queries.length == 0) {
-			pentaho.xhr.execute(CONTEXT_PATH + "content/cda/listQueries", {
+			pentaho.xhr.execute(CONTEXT_PATH + "/plugin/cda/api/listQueries", {
 				async: true,
 				dataType: "json",
 				type: "GET",
@@ -232,7 +232,7 @@ pentaho.cda.Query.prototype = {
 		var that = this;
 
 		if (this.parameters.length == 0) {
-			$.getJSON(CONTEXT_PATH + "content/cda/listParameters", {path:that.file.path, dataAccessId:this.id},
+			$.getJSON(CONTEXT_PATH + "/plugin/cda/api/listParameters", {path:that.file.path, dataAccessId:this.id},
 			function(data){
 				for (var i=0,j=data.resultset.length;i<j;i++){
 					var rs = data.resultset[i];
@@ -249,7 +249,7 @@ pentaho.cda.Query.prototype = {
 		}
 	}
 	,execute: function(func){
-	$.getJSON(CONTEXT_PATH + "content/cda/doQuery", {path:this.file.path, dataAccessId:this.id},
+	$.getJSON(CONTEXT_PATH + "/plugin/cda/api/doQuery", {path:this.file.path, dataAccessId:this.id},
 		function(data){
 			//console.log(columns);
 			if (typeof func == 'function'){
