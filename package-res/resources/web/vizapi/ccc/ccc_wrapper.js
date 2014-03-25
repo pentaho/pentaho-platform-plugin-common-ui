@@ -3376,8 +3376,6 @@ function(def, pvc, pv){
 
             this.options.plot2OrthoAxis = 2;
             
-            configureColumnLabelsAlignmentOptions.call(this);
-            
             configureLineLabelsAlignmentOptions.call(this);
 
             // Plot2 uses same color scale
@@ -4094,6 +4092,7 @@ function(def, pvc, pv){
 
         _options: {
             valuesVisible: true,
+            valuesOverflow: 'trim',
             valuesOptimizeLegibility: false
         },
 
@@ -4107,34 +4106,79 @@ function(def, pvc, pv){
         _readUserOptions: function(options, vizOptions) {
             this.base(options, vizOptions);
 
+            var eps = options.extensionPoints;
+
             this._hideNullMembers = vizOptions.emptySlicesHidden;
 
             options.valuesFont = defaultFont(readFont(vizOptions, 'label'));
 
             if(vizOptions.emptySlicesHidden) {
-                options.extensionPoints.slice_visible =
-                options.extensionPoints.label_visible =
-                function(scene) {
+                eps.slice_visible = function(scene) {
                     var value = scene.vars.category.value;
                     return !!value && !_nullMemberRe.test(value);
                 };
             }
 
-            options.extensionPoints.label_textStyle = vizOptions.labelColor;
+            eps.label_textStyle = vizOptions.labelColor;
 
             // Determine whether to show values label
             if (vizOptions.labelsOption != "none") {
-                options.subValuesVisible = true;
+                eps.label_textBaseline = "bottom";
+                eps.label_textMargin = 2;
+
+                eps.label_visible = function(scene) {
+                    // Only show the size label if the size-value label also fits
+                    var pvLabel = this.pvMark,
+                        ir = scene.innerRadius,
+                        irmin = ir,
+                        or = scene.outerRadius,
+                        tm = pvLabel.textMargin(),
+                        a  = scene.angle, // angle span
+                        m  = pv.Text.measure(scene.vars.size.label, pvLabel.font()),
+                        twMax;
+
+                    if(a < Math.PI) {
+                        var th = m.height * 0.85, // tight text bounding box
+                            tb = pvLabel.textBaseline(),
+                            // The effective height of text that must be covered.
+                            // one text margin, for the anchor, 
+                            // half text margin for the anchor's opposite side.
+                            // All on only one of the sides of the wedge.
+                            thEf = 2 * (th + 3*tm/2);
+
+                        // Minimum inner radius whose straight-arc has a length `thEf`
+                        irmin = Math.max(
+                            irmin, 
+                            thEf / (2 * Math.tan(a / 2)));
+                    }
+
+                    // Here, on purpose, we're not including two `tm`, for left and right,
+                    // cause we don't want that the clipping by height, the <= 0 test below,
+                    // takes into account the inner margin. I.e., text is allowed to be shorter,
+                    // in the inner margin zone, which, after all, is supposed to not have any text!
+                    twMax = (or - tm) - irmin;
+
+                    // If with this angle-span only at a very far
+                    // radius would `th` be achieved, then text will never fit,
+                    // not even trimmed.
+                    if(twMax <= 0 || m.width > twMax - tm) return false;
+
+                    // Continue with normal processing for the main label.
+                    return null;
+                };
                 
-                options.extensionPoints.label_textBaseline = "bottom";
-                options.extensionPoints.label_textMargin = 2;
-                options.extensionPoints.label_add = function() {
+                eps.label_add = function() {
                     return new pv.Label()
+                        .visible(function(scene) {
+                            var pvMainLabel = this.proto;
+                            return pvMainLabel.visible();
+                        })
                         .text(function(scene) {
-                            return this.proto.text() === "" ? "" : scene.vars.size.label;
+                            var pvMainLabel = this.proto;
+                            return !pvMainLabel.text() ? "" : scene.vars.size.label;
                         })                
-                        .textBaseline("top")
-                }    
+                        .textBaseline("top");
+                };
             }
         }
     });
@@ -4399,21 +4443,6 @@ function(def, pvc, pv){
         }
     }
 
-    function configureLabelsAlignmentOptions() {
-        if (configureLabelsVisibilityOptions.call(this)) {
-             if (!this.options.extensionPoints) {
-                this.options.extensionPoints = {};
-            }
-
-            var labelsOption = this._vizOptions.labelsOption;
-
-            if (labelsOption == 'top' || labelsOption == 'bottom') {
-                this.options.extensionPoints.label_textBaseline = labelsOption == 'top' ? 'bottom' : 'top';
-            } else if (labelsOption == 'left' || labelsOption == 'right') {
-                this.options.extensionPoints.label_textAlign = labelsOption == 'left' ? 'right' : 'left';
-            }
-        }
-    }
     
     function configureColumnLabelsAlignmentOptions() {
         if (configureLabelsVisibilityOptions.call(this)) {
