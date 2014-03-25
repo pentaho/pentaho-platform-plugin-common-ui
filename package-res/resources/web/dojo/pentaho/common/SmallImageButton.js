@@ -14,10 +14,10 @@
  * limitations under the License.
  *
  */
-define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on", "dojo/query",
+define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dijit/_WidgetsInTemplateMixin", "dojo/on", "dojo/query",
   "dojo/text!pentaho/common/SmallImageButton.html", "dojo/dom-class", "dojo/_base/lang"],
-    function (declare, _WidgetBase, _Templated, on, query, templateStr, domClass, lang) {
-      return declare("pentaho.common.SmallImageButton", [_WidgetBase, _Templated],
+    function (declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, on, query, templateStr, domClass, lang) {
+      return declare("pentaho.common.SmallImageButton", [_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],
           {
             title: '',
 
