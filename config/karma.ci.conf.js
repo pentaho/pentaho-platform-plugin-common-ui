@@ -13,6 +13,7 @@ module.exports = function (config) {
       {pattern: 'ring/**/*.js', included: false},
       {pattern: 'underscore/**/*.js', included: false},
       {pattern: 'test/karma/unit/**/*.js', included: false},
+      {pattern: 'util/**/*.js', included: false},
       '../../../config/initEnv.js',
       '../../../build-res/requireCfg-raw.js',
       '../../../config/karma-require-js-cfg.js',
