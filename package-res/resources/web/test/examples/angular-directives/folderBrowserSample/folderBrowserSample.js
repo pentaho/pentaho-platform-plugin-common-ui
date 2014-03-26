@@ -43,15 +43,24 @@ require([
                 });
             },
             newFolder: "",
+                  id:1,
+                  getId: function(){
+                    return this.id++;
+                  },
             addNewFolder: function() {
               var f = this.newFolder;
-              this.addFolder = { name: f, localizedName: f };
+                  $scope.sample.addFolder = {
+                      id: this.getId(),
+                      name: f,
+                      permissions: {write: 'true'},
+                      localizedName: f,
+                      children: []
+                    };
             },
             selectThis: function(node) {
               this.externalSelect = { attr: 'path', val: node };
             }
           };
-
           $scope.sample.refreshTree();
         }
       ]);
