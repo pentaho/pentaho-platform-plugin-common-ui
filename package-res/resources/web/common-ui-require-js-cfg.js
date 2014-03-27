@@ -67,6 +67,7 @@ requireCfg['paths']['common-ui/underscore'] = prefix+'/underscore/underscore';
 requireCfg['paths']['underscore'] = prefix+'/underscore/underscore';
 
 requireCfg['paths']['common-ui/angular'] = prefix+'/angular/angular.min';
+requireCfg['paths']['common-ui/angular-i18n'] = prefix+'/angular/i18n';
 requireCfg['paths']['common-ui/angular-resource'] = prefix+'/angular/angular-resource.min';
 requireCfg['paths']['common-ui/angular-route'] = prefix+'/angular/angular-route.min';
 requireCfg['paths']['common-ui/angular-animate'] = prefix+'/angular/angular-animate.min';
@@ -75,13 +76,52 @@ requireCfg['paths']['common-ui/angular-ui-bootstrap'] = prefix+'/bootstrap/ui-bo
 
 requireCfg['shim']['common-ui/jquery'] = { exports: '$' };
 
-
 requireCfg['shim']['common-ui/bootstrap'] = ['common-ui/jquery'];
 requireCfg['shim']['common-ui/jquery-i18n'] = ['common-ui/jquery'];
 requireCfg['shim']['common-ui/handlebars'] = ['common-ui/jquery'];
 requireCfg['shim']['common-ui/ring'] = {deps: ['common-ui/underscore'], exports: "ring"};
 
-requireCfg['shim']['common-ui/angular'] = {deps: ['common-ui/jquery'], exports: 'angular'};
+requireCfg['shim']['common-ui/angular'] = {
+  deps: ['common-ui/jquery'],
+  exports: 'angular',
+  init: function() {
+    var locale;
+    // go load the i18n for angular
+    if (typeof SESSION_LOCALE != "undefined") {
+      locale = SESSION_LOCALE;
+    } else {
+      locale = "en";
+    }
+    locale = locale.replace('_', "-").toLowerCase();
+    require(["common-ui/angular-i18n/angular-locale_" + locale], function() {
+      // var $injector = angular.injector(['ng']);
+      // $injector.invoke(function($filter) {
+      //   console.log($filter('date')(new Date(), "yy-MMM-d"));
+      // });
+    }, function(err) {
+      // couldn't find the locale specified, fall back
+      var prev = locale;
+      if(locale.length > 2) {
+        // strip off the country designation, try to get just the language
+        locale = locale.substring(0,2);
+      } else {
+        locale = "en";
+      }
+      if(console && console.warn) {
+        console.warn("Could not load locale for '" + prev + "', falling back to '" + locale + "'");
+      }
+
+      require(["common-ui/angular-i18n/angular-locale_" + locale], function() { }, function(err) {
+        // can't find the language at all, go get english
+        if(console && console.warn) {
+          console.warn("Could not load locale for '" + locale + "', falling back to 'en'");
+        }
+        require(["common-ui/angular-i18n/angular-locale_en"], function() { });
+      });
+    });
+  }
+};
+
 requireCfg['shim']['common-ui/angular-resource'] = ['common-ui/angular'];
 requireCfg['shim']['common-ui/angular-route'] = ['common-ui/angular'];
 requireCfg['shim']['common-ui/angular-animate'] = ['common-ui/angular'];
