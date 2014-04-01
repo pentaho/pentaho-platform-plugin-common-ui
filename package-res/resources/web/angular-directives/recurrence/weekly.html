@@ -1,0 +1,18 @@
+<div>
+    {{weeklyLabel}}: <br>
+    {{mon}}: <input type="checkbox" ng-model="monday">
+    {{tue}}: <input type="checkbox" ng-model="tuesday">
+    {{wed}}: <input type="checkbox" ng-model="wednesday">
+    {{thu}}: <input type="checkbox" ng-model="thursday">
+    {{fri}}: <input type="checkbox" ng-model="friday">
+    {{sat}}: <input type="checkbox" ng-model="saturday">
+    {{sun}}: <input type="checkbox" ng-model="sunday">
+    <br/><br/>
+    {{startLabel}}: <br/>
+    <div datetime ></div>
+    <br/>
+    {{untilLabel}}: <br/>
+    <input type="radio" ng-model="endDate" value="none"> {{noEndLabel}}</input><br/>
+    <input type="radio" ng-model="endDate" value={{pen_cal_date}}> {{endByLabel}} </input><br/>
+    <div datetime ></div>
+</div>
