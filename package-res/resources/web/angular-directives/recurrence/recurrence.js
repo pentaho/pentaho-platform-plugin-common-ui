@@ -32,19 +32,37 @@ define([
 
             //Need to be able to inject this date into calendar picker
             $scope.startDate = new Date();
-            $scope.endDate = 'none';
 
-            $scope.weeklyRecurrenceInfo = {
-              monday: $scope.monday,
-              tuesday: $scope.tuesday,
-              wednesday: $scope.wednesday,
-              thursday: $scope.thursday,
-              friday: $scope.friday,
-              saturday: $scope.saturday,
-              sunday: $scope.sunday,
-              startDate: $scope.startDate,
-              endDate: $scope.endDate
-            }
+            $scope.endDateRadio = 'none';
+
+            $scope.weeklyRecurrenceInfo={};
+
+            $scope.populateDaysOfWeek = function () {
+              var daysArray = [];
+
+              if ($scope.sunday) {
+                daysArray.push(0);
+              }
+              if ($scope.monday) {
+                daysArray.push(1);
+              }
+              if ($scope.tuesday) {
+                daysArray.push(2);
+              }
+              if ($scope.wednesday) {
+                daysArray.push(3);
+              }
+              if ($scope.thursday) {
+                daysArray.push(4);
+              }
+              if ($scope.friday) {
+                daysArray.push(5);
+              }
+              if ($scope.saturday) {
+                daysArray.push(6);
+              }
+              return daysArray;
+            };
           }])
 
           .directive('weekly', function () {
@@ -55,7 +73,7 @@ define([
               controller: 'WeeklyRecurrenceController',
               templateUrl: templatePath + 'weekly.html',
               scope: {
-                weeklyLabel:'@',
+                weeklyLabel: '@',
                 startLabel: '@',
                 untilLabel: '@',
                 noEndLabel: '@',
@@ -64,19 +82,29 @@ define([
               },
               link: function (scope, elem, attrs) {
 
-                scope.$watchCollection('[monday, tuesday, wednesday, thursday, friday, saturday, sunday, startDate, endDate]', function () {
+                if(scope.weeklyRecurrenceInfo){
+                  console.log("================================defined");
+                }
 
-                  scope.weeklyRecurrenceInfo = {
-                    monday: scope.monday,
-                    tuesday: scope.tuesday,
-                    wednesday: scope.wednesday,
-                    thursday: scope.thursday,
-                    friday: scope.friday,
-                    saturday: scope.saturday,
-                    sunday: scope.sunday,
-                    startDate: scope.startDate,
-                    endDate: scope.endDate
+                scope.$watch('pen_cal_date', function () {
+                  scope.weeklyRecurrenceInfo.endTime = (scope.endDateRadio == "dateSelected") ? scope.pen_cal_date : "";
+                });
+
+                scope.$watchCollection('[monday, tuesday, wednesday, thursday, friday, saturday, sunday, startDate, endDateRadio]', function () {
+
+                  scope.weeklyRecurrenceInfo =
+                  {
+                    "daysOfWeek": scope.populateDaysOfWeek(),
+                    "daysOfMonth": "",
+                    "weeksOfMonth": "",
+                    "monthsOfYear": "",
+                    "years": "",
+                    "startTime": scope.startDate,
+                    "endTime": (scope.endDateRadio == "dateSelected") ? scope.pen_cal_date : "",
+                    "uiPassParam": "WEEKLY",
+                    "cronString": ""
                   }
+
                 });
               }
             }
