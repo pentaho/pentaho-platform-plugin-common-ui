@@ -1,18 +1,43 @@
 <div>
     {{weeklyLabel}}: <br>
-    {{mon}}: <input type="checkbox" ng-model="monday">
-    {{tue}}: <input type="checkbox" ng-model="tuesday">
-    {{wed}}: <input type="checkbox" ng-model="wednesday">
-    {{thu}}: <input type="checkbox" ng-model="thursday">
-    {{fri}}: <input type="checkbox" ng-model="friday">
-    {{sat}}: <input type="checkbox" ng-model="saturday">
-    {{sun}}: <input type="checkbox" ng-model="sunday">
+
+    <div class="form-inline">
+        <label class="checkbox inline">
+            <input type="checkbox" ng-model="monday">
+            {{mon}}
+        </label>
+        <label class="checkbox inline">
+            <input type="checkbox" ng-model="tuesday">
+            {{tue}}
+        </label>
+        <label class="checkbox inline">
+            <input type="checkbox" ng-model="wednesday">
+            {{wed}}
+        </label>
+        <label class="checkbox inline">
+            <input type="checkbox" ng-model="thursday">
+            {{thu}}
+        </label>
+        <label class="checkbox inline">
+            <input type="checkbox" ng-model="friday">
+            {{fri}}
+        </label>
+        <label class="checkbox inline">
+            <input type="checkbox" ng-model="saturday">
+            {{sat}}
+        </label>
+        <label class="checkbox inline">
+            <input type="checkbox" ng-model="sunday">
+            {{sun}}
+        </label>
+
+    </div>
     <br/><br/>
     {{startLabel}}: <br/>
     <div datetime ></div>
     <br/>
     {{untilLabel}}: <br/>
-    <input type="radio" ng-model="endDate" value="none"> {{noEndLabel}}</input><br/>
-    <input type="radio" ng-model="endDate" value={{pen_cal_date}}> {{endByLabel}} </input><br/>
+    <input type="radio" ng-model="endDateRadio" value="none"> {{noEndLabel}}</input><br/>
+    <input type="radio" ng-model="endDateRadio" value="dateSelected"> {{endByLabel}}: </input><br/>
     <div datetime ></div>
 </div>
