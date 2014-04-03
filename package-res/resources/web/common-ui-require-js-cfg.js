@@ -58,6 +58,7 @@ requireCfg['paths']['common-ui/jquery'] = prefix+'/jquery/jquery-1.9.1.min';
 
 requireCfg['paths']['common-ui/handlebars'] = prefix+'/handlebars/handlebars';
 requireCfg['paths']['common-ui/jquery-i18n'] = prefix+'/jquery/jquery.i18n.properties-min';
+requireCfg['paths']['common-ui/jquery-pentaho-i18n'] = prefix+'/jquery/jquery.i18n.properties.supported.languages';
 requireCfg['paths']['common-ui/bootstrap'] = prefix+'/bootstrap/bootstrap.min';
 requireCfg['paths']['common-ui/ring'] = prefix+'/ring/ring';
 requireCfg['paths']['common-ui/underscore'] = prefix+'/underscore/underscore';

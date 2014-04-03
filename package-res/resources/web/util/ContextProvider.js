@@ -23,7 +23,7 @@
 	var demoConfig = ["some_path/file_name1", { path:"some_path/file_name2", post: function(context, loadedMap) { }}, "some_other_path/file_name"];
 */
 
-define("common-ui/util/ContextProvider", ["common-ui/jquery-i18n"], function() {
+define("common-ui/util/ContextProvider", ["common-ui/jquery-pentaho-i18n"], function() {
 	var context = {};
 	var loaded = false;
 
