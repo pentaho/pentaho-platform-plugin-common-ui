@@ -34,10 +34,11 @@
     </div>
     <br/><br/>
     {{startLabel}}: <br/>
-    <div datetime ></div>
+    <div datetime selected-date="startDate" ></div>
     <br/>
     {{untilLabel}}: <br/>
     <input type="radio" ng-model="endDateRadio" value="none"> {{noEndLabel}}</input><br/>
     <input type="radio" ng-model="endDateRadio" value="dateSelected"> {{endByLabel}}: </input><br/>
-    <div datetime ></div>
+    <div datetime selected-date="endDate" ></div>
+
 </div>

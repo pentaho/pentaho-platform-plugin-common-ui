@@ -23,9 +23,12 @@ define([
               transclude: true,
               controller: 'DateTimeController',
               templateUrl: templatePath + 'dateTimePicker.html',
+              scope: {
+                selectedDate: '='
+              },
               link: function (scope, elem, attrs) {
               }
-            }
+            };
           }
 
       );

@@ -86,8 +86,8 @@ define([
                   console.log("================================defined");
                 }
 
-                scope.$watch('pen_cal_date', function () {
-                  scope.weeklyRecurrenceInfo.endTime = (scope.endDateRadio == "dateSelected") ? scope.pen_cal_date : "";
+                scope.$watch('endDate', function () {
+                  scope.weeklyRecurrenceInfo.endTime = (scope.endDateRadio == "dateSelected") ? scope.endDate : "";
                 });
 
                 scope.$watchCollection('[monday, tuesday, wednesday, thursday, friday, saturday, sunday, startDate, endDateRadio]', function () {
@@ -100,7 +100,7 @@ define([
                     "monthsOfYear": "",
                     "years": "",
                     "startTime": scope.startDate,
-                    "endTime": (scope.endDateRadio == "dateSelected") ? scope.pen_cal_date : "",
+                    "endTime": (scope.endDateRadio == "dateSelected") ? scope.endDate : "",
                     "uiPassParam": "WEEKLY",
                     "cronString": ""
                   }
