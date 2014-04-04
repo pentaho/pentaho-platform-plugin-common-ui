@@ -1,112 +1,101 @@
 define([
-  'common-ui/angular'
-],
+        'common-ui/angular'
+    ],
     function (angular) {
-      var templatePath = "";
-      if (typeof(CONTEXT_PATH) != "undefined") {
-        templatePath = CONTEXT_PATH + 'content/common-ui/resources/web/angular-directives/recurrence/';
-      } else {
-        templatePath = 'angular-directives/recurrence/';
-      }
+        var templatePath = "";
+        if (typeof(CONTEXT_PATH) != "undefined") {
+            templatePath = CONTEXT_PATH + 'content/common-ui/resources/web/angular-directives/recurrence/';
+        } else {
+            templatePath = 'angular-directives/recurrence/';
+        }
 
-      angular.module('recurrence', [])
+        angular.module('recurrence', [])
 
-          .controller('WeeklyRecurrenceController', ['$scope', '$attrs', '$locale', function ($scope, $attrs, $locale) {
+            .controller('WeeklyRecurrenceController', ['$scope', '$attrs', '$locale', function ($scope, $attrs, $locale) {
 
 
-            $scope.sun = $locale.DATETIME_FORMATS.DAY[0];
-            $scope.mon = $locale.DATETIME_FORMATS.DAY[1];
-            $scope.tue = $locale.DATETIME_FORMATS.DAY[2];
-            $scope.wed = $locale.DATETIME_FORMATS.DAY[3];
-            $scope.thu = $locale.DATETIME_FORMATS.DAY[4];
-            $scope.fri = $locale.DATETIME_FORMATS.DAY[5];
-            $scope.sat = $locale.DATETIME_FORMATS.DAY[6];
+                var sun = $locale.DATETIME_FORMATS.DAY[0];
+                var mon = $locale.DATETIME_FORMATS.DAY[1];
+                var tue = $locale.DATETIME_FORMATS.DAY[2];
+                var wed = $locale.DATETIME_FORMATS.DAY[3];
+                var thu = $locale.DATETIME_FORMATS.DAY[4];
+                var fri = $locale.DATETIME_FORMATS.DAY[5];
+                var sat = $locale.DATETIME_FORMATS.DAY[6];
 
-            $scope.monday = false;
-            $scope.tuesday = false;
-            $scope.wednesday = false;
-            $scope.thursday = false;
-            $scope.friday = false;
-            $scope.saturday = false;
-            $scope.sunday = false;
+                $scope.weeklyRecurrenceInfo = {};
 
-            //Need to be able to inject this date into calendar picker
-            $scope.startDate = new Date();
 
-            $scope.endDateRadio = 'none';
-
-            $scope.weeklyRecurrenceInfo={};
-
-            $scope.populateDaysOfWeek = function () {
-              var daysArray = [];
-
-              if ($scope.sunday) {
-                daysArray.push(0);
-              }
-              if ($scope.monday) {
-                daysArray.push(1);
-              }
-              if ($scope.tuesday) {
-                daysArray.push(2);
-              }
-              if ($scope.wednesday) {
-                daysArray.push(3);
-              }
-              if ($scope.thursday) {
-                daysArray.push(4);
-              }
-              if ($scope.friday) {
-                daysArray.push(5);
-              }
-              if ($scope.saturday) {
-                daysArray.push(6);
-              }
-              return daysArray;
-            };
-          }])
-
-          .directive('weekly', function () {
-            return {
-              restrict: 'A',
-              replace: true,
-              transclude: true,
-              controller: 'WeeklyRecurrenceController',
-              templateUrl: templatePath + 'weekly.html',
-              scope: {
-                weeklyLabel: '@',
-                startLabel: '@',
-                untilLabel: '@',
-                noEndLabel: '@',
-                endByLabel: '@',
-                weeklyRecurrenceInfo: '='
-              },
-              link: function (scope, elem, attrs) {
-
-                if(scope.weeklyRecurrenceInfo){
-                  console.log("================================defined");
+                $scope.data = {
+                    daysOfWeek: [
+                        {day: sun, key: "SUN"},
+                        {day: mon, key: "MON"},
+                        {day: tue, key: "TUES"},
+                        {day: wed, key: "WED"},
+                        {day: thu, key: "THURS"},
+                        {day: fri, key: "FRI"},
+                        {day: sat, key: "SAT"}
+                    ],
+                    selectedDays: { }
                 }
 
-                scope.$watch('endDate', function () {
-                  scope.weeklyRecurrenceInfo.endTime = (scope.endDateRadio == "dateSelected") ? scope.endDate : "";
-                });
+                $scope.startDate = new Date();
+                $scope.endDateRadio = 'none';
 
-                scope.$watchCollection('[monday, tuesday, wednesday, thursday, friday, saturday, sunday, startDate, endDateRadio]', function () {
 
-                  scope.weeklyRecurrenceInfo =
-                  {
-                    "daysOfWeek": scope.populateDaysOfWeek(),
-                    "daysOfMonth": "",
-                    "weeksOfMonth": "",
-                    "monthsOfYear": "",
-                    "years": "",
-                    "startTime": scope.startDate,
-                    "endTime": (scope.endDateRadio == "dateSelected") ? scope.endDate : "",
-                    "uiPassParam": "WEEKLY",
-                    "cronString": ""
-                  }
+                $scope.populateDaysOfWeek = function () {
+                    var daysArray = [];
+                    for (var obj in $scope.data.selectedDays) {
+                        for (var index = 0; index < $scope.data.daysOfWeek.length; index++) {
+                            if ($scope.data.selectedDays[obj] == true && $scope.data.daysOfWeek[index].key == obj) {
+                                daysArray.push(index);
+                            }
+                        }
 
-                });
-              }
-            }
-          });
+
+                    }
+                    return daysArray;
+                };
+            }])
+
+            .directive('weekly', function () {
+                return {
+                    restrict: 'A',
+                    replace: true,
+                    transclude: true,
+                    controller: 'WeeklyRecurrenceController',
+                    templateUrl: templatePath + 'weekly.html',
+                    scope: {
+                        weeklyLabel: '@',
+                        startLabel: '@',
+                        untilLabel: '@',
+                        noEndLabel: '@',
+                        endByLabel: '@',
+                        weeklyRecurrenceInfo: '='
+                    },
+                    link: function (scope, elem, attrs) {
+
+                        if (scope.weeklyRecurrenceInfo) {
+                            console.log("================================defined");
+                        }
+
+                        function onChangeEvent() {
+                            scope.weeklyRecurrenceInfo =
+                            {
+                                "daysOfWeek": scope.populateDaysOfWeek(),
+                                "daysOfMonth": "",
+                                "weeksOfMonth": "",
+                                "monthsOfYear": "",
+                                "years": "",
+                                "startTime": scope.startDate,
+                                "endTime": (scope.endDateRadio == "dateSelected") ? scope.endDate : "",
+                                "uiPassParam": "WEEKLY",
+                                "cronString": ""
+                            }
+                        }
+
+                        scope.$watch('data', onChangeEvent, true);
+                        scope.$watchCollection('[startDate,endDate,endDateRadio]', onChangeEvent, true);
+                    }
+                }
+            });
     });
