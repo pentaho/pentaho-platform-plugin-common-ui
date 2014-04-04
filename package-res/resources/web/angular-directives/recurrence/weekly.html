@@ -2,43 +2,24 @@
     {{weeklyLabel}}: <br>
 
     <div class="form-inline">
-        <label class="checkbox inline">
-            <input type="checkbox" ng-model="monday">
-            {{mon}}
-        </label>
-        <label class="checkbox inline">
-            <input type="checkbox" ng-model="tuesday">
-            {{tue}}
-        </label>
-        <label class="checkbox inline">
-            <input type="checkbox" ng-model="wednesday">
-            {{wed}}
-        </label>
-        <label class="checkbox inline">
-            <input type="checkbox" ng-model="thursday">
-            {{thu}}
-        </label>
-        <label class="checkbox inline">
-            <input type="checkbox" ng-model="friday">
-            {{fri}}
-        </label>
-        <label class="checkbox inline">
-            <input type="checkbox" ng-model="saturday">
-            {{sat}}
-        </label>
-        <label class="checkbox inline">
-            <input type="checkbox" ng-model="sunday">
-            {{sun}}
-        </label>
+
+        <div class="form-inline">
+            <label ng-repeat="day in data.daysOfWeek" class="checkbox inline">
+                <input type="checkbox" ng-model="data.selectedDays[day.key]">
+                {{day.day|date:'EEEE'}}
+            </label>
+        </div>
 
     </div>
     <br/><br/>
     {{startLabel}}: <br/>
-    <div datetime selected-date="startDate" ></div>
+
+    <div datetime selected-date="startDate"></div>
     <br/>
     {{untilLabel}}: <br/>
     <input type="radio" ng-model="endDateRadio" value="none"> {{noEndLabel}}</input><br/>
     <input type="radio" ng-model="endDateRadio" value="dateSelected"> {{endByLabel}}: </input><br/>
-    <div datetime selected-date="endDate" ></div>
+
+    <div datetime selected-date="endDate"></div>
 
 </div>
