@@ -1,7 +1,8 @@
 define([
-  'common-ui/angular'
+  'common-ui/angular',
+  'pentaho/common/DateTextBox'
 ],
-    function (angular) {
+    function (angular, dateTextBox) {
       var templatePath = "";
       if (typeof(CONTEXT_PATH) != "undefined") {
         templatePath = CONTEXT_PATH + 'content/common-ui/resources/web/angular-directives/dateTimePicker/';
