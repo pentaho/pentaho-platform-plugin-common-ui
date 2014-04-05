@@ -1,15 +1,12 @@
 <div>
     {{weeklyLabel}}: <br>
 
-    <div class="form-inline">
-
-        <div class="form-inline">
-            <label ng-repeat="day in data.daysOfWeek" class="checkbox inline">
-                <input type="checkbox" ng-model="data.selectedDays[day.key]">
-                {{day.day|date:'EEEE'}}
-            </label>
-        </div>
-
+    <div class="form-inline row">
+        <label ng-repeat="day in data.daysOfWeek" class="checkbox daysOfWeek">
+            <input type="checkbox" ng-model="data.selectedDays[day.key]">
+            {{day.day|date:'EEEE'}}
+            </input>
+        </label>
     </div>
     <br/><br/>
     {{startLabel}}: <br/>

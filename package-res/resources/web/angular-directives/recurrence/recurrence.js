@@ -22,7 +22,9 @@ define([
                 var fri = $locale.DATETIME_FORMATS.DAY[5];
                 var sat = $locale.DATETIME_FORMATS.DAY[6];
 
+                if(!$scope.weeklyRecurrenceInfo){
                 $scope.weeklyRecurrenceInfo = {};
+                }
 
 
                 $scope.data = {
@@ -75,7 +77,23 @@ define([
                     link: function (scope, elem, attrs) {
 
                         if (scope.weeklyRecurrenceInfo) {
-                            console.log("================================defined");
+
+                            //hydrate days of week checkboxes
+                            if(angular.isArray(scope.weeklyRecurrenceInfo.daysOfWeek)
+                                && scope.weeklyRecurrenceInfo.daysOfWeek.length > 0){
+                              for (var i=0;i<scope.weeklyRecurrenceInfo.daysOfWeek.length;i++){
+                                  //select each day in the array
+                                  scope.data.selectedDays[scope.data.daysOfWeek[scope.weeklyRecurrenceInfo.daysOfWeek[i]].key]=true;
+                              }
+                            }
+                            if(scope.weeklyRecurrenceInfo.startTime){
+                                scope.startDate=scope.weeklyRecurrenceInfo.startTime;
+                            }
+                            if(scope.weeklyRecurrenceInfo.endTime){
+                                scope.endDate=scope.weeklyRecurrenceInfo.endTime;
+                                scope.endDateRadio="dateSelected";
+                            }
+
                         }
 
                         function onChangeEvent() {
@@ -94,7 +112,7 @@ define([
                         }
 
                         scope.$watch('data', onChangeEvent, true);
-                        scope.$watchCollection('[startDate,endDate,endDateRadio]', onChangeEvent, true);
+                        scope.$watchCollection('[startDate,endDate,endDateRadio]', onChangeEvent);
                     }
                 }
             });
