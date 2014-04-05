@@ -103,3 +103,7 @@ treecontrol .treeControlLoading .spin {
   left: 50%;
   position: absolute;
 }
+
+.daysOfWeek {
+  padding-left: 20px !important;
+}
