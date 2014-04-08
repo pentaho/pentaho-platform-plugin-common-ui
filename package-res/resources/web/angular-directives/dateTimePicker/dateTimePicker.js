@@ -15,6 +15,22 @@ define([
 
           .controller('DateTimeController', ['$scope', '$attrs', function ($scope, $attrs) {
 
+            var tmpDate = new Date($scope.selectedDate);
+            if (typeof $scope.dateInited === 'undefined') {
+              var now = new Date();
+              tmpDate.setHours(now.getHours());
+              tmpDate.setMinutes(now.getMinutes());
+              $scope.selectedDate = tmpDate.toJSON();
+              $scope.dateInited = true;
+            }
+            $scope.hour = tmpDate.getHours() % 12;
+            $scope.minute = tmpDate.getMinutes();
+            if (tmpDate.getHours() > 12) {
+              $scope.tod = 'PM'
+            } else {
+              $scope.tod = 'AM'
+            }
+            $scope.hidetime = false;
           }])
 
           .directive('datetime', ['$timeout', function ($timeout) {
