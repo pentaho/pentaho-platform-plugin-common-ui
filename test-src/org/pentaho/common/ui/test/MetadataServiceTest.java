@@ -134,7 +134,7 @@ public class MetadataServiceTest {
     return domain;
   }
 
-  @Test
+  @Ignore
   public void testCondition2() throws KettleException {
 
     StandaloneSession session = new StandaloneSession();
@@ -566,7 +566,7 @@ public class MetadataServiceTest {
 
   }
 
-  @Test
+  @Ignore
   public void testJsonQuery() throws KettleException {
 
     StandaloneSession session = new StandaloneSession();
@@ -725,7 +725,7 @@ public class MetadataServiceTest {
     assertTrue( "wrong value", json.indexOf( "Classic Cars" ) != -1 );
   }
 
-  @Test
+  @Ignore
   public void testJsonQueryToJson1() throws KettleException {
 
     StandaloneSession session = new StandaloneSession();
@@ -785,7 +785,7 @@ public class MetadataServiceTest {
 
   }
 
-  @Test
+  @Ignore
   public void testXmlQueryToCdaJson1() throws KettleException {
 
     StandaloneSession session = new StandaloneSession();
@@ -949,7 +949,7 @@ public class MetadataServiceTest {
     assertNull( "model should be null", model );
   }
 
-  @Test
+  @Ignore
   public void testGetModelJson() {
     StandaloneSession session = new StandaloneSession();
     PentahoSessionHolder.setSession( session );
