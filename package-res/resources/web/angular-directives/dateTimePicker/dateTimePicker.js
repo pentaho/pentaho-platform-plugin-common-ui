@@ -26,7 +26,9 @@ define([
               templateUrl: templatePath + 'dateTimePicker.html',
               scope: {
                 selectedDate: '=',
-                isDisabled: '='
+                isDisabled: '=',
+                minDate: '=',
+                maxDate: '='
               },
               link: function (scope, elem, attrs) {
                 scope.$watch('hour', function(newValue, oldValue) {
@@ -57,7 +59,7 @@ define([
                   scope.selectedDate = tempDate.toJSON();
                 });
 
-                var toggleDisabled = function(initialValue) {
+                var toggleDisabled = function() {
                   var node = angular.element(elem);
                   var isDojoWidgetReady = node.find("input[type='text']").length > 0;
                   if(angular.isDefined(scope.isDisabled) && isDojoWidgetReady) {
@@ -71,11 +73,12 @@ define([
                     node.find(".pentaho-dropdownbutton-inner").removeClass("disabled");
                   }
                     // enable/disable the dijit widget itself
-                  try {
+                  if(node.find(".pentaho-listbox")[0]) {
                     var listBoxWidget = registry.byNode(node.find(".pentaho-listbox")[0]);
                     listBoxWidget.disabled = scope.isDisabled;
-                  } catch( err ) {
-                    // dojo isn't available, let this go
+                    if(!scope.isDisabled) {
+                      listBoxWidget.validate();
+                    }
                   }
 
                     // enable/disable the time-related elements
@@ -92,6 +95,19 @@ define([
                 };
 
                 scope.$watch('isDisabled', toggleDisabled);
+                scope.$watchCollection('[minDate, maxDate]', function() {
+                  // set the dojo constraints
+                  if(angular.element(elem).find(".pentaho-listbox")[0]) {
+                    var listBoxWidget = registry.byNode(angular.element(elem).find(".pentaho-listbox")[0]);
+                    if(scope.minDate) {
+                      listBoxWidget.constraints.min = scope.minDate;
+                    }
+                    if(scope.maxDate) {
+                      listBoxWidget.constraints.max = scope.maxDate;
+                    }
+                    listBoxWidget.validate();
+                  }
+                });
 
                 // need to initialize the disabled state AFTER the link function is complete
                 // using a timeout with a 0 delay accomplishaes that

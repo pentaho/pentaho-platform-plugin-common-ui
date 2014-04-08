@@ -42,6 +42,7 @@ define([
                 }
 
                 $scope.startDate = new Date();
+                $scope.minStartDate = new Date();
                 $scope.endDateRadio = 'none';
 
 
