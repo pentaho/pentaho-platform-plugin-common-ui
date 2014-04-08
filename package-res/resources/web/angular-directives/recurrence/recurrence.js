@@ -37,10 +37,12 @@ define([
                         {day: fri, key: "FRI"},
                         {day: sat, key: "SAT"}
                     ],
-                    selectedDays: { }
+                    selectedDays: { },
+                    endDateDisabled: true
                 }
 
                 $scope.startDate = new Date();
+                $scope.minStartDate = new Date();
                 $scope.endDateRadio = 'none';
 
 
@@ -108,7 +110,22 @@ define([
                                 "endTime": (scope.endDateRadio == "dateSelected") ? scope.endDate : "",
                                 "uiPassParam": "WEEKLY",
                                 "cronString": ""
-                            }
+                            };
+                            scope.data.endDateDisabled = scope.endDateRadio !== "dateSelected";
+
+                            // enable/disable the end date date picker
+                            // angular.element("#weeklyScheduleEndDate input[type='text']").attr("disabled", scope.endDateRadio !== "dateSelected");
+                            // if(scope.endDateRadio !== "dateSelected") {
+                            //   angular.element("#weeklyScheduleEndDate .pentaho-dropdownbutton-inner").addClass("disabled");
+                            // } else {
+                            //   angular.element("#weeklyScheduleEndDate .pentaho-dropdownbutton-inner").removeClass("disabled");
+                            // }
+                            // try {
+                            //   listBoxWidget = registry.byNode(angular.element("#weeklyScheduleEndDate .pentaho-listbox")[0]);
+                            //   listBoxWidget.disabled = scope.endDateRadio !== "dateSelected";
+                            // } catch( err ) {
+                            //   // dojo isn't available, let this
+                            // }
                         }
 
                         scope.$watch('data', onChangeEvent, true);

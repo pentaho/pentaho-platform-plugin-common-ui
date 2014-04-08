@@ -107,3 +107,30 @@ treecontrol .treeControlLoading .spin {
 .daysOfWeek {
   padding-left: 20px !important;
 }
+
+.bootstrap .angular-dojo.dateTimePicker input[type="text"] {
+  margin: 0px;
+  border: 1px solid #CCCCCC !important;
+  background-color: #FFFFFF !important;
+}
+
+.bootstrap .angular-dojo.dateTimePicker input.dijitValidationIcon {
+  margin: 0px 0px 0px 2px;
+  border: none !important;
+  background-color: transparent; !important;
+  box-shadow: none;
+  --webkit-box-shadow: none;
+  transition: none;
+  --webkit-transition: none;
+}
+
+.bootstrap .angular-dojo.dateTimePicker .pentaho-listbox {
+  border: none;
+  background-color: transparent;
+  background-image: none;
+  display: inline-block;
+}
+
+.bootstrap .angular-dojo.dateTimePicker .dijitInputContainer {
+  padding-right: 2px;
+}
