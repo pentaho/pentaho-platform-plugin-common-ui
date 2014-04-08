@@ -59,7 +59,8 @@ define([
         'ngChange': '&',
         'dojoStore': '&',
         'dojoProps': '@',
-        'dojoDisplayValue': '=?'
+        'dojoDisplayValue': '=?',
+        'dojoConstraints': '@'
       },
       link: function (scope, element, attrs, model) {
         require(["dojo/ready", attrs.dojoWidget, "dojo/on"], function (ready, DojoWidget, on) {
@@ -69,6 +70,11 @@ define([
 
             attrs.$observe('dojoProps', function (dojoProps) {
               scope.widget.set(parseProps(dojoProps, scope));
+            });
+
+            attrs.$observe('dojoConstraints', function (dojoConstraints) {
+              var constraints = parseProps(dojoConstraints, scope);
+              scope.widget.set({ "constraints": constraints });
             });
 
             attrs.$observe('dojoStore', function () {
