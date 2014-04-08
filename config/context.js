@@ -1,3 +1,4 @@
+
 /*
  * This program is free software; you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License, version 2.1 as published by the Free Software
@@ -12,35 +13,11 @@
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU Lesser General Public License for more details.
  *
- * Copyright 2014 Pentaho Corporation.  All rights reserved.
+ * Copyright 2014 Pentaho Corporation. All rights reserved.
  */
 
-define( [], function() {
-
-  function _preFetchTemplate(path, templateCache) {
-    var req = new XMLHttpRequest();
-    var tpl = "";
-    req.onload = function() {
-      tpl = this.responseText;
-    };
-    req.open("get", path, false);
-    req.send();
-    if(tpl) {
-      templateCache.put(path, tpl);
-      return tpl;
-    } else {
-      return null;
-    }
-  };
-
-  return {
-
-    addTemplate: function(path, httpBackend, templateCache) {
-      var url = require.toUrl(path);
-      var tpl = _preFetchTemplate(url, templateCache);
-      httpBackend.when('GET', url).respond(tpl);
-    }
-
-  }
-
-});
+requireCfg = {
+    paths: {},
+    shim: {}
+};
+var KARMA_RUN = true;

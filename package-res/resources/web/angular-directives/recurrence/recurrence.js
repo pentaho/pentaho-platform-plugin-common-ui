@@ -2,12 +2,7 @@ define([
         'common-ui/angular'
     ],
     function (angular) {
-        var templatePath = "";
-        if (typeof(CONTEXT_PATH) != "undefined") {
-            templatePath = CONTEXT_PATH + 'content/common-ui/resources/web/angular-directives/recurrence/';
-        } else {
-            templatePath = 'angular-directives/recurrence/';
-        }
+        var templatePath = require.toUrl('common-ui/angular-directives/recurrence')+"/";
 
         angular.module('recurrence', [])
 

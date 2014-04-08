@@ -28,12 +28,9 @@ define([
   'common-ui/angular'
 ],
     function (angular) {
-      var templatePath = "";
-      if( typeof(CONTEXT_PATH) != "undefined" ) {
-        templatePath = CONTEXT_PATH + 'content/common-ui/resources/web/angular-directives/accordionWizard/';
-      } else {
-        templatePath = 'angular-directives/accordionWizard/';
-      }
+      var templatePath = require.toUrl('common-ui/angular-directives/accordionWizard')+"/";
+      console.log(templatePath);
+
       angular.module('accordionWizard', ['ui.bootstrap.collapse'])
 
           .constant('accordionConfig', {

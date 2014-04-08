@@ -4,12 +4,7 @@ define([
   'dijit/registry'
 ],
     function (angular, dateTextBox, registry) {
-      var templatePath = "";
-      if (typeof(CONTEXT_PATH) != "undefined") {
-        templatePath = CONTEXT_PATH + 'content/common-ui/resources/web/angular-directives/dateTimePicker/';
-      } else {
-        templatePath = 'angular-directives/dateTimePicker/';
-      }
+      var templatePath = require.toUrl('common-ui/angular-directives/dateTimePicker')+"/";
 
       angular.module('dateTimePicker', [])
 

@@ -25,8 +25,8 @@ define(deps, function(angular, templateUtil) {
       httpBackend = $httpBackend;
       templateCache = $templateCache;
 
-      templateUtil.addTemplate("angular-directives/accordionWizard/accordionWizard.html", httpBackend, templateCache);
-      templateUtil.addTemplate("angular-directives/accordionWizard/accordionWizardGroup.html", httpBackend, templateCache);
+      templateUtil.addTemplate("common-ui/angular-directives/accordionWizard/accordionWizard.html", httpBackend, templateCache);
+      templateUtil.addTemplate("common-ui/angular-directives/accordionWizard/accordionWizardGroup.html", httpBackend, templateCache);
 
     }));
 

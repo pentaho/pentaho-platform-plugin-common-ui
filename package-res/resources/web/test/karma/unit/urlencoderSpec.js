@@ -12,23 +12,24 @@
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU Lesser General Public License for more details.
  *
- * Copyright 2014 Pentaho Corporation.  All rights reserved.
+ * Copyright 2014 Pentaho Corporation. All rights reserved.
  */
 
-// Find and inject tests using require
-var tests = Object.keys(window.__karma__.files).filter(function (file) {
-    return (/Spec\.js$/).test(file);
-});
 
-requireCfg['deps'] = tests;
+define(["common-ui/util/URLEncoder"], function(Encoder) {
 
-requireCfg['baseUrl'] = 'base/'
+  describe("URL Encoder", function() {
 
-requireCfg['paths']['angular-mocks'] = "angular/angular-mocks";
-requireCfg['paths']['angular-scenario'] = "angular/angular-scenario";
+    beforeEach(function(){
 
-requireCfg['shim']['angular-mocks'] = { deps: ['common-ui/angular-resource'] };
-requireCfg['callback'] = function() {
-  window.__karma__.start();
-};
-requirejs.config(requireCfg);
+    });
+
+    it("should handle non-reserved strings", function() {
+     expect(Encoder.encode("http://www.foo.com/{0}/{1}/", ["bang", "baz"])).toBe("http://www.foo.com/bang/baz/");
+
+    });
+    it("should handle reserved URI strings", function() {
+      expect(Encoder.encode("http://www.foo.com/{0}/{1}/", ["&/\\", "?:"])).toBe("http://www.foo.com/%26%252F%255C/%3F%3A/");
+    });
+  })
+})
