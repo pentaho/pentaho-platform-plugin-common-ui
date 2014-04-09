@@ -30,7 +30,6 @@ define([
             } else {
               $scope.tod = 'AM'
             }
-            $scope.hidetime = false;
           }])
 
           .directive('datetime', ['$timeout', function ($timeout) {
@@ -44,7 +43,8 @@ define([
                 selectedDate: '=',
                 isDisabled: '=',
                 minDate: '=',
-                maxDate: '='
+                maxDate: '=',
+                hideTime: '@'
               },
               link: function (scope, elem, attrs) {
                 scope.$watch('hour', function(newValue, oldValue) {
