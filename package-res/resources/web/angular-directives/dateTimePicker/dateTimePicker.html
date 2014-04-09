@@ -3,9 +3,8 @@
     ng-model="selectedDate"
     dojo-constraints="datePattern:'yyyy-MM-dd'"
     dojo-props="message:'';rangeMessage:''" />
-  <span  ng-hide="hideTime" >
-	<input type="number" min="1" max="12" ng-model="hour" class="input-small"/>
-	<input type="number" min="0" max="59" ng-model="minute" class="input-small"/>
-	<select ng-model="tod" ng-options="currOption for currOption in ['AM', 'PM']" class="input-small"/>
-  </span>
-</div>
+  <span ng-hide="hideTime" >
+ 	<select class="input-small" ng-model="hour" ng-options="currOption for currOption in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]"/>
+	<select class="input-small" ng-model="minute" ng-options="currOption for currOption in [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59]"/>
+	<select class="input-small" ng-model="tod" ng-options="currOption for currOption in ['AM', 'PM']"/>
+  </span></div>
