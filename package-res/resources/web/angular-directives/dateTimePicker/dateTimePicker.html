@@ -3,7 +3,7 @@
     ng-model="selectedDate"
     dojo-constraints="datePattern:'yyyy-MM-dd'"
     dojo-props="message:'';rangeMessage:''" />
-  <span  ng-hide="hidetime" >
+  <span  ng-hide="hideTime" >
 	<input type="number" min="1" max="12" ng-model="hour" class="input-small"/>
 	<input type="number" min="0" max="59" ng-model="minute" class="input-small"/>
 	<select ng-model="tod" ng-options="currOption for currOption in ['AM', 'PM']" class="input-small"/>
