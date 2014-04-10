@@ -110,13 +110,14 @@ define([
                         untilLabel: '@',
                         noEndLabel: '@',
                         endByLabel: '@',
-                        weeklyRecurrenceInfo: '=',
-                        valid: '='
+                        weeklyRecurrenceInfo: '='
                     },
                     link: function (scope, elem, attrs) {
 
                         function rehydrate() {
                             if (scope.weeklyRecurrenceInfo) {
+
+                                 scope.data.selectedDays={};
 
                                 //hydrate days of week checkboxes
                                 if (angular.isArray(scope.weeklyRecurrenceInfo.daysOfWeek)
@@ -127,21 +128,23 @@ define([
                                     }
                                 }
                                 if (scope.weeklyRecurrenceInfo.startTime) {
+                                  if(angular.isDate(scope.weeklyRecurrenceInfo.startTime)) {
                                     scope.startDate = scope.weeklyRecurrenceInfo.startTime;
+                                  } else {
+                                    scope.startDate = new Date(scope.weeklyRecurrenceInfo.startTime);
+                                  }
+
                                 }
                                 if (scope.weeklyRecurrenceInfo.endTime) {
+                                  if(angular.isDate(scope.weeklyRecurrenceInfo.endTime)) {
                                     scope.endDate = scope.weeklyRecurrenceInfo.endTime;
-                                    scope.endDateRadio = "dateSelected";
+                                  } else {
+                                    scope.endDate = new Date(scope.weeklyRecurrenceInfo.endTime);
+                                  }
+
+                                  scope.endDateRadio = "dateSelected";
                                 }
                             }
-                            if(scope.weeklyRecurrenceInfo.startTime){
-                                scope.startDate=scope.weeklyRecurrenceInfo.startTime;
-                            }
-                            if(scope.weeklyRecurrenceInfo.endTime){
-                                scope.endDate=scope.weeklyRecurrenceInfo.endTime;
-                                scope.endDateRadio="dateSelected";
-                            }
-
                         }
 
                         function onChangeEvent() {
@@ -159,7 +162,13 @@ define([
                             };
                             scope.data.endDateDisabled = scope.endDateRadio !== "dateSelected";
                             // be sure to set a min start date of today
-                            scope.minStartDate = new Date();
+                            var today = new Date();
+                            if(angular.isDate(scope.startDate)) {
+                              scope.minStartDate = today < scope.startDate ? today : scope.startDate;
+                            } else {
+                              scope.minStartDate = today;
+                            }
+
                         }
 
                         scope.$watch('data', onChangeEvent, true);
