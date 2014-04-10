@@ -2,7 +2,7 @@ define([
         'common-ui/angular'
     ],
     function (angular) {
-        var templatePath = require.toUrl('common-ui/angular-directives/recurrence')+"/";
+        var templatePath = require.toUrl('common-ui/angular-directives/recurrence') + "/";
 
         angular.module('recurrence', [])
 
@@ -17,8 +17,8 @@ define([
                 var fri = $locale.DATETIME_FORMATS.DAY[5];
                 var sat = $locale.DATETIME_FORMATS.DAY[6];
 
-                if(!$scope.weeklyRecurrenceInfo){
-                $scope.weeklyRecurrenceInfo = {};
+                if (!$scope.weeklyRecurrenceInfo) {
+                    $scope.weeklyRecurrenceInfo = {};
                 }
 
 
@@ -122,15 +122,24 @@ define([
                     },
                     link: function (scope, elem, attrs) {
 
-                        if (scope.weeklyRecurrenceInfo) {
+                        function rehydrate() {
+                            if (scope.weeklyRecurrenceInfo) {
 
-                            //hydrate days of week checkboxes
-                            if(angular.isArray(scope.weeklyRecurrenceInfo.daysOfWeek)
-                                && scope.weeklyRecurrenceInfo.daysOfWeek.length > 0){
-                              for (var i=0;i<scope.weeklyRecurrenceInfo.daysOfWeek.length;i++){
-                                  //select each day in the array
-                                  scope.data.selectedDays[scope.data.daysOfWeek[scope.weeklyRecurrenceInfo.daysOfWeek[i]].key]=true;
-                              }
+                                //hydrate days of week checkboxes
+                                if (angular.isArray(scope.weeklyRecurrenceInfo.daysOfWeek)
+                                    && scope.weeklyRecurrenceInfo.daysOfWeek.length > 0) {
+                                    for (var i = 0; i < scope.weeklyRecurrenceInfo.daysOfWeek.length; i++) {
+                                        //select each day in the array
+                                        scope.data.selectedDays[scope.data.daysOfWeek[scope.weeklyRecurrenceInfo.daysOfWeek[i]].key] = true;
+                                    }
+                                }
+                                if (scope.weeklyRecurrenceInfo.startTime) {
+                                    scope.startDate = scope.weeklyRecurrenceInfo.startTime;
+                                }
+                                if (scope.weeklyRecurrenceInfo.endTime) {
+                                    scope.endDate = scope.weeklyRecurrenceInfo.endTime;
+                                    scope.endDateRadio = "dateSelected";
+                                }
                             }
                             if(scope.weeklyRecurrenceInfo.startTime){
                                 scope.startDate=scope.weeklyRecurrenceInfo.startTime;
@@ -151,7 +160,7 @@ define([
                                 "monthsOfYear": "",
                                 "years": "",
                                 "startTime": scope.startDate,
-                                "endTime": (scope.endDateRadio == "dateSelected") ? scope.endDate : "",
+                                "endTime": (scope.endDateRadio == "dateSelected") ? scope.endDate : undefined,
                                 "uiPassParam": "WEEKLY",
                                 "cronString": ""
                             };
@@ -161,7 +170,11 @@ define([
                         }
 
                         scope.$watch('data', onChangeEvent, true);
+                        scope.$watch('weeklyRecurrenceInfo', rehydrate, true);
                         scope.$watchCollection('[startDate,endDate,endDateRadio]', onChangeEvent);
+
+                        //initial rehydrate from server
+                        rehydrate();
                     }
                 };
             });
