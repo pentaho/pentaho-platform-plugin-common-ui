@@ -2,12 +2,7 @@ define([
         'common-ui/angular'
     ],
     function (angular) {
-        var templatePath = "";
-        if (typeof(CONTEXT_PATH) != "undefined") {
-            templatePath = CONTEXT_PATH + 'content/common-ui/resources/web/angular-directives/recurrence/';
-        } else {
-            templatePath = 'angular-directives/recurrence/';
-        }
+        var templatePath = require.toUrl('common-ui/angular-directives/recurrence')+"/";
 
         angular.module('recurrence', [])
 
@@ -59,6 +54,54 @@ define([
                     }
                     return daysArray;
                 };
+
+                $scope.dayOfWeekIsValid = function() {
+                  return $scope.data.selectedDays.SUN ||
+                         $scope.data.selectedDays.MON ||
+                         $scope.data.selectedDays.TUES ||
+                         $scope.data.selectedDays.WED ||
+                         $scope.data.selectedDays.THURS ||
+                         $scope.data.selectedDays.FRI ||
+                         $scope.data.selectedDays.SAT;
+                };
+                $scope.hasValidDates = function() {
+                  var isValid = false;
+                  if(angular.isDate($scope.startDate)) {
+                    isValid = true;
+                    if(!$scope.data.endDateDisabled) {
+                      if(angular.isDate($scope.endDate)) {
+                        isValid = $scope.startDate < $scope.endDate;
+                      } else {
+                        isValid = $scope.startDate < new Date($scope.endDate);
+                      }
+                    }
+                  }
+                  return isValid;
+                };
+
+                $scope.isValid = function() {
+                  var formname = "weeklyScheduleForm",
+                      el = angular.element("form[name='" + formname + "']"),
+                      daysOfWeek_valid = false,
+                      dateTime_valid = false;
+                  if(el && el.scope && el.scope() && el.scope()[formname]) {
+                    // make sure that at least one day checkbox is selected
+                    daysOfWeek_valid = el.scope()[formname].$valid;
+                    // make sure we have a start date & time
+                    dateTime_valid = $scope.hasValidDates();
+
+                    return daysOfWeek_valid && dateTime_valid;
+                  } else {
+                    return false;
+                  }
+                };
+
+                // listen for the isValidRequest broadcast, respond appropriately
+                $scope.$on('scheduleSelector:isValidRequest', function() {
+                  var isValid = $scope.isValid();
+                  $scope.$emit('scheduleSelector:isValidResponse', isValid);
+                });
+
             }])
 
             .directive('weekly', function () {
@@ -74,7 +117,8 @@ define([
                         untilLabel: '@',
                         noEndLabel: '@',
                         endByLabel: '@',
-                        weeklyRecurrenceInfo: '='
+                        weeklyRecurrenceInfo: '=',
+                        valid: '='
                     },
                     link: function (scope, elem, attrs) {
 
@@ -112,25 +156,13 @@ define([
                                 "cronString": ""
                             };
                             scope.data.endDateDisabled = scope.endDateRadio !== "dateSelected";
-
-                            // enable/disable the end date date picker
-                            // angular.element("#weeklyScheduleEndDate input[type='text']").attr("disabled", scope.endDateRadio !== "dateSelected");
-                            // if(scope.endDateRadio !== "dateSelected") {
-                            //   angular.element("#weeklyScheduleEndDate .pentaho-dropdownbutton-inner").addClass("disabled");
-                            // } else {
-                            //   angular.element("#weeklyScheduleEndDate .pentaho-dropdownbutton-inner").removeClass("disabled");
-                            // }
-                            // try {
-                            //   listBoxWidget = registry.byNode(angular.element("#weeklyScheduleEndDate .pentaho-listbox")[0]);
-                            //   listBoxWidget.disabled = scope.endDateRadio !== "dateSelected";
-                            // } catch( err ) {
-                            //   // dojo isn't available, let this
-                            // }
+                            // be sure to set a min start date of today
+                            scope.minStartDate = new Date();
                         }
 
                         scope.$watch('data', onChangeEvent, true);
                         scope.$watchCollection('[startDate,endDate,endDateRadio]', onChangeEvent);
                     }
-                }
+                };
             });
     });

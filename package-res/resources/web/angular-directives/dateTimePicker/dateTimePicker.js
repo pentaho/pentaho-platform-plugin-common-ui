@@ -4,31 +4,31 @@ define([
   'dijit/registry'
 ],
     function (angular, dateTextBox, registry) {
-      var templatePath = "";
-      if (typeof(CONTEXT_PATH) != "undefined") {
-        templatePath = CONTEXT_PATH + 'content/common-ui/resources/web/angular-directives/dateTimePicker/';
-      } else {
-        templatePath = 'angular-directives/dateTimePicker/';
-      }
+      var templatePath = require.toUrl('common-ui/angular-directives/dateTimePicker')+"/";
 
       angular.module('dateTimePicker', [])
 
           .controller('DateTimeController', ['$scope', '$attrs', function ($scope, $attrs) {
-
-            var tmpDate = new Date($scope.selectedDate);
-            if (typeof $scope.dateInited === 'undefined') {
-              var now = new Date();
-              tmpDate.setHours(now.getHours());
-              tmpDate.setMinutes(now.getMinutes());
-              $scope.selectedDate = tmpDate.toJSON();
-              $scope.dateInited = true;
+            var formattedValues = function(first, last, step) {
+              var values = new Array();
+              for (var i=0; i<=(last-first)/step; i++) {
+                values[i] = new Object();
+                values[i].id = (i*step)+first;
+                values[i].title = (i*step)+first < 10 ? '0' + ((i*step)+first) : (i*step)+first;
+              }
+              return values;
             }
-            $scope.hour = tmpDate.getHours() % 12;
-            $scope.minute = tmpDate.getMinutes();
-            if (tmpDate.getHours() > 12) {
-              $scope.tod = 'PM'
-            } else {
-              $scope.tod = 'AM'
+            $scope.minutevalues = formattedValues(0, 59, $scope.minutesIncrement);
+            $scope.hourvalues = formattedValues(1, 12, 1);
+
+            if ($scope.selectedDate) {
+              $scope.hour = $scope.selectedDate.getHours() % 12;
+              $scope.minute = $scope.selectedDate.getMinutes() - ($scope.selectedDate.getMinutes() % $scope.minutesIncrement);
+              if ($scope.selectedDate.getHours() > 12) {
+                $scope.tod = 'PM'
+              } else {
+                $scope.tod = 'AM'
+              }
             }
           }])
 
@@ -44,7 +44,8 @@ define([
                 isDisabled: '=',
                 minDate: '=',
                 maxDate: '=',
-                hideTime: '@'
+                hideTime: '@',
+				minutesIncrement: '@'
               },
               link: function (scope, elem, attrs) {
                 scope.$watch('hour', function(newValue, oldValue) {
@@ -128,7 +129,9 @@ define([
                 // need to initialize the disabled state AFTER the link function is complete
                 // using a timeout with a 0 delay accomplishaes that
                 $timeout(function() {
-                  initializeDisabled();
+                  $timeout(function() {
+                    initializeDisabled();
+                  }, 0);
                 }, 0);
 
               }

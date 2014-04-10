@@ -1,23 +1,20 @@
 module.exports = function (config) {
   config.set({
-    basePath: '../package-res/resources/web',
+    basePath: '../',
 
     frameworks: ['jasmine', 'requirejs'],
 
     files: [
-      {pattern: 'angular/**/*.js', included: false},
-      {pattern: 'bootstrap/**/*.js', included: false},
-      {pattern: 'plugin-handler/**/*.js', included: false},
-      {pattern: 'angular-directives/**/*.js', included: false},
-      {pattern: 'jquery/**/*.js', included: false},
-      {pattern: 'ring/**/*.js', included: false},
-      {pattern: 'underscore/**/*.js', included: false},
-      {pattern: 'test/karma/unit/**/*.js', included: false},
-      {pattern: 'util/**/*.js', included: false},
-      '../../../config/initEnv.js',
-      '../../../build-res/requireCfg-raw.js',
-      '../../../config/karma-require-js-cfg.js',
-      {pattern: 'angular-directives/**/*.html', included: false}
+      {pattern: 'build-res/module-scripts/**/*.js', included: false},
+      {pattern: 'build-res/module-scripts/**/*.html', included: false},
+      {pattern: 'package-res/resources/web/**/*.js', included: false},
+      {pattern: 'package-res/resources/web/**/*.html', included: false},
+      {pattern: 'dev-res/dojo/dojo-release-1.9.2-src/**/*.js', included: false},
+      {pattern: 'dev-res/dojo/dojo-release-1.9.2-src/**/*.html', included: false},
+      'config/context.js',
+      'config/initEnv.js',
+      'build-res/requireCfg-raw.js',
+      'config/require-config.js'
     ],
 
     // auto run tests when files change
@@ -42,6 +39,7 @@ module.exports = function (config) {
       'angular-directives/**/*.js': ['coverage']
     },
 
+    // optionally, configure the reporter
     coverageReporter: {
       reporters: [
         {
