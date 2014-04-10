@@ -1664,21 +1664,28 @@ function(def, pvc, pv){
             this._dataTable = dataTable;
 
             /* TEST
-            if(!vizOptions.memberPalette){
-                vizOptions.memberPalette = {
-                    "[Markets].[Territory]": {
-                        "[Markets].[APAC]":   "red",
-                        "[Markets].[EMEA]":   "green",
-                        "[Markets].[Japan]":  "blue",
-                        "[Markets].[NA]":     "pink"
-                    },
+            vizOptions.memberPalette = {
+                "[Markets].[Territory]": {
+                    "[Markets].[APAC]":   "rgb(150, 0, 0)",
+                    "[Markets].[EMEA]":   "rgb(0, 150, 0)",
+                    "[Markets].[Japan]":  "rgb(0, 0, 150)",
+                    "[Markets].[NA]":     "pink"
+                },
 
-                    "[Measures].[MeasuresLevel]": {
-                        "[MEASURE:0]": "violet",
-                        "[MEASURE:1]": "orange"
-                    }
-                };
-            }
+                "[Order Status].[Type]": {
+                    "[Order Status].[Cancelled]":  "turquoise",
+                    "[Order Status].[Disputed]":   "tomato",
+                    //"[Order Status].[In Process]": "steelblue",
+                    "[Order Status].[Shipped]":    "seagreen"
+                    //"[Order Status].[On Hold]":    "",
+                    //"[Order Status].[Resolved]":   ""
+                },
+
+                "[Measures].[MeasuresLevel]": {
+                    "[MEASURE:0]": "violet",
+                    "[MEASURE:1]": "orange"
+                }
+            };
             */
 
             // ---------------
@@ -2348,15 +2355,15 @@ function(def, pvc, pv){
                     M = this.axes.measure.genericMeasuresCount;
                 }
 
-                var keyIncludesDiscrim = (M > 1);
                 if(C > 0 || M > 0){
+                    // var keyIncludesDiscrim = (M > 1);
+                    // var useMeasureGems = (C === 0) || (M > 1);
+
                     var isSunburst = this._cccClass === "pvc.SunburstChart";
                     var colorMap;
-                    var lastIndex;
-                    // var useMeasureGems = !C || keyIncludesDiscrim;
                     if(M <= 1){
                         if(C > 0){
-                            // Use colors
+                            // Use color gems
                             if (isSunburst) {
                                 for (var i in colorGems) {
                                     var map = memberPalette[colorGems[i].formula];
@@ -2381,64 +2388,75 @@ function(def, pvc, pv){
                             }
                         } else {
                             // Use measures (M === 1)
+                            
+                            /*
+                             * "[Measures].[MeasuresLevel]": {
+                             *    "[MEASURE:0]": "violet",
+                             *    "[MEASURE:1]": "orange"
+                             * }
+                             */
+
                             colorMap = memberPalette['[Measures].[MeasuresLevel]'];
                             var c = colorMap && colorMap[this.axes.measure.gems[0].id];
-                            return c ? pv.colors([colorFromAnalyzer(c)]) : null;
+                            return c ? pv.colors([c]) : null;
                         }
                     } else {
-                        // Use measures
-                        // keyIncludesDiscrim ; assume discrim is always placed at the end
-                        lastIndex = 0;
+                        // Use measures (M > 1)
+                        // When C > 0, assumes the measure discriminator is always placed at the end:
+                        //   "[Markets].[APAC]~[MEASURE:0]"
                         colorMap  = memberPalette['[Measures].[MeasuresLevel]'];
                     }
 
                     // Is there a color map for the chosen hierarchy?
                     if(colorMap){
-                        colorMap = def.query(def.ownKeys(colorMap))
-                                      .object({
-                                        value: function(k) {
-                                            return colorFromAnalyzer(colorMap[k]);
-                                        }
-                                      });
+                        // Convert colorMap colors to pv.color.
+                        for(var p in colorMap) {
+                            if(colorMap.hasOwnProperty(p)) {
+                                colorMap[p] = pv.color(colorMap[p]);
+                            }
+                        }
 
                         var defaultScale = pv.colors(this._getDefaultDiscreteColorScale());
-                        return function(){
-                            var scale = function(compKey){
+
+                        var scaleFactory;
+                        if(!isSunburst) {
+                            scaleFactory = function() {
+                                return function(compKey) {
                                 if(compKey){
-                                    var comps = compKey.split(/\s*,\s*/);
-                                    var key   = comps[comps.length - 1];
-                                    var keyArr = key.split("~");
-
-                                    var color = colorMap[key];
-
-                                    if (isSunburst && !color) {
-                                        // Sunburst Level 1 Key - [Department].[VAL]
-                                        // Sunburst Level 2 Key - [Department].[VAL]~[Region].[USA]
-                                        // colorMap= {
-                                        //  "[Region].[USA]" : "#FF00FF"
-                                        //  "[Department].[USA]" : "#AAFF00"
-                                        // }
-
-                                        // Use last index key instead of whole key to look up color
-                                        color = colorMap[keyArr[keyArr.length - 1]];
+                                        var keys = compKey.split("~");
+                                        var key  = keys[keys.length - 1];
+                                        return colorMap[key] || defaultScale(key);
                                     }
-
-                                    // Still no color in ColorMap
-                                    if (!color) {
-
-                                        // Only assign colors for the innermost ring if it is a sunburst
-                                        color = defaultScale(isSunburst ? keyArr[0] : key);
-                                    } else {
-                                        color = new pv.FillStyle.Solid(color);
-                                        color.isFixedColor = true;    
-                                    }                                        
-
-                                    return color;
-                                }
+                                };
                             };
+                        } else {
+                            // Sunburst Level 1 Wedge Key: "[Department].[VAL]"
+                            // Sunburst Level 2 Wedge Key: "[Department].[VAL]~[Region].[USA]"
+                            // colorMap= {
+                            //  "[Region].[USA]" : "#FF00FF"
+                            //  "[Department].[USA]" : "#AAFF00"
+                            // }
+                            scaleFactory = function() {
+                                return function(compKey) {
+                                    if(compKey) {
+                                        var keys     = compKey.split("~"),
+                                            level    = keys.length - 1,
+                                            keyLevel = keys[level];
+                                        
+                                        // Obtain color for most specific key from color map.
+                                        // If color map has no color and it is the 1st level,
+                                        //  then reserve a color from the default color scale.
+                                        // Otherwise, return undefined, 
+                                        //  meaning that a derived color should be used.
+                                        return colorMap[keyLevel] ||
+                                            (level ? undefined : defaultScale(keyLevel));
+                                    }
+                                };
+                            };
+                        }
 
-                            def.copy(scale, defaultScale);
-                            return scale;
+                        return function() {
+                            return def.copy(scaleFactory(), defaultScale);
                         };
                     }
                 }
@@ -4370,20 +4388,6 @@ function(def, pvc, pv){
 
     function readFontFamily(vizOptions, prefix){
         return vizOptions[prefix + "FontFamily"];
-    }
-
-    // FIX Analyzer's colors
-    function colorFromAnalyzer(color){
-        var L = color.length;
-        if(L > 4 && L < 7 && color.charAt(0) === '#'){
-            color = color.substr(1);
-            if(L === 6){
-                color = "#0" + color;
-            } else { //if(L === 5){
-                color = "#00" + color;
-            }
-        }
-        return pv.color(color);
     }
 
     // @private
