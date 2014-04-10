@@ -95,13 +95,6 @@ define([
                     return false;
                   }
                 };
-
-                // listen for the isValidRequest broadcast, respond appropriately
-                $scope.$on('scheduleSelector:isValidRequest', function() {
-                  var isValid = $scope.isValid();
-                  $scope.$emit('scheduleSelector:isValidResponse', isValid);
-                });
-
             }])
 
             .directive('weekly', function () {
@@ -175,6 +168,17 @@ define([
 
                         //initial rehydrate from server
                         rehydrate();
+
+                      // listen for the isValidRequest broadcast, respond appropriately
+                      var unregister = scope.$on('scheduleSelector:isValidRequest', function() {
+                        var isValid = scope.isValid();
+                        scope.$emit('scheduleSelector:isValidResponse', isValid);
+                      });
+
+                      // clean up
+                      elem.on('$destroy', function() {
+                        unregister(); // unregister above observer when directive is destroyed
+                      });
                     }
                 };
             });
