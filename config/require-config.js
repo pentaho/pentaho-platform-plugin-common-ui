@@ -1,6 +1,6 @@
 // Find and inject tests using require
 var tests = Object.keys(window.__karma__.files).filter(function (file) {
-    return (/Spec\.js$/).test(file);
+    return (/package\-res.*Spec\.js$/).test(file);
 });
 
 requireCfg['deps'] = tests;
