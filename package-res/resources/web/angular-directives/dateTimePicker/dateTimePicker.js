@@ -60,7 +60,8 @@ define([
                 minDate: '=?',
                 maxDate: '=?',
                 hideTime: '@',
-                minutesIncrement: '@'
+                minutesIncrement: '@',
+                atLabel: '@'
               },
               link: function (scope, elem, attrs) {
                 scope.$watch('hour', function(newValue, oldValue) {
