@@ -64,32 +64,37 @@ define([
               },
               link: function (scope, elem, attrs) {
                 scope.$watch('hour', function(newValue, oldValue) {
-                   var tempDate = new Date(scope.selectedDate);
-                   if (scope.tod === 'PM') {
-                      newValue += 12;
-                   }
-                   tempDate.setHours(newValue);
-                   scope.selectedDate = tempDate;
+                  updateTime(newValue, oldValue, scope.selectedDate.getMinutes(), scope.selectedDate.getMinutes(), scope.tod, scope.tod);
                 });
                 scope.$watch('minute', function(newValue, oldValue) {
-                  var tempDate = new Date(scope.selectedDate);
-                  tempDate.setMinutes(newValue);
-                  scope.selectedDate = tempDate;
+                  updateTime(scope.selectedDate.getHours(), scope.selectedDate.getHours(), newValue, oldValue, scope.tod, scope.tod);
                 });
                 scope.$watch('tod', function(newValue, oldValue) {
-                  var tempDate = new Date(scope.selectedDate);
+                  updateTime(scope.selectedDate.getHours(), scope.selectedDate.getHours(), scope.selectedDate.getMinutes(), scope.selectedDate.getMinutes(), newValue, oldValue);
+                });
 
-                  if (tempDate.getHours() < 12) { // hours less 12
-                    if (newValue === "PM") {
-                      tempDate.setHours(tempDate.getHours() + 12);
-                    }
-                  } else { // hourse more than 12
-                    if (newValue === "AM") {
-                      tempDate.setHours(tempDate.getHours() - 12);
+                var updateTime = function(hours, oldHours, minutes, oldMinutes, tod, oldTod) {
+                  // handle minutes
+                  if (minutes != oldMinutes) { // No massaging of minutes is needed
+                    scope.selectedDate.setMinutes(minutes);
+                  }
+                  // handle hours and tod
+                  if (hours != oldHours || tod != oldTod) { // This is where we massage hours based on tod
+                    if (tod === "AM") {  
+                      if (hours == 12) {  //  12am is midnight so we set the hours to 0
+                        scope.selectedDate.setHours(0);
+                      } else { // use what ever the user selecte (1-11)
+                        scope.selectedDate.setHours(hours);
+                      }
+                    } else { // This is PM we add 12 to everything except 12
+                      if (hours == 12) { // this is noon and shouldn't be changed
+                        scope.selectedDate.setHours(hours);
+                      } else { // any other pm should have 12 added to it
+                        scope.selectedDate.setHours(hours + 12)
+                      }
                     }
                   }
-                  scope.selectedDate = tempDate;
-                });
+                }
 
                 var toggleDisabled = function() {
                   var node = angular.element(elem);
