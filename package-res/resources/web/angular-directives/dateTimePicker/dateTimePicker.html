@@ -4,7 +4,8 @@
     dojo-constraints="datePattern:'yyyy-MM-dd'"
     dojo-props="message:'';rangeMessage:''" />
   <span ng-hide="hideTime" >
- 	  <select class="input-small" ng-model="hour" ng-options="hourvalue.id as hourvalue.title for hourvalue in hourvalues"/>
+    <span class="atText">{{ atLabel }}</span>
+ 	  <select class="input-small" ng-model="hour" ng-options="hourvalue.id as hourvalue.title for hourvalue in hourvalues"/> :
 	  <select class="input-small" ng-model="minute" ng-options="minutevalue.id as minutevalue.title for minutevalue in minutevalues"/>
 	  <select class="input-small" ng-model="tod" ng-options="currOption for currOption in ['AM', 'PM']"/>
   </span>

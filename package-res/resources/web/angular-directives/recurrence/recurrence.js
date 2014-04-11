@@ -110,6 +110,7 @@ define([
                         untilLabel: '@',
                         noEndLabel: '@',
                         endByLabel: '@',
+                        atLabel: '@',
                         weeklyRecurrenceInfo: '='
                     },
                     link: function (scope, elem, attrs) {
