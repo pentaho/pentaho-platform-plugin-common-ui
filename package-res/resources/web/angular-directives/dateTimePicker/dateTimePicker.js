@@ -165,7 +165,7 @@ define([
                 });
 
                 // need to initialize the disabled state AFTER the link function is complete
-                // using a timeout with a 0 delay accomplishaes that
+                // using a timeout with a 0 delay accomplishes that
                 $timeout(function() {
                   $timeout(function() {
                     initializeDisabled();

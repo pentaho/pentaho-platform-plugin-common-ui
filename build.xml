@@ -10,281 +10,292 @@
 <project name="Pentaho Commons UI" basedir="." default="dist"
          xmlns:ivy="antlib:org.apache.ivy.ant">
 
-  <description>
-    This build file is used to create the Pentaho Common UI project
-    and works with the subfloor.xml file.
-  </description>
+    <description>
+        This build file is used to create the Pentaho Common UI project
+        and works with the subfloor.xml file.
+    </description>
 
-  <!-- Import the common_build.xml file which contains all the default tasks -->
-  <import file="build-res/subfloor-gwt.xml"/>
+    <!-- Import the common_build.xml file which contains all the default tasks -->
+    <import file="build-res/subfloor-gwt.xml"/>
 
-  <property name="js.module.script.dir" value="package-res/resources/web"/>
-  <property name="js.module.script.namespace" value="common-ui"/>
+    <property name="js.module.script.dir" value="package-res/resources/web"/>
+    <property name="js.module.script.namespace" value="common-ui"/>
 
-  <import file="build-res/subfloor-js.xml"/>
+    <import file="build-res/subfloor-js.xml"/>
 
-  <!-- property overrides -->
-  <property name="js.module.script.dir" value="package-res/resources/web/app/js"/>
-  <!-- end property overrides -->
+    <!-- property overrides -->
+    <property name="js.module.script.dir" value="package-res/resources/web/app/js"/>
+    <!-- end property overrides -->
 
-  <property name="js.requires.node" value="true"/>
-  <property name="js.requires.karma" value="true"/>
-  <property name="js.karma.config" value="config/karma.ci.conf.js"/>
-  <property environment="env"/>
+    <property name="js.requires.node" value="true"/>
+    <property name="js.requires.karma" value="true"/>
+    <property name="js.karma.config" value="config/karma.ci.conf.js"/>
+    <property environment="env"/>
 
-  <path id="test.classpath">
-    <fileset dir="${devlib.dir}">
-      <include name="*.jar"/>
-    </fileset>
-    <fileset dir="${testlib.dir}">
-      <include name="*.jar"/>
-    </fileset>
-    <fileset dir="${lib.dir}">
-      <include name="*.jar"/>
-    </fileset>
-    <dirset dir="${testclasses.dir}"/>
-    <dirset dir="${classes.dir}"/>
-  </path>
+    <path id="test.classpath">
+        <fileset dir="${devlib.dir}">
+            <include name="*.jar"/>
+        </fileset>
+        <fileset dir="${testlib.dir}">
+            <include name="*.jar"/>
+        </fileset>
+        <fileset dir="${lib.dir}">
+            <include name="*.jar"/>
+        </fileset>
+        <dirset dir="${testclasses.dir}"/>
+        <dirset dir="${classes.dir}"/>
+    </path>
 
-  <!-- fail message="You do not have XMLTask installed. Please install.">
-       <condition>
-         <not>
-           <available classname="com.oopsconsultancy.xmltask.ant.XmlTask" />
-         </not>
-       </condition>
-     </fail -->
+    <!-- fail message="You do not have XMLTask installed. Please install.">
+         <condition>
+           <not>
+             <available classname="com.oopsconsultancy.xmltask.ant.XmlTask" />
+           </not>
+         </condition>
+       </fail -->
 
-  <property name="dojo.version" value="1.9.2"/>
-  <property name="dojo-artifact" value="dojo-release-${dojo.version}-src"/>
+    <property name="dojo.version" value="1.9.2"/>
+    <property name="dojo-artifact" value="dojo-release-${dojo.version}-src"/>
 
-  <property name="dev.res" value="dev-res"/>
+    <property name="dev.res" value="dev-res"/>
 
-  <property name="dojo.root"
-            value="${dev.res}/dojo"
-            description="Dojo source folder"/>
+    <property name="dojo.root"
+              value="${dev.res}/dojo"
+              description="Dojo source folder"/>
 
-  <property name="dojo.src"
-            value="${dojo.root}/dojo-release-${dojo.version}-src"
-            description="Dojo source folder"/>
+    <property name="dojo.src"
+              value="${dojo.root}/dojo-release-${dojo.version}-src"
+              description="Dojo source folder"/>
 
-  <property name="dojo.src.release"
-            value="${dojo.src}/release/dojo"
-            description="Dojo source folder"/>
-
-  
-  <property name="web.prod.stage.dir"
-            value="${approot.stage.dir}/resources/web"
-            description="production web staging directory"/>
-
-  <property name="dojo.prod.stage.dir"
-            value="${web.prod.stage.dir}/dojo"
-            description="production dojo staging directory"/>
+    <property name="dojo.src.release"
+              value="${dojo.src}/release/dojo"
+              description="Dojo source folder"/>
 
 
-  <target name="dist" depends="jar, build-js, dist-js" description="Creates a distribution">
-  </target>
+    <property name="web.prod.stage.dir"
+              value="${approot.stage.dir}/resources/web"
+              description="production web staging directory"/>
 
-  <!-- sets up the project for development/build, you should only need to run this once -->
-  <target name="setup" depends="create-dev.res, resolve, unzip_dojo">
-  </target>
+    <property name="dojo.prod.stage.dir"
+              value="${web.prod.stage.dir}/dojo"
+              description="production dojo staging directory"/>
 
-  <target name="resolve-and-classpath" depends="resolve,create-dot-classpath">
-  </target>
 
-  <target name="create-dev.res">
-    <mkdir dir="${dojo.root}"/>
-  </target>
+    <target name="dist" depends="jar, build-js, dist-js" description="Creates a distribution">
+    </target>
 
-  <target name="unzip_dojo">
-    <if>
-      <available file="${dojo.root}/${dojo-artifact}.zip"/>
-      <then/>
-      <else>
-<!--
-       <get src="http://download.dojotoolkit.org/release-${dojo.version}/${dojo-artifact}.zip"
-             dest="${dojo.root}/${dojo-artifact}.zip"/> -->
-       <get src="http://repository.pentaho.org/artifactory/third-party/org/dojotoolkit/dojo/dojo-release/${dojo.version}/${dojo-artifact}.zip"
-             dest="${dojo.root}/${dojo-artifact}.zip"/>
+    <!-- sets up the project for development/build, you should only need to run this once -->
+    <target name="setup" depends="create-dev.res, resolve, unzip_dojo">
+    </target>
+
+    <target name="resolve-and-classpath" depends="resolve,create-dot-classpath">
+    </target>
+
+    <target name="create-dev.res">
         <mkdir dir="${dojo.root}"/>
-        <unzip src="dev-res/dojo/${dojo-artifact}.zip" dest="${dojo.root}"/>
+    </target>
 
-        <!--<get src="http://download.dojotoolkit.org/release-${dojo.version}/${dojo-artifact}-src.zip" dest="${dojo.root}/${dojo-artifact}-src.zip"/>-->
-        <!--<mkdir dir="${dojo.root}"/>-->
-        <!--<unzip src="dev-res/dojo/${dojo-artifact}-src.zip" dest="${dojo.root}" />-->
-      </else>
-    </if>
-  </target>
+    <target name="unzip_dojo">
+        <if>
+            <available file="${dojo.root}/${dojo-artifact}.zip"/>
+            <then/>
+            <else>
+                <!--
+                       <get src="http://download.dojotoolkit.org/release-${dojo.version}/${dojo-artifact}.zip"
+                             dest="${dojo.root}/${dojo-artifact}.zip"/> -->
+                <get src="http://repository.pentaho.org/artifactory/third-party/org/dojotoolkit/dojo/dojo-release/${dojo.version}/${dojo-artifact}.zip"
+                     dest="${dojo.root}/${dojo-artifact}.zip"/>
+                <mkdir dir="${dojo.root}"/>
+                <unzip src="dev-res/dojo/${dojo-artifact}.zip" dest="${dojo.root}"/>
 
-  <target name="assemble"
-          depends="dist,assemble.init,assemble.copy-libs,assemble-plugin">
-  </target>
+                <!--<get src="http://download.dojotoolkit.org/release-${dojo.version}/${dojo-artifact}-src.zip" dest="${dojo.root}/${dojo-artifact}-src.zip"/>-->
+                <!--<mkdir dir="${dojo.root}"/>-->
+                <!--<unzip src="dev-res/dojo/${dojo-artifact}-src.zip" dest="${dojo.root}" />-->
+            </else>
+        </if>
+    </target>
 
-  <target name="package-zip">
-    <zip destfile="${dist.dir}/${package.basename}.zip">
-      <zipfileset dir="${stage.dir}"/>
-    </zip>
-  </target>
+    <target name="dev-refresh" if="dev.pdi.dir">
+        <copy todir="${dev.pdi.dir}/plugins/spoon/agile-bi/platform/pentaho-solutions/system/common-ui"
+              overwrite="true">
+            <fileset dir="package-res">
+                <exclude name="**/pdi-root/**"></exclude>
+            </fileset>
+        </copy>
+    </target>
 
-  <!-- override the subfloor assemble target to do special assembly -->
-  <target name="assemble-plugin">
+    <target name="assemble"
+            depends="dist,assemble.init,assemble.copy-libs,assemble-plugin">
+    </target>
 
-    <property environment="env"/>
-    
-    <!-- overlay the built angular-directives js module -->
-    <copy todir="${web.prod.stage.dir}/angular-directives" overwrite="true">
-      <fileset dir="${js.build.output.dir}">
-        <include name="angular-directives.js"/>
-      </fileset>
-    </copy>
+    <target name="package-zip">
+        <zip destfile="${dist.dir}/${package.basename}.zip">
+            <zipfileset dir="${stage.dir}"/>
+        </zip>
+    </target>
 
-    <copy todir="${approot.stage.dir}/resources/web/dojo/dojo" overwrite="true">
-      <fileset dir="${dojo.src}/dojo"/>
-    </copy>
+    <!-- override the subfloor assemble target to do special assembly -->
+    <target name="assemble-plugin">
 
-    <copy todir="${approot.stage.dir}/resources/web/dojo/dijit" overwrite="true">
-      <fileset dir="${dojo.src}/dijit"/>
-    </copy>
-    <copy todir="${approot.stage.dir}/resources/web/dojo/dojox" overwrite="true">
-      <fileset dir="${dojo.src}/dojox"/>
-    </copy>
+        <property environment="env"/>
 
-    <copy todir="${approot.stage.dir}" overwrite="true">
-      <fileset dir="${package.resdir}"/>
-    </copy>
+        <!-- overlay the built angular-directives js module -->
+        <copy todir="${web.prod.stage.dir}/angular-directives" overwrite="true">
+            <fileset dir="${js.build.output.dir}">
+                <include name="angular-directives.js"/>
+            </fileset>
+        </copy>
 
-    <property environment="env"/>
-   
-    <ant antfile="build-res/subfloor-gwt.xml" target="gwt-compile">
-      <property name="gwt-module.path" value="org.pentaho.gwt.widgets.themes.Themes"/>
-    </ant>
+        <copy todir="${approot.stage.dir}/resources/web/dojo/dojo" overwrite="true">
+            <fileset dir="${dojo.src}/dojo"/>
+        </copy>
 
-    <ant antfile="build-res/subfloor-gwt.xml" target="gwt-compile">
-      <property name="gwt-module.path" value="org.pentaho.gwt.widgets.client.formatter.JSTextFormatter"/>
-    </ant>
+        <copy todir="${approot.stage.dir}/resources/web/dojo/dijit" overwrite="true">
+            <fileset dir="${dojo.src}/dijit"/>
+        </copy>
+        <copy todir="${approot.stage.dir}/resources/web/dojo/dojox" overwrite="true">
+            <fileset dir="${dojo.src}/dojox"/>
+        </copy>
 
-    <copy todir="${approot.stage.dir}/resources/themes" overwrite="true">
-      <fileset dir="${bin.dir}/gwt/output/Themes/themes"/>
-    </copy>
+        <copy todir="${approot.stage.dir}" overwrite="true">
+            <fileset dir="${package.resdir}"/>
+        </copy>
 
-    <copy todir="${approot.stage.dir}/resources/web/formatter" overwrite="true">
-      <fileset dir="${bin.dir}/gwt/output/formatter"/>
-    </copy>
+        <property environment="env"/>
 
-  </target>
+        <ant antfile="build-res/subfloor-gwt.xml" target="gwt-compile">
+            <property name="gwt-module.path" value="org.pentaho.gwt.widgets.themes.Themes"/>
+        </ant>
 
-  <target name="package-targz">
-  </target>
+        <ant antfile="build-res/subfloor-gwt.xml" target="gwt-compile">
+            <property name="gwt-module.path" value="org.pentaho.gwt.widgets.client.formatter.JSTextFormatter"/>
+        </ant>
 
-  <!-- Dev targets for updating a server. Set biserver-root in build.properties to use. -->
-  <target name="clean-server" if="biserver-root">
-    <delete dir="${biserver-root}/pentaho-solutions/system/pentaho-interactive-reporting"/>
-  </target>
+        <copy todir="${approot.stage.dir}/resources/themes" overwrite="true">
+            <fileset dir="${bin.dir}/gwt/output/Themes/themes"/>
+        </copy>
 
-  <target name="update-server" if="biserver-root"
-          depends="clean,dist,assemble.init,package-zip,clean-server"
-          description="Update your BIServer with with a full archive build">
-    <unzip dest="${biserver-root}/pentaho-solutions/system"
-           src="${dist.dir}/${ivy.artifact.id}-${project.revision}-dev.zip"/>
-  </target>
+        <copy todir="${approot.stage.dir}/resources/web/formatter" overwrite="true">
+            <fileset dir="${bin.dir}/gwt/output/formatter"/>
+        </copy>
 
-  <target name="update-package-res" if="biserver-root"
-          description="Update your BIServer with only the contents of package-res/">
-    <copy todir="${biserver-root}/pentaho-solutions/system/pentaho-interactive-reporting">
-      <fileset dir="${package.resdir}"/>
-    </copy>
-    <copy todir="${biserver-root}/pentaho-solutions/system/pentaho-interactive-reporting/resources/web/testres"
-          file="${dev.res}/runner.html"/>
-  </target>
+    </target>
+
+    <target name="package-targz">
+    </target>
+
+    <!-- Dev targets for updating a server. Set biserver-root in build.properties to use. -->
+    <target name="clean-server" if="biserver-root">
+        <delete dir="${biserver-root}/pentaho-solutions/system/pentaho-interactive-reporting"/>
+    </target>
+
+    <target name="update-server" if="biserver-root"
+            depends="clean,dist,assemble.init,package-zip,clean-server"
+            description="Update your BIServer with with a full archive build">
+        <unzip dest="${biserver-root}/pentaho-solutions/system"
+               src="${dist.dir}/${ivy.artifact.id}-${project.revision}-dev.zip"/>
+    </target>
+
+    <target name="update-package-res" if="biserver-root"
+            description="Update your BIServer with only the contents of package-res/">
+        <copy todir="${biserver-root}/pentaho-solutions/system/pentaho-interactive-reporting">
+            <fileset dir="${package.resdir}"/>
+        </copy>
+        <copy todir="${biserver-root}/pentaho-solutions/system/pentaho-interactive-reporting/resources/web/testres"
+              file="${dev.res}/runner.html"/>
+    </target>
 
 
-  <target name="plugin-build-jslibs.init">
-    <delete dir="${stage.dir}/javascript"/>
-    <mkdir dir="${stage.dir}/javascript"/>
-  </target>
+    <target name="plugin-build-jslibs.init">
+        <delete dir="${stage.dir}/javascript"/>
+        <mkdir dir="${stage.dir}/javascript"/>
+    </target>
 
 
-  <target name="assemble.init">
-    <delete dir="${approot.stage.dir}/"/>
-    <mkdir dir="${approot.stage.dir}/"/>
-  </target>
+    <target name="assemble.init">
+        <delete dir="${approot.stage.dir}/"/>
+        <mkdir dir="${approot.stage.dir}/"/>
+    </target>
 
-  <target name="assemble.copy-libs">
-    <copy todir="${approot.stage.dir}/lib">
-      <fileset file="${dist.dir}/${ivy.artifact.id}-${project.revision}.jar"/>
-    </copy>
-    <copy todir="${approot.stage.dir}/lib">
-      <fileset file="${lib.dir}/flexjson-*.jar"/>
-    </copy>
-    <copy todir="${approot.stage.dir}/lib">
-      <fileset file="${lib.dir}/pentaho-modeler-${dependency.pentaho-modeler.revision}.jar"/>
-    </copy>
-  </target>
+    <target name="assemble.copy-libs">
+        <copy todir="${approot.stage.dir}/lib">
+            <fileset file="${dist.dir}/${ivy.artifact.id}-${project.revision}.jar"/>
+        </copy>
+        <copy todir="${approot.stage.dir}/lib">
+            <fileset file="${lib.dir}/flexjson-*.jar"/>
+        </copy>
+        <copy todir="${approot.stage.dir}/lib">
+            <fileset file="${lib.dir}/pentaho-modeler-${dependency.pentaho-modeler.revision}.jar"/>
+        </copy>
+    </target>
 
-  <target name="instrument-js" depends="instrument-js-pre,instrument-js-linux,instrument-js-windows,instrument-js-post">
-  </target>
+    <target name="instrument-js"
+            depends="instrument-js-pre,instrument-js-linux,instrument-js-windows,instrument-js-post">
+    </target>
 
-  <target name="instrument-js-pre">
-    <!-- create the stage dir for the instrumented scripts -->
-    <delete dir="${stage.dir}/javascript/instrumented"/>
-    <mkdir dir="${stage.dir}/javascript/instrumented"/>
-  </target>
+    <target name="instrument-js-pre">
+        <!-- create the stage dir for the instrumented scripts -->
+        <delete dir="${stage.dir}/javascript/instrumented"/>
+        <mkdir dir="${stage.dir}/javascript/instrumented"/>
+    </target>
 
-  <target name="instrument-js-post">
-    <!-- delete the unneeded files -->
-    <delete>
-      <fileset dir="${stage.dir}/javascript/instrumented">
-        <include name="*.html"/>
-        <include name="*.css"/>
-        <include name="*.gif"/>
-        <include name="jscoverage.js"/>
-      </fileset>
-    </delete>
+    <target name="instrument-js-post">
+        <!-- delete the unneeded files -->
+        <delete>
+            <fileset dir="${stage.dir}/javascript/instrumented">
+                <include name="*.html"/>
+                <include name="*.css"/>
+                <include name="*.gif"/>
+                <include name="jscoverage.js"/>
+            </fileset>
+        </delete>
 
-    <!-- copy to the dev target -->
-    <delete dir="${approot.stage.dir}/resources/web/instrumented"/>
-    <mkdir dir="${approot.stage.dir}/resources/web/instrumented"/>
-    <copy todir="${approot.stage.dir}/resources/web/instrumented">
-      <fileset dir="${stage.dir}/javascript/instrumented">
-      </fileset>
-    </copy>
-  </target>
+        <!-- copy to the dev target -->
+        <delete dir="${approot.stage.dir}/resources/web/instrumented"/>
+        <mkdir dir="${approot.stage.dir}/resources/web/instrumented"/>
+        <copy todir="${approot.stage.dir}/resources/web/instrumented">
+            <fileset dir="${stage.dir}/javascript/instrumented">
+            </fileset>
+        </copy>
+    </target>
 
-  <target name="instrument-js-linux" if="isLinux">
-    <!-- instrument the scripts -->
-    <exec dir="." executable="jscoverage/bin/jscoverage" os="Linux">
-      <arg line="${package.resdir}/resources/web"/>
-      <arg line="${stage.dir}/javascript/instrumented"/>
-    </exec>
-  </target>
+    <target name="instrument-js-linux" if="isLinux">
+        <!-- instrument the scripts -->
+        <exec dir="." executable="jscoverage/bin/jscoverage" os="Linux">
+            <arg line="${package.resdir}/resources/web"/>
+            <arg line="${stage.dir}/javascript/instrumented"/>
+        </exec>
+    </target>
 
-  <target name="instrument-js-windows" if="isWindows">
-    <!-- instrument the scripts -->
-    <exec dir="." executable="jscoverage/bin/jscoverage.exe" os="Windows">
-      <arg line="${package.resdir}/resources/web"/>
-      <arg line="${stage.dir}/javascript/instrumented"/>
-    </exec>
-  </target>
+    <target name="instrument-js-windows" if="isWindows">
+        <!-- instrument the scripts -->
+        <exec dir="." executable="jscoverage/bin/jscoverage.exe" os="Windows">
+            <arg line="${package.resdir}/resources/web"/>
+            <arg line="${stage.dir}/javascript/instrumented"/>
+        </exec>
+    </target>
 
-  <target name="publish-nojar" depends="subfloor-js.js.publish-nojar, subfloor-pkg.publish-nojar"/>
+    <target name="publish-nojar" depends="subfloor-js.js.publish-nojar, subfloor-pkg.publish-nojar"/>
 
-  <target name="dist-js">
-    <delete dir="bin/js-source"/>
-    <copy todir="bin/js-source/${js.module.script.namespace}/dojo">
-      <fileset dir="${dojo.src}">
-        <include name="**/*"/>
-        <exclude name="util/"/>
-      </fileset>
-    </copy>
+    <target name="dist-js">
+        <delete dir="bin/js-source"/>
+        <copy todir="bin/js-source/${js.module.script.namespace}/dojo">
+            <fileset dir="${dojo.src}">
+                <include name="**/*"/>
+                <exclude name="util/"/>
+            </fileset>
+        </copy>
 
-    <antcall target="subfloor-js.dist-js"/>
-  </target>
-  
-<target name="build-js" depends="cleanup-js-build-dir, subfloor-js.build-js" description="Build the JavaScript builds into the compressed and uncompressed versions">
-  </target>
+        <antcall target="subfloor-js.dist-js"/>
+    </target>
 
-  <target name="cleanup-js-build-dir">
-    <!-- clean up the output dir for this to avoid pen.define killing the dependency tracing -->
-    <delete dir="${js.build.output.dir}/common-ui" />
-  </target>
-  
+    <target name="build-js" depends="cleanup-js-build-dir, subfloor-js.build-js"
+            description="Build the JavaScript builds into the compressed and uncompressed versions">
+    </target>
+
+    <target name="cleanup-js-build-dir">
+        <!-- clean up the output dir for this to avoid pen.define killing the dependency tracing -->
+        <delete dir="${js.build.output.dir}/common-ui"/>
+    </target>
+
 </project>
