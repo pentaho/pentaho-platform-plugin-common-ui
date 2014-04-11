@@ -118,6 +118,9 @@ define([
                             if (scope.weeklyRecurrenceInfo) {
 
                                  scope.data.selectedDays={};
+                                 scope.endDate=undefined;
+                                 scope.startDate=new Date();
+
 
                                 //hydrate days of week checkboxes
                                 if (angular.isArray(scope.weeklyRecurrenceInfo.daysOfWeek)

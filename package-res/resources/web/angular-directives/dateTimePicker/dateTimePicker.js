@@ -35,7 +35,7 @@ define([
               if (defaultDate) {
                 $scope.hour = defaultDate.getHours() % 12;
                 $scope.minute = defaultDate.getMinutes() - (defaultDate.getMinutes() % increment);
-                if ($scope.selectedDate.getHours() > 12) {
+                if (defaultDate.getHours() > 12) {
                   $scope.tod = 'PM';
                 } else {
                   $scope.tod = 'AM';
