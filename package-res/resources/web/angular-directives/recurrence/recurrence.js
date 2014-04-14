@@ -195,7 +195,8 @@ define([
                         rehydrate();
 
                       // listen for the isValidRequest broadcast, respond appropriately
-                      var unregister = scope.$on('scheduleSelector:isValidRequest', function() {
+                      var eventName = 'scheduleSelector:isValidRequest:weekly';
+                      var unregister = scope.$on(eventName, function() {
                         var isValid = scope.isValid();
                         scope.$emit('scheduleSelector:isValidResponse', isValid);
                       });
