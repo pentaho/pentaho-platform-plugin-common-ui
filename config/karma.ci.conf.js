@@ -27,7 +27,7 @@ module.exports = function (config) {
     reporters: ['progress', 'junit', 'coverage'],
 
     junitReporter: {
-      outputFile: '../../../bin/reports/test/js/test-results.xml',
+      outputFile: 'bin/reports/test/js/test-results.xml',
       suite: 'unit'
     },
 
@@ -44,14 +44,14 @@ module.exports = function (config) {
       reporters: [
         {
           type: 'html',
-          dir: '../../../bin/reports/jscoverage/html/'
+          dir: 'bin/reports/jscoverage/html/'
         },
         {
           type : 'cobertura',
-          dir : '../../../bin/reports/cobertura/xml/'
+          dir : 'bin/reports/cobertura/xml/'
         }
       ],
-      dir: '../../../bin/reports/'
+      dir: 'bin/reports/'
     },
 
     // level of logging
