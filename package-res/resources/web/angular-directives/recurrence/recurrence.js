@@ -110,6 +110,7 @@ define([
                         untilLabel: '@',
                         noEndLabel: '@',
                         endByLabel: '@',
+                        atLabel: '@',
                         weeklyRecurrenceInfo: '='
                     },
                     link: function (scope, elem, attrs) {
@@ -174,9 +175,9 @@ define([
 
                         }
 
-                        scope.$watch('data', onChangeEvent, true);
-                        scope.$watch('weeklyRecurrenceInfo', rehydrate, true);
-                        scope.$watchCollection('[startDate,endDate,endDateRadio]', onChangeEvent);
+                        var dataWatch=scope.$watch('data', onChangeEvent, true);
+                        var infoWatch=scope.$watch('weeklyRecurrenceInfo', rehydrate, true);
+                        var collWatch=scope.$watchCollection('[startDate,endDate,endDateRadio]', onChangeEvent);
 
                         //initial rehydrate from server
                         rehydrate();
@@ -190,6 +191,9 @@ define([
                       // clean up
                       elem.on('$destroy', function() {
                         unregister(); // unregister above observer when directive is destroyed
+                        dataWatch();
+                        infoWatch();
+                        collWatch();
                       });
                     }
                 };

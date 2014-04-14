@@ -20,6 +20,7 @@ define([
                 return values;
               };
 
+              // Set up the default date to be the selected date
               var defaultDate;
               if(angular.isDate($scope.selectedDate)) {
                 defaultDate = $scope.selectedDate;
@@ -27,15 +28,27 @@ define([
                 defaultDate = new Date($scope.selectedDate);
               }
 
+              // Let the html pass in the increment for the minutes or default to 1
               var increment = $scope.minutesIncrement ? $scope.minutesIncrement : 1;
+
+              // Create the models for the hours and minutes dropdown.
               $scope.minutevalues = formattedValues(0, 59, increment);
               $scope.hourvalues = formattedValues(1, 12, 1);
 
-
+              // If we have a default date we need to massage it to fit the dropdowns.
               if (defaultDate) {
-                $scope.hour = defaultDate.getHours() % 12;
+                if (defaultDate.getHours() == 0) { // If it is midnight we need to display 12 not 0
+                  $scope.hour = 12;
+                } else { // otherwise we mod it
+                  $scope.hour = defaultDate.getHours() % 12;
+                }
+                // massage minutes so that it will fit within the confines of whatever increment we're displaying for minutes.
                 $scope.minute = defaultDate.getMinutes() - (defaultDate.getMinutes() % increment);
-                if (defaultDate.getHours() > 12) {
+                defaultDate.setMinutes($scope.minute); // now that we've massaged the date, we need to set it back as the default.
+                if ($scope.selectedDate) {  // little defensive programming if nothing was selected to start with.
+                  $scope.selectedDate.setMinutes($scope.minute); // and the selected
+                }
+                if (defaultDate.getHours() >= 12) { // set am/pm based on the hours.
                   $scope.tod = 'PM';
                 } else {
                   $scope.tod = 'AM';
@@ -60,7 +73,8 @@ define([
                 minDate: '=?',
                 maxDate: '=?',
                 hideTime: '@',
-                minutesIncrement: '@'
+                minutesIncrement: '@',
+                atLabel: '@'
               },
               link: function (scope, elem, attrs) {
                 scope.$watch('hour', function(newValue, oldValue) {

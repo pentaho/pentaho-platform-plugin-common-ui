@@ -1,5 +1,5 @@
 <div>
-    {{weeklyLabel}}: <br>
+  {{weeklyLabel}} <br>
   <form name="weeklyScheduleForm" novalidate>
     <div class="form-inline row">
         <label ng-repeat="day in data.daysOfWeek" class="checkbox daysOfWeek">
@@ -8,19 +8,29 @@
             </input>
         </label>
     </div>
-    <br/><br/>
-    {{startLabel}}: <br/>
-
-    <div datetime selected-date="startDate" min-date="minStartDate" minutes-increment="15"></div>
     <br/>
-    {{untilLabel}}: <br/>
-    <input type="radio" ng-model="endDateRadio" value="none"> {{noEndLabel}}</input><br/>
-    <input type="radio" ng-model="endDateRadio" value="dateSelected"> {{endByLabel}}: </input><br/>
+    {{startLabel}} <br/>
 
-    <div datetime selected-date="endDate"
-         id="weeklyScheduleEndDate"
-         is-disabled="data.endDateDisabled"
-         min-date="startDate"
-         hide-time="true"></div>
+    <div datetime selected-date="startDate" min-date="minStartDate" minutes-increment="15" at-label="{{atLabel}}"></div>
+    <br/>
+    {{untilLabel}} <br/>
+    <div class="endDateRadioWrapper">
+      <div class="form-inline">
+        <label class="radio noEndDate" >
+          <input type="radio" ng-model="endDateRadio" value="none"> {{noEndLabel}}</input>
+      </label>
+      </div>
+      <div class="form-inline">
+        <label class="radio endDate" >
+          <input type="radio" ng-model="endDateRadio" value="dateSelected"> {{endByLabel}} </input>
+        </label>
+        <div datetime selected-date="endDate"
+            id="weeklyScheduleEndDate"
+            is-disabled="data.endDateDisabled"
+            min-date="startDate"
+            hide-time="true"></div>
+
+      </div>
+    </div>
   </form>
 </div>

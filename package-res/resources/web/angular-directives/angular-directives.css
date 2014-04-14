@@ -104,7 +104,7 @@ treecontrol .treeControlLoading .spin {
   position: absolute;
 }
 
-.daysOfWeek {
+.weeklyRecurrenceDirective .daysOfWeek {
   padding-left: 20px !important;
 }
 
@@ -129,8 +129,35 @@ treecontrol .treeControlLoading .spin {
   background-color: transparent;
   background-image: none;
   display: inline-block;
+  width: 130px;
 }
 
 .bootstrap .angular-dojo.dateTimePicker .dijitInputContainer {
   padding-right: 2px;
+}
+
+.bootstrap .angular-dojo.dateTimePicker .input-small {
+  width: 55px;
+  margin-left: 6px;
+}
+
+.angular-dojo.dateTimePicker .atText {
+  margin-left: 4px
+}
+
+.weeklyRecurrenceDirective .endDateRadioWrapper {
+  padding-left: 2px;
+}
+.weeklyRecurrenceDirective .endDateRadioWrapper .endDate,
+.weeklyRecurrenceDirective .endDateRadioWrapper .angular-dojo.dateTimePicker {
+  display: inline-block;
+}
+
+.dijitCalendarPopup .pentaho-rounded-panel,
+.dijitCalendarPopup .pentaho-rounded-panel .pentaho-padding-sm {
+  padding: 0px;
+  border: none;
+  width: 190px !important;
+  box-shadow: none;
+  --webkit-box-shadow: none;
 }
