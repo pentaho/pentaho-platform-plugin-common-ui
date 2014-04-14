@@ -35,8 +35,9 @@ module.exports = function (config) {
       // source files, that you wanna generate coverage for
       // do not include tests or libraries
       // (these files will be instrumented by Istanbul)
-      'plugin-handler/**/*.js': ['coverage'],
-      'angular-directives/**/*.js': ['coverage']
+      'package-res/resources/web/plugin-handler/**/*.js': ['coverage'],
+      'package-res/resources/web/angular-directives/**/*.js': ['coverage'],
+      '**/*.html': []
     },
 
     // optionally, configure the reporter
