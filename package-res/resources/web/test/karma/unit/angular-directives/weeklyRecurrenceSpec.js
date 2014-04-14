@@ -62,12 +62,12 @@ define(deps, function(angular, templateUtil) {
                     expect(scope.model.startTime).toBeDefined();
 
                     //Grab first checkbox and un-check it
-                    element.find('[type="checkbox"]:eq(0)').click();
+                    element.find('input.SUN').click();
                     //ensure that the first checkbox is unchecked
                     expect(scope.model.daysOfWeek.length).toBe(1);
 
                     //Grab last checkbox and un-check it
-                    element.find('[type="checkbox"]:eq(6)').click();
+                    element.find('input.SAT').click();
                     //ensure that the last checkbox is unchecked
                     expect(scope.model.daysOfWeek.length).toBe(0);
 
@@ -85,28 +85,28 @@ define(deps, function(angular, templateUtil) {
                 it('clicking checkbox set model on the scope', function () {
 
                     //Grab checkbox and check it
-                    element.find('[type="checkbox"]:eq(1)').click();
+                    element.find('input.MON').click();
                     //ensure that the second checkbox is checked
                     expect(scope.model.daysOfWeek.length).toBe(3);
                     //Grab checkbox and check it
-                    element.find('[type="checkbox"]:eq(2)').click();
+                    element.find('input.TUES').click();
                     //ensure that the third checkbox is checked
                     expect(scope.model.daysOfWeek.length).toBe(4);
                     //Grab checkbox and check it
-                    element.find('[type="checkbox"]:eq(3)').click();
+                    element.find('input.WED').click();
                     //ensure that the fourth checkbox is checked
                     expect(scope.model.daysOfWeek.length).toBe(5);
                     //Grab checkbox and check it
-                    element.find('[type="checkbox"]:eq(4)').click();
+                    element.find('input.THURS').click();
                     //ensure that the fifth checkbox is checked
                     expect(scope.model.daysOfWeek.length).toBe(6);
                     //Grab checkbox and check it
-                    element.find('[type="checkbox"]:eq(5)').click();
+                    element.find('input.FRI').click();
                     //ensure that the sixth checkbox is checked
                     expect(scope.model.daysOfWeek.length).toBe(7);
 
                     //Click checkbox again to deselect it
-                    element.find('[type="checkbox"]:eq(3)').click();
+                    element.find('input.WED').click();
                     //ensure that the seventh checkbox is deselected
                     expect(scope.model.daysOfWeek.length).toBe(6);
 

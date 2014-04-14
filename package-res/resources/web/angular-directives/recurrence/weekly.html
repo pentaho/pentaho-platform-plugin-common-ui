@@ -1,9 +1,9 @@
-<div>
+<div class="weeklyRecurrenceDirective">
   {{weeklyLabel}} <br>
   <form name="weeklyScheduleForm" novalidate>
     <div class="form-inline row">
         <label ng-repeat="day in data.daysOfWeek" class="checkbox daysOfWeek">
-            <input type="checkbox" ng-model="data.selectedDays[day.key]" ng-required="!dayOfWeekIsValid()" >
+            <input type="checkbox" ng-model="data.selectedDays[day.key]" ng-required="!dayOfWeekIsValid()" class="{{day.key}}" >
             {{day.day|date:'EEEE'}}
             </input>
         </label>

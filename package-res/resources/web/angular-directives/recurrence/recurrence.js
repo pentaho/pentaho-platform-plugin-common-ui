@@ -24,14 +24,24 @@ define([
 
                 $scope.data = {
                     daysOfWeek: [
-                        {day: sun, key: "SUN"},
-                        {day: mon, key: "MON"},
-                        {day: tue, key: "TUES"},
-                        {day: wed, key: "WED"},
-                        {day: thu, key: "THURS"},
-                        {day: fri, key: "FRI"},
-                        {day: sat, key: "SAT"}
+                        {day: mon, key: "MON", idx: 1},
+                        {day: tue, key: "TUES", idx: 2},
+                        {day: wed, key: "WED", idx: 3},
+                        {day: thu, key: "THURS", idx: 4},
+                        {day: fri, key: "FRI", idx: 5},
+                        {day: sat, key: "SAT", idx: 6},
+                        {day: sun, key: "SUN", idx: 0}
                     ],
+                    getDayByIndex: function(index) {
+                      var theDay = null;
+                      angular.forEach($scope.data.daysOfWeek, function(day) {
+                        if(day.idx === index) {
+                          theDay = day;
+                          return false;
+                        }
+                      });
+                      return theDay;
+                    },
                     selectedDays: { },
                     endDateDisabled: true
                 }
@@ -46,11 +56,9 @@ define([
                     for (var obj in $scope.data.selectedDays) {
                         for (var index = 0; index < $scope.data.daysOfWeek.length; index++) {
                             if ($scope.data.selectedDays[obj] == true && $scope.data.daysOfWeek[index].key == obj) {
-                                daysArray.push(index);
+                                daysArray.push($scope.data.daysOfWeek[index].idx);
                             }
                         }
-
-
                     }
                     return daysArray;
                 };
@@ -128,7 +136,11 @@ define([
                                     && scope.weeklyRecurrenceInfo.daysOfWeek.length > 0) {
                                     for (var i = 0; i < scope.weeklyRecurrenceInfo.daysOfWeek.length; i++) {
                                         //select each day in the array
-                                        scope.data.selectedDays[scope.data.daysOfWeek[scope.weeklyRecurrenceInfo.daysOfWeek[i]].key] = true;
+                                        dayIndex = scope.weeklyRecurrenceInfo.daysOfWeek[i];
+                                        var day = scope.data.getDayByIndex(dayIndex)
+                                        if(day) {
+                                          scope.data.selectedDays[day.key] = true;
+                                        }
                                     }
                                 }
                                 if (scope.weeklyRecurrenceInfo.startTime) {
