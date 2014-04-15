@@ -15,8 +15,6 @@ define(deps, function (angular, templateUtil) {
 
         beforeEach(inject(function ($rootScope, $httpBackend, $templateCache) {
             $scope = $rootScope;
-//            datetimeScope = $rootScope.$new();
-//            datetimeScope.startDate = new Date("2014-04-01 11:15:00 PM");
             httpBackend = $httpBackend;
             templateCache = $templateCache;
 
@@ -216,7 +214,79 @@ define(deps, function (angular, templateUtil) {
                     expect(isolateScope.isValid()).toBeTruthy();
 
                 });
+
             });
+
+          describe("Weekly validation tests", function() {
+            var $myscope, isolateScope;
+
+            beforeEach(inject(function ($rootScope, $compile) {
+              var tpl = "<div weekly weekly-label='Run every week on' start-label='Start' until-label='Until' no-end-label='No end date' end-by-label='End by' weekly-recurrence-info='model'></div>";
+
+              $myscope = $rootScope.$new();
+              element = angular.element(tpl);
+              $compile(element)($myscope);
+              $myscope.$digest();
+
+              // get the isolate scope from the element
+              isolateScope = element.scope();
+              $myscope.model = {};
+              $myscope.$apply();
+            }));
+
+            afterEach(function() {
+              element.remove();
+            });
+
+            it("should not be valid by default", function() {
+              var v = isolateScope.isValid();
+              expect(v).toBeFalsy();
+            });
+
+            it("should have at least one day selected considered valid", function() {
+              expect(isolateScope.isValid()).toBeFalsy();
+
+              // this should be defaulted to the current date/time
+              expect(isolateScope.startDate).toBeDefined();
+              expect(isolateScope.startDate).toBeLessThan(new Date());
+
+              element.find("input.SUN").click();
+              expect(isolateScope.isValid()).toBeTruthy();
+
+              element.find("input.SUN").click();
+              expect(isolateScope.isValid()).toBeFalsy();
+
+              element.find("input.SUN").click();      // turn it back on
+              expect(isolateScope.isValid()).toBeTruthy();
+
+            });
+
+            it("should have an end date after the start date to be valid", function() {
+              expect(isolateScope.isValid()).toBeFalsy();
+
+              element.find("input.SUN").click();
+              isolateScope.data.endDateDisabled = false;   // select the end date radio
+              isolateScope.endDate = new Date();
+
+              expect(isolateScope.isValid()).toBeTruthy();
+
+              isolateScope.endDate = "2014-04-01";  // before now and a string version of the date
+              expect(isolateScope.isValid()).toBeFalsy();
+
+            });
+
+            it("should hydrate from strings for start and end time", function() {
+              $myscope.model = { startTime: "2014-04-01", endTime: "2014-04-02" };
+              $myscope.$apply();
+
+              element.find("input.SUN").click();
+              isolateScope.data.endDateDisabled = false;   // select the end date radio
+              expect(isolateScope.isValid()).toBeTruthy();
+
+            });
+
+          });
+
         });
     });
 });
