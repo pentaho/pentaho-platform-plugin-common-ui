@@ -78,13 +78,19 @@ define([
               },
               link: function (scope, elem, attrs) {
                 scope.$watch('hour', function(newValue, oldValue) {
-                  updateTime(newValue, oldValue, scope.selectedDate.getMinutes(), scope.selectedDate.getMinutes(), scope.tod, scope.tod);
+                  if (scope.selectedDate) {
+                    updateTime(newValue, oldValue, scope.selectedDate.getMinutes(), scope.selectedDate.getMinutes(), scope.tod, scope.tod);
+                  } 
                 });
                 scope.$watch('minute', function(newValue, oldValue) {
-                  updateTime(scope.selectedDate.getHours(), scope.selectedDate.getHours(), newValue, oldValue, scope.tod, scope.tod);
+                  if (scope.selectedDate) {
+                    updateTime(scope.selectedDate.getHours(), scope.selectedDate.getHours(), newValue, oldValue, scope.tod, scope.tod);
+                  }
                 });
                 scope.$watch('tod', function(newValue, oldValue) {
-                  updateTime(scope.selectedDate.getHours(), scope.selectedDate.getHours(), scope.selectedDate.getMinutes(), scope.selectedDate.getMinutes(), newValue, oldValue);
+                  if (scope.selectedDate) {
+                    updateTime(scope.selectedDate.getHours(), scope.selectedDate.getHours(), scope.selectedDate.getMinutes(), scope.selectedDate.getMinutes(), newValue, oldValue);
+                  }
                 });
 
                 var updateTime = function(hours, oldHours, minutes, oldMinutes, tod, oldTod) {
