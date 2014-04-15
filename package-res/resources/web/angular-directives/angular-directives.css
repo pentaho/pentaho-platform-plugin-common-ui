@@ -12,6 +12,10 @@
 
 }
 
+.bootstrap .accordion-wizard .accordion-footing {
+  padding: 0 0 2px 2px;
+}
+
 .bootstrap .accordion-wizard .accordion-group {
   border-radius: 0px;
   -webkit-border-radius: 0px;
