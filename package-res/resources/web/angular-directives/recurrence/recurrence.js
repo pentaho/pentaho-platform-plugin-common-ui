@@ -6,7 +6,7 @@ define([
 
         angular.module('recurrence', [])
 
-            .controller('WeeklyRecurrenceController', ['$scope', '$attrs', '$locale', function ($scope, $attrs, $locale) {
+            .controller('WeeklyRecurrenceController', ['$scope', '$attrs', '$locale', '$element', function ($scope, $attrs, $locale, $element) {
 
 
                 var sun = $locale.DATETIME_FORMATS.DAY[0];
@@ -89,7 +89,7 @@ define([
 
                 $scope.isValid = function() {
                   var formname = "weeklyScheduleForm",
-                      el = angular.element("form[name='" + formname + "']"),
+                      el = $element.find("form[name='" + formname + "']"),
                       daysOfWeek_valid = false,
                       dateTime_valid = false;
                   if(el && el.scope && el.scope() && el.scope()[formname]) {
@@ -136,7 +136,7 @@ define([
                                     && scope.weeklyRecurrenceInfo.daysOfWeek.length > 0) {
                                     for (var i = 0; i < scope.weeklyRecurrenceInfo.daysOfWeek.length; i++) {
                                         //select each day in the array
-                                        dayIndex = scope.weeklyRecurrenceInfo.daysOfWeek[i];
+                                        var dayIndex = scope.weeklyRecurrenceInfo.daysOfWeek[i];
                                         var day = scope.data.getDayByIndex(dayIndex)
                                         if(day) {
                                           scope.data.selectedDays[day.key] = true;
@@ -172,7 +172,7 @@ define([
                                 "monthsOfYear": "",
                                 "years": "",
                                 "startTime": scope.startDate,
-                                "endTime": (scope.endDateRadio == "dateSelected") ? scope.endDate : undefined,
+                                "endTime": (scope.endDateRadio === "dateSelected") ? scope.endDate : undefined,
                                 "uiPassParam": "WEEKLY",
                                 "cronString": ""
                             };
