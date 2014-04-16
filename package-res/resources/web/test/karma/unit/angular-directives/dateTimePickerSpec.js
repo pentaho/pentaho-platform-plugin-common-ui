@@ -31,6 +31,24 @@ define(deps, function(angular, templateUtil, dojoParser, ready, registry) {
           scope = isolateScope = element = httpBackend = templateCache = timeout = undefined;
         });
 
+define(deps, function(angular, templateUtil) {
+
+    describe("dateTimePicker", function () {
+        var scope, isolateScope, element, httpBackend, templateCache;
+
+        beforeEach(module("dateTimePicker"));
+
+        beforeEach(inject(function ($rootScope, $httpBackend, $templateCache) {
+            scope = $rootScope.$new();
+            scope.startDate = new Date("2014-04-01 11:15:00 PM");
+            httpBackend = $httpBackend;
+            templateCache = $templateCache;
+
+            templateUtil.addTemplate("common-ui/angular-directives/dateTimePicker/dateTimePicker.html", httpBackend, templateCache);
+
+        }));
+>>>>>>> [PDI-11302] - Styling tweaks based on UX feedback
+
         describe("controller", function () {
             var ctrl, $attrs;
 
