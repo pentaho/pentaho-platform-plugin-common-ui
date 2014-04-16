@@ -1006,8 +1006,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
           {
             className: "propPanel_checkbox propPanel_control",
             value: false,
-            templateString: "<div class='${className}'><input id='${model.id}_checkbox' name='${model.id}_checkbox' data-dojo-type='dijit.form.CheckBox' /> <label for='${model.id}_checkbox'>${label}</label></div>",
-            handles: [],
+            templateString: "<div class='${className}'><label for='${model.id}_checkbox'>${label}</label></div>",
             constructor: function (options) {
               if (this.model.value) {
                 this.value = this.model.value;
@@ -1017,31 +1016,16 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
               this.label = pentaho.common.Messages.getString(this.model.ui.label, this.model.ui.label);
             },
             postCreate: function () {
-              this.checkbox = registry.byId(this.model.id + "_checkbox");
               var outterThis = this;
-
-              // ANALYZER-1040, IE checkbox issues force us to set the checked status here rather than in the templateString
-              if (typeof(this.value) != 'boolean') {
-                this.value = false;
-              }
-              this.checkbox.attr('checked', this.value);
-
-              this.handles.push(on(this.checkbox,  "onChange", function () {
-                if (outterThis.model.value != outterThis.checkbox.checked) {
-                  outterThis.model.set('value',  outterThis.checkbox.checked);
+              this.checkbox = new CheckBox({
+                id: this.model.id+"_checkbox",
+                name: this.model.id+"_checkbox",
+                checked: outterThis.model.get('value'),
+                onChange: function(value){
+                  outterThis.model.set('value',  value);
                 }
-              }));
-            },
-            set: function (prop, newVal) {
-              if (this.checkbox) {
-                if (prop == "value" && newVal != this.checkbox.checked) {
-                  this.checkbox.set(prop, newVal);
-                }
-              }
-
-            },
-            onChange: function () {
-
+              }, this.model.id+"_checkbox");
+              this.checkbox.placeAt(this.domNode, "first");
             },
             destroy: function () {
               array.forEach(this.handles, function(handle){handle});
