@@ -1,5 +1,5 @@
 <div class="weeklyRecurrenceDirective">
-  {{weeklyLabel}} <br>
+  <label>{{weeklyLabel}}</label>
   <form name="weeklyScheduleForm" novalidate>
     <div class="form-inline row">
         <label ng-repeat="day in data.daysOfWeek" class="checkbox daysOfWeek">
@@ -9,11 +9,10 @@
         </label>
     </div>
     <br/>
-    {{startLabel}} <br/>
-
+    <label>{{startLabel}}</label>
     <div datetime selected-date="startDate" min-date="minStartDate" minutes-increment="15" at-label="{{atLabel}}"></div>
     <br/>
-    {{untilLabel}} <br/>
+    <label>{{untilLabel}}</label>
     <div class="endDateRadioWrapper">
       <div class="form-inline">
         <label class="radio noEndDate" >
