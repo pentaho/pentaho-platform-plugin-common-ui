@@ -37,6 +37,9 @@ define([
 
               // If we have a default date we need to massage it to fit the dropdowns.
               if (defaultDate) {
+                defaultDate = new Date(defaultDate.getTime() + (increment * 60000)); // round the date forward by the increment
+                defaultDate.setSeconds(0); // Zero out the seconds
+
                 if (defaultDate.getHours() == 0) { // If it is midnight we need to display 12 not 0
                   $scope.hour = 12;
                 } else { // otherwise we mod it
