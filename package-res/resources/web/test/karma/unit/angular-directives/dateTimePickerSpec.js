@@ -15,7 +15,7 @@ define(deps, function(angular, templateUtil) {
 
         beforeEach(inject(function ($rootScope, $httpBackend, $templateCache) {
             scope = $rootScope.$new();
-            scope.startDate = new Date("2014-04-01 11:15:00 PM");
+            scope.startDate = new Date(2014,4,1,23,15,0);
             httpBackend = $httpBackend;
             templateCache = $templateCache;
 

@@ -139,11 +139,12 @@ define(deps, function (angular, templateUtil) {
                         expect(scope.model.startTime.getHours()).toBe(10);
                         expect(scope.model.startTime.getMinutes()).toBe(59);
 
-                        isolateScope.selectedDate = new Date("2014-04-01 11:15:00 PM");
+                        var myDate = new Date(2014,4,1,23,15,0);
+                        isolateScope.selectedDate = myDate;
 
                         scope.$apply();
 
-                        expect(scope.model.startTime.toString()).toBe( new Date("2014-04-01 11:15:00 PM").toString());
+                        expect(scope.model.startTime).toBe(myDate);
                     });
                 });
             });
