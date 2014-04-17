@@ -143,7 +143,6 @@ treecontrol .treeControlLoading .spin {
 
 .bootstrap .angular-dojo.dateTimePicker .input-small {
   width: 62px;
-  margin-left: 6px;
 }
 
 .bootstrap .angular-dojo.dateTimePicker .hourMinuteSeperator {
@@ -151,7 +150,7 @@ treecontrol .treeControlLoading .spin {
 }
 
 .angular-dojo.dateTimePicker .atText {
-  margin-left: 4px
+  margin: 0 2px 0 4px;
 }
 
 .weeklyRecurrenceDirective .endDateRadioWrapper {
