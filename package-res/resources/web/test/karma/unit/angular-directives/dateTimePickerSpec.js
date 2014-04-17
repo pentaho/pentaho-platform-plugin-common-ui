@@ -72,7 +72,7 @@ define(deps, function(angular, templateUtil) {
                 //Since we told the datetime directive to use the scope.startDate
                 //we need to verify the selected hours, minutes, and tod match
                 expect(element.find("select")[0].value).toEqual("10");
-                expect(element.find("select")[1].value).toEqual("1");
+                expect(element.find("select")[1].value).toEqual("2");
                 expect(element.find("select")[2].value).toEqual("1");
             });
         });
