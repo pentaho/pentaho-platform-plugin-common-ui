@@ -327,12 +327,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       <available file="${js.karma.ci.config}"/>
       <then>
         <!-- we have karma available, use it to run the tests -->
-        <exec executable="karma">
-          <arg value="start"/>
-          <arg value="${js.karma.ci.config}"/>
-          <!-- if we are running via ant, then assume we must 'single-run' -->
-          <arg value="--single-run"/>
-        </exec>
+          <if>
+              <isset property="isWindows"/>
+              <then>
+                  <exec executable="karma.cmd">
+                      <arg value="start"/>
+                      <arg value="${js.karma.ci.config}"/>
+                      <!-- if we are running via ant, then assume we must 'single-run' -->
+                      <arg value="--single-run"/>
+                  </exec>
+              </then>
+              <else>
+                  <exec executable="karma">
+                      <arg value="start"/>
+                      <arg value="${js.karma.ci.config}"/>
+                      <!-- if we are running via ant, then assume we must 'single-run' -->
+                      <arg value="--single-run"/>
+                  </exec>
+              </else>
+          </if>
       </then>
       <else>
         <fail>There is no karma configuration file available (looking for: ${js.karma.ci.config})</fail>
