@@ -16,8 +16,7 @@
  */
 
 define([
-    'common-ui/angular',
-    'angular-mocks'
+    'common-ui/angular'
   ],
   function (angular) {
     angular.module('common.schedule', [])
