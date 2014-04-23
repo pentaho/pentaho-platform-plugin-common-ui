@@ -95,7 +95,7 @@
         <mkdir dir="${dojo.root}"/>
     </target>
 
-    <target name="unzip_dojo">
+    <target name="unzip_dojo" depends="install-antcontrib">
         <if>
             <available file="${dojo.root}/${dojo-artifact}.zip"/>
             <then/>
@@ -103,9 +103,10 @@
                 <!--
                        <get src="http://download.dojotoolkit.org/release-${dojo.version}/${dojo-artifact}.zip"
                              dest="${dojo.root}/${dojo-artifact}.zip"/> -->
+
+                <mkdir dir="${dojo.root}"/>
                 <get src="http://repository.pentaho.org/artifactory/third-party/org/dojotoolkit/dojo/dojo-release/${dojo.version}/${dojo-artifact}.zip"
                      dest="${dojo.root}/${dojo-artifact}.zip"/>
-                <mkdir dir="${dojo.root}"/>
                 <unzip src="dev-res/dojo/${dojo-artifact}.zip" dest="${dojo.root}"/>
 
                 <!--<get src="http://download.dojotoolkit.org/release-${dojo.version}/${dojo-artifact}-src.zip" dest="${dojo.root}/${dojo-artifact}-src.zip"/>-->
