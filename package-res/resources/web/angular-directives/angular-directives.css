@@ -149,6 +149,10 @@ treecontrol .treeControlLoading .spin {
   padding: 0px 4px 0px 4px;
 }
 
+.bootstrap .angular-dojo.dateTimePicker .hourMinuteSeperator {
+  padding: 0px 4px 0px 4px;
+}
+
 .angular-dojo.dateTimePicker .atText {
   margin: 0 2px 0 4px;
 }

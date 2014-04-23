@@ -199,11 +199,9 @@
 
     <target name="update-package-res" if="biserver-root"
             description="Update your BIServer with only the contents of package-res/">
-        <copy todir="${biserver-root}/pentaho-solutions/system/pentaho-interactive-reporting">
+        <copy todir="${biserver-root}/pentaho-solutions/system/common-ui">
             <fileset dir="${package.resdir}"/>
         </copy>
-        <copy todir="${biserver-root}/pentaho-solutions/system/pentaho-interactive-reporting/resources/web/testres"
-              file="${dev.res}/runner.html"/>
     </target>
 
 
