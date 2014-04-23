@@ -1,4 +1,3 @@
-
 /*
  * This program is free software; you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License, version 2.1 as published by the Free Software
@@ -17,52 +16,53 @@
  */
 
 require([
-  'common-ui/angular',
-  'common-ui/angular-directives/angular-directives'
-  ],
-  function(angular) {
-    angular.module('folderBrowserSample', ['folderBrowser'])
-      .controller('FolderBrowserSampleController', 
-        ["$scope", "$http", function($scope, $http) {
-          $scope.sample = {
-            addFolder: undefined,
-            externalSelect: undefined,
-            treeModel: {},
-            isLoading: false,
-            onSelect: function(selectedNode) {
+        'common-ui/angular',
+        'common-ui/angular-ui-bootstrap',
+        'common-ui/angular-directives/angular-directives'
+    ],
+    function (angular) {
+        angular.module('folderBrowserSample', ['folderBrowser'])
+            .controller('FolderBrowserSampleController',
+            ["$scope", "$http", function ($scope, $http) {
+                $scope.sample = {
+                    addFolder: undefined,
+                    externalSelect: undefined,
+                    treeModel: {},
+                    isLoading: false,
+                    onSelect: function (selectedNode) {
 
-            },
-            selectedNode: undefined,
-            refreshTree: function() {
-              $scope.sample.isLoading = true;
-              $http.get('folderBrowserSample/treeModel.json')
-                .then(function(response){
-                  $scope.sample.treeModel = response.data;
-                })["finally"]( function() {
-                  $scope.sample.isLoading = false;
-                });
-            },
-            newFolder: "",
-                  id:1,
-                  getId: function(){
-                    return this.id++;
-                  },
-            addNewFolder: function() {
-              var f = this.newFolder;
-                  $scope.sample.addFolder = {
-                      id: this.getId(),
-                      name: f,
-                      permissions: {write: 'true'},
-                      localizedName: f,
-                      children: []
-                    };
-            },
-            selectThis: function(node) {
-              this.externalSelect = { attr: 'path', val: node };
+                    },
+                    selectedNode: undefined,
+                    refreshTree: function () {
+                        $scope.sample.isLoading = true;
+                        $http.get('folderBrowserSample/treeModel.json')
+                            .then(function (response) {
+                                $scope.sample.treeModel = response.data;
+                            })["finally"](function () {
+                            $scope.sample.isLoading = false;
+                        });
+                    },
+                    newFolder: "",
+                    id: 1,
+                    getId: function () {
+                        return this.id++;
+                    },
+                    addNewFolder: function () {
+                        var f = this.newFolder;
+                        $scope.sample.addFolder = {
+                            id: this.getId(),
+                            name: f,
+                            permissions: {write: 'true'},
+                            localizedName: f,
+                            children: []
+                        };
+                    },
+                    selectThis: function (node) {
+                        this.externalSelect = { attr: 'path', val: node };
+                    }
+                };
+                $scope.sample.refreshTree();
             }
-          };
-          $scope.sample.refreshTree();
-        }
-      ]);
-  }
+            ]);
+    }
 );
