@@ -8,3 +8,5 @@ eclipse-bin/
 override.properties
 .classpath
 .project
+.idea
+.DS_Store
