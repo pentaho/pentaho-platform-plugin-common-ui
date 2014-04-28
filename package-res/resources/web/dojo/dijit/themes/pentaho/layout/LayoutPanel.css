@@ -90,7 +90,10 @@
   font-size:.85em;
   cursor: default;
   white-space: nowrap;
-  max-width: 87%;
+  width: 86%;
+  height: 18px;
+  line-height: 18px;
+  display: inline-block;
 }
 
 .gem .gemMenuHandle{
@@ -99,8 +102,13 @@
   background-position: center right;
   background-repeat: no-repeat;
   width: 16px;
-  height: 16px;
+  height: 18px;
+  display: inline-block;
   /*cursor:pointer;*/
+}
+
+.gem .gemMenuHandle.scalable{
+  width: 9%;
 }
 
 .gem.over .gemMenuHandle{
