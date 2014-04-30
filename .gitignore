@@ -8,3 +8,4 @@ eclipse-bin/
 override.properties
 .classpath
 .project
+/bin
