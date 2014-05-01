@@ -26,7 +26,7 @@
  * http://dojotoolkit.org/reference-guide/1.9/dojo/_base/lang.html#replace
  *
  * Usage (AMD):
- * require( [ "common-ui/util/URLEncoder” ], function( Encoder ){
+ * require( [ "common-ui/util/URLEncoder" ], function( Encoder ){
  *    var encodedURL = Encoder.encode( "some/path/{0}/{1}", [ val1, val2 ] );
  * }
  *
@@ -38,7 +38,7 @@
  * dojo/io-query: https://dojotoolkit.org/reference-guide/1.9/dojo/io-query.html
  *
  * Example:
- * require( [ "common-ui/util/URLEncoder” ], function( Encoder ){
+ * require( [ "common-ui/util/URLEncoder" ], function( Encoder ){
  *    var queryObject = { bang: "something", baz: ["a","b"]
  *    var encodedURL = Encoder.encode( "some/path/{0}/{1}", [ val1, val2 ], queryObject );
  *    // results in "some/path/val1/val2?bang=something&baz=a&baz=b
@@ -68,6 +68,17 @@ define( "common-ui/util/URLEncoder", [ "dojo/_base/lang", "dojo/_base/array", "d
     }
     return result;
   };
+  
+  Encoder.encodeRepositoryPath = function( str ) {
+    "use strict"
+    var encodedStr = String( str ).replace( new RegExp (":", "g"), "::").replace( new RegExp ("[\\\\/]", "g"), ":")
+    return encodedStr;
+  };
+  
+  Encoder.decodeRepositoryPath = function ( str ) {
+    return String( str ).replace( new RegExp (":", "g"), "\/").replace( new RegExp ("\/\/", "g"), ":");
+  };
+    
   // Return encoder for AMD use
   return Encoder;
 });
