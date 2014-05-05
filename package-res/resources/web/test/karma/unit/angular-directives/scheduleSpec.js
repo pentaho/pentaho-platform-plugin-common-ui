@@ -49,7 +49,7 @@ define(deps, function(angular) {
 
 
     it('should verify selected schedule is Never', function () {
-      var directiveScope = scheduleSelectorElement.scope();
+      var directiveScope = scheduleSelectorElement.isolateScope();
       expect(scheduleSelectorElement.find("[never-schedule='']").length).toBe(1);
       expect(directiveScope.model.type).toBe('Never');
 
@@ -63,7 +63,7 @@ define(deps, function(angular) {
       scope.selectedType = "Daily";
       scope.$digest();
 
-      var directiveScope = scheduleSelectorElement.scope();
+      var directiveScope = scheduleSelectorElement.isolateScope();
       expect(scheduleSelectorElement.find("[daily-schedule='']").length).toBe(1);
       expect(directiveScope.model.type).toBe('Daily');
     });
@@ -73,7 +73,7 @@ define(deps, function(angular) {
       scope.selectedType = "Weekly";
       scope.$digest();
 
-      var directiveScope = scheduleSelectorElement.scope();
+      var directiveScope = scheduleSelectorElement.isolateScope();
       expect(scheduleSelectorElement.find("[weekly='']").length).toBe(1);
       expect(directiveScope.model.type).toBe('Weekly');
     });
@@ -83,7 +83,7 @@ define(deps, function(angular) {
       scope.selectedType = "Monthly";
       scope.$digest();
 
-      var directiveScope = scheduleSelectorElement.scope();
+      var directiveScope = scheduleSelectorElement.isolateScope();
       expect(scheduleSelectorElement.find("[monthly-schedule='']").length).toBe(1);
       expect(directiveScope.model.type).toBe('Monthly');
     });
@@ -93,7 +93,7 @@ define(deps, function(angular) {
       scope.selectedType = "Yearly";
       scope.$digest();
 
-      var directiveScope = scheduleSelectorElement.scope();
+      var directiveScope = scheduleSelectorElement.isolateScope();
       expect(scheduleSelectorElement.find("[yearly-schedule='']").length).toBe(1);
       expect(directiveScope.model.type).toBe('Yearly');
     });
@@ -103,7 +103,7 @@ define(deps, function(angular) {
       scope.selectedType = "Weekly";
       scope.$digest();
 
-      var directiveScope = scheduleSelectorElement.scope();
+      var directiveScope = scheduleSelectorElement.isolateScope();
       expect(directiveScope.type).toBe('Weekly');
 
       directiveScope.sessionModelMap = { data:'test' };
@@ -116,7 +116,7 @@ define(deps, function(angular) {
       scope.selectedType = "Weekly";
       scope.$digest();
 
-      var directiveScope = scheduleSelectorElement.scope();
+      var directiveScope = scheduleSelectorElement.isolateScope();
       expect(directiveScope.type).toBe('Weekly');
 
       directiveScope.sessionModelMap = { data:'test' };
@@ -129,7 +129,7 @@ define(deps, function(angular) {
       scope.selectedType = "Weekly";
       scope.$digest();
 
-      var directiveScope = scheduleSelectorElement.scope();
+      var directiveScope = scheduleSelectorElement.isolateScope();
       expect(directiveScope.type).toBe('Weekly');
 
       directiveScope.model = { data: 'testWeekly', type: 'Weekly'}
@@ -145,7 +145,7 @@ define(deps, function(angular) {
       scope.selectedType = "Weekly";
       scope.$digest();
 
-      var directiveScope = scheduleSelectorElement.scope();
+      var directiveScope = scheduleSelectorElement.isolateScope();
       expect(directiveScope.type).toBe('Weekly');
 
       directiveScope.model = { data: 'A', type: 'Weekly'}

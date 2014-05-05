@@ -124,7 +124,7 @@ define(deps, function(angular, templateUtil, dojoParser, ready, registry) {
 
             timeout.flush();
 
-            isolateScope = angular.element(element).scope();
+            isolateScope = angular.element(element).isolateScope();
 
             expect(isolateScope.hideTime).toBeTruthy();
             expect(element.find("span[ng-hide='hideTime'].ng-hide").length).toEqual(1);
