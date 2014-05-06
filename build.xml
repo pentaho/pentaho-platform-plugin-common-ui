@@ -230,52 +230,6 @@
         </copy>
     </target>
 
-    <target name="instrument-js"
-            depends="instrument-js-pre,instrument-js-linux,instrument-js-windows,instrument-js-post">
-    </target>
-
-    <target name="instrument-js-pre">
-        <!-- create the stage dir for the instrumented scripts -->
-        <delete dir="${stage.dir}/javascript/instrumented"/>
-        <mkdir dir="${stage.dir}/javascript/instrumented"/>
-    </target>
-
-    <target name="instrument-js-post">
-        <!-- delete the unneeded files -->
-        <delete>
-            <fileset dir="${stage.dir}/javascript/instrumented">
-                <include name="*.html"/>
-                <include name="*.css"/>
-                <include name="*.gif"/>
-                <include name="jscoverage.js"/>
-            </fileset>
-        </delete>
-
-        <!-- copy to the dev target -->
-        <delete dir="${approot.stage.dir}/resources/web/instrumented"/>
-        <mkdir dir="${approot.stage.dir}/resources/web/instrumented"/>
-        <copy todir="${approot.stage.dir}/resources/web/instrumented">
-            <fileset dir="${stage.dir}/javascript/instrumented">
-            </fileset>
-        </copy>
-    </target>
-
-    <target name="instrument-js-linux" if="isLinux">
-        <!-- instrument the scripts -->
-        <exec dir="." executable="jscoverage/bin/jscoverage" os="Linux">
-            <arg line="${package.resdir}/resources/web"/>
-            <arg line="${stage.dir}/javascript/instrumented"/>
-        </exec>
-    </target>
-
-    <target name="instrument-js-windows" if="isWindows">
-        <!-- instrument the scripts -->
-        <exec dir="." executable="jscoverage/bin/jscoverage.exe" os="Windows">
-            <arg line="${package.resdir}/resources/web"/>
-            <arg line="${stage.dir}/javascript/instrumented"/>
-        </exec>
-    </target>
-
     <target name="publish-nojar" depends="subfloor-js.js.publish-nojar, subfloor-pkg.publish-nojar"/>
 
     <target name="dist-js">
