@@ -42,6 +42,7 @@ requireCfg['paths']['dojox/storage'] = prefix+'/dojo/pentaho/common/overrides/do
 requireCfg['paths']['dojox/json'] = prefix+'/dojo/pentaho/common/overrides/dojox/json';
 requireCfg['paths']['dojox/rpc'] = prefix+'/dojo/pentaho/common/overrides/dojox/rpc';
 requireCfg['paths']['dojo/_base/kernel'] = prefix+'/dojo/pentaho/common/overrides/dojo/_base/kernel';
+requireCfg['paths']['dojo/store/Memory'] = prefix+'/dojo/pentaho/common/overrides/dojo/store/Memory';
 
 
 // Plugin Handlers
