@@ -81,6 +81,17 @@ define( "common-ui/util/URLEncoder", [ "dojo/_base/lang", "dojo/_base/array", "d
     }
     return result;
   };
+
+  Encoder.encodeRepositoryPath = function( str ) {
+    "use strict"
+    var encodedStr = String( str ).replace( new RegExp (":", "g"), "::").replace( new RegExp ("[\\\\/]", "g"), ":")
+    return encodedStr;
+  };
+
+  Encoder.decodeRepositoryPath = function ( str ) {
+    return String( str ).replace( new RegExp (":", "g"), "\/").replace( new RegExp ("\/\/", "g"), ":");
+  };
+
   // Return encoder for AMD use
   return Encoder;
 });
