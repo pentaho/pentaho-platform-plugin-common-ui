@@ -26,7 +26,7 @@
  * http://dojotoolkit.org/reference-guide/1.9/dojo/_base/lang.html#replace
  *
  * Usage (AMD):
- * require( [ "common-ui/util/URLEncoder" ], function( Encoder ){
+ * require( [ "common-ui/util/URLEncoder” ], function( Encoder ){
  *    var encodedURL = Encoder.encode( "some/path/{0}/{1}", [ val1, val2 ] );
  * }
  *
@@ -38,7 +38,7 @@
  * dojo/io-query: https://dojotoolkit.org/reference-guide/1.9/dojo/io-query.html
  *
  * Example:
- * require( [ "common-ui/util/URLEncoder" ], function( Encoder ){
+ * require( [ "common-ui/util/URLEncoder” ], function( Encoder ){
  *    var queryObject = { bang: "something", baz: ["a","b"]
  *    var encodedURL = Encoder.encode( "some/path/{0}/{1}", [ val1, val2 ], queryObject );
  *    // results in "some/path/val1/val2?bang=something&baz=a&baz=b
@@ -55,25 +55,6 @@ define( "common-ui/util/URLEncoder", [ "dojo/_base/lang", "dojo/_base/array", "d
     return str.replace("\\", "%5C").replace("/", "%2F");
   }
 
-  function encodeQueryObject(obj){
-    "use strict";
-
-    for(var prop in obj){
-      var val = obj[prop], newProp = singleEncode(prop), newObj = {};
-
-      if(lang.isArray(val)){
-        newObj[newProp] = [];
-        for(var i = 0; i < val.length; i++){
-          newObj[newProp].push(singleEncode(val[i]));
-        }
-      }else{
-        newObj[newProp] = singleEncode(val);
-      }
-
-    }
-    return newObj;
-  }
-
   Encoder.encode = function( str, args, queryObj ){
     "use strict"
     if( typeof args === "undefined" ){
@@ -82,30 +63,24 @@ define( "common-ui/util/URLEncoder", [ "dojo/_base/lang", "dojo/_base/array", "d
     if( args instanceof Array === false ){
       args = [ args ];
     }
-    args = array.map( args, function( item ){
+    // detect the presence of the "?" to determin when the special double-slash encoding should end
+    var pathPart = str.split("\?")[0];
+    var pathBounds = (pathPart.match(/\{[\d]+\}/) || []).length;
+    args = array.map( args, function( item, pos ){
       var encodedStr = encodeURIComponent( String( item ) )
       // double-encode / and \ to work around Tomcat issue
-      encodedStr = encodedStr.replace("%5C", "%255C").replace("%2F", "%252F");
+      if(pos < pathBounds){
+        encodedStr = encodedStr.replace("%5C", "%255C").replace("%2F", "%252F");
+      }
       return encodedStr;
     } );
     var result = lang.replace( str, args )
     if( queryObj ){
-
-      result += "?" + ioQuery.objectToQuery( encodeQueryObject(queryObj) );
+      result += (result.indexOf("?") > -1)? "&" : "?";
+      result += ioQuery.objectToQuery( queryObj );
     }
     return result;
   };
-  
-  Encoder.encodeRepositoryPath = function( str ) {
-    "use strict"
-    var encodedStr = String( str ).replace( new RegExp (":", "g"), "::").replace( new RegExp ("[\\\\/]", "g"), ":")
-    return encodedStr;
-  };
-  
-  Encoder.decodeRepositoryPath = function ( str ) {
-    return String( str ).replace( new RegExp (":", "g"), "\/").replace( new RegExp ("\/\/", "g"), ":");
-  };
-    
   // Return encoder for AMD use
   return Encoder;
 });
