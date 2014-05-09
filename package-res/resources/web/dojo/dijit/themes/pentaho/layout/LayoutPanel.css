@@ -150,6 +150,7 @@
 .pentahoPropertiesPanel .caption-text {
   font-size: .85em;
   font-weight: normal;
+  float: left;
 }
 
 .pentahoPropertiesPanel .captionIcon {
