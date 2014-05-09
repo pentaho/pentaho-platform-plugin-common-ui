@@ -44,9 +44,35 @@
  *    // results in "some/path/val1/val2?bang=something&baz=a&baz=b
  * }
  */
-define( "common-ui/util/URLEncoder", [ "dojo/_base/lang", "dojo/_base/array", "dojo/io-query" ], function( lang, array, query ){
+define( "common-ui/util/URLEncoder", [ "dojo/_base/lang", "dojo/_base/array", "dojo/io-query" ], function( lang, array, ioQuery ){
 
   var Encoder = lang.getObject("pho.Encoder", true); // create global reference for non-amd users
+
+  function doubleEncode(str){
+    return str.replace("%5C", "%255C").replace("%2F", "%252F");
+  }
+  function singleEncode(str){
+    return str.replace("\\", "%5C").replace("/", "%2F");
+  }
+
+  function encodeQueryObject(obj){
+    "use strict";
+
+    for(var prop in obj){
+      var val = obj[prop], newProp = singleEncode(prop), newObj = {};
+
+      if(lang.isArray(val)){
+        newObj[newProp] = [];
+        for(var i = 0; i < val.length; i++){
+          newObj[newProp].push(singleEncode(val[i]));
+        }
+      }else{
+        newObj[newProp] = singleEncode(val);
+      }
+
+    }
+    return newObj;
+  }
 
   Encoder.encode = function( str, args, queryObj ){
     "use strict"
@@ -64,7 +90,8 @@ define( "common-ui/util/URLEncoder", [ "dojo/_base/lang", "dojo/_base/array", "d
     } );
     var result = lang.replace( str, args )
     if( queryObj ){
-      result += "?" + ioQuery.objectToQuery( queryObj );
+
+      result += "?" + ioQuery.objectToQuery( encodeQueryObject(queryObj) );
     }
     return result;
   };
