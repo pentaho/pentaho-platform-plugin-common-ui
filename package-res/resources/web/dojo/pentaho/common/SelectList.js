@@ -69,7 +69,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
               if (!this.fieldContextMenu) {
                 return;
               }
-              event.stop(event);
+              event.preventDefault();
               var x = event.pageX;
               var y = event.pageY;
               this.fieldContextMenu._scheduleOpen(event.target, null, {x: x, y: y});
