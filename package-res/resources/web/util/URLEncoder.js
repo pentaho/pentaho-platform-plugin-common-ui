@@ -66,7 +66,7 @@ define( "common-ui/util/URLEncoder", [ "dojo/_base/lang", "dojo/_base/array", "d
     // detect the presence of the "?" to determin when the special double-slash encoding should end
     var pathPart = str.split("\?")[0];
     var pathBounds = (pathPart.match(/\{[\d]+\}/) || []).length;
-    args = array.map( args, function( item, pos ){
+    argsMap = array.map( args, function( item, pos ){
       var encodedStr = encodeURIComponent( String( item ) )
       // double-encode / and \ to work around Tomcat issue
       if(pos < pathBounds){
@@ -74,7 +74,7 @@ define( "common-ui/util/URLEncoder", [ "dojo/_base/lang", "dojo/_base/array", "d
       }
       return encodedStr;
     } );
-    var result = lang.replace( str, args )
+    var result = lang.replace( str, argsMap )
     if( queryObj ){
       result += (result.indexOf("?") > -1)? "&" : "?";
       result += ioQuery.objectToQuery( queryObj );
