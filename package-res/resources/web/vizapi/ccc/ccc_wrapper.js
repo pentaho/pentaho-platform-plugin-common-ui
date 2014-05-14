@@ -1405,7 +1405,7 @@ function(def, pvc, pv){
                 var isMultiDatumGroup = group && group.count() > 1;
                 if(isMultiDatumGroup) {
                     var dim = group.dimensions(atom.dimension.name);
-                    return dim.format(dim.sum({visible: true}));
+                    return dim.format(dim.value({visible: true}));
                 }
             }
 
@@ -2630,6 +2630,24 @@ function(def, pvc, pv){
             }
         },
 
+        _parseDisplayUnits: function(displayUnits) {
+            if(displayUnits) {
+                var match = displayUnits.match(/^UNITS_(\d+)$/);
+                if(match) {
+                    // UNITS_0 -> 1
+                    // UNITS_1 -> 100
+                    // UNITS_2 -> 1000
+                    // ...
+                    var code = +match[1]; // >= 0  // + <=> Number( . )  conversion
+                    if(code > 0) {
+                        var exponent   = code + 1;
+                        return Math.pow(10, exponent); // >= 100
+                    }
+                }
+            }
+            return 1;
+        },
+
         // Logic that depends on width and height
         _prepareLayout: function(options){
             if(this._hasMultiChartColumns && pv.renderer() !== 'batik'){
@@ -3085,7 +3103,7 @@ function(def, pvc, pv){
 
             this.base();
 
-            this._configureAxesDisplayUnits();
+            this._configureDisplayUnits();
 
             if(this._showAxisTitle('base')){
                 this._configureAxisTitle('base',  this._getBaseAxisTitle ());
@@ -3124,7 +3142,7 @@ function(def, pvc, pv){
                 }
             } else {
                 var roleGems = measureAxis.gemsByRole[measureRole];
-            if(roleGems.length === 1){
+                if(roleGems.length === 1){
                     singleAxisGem = roleGems[0];
                 }
             }
@@ -3156,23 +3174,19 @@ function(def, pvc, pv){
 
         _cartesianAxesDisplayUnitsText: null,
 
-        _configureAxesDisplayUnits: function(){
+        _configureDisplayUnits: function(){
             this._cartesianAxesDisplayUnitsText = {};
         },
 
         _configureAxisDisplayUnits: function(primary, axisType, allowFractional){
-            if(!allowFractional){
+            if(!allowFractional) {
                 this.options[axisType + 'AxisTickExponentMin'] = 0; // 10^0 => 1
             }
 
             var text;
             var displayUnits = this._vizOptions['displayUnits' + (primary ? '' : 'Secondary')];
-            if(displayUnits && displayUnits !== 'UNITS_0'){
-
-                var match = displayUnits.match(/^UNITS_(\d+)$/) ||
-                            def.fail.argumentInvalid('displayUnits');
-                //var exponent = +match[1]; // + -> to number
-
+            var scaleFactor  = this._parseDisplayUnits(displayUnits);
+            if(scaleFactor > 1) {
                 text = this._message('dlgChartOption_' + displayUnits);
             }
 
@@ -3215,7 +3229,7 @@ function(def, pvc, pv){
             }
         },
 
-        _configureAxesDisplayUnits: function(){
+        _configureDisplayUnits: function(){
             this.base();
 
             this._configureAxisDisplayUnits(/*isPrimary*/true, 'ortho');
@@ -3377,7 +3391,7 @@ function(def, pvc, pv){
             configureLabelsOptions.call(this);
         },
 
-       _configureAxesDisplayUnits: function(){
+       _configureDisplayUnits: function(){
 
             this.base();
 
@@ -3618,13 +3632,13 @@ function(def, pvc, pv){
         },
 
         // Ortho axis title is not available on the server, so never show
-//        _getOrthoAxisTitle: function(){
-//            return this.axes.column.getAxisLabel();
-//        },
-//
-//        _getBaseAxisTitle: function(){
-//            return this.axes.row.getAxisLabel();
-//        },
+       // _getOrthoAxisTitle: function(){
+       //     return this.axes.column.getAxisLabel();
+       // },
+
+       // _getBaseAxisTitle: function(){
+       //     return this.axes.row.getAxisLabel();
+       // },
 
         _doesSharedSeriesSelection: function(){
             return false;
@@ -3833,12 +3847,12 @@ function(def, pvc, pv){
                     valueType: String
                 };
 
-//              options.visualRoles.color =
-//              this.axes.column.gemsByRole.color
-//                   .map(function(gem, index){
-//                      return pvc.buildIndexedId('color', index);
-//                   })
-//                   .join(', ');
+                // options.visualRoles.color =
+                // this.axes.column.gemsByRole.color
+                //     .map(function(gem, index){
+                //         return pvc.buildIndexedId('color', index);
+                //     })
+                //     .join(', ');
             }
         },
 
@@ -3862,7 +3876,7 @@ function(def, pvc, pv){
             return this._getMeasureRoleTitle('x');
         },
 
-        _configureAxesDisplayUnits: function(){
+        _configureDisplayUnits: function(){
 
             this.base();
 
@@ -4116,9 +4130,9 @@ function(def, pvc, pv){
 
         _discreteColorRole: 'rows',
 
-        _configure: function() {
-            this.base();
-            this.options.rootCategoryLabel = this._message('chartSunburstRootCategoryLabel');
+        // Changed in _configureDisplayUnits according to option "displayUnits".
+        _formatSize: function(sizeVar, sizeDim) {
+            return sizeVar.label;
         },
 
         _readUserOptions: function(options, vizOptions) {
@@ -4138,6 +4152,7 @@ function(def, pvc, pv){
             }
 
             eps.label_textStyle = vizOptions.labelColor;
+
 
             // Determine whether to show values label
             if (vizOptions.labelsOption != "none") {
@@ -4185,6 +4200,7 @@ function(def, pvc, pv){
                     return null;
                 };
                 
+                var me = this;
                 eps.label_add = function() {
                     return new pv.Label()
                         .visible(function(scene) {
@@ -4193,10 +4209,55 @@ function(def, pvc, pv){
                         })
                         .text(function(scene) {
                             var pvMainLabel = this.proto;
-                            return !pvMainLabel.text() ? "" : scene.vars.size.label;
-                        })                
+                            return !pvMainLabel.text() 
+                                ? "" 
+                                : me._formatSize(scene.vars.size, scene.firstAtoms.size.dimension);
+                        })
                         .textBaseline("top");
                 };
+            }
+        },
+
+
+        _configure: function() {
+            this.base();
+
+            this.options.rootCategoryLabel = this._message('chartSunburstRootCategoryLabel');
+
+            this._configureDisplayUnits();
+        },
+
+        _configureDisplayUnits: function() {
+            var scaleFactor = this._parseDisplayUnits(this._vizOptions.displayUnits);
+            if(scaleFactor > 1) {
+                var dims = this.options.dimensions;
+                var dimSize = dims.size || (dims.size = {});
+
+                // Values returned by the server are already divided by scaleFactor.
+                // The formatting, however is that of the original value.
+                // Here, we also want to show shorter values, so that they fit on slices.
+                // In the tooltip, however we want to show the original values.
+                // So, the strategy is:
+                // * remove the scale from values in the data table, reverting to original
+                // * scale and format the values only when showing them in the slice.
+
+                // Undo scaling applied by the server
+                // The existence of a converter discards any label received through a google style cell
+                // (DataTable conversion sends values and labels to CCC as a google-style cell).
+                dimSize.converter = function(v) {
+                    return (v != null && !isNaN(v))
+                        ? (v * scaleFactor)
+                        : v;
+                };
+
+                // Override slice size label formatting function
+                this._formatSize = function(sizeVar, sizeDim) {
+                    var size = sizeVar.value;
+                    // Scale & Format using the size dimension's formatting function
+                    return size == null ? "" : sizeDim.format(size / scaleFactor);
+                };
+            } else {
+                delete this._formatSize;
             }
         }
     });
