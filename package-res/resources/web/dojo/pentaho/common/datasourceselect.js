@@ -17,9 +17,10 @@
 define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dijit/_WidgetsInTemplateMixin", "dojo/on", 'pentaho/common/SmallImageButton',
   'pentaho/common/ListBox',
   'pentaho/common/Dialog',
-  'pentaho/common/MessageBox', "dojo/_base/lang", 'dojo/text!pentaho/common/datasourceselect.html'],
-  function (declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, on, SmallImageButton, ListBox, Dialog, MessageBox, lang, templateStr) {
-    return declare("pentaho.common.datasourceselect", [Dialog, _TemplatedMixin, _WidgetsInTemplateMixin],
+  'pentaho/common/MessageBox', "dojo/_base/lang", 'dojo/text!pentaho/common/datasourceselect.html',
+  'dojo/Stateful', 'dojo/has', 'dojo/_base/sniff'],
+  function (declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, on, SmallImageButton, ListBox, Dialog, MessageBox, lang, templateStr, Stateful, has) {
+    return declare("pentaho.common.datasourceselect", [Stateful, Dialog, _TemplatedMixin, _WidgetsInTemplateMixin],
 
       {
         getModel: null,
@@ -32,6 +33,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
         datasourceEditorPath: '',
         models: null,
         buttons: ['Ok_txt', 'Cancel_txt'],
+        scrollPosition: 0,
 
         /* dynamic injection of the wizard does not work currently
          includeDatasourceWizard: function() {
@@ -131,6 +133,32 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
           on(this.editdatasourceimg.buttonImg, "click", lang.hitch( this,  this.editDatasource));
           on(this.deletedatasourceimg.buttonImg, "click", lang.hitch( this,  this.deleteDatasource));
           on(this.modelList.menuNode, "dblclick", lang.hitch( this,  this.onModelDblClick)); //[PIR-439]
+
+          // workaround to make scrollbar somewhat usable in IE8
+          if(has("ie") == 8){
+
+            // remember scroll position
+            on(this.modelList.menuOuterNode, "scroll", lang.hitch(this, this.retainScrollPosition));
+
+            // apply scroll position whenever possible
+            on(this, "focus", lang.hitch(this, this.applyScrollPosition));
+            on(this, "blur", lang.hitch(this, this.applyScrollPosition));
+            on(this, "mouseover", lang.hitch(this, this.applyScrollPosition));
+            on(this, "mouseout", lang.hitch(this, this.applyScrollPosition));
+          }
+
+        },
+
+        retainScrollPosition: function () {
+          this.scrollPosition = this.modelList.menuOuterNode.scrollTop;
+        },
+
+        applyScrollPosition: function () {
+          window.setTimeout(lang.hitch( this, function(){
+            if(this.modelList.menuOuterNode.scrollTop === 0){
+              this.modelList.menuOuterNode.scrollTop = this.scrollPosition;
+            }
+          }), 0);
         },
 
         addDatasource: function () {
