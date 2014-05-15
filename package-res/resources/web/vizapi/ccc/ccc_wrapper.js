@@ -2638,9 +2638,8 @@ function(def, pvc, pv){
                     // UNITS_1 -> 100
                     // UNITS_2 -> 1000
                     // ...
-                    var code = +match[1]; // >= 0  // + <=> Number( . )  conversion
-                    if(code > 0) {
-                        var exponent   = code + 1;
+                    var exponent = +match[1]; // >= 0  // + <=> Number( . )  conversion
+                    if(exponent > 0) {
                         return Math.pow(10, exponent); // >= 100
                     }
                 }
