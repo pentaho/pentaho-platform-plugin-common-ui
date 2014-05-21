@@ -495,7 +495,14 @@ define("common-ui/prompting/pentaho-prompting", [ 'cdf/cdf-module', 'common-ui/p
             if (param.multiSelect && !$.isArray(value)) {
               value = [value];
             }
-            params[param.name] = value;
+
+            var valueParsed;
+            try {
+              valueParsed = dojo.number.parse(value, {locale: SESSION_LOCALE.toLowerCase()});
+            } catch(e) {
+              valueParsed = value;
+            }
+            params[param.name] = isNaN(valueParsed) ? value : valueParsed;
         }, this);
         return params;
       };
