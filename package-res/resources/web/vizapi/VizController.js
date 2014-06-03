@@ -129,7 +129,8 @@ pentaho.VizController = function(id) {
   this.chart = null;
   this.palette = pentaho.palettes[0];
   this.lastError = null;
-  this.memberPalette = null;  
+  this.memberPalette = null;
+  this.formatInfo = null;
 }
 
 /*
@@ -258,6 +259,25 @@ colors     Map of attributes/measures in the table to a map of member to color m
 */
 pentaho.VizController.prototype.setMemberPalette = function(colors) {
  this.memberPalette = colors;
+}
+
+/*
+setFormatInfo
+Sets the formatting strings and style
+for measure members in the current data table
+
+formatInfo  The new format info.
+The structure of this argument is like the following:
+    {
+        "[MEASURE:0]":      "#,###",
+        ...
+        currencySymbol:     "$",
+        decimalPlaceholder: ".",
+        thousandSeparator:  ","
+    }
+*/
+pentaho.VizController.prototype.setFormatInfo = function(formatInfo) {
+ this.formatInfo = formatInfo;
 }
 
 /*
@@ -392,7 +412,8 @@ pentaho.VizController.prototype.doVisualization = function( visualization, userD
     }
 
     options.memberPalette = this.memberPalette ? this.memberPalette : {};
-    
+    options.formatInfo    = this.formatInfo;
+
     var id = 'chart_div'+this.id;
 
     if( this.chart && this.chart.vizId == visualization.id ) {
