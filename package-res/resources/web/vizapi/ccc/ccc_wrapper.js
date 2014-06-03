@@ -1335,13 +1335,17 @@ function(def, pvc, pv){
             return filtered;
         },
 
-        cccDimList: function(){
-            if(!this._cccDimList){
+        cccDimList: function() {
+            if(!this._cccDimList) {
                 this._cccDimList =
                     this.chart._measureRolesInfoList
-                        .map(function(role){ return role.cccDimName; });
+                        .map(function(role) {
+                            this.gemsByRole[role.id].forEach(function(gem) {
+                                gem.cccDimName = role.cccDimName;
+                            });
+                            return role.cccDimName;
+                        }, this);
             }
-
             return this._cccDimList;
         },
 
@@ -2099,12 +2103,12 @@ function(def, pvc, pv){
 
             function processMeasureColumn(colGroupValues, id){
 
-                var meaInfo = def.getOwn(measuresInfo, id);
+                var meaInfo = def.getOwn(measuresInfo, id), roleAndLevel;
 
                 /* New measure? */
                 if(!meaInfo){
                     // TODO - last() ?
-                    var roleAndLevel = getColumnRolesAndLevels(dataTable, tc).pop();
+                    roleAndLevel = getColumnRolesAndLevels(dataTable, tc).pop();
 
                     // NOTE: roleAndLevel.level == [Measures].[MeasuresLevel],
                     // which is not the formula...
@@ -2285,6 +2289,7 @@ function(def, pvc, pv){
 
             this._configureTrends();
             this._configureSorts();
+            this._configureFormats();
 
             options.axisFont = defaultFont(options.axisFont, 12);
             options.axisTitleFont = defaultFont(options.axisTitleFont, 12);
@@ -2500,6 +2505,40 @@ function(def, pvc, pv){
             var sliceOrder = this._vizOptions.sliceOrder;
             if(sliceOrder){
                 this.options.sliceOrder = sliceOrder;
+            }
+        },
+
+        _configureFormats: function() {
+            var fz = this._vizOptions.formatInfo;
+            if(fz) {
+                var numberStyle = {
+                    currency: fz.currencySymbol,
+                    decimal:  fz.decimalPlaceholder,
+                    group:    fz.thousandSeparator
+                };
+
+                this.options.format = {
+                    number:  {style: numberStyle},
+                    percent: {style: numberStyle}
+                };
+
+                var dims = this.options.dimensions,
+                    meaAxis = this.axes.measure,
+                    gemsByRole = meaAxis.gemsByRole;
+
+                def.eachOwn(meaAxis.boundRoles, function(one, roleName) {
+                    // NOTE: As multiple measure gems can be in the same role (gem bar),
+                    // and each measure role goes into a single CCC dimension (plus the measureDiscrim)
+                    // (as when both Sales and Quantity are placed on the "Measure" gem bar),
+                    // it follows that only the format of one of these can be specified.
+                    var gem  = gemsByRole[roleName][0];
+                    var mask = fz[gem.id];
+                    if(mask) {
+                        var dimName = gem.cccDimName;
+                        var dim = dims[dimName] || (dims[dimName] = {});
+                        dim.format = mask;
+                    }
+                });
             }
         },
 
