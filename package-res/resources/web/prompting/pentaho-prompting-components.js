@@ -458,7 +458,19 @@ define("common-ui/prompting/pentaho-prompting-components", ['common-ui/prompting
       }.bind(this));
 
       input.focusout(function() {
-      if(_inValue !== this.getValue()) {
+        if(_inValue !== this.getValue()) {
+
+          // focusout may override the autocomplete select handler.
+          // we need to update the input with the selected value
+          try{
+            var newVal = $('#ui-active-menuitem').text();
+            if(newVal){
+              $('#' + this.htmlObject + '-input').val(newVal);
+            }
+          }
+          catch(e){
+          }
+
           Dashboards.processChange(this.name);
         }
       }.bind(this));
