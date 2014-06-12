@@ -4193,7 +4193,7 @@ function(def, pvc, pv){
 
 
             // Determine whether to show values label
-            if (vizOptions.labelsOption != "none") {
+            if (vizOptions.labelsOption != "none" && this.axes.measure.boundRoles.size) {
                 eps.label_textBaseline = "bottom";
                 eps.label_textMargin = 2;
 
