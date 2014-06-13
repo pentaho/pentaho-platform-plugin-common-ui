@@ -49,10 +49,10 @@ define( "common-ui/util/URLEncoder", [ "dojo/_base/lang", "dojo/_base/array", "d
   var Encoder = lang.getObject("pho.Encoder", true); // create global reference for non-amd users
 
   function doubleEncode(str){
-    return str.replace("%5C", "%255C").replace("%2F", "%252F");
+    return str.replace(/%5C/g, "%255C").replace(/%2F/g, "%252F");
   }
   function singleEncode(str){
-    return str.replace("\\", "%5C").replace("/", "%2F");
+    return str.replace(/\\/g, "%5C").replace(/\//g, "%2F");
   }
 
   Encoder.encode = function( str, args, queryObj ){
@@ -65,12 +65,12 @@ define( "common-ui/util/URLEncoder", [ "dojo/_base/lang", "dojo/_base/array", "d
     }
     // detect the presence of the "?" to determin when the special double-slash encoding should end
     var pathPart = str.split("\?")[0];
-    var pathBounds = (pathPart.match(/\{[\d]+\}/) || []).length;
+    var pathBounds = (pathPart.match(/\{[\d]+\}/g) || []).length;
     args = array.map( args, function( item, pos ){
       var encodedStr = encodeURIComponent( String( item ) )
       // double-encode / and \ to work around Tomcat issue
       if(pos < pathBounds){
-        encodedStr = encodedStr.replace("%5C", "%255C").replace("%2F", "%252F");
+        encodedStr = encodedStr.replace(/%5C/g, "%255C").replace(/%2F/g, "%252F");
       }
       return encodedStr;
     } );
