@@ -31,5 +31,9 @@ define(["common-ui/util/URLEncoder"], function(Encoder) {
     it("should handle reserved URI strings", function() {
       expect(Encoder.encode("http://www.foo.com/{0}/{1}/", ["&/\\", "?:"])).toBe("http://www.foo.com/%26%252F%255C/%3F%3A/");
     });
+
+    it("should handle multiple occurances of slashes", function() {
+      expect(Encoder.encode("http://www.foo.com/{0}/{1}/", ["&/\\foo\\", "?:/var/"])).toBe("http://www.foo.com/%26%252F%255Cfoo%255C/%3F%3A%252Fvar%252F/" );
+    });
   })
 })
