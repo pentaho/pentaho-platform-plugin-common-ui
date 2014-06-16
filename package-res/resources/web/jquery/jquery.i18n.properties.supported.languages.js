@@ -20,10 +20,10 @@ define("common-ui/jquery-pentaho-i18n", ["common-ui/jquery-i18n"], function() {
     var original_browserLang = $.i18n.browserLang;
     $.i18n.properties = function(settings) {
 
-        if(settings.language === null || settings.language == '') {
+        if(settings.language === null || settings.language == '' || settings.language == undefined) {
             settings.language = original_browserLang();
         }
-        if(settings.language === null) {settings.language='';}
+        if(settings.language === null || settings.language == undefined) {settings.language='';}
 
         settings.language = supportedLocale(settings);
 
