@@ -406,6 +406,16 @@ define("common-ui/prompting/pentaho-prompting-components", ['common-ui/prompting
         $.each(this.param.values, function(i, v) {
           if (v.selected) {
             initialValue = this.formatter ? this.formatter.format(this.transportFormatter.parse(v.label)) : v.label;
+
+            try {
+              valueParsed = dojo.number.format(v.label, {locale: SESSION_LOCALE.toLowerCase()});
+            } catch(e) {
+              valueParsed = v.label;
+            }
+
+            if(valueParsed != null){
+              initialValue = v.label = v.value = valueParsed;
+            } 
           }
         }.bind(this));
 
