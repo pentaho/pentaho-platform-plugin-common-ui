@@ -2413,7 +2413,7 @@ function(def, pvc, pv){
                     }
 
                     // Is there a color map for the chosen hierarchy?
-                    if(colorMap){
+                    if(colorMap || isSunburst) {
                         // Convert colorMap colors to pv.color.
                         for(var p in colorMap) {
                             if(colorMap.hasOwnProperty(p)) {
@@ -2453,7 +2453,7 @@ function(def, pvc, pv){
                                         //  then reserve a color from the default color scale.
                                         // Otherwise, return undefined, 
                                         //  meaning that a derived color should be used.
-                                        return colorMap[keyLevel] ||
+                                        return def.getOwn(colorMap, keyLevel) ||
                                             (level ? undefined : defaultScale(keyLevel));
                                     }
                                 };
