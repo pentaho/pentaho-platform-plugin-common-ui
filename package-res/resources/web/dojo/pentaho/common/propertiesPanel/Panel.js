@@ -226,7 +226,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
             },
 
             onUIEvent: function (type, args) {
-              on.emit(type, args);
+              on.emit(this, type, args);
             },
             setupEventHandling: function (ui) {
 
