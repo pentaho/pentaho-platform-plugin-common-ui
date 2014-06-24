@@ -648,7 +648,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
       }
     } else {
       // Treat pentaho.pda.Column.DATA_TYPES.UNKNOWN as pentaho.pda.Column.DATA_TYPES.STRING
-      var dataType = pentaho.pda.Column.dataType == pentaho.pda.Column.DATA_TYPES.UNKNOWN ? pentaho.pda.Column.DATA_TYPES.STRING : pentaho.pda.Column.dataType;
+      var dataType = column.dataType == pentaho.pda.Column.DATA_TYPES.UNKNOWN ? pentaho.pda.Column.DATA_TYPES.STRING : column.dataType;
       var comparatorMapping = pentaho.pda.Column.COMPARATOR[dataType];
       if (comparatorMapping) {
         array.some(comparatorMapping, function(cArray) {
