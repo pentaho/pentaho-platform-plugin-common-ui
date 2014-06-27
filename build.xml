@@ -54,8 +54,7 @@
          </condition>
        </fail -->
 
-    <property name="dojo.version" value="1.9.2"/>
-    <property name="dojo-artifact" value="dojo-release-${dojo.version}-src"/>
+    <property name="dojo-artifact" value="dojo-release-${dependency.dojo.revision}-src"/>
 
     <property name="dev.res" value="dev-res"/>
 
@@ -64,7 +63,7 @@
               description="Dojo source folder"/>
 
     <property name="dojo.src"
-              value="${dojo.root}/dojo-release-${dojo.version}-src"
+              value="${dojo.root}/dojo-release-${dependency.dojo.revision}-src"
               description="Dojo source folder"/>
 
     <property name="dojo.src.release"
@@ -100,18 +99,10 @@
             <available file="${dojo.root}/${dojo-artifact}.zip"/>
             <then/>
             <else>
-                <!--
-                       <get src="http://download.dojotoolkit.org/release-${dojo.version}/${dojo-artifact}.zip"
-                             dest="${dojo.root}/${dojo-artifact}.zip"/> -->
-
                 <mkdir dir="${dojo.root}"/>
-                <get src="http://repository.pentaho.org/artifactory/third-party/org/dojotoolkit/dojo/dojo-release/${dojo.version}/${dojo-artifact}.zip"
-                     dest="${dojo.root}/${dojo-artifact}.zip"/>
-                <unzip src="dev-res/dojo/${dojo-artifact}.zip" dest="${dojo.root}"/>
-
-                <!--<get src="http://download.dojotoolkit.org/release-${dojo.version}/${dojo-artifact}-src.zip" dest="${dojo.root}/${dojo-artifact}-src.zip"/>-->
-                <!--<mkdir dir="${dojo.root}"/>-->
-                <!--<unzip src="dev-res/dojo/${dojo-artifact}-src.zip" dest="${dojo.root}" />-->
+            	<ivy:resolve file="${ivyfile}" conf="dojo" />
+            	<ivy:retrieve conf="dojo" pattern="${dojo.root}/${dojo-artifact}.zip" />
+                <unzip src="${dojo.root}/${dojo-artifact}.zip" dest="${dojo.root}"/>
             </else>
         </if>
     </target>
