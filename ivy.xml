@@ -6,10 +6,11 @@
 		<conf name="default" />
 		<conf name="test" visibility="private" />
 		<conf name="source" />
-    <conf name="codegen" />
+    	<conf name="codegen" />
 		<conf name="runtime" />
-    <conf name="zip" />
-    <conf name="js" />
+    	<conf name="zip" />
+    	<conf name="js" />
+    	<conf name="dojo" />
 	</configurations>
 
 	<publications>
@@ -92,8 +93,12 @@
             <artifact name="pentaho-gwt-widgets" type="source" ext="jar" m:classifier="sources"/>
         </dependency>
 
-    <dependency org="com.google.gwt" name="gwt-user" rev="2.5.1" conf="codegen->default"/>
-    <dependency org="com.google.gwt" name="gwt-dev"  rev="2.5.1" conf="codegen->default"/>
+    	<dependency org="com.google.gwt" name="gwt-user" rev="2.5.1" conf="codegen->default"/>
+    	<dependency org="com.google.gwt" name="gwt-dev"  rev="2.5.1" conf="codegen->default"/>
+    
+    	<dependency org="org.dojotoolkit.dojo" name="dojo-release" rev="${dependency.dojo.revision}" conf="dojo->default">
+    		<artifact name="dojo-release" type="source" ext="zip" m:classifier="src"/>
+    	</dependency>
 
 	</dependencies>
 </ivy-module>
