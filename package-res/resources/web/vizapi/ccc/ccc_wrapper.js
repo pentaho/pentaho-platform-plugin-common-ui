@@ -1381,7 +1381,7 @@ function(def, pvc, pv){
                     if(!this.chart._noPercentInTootltipForPercentGems || gem.measureType !== 'PCTOF'){
                         var valuePct = this._getAtomPercent(atom, context);
                         if(valuePct != null){
-                            tooltipLine += " (" + def.html.escape(''+valuePct) + "%)";
+                            tooltipLine += " (" + def.html.escape(''+valuePct) + ")";
                         }
                     }
 
@@ -1421,21 +1421,17 @@ function(def, pvc, pv){
             if(context) {
                 var cccChart = context.chart,
                     data = cccChart.data,
-                    playingPercentMap = data.type.getPlayingPercentVisualRoleDimensionMap(),
-                    cccDimName = atom.dimension.name
-                    ;
+                    cccDimName = atom.dimension.name,
+                    visRoles = context.panel.visualRolesOf(cccDimName, /*includeChart*/true);
 
-                if(playingPercentMap.has(cccDimName)){
-                    var group = context.scene.group,
-                        pct;
-                    if(group) {
-                        pct = group.dimensions(cccDimName)
-                                   .percentOverParent({ visible: true });
-                    } else {
-                        pct = data.dimensions(cccDimName).percent(atom.value);
-                    }
+                if(visRoles.some(function(r) { return r.isPercent; })) {
+                    var group = context.scene.group, 
+                        dim   = (group || data).dimensions(cccDimName), 
+                        pct   = group 
+                            ? dim.percentOverParent({visible: true})
+                            : dim.percent(atom.value);
 
-                    return cccChart.options.valueFormat.call(null, Math.round(pct * 10000) / 100);
+                    return dim.type.format().percent()(pct);
                 }
             }
         },
@@ -1519,6 +1515,10 @@ function(def, pvc, pv){
         margins:  0,
         paddings: 10,
         plotFrameVisible: false,
+
+        format: {
+            percent: "#,0.00%"
+        },
 
         /* Multichart */
         multiChartMax: 50,
@@ -2519,7 +2519,7 @@ function(def, pvc, pv){
 
                 this.options.format = {
                     number:  {style: numberStyle},
-                    percent: {style: numberStyle}
+                    percent: {style: numberStyle, mask: this.options.format.percent}
                 };
 
                 var dims = this.options.dimensions,
@@ -4163,7 +4163,8 @@ function(def, pvc, pv){
         _options: {
             valuesVisible: true,
             valuesOverflow: 'trim',
-            valuesOptimizeLegibility: false
+            valuesOptimizeLegibility: false,
+            colorMode: 'slice'
         },
 
         _discreteColorRole: 'rows',
