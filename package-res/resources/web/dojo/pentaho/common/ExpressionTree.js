@@ -2,6 +2,7 @@ dojo.provide("pentaho.common.ExpressionTree");
 dojo.require("dijit.form.Select");
 dojo.require('dijit._Widget');
 dojo.require('dijit._Templated');
+dojo.require('pentaho.common.Messages');
 
 dojo.declare("pentaho.common.ExpressionTree",
   [dijit._Widget, dijit._Templated],  {
@@ -12,21 +13,37 @@ dojo.declare("pentaho.common.ExpressionTree",
     defaultOperator: null,
     operators: null,
 
+    addBundleMessages: function() {
+      pentaho.common.Messages.addUrlBundle('pentaho.common',CONTEXT_PATH+'i18n?plugin=common-ui&name=resources/web/dojo/pentaho/common/nls/messages');
+    },
+
+    // Function for retrieving localized strings
+    getLocaleString: function(key) {
+      var localizedMessage = key;
+      if (key) {
+        localizedMessage = pentaho.common.Messages.getString(key);
+      }
+      return localizedMessage;
+    },
+
     constructor: function(defaultOp) {
+      this.addBundleMessages();
+
       if(defaultOp && defaultOp.label && defaultOp.value){
+        defaultOp.label = this.getLocaleString(defaultOp.label);
         this.defaultOperator = defaultOp;
       }
       else{
         this.defaultOperator = {
-          label: 'AND',
+          label: this.getLocaleString('AND'),
           value: 'AND'
           //selected: true
         };  
       }
 
       this.operators = [
-        { label: 'AND', value: 'AND' },
-        { label: 'OR', value: 'OR' }
+        { label: this.getLocaleString('AND'), value: 'AND' },
+        { label: this.getLocaleString('OR'), value: 'OR' }
       ];
     },
 
@@ -69,7 +86,7 @@ dojo.declare("pentaho.common.ExpressionTree",
 
     onOperatorChange: function(newValue){
       this.defaultOperator = {
-        label: newValue,
+        label: this.getLocaleString(newValue),
         value: newValue,
         selected: true
       };
