@@ -16,30 +16,45 @@
  */
 
 define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dijit/_WidgetsInTemplateMixin", "dojo/on", "dojo/query", "dojo/dom-construct", "dojo/dom-geometry",
-  "dijit/form/Select", "dojo/text!pentaho/common/ExpressionTree/ExpressionTree.html", "dojo/has", "dojo/sniff"],
+  "dijit/form/Select", "dojo/text!pentaho/common/ExpressionTree/ExpressionTree.html", "dojo/has", "dojo/sniff", "pentaho/common/Messages"],
 
     function (declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, on, query, construct, geometry, Select, templateStr, has, sniff) {
       return declare("pentaho.common.ExpressionTree",[_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
-
             templateString: templateStr,
             defaultOperator: null,
             operators: null,
 
+            addBundleMessages: function() {
+              pentaho.common.Messages.addUrlBundle('pentaho.common',CONTEXT_PATH+'i18n?plugin=common-ui&name=resources/web/dojo/pentaho/common/nls/messages');
+            },
+
+            // Function for retrieving localized strings
+            getLocaleString: function(key) {
+              var localizedMessage = key;
+              if (key) {
+                localizedMessage = pentaho.common.Messages.getString(key);
+              }
+              return localizedMessage;
+            },
+
             constructor: function (defaultOp) {
+              this.addBundleMessages();
+
               if (defaultOp && defaultOp.label && defaultOp.value) {
+                defaultOp.label = this.getLocaleString(defaultOp.label);
                 this.defaultOperator = defaultOp;
               }
               else {
                 this.defaultOperator = {
-                  label: 'AND',
+                  label: this.getLocaleString('AND'),
                   value: 'AND'
                   //selected: true
                 };
               }
 
               this.operators = [
-                { label: 'AND', value: 'AND' },
-                { label: 'OR', value: 'OR' }
+                { label: this.getLocaleString('AND'), value: 'AND' },
+                { label: this.getLocaleString('OR'), value: 'OR' }
               ];
             },
 
@@ -82,7 +97,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
 
             onOperatorChange: function (newValue) {
               this.defaultOperator = {
-                label: newValue,
+                label: this.getLocaleString(newValue),
                 value: newValue,
                 selected: true
               };
