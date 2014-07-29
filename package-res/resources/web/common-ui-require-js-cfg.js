@@ -70,6 +70,7 @@ requireCfg['paths']['common-ui/angular-i18n'] = prefix+'/angular/i18n';
 requireCfg['paths']['common-ui/angular-resource'] = prefix+'/angular/angular-resource'+(isDebug? "" : ".min");
 requireCfg['paths']['common-ui/angular-route'] = prefix+'/angular/angular-route'+(isDebug? "" : ".min");
 requireCfg['paths']['common-ui/angular-animate'] = prefix+'/angular/angular-animate'+(isDebug? "" : ".min");
+requireCfg['paths']['common-ui/angular-sanitize'] = prefix+'/angular/angular-sanitize'+(isDebug? "" : ".min");
 
 requireCfg['paths']['common-ui/angular-ui-bootstrap'] = prefix+'/bootstrap/ui-bootstrap-tpls-0.6.0.min';
 
@@ -124,6 +125,7 @@ requireCfg['shim']['common-ui/angular'] = {
 requireCfg['shim']['common-ui/angular-resource'] = ['common-ui/angular'];
 requireCfg['shim']['common-ui/angular-route'] = ['common-ui/angular'];
 requireCfg['shim']['common-ui/angular-animate'] = ['common-ui/angular'];
+requireCfg['shim']['common-ui/angular-sanitize'] = ['common-ui/angular'];
 
 /* UI-Bootstrap configuration */
 requireCfg['shim']['common-ui/angular-ui-bootstrap'] = ['common-ui/angular'];
