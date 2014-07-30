@@ -48,8 +48,10 @@
 
 // don't overwrite this if they've set djConfig ahead of time
 if(djConfig == 'undefined' || djConfig == undefined) {
+  var url = (window.location != window.parent.location) ? document.referrer: document.location.href;
   var djConfig = {
-    disableFlashStorage: true /* turn off flash storage for client-side caching */
+        disableFlashStorage: true, /* turn off flash storage for client-side caching */			
+        locale: url.match(/locale=([\w\-]+)/) ? RegExp.$1 : "en" /* look for a locale=xx query string param, else default to 'en' */
   };
 } else {
   if(djConfig['disableFlashStorage'] == 'undefined' || djConfig['disableFlashStorage'] == undefined) {
