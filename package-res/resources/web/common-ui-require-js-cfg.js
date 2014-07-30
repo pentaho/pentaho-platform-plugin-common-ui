@@ -16,6 +16,7 @@
  */
 var prefix = (typeof CONTEXT_PATH != "undefined") ? CONTEXT_PATH + 'content/common-ui/resources/web' :
     (typeof KARMA_RUN != "undefined") ? "../../package-res/resources/web" :"common-ui"; //prod vs build
+var isDebug = typeof document == "undefined" || document.location.href.indexOf("debug=true") > 0;
 
 requireCfg['paths']['common-ui'] = prefix;
 
@@ -64,11 +65,12 @@ requireCfg['paths']['common-ui/ring'] = prefix+'/ring/ring';
 requireCfg['paths']['common-ui/underscore'] = prefix+'/underscore/underscore';
 requireCfg['paths']['underscore'] = prefix+'/underscore/underscore';
 
-requireCfg['paths']['common-ui/angular'] = prefix+'/angular/angular.min';
+requireCfg['paths']['common-ui/angular'] = prefix+'/angular/angular'+(isDebug? "" : ".min");
 requireCfg['paths']['common-ui/angular-i18n'] = prefix+'/angular/i18n';
-requireCfg['paths']['common-ui/angular-resource'] = prefix+'/angular/angular-resource.min';
-requireCfg['paths']['common-ui/angular-route'] = prefix+'/angular/angular-route.min';
-requireCfg['paths']['common-ui/angular-animate'] = prefix+'/angular/angular-animate.min';
+requireCfg['paths']['common-ui/angular-resource'] = prefix+'/angular/angular-resource'+(isDebug? "" : ".min");
+requireCfg['paths']['common-ui/angular-route'] = prefix+'/angular/angular-route'+(isDebug? "" : ".min");
+requireCfg['paths']['common-ui/angular-animate'] = prefix+'/angular/angular-animate'+(isDebug? "" : ".min");
+requireCfg['paths']['common-ui/angular-sanitize'] = prefix+'/angular/angular-sanitize'+(isDebug? "" : ".min");
 
 requireCfg['paths']['common-ui/angular-ui-bootstrap'] = prefix+'/bootstrap/ui-bootstrap-tpls-0.6.0.min';
 
@@ -123,6 +125,7 @@ requireCfg['shim']['common-ui/angular'] = {
 requireCfg['shim']['common-ui/angular-resource'] = ['common-ui/angular'];
 requireCfg['shim']['common-ui/angular-route'] = ['common-ui/angular'];
 requireCfg['shim']['common-ui/angular-animate'] = ['common-ui/angular'];
+requireCfg['shim']['common-ui/angular-sanitize'] = ['common-ui/angular'];
 
 /* UI-Bootstrap configuration */
 requireCfg['shim']['common-ui/angular-ui-bootstrap'] = ['common-ui/angular'];
