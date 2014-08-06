@@ -1375,7 +1375,13 @@ function(def, pvc, pv){
                     if(this.chart._noRoleInTooltipMeasureRoles[gem.role] !== true) {
                         tooltipLine += " (" + def.html.escape(gem.role) + ")";
                     }
-
+					
+					if(parseFloat(atom) > 100.0)
+					{						
+						atom.label = Math.round(parseFloat(atom)) / 100.0;
+						atom.label += '%';
+					}
+					
                     tooltipLine += ": " + def.html.escape(this._getAtomLabel(atom, context));
 
                     if(!this.chart._noPercentInTootltipForPercentGems || gem.measureType !== 'PCTOF'){
