@@ -2,7 +2,7 @@
   padding: 0;
 }
 .tundra .dijitSelect .dijitButtonNode .dijitArrowButtonInner {
-  margin: 0 4px 0 5px;
+  margin: 0 1px;
 }
 
 /* Make unselected content portion "look" more like a text box and less like a button */
