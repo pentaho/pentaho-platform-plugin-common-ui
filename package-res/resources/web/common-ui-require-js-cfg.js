@@ -73,7 +73,7 @@ requireCfg['paths']['common-ui/angular-animate'] = prefix+'/angular/angular-anim
 requireCfg['paths']['common-ui/angular-sanitize'] = prefix+'/angular/angular-sanitize'+(isDebug? "" : ".min");
 
 requireCfg['paths']['common-ui/es5-shim'] = prefix+'/util/es5-shim';
-requireCfg['paths']['common-ui/properties-parser'] = prefix+'/angular-translate/properties-parser');
+requireCfg['paths']['common-ui/properties-parser'] = prefix+'/angular-translate/properties-parser';
 requireCfg['paths']['common-ui/angular-translate'] = prefix+'/angular-translate/angular-translate'+(isDebug? "" : ".min");
 requireCfg['paths']['common-ui/angular-translate-loader-partial'] = prefix+'/angular-translate/angular-translate-loader-partial'+(isDebug? "" : ".min");
 requireCfg['paths']['common-ui/angular-translate-loader-static'] = prefix+'/angular-translate/angular-translate-loader-static'+(isDebug? "" : ".min");
