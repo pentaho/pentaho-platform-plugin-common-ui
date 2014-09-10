@@ -443,7 +443,9 @@ pentaho.VizController.prototype.doVisualization = function( visualization, userD
     try {
       this.chart.draw(currentView, options);
     } catch (e) {
-      alert(e)
+		if( console && console.log ) {
+			console.log(e.message);
+		}
     }
     this.currentViz = visualization;
     return true;
