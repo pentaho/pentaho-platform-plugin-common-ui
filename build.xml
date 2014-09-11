@@ -20,6 +20,7 @@
 
     <property name="js.module.script.dir" value="package-res/resources/web"/>
     <property name="js.module.script.namespace" value="common-ui"/>
+    <property name="include.js.test.folder" value="false" />
 
     <import file="build-res/subfloor-js.xml"/>
 
@@ -120,10 +121,23 @@
             depends="dist,assemble.init,assemble.copy-libs,assemble-plugin">
     </target>
 
-    <target name="package-zip">
-        <zip destfile="${dist.dir}/${package.basename}.zip">
+    <target name="package-zip" depends="install-antcontrib">
+      <if>
+        <equals arg1="${include.js.test.folder}" arg2="true"/>
+        <then>
+          <zip destfile="${dist.dir}/${package.basename}.zip">
             <zipfileset dir="${stage.dir}"/>
-        </zip>
+          </zip>
+        </then>
+        <else>
+          <zip destfile="${dist.dir}/${package.basename}.zip">
+            <zipfileset dir="${stage.dir}">
+              <exclude name="**/test/" />
+              <exclude name="**/tests/" />
+            </zipfileset>
+          </zip>
+        </else>
+      </if>
     </target>
 
     <!-- override the subfloor assemble target to do special assembly -->
