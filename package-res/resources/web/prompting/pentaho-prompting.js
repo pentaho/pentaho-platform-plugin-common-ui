@@ -451,6 +451,8 @@ define("common-ui/prompting/pentaho-prompting", [ 'cdf/cdf-module', 'common-ui/p
       if (!paramDefn) { throw 'paramDefn is required'; }
       this.paramDefn = paramDefn;
 
+      this.whiteList = ["java.lang.Number", "java.lang.Byte", "java.lang.Double", "java.lang.Float", "java.lang.Integer", "java.lang.Long", "java.lang.Short", "java.math.BigDecimal", "java.math.BigInteger"];
+
       // Initialize the auto submit setting for this panel from the parameter definition
       this.autoSubmit = paramDefn.allowAutoSubmit();
 
@@ -482,29 +484,26 @@ define("common-ui/prompting/pentaho-prompting", [ 'cdf/cdf-module', 'common-ui/p
        * as necessary.
        */
       this.getParameterValues = function() {
-        var params = {};
-        this.paramDefn.mapParameters(function(param) {
-            var value = Dashboards.getParameterValue(this.getParameterName(param));
-            // if ((value == '' || value == undefined) && 'true' == param.attributes['hidden']) {
-            //   value = param.values
-            // }
-            // Empty string is Dashboards' "null"
-            if (value === '' || typeof value == 'undefined') {
-              return; // continue
-            }
-            if (param.multiSelect && !$.isArray(value)) {
+      var params = {};
+      this.paramDefn.mapParameters(function(param) {
+          var value = Dashboards.getParameterValue(this.getParameterName(param));
+          if (value === '' || typeof value == 'undefined') {
+              return;
+          }
+          if (param.multiSelect && !$.isArray(value)) {
               value = [value];
-            }
-
-            var valueParsed;
-            try {
-              valueParsed = dojo.number.parse(value, {locale: SESSION_LOCALE.toLowerCase()});
-            } catch(e) {
-              valueParsed = value;
-            }
-            params[param.name] = isNaN(valueParsed) ? value : valueParsed;
-        }, this);
-        return params;
+          }
+          var valueParsed;
+          if (_.contains(this.whiteList, param.type)) {
+              try {
+                valueParsed = dojo.number.parse(value, {locale: SESSION_LOCALE.toLowerCase()});
+              } catch(e) {
+                valueParsed = value;
+              }
+          }
+          params[param.name] = isNaN(valueParsed) ? value : valueParsed;
+          }, this);
+          return params;
       };
 
       /**
@@ -577,7 +576,7 @@ define("common-ui/prompting/pentaho-prompting", [ 'cdf/cdf-module', 'common-ui/p
         if (typeof param !== 'string') {
           param = this.getParameterName(param);
         }
-        
+
         return Dashboards.getParameterValue(param);
       };
 
@@ -687,7 +686,7 @@ define("common-ui/prompting/pentaho-prompting", [ 'cdf/cdf-module', 'common-ui/p
             if(!(/android|ipad|iphone/i).test(navigator.userAgent)) {
               topValuesByParam = this._multiListBoxTopValuesByParam = {};
             }
-            
+
             var focusedParam;
             window.CompositeComponent.mapComponentsList(this.components, function(c) {
               if(!c.components && c.param && c.promptType === 'prompt') {
@@ -697,7 +696,7 @@ define("common-ui/prompting/pentaho-prompting", [ 'cdf/cdf-module', 'common-ui/p
                     focusedParam = c.param.name;
                   }
                 }
-                
+
                 if(topValuesByParam && c.type === 'SelectMultiComponent') {
                   var topValue = c.topValue();
                   if(topValue != null) {
@@ -706,7 +705,7 @@ define("common-ui/prompting/pentaho-prompting", [ 'cdf/cdf-module', 'common-ui/p
                 }
               }
             });
-            
+
             this._focusedParam = focusedParam;
           }
 
@@ -725,21 +724,21 @@ define("common-ui/prompting/pentaho-prompting", [ 'cdf/cdf-module', 'common-ui/p
         var fireSubmit = true;
         if (this.paramDefn.showParameterUI()) {
           this._widgetGUIDHelper.reset(); // Clear the widget helper for this prompt
-          
+
           var components = [];
-          
+
           var layout = pentaho.common.prompting.builders.WidgetBuilder.build(this, 'prompt-panel');
-          
+
           var topValuesByParam = this._multiListBoxTopValuesByParam;
           if(topValuesByParam) { delete this._multiListBoxTopValuesByParam; }
 
           var focusedParam = this._focusedParam;
           if(focusedParam) { delete this._focusedParam; }
 
-          window.CompositeComponent.mapComponents(layout, function(c) { 
+          window.CompositeComponent.mapComponents(layout, function(c) {
             components.push(c);
-           
-            // Don't fire the submit on load if we have a submit button. 
+
+            // Don't fire the submit on load if we have a submit button.
             // It will take care of firing this itself (based on auto-submit)
             if (fireSubmit && c.promptType == 'submit') {
               fireSubmit = false;
@@ -760,7 +759,7 @@ define("common-ui/prompting/pentaho-prompting", [ 'cdf/cdf-module', 'common-ui/p
               }
             }
           });
-          
+
           if (this.components && this.components.length > 0) {
             // We have old components we MUST call .clear() on to prevent memory leaks. In order to
             // prevent flickering we must do this during the same execution block as when Dashboards
@@ -769,12 +768,12 @@ define("common-ui/prompting/pentaho-prompting", [ 'cdf/cdf-module', 'common-ui/p
               promptPanel: this,
               components: this.components
             }, 'gc');
-            
+
             if (!gc) { throw 'Cannot create garbage collector'; }
-            
+
             components = [gc].concat(components);
           }
-          
+
           this.components = components;
 
           Dashboards.init(components);
@@ -814,7 +813,7 @@ define("common-ui/prompting/pentaho-prompting", [ 'cdf/cdf-module', 'common-ui/p
           // doesn't have a value yet, so eventually, we'll show this parameter.. we hope
           return;
         }
-        
+
         return pentaho.common.prompting.builders.WidgetBuilder.build({
           promptPanel: this,
           param: param
@@ -884,7 +883,7 @@ define("common-ui/prompting/pentaho-prompting", [ 'cdf/cdf-module', 'common-ui/p
 
             components.push(panel);
           }.bind(this));
-          
+
           if (components.length > 0) {
             var groupPanel = pentaho.common.prompting.builders.WidgetBuilder.build({
               promptPanel: this,
