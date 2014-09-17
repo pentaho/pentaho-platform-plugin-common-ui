@@ -486,37 +486,37 @@ define("common-ui/prompting/pentaho-prompting", [ 'cdf/cdf-module', 'common-ui/p
       this.getParameterValues = function() {
       var params = {};
       this.paramDefn.mapParameters(function(param) {
-          var value = Dashboards.getParameterValue(this.getParameterName(param));
-          if (value === '' || typeof value == 'undefined') {
-              return;
-          }
-          if (param.multiSelect && !$.isArray(value)) {
-              value = [value];
-          }
-          if (_.contains(this.whiteList, param.type)) {
-              var localization = dojo.i18n.getLocalization("dojo.cldr", "number", SESSION_LOCALE.toLowerCase());
-              var defaultLocalization = dojo.i18n.getLocalization("dojo.cldr", "number", null);
-              var valueParsed;
-              try {
-                if(value.indexOf(localization ? localization.decimal : defaultLocalization.decimal) > 0) {
-                  valueParsed = dojo.number.parse(value, {
-                  locale: SESSION_LOCALE.toLowerCase()});
-                  if( valueParsed.toString().indexOf(defaultLocalization.decimal) < 0 ) {
-                    valueParsed = dojo.number.format(valueParsed, {
-                      places: value.length-value.indexOf(localization ? localization.decimal : defaultLocalization.decimal)-1});
-                    var defaultLocalization = dojo.i18n.getLocalization("dojo.cldr", "number", null);
-                    valueParsed = valueParsed.split(defaultLocalization.group).join("");
-                  }
-                } else {
-                  valueParsed = dojo.number.parse(value, {locale: SESSION_LOCALE.toLowerCase()});
-                }
-              } catch (e) {
-               valueParsed = value;
+        var value = Dashboards.getParameterValue(this.getParameterName(param));
+        if (value === '' || typeof value == 'undefined') {
+          return;
+        }
+        if (param.multiSelect && !$.isArray(value)) {
+          value = [value];
+        }
+        if (_.contains(this.whiteList, param.type)) {
+          var localization = dojo.i18n.getLocalization("dojo.cldr", "number", SESSION_LOCALE.toLowerCase());
+          var defaultLocalization = dojo.i18n.getLocalization("dojo.cldr", "number", null);
+          var valueParsed;
+          try {
+            if(value.indexOf(localization ? localization.decimal : defaultLocalization.decimal) > 0) {
+              valueParsed = dojo.number.parse(value, {
+              locale: SESSION_LOCALE.toLowerCase()});
+              if( valueParsed.toString().indexOf(defaultLocalization.decimal) < 0 ) {
+                valueParsed = dojo.number.format(valueParsed, {
+                  places: value.length-value.indexOf(localization ? localization.decimal : defaultLocalization.decimal)-1});
+                var defaultLocalization = dojo.i18n.getLocalization("dojo.cldr", "number", null);
+                valueParsed = valueParsed.split(defaultLocalization.group).join("");
               }
+            } else {
+              valueParsed = dojo.number.parse(value, {locale: SESSION_LOCALE.toLowerCase()});
+            }
+          } catch (e) {
+            valueParsed = value;
           }
-          params[param.name] = isNaN(valueParsed) ? value : valueParsed;
-          }, this);
-          return params;
+        }
+        params[param.name] = isNaN(valueParsed) ? value : valueParsed;
+        }, this);
+        return params;
       };
 
       /**
