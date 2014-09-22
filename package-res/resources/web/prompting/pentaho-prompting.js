@@ -269,6 +269,7 @@ define("common-ui/prompting/pentaho-prompting", [ 'cdf/cdf-module', 'common-ui/p
     prepareCDF: function() {
       if (this.prepared) { return; }
       Dashboards.setGlobalContext(false);
+      Dashboards._setFlatParameters(true); // supporting parameters with dots not requiring the full path to be previously created
 
       // Don't escape parameter values - we want the exactly as they are declared. We'll handle escaping the values if necessary.
       Dashboards.escapeParameterValues = false;
