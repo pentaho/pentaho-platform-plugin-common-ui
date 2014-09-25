@@ -1424,7 +1424,7 @@ function(def, pvc, pv){
                     cccDimName = atom.dimension.name,
                     visRoles = context.panel.visualRolesOf(cccDimName, /*includeChart*/true);
 
-                if(visRoles.some(function(r) { return r.isPercent; })) {
+                if(visRoles && visRoles.some(function(r) { return r.isPercent; })) {
                     var group = context.scene.group, 
                         dim   = (group || data).dimensions(cccDimName), 
                         pct   = group 
