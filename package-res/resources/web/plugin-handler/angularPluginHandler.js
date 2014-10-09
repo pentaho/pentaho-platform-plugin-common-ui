@@ -35,10 +35,15 @@ define(deps, function(PentahoPlugin, PentahoPluginHandler, ring, angular) {
 			this.$super();
 
 			this.docBootstrapped = false;
+			this.pluginModules = {};
 		},
 
 		// Provide function for onRegister
 		_onRegister : function(plugin) {
+
+			if (this.pluginModules[plugin.id]) {
+				return;
+			}
 
 			// Retrieve module
 			var module = angular.module(plugin.moduleName);
@@ -145,10 +150,17 @@ define(deps, function(PentahoPlugin, PentahoPluginHandler, ring, angular) {
 			if (plugin.config.directiveCallback) {
 				plugin.config.directiveCallback.call(this, Directive);
 			}
+
+			this.pluginModules[plugin.id] = module;
 		},
 
 		// Provide function for onUnregister
 		_onUnregister : function(plugin) {
+
+			if(!this.pluginModules[plugin.id]) {
+				return;
+			}
+
 			// Retrieve module
 			var module = angular.module(plugin.moduleName);
 
@@ -199,6 +211,8 @@ define(deps, function(PentahoPlugin, PentahoPluginHandler, ring, angular) {
 					module.$compileProvider.directive(directive, null) :
 					module.directive(directive, null);
 			});
+
+			delete this.pluginModules[plugin.id];
 		},
 
 		// Provide a method for creating the angular module and adding the necessary dependencies
