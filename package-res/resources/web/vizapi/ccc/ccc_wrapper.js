@@ -970,8 +970,10 @@ function(def, pvc, pv){
                 index   = virtualItemStartIndex;
 
             this.cccDimList().forEach(function(dimName) {
-                if(!def.hasOwn(cccDimNamesSet, dimName)) {
-                    cccDimNamesSet[dimName] = true;
+                if(dimName == null || !def.hasOwn(cccDimNamesSet, dimName)) {
+
+                    if(dimName != null) { cccDimNamesSet[dimName] = true; }
+
                     readers.push(this._createReader(dimName, index));
                     index++;
                 }
