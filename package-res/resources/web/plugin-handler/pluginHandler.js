@@ -7,10 +7,7 @@
  * of the plugin object
  */
 
-var deps = [	
-	'common-ui/ring'
-]
-define(deps, function(ring) {
+define(['common-ui/ring'], function(ring) {
 	
 	var PentahoPlugin;
 	
