@@ -34,7 +34,9 @@ define(['common-ui/PluginHandler', 'common-ui/ring'], function(PentahoPluginHand
       this.id = _guid();
       this.config = config;
       this.isRegistered = false;
+    },
 
+    _validatePluginHandler: function() {
       if (!this.config.pluginHandler) {
         throw PentahoPlugin.errMsgs.noPluginHandler;
       }
@@ -52,6 +54,8 @@ define(['common-ui/PluginHandler', 'common-ui/ring'], function(PentahoPluginHand
      *        As defined in the register function for PentahoPluginHandler
      */
     register: function() {
+      this._validatePluginHandler();
+
       return this.config.pluginHandler.register(this);
     },
 
@@ -63,6 +67,8 @@ define(['common-ui/PluginHandler', 'common-ui/ring'], function(PentahoPluginHand
      *        As defined in the register function for PentahoPluginHandler
      */
     unregister: function() {
+      this._validatePluginHandler();
+
       return this.config.pluginHandler.unregister(this);
     },
 
