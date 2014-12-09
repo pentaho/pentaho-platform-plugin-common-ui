@@ -58,6 +58,8 @@ define(['common-ui/ring'], function(ring) {
 		register : function(plugin) {
 			_verifyPlugin(plugin);
 
+			plugin.config.pluginHandler = this;
+
 			if (this.plugins[plugin.id]) {
 				_throwException(plugin + PentahoPluginHandler.errMsgs.alreadyRegistered);
 			}
