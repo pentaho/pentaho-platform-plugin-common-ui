@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
@@ -34,6 +35,7 @@ import org.pentaho.commons.connection.IPentahoResultSet;
 import org.pentaho.commons.connection.marshal.MarshallableResultSet;
 import org.pentaho.metadata.model.Domain;
 import org.pentaho.metadata.model.LogicalModel;
+import org.pentaho.metadata.model.concept.Property;
 import org.pentaho.metadata.query.model.util.QueryXmlHelper;
 import org.pentaho.metadata.repository.IMetadataDomainRepository;
 import org.pentaho.platform.api.engine.ILogger;
@@ -43,7 +45,6 @@ import org.pentaho.platform.engine.core.system.PentahoSystem;
 import org.pentaho.platform.plugin.action.pentahometadata.MetadataQueryComponent;
 import org.pentaho.platform.util.messages.LocaleHelper;
 import org.pentaho.pms.core.exception.PentahoMetadataException;
-import org.apache.commons.lang.StringUtils;
 
 import flexjson.JSONSerializer;
 
@@ -145,7 +146,11 @@ public class MetadataService extends PentahoBase {
 
     // iterate over all of the models in this domain
     for ( LogicalModel model : domainObject.getLogicalModels() ) {
-      String vis = (String) model.getProperty( "visible" );
+      String vis = null; 
+      Property property = model.getProperty( "visible" );
+      if ( property != null ) {
+        vis = (String) property.getValue();
+      }
       if ( vis != null ) {
         String[] visibleContexts = vis.split( "," );
         boolean visibleToContext = false;

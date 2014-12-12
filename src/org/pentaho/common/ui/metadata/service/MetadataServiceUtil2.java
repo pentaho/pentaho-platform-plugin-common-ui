@@ -32,6 +32,7 @@ import org.pentaho.metadata.model.IPhysicalColumn;
 import org.pentaho.metadata.model.LogicalColumn;
 import org.pentaho.metadata.model.LogicalModel;
 import org.pentaho.metadata.model.concept.Concept;
+import org.pentaho.metadata.model.concept.Property;
 import org.pentaho.metadata.model.concept.types.AggregationType;
 import org.pentaho.metadata.model.concept.types.Alignment;
 import org.pentaho.metadata.model.concept.types.DataType;
@@ -202,7 +203,11 @@ public class MetadataServiceUtil2 extends PentahoBase {
     // set the alignment
     DataType dataType = c.getDataType();
     FieldType fieldType = c.getFieldType();
-    Object obj = c.getProperty( "alignment" ); //$NON-NLS-1$
+    Property alignmentProperty = c.getProperty( "alignment" ); //$NON-NLS-1$
+    Object obj = null;
+    if ( alignmentProperty != null ) {
+      obj = alignmentProperty.getValue();
+    }
     if ( obj instanceof Alignment ) {
       if ( obj == Alignment.LEFT ) {
         col.setHorizontalAlignment( Alignment.LEFT.toString() );
@@ -219,12 +224,19 @@ public class MetadataServiceUtil2 extends PentahoBase {
       col.setHorizontalAlignment( Alignment.LEFT.toString() );
     }
     // set the format mask
-    obj = c.getProperty( "mask" ); //$NON-NLS-1$
+    Property maskProperty = c.getProperty( "mask" ); //$NON-NLS-1$
+    if ( maskProperty != null ) {
+      obj = maskProperty.getValue();
+    }
     if ( obj != null ) {
       col.setFormatMask( (String) obj );
     }
 
-    Boolean hidden = (Boolean) c.getProperty( "hidden" );
+    Boolean hidden = null; 
+    Property property = c.getProperty( "hidden" );
+    if ( property != null ) {
+      hidden = (Boolean) property.getValue();
+    }
     if ( hidden != null ) {
       col.setHiddenForUser( hidden.booleanValue() );
     }
@@ -364,7 +376,7 @@ public class MetadataServiceUtil2 extends PentahoBase {
       String[] value = parameter.getValue();
       final String name = parameter.getName() != null ? parameter.getName() : parameter.getElementId();
       org.pentaho.metadata.query.model.Parameter fullParam =
-          new org.pentaho.metadata.query.model.Parameter( name, type, value[0] );
+          new org.pentaho.metadata.query.model.Parameter( name, type, new Property( value[0] ) );
       parameters.add( fullParam );
     }
     return dest;
