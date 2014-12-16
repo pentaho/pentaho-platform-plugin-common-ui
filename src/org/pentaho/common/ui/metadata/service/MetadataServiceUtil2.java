@@ -267,9 +267,9 @@ public class MetadataServiceUtil2 extends PentahoBase {
       JSONObject info = new JSONObject();
       info.put( "colIndex", i ); //$NON-NLS-1$
       info.put( "colName", resultSet.getMetaData().getColumnHeaders()[0][i] ); //$NON-NLS-1$
-      DataType type = (DataType) resultSet.getMetaData().getAttribute( 0, i, IPhysicalColumn.DATATYPE_PROPERTY );
+      DataType type = (DataType) ( (Property) resultSet.getMetaData().getAttribute( 0, i, IPhysicalColumn.DATATYPE_PROPERTY )).getValue();
       info.put( "colType", type.getName().toUpperCase() ); //$NON-NLS-1$
-      LocalizedString name = (LocalizedString) resultSet.getMetaData().getAttribute( 0, i, Concept.NAME_PROPERTY );
+      LocalizedString name = (LocalizedString) ( (Property) resultSet.getMetaData().getAttribute( 0, i, Concept.NAME_PROPERTY )).getValue();
       if ( name != null && locale != null ) {
         info.put( "colLabel", name.getString( locale ) ); //$NON-NLS-1$
       }
