@@ -18,7 +18,6 @@
 package org.pentaho.common.ui.metadata.service;
 
 import flexjson.JSONSerializer;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -29,7 +28,6 @@ import org.pentaho.commons.connection.marshal.MarshallableResultSet;
 import org.pentaho.metadata.datatable.DataTable;
 import org.pentaho.metadata.model.Domain;
 import org.pentaho.metadata.model.LogicalModel;
-import org.pentaho.metadata.model.concept.Property;
 import org.pentaho.metadata.model.thin.Model;
 import org.pentaho.metadata.model.thin.ModelInfo;
 import org.pentaho.metadata.model.thin.ModelInfoComparator;
@@ -143,11 +141,7 @@ public class MetadataService2 extends PentahoBase implements ModelProvider {
 
     // iterate over all of the models in this domain
     for ( LogicalModel model : domainObject.getLogicalModels() ) {
-      String vis = null; 
-      Property property = model.getProperty( "visible" );
-      if ( property != null ) {
-        vis = (String) property.getValue();
-      }
+      String vis = (String) model.getProperty( "visible" );
       if ( vis != null ) {
         String[] visibleContexts = vis.split( "," );
         boolean visibleToContext = false;
