@@ -12,12 +12,15 @@
     <file>globalSlate.css</file>
   </slate>
   <native display-name="Native" system="true" hidden="true">
-    <file>globalNative.css</file>
+    <file>globalNative_ltr.css</file>
+    <file>globalNative_rtl.css</file>
   </native>
   <sample1 system="true" hidden="true">
-    <file>style1.css</file>
+    <file>style1_ltr.css</file>
+    <file>style1_rtl.css</file>
   </sample1>
   <replaceable system="true" hidden="true"> <!-- change this to false to enable the replaceable theme -->
-    <file>replaceable.css</file>
+    <file>replaceable_ltr.css</file>
+    <file>replaceable_rtl.css</file>
   </replaceable>
 </themes>
