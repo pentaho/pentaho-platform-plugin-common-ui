@@ -32,6 +32,8 @@ requireCfg['paths']['common-repo'] = prefix+'/repo';
 
 requireCfg['paths']['common-data'] = prefix+'/dataapi';
 
+requireCfg['paths']['dojo/on'] = prefix+'/dojo/pentaho/common/overrides/dojo/on';
+
 requireCfg['paths']['dojox/layout/ResizeHandle'] = prefix+'/dojo/pentaho/common/overrides/dojox/layout/ResizeHandle';
 requireCfg['paths']['dojox/grid/_View'] = prefix+'/dojo/pentaho/common/overrides/dojox/grid/_View';
 requireCfg['paths']['dojox/xml/parser'] = prefix+'/dojo/pentaho/common/overrides/dojox/xml/parser';
