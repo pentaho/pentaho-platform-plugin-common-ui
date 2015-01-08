@@ -408,7 +408,11 @@ define("common-ui/prompting/pentaho-prompting-components", ['common-ui/prompting
             initialValue = this.formatter ? this.formatter.format(this.transportFormatter.parse(v.label)) : v.label;
 
             try {
-              valueParsed = dojo.number.format(v.label, {locale: SESSION_LOCALE.toLowerCase()});
+	      if(isNaN(v.label) || Math.abs(v.label) == Infinity){ 
+                valueParsed =  null; 
+              } else {
+                valueParsed = dojo.number.format(v.label, {locale: SESSION_LOCALE.toLowerCase()});
+              }
             } catch(e) {
               valueParsed = v.label;
             }
