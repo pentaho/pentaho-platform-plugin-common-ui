@@ -169,10 +169,11 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
 
           var callbacks = {
             onError: function (val) {
-              alert('error:' + val);
+              if(console){
+                console.log("Error with Datasource Editor", val);
+              }
             },
             onCancel: function () {
-              alert('cancelled');
             },
             onReady: function () {
             }
@@ -199,10 +200,11 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
             // find the model
             var callbacks = {
               onError: function (val) {
-                alert('error:' + val);
+                if(console){
+                  console.log("Error with Datasource Editor", val);
+                }
               },
               onCancel: function () {
-                alert('cancelled');
               },
               onReady: function () {
               }
