@@ -85,11 +85,12 @@
       <available file="${dojo.root}/${dojo-artifact}.zip"/>
       <then/>
       <else>
-<!--
-       <get src="http://download.dojotoolkit.org/release-${dojo.version}/${dojo-artifact}.zip"
-             dest="${dojo.root}/${dojo-artifact}.zip"/> -->
+       <get src="http://nexus.pentaho.org/content/groups/omni/org/dojotoolkit/dojo/${dojo.version}/${dojo-artifact}.zip"
+             dest="${dojo.root}/${dojo-artifact}.zip"/>
+       <!--
        <get src="http://repository.pentaho.org/artifactory/third-party/org/dojotoolkit/dojo/${dojo.version}/${dojo-artifact}.zip"
-             dest="${dojo.root}/${dojo-artifact}.zip"/>             
+             dest="${dojo.root}/${dojo-artifact}.zip"/>
+        -->
         <mkdir dir="${dojo.root}"/>
         <unzip src="dev-res/dojo/${dojo-artifact}.zip" dest="${dojo.root}"/>
 
