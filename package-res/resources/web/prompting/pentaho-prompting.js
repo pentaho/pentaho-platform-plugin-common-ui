@@ -18,6 +18,7 @@
 pentaho = typeof pentaho == "undefined" ? {} : pentaho;
 pentaho.common = pentaho.common || {};
 pentaho.common.prompting = pentaho.common.prompting || {};
+pentaho.common.prompting.parametersChanged = false;
 
 define("common-ui/prompting/pentaho-prompting", [ 'cdf/cdf-module', 'common-ui/prompting/pentaho-prompting-bind', 'common-ui/prompting/pentaho-prompting-components', 'common-ui/util/base64' ], function() {
   var GUIDHelper = function() {
@@ -633,6 +634,7 @@ define("common-ui/prompting/pentaho-prompting", [ 'cdf/cdf-module', 'common-ui/p
        */
       this.parameterChanged = function(param, name, value) {
         this.refreshPrompt();
+        pentaho.common.prompting.parametersChanged = true;
       };
 
 
