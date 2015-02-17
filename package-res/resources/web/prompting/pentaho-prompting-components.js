@@ -408,10 +408,14 @@ define("common-ui/prompting/pentaho-prompting-components", ['common-ui/prompting
             initialValue = this.formatter ? this.formatter.format(this.transportFormatter.parse(v.label)) : v.label;
 
             try {
-	      if(isNaN(v.label) || Math.abs(v.label) == Infinity){ 
-                valueParsed =  null; 
+              if(isNaN(v.label) || Math.abs(v.label) == Infinity) {
+                valueParsed =  null;
               } else {
-                valueParsed = dojo.number.format(v.label, {locale: SESSION_LOCALE.toLowerCase()});
+                if (isNumberType(v.type)) {
+                  valueParsed = dojo.number.format(v.label, {locale: SESSION_LOCALE.toLowerCase()});
+                } else {
+                  valueParsed = v.label;
+                }
               }
             } catch(e) {
               valueParsed = v.label;
@@ -543,4 +547,9 @@ define("common-ui/prompting/pentaho-prompting-components", ['common-ui/prompting
       }
     }
   });
+
+  isNumberType = function(type) {
+	var whiteList = ["java.lang.Number", "java.lang.Byte", "java.lang.Double", "java.lang.Float", "java.lang.Integer", "java.lang.Long", "java.lang.Short", "java.math.BigDecimal", "java.math.BigInteger"];
+	return _.contains(whiteList, type);
+  }
 });
