@@ -15,41 +15,74 @@
  * Copyright 2015 Pentaho Corporation. All rights reserved.
  */
 
-define(["common-ui/prompting/pentaho-prompting-components"], function(promptingComponents) {
+define(["common-ui/prompting/pentaho-prompting-components", "dojo/number"], function(promptingComponents, dojoNumber) {
 
-  describe("StaticAutocompleteBoxComponent", function() {
+  describe("StaticAutocompleteBoxComponent.update()", function() {
 
-    it("dojo should not try to parse a string", function() {
-      var comp = promptingComponents.window.StaticAutocompleteBoxComponent;
+    createCommonParameters = function(parameter, values) {
+      return {
+        parameter: parameter,
+        param:  {values: [values]},
+        name: "staticAutocompleteBoxComponent",
+        type: "StaticAutocompleteBoxComponent",
+        htmlObject: "",
+        valuesArray: []
+      };
+    };
 
-      comp.parameter = "1234String";
-      comp.param = {type: "java.lang.String", label: "123456", value: "123456"};
+    it("should not try to parse a string", function() {
+      spyOn(dojoNumber, "format");
+
+      var comp =  new promptingComponents.StaticAutocompleteBoxComponent();
+      $.extend(comp, createCommonParameters("1234String", {
+        type: "java.lang.String",
+        label: "123456",
+        value: "123456"
+      }));
+
       comp.update();
 
-      expect(comp.param.label("123456")).toBe("123456");
-      expect(comp.param.value("123456")).toBe("123456");
+      expect(dojoNumber.format).not.toHaveBeenCalled();
+      expect(comp.param.values[0].label).toBe("123456");
+      expect(comp.param.values[0].value).toBe("123456");
     });
 
-    it("dojo should try to parse a number", function() {
-      var comp = promptingComponents.window.StaticAutocompleteBoxComponent;
+    it("should try to parse a number", function() {
+      spyOn(dojoNumber, "format").andCallFake(function(p) {
+        // just make a returned value different from the parameter
+        return '_' + p;
+      });
 
-      comp.parameter = "1234Integer";
-      comp.param = {type: "java.lang.Integer", label: "123456", value: "123456"};
+      var comp = new promptingComponents.StaticAutocompleteBoxComponent();
+      $.extend(comp, createCommonParameters("1234Integer", {
+        type: "java.lang.Integer",
+        label: "123456",
+        value: "123456",
+        selected: true
+      }));
+      
       comp.update();
 
-      expect(comp.param.label("123456")).not.toBe("123456");
-      expect(comp.param.value("123456")).not.toBe("123456");
+      expect(dojoNumber.format).toHaveBeenCalled();
+      expect(comp.param.values[0].label).not.toBe("123456");
+      expect(comp.param.values[0].value).not.toBe('123456');
     });
 
-    it("dojo should keep string if failed to to parse a number", function() {
-      var comp = promptingComponents.window.StaticAutocompleteBoxComponent;
+    it("should keep string if failed to to parse a number", function() {
+      spyOn(dojoNumber, 'format').andThrow();
 
-      comp.parameter = "1234Integer";
-      comp.param = {type: "java.lang.Integer", label: "12qw", value: "12qw"};
+      var comp = new promptingComponents.StaticAutocompleteBoxComponent();
+      $.extend(comp, createCommonParameters("1234Integer", {
+        type: "java.lang.Integer",
+        label: "12qw",
+        value: "12qw",
+        selected: true
+      }));
+
       comp.update();
 
-      expect(comp.param.label("12qw")).toBe("12qw");
-      expect(comp.param.value("12qw")).toBe("12qw");
+      expect(comp.param.values[0].label).toBe("12qw");
+      expect(comp.param.values[0].label).toBe("12qw");
     });
 
   })
