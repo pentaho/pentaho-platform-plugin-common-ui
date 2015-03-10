@@ -21,3 +21,6 @@ requireCfg = {
     shim: {}
 };
 var KARMA_RUN = true;
+
+var pen = {define : define, require : require};
+var SESSION_LOCALE="en";

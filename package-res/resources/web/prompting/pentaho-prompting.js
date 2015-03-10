@@ -18,6 +18,7 @@
 pentaho = typeof pentaho == "undefined" ? {} : pentaho;
 pentaho.common = pentaho.common || {};
 pentaho.common.prompting = pentaho.common.prompting || {};
+pentaho.common.prompting.parametersChanged = false;
 
 define("common-ui/prompting/pentaho-prompting", [ 'cdf/cdf-module', 'common-ui/prompting/pentaho-prompting-bind', 'common-ui/prompting/pentaho-prompting-components', 'common-ui/util/base64' ], function() {
   var GUIDHelper = function() {
@@ -452,8 +453,6 @@ define("common-ui/prompting/pentaho-prompting", [ 'cdf/cdf-module', 'common-ui/p
       if (!paramDefn) { throw 'paramDefn is required'; }
       this.paramDefn = paramDefn;
 
-      this.whiteList = ["java.lang.Number", "java.lang.Byte", "java.lang.Double", "java.lang.Float", "java.lang.Integer", "java.lang.Long", "java.lang.Short", "java.math.BigDecimal", "java.math.BigInteger"];
-
       // Initialize the auto submit setting for this panel from the parameter definition
       this.autoSubmit = paramDefn.allowAutoSubmit();
 
@@ -494,7 +493,7 @@ define("common-ui/prompting/pentaho-prompting", [ 'cdf/cdf-module', 'common-ui/p
         if (param.multiSelect && !$.isArray(value)) {
           value = [value];
         }
-        if (_.contains(this.whiteList, param.type)) {
+        if (isNumberType(param.type)) {
           var localization = dojo.i18n.getLocalization("dojo.cldr", "number", SESSION_LOCALE.toLowerCase());
           var defaultLocalization = dojo.i18n.getLocalization("dojo.cldr", "number", null);
           var valueParsed;
@@ -633,6 +632,7 @@ define("common-ui/prompting/pentaho-prompting", [ 'cdf/cdf-module', 'common-ui/p
        */
       this.parameterChanged = function(param, name, value) {
         this.refreshPrompt();
+        pentaho.common.prompting.parametersChanged = true;
       };
 
 

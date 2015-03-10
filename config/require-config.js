@@ -19,6 +19,8 @@ requireCfg['paths']['dojo'] = '../../dev-res/dojo/dojo-release-1.9.2-src/dojo';
 requireCfg['paths']['dojox'] = '../../dev-res/dojo/dojo-release-1.9.2-src/dojox';
 requireCfg['paths']['dijit'] = '../../dev-res/dojo/dojo-release-1.9.2-src/dijit';
 
+requireCfg['paths']['common-ui/prompting'] = 'common-ui/prompting';
+
 requireCfg['callback'] = function() {
   window.__karma__.start();
 };
