@@ -74,6 +74,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   <property name="js.karma.ci.config" value="config/karma.ci.conf.js"/>
   <property name="js.node.node_modules.dir" value="node_modules"/>
 
+  <!-- Path to the yuidoc configuration -->
+  <property name="yuidoc.json" value=""/>
+
   <property environment="env"/>
 
   <target name="js.clean"
@@ -397,6 +400,60 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       </else>
     </if>
 
+  </target>
+
+  <available file="yuidoc.cmd" filepath="${env.Path}" property="yuidoc-for-windows-is-available"/>
+  <target name="doc-js" depends="install-antcontrib, npm-install">
+    <if>
+      <not>
+        <equals arg1="${yuidoc.json}" arg2="" />
+      </not>
+      <then>
+        <!-- YUIDoc fails creating out dirs with more than one level.
+             So, we create the standardized output base dir. -->
+        <mkdir dir="doc-js" />
+
+        <foreach param="yuidoc-one.json" list="${yuidoc.json}" target="doc-one-js" />
+
+        <zip destfile="${dist.dir}/js-doc-${project.revision}.zip" basedir="${basedir}/doc-js" />
+      </then>
+      <else>
+        <fail>The location of YUIDoc configuration files is not set (property "yuidoc.json")</fail>
+      </else>
+    </if>
+  </target>
+  <target name="doc-one-js">
+    <if>
+      <available file="${yuidoc-one.json}"/>
+      <then>
+          <!-- The yuidoc configuration file exists.
+               Check if yuidoc is installed. -->
+          <if>
+            <isset property="isWindows"/>
+            <then>
+              <if>
+                <not>
+                  <isset property="yuidoc-for-windows-is-available"/>
+                </not>
+                <then>
+                  <fail>Run 'npm -g install yuidocjs'</fail>
+                </then>
+              </if>
+              <exec executable="yuidoc.cmd" failonerror="true">
+                <arg line='--config "${yuidoc-one.json}"' />
+              </exec>
+            </then>
+            <else>
+              <exec executable="node_modules/yuidocjs/lib/cli.js" failonerror="true">
+                <arg line='--config "${yuidoc-one.json}"' />
+              </exec>
+            </else>
+          </if>
+      </then>
+      <else>
+        <fail>There is no YUIDoc configuration file available at ${yuidoc-one.json}.</fail>
+      </else>
+    </if>
   </target>
 
 </project>

@@ -15,6 +15,10 @@
 *
 */
 
+/**
+ * Pentaho JavaScript Visualization API  [TODO: WRITE ME!]
+ * @module pentaho.visualizations
+ */
 /*
  pentaho.VizController
 
@@ -103,10 +107,16 @@ pentaho.visualizations.getById = function(id){
 
 
 var visualizations = pentaho.visualizations;
-
 /*
  pentaho.VizController
  The visualization controller
+ */
+
+/**
+ * The visualization controller.  [TODO: WRITE ME!]
+ *
+ * @class VizController
+ * @constructor
  */
 pentaho.VizController = function(id) {
   this.id = id;
@@ -136,6 +146,13 @@ pentaho.VizController = function(id) {
 /*
  getError
  Returns the most recent Javascript error object
+ */
+
+/**
+ * Gets the last error. [TODO: WRITE ME!]
+ *
+ * @method getError
+ * @return {Object} Returns the most recent error.
  */
 pentaho.VizController.prototype.getError = function() {
   return this.lastError;
