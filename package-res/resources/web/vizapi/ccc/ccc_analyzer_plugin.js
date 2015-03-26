@@ -16,8 +16,8 @@
 */
 
 define([ 
-            "cdf/lib/CCC/def", 
-            "cdf/lib/CCC/pvc-d1.0",
+            "cdf-legacy/lib/CCC/def", 
+            "cdf-legacy/lib/CCC/pvc-d1.0",
             "common-ui/vizapi/VizController",
             "pentaho/common/Messages",
             "dojo/_base/declare", "dojo/_base/array"

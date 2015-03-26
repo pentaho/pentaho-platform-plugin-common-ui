@@ -16,9 +16,9 @@
 */
 
 define([
-        "cdf/lib/CCC/def",
-        "cdf/lib/CCC/pvc-d1.0",
-        "cdf/lib/CCC/protovis",
+        "cdf-legacy/lib/CCC/def",
+        "cdf-legacy/lib/CCC/pvc-d1.0",
+        "cdf-legacy/lib/CCC/protovis",
         "common-ui/vizapi/VizController",
         "common-ui/vizapi/ccc/ccc_analyzer_plugin" // TODO: temporary dependency due to debug loading time problems
     ],
