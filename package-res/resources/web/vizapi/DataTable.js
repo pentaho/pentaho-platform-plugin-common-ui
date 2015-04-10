@@ -15,1094 +15,1219 @@
 *
 */
 
-/*
-pentaho.DataTable
-pentaho.DataView
-
-Client-side non-visual data tables.
-
-author: James Dixon
-
-*/
-
 pentaho = typeof pentaho == "undefined" ? {} : pentaho;
 
-/****************************************************
-    pentaho.DataTable
-    A client-side table object. 
-****************************************************/
+/**
+ * Pentaho JavaScript Visualization Data APIs.
+ *
+ * This module defines interfaces and classes
+ * used by visualizations for data representation and manipulatation.
+ *
+ * @module common-ui.vizapi.data
+ * @main common-ui.vizapi.data
+ */
+
+/**
+ * An _AbstractDataTable_ represents a set of tabular data.
+ *
+ * @class AbstractDataTable
+ * @constructor
+ */
+ pentaho.AbstractDataTable = function AbstractDataTable() {};
+
+/**
+ * Gets a column object, given its index.
+ *
+ * @method _getColumn
+ * @param {Number} colIdx The column index (zero-based).
+ * @return {Object} The column object.
+ * @protected
+ */
+
+/**
+ * Gets a row object, given its index.
+ *
+ * @method _getRow
+ * @param {Number} rowIdx The row index (zero-based).
+ * @return {Object} The row object.
+ * @protected
+ */
+
+/**
+ * Gets a cell, given its row and column index.
+ *
+ * @method _getCell
+ * @param {Number} rowIdx The cell's row index (zero-based).
+ * @param {Number} colIdx The cell's column index (zero-based).
+ * @return {Null|Object} The cell.
+ * @protected
+ */
+
+/**
+ * Gets the number of columns.
+ *
+ * @method getNumberOfColumns
+ * @return {Number} The number of columns.
+ */
+
+/**
+ * Gets the number of rows.
+ *
+ * @method getNumberOfRows
+ * @return {Number} The number of rows.
+ */
+
+// NOTE: Not publicizing the add method yet, as it is not unit-tested,
+// and would need many other methods to be complete:
+// addRow, addRows, setCell, setValue, setFormattedValue, ...
+// Used internally for the createTrend method.
 
 /*
-    Constructor.
-    jsonTable:      A CDA JSON table object or a Google DataTable JSON object
-*/
-pentaho.DataTable = function( jsonTable ) {
-    this.jsonTable = jsonTable;
-    this.className = "pentaho.DataTable";
-    if( jsonTable.metadata ) {
-        // convert from CDA to DataTable
-        this.jsonTable = pentaho.DataTable.convertCdaToDataTable(jsonTable);
-    }
-}
+ * Appends a new column to the table, given its specification.
+ *
+ * For data views,
+ * this method adds a column to the nearest `DataTable`
+ * and makes the column visible in the intervening views.
+ *
+ * In all existing rows, the value of the new column will be set to `null`.
+ *
+ * @method addColumn
+ * @param {Object} colSpec The column specification.
+ * @param {String} colSpec.id The id of the column.
+ * @param {String} [colSpec.type="string"]  The data type of the column's values.
+ * @param {String} [colSpec.label] The label of the column.
+ * @return {Number} The index of the new column.
+ */
 
-/*
-    convertCdaToDataTable
-    Converts a CDA JSON table object to a Google DataTable JSON table object
-    
-    Input format
-    {
-        metadata: [
-            { colName: 'col1', colType: 'STRING', colLabel: 'Column 1' },
-            { colName: 'col2', colType: 'NUMERIC', colLabel: 'Column 2' }
-        ],
-        resultset: [
-            [ 'Row1', 123 ],
-            [ 'Row2', 456 ]
-        ]
-    }
-    
-    Output format
-    {
-        cols: [
-            { id: 'col1', type: 'string', label: 'Column 1' },
-            { id: 'col2', type: 'number', label: 'Column 2' },
-        ],
-        rows: [
-            { c: [ {v: 'Row 1' }, {v: 123} ] },
-            { c: [ {v: 'Row 2' }, {v: 456} ] }
-        ]
-    }
-    
-    cdaTable:   a CDA JSON table
-    returns:    a Google DataTable JSON table object
-*/
-pentaho.DataTable.convertCdaToDataTable = function( cdaTable ) {
+// TODO: metadata/properties on column/cell/row/table should be stored in a metadata bag, property "p".
+// However, any change must be performed in tandem with Analyzer server-side placement of
+// the "dataReq", "geoRole column property (See GoogleVisualizationRender.renderDataTable).
+// Deferred to when we touch server-side, during DataTable extensions work.
 
-    var cols = [];
-    var rows = [];
-    
-    // create the columns objects
-    for(var columnIdx=0; columnIdx<cdaTable.metadata.length; columnIdx++) {
-        // create a column object
-        col = {
-            id: cdaTable.metadata[columnIdx].colName,
-            type: cdaTable.metadata[columnIdx].colType.toLowerCase(),
-            label: cdaTable.metadata[columnIdx].colLabel
-        }
-        if(!col.label) {
-            col.label = col.id;
-        }
-        if(col.type == 'numeric') {
-            // convert 'numeric' to 'number' to be compatible with Google Charts
-            col.type = 'number';
-        }
-        // add the column to the cols array
-        cols.push(col);
-    }
-    
-    // now add the rows
-    var cdaData = cdaTable.resultset;
-    for(var rowIdx=0; rowIdx<cdaData.length; rowIdx++) {
-        // create a cells array
-        var cells = [];
-        var cdaRow = cdaData[rowIdx];
-        for( columnIdx=0; columnIdx<cdaRow.length; columnIdx++ ) {
-            // add a value to the cells array
-            cells.push({
-                v: cdaRow[columnIdx]
-            });
-        }
-        var row = {
-            c: cells
-        };
-        // add the row to the rows array
-        rows.push(row);
-    }
-    
-    // returns the finished object
-    return {
-        cols: cols,
-        rows: rows
-    };
+// ----
+// COLS
 
-}
+/**
+ * Gets the data type of the values of a column, given its index.
+ *
+ * DataType values are always delivered in lower case
+ * (whatever the initially provided casing).
+ *
+ * The recognized data type values are:
+ * * `"string"` — values are such that `typeof value === "string"`
+ * * `"number"` — values are such that `typeof value === "number"`
+ * * `"boolean"` — values are such that `typeof value === "boolean"`
+ *
+ * @method getColumnType
+ * @param {Number} colIdx The column index (zero-based).
+ * @return {String} The data type of the column's values.
+ */
+pentaho.AbstractDataTable.prototype.getColumnType = function(colIdx) {
+  var type = this._getColumn(colIdx).type;
+  return type ? type.toLowerCase() : "string";
+};
 
-/*
-    Add Java classnames in select places so that this data table can be
-    deserialized from JSON into Java objects
-*/
-pentaho.DataTable.prototype.makePostable = function() {
-    this.jsonTable["class"] = "org.pentaho.dataservice.DataTable";
-    for( var idx=0; idx<this.getNumberOfColumns(); idx++ ) {
-        this.jsonTable.cols[idx]["class"] = "org.pentaho.dataservice.Column";
-    } 
-    for( var idx=0; idx<this.getNumberOfRows(); idx++ ) {
-        var cells = this.jsonTable.rows[idx].c;
-        if( cells ) {
-            for( cellNo=0; cellNo<cells.length; cellNo++ ) {
-                if( cells[cellNo] ) {
-                    cells[cellNo]["class"] = "org.pentaho.dataservice.Cell";
-                }
-            }
-        }
+/**
+ * Gets the id of the data property stored in a column, given its index.
+ *
+ * @method getColumnId
+ * @param {Number} colIdx The column index (zero-based).
+ * @return {String} The column's data property id.
+ */
+pentaho.AbstractDataTable.prototype.getColumnId = function(colIdx) {
+  return this._getColumn(colIdx).id;
+};
+
+/**
+ * Gets the label of the data property stored in a column, given its index.
+ *
+ * @method getColumnLabel
+ * @param {Number} colIdx The column index (zero-based).
+ * @return {String} The column's data property label.
+ */
+pentaho.AbstractDataTable.prototype.getColumnLabel = function(colIdx) {
+  return this._getColumn(colIdx).label;
+};
+
+/**
+ * Gets the value of a column property.
+ *
+ * @method getColumnProperty
+ * @param {Number} colIdx The column index (zero-based).
+ * @param {String} name  The name of the property.
+ * @return {any} The property value.
+ */
+pentaho.AbstractDataTable.prototype.getColumnProperty = function(colIdx, name) {
+  return this._getColumn(colIdx)[name];
+};
+
+/**
+ * Sets the value of a column property.
+ *
+ * @method setColumnProperty
+ * @param {Number} colIdx The column index (zero-based).
+ * @param {String} name  The name of the property.
+ * @param {any}    value The value of the property.
+ * @chainable
+ */
+pentaho.AbstractDataTable.prototype.setColumnProperty = function(colIdx, name, value) {
+  this._getColumn(colIdx)[name] = value;
+  return this;
+};
+
+// TODO: Cache results when no key function is specified.
+
+/**
+ * Gets the value range of a column, given its index.
+ *
+ * When there is no data, or all data is `null`, `undefined` or `NaN`,
+ * the returned range object will have both of its properties, `min` and `max`,
+ * with the value `undefined`.
+ *
+ * This method can be applied meaningfully to columns having a `"number"` or `"string"` data type
+ * (or whose specified `options.key` function evaluates to such types of values).
+ * When the data type is `"string"`, the comparison is lexicographical.
+ *
+ * @example
+ *     {min: 123, max: 456}
+ *
+ * @method getColumnRange
+ * @param {Number} colIdx The column index (zero-based).
+ * @param {Object} [options] A keyword arguments object.
+ * @param {Function} [options.key] A function that derives values from the actual column values.
+ * @return {Object} A non-null range object.
+ */
+pentaho.AbstractDataTable.prototype.getColumnRange = function(colIdx, options) {
+  var set = false,
+      key = options && options.key,
+      i = 0,
+      R = this.getNumberOfRows(),
+      min, max; // = undefined
+
+  while(i < R) {
+    var value = this.getValue(i++, colIdx);
+    if(value != null && !isNaN(value)) {
+      if(key) {
+        value = key(value);
+        if(value == null || isNaN(value)) continue;
+      }
+
+      if(!set) {
+        min = max = value;
+        set = true;
+      } else {
+        if(value < min) min = value;
+        if(value > max) max = value;
+      }
     }
-}
+  }
 
-/*
-    Returns the underlying JSON table
-*/
-pentaho.DataTable.prototype.getJsonTable = function() {
-    return this.jsonTable;
-}
- 
-/*
-    getNumberOfColumns
-    returns     The number of columns in the table
-*/
+  return {min: min, max: max};
+};
+
+/**
+ * Gets an array of the distinct values of a column, given its index.
+ *
+ * Values are obtained by calling
+ * {{#crossLink "AbstractDataTable/getValue:method"}}{{/crossLink}} on each cell.
+ *
+ * The distinct values are returned in order of first occurrence (not sorted).
+ *
+ * The values `null` and `NaN` are treated just like other values and
+ * can thus be returned.
+ *
+ * @method getDistinctValues
+ * @param {Number} colIdx The column index (zero-based).
+ * @return {Array} A non-null array with the distinct values.
+ */
+pentaho.AbstractDataTable.prototype.getDistinctValues = function(colIdx) {
+  return this._getDistinctValuesCore(colIdx, /*formatted:*/false);
+};
+
+/**
+ * Gets an array of the distinct _formatted_ values of a column, given its index.
+ *
+ * Formatted values are obtained by calling
+ * {{#crossLink "AbstractDataTable/getFormattedValue:method"}}{{/crossLink}} on each cell.
+ *
+ * The distinct formatted values are returned in order of first occurrence (not sorted).
+ *
+ * The value `null` is treated just like other values and can thus be returned.
+ *
+ * @method getDistinctFormattedValues
+ * @param {Number} colIdx The cell's column index (zero-based).
+ * @return {Array} A non-null array with the distinct formatted values.
+ */
+pentaho.AbstractDataTable.prototype.getDistinctFormattedValues = function(colIdx) {
+  return this._getDistinctValuesCore(colIdx, /*formatted:*/true);
+};
+
+pentaho.AbstractDataTable.prototype._getDistinctValuesCore = function(colIdx, formatted) {
+  var values = [],
+      keyMap = {},
+      i = 0,
+      R = this.getNumberOfRows(),
+      getValue = formatted ? this.getValue : this.getFormattedValue,
+      value, key;
+
+  while(i < R) {
+    value = getValue.call(this, i++, colIdx);
+    key   = (typeof value) + ":" + value;
+    if(keyMap[key] !== 1) {
+      keyMap[key] = 1;
+      values.push(value);
+    }
+  }
+
+  return values;
+};
+
+// =====
+// CELLS
+
+/**
+ * Gets the value of a cell, given its row and column index.
+ *
+ * When a cell is missing or has a `null`or `undefined` value,
+ * then `null` is returned.
+ *
+ * @method getValue
+ * @param {Number} rowIdx The cell's row index (zero-based).
+ * @param {Number} colIdx The cell's column index (zero-based).
+ * @return {Null|Boolean|Number|String} The cell's value.
+ */
+pentaho.AbstractDataTable.prototype.getValue = function(rowIdx, colIdx) {
+  var cell = this._getCell(rowIdx, colIdx),
+      v;
+
+  return cell         ==  null      ? null :
+         (typeof cell !== "object") ? cell :
+         (v = cell.v) !=  null      ? v    :
+         null;
+};
+
+/**
+ * Gets a _copy_ of a cell, given its row and column index.
+ *
+ * The value `null` is returned when:
+ * 1. a cell is missing, or
+ * 2. a cell has both a _nully_ value and formatted value properties
+ *    (where _nully_ means `null`or `undefined`).
+ *
+ * @method getCell
+ * @param {Number} rowIdx The cell's row index (zero-based).
+ * @param {Number} colIdx The cell's column index (zero-based).
+ * @return {Null|Object} A copy of the cell or `null`.
+ */
+pentaho.AbstractDataTable.prototype.getCell = function(rowIdx, colIdx) {
+  var cell = this._getCell(rowIdx, colIdx);
+  if(cell == null) return null;
+  if(typeof cell !== "object") return {v: cell, f: null};
+
+  var v = cell.v, f = cell.f;
+  if(v == null && f == null) return null;
+  return {
+    v: v == null ? null : v,
+    f: f == null ? null : String(f)
+  };
+};
+
+/**
+ * Gets the formatted value of a cell, given its row and column index.
+ *
+ * If the cell has a specified formatted value,
+ * then the string representation of that value is returned.
+ *
+ * Otherwise, if the cell has a specified value,
+ * then the string representation of that value is returned.
+ *
+ * **Note**: When both the cell's formatted value and value are `null`or `undefined`,
+ * then `null` is returned.
+ *
+ * Contrast this method with {{#crossLink "AbstractDataTable/getLabel:method"}}{{/crossLink}},
+ * that only returns a formatted value when one has been explicitly defined in the cell's `f` property.
+ *
+ * @method getFormattedValue
+ * @param {Number} rowIdx The cell's row index (zero-based).
+ * @param {Number} colIdx The cell's column index (zero-based).
+ * @return {Null|String} The cell's formatted value.
+ */
+pentaho.AbstractDataTable.prototype.getFormattedValue = function(rowIdx, colIdx) {
+  var cell = this._getCell(rowIdx, colIdx),
+      f;
+
+  return cell == null ? null :
+         (((f = cell.f) != null) || ((f = cell.v) != null))  ? String(f) :
+         (typeof cell === 'object') ? null :
+         String(cell);
+};
+
+/**
+ * Gets the formatted value _property_ of a cell, given its row and column index.
+ *
+ * This method returns the string representation of the value of the cell's `f` property,
+ * when the value is defined, or `null`, otherwise.
+ *
+ * Contrast this method with {{#crossLink "AbstractDataTable/getFormattedValue:method"}}{{/crossLink}},
+ * that returns a best-effort formatted value in all cases,
+ * except for `null` or `undefined` values.
+ *
+ * @method getLabel
+ * @param {Number} rowIdx The cell's row index (zero-based).
+ * @param {Number} colIdx The cell's column index (zero-based).
+ * @return {Null|String} The specified formatted value or `null`.
+ * @since 3.0
+ */
+pentaho.AbstractDataTable.prototype.getLabel = function(rowIdx, colIdx) {
+  var cell = this._getCell(rowIdx, colIdx),
+      f;
+
+  return cell != null && (f = cell.f) != null ? String(f) : null;
+};
+
+// -----
+// TABLE
+
+/**
+ * Gets a table plain-object, in DataTable format.
+ *
+ * See also: {{#crossLink "DataView/toDataTable:method"}}{{/crossLink}}.
+ *
+ * @method toJSON
+ * @return {Object} A table plain-object.
+ * @since 3.0
+ */
+pentaho.AbstractDataTable.prototype.toJSON = function() {
+  var C = this.getNumberOfColumns(),
+      cols = new Array(C),
+      j = -1;
+
+  while(++j < C) {
+    // Copy, to preserve any metadata.
+    var srcCol = this._getColumn(j),
+        col    = cols[j] = {};
+    for(var p in srcCol)
+      if(srcCol.hasOwnProperty(p))
+        col[p] = srcCol[p];
+  }
+
+  var R = this.getNumberOfRows(),
+      rows = new Array(R),
+      i = -1,
+      cells;
+
+  while(++i < R) {
+    cells = new Array((j = C));
+
+    while(j--) cells[j] = this.getCell(i, j);
+
+    rows[i] = {c: cells};
+  }
+
+  return {cols: cols, rows: rows};
+};
+
+// ---------------
+
+/**
+ * A {{#crossLink "DataTable"}}{{/crossLink}} is a
+ * type of table that directly stores tabular data.
+ *
+ * A `DataTable` can be constructed empty, or from either:
+ * * a {{#crossLink "AbstractDataTable"}}{{/crossLink}} object,
+ *   in which case its data is copied, or
+ * * a plain JavaScript object having one of the supported data formats:
+ *   _DataTable_ or _CDA_.
+ *
+ * @example
+ * To create a `DataTable` from a plain JavaScript object in _DataTable_ format:
+ *
+ *     var dataTable = new DataTable({
+ *       cols: [
+ *         {id: "col1", type: "string", label: "Column 1"},
+ *         {id: "col2", type: "number", label: "Column 2"},
+ *       ],
+ *       rows: [
+ *         {c: [ {v: "row1", f: "Row 1"}, 123] },
+ *         {c: [ {v: "row2", f: "Row 1"}, {v: 456}] }
+ *       ]
+ *     });
+ *
+ * @example
+ * To create a `DataTable` from a plain JavaScript object in _CDA_ format:
+ *
+ *     var dataTable = new DataTable({
+ *       metadata: [
+ *         {colName: "col1", colType: "STRING",  colLabel: "Column 1"},
+ *         {colName: "col2", colType: "NUMERIC", colLabel: "Column 2"}
+ *       ],
+ *       resultset: [
+ *         ["Row1", 123],
+ *         ["Row2", 456]
+ *       ]
+ *     });
+ *
+ * @example
+ * To create a `DataTable` with a copy of the data
+ * in a `DataTable` or `DataView` object,
+ * use the copy constructor variant:
+ *
+ *     var dataTable = new DataTable(dataTableOrView);
+ *
+ * @class DataTable
+ * @extends AbstractDataTable
+ * @constructor
+ * @param {Object|AbstractDataTable} [table]
+ *    An instance of {{#crossLink "AbstractDataTable"}}{{/crossLink}} or
+ *    a plain JavaScript object in a supported data format.
+ */
+pentaho.DataTable = function DataTable(table) {
+  this._jsonTable =
+    !table ? {cols: [], rows: []} :
+    table instanceof pentaho.AbstractDataTable ? table.toJSON() :
+    table.metadata ? pentaho.DataTable.convertCdaToDataTable(table) :
+    table;
+};
+
+pentaho.DataTable.prototype = new pentaho.AbstractDataTable();
+pentaho.DataTable.prototype.constructor = pentaho.DataTable;
+
+// ====
+// Abstract class implementation
+
+pentaho.DataTable.prototype._getColumn = function(colIdx) {
+  return this._jsonTable.cols[colIdx];
+};
+
+pentaho.DataTable.prototype._getRow = function(rowIdx) {
+  return this._jsonTable.rows[rowIdx];
+};
+
+pentaho.DataTable.prototype._getCell = function(rowIdx, colIdx) {
+  return this._jsonTable.rows[rowIdx].c[colIdx];
+};
+
 pentaho.DataTable.prototype.getNumberOfColumns = function() {
-    return this.jsonTable.cols.length;
-}
+  return this._jsonTable.cols.length;
+};
 
-/*
-    getNumberOfRows
-    returns     The number of rows in the table
-*/
 pentaho.DataTable.prototype.getNumberOfRows = function() {
-    return this.jsonTable.rows.length;
-}
+  return this._jsonTable.rows.length;
+};
 
-/*
-    getColumnType
-    columnIdx   The column number (zero based)
-    returns     The type of the specified column (number, string, date, boolean
-*/
-pentaho.DataTable.prototype.getColumnType = function(columnIdx) {
-    return this.jsonTable.cols[columnIdx].type;
-}
+// =====
+// TABLE
 
-/*
-    getColumnId
-    columnIdx   The column number (zero based)
-    returns     The id of the specified column
-*/
-pentaho.DataTable.prototype.getColumnId = function(columnIdx) {
-    return this.jsonTable.cols[columnIdx].id;
-}
+/**
+ * Converts a table in plain JavaScript object, in _CDA_ format, to _DataTable_ format.
+ *
+ * @example
+ * If the _CDA_ table object is:
+ *
+ *     {
+ *        metadata: [
+ *          {colName: "country", colType: "STRING",  colLabel: "Country"},
+ *          {colName: "sales",   colType: "NUMERIC", colLabel: "Sales"  }
+ *        ],
+ *        resultset: [
+ *          ["Portugal", 12000],
+ *          ["Ireland",   6000]
+ *        ]
+ *     }
+ *
+ * the resulting table object in _DataTable_ format is:
+ *
+ *     {
+ *       cols: [
+ *         {id: "country", type: "string", label: "Country"},
+ *         {id: "sales",   type: "number", label: "Sales"  },
+ *       ],
+ *       rows: [
+ *         {c: [ {v: "Portugal"}, {v: 12000}] },
+ *         {c: [ {v: "Ireland" }, {v:  6000}] }
+ *       ]
+ *     }
+ *
+ * @method convertCdaToDataTable
+ * @static
+ * @param {Object} cdaTable A table object in _CDA_ format.
+ * @return {Object} A table object in _DataTable_ format.
+ */
+pentaho.DataTable.convertCdaToDataTable = function(cdaTable) {
+  var cdaCols = cdaTable.metadata,
+      cdaRows = cdaTable.resultset,
+      C = cdaCols.length,
+      R = cdaRows.length,
+      cols = new Array(C),
+      rows = new Array(R),
+      j;
 
-/*
-    getColumnLabel
-    columnIdx   The column number (zero based)
-    returns     The label of the specified column
-*/
-pentaho.DataTable.prototype.getColumnLabel = function(columnIdx) {
-    return this.jsonTable.cols[columnIdx].label;
-}
+  // TODO: Move this constant object out to closure space upon AMD conversion!
+  // CDA lowercase -> DT
+  var colTypeMap = {
+    'numeric': 'number',
+    'integer': 'number'
+  };
 
-/*
-    getValue
-    columnIdx   The column number (zero based)
-    rowIdx      The row number (zero based)
-    returns     The value of the specified cell
-*/
-pentaho.DataTable.prototype.getValue = function(rowIdx,columnIdx) {
-    if(!this.jsonTable.rows[rowIdx].c[columnIdx]){
-        return null;
+  // Columns
+  j = -1;
+  while(++j < C) {
+    var cdaCol  = cdaCols[j],
+        colType = String(cdaCol.colType || 'string').toLowerCase();
+
+    if(colTypeMap.hasOwnProperty(colType))
+      colType = colTypeMap[colType];
+
+    cols[j] = {
+      id:    cdaCol.colName,
+      type:  colType,
+      label: cdaCol.colLabel || cdaCol.colName
+    };
+  }
+
+  // Rows
+  var i = -1;
+  while(++i < R) {
+    var cdaRow = cdaData[i], cells = new Array(C);
+
+    // Copy cells
+    j = C;
+    while(j--) {
+      var v = cdaRow[j];
+      cells[j] = v == null ? null : // direct null
+                 (typeof v === 'object') && ('v' in v) ? v : // direct cell
+                 {v: v, f: undefined}; // value to cell
     }
-    if( this.jsonTable.rows[rowIdx].c[columnIdx].v !== undefined ) {
-        // we have a value field so return it
-        return this.jsonTable.rows[rowIdx].c[columnIdx].v;
-    } else {
-        return this.jsonTable.rows[rowIdx].c[columnIdx];
-    }
-}
 
-/*
-    Returns the cell object
-*/
-pentaho.DataTable.prototype._getCell = function(rowIdx,columnIdx) {
-    if(!this.jsonTable.rows[rowIdx].c[columnIdx]){
-        return null;
-    }
-    return this.jsonTable.rows[rowIdx].c[columnIdx];
-}
+    rows[i] = {c: cells};
+  }
 
+  return {cols: cols, rows: rows};
+};
 
-/*
-    getFormattedValue
-    columnIdx   The column number (zero based)
-    rowIdx      The row number (zero based)
-    returns     The formatted value of the specified cell
-*/
-pentaho.DataTable.prototype.getFormattedValue = function(rowIdx,columnIdx) {
-    if( !this.jsonTable.rows[rowIdx].c[columnIdx] ) {
-        return null;
-    }
-    else if( this.jsonTable.rows[rowIdx].c[columnIdx].f !== undefined ) {
-        // we have a formatted value so return it
-        return this.jsonTable.rows[rowIdx].c[columnIdx].f;
-    } 
-    else if( this.jsonTable.rows[rowIdx].c[columnIdx].v !== undefined ) {
-        // we have a value field so return it
-        return this.jsonTable.rows[rowIdx].c[columnIdx].v;
-    } 
-    else if( this.jsonTable.rows[rowIdx].c[columnIdx].v == null ) {
-        // we have a null value field so return it
-        return null;
-    } 
-    else {
-        return this.jsonTable.rows[rowIdx].c[columnIdx];
-    }
-}
+/**
+ * Gets the underlying plain object in DataTable format,
+ * that contains the current data in the data table.
+ *
+ * Do **NOT** modify the returned data structure.
+ *
+ * This method is deprecated.
+ * You can use {{#crossLink "AbstractDataTable/toJSON:method"}}{{/crossLink}}
+ * to get a copy of the contained data,
+ * or use the methods that access each table component directly.
+ *
+ * @method getJsonTable
+ * @return {Object} The JSON-like data object.
+ * @deprecated Use method "toJSON" instead.
+ */
+pentaho.DataTable.prototype.getJsonTable = function() {
+  return this._jsonTable;
+};
 
-/*
-    getColumnRange
-    Returns a range object describing the minimum and maximum values from the specified column
-    columnIdx   The column number (zero based)
-    options      A keyword arguments object.
-    options.key  A function that extracts the values from the column data.
-    returns      A range object - { min: 123, max: 456 }.
-                 When there is no data, or all data is null or NaN, the returned
-                 range object will have both its properties, 'min' and 'max', 
-                 with the value undefined.
-*/
-pentaho.DataTable.prototype.getColumnRange = function(columnIdx, options) {
+// ====
+// COLS
+pentaho.DataTable.prototype.addColumn = function(colSpec) {
+  var j = this._jsonTable.cols.push({
+     id:    colSpec.id,
+     type:  colSpec.type,
+     label: colSpec.label,
+  }) - 1;
 
-    var min;
-    var max;
-    var set = false;
-    var key = options && options.key;
-    
-    for( var rowNo=0; rowNo<this.getNumberOfRows(); rowNo++ ) {
-        // get the value from this row
-        var value = this.getValue( rowNo, columnIdx );
-        if(value != null) {
-            if(key){
-                value = key(value);
-            }
-            
-            if(!set) {
-                min = value;
-                max = value;
-                set = true;
-            } else {
-                if( value < min ) {
-                    min = value;
-                }
-                if( value > max ) {
-                    max = value;
-                }
-            }
-        }
-    }
-    
-    // return the range 
-    var range = {
-        min: min,
-        max: max
-    }
-    return range;
+  // Set all rows to null
+  var rows = this._jsonTable.rows,
+      R = rows.length;
+  if(R) {
+    var i = -1;
+    while(++i < R) rows[i].c[j] = null;
+  }
 
-}
+  return j;
+};
 
-/*
-    getDistinctValues
-    Returns an array of the distinct values from the specified column
-    columnIdx   The column number (zero based)
-    Returns     An array of the distinct values from the specified column
-*/
-pentaho.DataTable.prototype.getDistinctValues = function(columnIdx) {
-    var values = [];
-    var valueMap = {};
-    var isNumber = this.getColumnType(columnIdx) == 'number';
-    for( var rowNo=0; rowNo<this.getNumberOfRows(); rowNo++ ) {
-        var value = isNumber ? this.getValue( rowNo, columnIdx ) : this.getFormattedValue( rowNo, columnIdx );
-        if( !valueMap[value] ) {
-            valueMap[value] = true;
-            values.push(value);
-        }
-    }
-    return values;
-}
+// ====
+// ROWS
 
-/*
-    getDistinctFormattedValues
-    Returns an array of the distinct formatted values from the specified column
-    columnIdx   The column number (zero based)
-    Returns     an array of the distinct formatted values from the specified column
-*/
-pentaho.DataTable.prototype.getDistinctFormattedValues = function(columnIdx) {
-    var values = [];
-    var valueMap = {};
-    for( var rowNo=0; rowNo<this.getNumberOfRows(); rowNo++ ) {
-        var value = this.getFormattedValue( rowNo, columnIdx );
-        if( !valueMap[value] ) {
-            valueMap[value] = true;
-            values.push(value);
-        }
-    }
-    return values;
-}
-
-/*
-    getFilteredRows
-    Filters the rows of the table using the specified filter(s). Returns an array of the row numbers
-    that met the filter criteria. The result can be passed to DataView.setRows to get a filtered table
-    
-    To filter on column 0 == 'France'
-    var rows = dataTable.getFilteredRows({ column: 0, value: 'France' })
-    var view = new pentaho.DataView( dataTable );
-    view.setRows(rows)
-    
-    To combine France and Germany
-    var rows = dataTable.getFilteredRows({ column: 0, combine: [{values:['France','Germany']}] })
-    var view = new pentaho.DataView( dataTable );
-    view.setRows(rows)
-    
-    Returns     an array of row nummbers of the rows that met the filter requirements
+/**
+ * Filters the rows of the table using the specified filters.
+ * Returns an array of the row indexes that meet the filter criteria.
+ *
+ * The result can be passed to
+ * {{#crossLink "DataView/setRows:method"}}{{/crossLink}}
+ * to obtain a filtered table.
+ *
+ * When no value filters are specified, all rows will be included in the output.
+ *
+ * @example
+ * To filter on column 0 == 'France':
+ *     var rows = dataTable.getFilteredRows({column: 0, value: 'France'});
+ *     var view = new pentaho.DataView(dataTable);
+ *     view.setRows(rows);
+ *
+ * @method getFilteredRows
+ * @param {Array} filters The filters array.
+ * @return {Array} An array of row indexes of the rows that meet the filter requirements.
 */
 pentaho.DataTable.prototype.getFilteredRows = function(filters) {
-    var rows = [];
-    var comboMap = {};
-    for( var rowNo=0; rowNo<this.getNumberOfRows(); rowNo++ ) { // check each row
-        for( var filterNo=0; filterNo<filters.length; filterNo++ ) { // check each filter
-            if( filters[filterNo].value ) {
-                // this is a 'filter by value'
-                if( this.getValue( rowNo, filters[filterNo].column ) == filters[filterNo].value ) {
-                    // this row passes the filter requirements, add the row number to the rows array
-                    rows.push( rowNo );
-                }
-            }
-            if( filters[filterNo].combinations ) {
-                // this is a 'local combination of rows'
-                var value = this.getValue( rowNo, filters[filterNo].column );
-                var combinations = filters[filterNo].combinations;
-                var combined = false;
-                for( combinationNo=0; combinationNo<combinations.length; combinationNo++ ) {
-                    // check the values
-                    for( valueNo=0; valueNo<combinations[combinationNo].values.length; valueNo++ ) {
-                        if( value == combinations[combinationNo].values[valueNo] ) {
-                            // found something to combine
-                            if( comboMap[combinationNo] ) {
-                                comboMap[combinationNo][1].push( rowNo );
-                            } else {
-                                // this is a new one
-                                var row = ['combine',[]];
-                                row[1].push( rowNo );
-                                rows.push( row );
-                                comboMap[combinationNo] = row;
-                            }
-                            combined = true;
-                        }
-                    }
-                }
-                if( !combined ) {
-                    rows.push( rowNo );
-                }
-            }
-        }
+  var rows = [],
+      R = this.getNumberOfRows();
+
+  // Any data?
+  if(R) {
+    // Process filters
+    var valuePredicate = this._buildFilteredRowsPredicate(filters),
+        i = -1;
+
+    // Filter
+    while(++i < R)
+      if(!valuePredicate || valuePredicate.call(this, i))
+        rows.push(i);
+  }
+
+  return rows;
+};
+
+// TODO: Convert this to internal function upon the AMD conversion.
+
+// Conjunction of all value filters, if any.
+pentaho.DataTable.prototype._buildFilteredRowsPredicate = function(valueFilters) {
+  var F = valueFilters.length;
+
+  // (rowIdx: number) -> boolean
+  if(F) return function(rowIdx) {
+    for(var f = 0; f < F; f++) {
+      var filter = valueFilters[f],
+          v = filter.value;
+      if(v !== undefined && this.getValue(rowIdx, filter.column) !== v) return false;
     }
-    return rows;
-}
+    return true;
+  };
+};
 
-/*
-    setColumnProperty
-    Sets a column property
+/**
+ * A **data view** is an object that
+ * provides a way to access a subset of a source table.
+ *
+ * A data view can selectively show rows and/or columns from the source table
+ * through use of the
+ * {{#crossLink "DataView/setRows:method"}}{{/crossLink}}
+ * and {{#crossLink "DataView/setColumns:method"}}{{/crossLink}} methods,
+ * respectively.
+ * Columns can also be hidden by using the
+ * {{#crossLink "DataView/hideColumns:method"}}{{/crossLink}},
+ * a variant that preserves already hidden columns.
+ *
+ * @class DataView
+ * @extends AbstractDataTable
+ * @constructor
+ * @param {AbstractDataTable} table The source table.
+ */
+pentaho.DataView = function DataView(table) {
+  this._source = table;
 
-    columnIndex The index of the column to set the property on
-    name        The name of the property
-    value       The value of the property
-*/
-pentaho.DataTable.prototype.setColumnProperty = function(columnIndex, name, value) {
-    if( columnIndex >= 0 && columnIndex < this.jsonTable.cols.length) {
-        this.jsonTable.cols[columnIndex][name] = value;
-    }
-}
+  this._rows    = null;
+  this._columns = this._getSourceColumns();
+};
 
-/*
-    getColumnProperty
-    Returns a column property
+pentaho.DataView.prototype = new pentaho.AbstractDataTable();
+pentaho.DataView.prototype.constructor = pentaho.DataView;
 
-    columnIndex The index of the column to set the property on
-    name        The name of the property
+// ====
+// Implement abstract class
 
-    Return      The value of the property
-*/
-pentaho.DataTable.prototype.getColumnProperty = function(columnIndex, name) {
-    if( columnIndex >= 0 && columnIndex < this.jsonTable.cols.length) {
-        return this.jsonTable.cols[columnIndex][name];
-    }
-    return null;
-}
+pentaho.DataView.prototype._getColumn = function(colIdx) {
+  return this._source._getColumn(this.getTableColumnIndex(colIdx));
+};
 
-/****************************************************
-    pentaho.DataView
-    A client-side data view object.
-    Provides a way to access a subset of a DataTable.
-    You can reduce the rows and/or columns of the
-    underlying DataTable
-****************************************************/
+pentaho.DataView.prototype._getRow = function(rowIdx) {
+  return this._source._getRow(this.getTableRowIndex(rowIdx));
+};
 
-/*
-    Constructor
-    dataTable:  A DataTable object to base this view on
-*/
-pentaho.DataView = function( dataTable ) {
-    this.dataTable = dataTable;
-    this.rows = null;
-    this.columns = null;
-    this.className = "pentaho.DataView";
-}
+pentaho.DataView.prototype._getCell = function(rowIdx, colIdx) {
+  return this._source._getCell(this.getTableRowIndex(rowIdx), this.getTableColumnIndex(colIdx));
+};
 
-/*
-    setRows
-    Sets the row numbers of the rows to have in the view.
-    The row numbers do not have to match the order of the
-    underlying table.
-    If this function is not called this DataView will include
-    all the rows of the underlying DataTable.
-    All of the row numbers must be within the range of valid
-    row numbers for the DataTable.
-    
-    rows    An array of row numbers
-*/
-pentaho.DataView.prototype.setRows = function(rows) {
-    this.rows = rows;
-}
-
-/*
-    setColumns
-    Sets the column numbers to have in the view.
-    The column numbers do not have to match the order of the
-    columns in the underlying table.
-    If this function is not called this DataView will include
-    all the columns of the underlying DataTable.
-    All of the columns numbers must be within the range of valid
-    columns numbers for the DataTable.
-    
-    columns    An array of columns numbers
-*/
-pentaho.DataView.prototype.setColumns = function(columns) {
-    this.columns = columns;
-}
-
-/*
-    getColumnRange
-    Returns a range object describing the minimum and maximum values from the specified column
-    columnIdx   The column number (zero based)
-    options      A keyword arguments object.
-    options.key  A function that extracts the values from the column data.
-    returns      A range object - { min: 123, max: 456 }.
-                 When there is no data, or all data is null or NaN, the returned
-                 range object will have both its properties, 'min' and 'max', 
-                 with the value undefined.
-*/
-pentaho.DataView.prototype.getColumnRange = function(columnIdx, options) {
-
-    var min;
-    var max;
-    var set = false;
-    var key = options && options.key;
-    
-    for( var rowNo=0; rowNo<this.getNumberOfRows(); rowNo++ ) {
-        var value = this.getValue( rowNo, columnIdx );
-        if(value != null) {
-            if(key){
-                value = key(value);
-            }
-            
-            if(!set) {
-                min = value;
-                max = value;
-                set = true;
-            } else {
-                if( value < min ) {
-                    min = value;
-                }
-                if( value > max ) {
-                    max = value;
-                }
-            }
-        }
-    }
-    var range = {
-        min: min,
-        max: max
-    }
-    return range;
-
-}
-
-/*
-    getDistinctValues
-    Returns an array of the distinct values from the specified column
-    columnIdx   The column number (zero based)
-    Returns     An array of the distinct values from the specified column
-*/
-pentaho.DataView.prototype.getDistinctValues = function(columnIdx) {
-    var values = [];
-    var valueMap = {};
-    for( var rowNo=0; rowNo<this.getNumberOfRows(); rowNo++ ) {
-        var value = this.getValue( rowNo, columnIdx );
-        if( !valueMap[value] ) {
-            valueMap[value] = true;
-            values.push(value);
-        }
-    }
-    return values;
-}
-
-/*
-    getDistinctFormattedValues
-    Returns an array of the distinct formatted values from the specified column
-    columnIdx   The column number (zero based)
-    Returns     an array of the distinct formatted values from the specified column
-*/
-pentaho.DataView.prototype.getDistinctFormattedValues = function(columnIdx) {
-    var values = [];
-    var valueMap = {};
-    for( var rowNo=0; rowNo<this.getNumberOfRows(); rowNo++ ) {
-        var value = this.getFormattedValue( rowNo, columnIdx );
-        if( !valueMap[value] ) {
-            valueMap[value] = true;
-            values.push(value);
-        }
-    }
-    return values;
-}
-
-/*
-    hideColumns
-    Removes columns from the view.
-    The list of column numbers to hide must be in ascending order so the indexes don't shift as we delete.
-    
-    columns     An array of column numbers to hide
-*/
-pentaho.DataView.prototype.hideColumns = function(columns) {
-    tmpCols = [];
-    for( var columnIdx=0; columnIdx < this.getNumberOfColumns(); columnIdx++ ) {
-        tmpCols.push( columnIdx );
-    }
-    for( var idx=columns.length-1; idx> -1; idx-- ) {
-        tmpCols.splice(columns[idx],1)
-    }
-    this.columns = tmpCols;
-}
-
-/*
-    getNumberOfRows
-    returns     The number of rows in the table
-*/
-pentaho.DataView.prototype.getNumberOfRows = function() {
-    return this.rows == null ? this.dataTable.getNumberOfRows() : this.rows.length;
-}
-
-/*
-    getNumberOfColumns
-    returns     The number of columns in the table
-*/
 pentaho.DataView.prototype.getNumberOfColumns = function() {
-    return this.columns == null ? this.dataTable.getNumberOfColumns() : this.columns.length;
-}
+  return this._columns.length;
+};
+
+pentaho.DataView.prototype.getNumberOfRows = function() {
+  return this._rows ? this._rows.length : this._source.getNumberOfRows();
+};
+
+// ====
+// COLS
 
 /*
-    getColumnId
-    columnIdx   The column number (zero based)
-    returns     The id of the specified column
-*/
-pentaho.DataView.prototype.getColumnId = function(columnIdx) {
-    return this.columns == null ? this.dataTable.getColumnId(columnIdx) : this.dataTable.getColumnId(this.columns[columnIdx]);
-}
+ * Gets an array with all source column indexes.
+ *
+ * @method _getSourceColumns
+ * @return {Array} An array of source column indexes.
+ */
+pentaho.DataView.prototype._getSourceColumns = function() {
+  var C = this._source.getNumberOfColumns(),
+      cols = new Array(C),
+      j;
+
+  for(j = 0; j < C; j++) cols[j] = j;
+
+  return cols;
+};
+
+/**
+ * Gets the source column index corresponding to a given view column index.
+ *
+ * @method getTableColumnIndex
+ * @param {Number} colIdx The view column index.
+ * @return {Number} The source column index.
+ * @since 3.0
+ */
+pentaho.DataView.prototype.getTableColumnIndex = function(colIdx) {
+  return this._columns[colIdx];
+};
+
+/**
+ * Sets the indexes of the visible source columns.
+ *
+ * The column indexes do not have to match the order of columns in the source table.
+ * However, these must be within the range of valid source column indexes.
+ *
+ * If this method is not called or is called with a `null` or `undefined` value in the `columns` argument,
+ * all of the source columns are made visible.
+ *
+ * @method setColumns
+ * @param {Array} [columns] An array of source column indexes.
+ * @chainable
+ */
+pentaho.DataView.prototype.setColumns = function(columns) {
+  this._columns = columns ? columns.slice() : this._getSourceColumns();
+  return this;
+};
+
+/**
+ * Gets the indexes of the visible source columns.
+ *
+ * Do **NOT** modify the returned array directly.
+ *
+ * @method getViewColumns
+ * @return {Array} The array of source column indexes.
+ * @since 3.0
+ */
+pentaho.DataView.prototype.getViewColumns = function() {
+  return this._columns;
+};
+
+/**
+ * Hides columns, given their **source** indexes.
+ *
+ * It is allowed to specify a column that is already hidden.
+ *
+ * @method hideColumns
+ * @param columns An array of source column indexes to hide.
+ * @chainable
+ */
+pentaho.DataView.prototype.hideColumns = function(columns) {
+  var cols = this._columns;
+  if(cols.length) {
+    var hideColsMap = {},
+        j;
+
+    // Index the indexes of the specified columns to be hidden.
+    j = columns.length;
+    while(j--)  hideColsMap[j] = 1;
+
+    // Remove those indexes from the current visible columns.
+    j = cols.length;
+    while(j--)
+      if(hideColsMap[columns[j]] === 1)
+        cols.splice(j, 1);
+  }
+
+  return this;
+};
+
+pentaho.DataView.prototype.addColumn = function(colSpec) {
+  var colIdx = this._source.addColumn(colSpec);
+  return this._columns.push(colIdx) - 1;
+};
+
+// ====
+// ROWS
+
+/**
+ * Gets the source row index corresponding to a given view row index.
+ *
+ * @method getTableRowIndex
+ * @param {Number} rowIdx The view row index.
+ * @return {Number} The source row index.
+ * @since 3.0
+ */
+pentaho.DataView.prototype.getTableRowIndex = function(rowIdx) {
+  return this._rows ? this._rows[rowIdx] : rowIdx;
+};
+
+/**
+ * Sets the indexes of the source rows to show in the view.
+ *
+ * The row indexes do not have to match the order of rows in the source table.
+ *
+ * If this method is not called, or is called with a `null` value,
+ * all of the source rows are included.
+ *
+ * The row indexes must be within the range of valid row indexes of the source table.
+ *
+ * @method setRows
+ * @param {Array} [rows=null] An array of source row indexes.
+ * @chainable
+ */
+pentaho.DataView.prototype.setRows = function(rows) {
+  this._rows = rows || null;
+  return this;
+};
+
+/**
+ * Gets the indexes of the visible source rows.
+ *
+ * Do **NOT** modify the returned array directly.
+ *
+ * @method getViewRows
+ * @return {Array|Null} The array of source row indexes or `null`, if one has not been set.
+ * @since 3.0
+ */
+pentaho.DataView.prototype.getViewRows = function() {
+  return this._rows;
+};
+
+// -----
+// TABLE
 
 /*
-    getColumnLabel
-    columnIdx   The column number (zero based)
-    returns     The label of the specified column
-*/
-pentaho.DataView.prototype.getColumnLabel = function(columnIdx) {
-    return this.columns == null ? this.dataTable.getColumnLabel(columnIdx) : this.dataTable.getColumnLabel(this.columns[columnIdx]);
-}
+ * Gets the view's source table.
+ *
+ * @method getSourceTable
+ * @return {AbstractDataTable} The source table.
+ * @since 3.0
+ */
+pentaho.DataView.prototype.getSourceTable = function() {
+  return this._source;
+};
 
-/*
-    getColumnType
-    columnIdx   The column number (zero based)
-    returns     The type of the specified column (number, string, date, boolean
-*/
-pentaho.DataView.prototype.getColumnType = function(columnIdx) {
-    return this.columns == null ? this.dataTable.getColumnType(columnIdx) : this.dataTable.getColumnType(this.columns[columnIdx]);
-}
-
-/*
-    getValue
-    columnIdx   The column number (zero based)
-    rowIdx      The row number (zero based)
-    returns     The value of the specified cell
-*/
-pentaho.DataView.prototype.getValue = function(rowNo, colNo) {
-    var rowIdx = this.rows == null ? rowNo : this.rows[rowNo];
-    var colIdx = this.columns == null ? colNo : this.columns[colNo];
-    if( rowIdx.length && rowIdx[0] == 'combine' ) {
-        // this is a combined row
-
-        var type = this.getColumnType(colNo);
-        var value 
-        for( var idx=0; idx<rowIdx[1].length; idx++ ) {
-            if( idx == 0 ) {
-                value = this.dataTable.getValue(rowIdx[1][idx], colIdx);
-            }
-            else if( type == 'string' ) {
-                value += ' + '+this.dataTable.getValue(rowIdx[1][idx], colIdx);
-            }
-            else if( type == 'number' ) {
-                value += this.dataTable.getValue(rowIdx[1][idx], colIdx);
-            }
-        }
-        return value;
-    }
-    return this.dataTable.getValue(rowIdx, colIdx);
-}
-
-pentaho.DataView.prototype._getCell = function(rowNo, colNo) {
-    var rowIdx = this.rows == null ? rowNo : this.rows[rowNo];
-    var colIdx = this.columns == null ? colNo : this.columns[colNo];
-    return this.dataTable._getCell(rowIdx, colIdx);
-}
-
-/*
-    getFormattedValue
-    columnIdx   The column number (zero based)
-    rowIdx      The row number (zero based)
-    returns     The formatted value of the specified cell
-*/
-pentaho.DataView.prototype.getFormattedValue = function(rowNo, colNo) {
-    var rowIdx = this.rows == null ? rowNo : this.rows[rowNo];
-    var colIdx = this.columns == null ? colNo : this.columns[colNo];
-    if( rowIdx.length && rowIdx[0] == 'combine' ) {
-        // this is a combined row
-
-        var type = this.getColumnType(colNo);
-        var value 
-        for( var idx=0; idx<rowIdx[1].length; idx++ ) {
-            if( idx == 0 ) {
-                value = this.dataTable.getFormattedValue(rowIdx[1][idx], colIdx);
-            }
-            else if( type == 'string' ) {
-                value += ' + '+this.dataTable.getFormattedValue(rowIdx[1][idx], colIdx);
-            }
-            else if( type == 'number' ) {
-                value += this.dataTable.getFormattedValue(rowIdx[1][idx], colIdx);
-            }
-        }
-        return value;
-    }
-    return this.dataTable.getFormattedValue(rowIdx, colIdx);
-}
-
-/*
-    toDataTable
-    Converts this view into a DataTable that has its own copy of the
-    underlying data.
-    The column metadata and the rows are copied into the new object.
-    
-    Returns:    A DataTable
+/**
+ * Gets a {{#crossLink "DataTable"}}{{/crossLink}} loaded with the
+ * data view's visible rows and columns.
+ *
+ * This is a convenience method for abbreviating:
+ *
+ *      var dataTable = new pentaho.DataTable(thisDataView.toJSON());
+ *
+ * @method toDataTable
+ * @return {DataTable} A data table.
 */
 pentaho.DataView.prototype.toDataTable = function() {
-
-    var cols = [];
-    for( var colIdx=0; colIdx<this.getNumberOfColumns(); colIdx++ ) {
-        col = {
-            type: this.getColumnType(colIdx),
-            id:  this.getColumnId(colIdx),
-            label: this.getColumnLabel(colIdx)
-        }
-        cols.push(col);
-    }
-    
-    var rows = [];
-    for( var rowIdx=0; rowIdx<this.getNumberOfRows(); rowIdx++ ) {
-        cells = [];
-        for( var colIdx=0; colIdx<this.getNumberOfColumns(); colIdx++ ) {
-            var cell = this._getCell(rowIdx, colIdx);
-            cells.push(cell);
-        }
-        row = {
-            c: cells
-        };
-        rows.push( row );
-    }
-    
-    var json = { cols: cols, rows: rows };
-    
-    var table = new pentaho.DataTable(json);
-    return table;
-
-}
-
-/*
-    setColumnProperty
-    Sets a column property
-
-    columnIndex The index of the column to set the property on
-    name        The name of the property
-    value       The value of the property
-*/
-pentaho.DataView.prototype.setColumnProperty = function(columnIndex, name, value) {
-    this.dataTable.setColumnProperty(columnIndex, name, value);
-}
-
-/*
-    getColumnProperty
-    Returns a column property
-
-    columnIndex The index of the column to set the property on
-    name        The name of the property
-
-    Return      The value of the property
-*/
-pentaho.DataView.prototype.getColumnProperty = function(columnIndex, name) {
-    return this.dataTable.getColumnProperty(columnIndex, name);
+  return new pentaho.DataTable(this.toJSON());
 };
 
 /* TRENDS */
 
-(function(){
+(function() {
 
-    function argRequired(name){
-        return new Error("Argument '" + name + "' is required.");
+    function argRequired(name) {
+      return new Error("Argument '" + name + "' is required.");
     }
-    
-    function argInvalid(name, text){
-        return new Error("Argument '" + name + "' is invalid." + (text ? (" " + text) : ""));
+
+    function argInvalid(name, text) {
+      return new Error("Argument '" + name + "' is invalid." + (text ? (" " + text) : ""));
     }
-    
-    /* createTrend
-     * Computes a trend of a given type and adds the 
-     * result to a new column in the data table.
-     *  
-     * trendArgs Keyword arguments
-     * trendArgs.type  The type of trend to create; possible values: 'linear'
-     * trendArgs.x     The index of the "x" value column; can be a numeric or string column
-     * trendArgs.y     The index of the "y" value column; must be of a column of type 'number'
-     * trendArgs.name  The name of the new trend column; defaults to the type of trend plus the suffix "Trend"
-     * trendArgs.label The label of the new trend column; defaults to the trend name, if specified, or the default label of the trend type.
-     * 
+
+    // NOTE: This needs unit-testing before being documented publicly.
+
+    /*
+     * Computes a trend of a given type and adds the
+     * result to a new column in the table.
+     *
+     * For data views,
+     * this method creates the trend in the _root_ `DataTable`,
+     * and makes the created trend column visible in the intervening views.
+     *
+     * @method createTrend
+     * @for AbstractDataTable
+     * @param {Object} trendArgs A keyword arguments object.
+     * @param {String} trendArgs.type  The type of trend to create; possible values: 'linear'.
+     * @param {Number} trendArgs.x     The index of the "x" value column; can be a numeric or string column.
+     * @param {Number} trendArgs.y     The index of the "y" value column; must be of a column of type 'number'.
+     * @param {String} trendArgs.name  The name of the new trend column; defaults to the type of trend plus the suffix "Trend".
+     * @param {String} trendArgs.label The label of the new trend column; defaults to the trend name, when specified, or to the default label of the trend type.
+     * @return {Number} The index of the added trend column.
      */
-    pentaho.DataView.prototype.createTrend = 
-    pentaho.DataTable.prototype.createTrend = function(trendArgs){
-        
-        // Validate arguments
-        
-        if(!(trendArgs instanceof Object)){
-            throw argRequired('trendArgs');
-        }
-        
-        // ----
-        
-        var trendType = trendArgs.type;
-        if(!trendType){
-            throw argRequired('trendArgs.type');
-        }
-        
-        trendType = '' + trendType; // toString
-        
-        var trendInfo = pentaho.trends.get(trendType, /*assert*/ true);
-        
-        // -----
-        
-        var colCount = this.getNumberOfColumns();
-        
-        var xIndex = trendArgs.x;
-        if(xIndex == null){
-            throw argRequired('trendArgs.x');
-        }
-        
-        xIndex = +xIndex; // toNumber
-        if(isNaN(xIndex)){
-            throw argInvalid('trendArgs.x', "Not a number.");
-        }
-        
-        if(xIndex < 0 || xIndex >= colCount){
-            throw argInvalid('trendArgs.x', "Out of range.");
-        }
-        
-        // can be numeric or string
-        
-        // -----
-        
-        var yIndex = trendArgs.y;
-        if(yIndex == null){
-            throw argRequired('trendArgs.y');
-        }
-        
-        yIndex = +yIndex; // toNumber
-        if(isNaN(yIndex)){
-            throw argInvalid('trendArgs.y', "Not a number.");
-        }
-        
-        if(yIndex < 0 || yIndex >= colCount){
-            throw argInvalid('trendArgs.y', "Out of range.");
-        }
-        
-        if(this.getColumnType(yIndex) !== 'number'){
-            throw argInvalid('trendArgs.y', "Must be a numeric column.");
-        }
-        
-        // xIndex may be equal to yIndex...
-        
-        // ----
-        
-        var trendName  = trendArgs.name  ||
-                         (trendType + "Trend");
-        
-        var trendLabel = trendArgs.label ||
-                         (trendArgs.name ?  trendName : trendInfo.label);
-        
-        // ----
-        
-        var trendOptions = trendArgs.options || {};
-        
-        // ----
-        
-        // Create the trend column. 
-        //   Am I a DataView or a DataTable?
-        var table = (this.dataTable || this).jsonTable;
-        var trendIndex = table.cols.length; 
-        table.cols.push({
-            type:  'number',
-            id:    trendName,
-            label: trendLabel
-        });
-        
-        // ----
-        
-        var isXDiscrete = this.getColumnType(xIndex) !== 'number';
-        
-        var rowIndexesEnumtor = this.getRowIndexEnumerator();
-        
-        var me = this;
-        
-        var funX = isXDiscrete ? 
-            null : // means: "use *index* as X value"
-            function(i){
-                return me.getValue(i, xIndex);
-            };
-        
-        var funY = function(i){
-                return me.getValue(i, yIndex);
-            };
-        
-        var options = Object.create(trendOptions);
-        options.rows = rowIndexesEnumtor;
-        options.x = funX;
-        options.y = funY;
-        
-        var trendModel = trendInfo.model(options);
-        if(!trendModel){
-            // Not enough points to interpolate...
-            // Fill every row's trend column with null
-            dojo.forEach(table.rows, function(row){
-                row.c[trendIndex] = {v: null};
-            });
-            
-            return false;
-        }
-        
-        dojo.forEach(table.rows, function(row, i){
-            var trendX = funX ? funX(i) : i;
-            var trendY = trendX != null ?
-                trendModel.sample(trendX, funY(i), i) : 
-                null;
-            
-            row.c[trendIndex] = {v: trendY};
-        });
-        
-        return true;
+
+    pentaho.DataView.prototype.createTrend = function(trendArgs) {
+      var trendIndex = this._source.createTrend(trendArgs);
+      return this._columns.push(trendIndex) - 1;
+    };
+
+    pentaho.DataTable.prototype.createTrend = function(trendArgs) {
+      // Argument validation
+      // ===================
+
+      if(!(trendArgs instanceof Object)) throw argRequired('trendArgs');
+
+      // # TrendType
+
+      var trendType = trendArgs.type;
+      if(!trendType) throw argRequired('trendArgs.type');
+
+      trendType = '' + trendType; // toString
+
+      var trendInfo = pentaho.trends.get(trendType, /*assert*/ true);
+
+      // # x
+
+      var colCount = this.getNumberOfColumns();
+
+      var xIndex = trendArgs.x;
+      if(xIndex == null) throw argRequired('trendArgs.x');
+
+      xIndex = +xIndex; // toNumber
+      if(isNaN(xIndex)) throw argInvalid('trendArgs.x', "Not a number.");
+
+      if(xIndex < 0 || xIndex >= colCount) throw argInvalid('trendArgs.x', "Out of range.");
+
+      // can be numeric or string
+
+      // # y
+
+      var yIndex = trendArgs.y;
+      if(yIndex == null)
+        throw argRequired('trendArgs.y');
+
+      yIndex = +yIndex; // toNumber
+      if(isNaN(yIndex))
+        throw argInvalid('trendArgs.y', "Not a number.");
+
+      if(yIndex < 0 || yIndex >= colCount)
+        throw argInvalid('trendArgs.y', "Out of range.");
+
+      if(this.getColumnType(yIndex) !== 'number')
+        throw argInvalid('trendArgs.y', "Must be a numeric column.");
+
+      // xIndex may be equal to yIndex...
+
+      // # name and label
+
+      var trendName  = trendArgs.name  ||
+                       (trendType + "Trend");
+
+      var trendLabel = trendArgs.label ||
+                       (trendArgs.name ?  trendName : trendInfo.label);
+
+      // # custom options
+
+      var trendOptions = trendArgs.options || {};
+
+      // Create Trend Column
+      // ===================
+
+      // TODO: Use setCell method when available.
+
+      // Create the trend column.
+      // Am I a DataView or a DataTable?
+      var trendIndex = this.addColumn({
+        id:    trendName,
+        type:  'number',
+        label: trendLabel
+      });
+
+      var table = this._jsonTable;
+      var me = this;
+
+      // ----
+
+      var isXDiscrete = this.getColumnType(xIndex) !== 'number';
+
+      var rowIndexesEnumtor = this.getRowIndexEnumerator();
+
+      var getX = isXDiscrete ?
+          null : // means: "use *index* as X value"
+          function(i) { return me.getValue(i, xIndex); };
+
+      var getY = function(i) { return me.getValue(i, yIndex); };
+
+      var options = Object.create(trendOptions);
+      options.rows = rowIndexesEnumtor;
+      options.x = getX;
+      options.y = getY;
+
+      var trendModel = trendInfo.model(options);
+
+      // Not enough points to interpolate?
+      // Every row's trend column already has the value null.
+      if(!trendModel) return false;
+
+      dojo.forEach(table.rows, function(row, i){
+        var trendX = getX ? getX(i) : i,
+            trendY = trendX != null ? trendModel.sample(trendX, getY(i), i) : null;
+
+        row.c[trendIndex] = {v: trendY};
+      });
+
+      return true;
     };
 
     /* getRowIndexEnumerator
-     * 
-     * Obtains an enumerator for the row index of the data table. 
+     *
+     * Obtains an enumerator for the row index of the data table.
      */
-    pentaho.DataView.prototype.getRowIndexEnumerator = 
-    pentaho.DataTable.prototype.getRowIndexEnumerator = function(){
-        var index = -1;
-        var count = this.getNumberOfRows();
-        var enumtor = {
+    pentaho.AbstractDataTable.prototype.getRowIndexEnumerator = function() {
+      var index = -1,
+          count = this.getNumberOfRows(),
+          enumtor = {
             item: undefined,
-            next: function(){
-                if(index < count - 1){
+            next: function() {
+                if(index < count - 1) {
                     enumtor.item = ++index; // the row index
                     return true;
                 }
-                
-                if(enumtor.item) {
-                    enumtor.item = undefined; 
-                }
-                
+
+                if(enumtor.item) enumtor.item = undefined;
+
                 return false;
             }
-        };
-        
-        return enumtor;
+          };
+
+      return enumtor;
     };
-        
+
     /* trendType -> trendInfo */
     var _trends = {};
-    
+
     pentaho.trends = {};
-    
+
     /* define
      * Defines a trend type given its specification.
-     * 
+     *
      * type The type of trend to define.
      * spec The trend specification object.
      * spec.label A name for the type of trend; defaults to the capitalized trend type with the suffix "Trend".
      * spec.model A function that given a series of points computes a trend model.
-     * 
+     *
      */
     pentaho.trends.define = function(type, spec){
-        if(!type){
-            throw argRequired('type');
-        }
-        
-        type = '' + type; // to string
-        
-        if(!spec){
-            throw argRequired('spec');
-        }
-        
-        // ----
-        
-        var model = spec.model;
-        if(!model){
-            throw argRequired('spec.model');
-        }
-        
-        if(typeof model !== 'function'){
-            throw argInvalid('spec.model', "Not a function");
-        }
-        
-        // ----
-        
-        var label = spec.label;
-        if(!label){
-            label = type.chartAt(0).toUpperCase() + type.substr(1) + " Trend";
-        }
-        
-        var trendInfo = {
-           type:  type,
-           label: label,
-           model: model
-        };
-        
-        _trends[type] = trendInfo;
+      if(!type) throw argRequired('type');
+
+      type = '' + type; // to string
+
+      if(!spec) throw argRequired('spec');
+
+      // ----
+
+      var model = spec.model;
+      if(!model) throw argRequired('spec.model');
+      if(typeof model !== 'function') throw argInvalid('spec.model', "Not a function");
+
+      // ----
+
+      var label = spec.label;
+      if(!label) label = type.chartAt(0).toUpperCase() + type.substr(1) + " Trend";
+
+      _trends[type] = {
+        type:  type,
+        label: label,
+        model: model
+      };
     };
-    
+
     /* get
      * Obtains the trend info object of a given trend type.
-     * 
+     *
      * type The type of trend desired.
      * assert If an error should be thrown if the trend type is not defined.
      */
-    pentaho.trends.get = function(type, assert){
-        if(!type){
-            throw argRequired('type');
-        }
-        
-        var trendInfo = _trends.hasOwnProperty(type) ? _trends[type] : null;
-        if(!trendInfo && assert){
-            throw argInvalid('type', "There is no trend type named '" + type + "'.");
-        }
-        
-        return trendInfo;
+    pentaho.trends.get = function(type, assert) {
+      if(!type) throw argRequired('type');
+
+      var trendInfo = _trends.hasOwnProperty(type) ? _trends[type] : null;
+      if(!trendInfo && assert)
+        throw argInvalid('type', "There is no trend type named '" + type + "'.");
+
+      return trendInfo;
     };
-    
+
     /* types
      * Obtains an array with the names of all defined trend types.
      */
-    pentaho.trends.types = function(){
-        // TODO: replace with dojo or JavaScript's Object.keys implementation...
-        
-        var ret = [];
-        for(var p in _trends){
-            if(Object.prototype.hasOwnProperty.call(_trends, p)){
-                ret.push(p);
+    pentaho.trends.types = function() {
+      // TODO: replace with dojo or JavaScript's Object.keys implementation...
+
+      var ret = [];
+      for(var p in _trends)
+        if(Object.prototype.hasOwnProperty.call(_trends, p))
+          ret.push(p);
+
+      return ret;
+    };
+
+    // --------------------
+
+    function parseNum(value) {
+      return value != null ? (+value) : NaN;  // to Number works for dates as well
+    }
+
+    pentaho.trends.define('linear', {
+      label: 'Linear trend',
+      model: function(options) {
+        var rowsQuery = options.rows,
+            getX = options.x,
+            getY = options.y,
+            i = 0,
+            N = 0,
+            sumX  = 0,
+            sumY  = 0,
+            sumXY = 0,
+            sumXX = 0;
+
+        while(rowsQuery.next()) {
+          var row = rowsQuery.item,
+              // Ignore null && NaN values
+              x = getX ? parseNum(getX(row)) : i; // use the index itself for discrete stuff
+
+          if(!isNaN(x)) {
+            var y = parseNum(getY(row));
+            if(!isNaN(y)) {
+              N++;
+
+              sumX  += x;
+              sumY  += y;
+              sumXY += x * y;
+              sumXX += x * x;
             }
+          }
+
+          i++; // Discrete nulls must still increment the index
         }
 
-        return ret;
-    };
-    
-    // --------------------
-    
-    function parseNum(value){
-        return value != null ? (+value) : NaN;  // to Number works for dates as well
-    }
-  
-    pentaho.trends.define('linear', {
-        label: 'Linear trend',
-        model: function(options){
-            var rowsQuery = options.rows;
-            var funX = options.x;
-            var funY = options.y;
-            
-            var i = 0;
-            var N = 0;
-            var sumX  = 0;
-            var sumY  = 0;
-            var sumXY = 0;
-            var sumXX = 0;
-            
-            while(rowsQuery.next()){
-                var row = rowsQuery.item;
-                
-                // Ignore null && NaN values
-                var x = funX ? parseNum(funX(row)) : i; // use the index itself for discrete stuff
-                if(!isNaN(x)){
-                    var y = parseNum(funY(row));
-                    if(!isNaN(y)){
-                        N++;
-                        
-                        sumX  += x;
-                        sumY  += y;
-                        sumXY += x * y;
-                        sumXX += x * x;
-                    }
-                }
-                
-                i++; // Discrete nulls must still increment the index
-            }
-            
+        // y = alpha + beta * x
+        if(N >= 2) {
+          var avgX  = sumX  / N,
+              avgY  = sumY  / N,
+              avgXY = sumXY / N,
+              avgXX = sumXX / N,
+
+              // When N === 1 => den = 0
+              den = (avgXX - avgX * avgX),
+
+              beta = den && ((avgXY - (avgX * avgY)) / den),
+
+              alpha = avgY - beta * avgX;
+
+          return {
+            alpha: alpha,
+            beta:  beta,
+            reset: function() {},
+
             // y = alpha + beta * x
-            var alpha, beta;
-            if(N >= 2){
-                var avgX  = sumX  / N;
-                var avgY  = sumY  / N;
-                var avgXY = sumXY / N;
-                var avgXX = sumXX / N;
-            
-                // When N === 1 => den = 0
-                var den = (avgXX - avgX * avgX);
-                if(den === 0){
-                    beta = 0;
-                } else {
-                    beta = (avgXY - (avgX * avgY)) / den;
-                }
-                
-                alpha = avgY - beta * avgX;
-                
-                return {
-                    alpha: alpha,
-                    beta:  beta,
-                    
-                    reset: function(){},
-                    
-                    // y = alpha + beta * x
-                    sample: function(x){
-                        return alpha + beta * (+x);
-                    }
-                };
-            }
+            sample: function(x) { return alpha + beta * (+x); }
+          };
         }
+      }
     });
-    
+
 }());

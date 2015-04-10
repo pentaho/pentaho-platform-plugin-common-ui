@@ -4,8 +4,9 @@
     "version": "5.3",
     "url": "localhost",
     "options": {
-    	"linkNatives": "true",
-    	"attributesEmit": "true",
+      "lint": false,
+      "linkNatives": "true",
+      "attributesEmit": "true",
       "paths":    ["package-res/resources/web/vizapi/"],
       "exclude":  "package-res/resources/web/vizapi/ccc",
       "outdir":   "doc-js/vizapi/"
