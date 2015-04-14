@@ -104,6 +104,12 @@ pentaho = typeof pentaho == "undefined" ? {} : pentaho;
 // the "dataReq", "geoRole column property (See GoogleVisualizationRender.renderDataTable).
 // Deferred to when we touch server-side, during DataTable extensions work.
 
+pentaho.AbstractDataTable.prototype.isValueEqual = function(a, b) {
+  return (a === b) ||
+         (a == null && b == null) ||
+         (typeof a === 'number' && isNaN(a) && typeof b === 'number' && isNaN(b));
+};
+
 // ----
 // COLS
 
@@ -206,7 +212,7 @@ pentaho.AbstractDataTable.prototype.getColumnRange = function(colIdx, options) {
 
   while(i < R) {
     var value = this.getValue(i++, colIdx);
-    if(value != null && !isNaN(value)) {
+    if(value != null && ((typeof value !== "number") || !isNaN(value))) {
       if(key) {
         value = key(value);
         if(value == null || isNaN(value)) continue;
@@ -267,7 +273,7 @@ pentaho.AbstractDataTable.prototype._getDistinctValuesCore = function(colIdx, fo
       keyMap = {},
       i = 0,
       R = this.getNumberOfRows(),
-      getValue = formatted ? this.getValue : this.getFormattedValue,
+      getValue = formatted ? this.getFormattedValue : this.getValue,
       value, key;
 
   while(i < R) {
@@ -288,7 +294,7 @@ pentaho.AbstractDataTable.prototype._getDistinctValuesCore = function(colIdx, fo
 /**
  * Gets the value of a cell, given its row and column index.
  *
- * When a cell is missing or has a `null`or `undefined` value,
+ * When a cell is missing or has a `null` or `undefined` value,
  * then `null` is returned.
  *
  * @method getValue
@@ -588,7 +594,7 @@ pentaho.DataTable.convertCdaToDataTable = function(cdaTable) {
   // Rows
   var i = -1;
   while(++i < R) {
-    var cdaRow = cdaData[i], cells = new Array(C);
+    var cdaRow = cdaRows[i], cells = new Array(C);
 
     // Copy cells
     j = C;
@@ -596,7 +602,7 @@ pentaho.DataTable.convertCdaToDataTable = function(cdaTable) {
       var v = cdaRow[j];
       cells[j] = v == null ? null : // direct null
                  (typeof v === 'object') && ('v' in v) ? v : // direct cell
-                 {v: v, f: undefined}; // value to cell
+                 {v: v, f: null}; // value to cell
     }
 
     rows[i] = {c: cells};
@@ -659,6 +665,7 @@ pentaho.DataTable.prototype.addColumn = function(colSpec) {
  *
  * @example
  * To filter on column 0 == 'France':
+ * 
  *     var rows = dataTable.getFilteredRows({column: 0, value: 'France'});
  *     var view = new pentaho.DataView(dataTable);
  *     view.setRows(rows);
@@ -697,7 +704,8 @@ pentaho.DataTable.prototype._buildFilteredRowsPredicate = function(valueFilters)
     for(var f = 0; f < F; f++) {
       var filter = valueFilters[f],
           v = filter.value;
-      if(v !== undefined && this.getValue(rowIdx, filter.column) !== v) return false;
+      if(v !== undefined && !this.isValueEqual(this.getValue(rowIdx, filter.column), v))
+        return false;
     }
     return true;
   };
@@ -722,6 +730,7 @@ pentaho.DataTable.prototype._buildFilteredRowsPredicate = function(valueFilters)
  * @param {AbstractDataTable} table The source table.
  */
 pentaho.DataView = function DataView(table) {
+  if(!table) throw new Error("Argument 'table' is required.");
   this._source = table;
 
   this._rows    = null;
@@ -833,12 +842,12 @@ pentaho.DataView.prototype.hideColumns = function(columns) {
 
     // Index the indexes of the specified columns to be hidden.
     j = columns.length;
-    while(j--)  hideColsMap[j] = 1;
+    while(j--)  hideColsMap[columns[j]] = 1;
 
     // Remove those indexes from the current visible columns.
     j = cols.length;
     while(j--)
-      if(hideColsMap[columns[j]] === 1)
+      if(hideColsMap[cols[j]] === 1)
         cols.splice(j, 1);
   }
 
