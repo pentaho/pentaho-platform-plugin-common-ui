@@ -1,12 +1,12 @@
 // Find and inject tests using require
-var tests = Object.keys(window.__karma__.files).filter(function (file) {
+var tests = Object.keys(window.__karma__.files).filter(function(file) {
     return (/package\-res.*Spec\.js$/).test(file);
 });
 
 requireCfg['deps'] = tests;
 
 
-requireCfg['baseUrl'] = 'base/build-res/module-scripts/';
+requireCfg['baseUrl'] = '/base/build-res/module-scripts/';
 
 requireCfg['paths']['test/karma/unit/angular-directives'] = "../../package-res/resources/web/test/karma/unit/angular-directives";
 

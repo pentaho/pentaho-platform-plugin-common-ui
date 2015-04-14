@@ -92,7 +92,7 @@ pentaho.palettes.push( {
  */
 pentaho.visualizations = pentaho.visualizations || [];
 
-pentaho.visualizations.getById = function(id){
+pentaho.visualizations.getById = function(id) {
   for(var i = 0; i < this.length ; i++){
     if(this[i].id == id){
       return this[i];
@@ -105,18 +105,16 @@ pentaho.visualizations.getById = function(id){
 var visualizations = pentaho.visualizations;
 
 /*
- pentaho.VizController
+    pentaho.VizController
  The visualization controller
  */
 pentaho.VizController = function(id) {
   this.id = id;
   this.domNode = null;
   this.isDragging = false;
-  this.combinations = [];
   this.selections = [];
   this.highlights = [];
   this.metrics = null;
-  this.origTable = null;
   this.dataTable = null;
   this.currentViz = null;
   this.currentAction = 'select';
@@ -153,14 +151,14 @@ pentaho.VizController.prototype.getState = function() {
   try {
     var state = {};
 
-    if( this.currentViz ) {
+    if(this.currentViz) {
       state.vizId = this.currentViz.id;
-      if( this.chart.getState ) {
+      if(this.chart.getState) {
         state.vizState = this.chart.getState();
       }
     }
     return state;
-  } catch (e) {
+  } catch(e) {
     this.lastError = e;
     return null;
   }
@@ -170,8 +168,8 @@ pentaho.VizController.prototype.getState = function() {
  setState
  Sets the state of the controller and the visualization
 
- state       A state object
- returns     true if there were no errors
+ state    A state object
+ returns  true if there were no errors
  */
 pentaho.VizController.prototype.setState = function(state) {
   try {
@@ -194,7 +192,7 @@ pentaho.VizController.prototype.setState = function(state) {
     dojo.safeMixin(this.currentViz, state);
 
     if( this.chart && this.chart.setState ) {
-      this.chart.setState( state.vizState );
+      this.chart.setState(state.vizState);
     }
     return true;
   } catch (e) {
@@ -210,16 +208,16 @@ pentaho.VizController.prototype.setState = function(state) {
  node    HTML DOM element
  returns     true if there were no errors
  */
-pentaho.VizController.prototype.setDomNode = function( node ) {
+pentaho.VizController.prototype.setDomNode = function(node) {
   try {
-    this.domNode = node;
+  this.domNode = node;
 
     // Empty out the node
     while(node.firstChild) {
       node.removeChild(node.firstChild);
     }
 
-    // Create an empty DIV for the visualization to render in
+  // Create an empty DIV for the visualization to render in
     var width = this.domNode.offsetWidth;
     var height = this.domNode.offsetHeight;
     this.visualPanelElement = document.createElement("DIV");
@@ -242,7 +240,7 @@ pentaho.VizController.prototype.setDomNode = function( node ) {
  */
 pentaho.VizController.prototype.setDataTable = function(table) {
   try {
-    this.origTable = table;
+    this.dataTable = table;
     this.setupTable();
     return true;
   } catch (e) {
@@ -258,7 +256,7 @@ Sets the color mappings for members in the current data table
 colors     Map of attributes/measures in the table to a map of member to color mappings
 */
 pentaho.VizController.prototype.setMemberPalette = function(colors) {
- this.memberPalette = colors;
+  this.memberPalette = colors;
 }
 
 /*
@@ -277,7 +275,7 @@ The structure of this argument is like the following:
     }
 */
 pentaho.VizController.prototype.setFormatInfo = function(formatInfo) {
- this.formatInfo = formatInfo;
+  this.formatInfo = formatInfo;
 }
 
 /*
@@ -299,7 +297,7 @@ pentaho.VizController.prototype.setTitle = function(title) {
  */
 pentaho.VizController.prototype.setVisualization = function(visualization, options) {
   try {
-    if( this.currentViz && this.currentViz['class'] != visualization['class'] ) {
+    if(this.currentViz && this.currentViz['class'] != visualization['class']) {
       // remove the old visualization
       this.setDomNode(this.domNode);
     }
@@ -307,7 +305,7 @@ pentaho.VizController.prototype.setVisualization = function(visualization, optio
     // dipslay the new visualization
     this.doVisualization(visualization, options);
     return true;
-  } catch (e) {
+  } catch(e) {
     this.lastError = e;
     return false;
   }
@@ -359,48 +357,48 @@ pentaho.VizController.prototype.doVisualization = function( visualization, userD
       controller: this,
       action: this.currentAction,
       selections: this.highlights
-    };
+};
 
     if( visualization.needsColorGradient ) {
       var gradMap = [ [255,0,0],[255,255,0],[0,0,255],[0,255,0] ];
-//            var idx = document.getElementById('colorGradient1Select').selectedIndex;
+    // var idx = document.getElementById('colorGradient1Select').selectedIndex;
       options.color1 = gradMap[0];
-//            idx = document.getElementById('colorGradient2Select').selectedIndex;
+    // idx = document.getElementById('colorGradient2Select').selectedIndex;
       options.color2 = gradMap[3];
-    }
+  }
 
 
     // see if we have additional properties to set
     var propMap = visualization.propMap;
-    if(propMap) {
-      for(var propNo=0; propNo<propMap.length; propNo++) {
-        var prop = propMap[propNo];
-        var propValue = null;
-        if( prop.source == 'columnlabel') {
-          propValue = currentView.getColumnLabel(prop.position);
+  if(propMap) {
+    for(var propNo=0; propNo<propMap.length; propNo++) {
+      var prop = propMap[propNo];
+      var propValue = null;
+      if(prop.source == 'columnlabel') {
+        propValue = currentView.getColumnLabel(prop.position);
         }
         if( prop.source == 'maxvalue') {
-          propValue = this.metrics[prop.position].range.max;
+        propValue = this.metrics[prop.position].range.max;
         }
         if( prop.source == 'minvalue') {
-          propValue = this.metrics[prop.position].range.min;
-        }
+        propValue = this.metrics[prop.position].range.min;
+      }
         var obj = options;
-        for( var nameNo=0; nameNo<prop.name.length; nameNo++) {
-          if(nameNo < prop.name.length-1) {
-            // make sure the parent parts exist
-            if( !obj[prop.name[nameNo]] ) {
-              obj[prop.name[nameNo]] = {};
-            }
+      for(var nameNo = 0; nameNo < prop.name.length; nameNo++) {
+        if(nameNo < prop.name.length - 1) {
+          // make sure the parent parts exist
+          if(!obj[prop.name[nameNo]]) {
+            obj[prop.name[nameNo]] = {};
+          }
             obj = obj[prop.name[nameNo]]
           }
           else {
-            // we are at the end
-            obj[prop.name[nameNo]] = propValue;
-          }
+          // we are at the end
+          obj[prop.name[nameNo]] = propValue;
         }
       }
     }
+  }
 
     if(visualization.args) {
       for(var x in visualization.args) {
@@ -438,7 +436,7 @@ pentaho.VizController.prototype.doVisualization = function( visualization, userD
       alert('No suitable dataset');
       document.getElementById('chart_div').innerHTML = '';
       return;
-    }
+  }
 
     try {
       this.chart.draw(currentView, options);
@@ -525,13 +523,13 @@ pentaho.VizController.prototype.processHighlights = function(args) {
         }
 
         if( rowItemsSame && colItemsSame && this.highlights[hNo].colId && this.highlights[hNo].colId == colId && this.highlights[hNo].type == 'column' && selectedItem.type == 'cell') {
-          // switch this
+              // switch this
           this.highlights[hNo].type = 'row';
-          highlight.id = selectedItem.rowId;
-          highlight.value = rowItem;
-          modified = true;
-          break;
-        }
+              highlight.id    = selectedItem.rowId;
+              highlight.value = rowItem;
+              modified = true;
+              break;
+            }
         else if( rowItemsSame && colItemsSame && this.highlights[hNo].colId && this.highlights[hNo].colId == colId && this.highlights[hNo].type == 'column') {
           // remove this
           this.highlights.splice( hNo, 1 );
@@ -539,10 +537,10 @@ pentaho.VizController.prototype.processHighlights = function(args) {
           break;
         }
         else if( rowItemsSame && colItemsSame ) {
-          // remove this
-          this.highlights.splice( hNo, 1 );
-          removed = true;
-          break;
+            // remove this
+            this.highlights.splice( hNo, 1 );
+            removed = true;
+            break;
         }
       }
     }
@@ -567,33 +565,7 @@ pentaho.VizController.prototype.processHighlights = function(args) {
     }
   }
 //    this.updateHighlights();
-}
-
-
-pentaho.VizController.prototype.createCombination = function() {
-
-  // assume the highlighted items are of the same type
-  var type, columnId, values = [];
-  for( var idx=0; idx<this.highlights.length; idx++ ) {
-    if( idx==0) {
-      type = this.highlights[idx].type;
-      values.push(this.highlights[idx].value);
-      columnId = this.highlights[idx].id;
-    }
-    else if(this.highlights[idx].id == columnId) {
-      values.push(this.highlights[idx].value);
-    }
-  }
-  this.combinations.push( {
-    values: values,
-    columnId: columnId
-  });
-  this.setupTable();
-  // now clear the selections
-  this.highlights = [];
-  this.updateVisualization();
-
-}
+};
 
 /*
  updateHighlights
@@ -601,7 +573,7 @@ pentaho.VizController.prototype.createCombination = function() {
  */
 pentaho.VizController.prototype.updateHighlights = function() {
 
-  if( this.chart.setHighlights ) {
+  if(this.chart.setHighlights) {
     this.chart.setHighlights(this.highlights);
   }
 
@@ -617,30 +589,18 @@ pentaho.VizController.prototype.clearSelections = function() {
 
 
 pentaho.VizController.prototype.setupTable = function( ) {
-
-  if(!this.origTable) {
-    return;
-  }
+  if(!this.dataTable) return;
 
   this.metrics = [];
-  this.dataTable = this.origTable;
-
-  // apply any local combinations
-  if( this.combinations && this.combinations.length > 0 ) {
-    var rows = this.origTable.getFilteredRows([{column: 0, combinations: this.combinations}]);
-    var view = new pentaho.DataView(table);
-    view.setRows( rows );
-    this.dataTable = view;
-  }
-
+  
   // get metrics across the entire dataset in case we need them
-  for( var colNo=0; colNo<this.dataTable.getNumberOfColumns(); colNo++) {
-    if( this.dataTable.getColumnType(colNo) == 'string' ) {
+  for(var colNo = 0; colNo < this.dataTable.getNumberOfColumns(); colNo++) {
+    if(this.dataTable.getColumnType(colNo) == 'string') {
       var values = this.dataTable.getDistinctValues(colNo);
-      var paletteMap = pentaho.VizController.createPaletteMap( values, this.palette );
+      var paletteMap = pentaho.VizController.createPaletteMap(values, this.palette);
       // TODO add longest sting length to the metrics
       this.metrics.push({
-        values: values,
+        values:     values,
         paletteMap: paletteMap
       });
     }
@@ -664,13 +624,13 @@ function sort( columnIdx, direction ) {
  createPaletteMap
  Static function to create a palette map
  */
-pentaho.VizController.createPaletteMap = function( items, palette ) {
+pentaho.VizController.createPaletteMap = function(items, palette) {
   var map = {};
-  for(var itemNo=0; itemNo<items.length && itemNo<palette.colors.length; itemNo++) {
+  for(var itemNo = 0; itemNo < items.length && itemNo < palette.colors.length; itemNo++) {
     map[items[itemNo]] = palette.colors[itemNo];
   }
   // are there more items than colors in the palette?
-  for(var itemNo=palette.colors.length; itemNo<items.length; itemNo++) {
+  for(var itemNo = palette.colors.length; itemNo < items.length; itemNo++) {
     map[items[itemNo]] = "#000000";
   }
 
@@ -752,16 +712,16 @@ pentaho.VizController.getRgbStepFromMultiColorHex = function(value, min, max, co
   return pentaho.VizController.getRrbColor(color[0], color[1], color[2]);
 }
 
-pentaho.VizController.convertToRGB = function(hex){
+pentaho.VizController.convertToRGB = function(hex) {
   if(hex.indexOf("#") == 0){
     hex = hex.substring(1);
   } else {
     hex = pentaho.VizController.CSS_Names[hex.toLowerCase()];
   }
   return [
-    parseInt(hex.substring(0,2),16),
-    parseInt(hex.substring(2,4),16),
-    parseInt(hex.substring(4,6),16)
+    parseInt(hex.substring(0, 2), 16),
+    parseInt(hex.substring(2, 4), 16),
+    parseInt(hex.substring(4, 6), 16)
   ];
 }
 

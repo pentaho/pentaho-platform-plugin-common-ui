@@ -37,6 +37,8 @@ function(def, pvc, pv){
         pentaho.visualizations.push(viz);
     }
 
+    // Null Members:  {v: "...[#null]", f: "Not Available"}
+    // Null Values:   come as a null cell or null cell value ("-" report setting only affects the pivot table view).
     var _nullMemberRe = /\[#null\]$/;
 
     defCCCVisualizations();
@@ -65,7 +67,7 @@ function(def, pvc, pv){
                 name: 'Default',
                 reqs: def.array.appendMany(
                     createDataReq('VERTICAL_BAR', {options: false}),
-                    [ createColumnDataLabelsReq({separator: false, anchors:['none', 'center', 'inside_end', 'inside_base', 'outside_end']}) ],                    
+                    [ createColumnDataLabelsReq({separator: false, anchors:['none', 'center', 'inside_end', 'inside_base', 'outside_end']}) ],
                     createTrendsDataReqs({separator: true}),
                     [ createChartOptionsDataReq(true) ])
             }],
@@ -102,7 +104,7 @@ function(def, pvc, pv){
                 name: 'Default',
                 reqs: def.array.appendMany(
                     createDataReq('HORIZONTAL_BAR', {options: false}),
-                    [ createColumnDataLabelsReq({separator: false, anchors:['none', 'center', 'inside_end', 'inside_base', 'outside_end']}) ],                    
+                    [ createColumnDataLabelsReq({separator: false, anchors:['none', 'center', 'inside_end', 'inside_base', 'outside_end']}) ],
                     [ createChartOptionsDataReq(true) ])
             }],
             menuOrdinal: 130,
@@ -186,7 +188,7 @@ function(def, pvc, pv){
                      createLineWidthDataReq()
                     ],
                     createTrendsDataReqs(),
-                    [ 
+                    [
                      createChartOptionsDataReq(true)
                     ]
                 )
@@ -311,7 +313,7 @@ function(def, pvc, pv){
                         createMeaDataReq('VERTICAL_BAR_LINE_NUMLINE'),
                         'id', 'measuresLine',
                         'required', false),
-                    
+
                     createColumnDataLabelsReq({value_anchor: 'VALUE_COLUMN_ANCHOR',   separator: false, anchors:['none', 'center', 'inside_end', 'inside_base', 'outside_end']}),
                     createLabelsVisibleAnchorDataReq({labels_option: 'lineLabelsOption', value_anchor: 'VALUE_LINE_ANCHOR'}),
                     createMultiDataReq(),
@@ -405,7 +407,7 @@ function(def, pvc, pv){
                 name: 'Default',
                 drillOrder: ['rows','columns'],
                 hyperlinkOrder: ['rows','columns'],
-                reqs : def.array.appendMany(                    
+                reqs : def.array.appendMany(
                     createDataReq("MULTIPLE_PIE", {multi: false, options: false}),
                     [
                         createLabelsVisiblePositionDataReq(),
@@ -559,7 +561,7 @@ function(def, pvc, pv){
                           caption: dropZoneLabel('SUNBURST_SIZE'),
                           required: false,
                           allowMultiple: false
-                      },                      
+                      },
                       createMultiDataReq()],
                       [createLabelsVisibleAnchorDataReq({ hideOptions : ['left', 'right', 'top', 'bottom'] })],
                       createSortDataReqs(true),
@@ -805,7 +807,7 @@ function(def, pvc, pv){
                     }
                 }
             }
-            
+
             return {
                     id: def.get(keyArgs, 'labels_option', 'labelsOption'),
                     dataType: 'string',
@@ -818,11 +820,11 @@ function(def, pvc, pv){
                     }
                 };
         }
-        
+
         function createColumnDataLabelsReq(keyArgs){
-          
+
             var anchors = def.get(keyArgs, 'anchors');
-          
+
             return {
                 id: 'labelsOption',
                 dataType: 'string',
@@ -846,11 +848,11 @@ function(def, pvc, pv){
                     group: 'options',
                     type:  'checkbox',
                     seperator: def.get(keyArgs, 'separator', true),
-                    caption: 'Labels' // TODO i18n pending....                
+                    caption: 'Labels' // TODO i18n pending....
                 }
             };
         }
-        
+
         function createChartOptionsDataReq(hasSeparator){
             return {
                 id: "optionsBtn",
@@ -1427,9 +1429,9 @@ function(def, pvc, pv){
                     visRoles = context.panel.visualRolesOf(cccDimName, /*includeChart*/true);
 
                 if(visRoles && visRoles.some(function(r) { return r.isPercent; })) {
-                    var group = context.scene.group, 
-                        dim   = (group || data).dimensions(cccDimName), 
-                        pct   = group 
+                    var group = context.scene.group,
+                        dim   = (group || data).dimensions(cccDimName),
+                        pct   = group
                             ? dim.percentOverParent({visible: true})
                             : dim.percent(atom.value);
 
@@ -2259,9 +2261,8 @@ function(def, pvc, pv){
             for(var tr = 0; tr < rowCount; tr++) {
                 var row = new Array(colCount);
 
-                for(tc = 0 ; tc < colCount ; tc++){
-                    row[tc] = this._getTableCell(tr, tc);
-                }
+                tc = -1;
+                while(++tc < colCount) row[tc] = this._dataTable.getCell(tr, tc);
 
                 table[tr] = row;
             }
@@ -2382,8 +2383,8 @@ function(def, pvc, pv){
                                         }
 
                                         // Copy map values to ColorMap
-                                        // All color maps are joined together and there will be no 
-                                        // value collisions because the key is prefixed with the name 
+                                        // All color maps are joined together and there will be no
+                                        // value collisions because the key is prefixed with the name
                                         // of the category
                                         for (var j in map) {
                                             colorMap[j] = map[j];
@@ -2391,11 +2392,11 @@ function(def, pvc, pv){
                                     }
                                 }
                             } else {
-                                colorMap = memberPalette[colorGems[C - 1].formula];    
+                                colorMap = memberPalette[colorGems[C - 1].formula];
                             }
                         } else {
                             // Use measures (M === 1)
-                            
+
                             /*
                              * "[Measures].[MeasuresLevel]": {
                              *    "[MEASURE:0]": "violet",
@@ -2449,11 +2450,11 @@ function(def, pvc, pv){
                                         var keys     = compKey.split("~"),
                                             level    = keys.length - 1,
                                             keyLevel = keys[level];
-                                        
+
                                         // Obtain color for most specific key from color map.
                                         // If color map has no color and it is the 1st level,
                                         //  then reserve a color from the default color scale.
-                                        // Otherwise, return undefined, 
+                                        // Otherwise, return undefined,
                                         //  meaning that a derived color should be used.
                                         return def.getOwn(colorMap, keyLevel) ||
                                             (level ? undefined : defaultScale(keyLevel));
@@ -2857,7 +2858,7 @@ function(def, pvc, pv){
             }
         },
 
-        _limitSelection: function(selections){
+        _limitSelection: function(selections) {
             // limit selection
             var filterSelectionMaxCount = this._vizOptions['filter.selection.max.count'] || 200;
             var selections2 = selections;
@@ -2871,10 +2872,10 @@ function(def, pvc, pv){
                 for(var i = 0 ; i < L ; i++){
                     var selection = selections[i];
                     var keep = true;
-                    if(deselectCount){
-                        if(this._previousSelectionKeys){
+                    if(deselectCount) {
+                        if(this._previousSelectionKeys) {
                             var key = this._getSelectionKey(selection);
-                            if(!this._previousSelectionKeys[key]){
+                            if(!this._previousSelectionKeys[key]) {
                                 keep = false;
                             }
                         } else if(i >= filterSelectionMaxCount) {
@@ -2882,12 +2883,12 @@ function(def, pvc, pv){
                         }
                     }
 
-                    if(keep){
+                    if(keep) {
                         selections2.push(selection);
                     } else {
                         var datums = selection.__cccDatums;
-                        if(datums){
-                            if(def.array.is(datums)){
+                        if(datums) {
+                            if(def.array.is(datums)) {
                                 def.array.append(deselectDatums, datums);
                             } else {
                                 deselectDatums.push(datums);
@@ -3019,11 +3020,11 @@ function(def, pvc, pv){
             }
 
             function addDatum(datum) {
-                if(!datum.isNull){
+                if(!datum.isNull) {
                     if(datum.isTrend){
-                        // Some trend datums, like those of the scatter plot,
-                        // don't have anything distinguishing between them,
-                        // so we need to explicitly add them to the output.
+                    // Some trend datums, like those of the scatter plot,
+                    // don't have anything distinguishing between them,
+                    // so we need to explicitly add them to the output.
                         outDatums.push(datum);
                     }
 
@@ -3107,28 +3108,6 @@ function(def, pvc, pv){
                 colLabel: colLabel,
                 colType:  colType
             });
-        },
-
-        _getTableCell: function(tr, tc) {
-            var cell = this._dataTable._getCell(tr, tc);
-            if(!cell){
-                return null;
-            }
-
-            var value = cell.v;
-            if(value == null || value === '-') {
-                return null;
-            }
-
-            return {
-                v: value,
-                f: cell.f
-            };
-        },
-
-        _getTableValue: function(tr, tc) {
-            var cell = this._getTableCell(tr, tc);
-            return cell ? cell.v : ceff.f;
         }
     });
 
@@ -3294,12 +3273,12 @@ function(def, pvc, pv){
 
             configureColumnLabelsAlignmentOptions.call(this);
         },
-        
+
         _readUserOptions: function(options, vizOptions) {
             this.base(options, vizOptions);
             options.valuesFont = defaultFont(readFont(vizOptions, 'label'));
             options.extensionPoints.label_textStyle = vizOptions.labelColor;
-        }        
+        }
     });
 
     // -------------------
@@ -3427,7 +3406,7 @@ function(def, pvc, pv){
 
             options.plot2ValuesFont = defaultFont(readFont(vizOptions, 'label'));
             options.extensionPoints.plot2Label_textStyle = vizOptions.labelColor;
-            
+
             configureLabelsOptions.call(this);
         },
 
@@ -3447,7 +3426,7 @@ function(def, pvc, pv){
             this._configureAxisTitle('ortho2',"");
 
             this.options.plot2OrthoAxis = 2;
-            
+
             configureLineLabelsAlignmentOptions.call(this);
 
             // Plot2 uses same color scale
@@ -3487,7 +3466,7 @@ function(def, pvc, pv){
                 options.dotsVisible = true;
                 options.extensionPoints.dot_shape = shape;
             }
-            
+
             options.valuesFont = defaultFont(readFont(vizOptions, 'label'));
             options.extensionPoints.label_textStyle = vizOptions.labelColor;
 
@@ -3608,7 +3587,7 @@ function(def, pvc, pv){
 
             configureLabelsAnchorOptions.call(this);
         },
-        
+
         _readUserOptions: function(options, vizOptions) {
             this.base(options, vizOptions);
             options.valuesFont = defaultFont(readFont(vizOptions, 'label'));
@@ -3975,7 +3954,7 @@ function(def, pvc, pv){
             // configure value label
             if(this.options.valuesVisible){
                 this._configureValuesMask();
-            }            
+            }
         },
 
         _showLegend: function(){
@@ -4215,14 +4194,14 @@ function(def, pvc, pv){
                         var th = m.height * 0.85, // tight text bounding box
                             tb = pvLabel.textBaseline(),
                             // The effective height of text that must be covered.
-                            // one text margin, for the anchor, 
+                            // one text margin, for the anchor,
                             // half text margin for the anchor's opposite side.
                             // All on only one of the sides of the wedge.
                             thEf = 2 * (th + 3*tm/2);
 
                         // Minimum inner radius whose straight-arc has a length `thEf`
                         irmin = Math.max(
-                            irmin, 
+                            irmin,
                             thEf / (2 * Math.tan(a / 2)));
                     }
 
@@ -4240,7 +4219,7 @@ function(def, pvc, pv){
                     // Continue with normal processing for the main label.
                     return null;
                 };
-                
+
                 var me = this;
                 eps.label_add = function() {
                     return new pv.Label()
@@ -4250,8 +4229,8 @@ function(def, pvc, pv){
                         })
                         .text(function(scene) {
                             var pvMainLabel = this.proto;
-                            return !pvMainLabel.text() 
-                                ? "" 
+                            return !pvMainLabel.text()
+                                ? ""
                                 : me._formatSize(scene.vars.size, scene.firstAtoms.size.dimension);
                         })
                         .textBaseline("top");
@@ -4359,11 +4338,11 @@ function(def, pvc, pv){
                     // Normal relational part
                         category, // aggregated category
                         dtColParts.join('~'), // series label
-                        this._getTableValue(tr, tc),  // series value - may be null...is it ok?
+                        this._dataTable.getValue(tr, tc), // series value - may be null...is it ok?
 
                         // Marker - may be missing on the last measure pair
                         m + 1 < measuresCount ?
-                        this._getTableValue(tr, measureCols[markerColIndex]) :
+                        this._dataTable.getValue(tr, measureCols[markerColIndex]) :
                         vizOptions.bulletMarkers[0] // TODO: 7500
                     ];
 
@@ -4383,8 +4362,8 @@ function(def, pvc, pv){
 
     oldCccChart._aggregateRowAxisForTableRow = function(tr) {
         // Concat all of the string columns
-        var values = this._rowNormalDtColIndexes.map(function(tc){
-            return this._getTableValue(tr, tc);
+        var values = this._rowNormalDtColIndexes.map(function(tc) {
+            return this._dataTable.getValue(tr, tc);
         }, this);
 
         return values.join('~');
@@ -4514,13 +4493,13 @@ function(def, pvc, pv){
 
         // Set Values Visible
         if(this._vizOptions.labelsVisible) {
-            this.options.valuesVisible = this._vizOptions.labelsVisible;    
+            this.options.valuesVisible = this._vizOptions.labelsVisible;
         }
 
         if (this._vizOptions.labelsAnchor) {
-            this.options.valuesAnchor = this._vizOptions.labelsAnchor;    
+            this.options.valuesAnchor = this._vizOptions.labelsAnchor;
         }
-        
+
         if (this._vizOptions.labelsTextAlign) {
              if (!this.options.extensionPoints) {
                 this.options.extensionPoints = {};
@@ -4537,7 +4516,7 @@ function(def, pvc, pv){
 
         if(!this._vizOptions.labelsOption || this._vizOptions.labelsOption == 'none') {
             return this.options.valuesVisible = false;
-        } 
+        }
 
         return this.options.valuesVisible = true;
     }
@@ -4549,7 +4528,7 @@ function(def, pvc, pv){
         }
     }
 
-    
+
     function configureColumnLabelsAlignmentOptions() {
         if (configureLabelsVisibilityOptions.call(this)) {
             if (!this.options.extensionPoints) {
@@ -4559,7 +4538,7 @@ function(def, pvc, pv){
             var labelsOption = this._vizOptions.labelsOption;
 
             this.options.extensionPoints.label_textMargin = 7;
-            
+
             if(labelsOption == 'center') {
                 this.options.valuesAnchor = 'center';
             }
@@ -4588,7 +4567,7 @@ function(def, pvc, pv){
             }
         }
     }
-    
+
     function configureLineLabelsAlignmentOptions() {
         var lineLabelsOption = this._vizOptions.lineLabelsOption;
         if(lineLabelsOption && lineLabelsOption != 'none') {

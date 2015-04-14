@@ -145,9 +145,9 @@ pentaho.pda.app.prototype.getSources = function(callback, options) {
 		} else {
 			return _sources;
 		}
-		
+
 	}
-	
+
 }
 
 pentaho.pda.app.prototype.addSource = function(source) {
@@ -161,11 +161,11 @@ pentaho.pda.app.prototype.sortData = function( results, columnIdx, direction ) {
         return;
     }
     // create a new data set
-    var sorted = { 
+    var sorted = {
         "metadata" : results.metadata,
         "resultset" : []
     };
-    
+
     // TODO support multi-level sort
     try {
         // TODO find a better way to do this without using globals
@@ -175,7 +175,7 @@ pentaho.pda.app.prototype.sortData = function( results, columnIdx, direction ) {
     } catch (e) {
         alert(e.message);
     }
-    return sorted;    
+    return sorted;
 
 }
 
@@ -190,7 +190,7 @@ pentaho.pda.app.prototype.compareRows = function( row1, row2 ) {
         return ( row1[pentaho.pda.app.prototype.sortedColumnIdx] > row2[pentaho.pda.app.prototype.sortedColumnIdx] ) ? 1 : -1;
     } else {
         return ( row1[pentaho.pda.app.prototype.sortedColumnIdx] < row2[pentaho.pda.app.prototype.sortedColumnIdx] ) ? 1 : -1;
-    } 
+    }
 }
 
 pentaho.pda.Handler = function(sandbox) {
@@ -226,7 +226,7 @@ pentaho.pda.model.prototype.getNodeText = function( node, tag ) {
         }
         return null;
 } //getNodeText
-    
+
 pentaho.pda.model.prototype.getNodeTextOfChild = function( node, tag1, tag2 ) {
         for( var idx=0; idx<node.childNodes.length; idx++ ) {
             if(node.childNodes[idx].nodeName == tag1) {
@@ -256,7 +256,7 @@ pentaho.pda.model.prototype.getCapabilityValue = function( capability ) {
 
 pentaho.pda.model.prototype.addCapability = function( capability, value ) {
         if( typeof value == 'undefined' ) {
-          value = true;  
+          value = true;
         }
         this.capabilities[capability] = value;
     }
@@ -314,13 +314,13 @@ pentaho.pda.model.prototype.getQueryElementsByFieldType = function( fieldType ) 
         fieldTypes.push( fieldType );
         return this.getColumnsByFieldTypes(fieldTypes, false);
     }
-	
+
 pentaho.pda.model.prototype.getColumnsByFieldType = function( fieldType ) {
         var fieldTypes = new Array();
         fieldTypes.push( fieldType );
         return this.getColumnsByFieldTypes(fieldTypes, true);
     }
-    
+
 pentaho.pda.model.prototype.getColumnsByFieldTypes = function( fieldTypes, allElements ) {
         var cols = this.getAllColumns();
         var columns = new Array();
@@ -335,20 +335,20 @@ pentaho.pda.model.prototype.getColumnsByFieldTypes = function( fieldTypes, allEl
             }
         }
         return columns;
-    }    
-    
+    }
+
 pentaho.pda.model.prototype.getQueryElementsByDataType = function( dataType ) {
         var dataTypes = new Array();
         dataTypes.push( dataType );
         return this.getColumnsByDataTypes(dataTypes, false);
     }
-        
+
 pentaho.pda.model.prototype.getColumnsByDataType = function( dataType ) {
         var dataTypes = new Array();
         dataTypes.push( dataType );
         return this.getColumnsByDataTypes(dataTypes, true);
     }
-    
+
 pentaho.pda.model.prototype.getColumnsByDataTypes = function( dataTypes, allElements ) {
         var cols = this.getAllColumns();
         var columns = new Array();
@@ -363,8 +363,8 @@ pentaho.pda.model.prototype.getColumnsByDataTypes = function( dataTypes, allElem
             }
         }
         return columns;
-    }    
-    
+    }
+
 pentaho.pda.model.prototype.getColumnById = function( id ) {
         var cols = this.getAllColumns();
         for( var colNo=0; colNo<cols.length; colNo++ ) {
@@ -374,11 +374,11 @@ pentaho.pda.model.prototype.getColumnById = function( id ) {
         }
         return null;
     }
-    
+
 pentaho.pda.model.prototype.sortColumnsByName = function( columns ) {
         return columns.sort( function( c1, c2 ) { return ( c1.name == c2.name ) ? 0 : ( c1.name > c2.name ) ? 1 : -1 } )
-    }    
-    
+    }
+
 pentaho.pda.model.prototype.createListOptions = function (columnList ) {
         var options = new Array();
         for( var idx=0; idx<columnList.length; idx++ ) {
@@ -387,7 +387,7 @@ pentaho.pda.model.prototype.createListOptions = function (columnList ) {
         }
         return options;
     }
-        
+
 pentaho.pda.model.prototype.populateListFromResults = function( valuesList, results, textColumnNumber, valueColumnNumber ) {
         var hasValues = false;
         if( ''+valueColumnNumber != 'undefined' ) {
@@ -406,8 +406,7 @@ pentaho.pda.model.prototype.populateListFromResults = function( valuesList, resu
                 }
                 valuesList.options[valuesList.options.length] = option;
             }
-        } 
-        else if( results.jsonTable ) { // DataTable format
+        } else if(results.getJsonTable) { // DataTable format
             for( var idx=0; idx<results.getNumberOfRows(); idx++ ) {
                 var option;
                 if( hasValues ) {
@@ -419,8 +418,8 @@ pentaho.pda.model.prototype.populateListFromResults = function( valuesList, resu
             }
         }
     }
-        
-        
+
+
 pentaho.pda.dataelement = function() {
 	this.dataType = pentaho.pda.Column.DATA_TYPES.UNKNOWN;
 this.elementType = pentaho.pda.Column.ELEMENT_TYPES.UNKNOWN;
@@ -569,7 +568,7 @@ pentaho.pda.Column.JAVA_SQL_TYPE_TO_TYPE[ pentaho.pda.Column.JAVA_SQL_TYPES.DATE
 pentaho.pda.Column.JAVA_SQL_TYPE_TO_TYPE[ pentaho.pda.Column.JAVA_SQL_TYPES.BOOLEAN ] = pentaho.pda.Column.DATA_TYPES.BOOLEAN;
 
 pentaho.pda.Column.COMPARATOR = new Object();
-pentaho.pda.Column.COMPARATOR.STRING = [ 
+pentaho.pda.Column.COMPARATOR.STRING = [
 	[pentaho.common.Messages.getString( "EXACTLY_MATCHES" ), pentaho.pda.Column.CONDITION_TYPES.EQUAL],
 	[pentaho.common.Messages.getString( "CONTAINS" ), pentaho.pda.Column.CONDITION_TYPES.CONTAINS],
 	[pentaho.common.Messages.getString( "ENDS_WITH" ), pentaho.pda.Column.CONDITION_TYPES.ENDSWITH],
@@ -591,7 +590,7 @@ pentaho.pda.Column.COMPARATOR.BOOLEAN = [
 //  ["<>", ],
   [pentaho.common.Messages.getString( "IS_NULL" ), pentaho.pda.Column.CONDITION_TYPES.IS_NULL],
   [pentaho.common.Messages.getString( "IS_NOT_NULL" ), pentaho.pda.Column.CONDITION_TYPES.NOT_NULL]];
-pentaho.pda.Column.COMPARATOR.DATE = [ 
+pentaho.pda.Column.COMPARATOR.DATE = [
 	[pentaho.common.Messages.getString( "ON" ), pentaho.pda.Column.CONDITION_TYPES.EQUAL],
 //	[pentaho.common.Messages.getString( "NOT_ON" ),
 	[pentaho.common.Messages.getString( "ON_OR_AFTER" ), pentaho.pda.Column.CONDITION_TYPES.MORE_THAN_OR_EQUAL],
@@ -605,7 +604,7 @@ pentaho.pda.Column.COMPARATOR.DATE = [
 pentaho.pda.Column.SINGLE_COMPARATORS = {};
 pentaho.pda.Column.SINGLE_COMPARATORS[pentaho.pda.Column.CONDITION_TYPES.IS_NULL] = {};
 pentaho.pda.Column.SINGLE_COMPARATORS[pentaho.pda.Column.CONDITION_TYPES.NOT_NULL] = {};
-  
+
 pentaho.pda.Column.COMPARATOR_MAP = new Object();
 pentaho.pda.Column.COMPARATOR_MAP[ pentaho.pda.Column.DATA_TYPES.NUMERIC ] = pentaho.pda.Column.COMPARATOR.NUMERIC;
 pentaho.pda.Column.COMPARATOR_MAP[ pentaho.pda.Column.DATA_TYPES.STRING ] = pentaho.pda.Column.COMPARATOR.STRING;
