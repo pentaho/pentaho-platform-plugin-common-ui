@@ -16,9 +16,9 @@
 */
 
 define([
-        "cdf-legacy/lib/CCC/def",
-        "cdf-legacy/lib/CCC/pvc-d1.0",
-        "cdf-legacy/lib/CCC/protovis",
+        "cdf/lib/CCC/def",
+        "cdf/lib/CCC/pvc-d1.0",
+        "cdf/lib/CCC/protovis",
         "common-ui/vizapi/VizController",
         "common-ui/vizapi/ccc/ccc_analyzer_plugin" // TODO: temporary dependency due to debug loading time problems
     ],
@@ -1808,9 +1808,6 @@ function(def, pvc, pv){
 
             this._vizHelper = cv.pentahoVisualizationHelpers[vizOptions.customChartType];
 
-            this._hasContentLink = this._vizHelper.isInteractionEnabled() &&
-                                   this._vizHelper.hasContentLink();
-
             // Store the current selections
             this._selections = vizOptions.selections;
 
@@ -2866,18 +2863,20 @@ function(def, pvc, pv){
         },
 
         _limitSelection: function(selections) {
+            var selectionsKept = selections;
+
             // limit selection
             var filterSelectionMaxCount = this._vizOptions['filter.selection.max.count'] || 200;
-            var selections2 = selections;
             var L = selections.length;
             var deselectCount = L - filterSelectionMaxCount;
             if(deselectCount > 0) {
                 // Build a list of datums to deselect
                 var deselectDatums = [];
-                selections2 = [];
+                selectionsKept = [];
 
                 for(var i = 0 ; i < L ; i++){
                     var selection = selections[i];
+
                     var keep = true;
                     if(deselectCount) {
                         if(this._previousSelectionKeys) {
@@ -2891,7 +2890,7 @@ function(def, pvc, pv){
                     }
 
                     if(keep) {
-                        selections2.push(selection);
+                        selectionsKept.push(selection);
                     } else {
                         var datums = selection.__cccDatums;
                         if(datums) {
@@ -2920,14 +2919,14 @@ function(def, pvc, pv){
 
             // Index with the keys of previous selections
             this._previousSelectionKeys =
-                    def.query(selections2)
+                    def.query(selectionsKept)
                         .object({
                             name:    function(selection){ return this._getSelectionKey(selection); },
                             value:   def.retTrue,
                             context: this
                         });
 
-            return selections2;
+            return selectionsKept;
         },
 
         /**
@@ -3028,31 +3027,24 @@ function(def, pvc, pv){
 
             function addDatum(datum) {
                 if(!datum.isNull) {
-                    if(datum.isTrend){
+
                     // Some trend datums, like those of the scatter plot,
                     // don't have anything distinguishing between them,
                     // so we need to explicitly add them to the output.
-                        outDatums.push(datum);
-                    }
+                    if(datum.isTrend) outDatums.push(datum);
 
                     var datumFilter = {};
+                    var datoms = datum.atoms;
 
-                    var atoms = datum.atoms;
-
-                    if(colDimNames){
-                        colDimNames.forEach(addDim);
-                    }
-
-                    if(rowDimNames){
-                        rowDimNames.forEach(addDim);
-                    }
+                    if(colDimNames) colDimNames.forEach(addDim);
+                    if(rowDimNames) rowDimNames.forEach(addDim);
 
                     whereSpec.push(datumFilter);
                 }
 
                 function addDim(dimName) {
                     // The atom itself may be used as a value condition
-                    datumFilter[dimName] = atoms[dimName];
+                    datumFilter[dimName] = datoms[dimName];
                 }
             }
 
@@ -3782,20 +3774,6 @@ function(def, pvc, pv){
                         dimAtomsById[atom.id] = atom;
                     }
                 }
-            }
-
-            function buildWhereSpec() {
-                var datumFilter = {};
-                var whereSpec   = [datumFilter];
-
-                def.eachOwn(atomsByDim, addDim);
-
-                function addDim(dimAtomsById, dimName) {
-                    // The atom itself may be used as a value condition
-                    datumFilter[dimName] = def.own(dimAtomsById);
-                }
-
-                return whereSpec;
             }
 
             return selectedDatums;

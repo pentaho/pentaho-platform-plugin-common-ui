@@ -6,8 +6,7 @@
  * TODO: consider adding
  * * propsMap
  * * color1, color2, from VizType#needsColorGradient
- * * static args
- * * arbitrary user defined options
+ * * user defined options
  * * controller
  * * title
  * * action
