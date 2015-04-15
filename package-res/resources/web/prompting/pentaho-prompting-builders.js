@@ -299,8 +299,10 @@ define("common-ui/prompting/pentaho-prompting-builders", ['cdf/cdf-module', 'com
   pentaho.common.prompting.builders.CheckBuilder = pentaho.common.prompting.builders.ToggleButtonBaseBuilder.extend({
     build: function(args) {
       var widget = this.base(args);
-      widget.type = 'CheckComponent';
-      return widget;
+      return $.extend(widget, {
+        type: 'CheckComponent',
+        changeMode: 'timeout-focus' // SP-1771
+      });
     }
   });
 

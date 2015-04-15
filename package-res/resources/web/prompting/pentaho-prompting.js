@@ -716,7 +716,13 @@ define("common-ui/prompting/pentaho-prompting", [ 'cdf/cdf-module', 'common-ui/p
                   if(topValue != null) {
                     topValuesByParam['_' + c.param.name] = topValue;
                   }
-                }
+                }//START SP-1771
+                else if(topValuesByParam && c.type === 'CheckComponent' ) {
+                  var topValue = $('div.prompt-panel').scrollTop();
+                  if(topValue != null) {
+                    topValuesByParam['_' + c.param.name] = topValue;
+                  }
+                }//END SP-1771
               }
             });
 
@@ -770,7 +776,13 @@ define("common-ui/prompting/pentaho-prompting", [ 'cdf/cdf-module', 'common-ui/p
                 if(topValue != null) {
                   c.autoTopValue = topValue;
                 }
-              }
+              }//START SP-1771
+              else if(topValuesByParam && c.type === 'CheckComponent') {
+                var topHeight = topValuesByParam['_' + name];
+                if(topHeight != null) {
+                  c.autoTopHeight = topHeight;
+                }
+              }//END SP-1771
             }
           });
 
