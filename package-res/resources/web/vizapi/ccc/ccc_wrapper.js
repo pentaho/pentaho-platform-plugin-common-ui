@@ -16,9 +16,9 @@
 */
 
 define([
-        "cdf/lib/CCC/def",
-        "cdf/lib/CCC/pvc-d1.0",
-        "cdf/lib/CCC/protovis",
+        "cdf-legacy/lib/CCC/def",
+        "cdf-legacy/lib/CCC/pvc-d1.0",
+        "cdf-legacy/lib/CCC/protovis",
         "common-ui/vizapi/VizController",
         "common-ui/vizapi/ccc/ccc_analyzer_plugin" // TODO: temporary dependency due to debug loading time problems
     ],
@@ -1390,8 +1390,15 @@ function(def, pvc, pv){
                     }
 
                     var suffix;
-                    if(complex.isInterpolated){
-                        suffix = this.chart._message('chartTooltipGemInterp_' + complex.interpolation);
+                    
+                    // It can happen that the scene has more than one datum.
+                    // One is a null one and the other an interpolated one.
+                    // We may receive the null one in `complex` and 
+                    // miss detecting that the scene is actually interpolated.
+                    if(context && context.scene && context.scene.datums()) {
+                    	if( context.scene.datums().where(function(d) { return d.isInterpolated && d.interpDimName === cccDimName; }).first() ) {
+                    		suffix = this.chart._message('chartTooltipGemInterp_' + complexInterp.interpolation);
+                    	}
                     } else if(complex.isTrend/* && atom.label*/){
                         // TODO: "atom.label" -- is a weak test for trended measures,
                         // that relies on the fact that non-trended measures are left null
