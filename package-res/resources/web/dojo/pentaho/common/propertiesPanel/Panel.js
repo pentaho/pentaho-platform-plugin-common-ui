@@ -395,11 +395,13 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
           nodes[0].id = newId;
           this.sync();
           source.sync();
-          return true;
 
+          this._executePostDrop(droppedNode.getAttribute("formula"), source.postDrop);
+
+          return true;
         },
 
-        _onDrop: function(formula, dndType, value, gemBar, before, anchor, dndNode) {
+        _onDrop: function(formula, dndType, value, gemBar, before, anchor, dndNode, postDrop) {
           var oldGemBar = this.gemBar;
           var oldDndNode = this.node;
 
@@ -413,6 +415,14 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
 
           this.gemBar = oldGemBar;
           this.node = oldDndNode;
+
+          this._executePostDrop(formula, postDrop);
+        },
+
+        _executePostDrop : function(formula, postDrop) {
+          if (postDrop) {
+            postDrop.f.call(postDrop.scope, formula, this.gemBar.id);
+          }
         },
 
         createGemFromNode: function (sourceNode) {
