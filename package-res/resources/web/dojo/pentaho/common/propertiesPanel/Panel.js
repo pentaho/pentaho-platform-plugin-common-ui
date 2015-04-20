@@ -399,6 +399,22 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
 
         },
 
+        _onDrop: function(formula, dndType, value, gemBar, before, anchor, dndNode) {
+          var oldGemBar = this.gemBar;
+          var oldDndNode = this.node;
+
+          this.gemBar = gemBar;
+          this.node = dndNode;
+
+          var gem = this.createGemByFormula(formula, value);
+          this.gemUIbeingInserted = this.createGembarUIFromGembar(gem, gemBar, dndType);
+
+          this.insertNodes(null, null, before, anchor, true);
+
+          this.gemBar = oldGemBar;
+          this.node = oldDndNode;
+        },
+
         createGemFromNode: function (sourceNode) {
 
           var modelClass = pentaho.common.propertiesPanel.Configuration.registeredTypes["gem"];
@@ -411,9 +427,31 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
             return new modelClass(options);
           }
         },
+        createGemByFormula: function(formula, value) {
+          var modelClass = pentaho.common.propertiesPanel.Configuration.registeredTypes["gem"];
+          var options = {formula: formula, value: value, gemBar: this.gemBar.model};
+
+          // check to see if it's a factory class
+          if (modelClass.create) {
+            return modelClass.create(options)
+          } else {
+            return new modelClass(options);
+          }
+        },
+
         createGemUI: function (gem, sourceNode) {
           var uiClass = Panel.registeredTypes["gem"];
           var options = {id: gem.id, model: gem, gemBar: this.gemBar, dndType: sourceNode.getAttribute("dndType"), sourceNode: sourceNode};
+          if (uiClass.create) {
+            return uiClass.create(options);
+          } else {
+            return new uiClass(options);
+          }
+        },
+
+        createGembarUIFromGembar: function(gem, dndType) {
+          var uiClass = Panel.registeredTypes["gem"];
+          var options = {model: gem, gemBar: this.gemBar, dndType: dndType};
           if (uiClass.create) {
             return uiClass.create(options);
           } else {
@@ -452,6 +490,28 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
               return;
             }
             this.placeIndicator(e, overNode, before);
+          }
+        },
+        _showDropIndicator: function(e) {
+          var overNode = this._getNodeUnderMouse(e);
+          if(overNode == -1){
+            return;
+          }
+          var before = this.gravity(this.node.children[overNode], e) & 1;
+          if (this.node.children[overNode] == ManagerClass.manager().nodes[0] && (before && overNode == 0 || !before && this.node.children.length - 1 == overNode)) {
+            this.dropIndicator.style.display = "none";
+            return;
+          }
+          this.placeIndicator(e, overNode, before);
+
+          return {
+            before: before === 1,
+            anchor: this.node.children[overNode]
+          }
+        },
+        _hideDropIndicator: function() {
+          if (this.dropIndicator) {
+            this.dropIndicator.style.display = "none";
           }
         },
         onMouseOut: function (e) {
@@ -538,7 +598,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
             return ((mouse.x < nodecenterx ? WEST : EAST) | (mouse.y < nodecentery ? NORTH : SOUTH)); //  integer
           }
         },
-        insertNodes: function (addSelected, data, before, anchor) {
+        insertNodes: function (addSelected, data, before, anchor, suppressInherited) {
           // When called by a frop on the placeholder before will come in false, this need to be corrected by checking the flag
           // set in the onDrop method
           if (typeof this.dropAtEnd != "undefined") {
@@ -562,7 +622,11 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
             pos = (before) ? pos : pos + 1;
           }
           this.gemBar.insertAt(this.gemUIbeingInserted, pos, this.dropZone2Zone);
-          this.inherited(arguments);
+
+          if (!suppressInherited) {
+            this.inherited(arguments);
+          }
+
           this.gemBar.propPanel.resize();
         },
 
@@ -641,12 +705,12 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
 
               this.subscriptions.push(topic.subscribe("/dnd/start", function () {
                 if (!outterThis.checkAcceptance(outterThis.dropZone, ManagerClass.manager().nodes)) {
-                  domClass.add(outterThis.domNode, "dimished");
+                  outterThis._showDiminish();
                 }
               }));
               var unSubscribeFunc = function () {
                 if (outterThis.domNode) { // may have been disposed
-                  domClass.remove(outterThis.domNode, "dimished");
+                  outterThis._hideDiminish();
                 }
               };
               this.subscriptions.push(topic.subscribe("/dnd/cancel", unSubscribeFunc));
@@ -655,14 +719,14 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
 
               on(this.domNode,  "mouseover", function (event) {
                 if (ManagerClass.manager().source && outterThis.checkAcceptance(outterThis.dropZone,  ManagerClass.manager().nodes)) {
-                  domClass.add(outterThis.domNode, "over");
+                  outterThis._showOver();
                 }
               });
               on(this.domNode, "mouseout", function (event) {
-                domClass.remove(outterThis.domNode,  "over");
+                outterThis._hideOver();
               });
               on(this.domNode, "mouseup", function (event) {
-                domClass.remove(outterThis.domNode,  "over");
+                outterThis._hideOver();
               });
 
 
@@ -691,6 +755,26 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
               this.dropZone.sync();
               this.inherited(arguments);
 
+            },
+            _showOver: function() {
+              if (this.domNode) {
+                domClass.add(this.domNode, "over");
+              }
+            },
+            _hideOver: function() {
+              if (this.domNode) {
+                domClass.remove(this.domNode, "over");
+              }
+            },
+            _showDiminish: function() {
+              if (this.domNode) {
+                domClass.add(this.domNode, "dimished");
+              }
+            },
+            _hideDiminish: function() {
+              if (this.domNode) {
+                domClass.remove(this.domNode, "dimished");
+              }
             },
             insertNodes: function (addSelected, data, before, anchor) {
               //this.domNode.appendChild(data[0]);
