@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2013 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,7 +12,6 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
 var prefix = (typeof CONTEXT_PATH != "undefined") ? CONTEXT_PATH + 'content/common-ui/resources/web' :
     (typeof KARMA_RUN != "undefined") ? "../../package-res/resources/web" :"common-ui"; //prod vs build
@@ -27,6 +26,7 @@ requireCfg['paths']['pentaho/common'] = prefix+'/dojo/pentaho/common';
 
 
 requireCfg['paths']['local'] = prefix+'/util/local';
+requireCfg['paths']['service'] = prefix+'/util/service';
 
 requireCfg['paths']['common-repo'] = prefix+'/repo';
 //requireCfg['paths']['common-repo/pentaho-ajax'] = prefix+'/repo/pentaho-ajax';
