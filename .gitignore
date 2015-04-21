@@ -5,7 +5,16 @@ lib/
 codegen-lib/
 test-lib/
 eclipse-bin/
+doc-js
+build-res/module-scripts/
+build-res/requireCfg-raw.js
+build-res/requireCfg.js
+build-res/pentaho-js-build/
+test-res/data/sampledata.log
+dev-res/dojo/
+node_modules/
 override.properties
+pentaho.log
 .classpath
 .project
 .idea
