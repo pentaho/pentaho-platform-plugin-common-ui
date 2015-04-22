@@ -32,10 +32,5 @@
 
 
   modules: [
-    {
-      name: "angular-directives",
-      include: ["common-ui/angular-directives/angular-directives"],
-      create: true
-    }
   ]
 })
