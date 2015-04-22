@@ -396,7 +396,14 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
           this.sync();
           source.sync();
 
-          this._executePostDrop(droppedNode.getAttribute("formula"), source.postDrop);
+          var postDrop;
+          if (source.postDrop) {
+            postDrop = source.postDrop;
+          } else if (gem.postDrop) {
+            postDrop = gem.postDrop;
+          }
+
+          this._executePostDrop(droppedNode.getAttribute("formula"), postDrop);
 
           return true;
         },
@@ -759,6 +766,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
                 } else {
                   gemUI = new uiClass(options);
                 }
+                gemUI.postDrop = gem.postDrop;
                 this.domNode.firstChild.appendChild(gemUI.domNode);
                 this.add(gemUI);
               }, this);
