@@ -13,14 +13,16 @@
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU Lesser General Public License for more details.
  *
- * Copyright 2014 Pentaho Corporation. All rights reserved.
+ * Copyright 2015 Pentaho Corporation. All rights reserved.
  */
-
-requireCfg = {
+var requireCfg = {
     paths: {},
-    shim: {}
+    shim:  {},
+    map:   {"*": {}},
+    bundles:  {},
+    config:   {service: {}},
+    packages: []
 };
 var KARMA_RUN = true;
-
 var pen = {define : define, require : require};
 var SESSION_LOCALE="en";
