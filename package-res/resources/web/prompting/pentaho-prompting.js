@@ -714,6 +714,18 @@ define("common-ui/prompting/pentaho-prompting", [ 'cdf/cdf-module', 'common-ui/p
                   if(topValue != null) {
                     topValuesByParam['_' + c.param.name] = topValue;
                   }
+                } else if(topValuesByParam && (c.type === 'CheckComponent' || c.type === 'radio')) {
+                  // save last scroll position for checkbox and radio button components
+                  var scrollTopValue = c.placeholder().children("ul").scrollTop();
+                  if(scrollTopValue != null){
+                    topValuesByParam['_' + c.param.name] = scrollTopValue;
+                  }
+                }
+              } else if(topValuesByParam && c.type === 'ScrollingPromptPanelLayoutComponent'){
+                // save last scroll position for prompt panel
+                var scrollTopValue = c.placeholder().children(".prompt-panel").scrollTop();
+                if(scrollTopValue != null){
+                  topValuesByParam['_' + c.name] = scrollTopValue;
                 }
               }
             });
@@ -768,6 +780,18 @@ define("common-ui/prompting/pentaho-prompting", [ 'cdf/cdf-module', 'common-ui/p
                 if(topValue != null) {
                   c.autoTopValue = topValue;
                 }
+              } else if(topValuesByParam && (c.type === 'CheckComponent' || c.type === 'radio')) {
+                // init scroll position field for checkbox and radio button components with last value
+                var scrollTopValue = topValuesByParam['_' + name];
+                if(scrollTopValue != null) {
+                  c.autoScrollTopValue = scrollTopValue;
+                }
+              }
+            } else if(topValuesByParam && c.type === 'ScrollingPromptPanelLayoutComponent'){
+              // init scroll position field for prompt panel with last value
+              var scrollTopValue = topValuesByParam['_' + c.name];
+              if(scrollTopValue != null){
+                c.autoScrollTopValue = scrollTopValue;
               }
             }
           });
