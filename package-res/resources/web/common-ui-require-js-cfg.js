@@ -27,6 +27,7 @@ requireCfg['paths']['pentaho/common'] = prefix+'/dojo/pentaho/common';
 
 requireCfg['paths']['local'] = prefix+'/util/local';
 requireCfg['paths']['service'] = prefix+'/util/service';
+requireCfg['paths']['css'] = prefix+'/util/require-css/css' + (isDebug ? "" : ".min");
 
 requireCfg['paths']['common-repo'] = prefix+'/repo';
 //requireCfg['paths']['common-repo/pentaho-ajax'] = prefix+'/repo/pentaho-ajax';
