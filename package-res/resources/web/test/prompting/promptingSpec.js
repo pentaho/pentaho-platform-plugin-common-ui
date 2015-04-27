@@ -48,7 +48,7 @@ define(["common-ui/prompting/pentaho-prompting-components", "dojo/number"], func
     });
 
     it("should try to parse a number", function() {
-      spyOn(dojoNumber, "format").andCallFake(function(p) {
+      spyOn(dojoNumber, "format").and.callFake(function(p) {
         // just make a returned value different from the parameter
         return '_' + p;
       });
@@ -60,7 +60,7 @@ define(["common-ui/prompting/pentaho-prompting-components", "dojo/number"], func
         value: "123456",
         selected: true
       }));
-      
+
       comp.update();
 
       expect(dojoNumber.format).toHaveBeenCalled();
@@ -69,7 +69,7 @@ define(["common-ui/prompting/pentaho-prompting-components", "dojo/number"], func
     });
 
     it("should keep string if failed to to parse a number", function() {
-      spyOn(dojoNumber, 'format').andThrow();
+      spyOn(dojoNumber, 'format').and.throwError();
 
       var comp = new promptingComponents.StaticAutocompleteBoxComponent();
       $.extend(comp, createCommonParameters("1234Integer", {
