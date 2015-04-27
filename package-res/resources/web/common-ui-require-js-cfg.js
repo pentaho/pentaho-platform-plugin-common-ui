@@ -149,3 +149,8 @@ requireCfg['shim']['common-ui/angular-ui-bootstrap'] = ['common-ui/angular'];
 requireCfg['shim']['common-ui/PluginHandler'] = ['common-ui/jquery'];
 requireCfg['paths']['common-ui/angular-directives'] = prefix + '/angular-directives';
 requireCfg['shim']['common-ui/angular-directives'] = ['common-ui/angular-ui-bootstrap'];
+
+requireCfg.config.service['common-ui/vizapi/ccc/vizTypeProvider'] = 'IVizTypeProvider';
+
+// Uncomment to install sample visualizations
+//requireCfg.config.service['common-ui/vizapi/sample/vizTypeProvider'] = 'IVizTypeProvider';

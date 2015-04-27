@@ -15,12 +15,11 @@
 *
 */
 define([
-  "common-ui/vizapi/DataTable"
-], function() {
+  "common-ui/vizapi/data/DataTable",
+  "common-ui/vizapi/data/DataView"
+], function(DataTable, DataView) {
 
-  var DataTable = pentaho.DataTable,
-      DataView  = pentaho.DataView,
-      fooValue = {},
+  var fooValue = {},
       barValue = {};
 
   function getDatasetDT1() {

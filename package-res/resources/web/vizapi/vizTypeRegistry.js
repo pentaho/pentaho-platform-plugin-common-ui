@@ -1,0 +1,130 @@
+
+/*!
+ * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+define(["service!IVizTypeProvider"], function(vizTypeProviders) {
+
+  var O_hasOwn = Object.prototype.hasOwnProperty;
+
+  /**
+   * @module common-ui.vizapi
+   */
+
+   /**
+    * A singleton class that manages visualization types
+    * of which visualization instances can be created.
+    *
+    * @class VizTypeRegistry
+    * @constructor
+    */
+  function VizTypeRegistry() {
+    this._vizTypeList = [];
+    this._vizTypeMap  = {};
+  }
+
+  /**
+   * Adds a visualization type.
+   *
+   * An error is thrown if a visualization type with
+   * the same _id_ is already registered.
+   *
+   * @param {IVizType} vizType The visualization type.
+   * @chainable
+   */
+  VizTypeRegistry.prototype.add = function(vizType) {
+    if(!vizType) throw new Error("Argument required: 'vizType'.");
+
+    var vizType0 = O_hasOwn.call(this._vizTypeMap, vizType.id)
+      ? this._vizTypeMap[vizType.id]
+      : null;
+    if(vizType0) {
+      if(vizType0 === vizType) return this;
+
+      throw new Error(
+        "Argument invalid: 'vizType'. " +
+        "A visualization with the id '" + vizType.id +
+        "' is already registered.");
+    }
+
+    this._vizTypeList.push(vizType);
+    this._vizTypeMap[vizType.id] = vizType;
+    return this;
+  };
+
+  /**
+   * Gets an array with all registered visualization types.
+   *
+   * Do **not** modify the returned array.
+   *
+   * @return {Array} An array of {{#crossLink "IVizType"}}{{/crossLink}}.
+   */
+  VizTypeRegistry.prototype.getAll = function() {
+    return this._vizTypeList;
+  };
+
+  /**
+   * Gets a visualization type given its id,
+   * or `null` if one is not registered.
+   *
+   * @method get
+   * @param {String} [id] The id of the visualization type.
+   * @return {IVizType|Null} The visualization type or `null`.
+   */
+  VizTypeRegistry.prototype.get = function(id) {
+    return O_hasOwn.call(this._vizTypeMap, id) ? this._vizTypeMap[id] : null;
+  };
+
+  /*
+  // NOTE: This method is temporary until createAsync is implemented.
+  VizTypeRegistry.prototype.create = function(id, arg) {
+    var vizType = this.get(id);
+    if(!vizType) throw new Error("Undefined visualization type: '" + id + "'.");
+
+    var className = vizType['class'];
+    var viz;
+    eval('(viz = new ' + className + '(arg))');
+    return viz;
+  };
+  */
+
+  // NOTE: This method is temporary until createAsync is implemented.
+  VizTypeRegistry.prototype.createByTypeAync = function(vizType, arg, onCreated) {
+    var moduleId = vizType.instanceModule;
+    if(moduleId) {
+      require([moduleId], function(instFactory) {
+        var viz = instFactory(vizType.id, arg);
+        onCreated(viz);
+      });
+    } else {
+      var className = vizType['class'];
+      var viz2;
+      eval('(viz2 = new ' + className + '(arg))');
+      onCreated(viz2);
+    }
+  };
+
+  // -------
+
+  var vizTypeRegistry = new VizTypeRegistry();
+
+  // Auto-load the registry from registered IVizTypeProvider instances.
+  vizTypeProviders.forEach(function(vizTypeProvider) {
+    vizTypeProvider.getAll().forEach(function(vizType) {
+      vizTypeRegistry.add(vizType);
+    });
+  });
+
+  return vizTypeRegistry;
+});

@@ -1,5 +1,5 @@
 /*!
-* Copyright 2010 - 2013 Pentaho Corporation.  All rights reserved.
+* Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -12,28 +12,19 @@
 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 * See the License for the specific language governing permissions and
 * limitations under the License.
-*
 */
 
-define([ 
-            "cdf/lib/CCC/def", 
-            "cdf/lib/CCC/pvc-d1.0",
-            "common-ui/vizapi/VizController",
-            "pentaho/common/Messages",
-            "dojo/_base/declare", "dojo/_base/array"
-        ],
-        function(def, pvc, VizController, Messages, declare, array){
-
-
-    pentaho = typeof pentaho != "undefined" ? pentaho : {};
-    pentaho.visualizations || (pentaho.visualizations = {});
+define([
+    "dojo/_base/declare",
+    "cdf/lib/CCC/def",
+    "../vizTypeRegistry"
+], function(declare, def, vizTypes) {
 
     // If necessary, declare **global** variable, initializing it with an array
     analyzerPlugins = typeof analyzerPlugins == "undefined" ? [] : analyzerPlugins;
 
-
     analyzerPlugins.push({
-        init: function (){
+        init: function () {
 
             declare("analyzer.CCCVizHelper", null, {
                 /**
@@ -112,7 +103,7 @@ define([
                         return gemElem;
                     }
 
-                    array.forEach(gemsInfoList, function(gemInfo) {
+                    if(gemsInfoList) gemsInfoList.forEach(function(gemInfo) {
                         var role = gemInfo.role;
                         if(!role || role === 'undefined') {
                             // unmapped role
@@ -235,7 +226,8 @@ define([
                     // Make sure that every dataReq value is passed as a report arg.
                     // This is not the case on a new report...
                     var reportArgs = this.report.visualization.args;
-                    array.forEach(config.properties, function(item) {
+                    var props = config.properties;
+                    if(props) props.forEach(function(item) {
                         if(!item.dataStructure){
                             var value = item.value;
                             if(value === undefined){
@@ -419,9 +411,7 @@ define([
                 }
             });
 
-            // ----------------------
             // Register CCC Visualizations
-
             var vizIds = [
                 'ccc_bar',
                 'ccc_barstacked',
@@ -455,24 +445,17 @@ define([
 
             var vizHelper = new analyzer.CCCVizHelper();
 
-            if (!cv.pentahoVisualizations) {
-                cv.pentahoVisualizations = [];
-            }
+            if(!cv.pentahoVisualizations       ) cv.pentahoVisualizations = [];
+            if(!cv.pentahoVisualizationsHelpers) cv.pentahoVisualizationsHelpers = {};
 
-            if (!cv.pentahoVisualizationsHelpers) {
-                cv.pentahoVisualizationsHelpers = {};
-            }
-
-            array.forEach(vizIds, function(vizId){
-
-                cv.pentahoVisualizations.push(pentaho.visualizations.getById(vizId));
+            vizIds.forEach(function(vizId) {
+                cv.pentahoVisualizations.push(vizTypes.get(vizId));
 
                 cv.pentahoVisualizationHelpers[vizId] = vizHelper;
 
                 analyzer.LayoutPanel.configurationManagers['JSON_' + vizId] =
                     vizCustomConfigs[vizId] || analyzer.CCCVizConfig;
-
-            }, this);
+            });
         } // end init method
     });
 });

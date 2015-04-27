@@ -31,7 +31,7 @@
  *
  *     require.config({
  *       config: {
- *         "system": {
+ *         "service": {
  *           "myModule/myHomeScreenModule":    "IHomeScreen",
  *           "anotherModule/homeScreenPlugin": "IHomeScreen"
  *         }
