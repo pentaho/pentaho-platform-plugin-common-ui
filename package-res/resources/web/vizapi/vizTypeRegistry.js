@@ -86,19 +86,6 @@ define(["service!IVizTypeProvider"], function(vizTypeProviders) {
     return O_hasOwn.call(this._vizTypeMap, id) ? this._vizTypeMap[id] : null;
   };
 
-  /*
-  // NOTE: This method is temporary until createAsync is implemented.
-  VizTypeRegistry.prototype.create = function(id, arg) {
-    var vizType = this.get(id);
-    if(!vizType) throw new Error("Undefined visualization type: '" + id + "'.");
-
-    var className = vizType['class'];
-    var viz;
-    eval('(viz = new ' + className + '(arg))');
-    return viz;
-  };
-  */
-
   // NOTE: This method is temporary until createAsync is implemented.
   VizTypeRegistry.prototype.createByTypeAync = function(vizType, arg, onCreated) {
     var moduleId = vizType.instanceModule;
