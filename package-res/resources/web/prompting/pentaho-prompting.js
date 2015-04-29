@@ -717,6 +717,12 @@ define("common-ui/prompting/pentaho-prompting", [ 'cdf/cdf-module', 'common-ui/p
                     topValuesByParam['_' + c.param.name] = topValue;
                   }
                 }
+              } else if(topValuesByParam && c.type === 'ScrollingPromptPanelLayoutComponent'){
+                // save last scroll position for prompt panel
+                var scrollTopValue = c.placeholder().children(".prompt-panel").scrollTop();
+                if(scrollTopValue != null){
+                  topValuesByParam['_' + c.name] = scrollTopValue;
+                }
               }
             });
 
@@ -749,6 +755,25 @@ define("common-ui/prompting/pentaho-prompting", [ 'cdf/cdf-module', 'common-ui/p
           var focusedParam = this._focusedParam;
           if(focusedParam) { delete this._focusedParam; }
 
+          // dummy component for prompt panel scroll restoring (after all components was rendered)
+          var postInitComponent = {
+            name: "PostInitPromptPanelScrollRestorer",
+            type: "base",
+            lifecycle: {
+              silent: true
+            },
+            executeAtStart: true,
+            priority:999999999,
+            update: function() {
+              // restore last scroll position for prompt panel
+              if(this.promptPanelScrollValue){
+                $("#" + this.promptPanel).children(".prompt-panel").scrollTop(this.promptPanelScrollValue);
+                delete this.promptPanelScrollValue;
+              }
+
+            }
+          };
+
           window.CompositeComponent.mapComponents(layout, function(c) {
             components.push(c);
 
@@ -771,8 +796,20 @@ define("common-ui/prompting/pentaho-prompting", [ 'cdf/cdf-module', 'common-ui/p
                   c.autoTopValue = topValue;
                 }
               }
+            } else if(topValuesByParam && c.type === 'ScrollingPromptPanelLayoutComponent'){
+              // save prompt pane reference and scroll value to dummy component
+              var scrollTopValue = topValuesByParam['_' + c.name];
+              if(scrollTopValue != null){
+                postInitComponent.promptPanelScrollValue = scrollTopValue;
+                postInitComponent.promptPanel = c.htmlObject;
+              }
             }
           });
+
+          // add dummy component to components list
+          if(postInitComponent.promptPanelScrollValue) {
+            components.push(postInitComponent);
+          }
 
           if (this.components && this.components.length > 0) {
             // We have old components we MUST call .clear() on to prevent memory leaks. In order to
