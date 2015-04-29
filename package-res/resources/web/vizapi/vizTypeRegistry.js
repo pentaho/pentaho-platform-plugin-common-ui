@@ -22,13 +22,13 @@ define(["service!IVizTypeProvider"], function(vizTypeProviders) {
    * @module common-ui.vizapi
    */
 
-   /**
-    * A singleton class that manages visualization types
-    * of which visualization instances can be created.
-    *
-    * @class VizTypeRegistry
-    * @constructor
-    */
+  /**
+   * A singleton class that manages visualization types
+   * of which visualization instances can be created.
+   *
+   * @class VizTypeRegistry
+   * @constructor
+   */
   function VizTypeRegistry() {
     this._vizTypeList = [];
     this._vizTypeMap  = {};
@@ -40,6 +40,7 @@ define(["service!IVizTypeProvider"], function(vizTypeProviders) {
    * An error is thrown if a visualization type with
    * the same _id_ is already registered.
    *
+   * @method add
    * @param {IVizType} vizType The visualization type.
    * @chainable
    */
@@ -68,6 +69,7 @@ define(["service!IVizTypeProvider"], function(vizTypeProviders) {
    *
    * Do **not** modify the returned array.
    *
+   * @method getAll
    * @return {Array} An array of {{#crossLink "IVizType"}}{{/crossLink}}.
    */
   VizTypeRegistry.prototype.getAll = function() {

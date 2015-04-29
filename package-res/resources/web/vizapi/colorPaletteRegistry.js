@@ -51,6 +51,58 @@ define(function() {
    * A singleton class that manages a set of discrete color palettes
    * available for visualizations to consume.
    *
+   * The registry comes pre-loaded with three color palettes:
+   * 1. `"palette1"` (13 colors):
+   * <table style="font-family:courier; width:120px;">
+   * <colgroup><col width="20px"/><col />
+   * <tr><td style="background-color:#336699"></td><td>#336699</td></tr>
+   * <tr><td style="background-color:#99CCFF"></td><td>#99CCFF</td></tr>
+   * <tr><td style="background-color:#999933"></td><td>#999933</td></tr>
+   * <tr><td style="background-color:#666699"></td><td>#666699</td></tr>
+   * <tr><td style="background-color:#CC9933"></td><td>#CC9933</td></tr>
+   * <tr><td style="background-color:#006666"></td><td>#006666</td></tr>
+   * <tr><td style="background-color:#3399FF"></td><td>#3399FF</td></tr>
+   * <tr><td style="background-color:#993300"></td><td>#993300</td></tr>
+   * <tr><td style="background-color:#CCCC99"></td><td>#CCCC99</td></tr>
+   * <tr><td style="background-color:#666666"></td><td>#666666</td></tr>
+   * <tr><td style="background-color:#FFCC66"></td><td>#FFCC66</td></tr>
+   * <tr><td style="background-color:#6699CC"></td><td>#6699CC</td></tr>
+   * <tr><td style="background-color:#663366"></td><td>#663366</td></tr>
+   * </table>
+   *
+   * 2. `"palette2"` (11 colors):
+   * <table style="font-family:courier; width:120px;">
+   * <colgroup><col width="20px"/><col />
+   * <tr><td style="background-color:#880A0F"></td><td>#880A0F</td></tr>
+   * <tr><td style="background-color:#B09A6B"></td><td>#B09A6B</td></tr>
+   * <tr><td style="background-color:#772200"></td><td>#772200</td></tr>
+   * <tr><td style="background-color:#C52F0D"></td><td>#C52F0D</td></tr>
+   * <tr><td style="background-color:#123D82"></td><td>#123D82</td></tr>
+   * <tr><td style="background-color:#4A0866"></td><td>#4A0866</td></tr>
+   * <tr><td style="background-color:#FFAA00"></td><td>#FFAA00</td></tr>
+   * <tr><td style="background-color:#1E8AD3"></td><td>#1E8AD3</td></tr>
+   * <tr><td style="background-color:#AA6611"></td><td>#AA6611</td></tr>
+   * <tr><td style="background-color:#8B2834"></td><td>#8B2834</td></tr>
+   * <tr><td style="background-color:#333333"></td><td>#333333</td></tr>
+   * </table>
+   *
+   * 3. `"palette3"` (12 colors):
+   * <table style="font-family:courier; width:120px;">
+   * <colgroup><col width="20px"/><col />
+   * <tr><td style="background-color:#387179"></td><td>#387179</td></tr>
+   * <tr><td style="background-color:#626638"></td><td>#626638</td></tr>
+   * <tr><td style="background-color:#A8979A"></td><td>#A8979A</td></tr>
+   * <tr><td style="background-color:#B09A6B"></td><td>#B09A6B</td></tr>
+   * <tr><td style="background-color:#772200"></td><td>#772200</td></tr>
+   * <tr><td style="background-color:#C52F0D"></td><td>#C52F0D</td></tr>
+   * <tr><td style="background-color:#123D82"></td><td>#123D82</td></tr>
+   * <tr><td style="background-color:#4A0866"></td><td>#4A0866</td></tr>
+   * <tr><td style="background-color:#445500"></td><td>#445500</td></tr>
+   * <tr><td style="background-color:#FFAA00"></td><td>#FFAA00</td></tr>
+   * <tr><td style="background-color:#1E8AD3"></td><td>#1E8AD3</td></tr>
+   * <tr><td style="background-color:#AA6611"></td><td>#AA6611</td></tr>
+   * </table>
+   *
    * @class ColorPaletteRegistry
    * @constructor
    */
@@ -61,6 +113,8 @@ define(function() {
 
   /**
    * Adds a specified color palette.
+   *
+   * @method add
    * @param {IColorPalette} palette The color palette.
    * @chainable
    */
@@ -80,6 +134,7 @@ define(function() {
    *
    * Do **not** modify the returned array.
    *
+   * @method getAll
    * @return {Array} An array of {{#crossLink "IColorPalette"}}{{/crossLink}}.
    */
   ColorPaletteRegistry.prototype.getAll = function() {
@@ -100,6 +155,7 @@ define(function() {
    * @example
    *     var defaultPalette = colorPaletteRegistry.get();
    *
+   * @method setDefault
    * @param {String} [name] The name of the default palette.
    * @chainable
    */
@@ -166,7 +222,6 @@ define(function() {
       "#ffaa00",
       "#1e8ad3",
       "#aa6611",
-      "#772200",
       "#8b2834",
       "#333333"
     ]
@@ -186,8 +241,7 @@ define(function() {
       "#445500",
       "#FFAA00",
       "#1E8AD3",
-      "#AA6611",
-      "#772200"
+      "#AA6611"
     ]
   });
 

@@ -48,7 +48,7 @@ function(declare, array, vizTypes) {
       // Declare a new class which extends the built-in version from Analyzer
       declare("SampleConfig", [analyzer.LayoutConfig], {
 
-        /**
+        /*
          * @param config    The parse Configuration object which serves as the model of of the Panel
          * @param item      The item in the panel which originated the event.
          * @param eventName The name of the event (clicked, value, etc)
@@ -83,7 +83,7 @@ function(declare, array, vizTypes) {
           }, this);
         },
 
-        /**
+        /*
          * Return the JSON configuration object which the panel will use to create the UI and it's model
          */
         getConfiguration: function() {
