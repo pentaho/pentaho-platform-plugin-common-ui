@@ -52,7 +52,7 @@ define(function() {
    * available for visualizations to consume.
    *
    * The registry comes pre-loaded with three color palettes:
-   * 1. `"palette1"` (13 colors):
+   * 1. `"palette 1"` (13 colors):
    * <table style="font-family:courier; width:120px;">
    * <colgroup><col width="20px"/><col />
    * <tr><td style="background-color:#336699"></td><td>#336699</td></tr>
@@ -70,7 +70,7 @@ define(function() {
    * <tr><td style="background-color:#663366"></td><td>#663366</td></tr>
    * </table>
    *
-   * 2. `"palette2"` (11 colors):
+   * 2. `"palette 2"` (11 colors):
    * <table style="font-family:courier; width:120px;">
    * <colgroup><col width="20px"/><col />
    * <tr><td style="background-color:#880A0F"></td><td>#880A0F</td></tr>
@@ -86,7 +86,7 @@ define(function() {
    * <tr><td style="background-color:#333333"></td><td>#333333</td></tr>
    * </table>
    *
-   * 3. `"palette3"` (12 colors):
+   * 3. `"palette 3"` (12 colors):
    * <table style="font-family:courier; width:120px;">
    * <colgroup><col width="20px"/><col />
    * <tr><td style="background-color:#387179"></td><td>#387179</td></tr>
@@ -121,9 +121,13 @@ define(function() {
   ColorPaletteRegistry.prototype.add = function(palette) {
     if(!palette) throw new Error("Argument required 'palette'.");
 
-    var name = palette.name;
-    if(!O_hasOwn.call(this._paletteMap, name))
+    var name = palette.name,
+        current = O_hasOwn.call(this._paletteMap, name) ? this._paletteMap[name] : null; 
+    
+    if(!current)
       this._paletteList.push(palette);
+    else
+      this._paletteList.splice(this._paletteList.indexOf(current), 1, palette);
 
     this._paletteMap[name] = palette;
     return this;
