@@ -27,6 +27,7 @@ requireCfg['paths']['pentaho/common'] = prefix+'/dojo/pentaho/common';
 
 requireCfg['paths']['local'] = prefix+'/util/local';
 requireCfg['paths']['service'] = prefix+'/util/service';
+requireCfg['paths']['css'] = prefix+'/util/require-css/css' + (isDebug ? "" : ".min");
 
 requireCfg['paths']['common-repo'] = prefix+'/repo';
 //requireCfg['paths']['common-repo/pentaho-ajax'] = prefix+'/repo/pentaho-ajax';
@@ -148,3 +149,8 @@ requireCfg['shim']['common-ui/angular-ui-bootstrap'] = ['common-ui/angular'];
 requireCfg['shim']['common-ui/PluginHandler'] = ['common-ui/jquery'];
 requireCfg['paths']['common-ui/angular-directives'] = prefix + '/angular-directives';
 requireCfg['shim']['common-ui/angular-directives'] = ['common-ui/angular-ui-bootstrap'];
+
+requireCfg.config.service['common-ui/vizapi/ccc/vizTypeProvider'] = 'IVizTypeProvider';
+
+// Uncomment to install sample visualizations
+//requireCfg.config.service['common-ui/vizapi/sample/vizTypeProvider'] = 'IVizTypeProvider';

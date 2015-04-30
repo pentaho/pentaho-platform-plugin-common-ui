@@ -9,6 +9,9 @@
       "attributesEmit": "true",
       "paths":    ["package-res/resources/web/vizapi/"],
       "exclude":  "package-res/resources/web/vizapi/ccc",
-      "outdir":   "doc-js/vizapi/"
+      "outdir":   "doc-js/vizapi/",
+      "markdown": {
+        "html": true
+      }
     }
 }

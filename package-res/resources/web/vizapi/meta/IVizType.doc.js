@@ -8,7 +8,7 @@
  * * needsColorGradient
  * * Analyzer's maxValues: [....] max number of plot values... domain limit. rows? rows*cols
  * * propMap
- *
+ * * Analyzer's keepLevelOnDrilldown
  */
 
 

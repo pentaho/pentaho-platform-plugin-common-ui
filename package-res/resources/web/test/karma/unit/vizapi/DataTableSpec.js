@@ -14,11 +14,7 @@
 * limitations under the License.
 *
 */
-define([
-  "common-ui/vizapi/DataTable"
-], function() {
-
-  var DataTable = pentaho.DataTable;
+define(["common-ui/vizapi/data/DataTable"], function(DataTable) {
 
   function getDatasetCDA1() {
     return {

@@ -139,7 +139,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
           </fileset>
         </path>
         <echo message="Collecting RequireJS Configurations"/>
-        <echo message="var requireCfg={paths: {}, shim: {}, map: {&quot;*&quot;: {}}, bundles: {}, config: {service: {}}, packages: []};" 
+        <echo message="var requireCfg={paths: {}, shim: {}, map: {&quot;*&quot;: {}}, bundles: {}, config: {service: {}}, packages: []};"
               file="build-res/requireCfg-raw.js" append="false" />
         <concat destfile="build-res/requireCfg-raw.js" append="true" force="yes">
           <fileset dir="${js.module.script.agg.dir}" casesensitive="yes">
@@ -343,7 +343,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                   <fail>Run 'npm install -g karma-cli' [adds karma.cmd to the command line]</fail>
                 </then>
               </if>
-              <exec executable="karma.cmd">
+              <exec executable="karma.cmd" failonerror="true">
                 <arg value="start"/>
                 <arg value="${js.karma.ci.config}"/>
                 <!-- if we are running via ant, then assume we must 'single-run' -->
@@ -351,7 +351,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
               </exec>
             </then>
             <else>
-              <exec executable="node_modules/karma/bin/karma">
+              <exec executable="node_modules/karma/bin/karma" failonerror="true">
                 <arg value="start"/>
                 <arg value="${js.karma.ci.config}"/>
                 <!-- if we are running via ant, then assume we must 'single-run' -->
