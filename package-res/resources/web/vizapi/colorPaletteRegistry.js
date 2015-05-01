@@ -51,6 +51,14 @@ define(function() {
    * A singleton class that manages a set of discrete color palettes
    * available for visualizations to consume.
    *
+   * #### AMD
+   *
+   * **Module Id**: `"common-ui/vizapi/colorPaletteRegistry"`
+   *
+   * **Module Type**: {{#crossLink "ColorPaletteRegistry"}}{{/crossLink}}
+   *
+   * #### Standard Color Palettes
+   *
    * The registry comes pre-loaded with three color palettes:
    * 1. `"palette 1"` (13 colors):
    * <table style="font-family:courier; width:120px;">
@@ -122,8 +130,8 @@ define(function() {
     if(!palette) throw new Error("Argument required 'palette'.");
 
     var name = palette.name,
-        current = O_hasOwn.call(this._paletteMap, name) ? this._paletteMap[name] : null; 
-    
+        current = O_hasOwn.call(this._paletteMap, name) ? this._paletteMap[name] : null;
+
     if(!current)
       this._paletteList.push(palette);
     else
