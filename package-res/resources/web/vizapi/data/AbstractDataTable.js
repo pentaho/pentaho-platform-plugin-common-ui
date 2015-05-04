@@ -21,6 +21,12 @@ define(function() {
   /**
    * An _AbstractDataTable_ represents a set of tabular data.
    *
+   * #### AMD
+   *
+   * **Module Id**: `"common-ui/vizapi/data/AbstractDataTable"`
+   *
+   * **Module Type**: The {{#crossLink "AbstractDataTable"}}{{/crossLink}} constructor.
+   *
    * @class AbstractDataTable
    * @constructor
    */

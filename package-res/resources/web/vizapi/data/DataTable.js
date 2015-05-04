@@ -22,6 +22,14 @@ define(['./AbstractDataTable'], function(AbstractDataTable) {
    * A {{#crossLink "DataTable"}}{{/crossLink}} is a
    * type of table that directly stores tabular data.
    *
+   * #### AMD
+   *
+   * **Module Id**: `"common-ui/vizapi/data/DataTable"`
+   *
+   * **Module Type**: The {{#crossLink "DataTable"}}{{/crossLink}} constructor.
+   *
+   * #### Description
+   *
    * A `DataTable` can be constructed empty, or from either:
    * * a {{#crossLink "AbstractDataTable"}}{{/crossLink}} object,
    *   in which case its data is copied, or

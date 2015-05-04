@@ -26,6 +26,12 @@ define(["service!IVizTypeProvider"], function(vizTypeProviders) {
    * A singleton class that manages visualization types
    * of which visualization instances can be created.
    *
+   * #### AMD
+   *
+   * **Module Id**: `"common-ui/vizapi/vizTypeRegistry"`
+   *
+   * **Module Type**: {{#crossLink "VizTypeRegistry"}}{{/crossLink}}
+   *
    * @class VizTypeRegistry
    * @constructor
    */

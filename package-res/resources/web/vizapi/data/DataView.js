@@ -22,6 +22,14 @@ define(['./AbstractDataTable', './DataTable'], function(AbstractDataTable, DataT
    * A **data view** is an object that
    * provides a way to access a subset of a source table.
    *
+   * #### AMD
+   *
+   * **Module Id**: `"common-ui/vizapi/data/DataView"`
+   *
+   * **Module Type**: The {{#crossLink "DataView"}}{{/crossLink}} constructor.
+   *
+   * #### Description
+   *
    * A data view can selectively show rows and/or columns from the source table
    * through use of the
    * {{#crossLink "DataView/setRows:method"}}{{/crossLink}}
