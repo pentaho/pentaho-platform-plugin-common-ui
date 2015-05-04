@@ -350,7 +350,7 @@ define([
         chartExists();
       } else {
         var chartDiv = this.visualPanelElement;
-        vizTypes.createByTypeAync(visualization, chartDiv, function(viz) {
+        vizTypes.createByTypeAync(visualization, chartDiv).then(function(viz) {
           myself.chart = viz;
 
           events.addListener(viz, 'select',      function(){ return myself.chartSelectHandler.apply(myself,arguments||[]);} );

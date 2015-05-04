@@ -14,8 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define(["service!IVizTypeProvider"], function(vizTypeProviders) {
-
+define([
+  "service!IVizTypeProvider",
+  "es6-promise-shim"
+], function(vizTypeProviders) {
+  
+  /*global Promise:true*/
+   
   var O_hasOwn = Object.prototype.hasOwnProperty;
 
   /**
@@ -95,19 +100,32 @@ define(["service!IVizTypeProvider"], function(vizTypeProviders) {
   };
 
   // NOTE: This method is temporary until createAsync is implemented.
-  VizTypeRegistry.prototype.createByTypeAync = function(vizType, arg, onCreated) {
-    var moduleId = vizType.instanceModule;
-    if(moduleId) {
-      require([moduleId], function(instFactory) {
-        var viz = instFactory(vizType.id, arg);
-        onCreated(viz);
-      });
-    } else {
-      var className = vizType['class'];
-      var viz2;
-      eval('(viz2 = new ' + className + '(arg))');
-      onCreated(viz2);
-    }
+  VizTypeRegistry.prototype.createByTypeAync = function(vizType, arg) {
+    return new Promise(function(resolve, reject) {
+      var moduleId = vizType.instanceModule,
+          tryResolve = function(viz) {
+            if(!viz)
+              reject(new Error("Invalid visualization factory."));
+            else
+              resolve(viz);
+          };
+      if(moduleId) {
+        require([moduleId], function(instFactory) {
+          Promise.resolve(instFactory(vizType.id, arg))
+            .then(tryResolve, reject);
+        });
+      } else {
+        try {
+          // Legacy global class
+          var className = vizType['class'],
+              viz2;
+          eval('(viz2 = new ' + className + '(arg))');
+          tryResolve(viz2);
+        } catch(ex) {
+          reject(ex);
+        }
+      }
+    });
   };
 
   // -------
