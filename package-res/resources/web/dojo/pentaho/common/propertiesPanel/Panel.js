@@ -11,6 +11,7 @@ dojo.require("dijit.form.Select");
 dojo.require("dijit.form.CheckBox");
 dojo.require("dojo.dnd.Source");
 dojo.require("dijit.TitlePane");
+dojo.require("dojox.html.entities");
 
 dojo.require("pentaho.common.Messages");
 
@@ -796,12 +797,12 @@ dojo.declare(
     {
       className: "gem",
 
-      templateString: "<div id='${id}' class='${className} dojoDndItem' dndType='${dndType}'><div class='gem-label'>${model.value}</div><div class='gemMenuHandle'></div></div>",
+      templateString: "<div id='${id}' class='${className} dojoDndItem' dndType='${dndType}'><div class='gem-label'><span>${model.value}</span></div><div class='gemMenuHandle'></div></div>",
       constructor:function (options) {
         this.gemBar = options.gemBar;
         this.dndType = options.dndType;
         this.id = options.id;
-
+        this.model.value = dojox.html.entities.encode(this.model.value);
       },
       detach: function(){
         model.detach();
