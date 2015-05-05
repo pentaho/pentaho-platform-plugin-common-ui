@@ -809,13 +809,11 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
           [_WidgetBase, _TemplatedMixin, Evented, StatefulUI],
           {
             className: "gem",
-
-            templateString: "<div id='${id}' class='${className} dojoDndItem' dndType='${dndType}'><div class='gem-label'>${model.value}</div><div class='gemMenuHandle'></div></div>",
+            templateString: "<div id='${id}' class='${className} dojoDndItem' dndType='${dndType}'><div class='gem-label' title='${model.value}'></div><div class='gemMenuHandle'></div></div>",
             constructor: function (options) {
               this.gemBar = options.gemBar;
               this.dndType = options.dndType;
               this.id = options.id;
-
             },
             detach: function () {
               model.detach();
@@ -824,6 +822,9 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
               on(this.domNode, "contextmenu", lang.hitch( this,  "onContextMenu"));
               var outterThis = this;
               this.menuHandle = query("div.gemMenuHandle", this.domNode)[0];
+
+              var gemLabel = query("div.gem-label", this.domNode)[0];
+              gemLabel.appendChild(document.createTextNode(this.model.value));
 
               on(query("div.gemMenuHandle",  this.domNode)[0], "mouseover",  function (e) {
                 if (!ManagerClass.manager().source) {
