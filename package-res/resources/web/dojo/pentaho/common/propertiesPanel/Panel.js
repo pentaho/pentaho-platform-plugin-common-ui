@@ -913,7 +913,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
           {
             className: "gem",
 
-            templateString: "<div id='${id}' class='${className} dojoDndItem' dndType='${dndType}'><div class='gem-label'>${model.value}</div><div class='gemMenuHandle'></div></div>",
+            templateString: "<div id='${id}' class='${className} dojoDndItem' dndType='${dndType}'><div class='gem-label'><span>${model.value}</span></div><div class='gemMenuHandle'></div></div>",
             constructor: function (options) {
               this.gemBar = options.gemBar;
               this.dndType = options.dndType;
