@@ -26,10 +26,9 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
   ,"dijit/TitlePane"
   ,"pentaho/common/Messages", "dojo/_base/array", "dojo/_base/lang", "dojo/html", "dojo/dom-construct",
   "dojo/string", "dojo/dom-class", "pentaho/common/propertiesPanel/Configuration", "dijit/registry", "dojo/dnd/Target",
-  "dojo/dnd/Source", "dojo/Evented", "dojo/topic", "dojo/dnd/Manager", "dojo/dom", "dojo/dom-geometry", "dojo/aspect",
-  "dojox/html/entities"],
+  "dojo/dnd/Source", "dojo/Evented", "dojo/topic", "dojo/dnd/Manager", "dojo/dom", "dojo/dom-geometry", "dojo/aspect"],
     function (declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, on, query, ContentPane, BorderContainer, HorizontalSlider, TextBox, ComboBox, ItemFileReadStore, Select, CheckBox, TitlePane, Messages, array, lang, html, construct, string, domClass, Configuration, registry, Target, Source, Evented, topic, ManagerClass,
-              dom, geometry, aspect, Entities) {
+              dom, geometry, aspect) {
 
       var Panel = declare("pentaho.common.propertiesPanel.Panel",
           [ContentPane, Evented],
@@ -912,13 +911,11 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
           [_WidgetBase, _TemplatedMixin, Evented, StatefulUI],
           {
             className: "gem",
-
-            templateString: "<div id='${id}' class='${className} dojoDndItem' dndType='${dndType}'><div class='gem-label'><span>${model.value}</span></div><div class='gemMenuHandle'></div></div>",
+            templateString: "<div id='${id}' class='${className} dojoDndItem' dndType='${dndType}'><div class='gem-label' title='${model.value}'></div><div class='gemMenuHandle'></div></div>",
             constructor: function (options) {
               this.gemBar = options.gemBar;
               this.dndType = options.dndType;
               this.id = options.id;
-              this.model.value = Entities.encode(this.model.value);
             },
             detach: function () {
               model.detach();
@@ -927,6 +924,9 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
               on(this.domNode, "contextmenu", lang.hitch( this,  "onContextMenu"));
               var outterThis = this;
               this.menuHandle = query("div.gemMenuHandle", this.domNode)[0];
+
+              var gemLabel = query("div.gem-label", this.domNode)[0];
+              gemLabel.appendChild(document.createTextNode(this.model.value));
 
               on(query("div.gemMenuHandle",  this.domNode)[0], "mouseover",  function (e) {
                 if (!ManagerClass.manager().source) {

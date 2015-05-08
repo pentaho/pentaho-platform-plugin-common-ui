@@ -15,11 +15,13 @@
  * Copyright 2015 Pentaho Corporation. All rights reserved.
  */
 
-define(["pentaho/common/propertiesPanel/Panel", "dijit/registry"], function(Panel, registry) {
+define(["pentaho/common/propertiesPanel/Panel", "dijit/registry", "dojo/query"], function(Panel, registry, query) {
 
   describe("GemUI", function() {
 
     var testId = 'test-id';
+
+    var gemUi = Panel.registeredTypes["gem"];
 
     afterEach(function() {
       registry.remove(testId);
@@ -37,27 +39,37 @@ define(["pentaho/common/propertiesPanel/Panel", "dijit/registry"], function(Pane
       };
     };
 
-    it("should encode input data to prevent XSS", function() {
-      var options = createStubOptions('<h1>XSS</h1>');
-
-      var gemUi = Panel.registeredTypes["gem"];
-      var encodedModelValue = new gemUi(options).model.value;
-
-      var leftBracketIndex = encodedModelValue.indexOf('<');
-      expect(leftBracketIndex).toEqual(-1);
-
-      var rightBracketIndex = encodedModelValue.indexOf('>');
-      expect(rightBracketIndex).toEqual(-1);
-    });
-
-    it("should not spoil correct input data", function() {
+    it("should put text value to title", function() {
       var value = 'Just a label';
-      var options = createStubOptions(value);
+      var instance = new gemUi(createStubOptions(value));
 
-      var gemUi = Panel.registeredTypes["gem"];
-      var encodedModelValue = new gemUi(options).model.value;
-
-      expect(encodedModelValue).toEqual(value);
+      var gemLabelNode = query("div.gem-label", instance.domNode)[0];
+      expect(gemLabelNode.title).toEqual(value);
     });
+
+    it("should create a text node if html is passed", function() {
+      var value = '<h1>XSS</h1>';
+      var instance = new gemUi(createStubOptions(value));
+
+      var gemLabelNode = query("div.gem-label", instance.domNode)[0];
+
+      var children = gemLabelNode.childNodes;
+      expect(children.length).toEqual(1);
+      expect(children[0].nodeType).toEqual(3);       // nodeType = 3 -> Text node
+      expect(children[0].nodeValue).toEqual(value);
+    });
+
+    it("should not create additional nodes if html is passed", function() {
+      var value = '<h1>XSS</h1>';
+      var instance = new gemUi(createStubOptions(value));
+
+      var gemLabelNode = query("div.gem-label", instance.domNode)[0];
+
+      var children = gemLabelNode.childNodes;
+      for (var i = 0; i < children.length; i++) {
+        expect(children[i].nodeType).not.toEqual(1); // nodeType = 1 -> Element node
+      }
+    });
+
   })
 })
