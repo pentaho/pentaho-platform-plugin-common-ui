@@ -1393,10 +1393,14 @@ function(def, pvc, pv){
                     // One is a null one and the other an interpolated one.
                     // We may receive the null one in `complex` and 
                     // miss detecting that the scene is actually interpolated.
-                    if(context && context.scene && context.scene.datums()) {
-                    	if( context.scene.datums().where(function(d) { return d.isInterpolated && d.interpDimName === cccDimName; }).first() ) {
-                    		suffix = this.chart._message('chartTooltipGemInterp_' + complexInterp.interpolation);
-                    	}
+                    if(context && context.scene) {
+                    	// create local variable for avoid double call datums()
+                    	var datums = context.scene.datums();
+                    	if (datums) {
+                    		var complexInterp = datums.where(function(d) { return d.isInterpolated && d.interpDimName === cccDimName; }).first();
+                    		if(complexInterp) 
+                    			suffix = this.chart._message('chartTooltipGemInterp_' + complexInterp.interpolation);
+                    		}
                     } else if(complex.isTrend/* && atom.label*/){
                         // TODO: "atom.label" -- is a weak test for trended measures,
                         // that relies on the fact that non-trended measures are left null
