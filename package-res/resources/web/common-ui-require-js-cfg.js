@@ -29,6 +29,9 @@ requireCfg['paths']['local'] = prefix+'/util/local';
 requireCfg['paths']['service'] = prefix+'/util/service';
 requireCfg['paths']['css'] = prefix+'/util/require-css/css' + (isDebug ? "" : ".min");
 
+requireCfg['paths']["es6-promise"] = prefix+'/es6-promise/es6-promise' + (isDebug ? "" : ".min");
+requireCfg['paths']["es6-promise-shim"] = prefix+'/util/es6-promise-shim';
+
 requireCfg['paths']['common-repo'] = prefix+'/repo';
 //requireCfg['paths']['common-repo/pentaho-ajax'] = prefix+'/repo/pentaho-ajax';
 
