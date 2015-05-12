@@ -18,9 +18,9 @@ define([
   "service!IVizTypeProvider",
   "es6-promise-shim"
 ], function(vizTypeProviders) {
-  
+
   /*global Promise:true*/
-   
+
   var O_hasOwn = Object.prototype.hasOwnProperty;
 
   /**
@@ -100,7 +100,7 @@ define([
   };
 
   // NOTE: This method is temporary until createAsync is implemented.
-  VizTypeRegistry.prototype.createByTypeAync = function(vizType, arg) {
+  VizTypeRegistry.prototype.createByTypeAsync = function(vizType, arg) {
     return new Promise(function(resolve, reject) {
       var moduleId = vizType.instanceModule,
           tryResolve = function(viz) {
