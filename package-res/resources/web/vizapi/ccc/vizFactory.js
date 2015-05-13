@@ -14,7 +14,7 @@
 * limitations under the License.
 */
 define([
-    "es6-promise-shim",
+    "common-ui/es6-promise-shim",
     "require",
     "cdf/lib/CCC/def",
     "./wrapper/trends"

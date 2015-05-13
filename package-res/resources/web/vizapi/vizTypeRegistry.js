@@ -16,7 +16,7 @@
  */
 define([
   "service!IVizTypeProvider",
-  "es6-promise-shim"
+  "common-ui/es6-promise-shim"
 ], function(vizTypeProviders) {
 
   /*global Promise:true*/
