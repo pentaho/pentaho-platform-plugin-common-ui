@@ -13,11 +13,19 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-define(["cdf/lib/CCC/def"], function(def) {
+define(["module"], function(module) {
+  var O_hasOwn = Object.prototype.hasOwnProperty;
+
+  var instanceModule = getModuleBaseId(module.id) + "/vizFactory";
 
   return /** @type IVizTypeProvider */{
     getAll: getCccVizTypes
   };
+
+  function getModuleBaseId(moduleId) {
+    var index = moduleId.lastIndexOf("/");
+    return index < 0 ? "." : moduleId.substr(0, index);
+  }
 
   function getCccVizTypes() {
     return [
@@ -26,19 +34,19 @@ define(["cdf/lib/CCC/def"], function(def) {
         type:     "barchart",
         source:   "CCC",
         name:     vizLabel("VERTICAL_BAR"),
-        instanceModule: "common-ui/vizapi/ccc/ccc_wrapper",
+        instanceModule: instanceModule,
         args:     {},
         propMap:  [],
         dataReqs: [{
           name: "Default",
-          reqs: def.array.appendMany(
+          reqs: arrayAppendMany(
             createDataReq("VERTICAL_BAR", {options: false}),
-            [createColumnDataLabelsReq({
+            createColumnDataLabelsReq({
               separator: false,
               anchors: ["none", "center", "inside_end", "inside_base", "outside_end"]
-            })],
+            }),
             createTrendsDataReqs({separator: true}),
-            [createChartOptionsDataReq(true)])
+            createChartOptionsDataReq(true))
         }],
         menuOrdinal: 100
       },
@@ -47,18 +55,18 @@ define(["cdf/lib/CCC/def"], function(def) {
         type:     "barchart",
         source:   "CCC",
         name:     vizLabel("STACKED_VERTICAL_BAR"),
-        instanceModule: "common-ui/vizapi/ccc/ccc_wrapper",
+        instanceModule: instanceModule,
         args:     {},
         propMap:  [],
         dataReqs: [{
           name: "Default",
-          reqs: def.array.appendMany(
+          reqs: arrayAppendMany(
             createDataReq("STACKED_VERTICAL_BAR", {options: false}),
-            [createColumnDataLabelsReq({
+            createColumnDataLabelsReq({
               separator: false,
               anchors: ["none", "center", "inside_end", "inside_base"]
-            })],
-            [createChartOptionsDataReq(true)])
+            }),
+            createChartOptionsDataReq(true))
         }],
         menuOrdinal: 110
       },
@@ -67,18 +75,18 @@ define(["cdf/lib/CCC/def"], function(def) {
         type:     "horzbarchart",
         source:   "CCC",
         name:     vizLabel("HORIZONTAL_BAR"),
-        instanceModule: "common-ui/vizapi/ccc/ccc_wrapper",
+        instanceModule: instanceModule,
         args:     {},
         propMap:  [],
         dataReqs: [{
           name: "Default",
-          reqs: def.array.appendMany(
+          reqs: arrayAppendMany(
             createDataReq("HORIZONTAL_BAR", {options: false}),
-            [createColumnDataLabelsReq({
+            createColumnDataLabelsReq({
               separator: false,
               anchors: ["none", "center", "inside_end", "inside_base", "outside_end"]
-            })],
-            [createChartOptionsDataReq(true)])
+            }),
+            createChartOptionsDataReq(true))
         }],
         menuOrdinal: 130,
         menuSeparator: true
@@ -88,18 +96,18 @@ define(["cdf/lib/CCC/def"], function(def) {
         type:     "horzbarchart",
         source:   "CCC",
         name:     vizLabel("STACKED_HORIZONTAL_BAR"),
-        instanceModule: "common-ui/vizapi/ccc/ccc_wrapper",
+        instanceModule: instanceModule,
         args:     {},
         propMap:  [],
         dataReqs: [{
           name: "Default",
-          reqs: def.array.appendMany(
+          reqs: arrayAppendMany(
             createDataReq("STACKED_HORIZONTAL_BAR", {options: false}),
-            [createColumnDataLabelsReq({
+            createColumnDataLabelsReq({
               separator: false,
               anchors: ["none", "center", "inside_end", "inside_base"]
-            })],
-            [createChartOptionsDataReq(true)])
+            }),
+            createChartOptionsDataReq(true))
         }],
         menuOrdinal: 140
       },
@@ -108,18 +116,18 @@ define(["cdf/lib/CCC/def"], function(def) {
         type:     "barchart",
         source:   "CCC",
         name:     vizLabel("PCT_STACKED_VERTICAL_BAR"),
-        instanceModule: "common-ui/vizapi/ccc/ccc_wrapper",
+        instanceModule: instanceModule,
         args:     {},
         propMap:  [],
         dataReqs: [{
           name: "Default",
-          reqs: def.array.appendMany(
+          reqs: arrayAppendMany(
             createDataReq("PCT_STACKED_VERTICAL_BAR", {options: false}),
-            [createColumnDataLabelsReq({
+            createColumnDataLabelsReq({
               separator: false,
               anchors:   ["none", "center", "inside_end", "inside_base"]
-            })],
-            [createChartOptionsDataReq(true)])
+            }),
+            createChartOptionsDataReq(true))
         }],
         menuOrdinal: 120
       },
@@ -128,18 +136,18 @@ define(["cdf/lib/CCC/def"], function(def) {
         type:     "horzbarchart",
         source:   "CCC",
         name:     vizLabel("PCT_STACKED_HORIZONTAL_BAR"),
-        instanceModule: "common-ui/vizapi/ccc/ccc_wrapper",
+        instanceModule: instanceModule,
         args:     {},
         propMap:  [],
         dataReqs: [{
           name: "Default",
-          reqs: def.array.appendMany(
+          reqs: arrayAppendMany(
             createDataReq("PCT_STACKED_HORIZONTAL_BAR", {options: false}),
-            [createColumnDataLabelsReq({
+            createColumnDataLabelsReq({
               separator: false,
               anchors: ["none", "center", "inside_end", "inside_base"]
-            })],
-            [createChartOptionsDataReq(true)])
+            }),
+            createChartOptionsDataReq(true))
         }],
         menuOrdinal: 150
       },
@@ -148,27 +156,26 @@ define(["cdf/lib/CCC/def"], function(def) {
         type:     "linechart",
         source:   "CCC",
         name:     vizLabel("LINE"),
-        instanceModule: "common-ui/vizapi/ccc/ccc_wrapper",
+        instanceModule: instanceModule,
         args: {
             // Default value for "shape" data request
             shape: "circle"
         },
         propMap:  [],
-        dataReqs: [{
-          name: "Default",
-          drillOrder: ["rows"],
-          hyperlinkOrder: ["rows","columns"],
-          reqs: def.array.appendMany(
-            createDataReq("LINE", {options: false}),
-            [
-             createLabelsVisibleAnchorDataReq(true),
-             createShapeDataReq(null, {separator: true}),
-             createLineWidthDataReq()
-            ],
-            createTrendsDataReqs(),
-            [createChartOptionsDataReq(true)]
-          )
-        }],
+        dataReqs: [
+          {
+            name: "Default",
+            drillOrder: ["rows"],
+            hyperlinkOrder: ["rows","columns"],
+            reqs: arrayAppendMany(
+              createDataReq("LINE", {options: false}),
+              createLabelsVisibleAnchorDataReq(),
+              createShapeDataReq(null, {separator: true}),
+              createLineWidthDataReq(),
+              createTrendsDataReqs(),
+              createChartOptionsDataReq(true))
+          }
+        ],
         menuOrdinal: 160,
         menuSeparator: true
       },
@@ -177,18 +184,17 @@ define(["cdf/lib/CCC/def"], function(def) {
         type:     "areachart",
         source:   "CCC",
         name:     vizLabel("STACKED_AREA"),
-        instanceModule: "common-ui/vizapi/ccc/ccc_wrapper",
+        instanceModule: instanceModule,
         args:     {},
         propMap:  [],
         dataReqs: [{
           name: "Default",
           drillOrder: ["rows"],
           hyperlinkOrder: ["rows","columns"],
-          reqs: def.array.appendMany(
+          reqs: arrayAppendMany(
             createDataReq("STACKED_AREA",{options: false}),
-            [createLabelsVisibleAnchorDataReq(true)],
-            [createChartOptionsDataReq(true)]
-          )
+            createLabelsVisibleAnchorDataReq(true),
+            createChartOptionsDataReq(true))
         }],
         menuOrdinal: 180
       },
@@ -197,13 +203,13 @@ define(["cdf/lib/CCC/def"], function(def) {
         type:      "scatter",
         source:    "CCC",
         name:      vizLabel("SCATTER"),
-        instanceModule: "common-ui/vizapi/ccc/ccc_wrapper",
+        instanceModule: instanceModule,
         maxValues: [1000, 2500, 5000, 10000],
         args:      {},
         propMap:   [],
         dataReqs:  [{
           name: "Default",
-          reqs:  def.array.appendMany([
+          reqs:  arrayAppendMany(
             {
               id: "x",
               dataType: "number",
@@ -247,11 +253,10 @@ define(["cdf/lib/CCC/def"], function(def) {
             createMultiDataReq(),
             createPatternDataReq(),
             createColorSetDataReq(),
-            createReverseColorsDataReq()
-          ],
-          [createLabelsVisibleAnchorDataReq()],
-          createTrendsDataReqs(),
-          [createChartOptionsDataReq(true)])
+            createReverseColorsDataReq(),
+            createLabelsVisibleAnchorDataReq(),
+            createTrendsDataReqs(),
+            createChartOptionsDataReq(true))
         }],
         menuOrdinal: 190,
         menuSeparator: true
@@ -261,7 +266,7 @@ define(["cdf/lib/CCC/def"], function(def) {
         type: "barchart",
         source: "CCC",
         name: vizLabel("VERTICAL_BAR_LINE"),
-        instanceModule: "common-ui/vizapi/ccc/ccc_wrapper",
+        instanceModule: instanceModule,
         args:  {
           // Default value for "shape" data request
           shape: "circle"
@@ -273,10 +278,10 @@ define(["cdf/lib/CCC/def"], function(def) {
           reqs: [
             createRowDataReq("VERTICAL_BAR_LINE_ROW"),
             createColDataReq("VERTICAL_BAR_LINE_COL"),
-            def.set(
+            propSet(
               createMeaDataReq("VERTICAL_BAR_LINE_NUMCOL"),
               "required", false),
-            def.set(
+            propSet(
               createMeaDataReq("VERTICAL_BAR_LINE_NUMLINE"),
               "id", "measuresLine",
               "required", false),
@@ -303,7 +308,7 @@ define(["cdf/lib/CCC/def"], function(def) {
         type: "waterfallchart",
         source: "CCC",
         name: vizLabel("WATERFALL"),
-        instanceModule: "common-ui/vizapi/ccc/ccc_wrapper",
+        instanceModule: instanceModule,
         args:     {},
         propMap:  [],
         dataReqs: [{
@@ -316,7 +321,7 @@ define(["cdf/lib/CCC/def"], function(def) {
         type:     "boxplotchart",
         source:   "CCC",
         name:     vizLabel("BOXPLOT"),
-        instanceModule: "common-ui/vizapi/ccc/ccc_wrapper",
+        instanceModule: instanceModule,
         args:     {},
         propMap:  [],
         dataReqs: [{
@@ -324,9 +329,11 @@ define(["cdf/lib/CCC/def"], function(def) {
           reqs: [
             createRowDataReq("BOXPLOT_ROW"),
 
-            def.set(createMeaDataReq("BOXPLOT_PCT50"),
+            propSet(
+              createMeaDataReq("BOXPLOT_PCT50"),
               "allowMultiple", false,
               "required", false),
+
             {
               id: "percentil25",
               dataType: "number",
@@ -369,7 +376,7 @@ define(["cdf/lib/CCC/def"], function(def) {
         type:     "piechart",
         source:   "CCC",
         name:     vizLabel("MULTIPLE_PIE"),
-        instanceModule: "common-ui/vizapi/ccc/ccc_wrapper",
+        instanceModule: instanceModule,
         args: {
           labelsOption: "outside"
         },
@@ -378,12 +385,10 @@ define(["cdf/lib/CCC/def"], function(def) {
           name: "Default",
           drillOrder: ["rows","columns"],
           hyperlinkOrder: ["rows","columns"],
-          reqs: def.array.appendMany(
+          reqs: arrayAppendMany(
             createDataReq("MULTIPLE_PIE", {multi: false, options: false}),
-            [
-              createLabelsVisiblePositionDataReq(),
-              createChartOptionsDataReq(true)
-            ])
+            createPieLabelsVisiblePositionDataReq(),
+            createChartOptionsDataReq(true))
         }],
         menuOrdinal: 183
       },
@@ -393,7 +398,7 @@ define(["cdf/lib/CCC/def"], function(def) {
         source:    "CCC",
         name:      vizLabel("HEATGRID"),
         "class":   "pentaho.ccc.HeatGridChart",
-        instanceModule: "common-ui/vizapi/ccc/ccc_wrapper",
+        instanceModule: instanceModule,
         maxValues: [500, 1000, 2000, 5000],
         args:      {
           // Default value for "shape" data request
@@ -452,13 +457,15 @@ define(["cdf/lib/CCC/def"], function(def) {
         type: "treemapchart",
         source: "CCC",
         name: vizLabel("TREEMAP"),
-        instanceModule: "common-ui/vizapi/ccc/ccc_wrapper",
+        instanceModule: instanceModule,
         args:     {},
         propMap:  [],
         dataReqs: [{
           name: "Default",
           reqs: [
-            def.set(createRowDataReq("TREEMAP_ROW"), "required", true),
+            propSet(
+              createRowDataReq("TREEMAP_ROW"),
+              "required", true),
             {
               id: "size",
               dataType: "number",
@@ -477,7 +484,7 @@ define(["cdf/lib/CCC/def"], function(def) {
         type: "bulletchart",
         source: "CCC",
         name: "Bullet Chart",
-        instanceModule: "common-ui/vizapi/ccc/ccc_wrapper",
+        instanceModule: instanceModule,
         args:     {},
         propMap:  [],
         dataReqs: [
@@ -515,13 +522,16 @@ define(["cdf/lib/CCC/def"], function(def) {
         type:   "treemapchart",
         source: "CCC",
         name:   vizLabel("SUNBURST"),
-        instanceModule: "common-ui/vizapi/ccc/ccc_wrapper",
+        instanceModule: instanceModule,
         args:     {},
         propMap:  [],
         dataReqs: [{
           name: "Default",
-          reqs: def.array.appendMany([
-            def.set(createRowDataReq("SUNBURST_ROW"), "required", true),
+          reqs: arrayAppendMany(
+            propSet(
+              createRowDataReq("SUNBURST_ROW"),
+              "required", true),
+
             {
                 id: "size",
                 dataType: "number",
@@ -530,14 +540,13 @@ define(["cdf/lib/CCC/def"], function(def) {
                 required: false,
                 allowMultiple: false
             },
-            createMultiDataReq()],
-            [createLabelsVisibleAnchorDataReq({
+            createMultiDataReq(),
+            createLabelsVisibleAnchorDataReq({
               hideOptions: ["left", "right", "top", "bottom"]
-            })],
+            }),
             createSortDataReqs(true),
-            [createEmptySlicesDataReq()],
-            [createChartOptionsDataReq(true)]
-          )
+            createEmptySlicesDataReq(),
+            createChartOptionsDataReq(true))
         }],
         menuOrdinal: 185
       }
@@ -572,8 +581,7 @@ define(["cdf/lib/CCC/def"], function(def) {
       dataStructure: "column",
       caption: dropZoneLabel(rowLabel),
       required: false,
-      allowMultiple: true,
-      defaultAppend: true
+      allowMultiple: true
     };
   }
 
@@ -595,8 +603,7 @@ define(["cdf/lib/CCC/def"], function(def) {
       dataStructure: "column",
       caption: dropZoneLabel(measureLabel),
       required: true,
-      allowMultiple: true,
-      defaultAppend: true
+      allowMultiple: true
     };
   }
 
@@ -606,15 +613,15 @@ define(["cdf/lib/CCC/def"], function(def) {
       dataType: "string",
       dataStructure: "column",
       caption: dropZoneLabel("MULTI_CHART"),
-      allowMultiple: true,
-      required: false
+      required: false,
+      allowMultiple: true
     };
   }
 
   function createShapeDataReq(valuesSet, options) {
     var values = ["circle", "cross", "diamond", "square", "triangle"];
     if(valuesSet)
-      values = values.filter(function(value){ return def.hasOwn(valuesSet, value); });
+      values = values.filter(function(value) { return propHasOwn(valuesSet, value); });
 
     values.unshift("none");
 
@@ -626,7 +633,7 @@ define(["cdf/lib/CCC/def"], function(def) {
         labels:    values.map(function(option) { return dropZoneLabel(option.toUpperCase()); }),
         group:     "options",
         type:      "combo",
-        seperator: options ? def.get(options, "separator", false) : false,
+        seperator: options ? propGet(options, "separator", false) : false,
         caption:   dropZoneLabel("BULLET_STYLE")
       }
     };
@@ -660,9 +667,10 @@ define(["cdf/lib/CCC/def"], function(def) {
           group: "options",
           type:  "combo",
           caption: dropZoneLabel("TREND_TYPE"),
-          seperator: def.get(keyArgs, "separator", true)
+          seperator: propGet(keyArgs, "separator", true)
         }
-      }, {
+      },
+      {
         id: "trendName",
         dataType: "string",
         ui: {
@@ -670,7 +678,8 @@ define(["cdf/lib/CCC/def"], function(def) {
           type:  "textbox",
           caption: dropZoneLabel("TREND_NAME")
         }
-      }, {
+      },
+      {
         id: "trendLineWidth",
         dataType: "string",
         values: ["1", "2", "3", "4", "5", "6", "7", "8"],
@@ -686,22 +695,20 @@ define(["cdf/lib/CCC/def"], function(def) {
 
   function createSortDataReqs(addSeparator) {
     var types = ["bySizeDescending", "bySizeAscending", "none"];
-    return [
-      {
-        id: "sliceOrder",
-        dataType: "string",
-        values: types,
-        ui: {
-          labels: types.map(function(option) {
-            return dropZoneLabel("SORT_TYPE_" + option.toUpperCase());
-          }),
-          group:     "options",
-          type:      "combo",
-          caption:   dropZoneLabel("SORT_TYPE"),
-          seperator: addSeparator
-        }
+    return {
+      id: "sliceOrder",
+      dataType: "string",
+      values: types,
+      ui: {
+        labels: types.map(function(option) {
+          return dropZoneLabel("SORT_TYPE_" + option.toUpperCase());
+        }),
+        group:     "options",
+        type:      "combo",
+        caption:   dropZoneLabel("SORT_TYPE"),
+        seperator: addSeparator
       }
-    ];
+    };
   }
 
   function createPatternDataReq(keyArgs) {
@@ -715,7 +722,7 @@ define(["cdf/lib/CCC/def"], function(def) {
         group: "options",
         type:  "combo",
         caption: dropZoneLabel("PATTERN"),
-        seperator: def.get(keyArgs, "separator", false)
+        seperator: propGet(keyArgs, "separator", false)
       }
     };
   }
@@ -761,7 +768,7 @@ define(["cdf/lib/CCC/def"], function(def) {
     };
   }
 
-  function createLabelsVisiblePositionDataReq(keyArgs) {
+  function createPieLabelsVisiblePositionDataReq(keyArgs) {
     var positions = ["none", "outside", "inside"];
 
     return {
@@ -781,12 +788,13 @@ define(["cdf/lib/CCC/def"], function(def) {
   }
 
   function createLabelsVisibleAnchorDataReq(keyArgs) {
-    var anchors = ["none", "center", "left", "right", "top", "bottom"];
+    var anchors = ["none", "center", "left", "right", "top", "bottom"],
+        hideOptions = propGet(keyArgs, "hideOptions");
 
-    if(keyArgs && keyArgs.hideOptions) {
-      for(var i = 0; i < keyArgs.hideOptions.length; i++) {
+    if(hideOptions) {
+      for(var i = 0; i < hideOptions.length; i++) {
         for(var j = 0; j < anchors.length; j++) {
-          if(anchors[j] === keyArgs.hideOptions[i]) {
+          if(anchors[j] === hideOptions[i]) {
             anchors.splice(j, 1);
             break;
           }
@@ -795,7 +803,7 @@ define(["cdf/lib/CCC/def"], function(def) {
     }
 
     return {
-      id: def.get(keyArgs, "labels_option", "labelsOption"),
+      id: propGet(keyArgs, "labels_option", "labelsOption"),
       dataType: "string",
       values: anchors,
       ui: {
@@ -804,13 +812,13 @@ define(["cdf/lib/CCC/def"], function(def) {
         }),
         group: "options",
         type:  "combo",
-        caption: dropZoneLabel(def.get(keyArgs, "value_anchor", "VALUE_ANCHOR"))
+        caption: dropZoneLabel(propGet(keyArgs, "value_anchor", "VALUE_ANCHOR"))
       }
     };
   }
 
   function createColumnDataLabelsReq(keyArgs) {
-    var anchors = def.get(keyArgs, "anchors");
+    var anchors = propGet(keyArgs, "anchors");
 
     return {
       id: "labelsOption",
@@ -822,22 +830,8 @@ define(["cdf/lib/CCC/def"], function(def) {
         }),
         group: "options",
         type:  "combo",
-        seperator: def.get(keyArgs, "separator", true),
-        caption: dropZoneLabel(def.get(keyArgs, "value_anchor", "VALUE_ANCHOR"))
-      }
-    };
-  }
-
-  function createLabelsVisibleDataReq(keyArgs) {
-    return {
-      id: "labelsVisible",
-      dataType: "boolean",
-      ui: {
-        label: dropZoneLabel("SHOW_LABELS"),
-        group: "options",
-        type:  "checkbox",
-        seperator: def.get(keyArgs, "separator", true),
-        caption: "Labels" // TODO i18n pending....
+        seperator: propGet(keyArgs, "separator", true),
+        caption: dropZoneLabel(propGet(keyArgs, "value_anchor", "VALUE_ANCHOR"))
       }
     };
   }
@@ -858,21 +852,58 @@ define(["cdf/lib/CCC/def"], function(def) {
   function createDataReq(chartId, options) {
     var json = [];
 
-    if(def.get(options, "row", true))
+    if(propGet(options, "row", true))
         json.push(createRowDataReq(chartId + "_ROW"));
 
-    if(def.get(options, "column", true))
+    if(propGet(options, "column", true))
         json.push(createColDataReq(chartId + "_COL"));
 
-    if(def.get(options, "measure", true))
+    if(propGet(options, "measure", true))
         json.push(createMeaDataReq(chartId + "_NUM"));
 
-    if(def.get(options, "multi", true))
+    if(propGet(options, "multi", true))
         json.push(createMultiDataReq());
 
-    if(def.get(options, "options", true))
+    if(propGet(options, "options", true))
         json.push(createChartOptionsDataReq(false));
 
     return json;
+  }
+
+  // -----
+
+  function propGet(o, p, dv) {
+    var v;
+    return o && (v = o[p]) != null ? v : dv;
+  }
+
+  function propSet(o) {
+      // Not assigning to arguments variable allows optimizations.
+    var oo = o || {},
+        a  = arguments;
+    for(var i = 1, A = a.length - 1 ; i < A ; i += 2) oo[a[i]] = a[i+1];
+    return oo;
+  }
+
+  function propHasOwn(o, p) {
+    return !!o && O_hasOwn.call(o, p);
+  }
+
+  function arrayAppendMany(target) {
+      var a = arguments, S = a.length, source;
+      target = arrayTo(target);
+      if(S > 1) {
+          for(var s = 1 ; s < S ; s++) {
+              if((source = arrayTo(a[s]))) {
+                  var i = 0, L = source.length;
+                  while(i < L) target.push(source[i++]);
+              }
+          }
+      }
+      return target;
+  }
+
+  function arrayTo(v) {
+      return (v instanceof Array) ? v : ((v != null) ? [v] : null);
   }
 });

@@ -19,7 +19,9 @@ define([
     "cdf/lib/CCC/def",
     "../vizTypeRegistry"
 ], function(declare, def, vizTypes) {
-
+    
+    /*global analyzerPlugins:true, cv: true, cvCatalog: true, analyzer: true*/
+    
     // If necessary, declare **global** variable, initializing it with an array
     analyzerPlugins = typeof analyzerPlugins == "undefined" ? [] : analyzerPlugins;
 
@@ -32,42 +34,42 @@ define([
                  * When printing, as in a server environment,
                  * interaction features are disabled.
                  */
-                isInteractionEnabled: function(){
+                isInteractionEnabled: function() {
                     return true;
                 },
 
-                showConfirm: function(msg, msgId){
-                    if (!msgId || !cv.prefs.suppressMsg[msgId]){
+                showConfirm: function(msg, msgId) {
+                    if (!msgId || !cv.prefs.suppressMsg[msgId]) {
                         cv.getActiveReport().rptDlg.showConfirm(msg, null, null, null, msgId);
                     }
                 },
 
-                message: function(msgId, args){
+                message: function(msgId, args) {
                     var msg = cvCatalog[msgId] || "";
-                    if(msg && args){
+                    if(msg && args) {
                         msg = cv.util.substituteParams.apply(cv.util, [msg].concat(args));
                     }
 
                     return msg;
                 },
 
-                getDoubleClickTooltip: function(){
+                getDoubleClickTooltip: function() {
                     return cv.getActiveReport().getDoubleClickTooltip();
                 },
 
-                completeAxisGemsMetadata: function(axis, gemsInfoList){
+                completeAxisGemsMetadata: function(axis, gemsInfoList) {
                     var reportElem = cv.getActiveReport().reportDoc.getReportNode();
                     var isMeasure  = (axis === 'measure');
                     var unboundGemElemsByRole = {};
 
-                    function gemElemComparer(a, b){
+                    function gemElemComparer(a, b) {
                         return parseFloat(a.getAttribute("gembarOrdinal")) -
                                parseFloat(b.getAttribute("gembarOrdinal"));
                     }
 
-                    function getRoleGemElems(role){
+                    function getRoleGemElems(role) {
                         var xpath = "[@gembarId='" + role + "']";
-                        if(isMeasure){
+                        if(isMeasure) {
                             xpath = "cv:measures/cv:measure" + xpath;
                         } else {
                             xpath = "cv:columnAttributes/cv:attribute" + xpath +
@@ -86,16 +88,16 @@ define([
                         return unboundGemElems;
                     }
 
-                    function getNextGemElem(role){
+                    function getNextGemElem(role) {
                         var gemElems = def.getOwn(unboundGemElemsByRole, role);
-                        if(!gemElems){
+                        if(!gemElems) {
                             gemElems = unboundGemElemsByRole[role] = getRoleGemElems(role);
                         }
 
                         var gemElem;
-                        while(gemElems.length){
+                        while(gemElems.length) {
                             gemElem = gemElems.shift();
-                            if(gemElem.getAttribute("hideInChart") !== 'true'){
+                            if(gemElem.getAttribute("hideInChart") !== 'true') {
                                 break;
                             }
                         }
@@ -159,7 +161,7 @@ define([
                   var chartOptions = report.reportDoc.getChartOptions().attributes;
                   for (var i = 0; i < chartOptions.length; i++) {
                     var option = chartOptions[i];
-                    switch(option.nodeName){
+                    switch(option.nodeName) {
                       case 'lineShape':
                       case 'lineWidth':
                       case 'scatterPattern':
@@ -179,7 +181,7 @@ define([
                 // DCL - this uses the report API while
                 // the Config#updateConfiguration uses the
                 // pentaho.commons.propertiesPanel.Configuration API...
-                canRefreshReport: function(report){
+                canRefreshReport: function(report) {
                     var dataReq = report.getVizDataReq();
                     for(var i = 0; i < dataReq.length ; i++) {
                       if(dataReq[i].required == true) {
@@ -188,7 +190,7 @@ define([
                       }
                     }
 
-                    switch(report.visualization.id){
+                    switch(report.visualization.id) {
                         case 'ccc_heatgrid':
                             return report.findGemsByGembarId("color").length > 0 ||
                                    report.findGemsByGembarId("size" ).length > 0;
@@ -206,7 +208,7 @@ define([
 
             declare("analyzer.CCCVizConfig", [analyzer.ColorConfiguration], {
 
-                _processModelValueChange: function(item, args){
+                _processModelValueChange: function(item, args) {
                     // works by convention where the ids of the data req items match the property names
                     this.report.visualization.args[item.id] = args.newVal;
                 },
@@ -219,7 +221,7 @@ define([
                     this.inherited(arguments); // Let super class handle the insertAt and removedGem events
                 },
 
-                updateConfiguration: function(config){
+                updateConfiguration: function(config) {
 
                     this.inherited(arguments);
 
@@ -228,16 +230,16 @@ define([
                     var reportArgs = this.report.visualization.args;
                     var props = config.properties;
                     if(props) props.forEach(function(item) {
-                        if(!item.dataStructure){
+                        if(!item.dataStructure) {
                             var value = item.value;
-                            if(value === undefined){
+                            if(value === undefined) {
                                 var values = item.values;
-                                if(values && values.length){
+                                if(values && values.length) {
                                     value = /*item.value = */values[0];
                                 }
                             }
 
-                            if(value !== undefined){
+                            if(value !== undefined) {
                                 reportArgs[item.id] = value;
                             }
                         }
@@ -251,9 +253,9 @@ define([
                     // When the report is saved, those
                     // properties will be saved with the report args
                     // and will no longer be empty.
-                    if(!reportArgs.colorScaleType){
+                    if(!reportArgs.colorScaleType) {
                         var patternConfig = config.byId('pattern');
-                        if(patternConfig){
+                        if(patternConfig) {
                             this._updateColorConfiguration(config);
                         }
                     }
@@ -262,13 +264,13 @@ define([
                 },
 
                 // TODO: Taken from analyzer.ColorConfiguration#onModelEvent
-                _updateColorConfiguration: function(config){
+                _updateColorConfiguration: function(config) {
                     var pattern = config.byId("pattern" ).value;
                     var colors  = config.byId("colorSet").value;
                     var suffix = "";
                     var scalingType;
                     // compute an array
-                    if(pattern == "GRADIENT"){
+                    if(pattern == "GRADIENT") {
                       //smooth gradient based on range
                       scalingType = "linear";
                       suffix = "-5";
@@ -281,9 +283,9 @@ define([
 
                     var reverse = config.byId("reverseColors").value;
                     var palette = this.palettes[colors+suffix];
-                    if(reverse){
+                    if(reverse) {
                       var newPalette = [];
-                      for(var i = palette.length-1; i >= 0; i--){
+                      for(var i = palette.length-1; i >= 0; i--) {
                         newPalette.push(palette[i]);
                       }
                       palette = newPalette;
@@ -292,9 +294,9 @@ define([
                     this._setColorRange(palette);
                 },
 
-                _updateTrendUI: function(config){
+                _updateTrendUI: function(config) {
                     var trendTypeConfig = config.byId('trendType');
-                    if(trendTypeConfig){
+                    if(trendTypeConfig) {
                         var trendType = trendTypeConfig.value;
                         var hidden = !trendType || trendType === 'none';
 
@@ -314,7 +316,7 @@ define([
             declare("analyzer.CCCHeatgridVizConfig", [analyzer.CCCVizConfig], {
 
                 onModelEvent: function (config, item, eventName, args) {
-                    switch(eventName){
+                    switch(eventName) {
                         case 'insertAt':
                         case 'gems': // move gem
                             this._updateOptions(config);
@@ -324,14 +326,15 @@ define([
                     this.inherited(arguments); // ends up calling updateConfiguration
                 },
 
-                updateConfiguration: function(config){
+                updateConfiguration: function(config) {
                     this._updateOptions(config);
 
                     this.inherited(arguments);
                 },
 
-                _updateOptions: function(config){
-                    // Required logic, both size and color required by default, turn required off one when the other is filled.
+                _updateOptions: function(config) {
+                    // Required logic, both size and color required by default, 
+                    // turn required off one when the other is filled.
 
                     var colorBy = config.byId("color");
                     var sizeBy  = config.byId("size");
@@ -345,7 +348,7 @@ define([
 
                 onModelEvent: function (config, item, eventName, args) {
                     // Moving or adding a gem may cause the color options to appear/disappear
-                    switch(eventName){
+                    switch(eventName) {
                         case 'insertAt':
                         case 'gems': // move gem
                             this._updateMeasuresOptions(config);
@@ -355,13 +358,13 @@ define([
                     this.inherited(arguments); // ends up calling updateConfiguration
                 },
 
-                updateConfiguration: function(config){
+                updateConfiguration: function(config) {
                     this._updateMeasuresOptions(config);
 
                     this.inherited(arguments);
                 },
 
-                _updateMeasuresOptions: function(config){
+                _updateMeasuresOptions: function(config) {
                     // Required logic, at least one of measuresBar or measuresLine is required by default
                     var measuresBar  = config.byId("measures");
                     var measuresLine = config.byId("measuresLine");
@@ -372,9 +375,7 @@ define([
                     // Show/hide line color options
                     var visible = measuresLine.gems.length > 0;
                     ["shape", "lineWidth"]
-                    .forEach(function(id){
-                        config.byId(id).ui.hidden = !visible;
-                    })
+                    .forEach(function(id) { config.byId(id).ui.hidden = !visible; });
                 }
             });
 
@@ -382,7 +383,7 @@ define([
 
                 onModelEvent: function (config, item, eventName, args) {
                     // Moving or adding a gem may cause the color options to appear/disappear
-                    switch(eventName){
+                    switch(eventName) {
                         case 'insertAt':
                         case 'gems': // move gem
                             this._updateColorRoleOptions(config);
@@ -392,12 +393,12 @@ define([
                     this.inherited(arguments); // ends up calling updateConfiguration
                 },
 
-                updateConfiguration: function(config){
+                updateConfiguration: function(config) {
                     this._updateColorRoleOptions(config);
                     this.inherited(arguments);
                 },
 
-                _updateColorRoleOptions: function(config){
+                _updateColorRoleOptions: function(config) {
                     var colorBy = config.byId("color");
 
                     colorBy.allowMultiple = !colorBy.gems.length ||
@@ -411,30 +412,21 @@ define([
                 }
             });
 
-            // Register CCC Visualizations
+            // Register CCC Visualizations with Analyzer
             var vizIds = [
                 'ccc_bar',
                 'ccc_barstacked',
                 'ccc_barnormalized',
-
                 'ccc_horzbar',
                 'ccc_horzbarstacked',
                 'ccc_horzbarnormalized',
-
                 'ccc_pie',
                 'ccc_line',
                 'ccc_area',
-
                 'ccc_scatter',
                 'ccc_barline',
                 'ccc_heatgrid',
                 'ccc_sunburst'
-
-                //'ccc_treemap' - See ANALYZER-1983
-
-                //'ccc_waterfall',
-                //'ccc_boxplot'
-                //'ccc_bulletchart'
             ];
 
             var vizCustomConfigs = {
