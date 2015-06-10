@@ -1,0 +1,17 @@
+{
+    "name": "VizAPI JS Documentation",
+    "description": "Pentaho JavaScript Visualization API",
+    "version": "5.3",
+    "url": "localhost",
+    "options": {
+      "lint": false,
+      "linkNatives": "true",
+      "attributesEmit": "true",
+      "paths":    ["package-res/resources/web/vizapi/"],
+      "exclude":  "package-res/resources/web/vizapi/ccc",
+      "outdir":   "doc-js/vizapi/",
+      "markdown": {
+        "html": true
+      }
+    }
+}

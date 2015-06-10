@@ -1,5 +1,5 @@
 /*!
-* Copyright 2010 - 2013 Pentaho Corporation.  All rights reserved.
+* Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -12,8 +12,16 @@
 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 * See the License for the specific language governing permissions and
 * limitations under the License.
-*
 */
+define([
+    "./AbstractBarChart"
+], function(AbstractBarChart) {
 
-// This script informs Analyzer that it should request the ccc_analyzer_plugin.js through RequireJS
-analyzerVizPlugins.push("common-ui/vizapi/ccc/ccc_analyzer_plugin");
+    return AbstractBarChart.extend({
+        methods: {
+            _options: {
+                stacked: true
+            }
+        }
+    });
+});

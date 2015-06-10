@@ -30,11 +30,11 @@ var webAppPath = "/" + pathArray[1];
  * @param solution String name of the solution containing the action sequence definition being called
  * @param path String path to the action sequence definition being called
  * @param action String name of the action sequence definition being called
- * @param params Array containing the parameters for the query string 
- * @param func String, object, or function. It is optional. Refers to the function to call 
+ * @param params Array containing the parameters for the query string
+ * @param func String, object, or function. It is optional. Refers to the function to call
  * asynchronously when the client receives the server's response. If the parameter is:
  *   null or undefined:
- *     the request to the server is synchronous, and the response is returned 
+ *     the request to the server is synchronous, and the response is returned
  *     by this method.
  *   of type String or string:
  *     the name of the function to call
@@ -43,17 +43,17 @@ var webAppPath = "/" + pathArray[1];
  *   of type object, where the object has the properties obj and method:
  *     func.obj is the object to call the method func.method on,
  *     e.g. obj.method()
- * 
+ *
  * @return String containing the server's response if func is not null or undefined,
  * null if the call is asynchronous.
- * 
+ *
  * @throws Error when unable to create an XMLHttpRequest object
  */
 function pentahoAction( solution, path, action, params, func ) {
 	// execute an Action Sequence on the server
 
 	var url = WEB_CONTEXT_BASE + "ViewAction";
-	
+
 	// create the URL we need
 	var query = "wrapper=false&solution="+solution+"&path="+path+"&action="+action;
 	// add any parameters provided
@@ -65,14 +65,14 @@ function pentahoAction( solution, path, action, params, func ) {
 	}
 	// submit this as a post
 	return pentahoPost( url, query, func );
-}    
+}
 /**
  * @param component String
- * @param params Array containing the parameters for the query string 
- * @param func String, object, or function. It is optional. Refers to the function to call when the client 
+ * @param params Array containing the parameters for the query string
+ * @param func String, object, or function. It is optional. Refers to the function to call when the client
  * receives the server's response. If the parameter is:
  *   null or undefined:
- *     the request to the server is synchronous, and the response is returned 
+ *     the request to the server is synchronous, and the response is returned
  *     by this method.
  *   of type String or string:
  *     the name of the function to call
@@ -82,17 +82,17 @@ function pentahoAction( solution, path, action, params, func ) {
  *     func.obj is the object to call the method func.method on,
  *     e.g. obj.method()
  * @param mimeType String optional, specifies the mime type of the response
- * 
+ *
  * @return String containing the server's response if func is not null or undefined,
  * null if the call is asynchronous.
- * 
+ *
  * @throws Error when unable to create an XMLHttpRequest object
  */
 function pentahoService( component, params, func, mimeType ) {
 	// execute a web service on the server
 	// create the URL we need
 	var url = WEB_CONTEXT_BASE + "ServiceAction";
-	
+
 	var query = "ajax=true&";
 	if( component ) {
 		query += "component="+component+"&";
@@ -104,7 +104,7 @@ function pentahoService( component, params, func, mimeType ) {
 			query += "&" +encodeURIComponent( params[idx][0] ) + "=" + encodeURIComponent( params[idx][1] );
 		}
 	}
-	
+
 	// submit this as a post
 	return pentahoPost( url, query, func, mimeType );
 }
@@ -112,10 +112,10 @@ function pentahoService( component, params, func, mimeType ) {
 /**
  * @param url String url of the web service/servlet
  * @param query String containing the message to send to the server
- * @param func String, object, or function. It is optional. Refers to the function to call when the client 
+ * @param func String, object, or function. It is optional. Refers to the function to call when the client
  * receives the server's response. If the parameter is:
  *   null or undefined:
- *     the request to the server is synchronous, and the response is returned 
+ *     the request to the server is synchronous, and the response is returned
  *     by this method.
  *   of type String or string:
  *     the name of the function to call
@@ -125,11 +125,11 @@ function pentahoService( component, params, func, mimeType ) {
  *     func.obj is the object to call the method func.method on,
  *     e.g. obj.method()
  * @param mimeType String optional, specifies the mime type of the response
- * @param allowCaching If not true a unique request string will be generated 
- * 
+ * @param allowCaching If not true a unique request string will be generated
+ *
  * @return String containing the server's response if func is not null or undefined,
  * null if the call is asynchronous.
- * 
+ *
  * @throws Error when unable to create an XMLHttpRequest object
  */
 function pentahoGet( url, query, func, mimeType, allowCaching ) {
@@ -154,7 +154,7 @@ function pentahoGet( url, query, func, mimeType, allowCaching ) {
         } catch (e) {
             try {
                 http_request = new ActiveXObject("Microsoft.XMLHTTP");
-            } catch (e) 
+            } catch (e)
             {
             	http_request = null;
             }
@@ -164,13 +164,13 @@ function pentahoGet( url, query, func, mimeType, allowCaching ) {
     if (!http_request) {
         throw new Error('Cannot create an XMLHTTP instance');
     }
-    
+
     // set the callback function
 	  if ( async )
 	  {
 	    http_request.onreadystatechange = function() { pentahoResponse(http_request, func); };
 	  }
-	
+
 	  if (allowCaching !== true) {
 	    var time = new Date().getTime();
 	    query = query + (query.length === 0 ? "" : "&") + time + "=" + time;
@@ -202,10 +202,10 @@ function getNotFoundMsg()
 /**
  * @param url String url of the web service/servlet
  * @param query String containing the message to send to the server
- * @param func String, object, or function. It is optional. Refers to the function to call when the client 
+ * @param func String, object, or function. It is optional. Refers to the function to call when the client
  * receives the server's response. If the parameter is:
  *   null or undefined:
- *     the request to the server is synchronous, and the response is returned 
+ *     the request to the server is synchronous, and the response is returned
  *     by this method.
  *   of type String or string:
  *     the name of the function to call
@@ -215,21 +215,21 @@ function getNotFoundMsg()
  *     func.obj is the object to call the method func.method on,
  *     e.g. obj.method()
  * @param mimeType String optional, specifies the mime type of the response
- * 
+ *
  * @return String containing the server's response if func is not null or undefined,
  * null if the call is asynchronous.
- * 
+ *
  * @throws Error when unable to create an XMLHttpRequest object
  */
 function pentahoPost( url, query, func, mimeType ) {
 	var async = undefined != func && null != func;
-	
+
 	var http_request = null;
 	var returnType = "text/xml";
 	if( mimeType ) {
 		returnType = mimeType;
 	}
-  
+
 	// create an HTTP request object
 	if (window.XMLHttpRequest) { // Mozilla, Safari,...
 		http_request = new XMLHttpRequest();
@@ -242,7 +242,7 @@ function pentahoPost( url, query, func, mimeType ) {
 		} catch (e) {
 			try {
 				http_request = new ActiveXObject("Microsoft.XMLHTTP");
-			} catch (e) 
+			} catch (e)
 			{
 				http_request = null;
 			}
@@ -251,7 +251,7 @@ function pentahoPost( url, query, func, mimeType ) {
 	if (!http_request) {
 		throw new Error('Cannot create XMLHTTP instance');
 	}
-  
+
   // set the callback function
   if ( async )
   {
@@ -261,8 +261,11 @@ function pentahoPost( url, query, func, mimeType ) {
   // submit the request
   http_request.open('POST', url, async);
   http_request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-  http_request.setRequestHeader("Content-length", query.length);
-  http_request.setRequestHeader("Connection", "close");
+
+  // These headers are forbidden for security reasons.
+  // See http://www.w3.org/TR/XMLHttpRequest/#the-setrequestheader%28%29-method.
+  //http_request.setRequestHeader("Content-length", query.length);
+  //http_request.setRequestHeader("Connection", "close");
 	http_request.send(query);
 	if ( !async )
 	{
@@ -276,9 +279,9 @@ function pentahoPost( url, query, func, mimeType ) {
 
 /**
  * NOTE: http://radio.javaranch.com/pascarello/2006/02/07/1139345471027.html discusses the necessity of the try/catch block
- * 
+ *
  * @param http_request instance of XMLHttpRequest object, actually object is platform dependent.
- * @param func String, object, or function. Required. Refers to the function to call when the client 
+ * @param func String, object, or function. Required. Refers to the function to call when the client
  * receives the server's response. If the parameter is:
  *   of type String or string:
  *     the name of the function to call
@@ -289,13 +292,13 @@ function pentahoPost( url, query, func, mimeType ) {
  *     e.g. obj.method()
  */
 function pentahoResponse(http_request, func) {
-  
+
 	// see if we got a good response back
 	if (http_request.readyState == COMPLETE ) {
 		try
 		{
 			var content = getResponse( http_request );
-			
+
 			// execute the callback function
 			if ( typeof( func ) == "function" )
 			{
