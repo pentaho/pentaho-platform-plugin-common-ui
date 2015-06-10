@@ -6,6 +6,7 @@ codegen-lib/
 test-lib/
 doc-js/
 eclipse-bin/
+doc-js
 build-res/pentaho-js-build/
 build-res/module-scripts/
 build-res/requireCfg-raw.js
