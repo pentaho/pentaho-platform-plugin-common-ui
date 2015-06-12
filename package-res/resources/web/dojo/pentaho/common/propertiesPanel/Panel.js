@@ -298,7 +298,8 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
             destroy: function() {
               this.inherited(arguments);
 
-              this.model = this.propPanel = null;
+              // this.model = null;
+              // this.propPanel = null;
 
               if(this._watchHandle) {
                 this._watchHandle.remove();
@@ -353,7 +354,8 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
 
         destroy: function() {
           this.inherited(arguments);
-          this.dropIndicator = this.gemUIbeingInserted = this.gemBar = null;
+          this.dropIndicator = this.gemUIbeingInserted = null;
+          // this.gemBar = null
         },
 
         _redirectMouseUp: function (e) {
@@ -403,7 +405,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
               gemUI.gemBar = this.gemBar;
             }
           } else {
-            var gem = this.createGemFromNode(droppedNode);
+            gem = this.createGemFromNode(droppedNode);
             gemUI = this.createGemUI(gem, droppedNode);
             nodes[0] = gemUI.domNode;
           }
@@ -832,16 +834,18 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
               }
 
               this.dropZoneNode = null;
+              this.placeholder = null;
+              /*
               if(this.dropZone) {
                 this.dropZone.destroy();
                 this.dropZone = null;
               }
 
-              this.placeholder = null;
               if(this._placeHolderSource) {
                 this._placeHolderSource.destroy();
                 this._placeHolderSource = null;
               }
+              */
 
               this.inherited(arguments);
 
@@ -875,8 +879,8 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
                 this.handles = null;
               }
               this.menuHandle = null;
-              this.postDrop   = null;
-              this.gemBar     = null;
+              //this.postDrop   = null;
+              //this.gemBar     = null;
 
               // Prevent leak
               this._startupWidgets = null;
