@@ -19,7 +19,7 @@ define(["dojo/dom-geometry", "dojo/dom", "dojo/_base/window"], function(geom, do
 
   describe("PRD-5440", function() {
     it("should mute an error thrown when asking bounds of a node detached from main tree", function() {
-      spyOn(dom, 'byId').andCallFake(function(p) {
+      spyOn(dom, 'byId').and.callFake(function(p) {
         return p;
       });
       spyOn(win, 'body');
