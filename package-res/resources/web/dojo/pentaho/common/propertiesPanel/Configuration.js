@@ -82,21 +82,39 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
           "pentaho.common.propertiesPanel.GemBar",
           [pentaho.common.propertiesPanel.Property],
           {
-            gems: [],
+            gems: null,
+            selectedGem: null,
             allowMultiple: true,
-            constructor: function (item) {
+
+            constructor: function(item) {
             },
-            initializeGem: function (gemJson) {
-              var gem = new pentaho.common.propertiesPanel.Configuration.registeredTypes["gem"](gemJson);
-              gem.postCreate();
-              this.gems.push(gem);
-            },
+
             postCreate: function () {
               var originalGems = this.gems;
               this.gems = [];
               array.forEach(originalGems, this.initializeGem, this);
-
             },
+
+            initializeGem: function(gemJson) {
+              var gem = new Configuration.registeredTypes["gem"](gemJson);
+              gem.postCreate();
+              this.gems.push(gem);
+            },
+
+            createGemFromNode: function(sourceNode) {
+              var GemClass = Configuration.registeredTypes["gem"];
+              var options = {
+                      id:         "gem-" + sourceNode.id,
+                      value:      sourceNode.innerHTML,
+                      gemBar:     this,
+                      sourceNode: sourceNode,
+                      dndType:    sourceNode.getAttribute("dndType")
+                    };
+
+              // check to see if it's a factory class
+              return GemClass.create ? GemClass.create(options) : new GemClass(options);
+            },
+
             remove: function (gem) {
               this.gems.splice(this.gems.indexOf(gem), 1);
 
@@ -104,6 +122,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
               this.set("gems", this.gems);
               this.onModelEvent("removedGem", {gem: gem});
             },
+
             add: function (gem) {
               this.gems.push(gem);
 
@@ -111,10 +130,12 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
               this.set("gems", this.gems);
               this.onModelEvent("insertAt", {gem: gem, idx: this.gems.length, oldIdx: -1});
             },
+
             reorder: function () {
               this.set("gems", this.gems);
               this.onModelEvent("reorderedGems", {});
             },
+
             insertAt: function (gem, newIdx, oldIdx) {
               var currIdx = array.indexOf(this.gems, gem);
               this.gems.splice(newIdx, 0, gem); // add it to the new pos
@@ -130,13 +151,9 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
                 newIdx--;
               }
               this.onModelEvent("insertAt", {gem: gem, idx: newIdx, oldIdx: oldIdx});
-            },
+            }
+          });
 
-            gems: [],
-            selectedGem: null
-
-          }
-      );
       Configuration.registeredTypes["gemBar"] = pentaho.common.propertiesPanel.GemBar;
       Configuration.registeredTypes["gem"] = pentaho.common.propertiesPanel.Property;
       Configuration.registeredTypes["combo"] = pentaho.common.propertiesPanel.Property;

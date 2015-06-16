@@ -27,8 +27,13 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
   ,"pentaho/common/Messages", "dojo/_base/array", "dojo/_base/lang", "dojo/html", "dojo/dom-construct",
   "dojo/string", "dojo/dom-class", "pentaho/common/propertiesPanel/Configuration", "dijit/registry", "dojo/dnd/Target",
   "dojo/dnd/Source", "dojo/Evented", "dojo/topic", "dojo/dnd/Manager", "dojo/dom", "dojo/dom-geometry", "dojo/aspect"],
-    function (declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, on, query, ContentPane, BorderContainer, HorizontalSlider, TextBox, ComboBox, ItemFileReadStore, Select, CheckBox, TitlePane, Messages, array, lang, html, construct, string, domClass, Configuration, registry, Target, Source, Evented, topic, ManagerClass,
+    function(declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, on, query, ContentPane, BorderContainer, HorizontalSlider, TextBox, ComboBox, ItemFileReadStore, Select, CheckBox, TitlePane, Messages, array, lang, html, construct, string, domClass, Configuration, registry, Target, Source, Evented, topic, ManagerClass,
               dom, geometry, aspect) {
+
+      var nextId = 0;
+      function newId(prefix) {
+        return prefix + (++nextId);
+      }
 
       var Panel = declare("pentaho.common.propertiesPanel.Panel",
           [ContentPane, Evented],
@@ -40,172 +45,73 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
             gutters: false,
             baseClass: "pentahoPropertiesPanel",
             minHeightDeviation: 0,
-            constructor: function (propertiesConfiguration) {
+
+            _gemUIByGemId: null,
+
+            constructor: function(propertiesConfiguration) {
               this.configuration = propertiesConfiguration;
+              this._gemUIByGemId = {};
             },
-            postCreate: function () {
+
+            postCreate: function() {
               array.forEach(this.configuration.items, lang.hitch(this, "initializeItem"));
 
               //var placeholderPanel = new dijit.layout.ContentPane({region: "center", splitter: false});
               //this.domNode.appendChild(placeholderPanel.domNode);
               this.inherited(arguments);
             },
-            resize: function () {
+
+            resize: function() {
               this.minHeightDeviation = 0; // zero out adjustments
               this.inherited(arguments);
             },
-            initializeItem: function (item) {
-              if (item.ui.hidden) {
-                return;
-              }
+
+            initializeItem: function(item) {
+              if(item.ui.hidden) { return; }
+
               // Lookup class impl from map
-              var layoutClass = Panel.registeredTypes[item.ui.type];
-              if (!layoutClass) {
+              var LayoutItemClass = Panel.registeredTypes[item.ui.type];
+              if(!LayoutItemClass) {
                 throw "No Properties Panel UI implementation found for " + item.ui.type;
               }
 
-              var propUi;
+              var propUI;
               // check to see if it's a factory class
-              if (layoutClass.create) {
-                propUi = layoutClass.create({model: item, propPanel: this});
+              if(LayoutItemClass.create) {
+                propUI = LayoutItemClass.create({model: item, propPanel: this});
               } else {
-                propUi = new layoutClass({model: item, propPanel: this});
+                propUI = new LayoutItemClass({model: item, propPanel: this});
               }
+
               var targetNode = this.domNode;
-              var groupId = item.ui.group;
 
               // If the property is grouped, create the group or add it to the existing one.
-              if (groupId) {
-                var group = this.groups[groupId];
-                var groupConfig = this.configuration.groups[item.ui.group];
-                if (!group && groupConfig) {
-                  var groupContents = document.createElement("div");
-
-                  var outterThis = this;
-                  group = new TitlePane({
-                    title: Messages.getString(groupConfig.title, groupConfig.title),
-                    content: groupContents,
-                    region: 'top',
-                    splitter: false
-                  });
-                  aspect.after(group,  "resize",  function () {
-
-
-                    var lastChild = geometry.position(outterThis.domNode.children[outterThis.domNode.children.length - 1]);
-                    var totalNumOfGroups = 0;
-                    var totalGroupHeight = 0;
-                    var totalNonGroupHeight = 0;
-
-                    var minHeightAdjustment = 0;
-                    for (var g in outterThis.groups) {
-                      totalNumOfGroups++;
-                      var gp = outterThis.groups[g];
-                      var titleBarHeight = geometry.position(gp.titleBarNode).h
-                      totalGroupHeight += (gp.open) ? titleBarHeight + gp.hideNode.scrollHeight : 0;
-                      if (gp.open) {
-                        minHeightAdjustment += (gp.usingMinHeight) ? gp.heightAdjustment : 0;
-                      } else {
-                        minHeightAdjustment += titleBarHeight;
-                      }
-                    }
-                    array.forEach(outterThis.domNode.children, function (node) {
-                      if (!node.className.match(/dijitTitlePane/)) {
-                        totalNonGroupHeight += geometry.position(node).h;
-                      }
-                    });
-                    var panelHeight = geometry.position(outterThis.domNode).h;
-                    // if(totalGroupHeight + totalNonGroupHeight < panelHeight - /*margins*/ 20){
-                    //   // plenty of space, make natural size
-                    //   var gHeight = geometry.position(group.titleBarNode).h + group.hideNode.scrollHeight;
-                    //   group.domNode.style.height = gHeight + "px";
-                    //   group.hideNode.style.height = (gHeight - geometry.position(group.titleBarNode).h)+ "px";
-                    // } else {
-                    // divide up available room based on relative sizes of panels
-                    var remainderToDivide = geometry.position(outterThis.domNode).h - totalNonGroupHeight - minHeightAdjustment;
-
-                    var titleCoords = geometry.position(group.titleBarNode);
-                    var titleBarHeight = titleCoords.h;
-                    var titleBarWidth = titleCoords.w;
-                    if (group.open) {
-                      var naturalHeight = titleBarHeight + group.hideNode.scrollHeight;
-
-                      var calculatedHeight = (naturalHeight / totalGroupHeight) * remainderToDivide;
-                      if (calculatedHeight > naturalHeight) {
-                        // No need to scroll
-                        group.hideNode.style.overflow = "hidden";
-                        //previously scrolling divs don't always relayout when scrolling is disabled. set width to fix
-                        group.wipeNode.style.width = titleBarWidth + "px";
-                      } else {
-                        group.hideNode.style.overflow = "auto";
-                        group.wipeNode.style.width = "";
-                      }
-
-                      // ensure minimum height
-                      var minHeightFactor = 2.2;
-                      if (calculatedHeight < titleBarHeight * minHeightFactor) {
-                        group.usingMinHeight = true;
-                        group.heightAdjustment = titleBarHeight * minHeightFactor - calculatedHeight;
-                        calculatedHeight = titleBarHeight * minHeightFactor;
-                      } else {
-                        group.usingMinHeight = false;
-                      }
-                      if (!isNaN(calculatedHeight)) {
-                        group.domNode.style.height = calculatedHeight + "px";
-                      }
-
-                      if (geometry.position(group.domNode).h > 0) {
-                        group.hideNode.style.height = Math.min((geometry.position(group.domNode).h - titleBarHeight), group.hideNode.scrollHeight) + "px";
-                      }
-                    } else {
-                      if (!isNaN(titleBarHeight)) {
-                        group.domNode.style.height = titleBarHeight + "px";
-                      }
-                      group.usingMinHeight = false;
-                    }
-                    group.domNode.style.width = "";
-
-                    // }
-
-                    // setTimeout(function(){
-                    //   group._splitterWidget.domNode.style.top = Math.min(parseInt(group._splitterWidget.domNode.style.top), (parseInt(group.domNode.style.top) + parseInt(group.domNode.style.height))) + "px";
-                    // });
-
-                  });
-
-                  aspect.after(group._wipeOut, "onEnd", function () {
-                    outterThis.resize();
-                  });
-
-                  aspect.after(group._wipeIn, "onEnd", function () {
-                    outterThis.resize();
-                  });
-                  this.groups[groupId] = group;
-                  this.domNode.appendChild(group.domNode);
-                }
-                targetNode = group.content;
+              var groupId = item.ui.group;
+              if(groupId) {
+                var group = this._getOrCreateGroup(groupId);
+                if(group) { targetNode = group.content; }
               }
 
               // Items can request a separator to be inserted before themselves
-
-              if (item.ui.seperator) {
+              if(item.ui.seperator) {
                 targetNode.appendChild(construct.toDom(this.seperatorTemplate));
               }
 
-              // Items can have a caption. If specified, create and add it before the property UI component
-              if (item.ui.caption) {
-
+              // Items can have a caption.
+              // If specified, create and add it before the property UI component
+              if(item.ui.caption) {
                 var cap = construct.toDom(string.substitute(this.captionTemplate, item, null,
                     {
-                      i18n: function (value, key) {
+                      i18n: function(value, key) {
                         return Messages.getString(value, value);
                       }
                     }));
 
                 // support the new Themeable way
                 var img = query("i", cap);
-                if (img && img != null && img.length > 0) {
+                if(img && img != null && img.length > 0) {
                   img = img[img.length - 1]; //select the last i tag found
-                  if (item.ui.captionIcon) {
+                  if(item.ui.captionIcon) {
                     domClass.add(img, item.ui.captionIcon);
                   } else {
                     img.style.display = "none";
@@ -216,119 +122,274 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
               }
 
               // Route UI events to onPropertyChange
-              this.setupEventHandling(propUi);
-              this.propUIs.push(propUi);
-              this.own(on(propUi, "UIEvent", lang.hitch(this, "onUIEvent")));
-              domClass.add(propUi.domNode, "propPanelItem")
-              targetNode.appendChild(propUi.domNode);
-              this.resize();
+              this.setupEventHandling(propUI);
 
+              if(propUI instanceof GemUI) this.registerGemUI(propUI);
+
+              this.propUIs.push(propUI);
+              this.own(on(propUI, "UIEvent", lang.hitch(this, "onUIEvent")));
+              domClass.add(propUI.domNode, "propPanelItem")
+
+              targetNode.appendChild(propUI.domNode);
+
+              this.resize();
             },
 
-            onUIEvent: function (type, args) {
+            _getOrCreateGroup: function(groupId) {
+              var group = this.groups[groupId];
+              if(!group) {
+                var groupConfig = this.configuration.groups[groupId];
+                if(groupConfig)
+                  group = this._createGroup(groupId, groupConfig);
+              }
+              return group;
+            },
+
+            _createGroup: function(groupId, groupConfig) {
+              var group = new TitlePane({
+                    title:    Messages.getString(groupConfig.title, groupConfig.title),
+                    content:  document.createElement("div"),
+                    region:   'top',
+                    splitter: false
+                  });
+
+              aspect.after(group, "resize", lang.hitch(this, function() {
+                this._resizeGroup(group);
+              }));
+
+              aspect.after(group._wipeOut, "onEnd", lang.hitch(this, "resize"));
+              aspect.after(group._wipeIn,  "onEnd", lang.hitch(this, "resize"));
+
+              this.domNode.appendChild(group.domNode);
+
+              return (this.groups[groupId] = group);
+            },
+
+            _resizeGroup: function(group) {
+              var lastChild = geometry.position(this.domNode.children[this.domNode.children.length - 1]);
+              var totalNumOfGroups = 0;
+              var totalGroupHeight = 0;
+              var totalNonGroupHeight = 0;
+
+              var minHeightAdjustment = 0;
+              for(var g in this.groups) {
+                totalNumOfGroups++;
+                var gp = this.groups[g];
+                var titleBarHeight = geometry.position(gp.titleBarNode).h
+                totalGroupHeight += (gp.open) ? titleBarHeight + gp.hideNode.scrollHeight : 0;
+                if(gp.open) {
+                  minHeightAdjustment += (gp.usingMinHeight) ? gp.heightAdjustment : 0;
+                } else {
+                  minHeightAdjustment += titleBarHeight;
+                }
+              }
+
+              array.forEach(this.domNode.children, function(node) {
+                if(!node.className.match(/dijitTitlePane/)) {
+                  totalNonGroupHeight += geometry.position(node).h;
+                }
+              });
+
+              var panelHeight = geometry.position(this.domNode).h;
+              // if(totalGroupHeight + totalNonGroupHeight < panelHeight - /*margins*/ 20){
+              //   // plenty of space, make natural size
+              //   var gHeight = geometry.position(group.titleBarNode).h + group.hideNode.scrollHeight;
+              //   group.domNode.style.height = gHeight + "px";
+              //   group.hideNode.style.height = (gHeight - geometry.position(group.titleBarNode).h)+ "px";
+              // } else {
+              // divide up available room based on relative sizes of panels
+              var remainderToDivide = geometry.position(this.domNode).h - totalNonGroupHeight - minHeightAdjustment;
+
+              var titleCoords = geometry.position(group.titleBarNode);
+              var titleBarHeight = titleCoords.h;
+              var titleBarWidth = titleCoords.w;
+              if(group.open) {
+                var naturalHeight = titleBarHeight + group.hideNode.scrollHeight;
+
+                var calculatedHeight = (naturalHeight / totalGroupHeight) * remainderToDivide;
+                if(calculatedHeight > naturalHeight) {
+                  // No need to scroll
+                  group.hideNode.style.overflow = "hidden";
+                  //previously scrolling divs don't always relayout when scrolling is disabled. set width to fix
+                  group.wipeNode.style.width = titleBarWidth + "px";
+                } else {
+                  group.hideNode.style.overflow = "auto";
+                  group.wipeNode.style.width = "";
+                }
+
+                // ensure minimum height
+                var minHeightFactor = 2.2;
+                if(calculatedHeight < titleBarHeight * minHeightFactor) {
+                  group.usingMinHeight = true;
+                  group.heightAdjustment = titleBarHeight * minHeightFactor - calculatedHeight;
+                  calculatedHeight = titleBarHeight * minHeightFactor;
+                } else {
+                  group.usingMinHeight = false;
+                }
+
+                if(!isNaN(calculatedHeight)) {
+                  group.domNode.style.height = calculatedHeight + "px";
+                }
+
+                if(geometry.position(group.domNode).h > 0) {
+                  group.hideNode.style.height = Math.min((geometry.position(group.domNode).h - titleBarHeight), group.hideNode.scrollHeight) + "px";
+                }
+              } else {
+                if(!isNaN(titleBarHeight)) {
+                  group.domNode.style.height = titleBarHeight + "px";
+                }
+                group.usingMinHeight = false;
+              }
+              group.domNode.style.width = "";
+
+              // }
+
+              // setTimeout(function(){
+              //   group._splitterWidget.domNode.style.top = Math.min(parseInt(group._splitterWidget.domNode.style.top), (parseInt(group.domNode.style.top) + parseInt(group.domNode.style.height))) + "px";
+              // });
+            },
+
+            onUIEvent: function(type, args) {
               on.emit(this, type, args);
             },
-            setupEventHandling: function (ui) {
 
-              this.own(on(ui, "contextMenu", function (e) {
+            registerGemUI: function(gemUI) {
+              this._gemUIByGemId[gemUI.model.id] = gemUI;
+            },
+
+            unregisterGemUI: function(gemUI) {
+              delete this._gemUIByGemId[gemUI.model.id];
+            },
+
+            getGemUIById: function(id) {
+              if(id) {
+                var m = /^gem_(.*?)(:?_\d+)?$/.exec(id);
+                if(m) id = m[1];
+                return this._gemUIByGemId[id];
+              }
+            },
+
+            setupEventHandling: function(ui) {
+              this.own(on(ui, "contextMenu", function(e) {
                 this.onUIEvent("onContextMenu", {item: ui, args: [ui, e]});
               }));
-              this.own(on(ui, "click", function (e) {
+              this.own(on(ui, "click", function(e) {
                 this.onUIEvent("onClick", {item: ui, args: [ui, e]});
               }));
-              this.own(on(ui, "dblclick", function (e) {
+              this.own(on(ui, "dblclick", function(e) {
                 this.onUIEvent("onDblClick", {item: ui, args: [ui, e]});
               }));
             },
 
-            setConfiguration: function (configJson) {
+            setConfiguration: function(configJson) {
               this._setConfiguration(new Configuration(configJson));
             },
-            _setConfiguration: function (config) {
-              this.propUIs.forEach(function (widget) {
-                widget.destroyRecursive();
-              });
-              for(var gid in this.groups) {
-                this.groups[gid].destroyRecursive();
-              }
+
+            _setConfiguration: function(config) {
+              if(this.propUIs.length) this._destroyChildrenDeferred();
 
               this.propUIs = [];
-              this.groups = {};
+              this.groups  = {};
+              this._gemUIByGemId = {};
+
               this.domNode.innerHTML = "";
               this.configuration = config;
               this.postCreate();
             },
-            reload: function () {
+
+            _destroyChildrenDeferred: function() {
+              var oldChildren = this.getChildren();
+
+              function destroyOldChildren() {
+                array.forEach(oldChildren, function(w) { w.destroyRecursive(); });
+              }
+
+              window.setTimeout(destroyOldChildren, 0);
+            },
+
+            reload: function() {
               this._setConfiguration(this.configuration);
             },
-            set: function (property, id, value) {
-              array.forEach(this.propUIs, function (prop) {
-                if (prop.model.id == id) {
+
+            set: function(property, id, value) {
+              array.forEach(this.propUIs, function(prop) {
+                if(prop.model.id == id) {
                   prop.model.set(property, value);
                 }
-              })
+              });
             }
           }
-
       );
+
       Panel.registeredTypes = {};
 
-      var StatefulUI = declare(
-          [],
-          {
-            constructor: function(options) {
-              this.model = options.model;
-              this.propPanel = options.propPanel;
+      var StatefulUI = declare([], {
+        constructor: function(options) {
+          this.model     = options.model;
+          this.propPanel = options.propPanel;
 
-              var outterThis = this;
-
-              this._watchHandle = this.model.watch(function(propName, prevVal, newVal) {
-                switch(propName) {
-                  case "value":
-                  case "default":
-                    if(!outterThis._destroyed) outterThis.set(propName, newVal);
-                    break;
-                }
-              });
-            },
-
-            onUIEvent: function(type, args) {
-            },
-
-            destroy: function() {
-              this.inherited(arguments);
-
-              // this.model = null;
-              // this.propPanel = null;
-
-              if(this._watchHandle) {
-                this._watchHandle.remove();
-                this._watchHandle = null;
-              }
+          this._watchHandle = this.model.watch(lang.hitch(this, function(propName, prevVal, newVal) {
+            switch(propName) {
+              case "value":
+              case "default":
+                if(!this._destroyed) this.set(propName, newVal);
+                break;
             }
+          }));
+        },
+
+        onUIEvent: function(type, args) {
+        },
+
+        destroy: function() {
+          this.inherited(arguments);
+
+          this.model =
+          this.propPanel = null;
+
+          // Otherwise the old widgets get replaced by the new ones when reloading,
+          // before being destroyed.
+          if(this._watchHandle) {
+            this._watchHandle.remove();
+            this._watchHandle = null;
           }
-      );
+        }
+      });
 
       var GemBarUISource = declare([Source], {
 
-        constructor: function (node) {
+        constructor: function(node) {
           this.dropIndicator = document.createElement("div");
           this.dropIndicator.className = "indicator";
           this.dropIndicator.id = "propertyPanelIndicator";
+          this.dropIndicator.style.display = "none";
+
+          // Source#topics
+          this.topics.push(
+            on(this.dropIndicator, "mouseover", lang.hitch(this, "_redirectMouseOver")),
+            on(this.dropIndicator, "mouseup",   lang.hitch(this, "_redirectMouseUp"  )));
+
           var line = document.createElement("div");
           line.className = "indicatorLine";
+
           this.dropIndicator.appendChild(line);
-          this.dropIndicator.style.display = "none";
-          on(this.dropIndicator, "mouseover", lang.hitch(this, "_redirectMouseOver"));
-          on(this.dropIndicator, "mouseup", lang.hitch(this, "_redirectMouseUp"));
+
           this.node.parentNode.appendChild(this.dropIndicator);
         },
 
-        _redirectMouseOver: function (e) {
+        destroy: function() {
+          this.inherited(arguments);
+
+          this.gemBar =
+          this.dropIndicator =
+          this.gemUIbeingInserted = null;
+        },
+
+        _redirectMouseOver: function(e) {
           var idx = this._getNodeUnderMouse(e);
           this.lastItemOver = idx;
-          if (idx > -1) {
-            if (document.createEvent) {
+          if(idx > -1) {
+            if(document.createEvent) {
               var evt = document.createEvent("MouseEvent");
               evt.initMouseEvent("mouseover", true, true, window, 0, e.screenX, e.screenY, e.clientX, e.clientY,
                   e.ctrlKey, e.altKey, e.shiftKey, e.metaKey, 0, null);
@@ -341,205 +402,169 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
                   e.ctrlKey, e.altKey, e.shiftKey, e.metaKey, 0, null);
               this.node.dispatchEvent(evt);
               this.node.children[idx].dispatchEvent(evt);
-            } else if (document.createEventObject) {
+            } else if(document.createEventObject) {
               var evt = document.createEventObject(window.event);
               evt.button = 1;
               this.node.children[idx].fireEvent("onmouseover", evt);
               this.node.children[idx].fireEvent("onmousemove", evt);
             }
-
           }
         },
 
-        destroy: function() {
-          this.inherited(arguments);
-          this.dropIndicator = this.gemUIbeingInserted = null;
-          // this.gemBar = null
-        },
-
-        _redirectMouseUp: function (e) {
+        _redirectMouseUp: function(e) {
           var idx = this._getNodeUnderMouse(e);
-          if (idx > -1) {
-            if (document.createEvent) {
+          if(idx > -1) {
+            if(document.createEvent) {
               var evt = document.createEvent("MouseEvent");
               evt.initMouseEvent("mouseup", true, true, window, 0, e.screenX, e.screenY, e.clientX, e.clientY,
                   e.ctrlKey, e.altKey, e.shiftKey, e.metaKey, 0, null);
               // this.node.dispatchEvent(evt);
               this.node.children[idx].dispatchEvent(evt);
-            } else if (document.createEventObject) {
+            } else if(document.createEventObject) {
               var evt = document.createEventObject(window.event);
               this.node.children[idx].fireEvent("onmouseup", evt);
             }
-
           }
         },
-        onDrop: function (source, nodes, copy, dropAtEnd) {
+
+        onDrop: function(source, nodes, copy, dropAtEnd) {
           this.dropAtEnd = dropAtEnd; // passed in by the placeholder source so we can know to insert at the end of the list
           this.dropZone2Zone = false; // flag moves from one gembar to another
 
-          if (!nodes || nodes.length == 0) {
+          if(!nodes || nodes.length == 0) {
             return false;
           }
+
           var droppedNode = nodes[0];
 
-          // Look for an existing gem for the same element
-          var gemUI = registry.byId(droppedNode.id);
-          if (!gemUI) {
-            registry.byId("gem-" + droppedNode.id);
-          }
-
-          if ((!gemUI || (gemUI && gemUI.gemBar != this.gemBar)) && !this.gemBar.checkAcceptance(this, nodes, /* showErrors */ true)) { //only check if not a reorder
+          // Look for an existing gem for the same element.
+          // Only check if not a reorder (same gemBar).
+          var gemUI = this.gemBar.propPanel.getGemUIById(droppedNode.id);
+          if((!gemUI || (gemUI && gemUI.gemBar != this.gemBar)) &&
+             !this.gemBar.checkAcceptance(this, nodes, /* showErrors */ true)) {
             return;
           }
+
           var gem;
-          if (gemUI) {
+          if(gemUI) {
             gem = gemUI.model;
-            if (gemUI.gemBar == this.gemBar) { //Reorder, notify model so it can fire an event
+            if(gemUI.gemBar == this.gemBar) { // Reorder, notify model so it can fire an event
               // fire reordered in insertNodes where we know more information
             } else {
               this.dropZone2Zone = true;
-              gemUI.gemBar.remove(gemUI, /* suppressEvent */ true);
+              gemUI.gemBar.remove(gemUI, /*suppressEvent:*/true);
               // for moves we cache the previous bar in order to add it to the move event
               gemUI.model.previousGemBar = gemUI.gemBar.model;
               gemUI.gemBar = this.gemBar;
             }
           } else {
-            gem = this.createGemFromNode(droppedNode);
+            gem   = this.createGemFromNode(droppedNode);
             gemUI = this.createGemUI(gem, droppedNode);
+
             nodes[0] = gemUI.domNode;
           }
+
           this.gemUIbeingInserted = gemUI;
 
           var newId = nodes[0].id;
           nodes[0].id = droppedNode.id; // need to ensure the original id is used when calling superclass
           this.inherited(arguments);
           nodes[0].id = newId;
+
           this.sync();
           source.sync();
 
-          var postDrop;
-          if (source.postDrop) {
-            postDrop = source.postDrop;
-          } else if (gem.postDrop) {
-            postDrop = gem.postDrop;
-          }
+          var postDrop = source.postDrop || gem.postDrop;
 
           this._executePostDrop(droppedNode.getAttribute("formula"), postDrop);
 
           return true;
         },
 
-        _onDrop: function(formula, dndType, value, gemBar, before, anchor, dndNode, postDrop) {
-          var oldGemBar = this.gemBar;
-          var oldDndNode = this.node;
-
-          this.gemBar = gemBar;
-          this.node = dndNode;
-
-          var gem = this.createGemByFormula(formula, value);
-          this.gemUIbeingInserted = this.createGembarUIFromGembar(gem, gemBar, dndType);
-
-          this.insertNodes(null, null, before, anchor, true);
-
-          this.gemBar = oldGemBar;
-          this.node = oldDndNode;
-
-          this._executePostDrop(formula, postDrop);
-        },
-
-        _executePostDrop : function(formula, postDrop) {
-          if (postDrop) {
+        _executePostDrop: function(formula, postDrop) {
+          if(postDrop) {
             postDrop.f.call(postDrop.scope, formula, this.gemBar.id);
           }
         },
 
-        createGemFromNode: function (sourceNode) {
-
-          var modelClass = pentaho.common.propertiesPanel.Configuration.registeredTypes["gem"];
-          var options = {id: "gem-" + sourceNode.id, value: sourceNode.innerHTML, gemBar: this.gemBar.model, sourceNode: sourceNode};
-
-          // check to see if it's a factory class
-          if (modelClass.create) {
-            return modelClass.create(options)
-          } else {
-            return new modelClass(options);
-          }
-        },
-        createGemByFormula: function(formula, value) {
-          var modelClass = pentaho.common.propertiesPanel.Configuration.registeredTypes["gem"];
-          var options = {formula: formula, value: value, gemBar: this.gemBar.model};
-
-          // check to see if it's a factory class
-          if (modelClass.create) {
-            return modelClass.create(options)
-          } else {
-            return new modelClass(options);
-          }
+        createGemFromNode: function(sourceNode) {
+          return this.gemBar.model.createGemFromNode(sourceNode);
         },
 
-        createGemUI: function (gem, sourceNode) {
-          var uiClass = Panel.registeredTypes["gem"];
-          var options = {id: gem.id, model: gem, gemBar: this.gemBar, dndType: sourceNode.getAttribute("dndType"), sourceNode: sourceNode};
-          if (uiClass.create) {
-            return uiClass.create(options);
-          } else {
-            return new uiClass(options);
-          }
+        createGemUI: function(gem, sourceNode) {
+          return this.gemBar.createGemUI(gem, sourceNode);
         },
 
-        createGembarUIFromGembar: function(gem, dndType) {
-          var uiClass = Panel.registeredTypes["gem"];
-          var options = {model: gem, gemBar: this.gemBar, dndType: dndType};
-          if (uiClass.create) {
-            return uiClass.create(options);
-          } else {
-            return new uiClass(options);
-          }
-        },
-
-        onMouseMove: function (e) {
+        onMouseMove: function(e) {
           this.showIndicatorIfReorder(e);
+
           this.inherited(arguments);
         },
-        onMouseOver: function (e) {
+
+        onMouseOver: function(e) {
           this.showIndicatorIfReorder(e);
+
           this.inherited(arguments);
         },
-        showIndicatorIfReorder: function (e) {
-          if (ManagerClass.manager().source && this.checkAcceptance(this, ManagerClass.manager().nodes)) { // drag in progress
+
+        onMouseOut: function(e) {
+          if(e.target == this.dropIndicator) {
+            // moused over the indicator. Ignore
+            return;
+          }
+
+          this.dropIndicator.style.display = "none";
+
+          this.inherited(arguments);
+        },
+
+        onDraggingOut: function(e) {
+          this.dropIndicator.style.display = "none";
+
+          this.inherited(arguments);
+        },
+
+        showIndicatorIfReorder: function(e) {
+          if(ManagerClass.manager().source && this.checkAcceptance(this, ManagerClass.manager().nodes)) { // drag in progress
 
             var indicator = this.dropIndicator;
-
-            var tearDown = function () {
-              indicator.style.display = "none";
-              cancelHandle.remove()
-            };
+            var tearDown  = function() {
+                    indicator.style.display = "none";
+                    cancelHandle.remove()
+                  };
             var cancelHandle = topic.subscribe("/dnd/cancel", tearDown);
-            var dropHandle = topic.subscribe("/dnd/drop", tearDown);
+            var dropHandle   = topic.subscribe("/dnd/drop",   tearDown);
 
             var overNode = this._getNodeUnderMouse(e);
             // console.log("over: "+overNode);
-            if(overNode == -1){
+            if(overNode == -1) {
               return;
             }
+
             var before = this.gravity(this.node.children[overNode], e) & 1;
-            if (this.node.children[overNode] == ManagerClass.manager().nodes[0] && (before && overNode == 0 || !before && this.node.children.length - 1 == overNode)) {
+            if(this.node.children[overNode] == ManagerClass.manager().nodes[0] &&
+               (before && overNode == 0 || !before && this.node.children.length - 1 == overNode)) {
               this.dropIndicator.style.display = "none";
               return;
             }
+
             this.placeIndicator(e, overNode, before);
           }
         },
+
         _showDropIndicator: function(e) {
           var overNode = this._getNodeUnderMouse(e);
-          if(overNode == -1){
+          if(overNode == -1) {
             return;
           }
+
           var before = this.gravity(this.node.children[overNode], e) & 1;
-          if (this.node.children[overNode] == ManagerClass.manager().nodes[0] && (before && overNode == 0 || !before && this.node.children.length - 1 == overNode)) {
+          if(this.node.children[overNode] == ManagerClass.manager().nodes[0] &&
+             (before && overNode == 0 || !before && this.node.children.length - 1 == overNode)) {
             this.dropIndicator.style.display = "none";
             return;
           }
+
           this.placeIndicator(e, overNode, before);
 
           return {
@@ -547,33 +572,21 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
             anchor: this.node.children[overNode]
           }
         },
+
         _hideDropIndicator: function() {
-          if (this.dropIndicator) {
+          if(this.dropIndicator) {
             this.dropIndicator.style.display = "none";
           }
         },
-        onMouseOut: function (e) {
-          if (e.target == this.dropIndicator) {
-            // moused over the indicator. Ignore
-            return;
-          }
-          this.dropIndicator.style.display = "none";
 
-          this.inherited(arguments);
-        },
-        onDraggingOut: function (e) {
-          this.dropIndicator.style.display = "none";
-          this.inherited(arguments);
-        },
-        placeIndicator: function (e, boxIndex, before) {
+        placeIndicator: function(e, boxIndex, before) {
           var spacing = -5, indicatorHeight = 3;
           var bbCoords = geometry.position(this.node, true);
-          with (this.dropIndicator.style) {
-            if (boxIndex < 0) {
-              if (this.node.children.length) {
+          with(this.dropIndicator.style) {
+            if(boxIndex < 0) {
+              if(this.node.children.length) {
                 var coords = geometry.position(this.node.children[this.node.children.length - 1], true);
                 left = coords.x - 7 - (bbCoords.x - 5) + "px";
-
 
                 var coords = geometry.position(this.node.children[0]);
                 var lastChild = geometry.position(this.node.children[this.node.children.length - 1]);
@@ -594,20 +607,22 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
           }
           this.dropIndicator.style.display = "";
         },
-        _getNodeUnderMouse: function (e) {
+
+        _getNodeUnderMouse: function(e) {
           // find the child
           var children = this.node.children;
-          for (var i = 0, child; children && i < children.length; ++i) {
-            if (children[i] == this.dropIndicator) {
+          for(var i = 0, child; children && i < children.length; ++i) {
+            if(children[i] == this.dropIndicator) {
               continue;
             }
             var coords = geometry.position(children[i], true);
-            if (e.clientX >= coords.x && e.clientX <= coords.x + coords.w &&
-                e.clientY >= coords.y && e.clientY <= coords.y + coords.h) return i;
+            if(e.clientX >= coords.x && e.clientX <= coords.x + coords.w &&
+               e.clientY >= coords.y && e.clientY <= coords.y + coords.h) return i;
           }
           return -1;
         },
-        gravity: function (/* HTMLElement */node, /* DOMEvent */e) {
+
+        gravity: function(/* HTMLElement */node, /* DOMEvent */e) {
           //  summary
           //  Calculates the mouse's direction of gravity relative to the centre
           //  of the given node.
@@ -615,7 +630,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
           //  If you wanted to insert a node into a DOM tree based on the mouse
           //  position you might use the following code:
           //  <pre>
-          //  if (gravity(node, e) & gravity.NORTH) { [insert before]; }
+          //  if(gravity(node, e) & gravity.NORTH) { [insert before]; }
           //  else { [insert after]; }
           //  </pre>
           //
@@ -626,67 +641,64 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
           node = dom.byId(node);
           var mouse = {y: e.clientY, x: e.clientX};
 
-
           var bb = geometry.position(node);
           var nodecenterx = bb.x + (bb.w / 2);
           var nodecentery = bb.y + (bb.h / 2);
 
-
-          with (cv.util.gravity) {
-            return ((mouse.x < nodecenterx ? WEST : EAST) | (mouse.y < nodecentery ? NORTH : SOUTH)); //  integer
+          with(cv.util.gravity) {
+            return ((mouse.x < nodecenterx ? WEST  : EAST) |
+                    (mouse.y < nodecentery ? NORTH : SOUTH)); //  integer
           }
         },
-        insertNodes: function (addSelected, data, before, anchor, suppressInherited) {
+
+        insertNodes: function(addSelected, data, before, anchor, suppressInherited) {
           // When called by a frop on the placeholder before will come in false, this need to be corrected by checking the flag
           // set in the onDrop method
-          if (typeof this.dropAtEnd != "undefined") {
+          if(typeof this.dropAtEnd != "undefined") {
             before = !this.dropAtEnd;
           }
 
           // Append : before = true, anchor = null
           var pos = 0;
-          if (anchor == null) {
+          if(anchor == null) {
             // add is fired in onDrop
             pos = this.gemBar.gems.length;
             before = false;
-          } else if (anchor != null) {
+          } else if(anchor != null) {
             // could be adding to the end, ignore ite
-            for (var i = 0; i < this.node.children.length; i++) {
-              if (this.node.children[i] == anchor) {
+            for(var i = 0; i < this.node.children.length; i++) {
+              if(this.node.children[i] == anchor) {
                 pos = i;
               }
             }
 
-            pos = (before) ? pos : pos + 1;
+            pos = before ? pos : pos + 1;
           }
+
           this.gemBar.insertAt(this.gemUIbeingInserted, pos, this.dropZone2Zone);
 
-          if (!suppressInherited) {
+          if(!suppressInherited) {
             this.inherited(arguments);
           }
 
           this.gemBar.propPanel.resize();
         },
 
-        checkAcceptance: function (source, nodes, silent) {
-          var ok = this.gemBar.checkAcceptance(source, nodes, silent);
-          ;
-          return ok;
+        checkAcceptance: function(source, nodes, silent) {
+          return this.gemBar.checkAcceptance(source, nodes, silent);
         }
       });
 
       var PlaceholderSource = declare([Target], {
-        constructor: function (node, opts) {
+        constructor: function(node, opts) {
           this.dropZone = opts.dropZone;
         },
-        onDrop: function (source, nodes, copy) {
+        onDrop: function(source, nodes, copy) {
           return this.dropZone.onDrop(source, nodes, copy, /* dropAtEnd */ true);
         },
 
-        checkAcceptance: function (source, nodes, silent) {
-          var ok = this.dropZone.checkAcceptance(source, nodes, silent);
-          ;
-          return ok;
+        checkAcceptance: function(source, nodes, silent) {
+          return this.dropZone.checkAcceptance(source, nodes, silent);
         },
 
         destroy: function() {
@@ -701,30 +713,27 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
             className: "propPanel_gemBar",
             gemLimit: -1,
             templateString: "<div class='${className}' data-dojo-type='dijit.layout.BorderContainer' data-dojo-props='gutters:false'><div data-dojo-props='region:center'></div><div class='gemPlaceholder'><span>${placeholderText}</span></div></div>",
-            gems: [],
-            handles: [],
-            subscriptions: [],
+            gems:   null,
             accept: ["gem"],
             showPlaceholder: true,
             placeholderText: "Drop Level Here",
-            constructor: function (options) {
-              this.id = this.model.id + "_ui";
+
+            constructor: function(options) {
+              this.id = newId(this.model.id + "_ui");
               this.showPlaceholder = this.model.ui.showPlaceholder;
 
-              this.handles = [];
-              this.subscriptions = [];
-
-              if (this.model.ui.placeholderText) {
+              if(this.model.ui.placeholderText) {
                 this.placeholderText = this.model.ui.placeholderText;
               }
 
             },
-            postCreate: function () {
+
+            postCreate: function() {
               domClass.add(this.domNode, this.model.dataType); // add dataType as css class.
               this.gems = [];
               this.placeholder = query(".gemPlaceholder", this.domNode)[0];
               this.placeholder.style.display = (this.showPlaceholder && (this.model.allowMultiple || this.model.gems.length == 0)) ? "" : "none";
-              if (this.model.required && this.model.gems.length == 0) {
+              if(this.model.required && this.model.gems.length == 0) {
                 domClass.add(this.placeholder, "reqiured");
               }
 
@@ -733,9 +742,8 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
               this.dropZone = new GemBarUISource(this.dropZoneNode, {accept: this.model.ui.dndType, gemBar: this});
               // new pentaho.common.propertiesPanel.PlaceholderSource(this.domNode, {accept: this.model.ui.dndType, dropZone: this.dropZone});
 
-              if (this.showPlaceholder && (this.model.allowMultiple || this.model.gems.length < 2)) {
+              if(this.showPlaceholder && (this.model.allowMultiple || this.model.gems.length < 2)) {
                 this._placeHolderSource = new PlaceholderSource(this.placeholder, {accept: this.model.ui.dndType, dropZone: this.dropZone});
-
 
                 // dojo.connect(this.placeholder.firstChild, "onmouseover", function(event){
                 //   if(Manager.source && outterThis.checkAcceptance(outterThis.dropZone, Manager.nodes)){
@@ -747,195 +755,198 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
                 // });
               }
 
-
-              var outterThis = this;
-
-              this.subscriptions.push(topic.subscribe("/dnd/start", function () {
-                if (!outterThis.checkAcceptance(outterThis.dropZone, ManagerClass.manager().nodes)) {
-                  outterThis._showDiminish();
+              var unSubscribeFunc = lang.hitch(this, function() {
+                if(this.domNode) { // may have been disposed
+                  this._hideDiminish();
                 }
-              }));
-              var unSubscribeFunc = function () {
-                if (outterThis.domNode) { // may have been disposed
-                  outterThis._hideDiminish();
-                }
-              };
-              this.subscriptions.push(topic.subscribe("/dnd/cancel", unSubscribeFunc));
-              this.subscriptions.push(topic.subscribe("/dnd/drop", unSubscribeFunc));
+              });
 
-              this.handles.push(on(this.domNode,  "mouseover", function (event) {
-                if (ManagerClass.manager().source && outterThis.checkAcceptance(outterThis.dropZone,  ManagerClass.manager().nodes)) {
-                  outterThis._showOver();
-                }
-              }));
-              this.handles.push(on(this.domNode, "mouseout", function (event) {
-                outterThis._hideOver();
-              }));
-              this.handles.push(on(this.domNode, "mouseup", function (event) {
-                outterThis._hideOver();
-              }));
+              this.own(
+                topic.subscribe("/dnd/start", lang.hitch(this, function() {
+                  if(!this.checkAcceptance(this.dropZone, ManagerClass.manager().nodes)) {
+                    this._showDiminish();
+                  }
+                })),
+                topic.subscribe("/dnd/cancel", unSubscribeFunc),
+                topic.subscribe("/dnd/drop",   unSubscribeFunc),
+                on(this.domNode, "mouseover",  lang.hitch(this, function(event) {
+                  if(ManagerClass.manager().source &&
+                     this.checkAcceptance(this.dropZone, ManagerClass.manager().nodes)) {
+                    this._showOver();
+                  }
+                })),
+                on(this.domNode,   "mouseout", lang.hitch(this, "_hideOver")),
+                on(this.domNode,   "mouseup",  lang.hitch(this, "_hideOver")),
+                // on(this.dropZone,  "onDrop", lang.hitch(this,  "onDrop")),
+                on(this.dropZone,  "createDropIndicator", lang.hitch(this, "createDropIndicator")),
+                on(this.dropZone,  "placeDropIndicator",  lang.hitch(this, "placeDropIndicator")),
+                on(this.dropZone,  "onMouseOver",         lang.hitch(this, "onMouseOver")),
+                on(this.dropZone,  "onMouseOut",          lang.hitch(this, "onMouseOut")),
+                on(this.dropZone,  "onDraggingOver",      lang.hitch(this, "onDraggingOver")),
+                on(this.dropZone,  "onDraggingOver",      lang.hitch(this, "onDraggingOut")),
+                // on(this.dropZone,  "checkAcceptance", lang.hitch(this, "checkAcceptance")),
+                on(this.dropZone,  "insertNodes",         lang.hitch(this, "insertNodes")));
 
-              // this.handles.push(on(this.dropZone,  "onDrop", lang.hitch( this,  "onDrop")));
-              this.handles.push(on(this.dropZone,  "createDropIndicator", lang.hitch( this,  "createDropIndicator")));
-              this.handles.push(on(this.dropZone,  "placeDropIndicator", lang.hitch( this,  "placeDropIndicator")));
-              this.handles.push(on(this.dropZone,  "onMouseOver", lang.hitch( this,  "onMouseOver")));
-              this.handles.push(on(this.dropZone,  "onMouseOut", lang.hitch( this,  "onMouseOut")));
-              this.handles.push(on(this.dropZone,  "onDraggingOver", lang.hitch( this,  "onDraggingOver")));
-              this.handles.push(on(this.dropZone,  "onDraggingOver", lang.hitch( this,  "onDraggingOut")));
-              // this.handles.push(on(this.dropZone,  "checkAcceptance", lang.hitch( this,  "checkAcceptance")));
-              this.handles.push(on(this.dropZone,  "insertNodes", lang.hitch( this,  "insertNodes")));
+              array.forEach(this.model.gems, function(gem) {
+                var gemUI = this.createGemUI(gem, gem.sourceNode);
 
-              array.forEach(this.model.gems, function (gem) {
-                var uiClass = Panel.registeredTypes["gem"];
-                var options = {sourceNode: gem.sourceNode, id: gem.id, model: gem, gemBar: this, dndType: gem.dndType};
-                var gemUI;
-                if (uiClass.create) {
-                  gemUI = uiClass.create(options);
-                } else {
-                  gemUI = new uiClass(options);
-                }
-                gemUI.postDrop = gem.postDrop;
                 this.domNode.firstChild.appendChild(gemUI.domNode);
                 this.add(gemUI);
               }, this);
+
               this.dropZone.sync();
+
               this.inherited(arguments);
             },
+
             _showOver: function() {
-              if (this.domNode) {
+              if(this.domNode) {
                 domClass.add(this.domNode, "over");
               }
             },
+
             _hideOver: function() {
-              if (this.domNode) {
+              if(this.domNode) {
                 domClass.remove(this.domNode, "over");
               }
             },
+
             _showDiminish: function() {
-              if (this.domNode) {
+              if(this.domNode) {
                 domClass.add(this.domNode, "dimished");
               }
             },
+
             _hideDiminish: function() {
-              if (this.domNode) {
+              if(this.domNode) {
                 domClass.remove(this.domNode, "dimished");
               }
             },
-            insertNodes: function (addSelected, data, before, anchor) {
+
+            insertNodes: function(addSelected, data, before, anchor) {
               //this.domNode.appendChild(data[0]);
               this.onUIEvent("insertNodes", {item: this, args: arguments});
             },
-            add: function (gemUI) {
-              gemUI.model.gemBar = this.model;
-              this.gems.push(gemUI);
-              gemUI.gemBar = this;
-              this.propPanel.setupEventHandling(gemUI);
 
-              if (this.model.required) {
+            add: function(gemUI) {
+              gemUI.model.gemBar = this.model;
+              gemUI.gemBar = this;
+
+              this.gems.push(gemUI);
+
+              this.propPanel.setupEventHandling(gemUI);
+              this.propPanel.registerGemUI(gemUI);
+
+              if(this.model.required) {
                 domClass.remove(this.placeholder, "reqiured");
               }
             },
-            insertAt: function (gem, pos, move) {
-              var currIdx = array.indexOf(this.gems, gem);
 
-
-              this.gems.splice(pos, 0, gem); // add it to the new pos
-              if (currIdx > -1) { //reorder
-                if (currIdx >= pos) { // if we just inserted before the old pos, increment the old pos value
-                  currIdx++;
-                }
+            insertAt: function(gemUI, pos, move) {
+              var currIdx = array.indexOf(this.gems, gemUI);
+              if(currIdx > -1) { // move
                 this.gems.splice(currIdx, 1); // remove from old pos
-
               }
-              this.model.insertAt(gem.model, pos, currIdx, move);
 
-              if (this.model.allowMultiple == false) {
+              this.gems.splice(pos, 0, gemUI); // add it to the new pos
+
+              this.propPanel.registerGemUI(gemUI);
+
+              this.model.insertAt(gemUI.model, pos, currIdx, move);
+
+              if(this.model.allowMultiple == false) {
                 this.placeholder.style.display = "none";
               }
 
-              if (this.model.required) {
+              if(this.model.required) {
                 domClass.remove(this.placeholder, "reqiured");
               }
-
             },
-            remove: function (gemUI, suppressEvent) {
+
+            remove: function(gemUI, suppressEvent) {
               this.dropZoneNode.removeChild(gemUI.domNode);
+
               var currIdx = array.indexOf(this.gems, gemUI);
               this.gems.splice(currIdx, 1);
+
               this.model.remove(gemUI.model, suppressEvent);
 
-              if (this.model.allowMultiple == true || this.model.gems.length == 0) {
+              if(this.model.allowMultiple == true || this.model.gems.length == 0) {
                 this.placeholder.style.display = "";
               }
+
+              this.propPanel.unregisterGemUI(gemUI);
               this.propPanel.resize();
             },
-            onContextMenu: function (event, gem) {
+
+            onContextMenu: function(event, gem) {
               // to be overwritten
             },
-            createDropIndicator: function () {
 
+            createDropIndicator: function() {
             },
-            placeDropIndicator: function (e) {
 
+            placeDropIndicator: function(e) {
             },
-            onMouseOver: function () {
+
+            onMouseOver: function() {
               // this.mouseMoveHandle = this.connect(window, "onMouseMove", this, "placeDropIndicator");
             },
-            onMouseOut: function () {
-              // if (this.mouseMoveHandle) {
+
+            onMouseOut: function() {
+              // if(this.mouseMoveHandle) {
               //   this.mouseMoveHandle.remove();
               // }
             },
-            onDraggingOver: function () {
+
+            onDraggingOver: function() {
               return this.inherited(arguments);
-
-            },
-            onDraggingOut: function () {
-
-            },
-            checkAcceptance: function (source, nodes) {
-              var ok = this.model.allowMultiple || (this.model.allowMultiple == false && this.model.gems.length == 0);
-              return ok;
             },
 
-            createGems: function (gem) {
-              var gemUI = createGemUI(gem);
-              this.domNode.appendChild(gemUI.domNode);
-
-              this.propPanel.setupEventHandling(gemUI);
+            onDraggingOut: function() {
             },
 
+            checkAcceptance: function(source, nodes) {
+              return this.model.allowMultiple ||
+                     (this.model.allowMultiple == false && this.model.gems.length == 0);
+            },
 
             /* extension points */
-            validateGem: function (gem) {
+            validateGem: function(gem) {
               return true;
             },
-            createGemFromNode: function (sourceNode) {
-              return new pentaho.common.propertiesPanel.Configuration.registeredTypes["gem"]({id: sourceNode.innerHTML});
+
+            createGemFromNode: function(sourceNode) {
+              var options = {id: sourceNode.innerHTML};
+
+              return new Configuration.registeredTypes["gem"](options);
             },
-            createGemUI: function (gem) {
-              return new pentaho.common.propertiesPanel.GemUI(gem, this.className);
+
+            createGemUI: function(gem, sourceNode) {
+              var GemUIClass = Panel.registeredTypes["gem"];
+              var options = {
+                      model:      gem,
+                      postDrop:   gem.postDrop,
+                      dndType:    gem.dndType,
+                      gemBar:     this,
+                      sourceNode: sourceNode
+                    };
+
+              return GemUIClass.create ? GemUIClass.create(options) : new GemUIClass(options);
             },
-            destroyRecursive: function () {
+
+            // -----------
+
+            destroyRecursive: function() {
               this.inherited(arguments);
+
               // destroyRecursive should do this, investigate
-              array.forEach(this.gems, function (gem) {
-                gem.destroyRecursive();
+              array.forEach(this.gems, function(gemUI) {
+                gemUI.destroyRecursive();
               });
             },
-            destroy: function () {
-              if(this.handles) {
-                array.forEach(this.handles, function(handle){handle.remove()});
-                this.handles = null;
-              }
-              if(this.subscriptions) {
-                array.forEach(this.subscriptions, function(handle){handle.remove()});
-                this.subscriptions = null;
-              }
 
-              this.dropZoneNode = null;
-              this.placeholder = null;
-              /*
+            destroy: function() {
               if(this.dropZone) {
                 this.dropZone.destroy();
                 this.dropZone = null;
@@ -945,12 +956,13 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
                 this._placeHolderSource.destroy();
                 this._placeHolderSource = null;
               }
-              */
 
               this.inherited(arguments);
 
               // Prevent leak
-              this._startupWidgets = null;
+              this.dropZoneNode =
+              this.placeholder  =
+              this._startupWidgets =
               this._supportingWidgets = null;
             }
           }
@@ -958,75 +970,73 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
 
       Panel.registeredTypes["gemBar"] = GemBarUI;
 
-      var GemUI = declare(
-          [_WidgetBase, _TemplatedMixin, Evented, StatefulUI],
-          {
+      var GemUI = declare([_WidgetBase, _TemplatedMixin, Evented, StatefulUI], {
             className: "gem",
             templateString: "<div id='${id}' class='${className} dojoDndItem' dndType='${dndType}'><div class='gem-label' title='${model.value}'></div><div class='gemMenuHandle'></div></div>",
+
             constructor: function(options) {
+
+              options.id = newId("gem_" + this.model.id + "_");
+
               this.gemBar  = options.gemBar;
               this.dndType = options.dndType;
-              this.id = options.id;
-              this.handles = [];
             },
-            detach: function () {
+
+            detach: function() {
               model.detach();
             },
+
             destroy: function() {
               this.inherited(arguments);
-              if(this.handles) {
-                array.forEach(this.handles, function(handle){handle.remove()});
-                this.handles = null;
-              }
-              this.menuHandle = null;
-              //this.postDrop   = null;
-              //this.gemBar     = null;
 
-              // Prevent leak
-              this._startupWidgets = null;
+              this.menuHandle =
+              this.postDrop   =
+              this.gemBar     =
+              this._startupWidgets =
               this._supportingWidgets = null;
             },
-            postCreate: function () {
-              this.handles.push(on(this.domNode, "contextmenu", lang.hitch( this,  "onContextMenu")));
 
-              var outterThis = this;
+            postCreate: function() {
               this.menuHandle = query("div.gemMenuHandle", this.domNode)[0];
 
               var gemLabel = query("div.gem-label", this.domNode)[0];
               gemLabel.appendChild(document.createTextNode(this.model.value));
 
-              this.handles.push(on(query("div.gemMenuHandle",  this.domNode)[0], "mouseover",  function (e) {
-                if (!ManagerClass.manager().source) {
-                  domClass.add(e.target, "over");
-                }
-              }));
-              this.handles.push(on(query("div.gemMenuHandle", this.domNode)[0], "mouseout", function (e) {
-                if (!ManagerClass.manager().source) {
-                  domClass.remove(e.target, "over");
-                }
-              }));
-              this.handles.push(on(this.menuHandle, "click", lang.hitch( this,  "onContextMenu")));
+              this.own(
+                on(this.domNode, "contextmenu", lang.hitch(this, "onContextMenu")),
+                on(query("div.gemMenuHandle",  this.domNode)[0], "mouseover",  function(e) {
+                  if(!ManagerClass.manager().source) {
+                    domClass.add(e.target, "over");
+                  }
+                }),
+                on(query("div.gemMenuHandle", this.domNode)[0], "mouseout", function(e) {
+                  if(!ManagerClass.manager().source) {
+                    domClass.remove(e.target, "over");
+                  }
+                }),
+                on(this.menuHandle, "click", lang.hitch(this,  "onContextMenu")),
+                on(this.domNode, "mouseover", lang.hitch(this,  "onMouseOver")),
+                on(this.domNode, "mouseout", lang.hitch(this,  "onMouseOut")));
 
-              this.handles.push(on(this.domNode, "mouseover", lang.hitch( this,  "onMouseOver")));
-              this.handles.push(on(this.domNode, "mouseout", lang.hitch( this,  "onMouseOut")));
               this.inherited(arguments);
             },
-            onMouseOver: function () {
-              if (!ManagerClass.manager().source) {
+
+            onMouseOver: function() {
+              if(!ManagerClass.manager().source) {
                 domClass.add(this.domNode, "over");
               }
             },
-            onMouseOut: function () {
+
+            onMouseOut: function() {
               domClass.remove(this.domNode, "over");
             },
 
             // to be overwritten by container
-            onContextMenu: function (e) {
-              console.log("inner onContextMenu");
+            onContextMenu: function(e) {
+              //console.log("inner onContextMenu");
               //event.stop(e);
             }
-          }
-      );
+          });
 
       Panel.registeredTypes["gem"] = GemUI;
 
@@ -1034,60 +1044,67 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
           [_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, StatefulUI, Evented],
           {
             className: "propPanel_combobox propPanel_control",
-            options: [],
-            templateString: "<div class='${className}' id='${model.id}_wrapper'></div>",
-            handles: [],
-            constructor: function (options) {
-              this.name = options.id;
+            options: null,
+            templateString: "<div class='${className}' id='${id}'></div>",
+
+            constructor: function(options) {
+              this.name  = this.model.id;
+              options.id = newId(this.name, "_wrapper"); // -> this.id
+
               this.options = [];
-              this.handles = [];
-              array.forEach(this.model.values, function (val, idx) {
+
+              array.forEach(this.model.values, function(val, idx) {
                 var opt = {label: val, value: val};
-                if (this.model.ui.labels) {
+
+                if(this.model.ui.labels) {
                   var lbl = this.model.ui.labels[idx];
-                  opt.label = pentaho.common.Messages.getString(lbl, lbl);
+                  opt.label = Messages.getString(lbl, lbl);
                 }
+
                 this.options.push(opt);
               }, this);
 
-              if (this.model.value == null)
+              if(this.model.value == null)
                 this.model.set('value', this.model.values[0]);
+
               this.value = this.model.value;
             },
 
-            postCreate: function () {
+            postCreate: function() {
               var me = this;
               var opts = this.options;
-              array.forEach(opts, function (val, idx) {
-                if (typeof(me.value) == "undefined") {
+
+              array.forEach(opts, function(val, idx) {
+                if(typeof(me.value) == "undefined") {
                   opts['selected'] = true;
                 } else {
-                  if (me.value == val.value) {
+                  if(me.value == val.value) {
                     val['selected'] = true;
                   }
                 }
               }, this);
 
-              if (this.isMobile()) {
-
+              if(this.isMobile()) {
                 // create native select widget
 
-                var selectId = this.id + "_select";
+                var selectId  = this.id + "_select";
                 var selectBox = construct.create("select", {id: selectId});
 
-                array.forEach(opts, function (val, idx) {
-                  if (typeof(val.selected) != "undefined" && val.selected == true) {
-                    var selOpt = {label: val.label, value: val.value, selected: true};
+                array.forEach(opts, function(val, idx) {
+                  var selOpt;
+                  if(typeof(val.selected) != "undefined" && val.selected == true) {
+                    selOpt = {label: val.label, value: val.value, selected: true};
                   } else {
-                    var selOpt = {label: val.label, value: val.value};
+                    selOpt = {label: val.label, value: val.value};
                   }
                   construct.create("option", selOpt, selectBox);
                 }, this);
 
 
                 this.domNode.appendChild(selectBox);
-                this.handles.push(on(selectBox,  "onchange", function () {
-                  me.model.set('value',  this.value);
+
+                this.own(on(selectBox, "onchange", function() {
+                  me.model.set('value', this.value);
                   me.value = this.value;
                 }));
 
@@ -1096,29 +1113,32 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
                 // use the styled drop down
 
                 domClass.add(this.domNode, this.className);
+
                 var sel = this.selNode = new Select({
                   options: opts,
-                  onChange: function () {
+                  onChange: function() {
                     me.model.set('value', this.value);
                     me.value = this.value;
                   }
                 });
                 sel.placeAt(this.domNode);
               }
+
               this.inherited(arguments);
             },
 
-            isMobile: function () {
-              return (this.isMobileSafari() || window.orientation !== undefined);
+            isMobile: function() {
+              return this.isMobileSafari() || window.orientation !== undefined;
             },
 
-            isMobileSafari: function () {
+            isMobileSafari: function() {
               return navigator.userAgent.match(/(iPad|iPod|iPhone)/) != null;
             },
 
-            destroy: function () {
-              array.forEach(this.handles, function(handle){handle.remove()});
+            destroy: function() {
+
               this.inherited(arguments);
+
               if(this.selNode) {
                 this.selNode.destroyRecursive();
                 this.selNode = null;
@@ -1128,84 +1148,90 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
               this._startupWidgets = null;
               this._supportingWidgets = null;
             }
-
-          }
-      );
+          });
 
       Panel.registeredTypes["combo"] = ComboUI;
 
-      var SliderUI = declare(
-          [HorizontalSlider, StatefulUI, Evented],
-          {
-            className: "propPanel_slider propPanel_control",
-            minimum: 0,
-            maximum: 100,
-            style: "width: 100%",
-            intermediateChanges: true,
-            discreteValues: true,
-            constructor: function (options) {
-              this.inherited(arguments);
-              this.value = this.model.value;
-              if (this.model.minimum) {
-                this.minimum = this.model.minimum;
+      var SliderUI = declare([HorizontalSlider, StatefulUI, Evented], {
+              className: "propPanel_slider propPanel_control",
+              minimum: 0,
+              maximum: 100,
+              style: "width: 100%",
+              intermediateChanges: true,
+              discreteValues: true,
+
+              constructor: function(options) {
+
+                options.id = newId(this.model.id + "_slider"); // -> this.id
+
+                this.value = this.model.value;
+
+                if(this.model.minimum) { this.minimum = this.model.minimum; }
+                if(this.model.maximum) { this.maximum = this.model.maximum; }
+
+                this.discreteValues = this.maximum - this.minimum + 1;
+              },
+
+              onChange: function() {
+                this.model.set('value', this.value);
               }
-              if (this.model.maximum) {
-                this.maximum = this.model.maximum;
-              }
-              this.discreteValues = this.maximum - this.minimum + 1;
-              this.id = this.model.id + "_slider";
-            },
-            onChange: function () {
-              this.model.set('value', this.value);
-            }
-          }
-      );
+            });
       Panel.registeredTypes["slider"] = SliderUI;
 
-      var TextboxUI = declare(
-          [TextBox, StatefulUI, Evented],
-          {
+      var TextboxUI = declare([TextBox, StatefulUI, Evented], {
             className: "propPanel_control",
-            constructor: function (options) {
+
+            constructor: function(options) {
               this.disabled = this.model.disabled;
-              this.value = this.model.value;
+              this.value    = this.model.value;
+
+              options.id = null;
+
               this.inherited(arguments);
             },
-            onChange: function () {
+
+            onChange: function() {
               this.model.set('value', this.value);
             }
-          }
-      );
+          });
       Panel.registeredTypes["textbox"] = TextboxUI;
-
 
       var CheckBoxUI = declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, StatefulUI, Evented],
           {
             className: "propPanel_checkbox propPanel_control",
             value: false,
-            templateString: "<div class='${className}'><label for='${model.id}_checkbox'>${label}</label></div>",
-            constructor: function (options) {
-              if (this.model.value) {
+            templateString: "<div class='${className}'><label for='${checkBoxId}'>${label}</label></div>",
+
+            constructor: function(options) {
+
+              options.id = null; // auto
+
+              this.checkBoxId = newId(this.model.id + "_checkbox");
+
+              if(this.model.value != null) {
                 this.value = this.model.value;
               } else {
                 this.model.set('value', this.value);
               }
-              this.label = pentaho.common.Messages.getString(this.model.ui.label, this.model.ui.label);
+
+              this.label = Messages.getString(this.model.ui.label, this.model.ui.label);
             },
-            postCreate: function () {
-              var outterThis = this;
+
+            postCreate: function() {
+              var id = this.checkBoxId;
+
               this.checkbox = new CheckBox({
-                id: this.model.id+"_checkbox",
-                name: this.model.id+"_checkbox",
-                checked: outterThis.model.get('value'),
-                onChange: function(value){
-                  outterThis.model.set('value',  value);
-                }
-              }, this.model.id+"_checkbox");
+                    id:       id,
+                    name:     id,
+                    checked:  this.model.get('value'),
+                    onChange: lang.hitch(this, function(value) { this.model.set('value',  value); })
+                  }, id);
+
               this.checkbox.placeAt(this.domNode, "first");
             },
-            destroy: function () {
-              array.forEach(this.handles, function(handle){handle});
+
+            destroy: function() {
+
               this.inherited(arguments);
 
               if(this.checkbox) {
@@ -1214,30 +1240,36 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
               }
 
               // Prevent leak
-              this._startupWidgets = null;
+              this._startupWidgets =
               this._supportingWidgets = null;
             }
-          }
-      );
+          });
       Panel.registeredTypes["checkbox"] = CheckBoxUI;
-
 
       var ButtonUI = declare(
           [_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, StatefulUI, Evented],
           {
-            templateString: "<div class='button-wrapper'><button id='${model.id}_button' name='${model.id}_button'  data-dojo-type='dijit.form.Button' type='button' >${label}</button></div>",
-            constructor: function (options) {
+            templateString: "<div class='button-wrapper'><button id='${buttonId}' name='${buttonId}' data-dojo-type='dijit.form.Button' type='button' >${label}</button></div>",
+
+            constructor: function(options) {
+              this.buttonId = newId(this.model.id + "_button");
               this.disabled = this.model.disabled;
-              this.label = pentaho.common.Messages.getString(this.model.ui.label, this.model.ui.label);
+
+              options.id = null; // auto
+
+              var lbl = this.model.ui.label;
+              this.label = Messages.getString(lbl, lbl);
+
               this.inherited(arguments);
             },
 
-            postCreate: function () {
-              this.button = registry.byId(this.model.id + "_button");
-              this.connect(this.button, "onClick", "onClick");
+            postCreate: function() {
+              var button = registry.byId(this.buttonId);
+              this.own(
+                on(button, "click", lang.hitch(this, "onClick")));
             },
 
-            onClick: function () {
+            onClick: function() {
               this.model.set('clicked', true);
             },
 
@@ -1245,11 +1277,11 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
               this.inherited(arguments);
 
               // Prevent leak
-              this._startupWidgets = null;
+              this._startupWidgets =
               this._supportingWidgets = null;
             }
-          }
-      );
+          });
       Panel.registeredTypes["button"] = ButtonUI;
+
       return Panel;
     });
