@@ -1669,7 +1669,11 @@ function(def, pvc, pv){
         /* PLUGIN INTERFACE  */
 
         dispose: function() {
-           this._element = null;
+           this._element =
+           this.options  =
+           this.controller =
+           this._vizOptions = null;
+
            if(this._chart && this._chart.dispose) {
             this._chart.dispose();
             this._chart = null;
