@@ -1,36 +1,40 @@
 module.exports = function (config) {
   config.set({
-    basePath: '../',
+    basePath: "../",
 
-    frameworks: ['jasmine', 'requirejs'],
+    frameworks: ["jasmine", "requirejs"],
 
-
-    files: [
-      {pattern: 'build-res/module-scripts/**/*.js', included: false},
-      {pattern: 'build-res/module-scripts/**/*.html', included: false},
-      {pattern: 'package-res/resources/web/**/*.js', included: false},
-      {pattern: 'package-res/resources/web/**/*.html', included: false},
-      {pattern: 'dev-res/dojo/dojo-release-1.9.2-src/**/*.js', included: false},
-      {pattern: 'dev-res/dojo/dojo-release-1.9.2-src/**/*.html', included: false},
-      'config/context.js',
-      'config/initEnv.js',
-      'build-res/requireCfg-raw.js',
-      'config/require-config.js'
+    plugins: [
+      'karma-jasmine',
+      'karma-requirejs',
+      'karma-chrome-launcher'
     ],
 
+    files: [
+      {pattern: "build-res/module-scripts/**/{*.js,*.html}",  included: false},
+      {pattern: "package-res/resources/web/**/{*.js,*.html}", included: false},
+      {pattern: "dev-res/dojo/dojo-release-1.9.2-src/**/{*.js,*.html}", included: false},
 
-    preprocessors: {
-    },
+      "config/context.js",
+      "build-res/requireCfg-raw.js",
+      // needs to be last file
+      "config/require-config.js"
+    ],
+
+    // Too many files cause karma launcher/file-serving errors.
+    // Exclude these as we don't use them and they're many.
+    exclude: [
+      "dev-res/dojo/dojo-release-1.9.2-src/**/tests/**"
+    ],
 
     // auto run tests when files change
     autoWatch: true,
 
-    browsers: ['Chrome'],
-    reporters: ['progress'/*, 'coverage'*/],
+    browsers:  ["Chrome"],
+    reporters: ["progress"],
 
     // level of logging
     // possible values: LOG_DISABLE || LOG_ERROR || LOG_WARN || LOG_INFO || LOG_DEBUG
     logLevel: config.LOG_INFO
-
   });
 };

@@ -26,8 +26,8 @@ define(deps, function(AngularPluginHandler, AngularPlugin) {
 
             module = pluginHandler.module(moduleName, []);
 
-            spyOn(pluginHandler, "_onRegister").andCallThrough();
-            spyOn(pluginHandler, "_onUnregister").andCallThrough();
+            spyOn(pluginHandler, "_onRegister").and.callThrough();
+            spyOn(pluginHandler, "_onUnregister").and.callThrough();
         });
 
         it("should extend all of the Pentaho Plugin Handler functions", function() {
@@ -39,7 +39,7 @@ define(deps, function(AngularPluginHandler, AngularPlugin) {
 
         describe("pre-bootstrap tests", function() {
             var routeProvider;
-            
+
             beforeEach(function(){
                 spyOn(module, "controller");
                 spyOn(module, "service");
@@ -55,7 +55,7 @@ define(deps, function(AngularPluginHandler, AngularPlugin) {
 
             it("should define a module", function() {
                 expect(module).toBeDefined();
-                expect(module.name).toEqual(moduleName);            
+                expect(module.name).toEqual(moduleName);
             });
 
             it("should register a plugin and call the private onRegister function", function() {
@@ -152,12 +152,12 @@ define(deps, function(AngularPluginHandler, AngularPlugin) {
                 pluginHandler.register(plugin);
                 pluginHandler.unregister(plugin);
 
-                expect(module.$routeProvider.when.calls.length).toEqual(2);
-                expect(module.$controllerProvider.register.calls.length).toEqual(2);
-                expect(module.$provide.service.calls.length).toEqual(2);
-                expect(module.$provide.factory.calls.length).toEqual(2);
-                expect(module.$filterProvider.register.calls.length).toEqual(2);
-                expect(module.$compileProvider.directive.calls.length).toEqual(2);
+                expect(module.$routeProvider.when.calls.count()).toEqual(2);
+                expect(module.$controllerProvider.register.calls.count()).toEqual(2);
+                expect(module.$provide.service.calls.count()).toEqual(2);
+                expect(module.$provide.factory.calls.count()).toEqual(2);
+                expect(module.$filterProvider.register.calls.count()).toEqual(2);
+                expect(module.$compileProvider.directive.calls.count()).toEqual(2);
             });
 
 
@@ -180,7 +180,7 @@ define(deps, function(AngularPluginHandler, AngularPlugin) {
             it("should goHome goHome in the browser", function() {
                 module.$rootScope.goHome(moduleName);
                 expect(module.$location.path()).toMatch('/');
-            });            
+            });
         });
     })
 })

@@ -26,7 +26,7 @@
     <classname>org.pentaho.common.ui.services.ChartSeriesColorContentGenerator</classname>
     <title>ChartSeriesColorService</title>
   </content-generator>
-  
+
   <webservice
       id="RepositoryClientService"
       type="xml"
@@ -55,21 +55,20 @@
     <file context="global">content/common-ui/resources/themes/jquery.js</file>
     <file context="global">content/common-ui/resources/themes/themeUtils.js</file>
     <file context="global">content/common-ui/resources/web/util/URLEncoder.js</file>
+
     <file context="requirejs">content/common-ui/resources/web/common-ui-require-js-cfg.js</file>
-    <!-- Example Visualizaiton Plugin. Un-comment to test -->
-    <!--file context="analyzer">content/common-ui/resources/web/vizapi/ccc/sample/sampleVisualization.js</file-->
-    <!--file context="analyzer">content/common-ui/resources/web/vizapi/ccc/sample/sampleVisualization_analyzer_plugin.js</file-->
-    <!-- Example Visualizaiton Plugin. Un-comment to test -->
+
+    <!-- Example Visualization Plugin. Un-comment to test.
+         Also, uncomment corresponding line in common-ui-require-js-cfg.js file -->
+    <!--file context="analyzer">content/common-ui/resources/web/vizapi/sample/sampleVisualization_analyzer_plugin_loader.js</file-->
+
 
     <!-- Example Prompting Sample Plugin. Used in prompting/sample.html -->
     <file context="prompting-sample">content/common-ui/resources/web/prompting/pentaho-prompting-sample-component.js</file>
-    <!-- Example Prompting Sample Plugin. Used in prompting/sample.html -->
 
 
     <!-- uncomment to debug CCC charts -->
     <!--file context="analyzer">content/common-ui/resources/web/vizapi/ccc/ccc_analyzer_plugin_loader.js</file-->
 
   </external-resources>
-
-
 </plugin>

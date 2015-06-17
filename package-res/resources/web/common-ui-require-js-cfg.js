@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2013 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,7 +12,6 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
 var prefix = (typeof CONTEXT_PATH != "undefined") ? CONTEXT_PATH + 'content/common-ui/resources/web' :
     (typeof KARMA_RUN != "undefined") ? "../../package-res/resources/web" :"common-ui"; //prod vs build
@@ -27,6 +26,11 @@ requireCfg['paths']['pentaho/common'] = prefix+'/dojo/pentaho/common';
 
 
 requireCfg['paths']['local'] = prefix+'/util/local';
+requireCfg['paths']['service'] = prefix+'/util/service';
+requireCfg['paths']['css'] = prefix+'/util/require-css/css' + (isDebug ? "" : ".min");
+
+requireCfg['paths']["es6-promise"] = prefix+'/es6-promise/es6-promise' + (isDebug ? "" : ".min");
+requireCfg['paths']["es6-promise-shim"] = prefix+'/util/es6-promise-shim';
 
 requireCfg['paths']['common-repo'] = prefix+'/repo';
 //requireCfg['paths']['common-repo/pentaho-ajax'] = prefix+'/repo/pentaho-ajax';
@@ -75,6 +79,12 @@ requireCfg['paths']['common-ui/angular-resource'] = prefix+'/angular/angular-res
 requireCfg['paths']['common-ui/angular-route'] = prefix+'/angular/angular-route'+(isDebug? "" : ".min");
 requireCfg['paths']['common-ui/angular-animate'] = prefix+'/angular/angular-animate'+(isDebug? "" : ".min");
 requireCfg['paths']['common-ui/angular-sanitize'] = prefix+'/angular/angular-sanitize'+(isDebug? "" : ".min");
+
+requireCfg['paths']['common-ui/es5-shim'] = prefix+'/util/es5-shim';
+requireCfg['paths']['common-ui/properties-parser'] = prefix+'/angular-translate/properties-parser';
+requireCfg['paths']['common-ui/angular-translate'] = prefix+'/angular-translate/angular-translate'+(isDebug? "" : ".min");
+requireCfg['paths']['common-ui/angular-translate-loader-partial'] = prefix+'/angular-translate/angular-translate-loader-partial'+(isDebug? "" : ".min");
+requireCfg['paths']['common-ui/angular-translate-loader-static'] = prefix+'/angular-translate/angular-translate-loader-static'+(isDebug? "" : ".min");
 
 requireCfg['paths']['common-ui/angular-ui-bootstrap'] = prefix+'/bootstrap/ui-bootstrap-tpls-0.6.0.min';
 
@@ -131,9 +141,21 @@ requireCfg['shim']['common-ui/angular-route'] = ['common-ui/angular'];
 requireCfg['shim']['common-ui/angular-animate'] = ['common-ui/angular'];
 requireCfg['shim']['common-ui/angular-sanitize'] = ['common-ui/angular'];
 
+requireCfg['shim']['common-ui/angular-translate'] = ['common-ui/es5-shim', 'common-ui/angular'];
+requireCfg['shim']['common-ui/properties-parser'] = ['common-ui/es5-shim'];
+requireCfg['shim']['common-ui/angular-translate-loader-partial'] = ['common-ui/angular-translate'];
+requireCfg['shim']['common-ui/angular-translate-loader-static'] = ['common-ui/angular-translate'];
+requireCfg['shim']['common-ui/angular-translate'] = ['common-ui/es5-shim', 'common-ui/angular'];
+requireCfg['shim']['common-ui/angular-translate'] = ['common-ui/es5-shim', 'common-ui/angular'];
+
 /* UI-Bootstrap configuration */
 requireCfg['shim']['common-ui/angular-ui-bootstrap'] = ['common-ui/angular'];
 
 requireCfg['shim']['common-ui/PluginHandler'] = ['common-ui/jquery'];
 requireCfg['paths']['common-ui/angular-directives'] = prefix + '/angular-directives';
 requireCfg['shim']['common-ui/angular-directives'] = ['common-ui/angular-ui-bootstrap'];
+
+requireCfg.config.service['common-ui/vizapi/ccc/vizTypeProvider'] = 'IVizTypeProvider';
+
+// Uncomment to install sample visualizations
+//requireCfg.config.service['common-ui/vizapi/sample/vizTypeProvider'] = 'IVizTypeProvider';

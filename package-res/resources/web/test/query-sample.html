@@ -35,7 +35,7 @@
         <script language="javascript" src="../dataapi/models-cda.js" type="text/javascript"></script>
         <script language="javascript" src="../dataapi/models-svc.js" type="text/javascript"></script>
         <script language="javascript" src="../vizapi/DataTable.js" type="text/javascript"></script>
-          
+
         <script language="javascript" >
 
         pentaho.common.Messages.addUrlBundle('dataapi',CONTEXT_PATH+'i18n?plugin=common-ui&name=resources/web/dataapi/nls/messages');
@@ -75,7 +75,7 @@ function loadPage() {
     while( dataTable.rows.length > 0 ) {
         dataTable.deleteRow(0);
     }
-    
+
     var row = document.getElementById('param-template-row');
     paramHtmlTemplate = row.innerHTML;
     document.getElementById('data-select-table').deleteRow(9);
@@ -104,7 +104,7 @@ function loadPage() {
 		source: {}
 	};
 	var moduleArray = [da_mql,da_olap,da_svc];
-	pentaho.myapp.app.init(moduleArray);	
+	pentaho.myapp.app.init(moduleArray);
     pentaho.myapp.app.moduleData['da-mql'].instance.METADATA_SERVICE_URL = CONTEXT_PATH + 'content/ws-run/metadataService';
 
     try {
@@ -112,7 +112,7 @@ function loadPage() {
     } catch(e) {
         alert(e.message);
     }
-    
+
     filterDialog = dijit.byId('filterDialog');
     filterDialog.setLocalizationLookupFunction(pentaho.common.Messages.getString);
     filterDialog.setSearchListLimit(200);
@@ -130,13 +130,13 @@ function loadModels() {
     // load the list of datasource models
 	pentaho.myapp.app.getSources(
 		//function to be called for each source as it is added
-		function(source) {	
+		function(source) {
 			//console.log(source);
 			var list = document.getElementById('model-list');
             opt = new Option( source.name, source.id );
 			list.options[list.length] = opt;
 		}
-	);    
+	);
     if( document.getElementById('model-list').options.length > 0 ) {
         document.getElementById('model-list').selectedIndex=0;
     }
@@ -155,7 +155,7 @@ try {
     // get the model
     pentaho.myapp.source = pentaho.myapp.app.getSources(null, {filter: {property:'id', value:document.getElementById('model-list').options[idx].value}});
   	pentaho.myapp.source.discoverModelDetail();
-    model = pentaho.myapp.source; 
+    model = pentaho.myapp.source;
 
     document.getElementById('use-across-location-1').disabled = !model.hasCapability(pentaho.pda.CAPABILITIES.HAS_ACROSS_AXIS);
     document.getElementById('use-across-location-1').checked = false;
@@ -168,18 +168,18 @@ try {
     list1.options.length = 0;
     list2.options.length = 0;
     list3.options.length = 0;
-    
+
     // populate the lists of fields
-    var types = new Array( pentaho.pda.Column.ELEMENT_TYPES.LEVEL, 
-        pentaho.pda.Column.ELEMENT_TYPES.DIMENSION, 
-        pentaho.pda.Column.ELEMENT_TYPES.ATTRIBUTE, 
-        pentaho.pda.Column.ELEMENT_TYPES.KEY, 
+    var types = new Array( pentaho.pda.Column.ELEMENT_TYPES.LEVEL,
+        pentaho.pda.Column.ELEMENT_TYPES.DIMENSION,
+        pentaho.pda.Column.ELEMENT_TYPES.ATTRIBUTE,
+        pentaho.pda.Column.ELEMENT_TYPES.KEY,
         pentaho.pda.Column.ELEMENT_TYPES.UNKNOWN );
-        
+
     var columns = model.getColumnsByFieldTypes( types );
     columns = model.sortColumnsByName( columns );
     var options = model.createListOptions( columns );
-    
+
     list1.options[0] = new Option('');
     list2.options[0] = new Option('');
     for( var idx=0; idx<options.length; idx++ ) {
@@ -195,12 +195,12 @@ try {
     columns = model.getColumnsByFieldTypes( types );
     columns = model.sortColumnsByName( columns );
     options = model.createListOptions( columns );
-    
+
     for( var idx=0; idx<options.length; idx++ ) {
         list3.options[list3.options.length] = options[idx];
     }
     list3.size = Math.min( columns.length, 10 );
-    
+
     // enabled all of the controls now that a model has been selected
     document.getElementById('Column1Select').disabled = false;
     document.getElementById('Column1ValuesSelect').disabled = false;
@@ -220,7 +220,7 @@ try {
     } catch (e) {
         alert( e.message );
     }
-    
+
 }
 
 function changeColumn( selectId, valuesId ) {
@@ -236,7 +236,7 @@ function changeColumn( selectId, valuesId ) {
     var column = model.getColumnById( columnId );
     // get the values for the column
     var results = model.getAllValuesForColumn( column );
-    if( results['className'] != 'pentaho.DataTable' ) {
+    if( !(results instanceof pentaho.DataTable) ) {
         results = new pentaho.DataTable(results);
     }
     valuesList.options[0] = new Option('<ALL>');
@@ -258,14 +258,14 @@ function selectionsChanged() {
         var list = document.getElementById('Column1ValuesSelect' );
         handleSelection( column, list, query, document.getElementById('use-across-location-1').checked );
     }
-    
+
     // add item 2
     var column = model.getColumnById( document.getElementById('Column2Select').value );
     if( column ) {
         var list = document.getElementById('Column2ValuesSelect' );
         handleSelection( column, list, query, document.getElementById('use-across-location-2').checked );
     }
-    
+
     // add measures
     var list = document.getElementById('MeasureSelect' );
     for( var idx=0; idx<list.options.length; idx++ ) {
@@ -273,14 +273,14 @@ function selectionsChanged() {
             query.addSelectionById( list.options[idx].value );
         }
     }
-    
+
     if( queryParameters && queryParameters.length ) {
         for( var idx=0; idx<queryParameters.length; idx++ ) {
-            query.addConditionById(queryParameters[idx].columnId, 
+            query.addConditionById(queryParameters[idx].columnId,
                 queryParameters[idx].operator,queryParameters[idx].value,queryParameters[idx].condition);
         }
     }
-    
+
 //    alert(query.getJson());
     query.prepare();
     document.getElementById('querytext').value = query.getQueryStr();
@@ -290,7 +290,7 @@ function selectionsChanged() {
         return;
     }
     results = model.submitQuery( query );
-    if( results['className'] != 'pentaho.DataTable' ) {
+    if( !(results instanceof pentaho.DataTable) ) {
         results = new pentaho.DataTable(results);
     }
     if( results == null ) {
@@ -304,7 +304,7 @@ function selectionsChanged() {
 
 function handleSelection( column, list, query, useAcross ) {
         var selection = null;
-        
+
         var location = (useAcross) ? pentaho.pda.AXIS_LOCATION_ACROSS : pentaho.pda.AXIS_LOCATION_DOWN;
         if( list.options[0].selected ) {
             // the 'ALL' option is selected, so we don't need individual selections
@@ -323,7 +323,7 @@ function handleSelection( column, list, query, useAcross ) {
                 var value = null;
                 if( selectedValues.length == 1 ) {
                     value = selectedValues[0];
-                } 
+                }
                 else if( selectedValues.length > 1 ) {
                     value = selectedValues;
                 }
@@ -350,7 +350,7 @@ function displayData( results ) {
         }
         var html = headerCellHtml.replace( /{contents}/, headerContent );
         html = html.replace( /{idx}/g, idx );
-        if( results.getColumnType(idx) == pentaho.pda.Column.DATA_TYPES.NUMERIC || 
+        if( results.getColumnType(idx) == pentaho.pda.Column.DATA_TYPES.NUMERIC ||
             results.getColumnType(idx) == pentaho.pda.Column.DATA_TYPES.BOOLEAN ) {
             html = html.replace( /text-align: left;/, 'text-align: right;' );
         }
@@ -364,10 +364,10 @@ function displayData( results ) {
         var rowHtml = '';
         for( var colNo=0; colNo<results.getNumberOfColumns();colNo++ ) {
             var html = dataCellHtml.replace( /{contents}/, results.getFormattedValue(rowNo, colNo) );
-            if( results.getColumnType(colNo) == pentaho.pda.Column.DATA_TYPES.NUMERIC || 
+            if( results.getColumnType(colNo) == pentaho.pda.Column.DATA_TYPES.NUMERIC ||
                 results.getColumnType(colNo) == pentaho.pda.Column.DATA_TYPES.BOOLEAN ) {
                 html = html.replace( /text-align: left;/, 'text-align: right;' );
-            }            
+            }
             rowHtml += html;
         }
         var newRow = dataTable.insertRow(dataTable.rows.length);
@@ -413,7 +413,7 @@ function createFilter () {
 
     filter.value = ["Testing"];
     dialog.configureFor(filter);
-    
+
     dialog.show();
 
 }
@@ -468,8 +468,8 @@ function updateParametersList() {
     for( var idx=0; idx<queryParameters.length; idx++ ) {
         var param = queryParameters[idx];
         var html = paramHtmlTemplate;
-        html = html.replace( /{idx}/g, ''+idx );   
-        html = html.replace( /{desc}/g, param.description );   
+        html = html.replace( /{idx}/g, ''+idx );
+        html = html.replace( /{desc}/g, param.description );
         var newRow = table.insertRow(9+idx);
         addTableCells( newRow, html );
 
@@ -511,7 +511,7 @@ function autoUpdateChanged() {
 function showQueryChanged() {
 
     var e = document.getElementById("querySection");
-    
+
     if( document.getElementById("show-query").checked ) {
         e.style.display = 'block';
     } else {
@@ -532,7 +532,7 @@ function submitPassThrough() {
         var sorted = pentaho.pda.app.prototype.sortData( results, 0, pentaho.pda.Column.SORT_TYPES.ASCENDING );
         displayData( sorted );
     }
-    
+
 }
 
 dojo.ready(loadPage);
@@ -548,7 +548,7 @@ dojo.ready(loadPage);
         </div>
 
         <div style="padding: 8px; background-color:white">
-        
+
             <h3>Data API - Queries</h3>
             This example shows you how to create and execute a query against a data source.
             <p/>
@@ -573,7 +573,7 @@ dojo.ready(loadPage);
                                     <td><select size="10" multiple="true" id="Column1ValuesSelect" onchange="selectionsChanged()" style="width:200px" disabled="true"></select></td>
                                 </tr>
                                 <tr>
-                                    <td>Item 2 
+                                    <td>Item 2
                                         <input id="use-across-location-2" type="checkbox" checked="false" onchange="selectionsChanged()"/>Across
                                     </td>
                                 </tr>
@@ -628,7 +628,7 @@ dojo.ready(loadPage);
             </table>
 
         </div>
-        
+
     </body>
-  
+
 </html>
