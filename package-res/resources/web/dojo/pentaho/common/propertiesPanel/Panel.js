@@ -281,8 +281,6 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
               this.model = options.model;
               this.propPanel = options.propPanel;
               var outterThis = this;
-              this.model.watch(function (propName, prevVal, newVal) {
-
               this._watchHandle = this.model.watch(function(propName, prevVal, newVal) {
                 switch (propName) {
                   case "value":
