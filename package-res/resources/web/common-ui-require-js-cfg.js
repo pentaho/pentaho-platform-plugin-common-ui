@@ -13,149 +13,162 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-var prefix = (typeof CONTEXT_PATH != "undefined") ? CONTEXT_PATH + 'content/common-ui/resources/web' :
-    (typeof KARMA_RUN != "undefined") ? "../../package-res/resources/web" :"common-ui"; //prod vs build
-var isDebug = typeof document == "undefined" || document.location.href.indexOf("debug=true") > 0;
+(function() {
+  /* global requireCfg:true, CONTEXT_PATH:true, KARMA_RUN:true, SESSION_LOCALE:true */
+  var basePath = 
+        // production
+        (typeof CONTEXT_PATH !== "undefined") ? CONTEXT_PATH + "content/common-ui/resources/web" :
+        // test
+        (typeof KARMA_RUN    !== "undefined") ? "../../package-res/resources/web" :
+        // build 
+        "common-ui",
+      
+      useDebug  = typeof document === "undefined" || document.location.href.indexOf("debug=true") > 0,
+      minSuffix = useDebug ? "" : ".min",
+      requirePaths   = requireCfg.paths,
+      requireShim    = requireCfg.shim,
+      requireMap     = requireCfg.map,
+      requireService = requireCfg.config.service;
+  
+  requirePaths["common-ui"     ] = basePath;
+  requirePaths["common-repo"   ] = basePath + "/repo";
+  requirePaths["common-data"   ] = basePath + "/dataapi";
+  requirePaths["pentaho/common"] = basePath + "/dojo/pentaho/common";
+  
+  // AMD PLUGINS
+  requirePaths["local"  ] = basePath + "/util/local";
+  requirePaths["service"] = basePath + "/util/service";
+  requirePaths["json"   ] = basePath + "/util/require-json/json";
+  requirePaths["text"   ] = basePath + "/util/require-text/text";
+  // Using `map` is important for use in r.js and correct AMD config of the other files of the package.
+  requireMap["*"]["css" ] = basePath + "/util/require-css/css" + minSuffix;
+  
+  // SHIMS
+  requirePaths["common-ui/es6-promise-shim"] = basePath + "/util/es6-promise-shim";
+  requirePaths["common-ui/es5-shim"] = basePath + "/util/es5-shim";
+  
+  // DOJO
+  requirePaths["dojo" ] = basePath + "/dojo/dojo";
+  requirePaths["dojox"] = basePath + "/dojo/dojox";
+  requirePaths["dijit"] = basePath + "/dojo/dijit";
+  
+  // ...Overrides
+  var dojoOverrides = basePath + "/dojo/pentaho/common/overrides/";
+  requirePaths["dojo/on"] = dojoOverrides + "dojo/on";
+  requirePaths["dojo/dom-geometry"] = dojoOverrides + "dojo/dom-geometry";
+  requirePaths["dojo/dom-prop"] = dojoOverrides + "dojo/dom-prop";
+  requirePaths["dojox/layout/ResizeHandle"] = dojoOverrides + "dojox/layout/ResizeHandle";
+  requirePaths["dojox/grid/_View"] = dojoOverrides + "dojox/grid/_View";
+  requirePaths["dojox/xml/parser"] = dojoOverrides + "dojox/xml/parser";
+  requirePaths["dojox/grid/Selection"] = dojoOverrides + "dojox/grid/Selection";
+  requirePaths["dojox/grid/_FocusManager"] = dojoOverrides + "dojox/grid/_FocusManager";
+  requirePaths["dojox/grid/_Scroller"] = dojoOverrides + "dojox/grid/_Scroller";
+  requirePaths["dojox/storage"] = dojoOverrides + "dojox/storage";
+  requirePaths["dojox/json"] = dojoOverrides + "dojox/json";
+  requirePaths["dojox/rpc"] = dojoOverrides + "dojox/rpc";
+  requirePaths["dojo/_base/kernel"] = dojoOverrides + "dojo/_base/kernel";
+  requirePaths["dojo/store/Memory"] = dojoOverrides + "dojo/store/Memory";
+  
+  // Plugin Handler
+  requirePaths["common-ui/PluginHandler"] = basePath + "/plugin-handler/pluginHandler";
+  requirePaths["common-ui/Plugin"] = basePath + "/plugin-handler/plugin";
+  requirePaths["common-ui/AngularPluginHandler"] = basePath + "/plugin-handler/angularPluginHandler";
+  requirePaths["common-ui/AngularPlugin"] = basePath + "/plugin-handler/angularPlugin";
+  requirePaths["common-ui/AnimatedAngularPluginHandler"] = basePath + "/plugin-handler/animatedAngularPluginHandler";
+  requirePaths["common-ui/AnimatedAngularPlugin"] = basePath + "/plugin-handler/animatedAngularPlugin";
+  
+  // OTHER LIBS
+  requirePaths["common-ui/jquery"] = basePath + "/jquery/jquery-1.9.1" + minSuffix;
+  requireShim ["common-ui/jquery"] = {exports: "$"};
+  
+  requirePaths["common-ui/handlebars"] = basePath + "/handlebars/handlebars";
+  requireShim ["common-ui/handlebars"] = ["common-ui/jquery"];
+  
+  requirePaths["common-ui/jquery-i18n"] = basePath + "/jquery/jquery.i18n.properties-min";
+  requireShim ["common-ui/jquery-i18n"] = ["common-ui/jquery"];
+  requirePaths["common-ui/jquery-pentaho-i18n"] = basePath + "/jquery/jquery.i18n.properties.supported.languages";
+  
+  requirePaths["common-ui/bootstrap"] = basePath + "/bootstrap/bootstrap" + minSuffix;
+  requireShim ["common-ui/bootstrap"] = ["common-ui/jquery"];
+  
+  requirePaths["common-ui/ring"] = basePath + "/ring/ring";
+  requireShim ["common-ui/ring"] = {deps: ["common-ui/underscore"], exports: "ring"};
+  
+  requirePaths["common-ui/underscore"] = basePath + "/underscore/underscore" + minSuffix;
+  requirePaths["underscore"] = basePath + "/underscore/underscore" + minSuffix;
+  
+  // Intended for private use of "common-ui/es6-promise-shim" 
+  requirePaths["es6-promise"] = basePath + "/es6-promise/es6-promise" + minSuffix;
+  
+  // ANGULAR
+  requirePaths["common-ui/angular"] = basePath + "/angular/angular" + minSuffix;
+  requireShim ["common-ui/angular"] = {
+    deps: ["common-ui/jquery"],
+    exports: "angular",
+    init: function() {
+      // Load i18n for angular.
+      var baseMid = "common-ui/angular-i18n/angular-locale_", // mid = module id
+          locale = (typeof SESSION_LOCALE !== "undefined") ? SESSION_LOCALE : "en";
+      
+      locale = locale.replace("_", "-").toLowerCase();
+      
+      require([baseMid + locale], function() { }, function(err) {
+          // Couldn"t find the locale specified, fall back.
+          var prev = locale;
+          
+          // Strip off the country designation, try to get just the language.
+          locale = (locale.length > 2) ? locale.substring(0, 2) : "en";
 
-requireCfg['paths']['common-ui'] = prefix;
-
-requireCfg['paths']['dojo'] = prefix+'/dojo/dojo';
-requireCfg['paths']['dojox'] = prefix+'/dojo/dojox';
-requireCfg['paths']['dijit'] = prefix+'/dojo/dijit';
-requireCfg['paths']['pentaho/common'] = prefix+'/dojo/pentaho/common';
-
-
-requireCfg['paths']['local'] = prefix+'/util/local';
-requireCfg['paths']['service'] = prefix+'/util/service';
-requireCfg['paths']['css'] = prefix+'/util/require-css/css' + (isDebug ? "" : ".min");
-
-requireCfg['paths']["es6-promise"] = prefix+'/es6-promise/es6-promise' + (isDebug ? "" : ".min");
-requireCfg['paths']["es6-promise-shim"] = prefix+'/util/es6-promise-shim';
-
-requireCfg['paths']['common-repo'] = prefix+'/repo';
-//requireCfg['paths']['common-repo/pentaho-ajax'] = prefix+'/repo/pentaho-ajax';
-
-requireCfg['paths']['common-data'] = prefix+'/dataapi';
-
-requireCfg['paths']['dojo/on'] = prefix+'/dojo/pentaho/common/overrides/dojo/on';
-requireCfg['paths']['dojo/dom-geometry'] = prefix+'/dojo/pentaho/common/overrides/dojo/dom-geometry';
-requireCfg['paths']['dojo/dom-prop'] = prefix+'/dojo/pentaho/common/overrides/dojo/dom-prop';
-
-requireCfg['paths']['dojox/layout/ResizeHandle'] = prefix+'/dojo/pentaho/common/overrides/dojox/layout/ResizeHandle';
-requireCfg['paths']['dojox/grid/_View'] = prefix+'/dojo/pentaho/common/overrides/dojox/grid/_View';
-requireCfg['paths']['dojox/xml/parser'] = prefix+'/dojo/pentaho/common/overrides/dojox/xml/parser';
-requireCfg['paths']['dojox/grid/Selection'] = prefix+'/dojo/pentaho/common/overrides/dojox/grid/Selection';
-requireCfg['paths']['dojox/grid/_FocusManager'] = prefix+'/dojo/pentaho/common/overrides/dojox/grid/_FocusManager';
-requireCfg['paths']['dojox/grid/_Scroller'] = prefix+'/dojo/pentaho/common/overrides/dojox/grid/_Scroller';
-requireCfg['paths']['dojox/storage'] = prefix+'/dojo/pentaho/common/overrides/dojox/storage';
-requireCfg['paths']['dojox/json'] = prefix+'/dojo/pentaho/common/overrides/dojox/json';
-requireCfg['paths']['dojox/rpc'] = prefix+'/dojo/pentaho/common/overrides/dojox/rpc';
-requireCfg['paths']['dojo/_base/kernel'] = prefix+'/dojo/pentaho/common/overrides/dojo/_base/kernel';
-requireCfg['paths']['dojo/store/Memory'] = prefix+'/dojo/pentaho/common/overrides/dojo/store/Memory';
-
-
-// Plugin Handlers
-requireCfg['paths']['common-ui/PluginHandler'] = prefix+'/plugin-handler/pluginHandler';
-requireCfg['paths']['common-ui/Plugin'] = prefix+'/plugin-handler/plugin';
-requireCfg['paths']['common-ui/AngularPluginHandler'] = prefix+'/plugin-handler/angularPluginHandler';
-requireCfg['paths']['common-ui/AngularPlugin'] = prefix+'/plugin-handler/angularPlugin';
-requireCfg['paths']['common-ui/AnimatedAngularPluginHandler'] = prefix+'/plugin-handler/animatedAngularPluginHandler';
-requireCfg['paths']['common-ui/AnimatedAngularPlugin'] = prefix+'/plugin-handler/animatedAngularPlugin';
-
-requireCfg['paths']['common-ui/jquery'] = prefix+'/jquery/jquery-1.9.1.min';
-
-
-requireCfg['paths']['common-ui/handlebars'] = prefix+'/handlebars/handlebars';
-requireCfg['paths']['common-ui/jquery-i18n'] = prefix+'/jquery/jquery.i18n.properties-min';
-requireCfg['paths']['common-ui/jquery-pentaho-i18n'] = prefix+'/jquery/jquery.i18n.properties.supported.languages';
-requireCfg['paths']['common-ui/bootstrap'] = prefix+'/bootstrap/bootstrap.min';
-requireCfg['paths']['common-ui/ring'] = prefix+'/ring/ring';
-requireCfg['paths']['common-ui/underscore'] = prefix+'/underscore/underscore';
-requireCfg['paths']['underscore'] = prefix+'/underscore/underscore';
-
-requireCfg['paths']['common-ui/angular'] = prefix+'/angular/angular'+(isDebug? "" : ".min");
-requireCfg['paths']['common-ui/angular-i18n'] = prefix+'/angular/i18n';
-requireCfg['paths']['common-ui/angular-resource'] = prefix+'/angular/angular-resource'+(isDebug? "" : ".min");
-requireCfg['paths']['common-ui/angular-route'] = prefix+'/angular/angular-route'+(isDebug? "" : ".min");
-requireCfg['paths']['common-ui/angular-animate'] = prefix+'/angular/angular-animate'+(isDebug? "" : ".min");
-requireCfg['paths']['common-ui/angular-sanitize'] = prefix+'/angular/angular-sanitize'+(isDebug? "" : ".min");
-
-requireCfg['paths']['common-ui/es5-shim'] = prefix+'/util/es5-shim';
-requireCfg['paths']['common-ui/properties-parser'] = prefix+'/angular-translate/properties-parser';
-requireCfg['paths']['common-ui/angular-translate'] = prefix+'/angular-translate/angular-translate'+(isDebug? "" : ".min");
-requireCfg['paths']['common-ui/angular-translate-loader-partial'] = prefix+'/angular-translate/angular-translate-loader-partial'+(isDebug? "" : ".min");
-requireCfg['paths']['common-ui/angular-translate-loader-static'] = prefix+'/angular-translate/angular-translate-loader-static'+(isDebug? "" : ".min");
-
-requireCfg['paths']['common-ui/angular-ui-bootstrap'] = prefix+'/bootstrap/ui-bootstrap-tpls-0.6.0.min';
-
-requireCfg['shim']['common-ui/jquery'] = { exports: '$' };
-
-requireCfg['shim']['common-ui/bootstrap'] = ['common-ui/jquery'];
-requireCfg['shim']['common-ui/jquery-i18n'] = ['common-ui/jquery'];
-requireCfg['shim']['common-ui/handlebars'] = ['common-ui/jquery'];
-requireCfg['shim']['common-ui/ring'] = {deps: ['common-ui/underscore'], exports: "ring"};
-
-requireCfg['shim']['common-ui/angular'] = {
-  deps: ['common-ui/jquery'],
-  exports: 'angular',
-  init: function() {
-    var locale;
-    // go load the i18n for angular
-    if (typeof SESSION_LOCALE != "undefined") {
-      locale = SESSION_LOCALE;
-    } else {
-      locale = "en";
-    }
-    locale = locale.replace('_', "-").toLowerCase();
-    require(["common-ui/angular-i18n/angular-locale_" + locale], function() {
-      // var $injector = angular.injector(['ng']);
-      // $injector.invoke(function($filter) {
-      //   console.log($filter('date')(new Date(), "yy-MMM-d"));
-      // });
-    }, function(err) {
-      // couldn't find the locale specified, fall back
-      var prev = locale;
-      if(locale.length > 2) {
-        // strip off the country designation, try to get just the language
-        locale = locale.substring(0,2);
-      } else {
-        locale = "en";
-      }
-      if(console && console.warn) {
-        console.warn("Could not load locale for '" + prev + "', falling back to '" + locale + "'");
-      }
-
-      require(["common-ui/angular-i18n/angular-locale_" + locale], function() { }, function(err) {
-        // can't find the language at all, go get english
-        if(console && console.warn) {
-          console.warn("Could not load locale for '" + locale + "', falling back to 'en'");
-        }
-        require(["common-ui/angular-i18n/angular-locale_en"], function() { });
+          if(typeof console !== "undefined" && console.warn)
+            console.warn("Could not load locale for '" + prev + "', falling back to '" + locale + "'");
+    
+          require([baseMid + locale], function() { }, function(err) {
+            // Can't find the language at all, go get english.
+            if(typeof console !== "undefined" && console.warn)
+              console.warn("Could not load locale for '" + locale + "', falling back to 'en'");
+            
+            require([baseMid + "en"], function() {});
+          });
       });
-    });
-  }
-};
+    }
+  };
+  
+  requirePaths["common-ui/angular-i18n"] = basePath + "/angular/i18n";
+  
+  requirePaths["common-ui/angular-resource"] = basePath + "/angular/angular-resource" + minSuffix;
+  requireShim ["common-ui/angular-resource"] = ["common-ui/angular"];
+  
+  requirePaths["common-ui/angular-route"] = basePath + "/angular/angular-route" + minSuffix;
+  requireShim ["common-ui/angular-route"] = ["common-ui/angular"];
+  
+  requirePaths["common-ui/angular-animate"] = basePath + "/angular/angular-animate" + minSuffix;
+  requireShim ["common-ui/angular-animate" ] = ["common-ui/angular"];
+  
+  requirePaths["common-ui/angular-sanitize"] = basePath + "/angular/angular-sanitize" + minSuffix;
+  requireShim ["common-ui/angular-sanitize"] = ["common-ui/angular"];
+  
+  requirePaths["common-ui/properties-parser"] = basePath + "/angular-translate/properties-parser";
+  requireShim ["common-ui/properties-parser"] = ["common-ui/es5-shim"];
+  
+  requirePaths["common-ui/angular-translate"] = basePath + "/angular-translate/angular-translate" + minSuffix;
+  requireShim ["common-ui/angular-translate"] = ["common-ui/es5-shim", "common-ui/angular"];
+  
+  requirePaths["common-ui/angular-translate-loader-partial"] = basePath + "/angular-translate/angular-translate-loader-partial" + minSuffix;
+  requireShim ["common-ui/angular-translate-loader-partial"] = ["common-ui/angular-translate"];
+  
+  requirePaths["common-ui/angular-translate-loader-static"] = basePath + "/angular-translate/angular-translate-loader-static" + minSuffix;
+  requireShim ["common-ui/angular-translate-loader-static"] = ["common-ui/angular-translate"];
+  
+  requirePaths["common-ui/angular-ui-bootstrap"] = basePath + "/bootstrap/ui-bootstrap-tpls-0.6.0.min";
+  requireShim ["common-ui/angular-ui-bootstrap"] = ["common-ui/angular"];
+  
+  requirePaths["common-ui/angular-directives"] = basePath + "/angular-directives";
+  requireShim ["common-ui/angular-directives"] = ["common-ui/angular-ui-bootstrap"];
+  
+  // Viz API
+  requireService["common-ui/vizapi/ccc/vizTypeProvider"] = "IVizTypeProvider";
+  
+  //   Uncomment to install sample visualizations
+  //requireService["common-ui/vizapi/sample/vizTypeProvider"] = "IVizTypeProvider";
 
-requireCfg['shim']['common-ui/angular-resource'] = ['common-ui/angular'];
-requireCfg['shim']['common-ui/angular-route'] = ['common-ui/angular'];
-requireCfg['shim']['common-ui/angular-animate'] = ['common-ui/angular'];
-requireCfg['shim']['common-ui/angular-sanitize'] = ['common-ui/angular'];
-
-requireCfg['shim']['common-ui/angular-translate'] = ['common-ui/es5-shim', 'common-ui/angular'];
-requireCfg['shim']['common-ui/properties-parser'] = ['common-ui/es5-shim'];
-requireCfg['shim']['common-ui/angular-translate-loader-partial'] = ['common-ui/angular-translate'];
-requireCfg['shim']['common-ui/angular-translate-loader-static'] = ['common-ui/angular-translate'];
-requireCfg['shim']['common-ui/angular-translate'] = ['common-ui/es5-shim', 'common-ui/angular'];
-requireCfg['shim']['common-ui/angular-translate'] = ['common-ui/es5-shim', 'common-ui/angular'];
-
-/* UI-Bootstrap configuration */
-requireCfg['shim']['common-ui/angular-ui-bootstrap'] = ['common-ui/angular'];
-
-requireCfg['shim']['common-ui/PluginHandler'] = ['common-ui/jquery'];
-requireCfg['paths']['common-ui/angular-directives'] = prefix + '/angular-directives';
-requireCfg['shim']['common-ui/angular-directives'] = ['common-ui/angular-ui-bootstrap'];
-
-requireCfg.config.service['common-ui/vizapi/ccc/vizTypeProvider'] = 'IVizTypeProvider';
-
-// Uncomment to install sample visualizations
-//requireCfg.config.service['common-ui/vizapi/sample/vizTypeProvider'] = 'IVizTypeProvider';
+}());
