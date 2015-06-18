@@ -28,11 +28,11 @@ define([
                 tooltipOffset: 15
             },
 
-            _readUserOptions: function(options, vizOptions) {
+            _readUserOptions: function(options, drawSpec) {
 
-                this.base(options, vizOptions);
+                this.base(options, drawSpec);
 
-                var shape = vizOptions.shape;
+                var shape = drawSpec.shape;
                 if(shape && shape === 'none') {
                     options.dotsVisible = false;
                 } else {

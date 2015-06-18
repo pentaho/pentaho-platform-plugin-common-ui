@@ -15,7 +15,7 @@
 */
 define(['./AbstractDataTable'], function(AbstractDataTable) {
   /**
-   * @module common-ui.vizapi.data
+   * @module pentaho.visual.data
    */
 
   /**
@@ -24,7 +24,7 @@ define(['./AbstractDataTable'], function(AbstractDataTable) {
    *
    * #### AMD
    *
-   * **Module Id**: `"common-ui/vizapi/data/DataTable"`
+   * **Module Id**: `"pentaho/visual/data/DataTable"`
    *
    * **Module Type**: The {{#crossLink "DataTable"}}{{/crossLink}} constructor.
    *
@@ -32,9 +32,10 @@ define(['./AbstractDataTable'], function(AbstractDataTable) {
    *
    * A `DataTable` can be constructed empty, or from either:
    * * a {{#crossLink "AbstractDataTable"}}{{/crossLink}} object,
-   *   in which case its data is copied, or
+   *   in which case its data is copied,
    * * a plain JavaScript object having one of the supported data formats:
-   *   _DataTable_ or _CDA_.
+   *   _DataTable_ or _CDA_,
+   * * a string which is the JSON serialization of one of the above formats.
    *
    * @example
    * To create a `DataTable` from a plain JavaScript object in _DataTable_ format:
@@ -74,16 +75,26 @@ define(['./AbstractDataTable'], function(AbstractDataTable) {
    * @class DataTable
    * @extends AbstractDataTable
    * @constructor
-   * @param {Object|AbstractDataTable} [table]
-   *    An instance of {{#crossLink "AbstractDataTable"}}{{/crossLink}} or
-   *    a plain JavaScript object in a supported data format.
+   * @param {string|Object|AbstractDataTable} [table]
+   *    An instance of {{#crossLink "AbstractDataTable"}}{{/crossLink}},
+   *    a plain JavaScript object in a supported data format,
+   *    or a JSON-serialized string of the latter.
    */
   function DataTable(table) {
-    this._jsonTable =
-      !table ? {cols: [], rows: []} :
-      table instanceof AbstractDataTable ? table.toJSON() :
-      table.metadata ? DataTable.convertCdaToDataTable(table) :
-      table;
+    var jsonTable;
+    if(!table) {
+      jsonTable = {cols: [], rows: []};
+    } else if(table instanceof AbstractDataTable) {
+      jsonTable = table.toJSON();
+    } else {
+      // NOTE: We only use eval instead of JSON.parse to be tolerant of Analyzer's
+      // comment headers... Undocumented feature. May change anytime.
+      if(typeof table === "string") table = eval('(' + table + ')');
+
+      jsonTable = table.metadata ? DataTable.convertCdaToDataTable(table) : table;
+    }
+
+    this._jsonTable = jsonTable;
   }
 
   DataTable.prototype = new AbstractDataTable();

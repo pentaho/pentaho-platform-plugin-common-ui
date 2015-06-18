@@ -58,17 +58,13 @@
 
     <file context="requirejs">content/common-ui/resources/web/common-ui-require-js-cfg.js</file>
 
-    <!-- Example Visualization Plugin. Un-comment to test.
-         Also, uncomment corresponding line in common-ui-require-js-cfg.js file -->
-    <!--file context="analyzer">content/common-ui/resources/web/vizapi/sample/sampleVisualization_analyzer_plugin_loader.js</file-->
-
+    <!-- Example Analyzer Visualization Plugin. Un-comment to test.
+         Also, comment the rule, in "resources/web/vizapi/config.js",
+         that disables the sample visualization in Analyzer. -->
+    <!--file context="analyzer">content/common-ui/resources/web/vizapi/sample/analyzer_plugin_loader.js</file-->
 
     <!-- Example Prompting Sample Plugin. Used in prompting/sample.html -->
     <file context="prompting-sample">content/common-ui/resources/web/prompting/pentaho-prompting-sample-component.js</file>
-
-
-    <!-- uncomment to debug CCC charts -->
-    <!--file context="analyzer">content/common-ui/resources/web/vizapi/ccc/ccc_analyzer_plugin_loader.js</file-->
 
   </external-resources>
 </plugin>

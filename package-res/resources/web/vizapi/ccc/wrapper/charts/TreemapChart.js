@@ -46,7 +46,7 @@ define([
             _getDiscreteColorScale: function() {
                 // Don't use memberPalette for now
                 // as the given colors don't match the members that
-                // are actually colored in this visualization type.
+                // are actually colored in this visual type.
                 return this._getDefaultDiscreteColorScale();
             }
         }

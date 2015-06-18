@@ -45,22 +45,22 @@ define([
                 return sizeVar.label;
             },
 
-            _readUserOptions: function(options, vizOptions) {
-                this.base(options, vizOptions);
+            _readUserOptions: function(options, drawSpec) {
+                this.base(options, drawSpec);
 
                 var eps = options.extensionPoints;
 
-                this._hideNullMembers = vizOptions.emptySlicesHidden;
+                this._hideNullMembers = drawSpec.emptySlicesHidden;
 
-                if(vizOptions.emptySlicesHidden)
+                if(drawSpec.emptySlicesHidden)
                     eps.slice_visible = function(scene) {
                         return util.isNullMember(scene.vars.category.value);
                     };
 
-                eps.label_textStyle = vizOptions.labelColor;
+                eps.label_textStyle = drawSpec.labelColor;
 
                 // Determine whether to show values label
-                if (vizOptions.labelsOption != "none" && this.axes.measure.boundRoles.size) {
+                if (drawSpec.labelsOption != "none" && this.axes.measure.boundRoles.size) {
                     eps.label_textBaseline = "bottom";
                     eps.label_textMargin = 2;
 
@@ -131,7 +131,7 @@ define([
             },
 
             _configureDisplayUnits: function() {
-                var scaleFactor = this._parseDisplayUnits(this._vizOptions.displayUnits);
+                var scaleFactor = this._parseDisplayUnits(this._drawSpec.displayUnits);
                 if(scaleFactor > 1) {
                     var dims = this.options.dimensions,
                         dimSize = dims.size || (dims.size = {});

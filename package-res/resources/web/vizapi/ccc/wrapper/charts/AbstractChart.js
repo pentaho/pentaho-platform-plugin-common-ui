@@ -17,12 +17,14 @@ define([
     "cdf/lib/CCC/def",
     "cdf/lib/CCC/pvc",
     "cdf/lib/CCC/cdo",
-      "cdf/lib/CCC/protovis",
+    "cdf/lib/CCC/protovis",
     "../axes/Axis",
     "../util",
-    "../../../eventsManager",
+    "pentaho/visual/events",
+    "pentaho/visual/color/utils",
+    "pentaho/visual/color/paletteRegistry",
     "css!../tipsy"
-], function(def, pvc, cdo, pv, Axis, util, vizEvents) {
+], function(def, pvc, cdo, pv, Axis, util, visualEvents, visualColorUtils, visualPaletteRegistry) {
 
     var ruleStrokeStyle = "#808285",  // #D8D8D8',  // #f0f0f0
         lineStrokeStyle = "#D1D3D4";  // "#D1D3D4"; //'#A0A0A0'; // #D8D8D8',// #f0f0f0
@@ -75,7 +77,7 @@ define([
         clearSelectionMode: 'manual',
         tooltipEnabled: true,
         tooltip: {
-            className:    "common-ui-ccc-viz",
+            className:    "pentaho-visual-ccc",
             delayIn:      200,
             delayOut:     80,
             offset:       2,
@@ -119,9 +121,8 @@ define([
     };
 
     return def.type()
-        .init(function(element) {
-            this._element     = element;
-            this._elementName = element.id;
+        .init(function(createOptions) {
+            this._element = createOptions.domElement;
         })
         .add({
             _options: baseOptions,
@@ -161,13 +162,9 @@ define([
 
             _useLabelColor: true,
 
-            /* Viz API INTERFACE  */
+            /* Visual API INTERFACE  */
 
-            /**
-             * Instructs the visualization to draw itself with
-             * supplied data and options.
-             */
-            draw: function(dataTable, vizOptions) {
+            draw: function(dataTable, drawSpec) {
                 // CDA table
                 this._metadata  = [];
                 this._resultset = null;
@@ -176,7 +173,7 @@ define([
                 this._dataTable = dataTable;
 
                 /* TEST
-                vizOptions.memberPalette = {
+                drawSpec.memberPalette = {
                     "[Markets].[Territory]": {
                         "[Markets].[APAC]":   "rgb(150, 0, 0)",
                         "[Markets].[EMEA]":   "rgb(0, 150, 0)",
@@ -202,7 +199,7 @@ define([
 
                 // ---------------
 
-                this._initOptions(vizOptions);
+                this._initOptions(drawSpec);
 
                 this._processDataTable();
 
@@ -217,7 +214,7 @@ define([
 
                 // ---------------
 
-                this._readUserOptions(this.options, vizOptions);
+                this._readUserOptions(this.options, drawSpec);
 
                 // ---------------
 
@@ -263,11 +260,11 @@ define([
             },
 
             // Sets the items on the chart that should be highlighted
-            setHighlights: function(selections) {
-                this._selections = selections;
+            setHighlights: function(highlights) {
+                this._selections = highlights;
 
                 if(!this._ownChange) { // reentry control
-                    if(!selections || selections.length == 0) {
+                    if(!highlights || highlights.length == 0) {
                         // will cause selectionChangedAction being called
                         this._ownChange = true;
                         try {
@@ -304,23 +301,23 @@ define([
 
             /* HELPERS  */
 
-            _initOptions: function(vizOptions) {
+            _initOptions: function(drawSpec) {
                 // Make a copy
-                vizOptions = this._vizOptions = def.copy(vizOptions);
+                drawSpec = this._drawSpec = def.copy(drawSpec);
 
                 // TODO: Analyzer dependency alert!!
-                this._vizHelper = cv.pentahoVisualizationHelpers[vizOptions.customChartType];
+                this._vizHelper = cv.pentahoVisualizationHelpers[drawSpec.type];
 
                 // Store the current selections
-                this._selections = vizOptions.selections;
+                this._selections = drawSpec.highlights;
 
                 // Recursively inherit this class' shared options
                 var options = this.options = def.create(this._options);
                 def.set(
                     options,
-                    'canvas',          this._elementName,
-                    'height',          vizOptions.height || 400,
-                    'width',           vizOptions.width  || 400,
+                    'canvas',          this._element,
+                    'height',          drawSpec.height || 400,
+                    'width',           drawSpec.width  || 400,
                     'dimensionGroups', {},
                     'dimensions',      {},
                     'visualRoles',     {},
@@ -335,17 +332,17 @@ define([
             _setNullInterpolationMode: function(options, value) {
             },
 
-            _readUserOptions: function(options, vizOptions) {
-                // Apply vizOptions to extension points and others
+            _readUserOptions: function(options, drawSpec) {
+                // Apply drawSpec to extension points and others
                 var extPoints = options.extensionPoints;
 
-                var value = vizOptions.backgroundFill;
+                var value = drawSpec.backgroundFill;
                 if(value && value !== 'NONE') {
                     var fillStyle;
                     if(value === 'GRADIENT') {
                         if(this._hasMultiChartColumns) {
                             // Use the first color with half of the saturation
-                            var bgColor = pv.color(vizOptions.backgroundColor).rgb();
+                            var bgColor = pv.color(drawSpec.backgroundColor).rgb();
                             bgColor = pv.rgb(
                                     ~~((255 + bgColor.r) / 2), // ~~ <=> Math.floor
                                     ~~((255 + bgColor.g) / 2),
@@ -355,44 +352,44 @@ define([
                             fillStyle = bgColor;
                         } else {
                             fillStyle = 'linear-gradient(to top, ' +
-                                        vizOptions.backgroundColor + ', ' +
-                                        vizOptions.backgroundColorEnd + ')';
+                                        drawSpec.backgroundColor + ', ' +
+                                        drawSpec.backgroundColorEnd + ')';
                         }
                     } else {
-                        fillStyle = vizOptions.backgroundColor;
+                        fillStyle = drawSpec.backgroundColor;
                     }
 
                     extPoints.base_fillStyle = fillStyle;
                 }
 
-                value = vizOptions.labelColor;
+                value = drawSpec.labelColor;
                 if(value !== undefined) {
                     extPoints.axisLabel_textStyle =
                     extPoints.axisTitleLabel_textStyle = value;
                 }
 
-                value = ('' + vizOptions.showLegend) === 'true';
+                value = ('' + drawSpec.showLegend) === 'true';
                 options.legend = value;
                 if(value) {
-                    value = vizOptions.legendColor;
+                    value = drawSpec.legendColor;
                     if(value !== undefined) extPoints.legendLabel_textStyle = value;
 
                     // TODO: ignoring white color cause analyzer has no on-off for the legend bg color
                     // and always send white. When the chart bg color is active it
                     // would not show through the legend.
-                    value = vizOptions.legendBackgroundColor;
+                    value = drawSpec.legendBackgroundColor;
                     if(value && value.toLowerCase() !== "#ffffff")
                         extPoints.legendArea_fillStyle = value;
 
-                    value = vizOptions.legendPosition;
+                    value = drawSpec.legendPosition;
                     if(value) options.legendPosition = value.toLowerCase();
 
 
-                    if(vizOptions.legendSize)
-                        options.legendFont = util.readFont(vizOptions, 'legend');
+                    if(drawSpec.legendSize)
+                        options.legendFont = util.readFont(drawSpec, 'legend');
                 }
 
-                value = vizOptions.lineWidth;
+                value = drawSpec.lineWidth;
                 if(value !== undefined) {
                     extPoints.line_lineWidth  = +value;      // + -> to number
                     var radius = 3 + 6 * ((+value) / 8); // 1 -> 8 => 3 -> 9,
@@ -402,11 +399,11 @@ define([
                     extPoints.plot2Dot_shapeSize  = extPoints.dot_shapeSize;
                 }
 
-                value = vizOptions.maxChartsPerRow;
+                value = drawSpec.maxChartsPerRow;
                 if(value !== undefined)
                     options.multiChartColumnsMax = +value; // + -> to number
 
-                value = vizOptions.emptyCellMode;
+                value = drawSpec.emptyCellMode;
                 if(value) {
                     switch(value) {
                         case 'GAP':    value = 'none';   break;
@@ -417,7 +414,7 @@ define([
                     this._setNullInterpolationMode(options, value);
                 }
 
-                value = vizOptions.multiChartRangeScope;
+                value = drawSpec.multiChartRangeScope;
                 if(value) {
                     switch(value) {
                         case 'GLOBAL': value = 'global'; break;
@@ -428,20 +425,20 @@ define([
                 }
 
                 // build style for pv
-                if(vizOptions.labelSize) {
-                    var labelFont = util.readFont(vizOptions, 'label');
+                if(drawSpec.labelSize) {
+                    var labelFont = util.readFont(drawSpec, 'label');
 
                     options.axisTitleFont =
                     options.axisFont = labelFont;
 
                     if(this._hasMultiChartColumns) {
-                        var labelFontSize   = util.readFontSize(vizOptions, 'label');
-                        var labelFontFamily = util.readFontFamily(vizOptions, 'label');
+                        var labelFontSize   = util.readFontSize(drawSpec, 'label');
+                        var labelFontFamily = util.readFontFamily(drawSpec, 'label');
                         options.titleFont = (labelFontSize + 2) + "px " + labelFontFamily;
                     }
                 }
 
-                var sizeByNegativesMode = vizOptions.sizeByNegativesMode;
+                var sizeByNegativesMode = drawSpec.sizeByNegativesMode;
                 options.sizeAxisUseAbs = sizeByNegativesMode === 'USE_ABS';
             },
 
@@ -752,12 +749,11 @@ define([
 
             _configure: function() {
                 var options = this.options,
-                    vizOptions = this._vizOptions;
+                    drawSpec = this._drawSpec;
 
                 // By default hide overflow, otherwise,
                 // resizing the window frequently ends up needlessly showing scrollbars.
-                // TODO: is it ok to access "vizOptions.controller.domNode" ?
-                vizOptions.controller.domNode.style.overflow = 'hidden'; // Hide overflow
+                this._element.parentNode.style.overflow = 'hidden'; // Hide overflow
 
                 var colorScaleKind = this._getColorScaleKind();
                 if(colorScaleKind) this._configureColor(colorScaleKind);
@@ -769,7 +765,7 @@ define([
                 this._configureTrends();
                 this._configureSorts();
                 this._configureFormats();
-                this._configureLabels(options, vizOptions);
+                this._configureLabels(options, drawSpec);
 
                 options.axisFont = util.defaultFont(options.axisFont, 12);
                 options.axisTitleFont = util.defaultFont(options.axisTitleFont, 12);
@@ -789,7 +785,7 @@ define([
 
             _configureColor: function(colorScaleKind) {
                 var options = this.options,
-                    vizOptions = this._vizOptions;
+                    drawSpec = this._drawSpec;
 
                 switch(colorScaleKind) {
                     case 'discrete':
@@ -797,20 +793,20 @@ define([
                         break;
 
                     case 'continuous':
-                        options.colorScaleType = vizOptions.colorScaleType;
-                        options.colors = vizOptions.colors;
+                        options.colorScaleType = drawSpec.pattern === "GRADIENT" ? "linear" : "discrete";
+                        options.colors = visualColorUtils.buildPalette(drawSpec.colorSet, drawSpec.pattern, drawSpec.reverseColors);
                         break;
                 }
             },
 
             _getDiscreteColorScale: function() {
-                var memberPalette = this._vizOptions.memberPalette,
+                var memberPalette = this._drawSpec.memberPalette,
                     colorScale = memberPalette && this._getDiscreteColorScaleCore(memberPalette);
                 return colorScale || this._getDefaultDiscreteColorScale();
             },
 
             _getDefaultDiscreteColorScale: function() {
-                return this._vizOptions.palette.colors.slice();
+                return visualPaletteRegistry.get().colors.slice();
             },
 
             _getDiscreteColorScaleCore: function(memberPalette) {
@@ -941,9 +937,9 @@ define([
 
             _configureTrends: function() {
                 var options = this.options,
-                    vizOptions = this._vizOptions;
+                    drawSpec = this._drawSpec;
 
-                var trendType = (this._supportsTrends ? vizOptions.trendType : null) || 'none';
+                var trendType = (this._supportsTrends ? drawSpec.trendType : null) || 'none';
                 switch(trendType) {
                     case 'none':
                     case 'linear':
@@ -954,13 +950,13 @@ define([
 
                 options.trendType = trendType;
                 if(trendType !== 'none') {
-                    var trendName = vizOptions.trendName;
+                    var trendName = drawSpec.trendName;
                     if(!trendName)
                         trendName = this._message('dropZoneLabels_TREND_NAME_' + trendType.toUpperCase());
 
                     options.trendLabel = trendName;
 
-                    var value = vizOptions.trendLineWidth;
+                    var value = drawSpec.trendLineWidth;
                     if(value !== undefined) {
                         var extPoints = options.extensionPoints;
 
@@ -972,12 +968,12 @@ define([
             },
 
             _configureSorts: function() {
-                var sliceOrder = this._vizOptions.sliceOrder;
+                var sliceOrder = this._drawSpec.sliceOrder;
                 if(sliceOrder) this.options.sliceOrder = sliceOrder;
             },
 
             _configureFormats: function() {
-                var fz = this._vizOptions.formatInfo;
+                var fz = this._drawSpec.formatInfo;
                 if(fz) {
                     var numberStyle = {
                         currency: fz.currencySymbol,
@@ -1010,30 +1006,30 @@ define([
                 }
             },
 
-            _configureLabels: function(options, vizOptions) {
-                var valuesAnchor  = vizOptions.labelsOption,
+            _configureLabels: function(options, drawSpec) {
+                var valuesAnchor  = drawSpec.labelsOption,
                     valuesVisible = !!valuesAnchor && valuesAnchor !== 'none';
 
                 options.valuesVisible = valuesVisible;
                 if(valuesVisible) {
-                    this._configureLabelsAnchor(options, vizOptions);
+                    this._configureLabelsAnchor(options, drawSpec);
 
-                    options.valuesFont = util.defaultFont(util.readFont(vizOptions, 'label'));
+                    options.valuesFont = util.defaultFont(util.readFont(drawSpec, 'label'));
 
                     if(this._useLabelColor)
-                        options.extensionPoints.label_textStyle = vizOptions.labelColor;
+                        options.extensionPoints.label_textStyle = drawSpec.labelColor;
                 }
             },
 
-            _configureLabelsAnchor: function(options, vizOptions) {
-                options.valuesAnchor = vizOptions.labelsOption;
+            _configureLabelsAnchor: function(options, drawSpec) {
+                options.valuesAnchor = drawSpec.labelsOption;
             },
 
             _configureMultiChart: function() {
                 var options = this.options;
 
                 // Let the vertical scrollbar show up if necessary
-                var containerStyle = this._vizOptions.controller.domNode.style;
+                var containerStyle = this._element.parentNode.style;
                 containerStyle.overflowX = 'hidden';
                 containerStyle.overflowY = 'auto';
 
@@ -1046,7 +1042,7 @@ define([
 
                 options.smallTitleFont = titleFont;
 
-                var multiChartOverflow = this._vizOptions.multiChartOverflow;
+                var multiChartOverflow = this._drawSpec.multiChartOverflow;
                 if(multiChartOverflow)
                     options.multiChartOverflow = multiChartOverflow.toLowerCase();
             },
@@ -1192,7 +1188,7 @@ define([
                 /* Add selection information */
                 // Not the data point count, but the selection count (a single column selection may select many data points).
                 //var selectedCount = this._chart && this._chart.data.selectedCount();
-                var selections = this._vizOptions.controller.highlights,
+                var selections = this._selections,
                     selectedCount = selections && selections.length;
                 if(selectedCount) {
                     var msgId = selectedCount === 1 ?
@@ -1305,7 +1301,7 @@ define([
                 this._ownChange = true;
                 try {
                     // Launch analyzer select event, even if selection is empty (to clear it)
-                    vizEvents.trigger(this, "select", {
+                    visualEvents.trigger(this, "select", {
                         source:        this,
                         selections:    selections,
                         selectionMode: "REPLACE"
@@ -1319,7 +1315,7 @@ define([
                 var selectionsKept = selections;
 
                 // limit selection
-                var filterSelectionMaxCount = this._vizOptions['filter.selection.max.count'] || 200,
+                var filterSelectionMaxCount = this._drawSpec['filter.selection.max.count'] || 200,
                     L = selections.length,
                     deselectCount = L - filterSelectionMaxCount;
                 if(deselectCount > 0) {
@@ -1505,7 +1501,7 @@ define([
 
             _onDoubleClick: function(complex) {
                 var selection = this._complexToCellSelection(complex, this._selectionExcludesMultiGems());
-                vizEvents.trigger(this, "doubleclick", {
+                visualEvents.trigger(this, "doubleclick", {
                     source:        this,
                     selections:    [selection]
                     // TODO: Analyzer needs to know whether this double click is coming from a chart data point or an axis.

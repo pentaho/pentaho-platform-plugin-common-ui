@@ -62,10 +62,10 @@ define([
                 });
             },
 
-            _readUserOptions: function(options, vizOptions) {
-                this.base(options, vizOptions);
+            _readUserOptions: function(options, drawSpec) {
+                this.base(options, drawSpec);
 
-                var shape = vizOptions.shape;
+                var shape = drawSpec.shape;
                 if(shape && shape === 'none') {
                     options.pointDotsVisible = false;
                 } else {
@@ -88,16 +88,16 @@ define([
                 // options.color2AxisTransform = null;
             },
 
-            _configureLabels: function(options, vizOptions) {
+            _configureLabels: function(options, drawSpec) {
                 this.base.apply(this, arguments);
 
                 // Plot2
-                var lineLabelsAnchor = vizOptions.lineLabelsOption;
+                var lineLabelsAnchor = drawSpec.lineLabelsOption;
                 if(lineLabelsAnchor && lineLabelsAnchor !== 'none') {
                     options.plot2ValuesVisible = true;
                     options.plot2ValuesAnchor  = lineLabelsAnchor;
-                    options.plot2ValuesFont    = util.defaultFont(util.readFont(vizOptions, 'label'));
-                    options.extensionPoints.plot2Label_textStyle = vizOptions.labelColor;
+                    options.plot2ValuesFont    = util.defaultFont(util.readFont(drawSpec, 'label'));
+                    options.extensionPoints.plot2Label_textStyle = drawSpec.labelColor;
                 }
             },
 
