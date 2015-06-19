@@ -14,7 +14,8 @@
 * limitations under the License.
 */
 define([
-    "./AbstractCategoricalContinuousChart"
+    "./AbstractCategoricalContinuousChart",
+    "../trends"
 ], function(AbstractCategoricalContinuousChart) {
 
     return AbstractCategoricalContinuousChart.extend({

@@ -14,7 +14,8 @@
 * limitations under the License.
 */
 define([
-    "./AbstractBarChart"
+    "./AbstractBarChart",
+    "../trends"
 ], function(AbstractBarChart) {
 
     return AbstractBarChart.extend({

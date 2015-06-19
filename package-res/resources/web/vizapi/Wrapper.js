@@ -461,7 +461,7 @@ define([
      * @param {boolean} [options.saveData=false] Indicates if the current visual
      *    data should be included.
      *
-     * @return {object} A visual specification.
+     * @return {IVisualSpec} The current visual specification.
      */
     save: function(options) {
       this._checkVisualState();

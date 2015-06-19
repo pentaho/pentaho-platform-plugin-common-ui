@@ -14,7 +14,8 @@
 * limitations under the License.
 */
 define([
-    "./AbstractCartesianChart"
+    "./AbstractCartesianChart",
+    "../trends"
 ], function(AbstractCartesianChart) {
 
     return AbstractCartesianChart.extend({
