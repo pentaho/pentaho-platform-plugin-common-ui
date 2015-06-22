@@ -58,6 +58,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
   <property name="js.build.file" value="build-res/javascript.build.js"/>
+  
+  <property name="js.build.failonerror" value="true" description="Fail the build if r.js build fails"/>
+  
   <property name="js.script.package.dest" value="${stage.dir}/${package.root.dir}/scripts"/>
 
   <property name="css.build.file" value="build-res/css.build.js"/>
@@ -73,10 +76,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   <property name="js.karma.config" value="config/karma.conf.js"/>
   <property name="js.karma.ci.config" value="config/karma.ci.conf.js"/>
   <property name="js.node.node_modules.dir" value="node_modules"/>
-
-  <!-- List of comma-separated paths to yuidoc configuration files -->
-  <property name="yuidoc.json" value=""/>
-
+  
+  <property name="js.karma.failonerror" value="true" description="Fail the build if a JS test fails"/>
+  
   <property environment="env"/>
 
   <target name="js.clean"
@@ -106,7 +108,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       </not>
       <then>
         <ivy:resolve organisation="pentaho" module="pentaho-js-build" revision="0.2" inline="true"/>
-        <ivy:retrieve organisation="pentaho" module="pentaho-js-build" revision="0.2" inline="true" pattern="build-res/[artifact].[ext]"/>
+        <ivy:retrieve organisation="pentaho" module="pentaho-js-build" revision="0.2" inline="true"
+                      pattern="build-res/[artifact].[ext]"/>
         <unzip src="build-res/pentaho-js-build.zip" dest="build-res"/>
       </then>
     </if>
@@ -139,8 +142,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
           </fileset>
         </path>
         <echo message="Collecting RequireJS Configurations"/>
-        <echo message="var requireCfg={paths: {}, shim: {}, map: {&quot;*&quot;: {}}, bundles: {}, config: {service: {}}, packages: []};"
-              file="build-res/requireCfg-raw.js" append="false" />
+        <echo message="var requireCfg={paths:{},shim:{}};" file="build-res/requireCfg-raw.js" append="false"/>
         <concat destfile="build-res/requireCfg-raw.js" append="true" force="yes">
           <fileset dir="${js.module.script.agg.dir}" casesensitive="yes">
             <include name="*/*-require-js-cfg.js"/>
@@ -178,7 +180,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     <if>
       <equals arg1="true" arg2="${node-is-available}"/>
       <then>
-        <exec command="node">
+        <exec command="node" failonerror="${js.build.failonerror}">
           <arg value="build-res/pentaho-js-build/r.js"/>
           <arg value="-o"/>
           <arg value="${js.build.file}"/>
@@ -189,12 +191,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         <java classname="org.mozilla.javascript.tools.shell.Main"
               fork="true"
               classpathref="build.classpath"
-              args="build-res/pentaho-js-build/r.js -o ${js.build.file} optimize=${js.build.optimizer}">
+              args="build-res/pentaho-js-build/r.js -o ${js.build.file} optimize=${js.build.optimizer}"
+              failonerror="${js.build.failonerror}">
         </java>
       </else>
     </if>
-
-
   </target>
 
   <target name="dist-js">
@@ -343,7 +344,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                   <fail>Run 'npm install -g karma-cli' [adds karma.cmd to the command line]</fail>
                 </then>
               </if>
-              <exec executable="karma.cmd" failonerror="true">
+              <exec executable="karma.cmd" failonerror="${js.karma.failonerror}">
                 <arg value="start"/>
                 <arg value="${js.karma.ci.config}"/>
                 <!-- if we are running via ant, then assume we must 'single-run' -->
@@ -351,7 +352,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
               </exec>
             </then>
             <else>
-              <exec executable="node_modules/karma/bin/karma" failonerror="true">
+              <exec executable="node_modules/karma/bin/karma" failonerror="${js.karma.failonerror}">
                 <arg value="start"/>
                 <arg value="${js.karma.ci.config}"/>
                 <!-- if we are running via ant, then assume we must 'single-run' -->
@@ -401,92 +402,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       </else>
     </if>
 
-  </target>
-
-  <available file="yuidoc.cmd" filepath="${env.Path}" property="yuidoc-for-windows-is-available"/>
-
-  <!-- Top-level JS Documentation target for MindTouch output -->
-  <target name="doc-js-mindtouch">
-    <antcall target="doc-many-js">
-      <param name="yuidoc.template.dir" value="build-res/yuidoc-theme-mindtouch" />
-    </antcall>
-  </target>
-
-  <!-- Top-level JS Documentation target for default template output -->
-  <target name="doc-js">
-    <antcall target="doc-many-js">
-      <param name="yuidoc.template.dir" value="" />
-    </antcall>
-  </target>
-
-  <target name="doc-many-js" depends="install-antcontrib, npm-install">
-    <if>
-      <not>
-        <equals arg1="${yuidoc.json}" arg2="" />
-      </not>
-      <then>
-        <!-- YUIDoc fails creating out dirs with more than one level.
-             So, we create the standardized output base dir. -->
-        <mkdir dir="doc-js" />
-
-        <foreach param="yuidoc-one.json" list="${yuidoc.json}" target="doc-one-js" />
-
-        <zip destfile="${dist.dir}/js-doc-${project.revision}.zip" basedir="${basedir}/doc-js" />
-      </then>
-    </if>
-  </target>
-  <target name="doc-one-js">
-    <if>
-      <available file="${yuidoc-one.json}"/>
-      <then>
-          <!-- The yuidoc configuration file exists.
-               Check if yuidoc is installed. -->
-          <if>
-            <isset property="isWindows"/>
-            <then>
-              <if>
-                <not>
-                  <isset property="yuidoc-for-windows-is-available"/>
-                </not>
-                <then>
-                  <fail>Run 'npm -g install yuidocjs'</fail>
-                </then>
-              </if>
-              <if>
-                <equals arg1="${yuidoc.template.dir}" arg2="" />
-                <then>
-                  <exec executable="yuidoc.cmd" failonerror="true">
-                    <arg line='--config "${yuidoc-one.json}"' />
-                  </exec>
-                </then>
-                <else>
-                  <exec executable="yuidoc.cmd" failonerror="true">
-                    <arg line='--config "${yuidoc-one.json}" --themedir "${yuidoc.template.dir}"' />
-                  </exec>
-                </else>
-              </if>
-            </then>
-            <else>
-              <if>
-                <equals arg1="${yuidoc.template.dir}" arg2="" />
-                <then>
-                  <exec executable="node_modules/yuidocjs/lib/cli.js" failonerror="true">
-                    <arg line='--config "${yuidoc-one.json}"' />
-                  </exec>
-                </then>
-                <else>
-                  <exec executable="node_modules/yuidocjs/lib/cli.js" failonerror="true">
-                    <arg line='--config "${yuidoc-one.json}" --themedir "${yuidoc.template.dir}"' />
-                  </exec>
-                </else>
-              </if>
-            </else>
-          </if>
-      </then>
-      <else>
-        <fail>There is no YUIDoc configuration file available at ${yuidoc-one.json}.</fail>
-      </else>
-    </if>
   </target>
 
 </project>
