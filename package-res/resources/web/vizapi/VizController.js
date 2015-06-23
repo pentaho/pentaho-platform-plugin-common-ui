@@ -133,17 +133,6 @@ pentaho.VizController = function(id) {
   this.formatInfo = null;
 }
 
-pentaho.VizController.prototype.dispose = function() {
-  pentaho.events.removeSource(this);
-  if(this.chart) {
-    if(this.chart.dispose) this.chart.dispose();
-    pentaho.events.removeSource(this.chart);
-    this.chart = null;
-  }
-
-  this.domNode = this.visualPanelElement = null;
-};
-
 /*
  getError
  Returns the most recent Javascript error object

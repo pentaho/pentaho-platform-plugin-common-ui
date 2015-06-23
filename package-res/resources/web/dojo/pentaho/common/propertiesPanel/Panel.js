@@ -248,10 +248,6 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
               this.propUIs.forEach(function (widget) {
                 widget.destroyRecursive();
               });
-              for(var gid in this.groups) {
-                this.groups[gid].destroyRecursive();
-              }
-
               this.propUIs = [];
               this.groups = {};
               this.domNode.innerHTML = "";
@@ -283,28 +279,16 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
               var outterThis = this;
               this.model.watch(function (propName, prevVal, newVal) {
 
-              this._watchHandle = this.model.watch(function(propName, prevVal, newVal) {
                 switch (propName) {
                   case "value":
                   case "default":
-                    if(!outterThis._destroyed) outterThis.set(propName, newVal);
+                    outterThis.set(propName, newVal);
                     break;
                 }
               });
             },
             onUIEvent: function (type, args) {
-            },
 
-            destroy: function() {
-              this.inherited(arguments);
-
-              // this.model = null;
-              // this.propPanel = null;
-
-              if(this._watchHandle) {
-                this._watchHandle.remove();
-                this._watchHandle = null;
-              }
             }
           }
       );
@@ -350,12 +334,6 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
             }
 
           }
-        },
-
-        destroy: function() {
-          this.inherited(arguments);
-          this.dropIndicator = this.gemUIbeingInserted = null;
-          // this.gemBar = null
         },
 
         _redirectMouseUp: function (e) {
@@ -405,7 +383,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
               gemUI.gemBar = this.gemBar;
             }
           } else {
-            gem = this.createGemFromNode(droppedNode);
+            var gem = this.createGemFromNode(droppedNode);
             gemUI = this.createGemUI(gem, droppedNode);
             nodes[0] = gemUI.domNode;
           }
@@ -607,11 +585,6 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
           var ok = this.dropZone.checkAcceptance(source, nodes, silent);
           ;
           return ok;
-        },
-
-        destroy: function() {
-          this.inherited(arguments);
-          this.dropZone = null;
         }
       });
 
@@ -630,10 +603,6 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
             constructor: function (options) {
               this.id = this.model.id + "_ui";
               this.showPlaceholder = this.model.ui.showPlaceholder;
-
-              this.handles = [];
-              this.subscriptions = [];
-
               if (this.model.ui.placeholderText) {
                 this.placeholderText = this.model.ui.placeholderText;
               }
@@ -654,7 +623,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
               // new pentaho.common.propertiesPanel.PlaceholderSource(this.domNode, {accept: this.model.ui.dndType, dropZone: this.dropZone});
 
               if (this.showPlaceholder && (this.model.allowMultiple || this.model.gems.length < 2)) {
-                this._placeHolderSource = new PlaceholderSource(this.placeholder, {accept: this.model.ui.dndType, dropZone: this.dropZone});
+                new PlaceholderSource(this.placeholder, {accept: this.model.ui.dndType, dropZone: this.dropZone});
 
 
                 // dojo.connect(this.placeholder.firstChild, "onmouseover", function(event){
@@ -683,27 +652,29 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
               this.subscriptions.push(topic.subscribe("/dnd/cancel", unSubscribeFunc));
               this.subscriptions.push(topic.subscribe("/dnd/drop", unSubscribeFunc));
 
-              this.handles.push(on(this.domNode,  "mouseover", function (event) {
-                if (ManagerClass.manager().source && outterThis.checkAcceptance(outterThis.dropZone,  ManagerClass.manager().nodes)) {
-                  outterThis._showOver();
-                }
-              }));
-              this.handles.push(on(this.domNode, "mouseout", function (event) {
-                outterThis._hideOver();
-              }));
-              this.handles.push(on(this.domNode, "mouseup", function (event) {
-                outterThis._hideOver();
-              }));
 
-              // this.handles.push(on(this.dropZone,  "onDrop", lang.hitch( this,  "onDrop")));
-              this.handles.push(on(this.dropZone,  "createDropIndicator", lang.hitch( this,  "createDropIndicator")));
-              this.handles.push(on(this.dropZone,  "placeDropIndicator", lang.hitch( this,  "placeDropIndicator")));
-              this.handles.push(on(this.dropZone,  "onMouseOver", lang.hitch( this,  "onMouseOver")));
-              this.handles.push(on(this.dropZone,  "onMouseOut", lang.hitch( this,  "onMouseOut")));
-              this.handles.push(on(this.dropZone,  "onDraggingOver", lang.hitch( this,  "onDraggingOver")));
-              this.handles.push(on(this.dropZone,  "onDraggingOver", lang.hitch( this,  "onDraggingOut")));
-              // this.handles.push(on(this.dropZone,  "checkAcceptance", lang.hitch( this,  "checkAcceptance")));
-              this.handles.push(on(this.dropZone,  "insertNodes", lang.hitch( this,  "insertNodes")));
+              on(this.domNode,  "mouseover", function (event) {
+                if (ManagerClass.manager().source && outterThis.checkAcceptance(outterThis.dropZone,  ManagerClass.manager().nodes)) {
+                  domClass.add(outterThis.domNode, "over");
+                }
+              });
+              on(this.domNode, "mouseout", function (event) {
+                domClass.remove(outterThis.domNode,  "over");
+              });
+              on(this.domNode, "mouseup", function (event) {
+                domClass.remove(outterThis.domNode,  "over");
+              });
+
+
+              // this.handles.push[on(this.dropZone,  "onDrop", lang.hitch( this,  "onDrop"))];
+              this.handles.push[on(this.dropZone,  "createDropIndicator", lang.hitch( this,  "createDropIndicator"))];
+              this.handles.push[on(this.dropZone,  "placeDropIndicator", lang.hitch( this,  "placeDropIndicator"))];
+              this.handles.push[on(this.dropZone,  "onMouseOver", lang.hitch( this,  "onMouseOver"))];
+              this.handles.push[on(this.dropZone,  "onMouseOut", lang.hitch( this,  "onMouseOut"))];
+              this.handles.push[on(this.dropZone,  "onDraggingOver", lang.hitch( this,  "onDraggingOver"))];
+              this.handles.push[on(this.dropZone,  "onDraggingOver", lang.hitch( this,  "onDraggingOut"))];
+              // this.handles.push[on(this.dropZone,  "checkAcceptance", lang.hitch( this,  "checkAcceptance"))];
+              this.handles.push[on(this.dropZone,  "insertNodes", lang.hitch( this,  "insertNodes"))];
 
               array.forEach(this.model.gems, function (gem) {
                 var uiClass = Panel.registeredTypes["gem"];
@@ -820,38 +791,14 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
               this.inherited(arguments);
               // destroyRecursive should do this, investigate
               array.forEach(this.gems, function (gem) {
-                gem.destroyRecursive();
+                gem.destroy();
               });
+              this.destroy();
+              array.forEach(this.handles, function(handle){handle.remove()});
             },
             destroy: function () {
-              if(this.handles) {
-              array.forEach(this.handles, function(handle){handle.remove()});
-                this.handles = null;
-              }
-              if(this.subscriptions) {
               array.forEach(this.subscriptions, function(handle){handle.remove()});
-                this.subscriptions = null;
-              }
-
-              this.dropZoneNode = null;
-              this.placeholder = null;
-              /*
-              if(this.dropZone) {
-                this.dropZone.destroy();
-                this.dropZone = null;
-              }
-
-              if(this._placeHolderSource) {
-                this._placeHolderSource.destroy();
-                this._placeHolderSource = null;
-              }
-              */
-
               this.inherited(arguments);
-
-              // Prevent leak
-              this._startupWidgets = null;
-              this._supportingWidgets = null;
             }
           }
       );
@@ -867,48 +814,32 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
               this.gemBar = options.gemBar;
               this.dndType = options.dndType;
               this.id = options.id;
-              this.handles = [];
             },
             detach: function () {
               model.detach();
             },
-            destroy: function() {
-              this.inherited(arguments);
-              if(this.handles) {
-                array.forEach(this.handles, function(handle){handle.remove()});
-                this.handles = null;
-              }
-              this.menuHandle = null;
-              //this.postDrop   = null;
-              //this.gemBar     = null;
-
-              // Prevent leak
-              this._startupWidgets = null;
-              this._supportingWidgets = null;
-            },
             postCreate: function () {
-              this.handles.push(on(this.domNode, "contextmenu", lang.hitch( this,  "onContextMenu")));
-
+              on(this.domNode, "contextmenu", lang.hitch( this,  "onContextMenu"));
               var outterThis = this;
               this.menuHandle = query("div.gemMenuHandle", this.domNode)[0];
 
               var gemLabel = query("div.gem-label", this.domNode)[0];
               gemLabel.appendChild(document.createTextNode(this.model.value));
 
-              this.handles.push(on(query("div.gemMenuHandle",  this.domNode)[0], "mouseover",  function (e) {
+              on(query("div.gemMenuHandle",  this.domNode)[0], "mouseover",  function (e) {
                 if (!ManagerClass.manager().source) {
                   domClass.add(e.target, "over");
                 }
-              }));
-              this.handles.push(on(query("div.gemMenuHandle", this.domNode)[0], "mouseout", function (e) {
+              });
+              on(query("div.gemMenuHandle", this.domNode)[0], "mouseout", function (e) {
                 if (!ManagerClass.manager().source) {
                   domClass.remove(e.target, "over");
                 }
-              }));
-              this.handles.push(on(this.menuHandle, "click", lang.hitch( this,  "onContextMenu")));
+              });
+              on(this.menuHandle, "click", lang.hitch( this,  "onContextMenu"));
 
-              this.handles.push(on(this.domNode, "mouseover", lang.hitch( this,  "onMouseOver")));
-              this.handles.push(on(this.domNode, "mouseout", lang.hitch( this,  "onMouseOut")));
+              on(this.domNode, "mouseover", lang.hitch( this,  "onMouseOver"));
+              on(this.domNode, "mouseout", lang.hitch( this,  "onMouseOut"));
               this.inherited(arguments);
             },
             onMouseOver: function () {
@@ -941,7 +872,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
             constructor: function (options) {
               this.name = options.id;
               this.options = [];
-              this.handles = [];
+
               array.forEach(this.model.values, function (val, idx) {
                 var opt = {label: val, value: val};
                 if (this.model.ui.labels) {
@@ -997,7 +928,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
                 // use the styled drop down
 
                 domClass.add(this.domNode, this.className);
-                var sel = this.selNode = new Select({
+                var sel = new Select({
                   options: opts,
                   onChange: function () {
                     me.model.set('value', this.value);
@@ -1020,14 +951,6 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
             destroy: function () {
               array.forEach(this.handles, function(handle){handle.remove()});
               this.inherited(arguments);
-              if(this.selNode) {
-                this.selNode.destroyRecursive();
-                this.selNode = null;
-              }
-
-              // Prevent leak
-              this._startupWidgets = null;
-              this._supportingWidgets = null;
             }
 
           }
@@ -1108,15 +1031,6 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
             destroy: function () {
               array.forEach(this.handles, function(handle){handle});
               this.inherited(arguments);
-
-              if(this.checkbox) {
-                this.checkbox.destroyRecursive();
-                this.checkbox = null;
-              }
-
-              // Prevent leak
-              this._startupWidgets = null;
-              this._supportingWidgets = null;
             }
           }
       );
@@ -1140,14 +1054,6 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
 
             onClick: function () {
               this.model.set('clicked', true);
-            },
-
-            destroy: function() {
-              this.inherited(arguments);
-
-              // Prevent leak
-              this._startupWidgets = null;
-              this._supportingWidgets = null;
             }
           }
       );
