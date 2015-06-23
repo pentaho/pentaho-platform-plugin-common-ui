@@ -1657,14 +1657,6 @@ function(def, pvc, pv){
 
         /* PLUGIN INTERFACE  */
 
-        dispose: function() {
-           this._element = null;
-           if(this._chart && this._chart.dispose) {
-            this._chart.dispose();
-            this._chart = null;
-           }
-        },
-
         /**
          * Instructs the visualization to draw itself with
          * supplied data and options.
