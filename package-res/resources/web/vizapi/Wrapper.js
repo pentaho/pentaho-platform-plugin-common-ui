@@ -380,6 +380,10 @@ define([
      */
     updateHighlights: function() {
       if(this._visual.setHighlights) {
+        this._checkVisualState();
+
+        this._drawSpec.highlights = this.highlights;
+
         this._visual.setHighlights(this.highlights);
       }
     },

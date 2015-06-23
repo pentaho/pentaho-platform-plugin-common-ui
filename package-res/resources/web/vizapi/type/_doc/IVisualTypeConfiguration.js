@@ -152,15 +152,14 @@
  */
 
 /**
- * **Optional** method that translates editor _external_ properties to properties of visuals.
+ * **Optional** method that gets the visualization properties exposed by a visualization editor's document.
  *
  * This method is called with the configured visual type,
  * {{#crossLink "IVisualType"}}{{/crossLink}}, as the `this` JavaScript context.
  *
- * @method translateEditorProperties
+ * @method getEditorProperties
  *
- * @param {string} editorTypeId The id of the editor type that is the source of _editorProps_.
- * @param {IVisualEditorProperties} editorProps An object that allows reading the editor's properties.
+ * @param {IVisualEditorDocument} editorDoc An object that allows accessing the editor's document and properties.
  * @param {string|string[]} [filterPropsList] A string or an array of strings with
    *   the editor property names
    *   that should be processed. When this is unspecified, _nully_,

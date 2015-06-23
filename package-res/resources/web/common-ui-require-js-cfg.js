@@ -173,7 +173,7 @@
 
   // Visual API - CCC
   requireService["pentaho/visual/ccc/visualTypeProvider"] = "IVisualTypeProvider";
-  requireService["pentaho/visual/ccc/visualTypeConfig"  ] = "IVisualApiConfiguration";
+  requireService["pentaho/visual/ccc/visualApiConfig"] = "IVisualApiConfiguration";
 
   // Sample visualizations
   requireService["pentaho/visual/sample/visualTypeProvider"] = "IVisualTypeProvider";

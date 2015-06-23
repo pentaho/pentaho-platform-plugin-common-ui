@@ -15,7 +15,9 @@
  */
 define(["pentaho/visual/editor/utils"], function(singletonEditorUtils) {
 
-  function MapEditorProps(dict) {
+  function MapEditorProps(editorTypeId, dict) {
+    this.editorTypeId = editorTypeId;
+
     this.get = function(p) {
       return dict.hasOwnProperty(p) ? dict[p] : null;
     };
@@ -39,103 +41,92 @@ define(["pentaho/visual/editor/utils"], function(singletonEditorUtils) {
 
   describe("Visual Editor Utils -", function() {
 
-    describe("#translateEditorProperties(type, editorTypeId, editorProps, filterPropsList)", function() {
+    describe("#getEditorProperties(type, editorDoc, filterPropsList)", function() {
       it("should be a function", function() {
-        expect(typeof singletonEditorUtils.translateEditorProperties).toBe("function");
+        expect(typeof singletonEditorUtils.getEditorProperties).toBe("function");
       });
 
       it("should throw if `type` is not specified", function() {
         expect(function() {
-          singletonEditorUtils.translateEditorProperties();
+          singletonEditorUtils.getEditorProperties();
         }).toThrow();
       });
 
-      it("should throw if `editorTypeId` is not specified", function() {
+      it("should throw if `editorDoc` is not specified", function() {
         expect(function() {
-          singletonEditorUtils.translateEditorProperties({});
+          singletonEditorUtils.getEditorProperties({});
         }).toThrow();
       });
 
-      it("should throw if `editorProps` is not specified", function() {
-        expect(function() {
-          singletonEditorUtils.translateEditorProperties({}, "fooo");
-        }).toThrow();
-      });
-
-      describe("type/config specifies `translateEditorProperties`", function() {
-        it("should call `translateEditorProperties` with `type` as `this` JS context", function() {
+      describe("type/config specifies `getEditorProperties`", function() {
+        it("should call `getEditorProperties` with `type` as `this` JS context", function() {
           var type = {
             id: "ccc_bar",
-            translateEditorProperties: function() {}
+            getEditorProperties: function() {}
           };
 
-          var editorTypeId = "analyzer";
-          var editorProps = {};
+          var editorDoc = {type: "analyzer"};
 
-          spyOn(type, "translateEditorProperties");
+          spyOn(type, "getEditorProperties");
 
-          singletonEditorUtils.translateEditorProperties(type, editorTypeId, editorProps);
+          singletonEditorUtils.getEditorProperties(type, editorDoc);
 
-          expect(type.translateEditorProperties).toHaveBeenCalled();
-          expect(type.translateEditorProperties.calls.first().object).toBe(type);
+          expect(type.getEditorProperties).toHaveBeenCalled();
+          expect(type.getEditorProperties.calls.first().object).toBe(type);
         });
 
-        it("should call `translateEditorProperties` with all the expected arguments", function() {
+        it("should call `getEditorProperties` with all the expected arguments", function() {
           var type = {
             id: "ccc_bar",
-            translateEditorProperties: function() {}
+            getEditorProperties: function() {}
           };
 
-          var editorTypeId = "analyzer";
-          var editorProps = {};
+          var editorDoc = {editorTypeId: "analyzer"};
           var filterPropsList = ["foo", "bar"];
 
-          spyOn(type, "translateEditorProperties");
+          spyOn(type, "getEditorProperties");
 
-          singletonEditorUtils.translateEditorProperties(type, editorTypeId, editorProps, filterPropsList);
+          singletonEditorUtils.getEditorProperties(type, editorDoc, filterPropsList);
 
-          expect(type.translateEditorProperties).toHaveBeenCalled();
+          expect(type.getEditorProperties).toHaveBeenCalled();
 
-          var call = type.translateEditorProperties.calls.first();
+          var call = type.getEditorProperties.calls.first();
 
-          expect(call.args.length).toBe(4);
+          expect(call.args.length).toBe(3);
 
-          expect(call.args[0]).toBe(editorTypeId);
-          expect(call.args[1]).toBe(editorProps);
-          expect(call.args[2]).toBe(filterPropsList);
+          expect(call.args[0]).toBe(editorDoc);
+          expect(call.args[1]).toBe(filterPropsList);
 
-          var filterPropsMap = call.args[3];
+          var filterPropsMap = call.args[2];
           expect(filterPropsMap instanceof Object).toBe(true);
           filterPropsList.forEach(function(p) {
             expect(filterPropsMap[p]).toBe(true);
           });
         });
 
-        it("should return an empty object if `translateEditorProperties` returns nully", function() {
+        it("should return an empty object if `getEditorProperties` returns nully", function() {
           var type = {
             id: "ccc_bar",
-            translateEditorProperties: function() {}
+            getEditorProperties: function() {}
           };
 
-          var editorTypeId = "analyzer";
-          var editorProps = {};
+          var editorDoc = {editorTypeId: "analyzer"};
 
-          var result = singletonEditorUtils.translateEditorProperties(type, editorTypeId, editorProps);
+          var result = singletonEditorUtils.getEditorProperties(type, editorDoc);
 
           expect(result).toEqual({});
         });
 
-        it("should filter the result of `translateEditorProperties` to respect `filterPropsList`", function() {
+        it("should filter the result of `getEditorProperties` to respect `filterPropsList`", function() {
           var type = {
             id: "ccc_bar",
-            translateEditorProperties: function() { return {"foo": 1, "bar": 2, "dudu": 3}; }
+            getEditorProperties: function() { return {"foo": 1, "bar": 2, "dudu": 3}; }
           };
 
-          var editorTypeId = "analyzer";
-          var editorProps = {};
+          var editorDoc = {editorTypeId: "analyzer"};
           var filterPropsList = ["foo", "bar"];
 
-          var result = singletonEditorUtils.translateEditorProperties(type, editorTypeId, editorProps, filterPropsList);
+          var result = singletonEditorUtils.getEditorProperties(type, editorDoc, filterPropsList);
 
           expect(result.foo).toBe(1);
           expect(result.bar).toBe(2);
@@ -143,7 +134,7 @@ define(["pentaho/visual/editor/utils"], function(singletonEditorUtils) {
         });
       });
 
-      describe("type/config does not specify translateEditorProperties", function() {
+      describe("type/config does not specify getEditorProperties", function() {
 
         it("should copy defined editor props that have the name of a general data req", function() {
           var type = {
@@ -154,14 +145,13 @@ define(["pentaho/visual/editor/utils"], function(singletonEditorUtils) {
                 {id: "bar"}
               ]}]
             };
-          var editorTypeId = "analyzer";
-          var editorProps = new MapEditorProps({
+          var editorDoc = new MapEditorProps("analyzer", {
               foo: 1,
               bar: undefined,
-              zas: 3,
+              zas: 3
             });
 
-          var visualProps = singletonEditorUtils.translateEditorProperties(type, editorTypeId, editorProps);
+          var visualProps = singletonEditorUtils.getEditorProperties(type, editorDoc);
 
           expect(visualProps instanceof Object).toBe(true);
           expect(visualProps.foo).toBe(1);
@@ -178,15 +168,14 @@ define(["pentaho/visual/editor/utils"], function(singletonEditorUtils) {
                 {id: "bar"}
               ]}]
             };
-          var editorTypeId = "analyzer";
-          var editorProps = new MapEditorProps({
+          var editorDoc = new MapEditorProps("analyzer", {
               foo: 1,
               bar: 2,
-              zas: 3,
+              zas: 3
             });
           var filterPropsList = ["foo", "zas"];
 
-          var visualProps = singletonEditorUtils.translateEditorProperties(type, editorTypeId, editorProps, filterPropsList);
+          var visualProps = singletonEditorUtils.getEditorProperties(type, editorDoc, filterPropsList);
 
           expect(visualProps instanceof Object).toBe(true);
           expect(visualProps.foo).toBe(1);
