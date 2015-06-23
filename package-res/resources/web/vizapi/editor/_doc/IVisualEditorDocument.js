@@ -19,17 +19,35 @@
  */
 
 /**
- * A minimal interface for reading properties exposed by a visuals editor.
+ * A minimal interface for accessing a visualization editor document counterpart and
+ * also for providing a way to generically read the properties it exposes.
  *
- * Used by {{#crossLink "IVisualTypeConfiguration/translateEditorProperties:property"}}{{/crossLink}}.
+ * Used by {{#crossLink "IVisualTypeConfiguration/getEditorProperties:property"}}{{/crossLink}}.
  *
- * @class IVisualEditorProperties
+ * @class IVisualEditorDocument
  * @constructor
  */
 
 /**
- * Calls a function once for each editor property,
- * passing it its name.
+ * The editor type id.
+ *
+ * @property editorTypeId
+ * @type string
+ */
+
+/**
+ * An editor specific object that represents and gives access to the underlying document
+ * and, possibly, to the editor itself.
+ *
+ * Can be _nully_, always or only in certain environments (like when printing), so code
+ * should be able to handle both situations.
+ *
+ * @property source
+ * @type object
+ */
+
+/**
+ * Calls a function once for each editor property, passing it its name.
  *
  * @method forEach
  * @param {function} fun The mapping function.
