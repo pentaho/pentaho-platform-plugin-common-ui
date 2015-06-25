@@ -50,7 +50,7 @@ define([
 
                 this.base();
 
-                this.options.shape = this._vizOptions.shape;
+                this.options.shape = this._drawSpec.shape;
             },
 
             _getColorScaleKind: function() {

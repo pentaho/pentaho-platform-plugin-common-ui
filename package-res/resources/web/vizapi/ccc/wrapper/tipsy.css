@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.common-ui-ccc-viz.tipsy {
+.pentaho-visual-ccc.tipsy {
   padding: 0px;
   font-family: OpenSansRegular, sans-serif;
   font-size: 14px;
 }
 
-.common-ui-ccc-viz .tipsy-inner {
+.pentaho-visual-ccc .tipsy-inner {
   color: #26363d;
   background-color: #dedede;
   padding: 4px;

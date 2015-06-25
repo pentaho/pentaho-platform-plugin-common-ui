@@ -15,16 +15,16 @@
 */
 define([
     "cdf/lib/CCC/pvc",
-    "../../data/trends"
-], function(pvc, vizTrends) {
-    
+    "pentaho/visual/data/trends"
+], function(pvc, trends) {
+
     // Install pentaho trends on CCC trends.
-    vizTrends.types().forEach(function(trendType) {
+    trends.types().forEach(function(trendType) {
         if(!pvc.trends.has(trendType)) {
-            var trendInfo = vizTrends.get(trendType);
+            var trendInfo = trends.get(trendType);
 
             pvc.trends.define(trendType, trendInfo);
         }
     });
 });
-    
+

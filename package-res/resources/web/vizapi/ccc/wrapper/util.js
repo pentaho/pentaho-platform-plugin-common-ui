@@ -29,25 +29,25 @@ define(function() {
             return font.replace(/\bdefault\s*$/i, 'sans-serif');
         },
 
-        readFont: function(vizOptions, prefix) {
-            var size = vizOptions[prefix + "Size"];
+        readFont: function(visualSpec, prefix) {
+            var size = visualSpec[prefix + "Size"];
             if(size) {
-                var style = vizOptions[prefix + "Style"];
+                var style = visualSpec[prefix + "Style"];
                 if(style == null || style == 'PLAIN')
                     style = '';
                 else
                     style += ' ';
 
-                return style + size + 'px ' + vizOptions[prefix + "FontFamily"];
+                return style + size + 'px ' + visualSpec[prefix + "FontFamily"];
             }
         },
 
-        readFontSize: function(vizOptions, prefix) {
-            return +vizOptions[prefix + "Size"];
+        readFontSize: function(visualSpec, prefix) {
+            return +visualSpec[prefix + "Size"];
         },
 
-        readFontFamily: function(vizOptions, prefix) {
-            return vizOptions[prefix + "FontFamily"];
+        readFontFamily: function(visualSpec, prefix) {
+            return visualSpec[prefix + "FontFamily"];
         }
     };
 });

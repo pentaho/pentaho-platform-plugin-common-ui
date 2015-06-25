@@ -15,7 +15,7 @@
 */
 
 // Use this AMD module if you want to include
-// all of the CCC Viz charts' files in a single bundle.
+// all of the CCC Visual charts' files in a single bundle.
 define([
     "./BarChart",
     "./StackedBarChart",

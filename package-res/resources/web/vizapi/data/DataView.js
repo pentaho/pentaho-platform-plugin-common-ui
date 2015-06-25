@@ -15,7 +15,7 @@
 */
 define(['./AbstractDataTable', './DataTable'], function(AbstractDataTable, DataTable) {
   /**
-   * @module common-ui.vizapi.data
+   * @module pentaho.visual.data
    */
 
   /**
@@ -24,7 +24,7 @@ define(['./AbstractDataTable', './DataTable'], function(AbstractDataTable, DataT
    *
    * #### AMD
    *
-   * **Module Id**: `"common-ui/vizapi/data/DataView"`
+   * **Module Id**: `"pentaho/visual/data/DataView"`
    *
    * **Module Type**: The {{#crossLink "DataView"}}{{/crossLink}} constructor.
    *

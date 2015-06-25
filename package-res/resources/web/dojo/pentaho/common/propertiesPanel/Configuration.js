@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2013 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,152 +14,182 @@
  * limitations under the License.
  *
  */
-define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on", "dojo/query", "dojo/dnd/Source"
-  , "dojo/Stateful", "dojo/_base/array", "dojo/Evented", "dojo/_base/lang", "dojo/aspect"],
-    function (declare, _WidgetBase, _Templated, on, query, Source, Stateful, array, Evented, lang, aspect) {
-      var Configuration = declare("pentaho.common.propertiesPanel.Configuration", [Stateful, Evented],
-          {
-            constructor: function (configuration) {
-              this.items = [];
-              this.rawConfiguration = configuration;
-              if (configuration && configuration.properties) {
-                array.forEach(configuration.properties, this.initializeItem, this);
-              }
-            },
-            initializeItem: function (item) {
+define([
+  "dojo/_base/declare", "dojo/Stateful", "dojo/_base/array", "dojo/Evented", "dojo/_base/lang", "dojo/aspect"
+], function(declare, Stateful, array, Evented, lang, aspect) {
 
-              var propertyClass = Configuration.registeredTypes[item.ui.type];
-              if (!propertyClass) {
-                throw "No Properties Panel UI implementation found for " + item.ui.type;
-              }
-              var propItem = new propertyClass(item);
-              propItem.postCreate();
-              var outterThis = this;
-              aspect.after(propItem,  "onModelEvent", function (eventName,  args) {
-                outterThis.onModelEvent(propItem, eventName, args);
-              }, true);
-              propItem.watch(function (propName, old, now) {
-                outterThis.onModelEvent(propItem, propName, {prevVal: old, newVal: now});
-              });
-              this.items.push(propItem);
-            },
+  var O_hasOwn = Object.prototype.hasOwnProperty;
 
-            onModelEvent: function (item, eventName, args) {
+  var Configuration = declare("pentaho.common.propertiesPanel.Configuration", [Stateful, Evented], {
+    constructor: function(configuration) {
+      this.items = [];
+      this.itemsById = {};
+      this.rawConfiguration = configuration;
+      if(configuration && configuration.properties) {
+        array.forEach(configuration.properties, this.initializeItem, this);
+      }
+    },
 
-            },
-            byId: function (id) {
-              for (var i = 0; i < this.items.length; i++) {
-                if (this.items[i].id == id) {
-                  return this.items[i];
-                }
-              }
-            }
+    initializeItem: function(item) {
+      var ItemClass = Configuration.registeredTypes[item.ui.type];
+      if(!ItemClass)
+        throw "No Properties Panel UI implementation found for " + item.ui.type;
 
-          });
-      Configuration.registeredTypes = {};
+      var propItem = new ItemClass(item);
+      propItem.postCreate();
 
-      declare(
-          "pentaho.common.propertiesPanel.Property",
-          [Stateful, Evented],
-          {
-            constructor: function (item) {
-              this.item = item;
-              lang.mixin(this, item);
-            },
-            postCreate: function () {
-            },
-            value: null,
-            setValue: function (value) {
-              this.value = value;
-            },
-            onModelEvent: function (prop, args) {
-              // stub which others can connect to to "listen"
-            }
-          });
+      aspect.after(propItem, "onModelEvent", lang.hitch(this, function(eventName, args) {
+        this.onModelEvent(propItem, eventName, args);
+      }), true);
 
+      propItem.watch(lang.hitch(this, function(propName, old, now) {
+        this.onModelEvent(propItem, propName, {prevVal: old, newVal: now});
+      }));
 
-      declare(
-          "pentaho.common.propertiesPanel.GemBar",
-          [pentaho.common.propertiesPanel.Property],
-          {
-            gems: null,
-            selectedGem: null,
-            allowMultiple: true,
+      this.items.push(propItem);
+      this.itemsById[propItem.id] = propItem;
+    },
 
-            constructor: function(item) {
-            },
+    onModelEvent: function(item, eventName, args) {
+    },
 
-            postCreate: function () {
-              var originalGems = this.gems;
-              this.gems = [];
-              array.forEach(originalGems, this.initializeGem, this);
-            },
+    byId: function(id) {
+      if(O_hasOwn.call(this.itemsById, id)) return this.itemsById[id];
+    }
+  });
 
-            initializeGem: function(gemJson) {
-              var gem = new Configuration.registeredTypes["gem"](gemJson);
-              gem.postCreate();
-              this.gems.push(gem);
-            },
+  Configuration.registeredTypes = {};
 
-            createGemFromNode: function(sourceNode) {
-              var GemClass = Configuration.registeredTypes["gem"];
-              var options = {
-                      id:         "gem-" + sourceNode.id,
-                      value:      sourceNode.innerHTML,
-                      gemBar:     this,
-                      sourceNode: sourceNode,
-                      dndType:    sourceNode.getAttribute("dndType")
-                    };
+  var propertiesPanel = pentaho.common.propertiesPanel;
 
-              // check to see if it's a factory class
-              return GemClass.create ? GemClass.create(options) : new GemClass(options);
-            },
+  var Property = declare("pentaho.common.propertiesPanel.Property", [Stateful, Evented], {
+    value: null,
 
-            remove: function (gem) {
-              this.gems.splice(this.gems.indexOf(gem), 1);
+    constructor: function(item) {
+      this.item = item;
+      lang.mixin(this, item);
 
-              // fire event
-              this.set("gems", this.gems);
-              this.onModelEvent("removedGem", {gem: gem});
-            },
+      // Default to 1st possible value.
+      if(this.value == null && this.values && this.values.length)
+        this.value = this.values[0];
+    },
 
-            add: function (gem) {
-              this.gems.push(gem);
+    postCreate: function() {
+    },
 
-              // fire event
-              this.set("gems", this.gems);
-              this.onModelEvent("insertAt", {gem: gem, idx: this.gems.length, oldIdx: -1});
-            },
+    setValue: function(value) {
+      this.value = value;
+    },
 
-            reorder: function () {
-              this.set("gems", this.gems);
-              this.onModelEvent("reorderedGems", {});
-            },
+    onModelEvent: function(prop, args) {
+      // stub which others can connect to to "listen"
+    }
+  });
 
-            insertAt: function (gem, newIdx, oldIdx) {
-              var currIdx = array.indexOf(this.gems, gem);
-              this.gems.splice(newIdx, 0, gem); // add it to the new pos
-              var oldIdx = currIdx;
-              if (currIdx > -1) { //reorder
-                if (currIdx >= newIdx) {
-                  currIdx++;
-                }
-                this.gems.splice(currIdx, 1); // remove from old pos
-              }
-              // adjust new index to account for a move
-              if (currIdx > -1 && currIdx < newIdx) {
-                newIdx--;
-              }
-              this.onModelEvent("insertAt", {gem: gem, idx: newIdx, oldIdx: oldIdx});
-            }
-          });
+  declare("pentaho.common.propertiesPanel.GemBar", [Property], {
+    gems: null,
+    _value: null,
+    selectedGem: null,
+    allowMultiple: true,
 
-      Configuration.registeredTypes["gemBar"] = pentaho.common.propertiesPanel.GemBar;
-      Configuration.registeredTypes["gem"] = pentaho.common.propertiesPanel.Property;
-      Configuration.registeredTypes["combo"] = pentaho.common.propertiesPanel.Property;
-      Configuration.registeredTypes["slider"] = pentaho.common.propertiesPanel.Property;
-      Configuration.registeredTypes["textbox"] = pentaho.common.propertiesPanel.Property;
-      Configuration.registeredTypes["checkbox"] = pentaho.common.propertiesPanel.Property;
-      Configuration.registeredTypes["button"] = pentaho.common.propertiesPanel.Property;
-      return Configuration;
-    });
+    constructor: function(item) {
+    },
+
+    postCreate: function () {
+      var originalGems = this.gems;
+      this.gems = [];
+      array.forEach(originalGems, this.initializeGem, this);
+    },
+
+    initializeGem: function(gemJson) {
+      var gem = new Configuration.registeredTypes["gem"](gemJson);
+      gem.postCreate();
+      this._value = null;
+      this.gems.push(gem);
+    },
+
+    createGemFromNode: function(sourceNode) {
+      var GemClass = Configuration.registeredTypes["gem"];
+      var options = {
+              id:         "gem-" + sourceNode.id,
+              value:      sourceNode.innerHTML,
+              gemBar:     this,
+              sourceNode: sourceNode,
+              dndType:    sourceNode.getAttribute("dndType")
+            };
+
+      // check to see if it's a factory class
+      return GemClass.create ? GemClass.create(options) : new GemClass(options);
+    },
+
+    remove: function (gem) {
+      this._value = null;
+      this.gems.splice(this.gems.indexOf(gem), 1);
+
+      // fire event
+      this.set("gems", this.gems);
+      this.onModelEvent("removedGem", {gem: gem});
+    },
+
+    add: function(gem) {
+      this._value = null;
+      this.gems.push(gem);
+
+      // fire event
+      this.set("gems", this.gems);
+      this.onModelEvent("insertAt", {gem: gem, idx: this.gems.length, oldIdx: -1});
+    },
+
+    reorder: function() {
+      this._value = null;
+      this.set("gems", this.gems);
+      this.onModelEvent("reorderedGems", {});
+    },
+
+    insertAt: function(gem, newIdx, oldIdx) {
+      this._value = null;
+      var currIdx = array.indexOf(this.gems, gem);
+      this.gems.splice(newIdx, 0, gem); // add it to the new pos
+      var oldIdx = currIdx;
+      if(currIdx > -1) { //reorder
+        if(currIdx >= newIdx) {
+          currIdx++;
+        }
+        this.gems.splice(currIdx, 1); // remove from old pos
+      }
+      // adjust new index to account for a move
+      if(currIdx > -1 && currIdx < newIdx) {
+        newIdx--;
+      }
+      this.onModelEvent("insertAt", {gem: gem, idx: newIdx, oldIdx: oldIdx});
+    }
+  });
+
+  // NOTE: Unfortunately, dojo's declare doesn't support JS get/set props.
+  // so this has to be defined a posteriori.
+  // IVisualRoleRequirement#value : IDataModelProperty[]
+  Object.defineProperty(propertiesPanel.GemBar.prototype, "value", {
+    get: function() {
+      if(!this.gems) return;
+
+      return this._value ||
+        (this._value = this.gems.map(function(gem) {
+          return {
+            name:  gem.id,
+            label: gem.value,
+            type:  gem.type === "measure" ? "number" : "string"
+          };
+        }));
+    }
+  });
+
+  Configuration.registeredTypes["gemBar"  ] = propertiesPanel.GemBar;
+  Configuration.registeredTypes["gem"     ] = Property;
+  Configuration.registeredTypes["combo"   ] = Property;
+  Configuration.registeredTypes["slider"  ] = Property;
+  Configuration.registeredTypes["textbox" ] = Property;
+  Configuration.registeredTypes["checkbox"] = Property;
+  Configuration.registeredTypes["button"  ] = Property;
+
+  return Configuration;
+});

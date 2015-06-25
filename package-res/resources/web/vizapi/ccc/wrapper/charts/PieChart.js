@@ -60,11 +60,11 @@ define([
                 return this.options.legend && this.axes.row.depth > 0;
             },
 
-            _configureLabels: function(options, vizOptions) {
+            _configureLabels: function(options, drawSpec) {
                 this.base.apply(this, arguments);
 
                 if(options.valuesVisible) {
-                    options.valuesLabelStyle = vizOptions.labelsOption;
+                    options.valuesLabelStyle = drawSpec.labelsOption;
                 }
             },
 

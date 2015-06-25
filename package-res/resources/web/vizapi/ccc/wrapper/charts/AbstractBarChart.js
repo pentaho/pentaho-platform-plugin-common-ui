@@ -29,11 +29,11 @@ define([
                     options.visualRoles.category = {isReversed: true};
             },
 
-            _configureLabelsAnchor: function(options, vizOptions) {
+            _configureLabelsAnchor: function(options, visualSpec) {
 
                 options.extensionPoints.label_textMargin = 7;
 
-                switch(vizOptions.labelsOption) {
+                switch(visualSpec.labelsOption) {
                     case 'center':
                         options.valuesAnchor = 'center';
                         break;

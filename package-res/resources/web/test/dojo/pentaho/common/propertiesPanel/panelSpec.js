@@ -21,13 +21,13 @@ define(["pentaho/common/propertiesPanel/Panel", "dijit/registry", "dojo/query"],
 
     var testId = 'test-id';
 
-    var gemUi = Panel.registeredTypes["gem"];
+    var GemUI = Panel.registeredTypes["gem"];
 
     afterEach(function() {
       registry.remove(testId);
     });
 
-    createStubOptions = function(value) {
+    var createStubOptions = function(value) {
       return {
         id: testId,
         gemBar: {},
@@ -41,7 +41,7 @@ define(["pentaho/common/propertiesPanel/Panel", "dijit/registry", "dojo/query"],
 
     it("should put text value to title", function() {
       var value = 'Just a label';
-      var instance = new gemUi(createStubOptions(value));
+      var instance = new GemUI(createStubOptions(value));
 
       var gemLabelNode = query("div.gem-label", instance.domNode)[0];
       expect(gemLabelNode.title).toEqual(value);
@@ -49,7 +49,7 @@ define(["pentaho/common/propertiesPanel/Panel", "dijit/registry", "dojo/query"],
 
     it("should create a text node if html is passed", function() {
       var value = '<h1>XSS</h1>';
-      var instance = new gemUi(createStubOptions(value));
+      var instance = new GemUI(createStubOptions(value));
 
       var gemLabelNode = query("div.gem-label", instance.domNode)[0];
 
@@ -61,7 +61,7 @@ define(["pentaho/common/propertiesPanel/Panel", "dijit/registry", "dojo/query"],
 
     it("should not create additional nodes if html is passed", function() {
       var value = '<h1>XSS</h1>';
-      var instance = new gemUi(createStubOptions(value));
+      var instance = new GemUI(createStubOptions(value));
 
       var gemLabelNode = query("div.gem-label", instance.domNode)[0];
 

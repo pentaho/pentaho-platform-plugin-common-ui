@@ -15,14 +15,6 @@
  *
  * Copyright 2015 Pentaho Corporation. All rights reserved.
  */
-var requireCfg = {
-    paths: {},
-    shim:  {},
-    map:   {"*": {}},
-    bundles:  {},
-    config:   {service: {}},
-    packages: []
-};
 var KARMA_RUN = true;
 var pen = {define : define, require : require};
 var SESSION_LOCALE="en";

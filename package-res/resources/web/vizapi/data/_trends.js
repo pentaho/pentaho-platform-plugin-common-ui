@@ -17,19 +17,12 @@
 define([
   "./AbstractDataTable",
   "./DataTable",
-  "./DataView"
-], function(AbstractDataTable, DataTable, DataView) {
+  "./DataView",
+  "../_utils"
+], function(AbstractDataTable, DataTable, DataView, utils) {
   /**
-   * @module common-ui.vizapi.data
+   * @module pentaho.visual.data
    */
-
-  function argRequired(name) {
-    return new Error("Argument '" + name + "' is required.");
-  }
-
-  function argInvalid(name, text) {
-    return new Error("Argument '" + name + "' is invalid." + (text ? (" " + text) : ""));
-  }
 
   // NOTE: This needs unit-testing before being documented publicly.
 
@@ -61,12 +54,12 @@ define([
     // Argument validation
     // ===================
 
-    if(!(trendArgs instanceof Object)) throw argRequired('trendArgs');
+    if(!(trendArgs instanceof Object)) throw utils.error.argRequired('trendArgs');
 
     // # TrendType
 
     var trendType = trendArgs.type;
-    if(!trendType) throw argRequired('trendArgs.type');
+    if(!trendType) throw utils.error.argRequired('trendArgs.type');
 
     trendType = '' + trendType; // toString
 
@@ -77,12 +70,12 @@ define([
     var colCount = this.getNumberOfColumns();
 
     var xIndex = trendArgs.x;
-    if(xIndex == null) throw argRequired('trendArgs.x');
+    if(xIndex == null) throw utils.error.argRequired('trendArgs.x');
 
     xIndex = +xIndex; // toNumber
-    if(isNaN(xIndex)) throw argInvalid('trendArgs.x', "Not a number.");
+    if(isNaN(xIndex)) throw utils.error.argInvalid('trendArgs.x', "Not a number.");
 
-    if(xIndex < 0 || xIndex >= colCount) throw argInvalid('trendArgs.x', "Out of range.");
+    if(xIndex < 0 || xIndex >= colCount) throw utils.error.argInvalid('trendArgs.x', "Out of range.");
 
     // can be numeric or string
 
@@ -90,17 +83,17 @@ define([
 
     var yIndex = trendArgs.y;
     if(yIndex == null)
-      throw argRequired('trendArgs.y');
+      throw utils.error.argRequired('trendArgs.y');
 
     yIndex = +yIndex; // toNumber
     if(isNaN(yIndex))
-      throw argInvalid('trendArgs.y', "Not a number.");
+      throw utils.error.argInvalid('trendArgs.y', "Not a number.");
 
     if(yIndex < 0 || yIndex >= colCount)
-      throw argInvalid('trendArgs.y', "Out of range.");
+      throw utils.error.argInvalid('trendArgs.y', "Out of range.");
 
     if(this.getColumnType(yIndex) !== 'number')
-      throw argInvalid('trendArgs.y', "Must be a numeric column.");
+      throw utils.error.argInvalid('trendArgs.y', "Must be a numeric column.");
 
     // xIndex may be equal to yIndex...
 
@@ -201,17 +194,17 @@ define([
    * spec.model A function that given a series of points computes a trend model.
    */
   function trends_define(type, spec){
-    if(!type) throw argRequired('type');
+    if(!type) throw utils.error.argRequired('type');
 
     type = '' + type; // to string
 
-    if(!spec) throw argRequired('spec');
+    if(!spec) throw utils.error.argRequired('spec');
 
     // ----
 
     var model = spec.model;
-    if(!model) throw argRequired('spec.model');
-    if(typeof model !== 'function') throw argInvalid('spec.model', "Not a function");
+    if(!model) throw utils.error.argRequired('spec.model');
+    if(typeof model !== 'function') throw utils.error.argInvalid('spec.model', "Not a function");
 
     // ----
 
@@ -232,11 +225,11 @@ define([
    * assert If an error should be thrown if the trend type is not defined.
    */
   function trends_get(type, assert) {
-    if(!type) throw argRequired('type');
+    if(!type) throw utils.error.argRequired('type');
 
     var trendInfo = _trends.hasOwnProperty(type) ? _trends[type] : null;
     if(!trendInfo && assert)
-      throw argInvalid('type', "There is no trend type named '" + type + "'.");
+      throw utils.error.argInvalid('type', "There is no trend type named '" + type + "'.");
 
     return trendInfo;
   };

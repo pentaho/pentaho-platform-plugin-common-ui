@@ -15,7 +15,7 @@
 */
 define(function() {
   /**
-   * @module common-ui.vizapi.data
+   * @module pentaho.visual.data
    */
 
   /**
@@ -23,7 +23,7 @@ define(function() {
    *
    * #### AMD
    *
-   * **Module Id**: `"common-ui/vizapi/data/AbstractDataTable"`
+   * **Module Id**: `"pentaho/visual/data/AbstractDataTable"`
    *
    * **Module Type**: The {{#crossLink "AbstractDataTable"}}{{/crossLink}} constructor.
    *

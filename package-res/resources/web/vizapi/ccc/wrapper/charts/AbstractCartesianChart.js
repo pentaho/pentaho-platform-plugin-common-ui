@@ -69,17 +69,17 @@ define([
             },
 
             _configureAxisRange: function(primary, axisType) {
-                var vizOptions = this._vizOptions,
+                var drawSpec = this._drawSpec,
                     suffix = primary ? '' : 'Secondary';
 
-                if(vizOptions['autoRange' + suffix] !== 'true') {
-                    var limit = vizOptions['valueAxisLowerLimit' + suffix];
+                if(drawSpec['autoRange' + suffix] !== 'true') {
+                    var limit = drawSpec['valueAxisLowerLimit' + suffix];
                     if(limit != null) {
                         this.options[axisType + 'AxisFixedMin'] = limit;
                         this.options[axisType + 'AxisOriginIsZero'] = false;
                     }
 
-                    limit = vizOptions['valueAxisUpperLimit' + suffix];
+                    limit = drawSpec['valueAxisUpperLimit' + suffix];
                     if(limit != null) this.options[axisType + 'AxisFixedMax'] = limit;
                 }
             },
@@ -95,7 +95,7 @@ define([
                     this.options[axisType + 'AxisTickExponentMin'] = 0; // 10^0 => 1
 
                 var text,
-                    displayUnits = this._vizOptions['displayUnits' + (primary ? '' : 'Secondary')],
+                    displayUnits = this._drawSpec['displayUnits' + (primary ? '' : 'Secondary')],
                     scaleFactor  = this._parseDisplayUnits(displayUnits);
                 if(scaleFactor > 1) text = this._message('dlgChartOption_' + displayUnits);
 
