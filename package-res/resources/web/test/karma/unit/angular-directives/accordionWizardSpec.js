@@ -8,7 +8,7 @@ var deps = [
 
 define(deps, function(angular, templateUtil) {
 
-  describe('accordionWizard', function () {
+  xdescribe('accordionWizard', function () {
     var $scope, httpBackend, templateCache;
 
     var DEFAULTS = {

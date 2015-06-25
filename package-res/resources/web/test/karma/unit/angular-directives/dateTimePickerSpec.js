@@ -12,7 +12,7 @@ var deps = [
 
 define(deps, function(angular, templateUtil, dojoParser, ready, registry) {
 
-    describe("dateTimePicker", function () {
+    xdescribe("dateTimePicker", function () {
         var scope, isolateScope, element, httpBackend, templateCache, timeout;
 
         beforeEach(module("angular-dojo"));

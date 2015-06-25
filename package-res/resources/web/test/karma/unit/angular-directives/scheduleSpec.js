@@ -24,7 +24,7 @@ var deps = [
 
 define(deps, function(angular) {
 
-  describe("Schedule Directives", function() {
+  xdescribe("Schedule Directives", function() {
 
     beforeEach(module('common.schedule'));
     beforeEach(module('common.filters.mock')); // this is a mock of the i18n filter in common.filters
