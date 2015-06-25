@@ -8,7 +8,7 @@ var deps = [
 
 define(deps, function (angular, templateUtil) {
 
-    describe('weeklyRecurrence', function () {
+    xdescribe('weeklyRecurrence', function () {
         var $scope, httpBackend, templateCache;
 
         beforeEach(module('recurrence', 'dateTimePicker'));

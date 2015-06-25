@@ -24,7 +24,7 @@ var deps = [
 
 define(deps, function (angular, mocks, folderBrowser) {
 
-  describe('unit testing angular tree control directive', function () {
+  xdescribe('unit testing angular tree control directive', function () {
     var $compile, $rootScope, element, sampleData;
 
     beforeEach(function () {
