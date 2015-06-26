@@ -15,6 +15,12 @@
  */
 (function() {
   /* global requireCfg:true, CONTEXT_PATH:true, KARMA_RUN:true, SESSION_LOCALE:true */
+  if (!requireCfg.map) {
+    requireCfg.map = {};
+  }
+  if (!requireCfg.map["*"]) {
+    requireCfg.map["*"] = {};
+  }
   var basePath =
         // production
         (typeof CONTEXT_PATH !== "undefined") ? CONTEXT_PATH + "content/common-ui/resources/web" :
