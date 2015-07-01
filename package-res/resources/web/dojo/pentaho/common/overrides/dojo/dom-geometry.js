@@ -1,4 +1,6 @@
-/* Overridden due to PRD-5440 */
+/* Overridden due to PRD-5440
+		see lines: 534-545
+*/
 
 define(["./sniff", "./_base/window","./dom", "./dom-style"],
 		function(has, win, dom, style){
