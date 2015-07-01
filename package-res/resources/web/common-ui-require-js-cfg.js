@@ -49,6 +49,9 @@ requireCfg['paths']['dojox/rpc'] = prefix+'/dojo/pentaho/common/overrides/dojox/
 requireCfg['paths']['dojo/_base/kernel'] = prefix+'/dojo/pentaho/common/overrides/dojo/_base/kernel';
 requireCfg['paths']['dojo/store/Memory'] = prefix+'/dojo/pentaho/common/overrides/dojo/store/Memory';
 
+requireCfg['paths']['dijit/_HasDropDown'] = prefix+'/dojo/pentaho/common/overrides/dijit/_HasDropDown';
+requireCfg['paths']['dijit/_CssStateMixin'] = prefix+'/dojo/pentaho/common/overrides/dijit/_CssStateMixin';
+
 
 // Plugin Handlers
 requireCfg['paths']['common-ui/PluginHandler'] = prefix+'/plugin-handler/pluginHandler';
