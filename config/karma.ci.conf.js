@@ -48,6 +48,7 @@ module.exports = function (config) {
       "package-res/resources/web/plugin-handler/**/*.js": ["coverage"],
       "package-res/resources/web/angular-directives/**/*.js": ["coverage"],
       "package-res/resources/web/vizapi/**/*.js": ["coverage"],
+      "package-res/resources/web/prompting/**/*.js": ["coverage"],
       "**/*.html": []
     },
 
