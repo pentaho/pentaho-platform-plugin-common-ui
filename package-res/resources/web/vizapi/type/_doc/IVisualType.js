@@ -198,3 +198,20 @@
  * @param {string} [changedProp] The name of the property that has changed.
  *    When unspecified, it is assumed that all properties have changed.
  */
+
+/**
+ * Validates a given edit model based on the current requirement values.
+ *
+ * This method can assume that basic validation —
+ * "requiredness" and minimum occurrence —
+ * has been performed and was successful.
+ *
+ * The returned {{#crossLink "Error"}}{{/crossLink}} objects can
+ * have a string `code` property with an error code.
+ *
+ * @method validateEditModel
+ *
+ * @param {IVisualEditModel} editModel The visual edit model to validate.
+ * @return {Error[]|null} A non-empty array of error objects,
+ *    or `null`, when there are no validation errors.
+ */

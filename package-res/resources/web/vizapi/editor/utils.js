@@ -37,7 +37,8 @@ define([
 
   return {
       getEditorProperties:    getEditorProperties,
-      processEditModelChange: processEditModelChange
+      processEditModelChange: processEditModelChange,
+      validateEditModel:      validateEditModel
     };
 
   /**
@@ -122,6 +123,77 @@ define([
     if(type.updateEditModel) type.updateEditModel(editModel, changedProp);
 
     storeEditModel(type, spec, editModel);
+  }
+
+  /**
+   * Validates a given edit model against a given visual type.
+   *
+   * Performs basic "requiredness" and "allow multiple" validation —
+   * more generally, minimum and maximum occurrence validation —
+   * for visual role requirements.
+   *
+   * If basic validation succeeds and
+   * if the visual type has defined
+   * {{#crossLink "IVisualType/validateEditModel:method"}}{{/crossLink}},
+   * it is called, to validate the model.
+   *
+   * @method vaidateEditModel
+   *
+   * @param {IVisualType} type The visual type.
+   * @param {IVisualEditModel} editModel The visual edit model.
+   * @return {Error[]|null} A non-empty array of validation error objects,
+   *    or `null`, when there are no validation errors.
+   */
+  function validateEditModel(type, editModel) {
+    if(!editModel) throw utils.error.argRequired("editModel");
+
+    var errors;
+
+    // Basic validation
+    typeHelper.mapVisualRoleRequirements(type, function(req) {
+      var item = editModel.byId(req.id);
+      var occur = item ? item.value.length : 0;
+
+      var occurs = typeHelper.getRequirementOccurRange(item || req);
+
+      function addError(code, msg, reqs) {
+        var er = new Error(msg);
+        er.code = code;
+        er.reqs = reqs;
+        (errors || (errors = [])).push(er);
+        return er;
+      }
+
+      var error, msg;
+      if(occur < occurs.min) {
+        if(!errors) ;
+
+        msg = "Visual role requirement '" + req.id + "' ";
+        if(occurs.min === 1) {
+          msg += "is required.";
+        } else {
+          msg += "needs to be bound to at least " + occurs.min + " data properties.";
+        }
+
+        error = addError("minOccur", msg, [req.id]);
+        error.minOccur = occurs.min;
+      } else if(occur > occurs.max) {
+        msg = "Visual role requirement '" + req.id +
+            "' cannot be bound to more than " + occurs.max + " data properties.";
+        error = addError("maxOccur", msg, [req.id]);
+        error.maxOccur = occurs.max;
+      }
+    });
+
+    if(!errors && type.validateEditModel) {
+      errors = type.validateEditModel(editModel);
+
+      if(errors && (!(errors instanceof Array) || !errors.length)) {
+        errors = null;
+      }
+    }
+
+    return errors || null;
   }
 
   // @private

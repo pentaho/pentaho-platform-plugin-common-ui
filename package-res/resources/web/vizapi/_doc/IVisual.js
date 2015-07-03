@@ -80,6 +80,7 @@
  * is subsequently called to inform it of the new highlights.
  *
  * @event select
+ *
  * @param {IVisual} source The visual that triggered the event.
  * @param {Array} selections An array of {{#crossLink "ISelection"}}{{/crossLink}}.
  * @param {String} [selectionMode="REPLACE"] The mode by which the specified _selections_
@@ -97,6 +98,7 @@
  * and affect subsequent handlers.
  *
  * @event doubleclick
+ *
  * @param {IVisual} source The visual that triggered the event.
  * @param {Array} selections An array of {{#crossLink "ISelection"}}{{/crossLink}}.
  */
@@ -106,15 +108,17 @@
  * with the given data.
  *
  * @method draw
+ *
  * @param {DataTable} dataTable The data to encode visually.
  * @param {IVisualDrawSpec} drawSpec The visual _draw_ specification.
+ *
+ * @return {Promise} A promise that is resolved when the operation completes, or _nully_.
  */
 
 /**
  * **Optional** method that resizes the visual to new given dimensions.
  *
- * This method can only be called if the visual
- * has been previously rendered,
+ * This method can only be called if the visual has been previously rendered,
  * with a call to {{#crossLink "IVisual/draw:method"}}{{/crossLink}}.
  *
  * When a visual does not implement it,
@@ -132,51 +136,33 @@
  * before calling this method.
  *
  * @method resize
+ *
  * @param {number} width  The new width, in pixels. A non-negative number.
  * @param {number} height The new height, in pixels. A non-negative number.
+ *
+ * @return {Promise} A promise that is resolved when the operation completes, or _nully_.
  */
 
 /**
  * **Optional** method that gets the state of a visual.
  *
- * This method can only be called if the visual
- * has been previously rendered,
+ * This method can only be called if the visual has been previously rendered,
  * with a call to {{#crossLink "IVisual/draw:method"}}{{/crossLink}}.
  *
  * Note that state information should not include properties
- * that are otherwise present in a
- * {{#crossLink "IVisualSpec"}}visual specification{{/crossLink}}.
+ * that are otherwise present in a {{#crossLink "IVisualSpec"}}visual specification{{/crossLink}}.
  *
  * In general, state information _can_ be related to the current dataset.
  * However, there are no guarantees that the returned state object will only be
  * specified in a subsequent {{#crossLink "IVisual/draw:method"}}{{/crossLink}} call,
  * in {{#crossLink "IVisualSpec/state:property"}}visualSpec.state{{/crossLink}},
- * along with the current dataset.
- * However, it can be assumed that it will only be used with a dataset
- * having the _same structure_ as the current one.
+ * along with the current dataset, or even with a different one but having the _same structure_.
  *
  * State information must be JSON-serializable.
  *
  * @method getState
+ *
  * @return {Object} An object containing the visual's state, or a _nully_ value.
- */
-
-/**
- * **Optional** method that sets the state of a visual,
- * previously obtained by a call to {{#crossLink "IVisual/getState:method"}}{{/crossLink}}.
- *
- * This method can only be called if the visual
- * has been previously rendered,
- * with a call to {{#crossLink "IVisual/draw:method"}}{{/crossLink}}.
- *
- * Usually, state will be provided in the
- * {{#crossLink "IVisualSpec/state:property"}}visualSpec.state{{/crossLink}}
- * argument of a {{#crossLink "IVisual/draw:method"}}{{/crossLink}} method call.
- * However, this method is provided for completness with the
- * {{#crossLink "IVisual/getState:method"}}{{/crossLink}}.
- *
- * @method setState
- * @param {Object} state A non _nully_ object containing the visual's state.
  */
 
 /**
@@ -189,8 +175,7 @@
  * A visual implements this method if it _can_ visually represent the
  * highlighted state of represented entities.
  *
- * This method can only be called if the visual
- * has been previously rendered,
+ * This method can only be called if the visual has been previously rendered,
  * with a call to {{#crossLink "IVisual/draw:method"}}{{/crossLink}}.
  *
  * This method can be called with an empty array, or with a _nully_ value,
@@ -211,14 +196,17 @@
  * and not in a immediately following call to this method.
  *
  * @method setHighlights
+ *
  * @param {Array} [highlights] The current highlights, or,
  *     when none, an empty array or a _nully_ value.
+ *
+ * @return {Promise} A promise that is resolved when the operation completes, or _nully_.
  */
 
 /**
  * **Optional** method that disposes a visual.
  *
- * Allows a visual to release important shared or memory-leaking resources.
+ * Allows a visual to release important resources.
  *
  * @method dispose
  * @since 3.0

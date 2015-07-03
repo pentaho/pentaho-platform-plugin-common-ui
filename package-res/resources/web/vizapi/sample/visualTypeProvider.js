@@ -21,7 +21,9 @@ define(["require", "es6-promise-shim"], function(require) {
 
   function visualFactory(createOptions) {
     return new Promise(function(resolve, reject) {
-      require(["./Calc"], function(Calc) { return new Calc(createOptions); }, reject);
+      require(["./Calc"], function(Calc) {
+        resolve(new Calc(createOptions));
+      }, reject);
     });
   }
 

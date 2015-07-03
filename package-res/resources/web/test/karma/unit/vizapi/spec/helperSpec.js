@@ -15,6 +15,7 @@
  */
 define(["pentaho/visual/spec/helper"], function(singletonSpecHelper) {
   var standardSpec = {
+      action: 1,
       type:   1,
       state:  1,
       data:   1,
@@ -56,14 +57,14 @@ define(["pentaho/visual/spec/helper"], function(singletonSpecHelper) {
         expect(spec.type).toBe(type.id);
       });
 
-      it("should return a spec object in which every standard property is present, albeit possibly `undefined`", function() {
+      it("should return a spec object in which every standard IVisualSpec property is present, albeit possibly `undefined`", function() {
         var type = {
           id: "foo"
         };
 
         var spec = singletonSpecHelper.create(type);
         for(var p in standardSpec) {
-          if(standardSpec.hasOwnProperty(p)) {
+          if(p !== "action" && standardSpec.hasOwnProperty(p)) {
             expect(spec.hasOwnProperty(p)).toBe(true);
           }
         }
