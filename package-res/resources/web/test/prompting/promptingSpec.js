@@ -15,7 +15,7 @@
  * Copyright 2015 Pentaho Corporation. All rights reserved.
  */
 
-define(["common-ui/prompting/pentaho-prompting-components", "dojo/number"], function(promptingComponents, dojoNumber) {
+define(["common-ui/prompting/components/StaticAutocompleteBoxComponent", "dojo/number"], function(StaticAutocompleteBoxComponent, dojoNumber) {
 
   describe("StaticAutocompleteBoxComponent.update()", function() {
 
@@ -33,7 +33,7 @@ define(["common-ui/prompting/pentaho-prompting-components", "dojo/number"], func
     it("should not try to parse a string", function() {
       spyOn(dojoNumber, "format");
 
-      var comp =  new promptingComponents.StaticAutocompleteBoxComponent();
+      var comp =  new StaticAutocompleteBoxComponent();
       $.extend(comp, createCommonParameters("1234String", {
         type: "java.lang.String",
         label: "123456",
@@ -53,7 +53,7 @@ define(["common-ui/prompting/pentaho-prompting-components", "dojo/number"], func
         return '_' + p;
       });
 
-      var comp = new promptingComponents.StaticAutocompleteBoxComponent();
+      var comp = new StaticAutocompleteBoxComponent();
       $.extend(comp, createCommonParameters("1234Integer", {
         type: "java.lang.Integer",
         label: "123456",
@@ -71,7 +71,7 @@ define(["common-ui/prompting/pentaho-prompting-components", "dojo/number"], func
     it("should keep string if failed to to parse a number", function() {
       spyOn(dojoNumber, 'format').and.throwError();
 
-      var comp = new promptingComponents.StaticAutocompleteBoxComponent();
+      var comp = new StaticAutocompleteBoxComponent();
       $.extend(comp, createCommonParameters("1234Integer", {
         type: "java.lang.Integer",
         label: "12qw",

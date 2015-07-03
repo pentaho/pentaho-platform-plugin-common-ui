@@ -1,5 +1,5 @@
-define(['amd!cdf/lib/underscore', 'cdf/lib/Base', './utils/GUIDHelper', './WidgetBuilder', 'cdf/Dashboard.Clean', './components/CompositeComponent', './components/PostInitComponent'],
-    function (_, Base, GUIDHelper, WidgetBuilder, Dashboard, CompositeComponent, PostInitComponent) {
+define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', './utils/GUIDHelper', './WidgetBuilder', 'cdf/Dashboard.Clean', './components/CompositeComponent', './components/PostInitComponent'],
+    function (_, Base, Logger, GUIDHelper, WidgetBuilder, Dashboard, CompositeComponent, PostInitComponent) {
 
       /**
        * Checks if the type is numeric
@@ -298,7 +298,7 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', './utils/GUIDHelper', './Widge
           var myself = this;
           // Should really throw an error? Or return?
           if (this.dashboard.waitingForInit && this.dashboard.waitingForInit.length) {
-            this.dashboard.log("Overlapping refresh!", 'warn');
+            Logger.warn("Overlapping refresh!");
             setTimeout(function () {
               myself.refresh(paramDefn, noAutoAutoSubmit);
             }, 0);

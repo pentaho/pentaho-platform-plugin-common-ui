@@ -24,6 +24,7 @@ define(['./LabelBuilder'], function (LabelBuilder) {
       widget.expression = function () {
         return label;
       };
+      return widget;
     }
   });
 });

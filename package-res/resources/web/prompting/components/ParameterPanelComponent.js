@@ -15,7 +15,7 @@
  *
  */
 
-define(['./PanelComponent'], function(PanelComponent){
+define("common-ui/prompting/components/ParameterPanelComponent", ['./PanelComponent'], function(PanelComponent){
   return PanelComponent.extend({
     getClassFor: function (component) {
       if (component.promptType === 'label') {
