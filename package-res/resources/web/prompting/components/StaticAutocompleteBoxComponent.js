@@ -15,8 +15,8 @@
  *
  */
 
-define(['cdf/components/BaseComponent', 'dojo/number', 'cdf/lib/jquery.ui'],
-    function (BaseComponent, DojoNumber) {
+define(['cdf/components/BaseComponent', 'dojo/number', 'amd!cdf/lib/jquery.ui'],
+    function (BaseComponent, DojoNumber, $) {
 
       /**
        *

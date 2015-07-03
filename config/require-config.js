@@ -22,8 +22,6 @@ requireCfg.paths["common-ui/prompting"] = "common-ui/prompting";
 requireCfg.paths["pentaho/visual/type/registryMock"] =
     "/base/package-res/resources/web/test/karma/unit/vizapi/type/registryMock";
 
-requireCfg.paths["cdf/lib"] = "cdf/js/lib";
-
 // Reset "service" module configuration.
 requireCfg.config.service = {};
 
