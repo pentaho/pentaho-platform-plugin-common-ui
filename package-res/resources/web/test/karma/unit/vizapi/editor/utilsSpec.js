@@ -274,5 +274,346 @@ define(["pentaho/visual/editor/utils"], function(singletonEditorUtils) {
       });
     });
 
+    describe("#validateEditModel(type, editModel)", function() {
+      it("should be a function", function() {
+        expect(typeof singletonEditorUtils.validateEditModel).toBe("function");
+      });
+
+      it("should throw if `type` is not specified", function() {
+        expect(function() {
+          singletonEditorUtils.validateEditModel(undefined, {});
+        }).toThrow();
+      });
+
+      it("should throw if `editModel` is not specified", function() {
+        expect(function() {
+          singletonEditorUtils.validateEditModel({});
+        }).toThrow();
+      });
+
+      it("should validate 'required' visual role requirements", function() {
+        var type = {
+          id: "ccc_bar",
+          dataReqs: [{reqs: [
+            {id: "zas", dataStructure: "row", required: true, value: []}
+          ]}]
+        };
+
+        var items = {
+          zas: type.dataReqs[0].reqs[0]
+        };
+
+        var editModel = {
+          byId: function(name) { return items[name]; }
+        };
+
+        var errors = singletonEditorUtils.validateEditModel(type, editModel);
+
+        expect(errors instanceof Array).toBe(true);
+        expect(errors.length).toBe(1);
+        expect(errors[0] instanceof Error).toBe(true);
+        expect(errors[0].code).toBe("minOccur");
+        expect(errors[0].reqs).toEqual(["zas"]);
+        expect(errors[0].minOccur).toBe(1);
+      });
+
+      it("should not be 'required' by default", function() {
+        var type = {
+          id: "ccc_bar",
+          dataReqs: [{reqs: [
+            {id: "zas", dataStructure: "row", value: []}
+          ]}]
+        };
+
+        var items = {
+          zas: type.dataReqs[0].reqs[0]
+        };
+
+        var editModel = {
+          byId: function(name) { return items[name]; }
+        };
+
+        var errors = singletonEditorUtils.validateEditModel(type, editModel);
+
+        expect(errors).toBe(null);
+      });
+
+      it("should validate 'minOccur' invalid visual role requirements", function() {
+        var type = {
+          id: "ccc_bar",
+          dataReqs: [{reqs: [
+            {id: "zas", dataStructure: "row", minOccur: 1, value: []},
+            {id: "bar", dataStructure: "col", minOccur: 2, value: ["A"]}
+          ]}]
+        };
+
+        var items = {
+          zas: type.dataReqs[0].reqs[0],
+          bar: type.dataReqs[0].reqs[1]
+        };
+
+        var editModel = {
+          byId: function(name) { return items[name]; }
+        };
+
+        var errors = singletonEditorUtils.validateEditModel(type, editModel);
+
+        expect(errors instanceof Array).toBe(true);
+        expect(errors.length).toBe(2);
+
+        expect(errors[0] instanceof Error).toBe(true);
+        expect(errors[0].code).toBe("minOccur");
+        expect(errors[0].reqs).toEqual(["zas"]);
+        expect(errors[0].minOccur).toBe(1);
+
+        expect(errors[1] instanceof Error).toBe(true);
+        expect(errors[1].code).toBe("minOccur");
+        expect(errors[1].reqs).toEqual(["bar"]);
+        expect(errors[1].minOccur).toBe(2);
+      });
+
+      it("should validate 'minOccur' valid visual role requirements", function() {
+        var type = {
+          id: "ccc_bar",
+          dataReqs: [{reqs: [
+            {id: "zas", dataStructure: "row", minOccur: 1, value: ["A"]},
+            {id: "bar", dataStructure: "col", minOccur: 2, value: ["A", "B", "C"]}
+          ]}]
+        };
+
+        var items = {
+          zas: type.dataReqs[0].reqs[0],
+          bar: type.dataReqs[0].reqs[1]
+        };
+
+        var editModel = {
+          byId: function(name) { return items[name]; }
+        };
+
+        var errors = singletonEditorUtils.validateEditModel(type, editModel);
+
+        expect(errors).toBe(null);
+      });
+
+      it("should validate 'allowMultiple:false' visual role requirements", function() {
+        var type = {
+          id: "ccc_bar",
+          dataReqs: [{reqs: [
+            {id: "zas", dataStructure: "row", allowMultiple: false, value: ["A", "B"]}
+          ]}]
+        };
+
+        var items = {
+          zas: type.dataReqs[0].reqs[0]
+        };
+
+        var editModel = {
+          byId: function(name) { return items[name]; }
+        };
+
+        var errors = singletonEditorUtils.validateEditModel(type, editModel);
+
+        expect(errors instanceof Array).toBe(true);
+        expect(errors.length).toBe(1);
+        expect(errors[0] instanceof Error).toBe(true);
+        expect(errors[0].code).toBe("maxOccur");
+        expect(errors[0].reqs).toEqual(["zas"]);
+        expect(errors[0].maxOccur).toBe(1);
+      });
+
+      it("should validate 'allowMultiple:true' visual role requirement", function() {
+        var type = {
+          id: "ccc_bar",
+          dataReqs: [{reqs: [
+            {id: "zas", dataStructure: "row", allowMultiple: true, value: ["A", "B"]}
+          ]}]
+        };
+
+        var items = {
+          zas: type.dataReqs[0].reqs[0]
+        };
+
+        var editModel = {
+          byId: function(name) { return items[name]; }
+        };
+
+        var errors = singletonEditorUtils.validateEditModel(type, editModel);
+
+        expect(errors).toBe(null);
+      });
+
+      it("should allow multiple by default", function() {
+        var type = {
+          id: "ccc_bar",
+          dataReqs: [{reqs: [
+            {id: "zas", dataStructure: "row", value: ["A", "B"]}
+          ]}]
+        };
+
+        var items = {
+          zas: type.dataReqs[0].reqs[0]
+        };
+
+        var editModel = {
+          byId: function(name) { return items[name]; }
+        };
+
+        var errors = singletonEditorUtils.validateEditModel(type, editModel);
+
+        expect(errors).toBe(null);
+      });
+
+      it("should validate 'maxOccur' invalid visual role requirement", function() {
+        var type = {
+          id: "ccc_bar",
+          dataReqs: [{reqs: [
+            {id: "zas", dataStructure: "row", maxOccur: 1, value: ["A", "B"]},
+            {id: "bar", dataStructure: "row", maxOccur: 2, value: ["A", "B", "C"]}
+          ]}]
+        };
+
+        var items = {
+          zas: type.dataReqs[0].reqs[0],
+          bar: type.dataReqs[0].reqs[1]
+        };
+
+        var editModel = {
+          byId: function(name) { return items[name]; }
+        };
+
+        var errors = singletonEditorUtils.validateEditModel(type, editModel);
+
+        expect(errors instanceof Array).toBe(true);
+        expect(errors.length).toBe(2);
+
+        expect(errors[0] instanceof Error).toBe(true);
+        expect(errors[0].code).toBe("maxOccur");
+        expect(errors[0].reqs).toEqual(["zas"]);
+        expect(errors[0].maxOccur).toBe(1);
+
+        expect(errors[1] instanceof Error).toBe(true);
+        expect(errors[1].code).toBe("maxOccur");
+        expect(errors[1].reqs).toEqual(["bar"]);
+        expect(errors[1].maxOccur).toBe(2);
+      });
+
+      it("should validate 'maxOccur' valid visual role requirement", function() {
+        var type = {
+          id: "ccc_bar",
+          dataReqs: [{reqs: [
+            {id: "zas", dataStructure: "row", maxOccur: 1, value: []},
+            {id: "bar", dataStructure: "row", maxOccur: 2, value: ["A", "B"]}
+          ]}]
+        };
+
+        var items = {
+          zas: type.dataReqs[0].reqs[0],
+          bar: type.dataReqs[0].reqs[1]
+        };
+
+        var editModel = {
+          byId: function(name) { return items[name]; }
+        };
+
+        var errors = singletonEditorUtils.validateEditModel(type, editModel);
+
+        expect(errors).toBe(null);
+      });
+
+      it("should not call `type.validateEditModel` if basic validation fails", function() {
+        var type = {
+          id: "ccc_bar",
+          dataReqs: [{reqs: [
+            {id: "zas", dataStructure: "row", required: true, value: []} // invalid
+          ]}],
+          validateEditModel: jasmine.createSpy("validateEditModel")
+        };
+
+        var items = {
+          zas: type.dataReqs[0].reqs[0]
+        };
+
+        var editModel = {
+          byId: function(name) { return items[name]; }
+        };
+
+        var errors = singletonEditorUtils.validateEditModel(type, editModel);
+
+        expect(!!errors).toBe(true);
+
+        expect(type.validateEditModel).not.toHaveBeenCalled();
+      });
+
+      it("should call `type.validateEditModel` if basic validation succeeds", function() {
+        var type = {
+          id: "ccc_bar",
+          dataReqs: [{reqs: [
+            {id: "zas", dataStructure: "row", value: []} // invalid
+          ]}],
+          validateEditModel: jasmine.createSpy("validateEditModel")
+        };
+
+        var items = {
+          zas: type.dataReqs[0].reqs[0]
+        };
+
+        var editModel = {
+          byId: function(name) { return items[name]; }
+        };
+
+        var errors = singletonEditorUtils.validateEditModel(type, editModel);
+
+        expect(!!errors).toBe(false);
+
+        expect(type.validateEditModel).toHaveBeenCalledWith(editModel);
+        expect(type.validateEditModel.calls.first().object).toBe(type);
+      });
+
+      it("should return the errors returned by `type.validateEditModel`", function() {
+        var errors = [new Error()];
+        var type = {
+          id: "ccc_bar",
+          dataReqs: [{reqs: [
+            {id: "zas", dataStructure: "row", value: []} // invalid
+          ]}],
+          validateEditModel: jasmine.createSpy("validateEditModel").and.returnValue(errors)
+        };
+
+        var items = {
+          zas: type.dataReqs[0].reqs[0]
+        };
+
+        var editModel = {
+          byId: function(name) { return items[name]; }
+        };
+
+        var errors2 = singletonEditorUtils.validateEditModel(type, editModel);
+
+        expect(errors2).toBe(errors);
+      });
+
+      it("should normalize an empty errors array returned by `type.validateEditModel` to null", function() {
+        var errors = [];
+        var type = {
+          id: "ccc_bar",
+          dataReqs: [{reqs: [
+            {id: "zas", dataStructure: "row", value: []} // invalid
+          ]}],
+          validateEditModel: jasmine.createSpy("validateEditModel").and.returnValue(errors)
+        };
+
+        var items = {
+          zas: type.dataReqs[0].reqs[0]
+        };
+
+        var editModel = {
+          byId: function(name) { return items[name]; }
+        };
+
+        var errors2 = singletonEditorUtils.validateEditModel(type, editModel);
+
+        expect(errors2).toBe(null);
+      });
+    });
   });
 });

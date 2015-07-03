@@ -41,7 +41,8 @@ define([
       createInstance: createInstance,
       mapGeneralRequirements: mapGeneralRequirements,
       mapVisualRoleRequirements: mapVisualRoleRequirements,
-      getRequirements: getRequirements
+      getRequirements: getRequirements,
+      getRequirementOccurRange: getRequirementOccurRange
     };
 
   /**
@@ -60,8 +61,6 @@ define([
    * @param {function} fun The mapping function.
    *   Called with the general requirement
    *   {{#crossLink "IGeneralRequirement"}}{{/crossLink}} as only argument.
-   *   Standard specification properties are ignored
-   *   (`type`, `state`, `data`, `highlights`, `width` and `height`).
    * @param {object} [ctx] The `this`context on which to call `fun`.
    */
   function mapGeneralRequirements(type, fun, ctx) {
@@ -89,8 +88,6 @@ define([
    * @param {function} fun The mapping function.
    *   Called with the visual role requirement
    *   {{#crossLink "IVisualRoleRequirement"}}{{/crossLink}} as only argument.
-   *   Standard specification properties are ignored
-   *   (`type`, `state`, `data`, `highlights`, `width` and `height`).
    * @param {object} [ctx] The `this`context on which to call `fun`.
    */
   function mapVisualRoleRequirements(type, fun, ctx) {
@@ -123,6 +120,29 @@ define([
     if(!type) throw utils.error.argRequired("type");
     var dataReqs = type.dataReqs;
     return (dataReqs && dataReqs[0] && dataReqs[0].reqs) || null;
+  }
+
+  /**
+   * Gets the normalized occurrence range of a requirement.
+   *
+   * @method getRequirementOccurRange
+   *
+   * @param {IRequirement} req The data requirement.
+   *
+   * @return {Object} An object with `min` and `max` properties.
+   */
+  function getRequirementOccurRange(req) {
+    var minOccur = Math.max(req.required ? 1 : 0, req.minOccur || 0); // >= 0
+
+    var allowMultiple = req.allowMultiple == null || !!req.allowMultiple;
+    var maxOccur = Math.min( // >=  1
+          allowMultiple ? Infinity : 1,
+          req.maxOccur == null ? Infinity : Math.max(req.maxOccur, 1));
+
+    return {
+      min: minOccur,
+      max: minOccur > maxOccur ? minOccur : maxOccur
+    };
   }
 
   /**
