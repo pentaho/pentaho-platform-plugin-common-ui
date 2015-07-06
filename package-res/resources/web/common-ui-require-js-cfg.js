@@ -34,9 +34,7 @@
   requirePaths["common-repo"   ] = basePath + "/repo";
   requirePaths["common-data"   ] = basePath + "/dataapi";
   requirePaths["pentaho/common"] = basePath + "/dojo/pentaho/common";
-
-  requirePaths["pentaho/visual" ] = basePath + "/vizapi";
-  requireMap["*"]["common-ui/vizapi"] = "pentaho/visual";
+  requirePaths["pentaho/visual"] = basePath + "/visual";
 
   // AMD PLUGINS
   requirePaths["local"  ] = basePath + "/util/local";

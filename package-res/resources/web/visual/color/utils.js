@@ -189,10 +189,6 @@ define([
     getRgbDarker: getRgbDarker
   };
 
-  /*
-   createPaletteMap
-   Static function to create a palette map
-   */
   function createPaletteMap(items, palette) {
     var map = {},
         I = items.length,
@@ -208,13 +204,8 @@ define([
     }
 
     return map;
-  };
+  }
 
-  /*
-   createPaletteMap
-   Static function to create a color within a color gradient
-   Return  an RGB() color
-   */
   function getRgbGradient(value, min, max, color1, color2) {
     // Clamp `value` to given interval
     if(value < min)
@@ -341,11 +332,6 @@ define([
     return colors;
   }
 
-  /*
-   getRgbColor
-   Static function to create a RGB color
-   Return  an RGB() color
-   */
   function getRgbColor(r, g, b) {
     if(r instanceof Array) {
       b = r[2];
