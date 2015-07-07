@@ -17,8 +17,6 @@ requireCfg.paths["dojo"]  = "/base/dev-res/dojo/dojo-release-1.9.2-src/dojo";
 requireCfg.paths["dojox"] = "/base/dev-res/dojo/dojo-release-1.9.2-src/dojox";
 requireCfg.paths["dijit"] = "/base/dev-res/dojo/dojo-release-1.9.2-src/dijit";
 
-requireCfg.paths["common-ui/prompting"] = "common-ui/prompting";
-
 requireCfg.paths["pentaho/visual/type/registryMock"] =
     "/base/package-res/resources/web/test/karma/unit/vizapi/type/registryMock";
 
