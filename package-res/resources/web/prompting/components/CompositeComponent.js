@@ -15,31 +15,31 @@
  *
  */
 
-define(['cdf/lib/jquery', 'cdf/components/BaseComponent', 'cdf/dashboard/Utils'], function($, BaseComponent, Utils){
+define([ 'cdf/lib/jquery', 'cdf/components/BaseComponent', 'cdf/dashboard/Utils' ], function($, BaseComponent, Utils) {
 
   return BaseComponent.extend({
-    components: undefined, // array of components
+    components : undefined, // array of components
 
-    executeAtStart: true,
+    executeAtStart : true,
 
-    getComponents: function () {
+    getComponents : function() {
       return this.components;
     },
 
-    clear: function () {
+    clear : function() {
       if (this.components) {
-        $.each(this.components, function (i, c) {
+        $.each(this.components, function(i, c) {
           c.clear();
         });
       }
       this.base();
     },
 
-    getClassFor: function (component) {
+    getClassFor : function(component) {
       return component.cssClass;
     },
 
-    getMarkupFor: function (component) {
+    getMarkupFor : function(component) {
       var _class = this.getClassFor(component);
       var html = '<div id="' + component.htmlObject + '"';
       if (_class) {
@@ -49,7 +49,7 @@ define(['cdf/lib/jquery', 'cdf/components/BaseComponent', 'cdf/dashboard/Utils']
       return html;
     },
 
-    update: function () {
+    update : function() {
       var html = '';
 
       if (this.label !== undefined) {
@@ -76,9 +76,9 @@ define(['cdf/lib/jquery', 'cdf/components/BaseComponent', 'cdf/dashboard/Utils']
       }
     },
 
-    updateInternal: function () {
+    updateInternal : function() {
       var html = '';
-      $.each(this.components, function (i, c) {
+      $.each(this.components, function(i, c) {
         html += this.getMarkupFor(c);
       }.bind(this));
       return html;
@@ -87,8 +87,8 @@ define(['cdf/lib/jquery', 'cdf/components/BaseComponent', 'cdf/dashboard/Utils']
     /**
      * Pre-order traversal of a component and its descendants.
      */
-    //TODO REVIEW!
-    mapComponents: function (c, f, x) {
+    // TODO REVIEW!
+    mapComponents : function(c, f, x) {
       f.call(x, c);
       if (c.components) {
         this.mapComponentsList(c.components, f, x);
@@ -99,10 +99,10 @@ define(['cdf/lib/jquery', 'cdf/components/BaseComponent', 'cdf/dashboard/Utils']
     /**
      * Pre-order traversal of components given a list of root components.
      */
-    //TODO REVIEW!
-    mapComponentsList: function (comps, f, x) {
+    // TODO REVIEW!
+    mapComponentsList : function(comps, f, x) {
       var me = this;
-      $.each(comps, function (i, c) {
+      $.each(comps, function(i, c) {
         me.mapComponents(c, f, x);
       });
       return me;
