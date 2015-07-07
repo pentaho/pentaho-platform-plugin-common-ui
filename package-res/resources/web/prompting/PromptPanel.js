@@ -1,5 +1,5 @@
-define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', './utils/GUIDHelper', './WidgetBuilder', 'cdf/Dashboard.Clean', './components/CompositeComponent', './components/PostInitComponent'],
-    function (_, Base, Logger, GUIDHelper, WidgetBuilder, Dashboard, CompositeComponent, PostInitComponent) {
+define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', './utils/GUIDHelper', './WidgetBuilder', 'cdf/Dashboard.Clean', './components/CompositeComponent', './components/PostInitComponent'],
+    function (_, Base, Logger, DojoNumber, GUIDHelper, WidgetBuilder, Dashboard, CompositeComponent, PostInitComponent) {
 
       /**
        * Checks if the type is numeric
@@ -116,18 +116,18 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', './utils/GUIDHel
               var valueParsed;
               try {
                 if (value.indexOf(localization ? localization.decimal : defaultLocalization.decimal) > 0) {
-                  valueParsed = dojo.number.parse(value, {
+                  valueParsed = DojoNumber.parse(value, {
                     locale: SESSION_LOCALE.toLowerCase()
                   });
                   if (valueParsed.toString().indexOf(defaultLocalization.decimal) < 0) {
-                    valueParsed = dojo.number.format(valueParsed, {
+                    valueParsed = DojoNumber.format(valueParsed, {
                       places: value.length - value.indexOf(localization ? localization.decimal : defaultLocalization.decimal) - 1
                     });
                     var defaultLocalization = dojo.i18n.getLocalization("dojo.cldr", "number", null);
                     valueParsed = valueParsed.split(defaultLocalization.group).join("");
                   }
                 } else {
-                  valueParsed = dojo.number.parse(value, {locale: SESSION_LOCALE.toLowerCase()});
+                  valueParsed = DojoNumber.parse(value, {locale: SESSION_LOCALE.toLowerCase()});
                 }
               } catch (e) {
                 valueParsed = value;

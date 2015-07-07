@@ -1,5 +1,5 @@
-define(['cdf/lib/Base', './Parameter', './ParameterDefinition', './ParameterGroup', './ParameterValue'],
-    function (Base, Parameter, ParameterDefinition, ParameterGroup, ParameterValue) {
+define(['cdf/lib/Base', 'common-ui/util/base64', './Parameter', './ParameterDefinition', './ParameterGroup', './ParameterValue'],
+    function (Base, Base64Util, Parameter, ParameterDefinition, ParameterGroup, ParameterValue) {
 
       /**
        *
@@ -120,14 +120,14 @@ define(['cdf/lib/Base', './Parameter', './ParameterDefinition', './ParameterGrou
           value = $(value);
 
           if ('true' == value.attr('encoded')) {
-            pVal.label = base64Decode(value.attr('label'));
+            pVal.label = Base64Util.base64Decode(value.attr('label'));
           } else {
             pVal.label = value.attr('label');
           }
           if ('true' == value.attr('null')) {
             pVal.value = ''; // Dashboards doesn't play nicely with null values for parameters
           } else if ('true' == value.attr('encoded')) {
-            pVal.value = base64Decode(value.attr('value'));
+            pVal.value = Base64Util.base64Decode(value.attr('value'));
           } else {
             pVal.value = value.attr('value');
           }
