@@ -1,4 +1,4 @@
-define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', './utils/GUIDHelper', './WidgetBuilder', 'cdf/Dashboard.Clean', './components/CompositeComponent', './components/PostInitComponent'],
+define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'common-ui/util/GUIDHelper', './WidgetBuilder', 'cdf/Dashboard.Clean', './components/CompositeComponent', './components/PostInitComponent'],
     function (_, Base, Logger, DojoNumber, GUIDHelper, WidgetBuilder, Dashboard, CompositeComponent, PostInitComponent) {
 
       /**
