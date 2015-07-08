@@ -15,22 +15,20 @@
  *
  */
 
-define(['cdf/lib/jquery', 'cdf/components/BaseComponent'], function($, BaseComponent){
+define([ 'cdf/lib/jquery', 'common-ui/prompting/components/FlowPromptLayoutComponent' ], function($,
+  FlowPromptLayoutComponent) {
 
-  return BaseComponent.extend({
-    name: "PostInitPromptPanelScrollRestorer",
-    type: "base",
-    lifecycle: {
-      silent: true
-    },
-    executeAtStart: true,
-    priority: 999999999,
-    update: function () {
-      // restore last scroll position for prompt panel
-      if (this.promptPanelScrollValue) {
-        $("#" + this.promptPanel).children(".prompt-panel").scrollTop(this.promptPanelScrollValue);
-        delete this.promptPanelScrollValue;
-      }
-    }
+  describe("FlowPromptLayoutComponent", function() {
+
+    describe("update", function() {
+      it("should add css class 'flow'", function() {
+        spyOn($.fn, "addClass");
+
+        var comp = new FlowPromptLayoutComponent();
+        comp.update();
+
+        expect($.fn.addClass).toHaveBeenCalledWith('flow');
+      });
+    });
   });
 });

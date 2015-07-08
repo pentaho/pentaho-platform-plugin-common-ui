@@ -15,22 +15,15 @@
  *
  */
 
-define(['cdf/lib/jquery', 'cdf/components/BaseComponent'], function($, BaseComponent){
+define([ 'common-ui/prompting/components/GarbageCollectorComponent' ], function(GarbageCollectorComponent) {
 
-  return BaseComponent.extend({
-    name: "PostInitPromptPanelScrollRestorer",
-    type: "base",
-    lifecycle: {
-      silent: true
-    },
-    executeAtStart: true,
-    priority: 999999999,
-    update: function () {
-      // restore last scroll position for prompt panel
-      if (this.promptPanelScrollValue) {
-        $("#" + this.promptPanel).children(".prompt-panel").scrollTop(this.promptPanelScrollValue);
-        delete this.promptPanelScrollValue;
-      }
-    }
+  describe("GarbageCollectorComponent", function() {
+
+    it("should create component'", function() {
+      var comp = new GarbageCollectorComponent();
+
+      expect(comp).toBeDefined();
+      expect(comp.executeAtStart).toBeTruthy();
+    });
   });
 });
