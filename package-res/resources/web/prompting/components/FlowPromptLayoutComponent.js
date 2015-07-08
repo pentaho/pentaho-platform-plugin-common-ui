@@ -15,7 +15,7 @@
  *
  */
 
-define(['./PromptLayoutComponent'], function(PromptLayoutComponent){
+define(['cdf/lib/jquery', './PromptLayoutComponent'], function($, PromptLayoutComponent){
 
   return PromptLayoutComponent.extend({
     update: function () {

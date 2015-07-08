@@ -15,8 +15,8 @@
  *
  */
 
-define(['cdf/components/BaseComponent', 'pentaho/common/DateTextBox', 'dijit/registry'],
-    function (BaseComponent, DateTextBox, registry) {
+define(['cdf/components/BaseComponent', 'pentaho/common/DateTextBox', 'dijit/registry', 'cdf/lib/jquery', 'dojo/on'],
+    function (BaseComponent, DateTextBox, registry, $, on) {
 
       return BaseComponent.extend({
         clear: function () {
@@ -29,12 +29,12 @@ define(['cdf/components/BaseComponent', 'pentaho/common/DateTextBox', 'dijit/reg
           }
         },
         update: function () {
-          var nyself = this;
+          var myself = this;
 
           var value = this.transportFormatter.parse(this.dashboard.getParameterValue(this.parameter));
           this.dijitId = this.htmlObject + '_input';
-          var input = $('#' + this.htmlObject).html($('<input/>').attr('id', this.dijitId));
-          var dateTextBox = new pentaho.common.DateTextBox({
+          $('#' + this.htmlObject).html($('<input/>').attr('id', this.dijitId));
+          var dateTextBox = new DateTextBox({
             name: this.name,
             constraints: {
               datePattern: this.param.attributes['data-format'],
