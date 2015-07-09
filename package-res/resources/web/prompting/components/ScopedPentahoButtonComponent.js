@@ -15,7 +15,7 @@
  *
  */
 
-define(['cdf/components/BaseComponent', 'cdf/lib/jquery', 'amd!cdf/lib/jquery.ui'], function(BaseComponent, $){
+define(['cdf/components/BaseComponent', 'cdf/lib/jquery'], function(BaseComponent, $){
   return BaseComponent.extend({
     viewReportButtonRegistered: false,
 
