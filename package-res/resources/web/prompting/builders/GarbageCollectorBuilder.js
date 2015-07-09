@@ -35,9 +35,10 @@ define(['cdf/Logger', 'cdf/lib/Base', '../components/GarbageCollectorComponent']
                   Logger.log(e, 'exception');
                 }
               });
+
+              // setTimeout allows for execution to be broken out from the current
               setTimeout(function () {
                 // Remove myself from Dashboards.components when we're done updating
-                //TODO Review this!!
                 args.promptPanel.removeDashboardComponents([this]);
               }.bind(this));
               return false; // Don't try to update, we're done
