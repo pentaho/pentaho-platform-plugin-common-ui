@@ -1,5 +1,5 @@
-define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'common-ui/util/GUIDHelper', './WidgetBuilder', 'cdf/Dashboard.Clean', './components/CompositeComponent', './components/PostInitComponent'],
-    function (_, Base, Logger, DojoNumber, GUIDHelper, WidgetBuilder, Dashboard, CompositeComponent, PostInitComponent) {
+define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'common-ui/util/GUIDHelper', './WidgetBuilder', 'cdf/Dashboard.Clean', './components/PostInitComponent'],
+    function (_, Base, Logger, DojoNumber, GUIDHelper, WidgetBuilder, Dashboard, PostInitComponent) {
 
       /**
        * Checks if the type is numeric
@@ -123,6 +123,39 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
        */
       function _createWidgetForPromptPanel() {
         return WidgetBuilder.WidgetBuilder.build(this, 'prompt-panel');
+      }
+
+      /**
+       * @callback callback~cb
+       * @param {Object} component The component
+       */
+
+      /**
+       * Pre-order traversal of a component and its descendants.
+       *
+       * @function
+       * @param {Object} component The component to iterate
+       * @param {callback~cb} callback The callback to call on each component
+       * @private
+       */
+      function _mapComponents(component, callback) {
+        callback(component);
+        if (component.components) {
+          _mapComponentsList(component.components, callback);
+        }
+      }
+
+      /**
+       * Pre-order traversal of components given a list of root components.
+       *
+       * @function
+       * @param {Object[]} components The list of components to iterate
+       * @param {callback~cb} callback The callback to call on each component
+       */
+      function _mapComponentsList(components, callback) {
+        $.each(components, function(i, component) {
+          _mapComponents(component, callback);
+        });
       }
 
       var PromptPanel = Base.extend({
@@ -455,27 +488,26 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
               }
 
               var focusedParam;
-              var compositeComponent = new CompositeComponent();
-              compositeComponent.mapComponentsList(this.components, function (c) {
-                if (!c.components && c.param && c.promptType === 'prompt') {
+              _mapComponentsList(this.components, function (component) {
+                if (!component.components && component.param && component.promptType === 'prompt') {
                   if (!focusedParam) {
-                    var ph = c.placeholder();
+                    var ph = component.placeholder();
                     if ($(":focus", ph).length) {
-                      focusedParam = c.param.name;
+                      focusedParam = component.param.name;
                     }
                   }
 
-                  if (topValuesByParam && c.type === 'SelectMultiComponent') {
-                    var topValue = c.topValue();
+                  if (topValuesByParam && component.type === 'SelectMultiComponent') {
+                    var topValue = component.topValue();
                     if (topValue != null) {
-                      topValuesByParam['_' + c.param.name] = topValue;
+                      topValuesByParam['_' + component.param.name] = topValue;
                     }
                   }
-                } else if (topValuesByParam && c.type === 'ScrollingPromptPanelLayoutComponent') {
+                } else if (topValuesByParam && component.type === 'ScrollingPromptPanelLayoutComponent') {
                   // save last scroll position for prompt panel
-                  var scrollTopValue = c.placeholder().children(".prompt-panel").scrollTop();
+                  var scrollTopValue = component.placeholder().children(".prompt-panel").scrollTop();
                   if (scrollTopValue != null) {
-                    topValuesByParam['_' + c.name] = scrollTopValue;
+                    topValuesByParam['_' + component.name] = scrollTopValue;
                   }
                 }
               });
@@ -517,36 +549,34 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
             // dummy component for prompt panel scroll restoring (after all components was rendered)
             var postInitComponent = new PostInitComponent();
 
-            var compositeComponent = new CompositeComponent();
-
-            compositeComponent.mapComponents(layout, function (c) {
-              components.push(c);
+            _mapComponents(layout, function (component) {
+              components.push(component);
 
               // Don't fire the submit on load if we have a submit button.
               // It will take care of firing this itself (based on auto-submit)
-              if (fireSubmit && c.promptType == 'submit') {
+              if (fireSubmit && component.promptType == 'submit') {
                 fireSubmit = false;
               }
 
-              if (!c.components && c.param && c.promptType === 'prompt') {
-                var name = c.param.name;
+              if (!component.components && component.param && component.promptType === 'prompt') {
+                var name = component.param.name;
                 if (focusedParam && focusedParam === name) {
                   focusedParam = null;
-                  c.autoFocus = true;
+                  component.autoFocus = true;
                 }
 
-                if (topValuesByParam && c.type === 'SelectMultiComponent') {
+                if (topValuesByParam && component.type === 'SelectMultiComponent') {
                   var topValue = topValuesByParam['_' + name];
                   if (topValue != null) {
-                    c.autoTopValue = topValue;
+                    componentautoTopValue = topValue;
                   }
                 }
-              } else if (topValuesByParam && c.type === 'ScrollingPromptPanelLayoutComponent') {
+              } else if (topValuesByParam && component.type === 'ScrollingPromptPanelLayoutComponent') {
                 // save prompt pane reference and scroll value to dummy component
-                var scrollTopValue = topValuesByParam['_' + c.name];
+                var scrollTopValue = topValuesByParam['_' + component.name];
                 if (scrollTopValue != null) {
                   postInitComponent.promptPanelScrollValue = scrollTopValue;
-                  postInitComponent.promptPanel = c.htmlObject;
+                  postInitComponent.promptPanel = component.htmlObject;
                 }
               }
             });
@@ -664,7 +694,7 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
             }
           }.bind(this));
 
-          if (panelGroupComponents > 0) {
+          if (panelGroupComponents.length > 0) {
             panelGroupComponents.push(_createWidgetForSubmitPanel.call(this));
           }
 
@@ -682,9 +712,8 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
           // Traverse all embedded components to remove them
 
           var removed = [];
-          var compositeComponent = new CompositeComponent();
-          compositeComponent.mapComponentsList(components, function (c) {
-            var rc = myself.dashboard.removeComponent(c.name);
+          _mapComponentsList(components, function (component) {
+            var rc = myself.dashboard.removeComponent(component.name);
             if (rc) {
               removed.push(rc);
             }
@@ -702,23 +731,22 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
 
             if (component.parameter) {
               // Remove our parameter from any other listening components
-              $.each(myself.dashboard.components, function (i, c) {
-                if ($.isArray(c.listeners)) {
-                  c.listeners = $.grep(c.listeners, function (l) {
+              $.each(myself.dashboard.components, function (i, comp) {
+                if ($.isArray(comp.listeners)) {
+                  comp.listeners = $.grep(comp.listeners, function (l) {
                     return l !== component.parameter;
                   });
                 }
-                ;
               });
 
               // Remove our parameter from any other component's dynamic parameters list
-              $.each(myself.dashboard.components, function (i, c) {
-                if ($.isArray(c.parameters)) {
+              $.each(myself.dashboard.components, function (i, comp) {
+                if ($.isArray(comp.parameters)) {
                   // TODO: I'm afraid that the following code does nothing...
                   // The return value of the $.each callback function is only taken account when === false,
                   // meaning to break the loop. Otherwise, it is ignored.
                   // The return value of $.each is the first argument: c.parameters .
-                  c.parameters = $.each(c.parameters, function (j, p) {
+                  comp.parameters = $.each(comp.parameters, function (j, p) {
                     if (p[1] === component.parameter) {
                       return [p[0], '', ''];
                     } else {
@@ -726,11 +754,10 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
                     }
                   });
                 }
-                ;
               });
             }
           });
-        },
+        }
 
       });
 
