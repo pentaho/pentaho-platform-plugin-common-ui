@@ -25,15 +25,15 @@ define(function() {
         id:        /^ccc_/,
         container: "analyzer",
 
-        translateEditorProperties: function(editorTypeId, editorProps, filterPropsList, filterPropsMap) {
+        getEditorProperties: function(editorDoc, filterPropsList, filterPropsMap) {
           // Let every Analyzer option pass-through except certain ignored ones.
           // This is true even if some/all don't have corresponding data requirements.
 
           var visualProps = {};
 
-          (filterPropsList || editorProps).forEach(function(p) {
+          (filterPropsList || editorDoc).forEach(function(p) {
               if(!isIgnoredEditorProp(p)) {
-                var value = editorProps.get(p);
+                var value = editorDoc.get(p);
                 switch(p) {
                   // boolean
                   case "autoRange":

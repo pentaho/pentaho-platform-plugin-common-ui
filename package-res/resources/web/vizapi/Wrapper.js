@@ -89,20 +89,14 @@ define([
     this._drawSpec   = null; // last .draw(, drawSpec) argument
     this._visual     = null;
 
+    this._lastAction  = null;
+    this._actionCount = 0;
+
     // --------
 
     this._dataTable = null;
 
-    /**
-     * Gets the current highlights.
-     *
-     * Do **not** modify the returned array or its contents.
-     *
-     * @property highlights
-     * @type ISelection[]
-     * @readonly
-     */
-    this.highlights = [];
+    this._highlights = [];
   }
 
   utils.extend(VisualWrapper.prototype, {
@@ -110,10 +104,12 @@ define([
     // PROPS
 
     /**
-     * Gets or sets the data table instance that will be used by the next
-     * {{#crossLink "VisualWrapper/update:method"}}{{/crossLink}} call.
+     * Gets or sets the data to display.
      *
-     * A data table must be set before a visual can be drawn.
+     * Data must be set before a visual can be displayed.
+     *
+     * To update the visualization display,
+     * call {{#crossLink "VisualWrapper/update:method"}}{{/crossLink}}.
      *
      * @property data
      * @type DataTable
@@ -130,20 +126,57 @@ define([
           value = new DataTable(value);
 
         this._dataTable = value;
+
+        this._setAction("setData");
       }
+    },
+
+    /**
+     * Gets or sets the current highlights.
+     *
+     * When set to _nully_, all highlights are cleared.
+     *
+     * When the visual specification is defined, its highlights are updated.
+     *
+     * To update the visualization display,
+     * call {{#crossLink "VisualWrapper/update:method"}}{{/crossLink}}.
+     *
+     * Do **not** directly modify the returned array or its contents.
+     *
+     * @property highlights
+     *
+     * @type ISelection[]
+     */
+    get highlights() {
+      return this._highlights;
+    },
+
+    set highlights(highlights) {
+      if(!highlights) {
+        if(!this._highlights.length) return;
+
+        this._highlights.length = 0;
+      } else {
+        // TODO: do deep equality test on set highlights ?
+        this._highlights = highlights;
+      }
+
+      if(this._visualSpec) this._visualSpec.highlights = this._highlights;
+
+      this._setAction("setHighlights");
     },
 
     /**
      * Gets or sets a visual specification.
      *
-     * When set to _nully_, the current visual display will be cleared if updated.
-     *
-     * When the visual specification is a _nully_ value,
-     * the current visual display will be cleared, if updated.
+     * When set to _nully_, the current visual display will be cleared, if updated.
      *
      * An error is thrown if the type of the specified visual is not defined or
      * is disabled for the wrapper's container type,
      * {{#crossLink "VisualWrapper/containerTypeId:property"}}{{/crossLink}}.
+     *
+     * To update the visualization display,
+     * call {{#crossLink "VisualWrapper/update:method"}}{{/crossLink}}.
      *
      * @property visualSpec
      *
@@ -156,25 +189,39 @@ define([
     set visualSpec(visualSpec) {
       var prevVisualSpec = this._visualSpec;
       if(prevVisualSpec) {
-
         // Clear, even when the same object.
         // spec.type may have been mutated.
         this._visualSpec = this._drawSpec = null;
 
         if(!visualSpec || this._visualType.id !== visualSpec.type) {
           // Clear visual and visualType.
+          // NOTE: resets _lastAction and _actionCount!
           this._disposeVisual();
           this._visualType = null;
         }
         // else
-        // Same visual type. Keep visual and update with new spec.
+        // Same visual type. Keep the Visual and update it with new spec.
+
+        // Also, keep existing highlights, whether or not the visual type has changed,
+        // unless present in the new visualSpec.
       }
 
       if(visualSpec) {
-        if(!this._visualType)
-          this._visualType = typeRegistry.get(visualSpec.type, this.containerTypeId, /*assert:*/true);
+        // We don't check if any property actually changed its value.
+        // A deep equality test would need to be performed, and, for that,
+        // a deep-clone would need to be kept, and, still,
+        // would remain vulnerable to problems with custom class objects.
+        this._setAction("setProps");
+
+        // Registers "setHighlights" if highlights change,
+        // causing the `visualSpec` set operation to cause a future full draw.
+        var specHighlights = visualSpec.highlights;
+        if(specHighlights) this.highlights = specHighlights;
 
         this._visualSpec = visualSpec;
+
+        if(!this._visualType)
+          this._visualType = typeRegistry.get(visualSpec.type, this.containerTypeId, /*assert:*/true);
       }
     },
 
@@ -212,12 +259,10 @@ define([
     // OPERS
 
     // TODO: document when highlights/events are refactored.
-    // [DCL] NEW
     on: function(name, handler) {
       visualEvents.addListener(this, name, handler);
     },
 
-    // [DCL] NEW
     off: function(name) {
       visualEvents.removeListener(this, name);
     },
@@ -226,8 +271,7 @@ define([
      * Displays a visual.
      *
      * When a visual specification is not defined,
-     * the current visual display is cleared and the returned promise
-     * is immediately resolved.
+     * the current visual display is cleared and the returned promise is immediately resolved.
      *
      * If any of the visual specification properties
      * {{#crossLink "IVisual/width:property"}}{{/crossLink}} and
@@ -235,7 +279,7 @@ define([
      * it takes the value of the current corresponding dimension
      * of {{#crossLink "VisualWrapper/domElement:property"}}{{/crossLink}}.
      * Otherwise, when specified, it is the corresponding element's dimension
-     * that takes that value.
+     * that is set with that value.
      *
      * The following errors are thrown, synchronously, if:
      *
@@ -243,18 +287,41 @@ define([
      * 2. no data has been set.
      *
      * @method update
+     *
      * @param {object} [drawOptions] A map of contextual, transient, arbitrary options to pass to the visual.
      *   Its properties are used to set any `undefined` properties of the visual specification.
-     *   Its properties are not saved with the visual specification.
+     *   Its properties are _not_ saved along with the visual specification.
+     * @param {string} [drawOptions.action] The action that triggered the update call and
+     *   feeds {{#crossLink "IVisualDrawSpec/action:property"}}{{/crossLink}}.
+     *
+     *   When unspecified and a single operation was performed on the wrapper since
+     *   the last update call, the action passed to the _visual_ is
+     *   the corresponding standard action (like `"setHighlights"`, `"setData"` or `"setProps"`).
+     *
+     *   Otherwise, the action passed to the _visual_ will be `null`.
      *
      * @return {Promise} A promise that is resolved when the visual has been displayed.
      */
     update: function(drawOptions) {
       this._checkAsyncState();
 
-      if(!this._visualSpec) return Promise.resolve(undefined);
+      if(!this._visualSpec) {
+        // TODO: Clear the display?
+        return Promise.resolve(undefined);
+      }
 
-      // Reset so that any updates to visualSpec may pass-through.
+      // TODO: Should prevent action from being a standard action?
+      if((!drawOptions || !drawOptions.action) &&
+         this._drawSpec && this._actionCount === 1) {
+        switch(this._lastAction) {
+          case "setHighlights":
+            if(this._visual.setHighlights) return this._updateHighlights();
+            break;
+        }
+      }
+
+      // Reset so that `visualSpec` mutations pass-through even when
+      // the user does not call `this.visualSpec = .` again.
       this._drawSpec = null;
 
       return this._updateVisual(drawOptions);
@@ -262,14 +329,18 @@ define([
 
     // -----------------
 
-    processHighlights: function(args) {
+    _processHighlights: function(args) {
       var mode = args.selectionMode || "TOGGLE";
 
-      if (mode == "REPLACE") {
-        // only use the selections from the arguments passed in
-        this.highlights = [];
+      if(mode === "REPLACE") {
+        // Only use the selections from the arguments passed in.
+        this.highlights.length = 0;
       }
 
+      // Just assume these changed, for now.
+      this._setAction("setHighlights");
+
+      var highlights = this.highlights;
       for (var i = 0; i < args.selections.length; i++) {
         var selectedItem = args.selections[i];
 
@@ -307,8 +378,8 @@ define([
 
         if(mode == "TOGGLE") {
           // previous selection should be retained or if re-selected should be toggled
-          for( var hNo=0; hNo<this.highlights.length; hNo++) {
-            var highlight = this.highlights[hNo];
+          for( var hNo=0; hNo< highlights.length; hNo++) {
+            var highlight = highlights[hNo];
             var highlightRowItem = highlight.rowItem;
             var highlightColItem = highlight.colItem;
 
@@ -344,7 +415,7 @@ define([
                 }
 
                 // remove this
-                this.highlights.splice( hNo, 1 );
+                highlights.splice( hNo, 1 );
                 removed = true;
                 break;
             }
@@ -368,31 +439,23 @@ define([
             highlight.id = colId;
             highlight.value = colLabel;
           }
-          this.highlights.push( highlight );
+          highlights.push( highlight );
         }
       }
-      //this.updateHighlights();
     },
 
-    /*
-     updateHighlights
-     Updates all of the highlights on the visual
-     */
-    updateHighlights: function() {
-      if(this._visual.setHighlights) {
-        this._visual.setHighlights(this.highlights);
+    // TODO: remove when IVisual#setHighlights is removed.
+    _updateHighlights: function() {
+      var hs = this._drawSpec.highlights = this.highlights;
+
+      var promise = utils.promiseCall(this._visual.setHighlights.bind(this._visual, hs))
+          .then(drawn.bind(this));
+
+      return this._async().until(promise);
+
+      function drawn() {
+        this._setAction(null);
       }
-    },
-
-    // TODO: Missing setHighlights and getHighlights...
-    // TODO: Should be called clearHighlights??
-    /*
-     updateHighlights
-     Clears all of the highlights on the visual
-     */
-    clearSelections: function() {
-      this.highlights = [];
-      // [DCL] Why isn't visual updated?
     },
 
     // -----------------
@@ -410,7 +473,8 @@ define([
      * Calls the visual's {{#crossLink "IVisual/resize:method"}}{{/crossLink}} method,
      * if implemented, or, otherwise,
      * calls the {{#crossLink "IVisual/draw:method"}}{{/crossLink}} method with
-     * the __same arguments__ used in the previous call.
+     * the __same arguments__ used in the previous call
+     * and with a `"resize"` action.
      *
      * The following errors are thrown, synchronously, if:
      *
@@ -422,8 +486,7 @@ define([
      * @param {number} [width] The new width, in pixels. Defaults to the DOM element's current width.
      * @param {number} [height] The new height, in pixels. Defaults to the DOM element's current height.
      *
-     * @return {Promise} A promise that is
-     *    resolved when the current visual display has finished.
+     * @return {Promise} A promise that is resolved when the update operation has ended.
      */
     resize: function(width, height) {
       this._checkVisualState();
@@ -434,18 +497,25 @@ define([
           w = drawSpec.width  = this._resizeDomDim("width",  width ),
           h = drawSpec.height = this._resizeDomDim("height", height);
 
+      this._setAction("resize");
+
       // Method IVisual#resize is optional.
-      // Call draw with same args when missing.
+      // When not implemented, call draw with the same args and a "resize" action.
       if(!this._visual.resize)
         return this._updateVisual();
 
-      var promise = utils.promiseCall(this._visual.resize.bind(this._visual, w, h));
+      var promise = utils.promiseCall(this._visual.resize.bind(this._visual, w, h))
+          .then(drawn.bind(this));
 
       return this._async().until(promise);
+
+      function drawn() {
+        this._setAction(null);
+      }
     },
 
     /**
-     * Updates the visual specification with the current highlights, state or data.
+     * Updates the visual specification with the current state and/or data.
      *
      * The following errors are thrown, synchronously, if:
      *
@@ -461,7 +531,7 @@ define([
      * @param {boolean} [options.saveData=false] Indicates if the current visual
      *    data should be included.
      *
-     * @return {object} A visual specification.
+     * @return {IVisualSpec} The current visual specification.
      */
     save: function(options) {
       this._checkVisualState();
@@ -469,8 +539,6 @@ define([
       var visualSpec = this._visualSpec;
 
       if(utils.option(options, "saveState", true)) {
-        visualSpec.highlights = this.highlights;
-
         // Method IVisual#getState is optional.
         if(this._visual.getState)
           visualSpec.state = this._visual.getState() || null;
@@ -570,7 +638,9 @@ define([
       var dataTable = this._dataTable;
       if(!dataTable) throw new Error("No Data");
 
-      var promise = this._getVisual().then(drawItNow.bind(this));
+      var promise = this._getVisual()
+          .then(drawItNow.bind(this))
+          .then(drawn.bind(this));
 
       return this._async().until(promise);
 
@@ -579,6 +649,10 @@ define([
         var drawSpec = this._getDrawSpec(drawOptions);
 
         return this._visual.draw(dataView, drawSpec);
+      }
+
+      function drawn() {
+        this._setAction(null);
       }
     },
 
@@ -626,6 +700,10 @@ define([
         specHelper.setProperties(drawSpec, drawOptions,           ONLY_DEFAULTS);
       }
 
+      // Always set
+      drawSpec.action = (drawOptions && drawOptions.action) ||
+          (this._actionCount === 1 ? this._lastAction : null);
+
       return drawSpec;
     },
 
@@ -640,10 +718,12 @@ define([
      * @param {object} ev The event object.
      */
     _onVisualSelect: function(ev) {
-      this.processHighlights(ev);
+      this._processHighlights(ev);
 
       // Forward event
       visualEvents.trigger(this, "select", ev);
+
+      if(this._actionCount) this.update();
     },
 
     /***
@@ -683,9 +763,38 @@ define([
 
         if(visual.dispose) visual.dispose();
 
-        if(!finalDispose) this._resetDomElem();
+        if(!finalDispose) {
+          this._resetDomElem();
+          this._setAction(null);
+        }
 
         this._visual = visual = null;
+      }
+    },
+
+    /***
+     * Registers an action performed.
+     *
+     * When _nully_, resets the action registry.
+     *
+     * The action registry is tied to the lifetime of a visual instance.
+     * As such, a call to this method only takes effect if there is a current one.
+     *
+     * @method _setAction
+     * @param {string} [action=null] The action performed.
+     * @private
+     */
+    _setAction: function(action) {
+      if(this._visual) {
+        if(action) {
+          if(action !== this._lastAction) {
+            this._lastAction = "setHighlights";
+            this._actionCount++;
+          }
+        } else {
+          this._lastAction  = null;
+          this._actionCount = 0;
+        }
       }
     },
 

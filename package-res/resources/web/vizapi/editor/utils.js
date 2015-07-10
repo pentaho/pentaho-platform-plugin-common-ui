@@ -36,25 +36,25 @@ define([
    */
 
   return {
-      translateEditorProperties: translateEditorProperties,
-      processEditModelChange:    processEditModelChange
+      getEditorProperties:    getEditorProperties,
+      processEditModelChange: processEditModelChange,
+      validateEditModel:      validateEditModel
     };
 
   /**
-   * Translates editor _external_ properties to properties of visuals.
+   * Gets the visualization properties exposed by a visualization editor's document.
    *
    * If the visual type has been configured with
-   * {{#crossLink "IVisualTypeConfiguration/translateEditorProperties:method"}}{{/crossLink}},
-   * it is called to perform the translation.
+   * {{#crossLink "IVisualTypeConfiguration/getEditorProperties:method"}}{{/crossLink}},
+   * it is called to perform the retrieval.
    *
    * When _filterPropsList_ is specified,
    * the returned properties surely only contain properties present in the list.
    *
-   * @method translateEditorProperties
+   * @method getEditorProperties
    *
    * @param {IVisualType} type The visual type.
-   * @param {string} editorType The id of the editor type that is the source of _editorProps_.
-   * @param {IVisualEditorProperties} editorProps An object that allows reading the editor's properties.
+   * @param {IVisualEditorDocument} editorDoc An object that allows accessing the editor's document and properties.
    * @param {string|string[]} [filterPropsList] A string or an array of strings with
    *   the editor property names
    *   that should be processed. When this is unspecified, _nully_,
@@ -65,12 +65,11 @@ define([
    *
    * @return {Object} A map of "visual properties".
    */
-  function translateEditorProperties(type, editorType, editorProps, filterPropsList) {
+  function getEditorProperties(type, editorDoc, filterPropsList) {
     if(!type)        throw utils.error.argRequired("type");
-    if(!editorType)  throw utils.error.argRequired("editorType");
-    if(!editorProps) throw utils.error.argRequired("editorProps");
+    if(!editorDoc) throw utils.error.argRequired("editorDoc");
 
-    var translateProps = type.translateEditorProperties || defaultTranslateProperties;
+    var getProps = type.getEditorProperties || defaultGetProperties;
 
     // Create an index for `filterPropsList` on property name.
     var filterPropsMap;
@@ -83,10 +82,10 @@ define([
       filterPropsList = filterPropsMap = null;
     }
 
-    var visualProps = translateProps.call(type, editorType, editorProps, filterPropsList, filterPropsMap);
+    var visualProps = getProps.call(type, editorDoc, filterPropsList, filterPropsMap);
 
     // Ensure only props specified in filterPropsList are output.
-    if(visualProps && filterPropsList && translateProps !== defaultTranslateProperties) {
+    if(visualProps && filterPropsList && getProps !== defaultGetProperties) {
       var visualProps2 = {};
       filterPropsList.forEach(function(p) {
         if(utils.O_hasOwn.call(visualProps, p))
@@ -126,6 +125,77 @@ define([
     storeEditModel(type, spec, editModel);
   }
 
+  /**
+   * Validates a given edit model against a given visual type.
+   *
+   * Performs basic "requiredness" and "allow multiple" validation —
+   * more generally, minimum and maximum occurrence validation —
+   * for visual role requirements.
+   *
+   * If basic validation succeeds and
+   * if the visual type has defined
+   * {{#crossLink "IVisualType/validateEditModel:method"}}{{/crossLink}},
+   * it is called, to validate the model.
+   *
+   * @method vaidateEditModel
+   *
+   * @param {IVisualType} type The visual type.
+   * @param {IVisualEditModel} editModel The visual edit model.
+   * @return {Error[]|null} A non-empty array of validation error objects,
+   *    or `null`, when there are no validation errors.
+   */
+  function validateEditModel(type, editModel) {
+    if(!editModel) throw utils.error.argRequired("editModel");
+
+    var errors;
+
+    // Basic validation
+    typeHelper.mapVisualRoleRequirements(type, function(req) {
+      var item = editModel.byId(req.id);
+      var occur = item ? item.value.length : 0;
+
+      var occurs = typeHelper.getRequirementOccurRange(item || req);
+
+      function addError(code, msg, reqs) {
+        var er = new Error(msg);
+        er.code = code;
+        er.reqs = reqs;
+        (errors || (errors = [])).push(er);
+        return er;
+      }
+
+      var error, msg;
+      if(occur < occurs.min) {
+        if(!errors) ;
+
+        msg = "Visual role requirement '" + req.id + "' ";
+        if(occurs.min === 1) {
+          msg += "is required.";
+        } else {
+          msg += "needs to be bound to at least " + occurs.min + " data properties.";
+        }
+
+        error = addError("minOccur", msg, [req.id]);
+        error.minOccur = occurs.min;
+      } else if(occur > occurs.max) {
+        msg = "Visual role requirement '" + req.id +
+            "' cannot be bound to more than " + occurs.max + " data properties.";
+        error = addError("maxOccur", msg, [req.id]);
+        error.maxOccur = occurs.max;
+      }
+    });
+
+    if(!errors && type.validateEditModel) {
+      errors = type.validateEditModel(editModel);
+
+      if(errors && (!(errors instanceof Array) || !errors.length)) {
+        errors = null;
+      }
+    }
+
+    return errors || null;
+  }
+
   // @private
   // @static
   function storeEditModel(type, spec, editModel) {
@@ -140,7 +210,7 @@ define([
 
   // @private
   // @this IVisualType
-  function defaultTranslateProperties(editorType, editorProps, filterPropsList, filterPropsMap) {
+  function defaultGetProperties(editorDoc, filterPropsList, filterPropsMap) {
     // Copy all editor options that have the same name of a non-structure data req,
     // filtered by filterPropsMap
 
@@ -148,7 +218,7 @@ define([
 
     typeHelper.mapGeneralRequirements(this, function(req) {
       var id = req.id, value;
-      if((value = editorProps.get(id)) !== undefined &&
+      if((value = editorDoc.get(id)) !== undefined &&
          (!filterPropsMap || utils.O_hasOwn.call(filterPropsMap, id))) {
         visualProps[id] = value;
       }

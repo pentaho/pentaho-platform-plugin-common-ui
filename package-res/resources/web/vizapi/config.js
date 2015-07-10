@@ -42,7 +42,7 @@ define(function() {
       {
         priority:  -1,
         id:        ["ccc_bulletchart", "ccc_treemap", "ccc_waterfall", "ccc_boxplot"],
-        enabled:   false,
+        enabled:   false
       },
 
       // Override/Configure the CCC Line chart for Analyzer

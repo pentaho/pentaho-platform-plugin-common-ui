@@ -36,6 +36,7 @@ define([
    */
 
   var standardSpec = {
+          action: 1,
           type:   1,
           state:  1,
           data:   1,
@@ -49,6 +50,7 @@ define([
       create: create,
       clone:  clone,
       setProperties: setProperties,
+      eachProperties: eachProperties,
       isStandardProperty: isStandardProperty
     };
 
@@ -56,7 +58,8 @@ define([
    * Indicates if a name is that of a standard property name.
    *
    * Standard specification properties are those defined
-   * by the {{#crossLink "IVisualSpec"}}{{/crossLink}} interface:
+   * by the {{#crossLink "IVisualSpec"}}{{/crossLink}} and
+   * {{#crossLink "IVisualDrawSpec"}}{{/crossLink}} interfaces:
    *
    * * `type`
    * * `state`
@@ -65,6 +68,7 @@ define([
    * * `direct`
    * * `width`
    * * `height`
+   * * `action`
    *
    * @method isStandardProperty
    *
@@ -131,6 +135,26 @@ define([
   }
 
   /**
+   * Calls a function for each generic (non-standard), defined property of a visual specification.
+   *
+   * @method eachProperties
+   *
+   * @param {IVisualSpec} spec The specification whose properties to map.
+   * @param {function} fun The mapping function.
+   *   Called with each property's value and name as arguments.
+   *   Iteration is cancelled if the function returns the value `false`.
+   * @param {object} [ctx] The `this` context on which to call `fun`.
+   *
+   * @return {boolean} `true` if iteration was not cancelled, `false` otherwise.
+   */
+  function eachProperties(spec, fun, ctx) {
+    return utils.O_eachOwnDefined.call(spec, function(v, p) {
+      if(!isStandardProperty(p))
+        return fun.call(ctx, v, p); // maybe stop
+    });
+  }
+
+  /**
    * Sets properties in a visual specification, given a property map.
    *
    * Optionally, only sets properties that are not yet defined in
@@ -148,8 +172,8 @@ define([
    * of the specification that have no value should be set.
    */
   function setProperties(spec, props, defaultsOnly) {
-    if(props) utils.O_eachOwnDefined.call(props, function(v, p) {
-      if(!isStandardProperty(p) && (!defaultsOnly || spec[p] === undefined))
+    if(props) eachProperties(props, function(v, p) {
+      if(!defaultsOnly || spec[p] === undefined)
         spec[p] = v;
     });
   }
