@@ -87,8 +87,7 @@ define([ 'cdf/lib/jquery', 'cdf/components/BaseComponent', 'cdf/dashboard/Utils'
     /**
      * Pre-order traversal of a component and its descendants.
      */
-    // TODO REVIEW!
-    mapComponents : function(c, f, x) {
+    mapComponents: function (c, f, x) {
       f.call(x, c);
       if (c.components) {
         this.mapComponentsList(c.components, f, x);
@@ -99,14 +98,12 @@ define([ 'cdf/lib/jquery', 'cdf/components/BaseComponent', 'cdf/dashboard/Utils'
     /**
      * Pre-order traversal of components given a list of root components.
      */
-    // TODO REVIEW!
-    mapComponentsList : function(comps, f, x) {
+    mapComponentsList: function (comps, f, x) {
       var me = this;
       $.each(comps, function(i, c) {
         me.mapComponents(c, f, x);
       });
       return me;
     }
-
   });
 });

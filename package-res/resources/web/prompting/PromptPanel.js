@@ -13,29 +13,6 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
         return _.contains(whiteList, type);
       };
 
-      /**
-       * Pre-order traversal of a component and its descendants.
-       */
-      var _mapComponents = function (c, f, x) {
-        f.call(x, c);
-        if (c.components) {
-          _mapComponentsList(c.components, f, x);
-        }
-        return c;
-      };
-
-      /**
-       * Pre-order traversal of components given a list of root components.
-       */
-      //TODO REVIEW!
-      var _mapComponentsList = function (comps, f, x) {
-        var me = this;
-        $.each(comps, function (i, c) {
-          _mapComponents(c, f, x);
-        });
-        return me;
-      };
-
       var PromptPanel = Base.extend({
 
         guid: undefined,
@@ -282,7 +259,8 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
           try {
             this.getParameterDefinition(this, this.refresh.bind(this));
           } catch (e) {
-            alert('Error in refreshCallback'); // TODO Add better error message
+            console.log(e);
+            alert('Exception caught attempting to execute refreshCallback');
           }
         },
 
@@ -363,8 +341,6 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
          * in the case the the parameter UI is not shown.
          */
         init: function (noAutoAutoSubmit) {
-          //TODO: Review!!
-          //pentaho.common.prompting.prepareCDF();
           var fireSubmit = true;
           if (this.paramDefn.showParameterUI()) {
             this._widgetGUIDHelper.reset(); // Clear the widget helper for this prompt
