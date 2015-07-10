@@ -22,7 +22,8 @@ define(['./ValueBasedParameterWidgetBuilder', '../components/ExternalInputCompon
         build: function (args) {
           var formatter = args.promptPanel.createFormatter(args.promptPanel.paramDefn, args.param);
 
-          $.extend(this.base(args), {
+          var widget = this.base(args);
+          $.extend(widget, {
             type: 'ExternalInputComponent',
             transportFormatter: args.promptPanel.createDataTransportFormatter(args.promptPanel.paramDefn, args.param, formatter),
             formatter: formatter,
