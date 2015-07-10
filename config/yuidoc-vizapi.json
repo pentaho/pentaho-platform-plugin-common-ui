@@ -7,9 +7,9 @@
       "lint": false,
       "linkNatives": "true",
       "attributesEmit": "true",
-      "paths":    ["package-res/resources/web/vizapi/"],
-      "exclude":  "package-res/resources/web/vizapi/ccc",
-      "outdir":   "doc-js/vizapi/",
+      "paths":    ["package-res/resources/web/visual/"],
+      "exclude":  "package-res/resources/web/visual/ccc, package-res/resources/web/visual/sample",
+      "outdir":   "doc-js/visual/",
       "markdown": {
         "html": true
       }
