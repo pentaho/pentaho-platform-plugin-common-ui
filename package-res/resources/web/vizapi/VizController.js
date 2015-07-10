@@ -16,7 +16,7 @@
 define([
   "pentaho/visual/color/paletteRegistry",
   "pentaho/visual/color/utils",
-  "common-ui/vizapi/Events",
+  "common-ui/vizapi/events",
   "common-ui/vizapi/DataTable"
 ], function(colorPalettes, colorUtils) {
 
