@@ -1,4 +1,6 @@
-/* Overridden due to PRD-5440 */
+/* Overridden due to PRD-5440
+		see lines: 101-106
+*/
 
 define(["exports", "./_base/kernel", "./sniff", "./_base/lang", "./dom", "./dom-style", "./dom-construct", "./_base/connect"],
 		function(exports, dojo, has, lang, dom, style, ctr, conn){
