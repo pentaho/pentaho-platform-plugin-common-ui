@@ -738,29 +738,10 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
                   });
                 }
               });
-
-              // Remove our parameter from any other component's dynamic parameters list
-              $.each(myself.dashboard.components, function (i, comp) {
-                if ($.isArray(comp.parameters)) {
-                  // TODO: I'm afraid that the following code does nothing...
-                  // The return value of the $.each callback function is only taken account when === false,
-                  // meaning to break the loop. Otherwise, it is ignored.
-                  // The return value of $.each is the first argument: c.parameters .
-                  comp.parameters = $.each(comp.parameters, function (j, p) {
-                    if (p[1] === component.parameter) {
-                      return [p[0], '', ''];
-                    } else {
-                      return p;
-                    }
-                  });
-                }
-              });
             }
           });
         }
-
       });
-
 
       return PromptPanel;
     });
