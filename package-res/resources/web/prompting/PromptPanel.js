@@ -13,20 +13,132 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
         return _.contains(whiteList, type);
       };
 
+      /**
+       * Creates a Widget calling the wigdet builder factory
+       * @param options {object} with the properties to be added to the Widget
+       * @param type {string} the type of the Widget to build
+       * @returns {object} A widget instance
+       * @private
+       */
+      function _createWidget(options, type) {
+        var newObj = $.extend(options, {
+          promptPanel: this
+        });
+        return WidgetBuilder.WidgetBuilder.build(newObj, type);
+      };
+
+      /**
+       * Creates a Widget for the Parameter
+       *
+       * @param param The param to be created
+       * @returns {object} A widget for the given parameter
+       * @private
+       */
+      function _createWidgetForParameter(param) {
+        if (param.strict && param.values.length === 0) {
+          // if the parameter is strict but we have no valid choices for it, it is impossible for the user to give it a
+          // value, so we will hide this parameter it is highly likely that the parameter is driven by another parameter
+          // which doesn't have a value yet, so eventually, we'll show this parameter.. we hope
+          return null;
+        }
+
+        return _createWidget.call(this, {
+          param: param
+        });
+      };
+
+      /**
+       * Creates a Widget for the Label
+       *
+       * @param param The param to be created
+       * @returns {object} A widget for the given parameter
+       * @private
+       */
+      function _createWidgetForLabel(param) {
+        return _createWidget.call(this, {
+          param: param
+        }, 'label');
+      };
+
+      /**
+       * Creates a Widget for the Error Label
+       *
+       * @param param The param to be created
+       * @param e {string} The error message
+       * @returns {Object} A widget for the given parameter
+       * @private
+       */
+      function _createWidgetForErrorLabel(param, e) {
+        return _createWidget.call(this, {
+          param: param,
+          errorMessage: e
+        }, 'error-label');
+      }
+
+      /**
+       * Creates a Widget for the Parameter Panel
+       *
+       * @param param {Object} The param definition
+       * @param components {Object[]} The Array of components to add to the Group Panel
+       * @returns {Object} The Widget for the Parameter Panel
+       * @private
+       */
+      function _createWidgetForParameterPanel(param, components) {
+        return _createWidget.call(this, {
+          param: param,
+          components: components
+        }, 'parameter-panel');
+      }
+
+      /**
+       * Creates a Widget for the Group Panel
+       *
+       * @param group {Object} The group definition
+       * @param components {Object[]} The Array of components to add to the Group Panel
+       * @returns {Object} The Widget for the Group Panel
+       * @private
+       */
+      function _createWidgetForGroupPanel(group, components) {
+        return _createWidget.call(this, {
+          paramGroup: group,
+          components: components
+        }, 'group-panel');
+      }
+
+      /**
+       * Creates a Widget for the Submit Panel
+       *
+       * @returns {Object}
+       * @private
+       */
+      function _createWidgetForSubmitPanel() {
+        return _createWidget.call(this,{}, 'submit-panel');
+      }
+
+      /**
+       * Creates a Widget for the Prompt Panel
+       *
+       * @returns {Object}
+       * @private
+       */
+      function _createWidgetForPromptPanel() {
+        return WidgetBuilder.WidgetBuilder.build(this, 'prompt-panel');
+      }
+
       var PromptPanel = Base.extend({
 
         guid: undefined,
-        destinationId: undefined,
         paramDefn: undefined,
         autoSubmit: undefined,
-        promptGUIDHelper: new GUIDHelper(),
 
         dashboard: undefined,
 
         parametersChanged: false,
 
         /**
+         * Contructor for the PromptPanel
          *
+         * @constructor
          * @param destinationId
          * @param paramDefn
          */
@@ -34,6 +146,14 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
           if (!destinationId) {
             throw 'destinationId is required';
           }
+
+          /**
+           * The html id destination where the prompt will be rendered
+           *
+           * @name PromptPanel#destinationId
+           * @type String
+           * @default undefined
+           */
           this.destinationId = destinationId;
 
           if (!paramDefn) {
@@ -43,6 +163,8 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
 
           this.autoSubmit = paramDefn.allowAutoSubmit();
 
+          this.promptGUIDHelper = new GUIDHelper();
+
           this.guid = this.promptGUIDHelper.generateGUID();
 
           this.dashboard = new Dashboard();
@@ -51,7 +173,7 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
         /**
          * Get the current auto submit setting for this panel.
          *
-         * @returns {*}
+         * @returns {Boolean}
          */
         getAutoSubmitSetting: function () {
           return this.autoSubmit;
@@ -60,7 +182,7 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
         /**
          * Get a localized string for this prompt panel.
          *
-         * @returns {*}
+         * @returns {string} The localized string
          */
         getString: function (key, defaultString) {
           return defaultString || '!' + key + '!';
@@ -68,19 +190,24 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
 
         /**
          * Returns a parameter name unique to this parameter panel.
+         *
+         * @param parameter {Object} The parameter
+         * @returns {string} The Paramerer Name
          */
         getParameterName: function (parameter) {
           return this.guid + parameter.name;
         },
 
         /**
-         * Returns a map of parameter name -> value. This will extract the current parameter value from Dashboards
-         * as necessary.
+         * Returns a map of parameter name value. This will extract the current parameter value from the dashboard
+         * instance as necessary
+         *
+         * @returns {Object} parameters The parameters name|value pair assigned to the dashboard instance
          */
         getParameterValues: function () {
           var params = {};
           this.paramDefn.mapParameters(function (param) {
-            var value = this.dashboard.getParameterValue(this.getParameterName(param));
+            var value = this.getParameterValue(this.getParameterName(param));
             if (value === '' || typeof value == 'undefined') {
               return;
             }
@@ -100,7 +227,7 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
                     valueParsed = DojoNumber.format(valueParsed, {
                       places: value.length - value.indexOf(localization ? localization.decimal : defaultLocalization.decimal) - 1
                     });
-                    var defaultLocalization = dojo.i18n.getLocalization("dojo.cldr", "number", null);
+                    defaultLocalization = dojo.i18n.getLocalization("dojo.cldr", "number", null);
                     valueParsed = valueParsed.split(defaultLocalization.group).join("");
                   }
                 } else {
@@ -114,6 +241,7 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
           }, this);
           return params;
         },
+
         /**
          * This should return an object capable of formatting an object to the format used to send over the wire
          * (the format it is transported in). See PromptPanel.createFormatter() for how a format object should look.
@@ -133,13 +261,13 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
          *
          * A formatter should have two methods:
          * formatter = {
-       *   format: function(object) {
-       *     return ...; // string
-       *   },
-       *   parse: function(string) {
-       *     return ...; // object
-       *   }
-       * }
+         *   format: function(object) {
+         *     return ...; // string
+         *   },
+         *   parse: function(string) {
+         *     return ...; // object
+         *   }
+         * }
          *
          * @param paramDefn Parameter definition
          * @param parameter Parameter to create text formatter for
@@ -149,19 +277,22 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
           //return undefined;
         },
 
-        _widgetGUIDHelper: new GUIDHelper(),
-
         /**
          * Generate a unique GUID for a widget of this panel.
+         *
+         * @returns {string} The join of the guid of the prompt with a new one generated by the GUIDHelper
          */
         generateWidgetGUID: function () {
-          return this.guid + '-' + this._widgetGUIDHelper.generateGUID();
+          return this.guid + '-' + this.promptGUIDHelper.generateGUID();
         },
 
         /**
          * Sets the parameter value in Dashboards' parameter map to a properly initialized value.
+         *
+         * @param {Object} paramDefn The parameter definition map
+         * @param {String} param The parameter name
          */
-        initializeParameterValue: function (paramDefn, param) {
+        _initializeParameterValue: function (paramDefn, param) {
           var value = param.getSelectedValuesValue();
           if (value.length === 0) {
             value = ''; // Dashboards' null value is an empty string
@@ -172,14 +303,20 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
         },
 
         /**
-         * Sets the parameter value in Dashboards' parameter map.
+         * Sets the parameter value in the dashboard instance parameter map
+         *
+         * @param param {String} The name of the parameter
+         * @param value {Object} The value of the parameter
          */
         setParameterValue: function (param, value) {
           this.dashboard.setParameter(this.getParameterName(param), value);
         },
 
         /**
-         * Gets the parameter value from Dashboards' parameter map.
+         * Gets the parameter value from the dashboard instance parameter map
+         *
+         * @param param {String} The parameter name
+         * @returns {Object} The parameter value stored in the dashboard instance
          */
         getParameterValue: function (param) {
           if (typeof param !== 'string') {
@@ -189,14 +326,31 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
           return this.dashboard.getParameterValue(param);
         },
 
+        /**
+         * Called by the prompt-panel component when the CDE components have been updated.
+         *
+         * @private
+         */
         _ready: function () {
           this.ready(this);
         },
 
+        /**
+         * Called when the prompt-panel component's submit button is clicked or auto-submit is enabled and a parameter
+         * value changes.
+         *
+         * @param options
+         * @private
+         */
         _submit: function (options) {
           this.submit(this, options);
         },
 
+        /**
+         * Called when the prompt-panel component's submit button is pressed (mouse-down only).
+         *
+         * @private
+         */
         _submitStart: function () {
           this.submitStart(this);
         },
@@ -208,7 +362,8 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
         },
 
         /**
-         * Called when the prompt-panel component's submit button is clicked or auto-submit is enabled and a parameter value changes.
+         * Called when the prompt-panel component's submit button is clicked or auto-submit is enabled and a parameter
+         * value changes.
          */
         submit: function (promptPanel, options) {
           this.forceAutoSubmit = false;
@@ -232,7 +387,6 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
           this.refreshPrompt();
           this.parametersChanged = true;
         },
-
 
         /**
          * This is called to refresh the prompt panel.
@@ -337,17 +491,18 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
         /**
          * Initialize this prompt panel.
          * This will create the components and pass them to CDF to be loaded.
+         *
          * @param {boolean} [noAutoAutoSubmit=false] prevents auto-submiting, even when auto-submit is false,
          * in the case the the parameter UI is not shown.
          */
         init: function (noAutoAutoSubmit) {
           var fireSubmit = true;
           if (this.paramDefn.showParameterUI()) {
-            this._widgetGUIDHelper.reset(); // Clear the widget helper for this prompt
+            this.promptGUIDHelper.reset(); // Clear the widget helper for this prompt
 
             var components = [];
 
-            var layout = WidgetBuilder.WidgetBuilder.build(this, 'prompt-panel');
+            var layout = _createWidgetForPromptPanel.call(this);
 
             var topValuesByParam = this._multiListBoxTopValuesByParam;
             if (topValuesByParam) {
@@ -423,7 +578,7 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
           } else {
             this.paramDefn.mapParameters(function (param) {
               // initialize parameter values regardless of whether we're showing the parameter or not
-              this.initializeParameterValue(paramDefn, param);
+              this._initializeParameterValue(paramDefn, param);
             }, this);
 
             // Must submit, independently of auto-submit value.
@@ -436,119 +591,92 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
           }
         },
 
+        /**
+         * Hides this instance of PromptPanel
+         */
         hide: function () {
           $('#' + this.destinationId).css('display', 'none');
         },
 
-        createSubmitPanel: function (paramDefn) {
-          return WidgetBuilder.WidgetBuilder.build({
-            promptPanel: this
-          }, 'submit-panel');
-        },
+        /**
+         * Creates a panel for a parameter
+         * If no widget for the parameter is created this method returns null
+         *
+         * @param param
+         * @returns {object} The panel parameter. It returns undefined if the panel is not created
+         * @private
+         */
+        _buildPanelForParameter: function(param) {
+          var panelComponents = [];
 
-        getParameterPanelType: function () {
-          return 'parameter-panel';
-        },
+          // initialize parameter values regardless of whether we're showing the parameter or not
+          this._initializeParameterValue(this.paramDefn, param);
 
-        createWidgetForParameter: function (paramDefn, param) {
-          if (param.strict && param.values.length === 0) {
-            // if the parameter is strict but we have no valid choices for it, it is impossible
-            // for the user to give it a value, so we will hide this parameter
-            // it is highly likely that the parameter is driven by another parameter which
-            // doesn't have a value yet, so eventually, we'll show this parameter.. we hope
-            return;
+          //add the parameter widget
+          var widget = _createWidgetForParameter.call(this, param);
+          if (widget !== 'undefined') {
+            panelComponents.push(widget);
+          } else { // No widget created. Do not create a label or parameter panel
+            Logger.log( "No widget created, return");
+            return undefined;
           }
 
-          return WidgetBuilder.WidgetBuilder.build({
-            promptPanel: this,
-            param: param
-          });
+          //add the label widget
+          panelComponents.push(_createWidgetForLabel.call(this, param));
+
+          //add the error widgets
+          var errors = this.paramDefn.errors[param.name];
+          if (errors && errors.length > 0) {
+            $.each(errors, function (i, e) {
+              panelComponents.push(_createWidgetForErrorLabel.call(this, param ,e));
+            });
+          }
+
+          var panel = _createWidgetForParameterPanel.call(this, param, panelComponents);
+
+          if (errors && errors.length > 0) {
+            panel.cssClass = (panel.cssClass || '') + ' error';
+          }
+
+          return panel;
         },
 
         /**
-         * Determines if the submit panel should be built for this panel. Default implementation checks for number of parameters.
-         * @param panelComponents Components being built for this panel.
+         * Builds the Panel and its components for the parameters
+         *
+         * @returns {Array}
          */
-        shouldBuildSubmitPanel: function (panelComponents) {
-          return panelComponents.length > 0;
-        },
-
         buildPanelComponents: function () {
-          var panelComponents = [];
+          var panelGroupComponents = [];
           // Create a composite panel of the correct layout type for each group
           $.each(this.paramDefn.parameterGroups, function (i, group) {
             var components = [];
             // Create a label and a CDF widget for each parameter
             $.each(group.parameters, function (i, param) {
-              // initialize parameter values regardless of whether we're showing the parameter or not
-              this.initializeParameterValue(this.paramDefn, param);
-
-              if ('true' == param.attributes['hidden']) {
-                return; // continue
+              if (param.attributes['hidden'] == 'true') {
+                return;
               }
-
-              var widget = this.createWidgetForParameter(this.paramDefn, param);
-              if (!widget) {
-                // No widget created. Do not create a label or parameter panel
-                return; // continue
-              }
-
-              var label = WidgetBuilder.WidgetBuilder.build({
-                promptPanel: this,
-                param: param
-              }, 'label');
-
-              var errors = this.paramDefn.errors[param.name];
-              var errorLabels = [];
-              if (errors && errors.length > 0) {
-                $.each(errors, function (i, e) {
-                  var l = WidgetBuilder.WidgetBuilder.build({
-                    promptPanel: this,
-                    param: param,
-                    errorMessage: e
-                  }, 'error-label');
-                  if (l) {
-                    errorLabels.push(l);
-                  }
-                }.bind(this));
-              }
-
-              var c = [label];
-              c = c.concat(errorLabels);
-              c.push(widget);
-              var panel = WidgetBuilder.WidgetBuilder.build({
-                promptPanel: this,
-                param: param,
-                components: c
-              }, this.getParameterPanelType());
-
-              if (errorLabels.length > 0) {
-                panel.cssClass = (panel.cssClass || '') + ' error';
-              }
-
-              components.push(panel);
+              components.push(this._buildPanelForParameter(param));
             }.bind(this));
 
             if (components.length > 0) {
-              var groupPanel = WidgetBuilder.WidgetBuilder.build({
-                promptPanel: this,
-                paramGroup: group,
-                components: components
-              }, 'group-panel');
-              panelComponents.push(groupPanel);
+              panelGroupComponents.push(_createWidgetForGroupPanel.call(this, group, components));
             }
           }.bind(this));
 
-          if (this.shouldBuildSubmitPanel(panelComponents)) {
-            var submitPanel = this.createSubmitPanel(this.paramDefn);
-            if (submitPanel) {
-              panelComponents.push(submitPanel);
-            }
+          if (panelGroupComponents > 0) {
+            panelGroupComponents.push(_createWidgetForSubmitPanel.call(this));
           }
 
-          return panelComponents;
+          return panelGroupComponents;
         },
 
+        /**
+         * Removes all components from the current instance of dashboard
+         *
+         * @param components The list of components to be removed
+         * @param postponeClear
+         */
         removeDashboardComponents: function (components, postponeClear) {
           var myself = this;
           // Traverse all embedded components to remove them
