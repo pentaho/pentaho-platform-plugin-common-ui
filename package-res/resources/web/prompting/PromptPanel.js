@@ -4,8 +4,8 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
       /**
        * Checks if the type is numeric
        *
-       * @param type
-       * @return boolean if the type is a numeric type
+       * @param {String} type
+       * @return {Boolean} if the type is a numeric type
        * @private
        */
       var _isNumberType = function (type) {
@@ -15,9 +15,9 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
 
       /**
        * Creates a Widget calling the wigdet builder factory
-       * @param options {object} with the properties to be added to the Widget
-       * @param type {string} the type of the Widget to build
-       * @returns {object} A widget instance
+       * @param options {Object} with the properties to be added to the Widget
+       * @param type {String} the type of the Widget to build
+       * @returns {Object} A widget instance
        * @private
        */
       function _createWidget(options, type) {
@@ -30,8 +30,8 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
       /**
        * Creates a Widget for the Parameter
        *
-       * @param param The param to be created
-       * @returns {object} A widget for the given parameter
+       * @param param {Object} The param to be created
+       * @returns {Object} A widget for the given parameter
        * @private
        */
       function _createWidgetForParameter(param) {
@@ -50,8 +50,8 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
       /**
        * Creates a Widget for the Label
        *
-       * @param param The param to be created
-       * @returns {object} A widget for the given parameter
+       * @param param {Object} The param to be created
+       * @returns {Object} A widget for the given parameter
        * @private
        */
       function _createWidgetForLabel(param) {
@@ -63,8 +63,8 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
       /**
        * Creates a Widget for the Error Label
        *
-       * @param param The param to be created
-       * @param e {string} The error message
+       * @param param {Object} The param to be created
+       * @param e {String} The error message
        * @returns {Object} A widget for the given parameter
        * @private
        */
@@ -169,11 +169,11 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
         parametersChanged: false,
 
         /**
-         * Contructor for the PromptPanel
+         * Constructor for the PromptPanel
          *
          * @constructor
-         * @param destinationId
-         * @param paramDefn
+         * @param destinationId {String}
+         * @param paramDefn {Object}
          */
         constructor: function (destinationId, paramDefn) {
           if (!destinationId) {
@@ -215,7 +215,10 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
         /**
          * Get a localized string for this prompt panel.
          *
-         * @returns {string} The localized string
+         * @param key {String}
+         * @param defaultString {String}
+         *
+         * @returns {String} The localized string
          */
         getString: function (key, defaultString) {
           return defaultString || '!' + key + '!';
@@ -225,7 +228,7 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
          * Returns a parameter name unique to this parameter panel.
          *
          * @param parameter {Object} The parameter
-         * @returns {string} The Paramerer Name
+         * @returns {String} The parameter name
          */
         getParameterName: function (parameter) {
           return this.guid + parameter.name;
@@ -279,10 +282,10 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
          * This should return an object capable of formatting an object to the format used to send over the wire
          * (the format it is transported in). See PromptPanel.createFormatter() for how a format object should look.
          *
-         * @param paramDefn Parameter definition
-         * @param parameter Parameter to create text formatter for
-         * @param pattern Optional pattern to use instead of any the parameter declares
-         * @param formatter Formatter used to format this parameter to display
+         * @param paramDefn {Object} Parameter definition
+         * @param parameter {String} Parameter to create text formatter for
+         * @param pattern {String} Optional pattern to use instead of any the parameter declares
+         * @param formatter {Object} Formatter used to format this parameter to display
          */
         createDataTransportFormatter: function (paramDefn, parameter, pattern, formatter) {
           //return undefined;
@@ -302,9 +305,11 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
          *   }
          * }
          *
-         * @param paramDefn Parameter definition
-         * @param parameter Parameter to create text formatter for
-         * @param pattern Optional pattern to use instead of any the parameter declares
+         * @param paramDefn {Object} Parameter definition
+         * @param parameter {String} Parameter to create text formatter for
+         * @param pattern {String} Optional pattern to use instead of any the parameter declares
+         *
+         * @returns {Object} Optional object capable of formatting the 'type' to and from text
          */
         createFormatter: function (paramDefn, parameter, pattern) {
           //return undefined;
@@ -313,7 +318,7 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
         /**
          * Generate a unique GUID for a widget of this panel.
          *
-         * @returns {string} The join of the guid of the prompt with a new one generated by the GUIDHelper
+         * @returns {String} The join of the guid of the prompt with a new one generated by the GUIDHelper
          */
         generateWidgetGUID: function () {
           return this.guid + '-' + this.promptGUIDHelper.generateGUID();
@@ -390,6 +395,8 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
 
         /**
          * Called by the prompt-panel component when the CDE components have been updated.
+         *
+         * @param promptPanel {Object}
          */
         ready: function (promptPanel) {
         },
@@ -397,6 +404,9 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
         /**
          * Called when the prompt-panel component's submit button is clicked or auto-submit is enabled and a parameter
          * value changes.
+         *
+         * @param promptPanel {Object}
+         * @param options {Object}
          */
         submit: function (promptPanel, options) {
           this.forceAutoSubmit = false;
@@ -404,6 +414,8 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
 
         /**
          * Called when the prompt-panel component's submit button is pressed (mouse-down only).
+         *
+         * @param promptPanel {Object}
          */
         submitStart: function (promptPanel) {
         },
@@ -415,6 +427,10 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
          * a method to the "postChange" CDF method of just built widgets
          * that have a "parameter".
          * This method calls its PromptPanel's "parameterChanged" method.
+         *
+         * @param param {String}
+         * @param name {String}
+         * @param value {Object}
          */
         parameterChanged: function (param, name, value) {
           this.refreshPrompt();
@@ -429,8 +445,8 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
          * This method should be overriden.
          * The default implementation simply calls the provided callback with no parameter definition.
          *
-         * @param promptPanel the panel that needs a new parameter definition
-         * @param callback function to call when the parameter definition has been fetched.
+         * @param promptPanel {Object} the panel that needs a new parameter definition
+         * @param callback {Function} function to call when the parameter definition has been fetched.
          *
          * The callback signature is: <pre>void function([newParamDef=undefined])</pre> and is called in the global context.
          */
@@ -454,9 +470,9 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
         /**
          * Refreshes the prompt panel with a given parameter definition.
          *
-         * @param {ParameterDefinition} [paramDefn] the parameter definition used to refresh the prompt panel.
+         * @param {Object} [paramDefn] the parameter definition used to refresh the prompt panel.
          * When unspecified, nothing is done.
-         * @param {boolean} [noAutoAutoSubmit=false] prevents auto-submiting, even when auto-submit is false,
+         * @param {Boolean} [noAutoAutoSubmit=false] prevents auto-submiting, even when auto-submit is false,
          * in the case the the parameter UI is not shown.
          */
         refresh: function (paramDefn, noAutoAutoSubmit) {
@@ -524,7 +540,7 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
          * Initialize this prompt panel.
          * This will create the components and pass them to CDF to be loaded.
          *
-         * @param {boolean} [noAutoAutoSubmit=false] prevents auto-submiting, even when auto-submit is false,
+         * @param {Boolean} [noAutoAutoSubmit=false] prevents auto-submiting, even when auto-submit is false,
          * in the case the the parameter UI is not shown.
          */
         init: function (noAutoAutoSubmit) {
@@ -632,8 +648,8 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
          * Creates a panel for a parameter
          * If no widget for the parameter is created this method returns null
          *
-         * @param param
-         * @returns {object} The panel parameter. It returns undefined if the panel is not created
+         * @param param {String}
+         * @returns {Object} The panel parameter. It returns undefined if the panel is not created
          * @private
          */
         _buildPanelForParameter: function(param) {
@@ -713,8 +729,8 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
         /**
          * Removes all components from the current instance of dashboard
          *
-         * @param components The list of components to be removed
-         * @param postponeClear
+         * @param components {Array} The list of components to be removed
+         * @param postponeClear {Boolean}
          */
         removeDashboardComponents: function (components, postponeClear) {
           var myself = this;
