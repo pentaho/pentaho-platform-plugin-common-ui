@@ -1,37 +1,47 @@
+/*!
+ * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
 define(['cdf/lib/Base', 'common-ui/util/base64', './Parameter', './ParameterDefinition', './ParameterGroup', './ParameterValue'],
     function (Base, Base64Util, Parameter, ParameterDefinition, ParameterGroup, ParameterValue) {
 
       /**
+       * Parses the xml retrieved from the server call
        *
-       * @param data
-       * @param xml
-       * @param tmp
-       * @returns {*}
+       * @param {Object} data The data to be parsed
+       * @returns {Object} The xml parsed from a DOMParser
        * @private
        */
-      var _parseXML = function (data, xml, tmp) {
-        if (window.DOMParser) { // Standard
-          tmp = new DOMParser();
-          xml = tmp.parseFromString(data, "text/xml");
-        } else { // IE
-          xml = new ActiveXObject("Microsoft.XMLDOM");
-          xml.async = "false";
-          xml.loadXML(data);
-        }
+      var _parseXML = function (data) {
+        var domParser = new DOMParser();
+        var xml = domParser.parseFromString(data, "text/xml");
+        var documentElement = xml.documentElement;
 
-        tmp = xml.documentElement;
-
-        if (!tmp || !tmp.nodeName || tmp.nodeName === "parsererror") {
-          jQuery.error("Invalid XML: " + data);
+        if (!documentElement || !documentElement.nodeName || documentElement.nodeName === "parsererror") {
+          $.error("Invalid XML: " + data);
         }
 
         return xml;
       };
 
       /**
+       * Parses the errors from the parsed xml
        *
-       * @param paramDefn
-       * @param xmlRoot
+       * @param {ParameterDefinition} paramDefn The parameter definition to store the errors parsed
+       * @param {Object} xmlRoot The xml to parse errors
        * @private
        */
       var _parseErrors = function (paramDefn, xmlRoot) {
@@ -58,6 +68,13 @@ define(['cdf/lib/Base', 'common-ui/util/base64', './Parameter', './ParameterDefi
         }.bind(this));
       };
 
+      /**
+       * Parses the parameters and stores the info in the ParameterDefinition
+       *
+       * @param {ParameterDefinition} paramDefn The parameters objects storing the parameter info
+       * @param {Object} parametersNode The node of parameter to iterate
+       * @private
+       */
       var _parseParameters = function (paramDefn, parametersNode) {
         parametersNode.find('parameter').each(function(i, node) {
           var param = _parseParameter(node);
@@ -78,9 +95,10 @@ define(['cdf/lib/Base', 'common-ui/util/base64', './Parameter', './ParameterDefi
       };
 
       /**
+       * Parses a parameter, creating a parameter instance based on the info passed as parameter
        *
-       * @param node
-       * @returns {exports}
+       * @param {Object} node The xml node containing the parameter information
+       * @returns {Parameter} The Parameter instance
        * @private
        */
       var _parseParameter = function (node) {
@@ -106,15 +124,16 @@ define(['cdf/lib/Base', 'common-ui/util/base64', './Parameter', './ParameterDefi
       };
 
       /**
+       * Parses the xml node fetching the parameter values
        *
-       * @param paramNode
-       * @param parameter
-       * @returns {Array}
+       * @param {Object} node The xml node containing the parameter information
+       * @param {Parameter} parameter Parameter with the current parameter metadata
+       * @returns {Array} Array with the
        * @private
        */
-      var _parseParameterValues = function (paramNode, parameter) {
+      var _parseParameterValues = function (node, parameter) {
         var values = [];
-        $(paramNode).find('values value').each(function(i, value) {
+        $(node).find('values value').each(function(i, value) {
           var pVal = new ParameterValue();
 
           value = $(value);
@@ -146,6 +165,12 @@ define(['cdf/lib/Base', 'common-ui/util/base64', './Parameter', './ParameterDefi
       /**
        * Called for every parameter value that is parsed. Override this to update the parameter
        * value at parse time.
+       *
+       * @param {Parameter} parameter The Parameter instance
+       * @param {String} type The type of the parameter
+       * @param {Object} value The value to be normalized
+       * @return {Object} The normalized value
+       * @private
        */
       var _normalizeParameterValue = function (parameter, type, value) {
         return value;
