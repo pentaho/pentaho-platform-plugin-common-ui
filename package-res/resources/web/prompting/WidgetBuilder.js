@@ -109,6 +109,6 @@ define(['./builders/PromptPanelBuilder', './builders/ParameterGroupPanelBuilder'
       };
 
       return {
-        WidgetBuilder
-      };
+        WidgetBuilder: WidgetBuilder
+      }
     });
