@@ -672,6 +672,15 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
         },
 
         /**
+         * Creates a Widget for the Submit Component
+         *
+         * @returns {Object}
+         */
+        createWidgetForSubmitComponent: function() {
+          return _createWidget.call(this,{}, 'submit');
+        },
+        
+        /**
          * Builds the Panel and its components for the parameters
          *
          * @returns {Array}

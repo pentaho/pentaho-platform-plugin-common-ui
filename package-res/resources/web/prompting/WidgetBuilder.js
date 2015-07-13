@@ -41,14 +41,14 @@
 
  */
 
-define(['exports', './builders/PromptPanelBuilder', './builders/ParameterGroupPanelBuilder', './builders/ParameterPanelBuilder',
+define(['./builders/PromptPanelBuilder', './builders/ParameterGroupPanelBuilder', './builders/ParameterPanelBuilder',
       './builders/SubmitPanelBuilder', './builders/SubmitComponentBuilder', './builders/LabelBuilder',
       './builders/ErrorLabelBuilder', './builders/DropDownBuilder', './builders/RadioBuilder', './builders/CheckBuilder',
       './builders/MultiButtonBuilder', './builders/ListBuilder', './builders/DateInputBuilder',
       './builders/ExternalInputBuilder', './builders/TextAreaBuilder', './builders/GarbageCollectorBuilder',
       './builders/PlainPromptBuilder'],
 
-    function (exports, PromptPanelBuilder, ParameterGroupPanelBuilder, ParameterPanelBuilder, SubmitPanelBuilder,
+    function (PromptPanelBuilder, ParameterGroupPanelBuilder, ParameterPanelBuilder, SubmitPanelBuilder,
               SubmitComponentBuilder, LabelBuilder, ErrorLabelBuilder, DropDownBuilder, RadioBuilder, CheckBuilder,
               MultiButtonBuilder, ListBuilder, DateInputBuilder, ExternalInputBuilder, TextAreaBuilder,
               GarbageCollectorBuilder, PlainPromptBuilder) {
@@ -108,5 +108,7 @@ define(['exports', './builders/PromptPanelBuilder', './builders/ParameterGroupPa
         }
       };
 
-      exports.WidgetBuilder = WidgetBuilder;
+      return {
+        WidgetBuilder
+      };
     });
