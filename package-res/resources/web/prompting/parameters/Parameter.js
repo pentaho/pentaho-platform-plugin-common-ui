@@ -1,4 +1,21 @@
-define(['cdf/lib/Base'], function (Base) {
+/*!
+ * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
+define([], function () {
   return function () {
     return {
       'name': undefined, // string
@@ -13,8 +30,9 @@ define(['cdf/lib/Base'], function (Base) {
 
       /**
        * Checks if the value provided is selected in this parameter
-       * @param value Value to search for
-       * @return boolean if this parameter contains a selection whose value = {value}
+       *
+       * @param {Object} value Value to search for
+       * @return {Boolean} true if this parameter contains a selection whose value = {value}
        */
       isSelectedValue: function (value) {
         var selected = false;
@@ -31,6 +49,8 @@ define(['cdf/lib/Base'], function (Base) {
 
       /**
        * Determine if any of our values are selected (selected = true)
+       *
+       * @return {Boolean} {true} if any value is selected, {false} otherwise
        */
       hasSelection: function () {
         var s = false;
@@ -44,20 +64,9 @@ define(['cdf/lib/Base'], function (Base) {
       },
 
       /**
-       * Obtains an array with the selected ParameterValue objects.
-       */
-      getSelectedValues: function () {
-        var selected = [];
-        $.each(this.values, function (i, val) {
-          if (val.selected) {
-            selected.push(val);
-          }
-        });
-        return selected;
-      },
-
-      /**
        * Obtains an array with the values of the selected ParameterValue objects.
+       *
+       * @return {Array} Array with the values selected
        */
       getSelectedValuesValue: function () {
         var selected = [];
