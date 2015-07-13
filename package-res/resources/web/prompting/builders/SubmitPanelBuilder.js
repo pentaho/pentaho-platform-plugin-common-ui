@@ -15,7 +15,7 @@
  *
  */
 
-define(['cdf/lib/Base', '../components/FlowPromptLayoutComponent', '../WidgetBuilder'],
+define(['cdf/lib/Base', '../components/FlowPromptLayoutComponent'],
     function (Base, FlowPromptLayoutComponent, WidgetBuilder) {
       return Base.extend({
         build: function (args) {
@@ -28,7 +28,7 @@ define(['cdf/lib/Base', '../components/FlowPromptLayoutComponent', '../WidgetBui
             htmlObject: guid,
             executeAtStart: true,
             components: [
-              WidgetBuilder.WidgetBuilder.build(args, 'submit')
+              args.promptPanel.createWidgetForSubmitComponent(this)
             ]
           });
         }
