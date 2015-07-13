@@ -642,6 +642,9 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
           // initialize parameter values regardless of whether we're showing the parameter or not
           this._initializeParameterValue(this.paramDefn, param);
 
+          //add the label widget
+          panelComponents.push(_createWidgetForLabel.call(this, param));
+
           //add the parameter widget
           var widget = _createWidgetForParameter.call(this, param);
           if (widget !== 'undefined') {
@@ -650,9 +653,6 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
             Logger.log( "No widget created, return");
             return undefined;
           }
-
-          //add the label widget
-          panelComponents.push(_createWidgetForLabel.call(this, param));
 
           //add the error widgets
           var errors = this.paramDefn.errors[param.name];
