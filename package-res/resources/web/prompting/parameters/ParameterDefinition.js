@@ -65,15 +65,14 @@ define([], function () {
        * @returns {Boolean} The value of the parameter ShowParameters
        */
       showParameterUI: function () {
-        var showParameters;
+        var showParameters = true;
         this.mapParameters(function (p) {
           if (p.name == 'showParameters') {
             showParameters = p;
             return false; // break
           }
         });
-
-        return !showParameters || !showParameters.isSelectedValue('false');
+        return (showParameters.isSelectedValue !== undefined) ? !showParameters.isSelectedValue('false') : !showParameters;
       },
 
       /**
