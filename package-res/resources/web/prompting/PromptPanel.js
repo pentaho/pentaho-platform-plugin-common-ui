@@ -1,5 +1,5 @@
-define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'common-ui/util/GUIDHelper', './WidgetBuilder', 'cdf/Dashboard.Clean', './components/PostInitComponent'],
-    function (_, Base, Logger, DojoNumber, GUIDHelper, WidgetBuilder, Dashboard, PostInitComponent) {
+define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/util/GUIDHelper', './WidgetBuilder', 'cdf/Dashboard.Clean', './components/PostInitComponent'],
+    function (_, Base, Logger, DojoNumber, i18n, GUIDHelper, WidgetBuilder, Dashboard, PostInitComponent) {
 
       /**
        * Checks if the type is numeric
@@ -14,7 +14,7 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
       };
 
       /**
-       * Creates a Widget calling the wigdet builder factory
+       * Creates a Widget calling the widget builder factory
        * @param options {Object} with the properties to be added to the Widget
        * @param type {String} the type of the Widget to build
        * @returns {Object} A widget instance
@@ -73,7 +73,7 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
           param: param,
           errorMessage: e
         }, 'error-label');
-      }
+      };
 
       /**
        * Creates a Widget for the Parameter Panel
@@ -88,7 +88,7 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
           param: param,
           components: components
         }, 'parameter-panel');
-      }
+      };
 
       /**
        * Creates a Widget for the Group Panel
@@ -103,7 +103,7 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
           paramGroup: group,
           components: components
         }, 'group-panel');
-      }
+      };
 
       /**
        * Creates a Widget for the Submit Panel
@@ -113,7 +113,7 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
        */
       function _createWidgetForSubmitPanel() {
         return _createWidget.call(this,{}, 'submit-panel');
-      }
+      };
 
       /**
        * Creates a Widget for the Prompt Panel
@@ -123,7 +123,7 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
        */
       function _createWidgetForPromptPanel() {
         return WidgetBuilder.WidgetBuilder.build(this, 'prompt-panel');
-      }
+      };
 
       /**
        * @callback callback~cb
@@ -143,7 +143,7 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
         if (component.components) {
           _mapComponentsList(component.components, callback);
         }
-      }
+      };
 
       /**
        * Pre-order traversal of components given a list of root components.
@@ -156,7 +156,7 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
         $.each(components, function(i, component) {
           _mapComponents(component, callback);
         });
-      }
+      };
 
       var PromptPanel = Base.extend({
 
@@ -251,8 +251,8 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
               value = [value];
             }
             if (_isNumberType(param.type)) {
-              var localization = dojo.i18n.getLocalization("dojo.cldr", "number", SESSION_LOCALE.toLowerCase());
-              var defaultLocalization = dojo.i18n.getLocalization("dojo.cldr", "number", null);
+              var localization = i18n.getLocalization("dojo.cldr", "number", SESSION_LOCALE.toLowerCase());
+              var defaultLocalization = i18n.getLocalization("dojo.cldr", "number", null);
               var valueParsed;
               try {
                 if (value.indexOf(localization ? localization.decimal : defaultLocalization.decimal) > 0) {
@@ -263,7 +263,7 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
                     valueParsed = DojoNumber.format(valueParsed, {
                       places: value.length - value.indexOf(localization ? localization.decimal : defaultLocalization.decimal) - 1
                     });
-                    defaultLocalization = dojo.i18n.getLocalization("dojo.cldr", "number", null);
+                    defaultLocalization = i18n.getLocalization("dojo.cldr", "number", null);
                     valueParsed = valueParsed.split(defaultLocalization.group).join("");
                   }
                 } else {
@@ -663,7 +663,7 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
 
           //add the parameter widget
           var widget = _createWidgetForParameter.call(this, param);
-          if (widget !== 'undefined') {
+          if (widget) {
             panelComponents.push(widget);
           } else { // No widget created. Do not create a label or parameter panel
             Logger.log( "No widget created, return");
@@ -672,10 +672,10 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
 
           //add the error widgets
           var errors = this.paramDefn.errors[param.name];
-          if (errors && errors.length > 0) {
+          if (errors) {
             $.each(errors, function (i, e) {
-              panelComponents.push(_createWidgetForErrorLabel.call(this, param ,e));
-            });
+              panelComponents.push(_createWidgetForErrorLabel.call(this, param, e));
+            }.bind(this));
           }
 
           var panel = _createWidgetForParameterPanel.call(this, param, panelComponents);
@@ -693,7 +693,7 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
          * @returns {Object}
          */
         createWidgetForSubmitComponent: function() {
-          return _createWidget.call(this,{}, 'submit');
+          return _createWidget.call(this, {}, 'submit');
         },
         
         /**
