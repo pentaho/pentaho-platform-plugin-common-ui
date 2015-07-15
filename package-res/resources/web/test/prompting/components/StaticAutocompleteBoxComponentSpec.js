@@ -88,6 +88,87 @@ define([ "common-ui/prompting/components/StaticAutocompleteBoxComponent", "dojo/
       expect(comp.param.values[0].label).toBe("12qw");
       expect(comp.param.values[0].label).toBe("12qw");
     });
+
+    it("should fire a change in the dashboard on enter keypress", function() {
+      var comp = new StaticAutocompleteBoxComponent();
+      $.extend(comp, createCommonParameters("1234Integer", {
+        type : "java.lang.Integer",
+        label : "12qw",
+        value : "12qw",
+        selected : true
+      }));
+
+      comp.dashboard = { 
+        processChange: function() { }
+      };
+      comp.htmlObject = 'test';
+
+      var ph = $('<div>').attr('id', comp.htmlObject);
+      $('body').append(ph);
+
+      comp.update();  
+
+      spyOn(comp.dashboard, 'processChange');      
+       $('input', comp.ph).trigger(jQuery.Event( 'keypress', { which: $.ui.keyCode.ENTER } ));
+
+      expect(comp.dashboard.processChange).toHaveBeenCalled();  
+      
+      ph.remove();
+    });
+
+    it("should not fire a change in the dashboard on any keypress other than enter", function() {
+      var comp = new StaticAutocompleteBoxComponent();
+      $.extend(comp, createCommonParameters("1234Integer", {
+        type : "java.lang.Integer",
+        label : "12qw",
+        value : "12qw",
+        selected : true
+      }));
+
+      comp.dashboard = { 
+        processChange: function() { }
+      };
+      comp.htmlObject = 'test';
+
+      var ph = $('<div>').attr('id', comp.htmlObject);
+      $('body').append(ph);
+
+      comp.update();
+      
+      spyOn(comp.dashboard, 'processChange');      
+      $('input', comp.ph).trigger(jQuery.Event( 'keypress', { which: $.ui.keyCode.ESCAPE } ));
+
+      expect(comp.dashboard.processChange).not.toHaveBeenCalled();  
+      
+      ph.remove();
+    });
+
+    it("shoud fire a change in the dashboard on focusout", function() {
+      var comp = new StaticAutocompleteBoxComponent();
+      $.extend(comp, createCommonParameters("1234Integer", {
+        type : "java.lang.Integer",
+        label : "12qw",
+        value : "12qw",
+        selected : true
+      }));
+
+      comp.dashboard = { 
+        processChange: function() { }
+      };
+      comp.htmlObject = 'test';
+
+      var ph = $('<div>').attr('id', comp.htmlObject);
+      $('body').append(ph);
+
+      comp.update();
+      
+      spyOn(comp.dashboard, 'processChange');      
+      $('input', comp.ph).trigger('focusout');
+
+      expect(comp.dashboard.processChange).toHaveBeenCalled();  
+      
+      ph.remove();
+    });
   });
 
   describe("getValue", function() {
