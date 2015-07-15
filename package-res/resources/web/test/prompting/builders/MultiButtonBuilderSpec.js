@@ -53,6 +53,17 @@ define(['common-ui/prompting/builders/MultiButtonBuilder'], function(MultiButton
       expect($.fn.addClass).toHaveBeenCalled();
     });
 
+    it("should return parameter value on expression", function() {
+      var component = multiButtonBuilder.build(args);
+      component.dashboard = {};
+      component.dashboard.getParameterValue = function() { };
+
+      spyOn(component.dashboard, 'getParameterValue').and.callThrough();
+      
+      component.expression();
+      expect(component.dashboard.getParameterValue).toHaveBeenCalled();
+    });
+
   });
 
 });

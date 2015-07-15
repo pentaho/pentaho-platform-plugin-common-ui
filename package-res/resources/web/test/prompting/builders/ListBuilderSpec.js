@@ -74,6 +74,15 @@ define(['common-ui/prompting/builders/ListBuilder'], function(ListBuilder) {
       expect(component.preExecution).toBeDefined();
     });
 
+    it("should set defaultIfEmpty to false on preExecution for non-multi selects", function() {
+      var component = listBuilder.build(args);
+      spyOn(component, 'preExecution').and.callThrough();
+      
+      component.preExecution();
+      expect(component.preExecution).toHaveBeenCalled();
+      expect(component.defaultIfEmpty).toBeFalsy();
+    });
+
   });
 
 });
