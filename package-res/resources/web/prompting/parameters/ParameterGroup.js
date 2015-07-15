@@ -15,12 +15,21 @@
  *
  */
 
+/**
+ * The Parameter Group Class
+ *
+ * @name ParameterGroup
+ * @class
+ * @property {String} name The name of the group
+ * @property {String} label The label of the group
+ * @property {Array|Parameter} parameters The array of parameters within this group
+ */
 define([], function(){
   return function(){
     return {
-      'name': undefined, // string
-      'label': undefined, // string
-      'parameters': []
+      name: undefined,
+      label: undefined,
+      parameters: []
     };
   }
 });

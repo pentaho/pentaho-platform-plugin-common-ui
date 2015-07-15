@@ -19,12 +19,6 @@ define(['./ParameterWidgetBuilderBase'],
     function (ParameterWidgetBuilderBase) {
 
       return ParameterWidgetBuilderBase.extend({
-        /**
-         *
-         * @param param
-         * @returns {Array}
-         * @private
-         */
         _getCDFValuesArray: function (param) {
           var valuesArray = [];
           $.each(param.values, function (i, val) {

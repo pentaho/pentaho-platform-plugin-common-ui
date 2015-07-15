@@ -15,13 +15,23 @@
  *
  */
 
+/**
+ * The Parameter Value Class
+ *
+ * @name ParameterValue
+ * @class
+ * @property {String} type The java type of the Parameter Value
+ * @property {String} label The label of the Parameter Value
+ * @property {Boolean} selected True if the Parameter Value is selected, False otherwise
+ * @property {Object} value The value of the Parameter Value
+ */
 define([], function () {
   return function () {
     return {
-      type: undefined, // string
-      label: undefined, // string
-      selected: false, // boolean
-      value: undefined // type defined by parameter this value belongs to
+      type: undefined,
+      label: undefined,
+      selected: false,
+      value: undefined
     };
   }
 });

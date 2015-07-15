@@ -16,24 +16,38 @@
  */
 
 /**
- * @class Parameter
+ * The Parameter Class
+ *
+ * @name Parameter
+ * @class
+ * @property {String} name The name of the parameter
+ * @property {String} type The java class name describing the type of the parameter
+ * @property {Boolean} list {true} if the parameter is a list, {false} otherwise
+ * @property {Boolean} mandatory {true} if the parameter is mandatory, {false} otherwise
+ * @property {Boolean} multiSelect {true} if the parameter is a multi select, {false} otherwise
+ * @property {Boolean} strict {true} if the parameter is strict, {false} otherwise
+ * @property {String} timezoneHint The timezone of the parameter
+ * @property {Object|String} attributes Hash of string for the remaining parameter attributes
+ * @property {Array|Object} values The array of possible values of the parameter
  */
 define([], function () {
   return function () {
     return {
-      'name': undefined, // string
-      'type': undefined, // string, java class name
-      'list': undefined, // boolean
-      'mandatory': undefined, // boolean
-      'multiSelect': undefined, // boolean
-      'strict': undefined, // boolean
-      'timezoneHint': undefined, // string
-      'attributes': {}, // hash of strings
-      'values': [],
+      name: undefined,
+      type: undefined,
+      list: undefined,
+      mandatory: undefined,
+      multiSelect: undefined,
+      strict: undefined,
+      timezoneHint: undefined,
+      attributes: {},
+      values: [],
 
       /**
        * Checks if the value provided is selected in this parameter
-       * @method isSelectedValues
+       *
+       * @name Parameter#isSelectedValue
+       * @method
        * @param {Object} value Value to search for
        * @return {Boolean} true if this parameter contains a selection whose value = {value}
        */
@@ -52,7 +66,9 @@ define([], function () {
 
       /**
        * Determine if any of our values are selected (selected = true)
-       * @method hasSelection
+       *
+       * @name Parameter#hasSelection
+       * @method
        * @return {Boolean} {true} if any value is selected, {false} otherwise
        */
       hasSelection: function () {
@@ -68,7 +84,9 @@ define([], function () {
 
       /**
        * Obtains an array with the values of the selected ParameterValue objects.
-       * @method getSelectedValuesValue
+       *
+       * @name Parameter#getSelectedValuesValue
+       * @method
        * @return {Array} Array with the values selected
        */
       getSelectedValuesValue: function () {

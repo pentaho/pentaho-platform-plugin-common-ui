@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2013 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,6 +41,13 @@
 
  */
 
+
+/**
+ * The WidgetBuilder Class
+ *
+ * @name WidgetBuilder
+ * @class
+ */
 define(['./builders/PromptPanelBuilder', './builders/ParameterGroupPanelBuilder', './builders/ParameterPanelBuilder',
       './builders/SubmitPanelBuilder', './builders/SubmitComponentBuilder', './builders/LabelBuilder',
       './builders/ErrorLabelBuilder', './builders/DropDownBuilder', './builders/RadioBuilder', './builders/CheckBuilder',
@@ -79,10 +86,13 @@ define(['./builders/PromptPanelBuilder', './builders/ParameterGroupPanelBuilder'
         },
 
         /**
+         * Gets the builder from the mapping for a given type
          *
-         * @param args
-         * @param type
-         * @returns {*}
+         * @name WidgetBuilder#_findBuilderFor
+         * @method
+         * @param {Object} args The arguments to call the builder
+         * @param {String} type The type of the builder to get
+         * @returns {ParameterWidgetBuilderBase}
          * @private
          */
         _findBuilderFor: function (args, type) {
@@ -91,13 +101,16 @@ define(['./builders/PromptPanelBuilder', './builders/ParameterGroupPanelBuilder'
         },
 
         /**
+         * Builds the widget and returns a component
          *
-         * @param args
-         * @param typeOverride
-         * @returns {*}
+         * @name WidgetBuilder#build
+         * @method
+         * @param {Object} args The arguments to call the builder
+         * @param {String} type The type of the builder to get
+         * @returns {BaseComponent} The CDF component built
          */
-        build: function (args, typeOverride) {
-          var widget = this._findBuilderFor(args, typeOverride).build(args);
+        build: function (args, type) {
+          var widget = this._findBuilderFor(args, type).build(args);
           if (widget.parameter && widget.param) {
             widget.postChange = function () {
               args.promptPanel.parameterChanged(this.param, this.parameter, this.getValue());

@@ -28,12 +28,7 @@ define(['cdf/lib/Base', '../components/HorizontalTableBasedPromptLayoutComponent
       'vertical': 'VerticalTableBasedPromptLayoutComponent'
     },
 
-    /**
-     *
-     * @param paramDefn
-     * @returns {*}
-     * @private
-     */
+
     _lookupPromptType: function (paramDefn) {
       switch (paramDefn.layout) {
         case 'horizontal':
@@ -45,11 +40,7 @@ define(['cdf/lib/Base', '../components/HorizontalTableBasedPromptLayoutComponent
       }
     },
 
-    /**
-     *
-     * @param args
-     * @returns {*}
-     */
+
     build: function (args) {
       var guid = args.promptPanel.generateWidgetGUID();
       var label = undefined;

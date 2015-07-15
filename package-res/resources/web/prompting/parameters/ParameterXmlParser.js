@@ -16,14 +16,19 @@
  */
 
 /**
- * @class ParameterXmlParser
+ * The ParameterXmlParser Class
+ *
+ * @name ParameterXmlParser
+ * @class
  */
 define(['cdf/lib/Base', 'common-ui/util/base64', './Parameter', './ParameterDefinition', './ParameterGroup', './ParameterValue'],
     function (Base, Base64Util, Parameter, ParameterDefinition, ParameterGroup, ParameterValue) {
 
       /**
        * Parses the xml retrieved from the server call
-       * @method _parseXML
+       *
+       * @name ParameterXmlParser#_parseXml
+       * @method
        * @param {Object} data The data to be parsed
        * @returns {Object} The xml parsed from a DOMParser
        * @private
@@ -42,7 +47,9 @@ define(['cdf/lib/Base', 'common-ui/util/base64', './Parameter', './ParameterDefi
 
       /**
        * Parses the errors from the parsed xml
-       * @method _parseErrors
+       *
+       * @name ParameterXmlParser#_parseErrors
+       * @method
        * @param {ParameterDefinition} paramDefn The parameter definition to store the errors parsed
        * @param {Object} xmlRoot The xml to parse errors
        * @private
@@ -73,7 +80,9 @@ define(['cdf/lib/Base', 'common-ui/util/base64', './Parameter', './ParameterDefi
 
       /**
        * Parses the parameters and stores the info in the ParameterDefinition
-       * @method _parseParameters
+       *
+       * @name ParameterXmlParser#_parseParameters
+       * @method
        * @param {ParameterDefinition} paramDefn The parameters objects storing the parameter info
        * @param {Object} parametersNode The node of parameter to iterate
        * @private
@@ -99,7 +108,9 @@ define(['cdf/lib/Base', 'common-ui/util/base64', './Parameter', './ParameterDefi
 
       /**
        * Parses a parameter, creating a parameter instance based on the info passed as parameter
-       * @method _parseParameter
+       *
+       * @name ParameterXmlParser#_parseParameter
+       * @method
        * @param {Object} node The xml node containing the parameter information
        * @returns {Parameter} The Parameter instance
        * @private
@@ -128,7 +139,9 @@ define(['cdf/lib/Base', 'common-ui/util/base64', './Parameter', './ParameterDefi
 
       /**
        * Parses the xml node fetching the parameter values
-       * @method _parseParameterValues
+       *
+       * @name ParameterXmlParser#_parseParameterValues
+       * @method
        * @param {Object} node The xml node containing the parameter information
        * @param {Parameter} parameter Parameter with the current parameter metadata
        * @returns {Array} Array with the
@@ -168,7 +181,9 @@ define(['cdf/lib/Base', 'common-ui/util/base64', './Parameter', './ParameterDefi
       /**
        * Called for every parameter value that is parsed. Override this to update the parameter
        * value at parse time.
-       * @method _normalizeParameterValue
+       *
+       * @name ParameterXmlParser#_normalizeParameterValue
+       * @method
        * @param {Parameter} parameter The Parameter instance
        * @param {String} type The type of the parameter
        * @param {Object} value The value to be normalized
@@ -182,9 +197,11 @@ define(['cdf/lib/Base', 'common-ui/util/base64', './Parameter', './ParameterDefi
       return Base.extend({
         /**
          * Parses the xml received from the server and returns and instance of ParameterDefinition
-         * @method parseParameterXml
-         * @param xmlString String with the xml
-         * @returns ParameterDefinition instance
+         *
+         * @name ParameterXmlParser#parseParameterXml
+         * @method
+         * @param {String} xmlString String with the xml
+         * @returns {ParameterDefinition} Parameter Definition instance
          */
         parseParameterXml: function (xmlString) {
           var xml = $(_parseXML(xmlString));

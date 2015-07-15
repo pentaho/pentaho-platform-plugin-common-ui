@@ -15,6 +15,12 @@
  *
  */
 
+/**
+ * The Parameter Widget Builder Base Class
+ *
+ * @name ParameterWidgetBuilderBase
+ * @class
+ */
 define(['cdf/lib/Base'], function(Base){
 
   return Base.extend({
