@@ -59,6 +59,15 @@ define(['common-ui/prompting/builders/DropDownBuilder'], function(DropDownBuilde
       expect(component.valuesArray[0][1]).toEqual("");
     });
 
+    it ("should set defaultIfEmpty to true for non-multi select on preExecution", function() {
+      var component = dropDownBuilder.build(args);
+
+      spyOn(component, 'preExecution').and.callThrough();     
+      component.preExecution();
+      expect(component.preExecution).toHaveBeenCalled();
+      expect(component.defaultIfEmpty).toBeFalsy();
+    });
+
   });
 
 });

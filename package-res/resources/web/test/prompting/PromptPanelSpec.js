@@ -564,11 +564,11 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
           expect(paramPanel.cssClass).toBe(' error');
           expect(paramPanel.components.length).toBe(3);
           expect(paramPanel.components[0].type).toBe("TextComponent");
-          expect(paramPanel.components[1].type).toBe("StaticAutocompleteBoxComponent");
-          expect(paramPanel.components[2].type).toBe("TextComponent");
+          expect(paramPanel.components[1].type).toBe("TextComponent");
+          expect(paramPanel.components[2].type).toBe("StaticAutocompleteBoxComponent");
           expect(paramPanel.components[0].promptType).toBe("label");
-          expect(paramPanel.components[1].promptType).toBe("prompt");
-          expect(paramPanel.components[2].promptType).toBe("label");
+          expect(paramPanel.components[1].promptType).toBe("label");
+          expect(paramPanel.components[2].promptType).toBe("prompt");
         });
       });
 

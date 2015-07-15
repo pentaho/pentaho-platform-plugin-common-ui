@@ -24,14 +24,18 @@ define(['common-ui/prompting/builders/ParameterWidgetBuilderBase'], function(Par
         getParameterName: function() { }
       }, 
       param:  {
-        values: []
+        values: [],
+        attributes: {}
       }
     };
 
     var parameterWidgetBuilderBase;
+    var component;
 
     beforeEach(function() {
       parameterWidgetBuilderBase = new ParameterWidgetBuilderBase();
+      component = parameterWidgetBuilderBase.build(args);
+      component.base = function() {};
     });
 
     it("should throw an error building component with no parameters", function() {
@@ -39,12 +43,36 @@ define(['common-ui/prompting/builders/ParameterWidgetBuilderBase'], function(Par
     });
 
     it("should return build successfully", function() {
-      var component = parameterWidgetBuilderBase.build(args);
       expect(component.postExecution).toBeDefined();
       expect(component.type).toBeUndefined();
       expect(component.promptType).toEqual('prompt');
     });
 
+    it("should not set the tooltip on postExecution if no tooltip is passed", function() {
+      spyOn(component, 'postExecution').and.callThrough();
+      spyOn(component, 'base').and.callThrough();      
+      spyOn($.fn, 'attr'); 
+
+      component.postExecution();
+      
+      expect(component.postExecution).toHaveBeenCalled();
+      expect(component.base).toHaveBeenCalled();
+      expect($.fn.attr).not.toHaveBeenCalled();
+    });
+
+    it("should set the tooltip on postExecution if any exists", function() {
+      args.param.attributes['tooltip'] = 'tooltip';
+
+      spyOn(component, 'postExecution').and.callThrough();
+      spyOn(component, 'base').and.callThrough();      
+      spyOn($.fn, 'attr');      
+      
+      component.postExecution();
+      
+      expect(component.postExecution).toHaveBeenCalled();
+      expect(component.base).toHaveBeenCalled();
+      expect($.fn.attr).toHaveBeenCalled();
+    });
   });
 
 });

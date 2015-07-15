@@ -28,13 +28,16 @@ define(['common-ui/prompting/builders/ErrorLabelBuilder'], function(ErrorLabelBu
         attributes: { 
           label: 'test-label'
         }
-      }
+      },
+      errorMessage: 'error message'
     };
 
     var errorLabelBuilder;
+    var component;
 
     beforeEach(function() {
       errorLabelBuilder = new ErrorLabelBuilder();
+      component = errorLabelBuilder.build(args);
     });
 
     it("should throw an error building component with no parameters", function() {
@@ -42,11 +45,17 @@ define(['common-ui/prompting/builders/ErrorLabelBuilder'], function(ErrorLabelBu
     });
 
     it("should return a TextComponent", function() {
-      var component = errorLabelBuilder.build(args);
       expect(component.type).toBe('TextComponent');
       expect(component.expression).toBeDefined();
       expect(component.isErrorIndicator).toBeTruthy();
     });
+
+    it("should return the error message on the expression", function() {
+      spyOn(component, 'expression').and.callThrough();
+      
+      expect(component.expression()).toEqual(args.errorMessage);
+      expect(component.expression).toHaveBeenCalled();
+    })
 
   });
 
