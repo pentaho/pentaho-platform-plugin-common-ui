@@ -16,18 +16,28 @@
  */
 
 /**
- * @class ParameterDefinition
+ * @name ParameterDefinition
+ * @class
+ * @property {Boolean} autoSubmit True is the prompt is in auto submit mode, False otherwise
+ * @property {Boolean} autoSubmitUI True if the prompt is in auto submit mode defined in the ui, False otherwise
+ * @property {String} layout String defining if the layout of hte prompt is Vertical or Horizontal
+ * @property {Number} page The number of the page
+ * @property {Boolean} paginate True if pagination is active, False otherwise
+ * @property {Array|ParameterGroup} parameterGroups The array of ParameterGroup
+ * @property {Boolean} promotNeeded True if prompts are needed, False otherwise
+ * @property {Number} totalPages The number of total pages of the report
+ * @property {Object|Array} errors The array of errors per parameter
  */
 define([], function () {
   return function () {
 
     return {
-      'autoSubmit': undefined, // boolean
-      'autoSubmitUI': undefined, // boolean
-      'ignoreBiServer5538': undefined, // boolean
-      'layout': undefined, // string, [vertical, horizontal]
-      'page': undefined, // integer
-      'paginate': undefined, // boolean
+      'autoSubmit': undefined,
+      'autoSubmitUI': undefined,
+      'ignoreBiServer5538': undefined,
+      'layout': undefined,
+      'page': undefined,
+      'paginate': undefined,
       'parameterGroups': [],
       'promptNeeded': undefined, // boolean
       'totalPages': undefined, // integer
@@ -35,7 +45,9 @@ define([], function () {
 
       /**
        * Returns parameter group from a given name
-       * @method getParameterGroup
+       *
+       * @name ParameterDefinition#getParameterGroup
+       * @method
        * @param {String} name The name of the group to get
        * @returns {ParameterGroup} The parameter group matching the name
        */
@@ -52,7 +64,9 @@ define([], function () {
 
       /**
        * Gets the value of autoSubmit, or if it is undefined the value of autoSubmitUI
-       * @method allowAutoSubmit
+       *
+       * @name ParameterDefinition#allowAutoSubmit
+       * @method
        * @returns {Boolean} The boolean value of auto submit
        */
       allowAutoSubmit: function () {
@@ -64,7 +78,9 @@ define([], function () {
 
       /**
        * Returns the boolean value of the parameter ShowParameters
-       * @method showParameterUI
+       *
+       * @name ParameterDefinition#showParameterUI
+       * @method
        * @returns {Boolean} The value of the parameter ShowParameters
        */
       showParameterUI: function () {
@@ -80,7 +96,9 @@ define([], function () {
 
       /**
        * Gets the parameter from a given name
-       * @method getParameter
+       *
+       * @name ParameterDefinition#getParameter
+       * @method
        * @param {String} name The name of the parameter
        * @returns {Parameter} The parameter
        */
@@ -103,7 +121,9 @@ define([], function () {
 
       /**
        * Executes the callback for each parameter
-       * @method mapParameters
+       *
+       * @name ParameterDefinition#mapParameters
+       * @method
        * @param {callback~cb} callback
        * @param {Object} x The context to run the callback
        * @returns {Boolean} {true} if all parameters were mapped, {false} otherwise
