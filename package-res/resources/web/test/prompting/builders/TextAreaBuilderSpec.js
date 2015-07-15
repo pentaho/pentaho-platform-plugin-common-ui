@@ -45,6 +45,46 @@ define(['common-ui/prompting/builders/TextAreaBuilder'], function(TextAreaBuilde
       var component = textAreaBuilder.build(args);
       expect(component.type).toBe('TextAreaComponent');
     });
+
+    it("should fire a change in the dashboard on enter keypress", function() {
+      var component = textAreaBuilder.build(args);
+      component.dashboard = { 
+        processChange: function() { },
+        getParameterValue: function() { return 'test' }
+      };
+      component.htmlObject = 'test';
+      var ph = $('<div>').attr('id', component.htmlObject);
+      $('body').append(ph);
+
+      component.update();  
+
+      spyOn(component.dashboard, 'processChange');      
+       $('textarea', component.ph).trigger(jQuery.Event( 'keypress', { which: 13 } ));
+
+      expect(component.dashboard.processChange).toHaveBeenCalled();  
+      
+      ph.remove();
+    });
+
+    it("should fire a change in the dashboard on focusout", function() {
+      var component = textAreaBuilder.build(args);
+      component.dashboard = { 
+        processChange: function() { },
+        getParameterValue: function() { return 'test' }
+      };
+      component.htmlObject = 'test';
+      var ph = $('<div>').attr('id', component.htmlObject);
+      $('body').append(ph);
+
+      component.update();  
+
+      spyOn(component.dashboard, 'processChange');      
+       $('textarea', component.ph).trigger(jQuery.Event( 'focusout', { } ));
+
+      expect(component.dashboard.processChange).toHaveBeenCalled();  
+      
+      ph.remove();
+    });
   
   });
 
