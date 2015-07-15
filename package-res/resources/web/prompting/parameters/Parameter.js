@@ -15,6 +15,9 @@
  *
  */
 
+/**
+ * @class Parameter
+ */
 define([], function () {
   return function () {
     return {
@@ -30,7 +33,7 @@ define([], function () {
 
       /**
        * Checks if the value provided is selected in this parameter
-       *
+       * @method isSelectedValues
        * @param {Object} value Value to search for
        * @return {Boolean} true if this parameter contains a selection whose value = {value}
        */
@@ -49,7 +52,7 @@ define([], function () {
 
       /**
        * Determine if any of our values are selected (selected = true)
-       *
+       * @method hasSelection
        * @return {Boolean} {true} if any value is selected, {false} otherwise
        */
       hasSelection: function () {
@@ -65,7 +68,7 @@ define([], function () {
 
       /**
        * Obtains an array with the values of the selected ParameterValue objects.
-       *
+       * @method getSelectedValuesValue
        * @return {Array} Array with the values selected
        */
       getSelectedValuesValue: function () {

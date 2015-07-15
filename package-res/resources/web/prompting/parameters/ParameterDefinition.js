@@ -15,6 +15,9 @@
  *
  */
 
+/**
+ * @class ParameterDefinition
+ */
 define([], function () {
   return function () {
 
@@ -32,7 +35,7 @@ define([], function () {
 
       /**
        * Returns parameter group from a given name
-       *
+       * @method getParameterGroup
        * @param {String} name The name of the group to get
        * @returns {ParameterGroup} The parameter group matching the name
        */
@@ -49,7 +52,7 @@ define([], function () {
 
       /**
        * Gets the value of autoSubmit, or if it is undefined the value of autoSubmitUI
-       *
+       * @method allowAutoSubmit
        * @returns {Boolean} The boolean value of auto submit
        */
       allowAutoSubmit: function () {
@@ -61,7 +64,7 @@ define([], function () {
 
       /**
        * Returns the boolean value of the parameter ShowParameters
-       *
+       * @method showParameterUI
        * @returns {Boolean} The value of the parameter ShowParameters
        */
       showParameterUI: function () {
@@ -77,7 +80,7 @@ define([], function () {
 
       /**
        * Gets the parameter from a given name
-       *
+       * @method getParameter
        * @param {String} name The name of the parameter
        * @returns {Parameter} The parameter
        */
@@ -100,7 +103,7 @@ define([], function () {
 
       /**
        * Executes the callback for each parameter
-       *
+       * @method mapParameters
        * @param {callback~cb} callback
        * @param {Object} x The context to run the callback
        * @returns {Boolean} {true} if all parameters were mapped, {false} otherwise

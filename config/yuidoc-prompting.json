@@ -1,0 +1,13 @@
+{
+  "name": "Prompting JS Documentation",
+  "description": "YUI JavaScript Framework",
+  "version": "5.3",
+  "url": "localhost",
+  "options": {
+    "lint": false,
+    "linkNatives": "true",
+    "attributesEmit": "true",
+    "paths": ["package-res/resources/web/prompting/"],
+    "outdir": "doc-js/prompting/"
+  }
+}
