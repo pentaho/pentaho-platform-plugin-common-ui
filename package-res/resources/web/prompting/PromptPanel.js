@@ -661,6 +661,14 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
           //add the label widget
           panelComponents.push(_createWidgetForLabel.call(this, param));
 
+          //add the error widgets
+          var errors = this.paramDefn.errors[param.name];
+          if (errors) {
+            $.each(errors, function (i, e) {
+              panelComponents.push(_createWidgetForErrorLabel.call(this, param, e));
+            }.bind(this));
+          }
+
           //add the parameter widget
           var widget = _createWidgetForParameter.call(this, param);
           if (widget) {
@@ -668,14 +676,6 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
           } else { // No widget created. Do not create a label or parameter panel
             Logger.log( "No widget created, return");
             return undefined;
-          }
-
-          //add the error widgets
-          var errors = this.paramDefn.errors[param.name];
-          if (errors) {
-            $.each(errors, function (i, e) {
-              panelComponents.push(_createWidgetForErrorLabel.call(this, param, e));
-            }.bind(this));
           }
 
           var panel = _createWidgetForParameterPanel.call(this, param, panelComponents);
