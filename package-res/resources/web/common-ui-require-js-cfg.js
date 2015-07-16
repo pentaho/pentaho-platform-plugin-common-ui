@@ -34,9 +34,7 @@
   requirePaths["common-repo"   ] = basePath + "/repo";
   requirePaths["common-data"   ] = basePath + "/dataapi";
   requirePaths["pentaho/common"] = basePath + "/dojo/pentaho/common";
-
-  requirePaths["pentaho/visual" ] = basePath + "/vizapi";
-  requireMap["*"]["common-ui/vizapi"] = "pentaho/visual";
+  requirePaths["pentaho/visual"] = basePath + "/visual";
 
   // AMD PLUGINS
   requirePaths["local"  ] = basePath + "/util/local";
@@ -71,6 +69,8 @@
   requirePaths["dojox/rpc"] = dojoOverrides + "dojox/rpc";
   requirePaths["dojo/_base/kernel"] = dojoOverrides + "dojo/_base/kernel";
   requirePaths["dojo/store/Memory"] = dojoOverrides + "dojo/store/Memory";
+  requirePaths["dijit/_HasDropDown"] = dojoOverrides + "dijit/_HasDropDown";
+  requirePaths["dijit/_CssStateMixin"] = dojoOverrides + "dijit/_CssStateMixin";
 
   // Plugin Handler
   requirePaths["common-ui/PluginHandler"] = basePath + "/plugin-handler/pluginHandler";
@@ -173,7 +173,7 @@
 
   // Visual API - CCC
   requireService["pentaho/visual/ccc/visualTypeProvider"] = "IVisualTypeProvider";
-  requireService["pentaho/visual/ccc/visualTypeConfig"  ] = "IVisualApiConfiguration";
+  requireService["pentaho/visual/ccc/visualApiConfig"] = "IVisualApiConfiguration";
 
   // Sample visualizations
   requireService["pentaho/visual/sample/visualTypeProvider"] = "IVisualTypeProvider";
