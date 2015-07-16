@@ -114,12 +114,6 @@ define([], function () {
       },
 
       /**
-       * @callback callback~cb
-       * @param {Parameter} parameter The parameter
-       * @param {ParameterGroup} group The group
-       */
-
-      /**
        * Executes the callback for each parameter
        *
        * @name ParameterDefinition#mapParameters
