@@ -528,9 +528,9 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
         /**
          * This is called to refresh the prompt panel.
          * It should return a new parameter definition.
-         * If it returns undefined no update will hapdefine
+         * If it returns undefined no update will happen
          *
-         * This method should be overriden.
+         * This method should be overridden.
          * The default implementation simply calls the provided callback with no parameter definition.
          *
          * @name PromptPanel#getParameterDefinition
