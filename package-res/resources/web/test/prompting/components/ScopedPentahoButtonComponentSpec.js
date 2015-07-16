@@ -37,9 +37,8 @@ define([ 'common-ui/prompting/components/ScopedPentahoButtonComponent', 'cdf/lib
       var testLabel = "test label";
       var id = "test_id";
       var comp;
-      var spyElem = jasmine.createSpyObj("spyElem", [ "bind", "button", "appendTo" ]);
+      var spyElem = jasmine.createSpyObj("spyElem", [ "bind", "appendTo" ]);
       spyElem.bind.and.returnValue(spyElem);
-      spyElem.button.and.returnValue(spyElem);
       spyElem.appendTo.and.returnValue(spyElem);
       beforeEach(function() {
         comp = new ScopedPentahoButtonComponent();
@@ -65,7 +64,6 @@ define([ 'common-ui/prompting/components/ScopedPentahoButtonComponent', 'cdf/lib
         expect($.fn.text).toHaveBeenCalledWith(testLabel);
         expect(spyElem.bind.calls.argsFor(0)).toEqual([ "mousedown", jasmine.any(Function) ]);
         expect(spyElem.bind.calls.argsFor(1)).toEqual([ "click", jasmine.any(Function) ]);
-        expect(spyElem.button).toHaveBeenCalled();
         expect(spyElem.appendTo).toHaveBeenCalled();
       });
     });

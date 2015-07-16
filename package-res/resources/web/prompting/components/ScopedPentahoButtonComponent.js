@@ -38,7 +38,6 @@ define(['cdf/components/BaseComponent', 'cdf/lib/jquery'], function(BaseComponen
               // Don't let click-event go as first argument.
               this.expression(false);
             }.bind(this))
-            .button()
             .appendTo($container);
 
         this.viewReportButtonRegistered = true;
