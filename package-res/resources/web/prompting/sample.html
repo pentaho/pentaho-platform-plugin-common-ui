@@ -2,47 +2,29 @@
 <html xmlns:pho="http:/www.pentaho.com">
 <head>
     <title>Pentaho Prompting Sample Page</title>
-    
-    <!-- Include CDF styles first to make sure they can be properly overridden -->
-    <link rel="stylesheet" href="../../../../../content/pentaho-cdf/js-legacy/cdf.css" type="text/css" />
 
     <script language="javascript" type="text/javascript" src="webcontext.js?context=prompting-sample"></script>
 
-    <link rel="stylesheet" href="../../../../../content/pentaho-cdf/js-legacy/lib/jdMenu/jquery.jdMenu.css" type="text/css" />
-    <link rel="stylesheet" href="../../../../../content/pentaho-cdf/js-legacy/lib/jdMenu/jquery.jdMenu.slate.css" type="text/css" />
-    <link rel="stylesheet" href="../../../../../content/pentaho-cdf/js-legacy/lib/impromptu/jquery-impromptu.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../content/pentaho-cdf/js/lib/jdMenu/jquery.jdMenu.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../content/pentaho-cdf/js/lib/jdMenu/jquery.jdMenu.slate.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../content/pentaho-cdf/js/lib/impromptu/jquery-impromptu.css" type="text/css" />
 
     <link rel="stylesheet" type="text/css" href="../dojo/dijit/themes/pentaho/pentaho.css"/>
 
     <link rel="stylesheet" href="pentaho-prompting.css" type="text/css" />
 
-    <script language="javascript">
-      // This script element contains required setup and scaffolding
-      $.extend(djConfig, {
-        modulePaths: {
-            'pentaho.common': '../pentaho/common'
-        },
-        parseOnLoad: true,
-        baseUrl: '../dojo/dojo/'
-      });
-
-      // Set up locale for Dojo
-      djConfig.locale = 'en-us';
-    </script>
-
-    <script language='javascript' type='text/javascript' src='../dojo/dojo/dojo-all.js.uncompressed.js'></script>
     <!-- Include the JSTextFormatter GWT Module -->
     <script type="text/javascript" src="../formatter/formatter.nocache.js"></script>
 
     <script type="text/javascript">
       gwtModuleLoaded = function(module) {
         // Define a local module for every GWT module that's loaded. In our case we're only going to get the formatter
-        definerequire(['local'], function(local) {
+        require(['local'], function(local) {
           local.define('gwt-' + module);
           console.log('defined module gwt-' + module);
         });
       }
-      definerequire(['local!gwt-formatter'], function() {
+      require(['local!gwt-formatter'], function() {
         var testNumberFormatter = function() {
           var numberFormatter = jsTextFormatter.createFormatter('number', '$#.0#');
           var number = 123.45;
@@ -67,54 +49,16 @@
     </script>
 
     <script language="javascript" type="text/javascript">
-      /**
-       * Provide a hook so the AMD module system knows when Dojo has been loaded. With this we can depend on Dojo
-       * with definerequire().
-       */
-      dojo.ready(function() {
-        // Dojo is now available, modules depending on it may now load.
-        definerequire(['local'], function(local) {
-          local.define('dojo');
-        });
-      });
-      
       // Global declaration for sample debugging purposes
       var paramDefn;
 
-      definerequire([
-        'local!dojo',
-        'common-ui/repo/pentaho-ajax',
-        'common-ui/prompting/pentaho-prompting',
+      require([
         'common-ui/util/formatting',
-        ], function(localDojo, pentahoAjax, pentahoPrompting, ReportFormatUtil) {
-            // Set the user to anonymous so Dashboards Storage is never invoked
-            window.Dashboards.context.user = 'anonymousUser';
-            window.SimileAjax = {};
-            window.Dashboards.blockUIwithDrag = function() {
-              $.blockUI.defaults.message = '';
-              $.blockUI.defaults.css.left = '0%';
-              $.blockUI.defaults.css.top = '0%';
-              $.blockUI.defaults.css.marginLeft = '85px';
-              $.blockUI.defaults.css.width = '100%';
-              $.blockUI.defaults.css.height = '100%';
-              $.blockUI.defaults.css.opacity = '1';
-              $.blockUI.defaults.css.backgroundColor = '#ffffcc';
-              $.blockUI.defaults.css['-webkit-border-radius'] = '10px'; 
-              $.blockUI.defaults.css['-moz-border-radius'] = '10px';
-          
-              $.blockUI.defaults.overlayCSS.backgroundColor = '#000000';
-              $.blockUI.defaults.overlayCSS.opacity = '0.6';
-              $.blockUI.defaults.overlayCSS.cursor = 'wait';
-              // Place it below the message box
-              $.blockUI.defaults.overlayCSS['z-index'] = '900';
-                // There's an issue with BlockUI and IE 8. As we don't even use this feature from CDF, it's hidden here.
-                // $.blockUI.defaults.showOverlay = false;
-              $.blockUI();
-            }
-
-
+        'common-ui/prompting/parameters/ParameterXmlParser',
+        'common-ui/prompting/PromptPanel'
+        ], function(ReportFormatUtil, ParameterXmlParser, PromptPanel) {
             // This script element contains the sample code to parse the parameter xml and build/refresh the prompt.
-            window.paramParser = new pentaho.common.prompting.ParameterXmlParser();
+            window.paramParser = new ParameterXmlParser();
             var promptPanel;
             /**
              * Create or refresh the current prompt with the parameter xml defined in the text area "parameterXml".
@@ -128,7 +72,32 @@
               }
               try {
                 if (!promptPanel) {
-                  promptPanel = new pentaho.common.prompting.PromptPanel('promptPanel', paramDefn);
+                  promptPanel = new PromptPanel('promptPanel', paramDefn);
+
+                  // Set the user to anonymous so Dashboards Storage is never invoked
+                  promptPanel.dashboard.context.user = 'anonymousUser';
+                  promptPanel.dashboard.blockUIwithDrag = function() {
+                    if ($.blockUI){
+                      $.blockUI.defaults.message = '';
+                      $.blockUI.defaults.css.left = '0%';
+                      $.blockUI.defaults.css.top = '0%';
+                      $.blockUI.defaults.css.marginLeft = '85px';
+                      $.blockUI.defaults.css.width = '100%';
+                      $.blockUI.defaults.css.height = '100%';
+                      $.blockUI.defaults.css.opacity = '1';
+                      $.blockUI.defaults.css.backgroundColor = '#ffffcc';
+                      $.blockUI.defaults.css['-webkit-border-radius'] = '10px';
+                      $.blockUI.defaults.css['-moz-border-radius'] = '10px';
+                      $.blockUI.defaults.overlayCSS.backgroundColor = '#000000';
+                      $.blockUI.defaults.overlayCSS.opacity = '0.6';
+                      $.blockUI.defaults.overlayCSS.cursor = 'wait';
+                      // Place it below the message box
+                      $.blockUI.defaults.overlayCSS['z-index'] = '900';
+                      // There's an issue with BlockUI and IE 8. As we don't even use this feature from CDF, it's hidden here.
+                      // $.blockUI.defaults.showOverlay = false;
+                      $.blockUI();
+				    }
+                  }
 
                   promptPanel.submit = function() {
                     alert("submit() called");

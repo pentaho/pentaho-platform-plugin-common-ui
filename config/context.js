@@ -15,6 +15,20 @@
  *
  * Copyright 2015 Pentaho Corporation. All rights reserved.
  */
+
+/**
+ * The possible configurations to define the environment where the require-cfg files are running.
+ * This allows the build and test environments, differing between several plugins to fully configure the path where
+ * the files from the external lib are served
+ *
+ * @type {{paths: {common-ui: string, cdf: string}}}
+ */
+var ENVIRONMENT_CONFIG = {
+  paths: {
+    "cdf": "../../build-res/module-scripts/cdf/js",
+    "cdf/lib": "../../build-res/module-scripts/cdf/js/lib"
+  }
+};
 var KARMA_RUN = true;
 var pen = {define : define, require : require};
 var SESSION_LOCALE="en";
