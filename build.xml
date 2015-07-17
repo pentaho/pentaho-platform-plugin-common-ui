@@ -35,6 +35,9 @@
     <!-- List of comma-separated paths to yuidoc configuration files -->
     <property name="yuidoc.json" value=""/>
 
+    <!-- List of comma-separated paths to jsdoc configuration files -->
+    <property name="jsdoc.json" value=""/>
+
     <property environment="env"/>
 
     <path id="test.classpath">
@@ -255,6 +258,8 @@
         <delete dir="${js.build.output.dir}/common-ui"/>
     </target>
 
+    <!-- JSdocs targets -->
+    <available file="jsdoc.cmd" filepath="${env.Path}" property="jsdoc-for-windows-is-available"/>
     <available file="yuidoc.cmd" filepath="${env.Path}" property="yuidoc-for-windows-is-available"/>
 
     <!-- Top-level JS Documentation target for MindTouch output -->
@@ -271,7 +276,17 @@
         </antcall>
     </target>
 
+    <!-- Target that calls the documentation using the list of configurations for jsdocs and yuidocs -->
     <target name="doc-many-js" depends="install-antcontrib, npm-install">
+        <if>
+            <not>
+                <equals arg1="${jsdoc.json}" arg2=""/>
+            </not>
+            <then>
+                <mkdir dir="doc-jsdoc" />
+                <foreach param="jsdoc-one.json" list="${jsdoc.json}" target="doc-one-js-with-jsdoc" />
+            </then>
+        </if>
         <if>
             <not>
                 <equals arg1="${yuidoc.json}" arg2="" />
@@ -280,15 +295,48 @@
                 <!-- YUIDoc fails creating out dirs with more than one level.
                      So, we create the standardized output base dir. -->
                 <mkdir dir="doc-js" />
-
-                <foreach param="yuidoc-one.json" list="${yuidoc.json}" target="doc-one-js" />
-
-                <zip destfile="${dist.dir}/js-doc-${project.revision}.zip" basedir="${basedir}/doc-js" />
+                <foreach param="yuidoc-one.json" list="${yuidoc.json}" target="doc-one-js-with-yuidoc" />
             </then>
         </if>
+        <zip destfile="${dist.dir}/doc-js-${project.revision}.zip" basedir="${basedir}/doc-js" />
     </target>
 
-    <target name="doc-one-js">
+    <!-- Target to execute jsdoc -->
+    <target name="doc-one-js-with-jsdoc">
+      <if>
+          <available file="${jsdoc-one.json}" />
+          <then>
+              <!-- The jsdoc configuration file exists. Check if jsdoc is installed. -->
+              <if>
+                  <isset property="isWindows" />
+                  <then>
+                      <if>
+                          <not>
+                              <isset property="jsdoc-for-windows-is-available"/>
+                          </not>
+                          <then>
+                              <fail>Run 'npm -g install jsdoc'</fail>
+                          </then>
+                      </if>
+                      <exec executable="jsdoc.cmd" failonerror="true">
+                          <arg line='-c "${jsdoc-one.json}"' />
+                      </exec>
+                  </then>
+                  <else>
+                      <exec executable="node_modules/jsdoc/jsdoc.js" failonerror="true">
+                          <arg line='-c "${jsdoc-one.json}"' />
+                      </exec>
+                  </else>
+              </if>
+          </then>
+          <else>
+              <fail>There is no jsdoc configuration file available at ${jsdoc-one.json}.</fail>
+          </else>
+      </if>
+    </target>
+
+    <!-- Target to execute yuidoc -->
+    <target name="doc-one-js-with-yuidoc">
         <if>
             <available file="${yuidoc-one.json}"/>
             <then>
