@@ -369,14 +369,9 @@ define([
 
     // For every base visual type...
     this._baseEntry.list.forEach(function(baseVisualType) {
-      var id = baseVisualType.id,
-          type = applyContainerConfigs.call(this, containerTypeId, baseVisualType);
-
       // Has specific configs for <type,container>?
-      if(type)
-        anyConfig = true;
-      else
-        type = baseVisualType;
+      var type = applyContainerConfigs.call(this, containerTypeId, baseVisualType) ||
+                 baseVisualType;
 
       if(type.enabled == null || type.enabled) {
         list.push(type);

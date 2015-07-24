@@ -30,10 +30,10 @@ define(["require", "es6-promise-shim"], function(require) {
   function getVisualTypes() {
     return [
       {
-        id:      "sample_calc",         // unique identifier
+        id:      "x-sample_calc",         // unique identifier
         type:    "calc",                // generic type id
         source:  "Sample",              // id of the source library
-        name:    "Sample Calculation",  // visible name, this will come from a properties file eventually
+        name:    "X - Sample Calculation",  // visible name, this will come from a properties file eventually
         factory: visualFactory,         // visuals-factory
         args:    {},                    // arguments to provide to the Javascript object and default data requirements
         dataReqs: [                     // dataReqs describes the data requirements of this visualization
