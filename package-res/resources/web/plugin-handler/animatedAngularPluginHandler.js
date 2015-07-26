@@ -1,7 +1,7 @@
 /*
  * This is an API layer providing standard animations for sliding left/right and fade out when exiting views. These transitions
  * are accessible by calling the goNext, goPrevious, and close functions provided. These functions can be called in 2 ways.
- * 1) You can call these methods directly from the included AnimatedAngularPluginHandler, when it is required. You will need to 
+ * 1) You can call these methods directly from the included AnimatedAngularPluginHandler, when it is required. You will need to
  * 		provide the module name for which you are changing the location, as the urls are namespaced
  * 2) You can call them from within partials. The module name is not required to call these functions, since they are bound to
  * 		the root scope with prior knowledge of which module should be accessing the location
@@ -32,26 +32,26 @@ define(deps, function(AngularPluginHandler, ring) {
 
 			this.animation = "slide-left";
 		},
-		
+
 		// Sets the animation to be performed on animation transitions
-		_setAnimation : function(anim) {			
+		_setAnimation : function(anim) {
 			this.animation = anim;
 		},
 
 		// Provide of means of switching views without animation
 		goto : function(url, moduleName, allowAnimation) {
 			if (!allowAnimation) {
-				this._setAnimation("none");	
+				this._setAnimation("none");
 			}
-			
+
 			this.$super(url, moduleName);
 		},
 
 		// Provide and override to goHome in AngularPluginHandler where there is no animation
 		goHome : function(moduleName, allowAnimation) {
-			if (!allowAnimation){
-				this._setAnimation("none");	
-			} 
+			if (!allowAnimation) {
+				this._setAnimation("none");
+			}
 			this.$super(moduleName);
 		},
 
@@ -79,9 +79,15 @@ define(deps, function(AngularPluginHandler, ring) {
 			this.goto(url, moduleName, true);
 		},
 
+		// Slide down from the top
+		slideDownTop : function(url, moduleName) {
+			this._setAnimation("slide-down-top");
+			this.goto(url, moduleName, true);
+		},
+
 		// Provide and override function for creating the module
 		module : function(moduleName, deps, config) {
-			
+
 			// Include 'ngAnimate' as part of the configuration
 			deps.push('ngAnimate');
 
@@ -95,29 +101,29 @@ define(deps, function(AngularPluginHandler, ring) {
 
 			var self = this;
 
-			// Set animation actions	
+			// Set animation actions
 			module.animation(".ng-app-element", function() {
 				return {
 				    enter: function(element, done) {
 
 				    	// On enter, find elements
 				    	$(".ng-app-element:not(.deny-animation-change)").attr("animate", self.animation);
-				    	
+
 						return function(cancelled) {
 
 							// Once completed, set the container styles
 							$(".ng-app-element:not(.deny-animation-change)").attr("animate", self.animation);
 						}
 					}
-			    }	
+			    }
 			})
 
-			// Set default actions for root scope and animations			
+			// Set default actions for root scope and animations
 			module.run(['$rootScope', function($rootScope) {
 				// Provides the navigation controls to any template
 				$rootScope.goNext = function(url) {
 					self.goNext(url, module.name);
-				}				
+				}
 				$rootScope.goPrevious = function(url){
 					self.goPrevious(url, module.name);
 				}
