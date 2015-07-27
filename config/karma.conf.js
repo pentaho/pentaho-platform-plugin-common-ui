@@ -24,7 +24,8 @@ module.exports = function (config) {
     // Too many files cause karma launcher/file-serving errors.
     // Exclude these as we don't use them and they're many.
     exclude: [
-      "dev-res/dojo/dojo-release-1.9.2-src/**/tests/**"
+      "dev-res/dojo/dojo-release-1.9.2-src/**/tests/**",
+      "build-res/module-scripts/common-ui/**"
     ],
 
     // auto run tests when files change
