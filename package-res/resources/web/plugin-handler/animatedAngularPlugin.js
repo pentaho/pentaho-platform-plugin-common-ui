@@ -34,8 +34,8 @@ define(deps, function(AngularPlugin, AnimatedAngularPluginHandler, ring) {
 		/**
 		 * see #AngularPlugin.goHome
 		 */
-		goHome : function() {
-			this.config.pluginHandler.goHome(this.moduleName);
+		goHome : function(allowAnimation) {
+			this.config.pluginHandler.goHome(this.moduleName, allowAnimation);
 		},
 
 		/**
@@ -55,7 +55,17 @@ define(deps, function(AngularPlugin, AnimatedAngularPluginHandler, ring) {
 		 * 		String hash url
 		 */
 		goPrevious : function(url) {
-			this.config.pluginHandler.goPrevious(url, this.moduleName);		
+			this.config.pluginHandler.goPrevious(url, this.moduleName);
+		},
+
+		/**
+		 * A function that sets the animation for "sliding down", then links to the hash url
+		 *
+		 * @param url
+		 * 		String hash url
+		 */
+		slideDownTop : function(url) {
+			this.config.pluginHandler.slideDownTop(url, this.moduleName);
 		},
 
 		/**
@@ -67,7 +77,7 @@ define(deps, function(AngularPlugin, AnimatedAngularPluginHandler, ring) {
 		open : function(url) {
 			this.config.pluginHandler.open(url, this.moduleName);
 		},
-		
+
 		/**
 		 * A function that sets the animation for "going home", then goes to "/"
 		 *
