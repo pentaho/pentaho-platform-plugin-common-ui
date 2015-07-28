@@ -136,8 +136,8 @@ define(deps, function(AngularPluginHandler, ring) {
 				$rootScope.goto = function(url) {
 					self.goto(url, module.name);
 				}
-				$rootScope.goHome = function() {
-					self.goHome(module.name)
+				$rootScope.goHome = function(allowAnimation) {
+					self.goHome(module.name, allowAnimation);
 				}
 			}]);
 		}
