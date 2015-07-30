@@ -681,7 +681,7 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
                 if (topValuesByParam && component.type === 'SelectMultiComponent') {
                   var topValue = topValuesByParam['_' + name];
                   if (topValue != null) {
-                    componentautoTopValue = topValue;
+                    component.autoTopValue = topValue;
                   }
                 }
               } else if (topValuesByParam && component.type === 'ScrollingPromptPanelLayoutComponent') {
@@ -721,7 +721,7 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
           } else {
             this.paramDefn.mapParameters(function (param) {
               // initialize parameter values regardless of whether we're showing the parameter or not
-              this._initializeParameterValue(paramDefn, param);
+              this._initializeParameterValue(this.paramDefn, param);
             }, this);
 
             // Must submit, independently of auto-submit value.
