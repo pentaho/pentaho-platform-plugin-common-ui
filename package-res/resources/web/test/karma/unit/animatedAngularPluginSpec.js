@@ -22,11 +22,11 @@ define(deps, function(AnimatedAngularPlugin, AnimatedAngularPluginHandler, angul
             })
         })
 
-        describe("Functions", function() {           
+        describe("Functions", function() {
 
             var plugin, pluginHandler, module;
             var path = "/test";
-            
+
             beforeEach(function() {
                 pluginHandler = new AnimatedAngularPluginHandler();
                 module = pluginHandler.module(moduleName, []);
@@ -43,6 +43,12 @@ define(deps, function(AnimatedAngularPlugin, AnimatedAngularPluginHandler, angul
                     expect(module.$location.path()).toMatch(moduleName + path);
                     expect(pluginHandler.animation).toBe("none");
                 })
+
+                it("should go home and set the animation to 'slide-left'", function() {
+                    plugin.goHome(true);
+                    expect(module.$location.path()).toBe("/");
+                    expect(pluginHandler.animation).toBe("slide-left");
+                });
 
                 it("should goto a url and set the animation to 'slide-left'", function() {
                     plugin.goNext(path);
@@ -76,7 +82,7 @@ define(deps, function(AnimatedAngularPlugin, AnimatedAngularPluginHandler, angul
             }
 
             describe("registering before bootstrapping", function() {
-                
+
                 beforeEach(function() {
                     plugin.register();
                     angular.bootstrap(null, [moduleName]);
@@ -95,7 +101,7 @@ define(deps, function(AnimatedAngularPlugin, AnimatedAngularPluginHandler, angul
                 runTests();
             })
 
-            
+
         })
 
     })

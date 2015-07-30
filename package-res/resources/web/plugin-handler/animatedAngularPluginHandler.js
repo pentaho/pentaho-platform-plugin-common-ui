@@ -136,6 +136,9 @@ define(deps, function(AngularPluginHandler, ring) {
 				$rootScope.goto = function(url) {
 					self.goto(url, module.name);
 				}
+				$rootScope.slideDownTop = function(url) {
+					self.slideDownTop(url, module.name);
+				}
 				$rootScope.goHome = function(allowAnimation) {
 					self.goHome(module.name, allowAnimation);
 				}
