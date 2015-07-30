@@ -10,7 +10,7 @@ define(deps, function(AnimatedAngularPluginHandler, AnimatedAngularPlugin, angul
         var pluginHandler, plugin, module;
         var moduleName = "test";
         var path = "/test";
-        
+
         beforeEach(function() {
             pluginHandler = new AnimatedAngularPluginHandler();
             module = pluginHandler.module(moduleName, []);
@@ -48,8 +48,30 @@ define(deps, function(AnimatedAngularPluginHandler, AnimatedAngularPlugin, angul
                 expect(pluginHandler.animation).toBe("fade");
             })
 
+            it("should goto a url and set the animation to 'slide-down-top'", function() {
+                fn().slideDownTop(path, moduleName);
+                expect(module.$location.path()).toMatch(moduleName + path);
+                expect(pluginHandler.animation).toBe("slide-down-top");
+            })
+
+            it("should go home and set the animation to 'slide-left'", function() {
+                if (fn().$root) {
+                  // rootscope doesn't need module name
+                  fn().goHome(true);
+                } else {
+                  fn().goHome(moduleName, true);
+                }
+                expect(module.$location.path()).toBe("/");
+                expect(pluginHandler.animation).toBe("slide-left");
+            })
+
             it("should go home and set the animation to 'none'", function() {
-                fn().goHome(moduleName);
+                if (fn().$root) {
+                  // rootscope doesn't need module name
+                  fn().goHome();
+                } else {
+                  fn().goHome(moduleName);
+                }
                 expect(module.$location.path()).toBe("/");
                 expect(pluginHandler.animation).toBe("none");
             });
@@ -58,7 +80,7 @@ define(deps, function(AnimatedAngularPluginHandler, AnimatedAngularPlugin, angul
                 fn().close(moduleName);
                 expect(module.$location.path()).toBe("/");
                 expect(pluginHandler.animation).toBe("fade");
-            });  
+            });
         }
 
         // Test with Plugin Handler
@@ -66,6 +88,6 @@ define(deps, function(AnimatedAngularPluginHandler, AnimatedAngularPlugin, angul
 
         // Test with $rootScope methods
         runTests(function(){ return module.$rootScope; });
-              
+
     })
 })
