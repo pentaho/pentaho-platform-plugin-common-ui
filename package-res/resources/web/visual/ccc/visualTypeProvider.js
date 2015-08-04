@@ -31,7 +31,7 @@ define(["require", "es6-promise-shim"], function(require) {
   function getVisualTypes() {
     return [
       {
-        id:      "ccc_bar",
+        id:      "x-ccc_bar",
         type:    "barchart",
         _chart:  "BarChart",
         source:  "CCC",
@@ -54,7 +54,7 @@ define(["require", "es6-promise-shim"], function(require) {
         menuOrdinal: 100
       },
       {
-        id:      "ccc_barstacked",
+        id:      "x-ccc_barstacked",
         type:    "barchart",
         _chart:  "StackedBarChart",
         source:  "CCC",
@@ -73,7 +73,7 @@ define(["require", "es6-promise-shim"], function(require) {
         menuOrdinal: 110
       },
       {
-        id:      "ccc_horzbar",
+        id:      "x-ccc_horzbar",
         type:    "horzbarchart",
         _chart:  "HorizontalBarChart",
         source:  "CCC",
@@ -93,7 +93,7 @@ define(["require", "es6-promise-shim"], function(require) {
         menuSeparator: true
       },
       {
-        id:      "ccc_horzbarstacked",
+        id:      "x-ccc_horzbarstacked",
         type:    "horzbarchart",
         _chart:  "HorizontalStackedBarChart",
         source:  "CCC",
@@ -112,7 +112,7 @@ define(["require", "es6-promise-shim"], function(require) {
         menuOrdinal: 140
       },
       {
-        id:      "ccc_barnormalized",
+        id:      "x-ccc_barnormalized",
         type:    "barchart",
         _chart:  "NormalizedBarChart",
         source:  "CCC",
@@ -131,7 +131,7 @@ define(["require", "es6-promise-shim"], function(require) {
         menuOrdinal: 120
       },
       {
-        id:      "ccc_horzbarnormalized",
+        id:      "x-ccc_horzbarnormalized",
         type:    "horzbarchart",
         _chart:  "HorizontalNormalizedBarChart",
         source:  "CCC",
@@ -150,7 +150,7 @@ define(["require", "es6-promise-shim"], function(require) {
         menuOrdinal: 150
       },
       {
-        id:      "ccc_line",
+        id:      "x-ccc_line",
         type:    "linechart",
         _chart:  "LineChart",
         source:  "CCC",
@@ -181,7 +181,7 @@ define(["require", "es6-promise-shim"], function(require) {
         menuSeparator: true
       },
       {
-        id:      "ccc_area",
+        id:      "x-ccc_area",
         type:    "areachart",
         _chart:  "StackedAreaChart",
         source:  "CCC",
@@ -199,7 +199,7 @@ define(["require", "es6-promise-shim"], function(require) {
         menuOrdinal: 180
       },
       {
-        id:      "ccc_scatter",
+        id:      "x-ccc_scatter",
         type:    "scatter",
         _chart:  "MetricDotChart",
         source:  "CCC",
@@ -263,7 +263,7 @@ define(["require", "es6-promise-shim"], function(require) {
         menuSeparator: true
       },
       {
-        id:      "ccc_barline",
+        id:      "x-ccc_barline",
         type:    "barchart",
         _chart:  "BarLineChart",
         source:  "CCC",
@@ -306,7 +306,7 @@ define(["require", "es6-promise-shim"], function(require) {
         menuOrdinal: 125
       },
       {
-        id:      "ccc_waterfall",
+        id:      "x-ccc_waterfall",
         type:    "waterfallchart",
         _chart:  "WaterfallChart",
         source:  "CCC",
@@ -318,7 +318,7 @@ define(["require", "es6-promise-shim"], function(require) {
         }]
       },
       {
-        id:      "ccc_boxplot",
+        id:      "x-ccc_boxplot",
         type:    "boxplotchart",
         _chart:  "BoxplotChart",
         source:  "CCC",
@@ -372,7 +372,7 @@ define(["require", "es6-promise-shim"], function(require) {
         }]
       },
       {
-        id:      "ccc_pie",
+        id:      "x-ccc_pie",
         type:    "piechart",
         _chart:  "PieChart",
         source:  "CCC",
@@ -393,7 +393,7 @@ define(["require", "es6-promise-shim"], function(require) {
         menuOrdinal: 183
       },
       {
-        id:      "ccc_heatgrid",
+        id:      "x-ccc_heatgrid",
         type:    "heatgrid",
         _chart:  "HeatGridChart",
         source:  "CCC",
@@ -452,7 +452,7 @@ define(["require", "es6-promise-shim"], function(require) {
         menuOrdinal: 200
       },
       {
-        id:      "ccc_treemap",
+        id:      "x-ccc_treemap",
         type:    "treemapchart",
         _chart:  "TreemapChart",
         source:  "CCC",
@@ -478,7 +478,7 @@ define(["require", "es6-promise-shim"], function(require) {
         }]
       },
       {
-        id:      "ccc_bulletchart",
+        id:      "x-ccc_bulletchart",
         type:    "bulletchart",
         _chart:  "BulletChart",
         source:  "CCC",
@@ -515,7 +515,7 @@ define(["require", "es6-promise-shim"], function(require) {
         ]
       },
       {
-        id:      "ccc_sunburst",
+        id:      "x-ccc_sunburst",
         type:    "treemapchart",
         _chart:  "SunburstChart",
         source:  "CCC",
@@ -618,7 +618,7 @@ define(["require", "es6-promise-shim"], function(require) {
   }
 
   function vizLabel(id) {
-    return label("VIZ_", id) || id;
+    return "X - " + (label("VIZ_", id) || id);
   }
 
   function dropZoneLabel(id, defaultLabel) {

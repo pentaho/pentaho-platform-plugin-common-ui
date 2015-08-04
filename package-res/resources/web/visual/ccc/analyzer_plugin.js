@@ -16,9 +16,8 @@
 
 define([
     "dojo/_base/declare",
-    "cdf/lib/CCC/def",
-    "pentaho/visual/type/registry"
-], function(declare, def, typeRegistry) {
+    "cdf/lib/CCC/def"
+], function(declare, def) {
 
     /*global analyzerPlugins:true, cv: true, cvCatalog: true, analyzer: true*/
 
@@ -27,7 +26,7 @@ define([
 
     analyzerPlugins.push({
         init: function () {
-            declare("analyzer.CCCVizHelper", null, {
+            declare("analyzer.XCCCVizHelper", null, {
                 // Analyzer hooks.
                 // generateOptionsFromAnalyzerState(report)
                 // placeholderImageSrc
@@ -160,7 +159,7 @@ define([
             });
 
             // Register CCC Visuals with Analyzer
-            var visualHelper = new analyzer.CCCVizHelper();
+            var visualHelper = new analyzer.XCCCVizHelper();
 
             [
                 'ccc_bar',
@@ -177,7 +176,13 @@ define([
                 'ccc_heatgrid',
                 'ccc_sunburst'
             ].forEach(
-                function(typeId) { this[typeId] = visualHelper; },
+                function(typeId) {
+                    // VizAPI 3 side-by-side
+                    // x-prefix
+                    typeId = "x-" + typeId;
+
+                    this[typeId] = visualHelper;
+                },
                 cv.pentahoVisualizationHelpers || (cv.pentahoVisualizationHelpers = {}));
         } // end init method
     });

@@ -19,40 +19,20 @@ define(function() {
     // VisualType Configurations for sets of <type,container>
     types: /* @type IVisualTypeConfiguration[] */[
 
-      // Disable all Sample visualizations in Analyzer
+      // VizAPI 3 side-by-side
+      // Disable **all** VizAPI 3 visualizations in Analyzer.
+      // Comment this rule to test VizAPI 3 visualizations in Analyzer.
       {
         priority:  -1,
-        id:        /^sample_/,
         container: "analyzer",
         enabled:   false
       },
 
-      // Configure all CCC-based visuals for Analyzer
+      // Disable unfinished CCC visualizations, in any container.
       {
         priority:  -1,
-        id:        /^ccc_/,
-        container: "analyzer",
-
-        args: {
-          direct: {}
-        }
-      },
-
-      // Disable some unfinished CCC visuals
-      {
-        priority:  -1,
-        id:        ["ccc_bulletchart", "ccc_treemap", "ccc_waterfall", "ccc_boxplot"],
+        id:        ["x-ccc_bulletchart", "x-ccc_treemap", "x-ccc_waterfall", "x-ccc_boxplot"],
         enabled:   false
-      },
-
-      // Override/Configure the CCC Line chart for Analyzer
-      {
-        priority:  -1,
-        id:        "ccc_line",
-        container: "analyzer",
-        args: {
-          direct: {}
-        }
       }
     ]
   };

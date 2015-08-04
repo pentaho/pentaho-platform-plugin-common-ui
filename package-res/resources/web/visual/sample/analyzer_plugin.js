@@ -24,7 +24,9 @@ define(function() {
 
       // Helpers contain code that knows about the Analyzer specific context.
 
-      cv.pentahoVisualizationHelpers["sample_calc"] = {
+      // VizAPI 3 side-by-side
+      // x-prefix
+      cv.pentahoVisualizationHelpers["x-sample_calc"] = {
         // Use one of Analyzer's stock placeholder images
         placeholderImageSrc: CONTEXT_PATH + "content/analyzer/images/viz/VERTICAL_BAR.png"
       };

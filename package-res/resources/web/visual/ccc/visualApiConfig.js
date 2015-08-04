@@ -22,7 +22,7 @@ define(function() {
 
       // Configure all CCC-based visuals for Analyzer
       {
-        id:        /^ccc_/,
+        id:        /^x-ccc_/,
         container: "analyzer",
 
         getEditorProperties: function(editorDoc, filterPropsList, filterPropsMap) {
