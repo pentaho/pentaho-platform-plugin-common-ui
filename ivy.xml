@@ -34,7 +34,7 @@
 		<dependency org="net.sf.flexjson" name="flexjson" rev="2.1" transitive="false" conf="default->default"/>
 		<dependency org="org.json" name="json" rev="3.1.1" transitive="false" conf="default->default" />
 
-		<dependency org="org.springframework" name="spring" rev="2.5.6" transitive="false" conf="default->default" />
+		<dependency org="org.springframework" name="spring-beans" rev="${dependency.spring.framework.revision}" transitive="false" conf="default->default" />
 
 		<!-- Pentaho dependencies -->
 		<dependency org="pentaho-kettle" name="kettle-engine" rev="${dependency.kettle.revision}" changing="true" transitive="false" conf="default->default" />
@@ -61,9 +61,6 @@
         </dependency>
         <dependency org="pentaho" name="pentaho-platform-repository-test" rev="${dependency.pentaho-platform.revision}" changing="true"
                     conf="test->default" transitive="false"/>
-
-        <dependency org="org.springframework" name="spring-test" rev="2.5.6" transitive="false" conf="test->default" />
-        <dependency org="org.springframework.security" name="spring-security-core" rev="2.0.5.RELEASE" transitive="false" conf="test->default"/>
 
         <dependency org="commons-collections" name="commons-collections" rev="3.2" transitive="false" conf="test->default" />
 		<dependency org="commons-io" name="commons-io" rev="2.1" transitive="false" conf="test->default"/>
