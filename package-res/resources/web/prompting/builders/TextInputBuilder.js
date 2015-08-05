@@ -15,16 +15,57 @@
  *
  */
 
+/**
+ * <h2>The Text Input Builder</h2>
+ *
+ * To use the TextInputBuilder you should require the appropriate file
+ * from Common-Ui:
+ *
+ * <pre><code>
+ *   require(['common-ui/builders/TextInputBuilder'], 
+ *     function(TextInputBuilder) { 
+ *       
+ *     }
+ *   );
+ * </code></pre>
+ * 
+ * To get the component you'll have to create a new instance of the builder and
+ * call the <code>build</code> method:
+ *
+ * <pre><code>
+ *   var textInputBuilder = new TextInputBuilder();
+ *
+ *   var textInputComponent = textInputBuilder.build(args);
+ * </code></pre>
+ *
+ * where 'args' is an object that contains the prompt panel and the parameters
+ * necessary for the component as per [the CDF documentation]{@link http://localhost:8080/pentaho/api/repos/:public:plugin-samples:pentaho-cdf:pentaho-cdf-require:30-documentation:30-component_reference:10-core:37-TextInputComponent:text_input_component.xcdf/generatedContent}.
+ * 
+ * <p>
+ *   Note: the CDF documentation points to the Dashboard located on the Pentaho BI Server
+ * </p>
+ *
+ * @name TextInputBuilder
+ * @class
+ * @extends ParameterWidgetBuilderBase
+ */
 define(['cdf/components/TextInputComponent', './ParameterWidgetBuilderBase'],
-    function (TextInputComponent, ParameterWidgetBuilderBase) {
+  function (TextInputComponent, ParameterWidgetBuilderBase) {
 
-      return ParameterWidgetBuilderBase.extend({
-        build: function (args) {
-          var widget = this.base(args);
-          $.extend(widget, {
-            type: 'TextInputComponent'
-          });
-          return new TextInputComponent(widget);
-        }
-      });
+    return ParameterWidgetBuilderBase.extend({
+      /**
+       * Builds the widget and returns a TextInputComponent
+       * @method
+       * @name TextInputBuilder#build
+       * @param {Object} args The arguments to build the widget in accordance with [the CDF documentation]{@link http://localhost:8080/pentaho/api/repos/:public:plugin-samples:pentaho-cdf:pentaho-cdf-require:30-documentation:30-component_reference:10-core:37-TextInputComponent:text_input_component.xcdf/generatedContent}.
+       * @returns {TextInputComponent} The TextInputComponent built
+       */
+      build: function (args) {
+        var widget = this.base(args);
+        $.extend(widget, {
+          type: 'TextInputComponent'
+        });
+        return new TextInputComponent(widget);
+      }
     });
+  });
