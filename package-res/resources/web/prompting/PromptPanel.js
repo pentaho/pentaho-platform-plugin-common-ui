@@ -425,7 +425,7 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
         /**
          * Gets the parameter value from the dashboard instance parameter map
          *
-         * @name PromptPanel#getParameterName
+         * @name PromptPanel#getParameterValue
          * @method
          * @param {Parameter} param The parameter name
          * @returns {Object} The parameter value stored in the dashboard instance
