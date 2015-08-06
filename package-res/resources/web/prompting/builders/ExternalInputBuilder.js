@@ -15,10 +15,49 @@
  *
  */
 
+/**
+ * <h2>The External Input Builder</h2>
+ *
+ * To use the ExternalInputBuilder you should require the appropriate file
+ * from Common-Ui:
+ *
+ * <pre><code>
+ *   require(['common-ui/builders/ExternalInputBuilder'],
+ *     function(ExternalInputBuilder) {
+ *
+ *     }
+ *   );
+ * </code></pre>
+ *
+ * To get the component you'll have to create a new instance of the builder and
+ * call the <code>build</code> method:
+ *
+ * <pre><code>
+ *   var externalInputBuilder = new ExternalInputBuilder();
+ *
+ *   var externalInputBuilder = externalInputBuilder.build(args);
+ * </code></pre>
+ *
+ * where 'args' is an object that contains the parameters necessary for the {@link ExternalInputComponent}.
+ *
+ * @name ExternalInputBuilder
+ * @class
+ * @extends ValueBasedParameterWidgetBuilder
+ */
+
 define(['./ValueBasedParameterWidgetBuilder', '../components/ExternalInputComponent'],
     function (ValueBasedParameterWidgetBuilder, ExternalInputComponent) {
 
       return ValueBasedParameterWidgetBuilder.extend({
+        /**
+         * Creates and returns a new instance of ExternalInputComponent.
+         *
+         * @name ExternalInputComponent#build
+         * @method
+         *
+         * @param   {Object}          args - The arguments to build the widget in accordance with {@link ExternalInputComponent}
+         * @returns {ExternalInputComponent} The new instance of ExternalInputComponent
+         */
         build: function (args) {
           var formatter = args.promptPanel.createFormatter(args.promptPanel.paramDefn, args.param);
 

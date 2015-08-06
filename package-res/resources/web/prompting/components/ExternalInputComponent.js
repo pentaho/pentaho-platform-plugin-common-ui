@@ -15,8 +15,57 @@
  *
  */
 
+/**
+ * <h2>The External Input Component class</h2>
+ *
+ * <p>The ExternalInputComponent renders a necessary elements for external input.</p>
+ *
+ * To use the ExternalInputComponent you should require the appropriate file from common-ui:
+ *
+ * <pre><code>
+ *   require([ 'common-ui/components/ExternalInputComponent' ],
+ *     function(ExternalInputComponent) {
+ *       var promptPanel = ...;
+ *       var paramDefn = ...;
+ *       var args = {
+ *         promptType: 'submit',
+ *         type: 'SubmitPromptComponent',
+ *         name: 'component_name',
+ *         htmlObject: 'dom_element_id',
+ *         label: 'Submit label',
+ *         autoSubmitLabel: 'Auto-Submit label',
+ *         promptPanel: promptPanel,
+ *         paramDefn: paramDefn,
+ *         executeAtStart: true
+ *       };
+ *       var externalInputComponent = new ExternalInputComponent(args);
+ *     }
+ *   );
+ * </code></pre>
+ *
+ * where 'args' is an object that contains the parameters necessary for base CDF component and special options:
+ * <ul>
+ *   <li>promptPanel - {@link PromptPanel} used to check 'autoSubmit' and 'forceAutoSubmit' properties</li>
+ *   <li>paramDefn - {@link ParameterDefinition} used to check 'autoSubmit' property</li>
+ *   <li>param - {@link Parameter} The parameter with the properties needed to build the component</li>
+ *   <li>parameter - {@link PromptPanel#getParameterName} parameter name unique to this parameter panel</li>
+ *   <li>transportFormatter - {@link PromptPanel#createDataTransportFormatter} the format used to send over the wire</li>
+ *   <li>formatter - {@link PromptPanel#createFormatter} Formatter used to format this parameter to display</li>
+ * </ul>
+ *
+ * @name ExternalInputComponent
+ * @class
+ * @extends BaseComponent
+ */
 define(['cdf/components/BaseComponent','dojo/_base/lang', 'dijit/registry'], function(BaseComponent, lang, registry){
   return BaseComponent.extend({
+
+    /**
+     * Clears an external input element.
+     *
+     * @method
+     * @name ExternalInputComponent#clear
+     */
     clear: function () {
       if (this.dijitId) {
         if (this.onChangeHandle) {
@@ -26,6 +75,13 @@ define(['cdf/components/BaseComponent','dojo/_base/lang', 'dijit/registry'], fun
         delete this.dijitId;
       }
     },
+
+    /**
+     * Renders an external input element.
+     *
+     * @method
+     * @name ExternalInputComponent#update
+     */
     update: function () {
       var myself = this;
 
@@ -71,6 +127,12 @@ define(['cdf/components/BaseComponent','dojo/_base/lang', 'dijit/registry'], fun
       });
     },
 
+    /**
+     * Returns the value of the external input component.
+     *
+     * @method
+     * @name ExternalInputComponent#getValue
+     */
     getValue: function () {
       return registry.byId(this.dijitId).get('value');
     }
