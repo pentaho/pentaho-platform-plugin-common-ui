@@ -15,9 +15,46 @@
  *
  */
 
+/**
+ * <h2>The Submit Panel Builder</h2>
+ *
+ * To use the SubmitPanelBuilder you should require the appropriate file from common-ui:
+ *
+ * <pre><code>
+ *   require([ 'common-ui/builders/SubmitPanelBuilder' ],
+ *     function(SubmitPanelBuilder) {
+ *
+ *     }
+ *   );
+ * </code></pre>
+ *
+ * To get the component you'll have to create a new instance of the builder and call the <code>build</code> method:
+ *
+ * <pre><code>
+ *   var submitPanelBuilder = new SubmitPanelBuilder();
+ *
+ *   var flowPromptLayoutComponent = submitPanelBuilder(args);
+ * </code></pre>
+ *
+ * where 'args' is an object that contains the parameters necessary for the {@link FlowPromptLayoutComponent}.
+ *
+ * @name SubmitPanelBuilder
+ * @class
+ * @extends Base
+ */
 define(['cdf/lib/Base', '../components/FlowPromptLayoutComponent'],
     function (Base, FlowPromptLayoutComponent) {
       return Base.extend({
+
+        /**
+         * Creates and returns a new instance of FlowPromptLayoutComponent.
+         *
+         * @method
+         * @name SubmitPanelBuilder#build
+         * @param {Object}
+         *          args The arguments to build the widget in accordance with {@link FlowPromptLayoutComponent}
+         * @returns {FlowPromptLayoutComponent} The new instance of FlowPromptLayoutComponent
+         */
         build: function (args) {
           var guid = args.promptPanel.generateWidgetGUID();
 

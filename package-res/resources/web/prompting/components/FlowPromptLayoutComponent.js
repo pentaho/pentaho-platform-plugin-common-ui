@@ -15,9 +15,35 @@
  *
  */
 
+/**
+ * <h2>The Flow Prompt Layout Component class</h2>
+ *
+ * <p>The FlowPromptLayoutComponent renders elements with special css class.</p>
+ *
+ * To use the FlowPromptLayoutComponent you should require the appropriate file from common-ui:
+ *
+ * <pre><code>
+ *   require([ 'common-ui/components/FlowPromptLayoutComponent' ],
+ *     function(FlowPromptLayoutComponent) {
+ *
+ *     }
+ *   );
+ * </code></pre>
+ *
+ * @name FlowPromptLayoutComponent
+ * @class
+ * @extends PromptLayoutComponent
+ */
 define(['cdf/lib/jquery', './PromptLayoutComponent'], function($, PromptLayoutComponent){
 
   return PromptLayoutComponent.extend({
+
+    /**
+     * Renders component with special flow css class.
+     *
+     * @method
+     * @name FlowPromptLayoutComponent#update
+     */
     update: function () {
       $('#' + this.htmlObject).addClass('flow');
       this.base();
