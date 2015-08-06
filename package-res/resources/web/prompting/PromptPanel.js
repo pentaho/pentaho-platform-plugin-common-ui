@@ -27,8 +27,8 @@
  * @property {Dashboard} dashboard The dashboard object assigned to the prompt
  * @property {Boolean} parametersChanged True if the parameters have changed, False otherwise
  */
-define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/util/util', 'common-ui/util/GUIDHelper', './WidgetBuilder', 'cdf/Dashboard.Clean'],
-    function (Base, Logger, DojoNumber, i18n, Utils, GUIDHelper, WidgetBuilder, Dashboard) {
+define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/util/util', 'common-ui/util/GUIDHelper', './WidgetBuilder', 'cdf/Dashboard.Clean', './parameters/ParameterDefinitionDiffer'],
+    function (Base, Logger, DojoNumber, i18n, Utils, GUIDHelper, WidgetBuilder, Dashboard, ParamDiff) {
       /**
        * Creates a Widget calling the widget builder factory
        *
@@ -239,6 +239,8 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
           this.guid = this.promptGUIDHelper.generateGUID();
 
           this.dashboard = new Dashboard();
+
+          this.paramDiffer = new ParamDiff();
 
           this.widgetBuilder = WidgetBuilder;
         },
@@ -569,51 +571,130 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
           }
 
           if (paramDefn) {
-            this.paramDefn = paramDefn;
+            var diff = this.paramDiffer.diff(this.paramDefn, paramDefn);
 
-            // Remove this `PromptPanel`'s components from `Dashboards`.
-            if (this.components) {
-              // Postpone the clearing of removed components if we'll be showing some components.
-              // We'll clear the old components with a special component in front of all other components during init().
-              var postponeClear = this.paramDefn.showParameterUI();
-              this.removeDashboardComponents(this.components, postponeClear);
+            if (diff.changesToMake()) {
+              this.paramDefn = paramDefn;
+              this.update(diff, noAutoAutoSubmit);
+            }
+          }
+        },
 
-              // Create dictionary by parameter name, of topValue of multi-select listboxes, for restoring later, when possible.
-              // But not for mobile, cause the UIs vary. Would need more time to check each.
-              var topValuesByParam;
-              if (!(/android|ipad|iphone/i).test(navigator.userAgent)) {
-                topValuesByParam = this._multiListBoxTopValuesByParam = {};
+        /**
+         * Updates the dashboard and prompt panel based off of differences in the parameter definition
+         * @method update
+         * @param {JSON} diff - contains the differences between the old and new parameter definitions
+         * @param {bool} noAutoAutoSubmit
+         */
+        update: function(diff, noAutoAutoSubmit) {
+
+          // Retrieves a component by a param
+          var _getComponentByParam = (function(param, getPanel) {
+            var parameterName = this.getParameterName(param);
+            return _getComponentByParamName(parameterName, getPanel);
+          }).bind(this);
+
+          var _getComponentByParamName = (function(parameterName, getPanel) {
+            for (var i in this.components) {
+              var component = this.components[i];
+              if (component.parameter === parameterName) {
+                var isPanel = component.type.search("Panel") > -1;
+                if ((getPanel && isPanel) || (!getPanel && !isPanel)) {
+                  return component;
+                }
               }
+            }
+            return null;
+          }).bind(this);
 
-              var focusedParam;
-              _mapComponentsList(this.components, function (component) {
-                if (!component.components && component.param && component.promptType === 'prompt') {
-                  if (!focusedParam) {
-                    var ph = component.placeholder();
-                    if ($(":focus", ph).length) {
-                      focusedParam = component.param.name;
-                    }
-                  }
+          // Removes a single component from dashboard and prompt panel
+          var _removeComponent = (function(component) {
+            this.dashboard.removeComponent(component);
+            for (var i in this.components) {
+              if (this.components[i].name == component.name) {
+                this.components.splice(i, 1);
+                break;
+              }
+            }
+            component.clear();
+          }).bind(this);
 
-                  if (topValuesByParam && component.type === 'SelectMultiComponent') {
-                    var topValue = component.topValue();
-                    if (topValue != null) {
-                      topValuesByParam['_' + component.param.name] = topValue;
-                    }
-                  }
-                } else if (topValuesByParam && component.type === 'ScrollingPromptPanelLayoutComponent') {
-                  // save last scroll position for prompt panel
-                  var scrollTopValue = component.placeholder().children(".prompt-panel").scrollTop();
-                  if (scrollTopValue != null) {
-                    topValuesByParam['_' + component.name] = scrollTopValue;
+          var _addComponent = (function(component) {
+            this.dashboard.addComponent(component);
+            this.components.push(component);
+            this.dashboard.updateComponent(component);
+
+            for (var i in component.components) { // Loop through panel components
+              _addComponent(component.components[i]);
+            }
+          }).bind(this);
+
+          if(diff.toRemove.length > 0) { // To Remove
+            for (var i in diff.toRemove) {
+              var param = diff.toRemove[i];
+              var component = _getComponentByParam(param, true); // get component panel
+
+              if (component != null) {
+                if (component.components) { // Panel component has many components to be cleaned up
+                  for (var j in component.components) { // Loop through panel components
+                    _removeComponent(component.components[j]);
                   }
                 }
-              });
-
-              this._focusedParam = focusedParam;
+                _removeComponent(component);
+                $("#" + component.htmlObject).remove(); // Clean up remaining html object
+              }
             }
 
-            this.init(noAutoAutoSubmit);
+          }
+
+          if(diff.toAdd.length > 0) { // To Add
+            for (var i in diff.toAdd) {
+              var param = diff.toAdd[i];
+              var component = this._buildPanelForParameter(param); // returns a panel component
+
+              var panelComponent = this.dashboard.getComponentByName("prompt" + this.guid);
+              panelComponent.components.push(component);
+
+              // Psuedo update call for panel component, without wiping out other components on update
+              var markup = panelComponent.getMarkupFor(component);
+              var className = component.promptType === 'submit' ? "submit-panel" : "prompt-panel";
+              $("#" + panelComponent.htmlObject + " ." + className).append(markup);
+
+              _addComponent(component);
+            }
+          }
+
+          if(diff.toChangeData.length > 0) { // To Change
+            for (var i in diff.toChangeData) {
+              var param = diff.toChangeData[i];
+
+              // Find selected value in param values list and set it. This works, even if the data in valuesArray is different
+              var selectedValues = param.getSelectedValuesValue();
+              for (var j in selectedValues) {
+                this.setParameterValue(param, selectedValues[j]);
+              }
+
+              var component = _getComponentByParam(param);
+              if (component != null) {
+                // Create new widget to get properly formatted values array
+                var newValuesArray = WidgetBuilder.WidgetBuilder.build({
+                  param: param,
+                  promptPanel: this
+                }, param.attributes["parameter-render-type"]).valuesArray;
+
+                // Compare values array from param (which is formatted into valuesArray) with the current valuesArray
+                if (JSON.stringify(component.valuesArray) !== JSON.stringify(newValuesArray)) {
+                  component.valuesArray = newValuesArray;
+                }
+
+                // Update still needs to be called b/c we are setting a new value above
+                this.dashboard.updateComponent(component);
+              }
+            }
+          }
+
+          if(!noAutoAutoSubmit) {
+            this.submit(this, {isInit: false});
           }
         },
 
@@ -683,23 +764,7 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
                 }
               }
             });
-
-            if (this.components && this.components.length > 0) {
-              // We have old components we MUST call .clear() on to prevent memory leaks. In order to
-              // prevent flickering we must do this during the same execution block as when Dashboards
-              // updates the new components. We'll use our aptly named GarbageCollectorBuilder to handle this.
-              var gc = this.widgetBuilder.build({
-                promptPanel: this,
-                components: this.components
-              }, 'gc');
-
-              if (!gc) {
-                throw 'Cannot create garbage collector';
-              }
-
-              components = [gc].concat(components);
-            }
-
+            
             this.components = components;
             this.dashboard.addComponents(this.components);
             this.dashboard.init();
