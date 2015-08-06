@@ -15,10 +15,47 @@
  *
  */
 
+/**
+ * <h2>The Submit Component Builder</h2>
+ *
+ * To use the SubmitComponentBuilder you should require the appropriate file from common-ui:
+ *
+ * <pre><code>
+ *   require([ 'common-ui/builders/SubmitComponentBuilder' ],
+ *     function(SubmitComponentBuilder) {
+ *
+ *     }
+ *   );
+ * </code></pre>
+ *
+ * To get the component you'll have to create a new instance of the builder and call the <code>build</code> method:
+ *
+ * <pre><code>
+ *   var submitComponentBuilder = new SubmitComponentBuilder();
+ *
+ *   var submitPromptComponent = submitComponentBuilder.build(args);
+ * </code></pre>
+ *
+ * where 'args' is an object that contains the parameters necessary for the {@link SubmitPromptComponent}.
+ *
+ * @name SubmitComponentBuilder
+ * @class
+ * @extends Base
+ */
 define(['cdf/lib/Base', '../components/SubmitPromptComponent'],
     function (Base, SubmitPromptComponent) {
 
       return Base.extend({
+
+        /**
+         * Creates and returns a new instance of SubmitPromptComponent.
+         *
+         * @method
+         * @name SubmitComponentBuilder#build
+         * @param {Object}
+         *          args The arguments to build the widget in accordance with {@link SubmitPromptComponent}
+         * @returns {SubmitPromptComponent} The new instance of SubmitPromptComponent
+         */
         build: function (args) {
           var guid = args.promptPanel.generateWidgetGUID();
 
