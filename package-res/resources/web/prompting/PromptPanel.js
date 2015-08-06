@@ -27,8 +27,8 @@
  * @property {Dashboard} dashboard The dashboard object assigned to the prompt
  * @property {Boolean} parametersChanged True if the parameters have changed, False otherwise
  */
-define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/util/GUIDHelper', './WidgetBuilder', 'cdf/Dashboard.Clean', './components/PostInitComponent'],
-    function (_, Base, Logger, DojoNumber, i18n, GUIDHelper, WidgetBuilder, Dashboard, PostInitComponent) {
+define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/util/GUIDHelper', './WidgetBuilder', 'cdf/Dashboard.Clean'],
+    function (_, Base, Logger, DojoNumber, i18n, GUIDHelper, WidgetBuilder, Dashboard) {
 
       /**
        * Checks if the type is numeric
@@ -659,9 +659,6 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
               delete this._focusedParam;
             }
 
-            // dummy component for prompt panel scroll restoring (after all components was rendered)
-            var postInitComponent = new PostInitComponent();
-
             _mapComponents(layout, function (component) {
               components.push(component);
 
@@ -688,16 +685,17 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
                 // save prompt pane reference and scroll value to dummy component
                 var scrollTopValue = topValuesByParam['_' + component.name];
                 if (scrollTopValue != null) {
-                  postInitComponent.promptPanelScrollValue = scrollTopValue;
-                  postInitComponent.promptPanel = component.htmlObject;
+                  this.dashboard.postInit(function(){
+                      // restore last scroll position for prompt panel
+                      if (scrollTopValue) {
+                        $("#" + component.htmlObject).children(".prompt-panel").scrollTop(scrollTopValue);
+                        delete scrollTopValue;
+                      }
+                    }
+                  )
                 }
               }
             });
-
-            // add dummy component to components list
-            if (postInitComponent.promptPanelScrollValue) {
-              this.dashboard.addComponent(postInitComponent);
-            }
 
             if (this.components && this.components.length > 0) {
               // We have old components we MUST call .clear() on to prevent memory leaks. In order to
