@@ -42,7 +42,12 @@
   requirePaths["json"   ] = basePath + "/util/require-json/json";
   requirePaths["text"   ] = basePath + "/util/require-text/text";
   // Using `map` is important for use in r.js and correct AMD config of the other files of the package.
-  requireMap["*"]["css" ] = "common-ui/util/require-css/css" + minSuffix;
+  // Placing the minSuffix in the path ensures building works well,
+  // so that the resolved module id is the same in both debug and non-debug cases.
+  if(minSuffix) {
+    requirePaths["common-ui/util/require-css/css"] = basePath + "/util/require-css/css" + minSuffix;
+  }
+  requireMap["*"]["css" ] = "common-ui/util/require-css/css";
 
   // SHIMS
   requirePaths["es6-promise-shim"] = basePath + "/util/es6-promise-shim";

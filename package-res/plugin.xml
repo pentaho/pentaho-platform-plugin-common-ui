@@ -68,10 +68,9 @@
          Uncomment to test.
          Also, enable VizAPI version 3 visualizations by editing the configuration file:
          "resources/web/visual/config.js".
-      -->
 
     <file context="analyzer">content/common-ui/resources/web/visual/ccc/analyzer_plugin_loader.js</file>
     <file context="analyzer">content/common-ui/resources/web/visual/sample/analyzer_plugin_loader.js</file>
-
+    -->
   </external-resources>
 </plugin>
