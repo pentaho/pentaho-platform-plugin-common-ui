@@ -67,13 +67,35 @@ define(['./FormattedParameterWidgetBuilderBase', 'cdf/components/TextareaInputCo
           var widget = this.base(args);
           $.extend(widget, {
             name: widget.name + '-input',
-            type: 'TextareaInputComponent'
+            type: 'TextareaInputComponent',
+            postExecution: function () {
+              
+              var input = $('#' + this.htmlObject + '-input');
+              
+              input.change(function () {
+                // blur wasn't good enough. clicking of the submit button without clicking out of the text component
+                // doesn't trigger blur. so modified text fields can have a stale value.
+                // we now use the jQuery ui focusout event on the input.
+              }.bind(this));
+
+              input.keypress(function (e) {
+                if (e.which === 13) {
+                  this.dashboard.processChange(this.name);
+                }
+              }.bind(this));
+
+              input.focusout(function () {
+                this.getValue();
+              }.bind(this));
+
+              this._doAutoFocus();
+            }
           });
 
           var comp = new TextareaInputComponent(widget);
           //override just the getValue function to allow format values
           comp.getValue = function(){
-            var val = $('#' + name).val();
+            var val = $('#' + this.name).val();
             if (this.formatter) {
               return this.transportFormatter.format(this.formatter.parse(val));
             } else {
