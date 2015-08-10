@@ -35,6 +35,8 @@ define(['common-ui/prompting/builders/ExternalInputBuilder'], function(ExternalI
 
     beforeEach(function() {
       externalInputBuilder = new ExternalInputBuilder();
+      spyOn(externalInputBuilder, '_createFormatter').and.returnValue(null);
+      spyOn(externalInputBuilder, '_createDataTransportFormatter').and.returnValue(null);
     });
 
     it("should throw an error building component with no parameters", function() {      

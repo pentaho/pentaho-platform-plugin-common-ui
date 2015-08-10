@@ -14,9 +14,9 @@
  * limitations under the License.
  *
  */
-define(['common-ui/prompting/builders/PlainPromptBuilder'], function(PlainPromptBuilder) {
+define(['common-ui/prompting/builders/StaticAutocompleteBoxBuilder'], function(StaticAutocompleteBoxBuilder) {
 
-  describe("PlainPromptBuilder", function() {
+  describe("StaticAutocompleteBoxBuilder", function() {
 
     var args = {
       promptPanel: {
@@ -31,18 +31,20 @@ define(['common-ui/prompting/builders/PlainPromptBuilder'], function(PlainPrompt
       }
     };
 
-    var plainPromptBuilder;
+    var staticAutocompleteBoxBuilder;
 
     beforeEach(function() {
-      plainPromptBuilder = new PlainPromptBuilder();
+      staticAutocompleteBoxBuilder = new StaticAutocompleteBoxBuilder();
+      spyOn(staticAutocompleteBoxBuilder, '_createFormatter').and.returnValue(null);
+      spyOn(staticAutocompleteBoxBuilder, '_createDataTransportFormatter').and.returnValue(null);
     });
 
     it("should throw an error building component with no parameters", function() {
-      expect(plainPromptBuilder.build).toThrow();
+      expect(staticAutocompleteBoxBuilder.build).toThrow();
     });
 
     it("should return a StaticAutocompleteBoxComponent", function() {
-      var component = plainPromptBuilder.build(args);
+      var component = staticAutocompleteBoxBuilder.build(args);
       expect(component.type).toBe('StaticAutocompleteBoxComponent');
     });
 

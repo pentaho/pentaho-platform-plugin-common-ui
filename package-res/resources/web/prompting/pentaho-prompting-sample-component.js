@@ -58,5 +58,5 @@ define("common-ui/prompting/pentaho-prompting-sample-component",
 // We require the Prompting Builder API to be loaded as we'll replace the existing label builder with ours
 [ 'common-ui/prompting/WidgetBuilder', 'MyCustomBuilder' ], function(WidgetBuilder, MyCustomBuilder) {
   // Replace the label component builder with ours
-  WidgetBuilder.WidgetBuilder.mapping['label'] = new MyCustomBuilder();
+  WidgetBuilder.mapping['label'] = new MyCustomBuilder();
 });

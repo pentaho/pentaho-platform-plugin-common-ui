@@ -53,10 +53,9 @@
       var paramDefn;
 
       require([
-        'common-ui/util/formatting',
         'common-ui/prompting/parameters/ParameterXmlParser',
         'common-ui/prompting/PromptPanel'
-        ], function(ReportFormatUtil, ParameterXmlParser, PromptPanel) {
+        ], function(ParameterXmlParser, PromptPanel) {
             // This script element contains the sample code to parse the parameter xml and build/refresh the prompt.
             window.paramParser = new ParameterXmlParser();
             var promptPanel;
@@ -111,16 +110,13 @@
 
                 promptPanel.getExternalValueForParam = function(param) {
                   if(param.attributes['parameter-render-type'] == 'filebrowser'){
-                    return prompt("Please enter the file path"); 
-                  } 
+                    return prompt("Please enter the file path");
+                  }
 
                   if(param.attributes['parameter-render-type'] == 'external-input'){
-                    return prompt("Please enter a value"); 
-                  }                     
+                    return prompt("Please enter a value");
+                  }
                 }
-
-                  promptPanel.createDataTransportFormatter = ReportFormatUtil.createDataTransportFormatter.bind(ReportFormatUtil);
-                  promptPanel.createFormatter = ReportFormatUtil.createFormatter.bind(ReportFormatUtil);
 
                   promptPanel.init();
                 } else {

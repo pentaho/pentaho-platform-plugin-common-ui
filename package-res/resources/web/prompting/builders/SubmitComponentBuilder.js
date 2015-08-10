@@ -21,7 +21,7 @@
  * To use the SubmitComponentBuilder you should require the appropriate file from common-ui:
  *
  * <pre><code>
- *   require([ 'common-ui/builders/SubmitComponentBuilder' ],
+ *   require([ 'common-ui/promting/builders/SubmitComponentBuilder' ],
  *     function(SubmitComponentBuilder) {
  *
  *     }

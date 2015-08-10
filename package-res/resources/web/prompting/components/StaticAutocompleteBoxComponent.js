@@ -15,16 +15,56 @@
  *
  */
 
-define([ 'cdf/components/BaseComponent', 'dojo/number', 'amd!cdf/lib/jquery.ui' ], function(BaseComponent, DojoNumber,
+/**
+ * <h2>The Static Autocomplete Box Component class</h2>
+ *
+ * <p>The StaticAutocompleteBoxComponent renders an autocomplete input box that helps users with the sugestions based on his input</p>
+ *
+ * To use the StaticAutocompleteBoxComponent you should require the appropriate file from common-ui:
+ *
+ * <pre><code>
+ *   require([ 'common-ui/prompting/components/StaticAutocompleteBoxComponent' ],
+ *     function(StaticAutocompleteBoxComponent) {
+ *       var paramDefn = ...;
+ *       var param = ...;
+ *       var formatter = createFormatter(paramDefn, param);
+ *       var transportFormatter = createDataTransportFormatter(paramDefn, param);
+ *       var args = {
+ *         type: 'StaticAutocompleteBoxBuilder',
+ *         name: 'component_name',
+ *         htmlObject: 'dom_element_id',
+ *         formatter: formatter,
+ *         transportFormatter: transportFormatter,
+ *         executeAtStart: true
+ *       };
+ *       var staticAutocompleteBoxComponent = new StaticAutocompleteBoxComponent(args);
+ *     }
+ *   );
+ * </code></pre>
+ *
+ * where 'args' is an object that contains the parameters necessary for base CDF component and special options:
+ * <ul>
+ *   <li>param - {@link Parameter} the parameter info about this widget</li>
+ *   <li>paramDefn - {@link ParameterDefinition} the parameter definition used to create the formatter</li>
+ *   <li>formatter - {@link formatting} utility to format values</li>
+ *   <li>transportFormatter - {@link formatting} utility to format values</li>
+ * </ul>
+ *
+ * @name StaticAutocompleteBoxComponent
+ * @class
+ * @extends BaseComponent
+ */
+define([ 'common-ui/util/util', 'cdf/components/BaseComponent', 'dojo/number', 'amd!cdf/lib/jquery.ui' ], function(Utils, BaseComponent, DojoNumber,
   $) {
 
-  function _isNumberType(type) {
-    var whiteList = [ "java.lang.Number", "java.lang.Byte", "java.lang.Double", "java.lang.Float", "java.lang.Integer",
-      "java.lang.Long", "java.lang.Short", "java.math.BigDecimal", "java.math.BigInteger" ];
-    return _.contains(whiteList, type);
-  }
-
   return BaseComponent.extend({
+
+    /**
+     * Creates a static autocomplete box element.
+     *
+     * @method
+     * @name StaticAutocompleteBoxComponent#update
+     */
     update : function() {
       var myself = this;
 
@@ -50,7 +90,7 @@ define([ 'cdf/components/BaseComponent', 'dojo/number', 'amd!cdf/lib/jquery.ui' 
               if (isNaN(v.label) || Math.abs(v.label) == Infinity) {
                 var valueParsed = null;
               } else {
-                if (_isNumberType(v.type)) {
+                if (Utils.isNumberType(v.type)) {
                   valueParsed = DojoNumber.format(v.label, {
                     locale : SESSION_LOCALE.toLowerCase()
                   });
@@ -136,6 +176,14 @@ define([ 'cdf/components/BaseComponent', 'dojo/number', 'amd!cdf/lib/jquery.ui' 
       this._doAutoFocus();
     },
 
+    /**
+     * Returns the value assigned to the component
+     *
+     * @method
+     * @name StaticAutocompleteBoxComponent#getValue
+     *
+     * @returns {String} The string inserted in the text area, parsed using the common-ui formatters
+     */
     getValue : function() {
       var val = $('#' + this.htmlObject + '-input').val();
       if (this.param.list) {

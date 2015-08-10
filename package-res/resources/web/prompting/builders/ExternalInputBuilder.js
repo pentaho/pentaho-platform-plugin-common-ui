@@ -22,7 +22,7 @@
  * from Common-Ui:
  *
  * <pre><code>
- *   require(['common-ui/builders/ExternalInputBuilder'],
+ *   require(['common-ui/prompting/builders/ExternalInputBuilder'],
  *     function(ExternalInputBuilder) {
  *
  *     }
@@ -35,20 +35,20 @@
  * <pre><code>
  *   var externalInputBuilder = new ExternalInputBuilder();
  *
- *   var externalInputBuilder = externalInputBuilder.build(args);
+ *   var externalInputComponent = externalInputBuilder.build(args);
  * </code></pre>
  *
  * where 'args' is an object that contains the parameters necessary for the {@link ExternalInputComponent}.
  *
  * @name ExternalInputBuilder
  * @class
- * @extends ValueBasedParameterWidgetBuilder
+ * @extends FormattedParameterWidgetBuilderBase
  */
 
-define(['./ValueBasedParameterWidgetBuilder', '../components/ExternalInputComponent'],
-    function (ValueBasedParameterWidgetBuilder, ExternalInputComponent) {
+define(['./FormattedParameterWidgetBuilderBase', '../components/ExternalInputComponent'],
+    function (FormattedParameterWidgetBuilderBase, ExternalInputComponent) {
 
-      return ValueBasedParameterWidgetBuilder.extend({
+      return FormattedParameterWidgetBuilderBase.extend({
         /**
          * Creates and returns a new instance of ExternalInputComponent.
          *
@@ -59,13 +59,9 @@ define(['./ValueBasedParameterWidgetBuilder', '../components/ExternalInputCompon
          * @returns {ExternalInputComponent} The new instance of ExternalInputComponent
          */
         build: function (args) {
-          var formatter = args.promptPanel.createFormatter(args.promptPanel.paramDefn, args.param);
-
           var widget = this.base(args);
           $.extend(widget, {
             type: 'ExternalInputComponent',
-            transportFormatter: args.promptPanel.createDataTransportFormatter(args.promptPanel.paramDefn, args.param, formatter),
-            formatter: formatter,
             promptPanel: args.promptPanel,
             paramDefn: args.promptPanel.paramDefn
           });

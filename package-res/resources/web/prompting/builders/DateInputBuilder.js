@@ -15,18 +15,52 @@
  *
  */
 
-define(['./ValueBasedParameterWidgetBuilder', '../components/DojoDateTextBoxComponent'],
-    function (ValueBasedParameterWidgetBuilder, DojoDateTextBoxComponent) {
+/**
+ * <h2>The Date Input Builder</h2>
+ *
+ * To use the DateInputBuilder you should require the appropriate file
+ * from Common-Ui:
+ *
+ * <pre><code>
+ *   require(['common-ui/prompting/builders/DateInputBuilder'],
+ *     function(DateInputBuilder) {
+ *
+ *     }
+ *   );
+ * </code></pre>
+ *
+ * To get the component you'll have to create a new instance of the builder and
+ * call the <code>build</code> method:
+ *
+ * <pre><code>
+ *   var dateInputBuilder = new DateInputBuilder();
+ *
+ *   var dateInputComponent = dateInputBuilder.build(args);
+ * </code></pre>
+ *
+ * where 'args' is an object that contains the parameters necessary for the {@link DojoDateTextBoxComponent}.
+ *
+ * @name DateInputBuilder
+ * @class
+ * @extends ValueBasedParameterWidgetBuilder
+ */
+define(['./FormattedParameterWidgetBuilderBase', '../components/DojoDateTextBoxComponent'],
+    function (FormattedParameterWidgetBuilderBase, DojoDateTextBoxComponent) {
 
-      return ValueBasedParameterWidgetBuilder.extend({
+      return FormattedParameterWidgetBuilderBase.extend({
+        /**
+         * Creates and returns a new instance of DojoDateTextBoxComponent.
+         *
+         * @name DateInputBuilder#build
+         * @method
+         *
+         * @param   {Object}          args - The arguments to build the widget in accordance with {@link DojoDateTextBoxComponent}
+         * @returns {ExternalInputComponent} The new instance of DojoDateTextBoxComponent
+         */
         build: function (args) {
-          var formatter = args.promptPanel.createFormatter(args.promptPanel.paramDefn, args.param);
-
           var widget = this.base(args);
           $.extend(widget, {
-            type: 'DojoDateTextBoxComponent',
-            transportFormatter: args.promptPanel.createDataTransportFormatter(args.promptPanel.paramDefn, args.param, formatter),
-            formatter: formatter
+            type: 'DojoDateTextBoxComponent'
           });
 
           return new DojoDateTextBoxComponent(widget);

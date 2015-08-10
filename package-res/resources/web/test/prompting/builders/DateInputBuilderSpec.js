@@ -21,9 +21,7 @@ define(['common-ui/prompting/builders/DateInputBuilder'], function(DateInputBuil
     var args = {
       promptPanel: {
         generateWidgetGUID: function() { },
-        getParameterName: function() { },
-        createFormatter: function() { },
-        createDataTransportFormatter: function() { }
+        getParameterName: function() { }
       }, 
       param:  {
         values: { },
@@ -35,6 +33,8 @@ define(['common-ui/prompting/builders/DateInputBuilder'], function(DateInputBuil
 
     beforeEach(function() {
       dateInputBuilder = new DateInputBuilder();
+      spyOn(dateInputBuilder, '_createFormatter').and.returnValue(null);
+      spyOn(dateInputBuilder, '_createDataTransportFormatter').and.returnValue(null);
     });
 
     it("should throw an error building component with no parameters", function() {

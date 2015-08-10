@@ -22,7 +22,7 @@
  * from Common-Ui:
  *
  * <pre><code>
- *   require(['common-ui/builders/DropDownBuilder'],
+ *   require(['common-ui/prompting/builders/DropDownBuilder'],
  *     function(DropDownBuilder) {
  *
  *     }

@@ -18,23 +18,21 @@ define(['common-ui/prompting/WidgetBuilder', 'common-ui/prompting/builders/Promp
 
   describe("WidgetBuilder", function() {
 
-    var wb = WidgetBuilder.WidgetBuilder;
-
     it("should have mappings array", function() {       
-      expect(wb.mapping).toBeDefined();
+      expect(WidgetBuilder.mapping).toBeDefined();
     });
 
     it("should throw an error trying to build a prompt-panel with no arguments", function() {
-      expect(wb.build).toThrow();
+      expect(WidgetBuilder.build).toThrow();
     });
 
     it("should successfully build a prompt panel", function() {
       var buildPanelComponentsFn = jasmine.createSpy('buildPanelComponents');
       var args = {
         buildPanelComponents: buildPanelComponentsFn
-      } 
+      };
 
-      var panel = wb.build(args, 'prompt-panel');
+      var panel = WidgetBuilder.build(args, 'prompt-panel');
       expect(panel.type).toEqual('ScrollingPromptPanelLayoutComponent');
       expect(buildPanelComponentsFn).toHaveBeenCalled();
       expect(panel.promptPanel).toBeDefined();

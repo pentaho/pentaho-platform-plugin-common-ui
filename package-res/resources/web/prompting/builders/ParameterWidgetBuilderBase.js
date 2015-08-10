@@ -22,7 +22,7 @@
  * from Common-Ui:
  *
  * <pre><code>
- *   require(['common-ui/builders/ParameterWidgetBuilderBase'],
+ *   require(['common-ui/prompting/builders/ParameterWidgetBuilderBase'],
  *     function(ParameterWidgetBuilderBase) {
  *
  *     }
