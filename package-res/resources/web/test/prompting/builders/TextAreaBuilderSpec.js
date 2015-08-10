@@ -20,7 +20,7 @@ define(['common-ui/prompting/builders/TextAreaBuilder'], function(TextAreaBuilde
 
     var args = {
       promptPanel: {
-        generateWidgetGUID: function() { },
+        generateWidgetGUID: function() { return "12345" },
         getParameterName: function() { }
       }, 
       param:  {
@@ -47,44 +47,90 @@ define(['common-ui/prompting/builders/TextAreaBuilder'], function(TextAreaBuilde
     });
 
     //check if it needs to go to CDF
-    xit("should fire a change in the dashboard on enter keypress", function() {
+    it("should fire a change in the dashboard on enter keypress", function() {
       var component = textAreaBuilder.build(args);
       component.dashboard = { 
         processChange: function() { },
         getParameterValue: function() { return 'test' }
       };
-      component.htmlObject = 'test';
+
       var ph = $('<div>').attr('id', component.htmlObject);
       $('body').append(ph);
 
-      component.update();  
+      component.update();
+      component.postExecution();
 
       spyOn(component.dashboard, 'processChange');
       $('textarea', component.ph).trigger(jQuery.Event( 'keypress', { which: 13 } ));
+      
+      expect(component.dashboard.processChange).toHaveBeenCalled();  
+      
+      ph.remove(); 
+    });
 
-      expect(component.dashboard.processChange).toHaveBeenCalled();
+    //check if it needs to go to CDF
+    it("should fire a change in the dashboard on focusout", function() {
+      var component = textAreaBuilder.build(args);
+      component.dashboard = { 
+        processChange: function() { },
+        getParameterValue: function() { return 'test' }
+      };
+      
+      var ph = $('<div>').attr('id', component.htmlObject);
+      $('body').append(ph);
+
+      component.update();
+      component.postExecution();
+
+      spyOn(component, 'getValue');      
+      $('textarea', component.ph).trigger(jQuery.Event( 'focusout', { } ));
+
+      expect(component.getValue).toHaveBeenCalled();  
       
       ph.remove();
     });
 
-    //check if it needs to go to CDF
-    xit("should fire a change in the dashboard on focusout", function() {
+    it("should get value of component with no formatter present", function() {
       var component = textAreaBuilder.build(args);
+      var parameterValue = 'test';
       component.dashboard = { 
         processChange: function() { },
-        getParameterValue: function() { return 'test' }
+        getParameterValue: function() { return parameterValue }
       };
-      component.htmlObject = 'test';
+
       var ph = $('<div>').attr('id', component.htmlObject);
       $('body').append(ph);
 
-      component.update();  
+      component.update();
+      component.postExecution();
 
-      spyOn(component.dashboard, 'processChange');
-      $('textarea', component.ph).trigger(jQuery.Event( 'focusout', { } ));
+      expect(component.getValue()).toBe(parameterValue);
 
-      expect(component.dashboard.processChange).toHaveBeenCalled();
-      
+      ph.remove();
+    });
+
+    it("should get value of component with formatter present", function() {
+      var component = textAreaBuilder.build(args);
+      var parameterValue = 'test';
+      component.dashboard = { 
+        processChange: function() { },
+        getParameterValue: function() { return parameterValue; }
+      };
+      component.formatter = {
+        parse: function() { return parameterValue; }
+      };
+      component.transportFormatter = {
+        format: function(arg) { return arg; }
+      }
+
+      var ph = $('<div>').attr('id', component.htmlObject);
+      $('body').append(ph);
+
+      component.update();
+      component.postExecution();
+
+      expect(component.getValue()).toBe(parameterValue);
+
       ph.remove();
     });
   
