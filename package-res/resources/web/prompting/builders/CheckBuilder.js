@@ -21,7 +21,7 @@
  * To use the CheckBuilder you should require the appropriate file from common-ui:
  *
  * <pre><code>
- *   require([ 'common-ui/builders/CheckBuilder' ],
+ *   require([ 'common-ui/prompting/builders/CheckBuilder' ],
  *     function(CheckBuilder) {
  *
  *     }

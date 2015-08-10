@@ -33,6 +33,8 @@ define(['common-ui/prompting/builders/TextInputBuilder'], function(TextInputBuil
 
     beforeEach(function() {
       textInputBuilder = new TextInputBuilder();
+      spyOn(textInputBuilder, '_createFormatter').and.returnValue(null);
+      spyOn(textInputBuilder, '_createDataTransportFormatter').and.returnValue(null);
     });
 
     it("should throw an error building component with no parameters", function() {

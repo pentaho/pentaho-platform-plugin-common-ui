@@ -22,7 +22,7 @@
  * from Common-Ui:
  *
  * <pre><code>
- *   require(['common-ui/builders/ValueBasedParameterWidgetBuilder'],
+ *   require(['common-ui/promting/builders/ValueBasedParameterWidgetBuilder'],
  *     function(ValueBasedParameterWidgetBuilder) {
  *
  *     }

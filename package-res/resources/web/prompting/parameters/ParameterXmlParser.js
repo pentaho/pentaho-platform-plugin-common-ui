@@ -21,8 +21,8 @@
  * @name ParameterXmlParser
  * @class
  */
-define(['cdf/lib/Base', 'common-ui/util/base64', './Parameter', './ParameterDefinition', './ParameterGroup', './ParameterValue'],
-    function (Base, Base64Util, Parameter, ParameterDefinition, ParameterGroup, ParameterValue) {
+define(['cdf/lib/Base', 'common-ui/util/base64', 'common-ui/util/formatting',  './Parameter', './ParameterDefinition', './ParameterGroup', './ParameterValue'],
+    function (Base, Base64Util, Formatter, Parameter, ParameterDefinition, ParameterGroup, ParameterValue) {
 
       /**
        * Parses the xml retrieved from the server call
@@ -172,26 +172,10 @@ define(['cdf/lib/Base', 'common-ui/util/base64', './Parameter', './ParameterDefi
           }
           pVal.selected = 'true' == value.attr('selected');
 
-          pVal.value = _normalizeParameterValue(parameter, pVal.type, pVal.value);
+          pVal.value = Formatter.normalizeParameterValue(parameter, pVal.type, pVal.value);
           values.push(pVal);
         }.bind(this));
         return values;
-      };
-
-      /**
-       * Called for every parameter value that is parsed. Override this to update the parameter
-       * value at parse time.
-       *
-       * @name ParameterXmlParser#_normalizeParameterValue
-       * @method
-       * @param {Parameter} parameter The Parameter instance
-       * @param {String} type The type of the parameter
-       * @param {Object} value The value to be normalized
-       * @return {Object} The normalized value
-       * @private
-       */
-      var _normalizeParameterValue = function (parameter, type, value) {
-        return value;
       };
 
       return Base.extend({

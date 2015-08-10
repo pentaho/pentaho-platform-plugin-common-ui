@@ -223,14 +223,6 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
         });
       });
 
-      it("createDataTransportFormatter", function() {
-        expect(panel.createDataTransportFormatter()).not.toBeDefined();
-      });
-
-      it("createFormatter", function() {
-        expect(panel.createFormatter()).not.toBeDefined();
-      });
-
       it("generateWidgetGUID", function() {
         var widgetGuid = panel.generateWidgetGUID();
         expect(widgetGuid).toBeDefined();
@@ -558,6 +550,8 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
             label : "test label"
           };
           panel.paramDefn.errors[param.name] = [ "Error 1" ];
+          spyOn(panel.widgetBuilder.mapping['default'], '_createFormatter').and.returnValue(null);
+          spyOn(panel.widgetBuilder.mapping['default'], '_createDataTransportFormatter').and.returnValue(null);
           var paramPanel = panel._buildPanelForParameter(param);
           expect(paramPanel).toBeDefined();
           expect(panel._initializeParameterValue).toHaveBeenCalledWith(panel.paramDefn, param);
@@ -565,7 +559,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
           expect(paramPanel.components.length).toBe(3);
           expect(paramPanel.components[0].type).toBe("TextComponent");
           expect(paramPanel.components[1].type).toBe("TextComponent");
-          expect(paramPanel.components[2].type).toBe("StaticAutocompleteBoxComponent");
+          expect(paramPanel.components[2].type).toBe("TextInputComponent");
           expect(paramPanel.components[0].promptType).toBe("label");
           expect(paramPanel.components[1].promptType).toBe("label");
           expect(paramPanel.components[2].promptType).toBe("prompt");

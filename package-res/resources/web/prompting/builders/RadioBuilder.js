@@ -21,7 +21,7 @@
  * To use the RadioBuilder you should require the appropriate file from common-ui:
  *
  * <pre><code>
- *   require([ 'common-ui/builders/RadioBuilder' ],
+ *   require([ 'common-ui/prompting/builders/RadioBuilder' ],
  *     function(RadioBuilder) {
  *
  *     }

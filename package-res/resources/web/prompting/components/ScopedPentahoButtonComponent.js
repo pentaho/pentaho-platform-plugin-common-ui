@@ -25,7 +25,7 @@
  * To use the ScopedPentahoButtonComponent you should require the appropriate file from common-ui:
  *
  * <pre><code>
- *   require([ 'common-ui/components/ScopedPentahoButtonComponent' ],
+ *   require([ 'common-ui/promting/components/ScopedPentahoButtonComponent' ],
  *     function(ScopedPentahoButtonComponent) {
  *
  *     }

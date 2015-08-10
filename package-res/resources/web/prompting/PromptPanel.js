@@ -27,23 +27,8 @@
  * @property {Dashboard} dashboard The dashboard object assigned to the prompt
  * @property {Boolean} parametersChanged True if the parameters have changed, False otherwise
  */
-define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/util/GUIDHelper', './WidgetBuilder', 'cdf/Dashboard.Clean'],
-    function (_, Base, Logger, DojoNumber, i18n, GUIDHelper, WidgetBuilder, Dashboard) {
-
-      /**
-       * Checks if the type is numeric
-       *
-       * @name PromptPanel#_isNumberType
-       * @method
-       * @param {String} type
-       * @return {Boolean} if the type is a numeric type
-       * @private
-       */
-      var _isNumberType = function (type) {
-        var whiteList = ["java.lang.Number", "java.lang.Byte", "java.lang.Double", "java.lang.Float", "java.lang.Integer", "java.lang.Long", "java.lang.Short", "java.math.BigDecimal", "java.math.BigInteger"];
-        return _.contains(whiteList, type);
-      };
-
+define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/util/util', 'common-ui/util/GUIDHelper', './WidgetBuilder', 'cdf/Dashboard.Clean'],
+    function (_, Base, Logger, DojoNumber, i18n, Utils, GUIDHelper, WidgetBuilder, Dashboard) {
       /**
        * Creates a Widget calling the widget builder factory
        *
@@ -58,7 +43,7 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
         var newObj = $.extend(options, {
           promptPanel: this
         });
-        return WidgetBuilder.WidgetBuilder.build(newObj, type);
+        return this.widgetBuilder.build(newObj, type);
       };
 
       /**
@@ -170,7 +155,7 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
        * @private
        */
       function _createWidgetForPromptPanel() {
-        return WidgetBuilder.WidgetBuilder.build(this, 'prompt-panel');
+        return this.widgetBuilder.build(this, 'prompt-panel');
       };
 
       /**
@@ -254,6 +239,8 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
           this.guid = this.promptGUIDHelper.generateGUID();
 
           this.dashboard = new Dashboard();
+
+          this.widgetBuilder = WidgetBuilder;
         },
 
         /**
@@ -311,7 +298,7 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
             if (param.multiSelect && !$.isArray(value)) {
               value = [value];
             }
-            if (_isNumberType(param.type)) {
+            if (Utils.isNumberType(param.type)) {
               var localization = i18n.getLocalization("dojo.cldr", "number", SESSION_LOCALE.toLowerCase());
               var defaultLocalization = i18n.getLocalization("dojo.cldr", "number", null);
               var valueParsed;
@@ -641,6 +628,7 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
          * in the case the the parameter UI is not shown.
          */
         init: function (noAutoAutoSubmit) {
+          var myself = this;
           var fireSubmit = true;
           if (this.paramDefn.showParameterUI()) {
             this.promptGUIDHelper.reset(); // Clear the widget helper for this prompt
@@ -685,14 +673,13 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
                 // save prompt pane reference and scroll value to dummy component
                 var scrollTopValue = topValuesByParam['_' + component.name];
                 if (scrollTopValue != null) {
-                  this.dashboard.postInit(function(){
-                      // restore last scroll position for prompt panel
-                      if (scrollTopValue) {
-                        $("#" + component.htmlObject).children(".prompt-panel").scrollTop(scrollTopValue);
-                        delete scrollTopValue;
-                      }
+                  myself.dashboard.postInit = function(){
+                    // restore last scroll position for prompt panel
+                    if (scrollTopValue) {
+                      $("#" + component.htmlObject).children(".prompt-panel").scrollTop(scrollTopValue);
+                      delete scrollTopValue;
                     }
-                  )
+                  };
                 }
               }
             });
@@ -701,7 +688,7 @@ define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', '
               // We have old components we MUST call .clear() on to prevent memory leaks. In order to
               // prevent flickering we must do this during the same execution block as when Dashboards
               // updates the new components. We'll use our aptly named GarbageCollectorBuilder to handle this.
-              var gc = WidgetBuilder.WidgetBuilder.build({
+              var gc = this.widgetBuilder.build({
                 promptPanel: this,
                 components: this.components
               }, 'gc');

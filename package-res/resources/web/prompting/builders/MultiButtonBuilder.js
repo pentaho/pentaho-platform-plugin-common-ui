@@ -22,7 +22,7 @@
  * from Common-Ui:
  *
  * <pre><code>
- *   require(['common-ui/builders/MultiButtonBuilder'], 
+ *   require(['common-ui/prompting/builders/MultiButtonBuilder'],
  *     function(MultiButtonBuilder) { 
  *       
  *     }

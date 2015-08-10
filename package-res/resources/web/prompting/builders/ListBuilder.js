@@ -22,7 +22,7 @@
  * from Common-Ui:
  *
  * <pre><code>
- *   require(['common-ui/builders/ListBuilder'],
+ *   require(['common-ui/prompting/builders/ListBuilder'],
  *     function(ListBuilder) {
  *
  *     }

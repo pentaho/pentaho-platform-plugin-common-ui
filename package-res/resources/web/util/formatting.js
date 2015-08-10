@@ -15,6 +15,9 @@
 *
 */
 
+/**
+ * @name formatting
+ */
 define("common-ui/util/formatting", ['common-ui/util/timeutil'], function(ReportTimeUtil) {
   return {
     /**

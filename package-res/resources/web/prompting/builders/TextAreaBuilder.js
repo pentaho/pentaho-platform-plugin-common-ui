@@ -22,7 +22,7 @@
  * from Common-Ui:
  *
  * <pre><code>
- *   require(['common-ui/builders/TextAreaBuilder'], 
+ *   require(['common-ui/promting/builders/TextAreaBuilder'],
  *     function(TextAreaBuilder) { 
  *       
  *     }
@@ -47,30 +47,40 @@
  *
  * @name TextAreaBuilder
  * @class
- * @extends ValueBasedParameterWidgetBuilder
+ * @extends FormattedParameterWidgetBuilderBase
  */
-define(['./ValueBasedParameterWidgetBuilder', 'cdf/components/TextAreaInputComponent'],
-    function (ValueBasedParameterWidgetBuilder, TextAreaInputComponent) {
+define(['./FormattedParameterWidgetBuilderBase', 'cdf/components/TextareaInputComponent'],
+    function (FormattedParameterWidgetBuilderBase, TextareaInputComponent) {
 
-      return ValueBasedParameterWidgetBuilder.extend({
+      return FormattedParameterWidgetBuilderBase.extend({
         /**
-         * Builds the widget and returns a TextAreaInputComponent
+         * Builds the widget and returns a TextareaInputComponent
          * @method
          * @name TextAreaBuilder#build
-         * @param {Object} args The arguments to build the widget in accordance with [the CDF documentation]{@link http://localhost:8080/pentaho/api/repos/:public:plugin-samples:pentaho-cdf:pentaho-cdf-require:30-documentation:30-component_reference:10-core:38-TextareaInputComponent:text_area_input_component.xcdf/generatedContent}.
-         * @returns {TextAreaInputComponent} The TextAreaInputComponent built
+         * @param {Object} args - The arguments to build the widget in accordance with [the CDF documentation]{@link http://localhost:8080/pentaho/api/repos/:public:plugin-samples:pentaho-cdf:pentaho-cdf-require:30-documentation:30-component_reference:10-core:38-TextareaInputComponent:text_area_input_component.xcdf/generatedContent}.
+         * @param {PromptPanel} args.promptPanel - The instance of PromptPanel
+         * @param {ParameterDefinition} args.promptPanel.paramDefn - The parameter definition
+         * @param {Parameter} args.param - The Parameter instance
+         * @returns {TextareaInputComponent} The TextAreaInputComponent built
          */
         build: function (args) {
-          var formatter = args.promptPanel.createFormatter(args.promptPanel.paramDefn, args.param);
           var widget = this.base(args);
           $.extend(widget, {
             name: widget.name + '-input',
-            type: 'TextAreaInputComponent',
-            transportFormatter: args.promptPanel.createDataTransportFormatter(args.promptPanel.paramDefn, args.param, formatter),
-            formatter: formatter
+            type: 'TextareaInputComponent'
           });
 
-          return new TextAreaInputComponent(widget);
+          var comp = new TextareaInputComponent(widget);
+          //override just the getValue function to allow format values
+          comp.getValue = function(){
+            var val = $('#' + name).val();
+            if (this.formatter) {
+              return this.transportFormatter.format(this.formatter.parse(val));
+            } else {
+              return val;
+            }
+          };
+          return comp;
         }
       });
     });

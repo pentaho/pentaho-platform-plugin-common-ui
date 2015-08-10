@@ -193,7 +193,20 @@ define("common-ui/util/util", ["dijit/registry", "dojo/dom"], function(registry,
       } else {
         console.log("pentaho.common.Messages not available for localizing the DOM");
       }
-    }
+    },
 
+    /**
+     * Checks if the type is numeric
+     *
+     * @name TextInputBuilder#_isNumberType
+     * @method
+     * @param {String} type
+     * @return {Boolean} if the type is a numeric type
+     */
+    isNumberType: function (type) {
+      var whiteList = ["java.lang.Number", "java.lang.Byte", "java.lang.Double", "java.lang.Float", "java.lang.Integer",
+        "java.lang.Long", "java.lang.Short", "java.math.BigDecimal", "java.math.BigInteger"];
+      return _.contains(whiteList, type);
+    }
   }
 });
