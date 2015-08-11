@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<plugin title="common-ui">
+<plugin loader="OVERRIDING" title="common-ui">
 
   <!-- uncomment these menu items to access the test pages via the User Console menu -->
   <!-- menu-items>
