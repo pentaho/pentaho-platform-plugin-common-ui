@@ -54,7 +54,7 @@
  * @class
  * @extends BaseComponent
  */
-define(['cdf/components/BaseComponent', 'pentaho/common/DateTextBox', 'dijit/registry', 'cdf/lib/jquery', 'dojo/on'],
+define(['cdf/components/BaseComponent', 'dijit/form/DateTextBox', 'dijit/registry', 'cdf/lib/jquery', 'dojo/on'],
     function (BaseComponent, DateTextBox, registry, $, on) {
 
       return BaseComponent.extend({
