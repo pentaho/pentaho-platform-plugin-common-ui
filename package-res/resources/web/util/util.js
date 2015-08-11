@@ -19,7 +19,7 @@
  * Utility methods designed for general use
  */
 
-define("common-ui/util/util", ["dijit/registry", "dojo/dom"], function(registry, dom) {
+define("common-ui/util/util", ["common-ui/underscore", "dijit/registry", "dojo/dom"], function(_, registry, dom) {
   return {
 
   /**
@@ -198,7 +198,7 @@ define("common-ui/util/util", ["dijit/registry", "dojo/dom"], function(registry,
     /**
      * Checks if the type is numeric
      *
-     * @name TextInputBuilder#_isNumberType
+     * @name util#_isNumberType
      * @method
      * @param {String} type
      * @return {Boolean} if the type is a numeric type
