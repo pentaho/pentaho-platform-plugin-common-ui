@@ -38,7 +38,6 @@
  */
 define([ 'cdf/components/BaseComponent', 'cdf/lib/jquery' ], function(BaseComponent, $) {
   return BaseComponent.extend({
-    viewReportButtonRegistered : false,
 
     /**
      * Renders a submit button element.
@@ -68,8 +67,6 @@ define([ 'cdf/components/BaseComponent', 'cdf/lib/jquery' ], function(BaseCompon
           // Don't let click-event go as first argument.
           this.expression(false);
         }.bind(this)).appendTo($container);
-
-        this.viewReportButtonRegistered = true;
       }
     },
 

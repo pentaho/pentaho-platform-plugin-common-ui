@@ -43,7 +43,6 @@ define([ 'common-ui/prompting/components/ScopedPentahoButtonComponent', 'cdf/lib
       beforeEach(function() {
         comp = new ScopedPentahoButtonComponent();
         comp.htmlObject = id;
-        comp.viewReportButtonRegistered = false;
         comp.label = testLabel;
         spyOn($.fn, "empty");
         spyOn($.fn, "text").and.returnValue(spyElem);
@@ -59,7 +58,6 @@ define([ 'common-ui/prompting/components/ScopedPentahoButtonComponent', 'cdf/lib
       });
 
       afterEach(function() {
-        expect(comp.viewReportButtonRegistered).toBeTruthy();
         expect($.fn.empty).toHaveBeenCalled();
         expect($.fn.text).toHaveBeenCalledWith(testLabel);
         expect(spyElem.bind.calls.argsFor(0)).toEqual([ "mousedown", jasmine.any(Function) ]);

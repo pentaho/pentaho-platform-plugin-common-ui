@@ -27,8 +27,8 @@
  * @property {Dashboard} dashboard The dashboard object assigned to the prompt
  * @property {Boolean} parametersChanged True if the parameters have changed, False otherwise
  */
-define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/util/util', 'common-ui/util/GUIDHelper', './WidgetBuilder', 'cdf/Dashboard.Clean'],
-    function (Base, Logger, DojoNumber, i18n, Utils, GUIDHelper, WidgetBuilder, Dashboard) {
+define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/util/util', 'common-ui/util/GUIDHelper', './WidgetBuilder', 'cdf/Dashboard.Clean', './parameters/ParameterDefinitionDiffer'],
+    function (Base, Logger, DojoNumber, i18n, Utils, GUIDHelper, WidgetBuilder, Dashboard, ParamDiff) {
       /**
        * Creates a Widget calling the widget builder factory
        *
@@ -193,6 +193,94 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
         });
       };
 
+      /**
+       * Gets a component by its parameter definition.
+       *
+       * @name _getComponentByParam
+       * @method
+       * @private
+       * @param {ParameterDefinition} param
+       * @param {bool} getPanel If true, retrieves the surrounding panel for the component
+       *
+       * @returns {BaseComponent|null} If no component is found, null will be returned
+       */
+      var _getComponentByParam = function(param, getPanel) {
+        var parameterName = this.getParameterName(param);
+        return _getComponentByParamName.call(this, parameterName, getPanel);
+      };
+
+      /**
+       * Gets a component by its compile parameter name. Normally, it is a combination of the parameter name and the guid of the PromptPanel.
+       *
+       * @name _getComponentByParamName
+       * @method
+       * @private
+       * @param {String} parameterName The compiled name of the prompt panel component
+       * @param {bool} getPanel If true, retrieves the surrounding panel for the component
+       *
+       * @returns {BaseComponent|null} If no component is found, null will be returned
+       */
+      var _getComponentByParamName = function(parameterName, getPanel) {
+        for (var i in this.dashboard.components) {
+          var component = this.dashboard.components[i];
+          if (component.parameter === parameterName) {
+            var isPanel = component.type.search("Panel") > -1;
+            if ((getPanel && isPanel) || (!getPanel && !isPanel)) {
+              return component;
+            }
+          }
+        }
+        return null;
+      };
+
+      /**
+       * Removes a list of components from the current dashboard
+       *
+       * @name _removeComponents
+       * @method
+       * @private
+       * @param {Array} components An array of components to remove
+       */
+      var _removeComponents = function(components) {
+        this.removeDashboardComponents(components);
+      };
+
+      /**
+       * Recurrsively adds the component and its children to the current dashboard
+       *
+       * @name _addComponent
+       * @method
+       * @private
+       * @param {Array} component The parent component, which is added before its children
+       */
+      var _addComponent = function(component) {
+        this.dashboard.addComponent(component);
+        this.dashboard.updateComponent(component);
+
+        for (var i in component.components) { // Loop through panel components
+          _addComponent.call(this, component.components[i]);
+        }
+      };
+
+      /**
+       * Finds the specific submit component located on the parent panel component
+       * @name _findSubmitComponent
+       * @method
+       * @private
+       * @param {BaseComponent} panelComponent The parent panel component to search within for the submit component
+       */
+      var _findSubmitComponent = function(panelComponent) {
+        var result = null;
+        for (var i = 0; i < panelComponent.components.length; i++) {
+          if (panelComponent.components[i].promptType == "submit"
+            && panelComponent.components[i].type == "FlowPromptLayoutComponent") {
+            result = panelComponent.components[i];
+            break;
+          }
+        }
+        return result;
+      };
+
 
       var PromptPanel = Base.extend({
 
@@ -239,6 +327,8 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
           this.guid = this.promptGUIDHelper.generateGUID();
 
           this.dashboard = new Dashboard();
+
+          this.paramDiffer = new ParamDiff();
 
           this.widgetBuilder = WidgetBuilder;
         },
@@ -569,54 +659,179 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
           }
 
           if (paramDefn) {
+            this.diff = this.paramDiffer.diff(this.paramDefn, paramDefn);
+            this.isRefresh = true;
             this.paramDefn = paramDefn;
 
-            // Remove this `PromptPanel`'s components from `Dashboards`.
-            if (this.components) {
-              // Postpone the clearing of removed components if we'll be showing some components.
-              // We'll clear the old components with a special component in front of all other components during init().
-              var postponeClear = this.paramDefn.showParameterUI();
-              this.removeDashboardComponents(this.components, postponeClear);
-
-              // Create dictionary by parameter name, of topValue of multi-select listboxes, for restoring later, when possible.
-              // But not for mobile, cause the UIs vary. Would need more time to check each.
-              var topValuesByParam;
-              if (!(/android|ipad|iphone/i).test(navigator.userAgent)) {
-                topValuesByParam = this._multiListBoxTopValuesByParam = {};
-              }
-
-              var focusedParam;
-              _mapComponentsList(this.components, function (component) {
-                if (!component.components && component.param && component.promptType === 'prompt') {
-                  if (!focusedParam) {
-                    var ph = component.placeholder();
-                    if ($(":focus", ph).length) {
-                      focusedParam = component.param.name;
-                    }
-                  }
-
-                  if (topValuesByParam && component.type === 'SelectMultiComponent') {
-                    var topValue = component.topValue();
-                    if (topValue != null) {
-                      topValuesByParam['_' + component.param.name] = topValue;
-                    }
-                  }
-                } else if (topValuesByParam && component.type === 'ScrollingPromptPanelLayoutComponent') {
-                  // save last scroll position for prompt panel
-                  var scrollTopValue = component.placeholder().children(".prompt-panel").scrollTop();
-                  if (scrollTopValue != null) {
-                    topValuesByParam['_' + component.name] = scrollTopValue;
-                  }
-                }
-              });
-
-              this._focusedParam = focusedParam;
-            }
 
             this.init(noAutoAutoSubmit);
           }
         },
 
+        /**
+         * Removes a set of components determined by the ParameterDefinitionDiffer#diff
+         *
+         * @name PromptPanel#_removeComponentsByDiff
+         * @method
+         * @param {JSON} toRemoveDiff The group of paramters which need to be removed
+         */
+        _removeComponentsByDiff: function(toRemoveDiff) {
+          var toRemove = [];
+          for (var groupName in toRemoveDiff) {
+            var removeWrap = toRemoveDiff[groupName];
+            var params = removeWrap.params;
+
+            for (var i = 0; i < params.length; i++) {
+              var param = params[i];
+              var component = _getComponentByParam.call(this, param, true); // get component panel
+              if (component != null) {
+                toRemove.push(component);
+
+                var groupPanel = this.dashboard.getComponentByName(groupName);
+                if (groupPanel) {
+                  var index = groupPanel.components.indexOf(component);
+                  if (index > -1) {
+                    groupPanel.components.splice(index, 1);
+                  }
+                  if (groupPanel.components.length == 0) {
+                    toRemove.push(groupPanel);
+                  }
+                }
+              }
+            }
+          }
+
+          var panelComponent = this.dashboard.getComponentByName("prompt" + this.guid);
+          if (panelComponent) {
+            if (panelComponent.components.length <= 2) {
+              var submitPanel = _findSubmitComponent.call(this, panelComponent);
+              if (submitPanel) {
+                toRemove.push(submitPanel);
+              }
+            }
+
+            // we need to remove components from prompt panel component also
+            for (var i in toRemove) {
+              var toRemoveComponent = toRemove[i];
+              var index = panelComponent.components.indexOf(toRemoveComponent);
+              if (index > -1) {
+                panelComponent.components.splice(index, 1);
+              }
+            }
+          }
+
+          _removeComponents.call(this, toRemove);
+        },
+
+        /**
+         * Adds a set of components determined by the ParameterDefinitionDiffer#diff
+         *
+         * @name PromptPanel#_addComponentsByDiff
+         * @method
+         * @param {JSON} toAddDiff The group of parameters which need to be added
+         */
+        _addComponentsByDiff: function(toAddDiff) {
+          var panelComponent = this.dashboard.getComponentByName("prompt" + this.guid);
+
+          for (var groupName in toAddDiff) {
+            var addWrap = toAddDiff[groupName];
+            var params = addWrap.params;
+
+            var fieldComponents = [];
+            for (var i = 0; i < params.length; i++) {
+              var param = params[i];
+              var component = this._buildPanelForParameter(param); // returns a panel component
+              fieldComponents.push(component);
+            }
+
+            var groupPanel = this.dashboard.getComponentByName(groupName);
+            if (!groupPanel) {
+              groupPanel = _createWidgetForGroupPanel.call(this, addWrap.group, fieldComponents);
+              panelComponent.components.push(groupPanel);
+            } else {
+              groupPanel.components = groupPanel.components.concat(fieldComponents);
+            }
+          }
+
+          if (panelComponent.components.length > 0 && !_findSubmitComponent.call(this, panelComponent)) {
+            var submitPanel = _createWidgetForSubmitPanel.call(this);
+            panelComponent.components.push(submitPanel);
+          }
+
+          _addComponent.call(this, panelComponent);
+        },
+
+        /**
+         * Changes the data and selects the current value(s) of a set of components determined by the ParameterDefinitionDiffer#diff.
+         *
+         * @name PromptPanel#_changeComponentsByDiff
+         * @method
+         * @param {JSON} toChangeDiff The group of paramters which need to be have their data changed
+         */
+        _changeComponentsByDiff: function(toChangeDiff) {
+          for (var groupName in toChangeDiff) {
+            var changeWrap = toChangeDiff[groupName];
+            var params = changeWrap.params;
+
+            for (var i in params) {
+              var param = params[i];
+
+              // Find selected value in param values list and set it. This works, even if the data in valuesArray is different
+              var selectedValues = param.getSelectedValuesValue();
+              this.setParameterValue(param, selectedValues);
+
+              var component = _getComponentByParam.call(this, param);
+              if (component != null) {
+                // Create new widget to get properly formatted values array
+                var newValuesArray = this.widgetBuilder.build({
+                  param: param,
+                  promptPanel: this
+                }, param.attributes["parameter-render-type"]).valuesArray;
+
+                // Compare values array from param (which is formatted into valuesArray) with the current valuesArray
+                if (JSON.stringify(component.valuesArray) !== JSON.stringify(newValuesArray)) {
+                  component.valuesArray = newValuesArray;
+                }
+
+                var groupPanel = this.dashboard.getComponentByName(groupName);
+                for (var i in groupPanel.components) {
+                  if (groupPanel.components[i].name == component.name) {
+                    groupPanel.components[i] = component;
+                    break;
+                  }
+                }
+                var panelComponent = this.dashboard.getComponentByName("prompt" + this.guid);
+                _mapComponents(panelComponent, function (component) {
+                  this.dashboard.updateComponent(component);
+                }.bind(this));
+              }
+            }
+          }
+        },
+
+        /**
+         * Updates the dashboard and prompt panel based off of differences in the parameter definition
+         *
+         * @method update
+         * @param {JSON} diff - contains the differences between the old and new parameter definitions produced by ParameterDefinitionDiffer.diff
+         */
+        update: function(diff) {
+
+          // Determine if there are params which need to be removed
+          if (Object.keys(diff.toRemove).length > 0) {
+            this._removeComponentsByDiff(diff.toRemove);
+          }
+
+          // Determine if there are params which need to be added
+          if (Object.keys(diff.toAdd).length > 0) {
+            this._addComponentsByDiff(diff.toAdd);
+          }
+
+          // Determine if there are params which need to be changed
+          if (Object.keys(diff.toChangeData).length > 0) {
+            this._changeComponentsByDiff(diff.toChangeData);
+          }
+        },
 
         /**
          * Initialize this prompt panel.
@@ -630,80 +845,86 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
         init: function (noAutoAutoSubmit) {
           var myself = this;
           var fireSubmit = true;
-          if (this.paramDefn.showParameterUI()) {
-            this.promptGUIDHelper.reset(); // Clear the widget helper for this prompt
 
-            var components = [];
+          var topValuesByParam = this._multiListBoxTopValuesByParam;
+          var focusedParam = this._focusedParam;
+          var components = [];
+
+          var updateComponent = (function (component) {
+            components.push(component);
+
+            // Don't fire the submit on load if we have a submit button.
+            // It will take care of firing this itself (based on auto-submit)
+            if (fireSubmit && component.promptType == 'submit') {
+              fireSubmit = false;
+            }
+
+            if (!component.components && component.param && component.promptType === 'prompt') {
+              var name = component.param.name;
+              if (focusedParam && focusedParam === name) {
+                focusedParam = null;
+                component.autoFocus = true;
+              }
+
+              if (topValuesByParam && component.type === 'SelectMultiComponent') {
+                var topValue = topValuesByParam['_' + name];
+                if (topValue != null) {
+                  component.autoTopValue = topValue;
+                }
+              }
+            } else if (topValuesByParam && component.type === 'ScrollingPromptPanelLayoutComponent') {
+              // save prompt pane reference and scroll value to dummy component
+              var scrollTopValue = topValuesByParam['_' + component.name];
+              if (scrollTopValue != null) {
+                var setScrollTop = function() {
+                  $("#" + component.htmlObject).children(".prompt-panel").scrollTop(scrollTopValue);
+                }
+
+                // restore last scroll position for prompt panel
+                if (!this.isRefresh) {
+                  this.dashboard.postInit(function() {
+                    if (scrollTopValue) {
+                      setScrollTop();
+                      delete scrollTopValue;
+                    }
+                  });
+                } else {
+                  setScrollTop();
+                }
+              }
+            }
+          }).bind(this);
+
+          if (!this.isRefresh && this.paramDefn.showParameterUI()) { // First time init
+            this.promptGUIDHelper.reset(); // Clear the widget helper for this prompt
 
             var layout = _createWidgetForPromptPanel.call(this);
 
-            var topValuesByParam = this._multiListBoxTopValuesByParam;
             if (topValuesByParam) {
               delete this._multiListBoxTopValuesByParam;
             }
 
-            var focusedParam = this._focusedParam;
             if (focusedParam) {
               delete this._focusedParam;
             }
 
-            _mapComponents(layout, function (component) {
-              components.push(component);
+            _mapComponents(layout, updateComponent);
 
-              // Don't fire the submit on load if we have a submit button.
-              // It will take care of firing this itself (based on auto-submit)
-              if (fireSubmit && component.promptType == 'submit') {
-                fireSubmit = false;
-              }
+            this.dashboard.addComponents(components);
+            this.dashboard.init();
+          } else if (this.diff) { // Perform update when there are differences
+            this.update(this.diff);
 
-              if (!component.components && component.param && component.promptType === 'prompt') {
-                var name = component.param.name;
-                if (focusedParam && focusedParam === name) {
-                  focusedParam = null;
-                  component.autoFocus = true;
-                }
-
-                if (topValuesByParam && component.type === 'SelectMultiComponent') {
-                  var topValue = topValuesByParam['_' + name];
-                  if (topValue != null) {
-                    component.autoTopValue = topValue;
-                  }
-                }
-              } else if (topValuesByParam && component.type === 'ScrollingPromptPanelLayoutComponent') {
-                // save prompt pane reference and scroll value to dummy component
-                var scrollTopValue = topValuesByParam['_' + component.name];
-                if (scrollTopValue != null) {
-                  myself.dashboard.postInit = function(){
-                    // restore last scroll position for prompt panel
-                    if (scrollTopValue) {
-                      $("#" + component.htmlObject).children(".prompt-panel").scrollTop(scrollTopValue);
-                      delete scrollTopValue;
-                    }
-                  };
-                }
-              }
-            });
-
-            if (this.components && this.components.length > 0) {
-              // We have old components we MUST call .clear() on to prevent memory leaks. In order to
-              // prevent flickering we must do this during the same execution block as when Dashboards
-              // updates the new components. We'll use our aptly named GarbageCollectorBuilder to handle this.
-              var gc = this.widgetBuilder.build({
-                promptPanel: this,
-                components: this.components
-              }, 'gc');
-
-              if (!gc) {
-                throw 'Cannot create garbage collector';
-              }
-
-              components = [gc].concat(components);
+            if (topValuesByParam) {
+              delete this._multiListBoxTopValuesByParam;
             }
 
-            this.components = components;
-            this.dashboard.addComponents(this.components);
-            this.dashboard.init();
-          } else {
+            if (focusedParam) {
+              delete this._focusedParam;
+            }
+            var layout = this.dashboard.getComponentByName("prompt" + this.guid);
+            _mapComponents(layout, updateComponent);
+          } else { // Simple parameter value initialization
             this.paramDefn.mapParameters(function (param) {
               // initialize parameter values regardless of whether we're showing the parameter or not
               this._initializeParameterValue(this.paramDefn, param);
@@ -715,8 +936,11 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
           }
 
           if (fireSubmit) {
-            this.submit(this, {isInit: true});
+            this.submit(this, {isInit: !this.isRefresh});
           }
+
+          this.diff = null;
+          this.isRefresh = null;
         },
 
         /**
