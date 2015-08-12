@@ -48,8 +48,19 @@ define([], function() {
         return JSON.stringify(oldErrors) !== JSON.stringify(newErrors);
       },
 
+      _fillWrapObj : function(result, propName, group, param) {
+        if (!result[propName][group.name]) {
+          result[propName][group.name] = {
+            group : group,
+            params : []
+          }
+        }
+
+        result[propName][group.name].params.push(param);
+      },
+
       /**
-       * Returns result differences object for oldParamDefn and newParamDefn object. The result contains arrays of
+       * Returns result differences object for oldParamDefn and newParamDefn object. The result contains group and arrays of
        * parameters that were added to newParamDefn object, were removed from newParamDefn object and were changed in
        * newParamDefn object. The result array "toAdd" contains new parameters and means that is needed to create new 
        * components based this new parameters. The result array "toRemove" contains old parameters and means that is
@@ -65,12 +76,34 @@ define([], function() {
        * @returns {Object} The result object contains data about added, changed and removed parameters between
        *          oldParamDefn and newParamDefn object. The result object consists of properties "toAdd",
        *          "toChangeData", "toRemove". Each property is an array with values of {@link Parameter} type
-       * @example
-       * var differ = new ParameterDefinitionDiffer();
-       * var result = differ.diff(new ParameterDefinition(), new ParameterDefinition());
        * 
-       * Return Value:
-       * {"toAdd":[],"toChangeData":[],"toRemove":[]}
+       * An example of using:
+       * <pre><code>
+       *  require([ 'common-ui/prompting/parameters/ParameterDefinitionDiffer' ],
+       *     function(ParameterDefinitionDiffer) {
+       *       var differ = new ParameterDefinitionDiffer();
+       *       var result = differ.diff(new ParameterDefinition(), new ParameterDefinition());
+       *     }
+       *   );
+       * </code></pre>
+       *
+       * An example returned result:
+       * <pre><code>
+       *   {
+       *     "toAdd" : {
+       *       "my_test_group" : {
+       *         "group" : {
+       *           "name" : "my_test_group",
+       *           "label" : undefined,
+       *           "parameters" : []
+       *         },
+       *         params : [] // new parameters to add
+       *       }
+       *     },
+       *     "toChangeData" : {},
+       *     "toRemove" : {}
+       *   }
+       * </code></pre>
        */
       diff : function(oldParamDefn, newParamDefn) {
         if (!oldParamDefn || !newParamDefn) {
@@ -78,33 +111,34 @@ define([], function() {
         }
 
         var result = {
-          toAdd : [],
-          toChangeData : [],
-          toRemove : [],
-          changesToMake : function() {
-            return result.toAdd.length > 0 || result.toChangeData.length > 0 || result.toRemove.length > 0;
-          }
+          toAdd : {},
+          toChangeData : {},
+          toRemove : {}
         };
 
         // find removed parameters
-        oldParamDefn.mapParameters(function(param) {
-          var newParam = newParamDefn.getParameter(param.name);
-          if (!newParam) {
-            result.toRemove.push(param);
+        oldParamDefn.mapParameters(function(param, group) {
+          if (!param.attributes.hidden || param.attributes.hidden == 'false') { // Can be 'false' or undefined
+            var newParam = newParamDefn.getParameter(param.name);
+            if (!newParam || newParam.attributes.hidden == 'true') {
+              this._fillWrapObj(result, "toRemove", group, param);
+            }
           }
-        });
+        }, this);
         // find new and changed parameters
-        newParamDefn.mapParameters(function(param) {
-          var oldParam = oldParamDefn.getParameter(param.name);
-          if (!oldParam) {
-            result.toAdd.push(param); // found newest parameters
-          } else if (this._isBehavioralAttrsChanged(oldParam, param)
-            || this._isErrorsChanged(param.name, oldParamDefn, newParamDefn)) {
-            // add parameter to remove and add arrays for recreating components
-            result.toRemove.push(oldParam);
-            result.toAdd.push(param);
-          } else if (this._isDataChanged(oldParam, param)) {
-            result.toChangeData.push(param);
+        newParamDefn.mapParameters(function(param, group) {
+          if (!param.attributes.hidden || param.attributes.hidden == 'false') { // Can be 'false' or undefined
+            var oldParam = oldParamDefn.getParameter(param.name);
+            if (!oldParam || oldParam.attributes.hidden == 'true') {
+              this._fillWrapObj(result, "toAdd", group, param); // found newest parameters
+            } else if (this._isBehavioralAttrsChanged(oldParam, param)
+              || this._isErrorsChanged(param.name, oldParamDefn, newParamDefn)) {
+              // add parameter to remove and add arrays for recreating components
+              this._fillWrapObj(result, "toRemove", group, oldParam);
+              this._fillWrapObj(result, "toAdd", group, param);
+            } else if (this._isDataChanged(oldParam, param)) {
+              this._fillWrapObj(result, "toChangeData", group, param);
+            }
           }
         }, this);
 

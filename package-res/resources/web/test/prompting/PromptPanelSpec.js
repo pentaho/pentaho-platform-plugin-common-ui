@@ -59,7 +59,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
       beforeEach(function() {
         paramDefn = jasmine.createSpyObj("paramDefn", [ "allowAutoSubmit" ]);
         paramDefn.allowAutoSubmit.and.returnValue(true);
-        dashboardSpy = jasmine.createSpyObj("dashboardSpy", [ "setParameter", "getParameterValue" ]);
+        dashboardSpy = jasmine.createSpyObj("dashboardSpy", [ "setParameter", "getParameterValue", "getComponentByName", "addComponent", "updateComponent" ]);
         panel = new PromptPanel(testId, paramDefn);
         panel.dashboard = dashboardSpy;
       });
@@ -365,6 +365,8 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
           spyOn(panel, "init");
           spyOn(panel, "removeDashboardComponents");
           spyOn(window, "setTimeout");
+          spyOn(panel.paramDiffer, "diff");
+          spyOn(panel, "update");
         });
 
         it("should not refresh if exists waitingForInit parameter", function() {
@@ -391,7 +393,6 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
           panel.refresh(paramDefn, noAutoAutoSubmit);
           expect(panel.paramDefn).toBe(paramDefn);
           expect(window.setTimeout).not.toHaveBeenCalled();
-          expect(panel.init).toHaveBeenCalledWith(noAutoAutoSubmit);
           expect(panel.removeDashboardComponents).not.toHaveBeenCalled();
         });
 
@@ -403,8 +404,6 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
           panel.refresh(paramDefn);
           expect(panel.paramDefn).toBe(paramDefn);
           expect(window.setTimeout).not.toHaveBeenCalled();
-          expect(panel.init).toHaveBeenCalledWith(undefined);
-          expect(panel.removeDashboardComponents).toHaveBeenCalled();
           expect(panel._focusedParam).not.toBeDefined();
         });
 
@@ -423,11 +422,6 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
           panel.refresh(paramDefn);
           expect(panel.paramDefn).toBe(paramDefn);
           expect(window.setTimeout).not.toHaveBeenCalled();
-          expect(panel.init).toHaveBeenCalledWith(undefined);
-          expect(panel.removeDashboardComponents).toHaveBeenCalled();
-          expect(panel._focusedParam).toBe(comp.param.name);
-          expect(comp.placeholder).toHaveBeenCalled();
-          expect(window.$).toHaveBeenCalled();
         });
 
         it("should init also with components for ScrollingPromptPanelLayoutComponent", function() {
@@ -449,10 +443,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
           panel.refresh(paramDefn);
           expect(panel.paramDefn).toBe(paramDefn);
           expect(window.setTimeout).not.toHaveBeenCalled();
-          expect(panel.init).toHaveBeenCalledWith(undefined);
-          expect(panel.removeDashboardComponents).toHaveBeenCalled();
           expect(panel._focusedParam).not.toBeDefined();
-          expect(comp.placeholder).toHaveBeenCalled();
           expect(window.$).not.toHaveBeenCalled();
         });
       });
@@ -471,7 +462,6 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
 
         it("should not init dashboard without showing panel and without submitting", function() {
           panel.init(true);
-          expect(panel.components).not.toBeDefined();
           expect(paramDefn.showParameterUI).toHaveBeenCalled();
           expect(paramDefn.mapParameters).toHaveBeenCalled();
           expect(dash.addComponents).not.toHaveBeenCalled();
@@ -482,7 +472,6 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
 
         it("should not init dashboard without showing panel and with submitting", function() {
           panel.init();
-          expect(panel.components).not.toBeDefined();
           expect(paramDefn.showParameterUI).toHaveBeenCalled();
           expect(paramDefn.mapParameters).toHaveBeenCalled();
           expect(dash.addComponents).not.toHaveBeenCalled();
@@ -502,7 +491,6 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
           panel.init(true);
           expect(panel._multiListBoxTopValuesByParam).not.toBeDefined();
           expect(panel._focusedParam).not.toBeDefined();
-          expect(panel.components.length > 0).toBeTruthy();
           expect(paramDefn.showParameterUI).toHaveBeenCalled();
           expect(paramDefn.mapParameters).not.toHaveBeenCalled();
           expect(dash.addComponents).toHaveBeenCalled();
@@ -659,6 +647,275 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
           expect(comp.clear).not.toHaveBeenCalled();
           expect(panel.dashboard.components[0].listeners.length).toBe(0);
         });
+      });
+
+      describe("update", function() {
+        var diffSpy;
+        beforeEach(function() {
+          diffSpy = jasmine.createSpy("diffSpy");
+          diffSpy.toRemove = {};
+          diffSpy.toAdd = {};
+          diffSpy.toChangeData = {};
+        });
+
+        it("should not call every update call", function() {
+          spyOn(panel, "_removeComponentsByDiff");
+          spyOn(panel, "_addComponentsByDiff");
+          spyOn(panel, "_changeComponentsByDiff");
+
+          panel.update(diffSpy);
+
+          expect(panel._removeComponentsByDiff).not.toHaveBeenCalledWith(diffSpy.toRemove);
+          expect(panel._addComponentsByDiff).not.toHaveBeenCalledWith(diffSpy.toAdd);
+          expect(panel._changeComponentsByDiff).not.toHaveBeenCalledWith(diffSpy.toChangeData);
+        });
+
+        it("should call every update call", function() {
+          spyOn(panel, "_removeComponentsByDiff");
+          spyOn(panel, "_addComponentsByDiff");
+          spyOn(panel, "_changeComponentsByDiff");
+
+          diffSpy.toRemove.test = {};
+          diffSpy.toAdd.test = {};
+          diffSpy.toChangeData.test = {};
+
+          panel.update(diffSpy);
+
+          expect(panel._removeComponentsByDiff).toHaveBeenCalledWith(diffSpy.toRemove);
+          expect(panel._addComponentsByDiff).toHaveBeenCalledWith(diffSpy.toAdd);
+          expect(panel._changeComponentsByDiff).toHaveBeenCalledWith(diffSpy.toChangeData);
+        });
+
+        describe("Add/Remove/Change by diff", function() {
+          var componentSpy, paramSpy, groupPanelSpy, promptPanelSpy, submitComponentSpy;
+          var paramName = "testParamName";
+          var groupParamName = "testGroupName";
+          var guid = "guid";
+
+          beforeEach(function() {
+            paramSpy = jasmine.createSpy("paramSpy");
+
+            componentSpy = jasmine.createSpy("componentSpy");
+            componentSpy.parameter = paramName;
+            componentSpy.type = "TestPanel";
+
+            panel.dashboard.components = [componentSpy];
+            panel.guid = guid;
+
+            groupPanelSpy = jasmine.createSpy("groupPanelSpy");
+            groupPanelSpy.components = [componentSpy];
+            spyOn(groupPanelSpy.components, "indexOf").and.callThrough();
+            spyOn(groupPanelSpy.components, "splice").and.callThrough();
+
+            promptPanelSpy = jasmine.createSpy("promptPanelSpy");
+            promptPanelSpy.components = [];
+
+            spyOn(panel, "getParameterName").and.returnValue(paramName);
+            panel.dashboard.getComponentByName.and.callFake(function(name) {
+              if (name == groupParamName) {
+                return groupPanelSpy;
+              } else if (name == "prompt" + guid) {
+                return promptPanelSpy;
+              }
+            });
+
+            submitComponentSpy = jasmine.createSpy("submitComponentSpy");
+            submitComponentSpy.promptType = "submit";
+            submitComponentSpy.type = "FlowPromptLayoutComponent";
+          });
+
+          describe("_removeComponentsByDiff", function() {
+            it ("should successfully remove the provided components", function() {
+              diffSpy.toRemove[groupParamName] = {
+                params : [paramSpy]
+              };
+
+              promptPanelSpy.components = [submitComponentSpy];
+              spyOn(promptPanelSpy.components, "splice").and.callThrough();
+
+              spyOn(panel, "removeDashboardComponents");
+
+              panel._removeComponentsByDiff(diffSpy.toRemove);
+
+              expect(panel.getParameterName).toHaveBeenCalledWith(paramSpy);
+              expect(panel.dashboard.getComponentByName).toHaveBeenCalledWith(groupParamName);
+              expect(panel.dashboard.getComponentByName).toHaveBeenCalledWith("prompt"+guid);
+              expect(groupPanelSpy.components.indexOf).toHaveBeenCalledWith(componentSpy);
+              expect(groupPanelSpy.components.splice).toHaveBeenCalledWith(0, 1);
+              expect(promptPanelSpy.components.splice).toHaveBeenCalledWith(0, 1);
+              expect(panel.removeDashboardComponents).toHaveBeenCalled();
+            });
+          });
+
+          describe("_addComponentsByDiff", function() {
+            var panelSpy;
+            beforeEach(function() {
+              diffSpy.toAdd[groupParamName] = {
+                params : [paramSpy]
+              };
+
+              panelSpy = jasmine.createSpy("panelSpy");
+              spyOn(panel, "_buildPanelForParameter").and.returnValue(panelSpy);
+            });
+
+            it("should not find a group panel by name and succeed", function() {
+              var widgetSpy = jasmine.createSpy("widgetSpy");
+              spyOn(panel.widgetBuilder, "build").and.returnValue(widgetSpy);
+
+              promptPanelSpy.components = [submitComponentSpy];
+
+              panel.dashboard.getComponentByName.and.callFake(function(name) {
+                if (name == "prompt" + guid) {
+                  return promptPanelSpy;
+                }
+              });
+
+              promptPanelSpy.components = [submitComponentSpy];
+
+              panel._addComponentsByDiff(diffSpy.toAdd);
+
+              expect(panel.dashboard.addComponent).toHaveBeenCalled();
+              expect(panel.dashboard.addComponent.calls.count()).toBe(3);
+              expect(panel.dashboard.updateComponent).toHaveBeenCalled();
+              expect(panel.dashboard.updateComponent.calls.count()).toBe(3);
+              expect(panel.dashboard.getComponentByName).toHaveBeenCalledWith(groupParamName);
+              expect(panel.dashboard.getComponentByName).toHaveBeenCalledWith("prompt"+guid);
+              expect(panel._buildPanelForParameter).toHaveBeenCalledWith(paramSpy);
+              expect(panel.widgetBuilder.build).toHaveBeenCalled();
+            });
+
+            it("should find a group panel by name and succeed", function() {
+              promptPanelSpy.components = [componentSpy];
+
+              var widgetSpy = jasmine.createSpy("widgetSpy");
+              spyOn(panel.widgetBuilder, "build").and.returnValue(widgetSpy);
+
+              panel._addComponentsByDiff(diffSpy.toAdd);
+
+              expect(panel.dashboard.addComponent).toHaveBeenCalled();
+              expect(panel.dashboard.addComponent.calls.count()).toBe(3);
+              expect(panel.dashboard.updateComponent).toHaveBeenCalled();
+              expect(panel.dashboard.updateComponent.calls.count()).toBe(3);
+              expect(panel.dashboard.getComponentByName).toHaveBeenCalledWith(groupParamName);
+              expect(panel.dashboard.getComponentByName).toHaveBeenCalledWith("prompt"+guid);
+              expect(panel._buildPanelForParameter).toHaveBeenCalledWith(paramSpy);
+              expect(panel.widgetBuilder.build).toHaveBeenCalled();
+            });
+          });
+
+          describe("_changeComponentsByDiff", function() {
+            var originalParam, change, componentSpy,
+                guid = "guid", groupName = "test_group",
+                changedParam, value1, value2;
+
+            beforeEach(function() {
+              // set up some parameter values
+              value1 = new ParameterValue();
+              value1.value = "jitsu";
+              value1.label = "jitsu";
+              value1.type = "java.lang.String";
+
+              value2 = new ParameterValue();
+              value2.value = "do";
+              value2.label = "dō";
+              value2.selected = true;
+              value2.type = "java.lang.String";
+
+              var paramDefn;
+              // create a parameter
+              originalParam = new Parameter();
+              originalParam.type = "java.lang.String";
+              originalParam.name = paramName;
+              originalParam.multiSelect = true;
+              originalParam.values = [ value1, value2 ];
+
+              paramDefn = new ParameterDefinition();
+              var group = new ParameterGroup();
+              group.name = groupName;
+              group.label = "test_group_label";
+              paramDefn.parameterGroups.push(group);
+              group.parameters.push(originalParam);
+
+              panel.paramDefn = paramDefn;
+              change = {};
+              change[groupName] = {
+                params: [originalParam]
+              };
+
+              spyOn(panel, "setParameterValue");
+              spyOn(panel.widgetBuilder.mapping['default'], '_createFormatter').and.returnValue(null);
+              spyOn(panel.widgetBuilder.mapping['default'], '_createDataTransportFormatter').and.returnValue(null);
+
+              componentSpy = jasmine.createSpyObj("componentSpy", ["getPanel"]);
+              componentSpy.parameter = paramName;
+              componentSpy.type = "TestComponent";
+              componentSpy.name = "testComponent";
+
+              panel.components = [componentSpy];
+              panel.dashboard.components = [componentSpy];
+              panel.guid = guid;
+
+              panel.dashboard.getComponentByName.and.returnValue(group);
+            });
+
+            it("should handle null param", function() {
+              panel._changeComponentsByDiff(null);
+            });
+
+            it("should set the selected value", function() {
+
+              panel._changeComponentsByDiff(change);
+
+              expect(panel.setParameterValue).toHaveBeenCalledWith(originalParam, "do");
+            });
+
+            it("should compare the data values to determine if a change was made.", function() {
+
+              var submitComponentSpy = jasmine.createSpy("submitComponentSpy");
+              submitComponentSpy.promptType = "submit";
+              submitComponentSpy.type = "FlowPromptLayoutComponent";
+
+              var panelSpy = jasmine.createSpy("panelSpy");
+
+              var groupPanelSpy = jasmine.createSpy("groupPanelSpy");
+              groupPanelSpy.components = [componentSpy];
+
+              panelSpy.components = [submitComponentSpy, groupPanelSpy];
+              spyOn(panelSpy.components, "splice").and.callThrough();
+
+              panel.dashboard.getComponentByName.and.callFake(function(name) {
+                if (name == groupName) {
+                  return groupPanelSpy;
+                } else if (name == "prompt" + guid) {
+                  return panelSpy;
+                }
+              });
+
+              changedParam = new Parameter();
+              changedParam.type = "java.lang.String";
+              changedParam.name = paramName;
+              changedParam.values = [ value1, value2 ];
+              var valuesArray = [["jitsu", "dō", "-- no selection --"],["jitsu", "do", "_none_"]];
+              spyOn(panel.widgetBuilder, "build").and.callFake(function(obj, type) {
+                return { "valuesArray": valuesArray };
+              });
+
+              change = {};
+              change[groupName] = {
+                params: [changedParam]
+              };
+
+              panel._changeComponentsByDiff(change);
+
+              expect(panel.dashboard.updateComponent).toHaveBeenCalledWith(panelSpy);
+              expect(panel.dashboard.getComponentByName).toHaveBeenCalledWith(groupName);
+              expect(panel.dashboard.getComponentByName).toHaveBeenCalledWith("prompt"+guid);
+              expect(groupPanelSpy.components[0]).toBe(componentSpy);
+              expect(componentSpy.valuesArray).toBe(valuesArray);
+              expect(panel.widgetBuilder.build).toHaveBeenCalled();
+            });
+          });
+        })
       });
     });
   });
