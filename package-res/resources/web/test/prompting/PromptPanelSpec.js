@@ -866,7 +866,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
 
               panel._changeComponentsByDiff(change);
 
-              expect(panel.setParameterValue).toHaveBeenCalledWith(originalParam, "do");
+              expect(panel.setParameterValue).toHaveBeenCalledWith(originalParam, ["do"]);
             });
 
             it("should compare the data values to determine if a change was made.", function() {
