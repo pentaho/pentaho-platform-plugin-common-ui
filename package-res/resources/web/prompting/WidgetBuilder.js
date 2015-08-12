@@ -52,13 +52,13 @@ define(['./builders/PromptPanelBuilder', './builders/ParameterGroupPanelBuilder'
       './builders/SubmitPanelBuilder', './builders/SubmitComponentBuilder', './builders/LabelBuilder',
       './builders/ErrorLabelBuilder', './builders/DropDownBuilder', './builders/RadioBuilder', './builders/CheckBuilder',
       './builders/MultiButtonBuilder', './builders/ListBuilder', './builders/DateInputBuilder',
-      './builders/ExternalInputBuilder', './builders/TextAreaBuilder', './builders/GarbageCollectorBuilder',
+      './builders/ExternalInputBuilder', './builders/TextAreaBuilder',
       './builders/TextInputBuilder'],
 
     function (PromptPanelBuilder, ParameterGroupPanelBuilder, ParameterPanelBuilder, SubmitPanelBuilder,
               SubmitComponentBuilder, LabelBuilder, ErrorLabelBuilder, DropDownBuilder, RadioBuilder, CheckBuilder,
               MultiButtonBuilder, ListBuilder, DateInputBuilder, ExternalInputBuilder, TextAreaBuilder,
-              GarbageCollectorBuilder, TextInputBuilder) {
+              TextInputBuilder) {
 
       return {
         /**
@@ -81,7 +81,6 @@ define(['./builders/PromptPanelBuilder', './builders/ParameterGroupPanelBuilder'
           'filebrowser': new ExternalInputBuilder(),
           'external-input': new ExternalInputBuilder(),
           'multi-line': new TextAreaBuilder(),
-          'gc': new GarbageCollectorBuilder(),
           'default': new TextInputBuilder()
         },
 
