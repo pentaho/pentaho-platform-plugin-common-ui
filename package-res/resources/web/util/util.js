@@ -19,7 +19,7 @@
  * Utility methods designed for general use
  */
 
-define("common-ui/util/util", ["common-ui/underscore", "dijit/registry", "dojo/dom"], function(_, registry, dom) {
+define("common-ui/util/util", ["dijit/registry", "dojo/dom"], function(registry, dom) {
   return {
 
   /**
@@ -206,7 +206,7 @@ define("common-ui/util/util", ["common-ui/underscore", "dijit/registry", "dojo/d
     isNumberType: function (type) {
       var whiteList = ["java.lang.Number", "java.lang.Byte", "java.lang.Double", "java.lang.Float", "java.lang.Integer",
         "java.lang.Long", "java.lang.Short", "java.math.BigDecimal", "java.math.BigInteger"];
-      return _.contains(whiteList, type);
+      return whiteList.indexOf(type) >= 0;
     }
   }
 });

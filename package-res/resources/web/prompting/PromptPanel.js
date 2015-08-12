@@ -27,8 +27,8 @@
  * @property {Dashboard} dashboard The dashboard object assigned to the prompt
  * @property {Boolean} parametersChanged True if the parameters have changed, False otherwise
  */
-define(['amd!cdf/lib/underscore', 'cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/util/util', 'common-ui/util/GUIDHelper', './WidgetBuilder', 'cdf/Dashboard.Clean'],
-    function (_, Base, Logger, DojoNumber, i18n, Utils, GUIDHelper, WidgetBuilder, Dashboard) {
+define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/util/util', 'common-ui/util/GUIDHelper', './WidgetBuilder', 'cdf/Dashboard.Clean'],
+    function (Base, Logger, DojoNumber, i18n, Utils, GUIDHelper, WidgetBuilder, Dashboard) {
       /**
        * Creates a Widget calling the widget builder factory
        *
