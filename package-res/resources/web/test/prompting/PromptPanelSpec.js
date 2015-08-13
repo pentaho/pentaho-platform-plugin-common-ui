@@ -695,19 +695,19 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
           beforeEach(function() {
             paramSpy = jasmine.createSpy("paramSpy");
 
-            componentSpy = jasmine.createSpy("componentSpy");
+            componentSpy = jasmine.createSpyObj("componentSpy", [ "clear" ]);
             componentSpy.parameter = paramName;
             componentSpy.type = "TestPanel";
 
             panel.dashboard.components = [componentSpy];
             panel.guid = guid;
 
-            groupPanelSpy = jasmine.createSpy("groupPanelSpy");
+            groupPanelSpy = jasmine.createSpyObj("groupPanelSpy", [ "clear" ]);
             groupPanelSpy.components = [componentSpy];
             spyOn(groupPanelSpy.components, "indexOf").and.callThrough();
             spyOn(groupPanelSpy.components, "splice").and.callThrough();
 
-            promptPanelSpy = jasmine.createSpy("promptPanelSpy");
+            promptPanelSpy = jasmine.createSpyObj("promptPanelSpy", [ "clear" ]);
             promptPanelSpy.components = [];
 
             spyOn(panel, "getParameterName").and.returnValue(paramName);
@@ -719,7 +719,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
               }
             });
 
-            submitComponentSpy = jasmine.createSpy("submitComponentSpy");
+            submitComponentSpy = jasmine.createSpyObj("submitComponentSpy", [ "clear" ]);
             submitComponentSpy.promptType = "submit";
             submitComponentSpy.type = "FlowPromptLayoutComponent";
           });
@@ -915,7 +915,77 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
               expect(panel.widgetBuilder.build).toHaveBeenCalled();
             });
           });
-        })
+
+          describe("_changeErrors", function() {
+            beforeEach(function() {
+              spyOn(panel, "removeDashboardComponents");
+              componentSpy.components = [];
+
+              spyOn(panel.widgetBuilder, "build").and.callFake(function(args) {
+                var spy = jasmine.createSpy("errSpy");
+                spy.promptType = "label";
+                spy.type = "TextComponent";
+                spy.isErrorIndicator = true;
+                spy.label = args.errorMessage;
+                return spy;
+              });
+            });
+
+            it("should not process errors if it's not changed", function() {
+              var panelComponentsCount = componentSpy.components.length;
+              paramSpy.isErrorChanged = false;
+
+              panel._changeErrors(paramSpy);
+
+              expect(componentSpy.components.length).toBe(panelComponentsCount);
+              expect(panel.removeDashboardComponents).not.toHaveBeenCalled();
+            });
+
+            it("should process existing errors", function() {
+              panel.paramDefn = {
+                errors : {}
+              };
+              panel.paramDefn.errors[paramSpy.name] = [ "error_0", "error_1" ];
+
+              var existErrorComponent = jasmine.createSpy("existErrorComponent");
+              existErrorComponent.promptType = "label";
+              existErrorComponent.type = "TextComponent";
+              existErrorComponent.isErrorIndicator = true;
+              existErrorComponent.label = "test error";
+              var existNotDelErrorComponent = jasmine.createSpy("existNotDelErrorComponent");
+              existNotDelErrorComponent.promptType = "label";
+              existNotDelErrorComponent.type = "TextComponent";
+              existNotDelErrorComponent.isErrorIndicator = true;
+              existNotDelErrorComponent.label = "error_1";
+              componentSpy.components.push(existErrorComponent);
+              componentSpy.components.push(existNotDelErrorComponent);
+
+              paramSpy.isErrorChanged = true;
+
+              panel._changeErrors(paramSpy);
+
+              expect(componentSpy.components.length).toBe(panel.paramDefn.errors[paramSpy.name].length);
+              expect(componentSpy.components[0].label).toBe(panel.paramDefn.errors[paramSpy.name][0]);
+              expect(componentSpy.components[1].label).toBe(panel.paramDefn.errors[paramSpy.name][1]);
+              expect(panel.removeDashboardComponents).toHaveBeenCalled();
+              expect(componentSpy.cssClass).toContain("error");
+            });
+
+            it("should process without errors", function() {
+              panel.paramDefn = {
+                errors : {}
+              };
+
+              paramSpy.isErrorChanged = true;
+
+              panel._changeErrors(paramSpy);
+
+              expect(componentSpy.components.length).toBe(0);
+              expect(panel.removeDashboardComponents).not.toHaveBeenCalled();
+              expect(componentSpy.cssClass).not.toContain("error");
+            });
+          });
+        });
       });
     });
   });

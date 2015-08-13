@@ -131,12 +131,12 @@ define([], function() {
             var oldParam = oldParamDefn.getParameter(param.name);
             if (!oldParam || oldParam.attributes.hidden == 'true') {
               this._fillWrapObj(result, "toAdd", group, param); // found newest parameters
-            } else if (this._isBehavioralAttrsChanged(oldParam, param)
-              || this._isErrorsChanged(param.name, oldParamDefn, newParamDefn)) {
+            } else if (this._isBehavioralAttrsChanged(oldParam, param)) {
               // add parameter to remove and add arrays for recreating components
               this._fillWrapObj(result, "toRemove", group, oldParam);
               this._fillWrapObj(result, "toAdd", group, param);
             } else if (this._isDataChanged(oldParam, param)) {
+              param.isErrorChanged = this._isErrorsChanged(param.name, oldParamDefn, newParamDefn);
               this._fillWrapObj(result, "toChangeData", group, param);
             }
           }

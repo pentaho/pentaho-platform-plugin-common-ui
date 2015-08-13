@@ -231,17 +231,17 @@ define([ 'common-ui/prompting/parameters/Parameter', 'common-ui/prompting/parame
                 spyOn(paramDefnOld, "getParameter").and.returnValue(paramSpy);
                 spyOn(parameterDefinitionDiffer, "_isBehavioralAttrsChanged").and.returnValue(false);
                 spyOn(parameterDefinitionDiffer, "_isErrorsChanged").and.returnValue(true);
-                spyOn(parameterDefinitionDiffer, "_isDataChanged").and.returnValue(false);
+                spyOn(parameterDefinitionDiffer, "_isDataChanged").and.returnValue(true);
 
                 var result = parameterDefinitionDiffer.diff(paramDefnOld, paramDefnNew);
 
                 expect(parameterDefinitionDiffer._isBehavioralAttrsChanged).toHaveBeenCalled();
                 expect(parameterDefinitionDiffer._isErrorsChanged).toHaveBeenCalled();
-                expect(parameterDefinitionDiffer._isDataChanged).not.toHaveBeenCalled();
+                expect(parameterDefinitionDiffer._isDataChanged).toHaveBeenCalled();
                 expect(result).toBeDefined();
-                expect(Object.keys(result.toAdd).length).toBe(1);
-                expect(Object.keys(result.toChangeData).length).toBe(0);
-                expect(Object.keys(result.toRemove).length).toBe(1);
+                expect(Object.keys(result.toAdd).length).toBe(0);
+                expect(Object.keys(result.toChangeData).length).toBe(1);
+                expect(Object.keys(result.toRemove).length).toBe(0);
             });
 
             it("should return result with changed parameters by changed values", function() {
@@ -282,7 +282,7 @@ define([ 'common-ui/prompting/parameters/Parameter', 'common-ui/prompting/parame
                 var result = parameterDefinitionDiffer.diff(paramDefnOld, paramDefnNew);
 
                 expect(parameterDefinitionDiffer._isBehavioralAttrsChanged).toHaveBeenCalled();
-                expect(parameterDefinitionDiffer._isErrorsChanged).toHaveBeenCalled();
+                expect(parameterDefinitionDiffer._isErrorsChanged).not.toHaveBeenCalled();
                 expect(parameterDefinitionDiffer._isDataChanged).toHaveBeenCalled();
                 expect(result).toBeDefined();
                 expect(Object.keys(result.toAdd).length).toBe(0);

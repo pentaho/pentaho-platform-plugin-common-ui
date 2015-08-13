@@ -234,19 +234,7 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
       };
 
       /**
-       * Removes a list of components from the current dashboard
-       *
-       * @name _removeComponents
-       * @method
-       * @private
-       * @param {Array} components An array of components to remove
-       */
-      var _removeComponents = function(components) {
-        this.removeDashboardComponents(components);
-      };
-
-      /**
-       * Recurrsively adds the component and its children to the current dashboard
+       * Recursively adds the component and its children to the current dashboard
        *
        * @name _addComponent
        * @method
@@ -281,6 +269,37 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
         return result;
       };
 
+      /**
+       * Finds error's components are located on the parent panel component
+       * @name _findErrorComponents
+       * @method
+       * @private
+       * @returns {Array} The array of error's components
+       */
+      var _findErrorComponents = function(panelComponent) {
+        var result = [];
+        if (panelComponent.components) {
+          result = panelComponent.components.filter(function(item) {
+            return item.promptType == "label" && item.type == "TextComponent" && item.isErrorIndicator;
+          });
+        }
+        return result;
+      };
+
+      /**
+       * Removes a component from parent panel
+       * @name _removeChildComponent
+       * @method
+       * @private
+       * @param {BaseComponent} parent The parent component that has array of child components
+       * @param {BaseComponent} toRemoveComponent The child component that should be deleted
+       */
+      var _removeChildComponent = function(parent, toRemoveComponent) {
+        var index = parent.components.indexOf(toRemoveComponent);
+        if (index > -1) {
+          parent.components.splice(index, 1);
+        }
+      };
 
       var PromptPanel = Base.extend({
 
@@ -683,16 +702,14 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
 
             for (var i = 0; i < params.length; i++) {
               var param = params[i];
-              var component = _getComponentByParam.call(this, param, true); // get component panel
+              var component = _getComponentByParam.call(this, param, true); // get component panel by param
               if (component != null) {
                 toRemove.push(component);
 
+                // removes the component from the group panel and also removes the group panel if it's empty
                 var groupPanel = this.dashboard.getComponentByName(groupName);
                 if (groupPanel) {
-                  var index = groupPanel.components.indexOf(component);
-                  if (index > -1) {
-                    groupPanel.components.splice(index, 1);
-                  }
+                  _removeChildComponent.call(this, groupPanel, component);
                   if (groupPanel.components.length == 0) {
                     toRemove.push(groupPanel);
                   }
@@ -701,26 +718,29 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
             }
           }
 
+          // removes the submit panel if it's needed
           var panelComponent = this.dashboard.getComponentByName("prompt" + this.guid);
           if (panelComponent) {
-            if (panelComponent.components.length <= 2) {
+            // we need to remove components from prompt panel component also
+            for (var i in toRemove) {
+              _removeChildComponent.call(this, panelComponent, toRemove[i]);
+            }
+
+            if (panelComponent.components.length == 1) {
               var submitPanel = _findSubmitComponent.call(this, panelComponent);
               if (submitPanel) {
                 toRemove.push(submitPanel);
+                _removeChildComponent.call(this, panelComponent, submitPanel);
               }
             }
 
-            // we need to remove components from prompt panel component also
-            for (var i in toRemove) {
-              var toRemoveComponent = toRemove[i];
-              var index = panelComponent.components.indexOf(toRemoveComponent);
-              if (index > -1) {
-                panelComponent.components.splice(index, 1);
-              }
+            this.removeDashboardComponents(toRemove);
+
+            // we need clear global panel if it's empty after removing child components
+            if (panelComponent.components.length == 0) {
+              panelComponent.clear();
             }
           }
-
-          _removeComponents.call(this, toRemove);
         },
 
         /**
@@ -740,10 +760,11 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
             var fieldComponents = [];
             for (var i = 0; i < params.length; i++) {
               var param = params[i];
-              var component = this._buildPanelForParameter(param); // returns a panel component
+              var component = this._buildPanelForParameter(param); // creates a panel component
               fieldComponents.push(component);
             }
 
+            // creates a new group panel if it's not present and adds the panel components to the group panel
             var groupPanel = this.dashboard.getComponentByName(groupName);
             if (!groupPanel) {
               groupPanel = _createWidgetForGroupPanel.call(this, addWrap.group, fieldComponents);
@@ -753,12 +774,65 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
             }
           }
 
+          // creates a new submit panel if it's not present and adds the submit panel to the prompt panel
           if (panelComponent.components.length > 0 && !_findSubmitComponent.call(this, panelComponent)) {
             var submitPanel = _createWidgetForSubmitPanel.call(this);
             panelComponent.components.push(submitPanel);
           }
 
           _addComponent.call(this, panelComponent);
+        },
+
+        /**
+         * Change error's components determined by the ParameterDefinitionDiffer#diff
+         *
+         * @name PromptPanel#_changeErrors
+         * @method
+         * @param {Parameter} param The parameter
+         * @private
+         */
+        _changeErrors: function(param) {
+          if (param.isErrorChanged) {
+            var errors = this.paramDefn.errors[param.name];
+            var panel = _getComponentByParam.call(this, param, true);
+            var existingErrors = _findErrorComponents.call(this, panel);
+
+            // remove unused old errors components
+            var toRemove = [];
+            for (var errIndex in existingErrors) {
+              var errComp = existingErrors[errIndex];
+              var _isExistingErrComp = errors && errors.some(function(item) {
+                return item == errComp.label;
+              });
+              if (!_isExistingErrComp) {
+                for (var i in existingErrors) {
+                  _removeChildComponent.call(this, panel, errComp);
+                }
+                toRemove.push(errComp);
+              }
+            }
+            if (toRemove.length > 0) {
+              this.removeDashboardComponents(toRemove);
+            }
+
+            // add new errors components
+            if (errors) {
+              for (var errIndex in errors) {
+                var error = errors[errIndex];
+                var isExist = existingErrors.some(function(item) {
+                  return item.label == error;
+                });
+                if (!isExist) {
+                  var errIndex = panel.components.length - 1;
+                  panel.components.splice(errIndex, 0, _createWidgetForErrorLabel.call(this, param, error));
+                }
+              }
+            }
+
+            // checks existing errors components to set correct css style
+            var existingErrorsComponents = _findErrorComponents.call(this, panel);
+            panel.cssClass = (existingErrorsComponents.length > 0) ? (panel.cssClass || '') + ' error' : (panel.cssClass || '').replace(' error', '');
+          }
         },
 
         /**
@@ -793,6 +867,10 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
                   component.valuesArray = newValuesArray;
                 }
 
+                // also we should check and update errors components
+                this._changeErrors(param);
+
+                // updates components in the group panel
                 var groupPanel = this.dashboard.getComponentByName(groupName);
                 for (var i in groupPanel.components) {
                   if (groupPanel.components[i].name == component.name) {
@@ -800,6 +878,8 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
                     break;
                   }
                 }
+
+                // updates global prompt panel
                 var panelComponent = this.dashboard.getComponentByName("prompt" + this.guid);
                 _mapComponents(panelComponent, function (component) {
                   this.dashboard.updateComponent(component);
@@ -1068,7 +1148,11 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
             // to update() in a setTimeout(). To prevent that, we'll clear the removed components with the GarbageCollectorComponent
             // when we initialize the next set of components.
             if (!postponeClear) {
-              component.clear();
+              if (component.remove) {
+                component.remove();
+              } else {
+                component.clear();
+              }
             }
 
             if (component.parameter) {
