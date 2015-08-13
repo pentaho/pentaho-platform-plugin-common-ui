@@ -59,6 +59,16 @@ define([ 'cdf/lib/jquery', 'cdf/components/BaseComponent', 'cdf/dashboard/Utils'
     },
 
     /**
+     * Removes the component
+     *
+     * @name CompositeComponent#remove
+     * @method
+     */
+    remove: function() {
+      this.placeholder().remove();
+    },
+
+    /**
      * Gets the CssClass assigned to the component
      *
      * @name CompositeComponent#getClassFor
