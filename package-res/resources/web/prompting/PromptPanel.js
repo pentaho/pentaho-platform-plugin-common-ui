@@ -851,8 +851,7 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
               var param = params[i];
 
               // Find selected value in param values list and set it. This works, even if the data in valuesArray is different
-              var selectedValues = param.getSelectedValuesValue();
-              this.setParameterValue(param, selectedValues);
+              this._initializeParameterValue(null, param);
 
               var component = _getComponentByParam.call(this, param);
               if (component != null) {
