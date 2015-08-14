@@ -81,6 +81,7 @@ define(['cdf/components/BaseComponent', 'dijit/form/DateTextBox', 'dijit/registr
          * @name DojoDateTextBoxComponent#update
          */
         update: function () {
+          this.clear();
           var myself = this;
 
           var parameterValue = this.dashboard.getParameterValue(this.parameter),
@@ -91,10 +92,6 @@ define(['cdf/components/BaseComponent', 'dijit/form/DateTextBox', 'dijit/registr
           this.dijitId = this.htmlObject + '_input';
 
           $('#' + this.htmlObject).html($('<input/>').attr('id', this.dijitId));
-
-          if(registry.byId(this.dijitId)) {
-            registry.remove(this.dijitId);
-          }
 
           var dateFormat = this.dateFormat;
           var dateTextBox = new DateTextBox({
