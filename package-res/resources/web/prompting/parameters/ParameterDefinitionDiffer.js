@@ -128,6 +128,11 @@ define([], function() {
         // find new and changed parameters
         newParamDefn.mapParameters(function(param, group) {
           if (!param.attributes.hidden || param.attributes.hidden == 'false') { // Can be 'false' or undefined
+            var index = group.parameters.indexOf(param);
+            if (index > 0) {
+              param.after = group.parameters[index-1];
+            }
+
             var oldParam = oldParamDefn.getParameter(param.name);
             if (!oldParam || oldParam.attributes.hidden == 'true') {
               this._fillWrapObj(result, "toAdd", group, param); // found newest parameters

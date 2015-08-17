@@ -784,7 +784,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
               expect(panel.widgetBuilder.build).toHaveBeenCalled();
             });
 
-            it("should find a group panel by name and succeed", function() {
+            it("should find a group panel by name and insert the element at index 0 and succeed", function() {
               promptPanelSpy.components = [componentSpy];
 
               var widgetSpy = jasmine.createSpy("widgetSpy");
@@ -800,6 +800,17 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
               expect(panel.dashboard.getComponentByName).toHaveBeenCalledWith("prompt"+guid);
               expect(panel._buildPanelForParameter).toHaveBeenCalledWith(paramSpy);
               expect(panel.widgetBuilder.build).toHaveBeenCalled();
+              expect(groupPanelSpy.components.indexOf(panelSpy)).toBe(0);
+            });
+
+            it("should preserve the index of the component and succeed", function() {
+              paramSpy.after = paramName;
+
+              panel._addComponentsByDiff(diffSpy.toAdd);
+
+              expect(panel.dashboard.addComponent).toHaveBeenCalled();
+              expect(panel.dashboard.addComponent.calls.count()).toBe(1);
+              expect(groupPanelSpy.components.indexOf(panelSpy)).toBe(1);
             });
           });
 

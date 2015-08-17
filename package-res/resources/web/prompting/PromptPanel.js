@@ -682,7 +682,6 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
             this.isRefresh = true;
             this.paramDefn = paramDefn;
 
-
             this.init(noAutoAutoSubmit);
           }
         },
@@ -761,6 +760,11 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
             for (var i = 0; i < params.length; i++) {
               var param = params[i];
               var component = this._buildPanelForParameter(param); // creates a panel component
+
+              if (param.after) { // Find component panel to insert after
+                component.after = _getComponentByParam.call(this, param.after, true);
+              }
+
               fieldComponents.push(component);
             }
 
@@ -770,7 +774,16 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
               groupPanel = _createWidgetForGroupPanel.call(this, addWrap.group, fieldComponents);
               panelComponent.components.push(groupPanel);
             } else {
-              groupPanel.components = groupPanel.components.concat(fieldComponents);
+
+              for (var j in fieldComponents) {
+                var fieldComponent = fieldComponents[j];
+                var insertAt = 0;
+                if (fieldComponent.after) {
+                  var insertAfter = groupPanel.components.indexOf(fieldComponent.after);
+                  insertAt = insertAfter + 1;
+                }
+                groupPanel.components.splice(insertAt, 0, fieldComponent);
+              }
             }
           }
 
