@@ -93,7 +93,7 @@ define([ 'cdf/lib/jquery', 'dijit/registry', 'common-ui/prompting/components/Doj
         spyOn(comp, "_doAutoFocus");
       });
 
-      it("should init date text box", function() {
+      it("should init date text box with plain param", function() {
         comp.update();
 
         expect(dashboard.getParameterValue).toHaveBeenCalledWith(testParam);
@@ -101,10 +101,87 @@ define([ 'cdf/lib/jquery', 'dijit/registry', 'common-ui/prompting/components/Doj
         expect(comp.dijitId).toBe(testId + '_input');
         expect($.fn.html).toHaveBeenCalled();
         expect($.fn.attr).toHaveBeenCalledWith('id', comp.dijitId);
-        expect(comp.onChangeHandle).toBeDefined();
         expect(comp._doAutoFocus).toHaveBeenCalled();
       });
+
+      it("should init date text box with array param", function() {
+        dashboard.getParameterValue.and.returnValue([testVal]);
+        comp.update();
+
+        expect(dashboard.getParameterValue).toHaveBeenCalledWith(testParam);
+        expect(transportFormatter.parse).toHaveBeenCalledWith(testVal);
+        expect(comp.dijitId).toBe(testId + '_input');
+        expect($.fn.html).toHaveBeenCalled();
+        expect($.fn.attr).toHaveBeenCalledWith('id', comp.dijitId);
+        expect(comp._doAutoFocus).toHaveBeenCalled();
+      });
+
+      it("should init date text box with legacy date", function() {
+        comp.transportFormatter = undefined;
+        comp.dateFormat = "yyyy-mm-dd";
+
+        var localeFormatter = jasmine.createSpyObj("localeFormatter", [ "parse" ]);
+        localeFormatter.parse.and.callFake(function(val) {
+          return "2001-04-14";
+        });
+        comp.localeFormatter = localeFormatter;
+        spyOn(comp, "_isLegacyDateFormat").and.callThrough();
+        spyOn(comp, "_convertFormat").and.callThrough();
+
+        comp.update();
+        expect(comp._isLegacyDateFormat).toHaveBeenCalled();
+        expect(comp._convertFormat).toHaveBeenCalled();
+      });
+
+      it("inits min constrainst properly from TODAY", function() {
+        comp.startDate = "TODAY";
+        var localeFormatter = jasmine.createSpyObj("localeFormatter", [ "format" ]);
+        localeFormatter.format.and.callFake(function(val) {
+          return "2001-04-14";
+        });
+        comp.localeFormatter = localeFormatter;
+
+        comp.update();
+        expect(comp.localeFormatter.format).not.toHaveBeenCalled();
+      });
+
+      it("inits min constrainst properly from date", function() {
+        comp.startDate = "2001-01-01";
+        var localeFormatter = jasmine.createSpyObj("localeFormatter", [ "format" ]);
+        localeFormatter.format.and.callFake(function(val) {
+          return "2001-04-14";
+        });
+        comp.localeFormatter = localeFormatter;
+
+        comp.update();
+        expect(comp.localeFormatter.format).toHaveBeenCalled();
+      });
+
+      it("inits max constrainst properly from TODAY", function() {
+        comp.endDate = "TODAY";
+        var localeFormatter = jasmine.createSpyObj("localeFormatter", [ "format" ]);
+        localeFormatter.format.and.callFake(function(val) {
+          return "2001-04-14";
+        });
+        comp.localeFormatter = localeFormatter;
+
+        comp.update();
+        expect(comp.localeFormatter.format).not.toHaveBeenCalled();
+      });
+
+      it("inits max constrainst properly from date", function() {
+        comp.endDate = "2001-01-01";
+        var localeFormatter = jasmine.createSpyObj("localeFormatter", [ "format" ]);
+        localeFormatter.format.and.callFake(function(val) {
+          return "2001-04-14";
+        });
+        comp.localeFormatter = localeFormatter;
+
+        comp.update();
+        expect(comp.localeFormatter.format).toHaveBeenCalled();
+      });
     });
+
 
     describe("getValue", function() {
       it("should return formatted value", function() {
@@ -128,6 +205,46 @@ define([ 'cdf/lib/jquery', 'dijit/registry', 'common-ui/prompting/components/Doj
         expect(registry.byId).toHaveBeenCalledWith(dijitId);
         expect(dijitElement.get).toHaveBeenCalledWith('value');
         expect(transportFormatter.format).toHaveBeenCalledWith(testVal);
+
+        comp.transportFormatter = undefined;
+        comp.dateFormat = "yyyy-mm-dd";
+        dijitElement.get.and.returnValue("2001-04-14");
+
+        var localeFormatter = jasmine.createSpyObj("localeFormatter", [ "format" ]);
+        localeFormatter.format.and.callFake(function(val) {
+          return "2001-04-14";
+        });
+        comp.localeFormatter = localeFormatter;
+        spyOn(comp, "_isLegacyDateFormat").and.callThrough();
+        spyOn(comp, "_convertFormat").and.callThrough();
+        value = comp.getValue();
+        expect(comp._isLegacyDateFormat).toHaveBeenCalled();
+        expect(comp._convertFormat).toHaveBeenCalled();
+      });
+    });
+
+    describe("_convertFormat", function(){
+      var component;
+      beforeEach(function(){
+        comp = new DojoDateTextBoxComponent();
+      });
+
+      it("converts the jquery format to dojo properly", function(){
+        var testFormat = function(initialFormat, newFormat){
+          comp.dateFormat = initialFormat;
+          comp._convertFormat();
+          expect(comp.dateFormat).toEqual(newFormat);
+        };
+
+        testFormat("yy-mm-dd", "yyyy-MM-dd");
+        testFormat("yyyy/mm MM/dd", "yyyy/MM MMMM/dd");
+        testFormat("yMMdd", "yyMMMMdd");
+        testFormat("MMyydd", "MMMMyyyydd");
+        testFormat("MMo", "MMMMD");
+        testFormat("MMoo", "MMMMDD");
+        testFormat("MM ooo", "MMMM DDD");
+        testFormat("MM D ooo", "MMMM EEE DDD");
+        testFormat("DD ooo", "EEEE DDD");
       });
     });
   });
