@@ -190,7 +190,7 @@ define([ 'common-ui/prompting/parameters/Parameter', 'common-ui/prompting/parame
                 spyOn(parameterDefinitionDiffer, "_isDataChanged").and.returnValue(false);
 
                 var group = paramDefnNew.getParameterGroup(groupName);
-                group.parameters.push(group.parameters[0]);
+                group.parameters.push(createParam(1, "String", true, true, true, true));
 
                 var result = parameterDefinitionDiffer.diff(paramDefnOld, paramDefnNew);
 
@@ -203,7 +203,7 @@ define([ 'common-ui/prompting/parameters/Parameter', 'common-ui/prompting/parame
                 expect(Object.keys(result.toRemove).length).toBe(1);
                 expect(result.toAdd[groupName].params[0].after).not.toBeDefined();
                 expect(result.toAdd[groupName].params[1].after).toBeDefined();
-                expect(result.toAdd[groupName].params[1].after).toBe("paramName");
+                expect(result.toAdd[groupName].params[1].after.name).toBe(group.parameters[0].name);
             });
 
             it("should return result with added and removed parameters by changed attributes", function() {
