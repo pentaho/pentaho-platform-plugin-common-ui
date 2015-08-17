@@ -22,6 +22,7 @@ define([ 'common-ui/prompting/parameters/Parameter', 'common-ui/prompting/parame
 
     describe("ParameterDefinitionDiffer", function() {
         var parameterDefinitionDiffer;
+        var groupName = "groupName";
 
         var createParam = function(arrayCount, type, list, mandatory, multiSelect, strict) {
             var param = new Parameter();
@@ -49,6 +50,7 @@ define([ 'common-ui/prompting/parameters/Parameter', 'common-ui/prompting/parame
                 paramDefn.errors[paramName].push("error" + i);
             }
             var group = new ParameterGroup();
+            group.name = groupName;
             var param = createParam(arrayCount, "String", true, true, true, true);
             param.name = paramName;
             group.parameters.push(param);
@@ -187,6 +189,9 @@ define([ 'common-ui/prompting/parameters/Parameter', 'common-ui/prompting/parame
                 spyOn(parameterDefinitionDiffer, "_isErrorsChanged").and.returnValue(false);
                 spyOn(parameterDefinitionDiffer, "_isDataChanged").and.returnValue(false);
 
+                var group = paramDefnNew.getParameterGroup(groupName);
+                group.parameters.push(group.parameters[0]);
+
                 var result = parameterDefinitionDiffer.diff(paramDefnOld, paramDefnNew);
 
                 expect(parameterDefinitionDiffer._isBehavioralAttrsChanged).not.toHaveBeenCalled();
@@ -196,6 +201,9 @@ define([ 'common-ui/prompting/parameters/Parameter', 'common-ui/prompting/parame
                 expect(Object.keys(result.toAdd).length).toBe(1);
                 expect(Object.keys(result.toChangeData).length).toBe(0);
                 expect(Object.keys(result.toRemove).length).toBe(1);
+                expect(result.toAdd[groupName].params[0].after).not.toBeDefined();
+                expect(result.toAdd[groupName].params[1].after).toBeDefined();
+                expect(result.toAdd[groupName].params[1].after).toBe("paramName");
             });
 
             it("should return result with added and removed parameters by changed attributes", function() {
