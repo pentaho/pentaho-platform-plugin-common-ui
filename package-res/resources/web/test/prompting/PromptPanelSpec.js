@@ -877,7 +877,9 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
 
               panel._changeComponentsByDiff(change);
 
-              expect(panel.setParameterValue).toHaveBeenCalledWith(originalParam, "do");
+              expect(panel.setParameterValue).not.toHaveBeenCalled();
+              expect(panel.forceSubmit).toBeDefined();
+              expect(panel.forceSubmit).toEqual(true);
             });
 
             it("should compare the data values to determine if a change was made.", function() {
@@ -924,6 +926,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
               expect(groupPanelSpy.components[0]).toBe(componentSpy);
               expect(componentSpy.valuesArray).toBe(valuesArray);
               expect(panel.widgetBuilder.build).toHaveBeenCalled();
+              expect(panel.forceSubmit).not.toBeDefined();
             });
           });
 
