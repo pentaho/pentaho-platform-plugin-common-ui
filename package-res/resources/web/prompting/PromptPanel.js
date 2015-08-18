@@ -863,11 +863,11 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
             for (var i in params) {
               var param = params[i];
 
-              // Find selected value in param values list and set it. This works, even if the data in valuesArray is different
-              this._initializeParameterValue(null, param);
-
               var component = _getComponentByParam.call(this, param);
               if (component != null) {
+                // also we should check and update errors components
+                this._changeErrors(param);
+
                 // Create new widget to get properly formatted values array
                 var newValuesArray = this.widgetBuilder.build({
                   param: param,
@@ -876,26 +876,29 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
 
                 // Compare values array from param (which is formatted into valuesArray) with the current valuesArray
                 if (JSON.stringify(component.valuesArray) !== JSON.stringify(newValuesArray)) {
+                  // Find selected value in param values list and set it. This works, even if the data in valuesArray is different
+                  this._initializeParameterValue(null, param);
+
+                  // Set new values array
                   component.valuesArray = newValuesArray;
-                }
 
-                // also we should check and update errors components
-                this._changeErrors(param);
-
-                // updates components in the group panel
-                var groupPanel = this.dashboard.getComponentByName(groupName);
-                for (var i in groupPanel.components) {
-                  if (groupPanel.components[i].name == component.name) {
-                    groupPanel.components[i] = component;
-                    break;
+                  // updates components in the group panel
+                  var groupPanel = this.dashboard.getComponentByName(groupName);
+                  for (var i in groupPanel.components) {
+                    if (groupPanel.components[i].name == component.name) {
+                      groupPanel.components[i] = component;
+                      break;
+                    }
                   }
-                }
 
-                // updates global prompt panel
-                var panelComponent = this.dashboard.getComponentByName("prompt" + this.guid);
-                _mapComponents(panelComponent, function (component) {
-                  this.dashboard.updateComponent(component);
-                }.bind(this));
+                  // updates global prompt panel
+                  var panelComponent = this.dashboard.getComponentByName("prompt" + this.guid);
+                  _mapComponents(panelComponent, function (component) {
+                    this.dashboard.updateComponent(component);
+                  }.bind(this));
+                } else {
+                  this.forceSubmit = true;
+                }
               }
             }
           }
@@ -1027,12 +1030,13 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
             fireSubmit = !noAutoAutoSubmit;
           }
 
-          if (fireSubmit) {
+          if (this.forceSubmit || fireSubmit) {
             this.submit(this, {isInit: !this.isRefresh});
           }
 
           this.diff = null;
           this.isRefresh = null;
+          this.forceSubmit = false;
         },
 
         /**
