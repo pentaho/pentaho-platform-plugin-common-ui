@@ -89,16 +89,25 @@ define(['cdf/components/BaseComponent', "dojo/date/locale", 'dijit/form/DateText
           var parameterValue = this.dashboard.getParameterValue(this.parameter),
               value = undefined;
 
-          if(parameterValue.length == 1) {
+          // If no value was specified use current date
+          if (!parameterValue.length){
+            parameterValue = this._getFormattedDate(new Date());
+          } else if(parameterValue.length == 1) {
             parameterValue = parameterValue[0];
           }
 
+          // Get the date well formatted according to the date format specified to pass on to the parser.
+          // For backwards compatibility we need to check if the component is a legacy version of the 
+          // date picker and update the date format accordingly.
+          var formattedDate = this._getFormattedDate(new Date(parameterValue));
+
+          // Parse the date to a Date object.
           if(this.transportFormatter) {
-            value = this.transportFormatter.parse(parameterValue);
+            value = this.transportFormatter.parse(formattedDate);
           } else if(this._isLegacyDateFormat()) {
-            this._convertFormat();
-            value = this.localeFormatter.parse(parameterValue, {datePattern: myself.dateFormat, selector: "date"});
-          }
+            value = this.localeFormatter.parse(formattedDate, {datePattern: myself.dateFormat, selector: "date"});
+          }          
+
           this.dijitId = this.htmlObject + '_input';
 
           $('#' + this.htmlObject).html($('<input/>').attr('id', this.dijitId));
@@ -137,10 +146,6 @@ define(['cdf/components/BaseComponent', "dojo/date/locale", 'dijit/form/DateText
         /**
          * Returns the value assigned to the component
          *
-         * Due to legacy reasons we can't format the numbers in the same way in the Dashboards plugin.
-         * Dashboards plugin do not have the notion of timezone and we need to keep the jquery date picker plain date
-         * picking.
-         *
          * @method
          * @name DojoDateTextBoxComponent#getValue
          *
@@ -148,6 +153,20 @@ define(['cdf/components/BaseComponent', "dojo/date/locale", 'dijit/form/DateText
          */
         getValue: function () {
           var date = registry.byId(this.dijitId).get('value');
+          return this._getFormattedDate(date);
+        },
+
+        /**
+         * Returns a formatted date
+         *
+         * Due to legacy reasons we can't format the numbers in the same way in the Dashboards plugin.
+         * Dashboards plugin do not have the notion of timezone and we need to keep the jquery date picker plain date
+         * picking.
+         *
+         * @returns {date}
+         * @private
+         */
+        _getFormattedDate: function(date) {
           if(this.transportFormatter) {
             return this.transportFormatter.format(date);
           } else if(this._isLegacyDateFormat()) {
@@ -188,8 +207,8 @@ define(['cdf/components/BaseComponent', "dojo/date/locale", 'dijit/form/DateText
           myself.dateFormat = this.dateFormat ? this.dateFormat : this.param.attributes['data-format'];
 
           var regexConvertYear =      [[/(^|(?!y).)(y{1}(?!y))/, "$1yy"],  [/(^|(?!y).)(y{2}(?!y))/, "$1yyyy"]],
-              regexConvertMonth =     [[/(^|(?!m).)(m{1}(?!m))/, "$1M"],   [/(^|(?!m).)(m{2}(?!m))/, "$1MM"]],
-              regexConvertMonthText = [[/(^|(?!M).)(M{1}(?!M))/, "$1MMM"], [/(^|(?!M).)(M{2}(?!M))/, "$1MMMM"]],
+              regexConvertMonth =     [[/(^|(?!m).)(m{1}(?!m))/i, "$1M"],   [/(^|(?!m).)(m{2}(?!m))/i, "$1MM"]], // case insensitive for this type
+              regexConvertMonthText = [[/(^|(?!M).)(M{3}(?!M))/, "$1MMM"], [/(^|(?!M).)(M{4}(?!M))/, "$1MMMM"]],
               regexConvertDayText =   [[/(^|(?!D).)(D{1}(?!D))/, "$1EEE"], [/(^|(?!D).)(D{2}(?!D))/, "$1EEEE"]],
               regexConvertDayMonth =  [[/(^|(?!o).)(o{1}(?!o))/, "$1D"],   [/(^|(?!o).)(o{2}(?!o))/, "$1DD"], [/(^|(?!o).)(o{3}(?!o))/, "$1DDD"]];
 
