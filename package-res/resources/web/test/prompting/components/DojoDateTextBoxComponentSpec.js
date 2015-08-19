@@ -67,6 +67,7 @@ define([ 'cdf/lib/jquery', 'dijit/registry', 'common-ui/prompting/components/Doj
       var testParam = "test_param";
       var testVal = "test_val";
       var parsedVal = "parsed_";
+      var formattedVal = "formatted_";
       var comp;
       var transportFormatter;
       var dashboard;
@@ -88,6 +89,9 @@ define([ 'cdf/lib/jquery', 'dijit/registry', 'common-ui/prompting/components/Doj
             'data-format' : "dd.MM.yyyy"
           }
         };
+        spyOn(comp, '_getFormattedDate').and.callFake(function(val) {
+          return formattedVal + val;
+        });
         spyOn($.fn, 'html');
         spyOn($.fn, 'attr');
         spyOn(comp, "_doAutoFocus");
@@ -95,9 +99,9 @@ define([ 'cdf/lib/jquery', 'dijit/registry', 'common-ui/prompting/components/Doj
 
       it("should init date text box with plain param", function() {
         comp.update();
-
+        
         expect(dashboard.getParameterValue).toHaveBeenCalledWith(testParam);
-        expect(transportFormatter.parse).toHaveBeenCalledWith(testVal);
+        expect(transportFormatter.parse).toHaveBeenCalledWith(formattedVal + new Date(testVal));
         expect(comp.dijitId).toBe(testId + '_input');
         expect($.fn.html).toHaveBeenCalled();
         expect($.fn.attr).toHaveBeenCalledWith('id', comp.dijitId);
@@ -109,7 +113,7 @@ define([ 'cdf/lib/jquery', 'dijit/registry', 'common-ui/prompting/components/Doj
         comp.update();
 
         expect(dashboard.getParameterValue).toHaveBeenCalledWith(testParam);
-        expect(transportFormatter.parse).toHaveBeenCalledWith(testVal);
+        expect(transportFormatter.parse).toHaveBeenCalledWith(formattedVal + new Date(testVal));
         expect(comp.dijitId).toBe(testId + '_input');
         expect($.fn.html).toHaveBeenCalled();
         expect($.fn.attr).toHaveBeenCalledWith('id', comp.dijitId);
@@ -119,14 +123,14 @@ define([ 'cdf/lib/jquery', 'dijit/registry', 'common-ui/prompting/components/Doj
       it("should init date text box with legacy date", function() {
         comp.transportFormatter = undefined;
         comp.dateFormat = "yyyy-mm-dd";
-
-        var localeFormatter = jasmine.createSpyObj("localeFormatter", [ "parse" ]);
+        var localeFormatter = jasmine.createSpyObj("localeFormatter", [ "parse", "format" ]);
         localeFormatter.parse.and.callFake(function(val) {
           return "2001-04-14";
         });
         comp.localeFormatter = localeFormatter;
         spyOn(comp, "_isLegacyDateFormat").and.callThrough();
         spyOn(comp, "_convertFormat").and.callThrough();
+        comp._getFormattedDate.and.callThrough();
 
         comp.update();
         expect(comp._isLegacyDateFormat).toHaveBeenCalled();
@@ -182,7 +186,6 @@ define([ 'cdf/lib/jquery', 'dijit/registry', 'common-ui/prompting/components/Doj
       });
     });
 
-
     describe("getValue", function() {
       it("should return formatted value", function() {
         var testVal = "test_val";
@@ -237,13 +240,13 @@ define([ 'cdf/lib/jquery', 'dijit/registry', 'common-ui/prompting/components/Doj
         };
 
         testFormat("yy-mm-dd", "yyyy-MM-dd");
-        testFormat("yyyy/mm MM/dd", "yyyy/MM MMMM/dd");
-        testFormat("yMMdd", "yyMMMMdd");
-        testFormat("MMyydd", "MMMMyyyydd");
-        testFormat("MMo", "MMMMD");
-        testFormat("MMoo", "MMMMDD");
-        testFormat("MM ooo", "MMMM DDD");
-        testFormat("MM D ooo", "MMMM EEE DDD");
+        testFormat("yyyy/mm MM/dd", "yyyy/MM MM/dd");
+        testFormat("yMMdd", "yyMMdd");
+        testFormat("MMyydd", "MMyyyydd");
+        testFormat("MMo", "MMD");
+        testFormat("MMoo", "MMDD");
+        testFormat("MM ooo", "MM DDD");
+        testFormat("MM D ooo", "MM EEE DDD");
         testFormat("DD ooo", "EEEE DDD");
       });
     });
