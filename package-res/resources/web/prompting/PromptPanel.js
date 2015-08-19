@@ -875,7 +875,8 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
                 }, param.attributes["parameter-render-type"]).valuesArray;
 
                 // Compare values array from param (which is formatted into valuesArray) with the current valuesArray
-                if (JSON.stringify(component.valuesArray) !== JSON.stringify(newValuesArray)) {
+                // We need to update the components if autoSubmit is off
+                if (JSON.stringify(component.valuesArray) !== JSON.stringify(newValuesArray) || !this.autoSubmit) {
                   // Find selected value in param values list and set it. This works, even if the data in valuesArray is different
                   this._initializeParameterValue(null, param);
 
@@ -897,6 +898,13 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
                     this.dashboard.updateComponent(component);
                   }.bind(this));
                 } else {
+                   // Only update current group panel and sub components
+                  var groupPanel = this.dashboard.getComponentByName(groupName);
+                  _mapComponents(groupPanel, function (component) {
+                    this.dashboard.updateComponent(component);
+                  }.bind(this));
+
+                  // Forces a submit since the entire panel was not updated
                   this.forceSubmit = true;
                 }
               }
