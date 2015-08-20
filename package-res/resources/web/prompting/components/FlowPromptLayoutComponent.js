@@ -23,7 +23,7 @@
  * To use the FlowPromptLayoutComponent you should require the appropriate file from common-ui:
  *
  * <pre><code>
- *   require([ 'common-ui/promting/components/FlowPromptLayoutComponent' ],
+ *   require([ 'common-ui/prompting/components/FlowPromptLayoutComponent' ],
  *     function(FlowPromptLayoutComponent) {
  *
  *     }

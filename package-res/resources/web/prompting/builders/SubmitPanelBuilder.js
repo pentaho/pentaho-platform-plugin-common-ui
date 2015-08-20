@@ -21,7 +21,7 @@
  * To use the SubmitPanelBuilder you should require the appropriate file from common-ui:
  *
  * <pre><code>
- *   require([ 'common-ui/promting/builders/SubmitPanelBuilder' ],
+ *   require([ 'common-ui/prompting/builders/SubmitPanelBuilder' ],
  *     function(SubmitPanelBuilder) {
  *
  *     }

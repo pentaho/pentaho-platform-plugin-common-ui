@@ -23,7 +23,7 @@
  * To use the DojoDateTextBoxComponent you should require the appropriate file from common-ui:
  *
  * <pre><code>
- *   require([ 'common-ui/promting/components/DojoDateTextBoxComponent' ],
+ *   require([ 'common-ui/prompting/components/DojoDateTextBoxComponent' ],
  *     function(DojoDateTextBoxComponent) {
  *       var paramDefn = ...;
  *       var param = ...;

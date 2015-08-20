@@ -23,7 +23,7 @@
  * To use the ExternalInputComponent you should require the appropriate file from common-ui:
  *
  * <pre><code>
- *   require([ 'common-ui/promting/components/ExternalInputComponent' ],
+ *   require([ 'common-ui/prompting/components/ExternalInputComponent' ],
  *     function(ExternalInputComponent) {
  *       var promptPanel = ...;
  *       var paramDefn = ...;

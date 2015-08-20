@@ -21,7 +21,7 @@
  * To use the StaticAutocompleteBoxBuilder you should require the appropriate file from common-ui:
  *
  * <pre><code>
- *   require([ 'common-ui/promting/builders/StaticAutocompleteBoxBuilder' ],
+ *   require([ 'common-ui/prompting/builders/StaticAutocompleteBoxBuilder' ],
  *     function(StaticAutocompleteBoxBuilder) {
  *
  *     }
