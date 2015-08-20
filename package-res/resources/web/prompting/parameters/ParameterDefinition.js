@@ -20,7 +20,7 @@
  * @class
  * @property {Boolean} autoSubmit True is the prompt is in auto submit mode, False otherwise
  * @property {Boolean} autoSubmitUI True if the prompt is in auto submit mode defined in the ui, False otherwise
- * @property {String} layout String defining if the layout of hte prompt is Vertical or Horizontal
+ * @property {String} layout String defining if the layout of the prompt is Vertical or Horizontal
  * @property {Number} page The number of the page
  * @property {Boolean} paginate True if pagination is active, False otherwise
  * @property {Array|ParameterGroup} parameterGroups The array of ParameterGroup

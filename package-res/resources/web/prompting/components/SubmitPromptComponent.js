@@ -23,7 +23,7 @@
  * To use the SubmitPromptComponent you should require the appropriate file from common-ui:
  *
  * <pre><code>
- *   require([ 'common-ui/promting/components/SubmitPromptComponent' ],
+ *   require([ 'common-ui/prompting/components/SubmitPromptComponent' ],
  *     function(SubmitPromptComponent) {
  *       var promptPanel = ...;
  *       var paramDefn = ...;

@@ -22,7 +22,7 @@
  * from Common-Ui:
  *
  * <pre><code>
- *   require(['common-ui/promting/builders/TextAreaBuilder'],
+ *   require(['common-ui/prompting/builders/TextAreaBuilder'],
  *     function(TextAreaBuilder) { 
  *       
  *     }

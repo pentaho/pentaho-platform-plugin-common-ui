@@ -315,7 +315,7 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
          * Constructor for the PromptPanel
          * Override to the Base constructor
          *
-         * @name PromptPanel#contructor
+         * @name PromptPanel#constructor
          * @method
          * @param {String} destinationId The html id to place the prompt
          * @param {ParameterDefinition} paramDefn The parameter definition assigned to the prompt
