@@ -453,15 +453,40 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
         var paramDefn;
         beforeEach(function() {
           paramDefn = jasmine.createSpyObj("paramDefn", [ "mapParameters", "showParameterUI" ]);
-          dash = jasmine.createSpyObj("dashSpy", [ "addComponents", "init" ]);
+          paramDefn.showParameterUI.and.returnValue(false);
+          dash = jasmine.createSpyObj("dashSpy", [ "addComponents", "init", "getComponentByName", "updateComponent", "postInit" ]);
+          var submitComponent = jasmine.createSpy("submitComponent");
+          submitComponent.promptType = "submit";
+          submitComponent.name = "submitCompName";
+          var promptComponent = jasmine.createSpy("promptComponent");
+          promptComponent.promptType = "prompt";
+          promptComponent.param = {
+            name : "test"
+          };
+          promptComponent.type = "SelectMultiComponent";
+          promptComponent.name = "promptCompName";
+          var scrollComponent = jasmine.createSpy("scrollComponent");
+          scrollComponent.type = "ScrollingPromptPanelLayoutComponent";
+          scrollComponent.name = "testName";
+          var prompt = jasmine.createSpy("prompt");
+          prompt.components = [submitComponent, promptComponent, scrollComponent];
+          dash.getComponentByName.and.returnValue(prompt);
           spyOn(panel, "_initializeParameterValue");
           spyOn(panel, "submit");
           panel.paramDefn = paramDefn;
           panel.dashboard = dash;
+          spyOn(panel, "buildPanelComponents");
+          spyOn(panel, "update");
+          panel._multiListBoxTopValuesByParam = {
+            test : 100,
+            testName : 100
+          };
+          panel._focusedParam = "test";
         });
 
         it("should not init dashboard without showing panel and without submitting", function() {
           panel.init(true);
+          expect(panel.update).not.toHaveBeenCalled();
           expect(paramDefn.showParameterUI).toHaveBeenCalled();
           expect(paramDefn.mapParameters).toHaveBeenCalled();
           expect(dash.addComponents).not.toHaveBeenCalled();
@@ -472,6 +497,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
 
         it("should not init dashboard without showing panel and with submitting", function() {
           panel.init();
+          expect(panel.update).not.toHaveBeenCalled();
           expect(paramDefn.showParameterUI).toHaveBeenCalled();
           expect(paramDefn.mapParameters).toHaveBeenCalled();
           expect(dash.addComponents).not.toHaveBeenCalled();
@@ -486,9 +512,9 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
           paramDefn.showParameterUI.and.returnValue(true);
           panel._multiListBoxTopValuesByParam = {};
           panel._focusedParam = "test";
-          spyOn(panel, "buildPanelComponents");
 
           panel.init(true);
+          expect(panel.update).not.toHaveBeenCalled();
           expect(panel._multiListBoxTopValuesByParam).not.toBeDefined();
           expect(panel._focusedParam).not.toBeDefined();
           expect(paramDefn.showParameterUI).toHaveBeenCalled();
@@ -499,6 +525,50 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
           expect(panel.submit).toHaveBeenCalledWith(panel, {
             isInit : true
           });
+          expect(panel.dashboard.updateComponent).not.toHaveBeenCalled();
+        });
+
+        it("should update components by diff", function() {
+          paramDefn.showParameterUI.and.returnValue(true);
+          panel._multiListBoxTopValuesByParam = {};
+          panel._focusedParam = "test";
+          panel.diff = jasmine.createSpy("diff");
+          panel.isRefresh = true;
+
+          panel.init(true);
+          expect(panel.update).toHaveBeenCalled();
+          expect(panel._multiListBoxTopValuesByParam).not.toBeDefined();
+          expect(panel._focusedParam).not.toBeDefined();
+          expect(paramDefn.showParameterUI).not.toHaveBeenCalled();
+          expect(paramDefn.mapParameters).not.toHaveBeenCalled();
+          expect(dash.addComponents).not.toHaveBeenCalled();
+          expect(dash.init).not.toHaveBeenCalled();
+          expect(panel._initializeParameterValue).not.toHaveBeenCalled();
+          expect(panel.submit).not.toHaveBeenCalled();
+          expect(panel.isRefresh).toBeNull();
+          expect(panel.dashboard.updateComponent).not.toHaveBeenCalled();
+        });
+
+        it("should update components if isForceRefresh dy diff", function() {
+          paramDefn.showParameterUI.and.returnValue(true);
+          panel._multiListBoxTopValuesByParam = {};
+          panel._focusedParam = "test";
+          panel.diff = jasmine.createSpy("diff");
+          panel.isRefresh = true;
+          panel.isForceRefresh = true;
+
+          panel.init(true);
+          expect(panel.update).toHaveBeenCalled();
+          expect(panel._multiListBoxTopValuesByParam).not.toBeDefined();
+          expect(panel._focusedParam).not.toBeDefined();
+          expect(paramDefn.showParameterUI).not.toHaveBeenCalled();
+          expect(paramDefn.mapParameters).not.toHaveBeenCalled();
+          expect(dash.addComponents).not.toHaveBeenCalled();
+          expect(dash.init).not.toHaveBeenCalled();
+          expect(panel._initializeParameterValue).not.toHaveBeenCalled();
+          expect(panel.submit).not.toHaveBeenCalled();
+          expect(panel.isRefresh).toBeNull();
+          expect(panel.isForceRefresh).not.toBeDefined();
         });
       });
 
