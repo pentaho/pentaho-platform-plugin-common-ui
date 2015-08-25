@@ -645,12 +645,15 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
          * If the new parameter definition is undefined (default impl) no re-initialization will be done.
          *
          * @name PromptPanel#refreshPrompt
+         * @param {Boolean} isForceRefresh The flag indicates ability to update all components regardless of the difference previos and new xml from server
          * @method
          */
-        refreshPrompt: function () {
+        refreshPrompt: function (isForceRefresh) {
           try {
+            this.isForceRefresh = isForceRefresh;
             this.getParameterDefinition(this, this.refresh.bind(this));
           } catch (e) {
+            this.isForceRefresh = undefined;
             console.log(e);
             alert('Exception caught attempting to execute refreshCallback');
           }
@@ -1025,8 +1028,15 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
             if (focusedParam) {
               delete this._focusedParam;
             }
+
             var layout = this.dashboard.getComponentByName("prompt" + this.guid);
-            _mapComponents(layout, updateComponent);
+            var updateCallback = (function(component) {
+              if (this.isForceRefresh) {
+                this.dashboard.updateComponent(component);
+              }
+              updateComponent(component);
+            }).bind(this);
+            _mapComponents(layout, updateCallback);
           } else { // Simple parameter value initialization
             this.paramDefn.mapParameters(function (param) {
               // initialize parameter values regardless of whether we're showing the parameter or not
@@ -1045,6 +1055,7 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
           this.diff = null;
           this.isRefresh = null;
           this.forceSubmit = false;
+          this.isForceRefresh = undefined;
         },
 
         /**
