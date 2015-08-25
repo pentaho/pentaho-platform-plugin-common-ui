@@ -30,7 +30,9 @@ define(['common-ui/prompting/PromptPanel', 'common-ui/prompting/parameters/Param
     this._parameterParser = new ParameterXmlParser();
     this._promptPanel = null;
     this._msgs = {
-      PROMPT_PANEL_NOT_FOUND: "Prompt Panel not found. Call 'api.operation.render' to create a panel."
+      PROMPT_PANEL_NOT_FOUND: "Prompt Panel not found. Call 'api.operation.render' to create a panel.",
+      NO_PARAM_XML: "'getParameterXml' function does not return valid xml.",
+      NO_PARAM_XML_FUNC: "No function defined for 'getParameterXml'. Prompts will not be refreshed."
     };
 
     this._getPromptPanel = function() {
@@ -47,23 +49,33 @@ define(['common-ui/prompting/PromptPanel', 'common-ui/prompting/parameters/Param
      * @name OperationAPI#render
      * @method
      * @param {String} id HTML object id where the render the panel
-     * @param {String} xml XML string containing the parameter definition
+     * @param {Function} getParameterXml The function called when the prompt panel needs to get the new parameter xml
      */
-    this.render = function(id, xml) {
+    this.render = function(id, getParameterXml) {
+      if (!getParameterXml || typeof getParameterXml != "function") {
+        api.log.error(this._msgs.NO_PARAM_XML_FUNC, true);
+      }
+
+      var xml = getParameterXml(api);
+      if (!xml) {
+        api.log.error(this._msgs.NO_PARAM_XML, true);
+      }
+
       var paramDefn = this._parameterParser.parseParameterXml(xml);
       this._promptPanel = new PromptPanel(id, paramDefn);
-    };
 
-    /**
-     * Refreshes the prompt panel with a given a new xml parameter definition
-     *
-     * @name OperationAPI#update
-     * @method
-     * @param {String} xml XML string containing the parameter definition
-     */
-    this.update = function(xml) {
-      var paramDefn = this._parameterParser.parseParameterXml(xml);
-      this._getPromptPanel().refresh(paramDefn);
+      // Override of getParameterDefinition
+      this._promptPanel.getParameterDefinition = (function(promptPanel, refreshCallback) {
+        var xml = getParameterXml(api);
+        if (!xml) {
+          api.log.error(this._msgs.NO_PARAM_XML);
+          refreshCallback(null);
+          return;
+        }
+
+        var paramDefn = this._parameterParser.parseParameterXml(xml);
+        refreshCallback(paramDefn);
+      }).bind(this);
     };
 
     /**
