@@ -100,7 +100,7 @@
     		<artifact name="dojo-release" type="source" ext="zip" m:classifier="src"/>
     	</dependency>
 
-        <dependency org="pentaho" name="pentaho-cdf" rev="${dependency.pentaho-cdf.revision}" conf="js->default" transitive="false"
+        <dependency org="pentaho" name="pentaho-cdf" rev="${dependency.pentaho-cdf-plugin.revision}" conf="js->default" transitive="false"
                     changing="true">
             <artifact name="pentaho-cdf" type="js" ext="zip" m:classifier="js"/>
         </dependency>
