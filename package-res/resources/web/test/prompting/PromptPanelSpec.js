@@ -418,58 +418,77 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
           comp.type = "SelectMultiComponent";
           spyOn(window, "$").and.returnValue([ {} ]);
           var components = [ comp ];
-          panel.components = components;
+          panel.dashboard.components = components;
           panel.refresh(paramDefn);
           expect(panel.paramDefn).toBe(paramDefn);
           expect(window.setTimeout).not.toHaveBeenCalled();
+          expect(panel._focusedParam).toBe(comp.param.name);
+          expect(panel._multiListBoxTopValuesByParam).toBeDefined();
         });
 
         it("should init also with components for ScrollingPromptPanelLayoutComponent", function() {
           var paramDefn = jasmine.createSpyObj("paramDefnSpy", [ "showParameterUI" ]);
           var comp = jasmine.createSpyObj("compSpy", [ "placeholder", "topValue" ]);
+          comp.name = "compTestName";
+          comp.placeholder.and.returnValue();
           comp.placeholder.and.returnValue({
             children : function() {
               return {
                 scrollTop : function() {
                   return 100;
-                }
+                },
+                children : comp.placeholder
               };
+            },
+            scrollLeft : function() {
+              return 50;
             }
           });
           comp.type = "ScrollingPromptPanelLayoutComponent";
           spyOn(window, "$");
           var components = [ comp ];
-          panel.components = components;
+          panel.dashboard.components = components;
           panel.refresh(paramDefn);
           expect(panel.paramDefn).toBe(paramDefn);
           expect(window.setTimeout).not.toHaveBeenCalled();
           expect(panel._focusedParam).not.toBeDefined();
           expect(window.$).not.toHaveBeenCalled();
+          expect(panel._multiListBoxTopValuesByParam).toEqual({
+            "_compTestName" : {
+              "scrollTopValue" : 100,
+              "scrollLeftValue" : 50
+            }
+          });
         });
       });
 
       describe("init", function() {
         var dash;
         var paramDefn;
+        var childElem;
         beforeEach(function() {
           paramDefn = jasmine.createSpyObj("paramDefn", [ "mapParameters", "showParameterUI" ]);
           paramDefn.showParameterUI.and.returnValue(false);
           dash = jasmine.createSpyObj("dashSpy", [ "addComponents", "init", "getComponentByName", "updateComponent", "postInit" ]);
-          var submitComponent = jasmine.createSpy("submitComponent");
-          submitComponent.promptType = "submit";
-          submitComponent.name = "submitCompName";
-          var promptComponent = jasmine.createSpy("promptComponent");
-          promptComponent.promptType = "prompt";
-          promptComponent.param = {
-            name : "test"
+          var submitComponent = {
+            promptType : "submit",
+            name : "submitCompName"
           };
-          promptComponent.type = "SelectMultiComponent";
-          promptComponent.name = "promptCompName";
-          var scrollComponent = jasmine.createSpy("scrollComponent");
-          scrollComponent.type = "ScrollingPromptPanelLayoutComponent";
-          scrollComponent.name = "testName";
-          var prompt = jasmine.createSpy("prompt");
-          prompt.components = [submitComponent, promptComponent, scrollComponent];
+          var promptComponent = {
+            promptType : "prompt",
+            param : {
+              name : "test"
+            },
+            type : "SelectMultiComponent",
+            name : "promptCompName"
+          };
+          var scrollComponent = {
+            type : "ScrollingPromptPanelLayoutComponent",
+            name : "testName"
+          };
+          var prompt = {
+            components : [ submitComponent, promptComponent, scrollComponent ]
+          }
           dash.getComponentByName.and.returnValue(prompt);
           spyOn(panel, "_initializeParameterValue");
           spyOn(panel, "submit");
@@ -478,10 +497,14 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
           spyOn(panel, "buildPanelComponents");
           spyOn(panel, "update");
           panel._multiListBoxTopValuesByParam = {
-            test : 100,
-            testName : 100
+            "_test" : 100,
+            "_testName" : {
+              scrollTopValue : 100,
+              scrollLeftValue : 50
+            }
           };
-          panel._focusedParam = "test";
+          panel._focusedParam = promptComponent.param.name;
+          spyOn(window, "setTimeout");
         });
 
         it("should not init dashboard without showing panel and without submitting", function() {
@@ -530,8 +553,6 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
 
         it("should update components by diff", function() {
           paramDefn.showParameterUI.and.returnValue(true);
-          panel._multiListBoxTopValuesByParam = {};
-          panel._focusedParam = "test";
           panel.diff = jasmine.createSpy("diff");
           panel.isRefresh = true;
 
@@ -547,12 +568,11 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
           expect(panel.submit).not.toHaveBeenCalled();
           expect(panel.isRefresh).toBeNull();
           expect(panel.dashboard.updateComponent).not.toHaveBeenCalled();
+          expect(window.setTimeout).toHaveBeenCalled();
         });
 
         it("should update components if isForceRefresh dy diff", function() {
           paramDefn.showParameterUI.and.returnValue(true);
-          panel._multiListBoxTopValuesByParam = {};
-          panel._focusedParam = "test";
           panel.diff = jasmine.createSpy("diff");
           panel.isRefresh = true;
           panel.isForceRefresh = true;
@@ -569,6 +589,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
           expect(panel.submit).not.toHaveBeenCalled();
           expect(panel.isRefresh).toBeNull();
           expect(panel.isForceRefresh).not.toBeDefined();
+          expect(window.setTimeout).toHaveBeenCalled();
         });
       });
 

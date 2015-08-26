@@ -685,6 +685,48 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
             this.isRefresh = true;
             this.paramDefn = paramDefn;
 
+            if (this.dashboard.components) {
+              // Create dictionary by parameter name, of topValue of multi-select listboxes, for restoring later, when possible.
+              // But not for mobile, cause the UIs vary. Would need more time to check each.
+              var topValuesByParam;
+              if(!(/android|ipad|iphone/i).test(navigator.userAgent)) {
+                topValuesByParam = this._multiListBoxTopValuesByParam = {};
+              }
+
+              var focusedParam;
+              _mapComponentsList(this.dashboard.components, function(c) {
+                if(!c.components && c.param && c.promptType === 'prompt') {
+                  if(!focusedParam) {
+                    var ph = c.placeholder();
+                    if($(":focus", ph).length) {
+                      focusedParam = c.param.name;
+                    }
+                  }
+
+                  if(topValuesByParam && c.type === 'SelectMultiComponent') {
+                    var topValue = c.topValue();
+                    if(topValue != null) {
+                      topValuesByParam['_' + c.param.name] = topValue;
+                    }
+                  }
+                } else if(topValuesByParam && c.type === 'ScrollingPromptPanelLayoutComponent'){
+                  // save last scroll position for prompt panel
+                  var scrollTopElem = c.placeholder().children(".prompt-panel");
+                  var scrollTopValue = scrollTopElem.scrollTop();
+                  var scrollLeftElem = scrollTopElem.children(".parameter-wrapper");
+                  var scrollLeftValue = scrollLeftElem.scrollLeft();
+                  if(scrollTopValue != null && scrollLeftValue != null){
+                    topValuesByParam['_' + c.name] = {
+                      scrollTopValue : scrollTopValue,
+                      scrollLeftValue : scrollLeftValue
+                    };
+                  }
+                }
+              });
+
+              this._focusedParam = focusedParam;
+            }
+
             this.init(noAutoAutoSubmit);
           }
         },
@@ -953,7 +995,15 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
           var fireSubmit = true;
 
           var topValuesByParam = this._multiListBoxTopValuesByParam;
+          if (topValuesByParam) {
+            delete this._multiListBoxTopValuesByParam;
+          }
+
           var focusedParam = this._focusedParam;
+          if (focusedParam) {
+            delete this._focusedParam;
+          }
+
           var components = [];
 
           var updateComponent = (function (component) {
@@ -980,22 +1030,24 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
               }
             } else if (topValuesByParam && component.type === 'ScrollingPromptPanelLayoutComponent') {
               // save prompt pane reference and scroll value to dummy component
-              var scrollTopValue = topValuesByParam['_' + component.name];
-              if (scrollTopValue != null) {
-                var setScrollTop = function() {
-                  $("#" + component.htmlObject).children(".prompt-panel").scrollTop(scrollTopValue);
+              var scrollValue = topValuesByParam['_' + component.name];
+              if (scrollValue != null) {
+                var setScroll = function() {
+                  var scrollElem = $("#" + component.htmlObject).children(".prompt-panel");
+                  scrollElem.scrollTop(scrollValue.scrollTopValue);
+                  scrollElem.children(".parameter-wrapper").scrollLeft(scrollValue.scrollLeftValue);
                 }
 
                 // restore last scroll position for prompt panel
                 if (!this.isRefresh) {
                   this.dashboard.postInit(function() {
                     if (scrollTopValue) {
-                      setScrollTop();
-                      delete scrollTopValue;
+                      setScroll();
+                      delete scrollValue;
                     }
                   });
                 } else {
-                  setScrollTop();
+                  setTimeout(function() {setScroll();}, 50);
                 }
               }
             }
@@ -1005,29 +1057,12 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
             this.promptGUIDHelper.reset(); // Clear the widget helper for this prompt
 
             var layout = _createWidgetForPromptPanel.call(this);
-
-            if (topValuesByParam) {
-              delete this._multiListBoxTopValuesByParam;
-            }
-
-            if (focusedParam) {
-              delete this._focusedParam;
-            }
-
             _mapComponents(layout, updateComponent);
 
             this.dashboard.addComponents(components);
             this.dashboard.init();
           } else if (this.diff) { // Perform update when there are differences
             this.update(this.diff);
-
-            if (topValuesByParam) {
-              delete this._multiListBoxTopValuesByParam;
-            }
-
-            if (focusedParam) {
-              delete this._focusedParam;
-            }
 
             var layout = this.dashboard.getComponentByName("prompt" + this.guid);
             var updateCallback = (function(component) {
