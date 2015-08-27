@@ -16,14 +16,20 @@
  */
 
 define(["common-ui/prompting/api/OperationAPI"], function(OperationAPI) {
-  describe("EventAPI unit tests", function() {
-    var operationApi, apiSpy, promptPanelSpy, xmlStr, htmlId, paramDefnSpy;
+  describe("OperationAPI unit tests", function() {
+    var operationApi, apiSpy, promptPanelSpy, xmlStr, xmlStr1, htmlId, paramDefnSpy;
     beforeEach(function() {
 
-      promptPanelSpy = jasmine.createSpyObj("PromptPanel", ["refresh", "init", "getParameterValues"]);
+      promptPanelSpy = jasmine.createSpyObj("PromptPanel", ["refresh", "init", "getParameterValues", "getParameterDefinition"]);
 
       apiSpy = jasmine.createSpy("PromptingAPI");
       apiSpy.log = jasmine.createSpyObj("Log", ["info", "warn", "error"]);
+
+      apiSpy.log.error.and.callFake(function(msg, throwErr) {
+        if (throwErr) {
+          throw msg;
+        }
+      });
 
       operationApi = new OperationAPI(apiSpy);
 
@@ -31,6 +37,7 @@ define(["common-ui/prompting/api/OperationAPI"], function(OperationAPI) {
       spyOn(operationApi._parameterParser, "parseParameterXml").and.returnValue(paramDefnSpy);
 
       xmlStr = "<XML></XML>";
+      xmlStr1 = "<XML1></XML1>";
       htmlId = "ID!";
 
       spyOn(operationApi, "_getPromptPanel").and.returnValue(promptPanelSpy);
@@ -42,7 +49,9 @@ define(["common-ui/prompting/api/OperationAPI"], function(OperationAPI) {
 
     it("should test private _getPromptPanel and fail", function() {
       operationApi._getPromptPanel.and.callThrough();
-      operationApi._getPromptPanel();
+      expect(function() {
+        operationApi._getPromptPanel();
+      }).toThrow(operationApi._msgs.PROMPT_PANEL_NOT_FOUND);
 
       expect(apiSpy.log.error).toHaveBeenCalledWith(operationApi._msgs.PROMPT_PANEL_NOT_FOUND, true);
     });
@@ -57,21 +66,79 @@ define(["common-ui/prompting/api/OperationAPI"], function(OperationAPI) {
       expect(promptPanel).toBe(promptPanelSpy);
     });
 
-    it("should test render", function() {
-      operationApi.render(htmlId, xmlStr);
+    describe("render tests", function() {
+      var verifyAfter = true;
 
-      expect(operationApi._parameterParser.parseParameterXml).toHaveBeenCalledWith(xmlStr);
-      expect(operationApi._promptPanel).toBeDefined();
-      expect(operationApi._promptPanel.destinationId).toBe(htmlId);
-      expect(operationApi._promptPanel.paramDefn).toBe(paramDefnSpy);
-    });
+      afterEach(function() {
+        if (verifyAfter) {
+          expect(operationApi._parameterParser.parseParameterXml).toHaveBeenCalledWith(xmlStr);
+          expect(operationApi._promptPanel).toBeDefined();
+          expect(operationApi._promptPanel.destinationId).toBe(htmlId);
+          expect(operationApi._promptPanel.paramDefn).toBe(paramDefnSpy);
+        }
 
-    it("should test update", function() {
-      operationApi.update(xmlStr);
+        verifyAfter = true;
+      });
 
-      expect(operationApi._parameterParser.parseParameterXml).toHaveBeenCalledWith(xmlStr);
-      expect(operationApi._getPromptPanel).toHaveBeenCalled();
-      expect(promptPanelSpy.refresh).toHaveBeenCalledWith(paramDefnSpy);
+      it("should test render with null getParameterXml callback", function() {
+        expect(function() {
+          operationApi.render(htmlId, null);
+        }).toThrow(operationApi._msgs.NO_PARAM_XML_FUNC);
+
+        verifyAfter = false;
+        expect(operationApi._parameterParser.parseParameterXml).not.toHaveBeenCalledWith(xmlStr);
+        expect(operationApi._promptPanel).toBeNull();
+        expect(apiSpy.log.error).toHaveBeenCalledWith(operationApi._msgs.NO_PARAM_XML_FUNC, true);
+      });
+
+      it("should test render with valid getParameterXml callback that returns null", function() {
+        var getParameterXml = function(api) {
+          expect(api).toBe(apiSpy);
+          return null;
+        };
+
+        expect(function() {
+          operationApi.render(htmlId, getParameterXml);
+        }).toThrow(operationApi._msgs.NO_PARAM_XML);
+        verifyAfter = false;
+
+        expect(apiSpy.log.error).toHaveBeenCalledWith(operationApi._msgs.NO_PARAM_XML, true);
+      });
+
+      it("should test render with valid getParameterXml callback that returns valid results first, then null", function() {
+        var getParameterXml = function(api) {
+          expect(api).toBe(apiSpy);
+
+          return !operationApi._promptPanel ? xmlStr : null;
+        };
+
+        operationApi.render(htmlId, getParameterXml);
+
+        var paramDefnVal;
+        operationApi._promptPanel.getParameterDefinition(promptPanelSpy, function(paramDefn) {
+          paramDefnVal = paramDefn;
+        });
+
+        expect(paramDefnVal).toBeNull();
+        expect(apiSpy.log.error).toHaveBeenCalledWith(operationApi._msgs.NO_PARAM_XML);
+      });
+
+      it("should test render with valid getParameterXml callback that returns appropriate value", function() {
+        var getParameterXml = function(api) {
+          expect(api).toBe(apiSpy);
+          return !operationApi._promptPanel ? xmlStr : xmlStr1;
+        };
+
+        operationApi.render(htmlId, getParameterXml);
+
+        var paramDefnValue;
+        operationApi._promptPanel.getParameterDefinition(promptPanelSpy, function(paramDefn) {
+          paramDefnValue = paramDefn;
+        });
+
+        expect(operationApi._parameterParser.parseParameterXml).toHaveBeenCalledWith(xmlStr1);
+        expect(paramDefnValue).toBe(paramDefnSpy);
+      });
     });
 
     it("should test init", function() {
