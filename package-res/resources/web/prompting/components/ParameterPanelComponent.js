@@ -21,6 +21,11 @@ define("common-ui/prompting/components/ParameterPanelComponent", ['./PanelCompon
       if (component.promptType === 'label') {
         return 'parameter-label';
       }
+    },
+
+    removeErrorClass: function(){
+      var $htmlObject = this.placeholder();
+      $htmlObject.removeClass('error');
     }
   });
 });

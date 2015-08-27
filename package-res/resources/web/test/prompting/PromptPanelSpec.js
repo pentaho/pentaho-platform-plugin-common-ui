@@ -786,7 +786,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
           beforeEach(function() {
             paramSpy = jasmine.createSpy("paramSpy");
 
-            componentSpy = jasmine.createSpyObj("componentSpy", [ "clear" ]);
+            componentSpy = jasmine.createSpyObj("componentSpy", [ "clear", "removeErrorClass" ]);
             componentSpy.parameter = paramName;
             componentSpy.type = "TestPanel";
 
@@ -1011,13 +1011,25 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
 
               panel._changeComponentsByDiff(change);
 
-              expect(panel.dashboard.updateComponent).toHaveBeenCalledWith(panelSpy);
+              expect(panel.dashboard.updateComponent).toHaveBeenCalledWith(componentSpy);
               expect(panel.dashboard.getComponentByName).toHaveBeenCalledWith(groupName);
-              expect(panel.dashboard.getComponentByName).toHaveBeenCalledWith("prompt"+guid);
               expect(groupPanelSpy.components[0]).toBe(componentSpy);
               expect(componentSpy.valuesArray).toBe(valuesArray);
               expect(panel.widgetBuilder.build).toHaveBeenCalled();
-              expect(panel.forceSubmit).not.toBeDefined();
+              expect(panel.forceSubmit).toBe(true);
+
+              spyOn(changedParam, "getSelectedValuesValue").and.callFake(function(){
+                return ["a"];
+              });
+              panel.dashboard.getParameterValue.and.returnValue("a");
+              panel.dashboard.updateComponent.calls.reset();
+              panel._changeComponentsByDiff(change);
+              expect(panel.dashboard.updateComponent).not.toHaveBeenCalled();
+
+              panel.dashboard.getParameterValue.and.returnValue("b");
+              panel.dashboard.updateComponent.calls.reset();
+              panel._changeComponentsByDiff(change);
+              expect(panel.dashboard.updateComponent).toHaveBeenCalledWith(componentSpy);
             });
           });
 
@@ -1074,6 +1086,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
               expect(componentSpy.components[1].label).toBe(panel.paramDefn.errors[paramSpy.name][1]);
               expect(panel.removeDashboardComponents).toHaveBeenCalled();
               expect(componentSpy.cssClass).toContain("error");
+              expect(componentSpy.removeErrorClass).not.toHaveBeenCalled();
             });
 
             it("should process without errors", function() {
@@ -1088,6 +1101,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
               expect(componentSpy.components.length).toBe(0);
               expect(panel.removeDashboardComponents).not.toHaveBeenCalled();
               expect(componentSpy.cssClass).not.toContain("error");
+              expect(componentSpy.removeErrorClass).toHaveBeenCalled();
             });
           });
         });

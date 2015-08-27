@@ -33,12 +33,12 @@ define([ 'common-ui/prompting/components/PromptLayoutComponent' ], function(Prom
         expect(css).toBe('parameter');
       });
 
-      it("should return specific css result for component", function() {
+      it("should not return specific css result for component", function() {
         var testCss = "test-css";
         paramComponent.param = jasmine.createSpy("param");
         paramComponent.cssClass = testCss;
         var css = comp.getClassFor(paramComponent);
-        expect(css).toBe('parameter ' + testCss);
+        expect(css).toBe('parameter');
       });
 
       it("should return undefined result if not exist param", function() {

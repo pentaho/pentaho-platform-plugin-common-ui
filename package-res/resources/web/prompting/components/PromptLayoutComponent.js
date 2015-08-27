@@ -22,7 +22,7 @@ define(['./CompositeComponent'], function(CompositeComponent){
       if (!component.param) {
         return;
       }
-      return 'parameter' + (component.cssClass ? ' ' + component.cssClass : '');
+      return 'parameter';
     }
   });
 
