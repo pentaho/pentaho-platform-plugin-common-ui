@@ -128,7 +128,7 @@ define([ 'cdf/lib/jquery', 'dijit/registry', 'common-ui/prompting/components/Doj
           return "2001-04-14";
         });
         comp.localeFormatter = localeFormatter;
-        spyOn(comp, "_isLegacyDateFormat").and.callThrough();
+        spyOn(comp, "_isLegacyDateFormat").and.callFake(function() { return true; });
         spyOn(comp, "_convertFormat").and.callThrough();
         comp._getFormattedDate.and.callThrough();
 
@@ -218,7 +218,7 @@ define([ 'cdf/lib/jquery', 'dijit/registry', 'common-ui/prompting/components/Doj
           return "2001-04-14";
         });
         comp.localeFormatter = localeFormatter;
-        spyOn(comp, "_isLegacyDateFormat").and.callThrough();
+        spyOn(comp, "_isLegacyDateFormat").and.callFake(function() { return true; });
         spyOn(comp, "_convertFormat").and.callThrough();
         value = comp.getValue();
         expect(comp._isLegacyDateFormat).toHaveBeenCalled();

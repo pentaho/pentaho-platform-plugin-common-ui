@@ -90,22 +90,21 @@ define(['cdf/components/BaseComponent', "dojo/date/locale", 'dijit/form/DateText
               value = undefined;
 
           // If no value was specified use current date
-          if (!parameterValue.length){
-            parameterValue = this._getFormattedDate(new Date());
-          } else if(parameterValue.length == 1) {
-            parameterValue = parameterValue[0];
+          // For backwards compatibility we need to check if the component
+          // is a legacy version of the date picker and update the date format accordingly.
+          var date;
+          if (!parameterValue.length) {
+            date = this._getFormattedDate(new Date());
+          } else {
+            date = this._getFormattedDate(new Date(parameterValue));
           }
 
-          // Get the date well formatted according to the date format specified to pass on to the parser.
-          // For backwards compatibility we need to check if the component is a legacy version of the 
-          // date picker and update the date format accordingly.
-          var formattedDate = this._getFormattedDate(new Date(parameterValue));
-
-          // Parse the date to a Date object.
+          // Parse the date to a Date object. 
+          // No need to convert the format here, that was taken care of in the _getFormattedDate call.
           if(this.transportFormatter) {
-            value = this.transportFormatter.parse(formattedDate);
-          } else if(this._isLegacyDateFormat()) {
-            value = this.localeFormatter.parse(formattedDate, {datePattern: myself.dateFormat, selector: "date"});
+            value = this.transportFormatter.parse(date);
+          } else {
+            value = this.localeFormatter.parse(date, {datePattern: this._getDateFormat(), selector: "date"});
           }          
 
           this.dijitId = this.htmlObject + '_input';
@@ -113,7 +112,7 @@ define(['cdf/components/BaseComponent', "dojo/date/locale", 'dijit/form/DateText
           $('#' + this.htmlObject).html($('<input/>').attr('id', this.dijitId));
 
           var constraints = {
-            datePattern: this.dateFormat ? this.dateFormat : this.param.attributes['data-format'],
+            datePattern: this._getDateFormat(),
             selector: 'date',
             formatLength: 'medium' // Used if datePattern is not defined, locale specific
           };
@@ -121,13 +120,13 @@ define(['cdf/components/BaseComponent', "dojo/date/locale", 'dijit/form/DateText
           if(myself.startDate == 'TODAY') {
             constraints.min = new Date();
           } else if(myself.startDate) {
-            constraints.min = this.localeFormatter.format(myself.startDate, {datePattern: myself.dateFormat, selector: "date"});
+            constraints.min = this.localeFormatter.format(myself.startDate, {datePattern: this._getDateFormat(), selector: "date"});
           }
 
           if(myself.endDate == 'TODAY') {
             constraints.max = new Date();
           } else if(myself.endDate) {
-            constraints.max = this.localeFormatter.format(myself.endDate, {datePattern: myself.dateFormat, selector: "date"});
+            constraints.max = this.localeFormatter.format(myself.endDate, {datePattern: this._getDateFormat(), selector: "date"});
           }
 
           var dateTextBox = new DateTextBox({
@@ -167,10 +166,12 @@ define(['cdf/components/BaseComponent', "dojo/date/locale", 'dijit/form/DateText
          * @private
          */
         _getFormattedDate: function(date) {
-          if(this.transportFormatter) {
-            return this.transportFormatter.format(date);
-          } else if(this._isLegacyDateFormat()) {
+          if (this._isLegacyDateFormat()) {
             this._convertFormat();
+          }
+          if (this.transportFormatter) {
+            return this.transportFormatter.format(date);
+          } else {
             return this.localeFormatter.format(date, {datePattern: this.dateFormat, selector: "date"});
           }
           return date;
@@ -184,8 +185,7 @@ define(['cdf/components/BaseComponent', "dojo/date/locale", 'dijit/form/DateText
          */
         _isLegacyDateFormat: function() {
           var dojoFormat;
-
-          var dateFormat = this.dateFormat ? this.dateFormat : this.param.attributes['data-format'];
+          var dateFormat = this._getDateFormat();
 
           try {
             dojoFormat = this.localeFormatter.format(new Date(), {datePattern: dateFormat, selector: "date"});
@@ -193,7 +193,7 @@ define(['cdf/components/BaseComponent', "dojo/date/locale", 'dijit/form/DateText
             return true;
           }
 
-          return dojoFormat != $.datepicker.formatDate(dateFormat, new Date());
+          return dojoFormat == $.datepicker.formatDate(dateFormat, new Date());
         },
 
         /**
@@ -204,7 +204,7 @@ define(['cdf/components/BaseComponent', "dojo/date/locale", 'dijit/form/DateText
          */
         _convertFormat: function() {
           var myself = this;
-          myself.dateFormat = this.dateFormat ? this.dateFormat : this.param.attributes['data-format'];
+          myself.dateFormat = this._getDateFormat();
 
           var regexConvertYear =      [[/(^|(?!y).)(y{1}(?!y))/, "$1yy"],  [/(^|(?!y).)(y{2}(?!y))/, "$1yyyy"]],
               regexConvertMonth =     [[/(^|(?!m).)(m{1}(?!m))/i, "$1M"],   [/(^|(?!m).)(m{2}(?!m))/i, "$1MM"]], // case insensitive for this type
@@ -224,6 +224,24 @@ define(['cdf/components/BaseComponent', "dojo/date/locale", 'dijit/form/DateText
           $.each(regexConvertMonth, replacer);
           $.each(regexConvertDayText, replacer);
           $.each(regexConvertDayMonth, replacer);
+        },
+
+        /**
+         * Returns the current date format
+         *
+         * @private
+         */
+        _getDateFormat: function() {
+          if (this.dateFormat) {
+            return this.dateFormat;
+          } else {
+            if (this.param && this.param.attributes['data-format']) {
+              return this.param.attributes['data-format']
+            } else {
+              // Fallback to a default value
+              return "yyyy-MM-dd";
+            }
+          }
         }
       });
     });
