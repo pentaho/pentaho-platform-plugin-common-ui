@@ -882,14 +882,23 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
                 });
                 if (!isExist) {
                   var errIndex = panel.components.length - 1;
-                  panel.components.splice(errIndex, 0, _createWidgetForErrorLabel.call(this, param, error));
+                  var errorComponent = _createWidgetForErrorLabel.call(this, param, error);
+                  this.dashboard.addComponent(errorComponent);
+                  panel.components.splice(errIndex, 0, errorComponent);
                 }
               }
             }
 
             // checks existing errors components to set correct css style
-            var existingErrorsComponents = _findErrorComponents.call(this, panel);
-            panel.cssClass = (existingErrorsComponents.length > 0) ? (panel.cssClass || '') + ' error' : (panel.cssClass || '').replace(' error', '');
+            var existingErrorComponents = _findErrorComponents.call(this, panel);
+            if(existingErrorComponents.length > 0) {
+              if (!panel.cssClass || (panel.cssClass && panel.cssClass.indexOf('error') == -1)) {
+                panel.cssClass = (panel.cssClass || '') + ' error';
+              }
+            } else {
+              panel.cssClass = (panel.cssClass || '').replace(' error', '');
+              panel.removeErrorClass();
+            }
           }
         },
 
@@ -910,6 +919,7 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
 
               var component = _getComponentByParam.call(this, param);
               if (component != null) {
+                var updateNeeded = false;
                 // also we should check and update errors components
                 this._changeErrors(param);
 
@@ -921,36 +931,30 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
 
                 // Compare values array from param (which is formatted into valuesArray) with the current valuesArray
                 // We need to update the components if autoSubmit is off
-                if (JSON.stringify(component.valuesArray) !== JSON.stringify(newValuesArray) || !this.autoSubmit) {
+                if (JSON.stringify(component.valuesArray) !== JSON.stringify(newValuesArray)) {
                   // Find selected value in param values list and set it. This works, even if the data in valuesArray is different
                   this._initializeParameterValue(null, param);
 
                   // Set new values array
                   component.valuesArray = newValuesArray;
+                  updateNeeded = true;
+                }
 
-                  // updates components in the group panel
-                  var groupPanel = this.dashboard.getComponentByName(groupName);
-                  for (var i in groupPanel.components) {
-                    if (groupPanel.components[i].name == component.name) {
-                      groupPanel.components[i] = component;
-                      break;
-                    }
-                  }
+                if (this.autoSubmit) {
+                  this.forceSubmit = true;
+                }
 
-                  // updates global prompt panel
-                  var panelComponent = this.dashboard.getComponentByName("prompt" + this.guid);
-                  _mapComponents(panelComponent, function (component) {
-                    this.dashboard.updateComponent(component);
-                  }.bind(this));
-                } else {
-                   // Only update current group panel and sub components
+                var paramSelectedValues = param.getSelectedValuesValue();
+                if (paramSelectedValues.length == 1) {
+                  paramSelectedValues = paramSelectedValues[0];
+                }
+                var paramValue = this.dashboard.getParameterValue(component.parameter);
+
+                if (paramValue != paramSelectedValues || updateNeeded) {
                   var groupPanel = this.dashboard.getComponentByName(groupName);
                   _mapComponents(groupPanel, function (component) {
                     this.dashboard.updateComponent(component);
                   }.bind(this));
-
-                  // Forces a submit since the entire panel was not updated
-                  this.forceSubmit = true;
                 }
               }
             }
