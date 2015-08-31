@@ -105,7 +105,7 @@ define([], function() {
        *   }
        * </code></pre>
        */
-      diff : function(oldParamDefn, newParamDefn) {
+      diff : function(oldParamDefn, newParamDefn, nullValueParams) {
         if (!oldParamDefn || !newParamDefn) {
           return false;
         }
@@ -146,6 +146,18 @@ define([], function() {
             }
           }
         }, this);
+
+        // Force change on null value params back to originally selected value
+        for (var i in nullValueParams) {
+          var nullValueParam = nullValueParams[i];
+          newParamDefn.mapParameters(function(param, group) {
+            if (nullValueParam.name == param.name) {
+              param.forceUpdate = true;
+              this._fillWrapObj(result, "toChangeData", group, param);
+              return false;
+            }
+          }, this);
+        }
 
         return result;
       }
