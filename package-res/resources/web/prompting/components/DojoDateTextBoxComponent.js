@@ -77,6 +77,22 @@ define(['cdf/components/BaseComponent', "dojo/date/locale", 'dijit/form/DateText
         },
 
         /**
+         * Parses the date using the correct formatter
+         *
+         * @param {String} value The String with the date to parse
+         * @returns {Date} The parsed string as a Date Object, if it is valid
+         * @private
+         */
+        _parseDate: function (value) {
+          if (this.transportFormatter) {
+            value = this.transportFormatter.parse(value);
+          } else if (this._isLegacyDateFormat()) {
+            value = this.localeFormatter.parse(value, {datePattern: this.dateFormat, selector: "date"});
+          }
+          return value;
+        },
+
+        /**
          * Renders the Dojo Date Text Box Component
          *
          * @method
@@ -99,13 +115,8 @@ define(['cdf/components/BaseComponent', "dojo/date/locale", 'dijit/form/DateText
             date = this._getFormattedDate(new Date(parameterValue));
           }
 
-          // Parse the date to a Date object. 
-          // No need to convert the format here, that was taken care of in the _getFormattedDate call.
-          if(this.transportFormatter) {
-            value = this.transportFormatter.parse(date);
-          } else {
-            value = this.localeFormatter.parse(date, {datePattern: this._getDateFormat(), selector: "date"});
-          }          
+          // Parse the date to a Date object.
+          value = this._parseDate(formattedDate);
 
           this.dijitId = this.htmlObject + '_input';
 
@@ -120,13 +131,13 @@ define(['cdf/components/BaseComponent', "dojo/date/locale", 'dijit/form/DateText
           if(myself.startDate == 'TODAY') {
             constraints.min = new Date();
           } else if(myself.startDate) {
-            constraints.min = this.localeFormatter.format(myself.startDate, {datePattern: this._getDateFormat(), selector: "date"});
+            constraints.min = this._parseDate(myself.startDate);
           }
 
           if(myself.endDate == 'TODAY') {
             constraints.max = new Date();
           } else if(myself.endDate) {
-            constraints.max = this.localeFormatter.format(myself.endDate, {datePattern: this._getDateFormat(), selector: "date"});
+            constraints.max = this._parseDate(myself.endDate);
           }
 
           var dateTextBox = new DateTextBox({
