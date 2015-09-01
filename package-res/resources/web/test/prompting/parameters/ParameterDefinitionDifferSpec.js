@@ -155,11 +155,21 @@ define([ 'common-ui/prompting/parameters/Parameter', 'common-ui/prompting/parame
 
         describe("diff", function() {
             var paramName = "paramName";
-            var paramDefnOld, paramDefnNew;
+            var nullParamName = "nullParamName";
+            var paramDefnOld, paramDefnNew, nullValueParamsSpy, nullValueParamSpy, nullValueParamGroupSpy;
+            var nullValueParamCallbackVal;
 
             beforeEach(function() {
+                nullValueParamCallbackVal = null;
                 paramDefnOld = createParamDefn(paramName, 2);
                 paramDefnNew = createParamDefn(paramName, 2);
+
+                nullValueParamSpy = jasmine.createSpyObj("Null Value Param Spy", ["mapParameters"]);
+                nullValueParamSpy.attributes = { hidden: true };
+                nullValueParamGroupSpy = jasmine.createSpy("Null Param Group Spy");
+                nullValueParamSpy.name = nullParamName;
+
+                nullValueParamsSpy = [nullValueParamSpy];
             });
 
             describe("should return false result", function() {
@@ -180,6 +190,26 @@ define([ 'common-ui/prompting/parameters/Parameter', 'common-ui/prompting/parame
                 afterEach(function() {
                     expect(result).toBeFalsy();
                 });
+            });
+
+            it("pass null value parameters and store them in 'toChange' in the result", function() {
+                spyOn(paramDefnNew, "getParameter").and.returnValue(false);
+                spyOn(paramDefnOld, "getParameter").and.returnValue(false);
+                spyOn(parameterDefinitionDiffer, "_isBehavioralAttrsChanged").and.returnValue(false);
+                spyOn(parameterDefinitionDiffer, "_isErrorsChanged").and.returnValue(false);
+                spyOn(parameterDefinitionDiffer, "_isDataChanged").and.returnValue(false);
+
+                spyOn(parameterDefinitionDiffer, "_fillWrapObj");
+
+                spyOn(paramDefnNew, "mapParameters").and.callFake(function(callback, scope) {
+                    nullValueParamCallbackVal = callback.call(scope, nullValueParamSpy, nullValueParamGroupSpy);
+                });
+
+                parameterDefinitionDiffer.diff(paramDefnOld, paramDefnNew, nullValueParamsSpy);
+
+                expect(nullValueParamCallbackVal).toBe(false);
+                expect(parameterDefinitionDiffer._fillWrapObj).toHaveBeenCalledWith(jasmine.any(Object), "toChangeData",
+                  nullValueParamGroupSpy, nullValueParamSpy)
             });
 
             it("should return result with added and removed parameters", function() {

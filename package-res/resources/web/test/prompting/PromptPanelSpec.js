@@ -331,6 +331,18 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
         expect(panel.refreshPrompt).toHaveBeenCalled();
       });
 
+      it("parameterChanged", function() {
+        var param = {};
+        var name = "name";
+        spyOn(panel, "refreshPrompt");
+        panel.parameterChanged(param, name);
+        expect(panel.parametersChanged).toBeTruthy();
+        expect(panel.refreshPrompt).toHaveBeenCalled();
+        expect(panel.nullValueParams).toBeDefined();
+        expect(panel.nullValueParams.length).toBe(1);
+        expect(panel.nullValueParams[0]).toBe(param);
+      });
+
       it("getParameterDefinition", function() {
         var promptPanel = {};
         var fn = jasmine.createSpyObj("callbackObj", [ "test" ]);
@@ -1026,11 +1038,17 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
               panel._changeComponentsByDiff(change);
               expect(panel.dashboard.updateComponent).not.toHaveBeenCalled();
 
+              changedParam.forceUpdate = true;
+              panel._changeComponentsByDiff(change);
+              expect(panel.dashboard.updateComponent).toHaveBeenCalledWith(componentSpy);
+
+              changedParam.forceUpdate = false;
               panel.dashboard.getParameterValue.and.returnValue("b");
               panel.dashboard.updateComponent.calls.reset();
               panel._changeComponentsByDiff(change);
               expect(panel.dashboard.updateComponent).toHaveBeenCalledWith(componentSpy);
             });
+
           });
 
           describe("_changeErrors", function() {

@@ -617,6 +617,14 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
          * @param {Object} value
          */
         parameterChanged: function (param, name, value) {
+          if (!value || value == "" || value == "null") {
+            if (!this.nullValueParams) {
+              this.nullValueParams = [];
+            }
+
+            this.nullValueParams.push(param);
+          }
+
           this.refreshPrompt();
           this.parametersChanged = true;
         },
@@ -681,7 +689,7 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
           }
 
           if (paramDefn) {
-            this.diff = this.paramDiffer.diff(this.paramDefn, paramDefn);
+            this.diff = this.paramDiffer.diff(this.paramDefn, paramDefn, this.nullValueParams);
             this.isRefresh = true;
             this.paramDefn = paramDefn;
 
@@ -931,7 +939,7 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
 
                 // Compare values array from param (which is formatted into valuesArray) with the current valuesArray
                 // We need to update the components if autoSubmit is off
-                if (JSON.stringify(component.valuesArray) !== JSON.stringify(newValuesArray)) {
+                if (JSON.stringify(component.valuesArray) !== JSON.stringify(newValuesArray) || param.forceUpdate) {
                   // Find selected value in param values list and set it. This works, even if the data in valuesArray is different
                   this._initializeParameterValue(null, param);
 
