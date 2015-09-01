@@ -138,51 +138,55 @@ define([ 'cdf/lib/jquery', 'dijit/registry', 'common-ui/prompting/components/Doj
       });
 
       it("inits min constrainst properly from TODAY", function() {
+        comp.transportFormatter = undefined;
         comp.startDate = "TODAY";
-        var localeFormatter = jasmine.createSpyObj("localeFormatter", [ "format" ]);
-        localeFormatter.format.and.callFake(function(val) {
-          return "2001-04-14";
+        var localeFormatter = jasmine.createSpyObj("localeFormatter", [ "parse" ]);
+        localeFormatter.parse.and.callFake(function(val) {
+          return new Date("2001-04-14");
         });
         comp.localeFormatter = localeFormatter;
 
         comp.update();
-        expect(comp.localeFormatter.format).not.toHaveBeenCalled();
+        expect(comp.localeFormatter.parse.calls.count()).toEqual(1);
       });
 
       it("inits min constrainst properly from date", function() {
+        comp.transportFormatter = undefined;
         comp.startDate = "2001-01-01";
-        var localeFormatter = jasmine.createSpyObj("localeFormatter", [ "format" ]);
-        localeFormatter.format.and.callFake(function(val) {
-          return "2001-04-14";
+        var localeFormatter = jasmine.createSpyObj("localeFormatter", [ "parse" ]);
+        localeFormatter.parse.and.callFake(function(val) {
+          return new Date("2001-04-14");
         });
         comp.localeFormatter = localeFormatter;
 
         comp.update();
-        expect(comp.localeFormatter.format).toHaveBeenCalled();
+        expect(comp.localeFormatter.parse.calls.count()).toEqual(2);
       });
 
       it("inits max constrainst properly from TODAY", function() {
+        comp.transportFormatter = undefined;
         comp.endDate = "TODAY";
-        var localeFormatter = jasmine.createSpyObj("localeFormatter", [ "format" ]);
-        localeFormatter.format.and.callFake(function(val) {
-          return "2001-04-14";
+        var localeFormatter = jasmine.createSpyObj("localeFormatter", [ "parse" ]);
+        localeFormatter.parse.and.callFake(function(val) {
+          return new Date("2001-04-14");
         });
         comp.localeFormatter = localeFormatter;
 
         comp.update();
-        expect(comp.localeFormatter.format).not.toHaveBeenCalled();
+        expect(comp.localeFormatter.parse.calls.count()).toEqual(1);
       });
 
       it("inits max constrainst properly from date", function() {
+        comp.transportFormatter = undefined;
         comp.endDate = "2001-01-01";
-        var localeFormatter = jasmine.createSpyObj("localeFormatter", [ "format" ]);
-        localeFormatter.format.and.callFake(function(val) {
-          return "2001-04-14";
+        var localeFormatter = jasmine.createSpyObj("localeFormatter", [ "parse" ]);
+        localeFormatter.parse.and.callFake(function(val) {
+          return new Date("2001-04-14");
         });
         comp.localeFormatter = localeFormatter;
 
         comp.update();
-        expect(comp.localeFormatter.format).toHaveBeenCalled();
+        expect(comp.localeFormatter.parse.calls.count()).toEqual(2);
       });
     });
 
