@@ -310,6 +310,9 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
         dashboard: undefined,
 
         parametersChanged: false,
+        onParameterChanged: null,
+        onAfterRender: null,
+        onBeforeRender: null,
 
         /**
          * Constructor for the PromptPanel
@@ -617,6 +620,10 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
          * @param {Object} value
          */
         parameterChanged: function (param, name, value) {
+          if (this.onParameterChanged) {
+            this.onParameterChanged(name, value);
+          }
+
           if (!value || value == "" || value == "null") {
             if (!this.nullValueParams) {
               this.nullValueParams = [];
@@ -1003,6 +1010,10 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
          * in the case the the parameter UI is not shown.
          */
         init: function (noAutoAutoSubmit) {
+          if (this.onBeforeRender) {
+            this.onBeforeRender();
+          }
+
           var myself = this;
           var fireSubmit = true;
 
@@ -1103,6 +1114,10 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
           this.isRefresh = null;
           this.forceSubmit = false;
           this.isForceRefresh = undefined;
+
+          if (this.onAfterRender) {
+            this.onAfterRender();
+          }
         },
 
         /**
