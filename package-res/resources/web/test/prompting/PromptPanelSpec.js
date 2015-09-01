@@ -665,6 +665,10 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
       });
 
       describe("buildPanelComponents", function() {
+        beforeEach(function() {
+          spyOn(panel, "_initializeParameterValue");
+        });
+
         it("should return empty array for empty groups", function() {
           var paramDefn = {
             parameterGroups : []
@@ -672,6 +676,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
           panel.paramDefn = paramDefn;
           var components = panel.buildPanelComponents();
           expect(components.length).toBe(0);
+          expect(panel._initializeParameterValue).not.toHaveBeenCalled();
         });
 
         it("should return empty array for empty parameters", function() {
@@ -684,6 +689,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
           panel.paramDefn = paramDefn;
           var components = panel.buildPanelComponents();
           expect(components.length).toBe(0);
+          expect(panel._initializeParameterValue).not.toHaveBeenCalled();
         });
 
         it("should return generated components", function() {
@@ -713,6 +719,8 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
           expect(components.length).toBe(2);
           expect(components[0].type).toEqual("VerticalTableBasedPromptLayoutComponent");
           expect(components[1].type).toEqual("FlowPromptLayoutComponent");
+          expect(panel._initializeParameterValue).toHaveBeenCalledWith(panel.paramDefn, hiddenParam);
+          expect(panel._initializeParameterValue).not.toHaveBeenCalledWith(panel.paramDefn, visibleParam);
         });
       });
 
