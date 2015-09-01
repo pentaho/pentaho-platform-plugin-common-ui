@@ -29,10 +29,11 @@ define([], function() {
      *
      * @name EventAPI#beforeRender
      * @method
-     * @param {Function} callback The function to be executed when the event is triggered
+     * @param {Function} callback   The function to be executed when the event is triggered
+     *                              Pass null if you wish to unbind this event
      */
     this.beforeRender = function(callback) {
-      api.operation._getPromptPanel().dashboard.on('cdf:beforeRender', callback);
+      api.operation._getPromptPanel().onBeforeRender = callback;
     };
     
     /**
@@ -40,10 +41,11 @@ define([], function() {
      *
      * @name EventAPI#afterRender
      * @method
-     * @param {Function} callback The function to be executed when the event is triggered
+     * @param {Function} callback   The function to be executed when the event is triggered
+     *                              Pass null if you wish to unbind this event
      */
     this.afterRender = function(callback) {
-      api.operation._getPromptPanel().dashboard.on('cdf:afterRender', callback);
+      api.operation._getPromptPanel().onAfterRender = callback;
     };
 
     /**
@@ -51,10 +53,15 @@ define([], function() {
      *
      * @name EventAPI#parameterChanged
      * @method
-     * @param {Function} callback The function to be executed when the event is triggered
+     * @param {Function} callback   The function to be executed when the event is triggered.
+     *                              Pass null if you wish to unbind this event
+     * @example
+     *  api.event.parameterChanged(function(parameterName, parameterValue) {
+     *    // Execute event based code
+     *  })
      */
     this.parameterChanged = function(callback) {
-      api.operation._getPromptPanel().dashboard.on('cdf:parameterChanged', callback);
+      api.operation._getPromptPanel().onParameterChanged = callback;
     };
 
     /**

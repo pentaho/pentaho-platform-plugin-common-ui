@@ -56,8 +56,21 @@
                     return $('#parameterXml').val();
                 });
 
+                var eventArea = $('#eventsLogArea');
+                promptApi.event.beforeRender(function() {
+                    eventArea.prepend("<p>Before Render event called</p>");
+                });
+
+                promptApi.event.afterRender(function() {
+                    eventArea.prepend("<p>After Render event called</p>");
+                });
+
+                promptApi.event.parameterChanged(function(paramName, paramVal) {
+                    eventArea.prepend("<p>Parameter Changed event called. param '" + paramName + "' value changed to '" + paramVal + "'</p>");
+                });
+
                 promptApi.event.postInit(function() {
-                    $('#eventsLogArea').append("<p>Executed Post Init event callback</p>");
+                    eventArea.prepend("<p>Executed Post Init event callback</p>");
                 });
 
                 promptApi.operation.init();

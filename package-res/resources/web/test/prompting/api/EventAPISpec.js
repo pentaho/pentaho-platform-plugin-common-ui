@@ -39,17 +39,20 @@ define(["common-ui/prompting/api/EventAPI"], function(EventAPI) {
 
     it("should register a beforeRender event", function() {
       eventApi.beforeRender(callback);
-      expect(dashboardSpy.on).toHaveBeenCalledWith('cdf:beforeRender', callback);
+      expect(promptPanelSpy.onBeforeRender).toBeDefined();
+      expect(promptPanelSpy.onBeforeRender).toBe(callback);
     });
 
     it("should register a afterRender event", function() {
       eventApi.afterRender(callback);
-      expect(dashboardSpy.on).toHaveBeenCalledWith('cdf:afterRender', callback);
+      expect(promptPanelSpy.onAfterRender).toBeDefined();
+      expect(promptPanelSpy.onAfterRender).toBe(callback);
     });
 
     it("should register a parameterChanged event", function() {
       eventApi.parameterChanged(callback);
-      expect(dashboardSpy.on).toHaveBeenCalledWith('cdf:parameterChanged', callback);
+      expect(promptPanelSpy.onParameterChanged).toBeDefined();
+      expect(promptPanelSpy.onParameterChanged).toBe(callback);
     });
 
     it("should register a postInit event", function() {

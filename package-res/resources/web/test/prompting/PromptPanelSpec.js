@@ -326,9 +326,14 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
         var name = "name";
         var value = 100;
         spyOn(panel, "refreshPrompt");
+
+        var parameterChangedSpy = jasmine.createSpy("ParameterChangedSpy");
+        panel.onParameterChanged = parameterChangedSpy;
+
         panel.parameterChanged(param, name, value);
         expect(panel.parametersChanged).toBeTruthy();
         expect(panel.refreshPrompt).toHaveBeenCalled();
+        expect(panel.onParameterChanged).toHaveBeenCalledWith(name, value);
       });
 
       it("parameterChanged", function() {
@@ -520,7 +525,12 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
         });
 
         it("should not init dashboard without showing panel and without submitting", function() {
+          var beforeRenderSpy = jasmine.createSpy("BeforeRenderSpy");
+          var afterRenderSpy = jasmine.createSpy("BeforeRenderSpy");
+          panel.onBeforeRender = beforeRenderSpy;
+          panel.onAfterRender = afterRenderSpy;
           panel.init(true);
+
           expect(panel.update).not.toHaveBeenCalled();
           expect(paramDefn.showParameterUI).toHaveBeenCalled();
           expect(paramDefn.mapParameters).toHaveBeenCalled();
@@ -528,6 +538,8 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
           expect(dash.init).not.toHaveBeenCalled();
           expect(panel._initializeParameterValue).not.toHaveBeenCalled();
           expect(panel.submit).not.toHaveBeenCalled();
+          expect(panel.onAfterRender).toHaveBeenCalled();
+          expect(panel.onBeforeRender).toHaveBeenCalled();
         });
 
         it("should not init dashboard without showing panel and with submitting", function() {
