@@ -116,7 +116,7 @@ define(['cdf/components/BaseComponent', "dojo/date/locale", 'dijit/form/DateText
           }
 
           // Parse the date to a Date object.
-          value = this._parseDate(formattedDate);
+          value = this._parseDate(date);
 
           this.dijitId = this.htmlObject + '_input';
 
