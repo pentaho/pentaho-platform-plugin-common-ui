@@ -1186,6 +1186,8 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
             // Create a label and a CDF widget for each parameter
             $.each(group.parameters, function (i, param) {
               if (param.attributes['hidden'] == 'true') {
+                // initialize parameter values regardless of whether we're showing the parameter or not
+                this._initializeParameterValue(this.paramDefn, param);
                 return;
               }
               components.push(this._buildPanelForParameter(param));
