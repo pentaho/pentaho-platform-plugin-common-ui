@@ -1137,7 +1137,7 @@ define([
              * Using the scene's group, preferably, because the datum (here the complex) may have dimensions
              * that are null in the groups' own atoms.
              */
-            if(this._nonMultiGemFilter(gem) &&
+            if(gem.cccDimName && this._nonMultiGemFilter(gem) &&
                !(this.chart._hideNullMembers && this._isNullMember(context.scene.group || complex, gem))) {
                 this.base.apply(this, arguments);
             }
