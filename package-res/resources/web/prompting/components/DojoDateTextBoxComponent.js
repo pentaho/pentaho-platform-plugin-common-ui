@@ -54,8 +54,8 @@
  * @class
  * @extends BaseComponent
  */
-define(['cdf/components/BaseComponent', "dojo/date/locale", 'dijit/form/DateTextBox', 'dijit/registry', 'cdf/lib/jquery', 'dojo/on'],
-    function (BaseComponent, locale, DateTextBox, registry, $, on) {
+define(['cdf/components/BaseComponent', "dojo/date/locale", 'dijit/form/DateTextBox', 'dijit/registry', 'amd!cdf/lib/jquery.ui'],
+    function (BaseComponent, locale, DateTextBox, registry, $) {
 
       return BaseComponent.extend({
         localeFormatter: locale,
@@ -66,13 +66,13 @@ define(['cdf/components/BaseComponent', "dojo/date/locale", 'dijit/form/DateText
          * @method
          * @name DojoDateTextBoxComponent#clear
          */
-        clear: function () {
-          if (this.dijitId) {
-            if (this.onChangeHandle) {
-              this.onChangeHandle.remove();
-            }
-            registry.byId(this.dijitId).destroyRecursive();
-            delete this.dijitId;
+        clear: function () { 
+          if(this.onChangeHandle) {
+            this.onChangeHandle.remove();
+          }
+          var object = registry.byId(this.dijitId);
+          if(object) {
+            object.destroyRecursive();
           }
         },
 
@@ -85,11 +85,10 @@ define(['cdf/components/BaseComponent', "dojo/date/locale", 'dijit/form/DateText
          */
         _parseDate: function (value) {
           if (this.transportFormatter) {
-            value = this.transportFormatter.parse(value);
-          } else if (this._isLegacyDateFormat()) {
-            value = this.localeFormatter.parse(value, {datePattern: this.dateFormat, selector: "date"});
+            return this.transportFormatter.parse(value);
           }
-          return value;
+
+          return this.localeFormatter.parse(value, {datePattern: this.dateFormat, selector: "date"});
         },
 
         /**
@@ -99,26 +98,32 @@ define(['cdf/components/BaseComponent', "dojo/date/locale", 'dijit/form/DateText
          * @name DojoDateTextBoxComponent#update
          */
         update: function () {
+          if(this.dijitId == undefined) {
+            this.dijitId = this.htmlObject + '_input'; 
+          }
+
           this.clear();
           var myself = this;
 
           var parameterValue = this.dashboard.getParameterValue(this.parameter),
               value = undefined;
 
-          // If no value was specified use current date
-          // For backwards compatibility we need to check if the component
-          // is a legacy version of the date picker and update the date format accordingly.
-          var date;
-          if (!parameterValue.length) {
-            date = this._getFormattedDate(new Date());
-          } else {
-            date = this._getFormattedDate(new Date(parameterValue));
+          if(this._isLegacyDateFormat()) {
+            this._convertFormat();
           }
 
-          // Parse the date to a Date object.
-          value = this._parseDate(date);
-
-          this.dijitId = this.htmlObject + '_input';
+          if(parameterValue) {
+            if($.isArray(parameterValue)) {
+              parameterValue = parameterValue.length == 0 ? undefined : (parameterValue.length == 1 ? parameterValue[0] : parameterValue);
+            }
+            if(!parameterValue) {
+              value = new Date();
+            } else {
+              value = this._parseDate(parameterValue);
+            }
+          } else {
+            value = new Date();
+          }
 
           $('#' + this.htmlObject).html($('<input/>').attr('id', this.dijitId));
 
@@ -148,7 +153,10 @@ define(['cdf/components/BaseComponent', "dojo/date/locale", 'dijit/form/DateText
             }
           }, this.dijitId);
 
-          dateTextBox.set('value', value, false);
+          if(this._getDateFormat().match(/(^|(?!y).)(y{2}(?!y))/)) {
+            dateTextBox.constraints.fullYear = false;
+          }
+          dateTextBox.set('value', value);
 
           this._doAutoFocus();
         },
@@ -177,13 +185,10 @@ define(['cdf/components/BaseComponent', "dojo/date/locale", 'dijit/form/DateText
          * @private
          */
         _getFormattedDate: function(date) {
-          if (this._isLegacyDateFormat()) {
-            this._convertFormat();
-          }
           if (this.transportFormatter) {
             return this.transportFormatter.format(date);
           } else {
-            return this.localeFormatter.format(date, {datePattern: this.dateFormat, selector: "date"});
+            return this.localeFormatter.format(date, {datePattern: this._getDateFormat(), selector: "date"});
           }
           return date;
         },
@@ -197,6 +202,10 @@ define(['cdf/components/BaseComponent', "dojo/date/locale", 'dijit/form/DateText
         _isLegacyDateFormat: function() {
           var dojoFormat;
           var dateFormat = this._getDateFormat();
+
+          if(dateFormat.match(/(^|(?!y).)(y{1}(?!y))/)) {
+            return true;
+          }
 
           try {
             dojoFormat = this.localeFormatter.format(new Date(), {datePattern: dateFormat, selector: "date"});
@@ -218,8 +227,8 @@ define(['cdf/components/BaseComponent', "dojo/date/locale", 'dijit/form/DateText
           myself.dateFormat = this._getDateFormat();
 
           var regexConvertYear =      [[/(^|(?!y).)(y{1}(?!y))/, "$1yy"],  [/(^|(?!y).)(y{2}(?!y))/, "$1yyyy"]],
-              regexConvertMonth =     [[/(^|(?!m).)(m{1}(?!m))/i, "$1M"],   [/(^|(?!m).)(m{2}(?!m))/i, "$1MM"]], // case insensitive for this type
-              regexConvertMonthText = [[/(^|(?!M).)(M{3}(?!M))/, "$1MMM"], [/(^|(?!M).)(M{4}(?!M))/, "$1MMMM"]],
+              regexConvertMonthText = [[/(^|(?!M).)(M{1}(?!M))/, "$1MMM"], [/(^|(?!M).)(M{2}(?!M))/, "$1MMMM"]],
+              regexConvertMonth =     [[/(^|(?!m).)(m{1}(?!m))/, "$1M"],   [/(^|(?!m).)(m{2}(?!m))/, "$1MM"]],
               regexConvertDayText =   [[/(^|(?!D).)(D{1}(?!D))/, "$1EEE"], [/(^|(?!D).)(D{2}(?!D))/, "$1EEEE"]],
               regexConvertDayMonth =  [[/(^|(?!o).)(o{1}(?!o))/, "$1D"],   [/(^|(?!o).)(o{2}(?!o))/, "$1DD"], [/(^|(?!o).)(o{3}(?!o))/, "$1DDD"]];
 
