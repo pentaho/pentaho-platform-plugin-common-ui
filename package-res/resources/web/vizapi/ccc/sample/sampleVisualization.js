@@ -90,16 +90,24 @@ require(["common-ui/vizapi/VizController"], function(){
     for(var i=0; i<rows.length; i++){
       dataArray.push(rows[i].c[1].v);
     }
-    var value = 0;
-    switch(vizOptions.calc){
+    var value = null;
+    switch(vizOptions.calc || "MIN") {
       case "MAX":
         for(var i=0; i< dataArray.length; i++){
-          value = Math.max(value, dataArray[i]);
+          if(value == null) {
+            value = dataArray[i];
+          } else {
+            value = Math.max(value, dataArray[i]);
+          }
         }
         break;
       case "MIN":
         for(var i=0; i< dataArray.length; i++){
-          value = Math.min(value, dataArray[i]);
+          if(value == null) {
+            value = dataArray[i];
+          } else {
+            value = Math.min(value, dataArray[i]);
+          }
         }
         break;
       case "AVG":
@@ -113,7 +121,7 @@ require(["common-ui/vizapi/VizController"], function(){
 
     }
 
-    this.numSpan.innerHTML = value;
+    this.numSpan.innerHTML = value == null ? "" : value;
     this.resize();
   }
 });

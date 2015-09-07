@@ -54,7 +54,14 @@ analyzerPlugins.push(
            * @param args      A Hash Object containing relevent values (prevVal, newVal, etc)
            */
           onModelEvent: function(config, item, eventName, args) {
-            this.report.visualization.args["calc"] = config.byId("calc").value;
+            if(eventName === "value") {
+              this.report.visualization.args["calc"] = config.byId("calc").value;
+
+              this.report.history.add(new cv.ReportState("actionChartProps"));
+              this.report.refreshReport();
+              return;
+            }
+
             this.inherited(arguments); // Let super class handle the insertAt and removedGem events
           },
 
