@@ -25,7 +25,6 @@ define([ 'cdf/lib/jquery', 'dijit/registry', 'common-ui/prompting/components/Doj
       var dijitElement = jasmine.createSpyObj("dijitElement", [ "destroyRecursive" ]);
       var changeHandler = jasmine.createSpyObj("changeHandler", [ "remove" ]);
       beforeEach(function() {
-        spyOn(registry, "byId").and.returnValue(dijitElement);
         comp = new DojoDateTextBoxComponent();
       });
 
@@ -33,29 +32,29 @@ define([ 'cdf/lib/jquery', 'dijit/registry', 'common-ui/prompting/components/Doj
         comp.clear();
 
         expect(comp.dijitId).not.toBeDefined();
-        expect(registry.byId).not.toHaveBeenCalled();
         expect(dijitElement.destroyRecursive).not.toHaveBeenCalled();
       });
 
       it("should destroy element", function() {
+        spyOn(registry, "byId").and.returnValue(dijitElement);
         var dijitId = "test_id";
         comp.dijitId = dijitId;
 
         comp.clear();
 
-        expect(comp.dijitId).not.toBeDefined();
+        expect(comp.dijitId).toBeDefined();
         expect(registry.byId).toHaveBeenCalledWith(dijitId);
         expect(dijitElement.destroyRecursive).toHaveBeenCalled();
       });
 
       it("should destroy element and remove change handler", function() {
+        spyOn(registry, "byId").and.returnValue(dijitElement);
         var dijitId = "test_id";
         comp.dijitId = dijitId;
         comp.onChangeHandle = changeHandler;
 
         comp.clear();
 
-        expect(comp.dijitId).not.toBeDefined();
         expect(changeHandler.remove).toHaveBeenCalled();
         expect(registry.byId).toHaveBeenCalledWith(dijitId);
         expect(dijitElement.destroyRecursive).toHaveBeenCalled();
@@ -65,19 +64,27 @@ define([ 'cdf/lib/jquery', 'dijit/registry', 'common-ui/prompting/components/Doj
     describe("update", function() {
       var testId = "test_id";
       var testParam = "test_param";
-      var testVal = "test_val";
+      var testVal = "2011-11-11";
       var parsedVal = "parsed_";
       var formattedVal = "formatted_";
       var comp;
-      var transportFormatter;
+      var transportFormatter, localeFormatter;
       var dashboard;
 
       beforeEach(function() {
-        dashboard = jasmine.createSpyObj("dashboard", [ "getParameterValue" ]);
+        dashboard = jasmine.createSpyObj("dashboard", [ "getParameterValue", "processChange" ]);
         dashboard.getParameterValue.and.returnValue(testVal);
+        dashboard.getParameterValue.and.callFake(function(){});
         transportFormatter = jasmine.createSpyObj("transportFormatter", [ "parse" ]);
         transportFormatter.parse.and.callFake(function(val) {
           return parsedVal + val;
+        });
+        localeFormatter = jasmine.createSpyObj("localeFormatter", [ "parse", "format" ]);
+        localeFormatter.parse.and.callFake(function(val) {
+          return new Date("2001-04-14");
+        });
+        localeFormatter.format.and.callFake(function(val) {
+          return "2001-04-14";
         });
         comp = new DojoDateTextBoxComponent();
         comp.htmlObject = testId;
@@ -97,11 +104,11 @@ define([ 'cdf/lib/jquery', 'dijit/registry', 'common-ui/prompting/components/Doj
         spyOn(comp, "_doAutoFocus");
       });
 
-      it("should init date text box with plain param", function() {
+      it("should init date text box with undefined param", function() {
         comp.update();
         
         expect(dashboard.getParameterValue).toHaveBeenCalledWith(testParam);
-        expect(transportFormatter.parse).toHaveBeenCalledWith(formattedVal + new Date(testVal));
+        expect(transportFormatter.parse).not.toHaveBeenCalled();
         expect(comp.dijitId).toBe(testId + '_input');
         expect($.fn.html).toHaveBeenCalled();
         expect($.fn.attr).toHaveBeenCalledWith('id', comp.dijitId);
@@ -113,7 +120,7 @@ define([ 'cdf/lib/jquery', 'dijit/registry', 'common-ui/prompting/components/Doj
         comp.update();
 
         expect(dashboard.getParameterValue).toHaveBeenCalledWith(testParam);
-        expect(transportFormatter.parse).toHaveBeenCalledWith(formattedVal + new Date(testVal));
+        expect(transportFormatter.parse).toHaveBeenCalledWith(testVal);
         expect(comp.dijitId).toBe(testId + '_input');
         expect($.fn.html).toHaveBeenCalled();
         expect($.fn.attr).toHaveBeenCalledWith('id', comp.dijitId);
@@ -121,12 +128,9 @@ define([ 'cdf/lib/jquery', 'dijit/registry', 'common-ui/prompting/components/Doj
       });
 
       it("should init date text box with legacy date", function() {
+        dashboard.getParameterValue.and.returnValue(testVal);
         comp.transportFormatter = undefined;
-        comp.dateFormat = "yyyy-mm-dd";
-        var localeFormatter = jasmine.createSpyObj("localeFormatter", [ "parse", "format" ]);
-        localeFormatter.parse.and.callFake(function(val) {
-          return "2001-04-14";
-        });
+        comp.dateFormat = "yy-mm-dd";
         comp.localeFormatter = localeFormatter;
         spyOn(comp, "_isLegacyDateFormat").and.callFake(function() { return true; });
         spyOn(comp, "_convertFormat").and.callThrough();
@@ -138,12 +142,9 @@ define([ 'cdf/lib/jquery', 'dijit/registry', 'common-ui/prompting/components/Doj
       });
 
       it("inits min constrainst properly from TODAY", function() {
+        dashboard.getParameterValue.and.returnValue(testVal);
         comp.transportFormatter = undefined;
         comp.startDate = "TODAY";
-        var localeFormatter = jasmine.createSpyObj("localeFormatter", [ "parse" ]);
-        localeFormatter.parse.and.callFake(function(val) {
-          return new Date("2001-04-14");
-        });
         comp.localeFormatter = localeFormatter;
 
         comp.update();
@@ -151,12 +152,9 @@ define([ 'cdf/lib/jquery', 'dijit/registry', 'common-ui/prompting/components/Doj
       });
 
       it("inits min constrainst properly from date", function() {
+        dashboard.getParameterValue.and.returnValue(testVal);
         comp.transportFormatter = undefined;
         comp.startDate = "2001-01-01";
-        var localeFormatter = jasmine.createSpyObj("localeFormatter", [ "parse" ]);
-        localeFormatter.parse.and.callFake(function(val) {
-          return new Date("2001-04-14");
-        });
         comp.localeFormatter = localeFormatter;
 
         comp.update();
@@ -164,12 +162,9 @@ define([ 'cdf/lib/jquery', 'dijit/registry', 'common-ui/prompting/components/Doj
       });
 
       it("inits max constrainst properly from TODAY", function() {
+        dashboard.getParameterValue.and.returnValue(testVal);
         comp.transportFormatter = undefined;
         comp.endDate = "TODAY";
-        var localeFormatter = jasmine.createSpyObj("localeFormatter", [ "parse" ]);
-        localeFormatter.parse.and.callFake(function(val) {
-          return new Date("2001-04-14");
-        });
         comp.localeFormatter = localeFormatter;
 
         comp.update();
@@ -177,12 +172,9 @@ define([ 'cdf/lib/jquery', 'dijit/registry', 'common-ui/prompting/components/Doj
       });
 
       it("inits max constrainst properly from date", function() {
+        dashboard.getParameterValue.and.returnValue(testVal);
         comp.transportFormatter = undefined;
         comp.endDate = "2001-01-01";
-        var localeFormatter = jasmine.createSpyObj("localeFormatter", [ "parse" ]);
-        localeFormatter.parse.and.callFake(function(val) {
-          return new Date("2001-04-14");
-        });
         comp.localeFormatter = localeFormatter;
 
         comp.update();
@@ -192,7 +184,7 @@ define([ 'cdf/lib/jquery', 'dijit/registry', 'common-ui/prompting/components/Doj
 
     describe("getValue", function() {
       it("should return formatted value", function() {
-        var testVal = "test_val";
+        var testVal = "2011-11-11";
         var testFormattedVal = "formatted_";
         var dijitId = "test_id";
         var comp = new DojoDateTextBoxComponent();
@@ -214,24 +206,23 @@ define([ 'cdf/lib/jquery', 'dijit/registry', 'common-ui/prompting/components/Doj
         expect(transportFormatter.format).toHaveBeenCalledWith(testVal);
 
         comp.transportFormatter = undefined;
-        comp.dateFormat = "yyyy-mm-dd";
-        dijitElement.get.and.returnValue("2001-04-14");
+        comp.dateFormat = "y-mm-dd";
+        dijitElement.get.and.returnValue("01-04-14");
 
         var localeFormatter = jasmine.createSpyObj("localeFormatter", [ "format" ]);
         localeFormatter.format.and.callFake(function(val) {
-          return "2001-04-14";
+          return "01-04-14";
         });
         comp.localeFormatter = localeFormatter;
-        spyOn(comp, "_isLegacyDateFormat").and.callFake(function() { return true; });
+        spyOn(comp, "_isLegacyDateFormat").and.callThrough();
         spyOn(comp, "_convertFormat").and.callThrough();
         value = comp.getValue();
-        expect(comp._isLegacyDateFormat).toHaveBeenCalled();
-        expect(comp._convertFormat).toHaveBeenCalled();
+        expect(comp._isLegacyDateFormat).not.toHaveBeenCalled();
+        expect(comp._convertFormat).not.toHaveBeenCalled();
       });
     });
 
     describe("_convertFormat", function(){
-      var component;
       beforeEach(function(){
         comp = new DojoDateTextBoxComponent();
       });
@@ -244,13 +235,14 @@ define([ 'cdf/lib/jquery', 'dijit/registry', 'common-ui/prompting/components/Doj
         };
 
         testFormat("yy-mm-dd", "yyyy-MM-dd");
-        testFormat("yyyy/mm MM/dd", "yyyy/MM MM/dd");
-        testFormat("yMMdd", "yyMMdd");
-        testFormat("MMyydd", "MMyyyydd");
-        testFormat("MMo", "MMD");
-        testFormat("MMoo", "MMDD");
-        testFormat("MM ooo", "MM DDD");
-        testFormat("MM D ooo", "MM EEE DDD");
+        testFormat("yyyy/mm MM/dd", "yyyy/MM MMMM/dd");
+        testFormat("yMMdd", "yyMMMMdd");
+        testFormat("MMyydd", "MMMMyyyydd");
+        testFormat("MMo", "MMMMD");
+        testFormat("MMoo", "MMMMDD");
+        testFormat("MM ooo", "MMMM DDD");
+        testFormat("M D", "MMM EEE");
+        testFormat("MM D ooo", "MMMM EEE DDD");
         testFormat("DD ooo", "EEEE DDD");
       });
     });
