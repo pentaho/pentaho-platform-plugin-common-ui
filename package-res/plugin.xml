@@ -58,8 +58,10 @@
 
     <file context="requirejs">content/common-ui/resources/web/common-ui-require-js-cfg.js</file>
 
-    <!-- Example Analyzer Visualization Plugin. Un-comment to test. -->
-    <!--file context="analyzer">content/common-ui/resources/web/vizapi/sample/analyzer_plugin_loader.js</file-->
+    <!-- Example Visualization Plugin. Un-comment to test -->
+    <!--file context="analyzer">content/common-ui/resources/web/vizapi/ccc/sample/sampleVisualization.js</file-->
+    <!--file context="analyzer">content/common-ui/resources/web/vizapi/ccc/sample/sampleVisualization_analyzer_plugin.js</file-->
+    <!-- Example Visualization Plugin. Un-comment to test -->
 
     <!-- Example Prompting Sample Plugin. Used in prompting/sample.html -->
     <file context="prompting-sample">content/common-ui/resources/web/prompting/pentaho-prompting-sample-component.js</file>
