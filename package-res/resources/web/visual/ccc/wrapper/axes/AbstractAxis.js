@@ -18,141 +18,38 @@ define([
 ], function(def) {
 
     return def.type()
-        .init(function(chart, axisId) {
+        .init(function(chart, axisId, gems) {
             this.chart = chart;
             this.id = axisId;
 
-            // Every role, bound or not may have an entry here
-            this.gemsByRole    = {}; // roleId -> [gem, ...]
-            this.indexesByRole = {}; // roleId -> [number, ...]
+            // TODO: revisit the need for boundRoles !!!!
 
             // Only bound roles will have an entry in this set
             this.boundRoles = {}; // roleId -> true
 
-            // Bound roles will have an entry here,
-            // in order of appearence in gems.
-            this.boundRolesIdList = []; // [i] -> roleId
-
-            this.gems  = this._getGems();
-            this.depth = this.gems.length;
-            this.formulas = [];
-
-            this.gems.forEach(initGem, this);
-
-            /** @instance */
-            function initGem(gem, index) {
+            this.gems  = gems;
+            this.depth = gems.length;
+            gems.forEach(function(gem) {
                 // Overwrite axis id with corresponding Axis instance
-                gem.axis  = this;
-                gem.index = index;
+                gem.axis = this;
 
-                var roleId = gem.role;
-                if(roleId && roleId !== 'undefined') {
-                    if(this._ensureRole(roleId)) {
-                        /* New role */
-                        this.boundRoles[roleId] = true;
-                        this.boundRolesIdList.push(roleId);
-                    }
-
-                    var roleGems = this.gemsByRole[roleId];
-                    gem.roleLevel = roleGems.length;
-                    roleGems.push(gem);
-
-                    this.indexesByRole[roleId].push(index);
-                }
-
-                this.formulas.push(gem.formula);
-            }
+                this.boundRoles[gem.role] = true;
+            }, this);
         })
         .add({
             defaultRole: null,
 
-            _ensureRole: function(roleId) {
-                if(!this.gemsByRole[roleId]) {
-                    this.gemsByRole[roleId]    = [];
-                    this.indexesByRole[roleId] = [];
-
-                    return true;
-                }
-            },
-
-            configure: function(virtualItemStartIndex, cccDimNamesSet) {
-                this.configureDimensionGroups();
-                return this.configureReaders(virtualItemStartIndex, cccDimNamesSet);
-            },
-
-            configureDimensionGroups: function() {
-            },
-
-            // We need to specify readers with indexes only because of unmapped
-            // gems that reach the dataTable.
-            // Because this is probably an analyzer bug,
-            // we fix this by adjusting the readers' indexes,
-            // (and not filtering the table columns, which is more difficult to do).
-            configureReaders: function(virtualItemStartIndex, cccDimNamesSet) {
-                var readers = this.chart.options.readers,
-                    index   = virtualItemStartIndex;
-
-                this.cccDimList().forEach(function(dimName) {
-                    if(dimName == null || !def.hasOwn(cccDimNamesSet, dimName)) {
-
-                        if(dimName != null) { cccDimNamesSet[dimName] = true; }
-
-                        readers.push(this._createReader(dimName, index));
-                        index++;
-                    }
+            buildHtmlTooltip: function(lines, complex, context) {
+                this.gems.forEach(function(gem, index) {
+                    if(gem.cccDimName) this._buildGemHtmlTooltip(lines, complex, context, gem, index);
                 }, this);
 
-                return index;
-            },
-
-            _createReader: function(dimName, index) {
-                return {
-                    // when dimName is null, the reader simply consumes the index,
-                    // and prevents a default reader
-                    names:   dimName,
-                    indexes: index
-                };
-            },
-
-            // NOTE: called during base constructor.
-            _getGems: function() {
-                var gems = this.chart._axesGemsInfo[this.id];
-                var vizHelper = this.chart._vizHelper;
-                if(vizHelper.completeAxisGemsMetadata) { // available on the client
-                    vizHelper.completeAxisGemsMetadata(this.id, gems);
-                }
-
-                return gems;
-            },
-
-            getAxisLabel: function() {
-                var labels = def.query(this._getAxisLabelGems())
-                                .where(function(gem) { return gem.cccDimName; })
-                                .select(function(gem) { return gem.label; })
-                                .array(),
-                    last   = labels.pop(),
-                    first  = labels.join(", ");
-
-                if(first && last) {
-                    return this.chart._message('chartAxisTitleMultipleDimText', [first, last]);
-                }
-
-                return first || last;
-            },
-
-            _getAxisLabelGems: function() {
-                return this.gems;
-            },
-
-            buildHtmlTooltip: function(lines, complex, context) {
-                this.gems.forEach(
-                    this._buildGemHtmlTooltip.bind(this, lines, complex, context));
             },
 
             _buildGemHtmlTooltip: function(lines, complex, context, gem, index) {
                 // Multi-chart formulas are not shown in the tooltip.
                 // They're on the small chart's title.
-                if(gem.cccDimName && gem.role !== this.chart._multiRole) {
+                if(gem.role !== this.chart._multiRole) {
                     var atom = complex.atoms[gem.cccDimName];
                     if(!atom.dimension.type.isHidden && (!complex.isTrend || atom.value != null)) {
                         // ex: "Line: Ships"
@@ -160,13 +57,6 @@ define([
                     }
                 }
             },
-
-           /**
-            * Obtains the ccc dimensions that this axis uses,
-            * in the order they are laid out in
-            * the CCC's virtual item.
-            */
-           cccDimList: def.method({isAbstract: true}),
 
            fillCellSelection: def.method({isAbstract: true})
         });

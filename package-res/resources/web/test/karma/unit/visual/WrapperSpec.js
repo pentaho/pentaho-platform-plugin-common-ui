@@ -16,9 +16,8 @@
 define([
   "pentaho/visual/type/registryMock",
   "pentaho/visual/color/paletteRegistry",
-  "pentaho/visual/data/DataTable",
-  "pentaho/visual/data/DataView"
-], function(typeRegistryMock, paletteRegistry, DataTable, DataView) {
+  "pentaho/visual/data/Table"
+], function(typeRegistryMock, paletteRegistry, DataTable) {
 
   describe("VisualWrapper —", function() {
     var Aux, VisualWrapper;
@@ -302,7 +301,7 @@ define([
         expect(wrapper._disposeVisual).toHaveBeenCalled();
       });
 
-      xit("should clear the current visual type when set to null", function() {
+      it("should clear the current visual type when set to null", function() {
         typeRegistryMock.add({id: "ccc_bar"});
 
         var wrapper = new Aux();
@@ -489,8 +488,7 @@ define([
           var args = theVisual.draw.calls.first().args;
 
           var data = args[0];
-          expect(data instanceof DataView).toBe(true);
-          expect(data.getSourceTable()).toBe(wrapper.data);
+          expect(data).toBe(wrapper.data);
 
           var drawSpec = args[1];
           expect(drawSpec instanceof Object).toBe(true);

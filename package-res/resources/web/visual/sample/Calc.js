@@ -42,7 +42,7 @@ define(function() {
     while(j--) if(dataTable.getColumnType(j) === "number") break;
     if(j < 0) return;
 
-    var value, vi;
+    var value = null, vi;
     switch(drawSpec.calc) {
       case "MAX":
         for(i = 0; i < R; i++)
@@ -67,7 +67,7 @@ define(function() {
         break;
     }
 
-    this.numSpan.innerHTML = value != null ? value.toFixed(2) : "-";
+    this.numSpan.innerHTML = value != null ? value.toFixed(2) : "NA";
 
     this.resize();
   };

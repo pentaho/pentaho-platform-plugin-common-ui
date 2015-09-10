@@ -22,28 +22,23 @@ define([
         methods: {
             _cccClass: 'PieChart',
 
-            _rolesToCccDimensionsMap: {
+            _roleToCccDimGroup: {
                 'columns':  'multiChart',
-                //'rows':     'category',
-                'multi':    null
-                //'measures': 'value'
+                'rows':     'category',
+                'measures': 'value'
             },
+
+            _genericMeasureCccDimName: "value",
 
             _multiRole: 'columns',
 
             _discreteColorRole: 'rows',
 
-            _noPercentInTootltipForPercentGems: true,
+            _tooltipHidePercentageForPercentGems: true,
 
             _options: {
                 legendShape: 'circle',
-
                 titlePosition: 'bottom',
-
-                dataOptions: {
-                    measuresInColumns: false
-                },
-
                 extensionPoints: {
                     slice_strokeStyle:'white',
                     slice_lineWidth:   0.8
@@ -56,8 +51,8 @@ define([
                 if(this.options.valuesVisible) this._configureValuesMask();
             },
 
-            _showLegend: function() {
-                return this.options.legend && this.axes.row.depth > 0;
+            _isLegendVisible: function() {
+                return this._getRoleDepth("rows") > 0;
             },
 
             _configureLabels: function(options, drawSpec) {
@@ -76,11 +71,10 @@ define([
 
             _configureValuesMask: function() {
                 // Change values mask according to each category's
-                // discriminated measure being PCTOF or not
-                var colAxis = this.axes.column,
-                    meaDiscrimName = colAxis.measureDiscrimName;
-                if(meaDiscrimName) {
-                    var gemsMap = this.gemsMap;
+                // discriminated measure being isPercent or not
+                if(this.measureDiscrimGem) {
+                    var gemsMap = this._gemsMap,
+                        meaDiscrimName = this.measureDiscrimGem.cccDimName;
 
                     this.options.pie = {
                         scenes: {
@@ -90,7 +84,8 @@ define([
                                         meaGemId, meaGem;
                                     if(meaAtom &&
                                        (meaGemId = meaAtom.value) &&
-                                       (meaGem = gemsMap[meaGemId]) && meaGem.measureType === 'PCTOF') {
+                                       (meaGem = gemsMap[meaGemId]) &&
+                                        meaGem.isPercent) {
                                         return "{value}"; // the value is the percentage itself;
                                     }
 
@@ -102,7 +97,21 @@ define([
                 }
             },
 
-            _selectionExcludesMultiGems: def.fun.constant(false)
+            _selectionExcludesMultiGems: def.fun.constant(false),
+
+            _getDiscreteColorMap: function() {
+                var memberPalette = this._getMemberPalette();
+                if(memberPalette) {
+                    var colorGems = this._getDiscreteColorGems(),
+                        C = colorGems.length;
+                    // C >= 0 (color -> "rows" -> is optional)
+                    // When multiple measures exist, the pie chart shows them as multiple charts
+                    // and if these would affect color, each small chart would have a single color.
+                    // => consider M = 0;
+                    // If C, use the members' colors of the last color attribute.
+                    if(C) return this._copyColorMap(null, memberPalette[colorGems[C - 1].name]);
+                }
+            }
         }
     });
 });

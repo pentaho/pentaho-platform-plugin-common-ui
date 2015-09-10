@@ -172,14 +172,14 @@ define([
         if(occurs.min === 1) {
           msg += "is required.";
         } else {
-          msg += "needs to be bound to at least " + occurs.min + " data properties.";
+          msg += "needs to be bound to at least " + occurs.min + " data attribute(s).";
         }
 
         error = addError("minOccur", msg, [req.id]);
         error.minOccur = occurs.min;
       } else if(occur > occurs.max) {
         msg = "Visual role requirement '" + req.id +
-            "' cannot be bound to more than " + occurs.max + " data properties.";
+            "' cannot be bound to more than " + occurs.max + " data attribute(s).";
         error = addError("maxOccur", msg, [req.id]);
         error.maxOccur = occurs.max;
       }

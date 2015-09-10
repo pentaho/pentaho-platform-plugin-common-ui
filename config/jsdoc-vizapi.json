@@ -1,0 +1,32 @@
+{
+  "tags": {
+    "allowUnknownTags": true
+  },
+  "source": {
+    "include": ["package-res/resources/web/visual/data"],
+    "includePattern": ".+\\.js(doc)?$"
+  },
+  "plugins": ["plugins/markdown"],
+  "templates": {
+    "cleverLinks": true,
+    "monospaceLinks": false,
+    "default": {
+      "outputSourceFiles": true,
+      "includeDate": true,
+      "layoutFile": "../build-res/jsdoc-template/layout.tmpl",
+      "staticFiles": {
+        "include": [
+          "build-res/jsdoc-template/static"
+        ]
+      }
+    }
+  },
+  "opts": {
+    "template": "templates/default",
+    "encoding": "utf8",
+    "destination": "doc-js/vizapi",
+    "recurse": true,
+    "private": true,
+    "verbose": true
+  }
+}

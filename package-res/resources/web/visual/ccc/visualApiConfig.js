@@ -51,11 +51,29 @@ define(function() {
               }
             });
 
+          // Selection should be disabled if there are 2 or more "column" report axis gems in the chart.
+          // Report object is not available when printing.
+          if(editorDoc.source) {
+            var count = getReportNumberOfReportColumnGems(editorDoc.source);
+            visualProps.selectable =  count < 2;
+            visualProps.sharedSeriesSelection = count === 1;
+          }
+
           return visualProps;
         }
       }
     ]
   };
+
+  function getReportNumberOfReportColumnGems(report) {
+    var columnGems = report.reportDoc.getReportNode().selectNodes("cv:columnAttributes/cv:attribute");
+    var count = 0;
+    for(var i = 0, L = columnGems.length; i < L; i++) {
+      var colGem = columnGems[i];
+      if(colGem.getAttribute("gembarId") && colGem.getAttribute("hideInChart") !== "true") count++;
+    }
+    return count;
+  }
 
   function isIgnoredEditorProp(p) {
     switch(p) {

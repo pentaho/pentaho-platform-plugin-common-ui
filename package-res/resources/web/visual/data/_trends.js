@@ -15,15 +15,11 @@
 *
 */
 define([
-  "./AbstractDataTable",
-  "./DataTable",
-  "./DataView",
+  "./AbstractTable",
+  "./Table",
+  "./View",
   "../_utils"
 ], function(AbstractDataTable, DataTable, DataView, utils) {
-  /**
-   * @module pentaho.visual.data
-   */
-
   // NOTE: This needs unit-testing before being documented publicly.
 
   /*
@@ -31,11 +27,11 @@ define([
    * result to a new column in the table.
    *
    * For data views,
-   * this method creates the trend in the _root_ `DataTable`,
+   * this method creates the trend in the _root_ `Table`,
    * and makes the created trend column visible in the intervening views.
    *
    * @method createTrend
-   * @for AbstractDataTable
+   * @for AbstractTable
    * @param {Object} trendArgs A keyword arguments object.
    * @param {String} trendArgs.type  The type of trend to create; possible values: 'linear'.
    * @param {Number} trendArgs.x     The index of the "x" value column; can be a numeric or string column.
@@ -112,20 +108,18 @@ define([
     // Create Trend Column
     // ===================
 
-    // TODO: Use setCell method when available.
-
     // Create the trend column.
-    // Am I a DataView or a DataTable?
-    var trendIndex = this.addColumn({
-      id:    trendName,
-      type:  'number',
+    // Am I a View or a Table?
+    this.model.attributes.add({
+      name: trendName,
+      type: "number",
       label: trendLabel
     });
-
-    var table = this._jsonTable;
-    var me = this;
+    var trendIndex = this.addColumn(trendName);
 
     // ----
+
+    var me = this;
 
     var isXDiscrete = this.getColumnType(xIndex) !== 'number';
 
@@ -148,12 +142,14 @@ define([
     // Every row's trend column already has the value null.
     if(!trendModel) return false;
 
-    dojo.forEach(table.rows, function(row, i){
+    var i = -1,
+        R = this.getNumberOfRows();
+    while(++i < R) {
       var trendX = getX ? getX(i) : i,
           trendY = trendX != null ? trendModel.sample(trendX, getY(i), i) : null;
 
-      row.c[trendIndex] = {v: trendY};
-    });
+      this.getCell(i, trendIndex).value = trendY;
+    }
 
     return true;
   };

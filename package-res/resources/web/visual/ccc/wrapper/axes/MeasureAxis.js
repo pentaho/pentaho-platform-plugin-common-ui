@@ -19,57 +19,36 @@ define([
 ], function(def, AbstractAxis) {
 
     return AbstractAxis.extend({
-        init: function(chart) {
-            this.base(chart, 'measure');
+        init: function(chart, axisId, gems) {
+            this.base(chart, axisId, gems);
 
-            this._ensureRole(this.defaultRole);
-
-            this.genericMeasuresCount = 0;
-            this.genericMeasureRoles = {};
-
-            def.eachOwn(this.gemsByRole, function(gems, role) {
-                if(role.indexOf('measures') === 0) {
-                    this.genericMeasureRoles[role] = true;
-                    this.genericMeasuresCount += gems.length;
-                }
-            }, this);
+            /* There can be one special CCC dimension into which
+             * the attributes of one or more measure roles are mapped.
+             *
+             * e.g.:
+             *
+             *   visual role  -> CCC dim group/name
+             *   -----------------------------
+             *   "measures"      "value"
+             *   "measuresLine"  "value"
+             *
+             * Each of the visual roles may support more than one attribute.
+             *
+             * In the end, if more than one measure attribute is mapped to the same
+             * CCC dimension group, either multiple CCC dimensions are created,
+             * one for each of the attributes (e.g.: value, value2, value3...)
+             * or a measure discriminator column is added to distinguish
+             * which of the measure attributes is in the single CCC dimension (e.g.: "value").
+             *
+             * To activate the measure discriminator mode, a chart class has to specify the
+             * prototype property `_genericMeasureCccDimName` with the name of the special CCC dimension.
+             *
+             * When multiple dimensions are created and multiple source roles exist,
+             * the source roles are sorted alphabetically and the within role attribute order is preserved.
+             */
         },
         methods: {
             defaultRole: 'measures',
-
-            /**
-             * Filters the report definition formulas
-             * excluding those not returned in the data table.
-             *
-             * Note this is called during base constructor.
-             */
-            _getGems: function() {
-                return this.base().filter(function(gem) {
-                    var meaId = gem.id,
-                        measureInfo;
-
-                    if(meaId && (measureInfo = def.getOwn(this.chart._measuresInfo, meaId))) {
-                        gem.role = measureInfo.role;
-                        return true;
-                    }
-                    return false;
-                }, this);
-            },
-
-            cccDimList: function() {
-                if(!this._cccDimList) {
-                    this._cccDimList = this.chart._measureRolesInfoList
-                        .map(function(role) {
-                            this.gemsByRole[role.id].forEach(function(gem) {
-                                gem.cccDimName = role.cccDimName;
-                            });
-
-                            return role.cccDimName;
-                        }, this);
-                }
-
-                return this._cccDimList;
-            },
 
             _buildGemHtmlTooltip: function(lines, complex, context, gem/*, index*/) {
                 /*
@@ -77,55 +56,55 @@ define([
                  * only the "active" measure in 'complex'
                  * is placed in the tooltip.
                  */
-                var colAxis = this.chart.axes.column;
-                if(colAxis.measureDiscrimName &&
-                   def.hasOwn(this.genericMeasureRoles, gem.role) &&
-                   gem.id !== complex.atoms[colAxis.measureDiscrimName].value) {
+                var measureDiscrimGem = this.chart.measureDiscrimGem;
+                if(measureDiscrimGem && gem.isMeasureGeneric &&
+                    gem.name !== complex.atoms[measureDiscrimGem.cccDimName].value) {
                    return;
                 }
 
                 // Obtain the dimension assigned to the role
-                var cccDimName = this.chart._measureRolesInfo[gem.role].cccDimName;
-                if(cccDimName) {
-                    var atom = complex.atoms[cccDimName];
-                    if(!atom.dimension.type.isHidden && (!complex.isTrend || atom.value != null)) {
-                        // ex: "GemLabel (RoleDesc): 200 (10%)"
-                        var tooltipLine = def.html.escape(gem.label);
+                var cccDimName = gem.cccDimName,
+                    atom = complex.atoms[cccDimName];
+                if(!atom.dimension.type.isHidden && (!complex.isTrend || atom.value != null)) {
+                    // ex: "GemLabel (RoleDesc): 200 (10%)"
+                    var tooltipLine = def.html.escape(gem.label);
 
-                        // Role description
-                        if(this.chart._noRoleInTooltipMeasureRoles[gem.role] !== true)
-                            tooltipLine += " (" + def.html.escape(gem.role) + ")";
+                    // Role description
+                    if(this.chart._noRoleInTooltipMeasureRoles[gem.role] !== true)
+                        tooltipLine += " (" + def.html.escape(gem.role) + ")";
 
-                        tooltipLine += ": " + def.html.escape(this._getAtomLabel(atom, context));
+                    tooltipLine += ": " + def.html.escape(this._getAtomLabel(atom, context));
 
-                        if(!this.chart._noPercentInTootltipForPercentGems || gem.measureType !== 'PCTOF') {
-                            var valuePct = this._getAtomPercent(atom, context);
-                            if(valuePct != null)
-                                tooltipLine += " (" + def.html.escape(''+valuePct) + ")";
-                        }
-
-                        // TODO: OMG! this piece of merged code is completely messed up!!!
-
-                        var suffix;
-
-                        // It can happen that the scene has more than one datum.
-                        // One is a null one and the other an interpolated one.
-                        // We may receive the null one in `complex` and
-                        // miss detecting that the scene is actually interpolated.
-                        if(context && context.scene && context.scene.datums()) {
-                            if(context.scene.datums().where(function(d) { return d.isInterpolated && d.interpDimName === cccDimName; }).first()) {
-                                suffix = this.chart._message('chartTooltipGemInterp_' + complexInterp.interpolation);
-                            }
-                        } else if(complex.isTrend/* && atom.label*/) {
-                            // TODO: "atom.label" -- is a weak test for trended measures,
-                            // that relies on the fact that non-trended measures are left null
-                            suffix = "(" + this.chart.options.trendLabel + ")"; //this.chart._message('chartTooltipGemTrend_' + complex.trendType);
-                        }
-
-                        if(suffix) tooltipLine += " " + suffix;
-
-                        lines.push(tooltipLine);
+                    if(!this.chart._tooltipHidePercentageForPercentGems || !gem.isPercent) {
+                        var valuePct = this._getAtomPercent(atom, context);
+                        if(valuePct != null)
+                            tooltipLine += " (" + def.html.escape(''+valuePct) + ")";
                     }
+
+                    var suffix;
+
+                    // It can happen that the scene has more than one datum.
+                    // One is a null one and the other an interpolated one.
+                    // We may receive the null one in `complex` and
+                    // miss detecting that the scene is actually interpolated.
+                    if(context && context.scene) {
+                        var complexInterp = context.scene.datums()
+                                .where(function(d) {
+                                    return d.isInterpolated && d.interpDimName === cccDimName;
+                                })
+                                .first();
+
+                        if(complexInterp)
+                            suffix = this.chart._message('chartTooltipGemInterp_' + complexInterp.interpolation);
+
+                    } else if(complex.isTrend) {
+                        suffix = "(" + this.chart.options.trendLabel + ")";
+                        //this.chart._message('chartTooltipGemTrend_' + complex.trendType);
+                    }
+
+                    if(suffix) tooltipLine += " " + suffix;
+
+                    lines.push(tooltipLine);
                 }
             },
 
@@ -166,10 +145,7 @@ define([
                 // Add a description of the selected values.
                 // At the time of writing, analyzer discards selection.value.
                 selection.value = def.query(this.gems)
-                    .select(function(gem) {
-                        var cccDimName = this.chart._measureRolesInfo[gem.role].cccDimName;
-                        if(cccDimName) return complex.atoms[cccDimName].label;
-                    }, this)
+                    .select(function(gem) { return complex.atoms[gem.cccDimName].label; })
                     .where(def.truthy)
                     .array()
                     .join(" ~ ");

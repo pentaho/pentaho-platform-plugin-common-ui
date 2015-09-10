@@ -18,12 +18,6 @@
  * @module pentaho.visual
  */
 
-/*
- * TODO: consider adding
- * * memberPalette -> datatable
- * * formatInfo -> datatable
- */
-
 /**
  * A visual specification describes a visualization,
  * by stating its type, state and properties.
@@ -56,7 +50,7 @@
  */
 
 /**
- * Gets a plain object, in DataTable format, of the visualization data, or _nully_.
+ * Gets a plain object, in _data table_ format, of the visualization data, or _nully_.
  *
  * This property is used for persistence only, and thus,
  * need not correspond to the data

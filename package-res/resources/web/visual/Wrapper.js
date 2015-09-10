@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 define([
-  './data/AbstractDataTable',
-  './data/DataTable',
-  './data/DataView',
+  './data/AbstractTable',
+  './data/Table',
+  './data/View',
   './events',
   './color/paletteRegistry',
   './color/utils',
@@ -645,10 +645,7 @@ define([
       return this._async().until(promise);
 
       function drawItNow() {
-        var dataView = new DataView(dataTable); // [DCL] Why a view? Isolation?
-        var drawSpec = this._getDrawSpec(drawOptions);
-
-        return this._visual.draw(dataView, drawSpec);
+        return this._visual.draw(dataTable, this._getDrawSpec(drawOptions));
       }
 
       function drawn() {
@@ -679,11 +676,6 @@ define([
 
         // Should we smash this here? Everytime?
         drawSpec.highlights = this.highlights;
-
-        // TODO: these will remain in the datatable under revised names.
-        var jsonTable = this._dataTable.getJsonTable();
-        drawSpec.memberPalette = jsonTable.colors || {};
-        drawSpec.formatInfo    = jsonTable.formatStrings;
 
         /*
           context: {},

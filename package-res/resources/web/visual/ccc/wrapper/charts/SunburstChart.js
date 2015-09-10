@@ -15,23 +15,22 @@
 */
 define([
     "cdf/lib/CCC/protovis",
+    "cdf/lib/CCC/def",
     "./AbstractChart",
     "../util"
-], function(pv, AbstractChart, util) {
+], function(pv, def, AbstractChart, util) {
 
     return AbstractChart.extend({
         methods: {
             _cccClass: 'SunburstChart',
 
-            _rolesToCccDimensionsMap: {
-                'columns':  null,
-                'measures': null,
-                'size':     'size'
+            _roleToCccDimGroup: {
+                'multi': 'multiChart',
+                'rows':  'category',
+                'size':  'size'
             },
 
             _discreteColorRole: 'rows',
-
-            _useLabelColor: false,
 
             _options: {
                 valuesVisible: true,
@@ -54,13 +53,13 @@ define([
 
                 if(drawSpec.emptySlicesHidden)
                     eps.slice_visible = function(scene) {
-                        return util.isNullMember(scene.vars.category.value);
+                        return !util.isNullMember(scene.vars.category.value);
                     };
 
                 eps.label_textStyle = drawSpec.labelColor;
 
                 // Determine whether to show values label
-                if (drawSpec.labelsOption != "none" && this.axes.measure.boundRoles.size) {
+                if(drawSpec.labelsOption != "none" && this.axes.measure.boundRoles.size) {
                     eps.label_textBaseline = "bottom";
                     eps.label_textMargin = 2;
 
@@ -130,6 +129,12 @@ define([
                 this._configureDisplayUnits();
             },
 
+            _configureLabels: function(options, drawSpec) {
+                // Sunburst always shows category labels.
+                options.valuesFont = util.defaultFont(util.readFont(drawSpec, 'label'));
+                options.extensionPoints.label_textStyle = drawSpec.labelColor;
+            },
+
             _configureDisplayUnits: function() {
                 var scaleFactor = this._parseDisplayUnits(this._drawSpec.displayUnits);
                 if(scaleFactor > 1) {
@@ -162,7 +167,54 @@ define([
                 } else {
                     delete this._formatSize;
                 }
-            }
+            },
+
+            /** @override */
+            _getDiscreteColorMap: function() {
+                // Always return a color map, even if no fixed member colors exist.
+                // This leads into creating the general #_createDiscreteColorMapScaleFactory color scale.
+                var colorMap = {},
+                    memberPalette = this._getMemberPalette();
+                if(memberPalette) {
+                    // The color role, "rows" is required, so necessarily C > 0.
+                    // Also, there can be at most one measure gem, "size", so M <= 1.
+                    // Use member colors of all of the color attributes.
+                    this._getDiscreteColorGems().forEach(function(colorGem) {
+                        // Copy map values to colorMap.
+                        // All color maps are joined together and there will be no
+                        // value collisions because the key is prefixed with the category.
+                        var map = memberPalette[colorGem.name];
+                        if(map) this._copyColorMap(colorMap, map);
+                    }, this);
+                }
+
+                return colorMap;
+            },
+
+            _createDiscreteColorMapScaleFactory: function(colorMap, defaultScale) {
+                // Sunburst Level 1 Wedge Key: "[Department].[VAL]"
+                // Sunburst Level 2 Wedge Key: "[Department].[VAL]~[Region].[USA]"
+                // colorMap= {
+                //   "[Region].[USA]" : "#FF00FF"
+                //   "[Department].[USA]" : "#AAFF00"
+                // }
+                return function scaleFactory() {
+                    return function(compKey) {
+                        if(compKey) {
+                            var keys     = compKey.split("~"),
+                                level    = keys.length - 1,
+                                keyLevel = keys[level];
+
+                            // Obtain color for most specific key from color map.
+                            // If color map has no color and it is the 1st level,
+                            //  then reserve a color from the default color scale.
+                            // Otherwise, return undefined, meaning that a derived color should be used.
+                            return def.getOwn(colorMap, keyLevel) ||
+                                (level ? undefined : defaultScale(keyLevel));
+                        }
+                    };
+                };
+            },
         }
     });
 });

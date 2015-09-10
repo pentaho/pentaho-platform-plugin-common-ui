@@ -1,20 +1,22 @@
 /*!
-* Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*
-*/
-define(["pentaho/visual/data/DataTable"], function(DataTable) {
+ * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+define([
+  "pentaho/visual/data/Table",
+  "pentaho/visual/data/Attribute"
+], function(DataTable, Attribute, Column) {
 
   function getDatasetCDA1() {
     return {
@@ -31,9 +33,9 @@ define(["pentaho/visual/data/DataTable"], function(DataTable) {
 
   function getDatasetDT1() {
     return {
-      cols: [
-        {id: "country", type: "string", label: "Country"},
-        {id: "sales",   type: "number", label: "Sales"  },
+      model: [
+        {name: "country", type: "string", label: "Country"},
+        {name: "sales",   type: "number", label: "Sales"  },
       ],
       rows: [
         {c: [ {v: "Portugal"}, {v: 12000}] },
@@ -44,9 +46,9 @@ define(["pentaho/visual/data/DataTable"], function(DataTable) {
 
   function getDatasetDT1Normalized() {
     return {
-      cols: [
-        {id: "country", type: "string", label: "Country"},
-        {id: "sales",   type: "number", label: "Sales"  },
+      model: [
+        {name: "country", type: "string", label: "Country"},
+        {name: "sales",   type: "number", label: "Sales"  },
       ],
       rows: [
         {c: [ {v: "Portugal", f: null}, {v: 12000, f: null}] },
@@ -55,6 +57,77 @@ define(["pentaho/visual/data/DataTable"], function(DataTable) {
     };
   }
 
+  function expectDataTableContent(dataTable, sourceData) {
+
+    // Compare DT columns to columns and attributes
+    var C = dataTable.getNumberOfColumns();
+
+    expect(C).toBe(sourceData.model.length);
+
+    sourceData.model.forEach(function(dtAttr, index) {
+      var type = dtAttr.type.toLowerCase();
+
+      expect(dataTable.getColumnId(index)).toBe(dtAttr.name);
+      expect(dataTable.getColumnLabel(index)).toBe(dtAttr.label);
+      expect(dataTable.getColumnType(index)).toBe(type);
+
+      var attr = dataTable.getColumnAttribute(index);
+      expect(attr.name ).toBe(dtAttr.name);
+      expect(attr.type ).toBe(type);
+      expect(attr.label).toBe(dtAttr.label);
+    });
+
+    // Compare DT rows to rows
+    expect(dataTable.getNumberOfRows(), sourceData.rows.length);
+
+    sourceData.rows.forEach(function(dtRow, i) {
+      var j = C;
+      while(j--) {
+        expect(dataTable.getValue(i, j)).toBe(dtRow.c[j].v);
+
+        var f = dtRow.c[j].f;
+        if(f === null) f = undefined;
+        expect(dataTable.getLabel(i, j)).toBe(f);
+      }
+    });
+  }
+
+  var COLTYPE_CDA_DT = {
+    "numeric": "number",
+    "integer": "number"
+  };
+  
+  function expectDataTableContentJsonCda(dataTable, sourceData) {
+    var dataTable = new DataTable(sourceData);
+
+    // Compare cda columns to columns and attributes
+    var C = dataTable.getNumberOfColumns();
+
+    expect(C).toBe(sourceData.metadata.length);
+
+    sourceData.metadata.forEach(function(cdaCol, index) {
+      var type = cdaCol.colType.toLowerCase();
+      type = COLTYPE_CDA_DT[type] || type;
+
+      expect(dataTable.getColumnId(index)).toBe(cdaCol.colName);
+      expect(dataTable.getColumnLabel(index)).toBe(cdaCol.colLabel);
+      expect(dataTable.getColumnType(index)).toBe(type);
+
+      var attr = dataTable.getColumnAttribute(index);
+      expect(attr.name ).toBe(cdaCol.colName);
+      expect(attr.type ).toBe(type);
+      expect(attr.label).toBe(cdaCol.colLabel);
+    });
+
+    // Compare cda rows to rows
+    expect(dataTable.getNumberOfRows(), sourceData.resultset.length);
+
+    sourceData.resultset.forEach(function(cdaRow, i) {
+      var j = C;
+      while(j--) expect(dataTable.getValue(i, j)).toBe(cdaRow[j]);
+    });
+  }
+  
   describe("DataTable -", function() {
     it("should be a function", function() {
       expect(typeof DataTable).toBe("function");
@@ -99,11 +172,6 @@ define(["pentaho/visual/data/DataTable"], function(DataTable) {
           var dataTable = new DataTable(jsTable);
           expect(dataTable.getNumberOfRows()).toBe(2);
         });
-
-        it("should return a data table whose internal _jsonTable is the specified object", function() {
-          var dataTable = new DataTable(jsTable);
-          expect(dataTable._jsonTable).toBe(jsTable);
-        });
       });
 
       describe("with one argument, a plain JavaScript object in CDA format -", function() {
@@ -114,12 +182,6 @@ define(["pentaho/visual/data/DataTable"], function(DataTable) {
         it("should return an instance of DataTable", function() {
           var dataTable = new DataTable(jsTable);
           expect(dataTable instanceof DataTable).toBe(true);
-        });
-
-        it("should return a data table whose internal _jsonTable is not the specified object", function() {
-          var dataTable = new DataTable(jsTable);
-          expect(dataTable._jsonTable instanceof Object).toBe(true);
-          expect(dataTable._jsonTable).not.toBe(jsTable);
         });
 
         it("should return a data table with 2 columns", function() {
@@ -133,7 +195,7 @@ define(["pentaho/visual/data/DataTable"], function(DataTable) {
         });
       });
 
-      // Exercizes toJSON, really.
+      // Exercises toSpec, really.
       describe("with one argument, another DataTable -", function() {
         var sourceDataTable;
 
@@ -145,18 +207,13 @@ define(["pentaho/visual/data/DataTable"], function(DataTable) {
           expect(dataTable).not.toBe(sourceDataTable);
         });
 
-        it("should return a data table whose internal _jsonTable is not that of the source data table", function() {
-          var dataTable = new DataTable(sourceDataTable);
-          expect(dataTable._jsonTable).not.toBe(sourceDataTable._jsonTable);
-        });
-
         it("should return a data table having the same data as the source data table", function() {
           var dataTable = new DataTable(sourceDataTable);
-          expect(dataTable._jsonTable).toEqual(sourceDataTable._jsonTable);
+          expect(dataTable.toSpec()).toEqual(sourceDataTable.toSpec());
         });
       });
 
-      describe("with one argument, a string in DataTable format -", function() {
+      describe("with one argument, a string in JSON-DataTable format -", function() {
         var sourceJson, sourceData;
 
         beforeEach(function() {
@@ -171,36 +228,37 @@ define(["pentaho/visual/data/DataTable"], function(DataTable) {
 
         it("should return a data table having the same data as the source JSON string", function() {
           var dataTable = new DataTable(sourceJson);
-          expect(dataTable._jsonTable).toEqual(sourceData);
+
+          expectDataTableContent(dataTable, sourceData);
         });
       });
 
-      describe("with one argument, a string in CDA format -", function() {
-        var sourceJson, sourceData;
+      describe("with one argument, a string in JSON-CDA format -", function() {
+        var sourceData;
 
         beforeEach(function() {
           sourceData = getDatasetCDA1();
-          sourceJson = JSON.stringify(sourceData);
         });
 
         it("should return an instance of DataTable", function() {
-          var dataTable = new DataTable(sourceJson);
+          var dataTable = new DataTable(JSON.stringify(sourceData));
           expect(dataTable instanceof DataTable).toBe(true);
         });
 
         it("should return a data table having the same data as the source JSON string", function() {
-          var dataTable = new DataTable(sourceJson);
-          expect(dataTable._jsonTable).toEqual(new DataTable(sourceData)._jsonTable);
+          var dataTable = new DataTable(sourceData);
+
+          expectDataTableContentJsonCda(dataTable, sourceData);
         });
       });
     });
 
     describe("table -", function() {
-      describe("#convertCdaToDataTable() -", function() {
+      describe("#convertJsonCdaToTableSpec() -", function() {
         var jsTable;
 
         beforeEach(function() {
-          jsTable = DataTable.convertCdaToDataTable(getDatasetCDA1());
+          jsTable = DataTable.convertJsonCdaToTableSpec(getDatasetCDA1());
         });
 
         it("should return an Object", function() {
@@ -212,8 +270,7 @@ define(["pentaho/visual/data/DataTable"], function(DataTable) {
         });
       });
 
-      // This is actually implemented in the abstract base class AbstractDataTable
-      describe("#toJSON() -", function() {
+      describe("#toSpec() -", function() {
         var dataTable;
 
         beforeEach(function() {
@@ -221,35 +278,16 @@ define(["pentaho/visual/data/DataTable"], function(DataTable) {
         });
 
         it("should return a plain JavaScript Object", function() {
-          var jsTable = dataTable.toJSON();
+          var jsTable = dataTable.toSpec();
           expect(jsTable instanceof Object).toBe(true);
         });
 
         it("should return an object with the same metadata and data", function() {
-          var jsTable = dataTable.toJSON();
-          expect(jsTable).toEqual(getDatasetDT1Normalized());
-        });
+          var jsTable = dataTable.toSpec();
+          var dataTable2 = new DataTable(jsTable);
 
-        it("should return an object having distinct col, row and cell objects from those of the source data table", function() {
-          var jsTable = dataTable.toJSON();
-
-          expect(jsTable.cols[0]).not.toBe(dataTable._jsonTable.cols[0]);
-          expect(jsTable.cols[1]).not.toBe(dataTable._jsonTable.cols[1]);
-
-          expect(jsTable.rows[0]).not.toBe(dataTable._jsonTable.rows[0]);
-          expect(jsTable.rows[0].c[0]).not.toBe(dataTable._jsonTable.rows[0].c[0]);
-          expect(jsTable.rows[0].c[1]).not.toBe(dataTable._jsonTable.rows[0].c[1]);
-
-          expect(jsTable.rows[1]).not.toBe(dataTable._jsonTable.rows[1]);
-          expect(jsTable.rows[1].c[0]).not.toBe(dataTable._jsonTable.rows[1].c[0]);
-          expect(jsTable.rows[1].c[1]).not.toBe(dataTable._jsonTable.rows[1].c[1]);
-        });
-      });
-
-      describe("#getJsonTable() -", function() {
-        it("should return the internal plain JavaScript object in DataTable format", function() {
-          var dataTable = new DataTable(getDatasetDT1());
-          expect(dataTable._jsonTable).toBe(dataTable.getJsonTable());
+          // previous jsTable has been "destroyed".
+          expectDataTableContent(dataTable2, getDatasetDT1());
         });
       });
     });
@@ -264,10 +302,10 @@ define(["pentaho/visual/data/DataTable"], function(DataTable) {
 
         it("should return 3 when there are 3 columns", function() {
           var dataTable = new DataTable({
-            cols: [
-              {id: "A", type: "string"},
-              {id: "B", type: "number"},
-              {id: "C", type: "boolean"}
+            model: [
+              {name: "A", type: "string"},
+              {name: "B", type: "number"},
+              {name: "C", type: "boolean"}
             ],
             rows: []
           });
@@ -275,13 +313,13 @@ define(["pentaho/visual/data/DataTable"], function(DataTable) {
         });
       });
 
-      describe("#getColumnType() -", function() {
+      describe("#getColumnType(j) -", function() {
         it("should return the column type of the given column index", function() {
           var dataTable = new DataTable({
-            cols: [
-              {id: "A", type: "string"},
-              {id: "B", type: "number"},
-              {id: "C", type: "boolean"}
+            model: [
+              {name: "A", type: "string"},
+              {name: "B", type: "number"},
+              {name: "C", type: "boolean"}
             ],
             rows: []
           });
@@ -293,10 +331,10 @@ define(["pentaho/visual/data/DataTable"], function(DataTable) {
 
         it("should return the column type as lower case", function() {
           var dataTable = new DataTable({
-            cols: [
-              {id: "A", type: "STRING"},
-              {id: "B", type: "NUMBER"},
-              {id: "C", type: "BOOLEAN"}
+            model: [
+              {name: "A", type: "STRING"},
+              {name: "B", type: "NUMBER"},
+              {name: "C", type: "BOOLEAN"}
             ],
             rows: []
           });
@@ -308,9 +346,9 @@ define(["pentaho/visual/data/DataTable"], function(DataTable) {
 
         it("should return unknown column types", function() {
           var dataTable = new DataTable({
-            cols: [
-              {id: "A", type: "GUGU"},
-              {id: "B", type: "DADA"}
+            model: [
+              {name: "A", type: "GUGU"},
+              {name: "B", type: "DADA"}
             ],
             rows: []
           });
@@ -321,11 +359,11 @@ define(["pentaho/visual/data/DataTable"], function(DataTable) {
 
         it("should return the column type 'string' as default", function() {
           var dataTable = new DataTable({
-            cols: [
-              {id: "A", type: null},
-              {id: "B", type: undefined},
-              {id: "C", type: ""},
-              {id: "D"}
+            model: [
+              {name: "A", type: null},
+              {name: "B", type: undefined},
+              {name: "C", type: ""},
+              {name: "D"}
             ],
             rows: []
           });
@@ -337,13 +375,13 @@ define(["pentaho/visual/data/DataTable"], function(DataTable) {
         });
       });
 
-      describe("#getColumnId() -", function() {
-        it("should return the column id of the given column index", function() {
+      describe("#getColumnId(j) -", function() {
+        it("should return the attribute name of the attribute of the given column index", function() {
           var dataTable = new DataTable({
-            cols: [
-              {id: "A" },
-              {id: "Bc"},
-              {id: "dE"}
+            model: [
+              {name: "A" },
+              {name: "Bc"},
+              {name: "dE"}
             ],
             rows: []
           });
@@ -354,13 +392,13 @@ define(["pentaho/visual/data/DataTable"], function(DataTable) {
         });
       });
 
-      describe("#getColumnLabel() -", function() {
-        it("should return the column label of the given column index", function() {
+      describe("#getColumnLabel(j) -", function() {
+        it("should return the attribute label of the attribute of given column index", function() {
           var dataTable = new DataTable({
-            cols: [
-              {label: "ABC"},
-              {label: "DEF"},
-              {label: "GHI"}
+            model: [
+              {name: "A", label: "ABC"},
+              {name: "B", label: "DEF"},
+              {name: "C", label: "GHI"}
             ],
             rows: []
           });
@@ -371,54 +409,7 @@ define(["pentaho/visual/data/DataTable"], function(DataTable) {
         });
       });
 
-      describe("#getColumnProperty() -", function() {
-        it("should return the value of the specified column property", function() {
-          var foo = {},
-              bar = {},
-              dataTable = new DataTable({
-            cols: [
-              {foo: foo},
-              {bar: bar}
-            ],
-            rows: []
-          });
-
-          expect(dataTable.getColumnProperty(0, "foo")).toBe(foo);
-          expect(dataTable.getColumnProperty(1, "bar")).toBe(bar);
-        });
-
-        it("should return `undefined` for a column property which is not defined", function() {
-          var dataTable = new DataTable({
-            cols: [
-              {}
-            ]
-          });
-
-          expect(dataTable.getColumnProperty(0, "foo")).toBeUndefined();
-        });
-      });
-
-      describe("#setColumnProperty() -", function() {
-        it("should set the value of the specified column property", function() {
-          var foo = {},
-              bar = {},
-              dataTable = new DataTable({
-            cols: [
-              {},
-              {}
-            ],
-            rows: []
-          });
-
-          dataTable.setColumnProperty(0, "foo", foo);
-          dataTable.setColumnProperty(1, "bar", bar);
-
-          expect(dataTable.getColumnProperty(0, "foo")).toBe(foo);
-          expect(dataTable.getColumnProperty(1, "bar")).toBe(bar);
-        });
-      });
-
-      describe("#getColumnRange() -", function() {
+      describe("#getColumnRange(j) -", function() {
         it("should return a range object with both min and max `undefined` when there is no data", function() {
 
           var dataTable = new DataTable({
@@ -491,7 +482,7 @@ define(["pentaho/visual/data/DataTable"], function(DataTable) {
         });
       });
 
-      describe("#getDistinctValues() -", function() {
+      describe("#getDistinctValues(j) -", function() {
 
         it("should return an empty array when there is no data", function() {
 
@@ -698,7 +689,7 @@ define(["pentaho/visual/data/DataTable"], function(DataTable) {
         });
       });
 
-      describe("#getDistinctFormattedValues() -", function() {
+      describe("#getDistinctFormattedValues(j) -", function() {
 
         it("should return an empty array when there is no data", function() {
 
@@ -717,9 +708,9 @@ define(["pentaho/visual/data/DataTable"], function(DataTable) {
 
           var values = ["1.2", "0.6", "2.4"],
               dataTable = new DataTable({
-                cols: [
-                  {id: "country", type: "STRING", label: "Country"},
-                  {id: "sales",   type: "NUMBER", label: "Sales"  }
+                model: [
+                  {name: "country", type: "STRING", label: "Country"},
+                  {name: "sales",   type: "NUMBER", label: "Sales"  }
                 ],
                 rows: [
                   {c: ["Portugal", {v: 12000, f: "1.2"}]},
@@ -743,9 +734,9 @@ define(["pentaho/visual/data/DataTable"], function(DataTable) {
 
           var values = ["1.2", "0.6", "2.4"],
               dataTable = new DataTable({
-                cols: [
-                  {id: "country", type: "STRING", label: "Country"},
-                  {id: "sales",   type: "NUMBER", label: "Sales"  }
+                model: [
+                  {name: "country", type: "STRING", label: "Country"},
+                  {name: "sales",   type: "NUMBER", label: "Sales"  }
                 ],
                 rows: [
                   {c: ["Portugal", {v: 12000, f: "1.2"}]},
@@ -766,9 +757,9 @@ define(["pentaho/visual/data/DataTable"], function(DataTable) {
 
           var values = ["1.2", "0.6", "2.4"],
               dataTable = new DataTable({
-                cols: [
-                  {id: "country", type: "STRING", label: "Country"},
-                  {id: "sales",   type: "NUMBER", label: "Sales"  }
+                model: [
+                  {name: "country", type: "STRING", label: "Country"},
+                  {name: "sales",   type: "NUMBER", label: "Sales"  }
                 ],
                 rows: [
                   {c: ["Portugal", {v: 12000, f: "1.2"}]},
@@ -792,9 +783,9 @@ define(["pentaho/visual/data/DataTable"], function(DataTable) {
         it("should return an array containing formatted values in the order of occurrence in the specified column", function() {
           var values = ["1.2", "0.6", "2.4"],
               dataTable = new DataTable({
-                cols: [
-                  {id: "country", type: "STRING", label: "Country"},
-                  {id: "sales",   type: "NUMBER", label: "Sales"  }
+                model: [
+                  {name: "country", type: "STRING", label: "Country"},
+                  {name: "sales",   type: "NUMBER", label: "Sales"  }
                 ],
                 rows: [
                   {c: ["Portugal", {v: 12000, f: "1.2"}]},
@@ -829,7 +820,7 @@ define(["pentaho/visual/data/DataTable"], function(DataTable) {
               }),
               distinctValues = dataTable.getDistinctFormattedValues(1);
 
-          expect(distinctValues.filter(function(v) { return v === null; }).length).toBe(1);
+          expect(distinctValues.filter(function(v) { return !v; }).length).toBe(1);
         });
 
         it("should return an array containing a single `NaN` value when the specified column contains `NaN` values", function() {
@@ -901,64 +892,7 @@ define(["pentaho/visual/data/DataTable"], function(DataTable) {
               }),
               distinctValues = dataTable.getDistinctFormattedValues(0);
 
-          expect(distinctValues).toEqual(["Portugal", null, "null", "Italy"]);
-        });
-      });
-
-      describe("#addColumn()", function() {
-        it("should add another column to the table", function() {
-          var dataTable = new DataTable();
-          dataTable.addColumn({id: "A", type: "string", label: "A"});
-          expect(dataTable.getNumberOfColumns()).toBe(1);
-
-          dataTable.addColumn({id: "B", type: "string", label: "B"});
-          expect(dataTable.getNumberOfColumns()).toBe(2);
-        });
-
-        it("should add another column to the table as the last column", function() {
-          var dataTable = new DataTable({
-            cols: [
-              {id: "A", type: "string"},
-              {id: "B", type: "number"},
-              {id: "C", type: "boolean"}
-            ],
-            rows: []
-          });
-
-          dataTable.addColumn({id: "D", type: "number", label: "D"});
-
-          expect(dataTable.getColumnId(3)).toBe("D");
-        });
-
-        it("should return the index of the added column", function() {
-          var dataTable = new DataTable({
-            cols: [
-              {id: "A", type: "string"},
-              {id: "B", type: "number"},
-              {id: "C", type: "boolean"}
-            ],
-            rows: []
-          });
-
-          var index = dataTable.addColumn({id: "D", type: "number", label: "D"});
-
-          expect(index).toBe(3);
-        });
-
-        it("should respect all the specified known column attributes", function() {
-          var dataTable = new DataTable({
-            cols: [
-              {id: "A", type: "string" },
-              {id: "B", type: "number" },
-              {id: "C", type: "boolean"}
-            ],
-            rows: []
-          });
-
-          var index = dataTable.addColumn({id: "D", type: "number", label: "d"});
-          expect(dataTable.getColumnId(index)).toBe("D");
-          expect(dataTable.getColumnType(index)).toBe("number");
-          expect(dataTable.getColumnLabel(index)).toBe("d");
+          expect(distinctValues).toEqual(["Portugal", "", "null", "Italy"]);
         });
       });
     });
@@ -966,10 +900,10 @@ define(["pentaho/visual/data/DataTable"], function(DataTable) {
     describe("cells -", function() {
       describe("#getValue()", function() {
         var dataTable = new DataTable({
-          cols: [
-            {id: "country", type: "string",  label: "Country"},
-            {id: "sales",   type: "number",  label: "Sales"  },
-            {id: "euro",    type: "boolean", label: "Euro"  }
+          model: [
+            {name: "country", type: "string",  label: "Country"},
+            {name: "sales",   type: "number",  label: "Sales"  },
+            {name: "euro",    type: "boolean", label: "Euro"  }
           ],
           rows: [
             {c: ["Ireland",  1]}, // 0
@@ -1014,7 +948,7 @@ define(["pentaho/visual/data/DataTable"], function(DataTable) {
           expect(dataTable.getValue(4, 1)).toBeNaN();
         });
 
-        it("should return a `null` value in the 'v' property of the specified row and column is nully", function() {
+        it("should return a `null` value if the 'v' property of the specified row and column is nully", function() {
           expect(dataTable.getValue(7, 1)).toBeNull();
           expect(dataTable.getValue(8, 1)).toBeNull();
         });
@@ -1032,10 +966,10 @@ define(["pentaho/visual/data/DataTable"], function(DataTable) {
 
       describe("#getFormattedValue()", function() {
         var dataTable = new DataTable({
-          cols: [
-            {id: "country", type: "string",  label: "Country"},
-            {id: "sales",   type: "number",  label: "Sales"  },
-            {id: "euro",    type: "boolean", label: "Euro"   }
+          model: [
+            {name: "country", type: "string",  label: "Country"},
+            {name: "sales",   type: "number",  label: "Sales"  },
+            {name: "euro",    type: "boolean", label: "Euro"   }
           ],
           rows: [
             {c: ["Ireland",  {v: 1, f: "1.0"}]},
@@ -1074,18 +1008,18 @@ define(["pentaho/visual/data/DataTable"], function(DataTable) {
           expect(dataTable.getFormattedValue(9, 2)).toBe("false");
         });
 
-        it("should return the `null` value if a direct value is nully", function() {
-          expect(dataTable.getFormattedValue(5, 1)).toBe(null);
-          expect(dataTable.getFormattedValue(6, 1)).toBe(null);
+        it("should return `\"\"` if a direct value is nully", function() {
+          expect(dataTable.getFormattedValue(5, 1)).toBe(""); // null
+          expect(dataTable.getFormattedValue(6, 1)).toBe(""); // undefined
         });
       });
 
       describe("#getLabel()", function() {
         var dataTable = new DataTable({
-          cols: [
-            {id: "country", type: "string",  label: "Country"},
-            {id: "sales",   type: "number",  label: "Sales"  },
-            {id: "euro",    type: "boolean", label: "Euro"   }
+          model: [
+            {name: "country", type: "string",  label: "Country"},
+            {name: "sales",   type: "number",  label: "Sales"  },
+            {name: "euro",    type: "boolean", label: "Euro"   }
           ],
           rows: [
             {c: ["Ireland",  {v: 1, f: "1.0"}]},
@@ -1110,32 +1044,32 @@ define(["pentaho/visual/data/DataTable"], function(DataTable) {
           expect(dataTable.getLabel(10, 0)).toBe("Portugal");
         });
 
-        it("should return `null` if the 'f' property is nully or missing", function() {
-          expect(dataTable.getLabel(1, 1)).toBe(null);
-          expect(dataTable.getLabel(2, 1)).toBe(null);
-          expect(dataTable.getLabel(3, 1)).toBe(null);
+        it("should return `undefined` if the 'f' property is nully or missing", function() {
+          expect(dataTable.getLabel(1, 1)).toBeUndefined();
+          expect(dataTable.getLabel(2, 1)).toBeUndefined();
+          expect(dataTable.getLabel(3, 1)).toBeUndefined();
         });
 
         it("should return `null` for a direct value (no cell object)", function() {
-          expect(dataTable.getLabel(4, 1)).toBe(null);
-          expect(dataTable.getLabel(4, 0)).toBe(null);
-          expect(dataTable.getLabel(7, 1)).toBe(null);
-          expect(dataTable.getLabel(8, 2)).toBe(null);
-          expect(dataTable.getLabel(9, 2)).toBe(null);
+          expect(dataTable.getLabel(4, 1)).toBeUndefined();
+          expect(dataTable.getLabel(4, 0)).toBeUndefined();
+          expect(dataTable.getLabel(7, 1)).toBeUndefined();
+          expect(dataTable.getLabel(8, 2)).toBeUndefined();
+          expect(dataTable.getLabel(9, 2)).toBeUndefined();
         });
 
         it("should return the `null` value if a direct value is nully", function() {
-          expect(dataTable.getLabel(5, 1)).toBe(null);
-          expect(dataTable.getLabel(6, 1)).toBe(null);
+          expect(dataTable.getLabel(5, 1)).toBeUndefined();
+          expect(dataTable.getLabel(6, 1)).toBeUndefined();
         });
       });
 
       describe("#getCell()", function() {
         var dataTable = new DataTable({
-          cols: [
-            {id: "country", type: "string",  label: "Country"},
-            {id: "sales",   type: "number",  label: "Sales"  },
-            {id: "euro",    type: "boolean", label: "Euro"   }
+          model: [
+            {name: "country", type: "string",  label: "Country"},
+            {name: "sales",   type: "number",  label: "Sales"  },
+            {name: "euro",    type: "boolean", label: "Euro"   }
           ],
           rows: [
             {c: ["Ireland",  {v: 1, f: "1.0"}]},
@@ -1164,23 +1098,16 @@ define(["pentaho/visual/data/DataTable"], function(DataTable) {
           ]
         });
 
-        it("should return a shallow copy of the internal cell object", function() {
-          var cell0 = dataTable._jsonTable.rows[0].c[1];
-          var cell1 = dataTable.getCell(0, 1);
-          expect(cell0).not.toBe(cell1);
-          expect(cell1.v).toBe(cell0.v);
-          expect(cell1.f).toBe(cell0.f);
-        });
-
         it("should return a cell 'f' property that is the string value of the source 'f' property", function() {
           expect(dataTable.getCell(16, 1).f).toBe("1");
         });
 
-        it("should return `null` when both 'v' or 'f' have a nully value", function() {
-          expect(dataTable.getCell(1, 1)).toBe(null);
-          expect(dataTable.getCell(2, 1)).toBe(null);
-          expect(dataTable.getCell(3, 1)).toBe(null);
-          expect(dataTable.getCell(4, 1)).toBe(null);
+        it("should not return `null` when both 'v' or 'f' have a nully value", function() {
+          // The reason being possible metadata these may contain.
+          expect(dataTable.getCell(1, 1)).not.toBe(null);
+          expect(dataTable.getCell(2, 1)).not.toBe(null);
+          expect(dataTable.getCell(3, 1)).not.toBe(null);
+          expect(dataTable.getCell(4, 1)).not.toBe(null);
         });
 
         it("should return a cell object when either 'v' or 'f' do not have a nully value", function() {
@@ -1194,7 +1121,7 @@ define(["pentaho/visual/data/DataTable"], function(DataTable) {
           function expectCell(i, j) {
             var cell = dataTable.getCell(i, j);
             expect(cell instanceof Object).toBe(true);
-            expect(cell.f).toBe(null);
+            expect(cell.f).toBe(undefined);
             return expect(cell.v);
           }
 
@@ -1206,9 +1133,9 @@ define(["pentaho/visual/data/DataTable"], function(DataTable) {
           expectCell(15, 1).toBe(0);
         });
 
-        it("should return `null` for direct nully values", function() {
-          expect(dataTable.getCell(10, 1)).toBe(null);
-          expect(dataTable.getCell(11, 1)).toBe(null);
+        it("should return a cell with a `null` value for direct nully values", function() {
+          expect(dataTable.getCell(10, 1).value).toBe(null);
+          expect(dataTable.getCell(11, 1).value).toBe(null);
         });
       });
     });
@@ -1222,8 +1149,8 @@ define(["pentaho/visual/data/DataTable"], function(DataTable) {
 
         it("should return 3 when there are 3 rows", function() {
           var dataTable = new DataTable({
-            cols: [
-              {id: "A", type: "string"}
+            model: [
+              {name: "A", type: "string"}
             ],
             rows: [
               {c: ["1"]},
@@ -1240,11 +1167,11 @@ define(["pentaho/visual/data/DataTable"], function(DataTable) {
           expect(new DataTable().getFilteredRows([])).toEqual([]);
         });
 
-        it("should return all rows indexes of there are 0 filters", function() {
+        it("should return all rows' indexes if there are 0 filters", function() {
           var dataTable = new DataTable({
-            cols: [
-              {id: "country", type: "string",  label: "Country"},
-              {id: "sales",   type: "number",  label: "Sales"  }
+            model: [
+              {name: "country", type: "string",  label: "Country"},
+              {name: "sales",   type: "number",  label: "Sales"  }
             ],
             rows: [
               {c: ["Ireland",  1]},
@@ -1258,9 +1185,9 @@ define(["pentaho/visual/data/DataTable"], function(DataTable) {
 
         it("should filter rows having a given value on the given column", function() {
           var dataTable = new DataTable({
-            cols: [
-              {id: "country", type: "string",  label: "Country"},
-              {id: "sales",   type: "number",  label: "Sales"  }
+            model: [
+              {name: "country", type: "string",  label: "Country"},
+              {name: "sales",   type: "number",  label: "Sales"  }
             ],
             rows: [
               {c: ["Ireland",  1]},
@@ -1278,9 +1205,9 @@ define(["pentaho/visual/data/DataTable"], function(DataTable) {
 
         it("should filter rows having a value on a column _and_ another value on another column", function() {
           var dataTable = new DataTable({
-            cols: [
-              {id: "country", type: "string",  label: "Country"},
-              {id: "sales",   type: "number",  label: "Sales"  }
+            model: [
+              {name: "country", type: "string",  label: "Country"},
+              {name: "sales",   type: "number",  label: "Sales"  }
             ],
             rows: [
               {c: ["Portugal",  1]},
@@ -1299,9 +1226,9 @@ define(["pentaho/visual/data/DataTable"], function(DataTable) {
 
         it("should filter rows having a `null` (or `undefined`) value on a column", function() {
           var dataTable = new DataTable({
-            cols: [
-              {id: "country", type: "string",  label: "Country"},
-              {id: "sales",   type: "number",  label: "Sales"  }
+            model: [
+              {name: "country", type: "string",  label: "Country"},
+              {name: "sales",   type: "number",  label: "Sales"  }
             ],
             rows: [
               {c: ["Portugal", null]},
@@ -1319,9 +1246,9 @@ define(["pentaho/visual/data/DataTable"], function(DataTable) {
 
         it("should filter rows having an `NaN` value on a column", function() {
           var dataTable = new DataTable({
-            cols: [
-              {id: "country", type: "string",  label: "Country"},
-              {id: "sales",   type: "number",  label: "Sales"  }
+            model: [
+              {name: "country", type: "string",  label: "Country"},
+              {name: "sales",   type: "number",  label: "Sales"  }
             ],
             rows: [
               {c: ["Portugal", 1]},

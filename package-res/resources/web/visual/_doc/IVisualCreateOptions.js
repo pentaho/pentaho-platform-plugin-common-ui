@@ -35,5 +35,11 @@
  *
  * @property domElement
  * @type HTMLElement
- * @since 3.0
+ */
+
+ /**
+ * The visual type.
+ *
+ * @property type
+ * @type IVisualType
  */

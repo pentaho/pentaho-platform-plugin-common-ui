@@ -20,7 +20,7 @@ define(function() {
 
     return {
         isNullMember: function(member) {
-            return !!member && !_nullMemberRe.test(member);
+            return member == null || _nullMemberRe.test(member);
         },
 
         defaultFont: function(font, defaultSize) {

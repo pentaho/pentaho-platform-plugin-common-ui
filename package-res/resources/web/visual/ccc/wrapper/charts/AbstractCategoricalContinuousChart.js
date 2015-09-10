@@ -14,28 +14,30 @@
 * limitations under the License.
 */
 define([
+    "cdf/lib/CCC/def",
     "./AbstractCartesianChart"
-], function(AbstractCartesianChart) {
+], function(def, AbstractCartesianChart) {
 
     return AbstractCartesianChart.extend({
         methods: {
+            _genericMeasureCccDimName: "value",
+
             _options: {
-                panelSizeRatio: 0.8,
-                dataOptions: {
-                    measuresInColumns: false
-                }
+                panelSizeRatio: 0.8
             },
 
-            _showAxisTitle: function(type) {
+            _isAxisTitleVisible: function(type) {
                 return !this._hasMultiChartColumns || type === 'ortho';
             },
 
             _getOrthoAxisTitle: function() {
-                return this._getMeasureRoleTitle();
+                var roleNames = def.getOwn(this._getRolesByCccDimGroup(), this._genericMeasureCccDimName);
+                return roleNames ? this._getMeasureRoleTitle(roleNames[0]) : "";
             },
 
             _getBaseAxisTitle: function() {
-                return this.axes.row.getAxisLabel();
+                var roleNames = this._getRolesByCccDimGroup()["category"];
+                return roleNames ? this._getDiscreteRolesTitle(roleNames) : "";
             },
 
             _configure: function() {

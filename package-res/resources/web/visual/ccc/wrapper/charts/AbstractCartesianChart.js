@@ -29,14 +29,14 @@ define([
 
                 this._configureDisplayUnits();
 
-                if(this._showAxisTitle('base'))
+                if(this._isAxisTitleVisible('base'))
                     this._configureAxisTitle('base',  this._getBaseAxisTitle());
 
-                if(this._showAxisTitle('ortho'))
+                if(this._isAxisTitleVisible('ortho'))
                     this._configureAxisTitle('ortho', this._getOrthoAxisTitle());
             },
 
-            _showAxisTitle: def.fun.constant(true),
+            _isAxisTitleVisible: def.fun.constant(true),
 
             _getOrthoAxisTitle: def.noop,
 
@@ -50,22 +50,33 @@ define([
                 if(title) this.options[axisType + 'AxisTitle'] = title;
             },
 
-             _getMeasureRoleTitle: function(measureRole) {
-                var title = "",
-                    measureAxis = this.axes.measure,
-                    singleAxisGem;
+            /**
+             * Builds a title composed of the label of the single attribute
+             * of the role, or empty, if the role has more than one attribute.
+             */
+            _getMeasureRoleTitle: function(measureRole) {
+                 var ais = this._getAttributeInfosOfRole(measureRole);
+                 return (ais && ais.length === 1) ? ais[0].label : "";
+            },
 
-                if(!measureRole) {
-                    if(this.axes.measure.genericMeasuresCount === 1)
-                        singleAxisGem = measureAxis.gemsByRole[measureAxis.defaultRole][0];
-                } else {
-                    var roleGems = measureAxis.gemsByRole[measureRole];
-                    if(roleGems.length === 1) singleAxisGem = roleGems[0];
+            _getDiscreteRolesTitle: function(roleNames) {
+                var q = def.query(roleNames);
+
+                if(this._multiRole) q = q.where(function(rn) { return rn !== this._multiRole; }, this);
+
+                var labels = q.selectMany(function(rn) { return this._getAttributeInfosOfRole(rn)}, this)
+                     .distinct(function(ai) { return ai.name; })
+                     .select(function(ai) { return ai.label; })
+                     .where(def.truthy)
+                     .array();
+
+                var last  = labels.pop(),
+                    first = labels.join(", ");
+                if(first && last) {
+                    return this._message('chartAxisTitleMultipleDimText', [first, last]);
                 }
 
-                if(singleAxisGem) title += singleAxisGem.label;
-
-                return title;
+                return first || last;
             },
 
             _configureAxisRange: function(primary, axisType) {
