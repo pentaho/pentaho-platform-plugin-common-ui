@@ -54,7 +54,7 @@
  * @class
  * @extends BaseComponent
  */
-define(['cdf/components/BaseComponent', "dojo/date/locale", 'dijit/form/DateTextBox', 'dijit/registry', 'amd!cdf/lib/jquery.ui'],
+define(['cdf/components/BaseComponent', "dojo/date/locale", 'dijit/form/DateTextBox', 'dijit/registry', 'amd!cdf/lib/jquery.ui', 'css!./DojoDateTextBoxComponent.css'],
     function (BaseComponent, locale, DateTextBox, registry, $) {
 
       return BaseComponent.extend({
