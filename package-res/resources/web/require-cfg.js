@@ -17,3 +17,7 @@
 
 // Included by webcontext.js to configure the RequireJS system
 require.config(requireCfg);
+
+pen = typeof pen != "undefined" ? pen : {};
+pen.require = require;
+pen.define = define;
