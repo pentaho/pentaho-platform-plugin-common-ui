@@ -26,6 +26,10 @@
  * @property {Boolean} autoSubmit True if the prompt is in auto submit mode, false otherwise
  * @property {Dashboard} dashboard The dashboard object assigned to the prompt
  * @property {Boolean} parametersChanged True if the parameters have changed, False otherwise
+ * @property {Function} onBeforeRender Callback called if defined before any change is performed in the prompt components
+ * @property {Function} onAfterRender Callback called if defined after any change is performed in the prompt components
+ * @property {Function} onBeforeUpdate Callback called if defined before the prompt update cycle is called
+ * @property {Function} onAfterUpdate Callback called if defined after the prompt update cycle is called
  */
 define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/util/util', 'common-ui/util/GUIDHelper', './WidgetBuilder', 'cdf/Dashboard.Clean', './parameters/ParameterDefinitionDiffer'],
     function (Base, Logger, DojoNumber, i18n, Utils, GUIDHelper, WidgetBuilder, Dashboard, ParamDiff) {
@@ -311,8 +315,10 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
 
         parametersChanged: false,
         onParameterChanged: null,
-        onAfterRender: null,
         onBeforeRender: null,
+        onAfterRender: null,
+        onBeforeUpdate: null,
+        onAfterUpdate: null,
 
         /**
          * Constructor for the PromptPanel
@@ -983,20 +989,31 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
          * @param {JSON} diff - contains the differences between the old and new parameter definitions produced by ParameterDefinitionDiffer.diff
          */
         update: function(diff) {
+          var toRemove = Object.keys(diff.toRemove).length > 0,
+              toAdd = Object.keys(diff.toAdd).length > 0,
+              toChangeData = Object.keys(diff.toChangeData).length > 0;
+
+          if ((toRemove || toAdd || toChangeData) && this.onBeforeRender) {
+            this.onBeforeRender();
+          }
 
           // Determine if there are params which need to be removed
-          if (Object.keys(diff.toRemove).length > 0) {
+          if (toRemove) {
             this._removeComponentsByDiff(diff.toRemove);
           }
 
           // Determine if there are params which need to be added
-          if (Object.keys(diff.toAdd).length > 0) {
+          if (toAdd) {
             this._addComponentsByDiff(diff.toAdd);
           }
 
           // Determine if there are params which need to be changed
-          if (Object.keys(diff.toChangeData).length > 0) {
+          if (toChangeData) {
             this._changeComponentsByDiff(diff.toChangeData);
+          }
+
+          if ((toRemove || toAdd || toChangeData) && this.onAfterRender) {
+            this.onAfterRender();
           }
         },
 
@@ -1010,8 +1027,8 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
          * in the case the the parameter UI is not shown.
          */
         init: function (noAutoAutoSubmit) {
-          if (this.onBeforeRender) {
-            this.onBeforeRender();
+          if (this.onBeforeUpdate) {
+            this.onBeforeUpdate();
           }
 
           var myself = this;
@@ -1077,6 +1094,10 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
           }).bind(this);
 
           if (!this.isRefresh && this.paramDefn.showParameterUI()) { // First time init
+            if (this.onBeforeRender) {
+              this.onBeforeRender();
+            }
+
             this.promptGUIDHelper.reset(); // Clear the widget helper for this prompt
 
             var layout = _createWidgetForPromptPanel.call(this);
@@ -1084,6 +1105,10 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
 
             this.dashboard.addComponents(components);
             this.dashboard.init();
+
+            if (this.onAfterRender) {
+              this.onAfterRender();
+            }
           } else if (this.diff) { // Perform update when there are differences
             this.update(this.diff);
 
@@ -1115,8 +1140,8 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
           this.forceSubmit = false;
           this.isForceRefresh = undefined;
 
-          if (this.onAfterRender) {
-            this.onAfterRender();
+          if (this.onAfterUpdate) {
+            this.onAfterUpdate();
           }
         },
 
