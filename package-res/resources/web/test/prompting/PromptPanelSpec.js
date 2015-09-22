@@ -527,8 +527,8 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
         it("should not init dashboard without showing panel and without submitting", function() {
           var beforeRenderSpy = jasmine.createSpy("BeforeRenderSpy");
           var afterRenderSpy = jasmine.createSpy("BeforeRenderSpy");
-          panel.onBeforeRender = beforeRenderSpy;
-          panel.onAfterRender = afterRenderSpy;
+          panel.onBeforeUpdate = beforeRenderSpy;
+          panel.onAfterUpdate = afterRenderSpy;
           panel.init(true);
 
           expect(panel.update).not.toHaveBeenCalled();
@@ -538,8 +538,8 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
           expect(dash.init).not.toHaveBeenCalled();
           expect(panel._initializeParameterValue).not.toHaveBeenCalled();
           expect(panel.submit).not.toHaveBeenCalled();
-          expect(panel.onAfterRender).toHaveBeenCalled();
-          expect(panel.onBeforeRender).toHaveBeenCalled();
+          expect(panel.onAfterUpdate).toHaveBeenCalled();
+          expect(panel.onBeforeUpdate).toHaveBeenCalled();
         });
 
         it("should not init dashboard without showing panel and with submitting", function() {

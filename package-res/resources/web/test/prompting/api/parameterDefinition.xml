@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<parameters accepted-page="-1" autoSubmitUI="false" ignore-biserver-5538="true" is-prompt-needed="false" layout="vertical" page-count="1" paginate="true" subscribe="false">
+  <parameter is-list="true" is-mandatory="false" is-multi-select="false" is-strict="true" name="PROD_LINE" type="java.lang.String">
+    <attribute name="role" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="user"/>
+    <attribute name="parameter-layout" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="horizontal"/>
+    <attribute name="parameter-render-type" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="togglebutton"/>
+    <attribute name="label" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="Line"/>
+    <attribute name="mandatory" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="true"/>
+    <values>
+      <value label="Classic Cars" null="false" selected="true" type="java.lang.String" value="Classic Cars"/>
+      <value label="Motorcycles" null="false" selected="false" type="java.lang.String" value="Motorcycles"/>
+      <value label="Ships" null="false" selected="false" type="java.lang.String" value="Ships"/>
+      <value label="Planes" null="false" selected="false" type="java.lang.String" value="Planes"/>
+    </values>
+  </parameter>
+  <parameter is-list="true" is-mandatory="false" is-multi-select="false" is-strict="true" name="PROD_CODE" type="java.lang.String">
+    <attribute name="role" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="user"/>
+    <attribute name="parameter-visible-items" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="6"/>
+    <attribute name="parameter-render-type" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="list"/>
+    <attribute name="label" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="Product"/>
+    <attribute name="mandatory" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="true"/>
+    <values>
+      <value label="1952 Alpine Renault 1300" null="false" selected="true" type="java.lang.String" value="S10_1949"/>
+      <value label="1972 Alfa Romeo GTA" null="false" selected="false" type="java.lang.String" value="S10_4757"/>
+      <value label="1962 LanciaA Delta 16V" null="false" selected="false" type="java.lang.String" value="S10_4962"/>
+      <value label="1968 Ford Mustang" null="false" selected="false" type="java.lang.String" value="S12_1099"/>
+      <value label="2001 Ferrari Enzo" null="false" selected="false" type="java.lang.String" value="S12_1108"/>
+      <value label="1969 Corvair Monza" null="false" selected="false" type="java.lang.String" value="S12_3148"/>
+      <value label="1968 Dodge Charger" null="false" selected="false" type="java.lang.String" value="S12_3380"/>
+      <value label="1969 Ford Falcon" null="false" selected="false" type="java.lang.String" value="S12_3891"/>
+      <value label="1970 Plymouth Hemi Cuda" null="false" selected="false" type="java.lang.String" value="S12_3990"/>
+      <value label="1969 Dodge Charger" null="false" selected="false" type="java.lang.String" value="S12_4675"/>
+      <value label="1993 Mazda RX-7" null="false" selected="false" type="java.lang.String" value="S18_1129"/>
+      <value label="1965 Aston Martin DB5" null="false" selected="false" type="java.lang.String" value="S18_1589"/>
+      <value label="1948 Porsche 356-A Roadster" null="false" selected="false" type="java.lang.String" value="S18_1889"/>
+      <value label="1995 Honda Civic" null="false" selected="false" type="java.lang.String" value="S18_1984"/>
+      <value label="1998 Chrysler Plymouth Prowler" null="false" selected="false" type="java.lang.String" value="S18_2238"/>
+      <value label="1999 Indy 500 Monte Carlo SS" null="false" selected="false" type="java.lang.String" value="S18_2870"/>
+      <value label="1992 Ferrari 360 Spider red" null="false" selected="false" type="java.lang.String" value="S18_3232"/>
+      <value label="1985 Toyota Supra" null="false" selected="false" type="java.lang.String" value="S18_3233"/>
+      <value label="1969 Dodge Super Bee" null="false" selected="false" type="java.lang.String" value="S18_3278"/>
+      <value label="1976 Ford Gran Torino" null="false" selected="false" type="java.lang.String" value="S18_3482"/>
+      <value label="1948 Porsche Type 356 Roadster" null="false" selected="false" type="java.lang.String" value="S18_3685"/>
+      <value label="1970 Triumph Spitfire" null="false" selected="false" type="java.lang.String" value="S18_4027"/>
+      <value label="1957 Corvette Convertible" null="false" selected="false" type="java.lang.String" value="S18_4721"/>
+      <value label="1957 Ford Thunderbird" null="false" selected="false" type="java.lang.String" value="S18_4933"/>
+      <value label="1970 Chevy Chevelle SS 454" null="false" selected="false" type="java.lang.String" value="S24_1046"/>
+      <value label="1970 Dodge Coronet" null="false" selected="false" type="java.lang.String" value="S24_1444"/>
+      <value label="1966 Shelby Cobra 427 S/C" null="false" selected="false" type="java.lang.String" value="S24_1628"/>
+      <value label="1949 Jaguar XK 120" null="false" selected="false" type="java.lang.String" value="S24_2766"/>
+      <value label="1958 Chevy Corvette Limited Edition" null="false" selected="false" type="java.lang.String" value="S24_2840"/>
+      <value label="1952 Citroen-15CV" null="false" selected="false" type="java.lang.String" value="S24_2887"/>
+      <value label="1982 Lamborghini Diablo" null="false" selected="false" type="java.lang.String" value="S24_2972"/>
+      <value label="1969 Chevrolet Camaro Z28" null="false" selected="false" type="java.lang.String" value="S24_3191"/>
+      <value label="1971 Alpine Renault 1600s" null="false" selected="false" type="java.lang.String" value="S24_3371"/>
+      <value label="2002 Chevy Corvette" null="false" selected="false" type="java.lang.String" value="S24_3432"/>
+      <value label="1956 Porsche 356A Coupe" null="false" selected="false" type="java.lang.String" value="S24_3856"/>
+      <value label="1992 Porsche Cayenne Turbo Silver" null="false" selected="false" type="java.lang.String" value="S24_4048"/>
+      <value label="1961 Chevrolet Impala" null="false" selected="false" type="java.lang.String" value="S24_4620"/>
+      <value label="1982 Camaro Z28" null="false" selected="false" type="java.lang.String" value="S700_2824"/>
+    </values>
+  </parameter>
+  <parameter is-list="false" is-mandatory="false" is-multi-select="false" is-strict="false" name="subscription-name" type="java.lang.String">
+    <attribute name="role" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="schedule"/>
+    <attribute name="preferred" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="false"/>
+    <attribute name="parameter-group" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="subscription"/>
+    <attribute name="parameter-group-label" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="Report Scheduling Options"/>
+    <attribute name="label" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="Report Name"/>
+    <attribute name="parameter-render-type" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="textbox"/>
+    <attribute name="hidden" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="true"/>
+  </parameter>
+  <parameter is-list="false" is-mandatory="false" is-multi-select="false" is-strict="false" name="destination" type="java.lang.String">
+    <attribute name="role" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="schedule"/>
+    <attribute name="preferred" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="false"/>
+    <attribute name="parameter-group" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="subscription"/>
+    <attribute name="parameter-group-label" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="Report Scheduling Options"/>
+    <attribute name="label" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="E-Mail To"/>
+    <attribute name="parameter-render-type" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="textbox"/>
+    <attribute name="hidden" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="true"/>
+  </parameter>
+  <parameter is-list="true" is-mandatory="false" is-multi-select="false" is-strict="true" name="schedule-id" type="java.lang.String">
+    <attribute name="role" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="schedule"/>
+    <attribute name="preferred" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="false"/>
+    <attribute name="parameter-group" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="subscription"/>
+    <attribute name="parameter-group-label" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="Report Scheduling Options"/>
+    <attribute name="label" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="Subscription"/>
+    <attribute name="parameter-render-type" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="dropdown"/>
+    <attribute name="hidden" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="true"/>
+    <values/>
+  </parameter>
+  <parameter is-list="true" is-mandatory="true" is-multi-select="false" is-strict="true" name="output-target" type="java.lang.String">
+    <attribute name="role" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="system"/>
+    <attribute name="preferred" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="true"/>
+    <attribute name="parameter-group" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="parameters"/>
+    <attribute name="parameter-group-label" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="Report Parameters"/>
+    <attribute name="label" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="Output Type"/>
+    <attribute name="parameter-render-type" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="dropdown"/>
+    <attribute name="hidden" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="false"/>
+    <values>
+      <value label="HTML (Paginated)" null="false" selected="true" type="java.lang.String" value="table/html;page-mode=page"/>
+      <value label="HTML (Single Page)" null="false" selected="false" type="java.lang.String" value="table/html;page-mode=stream"/>
+      <value label="PDF" null="false" selected="false" type="java.lang.String" value="pageable/pdf"/>
+      <value label="Excel" null="false" selected="false" type="java.lang.String" value="table/excel;page-mode=flow"/>
+      <value label="Excel 2007" null="false" selected="false" type="java.lang.String" value="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;page-mode=flow"/>
+      <value label="Comma Separated Value" null="false" selected="false" type="java.lang.String" value="table/csv;page-mode=stream"/>
+      <value label="Rich-Text-Format" null="false" selected="false" type="java.lang.String" value="table/rtf;page-mode=flow"/>
+      <value label="Text" null="false" selected="false" type="java.lang.String" value="pageable/text"/>
+    </values>
+  </parameter>
+  <parameter is-list="false" is-mandatory="false" is-multi-select="false" is-strict="false" name="subscribe" type="java.lang.Boolean">
+    <attribute name="role" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="system"/>
+    <attribute name="hidden" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="true"/>
+    <attribute name="preferred" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="false"/>
+    <attribute name="parameter-group" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="system"/>
+    <attribute name="parameter-group-label" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="System Parameters"/>
+    <attribute name="label" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="subscribe"/>
+    <attribute name="parameter-render-type" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="textbox"/>
+    <attribute name="deprecated" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="false"/>
+  </parameter>
+  <parameter is-list="true" is-mandatory="false" is-multi-select="true" is-strict="false" name="::cl" type="[Ljava.lang.String;">
+    <attribute name="role" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="system"/>
+    <attribute name="hidden" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="true"/>
+    <attribute name="preferred" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="false"/>
+    <attribute name="parameter-group" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="system"/>
+    <attribute name="parameter-group-label" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="System Parameters"/>
+    <attribute name="label" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="Content-Linking"/>
+    <attribute name="parameter-render-type" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="list"/>
+    <values/>
+  </parameter>
+  <parameter is-list="false" is-mandatory="false" is-multi-select="false" is-strict="false" name="::TabName" type="java.lang.String">
+    <attribute name="role" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="system"/>
+    <attribute name="hidden" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="true"/>
+    <attribute name="preferred" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="true"/>
+    <attribute name="parameter-group" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="system"/>
+    <attribute name="parameter-group-label" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="System Parameters"/>
+    <attribute name="label" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="::TabName"/>
+    <attribute name="parameter-render-type" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="textbox"/>
+    <attribute name="deprecated" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="false"/>
+  </parameter>
+  <parameter is-list="false" is-mandatory="false" is-multi-select="false" is-strict="false" name="::TabActive" type="java.lang.Boolean">
+    <attribute name="role" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="system"/>
+    <attribute name="hidden" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="true"/>
+    <attribute name="preferred" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="true"/>
+    <attribute name="parameter-group" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="system"/>
+    <attribute name="parameter-group-label" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="System Parameters"/>
+    <attribute name="label" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="::TabActive"/>
+    <attribute name="parameter-render-type" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="textbox"/>
+    <attribute name="deprecated" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="false"/>
+  </parameter>
+  <parameter is-list="false" is-mandatory="false" is-multi-select="false" is-strict="false" name="yield-rate" type="java.lang.Integer">
+    <attribute name="role" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="system"/>
+    <attribute name="hidden" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="true"/>
+    <attribute name="preferred" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="false"/>
+    <attribute name="parameter-group" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="system"/>
+    <attribute name="parameter-group-label" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="System Parameters"/>
+    <attribute name="label" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="yield-rate"/>
+    <attribute name="parameter-render-type" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="textbox"/>
+    <attribute name="deprecated" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="false"/>
+  </parameter>
+  <parameter is-list="false" is-mandatory="false" is-multi-select="false" is-strict="false" name="accepted-page" type="java.lang.Integer">
+    <attribute name="role" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="system"/>
+    <attribute name="hidden" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="true"/>
+    <attribute name="preferred" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="false"/>
+    <attribute name="parameter-group" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="system"/>
+    <attribute name="parameter-group-label" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="System Parameters"/>
+    <attribute name="label" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="accepted-page"/>
+    <attribute name="parameter-render-type" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="textbox"/>
+    <attribute name="deprecated" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="false"/>
+  </parameter>
+  <parameter is-list="false" is-mandatory="false" is-multi-select="false" is-strict="false" name="::session" type="java.lang.String">
+    <attribute name="role" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="system"/>
+    <attribute name="hidden" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="true"/>
+    <attribute name="preferred" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="false"/>
+    <attribute name="parameter-group" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="system"/>
+    <attribute name="parameter-group-label" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="System Parameters"/>
+    <attribute name="label" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="::session"/>
+    <attribute name="parameter-render-type" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="textbox"/>
+    <attribute name="deprecated" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="false"/>
+    <values>
+      <value label="9b414fc5-1d3b-11e1-be53-ab8279d66501" null="false" selected="true" type="java.lang.String" value="9b414fc5-1d3b-11e1-be53-ab8279d66501"/>
+    </values>
+  </parameter>
+  <parameter is-list="false" is-mandatory="false" is-multi-select="false" is-strict="false" name="output-type" type="java.lang.String">
+    <attribute name="role" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="system"/>
+    <attribute name="hidden" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="true"/>
+    <attribute name="preferred" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="false"/>
+    <attribute name="parameter-group" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="system"/>
+    <attribute name="parameter-group-label" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="System Parameters"/>
+    <attribute name="label" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="output-type"/>
+    <attribute name="parameter-render-type" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="textbox"/>
+    <attribute name="deprecated" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="true"/>
+  </parameter>
+  <parameter is-list="false" is-mandatory="false" is-multi-select="false" is-strict="false" name="layout" type="java.lang.String">
+    <attribute name="role" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="system"/>
+    <attribute name="hidden" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="true"/>
+    <attribute name="preferred" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="false"/>
+    <attribute name="parameter-group" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="system"/>
+    <attribute name="parameter-group-label" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="System Parameters"/>
+    <attribute name="label" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="layout"/>
+    <attribute name="parameter-render-type" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="textbox"/>
+    <attribute name="deprecated" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="true"/>
+  </parameter>
+  <parameter is-list="false" is-mandatory="false" is-multi-select="false" is-strict="false" name="content-handler-pattern" type="java.lang.String">
+    <attribute name="role" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="system"/>
+    <attribute name="hidden" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="true"/>
+    <attribute name="preferred" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="false"/>
+    <attribute name="parameter-group" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="system"/>
+    <attribute name="parameter-group-label" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="System Parameters"/>
+    <attribute name="label" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="content-handler-pattern"/>
+    <attribute name="parameter-render-type" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="textbox"/>
+    <attribute name="deprecated" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="true"/>
+  </parameter>
+  <parameter is-list="false" is-mandatory="false" is-multi-select="false" is-strict="false" name="autoSubmit" type="java.lang.Boolean">
+    <attribute name="role" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="system"/>
+    <attribute name="hidden" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="true"/>
+    <attribute name="preferred" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="true"/>
+    <attribute name="parameter-group" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="system"/>
+    <attribute name="parameter-group-label" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="System Parameters"/>
+    <attribute name="label" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="autoSubmit"/>
+    <attribute name="parameter-render-type" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="textbox"/>
+    <attribute name="deprecated" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="true"/>
+  </parameter>
+  <parameter is-list="false" is-mandatory="false" is-multi-select="false" is-strict="false" name="autoSubmitUI" type="java.lang.Boolean">
+    <attribute name="role" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="system"/>
+    <attribute name="hidden" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="true"/>
+    <attribute name="preferred" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="true"/>
+    <attribute name="parameter-group" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="system"/>
+    <attribute name="parameter-group-label" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="System Parameters"/>
+    <attribute name="label" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="autoSubmitUI"/>
+    <attribute name="parameter-render-type" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="textbox"/>
+    <attribute name="deprecated" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="true"/>
+  </parameter>
+  <parameter is-list="false" is-mandatory="false" is-multi-select="false" is-strict="false" name="dashboard-mode" type="java.lang.Boolean">
+    <attribute name="role" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="system"/>
+    <attribute name="hidden" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="true"/>
+    <attribute name="preferred" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="true"/>
+    <attribute name="parameter-group" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="system"/>
+    <attribute name="parameter-group-label" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="System Parameters"/>
+    <attribute name="label" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="dashboard-mode"/>
+    <attribute name="parameter-render-type" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="textbox"/>
+    <attribute name="deprecated" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="false"/>
+  </parameter>
+  <parameter is-list="false" is-mandatory="false" is-multi-select="false" is-strict="false" name="showParameters" type="java.lang.Boolean">
+    <attribute name="role" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="system"/>
+    <attribute name="hidden" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="true"/>
+    <attribute name="preferred" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="true"/>
+    <attribute name="parameter-group" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="system"/>
+    <attribute name="parameter-group-label" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="System Parameters"/>
+    <attribute name="label" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="showParameters"/>
+    <attribute name="parameter-render-type" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="textbox"/>
+    <attribute name="deprecated" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="true"/>
+    <values>
+      <value label="true" null="false" selected="true" type="java.lang.Boolean" value="true"/>
+    </values>
+  </parameter>
+  <parameter is-list="false" is-mandatory="false" is-multi-select="false" is-strict="false" name="paginate" type="java.lang.Boolean">
+    <attribute name="role" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="system"/>
+    <attribute name="hidden" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="true"/>
+    <attribute name="preferred" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="false"/>
+    <attribute name="parameter-group" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="system"/>
+    <attribute name="parameter-group-label" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="System Parameters"/>
+    <attribute name="label" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="paginate"/>
+    <attribute name="parameter-render-type" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="textbox"/>
+    <attribute name="deprecated" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="true"/>
+  </parameter>
+  <parameter is-list="false" is-mandatory="false" is-multi-select="false" is-strict="false" name="ignoreDefaultDates" type="java.lang.Boolean">
+    <attribute name="role" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="system"/>
+    <attribute name="hidden" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="true"/>
+    <attribute name="preferred" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="false"/>
+    <attribute name="parameter-group" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="system"/>
+    <attribute name="parameter-group-label" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="System Parameters"/>
+    <attribute name="label" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="ignoreDefaultDates"/>
+    <attribute name="parameter-render-type" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="textbox"/>
+    <attribute name="deprecated" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="true"/>
+  </parameter>
+  <parameter is-list="false" is-mandatory="false" is-multi-select="false" is-strict="false" name="print" type="java.lang.Boolean">
+    <attribute name="role" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="system"/>
+    <attribute name="hidden" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="true"/>
+    <attribute name="preferred" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="false"/>
+    <attribute name="parameter-group" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="system"/>
+    <attribute name="parameter-group-label" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="System Parameters"/>
+    <attribute name="label" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="print"/>
+    <attribute name="parameter-render-type" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="textbox"/>
+    <attribute name="deprecated" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="false"/>
+  </parameter>
+  <parameter is-list="false" is-mandatory="false" is-multi-select="false" is-strict="false" name="printer-name" type="java.lang.String">
+    <attribute name="role" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="system"/>
+    <attribute name="hidden" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="true"/>
+    <attribute name="preferred" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="false"/>
+    <attribute name="parameter-group" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="system"/>
+    <attribute name="parameter-group-label" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="System Parameters"/>
+    <attribute name="label" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="printer-name"/>
+    <attribute name="parameter-render-type" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="textbox"/>
+    <attribute name="deprecated" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="false"/>
+  </parameter>
+  <parameter is-list="true" is-mandatory="false" is-multi-select="false" is-strict="true" name="renderMode" type="java.lang.String">
+    <attribute name="role" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="system"/>
+    <attribute name="hidden" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="true"/>
+    <attribute name="preferred" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="false"/>
+    <attribute name="parameter-group" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="system"/>
+    <attribute name="parameter-group-label" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="System Parameters"/>
+    <attribute name="label" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="renderMode"/>
+    <attribute name="parameter-render-type" namespace="http://reporting.pentaho.org/namespaces/engine/parameter-attributes/core" value="dropdown"/>
+    <values>
+      <value label="XML" null="false" selected="true" type="java.lang.String" value="XML"/>
+      <value label="REPORT" null="false" selected="false" type="java.lang.String" value="REPORT"/>
+      <value label="SUBSCRIBE" null="false" selected="false" type="java.lang.String" value="SUBSCRIBE"/>
+      <value label="DOWNLOAD" null="false" selected="false" type="java.lang.String" value="DOWNLOAD"/>
+      <value label="PARAMETER" null="false" selected="false" type="java.lang.String" value="PARAMETER"/>
+    </values>
+  </parameter>
+</parameters>

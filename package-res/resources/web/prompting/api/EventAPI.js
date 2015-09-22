@@ -49,6 +49,30 @@ define([], function() {
     };
 
     /**
+     * Registers a before update event
+     *
+     * @name EventAPI#beforeUpdate
+     * @method
+     * @param {Function} callback   The function to be executed when the event is triggered
+     *                              Pass null if you wish to unbind this event
+     */
+    this.beforeUpdate = function(callback) {
+      api.operation._getPromptPanel().onBeforeUpdate = callback;
+    };
+
+    /**
+     * Registers an after render event
+     *
+     * @name EventAPI#afterRender
+     * @method
+     * @param {Function} callback   The function to be executed when the event is triggered
+     *                              Pass null if you wish to unbind this event
+     */
+    this.afterUpdate = function(callback) {
+      api.operation._getPromptPanel().onAfterUpdate = callback;
+    };
+
+    /**
      * Registers a parameter changed event
      *
      * @name EventAPI#parameterChanged

@@ -65,6 +65,14 @@
                     eventArea.prepend("<p>After Render event called</p>");
                 });
 
+                promptApi.event.beforeUpdate(function() {
+                    eventArea.prepend("<p>Before Update event called</p>");
+                });
+
+                promptApi.event.afterUpdate(function() {
+                    eventArea.prepend("<p>After Update event called</p>");
+                });
+
                 promptApi.event.parameterChanged(function(paramName, paramVal) {
                     eventArea.prepend("<p>Parameter Changed event called. param '" + paramName + "' value changed to '" + paramVal + "'</p>");
                 });
