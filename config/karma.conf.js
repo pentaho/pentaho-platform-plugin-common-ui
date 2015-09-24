@@ -11,8 +11,8 @@ module.exports = function (config) {
     ],
 
     files: [
-      {pattern: "build-res/module-scripts/**/{*.js,*.html}",  included: false},
-      {pattern: "package-res/resources/web/**/{*.js,*.html}", included: false},
+      {pattern: "build-res/module-scripts/**/{*.js,*.html,*.xml}",  included: false},
+      {pattern: "package-res/resources/web/**/{*.js,*.html,*.xml}", included: false},
       {pattern: "dev-res/dojo/dojo-release-1.9.2-src/**/{*.js,*.html}", included: false},
 
       "config/context.js",

@@ -816,7 +816,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
           var guid = "guid";
 
           beforeEach(function() {
-            paramSpy = jasmine.createSpy("paramSpy");
+            paramSpy = jasmine.createSpyObj("paramSpy", ["getSelectedValuesValue"]);
 
             componentSpy = jasmine.createSpyObj("componentSpy", [ "clear", "removeErrorClass" ]);
             componentSpy.parameter = paramName;
@@ -1089,6 +1089,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
             it("should not process errors if it's not changed", function() {
               var panelComponentsCount = componentSpy.components.length;
               paramSpy.isErrorChanged = false;
+              paramSpy.getSelectedValuesValue.and.returnValue(null);
 
               panel._changeErrors(paramSpy);
 
