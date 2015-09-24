@@ -865,7 +865,7 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
          * @private
          */
         _changeErrors: function(param) {
-          if (param.isErrorChanged) {
+          if (param.isErrorChanged || (param.getSelectedValuesValue() != null && param.mandatory)) {
             var errors = this.paramDefn.errors[param.name];
             var panel = _getComponentByParam.call(this, param, true);
             var existingErrors = _findErrorComponents.call(this, panel);
