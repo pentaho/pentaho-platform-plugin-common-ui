@@ -638,9 +638,21 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
             this.nullValueParams.push(param);
           }
 
+          this._setTimeoutRefreshPrompt();
+          this.parametersChanged = true;
+        },
+
+         /**
+         * Method called to sync the refresh of the prompt with the renderer calling a setTimeout 0
+         *
+         * @name PromptPanel#_setTimeoutRefreshPrompt
+         * @method
+         * @private
+         *
+         */
+        _setTimeoutRefreshPrompt: function() {
           var myself = this;
           setTimeout(function() { myself.refreshPrompt() }, 0);
-          this.parametersChanged = true;
         },
 
         /**
