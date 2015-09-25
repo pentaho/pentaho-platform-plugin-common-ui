@@ -632,8 +632,21 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
             this.nullValueParams.push(param);
           }
 
-          this.refreshPrompt();
+          this._setTimeoutRefreshPrompt();
           this.parametersChanged = true;
+        },
+
+         /**
+         * Method called to sync the refresh of the prompt with the renderer calling a setTimeout 0
+         *
+         * @name PromptPanel#_setTimeoutRefreshPrompt
+         * @method
+         * @private
+         *
+         */
+        _setTimeoutRefreshPrompt: function() {
+          var myself = this;
+          setTimeout(function() { myself.refreshPrompt() }, 0);
         },
 
         /**
@@ -865,7 +878,7 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
          * @private
          */
         _changeErrors: function(param) {
-          if (param.isErrorChanged || (param.getSelectedValuesValue() != null && param.mandatory)) {
+          if (param.isErrorChanged) {
             var errors = this.paramDefn.errors[param.name];
             var panel = _getComponentByParam.call(this, param, true);
             var existingErrors = _findErrorComponents.call(this, panel);
