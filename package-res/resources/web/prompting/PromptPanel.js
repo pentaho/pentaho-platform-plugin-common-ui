@@ -718,6 +718,7 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
             this.diff = this.paramDiffer.diff(this.paramDefn, paramDefn, this.nullValueParams);
             this.isRefresh = true;
             this.paramDefn = paramDefn;
+            this.nullValueParams = null;
 
             if (this.dashboard.components) {
               // Create dictionary by parameter name, of topValue of multi-select listboxes, for restoring later, when possible.
