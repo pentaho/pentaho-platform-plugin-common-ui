@@ -15,7 +15,7 @@
  * Copyright (c) 2002-2013 Pentaho Corporation..  All rights reserved.
  */
 
-package org.pentaho.common.ui.test;
+package org.pentaho.common.ui.metadata.service;
 
 import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
@@ -24,9 +24,7 @@ import java.util.Map;
 import junit.framework.Assert;
 
 import org.junit.Test;
-import org.pentaho.common.ui.metadata.service.MetadataModelsContentGenerator;
 import org.pentaho.metadata.datatable.DataTable;
-import org.pentaho.metadata.model.thin.Column;
 import org.pentaho.metadata.model.thin.Element;
 import org.pentaho.metadata.model.thin.Query;
 import org.pentaho.platform.api.engine.IParameterProvider;

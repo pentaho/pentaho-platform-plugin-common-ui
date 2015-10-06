@@ -15,7 +15,7 @@
  * Copyright (c) 2002-2013 Pentaho Corporation..  All rights reserved.
  */
 
-package org.pentaho.common.ui.test;
+package org.pentaho.common.ui.services;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -45,7 +45,7 @@ import java.util.Map;
 import static org.junit.Assert.*;
 
 @SuppressWarnings( { "all" } )
-public class SolutionUrlContentGeneratorTest {
+public class SolutionUrlContentGeneratorIT {
 
   private static MicroPlatform microPlatform = null;
 

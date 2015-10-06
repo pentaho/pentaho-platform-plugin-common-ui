@@ -8,7 +8,7 @@
    </static-paths>
 
     <content-generator scope="session" id="testgen" type="testgen">
-        <classname>org.pentaho.common.ui.test.MockContentGenerator</classname>
+        <classname>org.pentaho.common.ui.MockContentGenerator</classname>
         <title></title>
     </content-generator>
 

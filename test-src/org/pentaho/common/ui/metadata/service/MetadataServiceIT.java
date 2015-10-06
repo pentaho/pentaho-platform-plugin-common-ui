@@ -15,49 +15,39 @@
  * Copyright (c) 2002-2013 Pentaho Corporation..  All rights reserved.
  */
 
-package org.pentaho.common.ui.test;
+package org.pentaho.common.ui.metadata.service;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-
+import flexjson.JSONDeserializer;
+import flexjson.JSONSerializer;
 import org.apache.commons.io.IOUtils;
 import org.jmock.Mockery;
 import org.jmock.integration.junit4.JUnit4Mockery;
 import org.json.JSONException;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
-import org.pentaho.common.ui.messages.Messages;
-import org.pentaho.common.ui.metadata.service.MetadataService2;
-import org.pentaho.common.ui.metadata.service.MetadataServiceUtil2;
+import org.junit.Ignore;
+import org.pentaho.common.ui.metadata.model.IColumn;
+import org.pentaho.common.ui.metadata.model.Operator;
+import org.pentaho.common.ui.metadata.model.impl.*;
+import org.pentaho.common.ui.metadata.service.MetadataService;
+import org.pentaho.common.ui.metadata.service.MetadataServiceUtil;
 import org.pentaho.commons.connection.marshal.MarshallableResultSet;
 import org.pentaho.di.core.exception.KettleException;
 import org.pentaho.metadata.model.Domain;
 import org.pentaho.metadata.model.concept.types.AggregationType;
 import org.pentaho.metadata.model.concept.types.DataType;
-import org.pentaho.metadata.model.thin.Condition;
-import org.pentaho.metadata.model.thin.Element;
-import org.pentaho.metadata.model.thin.Model;
-import org.pentaho.metadata.model.thin.ModelInfo;
-import org.pentaho.metadata.model.thin.Operator;
-import org.pentaho.metadata.model.thin.Order;
-import org.pentaho.metadata.model.thin.Parameter;
-import org.pentaho.metadata.model.thin.Query;
 import org.pentaho.metadata.query.model.CombinationType;
 import org.pentaho.metadata.query.model.util.QueryXmlHelper;
 import org.pentaho.metadata.repository.IMetadataDomainRepository;
 import org.pentaho.metadata.repository.InMemoryMetadataDomainRepository;
 import org.pentaho.metadata.util.XmiParser;
 import org.pentaho.platform.api.data.IDBDatasourceService;
-import org.pentaho.platform.api.engine.*;
+import org.pentaho.platform.api.engine.IPentahoDefinableObjectFactory;
+import org.pentaho.platform.api.engine.IPluginManager;
+import org.pentaho.platform.api.engine.IPluginProvider;
+import org.pentaho.platform.api.engine.ISolutionEngine;
 import org.pentaho.platform.api.repository2.unified.IUnifiedRepository;
 import org.pentaho.platform.engine.core.system.PentahoSessionHolder;
-import org.pentaho.platform.engine.core.system.PentahoSystem;
-import org.pentaho.platform.engine.core.system.StandaloneApplicationContext;
 import org.pentaho.platform.engine.core.system.StandaloneSession;
 import org.pentaho.platform.engine.core.system.boot.PlatformInitializationException;
 import org.pentaho.platform.engine.services.connection.datasource.dbcp.JndiDatasourceService;
@@ -69,16 +59,19 @@ import org.pentaho.platform.plugin.services.pluginmgr.FileSystemXmlPluginProvide
 import org.pentaho.platform.plugin.services.pluginmgr.PluginAdapter;
 import org.pentaho.platform.repository2.unified.fs.FileSystemBackedUnifiedRepository;
 import org.pentaho.pms.core.exception.PentahoMetadataException;
-import org.pentaho.test.platform.engine.core.BaseTest;
-
-import flexjson.JSONDeserializer;
-import flexjson.JSONSerializer;
 import org.pentaho.test.platform.engine.core.MicroPlatform;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
 @SuppressWarnings( { "all" } )
-public class MetadataService2Test {
+public class MetadataServiceIT {
 
   private static final String SOLUTION_PATH = "test-res/pentaho-solutions/"; //$NON-NLS-1$
 
@@ -142,30 +135,31 @@ public class MetadataService2Test {
     return domain;
   }
 
-  @Test
+  @Ignore
   public void testCondition2() throws KettleException {
 
     StandaloneSession session = new StandaloneSession();
     PentahoSessionHolder.setSession( session );
 
     KettleSystemListener.environmentInit( session );
-    MetadataService2 svc = new MetadataService2();
+    MetadataService svc = new MetadataService();
 
     Query query = new Query();
-    query.setSourceId( MetadataService2.PROVIDER_ID + "~" + "steel-wheels~" + "BV_ORDERS" );
+    query.setDomainName( "steel-wheels" );
+    query.setModelId( "BV_ORDERS" );
     query.setDisableDistinct( Boolean.FALSE );
-    List<Element> cols = new ArrayList<Element>();
-    Element col = new Element();
+    List<Column> cols = new ArrayList<Column>();
+    Column col = new Column();
     col.setId( "BC_CUSTOMER_W_TER_COUNTRY" );
-    col.setParentId( "BC_CUSTOMER_W_TER_" );
-    col.setSelectedAggregation( "NONE" );
+    col.setCategory( "BC_CUSTOMER_W_TER_" );
+    col.setSelectedAggType( "NONE" );
     cols.add( col );
-    query.setElements( cols.toArray( new Element[cols.size()] ) );
+    query.setColumns( cols.toArray( new Column[cols.size()] ) );
 
     List<Condition> conditions = new ArrayList<Condition>();
     Condition condition = new Condition();
-    condition.setElementId( "BC_CUSTOMER_W_TER_COUNTRY" );
-    condition.setParentId( "BC_CUSTOMER_W_TER_" );
+    condition.setColumn( "BC_CUSTOMER_W_TER_COUNTRY" );
+    condition.setCategory( "BC_CUSTOMER_W_TER_" );
     condition.setOperator( Operator.EQUAL.name() );
     condition.setValue( new String[] { "Australia" } );
     conditions.add( condition );
@@ -173,8 +167,8 @@ public class MetadataService2Test {
 
     List<Order> orders = new ArrayList<Order>();
     Order order = new Order();
-    order.setElementId( "BC_CUSTOMER_W_TER_COUNTRY" );
-    order.setParentId( "BC_CUSTOMER_W_TER_" );
+    order.setColumn( "BC_CUSTOMER_W_TER_COUNTRY" );
+    order.setCategory( "BC_CUSTOMER_W_TER_" );
     order.setOrderType( "ASC" );
     orders.add( order );
     query.setOrders( orders.toArray( new Order[orders.size()] ) );
@@ -430,35 +424,33 @@ public class MetadataService2Test {
     StandaloneSession session = new StandaloneSession();
     PentahoSessionHolder.setSession( session );
 
-    MetadataService2 svc = new MetadataService2();
+    MetadataService svc = new MetadataService();
 
-    Model model = svc.getModel( MetadataService2.PROVIDER_ID + "~steel-wheels~BV_HUMAN_RESOURCES" );
+    Model model = svc.loadModel( "steel-wheels", "BV_HUMAN_RESOURCES" );
     assertNotNull( "model should not be null", model );
 
     assertTrue( model.equals( model ) );
     assertFalse( model.equals( null ) );
     assertFalse( model.equals( this ) );
-    assertFalse( model.equals( svc.getModel( MetadataService2.PROVIDER_ID + "~steel-wheels~BV_ORDERS" ) ) );
+    assertFalse( model.equals( svc.loadModel( "steel-wheels", "BV_ORDERS" ) ) );
 
     Model model2 = new Model();
     Model model3 = new Model();
 
     assertTrue( model2.equals( model3 ) );
-    model2.setElements( new Element[] { new Element() } );
-    model2.getElements()[0].setId( "id1" );
+    model2.setCategories( new Category[] { new Category() } );
     assertFalse( model2.equals( model3 ) );
-    model3.setElements( new Element[] { new Element() } );
-    model2.getElements()[0].setId( "id2" );
+    model3.setCategories( new Category[] { new Category() } );
     assertFalse( model2.equals( model3 ) );
-    model2.setElements( null );
+    model2.setCategories( null );
     assertFalse( model2.equals( model3 ) );
-    model3.setElements( null );
+    model3.setCategories( null );
     assertTrue( model2.equals( model3 ) );
-    model3.setModelId( "id" );
+    model3.setId( "id" );
     assertFalse( model2.equals( model3 ) );
-    model2.setModelId( "not id" );
+    model2.setId( "not id" );
     assertFalse( model2.equals( model3 ) );
-    model2.setModelId( "id" );
+    model2.setId( "id" );
     assertTrue( model2.equals( model3 ) );
     model3.setName( "name" );
     assertFalse( model2.equals( model3 ) );
@@ -476,26 +468,26 @@ public class MetadataService2Test {
     PentahoSessionHolder.setSession( session );
 
     KettleSystemListener.environmentInit( session );
-    MetadataService2 svc = new MetadataService2();
+    MetadataService svc = new MetadataService();
 
     String queryString =
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?><mql><domain_id>steel-wheels</domain_id><model_id>BV_ORDERS</model_id><options><disable_distinct>false</disable_distinct></options><selections><selection><view>CAT_PRODUCTS</view><column>BC_PRODUCTS_PRODUCTLINE</column><aggregation>NONE</aggregation></selection><selection><view>CAT_PRODUCTS</view><column>BC_PRODUCTS_PRODUCTNAME</column><aggregation>NONE</aggregation></selection><selection><view>CAT_PRODUCTS</view><column>BC_PRODUCTS_PRODUCTCODE</column><aggregation>NONE</aggregation></selection><selection><view>CAT_ORDERS</view><column>BC_ORDERDETAILS_QUANTITYORDERED</column><aggregation>SUM</aggregation></selection><selection><view>CAT_ORDERS</view><column>BC_ORDERDETAILS_TOTAL</column><aggregation>SUM</aggregation></selection></selections><constraints><constraint><operator>AND</operator><condition><![CDATA[[BC_CUSTOMER_W_TER_.BC_CUSTOMER_W_TER_COUNTRY] = \"Australia\"]]></condition></constraint></constraints><orders><order><direction>ASC</direction><view_id>CAT_ORDERS</view_id><column_id>BC_ORDERDETAILS_QUANTITYORDERED</column_id></order></orders></mql>";
 
-    MetadataServiceUtil2 util = new MetadataServiceUtil2();
+    MetadataServiceUtil util = new MetadataServiceUtil();
     Domain domain = util.getDomainObject( queryString );
     assertNotNull( domain );
     util.setDomain( domain );
     assertEquals( domain, util.getDomain() );
   }
 
-  @Test
+  @Ignore
   public void testQuery() throws KettleException {
 
     StandaloneSession session = new StandaloneSession();
     PentahoSessionHolder.setSession( session );
 
     KettleSystemListener.environmentInit( session );
-    MetadataService2 svc = new MetadataService2();
+    MetadataService svc = new MetadataService();
 
     Query query = getTestQuery();
 
@@ -512,14 +504,14 @@ public class MetadataService2Test {
 
   }
 
-  @Test
+  @Ignore
   public void testQuery2() throws KettleException {
 
     StandaloneSession session = new StandaloneSession();
     PentahoSessionHolder.setSession( session );
 
     KettleSystemListener.environmentInit( session );
-    MetadataService2 svc = new MetadataService2();
+    MetadataService svc = new MetadataService();
 
     Query query = getTestQuery();
     // remove the condition value so that the default value it used
@@ -538,14 +530,14 @@ public class MetadataService2Test {
 
   }
 
-  @Test
+  @Ignore
   public void testQuery3() throws KettleException {
 
     StandaloneSession session = new StandaloneSession();
     PentahoSessionHolder.setSession( session );
 
     KettleSystemListener.environmentInit( session );
-    MetadataService2 svc = new MetadataService2();
+    MetadataService svc = new MetadataService();
 
     Query query = getTestQuery();
     // Flag the condition as parameterized
@@ -553,13 +545,12 @@ public class MetadataService2Test {
     query.getConditions()[0].setParameterized( true );
     Parameter param = new Parameter();
     param.setDefaultValue( new String[] { "Canada" } );
-    param.setElementId( "BC_CUSTOMER_W_TER_COUNTRY" );
+    param.setColumn( "BC_CUSTOMER_W_TER_COUNTRY" );
     param.setValue( new String[] { "Germany" } );
     query.setParameters( new Parameter[] { param } );
 
-    MetadataServiceUtil2 util = new MetadataServiceUtil2();
-    Model model = svc.getModel( query.getSourceId() );
-    org.pentaho.metadata.query.model.Query fullQuery = util.convertQuery( query, model );
+    MetadataServiceUtil util = new MetadataServiceUtil();
+    org.pentaho.metadata.query.model.Query fullQuery = util.convertQuery( query );
     QueryXmlHelper helper = new QueryXmlHelper();
     String xml = helper.toXML( fullQuery );
     // System.out.println(xml);
@@ -576,14 +567,14 @@ public class MetadataService2Test {
 
   }
 
-  @Test
+  @Ignore
   public void testJsonQuery() throws KettleException {
 
     StandaloneSession session = new StandaloneSession();
     PentahoSessionHolder.setSession( session );
 
     KettleSystemListener.environmentInit( session );
-    MetadataService2 svc = new MetadataService2();
+    MetadataService svc = new MetadataService();
 
     Query query = getTestQuery();
     JSONSerializer serializer = new JSONSerializer();
@@ -605,45 +596,46 @@ public class MetadataService2Test {
 
   private Query getTestQuery() {
     Query query = new Query();
-    query.setSourceId( MetadataService2.PROVIDER_ID + "~steel-wheels~BV_ORDERS" );
+    query.setDomainName( "steel-wheels" );
+    query.setModelId( "BV_ORDERS" );
     query.setDisableDistinct( Boolean.FALSE );
-    List<Element> cols = new ArrayList<Element>();
-    Element col = new Element();
+    List<Column> cols = new ArrayList<Column>();
+    Column col = new Column();
     col.setId( "BC_PRODUCTS_PRODUCTLINE" );
-    col.setParentId( "CAT_PRODUCTS" );
-    col.setSelectedAggregation( "NONE" );
+    col.setCategory( "CAT_PRODUCTS" );
+    col.setSelectedAggType( "NONE" );
     cols.add( col );
-    col = new Element();
+    col = new Column();
     col.setId( "BC_CUSTOMER_W_TER_COUNTRY" );
-    col.setParentId( "BC_CUSTOMER_W_TER_" );
-    col.setSelectedAggregation( "NONE" );
+    col.setCategory( "BC_CUSTOMER_W_TER_" );
+    col.setSelectedAggType( "NONE" );
     cols.add( col );
-    col = new Element();
+    col = new Column();
     col.setId( "BC_PRODUCTS_PRODUCTNAME" );
-    col.setParentId( "CAT_PRODUCTS" );
-    col.setSelectedAggregation( "NONE" );
+    col.setCategory( "CAT_PRODUCTS" );
+    col.setSelectedAggType( "NONE" );
     cols.add( col );
-    col = new Element();
+    col = new Column();
     col.setId( "BC_PRODUCTS_PRODUCTCODE" );
-    col.setParentId( "CAT_PRODUCTS" );
-    col.setSelectedAggregation( "NONE" );
+    col.setCategory( "CAT_PRODUCTS" );
+    col.setSelectedAggType( "NONE" );
     cols.add( col );
-    col = new Element();
+    col = new Column();
     col.setId( "BC_ORDERDETAILS_QUANTITYORDERED" );
-    col.setParentId( "CAT_ORDERS" );
-    col.setSelectedAggregation( "SUM" );
+    col.setCategory( "CAT_ORDERS" );
+    col.setSelectedAggType( "SUM" );
     cols.add( col );
-    col = new Element();
+    col = new Column();
     col.setId( "BC_ORDERDETAILS_TOTAL" );
-    col.setParentId( "CAT_ORDERS" );
-    col.setSelectedAggregation( "SUM" );
+    col.setCategory( "CAT_ORDERS" );
+    col.setSelectedAggType( "SUM" );
     cols.add( col );
-    query.setElements( cols.toArray( new Element[cols.size()] ) );
+    query.setColumns( cols.toArray( new Column[cols.size()] ) );
 
     List<Condition> conditions = new ArrayList<Condition>();
     Condition condition = new Condition();
-    condition.setElementId( "BC_CUSTOMER_W_TER_COUNTRY" );
-    condition.setParentId( "BC_CUSTOMER_W_TER_" );
+    condition.setColumn( "BC_CUSTOMER_W_TER_COUNTRY" );
+    condition.setCategory( "BC_CUSTOMER_W_TER_" );
     condition.setOperator( Operator.EQUAL.name() );
     condition.setValue( new String[] { "Australia" } );
     conditions.add( condition );
@@ -651,8 +643,8 @@ public class MetadataService2Test {
 
     List<Order> orders = new ArrayList<Order>();
     Order order = new Order();
-    order.setElementId( "BC_ORDERDETAILS_QUANTITYORDERED" );
-    order.setParentId( "CAT_ORDERS" );
+    order.setColumn( "BC_ORDERDETAILS_QUANTITYORDERED" );
+    order.setCategory( "CAT_ORDERS" );
     order.setOrderType( "ASC" );
     orders.add( order );
     query.setOrders( orders.toArray( new Order[orders.size()] ) );
@@ -660,14 +652,14 @@ public class MetadataService2Test {
     return query;
   }
 
-  @Test
+  @Ignore
   public void testXmlQuery1() throws KettleException {
 
     StandaloneSession session = new StandaloneSession();
     PentahoSessionHolder.setSession( session );
 
     KettleSystemListener.environmentInit( session );
-    MetadataService2 svc = new MetadataService2();
+    MetadataService svc = new MetadataService();
 
     String queryString =
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?><mql><domain_id>steel-wheels</domain_id><model_id>BV_ORDERS</model_id><options><disable_distinct>false</disable_distinct></options><selections><selection><view>CAT_PRODUCTS</view><column>BC_PRODUCTS_PRODUCTLINE</column><aggregation>NONE</aggregation></selection><selection><view>CAT_PRODUCTS</view><column>BC_PRODUCTS_PRODUCTNAME</column><aggregation>NONE</aggregation></selection><selection><view>CAT_PRODUCTS</view><column>BC_PRODUCTS_PRODUCTCODE</column><aggregation>NONE</aggregation></selection><selection><view>CAT_ORDERS</view><column>BC_ORDERDETAILS_QUANTITYORDERED</column><aggregation>SUM</aggregation></selection><selection><view>CAT_ORDERS</view><column>BC_ORDERDETAILS_TOTAL</column><aggregation>SUM</aggregation></selection></selections><constraints><constraint><operator>AND</operator><condition><![CDATA[[BC_CUSTOMER_W_TER_.BC_CUSTOMER_W_TER_COUNTRY] = \"Australia\"]]></condition></constraint></constraints><orders><order><direction>ASC</direction><view_id>CAT_ORDERS</view_id><column_id>BC_ORDERDETAILS_QUANTITYORDERED</column_id></order></orders></mql>";
@@ -684,14 +676,14 @@ public class MetadataService2Test {
 
   }
 
-  @Test
+  @Ignore
   public void testXmlQuery2() throws KettleException {
 
     StandaloneSession session = new StandaloneSession();
     PentahoSessionHolder.setSession( session );
 
     KettleSystemListener.environmentInit( session );
-    MetadataService2 svc = new MetadataService2();
+    MetadataService svc = new MetadataService();
 
     String queryString =
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?><mql><domain_id>steel-wheels</domain_id><model_id>BV_ORDERS</model_id><options><disable_distinct>false</disable_distinct></options><selections><selection><view>CAT_PRODUCTS</view><column>BC_PRODUCTS_PRODUCTLINE</column><aggregation>NONE</aggregation></selection><selection><view>CAT_PRODUCTS</view><column>BC_PRODUCTS_PRODUCTNAME</column><aggregation>NONE</aggregation></selection><selection><view>CAT_PRODUCTS</view><column>BC_PRODUCTS_PRODUCTCODE</column><aggregation>NONE</aggregation></selection><selection><view>CAT_ORDERS</view><column>BC_ORDERDETAILS_QUANTITYORDERED</column><aggregation>SUM</aggregation></selection><selection><view>CAT_ORDERS</view><column>BC_ORDERDETAILS_TOTAL</column><aggregation>SUM</aggregation></selection></selections><constraints><constraint><operator>AND</operator><condition><![CDATA[[BC_CUSTOMER_W_TER_.BC_CUSTOMER_W_TER_COUNTRY] = \"Australia\"]]></condition></constraint></constraints><orders><order><direction>ASC</direction><view_id>CAT_ORDERS</view_id><column_id>BC_ORDERDETAILS_QUANTITYORDERED</column_id></order></orders></mql>";
@@ -707,7 +699,7 @@ public class MetadataService2Test {
     PentahoSessionHolder.setSession( session );
 
     KettleSystemListener.environmentInit( session );
-    MetadataService2 svc = new MetadataService2();
+    MetadataService svc = new MetadataService();
 
     String queryString =
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?><mql><domain_id>bogus</domain_id><model_id>BV_ORDERS</model_id><options><disable_distinct>false</disable_distinct></options><selections><selection><view>CAT_PRODUCTS</view><column>BC_PRODUCTS_PRODUCTLINE</column><aggregation>NONE</aggregation></selection><selection><view>CAT_PRODUCTS</view><column>BC_PRODUCTS_PRODUCTNAME</column><aggregation>NONE</aggregation></selection><selection><view>CAT_PRODUCTS</view><column>BC_PRODUCTS_PRODUCTCODE</column><aggregation>NONE</aggregation></selection><selection><view>CAT_ORDERS</view><column>BC_ORDERDETAILS_QUANTITYORDERED</column><aggregation>SUM</aggregation></selection><selection><view>CAT_ORDERS</view><column>BC_ORDERDETAILS_TOTAL</column><aggregation>SUM</aggregation></selection></selections><constraints><constraint><operator>AND</operator><condition><![CDATA[[BC_CUSTOMER_W_TER_.BC_CUSTOMER_W_TER_COUNTRY] = \"Australia\"]]></condition></constraint></constraints><orders><order><direction>ASC</direction><view_id>CAT_ORDERS</view_id><column_id>BC_ORDERDETAILS_QUANTITYORDERED</column_id></order></orders></mql>";
@@ -716,14 +708,13 @@ public class MetadataService2Test {
   }
 
   @Ignore
-  @Test
   public void testXmlQueryToJson1() throws KettleException {
 
     StandaloneSession session = new StandaloneSession();
     PentahoSessionHolder.setSession( session );
 
     KettleSystemListener.environmentInit( session );
-    MetadataService2 svc = new MetadataService2();
+    MetadataService svc = new MetadataService();
 
     String queryString =
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?><mql><domain_id>steel-wheels</domain_id><model_id>BV_ORDERS</model_id><options><disable_distinct>false</disable_distinct></options><selections><selection><view>CAT_PRODUCTS</view><column>BC_PRODUCTS_PRODUCTLINE</column><aggregation>NONE</aggregation></selection><selection><view>CAT_PRODUCTS</view><column>BC_PRODUCTS_PRODUCTNAME</column><aggregation>NONE</aggregation></selection><selection><view>CAT_PRODUCTS</view><column>BC_PRODUCTS_PRODUCTCODE</column><aggregation>NONE</aggregation></selection><selection><view>CAT_ORDERS</view><column>BC_ORDERDETAILS_QUANTITYORDERED</column><aggregation>SUM</aggregation></selection><selection><view>CAT_ORDERS</view><column>BC_ORDERDETAILS_TOTAL</column><aggregation>SUM</aggregation></selection></selections><constraints/><orders/></mql>";
@@ -736,14 +727,13 @@ public class MetadataService2Test {
   }
 
   @Ignore
-  @Test
   public void testJsonQueryToJson1() throws KettleException {
 
     StandaloneSession session = new StandaloneSession();
     PentahoSessionHolder.setSession( session );
 
     KettleSystemListener.environmentInit( session );
-    MetadataService2 svc = new MetadataService2();
+    MetadataService svc = new MetadataService();
 
     Query query = getTestQuery();
     JSONSerializer serializer = new JSONSerializer();
@@ -755,22 +745,19 @@ public class MetadataService2Test {
     // System.out.println(json);
     assertTrue( "wrong column name", json.indexOf( "BC_PRODUCTS_PRODUCTLINE" ) != -1 );
     assertTrue( "wrong column type", json.indexOf( "\"string\"" ) != -1 );
-    assertTrue( "wrong value", json.indexOf( "Classic Cars" ) != -1 );
+    assertTrue( "wrong value: " + json, json.indexOf( "Classic Cars" ) != -1 );
   }
 
-  @Ignore
-  @Test
   public void testJsonQueryToJson2() throws KettleException {
 
     StandaloneSession session = new StandaloneSession();
     PentahoSessionHolder.setSession( session );
 
     KettleSystemListener.environmentInit( session );
-    MetadataService2 svc = new MetadataService2();
+    MetadataService svc = new MetadataService();
+
     String json =
-        "{\"class\":\"org.pentaho.metadata.model.thin.Query\",\"sourceId\":\""
-            + MetadataService2.PROVIDER_ID
-            + "~steel-wheels~BV_ORDERS\",\"elements\":[{\"aggTypes\":[],\"parentId\":\"BC_CUSTOMER_W_TER_\",\"class\":\"org.pentaho.metadata.model.thin.Element\",\"defaultAggregation\":null,\"fieldType\":null,\"id\":\"BC_CUSTOMER_W_TER_COUNTRY\",\"name\":null,\"selectedAggregation\":\"NONE\",\"type\":null}],\"conditions\":[{\"parentId\":\"BC_CUSTOMER_W_TER_\",\"class\":\"org.pentaho.metadata.model.thin.Condition\",\"elementId\":\"BC_CUSTOMER_W_TER_COUNTRY\",\"combinationType\":\"AND\",\"operator\":\"EQUAL\",\"value\":[\"Australia\"]}],\"defaultParameterMap\":null,\"disableDistinct\":false,\"domainName\":\"steel-wheels\",\"modelId\":\"BV_ORDERS\",\"orders\":[{\"category\":\"BC_CUSTOMER_W_TER_\",\"class\":\"org.pentaho.metadata.model.thin.Order\",\"column\":\"BC_CUSTOMER_W_TER_COUNTRY\",\"orderType\":\"ASC\"}],\"parameters\":[]}";
+        "{\"class\":\"org.pentaho.common.ui.metadata.model.impl.Query\",\"columns\":[{\"aggTypes\":[],\"category\":\"BC_CUSTOMER_W_TER_\",\"class\":\"org.pentaho.common.ui.metadata.model.impl.Column\",\"defaultAggType\":null,\"fieldType\":null,\"id\":\"BC_CUSTOMER_W_TER_COUNTRY\",\"name\":null,\"selectedAggType\":\"NONE\",\"type\":null}],\"conditions\":[{\"category\":\"BC_CUSTOMER_W_TER_\",\"class\":\"org.pentaho.common.ui.metadata.model.impl.Condition\",\"column\":\"BC_CUSTOMER_W_TER_COUNTRY\",\"combinationType\":\"AND\",\"operator\":\"EQUAL\",\"value\":[\"Australia\"]}],\"defaultParameterMap\":null,\"disableDistinct\":false,\"domainName\":\"steel-wheels\",\"modelId\":\"BV_ORDERS\",\"orders\":[{\"category\":\"BC_CUSTOMER_W_TER_\",\"class\":\"org.pentaho.common.ui.metadata.model.impl.Order\",\"column\":\"BC_CUSTOMER_W_TER_COUNTRY\",\"orderType\":\"ASC\"}],\"parameters\":[]}";
     json = svc.doJsonQueryToJson( json, -1 );
 
     assertNotNull( "results are null", json );
@@ -787,26 +774,26 @@ public class MetadataService2Test {
     PentahoSessionHolder.setSession( session );
 
     KettleSystemListener.environmentInit( session );
-    MetadataService2 svc = new MetadataService2();
+    MetadataService svc = new MetadataService();
 
     String queryString =
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?><mql><domain_id>bogus</domain_id><model_id>BV_ORDERS</model_id><options><disable_distinct>false</disable_distinct></options><selections><selection><view>CAT_PRODUCTS</view><column>BC_PRODUCTS_PRODUCTLINE</column><aggregation>NONE</aggregation></selection><selection><view>CAT_PRODUCTS</view><column>BC_PRODUCTS_PRODUCTNAME</column><aggregation>NONE</aggregation></selection><selection><view>CAT_PRODUCTS</view><column>BC_PRODUCTS_PRODUCTCODE</column><aggregation>NONE</aggregation></selection><selection><view>CAT_ORDERS</view><column>BC_ORDERDETAILS_QUANTITYORDERED</column><aggregation>SUM</aggregation></selection><selection><view>CAT_ORDERS</view><column>BC_ORDERDETAILS_TOTAL</column><aggregation>SUM</aggregation></selection></selections><constraints/><orders/></mql>";
     String json = svc.doXmlQueryToJson( queryString, -1 );
     assertNull( "results are not null", json );
 
-    MetadataServiceUtil2 util = new MetadataServiceUtil2();
+    MetadataServiceUtil util = new MetadataServiceUtil();
     assertNull( "results are not null", util.createCdaJson( null, null ) );
 
   }
 
-  @Test
+  @Ignore
   public void testXmlQueryToCdaJson1() throws KettleException {
 
     StandaloneSession session = new StandaloneSession();
     PentahoSessionHolder.setSession( session );
 
     KettleSystemListener.environmentInit( session );
-    MetadataService2 svc = new MetadataService2();
+    MetadataService svc = new MetadataService();
 
     String queryString =
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?><mql><domain_id>steel-wheels</domain_id><model_id>BV_ORDERS</model_id><options><disable_distinct>false</disable_distinct></options><selections><selection><view>CAT_PRODUCTS</view><column>BC_PRODUCTS_PRODUCTLINE</column><aggregation>NONE</aggregation></selection><selection><view>CAT_PRODUCTS</view><column>BC_PRODUCTS_PRODUCTNAME</column><aggregation>NONE</aggregation></selection><selection><view>CAT_PRODUCTS</view><column>BC_PRODUCTS_PRODUCTCODE</column><aggregation>NONE</aggregation></selection><selection><view>CAT_ORDERS</view><column>BC_ORDERDETAILS_QUANTITYORDERED</column><aggregation>SUM</aggregation></selection><selection><view>CAT_ORDERS</view><column>BC_ORDERDETAILS_TOTAL</column><aggregation>SUM</aggregation></selection></selections><constraints/><orders/></mql>";
@@ -825,7 +812,7 @@ public class MetadataService2Test {
     PentahoSessionHolder.setSession( session );
 
     KettleSystemListener.environmentInit( session );
-    MetadataService2 svc = new MetadataService2();
+    MetadataService svc = new MetadataService();
 
     String queryString =
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?><mql><domain_id>bogus</domain_id><model_id>BV_ORDERS</model_id><options><disable_distinct>false</disable_distinct></options><selections><selection><view>CAT_PRODUCTS</view><column>BC_PRODUCTS_PRODUCTLINE</column><aggregation>NONE</aggregation></selection><selection><view>CAT_PRODUCTS</view><column>BC_PRODUCTS_PRODUCTNAME</column><aggregation>NONE</aggregation></selection><selection><view>CAT_PRODUCTS</view><column>BC_PRODUCTS_PRODUCTCODE</column><aggregation>NONE</aggregation></selection><selection><view>CAT_ORDERS</view><column>BC_ORDERDETAILS_QUANTITYORDERED</column><aggregation>SUM</aggregation></selection><selection><view>CAT_ORDERS</view><column>BC_ORDERDETAILS_TOTAL</column><aggregation>SUM</aggregation></selection></selections><constraints/><orders/></mql>";
@@ -833,14 +820,14 @@ public class MetadataService2Test {
     assertNull( "results are not null", json );
   }
 
-  @Test
+  @Ignore
   public void testJsonQueryToCdaJson1() throws KettleException {
 
     StandaloneSession session = new StandaloneSession();
     PentahoSessionHolder.setSession( session );
 
     KettleSystemListener.environmentInit( session );
-    MetadataService2 svc = new MetadataService2();
+    MetadataService svc = new MetadataService();
 
     Query query = getTestQuery();
     JSONSerializer serializer = new JSONSerializer();
@@ -860,62 +847,62 @@ public class MetadataService2Test {
     StandaloneSession session = new StandaloneSession();
     PentahoSessionHolder.setSession( session );
 
-    MetadataService2 svc = new MetadataService2();
+    MetadataService svc = new MetadataService();
 
-    Model model = svc.getModel( MetadataService2.PROVIDER_ID + "~steel-wheels~BV_ORDERS" );
-
+    Model model = svc.loadModel( "steel-wheels", "BV_ORDERS" );
     assertNotNull( "model should not be null", model );
 
-    assertEquals( "domain id is wrong", "steel-wheels", model.getGroupId() );
-    assertEquals( "model id is wrong", "BV_ORDERS", model.getModelId() );
+    assertEquals( "domain id is wrong", "steel-wheels", model.getDomainId() );
+    assertEquals( "model id is wrong", "BV_ORDERS", model.getId() );
     assertEquals( "model name is wrong", "Orders", model.getName() );
     assertEquals( "model description is wrong", "This model contains information about customers and their orders.",
         model.getDescription() );
     assertTrue( "model hash is wrong", model.hashCode() != 0 );
 
-    Element category = model.getElements()[0];
-    assertEquals( "wrong number of business columns", 38, model.getElements().length );
+    assertEquals( "wrong number of categories", 4, model.getCategories().length );
+
+    Category category = model.getCategories()[0];
+    assertEquals( "wrong number of business columns", 13, category.getColumns().length );
     assertEquals( "category id is wrong", "BC_CUSTOMER_W_TER_", category.getId() );
     assertEquals( "category name is wrong", "Customer", category.getName() );
 
-    Element column = model.getElements()[1];
-    assertEquals( "column default agg type is wrong", "NONE", column.getDefaultAggregation().toString() );
+    IColumn column = category.getColumns()[0];
+    assertEquals( "column default agg type is wrong", "NONE", column.getDefaultAggType().toString() );
     assertEquals( "column id is wrong", "BC_CUSTOMER_W_TER_TERRITORY", column.getId() );
     assertEquals( "column name is wrong", "Territory", column.getName() );
-    assertEquals( "column selected agg type is wrong", "NONE", column.getSelectedAggregation().toString() );
-    assertEquals( "column type is wrong", "STRING", column.getDataType().toString() );
-    assertEquals( "field type is wrong", "DIMENSION", column.getElementType().toString() );
+    assertEquals( "column selected agg type is wrong", "NONE", column.getSelectedAggType().toString() );
+    assertEquals( "column type is wrong", "STRING", column.getType().toString() );
+    assertEquals( "field type is wrong", "DIMENSION", column.getFieldType().toString() );
     assertEquals( "mask is wrong", null, column.getFormatMask() );
     assertEquals( "alignment is wrong", "LEFT", column.getHorizontalAlignment().toString() );
-    assertEquals( "column agg types list is wrong size", 1, column.getAvailableAggregations().length );
+    assertEquals( "column agg types list is wrong size", 1, column.getAggTypes().length );
 
-    int idx = 0;
-    for ( Element element : model.getElements() ) {
-      System.out.println( "" + idx + " : " + element.getId() );
-      idx++;
-    }
+    category = model.getCategories()[1];
+    assertEquals( "wrong number of business columns", 9, category.getColumns().length );
+    assertEquals( "category id is wrong", "CAT_ORDERS", category.getId() );
+    assertEquals( "category name is wrong", "Orders", category.getName() );
 
-    column = model.getElements()[21];
+    column = category.getColumns()[6];
+    assertEquals( "column default agg type is wrong", "SUM", column.getDefaultAggType().toString() );
     assertEquals( "column id is wrong", "BC_ORDERDETAILS_QUANTITYORDERED", column.getId() );
-    assertEquals( "column default agg type is wrong", "SUM", column.getDefaultAggregation().toString() );
     assertEquals( "column name is wrong", "Quantity Ordered", column.getName() );
-    assertEquals( "column selected agg type is wrong", "SUM", column.getSelectedAggregation().toString() );
-    assertEquals( "column type is wrong", "NUMERIC", column.getDataType().toString() );
-    assertEquals( "field type is wrong", "FACT", column.getElementType().toString() );
+    assertEquals( "column selected agg type is wrong", "SUM", column.getSelectedAggType().toString() );
+    assertEquals( "column type is wrong", "NUMERIC", column.getType().toString() );
+    assertEquals( "field type is wrong", "FACT", column.getFieldType().toString() );
     assertEquals( "mask is wrong", "#,###.##", column.getFormatMask() );
     assertEquals( "alignment is wrong", "RIGHT", column.getHorizontalAlignment().toString() );
-    assertEquals( "column agg types list is wrong size", 4, column.getAvailableAggregations().length );
+    assertEquals( "column agg types list is wrong size", 4, column.getAggTypes().length );
 
-    column = model.getElements()[23];
-    assertEquals( "column default agg type is wrong", "SUM", column.getDefaultAggregation().toString() );
+    column = category.getColumns()[8];
+    assertEquals( "column default agg type is wrong", "SUM", column.getDefaultAggType().toString() );
     assertEquals( "column id is wrong", "BC_ORDERDETAILS_TOTAL", column.getId() );
     assertEquals( "column name is wrong", "Total", column.getName() );
-    assertEquals( "column selected agg type is wrong", "SUM", column.getSelectedAggregation().toString() );
-    assertEquals( "column type is wrong", "NUMERIC", column.getDataType().toString() );
-    assertEquals( "field type is wrong", "FACT", column.getElementType().toString() );
+    assertEquals( "column selected agg type is wrong", "SUM", column.getSelectedAggType().toString() );
+    assertEquals( "column type is wrong", "NUMERIC", column.getType().toString() );
+    assertEquals( "field type is wrong", "FACT", column.getFieldType().toString() );
     assertEquals( "mask is wrong", "$#,##0.00;($#,##0.00)", column.getFormatMask() );
     assertEquals( "alignment is wrong", "RIGHT", column.getHorizontalAlignment().toString() );
-    assertEquals( "column agg types list is wrong size", 4, column.getAvailableAggregations().length );
+    assertEquals( "column agg types list is wrong size", 4, column.getAggTypes().length );
 
   }
 
@@ -924,9 +911,9 @@ public class MetadataService2Test {
     StandaloneSession session = new StandaloneSession();
     PentahoSessionHolder.setSession( session );
 
-    MetadataService2 svc = new MetadataService2();
+    MetadataService svc = new MetadataService();
 
-    Model model = svc.getModel( MetadataService2.PROVIDER_ID + "~steel-wheels/bogus.xmi~BV_HUMAN_RESOURCES" );
+    Model model = svc.loadModel( null, "BV_HUMAN_RESOURCES" );
     assertNull( "model should be null", model );
   }
 
@@ -935,9 +922,9 @@ public class MetadataService2Test {
     StandaloneSession session = new StandaloneSession();
     PentahoSessionHolder.setSession( session );
 
-    MetadataService2 svc = new MetadataService2();
+    MetadataService svc = new MetadataService();
 
-    Model model = svc.getModel( MetadataService2.PROVIDER_ID + "~steel-wheels~" );
+    Model model = svc.loadModel( "steel-wheels", null );
     assertNull( "model should be null", model );
   }
 
@@ -946,9 +933,9 @@ public class MetadataService2Test {
     StandaloneSession session = new StandaloneSession();
     PentahoSessionHolder.setSession( session );
 
-    MetadataService2 svc = new MetadataService2();
+    MetadataService svc = new MetadataService();
 
-    Model model = svc.getModel( MetadataService2.PROVIDER_ID + "~bogus~BV_ORDERS" );
+    Model model = svc.loadModel( "bogud", "BV_HUMAN_RESOURCES" );
     assertNull( "model should be null", model );
   }
 
@@ -957,10 +944,50 @@ public class MetadataService2Test {
     StandaloneSession session = new StandaloneSession();
     PentahoSessionHolder.setSession( session );
 
-    MetadataService2 svc = new MetadataService2();
+    MetadataService svc = new MetadataService();
 
-    Model model = svc.getModel( MetadataService2.PROVIDER_ID + "~steel-wheels~bogus" );
+    Model model = svc.loadModel( "steel-wheels", "bogus" );
     assertNull( "model should be null", model );
+  }
+
+  @Ignore
+  public void testGetModelJson() {
+    StandaloneSession session = new StandaloneSession();
+    PentahoSessionHolder.setSession( session );
+
+    MetadataService svc = new MetadataService();
+
+    String json = svc.loadModelJson( "steel-wheels", "BV_HUMAN_RESOURCES" );
+    assertNotNull( "json should not be null", json );
+    // System.out.println(json);
+
+    Model model = new JSONDeserializer<Model>().deserialize( json );
+    assertNotNull( "model should not be null", model );
+
+    assertEquals( "domain id is wrong", "steel-wheels", model.getDomainId() );
+    assertEquals( "model id is wrong", "BV_HUMAN_RESOURCES", model.getId() );
+    assertEquals( "model name is wrong", "Human Resources", model.getName() );
+    assertEquals( "model description is wrong", "This model contains information about Employees.", model
+        .getDescription() );
+    assertTrue( "model hash is wrong", model.hashCode() != 0 );
+
+    assertEquals( "wrong number of categories", 2, model.getCategories().length );
+
+    Category category = model.getCategories()[0];
+    assertEquals( "wrong number of business columns", 9, category.getColumns().length );
+    assertEquals( "category id is wrong", "BC_OFFICES_", category.getId() );
+    assertEquals( "category name is wrong", "Offices", category.getName() );
+    assertEquals( "category description is wrong", null, category.getDescription() );
+
+    IColumn column = category.getColumns()[0];
+    assertEquals( "column default agg type is wrong", "NONE", column.getDefaultAggType().toString() );
+    assertEquals( "column id is wrong", "BC_OFFICES_TERRITORY", column.getId() );
+    assertEquals( "column name is wrong", "Territory", column.getName() );
+    assertEquals( "column description is wrong", null, column.getDescription() );
+    assertEquals( "column selected agg type is wrong", "NONE", column.getSelectedAggType().toString() );
+    assertEquals( "column type is wrong", "STRING", column.getType().toString() );
+    assertEquals( "field type is wrong", "DIMENSION", column.getFieldType().toString() );
+    assertEquals( "column agg types list is wrong size", 1, column.getAggTypes().length );
   }
 
   @Test
@@ -968,19 +995,19 @@ public class MetadataService2Test {
     StandaloneSession session = new StandaloneSession();
     PentahoSessionHolder.setSession( session );
 
-    MetadataService2 svc = new MetadataService2();
+    MetadataService svc = new MetadataService();
 
-    ModelInfo[] models = svc.getModelList( MetadataService2.PROVIDER_ID, "steel-wheels", null );
+    ModelInfo[] models = svc.listBusinessModels( null, null );
     assertNotNull( models );
     assertTrue( "Wrong nuber of models returned", models.length > 2 );
     boolean found = false;
     for ( int idx = 0; idx < models.length; idx++ ) {
-      if ( models[idx].getGroupId().equals( "steel-wheels" ) && models[idx].getModelId().equals( "BV_HUMAN_RESOURCES" ) ) {
-        assertEquals( "Wrong domain id", "steel-wheels", models[idx].getGroupId() );
+      if ( models[idx].getDomainId().equals( "steel-wheels" ) && models[idx].getModelId().equals( "BV_HUMAN_RESOURCES" ) ) {
+        assertEquals( "Wrong domain id", "steel-wheels", models[idx].getDomainId() );
         assertEquals( "Wrong description", "This model contains information about Employees.", models[idx]
-            .getDescription() );
+            .getModelDescription() );
         assertEquals( "Wrong model id", "BV_HUMAN_RESOURCES", models[idx].getModelId() );
-        assertEquals( "Wrong model name", "Human Resources", models[idx].getName() );
+        assertEquals( "Wrong model name", "Human Resources", models[idx].getModelName() );
         found = true;
       }
     }
@@ -992,9 +1019,9 @@ public class MetadataService2Test {
     StandaloneSession session = new StandaloneSession();
     PentahoSessionHolder.setSession( session );
 
-    MetadataService2 svc = new MetadataService2();
+    MetadataService svc = new MetadataService();
 
-    ModelInfo[] models = svc.getModelList( MetadataService2.PROVIDER_ID, "steel-wheels", null );
+    ModelInfo[] models = svc.listBusinessModels( "steel-wheels", null );
     assertNotNull( models );
     assertEquals( "Wrong nuber of models returned", 3, models.length );
   }
@@ -1004,9 +1031,9 @@ public class MetadataService2Test {
     StandaloneSession session = new StandaloneSession();
     PentahoSessionHolder.setSession( session );
 
-    MetadataService2 svc = new MetadataService2();
+    MetadataService svc = new MetadataService();
 
-    ModelInfo[] models = svc.getModelList( "bogus", null, null );
+    ModelInfo[] models = svc.listBusinessModels( "bogus", null );
     assertNotNull( models );
     assertEquals( "Wrong nuber of models returned", 0, models.length );
   }
@@ -1016,11 +1043,42 @@ public class MetadataService2Test {
     // without a session we should not get any models back
     PentahoSessionHolder.removeSession();
 
-    MetadataService2 svc = new MetadataService2();
+    MetadataService svc = new MetadataService();
 
-    ModelInfo[] models = svc.getModelList( MetadataService2.PROVIDER_ID, "bogus", null );
+    ModelInfo[] models = svc.listBusinessModels( "bogus", null );
     assertNotNull( models );
     assertEquals( "Wrong nuber of models returned", 0, models.length );
+  }
+
+  @Test
+  public void testListBusinessModelsJson() throws IOException {
+    StandaloneSession session = new StandaloneSession();
+    PentahoSessionHolder.setSession( session );
+    MetadataService svc = new MetadataService();
+
+    String json = svc.listBusinessModelsJson( null, null );
+    assertNotNull( json );
+    // System.out.println(json);
+    // convert to a list
+    Object result = new JSONDeserializer().deserialize( json );
+    List<ModelInfo> modelList = new JSONDeserializer<List<ModelInfo>>().deserialize( json );
+
+    ModelInfo models[] = modelList.toArray( new ModelInfo[modelList.size()] );
+
+    assertNotNull( models );
+    assertTrue( "Wrong nuber of models returned", models.length > 2 );
+    boolean found = false;
+    for ( int idx = 0; idx < models.length; idx++ ) {
+      if ( models[idx].getDomainId().equals( "steel-wheels" ) && models[idx].getModelId().equals( "BV_HUMAN_RESOURCES" ) ) {
+        assertEquals( "Wrong domain id", "steel-wheels", models[idx].getDomainId() );
+        assertEquals( "Wrong description", "This model contains information about Employees.", models[idx]
+            .getModelDescription() );
+        assertEquals( "Wrong model id", "BV_HUMAN_RESOURCES", models[idx].getModelId() );
+        assertEquals( "Wrong model name", "Human Resources", models[idx].getModelName() );
+        found = true;
+      }
+    }
+    assertTrue( "model was not found", found );
   }
 
   @Test
@@ -1046,8 +1104,8 @@ public class MetadataService2Test {
   public void testCondition1() {
 
     Condition condition = new Condition();
-    condition.setElementId( "column" );
-    condition.setParentId( "cat" );
+    condition.setCategory( "cat" );
+    condition.setColumn( "column" );
     condition.setCombinationType( CombinationType.AND.name() );
     condition.setOperator( Operator.EQUAL.name() );
     condition.setValue( new String[] { "bingo" } );
@@ -1057,11 +1115,11 @@ public class MetadataService2Test {
     assertEquals( "[cat.column] = [param:bingo]", str );
 
     condition.setValue( new String[] { "bingo" } );
-    str = condition.getCondition( DataType.STRING.getName(), condition.getElementId() );
+    str = condition.getCondition( DataType.STRING.getName(), condition.getColumn() );
     assertEquals( "[cat.column] = [param:column]", str );
 
     condition.setValue( new String[] { "bingo" } );
-    str = condition.getCondition( DataType.DATE.getName(), condition.getElementId() );
+    str = condition.getCondition( DataType.DATE.getName(), condition.getColumn() );
     assertEquals( "[cat.column] =DATEVALUE([param:bingo])", str );
 
     condition.setValue( new String[] { "bingo" } );
@@ -1080,15 +1138,15 @@ public class MetadataService2Test {
   @Test
   public void testCondition_aggregate() {
     Condition c = new Condition();
-    c.setElementId( "column" );
-    c.setParentId( "cat" );
+    c.setCategory( "cat" );
+    c.setColumn( "column" );
     c.setCombinationType( CombinationType.OR.name() );
     c.setValue( new String[] { "testing" } );
 
     String str = c.getCondition( DataType.STRING.getName(), null );
     assertEquals( "[cat.column] = \"testing\"", str );
 
-    c.setSelectedAggregation( AggregationType.MINIMUM.name() );
+    c.setSelectedAggType( AggregationType.MINIMUM.name() );
     c.setValue( new String[] { "testing" } );
     str = c.getCondition( DataType.STRING.getName(), null );
     assertEquals( "[cat.column.MINIMUM] = \"testing\"", str );
