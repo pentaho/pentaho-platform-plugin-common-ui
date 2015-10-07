@@ -15,7 +15,7 @@
  * Copyright (c) 2002-2013 Pentaho Corporation..  All rights reserved.
  */
 
-package org.pentaho.common.ui.test;
+package org.pentaho.common.ui.services;
 
 import org.pentaho.common.ui.services.Setting;
 import org.pentaho.common.ui.services.UserSettingService;
@@ -27,7 +27,7 @@ import org.pentaho.platform.engine.core.system.StandaloneSession;
 import org.pentaho.test.platform.engine.core.BaseTest;
 
 @SuppressWarnings( { "all" } )
-public class UserSettingServiceTest extends BaseTest {
+public class UserSettingServiceIT extends BaseTest {
 
   private static final String SOLUTION_PATH = "test-res/pentaho-solutions";
 

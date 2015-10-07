@@ -41,6 +41,6 @@ PentahoSystem which is initialized after Spring
 
   <bean id="PentahoNameGenerator" class="org.pentaho.reporting.platform.plugin.repository.TempDirectoryNameGenerator" scope="prototype" />
   
-  <bean id="IUserSettingService" class="org.pentaho.common.ui.test.TestUserSettingService" scope="session" />
+  <bean id="IUserSettingService" class="org.pentaho.common.ui.TestUserSettingService" scope="session" />
   
 </beans>

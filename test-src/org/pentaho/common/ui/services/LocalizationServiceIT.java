@@ -15,7 +15,7 @@
  * Copyright (c) 2002-2013 Pentaho Corporation..  All rights reserved.
  */
 
-package org.pentaho.common.ui.test;
+package org.pentaho.common.ui.services;
 
 import java.io.File;
 
@@ -29,11 +29,11 @@ import org.pentaho.test.platform.engine.core.MicroPlatform;
 import junit.framework.TestCase;
 
 @SuppressWarnings( "nls" )
-public class LocalizationServiceTest extends TestCase {
+public class LocalizationServiceIT extends TestCase {
 
   MicroPlatform mp;
 
-  public LocalizationServiceTest() throws ClassNotFoundException, ObjectFactoryException {
+  public LocalizationServiceIT() throws ClassNotFoundException, ObjectFactoryException {
     mp = new MicroPlatform( "" );
     mp.define( IPluginResourceLoader.class, TstPluginResourceLoader.class );
   }

@@ -17,25 +17,22 @@
 
 package org.pentaho.common.ui.models;
 
-import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.pentaho.platform.api.repository2.unified.RepositoryFilePermission;
-import org.pentaho.platform.repository2.unified.jcr.LocalizationUtil;
-import org.pentaho.platform.repository2.unified.webservices.LocaleMapDto;
-import org.pentaho.platform.repository2.unified.webservices.RepositoryFileAclAceDto;
-import org.pentaho.platform.repository2.unified.webservices.RepositoryFileAclDto;
-import org.pentaho.platform.repository2.unified.webservices.RepositoryFileDto;
-import org.pentaho.platform.repository2.unified.webservices.RepositoryFileTreeDto;
-import org.pentaho.platform.repository2.unified.webservices.StringKeyStringValueDto;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
+
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.pentaho.platform.repository2.unified.jcr.LocalizationUtil;
+import org.pentaho.platform.repository2.unified.webservices.LocaleMapDto;
+import org.pentaho.platform.repository2.unified.webservices.RepositoryFileDto;
+import org.pentaho.platform.repository2.unified.webservices.RepositoryFileTreeDto;
+import org.pentaho.platform.repository2.unified.webservices.StringKeyStringValueDto;
 
 /**
  * @author Rowell Belen
@@ -72,8 +69,8 @@ public class TreeBrowserMapper {
     }
 
     // Map localized name
-    treeBrowserModel
-      .setLocalizedName( getLocalizedName( this.locale, repositoryDto, FILE_NAME_KEY, repositoryDto.getName() ) );
+    treeBrowserModel.setLocalizedName( getLocalizedName( this.locale, repositoryDto, FILE_NAME_KEY, repositoryDto
+        .getName() ) );
 
     // Initialize permissions
     PermissionsModel permissionsModel = new PermissionsModel();
@@ -134,7 +131,7 @@ public class TreeBrowserMapper {
   }
 
   public String getLocalizedName( Locale locale, RepositoryFileDto repositoryDto, String propertyName,
-                                  String defaultValue ) {
+      String defaultValue ) {
 
     // convert List<LocaleMapDto> to Map<String, Properties>
     Map<String, Properties> localePropertiesMap = toPropertiesMap( repositoryDto.getLocalePropertiesMapEntries() );
@@ -143,4 +140,3 @@ public class TreeBrowserMapper {
     return localizationUtil.resolveLocalizedString( propertyName, defaultValue );
   }
 }
-

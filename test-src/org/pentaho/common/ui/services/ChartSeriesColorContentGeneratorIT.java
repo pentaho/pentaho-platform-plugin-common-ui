@@ -15,7 +15,7 @@
  * Copyright (c) 2002-2013 Pentaho Corporation..  All rights reserved.
  */
 
-package org.pentaho.common.ui.test;
+package org.pentaho.common.ui.services;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -34,11 +34,11 @@ import org.pentaho.platform.plugin.services.pluginmgr.PluginResourceLoader;
 import org.pentaho.test.platform.engine.core.MicroPlatform;
 
 @SuppressWarnings( { "all" } )
-public class ChartSeriesColorContentGeneratorTest {
+public class ChartSeriesColorContentGeneratorIT {
 
   MicroPlatform mp;
 
-  public ChartSeriesColorContentGeneratorTest() throws ClassNotFoundException, ObjectFactoryException {
+  public ChartSeriesColorContentGeneratorIT() throws ClassNotFoundException, ObjectFactoryException {
     mp = new MicroPlatform( "" );
     mp.define( IPluginResourceLoader.class, TestPluginResourceLoader.class );
   }

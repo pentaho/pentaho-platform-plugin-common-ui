@@ -16,7 +16,7 @@
  * Copyright 2006 - 2013 Pentaho Corporation.  All rights reserved.
  */
 
-package org.pentaho.common.ui.test;
+package org.pentaho.common.ui;
 
 import java.io.OutputStream;
 
