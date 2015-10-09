@@ -1,9 +1,9 @@
 package org.pentaho.common.ui.models;
 
+import java.util.List;
+
 import org.pentaho.platform.repository2.unified.webservices.RepositoryFileDto;
 import org.pentaho.platform.repository2.unified.webservices.RepositoryFileTreeDto;
-
-import java.util.List;
 
 /**
  * @author Rowell Belen

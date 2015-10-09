@@ -17,7 +17,12 @@
 
 package org.pentaho.common.ui.metadata.service;
 
-import flexjson.JSONSerializer;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.StringTokenizer;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -44,10 +49,7 @@ import org.pentaho.platform.plugin.action.pentahometadata.MetadataQueryComponent
 import org.pentaho.platform.util.messages.LocaleHelper;
 import org.pentaho.pms.core.exception.PentahoMetadataException;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.StringTokenizer;
+import flexjson.JSONSerializer;
 
 /**
  * An object that makes lightweight, serializable metadata models available to callers, and allow queries to be
@@ -64,6 +66,8 @@ public class MetadataService2 extends PentahoBase implements ModelProvider {
 
   private Log logger = LogFactory.getLog( MetadataService2.class );
 
+  private MetadataServiceUtil2 util2 = new MetadataServiceUtil2();
+  private QueryXmlHelper helper = new QueryXmlHelper();
   private Provider provider;
 
   public MetadataService2() {
@@ -101,7 +105,7 @@ public class MetadataService2 extends PentahoBase implements ModelProvider {
     try {
       if ( StringUtils.isEmpty( domain ) ) {
         // if no domain has been specified, loop over all of them
-        for ( String aDomain : getMetadataRepository().getDomainIds() ) {
+        for ( String aDomain : repo.getDomainIds() ) {
           getModelInfos( match, aDomain, models );
         }
       } else {
@@ -147,6 +151,7 @@ public class MetadataService2 extends PentahoBase implements ModelProvider {
         boolean visibleToContext = false;
         for ( String c : visibleContexts ) {
           if ( c.equals( context ) ) {
+            // TODO investigate situation. Now context always is null.
             visibleToContext = true;
             break;
           }
@@ -225,7 +230,7 @@ public class MetadataService2 extends PentahoBase implements ModelProvider {
     }
 
     // create the thin metadata model and return it
-    MetadataServiceUtil2 util = new MetadataServiceUtil2();
+    MetadataServiceUtil2 util = getMetadataServiceUtil2();
     util.setDomain( domain );
     Model thinModel = util.createThinModel( model, domainId );
     thinModel.setProvider( provider );
@@ -248,12 +253,12 @@ public class MetadataService2 extends PentahoBase implements ModelProvider {
 
   public MarshallableResultSet doQuery( Query query, Integer rowLimit ) {
 
-    MetadataServiceUtil2 util = new MetadataServiceUtil2();
+    MetadataServiceUtil2 util = getMetadataServiceUtil2();
 
     Model model = getModel( query.getSourceId() );
 
     org.pentaho.metadata.query.model.Query fullQuery = util.convertQuery( query, model );
-    QueryXmlHelper helper = new QueryXmlHelper();
+    QueryXmlHelper helper = getHelper();
     String xml = helper.toXML( fullQuery );
     return doXmlQuery( xml, rowLimit );
   }
@@ -307,7 +312,7 @@ public class MetadataService2 extends PentahoBase implements ModelProvider {
     }
     String json = null;
     try {
-      MetadataServiceUtil2 util = new MetadataServiceUtil2();
+      MetadataServiceUtil2 util = getMetadataServiceUtil2();
       Domain domain = util.getDomainObject( xml );
       util.setDomain( domain );
       String locale = LocaleHelper.getClosestLocale( LocaleHelper.getLocale().toString(), domain.getLocaleCodes() );
@@ -389,7 +394,7 @@ public class MetadataService2 extends PentahoBase implements ModelProvider {
    * @return
    */
   protected String getQueryXmlFromJson( String json ) {
-    MetadataServiceUtil2 util = new MetadataServiceUtil2();
+    MetadataServiceUtil2 util = getMetadataServiceUtil2();
     Query query = util.deserializeJsonQuery( json );
     try {
       // convert the thin query model into a full one
@@ -397,7 +402,7 @@ public class MetadataService2 extends PentahoBase implements ModelProvider {
       org.pentaho.metadata.query.model.Query fullQuery = util.convertQuery( query, model );
 
       // get the XML for the query
-      QueryXmlHelper helper = new QueryXmlHelper();
+      QueryXmlHelper helper = getHelper();
       String xml = helper.toXML( fullQuery );
       return xml;
     } catch ( Exception e ) {
@@ -430,4 +435,17 @@ public class MetadataService2 extends PentahoBase implements ModelProvider {
     return PROVIDER_ID;
   }
 
+  /**
+   * package-local visibility for testing purposes
+   */
+  MetadataServiceUtil2 getMetadataServiceUtil2() {
+    return util2;
+  }
+
+  /**
+   * package-local visibility for testing purposes
+   */
+  QueryXmlHelper getHelper() {
+    return helper;
+  }
 }

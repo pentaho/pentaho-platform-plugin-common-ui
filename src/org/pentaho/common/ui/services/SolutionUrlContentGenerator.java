@@ -18,6 +18,11 @@
 
 package org.pentaho.common.ui.services;
 
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.security.InvalidParameterException;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.pentaho.common.ui.messages.Messages;
@@ -34,10 +39,6 @@ import org.pentaho.platform.engine.services.solution.BaseContentGenerator;
 import org.pentaho.platform.repository2.unified.fileio.RepositoryFileInputStream;
 import org.pentaho.platform.util.web.MimeHelper;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
-
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.security.InvalidParameterException;
 
 /**
  * SolutionUrlContentGenerator. Provides a way of URL addressing content within the solution repository, and allowing
@@ -112,7 +113,7 @@ public class SolutionUrlContentGenerator extends BaseContentGenerator {
 
     // is this a plugin file type?
     if ( type == TYPE_UNKNOWN ) {
-      IPluginManager pluginManager = PentahoSystem.get( IPluginManager.class, userSession );
+      IPluginManager pluginManager = getPluginManager();
       if ( pluginManager != null ) {
         IContentGenerator contentGenerator = null;
         try {
@@ -181,10 +182,7 @@ public class SolutionUrlContentGenerator extends BaseContentGenerator {
 
     // TODO support cache control settings
 
-    IUnifiedRepository repo = PentahoSystem.get( IUnifiedRepository.class, null );
-    RepositoryFile file = repo.getFile( urlPath, false );
-    InputStream in = new RepositoryFileInputStream( file );
-
+    InputStream in = createRepositoryFileInputStream( urlPath );
     if ( in == null ) {
       error( Messages.getErrorString( "SolutionUrlContentGenerator.ERROR_0003_RESOURCE_NOT_FOUND", urlPath ) ); //$NON-NLS-1$
       return;
@@ -206,6 +204,23 @@ public class SolutionUrlContentGenerator extends BaseContentGenerator {
   @Override
   public Log getLogger() {
     return LogFactory.getLog( SolutionUrlContentGenerator.class );
+  }
+
+  /**
+   * package-local visibility for testing purposes
+   */
+  RepositoryFileInputStream createRepositoryFileInputStream( String urlPath ) throws FileNotFoundException {
+    IUnifiedRepository repo = PentahoSystem.get( IUnifiedRepository.class, null );
+    RepositoryFile file = repo.getFile( urlPath, false );
+    RepositoryFileInputStream in = new RepositoryFileInputStream( file );
+    return in;
+  }
+
+  /**
+   * package-local visibility for testing purposes
+   */
+  IPluginManager getPluginManager() {
+    return PentahoSystem.get( IPluginManager.class, userSession );
   }
 
 }

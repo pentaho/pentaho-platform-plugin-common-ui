@@ -19,23 +19,24 @@ package org.pentaho.common.ui.services;
 
 import java.io.File;
 
-import org.pentaho.common.ui.services.LocalizationService;
+import junit.framework.TestCase;
+
 import org.pentaho.platform.api.engine.IPluginResourceLoader;
 import org.pentaho.platform.api.engine.ObjectFactoryException;
 import org.pentaho.platform.plugin.services.pluginmgr.PluginClassLoader;
 import org.pentaho.platform.plugin.services.pluginmgr.PluginResourceLoader;
 import org.pentaho.test.platform.engine.core.MicroPlatform;
 
-import junit.framework.TestCase;
-
-@SuppressWarnings( "nls" )
 public class LocalizationServiceIT extends TestCase {
 
-  MicroPlatform mp;
+  private MicroPlatform mp;
+  private LocalizationService svc;
 
   public LocalizationServiceIT() throws ClassNotFoundException, ObjectFactoryException {
     mp = new MicroPlatform( "" );
     mp.define( IPluginResourceLoader.class, TstPluginResourceLoader.class );
+
+    svc = new LocalizationService();
   }
 
   public static class TstPluginResourceLoader extends PluginResourceLoader {
@@ -46,16 +47,15 @@ public class LocalizationServiceIT extends TestCase {
     }
   };
 
-  public void testLocalizationService() {
-
-    LocalizationService svc = new LocalizationService();
-
+  public void testGetJSONBundle() {
     String json = svc.getJSONBundle();
-
     assertNotNull( json );
-    System.out.println( json );
-    assertEquals( "{\"", json.substring( 0, 2 ) );
-
+    assertEquals( "{\"messagebundleid\":\"commons-ui\"}", json );
   }
 
+  public void testGetHelpJSONBundle() {
+    String json = svc.getHelpJSONBundle();
+    assertNotNull( json );
+    assertEquals( "{\"messagebundleid\":\"commons-ui\"}", json );
+  }
 }

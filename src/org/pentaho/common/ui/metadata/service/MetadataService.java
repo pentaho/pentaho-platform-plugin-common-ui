@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
@@ -43,7 +44,6 @@ import org.pentaho.platform.engine.core.system.PentahoSystem;
 import org.pentaho.platform.plugin.action.pentahometadata.MetadataQueryComponent;
 import org.pentaho.platform.util.messages.LocaleHelper;
 import org.pentaho.pms.core.exception.PentahoMetadataException;
-import org.apache.commons.lang.StringUtils;
 
 import flexjson.JSONSerializer;
 
@@ -59,6 +59,10 @@ public class MetadataService extends PentahoBase {
   private static final long serialVersionUID = 8481450224870463494L;
 
   private Log logger = LogFactory.getLog( MetadataService.class );
+
+  private MetadataServiceUtil util = new MetadataServiceUtil();
+  private MetadataServiceUtil2 util2 = new MetadataServiceUtil2();
+  private QueryXmlHelper helper = new QueryXmlHelper();
 
   public MetadataService() {
     setLoggingLevel( ILogger.ERROR );
@@ -88,7 +92,7 @@ public class MetadataService extends PentahoBase {
     try {
       if ( StringUtils.isEmpty( domainName ) ) {
         // if no domain has been specified, loop over all of them
-        for ( String domain : getMetadataRepository().getDomainIds() ) {
+        for ( String domain : repo.getDomainIds() ) {
           getModelInfos( domain, context, models );
         }
       } else {
@@ -210,7 +214,7 @@ public class MetadataService extends PentahoBase {
     }
 
     // create the thin metadata model and return it
-    MetadataServiceUtil util = new MetadataServiceUtil();
+    MetadataServiceUtil util = getMetadataServiceUtil();
     util.setDomain( domain );
     Model thinModel = util.createThinModel( model, domainId );
     return thinModel;
@@ -243,9 +247,9 @@ public class MetadataService extends PentahoBase {
    */
   public MarshallableResultSet doQuery( Query query, Integer rowLimit ) {
 
-    MetadataServiceUtil util = new MetadataServiceUtil();
+    MetadataServiceUtil util = getMetadataServiceUtil();
     org.pentaho.metadata.query.model.Query fullQuery = util.convertQuery( query );
-    QueryXmlHelper helper = new QueryXmlHelper();
+    QueryXmlHelper helper = getHelper();
     String xml = helper.toXML( fullQuery );
     return doXmlQuery( xml, rowLimit );
   }
@@ -299,7 +303,7 @@ public class MetadataService extends PentahoBase {
     }
     String json = null;
     try {
-      MetadataServiceUtil2 util = new MetadataServiceUtil2();
+      MetadataServiceUtil2 util = getMetadataServiceUtil2();
       Domain domain = util.getDomainObject( xml );
       util.setDomain( domain );
       String locale = LocaleHelper.getClosestLocale( LocaleHelper.getLocale().toString(), domain.getLocaleCodes() );
@@ -381,14 +385,14 @@ public class MetadataService extends PentahoBase {
    * @return
    */
   protected String getQueryXmlFromJson( String json ) {
-    MetadataServiceUtil util = new MetadataServiceUtil();
+    MetadataServiceUtil util = getMetadataServiceUtil();
     Query query = util.deserializeJsonQuery( json );
     try {
       // convert the thin query model into a full one
       org.pentaho.metadata.query.model.Query fullQuery = util.convertQuery( query );
 
       // get the XML for the query
-      QueryXmlHelper helper = new QueryXmlHelper();
+      QueryXmlHelper helper = getHelper();
       String xml = helper.toXML( fullQuery );
       return xml;
     } catch ( Exception e ) {
@@ -414,5 +418,26 @@ public class MetadataService extends PentahoBase {
   @Override
   public Log getLogger() {
     return logger;
+  }
+
+  /**
+   * package-local visibility for testing purposes
+   */
+  MetadataServiceUtil getMetadataServiceUtil() {
+    return util;
+  }
+
+  /**
+   * package-local visibility for testing purposes
+   */
+  MetadataServiceUtil2 getMetadataServiceUtil2() {
+    return util2;
+  }
+
+  /**
+   * package-local visibility for testing purposes
+   */
+  QueryXmlHelper getHelper() {
+    return helper;
   }
 }

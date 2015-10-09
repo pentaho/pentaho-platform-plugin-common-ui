@@ -17,20 +17,35 @@
 
 package org.pentaho.common.ui.metadata.service;
 
-import flexjson.JSONDeserializer;
-import flexjson.JSONSerializer;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.io.IOUtils;
 import org.jmock.Mockery;
 import org.jmock.integration.junit4.JUnit4Mockery;
 import org.json.JSONException;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.Ignore;
 import org.pentaho.common.ui.metadata.model.IColumn;
 import org.pentaho.common.ui.metadata.model.Operator;
-import org.pentaho.common.ui.metadata.model.impl.*;
-import org.pentaho.common.ui.metadata.service.MetadataService;
-import org.pentaho.common.ui.metadata.service.MetadataServiceUtil;
+import org.pentaho.common.ui.metadata.model.impl.Category;
+import org.pentaho.common.ui.metadata.model.impl.Column;
+import org.pentaho.common.ui.metadata.model.impl.Condition;
+import org.pentaho.common.ui.metadata.model.impl.Model;
+import org.pentaho.common.ui.metadata.model.impl.ModelInfo;
+import org.pentaho.common.ui.metadata.model.impl.Order;
+import org.pentaho.common.ui.metadata.model.impl.Parameter;
+import org.pentaho.common.ui.metadata.model.impl.Query;
 import org.pentaho.commons.connection.marshal.MarshallableResultSet;
 import org.pentaho.di.core.exception.KettleException;
 import org.pentaho.metadata.model.Domain;
@@ -61,14 +76,8 @@ import org.pentaho.platform.repository2.unified.fs.FileSystemBackedUnifiedReposi
 import org.pentaho.pms.core.exception.PentahoMetadataException;
 import org.pentaho.test.platform.engine.core.MicroPlatform;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.junit.Assert.*;
+import flexjson.JSONDeserializer;
+import flexjson.JSONSerializer;
 
 @SuppressWarnings( { "all" } )
 public class MetadataServiceIT {
@@ -135,7 +144,7 @@ public class MetadataServiceIT {
     return domain;
   }
 
-  @Ignore
+  @Test
   public void testCondition2() throws KettleException {
 
     StandaloneSession session = new StandaloneSession();
@@ -480,7 +489,7 @@ public class MetadataServiceIT {
     assertEquals( domain, util.getDomain() );
   }
 
-  @Ignore
+  @Test
   public void testQuery() throws KettleException {
 
     StandaloneSession session = new StandaloneSession();
@@ -504,7 +513,7 @@ public class MetadataServiceIT {
 
   }
 
-  @Ignore
+  @Test
   public void testQuery2() throws KettleException {
 
     StandaloneSession session = new StandaloneSession();
@@ -530,7 +539,7 @@ public class MetadataServiceIT {
 
   }
 
-  @Ignore
+  @Test
   public void testQuery3() throws KettleException {
 
     StandaloneSession session = new StandaloneSession();
@@ -567,7 +576,7 @@ public class MetadataServiceIT {
 
   }
 
-  @Ignore
+  @Test
   public void testJsonQuery() throws KettleException {
 
     StandaloneSession session = new StandaloneSession();
@@ -652,7 +661,7 @@ public class MetadataServiceIT {
     return query;
   }
 
-  @Ignore
+  @Test
   public void testXmlQuery1() throws KettleException {
 
     StandaloneSession session = new StandaloneSession();
@@ -676,7 +685,7 @@ public class MetadataServiceIT {
 
   }
 
-  @Ignore
+  @Test
   public void testXmlQuery2() throws KettleException {
 
     StandaloneSession session = new StandaloneSession();
@@ -707,7 +716,7 @@ public class MetadataServiceIT {
     assertNull( "results are not null", results );
   }
 
-  @Ignore
+  @Test
   public void testXmlQueryToJson1() throws KettleException {
 
     StandaloneSession session = new StandaloneSession();
@@ -726,7 +735,7 @@ public class MetadataServiceIT {
     assertTrue( "wrong value", json.indexOf( "Classic Cars" ) != -1 );
   }
 
-  @Ignore
+  @Test
   public void testJsonQueryToJson1() throws KettleException {
 
     StandaloneSession session = new StandaloneSession();
@@ -786,7 +795,7 @@ public class MetadataServiceIT {
 
   }
 
-  @Ignore
+  @Test
   public void testXmlQueryToCdaJson1() throws KettleException {
 
     StandaloneSession session = new StandaloneSession();
@@ -820,7 +829,7 @@ public class MetadataServiceIT {
     assertNull( "results are not null", json );
   }
 
-  @Ignore
+  @Test
   public void testJsonQueryToCdaJson1() throws KettleException {
 
     StandaloneSession session = new StandaloneSession();
@@ -950,7 +959,7 @@ public class MetadataServiceIT {
     assertNull( "model should be null", model );
   }
 
-  @Ignore
+  @Test
   public void testGetModelJson() {
     StandaloneSession session = new StandaloneSession();
     PentahoSessionHolder.setSession( session );
