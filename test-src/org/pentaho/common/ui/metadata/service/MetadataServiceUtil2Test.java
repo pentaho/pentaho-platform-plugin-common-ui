@@ -177,7 +177,7 @@ public class MetadataServiceUtil2Test {
     String columnId = "my_test_column_id";
     LogicalModel logicalModel = mock( LogicalModel.class );
 
-    doReturn( Collections.<Category> emptyList() ).when( logicalModel ).getCategories();
+    doReturn( Collections.<Category>emptyList() ).when( logicalModel ).getCategories();
     Category result = spyMetadataServiceUtil.getCategory( columnId, logicalModel );
     assertNull( result );
 

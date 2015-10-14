@@ -1072,7 +1072,7 @@ public class MetadataServiceIT {
     Object result = new JSONDeserializer().deserialize( json );
     List<ModelInfo> modelList = new JSONDeserializer<List<ModelInfo>>().deserialize( json );
 
-    ModelInfo models[] = modelList.toArray( new ModelInfo[modelList.size()] );
+    ModelInfo[] models = modelList.toArray( new ModelInfo[modelList.size()] );
 
     assertNotNull( models );
     assertTrue( "Wrong nuber of models returned", models.length > 2 );

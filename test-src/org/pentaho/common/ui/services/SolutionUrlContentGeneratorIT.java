@@ -17,12 +17,27 @@
 
 package org.pentaho.common.ui.services;
 
-import org.junit.Before;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.OutputStream;
+import java.security.InvalidParameterException;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.pentaho.common.ui.messages.Messages;
-import org.pentaho.common.ui.services.SolutionUrlContentGenerator;
-import org.pentaho.platform.api.engine.*;
+import org.pentaho.platform.api.engine.IOutputHandler;
+import org.pentaho.platform.api.engine.IParameterProvider;
+import org.pentaho.platform.api.engine.IPentahoDefinableObjectFactory;
+import org.pentaho.platform.api.engine.IPluginManager;
+import org.pentaho.platform.api.engine.IPluginProvider;
+import org.pentaho.platform.api.engine.ISolutionEngine;
 import org.pentaho.platform.api.repository.IContentItem;
 import org.pentaho.platform.api.repository2.unified.IUnifiedRepository;
 import org.pentaho.platform.engine.core.output.SimpleOutputHandler;
@@ -34,15 +49,6 @@ import org.pentaho.platform.plugin.services.pluginmgr.FileSystemXmlPluginProvide
 import org.pentaho.platform.plugin.services.pluginmgr.PluginAdapter;
 import org.pentaho.platform.repository2.unified.fs.FileSystemBackedUnifiedRepository;
 import org.pentaho.test.platform.engine.core.MicroPlatform;
-
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.OutputStream;
-import java.security.InvalidParameterException;
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.junit.Assert.*;
 
 @SuppressWarnings( { "all" } )
 public class SolutionUrlContentGeneratorIT {

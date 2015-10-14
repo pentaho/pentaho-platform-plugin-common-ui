@@ -17,24 +17,25 @@
 
 package org.pentaho.common.ui.models;
 
-import org.apache.commons.io.FileUtils;
-import org.junit.Before;
-import org.junit.Test;
-import org.pentaho.common.ui.models.PermissionsModel;
-import org.pentaho.common.ui.models.PermissionsModelMapper;
-import org.pentaho.common.ui.models.TreeBrowserMapper;
-import org.pentaho.common.ui.models.TreeBrowserModel;
-import org.pentaho.platform.repository2.unified.webservices.RepositoryFileDto;
-import org.pentaho.platform.repository2.unified.webservices.RepositoryFileTreeDto;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Unmarshaller;
 import java.io.File;
 import java.io.StringReader;
 import java.util.List;
 import java.util.Locale;
 
-import static org.junit.Assert.*;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Unmarshaller;
+
+import org.apache.commons.io.FileUtils;
+import org.junit.Before;
+import org.junit.Test;
+import org.pentaho.platform.repository2.unified.webservices.RepositoryFileDto;
+import org.pentaho.platform.repository2.unified.webservices.RepositoryFileTreeDto;
 
 /**
  * @author Rowell Belen
@@ -56,7 +57,7 @@ public class TreeBrowserMapperTest {
   @Test
   public void testConvert() throws Exception {
 
-    File testFile = new File("test-res/data/repositoryFileTree.xml");
+    File testFile = new File( "test-res/data/repositoryFileTree.xml" );
     String repositoryFileTreeXml = FileUtils.readFileToString( testFile );
 
     RepositoryFileTreeDto repositoryFileTreeDto = unmarshal( repositoryFileTreeXml );
@@ -71,7 +72,8 @@ public class TreeBrowserMapperTest {
 
     // test with permissions mapper
     treeBrowserMapper.setPermissionsModelMapper( new PermissionsModelMapper() {
-      @Override public PermissionsModel map( TreeBrowserModel treeBrowserModel ) {
+      @Override
+      public PermissionsModel map( TreeBrowserModel treeBrowserModel ) {
         return null;
       }
     } );
@@ -81,7 +83,8 @@ public class TreeBrowserMapperTest {
 
     // test with permissions mapper
     treeBrowserMapper.setPermissionsModelMapper( new PermissionsModelMapper() {
-      @Override public PermissionsModel map( TreeBrowserModel treeBrowserModel ) {
+      @Override
+      public PermissionsModel map( TreeBrowserModel treeBrowserModel ) {
         PermissionsModel permissionsModel = new PermissionsModel();
         if ( treeBrowserModel.getOwner() != null ) { // some random logic
           permissionsModel.setRead( true );
@@ -128,8 +131,8 @@ public class TreeBrowserMapperTest {
 
     // Verify localized name
     String localizedName =
-      treeBrowserMapper
-        .getLocalizedName( Locale.getDefault(), repositoryFileDto, "file.title", repositoryFileDto.getName() );
+        treeBrowserMapper.getLocalizedName( Locale.getDefault(), repositoryFileDto, "file.title", repositoryFileDto
+            .getName() );
     assertEquals( localizedName, treeBrowserModel.getLocalizedName() );
 
     // May need a better way to validate this
@@ -139,7 +142,6 @@ public class TreeBrowserMapperTest {
     assertNotNull( permissionsModel.isWrite() );
     assertNotNull( permissionsModel.isExecute() );
   }
-
 
   private RepositoryFileTreeDto unmarshal( final String xml ) throws Exception {
 

@@ -17,7 +17,6 @@
 
 package org.pentaho.common.ui.metadata.service;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -85,7 +84,6 @@ public class MetadataService2 extends PentahoBase implements ModelProvider {
    * @param context
    *          Area to check for model visibility
    * @return list of ModelInfo objects representing the available models
-   * @throws IOException
    */
   @Override
   public ModelInfo[] getModelList( String providerId, String domain, String match ) {
