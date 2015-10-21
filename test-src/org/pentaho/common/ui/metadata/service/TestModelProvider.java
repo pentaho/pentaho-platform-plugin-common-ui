@@ -41,8 +41,8 @@ public class TestModelProvider implements ModelProvider {
 
   public static final String PROVIDER_ID = "test provider";
 
-  public final static String GROUP_ID = "test group"; //$NON-NLS-1$
-  public final static String MODEL_ID = "test model id";
+  public static final String GROUP_ID = "test group"; //$NON-NLS-1$
+  public static final String MODEL_ID = "test model id";
 
   private static final TestModelProvider instance = new TestModelProvider();
 
@@ -115,7 +115,7 @@ public class TestModelProvider implements ModelProvider {
 
     Model model = new Model();
 
-    Element elements[] = new Element[3];
+    Element[] elements = new Element[3];
 
     HashMap<String, String> elementCapabilities = new HashMap<String, String>();
     elementCapabilities.put( Element.CAPABILITY_CAN_SEARCH, "false" );
@@ -183,8 +183,8 @@ public class TestModelProvider implements ModelProvider {
 
   public DataTable executeQuery( Query query, int rowLimit ) {
 
-    // find out which stats are being requested
-    Element qColumns[] = query.getElements();
+    // find out which status are being requested
+    Element[] qColumns = query.getElements();
     List<org.pentaho.metadata.datatable.Column> tableColumnList =
         new ArrayList<org.pentaho.metadata.datatable.Column>();
     for ( Element qColumn : qColumns ) {
@@ -194,7 +194,7 @@ public class TestModelProvider implements ModelProvider {
       }
     }
 
-    Cell cells[] = new Cell[tableColumnList.size()];
+    Cell[] cells = new Cell[tableColumnList.size()];
 
     int idx = 0;
     for ( Element element : qColumns ) {
@@ -211,9 +211,9 @@ public class TestModelProvider implements ModelProvider {
     List<Row> rowList = new ArrayList<Row>();
     rowList.add( row );
 
-    org.pentaho.metadata.datatable.Column tableColumns[] =
+    org.pentaho.metadata.datatable.Column[] tableColumns =
         tableColumnList.toArray( new org.pentaho.metadata.datatable.Column[tableColumnList.size()] );
-    Row rows[] = rowList.toArray( new Row[rowList.size()] );
+    Row[] rows = rowList.toArray( new Row[rowList.size()] );
     DataTable dataTable = new DataTable();
     dataTable.setCols( tableColumns );
     dataTable.setRows( rows );

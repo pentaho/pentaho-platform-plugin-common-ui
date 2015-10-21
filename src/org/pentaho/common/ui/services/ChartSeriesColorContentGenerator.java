@@ -68,7 +68,7 @@ public class ChartSeriesColorContentGenerator extends SimpleContentGenerator {
       throw new IllegalStateException( "Unknown chart series color model type: " + type );
     }
 
-    IPluginResourceLoader resLoader = PentahoSystem.get( IPluginResourceLoader.class, null );
+    IPluginResourceLoader resLoader = getPluginResourceLoader();
     String json = null;
     try {
       json =
@@ -92,4 +92,12 @@ public class ChartSeriesColorContentGenerator extends SimpleContentGenerator {
   public Log getLogger() {
     return logger;
   }
+
+  /**
+   * package-local visibility for testing purposes
+   */
+  IPluginResourceLoader getPluginResourceLoader() {
+    return PentahoSystem.get( IPluginResourceLoader.class, null );
+  }
+
 }

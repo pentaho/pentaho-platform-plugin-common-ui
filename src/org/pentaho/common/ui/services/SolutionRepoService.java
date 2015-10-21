@@ -18,16 +18,14 @@
 
 package org.pentaho.common.ui.services;
 
+import java.net.URLDecoder;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.pentaho.common.ui.messages.Messages;
-import org.pentaho.platform.api.engine.IPentahoSession;
 import org.pentaho.platform.engine.core.solution.ActionInfo;
 import org.pentaho.platform.engine.core.system.PentahoBase;
-import org.pentaho.platform.engine.core.system.PentahoSessionHolder;
-
-import java.net.URLDecoder;
 
 /**
  * Saves state to the solution repository. This content generator requires the following parameters: filepath - the path
@@ -95,8 +93,9 @@ public class SolutionRepoService extends PentahoBase {
       return result;
     }
 
-    IPentahoSession userSession = PentahoSessionHolder.getSession();
     /*
+     * IPentahoSession userSession = PentahoSessionHolder.getSession();
+     * 
      * 
      * // Leaving this commented out so that when we do port it to IUnifiedRepository we still have the business logic.
      * 
@@ -162,8 +161,9 @@ public class SolutionRepoService extends PentahoBase {
       return result;
     }
 
-    IPentahoSession userSession = PentahoSessionHolder.getSession();
     /*
+     * IPentahoSession userSession = PentahoSessionHolder.getSession();
+     * 
      * 
      * // Leaving this commented out so that when we do port it to IUnifiedRepository we still have the business logic.
      * 

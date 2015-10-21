@@ -17,9 +17,6 @@
 
 package org.pentaho.common.ui.services;
 
-import org.pentaho.common.ui.services.Setting;
-import org.pentaho.common.ui.services.UserSettingService;
-import org.pentaho.platform.api.engine.ISystemSettings;
 import org.pentaho.platform.api.usersettings.IUserSettingService;
 import org.pentaho.platform.engine.core.system.PentahoSessionHolder;
 import org.pentaho.platform.engine.core.system.PentahoSystem;
@@ -54,7 +51,7 @@ public class UserSettingServiceIT extends BaseTest {
     assertTrue( json.indexOf( "\"class\":\"org.pentaho.common.ui.services.StatusMessage\"" ) != -1 );
 
     // this should return an error
-    Setting settings[] = svc.getUserSettings( "bogus" );
+    Setting[] settings = svc.getUserSettings( "bogus" );
     assertTrue( settings != null );
     assertEquals( 0, settings.length );
     json = svc.getUserSettingsJson( "bogus" );

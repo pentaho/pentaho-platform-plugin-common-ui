@@ -1,22 +1,20 @@
 package org.pentaho.common.ui.models;
 
-import org.apache.commons.io.FileUtils;
-import org.junit.Before;
-import org.junit.Test;
-import org.pentaho.common.ui.models.TreeBrowserMapper;
-import org.pentaho.common.ui.models.TreeBrowserModel;
-import org.pentaho.common.ui.models.TreeBrowserModelUtils;
-import org.pentaho.platform.repository2.unified.webservices.RepositoryFileDto;
-import org.pentaho.platform.repository2.unified.webservices.RepositoryFileTreeDto;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Unmarshaller;
 import java.io.File;
 import java.io.StringReader;
 import java.util.Locale;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Unmarshaller;
+
+import org.apache.commons.io.FileUtils;
+import org.junit.Before;
+import org.junit.Test;
+import org.pentaho.platform.repository2.unified.webservices.RepositoryFileDto;
+import org.pentaho.platform.repository2.unified.webservices.RepositoryFileTreeDto;
 
 /**
  * @author Rowell Belen
@@ -44,7 +42,8 @@ public class TreeBrowserModelUtilsTest {
 
     // check each node
     TreeBrowserModelUtils.traverse( repositoryFileTreeDto, new TreeBrowserModelUtils.RepositoryFileDtoVisitor() {
-      @Override public void visit( RepositoryFileDto repositoryFileDto ) {
+      @Override
+      public void visit( RepositoryFileDto repositoryFileDto ) {
         assertNotNull( repositoryFileDto );
       }
     } );
@@ -53,7 +52,8 @@ public class TreeBrowserModelUtilsTest {
     TreeBrowserModelUtils.traverse( null, (TreeBrowserModelUtils.RepositoryFileDtoVisitor) null );
     TreeBrowserModelUtils.traverse( repositoryFileTreeDto, null );
     TreeBrowserModelUtils.traverse( null, new TreeBrowserModelUtils.RepositoryFileDtoVisitor() {
-      @Override public void visit( RepositoryFileDto repositoryFileDto ) {
+      @Override
+      public void visit( RepositoryFileDto repositoryFileDto ) {
         assertNotNull( repositoryFileDto );
       }
     } );
@@ -62,18 +62,19 @@ public class TreeBrowserModelUtilsTest {
     RepositoryFileTreeDto mockRepositoryFileTreeDto = new RepositoryFileTreeDto();
     mockRepositoryFileTreeDto.setChildren( null );
     TreeBrowserModelUtils.traverse( new RepositoryFileTreeDto(), new TreeBrowserModelUtils.RepositoryFileDtoVisitor() {
-      @Override public void visit( RepositoryFileDto repositoryFileDto ) {
+      @Override
+      public void visit( RepositoryFileDto repositoryFileDto ) {
         assertNull( repositoryFileDto );
       }
     } );
-
 
     TreeBrowserModel treeBrowserModel = treeBrowserMapper.convert( repositoryFileTreeDto );
     assertNotNull( treeBrowserModel );
 
     // check each node
     TreeBrowserModelUtils.traverse( treeBrowserModel, new TreeBrowserModelUtils.TreeBrowserModelVisitor() {
-      @Override public void visit( TreeBrowserModel treeBrowserModel ) {
+      @Override
+      public void visit( TreeBrowserModel treeBrowserModel ) {
         assertNotNull( treeBrowserModel );
       }
     } );
@@ -82,7 +83,8 @@ public class TreeBrowserModelUtilsTest {
     TreeBrowserModelUtils.traverse( null, (TreeBrowserModelUtils.TreeBrowserModelVisitor) null );
     TreeBrowserModelUtils.traverse( treeBrowserModel, null );
     TreeBrowserModelUtils.traverse( null, new TreeBrowserModelUtils.TreeBrowserModelVisitor() {
-      @Override public void visit( TreeBrowserModel treeBrowserModel ) {
+      @Override
+      public void visit( TreeBrowserModel treeBrowserModel ) {
         assertNotNull( treeBrowserModel );
       }
     } );
@@ -91,7 +93,8 @@ public class TreeBrowserModelUtilsTest {
     TreeBrowserModel mockTreeBrowserModel = new TreeBrowserModel();
     mockTreeBrowserModel.setChildren( null );
     TreeBrowserModelUtils.traverse( mockTreeBrowserModel, new TreeBrowserModelUtils.TreeBrowserModelVisitor() {
-      @Override public void visit( TreeBrowserModel treeBrowserModel ) {
+      @Override
+      public void visit( TreeBrowserModel treeBrowserModel ) {
         assertNotNull( treeBrowserModel );
       }
     } );

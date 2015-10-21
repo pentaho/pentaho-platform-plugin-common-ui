@@ -24,7 +24,6 @@ import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.pentaho.common.ui.services.ChartSeriesColorContentGenerator;
 import org.pentaho.platform.api.engine.IParameterProvider;
 import org.pentaho.platform.api.engine.IPluginResourceLoader;
 import org.pentaho.platform.api.engine.ObjectFactoryException;

@@ -280,7 +280,7 @@ public class MetadataServiceUtil2 extends PentahoBase {
   }
 
   /**
-   * Returns the full domain obejct for a XML MQL query
+   * Returns the full domain object for a XML MQL query
    * 
    * @param query
    * @return
@@ -288,8 +288,7 @@ public class MetadataServiceUtil2 extends PentahoBase {
    */
   public org.pentaho.metadata.model.Domain getDomainObject( String query ) throws PentahoMetadataException {
     QueryXmlHelper helper = new QueryXmlHelper();
-    IMetadataDomainRepository domainRepository =
-        PentahoSystem.get( IMetadataDomainRepository.class, PentahoSessionHolder.getSession() );
+    IMetadataDomainRepository domainRepository = getDomainRepository();
     org.pentaho.metadata.query.model.Query fatQuery = helper.fromXML( domainRepository, query );
     return fatQuery.getDomain();
   }
@@ -302,15 +301,13 @@ public class MetadataServiceUtil2 extends PentahoBase {
    */
   public org.pentaho.metadata.query.model.Query convertQuery( Query src, ModelInfo info ) {
 
-    IMetadataDomainRepository domainRepository =
-        PentahoSystem.get( IMetadataDomainRepository.class, PentahoSessionHolder.getSession() );
+    IMetadataDomainRepository domainRepository = getDomainRepository();
 
     Domain fullDomain = domainRepository.getDomain( info.getGroupId() );
     LogicalModel logicalModel = fullDomain.findLogicalModel( info.getModelId() );
 
     // create a new full query object
-    org.pentaho.metadata.query.model.Query dest =
-       new org.pentaho.metadata.query.model.Query( fullDomain, logicalModel );
+    org.pentaho.metadata.query.model.Query dest = new org.pentaho.metadata.query.model.Query( fullDomain, logicalModel );
 
     // now add the selections
     List<Selection> selections = dest.getSelections();
@@ -413,4 +410,10 @@ public class MetadataServiceUtil2 extends PentahoBase {
     return logger;
   }
 
+  /**
+   * package-local visibility for testing purposes
+   */
+  IMetadataDomainRepository getDomainRepository() {
+    return PentahoSystem.get( IMetadataDomainRepository.class, PentahoSessionHolder.getSession() );
+  }
 }

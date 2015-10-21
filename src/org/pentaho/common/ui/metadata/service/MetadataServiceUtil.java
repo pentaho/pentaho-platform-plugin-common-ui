@@ -46,8 +46,8 @@ import org.pentaho.metadata.model.concept.types.FieldType;
 import org.pentaho.metadata.model.concept.types.LocalizedString;
 import org.pentaho.metadata.query.model.CombinationType;
 import org.pentaho.metadata.query.model.Constraint;
-import org.pentaho.metadata.query.model.Selection;
 import org.pentaho.metadata.query.model.Order.Type;
+import org.pentaho.metadata.query.model.Selection;
 import org.pentaho.metadata.query.model.util.QueryXmlHelper;
 import org.pentaho.metadata.repository.IMetadataDomainRepository;
 import org.pentaho.platform.engine.core.system.PentahoBase;
@@ -288,8 +288,7 @@ public class MetadataServiceUtil extends PentahoBase {
    */
   public org.pentaho.metadata.model.Domain getDomainObject( String query ) throws PentahoMetadataException {
     QueryXmlHelper helper = new QueryXmlHelper();
-    IMetadataDomainRepository domainRepository =
-        PentahoSystem.get( IMetadataDomainRepository.class, PentahoSessionHolder.getSession() );
+    IMetadataDomainRepository domainRepository = getDomainRepository();
     org.pentaho.metadata.query.model.Query fatQuery = helper.fromXML( domainRepository, query );
     return fatQuery.getDomain();
   }
@@ -302,15 +301,13 @@ public class MetadataServiceUtil extends PentahoBase {
    */
   public org.pentaho.metadata.query.model.Query convertQuery( Query src ) {
 
-    IMetadataDomainRepository domainRepository =
-        PentahoSystem.get( IMetadataDomainRepository.class, PentahoSessionHolder.getSession() );
+    IMetadataDomainRepository domainRepository = getDomainRepository();
 
     Domain fullDomain = domainRepository.getDomain( src.getDomainName() );
     LogicalModel logicalModel = fullDomain.findLogicalModel( src.getModelId() );
 
     // create a new full query object
-    org.pentaho.metadata.query.model.Query dest =
-       new org.pentaho.metadata.query.model.Query( fullDomain, logicalModel );
+    org.pentaho.metadata.query.model.Query dest = new org.pentaho.metadata.query.model.Query( fullDomain, logicalModel );
 
     // now add the selections
     List<Selection> selections = dest.getSelections();
@@ -411,6 +408,13 @@ public class MetadataServiceUtil extends PentahoBase {
   @Override
   public Log getLogger() {
     return logger;
+  }
+
+  /**
+   * package-local visibility for testing purposes
+   */
+  IMetadataDomainRepository getDomainRepository() {
+    return PentahoSystem.get( IMetadataDomainRepository.class, PentahoSessionHolder.getSession() );
   }
 
 }
