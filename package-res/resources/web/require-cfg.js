@@ -17,3 +17,17 @@
 
 // Included by webcontext.js to configure the RequireJS system
 require.config(requireCfg);
+
+pen = typeof pen != "undefined" ? pen : {};
+pen.require = function() {
+  if(typeof console !== "undefined" && console.warn) {
+    console.warn("'pen.require' is deprecated and will be removed in a future version. Use 'require' instead.");
+  }
+  return require.apply(null, arguments);
+};
+pen.define = function() {
+  if(typeof console !== "undefined" && console.warn) {
+    console.warn("'pen.define' is deprecated and will be removed in a future version. Use 'define' instead.");
+  }
+  return define.apply(null, arguments);
+};
