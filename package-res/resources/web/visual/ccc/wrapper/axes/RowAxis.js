@@ -18,12 +18,6 @@ define([
 ], function(DiscreteAxis) {
 
     return DiscreteAxis.extend({
-        init: function(chart) {
-
-            this.base(chart, 'row');
-
-            this._ensureRole(this.defaultRole);
-        },
         methods: {
             defaultRole: 'rows'
         }

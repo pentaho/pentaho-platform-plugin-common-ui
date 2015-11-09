@@ -598,8 +598,8 @@ define(["require", "es6-promise-shim"], function(require) {
         count     = colorBy.value.length,
         isMeasure = count > 0 && (colorBy.value[0].type === "number");
 
-    // == 1 continuous data property
-    // >= 0 discrete data properties
+    // == 1 continuous data attribute
+    // >= 0 discrete data attributes
     colorBy.allowMultiple = !isMeasure; // !count || !isMeasure ; !count => !isMeasure
 
     // Show/hide color options

@@ -26,7 +26,7 @@
  * that represents major data-bound visual functions.
  * Common visual roles are "Series", "X-axis", "Color-By", "Size-By", etc.
  *
- * The value of these requirements are names of data properties (Gems)
+ * The value of these requirements are names of data attributes (Gems)
  * that will play that role.
  *
  * Pentaho Analyzer shows these in the "Layout" panel.
@@ -40,7 +40,7 @@
 
 /**
  * The data table structure where
- * data properties bound to a visual role requirement
+ * data attributes bound to a visual role requirement
  * are encoded.
  *
  * A non-empty value identifies a visual role requirement.
@@ -50,8 +50,8 @@
  * * `"column"`.
  *
  * Usually,
- * `"row"` is used for discrete data properties and
- * `"column"` for continuous data properties.
+ * `"row"` is used for discrete data attributes and
+ * `"column"` for continuous data attributes.
  *
  * @property dataStructure
  * @type string
@@ -61,7 +61,7 @@
 
 /**
  * The name or names of the data types
- * _that data properties_ (gems) must have,
+ * _that data attributes_ (gems) must have,
  * to be bindable to the visual role.
  *
  * The supported values are:
@@ -72,7 +72,7 @@
  * these should be provided as a comma-separated string,
  * like, for example, `"number, string"`.
  *
- * See {{#crossLink "IDataModelProperty/type:property"}}IDataModelProperty type{{/crossLink}}.
+ * See {{#crossLink "IDataAttribute/type:property"}}IDataAttribute type{{/crossLink}}.
  *
  * @property dataType
  * @type string
@@ -82,7 +82,7 @@
 
 /**
  * Indicates if a visual role requirement supports
- * multiple data properties.
+ * multiple data attributes.
  *
  * Specifying this option with value `false` is equivalent to
  * specifying {{#crossLink "IVisualRoleRequirement/maxOccur:property"}}{{/crossLink}}
@@ -98,7 +98,7 @@
  */
 
 /**
- * The maximum number of data properties that a
+ * The maximum number of data attributes that a
  * visual role requirement supports.
  *
  * A number greater than or equal to `1`.
@@ -115,7 +115,7 @@
 /**
  * Indicates if a requirement is, actually, _required_.
  *
- * The visual role must be bound to at least one data property.
+ * The visual role must be bound to at least one data attribute.
  *
  * Specifying this option with value `true` is equivalent to
  * specifying {{#crossLink "IVisualRoleRequirement/minOccur:property"}}{{/crossLink}}
@@ -131,7 +131,7 @@
  */
 
 /**
- * The minimum number of data properties that a visual role requirement must be bound to.
+ * The minimum number of data attributes that a visual role requirement must be bound to.
  *
  * The most restrictive (maximum of occurrence limits) between
  * this property and {{#crossLink "IVisualRoleRequirement/required:property"}}{{/crossLink}} wins.
@@ -158,12 +158,12 @@
  * This property is only significant when the requirement is obtained via
  * {{#crossLink "IVisualEditModel/byId:method"}}{{/crossLink}}.
  *
- * The `value` property contains the requirement's _currently_ bound data model properties.
+ * The `value` property contains the requirement's _currently_ bound data model attributes.
  *
  * This property always returns an array, possibly empty.
  *
  * NOTE: The visual role value in a {{#crossLink "IVisualSpec"}}visual specification{{/crossLink}}
- * is not an array of data property objects, but one of their names only.
+ * is not an array of data attribute objects, but one of their names only.
  * So, for example, in a visual specification,
  * the value of a requirement with id `"colors"` could be:
  *
@@ -174,7 +174,7 @@
  *     }
  *
  * @property value
- * @type IDataModelProperty[]
+ * @type IDataAttribute[]
  * @optional
  * @default []
  */

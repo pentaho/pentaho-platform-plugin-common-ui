@@ -15,11 +15,17 @@
  */
 
 /**
- * Pentaho JavaScript Visual/Data APIs.
+ * @classdesc The `IMemberSpec` interface describes the structure of an attribute member specification.
  *
- * This module defines interfaces and classes
- * used by the VisualAPI for data representation and manipulatation.
+ * @name pentaho.visual.data.IMemberSpec
+ * @interface
+ * @extends pentaho.visual.data.IAnnotatableSpec
  *
- * @module pentaho.visual.data
- * @main pentaho.visual.data
+ * @property {!pentaho.visual.data.Atomic} v The value that identifies the member.
+ *
+ * @property {string|undefined|null} f The label of the member.
+ *
+ * If `null` is specified, it is instead taken to be `undefined`.
+ *
+ * The default value is `undefined`.
  */

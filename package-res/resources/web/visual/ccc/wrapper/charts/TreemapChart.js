@@ -21,9 +21,9 @@ define([
         methods: {
             _cccClass: 'TreemapChart',
 
-            _rolesToCccDimensionsMap: {
-                'columns':  null,
-                'measures': null,
+            _roleToCccDimGroup: {
+                'multi':    'multiChart',
+                'rows':     'category',
                 'size':     'size'
             },
 
@@ -43,11 +43,11 @@ define([
                 this.options.rootCategoryLabel = this._message('chartTreeMapRootCategoryLabel');
             },
 
-            _getDiscreteColorScale: function() {
+            _getDiscreteColors: function() {
                 // Don't use memberPalette for now
                 // as the given colors don't match the members that
                 // are actually colored in this visual type.
-                return this._getDefaultDiscreteColorScale();
+                return this._getDefaultDiscreteColors();
             }
         }
     });

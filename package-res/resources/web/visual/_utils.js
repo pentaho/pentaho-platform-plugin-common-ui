@@ -19,17 +19,36 @@
 define(["es6-promise-shim"], function() {
 
   var O_hasOwn = Object.prototype.hasOwnProperty;
+  var A_slice = Array.prototype.slice;
+  var canSetProto = !!{}.__proto__;
+  var setBase = canSetProto
+      ? function(o, proto) {
+          o.__proto__ = proto;
+          return o;
+        }
+      : function(o, proto) {
+          var other = Object.create(proto);
+          return extend(other, o);
+        };
+  var dummyProto = DummyBase.prototype;
 
   return {
     O_hasOwn: O_hasOwn,
     O_getOwn: O_getOwn,
+    A_slice:  A_slice,
     O_copyOwnDefined: O_copyOwnDefined,
     O_eachOwnDefined: O_eachOwnDefined,
+    setBase: setBase,
+    setClass: setClass,
     F_true: F_true,
     shallowObjectClone: shallowObjectClone,
+    isSubObject: isSubObject,
     extend:  extend,
+    inherit: inherit,
+    implement: implement,
     compare: compare,
     option:  option,
+    required:  required,
     randomId: randomId,
     promiseCall: promiseCall,
     promiseFinally: promiseFinally,
@@ -56,7 +75,7 @@ define(["es6-promise-shim"], function() {
     var v;
     for(var p in this)
       if(O_hasOwn.call(this, p) && (v = this[p]) !== undefined)
-        fun.call(this, v, p);
+        fun.call(ctx || this, v, p);
     return this;
   }
 
@@ -70,22 +89,6 @@ define(["es6-promise-shim"], function() {
     return v;
   }
 
-  // Copy own full
-  function extend(to, from) {
-    if(from) Object.keys(from).forEach(function(p) {
-      var pd = Object.getOwnPropertyDescriptor(from, p);
-      if(pd.get || pd.set || pd.value !== undefined) {
-        Object.defineProperty(to, p, pd);
-      }
-    });
-    return to;
-  }
-
-  function option(o, p, dv) {
-    var v;
-    return o && (v = o[p]) != null ? v : dv;
-  }
-
   function randomId(prefix) {
     return (prefix == null ? "a" : prefix) +
         "_" + (new Date()).getTime() +
@@ -96,20 +99,91 @@ define(["es6-promise-shim"], function() {
     return true;
   }
 
-  function argRequired(name) {
-    return new Error("Argument required: '" + name + "'.");
+  function compare(a, b) {
+    return (a === b) ? 0 : ((a > b) ? 1 : -1);
+  }
+
+  // INHERITANCE
+
+  // Copy own, full
+  function extend(to, from) {
+    if(from) Object.keys(from).forEach(function(p) {
+      var pd = Object.getOwnPropertyDescriptor(from, p);
+      if(pd.get || pd.set || pd.value !== undefined) {
+        Object.defineProperty(to, p, pd);
+      }
+    });
+    return to;
+  }
+
+  function inherit(Class, Base) {
+    var proto = Class.prototype = Object.create(Base.prototype || Base);
+    proto.constructor = Class;
+
+    var i = 2, L = arguments.length;
+    while(i < L) {
+      var Mix = arguments[i++];
+      extend(proto, Mix.prototype || Mix);
+    }
+
+    return Class;
+  }
+
+  function implement(Class) {
+    var i = 1,
+        L = arguments.length,
+        proto = Class.prototype;
+    while(i < L) {
+      var Mix = arguments[i++];
+      extend(proto, Mix.prototype || Mix);
+    }
+    return Class;
+  }
+
+  function DummyBase() {}
+
+  function isSubObject(o, base) {
+    if(o === base) return true;
+    DummyBase.prototype = base;
+    var result = (o instanceof DummyBase);
+    // Restore prototype to not leak base.
+    DummyBase.prototype = dummyProto;
+    return result;
+  }
+
+  function setClass(inst, Class) {
+    var proto = Class.prototype;
+    if(isSubObject(inst, proto)) return inst;
+    inst = setBase(inst, proto);
+    return Class.apply(inst, A_slice.call(arguments, 2)) || inst;
+  }
+
+  // ARGS
+
+  function option(o, p, dv) {
+    var v;
+    return o && (v = o[p]) != null ? v : dv;
+  }
+
+  function required(o, p, pscope) {
+    var v;
+    if(o && (v = o[p]) != null) return v;
+    throw argRequired((pscope ? (pscope + ".") : "") + p);
+  }
+
+  // ERRORS
+  function argRequired(name, text) {
+    return new Error("Argument required: '" + name + "'." + (text ? (" " + text) : ""));
   }
 
   function argInvalid(name, text) {
-    return new Error("Argument '" + name + "' is invalid." + (text ? (" " + text) : ""));
+    return new Error("Argument invalid: '" + name + "'." + (text ? (" " + text) : ""));
   }
 
-  function compare(a, b) {
-      return (a === b) ? 0 : ((a > b) ? 1 : -1);
-  }
+  // PROMISES and AMD
 
   function promiseCall(fun, ctx) {
-    // Wrapping a call this way,
+    // Wrapping the call of `fun` this way
     // ensures that any sync Error flows to the outer promise.
     return new Promise(function(resolve, reject) {
         Promise

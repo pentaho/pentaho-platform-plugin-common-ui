@@ -14,6 +14,6 @@
 * limitations under the License.
 *
 */
-define(["./_trends", "./trend-linear"], function(trends) {
+define(["./_trends", "./_trend-linear"], function(trends) {
   return trends;
 });

@@ -21,60 +21,14 @@ define([
 ], function(def, pvc, AbstractAxis, util) {
 
     return AbstractAxis.extend({
-        init: function(chart, axisId) {
-
-            this.base(chart, axisId);
-
-            var multiGems = this.gemsByRole[this.chart._multiRole];
-            this.hasMulti = !!multiGems &&
-                def.query(multiGems)
-                   .any(function(gem) { return !gem.isMeasureDiscrim; });
-        },
-        postInit: function() {
-            // Done here just to allow more specific roles to be ensured first
-
-            //this.base.apply(this, arguments);
-
-            if(this.hasMulti) this._ensureRole(this.chart._multiRole);
-        },
         methods: {
             _nonMultiGemFilter: function(gem) {
                 return gem.role !== this.chart._multiRole;
             },
 
-            /**
-             * The union of the ccc dimensions of the roles of this axis.
-             *
-             * CCC dimension names are inferred based on the name of the
-             * dimension group that is assigned to each role (name, name2, name3, ...).
-             */
-            cccDimList: function() {
-                if(!this._cccDimList) {
-                    // One dimension per gem
-                    var cccDimList = this._cccDimList = new Array(this.gems.length);
-
-                    // Unmapped gems may appear
-                    this.gems.forEach(function(gem) {
-                        gem.cccDimName =
-                        cccDimList[gem.index] = this._getGemDimName(gem) || null;
-                    }, this);
-                }
-
-                return this._cccDimList;
-            },
-
-            _getGemDimName: function(gem) {
-                var roleToCccDimMap = this.chart._rolesToCccDimensionsMap,
-                    cccDimGroup = roleToCccDimMap[gem.role];
-
-                if(typeof cccDimGroup === 'string')
-                     return pvc.buildIndexedId(cccDimGroup, gem.roleLevel);
-            },
-
             _isNullMember: function(complex, gem) {
-                var atom = complex.atoms[gem.cccDimName],
-                    value = atom.value;
-                return value == null || util.isNullMember(value);
+                var atom = complex.atoms[gem.cccDimName];
+                return util.isNullMember(atom.value);
             },
 
             _buildGemHtmlTooltip: function(lines, complex, context, gem, index) {
@@ -93,10 +47,6 @@ define([
                 }
             },
 
-            _getAxisLabelGems: function() {
-                return def.query(this.gems).where(this._nonMultiGemFilter, this);
-            },
-
             fillCellSelection: function(selection, complex, selectionExcludesMulti) {
                 var forms  = [],
                     values = [],
@@ -105,7 +55,8 @@ define([
                 this.getSelectionGems(selectionExcludesMulti)
                     .each(function(gem) {
                         var atom = complex.atoms[gem.cccDimName];
-                        forms.push(gem.formula);
+                        forms.push(gem.name);
+
                         // Translate back null member values to the original member value,
                         // which is accessible in rawValue.
                         values.push(atom.value == null ? atom.rawValue : atom.value);
@@ -127,10 +78,8 @@ define([
                 if(selectionExcludesMulti == null) selectionExcludesMulti = true;
 
                 return def.query(this.gems)
-                     .where(function(gem, index) {
-                        return (!selectionExcludesMulti || this._nonMultiGemFilter(gem)) &&
-                               !gem.isMeasureDiscrim &&
-                               !!gem.cccDimName;
+                     .where(function(gem) {
+                        return !gem.isMeasureDiscrim && (!selectionExcludesMulti || this._nonMultiGemFilter(gem));
                      }, this);
             }
         }

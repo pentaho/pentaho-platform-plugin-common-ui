@@ -66,7 +66,7 @@
  * [Analyzer specific]
  * An array of ids of visual-role requirements in order of hyperlink precedence.
  *
- * The first data property of the specified visual roles that has a defined hyperlink
+ * The first data attribute of the specified visual roles that has a defined hyperlink
  * defines the hyperlink target.
  *
  * An array of {{#crossLink "String"}}{{/crossLink}}.

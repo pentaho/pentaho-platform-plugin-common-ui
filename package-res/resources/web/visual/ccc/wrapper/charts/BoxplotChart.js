@@ -21,10 +21,9 @@ define([
         methods: {
             _cccClass: 'BoxplotChart',
 
-            _rolesToCccDimensionsMap: {
-                'columns':     null,
-                //'rows':      'category',
+            _roleToCccDimGroup: {
                 'multi':       'multiChart',
+                'rows':        'category',
                 'measures':    'median',
                 'percentil25': 'percentil25',
                 'percentil75': 'percentil75',
@@ -33,20 +32,19 @@ define([
             },
 
             _options: {
-                extensionPoints: {
-                    boxRuleWhisker_strokeDasharray: '- '
-                }
-            },
-
+                boxRuleWhisker_strokeDasharray: '- '
+            }
+            /*
             _readData: function() {
-                // The boxplot data passes-trough, as is.
+
                 this.base();
 
                 // In CCC, it is read as a custom format (more relational-like)
                 // Where categoriesCount is the number of "category" dimensions,
-                // not including multichart columns...
-                this.options.dataOptions.categoriesCount = this.axes.row.gemsByRole.rows.length;
+                // not including multi-chart columns...
+                this.options.dataCategoriesCount = this.axes.row.gemsByRole.rows.length;
             }
+            */
         }
     });
 });

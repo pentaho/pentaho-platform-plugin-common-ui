@@ -23,12 +23,11 @@ define([
         methods: {
             _cccClass: 'HeatGridChart',
 
-            _rolesToCccDimensionsMap: {
-                'multi': null,
-                //'columns':  'series',
-                //'rows':     'category',
-                'color': 'value',
-                'size':  'value2'
+            _roleToCccDimGroup: {
+                'columns': 'series',
+                'rows':    'category',
+                'color':   'value',
+                'size':    'value2'
             },
 
             _options: {
@@ -61,9 +60,10 @@ define([
 
                 this.base(options);
 
-                var measureCount = this.axes.measure.depth,
-                    catsDepth    = this.axes.row.depth,
-                    sersDepth    = this.axes.column.depth,
+                var measureCount = this._getRoleDepth("size") + this._getRoleDepth("color"),
+                    catsDepth    = this._getRoleDepth("rows"),
+                    sersDepth    = this._getRoleDepth("columns"),
+
                     catsBreadth  = Math.max(1, this._dataTable.getNumberOfRows() - 1),
                     sersBreadth  = this._dataTable.getNumberOfColumns() - catsDepth;
 
@@ -109,14 +109,13 @@ define([
                 options.yAxisSize = yAxisSize;
             },
 
+            // TODO: not true anymore...
             // Ortho axis title is not available on the server, so never show
-           // _getOrthoAxisTitle: function(){
-           //     return this.axes.column.getAxisLabel();
-           // },
+            // _getOrthoAxisTitle: function(){
+            // },
 
-           // _getBaseAxisTitle: function(){
-           //     return this.axes.row.getAxisLabel();
-           // },
+            // _getBaseAxisTitle: function(){
+            // },
 
             _doesSharedSeriesSelection: function() {
                 return false;
@@ -130,8 +129,8 @@ define([
 
                 var data = this._chart.data,
                     // columns are optional in the HG
-                    colDimNames = getAxisCccDimNames(this.axes.column),
-                    rowDimNames = getAxisCccDimNames(this.axes.row),
+                    colDimNames = this._getCccDimNamesOfRole("columns"),
+                    rowDimNames = this._getCccDimNamesOfRole("rows"),
                     nonAdditive = selectedDatums.length === 1 && selectedDatums[0].isSelected;
 
                 return nonAdditive ? getSelectedDatumsNonAdditive() : getSelectedDatumsAdditive();
@@ -209,12 +208,6 @@ define([
 
                     return data
                         .datums(whereSpec, {visible: true})
-                        .array();
-                }
-
-                function getAxisCccDimNames(axis) {
-                    return axis.getSelectionGems()
-                        .select(function(gem) { return gem.cccDimName; })
                         .array();
                 }
 

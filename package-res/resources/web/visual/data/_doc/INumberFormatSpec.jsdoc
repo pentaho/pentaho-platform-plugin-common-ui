@@ -1,0 +1,59 @@
+/*!
+ * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * @classdesc The `INumberFormatSpec` interface contains all of the information required to
+ * format a number value.
+ *
+ * This interface is used to form a
+ * {@link pentaho.visual.data.IFormatProviderSpec} specification.
+ *
+ * A _number format_ describes how to format numbers by using a formatting mask.
+ * The mask syntax is mostly compatible with VB's <i>format()</i> function mask syntax.
+ * See {@link http://apostate.com/programming/vb-format-syntax.html}
+ * for more information on the mask syntax (only the number related subset is relevant).
+ *
+ * @example <caption>A sample number format specification</caption>
+ *
+ *     var numberFormatSpec = {
+ *       mask:  "#,0.00 A¤",
+ *       style: {
+ *         integerPad:    "0",
+ *         fractionPad:   "0",
+ *         decimal:       ",",
+ *         group:         " ",
+ *         groupSizes:    [3],
+ *         abbreviations: ["K", "M", "B", "T"],
+ *         negativeSign:  "-",
+ *         currency:      "€"
+ *       }
+ *     };
+ *
+ * @name pentaho.visual.data.INumberFormatSpec
+ * @interface
+ * @see pentaho.visual.data.IFormatProviderSpec
+ * @see pentaho.visual.data.AtomicTypeName.NUMBER
+ *
+ * @property {string} mask The formatting mask.
+ *
+ * When the mask is `""`, numbers are formatted like JavaScript's `toString()` would.
+ *
+ * The default value is `""`.
+ *
+ * @property {pentaho.visual.data.INumberFormatStyleSpec} style The number format style.
+ *
+ * The default number format style has all of its properties with their default values.
+ */

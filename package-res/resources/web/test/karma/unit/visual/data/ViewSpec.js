@@ -15,8 +15,8 @@
 *
 */
 define([
-  "pentaho/visual/data/DataTable",
-  "pentaho/visual/data/DataView"
+  "pentaho/visual/data/Table",
+  "pentaho/visual/data/View"
 ], function(DataTable, DataView) {
 
   var fooValue = {},
@@ -24,10 +24,10 @@ define([
 
   function getDatasetDT1() {
     return {
-      cols: [
-        {id: "country", type: "string",  label: "Country", foo: fooValue},
-        {id: "sales",   type: "number",  label: "Sales",   bar: barValue},
-        {id: "euro",    type: "boolean", label: "Euro"   }
+      model: [
+        {name: "country", type: "string",  label: "Country", p: {foo: fooValue}},
+        {name: "sales",   type: "number",  label: "Sales",   p: {bar: barValue}},
+        {name: "euro",    type: "boolean", label: "Euro"   }
       ],
       rows: [
         {c: [ {v: "Portugal"}, {v: 12000, f: "1.2"},  true] },
@@ -59,27 +59,24 @@ define([
 
       });
 
-      describe("with one argument, a plain JavaScript object in DataTable format -", function() {
+      it("should return an instance of DataView", function() {
+        var dataView = new DataView(dataTable);
+        expect(dataView instanceof DataView).toBe(true);
+      });
 
-        it("should return an instance of DataView", function() {
-          var dataView = new DataView(dataTable);
-          expect(dataView instanceof DataView).toBe(true);
-        });
+      it("should return a data view with all source columns", function() {
+        var dataView = new DataView(dataTable);
+        expect(dataView.getNumberOfColumns()).toBe(dataTable.getNumberOfColumns());
+      });
 
-        it("should return a data view with all source columns", function() {
-          var dataView = new DataView(dataTable);
-          expect(dataView.getNumberOfColumns()).toBe(dataTable.getNumberOfColumns());
-        });
+      it("should return a data view with all source rows", function() {
+        var dataView = new DataView(dataTable);
+        expect(dataView.getNumberOfRows()).toBe(dataTable.getNumberOfRows());
+      });
 
-        it("should return a data view with all source rows", function() {
-          var dataView = new DataView(dataTable);
-          expect(dataView.getNumberOfRows()).toBe(dataTable.getNumberOfRows());
-        });
-
-        it("should return a data view whose source is the specified data table", function() {
-          var dataView = new DataView(dataTable);
-          expect(dataView._source).toBe(dataTable);
-        });
+      it("should return a data view whose source is the specified data table", function() {
+        var dataView = new DataView(dataTable);
+        expect(dataView._source).toBe(dataTable);
       });
     });
 
@@ -108,12 +105,12 @@ define([
           var dataView = new DataView(dataTable);
           var dataTable2 = dataView.toDataTable();
 
-          expect(dataTable2.toJSON()).toEqual(dataTable.toJSON());
+          expect(dataTable2.toSpec()).toEqual(dataTable.toSpec());
         });
 
         it("should return a data table having only the view's visible columns", function() {
           var dataView = new DataView(dataTable);
-          dataView.setColumns([0, 1]);
+          dataView.setSourceColumns([0, 1]);
 
           var dataTable2 = dataView.toDataTable();
 
@@ -126,7 +123,7 @@ define([
 
         it("should return a data table having only the view's visible rows", function() {
           var dataView = new DataView(dataTable);
-          dataView.setRows([0, 1]);
+          dataView.setSourceRows([0, 1]);
 
           var dataTable2 = dataView.toDataTable();
 
@@ -144,7 +141,7 @@ define([
 
       beforeEach(function() {
         dataView = new DataView(dataTable);
-        dataView.setColumns([2, 0, 1]);
+        dataView.setSourceColumns([2, 0, 1]);
       });
 
       describe("#getNumberOfColumns() -", function() {
@@ -160,7 +157,7 @@ define([
 
         it("should return 2 when there are 2 visible columns", function() {
           var dataView2 = new DataView(dataTable);
-          dataView2.setColumns([2, 1]);
+          dataView2.setSourceColumns([2, 1]);
           expect(dataView2.getNumberOfColumns()).toBe(2);
         });
 
@@ -169,45 +166,45 @@ define([
         });
       });
 
-      describe("#getTableColumnIndex()", function() {
-        it("should return the specified index when setColumns was not called", function() {
+      describe("#getSourceColumnIndex()", function() {
+        it("should return the specified index when setSourceColumns was not called", function() {
           var dataView2 = new DataView(dataTable);
-          expect(dataView2.getTableColumnIndex(1)).toBe(1);
+          expect(dataView2.getSourceColumnIndex(1)).toBe(1);
         });
 
-        it("should return the mapped index when setColumns was called", function() {
-          expect(dataView.getTableColumnIndex(0)).toBe(2);
-          expect(dataView.getTableColumnIndex(1)).toBe(0);
-          expect(dataView.getTableColumnIndex(2)).toBe(1);
+        it("should return the mapped index when setSourceColumns was called", function() {
+          expect(dataView.getSourceColumnIndex(0)).toBe(2);
+          expect(dataView.getSourceColumnIndex(1)).toBe(0);
+          expect(dataView.getSourceColumnIndex(2)).toBe(1);
         });
       });
 
-      describe("#setColumns()", function() {
+      describe("#setSourceColumns()", function() {
         it("should set all columns visible when called with a nully value", function() {
           var dataView2 = new DataView(dataTable);
-          dataView2.setColumns([]);
+          dataView2.setSourceColumns([]);
           expect(dataView2.getNumberOfColumns()).toBe(0);
 
-          dataView2.setColumns();
+          dataView2.setSourceColumns();
           expect(dataView2.getNumberOfColumns()).toBe(dataTable.getNumberOfColumns());
 
-          dataView2.setColumns([]);
-          dataView2.setColumns(null);
+          dataView2.setSourceColumns([]);
+          dataView2.setSourceColumns(null);
           expect(dataView2.getNumberOfColumns()).toBe(dataTable.getNumberOfColumns());
 
-          dataView2.setColumns([]);
-          dataView2.setColumns(undefined);
+          dataView2.setSourceColumns([]);
+          dataView2.setSourceColumns(undefined);
           expect(dataView2.getNumberOfColumns()).toBe(dataTable.getNumberOfColumns());
         });
 
         it("should set only the specified columns visible", function() {
           var dataView2 = new DataView(dataTable);
-          dataView2.setColumns([0, 1]);
+          dataView2.setSourceColumns([0, 1]);
           expect(dataView2.getNumberOfColumns()).toBe(2);
           expect(dataView2.getColumnId(0)).toBe("country");
           expect(dataView2.getColumnId(1)).toBe("sales"  );
 
-          dataView2.setColumns([1, 2, 1]);
+          dataView2.setSourceColumns([1, 2, 1]);
           expect(dataView2.getNumberOfColumns()).toBe(3);
           expect(dataView2.getColumnId(0)).toBe("sales"  );
           expect(dataView2.getColumnId(1)).toBe("euro");
@@ -216,7 +213,7 @@ define([
 
         it("should return `this`", function() {
           var dataView2 = new DataView(dataTable);
-          expect(dataView2.setColumns([0, 1])).toBe(dataView2);
+          expect(dataView2.setSourceColumns([0, 1])).toBe(dataView2);
         });
       });
 
@@ -233,31 +230,31 @@ define([
         });
 
         it("should not throw if a specified column is already visible", function() {
-          dataView.setColumns([0, 2]);
+          dataView.setSourceColumns([0, 2]);
           dataView.hideColumns([1, 0]);
           expect(dataView.getNumberOfColumns()).toBe(1);
           expect(dataView.getColumnId(0)).toBe("euro");
         });
       });
 
-      describe("#getViewColumns()", function() {
-        it("should get all source column indexes, before setColumns is called", function() {
+      describe("#getSourceColumns()", function() {
+        it("should get all source column indexes, before setSourceColumns is called", function() {
           var dataView2 = new DataView(dataTable);
-          expect(dataView2.getViewColumns()).toEqual([0, 1, 2]);
+          expect(dataView2.getSourceColumns()).toEqual([0, 1, 2]);
         });
 
         it("should get the source column indexes currently visible", function() {
-          expect(dataView.getViewColumns()).toEqual([2, 0, 1]);
+          expect(dataView.getSourceColumns()).toEqual([2, 0, 1]);
 
-          dataView.setColumns([1, 2]);
-          expect(dataView.getViewColumns()).toEqual([1, 2]);
+          dataView.setSourceColumns([1, 2]);
+          expect(dataView.getSourceColumns()).toEqual([1, 2]);
 
-          dataView.setColumns([2, 2]);
-          expect(dataView.getViewColumns()).toEqual([2, 2]);
+          dataView.setSourceColumns([2, 2]);
+          expect(dataView.getSourceColumns()).toEqual([2, 2]);
         });
       });
 
-      describe("#getColumnType() -", function() {
+      describe("#getColumnType(j) -", function() {
         it("should return the column type of the given column index", function() {
           expect(dataView.getColumnType(0)).toBe("boolean");
           expect(dataView.getColumnType(1)).toBe("string");
@@ -265,15 +262,15 @@ define([
         });
       });
 
-      describe("#getColumnId() -", function() {
-        it("should return the column id of the given column index", function() {
+      describe("#getColumnId(j) -", function() {
+        it("should return the attribute name of the attribute of the given column index", function() {
           expect(dataView.getColumnId(0)).toBe("euro");
           expect(dataView.getColumnId(1)).toBe("country");
           expect(dataView.getColumnId(2)).toBe("sales");
         });
       });
 
-      describe("#getColumnLabel() -", function() {
+      describe("#getColumnLabel(j) -", function() {
         it("should return the column label of the given column index", function() {
           expect(dataView.getColumnLabel(0)).toBe("Euro");
           expect(dataView.getColumnLabel(1)).toBe("Country");
@@ -281,31 +278,10 @@ define([
         });
       });
 
-      describe("#getColumnProperty() -", function() {
-        it("should return the value of the specified column property", function() {
-          expect(dataView.getColumnProperty(1, "foo")).toBe(fooValue);
-          expect(dataView.getColumnProperty(2, "bar")).toBe(barValue);
-        });
-
-        it("should return `undefined` for a column property which is not defined", function() {
-          expect(dataView.getColumnProperty(0, "foo")).toBeUndefined();
-        });
-      });
-
-      describe("#setColumnProperty() -", function() {
-        it("should set the value of the specified column property", function() {
-          var guru = {};
-          dataView.setColumnProperty(0, "guru", guru);
-
-          expect(dataView.getColumnProperty(0, "guru")).toBe(guru);
-          expect(dataTable.getColumnProperty(2, "guru")).toBe(guru);
-        });
-      });
-
-      describe("#getColumnRange() -", function() {
+      describe("#getColumnRange(j) -", function() {
         it("should return a range object with both min and max `undefined` when there is no data", function() {
           var dataView2 = new DataView(dataTable);
-          dataView2.setRows([]);
+          dataView2.setSourceRows([]);
 
           expect(dataView2.getColumnRange(1)).toEqual({min: undefined, max: undefined});
         });
@@ -318,19 +294,19 @@ define([
         });
       });
 
-      describe("#getDistinctValues() -", function() {
+      describe("#getDistinctValues(j) -", function() {
 
         it("should return an empty array when there is no data", function() {
           var dataView2 = new DataView(dataTable);
-          dataView2.setRows([]);
+          dataView2.setSourceRows([]);
 
           expect(dataView2.getDistinctValues(1)).toEqual([]);
         });
 
         it("should return an array containing the distinct values of the specified column", function() {
           var dataView2 = new DataView(dataTable);
-          dataView2.setColumns([2, 0, 1]);
-          dataView2.setRows([2, 1, 3, 0]);
+          dataView2.setSourceColumns([2, 0, 1]);
+          dataView2.setSourceRows([2, 1, 3, 0]);
 
           expect(dataView2.getDistinctValues(0)).toEqual([true, false]);
           expect(dataView2.getDistinctValues(1)).toEqual(["Italy", "Ireland", "France", "Portugal"]);
@@ -338,19 +314,19 @@ define([
         });
       });
 
-      describe("#getDistinctFormattedValues() -", function() {
+      describe("#getDistinctFormattedValues(j) -", function() {
 
         it("should return an empty array when there is no data", function() {
           var dataView2 = new DataView(dataTable);
-          dataView2.setRows([]);
+          dataView2.setSourceRows([]);
 
           expect(dataView2.getDistinctFormattedValues(1)).toEqual([]);
         });
 
         it("should return an array containing the distinct formatted values of the specified column", function() {
           var dataView2 = new DataView(dataTable);
-          dataView2.setColumns([2, 0, 1]);
-          dataView2.setRows([2, 1, 3, 0]);
+          dataView2.setSourceColumns([2, 0, 1]);
+          dataView2.setSourceRows([2, 1, 3, 0]);
 
           expect(dataView2.getDistinctFormattedValues(0)).toEqual(["true", "false"]);
           expect(dataView2.getDistinctFormattedValues(1)).toEqual(["Italy", "Ireland", "France", "Portugal"]);
@@ -358,10 +334,15 @@ define([
         });
       });
 
-      describe("#addColumn()", function() {
+      describe("#addColumn(colSpec)", function() {
         it("should add another column to the root table as last column", function() {
           var count = dataTable.getNumberOfColumns();
-          dataView.addColumn({id: "A", type: "string", label: "A"});
+          dataTable.model.attributes.add({
+            name: "A",
+            type: "string",
+            label: "A"
+          });
+          dataView.addColumn("A");
 
           expect(dataTable.getNumberOfColumns()).toBe(count + 1);
           expect(dataTable.getColumnId(count)).toBe("A");
@@ -370,8 +351,14 @@ define([
         it("should make the new column visible in the view", function() {
           var count = dataTable.getNumberOfColumns();
           var dataView2 = new DataView(dataTable);
-          dataView2.setColumns([0, 1]);
-          dataView2.addColumn({id: "A", type: "string", label: "A"});
+          dataView2.setSourceColumns([0, 1]);
+
+          dataTable.model.attributes.add({
+            name: "A",
+            type: "string",
+            label: "A"
+          });
+          dataView2.addColumn("A");
 
           expect(dataTable.getColumnId(count)).toBe("A");
 
@@ -381,8 +368,14 @@ define([
 
         it("should return the index of the added view column", function() {
           var dataView2 = new DataView(dataTable);
-          dataView2.setColumns([0, 1]);
-          var index = dataView2.addColumn({id: "A", type: "string", label: "A"});
+          dataView2.setSourceColumns([0, 1]);
+
+          dataTable.model.attributes.add({
+            name: "A",
+            type: "string",
+            label: "A"
+          });
+          var index = dataView2.addColumn("A");
           expect(index).toBe(2);
         });
       });
@@ -402,59 +395,59 @@ define([
 
         it("should return 2 when there are 2 visible rows", function() {
           var dataView2 = new DataView(dataTable);
-          dataView2.setRows([1, 2]);
+          dataView2.setSourceRows([1, 2]);
           expect(dataView2.getNumberOfRows()).toBe(2);
         });
 
         it("should return 3 when there are 3 visible rows", function() {
           var dataView2 = new DataView(dataTable);
-          dataView2.setRows([1, 2, 0]);
+          dataView2.setSourceRows([1, 2, 0]);
           expect(dataView2.getNumberOfRows()).toBe(3);
         });
       });
 
-      describe("#getTableRowIndex()", function() {
+      describe("#getSourceRowIndex()", function() {
         it("should return the specified index when setRows was not called", function() {
           var dataView2 = new DataView(dataTable);
-          expect(dataView2.getTableRowIndex(1)).toBe(1);
-          expect(dataView2.getTableRowIndex(0)).toBe(0);
+          expect(dataView2.getSourceRowIndex(1)).toBe(1);
+          expect(dataView2.getSourceRowIndex(0)).toBe(0);
         });
 
         it("should return the mapped index when setRows was called", function() {
           var dataView2 = new DataView(dataTable);
-          dataView2.setRows([0, 2, 1]);
-          expect(dataView2.getTableRowIndex(0)).toBe(0);
-          expect(dataView2.getTableRowIndex(1)).toBe(2);
-          expect(dataView2.getTableRowIndex(2)).toBe(1);
+          dataView2.setSourceRows([0, 2, 1]);
+          expect(dataView2.getSourceRowIndex(0)).toBe(0);
+          expect(dataView2.getSourceRowIndex(1)).toBe(2);
+          expect(dataView2.getSourceRowIndex(2)).toBe(1);
         });
       });
 
-      describe("#setRows()", function() {
+      describe("#setSourceRows()", function() {
         it("should set all rows visible when called with a nully value", function() {
           var dataView2 = new DataView(dataTable);
-          dataView2.setRows([]);
+          dataView2.setSourceRows([]);
           expect(dataView2.getNumberOfRows()).toBe(0);
 
-          dataView2.setRows();
+          dataView2.setSourceRows();
           expect(dataView2.getNumberOfRows()).toBe(dataTable.getNumberOfRows());
 
-          dataView2.setRows([]);
-          dataView2.setRows(null);
+          dataView2.setSourceRows([]);
+          dataView2.setSourceRows(null);
           expect(dataView2.getNumberOfRows()).toBe(dataTable.getNumberOfRows());
 
-          dataView2.setRows([]);
-          dataView2.setRows(undefined);
+          dataView2.setSourceRows([]);
+          dataView2.setSourceRows(undefined);
           expect(dataView2.getNumberOfRows()).toBe(dataTable.getNumberOfRows());
         });
 
         it("should set only the specified rows visible", function() {
           var dataView2 = new DataView(dataTable);
-          dataView2.setRows([1, 0]);
+          dataView2.setSourceRows([1, 0]);
           expect(dataView2.getNumberOfRows()).toBe(2);
           expect(dataView2.getValue(0, 0)).toBe("Ireland");
           expect(dataView2.getValue(1, 0)).toBe("Portugal");
 
-          dataView2.setRows([1, 2, 1]);
+          dataView2.setSourceRows([1, 2, 1]);
           expect(dataView2.getNumberOfRows()).toBe(3);
           expect(dataView2.getValue(0, 0)).toBe("Ireland");
           expect(dataView2.getValue(1, 0)).toBe("Italy");
@@ -463,27 +456,27 @@ define([
 
         it("should return `this`", function() {
           var dataView2 = new DataView(dataTable);
-          expect(dataView2.setRows([0, 1])).toBe(dataView2);
+          expect(dataView2.setSourceRows([0, 1])).toBe(dataView2);
         });
       });
 
-      describe("#getViewRows()", function() {
+      describe("#getSourceRows()", function() {
         var dataView;
 
         beforeEach(function() {
           dataView = new DataView(dataTable);
         });
 
-        it("should return null before setColumns is called", function() {
-          expect(dataView.getViewRows()).toBe(null);
+        it("should return null before setSourceRows is called", function() {
+          expect(dataView.getSourceRows()).toBe(null);
         });
 
         it("should get the source column indexes currently visible", function() {
-          dataView.setRows([1, 2]);
-          expect(dataView.getViewRows()).toEqual([1, 2]);
+          dataView.setSourceRows([1, 2]);
+          expect(dataView.getSourceRows()).toEqual([1, 2]);
 
-          dataView.setRows([2, 2]);
-          expect(dataView.getViewRows()).toEqual([2, 2]);
+          dataView.setSourceRows([2, 2]);
+          expect(dataView.getSourceRows()).toEqual([2, 2]);
         });
       });
     });
@@ -493,8 +486,8 @@ define([
 
       beforeEach(function() {
         dataView = new DataView(dataTable);
-        dataView.setColumns([2, 0, 1]);
-        dataView.setRows([3, 0, 1]);
+        dataView.setSourceColumns([2, 0, 1]);
+        dataView.setSourceRows([3, 0, 1]);
       });
 
       describe("#getValue()", function() {
@@ -514,14 +507,19 @@ define([
       describe("#getLabel()", function() {
         it("should return the label of the specified row and column", function() {
           expect(dataView.getLabel(0, 2)).toBe("2.4");
-          expect(dataView.getLabel(1, 0)).toBe(null);
+          expect(dataView.getLabel(1, 0)).toBe(undefined);
         });
       });
 
       describe("#getCell()", function() {
         it("should return the cell of the specified row and column", function() {
-          expect(dataView.getCell(0, 2)).toEqual({v: 24000, f: "2.4"});
-          expect(dataView.getCell(1, 0)).toEqual({v: true,  f:  null});
+          var cell = dataView.getCell(0, 2);
+          expect(cell.v).toBe(24000);
+          expect(cell.f).toBe("2.4");
+
+          cell = dataView.getCell(1, 0);
+          expect(cell.v).toBe(true);
+          expect(cell.f).toBe(undefined);
         });
       });
 

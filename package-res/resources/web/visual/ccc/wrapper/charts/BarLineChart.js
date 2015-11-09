@@ -21,17 +21,22 @@ define([
 
     return AbstractBarChart.extend({
         methods: {
-            _rolesToCccDimensionsMap: {
-                'measuresLine': 'value' // maps to same dim group as 'measures' role
+            _roleToCccDimGroup: {
+                'columns':      'series',
+                'rows':         'category',
+                'multi':        'multiChart',
+                'measures':     'value',
+                'measuresLine': 'value' // NOTE: maps to same dim group as 'measures' role!
             },
 
             _noRoleInTooltipMeasureRoles: {'measures': true, 'measuresLine': true},
 
             _options: {
                 plot2: true,
-                secondAxisIndependentScale: false,
-                // prevent default of -1 (which means last series) // TODO: is this needed??
-                secondAxisSeriesIndexes: null
+
+                secondAxisIndependentScale: false, // TODO: isn't this option CCC-V1 only?
+                // prevent default of -1 (which means last series)
+                secondAxisSeriesIndexes: null // TODO: isn't this option CCC-V1 only?
             },
 
             _setNullInterpolationMode: function(options, value) {
@@ -39,27 +44,35 @@ define([
             },
 
             _initAxes: function() {
-                this.base();
+                this.base.apply(this, arguments);
 
-                this._measureDiscrimGem || def.assert("Must exist to distinguish measures.");
+                // Data part codes
+                // 0 -> bars
+                // 1 -> lines
 
-                var measureDiscrimCccDimName = this._measureDiscrimGem.cccDimName,
-                    meaAxis = this.axes.measure,
-                    barGems = meaAxis.gemsByRole[meaAxis.defaultRole],
-                    barGemsById = def.query(barGems) // bar: measures, line: measuresLine
-                        .uniqueIndex(function(gem) { return gem.id; });
+                var calculation,
+                    measureDiscrimCccDimName = this.measureDiscrimGem && this.measureDiscrimGem.cccDimName;
+                if(measureDiscrimCccDimName) {
+                    var barAttrInfos = this._getAttributeInfosOfRole("measures"),
+                        barAttrInfosByName = barAttrInfos
+                            ? def.query(barAttrInfos).uniqueIndex(function(ai) { return ai.name; })
+                            : {};
+
+                    calculation = function(datum, atoms) {
+                        var meaAttrName = datum.atoms[measureDiscrimCccDimName].value;
+                        atoms.dataPart = def.hasOwn(barAttrInfosByName, meaAttrName) ? '0' : '1';
+                    };
+                } else if(this._genericMeasuresCount > 0) {
+                    // One measure of one of the roles exists.
+                    // And so, either it is always bar or always line...
+                    var constDataPart = this._getAttributeInfosOfRole("measures") ? '0' : '1';
+                    calculation = function(datum, atoms) { atoms.dataPart = constDataPart; };
+                } else {
+                    throw def.error("At least one of the measure roles must be specified");
+                }
 
                 // Create the dataPart dimension calculation
-                this.options.calculations.push({
-                    names: 'dataPart',
-                    calculation: function(datum, atoms) {
-                        var meaGemId = datum.atoms[measureDiscrimCccDimName].value;
-                        // Data part codes
-                        // 0 -> bars
-                        // 1 -> lines
-                        atoms.dataPart = def.hasOwn(barGemsById, meaGemId) ? '0' : '1';
-                    }
-                });
+                this.options.calculations.push({names: 'dataPart', calculation: calculation});
             },
 
             _readUserOptions: function(options, drawSpec) {

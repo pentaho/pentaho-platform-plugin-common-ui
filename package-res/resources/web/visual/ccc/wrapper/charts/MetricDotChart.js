@@ -36,15 +36,13 @@ define([
             },
 
             /* Override Default map */
-            _rolesToCccDimensionsMap: {
-                'columns':  null,
-                'color':    'color',
-                //'rows':     'category',
+            _roleToCccDimGroup: {
                 'multi':    'multiChart',
-                'measures': null,
+                'rows':     'category',
                 'x':        'x',
                 'y':        'y',
-                'size':     'size'
+                'size':     'size',
+                'color':    'color'
             },
 
             _discreteColorRole: 'color',
@@ -53,9 +51,10 @@ define([
             _noRoleInTooltipMeasureRoles: {'x': true, 'y': true, 'measures': false},
 
             _getColorScaleKind: function() {
-                return this.axes.measure.boundRoles.color ? 'continuous' :
-                       this.axes.column .boundRoles.color ? 'discrete'   :
-                       undefined;
+                var isDiscrete = this._getRoleIsDiscrete("color");
+                return isDiscrete == null ? undefined  :
+                       isDiscrete         ? "discrete" :
+                       "continuous";
             },
 
             _configure: function() {
@@ -65,7 +64,7 @@ define([
                 this._configureAxisRange(/*isPrimary*/false, 'ortho');
 
                 // ~ DOT SIZE
-                this.options.axisOffset = this.axes.measure.boundRoles.size
+                this.options.axisOffset = this._isRoleBound("size")
                     ? (1.1 * this.options.sizeAxisRatio / 2) // Axis offset like legacy analyzer
                     : 0;
             },
@@ -76,21 +75,15 @@ define([
                 if(colorScaleKind === 'discrete') {
                     // Must force the discrete type
                     this.options.dimensionGroups.color = {valueType: String};
-
-                    // this.options.visualRoles.color =
-                    // this.axes.column.gemsByRole.color
-                    //     .map(function(gem, index) {
-                    //         return pvc.buildIndexedId('color', index);
-                    //     })
-                    //     .join(', ');
                 }
             },
 
-            _showLegend: function() {
+            _isLegendVisible: function() {
                 // Prevent default behavior that hides the legend when there are no series.
-                // Hide the legend if there is only one "series".
-                return this.options.legend &&
-                    (!this.axes.column.boundRoles.color || this._colGroups.length > 1);
+                // Hide the legend even if there is only one "series".
+
+                return this._getRoleIsDiscrete("color") === true &&
+                    (this._dataTable.isCrossTable && this._dataTable.implem.cols.length > 1);
             },
 
             _getOrthoAxisTitle: function() {

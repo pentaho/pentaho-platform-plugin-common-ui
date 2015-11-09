@@ -20,3 +20,4 @@ pentaho.log
 .project
 .idea
 .DS_Store
+*.iml

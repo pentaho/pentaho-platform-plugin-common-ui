@@ -166,7 +166,9 @@ define([
       switch(typeof factory) {
         case "string":
           return utils.requirePromise([factory])
-            .then(function(factory) { return factory(createOptions); })
+            .then(function(factory) {
+                return factory(createOptions);
+              })
             .then(haveVisual);
 
         case "function": break;

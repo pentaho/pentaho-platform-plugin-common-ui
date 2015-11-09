@@ -19,7 +19,7 @@ define([
     "cdf/lib/CCC/def"
 ], function(declare, def) {
 
-    /*global analyzerPlugins:true, cv: true, cvCatalog: true, analyzer: true*/
+    /*global analyzerPlugins:true, cv: true, cvCatalog: true, analyzer: true */
 
     // If necessary, declare **global** variable, initializing it with an array
     analyzerPlugins = typeof analyzerPlugins == "undefined" ? [] : analyzerPlugins;
@@ -58,103 +58,6 @@ define([
 
                 getDoubleClickTooltip: function() {
                     return cv.getActiveReport().getDoubleClickTooltip();
-                },
-
-                completeAxisGemsMetadata: function(axis, gemsInfoList) {
-                    var reportElem = cv.getActiveReport().reportDoc.getReportNode();
-                    var isMeasure  = (axis === 'measure');
-                    var unboundGemElemsByRole = {};
-
-                    function gemElemComparer(a, b) {
-                        return parseFloat(a.getAttribute("gembarOrdinal")) -
-                               parseFloat(b.getAttribute("gembarOrdinal"));
-                    }
-
-                    function getRoleGemElems(role) {
-                        var xpath = "[@gembarId='" + role + "']";
-                        if(isMeasure) {
-                            xpath = "cv:measures/cv:measure" + xpath;
-                        } else {
-                            xpath = "cv:columnAttributes/cv:attribute" + xpath +
-                                    " | " +
-                                    "cv:rowAttributes/cv:attribute" + xpath;
-                        }
-
-                        var unboundGemElems = reportElem.selectNodes(xpath);
-
-                        // Converts array like collection to array
-                        unboundGemElems = def.query(unboundGemElems).array();
-
-                        // Sort by gem bar position
-                        unboundGemElems.sort(gemElemComparer);
-
-                        return unboundGemElems;
-                    }
-
-                    function getNextGemElem(role) {
-                        var gemElems = def.getOwn(unboundGemElemsByRole, role);
-                        if(!gemElems) {
-                            gemElems = unboundGemElemsByRole[role] = getRoleGemElems(role);
-                        }
-
-                        var gemElem;
-                        while(gemElems.length) {
-                            gemElem = gemElems.shift();
-                            if(gemElem.getAttribute("hideInChart") !== 'true') {
-                                break;
-                            }
-                        }
-
-                        return gemElem;
-                    }
-
-                    if(gemsInfoList) gemsInfoList.forEach(function(gemInfo) {
-                        var role = gemInfo.role;
-                        if(!role || role === 'undefined') {
-                            // unmapped role
-                            return;
-                        }
-
-                        var gemElem = getNextGemElem(gemInfo.role) || def.assert("Undefined gem in document.");
-                        var formula = gemElem.getAttribute('formula') || null;
-                        var id, reportAxis;
-
-                        switch(gemElem.parentNode.tagName) {
-                            case 'rowAttributes':    reportAxis = 'row';     break;
-                            case 'columnAttributes': reportAxis = 'column';  break;
-                            case 'measures':         reportAxis = 'measure'; break;
-                        }
-
-                        if(isMeasure) gemInfo.measureType = gemElem.getAttribute("measureTypeEnum");
-
-                        if(isMeasure && gemInfo.measureType !== 'VALUE') {
-                            // Some kind of calculated formula
-                            id      = gemElem.getAttribute('id');
-                            formula = null; // ignore
-                            //label   = getLevelLabel(gemElem);
-                        } else {
-                            var gem = cv.getActiveReport().getGem(formula) ||
-                                def.assert("No gem object.");
-
-                            // measures have an id != from formula
-                            id = gem.getUniqueId();
-
-                            // Need to get the label of "column" gems (reportAxis=column) this way,
-                            // because of limitations of the metadata in the
-                            // crosstab datatable format.
-                            gemInfo.label = gem.getDisplayLabel(true);
-
-                            isMeasure || formula || def.assert("Non-measures have formulas.");
-                        }
-
-                        def.set(
-                            gemInfo,
-                            'id',         id,
-                            'formula',    formula,
-                            // label
-                            // measureType
-                            'reportAxis', reportAxis);
-                    });
                 }
             });
 
