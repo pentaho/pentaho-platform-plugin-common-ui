@@ -613,6 +613,7 @@ define([
                 this._gemsMap = gemsMap;
                 this._visualMapInfo = visualMapInfo;
                 this._genericMeasuresCount = genericMeasuresCount;
+                this.measureDiscrimGem = null;
 
                 var hasDiscrim = genericMeasuresCount > 1;
                 if(hasDiscrim) this._addGenericMeasureDiscriminator();
