@@ -122,6 +122,18 @@ define([
       return GemClass.create ? GemClass.create(options) : new GemClass(options);
     },
 
+    createGemByFormula: function(formula, value) {
+      var GemClass = Configuration.registeredTypes["gem"];
+      var options = {
+          formula: formula,
+          value: value,
+          gemBar: this
+      };
+
+      // check to see if it's a factory class
+      return GemClass.create ? GemClass.create(options) : new GemClass(options);
+    },
+
     remove: function (gem) {
       this._value = null;
       this.gems.splice(this.gems.indexOf(gem), 1);

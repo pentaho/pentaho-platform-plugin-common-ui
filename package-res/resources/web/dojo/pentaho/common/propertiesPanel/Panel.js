@@ -503,6 +503,25 @@ define([
       return true;
     },
 
+    // NOTE: used from Analyzer automation API
+    _onDrop: function(formula, dndType, value, gemBar, before, anchor, dndNode, postDrop) {
+      var oldGemBar  = this.gemBar;
+      var oldDndNode = this.node;
+
+      this.gemBar = gemBar;
+      this.node = dndNode;
+
+      var gem = this.createGemByFormula(formula, value);
+      this.gemUIbeingInserted = this.createGembarUIFromGembar(gem, gemBar, dndType);
+
+      this.insertNodes(null, null, before, anchor, true);
+
+      this.gemBar = oldGemBar;
+      this.node = oldDndNode;
+
+      this._executePostDrop(formula, postDrop);
+    },
+
     _executePostDrop: function(formula, postDrop) {
       if(postDrop) {
         postDrop.f.call(postDrop.scope, formula, this.gemBar.id);
@@ -511,6 +530,16 @@ define([
 
     createGemFromNode: function(sourceNode) {
       return this.gemBar.model.createGemFromNode(sourceNode);
+    },
+
+    createGemByFormula: function(formula, value) {
+      return this.gemBar.model.createGemByFormula(formula, value);
+    },
+
+    createGembarUIFromGembar: function(gem, dndType) {
+      var UiClass = Panel.registeredTypes["gem"];
+      var options = {model: gem, gemBar: this.gemBar, dndType: dndType};
+      return UiClass.create ? UiClass.create(options) : new UiClass(options);
     },
 
     createGemUI: function(gem, sourceNode) {
