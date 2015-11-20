@@ -89,9 +89,6 @@
 
 
     <target name="dist" depends="create-dev.res, unzip_dojo, jar, dist-js" description="Creates a distribution">
-        <zip destfile="dist/pentaho-samples-framework-plugin-${project.revision}.zip">
-            <zipfileset dir="${basedir}/samples-framework-plugin" />
-        </zip>
     </target>
 
     <!-- sets up the project for development/build, you should only need to run this once -->
@@ -151,7 +148,7 @@
     </target>
 
     <!-- override the subfloor assemble target to do special assembly -->
-    <target name="assemble-plugin" depends="doc-js">
+    <target name="assemble-plugin">
 
         <property environment="env"/>
 
@@ -168,10 +165,6 @@
 
         <copy todir="${approot.stage.dir}" overwrite="true">
             <fileset dir="${package.resdir}"/>
-        </copy>
-
-        <copy todir="${approot.stage.dir}/resources/web/prompting/samples-framework-plugin/resources" overwrite="true">
-            <fileset file="${basedir}/doc-js/prompting/*API.html"/>
         </copy>
 
         <property environment="env"/>
