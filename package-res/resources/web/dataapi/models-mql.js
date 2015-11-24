@@ -201,7 +201,7 @@ pentaho.pda.model.mql.prototype.discoverModelDetail = function() {
 
   // get the info about the models from the server
   var url = this.handler.METADATA_SERVICE_URL+'/loadModel';
-  var query = 'domainId='+escape(this.domainId)+'&modelId='+escape(this.modelId);
+  var query = 'domainId='+encodeURIComponent(this.domainId)+'&modelId='+encodeURIComponent(this.modelId);
   var result = pentahoGet( url, query );
   // parse the XML
   var xml = parseXML( result );
