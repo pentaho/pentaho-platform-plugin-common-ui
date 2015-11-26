@@ -3,8 +3,7 @@
 <head>
     <title>Pentaho Prompting Sample Page</title>
 
-    <script language="javascript" type="text/javascript" src="webcontext.js?context=prompting-sample"></script>
-
+    <script language="javascript" type="text/javascript" src="webcontext.js?context=prompting-sample&requireJsOnly=true"></script>
     <link rel="stylesheet" href="../../../../../content/pentaho-cdf/js/lib/jdMenu/jquery.jdMenu.css" type="text/css" />
     <link rel="stylesheet" href="../../../../../content/pentaho-cdf/js/lib/jdMenu/jquery.jdMenu.slate.css" type="text/css" />
     <link rel="stylesheet" href="../../../../../content/pentaho-cdf/js/lib/impromptu/jquery-impromptu.css" type="text/css" />
@@ -24,7 +23,8 @@
           console.log('defined module gwt-' + module);
         });
       }
-      require(['local!gwt-formatter'], function() {
+
+      require(['common-ui/jquery-clean', 'local!gwt-formatter'], function($) {
         var testNumberFormatter = function() {
           var numberFormatter = jsTextFormatter.createFormatter('number', '$#.0#');
           var number = 123.45;
@@ -54,8 +54,11 @@
 
       require([
         'common-ui/prompting/parameters/ParameterXmlParser',
-        'common-ui/prompting/PromptPanel'
-        ], function(ParameterXmlParser, PromptPanel) {
+        'common-ui/prompting/PromptPanel',
+        'common-ui/jquery-clean'
+        ], function(ParameterXmlParser, PromptPanel, $) {
+            console.log( "logging jquery: " + $ );
+
             // This script element contains the sample code to parse the parameter xml and build/refresh the prompt.
             window.paramParser = new ParameterXmlParser();
             var promptPanel;
@@ -76,7 +79,7 @@
                   // Set the user to anonymous so Dashboards Storage is never invoked
                   promptPanel.dashboard.context.user = 'anonymousUser';
                   promptPanel.dashboard.blockUIwithDrag = function() {
-                    if ($.blockUI){
+                    if ($.blockUI) {
                       $.blockUI.defaults.message = '';
                       $.blockUI.defaults.css.left = '0%';
                       $.blockUI.defaults.css.top = '0%';
@@ -95,7 +98,7 @@
                       // There's an issue with BlockUI and IE 8. As we don't even use this feature from CDF, it's hidden here.
                       // $.blockUI.defaults.showOverlay = false;
                       $.blockUI();
-				    }
+                    }
                   }
 
                   promptPanel.submit = function() {

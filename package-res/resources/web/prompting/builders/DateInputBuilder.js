@@ -44,8 +44,8 @@
  * @class
  * @extends ValueBasedParameterWidgetBuilder
  */
-define(['./FormattedParameterWidgetBuilderBase', '../components/DojoDateTextBoxComponent'],
-    function (FormattedParameterWidgetBuilderBase, DojoDateTextBoxComponent) {
+define(['./FormattedParameterWidgetBuilderBase', '../components/DojoDateTextBoxComponent', 'common-ui/jquery-clean'],
+    function (FormattedParameterWidgetBuilderBase, DojoDateTextBoxComponent, $) {
 
       return FormattedParameterWidgetBuilderBase.extend({
         /**

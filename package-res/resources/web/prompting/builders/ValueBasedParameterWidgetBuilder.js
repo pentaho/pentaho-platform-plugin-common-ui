@@ -38,8 +38,8 @@
  * @extends ParameterWidgetBuilderBase
  */
 
-define(['./ParameterWidgetBuilderBase'],
-    function (ParameterWidgetBuilderBase) {
+define(['./ParameterWidgetBuilderBase', 'common-ui/jquery-clean'],
+    function (ParameterWidgetBuilderBase, $) {
 
       return ParameterWidgetBuilderBase.extend({
         /**

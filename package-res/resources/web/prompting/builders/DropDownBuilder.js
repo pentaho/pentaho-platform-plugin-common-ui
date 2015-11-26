@@ -50,8 +50,8 @@
  * @class
  * @extends ValueBasedParameterWidgetBuilder
  */
-define(['cdf/components/SelectComponent', './ValueBasedParameterWidgetBuilder'],
-    function(SelectComponent, ValueBasedParameterWidgetBuilder){
+define(['cdf/components/SelectComponent', './ValueBasedParameterWidgetBuilder', 'common-ui/jquery-clean'],
+    function(SelectComponent, ValueBasedParameterWidgetBuilder, $){
 
   return ValueBasedParameterWidgetBuilder.extend({
     /**

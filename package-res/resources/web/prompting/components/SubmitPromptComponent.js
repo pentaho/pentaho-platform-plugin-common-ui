@@ -55,7 +55,7 @@
  * @class
  * @extends ScopedPentahoButtonComponent
  */
-define(['./ScopedPentahoButtonComponent'], function(ScopedPentahoButtonComponent){
+define(['./ScopedPentahoButtonComponent', 'common-ui/jquery-clean'], function(ScopedPentahoButtonComponent, $) {
   return ScopedPentahoButtonComponent.extend({
 
     /**
@@ -74,24 +74,35 @@ define(['./ScopedPentahoButtonComponent'], function(ScopedPentahoButtonComponent
       // only show the UI for the auto-submit check-box if no preference exists
       // TODO: true/false is irrelevant?
       if (this.paramDefn.autoSubmit == undefined) {
-        var checkboxStr = '<label class="auto-complete-checkbox">' +
+        var checkBox = this._createElement('<label class="auto-complete-checkbox">' +
             '<input type="checkbox"' +
             (promptPanel.autoSubmit ? ' checked="checked"' : '') +
             ' />' +
             this.autoSubmitLabel +
-            '</label>';
+            '</label>');
 
-        $(checkboxStr)
-            .appendTo($('#' + this.htmlObject))
-            .bind('click', function (ev) {
-              promptPanel.autoSubmit = ev.target.checked;
-            });
+        checkBox.appendTo($('#' + this.htmlObject))
+                .bind('click', function (ev) {
+                  promptPanel.autoSubmit = ev.target.checked;
+                });
       }
 
       // BISERVER-6915 Should not request pagination when auto-submit is set to false
       if (promptPanel.forceAutoSubmit || promptPanel.autoSubmit) {
         this.expression(/*isInit*/true);
       }
+    },
+
+    /**
+     * Called to create the check box HTML element
+     *
+     * @name SubmitPromptComponent#_createElement
+     * @method
+     * @param {String}checkboxStr
+     * @private
+     */
+    _createElement: function(checkboxStr) {
+      return $(checkboxStr);
     },
 
     /**

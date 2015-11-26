@@ -125,7 +125,7 @@ define([
           eventApi.postInit(function(){
             initialParameterDefinition.parameterGroups[0].parameters.splice(1);
             promptPanel.refresh(initialParameterDefinition);
-            expect(promptPanel.onBeforeRender.calls.count()).toEqual(2);
+            expect(promptPanel.onBeforeRender.calls.count()).toEqual(1);
             expect(promptPanel.onAfterRender.calls.count()).toEqual(2);
             expect(promptPanel.onBeforeUpdate.calls.count()).toEqual(2);
             expect(promptPanel.onAfterUpdate.calls.count()).toEqual(2);

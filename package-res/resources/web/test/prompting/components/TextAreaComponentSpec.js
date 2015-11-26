@@ -15,8 +15,8 @@
  *
  */
 
-define([ 'common-ui/prompting/components/TextAreaComponent', 'cdf/dashboard/Utils' ],
-  function(TextAreaComponent, Utils) {
+define([ 'common-ui/prompting/components/TextAreaComponent', 'cdf/dashboard/Utils', 'common-ui/jquery-clean' ],
+  function(TextAreaComponent, Utils, $) {
 
     describe("TextAreaComponent", function() {
       var id = "test_id";

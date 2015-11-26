@@ -34,7 +34,7 @@
  * @class
  * @extends PromptLayoutComponent
  */
-define(['cdf/lib/jquery', './PromptLayoutComponent'], function($, PromptLayoutComponent){
+define(['common-ui/jquery-clean', './PromptLayoutComponent'], function($, PromptLayoutComponent) {
 
   return PromptLayoutComponent.extend({
 

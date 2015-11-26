@@ -37,7 +37,7 @@
  * @class
  * @extends Base
  */
-define(['cdf/lib/Base'], function(Base){
+define(['cdf/lib/Base', 'common-ui/jquery-clean'], function(Base, $) {
 
   return Base.extend({
     /**

@@ -57,7 +57,9 @@
  * @class
  * @extends BaseComponent
  */
-define(['cdf/components/BaseComponent','dojo/_base/lang', 'dijit/registry'], function(BaseComponent, lang, registry){
+define(['cdf/components/BaseComponent','dojo/_base/lang', 'dijit/registry', 'common-ui/jquery-clean'], 
+  function(BaseComponent, lang, registry, $) {
+    
   return BaseComponent.extend({
 
     /** Clears an external input element.

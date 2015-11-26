@@ -15,7 +15,7 @@
  *
  */
 
-define(['./CompositeComponent'], function(CompositeComponent){
+define(['./CompositeComponent', 'common-ui/jquery-clean'], function(CompositeComponent, $) {
 
   return CompositeComponent.extend({
     getClassFor: function (component) {

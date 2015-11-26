@@ -36,8 +36,8 @@
  * @class
  * @extends ParameterWidgetBuilderBase
  */
-define(['common-ui/util/formatting', './ParameterWidgetBuilderBase'],
-    function (FormatUtils, ParameterWidgetBuilderBase) {
+define(['common-ui/util/formatting', './ParameterWidgetBuilderBase', 'common-ui/jquery-clean'],
+    function (FormatUtils, ParameterWidgetBuilderBase, $) {
 
       return ParameterWidgetBuilderBase.extend({
         /**

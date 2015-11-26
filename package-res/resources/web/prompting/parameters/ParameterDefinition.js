@@ -28,7 +28,7 @@
  * @property {Number} totalPages The number of total pages of the report
  * @property {Object|Array} errors The array of errors per parameter
  */
-define([], function () {
+define(['common-ui/jquery-clean'], function ($) {
   return function () {
 
     return {

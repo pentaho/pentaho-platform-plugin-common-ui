@@ -15,7 +15,7 @@
  *
  */
 
-define([ 'cdf/lib/jquery', 'cdf/dashboard/Utils', 'common-ui/prompting/components/CompositeComponent' ], function($,
+define([ 'common-ui/jquery-clean', 'cdf/dashboard/Utils', 'common-ui/prompting/components/CompositeComponent' ], function($,
   Utils, CompositeComponent) {
 
   describe("CompositeComponent", function() {

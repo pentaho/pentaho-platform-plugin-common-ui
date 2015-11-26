@@ -36,7 +36,7 @@
  * @class
  * @extends BaseComponent
  */
-define([ 'cdf/components/BaseComponent', 'cdf/lib/jquery' ], function(BaseComponent, $) {
+define([ 'cdf/components/BaseComponent', 'common-ui/jquery-clean' ], function(BaseComponent, $) {
   return BaseComponent.extend({
 
     /**
