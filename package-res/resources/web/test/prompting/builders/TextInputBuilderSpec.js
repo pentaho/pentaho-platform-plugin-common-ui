@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-define(['common-ui/prompting/builders/TextInputBuilder', 'dojo/number'], function(TextInputBuilder, DojoNumber) {
+define(['common-ui/prompting/builders/TextInputBuilder', 'dojo/number', 'common-ui/jquery-clean'], function(TextInputBuilder, DojoNumber, $) {
 
   describe("TextInputBuilder", function() {
 

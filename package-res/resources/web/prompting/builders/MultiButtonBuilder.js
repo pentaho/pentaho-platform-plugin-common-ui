@@ -50,8 +50,8 @@
  * @extends ValueBasedParameterWidgetBuilder
  */
 
-define(['cdf/components/MultiButtonComponent', './ValueBasedParameterWidgetBuilder'],
-    function (MultiButtonComponent, ValueBasedParameterWidgetBuilder) {
+define(['cdf/components/MultiButtonComponent', './ValueBasedParameterWidgetBuilder', 'common-ui/jquery-clean'],
+    function (MultiButtonComponent, ValueBasedParameterWidgetBuilder, $) {
 
       return ValueBasedParameterWidgetBuilder.extend({
         /**

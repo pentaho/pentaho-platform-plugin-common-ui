@@ -15,9 +15,10 @@
  *
  */
 
-define([ 'common-ui/prompting/components/SubmitPromptComponent' ], function(SubmitPromptComponent) {
+define([ 'common-ui/prompting/components/SubmitPromptComponent', 'common-ui/jquery-clean' ], function(SubmitPromptComponent, $) {
 
   describe("SubmitPromptComponent", function() {
+    
     var id = "test_id";
     var autoSubmitLabel = "test submit label";
     var comp;
@@ -53,13 +54,13 @@ define([ 'common-ui/prompting/components/SubmitPromptComponent' ], function(Subm
       beforeEach(function() {
         spyElem = jasmine.createSpyObj("spyElem", [ "appendTo", "bind" ]);
         spyOn(comp, "expression");
+        spyOn(comp, "createElement").and.returnValue(spyElem);
         spyElem.appendTo.and.returnValue(spyElem);
-        spyOn(window, "$").and.returnValue(spyElem);
       });
 
       it("should create auto submit elements with unchecked state", function() {
         comp.update();
-        expect(window.$).toHaveBeenCalledWith(
+        expect(comp.createElement).toHaveBeenCalledWith(
           '<label class="auto-complete-checkbox"><input type="checkbox" />' + autoSubmitLabel + '</label>');
         expect(spyElem.appendTo).toHaveBeenCalled();
         expect(spyElem.bind).toHaveBeenCalledWith('click', jasmine.any(Function));
@@ -69,7 +70,7 @@ define([ 'common-ui/prompting/components/SubmitPromptComponent' ], function(Subm
       it("should create auto submit elements with checked state", function() {
         comp.promptPanel.autoSubmit = true;
         comp.update();
-        expect(window.$).toHaveBeenCalledWith(
+        expect(comp.createElement).toHaveBeenCalledWith(
           '<label class="auto-complete-checkbox"><input type="checkbox" checked="checked" />' + autoSubmitLabel
             + '</label>');
         expect(spyElem.appendTo).toHaveBeenCalled();

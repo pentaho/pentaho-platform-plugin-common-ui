@@ -15,8 +15,8 @@
  *
  */
 
-define([ 'common-ui/prompting/components/ScrollingPromptPanelLayoutComponent' ], function(
-  ScrollingPromptPanelLayoutComponent) {
+define([ 'common-ui/prompting/components/ScrollingPromptPanelLayoutComponent', 'common-ui/jquery-clean' ], function(
+  ScrollingPromptPanelLayoutComponent, $) {
 
   describe("ScrollingPromptPanelLayoutComponent", function() {
 

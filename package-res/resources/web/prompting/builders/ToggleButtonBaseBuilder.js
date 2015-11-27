@@ -15,8 +15,8 @@
  *
  */
 
-define(['./ValueBasedParameterWidgetBuilder'],
-    function (ValueBasedParameterWidgetBuilder) {
+define(['./ValueBasedParameterWidgetBuilder', 'common-ui/jquery-clean'],
+    function (ValueBasedParameterWidgetBuilder, $) {
       return ValueBasedParameterWidgetBuilder.extend({
         build: function (args) {
           var widget = this.base(args);

@@ -15,8 +15,8 @@
  *
  */
 
-define(['cdf/dashboard/Utils', 'cdf/components/TextComponent', './ParameterWidgetBuilderBase'],
-    function (Utils, TextComponent, ParameterWidgetBuilderBase) {
+define(['cdf/dashboard/Utils', 'cdf/components/TextComponent', './ParameterWidgetBuilderBase', 'common-ui/jquery-clean'],
+    function (Utils, TextComponent, ParameterWidgetBuilderBase, $) {
 
       return ParameterWidgetBuilderBase.extend({
         build: function (args) {

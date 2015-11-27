@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-define(['common-ui/prompting/builders/ParameterWidgetBuilderBase'], function(ParameterWidgetBuilderBase) {
+define(['common-ui/prompting/builders/ParameterWidgetBuilderBase', 'common-ui/jquery-clean'], function(ParameterWidgetBuilderBase, $) {
 
   describe("ParameterWidgetBuilderBase", function() {
 

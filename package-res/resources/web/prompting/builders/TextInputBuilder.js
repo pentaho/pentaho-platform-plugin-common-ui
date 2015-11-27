@@ -49,8 +49,8 @@
  * @class
  * @extends FormattedParameterWidgetBuilderBase
  */
-define(["common-ui/util/util", 'dojo/number', 'cdf/components/TextInputComponent', './FormattedParameterWidgetBuilderBase'],
-  function (Util, DojoNumber, TextInputComponent, FormattedParameterWidgetBuilderBase) {
+define(["common-ui/util/util", 'dojo/number', 'cdf/components/TextInputComponent', './FormattedParameterWidgetBuilderBase', 'common-ui/jquery-clean'],
+  function (Util, DojoNumber, TextInputComponent, FormattedParameterWidgetBuilderBase, $) {
 
     return FormattedParameterWidgetBuilderBase.extend({
       /**

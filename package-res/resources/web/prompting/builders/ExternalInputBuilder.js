@@ -45,8 +45,8 @@
  * @extends FormattedParameterWidgetBuilderBase
  */
 
-define(['./FormattedParameterWidgetBuilderBase', '../components/ExternalInputComponent'],
-    function (FormattedParameterWidgetBuilderBase, ExternalInputComponent) {
+define(['./FormattedParameterWidgetBuilderBase', '../components/ExternalInputComponent', 'common-ui/jquery-clean'],
+    function (FormattedParameterWidgetBuilderBase, ExternalInputComponent, $) {
 
       return FormattedParameterWidgetBuilderBase.extend({
         /**

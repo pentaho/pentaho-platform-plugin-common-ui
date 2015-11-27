@@ -30,7 +30,7 @@
  * @property {Object|String} attributes Hash of string for the remaining parameter attributes
  * @property {Array|Object} values The array of possible values of the parameter
  */
-define([], function () {
+define(['common-ui/jquery-clean'], function ($) {
   return function () {
     return {
       name: undefined,

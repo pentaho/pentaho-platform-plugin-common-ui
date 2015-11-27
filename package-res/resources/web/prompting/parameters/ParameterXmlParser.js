@@ -21,8 +21,8 @@
  * @name ParameterXmlParser
  * @class
  */
-define(['cdf/lib/Base', 'common-ui/util/base64', 'common-ui/util/formatting',  './Parameter', './ParameterDefinition', './ParameterGroup', './ParameterValue'],
-    function (Base, Base64Util, Formatter, Parameter, ParameterDefinition, ParameterGroup, ParameterValue) {
+define(['cdf/lib/Base', 'common-ui/util/base64', 'common-ui/util/formatting',  './Parameter', './ParameterDefinition', './ParameterGroup', './ParameterValue', 'common-ui/jquery-clean'],
+    function (Base, Base64Util, Formatter, Parameter, ParameterDefinition, ParameterGroup, ParameterValue, $) {
 
       /**
        * Parses the xml retrieved from the server call

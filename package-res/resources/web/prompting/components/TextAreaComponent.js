@@ -15,7 +15,7 @@
  *
  */
 
-define(['cdf/components/BaseComponent', 'cdf/dashboard/Utils'], function (BaseComponent, Utils) {
+define(['cdf/components/BaseComponent', 'cdf/dashboard/Utils', 'common-ui/jquery-clean'], function (BaseComponent, Utils, $) {
   return BaseComponent.extend({
     update: function () {
       var myself = this;

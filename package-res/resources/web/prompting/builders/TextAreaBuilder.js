@@ -49,8 +49,8 @@
  * @class
  * @extends FormattedParameterWidgetBuilderBase
  */
-define(['./FormattedParameterWidgetBuilderBase', 'cdf/components/TextareaInputComponent'],
-    function (FormattedParameterWidgetBuilderBase, TextareaInputComponent) {
+define(['./FormattedParameterWidgetBuilderBase', 'cdf/components/TextareaInputComponent', 'common-ui/jquery-clean'],
+    function (FormattedParameterWidgetBuilderBase, TextareaInputComponent, $) {
 
       return FormattedParameterWidgetBuilderBase.extend({
         /**

@@ -15,9 +15,9 @@
  *
  */
 
-define(['./ParameterWidgetBuilderBase', '../components/ParameterPanelComponent'],
+define(['./ParameterWidgetBuilderBase', '../components/ParameterPanelComponent', 'common-ui/jquery-clean'],
 
-    function (ParameterWidgetBuilderBase, ParameterPanelComponent) {
+    function (ParameterWidgetBuilderBase, ParameterPanelComponent, $) {
 
       return ParameterWidgetBuilderBase.extend({
         build: function (args) {

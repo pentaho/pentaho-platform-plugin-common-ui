@@ -15,7 +15,7 @@
  *
  */
 
-define(['./TableBasedPromptLayoutComponent'], function (TableBasedPromptLayoutComponent) {
+define(['./TableBasedPromptLayoutComponent', 'common-ui/jquery-clean'], function (TableBasedPromptLayoutComponent, $) {
 
   return TableBasedPromptLayoutComponent.extend({
     getMarkupFor: function (components) {

@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-define(['common-ui/prompting/builders/TextAreaBuilder'], function(TextAreaBuilder) {
+define(['common-ui/prompting/builders/TextAreaBuilder', 'common-ui/jquery-clean'], function(TextAreaBuilder, $) {
 
   describe("TextAreaBuilder", function() {
 

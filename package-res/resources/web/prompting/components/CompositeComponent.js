@@ -25,7 +25,8 @@
  * @property {Boolean} executeAtStart True if this component should be executed on the first update of the Dashboard
  * object were it is, False otherwise
  */
-define([ 'cdf/lib/jquery', 'cdf/components/BaseComponent', 'cdf/dashboard/Utils' ], function($, BaseComponent, Utils) {
+define([ 'common-ui/jquery-clean', 'cdf/components/BaseComponent', 'cdf/dashboard/Utils' ], 
+  function($, BaseComponent, Utils) {
 
   return BaseComponent.extend({
     components : undefined, // array of components

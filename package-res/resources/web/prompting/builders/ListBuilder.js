@@ -53,8 +53,8 @@
  * @extends ValueBasedParameterWidgetBuilder
  */
 
-define(['cdf/components/SelectComponent', 'cdf/components/SelectMultiComponent', './ValueBasedParameterWidgetBuilder'],
-    function (SelectComponent, SelectMultiComponent, ValueBasedParameterWidgetBuilder) {
+define(['cdf/components/SelectComponent', 'cdf/components/SelectMultiComponent', './ValueBasedParameterWidgetBuilder', 'common-ui/jquery-clean'],
+    function (SelectComponent, SelectMultiComponent, ValueBasedParameterWidgetBuilder, $) {
 
       return ValueBasedParameterWidgetBuilder.extend({
         /**

@@ -42,8 +42,8 @@
  * @class
  * @extends FormattedParameterWidgetBuilderBase
  */
-define(['./FormattedParameterWidgetBuilderBase', '../components/StaticAutocompleteBoxComponent'],
-    function (FormattedParameterWidgetBuilderBase, StaticAutocompleteBoxComponent) {
+define(['./FormattedParameterWidgetBuilderBase', '../components/StaticAutocompleteBoxComponent', 'common-ui/jquery-clean'],
+    function (FormattedParameterWidgetBuilderBase, StaticAutocompleteBoxComponent, $) {
 
       return FormattedParameterWidgetBuilderBase.extend({
 

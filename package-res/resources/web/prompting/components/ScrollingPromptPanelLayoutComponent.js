@@ -15,7 +15,7 @@
  *
  */
 
-define(['./PromptLayoutComponent'], function(PromptLayoutComponent){
+define(['./PromptLayoutComponent', 'common-ui/jquery-clean'], function(PromptLayoutComponent, $) {
   return PromptLayoutComponent.extend({
     update: function () {
       if (this.components) {

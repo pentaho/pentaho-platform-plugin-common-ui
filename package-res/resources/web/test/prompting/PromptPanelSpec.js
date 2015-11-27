@@ -17,8 +17,8 @@
 
 define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
   'common-ui/prompting/parameters/ParameterDefinition', 'common-ui/prompting/parameters/ParameterGroup',
-  'common-ui/prompting/parameters/Parameter', 'common-ui/prompting/parameters/ParameterValue' ], function(DojoNumber,
-  i18n, PromptPanel, ParameterDefinition, ParameterGroup, Parameter, ParameterValue) {
+  'common-ui/prompting/parameters/Parameter', 'common-ui/prompting/parameters/ParameterValue', 'common-ui/jquery-clean' ], function(DojoNumber,
+  i18n, PromptPanel, ParameterDefinition, ParameterGroup, Parameter, ParameterValue, $) {
 
   describe("PromptPanel", function() {
 
@@ -433,7 +433,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
           };
           comp.promptType = "prompt";
           comp.type = "SelectMultiComponent";
-          spyOn(window, "$").and.returnValue([ {} ]);
+          spyOn($.fn, "init").and.returnValue([ {} ]);
           var components = [ comp ];
           panel.dashboard.components = components;
           panel.refresh(paramDefn);
@@ -619,9 +619,9 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
 
       it("hide", function() {
         var spyElem = jasmine.createSpyObj("spyElem", [ "css" ]);
-        spyOn(window, "$").and.returnValue(spyElem);
+        spyOn($.fn, "init").and.returnValue(spyElem);
         panel.hide();
-        expect(window.$).toHaveBeenCalledWith("#" + panel.destinationId);
+        expect($.fn.init).toHaveBeenCalledWith("#" + panel.destinationId, undefined, jasmine.any(Object));
         expect(spyElem.css).toHaveBeenCalledWith('display', 'none');
       });
 

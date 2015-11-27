@@ -15,7 +15,7 @@
  *
  */
 
-define([ 'common-ui/prompting/components/ScopedPentahoButtonComponent', 'cdf/lib/jquery' ], function(
+define([ 'common-ui/prompting/components/ScopedPentahoButtonComponent', 'common-ui/jquery-clean' ], function(
   ScopedPentahoButtonComponent, $) {
 
   describe("ScopedPentahoButtonComponent", function() {

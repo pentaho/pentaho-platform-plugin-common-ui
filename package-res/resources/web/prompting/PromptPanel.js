@@ -31,8 +31,8 @@
  * @property {Function} onBeforeUpdate Callback called if defined before the prompt update cycle is called
  * @property {Function} onAfterUpdate Callback called if defined after the prompt update cycle is called
  */
-define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/util/util', 'common-ui/util/GUIDHelper', './WidgetBuilder', 'cdf/Dashboard.Clean', './parameters/ParameterDefinitionDiffer'],
-    function (Base, Logger, DojoNumber, i18n, Utils, GUIDHelper, WidgetBuilder, Dashboard, ParamDiff) {
+define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/util/util', 'common-ui/util/GUIDHelper', './WidgetBuilder', 'cdf/Dashboard.Clean', './parameters/ParameterDefinitionDiffer', 'common-ui/jquery-clean'],
+    function (Base, Logger, DojoNumber, i18n, Utils, GUIDHelper, WidgetBuilder, Dashboard, ParamDiff, $) {
       /**
        * Creates a Widget calling the widget builder factory
        *
@@ -1097,7 +1097,7 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
                   this.dashboard.postInit(function() {
                     if (scrollTopValue) {
                       setScroll();
-                      delete scrollValue;
+                      scrollValue = undefined;
                     }
                   });
                 } else {

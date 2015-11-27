@@ -90,6 +90,14 @@
   requirePaths["common-ui/jquery"] = basePath + "/jquery/jquery-1.9.1" + minSuffix;
   requireShim ["common-ui/jquery"] = {exports: "$"};
 
+  requirePaths["common-ui/jquery-clean"] = basePath + "/jquery/jquery-1.9.1" + minSuffix;
+  requireShim ["common-ui/jquery-clean"] = {
+    exports: "$",
+    init: function() {
+      return $.noConflict(true);
+    }
+  } 
+
   requirePaths["common-ui/handlebars"] = basePath + "/handlebars/handlebars";
   requireShim ["common-ui/handlebars"] = ["common-ui/jquery"];
 

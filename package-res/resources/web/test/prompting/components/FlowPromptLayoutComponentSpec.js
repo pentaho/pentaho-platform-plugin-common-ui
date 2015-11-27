@@ -15,7 +15,7 @@
  *
  */
 
-define([ 'cdf/lib/jquery', 'common-ui/prompting/components/FlowPromptLayoutComponent' ], function($,
+define([ 'common-ui/jquery-clean', 'common-ui/prompting/components/FlowPromptLayoutComponent' ], function($,
   FlowPromptLayoutComponent) {
 
   describe("FlowPromptLayoutComponent", function() {

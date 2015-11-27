@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-define(['common-ui/prompting/builders/MultiButtonBuilder'], function(MultiButtonBuilder) {
+define(['common-ui/prompting/builders/MultiButtonBuilder', 'common-ui/jquery-clean'], function(MultiButtonBuilder, $) {
 
   describe("MultiButtonBuilder", function() {
 
