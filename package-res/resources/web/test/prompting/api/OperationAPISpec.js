@@ -92,9 +92,9 @@ define(["common-ui/prompting/api/OperationAPI"], function(OperationAPI) {
       });
 
       it("should test render with valid getParameterXml callback that returns null", function() {
-        var getParameterXml = function(api) {
+        var getParameterXml = function(api, callback) {
           expect(api).toBe(apiSpy);
-          return null;
+          callback(null);
         };
 
         expect(function() {
@@ -106,10 +106,9 @@ define(["common-ui/prompting/api/OperationAPI"], function(OperationAPI) {
       });
 
       it("should test render with valid getParameterXml callback that returns valid results first, then null", function() {
-        var getParameterXml = function(api) {
+        var getParameterXml = function(api, callback) {
           expect(api).toBe(apiSpy);
-
-          return !operationApi._promptPanel ? xmlStr : null;
+          callback(!operationApi._promptPanel ? xmlStr : null);
         };
 
         operationApi.render(htmlId, getParameterXml);
@@ -124,9 +123,9 @@ define(["common-ui/prompting/api/OperationAPI"], function(OperationAPI) {
       });
 
       it("should test render with valid getParameterXml callback that returns appropriate value", function() {
-        var getParameterXml = function(api) {
+        var getParameterXml = function(api, callback) {
           expect(api).toBe(apiSpy);
-          return !operationApi._promptPanel ? xmlStr : xmlStr1;
+          callback(!operationApi._promptPanel ? xmlStr : xmlStr1);
         };
 
         operationApi.render(htmlId, getParameterXml);

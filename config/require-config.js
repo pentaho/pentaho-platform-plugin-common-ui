@@ -21,6 +21,12 @@ requireCfg.paths["pentaho/visual/type/registryMock"] =
     "/base/package-res/resources/web/test/karma/unit/visual/type/registryMock";
 
 requireCfg.paths["common-ui/jquery-clean"] = "/base/package-res/resources/web/jquery/jquery-1.9.1";
+requireCfg.shim["common-ui/jquery-clean"] = {
+  exports: "$",
+  init: function() {
+    return $.noConflict(true);
+  }
+};
 
 // Reset "service" module configuration.
 requireCfg.config.service = {};
