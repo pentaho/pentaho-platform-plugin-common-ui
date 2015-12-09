@@ -960,7 +960,15 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
 
                 // Compare values array from param (which is formatted into valuesArray) with the current valuesArray
                 // We need to update the components if autoSubmit is off
-                if (JSON.stringify(component.valuesArray) !== JSON.stringify(newValuesArray) || param.forceUpdate) {
+                var valArr;
+                if ( component.valuesArray ) {
+                  valArr = component.valuesArray.slice();
+                  if ( "" == component.valuesArray[0][0] && "" == component.valuesArray[0][1] ) {
+                    //no update needed if component.valuesArray equals newValuesArray except first empty(default) value
+                    valArr = component.valuesArray.slice(1);
+                  }
+                }
+                if (JSON.stringify(valArr) !== JSON.stringify(newValuesArray) || param.forceUpdate) {
                   // Find selected value in param values list and set it. This works, even if the data in valuesArray is different
                   this._initializeParameterValue(null, param);
 
