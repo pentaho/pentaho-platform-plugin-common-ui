@@ -109,7 +109,7 @@ define(['common-ui/prompting/PromptPanel', 'common-ui/prompting/parameters/Param
      *
      * @name OperationAPI#getParameterValues
      * @method
-     * @returns {Array} parameter values
+     * @returns {JSON} parameter values
      */
     this.getParameterValues = function() {
       return this._getPromptPanel().getParameterValues();
