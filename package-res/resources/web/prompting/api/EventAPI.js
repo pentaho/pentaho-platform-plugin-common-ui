@@ -61,9 +61,9 @@ define([], function() {
     };
 
     /**
-     * Registers an after render event
+     * Registers an after update event
      *
-     * @name EventAPI#afterRender
+     * @name EventAPI#afterUpdate
      * @method
      * @param {Function} callback   The function to be executed when the event is triggered
      *                              Pass null if you wish to unbind this event
