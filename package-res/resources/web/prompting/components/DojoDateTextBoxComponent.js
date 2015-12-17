@@ -117,12 +117,12 @@ define(['cdf/components/BaseComponent', "dojo/date/locale", 'dijit/form/DateText
               parameterValue = parameterValue.length == 0 ? undefined : (parameterValue.length == 1 ? parameterValue[0] : parameterValue);
             }
             if(!parameterValue) {
-              value = new Date();
+              value = null;
             } else {
               value = this._parseDate(parameterValue);
             }
           } else {
-            value = new Date();
+            value = null;
           }
 
           $('#' + this.htmlObject).html($('<input/>').attr('id', this.dijitId));
