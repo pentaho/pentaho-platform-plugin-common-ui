@@ -23,12 +23,12 @@
  *
  * <pre><code>
  *   require(['common-ui/prompting/builders/TextInputBuilder'],
- *     function(TextInputBuilder) { 
- *       
+ *     function(TextInputBuilder) {
+ *
  *     }
  *   );
  * </code></pre>
- * 
+ *
  * To get the component you'll have to create a new instance of the builder and
  * call the <code>build</code> method:
  *
@@ -40,7 +40,7 @@
  *
  * where 'args' is an object that contains the prompt panel and the parameters
  * necessary for the component as per [the CDF documentation]{@link http://localhost:8080/pentaho/api/repos/:public:plugin-samples:pentaho-cdf:pentaho-cdf-require:30-documentation:30-component_reference:10-core:37-TextInputComponent:text_input_component.xcdf/generatedContent}.
- * 
+ *
  * <p>
  *   Note: the CDF documentation points to the Dashboard located on the Pentaho BI Server
  * </p>
@@ -103,7 +103,7 @@ define(["common-ui/util/util", 'dojo/number', 'cdf/components/TextInputComponent
                   initialValue = v.label = v.value = valueParsed;
                 }
               }
-            });
+            }.bind(this));
 
             $("#"+this.name).attr('value', initialValue);
           }

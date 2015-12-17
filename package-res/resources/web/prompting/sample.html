@@ -12,21 +12,10 @@
 
     <link rel="stylesheet" href="pentaho-prompting.css" type="text/css" />
 
-    <!-- Include the JSTextFormatter GWT Module -->
-    <script type="text/javascript" src="../formatter/formatter.nocache.js"></script>
-
     <script type="text/javascript">
-      gwtModuleLoaded = function(module) {
-        // Define a local module for every GWT module that's loaded. In our case we're only going to get the formatter
-        require(['local'], function(local) {
-          local.define('gwt-' + module);
-          console.log('defined module gwt-' + module);
-        });
-      }
-
-      require(['common-ui/jquery-clean', 'local!gwt-formatter'], function($) {
+      require(['common-ui/jquery-clean', 'common-ui/util/TextFormatter'], function($, TextFormatter) {
         var testNumberFormatter = function() {
-          var numberFormatter = jsTextFormatter.createFormatter('number', '$#.0#');
+          var numberFormatter = TextFormatter.createFormatter('number', '$#.0#');
           var number = 123.45;
           var formatted = numberFormatter.format(number);
           alert('Formatted number object: ' + number + ' -> ' + formatted);
@@ -34,7 +23,7 @@
           alert('Parsed string: ' + formatted + ' -> ' + parsed);
         };
         var testDateFormatter = function() {
-          var dateFormatter = jsTextFormatter.createFormatter('date', 'yyyy-MM-dd HH:mm');
+          var dateFormatter = TextFormatter.createFormatter('date', 'yyyy-MM-dd HH:mm');
           var date = new Date();
           var formatted = dateFormatter.format(date);
           alert('Formatted date object: ' + date + ' -> ' + formatted);
