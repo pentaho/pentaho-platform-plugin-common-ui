@@ -112,35 +112,28 @@ define([
           eventApi.afterUpdate(afterUpdateCallback);
         });
 
-        it("should call update always and render events if a change is needed", function () {
-          promptPanel.getParameterDefinition = function(promptPanel, callback) {
-            promptPanel.paramDefn = initialParameterDefinition;
-          };
-          promptPanel.init();
-          expect(promptPanel.onBeforeRender.calls.count()).toEqual(1);
-          expect(promptPanel.onAfterRender.calls.count()).toEqual(1);
-          expect(promptPanel.onBeforeUpdate.calls.count()).toEqual(1);
-          expect(promptPanel.onAfterUpdate.calls.count()).toEqual(1);
+        it("should call update always and render events if a change is needed", function (done) {
+          promptPanel.paramDefn = $.extend(true, {}, initialParameterDefinition);
 
           eventApi.postInit(function(){
             initialParameterDefinition.parameterGroups[0].parameters.splice(1);
             promptPanel.refresh(initialParameterDefinition);
-            expect(promptPanel.onBeforeRender.calls.count()).toEqual(1);
+            expect(promptPanel.onBeforeRender.calls.count()).toEqual(2);
             expect(promptPanel.onAfterRender.calls.count()).toEqual(2);
             expect(promptPanel.onBeforeUpdate.calls.count()).toEqual(2);
-            expect(promptPanel.onAfterUpdate.calls.count()).toEqual(2);
+            expect(promptPanel.onAfterUpdate.calls.count()).toEqual(2);            
+            done(); 
           });
-        });
 
-        it("should call update, but not render events if a change is not needed", function () {
-          promptPanel.getParameterDefinition = function(promptPanel, callback) {
-            promptPanel.paramDefn = initialParameterDefinition;
-          };
           promptPanel.init();
           expect(promptPanel.onBeforeRender.calls.count()).toEqual(1);
           expect(promptPanel.onAfterRender.calls.count()).toEqual(1);
           expect(promptPanel.onBeforeUpdate.calls.count()).toEqual(1);
           expect(promptPanel.onAfterUpdate.calls.count()).toEqual(1);
+        });
+
+        it("should call update, but not render events if a change is not needed", function (done) {
+          promptPanel.paramDefn = $.extend(true, {}, initialParameterDefinition);
 
           eventApi.postInit(function(){
             promptPanel.refresh(initialParameterDefinition);
@@ -148,7 +141,14 @@ define([
             expect(promptPanel.onAfterRender.calls.count()).toEqual(1);
             expect(promptPanel.onBeforeUpdate.calls.count()).toEqual(2);
             expect(promptPanel.onAfterUpdate.calls.count()).toEqual(2);
+            done();
           });
+
+          promptPanel.init();
+          expect(promptPanel.onBeforeRender.calls.count()).toEqual(1);
+          expect(promptPanel.onAfterRender.calls.count()).toEqual(1);
+          expect(promptPanel.onBeforeUpdate.calls.count()).toEqual(1);
+          expect(promptPanel.onAfterUpdate.calls.count()).toEqual(1);
         });
       });
     });

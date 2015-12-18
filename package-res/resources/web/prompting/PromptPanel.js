@@ -445,47 +445,6 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
         },
 
         /**
-         * This should return an object capable of formatting an object to the format used to send over the wire
-         * (the format it is transported in). See PromptPanel.createFormatter() for how a format object should look.
-         *
-         * @name PromptPanel#createDataTransportFormatter
-         * @method
-         * @param {ParameterDefinition} paramDefn Parameter definition
-         * @param {Parameter} parameter Parameter to create text formatter for
-         * @param {String} pattern Optional pattern to use instead of any the parameter declares
-         * @param {Object} formatter Formatter used to format this parameter to display
-         */
-        createDataTransportFormatter: function (paramDefn, parameter, pattern, formatter) {
-          //return undefined;
-        },
-
-        /**
-         * This should return an object capable of formatting the 'type' to and from text. If no formatter
-         * is required the return value should be undefined.
-         *
-         * A formatter should have two methods:
-         * formatter = {
-         *   format: function(object) {
-         *     return ...; // string
-         *   },
-         *   parse: function(string) {
-         *     return ...; // object
-         *   }
-         * }
-         *
-         * @name PromptPanel#createFormatter
-         * @method
-         * @param {ParameterDefinition} paramDefn Parameter definition
-         * @param {Parameter} parameter Parameter to create text formatter for
-         * @param {String} pattern Optional pattern to use instead of any the parameter declares
-         *
-         * @returns {Object} Optional object capable of formatting the 'type' to and from text
-         */
-        createFormatter: function (paramDefn, parameter, pattern) {
-          //return undefined;
-        },
-
-        /**
          * Generate a unique GUID for a widget of this panel.
          *
          * @name PromptPanel#generateWidgetGUID
