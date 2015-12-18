@@ -44,14 +44,14 @@ define(['common-ui/util/formatting', './ParameterWidgetBuilderBase', 'common-ui/
          * Creates a data transport formatter from the Format Utils
          *
          * @method
-         * @name StaticAutocompleteBoxBuilder#_createDataTransportFormatter
+         * @name FormattedParameterWidgetBuilderBase#_createDataTransportFormatter
          *
          * @param {ParameterDefinition} paramDefn - The Parameter Definition with the server response
          * @param {Parameter} param - The parameter instance
          * @returns {*|{format, parse}}
          * @private
          */
-        _createDataTransportFormatter: function(paramDefn, param){
+        _createDataTransportFormatter: function(paramDefn, param) {
           return FormatUtils.createDataTransportFormatter(paramDefn, param);
         },
 
@@ -59,11 +59,11 @@ define(['common-ui/util/formatting', './ParameterWidgetBuilderBase', 'common-ui/
          * Creates a formatter from the Format Utils
          *
          * @method
-         * @name StaticAutocompleteBoxBuilder#_createFormatter
+         * @name FormattedParameterWidgetBuilderBase#_createFormatter
          *
          * @param {ParameterDefinition} paramDefn - The Parameter Definition with the server response
          * @param {Parameter} param - The parameter instance
-         * @returns {*|Object}
+         * @returns {*|{format, parse}}
          * @private
          */
         _createFormatter: function(paramDefn, param){
