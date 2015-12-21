@@ -18,15 +18,15 @@
 /**
  * @name formatting
  */
-define("common-ui/util/formatting", ['common-ui/util/timeutil'], function(ReportTimeUtil) {
+define("common-ui/util/formatting", ['common-ui/util/timeutil', 'common-ui/util/TextFormatter'], function(ReportTimeUtil, TextFormatter) {
   return {
     /**
      * Create a text formatter that formats to/from text. This is designed to convert between data formatted as a string
      * and the Reporting Engine's expected format for that object type.
      * e.g. "01/01/2003" <-> "2003-01-01T00:00:00.000-0500"
      */
-    createDataTransportFormatter: function(paramDefn, parameter, pattern) {
-      var formatterType = this._formatTypeMap[parameter.type];
+    createDataTransportFormatter: function(paramDefn, parameter) {
+      var formatterType = TextFormatter.getFormatType(parameter.type);
       if (formatterType == 'number') {
         return {
           format: function(number) {
@@ -46,45 +46,22 @@ define("common-ui/util/formatting", ['common-ui/util/timeutil'], function(Report
      * format the Pentaho Reporting Engine expects.
      */
     createFormatter: function(paramDefn, parameter, pattern) {
-      if (!jsTextFormatter) {
-        console.log("Unable to find formatter module. No text formatting will be possible.");
-        return;
-      }
       // Create a formatter if a date format was provided and we're not a list parameter type. They are
       // mutually exclusive.
       var dataFormat = pattern || parameter.attributes['data-format'];
       if (!parameter.list && dataFormat) {
-        return jsTextFormatter.createFormatter(parameter.type, dataFormat);
+        return TextFormatter.createFormatter(parameter.type, dataFormat);
       }
-    },
-
-    _formatTypeMap: {
-      'number': 'number',
-      'java.lang.Number': 'number',
-      'java.lang.Byte': 'number',
-      'java.lang.Short': 'number',
-      'java.lang.Integer': 'number',
-      'java.lang.Long': 'number',
-      'java.lang.Float': 'number',
-      'java.lang.Double': 'number',
-      'java.math.BigDecimal': 'number',
-      'java.math.BigInteger': 'number',
-
-      'date': 'date',
-      'java.util.Date': 'date',
-      'java.sql.Date': 'date',
-      'java.sql.Time': 'date',
-      'java.sql.Timestamp': 'date'
     },
 
     _initDateFormatters: function() {
       // Lazily create all date formatters since we may not have createFormatter available when we're loaded
       if (!this.dateFormatters) {
         this.dateFormatters = {
-          'with-timezone': jsTextFormatter.createFormatter('date', "yyyy-MM-dd'T'HH:mm:ss.SSSZ"),
-          'without-timezone': jsTextFormatter.createFormatter('date', "yyyy-MM-dd'T'HH:mm:ss.SSS"),
-          'utc': jsTextFormatter.createFormatter('date', "yyyy-MM-dd'T'HH:mm:ss.SSS'+0000'"),
-          'simple': jsTextFormatter.createFormatter('date', "yyyy-MM-dd")
+          'with-timezone': TextFormatter.createFormatter('date', "yyyy-MM-dd'T'HH:mm:ss.SSSZ"),
+          'without-timezone': TextFormatter.createFormatter('date', "yyyy-MM-dd'T'HH:mm:ss.SSS"),
+          'utc': TextFormatter.createFormatter('date', "yyyy-MM-dd'T'HH:mm:ss.SSS'+0000'"),
+          'simple': TextFormatter.createFormatter('date', "yyyy-MM-dd")
         }
       }
     },
@@ -94,7 +71,7 @@ define("common-ui/util/formatting", ['common-ui/util/timeutil'], function(Report
      * with the Parameter XML output from the Report Viewer.
      */
     _createDataTransportFormatter: function(parameter, formatter) {
-      var formatterType = this._formatTypeMap[parameter.type];
+      var formatterType = TextFormatter.getFormatType(parameter.type);
       if (formatterType == 'number') {
         return {
           format: function(object) {
@@ -138,7 +115,7 @@ define("common-ui/util/formatting", ['common-ui/util/timeutil'], function(Report
           } else {
             var offset = ReportTimeUtil.getOffsetAsString(timezone);
             if (!this.dateFormatters[offset]) {
-              this.dateFormatters[offset] = jsTextFormatter.createFormatter('date', "yyyy-MM-dd'T'HH:mm:ss.SSS'" + offset + "'");
+              this.dateFormatters[offset] = TextFormatter.createFormatter('date', "yyyy-MM-dd'T'HH:mm:ss.SSS'" + offset + "'");
             }
             return this.dateFormatters[offset].format(date);
           }
