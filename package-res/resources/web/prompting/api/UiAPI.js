@@ -15,8 +15,24 @@
  *
  */
 
+/**
+ * This is the prompting user interface API class. Contains all general functions for working with the prompting user interface.
+ *
+ * @name UiAPI
+ * @class
+ */
 define([], function() {
   return function(api) {
-
+    /**
+     * Shows the progress indicator by calling the function PromptPanel#showProgressIndicator.
+     *
+     * @name UiAPI#showProgressIndicator
+     * @method
+     * @example
+     *     api.ui.showProgressIndicator();
+     */
+    this.showProgressIndicator = function() {
+      api.operation._getPromptPanel().showProgressIndicator();
+    };
   };
 });
