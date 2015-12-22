@@ -114,5 +114,17 @@ define(['common-ui/prompting/PromptPanel', 'common-ui/prompting/parameters/Param
     this.getParameterValues = function() {
       return this._getPromptPanel().getParameterValues();
     };
+
+    /**
+     * Sets a parameter value
+     *
+     * @name OperationAPI#setParameterValue
+     * @method
+     * @param {String}    param The name of the parameter that's going to be set
+     * @param {Object}    value The new value for the parameter
+     */
+    this.setParameterValue = function(param, value) {
+      this._getPromptPanel().setParameterValue(param, value);
+    }
   };
 });

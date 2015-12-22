@@ -20,7 +20,7 @@ define(["common-ui/prompting/api/OperationAPI"], function(OperationAPI) {
     var operationApi, apiSpy, promptPanelSpy, xmlStr, xmlStr1, htmlId, paramDefnSpy;
     beforeEach(function() {
 
-      promptPanelSpy = jasmine.createSpyObj("PromptPanel", ["refresh", "init", "getParameterValues", "getParameterDefinition"]);
+      promptPanelSpy = jasmine.createSpyObj("PromptPanel", ["refresh", "init", "getParameterValues" ," getParameterDefinition", "setParameterValue"]);
 
       apiSpy = jasmine.createSpy("PromptingAPI");
       apiSpy.log = jasmine.createSpyObj("Log", ["info", "warn", "error"]);
@@ -152,6 +152,13 @@ define(["common-ui/prompting/api/OperationAPI"], function(OperationAPI) {
 
       expect(operationApi._getPromptPanel).toHaveBeenCalled();
       expect(promptPanelSpy.getParameterValues).toHaveBeenCalled();
+    });
+
+    it("should test setParameterValue", function() {
+      operationApi.setParameterValue("param", "value");
+
+      expect(operationApi._getPromptPanel).toHaveBeenCalled();
+      expect(promptPanelSpy.setParameterValue).toHaveBeenCalledWith("param", "value");
     });
   });
 });
