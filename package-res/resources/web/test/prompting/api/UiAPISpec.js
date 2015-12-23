@@ -20,7 +20,7 @@ define(["common-ui/prompting/api/UiAPI"], function(UiAPI) {
   describe("UiAPI unit tests", function() {
     var uiApi, apiSpy, promptPanelSpy;
     beforeEach(function() {
-      promptPanelSpy = jasmine.createSpyObj("PromptPanel", ["showProgressIndicator"]);
+      promptPanelSpy = jasmine.createSpyObj("PromptPanel", ["showProgressIndicator", "hideProgressIndicator"]);
 
       apiSpy = jasmine.createSpy("PromptingAPI");
       apiSpy.operation = jasmine.createSpyObj("OperationAPI", ["_getPromptPanel"]);
@@ -33,6 +33,12 @@ define(["common-ui/prompting/api/UiAPI"], function(UiAPI) {
       uiApi.showProgressIndicator();
       expect(apiSpy.operation._getPromptPanel).toHaveBeenCalled();
       expect(promptPanelSpy.showProgressIndicator).toHaveBeenCalled();
+    });
+
+    it("should hide progress indicator", function() {
+      uiApi.hideProgressIndicator();
+      expect(apiSpy.operation._getPromptPanel).toHaveBeenCalled();
+      expect(promptPanelSpy.hideProgressIndicator).toHaveBeenCalled();
     });
   });
 });

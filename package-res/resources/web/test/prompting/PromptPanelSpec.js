@@ -59,7 +59,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
       beforeEach(function() {
         paramDefn = jasmine.createSpyObj("paramDefn", [ "allowAutoSubmit" ]);
         paramDefn.allowAutoSubmit.and.returnValue(true);
-        dashboardSpy = jasmine.createSpyObj("dashboardSpy", [ "setParameter", "getParameterValue", "getComponentByName", "addComponent", "updateComponent", "showProgressIndicator" ]);
+        dashboardSpy = jasmine.createSpyObj("dashboardSpy", [ "setParameter", "getParameterValue", "getComponentByName", "addComponent", "updateComponent", "showProgressIndicator", "hideProgressIndicator" ]);
         panel = new PromptPanel(testId, paramDefn);
         panel.dashboard = dashboardSpy;
       });
@@ -1185,6 +1185,11 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
       it("should show progress indicator", function() {
         panel.showProgressIndicator();
         expect(dashboardSpy.showProgressIndicator).toHaveBeenCalled();
+      });
+
+      it("should hide progress indicator", function() {
+        panel.hideProgressIndicator();
+        expect(dashboardSpy.hideProgressIndicator).toHaveBeenCalled();
       });
     });
   });
