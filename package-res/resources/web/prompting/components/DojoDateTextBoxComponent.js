@@ -213,6 +213,10 @@ define(['cdf/components/BaseComponent', "dojo/date/locale", 'dijit/form/DateText
             return true;
           }
 
+          if(dateFormat.match(/m/)) {
+            return true;
+          }
+
           return dojoFormat == $.datepicker.formatDate(dateFormat, new Date());
         },
 

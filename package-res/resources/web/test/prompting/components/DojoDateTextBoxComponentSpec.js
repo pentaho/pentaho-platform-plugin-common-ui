@@ -246,5 +246,29 @@ define([ 'cdf/lib/jquery', 'dijit/registry', 'common-ui/prompting/components/Doj
         testFormat("DD ooo", "EEEE DDD");
       });
     });
+
+    describe("_isLegacyDateFormat", function(){
+      beforeEach(function(){
+        comp = new DojoDateTextBoxComponent();
+      });
+
+      it("properly identifies legacy formats", function(){
+        var testLegacy = function(format, legacy){
+          comp.dateFormat = format;
+          expect(comp._isLegacyDateFormat()).toEqual(legacy);
+        };
+
+        testLegacy("yy-mm-dd", true);
+        testLegacy("yyyy/mm MM/dd", true);
+        testLegacy("yMMdd", true);
+        testLegacy("MMyydd", false);
+        testLegacy("MMo", true);
+        testLegacy("MMoo", true);
+        testLegacy("MM ooo", true);
+        testLegacy("M D", false);
+        testLegacy("MM D ooo", true);
+        testLegacy("DD ooo", true);
+      });
+    });
   });
 });
