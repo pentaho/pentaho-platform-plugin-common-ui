@@ -395,6 +395,9 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
          * @returns {String} The parameter name
          */
         getParameterName: function (parameter) {
+          if (typeof parameter === 'string') {
+            return this.guid + parameter;
+          }
           return this.guid + parameter.name;
         },
 
