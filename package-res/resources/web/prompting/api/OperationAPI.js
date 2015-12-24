@@ -126,6 +126,22 @@ define(['common-ui/prompting/PromptPanel', 'common-ui/prompting/parameters/Param
      */
     this.setParameterValue = function(param, value) {
       this._getPromptPanel().setParameterValue(param, value);
-    }
+    };
+
+    /**
+     * Refreshes the prompt panel.
+     * This API function gets a new parameter definition by using a special function that is defined as input callback for {@link OperationAPI#render}.
+     * Further are compared the previous and the new parameter definitions and after that it refreshes the prompt user interface with the differences between parameter definitions.
+     * For example, this API function can be used for submitting prompt panel.
+     *
+     * @name OperationAPI#refreshPrompt
+     * @param {Boolean} forceUpdate The flag indicates ability to update all components regardless of the difference previous and new xml from server
+     * @method
+     * @example
+     *     api.operation.refreshPrompt();
+     */
+    this.refreshPrompt = function(forceUpdate) {
+      this._getPromptPanel().refreshPrompt(forceUpdate);
+    };
   };
 });

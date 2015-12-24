@@ -20,7 +20,7 @@ define(["common-ui/prompting/api/OperationAPI"], function(OperationAPI) {
     var operationApi, apiSpy, promptPanelSpy, xmlStr, xmlStr1, htmlId, paramDefnSpy;
     beforeEach(function() {
 
-      promptPanelSpy = jasmine.createSpyObj("PromptPanel", ["refresh", "init", "getParameterValues", "getParameterDefinition", "setParameterValue"]);
+      promptPanelSpy = jasmine.createSpyObj("PromptPanel", ["refresh", "init", "getParameterValues", "getParameterDefinition", "setParameterValue", "refreshPrompt"]);
 
       apiSpy = jasmine.createSpy("PromptingAPI");
       apiSpy.log = jasmine.createSpyObj("Log", ["info", "warn", "error"]);
@@ -159,6 +159,23 @@ define(["common-ui/prompting/api/OperationAPI"], function(OperationAPI) {
 
       expect(operationApi._getPromptPanel).toHaveBeenCalled();
       expect(promptPanelSpy.setParameterValue).toHaveBeenCalledWith("param", "value");
+    });
+
+    describe("refreshPrompt tests", function() {
+      it("should refresh prompt without parameter", function() {
+        operationApi.refreshPrompt();
+        expect(promptPanelSpy.refreshPrompt).toHaveBeenCalled();
+      });
+
+      it("should refresh prompt with parameter", function() {
+        var forceUpdate = true;
+        operationApi.refreshPrompt(forceUpdate);
+        expect(promptPanelSpy.refreshPrompt).toHaveBeenCalledWith(forceUpdate);
+      });
+
+      afterEach(function() {
+        expect(operationApi._getPromptPanel).toHaveBeenCalled();
+      });
     });
   });
 });
