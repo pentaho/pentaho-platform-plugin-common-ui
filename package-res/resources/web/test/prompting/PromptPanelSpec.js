@@ -83,12 +83,18 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
         });
       });
 
-      it("getParameterName", function() {
+      it("getParameterName with parameter object", function() {
         var parameter = {
           name : "test_name"
         };
         var name = panel.getParameterName(parameter);
         expect(name).toBe(panel.guid + parameter.name);
+      });
+
+      it("getParameterName with string", function() {
+        var parameter = "test_name";
+        var name = panel.getParameterName(parameter);
+        expect(name).toBe(panel.guid + parameter);
       });
 
       describe("getParameterValues", function() {
