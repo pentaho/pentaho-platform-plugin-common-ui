@@ -1194,7 +1194,7 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
         createWidgetForSubmitComponent: function() {
           return _createWidget.call(this, {}, 'submit');
         },
-        
+
         /**
          * Builds the Panel and its components for the parameters
          *
@@ -1274,6 +1274,26 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
               });
             }
           });
+        },
+
+        /**
+         * Makes visible the progress indicator by calling the function Dashboard#showProgressIndicator.
+         *
+         * @name PromptPanel#showProgressIndicator
+         * @method
+         */
+        showProgressIndicator: function() {
+          this.dashboard.showProgressIndicator();
+        },
+
+        /**
+         * Hides the progress indicator by calling the function Dashboard#hideProgressIndicator.
+         *
+         * @name PromptPanel#hideProgressIndicator
+         * @method
+         */
+        hideProgressIndicator: function() {
+          this.dashboard.hideProgressIndicator();
         }
       });
 

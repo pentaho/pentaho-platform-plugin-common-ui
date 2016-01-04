@@ -15,8 +15,41 @@
  *
  */
 
+/**
+ * This is the prompting user interface API class. Contains all general functions for working with the prompting user interface.
+ *
+ * @name UiAPI
+ * @class
+ */
 define([], function() {
   return function(api) {
+    /**
+     * Makes visible the progress indicator.
+     * By default it adds elements to the DOM to give the appearance and behavior of blocking user interaction.
+     * For example, this API function can be used during long-running calls or to show a special popup with messages.
+     * To cancel this action can be used {@link UiAPI#hideProgressIndicator}.
+     *
+     * @name UiAPI#showProgressIndicator
+     * @method
+     * @example
+     *     api.ui.showProgressIndicator();
+     */
+    this.showProgressIndicator = function() {
+      api.operation._getPromptPanel().showProgressIndicator();
+    };
 
+    /**
+     * Hides the progress indicator.
+     * The main use-case of this API function is cancel the {@link UiAPI#showProgressIndicator} action.
+     * By default it removes elements from the DOM to hide the progress indicator and unblock user interaction.
+     *
+     * @name UiAPI#hideProgressIndicator
+     * @method
+     * @example
+     *     api.ui.hideProgressIndicator();
+     */
+    this.hideProgressIndicator = function() {
+      api.operation._getPromptPanel().hideProgressIndicator();
+    };
   };
 });
