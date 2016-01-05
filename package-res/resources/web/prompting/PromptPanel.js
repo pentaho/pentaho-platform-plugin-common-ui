@@ -368,12 +368,7 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
            */
           this.destinationId = destinationId;
 
-          if (!paramDefn) {
-            throw 'paramDefn is required';
-          }
-          this.paramDefn = paramDefn;
-
-          this.autoSubmit = paramDefn.allowAutoSubmit();
+          this.setParamDefn(paramDefn);
 
           this.promptGUIDHelper = new GUIDHelper();
 
@@ -384,6 +379,30 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
           this.paramDiffer = new ParamDiff();
 
           this.widgetBuilder = WidgetBuilder;
+        },
+
+        /**
+         * Returns the parameter definition if it has been set. Otherwise an exception is thrown.
+         *
+         * @returns {Object}
+         */
+        getParamDefn: function() {
+          if (!this.paramDefn) {
+            throw 'paramDefn is required. Call setParameterDefn';
+          }
+
+          return this.paramDefn;
+        },
+
+        /**
+         * Sets the parameter definition for the prompt panel. Also sets whether the prompt panel has auto submit
+         * @param paramDefn {Object} The parameter definition object
+         */
+        setParamDefn: function(paramDefn) {
+          this.paramDefn = paramDefn;
+          if (paramDefn) {
+            this.autoSubmit = paramDefn.allowAutoSubmit();
+          }
         },
 
         /**
@@ -436,7 +455,7 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
          */
         getParameterValues: function () {
           var params = {};
-          this.paramDefn.mapParameters(function (param) {
+          this.getParamDefn().mapParameters(function (param) {
             var value = this.getParameterValue(this.getParameterName(param));
             if (value === '' || typeof value == 'undefined') {
               return;
@@ -702,9 +721,9 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
           }
 
           if (paramDefn) {
-            this.diff = this.paramDiffer.diff(this.paramDefn, paramDefn, this.nullValueParams);
+            this.diff = this.paramDiffer.diff(this.getParamDefn(), paramDefn, this.nullValueParams);
             this.isRefresh = true;
-            this.paramDefn = paramDefn;
+            this.setParamDefn(paramDefn);
             this.nullValueParams = null;
 
             if (this.dashboard.components) {
@@ -873,7 +892,7 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
          */
         _changeErrors: function(param) {
           if (param.isErrorChanged) {
-            var errors = this.paramDefn.errors[param.name];
+            var errors = this.getParamDefn().errors[param.name];
             var panel = _getComponentByParam.call(this, param, true);
             var existingErrors = _findErrorComponents.call(this, panel);
 
@@ -1108,7 +1127,8 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
             }
           }).bind(this);
 
-          if (!this.isRefresh && this.paramDefn.showParameterUI()) { // First time init
+          var paramDefn = this.getParamDefn();
+          if (!this.isRefresh && paramDefn.showParameterUI()) { // First time init
             if (this.onBeforeRender) {
               this.onBeforeRender();
             }
@@ -1136,9 +1156,9 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
             }).bind(this);
             _mapComponents(layout, updateCallback);
           } else { // Simple parameter value initialization
-            this.paramDefn.mapParameters(function (param) {
+            paramDefn.mapParameters(function (param) {
               // initialize parameter values regardless of whether we're showing the parameter or not
-              this._initializeParameterValue(this.paramDefn, param);
+              this._initializeParameterValue(paramDefn, param);
             }, this);
 
             // Must submit, independently of auto-submit value.
@@ -1182,15 +1202,16 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
          */
         _buildPanelForParameter: function(param) {
           var panelComponents = [];
+          var paramDefn = this.getParamDefn();
 
           // initialize parameter values regardless of whether we're showing the parameter or not
-          this._initializeParameterValue(this.paramDefn, param);
+          this._initializeParameterValue(paramDefn, param);
 
           //add the label widget
           panelComponents.push(_createWidgetForLabel.call(this, param));
 
           //add the error widgets
-          var errors = this.paramDefn.errors[param.name];
+          var errors = paramDefn.errors[param.name];
           if (errors) {
             $.each(errors, function (i, e) {
               panelComponents.push(_createWidgetForErrorLabel.call(this, param, e));
@@ -1235,14 +1256,15 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
          */
         buildPanelComponents: function () {
           var panelGroupComponents = [];
+          var paramDefn = this.getParamDefn();
           // Create a composite panel of the correct layout type for each group
-          $.each(this.paramDefn.parameterGroups, function (i, group) {
+          $.each(paramDefn.parameterGroups, function (i, group) {
             var components = [];
             // Create a label and a CDF widget for each parameter
             $.each(group.parameters, function (i, param) {
               if (param.attributes['hidden'] == 'true') {
                 // initialize parameter values regardless of whether we're showing the parameter or not
-                this._initializeParameterValue(this.paramDefn, param);
+                this._initializeParameterValue(paramDefn, param);
                 return;
               }
               components.push(this._buildPanelForParameter(param));

@@ -121,8 +121,8 @@ define([
             expect(promptPanel.onBeforeRender.calls.count()).toEqual(2);
             expect(promptPanel.onAfterRender.calls.count()).toEqual(2);
             expect(promptPanel.onBeforeUpdate.calls.count()).toEqual(2);
-            expect(promptPanel.onAfterUpdate.calls.count()).toEqual(2);            
-            done(); 
+            expect(promptPanel.onAfterUpdate.calls.count()).toEqual(2);
+            done();
           });
 
           promptPanel.init();

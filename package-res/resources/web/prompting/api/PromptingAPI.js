@@ -20,6 +20,7 @@
  * This is a simple and concise mechanism for easily plugging prompting.
  *
  * @name PromptingAPI
+ * @param {String}    id HTML object id where to render the prompt panel
  * @class
  * @property {OperationAPI} operation The prompting operation API
  * @property {EventAPI} event The prompting event API
@@ -28,11 +29,7 @@
  * @property {Object} log The console logger of prompting API
  */
 define(["./OperationAPI", "./EventAPI", "./UiAPI", "./UtilAPI"], function(OperationAPI, EventAPI, UiAPI, UtilAPI) {
-  var API = function() {
-    this.operation = new OperationAPI(this),
-    this.util = new UtilAPI(this),
-    this.ui = new UiAPI(this),
-    this.event = new EventAPI(this),
+  var API = function(id) {
     this.log = {
       info: function(msg) {
         console.log(msg);
@@ -46,7 +43,20 @@ define(["./OperationAPI", "./EventAPI", "./UiAPI", "./UtilAPI"], function(Operat
         }
         console.error(msg);
       }
+    };
+
+    if (!id) {
+      this.log.error(API._msgs.NO_ID, true);
     }
+
+    this.operation = new OperationAPI(this, id);
+    this.util = new UtilAPI(this);
+    this.ui = new UiAPI(this);
+    this.event = new EventAPI(this);
+  };
+
+  API._msgs = {
+    NO_ID: "An HTML id for the prompt panel is required."
   };
 
   return API;
