@@ -357,102 +357,6 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
         return paramValue != paramSelectedValue;
       };
 
-      /**
-       * Checks input state parameter to contain read only properties. If contains, it throws an exception.
-       *
-       * @name PromptPanel#_validateReadOnlyState
-       * @method
-       * @private
-       * @param  {Object} state The set of properties
-       * @throws {String}       Exception if input state parameter contains read only properties
-       */
-      var _validateReadOnlyState = function(state) {
-        var cantModify = _STATE_CONSTANTS.readOnlyProperties.some(function(item) {
-          return state.hasOwnProperty(item);
-        });
-        if (cantModify) {
-          throw _STATE_CONSTANTS.msgs.notChangeReadonlyProp(_STATE_CONSTANTS.readOnlyProperties);
-        }
-      };
-
-      /**
-       * Checks input value as boolean type.
-       *
-       * @name PromptPanel#_validateBooleanState
-       * @method
-       * @private
-       * @param  {String} name  The name of the state property
-       * @param  {Object} value The value of the state property
-       * @throws {String}       Exception if input value is not a boolean type
-       */
-      var _validateBooleanState = function(name, value) {
-        if (value != null && typeof value !== "boolean") {
-          throw _STATE_CONSTANTS.msgs.incorrectBooleanType(name, value);
-        }
-      };
-
-      /**
-       * Validates property 'autoSubmit'.
-       *
-       * @name PromptPanel#_validateAutoSubmit
-       * @method
-       * @private
-       * @param  {Boolean} autoSubmit      The value of the 'autoSubmit' property
-       * @param  {Boolean} allowAutoSubmit The whether auto-submit is allowed
-       * @throws {String}                  Exception if type of 'autoSubmit' is incorrect or setting autoSubmit is not allowed
-       */
-      var _validateAutoSubmit = function(autoSubmit, allowAutoSubmit) {
-        _validateBooleanState("autoSubmit", autoSubmit);
-        if (autoSubmit != null && !allowAutoSubmit) {
-          throw _STATE_CONSTANTS.msgs.notAllowedAutoSubmit;
-        }
-      };
-
-      /**
-       * Validates property 'page'.
-       *
-       * @name PromptPanel#_validateStatePage
-       * @method
-       * @private
-       * @param {Number} page       The value of page
-       * @param {Boolean} paginate  The whether pagination is active
-       * @param {Number} totalPages The value of total pages
-       * @throws {String}           Exception if type of 'page' is incorrect or pagination is not activated or 'page' has incorrect value
-       */
-      var _validateStatePage = function(page, paginate, totalPages) {
-        if (page != null) {
-          if (typeof page !== "number") {
-            throw _STATE_CONSTANTS.msgs.incorrectNumberType(page);
-          }
-          if (!paginate) {
-            throw _STATE_CONSTANTS.msgs.paginationNotActivated(page);
-          }
-          if (page < 0 || page >= totalPages) {
-            throw _STATE_CONSTANTS.msgs.incorrectPageValue(page, totalPages - 1);
-          }
-        }
-      };
-
-      /**
-       * Validates all state's properties.
-       *
-       * @name PromptPanel#_validateState
-       * @method
-       * @private
-       * @param  {Object} state                  The set of properties
-       * @param  {ParameterDefinition} paramDefn The parameter definition instance
-       * @throws {String}                        Exception if input 'state' parameter is invalid
-       */
-      var _validateState = function(state, paramDefn) {
-        if (!state || typeof state !== 'object') {
-          throw _STATE_CONSTANTS.msgs.incorrectStateObjType;
-        }
-        _validateReadOnlyState(state);
-        _validateBooleanState("parametersChanged", state.parametersChanged);
-        _validateAutoSubmit(state.autoSubmit, paramDefn.allowAutoSubmit());
-        _validateStatePage(state.page, paramDefn.paginate, paramDefn.totalPages);
-      };
-
       var PromptPanel = Base.extend({
 
         guid: undefined,
@@ -1198,8 +1102,8 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
                 }
 
                 if (!updateNeeded) {
-                  updateNeeded = _areParamsDifferent(this.dashboard.getParameterValue(component.parameter),
-                      paramSelectedValues, paramType);
+                  var paramValue = this.dashboard.getParameterValue(component.parameter);
+                  updateNeeded = _areParamsDifferent(paramValue, paramSelectedValues, paramType);
                 }
 
                 if (updateNeeded) {

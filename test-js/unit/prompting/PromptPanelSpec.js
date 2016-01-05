@@ -1093,7 +1093,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
               spyOn(panel, "_initializeParameterValue");
               panel.dashboard.getParameterValue.and.returnValue("do");
 
-              var valuesArrayWithDefaults = [ ["test1", "test1"], ["test2", "test2"] ];
+              var valuesArrayWithDefaults = [ ["", ""], ["test1", "test1"], ["test2", "test2"] ];
               componentSpy.valuesArray = valuesArrayWithDefaults;
 
               var valuesArray = [ ["test1", "test1"], ["test2", "test2"] ];
