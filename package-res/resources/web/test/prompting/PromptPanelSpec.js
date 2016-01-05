@@ -31,13 +31,6 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
         expect(fn).toThrow('destinationId is required');
       });
 
-      it("should not create prompt panel without paramDefn", function() {
-        var fn = function() {
-          new PromptPanel(testId);
-        };
-        expect(fn).toThrow('paramDefn is required');
-      });
-
       it("should create prompt panel", function() {
         var paramDefn = jasmine.createSpyObj("paramDefn", [ "allowAutoSubmit" ]);
         paramDefn.allowAutoSubmit.and.returnValue(true);
@@ -412,7 +405,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
 
         it("should init also without components", function() {
           var noAutoAutoSubmit = true;
-          var paramDefn = jasmine.createSpy("paramDefnSpy");
+          var paramDefn = jasmine.createSpyObj("paramDefnSpy", ["allowAutoSubmit"]);
           panel.refresh(paramDefn, noAutoAutoSubmit);
           expect(panel.paramDefn).toBe(paramDefn);
           expect(window.setTimeout).not.toHaveBeenCalled();
@@ -420,7 +413,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
         });
 
         it("should init also with components", function() {
-          var paramDefn = jasmine.createSpyObj("paramDefnSpy", [ "showParameterUI" ]);
+          var paramDefn = jasmine.createSpyObj("paramDefnSpy", [ "showParameterUI", "allowAutoSubmit" ]);
           var comp = jasmine.createSpy("compSpy");
           var components = [ comp ];
           panel.components = components;
@@ -431,7 +424,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
         });
 
         it("should init also with components and find focused param", function() {
-          var paramDefn = jasmine.createSpyObj("paramDefnSpy", [ "showParameterUI" ]);
+          var paramDefn = jasmine.createSpyObj("paramDefnSpy", [ "showParameterUI", "allowAutoSubmit" ]);
           var comp = jasmine.createSpyObj("compSpy", [ "placeholder", "topValue" ]);
           comp.topValue.and.returnValue(100);
           comp.param = {
@@ -450,7 +443,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
         });
 
         it("should init also with components for ScrollingPromptPanelLayoutComponent", function() {
-          var paramDefn = jasmine.createSpyObj("paramDefnSpy", [ "showParameterUI" ]);
+          var paramDefn = jasmine.createSpyObj("paramDefnSpy", [ "showParameterUI", "allowAutoSubmit" ]);
           var comp = jasmine.createSpyObj("compSpy", [ "placeholder", "topValue" ]);
           comp.name = "compTestName";
           comp.placeholder.and.returnValue();
@@ -490,7 +483,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
         var paramDefn;
         var childElem;
         beforeEach(function() {
-          paramDefn = jasmine.createSpyObj("paramDefn", [ "mapParameters", "showParameterUI" ]);
+          paramDefn = jasmine.createSpyObj("paramDefn", [ "mapParameters", "showParameterUI", "allowAutoSubmit" ]);
           paramDefn.showParameterUI.and.returnValue(false);
           dash = jasmine.createSpyObj("dashSpy", [ "addComponents", "init", "getComponentByName", "updateComponent", "postInit" ]);
           var submitComponent = {
