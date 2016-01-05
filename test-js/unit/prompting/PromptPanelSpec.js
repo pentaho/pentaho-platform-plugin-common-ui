@@ -394,16 +394,100 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
         expect(parameterChangedSpyGeneric).toHaveBeenCalled();
       });
 
-      it("parameterChanged", function() {
-        var param = {};
-        var name = "name";
-        spyOn(panel, "_setTimeoutRefreshPrompt");
-        panel.parameterChanged(param, name);
-        expect(panel.parametersChanged).toBeTruthy();
-        expect(panel._setTimeoutRefreshPrompt).toHaveBeenCalled();
-        expect(panel.nullValueParams).toBeDefined();
-        expect(panel.nullValueParams.length).toBe(1);
-        expect(panel.nullValueParams[0]).toBe(param);
+      describe("parameterChanged", function() {
+        var param;
+        var name;
+        beforeEach(function() {
+          param = {};
+          name = "name";
+          spyOn(panel, "_setTimeoutRefreshPrompt");
+        });
+
+        describe("for single components (Text Area, Text Box, etc.)", function() {
+          beforeEach(function() {
+            param.list = false; // means that it is single component
+          });
+
+          var assertForSingleComponents = function() {
+            expect(panel.nullValueParams).toBeUndefined();
+            expect(panel.parametersChanged).toBeTruthy();
+            expect(panel._setTimeoutRefreshPrompt).toHaveBeenCalled();
+          };
+
+          it("should not fill nullValueParams with undefined value", function() {
+            panel.parameterChanged(param, name);
+            assertForSingleComponents();
+          });
+
+          it("should not fill nullValueParams with null value", function() {
+            var value = null;
+            panel.parameterChanged(param, name, value);
+            assertForSingleComponents();
+          });
+
+          it("should not fill nullValueParams with \"null\" value", function() {
+            var value = "null";
+            panel.parameterChanged(param, name, value);
+            assertForSingleComponents();
+          });
+
+          it("should not fill nullValueParams with \"\" value", function() {
+            var value = "";
+            panel.parameterChanged(param, name, value);
+            assertForSingleComponents();
+          });
+
+          it("should not fill nullValueParams with not empty value", function() {
+            var value = "value";
+            panel.parameterChanged(param, name, value);
+            assertForSingleComponents();
+          });
+        });
+
+        describe("for multi components (Multi Selection Button, Drop Down, etc.)", function() {
+          beforeEach(function() {
+            param.list = true; // means that it is multi component
+          });
+
+          var assertForMultiComponents = function() {
+            expect(panel.nullValueParams).toBeDefined();
+            expect(panel.nullValueParams.length).toBe(1);
+            expect(panel.nullValueParams[0]).toBe(param);
+            expect(panel.parametersChanged).toBeTruthy();
+            expect(panel._setTimeoutRefreshPrompt).toHaveBeenCalled();
+          };
+
+          it("should fill nullValueParams with undefined value", function() {
+            panel.parameterChanged(param, name);
+            assertForMultiComponents();
+          });
+
+          it("should fill nullValueParams with null value", function() {
+            var value = null;
+            panel.parameterChanged(param, name, value);
+            assertForMultiComponents();
+          });
+
+          it("should fill nullValueParams with \"null\" value", function() {
+            var value = "null";
+            panel.parameterChanged(param, name, value);
+            assertForMultiComponents();
+          });
+
+          it("should fill nullValueParams with \"\" value", function() {
+            var value = "";
+            panel.parameterChanged(param, name, value);
+            assertForMultiComponents();
+          });
+
+          it("should not fill nullValueParams with not empty value", function() {
+            var value = "value";
+            panel.parameterChanged(param, name, value);
+            expect(panel.nullValueParams).toBeUndefined();
+            expect(panel.parametersChanged).toBeTruthy();
+            expect(panel._setTimeoutRefreshPrompt).toHaveBeenCalled();
+          });
+        });
       });
 
       it("parameterChanged with specific parameter callback", function() {
@@ -747,7 +831,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
           expect(paramPanel.components.length).toBe(3);
           expect(paramPanel.components[0].type).toBe("TextComponent");
           expect(paramPanel.components[1].type).toBe("TextComponent");
-          expect(paramPanel.components[2].type).toBe("StaticAutocompleteBoxComponent");
+          expect(paramPanel.components[2].type).toBe("TextInputComponent");
           expect(paramPanel.components[0].promptType).toBe("label");
           expect(paramPanel.components[1].promptType).toBe("label");
           expect(paramPanel.components[2].promptType).toBe("prompt");
@@ -1044,6 +1128,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
               // create a parameter
               originalParam = new Parameter();
               originalParam.type = "java.lang.String";
+              originalParam.list = true;
               originalParam.name = paramName;
               originalParam.multiSelect = true;
               originalParam.values = [ value1, value2 ];
@@ -1200,16 +1285,19 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
                 panel.dashboard.updateComponent.calls.reset();
                 panel.dashboard.getParameterValue.and.returnValue(currentValue);
 
-                var paramValue = new ParameterValue();
-                paramValue.value = selectedValue;
-                paramValue.type = type;
-                paramValue.label = 'param'
-                paramValue.selected = true;
+                var selectedParams = [];
+                selectedValue = (type.indexOf("[") === 0 && selectedValue) ? selectedValue : [selectedValue];
+
+                for(var i=0; i < selectedValue.length; i++) {
+                  selectedParams[i] = new ParameterValue();
+                  selectedParams[i].value = selectedValue[i];
+                  selectedParams[i].selected = true;
+                }
 
                 var param = new Parameter();
                 param.name = 'param';
                 param.type = type;
-                param.values = [paramValue];
+                param.values = selectedParams;
 
                 var toChangeDiff = { groupName: { params: [param] } };
                 panel._changeComponentsByDiff(toChangeDiff);
@@ -1252,6 +1340,23 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
                 doTest(undefined, null, dateType, false);
                 doTest(null, undefined, dateType, false);
                 doTest(undefined, undefined, dateType, false);
+              });
+
+              it("cases for arrays", function () {
+                var arrayType = '[arrayType'; // Starting with "[" means its an array
+
+                doTest(["a","b"], ["a","b"], arrayType, false);
+                doTest(["a","b"], ["b","a"], arrayType, false);
+                doTest(["b","a","c"], ["c","b","a"], arrayType, false);
+
+                doTest(["a","b"], ["a"], arrayType, true);
+                doTest(["a","b"], ["a","c"], arrayType, true);
+                doTest(["a"], ["b","c"], arrayType, true);
+
+                doTest(null, null, arrayType, false);
+                doTest(undefined, null, arrayType, false);
+                doTest(null, undefined, arrayType, false);
+                doTest(undefined, undefined, arrayType, false);
               });
 
               it("cases for other types", function () {
@@ -1369,11 +1474,11 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
         it("should throw exception if state incorrect", function() {
           expect(function() {
             panel.setState();
-          }).toThrow("The input parameter 'state' is incorrect. It should be an object.");
+          }).toThrowError("The input parameter 'state' is incorrect. It should be an object.");
 
           expect(function() {
             panel.setState("incorrect param");
-          }).toThrow("The input parameter 'state' is incorrect. It should be an object.");
+          }).toThrowError("The input parameter 'state' is incorrect. It should be an object.");
         });
 
         it("should throw exception if try modify read only properties", function() {
@@ -1383,7 +1488,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
               var state = {};
               state[prop] = true;
               panel.setState(state);
-            }).toThrow("Not possible to change the following read-only properties: " + readOnlyProps + ".");
+            }).toThrowError("Not possible to change the following read-only properties: " + readOnlyProps + ".");
           });
         });
 
@@ -1393,14 +1498,14 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
               parametersChanged: "str"
             };
             panel.setState(state);
-          }).toThrow("Unexpected value 'str' for 'parametersChanged'. Must be boolean type.");
+          }).toThrowError("Unexpected value 'str' for 'parametersChanged'. Must be boolean type.");
 
           expect(function() {
             var state = {
               autoSubmit: "str"
             };
             panel.setState(state);
-          }).toThrow("Unexpected value 'str' for 'autoSubmit'. Must be boolean type.");
+          }).toThrowError("Unexpected value 'str' for 'autoSubmit'. Must be boolean type.");
         });
 
         it("should throw exception if try set not allowed autoSubmit flag", function() {
@@ -1411,7 +1516,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
               autoSubmit: true
             };
             panel.setState(state);
-          }).toThrow("Not possible to set 'autoSubmit'. It's limited by the 'allowAutoSubmit' flag.");
+          }).toThrowError("Not possible to set 'autoSubmit'. It's limited by the 'allowAutoSubmit' flag.");
         });
 
         it("should throw exception if try set incorrect page property", function() {
@@ -1420,7 +1525,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
               page: "str"
             };
             panel.setState(state);
-          }).toThrow("Unexpected value 'str' for 'page'. Must be a number type.");
+          }).toThrowError("Unexpected value 'str' for 'page'. Must be a number type.");
 
           expect(function() {
             paramDefn.paginate = false;
@@ -1428,7 +1533,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
               page: 1
             };
             panel.setState(state);
-          }).toThrow("Not possible to set page '1'. The pagination should be activated.");
+          }).toThrowError("Not possible to set page '1'. The pagination should be activated.");
 
           expect(function() {
             paramDefn.paginate = true;
@@ -1436,7 +1541,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
               page: 10
             };
             panel.setState(state);
-          }).toThrow("Not possible to set page '10'. The correct value should be between 0 and " + (paramDefn.totalPages - 1) + ".");
+          }).toThrowError("Not possible to set page '10'. The correct value should be between 0 and " + (paramDefn.totalPages - 1) + ".");
         });
 
         it("should set state correctly", function() {
