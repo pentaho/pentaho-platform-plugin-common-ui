@@ -1005,6 +1005,36 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
               expect(panel.forceSubmit).toEqual(true);
             });
 
+            it("should not update the components if old value array differs from new one only with default value", function() {
+
+              spyOn(panel, "_initializeParameterValue");
+              panel.dashboard.getParameterValue.and.returnValue("do");
+
+              var valuesArrayWithDefaultEmtyStrings = [["", ""],["test1", "test1"],["test2", "test2"]];
+              componentSpy.valuesArray = valuesArrayWithDefaultEmtyStrings;
+
+              changedParam = new Parameter();
+              changedParam.type = "java.lang.String";
+              changedParam.name = paramName;
+              changedParam.values = [ value1, value2 ];
+              var valuesArray = [["test1", "test1"],["test2", "test2"]];
+              spyOn(panel.widgetBuilder, "build").and.callFake(function(obj, type) {
+                return { "valuesArray": valuesArray };
+              });
+
+              change = {};
+              change[groupName] = {
+                params: [changedParam]
+              };
+
+              panel._changeComponentsByDiff(change);
+
+              expect(componentSpy.valuesArray).toBe(valuesArrayWithDefaultEmtyStrings);
+              expect(panel.widgetBuilder.build).toHaveBeenCalled();
+              expect(panel._initializeParameterValue).not.toHaveBeenCalled();
+              expect(panel.dashboard.updateComponent).not.toHaveBeenCalled();
+            });
+
             it("should compare the data values to determine if a change was made.", function() {
 
               var submitComponentSpy = jasmine.createSpy("submitComponentSpy");
