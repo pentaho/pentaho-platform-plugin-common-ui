@@ -1,0 +1,64 @@
+/*!
+ * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * The `spec.Model` type is the _union_ of all of the
+ * types that can be used to specify a model.
+ *
+ * @typedef {pentaho.data.spec.IModel |
+ *     Array.<pentaho.data.spec.IAttribute | pentaho.data.Attribute>}
+ *     pentaho.data.spec.Model
+ */
+
+/**
+ * @classdesc The `spec.IModel` interface describes the structure of a model specification.
+ *
+ * @name pentaho.data.spec.IModel
+ * @interface
+ * @extends pentaho.lang.spec.IAnnotatable
+ * @see pentaho.data.spec.Model
+ *
+ * @property {Array.<pentaho.data.spec.IAttribute | pentaho.data.Attribute>} attrs
+ * An array of attribute instances or specifications.
+ *
+ * Can be an empty array or not be specified.
+ *
+ * @example <caption>A basic model specification</caption>
+ *
+ *     var modelSpec = {
+ *       attrs: [
+ *         {
+ *           name: "product",
+ *           label: "Product",
+ *           type: "string",
+ *           members: [
+ *             {v: "car",   f: "Car"},
+ *             {v: "plane", f: "Plane"}
+ *           ]
+ *         },
+ *         {
+ *           name: "price",
+ *           label: "Price",
+ *           type: "number"
+ *         }
+ *       ],
+ *
+ *       p: {
+ *         "foo": 1,
+ *         "bar": 2
+ *       }
+ *     };
+ */

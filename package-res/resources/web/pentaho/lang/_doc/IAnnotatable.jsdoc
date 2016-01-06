@@ -1,0 +1,74 @@
+/*!
+ * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * @classdesc The `IAnnotatable` interface represents
+ * the class of objects whose instances can be freely augmented
+ * with annotations.
+ *
+ * An annotation has a name and a value, of (almost) any kind.
+ * The `undefined` value denotes a missing annotation,
+ * so it cannot be usefully be the value of an annotation.
+ *
+ * The {@link pentaho.lang.IAnnotatable#property} method
+ * allows getting or setting annotations on an _annotated_ object.
+ *
+ * By convention, the specification of an annotatable object
+ * uses a property named `p` to contain a plain object,
+ * a dictionary of annotations' names and values (see {@link pentaho.lang.spec.IAnnotatable}).
+ *
+ * @see pentaho.lang.ISpecifiable
+ * @see pentaho.lang.spec.IAnnotatable
+ *
+ * @example
+ *    // Obtain an annotatable object
+ *    var foo = ...
+ *
+ *    // Read foo's "bar" annotation
+ *    var bar = foo.property("bar");
+ *
+ *    // And create it, if it ain't there
+ *    if(bar === undefined) {
+ *        bar = "I have a 'bar' annotation!";
+ *        foo.property("bar", bar);
+ *    }
+ *
+ *    console.log(bar);
+ *
+ * @name pentaho.lang.IAnnotatable
+ * @interface
+ */
+
+/**
+ * Gets an annotation of the object.
+ *
+ * If an annotation with the specified name does not exist,
+ * `undefined` is returned.
+ *
+ * @name pentaho.lang.IAnnotatable#property
+ * @method
+ * @param {string} name The name of the annotation.
+ * @return {*} The annotation's value.
+ */
+/**
+ * Sets an annotation on this object.
+ *
+ * @name pentaho.lang.IAnnotatable#property
+ * @method
+ * @param {string} name The name of the annotation.
+ * @param {*} value The value of the annotation.
+ * @return {pentaho.lang.ISpecifiable} This object — the `this` value.
+ */

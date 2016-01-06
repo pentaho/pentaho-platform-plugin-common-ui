@@ -3,7 +3,11 @@
     "allowUnknownTags": true
   },
   "source": {
-    "include": ["package-res/resources/web/visual/data"],
+    "include": ["package-res/resources/web/pentaho"],
+    "exclude": [
+      "package-res/resources/web/pentaho/visual",
+      "package-res/resources/web/pentaho/data",
+      "package-res/resources/web/pentaho/component"],
     "includePattern": ".+\\.js(doc)?$"
   },
   "plugins": ["plugins/markdown"],
@@ -11,6 +15,7 @@
     "cleverLinks": true,
     "monospaceLinks": false,
     "default": {
+      "useLongnameInNav": true,
       "outputSourceFiles": true,
       "includeDate": true,
       "layoutFile": "../build-res/jsdoc-template/layout.tmpl",

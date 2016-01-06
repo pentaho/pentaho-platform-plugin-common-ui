@@ -1,0 +1,142 @@
+/*!
+ * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * @classdesc The `ISpecifiable` interface represents
+ * the class of objects that can be described by a specification.
+ *
+ * A specification is a minimal representation of the information required
+ * to build a typed object and all of its "owned" contents.
+ *
+ * It can be used to create a copy of a typed object.
+ *
+ * In most cases,
+ * a specification is a plain JavaScript object
+ * (plain, i.e., think "it was built with an object literal").
+ * However, it can also be a non-object value,
+ * when a typed object can be wholly expressed as
+ * a number, boolean, string or function value.
+ *
+ * To be clear,
+ * depending on a specification's contents,
+ * it may or may qualify as a _JSON_ object.
+ *
+ * The {@link pentaho.lang.ISpecifiable#toSpec} method
+ * creates a specification of a specifiable object.
+ *
+ * ### Construction
+ *
+ * Given a specification,
+ * a specifiable class must provide a way
+ * to construct instances from it.
+ *
+ * A specification object (or any of its "owned" contents)
+ * **_can_ be used destructively**, partially or totally,
+ * to construct a specifiable object.
+ *
+ * This supports the memory-effective, one-time cast-construction pattern,
+ * where the prototype of existing objects is changed,
+ * by using {@link Object.setPrototypeOf}.
+ *
+ * This also means that, without further knowledge,
+ * a specification can only be used to create a single copy of an object.
+ *
+ * ### "Newable" constructors
+ *
+ * By convention,
+ * in classes that have a constructor function
+ * that should be used with the `new` operator
+ * — has a "newable" constructor —
+ * the specification object is the first,
+ * optional or required, constructor argument.
+ *
+ * The following example illustrates this type of constructor function.
+ *
+ *     function Foo(spec) {
+ *        this.bar = (spec && spec.bar) || "bar";
+ *        this.qux = (spec && spec.qux) || "qux";
+ *     }
+ *
+ *     Foo.prototype.toSpec = function() {
+ *         return {
+ *             bar: this.bar,
+ *             qux: this.qux
+ *         };
+ *     };
+ *
+ *     // Create a Foo instance
+ *     var foo1 = new Foo({bar: "a", qux: "b"});
+ *
+ *     // Obtain a specification of `foo1`
+ *     var foo1Spec = foo1.toSpec();
+ *
+ *     // And use it to create a copy of it
+ *     var foo2 = new Foo(foo1Spec);
+ *
+ *     // Obtain another specification of `foo1`
+ *     foo1Spec = foo1.toSpec();
+ *
+ *     // And use it to create another copy of it
+ *     var foo3 = new Foo(foo1Spec);
+ *
+ * ### "Initialization" constructors
+ *
+ * In classes whose constructor is an initialization function
+ * that should not, however, be called using `new` (not "newable"),
+ * a plain object's prototype should be set using {@link Object.setPrototypeOf}
+ * and the constructor called on the "morphed" object, afterwards.
+ * In these cases, it is also conventional for the constructor function
+ * to provide a static `to` method that performs the class "conversion".
+ *
+ * The following example illustrates this type of constructor function.
+ *
+ *     function Foo() {
+ *        if(!this.bar) this.bar = "bar";
+ *        if(!this.qux) this.qux = "qux";
+ *     }
+ *
+ *     Foo.prototype.toSpec = function() {
+ *         return {
+ *             bar: this.bar,
+ *             qux: this.qux
+ *         };
+ *     };
+ *
+ *     Foo.to = function(spec) {
+ *         if(spec instanceof Foo) return spec;
+ *
+ *         Object.setPrototypeOf(spec, Foo);
+ *         Foo.call(spec);
+ *         return spec;
+ *     };
+ *
+ *     // Convert to a Foo instance
+ *     var foo1 = Foo.to({bar: "a", qux: "b"});
+ *
+ * @name pentaho.lang.ISpecifiable
+ * @interface
+ */
+
+/**
+ * Creates a specification of this object.
+ *
+ * Specific classes can support optional keyword arguments.
+ *
+ * @name pentaho.lang.ISpecifiable#toSpec
+ * @method
+ * @param {Object} [keyArgs] The keyword arguments.
+ * @return {*} A new specification of the object.
+ */

@@ -1,0 +1,137 @@
+/*!
+ * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * @name pentaho.type
+ * @namespace
+ *
+ * @description
+ *
+ * The `type` namespace contains the classes and interfaces
+ * that support the Pentaho platform's type metadata.
+ *
+ * ## Web Component Convention
+ *
+ * The Web Component Convention establishes a common-ground around
+ * file organization,
+ * AMD configuration,
+ * metadata,
+ * messages localization,
+ * theming,
+ * registration,
+ * configuration,
+ * and component identification,
+ * amongst disparate component frameworks,
+ * like, for example, the Community Dashboard Framework and the Visualization API.
+ *
+ * It does **not** pose any restrictions on the actual interface and runtime environment of components.
+ * Its goals are to:
+ *
+ * * Align the multitude of ways of doing the same component-related things
+ * * Make the lives of component authors easier
+ *   * easier to achieve the same goal
+ *   * less framework specifics to learn
+ * * Make the lives of framework authors easier
+ *   * can concentrate on each framework's core business
+ * * Provide platform-aware services, that can be used by component authors of any component-framework
+ * * Leverage the identification naturally provided by the AMD/requireJS module system,
+ *   and drop the use of local framework component type ids
+ * * Establish the common metadata required to describe component types
+ * * Provide centralized configuration of component types, per context/container,
+ *   for easily changing things like labels or default values
+ * * Enable the existence of framework-agnostic component editors
+ * * Enable the existence platform component directory service
+ * * Respect the runtime workings of each component framework
+ *
+ * ### Component type constituents and organization
+ *
+ * Generally, a web component is made up of several assets,
+ * like scripts, themes and messages.
+ * Ideally (and frequently), these are organized under a single folder,
+ * which is made accessible by some established AMD/RequireJS module id.
+ *
+ * ### Info
+ *
+ * Displaying very general information about existing component types is a need of component editors,
+ * allowing a component author to choose amongst available component types.
+ *
+ * The _Web Component Convention_ uses the class {@link pentaho.component.TypeInfo} for this effect.
+ * Every component type creates a `TypeInfo` sub-class and publishes it in the sub-module named **info**.
+ *
+ * ### Model
+ *
+ * A web component necessarily receives some model object that contains the properties that configure its use.
+ *
+ * Some implementations use a simple JavaScript object, whose keys are the property names, and whose values are the property values.
+ * Others use a more sophisticated _Backbone_ model object, that allows for change tracking and notifications.
+ * Others still, may use a more "conscious" model object that can provide metadata about the properties it contains.
+ *
+ * The latter class of model is particularly interesting, cause it:
+ * * _can_ be used to directly feed components,
+ * * enables component editors to satisfy those requirements.
+ *
+ * Additionally, the existence of a base model class and "model language",
+ * allied with each component type deriving its own model class:
+ * * allows component authors to implement custom validation logic,
+ * * allows for a generic component (instance) serialization format.
+ *
+ * The _Web Component Convention_ uses the class {@link pentaho.component.Model} for this effect.
+ * Every component type creates a `Model` sub-class and publishes it in the sub-module named **model**.
+ *
+ * ### View
+ *
+ * Last, but not the least, a web component necessarily has a class that _implements_ its main function.
+ *
+ * For visual components, their main function is the rendering of their visual representation.
+ *
+ * Without loss of generality, this name applies to any component, whether visual or not,
+ * in that a _view_ is an expression or representation of a _model_.
+ *
+ * Every component type publishes its view class in the sub-module named **view**.
+ *
+ * There is no requirement whatsoever on the view class.
+ * It can be a normal "constructor and prototype" JavaScript class,
+ * or its instances can be created using a factory function and return function instances,
+ * or anything else.
+ * Naturally, the _view_ sub-module must have as a value something that allows the creation of multiple instances...
+ *
+ * ### Identification
+ *
+ * Identification is naturally provided by the AMD module id of a component's base folder.
+ *
+ * This and the already described conventions for the info, model and view files are highly convenient.
+ *
+ * Given the id of a component type, an instance of it can be immediately created, or its _info_ obtained,
+ * without any other intermediaries (apart from the module system).
+ *
+ * For instance, if the id of a component type is `"pentaho/component/samples/textBox"`,
+ * then a component instance of it can be created as follows:
+ *
+ * ```javascript
+ * require([
+ *   "pentaho/component/samples/textBox/view"
+ * ], function(TextBox) {
+ *
+ *   var component = new TextBox();
+ *
+ *   // Use it
+ *
+ * });
+ * ```
+ *
+ * As said before, to use a component effectively, it is necessary to know the specifics of
+ * its component type's _view_ class.
+ */

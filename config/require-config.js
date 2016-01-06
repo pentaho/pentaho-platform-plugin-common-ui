@@ -18,7 +18,7 @@ requireCfg.paths["dojox"] = "/base/dev-res/dojo/dojo-release-1.9.2-src/dojox";
 requireCfg.paths["dijit"] = "/base/dev-res/dojo/dojo-release-1.9.2-src/dijit";
 
 requireCfg.paths["pentaho/visual/type/registryMock"] =
-    "/base/package-res/resources/web/test/karma/unit/visual/type/registryMock";
+    "/base/package-res/resources/web/test/karma/unit/pentaho/visual/type/registryMock";
 
 requireCfg.paths["common-ui/jquery-clean"] = "/base/package-res/resources/web/jquery/jquery-1.9.1";
 requireCfg.shim["common-ui/jquery-clean"] = {
@@ -28,8 +28,11 @@ requireCfg.shim["common-ui/jquery-clean"] = {
   }
 };
 
-// Reset "service" module configuration.
-requireCfg.config.service = {};
+requireCfg.paths["pentaho/i18n"] =
+    "/base/package-res/resources/web/test/karma/unit/pentaho/i18nMock";
+
+// Reset "pentaho/service" module configuration.
+requireCfg.config["pentaho/service"] = {};
 
 requireCfg.callback = function() {
   window.__karma__.start();

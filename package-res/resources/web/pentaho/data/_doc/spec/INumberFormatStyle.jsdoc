@@ -1,0 +1,108 @@
+/*!
+ * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * @classdesc The `spec.INumberFormatStyle` interface contains information that
+ * affects the style of number formatting.
+ *
+ * This interface is used to form a
+ * {@link pentaho.data.spec.INumberFormatFormat} specification.
+ *
+ * @example <caption>The default number format style specification</caption>
+ *
+ *     var numberFormatStyleSpec = {
+ *       integerPad:    "0",
+ *       fractionPad:   "0",
+ *       decimal:       ".",
+ *       group:         ",",
+ *       groupSizes:    [3],
+ *       abbreviations: ["k", "m", "b", "t"],
+ *       negativeSign:  "-",
+ *       currency:      "$"
+ *     };
+ *
+ * @name pentaho.data.spec.INumberFormatStyle
+ * @interface
+ * @see pentaho.data.spec.INumberFormatFormat
+ * @see pentaho.data.AtomicTypeName.NUMBER
+ *
+ * @property {string} decimal The character to use in place of the "." mask character.
+ *
+ * The decimal point separates the integer and fraction parts of the number.
+ *
+ * The default value is `"."`.
+ *
+ * @property {string} group The character to use in place of the "," mask character.
+ *
+ * The group separator groups integer digits according to the
+ * sizes in pentaho.data.spec.INumberFormatStyle#groupSizes.
+ *
+ * Grouping can be disabled, independently of the mask, by specifying "".
+ *
+ * The default value is `","`.
+ *
+ * @property {number[]} groupSizes The array of group sizes.
+ *
+ * The group sizes array must contain at least one element.
+ *
+ * The last group is repeated indefinitely.
+ *
+ * The default value is `[3]`.
+ *
+ * @property {string} negativeSign The negative sign character.
+ *
+ * The negative sign is used to indicate a negative number
+ * when a mask does not have a negative values section.
+ *
+ * The negative sign is placed leftmost in the resulting string.
+ *
+ * The negative sign is also used for showing a negative exponent,
+ * in scientific notation.
+ *
+ * The default value is `"-"`.
+ *
+ * @property {string} currency The currency symbol to use in place of the "¤" mask character.
+ *
+ * The **currency sign**, ¤, is a character used to denote an _unspecified_ currency.
+ * Its unicode is U+00A4 and
+ * its HTML entities are &amp;amp;#164; and &amp;amp;curren;
+ *
+ * See {@link http://en.wikipedia.org/wiki/Currency_sign_(typography)} for
+ * more information on the currency sign character.
+ *
+ * The default value is `"$"`.
+ *
+ * @property {string} integerPad The character to use in place of a "0" mask character in the integer part.
+ *
+ * The default value is `"0"`.
+ *
+ * @property {string} fractionPad The character to use in place of a "0" mask character in the fractional part.
+ *
+ * The default value is `"0"`.
+ *
+ * @property {string} abbreviations The possible abbreviations to use
+ *    when abbreviating the integer part.
+ *
+ * Abbreviations are output in place of the "A" or "Abbreviation" mask macros.
+ *
+ * The first abbreviation is used for the thousands unit,
+ * the second to the millions unit,
+ * ...
+ *
+ * Any number of abbreviations can be specified.
+ *
+ * The default value is `["k", "m", "b", "t"]`.
+ */
