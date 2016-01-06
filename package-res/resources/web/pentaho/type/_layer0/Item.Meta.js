@@ -452,8 +452,10 @@ define([
       return toTop;
     },
 
-    set to(to) {
-      this._to = to || toCore;
+    // NOTE: the argument cannot have the same name as the property setter
+    // or PhantomJS 1.9.8 will throw a syntax error...
+    set to(_) {
+      this._to = _ || toCore;
     },
 
     _to: toCore

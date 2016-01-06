@@ -449,7 +449,12 @@ define([
   // can be set, but only through `Object.defineProperty`.
   function setFunName(fun, name) {
     fun.displayName = name;
-    Object.defineProperty(fun, "name", {value: name, configurable: true});
+    try {
+      Object.defineProperty(fun, "name", {value: name, configurable: true});
+    } catch(ex) {
+      // TODO: for some pre-ES6 engines the property is not configurable
+      // Notably, PhantomJS 1.9.8 fails here.
+    }
   }
   //endregion
 });

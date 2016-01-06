@@ -102,15 +102,17 @@ define([
         return this._value;
       },
 
-      set value(value) {
+      // NOTE: the argument cannot have the same name as the property setter
+      // or PhantomJS 1.9.8 will throw a syntax error...
+      set value(_) {
         // Can only be set once.
         // Throws if nully.
-        value = this.meta.cast(value);
+        _ = this.meta.cast(_);
 
         if(this._value == null) {
           // First set
-          this._value = value;
-        } else if(this._value !== value) {
+          this._value = _;
+        } else if(this._value !== _) {
           throw error.operInvalid("Cannot change the primitive value of a simple value.");
         }
       },
@@ -165,8 +167,10 @@ define([
           return castTop;
         },
 
-        set cast(cast) {
-          this._cast = cast || castCore;
+        // NOTE: the argument cannot have the same name as the property setter
+        // or PhantomJS 1.9.8 will throw a syntax error...
+        set cast(_) {
+          this._cast = _ || castCore;
         },
 
         _cast: castCore,

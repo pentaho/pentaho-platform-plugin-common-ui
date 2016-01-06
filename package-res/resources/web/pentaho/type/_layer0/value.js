@@ -140,11 +140,13 @@ define([
         // @see Value.Meta#constructor.
         _abstract: true,
 
-        get "abstract"() {
+        // TODO: Rhino probably gives a syntax error on this.
+        // However, cannot use the `get "abstract"()` syntax cause then Phantom JS 1.9.8 starts failing...
+        get abstract() {
           return this._abstract;
         },
 
-        set "abstract"(value) {
+        set abstract(value) {
           // nully is reset, which is false, so !! works well.
           this._abstract = !!value;
         },
@@ -224,8 +226,10 @@ define([
           return validateTop;
         },
 
-        set validate(validate) {
-          this._validate = validate || validateCore;
+        // NOTE: the argument cannot have the same name as the property setter
+        // or PhantomJS 1.9.8 will throw a syntax error...
+        set validate(_) {
+          this._validate = _ || validateCore;
         },
 
         _validate: validateCore,
@@ -240,8 +244,10 @@ define([
           return areEqualTop;
         },
 
-        set areEqual(areEqual) {
-          this._areEqual = areEqual || areEqualCore;
+        // NOTE: the argument cannot have the same name as the property setter
+        // or PhantomJS 1.9.8 will throw a syntax error...
+        set areEqual(_) {
+          this._areEqual = _ || areEqualCore;
         },
 
         _areEqual: areEqualCore,
@@ -255,8 +261,10 @@ define([
           return compareTop;
         },
 
-        set compare(compare) {
-          this._compare = compare || compareCore;
+        // NOTE: the argument cannot have the same name as the property setter
+        // or PhantomJS 1.9.8 will throw a syntax error...
+        set compare(_) {
+          this._compare = _ || compareCore;
         },
 
         _compare: compareCore,

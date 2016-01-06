@@ -139,7 +139,9 @@ define([
       // 3. The Meta class requires Mesa to already exist, to be able to define accessors
       var metaInstSpec  = O["delete"](instSpec,  "meta"),
           metaClassSpec = O["delete"](classSpec, "meta"),
-          metaName      = SubMesa.name && (SubMesa.name + ".Meta");
+          // Setting a function's name is failing on PhantomJS 1.9.8...
+          mesaName      = SubMesa.name || SubMesa.displayName,
+          metaName      = mesaName && (mesaName + ".Meta");
 
       var ka = keyArgs ? Object.create(keyArgs) : {};
       ka.mesa = SubMesa.prototype;

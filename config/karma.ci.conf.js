@@ -48,6 +48,7 @@ module.exports = function (config) {
       // (these files will be instrumented by Istanbul)
       "package-res/resources/web/plugin-handler/**/*.js": ["coverage"],
       "package-res/resources/web/angular-directives/**/*.js": ["coverage"],
+      "package-res/resources/web/pentaho/**/*.js": ["coverage"],
       "package-res/resources/web/vizapi/**/*.js": ["coverage"],
       "package-res/resources/web/prompting/**/*.js": ["coverage"],
       "package-res/resources/web/util/**/*.js": ["coverage"],

@@ -96,11 +96,13 @@ define([
       return this._value;
     },
 
-    set value(value) {
+    // NOTE: the argument cannot have the same name as the property setter
+    // or PhantomJS 1.9.8 will throw a syntax error...
+    set value(_) {
       // TODO: change event
-      value = this._toValue(value);
-      if(!this._areEqual(value, this._value)) {
-        this._value = value;
+      _ = this._toValue(_);
+      if(!this._areEqual(_, this._value)) {
+        this._value = _;
       }
     },
 
@@ -123,8 +125,8 @@ define([
         return value == null
           // Reset. Copy the default value...
           // TODO: fix meta.value default value for list properties
-          ? (this.meta.value || []).slice()
-          : this._toValueArray((value instanceof Array) ? value : [value]);
+            ? (this.meta.value || []).slice()
+            : this._toValueArray((value instanceof Array) ? value : [value]);
       }
 
       return this.meta.type.to(value);
@@ -431,9 +433,11 @@ define([
         return this._value;
       },
 
-      set value(value) {
+      // NOTE: the argument cannot have the same name as the property setter
+      // or PhantomJS 1.9.8 will throw a syntax error...
+      set value(_) {
         // TODO
-        this._value = value;
+        this._value = _;
       },
       //endregion
 
@@ -444,10 +448,7 @@ define([
       },
       //endregion
 
-      //region countMin attribute
-      _countMin: 0,
-      _countMinEval: F.constant(0),
-
+      //region required attribute (TEMP)
       /**
        * Gets or sets whether a property is required.
        *
@@ -485,7 +486,7 @@ define([
        * on a given owner complex value.
        *
        * @param {pentaho.type.Complex} owner The complex value that owns the property.
-       * @return {number} The evaluated value of the `required` attribute.
+       * @return {boolean} The evaluated value of the `required` attribute.
        */
       requiredEval: function(owner) {
         return this.countMinEval(owner) > 0;
@@ -500,7 +501,7 @@ define([
         var mesa = this._declaringMeta.mesa,
             name = this._name,
             namePriv = this._namePriv;
-            //nameFormattedPriv = name + "Formatted";
+        //nameFormattedPriv = name + "Formatted";
 
         if((name in mesa) || (namePriv in mesa)/* || (nameFormattedPriv in mesa)*/)
           throw error.argInvalid("name", "Property cannot have name '" + name + "' cause it's reserved.");
@@ -522,15 +523,15 @@ define([
           }
         });
         /*
-        Object.defineProperty(mesa, name + "Formatted", {
-          configurable: true,
+         Object.defineProperty(mesa, name + "Formatted", {
+         configurable: true,
 
-          get: function propertyFormattedGetter() {
-            var value = this[namePriv].value;
-            return value && value.toString();
-          }
-        });
-        */
+         get: function propertyFormattedGetter() {
+         var value = this[namePriv].value;
+         return value && value.toString();
+         }
+         });
+         */
       },
       //endregion
 
