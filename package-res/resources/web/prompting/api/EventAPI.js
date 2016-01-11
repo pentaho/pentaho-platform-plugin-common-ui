@@ -98,5 +98,25 @@ define([], function() {
     this.postInit = function(callback) {
       api.operation._getPromptPanel().dashboard.on('cdf:postInit', callback);
     };
+
+    /**
+     * Registers a ready event
+     *
+     * @name EventAPI#ready
+     * @method
+     * @param {Function} callback   The function to be executed when the event is triggered.
+     *                              Pass null if you wish to unbind this event
+     * @example
+     *  api.event.ready(function(promptPanel) {
+     *    // Execute event based code
+     *  })
+     */
+    this.ready = function(callback) {
+      if(typeof callback === 'function') {
+        api.operation._getPromptPanel().ready = callback;
+      } else {
+        api.operation._getPromptPanel().ready = function(){};
+      }
+    };
   };
 });
