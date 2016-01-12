@@ -78,12 +78,19 @@ define([
           eventApi.postInit(callback);
           expect(dashboardSpy.on).toHaveBeenCalledWith('cdf:postInit', callback);
         });
+
+        it("should register a ready event", function () {
+          eventApi.ready(callback);
+          expect(promptPanelSpy.ready).toBeDefined();
+          expect(promptPanelSpy.ready).toBe(callback);
+        });
       });
 
       describe("EventAPI Tests with PromptPanel updates", function(){
         var eventApi, apiSpy, promptPanel, dashboard;
         var beforeRenderCallback, afterRenderCallback,
-            beforeUpdateCallback, afterUpdateCallback;
+            beforeUpdateCallback, afterUpdateCallback,
+            readyCallback;
         var parameterParser, initialParameterDefinition;
 
         beforeEach(function () {
@@ -105,11 +112,13 @@ define([
           afterRenderCallback = jasmine.createSpy("beforeRender");
           beforeUpdateCallback = jasmine.createSpy("beforeRender");
           afterUpdateCallback = jasmine.createSpy("beforeRender");
+          readyCallback = jasmine.createSpy("ready");
 
           eventApi.beforeRender(beforeRenderCallback);
           eventApi.afterRender(afterRenderCallback);
           eventApi.beforeUpdate(beforeUpdateCallback);
           eventApi.afterUpdate(afterUpdateCallback);
+          eventApi.ready(readyCallback);
         });
 
         it("should call update always and render events if a change is needed", function (done) {
@@ -122,6 +131,7 @@ define([
             expect(promptPanel.onAfterRender.calls.count()).toEqual(2);
             expect(promptPanel.onBeforeUpdate.calls.count()).toEqual(2);
             expect(promptPanel.onAfterUpdate.calls.count()).toEqual(2);
+            expect(promptPanel.ready.calls.count()).toEqual(1);
             done();
           });
 
@@ -141,6 +151,7 @@ define([
             expect(promptPanel.onAfterRender.calls.count()).toEqual(1);
             expect(promptPanel.onBeforeUpdate.calls.count()).toEqual(2);
             expect(promptPanel.onAfterUpdate.calls.count()).toEqual(2);
+            expect(promptPanel.ready.calls.count()).toEqual(1);
             done();
           });
 
