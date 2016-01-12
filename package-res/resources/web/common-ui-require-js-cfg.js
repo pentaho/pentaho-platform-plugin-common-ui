@@ -124,7 +124,9 @@
   requirePaths["underscore"] = basePath + "/underscore/underscore" + minSuffix;
 
   // Intended for private use of "pentaho/shim/es6-promise" only!
-  requirePaths["pentaho/shim/_es6-promise"] = basePath + "/pentaho/shim/_es6-promise/es6-promise" + minSuffix;
+  if(minSuffix) {
+    requirePaths["pentaho/shim/_es6-promise/es6-promise"] = basePath + "/pentaho/shim/_es6-promise/es6-promise" + minSuffix;
+  }
 
   // ANGULAR
   requirePaths["common-ui/angular"] = basePath + "/angular/angular" + minSuffix;

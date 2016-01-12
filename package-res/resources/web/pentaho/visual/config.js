@@ -22,11 +22,11 @@ define(function() {
       // VizAPI 3 side-by-side
       // Disable **all** VizAPI 3 visualizations in Analyzer.
       // Comment this rule to test VizAPI 3 visualizations in Analyzer.
-      /*{
+      {
         priority:  -1,
         container: "analyzer",
         enabled:   false
-      },*/
+      },
 
       // Disable unfinished CCC visualizations, in any container.
       {

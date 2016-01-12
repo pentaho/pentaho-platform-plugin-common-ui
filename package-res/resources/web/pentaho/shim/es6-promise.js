@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define(['./_es6-promise'], function(es6promise) {
+define(["./_es6-promise/es6-promise"], function(es6promise) {
 	es6promise.polyfill();
 	/*global Promise: true */
 	return Promise;
