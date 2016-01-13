@@ -13,32 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define([
-  "./Item",
-  "./value",
-  "./simple",
-  "./complex",
-  "./string",
-  "./number",
-  "./boolean",
-  "./date"
-], function(Item, Value, Simple, Complex, String, Number, Boolean, Date) {
 
-  "use strict";
-  
-  // The layer0 module defines:
-  // * all classes at a basic level
-  // * all standard simple types (from which complex properties build complex types...)
-  return {
-    "Item": Item,
-
-    // types
-    "value":    Value,
-    "simple":   Simple,
-    "string":   String,
-    "number":   Number,
-    "boolean":  Boolean,
-    "date":     Date,
-    "complex":  Complex
-  };
-});
+/**
+ * The signature of a function of a dynamic attribute of a property.
+ *
+ * Examples of dynamic property attributes:
+ *
+ * * {@link pentaho.type.Property.Meta#applicable}
+ * * {@link pentaho.type.Property.Meta#readOnly}
+ * * {@link pentaho.type.Property.Meta#required}
+ * * {@link pentaho.type.Property.Meta#countMin}
+ * * {@link pentaho.type.Property.Meta#countMax}
+ *
+ * @callback pentaho.type.PropertyDynamicAttribute
+ * @template T
+ * @this pentaho.type.Complex
+ * @return {T} The calculated attribute's value.
+ */

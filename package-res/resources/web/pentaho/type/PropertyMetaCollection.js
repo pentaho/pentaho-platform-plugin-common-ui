@@ -15,10 +15,10 @@
  */
 define([
   "./Property",
-  "../../lang/Collection",
-  "../../util/arg",
-  "../../util/error",
-  "../../util/object"
+  "../lang/Collection",
+  "../util/arg",
+  "../util/error",
+  "../util/object"
 ], function(Property, Collection, arg, error, O) {
 
   "use strict";
@@ -36,6 +36,7 @@ define([
    * This constructor is used internally by the `pentaho/type` package and should not be used directly.
    *
    * @see pentaho.type.Property
+   * @ignore
    */
   return Collection.extend("pentaho.type.PropertyMetaCollection",
       /** @lends pentaho.type.PropertyMetaCollection# */{
@@ -57,7 +58,7 @@ define([
 
       // Copy the declaring complex type's ancestor's properties.
       var ancestorMeta = declaringMeta.ancestor,
-          colBase = ancestorMeta && ancestorMeta.props;
+          colBase = ancestorMeta && ancestorMeta._getProps && ancestorMeta._getProps();
 
       if(colBase) {
         // Backup any provided specs.

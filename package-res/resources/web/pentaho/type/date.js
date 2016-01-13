@@ -13,4 +13,47 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define(["./_layer1/main"], function(types) { "use strict"; return types["date"]; });
+define([
+  "module",
+  "./simple",
+  "../i18n!types"
+], function(module, simpleFactory, bundle) {
+
+  "use strict";
+
+  return function(context) {
+
+    var Simple = context.get(simpleFactory);
+
+    /**
+     * @name pentaho.type.Date
+     * @class
+     * @extends pentaho.type.Simple
+     * @amd pentaho/type/date
+     *
+     * @classDesc The class of a date value.
+     *
+     * ### AMD
+     *
+     * Module Id: `pentaho/type/date`
+     *
+     * The AMD module returns the type's factory, a
+     * {@link pentaho.type.Factory<pentaho.type.Date>}.
+     *
+     * @description Creates a date instance.
+     */
+    return Simple.extend("pentaho.type.Date", {
+      meta: {
+        id: module.id,
+
+        styleClass: "pentaho-type-date",
+
+        cast: function(v) {
+          return (v instanceof Date) ? v : Date.parse(v);
+        }
+      }
+    }).implement({
+      meta: bundle.structured["date"]
+    });
+  };
+});

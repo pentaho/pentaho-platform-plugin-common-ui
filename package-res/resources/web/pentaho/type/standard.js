@@ -13,11 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+define([
+  "./Item",
+  "./value",
+  "./simple",
+  "./complex",
+  "./string",
+  "./number",
+  "./boolean",
+  "./date",
+  "./object",
+  "./function"
+], function(Item, Value, Simple, Complex, String, Number, Boolean, Date, Object, Function) {
 
-/**
- * Creates the class of a `Value` type for a given context.
- *
- * @callback pentaho.type.Factory
- * @param {pentaho.type.IContext} context The context for which the type's class is being created.
- * @return {Class.<pentaho.type.Value>} The new type class.
- */
+  "use strict";
+  
+  return {
+    "Item": Item,
+
+    // types
+    "value":    Value,
+    "simple":   Simple,
+    "string":   String,
+    "number":   Number,
+    "boolean":  Boolean,
+    "date":     Date,
+    "complex":  Complex,
+    "object":   Object,
+    "function": Function
+  };
+});

@@ -14,21 +14,23 @@
  * limitations under the License.
  */
 define([
-  "./Item",
+  "module",
+  "./standard",
   "../lang/Base",
   "../util/promise",
   "../util/arg",
   "../util/error",
   "../util/object",
   "../util/fun"
-], function(Abstract, Base, promise, arg, error, O, F) {
+], function(module, standard, Base, promise, arg, error, O, F) {
 
   "use strict";
 
   /*global SESSION_NAME:false, SESSION_LOCALE:false, active_theme:false*/
 
   var _nextUid = 1,
-      _baseMid = "pentaho/type/",
+
+      _baseMid = module.id.replace(/Context$/, ""),// e.g.: "pentaho/type/"
 
       // Default type, in a type specification.
       _defaultTypeMid = "string",
@@ -37,10 +39,12 @@ define([
       _defaultBaseTypeMid = "complex",
 
       // Standard types which can be assumed to already be loaded.
-      _basicStandardTypes = {};
+      _standardTypeMids = {},
 
-  ["value", "complex", "simple", "string", "number", "boolean", "date"].forEach(function(name) {
-    _basicStandardTypes[_baseMid + name] = 1;
+      Item = standard.Item;
+
+  Object.keys(standard).forEach(function(name) {
+    _standardTypeMids[_baseMid + name] = 1;
   });
 
   /**
@@ -102,6 +106,33 @@ define([
       return this._get(typeRef, false);
     },
 
+    /**
+     * Obtains a promise for all type classes that inherit
+     * from a base `Value` type, given its _id_.
+     *
+     * @param {string} [baseTypeId] The id of the base type. Defaults to `"pentaho/type/value"`.
+     * @param {object} [ka] The keyword arguments.
+     * @param {?boolean} [ka.browsable=null] Indicates that only types with the specified
+     *   {@link pentaho.type.Value.Meta#browsable} are returned.
+     *
+     * @return {Promise.<Array.<!Class.<pentaho.item.Value>>>} The promise for the requested `Value` types.
+     */
+    getAllAsync: function(baseTypeId, ka) {
+      if(!baseTypeId) baseTypeId = "pentaho/type/value";
+
+      var predicate = F.predicate(ka);
+      var me = this;
+      return promise.require(["pentaho/service!" + baseTypeId])
+          .then(function(factories) {
+            return Promise.all(factories.map(me.getAsync, me));
+          })
+          .then(function(Mesas) {
+            return predicate
+                ? Mesas.filter(function(Mesa) { return predicate(Mesa.meta); })
+                : Mesas;
+          });
+    },
+
     _get: function(typeRef, sync) {
       // Default property type is "string".
       if(!typeRef) typeRef = _defaultTypeMid;
@@ -132,8 +163,8 @@ define([
     _getByFun: function(fun, sync) {
       var proto = fun.prototype;
 
-      if(proto instanceof Abstract     ) return this._getByType(fun, sync);
-      if(proto instanceof Abstract.Meta) return this._getByType(fun.Mesa, sync);
+      if(proto instanceof Item     ) return this._getByType(fun, sync);
+      if(proto instanceof Item.Meta) return this._getByType(fun.Mesa, sync);
 
       // Assume it's a factory function.
       return this._getByFactory(fun, sync);
@@ -174,7 +205,7 @@ define([
 
       Type = typeFactory(this);
 
-      if(!F.is(Type) || !(Type.prototype instanceof Abstract))
+      if(!F.is(Type) || !(Type.prototype instanceof Item))
         throw error.operInvalid("Type factory must return a sub-class of 'pentaho/type/value'.");
 
       // Errors are thrown synchronously.
@@ -268,7 +299,7 @@ define([
         if(typeSpec.indexOf("/") < 0) typeSpec = _baseMid + typeSpec;
 
         // A standard type that is surely loaded?
-        if(_basicStandardTypes[typeSpec] === 1) return;
+        if(_standardTypeMids[typeSpec] === 1) return;
 
         outIds.push(typeSpec);
         return;

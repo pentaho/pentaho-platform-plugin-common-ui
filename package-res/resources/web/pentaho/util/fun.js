@@ -35,8 +35,35 @@ define(function() {
 
     compare: function(a, b) {
       return (a === b) ? 0 : ((a > b) ? 1 : -1);
+    },
+
+    predicate: function(attrs) {
+      var attrValues = [];
+
+      if(attrs) Object.keys(attrs).forEach(function(name) {
+        var value = attrs[name];
+        if(value !== undefined) attrValues.push([name, value]);
+      });
+
+
+      return attrValues.length ? buildPredicate(attrValues) : null;
+
     }
   };
 
   return fun;
+
+  function buildPredicate(attrValues) {
+    return function instancePredicate(inst) {
+      if(!inst) return false;
+
+      var i = attrValues.length, attrValue;
+      while(i--) {
+        attrValue = attrValues[i];
+        if(inst[attrValue[0]] !== attrValue[1])
+          return false;
+      }
+      return true;
+    };
+  }
 });

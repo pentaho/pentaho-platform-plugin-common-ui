@@ -13,4 +13,43 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define(["./_layer1/main"], function(types) { "use strict"; return types["boolean"]; });
+define([
+  "module",
+  "./simple",
+  "../i18n!types"
+], function(module, simpleFactory, bundle) {
+
+  "use strict";
+
+  return function(context) {
+
+    var Simple = context.get(simpleFactory);
+
+    /**
+     * @name pentaho.type.Boolean
+     * @class
+     * @extends pentaho.type.Simple
+     * @amd pentaho/type/boolean
+     *
+     * @classDesc The class of boolean values.
+     *
+     * ### AMD
+     *
+     * Module Id: `pentaho/type/boolean`
+     *
+     * The AMD module returns the type's factory, a
+     * {@link pentaho.type.Factory<pentaho.type.Boolean>}.
+     *
+     * @description Creates a boolean instance.
+     */
+    return Simple.extend("pentaho.type.Boolean", {
+      meta: {
+        id: module.id,
+        styleClass: "pentaho-type-boolean",
+        cast: Boolean
+      }
+    }).implement({
+      meta: bundle.structured["boolean"]
+    });
+  };
+});

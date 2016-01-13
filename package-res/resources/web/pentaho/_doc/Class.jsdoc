@@ -13,14 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define([
-  "../_layer0/main"
-], function(layer0) {
-  "use strict";
-  // The layer1 modules define:
-  // * any _standard_ complex types
 
-  // layer0.foo = Foo
-
-  return layer0;
-});
+/**
+ * The `Class.<T>` type denotes the constructor, or class, `T`,
+ * in a place where it could be interpreted as an instance of that class.
+ *
+ * @typedef {Function} Class
+ */
