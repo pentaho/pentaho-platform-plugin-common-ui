@@ -44,55 +44,38 @@ define([
      *
      * @description Creates a base `Model`.
      * @constructor
-     * @throws {TypeError} IncompleteSpec. All required properties must be specified, otherwise an exception is thrown.
-     * @param {pentaho.visual.base.IModel} modelSpec A plain object containing the model specification.
      */
     var Model = Complex.extend({
-        constructor: function(spec) {
-          this.base(spec);
-          var missingProps = this.meta.props.filter(function(prop) {
-            return prop.required && !spec.hasOwnProperty(prop.name);
-          }).map(function(prop) {
-            return prop.name;
-          });
-          if(missingProps.length > 0) {
-            throw new TypeError("IncompleteSpec: The following required properties were not specified: " + missingProps.join(","));
+          meta: {
+            id: "pentaho/visual/base",
+            view: "View",
+            "abstract": true,
+            props: [
+              {
+                name: "width",
+                type: "number",
+                required: true
+              },
+              {
+                name: "height",
+                type: "number",
+                required: true
+              },
+              {
+                name: "interactive",
+                type: "boolean",
+                required: true
+              },
+              {
+                name: "data",
+                type: "object",
+                required: true
+              }
+            ]
           }
-
-        },
-        meta: {
-          id: "pentaho/visual/base",
-          v2Id: "base",
-          view: "View",
-          "abstract": true,
-          props: [
-            {
-              name: "width",
-              type: "number",
-              required: true
-            },
-            {
-              name: "height",
-              type: "number",
-              required: true
-            },
-            {
-              name: "interactive",
-              type: "boolean",
-              required: true
-            },
-            {
-              name: "data",
-              type: "object",
-              required: true
-            }
-          ]
-        }
-      })
-      .implement({meta: bundle.structured});
+        })
+        .implement({meta: bundle.structured});
 
     return Model;
   };
 });
-
-

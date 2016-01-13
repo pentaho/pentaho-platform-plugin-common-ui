@@ -158,7 +158,7 @@ define([
     configure: function(config) {
       if(!config) throw error.argRequired("config");
 
-      if(config instanceof Array) {
+      if(Array.isArray(config)) {
         this.addMany(config);
       } else {
         O.eachOwn(config, function(propConfig, name) {

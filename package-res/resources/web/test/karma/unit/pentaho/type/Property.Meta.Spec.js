@@ -318,7 +318,6 @@ define([
             expect(function() {
               createRootPropMeta({
                 name: name,
-                list: false,
                 type: "string"
               });
             }).toThrowError(error.argRequired("name").message);
@@ -332,7 +331,6 @@ define([
         it("should respect a truthy spec value -", function() {
           var propMeta = createRootPropMeta({
             name: "fooBar",
-            list: true,
             type: "string"
           });
 
@@ -342,7 +340,6 @@ define([
         it("should throw when changed", function() {
           var propMeta = createRootPropMeta({
             name: "fooBar",
-            list: true,
             type: "string"
           });
 
@@ -353,7 +350,8 @@ define([
 
         it("should not throw when set but not changed", function() {
           var propMeta = createRootPropMeta({
-            name: "fooBar"
+            name: "fooBar",
+            type: "string"
           });
 
           propMeta.name = "fooBar";
@@ -361,43 +359,14 @@ define([
       }); // end name
 
       describe("list - ", function() {
-        it("should default to `false`", function() {
-          var propMeta = createRootPropMeta({name: "foo"});
-          expect(propMeta.list).toBe(false);
-        });
-
-        it("should respect the specified spec value", function() {
-          var propMeta = createRootPropMeta({name: "foo1", list: true});
-          expect(propMeta.list).toBe(true);
-
-          propMeta = createRootPropMeta({name: "foo2", list: false});
-          expect(propMeta.list).toBe(false);
-
-          propMeta = createRootPropMeta({name: "foo3", list: 0});
-          expect(propMeta.list).toBe(false);
-
-          propMeta = createRootPropMeta({name: "foo4", list: 1});
+        it("should return `true` when the type is a list type", function() {
+          var propMeta = createRootPropMeta({name: "foo", type: ["string"]});
           expect(propMeta.list).toBe(true);
         });
 
-        it("should throw when changed", function() {
-          var propMeta = createRootPropMeta({
-            name: "fooBar",
-            list: true
-          });
-
-          expect(function() {
-            propMeta.list = false;
-          }).toThrow(); // message varies with JS engine...
-        });
-
-        it("should not throw when set but not changed", function() {
-          var propMeta = createRootPropMeta({
-            name: "fooBar",
-            list: true
-          });
-
-          propMeta.list = true;
+        it("should return `false` when the type is an element type", function() {
+          var propMeta = createRootPropMeta({name: "foo", type: "string"});
+          expect(propMeta.list).toBe(false);
         });
       }); // end list
 
@@ -897,7 +866,7 @@ define([
         });
 
         it("should not limit min and max to 1 when list = true", function() {
-          var propMeta = createRootPropMeta({name: "foo", countMin: 10, countMax: 10, list: true});
+          var propMeta = createRootPropMeta({name: "foo", countMin: 10, countMax: 10, type: ["string"]});
           expect(propMeta.countMin).toBe(10);
           expect(propMeta.countMax).toBe(10);
           expect(propMeta.countRangeEval({})).toEqual({min: 10, max: 10});
@@ -928,12 +897,12 @@ define([
           expect(propMeta.countMax).toBe(undefined);
           expect(propMeta.countRangeEval({}).min).toBe(1);
 
-          propMeta = createRootPropMeta({name: "foo3", required: true, countMin: 3, list: true});
+          propMeta = createRootPropMeta({name: "foo3", required: true, countMin: 3, type: ["string"]});
           expect(propMeta.countMin).toBe(3);
           expect(propMeta.countMax).toBe(undefined);
           expect(propMeta.countRangeEval({}).min).toBe(3);
 
-          propMeta = createRootPropMeta({name: "foo4", required: false, countMin: 3, list: true});
+          propMeta = createRootPropMeta({name: "foo4", required: false, countMin: 3, type: ["string"]});
           expect(propMeta.countMin).toBe(3);
           expect(propMeta.countMax).toBe(undefined);
           expect(propMeta.countRangeEval({}).min).toBe(3);
@@ -955,21 +924,21 @@ define([
         });
 
         it("should have max = 10 when countMin = 10, countMax = 5 and list = true", function() {
-          var propMeta = createRootPropMeta({name: "foo", countMin: 10, countMax: 5, list: true});
+          var propMeta = createRootPropMeta({name: "foo", countMin: 10, countMax: 5, type: ["string"]});
           expect(propMeta.countMin).toBe(10);
           expect(propMeta.countMax).toBe(5);
           expect(propMeta.countRangeEval({}).max).toBe(10);
         });
 
         it("should have max = Infinity when countMin = 10 and list = true", function() {
-          var propMeta = createRootPropMeta({name: "foo", countMin: 10, list: true});
+          var propMeta = createRootPropMeta({name: "foo", countMin: 10, type: ["string"]});
           expect(propMeta.countMin).toBe(10);
           expect(propMeta.countMax).toBe(undefined);
           expect(propMeta.countRangeEval({}).max).toBe(Infinity);
         });
 
         it("should have min = 0 when countMax = 10 and list = true", function() {
-          var propMeta = createRootPropMeta({name: "foo", countMax: 10, list: true});
+          var propMeta = createRootPropMeta({name: "foo", countMax: 10, type: []});
           expect(propMeta.countMin).toBe(undefined);
           expect(propMeta.countMax).toBe(10);
           expect(propMeta.countRangeEval({}).min).toBe(0);
@@ -1658,136 +1627,6 @@ define([
         });
       }); // end name
 
-      describe("list - ", function() {
-        it("should inherit base list value by default", function() {
-          var Base = Complex.extend();
-
-          Base.meta.add({name: "baseStr", list: true});
-
-          var Derived = Base.extend();
-
-          var propMeta = extendProp(Derived.meta, "baseStr", {name: "baseStr"});
-
-          expect(propMeta.list).toBe(true);
-
-          // ---
-
-          Base = Complex.extend();
-
-          Base.meta.add({name: "baseStr", list: false});
-
-          Derived = Base.extend();
-
-          propMeta = extendProp(Derived.meta, "baseStr", {name: "baseStr"});
-
-          expect(propMeta.list).toBe(false);
-        });
-
-        it("should throw when base is list and derived isn't", function() {
-          var Base = Complex.extend();
-
-          Base.meta.add({name: "baseStr", list: true});
-
-          var Derived = Base.extend();
-
-          expect(function() {
-            extendProp(Derived.meta, "baseStr", {name: "baseStr", list: false});
-          }).toThrowError(
-              error.argInvalid("list", "Sub-properties cannot change the 'list' attribute.").message);
-        });
-
-        it("should throw when base is not list and derived is", function() {
-          var Base = Complex.extend();
-
-          Base.meta.add({name: "baseStr", list: false});
-
-          var Derived = Base.extend();
-
-          expect(function() {
-            extendProp(Derived.meta, "baseStr", {name: "baseStr", list: true});
-          }).toThrowError(
-              error.argInvalid("list", "Sub-properties cannot change the 'list' attribute.").message);
-        });
-
-        it("should throw when _set_ to a value different from the base value", function() {
-          var Base = Complex.extend();
-
-          Base.meta.add({name: "baseStr", list: true});
-
-          var Derived = Base.extend();
-
-          var propMeta = extendProp(Derived.meta, "baseStr", {name: "baseStr"});
-
-          expect(function() {
-            propMeta.list = false;
-          }).toThrowError(
-              error.argInvalid("list", "Sub-properties cannot change the 'list' attribute.").message);
-
-          // --------
-
-          Base = Complex.extend();
-
-          Base.meta.add({name: "baseStr", list: false});
-
-          Derived = Base.extend();
-
-          propMeta = extendProp(Derived.meta, "baseStr", {name: "baseStr"});
-
-          expect(function() {
-            propMeta.list = true;
-          }).toThrowError(
-              error.argInvalid("list", "Sub-properties cannot change the 'list' attribute.").message);
-        });
-
-        it("should not throw when base and derived are equal", function() {
-          var Base = Complex.extend();
-
-          Base.meta.add({name: "baseStr", list: false});
-
-          var Derived = Base.extend();
-
-          extendProp(Derived.meta, "baseStr", {name: "baseStr", list: false});
-
-          // ---
-
-          Base = Complex.extend();
-
-          Base.meta.add({name: "baseStr", list: true});
-
-          Derived = Base.extend();
-
-          extendProp(Derived.meta, "baseStr", {name: "baseStr", list: true});
-        });
-
-        it("should not throw when _set_ to a value equal to the base value", function() {
-          var Base = Complex.extend();
-
-          Base.meta.add({name: "baseStr", list: true});
-
-          var Derived = Base.extend();
-
-          var propMeta = extendProp(Derived.meta, "baseStr", {name: "baseStr"});
-
-          propMeta.list = 1;
-
-          expect(propMeta.list).toBe(true);
-
-          // --------
-
-          Base = Complex.extend();
-
-          Base.meta.add({name: "baseStr", list: false});
-
-          Derived = Base.extend();
-
-          propMeta = extendProp(Derived.meta, "baseStr", {name: "baseStr"});
-
-          propMeta.list = 0;
-
-          expect(propMeta.list).toBe(false);
-        });
-      });
-
       // mutable, but must always inherit from the base type.
       // should not change after the complex class has been sub-classed or has any instances of it (not enforced).
       describe("type - ", function() {
@@ -2379,6 +2218,8 @@ define([
       }); // end readOnly
       //endregion
     }); // end override a property
+
+    // TODO: toValue
 
   }); // pentaho/type/Property.Meta
 });

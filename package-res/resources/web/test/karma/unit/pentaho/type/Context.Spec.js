@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context"
-], function(Context) {
+  "pentaho/type/Context",
+  "pentaho/util/error",
+  "pentaho/i18n!/pentaho/type/i18n/types"
+], function(Context, error, bundle) {
 
   "use strict";
 
@@ -47,6 +49,19 @@ define([
         expect(context.get("pentaho/type/date"    ).meta.id).toBe("pentaho/type/date"    );
         expect(context.get("pentaho/type/object"  ).meta.id).toBe("pentaho/type/object"  );
         expect(context.get("pentaho/type/function").meta.id).toBe("pentaho/type/function");
+      });
+
+      it("should be able to create a list type using the shorthand list-type notation", function() {
+        var context = new Context();
+        var type = context.get([{props: ["a", "b"]}]);
+
+        expect(type.prototype instanceof context.get("list")).toBe(true);
+
+        var ofMeta = type.meta.of;
+        expect(ofMeta.mesa instanceof context.get("complex")).toBe(true);
+        expect(ofMeta.count).toBe(2);
+        expect(ofMeta.has("a")).toBe(true);
+        expect(ofMeta.has("b")).toBe(true);
       });
     }); // #get
 
@@ -159,5 +174,157 @@ define([
       });
     }); // #getAll
 
+    describe("#create(valueSpec, defaultType, baseType)", function() {
+
+      it("should create an instance given a number value and the defaultType number", function() {
+        var context = new Context();
+        var Number  = context.get("pentaho/type/number");
+
+        var number = context.create(1, Number);
+
+        expect(number instanceof Number).toBe(true);
+        expect(number.value).toBe(1);
+      });
+
+      it("should create an instance given a boolean value and the defaultType boolean", function() {
+        var context = new Context();
+        var Boolean  = context.get("pentaho/type/boolean");
+
+        var value = context.create(true, Boolean);
+
+        expect(value instanceof Boolean).toBe(true);
+        expect(value.value).toBe(true);
+      });
+
+      it("should create an instance given an object value and the defaultType object", function() {
+        var context = new Context();
+        var Object  = context.get("pentaho/type/object");
+
+        var primitive = {};
+        var value = context.create({v: primitive}, Object);
+
+        expect(value instanceof Object).toBe(true);
+        expect(value.value).toBe(primitive);
+      });
+
+      it("should create an instance given an object with a type annotation, '_', and not defaultType", function() {
+        var context = new Context();
+        var Number = context.get("pentaho/type/number");
+
+        var value = context.create({_: "pentaho/type/number", v: 1});
+
+        expect(value instanceof Number).toBe(true);
+        expect(value.value).toBe(1);
+      });
+
+      it("should throw if given a non-type-annotated and not given defaultType", function() {
+        var context = new Context();
+        expect(function() {
+          context.create({v: 1});
+        }).toThrowError(
+            error.operInvalid(bundle.structured.errors.context.cannotCreateValueOfUnknownType).message);
+      });
+
+      it("should throw if given a type-annotated value that does not extend from the given baseType", function() {
+        var context = new Context();
+        expect(function() {
+          context.create({_: "pentaho/type/number", v: 1}, null, "pentaho/type/string");
+        }).toThrowError(
+            error.operInvalid(
+              bundle.format(
+                bundle.structured.errors.context.valueNotOfExpectedBaseType,
+                ["pentaho/type/string"])).message);
+      });
+
+      it("should not throw if given a type-annotated value that does extend from the given baseType", function() {
+        var context = new Context();
+
+        var value = context.create({_: "pentaho/type/number", v: 1}, null, "pentaho/type/simple");
+
+        expect(value instanceof context.get("pentaho/type/number")).toBe(true);
+        expect(value.value).toBe(1);
+      });
+
+      it("should be able to create a type-annotated value of a list type", function() {
+        var context = new Context();
+        var NumberList = context.get({base: "list", of: "number"});
+
+        var value = context.create({_: NumberList, d: [1, 2]});
+
+        expect(value instanceof NumberList).toBe(true);
+        expect(value.count).toBe(2);
+        expect(value.at(0).value).toBe(1);
+        expect(value.at(1).value).toBe(2);
+      });
+
+      it("should be able to create a type-annotated value of an inline list type", function() {
+        var context = new Context();
+
+        var value = context.create({
+          _: {base: "list", of: "number"},
+          d: [1, 2]
+        });
+
+        expect(value instanceof context.get("list")).toBe(true);
+        expect(value.count).toBe(2);
+        expect(value.at(0).value).toBe(1);
+        expect(value.at(1).value).toBe(2);
+      });
+
+      it("should be able to create a type-annotated value of an inline complex type", function() {
+        var context = new Context();
+
+        var value = context.create({
+            _: {
+              props: ["a", "b"]
+            },
+            "a": 1,
+            "b": 2
+          });
+
+        expect(value instanceof context.get("complex")).toBe(true);
+        expect(value.get("a").value).toBe("1");
+        expect(value.get("b").value).toBe("2");
+      });
+
+      it("should be able to create a type-annotated value of an inline list complex type", function() {
+        var context = new Context();
+
+        var value = context.create({
+          _: [
+            {
+              props: [
+                {name: "a"},
+                "b"
+              ]
+            }
+          ],
+          d: [
+            {a: 1, b: 2}
+          ]
+        });
+
+        expect(value instanceof context.get("list")).toBe(true);
+        expect(value.count).toBe(1);
+      });
+
+      it("should be able to create a type-annotated value of an inline list complex type in array form", function() {
+        var context = new Context();
+
+        var value = context.create({
+          _: [{
+            props: ["a", "b"]
+          }],
+          d: [
+            [1, 2],
+            [3, 4]
+          ]
+        });
+
+        expect(value instanceof context.get("list")).toBe(true);
+        expect(value.count).toBe(2);
+      });
+
+    }); // #create
   }); // pentaho/type/Context
 });

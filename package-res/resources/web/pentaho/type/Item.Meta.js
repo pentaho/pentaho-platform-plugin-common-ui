@@ -529,22 +529,26 @@ define([
       return O_isProtoOf.call(this.mesa, value);
     },
 
-    //region to method
-    // Configurable in a special way.
-    // Setting always sets the core.
-    // Getting always gets the wrapper.
-    get to() {
-      return toTop;
-    },
-
-    // NOTE: the argument cannot have the same name as the property setter
-    // or PhantomJS 1.9.8 will throw a syntax error...
-    set to(_) {
-      this._to = _ || toCore;
-    },
-
-    _to: toCore
-    //endregion
+    /**
+     * Converts a given value to a _mesa_ instance of this _prototype_,
+     * if it is not one already.
+     *
+     * If a {@link nully} value is specified, `null` is returned.
+     *
+     * If a given value is not {@link nully}
+     * and not already an instance of this _prototype_
+     * (checked using {@link pentaho.type.Item.Meta#is}),
+     * this method delegates the creation of an instance to
+     * {@link pentaho.type.Item.Meta#create}.
+     *
+     * @param {?any} value The value to convert.
+     * @return {?pentaho.type.Item} The converted value or `null`.
+     */
+    to: function(value) {
+      return value == null   ? null  :
+             this.is(value)  ? value :
+             this.create(value);
+    }
 
   }, /** @lends pentaho.type.Item.Meta */{
 
@@ -588,18 +592,6 @@ define([
   _itemMeta = ItemMeta.prototype;
 
   return ItemMeta;
-
-  //region to private methods
-  function toTop(value) {
-    return value == null   ? null  :
-           this.is(value)  ? value :
-           this._to(value);
-  }
-
-  function toCore(value) {
-    return this.create(value);
-  }
-  //endregion
 
   function nonEmptyString(value) {
     return value == null ? null : (String(value) || null);

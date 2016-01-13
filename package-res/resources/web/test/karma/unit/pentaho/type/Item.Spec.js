@@ -198,9 +198,9 @@ define([
 
           expect(B.meta.view).toBe(FB);
         });
-      }); // end view
+      }); // end #view
 
-      describe("viewClass -", function() {
+      describe("#viewClass -", function() {
 
         afterEach(function() {
           require.undef("foo/bar");
@@ -330,7 +330,187 @@ define([
           });
         });
 
-      }); // end viewClass
+      }); // end #viewClass
+
+      describe("#label -", function() {
+
+        describe("when `label` is falsy -", function() {
+          it("should inherit `label`", function() {
+            function expectIt(derivedSpec) {
+              var Derived = Item.extend({meta: derivedSpec});
+              expect(Derived.meta.label).toBe(Item.meta.label);
+            }
+
+            expectIt({});
+            expectIt({label: undefined});
+            expectIt({label: null});
+            expectIt({label: ""});
+          });
+        }); // when `label` is falsy
+
+        describe("when `label` is truthy", function() {
+          // Can change the label
+          it("should respect the `label`", function() {
+            var Derived = Item.extend({meta: {label: "Foo"}});
+            expect(Derived.meta.label).toBe("Foo");
+          });
+        });
+      }); // #label
+
+      describe("#id -", function() {
+        describe("when `id` is falsy -", function() {
+          it("should have `null` as a default `id`", function() {
+            function expectIt(spec) {
+              var Derived = Item.extend({meta: spec});
+              expect(Derived.meta.id).toBe(null);
+            }
+
+            expectIt({});
+            expectIt({id: undefined});
+            expectIt({id: null});
+            expectIt({id: null});
+          });
+        });
+
+        describe("when `id` is truthy -", function() {
+          it("should respect it", function() {
+            var Derived = Item.extend({
+              meta: {id: "foo/bar"}
+            });
+
+            expect(Derived.meta.id).toBe("foo/bar");
+          });
+        });
+      }); // #id
+
+      describe("#description -", function() {
+        describe("when not specified -", function() {
+          it("should inherit the base description", function() {
+            function expectIt(spec) {
+              var Derived = Item.extend({meta: spec});
+
+              expect(Derived.meta.description).toBe(Item.meta.description);
+            }
+
+            expectIt({});
+            expectIt({description: undefined});
+          });
+        });
+
+        describe("when specified as `null` or an empty string -", function() {
+          it("should set the description to `null`", function() {
+            function expectIt(spec) {
+              var Derived = Item.extend({meta: spec});
+
+              expect(Derived.meta.description).toBe(null);
+            }
+
+            expectIt({description: null});
+            expectIt({description: ""});
+          });
+        });
+
+        describe("when specified as a non-empty string -", function() {
+          it("should respect it", function() {
+            var Derived = Item.extend({meta: {description: "Foo"}});
+
+            expect(Derived.meta.description).toBe("Foo");
+          });
+        });
+      }); // #description
+
+      describe("#category -", function() {
+        describe("when not specified -", function() {
+          it("should inherit the base category", function() {
+            function expectIt(spec) {
+              var Derived = Item.extend({meta: spec});
+
+              expect(Derived.meta.category).toBe(Item.meta.category);
+            }
+
+            expectIt({});
+            expectIt({category: undefined});
+          });
+        });
+
+        describe("when specified as `null` or an empty string -", function() {
+          it("should set the category to `null`", function() {
+            function expectIt(spec) {
+              var Derived = Item.extend({meta: spec});
+
+              expect(Derived.meta.category).toBe(null);
+            }
+
+            expectIt({category: null});
+            expectIt({category: ""});
+          });
+        });
+
+        describe("when specified as a non-empty string", function() {
+          it("should respect it", function() {
+            var Derived = Item.extend({meta: {category: "Foo"}});
+
+            expect(Derived.meta.category).toBe("Foo");
+          });
+        });
+      }); // #category
+
+      describe("#helpUrl -", function() {
+        describe("when not specified", function() {
+          it("should inherit the base helpUrl", function() {
+            function expectIt(spec) {
+              var Derived = Item.extend({meta: spec});
+
+              expect(Derived.meta.helpUrl).toBe(Item.meta.helpUrl);
+            }
+
+            expectIt({});
+            expectIt({helpUrl: undefined});
+          });
+        });
+
+        describe("when specified as `null` or an empty string -", function() {
+          it("should set the helpUrl to `null`", function() {
+            function expectIt(spec) {
+              var Derived = Item.extend({meta: spec});
+
+              expect(Derived.meta.helpUrl).toBe(null);
+            }
+
+            expectIt({helpUrl: null});
+            expectIt({helpUrl: ""});
+          });
+        });
+
+        describe("when specified as a non-empty string -", function() {
+          it("should respect it", function() {
+            var Derived = Item.extend({meta: {helpUrl: "Foo"}});
+
+            expect(Derived.meta.helpUrl).toBe("Foo");
+          });
+        });
+      }); // #helpUrl
+
+      describe("#uid -", function() {
+        it("should not be inherited", function() {
+          var Derived = Item.extend();
+          expect(Derived.meta.uid).not.toBe(Item.meta.uid);
+        });
+
+        it("should be unique", function() {
+          var DerivedA = Item.extend(),
+              DerivedB = Item.extend();
+          expect(DerivedA.meta.uid).not.toBe(DerivedB.meta.uid);
+          expect(DerivedA.meta.uid).not.toBe(Item.meta.uid);
+        });
+      }); // #uid
+
+      // TODO: ordinal, styleClass, advanced, browsable <- bring and adapt these from Property.Meta tests
+      // TODO: isRoot, ancestor
+      // TODO: create(.), is(.), to(.)
     });
+
+    // TODO: extendProto
+
   }); // pentaho/type/Item
 });
