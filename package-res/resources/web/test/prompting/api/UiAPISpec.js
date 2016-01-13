@@ -18,9 +18,11 @@
 define(["common-ui/prompting/api/UiAPI"], function(UiAPI) {
 
   describe("UiAPI unit tests", function() {
-    var uiApi, apiSpy, promptPanelSpy;
+    var uiApi, apiSpy, promptPanelSpy, dashboardSpy;
     beforeEach(function() {
-      promptPanelSpy = jasmine.createSpyObj("PromptPanel", ["showProgressIndicator", "hideProgressIndicator"]);
+      promptPanelSpy = jasmine.createSpyObj("PromptPanel", ["showProgressIndicator", "hideProgressIndicator", "getDashboard", "setBlockUiOptions"]);
+      dashboardSpy = jasmine.createSpyObj("Dashboard", ["_setBlockUiOptions"]);
+      promptPanelSpy.getDashboard.and.returnValue(dashboardSpy);
 
       apiSpy = jasmine.createSpy("PromptingAPI");
       apiSpy.operation = jasmine.createSpyObj("OperationAPI", ["_getPromptPanel"]);
@@ -39,6 +41,13 @@ define(["common-ui/prompting/api/UiAPI"], function(UiAPI) {
       uiApi.hideProgressIndicator();
       expect(apiSpy.operation._getPromptPanel).toHaveBeenCalled();
       expect(promptPanelSpy.hideProgressIndicator).toHaveBeenCalled();
+    });
+
+    it("should set the block ui options", function() {
+      var optionsSpy = jasmine.createSpy("Options");
+      uiApi.setBlockUiOptions(optionsSpy);
+      expect(apiSpy.operation._getPromptPanel).toHaveBeenCalled();
+      expect(promptPanelSpy.setBlockUiOptions).toHaveBeenCalledWith(optionsSpy);
     });
   });
 });

@@ -382,6 +382,15 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
         },
 
         /**
+         * Returns the dashboard store on the prompt panel
+         *
+         * @return {Object}
+         */
+        getDashboard: function() {
+          return this.dashboard;
+        },
+
+        /**
          * Returns the parameter definition if it has been set. Otherwise an exception is thrown.
          *
          * @returns {Object}
@@ -1336,7 +1345,7 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
          * @method
          */
         showProgressIndicator: function() {
-          this.dashboard.showProgressIndicator();
+          this.getDashboard().showProgressIndicator();
         },
 
         /**
@@ -1346,7 +1355,42 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
          * @method
          */
         hideProgressIndicator: function() {
-          this.dashboard.hideProgressIndicator();
+          this.getDashboard().hideProgressIndicator();
+        },
+
+        /**
+         * Sets the default options for blockUI
+         *
+         * @name UiAPI#setBlockUiOptions
+         * @method
+         * @param {Object} options - The options to configure the block ui
+         * @param {string} options.message - The message or html to display on block ui
+         * @param {Object} options.css - A json that accepts valid css key/value pairs
+         * @param {Object} options.overlayCSS - A json that accepts valid css key/value pairs for the block ui overlay
+         * @param {boolean} options.showOverlay - Allows you to show or hide the overlay on block ui
+         * @example
+         *      var defaults = {
+         *          message : '',
+         *          css : {
+         *              left : '0%',
+         *              top : '0%',
+         *              marginLeft : '85px',
+         *              width : '100%',
+         *              height : '100%',
+         *              opacity : '1',
+         *              backgroundColor : '#ffffcc'
+         *          },
+         *          overlayCSS : {
+         *              backgroundColor : '#000000',
+         *              opacity : '0.6',
+         *              cursor : 'wait'
+         *          },
+         *          showOverlay : false
+         *      };
+         *      api.ui.setBlockUiOptions(defaults);
+         */
+        setBlockUiOptions: function(options) {
+          this.getDashboard()._setBlockUiOptions(options);
         }
       });
 

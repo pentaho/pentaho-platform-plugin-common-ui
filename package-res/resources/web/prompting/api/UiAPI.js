@@ -51,5 +51,40 @@ define([], function() {
     this.hideProgressIndicator = function() {
       api.operation._getPromptPanel().hideProgressIndicator();
     };
+
+    /**
+     * Sets the default options for blockUI
+     *
+     * @name UiAPI#setBlockUiOptions
+     * @method
+     * @param {Object} options - The options to configure the block ui
+     * @param {string} options.message - The message or html to display on block ui
+     * @param {Object} options.css - A json that accepts valid css key/value pairs
+     * @param {Object} options.overlayCSS - A json that accepts valid css key/value pairs for the block ui overlay
+     * @param {boolean} options.showOverlay - Allows you to show or hide the overlay on block ui
+     * @example
+     *      var defaults = {
+     *          message : '',
+     *          css : {
+     *              left : '0%',
+     *              top : '0%',
+     *              marginLeft : '85px',
+     *              width : '100%',
+     *              height : '100%',
+     *              opacity : '1',
+     *              backgroundColor : '#ffffcc'
+     *          },
+     *          overlayCSS : {
+     *              backgroundColor : '#000000',
+     *              opacity : '0.6',
+     *              cursor : 'wait'
+     *          },
+     *          showOverlay : false
+     *      };
+     *      api.ui.setBlockUiOptions(defaults);
+     */
+    this.setBlockUiOptions = function(options) {
+      api.operation._getPromptPanel().setBlockUiOptions(options);
+    };
   };
 });
