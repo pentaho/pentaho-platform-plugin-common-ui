@@ -15,8 +15,27 @@
  *
  */
 
-define([], function() {
+/**
+ * The Prompting Util API Class
+ * Provides utility functions for working with prompting.
+ *
+ * @name UtilAPI
+ * @class
+ */
+define(["common-ui/prompting/parameters/ParameterXmlParser"], function(ParameterXmlParser) {
   return function(api) {
+    this._parameterXmlParser = new ParameterXmlParser();
 
+    /**
+     * Parses the xml string and returns an instance of ParameterDefinition.
+     *
+     * @name UtilAPI#parseParameterXml
+     * @method
+     * @param  {String} xmlString    String with the xml, format is described on the {@link http://wiki.pentaho.com/display/Reporting/Specification+for+the+BI-Server+Plugin+Parameter-XML+format|wiki page}
+     * @return {ParameterDefinition} Parameter Definition instance
+     */
+    this.parseParameterXml = function(xmlString) {
+      return this._parameterXmlParser.parseParameterXml(xmlString);
+    };
   }
 });
