@@ -28,7 +28,7 @@
  * @property {Boolean} strict {true} if the parameter is strict, {false} otherwise
  * @property {String} timezoneHint The timezone of the parameter
  * @property {Object|String} attributes Hash of string for the remaining parameter attributes
- * @property {Array|Object} values The array of possible values of the parameter
+ * @property {Array|ParameterValue} values The array of possible values of the parameter
  */
 define(['common-ui/jquery-clean'], function ($) {
   return function () {
@@ -87,7 +87,7 @@ define(['common-ui/jquery-clean'], function ($) {
        *
        * @name Parameter#getSelectedValuesValue
        * @method
-       * @return {Array} Array with the values selected
+       * @return {Array|Object} Array with the values selected
        */
       getSelectedValuesValue: function () {
         var selected = [];

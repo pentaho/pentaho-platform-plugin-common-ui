@@ -21,18 +21,16 @@
  *
  * @name OperationAPI
  * @class
- * @property {ParameterXmlParser} _parameterParser The parser for xml retrieved from the server call
  * @property {PromptPanel} _promptPanel The prompting panel object
  * @property {Object} _msgs Contains possible constants of messages
  */
-define(['common-ui/prompting/PromptPanel', 'common-ui/prompting/parameters/ParameterXmlParser'], function(PromptPanel, ParameterXmlParser) {
+define(['common-ui/prompting/PromptPanel'], function(PromptPanel) {
   return function(api, id) {
-    this._parameterParser = new ParameterXmlParser();
     this._promptPanel = new PromptPanel(id);
     this._msgs = {
       PROMPT_PANEL_NOT_FOUND: "Prompt Panel not found. Call 'api.operation.render' to create a panel.",
-      NO_PARAM_XML: "'getParameterXml' function does not return valid xml.",
-      NO_PARAM_XML_FUNC: "No function defined for 'getParameterXml'. Prompts will not be refreshed."
+      NO_PARAM_DEFN: "'getParameterDefinitionCallback' function does not return a valid ParameterDefinition instance.",
+      NO_PARAM_DEFN_FUNC: "No function defined for 'getParameterDefinitionCallback'. Prompts will not be refreshed."
     };
 
     this._getPromptPanel = function() {
@@ -44,49 +42,48 @@ define(['common-ui/prompting/PromptPanel', 'common-ui/prompting/parameters/Param
     };
 
     /**
-     * Creates a new prompt panel provided an html id and the xml parameter definition
+     * Sets a special 'getParameterDefinitionCallback' callback function that defines a new prompt set as a {@link ParameterDefinition} object.
+     * The getParameterDefinitionCallback callback function will be immediately called,
+     * and will subsequently continue to call it as needed when the prompt panel validates inputs given by the user.
      *
      * @name OperationAPI#render
      * @method
-     * @param {Function}  getParameterXml The function called when the prompt panel needs to get the new parameter xml.
-     *                                    Receives a callback function which needs to be executed either synchronously
-     *                                    or asynchronously.
+     * @param {Function}  getParameterDefinitionCallback The function called when the prompt panel needs to get the new parameter definition {@link ParameterDefinition}.
+     *                                                   Receives a callback function which needs to be executed either synchronously or asynchronously.
      * @example
      *  // Asynchronous
      *  api.operation.render(function(api, callback) {
-     *    retrieveXml(function(xml){
-     *      callback(xml);
+     *    retrieveParamDefn(function(paramDefn) {
+     *      callback(paramDefn);
      *    });
      *
      *  // Synchronous
      *  api.operation.render(function(api, callback) {
-     *    var xml = retrieveXml();
-     *    callback(xml); // return already retrieved xml definition
+     *    var paramDefn = retrieveParamDefn();
+     *    callback(paramDefn); // return ParameterDefinition object
      *  });
      */
-    this.render = function(getParameterXml) {
-      if (!getParameterXml || typeof getParameterXml != "function") {
-        api.log.error(this._msgs.NO_PARAM_XML_FUNC, true);
+    this.render = function(getParameterDefinitionCallback) {
+      if (!getParameterDefinitionCallback || typeof getParameterDefinitionCallback != "function") {
+        api.log.error(this._msgs.NO_PARAM_DEFN_FUNC, true);
       }
 
-      getParameterXml(api, (function(xml) {
-        if (!xml) {
-          api.log.error(this._msgs.NO_PARAM_XML, true);
+      getParameterDefinitionCallback(api, (function(paramDefn) {
+        if (!paramDefn) {
+          api.log.error(this._msgs.NO_PARAM_DEFN, true);
         }
 
-        var paramDefn = this._parameterParser.parseParameterXml(xml);
         this._promptPanel.setParamDefn(paramDefn);
 
         // Override of getParameterDefinition
         this._promptPanel.getParameterDefinition = (function(promptPanel, refreshCallback) {
-          getParameterXml(api, (function(xml) {
-            if (!xml) {
-              api.log.error(this._msgs.NO_PARAM_XML);
+          getParameterDefinitionCallback(api, (function(paramDefn) {
+            if (!paramDefn) {
+              api.log.error(this._msgs.NO_PARAM_DEFN);
               refreshCallback(null);
               return;
             }
 
-            var paramDefn = this._parameterParser.parseParameterXml(xml);
             refreshCallback(paramDefn);
           }).bind(this));
         }).bind(this);
@@ -123,7 +120,7 @@ define(['common-ui/prompting/PromptPanel', 'common-ui/prompting/parameters/Param
     };
 
     /**
-     * Sets the value of a dashboard parameter by parameter name. 
+     * Sets the value of a dashboard parameter by parameter name.
      * This operation won't trigger any event on the prompt panel.
      *
      * @name OperationAPI#setParameterValue

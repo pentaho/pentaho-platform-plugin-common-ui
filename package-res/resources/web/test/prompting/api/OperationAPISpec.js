@@ -17,7 +17,7 @@
 
 define(["common-ui/prompting/api/OperationAPI"], function(OperationAPI) {
   describe("OperationAPI unit tests", function() {
-    var operationApi, apiSpy, promptPanelSpy, xmlStr, xmlStr1, htmlId, paramDefnSpy;
+    var operationApi, apiSpy, promptPanelSpy, htmlId, paramDefnSpy;
     beforeEach(function() {
 
       promptPanelSpy = jasmine.createSpyObj("PromptPanel", ["refresh", "init", "getParameterValues", "getParameterDefinition", "setParamDefn", "setParameterValue", "refreshPrompt"]);
@@ -35,16 +35,8 @@ define(["common-ui/prompting/api/OperationAPI"], function(OperationAPI) {
       operationApi = new OperationAPI(apiSpy, htmlId);
 
       paramDefnSpy = jasmine.createSpyObj("ParameterDefinition", ["allowAutoSubmit"]);
-      spyOn(operationApi._parameterParser, "parseParameterXml").and.returnValue(paramDefnSpy);
-
-      xmlStr = "<XML></XML>";
-      xmlStr1 = "<XML1></XML1>";
 
       spyOn(operationApi, "_getPromptPanel").and.returnValue(promptPanelSpy);
-    });
-
-    afterEach(function() {
-      expect(operationApi._parameterParser).toBeDefined();
     });
 
     it("should test private _getPromptPanel and succeed", function() {
@@ -58,36 +50,35 @@ define(["common-ui/prompting/api/OperationAPI"], function(OperationAPI) {
     });
 
     describe("render tests", function() {
-      it("should test render with null getParameterXml callback", function() {
+      it("should test render with null getParameterDefinitionCallback callback", function() {
         expect(function() {
           operationApi.render(null);
-        }).toThrow(operationApi._msgs.NO_PARAM_XML_FUNC);
+        }).toThrow(operationApi._msgs.NO_PARAM_DEFN_FUNC);
 
-        expect(operationApi._parameterParser.parseParameterXml).not.toHaveBeenCalledWith(xmlStr);
         expect(operationApi._promptPanel).toBeDefined();
-        expect(apiSpy.log.error).toHaveBeenCalledWith(operationApi._msgs.NO_PARAM_XML_FUNC, true);
+        expect(apiSpy.log.error).toHaveBeenCalledWith(operationApi._msgs.NO_PARAM_DEFN_FUNC, true);
       });
 
-      it("should test render with valid getParameterXml callback that returns null", function() {
-        var getParameterXml = function(api, callback) {
+      it("should test render with valid getParameterDefinitionCallback callback that returns null", function() {
+        var getParameterDefinitionCallback = function(api, callback) {
           expect(api).toBe(apiSpy);
           callback(null);
         };
 
         expect(function() {
-          operationApi.render(getParameterXml);
-        }).toThrow(operationApi._msgs.NO_PARAM_XML);
+          operationApi.render(getParameterDefinitionCallback);
+        }).toThrow(operationApi._msgs.NO_PARAM_DEFN);
 
-        expect(apiSpy.log.error).toHaveBeenCalledWith(operationApi._msgs.NO_PARAM_XML, true);
+        expect(apiSpy.log.error).toHaveBeenCalledWith(operationApi._msgs.NO_PARAM_DEFN, true);
       });
 
-      it("should test render with valid getParameterXml callback that returns appropriate value", function() {
-        var getParameterXml = function(api, callback) {
+      it("should test render with valid getParameterDefinitionCallback callback that returns appropriate value", function() {
+        var getParameterDefinitionCallback = function(api, callback) {
           expect(api).toBe(apiSpy);
-          callback(xmlStr);
+          callback(paramDefnSpy);
         };
 
-        operationApi.render(getParameterXml);
+        operationApi.render(getParameterDefinitionCallback);
 
         var paramDefnValue;
         operationApi._promptPanel.getParameterDefinition(promptPanelSpy, function(paramDefn) {
@@ -95,18 +86,65 @@ define(["common-ui/prompting/api/OperationAPI"], function(OperationAPI) {
         });
 
         expect(paramDefnValue).toBe(paramDefnSpy);
-        expect(operationApi._parameterParser.parseParameterXml).toHaveBeenCalledWith(xmlStr);
         expect(operationApi._promptPanel).toBeDefined();
         expect(operationApi._promptPanel.destinationId).toBe(htmlId);
         expect(operationApi._promptPanel.paramDefn).toBe(paramDefnSpy);
       });
+
+      it("should test render with valid getParameterDefinitionCallback callback async that returns null", function() {
+        var count = 0;
+        var getParamDefn = function(callback) {
+          count++;
+          var p = count == 1 ? paramDefnSpy : null;
+          callback(p);
+        };
+        var getParameterDefinitionCallback = function(api, callback) {
+          expect(api).toBe(apiSpy);
+          getParamDefn(callback);
+        };
+
+        operationApi.render(getParameterDefinitionCallback);
+
+        var paramDefnValue;
+        operationApi._promptPanel.getParameterDefinition(promptPanelSpy, function(paramDefn) {
+          paramDefnValue = paramDefn;
+        });
+
+        expect(apiSpy.log.error).toHaveBeenCalledWith(operationApi._msgs.NO_PARAM_DEFN);
+        expect(paramDefnValue).toBeNull();
+      });
     });
 
-    it("should test init", function() {
-      operationApi.init();
+    describe("init tests", function() {
+      it("should success init", function() {
 
-      expect(operationApi._getPromptPanel).toHaveBeenCalled();
-      expect(promptPanelSpy.init).toHaveBeenCalled();
+        operationApi.init();
+
+        expect(operationApi._getPromptPanel).toHaveBeenCalled();
+        expect(promptPanelSpy.init).toHaveBeenCalled();
+      });
+
+      it("should warn about duplicate component name", function() {
+        promptPanelSpy.init.and.callFake(function() {
+          throw {
+            message: "addComponent: duplicate component name"
+          }
+        });
+        operationApi.init();
+
+        expect(operationApi._getPromptPanel).toHaveBeenCalled();
+        expect(promptPanelSpy.init).toHaveBeenCalled();
+        expect(apiSpy.log.warn).toHaveBeenCalledWith("Prompt Panel has been initialized already");
+      });
+
+      it("should throw an exception", function() {
+        promptPanelSpy.init.and.callThrough();
+        operationApi.init();
+
+        expect(operationApi._getPromptPanel).toHaveBeenCalled();
+        expect(promptPanelSpy.init).toHaveBeenCalled();
+        expect(operationApi.init).toThrow();
+      });
     });
 
     it("should test getParameterValues", function() {

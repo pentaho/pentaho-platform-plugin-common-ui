@@ -48,16 +48,18 @@
     </style>
 
     <script type="text/javascript">
-      require(['common-ui/prompting/api/PromptingAPI', 'common-ui/jquery-clean'], function(PromptingAPI, $) {
+      require(['common-ui/prompting/api/PromptingAPI', 'common-ui/prompting/parameters/ParameterXmlParser', 'common-ui/jquery-clean'], function(PromptingAPI, ParameterXmlParser, $) {
 
         $(document).ready(function() {
-            var promptApi = new PromptingAPI();
-            
+            var id = "promptPanel";
+            var promptApi = new PromptingAPI(id);
+            var parameterXmlParser = new ParameterXmlParser();
+
             $("#create-prompt").bind("click", function() {
-                
-                var id = "promptPanel";
-                promptApi.operation.render(id, function() {
-                    return $('#parameterXml').val();
+                promptApi.operation.render(function(api, callback) {
+                    var xml = $('#parameterXml').val();
+                    var paramDefn = parameterXmlParser.parseParameterXml(xml);
+                    callback(paramDefn);
                 });
 
                 var eventArea = $('#eventsLogArea');
