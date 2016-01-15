@@ -53,15 +53,16 @@ define([], function() {
     };
 
     /**
-     * Sets the default options for blockUI
+     * Sets the default options for blockUI, which allows you to simulate synchronous behaviour when using AJAX
+     * by preventing user activity. Visually, an overlay can be used to cover the user interface.
      *
      * @name UiAPI#setBlockUiOptions
      * @method
      * @param {Object} options - The options to configure the block ui
-     * @param {string} options.message - The message or html to display on block ui
-     * @param {Object} options.css - A json that accepts valid css key/value pairs
-     * @param {Object} options.overlayCSS - A json that accepts valid css key/value pairs for the block ui overlay
-     * @param {boolean} options.showOverlay - Allows you to show or hide the overlay on block ui
+     * @param {string} options.message - The message or html to display on the block ui
+     * @param {Object} options.css - A json which accepts valid css key/value pairs for the message container
+     * @param {Object} options.overlayCSS - A json which accepts valid css key/value pairs for the block ui overlay
+     * @param {boolean} options.showOverlay - Allows you to show or hide the overlay on the block ui
      * @example
      *      var defaults = {
      *          message : '',
