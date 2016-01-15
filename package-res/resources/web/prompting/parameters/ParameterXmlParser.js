@@ -186,12 +186,20 @@ define(['cdf/lib/Base', 'common-ui/util/base64', 'common-ui/util/formatting',  '
          * @method
          * @param {String} xmlString String with the xml
          * @returns {ParameterDefinition} Parameter Definition instance
+         * @throws Exception if the xml string is not a valid xml with the error
          */
         parseParameterXml: function (xmlString) {
+          if (typeof xmlString !== 'string') {
+            throw "parseParameterXml argument is not a string, parser expects a xml string";
+          } else if (xmlString == "") {
+            throw "parseParameterXml argument is an empty string, parser expects a valid xml string";
+          }
+
           var xml = $(_parseXML(xmlString));
 
-          if (xml.find('parsererror').length > 0) {
-            throw xmlString;
+          var parseError = xml.find('parsererror');
+          if (parseError.length > 0) {
+            throw "parseParameterXml error parsing xml string: " + parseError.find('div').html();
           }
 
           var paramDefn = new ParameterDefinition();

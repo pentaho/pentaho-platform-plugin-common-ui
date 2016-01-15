@@ -75,6 +75,20 @@ define(['common-ui/prompting/parameters/ParameterXmlParser'], function (Paramete
         expect(paramDefn['errors']['null'][0]).toEqual("test global-error message");
         expect(paramDefn['errors']['test_parameter_name'][0]).toEqual("test error message");
       });
+
+      it("fails parse if invalid xml string is used", function () {
+        expect(function(){
+          parameterXmlParser.parseParameterXml();
+        }).toThrow();
+        expect(function(){
+          parameterXmlParser.parseParameterXml("");
+        }).toThrow();
+        expect(function(){
+          parameterXmlParser.parseParameterXml(
+              "<parameters autoSubmitUI='false' autoSubmit='false' paginate='false' accepted-page='1' page-count='2' ignore-biserver-5538='false' is-prompt-needed='false' layout='test-layout'>" +
+              "</parameters");
+        }).toThrow();
+      });
     });
   });
 });
