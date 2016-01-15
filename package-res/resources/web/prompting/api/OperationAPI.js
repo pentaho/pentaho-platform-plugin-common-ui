@@ -42,9 +42,9 @@ define(['common-ui/prompting/PromptPanel'], function(PromptPanel) {
     };
 
     /**
-     * Sets a special 'getParameterDefinitionCallback' callback function that defines a new prompt set as a {@link ParameterDefinition} object.
-     * The getParameterDefinitionCallback callback function will be immediately called,
-     * and will subsequently continue to call it as needed when the prompt panel validates inputs given by the user.
+     * Sets a special 'getParameterDefinitionCallback' callback function which defines a new prompt set as a {@link ParameterDefinition} object.
+     * The getParameterDefinitionCallback callback function will be immediately called
+     * and will continue to be called as needed when the prompt panel validates input provided by the user.
      *
      * @name OperationAPI#render
      * @method
