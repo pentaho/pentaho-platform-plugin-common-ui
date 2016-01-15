@@ -100,12 +100,14 @@ define([], function() {
     };
 
     /**
-     * Registers a ready event
+     * This function allows you to bind a listener to the 'ready' state,
+     * which will be executed when the prompt is ready. If you have already
+     * bound a listener to this event, you can pass null to unbind it.
      *
      * @name EventAPI#ready
      * @method
      * @param {Function} callback   The function to be executed when the event is triggered.
-     *                              Pass null if you wish to unbind this event
+     *                               Pass null if you wish to unbind this event.
      * @example
      *  api.event.ready(function(promptPanel) {
      *    // Execute event based code
