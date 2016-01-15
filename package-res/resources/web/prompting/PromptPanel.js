@@ -1361,7 +1361,7 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
         /**
          * Sets the default options for blockUI
          *
-         * @name UiAPI#setBlockUiOptions
+         * @name PromptPanel#setBlockUiOptions
          * @method
          * @param {Object} options - The options to configure the block ui
          * @param {string} options.message - The message or html to display on block ui
@@ -1387,7 +1387,7 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
          *          },
          *          showOverlay : false
          *      };
-         *      api.ui.setBlockUiOptions(defaults);
+         *      promptPanel.setBlockUiOptions(defaults);
          */
         setBlockUiOptions: function(options) {
           this.getDashboard()._setBlockUiOptions(options);
