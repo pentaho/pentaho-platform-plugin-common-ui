@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2016 Pentaho Corporation.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,8 +21,8 @@
  * @name ParameterXmlParser
  * @class
  */
-define(['cdf/lib/Base', 'common-ui/util/base64', 'common-ui/util/formatting',  './Parameter', './ParameterDefinition', './ParameterGroup', './ParameterValue', 'common-ui/jquery-clean'],
-    function (Base, Base64Util, Formatter, Parameter, ParameterDefinition, ParameterGroup, ParameterValue, $) {
+define(['cdf/lib/Base', 'common-ui/util/base64', 'common-ui/util/formatting',  './Parameter', './ParameterDefinition', './ParameterGroup', './ParameterValue', 'common-ui/jquery-clean', 'cdf/Logger'],
+    function (Base, Base64Util, Formatter, Parameter, ParameterDefinition, ParameterGroup, ParameterValue, $, Logger) {
 
       /**
        * Parses the xml retrieved from the server call
@@ -66,14 +66,14 @@ define(['cdf/lib/Base', 'common-ui/util/base64', 'common-ui/util/formatting',  '
 
         xmlRoot.find('error').each(function (i, e) {
           var error = $(e);
-          var paramName = error.attr('parameter');
-          var message = error.attr('message');
+          var paramName = _getAttributeFromXmlNode(error, 'parameter');
+          var message = _getAttributeFromXmlNode(error, 'message');
           addToParameter(paramDefn, paramName, message);
         }.bind(this));
 
         xmlRoot.find('global-error').each(function (i, e) {
           var error = $(e);
-          var message = error.attr('message');
+          var message = _getAttributeFromXmlNode(error, 'message');
           addToParameter(paramDefn, null, message);
         }.bind(this));
       };
@@ -119,12 +119,12 @@ define(['cdf/lib/Base', 'common-ui/util/base64', 'common-ui/util/formatting',  '
         var param = new Parameter();
 
         node = $(node);
-        param.name = node.attr('name');
-        param.mandatory = 'true' == node.attr('is-mandatory');
-        param.strict = 'true' == node.attr('is-strict');
-        param.list = 'true' == node.attr('is-list');
-        param.multiSelect = 'true' == node.attr('is-multi-select');
-        param.type = node.attr('type');
+        param.name = _getAttributeFromXmlNode(node, 'name', true);
+        param.mandatory = _getBooleanFromXmlNode(node, 'is-mandatory');
+        param.strict = _getBooleanFromXmlNode(node, 'is-strict');
+        param.list = _getBooleanFromXmlNode(node, 'is-list');
+        param.multiSelect = _getBooleanFromXmlNode(node, 'is-multi-select');
+        param.type = _getAttributeFromXmlNode(node, 'type', true);
         param.timezoneHint = node.attr('timezone-hint');
 
         // TODO: Support namespaces
@@ -155,27 +155,74 @@ define(['cdf/lib/Base', 'common-ui/util/base64', 'common-ui/util/formatting',  '
           value = $(value);
 
           if ('true' == value.attr('encoded')) {
-            pVal.label = Base64Util.base64Decode(value.attr('label'));
+            pVal.label = Base64Util.base64Decode(_getAttributeFromXmlNode(value, 'label'));
           } else {
-            pVal.label = value.attr('label');
+            pVal.label = _getAttributeFromXmlNode(value, 'label');
           }
-          if ('true' == value.attr('null')) {
+          if ('true' == _getAttributeFromXmlNode(value, 'null')) {
             pVal.value = ''; // Dashboards doesn't play nicely with null values for parameters
           } else if ('true' == value.attr('encoded')) {
-            pVal.value = Base64Util.base64Decode(value.attr('value'));
+            pVal.value = Base64Util.base64Decode(_getAttributeFromXmlNode(value, 'value'));
           } else {
-            pVal.value = value.attr('value');
+            pVal.value = _getAttributeFromXmlNode(value, 'value');
           }
-          pVal.type = value.attr('type');
+          pVal.type = _getAttributeFromXmlNode(value, 'type');
           if (pVal.type == undefined || !$.trim(pVal.type).length) {
             pVal.type = parameter.type;
           }
-          pVal.selected = 'true' == value.attr('selected');
+          pVal.selected = _getBooleanFromXmlNode(value, 'selected');
 
           pVal.value = Formatter.normalizeParameterValue(parameter, pVal.type, pVal.value);
           values.push(pVal);
         }.bind(this));
         return values;
+      };
+
+      /**
+       * Retrieves a value from the xml node, making sure to warn if the value retrieved is empty, or not there at all
+       *
+       * @name ParameterXmlParser#_getAttributeFromXmlNode
+       * @method
+       * @param {Object} node The xml node containing the parameter information
+       * @param {String} name The name to extract from the xml node
+       * @param {Boolean} error Flag that indicates empty values should throw an error
+       * @returns {String} The value retrieved from the xml node
+       * @private
+       */
+      var _getAttributeFromXmlNode = function(node, name, error) {
+        var attr = node.attr(name);
+        if (!attr) {
+          var message = "ParameterDefinition: no attribute '" + name + "' found";
+          if(error) {
+            throw message;
+          }
+          Logger.warn(message);
+        }
+        return attr;
+      };
+
+      /**
+       * Retrieves a boolean value from the xml node, making sure to warn if the value retrieved is not a boolean
+       *
+       * @name ParameterXmlParser#_getBooleanFromXmlNode
+       * @method
+       * @param {Object} node The xml node containing the parameter information
+       * @param {String} name The name to extract from the xml node
+       * @param {Boolean} error Flag that indicates values different than boolean should throw an error
+       * @returns {Boolean} The boolean value retrieved from the xml node
+       * @private
+       */
+      var _getBooleanFromXmlNode = function(node, name, error) {
+        if('true' == node.attr(name)) {
+          return true;
+        } else if('false' != node.attr(name) ) {
+          var message = "ParameterDefinition: expected '" + name + "' to be boolean, got '" + node.attr(name) + "' instead";
+          if(error) {
+            throw message;
+          }
+          Logger.warn(message);
+        }
+        return false;
       };
 
       return Base.extend({
@@ -197,19 +244,19 @@ define(['cdf/lib/Base', 'common-ui/util/base64', 'common-ui/util/formatting',  '
           var paramDefn = new ParameterDefinition();
           var parameters = $(xml.find('parameters')[0]);
 
-          paramDefn.promptNeeded = 'true' == parameters.attr('is-prompt-needed');
-          paramDefn.ignoreBiServer5538 = 'true' == parameters.attr('ignore-biserver-5538');
-          paramDefn.paginate = 'true' == parameters.attr('paginate');
-          paramDefn.layout = parameters.attr('layout');
+          paramDefn.promptNeeded = _getBooleanFromXmlNode(parameters, 'is-prompt-needed');
+          paramDefn.ignoreBiServer5538 = _getBooleanFromXmlNode(parameters, 'ignore-biserver-5538');
+          paramDefn.paginate = _getBooleanFromXmlNode(parameters, 'paginate');
+          paramDefn.layout = _getAttributeFromXmlNode(parameters, 'layout');
 
           var parseInteger = function(s, def) {
             var n = parseInt(s);
             return 'NaN' == n ? def : n;
           }
-          paramDefn.page = parseInteger(parameters.attr('accepted-page'), 0);
-          paramDefn.totalPages = parseInteger(parameters.attr('page-count'), 0);
+          paramDefn.page = parseInteger(_getAttributeFromXmlNode(parameters, 'accepted-page'), 0);
+          paramDefn.totalPages = parseInteger(_getAttributeFromXmlNode(parameters, 'page-count'), 0);
 
-          paramDefn.autoSubmit = parameters.attr('autoSubmit');
+          paramDefn.autoSubmit = _getAttributeFromXmlNode(parameters, 'autoSubmit');
           if (paramDefn.autoSubmit == 'true') {
             paramDefn.autoSubmit = true;
           } else if (paramDefn.autoSubmit == 'false') {
@@ -218,7 +265,7 @@ define(['cdf/lib/Base', 'common-ui/util/base64', 'common-ui/util/formatting',  '
             paramDefn.autoSubmit = undefined;
           }
 
-          paramDefn.autoSubmitUI = 'true' == parameters.attr('autoSubmitUI');
+          paramDefn.autoSubmitUI = _getBooleanFromXmlNode(parameters, 'autoSubmitUI');
 
           _parseParameters(paramDefn, parameters);
           _parseErrors(paramDefn, xml);
