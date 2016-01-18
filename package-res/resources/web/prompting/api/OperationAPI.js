@@ -134,12 +134,12 @@ define(['common-ui/prompting/PromptPanel'], function(PromptPanel) {
 
     /**
      * Refreshes the prompt panel.
-     * This API function gets a new parameter definition by using a special function that is defined as input callback for {@link OperationAPI#render}.
-     * Further are compared the previous and the new parameter definitions and after that it refreshes the prompt user interface with the differences between parameter definitions.
-     * For example, this API function can be used for submitting prompt panel.
+     * This API function receives a new parameter definition by using a special function which is defined as input callback for {@link OperationAPI#render}.
+     * After the previous and the new parameter definitions are compared, it refreshes the prompt user interface with the differences between these parameter definitions.
+     * For example, this API function can be used for submitting the prompt panel.
      *
      * @name OperationAPI#refreshPrompt
-     * @param {Boolean} forceUpdate The flag indicates ability to update all components regardless of the difference previous and new xml from server
+     * @param {Boolean} forceUpdate The flag indicates the ability to update all components regardless of the differences between the previous and new xml from the server.
      * @method
      * @example
      *     api.operation.refreshPrompt();
