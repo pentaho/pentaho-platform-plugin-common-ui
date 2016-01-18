@@ -187,6 +187,7 @@ define(['cdf/lib/Base', 'common-ui/util/base64', 'common-ui/util/formatting',  '
        * @param {String} name The name to extract from the xml node
        * @param {Boolean} error Flag that indicates empty values should throw an error
        * @returns {String} The value retrieved from the xml node
+       * @throws {String} Exception if the error flag is true
        * @private
        */
       var _getAttributeFromXmlNode = function(node, name, error) {
@@ -208,18 +209,14 @@ define(['cdf/lib/Base', 'common-ui/util/base64', 'common-ui/util/formatting',  '
        * @method
        * @param {Object} node The xml node containing the parameter information
        * @param {String} name The name to extract from the xml node
-       * @param {Boolean} error Flag that indicates values different than boolean should throw an error
        * @returns {Boolean} The boolean value retrieved from the xml node
        * @private
        */
-      var _getBooleanFromXmlNode = function(node, name, error) {
+      var _getBooleanFromXmlNode = function(node, name) {
         if('true' == node.attr(name)) {
           return true;
         } else if('false' != node.attr(name) ) {
           var message = "ParameterDefinition: expected '" + name + "' to be boolean, got '" + node.attr(name) + "' instead";
-          if(error) {
-            throw message;
-          }
           Logger.warn(message);
         }
         return false;
@@ -233,7 +230,7 @@ define(['cdf/lib/Base', 'common-ui/util/base64', 'common-ui/util/formatting',  '
          * @method
          * @param {String} xmlString String with the xml
          * @returns {ParameterDefinition} Parameter Definition instance
-         * @throws Exception if the xml string is not a valid xml with the error
+         * @throws {String} Exception if the xml string is not a valid xml with the error
          */
         parseParameterXml: function (xmlString) {
           if (typeof xmlString !== 'string') {
