@@ -15,12 +15,13 @@
  *
  */
 
-define(['common-ui/prompting/parameters/ParameterXmlParser'], function (ParameterXmlParser) {
+define(['common-ui/prompting/parameters/ParameterXmlParser', 'cdf/Logger'], function (ParameterXmlParser, Logger) {
 
   describe("ParameterXmlParser", function () {
     var parameterXmlParser;
 
     beforeEach(function () {
+      spyOn(Logger, "warn");
       parameterXmlParser = new ParameterXmlParser();
     });
 
@@ -34,11 +35,11 @@ define(['common-ui/prompting/parameters/ParameterXmlParser'], function (Paramete
               "</parameter>" +
               "<parameter is-list='true' is-mandatory='false' timezone-hint='timezone-hint' is-multi-select='true' is-strict='false' name='test_parameter_name' type='test type 2'>" +
                 "<attribute name='test name' namespace='http://corp.name.org/namespaces/parameter-attributes' value='0'/>" +
-                "<values><value encoded='true' label='dGVzdCBsYWJlbA==' null='false' selected='true' value='dGVzdCBsYWJlbA=='/></values>" +
+                "<values><value encoded='true' label='dGVzdCBsYWJlbA==' null='false' selected='true' type='test type 2' value='dGVzdCBsYWJlbA=='/></values>" +
               "</parameter>" +
               "<parameter is-list='true' is-mandatory='false' timezone-hint='timezone-hint' is-multi-select='true' is-strict='false' name='test_parameter_name' type='test type 2'>" +
                 "<attribute name='test name' namespace='http://corp.name.org/namespaces/parameter-attributes' value='0'/>" +
-                "<values><value encoded='true' label='dGVzdCBsYWJlbA==' null='true' selected='true' value='dGVzdCBsYWJlbA=='/></values>" +
+                "<values><value encoded='true' label='dGVzdCBsYWJlbA==' null='true' selected='true' type='test type 2' value='dGVzdCBsYWJlbA=='/></values>" +
               "</parameter>" +
               "<error parameter='test_parameter_name' message='test error message'></error>" +
               "<global-error message='test global-error message'></global-error>" +
@@ -74,6 +75,7 @@ define(['common-ui/prompting/parameters/ParameterXmlParser'], function (Paramete
         expect(paramDefn.parameterGroups[0].parameters[2]['values'][0]['value']).toEqual('');
         expect(paramDefn['errors']['null'][0]).toEqual("test global-error message");
         expect(paramDefn['errors']['test_parameter_name'][0]).toEqual("test error message");
+        expect(Logger.warn).not.toHaveBeenCalled();
       });
 
       it("fails parse if invalid xml string is used", function () {
@@ -88,6 +90,71 @@ define(['common-ui/prompting/parameters/ParameterXmlParser'], function (Paramete
               "<parameters autoSubmitUI='false' autoSubmit='false' paginate='false' accepted-page='1' page-count='2' ignore-biserver-5538='false' is-prompt-needed='false' layout='test-layout'>" +
               "</parameters");
         }).toThrow();
+      });
+
+      it("should throw error if no attribute: _getAttributeFromXmlNode", function() {
+        expect(function() {
+          var xml = "<parameters autoSubmitUI='false' autoSubmit='false' paginate='false' accepted-page='1' page-count='2' ignore-biserver-5538='false' is-prompt-needed='false' layout='test-layout'>" +
+                        "<parameter is-list='true' is-mandatory='false' timezone-hint='timezone-hint' is-multi-select='true' is-strict='false' type='test type'>" +
+                          "<attribute name='test name' namespace='http://corp.name.org/namespaces/parameter-attributes' value='0'/>" +
+                          "<values><value encoded='false' label='test label' null='false' selected='true' value='test label'/></values>" +
+                        "</parameter>" +
+                      "</parameters>";
+          var paramDefn = parameterXmlParser.parseParameterXml(xml);
+        }).toThrow("ParameterDefinition: no attribute 'name' found");
+
+        expect(function() {
+          var xml = "<parameters autoSubmitUI='false' autoSubmit='false' paginate='false' accepted-page='1' page-count='2' ignore-biserver-5538='false' is-prompt-needed='false' layout='test-layout'>" +
+                        "<parameter is-list='true' is-mandatory='false' timezone-hint='timezone-hint' is-multi-select='true' is-strict='false' name='test_parameter_name'>" +
+                          "<attribute name='test name' namespace='http://corp.name.org/namespaces/parameter-attributes' value='0'/>" +
+                          "<values><value encoded='false' label='test label' null='false' selected='true' value='test label'/></values>" +
+                        "</parameter>" +
+                      "</parameters>";
+          var paramDefn = parameterXmlParser.parseParameterXml(xml);
+        }).toThrow("ParameterDefinition: no attribute 'type' found");
+      });
+
+      it("should log warning if no attrs: _getAttributeFromXmlNode", function() {
+        var xml = "<parameters autoSubmitUI='false' _autoSubmit='false' paginate='false' _accepted-page='1' _page-count='2' ignore-biserver-5538='false' is-prompt-needed='false' _layout='test-layout'>" +
+                      "<parameter is-list='true' is-mandatory='false' timezone-hint='timezone-hint' is-multi-select='true' is-strict='false' name='test_parameter_name' type='test type'>" +
+                        "<attribute name='test name' namespace='http://corp.name.org/namespaces/parameter-attributes' value='0'/>" +
+                        "<values><value encoded='false' _label='test label' _null='false' selected='true' _value='test label'/></values>" +
+                      "</parameter>" +
+                      "<error _parameter='test_parameter_name' _message='test error message'></error>" +
+                      "<global-error _message='test global-error message'></global-error>" +
+                    "</parameters>";
+        var paramDefn = parameterXmlParser.parseParameterXml(xml);
+        expect(Logger.warn).toHaveBeenCalledWith("ParameterDefinition: no attribute 'parameter' found");
+        expect(Logger.warn).toHaveBeenCalledWith("ParameterDefinition: no attribute 'message' found");
+        expect(Logger.warn).toHaveBeenCalledWith("ParameterDefinition: no attribute 'label' found");
+        expect(Logger.warn).toHaveBeenCalledWith("ParameterDefinition: no attribute 'null' found");
+        expect(Logger.warn).toHaveBeenCalledWith("ParameterDefinition: no attribute 'value' found");
+        expect(Logger.warn).toHaveBeenCalledWith("ParameterDefinition: no attribute 'type' found");
+        expect(Logger.warn).toHaveBeenCalledWith("ParameterDefinition: no attribute 'layout' found");
+        expect(Logger.warn).toHaveBeenCalledWith("ParameterDefinition: no attribute 'accepted-page' found");
+        expect(Logger.warn).toHaveBeenCalledWith("ParameterDefinition: no attribute 'page-count' found");
+        expect(Logger.warn).toHaveBeenCalledWith("ParameterDefinition: no attribute 'autoSubmit' found");
+      });
+
+      it("should log warning if no boolean value: _getBooleanFromXmlNode", function() {
+        var xml = "<parameters autoSubmitUI='test' autoSubmit='false' paginate='test' accepted-page='1' page-count='2' ignore-biserver-5538='test' is-prompt-needed='test' layout='test-layout'>" +
+                      "<parameter is-list='test' is-mandatory='test' timezone-hint='timezone-hint' is-multi-select='test' is-strict='test' name='test_parameter_name' type='test type'>" +
+                        "<attribute name='test name' namespace='http://corp.name.org/namespaces/parameter-attributes' value='0'/>" +
+                        "<values><value encoded='false' label='test label' null='false' selected='test' value='test label'/></values>" +
+                      "</parameter>" +
+                      "<error parameter='test_parameter_name' message='test error message'></error>" +
+                      "<global-error message='test global-error message'></global-error>" +
+                    "</parameters>";
+        var paramDefn = parameterXmlParser.parseParameterXml(xml);
+        expect(Logger.warn).toHaveBeenCalledWith("ParameterDefinition: expected 'is-mandatory' to be boolean, got 'test' instead");
+        expect(Logger.warn).toHaveBeenCalledWith("ParameterDefinition: expected 'is-strict' to be boolean, got 'test' instead");
+        expect(Logger.warn).toHaveBeenCalledWith("ParameterDefinition: expected 'is-list' to be boolean, got 'test' instead");
+        expect(Logger.warn).toHaveBeenCalledWith("ParameterDefinition: expected 'is-multi-select' to be boolean, got 'test' instead");
+        expect(Logger.warn).toHaveBeenCalledWith("ParameterDefinition: expected 'selected' to be boolean, got 'test' instead");
+        expect(Logger.warn).toHaveBeenCalledWith("ParameterDefinition: expected 'is-prompt-needed' to be boolean, got 'test' instead");
+        expect(Logger.warn).toHaveBeenCalledWith("ParameterDefinition: expected 'ignore-biserver-5538' to be boolean, got 'test' instead");
+        expect(Logger.warn).toHaveBeenCalledWith("ParameterDefinition: expected 'paginate' to be boolean, got 'test' instead");
+        expect(Logger.warn).toHaveBeenCalledWith("ParameterDefinition: expected 'autoSubmitUI' to be boolean, got 'test' instead");
       });
     });
   });
