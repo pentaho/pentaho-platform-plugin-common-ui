@@ -26,30 +26,30 @@ define([
     var Simple = context.get(simpleFactory);
 
     /**
-     * @name pentaho.type.String
+     * @name pentaho.type.Object
      * @class
      * @extends pentaho.type.Simple
-     * @amd pentaho/type/string
+     * @amd pentaho/type/object
      *
-     * @classDesc A textual type.
+     * @classDesc A primitive JavaScript object type.
      *
      * ### AMD
      *
-     * Module Id: `pentaho/type/string`
+     * Module Id: `pentaho/type/object`
      *
      * The AMD module returns the type's factory, a
-     * {@link pentaho.type.Factory<pentaho.type.String>}.
+     * {@link pentaho.type.Factory<pentaho.type.Object>}.
      *
-     * @description Creates a string instance.
+     * @description Creates an object instance.
      */
-    return Simple.extend("pentaho.type.String", {
+    return Simple.extend("pentaho.type.Object", {
       meta: {
         id: module.id,
-        styleClass: "pentaho-type-string",
-        cast: String
+        styleClass: "pentaho-type-object",
+        cast: Object
       }
     }).implement({
-      meta: bundle.structured["string"]
+      meta: bundle.structured["object"]
     });
   };
 });

@@ -5,9 +5,9 @@
   "source": {
     "include": ["package-res/resources/web/pentaho"],
     "exclude": [
+      "package-res/resources/web/pentaho/shim",
       "package-res/resources/web/pentaho/visual",
-      "package-res/resources/web/pentaho/data",
-      "package-res/resources/web/pentaho/component"],
+      "package-res/resources/web/pentaho/data"],
     "includePattern": ".+\\.js(doc)?$"
   },
   "plugins": ["plugins/markdown"],

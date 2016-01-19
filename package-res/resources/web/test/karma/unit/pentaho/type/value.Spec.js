@@ -16,15 +16,19 @@
 define([
   "pentaho/type/Item",
   "pentaho/type/Context",
-  "pentaho/type/value"
-], function(Abstract, Context, valueFactory) {
+  "pentaho/type/value",
+  "pentaho/type/number",
+  "pentaho/util/error",
+  "pentaho/i18n!/pentaho/type/i18n/types"
+], function(Abstract, Context, valueFactory, numberFactory, error, bundle) {
 
   "use strict";
 
   /*global describe:true, it:true, expect:true, beforeEach:true*/
 
   var context = new Context(),
-      Value = context.get(valueFactory);
+      Value = context.get(valueFactory),
+      Number = context.get(numberFactory);
 
   describe("pentaho/type/value -", function() {
 
@@ -263,6 +267,115 @@ define([
             expect(DerivedA.meta.uid).not.toBe(Value.meta.uid);
           });
         }); // #uid
+
+        describe("#domain -", function() {
+          it("should respect a specified base domain", function() {
+            var B = Number.extend({
+              meta: {
+                domain: [1, 2, 3]
+              }
+            });
+
+            var domain = B.meta.domain;
+            expect(domain instanceof Array).toBe(true);
+            expect(domain.length).toBe(3);
+
+            expect(domain[0] instanceof Number).toBe(true);
+            expect(domain[1] instanceof Number).toBe(true);
+            expect(domain[2] instanceof Number).toBe(true);
+
+            expect(domain[0].value).toBe(1);
+            expect(domain[1].value).toBe(2);
+            expect(domain[2].value).toBe(3);
+          });
+
+          it("should inherit the base domain when unspecified", function() {
+            var B = Number.extend({
+              meta: {
+                domain: [1, 2, 3]
+              }
+            });
+
+            var C = B.extend();
+
+            var domain = B.meta.domain;
+            expect(domain instanceof Array).toBe(true);
+            expect(domain.length).toBe(3);
+
+            expect(C.meta.domain).toBe(domain);
+          });
+
+          it("should throw if the specified domain is not a subset of the base domain", function() {
+            var B = Number.extend({
+              meta: {
+                domain: [1, 2, 3]
+              }
+            });
+
+            expect(function() {
+              B.extend({
+                meta: {
+                  domain: [1, 4]
+                }
+              });
+            }).toThrowError(
+                error.argInvalid("domain", bundle.structured.errors.type.domainIsNotSubsetOfBase)
+                    .message);
+          });
+
+          it("should respect a specified domain that is a subset of the base domain", function() {
+            var B = Number.extend({
+              meta: {
+                domain: [1, 2, 3]
+              }
+            });
+
+            var C = B.extend({
+              meta: {
+                domain: [1, 2]
+              }
+            });
+
+            var domain = C.meta.domain;
+            expect(domain instanceof Array).toBe(true);
+            expect(domain.length).toBe(2);
+
+            expect(domain[0].value).toBe(1);
+            expect(domain[1].value).toBe(2);
+          });
+
+          it("should inherit the base domain when later set to nully or empty array", function() {
+
+            function expectIt(newDomain) {
+              var B = Number.extend({
+                meta: {
+                  domain: [1, 2, 3]
+                }
+              });
+
+              var C = B.extend({
+                meta: {
+                  domain: [1, 2]
+                }
+              });
+
+              var domain = C.meta.domain;
+              expect(domain instanceof Array).toBe(true);
+              expect(domain.length).toBe(2);
+
+              C.meta.domain = newDomain;
+
+              domain = C.meta.domain;
+              expect(domain instanceof Array).toBe(true);
+              expect(domain.length).toBe(3);
+              expect(domain).toBe(B.meta.domain);
+            }
+
+            expectIt(null);
+            expectIt(undefined);
+            expectIt([]);
+          });
+        }); // #domain
       });
 
       // TODO: remaining properties: value, format, domain, abstract browsable, annotations...

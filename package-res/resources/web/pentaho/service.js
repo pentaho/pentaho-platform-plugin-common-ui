@@ -21,7 +21,7 @@
  * 
  * **Module Id**: `"service"`
  * 
- * **Plugin Usage**: `"service!{logical-module-name}"`
+ * **Plugin Usage**: `"pentaho/service!{logical-module-name}"`
  * 
  *   * `{logical-module-name}` — the name of a required logical module.
  * 
@@ -77,7 +77,7 @@
  *     });
  *
  *     // Require the dependencies of a logical module
- *     require(["service!IHomeScreen"], function(arrayOfHomeScreenModules) {
+ *     require(["pentaho/service!IHomeScreen"], function(arrayOfHomeScreenModules) {
  * 
  *  	     arrayOfHomeScreenModules.forEach(function(homeScreen) {
  *            // consume `homeScreen`

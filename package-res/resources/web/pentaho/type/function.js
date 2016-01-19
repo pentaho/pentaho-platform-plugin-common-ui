@@ -19,37 +19,46 @@ define([
   "../i18n!types"
 ], function(module, simpleFactory, bundle) {
 
-  "use strict";
+  // Cannot use strict here because of the evil eval, below...
 
   return function(context) {
+
+    "use strict";
 
     var Simple = context.get(simpleFactory);
 
     /**
-     * @name pentaho.type.String
+     * @name pentaho.type.Function
      * @class
      * @extends pentaho.type.Simple
-     * @amd pentaho/type/string
+     * @amd pentaho/type/function
      *
-     * @classDesc A textual type.
+     * @classDesc A primitive JavaScript function type.
      *
      * ### AMD
      *
-     * Module Id: `pentaho/type/string`
+     * Module Id: `pentaho/type/function`
      *
      * The AMD module returns the type's factory, a
-     * {@link pentaho.type.Factory<pentaho.type.String>}.
+     * {@link pentaho.type.Factory<pentaho.type.Function>}.
      *
-     * @description Creates a string instance.
+     * @description Creates a function instance.
      */
-    return Simple.extend("pentaho.type.String", {
+    return Simple.extend("pentaho.type.Function", {
       meta: {
         id: module.id,
-        styleClass: "pentaho-type-string",
-        cast: String
+        styleClass: "pentaho-type-function",
+        cast: castFun
       }
     }).implement({
-      meta: bundle.structured["string"]
+      meta: bundle.structured["object"]
     });
   };
+
+  function castFun(f) {
+    switch(typeof f) {
+      case "function": return f;
+      case "string"  : eval("(" + f + ")");
+    }
+  }
 });

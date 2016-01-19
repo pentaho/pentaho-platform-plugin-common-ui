@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 define([
-  "../../i18n!../i18n/types",
-  "../../lang/Base",
-  "../../lang/_AnnotatableLinked",
-  "../../util/error",
-  "../../util/arg",
-  "../../util/fun",
-  "../../util/object"
-], function(bundle, Base, AnnotatableLinked, error, arg, fun, O) {
+  "../i18n!types",
+  "../lang/Base",
+  "../lang/_AnnotatableLinked",
+  "../util/error",
+  "../util/arg",
+  "../util/fun",
+  "../util/object",
+  "../util/promise"
+], function(bundle, Base, AnnotatableLinked, error, arg, fun, O, promise) {
 
   "use strict";
 
@@ -211,7 +212,7 @@ define([
      *
      * This attribute is not inherited.
      *
-     * @type ?nonEmptystring
+     * @type {?nonEmptystring}
      * @readonly
      */
     get id() {
@@ -221,6 +222,25 @@ define([
     set id(value) {
       // Can only be set once or throws.
       O.setConst(this, "_id", nonEmptyString(value));
+    },
+
+    _buildRelativeId: function(value) {
+      // A module id.
+      // Unless it starts with a "/", it's relative to this Meta#id.
+      // Relative:
+      //   View
+      //   ./View
+      // Absolute:
+      //   foo.js
+      //   /View
+      //   http:
+      if(!/(^\w+:)|(^\/)|(\.js$)/.test(value)) {
+        // Considered relative.
+        // Also works well if the value has ./ or ../
+        var id = this.id;
+        value = (id ? (id + "/") : "") + value;
+      }
+      return value;
     },
     //endregion
 
@@ -397,6 +417,71 @@ define([
     },
     //endregion
 
+    //region view property
+
+    // -> nonEmptyString, Optional, Inherited, Configurable, Localized
+    // undefined -> inherit
+    // null -> clear
+    // "" -> null conversion
+
+    _view: null, // {value: any, promise: Promise.<Class.<View>>}
+
+   /**
+    * Gets or sets the default view for items of this type.
+    *
+    * When `undefined`, the view will be inherited from the ancestor type.
+    * When _falsy_ (like `null` or an empty string),
+    * the view will be cleared and not inherited.
+    *
+    * Otherwise, when a string, it is the id of the view's module.
+    * When the string starts with `/`, `xyz:` or ends with `.js`,
+    * the id is considered absolute.
+    * Otherwise, it is considered relative to the type's id folder.
+    *
+    * Otherwise, it is considered to be the class or factory of the view.
+    * It'll normally be a function, but this is not ensured.
+    *
+    * @type string | Class | any
+    * @readOnly
+    * @see pentaho.type.Item.Meta#viewClass
+    */
+    get view() {
+      return this._view && this._view.value;
+    },
+
+    set view(value) {
+      if(value === undefined) {
+        if(this !== _itemMeta) {
+          delete this._view;
+        }
+      } else if(!value) { // null || ""
+        this._view = null;
+      } else  if(typeof value === "string") {
+        value = this._buildRelativeId(value);
+        if(!this._view || this._view.value !== value) {
+          this._view = {value: value, promise: null};
+        }
+      } else {
+        // Assume it is the View class itself, already resolved.
+        if(!this._view || this._view.value !== value) {
+          this._view = {value: value, promise: Promise.resolve(value)};
+        }
+      }
+    },
+
+    /**
+     * Gets a promise for the default view class or `null` if no view is defined.
+     *
+     * @type ?Promise.<!Class|!any>
+     * @readOnly
+     * @see pentaho.type.Item.Meta#view
+     */
+    get viewClass() {
+      var view = this._view;
+      return view && (view.promise || (view.promise = promise.require([view.value])));
+    },
+    //endregion
+
     /**
      * Creates a sub-prototype of this one.
      *
@@ -468,7 +553,7 @@ define([
      *
      * If you're wondering were this name comes from,
      * "Mesa" is a Greek word which is opposite to "Meta".
-     * See {@link http://www.gwiznlp.com/wp-content/uploads/2014/08/Whats-the-opposite-of-meta.pdf}.
+     * See [here]{@link http://www.gwiznlp.com/wp-content/uploads/2014/08/Whats-the-opposite-of-meta.pdf}.
      *
      * @name Mesa
      * @memberOf pentaho.type.Item.Meta
