@@ -33,11 +33,16 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
        *
        * @param packageName String the name of the package containing the javascript
        * file with the resource strings.
-       * @param fileName String name of the javascript file with the
-       * resource strings, without the extention.
+       * @param {String|Object} fileName name of the javascript file with the
+       * resource strings, without the extension, or a bundle object directly.
        */
       /*public static*/
       moduleDef.addBundle = function (packageName, fileName) {
+        if (fileName && typeof fileName === "object") {
+            moduleDef.messageBundle[packageName] = fileName;
+            return;
+        }
+        
         // Make sure Dojo doesn't try to load message bundles from any other locales than the default (ROOT).
         // Without the locale override Dojo will attempt to load resources from: ROOT, language, locale (language + variant).
         //     e.g. For English in the US: ROOT, en, en-us

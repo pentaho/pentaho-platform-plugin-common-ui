@@ -19,6 +19,6 @@
     "karma-chrome-launcher": "~0.1.4",
     "requirejs": "~2.1.9",
     "yuidocjs": "~0.3.45",
-    "jsdoc": "3.3.2"
+    "jsdoc": "^3.4.0"
   }
 }

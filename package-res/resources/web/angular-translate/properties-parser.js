@@ -15,9 +15,8 @@
 *
 */
 
-'use strict';
-
-define(['common-ui/es5-shim'], function() {
+define(['pentaho/shim/es5'], function() {
+    'use strict';
 
     // Based on Xavi Ramirez's MIT licensed https://github.com/xavi-/node-properties-parser
 

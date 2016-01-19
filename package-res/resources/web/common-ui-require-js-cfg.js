@@ -28,17 +28,30 @@
       requirePaths   = requireCfg.paths,
       requireShim    = requireCfg.shim,
       requireMap     = requireCfg.map,
-      requireService = requireCfg.config.service;
 
-  requirePaths["common-ui"     ] = basePath;
-  requirePaths["common-repo"   ] = basePath + "/repo";
-  requirePaths["common-data"   ] = basePath + "/dataapi";
+      // TODO: This fallback logic is temporary, and can be removed when the remaining
+      //    parts of the system rename the "service" plugin id to "pentaho/service".
+      requireService = requireCfg.config["pentaho/service"] || (requireCfg.config["pentaho/service"] = []);
+
+  requirePaths["common-ui"  ] = basePath;
+  requirePaths["common-repo"] = basePath + "/repo";
+  requirePaths["common-data"] = basePath + "/dataapi";
+
   requirePaths["pentaho/common"] = basePath + "/dojo/pentaho/common";
-  requirePaths["pentaho/visual"] = basePath + "/visual";
+
+  // Unfortunately, mantle already maps the "pentaho" id to "/js",
+  // so all the following sub-modules must be mapped individually.
+  requirePaths["pentaho/data"] = basePath + "/pentaho/data";
+  requirePaths["pentaho/lang"] = basePath + "/pentaho/lang";
+  requirePaths["pentaho/type"] = basePath + "/pentaho/type";
+  requirePaths["pentaho/util"] = basePath + "/pentaho/util";
+  requirePaths["pentaho/visual"] = basePath + "/pentaho/visual";
+  requirePaths["pentaho/service"] = basePath + "/pentaho/service";
+  requirePaths["pentaho/i18n"] = basePath + "/pentaho/i18n";
+  requirePaths["pentaho/shim"] = basePath + "/pentaho/shim";
 
   // AMD PLUGINS
   requirePaths["local"  ] = basePath + "/util/local";
-  requirePaths["service"] = basePath + "/util/service";
   requirePaths["json"   ] = basePath + "/util/require-json/json";
   requirePaths["text"   ] = basePath + "/util/require-text/text";
   // Using `map` is important for use in r.js and correct AMD config of the other files of the package.
@@ -48,10 +61,6 @@
     requirePaths["common-ui/util/require-css/css"] = basePath + "/util/require-css/css" + minSuffix;
   }
   requireMap["*"]["css" ] = "common-ui/util/require-css/css";
-
-  // SHIMS
-  requirePaths["es6-promise-shim"] = basePath + "/util/es6-promise-shim";
-  requirePaths["common-ui/es5-shim"] = basePath + "/util/es5-shim";
 
   // DOJO
   requirePaths["dojo" ] = basePath + "/dojo/dojo";
@@ -114,8 +123,10 @@
   requirePaths["common-ui/underscore"] = basePath + "/underscore/underscore" + minSuffix;
   requirePaths["underscore"] = basePath + "/underscore/underscore" + minSuffix;
 
-  // Intended for private use of "es6-promise-shim" only
-  requirePaths["es6-promise"] = basePath + "/es6-promise/es6-promise" + minSuffix;
+  // Intended for private use of "pentaho/shim/es6-promise" only!
+  if(minSuffix) {
+    requirePaths["pentaho/shim/_es6-promise/es6-promise"] = basePath + "/pentaho/shim/_es6-promise/es6-promise" + minSuffix;
+  }
 
   // ANGULAR
   requirePaths["common-ui/angular"] = basePath + "/angular/angular" + minSuffix;
@@ -165,10 +176,9 @@
   requireShim ["common-ui/angular-sanitize"] = ["common-ui/angular"];
 
   requirePaths["common-ui/properties-parser"] = basePath + "/angular-translate/properties-parser";
-  requireShim ["common-ui/properties-parser"] = ["common-ui/es5-shim"];
 
   requirePaths["common-ui/angular-translate"] = basePath + "/angular-translate/angular-translate" + minSuffix;
-  requireShim ["common-ui/angular-translate"] = ["common-ui/es5-shim", "common-ui/angular"];
+  requireShim ["common-ui/angular-translate"] = ["pentaho/shim/es5", "common-ui/angular"];
 
   requirePaths["common-ui/angular-translate-loader-partial"] = basePath + "/angular-translate/angular-translate-loader-partial" + minSuffix;
   requireShim ["common-ui/angular-translate-loader-partial"] = ["common-ui/angular-translate"];
@@ -190,6 +200,6 @@
   requireService["pentaho/visual/ccc/visualApiConfig"] = "IVisualApiConfiguration";
 
   // Sample visualizations
-  requireService["pentaho/visual/sample/visualTypeProvider"] = "IVisualTypeProvider";
+  requireService["pentaho/visual/samples/calc/visualTypeProvider"] = "IVisualTypeProvider";
 
 }());

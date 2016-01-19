@@ -15,7 +15,7 @@ module.exports = function (config) {
 
     files: [
       {pattern: "build-res/module-scripts/**/{*.js,*.html,*.xml}",  included: false},
-      {pattern: "package-res/resources/web/**/{*.js,*.html,*.xml}", included: false},
+      {pattern: "package-res/resources/web/**/{*.js,*.html,*.xml,*.properties}", included: false},
       {pattern: "dev-res/dojo/dojo-release-1.9.2-src/**/{*.js,*.html}", included: false},
 
       "config/context.js",
@@ -48,6 +48,7 @@ module.exports = function (config) {
       // (these files will be instrumented by Istanbul)
       "package-res/resources/web/plugin-handler/**/*.js": ["coverage"],
       "package-res/resources/web/angular-directives/**/*.js": ["coverage"],
+      "package-res/resources/web/pentaho/**/*.js": ["coverage"],
       "package-res/resources/web/vizapi/**/*.js": ["coverage"],
       "package-res/resources/web/prompting/**/*.js": ["coverage"],
       "package-res/resources/web/util/**/*.js": ["coverage"],

@@ -1,0 +1,43 @@
+/*!
+ * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * A range represents the value limits, minimum and maximum, of a sequence of atomic values.
+ *
+ * The underlying sequence is assumed to be uniform in the type of elements it contains.
+ * These can be of any atomic type, (see {@link pentaho.data.Atomic}).
+ *
+ * In the case of the string element type,
+ * it is unspecified how the order of the elements is determined
+ * (although, typically, it is the lexicographical order).
+ *
+ * When a sequence does not have any elements, or
+ * when all of its elements are somehow invalid or undefined
+ * (like `null`, `undefined`, `NaN`, ...),
+ * a range _can_ still be built,
+ * having **both** of its limits with value `undefined`.
+ *
+ * @example
+ *    {min: 100, max: 200}
+ *
+ * @typedef {Object} pentaho.data.Range
+ *
+ * @property {pentaho.data.Atomic|undefined} min The minimum range value, or,
+ *     when there is no data, or no meaningful data, `undefined`.
+ *
+ * @property {pentaho.data.Atomic|undefined} max The maximum range value, or,
+ *     when there is no data, or no meaningful data, `undefined`.
+ */

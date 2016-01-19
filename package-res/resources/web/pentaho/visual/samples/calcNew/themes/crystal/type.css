@@ -1,0 +1,16 @@
+
+.pentaho-visual-samples-calculator.component-icon-small {
+  background-image: url("./images/icon-small.png");
+}
+
+.pentaho-visual-samples-calculator.component-icon-medium {
+  background-image: url("./images/icon-medium.png");
+}
+
+.pentaho-visual-samples-calculator.component-icon-large {
+  background-image: url("./images/icon-large.png");
+}
+
+.pentaho-visual-samples-calculator.component-icon-landscape {
+  background-image: url("./images/icon-landscape.png");
+}

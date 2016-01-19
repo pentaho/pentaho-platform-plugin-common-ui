@@ -1,0 +1,38 @@
+/*!
+ * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * The `spec.UTypeRef` union represents the set of JS types that can be used
+ * to reference a type.
+ *
+ * When a string, it is the type's {@link pentaho.type.Value.Meta#id}.
+ *
+ * When a function, it can be:
+ *
+ * 1. a `Value` class,
+ * 1. a `Value.Meta` class, or, else
+ * 1. a function which is assumed to be the type's module factory function.
+ *
+ * When an object, it is a type's metadata specification.
+ *
+ * @typedef {string|
+ *           pentaho.type.Factory|
+ *           pentaho.type.Value|
+ *           pentaho.type.Value.Meta|
+ *           pentaho.type.spec.ITypeMeta} pentaho.type.spec.UTypeRef
+ */
+
+
