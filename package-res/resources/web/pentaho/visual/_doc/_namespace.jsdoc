@@ -21,3 +21,12 @@
  * @name pentaho.visual
  * @namespace
  */
+
+
+/**
+ * The base namespace contains classes for developers to use
+ * to build new visualizations that work with the Visualization API.
+ *
+ * @name pentaho.visual.base
+ * @namespace
+ */

@@ -56,7 +56,12 @@ define(function() {
     operInvalid: function(text) {
       return new Error("Operation invalid." + (text ? (" " + text) : ""));
     },
+
+    notImplemented: function(text){
+      return new Error("Not Implemented." + (text ? (" " + text) : ""));
+    }
   };
+
 
   return error;
 });

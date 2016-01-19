@@ -3,11 +3,17 @@
     "allowUnknownTags": true
   },
   "source": {
-    "include": ["package-res/resources/web/pentaho"],
+    "include": [
+      "package-res/resources/web/pentaho/i18n.js",
+      "package-res/resources/web/pentaho/service.js",
+      "package-res/resources/web/pentaho/_doc",
+      "package-res/resources/web/pentaho/lang",
+      "package-res/resources/web/pentaho/type",
+      "package-res/resources/web/pentaho/visual/_doc/_namespace.jsdoc",
+      "package-res/resources/web/pentaho/visual/base"
+    ],
     "exclude": [
-      "package-res/resources/web/pentaho/shim",
-      "package-res/resources/web/pentaho/visual",
-      "package-res/resources/web/pentaho/data"],
+    ],
     "includePattern": ".+\\.js(doc)?$"
   },
   "plugins": ["plugins/markdown"],
