@@ -107,13 +107,13 @@ define([
        *
        * If the specified property is not defined, `null` is returned.
        *
-       * A list property always has an array value, possibly empty, but never `null`.
+       * A list property always has an array value, possibly empty but never `null`.
        *
-       * @param {string|pentaho.type.Property.Meta} [name] The property name or metadata.
+       * @param {string|pentaho.type.Property.Meta} [name] The property name or property metadata.
        * @param {boolean} [assertDefined=false] Indicates if an error should be thrown when a property
        *    with the specified name is not defined.
        *
-       * @return {pentaho.type.Value|pentaho.type.Value[]} The value(s) of the property, or _null_.
+       * @return {pentaho.type.Value|pentaho.type.Value[]} Returns the value(s) of the property, or _null_.
        * @see pentaho.type.Property.Meta#list
        */
       get: function(name, assertDefined) {
@@ -124,10 +124,10 @@ define([
       /**
        * Sets the value of a property.
        *
-       * @param {string|pentaho.type.Property.Meta} name The property name or metadata.
+       * @param {string|pentaho.type.Property.Meta} name The property name or property metadata.
        * @param {any?} [valueSpec=null] A value fragment specification.
        *
-       * return {pentaho.type.Complex} This object.
+       * @return {pentaho.type.Complex} Returns this object.
        */
       set: function(name, valueSpec) {
         var pMeta  = this.meta.get(name, true),
@@ -150,10 +150,10 @@ define([
        *
        * When a requested index does not exist, `null` is returned.
        *
-       * @param {string|pentaho.type.Property.Meta} [name] The property name or metadata.
+       * @param {string|pentaho.type.Property.Meta} [name] The property name or property property metadata.
        * @param {?number} [index=0] The index of the value.
        *
-       * @return {?pentaho.type.Value} A single property value or `null`.
+       * @return {?pentaho.type.Value} Returns a single property value or `null`.
        * @see pentaho.type.Property.Meta#list
        */
       get1: function(name, index) {
@@ -173,13 +173,14 @@ define([
        * the length of its value fragment is returned.
        *
        * When the specified property is not a _list_ property,
-       * `0` is returned if it is `null` and `1`, otherwise.
+       * returns `1`, except if the the property value is `null`,
+       * in which case `0` is returned.
        *
        * An error is thrown if the specified property is not defined.
        *
-       * @param {string|pentaho.type.Property.Meta} name The property name or metadata.
+       * @param {string|pentaho.type.Property.Meta} name The property name or property metadata.
        *
-       * @return {number} The number of values.
+       * @return {number} Returns the number of values.
        */
       count: function(name) {
         var pMeta = this.meta.get(name, true);
@@ -204,7 +205,7 @@ define([
        *
        * When a requested index does not exist, `undefined` is returned.
        *
-       * @param {string|pentaho.type.Property.Meta} [name] The property name or metadata.
+       * @param {string|pentaho.type.Property.Meta} [name] The property name or property metadata.
        * @param {?number} [index] The index of the value.
        *
        * @return {?any} The underlying value of the requested `Value` or `undefined`.
@@ -221,7 +222,7 @@ define([
        * on the `Value` returned by {@link pentaho.type.Complex#get1}.
        *
        * For a {@link pentaho.type.Simple} type, this corresponds to returning
-       * its {@link pentaho.type.Simple#formatted} attribute when it is not null.
+       * its {@link pentaho.type.Simple#formatted} attribute when it is not `null`.
        * For a {@link pentaho.type.Complex} type, depends totally on the implementation.
        *
        * An error is thrown if the specified property is not defined.
@@ -245,8 +246,8 @@ define([
        *
        * An error is thrown if the specified property is not defined.
        *
-       * @param {string|pentaho.type.Property.Meta} name The property name or metadata.
-       * @return {boolean} `true` if the property is applicable, `false`, otherwise.
+       * @param {string|pentaho.type.Property.Meta} name The property name or property metadata.
+       * @return {boolean} Returns `true` if the property is applicable; Returns `false` if otherwise.
        */
       applicable: function(name) {
         return this.meta.get(name, true).applicableEval(this);
@@ -255,12 +256,12 @@ define([
 
       //region readOnly attribute
       /**
-       * Obtains a value that indicates if a given property is currently readonly.
+       * Obtains a value that indicates if a given property is currently read-only.
        *
        * An error is thrown if the specified property is not defined.
        *
-       * @param {string|pentaho.type.Property.Meta} name The property name or metadata.
-       * @return {boolean} `true` if the property is read-only, `false`, otherwise.
+       * @param {string|pentaho.type.Property.Meta} name The property name or property metadata.
+       * @return {boolean} Returns `true` if the property is read-only, `false` if the value is other.
        *
        * @type boolean
        */
@@ -275,7 +276,7 @@ define([
        *
        * An error is thrown if the specified property is not defined.
        *
-       * @param {string|pentaho.type.Property.Meta} name The property name or metadata.
+       * @param {string|pentaho.type.Property.Meta} name The property name or property metadata.
        * @return {pentaho.IRange} The range of the property.
        */
       countRange: function(name) {
@@ -292,8 +293,8 @@ define([
        *
        * An error is thrown if the specified property is not defined.
        *
-       * @param {string|pentaho.type.Property.Meta} [name] The property name or metadata.
-       * @return {boolean} `true` if the property is required, `false`, otherwise.
+       * @param {string|pentaho.type.Property.Meta} [name] The property name or property metadata.
+       * @return {boolean} Returns `true` if the property is required, `false` if the value is other.
        */
       required: function(name) {
         return this.meta.get(name, true).countRangeEval(this).min > 0;

@@ -1,5 +1,5 @@
 define([
-  "pentaho/visual/View",
+  "pentaho/visual/base/View",
   "pentaho/i18n!view"
 ], function(Visual, bundle) {
 
@@ -28,6 +28,7 @@ define([
 
     /** @override */
     _init: function() {
+      this.base();
       this._setupHtmlSpan();
     },
 
@@ -65,9 +66,9 @@ define([
     },
 
     _calculate: function() {
-      var dataTable = this.data,
+      var dataTable = this.model.getv("data"),
           R = dataTable.getNumberOfRows(),
-          jMeasure = dataTable.model.attributes.get(this.model.measure),
+          jMeasure = dataTable.model.attributes.get(this.model.getv("measure")).ordinal,
           getValue = function(k) {
             var v = dataTable.getValue(k, jMeasure);
             return !isNaN(v) && v != null ? v : null;
@@ -75,7 +76,7 @@ define([
           i;
 
       var value = null, vi;
-      switch(this.model.operation) {
+      switch(this.model.getv("operation")) {
         case "MAX":
           for(i = 0; i < R; i++)
             if((vi = getValue(i)) != null)
@@ -101,4 +102,4 @@ define([
       return value;
     }
   });
-})
+});
