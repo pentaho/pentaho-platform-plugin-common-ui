@@ -36,8 +36,8 @@ pentaho.cda = {
 					async: true,
 					dataType: "json",
 					type: "GET",
-					complete: function(response){
-						var fileList = eval('(' + response + ')' );
+					complete: function(response) {
+						var fileList = JSON.parse(response);
 						var fileCount = fileList.resultset.length;
 						var result;
 						if ( fileCount > 0) {
@@ -130,8 +130,8 @@ pentaho.cda.Descriptor.prototype = {
 					path: that.path,
 					outputType:'json'
 				},
-				complete: function(data){
-					var queryList = eval('(' + data + ')' ),
+				complete: function(data) {
+					var queryList = JSON.parse(data),
 					rs=queryList.resultset, query, loc;
 					for (query in rs){
 						loc = rs[query];

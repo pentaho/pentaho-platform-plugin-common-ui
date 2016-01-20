@@ -109,7 +109,7 @@ pentaho.pda.model.svc.prototype.discoverModelDetail = function() {
 	var resultStr = pentahoPost( url, '', null, 'text/text' );
 	// parse the XML
 
-    this.state = eval( '('+resultStr+')' );
+    this.state = JSON.parse(resultStr);
     
     this.categories = this.state.categories;
     this.capabilities = this.state.capabilities;
@@ -193,7 +193,7 @@ pentaho.pda.model.svc.prototype.submit = function( jsonString, rowLimit, callbac
 //        alert(jsonString);
         var handleResultCallback = dojo.hitch(this, function(resultJson) {
 //alert(resultJson);
-          var jsonTable = eval('('+resultJson+')');
+          var jsonTable = JSON.parse(resultJson);
           result = new pentaho.DataTable(jsonTable);
           if (callback) {
             callback(result);

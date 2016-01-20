@@ -319,7 +319,7 @@ pentaho.pda.model.mql.prototype.submit = function( jsonString, rowLimit, callbac
     var nodes = result.getElementsByTagName('return');
     resultJson = this.getText( nodes[0] );
 //          alert(resultJson);
-    var result = eval('('+resultJson+')');
+    var result = JSON.parse(resultJson);
     if (callback) {
       callback(result);
     }
@@ -362,7 +362,7 @@ pentaho.pda.model.mql.prototype.submitXmlQuery = function( queryObject, rowLimit
     var nodes = result.getElementsByTagName('return');
     resultJson = this.getText( nodes[0] );
 //            alert(resultJson);
-    var result = eval('('+resultJson+')');
+    var result = JSON.parse(resultJson);
     return result;
   } catch (e) {
     alert(e.message);
@@ -377,8 +377,8 @@ pentaho.pda.model.mql.prototype.submitXmlQuery = function( queryObject, rowLimit
 pentaho.pda.model.mql.prototype.parseResultSetXml = function(xml) {
   var oXML  = parseXML(xml);
   var rowNodes = oXML.getElementsByTagName('rows');        //initialize array of all DATA-ROW returned in SOAP
-  var colNameNodes = oXML.getElementsByTagName('columnNames'); //initialize arry of all COLUMN-HDR-ITEM in SOAP
-  var colTypeNodes = oXML.getElementsByTagName('columnTypes'); //initialize arry of all COLUMN-HDR-ITEM in SOAP
+  var colNameNodes = oXML.getElementsByTagName('columnNames'); //initialize array of all COLUMN-HDR-ITEM in SOAP
+  var colTypeNodes = oXML.getElementsByTagName('columnTypes'); //initialize array of all COLUMN-HDR-ITEM in SOAP
   if( !colNameNodes || colNameNodes.length == 0 ) {
     return null;
   }
