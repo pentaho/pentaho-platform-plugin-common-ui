@@ -92,24 +92,5 @@ define(["common-data/models-svc", "common-repo/pentaho-ajax"], function(modelsSv
       expect(svc.elements).toBeNull();
     });
 
-
-    it("svc.submit() should parse valid response", function() {
-      var obj = { name: 'name' };
-      pentahoPost = returnTextFunction(JSON.stringify(obj));
-
-      var result = svc.submit('');
-      expect(result.jsonTable).toEqual(obj);
-    });
-
-    it("svc.submit() should not call eval() for obtained result", function() {
-      pentahoPost = returnTextFunction(bogusResponse);
-
-      flag = false;
-      var result = svc.submit('');
-      // returns null on errors
-      expect(result).toBeNull();
-      expect(flag).toBeFalsy();
-    });
-
   });
 })
