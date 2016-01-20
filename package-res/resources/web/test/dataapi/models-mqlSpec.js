@@ -46,26 +46,6 @@ define(["common-data/models-mql"], function(modelsMql) {
       };
     }
 
-    it("mql.submit() should parse valid response", function() {
-      var obj = { field: 'value' };
-      mql.getText = returnTextFunction(JSON.stringify(obj));
-
-      var result = mql.submit('');
-      expect(result).toEqual(obj);
-    });
-
-    it("mql.submit() should not call eval() for obtained result", function() {
-      var bogusResponse = 'setFlag()';
-      mql.getText = returnTextFunction(bogusResponse);
-
-      flag = false;
-      var result = mql.submit('');
-      // returns null on errors
-      expect(result).toBeNull();
-      expect(flag).toBeFalsy();
-    });
-
-
     it("mql.submitXmlQuery() should parse valid response", function() {
       var obj = { field: 'value' };
       mql.getText = returnTextFunction(JSON.stringify(obj));
@@ -73,17 +53,5 @@ define(["common-data/models-mql"], function(modelsMql) {
       var result = mql.submitXmlQuery(queryObject);
       expect(result).toEqual(obj);
     });
-
-    it("mql.submitXmlQuery() should not call eval() for obtained result", function() {
-      var bogusResponse = 'setFlag()';
-      mql.getText = returnTextFunction(bogusResponse);
-
-      flag = false;
-      var result = mql.submit('');
-      // returns null on errors
-      expect(result).toBeNull();
-      expect(flag).toBeFalsy();
-    });
-
   });
 })
