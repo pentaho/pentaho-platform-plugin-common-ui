@@ -1099,6 +1099,89 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
               expect(panel.dashboard.updateComponent).toHaveBeenCalledWith(componentSpy);
             });
 
+
+            describe("PromptPanel's update components behaviour in _changeComponentsByDiff()", function() {
+
+              beforeEach(function() {
+                spyOn(panel, "_initializeParameterValue");
+
+                var valuesArray = [ ['qwerty', 'qwerty'] ];
+                componentSpy.valuesArray = valuesArray;
+                spyOn(panel.widgetBuilder, "build").and.callFake(function(obj, type) {
+                  return { "valuesArray": valuesArray };
+                });
+              });
+
+
+              var doTest = function(currentValue, selectedValue, type, updateIsExpected) {
+                panel.dashboard.updateComponent.calls.reset();
+                panel.dashboard.getParameterValue.and.returnValue(currentValue);
+
+                var paramValue = new ParameterValue();
+                paramValue.value = selectedValue;
+                paramValue.type = type;
+                paramValue.label = 'param'
+                paramValue.selected = true;
+
+                var param = new Parameter();
+                param.name = 'param';
+                param.type = type;
+                param.values = [paramValue];
+
+                var toChangeDiff = { groupName: { params: [param] } };
+                panel._changeComponentsByDiff(toChangeDiff);
+
+                // should never be called in this test set
+                expect(panel._initializeParameterValue).not.toHaveBeenCalled();
+                if (updateIsExpected) {
+                  expect(panel.dashboard.updateComponent).toHaveBeenCalled();
+                } else {
+                  expect(panel.dashboard.updateComponent).not.toHaveBeenCalled();
+                }
+              };
+
+              it("cases for string", function () {
+                var stringType = 'java.lang.String';
+
+                doTest('a', 'a', stringType, false);
+                doTest('a', 'A', stringType, false);
+                doTest('A', 'a', stringType, false);
+
+                doTest('a', 'a ', stringType, true);
+                doTest('a', '1', stringType, true);
+
+                doTest(null, null, stringType, false);
+                doTest(undefined, null, stringType, false);
+                doTest(null, undefined, stringType, false);
+                doTest(undefined, undefined, stringType, false);
+              });
+
+              it("cases for date", function () {
+                var dateType = 'java.sql.Date';
+
+                doTest(new Date(2000, 0, 1), new Date(2000, 0, 1), dateType, false);
+                doTest(new Date(2000, 0, 1, 0, 1), new Date(2000, 0, 1, 2, 3), dateType, false);
+
+                doTest(new Date(2000, 0, 1), new Date(2000, 0, 2), dateType, true);
+                doTest(new Date(2000, 0, 1, 0, 1), new Date(2000, 0, 2, 2, 3), dateType, true);
+
+                doTest(null, null, dateType, false);
+                doTest(undefined, null, dateType, false);
+                doTest(null, undefined, dateType, false);
+                doTest(undefined, undefined, dateType, false);
+              });
+
+              it("cases for other types", function () {
+                var someType  = 'some-type';
+
+                doTest(0, 0, someType, false);
+                doTest(0, '0', someType, false);
+
+                doTest('null', null, someType, true);
+              });
+
+            });
+
           });
 
           describe("_changeErrors", function() {
