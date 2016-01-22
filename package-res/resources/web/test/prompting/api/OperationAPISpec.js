@@ -20,7 +20,7 @@ define(["common-ui/prompting/api/OperationAPI"], function(OperationAPI) {
     var operationApi, apiSpy, promptPanelSpy, htmlId, paramDefnSpy;
     beforeEach(function() {
 
-      promptPanelSpy = jasmine.createSpyObj("PromptPanel", ["refresh", "init", "getParameterValues", "getParameterDefinition", "setParamDefn", "setParameterValue", "refreshPrompt"]);
+      promptPanelSpy = jasmine.createSpyObj("PromptPanel", ["refresh", "init", "getParameterValues", "getParameterDefinition", "setParamDefn", "setParameterValue", "refreshPrompt", "getState", "setState"]);
 
       apiSpy = jasmine.createSpy("PromptingAPI");
       apiSpy.log = jasmine.createSpyObj("Log", ["info", "warn", "error"]);
@@ -175,6 +175,30 @@ define(["common-ui/prompting/api/OperationAPI"], function(OperationAPI) {
 
       afterEach(function() {
         expect(operationApi._getPromptPanel).toHaveBeenCalled();
+      });
+    });
+
+    describe("state tests", function() {
+      var fakeState = jasmine.createSpy("state");
+      beforeEach(function() {
+        promptPanelSpy.getState.and.returnValue(fakeState);
+      });
+
+      it("should return state without input parameter", function() {
+        var result = operationApi.state();
+        expect(result).toBe(fakeState);
+        expect(promptPanelSpy.setState).not.toHaveBeenCalled();
+        expect(promptPanelSpy.getState).toHaveBeenCalled();
+      });
+
+      it("should return modified state", function() {
+        var state = {
+          "parametersChanged": false
+        };
+        var result = operationApi.state(state);
+        expect(result).toBe(fakeState);
+        expect(promptPanelSpy.setState).toHaveBeenCalledWith(state);
+        expect(promptPanelSpy.getState).toHaveBeenCalled();
       });
     });
   });
