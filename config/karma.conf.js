@@ -14,6 +14,7 @@ module.exports = function (config) {
       {pattern: "config/phantomjs-shims.js", included: true},
       {pattern: "build-res/module-scripts/**/*.+(js|html|xml)",  included: false},
       {pattern: "package-res/resources/web/**/*.+(js|html|xml|properties)", included: false},
+      {pattern: "dev-res/dojo/dojo-release-1.9.2-src/**/*.+(js|html)", included: false},
 
       "config/context.js",
       "build-res/requireCfg-raw.js",
@@ -24,6 +25,7 @@ module.exports = function (config) {
     // Too many files cause karma launcher/file-serving errors.
     // Exclude these as we don't use them and they're many.
     exclude: [
+      "dev-res/dojo/dojo-release-1.9.2-src/**/tests/**",
       "build-res/module-scripts/common-ui/**"
     ],
 
