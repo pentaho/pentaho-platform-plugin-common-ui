@@ -147,5 +147,70 @@ define(['common-ui/prompting/PromptPanel'], function(PromptPanel) {
     this.refreshPrompt = function(forceUpdate) {
       this._getPromptPanel().refreshPrompt(forceUpdate);
     };
+
+    /**
+     * Reads and modifys a state of the prompting system.
+     * The state consists of a set of server provided properties that influence the Prompting UI behaviour.
+     * Additionally the state includes some Prompting UI properties which are necessary to interact with the user and the server.
+     * The API function can be used to read the current state without input 'state' parameter.
+     * Also the API function can be used to modify the current state with input 'state' parameter, and as a result the API function returns the modified current state.
+     *
+     * @name OperationAPI#state
+     * @method
+     * @param {Object} [state]                    The set of properties which will be applied to current state. It's optional parameter.
+     * @param {Boolean} [state.parametersChanged] True if the parameters have changed, False otherwise
+     * @param {Boolean} [state.autoSubmit]        True is the prompt is in auto submit mode, False otherwise
+     * @param {Number} [state.page]               The number of the page
+     * @returns {Object}                          The current state which consists of the next properties:
+     *                                            <ul>
+     *                                              <li>'promptNeeded' &lt;Boolean&gt; - True if prompts are needed, False otherwise (read only property)</li>
+     *                                              <li>'paginate' &lt;Boolean&gt; - True if pagination is active, False otherwise (read only property)</li>
+     *                                              <li>'totalPages' &lt;Number&gt; - The number of total pages of the report (read only property)</li>
+     *                                              <li>'showParameterUI' &lt;Boolean&gt; - The boolean value of the parameter ShowParameters (read only property)</li>
+     *                                              <li>'allowAutoSubmit' &lt;Boolean&gt; - The value of autoSubmit, or if it is undefined the value of autoSubmitUI (read only property)</li>
+     *                                              <li>'parametersChanged' &lt;Boolean&gt; - True if the parameters have changed, False otherwise</li>
+     *                                              <li>'autoSubmit' &lt;Boolean&gt; - True is the prompt is in auto submit mode, False otherwise</li>
+     *                                              <li>'page' &lt;Number&gt; - The number of the page</li>
+     *                                            </ul>
+     * @throws {String} Exception if input 'state' parameter is invalid
+     * @example
+     * // Read state
+     * var currentState = api.operation.state();
+     * // Return value:
+     * //   {
+     * //     "promptNeeded":false,
+     * //     "paginate":true,
+     * //     "totalPages":1,
+     * //     "showParameterUI":true,
+     * //     "allowAutoSubmit":false,
+     * //     "parametersChanged":false,
+     * //     "autoSubmit":false,
+     * //     "page":-1
+     * //   }
+     *
+     * // Modify state
+     * currentState.parametersChanged = true;
+     * currentState.autoSubmit = true;
+     * currentState.page = 2;
+     *
+     * var updatedState = api.operation.state(currentState);
+     * // Return value:
+     * //   {
+     * //     "promptNeeded":false,
+     * //     "paginate":true,
+     * //     "totalPages":1,
+     * //     "showParameterUI":true,
+     * //     "allowAutoSubmit":false,
+     * //     "parametersChanged":true,
+     * //     "autoSubmit":true,
+     * //     "page":2
+     * //   }
+     */
+    this.state = function(state) {
+      if (state) {
+        this._getPromptPanel().setState(state);
+      }
+      return this._getPromptPanel().getState();
+    };
   };
 });

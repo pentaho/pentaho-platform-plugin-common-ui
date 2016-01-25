@@ -50,8 +50,15 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
       var paramDefn;
       var dashboardSpy;
       beforeEach(function() {
-        paramDefn = jasmine.createSpyObj("paramDefn", [ "allowAutoSubmit" ]);
+        paramDefn = jasmine.createSpyObj("paramDefn", [ "allowAutoSubmit", "showParameterUI" ]);
         paramDefn.allowAutoSubmit.and.returnValue(true);
+        paramDefn.showParameterUI.and.returnValue(false);
+        paramDefn.promptNeeded = false;
+        paramDefn.paginate = true;
+        paramDefn.totalPages = 10;
+        paramDefn.autoSubmit = false;
+        paramDefn.page = 2;
+
         dashboardSpy = jasmine.createSpyObj("dashboardSpy", [ "setParameter", "getParameterValue", "getComponentByName", "addComponent", "updateComponent", "showProgressIndicator", "hideProgressIndicator" ]);
         panel = new PromptPanel(testId, paramDefn);
         panel.dashboard = dashboardSpy;
@@ -1266,6 +1273,95 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
       it("should hide progress indicator", function() {
         panel.hideProgressIndicator();
         expect(dashboardSpy.hideProgressIndicator).toHaveBeenCalled();
+      });
+
+      it("should return current state of prompting", function() {
+        var state = panel.getState();
+        expect(state).toBeDefined();
+        expect(state.promptNeeded).toBe(paramDefn.promptNeeded);
+        expect(state.paginate).toBe(paramDefn.paginate);
+        expect(state.totalPages).toBe(paramDefn.totalPages);
+        expect(state.showParameterUI).toBe(paramDefn.showParameterUI());
+        expect(state.allowAutoSubmit).toBe(paramDefn.allowAutoSubmit());
+        expect(state.parametersChanged).toBe(panel.parametersChanged);
+        expect(state.autoSubmit).toBe(paramDefn.autoSubmit);
+        expect(state.page).toBe(paramDefn.page);
+      });
+
+      describe("setState", function() {
+        it("should throw exception if state incorrect", function() {
+          expect(function() {
+            panel.setState();
+          }).toThrow("The input parameter 'state' is incorrect, should be an object");
+
+          expect(function() {
+            panel.setState("incorrect param");
+          }).toThrow("The input parameter 'state' is incorrect, should be an object");
+        });
+
+        it("should throw exception if try modify read only properties", function() {
+          var readOnlyProps = ["promptNeeded", "paginate", "totalPages", "showParameterUI", "allowAutoSubmit"];
+          readOnlyProps.forEach(function(prop) {
+            expect(function() {
+              var state = {};
+              state[prop] = true;
+              panel.setState(state);
+            }).toThrow("Not possible to change the read only properties: " + readOnlyProps);
+          });
+        });
+
+        it("should throw exception if try set incorrect boolean prop", function() {
+          expect(function() {
+            var state = {
+              parametersChanged: "str"
+            };
+            panel.setState(state);
+          }).toThrow("Unexpected value 'str' for 'parametersChanged'. Must be boolean type.");
+
+          expect(function() {
+            var state = {
+              autoSubmit: "str"
+            };
+            panel.setState(state);
+          }).toThrow("Unexpected value 'str' for 'autoSubmit'. Must be boolean type.");
+        });
+
+        it("should throw exception if try set incorrect page property", function() {
+          expect(function() {
+            var state = {
+              page: "str"
+            };
+            panel.setState(state);
+          }).toThrow("Unexpected value 'str' for 'page'. Must be number type.");
+
+          expect(function() {
+            paramDefn.paginate = false;
+            var state = {
+              page: 1
+            };
+            panel.setState(state);
+          }).toThrow("Not possible to set page '1'. The pagination should be activated.");
+
+          expect(function() {
+            paramDefn.paginate = true;
+            var state = {
+              page: 10
+            };
+            panel.setState(state);
+          }).toThrow("Not possible to set page '10'. The correct value should be between 0 and " + (paramDefn.totalPages - 1));
+        });
+
+        it("should set state correctly", function() {
+          var state = {
+            parametersChanged: true,
+            autoSubmit: true,
+            page: 1
+          };
+          panel.setState(state);
+          expect(panel.parametersChanged).toBeTruthy();
+          expect(paramDefn.autoSubmit).toBeTruthy();
+          expect(paramDefn.page).toBe(1);
+        });
       });
     });
   });

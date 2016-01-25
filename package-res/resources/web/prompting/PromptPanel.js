@@ -22,7 +22,7 @@
  * @name PromptPanel
  * @class
  * @property {String} guid The random generated id of the prompt panel
- * @property {ParameterDefinition} paramDef The parameter definition fetched and parsed from the server
+ * @property {ParameterDefinition} paramDefn The parameter definition fetched and parsed from the server
  * @property {Boolean} autoSubmit True if the prompt is in auto submit mode, false otherwise
  * @property {Dashboard} dashboard The dashboard object assigned to the prompt
  * @property {Boolean} parametersChanged True if the parameters have changed, False otherwise
@@ -33,6 +33,29 @@
  */
 define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/util/util', 'common-ui/util/GUIDHelper', './WidgetBuilder', 'cdf/Dashboard.Clean', './parameters/ParameterDefinitionDiffer', 'common-ui/jquery-clean'],
     function (Base, Logger, DojoNumber, i18n, Utils, GUIDHelper, WidgetBuilder, Dashboard, ParamDiff, $) {
+
+      var _STATE_CONSTANTS = {
+        readOnlyProperties: ["promptNeeded", "paginate", "totalPages", "showParameterUI", "allowAutoSubmit"],
+        msgs: {
+          notChangeReadonlyProp: function(readOnlyProperties) {
+            return "Not possible to change the read only properties: " + readOnlyProperties;
+          },
+          incorrectBooleanType: function(name, value) {
+            return "Unexpected value '" + value + "' for '" + name + "'. Must be boolean type.";
+          },
+          incorrectNumberType: function(page) {
+            return "Unexpected value '" + page + "' for 'page'. Must be number type.";
+          },
+          paginationNotActivated: function(page) {
+            return "Not possible to set page '" + page + "'. The pagination should be activated.";
+          },
+          incorrectPageValue: function(page, totalPages) {
+            return "Not possible to set page '" + page + "'. The correct value should be between 0 and " + totalPages;
+          },
+          incorrectStateObjType: "The input parameter 'state' is incorrect, should be an object"
+        }
+      };
+
       /**
        * Creates a Widget calling the widget builder factory
        *
@@ -328,6 +351,85 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
         }
 
         return paramValue != paramSelectedValue;
+      };
+
+      /**
+       * Checks input state parameter to contain read only properties. If conatins, it throws an exception
+       *
+       * @name PromptPanel#_validateReadOnlyState
+       * @method
+       * @private
+       * @param  {Object} state The set of properties
+       * @throws {String}       Exception if input state parameter contains read only prperties
+       */
+      var _validateReadOnlyState = function(state) {
+        var cantModify = _STATE_CONSTANTS.readOnlyProperties.some(function(item) {
+          return state.hasOwnProperty(item);
+        });
+        if (cantModify) {
+          throw _STATE_CONSTANTS.msgs.notChangeReadonlyProp(_STATE_CONSTANTS.readOnlyProperties);
+        }
+      };
+
+      /**
+       * Checks input value as boolean type.
+       *
+       * @name PromptPanel#_validateBooleanState
+       * @method
+       * @private
+       * @param  {String} name  The name of the property
+       * @param  {Object} value The value of property
+       * @throws {String}       Exception if input value is not a boolean type
+       */
+      var _validateBooleanState = function(name, value) {
+        if (value != null) {
+          if (typeof value !== "boolean") {
+            throw _STATE_CONSTANTS.msgs.incorrectBooleanType(name, value);
+          }
+        }
+      };
+
+      /**
+       * Validates property 'page'.
+       *
+       * @name PromptPanel#_validateStatePage
+       * @method
+       * @private
+       * @param  {Object} value The value of page
+       * @throws {String}       Exception if 'page' is incorrect
+       */
+      var _validateStatePage = function(page, paginate, totalPages) {
+        if (page != null) {
+          if (typeof page !== "number") {
+            throw _STATE_CONSTANTS.msgs.incorrectNumberType(page);
+          }
+          if (!paginate) {
+            throw _STATE_CONSTANTS.msgs.paginationNotActivated(page);
+          }
+          if (page < 0 || page >= totalPages) {
+            throw _STATE_CONSTANTS.msgs.incorrectPageValue(page, totalPages - 1);
+          }
+        }
+      };
+
+      /**
+       * Validates all state's properties.
+       *
+       * @name PromptPanel#_validateState
+       * @method
+       * @private
+       * @param  {Object} state The set of properties
+       * @param  {ParameterDefinition} paramDefn The parameter definition instance
+       * @throws {String}       Exception if input 'state' parameter is invalid
+       */
+      var _validateState = function(state, paramDefn) {
+        if (!state || typeof state !== 'object') {
+          throw _STATE_CONSTANTS.msgs.incorrectStateObjType;
+        }
+        _validateReadOnlyState(state);
+        _validateBooleanState("parametersChanged", state.parametersChanged);
+        _validateBooleanState("autoSubmit", state.autoSubmit);
+        _validateStatePage(state.page, paramDefn.paginate, paramDefn.totalPages);
       };
 
       var PromptPanel = Base.extend({
@@ -1391,6 +1493,87 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
          */
         setBlockUiOptions: function(options) {
           this.getDashboard()._setBlockUiOptions(options);
+        },
+
+        /**
+         * Gets a current state of the prompting system.
+         *
+         * @name PromptPanel#getState
+         * @method
+         * @returns {Object} The current state which consists of the next properties:
+         *                   <ul>
+         *                     <li>'promptNeeded' &lt;Boolean&gt; - True if prompts are needed, False otherwise (read only property)</li>
+         *                     <li>'paginate' &lt;Boolean&gt; - True if pagination is active, False otherwise (read only property)</li>
+         *                     <li>'totalPages' &lt;Number&gt; - The number of total pages of the report (read only property)</li>
+         *                     <li>'showParameterUI' &lt;Boolean&gt; - The boolean value of the parameter ShowParameters (read only property)</li>
+         *                     <li>'allowAutoSubmit' &lt;Boolean&gt; - The value of autoSubmit, or if it is undefined the value of autoSubmitUI (read only property)</li>
+         *                     <li>'parametersChanged' &lt;Boolean&gt; - True if the parameters have changed, False otherwise</li>
+         *                     <li>'autoSubmit' &lt;Boolean&gt; - True is the prompt is in auto submit mode, False otherwise</li>
+         *                     <li>'page' &lt;Number&gt; - The number of the page</li>
+         *                   </ul>
+         * @example
+         * var currentState = api.operation.state();
+         * // Return value:
+         * //   {
+         * //     "promptNeeded":false,
+         * //     "paginate":true,
+         * //     "totalPages":1,
+         * //     "showParameterUI":true,
+         * //     "allowAutoSubmit":false,
+         * //     "parametersChanged":false,
+         * //     "autoSubmit":false,
+         * //     "page":-1
+         * //   }
+         */
+        getState: function() {
+          var result = {
+            promptNeeded: this.paramDefn.promptNeeded,
+            paginate: this.paramDefn.paginate,
+            totalPages: this.paramDefn.totalPages,
+            showParameterUI: this.paramDefn.showParameterUI(),
+            allowAutoSubmit: this.paramDefn.allowAutoSubmit(),
+            parametersChanged: this.parametersChanged,
+            autoSubmit: this.paramDefn.autoSubmit,
+            page: this.paramDefn.page
+          };
+          return result;
+        },
+
+        /**
+         * Modifys a state of the prompting system.
+         *
+         * @name PromptPanel@setState
+         * @method
+         * @param {Object} [state]                    The set of flags which will be applyed to current state. It's optional parameter.
+         * @param {Boolean} [state.parametersChanged] True if the parameters have changed, False otherwise
+         * @param {Boolean} [state.autoSubmit]        True is the prompt is in auto submit mode, False otherwise
+         * @param {Number} [state.page]               The number of the page
+         * @throws {String} Exception if input 'state' parameter is invalid
+         * @example
+         * var state = {
+         *   "parametersChanged":true,
+         *   "autoSubmit":true,
+         *   "page":5
+         * };
+         *
+         * var updatedState = api.operation.state(state);
+         * // Return value:
+         * //   {
+         * //     "promptNeeded":false,
+         * //     "paginate":true,
+         * //     "totalPages":1,
+         * //     "showParameterUI":true,
+         * //     "allowAutoSubmit":true,
+         * //     "parametersChanged":true,
+         * //     "autoSubmit":true,
+         * //     "page":5
+         * //   }
+         */
+        setState: function(state) {
+          _validateState(state, this.paramDefn);
+          (state.parametersChanged != null) && (this.parametersChanged = state.parametersChanged);
+          (state.autoSubmit != null) && (this.paramDefn.autoSubmit = state.autoSubmit);
+          (state.page != null) && (this.paramDefn.page = state.page);
         }
       });
 
