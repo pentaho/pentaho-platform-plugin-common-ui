@@ -482,6 +482,31 @@ define([
     },
     //endregion
 
+    //region validation
+    // Returns array of non-empty Error objects or null.
+    /**
+     * Performs validation on a given value and
+     * returns a non-empty array of `Error` objects or `null`.
+     *
+     * If a {@link nully} value is specified, `null` is returned.
+     *
+     * @param {pentaho.type.Value|nully} value The value to validate.
+     * @return {?Array.<!Error>} An array of `Error` or `null`.
+     */
+    validate: function(value) {
+      if(value == null) return null;
+
+      if(!this.is(value)) {
+        return [
+          new Error(bundle.format(bundle.structured.errors.value.notOfType, [this.label]))
+        ];
+      }
+
+      var error = value.validate();
+      return !error ? null : Array.isArray(error) ? error : [error];
+    },
+    //endregion
+
     /**
      * Creates a sub-prototype of this one.
      *
