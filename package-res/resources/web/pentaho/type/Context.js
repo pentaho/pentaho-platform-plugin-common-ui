@@ -15,6 +15,7 @@
  */
 define([
   "module",
+  "../i18n!types",
   "./standard",
   "../lang/Base",
   "../util/promise",
@@ -22,7 +23,7 @@ define([
   "../util/error",
   "../util/object",
   "../util/fun"
-], function(module, standard, Base, promise, arg, error, O, F) {
+], function(module, bundle, standard, Base, promise, arg, error, O, F) {
 
   "use strict";
 
@@ -133,6 +134,96 @@ define([
           });
     },
 
+    //region Value creation
+    /*
+     * typeReference = "typeId" | ITypeSpec | typeFactory | Meta | Mesa ...
+     *
+     * A. Value fragment specification with Inline Type Metadata
+     *
+     *   key is { _: ... }
+     *
+     *   {
+     *     _: typeExpression,
+     *
+     *     // remaining properties are defined by each type
+     *
+     *     ...
+     *   }
+     *
+     *   typeExpression ::=
+     *
+     *     "typeId" |
+     *
+     *     {}       | // type extend spec
+     *
+     *     [          // list type spec
+     *
+     *        "elementTypeId" |
+     *        { element-type-spec }
+     *     ]
+     *
+     * B. Within _list_ typed property
+     *
+     *   [ValueSpec]
+     *
+     * C. Within _element_ typed property
+     *
+     *   ValueSpec
+     */
+
+    /**
+     * Creates a value given its specification.
+     *
+     * When the specification is {@link nully}, `null` is returned.
+     *
+     * When the specification doesn't state its type, using inline metadata,
+     * and `defaultType` is specified, it is used to create a value instance,
+     * otherwise, if `defaultType` isn't specified, an error is thrown.
+     *
+     * When `baseType` is specified,
+     * it is used to validate a type stated in inline metadata.
+     *
+     * It is assumed, but not validated,
+     * that if both `defaultType` and `baseType` are specified,
+     * the former is either equal to, or a sub-type of, the latter.
+     *
+     * @param {?any} valueSpec A value specification.
+     * @param {?any} [defaultType] A type expression of the _non-abstract_ type
+     *   to use for value specifications that don't specify a type.
+     * @param {?any} [baseType] A type expression of the _expected_ base type.
+     *
+     * @return {?pentaho.type.Value} A `Value` or `null`.
+     */
+    create: function(valueSpec, defaultType, baseType) {
+      if(valueSpec == null) return null;
+
+      // TODO: Should load default type immediately? Or only if actually needed...
+      var DefaultType = defaultType ? this.get(defaultType) : null;
+      var BaseType    = baseType    ? this.get(baseType)    : null;
+
+      // If it is a plain Object, does it have the inline, metadata property, "_"?
+      var Type, inlineTypeMetadata;
+      if(typeof valueSpec === "object" &&
+         valueSpec.constructor === Object &&
+         (inlineTypeMetadata = valueSpec._) != null) {
+
+        Type = this.get(inlineTypeMetadata);
+
+        if(BaseType && !(Type.prototype instanceof BaseType))
+          throw error.operInvalid(
+              bundle.format(bundle.structured.errors.context.valueNotOfExpectedBaseType, [
+                BaseType.meta.id || "anonymous"
+              ]));
+
+        delete valueSpec._;
+      } else if(!(Type = DefaultType)) {
+        throw error.operInvalid(bundle.structured.errors.context.cannotCreateValueOfUnknownType);
+      }// else assume DefaultType extends BaseType.
+
+      return new Type(valueSpec);
+    },
+    //endregion
+
     _get: function(typeRef, sync) {
       // Default property type is "string".
       if(!typeRef) typeRef = _defaultTypeMid;
@@ -140,7 +231,9 @@ define([
       switch(typeof typeRef) {
         case "string":   return this._getById(typeRef, sync);
         case "function": return this._getByFun(typeRef, sync);
-        case "object":   return this._getBySpec(typeRef, sync);
+        case "object":   return Array.isArray(typeRef)
+            ? this._getByListSpec(typeRef, sync)
+            : this._getByObjectSpec(typeRef, sync);
       }
 
       throw error.argInvalid("typeRef");
@@ -216,18 +309,18 @@ define([
       return result;
     },
 
-    // Properties only: [string||{}, ...] or
     // Inline type spec: {[base: "complex", ] ... }
-    _getBySpec: function(typeSpec, sync) {
+    _getByObjectSpec: function(typeSpec, sync) {
 
-      if(typeSpec instanceof Array) typeSpec = {props: typeSpec};
+      if(typeSpec instanceof Item     ) return this._getByType(typeSpec.constructor, sync);
+      if(typeSpec instanceof Item.Meta) return this._getByType(typeSpec.constructor.Mesa, sync);
 
       var baseTypeSpec = typeSpec.base || _defaultBaseTypeMid,
-          resolveSync = function() {
+          resolveSync = (function() {
               var BaseType = this._get(baseTypeSpec, /*sync:*/true),
-                  Type = BaseType.extend(typeSpec);
+                  Type = BaseType.extend({meta: typeSpec});
               return this._getByType(Type, /*sync:*/true);
-            }.bind(this);
+            }).bind(this);
 
       // When sync, it should be the case that every referenced id is already loaded,
       // or an error will be thrown when requiring these.
@@ -241,6 +334,22 @@ define([
           // All types are standard and can be assumed to be already loaded.
           // However, we should behave asynchronously as requested.
           : promise.call(resolveSync);
+    },
+
+    /*
+     * Example: a list of complex type elements
+     *
+     *  [{props: { ...}}]
+     *  <=>
+     *  {base: "list", of: {props: { ...}}}
+     */
+    _getByListSpec: function(typeSpec, sync) {
+      if(typeSpec.length > 1)
+        throw error.argInvalid("typeSpec", "List type specification should have at most one child element type spec.");
+
+      // Expand compact list type spec syntax and delegate to the generic handler.
+      var elemTypeSpec = (typeSpec.length && typeSpec[0]) || _defaultTypeMid;
+      return this._getByObjectSpec({base: "list", of: elemTypeSpec}, sync);
     },
 
     _getConfig: function(id) {
@@ -307,7 +416,7 @@ define([
       case "object":
         // Properties only: [string||{}, ...] or
         // Inline type spec: {[base: "complex", ] ... }
-        if(typeSpec instanceof Array) typeSpec = {props: typeSpec};
+        if(Array.isArray(typeSpec)) typeSpec = {props: typeSpec};
 
         collectTypeIdsRecursive(typeSpec.base, outIds);
 

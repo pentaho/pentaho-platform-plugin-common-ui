@@ -100,7 +100,7 @@ define([
       return this.elemClass.prototype.keyName;
     },
 
-    _getKey: function(elem) {
+    _getElemKey: function(elem) {
       return elem.key;
     },
 
@@ -115,7 +115,7 @@ define([
     _adding: function(elem, index, ka) {
       var elem2 = this._cast(elem, index, ka);
       if(elem2 !== undefined) {
-        var key = this._getKey(elem2);
+        var key = this._getElemKey(elem2);
         if(key == null) throw new Error(this._sayElemCannotHaveNullyKey());
         if(this.has(key)) throw new Error(this._sayElemWithKey(key) + " is already included.");
       }
@@ -125,18 +125,18 @@ define([
     _replacing: function(elem, index, elem0, ka) {
       var elem2 = this._cast(elem, index, ka);
       if(elem2 !== undefined) {
-        var key = this._getKey(elem2);
+        var key = this._getElemKey(elem2);
         if(key == null) throw new Error(this._sayElemCannotHaveNullyKey());
       }
       return elem2;
     },
 
     _added: function(elem) {
-      this._keys[this._getKey(elem)] = elem;
+      this._keys[this._getElemKey(elem)] = elem;
     },
 
     _replaced: function(elem) {
-      this._keys[this._getKey(elem)] = elem;
+      this._keys[this._getElemKey(elem)] = elem;
     },
 
     /**
@@ -147,7 +147,7 @@ define([
      */
     includes: function(elem) {
       if(elem) {
-        var key = this._getKey(elem);
+        var key = this._getElemKey(elem);
         if(key != null) return this.get(key) === elem;
       }
       return false;

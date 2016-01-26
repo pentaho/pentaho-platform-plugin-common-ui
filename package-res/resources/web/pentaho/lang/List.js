@@ -78,8 +78,7 @@ define([
      *
      * This class must implement the {@link pentaho.lang.IListElement} interface.
      *
-     * @type function
-     * @abstract
+     * @type Class
      * @readonly
      */
     elemClass: null,

@@ -15,21 +15,23 @@
  */
 define([
   "module",
-  "./value",
+  "./element",
   "../util/error",
+  "../util/object",
   "../i18n!types"
-], function(module, valueFactory, error, bundle) {
+], function(module, elemFactory, error, O, bundle) {
 
   "use strict";
 
   return function(context) {
 
-    var Value = context.get(valueFactory);
+    var Element = context.get(elemFactory),
+        _simpleMeta = null;
 
     /**
      * @name pentaho.type.Simple.Meta
      * @class
-     * @extends pentaho.type.Value.Meta
+     * @extends pentaho.type.Element.Meta
      *
      * @classDesc The metadata class of {@link pentaho.type.Simple}.
      */
@@ -37,7 +39,7 @@ define([
     /**
      * @name pentaho.type.Simple
      * @class
-     * @extends pentaho.type.Value
+     * @extends pentaho.type.Element
      * @amd pentaho/type/simple
      *
      * @classDesc The base abstract class of un-structured, indivisible values.
@@ -66,22 +68,45 @@ define([
      *
      * @description Creates a simple instance.
      */
-    return Value.extend("pentaho.type.Simple", /** @lends pentaho.type.Simple# */{
+    var Simple = Element.extend("pentaho.type.Simple", /** @lends pentaho.type.Simple# */{
 
       constructor: function(spec) {
-        // Should allow a spec at construction time?
-        // Throw if not possible?
-        // What if we want a try cast?
-        // meta.cast(.) -> meta.create( . )
-        if(spec && spec.constructor === Object) {
-          // TODO: more efficient implementation?
-          this.extend(spec);
+        if(spec instanceof Object) {
 
-          // Required validation
-          if(this._value == null) this.value = null;
-        } else {
-          this.value = spec;
+          // A plain object?
+          if(spec.constructor === Object) {
+            // TODO: more efficient implementation?
+            this.extend(spec);
+
+            // Required validation
+            if(this._value == null) this.value = null;
+            return;
+          }
+
+          // Another Simple? Clone or Downcast.
+          if(spec instanceof Simple) {
+            // Shouldn't be spec === this, but not testing...
+
+            // implicit "downcast" of simple values
+            this.value     = spec.value;
+            this.formatted = spec.formatted;
+            // TODO: generic metadata
+            return;
+          }
         }
+
+        this.value = spec;
+      },
+
+      /**
+       * Creates a clone of the simple value.
+       *
+       * @return {!pentaho.type.Simple} The simple value clone.
+       */
+      clone: function() {
+        var SimpleClass = this.constructor;
+
+        return new SimpleClass(this);
       },
 
       //region value attribute
@@ -100,7 +125,8 @@ define([
       // NOTE: the argument cannot have the same name as the property setter
       // or PhantomJS 1.9.8 will throw a syntax error...
       set value(_) {
-        // Can only be set once.
+        // Value is immutable. Can only be set once.
+
         // Throws if nully.
         _ = this.meta.cast(_);
 
@@ -149,10 +175,41 @@ define([
         return f != null ? f : String(this._value);
       },
 
+      /**
+       * Gets the key of the simple value.
+       *
+       * The key of a value identifies it among values of the same concrete type.
+       *
+       * If two values have the same concrete type and their
+       * keys are equal, then it must also be the case that
+       * {@link pentaho.type.Value.Meta#areEqual}
+       * returns `true` when given the two values.
+       * The opposite should be true as well.
+       * If two values of the same concrete type have distinct keys,
+       * then {@link pentaho.type.Value.Meta#areEqual} should return `false`.
+       *
+       * The default simple value implementation, returns the result of calling
+       * `toString()` on {@link pentaho.type.Simple#value}.
+       *
+       * @type string
+       * @readonly
+       */
+      get key() {
+        return this._value.toString();
+      },
+
       meta: /** pentaho.type.Simple.Meta# */{
         id: module.id,
         "abstract": true,
         styleClass: "pentaho-type-simple",
+
+        _postInit: function() {
+
+          this.base.apply(this, arguments);
+
+          // Force domain inheritance
+          if(!O.hasOwn(this, "_domain")) this.domain = null;
+        },
 
         //region cast method
         // Configurable in a special way.
@@ -164,16 +221,15 @@ define([
          * into the value stored in a simple's {@link pentaho.type.Simple#value}
          * property.
          *
-         * The casting function is never given a `null` or `undefined` value.
+         * The casting function is never given a {@link nully} value.
          *
-         * If, when given a value,
-         * the casting function returns `null`,
+         * If the casting function returns `null`,
          * an error is then thrown, in its behalf,
          * indicating that it cannot be converted to the type.
          *
          * Set to a nully value to reset to the default cast function.
          *
-         * The default cast function accepts any value.
+         * The default cast function is the identity function.
          *
          * @type {function(any) : ?any}
          */
@@ -187,12 +243,78 @@ define([
           this._cast = _ || castCore;
         },
 
-        _cast: castCore
+        _cast: castCore,
+        //endregion
+
+        //region domain
+
+        // TODO: Also defines the default natural ordering of the values?
+        // When inherited, specified values must be a subset of those in the base class.
+        // Although they can be in a different order...?
+        _domain: null,
+
+        /**
+         * Gets or sets the fixed domain of the type, if any, or `null`.
+         *
+         * The domain attribute restricts a type
+         * to a set of discrete values of the ancestor type.
+         *
+         * If the ancestor type also has `domain` set,
+         * the specified set of values must be a subset of those,
+         * or an error is thrown.
+         *
+         * Setting to a {@link nully} value or to an empty array,
+         * clears the local value and inherits the ancestor's domain.
+         *
+         * NOTE: This attribute can only be used successfully on
+         *  a type that has a non-abstract base type.
+         *
+         * @type {?pentaho.type.List}
+         */
+        get domain() {
+          return this._domain;
+        },
+
+        _getListOfType: function() {
+          return this.context.get([this]);
+        },
+
+        set domain(value) {
+          if(this === _simpleMeta) throw error.operInvalid("Cannot change root domain.");
+
+          var baseDomain = Object.getPrototypeOf(this)._domain;
+
+          // A list of this element's type...
+          var ListType = this._getListOfType();
+
+          if(value == null || !value.length) {
+            // Downcasts each base element to this type.
+            this._domain = baseDomain && new ListType(baseDomain);
+          } else {
+            // Convert value to ListType
+            var localDomain = new ListType(value);
+
+            if(baseDomain) {
+              var i = localDomain.count;
+
+              // Validate that all elements exist in the base domain
+              while(i--)
+                if(!baseDomain.has(localDomain.at(i).key))
+                  throw error.argInvalid("domain", bundle.structured.errors.type.domainIsNotSubsetOfBase);
+            }
+
+            this._domain = localDomain;
+          }
+        }
         //endregion
       }
     }).implement({
       meta: bundle.structured.simple
     });
+
+    _simpleMeta = Simple.meta;
+
+    return Simple;
 
     //region cast private methods
     function castTop(value) {
@@ -200,7 +322,6 @@ define([
         throw new Error("Simple value cannot contain null.");
 
       value = this._cast(value);
-
       if(value == null)
         throw new Error(bundle.format(bundle.structured.errors.value.cannotConvertToType, [this.label]));
 

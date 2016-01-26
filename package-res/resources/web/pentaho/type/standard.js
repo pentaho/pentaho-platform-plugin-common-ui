@@ -16,6 +16,8 @@
 define([
   "./Item",
   "./value",
+  "./element",
+  "./list",
   "./simple",
   "./complex",
   "./string",
@@ -24,7 +26,7 @@ define([
   "./date",
   "./object",
   "./function"
-], function(Item, Value, Simple, Complex, String, Number, Boolean, Date, Object, Function) {
+], function(Item, Value, Element, List, Simple, Complex, String, Number, Boolean, Date, Object, Function) {
 
   "use strict";
   
@@ -33,6 +35,8 @@ define([
 
     // types
     "value":    Value,
+    "element":  Element,
+    "list":     List,
     "simple":   Simple,
     "string":   String,
     "number":   Number,

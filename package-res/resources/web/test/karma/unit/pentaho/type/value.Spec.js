@@ -16,19 +16,17 @@
 define([
   "pentaho/type/Item",
   "pentaho/type/Context",
-  "pentaho/type/value",
-  "pentaho/type/number",
   "pentaho/util/error",
   "pentaho/i18n!/pentaho/type/i18n/types"
-], function(Abstract, Context, valueFactory, numberFactory, error, bundle) {
+], function(Item, Context, error, bundle) {
 
   "use strict";
 
   /*global describe:true, it:true, expect:true, beforeEach:true*/
 
   var context = new Context(),
-      Value = context.get(valueFactory),
-      Number = context.get(numberFactory);
+      Value = context.get("pentaho/type/value"),
+      Number = context.get("pentaho/type/number");
 
   describe("pentaho/type/value -", function() {
 
@@ -36,8 +34,8 @@ define([
       expect(typeof Value).toBe("function");
     });
 
-    it("should be a sub-class of `Abstract`", function() {
-      expect(Value.prototype instanceof Abstract).toBe(true);
+    it("should be a sub-class of `Item`", function() {
+      expect(Value.prototype instanceof Item).toBe(true);
     });
 
     describe(".Meta -", function() {
@@ -47,14 +45,121 @@ define([
         expect(typeof ValueMeta).toBe("function");
       });
 
-      it("should be a sub-class of `Abstract.Meta`", function() {
-        expect(ValueMeta.prototype instanceof Abstract.Meta).toBe(true);
+      it("should be a sub-class of `Item.Meta`", function() {
+        expect(ValueMeta.prototype instanceof Item.Meta).toBe(true);
       });
 
       it("should have an `uid`", function() {
         expect(ValueMeta.prototype.uid != null).toBe(true);
         expect(typeof ValueMeta.prototype.uid).toBe("number");
       });
+
+      it("should have `abstract` equal to `true`", function() {
+        expect(ValueMeta.prototype.abstract).toBe(true);
+      });
+
+      describe("#areEqual(va, vb)", function() {
+        it("should return `true` if both values are nully", function() {
+          expect(Value.meta.areEqual(null, null)).toBe(true);
+          expect(Value.meta.areEqual(undefined, undefined)).toBe(true);
+          expect(Value.meta.areEqual(null, undefined)).toBe(true);
+          expect(Value.meta.areEqual(undefined, null)).toBe(true);
+        });
+
+        it("should return `false` if only one of the values is nully", function() {
+          var va = new Value();
+
+          expect(Value.meta.areEqual(null, va)).toBe(false);
+          expect(Value.meta.areEqual(undefined, va)).toBe(false);
+          expect(Value.meta.areEqual(va, undefined)).toBe(false);
+          expect(Value.meta.areEqual(va, null)).toBe(false);
+        });
+
+        it("should return `true` when given the same value instances and not call its #equals method", function() {
+          var va = new Value();
+
+          spyOn(va, "equals").and.callThrough();
+
+          expect(Value.meta.areEqual(va, va)).toBe(true);
+          expect(va.equals).not.toHaveBeenCalled();
+        });
+
+        it("should return `false` when given values with different constructors and not call their #equals methods", function() {
+          var va = new Value();
+          var vb = new Number(1);
+
+          spyOn(va, "equals").and.callThrough();
+          spyOn(vb, "equals").and.callThrough();
+
+          expect(Value.meta.areEqual(va, vb)).toBe(false);
+
+          expect(va.equals).not.toHaveBeenCalled();
+          expect(vb.equals).not.toHaveBeenCalled();
+        });
+
+        it("should call the first value's #equals method when these are distinct instances with the same constructor",
+            function() {
+          var va = new Value();
+          var vb = new Value();
+
+          spyOn(va, "equals").and.callFake(function() { return false; });
+          spyOn(vb, "equals").and.callFake(function() { return false; });
+
+          expect(Value.meta.areEqual(va, vb)).toBe(false);
+
+          expect(va.equals).toHaveBeenCalled();
+          expect(vb.equals).not.toHaveBeenCalled();
+        });
+      }); // end #areEqual
+
+      describe("#validate(value)", function() {
+        it("should return `null` when given a nully value", function() {
+          expect(Value.meta.validate(null)).toBe(null);
+          expect(Value.meta.validate(undefined)).toBe(null);
+        });
+
+        it("should return `null` when given a valid `Value`", function() {
+          expect(Value.meta.validate(new Value())).toBe(null);
+        });
+
+        it("should return an error array when given a value not an instance " +
+            "of the type and not call the type's validate method", function() {
+          var value = new Value();
+          spyOn(value, "validate");
+
+          var errors = Number.meta.validate(value);
+
+          expect(value.validate).not.toHaveBeenCalled();
+          expect(Array.isArray(errors)).toBe(true);
+          expect(errors.length).toBe(1);
+          expect(errors[0] instanceof Error).toBe(true);
+          expect(errors[0].message)
+              .toBe(bundle.format(bundle.structured.errors.value.notOfType, [Number.meta.label]));
+        });
+
+        it("should call the value's validate method when it is an instance of the type", function() {
+          var value = new Value();
+          spyOn(value, "validate");
+          Value.meta.validate(value);
+          expect(value.validate.calls.count()).toBe(1);
+        });
+
+        it("should convert an error returned by the validate method to an array of errors", function() {
+          var value = new Value();
+          var error = new Error();
+          spyOn(value, "validate").and.returnValue(error);
+          var errors = Value.meta.validate(value);
+          expect(errors).toEqual([error]);
+        });
+
+        it("should return an error array returned by the validate method", function() {
+          var value = new Value();
+          var errors = [new Error()];
+          spyOn(value, "validate").and.returnValue(errors);
+
+          expect(Value.meta.validate(value)).toBe(errors);
+        });
+      });// end #validate
     }); // ".Meta -"
 
     describe(".extend({...}) returns a value that -", function() {
@@ -83,305 +188,135 @@ define([
           expect(Derived.meta instanceof Value.Meta).toBe(true);
         });
 
-        // =====
+        describe("#abstract", function() {
+          it("should respect a specified abstract spec value", function() {
+            var Derived = Value.extend({meta: {abstract: true}});
+            expect(Derived.meta.abstract).toBe(true);
 
-        describe("#label -", function() {
-
-          describe("when `label` is falsy -", function() {
-            it("should inherit `label`", function() {
-              function expectIt(derivedSpec) {
-                var Derived = Value.extend({meta: derivedSpec});
-                expect(Derived.meta.label).toBe(Value.meta.label);
-              }
-
-              expectIt({});
-              expectIt({label: undefined});
-              expectIt({label: null});
-              expectIt({label: ""});
-            });
-          }); // when `label` is falsy
-
-          describe("when `label` is truthy", function() {
-            // Can change the label
-            it("should respect the `label`", function() {
-              var Derived = Value.extend({meta: {label: "Foo"}});
-              expect(Derived.meta.label).toBe("Foo");
-            });
-          });
-        }); // #label
-
-        // =====
-
-        describe("#id -", function() {
-          describe("when `id` is falsy -", function() {
-            it("should have `null` as a default `id`", function() {
-              function expectIt(spec) {
-                var Derived = Value.extend({meta: spec});
-                expect(Derived.meta.id).toBe(null);
-              }
-
-              expectIt({});
-              expectIt({id: undefined});
-              expectIt({id: null});
-              expectIt({id: null});
-            });
+            Derived = Value.extend({meta: {abstract: false}});
+            expect(Derived.meta.abstract).toBe(false);
           });
 
-          describe("when `id` is truthy -", function() {
-            it("should respect it", function() {
-              var Derived = Value.extend({
-                meta: {id: "foo/bar"}
-              });
-
-              expect(Derived.meta.id).toBe("foo/bar");
-            });
-          });
-        }); // #id
-
-        // =====
-
-        describe("#description -", function() {
-          describe("when not specified -", function() {
-            it("should inherit the base description", function() {
-              function expectIt(spec) {
-                var Derived = Value.extend({meta: spec});
-
-                expect(Derived.meta.description).toBe(Value.meta.description);
-              }
-
-              expectIt({});
-              expectIt({description: undefined});
-            });
-          });
-
-          describe("when specified as `null` or an empty string -", function() {
-            it("should set the description to `null`", function() {
-              function expectIt(spec) {
-                var Derived = Value.extend({meta: spec});
-
-                expect(Derived.meta.description).toBe(null);
-              }
-
-              expectIt({description: null});
-              expectIt({description: ""});
-            });
-          });
-
-          describe("when specified as a non-empty string -", function() {
-            it("should respect it", function() {
-              var Derived = Value.extend({meta: {description: "Foo"}});
-
-              expect(Derived.meta.description).toBe("Foo");
-            });
-          });
-        }); // #description
-
-        // ====
-
-        describe("#category -", function() {
-          describe("when not specified -", function() {
-            it("should inherit the base category", function() {
-              function expectIt(spec) {
-                var Derived = Value.extend({meta: spec});
-
-                expect(Derived.meta.category).toBe(Value.meta.category);
-              }
-
-              expectIt({});
-              expectIt({category: undefined});
-            });
-          });
-
-          describe("when specified as `null` or an empty string -", function() {
-            it("should set the category to `null`", function() {
-              function expectIt(spec) {
-                var Derived = Value.extend({meta: spec});
-
-                expect(Derived.meta.category).toBe(null);
-              }
-
-              expectIt({category: null});
-              expectIt({category: ""});
-            });
-          });
-
-          describe("when specified as a non-empty string", function() {
-            it("should respect it", function() {
-              var Derived = Value.extend({meta: {category: "Foo"}});
-
-              expect(Derived.meta.category).toBe("Foo");
-            });
-          });
-        }); // #category
-
-        // ====
-
-        describe("#helpUrl -", function() {
-          describe("when not specified", function() {
-            it("should inherit the base helpUrl", function() {
-              function expectIt(spec) {
-                var Derived = Value.extend({meta: spec});
-
-                expect(Derived.meta.helpUrl).toBe(Value.meta.helpUrl);
-              }
-
-              expectIt({});
-              expectIt({helpUrl: undefined});
-            });
-          });
-
-          describe("when specified as `null` or an empty string -", function() {
-            it("should set the helpUrl to `null`", function() {
-              function expectIt(spec) {
-                var Derived = Value.extend({meta: spec});
-
-                expect(Derived.meta.helpUrl).toBe(null);
-              }
-
-              expectIt({helpUrl: null});
-              expectIt({helpUrl: ""});
-            });
-          });
-
-          describe("when specified as a non-empty string -", function() {
-            it("should respect it", function() {
-              var Derived = Value.extend({meta: {helpUrl: "Foo"}});
-
-              expect(Derived.meta.helpUrl).toBe("Foo");
-            });
-          });
-        }); // #helpUrl
-
-        // ====
-
-        describe("#uid -", function() {
-          it("should not be inherited", function() {
+          it("should default to `false` whe spec is unspecified and should not inherit the base value", function() {
             var Derived = Value.extend();
-            expect(Derived.meta.uid).not.toBe(Value.meta.uid);
+            expect(Derived.meta.abstract).toBe(false);
+
+            var Abstract = Value.extend({meta: {abstract: true }});
+            var Concrete = Value.extend({meta: {abstract: false}});
+
+            var DerivedAbstract = Abstract.extend();
+            var DerivedConcrete = Concrete.extend();
+
+            expect(DerivedAbstract.meta.abstract).toBe(false);
+            expect(DerivedConcrete.meta.abstract).toBe(false);
           });
 
-          it("should be unique", function() {
-            var DerivedA = Value.extend(),
-                DerivedB = Value.extend();
-            expect(DerivedA.meta.uid).not.toBe(DerivedB.meta.uid);
-            expect(DerivedA.meta.uid).not.toBe(Value.meta.uid);
-          });
-        }); // #uid
+          it("should respect a set non-nully value", function() {
+            var Derived = Value.extend();
+            expect(Derived.meta.abstract).toBe(false);
 
-        describe("#domain -", function() {
-          it("should respect a specified base domain", function() {
-            var B = Number.extend({
-              meta: {
-                domain: [1, 2, 3]
-              }
-            });
+            Derived.meta.abstract = true;
+            expect(Derived.meta.abstract).toBe(true);
 
-            var domain = B.meta.domain;
-            expect(domain instanceof Array).toBe(true);
-            expect(domain.length).toBe(3);
-
-            expect(domain[0] instanceof Number).toBe(true);
-            expect(domain[1] instanceof Number).toBe(true);
-            expect(domain[2] instanceof Number).toBe(true);
-
-            expect(domain[0].value).toBe(1);
-            expect(domain[1].value).toBe(2);
-            expect(domain[2].value).toBe(3);
+            Derived.meta.abstract = false;
+            expect(Derived.meta.abstract).toBe(false);
           });
 
-          it("should inherit the base domain when unspecified", function() {
-            var B = Number.extend({
-              meta: {
-                domain: [1, 2, 3]
-              }
-            });
+          it("should set to the default value false when set to a nully value", function() {
+            var Derived = Value.extend({meta: {abstract: true}});
+            expect(Derived.meta.abstract).toBe(true);
+            Derived.meta.abstract = null;
+            expect(Derived.meta.abstract).toBe(false);
 
-            var C = B.extend();
-
-            var domain = B.meta.domain;
-            expect(domain instanceof Array).toBe(true);
-            expect(domain.length).toBe(3);
-
-            expect(C.meta.domain).toBe(domain);
+            Derived = Value.extend({meta: {abstract: true}});
+            expect(Derived.meta.abstract).toBe(true);
+            Derived.meta.abstract = undefined;
+            expect(Derived.meta.abstract).toBe(false);
           });
-
-          it("should throw if the specified domain is not a subset of the base domain", function() {
-            var B = Number.extend({
-              meta: {
-                domain: [1, 2, 3]
-              }
-            });
-
-            expect(function() {
-              B.extend({
-                meta: {
-                  domain: [1, 4]
-                }
-              });
-            }).toThrowError(
-                error.argInvalid("domain", bundle.structured.errors.type.domainIsNotSubsetOfBase)
-                    .message);
-          });
-
-          it("should respect a specified domain that is a subset of the base domain", function() {
-            var B = Number.extend({
-              meta: {
-                domain: [1, 2, 3]
-              }
-            });
-
-            var C = B.extend({
-              meta: {
-                domain: [1, 2]
-              }
-            });
-
-            var domain = C.meta.domain;
-            expect(domain instanceof Array).toBe(true);
-            expect(domain.length).toBe(2);
-
-            expect(domain[0].value).toBe(1);
-            expect(domain[1].value).toBe(2);
-          });
-
-          it("should inherit the base domain when later set to nully or empty array", function() {
-
-            function expectIt(newDomain) {
-              var B = Number.extend({
-                meta: {
-                  domain: [1, 2, 3]
-                }
-              });
-
-              var C = B.extend({
-                meta: {
-                  domain: [1, 2]
-                }
-              });
-
-              var domain = C.meta.domain;
-              expect(domain instanceof Array).toBe(true);
-              expect(domain.length).toBe(2);
-
-              C.meta.domain = newDomain;
-
-              domain = C.meta.domain;
-              expect(domain instanceof Array).toBe(true);
-              expect(domain.length).toBe(3);
-              expect(domain).toBe(B.meta.domain);
-            }
-
-            expectIt(null);
-            expectIt(undefined);
-            expectIt([]);
-          });
-        }); // #domain
+        }); // #abstract
       });
 
-      // TODO: remaining properties: value, format, domain, abstract browsable, annotations...
+      // TODO: remaining properties: value, annotations...
 
     }); // .extend({...})
 
-  });
+    describe("#key", function() {
+      it("should return the result of toString()", function() {
+        var va = new Value();
 
+        spyOn(va, "toString").and.returnValue("FOOO");
+
+        expect(va.key).toBe("FOOO");
+        expect(va.toString).toHaveBeenCalled();
+      });
+    });// end #key
+
+    describe("#equals", function() {
+      it("should return `true` if given the same value", function() {
+        var va = new Value();
+
+        expect(va.equals(va)).toBe(true);
+      });
+
+      it("should return `true` if two distinct values have the same key", function() {
+        var va = new Value(),
+            vb = new Value();
+
+        // Override/Redefine getter property
+        Object.defineProperty(va, "key", {value: "A"});
+        Object.defineProperty(vb, "key", {value: "A"});
+
+        expect(va.equals(vb)).toBe(true);
+      });
+
+      it("should return `false` if two distinct values have different keys", function() {
+        var va = new Value(),
+            vb = new Value();
+
+        // Override/Redefine getter property
+        Object.defineProperty(va, "key", {value: "A"});
+        Object.defineProperty(vb, "key", {value: "B"});
+
+        expect(va.equals(vb)).toBe(false);
+      });
+    }); // end #equals
+
+    describe("#clone()", function() {
+      it("should throw a not implemented error", function() {
+        var va = new Value();
+
+        expect(function() {
+          va.clone();
+        }).toThrowError(error.notImplemented().message);
+      });
+    });// end #clone
+
+    describe("#validate()", function() {
+      it("should return null", function() {
+        var va = new Value();
+        expect(va.validate()).toBe(null);
+      });
+    });// end #validate
+
+    describe("#isValid", function() {
+      it("should call #validate()", function() {
+        var va = new Value();
+        spyOn(va, "validate");
+        va.isValid;
+        expect(va.validate).toHaveBeenCalled();
+      });
+
+      it("should return `false` is #validate() returns a truthy value", function() {
+        var va = new Value();
+        spyOn(va, "validate").and.returnValue({});
+        expect(va.isValid).toBe(false);
+      });
+
+      it("should return `true` is #validate() returns a nully value", function() {
+        var va = new Value();
+        spyOn(va, "validate").and.returnValue(null);
+        expect(va.isValid).toBe(true);
+      });
+    });// end #validate
+  });
 });

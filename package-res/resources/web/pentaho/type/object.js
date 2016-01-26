@@ -21,6 +21,8 @@ define([
 
   "use strict";
 
+  var _simpleObjectNextUid = 1;
+
   return function(context) {
 
     var Simple = context.get(simpleFactory);
@@ -43,6 +45,24 @@ define([
      * @description Creates an object instance.
      */
     return Simple.extend("pentaho.type.Object", {
+      constructor: function(spec) {
+        this.base(spec);
+
+        this._uid = String(_simpleObjectNextUid++);
+      },
+
+      /**
+       * Gets the unique key of the native object.
+       *
+       * The key of a value identifies it among its _peers_.
+       *
+       * @type string
+       * @readonly
+       */
+      get key() {
+        return this._uid;
+      },
+
       meta: {
         id: module.id,
         styleClass: "pentaho-type-object",
