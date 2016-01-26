@@ -66,8 +66,36 @@ define([
     set meta(config) {
       // Class.implement essentially just calls Class#extend.
       if(config) this.meta.extend(config);
+    },
+    //endregion
+
+    //region validation
+    /**
+     * Performs validation of this item.
+     *
+     * When invalid, returns either one `Error` or a non-empty array of `Error` objects.
+     * When valid, `null` is returned.
+     *
+     * @return {Error|Array.<!Error>|null} An `Error`, a non-empty array of `Error` or `null`.
+     */
+    validate: function() {
+      return null;
+    },
+
+    /**
+     * Gets a value that indicates if this value is valid.
+     *
+     * This property evaluates {@link pentaho.type.Value#validate} and
+     * returns whether no errors were returned.
+     *
+     * @type boolean
+     * @readonly
+     */
+    get isValid() {
+      return !this.validate().length;
     }
     //endregion
+
   }, /** @lends pentaho.type.Item */{
 
     //region meta property

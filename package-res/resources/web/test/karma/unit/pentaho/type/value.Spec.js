@@ -16,9 +16,8 @@
 define([
   "pentaho/type/Item",
   "pentaho/type/Context",
-  "pentaho/util/error",
-  "pentaho/i18n!/pentaho/type/i18n/types"
-], function(Item, Context, error, bundle) {
+  "pentaho/util/error"
+], function(Item, Context, error) {
 
   "use strict";
 
@@ -111,55 +110,6 @@ define([
           expect(vb.equals).not.toHaveBeenCalled();
         });
       }); // end #areEqual
-
-      describe("#validate(value)", function() {
-        it("should return `null` when given a nully value", function() {
-          expect(Value.meta.validate(null)).toBe(null);
-          expect(Value.meta.validate(undefined)).toBe(null);
-        });
-
-        it("should return `null` when given a valid `Value`", function() {
-          expect(Value.meta.validate(new Value())).toBe(null);
-        });
-
-        it("should return an error array when given a value not an instance " +
-            "of the type and not call the type's validate method", function() {
-          var value = new Value();
-          spyOn(value, "validate");
-
-          var errors = Number.meta.validate(value);
-
-          expect(value.validate).not.toHaveBeenCalled();
-          expect(Array.isArray(errors)).toBe(true);
-          expect(errors.length).toBe(1);
-          expect(errors[0] instanceof Error).toBe(true);
-          expect(errors[0].message)
-              .toBe(bundle.format(bundle.structured.errors.value.notOfType, [Number.meta.label]));
-        });
-
-        it("should call the value's validate method when it is an instance of the type", function() {
-          var value = new Value();
-          spyOn(value, "validate");
-          Value.meta.validate(value);
-          expect(value.validate.calls.count()).toBe(1);
-        });
-
-        it("should convert an error returned by the validate method to an array of errors", function() {
-          var value = new Value();
-          var error = new Error();
-          spyOn(value, "validate").and.returnValue(error);
-          var errors = Value.meta.validate(value);
-          expect(errors).toEqual([error]);
-        });
-
-        it("should return an error array returned by the validate method", function() {
-          var value = new Value();
-          var errors = [new Error()];
-          spyOn(value, "validate").and.returnValue(errors);
-
-          expect(Value.meta.validate(value)).toBe(errors);
-        });
-      });// end #validate
     }); // ".Meta -"
 
     describe(".extend({...}) returns a value that -", function() {
@@ -290,33 +240,5 @@ define([
         }).toThrowError(error.notImplemented().message);
       });
     });// end #clone
-
-    describe("#validate()", function() {
-      it("should return null", function() {
-        var va = new Value();
-        expect(va.validate()).toBe(null);
-      });
-    });// end #validate
-
-    describe("#isValid", function() {
-      it("should call #validate()", function() {
-        var va = new Value();
-        spyOn(va, "validate");
-        va.isValid;
-        expect(va.validate).toHaveBeenCalled();
-      });
-
-      it("should return `false` is #validate() returns a truthy value", function() {
-        var va = new Value();
-        spyOn(va, "validate").and.returnValue({});
-        expect(va.isValid).toBe(false);
-      });
-
-      it("should return `true` is #validate() returns a nully value", function() {
-        var va = new Value();
-        spyOn(va, "validate").and.returnValue(null);
-        expect(va.isValid).toBe(true);
-      });
-    });// end #validate
   });
 });

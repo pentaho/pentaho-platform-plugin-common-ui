@@ -415,6 +415,29 @@ define([
       //endregion
       //endregion
 
+      //region validation
+
+      /**
+       * Performs validation of this item.
+       *
+       * When invalid, returns either one `Error` or a non-empty array of `Error` objects.
+       * When valid, `null` is returned.
+       *
+       * @return {Error|Array.<!Error>|null} An `Error`, a non-empty array of `Error` or `null`.
+       */
+      validate: function() {
+        var errors = [];
+        for (var i in this._values) {
+          if (this._values[i]) {
+            Array.prototype.push.apply(errors, this._values[i].validate());
+          }
+        }
+
+        return errors.length > 0 ? errors : null;
+      },
+
+      //endregion
+
       meta: /** @lends pentaho.type.Complex.Meta# */{
         id: module.id,
 
