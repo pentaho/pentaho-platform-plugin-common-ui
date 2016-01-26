@@ -338,12 +338,12 @@ define([
        * If the given value is already an instance of the property's value type,
        * it is returned.
        *
-       * By default, a {@link nully} value is converted to
+       * By default, a {@link Nully} value is converted to
        * (a clone of) the property's default value,
        * {@link pentaho.type.Property.Meta#value}.
        *
        * @param {?any} valueSpec A value or value specification.
-       * @param {boolean} [noDefault=false] Indicates if {@link nully} values
+       * @param {boolean} [noDefault=false] Indicates if {@link Nully} values
        *  should _not_ be converted to the property's default value.
        *
        * @return {?pentaho.type.Value} A value.

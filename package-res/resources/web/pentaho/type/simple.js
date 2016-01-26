@@ -221,13 +221,13 @@ define([
          * into the value stored in a simple's {@link pentaho.type.Simple#value}
          * property.
          *
-         * The casting function is never given a {@link nully} value.
+         * The casting function is never given a {@link Nully} value.
          *
          * If the casting function returns `null`,
          * an error is then thrown, in its behalf,
          * indicating that it cannot be converted to the type.
          *
-         * Set to a nully value to reset to the default cast function.
+         * Set to a {@link Nully} value to reset to the default cast function.
          *
          * The default cast function is the identity function.
          *
@@ -263,7 +263,7 @@ define([
          * the specified set of values must be a subset of those,
          * or an error is thrown.
          *
-         * Setting to a {@link nully} value or to an empty array,
+         * Setting to a {@link Nully} value or to an empty array,
          * clears the local value and inherits the ancestor's domain.
          *
          * NOTE: This attribute can only be used successfully on

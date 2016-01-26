@@ -281,7 +281,7 @@ define([
        * given the start index and the number of elements to remove.
        *
        * If `count` is less than `1`, nothing is removed.
-       * If `count` is {@link nully} or omitted, it defaults to `1`.
+       * If `count` is {@link Nully} or omitted, it defaults to `1`.
        * If `start` is not less than the number of elements in the list, nothing is removed.
        * If `start` is negative,
        * it means to start removing that many elements from the end (`start' = length - start`).

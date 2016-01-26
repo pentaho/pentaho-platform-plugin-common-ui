@@ -142,7 +142,7 @@ define([
     /**
      * Gets or sets the value of the member.
      *
-     * Note that the value of a member cannot be `nully`.
+     * Note that the value of a member cannot be {@link Nully}.
      *
      * @type !pentaho.data.Atomic
      */
