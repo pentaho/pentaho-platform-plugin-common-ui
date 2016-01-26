@@ -196,9 +196,9 @@ define([
          * Performs validation on a given value and
          * returns a non-empty array of `Error` objects or `null`.
          *
-         * If a {@link nully} value is specified, `null` is returned.
+         * If a {@link Nully} value is specified, `null` is returned.
          *
-         * @param {pentaho.type.Value|nully} value The value to validate.
+         * @param {pentaho.type.Value|Nully} value The value to validate.
          * @return {?Array.<!Error>} An array of `Error` or `null`.
          */
         validate: function(value) {
@@ -216,14 +216,14 @@ define([
         /**
          * Gets a value that indicates if two given values are equal.
          *
-         * If both values are {@link nully}, `true` is returned.
-         * If only one is {@link nully}, `false` is returned.
+         * If both values are {@link Nully}, `true` is returned.
+         * If only one is {@link Nully}, `false` is returned.
          * If the values have different constructors, `false` is returned.
          * Otherwise, {@link pentaho.type.Value#equals} is called
          * on `va`, with `vb` as an argument, and its result is returned.
          *
-         * @param {pentaho.type.Value|nully} [va] The first value.
-         * @param {pentaho.type.Value|nully} [vb] The second value.
+         * @param {pentaho.type.Value|Nully} [va] The first value.
+         * @param {pentaho.type.Value|Nully} [vb] The second value.
          *
          * @return {boolean} `true` if two values are equal, `false` otherwise.
          */

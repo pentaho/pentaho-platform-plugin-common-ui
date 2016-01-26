@@ -15,7 +15,7 @@
  */
 
 /**
- * The `nully` type contains the two values: `null` and `undefined`.
+ * The `Nully` type contains the two values: `null` and `undefined`.
  *
- * @typedef {null|undefined} nully
+ * @typedef {null|undefined} Nully
  */

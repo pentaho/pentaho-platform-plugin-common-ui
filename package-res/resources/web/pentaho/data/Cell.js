@@ -236,7 +236,7 @@ define([
      * and an unspecified label,
      * getting its label returns its referent's label.
      *
-     * If a never-nully string representation of this cell is needed,
+     * If a never {@link Nully} string representation of this cell is needed,
      * use the {@link pentaho.data.Cell#toString} method instead.
      *
      * @type string

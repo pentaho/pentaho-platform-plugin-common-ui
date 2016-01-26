@@ -44,7 +44,7 @@ define([
      *
      * @description Creates an object instance.
      */
-    return Simple.extend("pentaho.type.Object", {
+    return Simple.extend("pentaho.type.Object", /** @lends "pentaho.type.Object#" */{
       constructor: function(spec) {
         this.base(spec);
 

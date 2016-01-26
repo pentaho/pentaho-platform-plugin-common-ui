@@ -533,9 +533,9 @@ define([
      * Converts a given value to a _mesa_ instance of this _prototype_,
      * if it is not one already.
      *
-     * If a {@link nully} value is specified, `null` is returned.
+     * If a {@link Nully} value is specified, `null` is returned.
      *
-     * If a given value is not {@link nully}
+     * If a given value is not {@link Nully}
      * and not already an instance of this _prototype_
      * (checked using {@link pentaho.type.Item.Meta#is}),
      * this method delegates the creation of an instance to

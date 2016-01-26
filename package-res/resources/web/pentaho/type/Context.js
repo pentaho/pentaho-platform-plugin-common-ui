@@ -174,7 +174,7 @@ define([
     /**
      * Creates a value given its specification.
      *
-     * When the specification is {@link nully}, `null` is returned.
+     * When the specification is {@link Nully}, `null` is returned.
      *
      * When the specification doesn't state its type, using inline metadata,
      * and `defaultType` is specified, it is used to create a value instance,
