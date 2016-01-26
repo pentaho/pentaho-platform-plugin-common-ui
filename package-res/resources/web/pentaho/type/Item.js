@@ -27,9 +27,49 @@ define([
    * @class
    * @abstract
    *
-   * @classDesc The abstract base class of _item_ types.
+   * @classDesc The base class of types in the Pentaho Client Metadata Model.
    *
-   * The metadata (prototype) of this class can be accessed through {@link pentaho.type.Item#meta}.
+   * The `pentaho.type.Item` class (and its descendents) embeds its own metadata,
+   * which can be accessed via the property {@link pentaho.type.Item#meta}.
+   * Because the metadata can be inherited, it is actually an instance
+   * of a metaclass stored at {@link pentaho.type.Item.Meta}.
+   *
+   * The developer is expected to subclass only the {@link pentaho.type.Item} class,
+   * as the corresponding companion class is automatically generated from the spec
+   * passed to the {@link pentaho.type.Item#meta} property.
+   *
+   * Other frameworks generally require the developer to maintain two class hierarchies
+   * (one for storing data, another for storing metadata) and ensure that the
+   * two hierarchies are properly linked together.
+   * This framework attempts to simplify the development process by automating the
+   * the generation and linking of the class that describes the metadata.
+   *
+   * @example
+   * <caption> Create a new class <code>DerivedItem</code> containing
+   * an attribute <code>greeting</code> and a method <code>doSomething</code> </caption>
+   *
+   * require(["pentaho/type/Item"], function(Item){
+   *   var DerivedItem = Item.extend({
+   *     constructor: function(label){
+   *       this.label = label;
+   *     },
+   *     meta: { // metadata spec
+   *       greeting: "Hello, ",
+   *       veryLongString: "..."
+   *     },
+   *     saySomething: function(){
+   *       console.log(this.meta.greeting + this.label + "!");
+   *     }
+   *   });
+   *
+   *   var a = new DerivedItem("Alice");
+   *   a.saySomething(); // "Hello, Alice!"
+   *   var b = new DerivedItem("Bob");
+   *   b.saySomething(); // "Hello, Bob!"
+   *
+   *   // All instances share the same _meta_:
+   *   b.meta.greeting ===  a.meta.greeting // true
+   * });
    *
    * @description Creates an instance.
    */
@@ -42,7 +82,7 @@ define([
     _meta: null,
 
     /**
-     * Gets the _metadata_ _prototype_ of this item type.
+     * Gets the singleton that describes the metadata associated with this type.
      *
      * @name meta
      * @memberOf pentaho.type.Item#
@@ -72,7 +112,7 @@ define([
 
     //region meta property
     /**
-     * Gets the _metadata_ _prototype_ of this item type.
+     * Gets the singleton that describes the metadata associated with this type.
      *
      * @type pentaho.type.Item.Meta
      * @readonly
@@ -118,7 +158,7 @@ define([
       var subMesa = Object.create(mesa);
 
       // META
-      var metaInstSpec = O["delete"](instSpec,  "meta");
+      var metaInstSpec = O["delete"](instSpec, "meta");
 
       var ka = keyArgs ? Object.create(keyArgs) : {};
       ka.mesa = subMesa;
@@ -137,11 +177,11 @@ define([
       // 1. `instSpec` may override property accessors only defined by `Complex.Meta`
       // 2. So, the Meta class must be created *before* applying instSpec and classSpec to SubMesa
       // 3. The Meta class requires Mesa to already exist, to be able to define accessors
-      var metaInstSpec  = O["delete"](instSpec,  "meta"),
-          metaClassSpec = O["delete"](classSpec, "meta"),
-          // Setting a function's name is failing on PhantomJS 1.9.8...
-          mesaName      = SubMesa.name || SubMesa.displayName,
-          metaName      = mesaName && (mesaName + ".Meta");
+      var metaInstSpec = O["delete"](instSpec, "meta"),
+        metaClassSpec = O["delete"](classSpec, "meta"),
+      // Setting a function's name is failing on PhantomJS 1.9.8...
+        mesaName = SubMesa.name || SubMesa.displayName,
+        metaName = mesaName && (mesaName + ".Meta");
 
       var ka = keyArgs ? Object.create(keyArgs) : {};
       ka.mesa = SubMesa.prototype;
