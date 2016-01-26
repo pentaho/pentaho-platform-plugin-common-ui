@@ -1284,7 +1284,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
         expect(state.showParameterUI).toBe(paramDefn.showParameterUI());
         expect(state.allowAutoSubmit).toBe(paramDefn.allowAutoSubmit());
         expect(state.parametersChanged).toBe(panel.parametersChanged);
-        expect(state.autoSubmit).toBe(paramDefn.autoSubmit);
+        expect(state.autoSubmit).toBe(panel.autoSubmit);
         expect(state.page).toBe(paramDefn.page);
       });
 
@@ -1326,6 +1326,17 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
           }).toThrow("Unexpected value 'str' for 'autoSubmit'. Must be boolean type.");
         });
 
+        it("should throw exception if try set not allowed autoSubmit flag", function() {
+          var paramDefnSpy = jasmine.createSpyObj("paramDefnSpy", [ "allowAutoSubmit" ]);
+          spyOn(panel, "getParamDefn").and.returnValue(paramDefnSpy);
+          expect(function() {
+            var state = {
+              autoSubmit: true
+            };
+            panel.setState(state);
+          }).toThrow("Not possible to set 'autoSubmit'. It's limited by the 'allowAutoSubmit' flag");
+        });
+
         it("should throw exception if try set incorrect page property", function() {
           expect(function() {
             var state = {
@@ -1359,7 +1370,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
           };
           panel.setState(state);
           expect(panel.parametersChanged).toBeTruthy();
-          expect(paramDefn.autoSubmit).toBeTruthy();
+          expect(panel.autoSubmit).toBeTruthy();
           expect(paramDefn.page).toBe(1);
         });
       });
