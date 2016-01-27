@@ -159,14 +159,14 @@ define(['common-ui/prompting/PromptPanel'], function(PromptPanel) {
      * @method
      * @param {Object} [state]                    The set of properties which will be applied to current state. It's optional parameter.
      * @param {Boolean} [state.parametersChanged] True if the parameters have changed, False otherwise
-     * @param {Boolean} [state.autoSubmit]        True is the prompt is in auto submit mode, False otherwise
-     * @param {Number} [state.page]               The number of the page
+     * @param {Boolean} [state.autoSubmit]        True is the prompt is in auto submit mode, False otherwise. It's limited by the 'allowAutoSubmit' flag
+     * @param {Number} [state.page]               The number of the page. It's limited in range by the 'totalPages' and 'paginate' flags
      * @returns {Object}                          The current state which consists of the next properties:
      *                                            <ul>
      *                                              <li>'promptNeeded' &lt;Boolean&gt; - True if prompts are needed, False otherwise (read only property)</li>
      *                                              <li>'paginate' &lt;Boolean&gt; - True if pagination is active, False otherwise (read only property)</li>
      *                                              <li>'totalPages' &lt;Number&gt; - The number of total pages of the report (read only property)</li>
-     *                                              <li>'showParameterUI' &lt;Boolean&gt; - The boolean value of the parameter ShowParameters (read only property)</li>
+     *                                              <li>'showParameterUI' &lt;Boolean&gt; - The boolean value of the parameter 'showParameters' (read only property)</li>
      *                                              <li>'allowAutoSubmit' &lt;Boolean&gt; - The value of autoSubmit, or if it is undefined the value of autoSubmitUI (read only property)</li>
      *                                              <li>'parametersChanged' &lt;Boolean&gt; - True if the parameters have changed, False otherwise</li>
      *                                              <li>'autoSubmit' &lt;Boolean&gt; - True is the prompt is in auto submit mode, False otherwise</li>
@@ -180,12 +180,12 @@ define(['common-ui/prompting/PromptPanel'], function(PromptPanel) {
      * //   {
      * //     "promptNeeded":false,
      * //     "paginate":true,
-     * //     "totalPages":1,
+     * //     "totalPages":10,
      * //     "showParameterUI":true,
-     * //     "allowAutoSubmit":false,
+     * //     "allowAutoSubmit":true,
      * //     "parametersChanged":false,
      * //     "autoSubmit":false,
-     * //     "page":-1
+     * //     "page":1
      * //   }
      *
      * // Modify state
@@ -198,9 +198,9 @@ define(['common-ui/prompting/PromptPanel'], function(PromptPanel) {
      * //   {
      * //     "promptNeeded":false,
      * //     "paginate":true,
-     * //     "totalPages":1,
+     * //     "totalPages":10,
      * //     "showParameterUI":true,
-     * //     "allowAutoSubmit":false,
+     * //     "allowAutoSubmit":true,
      * //     "parametersChanged":true,
      * //     "autoSubmit":true,
      * //     "page":2
