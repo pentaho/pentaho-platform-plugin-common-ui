@@ -31,6 +31,7 @@
  * @property {Function} onAfterRender Callback called if defined after any change is performed in the prompt components
  * @property {Function} onBeforeUpdate Callback called if defined before the prompt update cycle is called
  * @property {Function} onAfterUpdate Callback called if defined after the prompt update cycle is called
+ * @property {?Function} onSubmit Callback called when the submit function executes, null if no callback is registered
  */
 define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/util/util', 'common-ui/util/GUIDHelper', './WidgetBuilder', 'cdf/Dashboard.Clean', './parameters/ParameterDefinitionDiffer', 'common-ui/jquery-clean'],
     function (Base, Logger, DojoNumber, i18n, Utils, GUIDHelper, WidgetBuilder, Dashboard, ParamDiff, $) {
@@ -465,6 +466,7 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
         onAfterRender: null,
         onBeforeUpdate: null,
         onAfterUpdate: null,
+        onSubmit: null,
 
         /**
          * Constructor for the PromptPanel
@@ -696,7 +698,8 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
          *
          * @name PromptPanel#_submit
          * @method
-         * @param {Object} options
+         * @param {Object}  [options]        Aditional configuration options.
+         * @param {Boolean} [options.isInit] Flag indicating if submit is being executed during initialization.
          * @private
          */
         _submit: function (options) {
@@ -730,11 +733,19 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
          *
          * @name PromptPanel#submit
          * @method
-         * @param {PromptPanel} promptPanel
-         * @param {Object} options
+         * @param {PromptPanel} promptPanel  A prompt panel whose settings should be used for configuration purposes.
+         * @param {Object}  [options]        Additional configuration options.
+         * @param {Boolean} [options.isInit] Flag indicating if submit is being executed during initialization.
          */
         submit: function (promptPanel, options) {
           this.forceAutoSubmit = false;
+          if (this.onSubmit) {
+            if (typeof this.onSubmit === "function") {
+              this.onSubmit(promptPanel, options);
+            } else {
+              Logger.warn("The onSubmit event callback is not a function");
+            }
+          }
         },
 
         /**

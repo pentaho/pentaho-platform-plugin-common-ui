@@ -124,6 +124,20 @@ define([
           expect(promptPanelSpy.ready).toBeDefined();
           expect(promptPanelSpy.ready).toBe(callback);
         });
+
+        it("should register a submit event callback", function () {
+          eventApi.submit(callback);
+          expect(promptPanelSpy.onSubmit).toBeDefined();
+          expect(promptPanelSpy.onSubmit).toBe(callback);
+        });
+
+        it("should unregister a submit event callback", function () {
+          eventApi.submit(callback);
+          expect(promptPanelSpy.onSubmit).toBe(callback);
+          eventApi.submit(null);
+          expect(promptPanelSpy.onSubmit).toBeDefined();
+          expect(promptPanelSpy.onSubmit).toBe(null);
+        });
       });
 
       describe("EventAPI Tests with PromptPanel updates", function(){

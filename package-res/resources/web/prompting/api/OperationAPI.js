@@ -212,5 +212,17 @@ define(['common-ui/prompting/PromptPanel'], function(PromptPanel) {
       }
       return this._getPromptPanel().getState();
     };
+
+    /**
+     * Executes the prompt panel {@link PromptPanel#submit|submit} function.
+     *
+     * @name OperationAPI#submit
+     * @method
+     * @example
+     *     api.operation.submit();
+     */
+    this.submit = function() {
+      this._getPromptPanel().submit();
+    };
   };
 });

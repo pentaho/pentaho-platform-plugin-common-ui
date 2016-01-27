@@ -138,5 +138,26 @@ define([], function() {
         api.operation._getPromptPanel().ready = function(){};
       }
     };
+
+    /**
+     * Registers a callback function to be executed when the submit event is triggered.
+     *
+     * @name EventAPI#submit
+     * @method
+     * @param {Function} callback The function to be executed when the event is triggered.
+     *                            Passing anything other than a function will unbind this event.
+     * @example
+     *  api.event.submit(function(promptPanel, options) {
+     *    // Process options.isInit flag if needed
+     *    // Execute event based code
+     *  })
+     */
+    this.submit = function(callback) {
+      if(typeof callback === 'function') {
+        api.operation._getPromptPanel().onSubmit = callback;
+      } else {
+        api.operation._getPromptPanel().onSubmit = null;
+      }
+    };
   };
 });
