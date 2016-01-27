@@ -25,9 +25,9 @@ define([
    * Creates the `Model` type of a given context.
    *
    * @name modelFactory
-   * @memberOf pentaho.visual
+   * @memberOf pentaho.visual.base
    * @type pentaho.type.Factory
-   * @amd pentaho/visual/modelFactory
+   * @amd pentaho/visual/base/modelFactory
    */
   return function(context) {
 
