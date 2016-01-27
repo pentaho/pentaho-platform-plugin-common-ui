@@ -354,6 +354,32 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
         expect(panel.nullValueParams[0]).toBe(param);
       });
 
+      it("parameterChanged with specific parameter callback", function() {
+        var param = {};
+        var name = "paramName";
+        var parameterChangedSpy = jasmine.createSpy("ParameterChangedSpy");
+        panel.onParameterChanged = {};
+        panel.onParameterChanged[name] = parameterChangedSpy;
+        panel.parameterChanged(param, name);
+        expect(parameterChangedSpy).toHaveBeenCalled();
+      });
+
+      it("parameterChanged with multiple parameter callback", function() {
+        var param = {};
+        panel.onParameterChanged = {};
+        var name1 = "paramName1";
+        var name2 = "paramName2";
+        var parameterChangedSpy1 = jasmine.createSpy("ParameterChangedSpy1");
+        var parameterChangedSpy2 = jasmine.createSpy("ParameterChangedSpy2");
+        panel.onParameterChanged = {};
+        panel.onParameterChanged[name1] = parameterChangedSpy1;
+        panel.onParameterChanged[name2] = parameterChangedSpy2;
+        panel.parameterChanged(param, name1);
+        expect(parameterChangedSpy1).toHaveBeenCalled();
+        panel.parameterChanged(param, name2);
+        expect(parameterChangedSpy2).toHaveBeenCalled();
+      });
+
       it("getParameterDefinition", function() {
         var promptPanel = {};
         var fn = jasmine.createSpyObj("callbackObj", [ "test" ]);

@@ -79,13 +79,31 @@ define([], function() {
      * @method
      * @param {Function} callback   The function to be executed when the event is triggered.
      *                              Pass null if you wish to unbind this event
-     * @example
+     * @param {String} paramName    The name of the parameter to which the callback will be called
+     *                              This argument is optional. If no parameter name is passed on
+     *                              the callback will be assigned to all the parameters. If paramName is
+     *                              not a valid string the callback will be registered to all parameters.
+     *
+     * @example <caption>Register a parameter changed event to all parameters</caption>
      *  api.event.parameterChanged(function(parameterName, parameterValue) {
      *    // Execute event based code
      *  })
+     *
+     * @example <caption>Register a parameter changed event to the parameter called "parameterName"</caption>
+     *  api.event.parameterChanged(function(parameterName, parameterValue) {
+     *    // Execute event based code
+     *  }, "parameterName")
      */
-    this.parameterChanged = function(callback) {
-      api.operation._getPromptPanel().onParameterChanged = callback;
+    this.parameterChanged = function(callback, paramName) {
+      if (callback) {
+        if (!api.operation._getPromptPanel().onParameterChanged) {
+          api.operation._getPromptPanel().onParameterChanged = {};
+        }
+        paramName = (typeof paramName === "string" && paramName) || '';
+        api.operation._getPromptPanel().onParameterChanged[paramName] = callback; 
+      } else {
+        api.operation._getPromptPanel().onParameterChanged = null;
+      }
     };
 
     /**

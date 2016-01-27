@@ -74,6 +74,46 @@ define([
           expect(promptPanelSpy.onParameterChanged).toBe(callback);
         });
 
+        it("should clear callbacks if passed null", function () {
+          eventApi.parameterChanged(null);
+          expect(promptPanelSpy.onParameterChanged).toBe(null);
+        });
+
+        it("should assign overall callback if parameter name is null or empty", function () {
+          var parameterCallback = function() {};
+          eventApi.parameterChanged(parameterCallback);
+          eventApi.parameterChanged(parameterCallback, '');          
+          expect(promptPanelSpy.onParameterChanged).toBeDefined();
+          expect(promptPanelSpy.onParameterChanged['']).toBe(parameterCallback);
+        });
+
+        it("should register a parameterChanged event for a specific parameter", function() {
+          var parameterCallback = function() {};
+          eventApi.parameterChanged(parameterCallback, 'param');
+          expect(promptPanelSpy.onParameterChanged).toBeDefined();
+          expect(promptPanelSpy.onParameterChanged['param']).toBe(parameterCallback);
+        });
+
+        it("should register a parameterChanged event for multiple parameter", function() {
+          var parameterCallback1 = function() {};
+          var parameterCallback2 = function() {};
+          eventApi.parameterChanged(parameterCallback1, 'param1');
+          eventApi.parameterChanged(parameterCallback2, 'param2');
+          expect(promptPanelSpy.onParameterChanged).toBeDefined();
+          expect(promptPanelSpy.onParameterChanged['param1']).toBe(parameterCallback1);
+          expect(promptPanelSpy.onParameterChanged['param2']).toBe(parameterCallback2);
+        });
+
+        it("should register a parameterChanged event for a specific parameter and another for all parameters", function() {
+          var parameterCallback1 = function() {};
+          var parameterCallback2 = function() {};
+          eventApi.parameterChanged(parameterCallback1, 'param1');
+          eventApi.parameterChanged(parameterCallback2, '');
+          expect(promptPanelSpy.onParameterChanged).toBeDefined();
+          expect(promptPanelSpy.onParameterChanged['param1']).toBe(parameterCallback1);
+          expect(promptPanelSpy.onParameterChanged['']).toBe(parameterCallback2);
+        });
+
         it("should register a postInit event", function () {
           eventApi.postInit(callback);
           expect(dashboardSpy.on).toHaveBeenCalledWith('cdf:postInit', callback);

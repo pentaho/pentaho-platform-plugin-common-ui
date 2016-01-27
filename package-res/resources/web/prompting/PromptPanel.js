@@ -26,6 +26,7 @@
  * @property {Boolean} autoSubmit True if the prompt is in auto submit mode, false otherwise
  * @property {Dashboard} dashboard The dashboard object assigned to the prompt
  * @property {Boolean} parametersChanged True if the parameters have changed, False otherwise
+ * @property {Object} onParameterChanged collection of parameterNames and the callback called when that parameter is changed
  * @property {Function} onBeforeRender Callback called if defined before any change is performed in the prompt components
  * @property {Function} onAfterRender Callback called if defined after any change is performed in the prompt components
  * @property {Function} onBeforeUpdate Callback called if defined before the prompt update cycle is called
@@ -744,7 +745,14 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
          */
         parameterChanged: function (param, name, value) {
           if (this.onParameterChanged) {
-            this.onParameterChanged(name, value);
+            var paramCallback = this.onParameterChanged[name];
+            if (paramCallback) {
+              if (typeof paramCallback === 'function') {
+                paramCallback(name, value); 
+              } else {
+                Logger.warn("The parameterChanged callback for '" + name + "' is not a function");
+              }
+            }
           }
 
           if (!value || value == "" || value == "null") {
