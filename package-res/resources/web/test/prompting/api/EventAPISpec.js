@@ -71,7 +71,7 @@ define([
         it("should register a parameterChanged event", function () {
           eventApi.parameterChanged(callback);
           expect(promptPanelSpy.onParameterChanged).toBeDefined();
-          expect(promptPanelSpy.onParameterChanged).toBe(callback);
+          expect(promptPanelSpy.onParameterChanged['']).toBe(callback);
         });
 
         it("should clear callbacks if passed null", function () {

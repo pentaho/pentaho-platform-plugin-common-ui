@@ -334,12 +334,13 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
         spyOn(panel, "_setTimeoutRefreshPrompt");
 
         var parameterChangedSpy = jasmine.createSpy("ParameterChangedSpy");
-        panel.onParameterChanged = parameterChangedSpy;
+        panel.onParameterChanged = {};
+        panel.onParameterChanged['name'] = parameterChangedSpy;
 
         panel.parameterChanged(param, name, value);
         expect(panel.parametersChanged).toBeTruthy();
         expect(panel._setTimeoutRefreshPrompt).toHaveBeenCalled();
-        expect(panel.onParameterChanged).toHaveBeenCalledWith(name, value);
+        expect(parameterChangedSpy).toHaveBeenCalledWith(name, value);
       });
 
       it("parameterChanged", function() {
