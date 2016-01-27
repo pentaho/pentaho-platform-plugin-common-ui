@@ -20,7 +20,7 @@ define(["common-ui/prompting/api/OperationAPI"], function(OperationAPI) {
     var operationApi, apiSpy, promptPanelSpy, htmlId, paramDefnSpy;
     beforeEach(function() {
 
-      promptPanelSpy = jasmine.createSpyObj("PromptPanel", ["refresh", "init", "getParameterValues", "getParameterDefinition", "setParamDefn", "setParameterValue", "refreshPrompt", "getState", "setState"]);
+      promptPanelSpy = jasmine.createSpyObj("PromptPanel", ["refresh", "init", "getParameterValues", "getParameterDefinition", "setParamDefn", "setParameterValue", "refreshPrompt", "getState", "setState", "submit"]);
 
       apiSpy = jasmine.createSpy("PromptingAPI");
       apiSpy.log = jasmine.createSpyObj("Log", ["info", "warn", "error"]);
@@ -159,6 +159,13 @@ define(["common-ui/prompting/api/OperationAPI"], function(OperationAPI) {
 
       expect(operationApi._getPromptPanel).toHaveBeenCalled();
       expect(promptPanelSpy.setParameterValue).toHaveBeenCalledWith("param", "value");
+    });
+
+    it("should test submit", function() {
+      operationApi.submit();
+
+      expect(operationApi._getPromptPanel).toHaveBeenCalled();
+      expect(promptPanelSpy.submit).toHaveBeenCalled();
     });
 
     describe("refreshPrompt tests", function() {

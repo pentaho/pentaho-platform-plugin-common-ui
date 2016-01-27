@@ -319,8 +319,21 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
       });
 
       it("submit", function() {
+        var promptPanel = {};
+        var options = {isInit: true};
+        spyOn(panel, "onSubmit");
+        panel.submit(promptPanel, options);
+        expect(panel.forceAutoSubmit).toBeFalsy();
+        expect(panel.onSubmit).toHaveBeenCalledWith(promptPanel, options);
+      });
+
+      it("submit doesn't execute the onSubmit callback if the latter isn't a function", function() {
+        panel.onSubmit = {};
+        var Logger = require("cdf/Logger");
+        spyOn(Logger, "warn");
         panel.submit();
         expect(panel.forceAutoSubmit).toBeFalsy();
+        expect(Logger.warn).toHaveBeenCalled();
       });
 
       it("submitStart", function() {
