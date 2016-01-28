@@ -356,6 +356,44 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
         expect(parameterChangedSpy).toHaveBeenCalledWith(name, value);
       });
 
+      it("parameterChanged only specific callback should be called", function() {
+        var param = {};
+        var name = "name";
+        var value = 100;
+        spyOn(panel, "_setTimeoutRefreshPrompt");
+
+        var parameterChangedSpySpecific = jasmine.createSpy("parameterChangedSpySpecific");
+        var parameterChangedSpyGeneric = jasmine.createSpy("parameterChangedSpyGeneric");
+        panel.onParameterChanged = {};
+        panel.onParameterChanged['name'] = parameterChangedSpySpecific;
+        panel.onParameterChanged[''] = parameterChangedSpyGeneric;
+
+        panel.parameterChanged(param, name, value);
+        expect(panel.parametersChanged).toBeTruthy();
+        expect(panel._setTimeoutRefreshPrompt).toHaveBeenCalled();
+        expect(parameterChangedSpySpecific).toHaveBeenCalledWith(name, value);
+        expect(parameterChangedSpyGeneric).not.toHaveBeenCalled();
+      });
+
+      it("parameterChanged only generic callback should be called", function() {
+        var param = {};
+        var name = "name";
+        var value = 100;
+        spyOn(panel, "_setTimeoutRefreshPrompt");
+
+        var parameterChangedSpySpecific = jasmine.createSpy("parameterChangedSpySpecific");
+        var parameterChangedSpyGeneric = jasmine.createSpy("parameterChangedSpyGeneric");
+        panel.onParameterChanged = {};
+        panel.onParameterChanged['name'] = parameterChangedSpySpecific;
+        panel.onParameterChanged[''] = parameterChangedSpyGeneric;
+
+        panel.parameterChanged(param, 'name2', value);
+        expect(panel.parametersChanged).toBeTruthy();
+        expect(panel._setTimeoutRefreshPrompt).toHaveBeenCalled();
+        expect(parameterChangedSpySpecific).not.toHaveBeenCalled();
+        expect(parameterChangedSpyGeneric).toHaveBeenCalled();
+      });
+
       it("parameterChanged", function() {
         var param = {};
         var name = "name";

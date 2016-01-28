@@ -774,7 +774,9 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
          */
         parameterChanged: function (param, name, value) {
           if (this.onParameterChanged) {
-            var paramCallback = this.onParameterChanged[name];
+            var paramCallback = this.onParameterChanged[name] ? 
+                  this.onParameterChanged[name] : 
+                  this.onParameterChanged[''];
             if (paramCallback) {
               if (typeof paramCallback === 'function') {
                 paramCallback(name, value); 
