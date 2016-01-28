@@ -2,3 +2,10 @@
 h3 {
   font-size: 22px;
 }
+
+.amd-module {
+	font-size: 120%;
+  line-height: 140%;
+  margin-bottom: 1em;
+  margin-top: 1em
+}
