@@ -84,7 +84,7 @@ define([], function() {
      *                              the callback will be assigned to all the parameters. If paramName is
      *                              not a valid string the callback will be registered to all parameters.
      *
-     * @example <caption>Register a parameter changed event to all parameters</caption>
+     * @example <caption>Register a parameter changed event to all parameters that don't have a specific callback assigned</caption>
      *  api.event.parameterChanged(function(parameterName, parameterValue) {
      *    // Execute event based code
      *  })
