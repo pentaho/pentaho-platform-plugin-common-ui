@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2016 Pentaho Corporation.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,13 +19,5 @@
  * Pentaho Web Platform's classes and interfaces.
  *
  * @name pentaho
- * @namespace
- */
-
-/**
- * The visual namespace contains the classes and interfaces
- * of the Visualization API.
- *
- * @name pentaho.visual
  * @namespace
  */
