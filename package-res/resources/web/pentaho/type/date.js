@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2016 Pentaho Corporation.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,13 +43,19 @@ define([
      * @description Creates a date instance.
      */
     return Simple.extend("pentaho.type.Date", {
+      /**
+       * Gets the underlying `Date` object of the date value.
+       * @name pentaho.type.Date#value
+       * @type Date
+       * @readonly
+       */
       meta: {
         id: module.id,
 
         styleClass: "pentaho-type-date",
 
         cast: function(v) {
-          return (v instanceof Date) ? v : Date.parse(v);
+          return (v instanceof Date) ? v : new Date(v);
         }
       }
     }).implement({

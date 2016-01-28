@@ -319,7 +319,7 @@ define([
     //region cast private methods
     function castTop(value) {
       if(value == null)
-        throw new Error("Simple value cannot contain null.");
+        throw  new Error(bundle.structured.errors.value.isNull);
 
       value = this._cast(value);
       if(value == null)
