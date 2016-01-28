@@ -431,7 +431,7 @@ define([
         this.meta.each(function(pMeta) {
           var value = this._values[pMeta.name];
 
-          Array.prototype.push.apply(errors, pMeta.type.validate(value));
+          Array.prototype.push.apply(errors, pMeta.validate(value));
         }, this);
 
         return errors.length > 0 ? errors : null;
