@@ -507,9 +507,12 @@ define([
        * @return {Error|Array.<!Error>|null} An `Error`, a non-empty array of `Error` or `null`.
        */
       validate: function() {
-        var errors = [];
-        for(var i = 0, ic = this._elems.length; i !== ic; ++i) {
-          Array.prototype.push.apply(errors, this.meta.of.validate(this._elems[i]));
+        var errors = [],
+            elems = this._elems,
+            C = elems.length;
+
+        for(var i = 0; i < C; i++) {
+          errors.push.apply(errors, this.meta.of.validate(elems[i]));
         }
 
         return errors.length > 0 ? errors : null;

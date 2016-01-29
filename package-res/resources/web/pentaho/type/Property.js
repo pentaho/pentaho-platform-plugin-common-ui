@@ -408,17 +408,21 @@ define([
 
         if(range.min > cardinality) {
           if(this.list) {
-            errors.push(new Error(bundle.format(bundle.structured.errors.property.countOutOfRange, [this.label, cardinality, range.min, range.max])));
+            errors.push(new Error(bundle.format(
+              bundle.structured.errors.property.countOutOfRange,
+              [this.label, cardinality, range.min, range.max])));
           } else {
             errors.push(new Error(bundle.format(bundle.structured.errors.property.isRequired, [this.label])));
           }
         }
 
         if(range.max < cardinality) {
-          errors.push(new Error(bundle.format(bundle.structured.errors.property.countOutOfRange, [this.label, cardinality, range.min, range.max])));
+          errors.push(new Error(bundle.format(
+            bundle.structured.errors.property.countOutOfRange,
+            [this.label, cardinality, range.min, range.max])));
         }
 
-        Array.prototype.push.apply(errors, this.type.validate(value));
+        errors.push.apply(errors, this.type.validate(value));
 
         return errors.length > 0 ? errors : null;
       },
