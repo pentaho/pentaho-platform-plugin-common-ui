@@ -17,7 +17,6 @@
 
 var deps = [
   'common-ui/angular',
-  'angular-mocks',
   'common-ui/angular-directives/schedule/scheduleSelector',
   'test/karma/unit/angular-directives/commonFiltersMock'
 ];

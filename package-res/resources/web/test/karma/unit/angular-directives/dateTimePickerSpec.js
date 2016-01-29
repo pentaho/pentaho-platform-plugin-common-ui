@@ -5,7 +5,6 @@ var deps = [
     "dojo/ready",
     "dijit/registry",
     "common-ui/angular-ui-bootstrap",
-    "angular-mocks",
     "common-ui/angular-directives/dateTimePicker/dateTimePicker",
     "common-ui/angular-directives/angular-dojo/angular-dojo"
 ];
