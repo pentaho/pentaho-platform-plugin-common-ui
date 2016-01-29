@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2016 Pentaho Corporation.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,6 +43,12 @@ define([
      * @description Creates a string instance.
      */
     return Simple.extend("pentaho.type.String", {
+      /**
+       * Gets the underlying string primitive value of the value.
+       * @name pentaho.type.String#value
+       * @type string
+       * @readonly
+       */
       meta: {
         id: module.id,
         styleClass: "pentaho-type-string",
