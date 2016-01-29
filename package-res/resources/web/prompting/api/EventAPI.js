@@ -35,7 +35,7 @@ define([], function() {
     this.beforeRender = function(callback) {
       api.operation._getPromptPanel().onBeforeRender = callback;
     };
-    
+
     /**
      * Registers an after render event
      *
@@ -138,6 +138,37 @@ define([], function() {
         api.operation._getPromptPanel().ready = function(){};
       }
     };
+
+    /**
+     * Registers a listener for when the state of the prompt panel or parameter definition changes.
+     *
+     * @name EventAPI#stateChanged
+     * @method
+     * @param {Function} callback   The function to be executed when the event is triggered.
+     *                              Pass null if you wish to unbind this event.
+     * @example
+     *  api.event.stateChanged(function(name, oldValue, newValue) {
+     *    // Execute event based code
+     *
+     *    // State Changed Parameters which can change
+     *    // promptNeeded - server validation failed, user needs to correct inputs
+     *    // paginate - the content spans multiple pages, show pagination control
+     *    // totalPages - the number of pages expected by the server
+     *    // showParameterUI - initially hide the parameter UI, but show pagination control if needed.
+     *    // allowAutoSubmit - is auto-submit after input allowed by the server? Some heavy content may ban auto-submitting to limit the server's load.
+     *    // parametersChanged - has the user changed any of the  parameter values?
+     *    // autoSubmit - is auto-submit allowed? This mirrors the "auto-submit checkbox, but is limited by the "allowAutoSubmit" flag.
+     *    // page - the current page in the pagination control. Limited in range by the "totalPages" server state.
+     *  });
+     */
+    this.stateChanged = function(callback) {
+      var promptPanel = api.operation._getPromptPanel();
+      if(typeof callback === 'function') {
+        promptPanel.onStateChanged = callback;
+      } else {
+        promptPanel.onStateChanged = null;
+      }
+    }
 
     /**
      * Registers a callback function to be executed when the submit event is triggered.

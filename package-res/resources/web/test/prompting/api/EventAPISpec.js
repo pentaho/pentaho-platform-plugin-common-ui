@@ -138,6 +138,17 @@ define([
           expect(promptPanelSpy.onSubmit).toBeDefined();
           expect(promptPanelSpy.onSubmit).toBe(null);
         });
+
+        it("should register a stateChanged event", function() {
+          eventApi.stateChanged(callback);
+          expect(promptPanelSpy.onStateChanged).toBe(callback);
+
+          eventApi.stateChanged("test");
+          expect(promptPanelSpy.onStateChanged).toBe(null);
+
+          eventApi.stateChanged(null);
+          expect(promptPanelSpy.onStateChanged).toBe(null);
+        });
       });
 
       describe("EventAPI Tests with PromptPanel updates", function(){

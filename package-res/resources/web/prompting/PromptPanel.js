@@ -31,6 +31,7 @@
  * @property {Function} onAfterRender Callback called if defined after any change is performed in the prompt components
  * @property {Function} onBeforeUpdate Callback called if defined before the prompt update cycle is called
  * @property {Function} onAfterUpdate Callback called if defined after the prompt update cycle is called
+ * @property {Function} onStateChanged Callback called if defined after state variables have been changed on the prompt panel or parameter definition
  * @property {?Function} onSubmit Callback called when the submit function executes, null if no callback is registered
  */
 define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/util/util', 'common-ui/util/GUIDHelper', './WidgetBuilder', 'cdf/Dashboard.Clean', './parameters/ParameterDefinitionDiffer', 'common-ui/jquery-clean'],
@@ -466,6 +467,7 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
         onAfterRender: null,
         onBeforeUpdate: null,
         onAfterUpdate: null,
+        onStateChanged: null,
         onSubmit: null,
 
         /**
@@ -531,9 +533,47 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
          * @param paramDefn {Object} The parameter definition object
          */
         setParamDefn: function(paramDefn) {
+          var prevParamDefn = this.paramDefn;
           this.paramDefn = paramDefn;
+
+          var fireStateChanged = function(paramName, oldParamDefn, newParamDefn, getValueCallback) {
+            if (this.onStateChanged == null) {
+              return;
+            }
+
+            var oldVal = oldParamDefn ? getValueCallback(oldParamDefn) : undefined;
+            var newVal = newParamDefn ? getValueCallback(newParamDefn) : undefined;
+
+            if (oldVal != newVal) {
+              this.onStateChanged(paramName, oldVal, newVal);
+            }
+          }.bind(this);
+
           if (paramDefn) {
-            this.autoSubmit = paramDefn.allowAutoSubmit();
+            if(this.autoSubmit == undefined) {
+              this.setAutoSubmit(paramDefn.allowAutoSubmit());
+            }
+
+            fireStateChanged("promptNeeded", prevParamDefn, this.paramDefn, function(paramDefn) { return paramDefn.promptNeeded; });
+            fireStateChanged("paginate", prevParamDefn, this.paramDefn, function(paramDefn) { return paramDefn.paginate; });
+            fireStateChanged("totalPages", prevParamDefn, this.paramDefn, function(paramDefn) { return paramDefn.totalPages; });
+            fireStateChanged("showParameterUI", prevParamDefn, this.paramDefn, function(paramDefn) { return paramDefn.showParameterUI(); });
+            fireStateChanged("allowAutoSubmit", prevParamDefn, this.paramDefn, function(paramDefn) { return paramDefn.allowAutoSubmit(); });
+            fireStateChanged("page", prevParamDefn, this.paramDefn, function(paramDefn) { return paramDefn.page; });
+          }
+        },
+
+        /**
+         * Sets the autoSubmit property on the PromptPanel
+         *
+         * @param autoSubmit {Boolean} The autoSubmit boolean
+         */
+        setAutoSubmit: function(autoSubmit) {
+          var prevVal = this.autoSubmit;
+          this.autoSubmit = autoSubmit;
+
+          if (this.onStateChanged != null && prevVal != this.autoSubmit) {
+            this.onStateChanged("autoSubmit", prevVal, this.autoSubmit);
           }
         },
 
@@ -796,6 +836,10 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
 
           this._setTimeoutRefreshPrompt();
           this.parametersChanged = true;
+
+          if (this.onStateChanged != null) {
+            this.onStateChanged("parametersChanged", false, this.parametersChanged);
+          }
         },
 
          /**
@@ -1612,8 +1656,15 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
         setState: function(state) {
           var paramDefn = this.getParamDefn();
           _validateState(state, paramDefn);
-          (state.parametersChanged != null) && (this.parametersChanged = state.parametersChanged);
-          (state.autoSubmit != null) && (this.autoSubmit = state.autoSubmit);
+
+          if(state.parametersChanged != null) {
+            if (this.onStateChanged != null && this.parametersChanged != state.parametersChanged ) {
+              this.onStateChanged("parametersChanged", this.parametersChanged, state.parametersChanged);
+            }
+            this.parametersChanged = state.parametersChanged;
+          }
+
+          (state.autoSubmit != null) && this.setAutoSubmit(state.autoSubmit);
           (state.page != null) && (paramDefn.page = state.page);
           this.setParamDefn(paramDefn);
         }
