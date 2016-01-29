@@ -139,7 +139,7 @@ define([
       it("should inherit a base function", function() {
         var FA = function() {
         };
-        var A = Item.extend({meta: {view: FA}});
+        var A  = Item.extend({meta: {view: FA}});
 
         expect(A.meta.view).toBe(FA);
 
@@ -151,15 +151,21 @@ define([
       it("should respect a specified function", function() {
         var FA = function() {
         };
-        var A = Item.extend({meta: {view: FA}});
+        var A  = Item.extend({meta: {view: FA}});
 
         expect(A.meta.view).toBe(FA);
 
         var FB = function() {
         };
-        var B = A.extend({meta: {id: "baba/dudu", view: FB}});
+        var B  = A.extend({meta: {id: "baba/dudu", view: FB}});
 
         expect(B.meta.view).toBe(FB);
+      });
+
+      it("should preserve the default value", function() {
+        Item.meta.view = undefined;
+        // The default value is still there (did not delete)
+        expect(Item.meta.view).toBe(null);
       });
     }); // end #view
 
@@ -179,8 +185,8 @@ define([
       it("should return a Promise, when view is a function, and resolve to it", function(done) {
         var View = function() {
         };
-        var A = Item.extend({meta: {view: View}});
-        var p = A.meta.viewClass;
+        var A    = Item.extend({meta: {view: View}});
+        var p    = A.meta.viewClass;
 
         expect(p instanceof Promise).toBe(true);
 
@@ -192,8 +198,8 @@ define([
 
       it("should return a Promise, when view is an object, and resolve to it", function(done) {
         var View = {};
-        var A = Item.extend({meta: {view: View}});
-        var p = A.meta.viewClass;
+        var A    = Item.extend({meta: {view: View}});
+        var p    = A.meta.viewClass;
 
         expect(p instanceof Promise).toBe(true);
 
@@ -276,7 +282,7 @@ define([
 
       it("should return an new Promise and resolve to the new View when the view changes", function(done) {
 
-        var ViewBar = function() {
+        var ViewBar  = function() {
         };
         var ViewDude = function() {
         };
@@ -309,6 +315,12 @@ define([
         });
       });
 
+      it("should preserve the default value", function() {
+        Item.meta.view = undefined;
+        // The default value is still there (did not delete)
+        expect(Item.meta.view).toBe(null);
+      });
+
     }); // end #viewClass
 
     describe("#label -", function() {
@@ -325,6 +337,21 @@ define([
           expectIt({label: null});
           expectIt({label: ""});
         });
+
+        it("should preserve the default value", function() {
+          Item.meta.label = undefined;
+          // The default value is still there (did not delete)
+          expect(Item.meta.label).toBe(null);
+        });
+
+        it("subclasses should preserve the default value", function() {
+          var FirstDerivative         = Item.extend({meta: {label: "Foo"}});
+          var SecondDerivative        = FirstDerivative.extend({meta: {label: "Bar"}});
+          SecondDerivative.meta.label = undefined;
+          // The default value is still there (did not delete)
+          expect(SecondDerivative.meta.label).toBe("Foo");
+        });
+
       }); // when `label` is falsy
 
       describe("when `label` is truthy", function() {
@@ -349,6 +376,11 @@ define([
           expectIt({id: null});
           expectIt({id: null});
         });
+        it("should preserve the default value", function() {
+          Item.meta.id = undefined;
+          // The default value is still there (did not delete)
+          expect(Item.meta.id).toBe(null);
+        });
       });
 
       describe("when `id` is truthy -", function() {
@@ -363,6 +395,13 @@ define([
     }); // #id
 
     describe("#description -", function() {
+
+      it("should preserve the default value", function() {
+        Item.meta.description = undefined;
+        // The default value is still there (did not delete)
+        expect(Item.meta.description).toBe(null);
+      });
+
       describe("when not specified -", function() {
         it("should inherit the base description", function() {
           function expectIt(spec) {
@@ -400,6 +439,13 @@ define([
 
     describe("#category -", function() {
       describe("when not specified -", function() {
+
+        it("should preserve the default value", function() {
+          Item.meta.category = undefined;
+          // The default value is still there (did not delete)
+          expect(Item.meta.category).toBe(null);
+        });
+
         it("should inherit the base category", function() {
           function expectIt(spec) {
             var Derived = Item.extend({meta: spec});
@@ -435,6 +481,12 @@ define([
     }); // #category
 
     describe("#helpUrl -", function() {
+      it("should preserve the default value", function() {
+        Item.meta.helpUrl = undefined;
+        // The default value is still there (did not delete)
+        expect(Item.meta.helpUrl).toBe(null);
+      });
+
       describe("when not specified", function() {
         it("should inherit the base helpUrl", function() {
           function expectIt(spec) {
@@ -478,7 +530,7 @@ define([
 
       it("should be unique", function() {
         var DerivedA = Item.extend(),
-          DerivedB = Item.extend();
+            DerivedB = Item.extend();
         expect(DerivedA.meta.uid).not.toBe(DerivedB.meta.uid);
         expect(DerivedA.meta.uid).not.toBe(Item.meta.uid);
       });
@@ -487,6 +539,12 @@ define([
     // TODO: ordinal, styleClass, advanced, browsable <- bring and adapt these from Property.Meta tests
 
     describe("#styleClass -", function() {
+      it("should preserve the default value", function() {
+        Item.meta.styleClass = undefined;
+        // The default value is still there (did not delete)
+        expect(Item.meta.styleClass).toBe(null);
+      });
+
       it("can be set on a derived class", function() {
         ["xpto", null].forEach(function(propValue) {
           var Derived = Item.extend({meta: {"styleClass": propValue}});
@@ -506,8 +564,8 @@ define([
           [[], null]
         ].forEach(function(candidateAndFinal) {
           var candidate = candidateAndFinal[0];
-          var final = candidateAndFinal[1];
-          var Derived = Item.extend({meta: {"styleClass": candidate}});
+          var final     = candidateAndFinal[1];
+          var Derived   = Item.extend({meta: {"styleClass": candidate}});
           expect(Derived.meta.styleClass).toBe(final);
 
           var item = new Derived();
@@ -517,6 +575,12 @@ define([
     }); // #styleClass
 
     describe("#advanced -", function() {
+      it("should preserve the default value", function() {
+        Item.meta.advanced = undefined;
+        // The default value is still there (did not delete)
+        expect(Item.meta.advanced).toBe(false);
+      });
+
       it("can be set on a derived class", function() {
         [true, false].forEach(function(bool) {
           var Derived = Item.extend({meta: {"advanced": bool}});
@@ -529,7 +593,7 @@ define([
       it("can be unset by passing a nully, thus delegating to the ancestor class", function() {
         [true, false].forEach(function(bool) {
           [null, undefined].forEach(function(value) {
-            var FirstDerivative = Item.extend({meta: {"advanced": bool}});
+            var FirstDerivative  = Item.extend({meta: {"advanced": bool}});
             var SecondDerivative = FirstDerivative.extend({meta: {"advanced": !bool}});
 
             SecondDerivative.meta.advanced = value;
@@ -540,6 +604,11 @@ define([
     }); // #advanced
 
     describe("#browsable -", function() {
+      it("should preserve the default value", function() {
+        Item.meta.browsable = undefined;
+        // The default value is still there (did not delete)
+        expect(Item.meta.browsable).toBe(true);
+      });
       it("can be set on a derived class", function() {
         [true, false].forEach(function(bool) {
           var Derived = Item.extend({meta: {"browsable": bool}});
@@ -552,7 +621,7 @@ define([
       it("can be unset by passing a nully, thus delegating to the ancestor class", function() {
         [true, false].forEach(function(bool) {
           [null, undefined].forEach(function(value) {
-            var FirstDerivative = Item.extend({meta: {"browsable": bool}});
+            var FirstDerivative  = Item.extend({meta: {"browsable": bool}});
             var SecondDerivative = FirstDerivative.extend({meta: {"browsable": !bool}});
 
             SecondDerivative.meta.browsable = value;
@@ -563,6 +632,11 @@ define([
     }); // #browsable
 
     describe("#ordinal -", function() {
+      it("should preserve the default value", function() {
+        Item.meta.ordinal = undefined;
+        // The default value is still there (did not delete)
+        expect(Item.meta.ordinal).toBe(0);
+      });
       it("can be set on a derived class", function() {
         [1].forEach(function(someValue) {
           var Derived = Item.extend({meta: {"ordinal": someValue}});
@@ -584,9 +658,9 @@ define([
           [[], 0], [[1, 2], 0]
         ].forEach(function(candidateAndFinal) {
           var candidate = candidateAndFinal[0];
-          var final = candidateAndFinal[1];
+          var final     = candidateAndFinal[1];
 
-          var FirstDerivative = Item.extend({meta: {"ordinal": 42}});
+          var FirstDerivative  = Item.extend({meta: {"ordinal": 42}});
           var SecondDerivative = FirstDerivative.extend({meta: {"ordinal": candidate}});
           expect(SecondDerivative.meta.ordinal).toBe(final);
 
@@ -597,7 +671,7 @@ define([
       it("can be unset by passing a nully, thus delegating to the ancestor class", function() {
         [1, 20].forEach(function(someValue) {
           [null, undefined].forEach(function(resetValue) {
-            var FirstDerivative = Item.extend({meta: {"ordinal": 42}});
+            var FirstDerivative  = Item.extend({meta: {"ordinal": 42}});
             var SecondDerivative = FirstDerivative.extend({meta: {"ordinal": someValue}});
 
             SecondDerivative.meta.ordinal = resetValue;
@@ -621,8 +695,8 @@ define([
 
     describe("#ancestor -", function() {
       it("returns the immediate ancestor", function() {
-        var FirstDerivative = Item.extend({meta: {"firstDerivative": true}});
-        var FirstSibling = Item.extend({meta: {"firstSibling": true}});
+        var FirstDerivative  = Item.extend({meta: {"firstDerivative": true}});
+        var FirstSibling     = Item.extend({meta: {"firstSibling": true}});
         var SecondDerivative = FirstDerivative.extend({meta: {"secondDerivative": true}});
 
         expect(FirstDerivative.meta.ancestor).toBe(Item.meta);
@@ -641,9 +715,6 @@ define([
         expect(Derived.meta.ancestor).toBe(Item.meta);
       });
     }); // #ancestor
-
-    // TODO: create(.), is(.), to(.)
-
 
     describe("#create -", function() {
       it("returns a new instance of `pentaho.type.Item`", function() {
@@ -677,10 +748,10 @@ define([
       it("casts native data types to `pentaho.type.Item`", function() {
         [
           "",
-          0, 1, 1/0, Math.sqrt(-1),
+          0, 1, 1 / 0, Math.sqrt(-1),
           true,
           new Date(),
-          {},[]
+          {}, []
         ].forEach(function(value) {
           expect(Item.meta.to(value) instanceof Item).toBe(true);
         });

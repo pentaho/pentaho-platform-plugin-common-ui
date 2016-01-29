@@ -29,7 +29,7 @@ define([
    *
    * @classDesc The base class of types in the Pentaho Client Metadata Model.
    *
-   * The `pentaho.type.Item` class (and its descendents) embeds its own metadata,
+   * The `pentaho.type.Item` class (and its descendants) embeds its own metadata,
    * which can be accessed via the property {@link pentaho.type.Item#meta}.
    * Because the metadata can be inherited, it is actually an instance
    * of a metaclass stored at {@link pentaho.type.Item.Meta}.
@@ -141,11 +141,11 @@ define([
      * To create a _prototype_ with a constructor,
      * extend from the base constructor instead, by calling its `extend` method.
      *
-     * @param {pentaho.type.Item} [mesa] The base _mesadata_ prototype.
+     * @param {pentaho.type.Item} [mesa] The prototype of the class used for representing the data.
      *   When nully, defaults to the prototype of the constructor
      *   where this method is called.
      *
-     * @param {object} [instSpec] The sub-prototype specification.
+     * @param {object} [instSpec] The specification of the prototype that will be returned by this function.
      * @param {object} [keyArgs] Keyword arguments.
      *
      * @return {pentaho.type.Item} The created sub-prototype.
@@ -160,7 +160,7 @@ define([
       // META
       var metaInstSpec = O["delete"](instSpec, "meta");
 
-      var ka = keyArgs ? Object.create(keyArgs) : {};
+      var ka  = keyArgs ? Object.create(keyArgs) : {};
       ka.mesa = subMesa;
 
       mesa.meta._extendProto(metaInstSpec, ka);
@@ -177,13 +177,13 @@ define([
       // 1. `instSpec` may override property accessors only defined by `Complex.Meta`
       // 2. So, the Meta class must be created *before* applying instSpec and classSpec to SubMesa
       // 3. The Meta class requires Mesa to already exist, to be able to define accessors
-      var metaInstSpec = O["delete"](instSpec, "meta"),
-        metaClassSpec = O["delete"](classSpec, "meta"),
-      // Setting a function's name is failing on PhantomJS 1.9.8...
-        mesaName = SubMesa.name || SubMesa.displayName,
-        metaName = mesaName && (mesaName + ".Meta");
+      var metaInstSpec  = O["delete"](instSpec, "meta"),
+          metaClassSpec = O["delete"](classSpec, "meta"),
+          // Setting a function's name is failing on PhantomJS 1.9.8...
+          mesaName      = SubMesa.name || SubMesa.displayName,
+          metaName      = mesaName && (mesaName + ".Meta");
 
-      var ka = keyArgs ? Object.create(keyArgs) : {};
+      var ka  = keyArgs ? Object.create(keyArgs) : {};
       ka.mesa = SubMesa.prototype;
 
       this.Meta.extend(metaName, metaInstSpec, metaClassSpec, ka);

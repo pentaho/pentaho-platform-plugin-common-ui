@@ -77,7 +77,7 @@ define([
           expect(item.meta.someAttribute).toBe("someValue");
         });
       });
-      it("allows overwriting a .meta property", function() {
+      it("allows setting a .meta property", function() {
         Derived.meta = {"someAttribute": "someOtherValue"};
         expect(Derived.Meta.someAttribute).toBe("someOtherValue");
       });
@@ -113,13 +113,39 @@ define([
 
 
     // TODO: extendProto
-    xdescribe("#extendProto -", function() {
-      it("some tautology", function() {
-        var Derived = Item.extend();
-        Derived.extendProto({root: true});
-        var item = new Derived();
-        expect(item.meta.isRoot).toBe(true);
+    describe("#extendProto -", function() {
+      var Derived;
+      beforeEach(function() {
+        Derived = Item.extendProto(null, {}, {});
       });
+      it("derived classes have the proper 'ancestor'", function() {
+        expect(Derived.meta).not.toBe(Item.meta)
+        expect(Derived.meta.ancestor).toBe(Item.meta)
+        expect(Derived.meta.is(Item)).toBe(false)
+      });
+      it("can be invoked without arguments", function() {
+        expect(Item.extendProto().meta.ancestor).toBe(Item.meta);
+        expect(Item.extendProto(null).meta.ancestor).toBe(Item.meta);
+        expect(Item.extendProto(null, {}).meta.ancestor).toBe(Item.meta);
+      });
+
+      it("does not return a constructor", function() {
+        expect(typeof Derived).not.toBe("function");
+        expect(Derived.prototype).toBeUndefined();
+      });
+      it("returns an instance whose constructor is the same as the extended class", function() {
+        expect(Derived.constructor).toBe(Item);
+        expect(Derived.constructor).toBe(Item.prototype.constructor);
+        expect(Derived instanceof Item).toBe(true);
+      });
+      it("accepts keyArgs", function() {
+        var Derived = Item.extendProto(null, {}, {
+          isRoot: true
+        });
+        expect(Item.meta.isRoot).toBe(false);
+        expect(Derived.meta.isRoot).toBe(true);
+      });
+
     });
 
   }); // pentaho/type/Item
