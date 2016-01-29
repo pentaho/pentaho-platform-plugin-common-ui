@@ -19,7 +19,6 @@ requirejs.config({
     'common-ui/angular-resource': 'angular/angular-resource',
     'common-ui/angular-route': 'angular/angular-route',
     'common-ui/angular-ui-bootstrap': 'bootstrap/ui-bootstrap-tpls-0.6.0.min',
-    'angular-mocks': 'angular/angular-mocks',
     'angular-scenario': 'angular/angular-scenario',
     'underscore' : 'underscore/underscore',
     'common-ui/ring':  'ring/ring',
@@ -39,7 +38,6 @@ requirejs.config({
     'common-ui/angular-resource': { deps: ['common-ui/angular'], exports: 'Resource' },
     'common-ui/angular-route': { deps: ['common-ui/angular'], exports: 'Route' },
     'common-ui/angular-ui-bootstrap': { deps: ['common-ui/angular'] },
-    'angular-mocks': { deps: ['common-ui/angular-resource'] },
     
     'common-ui/jquery': { exports: '$' },
     'common-ui/PluginHandler': { deps: ['common-ui/jquery'] },

@@ -17,12 +17,11 @@
 
 var deps = [
   'common-ui/angular',
-  'angular-mocks',
   'common-ui/angular-directives/folderBrowser/folderBrowser',
   'common-ui/jquery'
 ];
 
-define(deps, function (angular, mocks, folderBrowser) {
+define(deps, function (angular, folderBrowser) {
 
   xdescribe('unit testing angular tree control directive', function () {
     var $compile, $rootScope, element, sampleData;

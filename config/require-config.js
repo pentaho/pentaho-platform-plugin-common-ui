@@ -8,9 +8,6 @@ requireCfg.baseUrl = "/base/build-res/module-scripts/";
 requireCfg.paths["test/karma/unit/angular-directives"] =
   "/base/package-res/resources/web/test/karma/unit/angular-directives";
 
-requireCfg.paths["angular-mocks"] = "/base/package-res/resources/web/angular/angular-mocks";
-requireCfg.shim ["angular-mocks"] = {deps: ["common-ui/angular-resource"]};
-
 requireCfg.paths["angular-scenario"] = "/base/package-res/resources/web/angular/angular-scenario";
 
 requireCfg.paths["dojo"]  = "/base/dev-res/dojo/dojo-release-1.9.2-src/dojo";

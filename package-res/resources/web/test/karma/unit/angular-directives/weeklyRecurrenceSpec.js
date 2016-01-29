@@ -2,7 +2,6 @@ var deps = [
     'common-ui/angular',
     'test/karma/unit/angular-directives/templateUtil',
     'common-ui/angular-ui-bootstrap',
-    'angular-mocks',
     'common-ui/angular-directives/recurrence/recurrence'
 ];
 
