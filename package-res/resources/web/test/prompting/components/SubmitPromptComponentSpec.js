@@ -24,7 +24,7 @@ define([ 'common-ui/prompting/components/SubmitPromptComponent', 'common-ui/jque
     var comp;
     var promptPanel;
     beforeEach(function() {
-      promptPanel = jasmine.createSpyObj("promptPanel", [ "_submit", "_submitStart" ]);
+      promptPanel = jasmine.createSpyObj("promptPanel", [ "_submit", "_submitStart", "getAutoSubmitSetting" ]);
       comp = new SubmitPromptComponent();
       comp.htmlObject = id;
       comp.promptPanel = promptPanel;
@@ -68,7 +68,7 @@ define([ 'common-ui/prompting/components/SubmitPromptComponent', 'common-ui/jque
       });
 
       it("should create auto submit elements with checked state", function() {
-        comp.promptPanel.autoSubmit = true;
+        comp.promptPanel.getAutoSubmitSetting.and.returnValue(true);
         comp.update();
         expect(comp._createElement).toHaveBeenCalledWith(
           '<label class="auto-complete-checkbox"><input type="checkbox" checked="checked" />' + autoSubmitLabel

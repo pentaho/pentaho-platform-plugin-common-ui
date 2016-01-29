@@ -59,7 +59,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
         paramDefn.autoSubmit = false;
         paramDefn.page = 2;
 
-        dashboardSpy = jasmine.createSpyObj("dashboardSpy", [ "setParameter", "getParameterValue", "getComponentByName", "addComponent", "updateComponent", "showProgressIndicator", "hideProgressIndicator" ]);
+        dashboardSpy = jasmine.createSpyObj("dashboardSpy", [ "setParameter", "getParameterValue", "getComponentByName", "addComponent", "updateComponent", "showProgressIndicator", "hideProgressIndicator"]);
         panel = new PromptPanel(testId, paramDefn);
         panel.dashboard = dashboardSpy;
       });
@@ -1450,6 +1450,48 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
           expect(panel.parametersChanged).toBeTruthy();
           expect(panel.autoSubmit).toBeTruthy();
           expect(paramDefn.page).toBe(1);
+        });
+      });
+
+      describe("setParamDefn", function() {
+        it("should set a parameter definition", function() {
+          var onStateChangedSpy = jasmine.createSpy("onStateChanged");
+          panel.onStateChanged = onStateChangedSpy;
+
+          panel.setParamDefn(paramDefn);
+          expect(panel.onStateChanged).not.toHaveBeenCalled();
+
+          panel.paramDefn = null;
+
+          panel.setParamDefn(paramDefn);
+
+          expect(panel.paramDefn).toBe(paramDefn);
+          expect(panel.onStateChanged).toHaveBeenCalledWith("promptNeeded", undefined, paramDefn.promptNeeded);
+          expect(panel.onStateChanged).toHaveBeenCalledWith("paginate", undefined, paramDefn.paginate);
+          expect(panel.onStateChanged).toHaveBeenCalledWith("totalPages", undefined, paramDefn.totalPages);
+          expect(panel.onStateChanged).toHaveBeenCalledWith("showParameterUI", undefined,paramDefn.showParameterUI());
+          expect(panel.onStateChanged).toHaveBeenCalledWith("allowAutoSubmit", undefined, paramDefn.allowAutoSubmit());
+          expect(panel.onStateChanged).toHaveBeenCalledWith("page", undefined, paramDefn.page);
+        });
+      });
+
+      describe("setAutoSubmit", function() {
+        it("should set the autoSubmit property on the prompt panel", function() {
+          panel.setAutoSubmit(false);
+          expect(panel.autoSubmit).toBe(false);
+
+          panel.setAutoSubmit(true);
+          expect(panel.autoSubmit).toBe(true);
+        });
+
+        it("should set the autoSubmit property and trigger onStateChanged", function() {
+          var onStateChangedSpy = jasmine.createSpy("onStateChanged");
+          panel.onStateChanged = onStateChangedSpy;
+
+          panel.autoSubmit = true;
+
+          panel.setAutoSubmit(false);
+          expect(panel.onStateChanged).toHaveBeenCalledWith("autoSubmit", true, false);
         });
       });
     });

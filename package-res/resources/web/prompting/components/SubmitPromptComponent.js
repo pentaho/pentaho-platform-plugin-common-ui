@@ -76,19 +76,19 @@ define(['./ScopedPentahoButtonComponent', 'common-ui/jquery-clean'], function(Sc
       if (this.paramDefn.autoSubmit == undefined) {
         var checkBox = this._createElement('<label class="auto-complete-checkbox">' +
             '<input type="checkbox"' +
-            (promptPanel.autoSubmit ? ' checked="checked"' : '') +
+            (promptPanel.getAutoSubmitSetting() ? ' checked="checked"' : '') +
             ' />' +
             this.autoSubmitLabel +
             '</label>');
 
         checkBox.appendTo($('#' + this.htmlObject))
                 .bind('click', function (ev) {
-                  promptPanel.autoSubmit = ev.target.checked;
+                  promptPanel.setAutoSubmit(ev.target.checked);
                 });
       }
 
       // BISERVER-6915 Should not request pagination when auto-submit is set to false
-      if (promptPanel.forceAutoSubmit || promptPanel.autoSubmit) {
+      if (promptPanel.forceAutoSubmit || promptPanel.getAutoSubmitSetting()) {
         this.expression(/*isInit*/true);
       }
     },
