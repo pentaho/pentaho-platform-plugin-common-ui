@@ -105,31 +105,6 @@ define([
         return this === other || this.key === other.key;
       },
 
-      /**
-       * Performs validation of this value.
-       *
-       * When invalid, returns either one `Error` or a non-empty array of `Error` objects.
-       * When valid, `null` is returned.
-       *
-       * @return {Error|Array.<!Error>|null} An `Error`, a non-empty array of `Error` or `null`.
-       */
-      validate: function() {
-        return null;
-      },
-
-      /**
-       * Gets a value that indicates if this value is valid.
-       *
-       * This property evaluates {@link pentaho.type.Value#validate} and
-       * returns whether no errors were returned.
-       *
-       * @type boolean
-       * @readonly
-       */
-      get isValid() {
-        return !this.validate();
-      },
-
       meta: /** @lends pentaho.type.Value.Meta# */{
         // Note: constructor/_init only called on sub-classes of Value.Meta,
         // and not on Value.Meta itself.
@@ -190,28 +165,6 @@ define([
           this._abstract = !!value;
         },
         //endregion
-
-        // Returns array of non-empty Error objects or null.
-        /**
-         * Performs validation on a given value and
-         * returns a non-empty array of `Error` objects or `null`.
-         *
-         * If a {@link Nully} value is specified, `null` is returned.
-         *
-         * @param {pentaho.type.Value|Nully} value The value to validate.
-         * @return {?Array.<!Error>} An array of `Error` or `null`.
-         */
-        validate: function(value) {
-          if(value == null) return null;
-
-          if(!this.is(value))
-            return [
-              new Error(bundle.format(bundle.structured.errors.value.notOfType, [this.label]))
-            ];
-
-          var error = value.validate();
-          return !error ? null : Array.isArray(error) ? error : [error];
-        },
 
         /**
          * Gets a value that indicates if two given values are equal.

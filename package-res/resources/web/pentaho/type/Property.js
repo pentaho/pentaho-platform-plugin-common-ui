@@ -16,13 +16,14 @@
 define([
   "./Item",
   "./value",
+  "../i18n!types",
   "../lang/_AnnotatableLinked",
   "../util/arg",
   "../util/error",
   "../util/object",
   "../util/text",
   "../util/fun"
-], function(Item, Value, AnnotatableLinked, arg, error, O, text, F) {
+], function(Item, Value, bundle, AnnotatableLinked, arg, error, O, text, F) {
 
   "use strict";
 
@@ -386,6 +387,45 @@ define([
         }
       },
       //endregion
+
+      //endregion
+
+      //region validation
+
+      /**
+       * Performs validation of this item.
+       *
+       * When invalid, returns either one `Error` or a non-empty array of `Error` objects.
+       * When valid, `null` is returned.
+       *
+       * @return {Error|Array.<!Error>|null} An `Error`, a non-empty array of `Error` or `null`.
+       */
+      validate: function(value) {
+        var errors = [];
+
+        var range = this.countRangeEval(value);
+        var cardinality = this.list ? value.count : (value ? 1 : 0);
+
+        if(range.min > cardinality) {
+          if(this.list) {
+            errors.push(new Error(bundle.format(
+              bundle.structured.errors.property.countOutOfRange,
+              [this.label, cardinality, range.min, range.max])));
+          } else {
+            errors.push(new Error(bundle.format(bundle.structured.errors.property.isRequired, [this.label])));
+          }
+        }
+
+        if(range.max < cardinality) {
+          errors.push(new Error(bundle.format(
+            bundle.structured.errors.property.countOutOfRange,
+            [this.label, cardinality, range.min, range.max])));
+        }
+
+        errors.push.apply(errors, this.type.validate(value));
+
+        return errors.length > 0 ? errors : null;
+      },
 
       //endregion
 
