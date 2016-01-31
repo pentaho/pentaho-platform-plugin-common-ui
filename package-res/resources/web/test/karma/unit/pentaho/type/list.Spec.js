@@ -40,7 +40,7 @@ define([
     meta: {of: Number}
   });
 
-  describe("pentaho/type/list -", function() {
+  describe("pentaho.type.List -", function() {
 
     it("is a function", function() {
       expect(typeof List).toBe("function");

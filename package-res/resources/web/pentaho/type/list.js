@@ -17,12 +17,13 @@ define([
   "module",
   "./value",
   "./element",
+  "./valueHelper",
   "../i18n!types",
   "../util/arg",
   "../util/error",
   "../util/fun",
   "../util/object"
-], function(module, valueFactory, elemFactory, bundle, arg, error, fun, O) {
+], function(module, valueFactory, elemFactory, valueHelper, bundle, arg, error, fun, O) {
 
   "use strict";
 
@@ -34,6 +35,16 @@ define([
         Element = context.get(elemFactory),
         _listMeta = null,
         _listNextUid = 1;
+
+    /**
+     * @name pentaho.type.List.Meta
+     * @class
+     * @extends pentaho.type.Value.Meta
+     *
+     * @classDesc The base type class of *plural*, list value types.
+     *
+     * For more information see {@link pentaho.type.List}.
+     */
 
     /**
      * @alias List
@@ -325,8 +336,7 @@ define([
        * @protected
        */
       _cast: function(valueSpec) {
-        var meta = this.meta;
-        return meta.context.create(valueSpec, meta._elemMeta, meta._elemMeta);
+        return this.meta._elemMeta.to(valueSpec);
       },
 
       //region Change tracking
@@ -496,30 +506,6 @@ define([
       },
       //endregion
 
-      //region validation
-
-      /**
-       * Performs validation of this item.
-       *
-       * When invalid, returns either one `Error` or a non-empty array of `Error` objects.
-       * When valid, `null` is returned.
-       *
-       * @return {Error|Array.<!Error>|null} An `Error`, a non-empty array of `Error` or `null`.
-       */
-      validate: function() {
-        var errors = [],
-            elems = this._elems,
-            C = elems.length;
-
-        for(var i = 0; i < C; i++) {
-          errors.push.apply(errors, this.meta.of.validate(elems[i]));
-        }
-
-        return errors.length > 0 ? errors : null;
-      },
-
-      //endregion
-
       meta: /** @lends pentaho.type.List.Meta# */{
 
         id: module.id,
@@ -527,6 +513,18 @@ define([
         styleClass: "pentaho-type-list",
 
         //region list property
+        //@override
+        /**
+         * Gets a value that indicates if a type is a list type.
+         *
+         * This implementation is sealed and always returns `true`.
+         *
+         * @name list
+         * @memberOf pentaho.type.List.Meta#
+         * @type boolean
+         * @readOnly
+         * @sealed
+         */
         get list() {
           return true;
         },
@@ -536,7 +534,7 @@ define([
         _elemMeta: Element.meta,
 
         /**
-         * Gets the metadata of the type of elements that the list can contain.
+         * Gets the type of the elements that the list can contain.
          *
          * @type {pentaho.type.Element.Meta}
          * @readonly
@@ -547,7 +545,7 @@ define([
 
         // supports configuration
         set of(value) {
-          if(!value) throw error.argRequired("name");
+          if(!value) throw error.argRequired("of");
 
           // NOTE: one of the problems is determining if two types are equal,
           //  because these can be anonymous types. Equality would have to mean
@@ -573,6 +571,38 @@ define([
 
           // Mark set locally even if it is the same...
           this._elemMeta = elemMeta;
+        },
+        //endregion
+
+        //region validation
+        //@override
+        /**
+         * Determines if a list value that
+         * _is an instance of this type_
+         * is also a **valid instance** of _this_ type.
+         *
+         * Thus, `this.is(value)` must be true.
+         *
+         * The default implementation validates each element against the
+         * list's [element type]{@link pentaho.type.List.Meta#of}
+         * and collects and returns any reported errors.
+         *
+         * @param {!pentaho.type.List} value The list value to validate.
+         *
+         * @return {Nully|Error|Array.<!Error>} An `Error`, a non-empty array of `Error` or a `Nully` value.
+         *
+         * @protected
+         * @overridable
+         *
+         * @see pentaho.type.Value.Meta#validate
+         * @see pentaho.type.Value.Meta#validateInstance
+         */
+        _validate: function(value) {
+          var elemType = this.of;
+
+          return value._elems.reduce(function(errors, elem) {
+            return valueHelper.combineErrors(errors, elemType.validateInstance(elem));
+          }.bind(this), null);
         }
         //endregion
       }

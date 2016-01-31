@@ -32,7 +32,9 @@ define([
      * @class
      * @extends pentaho.type.Value.Meta
      *
-     * @classDesc The base _metadata_ class of *singular* value types.
+     * @classDesc The base type class of *singular* value types.
+     *
+     * For more information see {@link pentaho.type.Element}.
      */
 
     var Value = context.get(valueFactory);
@@ -60,6 +62,24 @@ define([
         id: module.id,
 
         styleClass: "pentaho-type-element",
+
+        //region list property
+        //@override
+        /**
+         * Gets a value that indicates if a type is a list type.
+         *
+         * This implementation is sealed and always returns `false`.
+         *
+         * @name list
+         * @memberOf pentaho.type.Element.Meta#
+         * @type boolean
+         * @readOnly
+         * @sealed
+         */
+        get list() {
+          return false;
+        },
+        //endregion
 
         //region format
 

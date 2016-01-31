@@ -15,7 +15,7 @@
  */
 define([
   "./Item",
-  "./value",
+  "./valueHelper",
   "../i18n!types",
   "../lang/_AnnotatableLinked",
   "../util/arg",
@@ -23,7 +23,7 @@ define([
   "../util/object",
   "../util/text",
   "../util/fun"
-], function(Item, Value, bundle, AnnotatableLinked, arg, error, O, text, F) {
+], function(Item, valueHelper, bundle, AnnotatableLinked, arg, error, O, text, F) {
 
   "use strict";
 
@@ -354,10 +354,7 @@ define([
           return noDefault ? null : this._freshDefaultValue();
         }
 
-        var type = this.type;
-        return type.is(valueSpec)
-          ? valueSpec
-          : this.context.create(valueSpec, type, type);
+        return this.type.to(valueSpec);
       },
 
       /**
@@ -392,43 +389,45 @@ define([
 
       //region validation
 
-      /**
-       * Performs validation of this item.
-       *
-       * When invalid, returns either one `Error` or a non-empty array of `Error` objects.
-       * When valid, `null` is returned.
-       *
-       * @return {Error|Array.<!Error>|null} An `Error`, a non-empty array of `Error` or `null`.
-       */
-      validate: function(value) {
-        var errors = [];
+      validate: function(owner) {
+        var errors = null,
+            addErrors = function(newErrors) {
+              errors = valueHelper.combineErrors(errors, newErrors);
+            };
 
-        var range = this.countRangeEval(value);
-        var cardinality = this.list ? value.count : (value ? 1 : 0);
+        // Accessing private state in the name of performance.
+        var value = owner._values[this.name];
+        if(value) {
+          // Not null and surely of the type, so validateInstance can be called.
+          // If a list, element validation is done before cardinality validation.
+          // If a complex, its properties validation is done before local cardinality validation.
+          addErrors(this.type.validateInstance(value));
+        }
 
-        if(range.min > cardinality) {
+        var range = this.countRangeEval(owner),
+            count = this.list ? value.count : (value ? 1 : 0);
+
+        if(count < range.min) {
           if(this.list) {
-            errors.push(new Error(bundle.format(
-              bundle.structured.errors.property.countOutOfRange,
-              [this.label, cardinality, range.min, range.max])));
+            addErrors(new Error(bundle.format(
+                bundle.structured.errors.property.countOutOfRange,
+                [this.label, count, range.min, range.max])));
           } else {
-            errors.push(new Error(bundle.format(bundle.structured.errors.property.isRequired, [this.label])));
+            addErrors(new Error(bundle.format(
+                bundle.structured.errors.property.isRequired,
+                [this.label])));
           }
+        } else if(count > range.max) {
+          addErrors(new Error(bundle.format(
+              bundle.structured.errors.property.countOutOfRange,
+              [this.label, count, range.min, range.max])));
         }
 
-        if(range.max < cardinality) {
-          errors.push(new Error(bundle.format(
-            bundle.structured.errors.property.countOutOfRange,
-            [this.label, cardinality, range.min, range.max])));
-        }
-
-        errors.push.apply(errors, this.type.validate(value));
-
-        return errors.length > 0 ? errors : null;
+        return errors;
       },
-
       //endregion
 
+      //region dynamic attributes
       // Configuration support
       set attrs(attrSpecs) {
         Object.keys(attrSpecs).forEach(function(name) {
@@ -494,6 +493,7 @@ define([
           return this[namePrivEval].call(owner);
         };
       }
+      //endregion
     } // end instance meta:
   }).implement({
     meta: /** @lends pentaho.type.Property.Meta# */{

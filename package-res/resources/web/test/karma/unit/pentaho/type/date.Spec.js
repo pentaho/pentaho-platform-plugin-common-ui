@@ -23,13 +23,13 @@ define([
 
   /*global describe:true, it:true, expect:true, beforeEach:true*/
 
-  describe("pentaho/type/date -", function () {
+  describe("pentaho.type.Date -", function () {
 
     it("is a function", function () {
       expect(typeof dateFactory).toBe("function");
     });
 
-    describe("new date()", function () {
+    describe("new Date()", function () {
       var PentahoDate;
 
       beforeEach(function () {
@@ -72,5 +72,5 @@ define([
         }).toThrowError(bundle.structured.errors.value.isNull);
       });
     });
-  }); // pentaho/type/date
+  }); // pentaho.type.Date
 });

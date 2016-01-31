@@ -34,7 +34,7 @@ define([
       String  = context.get(stringFactory),
       Number  = context.get(numberFactory);
 
-  describe("pentaho/type/Property.Meta -", function() {
+  describe("pentaho.type.Property.Meta -", function() {
 
     it("is a function", function() {
       expect(typeof PropertyMeta).toBe("function");
@@ -2221,5 +2221,5 @@ define([
 
     // TODO: toValue
 
-  }); // pentaho/type/Property.Meta
+  }); // pentaho.type.Property.Meta
 });

@@ -18,6 +18,7 @@ define([
   "./value",
   "./element",
   "./list",
+  "./refinement",
   "./simple",
   "./complex",
   "./string",
@@ -25,8 +26,10 @@ define([
   "./boolean",
   "./date",
   "./object",
-  "./function"
-], function(Item, Value, Element, List, Simple, Complex, String, Number, Boolean, Date, Object, Function) {
+  "./function",
+  "./facets/DiscreteDomain"
+], function(Item, Value, Element, List, Refinement, Simple, Complex, String, Number, Boolean, Date, Object, Function,
+    DiscreteDomain) {
 
   "use strict";
   
@@ -37,6 +40,7 @@ define([
     "value":    Value,
     "element":  Element,
     "list":     List,
+    "refinement": Refinement,
     "simple":   Simple,
     "string":   String,
     "number":   Number,
@@ -44,6 +48,10 @@ define([
     "date":     Date,
     "complex":  Complex,
     "object":   Object,
-    "function": Function
+    "function": Function,
+
+    "facets": {
+      "DiscreteDomain": DiscreteDomain
+    }
   };
 });

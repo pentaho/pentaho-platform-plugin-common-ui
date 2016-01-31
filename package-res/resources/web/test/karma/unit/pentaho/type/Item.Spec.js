@@ -21,7 +21,7 @@ define([
 
   /*global describe:true, it:true, expect:true, beforeEach:true*/
 
-  describe("pentaho/type/Item -", function() {
+  describe("pentaho.type.Item -", function() {
     it("is a function", function() {
       expect(typeof Item).toBe("function");
     });
@@ -35,7 +35,7 @@ define([
       expect(Item.meta).toBe(Item.Meta.prototype);
     });
 
-    describe(".extend({...})", function() {
+    describe("extend({...}) -", function() {
       var Derived;
       beforeEach(function() {
         Derived = Item.extend();
@@ -61,7 +61,7 @@ define([
         expect(Derived.meta).toBe(Derived.Meta.prototype);
       });
 
-    }); // .extend({...})
+    }); // extend({...})
 
 
     describe("get/set meta of a derived class - ", function() {

@@ -16,9 +16,10 @@
 define([
   "module",
   "./Item",
+  "./valueHelper",
   "../i18n!types",
   "../util/error"
-], function(module, Item, bundle, error) {
+], function(module, Item, valueHelper, bundle, error) {
 
   "use strict";
 
@@ -26,12 +27,18 @@ define([
   // because it would get into trouble on the context getter, below...
   return function(theContext) {
 
+    // Late bound to break cyclic dependency.
+    // Resolved on first use, in pentaho.type.Value.refine.
+    var Refinement = null;
+
     /**
      * @name pentaho.type.Value.Meta
      * @class
      * @extends pentaho.type.Item.Meta
      *
-     * @classDesc The base _metadata_ class of value types.
+     * @classDesc The base type class of value types.
+     *
+     * For more information see {@link pentaho.type.Value}.
      */
 
     /**
@@ -105,6 +112,34 @@ define([
         return this === other || this.key === other.key;
       },
 
+      //region validation
+
+      /**
+       * Determines if this value is a **valid instance** of its type.
+       *
+       * This attribute calls [validate]{@link pentaho.type.Value#validate} and
+       * returns a boolean value indicating if it returned no errors.
+       *
+       * @type {boolean}
+       * @readonly
+       */
+      get isValid() {
+        return !this.validate();
+      },
+
+      /**
+       * Determines if this value is a **valid instance** of its type.
+       *
+       * @return {?Array.<!Error>} A non-empty array of `Error` or `null`.
+       *
+       * @see pentaho.type.Value#isValid
+       */
+      validate: function() {
+        return valueHelper.normalizeErrors(this.meta._validate(this));
+      },
+
+      //endregion
+
       meta: /** @lends pentaho.type.Value.Meta# */{
         // Note: constructor/_init only called on sub-classes of Value.Meta,
         // and not on Value.Meta itself.
@@ -121,24 +156,24 @@ define([
 
         //region list property
         /**
-         * Gets a value that indicates if a value is a list value,
-         * i.e. if it is or extends {@link pentaho.type.List}.
+         * Gets a value that indicates if a type is a list type.
          *
+         * @name list
+         * @memberOf pentaho.type.Value.Meta#
          * @type boolean
          * @readOnly
+         * @abstract
          */
-        get list() {
-          return false;
-        },
         //endregion
 
         //region context property
 
         // NOTE: any class extended from this one will return the same context...
+        //@override
         /**
          * Gets the context that defined this type class.
          * @type pentaho.type.IContext
-         * @override
+         * @readonly
          */
         get context() {
           // NOTE: PhantomJS does not like this variable to be named context...
@@ -184,11 +219,155 @@ define([
           return va === vb || (va == null && vb == null) ||
                  (va != null && vb != null &&
                   (va.constructor === vb.constructor) && va.equals(vb));
+        },
+
+        //region validation
+        /**
+         * Determines if a value is a **valid instance** of this type.
+         *
+         * This method calls [validate]{@link pentaho.type.Value.Meta#validate} and
+         * returns a boolean value indicating if it returned no errors.
+         *
+         * The `isValid` method can be seen as a stronger version
+         * of {@link pentaho.type.Value.Meta#is}.
+         *
+         * @param {any} value The value to validate.
+         *
+         * @return {boolean} `true` if the value is a valid instance of this type, `false` if not.
+         */
+        isValid: function(value) {
+          return !this.validate(value);
+        },
+
+        /**
+         * Determines if a value is a **valid instance** of this type.
+         *
+         * Validation of `value` proceeds as follows:
+         * 1. If it is {@link Nully}, an error is returned
+         * 2. If it does not satisfy [is]{@link pentaho.type.Value.Meta#is}, an error is returned
+         * 3. Validation is delegated to [validateInstance]{@link pentaho.type.Value.Meta#validateInstance}.
+         *
+         * Use this method when you know nothing about a value.
+         * Otherwise, if you know that a value is an instance of this type,
+         * you can call [validateInstance]{@link pentaho.type.Value.Meta#validateInstance} instead.
+         *
+         * @param {?any} value The value to validate.
+         *
+         * @return {?Array.<!Error>} A non-empty array of `Error` or `null`.
+         *
+         * @see pentaho.type.Value.Meta#isValid
+         */
+        validate: function(value) {
+          // 1. Is of type
+          if(value == null)
+            return [new Error(bundle.structured.errors.value.cannotBeNull)];
+
+          if(!this.is(value))
+            return [new Error(bundle.format(bundle.structured.errors.value.notOfType, [this.label]))];
+
+          // 2. Validate further, knowing it is an instance of.
+          return this.validateInstance(value);
+        },
+
+        /**
+         * Determines if a value,
+         * that _is an instance of this type_,
+         * is also a **valid instance** of this (and its) type.
+         *
+         * Thus, `this.is(value)` must be true.
+         *
+         * This method ensures that the value's actual type, `value.meta`,
+         * is called to validate it,
+         * whatever the relation that this type has with the actual type.
+         *
+         * When this type is not a base type of the value's actual type,
+         * this type's `_validate` method should also be called to validate it.
+         * This is the case with [refinement types]{@link pentaho.type.Refinement}.
+         *
+         * The default implementation calls `value.validate()`
+         * (which in turns calls [_validate]{@link pentaho.type.Value.Meta#_validate}).
+         *
+         * @param {!pentaho.type.Value} value The value to validate.
+         *
+         * @return {?Array.<!Error>} A non-empty array of `Error` or `null`.
+         *
+         * @overridable
+         *
+         * @see pentaho.type.Value#validate
+         * @see pentaho.type.Value.Meta#validate
+         * @see pentaho.type.Value.Meta#_validate
+         */
+        validateInstance: function(value) {
+          return value.validate();
+        },
+
+        /**
+         * Determines if a value,
+         * that _is an instance of this type_,
+         * is also a **valid instance** of _this_ type.
+         *
+         * Thus, `this.is(value)` must be true.
+         *
+         * The default implementation does nothing.
+         * Override to implement a type's specific validation logic.
+         *
+         * @param {!pentaho.type.Value} value The value to validate.
+         *
+         * @return {Nully|Error|Array.<!Error>} An `Error`, a non-empty array of `Error` or a `Nully` value.
+         *
+         * @protected
+         * @overridable
+         *
+         * @see pentaho.type.Value.Meta#validate
+         * @see pentaho.type.Value.Meta#validateInstance
+         */
+        _validate: function(value) {
         }
+        //endregion
+      }
+    }, /** @lends pentaho.type.Value */{
+
+      /**
+       * Creates a refinement type that refines this one.
+       *
+       * An error is thrown if `instSpec.meta` is not specified.
+       *
+       * An error is thrown if `instSpec` contains any property other than `meta`.
+       * The instance interface of refinement types is fixed.
+       *
+       * An error is thrown if `instSpec.meta.facets` specifies no refinement facet classes.
+       *
+       * @param {string} [name] A name of the refinement type used for debugging purposes.
+       * @param {Object} instSpec The refined type instance specification.
+       * The available attributes are those defined by the specified refinement facet classes.
+       *
+       * @return {Class.<pentaho.type.Refinement>} The refinement type's instance class.
+       *
+       * @see pentaho.type.Refinement.Meta#facets
+       * @see pentaho.type.Refinement.Meta#of
+       */
+      refine: function(name, instSpec) {
+
+        if(typeof name !== "string") {
+          instSpec = name;
+          name = null;
+        }
+
+        if(!instSpec) throw error.argRequired("instSpec");
+        if(!instSpec.meta) throw error.argRequired("instSpec.meta");
+
+        // Ugly but effective.
+        instSpec.meta.of = this.meta;
+
+        // Resolved on first use to break cyclic dependency.
+        if(!Refinement) {
+          Refinement = theContext.get("pentaho/type/refinement");
+        }
+
+        return Refinement.extend(name || "", instSpec);
       }
     },
-    /*classSpec:*/ null,
-    /*keyArgs:*/ {
+    /*keyArgs:*/{
       isRoot: true
     }).implement({
       meta: bundle.structured.value

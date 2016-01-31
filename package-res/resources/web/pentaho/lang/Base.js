@@ -216,7 +216,7 @@ define([
   // so the fixed `init` argument is actually required.
   function class_extend_createCtorInit(init) {
     return function() {
-      init.apply(this, arguments);
+      return init.apply(this, arguments);
     };
   }
 

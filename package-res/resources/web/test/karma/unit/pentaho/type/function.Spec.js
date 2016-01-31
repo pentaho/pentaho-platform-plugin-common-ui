@@ -14,54 +14,60 @@
  * limitations under the License.
  */
 define([
-    "pentaho/type/function",
-    "pentaho/type/Context",
-    "pentaho/i18n!/pentaho/type/i18n/types"
+  "pentaho/type/function",
+  "pentaho/type/Context",
+  "pentaho/i18n!/pentaho/type/i18n/types"
 ], function(functionFactory, Context, bundle) {
 
-    "use strict";
+  "use strict";
 
-    /*global describe:true, it:true, expect:true, beforeEach:true*/
+  /*global describe:true, it:true, expect:true, beforeEach:true*/
 
-    describe("pentaho/type/function -", function() {
-        it("is a function", function() {
-            expect(typeof functionFactory).toBe("function");
-        });
+  describe("pentaho.type.Function -", function() {
+    it("is a function", function() {
+      expect(typeof functionFactory).toBe("function");
+    });
 
-        describe("new function()", function() {
-            var PentahoFunction;
-            var testFunc;
-            beforeEach(function () {
-                PentahoFunction = functionFactory(new Context());
-                testFunc = new PentahoFunction(function(){});
-            });
-            it("should be a function", function () {
-                expect(typeof PentahoFunction).toBe("function");
-            });
-            it("should be a function", function () {
-                expect(typeof testFunc.value).toBe("function");
-            });
-            it("should return an object", function () {
-                expect(typeof testFunc).toBe("object");
-            });
-            it("should accept a function value as a string as an object", function () {
-                var identity = function(v) { return v; };
-                var test = new PentahoFunction(identity.toString());
-                var identity2 = test.value;
-                expect(typeof identity2).toBe("function");
-                var uniqueValue = {};
-                expect(identity2(uniqueValue)).toBe(uniqueValue);
-            });
-            it("should not accept null", function () {
-                expect(function () {
-                    new PentahoFunction(null)
-                }).toThrowError(bundle.structured.errors.value.isNull);
-            });
-            it("should not accept undefined", function () {
-                expect(function () {
-                    new PentahoFunction(undefined)
-                }).toThrowError(bundle.structured.errors.value.isNull);
-            });
-        });
-    }); // pentaho/type/function
+    describe("new Function()", function() {
+      var PentahoFunction, testFunc;
+
+      beforeEach(function() {
+        PentahoFunction = functionFactory(new Context());
+        testFunc = new PentahoFunction(function() {});
+      });
+
+      it("should be a function", function() {
+        expect(typeof PentahoFunction).toBe("function");
+      });
+
+      it("should be a function", function() {
+        expect(typeof testFunc.value).toBe("function");
+      });
+
+      it("should return an object", function() {
+        expect(typeof testFunc).toBe("object");
+      });
+
+      it("should accept a function value as a string as an object", function() {
+        var identity = function(v) { return v; };
+        var test = new PentahoFunction(identity.toString());
+        var identity2 = test.value;
+        expect(typeof identity2).toBe("function");
+        var uniqueValue = {};
+        expect(identity2(uniqueValue)).toBe(uniqueValue);
+      });
+
+      it("should not accept null", function() {
+        expect(function() {
+          new PentahoFunction(null);
+        }).toThrowError(bundle.structured.errors.value.isNull);
+      });
+
+      it("should not accept undefined", function() {
+        expect(function() {
+          new PentahoFunction(undefined);
+        }).toThrowError(bundle.structured.errors.value.isNull);
+      });
+    });
+  }); // pentaho.type.Function
 });

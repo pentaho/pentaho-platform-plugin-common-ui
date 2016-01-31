@@ -31,46 +31,32 @@ define([
   var List = context.get(listFactory);
   var Number = context.get(numberFactory);
 
-  describe("pentaho/type/list - Validation -", function() {
+  describe("pentaho.type.List.Meta -", function() {
     var NumberList = List.extend({
       meta: {of: Number}
     });
 
-    var list;
+    describe("#validate(value) -", function() {
+      it("should call validateInstance(.) of the list element type with each of its members", function() {
+        spyOn(Number.meta, "validateInstance");
 
-    beforeEach(function() {
-      list = new NumberList([1, 2, 3]);
-    });
+        var list = new NumberList([1, 2, 3]);
 
-    describe("this.validate()", function() {
-      it("should return null", function() {
-        expect(list.validate()).toBe(null);
+        list.meta.validate(list);
+
+        expect(Number.meta.validateInstance).toHaveBeenCalledWith(list.at(0));
+        expect(Number.meta.validateInstance).toHaveBeenCalledWith(list.at(1));
+        expect(Number.meta.validateInstance).toHaveBeenCalledWith(list.at(2));
       });
 
-      it("should call validate of its members", function() {
-        var v0 = list.at(0);
-        spyOn(v0, "validate");
-        var v1 = list.at(1);
-        spyOn(v1, "validate");
-        var v2 = list.at(2);
-        spyOn(v2, "validate");
-
-        list.validate();
-
-        expect(v0.validate).toHaveBeenCalled();
-        expect(v1.validate).toHaveBeenCalled();
-        expect(v2.validate).toHaveBeenCalled();
-      });
-    });// end #validate
-
-    describe("List.validate(value)", function() {
       it("should return errors when given an invalid `Value`", function() {
         expect(List.meta.validate(new Value())).not.toBe(null);
       });
 
-      it("should return `null` when given a subclass", function() {
+      it("should return `null` when given a valid instance of a subtype", function() {
+        expect(List.meta.validate(new List())).toBe(null);
         expect(List.meta.validate(new NumberList())).toBe(null);
       });
-    });// end #validate
+    });// end #validate(value)
   });
 });

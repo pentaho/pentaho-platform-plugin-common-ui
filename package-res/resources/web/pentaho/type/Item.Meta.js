@@ -301,11 +301,15 @@ define([
 
     set description(value) {
       if(value === undefined) {
-        if(this !== _itemMeta) {
-          delete this._description;
-        }
+        this._resetDescription();
       } else {
         this._description = nonEmptyString(value);
+      }
+    },
+
+    _resetDescription: function() {
+      if(this !== _itemMeta) {
+        delete this._description;
       }
     },
     //endregion
@@ -323,11 +327,15 @@ define([
 
     set category(value) {
       if(value === undefined) {
-        if(this !== _itemMeta) {
-          delete this._category;
-        }
+        this._resetCategory();
       } else {
         this._category = nonEmptyString(value);
+      }
+    },
+
+    _resetCategory: function() {
+      if(this !== _itemMeta) {
+        delete this._category;
       }
     },
     //endregion
@@ -345,11 +353,15 @@ define([
 
     set helpUrl(value) {
       if(value === undefined) {
-        if(this !== _itemMeta) {
-          delete this._helpUrl;
-        }
+        this._resetHelpUrl();
       } else {
         this._helpUrl = nonEmptyString(value);
+      }
+    },
+
+    _resetHelpUrl: function() {
+      if(this !== _itemMeta) {
+        delete this._helpUrl;
       }
     },
     //endregion
@@ -367,11 +379,15 @@ define([
 
     set browsable(value) {
       if(value == null) {
-        if(this !== _itemMeta) {
-          delete this._browsable;
-        }
+        this._resetBrowsable();
       } else {
         this._browsable = !!value;
+      }
+    },
+
+    _resetBrowsable: function() {
+      if(this !== _itemMeta) {
+        delete this._browsable;
       }
     },
     //endregion
@@ -388,11 +404,15 @@ define([
 
     set advanced(value) {
       if(value == null) {
-        if(this !== _itemMeta) {
-          delete this._advanced;
-        }
+        this._resetAdvanced();
       } else {
         this._advanced = !!value;
+      }
+    },
+
+    _resetAdvanced: function() {
+      if(this !== _itemMeta) {
+        delete this._advanced;
       }
     },
     //endregion
@@ -412,6 +432,17 @@ define([
       // undefined or "" -> null conversion
       this._styleClass = nonEmptyString(value);
     },
+
+    // TODO: implement inheritedStyleClasses
+    /**
+     * Gets the style classes of this and any base types.
+     *
+     * @type string[]
+     * @readonly
+     */
+    get inheritedStyleClasses() {
+      throw error.notImplemented("Implement me!");
+    },
     //endregion
 
     //region ordinal property
@@ -425,11 +456,15 @@ define([
 
     set ordinal(value) {
       if(value == null) {
-        if(this !== _itemMeta) {
-          delete this._ordinal;
-        }
+        this._resetOrdinal();
       } else {
         this._ordinal = Math.floor((+value) || 0);
+      }
+    },
+
+    _resetOrdinal: function() {
+      if(this !== _itemMeta) {
+        delete this._ordinal;
       }
     },
     //endregion
@@ -459,7 +494,7 @@ define([
     * the class or factory of the view.
     * It will normally be a function, but this is not ensured.
     *
-    * @type string | Class | any
+    * @type string | function | object
     * @readOnly
     * @see pentaho.type.Item.Meta#viewClass
     */
@@ -469,9 +504,7 @@ define([
 
     set view(value) {
       if(value === undefined) {
-        if(this !== _itemMeta) {
-          delete this._view;
-        }
+        this._resetView();
       } else if(!value) { // null || ""
         this._view = null;
       } else  if(typeof value === "string") {
@@ -487,41 +520,22 @@ define([
       }
     },
 
+    _resetView: function() {
+      if(this !== _itemMeta) {
+        delete this._view;
+      }
+    },
+
     /**
      * Gets a promise for the default view class, or `null` if no view is defined.
      *
-     * @type ?Promise.<!Class|!any>
+     * @type ?Promise.<!(function|object)>
      * @readOnly
      * @see pentaho.type.Item.Meta#view
      */
     get viewClass() {
       var view = this._view;
       return view && (view.promise || (view.promise = promise.require([view.value])));
-    },
-    //endregion
-
-    //region validation
-    // Returns array of non-empty Error objects or null.
-    /**
-     * Performs validation on a given value and
-     * returns a non-empty array of `Error` objects or `null`.
-     *
-     * If a {@link nully} value is specified, `null` is returned.
-     *
-     * @param {pentaho.type.Value|nully} value The value to validate.
-     * @return {?Array.<!Error>} An array of `Error` or `null`.
-     */
-    validate: function(value) {
-      if(value == null) return null;
-
-      if(!this.is(value)) {
-        return [
-          new Error(bundle.format(bundle.structured.errors.value.notOfType, [this.label]))
-        ];
-      }
-
-      var error = value.validate();
-      return !error ? null : Array.isArray(error) ? error : [error];
     },
     //endregion
 
@@ -549,6 +563,9 @@ define([
 
       return subMeta;
     },
+
+    // TODO: Now that Property instances are never created,
+    //   only types with constructors get created.
 
     /**
      * Creates an instance of this type.
@@ -589,9 +606,11 @@ define([
     to: function(value) {
       return value == null   ? null  :
              this.is(value)  ? value :
+             // Am a (normal) constructor type or a prototype-only type?
+             // TODO: Context can only handle constructor types and does: new Type( ... )
+             this.constructor.prototype === this ? this.context.create(value, this, this) :
              this.create(value);
     }
-
   }, /** @lends pentaho.type.Item.Meta */{
 
     /**
@@ -608,17 +627,25 @@ define([
      * @readonly
      */
 
+    //@override
     /**
-     * @override
      * @ignore
      */
     _subClassed: function(SubMeta, instSpec, classSpec, keyArgs) {
+      var SubMesa = keyArgs.mesa.constructor;
 
-      SubMeta._initMesa(keyArgs.mesa.constructor, instSpec, keyArgs);
+      // Links SubMeta and SubMesa and "implements" instSpec.
+      SubMeta._initMesa(SubMesa, instSpec, keyArgs);
 
+      // Implement the given static interface.
       if(classSpec) SubMeta.implementStatic(classSpec);
     },
 
+    // Links Meta (this) and the given Mesa together and
+    //  applies the Meta constructor to its own prototype, as a way to initialize it.
+    // The constructor receives `instSpec` and ends up extending the prototype with it.
+    // The static interface is not touched.
+    //
     // NOTE: optionally receiving `keyArgs` as an optimization.
     // `_subClassed` is given a _derived_ `keyArgs`
     // that can/should be passed to `this`(constructor).

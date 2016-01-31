@@ -14,70 +14,83 @@
  * limitations under the License.
  */
 define([
-    "pentaho/type/string",
-    "pentaho/type/Context",
-    "pentaho/i18n!/pentaho/type/i18n/types"
+  "pentaho/type/string",
+  "pentaho/type/Context",
+  "pentaho/i18n!/pentaho/type/i18n/types"
 ], function(stringFactory, Context, bundle) {
 
-    "use strict";
+  "use strict";
 
-    /*global describe:true, it:true, expect:true, beforeEach:true*/
+  /*global describe:true, it:true, expect:true, beforeEach:true*/
 
-    describe("pentaho/type/string -", function() {
-        it("is a function", function() {
-            expect(typeof stringFactory).toBe("function");
-        });
+  describe("pentaho.type.String -", function() {
+    it("is a function", function() {
+      expect(typeof stringFactory).toBe("function");
+    });
 
-        describe("new string()", function() {
-            var PentahoString;
-            beforeEach(function () {
-                PentahoString = stringFactory(new Context());
-            });
-            it("should be a function", function () {
-                expect(typeof PentahoString).toBe("function");
-            });
-            it("should return an object", function () {
-                expect(typeof new PentahoString("string")).toBe("object");
-            });
-            it("should accept 1 as '1'", function () {
-                expect(new PentahoString(1).value).toBe('1');
-            });
-            it("should accept '1' as '1'", function () {
-                expect(new PentahoString('1').value).toBe('1');
-            });
-            it("should accept true as 'true'", function () {
-                expect(new PentahoString(true).value).toBe('true');
-            });
-            it("should accept 'true' as 'true'", function () {
-                expect(new PentahoString('true').value).toBe('true');
-            });
-            it("should accept empty string as ''", function () {
-                expect(new PentahoString('').value).toBe('');
-            });
-            it("should accept empty array as ''", function () {
-                expect(new PentahoString([]).value).toBe('');
-            });
-            it("should not accept empty object literal", function () {
-                expect(function () {
-                    new PentahoString({}).value
-                }).toThrowError(bundle.structured.errors.value.isNull);
-            });
-            it("should accept the toString of an object", function () {
-                var obj = {toString: function() { return "FOO"; }};
-                // needs to be specified in a cell wrapper... or taken as a spec.
-                var penString = new PentahoString({v: obj});
-                expect(penString.value).toBe("FOO");
-            });
-            it("should not accept null", function () {
-                expect(function () {
-                    new PentahoString(null)
-                }).toThrowError(bundle.structured.errors.value.isNull);
-            });
-            it("should not accept undefined", function () {
-                expect(function () {
-                    new PentahoString(undefined)
-                }).toThrowError(bundle.structured.errors.value.isNull);
-            });
-        });
-    }); // pentaho/type/string
+    describe("new String() -", function() {
+      var PentahoString;
+
+      beforeEach(function() {
+        PentahoString = stringFactory(new Context());
+      });
+
+      it("should be a function", function() {
+        expect(typeof PentahoString).toBe("function");
+      });
+
+      it("should return an object", function() {
+        expect(typeof new PentahoString("string")).toBe("object");
+      });
+
+      it("should accept 1 as '1'", function() {
+        expect(new PentahoString(1).value).toBe('1');
+      });
+
+      it("should accept '1' as '1'", function() {
+        expect(new PentahoString('1').value).toBe('1');
+      });
+
+      it("should accept true as 'true'", function() {
+        expect(new PentahoString(true).value).toBe('true');
+      });
+
+      it("should accept 'true' as 'true'", function() {
+        expect(new PentahoString('true').value).toBe('true');
+      });
+
+      it("should accept empty string as ''", function() {
+        expect(new PentahoString('').value).toBe('');
+      });
+
+      it("should accept empty array as ''", function() {
+        expect(new PentahoString([]).value).toBe('');
+      });
+
+      it("should not accept empty object literal", function() {
+        expect(function() {
+          new PentahoString({}).value;
+        }).toThrowError(bundle.structured.errors.value.isNull);
+      });
+
+      it("should accept the toString of an object", function() {
+        var obj = {toString: function() { return "FOO"; }};
+        // needs to be specified in a cell wrapper... or taken as a spec.
+        var penString = new PentahoString({v: obj});
+        expect(penString.value).toBe("FOO");
+      });
+
+      it("should not accept null", function() {
+        expect(function() {
+          new PentahoString(null);
+        }).toThrowError(bundle.structured.errors.value.isNull);
+      });
+
+      it("should not accept undefined", function() {
+        expect(function() {
+          new PentahoString(undefined);
+        }).toThrowError(bundle.structured.errors.value.isNull);
+      });
+    });
+  }); // pentaho.type.String
 });
