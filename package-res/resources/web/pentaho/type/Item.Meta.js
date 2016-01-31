@@ -36,13 +36,25 @@ define([
    * @class
    * @abstract
    *
-   * @classDesc The base abstract _metadata_ class of _items_, whatever their context.
+   * @classDesc The base class for _metadata_ in the Pentaho Client Metadata Model.
    *
-   * _Meta_ classes do not create instances. Instead, their constructor is used to:
-   * 1. initialize _prototype_ instances
+   * The classes that descend from {@link pentaho.type.Item} also inherit its metadata.
+   * To acomplish this, the metadata of a given type is a singleton object that is
+   * referenced on all instances of the given type.
+   *
+   * Creating a subclass `Foo` of {@link pentaho.type.Item} implicitly generates the corresponding
+   * metadata class, placing a reference to it in the static member `Foo.Meta`.
+   * Therefore, in the regular workflow of this type system, the developer should not feel the need
+   * for creating _Meta_ subclasses.
+   *
+   * The `pentaho.type.Item` and `pentaho.type.Item.Meta` classes are closely bound and
+   * must naturally reference each other.
+   * The property {@link pentaho.type.Item.Meta#mesa} points to the prototype of the class this _Meta_ class refers to.
+   * Similarly, the property {@link pentaho.type.Item#meta} points to the singleton of its _Meta_ class.
+   *
+   * Note that _Meta_ classes do not create instances. Instead, their constructor is used to:
+   * 1. initialize _prototype_ instances (metadata singletons)
    * 2. hold static members.
-   *
-   * The _mesadata_ (prototype) of this class can be accessed through {@link pentaho.type.Item.Meta#mesa}.
    *
    * @description Initializes an item metadata instance.
    */
@@ -117,7 +129,7 @@ define([
     //region proto property
     // Set on `Item._extend`
     /**
-     * Gets the closest _prototype_, possibly itself.
+     * Gets the type of the closest ancestor, possibly itself.
      *
      * @name proto
      * @memberOf pentaho.type.Item.Meta#
@@ -132,11 +144,16 @@ define([
     // `root` is generally set on direct sub-classes of Item.
     // Should be the first meaningful, non-abstract item class below `Item` along a given branch.
     /**
-     * Gets the root _prototype_ item.
+     * Gets the root type in this type hierarchy.
      *
-     * Generally, root item types are the immediate sub-types of _item_.
+     * Even though all item types derive from {@link pentaho.type.Item},
+     * the developer can mark a given node is the hierarchy as _root_,
+     * in the sense that it defines a chain of related classes with a similar
+     * behavior.
+     *
+     * Generally, root types are the immediate sub-types of {@link pentaho.type.Item}.
      * The mandatory rule is, however, that
-     * root item types are _meaningful_, concrete roots of a type tree.
+     * root types are _meaningful_, concrete roots of a type tree.
      *
      * For example, {@link pentaho.type.Value} is a root type,
      * because it is the root of the value types and there is a single tree of value types.
@@ -155,7 +172,7 @@ define([
      */
 
     /**
-     * Gets a value that indicates if the item is a tree root _prototype_.
+     * Gets a value that indicates if this type is the root of its type hierarchy.
      *
      * @type boolean
      * @readonly
@@ -167,7 +184,7 @@ define([
 
     //region ancestor property
     /**
-     * Gets the closest **ancestor** _prototype_ item of the current tree, if any, or `null`.
+     * Gets the type of the closest **ancestor** in the current type hierarchy, if any, or `null`.
      *
      * The root item returns `null`.
      *
@@ -185,7 +202,7 @@ define([
     //region mesa property
     // Set on `Item._extend`
     /**
-     * Gets the _mesadata_ _prototype_ of this item type.
+     * Gets the _prototype_ of the class that represents this type.
      *
      * @name mesa
      * @memberOf pentaho.type.Item.Meta#
@@ -203,11 +220,11 @@ define([
     _id: null,
 
     /**
-     * Gets the id of the item type.
+     * Gets the id of this type.
      *
-     * Can only be specified when extending an item type.
+     * Can only be specified when extending a type.
      *
-     * Only item types which have an associated AMD/RequireJS module have an id.
+     * The id only exists for types which have an associated AMD/RequireJS module.
      * However, note that all have a {@link pentaho.type.Item.Meta#uid}.
      *
      * This attribute is not inherited.
@@ -429,17 +446,18 @@ define([
    /**
     * Gets or sets the default view for items of this type.
     *
-    * When `undefined`, the view will be inherited from the ancestor type.
-    * When _falsy_ (like `null` or an empty string),
-    * the view will be cleared and not inherited.
+    * Setting to `undefined` causes the view to be inherited from the ancestor type.
+    * Setting to a _falsy_ value (like `null` or an empty string),
+    * clears the value of the property, ignoring any inherited value.
     *
-    * Otherwise, when a string, it is the id of the view's module.
-    * When the string starts with `/`, `xyz:` or ends with `.js`,
-    * the id is considered absolute.
-    * Otherwise, it is considered relative to the type's id folder.
+    * Setting to a string defines the id of the view's module.
+    * If the string starts with `/`, `xyz:` or ends with `.js`,
+    * the id is considered to be absolute,
+    * otherwise it is considered to be relative to the type's id folder.
     *
-    * Otherwise, it is considered to be the class or factory of the view.
-    * It'll normally be a function, but this is not ensured.
+    * Attempting to set to some other value is interpreted as the intention to set
+    * the class or factory of the view.
+    * It will normally be a function, but this is not ensured.
     *
     * @type string | Class | any
     * @readOnly
@@ -470,7 +488,7 @@ define([
     },
 
     /**
-     * Gets a promise for the default view class or `null` if no view is defined.
+     * Gets a promise for the default view class, or `null` if no view is defined.
      *
      * @type ?Promise.<!Class|!any>
      * @readOnly
@@ -533,7 +551,7 @@ define([
     },
 
     /**
-     * Creates a _mesa_ instance of this _prototype_.
+     * Creates an instance of this type.
      *
      * @param {...any} args The construction arguments.
      * @return {pentaho.type.Item} The created instance.
@@ -545,23 +563,22 @@ define([
     },
 
     /**
-     * Determines if a specified value is a _mesa_ instance of this _prototype_.
+     * Determines if a specified value is an instance of this type.
      *
      * @param {any} value The value to test.
-     * @return {boolean} `true` if if is an instance, `false` otherwise.
+     * @return {boolean} Returns `true` if the argument is an instance or `false` otherwise.
      */
     is: function(value) {
       return O_isProtoOf.call(this.mesa, value);
     },
 
     /**
-     * Converts a given value to a _mesa_ instance of this _prototype_,
+     * Converts a given value to an instance of this type,
      * if it is not one already.
      *
      * If a {@link Nully} value is specified, `null` is returned.
      *
-     * If a given value is not {@link Nully}
-     * and not already an instance of this _prototype_
+     * Otherwise, if a given value is not already an instance of this type
      * (checked using {@link pentaho.type.Item.Meta#is}),
      * this method delegates the creation of an instance to
      * {@link pentaho.type.Item.Meta#create}.
@@ -578,7 +595,8 @@ define([
   }, /** @lends pentaho.type.Item.Meta */{
 
     /**
-     * Gets the class of which this one is the metadata class.
+     * Gets the class used for _representing_ data of this type,
+     * i.e. the class that this metadata describes.
      *
      * If you're wondering were this name comes from,
      * "Mesa" is a Greek word which is opposite to "Meta".
