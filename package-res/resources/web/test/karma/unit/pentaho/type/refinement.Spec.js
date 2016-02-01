@@ -1406,12 +1406,30 @@ define([
 
       it("should allow defining a property of a refinement type", function() {
         Complex.extend({
-            meta: {
-              props: [
-                {name: "likes", type: PositiveNumber}
-              ]
-            }
-          });
+          meta: {
+            props: [
+              {name: "likes", type: PositiveNumber}
+            ]
+          }
+        });
+      });
+
+      it("should allow overriding a property with a refinement of the base type", function() {
+        var MyComplex = Complex.extend({
+          meta: {
+            props: [
+              {name: "likes", type: Number}
+            ]
+          }
+        });
+
+        MyComplex.extend({
+          meta: {
+            props: [
+              {name: "likes", type: PositiveNumber}
+            ]
+          }
+        });
       });
 
       it("should allow specifying the value of a property of a refinement type given the primitive value", function() {

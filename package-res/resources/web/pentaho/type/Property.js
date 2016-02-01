@@ -278,11 +278,11 @@ define([
             // Hierarchy/PreviousValue consistency
             // Validate that it is a sub-type of the base property's type.
             if(typeMeta !== baseMeta) {
-
-              if(!O_isProtoOf.call(baseMeta, typeMeta))
+              if(typeMeta.of !== baseMeta && !O_isProtoOf.call(baseMeta, typeMeta)) {
                 throw error.argInvalid(
                     "type",
                     "Sub-properties must have a 'type' that derives from their base property's 'type'.");
+              }
 
               this._typeMeta = typeMeta;
             }
