@@ -36,18 +36,22 @@ define([
      * @class
      * @extends pentaho.type.Item.Meta
      *
-     * @classDesc The base type class of value types.
+     * @classDesc The base type class of value types.</br>
+     * Value types can be singular or plural ({@link pentaho.type.Value.Meta#list|list}).</br>
+     * A Value type should not be instantiated if it is {@link pentaho.type.Value.Meta#abstract|abstract}.
      *
      * For more information see {@link pentaho.type.Value}.
      */
 
     /**
      * @name pentaho.type.Value
+     * @abstract
      * @class
      * @extends pentaho.type.Item
      * @amd pentaho/type/value
      *
-     * @classDesc
+     * @classDesc A Value is an abstract class used as a base implementation and unifying type. </br>
+     * A Value has a key that uniquely identifies the entity it represents.
      *
      * ### AMD
      *
@@ -56,7 +60,6 @@ define([
      * The AMD module returns the type's factory, a
      * {@link pentaho.type.Factory<pentaho.type.Value>}.
      *
-     * @description Creates a value instance.
      */
     var Value = Item.extend("pentaho.type.Value", /** @lends pentaho.type.Value# */{
 
@@ -64,6 +67,8 @@ define([
        * Gets the key of the value.
        *
        * The key of a value identifies it among values of the same concrete type.
+       *
+       * Two values of the same concrete type and with the same key represent the same entity.*
        *
        * If two values have the same concrete type and their
        * keys are equal, then it must also be the case that
@@ -84,15 +89,14 @@ define([
 
       /**
        * Creates a shallow clone of this value.
-       *
+       * @name pentaho.type.Value#clone
+       * @abstract
+       * @function
        * @return {!pentaho.type.Value} The value clone.
        */
-      clone: function() {
-        throw error.notImplemented();
-      },
 
       /**
-       * Determines if a given value, of the same type, is equal to this one.
+       * Determines if a given value, of the same type, represents the same entity.
        *
        * The given value **must** be of the same concrete type (or the result is undefined).
        *
@@ -138,8 +142,12 @@ define([
         return valueHelper.normalizeErrors(this.meta._validate(this));
       },
 
-      //endregion
-
+      /**
+       * Gets the type of this instance.
+       *
+       * @type pentaho.type.Value.Meta
+       * @readonly
+       */
       meta: /** @lends pentaho.type.Value.Meta# */{
         // Note: constructor/_init only called on sub-classes of Value.Meta,
         // and not on Value.Meta itself.
@@ -189,6 +197,12 @@ define([
         // @see Value.Meta#constructor.
         _abstract: true,
 
+        /**
+         * Gets or sets a value that indicates if this type is abstract.
+         *
+         * @type {boolean}
+         * @default false
+         */
         // TODO: Rhino probably gives a syntax error on this.
         // However, cannot use the `get "abstract"()` syntax cause then Phantom JS 1.9.8 starts failing
         get abstract() {
