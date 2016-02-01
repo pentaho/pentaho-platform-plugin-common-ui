@@ -17,11 +17,11 @@ define([
   "module",
   "./element",
   "./PropertyMetaCollection",
+  "./valueHelper",
   "../i18n!types",
   "../util/object",
-  "../util/error",
-  "../util/arg"
-], function(module, elemFactory, PropertyMetaCollection, bundle, O, error, arg) {
+  "../util/error"
+], function(module, elemFactory, PropertyMetaCollection, valueHelper, bundle, O, error) {
 
   "use strict";
 
@@ -42,7 +42,9 @@ define([
      * @class
      * @extends pentaho.type.Element.Meta
      *
-     * @classDesc The metadata class of {@link pentaho.type.Complex}.
+     * @classDesc The base type class of complex types.
+     *
+     * For more information see {@link pentaho.type.Complex}.
      */
 
     /**
@@ -415,30 +417,6 @@ define([
       //endregion
       //endregion
 
-      //region validation
-
-      /**
-       * Performs validation of this item.
-       *
-       * When invalid, returns either one `Error` or a non-empty array of `Error` objects.
-       * When valid, `null` is returned.
-       *
-       * @return {Error|Array.<!Error>|null} An `Error`, a non-empty array of `Error` or `null`.
-       */
-      validate: function() {
-        var errors = [];
-
-        this.meta.each(function(pMeta) {
-          var value = this._values[pMeta.name];
-
-          errors.push.apply(errors, pMeta.validate(value));
-        }, this);
-
-        return errors.length > 0 ? errors : null;
-      },
-
-      //endregion
-
       meta: /** @lends pentaho.type.Complex.Meta# */{
         id: module.id,
 
@@ -559,7 +537,42 @@ define([
           if(!Array.isArray(metaSpec)) metaSpec = [metaSpec];
           this._getProps().configure(metaSpec);
           return this;
+        },
+
+        //region validation
+        // @override
+        /**
+         * Determines if a complex value,
+         * that _is an instance of this type_,
+         * is also a **valid instance** of _this_ type.
+         *
+         * Thus, `this.is(value)` must be true.
+         *
+         * The default implementation
+         * validates each property's value against
+         * the property's [type]{@link pentaho.type.Property.Meta#type}
+         * and collects and returns any reported errors.
+         *
+         * @param {!pentaho.type.Complex} value The complex value to validate.
+         *
+         * @return {Nully|Error|Array.<!Error>} An `Error`, a non-empty array of `Error` or a `Nully` value.
+         *
+         * @protected
+         * @overridable
+         *
+         * @see pentaho.type.Value.Meta#validate
+         * @see pentaho.type.Value.Meta#validateInstance
+         */
+        _validate: function(value) {
+          var errors = null;
+
+          this.each(function(pMeta) {
+            errors = valueHelper.combineErrors(errors, pMeta.validate(value));
+          }, this);
+
+          return errors;
         }
+        //endregion
       }
     }).implement({
       meta: bundle.structured.complex

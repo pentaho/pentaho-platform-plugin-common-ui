@@ -31,7 +31,7 @@ define([
       String  = context.get("pentaho/type/string"),
       List    = context.get("pentaho/type/list");
 
-  describe("pentaho/type/complex -", function() {
+  describe("pentaho.type.Complex -", function() {
     describe("anatomy -", function() {
       it("is a function", function() {
         expect(typeof Complex).toBe("function");
@@ -994,5 +994,5 @@ define([
       });
 
     });
-  }); // pentaho/type/complex
+  }); // pentaho.type.Complex
 });

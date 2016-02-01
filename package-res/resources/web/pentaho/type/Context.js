@@ -31,7 +31,9 @@ define([
 
   var _nextUid = 1,
 
-      _baseMid = module.id.replace(/Context$/, ""),// e.g.: "pentaho/type/"
+      _baseMid = module.id.replace(/Context$/, ""), // e.g.: "pentaho/type/"
+
+      _baseFacetsMid = _baseMid + "facets/",
 
       // Default type, in a type specification.
       _defaultTypeMid = "string",
@@ -45,7 +47,10 @@ define([
       Item = standard.Item;
 
   Object.keys(standard).forEach(function(name) {
-    _standardTypeMids[_baseMid + name] = 1;
+    if(name !== "facets") _standardTypeMids[_baseMid + name] = 1;
+  });
+  Object.keys(standard.facets).forEach(function(name) {
+    _standardTypeMids[_baseFacetsMid + name] = 1;
   });
 
   /**
@@ -127,16 +132,16 @@ define([
           .then(function(factories) {
             return Promise.all(factories.map(me.getAsync, me));
           })
-          .then(function(Mesas) {
+          .then(function(InstCtors) {
             return predicate
-                ? Mesas.filter(function(Mesa) { return predicate(Mesa.meta); })
-                : Mesas;
+                ? InstCtors.filter(function(InstCtor) { return predicate(InstCtor.meta); })
+                : InstCtors;
           });
     },
 
     //region Value creation
     /*
-     * typeReference = "typeId" | ITypeSpec | typeFactory | Meta | Mesa ...
+     * typeReference = "typeId" | ITypeSpec | typeFactory | TypeCtor | InstCtor ...
      *
      * A. Value fragment specification with Inline Type Metadata
      *
@@ -201,6 +206,8 @@ define([
       var DefaultType = defaultType ? this.get(defaultType) : null;
       var BaseType    = baseType    ? this.get(baseType)    : null;
 
+      if(BaseType && BaseType.meta.is(valueSpec)) return valueSpec;
+
       // If it is a plain Object, does it have the inline, metadata property, "_"?
       var Type, inlineTypeMetadata;
       if(typeof valueSpec === "object" &&
@@ -257,7 +264,7 @@ define([
       var proto = fun.prototype;
 
       if(proto instanceof Item     ) return this._getByType(fun, sync);
-      if(proto instanceof Item.Meta) return this._getByType(fun.Mesa, sync);
+      if(proto instanceof Item.Meta) return this._getByType(proto.mesa.constructor, sync);
 
       // Assume it's a factory function.
       return this._getByFactory(fun, sync);
@@ -313,7 +320,7 @@ define([
     _getByObjectSpec: function(typeSpec, sync) {
 
       if(typeSpec instanceof Item     ) return this._getByType(typeSpec.constructor, sync);
-      if(typeSpec instanceof Item.Meta) return this._getByType(typeSpec.constructor.Mesa, sync);
+      if(typeSpec instanceof Item.Meta) return this._getByType(typeSpec.mesa.constructor, sync);
 
       var baseTypeSpec = typeSpec.base || _defaultBaseTypeMid,
           resolveSync = (function() {
@@ -414,14 +421,35 @@ define([
         return;
 
       case "object":
-        // Properties only: [string||{}, ...] or
-        // Inline type spec: {[base: "complex", ] ... }
-        if(Array.isArray(typeSpec)) typeSpec = {props: typeSpec};
+        if(Array.isArray(typeSpec)) {
+          // Shorthand list type notation
+          // Example: [{props: { ...}}]
+          if(typeSpec.length)
+            collectTypeIdsRecursive(typeSpec[0], outIds);
+          return;
+        }
 
+        // TODO: this method only supports standard types deserialization.
+        //   Custom types with own type attributes would need special handling.
+        //   Something like a two phase protocol?
+
+        // {[base: "complex", ] [of: "..."] , [props: []]}
         collectTypeIdsRecursive(typeSpec.base, outIds);
+
+        collectTypeIdsRecursive(typeSpec.of, outIds);
 
         if(typeSpec.props) typeSpec.props.forEach(function(propSpec) {
           collectTypeIdsRecursive(propSpec && propSpec.type, outIds);
+        });
+
+        // These are not ids of types but only of mixin AMD modules.
+        if(typeSpec.facets) typeSpec.facets.forEach(function(facetIdOrClass) {
+          if(typeof facetIdOrClass === "string") {
+            if(facetIdOrClass.indexOf("/") < 0)
+              facetIdOrClass = _baseFacetsMid + facetIdOrClass;
+
+            collectTypeIdsRecursive(facetIdOrClass, outIds);
+          }
         });
         return;
     }

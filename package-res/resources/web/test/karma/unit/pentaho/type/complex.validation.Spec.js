@@ -15,67 +15,49 @@
  */
 define([
   "pentaho/type/Context",
-  "pentaho/type/Property",
-  "pentaho/type/PropertyMetaCollection",
-  "pentaho/util/error"
-], function(Context) {
+  "pentaho/util/error",
+  "pentaho/i18n!/pentaho/type/i18n/types"
+], function(Context, error, bundle) {
 
   "use strict";
 
   /*global describe:false, it:false, expect:false, beforeEach:false, spyOn:false*/
 
   var context = new Context();
-  var Value = context.get("pentaho/type/value");
   var Complex = context.get("pentaho/type/complex");
 
-  describe("pentaho/type/complex - Validation -", function() {
-    var Derived;
+  describe("pentaho.type.Complex.Meta -", function() {
 
-    beforeEach(function() {
-      Derived = Complex.extend({
-        meta: {
-          label: "Derived",
-          props: [
-            "x",
-            "y",
-            "z"
-          ]
-        }
-      });
-    });
+    describe("#validate(value) -", function() {
+      it("should call each property's validate with the owner complex", function() {
+        var Derived = Complex.extend({
+          meta: {
+            props: [
+              {name: "x", type: "number" },
+              {name: "y", type: "string" },
+              {name: "z", type: "boolean"}
+            ]
+          }
+        });
 
-    describe("this.validate()", function() {
-      it("should return null", function() {
-        var derived = new Derived();
-        expect(derived.validate()).toBe(null);
-      });
+        var derived = new Derived({x: 5, y: "a", z: true});
 
-      it("should call validate of its instanciated properties", function() {
-        var derived = new Derived({x: 5, y: 2, z: 4});
+        var xPropMeta = derived.meta.get("x");
+        var yPropMeta = derived.meta.get("y");
+        var zPropMeta = derived.meta.get("z");
 
-        var x = derived.get("x");
-        spyOn(x, "validate");
-        var y = derived.get("y");
-        spyOn(y, "validate");
-        var z = derived.get("z");
-        spyOn(z, "validate");
+        spyOn(xPropMeta, "validate");
+        spyOn(yPropMeta, "validate");
+        spyOn(zPropMeta, "validate");
 
-        derived.validate();
+        Derived.meta.validate(derived);
 
-        expect(x.validate).toHaveBeenCalled();
-        expect(y.validate).toHaveBeenCalled();
-        expect(z.validate).toHaveBeenCalled();
-      });
-    });// end #validate
-
-    describe("Complex.validate(value)", function() {
-      it("should return errors when given an invalid `Value`", function() {
-        expect(Complex.meta.validate(new Value())).not.toBe(null);
+        expect(xPropMeta.validate).toHaveBeenCalledWith(derived);
+        expect(yPropMeta.validate).toHaveBeenCalledWith(derived);
+        expect(zPropMeta.validate).toHaveBeenCalledWith(derived);
       });
 
-      it("should return `null` when given a subclass", function() {
-        expect(Complex.meta.validate(new Derived())).toBe(null);
-      });
-    });// end #validate
-  }); // pentaho/type/complex
+    });// end #validate(value)
+
+  }); // pentaho.type.Complex.Meta
 });

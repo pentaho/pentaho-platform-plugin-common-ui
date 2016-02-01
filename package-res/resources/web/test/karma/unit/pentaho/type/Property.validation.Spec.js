@@ -25,10 +25,9 @@ define([
   /*global describe:false, it:false, expect:false, beforeEach:false, spyOn:false*/
 
   var context = new Context();
-  var Value = context.get("pentaho/type/value");
   var Complex = context.get("pentaho/type/complex");
 
-  describe("pentaho/type/Property - Validation -", function() {
+  describe("pentaho.type.Property.Meta -", function() {
     var Derived;
 
     beforeEach(function() {
@@ -44,17 +43,17 @@ define([
       });
     });
 
-    describe("this.validate()", function() {
+    describe("#validate(owner) -", function() {
       it("should return null", function() {
         var derived = new Derived({x: "1", y: ["1", "2", "3"], z: ["1", "2"]});
-        expect(derived.validate()).toBe(null);
+        expect(Derived.meta.validate(derived)).toBe(null);
       });
 
       it("should return three errors", function() {
         var derived = new Derived({y: ["1"], z: ["1", "2", "3"]});
 
-        expect(derived.validate().length).toBe(3);
+        expect(Derived.meta.validate(derived).length).toBe(3);
       });
-    });// end #validate
-  }); // pentaho/type/complex
+    });// end #validate(owner)
+  }); // pentaho.type.Property.Meta
 });

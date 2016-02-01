@@ -25,8 +25,7 @@ define([
 
   return function(context) {
 
-    var Element = context.get(elemFactory),
-        _simpleMeta = null;
+    var Element = context.get(elemFactory);
 
     /**
      * @name pentaho.type.Simple.Meta
@@ -203,14 +202,6 @@ define([
         "abstract": true,
         styleClass: "pentaho-type-simple",
 
-        _postInit: function() {
-
-          this.base.apply(this, arguments);
-
-          // Force domain inheritance
-          if(!O.hasOwn(this, "_domain")) this.domain = null;
-        },
-
         //region cast method
         // Configurable in a special way.
         // Setting always sets the core.
@@ -243,76 +234,12 @@ define([
           this._cast = _ || castCore;
         },
 
-        _cast: castCore,
-        //endregion
-
-        //region domain
-
-        // TODO: Also defines the default natural ordering of the values?
-        // When inherited, specified values must be a subset of those in the base class.
-        // Although they can be in a different order...?
-        _domain: null,
-
-        /**
-         * Gets or sets the fixed domain of the type, if any, or `null`.
-         *
-         * The domain attribute restricts a type
-         * to a set of discrete values of the ancestor type.
-         *
-         * If the ancestor type also has `domain` set,
-         * the specified set of values must be a subset of those,
-         * or an error is thrown.
-         *
-         * Setting to a {@link Nully} value or to an empty array,
-         * clears the local value and inherits the ancestor's domain.
-         *
-         * NOTE: This attribute can only be used successfully on
-         *  a type that has a non-abstract base type.
-         *
-         * @type {?pentaho.type.List}
-         */
-        get domain() {
-          return this._domain;
-        },
-
-        _getListOfType: function() {
-          return this.context.get([this]);
-        },
-
-        set domain(value) {
-          if(this === _simpleMeta) throw error.operInvalid("Cannot change root domain.");
-
-          var baseDomain = Object.getPrototypeOf(this)._domain;
-
-          // A list of this element's type...
-          var ListType = this._getListOfType();
-
-          if(value == null || !value.length) {
-            // Downcasts each base element to this type.
-            this._domain = baseDomain && new ListType(baseDomain);
-          } else {
-            // Convert value to ListType
-            var localDomain = new ListType(value);
-
-            if(baseDomain) {
-              var i = localDomain.count;
-
-              // Validate that all elements exist in the base domain
-              while(i--)
-                if(!baseDomain.has(localDomain.at(i).key))
-                  throw error.argInvalid("domain", bundle.structured.errors.type.domainIsNotSubsetOfBase);
-            }
-
-            this._domain = localDomain;
-          }
-        }
+        _cast: castCore
         //endregion
       }
     }).implement({
       meta: bundle.structured.simple
     });
-
-    _simpleMeta = Simple.meta;
 
     return Simple;
 

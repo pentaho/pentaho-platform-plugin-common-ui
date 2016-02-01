@@ -23,7 +23,7 @@ define([
 
   /*global describe:true, it:true, expect:true, beforeEach:true*/
 
-  describe("pentaho/type/Context -", function() {
+  describe("pentaho.type.Context -", function() {
 
     it("is a function", function() {
       expect(typeof Context).toBe("function");
@@ -40,15 +40,22 @@ define([
       it("should return a type metadata given any of the yet unloaded standard primitive types", function() {
         var context  = new Context();
 
-        expect(context.get("pentaho/type/value"   ).meta.id).toBe("pentaho/type/value"   );
-        expect(context.get("pentaho/type/simple"  ).meta.id).toBe("pentaho/type/simple"  );
-        expect(context.get("pentaho/type/complex" ).meta.id).toBe("pentaho/type/complex" );
-        expect(context.get("pentaho/type/string"  ).meta.id).toBe("pentaho/type/string"  );
-        expect(context.get("pentaho/type/boolean" ).meta.id).toBe("pentaho/type/boolean" );
-        expect(context.get("pentaho/type/number"  ).meta.id).toBe("pentaho/type/number"  );
-        expect(context.get("pentaho/type/date"    ).meta.id).toBe("pentaho/type/date"    );
-        expect(context.get("pentaho/type/object"  ).meta.id).toBe("pentaho/type/object"  );
-        expect(context.get("pentaho/type/function").meta.id).toBe("pentaho/type/function");
+        [
+          "pentaho/type/value",
+          "pentaho/type/simple",
+          "pentaho/type/complex",
+          "pentaho/type/string",
+          "pentaho/type/boolean",
+          "pentaho/type/number",
+          "pentaho/type/date",
+          "pentaho/type/object",
+          "pentaho/type/function",
+          "pentaho/type/refinement"
+        ].forEach(function(mid) {
+          expect(context.get(mid).meta.id).toBe(mid);
+        });
+
+        require("pentaho/type/facets/DiscreteDomain");
       });
 
       it("should be able to create a list type using the shorthand list-type notation", function() {
@@ -133,10 +140,10 @@ define([
 
         context
             .getAllAsync()
-            .then(function(Mesas) {
-              expect(Mesas instanceof Array).toBe(true);
-              expect(Mesas.length).toBe(1);
-              expect(Mesas[0].meta.id).toBe("exp/dude");
+            .then(function(InstCtors) {
+              expect(InstCtors instanceof Array).toBe(true);
+              expect(InstCtors.length).toBe(1);
+              expect(InstCtors[0].meta.id).toBe("exp/dude");
               done();
             }, done.fail);
       });
@@ -146,9 +153,9 @@ define([
 
         context
             .getAllAsync("abcdefgh")
-            .then(function(Mesas) {
-              expect(Mesas instanceof Array).toBe(true);
-              expect(Mesas.length).toBe(0);
+            .then(function(InstCtors) {
+              expect(InstCtors instanceof Array).toBe(true);
+              expect(InstCtors.length).toBe(0);
               done();
             }, done.fail);
       });
@@ -158,11 +165,11 @@ define([
 
         context
           .getAllAsync("exp/thing")
-          .then(function(Mesas) {
-            expect(Mesas instanceof Array).toBe(true);
-            expect(Mesas.length).toBe(2);
+          .then(function(InstCtors) {
+            expect(InstCtors instanceof Array).toBe(true);
+            expect(InstCtors.length).toBe(2);
 
-            var metaIds = Mesas.map(function(Meta) { return Meta.meta.id; });
+            var metaIds = InstCtors.map(function(InstCtor) { return InstCtor.meta.id; });
             var iFoo = metaIds.indexOf("exp/foo");
             var iBar = metaIds.indexOf("exp/bar");
             expect(iFoo).not.toBeLessThan(0);
@@ -326,5 +333,5 @@ define([
       });
 
     }); // #create
-  }); // pentaho/type/Context
+  }); // pentaho.type.Context
 });

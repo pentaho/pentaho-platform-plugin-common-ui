@@ -14,39 +14,29 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context",
-], function(Context) {
+  "pentaho/type/facets/Refinement",
+  "pentaho/util/error"
+], function(RefinementFacet, error) {
 
   "use strict";
 
   /*global describe:true, it:true, expect:true, beforeEach:true*/
 
-  var context = new Context(),
-      Value   = context.get("pentaho/type/value"),
-      Element = context.get("pentaho/type/element");
-
-  describe("pentaho.type.Element -", function() {
+  describe("pentaho.type.facets.RefinementFacet -", function() {
     it("should be a function", function() {
-      expect(typeof Element).toBe("function");
+      expect(typeof RefinementFacet).toBe("function");
     });
 
-    it("should be a sub-class of `Value`", function() {
-      expect(Element.prototype instanceof Value).toBe(true);
-    });
-
-    describe("Meta -", function() {
-      var ElemMeta = Element.Meta;
-
-      it("should be a function", function() {
-        expect(typeof ElemMeta).toBe("function");
+    describe("validate(value)", function() {
+      it("should be defined", function() {
+        expect(typeof RefinementFacet.validate).toBe("function");
       });
 
-      it("should be a sub-class of `Value.Meta`", function() {
-        expect(ElemMeta.prototype instanceof Value.Meta).toBe(true);
+      it("should throw when called", function() {
+        expect(function() {
+          RefinementFacet.validate({});
+        }).toThrowError(error.notImplemented().message);
       });
-
-      // TODO: format
-      // TODO: compare
     });
   });
 });

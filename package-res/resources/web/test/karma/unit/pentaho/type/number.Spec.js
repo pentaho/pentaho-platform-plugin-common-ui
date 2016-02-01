@@ -23,12 +23,12 @@ define([
 
   /*global describe:true, it:true, expect:true, beforeEach:true*/
 
-  describe("pentaho/type/number -", function () {
+  describe("pentaho.type.Number -", function () {
     it("is a function", function () {
       expect(typeof numberFactory).toBe("function");
     });
 
-    describe("new number()", function () {
+    describe("new Number()", function () {
       var PentahoNumber;
 
       beforeEach(function () {
@@ -57,5 +57,5 @@ define([
         }).toThrowError(bundle.format(bundle.structured.errors.value.cannotConvertToType, ['Number']));
       });
     });
-  }); // pentaho/type/number
+  }); // pentaho.type.Number
 });
