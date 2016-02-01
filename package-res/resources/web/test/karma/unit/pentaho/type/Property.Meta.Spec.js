@@ -135,7 +135,7 @@ define([
       //region Item.Meta Attributes
       // TODO: unify with value tests
       describe("label - ", function() {
-        it("should default to the pluralization of `name`", function() {
+        it("should default to the capitalization of `name`", function() {
           var propMeta = createRootPropMeta({name: "foo"});
           expect(propMeta.label).toBe("Foo");
         });
