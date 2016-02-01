@@ -16,30 +16,43 @@
 define([
   "pentaho/type/Context",
   "pentaho/type/list",
+  "pentaho/type/complex",
   "pentaho/type/value",
-  "pentaho/type/number",
   "pentaho/util/error",
   "pentaho/i18n!/pentaho/type/i18n/types"
-], function(Context, listFactory, valueFactory, numberFactory, error, bundle) {
-
+], function(Context, listFactory, complexFactory, valueFactory) {
   "use strict";
 
-  /*global describe:false, it:false, expect:false, beforeEach:false, spyOn:false*/
+  /* global describe:false, it:false, expect:false, beforeEach:false, spyOn:false */
 
   var context = new Context();
   var Value = context.get(valueFactory);
   var List = context.get(listFactory);
-  var Number = context.get(numberFactory);
+  var Complex = context.get(complexFactory);
 
   describe("pentaho/type/list - Validation -", function() {
-    var NumberList = List.extend({
-      meta: {of: Number}
+    var Derived = Complex.extend({
+      meta: {
+        label: "Derived",
+        props: [
+          {name: "x", type: "string", required: true},
+          {name: "y", type: ["string"], countMin: 2},
+          {name: "z", type: ["string"], countMin: 1, countMax: 2}
+        ]
+      }
+    });
+
+    var DerivedList = List.extend({
+      meta: {of: Derived}
     });
 
     var list;
 
     beforeEach(function() {
-      list = new NumberList([1, 2, 3]);
+      list = new DerivedList([
+        {x: "1", y: ["1", "2", "3"], z: ["1", "2"]},
+        {x: "1", y: ["1", "2", "3"], z: ["1", "2"]}
+      ]);
     });
 
     describe("this.validate()", function() {
@@ -52,14 +65,18 @@ define([
         spyOn(v0, "validate");
         var v1 = list.at(1);
         spyOn(v1, "validate");
-        var v2 = list.at(2);
-        spyOn(v2, "validate");
 
         list.validate();
 
         expect(v0.validate).toHaveBeenCalled();
         expect(v1.validate).toHaveBeenCalled();
-        expect(v2.validate).toHaveBeenCalled();
+      });
+
+      it("should aggregate two errors", function() {
+        list.add({y: ["1", "2", "3"], z: ["1", "2"]});
+        list.add({x: "1", y: ["1"], z: ["1", "2"]});
+
+        expect(list.validate().length).toBe(2);
       });
     });// end #validate
 
@@ -69,7 +86,7 @@ define([
       });
 
       it("should return `null` when given a subclass", function() {
-        expect(List.meta.validate(new NumberList())).toBe(null);
+        expect(List.meta.validate(new DerivedList())).toBe(null);
       });
     });// end #validate
   });

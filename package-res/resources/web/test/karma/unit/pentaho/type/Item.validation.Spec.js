@@ -89,14 +89,6 @@ define([
         expect(value.validate.calls.count()).toBe(1);
       });
 
-      it("should convert an error returned by the validate method to an array of errors", function() {
-        var value = new Item();
-        var error = new Error();
-        spyOn(value, "validate").and.returnValue(error);
-        var errors = Item.meta.validate(value);
-        expect(errors).toEqual([error]);
-      });
-
       it("should return an error array returned by the validate method", function() {
         var value = new Item();
         var errors = [new Error()];

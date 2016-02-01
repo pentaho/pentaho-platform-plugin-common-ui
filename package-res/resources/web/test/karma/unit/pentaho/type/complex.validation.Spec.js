@@ -19,39 +19,34 @@ define([
   "pentaho/type/PropertyMetaCollection",
   "pentaho/util/error"
 ], function(Context) {
-
   "use strict";
 
-  /*global describe:false, it:false, expect:false, beforeEach:false, spyOn:false*/
+  /* global describe:false, it:false, expect:false, spyOn:false */
 
   var context = new Context();
   var Value = context.get("pentaho/type/value");
   var Complex = context.get("pentaho/type/complex");
 
   describe("pentaho/type/complex - Validation -", function() {
-    var Derived;
-
-    beforeEach(function() {
-      Derived = Complex.extend({
-        meta: {
-          label: "Derived",
-          props: [
-            "x",
-            "y",
-            "z"
-          ]
-        }
-      });
+    var Derived = Complex.extend({
+      meta: {
+        label: "Derived",
+        props: [
+          {name: "x", type: "string", required: true},
+          {name: "y", type: ["string"], countMin: 2},
+          {name: "z", type: ["string"], countMin: 1, countMax: 2}
+        ]
+      }
     });
 
     describe("this.validate()", function() {
       it("should return null", function() {
-        var derived = new Derived();
+        var derived = new Derived({x: "1", y: ["1", "2", "3"], z: ["1", "2"]});
         expect(derived.validate()).toBe(null);
       });
 
       it("should call validate of its instanciated properties", function() {
-        var derived = new Derived({x: 5, y: 2, z: 4});
+        var derived = new Derived({x: "1", y: ["1", "2", "3"], z: ["1", "2"]});
 
         var x = derived.get("x");
         spyOn(x, "validate");
@@ -66,6 +61,32 @@ define([
         expect(y.validate).toHaveBeenCalled();
         expect(z.validate).toHaveBeenCalled();
       });
+
+      it("should return one error if missing required property", function() {
+        var derived = new Derived({y: ["1", "2", "3"], z: ["1", "2"]});
+        expect(derived.validate().length).toBe(1);
+      });
+
+      it("should return one error if nully required property", function() {
+        var derived = new Derived({x: null, y: ["1", "2", "3"], z: ["1", "2"]});
+        expect(derived.validate().length).toBe(1);
+      });
+
+      it("should return one error if countMin isn't respected", function() {
+        var derived = new Derived({x: "1", y: ["1"], z: ["1", "2"]});
+        expect(derived.validate().length).toBe(1);
+      });
+
+      it("should return one error if countMax isn't respected", function() {
+        var derived = new Derived({x: "1", y: ["1", "2", "3"], z: ["1", "2", "3"]});
+        expect(derived.validate().length).toBe(1);
+      });
+
+      it("should aggregate three errors", function() {
+        var derived = new Derived({y: ["1"], z: ["1", "2", "3"]});
+
+        expect(derived.validate().length).toBe(3);
+      });
     });// end #validate
 
     describe("Complex.validate(value)", function() {
@@ -74,7 +95,7 @@ define([
       });
 
       it("should return `null` when given a subclass", function() {
-        expect(Complex.meta.validate(new Derived())).toBe(null);
+        expect(Complex.meta.validate(new Derived({x: "1", y: ["1", "2", "3"], z: ["1", "2"]}))).toBe(null);
       });
     });// end #validate
   }); // pentaho/type/complex
