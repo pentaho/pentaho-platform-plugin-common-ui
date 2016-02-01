@@ -140,10 +140,10 @@ define([
 
         context
             .getAllAsync()
-            .then(function(Mesas) {
-              expect(Mesas instanceof Array).toBe(true);
-              expect(Mesas.length).toBe(1);
-              expect(Mesas[0].meta.id).toBe("exp/dude");
+            .then(function(InstCtors) {
+              expect(InstCtors instanceof Array).toBe(true);
+              expect(InstCtors.length).toBe(1);
+              expect(InstCtors[0].meta.id).toBe("exp/dude");
               done();
             }, done.fail);
       });
@@ -153,9 +153,9 @@ define([
 
         context
             .getAllAsync("abcdefgh")
-            .then(function(Mesas) {
-              expect(Mesas instanceof Array).toBe(true);
-              expect(Mesas.length).toBe(0);
+            .then(function(InstCtors) {
+              expect(InstCtors instanceof Array).toBe(true);
+              expect(InstCtors.length).toBe(0);
               done();
             }, done.fail);
       });
@@ -165,11 +165,11 @@ define([
 
         context
           .getAllAsync("exp/thing")
-          .then(function(Mesas) {
-            expect(Mesas instanceof Array).toBe(true);
-            expect(Mesas.length).toBe(2);
+          .then(function(InstCtors) {
+            expect(InstCtors instanceof Array).toBe(true);
+            expect(InstCtors.length).toBe(2);
 
-            var metaIds = Mesas.map(function(Meta) { return Meta.meta.id; });
+            var metaIds = InstCtors.map(function(InstCtor) { return InstCtor.meta.id; });
             var iFoo = metaIds.indexOf("exp/foo");
             var iBar = metaIds.indexOf("exp/bar");
             expect(iFoo).not.toBeLessThan(0);

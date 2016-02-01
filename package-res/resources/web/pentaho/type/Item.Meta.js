@@ -34,29 +34,12 @@ define([
   /**
    * @name pentaho.type.Item.Meta
    * @class
-   * @abstract
    *
-   * @classDesc The base class for _metadata_ in the Pentaho Client Metadata Model.
+   * @classDesc The base **type metadata class** of types in the Pentaho Client Metadata Model.
    *
-   * The classes that descend from {@link pentaho.type.Item} also inherit its metadata.
-   * To acomplish this, the metadata of a given type is a singleton object that is
-   * referenced on all instances of the given type.
+   * For more information see {@link pentaho.type.Item}.
    *
-   * Creating a subclass `Foo` of {@link pentaho.type.Item} implicitly generates the corresponding
-   * metadata class, placing a reference to it in the static member `Foo.Meta`.
-   * Therefore, in the regular workflow of this type system, the developer should not feel the need
-   * for creating _Meta_ subclasses.
-   *
-   * The `pentaho.type.Item` and `pentaho.type.Item.Meta` classes are closely bound and
-   * must naturally reference each other.
-   * The property {@link pentaho.type.Item.Meta#mesa} points to the prototype of the class this _Meta_ class refers to.
-   * Similarly, the property {@link pentaho.type.Item#meta} points to the singleton of its _Meta_ class.
-   *
-   * Note that _Meta_ classes do not create instances. Instead, their constructor is used to:
-   * 1. initialize _prototype_ instances (metadata singletons)
-   * 2. hold static members.
-   *
-   * @description Initializes an item metadata instance.
+   * @description _Initializes_ the type's singleton metadata object.
    */
   var ItemMeta = Base.extend("pentaho.type.Item.Meta",
       /** @lends pentaho.type.Item.Meta# */{
@@ -82,9 +65,6 @@ define([
       if(arg.optional(keyArgs, "isRoot"))
         O.setConst(this, "root", this);
 
-      // Hierarchy
-      O.setConst(this, "proto", this);
-
       // Block inheritance, with default values
       this._id         = null;
       this._styleClass = null;
@@ -97,13 +77,15 @@ define([
     _uid: null,
 
     /**
-     * Gets the unique item type id (auto-generated).
+     * Gets the unique id of this type
      *
-     * Note that even anonymous item types -
-     * that do not have a {@link pentaho.type.Value.Meta#id} -
+     * Unique type ids are auto-generated, in each session.
+     *
+     * Note that even anonymous types -
+     * those whose {@link pentaho.type.Item.Meta#id} is `null` -
      * have an unique-id.
      *
-     * This attribute is (obviously) not inherited.
+     * This attribute is _not_ inherited.
      *
      * @type number
      * @readonly
@@ -115,28 +97,13 @@ define([
 
     //region context property
     /**
-     * Gets the context where this item type is defined.
+     * Gets the context where this type is defined.
      *
      * @name context
      * @memberOf pentaho.type.Item.Meta#
      * @type pentaho.type.IContext
      * @readonly
      * @abstract
-     * @see pentaho.type.Item.Meta#root
-     */
-    //endregion
-
-    //region proto property
-    // Set on `Item._extend`
-    /**
-     * Gets the type of the closest ancestor, possibly itself.
-     *
-     * @name proto
-     * @memberOf pentaho.type.Item.Meta#
-     * @type !pentaho.type.Item.Meta
-     * @readonly
-     * @see pentaho.type.Item.Meta#root
-     * @see pentaho.type.Item.Meta#ancestor
      */
     //endregion
 
@@ -144,38 +111,47 @@ define([
     // `root` is generally set on direct sub-classes of Item.
     // Should be the first meaningful, non-abstract item class below `Item` along a given branch.
     /**
-     * Gets the root type in this type hierarchy.
+     * Gets the root type of this type hierarchy.
      *
-     * Even though all item types derive from {@link pentaho.type.Item},
-     * the developer can mark a given node is the hierarchy as _root_,
-     * in the sense that it defines a chain of related classes with a similar
-     * behavior.
+     * Even though the ultimate type root of types defined in this
+     * system is [Item]{@link pentaho.type.Item},
+     * the system is designed to represent multiple type hierarchies,
+     * each representing concrete, more meaningful concepts.
      *
-     * Generally, root types are the immediate sub-types of {@link pentaho.type.Item}.
-     * The mandatory rule is, however, that
-     * root types are _meaningful_, concrete roots of a type tree.
+     * When deriving a type from `Item`,
+     * it can be marked as the _root_ of a type hierarchy,
+     * by specifying the `isRoot` keyword argument to `extend`.
      *
-     * For example, {@link pentaho.type.Value} is a root type,
-     * because it is the root of the value types and there is a single tree of value types.
+     * Typically, root types are immediate subtypes of `Item`.
+     * However, this is not enforced and it is up to the developer to decide
+     * at what level a practical, meaningful type root arises.
      *
-     * However, {@link pentaho.type.Property} is not considered a root type.
-     * It is its immediate types - each root property within a complex type - which are considered roots.
+     * For example, [Value]{@link pentaho.type.Value} is the root of _value_ types.
+     * However, [Property]{@link pentaho.type.Property},
+     * also an immediate subtype of `Item`,
+     * is not considered a root type.
+     * It is the immediate subtypes of `Property` -
+     * each root property within a complex type -
+     * which are considered roots.
      * This aligns with users expectations of what an attribute named `root`
-     * in a property metadata instance should mean.
+     * in a property type should mean.
      *
      * @name root
      * @memberOf pentaho.type.Item.Meta#
      * @type pentaho.type.Item.Meta
      * @readonly
+     * @see pentaho.type.Item.Meta#isRoot
      * @see pentaho.type.Item.Meta#ancestor
-     * @see pentaho.type.Item.Meta#proto
      */
 
     /**
      * Gets a value that indicates if this type is the root of its type hierarchy.
      *
      * @type boolean
+     *
      * @readonly
+     *
+     * @see pentaho.type.Item.Meta#root
      */
     get isRoot() {
       return this === this.root;
@@ -184,25 +160,28 @@ define([
 
     //region ancestor property
     /**
-     * Gets the type of the closest **ancestor** in the current type hierarchy, if any, or `null`.
+     * Gets the parent type in the current type hierarchy, if any, or `null`.
      *
-     * The root item returns `null`.
+     * The root type returns `null`.
      *
-     * @type pentaho.type.Item.Meta
+     * @type ?pentaho.type.Item.Meta
      * @readonly
+     * @see pentaho.type.Item.Meta#root
      */
     get ancestor() {
-      if(this.isRoot) return null;
-
-      var proto = this.proto;
-      return (proto !== this ? proto : Object.getPrototypeOf(proto).proto) || null;
+      return this.isRoot ? null : Object.getPrototypeOf(this);
     },
     //endregion
 
     //region mesa property
     // Set on `Item._extend`
     /**
-     * Gets the _prototype_ of the class that represents this type.
+     * Gets the _prototype_ of the instances of this type.
+     *
+     * If you're wondering were the word "mesa" comes from,
+     * it is a Greek word which is opposite to "meta".
+     * See more information
+     * [here]{@link http://www.gwiznlp.com/wp-content/uploads/2014/08/Whats-the-opposite-of-meta.pdf}.
      *
      * @name mesa
      * @memberOf pentaho.type.Item.Meta#
@@ -540,19 +519,19 @@ define([
     //endregion
 
     /**
-     * Creates a sub-prototype of this one.
+     * Creates a subtype of this one.
      *
-     * This method creates a _prototype_ which does not have an own constructor.
-     * The current constructor is kept.
+     * This method creates a type which does not have an own constructor.
+     * The base type's constructor is used to _initialize_ the type.
      *
      * Do not use this method directly.
      * Use {@link pentaho.type.Item#extendProto} instead.
      *
-     * @param {object} instSpec The prototype specification.
+     * @param {object} instSpec The type specification.
      * @param {object} keyArgs Keyword arguments.
-     * @param {pentaho.type.Item} keyArgs.mesa The corresponding _sub-mesadata_ item.
+     * @param {pentaho.type.Item} keyArgs.mesa The instances prototype of the type.
      *
-     * @return {pentaho.type.Item.Meta} The new sub-prototype.
+     * @return {pentaho.type.Item.Meta} The new type.
      * @ignore
      */
     _extendProto: function(instSpec, keyArgs) {
@@ -568,7 +547,8 @@ define([
     //   only types with constructors get created.
 
     /**
-     * Creates an instance of this type.
+     * Creates an instance of this type,
+     * given the construction arguments.
      *
      * @param {...any} args The construction arguments.
      * @return {pentaho.type.Item} The created instance.
@@ -580,25 +560,26 @@ define([
     },
 
     /**
-     * Determines if a specified value is an instance of this type.
+     * Determines if a value is an instance of this type.
      *
-     * @param {any} value The value to test.
-     * @return {boolean} Returns `true` if the argument is an instance or `false` otherwise.
+     * @param {?any} value The value to test.
+     * @return {boolean} Returns `true` if the value is an instance of this type or `false` otherwise.
      */
     is: function(value) {
       return O_isProtoOf.call(this.mesa, value);
     },
 
+    // TODO: is conversion always successful? If so, should it be?
     /**
-     * Converts a given value to an instance of this type,
+     * Converts a value to an instance of this type,
      * if it is not one already.
      *
      * If a {@link Nully} value is specified, `null` is returned.
      *
      * Otherwise, if a given value is not already an instance of this type
-     * (checked using {@link pentaho.type.Item.Meta#is}),
+     * (checked using [is]{@link pentaho.type.Item.Meta#is}),
      * this method delegates the creation of an instance to
-     * {@link pentaho.type.Item.Meta#create}.
+     * [create]{@link pentaho.type.Item.Meta#create}.
      *
      * @param {?any} value The value to convert.
      * @return {?pentaho.type.Item} The converted value or `null`.
@@ -612,49 +593,34 @@ define([
              this.create(value);
     }
   }, /** @lends pentaho.type.Item.Meta */{
-
-    /**
-     * Gets the class used for _representing_ data of this type,
-     * i.e. the class that this metadata describes.
-     *
-     * If you're wondering were this name comes from,
-     * "Mesa" is a Greek word which is opposite to "Meta".
-     * See [here]{@link http://www.gwiznlp.com/wp-content/uploads/2014/08/Whats-the-opposite-of-meta.pdf}.
-     *
-     * @name Mesa
-     * @memberOf pentaho.type.Item.Meta
-     * @type Class.<pentaho.type.Item>
-     * @readonly
-     */
-
     //@override
     /**
+     * See Base.js
      * @ignore
      */
-    _subClassed: function(SubMeta, instSpec, classSpec, keyArgs) {
-      var SubMesa = keyArgs.mesa.constructor;
+    _subClassed: function(SubTypeCtor, instSpec, classSpec, keyArgs) {
+      var SubInstCtor = keyArgs.mesa.constructor;
 
-      // Links SubMeta and SubMesa and "implements" instSpec.
-      SubMeta._initMesa(SubMesa, instSpec, keyArgs);
+      // Links SubTypeCtor and SubInstCtor and "implements" instSpec.
+      SubTypeCtor._initInstCtor(SubInstCtor, instSpec, keyArgs);
 
       // Implement the given static interface.
-      if(classSpec) SubMeta.implementStatic(classSpec);
+      if(classSpec) SubTypeCtor.implementStatic(classSpec);
     },
 
-    // Links Meta (this) and the given Mesa together and
-    //  applies the Meta constructor to its own prototype, as a way to initialize it.
+    // Links TypeCtor (this) and the given InstCtor together and
+    // applies the TypeCtor constructor to its own prototype, as a way to initialize it.
     // The constructor receives `instSpec` and ends up extending the prototype with it.
     // The static interface is not touched.
     //
     // NOTE: optionally receiving `keyArgs` as an optimization.
     // `_subClassed` is given a _derived_ `keyArgs`
     // that can/should be passed to `this`(constructor).
-    _initMesa: function(Mesa, instSpec, keyArgs) {
+    _initInstCtor: function(InstCtor, instSpec, keyArgs) {
 
-      O.setConst(Mesa, "Meta", this);
-      O.setConst(this, "Mesa", Mesa);
+      O.setConst(InstCtor, "Meta", this);
 
-      this.call(this.prototype, instSpec, keyArgs || {mesa: Mesa.prototype});
+      this.call(this.prototype, instSpec, keyArgs || {mesa: InstCtor.prototype});
     }
   })
   .implement(AnnotatableLinked);

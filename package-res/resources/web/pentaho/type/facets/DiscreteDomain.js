@@ -27,7 +27,7 @@ define([
    * @amd pentaho/type/facets/DiscreteDomain
    * @class
    * @extends pentaho.type.facets.RefinementFacet
-   * @classDesc The _domain_ refinement facet limits the domain of a representation type
+   * @classDesc The _discrete domain_ refinement facet limits the domain of a representation type
    * to a discrete set of its instances.
    *
    * @description The constructor is not used, as a mixin.

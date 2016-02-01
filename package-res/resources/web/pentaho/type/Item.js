@@ -27,43 +27,53 @@ define([
    * @class
    * @abstract
    *
-   * @classDesc The base class of types in the Pentaho Client Metadata Model.
+   * @classDesc The base **instance class** of types in the Pentaho Client Metadata Model.
    *
-   * The `pentaho.type.Item` class (and its descendants) embeds its own metadata,
-   * which can be accessed via the property {@link pentaho.type.Item#meta}.
-   * Because the metadata can be inherited, it is actually an instance
-   * of a metaclass stored at {@link pentaho.type.Item.Meta}.
+   * Types of the metadata model are constituted by two classes (or constructors):
+   * the **instance class** and the **type class**.
    *
-   * The developer is expected to subclass only the {@link pentaho.type.Item} class,
-   * as the corresponding companion class is automatically generated from the spec
-   * passed to the {@link pentaho.type.Item#meta} property.
+   * The former creates the actual instances of the type.
+   * The latter creates a single object (a singleton) that **represents the type**,
+   * is shared by all instances of the type,
+   * and, essentially, holds its metadata.
    *
-   * Other frameworks generally require the developer to maintain two class hierarchies
-   * (one for storing data, another for storing metadata) and ensure that the
-   * two hierarchies are properly linked together.
-   * This framework attempts to simplify the development process by automating the
-   * the generation and linking of the class that describes the metadata.
+   * The **type class** of the _Item_ type is {@link pentaho.type.Item.Meta}.
+   *
+   * When creating a subclass `Foo` of [Item]{@link pentaho.type.Item},
+   * the corresponding type metadata class is implicitly generated
+   * (a subclass of [Item.Meta]{@link pentaho.type.Item.Meta}),
+   * and its singleton object is placed in the static property
+   * [Foo.meta]{@link pentaho.type.Item.meta}.
+   *
+   * Instances of the type `Foo` can also conveniently access the type's singleton object
+   * through the instance property [this.meta]{@link pentaho.type.Item#meta}.
+   *
+   * The instance and type classes of a type are closely bound and
+   * must naturally reference each other.
+   * The type singleton object references back the prototype of the instance class,
+   * in a property named [mesa]{@link pentaho.type.Item.Meta#mesa}.
    *
    * @example
    * <caption> Create a new class <code>DerivedItem</code> containing
    * an attribute <code>greeting</code> and a method <code>doSomething</code> </caption>
    *
-   * require(["pentaho/type/Item"], function(Item){
+   * require(["pentaho/type/Item"], function(Item) {
    *   var DerivedItem = Item.extend({
-   *     constructor: function(label){
+   *     constructor: function(label) {
    *       this.label = label;
    *     },
    *     meta: { // metadata spec
    *       greeting: "Hello, ",
    *       veryLongString: "..."
    *     },
-   *     saySomething: function(){
+   *     saySomething: function() {
    *       console.log(this.meta.greeting + this.label + "!");
    *     }
    *   });
    *
    *   var a = new DerivedItem("Alice");
    *   a.saySomething(); // "Hello, Alice!"
+   *
    *   var b = new DerivedItem("Bob");
    *   b.saySomething(); // "Hello, Bob!"
    *
@@ -71,7 +81,7 @@ define([
    *   b.meta.greeting ===  a.meta.greeting // true
    * });
    *
-   * @description Creates an instance.
+   * @description Creates an instance of this type.
    */
   var Item = Base.extend("pentaho.type.Item", /** @lends pentaho.type.Item# */{
     // NOTE: not calling base to block default Base.js from copying 1st argument into `this`.
@@ -82,13 +92,12 @@ define([
     _meta: null,
 
     /**
-     * Gets the singleton that describes the metadata associated with this type.
+     * Gets the type of this instance.
      *
      * @name meta
-     * @memberOf pentaho.type.Item#
      * @type pentaho.type.Item.Meta
      * @readonly
-     * @abstract
+     * @see pentaho.type.Item.meta
      * @see pentaho.type.Item.Meta#mesa
      */
     get meta() {
@@ -102,7 +111,7 @@ define([
     // However, this is the simplest and cleanest way to implement:
     //   Item.implement({meta: {.}})
     // to mean
-    //   Item.Meta.implement({.}).Mesa
+    //   Item.Meta.implement({.}).mesa.constructor
     set meta(config) {
       // Class.implement essentially just calls Class#extend.
       if(config) this.meta.extend(config);
@@ -112,7 +121,7 @@ define([
 
     //region meta property
     /**
-     * Gets the singleton that describes the metadata associated with this type.
+     * Gets the type of this instance constructor.
      *
      * @type pentaho.type.Item.Meta
      * @readonly
@@ -126,73 +135,74 @@ define([
     // Allows writing;
     //   Item.implementStatic({meta: .})
     // to mean:
-    //   Item.Meta#implementStatic(.).Mesa
+    //   Item.Meta#implementStatic(.).mesa.constructor
     set meta(config) {
       if(config) this.meta.constructor.implementStatic(config);
     },
     //endregion
 
     /**
-     * Creates a sub-prototype of a given one.
+     * Creates a subtype of a given one.
      *
-     * This method creates a _prototype_ which does not have an own constructor.
-     * The current constructor is kept.
+     * This method creates a subtype which does not have an own instance constructor.
+     * The base type's instance constructor is used to _initialize_ instances.
      *
-     * To create a _prototype_ with a constructor,
-     * extend from the base constructor instead, by calling its `extend` method.
+     * To create a type with an own constructor,
+     * extend from the base constructor instead,
+     * by calling its `extend` method.
      *
-     * @param {pentaho.type.Item} [mesa] The prototype of the class used for representing the data.
-     *   When nully, defaults to the prototype of the constructor
-     *   where this method is called.
+     * @param {pentaho.type.Item} [baseInstProto] The base instances' prototype.
+     *   When nully, defaults to the prototype of this instance constructor.
      *
-     * @param {object} [instSpec] The specification of the prototype that will be returned by this function.
+     * @param {object} [instSpec] The new type specification.
      * @param {object} [keyArgs] Keyword arguments.
      *
-     * @return {pentaho.type.Item} The created sub-prototype.
+     * @return {pentaho.type.Item} The instances' prototype of the created subtype.
      */
-    extendProto: function(mesa, instSpec, keyArgs) {
+    extendProto: function(baseInstProto, instSpec, keyArgs) {
       if(!instSpec) instSpec = {};
-      if(!mesa) mesa = this.prototype;
+      if(!baseInstProto) baseInstProto = this.prototype;
 
       // MESA I
-      var subMesa = Object.create(mesa);
+      var subInstProto = Object.create(baseInstProto);
 
       // META
       var metaInstSpec = O["delete"](instSpec, "meta");
 
       var ka  = keyArgs ? Object.create(keyArgs) : {};
-      ka.mesa = subMesa;
+      ka.mesa = subInstProto;
 
-      mesa.meta._extendProto(metaInstSpec, ka);
+      baseInstProto.meta._extendProto(metaInstSpec, ka);
 
       // MESA II
-      return subMesa.extend(instSpec);
+      return subInstProto.extend(instSpec);
     },
 
     //@override
     /**
+     * See Base.js
      * @ignore
      */
-    _subClassed: function(SubMesa, instSpec, classSpec, keyArgs) {
+    _subClassed: function(SubInstCtor, instSpec, classSpec, keyArgs) {
       // 1. `instSpec` may override property accessors only defined by `Complex.Meta`
-      // 2. So, the Meta class must be created *before* applying instSpec and classSpec to SubMesa
-      // 3. The Meta class requires Mesa to already exist, to be able to define accessors
+      // 2. So, the Type class must be created *before* applying instSpec and classSpec to SubInstCtor
+      // 3. The Type class requires InstCtor to already exist, to be able to define accessors
       var metaInstSpec  = O["delete"](instSpec, "meta"),
           metaClassSpec = O["delete"](classSpec, "meta"),
           // Setting a function's name is failing on PhantomJS 1.9.8...
-          mesaName      = SubMesa.name || SubMesa.displayName,
+          mesaName      = SubInstCtor.name || SubInstCtor.displayName,
           metaName      = mesaName && (mesaName + ".Meta");
 
       var ka  = keyArgs ? Object.create(keyArgs) : {};
-      ka.mesa = SubMesa.prototype;
+      ka.mesa = SubInstCtor.prototype;
 
       this.Meta.extend(metaName, metaInstSpec, metaClassSpec, ka);
 
-      SubMesa.mix(instSpec, classSpec);
+      SubInstCtor.mix(instSpec, classSpec);
     }
   });
 
-  ItemMeta._initMesa(Item);
+  ItemMeta._initInstCtor(Item);
 
   return Item;
 });

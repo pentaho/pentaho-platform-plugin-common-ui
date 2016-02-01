@@ -132,16 +132,16 @@ define([
           .then(function(factories) {
             return Promise.all(factories.map(me.getAsync, me));
           })
-          .then(function(Mesas) {
+          .then(function(InstCtors) {
             return predicate
-                ? Mesas.filter(function(Mesa) { return predicate(Mesa.meta); })
-                : Mesas;
+                ? InstCtors.filter(function(InstCtor) { return predicate(InstCtor.meta); })
+                : InstCtors;
           });
     },
 
     //region Value creation
     /*
-     * typeReference = "typeId" | ITypeSpec | typeFactory | Meta | Mesa ...
+     * typeReference = "typeId" | ITypeSpec | typeFactory | TypeCtor | InstCtor ...
      *
      * A. Value fragment specification with Inline Type Metadata
      *
@@ -264,7 +264,7 @@ define([
       var proto = fun.prototype;
 
       if(proto instanceof Item     ) return this._getByType(fun, sync);
-      if(proto instanceof Item.Meta) return this._getByType(fun.Mesa, sync);
+      if(proto instanceof Item.Meta) return this._getByType(proto.mesa.constructor, sync);
 
       // Assume it's a factory function.
       return this._getByFactory(fun, sync);
@@ -320,7 +320,7 @@ define([
     _getByObjectSpec: function(typeSpec, sync) {
 
       if(typeSpec instanceof Item     ) return this._getByType(typeSpec.constructor, sync);
-      if(typeSpec instanceof Item.Meta) return this._getByType(typeSpec.constructor.Mesa, sync);
+      if(typeSpec instanceof Item.Meta) return this._getByType(typeSpec.mesa.constructor, sync);
 
       var baseTypeSpec = typeSpec.base || _defaultBaseTypeMid,
           resolveSync = (function() {

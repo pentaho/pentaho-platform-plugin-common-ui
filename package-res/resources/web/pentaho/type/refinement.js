@@ -642,7 +642,6 @@ define([
         //endregion
       }
     }, /** @lends pentaho.type.Refinement */{
-      // Validate that Mesa constructor is not specified.
       _extend: function(name, instSpec) {
 
         // Refinement types cannot specify any instance property.

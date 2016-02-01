@@ -19,7 +19,7 @@ define([
 
   "use strict";
 
-  /*global describe:true, it:true, expect:true, beforeEach:true*/
+  /*global describe:true, it:true, expect:true, beforeEach:true, afterEach:true, spyOn: true, jasmine: true*/
 
 
   describe("pentaho/type/Item.Meta", function() {
@@ -211,8 +211,7 @@ define([
 
       it("should return a Promise, when view is a string, and resolve to that module", function(done) {
 
-        var View = function() {
-        };
+        var View = function() {};
 
         define("foo/bar", function() {
           return View;
@@ -233,8 +232,7 @@ define([
 
       it("should return a Promise even if view is inherited from the base class", function(done) {
 
-        var View = function() {
-        };
+        var View = function() {};
 
         define("foo/bar", function() {
           return View;
@@ -260,8 +258,7 @@ define([
 
       it("should return the same Promise multiple times", function(done) {
 
-        var View = function() {
-        };
+        var View = function() {};
 
         define("foo/bar", function() {
           return View;
@@ -282,10 +279,8 @@ define([
 
       it("should return an new Promise and resolve to the new View when the view changes", function(done) {
 
-        var ViewBar  = function() {
-        };
-        var ViewDude = function() {
-        };
+        var ViewBar  = function() {};
+        var ViewDude = function() {};
 
         define("foo/bar", function() {
           return ViewBar;
@@ -345,13 +340,12 @@ define([
         });
 
         it("subclasses should preserve the default value", function() {
-          var FirstDerivative         = Item.extend({meta: {label: "Foo"}});
-          var SecondDerivative        = FirstDerivative.extend({meta: {label: "Bar"}});
+          var FirstDerivative  = Item.extend({meta: {label: "Foo"}});
+          var SecondDerivative = FirstDerivative.extend({meta: {label: "Bar"}});
           SecondDerivative.meta.label = undefined;
           // The default value is still there (did not delete)
           expect(SecondDerivative.meta.label).toBe("Foo");
         });
-
       }); // when `label` is falsy
 
       describe("when `label` is truthy", function() {
@@ -376,6 +370,7 @@ define([
           expectIt({id: null});
           expectIt({id: null});
         });
+
         it("should preserve the default value", function() {
           Item.meta.id = undefined;
           // The default value is still there (did not delete)
@@ -536,8 +531,6 @@ define([
       });
     }); // #uid
 
-    // TODO: ordinal, styleClass, advanced, browsable <- bring and adapt these from Property.Meta tests
-
     describe("#styleClass -", function() {
       it("should preserve the default value", function() {
         Item.meta.styleClass = undefined;
@@ -554,6 +547,7 @@ define([
           expect(item.meta.styleClass).toBe(propValue);
         });
       });
+
       it("casts to a string, or to `null` if it is nully or an object", function() {
         [
           [1 / 0, "Infinity"],
@@ -565,7 +559,7 @@ define([
         ].forEach(function(candidateAndFinal) {
           var candidate = candidateAndFinal[0];
           var final     = candidateAndFinal[1];
-          var Derived   = Item.extend({meta: {"styleClass": candidate}});
+          var Derived = Item.extend({meta: {"styleClass": candidate}});
           expect(Derived.meta.styleClass).toBe(final);
 
           var item = new Derived();
@@ -590,6 +584,7 @@ define([
           expect(item.meta.advanced).toBe(bool);
         });
       });
+
       it("can be unset by passing a nully, thus delegating to the ancestor class", function() {
         [true, false].forEach(function(bool) {
           [null, undefined].forEach(function(value) {
@@ -609,6 +604,7 @@ define([
         // The default value is still there (did not delete)
         expect(Item.meta.browsable).toBe(true);
       });
+
       it("can be set on a derived class", function() {
         [true, false].forEach(function(bool) {
           var Derived = Item.extend({meta: {"browsable": bool}});
@@ -618,6 +614,7 @@ define([
           expect(item.meta.browsable).toBe(bool);
         });
       });
+
       it("can be unset by passing a nully, thus delegating to the ancestor class", function() {
         [true, false].forEach(function(bool) {
           [null, undefined].forEach(function(value) {
@@ -637,6 +634,7 @@ define([
         // The default value is still there (did not delete)
         expect(Item.meta.ordinal).toBe(0);
       });
+
       it("can be set on a derived class", function() {
         [1].forEach(function(someValue) {
           var Derived = Item.extend({meta: {"ordinal": someValue}});
@@ -646,6 +644,7 @@ define([
           expect(item.meta.ordinal).toBe(someValue);
         });
       });
+
       it("casts to an integer, using 0 as a fallback", function() {
         [
           [37, 37],
@@ -668,6 +667,7 @@ define([
           expect(item.meta.ordinal).toBe(final);
         });
       });
+
       it("can be unset by passing a nully, thus delegating to the ancestor class", function() {
         [1, 20].forEach(function(someValue) {
           [null, undefined].forEach(function(resetValue) {
@@ -706,6 +706,7 @@ define([
         expect(SecondDerivative.meta.ancestor).toBe(FirstDerivative.meta);
         expect(SecondDerivative.meta.ancestor).not.toBe(Item.meta);
       });
+
       it("does not return an ancestor if this is a root class", function() {
         var Derived = Item.extend("", null, null, {isRoot: true});
         expect(Derived.meta.ancestor).toBeNull();
@@ -726,15 +727,28 @@ define([
       it("detects an instance of `pentaho.type.Item` correctly", function() {
         expect(Item.meta.is(new Item())).toBe(true);
       });
+
+      it("detects an instance of a sub-type correctly", function() {
+        var SubItem = Item.extend();
+
+        expect(Item.meta.is(new SubItem())).toBe(true);
+        expect(SubItem.meta.is(new SubItem())).toBe(true);
+      });
+
+      it("detects that an instance of another Item class is not of the type ", function() {
+        var SubItem1 = Item.extend();
+        var SubItem2 = Item.extend();
+
+        expect(SubItem1.meta.is(new SubItem2())).toBe(false);
+      });
+
       it("detects that simple objects aren't instances of `pentaho.type.Item`", function() {
         [
           true, 1, "",
           null, undefined,
           {}, [],
           new Date(),
-          function() {
-            return this;
-          }()
+          (function() { return this; }()) // global object
         ].forEach(function(obj) {
           expect(Item.meta.is(obj)).toBe(false);
         });
@@ -742,27 +756,61 @@ define([
     });
 
     describe("#to -", function() {
-      it("casts an instance of `pentaho.type.Item` correctly", function() {
-        expect(Item.meta.to(new Item()) instanceof Item).toBe(true);
+      it("returns an instance of it directly", function() {
+        var item = new Item();
+        expect(Item.meta.to(item)).toBe(item);
       });
-      it("casts native data types to `pentaho.type.Item`", function() {
-        [
-          "",
-          0, 1, 1 / 0, Math.sqrt(-1),
-          true,
-          new Date(),
-          {}, []
-        ].forEach(function(value) {
-          expect(Item.meta.to(value) instanceof Item).toBe(true);
+
+      it("calls #context.create(value) and returns its result " +
+         "when value is not an instance and type has an own constructor", function() {
+        var createSpy = jasmine.createSpy();
+        var SubItem = Item.extend({
+          meta: {
+            get context() {
+              return {
+                create: createSpy
+              };
+            }
+          }
         });
+
+        spyOn(SubItem.meta, "create").and.callThrough();
+
+        var value = {};
+        SubItem.meta.to(value);
+
+        expect(createSpy).toHaveBeenCalledWith(value, SubItem.meta, SubItem.meta);
+        expect(SubItem.meta.create).not.toHaveBeenCalled();
       });
+
+      it("calls #create(value) and returns its result " +
+          "when value is not an instance and type does not have an own constructor", function() {
+        var createSpy = jasmine.createSpy();
+        var SubItem = Item.extend({
+          meta: {
+            get context() {
+              return {
+                create: createSpy
+              };
+            }
+          }
+        });
+
+        var subSubMeta = SubItem.extendProto().meta;
+        spyOn(subSubMeta, "create").and.callThrough();
+
+        var value = {};
+        subSubMeta.to(value);
+
+        expect(createSpy).not.toHaveBeenCalled();
+        expect(subSubMeta.create).toHaveBeenCalledWith(value);
+      });
+
       it("casts a nully into `null`", function() {
         [null, undefined].forEach(function(value) {
           expect(Item.meta.to(value)).toBeNull();
         });
       });
     });
-
-
   });
 });
