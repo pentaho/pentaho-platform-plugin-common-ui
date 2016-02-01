@@ -16,21 +16,22 @@
  */
 
 var deps = [
+  'angular-mocks',
   'common-ui/angular',
   'common-ui/angular-directives/schedule/scheduleSelector',
   'test/karma/unit/angular-directives/commonFiltersMock'
 ];
 
-define(deps, function(angular) {
+define(deps, function (angular) {
 
-  xdescribe("Schedule Directives", function() {
+  xdescribe("Schedule Directives", function () {
 
     beforeEach(module('common.schedule'));
     beforeEach(module('common.filters.mock')); // this is a mock of the i18n filter in common.filters
 
     var compile, scope, scheduleSelectorElement;
 
-    beforeEach(inject(function ($rootScope, $compile ){
+    beforeEach(inject(function ($rootScope, $compile) {
 
       scope = $rootScope;
       compile = $compile;
@@ -105,7 +106,7 @@ define(deps, function(angular) {
       var directiveScope = scheduleSelectorElement.isolateScope();
       expect(directiveScope.type).toBe('Weekly');
 
-      directiveScope.sessionModelMap = { data:'test' };
+      directiveScope.sessionModelMap = {data: 'test'};
       directiveScope.$broadcast('scheduleSelector:onSave');
       expect(angular.toJson(directiveScope.sessionModelMap)).toBe('{}');
     });
@@ -118,7 +119,7 @@ define(deps, function(angular) {
       var directiveScope = scheduleSelectorElement.isolateScope();
       expect(directiveScope.type).toBe('Weekly');
 
-      directiveScope.sessionModelMap = { data:'test' };
+      directiveScope.sessionModelMap = {data: 'test'};
       directiveScope.$broadcast('scheduleSelector:onReset');
       expect(angular.toJson(directiveScope.sessionModelMap)).toBe('{}');
     });
@@ -131,12 +132,12 @@ define(deps, function(angular) {
       var directiveScope = scheduleSelectorElement.isolateScope();
       expect(directiveScope.type).toBe('Weekly');
 
-      directiveScope.model = { data: 'testWeekly', type: 'Weekly'}
-      directiveScope.saved = { data: 'testNever', type: 'Never'};
+      directiveScope.model = {data: 'testWeekly', type: 'Weekly'}
+      directiveScope.saved = {data: 'testNever', type: 'Never'};
       directiveScope.$broadcast('scheduleSelector:onReset');
 
       // directiveScope.model shouldn't have changed because the saved type isn't the same
-      expect(angular.equals(directiveScope.model, { data: 'testWeekly', type: 'Weekly'} )).toBe(true);
+      expect(angular.equals(directiveScope.model, {data: 'testWeekly', type: 'Weekly'})).toBe(true);
     });
 
     it('should verify saved model is copied to selected model on reset', function () {
@@ -147,12 +148,12 @@ define(deps, function(angular) {
       var directiveScope = scheduleSelectorElement.isolateScope();
       expect(directiveScope.type).toBe('Weekly');
 
-      directiveScope.model = { data: 'A', type: 'Weekly'}
-      directiveScope.saved = { data: 'B', type: 'Weekly'};
+      directiveScope.model = {data: 'A', type: 'Weekly'}
+      directiveScope.saved = {data: 'B', type: 'Weekly'};
       directiveScope.$broadcast('scheduleSelector:onReset');
 
       // verify that the model and saved are the same
-      expect(angular.equals(directiveScope.model, directiveScope.saved )).toBe(true);
+      expect(angular.equals(directiveScope.model, directiveScope.saved)).toBe(true);
 
       // verify that model.data has the new value
       expect(directiveScope.model.data).toBe('B');
