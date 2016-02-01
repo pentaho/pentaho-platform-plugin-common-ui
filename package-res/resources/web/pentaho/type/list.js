@@ -497,14 +497,14 @@ define([
       //endregion
 
       //region validation
-
       /**
-       * Performs validation of this item.
+       * Performs validation of this list, aggregating
+       * the results of the validation of each of its members.
        *
-       * When invalid, returns either one `Error` or a non-empty array of `Error` objects.
-       * When valid, `null` is returned.
+       * When invalid returns a non-empty array of `Error` objects.
+       * When valid `null` is returned.
        *
-       * @return {Error|Array.<!Error>|null} An `Error`, a non-empty array of `Error` or `null`.
+       * @return {Array.<!Error>|null} A non-empty array of `Error` or `null`.
        */
       validate: function() {
         var errors = [],
@@ -517,7 +517,6 @@ define([
 
         return errors.length > 0 ? errors : null;
       },
-
       //endregion
 
       meta: /** @lends pentaho.type.List.Meta# */{

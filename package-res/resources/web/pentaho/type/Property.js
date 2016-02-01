@@ -391,14 +391,17 @@ define([
       //endregion
 
       //region validation
-
       /**
-       * Performs validation of this item.
+       * Performs validation of this property.
        *
-       * When invalid, returns either one `Error` or a non-empty array of `Error` objects.
-       * When valid, `null` is returned.
+       * In addition to the validation of the property's value itself, it is checked that:
+       * 1. a _required_ property has at least one value (not nully nor an empty list);
+       * 2. a _list_ property has its member count between _countMin_ and _countMax_.
        *
-       * @return {Error|Array.<!Error>|null} An `Error`, a non-empty array of `Error` or `null`.
+       * When invalid returns a non-empty array of `Error` objects.
+       * When valid `null` is returned.
+       *
+       * @return {Array.<!Error>|null} A non-empty array of `Error` or `null`.
        */
       validate: function(value) {
         var errors = [];

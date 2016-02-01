@@ -113,17 +113,17 @@ define([
     /**
      * Performs validation of this item.
      *
-     * When invalid, returns either one `Error` or a non-empty array of `Error` objects.
-     * When valid, `null` is returned.
+     * When invalid returns a non-empty array of `Error` objects.
+     * When valid `null` is returned.
      *
-     * @return {Error|Array.<!Error>|null} An `Error`, a non-empty array of `Error` or `null`.
+     * @return {Array.<!Error>|null} A non-empty array of `Error` or `null`.
      */
     validate: function() {
       return null;
     },
 
     /**
-     * Gets a value that indicates if this value is valid.
+     * Indicates if this item is valid.
      *
      * This property evaluates {@link pentaho.type.Value#validate} and
      * returns whether no errors were returned.
