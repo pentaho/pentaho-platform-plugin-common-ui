@@ -41,22 +41,22 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
         readOnlyProperties: ["promptNeeded", "paginate", "totalPages", "showParameterUI", "allowAutoSubmit"],
         msgs: {
           notChangeReadonlyProp: function(readOnlyProperties) {
-            return "Not possible to change the read only properties: " + readOnlyProperties;
+            return "Not possible to change the following read-only properties: " + readOnlyProperties + ".";
           },
           incorrectBooleanType: function(name, value) {
             return "Unexpected value '" + value + "' for '" + name + "'. Must be boolean type.";
           },
-          notAllowedAutoSubmit: "Not possible to set 'autoSubmit'. It's limited by the 'allowAutoSubmit' flag",
+          notAllowedAutoSubmit: "Not possible to set 'autoSubmit'. It's limited by the 'allowAutoSubmit' flag.",
           incorrectNumberType: function(page) {
-            return "Unexpected value '" + page + "' for 'page'. Must be number type.";
+            return "Unexpected value '" + page + "' for 'page'. Must be a number type.";
           },
           paginationNotActivated: function(page) {
             return "Not possible to set page '" + page + "'. The pagination should be activated.";
           },
           incorrectPageValue: function(page, totalPages) {
-            return "Not possible to set page '" + page + "'. The correct value should be between 0 and " + totalPages;
+            return "Not possible to set page '" + page + "'. The correct value should be between 0 and " + totalPages + ".";
           },
-          incorrectStateObjType: "The input parameter 'state' is incorrect, should be an object"
+          incorrectStateObjType: "The input parameter 'state' is incorrect. It should be an object."
         }
       };
 
@@ -814,12 +814,12 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
          */
         parameterChanged: function (param, name, value) {
           if (this.onParameterChanged) {
-            var paramCallback = this.onParameterChanged[name] ? 
-                  this.onParameterChanged[name] : 
+            var paramCallback = this.onParameterChanged[name] ?
+                  this.onParameterChanged[name] :
                   this.onParameterChanged[''];
             if (paramCallback) {
               if (typeof paramCallback === 'function') {
-                paramCallback(name, value); 
+                paramCallback(name, value);
               } else {
                 Logger.warn("The parameterChanged callback for '" + name + "' is not a function");
               }
