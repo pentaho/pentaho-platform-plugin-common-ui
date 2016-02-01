@@ -67,6 +67,12 @@ define(function() {
     }
   };
 
+  /**
+   * Converts to array.
+   *
+   * @param {Array|Object} The value to convert to array.
+   * @return {Array} The given array or an array with the given value.
+  */
   function toArray(v) {
     return Array.isArray(v) ? v : [v];
   }

@@ -39,24 +39,50 @@ define([
     });
 
     describe(".Meta -", function() {
-      var ValueMeta = Value.Meta;
+      var valueMeta;
+      var Value;
+
+      beforeEach( function() {
+        // making sure that we have a new Value definition for each test
+        var myContext = new Context();
+        Value = myContext.get("pentaho/type/value");
+        valueMeta = Value.meta;
+      });
 
       it("should be a function", function() {
-        expect(typeof ValueMeta).toBe("function");
+        expect(typeof Value.Meta).toBe("function");
       });
 
       it("should be a sub-class of `Item.Meta`", function() {
-        expect(ValueMeta.prototype instanceof Item.Meta).toBe(true);
+        expect(valueMeta instanceof Item.Meta).toBe(true);
       });
 
       it("should have an `uid`", function() {
-        expect(ValueMeta.prototype.uid != null).toBe(true);
-        expect(typeof ValueMeta.prototype.uid).toBe("number");
+        expect(valueMeta.uid != null).toBe(true);
+        expect(typeof valueMeta.uid).toBe("number");
       });
 
-      it("should have `abstract` equal to `true`", function() {
-        expect(ValueMeta.prototype.abstract).toBe(true);
-      });
+      describe("#context()", function() {
+        it("the Value meta has the context in which it was defined", function() {
+          var myContext = new Context();
+          var Value = myContext.get("pentaho/type/value");
+
+          expect(Value.meta.context).toBe(myContext);
+        })
+      }); // end #context
+
+      describe("#abstract", function() {
+        it("should have default `abstract` equal to `true`", function () {
+          expect(valueMeta.abstract).toBe(true);
+        });
+
+        it("should allow changing `abstract` value", function () {
+          valueMeta.abstract = false;
+          expect(valueMeta.abstract).toBe(false);
+          valueMeta.abstract = true;
+          expect(valueMeta.abstract).toBe(true);
+        });
+      }); // end #abstract
 
       describe("#areEqual(va, vb)", function() {
         it("should return `true` if both values are nully", function() {
@@ -187,8 +213,6 @@ define([
         }); // #abstract
       });
 
-      // TODO: remaining properties: value, annotations...
-
     }); // .extend({...})
 
     describe("#key", function() {
@@ -231,15 +255,5 @@ define([
         expect(va.equals(vb)).toBe(false);
       });
     }); // end #equals
-
-    describe("#clone()", function() {
-      it("should throw a not implemented error", function() {
-        var va = new Value();
-
-        expect(function() {
-          va.clone();
-        }).toThrowError(error.notImplemented().message);
-      });
-    });// end #clone
   });
 });
