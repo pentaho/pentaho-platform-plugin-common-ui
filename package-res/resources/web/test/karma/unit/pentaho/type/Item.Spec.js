@@ -77,6 +77,7 @@ define([
           expect(item.meta.someAttribute).toBe("someValue");
         });
       });
+
       it("allows setting a .meta property", function() {
         Derived.meta = {"someAttribute": "someOtherValue"};
         expect(Derived.Meta.someAttribute).toBe("someOtherValue");
@@ -111,18 +112,18 @@ define([
       });
     });
 
-
-    // TODO: extendProto
     describe("#extendProto -", function() {
-      var Derived;
+      var derivedProto;
       beforeEach(function() {
-        Derived = Item.extendProto(null, {}, {});
+        derivedProto = Item.extendProto(null, {}, {});
       });
+
       it("derived classes have the proper 'ancestor'", function() {
-        expect(Derived.meta).not.toBe(Item.meta)
-        expect(Derived.meta.ancestor).toBe(Item.meta)
-        expect(Derived.meta.is(Item)).toBe(false)
+        expect(derivedProto.meta).not.toBe(Item.meta);
+        expect(derivedProto.meta.ancestor).toBe(Item.meta);
+        expect(derivedProto.meta.is(Item)).toBe(false);
       });
+
       it("can be invoked without arguments", function() {
         expect(Item.extendProto().meta.ancestor).toBe(Item.meta);
         expect(Item.extendProto(null).meta.ancestor).toBe(Item.meta);
@@ -130,14 +131,15 @@ define([
       });
 
       it("does not return a constructor", function() {
-        expect(typeof Derived).not.toBe("function");
-        expect(Derived.prototype).toBeUndefined();
+        expect(typeof derivedProto).not.toBe("function");
       });
+
       it("returns an instance whose constructor is the same as the extended class", function() {
-        expect(Derived.constructor).toBe(Item);
-        expect(Derived.constructor).toBe(Item.prototype.constructor);
-        expect(Derived instanceof Item).toBe(true);
+        expect(derivedProto.constructor).toBe(Item);
+        expect(derivedProto.constructor).toBe(Item.prototype.constructor);
+        expect(derivedProto instanceof Item).toBe(true);
       });
+
       it("accepts keyArgs", function() {
         var Derived = Item.extendProto(null, {}, {
           isRoot: true

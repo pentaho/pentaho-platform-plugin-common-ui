@@ -247,6 +247,17 @@ define([
 
     _label: null,
 
+    /**
+     * Gets or sets the label of this type.
+     *
+     * Attempting to set to a non-string value type implicitly converts the value to a string before assignment.
+     *
+     * Setting to an empty string
+     * or to a {@link Nully} value causes the attribute to use the inherited value,
+     * except for the root type _Item_ (which has no ancestor), where the label is `null`.
+     *
+     * @type {String | any}
+     */
     _resetLabel: function() {
       if(this !== _itemMeta) {
         delete this._label;
@@ -274,6 +285,18 @@ define([
 
     _description: null, // set through implement bundle, below
 
+    /**
+     * Gets or sets the description of this type.
+     *
+     * Attempting to set to a non-string value type implicitly converts the value to a string before assignment.
+     *
+     * Setting to `undefined` causes this attribute to use the inherited value,
+     * except for the root type _Item_ (which has no ancestor), where this attribute is `null`.
+     *
+     * Setting to `null` or to an empty string clears the attribute and sets it to `null, ignoring any inherited value.
+     *
+     * @type {?nonEmptyString}
+     */
     get description() {
       return this._description;
     },
@@ -300,6 +323,22 @@ define([
 
     _category: null,
 
+    /**
+     * Gets or sets the category associated with this type.
+     *
+     * The category is used primarily to group similar items in a user interface.
+     *
+     * Attempting to set to a non-string value type implicitly converts the value to a string before assignment.
+     *
+     * Setting to `undefined` causes this attribute to use the inherited value,
+     * except for the root type _Item_ (which has no ancestor), where the URL is `null`.
+     *
+     * Setting to `null` or to an empty string clears the attribute and sets it to `null, ignoring any inherited value.
+     *
+     * @type {?nonEmptyString}
+     * @see pentaho.type.Item.Meta#browsable
+     * @see pentaho.type.Item.Meta#ordinal
+     */
     get category() {
       return this._category;
     },
@@ -326,6 +365,18 @@ define([
 
     _helpUrl: null,
 
+    /**
+     * Gets or sets an URL pointing to documentation associated with this type.
+     *
+     * Attempting to set to a non-string value type implicitly converts the value to a string before assignment.
+     *
+     * Setting to `undefined` causes this attribute to use the inherited value,
+     * except for the root type _Item_ (which has no ancestor), where the URL is `null`.
+     *
+     * Setting to `null` or to an empty string clears the attribute and sets it to `null, ignoring any inherited value.
+     *
+     * @type {?nonEmptyString}
+     */
     get helpUrl() {
       return this._helpUrl;
     },
@@ -352,6 +403,17 @@ define([
 
     _browsable: true,
 
+    /**
+     * Gets or sets the `browsable` attribute of this type.
+     *
+     * Browsable items are exposed to the end user.
+     * Set this attribute to `false` to prevent exposing the item in a user interface.
+     *
+     * Setting to a {@link Nully} value causes this attribute to use the inherited value,
+     * except for the root type _Item_ (which has no ancestor), where the attribute is `true`.
+     *
+     * @type {boolean}
+     */
     get browsable() {
       return this._browsable;
     },
@@ -377,6 +439,19 @@ define([
     // null || undefined -> reset
     _advanced: false,
 
+    /**
+     * Gets or sets the `advanced` attribute of this type.
+     *
+     * Items with `advanced` attributes set to `true` are typically immediately accessible to the user.
+     * An advanced item typically escapes the expected flow of utilization, yet it is
+     * sufficiently relevant to be shown in a the user interface.
+     *
+     * Setting to a {@link Nully} value causes this attribute to use the inherited value,
+     * except for the root type _Item_ (which has no ancestor), where the attribute is `false`.
+     *
+     * @type {boolean}
+     * @see pentaho.type.Item.Meta#browsable
+     */
     get advanced() {
       return this._advanced;
     },
@@ -403,6 +478,13 @@ define([
 
     _styleClass: null,
 
+    /**
+     * Gets or sets the CSS class associated with this type.
+     *
+     * This attribute is typically used to associate an icon with this item.
+     *
+     * @type {nonEmptyString}
+     */
     get styleClass() {
       return this._styleClass;
     },
@@ -429,6 +511,17 @@ define([
     // -> Optional(0), Inherited, Configurable
     _ordinal: 0,
 
+    /**
+     * Gets or sets the ordinal associated with this type.
+     * The ordinal is used to disambiguate the order with which an item is show in the user interface.
+     *
+     * Setting to a {@link Nully} value causes this attribute to use the inherited value,
+     * except for the root type _Item_ (which has no ancestor), where the attribute is `0`.
+     *
+     * @type {integer}
+     * @see pentaho.type.Item.Meta#browsable
+     * @see pentaho.type.Item.Meta#category
+     */
     get ordinal() {
       return this._ordinal;
     },
@@ -460,14 +553,17 @@ define([
    /**
     * Gets or sets the default view for items of this type.
     *
-    * Setting to `undefined` causes the view to be inherited from the ancestor type.
-    * Setting to a _falsy_ value (like `null` or an empty string),
-    * clears the value of the property, ignoring any inherited value.
     *
     * Setting to a string defines the id of the view's module.
     * If the string starts with `/`, `xyz:` or ends with `.js`,
     * the id is considered to be absolute,
     * otherwise it is considered to be relative to the type's id folder.
+
+    * Setting to `undefined` causes the view to be inherited from the ancestor type,
+    * except for the root type _Item_ (which has no ancestor), where the attribute is `null`.
+    *
+    * Setting to a _falsy_ value (like `null` or an empty string),
+    * clears the value of the attribute and sets it to `null`, ignoring any inherited value.
     *
     * Attempting to set to some other value is interpreted as the intention to set
     * the class or factory of the view.
