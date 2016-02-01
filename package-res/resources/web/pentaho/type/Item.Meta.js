@@ -331,7 +331,7 @@ define([
      * Attempting to set to a non-string value type implicitly converts the value to a string before assignment.
      *
      * Setting to `undefined` causes this attribute to use the inherited value,
-     * except for the root type _Item_ (which has no ancestor), where the URL is `null`.
+     * except for the root type _Item_ (which has no ancestor), where the attribute is `null`.
      *
      * Setting to `null` or to an empty string clears the attribute and sets it to `null, ignoring any inherited value.
      *
@@ -368,12 +368,14 @@ define([
     /**
      * Gets or sets an URL pointing to documentation associated with this type.
      *
-     * Attempting to set to a non-string value type implicitly converts the value to a string before assignment.
+     * Attempting to set to a non-string value type implicitly
+     * converts the value to a string before assignment.
      *
      * Setting to `undefined` causes this attribute to use the inherited value,
-     * except for the root type _Item_ (which has no ancestor), where the URL is `null`.
+     * except for the root type _Item_ (which has no ancestor), where the attribute is `null`.
      *
-     * Setting to `null` or to an empty string clears the attribute and sets it to `null, ignoring any inherited value.
+     * Setting to `null` or to an empty string clears the attribute and sets it to `null,
+     * ignoring any inherited value.
      *
      * @type {?nonEmptyString}
      */
@@ -442,9 +444,9 @@ define([
     /**
      * Gets or sets the `advanced` attribute of this type.
      *
-     * Items with `advanced` attributes set to `true` are typically immediately accessible to the user.
+     * Items with `advanced` attributes set to `false` are typically immediately accessible to the user.
      * An advanced item typically escapes the expected flow of utilization, yet it is
-     * sufficiently relevant to be shown in a the user interface.
+     * sufficiently relevant to be shown in a user interface.
      *
      * Setting to a {@link Nully} value causes this attribute to use the inherited value,
      * except for the root type _Item_ (which has no ancestor), where the attribute is `false`.
@@ -481,7 +483,7 @@ define([
     /**
      * Gets or sets the CSS class associated with this type.
      *
-     * This attribute is typically used to associate an icon with this item.
+     * This attribute is typically used to associate an icon with this item type.
      *
      * @type {nonEmptyString}
      */
@@ -513,7 +515,7 @@ define([
 
     /**
      * Gets or sets the ordinal associated with this type.
-     * The ordinal is used to disambiguate the order with which an item is show in the user interface.
+     * The ordinal is used to disambiguate the order with which an item is shown in a user interface.
      *
      * Setting to a {@link Nully} value causes this attribute to use the inherited value,
      * except for the root type _Item_ (which has no ancestor), where the attribute is `0`.
