@@ -16,6 +16,7 @@
  */
 
 var deps = [
+  'angular-mocks',
   'common-ui/angular',
   'common-ui/angular-directives/folderBrowser/folderBrowser',
   'common-ui/jquery'
@@ -188,7 +189,6 @@ define(deps, function (angular, folderBrowser) {
         $rootScope.$apply();
         expect($rootScope.selectednode.children.length > 0);
       });
-
 
 
       it('should initialize spinner when loading binding is set', function () {
