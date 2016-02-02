@@ -137,8 +137,10 @@ define([
       },
 
       /**
-       * Alias function to set the underlying primitive value of the _simple_ value.
+       * Configuration alias that sets the underlying primitive value of the _simple_ value.
        * {@link pentaho.type.Simple#value}
+       *
+       * @ignore
        */
       set v(value) {
         this.value = value;
@@ -162,8 +164,10 @@ define([
       },
 
       /**
-       * Alias function to set the formatted value of the property
+       * Configuration alias that sets the formatted value of the property
        * {@link pentaho.type.Simple#formatted}
+       *
+       * @ignore
        */
       set f(value) {
         this.formatted = value;
@@ -173,7 +177,7 @@ define([
       /**
        * Gets the underlying primitive value of the _simple_ value.
        *
-       * @return {*}
+       * @return {*} The underlying value.
        */
       valueOf: function() {
         return this._value;
@@ -182,7 +186,7 @@ define([
       /**
        * Returns a string that represents the current _simple_ value.
        *
-       * @return {String}
+       * @return {String} The string representation.
        */
       toString: function() {
         var f = this._formatted;
