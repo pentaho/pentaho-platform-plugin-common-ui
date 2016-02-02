@@ -75,8 +75,8 @@ define([
        * Initializes a property metadata instance, given a property specification.
        *
        * @param {pentaho.type.spec.UPropertyMeta} spec A property name or specification object.
-       * @param {object} keyArgs Keyword arguments.
-       * @param {pentaho.type.Complex.Meta} keyArgs.declaringMeta The metadata class of the complex type
+       * @param {!Object} keyArgs Keyword arguments.
+       * @param {!pentaho.type.Complex.Meta} keyArgs.declaringMeta The metadata class of the complex type
        *    that declares the property.
        * @param {number} keyArgs.index The index of the property within its complex type.
        * @ignore
@@ -88,6 +88,18 @@ define([
         this.base(spec, keyArgs);
       },
 
+      /**
+       * Performs initialization tasks that take place before the instance is
+       * extended with its spec.
+       *
+       * @param {pentaho.type.spec.UPropertyMeta} spec A property name or specification object.
+       * @param {!Object} keyArgs Keyword arguments.
+       * @param {!pentaho.type.Complex.Meta} keyArgs.declaringMeta The metadata class of the complex type
+       *    that declares the property.
+       * @param {number} keyArgs.index The index of the property within its complex type.
+       * @protected
+       * @ignore
+       */
       _init: function(spec, keyArgs) {
 
         this.base.apply(this, arguments);
@@ -201,6 +213,14 @@ define([
         return this._name;
       },
 
+      /**
+       * The `name` attribute can only be set once.
+       * The setter is used internally when extending Property, e.g.:
+       *
+       * var derivedProp = Property.extendProto({name: "xpto"});
+       *
+       * @ignore
+       */
       set name(value) {
         value = nonEmptyString(value);
 
@@ -241,6 +261,7 @@ define([
        * that list type's element type,
        * {@link pentaho.type.List.Meta#of},
        * is returned.
+       *
        * Otherwise,
        * {@link pentaho.type.Property.type} is returned.
        *
@@ -264,6 +285,12 @@ define([
         return this._typeMeta;
       },
 
+      /**
+       * Sets the type of the value that the property can hold.
+       * Note that changing the type does not implicitly enforce a cast of the value to the new type.
+       * TODO: review this setter.
+       * @ignore
+       */
       set type(value) {
         // Resolves types synchronously.
         if(this.isRoot) {
@@ -399,6 +426,18 @@ define([
 
       //region validation
 
+      /**
+       * Determines if this property is valid in the instance of Complex that owns this property.
+       *
+       * This method first ensures the value of the property is consistent with its type.
+       * Afterwards, the cardinality is verified against the attributes
+       * {@link pentaho.type.Property.Meta#countMin} and {@link pentaho.type.Property.Meta#countMax}.
+       *
+       * @param {pentaho.type.Complex} owner The complex value that owns the property.
+       * @return {?Array.<!Error>} A non-empty array of `Error` or `null`.
+       *
+       * @see pentaho.type.Complex.Meta#_validate
+       */
       validate: function(owner) {
         var errors = null,
             addErrors = function(newErrors) {
@@ -440,7 +479,9 @@ define([
       //region dynamic attributes
       // Configuration support
       /**
-       * Sets the attributes of the property
+       * Sets the attributes of the property.
+       *
+       * This setter is used when the developer is extending Property to support new attributes.
        *
        * @type pentaho.type.spec.IPropertyMeta
        * @ignore
@@ -451,6 +492,17 @@ define([
         }, this);
       },
 
+      /**
+       * Dynamically defines an attribute and corresponding setter and getter methods.
+       *
+       * This method is an implementation detail,
+       * ans is invoked by {pentaho.type.Property.Meta#attrs}
+       *
+       * @param {String} name
+       * @param {} spec
+       * @private
+       * @ignore
+       */
       _dynamicAttribute: function(name, spec) {
         var cast = spec.cast,
             // default/neutral value
