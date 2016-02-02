@@ -314,6 +314,7 @@ define([
 
       //region Defining Attributes
       describe("name - ", function() {
+
         it("should throw when spec is falsy", function() {
           function expectIt(name) {
             expect(function() {
@@ -406,10 +407,48 @@ define([
           expect(propMeta.type).toBe(String.meta);
         });
       }); // end type
+
+      describe("elemType - ", function() {
+        it("for singular values, should provide same output as `type`", function() {
+          ["string", "number", "boolean", "date", "complex"].forEach(function(type) {
+            var propMeta = createRootPropMeta({name: "foo1", type: type});
+            expect(propMeta.elemType).toBe(propMeta.type);
+          });
+        });
+
+        it("for list values, should return the type of its elements (base/of syntax)", function() {
+          ["string", "number", "boolean", "date", "complex"].forEach(function(type) {
+            var propMeta = createRootPropMeta({name: "foo1", type: {base: "list", of: type}});
+            expect(propMeta.elemType).toBe(propMeta.type.of);
+          });
+        });
+
+      }); // end elemType
+
+      describe("value - ", function(){
+
+        var propMeta;
+        beforeEach(function(){
+          propMeta = createRootPropMeta({name: "foo", type: "string",  value: "Foo"});
+        });
+
+        it("should honor the default value", function(){
+          expect(propMeta.value.value).toBe("Foo");
+          expect(propMeta.value.formatted).toBe(null);
+        });
+
+      }); //end value
       //endregion
 
       //region Dynamic Attributes
       describe("required - ", function() {
+        it("should be immutable", function() {
+          var propMeta = Property.meta;
+          var isRequired = propMeta.required;
+          propMeta.required = true;
+          expect(propMeta.required).toBe(isRequired);
+        });
+
         it("should default to an unset local value", function() {
           var propMeta = createRootPropMeta({name: "foo"});
           expect(propMeta.required).toBe(undefined);
@@ -516,6 +555,13 @@ define([
       }); // end required
 
       describe("countMin - ", function() {
+        it("should be immutable", function() {
+          var propMeta = Property.meta;
+          var countMin = propMeta.countMin;
+          propMeta.countMin = 42;
+          expect(propMeta.countMin).toBe(countMin);
+        });
+
         it("should default to an unset local value", function() {
           var propMeta = createRootPropMeta({name: "foo"});
           expect(propMeta.countMin).toBe(undefined);
@@ -605,6 +651,13 @@ define([
       }); // end countMin
 
       describe("countMax - ", function() {
+        it("should be immutable", function() {
+          var propMeta = Property.meta;
+          var countMax = propMeta.countMax;
+          propMeta.countMax = 42;
+          expect(propMeta.countMax).toBe(countMax);
+        });
+
         it("should default to an unset local value", function() {
           var propMeta = createRootPropMeta({name: "foo"});
           expect(propMeta.countMax).toBe(undefined);
@@ -699,6 +752,13 @@ define([
       }); // end countMax
 
       describe("applicable - ", function() {
+        it("should be immutable", function() {
+          var propMeta = Property.meta;
+          var isApplicable = propMeta.applicable;
+          propMeta.applicable = false;
+          expect(propMeta.applicable).toBe(isApplicable);
+        });
+
         it("should default to an unset local value", function() {
           var propMeta = createRootPropMeta({name: "foo"});
           expect(propMeta.applicable).toBe(undefined);
@@ -777,6 +837,13 @@ define([
       }); // end applicable
 
       describe("readOnly - ", function() {
+        it("should be immutable", function() {
+          var propMeta = Property.meta;
+          var isReadOnly = propMeta.readOnly;
+          propMeta.readOnly = true;
+          expect(propMeta.readOnly).toBe(isReadOnly);
+        });
+
         it("should default to an unset local value", function() {
           var propMeta = createRootPropMeta({name: "foo"});
           expect(propMeta.readOnly).toBe(undefined);
@@ -2216,6 +2283,37 @@ define([
           expect(subSpy.calls.count()).toBe(0);
         });
       }); // end readOnly
+
+      describe("value -", function(){
+        var propMeta;
+        beforeEach(function(){
+          var Base = Complex.extend();
+          Base.meta.add({name: "baseNum", type: Number});
+          var Derived = Base.extend();
+
+          propMeta = extendProp(Derived.meta, "baseNum", {name: "baseNum"});
+        });
+
+        it("should be null by default", function() {
+          expect(propMeta.value).toBeNull();
+        });
+
+        it("should inherit base type value by default", function() {
+          propMeta.value = 42;
+          expect(propMeta.value.value).toBe(42);
+        });
+        it("should inherit base type value by default", function() {
+          propMeta.value = {value: 42, formatted: "Forty-two"};
+          expect(propMeta.value.value).toBe(42);
+        });
+
+        it("should be resettable to the default value", function() {
+          propMeta.value = 42;
+          propMeta.value = undefined;
+          expect(propMeta.value).toBeNull();
+        });
+
+      }); // end value
       //endregion
     }); // end override a property
 

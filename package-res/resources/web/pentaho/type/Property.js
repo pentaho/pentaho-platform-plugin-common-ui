@@ -27,6 +27,7 @@ define([
 
   "use strict";
 
+  var _propertyMeta;
   /**
    * @name pentaho.type.Property
    *
@@ -34,6 +35,8 @@ define([
    * @extends pentaho.type.Item
    *
    * @classdesc A property of a complex value.
+   *
+   * The developer is not expected to create instances of this type.
    *
    * @see pentaho.type.Complex
    */
@@ -49,6 +52,8 @@ define([
    * @implements pentaho.lang.ICollectionElement
    *
    * @classdesc The metadata of a property of a complex type.
+   *
+   * A _Property_ only exists within a _complex_ item.
    *
    * @description Creates a property metadata instance.
    *
@@ -70,8 +75,8 @@ define([
        * Initializes a property metadata instance, given a property specification.
        *
        * @param {pentaho.type.spec.UPropertyMeta} spec A property name or specification object.
-       * @param {object} keyArgs Keyword arguments.
-       * @param {pentaho.type.Complex.Meta} keyArgs.declaringMeta The metadata class of the complex type
+       * @param {!Object} keyArgs Keyword arguments.
+       * @param {!pentaho.type.Complex.Meta} keyArgs.declaringMeta The metadata class of the complex type
        *    that declares the property.
        * @param {number} keyArgs.index The index of the property within its complex type.
        * @ignore
@@ -83,6 +88,18 @@ define([
         this.base(spec, keyArgs);
       },
 
+      /**
+       * Performs initialization tasks that take place before the instance is
+       * extended with its spec.
+       *
+       * @param {pentaho.type.spec.UPropertyMeta} spec A property name or specification object.
+       * @param {!Object} keyArgs Keyword arguments.
+       * @param {!pentaho.type.Complex.Meta} keyArgs.declaringMeta The metadata class of the complex type
+       *    that declares the property.
+       * @param {number} keyArgs.index The index of the property within its complex type.
+       * @protected
+       * @ignore
+       */
       _init: function(spec, keyArgs) {
 
         this.base.apply(this, arguments);
@@ -196,6 +213,14 @@ define([
         return this._name;
       },
 
+      /**
+       * The `name` attribute can only be set once.
+       * The setter is used internally when extending Property, e.g.:
+       *
+       * var derivedProp = Property.extendProto({name: "xpto"});
+       *
+       * @ignore
+       */
       set name(value) {
         value = nonEmptyString(value);
 
@@ -236,6 +261,7 @@ define([
        * that list type's element type,
        * {@link pentaho.type.List.Meta#of},
        * is returned.
+       *
        * Otherwise,
        * {@link pentaho.type.Property.type} is returned.
        *
@@ -259,6 +285,12 @@ define([
         return this._typeMeta;
       },
 
+      /**
+       * Sets the type of the value that the property can hold.
+       * Note that changing the type does not implicitly enforce a cast of the value to the new type.
+       * TODO: review this setter.
+       * @ignore
+       */
       set type(value) {
         // Resolves types synchronously.
         if(this.isRoot) {
@@ -298,7 +330,7 @@ define([
        * inherits any base default value.
        *
        * Setting to `null` breaks inheritance
-       * and forces not having a default value.
+       * and forces not having a _default value_.
        *
        * Any other set values must be _convertible_ to
        * the property's value type, {@link pentaho.type.Property.Meta#type}.
@@ -319,11 +351,11 @@ define([
       // NOTE: the argument cannot have the same name as the property setter
       // or PhantomJS 1.9.8 will throw a syntax error...
       set value(_) {
-        if(this.isRoot) return;
-
         if(_ === undefined) {
-          // Clear local value. Inherit base value.
-          delete this._value;
+          if(this !== _propertyMeta) {
+            // Clear local value. Inherit base value.
+            delete this._value;
+          }
         } else {
           this._value = this.toValue(_, /*noDefault:*/true);
         }
@@ -372,7 +404,15 @@ define([
       //endregion
 
       //region label attribute
-      // default is a Capitalization of name
+      /**
+       * Resets the label of the property.
+       *
+       * The label of a root property is reset to a capitalization of the `name` attribute.
+       * A non-root property inherits the label of its closest ancestor.
+       *
+       * @return {nonEmptyString}
+       * @ignore
+       */
       _resetLabel: function() {
         if(this.isRoot) {
           this._label = text.titleFromName(this.name);
@@ -386,6 +426,18 @@ define([
 
       //region validation
 
+      /**
+       * Determines if this property is valid in the instance of Complex that owns this property.
+       *
+       * This method first ensures the value of the property is consistent with its type.
+       * Afterwards, the cardinality is verified against the attributes
+       * {@link pentaho.type.Property.Meta#countMin} and {@link pentaho.type.Property.Meta#countMax}.
+       *
+       * @param {pentaho.type.Complex} owner The complex value that owns the property.
+       * @return {?Array.<!Error>} A non-empty array of `Error` or `null`.
+       *
+       * @see pentaho.type.Complex.Meta#_validate
+       */
       validate: function(owner) {
         var errors = null,
             addErrors = function(newErrors) {
@@ -426,13 +478,31 @@ define([
 
       //region dynamic attributes
       // Configuration support
+      /**
+       * Sets the attributes of the property.
+       *
+       * This setter is used when the developer is extending Property to support new attributes.
+       *
+       * @type pentaho.type.spec.IPropertyMeta
+       * @ignore
+       */
       set attrs(attrSpecs) {
         Object.keys(attrSpecs).forEach(function(name) {
           this._dynamicAttribute(name, attrSpecs[name]);
         }, this);
-        return this;
       },
 
+      /**
+       * Dynamically defines an attribute and corresponding setter and getter methods.
+       *
+       * This method is an implementation detail,
+       * ans is invoked by {pentaho.type.Property.Meta#attrs}
+       *
+       * @param {String} name
+       * @param {} spec
+       * @private
+       * @ignore
+       */
       _dynamicAttribute: function(name, spec) {
         var cast = spec.cast,
             // default/neutral value
@@ -797,6 +867,8 @@ define([
       }
     } // end meta:
   });
+
+  _propertyMeta = Property.prototype;
 
   return Property;
 

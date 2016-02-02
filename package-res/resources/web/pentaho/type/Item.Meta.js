@@ -40,6 +40,11 @@ define([
    * For more information see {@link pentaho.type.Item}.
    *
    * @description _Initializes_ the type's singleton metadata object.
+   * @param {Object} instSpec The specification of this type.
+   * @param {!Object} keyArgs Keyword arguments.
+   * @param {!pentaho.type.Item} keyArgs.mesa _Prototype_ of the class used for representing the data of this type.
+   * @param {boolean} [keyArgs.isRoot=false] If `true`, creates a _root_ type.
+   *
    */
   var ItemMeta = Base.extend("pentaho.type.Item.Meta",
       /** @lends pentaho.type.Item.Meta# */{
@@ -54,6 +59,19 @@ define([
       this._postInit(instSpec, keyArgs);
     },
 
+    /**
+     * Performs initialization tasks that take place before the instance is
+     * extended with its spec.
+     *
+     * This method is typically overridden to block inheritance of attributes.
+     *
+     * @param {Object} instSpec The specification of this type.
+     * @param {!Object} keyArgs Keyword arguments.
+     * @param {!pentaho.type.Item} keyArgs.mesa _Prototype_ of the class used for representing the data of this type.
+     * @param {boolean} [keyArgs.isRoot=false] If `true`, creates a _root_ type.
+     * @protected
+     * @overridable
+     */
     _init: function(instSpec, keyArgs) {
       O.setConst(this, "_uid", _nextUid++);
 
@@ -70,6 +88,18 @@ define([
       this._styleClass = null;
     },
 
+    /**
+     * Performs initialization tasks that take place after the instance is
+     * extended with its spec.
+     *
+     * This method is typically overridden to validate the values of the attributes.
+     * The default implementation does nothing.
+     *
+     * @param {Object} instSpec The specification of this type.
+     * @param {Object} keyArgs Keyword arguments.
+     * @protected
+     * @overridable
+     */
     _postInit: function(instSpec, keyArgs) {
     },
 
@@ -208,7 +238,7 @@ define([
      *
      * This attribute is not inherited.
      *
-     * @type {?nonEmptystring}
+     * @type {?nonEmptyString}
      * @readonly
      */
     get id() {
@@ -293,7 +323,7 @@ define([
      * Setting to `undefined` causes this attribute to use the inherited value,
      * except for the root type _Item_ (which has no ancestor), where this attribute is `null`.
      *
-     * Setting to `null` or to an empty string clears the attribute and sets it to `null, ignoring any inherited value.
+     * Setting to `null` or to an empty string clears the attribute and sets it to `null`, ignoring any inherited value.
      *
      * @type {?nonEmptyString}
      */
@@ -328,12 +358,14 @@ define([
      *
      * The category is used primarily to group similar items in a user interface.
      *
-     * Attempting to set to a non-string value type implicitly converts the value to a string before assignment.
+     * Attempting to set to a non-string value type implicitly
+     * converts the value to a string before assignment.
      *
      * Setting to `undefined` causes this attribute to use the inherited value,
      * except for the root type _Item_ (which has no ancestor), where the attribute is `null`.
      *
-     * Setting to `null` or to an empty string clears the attribute and sets it to `null, ignoring any inherited value.
+     * Setting to `null` or to an empty string clears the attribute and sets it to `null`,
+     * thus ignoring any inherited value.
      *
      * @type {?nonEmptyString}
      * @see pentaho.type.Item.Meta#browsable
@@ -374,7 +406,7 @@ define([
      * Setting to `undefined` causes this attribute to use the inherited value,
      * except for the root type _Item_ (which has no ancestor), where the attribute is `null`.
      *
-     * Setting to `null` or to an empty string clears the attribute and sets it to `null,
+     * Setting to `null` or to an empty string clears the attribute and sets it to `null`,
      * ignoring any inherited value.
      *
      * @type {?nonEmptyString}
