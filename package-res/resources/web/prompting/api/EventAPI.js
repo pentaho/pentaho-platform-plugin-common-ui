@@ -73,23 +73,23 @@ define([], function() {
     };
 
     /**
-     * Registers a parameter changed event
+     * Registers a parameter changed event.
      *
      * @name EventAPI#parameterChanged
      * @method
      * @param {Function} callback   The function to be executed when the event is triggered.
-     *                              Pass null if you wish to unbind this event
-     * @param {String} paramName    The name of the parameter to which the callback will be called
+     *                              Pass null if you wish to unbind this event.
+     * @param {String} paramName    The name of the parameter to which the callback will be called.
      *                              This argument is optional. If no parameter name is passed on
-     *                              the callback will be assigned to all the parameters. If paramName is
-     *                              not a valid string the callback will be registered to all parameters.
+     *                              the callback, it will be assigned to all the parameters. If paramName is
+     *                              not a valid string, the callback will be registered to all parameters.
      *
-     * @example <caption>Register a parameter changed event to all parameters that don't have a specific callback assigned</caption>
+     * @example <caption>Register a parameter changed event to all parameters which do not have a specific callback assigned.</caption>
      *  api.event.parameterChanged(function(parameterName, parameterValue) {
      *    // Execute event based code
      *  })
      *
-     * @example <caption>Register a parameter changed event to the parameter called "parameterName"</caption>
+     * @example <caption>Register a parameter changed event to the parameter called "parameterName".</caption>
      *  api.event.parameterChanged(function(parameterName, parameterValue) {
      *    // Execute event based code
      *  }, "parameterName")

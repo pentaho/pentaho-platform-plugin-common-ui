@@ -26,7 +26,7 @@
  * @property {Boolean} autoSubmit True if the prompt is in auto submit mode, false otherwise
  * @property {Dashboard} dashboard The dashboard object assigned to the prompt
  * @property {Boolean} parametersChanged True if the parameters have changed, False otherwise
- * @property {Object} onParameterChanged collection of parameterNames and the callback called when that parameter is changed
+ * @property {Object} onParameterChanged Collection of parameterNames and the callback called when that parameter is changed.
  * @property {Function} onBeforeRender Callback called if defined before any change is performed in the prompt components
  * @property {Function} onAfterRender Callback called if defined after any change is performed in the prompt components
  * @property {Function} onBeforeUpdate Callback called if defined before the prompt update cycle is called
