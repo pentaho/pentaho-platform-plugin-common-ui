@@ -42,13 +42,16 @@ define([
       }
     }
 
-    function constructWithObject(value, formatted) {
-      var spec = Object.create({_value:value, _formatted: formatted});
+    function constructWithObject(v, f) {
+      var spec = {};
+      if(v != null && f != null) {
+        spec = {value: v, formatted: f};
+      }
 
-      if(spec && spec._value != null) {
+      if(v != null) {
         var simpleType = new Simple(spec);
-        expect(simpleType.value).toBe(value);
-        expect(simpleType.formatted).toBe(formatted);
+        expect(simpleType.value).toBe(v);
+        expect(simpleType.formatted).toBe(f);
       } else {
         expectThrow(spec, bundle.structured.errors.value.isNull);
       }
@@ -85,7 +88,6 @@ define([
         constructWithSimple(true, "true");
         constructWithSimple(123, "123");
         constructWithSimple("simple", "Simple");
-
       });
 
       it("Creating with a value", function() {
@@ -94,6 +96,7 @@ define([
         constructWithValue(true);
         constructWithValue(123);
         constructWithValue("simple");
+        constructWithValue(new Element());
       });
     });
 
@@ -102,13 +105,18 @@ define([
         var original = new Simple(constructWithObject(true, "true"));
         var clone = original.clone();
 
+        expect(clone).not.toBe(original);
         expect(clone.value).toBe(original.value);
         expect(clone.formatted).toBe(original.formatted);
       });
     });
 
     describe("#value -", function() {
-      var simpleType = new Simple(123);
+      var simpleType;
+
+      beforeEach(function() {
+        simpleType = new Simple(123);
+      });
 
       function setValueExpectedThrow(value, errorMessage) {
         expect(function() {
@@ -124,12 +132,19 @@ define([
         expect(simpleType.value).toBe(123);
       });
 
-      it("Simple value cannot contain null", function() {
-        setValueExpectedThrow(null, bundle.structured.errors.value.isNull);
-      });
-
       it("Cannot change the primitive value of a simple value", function() {
         setValueExpectedThrow(456, bundle.structured.errors.value.cannotChangeValue);
+      });
+
+      it("Nothing should happen when setting the underlying primitive value with the same value", function() {
+        expect(function() {
+          simpleType.value = 123;
+        }).not.toThrow();
+        expect(simpleType.value).toBe(123);
+      });
+
+      it("Simple value cannot contain null", function() {
+        setValueExpectedThrow(null, bundle.structured.errors.value.isNull);
       });
     });
 
@@ -153,7 +168,7 @@ define([
         expect(simpleType.formatted).toBe(value + "f");
       }
 
-      it("Should return null if set with nully values", function() {
+      it("Should return null if set with nully or empty values", function() {
         testNullValue(null);
         testNullValue(undefined);
         testNullValue("");
@@ -178,7 +193,7 @@ define([
       });
 
       it("Should return the value converted to a string if 'formatted' is not defined", function() {
-        var simpleType = new Simple(constructWithObject(123));
+        var simpleType = new Simple(123);
         expect(simpleType.toString()).toBe("123");
       });
     });
@@ -202,11 +217,23 @@ define([
       });
 
       describe("#cast -", function() {
-        var SimpleMeta = Simple.meta;
-        function expectCastError(value, message) {
+        var SimpleMeta, Derived;
+
+        beforeEach(function() {
+          SimpleMeta = Simple.meta;
+          Derived = Simple.extend({meta: {
+            cast: function (value) {
+              var n = parseFloat(value);
+              if (isNaN(n)) throw new Error("Invalid value");
+              return n;
+            }
+          }});
+        });
+
+        function expectCastError(meta, value, message) {
           expect(function() {
-            SimpleMeta.cast(value);
-          }).toThrowError(message)
+            meta.cast(value);
+          }).toThrowError(message);
         }
 
         it("Default cast should return the value unchanged", function() {
@@ -217,40 +244,33 @@ define([
         });
 
         it("Cannot cast null values", function() {
-          expectCastError(null, bundle.structured.errors.value.isNull)
+          expectCastError(SimpleMeta, null, bundle.structured.errors.value.isNull)
         });
 
-        it("Cannot set the cast function to null", function() {
-          SimpleMeta.cast = null;
+        it("Top cast function should throw an error message when cast function returns nully (null or undefined).", function() {
+          var errorMessage = bundle.format(bundle.structured.errors.value.cannotConvertToType, [SimpleMeta.label]);
 
-          expect(SimpleMeta.cast).not.toBeNull();
-          expect(typeof Simple.meta.cast).toBe('function');
-        });
-
-        it("Top cast function should throw error message when cast fails", function() {
           SimpleMeta.cast = function(value) {
             return value === 0 ? null : value;
           };
+          expectCastError(SimpleMeta, 0, errorMessage);
 
-          expectCastError(0, bundle.format(bundle.structured.errors.value.cannotConvertToType, [SimpleMeta.label]));
+          SimpleMeta.cast = function(value) {
+            return value === 0 ? undefined : value;
+          };
+          expectCastError(SimpleMeta, 0, errorMessage);
         });
 
         it("Should have changed the default cast behaviour and return an error if not a number", function() {
-          var errorMessage = "Invalid value";
-          var Derived = Simple.extend({
-            meta: {
-              cast: function (value) {
-                var n = parseFloat(value);
-                if (isNaN(n)) throw new Error(errorMessage);
-                return n;
-              }
-            }
-          });
-
           expect(Derived.meta.cast("1")).toBe(1);
-          expect(function() {
-           Derived.meta.cast("a");
-          }).toThrowError(errorMessage);
+          expectCastError(Derived.meta, "a", "Invalid value");
+        });
+
+        it("Setting cast to a falsy value restores the default cast function (identity)", function() {
+          var value = "123";
+          expect(Derived.meta.cast(value)).toBe(123);
+          Derived.meta.cast = null;
+          expect(Derived.meta.cast(value)).toBe(value);
         });
       });
     });
