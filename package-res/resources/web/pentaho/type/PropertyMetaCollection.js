@@ -84,6 +84,15 @@ define([
     //region List implementation
     elemClass: Property.Meta,
 
+    /**
+     * Add a pentaho.type.UPropertyMeta to the properties collection.
+     *
+     * This method allows adding elements to the collection using custom options (keyword arguments).
+     *
+     * @param {string} spec The name of the property.
+     * @param {number} index The location of the property in the collection.
+     * @param {Object} ka The keyword arguments.
+     */
     _adding: function(spec, index, ka) {
       if(!spec) throw error.argRequired("props[i]");
 
@@ -105,6 +114,15 @@ define([
       return this.base.apply(this, arguments);
     },
 
+    /**
+     * Replace a pentaho.type.UPropertyMeta in the properties collection.
+     *
+     * This method allows replacing elements in the collection using custom options (keyword arguments).
+     *
+     * @param {string} spec The name of the property.
+     * @param {number} index The location of the property in the collection.
+     * @param {Object} existing The keyword arguments.
+     */
     _replacing: function(spec, index, existing) {
       if(!spec) throw error.argRequired("props[i]");
 
@@ -125,6 +143,14 @@ define([
       return Property.extendProto(existing.mesa, {meta: spec}, ka).meta;
     },
 
+    /**
+     * Cast a property from the collection.
+     *
+     * The cast is called to convert specs of properties which are new (not an override) into a Property.Meta instance
+     *
+     * @param {string} spec The name of the property.
+     * @param {string} index The location of the property in the collection.
+     */
     _cast: function(spec, index) {
       // For new, root, local properties.
 
