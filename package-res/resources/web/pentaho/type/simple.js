@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2016 Pentaho Corporation.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,9 @@
 define([
   "module",
   "./element",
-  "../util/error",
   "../util/object",
   "../i18n!types"
-], function(module, elemFactory, error, O, bundle) {
+], function(module, elemFactory, O, bundle) {
 
   "use strict";
 
@@ -133,11 +132,14 @@ define([
           // First set
           this._value = _;
         } else if(this._value !== _) {
-          throw error.operInvalid("Cannot change the primitive value of a simple value.");
+          throw new Error(bundle.structured.errors.value.cannotChangeValue);
         }
       },
 
-      // configuration alias
+      /**
+       * Alias function to set the underlying primitive value of the _simple_ value.
+       * {@link pentaho.type.Simple#value}
+       */
       set v(value) {
         this.value = value;
       },
@@ -159,16 +161,29 @@ define([
         this._formatted = nonEmptyString(value);
       },
 
-      // configuration alias
+      /**
+       * Alias function to set the formatted value of the property
+       * {@link pentaho.type.Simple#formatted}
+       */
       set f(value) {
         this.formatted = value;
       },
       //endregion
 
+      /**
+       * Gets the underlying primitive value of the _simple_ value.
+       *
+       * @return {*}
+       */
       valueOf: function() {
         return this._value;
       },
 
+      /**
+       * Returns a string that represents the current _simple_ value.
+       *
+       * @return {String}
+       */
       toString: function() {
         var f = this._formatted;
         return f != null ? f : String(this._value);
@@ -244,6 +259,9 @@ define([
     return Simple;
 
     //region cast private methods
+    /**
+     * Wrapper cast function {@link pentaho.type.Simple.Meta#cast}
+     */
     function castTop(value) {
       if(value == null)
         throw new Error(bundle.structured.errors.value.isNull);
@@ -255,11 +273,20 @@ define([
       return value;
     }
 
+    /**
+     * Default identity cast function
+     */
     function castCore(value) {
       return value;
     }
     //endregion
 
+    /**
+     * Returns `null` when given a {@link Nully} value and a String otherwise
+     *
+     * @param value   {*} The value to be verified
+     * @return {?String}
+     */
     function nonEmptyString(value) {
       return value == null ? null : (String(value) || null);
     }
