@@ -455,6 +455,10 @@ define([
          * @return {?pentaho.type.Property.Meta} The property metadata.
          */
         get: function(name, lenient) {
+          if(!name && !lenient) {
+            throw error.argRequired("name");
+          }
+
           var p = this._get(name);
           if(!p && !lenient) throw error.operInvalid("A property with the name '" + (name.name || name) + "' is not defined.");
           return p;
