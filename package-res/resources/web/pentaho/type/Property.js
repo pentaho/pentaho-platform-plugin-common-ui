@@ -27,6 +27,7 @@ define([
 
   "use strict";
 
+  var _propertyMeta;
   /**
    * @name pentaho.type.Property
    *
@@ -34,6 +35,8 @@ define([
    * @extends pentaho.type.Item
    *
    * @classdesc A property of a complex value.
+   *
+   * The developer is not expected to create instances of this type.
    *
    * @see pentaho.type.Complex
    */
@@ -49,6 +52,8 @@ define([
    * @implements pentaho.lang.ICollectionElement
    *
    * @classdesc The metadata of a property of a complex type.
+   *
+   * A _Property_ only exists within a _complex_ item.
    *
    * @description Creates a property metadata instance.
    *
@@ -298,7 +303,7 @@ define([
        * inherits any base default value.
        *
        * Setting to `null` breaks inheritance
-       * and forces not having a default value.
+       * and forces not having a _default value_.
        *
        * Any other set values must be _convertible_ to
        * the property's value type, {@link pentaho.type.Property.Meta#type}.
@@ -319,11 +324,11 @@ define([
       // NOTE: the argument cannot have the same name as the property setter
       // or PhantomJS 1.9.8 will throw a syntax error...
       set value(_) {
-        if(this.isRoot) return;
-
         if(_ === undefined) {
-          // Clear local value. Inherit base value.
-          delete this._value;
+          if(this !== _propertyMeta) {
+            // Clear local value. Inherit base value.
+            delete this._value;
+          }
         } else {
           this._value = this.toValue(_, /*noDefault:*/true);
         }
@@ -372,7 +377,15 @@ define([
       //endregion
 
       //region label attribute
-      // default is a Capitalization of name
+      /**
+       * Resets the label of the property.
+       *
+       * The label of a root property is reset to a capitalization of the `name` attribute.
+       * A non-root property inherits the label of its closest ancestor.
+       *
+       * @return {nonEmptyString}
+       * @ignore
+       */
       _resetLabel: function() {
         if(this.isRoot) {
           this._label = text.titleFromName(this.name);
@@ -426,11 +439,16 @@ define([
 
       //region dynamic attributes
       // Configuration support
+      /**
+       * Sets the attributes of the property
+       *
+       * @type pentaho.type.spec.IPropertyMeta
+       * @ignore
+       */
       set attrs(attrSpecs) {
         Object.keys(attrSpecs).forEach(function(name) {
           this._dynamicAttribute(name, attrSpecs[name]);
         }, this);
-        return this;
       },
 
       _dynamicAttribute: function(name, spec) {
@@ -797,6 +815,8 @@ define([
       }
     } // end meta:
   });
+
+  _propertyMeta = Property.prototype;
 
   return Property;
 
