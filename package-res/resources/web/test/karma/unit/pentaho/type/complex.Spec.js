@@ -787,7 +787,7 @@ define([
         expect(value).toBe(undefined);
       });
 
-      it("should return undefined if not index provided for a list property", function() {
+      it("should return first value if no index provided for a list property", function() {
         var Derived = Complex.extend({
           meta: {props: [{name: "x", type: ["string"]}]}
         });
@@ -795,7 +795,7 @@ define([
         var derived = new Derived({"x": ["1", "2"]});
 
         var value = derived.getv("x");
-        expect(value).toBe(undefined);
+        expect(value).toBe("1");
       });
 
       it("should return the request index value of an existing list property", function() {
@@ -845,7 +845,7 @@ define([
         expect(value).toBe("1");
       });
 
-      it("should return empty string if not index provided for a list property", function() {
+      it("should return first value if no index provided for a list property", function() {
         var Derived = Complex.extend({
           meta: {props: [{name: "x", type: ["string"]}]}
         });
@@ -853,7 +853,7 @@ define([
         var derived = new Derived({"x": ["1", "2"]});
 
         var value = derived.getf("x");
-        expect(value).toBe("");
+        expect(value).toBe("1");
       });
 
       it("should return the request index value of an existing list property", function() {

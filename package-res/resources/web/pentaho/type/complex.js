@@ -250,7 +250,7 @@ define([
       get1: function(name, index) {
         var pMeta = this.meta.get(name),
             value = this._values[pMeta.name];
-        return pMeta.list ? value.at(index) :
+        return pMeta.list ? value.at(index == null ? 0 : index) :
                !index     ? value :
                null;
       },
@@ -319,9 +319,10 @@ define([
        * An error is thrown if the specified property is not defined.
        *
        * When a requested index does not exist, `undefined` is returned.
+       * If not provided the index defaults to 0 on a list property.
        *
        * @param {string|pentaho.type.Property.Meta} [name] The property name or metadata.
-       * @param {?number} [index] The index of the element.
+       * @param {?number} [index=0] The index of the element.
        *
        * @return {?any} The underlying value of the requested `Element` or `undefined`.
        */
@@ -343,9 +344,10 @@ define([
        * An error is thrown if the specified property is not defined.
        *
        * When a requested index does not exist, `""` is returned.
+       * If not provided the index defaults to 0 on a list property.
        *
        * @param {string|pentaho.type.Property.Meta} [name] The property name or metadata.
-       * @param {?number} [index] The index of the value.
+       * @param {?number} [index=0] The index of the value.
        *
        * @return {string} The string representation of the requested `Element` or `""`.
        */
