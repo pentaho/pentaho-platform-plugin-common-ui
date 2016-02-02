@@ -812,5 +812,26 @@ define([
         });
       });
     });
+
+    describe("#isSubtypeOf(superType)", function() {
+      it("should return false when superType is nully", function() {
+        expect(Item.meta.isSubtypeOf(null)).toBe(false);
+      });
+
+      it("should return true when superType is itself", function() {
+        expect(Item.meta.isSubtypeOf(Item.meta)).toBe(true);
+      });
+
+      it("should return true when this was extended from superType", function() {
+        var SubType = Item.extend();
+        expect(SubType.meta.isSubtypeOf(Item.meta)).toBe(true);
+      });
+
+      it("should return false when this was not extended from superType", function() {
+        var SubType1 = Item.extend();
+        var SubType2 = Item.extend();
+        expect(SubType1.meta.isSubtypeOf(SubType2.meta)).toBe(false);
+      });
+    });
   });
 });

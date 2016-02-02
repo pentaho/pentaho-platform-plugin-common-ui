@@ -661,10 +661,22 @@ define([
      * Determines if a value is an instance of this type.
      *
      * @param {?any} value The value to test.
-     * @return {boolean} Returns `true` if the value is an instance of this type or `false` otherwise.
+     * @return {boolean} `true` if the value is an instance of this type, `false` otherwise.
      */
     is: function(value) {
       return O_isProtoOf.call(this.mesa, value);
+    },
+
+    /**
+     * Determines if this is a subtype of another.
+     *
+     * A type is considered a subtype of itself.
+     *
+     * @param {?pentaho.type.Item.Meta} superType The candidate super-type.
+     * @return {boolean} `true` if this is a subtype of `superType` type, `false` otherwise.
+     */
+    isSubtypeOf: function(superType) {
+      return !!superType && (superType === this || O_isProtoOf.call(superType, this));
     },
 
     // TODO: is conversion always successful? If so, should it be?

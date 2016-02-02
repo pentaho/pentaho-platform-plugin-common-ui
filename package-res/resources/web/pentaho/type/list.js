@@ -29,8 +29,6 @@ define([
 
   return function(context) {
 
-    var O_isProtoOf = Object.prototype.isPrototypeOf;
-
     var Value = context.get(valueFactory),
         Element = context.get(elemFactory),
         _listMeta = null,
@@ -508,6 +506,14 @@ define([
 
       meta: /** @lends pentaho.type.List.Meta# */{
 
+        _postInit: function() {
+
+          this.base.apply(this, arguments);
+
+          // Force base value inheritance. Cannot change after set locally...
+          if(!O.hasOwn(this, "_elemMeta")) this._elemMeta = this._elemMeta;
+        },
+
         id: module.id,
 
         styleClass: "pentaho-type-list",
@@ -515,12 +521,10 @@ define([
         //region list property
         //@override
         /**
-         * Gets a value that indicates if a type is a list type.
+         * Gets a value that indicates if this type is a list type.
          *
          * This implementation is sealed and always returns `true`.
          *
-         * @name list
-         * @memberOf pentaho.type.List.Meta#
          * @type boolean
          * @readOnly
          * @sealed
@@ -530,11 +534,26 @@ define([
         },
         //endregion
 
+        //region refinement property
+        /**
+         * Gets a value that indicates if this type is a refinement type.
+         *
+         * This implementation is sealed and always returns `false`.
+         *
+         * @type boolean
+         * @readOnly
+         * @sealed
+         */
+        get refinement() {
+          return false;
+        },
+        //endregion
+
         //region of
         _elemMeta: Element.meta,
 
         /**
-         * Gets the type of the elements that the list can contain.
+         * Gets the type of the elements that this list can contain.
          *
          * @type {pentaho.type.Element.Meta}
          * @readonly
@@ -545,6 +564,7 @@ define([
 
         // supports configuration
         set of(value) {
+          if(value === undefined) return;
           if(!value) throw error.argRequired("of");
 
           // NOTE: one of the problems is determining if two types are equal,
@@ -552,22 +572,24 @@ define([
           //  structurally equal. Because there isn't an equals test,
           //  it cannot be validated that a set is ok as long as the set value does not change.
 
-          // Don't let change root default value.
-          if(this === _listMeta) return;
-
-          // Can't use O.setConst cause the configurable: false is inherited
-          // and we need to be able to set each local value at least once.
-          if(O.hasOwn(this, "_elemMeta"))  throw error.operInvalid("Property 'of' cannot change.");
-
           var ElemMeta = this.context.get(value),
               elemMeta = ElemMeta.meta,
               baseMeta = this._elemMeta;
 
+          // Can't use O.setConst cause the configurable: false is inherited
+          // and we need to be able to set each local value at least once.
+          if(O.hasOwn(this, "_elemMeta")) {
+            // Includes root _listMeta
+
+            if(elemMeta !== baseMeta) throw error.operInvalid("Property 'of' cannot change.");
+            return;
+          }
+
           // Hierarchy consistency
           // Validate that it is a sub-type of the base property's type.
           // This ensures that `of` is an element type...
-          if(elemMeta !== baseMeta && !O_isProtoOf.call(baseMeta, elemMeta))
-            throw error.argInvalid("of", bundle.structured.errors.list.elemTypeNotExtendsBaseElemType);
+          if(elemMeta !== baseMeta && !elemMeta.isSubtypeOf(baseMeta))
+            throw error.argInvalid("of", bundle.structured.errors.list.elemTypeNotSubtypeOfBaseElemType);
 
           // Mark set locally even if it is the same...
           this._elemMeta = elemMeta;

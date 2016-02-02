@@ -27,8 +27,6 @@ define([
 
   "use strict";
 
-  var O_isProtoOf = Object.prototype.isPrototypeOf;
-
   /**
    * @name pentaho.type.Property
    *
@@ -276,13 +274,12 @@ define([
                 baseMeta = this._typeMeta;
 
             // Hierarchy/PreviousValue consistency
-            // Validate that it is a sub-type of the base property's type.
+            // Validate that it is a sub-type of the base property's type
+            // or a refinement type whose `of` is the base type.
+            // (which can only happen if baseMeta itself is not a refinement type).
             if(typeMeta !== baseMeta) {
-              if(typeMeta.of !== baseMeta && !O_isProtoOf.call(baseMeta, typeMeta)) {
-                throw error.argInvalid(
-                    "type",
-                    "Sub-properties must have a 'type' that derives from their base property's 'type'.");
-              }
+              if(!typeMeta.isSubtypeOf(baseMeta))
+                throw error.argInvalid("type", bundle.structured.errors.property.typeNotSubtypeOfBaseType);
 
               this._typeMeta = typeMeta;
             }

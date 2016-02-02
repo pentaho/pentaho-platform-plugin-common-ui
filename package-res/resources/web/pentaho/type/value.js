@@ -164,9 +164,21 @@ define([
 
         //region list property
         /**
-         * Gets a value that indicates if a type is a list type.
+         * Gets a value that indicates if this type is a list type.
          *
          * @name list
+         * @memberOf pentaho.type.Value.Meta#
+         * @type boolean
+         * @readOnly
+         * @abstract
+         */
+        //endregion
+
+        //region refinement property
+        /**
+         * Gets a value that indicates if this type is a refinement type.
+         *
+         * @name refinement
          * @memberOf pentaho.type.Value.Meta#
          * @type boolean
          * @readOnly
