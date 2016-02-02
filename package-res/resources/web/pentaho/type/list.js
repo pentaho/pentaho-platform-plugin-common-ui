@@ -424,7 +424,8 @@ define([
         if(remove) {
           elems = this._elems;
           i = elems.length;
-          while(--i) {
+          while(i) {
+            --i;
             elem = elems[i];
             key  = elem.key;
             if(!O.hasOwn(setKeys, key)) this._removeOne(elem, i, key, silent);

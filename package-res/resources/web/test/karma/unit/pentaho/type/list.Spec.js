@@ -1038,6 +1038,20 @@ define([
         expect(list.at(2).value).toBe(5);
         expect(list._updateOne.calls.count()).toBe(0);
       });
+
+      it("should empty the list when given an empty array", function() {
+        var list = new NumberList([1, 2, 3, 4]);
+
+        expect(list.count).toBe(4);
+
+        // ---
+
+        list.set([]);
+
+        // ---
+
+        expect(list.count).toBe(0);
+      });
     }); // set
 
     describe("#toArray()", function() {
