@@ -372,17 +372,13 @@ define([
         set of(value) {
           if(value == null) throw error.argRequired("of");
 
-          if(value.context !== this.context)
-            throw error.argInvalid("of", "Different context.");
-
-          if(!(value === Element.meta ||
-               value === List.meta    ||
-               value instanceof Element.Meta ||
-               value instanceof List.Meta))
+          // Value returns refinement === undefined...
+          var ofMeta = this.context.get(value).meta;
+          if(ofMeta.refinement !== false)
             throw error.argInvalidType("of", "Not a representation type.");
 
           // Throws when set again with a different value.
-          O.setConst(this, "_of", value);
+          O.setConst(this, "_of", ofMeta);
         },
         //endregion
 

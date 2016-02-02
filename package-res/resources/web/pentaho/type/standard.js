@@ -28,27 +28,27 @@ define([
   "./object",
   "./function",
   "./facets/DiscreteDomain"
-], function(Item, Value, Element, List, Refinement, Simple, Complex, String, Number, Boolean, Date, Object, Function,
+], function(Item, valueFactory, elementFactory, listFactory, refinementFactory,
+    simpleFactory, complexFactory, stringFactory, numberFactory, booleanFactory,
+    dateFactory, objectFactory, functionFactory,
     DiscreteDomain) {
 
   "use strict";
   
   return {
-    "Item": Item,
-
     // types
-    "value":    Value,
-    "element":  Element,
-    "list":     List,
-    "refinement": Refinement,
-    "simple":   Simple,
-    "string":   String,
-    "number":   Number,
-    "boolean":  Boolean,
-    "date":     Date,
-    "complex":  Complex,
-    "object":   Object,
-    "function": Function,
+    "value":    valueFactory,
+    "element":  elementFactory,
+    "list":     listFactory,
+    "refinement": refinementFactory,
+    "simple":   simpleFactory,
+    "string":   stringFactory,
+    "number":   numberFactory,
+    "boolean":  booleanFactory,
+    "date":     dateFactory,
+    "complex":  complexFactory,
+    "object":   objectFactory,
+    "function": functionFactory,
 
     "facets": {
       "DiscreteDomain": DiscreteDomain

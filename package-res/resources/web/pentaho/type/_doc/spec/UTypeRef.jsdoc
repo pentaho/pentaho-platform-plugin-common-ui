@@ -26,12 +26,18 @@
  * 1. a `Value.Meta` class, or, else
  * 1. a function which is assumed to be the type's module factory function.
  *
- * When an object, it is a type's metadata specification.
+ * When an object, it can be:
+ *
+ * 1. a `Value` prototype or instance,
+ * 1. a type, i.e., a `Value.Meta` instance,
+ * 1. a generic type metadata specification.
  *
  * @typedef {string|
  *           pentaho.type.Factory|
  *           pentaho.type.Value|
  *           pentaho.type.Value.Meta|
+ *           Class.<pentaho.type.Value>|
+ *           Class.<pentaho.type.Value.Meta>|
  *           pentaho.type.spec.ITypeMeta} pentaho.type.spec.UTypeRef
  */
 

@@ -94,7 +94,6 @@ define([
     /**
      * Gets the type of this instance.
      *
-     * @name meta
      * @type pentaho.type.Item.Meta
      * @readonly
      * @see pentaho.type.Item.meta
