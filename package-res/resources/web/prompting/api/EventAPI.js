@@ -179,8 +179,8 @@ define([], function() {
      *                            Passing anything other than a function will unbind this event.
      * @example
      *  api.event.submit(function(promptPanel, options) {
-     *    // Process options.isInit flag if needed
-     *    // Execute event based code
+     *    // Process options.isInit flag if needed.
+     *    // Execute event-based code.
      *  })
      */
     this.submit = function(callback) {
