@@ -389,6 +389,16 @@ define([
         //region abstract property
         // TODO: Rhino probably gives a syntax error on this.
         // However, cannot use the `get "abstract"()` syntax cause then Phantom JS 1.9.8 starts failing
+        /**
+         * Gets a value that indicates if this type is abstract.
+         *
+         * This implementation is sealed and always returns
+         * the value of the representation type.
+         *
+         * @type {boolean}
+         * @readOnly
+         * @sealed
+         */
         get abstract() {
           return this.of["abstract"];
         },
@@ -403,13 +413,11 @@ define([
         //region list property
         //@override
         /**
-         * Gets a value that indicates if a type is a list type.
+         * Gets a value that indicates if this type is a list type.
          *
          * This implementation is sealed and always returns
          * the value of the representation type.
          *
-         * @name list
-         * @memberOf pentaho.type.Refinement.Meta#
          * @type boolean
          * @readOnly
          * @sealed
@@ -418,6 +426,36 @@ define([
           return this.of.list;
         },
         //endregion
+
+        //region refinement property
+        /**
+         * Gets a value that indicates if this type is a refinement type.
+         *
+         * This implementation is sealed and always returns `true`.
+         *
+         * @type boolean
+         * @readOnly
+         * @sealed
+         */
+          // Providing a default implementation is less code
+        get refinement() {
+          return true;
+        },
+        //endregion
+
+        /**
+         * Determines if this is a subtype of another.
+         *
+         * A type is considered a subtype of itself.
+         *
+         * A refinement type is a subtype of its representation type, [of]{@link pentaho.type.Refinement.Meta#of}.
+         *
+         * @param {?pentaho.type.Item.Meta} superType The candidate super-type.
+         * @return {boolean} `true` if this is a subtype of `superType` type, `false` otherwise.
+         */
+        isSubtypeOf: function(superType) {
+          return !!superType && (this.base(superType) || this.of.isSubtypeOf(superType));
+        },
 
         //region label property
         _label: undefined, // local Refinement root marker

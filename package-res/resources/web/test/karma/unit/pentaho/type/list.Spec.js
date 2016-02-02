@@ -24,7 +24,7 @@ define([
 
   "use strict";
 
-  /*global describe:true, it:true, expect:true, beforeEach:true*/
+  /*global describe:true, it:true, expect:true, beforeEach:true, afterEach:true, jasmine:true, spyOn:true*/
 
   var context = new Context(),
       Value = context.get(valueFactory),
@@ -46,21 +46,62 @@ define([
       expect(typeof List).toBe("function");
     });
 
-    describe("#extend({meta: { ... }}) -", function() {
+    describe("#of -", function() {
+
+      // NOTE: see also refinement.Spec.js, list usage unit tests
 
       it("accepts an `of` property be given a type derived from `Element`", function() {
         expect(NumberList.meta.of).toBe(Number.meta);
       });
 
-      it("throws if given an `of` property of a type not derived from `Element`", function() {
+      it("should throw if given a nully `of` property", function() {
+        expect(function() {
+          List.extend({
+            meta: {of: null}
+          });
+        }).toThrowError(error.argRequired("of").message);
+      });
+
+      it("should inherit the base `of` when unspecified or undefined", function() {
+        var DerivedList = List.extend();
+        expect(DerivedList.meta.of).toBe(List.meta.of);
+
+        DerivedList = List.extend({meta: {of: undefined}});
+        expect(DerivedList.meta.of).toBe(List.meta.of);
+      });
+
+      it("should throw if given a null `of` property", function() {
+        expect(function() {
+          List.extend({
+            meta: {of: null}
+          });
+        }).toThrowError(error.argRequired("of").message);
+      });
+
+      it("should throw if given an `of` property of a type not a subtype of `Element`", function() {
         expect(function() {
           List.extend({
             meta: {of: Value}
           });
         }).toThrowError(
-            error.argInvalid("of", bundle.structured.errors.list.elemTypeNotExtendsBaseElemType).message);
+            error.argInvalid("of", bundle.structured.errors.list.elemTypeNotSubtypeOfBaseElemType).message);
       });
 
+      it("should throw if set to a different value", function() {
+        var SubList = List.extend();
+
+        expect(function() {
+          SubList.meta.of = Number;
+        }).toThrowError(error.operInvalid("Property 'of' cannot change.").message);
+      });
+
+      it("should not throw if set to the same value", function() {
+        var SubList = List.extend();
+
+        var elemMeta = SubList.meta.of;
+        SubList.meta.of = elemMeta;
+        expect(SubList.meta.of).toBe(elemMeta);
+      });
     });
 
     describe("new (spec) -", function() {
@@ -184,6 +225,42 @@ define([
 
         it("should have no changes", function() {
           expectNoChanges(new NumberList({d: [1, 2, 3]}));
+        });
+      });
+
+      describe("given another list of convertible elements", function() {
+
+        it("it should successfully create an instance", function() {
+          var list1 = new NumberList([1, 2, 3]);
+          var list2 = new NumberList(list1);
+          expect(list2 instanceof NumberList).toBe(true);
+        });
+
+        it("it should have as many elements as those given", function() {
+          var list1 = new NumberList([1, 2, 3]);
+          var list2 = new NumberList(list1);
+          var elems = list2._elems;
+          expect(elems.length).toBe(3);
+        });
+
+        it("it should convert every given value to the list element type", function() {
+          var list1 = new NumberList([1, 2, 3]);
+          var list2 = new NumberList(list1);
+          var elems = list2._elems;
+
+          expect(elems[1] instanceof Number).toBe(true);
+          expect(elems[0] instanceof Number).toBe(true);
+          expect(elems[2] instanceof Number).toBe(true);
+
+          expect(elems[0].value).toBe(1);
+          expect(elems[1].value).toBe(2);
+          expect(elems[2].value).toBe(3);
+        });
+
+        it("should have no changes", function() {
+          var list1 = new NumberList([1, 2, 3]);
+          var list2 = new NumberList(list1);
+          expectNoChanges(list2);
         });
       });
 
@@ -1005,6 +1082,20 @@ define([
         expect(clone.at(0)).toBe(list.at(0));
         expect(clone.at(1)).toBe(list.at(1));
         expect(clone.at(2)).toBe(list.at(2));
+      });
+    });
+
+    describe("Meta -", function() {
+      describe("#list -", function() {
+        it("should return the value `true`", function() {
+          expect(List.meta.list).toBe(true);
+        });
+      });
+
+      describe("#refinement -", function() {
+        it("should return the value `false`", function() {
+          expect(List.meta.refinement).toBe(false);
+        });
       });
     });
   });

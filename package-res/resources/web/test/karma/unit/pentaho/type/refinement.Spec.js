@@ -169,6 +169,39 @@ define([
 
       var MySimple = Simple.extend();
 
+      describe("#isSubtypeOf(superType)", function() {
+        var MyRefinement = Refinement.extend({
+          meta: {of: MySimple.meta}
+        });
+
+        it("should return false when superType is nully", function() {
+          expect(MyRefinement.meta.isSubtypeOf(null)).toBe(false);
+        });
+
+        it("should return true when superType is itself", function() {
+          expect(MyRefinement.meta.isSubtypeOf(MyRefinement.meta)).toBe(true);
+        });
+
+        it("should return true when this was extended from superType", function() {
+          var SubMyRefinement = MyRefinement.extend();
+          expect(SubMyRefinement.meta.isSubtypeOf(MyRefinement.meta)).toBe(true);
+        });
+
+        it("should return false when this was not extended from superType", function() {
+          var SubMyRefinement1 = MyRefinement.extend();
+          var SubMyRefinement2 = Item.extend();
+          expect(SubMyRefinement1.meta.isSubtypeOf(SubMyRefinement2.meta)).toBe(false);
+        });
+
+        it("should return true when this.of is superType", function() {
+          expect(MyRefinement.meta.isSubtypeOf(MySimple.meta)).toBe(true);
+        });
+
+        it("should return true when this.of was extended from superType", function() {
+          expect(MyRefinement.meta.isSubtypeOf(Simple.meta)).toBe(true);
+        });
+      });
+
       describe("#of -", function() {
         it("should create a refinement type with the specified `of` type", function() {
           var MyRefinement = Refinement.extend({
@@ -427,6 +460,18 @@ define([
           expect(MyRefinement.meta.facets.length).toBe(1);
           expect(MyRefinement.meta.facets[0].prototype instanceof RefinementFacet).toBe(true);
         });
+
+        it("should support resolving absolute facet modules", function() {
+          var MyRefinement = Refinement.extend({
+            meta: {
+              of:     MySimple.meta,
+              facets: ["pentaho/type/facets/DiscreteDomain"]
+            }
+          });
+
+          expect(MyRefinement.meta.facets.length).toBe(1);
+          expect(MyRefinement.meta.facets[0].prototype instanceof RefinementFacet).toBe(true);
+        });
       });
 
       describe("#context -", function() {
@@ -514,6 +559,12 @@ define([
           });
 
           expect(MyRefinement.meta.list).toBe(true);
+        });
+      });
+
+      describe("#refinement -", function() {
+        it("should return the value `true`", function() {
+          expect(Refinement.meta.refinement).toBe(true);
         });
       });
 
@@ -1393,7 +1444,7 @@ define([
       });
     });
 
-    describe("property usage ", function() {
+    describe("property usage -", function() {
       var PositiveRefinement = RefinementFacet.extend({}, {
           validate: function(value) {
             return value.value > 0;
@@ -1430,6 +1481,26 @@ define([
             ]
           }
         });
+      });
+
+      it("should throw when overriding a property with a refinement of a type other than the base type", function() {
+        var MyComplex = Complex.extend({
+          meta: {
+            props: [
+              {name: "likes", type: Complex}
+            ]
+          }
+        });
+
+        expect(function() {
+          MyComplex.extend({
+            meta: {
+              props: [
+                {name: "likes", type: PositiveNumber}
+              ]
+            }
+          });
+        }).toThrowError(error.argInvalid("type", bundle.structured.errors.property.typeNotSubtypeOfBaseType).message);
       });
 
       it("should allow specifying the value of a property of a refinement type given the primitive value", function() {
@@ -1474,6 +1545,64 @@ define([
         var v = new Number(1);
         d.set("likes", v);
         expect(d.get("likes").value).toBe(1);
+      });
+    });
+
+    describe("list usage -", function() {
+      var PositiveRefinement = RefinementFacet.extend({}, {
+        validate: function(value) {
+          return value.value > 0;
+        }
+      });
+
+      var PositiveNumber = Number.refine({meta: {
+        facets: PositiveRefinement
+      }});
+
+      it("should allow defining a list of a refinement type", function() {
+        List.extend({meta: {of: PositiveNumber}});
+      });
+
+      it("should allow extending a list to a refinement of the base type", function() {
+        var NumberList = List.extend({meta: {of: Number}});
+
+        NumberList.extend({meta: {of: PositiveNumber}});
+      });
+
+      it("should throw when extending a list to a refinement of a type not a subtype of the base type", function() {
+        var ComplexList = List.extend({meta: {of: Complex}});
+
+        expect(function() {
+          ComplexList.extend({meta: {of: PositiveNumber}});
+        }).toThrowError(error.argInvalid("of", bundle.structured.errors.list.elemTypeNotSubtypeOfBaseElemType).message);
+      });
+
+      it("should allow specifying an element of a refinement type given the primitive value", function() {
+        var PositiveNumberList = List.extend({meta: {of: PositiveNumber}});
+
+        var list = new PositiveNumberList([1]);
+
+        expect(list.at(0).value).toBe(1);
+      });
+
+      it("should get a value whose class is that of the representation type", function() {
+        var PositiveNumberList = List.extend({meta: {of: PositiveNumber}});
+
+        var list = new PositiveNumberList([1]);
+
+        expect(list.at(0) instanceof Number).toBe(true);
+        expect(list.at(0).constructor).toBe(Number);
+      });
+
+      it("should accept being set to a value of the representation type", function() {
+        var PositiveNumberList = List.extend({meta: {of: PositiveNumber}});
+
+        var list = new PositiveNumberList();
+
+        var v = new Number(1);
+
+        list.add(1);
+        expect(list.at(0).value).toBe(1);
       });
     });
   });

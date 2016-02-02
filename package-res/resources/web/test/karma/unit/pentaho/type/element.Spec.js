@@ -45,6 +45,18 @@ define([
         expect(ElemMeta.prototype instanceof Value.Meta).toBe(true);
       });
 
+      describe("#list -", function() {
+        it("should return the value `false`", function() {
+          expect(Element.meta.list).toBe(false);
+        });
+      });
+
+      describe("#refinement -", function() {
+        it("should return the value `false`", function() {
+          expect(Element.meta.refinement).toBe(false);
+        });
+      });
+
       // TODO: format
       // TODO: compare
     });

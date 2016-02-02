@@ -20,12 +20,13 @@ define([
   "pentaho/type/string",
   "pentaho/type/boolean",
   "pentaho/type/number",
+  "pentaho/i18n!/pentaho/type/i18n/types",
   "pentaho/util/error"
-], function(Context, Property, complexFactory, stringFactory, booleanFactory, numberFactory, error) {
+], function(Context, Property, complexFactory, stringFactory, booleanFactory, numberFactory, bundle, error) {
 
   "use strict";
 
-  /*global describe:true, it:true, expect:true, beforeEach:true*/
+  /*global describe:true, it:true, expect:true, beforeEach:true, jasmine:true*/
 
   var context = new Context(),
       PropertyMeta = Property.Meta,
@@ -1629,6 +1630,7 @@ define([
 
       // mutable, but must always inherit from the base type.
       // should not change after the complex class has been sub-classed or has any instances of it (not enforced).
+      // NOTE: see also refinement.Spec.js, property usage unit tests
       describe("type - ", function() {
         it("should inherit base type value by default", function() {
           var Base = Complex.extend();
@@ -1687,8 +1689,7 @@ define([
 
           expect(function() {
             extendProp(Derived.meta, "num", {name: "num", type: Number});
-          }).toThrowError(error.argInvalid("type",
-              "Sub-properties must have a 'type' that derives from their base property's 'type'.").message);
+          }).toThrowError(error.argInvalid("type", bundle.structured.errors.property.typeNotSubtypeOfBaseType).message);
         });
 
         it("should throw on a set type that is not a sub-type of the base property's type", function() {
@@ -1703,8 +1704,7 @@ define([
 
           expect(function() {
             propMeta.type = Number;
-          }).toThrowError(error.argInvalid("type",
-              "Sub-properties must have a 'type' that derives from their base property's 'type'.").message);
+          }).toThrowError(error.argInvalid("type", bundle.structured.errors.property.typeNotSubtypeOfBaseType).message);
         });
       });
       //endregion
