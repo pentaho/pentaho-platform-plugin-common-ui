@@ -32,7 +32,7 @@
  * @property {Function} onBeforeUpdate Callback called if defined before the prompt update cycle is called
  * @property {Function} onAfterUpdate Callback called if defined after the prompt update cycle is called
  * @property {Function} onStateChanged Callback called if defined after state variables have been changed on the prompt panel or parameter definition
- * @property {?Function} onSubmit Callback called when the submit function executes, null if no callback is registered
+ * @property {?Function} onSubmit Callback called when the submit function executes, null if no callback is registered.
  */
 define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/util/util', 'common-ui/util/GUIDHelper', './WidgetBuilder', 'cdf/Dashboard.Clean', './parameters/ParameterDefinitionDiffer', 'common-ui/jquery-clean'],
     function (Base, Logger, DojoNumber, i18n, Utils, GUIDHelper, WidgetBuilder, Dashboard, ParamDiff, $) {
@@ -738,7 +738,7 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
          *
          * @name PromptPanel#_submit
          * @method
-         * @param {Object}  [options]        Aditional configuration options.
+         * @param {Object}  [options]        Additional configuration options.
          * @param {Boolean} [options.isInit] Flag indicating if submit is being executed during initialization.
          * @private
          */
