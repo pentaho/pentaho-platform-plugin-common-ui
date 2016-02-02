@@ -3237,7 +3237,7 @@ define([
         },
 
         _configureAxisDisplayUnits: function(primary, axisType, allowFractional){
-            if(!allowFractional) {
+            if(!allowFractional && axisType != 'ortho') {
                 this.options[axisType + 'AxisTickExponentMin'] = 0; // 10^0 => 1
             }
 
