@@ -38,14 +38,9 @@ define([
      * @name pentaho.type.Simple
      * @class
      * @extends pentaho.type.Element
-     * @amd pentaho/type/simple
+     * @amd {pentaho.type.Factory<pentaho.type.Simple>} pentaho/type/simple
      *
      * @classDesc The base abstract class of un-structured, indivisible values.
-     *
-     * ### AMD
-     *
-     * The AMD module returns the type's factory, a
-     * {@link pentaho.type.Factory<pentaho.type.Simple>}.
      *
      * Module Id: `pentaho/type/simple`
      *

@@ -15,6 +15,8 @@ exports.defineTags = function (dictionary) {
    */
   dictionary.defineTag('amd', {
 
+    canHaveType: true,
+    canHaveName: true,
     /**
      * A callback function executed when the tag is found
      * @param  {Object} doclet Doclet where the tag was "tagged"

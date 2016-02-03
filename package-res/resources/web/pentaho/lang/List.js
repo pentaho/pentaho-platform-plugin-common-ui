@@ -25,11 +25,6 @@ define([
      *
      * Elements of a list must implement the {@link pentaho.lang.IListElement} interface.
      *
-     * ### AMD
-     *
-     * To obtain the constructor of this class,
-     * require the module `"pentaho/lang/List"`.
-     *
      * @description Initializes a list instance.
      *
      * Note that because a `List` is a sub-class of `Array`,
@@ -44,6 +39,7 @@ define([
      * to help in their construction.
      *
      * @class
+     * @amd pentaho/lang/List
      * @abstract
      * @name List
      * @memberOf pentaho.lang

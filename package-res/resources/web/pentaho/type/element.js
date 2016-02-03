@@ -43,16 +43,7 @@ define([
      * @name pentaho.type.Element
      * @class
      * @extends pentaho.type.Value
-     * @amd pentaho/type/element
-     *
-     * @classDesc
-     *
-     * ### AMD
-     *
-     * Module Id: `pentaho/type/element`
-     *
-     * The AMD module returns the type's factory, a
-     * {@link pentaho.type.Factory<pentaho.type.Element>}.
+     * @amd {pentaho.type.Factory<pentaho.type.Element>} pentaho/type/element
      *
      * @description Creates an element instance.
      */

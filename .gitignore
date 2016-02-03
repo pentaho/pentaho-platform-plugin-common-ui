@@ -9,6 +9,7 @@ eclipse-bin/
 doc-js
 build-res/pentaho-js-build/
 build-res/module-scripts/
+build-res/pentaho-js-build.zip
 build-res/requireCfg-raw.js
 build-res/requireCfg.js
 test-res/data/sampledata.log

@@ -29,16 +29,9 @@ define([
      * @name pentaho.type.Number
      * @class
      * @extends pentaho.type.Simple
-     * @amd pentaho/type/number
+     * @amd {pentaho.type.Factory<pentaho.type.Number>} pentaho/type/number
      *
      * @classDesc The base class of numeric values.
-     *
-     * ### AMD
-     *
-     * Module Id: `pentaho/type/number`
-     *
-     * The AMD module returns the type's factory, a
-     * {@link pentaho.type.Factory<pentaho.type.Number>}.
      *
      * @description Creates a number instance.
      */
