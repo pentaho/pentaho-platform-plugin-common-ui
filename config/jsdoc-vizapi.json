@@ -12,28 +12,16 @@
       "package-res/resources/web/pentaho/visual/_doc/_namespace.jsdoc",
       "package-res/resources/web/pentaho/visual/base"
     ],
-    "exclude": [
-    ],
+    "exclude": [],
     "includePattern": ".+\\.js(doc)?$"
   },
-  "plugins": ["plugins/markdown"],
+  "plugins": ["plugins/markdown", "customPlugins/amd"],
   "templates": {
     "cleverLinks": true,
-    "monospaceLinks": false,
-    "default": {
-      "useLongnameInNav": true,
-      "outputSourceFiles": true,
-      "includeDate": true,
-      "layoutFile": "../build-res/jsdoc-template/layout.tmpl",
-      "staticFiles": {
-        "include": [
-          "build-res/jsdoc-template/static"
-        ]
-      }
-    }
+    "monospaceLinks": false
   },
   "opts": {
-    "template": "templates/default",
+    "template": "../build-res/jsdoc-template",
     "encoding": "utf8",
     "destination": "doc-js/vizapi",
     "recurse": true,

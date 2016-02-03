@@ -1,0 +1,9 @@
+<?js
+var data = obj;
+var self = this;
+?>
+<?js if(data.amd != null) { ?>
+	<div class="amd-tag">
+	<h5>AMD Require:</h5> <pre class="prettyprint"><code>require("<?js= data.amd.value ?>", function(<?js= data.name ?>){ /* code goes here */ });</code></pre>
+	</div>
+<?js } ?>
