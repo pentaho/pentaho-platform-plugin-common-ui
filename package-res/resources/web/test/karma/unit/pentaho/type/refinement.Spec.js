@@ -64,14 +64,14 @@ define([
               facets: [Facet]
             }
           });
-        }).toThrowError(error.argInvalid("of", "Different context.").message);
+        }).toThrowError(error.argInvalid("typeRef", "Type is from a different context.").message);
       });
 
       it("should throw if given an `of` which is not a representation type", function() {
         expect(function() {
           Refinement.extend({
             meta: {
-              of: context.get("pentaho/type/value").extend().meta,
+              of:     context.get("pentaho/type/value").extend().meta,
               facets: [Facet]
             }
           });

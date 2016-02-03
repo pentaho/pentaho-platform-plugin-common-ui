@@ -166,24 +166,28 @@ define([
         /**
          * Gets a value that indicates if this type is a list type.
          *
+         * The `Value` class return `undefined`.
+         *
          * @name list
          * @memberOf pentaho.type.Value.Meta#
          * @type boolean
          * @readOnly
-         * @abstract
          */
+        get list() {},
         //endregion
 
         //region refinement property
         /**
          * Gets a value that indicates if this type is a refinement type.
          *
+         * The `Value` class return `undefined`.
+         *
          * @name refinement
          * @memberOf pentaho.type.Value.Meta#
          * @type boolean
          * @readOnly
-         * @abstract
          */
+        get refinement() {},
         //endregion
 
         //region context property

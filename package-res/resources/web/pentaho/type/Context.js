@@ -15,6 +15,7 @@
  */
 define([
   "module",
+  "./Item",
   "../i18n!types",
   "./standard",
   "../lang/Base",
@@ -23,7 +24,7 @@ define([
   "../util/error",
   "../util/object",
   "../util/fun"
-], function(module, bundle, standard, Base, promise, arg, error, O, F) {
+], function(module, Item, bundle, standard, Base, promise, arg, error, O, F) {
 
   "use strict";
 
@@ -42,13 +43,12 @@ define([
       _defaultBaseTypeMid = "complex",
 
       // Standard types which can be assumed to already be loaded.
-      _standardTypeMids = {},
-
-      Item = standard.Item;
+      _standardTypeMids = {};
 
   Object.keys(standard).forEach(function(name) {
     if(name !== "facets") _standardTypeMids[_baseMid + name] = 1;
   });
+
   Object.keys(standard.facets).forEach(function(name) {
     _standardTypeMids[_baseFacetsMid + name] = 1;
   });
@@ -57,7 +57,8 @@ define([
    * @name pentaho.type.Context
    * @class
    * @implements pentaho.type.IContext
-   * @classDesc The `Context` class contains `Value` classes _configured_ for a particular _context_.
+   * @classDesc The `Context` class contains _Value_ instance classes
+   * _configured_ for a particular _context_.
    *
    * @constructor
    * @description Creates a `Context` whose variables default to the Pentaho thin-client state variables.
@@ -84,44 +85,103 @@ define([
       // non-anonymous types
       // type id : Class.<pentaho.type.Value>
       this._byTypeId = {};
+
+      // import standard types
+      // This mostly helps tests being able to undef these at any time :-(
+      Object.keys(standard).forEach(function(lid) {
+        if(lid !== "facets") this._getByFactory(standard[lid], /*sync:*/true);
+      }, this);
     },
 
     //region context variables
+
+    /**
+     * Gets the id of the context's container application, if any.
+     *
+     * @type {?string}
+     * @readonly
+     */
     get container() {
       return this._container;
     },
 
+    /**
+     * Gets the id of the context's user, if any.
+     *
+     * @type {?string}
+     * @readonly
+     */
     get user() {
       return this._user;
     },
 
+    /**
+     * Gets the id of the context's theme, if any.
+     *
+     * @type {?string}
+     * @readonly
+     */
     get theme() {
       return this._theme;
     },
 
+    /**
+     * Gets the id of the context's locale, if any.
+     *
+     * @type {?string}
+     * @readonly
+     */
     get locale() {
       return this._locale;
     },
     //endregion
 
+    /**
+     * Gets the instance constructor of a type.
+     *
+     * An error is thrown if a generic type specification references the ids of non-standard types
+     * whose modules have not been loaded yet.
+     * If is not known whether all referenced non-standard modules have been loaded,
+     * use {@link pentaho.type.Context#getAsync} instead.
+     *
+     * @param {?pentaho.type.spec.UTypeRef} [typeRef] A type reference.
+     * Defaults to type `"pentaho/type/string"`.
+     *
+     * @return {!Class.<pentaho.type.Value>} The instance constructor.
+     * @see pentaho.type.Context#getAsync
+     */
     get: function(typeRef) {
       return this._get(typeRef, true);
     },
 
+    /**
+     * Gets the instance constructor of a type.
+     *
+     * This method can be used even if a generic type specification references
+     * non-standard modules that have not yet been loaded.
+     *
+     * @param {?pentaho.type.spec.UTypeRef} [typeRef] A type reference.
+     * Defaults to type `"pentaho/type/string"`.
+     *
+     * @return {!Promise.<!Class.<pentaho.type.Value>>} A promise for the instance constructor.
+     * @see pentaho.type.Context#get
+     */
     getAsync: function(typeRef) {
       return this._get(typeRef, false);
     },
 
     /**
-     * Obtains a promise for all type classes that inherit
-     * from a base `Value` type, given its _id_.
+     * Obtains a promise for all instance classes that inherit from a given base type.
      *
      * @param {string} [baseTypeId] The id of the base type. Defaults to `"pentaho/type/value"`.
      * @param {object} [ka] The keyword arguments.
      * @param {?boolean} [ka.browsable=null] Indicates that only types with the specified
      *   {@link pentaho.type.Value.Meta#browsable} are returned.
      *
-     * @return {Promise.<Array.<!Class.<pentaho.item.Value>>>} The promise for the requested `Value` types.
+     * @return {Promise.<Array.<!Class.<pentaho.item.Value>>>} A promise for instance classes.
+     *
+     * @see pentaho.type.Context#get
+     * @see pentaho.type.Context#getAsync
      */
     getAllAsync: function(baseTypeId, ka) {
       if(!baseTypeId) baseTypeId = "pentaho/type/value";
@@ -192,10 +252,10 @@ define([
      * that if both `defaultType` and `baseType` are specified,
      * the former is either equal to, or a sub-type of, the latter.
      *
-     * @param {?any} valueSpec A value specification.
-     * @param {?any} [defaultType] A type expression of the _non-abstract_ type
+     * @param {?any} [valueSpec] A value specification.
+     * @param {?pentaho.type.spec.UTypeRef} [defaultType] A type reference of the _non-abstract_ type
      *   to use for value specifications that don't specify a type.
-     * @param {?any} [baseType] A type expression of the _expected_ base type.
+     * @param {?pentaho.type.spec.UTypeRef} [baseType] A type reference of the _expected_ base type.
      *
      * @return {?pentaho.type.Value} A `Value` or `null`.
      */
@@ -306,7 +366,7 @@ define([
       Type = typeFactory(this);
 
       if(!F.is(Type) || !(Type.prototype instanceof Item))
-        throw error.operInvalid("Type factory must return a sub-class of 'pentaho/type/value'.");
+        throw error.operInvalid("Type factory must return a sub-class of 'pentaho/type/Item'.");
 
       // Errors are thrown synchronously.
       var result = this._getByType(Type, sync);
@@ -402,7 +462,7 @@ define([
   function collectTypeIds(typeSpec) {
     var customTypeIds = [];
     collectTypeIdsRecursive(typeSpec, customTypeIds);
-    return typeSpec;
+    return customTypeIds;
   }
 
   function collectTypeIdsRecursive(typeSpec, outIds) {
