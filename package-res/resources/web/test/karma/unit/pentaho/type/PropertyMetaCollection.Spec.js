@@ -58,7 +58,17 @@ define([
         expect(props.length).toBe(0);
       });
 
+      it("should convert an array of pentaho.type.UPropertyMeta", function () {
+        var props = PropertyMetaCollection.to(["foo", "bar"], Derived.meta);
+        expect(props.length).toBe(2);
+        expect(props[0].name).toBe("foo");
+        expect(props[0].type).toBe(String.meta);
+        expect(props[1].name).toBe("bar");
+        expect(props[1].type).toBe(String.meta);
+      });
+
       describe("Adding, removing, and replacing a PropertyMeta to the PropertyMetaCollection", function () {
+
         it("should add object to the collection", function () {
           props.add({name: "foo1", type: "boolean"});
           expect(props.length).toBe(1);
@@ -73,6 +83,16 @@ define([
           expect(props[0].type).toBe(String.meta);
         });
 
+        it("should throw when attempting to add a property with a falsy name", function () {
+          [
+            null, undefined, false, 0, ""
+          ].forEach(function(name){
+            expect(function(){
+              props.add(name);
+            }).toThrowError(/required/);
+          });
+        });
+
         it("should use List.replace() to replace an object with the same name in the collection with updated type, etc.", function () {
           props.add({name: "foo", type: "boolean"});
           props.add({name: "foo2", type: "string"});
@@ -80,9 +100,22 @@ define([
           expect(props.length).toBe(2);
           expect(props[0].type).toBe(Boolean.meta);
         });
+
+        it("should throw when attempting to replace a non-existent property", function () {
+          props.add({name: "foo", type: "boolean"});
+          expect(function(){
+            props.replace({name: "bar", type: "string"}, 0);
+          }).toThrowError(/invalid/);
+        });
       });
 
       describe("Configuring the PropertyMetaCollection", function () {
+        it("should throw if invoked with no arguments", function () {
+          expect(function(){
+            props.configure();
+          }).toThrowError(/config/);
+        });
+
         it("should accept an array of pentaho.type.UPropertyMeta", function () {
           props.configure(["foo", "bar"]);
           expect(props.length).toBe(2);
@@ -92,12 +125,36 @@ define([
           expect(props[1].type).toBe(String.meta);
         });
 
+        it("should accept an array of pentaho.type.UPropertyMeta whose elements were previously defined", function () {
+          var props = PropertyMetaCollection.to(["foo", {name: "eggs", type: "boolean"}], Derived.meta);
+          props.configure(["foo", "bar"]);
+          expect(props.length).toBe(3);
+          expect(props[0].name).toBe("foo");
+          expect(props[0].type).toBe(String.meta);
+          expect(props[1].name).toBe("eggs");
+          expect(props[1].type).toBe(Boolean.meta);
+          expect(props[2].name).toBe("bar");
+          expect(props[2].type).toBe(String.meta);
+        });
+
         it("should accept an object whose keys are the property names and the values are pentaho.type.UPropertyMeta", function () {
           props.configure({foo: {name: "foo", type: "boolean"}, guru: {name: "guru", type: "boolean"}});
           expect(props.length).toBe(2);
           expect(props[0].type).toBe(Boolean.meta);
           expect(props[1].name).toBe("guru");
           expect(props[1].type).toBe(Boolean.meta);
+        });
+
+        it("should throw when attempting to configure with key that does not match its property name", function () {
+          expect(function(){
+            props.configure({foo: {name: "bar", type: "boolean"}});
+          }).toThrowError(/config/);
+        });
+
+        it("should use the key as property name if the property spec does not include a name", function () {
+          props.configure({foo: {type: "boolean"}});
+          expect(props.length).toBe(1);
+          expect(props[0].name).toBe("foo");
         });
 
         it("should replace any existing configurations of the same name and update its type", function () {
@@ -113,6 +170,14 @@ define([
           expect(props[2].name).toBe("guru");
           expect(props[2].type).toBe(Boolean.meta);
         });
+
+        it("should preserve the type when reconfiguring the property without specifying the type", function () {
+          props.configure({foo: {name: "foo", type: "boolean"}});
+          props.configure(["foo"]);
+          expect(props.length).toBe(1);
+          expect(props[0].type).toBe(Boolean.meta);
+        });
+
       });
     });
   }); // pentaho/type/PropertyMetaCollection
