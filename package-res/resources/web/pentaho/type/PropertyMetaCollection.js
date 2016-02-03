@@ -92,6 +92,7 @@ define([
      * @param {string} spec The name of the property.
      * @param {number} index The location of the property in the collection.
      * @param {Object} ka The keyword arguments.
+     * @protected
      */
     _adding: function(spec, index, ka) {
       if(!spec) throw error.argRequired("props[i]");
@@ -122,6 +123,7 @@ define([
      * @param {string} spec The name of the property.
      * @param {number} index The location of the property in the collection.
      * @param {Object} existing The keyword arguments.
+     * @protected
      */
     _replacing: function(spec, index, existing) {
       if(!spec) throw error.argRequired("props[i]");
@@ -150,6 +152,7 @@ define([
      *
      * @param {string} spec The name of the property.
      * @param {string} index The location of the property in the collection.
+     * @protected
      */
     _cast: function(spec, index) {
       // For new, root, local properties.
