@@ -20,45 +20,50 @@ define([
   "pentaho/type/string",
   "pentaho/type/PropertyMetaCollection",
   "pentaho/type/complex"
-], function (Context, Property, booleanFactory, stringFactory, PropertyMetaCollection, complexFactory) {
-
+], function(Context, Property, booleanFactory, stringFactory, PropertyMetaCollection, complexFactory) {
   "use strict";
 
-  /*global describe:true, it:true, expect:true, beforeEach:true*/
+  /* global describe:false, it:false, expect:false, beforeEach:false */
 
-  var context = new Context(),
-      Boolean = context.get(booleanFactory),
-      String = context.get(stringFactory),
-      Complex = context.get(complexFactory),
-      Derived= Complex.extend({
-        meta: {
-          label: "Derived",
-          props: ["foo", "guru"]
-        }
-      });
+  var context = new Context();
+  var Boolean = context.get(booleanFactory);
+  var String = context.get(stringFactory);
+  var Complex = context.get(complexFactory);
+  var Derived = Complex.extend({
+    meta: {
+      label: "Derived",
+      props: ["foo", "guru"]
+    }
+  });
 
-  describe("pentaho/type/PropertyMetaCollection -", function () {
+  describe("pentaho/type/PropertyMetaCollection -", function() {
 
-    it("is a function", function () {
+    it("is a function", function() {
       expect(typeof PropertyMetaCollection).toBe("function");
     });
 
-    describe("PropertyMetaCollection constructor()", function () {
+    describe("PropertyMetaCollection constructor()", function() {
       var props;
 
-      beforeEach(function () {
+      beforeEach(function() {
         props = PropertyMetaCollection.to([], Derived.meta);
       });
 
-      it("should return an object", function () {
+      it("should throw if constructor directly called without a declaring complex", function() {
+        expect(function() {
+          props = new PropertyMetaCollection();
+        }).toThrowError(/required/);
+      });
+
+      it("should return an object", function() {
         expect(typeof props).toBe("object");
       });
 
-      it("should return an array of length 0", function () {
+      it("should return an array of length 0", function() {
         expect(props.length).toBe(0);
       });
 
-      it("should convert an array of pentaho.type.UPropertyMeta", function () {
+      it("should convert an array of pentaho.type.UPropertyMeta", function() {
         var props = PropertyMetaCollection.to(["foo", "bar"], Derived.meta);
         expect(props.length).toBe(2);
         expect(props[0].name).toBe("foo");
@@ -67,15 +72,15 @@ define([
         expect(props[1].type).toBe(String.meta);
       });
 
-      describe("Adding, removing, and replacing a PropertyMeta to the PropertyMetaCollection", function () {
+      describe("Adding, removing, and replacing a PropertyMeta to the PropertyMetaCollection", function() {
 
-        it("should add object to the collection", function () {
+        it("should add object to the collection", function() {
           props.add({name: "foo1", type: "boolean"});
           expect(props.length).toBe(1);
           expect(props[0].type).toBe(Boolean.meta);
         });
 
-        it("should use List.add() to replace an object with the same name in the collection with updated type, etc.", function () {
+        it("should use List.add() to replace an object with the same name in the collection with updated type, etc.", function() {
           props.add({name: "foo", type: "boolean"});
           props.add({name: "foo2", type: "string"});
           props.add({name: "foo", type: "string"});
@@ -83,17 +88,17 @@ define([
           expect(props[0].type).toBe(String.meta);
         });
 
-        it("should throw when attempting to add a property with a falsy name", function () {
+        it("should throw when attempting to add a property with a falsy name", function() {
           [
             null, undefined, false, 0, ""
-          ].forEach(function(name){
-            expect(function(){
+          ].forEach(function(name) {
+            expect(function() {
               props.add(name);
             }).toThrowError(/required/);
           });
         });
 
-        it("should use List.replace() to replace an object with the same name in the collection with updated type, etc.", function () {
+        it("should use List.replace() to replace an object with the same name in the collection with updated type, etc.", function() {
           props.add({name: "foo", type: "boolean"});
           props.add({name: "foo2", type: "string"});
           props.replace({name: "foo", type: "boolean"}, 0);
@@ -101,22 +106,28 @@ define([
           expect(props[0].type).toBe(Boolean.meta);
         });
 
-        it("should throw when attempting to replace a non-existent property", function () {
+        it("should throw when attempting to replace a non-existent property", function() {
           props.add({name: "foo", type: "boolean"});
-          expect(function(){
+          expect(function() {
             props.replace({name: "bar", type: "string"}, 0);
           }).toThrowError(/invalid/);
         });
+
+        it("should throw when calling replace with no arguments", function() {
+          expect(function() {
+            props.replace();
+          }).toThrowError(/required/);
+        });
       });
 
-      describe("Configuring the PropertyMetaCollection", function () {
-        it("should throw if invoked with no arguments", function () {
-          expect(function(){
+      describe("Configuring the PropertyMetaCollection", function() {
+        it("should throw if invoked with no arguments", function() {
+          expect(function() {
             props.configure();
           }).toThrowError(/config/);
         });
 
-        it("should accept an array of pentaho.type.UPropertyMeta", function () {
+        it("should accept an array of pentaho.type.UPropertyMeta", function() {
           props.configure(["foo", "bar"]);
           expect(props.length).toBe(2);
           expect(props[0].name).toBe("foo");
@@ -125,7 +136,7 @@ define([
           expect(props[1].type).toBe(String.meta);
         });
 
-        it("should accept an array of pentaho.type.UPropertyMeta whose elements were previously defined", function () {
+        it("should accept an array of pentaho.type.UPropertyMeta whose elements were previously defined", function() {
           var props = PropertyMetaCollection.to(["foo", {name: "eggs", type: "boolean"}], Derived.meta);
           props.configure(["foo", "bar"]);
           expect(props.length).toBe(3);
@@ -137,7 +148,7 @@ define([
           expect(props[2].type).toBe(String.meta);
         });
 
-        it("should accept an object whose keys are the property names and the values are pentaho.type.UPropertyMeta", function () {
+        it("should accept an object whose keys are the property names and the values are pentaho.type.UPropertyMeta", function() {
           props.configure({foo: {name: "foo", type: "boolean"}, guru: {name: "guru", type: "boolean"}});
           expect(props.length).toBe(2);
           expect(props[0].type).toBe(Boolean.meta);
@@ -145,19 +156,19 @@ define([
           expect(props[1].type).toBe(Boolean.meta);
         });
 
-        it("should throw when attempting to configure with key that does not match its property name", function () {
-          expect(function(){
+        it("should throw when attempting to configure with key that does not match its property name", function() {
+          expect(function() {
             props.configure({foo: {name: "bar", type: "boolean"}});
           }).toThrowError(/config/);
         });
 
-        it("should use the key as property name if the property spec does not include a name", function () {
+        it("should use the key as property name if the property spec does not include a name", function() {
           props.configure({foo: {type: "boolean"}});
           expect(props.length).toBe(1);
           expect(props[0].name).toBe("foo");
         });
 
-        it("should replace any existing configurations of the same name and update its type", function () {
+        it("should replace any existing configurations of the same name and update its type", function() {
           props.configure(["foo", "bar"]);
           expect(props.length).toBe(2);
           expect(props[0].name).toBe("foo");
@@ -171,13 +182,62 @@ define([
           expect(props[2].type).toBe(Boolean.meta);
         });
 
-        it("should preserve the type when reconfiguring the property without specifying the type", function () {
+        it("should preserve the type when reconfiguring the property without specifying the type", function() {
           props.configure({foo: {name: "foo", type: "boolean"}});
           props.configure(["foo"]);
           expect(props.length).toBe(1);
           expect(props[0].type).toBe(Boolean.meta);
         });
 
+      });
+    });
+
+    describe("property ineritance", function() {
+      var MoreDerived = Derived.extend({
+        meta: {
+          label: "MoreDerived",
+          props: ["bar"]
+        }
+      });
+
+      var props;
+
+      beforeEach(function() {
+        props = PropertyMetaCollection.to([], MoreDerived.meta);
+      });
+
+      it("should inherit base properties and return an array of length 2", function() {
+        expect(props.length).toBe(2);
+      });
+
+      describe("Adding, removing, and replacing a PropertyMeta to the PropertyMetaCollection", function() {
+        it("should use List.add() to override a inherited property with the same name", function() {
+          expect(props[0].declaringType).toBe(Derived.meta);
+          props.add({name: "foo"});
+          expect(props[0].declaringType).toBe(MoreDerived.meta);
+
+          expect(props.length).toBe(2);
+        });
+
+        it("should throw if using List.add() to override a inherited property's 'type' to something that isn't a subtype of the base property's 'type'", function() {
+          expect(function() {
+            props.add({name: "foo", type: "boolean"});
+          }).toThrowError(/invalid/);
+        });
+
+        it("should use List.replace() to override a inherited property with the same name", function() {
+          expect(props[0].declaringType).toBe(Derived.meta);
+          props.replace({name: "foo"}, 0);
+          expect(props[0].declaringType).toBe(MoreDerived.meta);
+
+          expect(props.length).toBe(2);
+        });
+
+        it("should throw if using List.replace() to override a inherited property's 'type' to something that isn't a subtype of the base property's 'type'", function() {
+          expect(function() {
+            props.replace({name: "foo", type: "boolean"}, 0);
+          }).toThrowError(/invalid/);
+        });
       });
     });
   }); // pentaho/type/PropertyMetaCollection
