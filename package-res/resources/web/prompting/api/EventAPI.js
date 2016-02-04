@@ -112,9 +112,14 @@ define([], function() {
      * @name EventAPI#postInit
      * @method
      * @param {Function} callback The function to be executed when the event is triggered
+     *
+     * @example
+     * api.event.postInit(function() {
+     *   // Execute event based code
+     * })
      */
     this.postInit = function(callback) {
-      api.operation._getPromptPanel().dashboard.on('cdf:postInit', callback);
+      api.operation._getPromptPanel().onPostInit(callback);
     };
 
     /**

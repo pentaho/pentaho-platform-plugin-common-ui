@@ -59,7 +59,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
         paramDefn.autoSubmit = false;
         paramDefn.page = 2;
 
-        dashboardSpy = jasmine.createSpyObj("dashboardSpy", [ "setParameter", "getParameterValue", "getComponentByName", "addComponent", "updateComponent", "showProgressIndicator", "hideProgressIndicator"]);
+        dashboardSpy = jasmine.createSpyObj("dashboardSpy", [ "setParameter", "getParameterValue", "getComponentByName", "addComponent", "updateComponent", "showProgressIndicator", "hideProgressIndicator", "on"]);
         panel = new PromptPanel(testId, paramDefn);
         panel.dashboard = dashboardSpy;
       });
@@ -1492,6 +1492,19 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
 
           panel.setAutoSubmit(false);
           expect(panel.onStateChanged).toHaveBeenCalledWith("autoSubmit", true, false);
+        });
+      });
+
+      describe("onPostInit", function() {
+        it ("should register a postIinit function to the dashboard", function() {
+          var callbackSpy = jasmine.createSpy("functionSpy");
+          spyOn(panel, "getDashboard").and.callThrough();
+          
+          panel.onPostInit(callbackSpy);
+
+
+          expect(panel.getDashboard).toHaveBeenCalled();
+          expect(panel.dashboard.on).toHaveBeenCalledWith('cdf:postInit', callbackSpy);
         });
       });
     });

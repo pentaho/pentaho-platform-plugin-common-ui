@@ -28,7 +28,7 @@ define([
         beforeEach(function () {
           dashboardSpy = jasmine.createSpyObj("Dashboard", ["on"]);
 
-          promptPanelSpy = jasmine.createSpy("PromptPanel");
+          promptPanelSpy = jasmine.createSpyObj("PromptPanel", ["onPostInit"]);
           promptPanelSpy.dashboard = dashboardSpy;
 
           apiSpy = jasmine.createSpy("PromptingAPI");
@@ -116,7 +116,7 @@ define([
 
         it("should register a postInit event", function () {
           eventApi.postInit(callback);
-          expect(dashboardSpy.on).toHaveBeenCalledWith('cdf:postInit', callback);
+          expect(promptPanelSpy.onPostInit).toHaveBeenCalledWith(callback);
         });
 
         it("should register a ready event", function () {

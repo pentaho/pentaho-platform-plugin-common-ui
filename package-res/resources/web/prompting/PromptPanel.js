@@ -528,6 +528,15 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
           return this.paramDefn;
         },
 
+
+        /**
+         * Registers a post init event on the dashboard
+         * @param {Function} callback The function to be executed when the event is triggered
+         */
+        onPostInit: function(callback) {
+          this.getDashboard().on('cdf:postInit', callback);
+        },
+
         /**
          * Sets the parameter definition for the prompt panel. Also sets whether the prompt panel has auto submit
          * @param paramDefn {Object} The parameter definition object
