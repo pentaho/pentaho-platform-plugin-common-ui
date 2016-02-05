@@ -15,8 +15,9 @@
  */
 define([
   "pentaho/type/complex",
+  "pentaho/util/error",
   "pentaho/i18n!type"
-], function(complexFactory, bundle) {
+], function(complexFactory, error, bundle) {
 
   "use strict";
 
@@ -41,8 +42,9 @@ define([
      * @abstract
      * @classDesc This is the base model class for visualizations.
      *
-     * @description Creates a base `Model`.
      * @constructor
+     * @description Creates a base `Model`.
+     * @param {pentaho.visual.base.spec.IModel} modelSpec A plain object containing the model specification.
      */
     var Model = Complex.extend({
           meta: {
@@ -63,7 +65,7 @@ define([
               {
                 name: "interactive",
                 type: "boolean",
-                required: true
+                value: true
               },
               {
                 name: "data",

@@ -16,8 +16,9 @@
 define([
   "pentaho/lang/Base",
   "pentaho/util/error",
-  "pentaho/shim/es6-promise"
-], function(Base, error, Promise) {
+  "pentaho/shim/es6-promise",
+  "pentaho/i18n!view"
+], function(Base, error, Promise, bundle) {
 
   "use strict";
 
@@ -38,11 +39,14 @@ define([
 
   var View = Base.extend(/** @lends pentaho.visual.base.View# */{
     constructor: function(element, model) {
-      if(!isElement(element)) {
+      if(arguments.length === 0)
+        throw error.argRequired("element, model");
+      if(!isElement(element))
         throw error.argInvalidType("element", "HTMLElement");
-      } else {
-        this.element = element;
-      }
+      if(!model)
+        throw error.argRequired("model");
+
+      this.element = element;
       this.model = model;
       this._init();
     },
@@ -55,13 +59,18 @@ define([
     render: function() {
       var me = this;
       return new Promise(function(resolve, reject) {
-        Promise.resolve(me._render()).then(resolve, reject);
+        var validationErrors = me._validate();
+        if(!validationErrors) {
+          Promise.resolve(me._render()).then(resolve, reject);
+        } else {
+          reject(validationErrors);
+        }
       });
     },
     /**
      * Called before the visualization is discarded.
      */
-    dispose: function(){
+    dispose: function() {
 
     },
     /**
@@ -71,6 +80,18 @@ define([
      */
     _init: function() {
       //this.model.on("change", this._onChange);
+    },
+    /**
+     * Validates the view
+     * @protected
+     * @see pentaho.visual.base.Model
+     */
+    _validate: function() {
+      var validationErrors = this.model.validate();
+      return validationErrors;
+    },
+    _isValid: function() {
+      return !!this._validate();
     },
     /**
      * Renders the visualization.
@@ -95,7 +116,7 @@ define([
      *
      * @protected
      */
-    _selectionChanged: function(){
+    _selectionChanged: function() {
       this._render();
     },
     /**

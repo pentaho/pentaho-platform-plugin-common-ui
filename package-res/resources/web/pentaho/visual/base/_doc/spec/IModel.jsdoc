@@ -18,7 +18,7 @@
  * The `IModel` interface represents the set of options
  * used to initialize a visualization's model instance.
  *
- * @name pentaho.visual.base.IModel
+ * @name pentaho.visual.base.spec.IModel
  * @interface
  *
  * @property {number} width Width of the visualization, in pixels.
