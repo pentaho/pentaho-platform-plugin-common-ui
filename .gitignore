@@ -11,6 +11,7 @@ build-res/pentaho-js-build/
 build-res/module-scripts/
 build-res/requireCfg-raw.js
 build-res/requireCfg.js
+build-res/pentaho-js-build.zip
 test-res/data/sampledata.log
 dev-res/dojo/
 node_modules/
