@@ -20,7 +20,7 @@ define([
       "common-ui/prompting/PromptPanel",
       "common-ui/prompting/parameters/ParameterXmlParser",
       "common-ui/prompting/api/EventAPI",
-      "text!common-ui/test/prompting/api/parameterDefinition.xml!strip"],
+      "text!./parameterDefinition.xml!strip"],
     function (Dashboard, PromptPanel, ParameterXmlParser, EventAPI, parameterDefinitionXml) {
 
       describe("EventAPI unit tests", function () {

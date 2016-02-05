@@ -15,14 +15,12 @@
  * Copyright 2014 Pentaho Corporation.  All rights reserved.
  */
 
-var deps = [
+define([
   'angular-mocks',
   'common-ui/angular',
   'common-ui/angular-directives/folderBrowser/folderBrowser',
   'common-ui/jquery'
-];
-
-define(deps, function (angular, folderBrowser) {
+], function (angular, folderBrowser) {
 
   xdescribe('unit testing angular tree control directive', function () {
     var $compile, $rootScope, element, sampleData;

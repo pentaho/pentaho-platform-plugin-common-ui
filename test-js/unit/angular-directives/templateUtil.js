@@ -15,7 +15,7 @@
  * Copyright 2014 Pentaho Corporation.  All rights reserved.
  */
 
-define( [], function() {
+define([], function() {
 
   function _preFetchTemplate(path, templateCache) {
     var req = new XMLHttpRequest();
@@ -31,7 +31,7 @@ define( [], function() {
     } else {
       return null;
     }
-  };
+  }
 
   return {
 

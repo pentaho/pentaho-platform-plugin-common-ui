@@ -1,12 +1,10 @@
-var deps = [
+define([
   'angular-mocks',
   'common-ui/angular',
-  'test/karma/unit/angular-directives/templateUtil',
+  './templateUtil',
   'common-ui/angular-ui-bootstrap',
   'common-ui/angular-directives/accordionWizard/accordionWizard'
-];
-
-define(deps, function (angular, templateUtil) {
+], function (angular, templateUtil) {
 
   xdescribe('accordionWizard', function () {
     var $scope, httpBackend, templateCache;

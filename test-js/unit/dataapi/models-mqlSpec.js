@@ -16,6 +16,7 @@
  */
 
 define(["common-data/models-mql"], function(modelsMql) {
+
   describe("PPP-3455", function() {
 
     parseXML = function() {
@@ -86,4 +87,35 @@ define(["common-data/models-mql"], function(modelsMql) {
     });
 
   });
-})
+
+  describe("Models MQL", function() {
+
+    it("should enclose domain id with CDATA when serializing", function() {
+
+      var mqlQuery = new pentaho.pda.query.mql(new pentaho.pda.model.mql(
+          {domainId: 'domain',
+            modelId: 'model'
+          }
+      ));
+
+      var serializedQuery = mqlQuery.serialize();
+
+      expect(serializedQuery).toBe("<mql>\n" +
+          "<domain_type>relational</domain_type>\n" +
+          "<domain_id><![CDATA[domain]]></domain_id>\n" +
+          "<model_id>model</model_id>\n" +
+          "<options>\n" +
+          "<disable_distinct>false</disable_distinct>\n" +
+          "</options>\n" +
+          "<parameters>\n" +
+          "</parameters>\n" +
+          "<selections>\n" +
+          "</selections>\n" +
+          "<constraints>\n" +
+          "</constraints>\n" +
+          "<orders>\n" +
+          "</orders>\n" +
+          "</mql>\n");
+    });
+  });
+});

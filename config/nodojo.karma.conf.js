@@ -11,30 +11,37 @@ module.exports = function (config) {
     ],
 
     files: [
-      {pattern: "build-res/module-scripts/**/{*.js,*.html,*.xml}",  included: false},
+      // FIRST file
+      "config/context-begin.js",
+
+      // SOURCE files
+      {pattern: "build-res/module-scripts/**/{*.js,*.html,*.xml}", included: false},
       {pattern: "package-res/resources/web/**/{*.js,*.html,*.xml,*.properties}", included: false},
 
-      "config/context.js",
+      // AMD configuration
       "build-res/requireCfg-raw.js",
+      "test-js/unit/require-config.js",
 
-      // needs to be last file
-      "config/require-config.js"
+      // TEST files (must be after require-config.js, or it is not included)
+      {pattern: "test-js/unit/**", included: false},
+
+      // LAST file
+      "config/context-end.js"
     ],
 
     // Too many files cause karma launcher/file-serving errors.
     // Exclude these as we don't use them and they're many.
     exclude: [
       "build-res/module-scripts/common-ui/**",
+      "package-res/resources/web/test/**",
 
       // Exclude all unit tests that require dojo
-      "package-res/resources/web/test/dojo/**",
-      "package-res/resources/web/test/examples/angular-directives/**",
-      "package-res/resources/web/test/karma/unit/angular-directives/**",
-      "package-res/resources/web/test/prompting/**",
-      "package-res/resources/web/test/karma/unit/models-mqlSpec.js",
-      "package-res/resources/web/test/dataapi/**",
-      "package-res/resources/web/test/karma/unit/urlencoderSpec.js",
-      "package-res/resources/web/test/util/TextFormatterSpec.js"
+      "test-js/unit/dojo/**",
+      "test-js/unit/angular-directives/**",
+      "test-js/unit/prompting/**",
+      "test-js/unit/dataapi/**",
+      "test-js/unit/util/URLEncoderSpec.js",
+      "test-js/unit/util/TextFormatterSpec.js"
     ],
 
     // auto run tests when files change

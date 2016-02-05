@@ -1,16 +1,14 @@
-var deps = [
+define([
   'angular-mocks',
   "common-ui/angular",
-  "test/karma/unit/angular-directives/templateUtil",
+  "./templateUtil",
   "dojo/parser",
   "dojo/ready",
   "dijit/registry",
   "common-ui/angular-ui-bootstrap",
   "common-ui/angular-directives/dateTimePicker/dateTimePicker",
   "common-ui/angular-directives/angular-dojo/angular-dojo"
-];
-
-define(deps, function (angular, templateUtil, dojoParser, ready, registry) {
+], function (angular, templateUtil, dojoParser, ready, registry) {
 
   xdescribe("dateTimePicker", function () {
     var scope, isolateScope, element, httpBackend, templateCache, timeout;

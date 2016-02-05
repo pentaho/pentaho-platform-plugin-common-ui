@@ -15,7 +15,6 @@
  * Copyright 2015 Pentaho Corporation. All rights reserved.
  */
 
-CONTEXT_PATH = (typeof CONTEXT_PATH === 'undefined') ? '' : CONTEXT_PATH;
 define(["common-data/models-svc", "common-repo/pentaho-ajax"], function(modelsSvc, pentahoAjax) {
   describe("PPP-3455", function() {
 

@@ -15,14 +15,12 @@
  * Copyright 2014 Pentaho Corporation.  All rights reserved.
  */
 
-var deps = [
+define([
   'angular-mocks',
   'common-ui/angular',
   'common-ui/angular-directives/schedule/scheduleSelector',
-  'test/karma/unit/angular-directives/commonFiltersMock'
-];
-
-define(deps, function (angular) {
+  './commonFiltersMock'
+], function (angular) {
 
   xdescribe("Schedule Directives", function () {
 
