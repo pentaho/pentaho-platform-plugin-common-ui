@@ -15,7 +15,6 @@
  * Copyright 2015 Pentaho Corporation. All rights reserved.
  */
 
-CONTEXT_PATH = (typeof CONTEXT_PATH === 'undefined') ? '' : CONTEXT_PATH;
 define(["common-data/cda", "common-data/xhr"], function(cda, xhr) {
 
   describe("PPP-3455", function() {
