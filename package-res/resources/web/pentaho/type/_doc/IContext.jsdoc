@@ -37,7 +37,7 @@
  * @name get
  * @memberOf pentaho.type.IContext
  * @function
- * @param {pentaho.type.spec.UTypeRef} typeRef A reference of the desired type.
+ * @param {pentaho.type.spec.UTypeReference} typeRef A reference of the desired type.
  * @return {Class.<pentaho.type.Value>} The corresponding type class.
  */
 
@@ -47,6 +47,6 @@
  * @name getAsync
  * @memberOf pentaho.type.IContext
  * @function
- * @param {pentaho.type.spec.UTypeRef} typeRef typeRef A reference of the desired type.
+ * @param {pentaho.type.spec.UTypeReference} typeRef typeRef A reference of the desired type.
  * @return {Promise.<Class.<pentaho.type.Value>>} A promise for the corresponding type class.
  */

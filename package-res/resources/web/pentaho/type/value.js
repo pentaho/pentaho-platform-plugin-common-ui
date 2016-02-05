@@ -231,6 +231,187 @@ define([
         },
         //endregion
 
+        //region creation
+        //@override
+        /**
+         * Creates an instance of this type, given an instance specification.
+         *
+         * If the specified instance specification contains an inline type reference,
+         * in property `"_"`, the referenced type is used to create the instance,
+         * as long as it is a subtype of this type. Otherwise, if it is not a subtype,
+         * an error is thrown.
+         *
+         * If the specified instance specification does not contain an inline type reference
+         * the type is assumed to be this type.
+         *
+         * An error is thrown if the type ultimately used to create the instance
+         * is an [abstract]{@link pentaho.type.Value.Meta#abstract} type.
+         *
+         * @example
+         * <caption>
+         *   Create a complex instance from a specification that carries inline type metadata.
+         * </caption>
+         *
+         * require(["pentaho/type/Context"], function(Context) {
+         *
+         *   var context = new Context({container: "data-explorer-101"});
+         *   var Value   = context.get("value");
+         *
+         *   var product = Value.meta.create({
+         *         _: {
+         *           props: ["id", "name", {name: "price", type: "number"}]
+         *         },
+         *
+         *         id:    "mpma",
+         *         name:  "Principia Mathematica",
+         *         price: 1200
+         *       });
+         *
+         *   // ...
+         *
+         * });
+         *
+         * @example
+         * <caption>
+         *   Create a list instance from a specification that carries inline type metadata.
+         * </caption>
+         *
+         * require(["pentaho/type/Context"], function(Context) {
+         *
+         *   var context = new Context({container: "data-explorer-101"});
+         *   var Value   = context.get("value");
+         *
+         *   var productList = Value.meta.create({
+         *         _: [{
+         *           props: ["id", "name", {name: "price", type: "number"}]
+         *         }],
+         *
+         *         d: [
+         *           {id: "mpma", name: "Principia Mathematica", price: 1200},
+         *           {id: "flot", name: "The Laws of Thought",   price:  500}
+         *         ]
+         *       });
+         *
+         *   // ...
+         *
+         * });
+         *
+         * @example
+         * <caption>
+         *   Create an instance from a specification that <b>does not</b> carry inline type metadata.
+         * </caption>
+         *
+         * require(["pentaho/type/Context"], function(Context) {
+         *
+         *   var context = new Context({container: "data-explorer-101"});
+         *   var ProductList = context.get([{
+         *           props: [
+         *             "id",
+         *             "name",
+         *             {name: "price", type: "number"}
+         *           ]
+         *         }]);
+         *
+         *   // Provide the default type, in case the instance spec doesn't provide one.
+         *   var productList = ProductList.meta.create(
+         *          [
+         *            {id: "mpma", name: "Principia Mathematica", price: 1200},
+         *            {id: "flot", name: "The Laws of Thought",   price:  500}
+         *         ]);
+         *
+         *   // ...
+         *
+         * });
+         *
+         * @param {?any} [instSpec] A value instance specification.
+         *
+         * @return {!pentaho.type.Value} The created instance.
+         *
+         * @see pentaho.type.Item.Meta#isSubtypeOf
+         * @see pentaho.type.Context#get
+         */
+        create: function(instSpec) {
+          // All value types have constructors.
+          // So it is safe to override the base method with a constructor-type only version.
+
+          var Type = this._getTypeOfInstSpec(instSpec);
+
+          return new Type(instSpec);
+        },
+
+        /**
+         * Determines the instance constructor that should be used to build the specified
+         * instance specification.
+         *
+         * @param {any} instSpec A value instance specification.
+         *
+         * @return {Class.<pentaho.type.Value>} The instance constructor.
+         * @private
+         * @ignore
+         */
+        _getTypeOfInstSpec: function(instSpec) {
+          var Type, typeSpec;
+
+          // If it is a plain Object, does it have the inline metadata property, "_"?
+          if(instSpec && typeof instSpec === "object" && (typeSpec = instSpec._) && instSpec.constructor === Object) {
+
+            Type = this.context.get(typeSpec);
+
+            if(this._assertSubtype(Type.meta).abstract) Type.meta._throwAbstractType();
+
+            // ugly but "efficient"
+            delete instSpec._;
+
+          } else {
+            if(this.abstract) this._throwAbstractType();
+
+            Type = this.mesa.constructor;
+          }
+
+          return Type;
+        },
+
+        /**
+         * Asserts that a given type is a subtype of this type.
+         *
+         * @param {!pentaho.type.Value.Meta} typeMeta The subtype to assert.
+         * @return {!pentaho.type.Value.Meta} The subtype `typeMeta`.
+         * @private
+         * @ignore
+         */
+        _assertSubtype: function(typeMeta) {
+          if(!typeMeta.isSubtypeOf(this)) {
+            throw error.operInvalid(
+                bundle.format(bundle.structured.errors.value.notOfExpectedBaseType, [this._getErrorLabel()]));
+          }
+
+          return typeMeta;
+        },
+
+        /**
+         * Throws an error complaining the type is abstract an cannot create instances.
+         *
+         * @private
+         * @ignore
+         */
+        _throwAbstractType: function() {
+          throw error.operInvalid(
+              bundle.format(bundle.structured.errors.value.cannotCreateInstanceOfAbstractType, [this._getErrorLabel()]));
+        },
+
+        /**
+         * Gets a label suitable to identify this type in an error message.
+         *
+         * @return {string} An error label.
+         * @private
+         * @ignore
+         */
+        _getErrorLabel: function() {
+          return this.id || this.label; // Never empty - inherits from Value;
+        },
+        //endregion
+
+        //region equality
         /**
          * Gets a value that indicates if two given values are equal.
          *
@@ -250,6 +431,7 @@ define([
                  (va != null && vb != null &&
                   (va.constructor === vb.constructor) && va.equals(vb));
         },
+        //endregion
 
         //region validation
         /**

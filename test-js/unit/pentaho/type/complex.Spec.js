@@ -1328,13 +1328,14 @@ define([
       });
 
       it("should create an object having the same element value instances", function() {
-        var MyComplex = Complex.extend({
+        var MyComplex1 = Complex.extend();
+        var MyComplex2 = Complex.extend({
           meta: {
-            props: ["a", "b", {name: "c", type: "complex"}]
+            props: ["a", "b", {name: "c", type: MyComplex1}]
           }
         });
 
-        var a = new MyComplex([1, 2, {}]);
+        var a = new MyComplex2([1, 2, {}]);
         var b = a.clone();
         expect(a.get("a")).toBe(b.get("a"));
         expect(a.get("b")).toBe(b.get("b"));
@@ -1342,15 +1343,16 @@ define([
       });
 
       it("should create an object having distinct list value instances but the same list elements", function() {
-        var MyComplex = Complex.extend({
+        var MyComplex1 = Complex.extend();
+        var MyComplex2 = Complex.extend({
           meta: {
             props: [
-              {name: "a", type: ["complex"]}
+              {name: "a", type: [MyComplex1]}
             ]
           }
         });
 
-        var a = new MyComplex([[{}, {}, {}]]);
+        var a = new MyComplex2([[{}, {}, {}]]);
         var b = a.clone();
         var aList = a.get("a");
         var bList = b.get("a");

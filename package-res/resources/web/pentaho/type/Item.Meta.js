@@ -73,7 +73,8 @@ define([
      * @overridable
      */
     _init: function(instSpec, keyArgs) {
-      O.setConst(this, "_uid", _nextUid++);
+
+      O.setConst(this, "uid", _nextUid++);
 
       // Bind
       var mesa = arg.required(keyArgs, "mesa", "keyArgs");
@@ -104,8 +105,6 @@ define([
     },
 
     //region uid property
-    _uid: null,
-
     /**
      * Gets the unique id of this type
      *
@@ -120,9 +119,7 @@ define([
      * @type number
      * @readonly
      */
-    get uid() {
-      return this._uid;
-    },
+    uid: -1, // set in _init
     //endregion
 
     //region context property
@@ -674,11 +671,9 @@ define([
     },
 
     // TODO: Now that Property instances are never created,
-    //   only types with constructors get created.
-
+    // only types with constructors get created.
     /**
-     * Creates an instance of this type,
-     * given the construction arguments.
+     * Creates an instance of this type, given the construction arguments.
      *
      * @param {...any} args The construction arguments.
      * @return {pentaho.type.Item} The created instance.
@@ -729,9 +724,6 @@ define([
     to: function(value) {
       return value == null   ? null  :
              this.is(value)  ? value :
-             // Am a (normal) constructor type or a prototype-only type?
-             // TODO: Context can only handle constructor types and does: new Type( ... )
-             this.constructor.prototype === this ? this.context.create(value, this, this) :
              this.create(value);
     }
   }, /** @lends pentaho.type.Item.Meta */{

@@ -270,14 +270,12 @@ define([
         });
       }));
 
-      it("should be able to get a standard type given its type metadata constructor (Meta)", testGet(function(sync, Context) {
+      it("should throw when given a type metadata constructor (Meta)", testGet(function(sync, Context) {
         var context = new Context();
         var Value   = context.get("pentaho/type/value");
-        var promise = callGet(context, sync, Value.meta.constructor);
-
-        return promise.then(function(Type) {
-          expect(Type.meta.id).toBe("pentaho/type/value");
-        });
+        expect(function() {
+          callGet(context, sync, Value.meta.constructor);
+        }).toThrowError(error.argInvalid("typeRef", "Type constructor is not supported.").message);
       }));
 
       it("should be able to get a standard type given its type instance constructor (Mesa)", testGet(function(sync, Context) {
@@ -303,11 +301,10 @@ define([
       it("should be able to get a standard type given its instance prototype (mesa)", testGet(function(sync, Context) {
         var context = new Context();
         var Value   = context.get("pentaho/type/value");
-        var promise = callGet(context, sync, Value.prototype);
 
-        return promise.then(function(Type) {
-          expect(Type.meta.id).toBe("pentaho/type/value");
-        });
+        expect(function() {
+          callGet(context, sync, Value.prototype);
+        }).toThrowError(error.argInvalid("typeRef", "Value instance is not supported.").message);
       }));
 
       it("should be able to create an anonymous complex type with base complex", testGet(function(sync, Context) {
@@ -537,6 +534,7 @@ define([
       // should throw when sync and the requested module is not yet loaded
       // should not throw when async and the requested module is not defined
       // should not throw when async and the requested module is not yet loaded
+      // should get a Type given an arbitrary instance ?
     }); // #get
 
     describe("#getAllAsync(baseTypeId, ka)", function() {
@@ -654,167 +652,5 @@ define([
             });
       }));
     }); // #getAll
-
-    describe("#create(valueSpec, defaultType, baseType)", function() {
-
-      it("should return null when given nully", withContext(function(Context) {
-        var context = new Context();
-        expect(context.create(null)).toBe(null);
-        expect(context.create(undefined)).toBe(null);
-      }));
-
-      it("should create an instance given a number value and the defaultType number", withContext(function(Context) {
-        var context = new Context();
-        var Number  = context.get("pentaho/type/number");
-
-        var number = context.create(1, Number);
-
-        expect(number instanceof Number).toBe(true);
-        expect(number.value).toBe(1);
-      }));
-
-      it("should create an instance given a boolean value and the defaultType boolean", withContext(function(Context) {
-        var context = new Context();
-        var Boolean  = context.get("pentaho/type/boolean");
-
-        var value = context.create(true, Boolean);
-
-        expect(value instanceof Boolean).toBe(true);
-        expect(value.value).toBe(true);
-      }));
-
-      it("should create an instance given an object value and the defaultType object", withContext(function(Context) {
-        var context = new Context();
-        var Object  = context.get("pentaho/type/object");
-
-        var primitive = {};
-        var value = context.create({v: primitive}, Object);
-
-        expect(value instanceof Object).toBe(true);
-        expect(value.value).toBe(primitive);
-      }));
-
-      it("should create an instance given an object with a type annotation, '_', and not defaultType",
-      withContext(function(Context) {
-        var context = new Context();
-        var Number = context.get("pentaho/type/number");
-
-        var value = context.create({_: "pentaho/type/number", v: 1});
-
-        expect(value instanceof Number).toBe(true);
-        expect(value.value).toBe(1);
-      }));
-
-      it("should throw if given a non-type-annotated and not given defaultType", withContext(function(Context) {
-        var context = new Context();
-        expect(function() {
-          context.create({v: 1});
-        }).toThrowError(
-            error.operInvalid(bundle.structured.errors.context.cannotCreateValueOfUnknownType).message);
-      }));
-
-      it("should throw if given a type-annotated value that does not extend from the given baseType",
-      withContext(function(Context) {
-        var context = new Context();
-        expect(function() {
-          context.create({_: "pentaho/type/number", v: 1}, null, "pentaho/type/string");
-        }).toThrowError(
-            error.operInvalid(
-                bundle.format(
-                    bundle.structured.errors.context.valueNotOfExpectedBaseType,
-                    ["pentaho/type/string"])).message);
-      }));
-
-      it("should not throw if given a type-annotated value that does extend from the given baseType",
-      withContext(function(Context) {
-        var context = new Context();
-
-        var value = context.create({_: "pentaho/type/number", v: 1}, null, "pentaho/type/simple");
-
-        expect(value instanceof context.get("pentaho/type/number")).toBe(true);
-        expect(value.value).toBe(1);
-      }));
-
-      it("should be able to create a type-annotated value of a list type", withContext(function(Context) {
-        var context = new Context();
-        var NumberList = context.get({base: "list", of: "number"});
-
-        var value = context.create({_: NumberList, d: [1, 2]});
-
-        expect(value instanceof NumberList).toBe(true);
-        expect(value.count).toBe(2);
-        expect(value.at(0).value).toBe(1);
-        expect(value.at(1).value).toBe(2);
-      }));
-
-      it("should be able to create a type-annotated value of an inline list type", withContext(function(Context) {
-        var context = new Context();
-
-        var value = context.create({
-          _: {base: "list", of: "number"},
-          d: [1, 2]
-        });
-
-        expect(value instanceof context.get("list")).toBe(true);
-        expect(value.count).toBe(2);
-        expect(value.at(0).value).toBe(1);
-        expect(value.at(1).value).toBe(2);
-      }));
-
-      it("should be able to create a type-annotated value of an inline complex type", withContext(function(Context) {
-        var context = new Context();
-
-        var value = context.create({
-          _: {
-            props: ["a", "b"]
-          },
-          "a": 1,
-          "b": 2
-        });
-
-        expect(value instanceof context.get("complex")).toBe(true);
-        expect(value.get("a").value).toBe("1");
-        expect(value.get("b").value).toBe("2");
-      }));
-
-      it("should be able to create a type-annotated value of an inline list complex type", withContext(function(Context) {
-        var context = new Context();
-
-        var value = context.create({
-          _: [
-            {
-              props: [
-                {name: "a"},
-                "b"
-              ]
-            }
-          ],
-          d: [
-            {a: 1, b: 2}
-          ]
-        });
-
-        expect(value instanceof context.get("list")).toBe(true);
-        expect(value.count).toBe(1);
-      }));
-
-      it("should be able to create a type-annotated value of an inline list complex type in array form", withContext(function(Context) {
-        var context = new Context();
-
-        var value = context.create({
-          _: [{
-            props: ["a", "b"]
-          }],
-          d: [
-            [1, 2],
-            [3, 4]
-          ]
-        });
-
-        expect(value instanceof context.get("list")).toBe(true);
-        expect(value.count).toBe(2);
-      }));
-
-    }); // #create
   }); // pentaho.type.Context
 });

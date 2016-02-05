@@ -28,7 +28,7 @@ define([
 
   "use strict";
 
-  /*global SESSION_NAME:false, SESSION_LOCALE:false, active_theme:false*/
+  /*global SESSION_NAME:false, SESSION_LOCALE:false, active_theme:false, Promise:false */
 
   var _nextUid = 1,
 
@@ -57,24 +57,39 @@ define([
    * @name pentaho.type.Context
    * @class
    * @implements pentaho.type.IContext
-   * @classDesc The `Context` class contains _Value_ instance classes
+   * @classDesc A `Context` instance holds constructors/classes of _Value_ types
    * _configured_ for a particular _context_.
+   *
+   * A context has several variables that define it:
+   * [container]{@link pentaho.type.Context#container},
+   * [user]{@link pentaho.type.Context#user},
+   * [theme]{@link pentaho.type.Context#theme} and
+   * [locale]{@link pentaho.type.Context#locale}.
+   * Context variables are specified at construction time, through same named keyword arguments.
+   *
+   * These variables are used to select applicable configuration rules
+   * that are applied to the types provided by the context.
+   *
+   * Because configuration rules rely on the identification of types,
+   * only non-anonymous types -
+   * those that have an [id]{@link pentaho.type.Value.Meta#id} -
+   * can be _directly_ configured.
    *
    * @constructor
    * @description Creates a `Context` whose variables default to the Pentaho thin-client state variables.
-   * @param {object} [spec] The context specification.
-   * @param {string?} [spec.container] The id of the container application.
-   * @param {string?} [spec.user] The id of the user. Defaults to the current user.
-   * @param {string?} [spec.theme] The id of the theme. Defaults to the current theme.
-   * @param {string?} [spec.locale] The id of the locale. Defaults to the current locale.
+   * @param {object} [keyArgs] Keyword arguments.
+   * @param {string?} [keyArgs.container] The id of the container application.
+   * @param {string?} [keyArgs.user] The id of the user. Defaults to the current user.
+   * @param {string?} [keyArgs.theme] The id of the theme. Defaults to the current theme.
+   * @param {string?} [keyArgs.locale] The id of the locale. Defaults to the current locale.
    */
   var Context = Base.extend(/** @lends pentaho.type.Context# */{
 
-    constructor: function(spec) {
-      this._container = arg.optional(spec, "container") || getCurrentContainer();
-      this._user      = arg.optional(spec, "user")      || getCurrentUser();
-      this._theme     = arg.optional(spec, "theme")     || getCurrentTheme();
-      this._locale    = arg.optional(spec, "locale")    || getCurrentLocale();
+    constructor: function(keyArgs) {
+      this._container = arg.optional(keyArgs, "container") || getCurrentContainer();
+      this._user      = arg.optional(keyArgs, "user")      || getCurrentUser();
+      this._theme     = arg.optional(keyArgs, "theme")     || getCurrentTheme();
+      this._locale    = arg.optional(keyArgs, "locale")    || getCurrentLocale();
 
       // factory uid : Class.<pentaho.type.Value>
       this._byFactoryUid = {};
@@ -86,8 +101,9 @@ define([
       // type id : Class.<pentaho.type.Value>
       this._byTypeId = {};
 
-      // import standard types
-      // This mostly helps tests being able to undef these at any time :-(
+      // Register standard types
+      // This mostly helps tests being able to require.undef(.) these at any time
+      //  and not cause random failures for assuming all standard types were loaded.
       Object.keys(standard).forEach(function(lid) {
         if(lid !== "facets") this._getByFactory(standard[lid], /*sync:*/true);
       }, this);
@@ -137,17 +153,86 @@ define([
     //endregion
 
     /**
-     * Gets the instance constructor of a type.
+     * Gets the **configured instance constructor** of a value type.
      *
-     * An error is thrown if a generic type specification references the ids of non-standard types
-     * whose modules have not been loaded yet.
-     * If is not known whether all referenced non-standard modules have been loaded,
-     * use {@link pentaho.type.Context#getAsync} instead.
+     * For more information on the `typeRef` argument,
+     * please see [UTypeReference]{@link pentaho.type.spec.UTypeReference}.
      *
-     * @param {?pentaho.type.spec.UTypeRef} [typeRef] A type reference.
+     * The modules of standard types and refinement facet _mixins_ are preloaded and
+     * can be requested _synchronously_. These are:
+     *
+     * * [pentaho/type/value]{@link pentaho.type.Value}
+     *   * [pentaho/type/list]{@link pentaho.type.List}
+     *   * [pentaho/type/element]{@link pentaho.type.Element}
+     *     * [pentaho/type/complex]{@link pentaho.type.Complex}
+     *     * [pentaho/type/simple]{@link pentaho.type.Simple}
+     *       * [pentaho/type/string]{@link pentaho.type.String}
+     *       * [pentaho/type/number]{@link pentaho.type.Number}
+     *       * [pentaho/type/date]{@link pentaho.type.Date}
+     *       * [pentaho/type/boolean]{@link pentaho.type.Boolean}
+     *       * [pentaho/type/function]{@link pentaho.type.Function}
+     *       * [pentaho/type/object]{@link pentaho.type.Object}
+     *   * [pentaho/type/refinement]{@link pentaho.type.Refinement}
+     *     * [pentaho/type/facets/Refinement]{@link pentaho.type.facets.RefinementFacet}
+     *       * [pentaho/type/facets/DiscreteDomain]{@link pentaho.type.facets.DiscreteDomain}
+     *       * [pentaho/type/facets/OrdinalDomain]{@link pentaho.type.facets.OrdinalDomain}
+     *
+     * For all of these, the `pentaho/type/` or `pentaho/type/facets/` prefix is optional
+     * (when requested to a _context_; the AMD module system requires the full module ids to be specified).
+     *
+     * If is not known whether all non-standard types that are referenced by id have already been loaded,
+     * the asynchronous method version, [getAsync]{@link pentaho.type.Context#getAsync},
+     * should be used instead.
+     *
+     * An error is thrown when:
+     *
+     * * the argument `typeRef` is of an unsupported JavaScript type: not a string, function, array or object
+     *
+     * * the argument `typeRef` is a value type's constructor (e.g. [Value.Meta]{@link pentaho.type.Value.Meta})
+     *
+     * * the argument `typeRef` is a value instance
+     *
+     * * the id of a type is not defined as a module in the AMD module system
+     *   (specified directly in `typeRef`, or present in an generic type specification)
+     *
+     * * the id of a **non-standard type** is from a module that the AMD module system hasn't loaded yet
+     *   (specified directly in `typeRef`, or present in an generic type specification)
+     *
+     * * the value returned by a factory function is not a instance constructor of a subtype of _Value_
+     *   (specified directly in `typeRef`, or obtained indirectly by loading a type's module given its id)
+     *
+     * * an instance constructor is from a different [context]{@link pentaho.type.Value.Meta#context}
+     *   (directly specified in `typeRef`,
+     *    or obtained indirectly by loading a type's module given its id, or from a factory function)
+     *
+     * @example
+     * <caption>
+     *   Getting a <b>configured</b> type instance constructor <b>synchronously</b> for a specific container.
+     * </caption>
+     *
+     * require(["pentaho/type/Context", "my/viz/chord"], function(Context) {
+     *
+     *   var context = new Context({container: "data-explorer-101"})
+     *
+     *   // Request synchronously cause it was already loaded in the above `require`
+     *   var VizChordModel = context.get("my/viz/chord");
+     *
+     *   var model = new VizChordModel({outerRadius: 200});
+     *
+     *   // Render the model using the default view
+     *   model.meta.viewClass.then(function(View) {
+     *     var view = new View(document.getElementById("container"), model);
+     *
+     *     // ...
+     *   });
+     *
+     * });
+     *
+     * @param {?pentaho.type.spec.UTypeReference} [typeRef] A type reference.
      * Defaults to type `"pentaho/type/string"`.
      *
      * @return {!Class.<pentaho.type.Value>} The instance constructor.
+     *
      * @see pentaho.type.Context#getAsync
      */
     get: function(typeRef) {
@@ -155,15 +240,63 @@ define([
     },
 
     /**
-     * Gets the instance constructor of a type.
+     * Gets, asynchronously, the **configured instance constructor** instance constructor of a type.
      *
-     * This method can be used even if a generic type specification references
-     * non-standard modules that have not yet been loaded.
+     * For more information on the `typeRef` argument,
+     * please see [UTypeReference]{@link pentaho.type.spec.UTypeReference}.
      *
-     * @param {?pentaho.type.spec.UTypeRef} [typeRef] A type reference.
+     * This method can be used even if a generic type metadata specification references
+     * non-standard types whose modules have not yet been loaded by the AMD module system.
+     *
+     * An error is thrown when:
+     *
+     * * the argument `typeRef` is of an unsupported JavaScript type: not a string, function, array or object
+     *
+     * * the argument `typeRef` is a value type's constructor (e.g. [Value.Meta]{@link pentaho.type.Value.Meta})
+     *
+     * * the argument `typeRef` is a value instance.
+     *
+     * The returned promise gets rejected with an error when:
+     *
+     * * the id of a type is not defined as a module in the AMD module system
+     *   (specified directly in `typeRef`, or present in an generic type specification)
+     *
+     * * the value returned by a factory function is not a instance constructor of a subtype of _Value_
+     *   (specified directly in `typeRef`, or obtained indirectly by loading a type's module given its id)
+     *
+     * * an instance constructor is from a different [context]{@link pentaho.type.Value.Meta#context}
+     *   (directly specified in `typeRef`,
+     *    or obtained indirectly by loading a type's module given its id, or from a factory function).
+     *
+     * @example
+     * <caption>
+     *   Getting a <b>configured</b> type instance constructor <b>asynchronously</b> for a specific container.
+     * </caption>
+     *
+     * require(["pentaho/type/Context"], function(Context) {
+     *
+     *   var context = new Context({container: "data-explorer-101"})
+     *
+     *   context.getAsync("my/viz/chord")
+     *     .then(function(VizChordModel) {
+     *
+     *       var model = new VizChordModel({outerRadius: 200});
+     *
+     *       // Render the model using the default view
+     *       model.meta.viewClass.then(function(View) {
+     *         var view = new View(document.getElementById("container"), model);
+     *
+     *         // ...
+     *       });
+     *     });
+     *
+     * });
+     *
+     * @param {?pentaho.type.spec.UTypeReference} [typeRef] A type reference.
      * Defaults to type `"pentaho/type/string"`.
      *
      * @return {!Promise.<!Class.<pentaho.type.Value>>} A promise for the instance constructor.
+     *
      * @see pentaho.type.Context#get
      */
     getAsync: function(typeRef) {
@@ -171,22 +304,45 @@ define([
     },
 
     /**
-     * Obtains a promise for all instance classes that inherit from a given base type.
+     * Gets a promise for the **configured instance constructors** of
+     * all of the types that are subtypes of a given base type.
+     *
+     * @example
+     * <caption>
+     *   Getting all <code>"my/component"</code> sub-types browsable
+     *   in the container <code>"data-explorer-101"</code>.
+     * </caption>
+     *
+     * require(["pentaho/type/Context"], function(Context) {
+     *
+     *   var context = new Context({container: "data-explorer-101"});
+     *
+     *   context.getAllAsync("my/component", {browsable: true})
+     *     .then(function(ComponentModels) {
+     *
+     *       ComponentModels.forEach(function(ComponentModel) {
+     *
+     *         console.log("will display menu entry for: " + ComponentModel.meta.label);
+     *
+     *       });
+     *     });
+     *
+     * });
      *
      * @param {string} [baseTypeId] The id of the base type. Defaults to `"pentaho/type/value"`.
-     * @param {object} [ka] The keyword arguments.
-     * @param {?boolean} [ka.browsable=null] Indicates that only types with the specified
-     *   {@link pentaho.type.Value.Meta#browsable} are returned.
+     * @param {object} [keyArgs] Keyword arguments.
+     * @param {?boolean} [keyArgs.browsable=null] Indicates that only types with the specified
+     *   [browsable]{@link pentaho.type.Value.Meta#browsable} value are returned.
      *
-     * @return {Promise.<Array.<!Class.<pentaho.item.Value>>>} A promise for instance classes.
+     * @return {Promise.<Array.<!Class.<pentaho.type.Value>>>} A promise for instance classes.
      *
      * @see pentaho.type.Context#get
      * @see pentaho.type.Context#getAsync
      */
-    getAllAsync: function(baseTypeId, ka) {
+    getAllAsync: function(baseTypeId, keyArgs) {
       if(!baseTypeId) baseTypeId = "pentaho/type/value";
 
-      var predicate = F.predicate(ka);
+      var predicate = F.predicate(keyArgs);
       var me = this;
       return promise.require(["pentaho/service!" + baseTypeId])
           .then(function(factories) {
@@ -199,104 +355,32 @@ define([
           });
     },
 
-    //region Value creation
-    /*
-     * typeReference = "typeId" | ITypeSpec | typeFactory | TypeCtor | InstCtor ...
-     *
-     * A. Value fragment specification with Inline Type Metadata
-     *
-     *   key is { _: ... }
-     *
-     *   {
-     *     _: typeExpression,
-     *
-     *     // remaining properties are defined by each type
-     *
-     *     ...
-     *   }
-     *
-     *   typeExpression ::=
-     *
-     *     "typeId" |
-     *
-     *     {}       | // type extend spec
-     *
-     *     [          // list type spec
-     *
-     *        "elementTypeId" |
-     *        { element-type-spec }
-     *     ]
-     *
-     * B. Within _list_ typed property
-     *
-     *   [ValueSpec]
-     *
-     * C. Within _element_ typed property
-     *
-     *   ValueSpec
-     */
-
+    //region get support
     /**
-     * Creates a value given its specification.
+     * Gets the instance constructor of a type.
      *
-     * When the specification is {@link Nully}, `null` is returned.
+     * Internal get method shared by `get` and `getAsync`.
+     * Uses `sync` argument to distinguish between the two modes.
      *
-     * When the specification doesn't state its type, using inline metadata,
-     * and `defaultType` is specified, it is used to create a value instance,
-     * otherwise, if `defaultType` isn't specified, an error is thrown.
+     * Main dispatcher according to the type and class of `typeRef`:
+     * string, function or array or object.
      *
-     * When `baseType` is specified,
-     * it is used to validate a type stated in inline metadata.
+     * @param {?pentaho.type.spec.UTypeReference} [typeRef] A type reference.
+     * Defaults to type `"pentaho/type/string"`.
      *
-     * It is assumed, but not validated,
-     * that if both `defaultType` and `baseType` are specified,
-     * the former is either equal to, or a sub-type of, the latter.
+     * @param {boolean} [sync=false] Whether to perform a synchronous get.
+     * @return {!Promise.<!Class.<pentaho.type.Value>>|!Class.<pentaho.type.Value>} When sync,
+     *   returns the instance constructor, while, when async, returns a promise for it.
      *
-     * @param {?any} [valueSpec] A value specification.
-     * @param {?pentaho.type.spec.UTypeRef} [defaultType] A type reference of the _non-abstract_ type
-     *   to use for value specifications that don't specify a type.
-     * @param {?pentaho.type.spec.UTypeRef} [baseType] A type reference of the _expected_ base type.
-     *
-     * @return {?pentaho.type.Value} A `Value` or `null`.
+     * @private
+     * @ignore
      */
-    create: function(valueSpec, defaultType, baseType) {
-      if(valueSpec == null) return null;
-
-      // TODO: Should load default type immediately? Or only if actually needed...
-      var DefaultType = defaultType ? this.get(defaultType) : null;
-      var BaseType    = baseType    ? this.get(baseType)    : null;
-
-      if(BaseType && BaseType.meta.is(valueSpec)) return valueSpec;
-
-      // If it is a plain Object, does it have the inline, metadata property, "_"?
-      var Type, inlineTypeMetadata;
-      if(typeof valueSpec === "object" &&
-         valueSpec.constructor === Object &&
-         (inlineTypeMetadata = valueSpec._) != null) {
-
-        Type = this.get(inlineTypeMetadata);
-
-        if(BaseType && !(Type.prototype instanceof BaseType))
-          throw error.operInvalid(
-              bundle.format(bundle.structured.errors.context.valueNotOfExpectedBaseType, [
-                BaseType.meta.id || "anonymous"
-              ]));
-
-        delete valueSpec._;
-      } else if(!(Type = DefaultType)) {
-        throw error.operInvalid(bundle.structured.errors.context.cannotCreateValueOfUnknownType);
-      }// else assume DefaultType extends BaseType.
-
-      return new Type(valueSpec);
-    },
-    //endregion
-
     _get: function(typeRef, sync) {
       // Default property type is "string".
       if(!typeRef) typeRef = _defaultTypeMid;
 
       switch(typeof typeRef) {
-        case "string":   return this._getById(typeRef, sync);
+        case "string":   return this._getById (typeRef, sync);
         case "function": return this._getByFun(typeRef, sync);
         case "object":   return Array.isArray(typeRef)
             ? this._getByListSpec(typeRef, sync)
@@ -306,6 +390,34 @@ define([
       throw error.argInvalid("typeRef");
     },
 
+    /**
+     * Gets the instance constructor of a type given it's id.
+     *
+     * If the id does not contain any "/" character,
+     * it is considered relative to pentaho's `pentaho/type` module.
+     *
+     * Checks if id is already present in the `_byTypeId` map,
+     * returning immediately (modulo sync) if it is.
+     *
+     * Otherwise, requires the module, using either the sync or the async AMD form.
+     *
+     * If sync, AMD throws if a module with the given id is not yet loaded or isn't defined.
+     *
+     * When the resulting module is returned by AMD,
+     * its result is passed on, _recursively_, to `_get`,
+     * and, thus, the module can return any of the supported type reference formats.
+     * The usual is to return a factory function. Honestly, haven't thought much about
+     * whether it makes total sense for a module to return the other formats.
+     *
+     * @param {string} id A type reference.
+     * @param {boolean} [sync=false] Whether to perform a synchronous get.
+     *
+     * @return {!Promise.<!Class.<pentaho.type.Value>>|!Class.<pentaho.type.Value>} When sync,
+     *   returns the instance constructor, while, when async, returns a promise for it.
+     *
+     * @private
+     * @ignore
+     */
     _getById: function(id, sync) {
       id = toAbsTypeId(id);
 
@@ -320,19 +432,79 @@ define([
           : promise.require([id]).then(this._get.bind(this));
     },
 
+    /**
+     * Gets the instance constructor of a type given a function that represents it.
+     *
+     * The function can be:
+     *
+     * 1. An instance constructor (Mesa)
+     * 2. A type constructor (Meta)
+     * 3. Any other function, which is assumed to be a factory function.
+     *
+     * In the first two cases, the operation is delegated to `getByType`,
+     * passing in the instance constructor, representing the type.
+     *
+     * In the latter case, it is delegated to `_getByFactory`.
+     *
+     * @param {function} fun A function.
+     * @param {boolean} [sync=false] Whether to perform a synchronous get.
+     *
+     * @return {!Promise.<!Class.<pentaho.type.Value>>|!Class.<pentaho.type.Value>} When sync,
+     *   returns the instance constructor, while, when async, returns a promise for it.
+     *
+     * @private
+     * @ignore
+     */
     _getByFun: function(fun, sync) {
       var proto = fun.prototype;
 
       if(proto instanceof Item     ) return this._getByType(fun, sync);
-      if(proto instanceof Item.Meta) return this._getByType(proto.mesa.constructor, sync);
+      if(proto instanceof Item.Meta) throw error.argInvalid("typeRef", "Type constructor is not supported.");
 
       // Assume it's a factory function.
       return this._getByFactory(fun, sync);
     },
 
-    _getByType: function(Type, sync) {
-      // Don't use Value.meta, to not invoke the Meta constructor before configuration is performed, below.
-      var meta = Type.Meta.prototype;
+    /**
+     * Gets a configured instance constructor of a type,
+     * given the instance constructor of that type.
+     *
+     * An error is thrown if, for the given instance constructor,
+     * {@link pentaho.type.Value.Meta#context} is not `this` -
+     * the instance constructor must have been created by a factory called with this context,
+     * and have captured the context as the value of its `context` property,
+     * or, have been extended from a type that had this context.
+     *
+     * This method works for anonymous types as well -
+     * that have no [id]{@link pentaho.type.Value.Meta#id} -
+     * cause it uses the types' [uid]{@link pentaho.type.Value.Meta#uid}
+     * to identify types.
+     *
+     * A map of already configured types is kept in `_byTypeUid`.
+     *
+     * An error is thrown in the pathological case of a different instance constructor,
+     * with the same `uid` is already registered.
+     *
+     * If the type not yet in the map, and it is not anonymous,
+     * configuration is requested for it, and, if any exists,
+     * it is applied. Configuration may create a sub-classed instance constructor.
+     *
+     * The configured type is stored by _uid_ and _id_ (if not anonymous)
+     * and `factoryUid` (when specified) in corresponding maps,
+     * and is returned immediately (modulo sync).
+     *
+     * @param {!Class.<pentaho.type.Value>} Type An instance constructor.
+     * @param {boolean} [sync=false] Whether to perform a synchronous get.
+     * @param {?number} [factoryUid] The factory unique id, when `Type` was created by one.
+     *
+     * @return {!Promise.<!Class.<pentaho.type.Value>>|!Class.<pentaho.type.Value>} When sync,
+     *   returns the instance constructor, while, when async, returns a promise for it.
+     *
+     * @private
+     * @ignore
+     */
+    _getByType: function(Type, sync, factoryUid) {
+      var meta = Type.meta;
       if(meta.context !== this)
         throw error.argInvalid("typeRef", "Type is from a different context.");
 
@@ -342,8 +514,10 @@ define([
         // Not present yet.
         var id = meta.id;
         if(id) {
+          // TODO: configuration may need to subclass Type
+          // TODO: configuration is Meta only?
           var config = this._getConfig(id);
-          if(config) Type.Meta.implement(config);
+          if(config) meta.constructor.implement(config);
 
           this._byTypeId[id] = Type;
         }
@@ -351,36 +525,67 @@ define([
         this._byTypeUid[meta.uid] = Type;
 
       } else if(Type !== TypeExisting) {
+        // Pathological case, only possible if the result of an exploit.
         throw error.argInvalid("typeRef", "Duplicate type class uid.");
+      }
+
+      if(factoryUid != null) {
+        this._byFactoryUid[factoryUid] = Type;
       }
 
       return this._return(Type, sync);
     },
 
+    /**
+     * Gets a configured instance constructor of a type,
+     * given a factory function that creates it.
+     *
+     * Factory functions are tracked by using an unique id property (`_uid_`),
+     * which is automatically assigned to them the first time they are given
+     * to this function.
+     *
+     * A map of already evaluated factory functions,
+     * indexed by their unique id, is kept in `_byFactoryUid`.
+     *
+     * If a factory has already been evaluated before,
+     * the type it returned then is now returned immediately (modulo sync).
+     *
+     * Otherwise the factory function is evaluated being passed this context as argument.
+     *
+     * An error is thrown if the factory function does not return an instance constructor
+     * derived from `Value`.
+     *
+     * The returned instance constructor is passed to `_getType`,
+     * for registration and configuration,
+     * and then returned immediately (module sync).
+     *
+     * @param {!pentaho.type.Factory.<pentaho.type.Value>} typeFactory A factory of a type's instance constructor.
+     * @param {boolean} [sync=false] Whether to perform a synchronous get.
+     *
+     * @return {!Promise.<!Class.<pentaho.type.Value>>|!Class.<pentaho.type.Value>} When sync,
+     *   returns the instance constructor, while, when async, returns a promise for it.
+     *
+     * @private
+     * @ignore
+     */
     _getByFactory: function(typeFactory, sync) {
-      var factoryUid = getFactoryUid(typeFactory),
-          Type = O.getOwn(this._byFactoryUid, factoryUid);
+      var factoryUid = getFactoryUid(typeFactory);
 
-      if(Type) return this._return(Type, sync);
+      var Type = O.getOwn(this._byFactoryUid, factoryUid);
+      if(Type)
+        return this._return(Type, sync);
 
       Type = typeFactory(this);
-
       if(!F.is(Type) || !(Type.prototype instanceof Item))
         throw error.operInvalid("Type factory must return a sub-class of 'pentaho/type/Item'.");
 
-      // Errors are thrown synchronously.
-      var result = this._getByType(Type, sync);
-
-      this._byFactoryUid[factoryUid] = Type;
-
-      return result;
+      return this._getByType(Type, sync, factoryUid);
     },
 
     // Inline type spec: {[base: "complex", ] ... }
     _getByObjectSpec: function(typeSpec, sync) {
-
-      if(typeSpec instanceof Item     ) return this._getByType(typeSpec.constructor, sync);
       if(typeSpec instanceof Item.Meta) return this._getByType(typeSpec.mesa.constructor, sync);
+      if(typeSpec instanceof Item) throw error.argInvalid("typeRef", "Value instance is not supported.");
 
       var baseTypeSpec = typeSpec.base || _defaultBaseTypeMid,
           resolveSync = (function() {
@@ -423,6 +628,7 @@ define([
       // TODO: link to configuration service
       return null;
     },
+    //endregion
 
     _return: function(Type, sync) {
       return sync ? Type : Promise.resolve(Type);
@@ -449,7 +655,7 @@ define([
   }
 
   function getFactoryUid(factory) {
-    return factory.uid || (factory.uid = _nextUid++);
+    return factory._fuid_ || (factory._fuid_ = _nextUid++);
   }
 
   // It's considered an AMD id only if it has at least one "/".
