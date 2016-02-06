@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2016 Pentaho Corporation.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,23 @@
 define(function() {
   "use strict";
 
+  /**
+   * The `text` namespace contains utility functions for
+   * formatting strings that arise in API design.
+   *
+   * @namespace
+   * @memberOf pentaho.util
+   * @amd pentaho/util/text
+   * @ignore
+   */
   var text = {
-    // Ensures the first letter is upper case.
+    /**
+     * Ensures the first letter is upper case.
+     *
+     * @param {string} s The string to format.
+     * @return {string} The formatted string.
+     * @ignore
+     */
     firstUpperCase: function(s) {
       if(s) {
         var c  = s.charAt(0),
@@ -27,8 +42,18 @@ define(function() {
       return s;
     },
 
+    /**
+     * Convert a camel-case string into title/label appropriate string.
+     *
+     * @param {string} name The string to convert to a title.
+     * @return {string} The title/label appropriate string.
+     * @ignore
+     */
     titleFromName: function(name) {
-      return text.firstUpperCase(name).replace(/([a-z\d])([A-Z])/g, "$1 $2");
+      if(name) {
+        return text.firstUpperCase(name).replace(/([a-z\d])([A-Z])/g, "$1 $2");
+      }
+      return name;
     }
   };
 
