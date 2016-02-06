@@ -462,7 +462,7 @@ define([
           }
 
           var p = this._get(name);
-          if(!p && !lenient) throw error.operInvalid("A property with the name '" + (name.name || name) + "' is not defined.");
+          if(!p && !lenient) throw error.argInvalid("name", "A property with the name '" + (name.name || name) + "' is not defined.");
           return p;
         },
 
