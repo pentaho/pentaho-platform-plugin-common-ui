@@ -301,31 +301,6 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
         }
       };
 
-      /**
-       * Compares the parameter value to its stored value
-       * @name _areParamsDifferent
-       * @method
-       * @private
-       * @param {String|Date|Number} paramValue The stored parameter value
-       * @param {String|Date|Number} paramSelectedValue The value of the selected parameter
-       * @param {String} paramType The parameter type
-       * @returns {bool} The result of comparison
-       */
-      var _areParamsDifferent = function(paramValue, paramSelectedValue, paramType) {
-        if (paramValue && paramSelectedValue) {
-          switch (paramType) {
-            case "java.lang.String": // Used upper case to eliminate UPPER() post-process formula influence on the strings comparison
-              return paramValue.toUpperCase() != paramSelectedValue.toUpperCase();
-            case "java.sql.Date": // Set time to zero to eliminate its influence on the days comparison
-              return (new Date(paramValue).setHours(0,0,0,0)) != (new Date(paramSelectedValue).setHours(0,0,0,0));
-            default:
-              return paramValue != paramSelectedValue;
-          }
-        }
-
-        return paramValue != paramSelectedValue;
-      };
-
       var PromptPanel = Base.extend({
 
         guid: undefined,
@@ -961,7 +936,7 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
          *
          * @name PromptPanel#_changeComponentsByDiff
          * @method
-         * @param {JSON} toChangeDiff The group of parameters which need to be have their data changed
+         * @param {JSON} toChangeDiff The group of paramters which need to be have their data changed
          */
         _changeComponentsByDiff: function(toChangeDiff) {
           for (var groupName in toChangeDiff) {
@@ -1006,19 +981,13 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
                   this.forceSubmit = true;
                 }
 
-                var paramType = null;
                 var paramSelectedValues = param.getSelectedValuesValue();
                 if (paramSelectedValues.length == 1) {
                   paramSelectedValues = paramSelectedValues[0];
-                  paramType = param.type;
                 }
+                var paramValue = this.dashboard.getParameterValue(component.parameter);
 
-                if (!updateNeeded) {
-                  var paramValue = this.dashboard.getParameterValue(component.parameter);
-                  updateNeeded = _areParamsDifferent(paramValue, paramSelectedValues, paramType);
-                }
-
-                if (updateNeeded) {
+                if (paramValue != paramSelectedValues || updateNeeded) {
                   var groupPanel = this.dashboard.getComponentByName(groupName);
                   _mapComponents(groupPanel, function (component) {
                     this.dashboard.updateComponent(component);
