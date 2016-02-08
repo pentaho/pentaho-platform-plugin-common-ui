@@ -420,7 +420,7 @@ define([
           };
         });
 
-        return promiseUtil.require([mid])
+        return promiseUtil.require(mid)
             .then(function() {
               var context = new Context();
               return callGet(context, sync, mid);
@@ -440,7 +440,7 @@ define([
           };
         });
 
-        return promiseUtil.require([mid])
+        return promiseUtil.require(mid)
             .then(function() {
               var context = new Context();
               return callGet(context, sync, mid);
@@ -463,7 +463,7 @@ define([
           };
         });
 
-        return promiseUtil.require([mid])
+        return promiseUtil.require(mid)
             .then(function() {
               var context = new Context();
               return callGet(context, sync, mid);

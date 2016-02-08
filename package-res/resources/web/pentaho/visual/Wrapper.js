@@ -29,7 +29,7 @@ define([
   '../util/promise'
 ], function(
       AbstractDataTable, DataTable, DataView, visualEvents, paletteRegistry, colorUtils,
-      typeRegistry, typeHelper, specHelper, Base, arg, error, promise) {
+      typeRegistry, typeHelper, specHelper, Base, arg, error, promiseUtil) {
 
  /**
   * @module pentaho.visual
@@ -452,7 +452,7 @@ define([
     _updateHighlights: function() {
       var hs = this._drawSpec.highlights = this.highlights;
 
-      var resultPromise = promise.call(this._visual.setHighlights.bind(this._visual, hs))
+      var resultPromise = promiseUtil.wrapCall(this._visual.setHighlights.bind(this._visual, hs))
           .then(drawn.bind(this));
 
       return this._async().until(resultPromise);
@@ -508,7 +508,7 @@ define([
       if(!this._visual.resize)
         return this._updateVisual();
 
-      var resultPromise = promise.call(this._visual.resize.bind(this._visual, w, h))
+      var resultPromise = promiseUtil.wrapCall(this._visual.resize.bind(this._visual, w, h))
           .then(drawn.bind(this));
 
       return this._async().until(resultPromise);
@@ -945,7 +945,7 @@ define([
         // Wrap the given promise,
         // and make sure to call _endAsync in any case.
         until: function asyncUntil(untilPromise) {
-          return promise["finally"](untilPromise, me._endAsync, me);
+          return promiseUtil["finally"](untilPromise, me._endAsync, me);
         }
       };
     },
