@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,9 +21,8 @@ define([
   "../i18n!types",
   "../util/arg",
   "../util/error",
-  "../util/fun",
   "../util/object"
-], function(module, valueFactory, elemFactory, valueHelper, bundle, arg, error, fun, O) {
+], function(module, valueFactory, elemFactory, valueHelper, bundle, arg, error, O) {
 
   "use strict";
 
