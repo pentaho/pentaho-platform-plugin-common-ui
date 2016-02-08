@@ -44,17 +44,6 @@ define([
       }).not.toThrowError();
     });
 
-    it("can be instantiated even if the modelSpec is not an object ", function() {
-      [
-        null, undefined,
-        1, "zu Hilfe!", true, new Date(), []
-      ].forEach(function(spec) {
-        expect(function() {
-          return new Model(spec);
-        }).not.toThrowError();
-      });
-    });
-
     it("cannot instantiate a modelSpec if one of its members has a value of the wrong type", function() {
       [{
         width: "nope",
@@ -118,6 +107,7 @@ define([
       });
 
       it("a model spec is invalid if at least one required property is omitted", function() {
+        invalidSpec();
         invalidSpec({});
         invalidSpec({
           width: 1

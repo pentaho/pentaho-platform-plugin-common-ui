@@ -53,13 +53,9 @@ define([
       });
 
       it("should throw and not accept a 'non-numeric' argument", function() {
-        [
-          'one'
-        ].forEach(function(spec) {
-          expect(function() {
-            new PentahoNumber(spec);
-          }).toThrowError(bundle.format(bundle.structured.errors.value.cannotConvertToType, ['Number']));
-        });
+        expect(function() {
+          new PentahoNumber('one');
+        }).toThrowError(bundle.format(bundle.structured.errors.value.cannotConvertToType, ['Number']));
       });
 
       it("should throw and not accept null", function() {
