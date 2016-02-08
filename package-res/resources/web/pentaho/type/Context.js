@@ -56,24 +56,88 @@ define([
   /**
    * @name pentaho.type.Context
    * @class
-   * @implements pentaho.type.IContext
-   * @classDesc A `Context` instance holds constructors/classes of _Value_ types
-   * _configured_ for a particular _context_.
+   * @classDesc A `Context` object holds instance constructors of **configured** _Value_ types.
    *
-   * A context has several variables that define it:
+   * When a component, like a visualization, is being assembled,
+   * it should not necessarily be unaware of the environment where it is going to be used.
+   * A context object gathers information that has a global scope,
+   * such as the current locale or the current theme,
+   * which is likely to have an impact on how a visualization is presented to the user.
+   * For instance, the color palette used in a categorical bar chart might be related to the current theme.
+   * As such, besides holding contextual, environmental information,
+   * a context object should contain the necessary logic to
+   * facilitate the configuration of component types using that information.
+   * The Pentaho Metadata Model embraces this concept by defining most types -
+   * the [Value]{@link pentaho.type.Value} types - as
+   * _type factories_ that take a context object as their argument.
+   *
+   * The instance constructors of _Value_ types
+   * **must** be obtained from a context object,
+   * using one of the provided methods:
+   * [get]{@link pentaho.type.Context#get},
+   * [getAsync]{@link pentaho.type.Context#getAsync} or
+   * [getAllAsync]{@link pentaho.type.Context#getAllAsync},
+   * so that these are configured before being used.
+   * This applies whether an instance constructor is used for creating an instance or to derive a subtype.
+   *
+   * The following properties are specified at construction time and
+   * constitute the environmental information held by a context:
    * [container]{@link pentaho.type.Context#container},
    * [user]{@link pentaho.type.Context#user},
    * [theme]{@link pentaho.type.Context#theme} and
    * [locale]{@link pentaho.type.Context#locale}.
-   * Context variables are specified at construction time, through same named keyword arguments.
+   * Their values determine (or "select") the _type configuration rules_ that
+   * apply and are used to configure the constructors provided by the context.
    *
-   * These variables are used to select applicable configuration rules
-   * that are applied to the types provided by the context.
+   * To better understand how a context provides configured types,
+   * assume that an non-anonymous type,
+   * with the [id]{@link pentaho.type.Value.Meta#id} `"my/own/type"`,
+   * is requested from a context object, `context`:
    *
-   * Because configuration rules rely on the identification of types,
-   * only non-anonymous types -
-   * those that have an [id]{@link pentaho.type.Value.Meta#id} -
-   * can be _directly_ configured.
+   * ```js
+   * var MyOwnInstanceCtor = context.get("my/own/type");
+   * ```
+   *
+   * Internally, (it is like if) the following steps are taken:
+   *
+   * 1. If the requested type has been previously created and configured, just return it:
+   *    ```js
+   *    var InstanceCtor = getStored(context, "my/own/type");
+   *    if(InstanceCtor != null) {
+   *      return InstanceCtor;
+   *    }
+   *    ```
+   *
+   * 2. Otherwise, the context requires the type's module from the AMD module system,
+   *    and obtains its [factory function]{@link pentaho.type.Factory} back:
+   *    ```js
+   *    var typeFactory = require("my/own/type");
+   *    ```
+   *
+   * 3. The factory function is called with the context as argument
+   *    and creates and returns an instance constructor for that context:
+   *
+   *    ```js
+   *    InstanceCtor = typeFactory(context);
+   *    ```
+   *
+   * 4. The instance constructor is configured with any applicable rules:
+   *    ```js
+   *    InstanceCtor = configure(context, InstanceCtor);
+   *    ```
+   *
+   * 5. The configured instance constructor is stored under its id:
+   *    ```js
+   *    store(context, InstanceCtor.meta.id, InstanceCtor);
+   *    ```
+   *
+   * 6. Finally, it is returned to the caller:
+   *    ```js
+   *    return InstanceCtor;
+   *    ```
+   *
+   * Note that anonymous types cannot be _directly_ configured,
+   * as _type configuration rules_ are targeted at specific, identified types.
    *
    * @constructor
    * @description Creates a `Context` whose variables default to the Pentaho thin-client state variables.
@@ -391,7 +455,7 @@ define([
     },
 
     /**
-     * Gets the instance constructor of a type given it's id.
+     * Gets the instance constructor of a type given its id.
      *
      * If the id does not contain any "/" character,
      * it is considered relative to pentaho's `pentaho/type` module.

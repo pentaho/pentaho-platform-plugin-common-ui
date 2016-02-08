@@ -196,7 +196,7 @@ define([
         //@override
         /**
          * Gets the context that defined this type class.
-         * @type pentaho.type.IContext
+         * @type pentaho.type.Context
          * @readonly
          */
         get context() {

@@ -128,7 +128,7 @@ define([
      *
      * @name context
      * @memberOf pentaho.type.Item.Meta#
-     * @type pentaho.type.IContext
+     * @type pentaho.type.Context
      * @readonly
      * @abstract
      */
