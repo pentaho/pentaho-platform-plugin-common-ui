@@ -50,7 +50,7 @@ define([
     constructor: function(element, model) {
       if(!element)
         throw error.argRequired("element");
-      else if(!isElement(element))
+      if(!isElement(element))
         throw error.argInvalidType("element", "Must be an HTMLElement.");
 
       if(!model)
@@ -135,7 +135,7 @@ define([
      * @see pentaho.visual.base.View#_validate
      */
     _isValid: function() {
-      return !!this._validate();
+      return !this._validate();
     },
 
     /**
