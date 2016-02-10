@@ -8,6 +8,7 @@ doc-js/
 eclipse-bin/
 doc-js
 build-res/pentaho-js-build/
+build-res/pentaho-js-build.zip
 build-res/module-scripts/
 build-res/requireCfg-raw.js
 build-res/requireCfg.js
@@ -22,3 +23,4 @@ pentaho.log
 .idea
 .DS_Store
 *.iml
+.vscode
