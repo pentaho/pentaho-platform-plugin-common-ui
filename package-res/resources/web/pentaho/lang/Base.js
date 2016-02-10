@@ -89,7 +89,7 @@ define([
     // finding `bootProto` along the way.
     var BaseBoot = function() {};
 
-    if(bootProto) BaseBoot.prototype = bootProto;
+    BaseBoot.prototype = bootProto;
 
     // Static interface that is inherited by all Base classes.
     BaseBoot.extend    = class_extend;
@@ -119,7 +119,7 @@ define([
     // the correct Base-root prototype for setting the "base" property,
     // in `methodOverride`.
     // Create shared, hidden, constant `__root_proto__` property.
-    Object.defineProperty(BaseRoot, "__root_proto__", {value: BaseRoot.prototype});
+    Object.defineProperty(BaseRoot.prototype, "__root_proto__", {value: BaseRoot.prototype});
 
     setFunName(BaseRoot, baseRootName);
 
@@ -186,8 +186,8 @@ define([
     // Otherwise:
     //   1. If there is an inherited init: create a constructor that simply calls it
     //   2. Otherwise, create an empty constructor.
-    var baseInit = proto.__init__,
-        Class = class_extend_readCtor(instSpec);
+    var baseInit = proto.__init__;
+    var Class = class_extend_readCtor(instSpec);
     if(Class) {
       // If `init` calls base, it gets wrapped so that the `base` property gets set,
       // just like with all regular prototype methods.
@@ -196,10 +196,8 @@ define([
 
       // Create shared, hidden, constant `__init__` property.
       Object.defineProperty(proto, "__init__", {value: Class});
-    } else if(baseInit) {
-      Class = class_extend_createCtorInit(baseInit);
     } else {
-      Class = class_extend_createCtorNoInit();
+      Class = class_extend_createCtorInit(baseInit);
     }
 
     return Class;
@@ -218,10 +216,6 @@ define([
     return function() {
       return init.apply(this, arguments);
     };
-  }
-
-  function class_extend_createCtorNoInit() {
-    return function() {};
   }
 
   function class_to(v) {
@@ -274,7 +268,6 @@ define([
 
   // Adapted from inst_extend_object to better handle the Class static inheritance case.
   function class_inherit_static(BaseClass) {
-
     // Do the "toString" and other methods manually.
     for(var i = 0; i < _hiddenClass.length; i++) {
       var h = _hiddenClass[i];
@@ -314,7 +307,6 @@ define([
   function inst_base() {}
 
   function inst_extend(source, value) {
-
     if(arguments.length > 1) {
       inst_extend_propAssign.call(this, source, value, this.__root_proto__);
     } else if(source) {
@@ -349,7 +341,6 @@ define([
   }
 
   function inst_extend_object(source, rootProto) {
-
     // Do the "toString" and other methods manually.
     for(var i = 0; i < _hidden.length; i++) {
       var h = _hidden[i];
@@ -369,9 +360,8 @@ define([
       // Property getter/setter
       var baseDesc = O.getPropertyDescriptor(this, name);
       if(baseDesc) {
-        // Specify null to block inheritance and, for example, make a property read-only.
-        if((desc.get !== null) && (desc.get || baseDesc.get)) desc.get = methodOverride(desc.get, baseDesc.get, rootProto);
-        if((desc.set !== null) && (desc.set || baseDesc.set)) desc.set = methodOverride(desc.set, baseDesc.set, rootProto);
+        if(desc.get || baseDesc.get) desc.get = methodOverride(desc.get, baseDesc.get, rootProto);
+        if(desc.set || baseDesc.set) desc.set = methodOverride(desc.set, baseDesc.set, rootProto);
       }
 
       Object.defineProperty(this, name, desc);
