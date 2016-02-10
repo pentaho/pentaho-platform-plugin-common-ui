@@ -33,7 +33,7 @@ define([
         return cellSpecs;
 
       if(!(cellSpecs instanceof Array))
-        throw error.argNotArray("cellSpecs");
+        throw error.argInvalidType("cellSpecs", "Array");
 
       var cellTuple = O.setPrototypeOf(cellSpecs, this.cellTupleBase);
       CellTuple.call(cellTuple, keyArgs);

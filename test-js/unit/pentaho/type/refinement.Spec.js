@@ -75,7 +75,7 @@ define([
               facets: [Facet]
             }
           });
-        }).toThrowError(error.argInvalidType("of", "Not a representation type.").message);
+        }).toThrowError(error.argInvalidType("of", ["pentaho/type/element", "pentaho/type/list"]).message);
       });
 
       it("should not throw if given an `of` which is a representation type", function() {
@@ -265,7 +265,7 @@ define([
                 }
               });
             }).toThrowError(
-                error.argInvalidType("facets", bundle.structured.errors.refinement.invalidRefinementFacet).message);
+                error.argInvalidType("facets", "pentaho/type/facets/Refinement").message);
           }
 
           expectIt([{}]); // Not a function

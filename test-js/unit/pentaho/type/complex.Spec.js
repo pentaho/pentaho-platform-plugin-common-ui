@@ -641,7 +641,7 @@ define([
 
         expect(function() {
           derived.get("y");
-        }).toThrowError(error.operInvalid("A property with the name 'y' is not defined.").message);
+        }).toThrowError(error.argInvalid("name", "A property with the name 'y' is not defined.").message);
       });
 
       it("should throw when given the name of an undefined property and lenient is false", function() {
@@ -653,7 +653,7 @@ define([
 
         expect(function() {
           derived.get("y", false);
-        }).toThrowError(error.operInvalid("A property with the name 'y' is not defined.").message);
+        }).toThrowError(error.argInvalid("name", "A property with the name 'y' is not defined.").message);
       });
 
       it("should return null when not given the name of a property and lenient is true", function() {
@@ -760,7 +760,7 @@ define([
 
         expect(function() {
           derived.set("y", "1");
-        }).toThrowError(error.operInvalid("A property with the name 'y' is not defined.").message);
+        }).toThrowError(error.argInvalid("name", "A property with the name 'y' is not defined.").message);
       });
     });
 
@@ -829,7 +829,7 @@ define([
 
         expect(function() {
           derived.getv("y");
-        }).toThrowError(error.operInvalid("A property with the name 'y' is not defined.").message);
+        }).toThrowError(error.argInvalid("name", "A property with the name 'y' is not defined.").message);
       });
     });
 
@@ -887,7 +887,7 @@ define([
 
         expect(function() {
           derived.getf("y");
-        }).toThrowError(error.operInvalid("A property with the name 'y' is not defined.").message);
+        }).toThrowError(error.argInvalid("name", "A property with the name 'y' is not defined.").message);
       });
     });
 
@@ -933,7 +933,7 @@ define([
 
         expect(function() {
           derived.applicable("y");
-        }).toThrowError(error.operInvalid("A property with the name 'y' is not defined.").message);
+        }).toThrowError(error.argInvalid("name", "A property with the name 'y' is not defined.").message);
       });
 
       it("should throw when given the metadata not owned by the complex, even if of same name as an existing one", function() {
@@ -947,7 +947,7 @@ define([
 
         expect(function() {
           derived.applicable(Other.meta.get("x"));
-        }).toThrowError(error.operInvalid("A property with the name 'x' is not defined.").message);
+        }).toThrowError(error.argInvalid("name", "A property with the name 'x' is not defined.").message);
       });
     }); // end applicable
 
@@ -993,7 +993,7 @@ define([
 
         expect(function() {
           derived.readOnly("y");
-        }).toThrowError(error.operInvalid("A property with the name 'y' is not defined.").message);
+        }).toThrowError(error.argInvalid("name", "A property with the name 'y' is not defined.").message);
       });
 
       it("should throw when given the metadata not owned by the complex, even if of same name as an existing one", function() {
@@ -1007,7 +1007,7 @@ define([
 
         expect(function() {
           derived.readOnly(Other.meta.get("x"));
-        }).toThrowError(error.operInvalid("A property with the name 'x' is not defined.").message);
+        }).toThrowError(error.argInvalid("name", "A property with the name 'x' is not defined.").message);
       });
     }); // end readOnly
 
@@ -1053,7 +1053,7 @@ define([
 
         expect(function() {
           derived.required("y");
-        }).toThrowError(error.operInvalid("A property with the name 'y' is not defined.").message);
+        }).toThrowError(error.argInvalid("name", "A property with the name 'y' is not defined.").message);
       });
 
       it("should throw when given the metadata not owned by the complex, even if of same name as an existing one", function() {
@@ -1067,7 +1067,7 @@ define([
 
         expect(function() {
           derived.required(Other.meta.get("x"));
-        }).toThrowError(error.operInvalid("A property with the name 'x' is not defined.").message);
+        }).toThrowError(error.argInvalid("name", "A property with the name 'x' is not defined.").message);
       });
     }); // end required
 
@@ -1115,7 +1115,7 @@ define([
 
         expect(function() {
           derived.countRange("y");
-        }).toThrowError(error.operInvalid("A property with the name 'y' is not defined.").message);
+        }).toThrowError(error.argInvalid("name", "A property with the name 'y' is not defined.").message);
       });
 
       it("should throw when the given metadata is not owned by the complex, even if of an existing name", function() {
@@ -1129,7 +1129,7 @@ define([
 
         expect(function() {
           derived.countRange(Other.meta.get("x"));
-        }).toThrowError(error.operInvalid("A property with the name 'x' is not defined.").message);
+        }).toThrowError(error.argInvalid("name", "A property with the name 'x' is not defined.").message);
       });
     }); // end countRange
 
@@ -1179,7 +1179,7 @@ define([
 
         expect(function() {
           derived.count("y");
-        }).toThrowError(error.operInvalid("A property with the name 'y' is not defined.").message);
+        }).toThrowError(error.argInvalid("name", "A property with the name 'y' is not defined.").message);
       });
     }); // end count
 
@@ -1298,7 +1298,7 @@ define([
 
         expect(function() {
           derived.path("x", "z", 1);
-        }).toThrowError(error.operInvalid("A property with the name 'z' is not defined.").message);
+        }).toThrowError(error.argInvalid("name", "A property with the name 'z' is not defined.").message);
 
       });
     }); // end path

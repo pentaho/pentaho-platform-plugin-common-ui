@@ -310,7 +310,7 @@ define([
       // Get measure attribute name.
       var meaAttrName;
       if(xC) {
-        if(typeof colSpec !== "object") throw error.argNotObject("cols[" + j + "]");
+        if(typeof colSpec !== "object") throw error.argInvalidType("cols[" + j + "]", "object");
 
         meaAttrName = colSpec.attr;
       } else {

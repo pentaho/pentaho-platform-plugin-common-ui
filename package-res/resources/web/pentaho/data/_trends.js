@@ -71,7 +71,7 @@ define([
         var xIndex = arg.required(trendArgs, "x", "trendArgs");
 
         xIndex = +xIndex; // toNumber
-        if(isNaN(xIndex)) throw error.argNotNumber("trendArgs.x");
+        if(isNaN(xIndex)) throw error.argInvalidType("trendArgs.x", "number");
 
         if(xIndex < 0 || xIndex >= colCount) throw error.argOutOfRange("trendArgs.x");
 
@@ -82,7 +82,7 @@ define([
         var yIndex = arg.required(trendArgs, "y", "trendArgs");
 
         yIndex = +yIndex; // toNumber
-        if(isNaN(yIndex)) throw error.argNotNumber("trendArgs.y");
+        if(isNaN(yIndex)) throw error.argInvalidType("trendArgs.y", "number");
 
         if(yIndex < 0 || yIndex >= colCount) throw error.argOutOfRange("trendArgs.y");
 
@@ -198,7 +198,7 @@ define([
     // ----
 
     var model = arg.required(spec, "model", "spec");
-    if(typeof model !== 'function') throw error.argNotFunction("spec.model");
+    if(typeof model !== 'function') throw error.argInvalidType("spec.model", "function");
 
     // ----
 

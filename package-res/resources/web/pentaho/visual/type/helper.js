@@ -172,7 +172,7 @@ define([
             .then(haveVisual);
 
         case "function": break;
-        default: throw error.argInvalidType("createOptions.type.factory");
+        default: throw error.argInvalidType("createOptions.type.factory", ["string", "function"], typeof factory);
       }
     } else if((classPath = type['class'])) {
       factory = createClassFactory(classPath);

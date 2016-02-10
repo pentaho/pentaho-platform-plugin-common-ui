@@ -333,9 +333,7 @@ define([
             }
 
             if(!F.is(Facet) || !(Facet.prototype instanceof RefinementFacet))
-              throw error.argInvalidType(
-                  "facets",
-                  bundle.structured.errors.refinement.invalidRefinementFacet);
+              throw error.argInvalidType("facets", "pentaho/type/facets/Refinement");
 
             if(facets.indexOf(Facet) < 0) {
               facets.push(Facet);
@@ -375,7 +373,7 @@ define([
           // Value returns refinement === undefined...
           var ofMeta = this.context.get(value).meta;
           if(ofMeta.refinement !== false)
-            throw error.argInvalidType("of", "Not a representation type.");
+            throw error.argInvalidType("of", ["pentaho/type/element", "pentaho/type/list"]);
 
           // Throws when set again with a different value.
           O.setConst(this, "_of", ofMeta);
