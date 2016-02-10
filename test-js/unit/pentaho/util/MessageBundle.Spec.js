@@ -17,7 +17,7 @@ define(["pentaho/util/MessageBundle"], function(MessageBundle) {
   "use strict";
 
   var isEmpty = function(obj) {
-    return obj || Object.keys(obj).length === 0;
+    return obj != null || Object.keys(obj).length === 0;
   };
 
   describe("MessageBundle -", function() {
