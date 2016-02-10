@@ -79,6 +79,10 @@ define([
         expect(new PentahoBoolean('').value).toBe(false);
       });
 
+      it("should accept some random string as true", function() {
+        expect(new PentahoBoolean('someRandom string').value).toBe(true);
+      });
+
       it("should not accept null", function() {
         expect(function() {
           new PentahoBoolean(null);

@@ -17,45 +17,53 @@ define([
   "pentaho/type/number",
   "pentaho/type/Context",
   "pentaho/i18n!/pentaho/type/i18n/types"
-], function (numberFactory, Context, bundle) {
+], function(numberFactory, Context, bundle) {
 
   "use strict";
 
   /*global describe:true, it:true, expect:true, beforeEach:true*/
 
-  describe("pentaho.type.Number -", function () {
-    it("is a function", function () {
+  describe("pentaho.type.Number -", function() {
+
+    it("the AMD module returns a factory function", function() {
       expect(typeof numberFactory).toBe("function");
     });
 
-    describe("new Number()", function () {
+    it("factory function should accept a context and return a function", function() {
+      expect(typeof numberFactory(new Context())).toBe("function");
+    });
+
+    describe("new Number()", function() {
       var PentahoNumber;
 
-      beforeEach(function () {
+      beforeEach(function() {
         PentahoNumber = numberFactory(new Context());
       });
 
-      it("should be a function", function () {
-        expect(typeof PentahoNumber).toBe("function");
-      });
-
-      it("should return an object", function () {
+      it("should return an object", function() {
         expect(typeof new PentahoNumber(1)).toBe("object");
       });
 
-      it("should return 1", function () {
+      it("should accept a number 1 and return the number 1", function() {
         expect(new PentahoNumber(1).value).toBe(1);
       });
 
-      it("should return 1", function () {
+      it("should accept a string '1' and return the number 1", function() {
         expect(new PentahoNumber('1').value).toBe(1);
       });
 
-      it("should throw", function () {
-        expect(function () {
-          new PentahoNumber('one').value;
+      it("should throw and not accept a 'non-numeric' argument", function() {
+        expect(function() {
+          new PentahoNumber('one');
         }).toThrowError(bundle.format(bundle.structured.errors.value.cannotConvertToType, ['Number']));
       });
+
+      it("should throw and not accept null", function() {
+        expect(function() {
+          new PentahoNumber(null);
+        }).toThrowError(bundle.structured.errors.value.isNull);
+      });
+
     });
   }); // pentaho.type.Number
 });

@@ -202,4 +202,9 @@
   // Sample visualizations
   requireService["pentaho/visual/samples/calc/visualTypeProvider"] = "IVisualTypeProvider";
 
+  requireCfg.packages.push({
+      "name": "pentaho/visual/base",
+      "main": "modelFactory"
+    });
+
 }());
