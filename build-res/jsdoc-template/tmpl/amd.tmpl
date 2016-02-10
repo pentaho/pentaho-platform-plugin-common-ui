@@ -2,8 +2,30 @@
 var data = obj;
 var self = this;
 ?>
-<?js if(data.amd != null) { ?>
-	<div class="amd-tag">
-	<h5>AMD Require:</h5> <pre class="prettyprint"><code>require("<?js= data.amd.value ?>", function(<?js= data.name ?>){ /* code goes here */ });</code></pre>
+<?js
+	if(data.amd != null) {
+		var value = data.amd.value;
+?>
+	<div class="amd-module">
+		<h5>AMD Require:</h5>
+		<?js
+			var type = value.type;
+			if(type != null) {
+		?>
+			<span class="amd-type">Type:<?js= self.partial('type.tmpl', type.names) ?></span>
+		<?js
+			}
+		?>
+		<pre class="prettyprint"><code>require("[<?js= value.name ?>]", function(<?js= data.name ?>){ /* code goes here */ });</code></pre>
+		<?js
+			var description = value.description;
+			if(description != null) {
+		?>
+			<p><?js= description ?></p>
+		<?js
+			}
+		?>
 	</div>
-<?js } ?>
+<?js
+	}
+?>

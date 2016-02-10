@@ -31,16 +31,9 @@ define([
      * @name pentaho.type.Function
      * @class
      * @extends pentaho.type.Simple
-     * @amd pentaho/type/function
+     * @amd {pentaho.type.Factory<pentaho.type.Function>} pentaho/type/function
      *
      * @classDesc A primitive JavaScript function type.
-     *
-     * ### AMD
-     *
-     * Module Id: `pentaho/type/function`
-     *
-     * The AMD module returns the type's factory, a
-     * {@link pentaho.type.Factory<pentaho.type.Function>}.
      *
      * @description Creates a function instance.
      */

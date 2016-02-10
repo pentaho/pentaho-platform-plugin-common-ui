@@ -22,11 +22,6 @@ define([
     /**
      * @classdesc The `Collection` class is an abstract base class for typed ordered maps.
      *
-     * ### AMD
-     *
-     * To obtain the constructor of this class,
-     * require the module `"pentaho/lang/Collection"`.
-     *
      * ### Remarks
      *
      * A collection is a list whose elements can only be contained in one position.
@@ -38,6 +33,7 @@ define([
      * Elements of a collection must implement the {@link pentaho.lang.ICollectionElement} interface.
      *
      * @class
+     * @amd pentaho/lang/Collection
      * @name Collection
      * @memberOf pentaho.lang
      * @abstract

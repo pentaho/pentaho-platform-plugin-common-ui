@@ -48,18 +48,10 @@ define([
      * @abstract
      * @class
      * @extends pentaho.type.Item
-     * @amd pentaho/type/value
+     * @amd {pentaho.type.Factory<pentaho.type.Value>} pentaho/type/value
      *
      * @classDesc A Value is an abstract class used as a base implementation and unifying type. </br>
      * A Value has a key that uniquely identifies the entity it represents.
-     *
-     * ### AMD
-     *
-     * Module Id: `pentaho/type/value`
-     *
-     * The AMD module returns the type's factory, a
-     * {@link pentaho.type.Factory<pentaho.type.Value>}.
-     *
      */
     var Value = Item.extend("pentaho.type.Value", /** @lends pentaho.type.Value# */{
 

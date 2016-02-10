@@ -31,11 +31,6 @@ define([
    * @classdesc The `AbstractTable` class is the abstract base class of
    * classes that represent a tabular dataset.
    *
-   * ### AMD
-   *
-   * To obtain the constructor of this class,
-   * require the module `"pentaho/data/AbstractTable"`.
-   *
    * ### Remarks
    *
    * The following derived classes are not abstract and can be used directly:

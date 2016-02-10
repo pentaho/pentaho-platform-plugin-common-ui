@@ -1,11 +1,18 @@
-
 h3 {
   font-size: 22px;
 }
 
-.amd-module {
-	font-size: 120%;
+#main {
+  overflow-x: hidden;
+}
+
+.amd-type, .amd-module h5 {
+  font-size: 120%;
   line-height: 140%;
   margin-bottom: 1em;
   margin-top: 1em
+}
+
+.amd-module pre {
+  min-width: 700px;
 }
