@@ -28,7 +28,8 @@ define([
           v: dataTableSpec
         }
       };
-      Model = modelFactory(new Context());
+      var context = new Context();
+      Model = context.get(modelFactory);
       model = new Model(dataSpec);
     });
 
@@ -54,7 +55,7 @@ define([
         ].forEach(function(elem) {
           expect(function() {
             return new View(elem, model);
-          }).toThrowError(error.argInvalidType("element", "Must be an HTMLElement.").message);
+          }).toThrowError(error.argInvalidType("element", "HTMLElement", typeof elem).message);
         });
       });
 

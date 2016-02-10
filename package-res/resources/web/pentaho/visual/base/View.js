@@ -51,7 +51,7 @@ define([
       if(!element)
         throw error.argRequired("element");
       if(!isElement(element))
-        throw error.argInvalidType("element", "Must be an HTMLElement.");
+        throw error.argInvalidType("element", "HTMLElement", typeof element);
 
       if(!model)
         throw error.argRequired("model");
