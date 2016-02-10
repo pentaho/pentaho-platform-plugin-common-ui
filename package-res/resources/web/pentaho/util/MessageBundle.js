@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2016 Pentaho Corporation.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,10 +26,10 @@ define([
    *
    * Each localized message is accessible by a string key.
    * Messages can have property tags in them,
-   * using the pattern: `"{0}"`, `"{1}"`, ...
+   * using the pattern: </br> `"{0}"`, `"{1}"`, ... **or** `"{keyword0}"`, `"{keyword1}"`, ...
    *
    * @description Creates a message bundle given a messages dictionary.
-   * @param {Object} [source] A messages dictionary.
+   * @param {Object.<string, string>} [source] A messages dictionary.
    */
   function MessageBundle(source) {
     /**
@@ -58,6 +58,18 @@ define([
    * @alias get
    * @memberOf pentaho.util.MessageBundle#
    *
+   * @example
+   * define(["pentaho/util/MessageBundle"], function(MessageBundle) {
+   *    var bundle = new MessageBundle({key1: "value1", key2: "value2_{0}", key3: "value3_{keyword}");
+   *
+   *    bundle.get("key1");                        //returns "value1"
+   *    bundle.get("keyNA", "default");            //returns "default"
+   *    bundle.get("key2", ["scope"]);             //returns "value2_first"
+   *    bundle.get("key2", {"keyword": "scope2"}); //returns "value3_scope2"
+   *    bundle.get("keyNA", ["scope"], "default"); //returns "default"
+   *    bundle.get("key2", [], "default");         //returns "value2_[?]"
+   * });
+   *
    * @param {string} key The message key.
    * @param {Array|Object|function} [scope] A scope array, object or function.
    *   This parameter can be specified _nully_ or totally omitted.
@@ -82,7 +94,28 @@ define([
   };
 
   /**
-   * Object representation of the message bundle.
+   * Gets the hierarchical object representation of the message bundle,
+   * formed from splitting dotted message keys.
+   *
+   * @example
+   * define(["pentaho/util/MessageBundle"], function(MessageBundle) {
+   *    var bundle = new MessageBundle({
+   *        'key1.folder1' : 'value1',
+   *        'key1.folder2' : 'value2',
+   *        'key2.folder1' : 'value3
+   *    }
+   *
+   *    var obj = bundle.structured;
+   *    //obj: {
+   *    //   key1: {
+   *    //       folder1: value1,
+   *    //       folder2: value2
+   *    //   },
+   *    //   key2: {
+   *    //       folder1: value3
+   *    //   }
+   *    //}
+   * });
    *
    * @type Object
    * @readonly
@@ -112,6 +145,15 @@ define([
    * When a property tag results in a _nully_ value (like when `scope` is not specified),
    * it is replaced by the special marker `"[?]"`.
    *
+   * @example
+   * MessageBundle.format("text");                    //returns "text"
+   * MessageBundle.format("text_{0}");                //returns "text_[?]"
+   * MessageBundle.format("text_{0}", ["v1"]);        //returns "text_v1"
+   * MessageBundle.format("text_{k}", {"k": "v2"});   //returns "text_v2"
+   * MessageBundle.format("text_{v3}", function(p) {  //returns "text_v3"
+   *    return p;
+   * });
+   *
    * @alias format
    * @memberOf pentaho.util.MessageBundle
    * @param {string} [text=""] The text to format.
@@ -134,16 +176,53 @@ define([
     });
   };
 
+  /**
+   * @alias format
+   * @memberOf pentaho.util.MessageBundle#
+   *
+   * @see pentaho.util.MessageBundle.format
+   */
   MessageBundle.prototype.format = MessageBundle.format;
 
   return MessageBundle;
 
+  /**
+   * The message bundle's object representation.
+   *
+   * @example
+   * var properties = {
+   *    'key1.folder1' : 'value1',
+   *    'key1.folder2' : 'value2',
+   *    'key2.folder1' : 'value3
+   * }
+   *
+   * var obj = propertiesToObject(properties);
+   * //obj: {
+   * //   key1: {
+   * //       folder1: value1,
+   * //       folder2: value2
+   * //   },
+   * //   key2: {
+   * //       folder1: value3
+   * //   }
+   * //}
+   *
+   * @param {Object} source  A messages dictionary.
+   * @return {Object} Message bundle object representation.
+   */
   function propertiesToObject(source) {
     var output = {};
     O.eachOwn(source, buildPath, output);
     return output;
   }
 
+  /**
+   * Auxiliary function for {@link propertiesToObject}
+   *
+   * @this this.structured
+   * @param {string} value  Dictionary message.
+   * @param {string} key    Dictionary message's key.
+   */
   function buildPath(value, key) {
     var path = key.split('.');
     var obj = this;
