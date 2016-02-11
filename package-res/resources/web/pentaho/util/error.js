@@ -13,8 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define(function() {
+define([
+  "./object"
+], function(O) {
+
   "use strict";
+
+  /*global TypeError:false, RangeError:false*/
 
   /**
    * The `error` namespace contains factory functions for
@@ -70,7 +75,10 @@ define(function() {
      * @return {!Error} The created `Error` object.
      */
     argRequired: function(name, text) {
-      return new Error(andSentence("Argument required: '" + name + "'.", text));
+      return createError(
+          Error,
+          andSentence("Argument " + name + " is required.", text),
+          {name: "ArgumentRequiredError", argument: name});
     },
 
     /**
@@ -117,18 +125,21 @@ define(function() {
      * @return {!Error} The created `Error` object.
      */
     argInvalid: function(name, reason) {
-      return new Error(andSentence("Argument invalid: '" + name + "'.", reason));
+      return createError(
+          Error,
+          andSentence("Argument " + name + " is invalid.", reason),
+          {name: "ArgumentInvalidError", argument: name});
     },
 
     /**
-     * Creates an `Error` object for a case where a function argument
+     * Creates a `TypeError` object for a case where a function argument
      * has been specified, albeit with a value of an unsupported type,
      * according to the documented contract.
      *
      * The name of the argument can be that of a nested property,
      * like, for example, `"keyArgs.description"`.
      *
-     * It is up to the caller to actually `throw` the returned `Error` object.
+     * It is up to the caller to actually `throw` the returned `TypeError` object.
      * This makes flow control be clearly visible at the call site.
      *
      * Types can be:
@@ -168,38 +179,45 @@ define(function() {
      *
      * @param {string} name The name of the argument.
      * @param {string|string[]} expectedType The name or names of the expected types.
-     * @param {string} [gotType] The name of the received type, when known.
-     * @return {!Error} The created `Error` object.
+     * @param {string} [actualType] The name of the received type, when known.
+     * @return {!TypeError} The created `TypeError` object.
      */
-    argInvalidType: function(name, expectedType, gotType) {
+    argInvalidType: function(name, expectedType, actualType) {
       var typesMsg = "Expected type to be ";
 
-      if(Array.isArray(expectedType)) {
-        if(expectedType.length > 1) {
-          var lastExpectedType = expectedType.pop();
-          typesMsg += "one of " + expectedType.join(", ") + " or " + lastExpectedType;
-        } else {
-          // If should have at least one entry...
-          typesMsg += expectedType[0];
-        }
+      if(!Array.isArray(expectedType)) expectedType = [expectedType];
+
+      if(expectedType.length > 1) {
+        var expectedTypesClone = expectedType.slice();
+        var lastExpectedType = expectedTypesClone.pop();
+        typesMsg += "one of " + expectedTypesClone.join(", ") + " or " + lastExpectedType;
       } else {
-        typesMsg += expectedType;
+        // If should have at least one entry...
+        typesMsg += expectedType[0];
       }
 
-      typesMsg += gotType ? (", but got " + gotType + ".") : ".";
+      typesMsg += actualType ? (", but got " + actualType + ".") : ".";
 
-      return error.argInvalid(name, typesMsg);
+      return createError(
+          TypeError,
+          andSentence("Argument " + name + " is invalid.", typesMsg),
+          {
+            name: "ArgumentInvalidTypeError",
+            argument: name,
+            actualType: actualType,
+            expectedTypes: expectedType
+          });
     },
 
     /**
-     * Creates an `Error` object for a case where a function argument
+     * Creates an `RangeError` object for a case where a function argument
      * was specified with a value of one of the expected types,
      * albeit not within the expected range.
      *
      * The name of the argument can be that of a nested property,
      * like, for example, `"keyArgs.index"`.
      *
-     * It is up to the caller to actually `throw` the returned `Error` object.
+     * It is up to the caller to actually `throw` the returned `RangeError` object.
      * This makes flow control be clearly visible at the call site.
      *
      * @example
@@ -220,10 +238,13 @@ define(function() {
      * });
      *
      * @param {string} name The name of the argument.
-     * @return {!Error} The created `Error` object.
+     * @return {!RangeError} The created `RangeError` object.
      */
     argOutOfRange: function(name) {
-      return error.argInvalid(name, "Out of range.");
+      return createError(
+          RangeError,
+          "Argument " + name + " is out of range.",
+          {name: "ArgumentOutOfRangeError", argument: name});
     },
 
     /**
@@ -272,7 +293,10 @@ define(function() {
      * @return {!Error} The created `Error` object.
      */
     operInvalid: function(reason) {
-      return new Error(andSentence("Operation invalid.", reason));
+      return createError(
+          Error,
+          andSentence("Operation invalid.", reason),
+          {name: "OperationInvalidError"});
     },
 
     /**
@@ -282,15 +306,31 @@ define(function() {
      * It is up to the caller to actually `throw` the returned `Error` object.
      * This makes flow control be clearly visible at the call site.
      *
-     * @param {string} text Complementary text.
+     * @param {?string} [text] Complementary text.
      * @return {!Error} The created `Error` object.
      */
     notImplemented: function(text) {
-      return new Error(andSentence("Not Implemented.", text));
+      return createError(
+          Error,
+          andSentence("Not Implemented.", text),
+          {name: "NotImplementedError"});
     }
   };
 
   return error;
+
+  /**
+   * Creates an error object of a given type and with a given message and properties.
+   *
+   * @param {Class.<Error>} ErrorCtor The error constructor.
+   * @param {string} message The error message.
+   * @param {?Object} [props] A map of properties to extend the error object with.
+   *
+   * @return {Error} The created error object.
+   */
+  function createError(ErrorCtor, message, props) {
+    return O.assignOwn(new ErrorCtor(message), props);
+  }
 
   /**
    * Appends a sentence to another,

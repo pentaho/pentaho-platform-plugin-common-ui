@@ -13,9 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define(["pentaho/util/error"], function(error) {
+define([
+  "pentaho/util/error",
+  "./error.Match"
+], function(error, errorMatch) {
 
-  /*global describe:false, it:false, expect:false, beforeEach:false, afterEach:false, spyOn:false, JSON:false*/
+  "use strict";
+
+  /*global describe:false, it:false, expect:false, beforeEach:false, afterEach:false, spyOn:false,
+           JSON:false, TypeError:false, RangeError:false, jasmine:false*/
 
   describe("pentaho.util.error -", function() {
     it("is defined", function() {
@@ -27,7 +33,9 @@ define(["pentaho/util/error"], function(error) {
 
         var result = error[methodName].apply(error, withArgs);
 
-        expect(result instanceof Error).toBe(true);
+        // Call and test (with) the error matcher
+        expect(result).toEqual(errorMatch[methodName].apply(errorMatch, withArgs));
+
         expect(result.message).toBe(message);
       });
     }
@@ -37,8 +45,8 @@ define(["pentaho/util/error"], function(error) {
         expect(typeof error.argRequired).toBe("function");
       });
 
-      itShouldHaveMessage("argRequired", ["foo"       ], "Argument required: 'foo'.");
-      itShouldHaveMessage("argRequired", ["foo", "bar"], "Argument required: 'foo'. bar.");
+      itShouldHaveMessage("argRequired", ["foo"       ], "Argument foo is required.");
+      itShouldHaveMessage("argRequired", ["foo", "bar"], "Argument foo is required. bar.");
     });
 
     describe("argInvalid(name, (reason)) -", function() {
@@ -46,8 +54,8 @@ define(["pentaho/util/error"], function(error) {
         expect(typeof error.argInvalid).toBe("function");
       });
 
-      itShouldHaveMessage("argInvalid", ["foo"       ], "Argument invalid: 'foo'.");
-      itShouldHaveMessage("argInvalid", ["foo", "bar"], "Argument invalid: 'foo'. bar.");
+      itShouldHaveMessage("argInvalid", ["foo"       ], "Argument foo is invalid.");
+      itShouldHaveMessage("argInvalid", ["foo", "bar"], "Argument foo is invalid. bar.");
     });
 
     describe("argInvalidType(name, [expectedType], (gotType)) -", function() {
@@ -56,25 +64,25 @@ define(["pentaho/util/error"], function(error) {
       });
 
       itShouldHaveMessage("argInvalidType", ["foo", "string"],
-          "Argument invalid: 'foo'. Expected type to be string.");
+          "Argument foo is invalid. Expected type to be string.");
 
       itShouldHaveMessage("argInvalidType", ["foo", ["string"]],
-          "Argument invalid: 'foo'. Expected type to be string.");
+          "Argument foo is invalid. Expected type to be string.");
 
       itShouldHaveMessage("argInvalidType", ["foo", "string", "boolean"],
-          "Argument invalid: 'foo'. Expected type to be string, but got boolean.");
+          "Argument foo is invalid. Expected type to be string, but got boolean.");
 
       itShouldHaveMessage("argInvalidType", ["foo", ["string"], "boolean"],
-          "Argument invalid: 'foo'. Expected type to be string, but got boolean.");
+          "Argument foo is invalid. Expected type to be string, but got boolean.");
 
       itShouldHaveMessage("argInvalidType", ["foo", ["string", "function"], "boolean"],
-          "Argument invalid: 'foo'. Expected type to be one of string or function, but got boolean.");
+          "Argument foo is invalid. Expected type to be one of string or function, but got boolean.");
 
       itShouldHaveMessage("argInvalidType", ["foo", ["string", "function"]],
-          "Argument invalid: 'foo'. Expected type to be one of string or function.");
+          "Argument foo is invalid. Expected type to be one of string or function.");
 
       itShouldHaveMessage("argInvalidType", ["foo", ["string", "function", "Array"], "boolean"],
-          "Argument invalid: 'foo'. Expected type to be one of string, function or Array, but got boolean.");
+          "Argument foo is invalid. Expected type to be one of string, function or Array, but got boolean.");
     });
 
     describe("argOutOfRange(name) -", function() {
@@ -82,7 +90,7 @@ define(["pentaho/util/error"], function(error) {
         expect(typeof error.argOutOfRange).toBe("function");
       });
 
-      itShouldHaveMessage("argOutOfRange", ["foo"], "Argument invalid: 'foo'. Out of range.");
+      itShouldHaveMessage("argOutOfRange", ["foo"], "Argument foo is out of range.");
     });
 
     describe("operInvalid((text)) -", function() {

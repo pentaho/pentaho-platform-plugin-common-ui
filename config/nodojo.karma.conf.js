@@ -15,8 +15,8 @@ module.exports = function (config) {
       "config/context-begin.js",
 
       // SOURCE files
-      {pattern: "build-res/module-scripts/**/{*.js,*.html,*.xml}", included: false},
-      {pattern: "package-res/resources/web/**/{*.js,*.html,*.xml,*.properties}", included: false},
+      {pattern: "build-res/module-scripts/**/*.+(js|html|xml)", included: false},
+      {pattern: "package-res/resources/web/**/*.+(js|html|xml|properties)", included: false},
 
       // AMD configuration
       "build-res/requireCfg-raw.js",
