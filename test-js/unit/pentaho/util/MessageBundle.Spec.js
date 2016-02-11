@@ -13,11 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define(["pentaho/util/MessageBundle"], function(MessageBundle) {
+define([
+  "pentaho/util/MessageBundle",
+  "pentaho/util/error"
+], function(MessageBundle, error) {
   "use strict";
 
   var isEmpty = function(obj) {
-    return obj != null || Object.keys(obj).length === 0;
+    return obj != null && Object.keys(obj).length === 0;
   };
 
   describe("MessageBundle -", function() {
@@ -106,10 +109,16 @@ define(["pentaho/util/MessageBundle"], function(MessageBundle) {
           return "_" + prop + "_";
         };
 
-        it("should return an empty string when no string is given.", function() {
-          expect(this.bundle.format()).toBe("");
-          expect(this.bundle.format(null)).toBe("");
-          expect(this.bundle.format(null, scope_obj)).toBe("");
+        it("should throw an error when no string is given.", function() {
+          var that = this;
+          function expectThrowError(text) {
+            expect(function() {
+              that.bundle.format(text);
+            }).toThrowError(error.argRequired("text").message);
+          }
+
+          expectThrowError(null);
+          expectThrowError(undefined);
         });
 
         it("should return '[?]' when the property doesn't exist.", function() {
