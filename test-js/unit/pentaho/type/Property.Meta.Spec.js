@@ -400,10 +400,10 @@ define([
           var propMeta = createRootPropMeta({name: "foo1", type: "number"});
 
           var Integer = Number.extend();
-          propMeta.type = Integer.Meta;
+          propMeta.type = Integer.meta;
           expect(propMeta.type).toBe(Integer.meta);
 
-          propMeta.type = String.Meta;
+          propMeta.type = String.meta;
           expect(propMeta.type).toBe(String.meta);
         });
       }); // end type

@@ -761,28 +761,6 @@ define([
         expect(Item.meta.to(item)).toBe(item);
       });
 
-      it("calls #context.create(value) and returns its result " +
-         "when value is not an instance and type has an own constructor", function() {
-        var createSpy = jasmine.createSpy();
-        var SubItem = Item.extend({
-          meta: {
-            get context() {
-              return {
-                create: createSpy
-              };
-            }
-          }
-        });
-
-        spyOn(SubItem.meta, "create").and.callThrough();
-
-        var value = {};
-        SubItem.meta.to(value);
-
-        expect(createSpy).toHaveBeenCalledWith(value, SubItem.meta, SubItem.meta);
-        expect(SubItem.meta.create).not.toHaveBeenCalled();
-      });
-
       it("calls #create(value) and returns its result " +
           "when value is not an instance and type does not have an own constructor", function() {
         var createSpy = jasmine.createSpy();

@@ -89,7 +89,7 @@ define([
     },
 
     //region meta property
-    _meta: null,
+    _meta: null, // Set on Item.Meta#_init
 
     /**
      * Gets the type of this instance.

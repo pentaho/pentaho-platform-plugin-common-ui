@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 define([
-  "./object"
-], function(O) {
+  "./object",
+  "./error"
+], function(O, error) {
   "use strict";
 
   /**
@@ -156,12 +157,14 @@ define([
    *
    * @alias format
    * @memberOf pentaho.util.MessageBundle
-   * @param {string} [text=""] The text to format.
+   * @param {string} text The text to format.
    * @param {Array|Object|function} [scope] A scope array, object or function.
    *
    * @return {string} The formatted string.
    */
   MessageBundle.format = function(text, scope) {
+    // This is to prevent errors in a wrong message bundle id not being caught!
+    if(text == null) throw error.argRequired("text");
     var scopeFun;
     if(scope == null)
       scopeFun = function(prop) { return null; };
@@ -170,7 +173,7 @@ define([
     else
       scopeFun = function(prop) { return O.getOwn(scope, prop); };
 
-    return (text || "").replace(/(^|[^{])\{([^{}]+)\}/g, function($0, before, prop) {
+    return String(text).replace(/(^|[^{])\{([^{}]+)\}/g, function($0, before, prop) {
       var value = scopeFun(prop);
       return before + (value == null ? "[?]" : value.toString());
     });

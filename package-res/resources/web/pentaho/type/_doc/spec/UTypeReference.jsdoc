@@ -1,0 +1,211 @@
+/*!
+ * Copyright 2010 - 2016 Pentaho Corporation.  All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * The `spec.UTypeReference` union represents the set of JS types that can be used
+ * to reference a type.
+ *
+ * It can be one of the following:
+ *
+ * ##### A _type id_ string
+ *
+ * A type's [id]{@link pentaho.type.Value.Meta#id},
+ * that must the id of a defined module in the AMD module system.
+ *
+ * If the id does not contain any "/" character,
+ * it is considered a standard type, and, thus,
+ * is taken relative to Pentaho's `"pentaho/type"` module.
+ *
+ * Note that relative AMD module ids, like, for example, `"./foo"`, are not supported.
+ *
+ * Example:
+ * ```js
+ * "pentaho/type/string"
+ * ```
+ *
+ * ##### An _instance constructor_ function
+ *
+ * A reference to an instance constructor, like [Complex]{@link pentaho.type.Complex}.
+ *
+ * Usually,
+ * a reference to an instance constructor is obtained from a [context]{@link pentaho.type.Context} object
+ * (and not used to obtain one...), by providing the type's id.
+ * Nevertheless, it is sometimes useful to be able to use it to identify a type.
+ *
+ * Example:
+ *
+ * ```js
+ * require(["pentaho/type/Context"], function(Context) {
+ *   var context = new Context();
+ *   var Complex = context.get("pentaho/type/complex");
+ *   // ...
+ * });
+ * ```
+ *
+ * ##### A _type factory_ function
+ *
+ * The functions that create instance constructors of value types,
+ * each time they are called,
+ * for a given [context]{@link pentaho.type.Context}.
+ * They have the signature {@link pentaho.type.Factory.<pentaho.type.Value>}.
+ *
+ * The AMD module under the id of a value type _must_ return a type factory function.
+ * A type factory can thus be obtained by requiring the AMD module that has the type's id:
+ *
+ * ```js
+ * require(["pentaho/type/Context", "pentaho/type/string"], function(Context, stringFactory) {
+ *   var context = new Context();
+ *   var PentahoString = context.get(stringFactory);
+ *
+ *   // ...
+ * });
+ * ```
+ *
+ * In practice, a type factory _reference_ is seldom needed,
+ * and is only used for getting the base type of a type being defined:
+ *
+ * ```js
+ * // In a file accessible through module id "my/derived/type"
+ *
+ * define(["my/base/type"], function(baseTypeFactory) {
+ *
+ *   // Return the derived type's factory function
+ *   return function(context) {
+ *
+ *     // Obtain the base type's instance constructor in this context
+ *     var MyBaseType = context.get(baseTypeFactory);
+ *
+ *     // Derive and return the derived type constructor
+ *     return MyBaseType.extend({
+ *        meta: {
+ *          id: "my/derived/type"
+ *          // ...
+ *        }
+ *        // ...
+ *     });
+ *   };
+ *
+ * });
+ * ```
+ *
+ * ##### A _type_ object
+ *
+ * A type's metadata singleton object,
+ * like `Number.meta`, where _Number_ is [Number]{@link pentaho.type.Number}.
+ *
+ * Example:
+ * ```js
+ * require(["pentaho/type/Context"], function(Context) {
+ *   var context = new Context();
+ *
+ *   var PentahoNumber = context.get("pentaho/type/number");
+ *   var numberMeta = PentahoNumber.meta;
+ *
+ *   // Get a number list type
+ *   var NumberList = context.get([numberMeta]);
+ *
+ *   var numbers = new NumberList([1, 2, 3]);
+ *
+ *   // ...
+ * });
+ * ```
+ *
+ * ##### A _generic type metadata specification_ object
+ *
+ * A plain {@link Object} specification used to generically
+ * describe the metadata of a type.
+ * Satisfies the interface [spec.ITypeMeta]{@link pentaho.type.spec.ITypeMeta}.
+ *
+ * The special `base` attribute allows specifying the base type
+ * and defaults to `"pentaho/type/complex"`.
+ * Additional supported attributes are determined and processed by
+ * the base value type's {@link pentaho.type.Value.Meta.extend} method.
+ *
+ * Example:
+ *
+ * ```js
+ * require(["pentaho/type/Context"], function(Context) {
+ *   var context = new Context();
+ *
+ *   // Obtain an anonymous, derived complex type from the context
+ *   var MyProduct = context.get({
+ *         base: "complex" // optional
+ *         props: [
+ *           {name: "id",    label: "Id",    type: "string"},
+ *           {name: "name",  label: "Name",  type: "string"},
+ *           {name: "price", label: "Price", type: "number"}
+ *         ]
+ *       });
+ *
+ *   var productA = new MyProduct({id: "mabc", name: "Principia Mathematica", price: 1200});
+ *
+ *   // ...
+ * });
+ * ```
+ *
+ * ##### A _list type shorthand specification_ array
+ *
+ * A shorter specification syntax to reference the _List_ type, or
+ * derived list types of varied [element types]{@link pentaho.type.List.Meta#of}.
+ *
+ * Example:
+ *
+ * ```js
+ * require(["pentaho/type/Context"], function(Context) {
+ *   var context = new Context();
+ *
+ *   // Obtain the List type instance constructor
+ *
+ *   // Using the id
+ *   var ListA = context.get("list");
+ *
+ *   // Using the shorthand syntax
+ *   var ListB = context.get([]);
+ *
+ *
+ *   // Obtain a derived List type instance constructor
+ *   // with Number as the element type
+ *
+ *   // Using the generic type metadata specification syntax
+ *   var NumberListA = context.get({base: "list", of: "number"});
+ *
+ *   // Using the shorthand syntax
+ *   var NumberListB = context.get(["number"]);
+ *
+ *   // ...
+ *
+ *   // Assuming the type MyProduct from a previous example
+ *
+ *   var ProductList = context.get([MyProduct]);
+ *
+ *   var productList = new ProductList([
+ *         {id: "mpma", name: "Principia Mathematica", price: 1200},
+ *         {id: "flot", name: "The Laws of Thought",   price:  500}
+ *       ]);
+ *
+ *   alert("Product count: " + productList.count);
+ * });
+ * ```
+ *
+ * @typedef {string|
+ *           pentaho.type.Factory|
+ *           pentaho.type.Value.Meta|
+ *           Class.<pentaho.type.Value>|
+ *           Array.<pentaho.type.spec.UTypeReference>|
+ *           pentaho.type.spec.ITypeMeta} pentaho.type.spec.UTypeReference
+ */
+
+

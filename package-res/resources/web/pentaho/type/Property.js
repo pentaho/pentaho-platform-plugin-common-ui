@@ -166,7 +166,7 @@ define([
        * The context of a property is that of
        * the complex type that declares it.
        *
-       * @type pentaho.type.IContext
+       * @type pentaho.type.Context
        * @readonly
        */
       get context() {
