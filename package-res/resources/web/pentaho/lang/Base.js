@@ -505,12 +505,11 @@ define([
   function class_inherit_static(BaseClass) {
     for(var i = 0; i < _hiddenClass.length; i++) {
       var h = _hiddenClass[i];
-      if(BaseClass[h] !== _extendProto[h])
-        inst_extend_propDesc.call(this, h, BaseClass, undefined, /*funOnly:*/true);
+      inst_extend_propDesc.call(this, h, BaseClass, undefined, /*funOnly:*/true);
     }
 
     for(var name in BaseClass)
-      if(!_extendProto[name] &&
+      if(!Object[name] &&
          name !== "ancestor" &&
          name !== "prototype" &&
          name !== "valueOf" &&
