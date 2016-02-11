@@ -187,6 +187,13 @@ define([
       ancestor: NativeBase // Replaces BaseBoot by NativeBase
     });
 
+    Object.defineProperty(BaseRoot.prototype, "base", {
+      configurable: true,
+      writable: true,
+      enumerable: false,
+      value: inst_base
+    });
+
     // The `__root_proto__` property is a cheap way to obtain
     // the correct Base-root prototype for setting the "base" property,
     // in `methodOverride`.
