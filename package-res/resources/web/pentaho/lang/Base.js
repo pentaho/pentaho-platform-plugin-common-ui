@@ -382,7 +382,9 @@ define([
 
   //region Method Override
   function methodOverride(value, baseValue, rootProto) {
-    if(!value || !baseValue) return value || baseValue;
+    if(!value) return baseValue;
+
+    if(!baseValue) baseValue = inst_base;
 
     // Get the unwrapped value.
     var method = value.valueOf();
