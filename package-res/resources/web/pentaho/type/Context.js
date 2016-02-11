@@ -24,7 +24,7 @@ define([
   "../util/error",
   "../util/object",
   "../util/fun"
-], function(module, Item, bundle, standard, Base, promise, arg, error, O, F) {
+], function(module, Item, bundle, standard, Base, promiseUtil, arg, error, O, F) {
 
   "use strict";
 
@@ -408,7 +408,7 @@ define([
 
       var predicate = F.predicate(keyArgs);
       var me = this;
-      return promise.require(["pentaho/service!" + baseTypeId])
+      return promiseUtil.require("pentaho/service!" + baseTypeId)
           .then(function(factories) {
             return Promise.all(factories.map(me.getAsync, me));
           })
@@ -493,7 +493,7 @@ define([
           // `require` fails if a module with the id in the `typeSpec` var
           // is not already _loaded_.
           ? this._get(require(id), true)
-          : promise.require([id]).then(this._get.bind(this));
+          : promiseUtil.require(id).then(this._get.bind(this));
     },
 
     /**
@@ -666,10 +666,10 @@ define([
       var customTypeIds = collectTypeIds(typeSpec);
       return customTypeIds.length
           // Require them all and only then invoke the synchronous BaseMeta.extend method.
-          ? promise.require(customTypeIds).then(resolveSync)
+          ? promiseUtil.require(customTypeIds).then(resolveSync)
           // All types are standard and can be assumed to be already loaded.
           // However, we should behave asynchronously as requested.
-          : promise.call(resolveSync);
+          : promiseUtil.wrapCall(resolveSync);
     },
 
     /*

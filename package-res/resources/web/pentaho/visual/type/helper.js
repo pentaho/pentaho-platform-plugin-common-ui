@@ -17,7 +17,7 @@ define([
   "../spec/helper",
   "../../util/promise",
   "../../util/error"
-], function(specHelper, promise, error) {
+], function(specHelper, promiseUtil, error) {
 
   /**
    * @module pentaho.visual.editing
@@ -165,7 +165,7 @@ define([
     if(factory) {
       switch(typeof factory) {
         case "string":
-          return promise.require([factory])
+          return promiseUtil.require(factory)
             .then(function(factory) {
                 return factory(createOptions);
               })
@@ -180,7 +180,7 @@ define([
       throw error.argRequired("createOptions.type.factory");
     }
 
-    return promise.call(function() { return factory(createOptions); })
+    return promiseUtil.wrapCall(function() { return factory(createOptions); })
       .then(haveVisual);
   }
 

@@ -22,7 +22,7 @@ define([
   "../util/fun",
   "../util/object",
   "../util/promise"
-], function(bundle, Base, AnnotatableLinked, error, arg, fun, O, promise) {
+], function(bundle, Base, AnnotatableLinked, error, arg, fun, O, promiseUtil) {
 
   "use strict";
 
@@ -619,7 +619,7 @@ define([
           this._view = {value: value, promise: null};
         }
       } else {
-        // Assume it is the View class itself, already resolved.
+        // Assume it is the View class itself, already fulfilled.
         if(!this._view || this._view.value !== value) {
           this._view = {value: value, promise: Promise.resolve(value)};
         }
@@ -641,7 +641,7 @@ define([
      */
     get viewClass() {
       var view = this._view;
-      return view && (view.promise || (view.promise = promise.require([view.value])));
+      return view && (view.promise || (view.promise = promiseUtil.require(view.value)));
     },
     //endregion
 
