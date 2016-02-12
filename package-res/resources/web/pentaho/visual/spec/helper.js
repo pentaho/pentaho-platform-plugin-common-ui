@@ -149,7 +149,9 @@ define([
    * @return {boolean} `true` if iteration was not cancelled, `false` otherwise.
    */
   function eachProperties(spec, fun, ctx) {
-    return O.eachOwnDefined(spec, function(v, p) {
+    return O.eachOwn(spec, function(v, p) {
+      if(v === undefined)
+        return;
       if(!isStandardProperty(p))
         return fun.call(ctx, v, p); // maybe stop
     });
