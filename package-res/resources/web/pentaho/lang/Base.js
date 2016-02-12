@@ -705,10 +705,18 @@ define([
   function methodOverride(value, baseValue, rootProto) {
     if(!value) return baseValue;
 
-    if(!baseValue) baseValue = inst_base;
-
     // Get the unwrapped value.
     var method = value.valueOf();
+
+    if(!baseValue) {
+      // if `value` was wrapped, return it
+      if(method != value) {
+        return value;
+      }
+
+      // if not, provide a default empty `baseValue`
+      baseValue = inst_base;
+    }
 
     // valueOf() test is to avoid circular references
     if(!method ||
