@@ -67,29 +67,78 @@ define([
 
   // -----------
 
+  /**
+   * Defines the Base class.
+   *
+   * @private
+   *
+   * @returns {Class.<pentaho.lang.Base>}
+   */
   function base_create() {
-    // The Base.Object root class is the base class for regular Object classes.
     var Base = base_root(Object, {}, "Base.Object");
     Base.version = "2.0";
+
+    /**
+     * The `Base.Object` root class is the base class for regular `Object` classes.
+     *
+     * It is an alias of `Base`.
+     *
+     * @see pentaho.lang.Base
+     *
+     * @name Object
+     * @memberOf pentaho.lang.Base
+     *
+     * @class
+     * @extends Object
+     */
     Base.Object = Base;
 
-    // The Base.Array root class is the base class for Array classes.
+    /**
+     * The `Base.Array` root class is the base class for `Array` classes.
+     *
+     * @name Array
+     * @memberOf pentaho.lang.Base
+     *
+     * @class
+     * @extends Array
+     *
+     *
+     * @borrows pentaho.lang.Base.ancestor as ancestor
+     * @borrows pentaho.lang.Base.extend as extend
+     * @borrows pentaho.lang.Base._extend as _extend
+     * @borrows pentaho.lang.Base.mix as mix
+     * @borrows pentaho.lang.Base.implement as implement
+     * @borrows pentaho.lang.Base.implementStatic as implementStatic
+     * @borrows pentaho.lang.Base#base as #base
+     * @borrows pentaho.lang.Base#extend as #extend
+     */
     Base.Array = base_root(Array, [], "Base.Array");
     Base.Array.to = class_array_to;
 
     return Base;
   }
 
-  // Creates a Base root class.
+  /**
+   * Creates a `Base` root class.
+   *
+   * @private
+   *
+   * @param {Class} NativeBase The native base constructor that this _Base_ root is rooted on.
+   * @param {object} bootProto The prototype of the _boot_ constructor.
+   * @param {string} baseRootName The name of the _root_ constructor.
+   *
+   * @returns {Class.<pentaho.lang.Base>} The new `Base` root class.
+   */
   function base_root(NativeBase, bootProto, baseRootName) {
     // Bootstrapping "Base" class.
     // Does not have the full "Base" class interface,
     // but only enough properties set to trick `class_extend`.
     // `BaseBoot` becomes accessible only by following the prototype chain,
     // finding `bootProto` along the way.
+
     var BaseBoot = function() {};
 
-    if(bootProto) BaseBoot.prototype = bootProto;
+    BaseBoot.prototype = bootProto;
 
     // Static interface that is inherited by all Base classes.
     BaseBoot.extend    = class_extend;
@@ -106,20 +155,59 @@ define([
     // ---
 
     var BaseRoot = BaseBoot.extend({
-      // Cannot reuse constructor functions.
+      /**
+       * Creates a new object of `Base` class.
+       *
+       * If provided extends the created instance with the spec in `source` parameter.
+       *
+       * @param {Object} [source] A instance spec. Optional parameter.
+       *
+       * @classdesc `Base` Class for JavaScript Inheritance.
+       * Based on Base.js by Dean Edwards, and later edited by Kenneth Powers.
+       *
+       * @amd pentaho/lang/Base
+       *
+       * @class
+       * @name Base
+       * @memberOf pentaho.lang
+       */
       constructor: function() {
         this.extend(arguments[0]);
       },
-      base: inst_base
     }, {
+      /**
+       * This class ancestor.
+       *
+       * @readonly
+       * @name ancestor
+       * @memberOf pentaho.lang.Base
+       */
       ancestor: NativeBase // Replaces BaseBoot by NativeBase
     });
 
+
+    /**
+     * If a method has been overridden then the base method provides access to the overridden method.
+     * Can also be called from within a constructor function.
+     *
+     * @var
+     * @readonly
+     * @type {Function}
+     * @name base
+     * @memberOf pentaho.lang.Base#
+     */
+    Object.defineProperty(BaseRoot.prototype, "base", {
+      configurable: true,
+      writable: true,
+      enumerable: false,
+      value: inst_base
+    });
+
     // The `__root_proto__` property is a cheap way to obtain
-    // the correct Base-root prototype for setting the "base" property,
+    // the correct Base-root prototype for setting the `base` property,
     // in `methodOverride`.
     // Create shared, hidden, constant `__root_proto__` property.
-    Object.defineProperty(BaseRoot, "__root_proto__", {value: BaseRoot.prototype});
+    Object.defineProperty(BaseRoot.prototype, "__root_proto__", {value: BaseRoot.prototype});
 
     setFunName(BaseRoot, baseRootName);
 
@@ -128,8 +216,24 @@ define([
 
   //region Class methods
 
-  // Creates a sub-class of this class.
-  // Static method of all "Base" constructors.
+  /**
+   * Subclass a `Base` class.
+   *
+   * All classes inherit the `extend` method, so they can also be subclassed.
+   *
+   * Inheritance is delegated to the `_extend` method, which can be overridden.
+   *
+   * @method
+   * @name extend
+   * @memberOf pentaho.lang.Base
+   *
+   * @param {string} [name] The name of the created class. Optional parameter.
+   * @param {?Object} instSpec The instance spec.
+   * @param {?Object} [classSpec] The static spec. Optional parameter.
+   * @param {?Object} [keyArgs] Keyword arguments. Optional parameter.
+   *
+   * @returns {Class.<pentaho.lang.Base>} The new subclass.
+   */
   function class_extend(name, instSpec, classSpec, keyArgs) {
     if(arguments.length < 3 && typeof name !== "string") {
       keyArgs = classSpec;
@@ -141,8 +245,22 @@ define([
     return this._extend(name, instSpec, classSpec, keyArgs);
   }
 
+  /**
+   * Default implementation of class extension.
+   *
+   * @private
+   * @method
+   * @name _extend
+   * @memberOf pentaho.lang.Base
+   *
+   * @param {?string} name The name of the created class.
+   * @param {?Object} instSpec The instance spec.
+   * @param {?Object} classSpec The static spec.
+   * @param {?Object} keyArgs Keyword arguments. Passed to `_subClassed` and `init` if present.
+   *
+   * @returns {Class.<pentaho.lang.Base>} The new subclass.
+   */
   function class_extend_core(name, instSpec, classSpec, keyArgs) {
-
     var SubClass = class_extend_subclass.call(this, name, instSpec);
 
     if(fun.is(this._subClassed))
@@ -156,6 +274,14 @@ define([
     return SubClass;
   }
 
+  /**
+   * @private
+   *
+   * @param {?string} name The name of the created class.
+   * @param {?Object} instSpec The instance spec.
+   *
+   * @returns {Class.<pentaho.lang.Base>} The new subclass.
+   */
   function class_extend_subclass(name, instSpec) {
     // Create PROTOTYPE and CONSTRUCTOR
     var subProto = Object.create(this.prototype),
@@ -178,59 +304,116 @@ define([
     return SubClass;
   }
 
+  /**
+   * Provides a constructor for the new subclass.
+   *
+   * When a `constructor` property has been specified in `instSpec`:
+   *    1. If it doesn't call base: uses it as the constructor;
+   *    2. If it calls base: uses its override wrapper as the constructor.
+   *
+   * Otherwise:
+   *    1. If there is an inherited init: creates a constructor that calls it;
+   *      a. If `init` calls base, it also gets wrapped;
+   *    2. Otherwise, creates an empty constructor.
+   *
+   * @private
+   *
+   * @param {Object} proto The subclass prototype.
+   * @param {?Object} instSpec The instance spec.
+   *
+   * @returns {Function} The subclass constructor.
+   */
   function class_extend_createCtor(proto, instSpec) {
-    // When a `constructor` property has been specified:
-    //   1. If it doesn't call base: use it as the constructor
-    //   2. If it calls base: it's override wrapper is used as constructor
-    //
-    // Otherwise:
-    //   1. If there is an inherited init: create a constructor that simply calls it
-    //   2. Otherwise, create an empty constructor.
-    var baseInit = proto.__init__,
-        Class = class_extend_readCtor(instSpec);
+    var baseInit = proto.__init__;
+    var Class = class_extend_readCtor(instSpec);
+
     if(Class) {
-      // If `init` calls base, it gets wrapped so that the `base` property gets set,
-      // just like with all regular prototype methods.
       // Maybe override base constructor.
       Class = methodOverride(Class, baseInit, proto.__root_proto__);
 
       // Create shared, hidden, constant `__init__` property.
       Object.defineProperty(proto, "__init__", {value: Class});
-    } else if(baseInit) {
-      Class = class_extend_createCtorInit(baseInit);
     } else {
-      Class = class_extend_createCtorNoInit();
+      Class = class_extend_createCtorInit(baseInit);
     }
 
     return Class;
   }
 
-  // Has a `constructor` property been specified (not Object#constructor!) ?
-  // Should not be a get/set property, or it will be evaluated and the resulting value used instead.
+  /**
+   * Reads the `constructor` property and returns it, if not `Object#constructor`.
+   *
+   * Note: Should not be a get/set property, or it will be evaluated and the resulting value used instead.
+   *
+   * @private
+   *
+   * @param {?Object} instSpec The instance spec.
+   *
+   * @returns {?Function} The constructor function provided in `instSpec`.
+   */
   function class_extend_readCtor(instSpec) {
     var init = instSpec && instSpec.constructor;
     return init && init !== _extendProto.constructor && fun.is(init) ? init : null;
   }
 
-  // When mixing in, init won't be available through this.__init__,
-  // so the fixed `init` argument is actually required.
+  /**
+   * Creates constructor that calls `init`.
+   *
+   * Notes: When mixing in, `init` won't be available through `this.__init__`,
+   * so the fixed `init` argument is actually required.
+   *
+   * @private
+   *
+   * @param {Function} init The function to be called by the constructor.
+   *
+   * @returns {Function} The function that calls init.
+   */
   function class_extend_createCtorInit(init) {
     return function() {
       return init.apply(this, arguments);
     };
   }
 
-  function class_extend_createCtorNoInit() {
-    return function() {};
-  }
-
+  /**
+   * Converts its arguments to an instance of `Class`, or throws if that is impossible.
+   *
+   * The default implementation tests if the first argument is an instance of that type and returns it, if it is.
+   * Otherwise, it calls `Class` with the `new` operator and all of the given arguments and returns the result.
+   *
+   * @method
+   * @name to
+   * @memberOf pentaho.lang.Base
+   *
+   * @param {*} v The value to be casted.
+   *
+   * @returns {pentaho.lang.Base}
+   *
+   * @throws {Error} If cannot convert value.
+   */
   function class_to(v) {
     return (v instanceof this) ? v : O.make(this, arguments);
   }
 
-  // Note that arrays of a certain sub-class cannot be newed up (in ES5, at least).
-  // As such, a normal array must be created first and then "switched" to
-  // inheriting from this class: var baseArray = BaseArray.to([]);
+  /**
+   * Converts its arguments to an instance of `Array`, or throws if that is impossible.
+   *
+   * The method tests if `a` is an instance of this type and returns it, if it is.
+   * Otherwise, if instance of `Array`, it converts it by changing it prototype.
+   *
+   * Warning: in this case, the input parameter only be modified!
+   *
+   * Notes: Arrays of a certain sub-class cannot be newed up (in ES5, at least).
+   * As such, a normal array must be created first and then "switched" to
+   * inheriting from this class: `var baseArray = BaseArray.to([]);`.
+   *
+   * @alias pentaho.lang.Base.Array.to
+   *
+   * @param {?Array} a The value to be casted.
+   *
+   * @returns {pentaho.lang.Base.Array}
+   *
+   * @throws {Error} If cannot convert value.
+   */
   function class_array_to(a) {
     // First, convert to an array.
     if(a == null)
@@ -243,6 +426,21 @@ define([
     return O.applyClass(a, this, A_slice.call(arguments, 1));
   }
 
+  /**
+   * Adds additional specs to a class.
+   * The specs can be defined by other classes or object literals.
+   *
+   * The method extends the class but does not create a new class.
+   *
+   * @method
+   * @name mix
+   * @memberOf pentaho.lang.Base
+   *
+   * @param {?Function|?Object} instSpec The Class to mixin or an instance spec.
+   * @param {?Object} [classSpec] The static spec. Optional parameter.
+   *
+   * @returns {Class.<pentaho.lang.Base>}
+   */
   function class_mix(instSpec, classSpec) {
     if(fun.is(instSpec)) {
       if(arguments.length === 1) classSpec = instSpec;
@@ -258,6 +456,22 @@ define([
     return this;
   }
 
+  /**
+   * Adds additional instance specs to a class.
+   * The specs can be defined by other classes or object literals.
+   *
+   * The method extends the class prototype but does not create a new class.
+   *
+   * Can be applied to non-`Base` classes (e.g. using `Base.implement.call(Alien, instanceMix)`).
+   *
+   * @method
+   * @name implement
+   * @memberOf pentaho.lang.Base
+   *
+   * @param {...Function|...Object} instSpec One or more classes to mixin or instance specs.
+   *
+   * @returns {Class.<pentaho.lang.Base>|Function}
+   */
   function class_implement() {
     var i = -1,
         L = arguments.length,
@@ -272,19 +486,26 @@ define([
     return this;
   }
 
-  // Adapted from inst_extend_object to better handle the Class static inheritance case.
+  /**
+   * Inherit each of the `BaseClass` properties to this class.
+   *
+   * Copies `toString` manually and skip _special_ members.
+   *
+   * Notes: Adapted from `inst_extend_object` to better handle the Class static inheritance case.
+   *
+   * @private
+   *
+   * @param {Function} BaseClass Class from where to inherit static members.
+   *
+   */
   function class_inherit_static(BaseClass) {
-
-    // Do the "toString" and other methods manually.
     for(var i = 0; i < _hiddenClass.length; i++) {
       var h = _hiddenClass[i];
-      if(BaseClass[h] !== _extendProto[h])
-        inst_extend_propDesc.call(this, h, BaseClass, undefined, /*funOnly:*/true);
+      inst_extend_propDesc.call(this, h, BaseClass, undefined, /*funOnly:*/true);
     }
 
-    // Copy each of the BaseClass' properties to this object.
     for(var name in BaseClass)
-      if(!_extendProto[name] &&
+      if(!Object[name] &&
          name !== "ancestor" &&
          name !== "prototype" &&
          name !== "valueOf" &&
@@ -296,6 +517,22 @@ define([
         inst_extend_propDesc.call(this, name, BaseClass, undefined, /*funOnly:*/true);
   }
 
+  /**
+   * Adds additional static specs to a class.
+   * The specs can be defined by other classes or object literals.
+   *
+   * The method extends the class prototype but does not create a new class.
+   *
+   * Can be applied to non-`Base` classes (e.g. using `Base.implementStatic.call(Alien, classMix)`).
+   *
+   * @method
+   * @name implementStatic
+   * @memberOf pentaho.lang.Base
+   *
+   * @param {...Function|...Object} classSpec One or more classes to mixin or static specs.
+   *
+   * @returns {Class.<pentaho.lang.Base>|Function}
+   */
   function class_implementStatic() {
     var i = -1,
         L = arguments.length;
@@ -308,13 +545,33 @@ define([
 
     return this;
   }
+
   // endregion
 
   //region Instance methods
+
   function inst_base() {}
 
+  /**
+   * Extend an object with either a key/value pair or an object literal defining key/value pairs.
+   *
+   * Methods that are overridden are accessible through `this.base`.
+   *
+   * The method extends the object but doesn't change its class.
+   *
+   * Can be applied to non-`Base` instances (e.g. using `Base.prototype.extend.call(alien, {a: "hello"})`)
+   *
+   * @method
+   * @name extend
+   * @memberOf pentaho.lang.Base#
+   *
+   * @param {String|Object} source The name of the member to extent or the instance spec.
+   * @param {?*} [value] The value to assign to the extended member. Optional parameter.
+   *  If provided `source` must be the name of the member to extend.
+   *
+   * @returns {Object} This object, extended.
+   */
   function inst_extend(source, value) {
-
     if(arguments.length > 1) {
       inst_extend_propAssign.call(this, source, value, this.__root_proto__);
     } else if(source) {
@@ -348,8 +605,17 @@ define([
     return this;
   }
 
+  /**
+   * Copy each of the `source` members to this object.
+   *
+   * Copies `toString` manually and skip _special_ members.
+   *
+   * @private
+   *
+   * @param {Object} source Object from where to copy members.
+   * @param {?Object} rootProto The root constructor.
+   */
   function inst_extend_object(source, rootProto) {
-
     // Do the "toString" and other methods manually.
     for(var i = 0; i < _hidden.length; i++) {
       var h = _hidden[i];
@@ -363,15 +629,24 @@ define([
         inst_extend_propDesc.call(this, name, source, rootProto);
   }
 
+  /**
+   * Copy member from `source` to this object.
+   *
+   * @private
+   *
+   * @param {String} name The name of the property.
+   * @param {Object} source Object from where to copy members.
+   * @param {?Object} rootProto The root constructor.
+   * @param {?boolean} funOnly If true, copy only if member is a function.
+   */
   function inst_extend_propDesc(name, source, rootProto, funOnly) {
     var desc = O.getPropertyDescriptor(source, name);
     if(desc.get || desc.set) {
       // Property getter/setter
       var baseDesc = O.getPropertyDescriptor(this, name);
       if(baseDesc) {
-        // Specify null to block inheritance and, for example, make a property read-only.
-        if((desc.get !== null) && (desc.get || baseDesc.get)) desc.get = methodOverride(desc.get, baseDesc.get, rootProto);
-        if((desc.set !== null) && (desc.set || baseDesc.set)) desc.set = methodOverride(desc.set, baseDesc.set, rootProto);
+        if(desc.get || baseDesc.get) desc.get = methodOverride(desc.get, baseDesc.get, rootProto);
+        if(desc.set || baseDesc.set) desc.set = methodOverride(desc.set, baseDesc.set, rootProto);
       }
 
       Object.defineProperty(this, name, desc);
@@ -381,6 +656,16 @@ define([
     }
   }
 
+  /**
+   * Assign `value` to member `name` of this object.
+   *
+   * @private
+   *
+   * @param {String} name The name of the property.
+   * @param {*} value The value to assign to the member.
+   * @param {?Object} rootProto The root constructor.
+   * @param {?boolean} funOnly If true, assign only if value is a function.
+   */
   function inst_extend_propAssign(name, value, rootProto, funOnly) {
     if(fun.is(value)) {
       this[name] = methodOverride(value, this[name], rootProto);
@@ -388,11 +673,38 @@ define([
       this[name] = value;
     }
   }
+
   //endregion
 
   //region Method Override
+
+  /**
+   * Evaluates the need to wrap a method for overriding
+   * and returns the appropriate version.
+   *
+   * If `value` is null, returns the `baseValue`.
+   * If `value` doesn't call `this.base`, returns `value`.
+   *
+   * Otherwise, returns a wrapped method that calls `value`,
+   * and modifies its `valueOf()` and `toString()` methods
+   * to return the unwrapped original function.
+   *
+   * If `baseValue` is null `this.base` will be the empty
+   * `inst_base` function.
+   *
+   * @private
+   *
+   * @param {?Function} value The method overriding.
+   * @param {?Function} baseValue The method to override.
+   * @param {?Object} rootProto The root constructor.
+   *
+   * @returns {?Function} The override-ready function,
+   * or null if both `value` and `baseValue` are nully.
+   */
   function methodOverride(value, baseValue, rootProto) {
-    if(!value || !baseValue) return value || baseValue;
+    if(!value) return baseValue;
+
+    if(!baseValue) baseValue = inst_base;
 
     // Get the unwrapped value.
     var method = value.valueOf();
@@ -415,10 +727,36 @@ define([
     return value;
   }
 
+  /**
+   * Checks if `this.base` is called in the body of `method`.
+   *
+   * @private
+   *
+   * @param {Function} method The function to check.
+   *
+   * @returns {boolean} `true` if the method calls `this.base`.
+   */
   function methodCallsBase(method) {
     return /\bbase\b/.test(method);
   }
 
+  /**
+   * Creates a wrapper method that injects `baseMethod` into `this.base`
+   * and calls `method`.
+   *
+   * The `baseMethod` is injected into the root constructor `rootProto`,
+   * when available.
+   *
+   * If not (non-Base classes) it is injected directly in the instance.
+   *
+   * @private
+   *
+   * @param {?Function} method The method overriding.
+   * @param {?Function} baseMethod The method to override.
+   * @param {?Object} rootProto The root constructor.
+   *
+   * @returns {Function} The wrapped function.
+   */
   function methodOverrideWrap(method, baseMethod, rootProto) {
     if(rootProto)
       return function() {
@@ -436,17 +774,36 @@ define([
       } finally { this.base = previous; }
     };
   }
+
   //endregion
 
   //region Helpers
-  // The native String function or toString method do not call .valueOf() on its argument.
-  // However, concatenating with a string does...
+
+  /**
+   * Returns the string representation of this method.
+   *
+   * Notes: The native String function or toString method do not call .valueOf() on its argument.
+   * However, concatenating with a string does...
+   *
+   * @private
+   *
+   * @returns {String} The string representation of the function.
+   */
   function properFunToString() {
     return F_toString.call(this.valueOf());
   }
 
-  // Because `Function#name` is non-writable but configurable it
-  // can be set, but only through `Object.defineProperty`.
+  /**
+   * Defines the `name` and `displayName` of a function.
+   *
+   * Notes: Because `Function#name` is non-writable but configurable it
+   * can be set, but only through `Object.defineProperty`.
+   *
+   * @private
+   *
+   * @param {Function} fun The function.
+   * @param {String} name The name to set on the function.
+   */
   function setFunName(fun, name) {
     fun.displayName = name;
     try {
@@ -456,5 +813,6 @@ define([
       // Notably, PhantomJS 1.9.8 fails here.
     }
   }
+
   //endregion
 });
