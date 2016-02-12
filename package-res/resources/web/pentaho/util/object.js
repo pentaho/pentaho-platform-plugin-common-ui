@@ -32,14 +32,29 @@ define(function() {
    */
   return /** @lends pentaho.util.object */{
     /**
-     * Deletes an enumerable property in an object, even if it is not a direct/own property.
+     * Deletes a local property of an object and returns its value before deletion.
+     *
      * Constant properties cannot be deleted.
      *
-     * @param {object} object
-     * @param {string} property - Property to be deleted
-     * @param {any} defaultValue - Default value of the property.
-     * @return {any} The value of the deleted property.
-     * If the property did not exist, `defaultValue` is returned instead.
+     * If the specified object is a {@link Nully} value,
+     * or the specified property does not exist in the object,
+     * locally or not,
+     * the value of `defaultValue` is returned,
+     * or `undefined`, if unspecified.
+     *
+     * Otherwise, if the specified property exists in the object
+     * but it is not present locally,
+     * it is not deleted and the inherited value is returned.
+     *
+     * Finally, if the specified property exists in the object
+     * and it is present locally,
+     * it is deleted and its previous local value is returned.
+     *
+     * @param {?Object} object - The object whose property is to be locally deleted.
+     * @param {string} property - The name of the property.
+     * @param {any} [defaultValue] - The default value. Defaults to `undefined`.
+     * @return {any} The value of the property.
+     *
      * @throws {TypeError} Cannot delete a constant property.
      */
     "delete": function(o, p, dv) {
@@ -52,11 +67,14 @@ define(function() {
     },
 
     /**
-     * Determines if the property is a direct property of the object.
+     * Determines if a property is a direct property of an object.
+     *
      * This method does not check down the object's prototype chain.
      *
-     * @param {?object} object - Object to be tested.
-     * @param {string} property - Name of the property to be tested.
+     * If the specified object is a {@link Nully} value, `false` is returned.
+     *
+     * @param {?Object} object - The object to be tested.
+     * @param {string} property - The name of the property.
      * @return {boolean} `true` if this is a direct/own property, or `false` otherwise.
      */
     hasOwn: function(o, p) {
@@ -65,11 +83,14 @@ define(function() {
 
     /**
      * Returns the value of a direct property, or the default value.
+     *
      * This method does not check down the object's prototype chain.
      *
-     * @param {?object} object - Object to be tested.
+     * If the specified object is a {@link Nully} value, the default value is returned.
+     *
+     * @param {?Object} object - Object whose property to get.
      * @param {string} property - Name of the property to be retrieved.
-     * @param {any} defaultValue - Default value of the property.
+     * @param {any} [defaultValue] - Default value of the property. Defaults to `undefined`.
      * @return {boolean} The value of the property if it exists in the object and is an own property,
      * otherwise returns `defaultValue`.
      */
@@ -78,28 +99,30 @@ define(function() {
     },
 
     /**
-     * Creates an immutable (constant) property in an object with a given value.
+     * Sets a property in an object to a value and makes it constant (immutable).
+     *
      * The created property can neither be overwritten nor deleted.
      *
-     * @param {!object} object - Object to be tested.
-     * @param {string} property - Name of the property to be created.
-     * @param {any} value - Value to be assigned to the property.
+     * @param {!Object} object - The object whose property is to be set.
+     * @param {string} property - The name of the property.
+     * @param {any} value - The value.
      */
     setConst: function(o, p, v) {
       Object.defineProperty(o, p, {value: v});
     },
 
     /**
-     * Interates over all **direct enumerable** properties of an object,
+     * Iterates over all **direct enumerable** properties of an object,
      * yielding each in turn to an iteratee function.
+     *
      * The iteratee is bound to the context object, if one is passed,
      * otherwise it is bound to the iterated object.
      * Each invocation of iteratee is called with two arguments: (propertyValue, propertyName).
      * If the iteratee function returns `false`, the iteration loop is broken out.
      *
-     * @param {!object} object - Object containing the properties to be iterated
-     * @param {function} iteratee - Function that will be iterated
-     * @param {?object} context - Object which will provide the execution context of the iteratee function.
+     * @param {!object} object - The object containing the properties to be iterated.
+     * @param {function} iteratee - The function that will be iterated.
+     * @param {?object} [context] - The object which will provide the execution context of the iteratee function.
      * If nully, the iteratee will run with the context of the iterated object.
      *
      * @return {boolean} `true` when the iteration completed regularly,
@@ -116,9 +139,9 @@ define(function() {
     /**
      * Iterates over the own properties of a source object and assigns them to a target object.
      *
-     * @param {!object} to - Target object.
-     * @param {!object} from - Source object.
-     * @return {object} The target object.
+     * @param {!Object} to - The target object.
+     * @param {?Object} from - The source object.
+     * @return {!Object} The target object.
      */
     assignOwn: function(to, from) {
       for(var p in from)
@@ -131,9 +154,9 @@ define(function() {
      * Iterates over the own properties of a source object,
      * checks if their values are defined, and if so, assigns them to a target object.
      *
-     * @param {!object} to - Target object.
-     * @param {!object} from - Source object.
-     * @return {object} The target object.
+     * @param {!Object} to - Target object.
+     * @param {?Object} from - Source object.
+     * @return {!Object} The target object.
      * @method
      * @see pentaho.util.object.assignOwn
      */
@@ -141,11 +164,12 @@ define(function() {
 
     /**
      * Creates a shallow clone of a plain object or array.
+     *
      * Undefined properties are ignored.
      * If `from` is an instance of a class, or a simple value (e.g. string, number),
      * no clone is created and the original object is returned instead.
      *
-     * @param {object|Array|any} from - Source object.
+     * @param {Object|Array|any} from - Source object.
      * @return {any} A shallow copy of the object,
      * or the object itself if it is neither a plain object nor an array.
      */
@@ -162,9 +186,9 @@ define(function() {
     /**
      * Retrieves an object that describes a property, traversing the inheritance chain if necessary.
      *
-     * @param {!object} object - Object that contains the property.
-     * @param {!string} property - Name of property.
-     * @return {object|null} The
+     * @param {!Object} object - The object that contains the property.
+     * @param {string} property - The name of property.
+     * @return {?Object} The
      * [property descriptor]{@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty}.
      * @method
      */
@@ -176,20 +200,21 @@ define(function() {
      * from an array of arguments.
      *
      * @param {function} Ctor - The constructor function of the class to be instantiated.
-     * @param {Array} [args] - The array of arguments, or arguments object, which will be passed to the constructor.
-     * @return {object} The constructed instance.
+     * @param {?Array} [args] - The array of arguments, or arguments object, which will be passed to the constructor.
+     * @return {!Object} The constructed instance.
      */
     //only used by pentaho.lang.Base
     make: function(Ctor, args) {
-      switch(args.length) {
+      switch(args ? args.length : 0) {
         case 0: return new Ctor();
         case 1: return new Ctor(args[0]);
         case 2: return new Ctor(args[0], args[1]);
         case 3: return new Ctor(args[0], args[1], args[2]);
       }
+
       // generic implementation, possibly slower
       var inst = Object.create(Ctor.prototype);
-      return Ctor.apply(inst, args || A_empty) || inst;
+      return Ctor.apply(inst, args) || inst;
     },
 
     /**
@@ -200,19 +225,20 @@ define(function() {
      *
      * Delegates to the native implementation of `Object.setPrototypeOf`, if supported.
      *
-     * @param {object} obj - The object which is to have its prototype set.
-     * @param {?object} prototype - The object's new prototype.
-     * @return {object} The `object`.
+     * @param {!Object} object - The object which is to have its prototype set.
+     * @param {?Object} prototype - The object's new prototype.
+     * @return {!Object} The `object`.
      */
     setPrototypeOf: setProtoOf,
 
     /**
      * Mutates an object so that it becomes an instance of a given class, if not already.
+     *
      * In particular, the _prototype_ and _constructor_ properties of a given object are replaced, if necessary.
      *
-     * @param {!object} inst - Object to be mutated.
+     * @param {!Object} inst - Object to be mutated.
      * @param {function} Class - Constructor of the class to be applied to the object.
-     * @param {?Array} args - Array of arguments to be passed to the constructor of the class.
+     * @param {?Array} [args] - Array of arguments to be passed to the constructor of the class.
      * @return {object} The mutated object.
      */
     //only used by pentaho.lang.Base
@@ -247,10 +273,10 @@ define(function() {
    * Copies a single property from a source object to a target object, provided it is defined.
    * A property is defined if either its value, getter or setter are defined.
    *
-   * @param {!object} to - Target object.
-   * @param {!object} from - Source object.
+   * @param {!Object} to - Target object.
+   * @param {!Object} from - Source object.
    * @param {string} p - Name of the property to be copied.
-   * @return {object} Returns the target object.
+   * @return {!Object} Returns the target object.
    * @method
    */
   function copyOneDefined(to, from, p) {
