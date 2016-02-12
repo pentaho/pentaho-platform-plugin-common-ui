@@ -32,28 +32,28 @@ define(function() {
    */
   return /** @lends pentaho.util.object */{
     /**
-     * Deletes a local property of an object and returns its value before deletion.
+     * Deletes a direct property of an object and returns its value before deletion.
      *
      * Constant properties cannot be deleted.
      *
      * If the specified object is a {@link Nully} value,
      * or the specified property does not exist in the object,
-     * locally or not,
+     * own or not,
      * the value of `defaultValue` is returned,
      * or `undefined`, if unspecified.
      *
-     * Otherwise, if the specified property exists in the object
-     * but it is not present locally,
+     * Otherwise, if the specified property exists in the object,
+     * but is not an own property,
      * it is not deleted and the inherited value is returned.
      *
      * Finally, if the specified property exists in the object
-     * and it is present locally,
-     * it is deleted and its previous local value is returned.
+     * and is an own property,
+     * it is deleted and its _previous_ own value is returned.
      *
-     * @param {?Object} object - The object whose property is to be locally deleted.
+     * @param {?Object} object - The object whose own property is to be deleted.
      * @param {string} property - The name of the property.
      * @param {any} [defaultValue] - The default value. Defaults to `undefined`.
-     * @return {any} The value of the property.
+     * @return {any} The value of the property before deletion.
      *
      * @throws {TypeError} Cannot delete a constant property.
      */
@@ -88,9 +88,9 @@ define(function() {
      *
      * If the specified object is a {@link Nully} value, the default value is returned.
      *
-     * @param {?Object} object - Object whose property to get.
-     * @param {string} property - Name of the property to be retrieved.
-     * @param {any} [defaultValue] - Default value of the property. Defaults to `undefined`.
+     * @param {?Object} object - The object whose property is to be retrieved.
+     * @param {string} property - The name of the property.
+     * @param {any} [defaultValue] - The default value. Defaults to `undefined`.
      * @return {boolean} The value of the property if it exists in the object and is an own property,
      * otherwise returns `defaultValue`.
      */
@@ -120,7 +120,7 @@ define(function() {
      * Each invocation of iteratee is called with two arguments: (propertyValue, propertyName).
      * If the iteratee function returns `false`, the iteration loop is broken out.
      *
-     * @param {!object} object - The object containing the properties to be iterated.
+     * @param {!Object} object - The object containing the properties to be iterated.
      * @param {function} iteratee - The function that will be iterated.
      * @param {?object} [context] - The object which will provide the execution context of the iteratee function.
      * If nully, the iteratee will run with the context of the iterated object.
@@ -154,8 +154,8 @@ define(function() {
      * Iterates over the own properties of a source object,
      * checks if their values are defined, and if so, assigns them to a target object.
      *
-     * @param {!Object} to - Target object.
-     * @param {?Object} from - Source object.
+     * @param {!Object} to - The target object.
+     * @param {?Object} from - The source object.
      * @return {!Object} The target object.
      * @method
      * @see pentaho.util.object.assignOwn
@@ -169,7 +169,7 @@ define(function() {
      * If `from` is an instance of a class, or a simple value (e.g. string, number),
      * no clone is created and the original object is returned instead.
      *
-     * @param {Object|Array|any} from - Source object.
+     * @param {Object|Array|any} from - The source object.
      * @return {any} A shallow copy of the object,
      * or the object itself if it is neither a plain object nor an array.
      */
@@ -236,9 +236,9 @@ define(function() {
      *
      * In particular, the _prototype_ and _constructor_ properties of a given object are replaced, if necessary.
      *
-     * @param {!Object} inst - Object to be mutated.
-     * @param {function} Class - Constructor of the class to be applied to the object.
-     * @param {?Array} [args] - Array of arguments to be passed to the constructor of the class.
+     * @param {!Object} inst - The object to be mutated.
+     * @param {function} Class - The constructor of the class to be applied to the object.
+     * @param {?Array} [args] - The array of arguments to be passed to the constructor of the class.
      * @return {object} The mutated object.
      */
     //only used by pentaho.lang.Base
@@ -273,10 +273,10 @@ define(function() {
    * Copies a single property from a source object to a target object, provided it is defined.
    * A property is defined if either its value, getter or setter are defined.
    *
-   * @param {!Object} to - Target object.
-   * @param {!Object} from - Source object.
-   * @param {string} p - Name of the property to be copied.
-   * @return {!Object} Returns the target object.
+   * @param {!Object} to - The target object.
+   * @param {!Object} from - The source object.
+   * @param {string} p - the name of the property.
+   * @return {!Object} The target object.
    * @method
    */
   function copyOneDefined(to, from, p) {
