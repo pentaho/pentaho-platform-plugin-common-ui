@@ -151,12 +151,12 @@ define([
       it("should throw an error when undefined provided.", function() {
         expect(function () {
           arg.slice(undefined);
-        }).toThrowError("Array.prototype.slice called on null or undefined");
+        }).toThrowError(error.argRequired("args").message);
       });
       it("should throw an error when null provided.", function() {
         expect(function () {
           arg.slice(null);
-        }).toThrowError("Array.prototype.slice called on null or undefined");
+        }).toThrowError(error.argRequired("args").message);
       });
     });
   }); // pentaho.util.arg
