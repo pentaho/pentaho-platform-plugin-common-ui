@@ -35,9 +35,9 @@ define(function() {
      * Deletes an enumerable property in an object, even if it is not a direct/own property.
      * Constant properties cannot be deleted.
      *
-     * @param {object} object
+     * @param {object} object - Object containing the property to be deleted.
      * @param {string} property - Property to be deleted
-     * @param {any} defaultValue - Default value of the property.
+     * @param {any} [defaultValue=undefined] - Default value of the property.
      * @return {any} The value of the deleted property.
      * If the property did not exist, `defaultValue` is returned instead.
      * @throws {TypeError} Cannot delete a constant property.
@@ -55,7 +55,7 @@ define(function() {
      * Determines if the property is a direct property of the object.
      * This method does not check down the object's prototype chain.
      *
-     * @param {?object} object - Object to be tested.
+     * @param {?object} object - Object containing the property to be tested.
      * @param {string} property - Name of the property to be tested.
      * @return {boolean} `true` if this is a direct/own property, or `false` otherwise.
      */
@@ -67,9 +67,9 @@ define(function() {
      * Returns the value of a direct property, or the default value.
      * This method does not check down the object's prototype chain.
      *
-     * @param {?object} object - Object to be tested.
+     * @param {?object} object - Object containing the property to be retrieved.
      * @param {string} property - Name of the property to be retrieved.
-     * @param {any} defaultValue - Default value of the property.
+     * @param {any} [defaultValue=undefined] - Default value of the property.
      * @return {boolean} The value of the property if it exists in the object and is an own property,
      * otherwise returns `defaultValue`.
      */
@@ -81,7 +81,7 @@ define(function() {
      * Creates an immutable (constant) property in an object with a given value.
      * The created property can neither be overwritten nor deleted.
      *
-     * @param {!object} object - Object to be tested.
+     * @param {!object} object - Object in which the property will be created.
      * @param {string} property - Name of the property to be created.
      * @param {any} value - Value to be assigned to the property.
      */
@@ -97,10 +97,10 @@ define(function() {
      * Each invocation of iteratee is called with two arguments: (propertyValue, propertyName).
      * If the iteratee function returns `false`, the iteration loop is broken out.
      *
-     * @param {!object} object - Object containing the properties to be iterated
-     * @param {function} iteratee - Function that will be iterated
-     * @param {?object} context - Object which will provide the execution context of the iteratee function.
-     * If nully, the iteratee will run with the context of the iterated object.
+     * @param {!object} object - Object containing the properties to be iterated.
+     * @param {function} iteratee - Function that will be iterated.
+     * @param {?object} [context] - Object which will provide the execution context of the iteratee function.
+     * If [nully]{@link Nully}, the iteratee will run with the context of the iterated object.
      *
      * @return {boolean} `true` when the iteration completed regularly,
      * or `false` if the iteration was forcefully terminated.
@@ -117,8 +117,8 @@ define(function() {
      * Iterates over the own properties of a source object and assigns them to a target object.
      *
      * @param {!object} to - Target object.
-     * @param {!object} from - Source object.
-     * @return {object} The target object.
+     * @param {?object} from - Source object.
+     * @return {!object} The target object.
      */
     assignOwn: function(to, from) {
       for(var p in from)
@@ -132,8 +132,8 @@ define(function() {
      * checks if their values are defined, and if so, assigns them to a target object.
      *
      * @param {!object} to - Target object.
-     * @param {!object} from - Source object.
-     * @return {object} The target object.
+     * @param {?object} from - Source object.
+     * @return {!object} The target object.
      * @method
      * @see pentaho.util.object.assignOwn
      */
@@ -174,10 +174,12 @@ define(function() {
     /**
      * Constructs an instance of a class,
      * from an array of arguments.
+     * If an array of arguments is not passed,
+     * the constructor will be invoked without arguments.
      *
      * @param {function} Ctor - The constructor function of the class to be instantiated.
-     * @param {Array} [args] - The array of arguments, or arguments object, which will be passed to the constructor.
-     * @return {object} The constructed instance.
+     * @param {!Array} [args] - The array of arguments, or arguments object, which will be passed to the constructor.
+     * @return {!object} The constructed instance.
      */
     //only used by pentaho.lang.Base
     make: function(Ctor, args) {
@@ -200,9 +202,9 @@ define(function() {
      *
      * Delegates to the native implementation of `Object.setPrototypeOf`, if supported.
      *
-     * @param {object} obj - The object which is to have its prototype set.
+     * @param {!object} obj - The object which is to have its prototype set.
      * @param {?object} prototype - The object's new prototype.
-     * @return {object} The `object`.
+     * @return {!object} The `object`.
      */
     setPrototypeOf: setProtoOf,
 
@@ -211,9 +213,9 @@ define(function() {
      * In particular, the _prototype_ and _constructor_ properties of a given object are replaced, if necessary.
      *
      * @param {!object} inst - Object to be mutated.
-     * @param {function} Class - Constructor of the class to be applied to the object.
+     * @param {!function} Class - Constructor of the class to be applied to the object.
      * @param {?Array} args - Array of arguments to be passed to the constructor of the class.
-     * @return {object} The mutated object.
+     * @return {!object} The mutated object.
      */
     //only used by pentaho.lang.Base
     applyClass: function(inst, Class, args) {
