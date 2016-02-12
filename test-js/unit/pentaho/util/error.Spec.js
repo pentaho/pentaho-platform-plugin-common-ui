@@ -15,7 +15,7 @@
  */
 define([
   "pentaho/util/error",
-  "./error.Match"
+  "./errorMatch"
 ], function(error, errorMatch) {
 
   "use strict";

@@ -17,6 +17,49 @@ define(function() {
 
   "use strict";
 
+  /**
+   * The `errorMatch` namespace contains factory functions
+   * that create jasmine _asymmetric match_ objects that can be compared to the
+   * real error objects returned by the same named factory functions of
+   * the {@link pentaho.util.error} namespace.
+   *
+   * The match objects can be passed to the jasmine matchers, like `toEqual` and `toThrow`.
+   * Note that the `toThrowError` matcher does not accept these match objects.
+   *
+   * For more information on this jasmine's feature, see
+   * [asymmetric equality testers](http://jasmine.github.io/edge/introduction.html#section-Custom_asymmetric_equality_tester).
+   *
+   * Each factory function accepts the same arguments as the corresponding real version,
+   * except that the free, natural text arguments, like `reason` and `text` are ignored.
+   *
+   * @example
+   *
+   * define([
+   *   "pentaho/some/api",  // <-- the module being tested
+   *   "tests/pentaho/util/errorMatch" // <- include errorMatch module
+   * ], function(someApi, errorMatch) {
+   *
+   *   describe("someApi.doWithNumber", function() {
+   *
+   *     it("should throw an argument invalid type error when given a string", function() {
+   *
+   *       expect(function() {
+   *
+   *         someApi.doWithNumber("NaN");
+   *
+   *       }).toThrow(errorMatch.argInvalidType("count", "number", "string"));
+   *     });
+   *
+   *   });
+   * });
+   *
+   *
+   * @namespace
+   * @name pentaho.util.errorMatch
+   * @amd tests/pentaho/util/errorMatch
+   * @ignore
+   */
+
   // Basic class inheritance routine
   function inherits(Sub, Base, props) {
     if(Base) {

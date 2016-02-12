@@ -50,6 +50,9 @@ define([
      * * not nully or an empty string - `if(value == null || value === "") ...`
      * * ...
      *
+     * The `name` property of the returned error object has the value `"ArgumentRequiredError"`.
+     * Additionally, the `argument` property has the name of the argument.
+     *
      * @example
      *
      * define(["pentaho/util/error"], function(error) {
@@ -103,6 +106,9 @@ define([
      * You should use this error if none of the other more specific
      * invalid argument errors applies.
      *
+     * The `name` property of the returned error object has the value `"ArgumentInvalidError"`.
+     * Additionally, the `argument` property has the name of the argument.
+     *
      * @example
      *
      * define(["pentaho/util/error"], function(error) {
@@ -150,6 +156,11 @@ define([
      *   by accessing the `constructor` property,
      *   like `"Array"`, `"Object"`, or `"HTMLElement"`
      * * the id of an AMD module that returns a constructor or factory, like `"pentaho/type/complex"`.
+     *
+     * The `name` property of the returned error object has the value `"ArgumentInvalidTypeError"`.
+     * Additionally, the `argument` property has the name of the argument.
+     * Property `expectedTypes` contains an array of the expected type names, and,
+     * property `actualType`, the name of the actual type, if specified, or `undefined`.
      *
      * @example
      *
@@ -220,6 +231,9 @@ define([
      * It is up to the caller to actually `throw` the returned `RangeError` object.
      * This makes flow control be clearly visible at the call site.
      *
+     * The `name` property of the returned error object has the value `"ArgumentOutOfRangeError"`.
+     * Additionally, the `argument` property has the name of the argument.
+     *
      * @example
      *
      * define(["pentaho/util/error"], function(error) {
@@ -258,6 +272,8 @@ define([
      *   like it is _locked_, _busy_ or _disposed_.
      * * it cannot be performed on a certain type of object
      * * ...
+     *
+     * The `name` property of the returned error object has the value `"OperationInvalidError"`.
      *
      * @example
      *
@@ -305,6 +321,8 @@ define([
      *
      * It is up to the caller to actually `throw` the returned `Error` object.
      * This makes flow control be clearly visible at the call site.
+     *
+     * The `name` property of the returned error object has the value `"NotImplementedError"`.
      *
      * @param {?string} [text] Complementary text.
      * @return {!Error} The created `Error` object.
