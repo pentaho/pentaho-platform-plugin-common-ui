@@ -38,7 +38,7 @@ define(function() {
      * @param {object} object
      * @param {string} property - Property to be deleted
      * @param {any} defaultValue - Default value of the property.
-     * @return {any} Returns the value of the deleted property.
+     * @return {any} The value of the deleted property.
      * If the property did not exist, `defaultValue` is returned instead.
      * @throws {TypeError} Cannot delete a constant property.
      */
@@ -57,7 +57,7 @@ define(function() {
      *
      * @param {?object} object - Object to be tested.
      * @param {string} property - Name of the property to be tested.
-     * @return {boolean} Returns `true` if this is a direct/own property, or `false` otherwise.
+     * @return {boolean} `true` if this is a direct/own property, or `false` otherwise.
      */
     hasOwn: function(o, p) {
       return !!o && O_hasOwn.call(o, p);
@@ -70,7 +70,7 @@ define(function() {
      * @param {?object} object - Object to be tested.
      * @param {string} property - Name of the property to be retrieved.
      * @param {any} defaultValue - Default value of the property.
-     * @return {boolean} Returns the value of the property if it exists in the object and is an own property,
+     * @return {boolean} The value of the property if it exists in the object and is an own property,
      * otherwise returns `defaultValue`.
      */
     getOwn: function(o, p, dv) {
@@ -102,7 +102,7 @@ define(function() {
      * @param {?object} context - Object which will provide the execution context of the iteratee function.
      * If nully, the iteratee will run with the context of the iterated object.
      *
-     * @return {boolean} Returns `true` when the iteration completed regularly,
+     * @return {boolean} `true` when the iteration completed regularly,
      * or `false` if the iteration was forcefully terminated.
      */
     eachOwn: function(o, fun, ctx) {
@@ -118,7 +118,7 @@ define(function() {
      *
      * @param {!object} to - Target object.
      * @param {!object} from - Source object.
-     * @return {object} Returns the target object.
+     * @return {object} The target object.
      */
     assignOwn: function(to, from) {
       for(var p in from)
@@ -133,7 +133,7 @@ define(function() {
      *
      * @param {!object} to - Target object.
      * @param {!object} from - Source object.
-     * @return {object} Returns the target object.
+     * @return {object} The target object.
      * @method
      * @see pentaho.util.object.assignOwn
      */
@@ -146,7 +146,7 @@ define(function() {
      * no clone is created and the original object is returned instead.
      *
      * @param {object|Array|any} from - Source object.
-     * @return {any} Returns shallow copy of object,
+     * @return {any} A shallow copy of the object,
      * or the object itself if it is neither a plain object nor an array.
      */
     cloneShallow: function(v) {
@@ -164,7 +164,7 @@ define(function() {
      *
      * @param {!object} object - Object that contains the property.
      * @param {!string} property - Name of property.
-     * @return {object|null} Returns the
+     * @return {object|null} The
      * [property descriptor]{@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty}.
      * @method
      */
@@ -177,7 +177,7 @@ define(function() {
      *
      * @param {function} Ctor - The constructor function of the class to be instantiated.
      * @param {Array} [args] - The array of arguments, or arguments object, which will be passed to the constructor.
-     * @return {object} Returns the constructed instance.
+     * @return {object} The constructed instance.
      */
     //only used by pentaho.lang.Base
     make: function(Ctor, args) {
@@ -202,7 +202,7 @@ define(function() {
      *
      * @param {object} obj - The object which is to have its prototype set.
      * @param {?object} prototype - The object's new prototype.
-     * @return {object} Returns `object`.
+     * @return {object} The `object`.
      */
     setPrototypeOf: setProtoOf,
 
@@ -213,7 +213,7 @@ define(function() {
      * @param {!object} inst - Object to be mutated.
      * @param {function} Class - Constructor of the class to be applied to the object.
      * @param {?Array} args - Array of arguments to be passed to the constructor of the class.
-     * @return {object} Returns the mutated object.
+     * @return {object} The mutated object.
      */
     //only used by pentaho.lang.Base
     applyClass: function(inst, Class, args) {
