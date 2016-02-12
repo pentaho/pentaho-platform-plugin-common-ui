@@ -746,7 +746,7 @@ define([
    * @returns {boolean} `true` if the method calls `this.base`.
    */
   function methodCallsBase(method) {
-    return /\bbase\b/.test(method);
+    return /\bthis(\s*)\.(\s*)base\b/.test(method);
   }
 
   /**
