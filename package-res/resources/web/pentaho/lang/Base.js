@@ -53,7 +53,8 @@ define([
       _hiddenClass = ["toString"],
       F_toString   = Function.prototype.toString,
       _extendProto = {
-        toSource: null
+        toSource: null,
+        base: true
         // Others from Object.prototype:
         // toString
         // valueOf

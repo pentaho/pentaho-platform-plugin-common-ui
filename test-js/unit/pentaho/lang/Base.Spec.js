@@ -108,6 +108,12 @@ define([
 
               expect(o.a).toBe(5);
             });
+
+            it("shouldn't be able to define this.base", function() {
+              var o = new Base({base: "hello"});
+
+              expect(o.base).not.toBe("hello");
+            });
           });
 
           describe("after construction time", function() {
@@ -155,6 +161,13 @@ define([
               o.e = "hello world";
               expect(o.e).toBe("hello world");
             });
+
+            it("shouldn't be able to define this.base", function() {
+              var o = new Base();
+              o.extend({base: "hello"});
+
+              expect(o.base).not.toBe("hello");
+            });
           });
         });
       });
@@ -170,7 +183,7 @@ define([
         it("should be named, if name provided", function() {
           var Top = Base.extend("MyClassName");
 
-          expect(Top.name).toBe("MyClassName");
+          expect(Top.name || Top.displayName).toBe("MyClassName");
         });
 
         it("should not inherit name", function() {
@@ -178,6 +191,13 @@ define([
           var Middle = Top.extend();
 
           expect(Middle.name).not.toBe("MyClassName");
+          expect(Middle.displayName).not.toBe("MyClassName");
+        });
+
+        it("shouldn't be able to define this.base", function() {
+          var Top = Base.extend({base: "hello"});
+
+          expect(Top.prototype.base).not.toBe("hello");
         });
 
         describe("should be able to define instance level", function() {
