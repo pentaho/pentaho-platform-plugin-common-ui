@@ -81,26 +81,36 @@ define([
     /**
      * The `Base.Object` root class is the base class for regular `Object` classes.
      *
-     * @alias pentaho.lang.Base.Object
+     * It is an alias of `Base`.
+     *
+     * @see pentaho.lang.Base
+     *
+     * @name Object
+     * @memberOf pentaho.lang.Base
      *
      * @class
-     * @extends pentaho.lang.Base
-     *
-     * @type {Class.<pentaho.lang.Base.Object>}
-     *
+     * @extends Object
      */
     Base.Object = Base;
 
     /**
      * The `Base.Array` root class is the base class for `Array` classes.
      *
-     * @alias pentaho.lang.Base.Array
+     * @name Array
+     * @memberOf pentaho.lang.Base
      *
      * @class
-     * @extends pentaho.lang.Base
+     * @extends Array
      *
-     * @type {Class.<pentaho.lang.Base.Array>}
      *
+     * @borrows pentaho.lang.Base.ancestor as ancestor
+     * @borrows pentaho.lang.Base.extend as extend
+     * @borrows pentaho.lang.Base._extend as _extend
+     * @borrows pentaho.lang.Base.mix as mix
+     * @borrows pentaho.lang.Base.implement as implement
+     * @borrows pentaho.lang.Base.implementStatic as implementStatic
+     * @borrows pentaho.lang.Base#base as #base
+     * @borrows pentaho.lang.Base#extend as #extend
      */
     Base.Array = base_root(Array, [], "Base.Array");
     Base.Array.to = class_array_to;
@@ -116,9 +126,8 @@ define([
    * @param {Class} NativeBase The native base constructor that this _Base_ root is rooted on.
    * @param {object} bootProto The prototype of the _boot_ constructor.
    * @param {string} baseRootName The name of the _root_ constructor.
-   * @return {Class} The new `Base` root class.
    *
-   * @returns {Function}
+   * @returns {Class.<pentaho.lang.Base>} The new `Base` root class.
    */
   function base_root(NativeBase, bootProto, baseRootName) {
     // Bootstrapping "Base" class.
@@ -145,40 +154,47 @@ define([
     BaseBoot.prototype.extend = inst_extend;
     // ---
 
-    var BaseRoot = BaseBoot.extend( /** @lends pentaho.lang.Base# */{
+    var BaseRoot = BaseBoot.extend({
       /**
        * Creates a new object of `Base` class.
        *
        * If provided extends the created instance with the spec in `source` parameter.
        *
-       * @param {Object} [source] A instance interface spec. Optional parameter.
+       * @param {Object} [source] A instance spec. Optional parameter.
        *
-       * @class
-       *
-       * @classDesc `Base` Class for JavaScript Inheritance.
+       * @classdesc `Base` Class for JavaScript Inheritance.
        * Based on Base.js by Dean Edwards, and later edited by Kenneth Powers.
        *
+       * @amd pentaho/lang/Base
+       *
+       * @class
        * @name Base
        * @memberOf pentaho.lang
        */
       constructor: function() {
         this.extend(arguments[0]);
       },
-    }, /** @lends pentaho.lang.Base */ {
+    }, {
       /**
        * This class ancestor.
        *
-       * @alias pentaho.lang.Base.ancestor
+       * @readonly
+       * @name ancestor
+       * @memberOf pentaho.lang.Base
        */
       ancestor: NativeBase // Replaces BaseBoot by NativeBase
     });
+
 
     /**
      * If a method has been overridden then the base method provides access to the overridden method.
      * Can also be called from within a constructor function.
      *
-     * @alias pentaho.lang.Base#base
-     *
+     * @var
+     * @readonly
+     * @type {Function}
+     * @name base
+     * @memberOf pentaho.lang.Base#
      */
     Object.defineProperty(BaseRoot.prototype, "base", {
       configurable: true,
@@ -207,11 +223,13 @@ define([
    *
    * Inheritance is delegated to the `_extend` method, which can be overridden.
    *
-   * @alias pentaho.lang.Base.extend
+   * @method
+   * @name extend
+   * @memberOf pentaho.lang.Base
    *
    * @param {string} [name] The name of the created class. Optional parameter.
-   * @param {?Object} instSpec The instance interface spec.
-   * @param {?Object} [classSpec] The static (class) interface spec. Optional parameter.
+   * @param {?Object} instSpec The instance spec.
+   * @param {?Object} [classSpec] The static spec. Optional parameter.
    * @param {?Object} [keyArgs] Keyword arguments. Optional parameter.
    *
    * @returns {Class.<pentaho.lang.Base>} The new subclass.
@@ -230,17 +248,19 @@ define([
   /**
    * Default implementation of class extension.
    *
-   * @alias pentaho.lang.Base._extend
+   * @private
+   * @method
+   * @name _extend
+   * @memberOf pentaho.lang.Base
    *
    * @param {?string} name The name of the created class.
-   * @param {?Object} instSpec The instance interface spec.
-   * @param {?Object} classSpec The static (class) interface spec.
+   * @param {?Object} instSpec The instance spec.
+   * @param {?Object} classSpec The static spec.
    * @param {?Object} keyArgs Keyword arguments. Passed to `_subClassed` and `init` if present.
    *
    * @returns {Class.<pentaho.lang.Base>} The new subclass.
    */
   function class_extend_core(name, instSpec, classSpec, keyArgs) {
-
     var SubClass = class_extend_subclass.call(this, name, instSpec);
 
     if(fun.is(this._subClassed))
@@ -258,7 +278,7 @@ define([
    * @private
    *
    * @param {?string} name The name of the created class.
-   * @param {?Object} instSpec The instance interface spec.
+   * @param {?Object} instSpec The instance spec.
    *
    * @returns {Class.<pentaho.lang.Base>} The new subclass.
    */
@@ -299,7 +319,7 @@ define([
    * @private
    *
    * @param {Object} proto The subclass prototype.
-   * @param {?Object} instSpec The instance interface spec.
+   * @param {?Object} instSpec The instance spec.
    *
    * @returns {Function} The subclass constructor.
    */
@@ -327,7 +347,7 @@ define([
    *
    * @private
    *
-   * @param {?Object} instSpec The instance interface spec.
+   * @param {?Object} instSpec The instance spec.
    *
    * @returns {?Function} The constructor function provided in `instSpec`.
    */
@@ -360,7 +380,9 @@ define([
    * The default implementation tests if the first argument is an instance of that type and returns it, if it is.
    * Otherwise, it calls `Class` with the `new` operator and all of the given arguments and returns the result.
    *
-   * @alias pentaho.lang.Base.to
+   * @method
+   * @name to
+   * @memberOf pentaho.lang.Base
    *
    * @param {*} v The value to be casted.
    *
@@ -405,15 +427,17 @@ define([
   }
 
   /**
-   * Adds interfaces to a class.
-   * The interfaces can be defined by another classes or object literals.
+   * Adds additional specs to a class.
+   * The specs can be defined by other classes or object literals.
    *
    * The method extends the class but does not create a new class.
    *
-   * @alias pentaho.lang.Base.mix
+   * @method
+   * @name mix
+   * @memberOf pentaho.lang.Base
    *
-   * @param {?Function|Object} instSpec The Class to mixin or an instance interface spec.
-   * @param {?Object} [classSpec] The static (class) interface spec. Optional parameter.
+   * @param {?Function|?Object} instSpec The Class to mixin or an instance spec.
+   * @param {?Object} [classSpec] The static spec. Optional parameter.
    *
    * @returns {Class.<pentaho.lang.Base>}
    */
@@ -433,16 +457,18 @@ define([
   }
 
   /**
-   * Adds another instance interfaces to a class.
-   * The new interfaces can be defined by another classes or object literals.
+   * Adds additional instance specs to a class.
+   * The specs can be defined by other classes or object literals.
    *
    * The method extends the class prototype but does not create a new class.
    *
-   * Can applied to non-`Base` classes (e.g. using `Base.implement.call(Alien, instanceMix)`).
+   * Can be applied to non-`Base` classes (e.g. using `Base.implement.call(Alien, instanceMix)`).
    *
-   * @alias pentaho.lang.Base.implement
+   * @method
+   * @name implement
+   * @memberOf pentaho.lang.Base
    *
-   * @param {...Function|Object} instSpec One or more classes to mixin or instance interface specs.
+   * @param {...Function|...Object} instSpec One or more classes to mixin or instance specs.
    *
    * @returns {Class.<pentaho.lang.Base>|Function}
    */
@@ -492,16 +518,18 @@ define([
   }
 
   /**
-   * Adds another static (class) interfaces to a class.
-   * The new interfaces can be defined by another classes or object literals.
+   * Adds additional static specs to a class.
+   * The specs can be defined by other classes or object literals.
    *
    * The method extends the class prototype but does not create a new class.
    *
-   * Can applied to non-`Base` classes (e.g. using `Base.implementStatic.call(Alien, classMix)`).
+   * Can be applied to non-`Base` classes (e.g. using `Base.implementStatic.call(Alien, classMix)`).
    *
-   * @alias pentaho.lang.Base.implementStatic
+   * @method
+   * @name implementStatic
+   * @memberOf pentaho.lang.Base
    *
-   * @param {...Function|Object} classSpec One or more classes to mixin or static (class) interface specs.
+   * @param {...Function|...Object} classSpec One or more classes to mixin or static specs.
    *
    * @returns {Class.<pentaho.lang.Base>|Function}
    */
@@ -531,11 +559,13 @@ define([
    *
    * The method extends the object but doesn't change its class.
    *
-   * Can applied to non-`Base` instances (e.g. using `Base.prototype.extend.call(alien, {a: "hello"})`)
+   * Can be applied to non-`Base` instances (e.g. using `Base.prototype.extend.call(alien, {a: "hello"})`)
    *
-   * @alias pentaho.lang.Base#extend
+   * @method
+   * @name extend
+   * @memberOf pentaho.lang.Base#
    *
-   * @param {String|Object} source The name of the member to extent or the instance interface spec.
+   * @param {String|Object} source The name of the member to extent or the instance spec.
    * @param {?*} [value] The value to assign to the extended member. Optional parameter.
    *  If provided `source` must be the name of the member to extend.
    *
@@ -668,7 +698,7 @@ define([
    * @param {?Function} baseValue The method to override.
    * @param {?Object} rootProto The root constructor.
    *
-   * @returns {Function|null} The override-ready function,
+   * @returns {?Function} The override-ready function,
    * or null if both `value` and `baseValue` are nully.
    */
   function methodOverride(value, baseValue, rootProto) {

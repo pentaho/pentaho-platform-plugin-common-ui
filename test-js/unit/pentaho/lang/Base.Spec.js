@@ -17,15 +17,10 @@ define([
     "pentaho/lang/Base",
     "pentaho/util/object",
   ],
-  /**
-   *
-   * @param {pentaho.lang.Base} Base
-   * @param {pentaho.util.object} O
-   */
-  function(Base, O) {
+  function(/** @type {Class.<pentaho.lang.Base>} */ Base, O) {
     "use strict";
 
-    /* global jasmine:false, describe:false, it:false, expect:false, beforeEach:false, toThrowError:false, spyOn: false */
+    /* global jasmine:false, describe:false, it:false, expect:false, beforeEach:false, spyOn: false */
 
     describe("Base.Object", function() {
       describe("instances", function() {
