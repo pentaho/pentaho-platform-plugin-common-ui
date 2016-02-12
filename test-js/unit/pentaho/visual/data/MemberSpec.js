@@ -16,8 +16,9 @@
 define([
   "pentaho/data/Model",
   "pentaho/data/Attribute",
-  "pentaho/data/Member"
-], function(Model, Attribute, Member) {
+  "pentaho/data/Member",
+  "tests/pentaho/util/errorMatch"
+], function(Model, Attribute, Member, errorMatch) {
 
   function expectMember(memberSpec) {
     var model = new Model([{name: "test", type: "string", members: [memberSpec]}]);
@@ -60,11 +61,11 @@ define([
       it("should throw if the specified `v` is null or undefined", function() {
         expect(function() {
           expectMember({v: undefined});
-        }).toThrowError("Argument invalid: 'value'. Cannot be nully.");
+        }).toThrow(errorMatch.argInvalid("value"));
 
         expect(function() {
           expectMember({v: null});
-        }).toThrowError("Argument invalid: 'value'. Cannot be nully.");
+        }).toThrow(errorMatch.argInvalid("value"));
       });
     });
 

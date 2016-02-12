@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 define([
-  "pentaho/data/Table",
-  "pentaho/data/Attribute"
-], function(DataTable, Attribute, Column) {
+  "pentaho/data/Table"
+], function(DataTable) {
 
   function getDatasetCDA1() {
     return {
