@@ -488,17 +488,6 @@ define([
         expect(deadParrot.spam).toBeUndefined();
       });
 
-      it("should throw an error if the desired prototype is neither an extensible object nor `null`", function() {
-        [
-          1, "foo", undefined
-        ].forEach(function(protoFoo) {
-          var parrot = new Spam();
-          expect(function() {
-            O.setPrototypeOf(parrot, protoFoo);
-          }).toThrowError(TypeError);
-        });
-      });
-
       it("should throw an error if the object is not extensible", function() {
         [
           Object.seal(new Spam()),
