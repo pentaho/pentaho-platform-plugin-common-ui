@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2016 Pentaho Corporation.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,23 +20,71 @@ define([
 
   var A_slice = Array.prototype.slice;
 
+  /**
+   * @name pentaho.util.arg
+   * @class
+   * @amd pentaho/util/arg
+   *
+   * @classDesc Util methods for keyword args.
+   *
+   * @description Performs actions on keyword args.
+   */
   return {
+    /**
+     * Gets the value of an optional property of an object. The property is considered specified when its value is not a {@link Nully} value.
+     * When the property is not specified, the value of `defaultValue` is returned. The latter defaults to `undefined`.
+     *
+     * @param {?object} obj The object from which to get a property.
+     * @param {string} propName The name of the property.
+     * @param {any} [defaultValue] The default value.
+     *
+     * @return {any} The value of the property. If the property does not exist, returns `defaultValue`.
+     */
     optional: function(o, p, dv) {
       var v;
       return o && (v = o[p]) != null ? v : dv;
     },
 
+    /**
+     * Gets the value of an defined property of an object. The property is considered specified when its value is not `undefined`.
+     * When the property is not specified, the value of `defaultValue` is returned. The latter defaults to `undefined`.
+     *
+     * @param {?object} obj The object from which to get a property.
+     * @param {string} propName The name of the property.
+     * @param {any} [defaultValue] The default value.
+     *
+     * @return {any} The value of the property. If the property does not exist, returns `defaultValue`.
+     */
     defined: function(o, p, dv) {
       var v;
       return o && (v = o[p]) !== undefined ? v : dv;
     },
 
+    /**
+     * Gets the value of an required property of an object. The property is considered specified when its value is not a {@link Nully} value.
+     *
+     * @param {?object} obj The object from which to get a property.
+     * @param {string} propName The name of the property.
+     * @param {?string} pscope The name of the argument where the `obj` is received in the caller.
+     *
+     * @return {any} The found required property value.
+     * @throws {Error} Argument required. The `obj` must contain the `propName`.
+     */
     required: function(o, p, pscope) {
       var v;
       if(o && (v = o[p]) != null) return v;
       throw error.argRequired((pscope ? (pscope + ".") : "") + p);
     },
 
+    /**
+     * Slices the provided array.
+     *
+     * @param {Object} args Array of anything.
+     * @param {number} [start=0] The index of the `args` array to begin the slice.
+     * @param {number} [end] The index of the `args` array to end the slice at.
+     *
+     * @return {Object} Array containing the elements from the `args` array between the `start` and the `end`.
+     */
     slice: function(args, start, end) {
       switch(arguments.length) {
         case 0: throw error.argRequired("args");
