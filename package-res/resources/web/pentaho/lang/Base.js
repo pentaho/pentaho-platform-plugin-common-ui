@@ -53,7 +53,8 @@ define([
       _hiddenClass = ["toString"],
       F_toString   = Function.prototype.toString,
       _extendProto = {
-        toSource: null
+        toSource: null,
+        base: true
         // Others from Object.prototype:
         // toString
         // valueOf
@@ -704,10 +705,18 @@ define([
   function methodOverride(value, baseValue, rootProto) {
     if(!value) return baseValue;
 
-    if(!baseValue) baseValue = inst_base;
-
     // Get the unwrapped value.
     var method = value.valueOf();
+
+    if(!baseValue) {
+      // if `value` was wrapped, return it
+      if(method != value) {
+        return value;
+      }
+
+      // if not, provide a default empty `baseValue`
+      baseValue = inst_base;
+    }
 
     // valueOf() test is to avoid circular references
     if(!method ||
@@ -737,7 +746,7 @@ define([
    * @returns {boolean} `true` if the method calls `this.base`.
    */
   function methodCallsBase(method) {
-    return /\bbase\b/.test(method);
+    return /\bthis(\s*)\.(\s*)base\b/.test(method);
   }
 
   /**
