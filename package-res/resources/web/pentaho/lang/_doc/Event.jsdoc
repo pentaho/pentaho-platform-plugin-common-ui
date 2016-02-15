@@ -39,11 +39,11 @@
  * the event is said to be _cancelable_.
  * That characteristic is exposed by the [isCancelable]{@link pentaho.lang.Event#isCancelable} property.
  *
- * When an event is canceled, not only its corresponding action is canceled,
- * but the listeners of unprocessed registrations are not notified.
+ * When an event is canceled, its corresponding action is also canceled and
+ * the listeners of unprocessed registrations are not notified.
  *
  * To cancel an event, call its [cancel]{@link pentaho.lang.Event#cancel} method.
- * To know if an event has been canceled, read the [isCanceled]{@link pentaho.lang.Event#isCanceled} property.
+ * To find out if an event has been canceled, read the [isCanceled]{@link pentaho.lang.Event#isCanceled} property.
  *
  * ##### Persistable Events
  *
@@ -74,7 +74,7 @@ var EventProto = /** @lends pentaho.lang.Event# */{
    * Gets the object where the event was initially emitted.
    *
    * @memberOf pentaho.lang.Event#
-   * @type {!object}
+   * @type {!Object}
    * @readonly
    */
   get source() {},
