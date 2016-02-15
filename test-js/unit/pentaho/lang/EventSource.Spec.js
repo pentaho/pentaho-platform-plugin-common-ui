@@ -200,7 +200,7 @@ define([
           var event = new Event("foo");
 
           var state = "original";
-          eventSource.on("foo", function() {You'll '
+          eventSource.on("foo", function() {
             state = state + " first";
           }, {
             priority: p
