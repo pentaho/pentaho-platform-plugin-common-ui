@@ -14,10 +14,14 @@
  * limitations under the License.
  */
 
-define(["pentaho/lang/Base"], function(Base) {
+define([
+  "./Base",
+  "../util/error"
+], function(Base, error) {
+
   "use strict";
 
-  return Base.extend("EventSource", /** @lends pentaho.lang.Event# */{
+  return Base.extend("pentaho.lang.Event", /** @lends pentaho.lang.Event# */{
     /**
      * @classDesc The `Event` class is the base class of event objects emitted by an
      * [EventSource]{@link pentaho.lang.EventSource}.
@@ -35,33 +39,42 @@ define(["pentaho/lang/Base"], function(Base) {
      * However, an `Event` subclass can be used by several event types.
      * The `Event` subclass of an event type mainly depends on the data that it is associated with.
      *
-     * ##### Actions, "Will Do" Events and Cancellation
+     * ##### Event Cancellation
      *
-     * Certain types of events are used to signal that an _action_ is about to execute - "will do" events.
+     * Certain types of events are used to signal that an _action_ is about to execute
+     * (or that a phase of an already executing action is about to start).
      * When the execution of the action can be canceled by the event listeners,
      * the event is said to be _cancelable_.
-     * That characteristic is exposed through the [isCancelable]{@link pentaho.lang.Event#isCancelable} property.
+     * That characteristic is exposed by the [isCancelable]{@link pentaho.lang.Event#isCancelable} property.
      *
-     * When an event is canceled, not only its corresponding action is canceled,
-     * but any following listeners are not notified.
+     * When an event is canceled, its corresponding action is also canceled and
+     * the listeners of unprocessed registrations are not notified.
      *
      * To cancel an event, call its [cancel]{@link pentaho.lang.Event#cancel} method.
-     * To know if an event has been canceled, read the [isCanceled]{@link pentaho.lang.Event#isCanceled} property.
+     * To find out if an event has been canceled, read the [isCanceled]{@link pentaho.lang.Event#isCanceled} property.
      *
-     * ##### Persistable events
+     * ##### Persistable Events
      *
-     * Certain types of events are emitted so frequently that it is highly beneficial to reuse event objects.
-     * To support these scenarios,
-     * the `Event` class requires that,
-     * to safely use an event object beyond its emission,
+     * Certain types of events are emitted so frequently that it
+     * makes it highly beneficial to reuse event objects.
+     * To safely use an event object beyond its emission,
      * a cloned event object must be obtained,
      * through [clone]{@link pentaho.lang.Event#clone}.
      *
      * @name Event
      * @memberOf pentaho.lang
      * @class
+     *
+     * @description Creates an event of a given type, source and cancelable.
+     * @constructor
+     * @param {!nonEmptyString} type - The type of the event.
+     * @param {!Object} source - The object where the event will be initially emitted.
+     * @param {?boolean} [cancelable=false] - Indicates if the event can be canceled.
      */
     constructor: function(type, source, cancelable) {
+      if(!type) throw error.argRequired("type");
+      if(!source) throw error.argRequired("source");
+
       this._type = type;
       this._source = source;
       this._cancelable = !!cancelable;
@@ -86,7 +99,7 @@ define(["pentaho/lang/Base"], function(Base) {
     /**
      * Gets the object where the event was initially emitted.
      *
-     * @type {!object}
+     * @type {!Object}
      * @readonly
      */
     get source() {

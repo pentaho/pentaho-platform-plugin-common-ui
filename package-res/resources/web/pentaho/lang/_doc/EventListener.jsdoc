@@ -17,6 +17,9 @@
 /**
  * An event listener function.
  *
+ * The event listener function is called with a `this` context
+ * being the object where the listener registered for the event.
+ *
  * This type can be used generically by specifying the type of event in angle brackets:
  * `pentaho.lang.EventListener<MyEvent>`.
  *

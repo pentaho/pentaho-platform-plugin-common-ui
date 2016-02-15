@@ -14,14 +14,35 @@
  * limitations under the License.
  */
 
-define(["pentaho/lang/Base", "pentaho/lang/Event"], function(Base, Event) {
+define([
+  "./Base",
+  "./Event",
+  "../util/error"
+], function(Base, Event, error) {
+
   "use strict";
 
-  return Base.extend("EventSource", /** @lends pentaho.lang.EventSource# */{
+  // EventRegistrationHandle class handles creating the alias, remove, from dispose.
+  /**
+   * @class
+   * @implements pentaho.lang.IEventRegistrationHandle
+   * @private
+   */
+  function EventRegistrationHandle(dispose) {
+    this.dispose = dispose;
+  }
+
+  EventRegistrationHandle.prototype.remove = function() {
+    return this.dispose();
+  };
+
+  // ---
+
+  return Base.extend("pentaho.lang.EventSource", /** @lends pentaho.lang.EventSource# */{
     _registry: null,
 
     /**
-     * @classDesc The `EventSource` class is a mixin to be
+     * @classDesc The `EventSource` class is a **mixin** to be
      * used by classes that are the source of events - that emit events.
      *
      * The exposed interface is compatible with the
@@ -33,71 +54,66 @@ define(["pentaho/lang/Base", "pentaho/lang/Event"], function(Base, Event) {
      */
 
     /**
-     * Registers a listener of events of a given type emitted by this object.
+     * Registers a listener function for events of a given type or types.
      *
-     * Optionally, a _listening priority_ may be specified to adjust the order
-     * by which listeners are notified of an emitted event.
+     * Optionally, a _listening priority_ may be specified to adjust
+     * the order by which a listener is notified of an emitted event,
+     * relative to other listeners.
      *
-     * If a listener is registered more than once to the same event,
-     * it is only actually registered once.
-     * However, it is the last specified priority that determines its listening priority.
+     * Note that if a listener function is registered more than once to the same event type,
+     * a **new registration** is created each time and the function will be called
+     * once per registration.
      *
-     * It is safe to add listeners during an event emission.
-     * However, new listeners are only notified in subsequent emissions.
+     * It is safe to register for an event type while it is being emitted.
+     * However, new registrations are only taken into account in subsequent emissions.
+     *
+     * When `type` represents multiple event types,
+     * the returned event registration handle is a
+     * composite registration for all event types.
      *
      * @see pentaho.lang.EventSource#off
      * @see pentaho.lang.Event
      *
-     * @param {string} type The type(s) of the event. Can match multiple event
-     * types with a single call by comma-delimiting the event names.
+     * @param {string|string[]} type The type or types of events.
+     *   When a string, it can be a comma-separated list of event types.
+     *
      * @param {!pentaho.lang.EventListener} listener The listener function.
      * @param {?object} [keyArgs] Keyword arguments.
      * @param {?number} [keyArgs.priority=0] The listening priority.
      * Higher priority event listeners listen to an event before any lower priority event listeners.
+     * The priority can be set to `-Infinity` or `Infinity`.
+     * In case two listeners are assigned the same priority,
+     * the insertion order determines which runs first.
      *
-     * @return {!pentaho.lang.IEventHandle} An event handle that can be used to
-     *   efficiently remove the event listener.
+     * @return {!pentaho.lang.IEventRegistrationHandle} An event registration handle that can be used
+     *   for later removal.
      */
     on: function(type, listener, keyArgs) {
+      if(!type) throw error.argRequired("type");
+      if(!listener) throw error.argRequired("listener");
+
       var handles = [];
 
-      var eventTypes;
-      if (type instanceof Array) {
-        // allow an array of event types
-        eventTypes = type;
-      } else if (type.indexOf(",") > -1) {
-        // allow comma delimited event types
-        eventTypes = type.split(/\s*,\s*/);
-      } else {
-        eventTypes = [type];
-      }
-
+      var eventTypes = parseEventTypes(type);
       if (eventTypes) {
+        var priority = !!keyArgs && !!keyArgs.priority ? keyArgs.priority : 0;
+
         for (var events_i = 0, events_len = eventTypes.length; events_i !== events_len; ++events_i) {
-          var eventType = eventTypes[events_i].trim();
-
-          var queue = this._getQueueOf(eventType);
-
-          var priority = !!keyArgs && !!keyArgs.priority ? keyArgs.priority : 0;
+          var eventType = eventTypes[events_i];
+          
+          var queue = this._getQueueOf(eventType, /*create:*/true);
 
           for (var i = queue.length - 1; i !== -2; --i) {
             if (i === -1 || priority >= queue[i].priority) {
               var listenerInfo = {
                 order: i + 1,
                 priority: priority,
-                listener: listener,
-                args: keyArgs
+                listener: listener
               };
 
               queue[i + 1] = listenerInfo;
 
-              handles.push(/** @implements pentaho.lang.IEventHandle */ {
-                _source: this,
-                _type: eventType,
-                _info: listenerInfo,
-
-                remove: removeSingleHandle
-              });
+              handles.push(new EventRegistrationHandle(removeSingleHandle.bind(this, eventType, listenerInfo)));
 
               break;
             }
@@ -113,57 +129,44 @@ define(["pentaho/lang/Base", "pentaho/lang/Event"], function(Base, Event) {
       }
 
       if (handles.length > 1) {
-        return /** @implements pentaho.lang.IEventHandle */ {
-          _source: this,
-          _type: type,
-          _handles: handles,
-
-          remove: removeMultipleHandles
-        };
+        return new EventRegistrationHandle(removeMultipleHandles.bind(this, handles));
       }
 
       return null;
-
-      function removeSingleHandle() {
-        var fromIndex = this._info.order;
-
-        var r = this._source._removeListener(this._type, this._info.listener, fromIndex);
-        if (!r && fromIndex > 0) {
-          r = this._source._removeListener(this._type, this._info.listener, 0);
-        }
-      }
-
-      function removeMultipleHandles() {
-        for (var i = 0; i !== this._handles.length; ++i) {
-          this._handles[i].remove();
-        }
-      }
     },
 
-    _getQueueOf: function(type) {
-      if (!this._registry) {
-        this._registry = {};
+    _getQueueOf: function(type, create) {
+      var registry = this._registry;
+      if(!registry) {
+        if(!create) return null;
+
+        // 1st event registration being added
+        this._registry = registry = {};
+        return (registry[type] = []);
       }
 
-      var queue = this._registry[type];
-      if (!queue) {
-        queue = [];
-        this._registry[type] = queue;
+      var queue = registry[type];
+      if(!queue) {
+        if(!create) return null;
+
+        // 1st event of this type being added
+        registry[type] = queue = [];
       }
 
       return queue;
     },
 
     _indexOfListener: function(type, listener, fromIndex) {
-      var queue = this._getQueueOf(type);
+      var queue = this._getQueueOf(type, /*create:*/false);
+      if(queue) {
+        if (fromIndex == null) {
+          fromIndex = 0;
+        }
 
-      if (fromIndex == null) {
-        fromIndex = 0;
-      }
-
-      for (var i = fromIndex, len = queue.length; i < len; ++i) {
-        if (queue[i].listener === listener) {
-          return i;
+        for (var i = fromIndex, len = queue.length; i < len; ++i) {
+          if (queue[i].listener === listener) {
+            return i;
+          }
         }
       }
 
@@ -172,7 +175,6 @@ define(["pentaho/lang/Base", "pentaho/lang/Event"], function(Base, Event) {
 
     _removeListener: function(type, listener, fromIndex) {
       var index = this._indexOfListener(type, listener, fromIndex);
-
       if (index !== -1) {
         var queue = this._registry[type];
         queue.splice(index, 1);
@@ -184,46 +186,45 @@ define(["pentaho/lang/Base", "pentaho/lang/Event"], function(Base, Event) {
     },
 
     /**
-     * Unregisters a listener from an event.
+     * Removes one registration, or all registrations of a given event type and listener function.
      *
-     * The recommended way to unregister from an event is by
-     * calling the [dispose]{@link pentaho.lang.IEventHandle#dispose} method
-     * of the event handle returned, upon registration, by [on]{@link pentaho.lang.EventSource#on}.
-     * This usage pattern, however, requires storing the event handle,
-     * something which is sometimes undesirable.
+     * To remove an event registration,
+     * it is sufficient to call the [dispose]{@link pentaho.lang.IEventRegistrationHandle#dispose} method
+     * (or `remove`) of the registration handle returned by [on]{@link pentaho.lang.EventSource#on},
+     * upon registration.
      *
-     * This method allows unregistering from an event
-     * when given the same main arguments used when registering to it.
+     * Alternatively, as a convenience syntax,
+     * the registration handle can be passed as the single argument to this method.
      *
-     * This method can also be called with a single argument, an event handle,
-     * in which case it is disposed of.
+     * To remove all registrations of a given event type and listener function,
+     * specify these as arguments.
      *
-     * It is safe to remove listeners during an event emission.
-     * However, removed listeners are still notified in the current emission.
+     * It is safe to unregister from an event type while it is being emitted.
+     * However, removed registrations are still taken into account in the current emission.
      *
-     * @param {string|!pentaho.lang.IEventHandle} typeOrHandle The type of the event,
-     *  or an event handle to dispose of.
+     * Specifying an event registration handle that has already been disposed of has no effect.
+     * Specifying an event type and listener function that have no registrations has no effect.
+     *
+     * @memberOf pentaho.lang.EventSource#
+     *
+     * @param {string|string[]|!pentaho.lang.IEventRegistrationHandle} typeOrHandle
+     * The type or types of events, or an event registration handle to dispose of.
+     * When a string, it can be a comma-separated list of event types.
+     *
      * @param {!pentaho.lang.EventListener} [listener] The listener function.
      */
     off: function(typeOrHandle, listener) {
-      if (typeof typeOrHandle === "object") {
-        if (typeOrHandle.remove && typeOrHandle._source === this) {
-          typeOrHandle.remove();
-          return;
-        }
+      if(!typeOrHandle) throw error.argRequired("typeOrHandle");
+
+      if(typeOrHandle instanceof EventRegistrationHandle) {
+        // This is just syntax sugar, so let dispose from any source.
+        typeOrHandle.dispose();
+        return;
       }
 
-      var eventTypes;
-      if (typeOrHandle instanceof Array) {
-        // allow an array of event types
-        eventTypes = typeOrHandle;
-      } else if (typeOrHandle.indexOf(",") > -1) {
-        // allow comma delimited event types
-        eventTypes = typeOrHandle.split(/\s*,\s*/);
-      } else {
-        eventTypes = [typeOrHandle];
-      }
+      if(!listener) throw error.argRequired("listener");
 
+      var eventTypes = parseEventTypes(typeOrHandle);
       if (eventTypes) {
         for (var events_i = 0, events_len = eventTypes.length; events_i !== events_len; ++events_i) {
           while (this._removeListener(eventTypes[events_i], listener)) {
@@ -233,10 +234,10 @@ define(["pentaho/lang/Base", "pentaho/lang/Event"], function(Base, Event) {
     },
 
     /**
-     * Determines if there are any listeners registered to an event.
+     * Determines if there are any registrations for a given event type.
      *
      * This method can be used to avoid creating expensive event objects
-     * for events that currently have no registered listeners.
+     * for event types that currently have no registrations.
      *
      * @example
      *
@@ -247,24 +248,32 @@ define(["pentaho/lang/Base", "pentaho/lang/Event"], function(Base, Event) {
      *   }
      * }
      *
+     * @memberOf pentaho.lang.EventSource#
+     *
      * @param {string} type The type of the event.
-     * @return {boolean} `true` if the event has any listeners, `false` if not.
+     * @return {boolean} `true` if the event has any registrations, `false` if not.
      *
      * @protected
      */
     _hasListeners: function(type) {
-      return this._registry != null && this._registry[type] != null && this._registry[type].length > 0;
+      var registry = this._registry;
+      return registry != null && registry[type] != null && registry[type].length > 0;
     },
 
     /**
      * Emits an event and returns it, unless it was canceled.
      *
-     * Event listeners registered by the time the method is called are notified,
-     * by priority order,
+     * The listeners of existing registrations by the time the method is called are notified,
+     * synchronously, by priority order and then insertion order,
      * until either the event is canceled or all of the listeners have been notified.
      *
-     * It is safe to add and/or remove listeners during an event emission.
-     * However, any changes only impact following event emissions.
+     * It is safe to register or unregister to/from and event type while it is being emitted.
+     * However, changes are only taken into account in subsequent emissions.
+     *
+     * If a listener function throws an error, the event processing is interrupted.
+     * No more registrations are processed and the error is passed to the caller.
+     *
+     * @memberOf pentaho.lang.EventSource#
      *
      * @param {!pentaho.lang.Event} event The event object emit.
      * @return {?pentaho.lang.Event} The emitted event object or `null`, when canceled.
@@ -273,26 +282,68 @@ define(["pentaho/lang/Base", "pentaho/lang/Event"], function(Base, Event) {
      * @sealed
      */
     _emit: function(event) {
-      if (!(event instanceof Event)) {
-        return null;
-      }
+      if(!event) throw error.argRequired("event");
+      if(!(event instanceof Event)) throw error.argInvalidType("event", "pentaho.type.Event");
 
       if (event.isCanceled) {
         return null;
       }
 
-      var queue = this._getQueueOf(event.type).slice();
+      var queue = this._getQueueOf(event.type, /*create:*/false);
+      if(queue) {
+        queue = queue.slice();
 
-      var i = queue.length;
-      while (i-- && !event.isCanceled) {
-        queue[i].listener.call(this, event);
-      }
+        var i = queue.length;
+        while (i-- && !event.isCanceled) {
+          queue[i].listener.call(this, event);
+        }
 
-      if (event.isCanceled) {
-        return null;
+        if (event.isCanceled) {
+          return null;
+        }
       }
 
       return event;
     }
   });
+
+  /**
+   * Removes a single registration.
+   *
+   * @param {string} type The event type.
+   * @param {Object} info The event registration.
+   *
+   * @this pentaho.lang.EventSource
+   * @inner
+   * @private
+   */
+  function removeSingleHandle(type, info) {
+    var fromIndex = info.order;
+
+    var r = this._removeListener(type, info.listener, fromIndex);
+    if (!r && fromIndex > 0) {
+      this._removeListener(type, info.listener, 0);
+    }
+  }
+
+  function removeMultipleHandles(handles) {
+    for (var i = 0, L = handles.length; i !== L; ++i) {
+      handles[i].dispose();
+    }
+  }
+
+  function parseEventTypes(type) {
+    if(type instanceof Array) {
+      // Allow an array of event types.
+      return type;
+    }
+
+    if(type.indexOf(",") > -1) {
+      // Allow comma delimited event types.
+      // Already eats spaces.
+      return type.split(/\s*,\s*/);
+    }
+
+    return [type];
+  }
 });
