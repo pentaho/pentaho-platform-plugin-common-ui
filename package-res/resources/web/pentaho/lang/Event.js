@@ -15,8 +15,9 @@
  */
 
 define([
-  "pentaho/lang/Base"
-], function(Base) {
+  "./Base",
+  "../util/error"
+], function(Base, error) {
 
   "use strict";
 
@@ -71,6 +72,9 @@ define([
      * @param {?boolean} [cancelable=false] - Indicates if the event can be canceled.
      */
     constructor: function(type, source, cancelable) {
+      if(!type) throw error.argRequired("type");
+      if(!source) throw error.argRequired("source");
+
       this._type = type;
       this._source = source;
       this._cancelable = !!cancelable;

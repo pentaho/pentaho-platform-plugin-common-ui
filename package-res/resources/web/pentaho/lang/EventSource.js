@@ -15,9 +15,10 @@
  */
 
 define([
-  "pentaho/lang/Base",
-  "pentaho/lang/Event"
-], function(Base, Event) {
+  "./Base",
+  "./Event",
+  "../util/error"
+], function(Base, Event, error) {
 
   "use strict";
 
@@ -72,6 +73,9 @@ define([
      *   for later removal.
      */
     on: function(type, listener, keyArgs) {
+      if(!type) throw error.argRequired("type");
+      if(!listener) throw error.argRequired("listener");
+
       var handles = [];
 
       var eventTypes;
@@ -225,12 +229,16 @@ define([
      * @param {!pentaho.lang.EventListener} [listener] The listener function.
      */
     off: function(typeOrHandle, listener) {
+      if(!typeOrHandle) throw error.argRequired("typeOrHandle");
+
       if (typeof typeOrHandle === "object") {
         if (typeOrHandle.remove && typeOrHandle._source === this) {
           typeOrHandle.remove();
           return;
         }
       }
+
+      if(!listener) throw error.argRequired("listener");
 
       var eventTypes;
       if (typeOrHandle instanceof Array) {
@@ -299,9 +307,8 @@ define([
      * @sealed
      */
     _emit: function(event) {
-      if (!(event instanceof Event)) {
-        return null;
-      }
+      if(!event) throw error.argRequired("event");
+      if(!(event instanceof Event)) throw error.argInvalidType("event", "pentaho.type.Event");
 
       if (event.isCanceled) {
         return null;
