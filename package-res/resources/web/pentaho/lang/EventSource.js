@@ -90,12 +90,12 @@ define([
       }
 
       if (eventTypes) {
+        var priority = !!keyArgs && !!keyArgs.priority ? keyArgs.priority : 0;
+
         for (var events_i = 0, events_len = eventTypes.length; events_i !== events_len; ++events_i) {
           var eventType = eventTypes[events_i].trim();
 
           var queue = this._getQueueOf(eventType);
-
-          var priority = !!keyArgs && !!keyArgs.priority ? keyArgs.priority : 0;
 
           for (var i = queue.length - 1; i !== -2; --i) {
             if (i === -1 || priority >= queue[i].priority) {
