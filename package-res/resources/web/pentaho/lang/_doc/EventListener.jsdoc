@@ -15,7 +15,7 @@
  */
 
 /**
- * An event listener.
+ * An event listener function.
  *
  * This type can be used generically by specifying the type of event in angle brackets:
  * `pentaho.lang.EventListener<MyEvent>`.
