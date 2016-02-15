@@ -85,7 +85,7 @@ define([
         for (var events_i = 0, events_len = eventTypes.length; events_i !== events_len; ++events_i) {
           var eventType = eventTypes[events_i];
           
-          var queue = this._getQueueOf(eventType);
+          var queue = this._getQueueOf(eventType, /*create:*/true);
 
           for (var i = queue.length - 1; i !== -2; --i) {
             if (i === -1 || priority >= queue[i].priority) {
@@ -147,30 +147,38 @@ define([
       }
     },
 
-    _getQueueOf: function(type) {
-      if (!this._registry) {
-        this._registry = {};
+    _getQueueOf: function(type, create) {
+      var registry = this._registry;
+      if(!registry) {
+        if(!create) return null;
+
+        // 1st event registration being added
+        this._registry = registry = {};
+        return (registry[type] = []);
       }
 
-      var queue = this._registry[type];
-      if (!queue) {
-        queue = [];
-        this._registry[type] = queue;
+      var queue = registry[type];
+      if(!queue) {
+        if(!create) return null;
+
+        // 1st event of this type being added
+        registry[type] = queue = [];
       }
 
       return queue;
     },
 
     _indexOfListener: function(type, listener, fromIndex) {
-      var queue = this._getQueueOf(type);
+      var queue = this._getQueueOf(type, /*create:*/false);
+      if(queue) {
+        if (fromIndex == null) {
+          fromIndex = 0;
+        }
 
-      if (fromIndex == null) {
-        fromIndex = 0;
-      }
-
-      for (var i = fromIndex, len = queue.length; i < len; ++i) {
-        if (queue[i].listener === listener) {
-          return i;
+        for (var i = fromIndex, len = queue.length; i < len; ++i) {
+          if (queue[i].listener === listener) {
+            return i;
+          }
         }
       }
 
@@ -179,7 +187,6 @@ define([
 
     _removeListener: function(type, listener, fromIndex) {
       var index = this._indexOfListener(type, listener, fromIndex);
-
       if (index !== -1) {
         var queue = this._registry[type];
         queue.splice(index, 1);
@@ -262,7 +269,8 @@ define([
      * @protected
      */
     _hasListeners: function(type) {
-      return this._registry != null && this._registry[type] != null && this._registry[type].length > 0;
+      var registry = this._registry;
+      return registry != null && registry[type] != null && registry[type].length > 0;
     },
 
     /**
@@ -294,15 +302,18 @@ define([
         return null;
       }
 
-      var queue = this._getQueueOf(event.type).slice();
+      var queue = this._getQueueOf(event.type, /*create:*/false);
+      if(queue) {
+        queue = queue.slice();
 
-      var i = queue.length;
-      while (i-- && !event.isCanceled) {
-        queue[i].listener.call(this, event);
-      }
+        var i = queue.length;
+        while (i-- && !event.isCanceled) {
+          queue[i].listener.call(this, event);
+        }
 
-      if (event.isCanceled) {
-        return null;
+        if (event.isCanceled) {
+          return null;
+        }
       }
 
       return event;
