@@ -14,10 +14,14 @@
  * limitations under the License.
  */
 
-define(["pentaho/lang/Base", "pentaho/lang/Event"], function(Base, Event) {
+define([
+  "pentaho/lang/Base",
+  "pentaho/lang/Event"
+], function(Base, Event) {
+
   "use strict";
 
-  return Base.extend("EventSource", /** @lends pentaho.lang.EventSource# */{
+  return Base.extend("pentaho.lang.EventSource", /** @lends pentaho.lang.EventSource# */{
     _registry: null,
 
     /**
@@ -100,7 +104,7 @@ define(["pentaho/lang/Base", "pentaho/lang/Event"], function(Base, Event) {
 
               queue[i + 1] = listenerInfo;
 
-              handles.push(/** @implements pentaho.lang.IEventHandle */ {
+              handles.push(/** @type pentaho.lang.IEventHandle */ {
                 _source: this,
                 _type: eventType,
                 _info: listenerInfo,
@@ -122,7 +126,7 @@ define(["pentaho/lang/Base", "pentaho/lang/Event"], function(Base, Event) {
       }
 
       if (handles.length > 1) {
-        return /** @implements pentaho.lang.IEventHandle */ {
+        return /** @type pentaho.lang.IEventHandle */ {
           _source: this,
           _type: type,
           _handles: handles,

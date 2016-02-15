@@ -14,10 +14,13 @@
  * limitations under the License.
  */
 
-define(["pentaho/lang/Base"], function(Base) {
+define([
+  "pentaho/lang/Base"
+], function(Base) {
+
   "use strict";
 
-  return Base.extend("EventSource", /** @lends pentaho.lang.Event# */{
+  return Base.extend("pentaho.lang.Event", /** @lends pentaho.lang.Event# */{
     /**
      * @classDesc The `Event` class is the base class of event objects emitted by an
      * [EventSource]{@link pentaho.lang.EventSource}.
@@ -60,6 +63,12 @@ define(["pentaho/lang/Base"], function(Base) {
      * @name Event
      * @memberOf pentaho.lang
      * @class
+     *
+     * @description Creates an event of a given type, source and cancelable.
+     * @constructor
+     * @param {!nonEmptyString} type - The type of the event.
+     * @param {!Object} source - The object where the event will be initially emitted.
+     * @param {?boolean} [cancelable=false] - Indicates if the event can be canceled.
      */
     constructor: function(type, source, cancelable) {
       this._type = type;
