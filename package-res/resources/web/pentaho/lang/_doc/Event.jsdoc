@@ -49,9 +49,7 @@
  *
  * Certain types of events are emitted so frequently that it
  * makes it highly beneficial to reuse event objects.
- * To support these scenarios,
- * the `Event` class requires that,
- * to safely use an event object beyond its emission,
+ * To safely use an event object beyond its emission,
  * a cloned event object must be obtained,
  * through [clone]{@link pentaho.lang.Event#clone}.
  *
