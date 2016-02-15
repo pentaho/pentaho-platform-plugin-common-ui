@@ -31,9 +31,9 @@
  * However, an `Event` subclass can be used by several event types.
  * The `Event` subclass of an event type mainly depends on the data that it is associated with.
  *
- * ##### Actions, "Will Do" Events and Cancellation
+ * ##### Event Cancellation
  *
- * Certain types of events are used to signal that an _action_ is about to execute - "will do" events.
+ * Certain types of events are used to signal that an _action_ is about to execute.
  * When the execution of the action can be canceled by the event listeners,
  * the event is said to be _cancelable_.
  * That characteristic is exposed through the [isCancelable]{@link pentaho.lang.Event#isCancelable} property.
@@ -44,9 +44,10 @@
  * To cancel an event, call its [cancel]{@link pentaho.lang.Event#cancel} method.
  * To know if an event has been canceled, read the [isCanceled]{@link pentaho.lang.Event#isCanceled} property.
  *
- * ##### Persistable events
+ * ##### Persistable Events
  *
- * Certain types of events are emitted so frequently that it is highly beneficial to reuse event objects.
+ * Certain types of events are emitted so frequently that it
+ * makes it highly beneficial to reuse event objects.
  * To support these scenarios,
  * the `Event` class requires that,
  * to safely use an event object beyond its emission,
