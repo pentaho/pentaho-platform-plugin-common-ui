@@ -33,13 +33,14 @@
  *
  * ##### Event Cancellation
  *
- * Certain types of events are used to signal that an _action_ is about to execute.
+ * Certain types of events are used to signal that an _action_ is about to execute
+ * (or that a phase of an already executing action is about to start).
  * When the execution of the action can be canceled by the event listeners,
  * the event is said to be _cancelable_.
- * That characteristic is exposed through the [isCancelable]{@link pentaho.lang.Event#isCancelable} property.
+ * That characteristic is exposed by the [isCancelable]{@link pentaho.lang.Event#isCancelable} property.
  *
  * When an event is canceled, not only its corresponding action is canceled,
- * but any following listeners are not notified.
+ * but the listeners of unprocessed registrations are not notified.
  *
  * To cancel an event, call its [cancel]{@link pentaho.lang.Event#cancel} method.
  * To know if an event has been canceled, read the [isCanceled]{@link pentaho.lang.Event#isCanceled} property.
@@ -63,6 +64,7 @@ var EventProto = /** @lends pentaho.lang.Event# */{
   /**
    * Gets the type of the event.
    *
+   * @memberOf pentaho.lang.Event#
    * @type {!nonEmptyString}
    * @readonly
    */
@@ -71,6 +73,7 @@ var EventProto = /** @lends pentaho.lang.Event# */{
   /**
    * Gets the object where the event was initially emitted.
    *
+   * @memberOf pentaho.lang.Event#
    * @type {!object}
    * @readonly
    */
@@ -79,6 +82,7 @@ var EventProto = /** @lends pentaho.lang.Event# */{
   /**
    * Gets a value that indicates if the event can be canceled.
    *
+   * @memberOf pentaho.lang.Event#
    * @type {!boolean}
    * @readonly
    */
@@ -91,6 +95,7 @@ var EventProto = /** @lends pentaho.lang.Event# */{
    * has already been canceled.
    *
    * @see pentaho.lang.Event#isCanceled
+   * @memberOf pentaho.lang.Event#
    */
   cancel: function() {},
 
@@ -99,6 +104,7 @@ var EventProto = /** @lends pentaho.lang.Event# */{
    *
    * @type {!boolean}
    * @readonly
+   * @memberOf pentaho.lang.Event#
    */
   get isCanceled() {},
 
@@ -106,6 +112,7 @@ var EventProto = /** @lends pentaho.lang.Event# */{
    * Creates a clone of the event object.
    *
    * @return {!pentaho.lang.Event} The cloned event object.
+   * @memberOf pentaho.lang.Event#
    */
   clone: function() {}
 };

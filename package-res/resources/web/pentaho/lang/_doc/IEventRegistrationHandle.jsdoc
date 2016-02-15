@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 /**
- * @classdesc The `IEventHandle` interface represents an event registration
+ * @classdesc The `IEventRegistrationHandle` interface represents an event registration
  * and provides a means to explicitly unsubscribe from it.
  *
  * This interface extends `IDisposable` to provide the
- * [remove]{pentaho.lang.IEventHandle#remove} as an alias
- * to [dispose]{pentaho.lang.IEventHandle#dispose}.
+ * [remove]{@link pentaho.lang.IEventRegistrationHandle#remove} as an alias
+ * for [dispose]{@link pentaho.lang.IEventRegistrationHandle#dispose}.
  * This alias supports the [dojo/on]{@link https://dojotoolkit.org/reference-guide/dojo/on.html} API.
  *
- * @name pentaho.lang.IEventHandle
+ * @name pentaho.lang.IEventRegistrationHandle
  * @interface
  * @extends pentaho.lang.IDisposable
  */
@@ -30,8 +30,10 @@
 /**
  * Removes the event registration, if it hasn't been removed yet.
  *
- * @name dispose
- * @memberOf pentaho.lang.IEventHandle#
+ * This method is an alias for [dispose]{@link pentaho.lang.IEventRegistrationHandle#dispose}.
+ *
+ * @name remove
+ * @memberOf pentaho.lang.IEventRegistrationHandle#
  * @method
  * @see pentaho.lang.IDisposable#dispose
  */
