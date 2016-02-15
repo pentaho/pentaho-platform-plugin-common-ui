@@ -93,8 +93,8 @@ define([
         var priority = !!keyArgs && !!keyArgs.priority ? keyArgs.priority : 0;
 
         for (var events_i = 0, events_len = eventTypes.length; events_i !== events_len; ++events_i) {
-          var eventType = eventTypes[events_i].trim();
-
+          var eventType = eventTypes[events_i];
+          
           var queue = this._getQueueOf(eventType);
 
           for (var i = queue.length - 1; i !== -2; --i) {
