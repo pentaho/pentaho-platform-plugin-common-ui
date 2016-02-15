@@ -22,6 +22,22 @@ define([
 
   "use strict";
 
+  // EventRegistrationHandle class handles creating the alias, remove, from dispose.
+  /**
+   * @class
+   * @implements pentaho.lang.IEventRegistrationHandle
+   * @private
+   */
+  function EventRegistrationHandle(dispose) {
+    this.dispose = dispose;
+  }
+
+  EventRegistrationHandle.prototype.remove = function() {
+    return this.dispose();
+  };
+
+  // ---
+
   return Base.extend("pentaho.lang.EventSource", /** @lends pentaho.lang.EventSource# */{
     _registry: null,
 
@@ -97,13 +113,7 @@ define([
 
               queue[i + 1] = listenerInfo;
 
-              handles.push(/** @type pentaho.lang.IEventHandle */ {
-                _source: this,
-                _type: eventType,
-                _info: listenerInfo,
-
-                remove: removeSingleHandle
-              });
+              handles.push(new EventRegistrationHandle(removeSingleHandle.bind(this, eventType, listenerInfo)));
 
               break;
             }
@@ -119,31 +129,10 @@ define([
       }
 
       if (handles.length > 1) {
-        return /** @type pentaho.lang.IEventHandle */ {
-          _source: this,
-          _type: type,
-          _handles: handles,
-
-          remove: removeMultipleHandles
-        };
+        return new EventRegistrationHandle(removeMultipleHandles.bind(this, handles));
       }
 
       return null;
-
-      function removeSingleHandle() {
-        var fromIndex = this._info.order;
-
-        var r = this._source._removeListener(this._type, this._info.listener, fromIndex);
-        if (!r && fromIndex > 0) {
-          r = this._source._removeListener(this._type, this._info.listener, 0);
-        }
-      }
-
-      function removeMultipleHandles() {
-        for (var i = 0; i !== this._handles.length; ++i) {
-          this._handles[i].remove();
-        }
-      }
     },
 
     _getQueueOf: function(type, create) {
@@ -227,11 +216,10 @@ define([
     off: function(typeOrHandle, listener) {
       if(!typeOrHandle) throw error.argRequired("typeOrHandle");
 
-      if (typeof typeOrHandle === "object") {
-        if (typeOrHandle.remove && typeOrHandle._source === this) {
-          typeOrHandle.remove();
-          return;
-        }
+      if(typeOrHandle instanceof EventRegistrationHandle) {
+        // This is just syntax sugar, so let dispose from any source.
+        typeOrHandle.dispose();
+        return;
       }
 
       if(!listener) throw error.argRequired("listener");
@@ -318,6 +306,31 @@ define([
       return event;
     }
   });
+
+  /**
+   * Removes a single registration.
+   *
+   * @param {string} type The event type.
+   * @param {Object} info The event registration.
+   *
+   * @this pentaho.lang.EventSource
+   * @inner
+   * @private
+   */
+  function removeSingleHandle(type, info) {
+    var fromIndex = info.order;
+
+    var r = this._removeListener(type, info.listener, fromIndex);
+    if (!r && fromIndex > 0) {
+      this._removeListener(type, info.listener, 0);
+    }
+  }
+
+  function removeMultipleHandles(handles) {
+    for (var i = 0, L = handles.length; i !== L; ++i) {
+      handles[i].dispose();
+    }
+  }
 
   function parseEventTypes(type) {
     if(type instanceof Array) {
