@@ -14,55 +14,173 @@
  * limitations under the License.
  */
 define([
-  ""
-], function(Event, EventSource) {
+  "pentaho/lang/Event",
+  "pentaho/lang/EventSource",
+  "pentaho/util/error"
+], function(Event, EventSource, error) {
   "use strict";
 
-  xdescribe("pentaho.lang.EventSource -", function() {
+  describe("pentaho.lang.EventSource -", function() {
     var eventSource;
     beforeEach(function() {
       eventSource = new EventSource();
     });
 
-    describe("#on(type, listener, keyArgs) -", function() {
-      var event, state;
+    describe("#on and #off -", function() {
+      var event1, event2, source, listener, state;
       beforeEach(function() {
-        event = new Event("foo");
+        source = {};
+        event1 = new Event("foo", source, true);
+        event2 = new Event("bar", source, true);
+        state = 0;
+        listener = function() {
+          state = state + 1;
+        };
+      });
+
+      it("both #on and #off should accept a csv string of types and register the given listener function", function() {
+        eventSource.on("foo,bar", listener);
+        eventSource._emit(event1);
+        eventSource._emit(event2);
+        expect(state).toBe(2);
+
+        eventSource.off("foo,bar", listener);
+        eventSource._emit(event1);
+        eventSource._emit(event2);
+        expect(state).toBe(2);
+      });
+
+      it("both #on and #off should accept an array of strings of types and register the given listener function", function() {
+        eventSource.on(["foo", "bar"], listener);
+        eventSource._emit(event1);
+        eventSource._emit(event2);
+        expect(state).toBe(2);
+
+        eventSource.off(["foo", "bar"], listener);
+        eventSource._emit(event1);
+        eventSource._emit(event2);
+        expect(state).toBe(2);
+      });
+    }); // on# and off# CSV/Array
+
+    describe("#on(type, listener, keyArgs) -", function() {
+      var event, source, state;
+      beforeEach(function() {
+        source = {};
+        event = new Event("foo", source, true);
         state = "original";
+      });
+
+      it("should not yet notify a listener if is being registered during an emit cycle", function() {
         eventSource.on("foo", function() {
           eventSource.on("foo", function() {
             state = state + " third";
           });
-          state = state + " first";
-        });
-        eventSource.on("foo", function() {
           state = state + " second";
         });
-      });
-
-      it("should not yet notify a listener if is being registered during an emit cycle", function() {
+        eventSource.on("foo", function() {
+          state = state + " first";
+        });
         eventSource._emit(event);
         expect(state).toBe("original first second");
       });
 
       it("should only notify a listener in the emit cycles that take place after registering the listener", function() {
+        eventSource.on("foo", function() {
+          eventSource.on("foo", function() {
+            state = state + " third";
+          });
+          state = state + " second";
+        });
+        eventSource.on("foo", function() {
+          state = state + " first";
+        });
         eventSource._emit(event);
         expect(state).toBe("original first second");
         eventSource._emit(event);
-        expect(state).toBe("original first second third");
+        expect(state).toBe("original first second third first second");
       });
 
+      it("should throw an error when no parameters provided.", function() {
+        expect(function () {
+          eventSource.on();
+        }).toThrowError(error.argRequired("type").message);
+        expect(function () {
+          eventSource.on(null);
+        }).toThrowError(error.argRequired("type").message);
+        expect(function () {
+          eventSource.on(undefined);
+        }).toThrowError(error.argRequired("type").message);
+      });
 
+      it("should throw an error when type parameter is set but the listener parameter is not provided.", function() {
+        expect(function () {
+          eventSource.on("test");
+        }).toThrowError(error.argRequired("listener").message);
+        expect(function () {
+          eventSource.on("test", null);
+        }).toThrowError(error.argRequired("listener").message);
+        expect(function () {
+          eventSource.on("test", undefined);
+        }).toThrowError(error.argRequired("listener").message);
+      });
     }); // on#
 
     describe("#off(type, listener) -", function() {
-
-      xit("should still notify a listener if it is unregistered during an emit cycle", function() {
-        expect(true).toBe(false);
+      var event, source, state;
+      beforeEach(function() {
+        source = {};
+        event = new Event("foo", source, true);
+        state = "original";
       });
 
-      xit("should only stop notifying a listener in the emit cycles that take place after unregistering the listener", function() {
-        expect(true).toBe(false);
+      it("should still notify a listener if it is unregistered during an emit cycle", function() {
+        var handle = eventSource.on("foo", function() {
+          state = state + " second";
+        });
+        eventSource.on("foo", function() {
+          eventSource.off(handle);
+          state = state + " first";
+        });
+        eventSource._emit(event);
+        expect(state).toBe("original first second");
+      });
+
+      it("should only stop notifying a listener in the emit cycles that take place after unregistering the listener", function() {
+        var handle = eventSource.on("foo", function() {
+          state = state + " second";
+        });
+        eventSource.on("foo", function() {
+          eventSource.off(handle);
+          state = state + " first";
+        });
+        eventSource._emit(event);
+        eventSource._emit(event);
+        expect(state).toBe("original first second first");
+      });
+
+      it("should throw an error when no parameters provided.", function() {
+        expect(function () {
+          eventSource.off();
+        }).toThrowError(error.argRequired("typeOrHandle").message);
+        expect(function () {
+          eventSource.off(null);
+        }).toThrowError(error.argRequired("typeOrHandle").message);
+        expect(function () {
+          eventSource.off(undefined);
+        }).toThrowError(error.argRequired("typeOrHandle").message);
+      });
+
+      it("should throw an error when the typeOrHandle is a string but no listerner is provided.", function() {
+        expect(function () {
+          eventSource.off("test");
+        }).toThrowError(error.argRequired("listener").message);
+        expect(function () {
+          eventSource.off("test", null);
+        }).toThrowError(error.argRequired("listener").message);
+        expect(function () {
+          eventSource.off("test", undefined);
+        }).toThrowError(error.argRequired("listener").message);
       });
 
     }); // #off
@@ -90,9 +208,25 @@ define([
     }); // #_hasListeners
 
     describe("#_emit(event) -", function() {
-      var event;
+      var event, source;
       beforeEach(function() {
-        event = new Event("foo");
+        source = {};
+        event = new Event("foo", source, true);
+      });
+
+      it("should throw an error when no parameters provided.", function() {
+        expect(function () {
+          eventSource._emit();
+        }).toThrowError(error.argRequired("event").message);
+        expect(function () {
+          eventSource._emit(null);
+        }).toThrowError(error.argRequired("event").message);
+        expect(function () {
+          eventSource._emit(undefined);
+        }).toThrowError(error.argRequired("event").message);
+        expect(function () {
+          eventSource._emit({});
+        }).toThrowError(error.argInvalidType("event", "pentaho.type.Event").message);
       });
 
       it("should notify a listener registered for the same event type as the event being emitted", function() {
@@ -128,12 +262,12 @@ define([
       it("should respect the priority with which the event listeners are registered", function() {
         var state = "original";
         eventSource.on("foo", function() {
-          state = state + "first";
+          state = state + " first";
         }, {
           priority: 0
         });
         eventSource.on("foo", function() {
-          state = state + "second";
+          state = state + " second";
         }, {
           priority: -1
         });
@@ -197,16 +331,16 @@ define([
           10, 1, 0, -1, 10
         ].forEach(function(p) {
           var eventSource = new EventSource();
-          var event = new Event("foo");
+          var event = new Event("foo", {}, true);
 
           var state = "original";
           eventSource.on("foo", function() {
-            state = state + " first";
+            state = state + " second";
           }, {
             priority: p
           });
           eventSource.on("foo", function() {
-            state = state + " second";
+            state = state + " first";
           }, {
             priority: p
           });
@@ -221,11 +355,11 @@ define([
           null, undefined, false, ""
         ].forEach(function(p) {
           var eventSource = new EventSource();
-          var event = new Event("foo");
+          var event = new Event("foo", {}, true);
           var state = "original";
 
           eventSource.on("foo", function() {
-            state = state + " first";
+            state = state + " third";
           }, {
             priority: 0
           });
@@ -235,7 +369,7 @@ define([
             priority: p
           });
           eventSource.on("foo", function() {
-            state = state + " third";
+            state = state + " first";
           }, {
             priority: 0
           });
@@ -260,7 +394,7 @@ define([
         });
 
         eventSource._emit(event);
-        expect(state).toBe("original second first");
+        expect(state).toBe("original first");
       });
 
       it("should only invoke a listener once even if it is registered multiple times", function() {
@@ -273,17 +407,17 @@ define([
         eventSource.on("foo", listener);
 
         eventSource._emit(event);
-        expect(state).toBe(1);
+        expect(state).toBe(3);
       });
 
       it("should interrupt the event being processed if a listener throws an exception", function() {
         var state = "original";
         eventSource.on("foo", function() {
-          state = state + "first";
-          throw new Error("Stirb!");
+          state = state + " second";
         });
         eventSource.on("foo", function() {
-          state = state + " second";
+          state = state + " first";
+          throw new Error("Stirb!");
         });
 
         expect(function() {
