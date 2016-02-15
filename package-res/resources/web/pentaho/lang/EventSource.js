@@ -14,28 +14,25 @@
  * limitations under the License.
  */
 
-/**
- * @classDesc The `EventSource` class is a mixin to be
- * used by classes that are the source of events - that emit events.
- *
- * The exposed interface is compatible with the
- * [dojo/on]{@link https://dojotoolkit.org/reference-guide/dojo/on.html} API.
- *
- * @name EventSource
- * @memberOf pentaho.lang
- * @class
- */
-define(["pentaho/lang/Base"], function(Base) {
+define(["pentaho/lang/Base", "pentaho/lang/Event"], function(Base, Event) {
   "use strict";
 
   return Base.extend("EventSource", /** @lends pentaho.lang.EventSource# */{
     _registry: null,
 
-    constructor: function() {
-      this._registry = {};
-    },
+    /**
+     * @classDesc The `EventSource` class is a mixin to be
+     * used by classes that are the source of events - that emit events.
+     *
+     * The exposed interface is compatible with the
+     * [dojo/on]{@link https://dojotoolkit.org/reference-guide/dojo/on.html} API.
+     *
+     * @name EventSource
+     * @memberOf pentaho.lang
+     * @class
+     */
 
-   /**
+    /**
      * Registers a listener of events of a given type emitted by this object.
      *
      * Optionally, a _listening priority_ may be specified to adjust the order
@@ -144,19 +141,21 @@ define(["pentaho/lang/Base"], function(Base) {
     },
 
     _getQueueOf: function(type) {
+      if (!this._registry) {
+        this._registry = {};
+      }
+
       var queue = this._registry[type];
       if (!queue) {
         queue = [];
         this._registry[type] = queue;
       }
+
       return queue;
     },
 
     _indexOfListener: function(type, listener, fromIndex) {
-      var queue = this._registry[type];
-      if (!queue) {
-        return -1;
-      }
+      var queue = this._getQueueOf(type);
 
       if (fromIndex == null) {
         fromIndex = 0;
@@ -207,14 +206,29 @@ define(["pentaho/lang/Base"], function(Base) {
      * @param {!pentaho.lang.EventListener} [listener] The listener function.
      */
     off: function(typeOrHandle, listener) {
-      if (typeof typeOrHandle === "function") {
+      if (typeof typeOrHandle === "object") {
         if (typeOrHandle.remove && typeOrHandle._source === this) {
           typeOrHandle.remove();
           return;
         }
       }
 
-      while (this._removeListener(typeOrHandle, listener)) {
+      var eventTypes;
+      if (typeOrHandle instanceof Array) {
+        // allow an array of event types
+        eventTypes = typeOrHandle;
+      } else if (typeOrHandle.indexOf(",") > -1) {
+        // allow comma delimited event types
+        eventTypes = typeOrHandle.split(/\s*,\s*/);
+      } else {
+        eventTypes = [typeOrHandle];
+      }
+
+      if (eventTypes) {
+        for (var events_i = 0, events_len = eventTypes.length; events_i !== events_len; ++events_i) {
+          while (this._removeListener(eventTypes[events_i], listener)) {
+          }
+        }
       }
     },
 
@@ -239,7 +253,7 @@ define(["pentaho/lang/Base"], function(Base) {
      * @protected
      */
     _hasListeners: function(type) {
-      return this._registry[type] != null && this._registry[type].length > 0;
+      return this._registry != null && this._registry[type] != null && this._registry[type].length > 0;
     },
 
     /**
@@ -259,6 +273,25 @@ define(["pentaho/lang/Base"], function(Base) {
      * @sealed
      */
     _emit: function(event) {
+      if (!(event instanceof Event)) {
+        return null;
+      }
+
+      if (event.isCanceled) {
+        return null;
+      }
+
+      var queue = this._getQueueOf(event.type).slice();
+
+      var i = queue.length;
+      while (i-- && !event.isCanceled) {
+        queue[i].listener.call(this, event);
+      }
+
+      if (event.isCanceled) {
+        return null;
+      }
+
       return event;
     }
   });
