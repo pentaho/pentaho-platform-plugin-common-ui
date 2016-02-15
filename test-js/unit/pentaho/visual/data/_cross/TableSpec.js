@@ -21,8 +21,8 @@ define([
   "pentaho/data/_cross/Table",
   "pentaho/data/_cross/Axis",
   "pentaho/data/_cross/MeasureCellSet",
-  "pentaho/util/error"
-], function(Model, Attribute, Structure, CellTuple, Table, Axis, MeasureCellSet, error) {
+  "tests/pentaho/util/errorMatch"
+], function(Model, Attribute, Structure, CellTuple, Table, Axis, MeasureCellSet, errorMatch) {
 
   function createModel1() {
     return new Model([
@@ -37,9 +37,6 @@ define([
 
   var UNDEFINED_ATTRIBUTE_FOO_ERROR = "A attribute with name 'foo' is not defined.";
   var MISMATCHED_COL_ATTR_D3_ERROR = "Invalid cross-table - attribute mismatch: 'D3'. Expected: 'D2'.";
-  var INVALID_COL_2_ATTR_ERROR = "Argument invalid: 'cols[2].attr'. Required when there is more than one measure.";
-  var INVALID_COL_3_ATTR_ERROR = "Argument invalid: 'cols[3].attr'. Required when there is more than one measure.";
-  var INVALID_COL_4_DUP_ERROR = "Argument invalid: 'cols[4]'. Duplicate column cell tuple and measure attribute.";
 
   var NOT_MEASURE_ATTR_N2_ERROR = "A structure position with name 'N2' is not defined.";
   var NOT_MEASURE_ATTR_D1_ERROR = "A structure position with name 'D1' is not defined.";
@@ -61,7 +58,7 @@ define([
       it("should throw when `keyArgs.model` is not specified", function() {
         expect(function() {
           new Table({});
-        }).toThrowError(error.argRequired("keyArgs.model").message);
+        }).toThrow(errorMatch.argRequired("keyArgs.model"));
       });
 
       it("should create empty cols and rows axes and measures list when all these are empty or nully in `spec.layout`", function() {
@@ -224,7 +221,7 @@ define([
             }, {
               model: model
             });
-          }).toThrowError(INVALID_COL_2_ATTR_ERROR);
+          }).toThrow(errorMatch.argInvalid("cols[2].attr"));
         });
 
         it("should throw if a COL column specifies an attribute that is not one of the measure attributes", function() {
@@ -612,9 +609,6 @@ define([
       });
 
       describe("when `spec.cols` is not specified -", function() {
-        var REQUIRED_COLS_ERROR =
-            "Argument invalid: 'spec.cols'. " +
-            "As many columns as row attributes are required when there are measure and/or column attributes.";
 
         it("should not throw if there are only row attributes", function() {
           new Table({
@@ -645,7 +639,7 @@ define([
                 ["d1_2", "d2_1"]
               ]
             }, {model: model});
-          }).toThrowError(REQUIRED_COLS_ERROR);
+          }).toThrow(errorMatch.argInvalid("spec.cols"));
         });
 
         it("should throw if there are measure attributes", function() {
@@ -662,7 +656,7 @@ define([
                 ["d1_2", "d2_1"]
               ]
             }, {model: model});
-          }).toThrowError(REQUIRED_COLS_ERROR);
+          }).toThrow(errorMatch.argInvalid("spec.cols"));
         });
       });
 
@@ -683,7 +677,7 @@ define([
             }, {
               model: model
             });
-          }).toThrowError("Argument invalid: 'rows[1].c'. Duplicate row tuple.");
+          }).toThrow(errorMatch.argInvalid("rows[1].c"));
         });
       });
     });
@@ -943,7 +937,7 @@ define([
 
         expect(function() {
           table.addColumn({c: ["d3_1"], attr: "N1"});
-        }).toThrowError(INVALID_COL_4_DUP_ERROR);
+        }).toThrow(errorMatch.argInvalid("cols[4]"));
       });
 
       it("should add when table has no column attributes and spec has a MIC-unbound measure", function() {
@@ -1009,7 +1003,7 @@ define([
 
         expect(function() {
           table.addColumn({attr: "N1"});
-        }).toThrowError(INVALID_COL_4_DUP_ERROR);
+        }).toThrow(errorMatch.argInvalid("cols[4]"));
       });
 
       describe("when measure attribute is unspecified ", function() {
@@ -1066,7 +1060,7 @@ define([
 
               table.addColumn({c: ["d3_2"]});
 
-            }).toThrowError(INVALID_COL_3_ATTR_ERROR);
+            }).toThrow(errorMatch.argInvalid("cols[3].attr"));
           });
         });
       });

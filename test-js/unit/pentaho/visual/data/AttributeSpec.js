@@ -16,8 +16,9 @@
 define([
   "pentaho/data/Model",
   "pentaho/data/Attribute",
-  "pentaho/data/Member"
-], function(Model, Attribute, Member) {
+  "pentaho/data/Member",
+  "tests/pentaho/util/errorMatch"
+], function(Model, Attribute, Member, errorMatch) {
 
   function expectAttribute(attrSpec) {
     var model = new Model([attrSpec]);
@@ -287,11 +288,11 @@ define([
       it("should throw if the attribute name is empty", function() {
         expect(function() {
           expectAttribute({attr: ""});
-        }).toThrowError("Argument required: 'spec.name'.");
+        }).toThrow(errorMatch.argRequired("spec.name"));
 
         expect(function() {
           expectAttribute("");
-        }).toThrowError("Argument required: 'spec.name'.");
+        }).toThrow(errorMatch.argRequired("spec.name"));
       });
     });
   });
