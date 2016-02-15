@@ -92,8 +92,7 @@ define([
               var listenerInfo = {
                 order: i + 1,
                 priority: priority,
-                listener: listener,
-                args: keyArgs
+                listener: listener
               };
 
               queue[i + 1] = listenerInfo;
