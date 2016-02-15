@@ -78,17 +78,7 @@ define([
 
       var handles = [];
 
-      var eventTypes;
-      if (type instanceof Array) {
-        // allow an array of event types
-        eventTypes = type;
-      } else if (type.indexOf(",") > -1) {
-        // allow comma delimited event types
-        eventTypes = type.split(/\s*,\s*/);
-      } else {
-        eventTypes = [type];
-      }
-
+      var eventTypes = parseEventTypes(type);
       if (eventTypes) {
         var priority = !!keyArgs && !!keyArgs.priority ? keyArgs.priority : 0;
 
@@ -240,17 +230,7 @@ define([
 
       if(!listener) throw error.argRequired("listener");
 
-      var eventTypes;
-      if (typeOrHandle instanceof Array) {
-        // allow an array of event types
-        eventTypes = typeOrHandle;
-      } else if (typeOrHandle.indexOf(",") > -1) {
-        // allow comma delimited event types
-        eventTypes = typeOrHandle.split(/\s*,\s*/);
-      } else {
-        eventTypes = [typeOrHandle];
-      }
-
+      var eventTypes = parseEventTypes(typeOrHandle);
       if (eventTypes) {
         for (var events_i = 0, events_len = eventTypes.length; events_i !== events_len; ++events_i) {
           while (this._removeListener(eventTypes[events_i], listener)) {
@@ -328,4 +308,19 @@ define([
       return event;
     }
   });
+
+  function parseEventTypes(type) {
+    if(type instanceof Array) {
+      // Allow an array of event types.
+      return type;
+    }
+
+    if(type.indexOf(",") > -1) {
+      // Allow comma delimited event types.
+      // Already eats spaces.
+      return type.split(/\s*,\s*/);
+    }
+
+    return [type];
+  }
 });
