@@ -47,6 +47,9 @@ var instanceMethods = /** @lends pentaho.lang.EventSource# */{
    * @param {?object} [keyArgs] Keyword arguments.
    * @param {?number} [keyArgs.priority=0] The listening priority.
    * Higher priority event listeners listen to an event before any lower priority event listeners.
+   * The priority can be set to `-Infinity` or `Infinity`.
+   * In case two listeners are assigned the same priority,
+   * the insertion order determines which runs first.
    *
    * @return {!pentaho.lang.IEventHandle} An event handle that can be used to
    *   efficiently remove the event listener.
@@ -107,11 +110,14 @@ var instanceMethods = /** @lends pentaho.lang.EventSource# */{
    * Emits an event and returns it, unless it was canceled.
    *
    * Event listeners registered by the time the method is called are notified,
-   * by priority order,
+   * synchronously, by priority order and then insertion order,
    * until either the event is canceled or all of the listeners have been notified.
    *
    * It is safe to add and/or remove listeners during an event emission.
    * However, any changes only impact following event emissions.
+   *
+   * If an event listener throws an error, the event processing is interrupted.
+   * No more listeners are notified and the error is passed to the caller.
    *
    * @param {!pentaho.lang.Event} event The event object emit.
    * @return {?pentaho.lang.Event} The emitted event object or `null`, when canceled.
