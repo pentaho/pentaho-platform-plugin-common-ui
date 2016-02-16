@@ -20,13 +20,15 @@ define([
 ], function(Event, EventSource, error) {
   "use strict";
 
+  /* global jasmine:false, describe:false, it:false, expect:false, beforeEach:false, spyOn: false */
+
   describe("pentaho.lang.EventSource -", function() {
     var eventSource;
     beforeEach(function() {
       eventSource = new EventSource();
     });
 
-    describe("#on and #off -", function() {
+    describe("both #on and #off -", function() {
       var event1, event2, source, listener, state;
       beforeEach(function() {
         source = {};
@@ -38,7 +40,7 @@ define([
         };
       });
 
-      it("both #on and #off should accept a csv string of types and register the given listener function", function() {
+      it("should accept a csv string of event types and register/unregister the given listener function.", function() {
         eventSource.on("foo,bar", listener);
         eventSource._emit(event1);
         eventSource._emit(event2);
@@ -50,7 +52,7 @@ define([
         expect(state).toBe(2);
       });
 
-      it("both #on and #off should accept an array of strings of types and register the given listener function", function() {
+      it("should accept an array of strings containing event types and register/unregister the given listener function.", function() {
         eventSource.on(["foo", "bar"], listener);
         eventSource._emit(event1);
         eventSource._emit(event2);
@@ -71,74 +73,114 @@ define([
         state = "original";
       });
 
-      it("should not yet notify a listener if is being registered during an emit cycle", function() {
-        eventSource.on("foo", function() {
-          eventSource.on("foo", function() {
-            state = state + " third";
-          });
-          state = state + " first";
-        });
-        eventSource.on("foo", function() {
-          state = state + " second";
-        });
-        eventSource._emit(event);
-        expect(state).toBe("original first second");
-      });
-
-      it("should only notify a listener in the emit cycles that take place after registering the listener", function() {
-        eventSource.on("foo", function() {
-          eventSource.on("foo", function() {
-            state = state + " third";
-          });
-          state = state + " first";
-        });
-        eventSource.on("foo", function() {
-          state = state + " second";
-        });
-        eventSource._emit(event);
-        expect(state).toBe("original first second");
-        eventSource._emit(event);
-        expect(state).toBe("original first second first second third");
-      });
-
-      it("should throw an error when no parameters provided.", function() {
+      it("should throw an `argRequired` error when no parameters are provided.", function() {
         expect(function() {
           eventSource.on();
         }).toThrowError(error.argRequired("type").message);
+
         expect(function() {
           eventSource.on(null);
         }).toThrowError(error.argRequired("type").message);
+
         expect(function() {
           eventSource.on(undefined);
         }).toThrowError(error.argRequired("type").message);
       });
 
-      it("should throw an error when type parameter is set but the listener parameter is not provided.", function() {
+      it("should throw an `argRequired` error when the `type` argument is set but the `listener` argument is not provided.", function() {
         expect(function() {
           eventSource.on("test");
         }).toThrowError(error.argRequired("listener").message);
+
         expect(function() {
           eventSource.on("test", null);
         }).toThrowError(error.argRequired("listener").message);
+
         expect(function() {
           eventSource.on("test", undefined);
         }).toThrowError(error.argRequired("listener").message);
       });
+
+      describe("should return -", function() {
+        it("`null` if `type` is []", function() {
+          var output = eventSource.on([], function() {});
+          expect(output).toBeNull();
+        });
+
+        function expectIEventRegistrationHandle(output) {
+          expect(typeof output).toBe("object");
+          expect(typeof output.dispose).toBe("function");
+          expect(typeof output.remove).toBe("function");
+        }
+
+        it("an object compliant with pentaho.lang.IEventRegistrationHandle` when registering a single event", function() {
+          var output = eventSource.on("foo", function() {});
+          expectIEventRegistrationHandle(output)
+        });
+
+        it("an object compliant with pentaho.lang.IEventRegistrationHandle` when registering a multiple event", function() {
+          var output = eventSource.on("spam,eggs", function() {});
+          expectIEventRegistrationHandle(output)
+        });
+      });
+
+      it("should not yet notify a listener if is being registered during an emit cycle.", function() {
+        var listeners = {
+          first: function() {
+            eventSource.on("foo", listeners.intruder);
+          },
+          second: function() {},
+          intruder: function() {}
+        };
+
+        spyOn(listeners, "first").and.callThrough();
+        spyOn(listeners, "second").and.callThrough();
+        spyOn(listeners, "intruder").and.callThrough();
+
+        eventSource.on("foo", listeners.first);
+        eventSource.on("foo", listeners.second);
+
+        eventSource._emit(event);
+        expect(listeners.intruder).not.toHaveBeenCalled();
+      });
+
+      it("should only notify a listener in the emit cycles that take place after registering the listener.", function() {
+        var listeners = {
+          first: function() {
+            eventSource.on("foo", listeners.intruder);
+          },
+          second: function() {},
+          intruder: function() {}
+        };
+
+        spyOn(listeners, "first").and.callThrough();
+        spyOn(listeners, "second").and.callThrough();
+        spyOn(listeners, "intruder").and.callThrough();
+
+        eventSource.on("foo", listeners.first);
+        eventSource.on("foo", listeners.second);
+
+        eventSource._emit(event);
+        expect(listeners.intruder).not.toHaveBeenCalled();
+        eventSource._emit(event);
+        expect(listeners.intruder).toHaveBeenCalled();
+      });
+
     }); // on#
 
     describe("#off(type, listener) -", function() {
       var event, source, state;
+
       beforeEach(function() {
         source = {};
         event = new Event("foo", source, true);
         state = "original";
       });
 
-      it("should still notify a listener if it is unregistered during an emit cycle", function() {
+      it("should remove a listener.", function() {
         var handle;
 
         eventSource.on("foo", function() {
-          eventSource.off(handle);
           state = state + " first";
         });
 
@@ -147,47 +189,51 @@ define([
         });
 
         eventSource._emit(event);
-
-        expect(state).toBe("original first second");
-      });
-
-      it("should only stop notifying a listener in the emit cycles that take place after unregistering the listener", function() {
-        var handle;
-
-        eventSource.on("foo", function() {
-          eventSource.off(handle);
-          state = state + " first";
-        });
-
-        handle = eventSource.on("foo", function() {
-          state = state + " second";
-        });
-
-        eventSource._emit(event);
+        eventSource.off(handle);
         eventSource._emit(event);
 
         expect(state).toBe("original first second first");
+      });
+
+      it("should not prevent its listener from being called when it is invoked during the execution of the event.", function() {
+        var handle;
+
+        eventSource.on("foo", function() {
+          eventSource.off(handle);
+          state = state + " first";
+        });
+
+        handle = eventSource.on("foo", function() {
+          state = state + " second";
+        });
+
+        eventSource._emit(event);
+        expect(state).toBe("original first second");
       });
 
       it("should throw an error when no parameters provided.", function() {
         expect(function() {
           eventSource.off();
         }).toThrowError(error.argRequired("typeOrHandle").message);
+
         expect(function() {
           eventSource.off(null);
         }).toThrowError(error.argRequired("typeOrHandle").message);
+
         expect(function() {
           eventSource.off(undefined);
         }).toThrowError(error.argRequired("typeOrHandle").message);
       });
 
-      it("should throw an error when the typeOrHandle is a string but no listerner is provided.", function() {
+      it("should throw an error when the typeOrHandle is a string but no listener is provided.", function() {
         expect(function() {
           eventSource.off("test");
         }).toThrowError(error.argRequired("listener").message);
+
         expect(function() {
           eventSource.off("test", null);
         }).toThrowError(error.argRequired("listener").message);
+
         expect(function() {
           eventSource.off("test", undefined);
         }).toThrowError(error.argRequired("listener").message);
@@ -197,20 +243,22 @@ define([
 
     describe("#_hasListeners(type) -", function() {
 
-      it("should return `true` if there are registered listeners", function() {
+      it("should return `true` if there are registered listeners.", function() {
         expect(eventSource._hasListeners("foo")).toBe(false);
-        eventSource.on("foo", function() {
-        });
+
+        eventSource.on("foo", function() {});
+
         expect(eventSource._hasListeners("foo")).toBe(true);
       });
 
-      it("should return `false` if there are no registered listeners", function() {
+      it("should return `false` if there are no registered listeners.", function() {
         expect(eventSource._hasListeners("foo")).toBe(false);
 
-        var fooListener = function() {
-        };
+        var fooListener = function() {};
+
         eventSource.on("foo", fooListener);
         expect(eventSource._hasListeners("foo")).toBe(true);
+
         eventSource.off("foo", fooListener);
         expect(eventSource._hasListeners("foo")).toBe(false);
       });
@@ -218,200 +266,119 @@ define([
     }); // #_hasListeners
 
     describe("#_emit(event) -", function() {
-      var event, source;
+      var event;
+
       beforeEach(function() {
-        source = {};
-        event = new Event("foo", source, true);
+        event = new Event("foo", eventSource, true);
       });
 
       it("should throw an error when no parameters provided.", function() {
         expect(function() {
           eventSource._emit();
         }).toThrowError(error.argRequired("event").message);
+
         expect(function() {
           eventSource._emit(null);
         }).toThrowError(error.argRequired("event").message);
+
         expect(function() {
           eventSource._emit(undefined);
         }).toThrowError(error.argRequired("event").message);
+      });
+
+      it("should throw an error when the argument is of an invalid type.", function() {
         expect(function() {
           eventSource._emit({});
         }).toThrowError(error.argInvalidType("event", "pentaho.type.Event").message);
       });
 
-      it("should notify a listener registered for the same event type as the event being emitted", function() {
-        var state = "original";
-        eventSource.on("foo", function() {
-          state = state + " foo";
-        });
-        eventSource.on("bar", function() {
-          state = state + " bar";
-        });
+      it("should notify a listener registered for the same event type as the event being emitted.", function() {
+        var listeners = {
+          foo: function() {}
+        };
+        spyOn(listeners, "foo").and.callThrough();
+
+        eventSource.on("foo", listeners.foo);
 
         eventSource._emit(event);
-        expect(state).toBe("original foo");
+        expect(listeners.foo).toHaveBeenCalled();
       });
 
-      it("should not notify a listener registered for a different event type as the event being emitted", function() {
-        var state = "original";
-        eventSource.on("bar", function() {
-          state = "bar";
-        });
-        eventSource.on("foo", function() {
-          state = "foo";
-        });
-        eventSource.on("spam", function() {
-          state = "spam";
-        });
+      it("should not notify a listener registered for a different event type as the event being emitted.", function() {
+        var listeners = {
+          foo: function() {},
+          bar: function() {}
+        };
+
+        spyOn(listeners, "bar").and.callThrough();
+        eventSource.on("foo", listeners.foo);
+        eventSource.on("bar", listeners.bar);
 
         eventSource._emit(event);
-        expect(state).not.toBe("bar");
-        expect(state).not.toBe("spam");
+        expect(listeners.bar).not.toHaveBeenCalled();
       });
 
-      it("should respect the priority with which the event listeners are registered", function() {
-        var state = "original";
-        eventSource.on("foo", function() {
-          state = state + " first";
-        }, {
-          priority: 0
-        });
-        eventSource.on("foo", function() {
-          state = state + " second";
-        }, {
-          priority: -1
-        });
+      it("should return `null` and not process an event that was previously canceled.", function() {
+        var listeners = {
+          foo: function() {}
+        };
+        
+        spyOn(listeners, "foo").and.callThrough();
+        eventSource.on("foo", listeners.foo);
 
-        eventSource._emit(event);
-        expect(state).toBe("original first second");
+        event.cancel();
+        var result = eventSource._emit(event);
+
+        expect(listeners.foo).not.toHaveBeenCalled();
+        expect(result).toBeNull();
       });
 
-      it("should handle listeners registered with a priority of `Infinity`", function() {
-        var state = "original";
-        eventSource.on("foo", function() {
-          state = state + " second";
-        });
-        eventSource.on("foo", function() {
-          state = state + " first";
-        }, {
-          priority: Infinity
-        });
-        eventSource.on("foo", function() {
-          state = state + " last";
-        }, {
-          priority: -Infinity
-        });
+      it("should return the event if no listener canceled the execution.", function() {
+        var listener = function() {};
 
-        eventSource._emit(event);
-        expect(state).toBe("original first second last");
+        eventSource.on("foo", listener);
+        var result = eventSource._emit(event);
+
+        expect(result).toBe(event);
       });
 
-      it("should handle listeners registered with a priority of Number.MAX_VALUE before `Infinity` and `Number.MIN_VALUE` after 0", function() {
-        var state = "original";
-        eventSource.on("foo", function() {
-          state = state + " fourth";
-        });
-        eventSource.on("foo", function() {
-          state = state + " third";
-        }, {
-          priority: Number.MIN_VALUE
-        });
-        eventSource.on("foo", function() {
-          state = state + " last";
-        }, {
-          priority: -Infinity
-        });
-        eventSource.on("foo", function() {
-          state = state + " first";
-        }, {
-          priority: Infinity
-        });
-        eventSource.on("foo", function() {
-          state = state + " second";
-        }, {
-          priority: Number.MAX_VALUE
-        });
-
-        eventSource._emit(event);
-        expect(state).toBe("original first second third fourth last");
-      });
-
-      it("should respect the insertion order, if the priority of the registered event listeners is the same", function() {
-        [
-          10, 1, 0, -1, 10
-        ].forEach(function(p) {
-          var eventSource = new EventSource();
-          var event = new Event("foo", {}, true);
-
-          var state = "original";
-          eventSource.on("foo", function() {
-            state = state + " first";
-          }, {
-            priority: p
-          });
-          eventSource.on("foo", function() {
-            state = state + " second";
-          }, {
-            priority: p
-          });
-
-          eventSource._emit(event);
-          expect(state).toBe("original first second");
-        });
-      });
-
-      it("should convert `nully` priorities to 0", function() {
-        [
-          null, undefined, false, ""
-        ].forEach(function(p) {
-          var eventSource = new EventSource();
-          var event = new Event("foo", {}, true);
-          var state = "original";
-
-          eventSource.on("foo", function() {
-            state = state + " first";
-          }, {
-            priority: 0
-          });
-          eventSource.on("foo", function() {
-            state = state + " second";
-          }, {
-            priority: p
-          });
-          eventSource.on("foo", function() {
-            state = state + " third";
-          }, {
-            priority: 0
-          });
-
-          eventSource._emit(event);
-          expect(state).toBe("original first second third");
-        });
-      });
-
-      it("should skip the execution of event listeners with lower priority when an event is canceled by a higher-priority event listener", function() {
-        var state = "original";
-        eventSource.on("foo", function(event) {
+      it("should return `null` if the event was canceled by some listener.", function() {
+        var listener = function(event) {
           event.cancel();
-          state = state + " first";
-        }, {
-          priority: 0
-        });
-        eventSource.on("foo", function() {
-          state = state + " second";
-        }, {
-          priority: -1
-        });
+        };
 
-        eventSource._emit(event);
-        expect(state).toBe("original first");
+        eventSource.on("foo", listener);
+        var result = eventSource._emit(event);
+
+        expect(result).toBeNull();
       });
 
-      it("should only invoke a listener once even if it is registered multiple times", function() {
+      it("should interrupt the event being processed if a listener throws an exception.", function() {
+        var listeners = {
+          firstAndThrow: function() {
+            throw new Error("Stirb!");
+          },
+          second: function() {}
+        };
+
+        spyOn(listeners, "firstAndThrow").and.callThrough();
+        spyOn(listeners, "second").and.callThrough();
+
+        eventSource.on("foo", listeners.firstAndThrow);
+        eventSource.on("foo", listeners.second);
+
+        expect(function() {
+          eventSource._emit(event);
+        }).toThrowError("Stirb!");
+        expect(listeners.second).not.toHaveBeenCalled();
+      });
+
+      it("should invoke a listener N times if it is registered N times.", function() {
         var state = 0;
         var listener = function() {
           state = state + 1;
         };
+
         eventSource.on("foo", listener);
         eventSource.on("foo", listener);
         eventSource.on("foo", listener);
@@ -420,21 +387,175 @@ define([
         expect(state).toBe(3);
       });
 
-      it("should interrupt the event being processed if a listener throws an exception", function() {
-        var state = "original";
-        eventSource.on("foo", function() {
-          state = state + " first";
-          throw new Error("Stirb!");
-        });
-        eventSource.on("foo", function() {
-          state = state + " second";
-        });
+      it("should not process a previously disposed EventRegistrationHandle.", function() {
+        var listeners = {
+          foo: function() {
+          }
+        };
 
-        expect(function() {
+        spyOn(listeners, "foo").and.callThrough();
+
+        var handle = eventSource.on("foo", listeners.foo);
+
+        handle.dispose();
+        eventSource._emit(event);
+
+        expect(listeners.foo).not.toHaveBeenCalled();
+      });
+
+      describe("should handle priorities, namely it -", function() {
+        it("should respect the priority with which the event listeners are registered.", function() {
+          var state = "original";
+
+          eventSource.on("foo", function() {
+            state = state + " first";
+          }, {
+            priority: 0
+          });
+
+          eventSource.on("foo", function() {
+            state = state + " second";
+          }, {
+            priority: -1
+          });
+
           eventSource._emit(event);
-        }).toThrowError("Stirb!");
+          expect(state).toBe("original first second");
+        });
 
-        expect(state).toBe("original first");
+        it("should handle listeners registered with a priority of `Infinity`.", function() {
+          var state = "original";
+
+          eventSource.on("foo", function() {
+            state = state + " second";
+          });
+
+          eventSource.on("foo", function() {
+            state = state + " first";
+          }, {
+            priority: Infinity
+          });
+
+          eventSource.on("foo", function() {
+            state = state + " last";
+          }, {
+            priority: -Infinity
+          });
+
+          eventSource._emit(event);
+          expect(state).toBe("original first second last");
+        });
+
+        it("should handle listeners registered with a priority of Number.MAX_VALUE before `Infinity` and `Number.MIN_VALUE` after 0.", function() {
+          var state = "original";
+
+          eventSource.on("foo", function() {
+            state = state + " fourth";
+          });
+
+          eventSource.on("foo", function() {
+            state = state + " third";
+          }, {
+            priority: Number.MIN_VALUE
+          });
+
+          eventSource.on("foo", function() {
+            state = state + " last";
+          }, {
+            priority: -Infinity
+          });
+
+          eventSource.on("foo", function() {
+            state = state + " first";
+          }, {
+            priority: Infinity
+          });
+
+          eventSource.on("foo", function() {
+            state = state + " second";
+          }, {
+            priority: Number.MAX_VALUE
+          });
+
+          eventSource._emit(event);
+          expect(state).toBe("original first second third fourth last");
+        });
+
+        it("should respect the insertion order, if the priority of the registered event listeners is the same.", function() {
+          [
+            -10, 1, 0, -1, 10
+          ].forEach(function(p) {
+            var eventSource = new EventSource();
+            var event = new Event("foo", eventSource, true);
+            var state = "original";
+
+            eventSource.on("foo", function() {
+              state = state + " first";
+            }, {
+              priority: p
+            });
+
+            eventSource.on("foo", function() {
+              state = state + " second";
+            }, {
+              priority: p
+            });
+
+            eventSource._emit(event);
+            expect(state).toBe("original first second");
+          });
+        });
+
+        it("should convert `nully` priorities to 0.", function() {
+          [
+            null, undefined, false, ""
+          ].forEach(function(p) {
+            var eventSource = new EventSource();
+            var event = new Event("foo", eventSource, true);
+            var state = "original";
+
+            eventSource.on("foo", function() {
+              state = state + " first";
+            }, {
+              priority: 0
+            });
+
+            eventSource.on("foo", function() {
+              state = state + " second";
+            }, {
+              priority: p
+            });
+
+            eventSource.on("foo", function() {
+              state = state + " third";
+            }, {
+              priority: 0
+            });
+
+            eventSource._emit(event);
+            expect(state).toBe("original first second third");
+          });
+        });
+
+        it("should skip the execution of event listeners with lower priority when an event is canceled by a higher-priority event listener.", function() {
+          var state = "original";
+
+          eventSource.on("foo", function(event) {
+            event.cancel();
+            state = state + " first"; // note that this code still runs
+          }, {
+            priority: 0
+          });
+
+          eventSource.on("foo", function() {
+            state = state + " second";
+          }, {
+            priority: -1
+          });
+
+          eventSource._emit(event);
+          expect(state).toBe("original first");
+        });
       });
 
     }); // #_emit

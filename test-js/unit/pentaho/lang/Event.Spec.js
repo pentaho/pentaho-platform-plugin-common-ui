@@ -15,21 +15,34 @@
  */
 define([
   "pentaho/lang/Event",
-  "pentaho/lang/EventSource"
-], function() {
+  "pentaho/util/error"
+], function(Event, error) {
   "use strict";
 
   describe("pentaho.lang.Event -", function(Event, EventSource) {
     var event, nc_event, source;
     beforeEach(function() {
-      source = new EventSource();
-
+      source = {}; // mock for `new EventSource(); `
       event = new Event("foo", source, true);
       nc_event = new Event("bar", source, false);
     });
 
     xit("should be defined.", function() {
       expect(typeof Event).toBeDefined();
+    });
+
+    describe("the constructor -", function() {
+      it("should throw an `argRequired` error if the `type` argument is omitted.", function() {
+        expect(function() {
+          var event = new Event();
+        }).toThrowError(error.argRequired("type").message);
+      });
+
+      it("should throw an `argRequired` error if the `source` argument is omitted.", function() {
+        expect(function() {
+          var event = new Event("foo");
+        }).toThrowError(error.argRequired("source").message);
+      });
     });
 
     describe("#type -", function() {
@@ -76,24 +89,51 @@ define([
     }); // #cancel()
 
     describe("#clone -", function() {
-      var clone = event.clone();
+      var clone;
 
-      xit("the cloned event should not be the same as the original", function() {
+      beforeEach(function() {
+        clone = event.clone();
+      });
+
+      it("should return an event that is distinct from the original", function() {
         expect(clone).not.toBe(event);
       });
 
-      xit("The cloned event should have the same properties values as the original", function() {
+      it("should return an event that has the same `type` as the original", function() {
         expect(clone.type).toBe(event.type);
-        expect(clone.source).toBe(event.source);
-        expect(clone.isCancelable()).toBe(event.isCancelable());
       });
 
-      xit("should not be canceled.", function() {
+      it("should return an event that has the same `source` as the original", function() {
+        expect(clone.source).toBe(event.source);
+      });
+
+      it("should return an event that has the same `isCancelable` as the original", function() {
+        expect(clone.isCancelable).toBe(event.isCancelable);
+      });
+
+      it("should not cancel the clone event if the original event was cancelled.", function() {
         event.cancel();
-        expect(event.isCanceled()).toBe(true);
-        clone = event.clone();
-        expect(clone.isCanceled()).toBe(false);
-      })
+        expect(event.isCanceled).toBe(true);
+        expect(clone.isCanceled).toBe(false);
+      });
+
+      it("should preserve properties if the event is an instance of a subclass of `pentaho.lang.Event`", function(){
+        var DerivedEvent = Event.extend({
+          extraProperty: "extraProperty",
+          extraMethod: function(){
+            return "extraMethod";
+          }
+        });
+
+        var type = "foo";
+        var derivedEvent = new DerivedEvent(type, {}, true);
+        var clone = derivedEvent.clone();
+
+        expect(clone instanceof DerivedEvent).toBe(true);
+        expect(clone.type).toBe(type);
+        expect(clone.extraProperty).toBe("extraProperty");
+        expect(clone.extraMethod()).toBe("extraMethod");
+      });
     }); // #clone()
 
   }); // #pentaho.lang.Event
