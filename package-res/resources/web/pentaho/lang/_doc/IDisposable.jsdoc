@@ -22,7 +22,7 @@
  */
 
 /**
- * Disposes an object if it hasn't been disposed yet.
+ * Disposes of an object if it hasn't been disposed of yet.
  *
  * This method should **not** throw an error in case the resource
  * has already been disposed of.
