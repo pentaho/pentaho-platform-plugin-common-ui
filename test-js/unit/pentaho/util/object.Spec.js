@@ -451,56 +451,62 @@ define([
 
     }); // getPropertyDescriptor
 
-    describe("`setPrototypeOf` -", function() {
-      var Spam, protoEggs, parrot;
-      beforeEach(function() {
-        Spam = function() {
-          this.bar = "bar";
-        };
-        Spam.prototype = new function() {
-          this.spam = "spam";
-        };
-        parrot = new Spam();
+    [
+      {setPrototypeOf: O.setPrototypeOf, _label: "ES5"},
+      {setPrototypeOf: O._forTestingPurposesOnly.setProtoCopy, _label: "setProtoCopy"},
+      {setPrototypeOf: O._forTestingPurposesOnly.setProtoProp, _label: "setProtoProp"}
+    ].forEach(function(O) {
+      describe("`setPrototypeOf` - " + O._label + " variant -", function() {
+        var Spam, protoEggs, parrot;
+        beforeEach(function() {
+          Spam = function() {
+            this.bar = "bar";
+          };
+          Spam.prototype = new (function() {
+            this.spam = "spam";
+          })();
+          parrot = new Spam();
 
-        var myProto = function() {
-          this.spam = "eggs";
-        };
-        protoEggs = new myProto();
-      });
-
-      it("should return the input object, if the desired prototype is an object", function() {
-        expect(O.setPrototypeOf(parrot, protoEggs)).toBe(parrot);
-      });
-
-      it("should return the input object, if the desired prototype is `null` ", function() {
-        expect(O.setPrototypeOf(parrot, null)).toBe(parrot);
-      });
-
-      it("should replace the `prototype` of an object, if the desired prototype is an object", function() {
-        expect(parrot.spam).toBe("spam");
-        O.setPrototypeOf(parrot, protoEggs);
-        expect(parrot.spam).toBe("eggs");
-      });
-
-      it("should clear the object's prototype, if the desired prototype is `null`", function() {
-        expect(parrot.spam).toBe("spam");
-        var deadParrot = O.setPrototypeOf(parrot, null);
-        expect(deadParrot.spam).toBeUndefined();
-      });
-
-      it("should throw an error if the object is not extensible", function() {
-        [
-          Object.seal(new Spam()),
-          Object.freeze(new Spam()),
-          Object.preventExtensions(new Spam())
-        ].forEach(function(parrot) {
-          expect(function() {
-            O.setPrototypeOf(parrot, protoEggs);
-          }).toThrowError(TypeError);
+          var myProto = function() {
+            this.spam = "eggs";
+          };
+          protoEggs = new myProto();
         });
-      });
 
-    }); // setPrototypeOf
+        it("should return the input object, if the desired prototype is an object", function() {
+          expect(O.setPrototypeOf(parrot, protoEggs)).toBe(parrot);
+        });
+
+        it("should return the input object, if the desired prototype is `null` ", function() {
+          expect(O.setPrototypeOf(parrot, null)).toBe(parrot);
+        });
+
+        it("should replace the `prototype` of an object, if the desired prototype is an object", function() {
+          expect(parrot.spam).toBe("spam");
+          O.setPrototypeOf(parrot, protoEggs);
+          expect(parrot.spam).toBe("eggs");
+        });
+
+        it("should clear the object's prototype, if the desired prototype is `null`", function() {
+          expect(parrot.spam).toBe("spam");
+          var deadParrot = O.setPrototypeOf(parrot, null);
+          expect(deadParrot.spam).toBeUndefined();
+        });
+
+        it("should throw an error if the object is not extensible", function() {
+          [
+            Object.seal(new Spam()),
+            Object.freeze(new Spam()),
+            Object.preventExtensions(new Spam())
+          ].forEach(function(parrot) {
+            expect(function() {
+              O.setPrototypeOf(parrot, protoEggs);
+            }).toThrowError(TypeError);
+          });
+        });
+
+      }); // setPrototypeOf
+    });
 
     describe("`make` -", function() {
 
