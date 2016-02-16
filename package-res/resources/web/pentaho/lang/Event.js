@@ -16,8 +16,9 @@
 
 define([
   "./Base",
+  "../util/object",
   "../util/error"
-], function(Base, error) {
+], function(Base, O, error) {
 
   "use strict";
 
@@ -72,8 +73,8 @@ define([
      * @param {?boolean} [cancelable=false] - Indicates if the event can be canceled.
      */
     constructor: function(type, source, cancelable) {
-      if(!type) throw error.argRequired("type");
-      if(!source) throw error.argRequired("source");
+      if (!type) throw error.argRequired("type");
+      if (!source) throw error.argRequired("source");
 
       this._type = type;
       this._source = source;
@@ -146,6 +147,17 @@ define([
      * @return {!pentaho.lang.Event} The cloned event object.
      */
     clone: function() {
+      var proto = Object.getPrototypeOf(this);
+
+      var clone = Object.create(proto);
+      for (var name in this) {
+        if (this.hasOwnProperty(name)) {
+          var desc = O.getPropertyDescriptor(this, name);
+          Object.defineProperty(clone, name, desc);
+        }
+      }
+
+      return clone;
     }
   });
 });
