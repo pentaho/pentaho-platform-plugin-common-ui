@@ -312,15 +312,13 @@ define([
      * This method can be used even if a generic type metadata specification references
      * non-standard types whose modules have not yet been loaded by the AMD module system.
      *
-     * An error is thrown when:
+     * The returned promise gets rejected with an error when:
      *
      * * the argument `typeRef` is of an unsupported JavaScript type: not a string, function, array or object
      *
      * * the argument `typeRef` is a value type's constructor (e.g. [Value.Meta]{@link pentaho.type.Value.Meta})
      *
      * * the argument `typeRef` is a value instance.
-     *
-     * The returned promise gets rejected with an error when:
      *
      * * the id of a type is not defined as a module in the AMD module system
      *   (specified directly in `typeRef`, or present in an generic type specification)
@@ -330,7 +328,9 @@ define([
      *
      * * an instance constructor is from a different [context]{@link pentaho.type.Value.Meta#context}
      *   (directly specified in `typeRef`,
-     *    or obtained indirectly by loading a type's module given its id, or from a factory function).
+     *    or obtained indirectly by loading a type's module given its id, or from a factory function)
+     *
+     * * any other, unexpected error occurs.
      *
      * @example
      * <caption>
@@ -364,12 +364,18 @@ define([
      * @see pentaho.type.Context#get
      */
     getAsync: function(typeRef) {
-      return this._get(typeRef, false);
+      try {
+        return this._get(typeRef, false);
+      } catch(ex) {
+        return Promise.reject(ex);
+      }
     },
 
     /**
      * Gets a promise for the **configured instance constructors** of
      * all of the types that are subtypes of a given base type.
+     *
+     * Any errors that may occur result in a rejected promise.
      *
      * @example
      * <caption>
@@ -404,19 +410,23 @@ define([
      * @see pentaho.type.Context#getAsync
      */
     getAllAsync: function(baseTypeId, keyArgs) {
-      if(!baseTypeId) baseTypeId = "pentaho/type/value";
+      try {
+        if(!baseTypeId) baseTypeId = "pentaho/type/value";
 
-      var predicate = F.predicate(keyArgs);
-      var me = this;
-      return promiseUtil.require("pentaho/service!" + baseTypeId)
-          .then(function(factories) {
-            return Promise.all(factories.map(me.getAsync, me));
-          })
-          .then(function(InstCtors) {
-            return predicate
-                ? InstCtors.filter(function(InstCtor) { return predicate(InstCtor.meta); })
-                : InstCtors;
-          });
+        var predicate = F.predicate(keyArgs);
+        var me = this;
+        return promiseUtil.require("pentaho/service!" + baseTypeId)
+            .then(function(factories) {
+              return Promise.all(factories.map(me.getAsync, me));
+            })
+            .then(function(InstCtors) {
+              return predicate
+                  ? InstCtors.filter(function(InstCtor) { return predicate(InstCtor.meta); })
+                  : InstCtors;
+            });
+      } catch(ex) {
+        return Promise.reject(ex);
+      }
     },
 
     //region get support
@@ -451,7 +461,7 @@ define([
             : this._getByObjectSpec(typeRef, sync);
       }
 
-      throw error.argInvalid("typeRef");
+      return this._error(error.argInvalid("typeRef"), sync);
     },
 
     /**
@@ -522,8 +532,11 @@ define([
     _getByFun: function(fun, sync) {
       var proto = fun.prototype;
 
-      if(proto instanceof Item     ) return this._getByType(fun, sync);
-      if(proto instanceof Item.Meta) throw error.argInvalid("typeRef", "Type constructor is not supported.");
+      if(proto instanceof Item)
+        return this._getByType(fun, sync);
+
+      if(proto instanceof Item.Meta)
+        return this._error(error.argInvalid("typeRef", "Type constructor is not supported."), sync);
 
       // Assume it's a factory function.
       return this._getByFactory(fun, sync);
@@ -570,7 +583,7 @@ define([
     _getByType: function(Type, sync, factoryUid) {
       var meta = Type.meta;
       if(meta.context !== this)
-        throw error.argInvalid("typeRef", "Type is from a different context.");
+        return this._error(error.argInvalid("typeRef", "Type is from a different context."), sync);
 
       // Check if already present, by uid.
       var TypeExisting = O.getOwn(this._byTypeUid, meta.uid);
@@ -590,7 +603,7 @@ define([
 
       } else if(Type !== TypeExisting) {
         // Pathological case, only possible if the result of an exploit.
-        throw error.argInvalid("typeRef", "Duplicate type class uid.");
+        return this._error(error.argInvalid("typeRef", "Duplicate type class uid."), sync);
       }
 
       if(factoryUid != null) {
@@ -641,15 +654,18 @@ define([
 
       Type = typeFactory(this);
       if(!F.is(Type) || !(Type.prototype instanceof Item))
-        throw error.operInvalid("Type factory must return a sub-class of 'pentaho/type/Item'.");
+        return this._error(error.operInvalid("Type factory must return a sub-class of 'pentaho/type/Item'."), sync);
 
       return this._getByType(Type, sync, factoryUid);
     },
 
     // Inline type spec: {[base: "complex", ] ... }
     _getByObjectSpec: function(typeSpec, sync) {
-      if(typeSpec instanceof Item.Meta) return this._getByType(typeSpec.mesa.constructor, sync);
-      if(typeSpec instanceof Item) throw error.argInvalid("typeRef", "Value instance is not supported.");
+      if(typeSpec instanceof Item.Meta)
+        return this._getByType(typeSpec.mesa.constructor, sync);
+
+      if(typeSpec instanceof Item)
+        return this._error(error.argInvalid("typeRef", "Value instance is not supported."), sync);
 
       var baseTypeSpec = typeSpec.base || _defaultBaseTypeMid,
           resolveSync = (function() {
@@ -681,7 +697,9 @@ define([
      */
     _getByListSpec: function(typeSpec, sync) {
       if(typeSpec.length > 1)
-        throw error.argInvalid("typeSpec", "List type specification should have at most one child element type spec.");
+        return this._error(
+            error.argInvalid("typeSpec", "List type specification should have at most one child element type spec."),
+            sync);
 
       // Expand compact list type spec syntax and delegate to the generic handler.
       var elemTypeSpec = (typeSpec.length && typeSpec[0]) || _defaultTypeMid;
@@ -696,6 +714,11 @@ define([
 
     _return: function(Type, sync) {
       return sync ? Type : Promise.resolve(Type);
+    },
+
+    _error: function(ex, sync) {
+      if(sync) throw ex;
+      return Promise.reject(ex);
     }
   });
 

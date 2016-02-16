@@ -198,8 +198,28 @@ define([
       });
     });
 
-    describe("#get(type)", function() {
+    describe("#get|getAsync(type)", function() {
 
+      /**
+       * Each of the following tests is performed both synchronously and asynchronously
+       * using a single tester function.
+       *
+       * A test that should succeed uses testGet.
+       * A test that should fail uses testGetError.
+       */
+
+      /**
+       * Creates an async test function suitable for `it`.
+       *
+       * Receives a _get-test_ function, `tester`, that is called in two modes: sync and async.
+       *
+       * The `tester` function has the signature `function(sync, Context) : ?Promise`.
+       *
+       * The `tester` function should use `callGet(context, sync, spec)` to actually call the
+       * corresponding get method, sync or async, while providing the test's specific spec argument.
+       *
+       * If the `tester` function returns a promise, it is resolved and expected to succeed.
+       */
       function testGet(tester) {
 
         return function testStub(overallDone) {
@@ -215,14 +235,62 @@ define([
         };
       }
 
+      /**
+       * Creates an async test function suitable for `it`.
+       *
+       * Receives a _get-test_ function, `tester`, that is called in two modes: sync and async.
+       *
+       * The `tester` function has the signature `function(sync, Context) : ?Promise`.
+       *
+       * The `tester` function should use `callGet(context, sync, spec)` to actually call the
+       * corresponding get method, sync or async, while providing the test's specific spec argument.
+       *
+       * When async, the `tester` function should return a promise that should be rejected.
+       * When sync, the `tester` is expected to throw...
+       *
+       * In both cases, the error should be `exExpected`.
+       */
+      function testGetError(tester, exExpected) {
+
+        return function testStub(overallDone) {
+
+          var syncDone = function() {
+            // Async test
+            withContext(function(Context) {
+
+              var promise = tester(false, Context);
+              expect(promise instanceof Promise);
+              return promise
+                  .then(overallDone.fail, function(ex) {
+                    expect(ex).toEqual(exExpected);
+                  });
+
+            })(overallDone);
+          };
+
+          syncDone.fail = overallDone.fail;
+
+          // Sync test
+          withContext(function(Context) {
+
+            expect(function() {
+              tester(true, Context);
+            }).toThrow(exExpected);
+
+          })(syncDone);
+        };
+      }
+
+      /**
+       * Calls the get or getAsync method depending on the `sync` argument value.
+       */
       function callGet(context, sync, spec) {
         var result = context[sync ? "get" : "getAsync"](spec);
 
         if(sync) {
-          expect(typeof result.then).not.toBe("function");
+          if(result) expect(result instanceof Promise).toBe(false);
         } else {
-          // A promise
-          expect(typeof result.then).toBe("function");
+          expect(result instanceof Promise).toBe(true);
         }
 
         return Promise.resolve(result);
@@ -270,13 +338,11 @@ define([
         });
       }));
 
-      it("should throw when given a type metadata constructor (Meta)", testGet(function(sync, Context) {
+      it("should throw/reject when given a type metadata constructor (Meta)", testGetError(function(sync, Context) {
         var context = new Context();
         var Value   = context.get("pentaho/type/value");
-        expect(function() {
-          callGet(context, sync, Value.meta.constructor);
-        }).toThrow(errorMatch.argInvalid("typeRef"));
-      }));
+        return callGet(context, sync, Value.meta.constructor);
+      }, errorMatch.argInvalid("typeRef")));
 
       it("should be able to get a standard type given its type instance constructor (Mesa)", testGet(function(sync, Context) {
         var context = new Context();
@@ -298,14 +364,12 @@ define([
         });
       }));
 
-      it("should be able to get a standard type given its instance prototype (mesa)", testGet(function(sync, Context) {
+      it("should throw/reject when given a standard type instance prototype (mesa)", testGetError(function(sync, Context) {
         var context = new Context();
         var Value   = context.get("pentaho/type/value");
 
-        expect(function() {
-          callGet(context, sync, Value.prototype);
-        }).toThrow(errorMatch.argInvalid("typeRef"));
-      }));
+        return callGet(context, sync, Value.prototype);
+      }, errorMatch.argInvalid("typeRef")));
 
       it("should be able to create an anonymous complex type with base complex", testGet(function(sync, Context) {
         var context = new Context();
@@ -372,13 +436,11 @@ define([
         });
       }));
 
-      it("should throw if the shorthand list-type notation has two entries", testGet(function(sync, Context) {
+      it("should throw/reject if the shorthand list-type notation has two entries", testGetError(function(sync, Context) {
         var context = new Context();
 
-        expect(function() {
-          callGet(context, sync, [123, 234]);
-        }).toThrow(errorMatch.argInvalid("typeSpec"));
-      }));
+        return callGet(context, sync, [123, 234]);
+      }, errorMatch.argInvalid("typeSpec")));
 
       it("should be able to create a refinement type using normal notation", testGet(function(sync, Context) {
         var context = new Context();
@@ -395,16 +457,19 @@ define([
         });
       }));
 
-      it("should throw if given something other than a string, function or object", testGet(function(sync, Context) {
+      it("should throw/reject if given a number (not a string, function or object)", testGetError(function(sync, Context) {
         var context = new Context();
-        expect(function() {
-          callGet(context, sync, 1);
-        }).toThrow(errorMatch.argInvalid("typeRef"));
 
-        expect(function() {
-          callGet(context, sync, true);
-        }).toThrow(errorMatch.argInvalid("typeRef"));
-      }));
+        return callGet(context, sync, 1);
+
+      }, errorMatch.argInvalid("typeRef")));
+
+      it("should throw/reject if given a boolean (not a string, function or object)", testGetError(function(sync, Context) {
+        var context = new Context();
+
+        return callGet(context, sync, true);
+
+      }, errorMatch.argInvalid("typeRef")));
 
       it("should be able to get an already loaded non-standard type given its absolute id", testGet(function(sync, Context) {
         var mid = "pentaho/foo/bar";
