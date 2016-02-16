@@ -146,6 +146,13 @@ define([
      * @return {!pentaho.lang.Event} The cloned event object.
      */
     clone: function() {
+      var proto = Object.getPrototypeOf(this);
+
+      var clone = Object.create(proto);
+      proto.constructor.call(clone, this._type, this._source, this._cancelable);
+      clone._canceled = this._canceled;
+
+      return clone;
     }
   });
 });
