@@ -19,70 +19,73 @@ define([
 ], function(Event, error) {
   "use strict";
 
-  describe("pentaho.lang.Event -", function(Event, EventSource) {
+  /* global jasmine:false, describe:false, it:false, expect:false, beforeEach:false, spyOn: false */
+
+  describe("pentaho.lang.Event -", function() {
     var event, nc_event, source;
+
     beforeEach(function() {
       source = {}; // mock for `new EventSource(); `
       event = new Event("foo", source, true);
       nc_event = new Event("bar", source, false);
     });
 
-    xit("should be defined.", function() {
+    it("should be defined.", function() {
       expect(typeof Event).toBeDefined();
     });
 
     describe("the constructor -", function() {
       it("should throw an `argRequired` error if the `type` argument is omitted.", function() {
         expect(function() {
-          var event = new Event();
+          new Event();
         }).toThrowError(error.argRequired("type").message);
       });
 
       it("should throw an `argRequired` error if the `source` argument is omitted.", function() {
         expect(function() {
-          var event = new Event("foo");
+          new Event("foo");
         }).toThrowError(error.argRequired("source").message);
       });
     });
 
     describe("#type -", function() {
-      xit("should return the proper type when constructing an event of a type.", function() {
-        expect(event.type()).toBe("foo");
+      it("should return the proper type when constructing an event of a type.", function() {
+        expect(event.type).toBe("foo");
       });
     }); // #type
 
     describe("#source -", function() {
-      xit("should return the object where the event was initially emitted.", function() {
+      it("should return the object where the event was initially emitted.", function() {
         expect(event.source).toBe(source);
       });
     }); // #source
 
     describe("#isCancelable -", function() {
-      xit("should return `true` if the event is cancelable.", function() {
-        expect(event.isCancelable()).toBe(true);
+      it("should return `true` if the event is cancelable.", function() {
+        expect(event.isCancelable).toBe(true);
       });
 
-      xit("should return `false` if the event isn't cancelable.", function() {
-        expect(nc_event.isCancelable()).toBe(false);
+      it("should return `false` if the event isn't cancelable.", function() {
+        expect(nc_event.isCancelable).toBe(false);
       });
     }); // #isCancelable
 
     describe("#cancel() -", function() { //and #isCanceled()
       var expectCancelEvent = function(e, initial, final) {
-        expect(e.isCanceled()).toBe(initial);
+        expect(e.isCanceled).toBe(initial);
         e.cancel();
-        expect(e.isCanceled()).toBe(final);
+        expect(e.isCanceled).toBe(final);
       };
 
-      xit("should mark the event as canceled if the event is cancelable.", function() {
+      it("should mark the event as canceled if the event is cancelable.", function() {
         expectCancelEvent(event, false, true);
       });
 
-      xit("should have no effect if the event is cancelable.", function() {
+      it("should have no effect if the event is cancelable.", function() {
         expectCancelEvent(nc_event, false, false);
       });
 
-      xit("should have no effect if the event is already canceled.", function() {
+      it("should have no effect if the event is already canceled.", function() {
         expectCancelEvent(event, false, true);
         expectCancelEvent(event, true, true);
       });
