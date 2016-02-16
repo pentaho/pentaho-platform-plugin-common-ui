@@ -16,13 +16,8 @@
 define([
   "pentaho/type/Context",
   "pentaho/type/Property",
-  "pentaho/type/complex",
-  "pentaho/type/string",
-  "pentaho/type/boolean",
-  "pentaho/type/number",
-  "pentaho/i18n!/pentaho/type/i18n/types",
-  "pentaho/util/error"
-], function(Context, Property, complexFactory, stringFactory, booleanFactory, numberFactory, bundle, error) {
+  "tests/pentaho/util/errorMatch"
+], function(Context, Property, errorMatch) {
 
   "use strict";
 
@@ -30,10 +25,10 @@ define([
 
   var context = new Context(),
       PropertyMeta = Property.Meta,
-      Boolean = context.get(booleanFactory),
-      Complex = context.get(complexFactory),
-      String  = context.get(stringFactory),
-      Number  = context.get(numberFactory);
+      Boolean = context.get("pentaho/type/boolean"),
+      Complex = context.get("pentaho/type/complex"),
+      String  = context.get("pentaho/type/string"),
+      Number  = context.get("pentaho/type/number");
 
   describe("pentaho.type.Property.Meta -", function() {
 
@@ -322,7 +317,7 @@ define([
                 name: name,
                 type: "string"
               });
-            }).toThrowError(error.argRequired("name").message);
+            }).toThrow(errorMatch.argRequired("name"));
           }
 
           expectIt(undefined);
@@ -1046,7 +1041,7 @@ define([
 
         expect(function() {
           extendProp(Derived.meta, "baseStr", {name: "baseStr2"});
-        }).toThrowError(error.argInvalid("name", "Sub-properties cannot change the 'name' attribute.").message);
+        }).toThrow(errorMatch.argInvalid("name"));
       });
 
       describe("basic characteristics -", function() {
@@ -1687,7 +1682,7 @@ define([
         it("should throw when changed", function() {
           expect(function() {
             propMeta.name = "baseStrXYZ";
-          }).toThrowError(error.argInvalid("name", "Sub-properties cannot change the 'name' attribute.").message);
+          }).toThrow(errorMatch.argInvalid("name"));
         });
 
         it("should not throw when set but not changed", function() {
@@ -1756,7 +1751,7 @@ define([
 
           expect(function() {
             extendProp(Derived.meta, "num", {name: "num", type: Number});
-          }).toThrowError(error.argInvalid("type", bundle.structured.errors.property.typeNotSubtypeOfBaseType).message);
+          }).toThrow(errorMatch.argInvalid("type"));
         });
 
         it("should throw on a set type that is not a sub-type of the base property's type", function() {
@@ -1771,7 +1766,7 @@ define([
 
           expect(function() {
             propMeta.type = Number;
-          }).toThrowError(error.argInvalid("type", bundle.structured.errors.property.typeNotSubtypeOfBaseType).message);
+          }).toThrow(errorMatch.argInvalid("type"));
         });
       });
       //endregion

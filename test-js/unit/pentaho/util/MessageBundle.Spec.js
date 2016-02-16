@@ -15,8 +15,8 @@
  */
 define([
   "pentaho/util/MessageBundle",
-  "pentaho/util/error"
-], function(MessageBundle, error) {
+  "tests/pentaho/util/errorMatch"
+], function(MessageBundle, errorMatch) {
   "use strict";
 
   var isEmpty = function(obj) {
@@ -114,7 +114,7 @@ define([
           function expectThrowError(text) {
             expect(function() {
               that.bundle.format(text);
-            }).toThrowError(error.argRequired("text").message);
+            }).toThrow(errorMatch.argRequired("text"));
           }
 
           expectThrowError(null);

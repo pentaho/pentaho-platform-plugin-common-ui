@@ -20,8 +20,8 @@ define([
   "pentaho/data/_plain/RowList",
   "pentaho/data/_plain/Row",
   "pentaho/data/Structure",
-  "pentaho/util/error"
-], function(Model, Attribute, Table, RowList, Row, Structure, error) {
+  "tests/pentaho/util/errorMatch"
+], function(Model, Attribute, Table, RowList, Row, Structure, errorMatch) {
 
   function createModel1() {
     return new Model([
@@ -47,13 +47,13 @@ define([
       it("should throw when `spec` is not specified", function() {
         expect(function() {
           new Table(null, {model: model});
-        }).toThrowError(error.argRequired("spec").message);
+        }).toThrow(errorMatch.argRequired("spec"));
       });
 
       it("should throw when `keyArgs.model` is not specified", function() {
         expect(function() {
           new Table({});
-        }).toThrowError(error.argRequired("keyArgs.model").message);
+        }).toThrow(errorMatch.argRequired("keyArgs.model"));
       });
 
       describe("when `spec` has empty cols and rows arrays -", function() {

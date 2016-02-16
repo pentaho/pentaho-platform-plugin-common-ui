@@ -2,8 +2,8 @@ define([
   "pentaho/visual/base/View",
   "pentaho/visual/base",
   "pentaho/type/Context",
-  "pentaho/util/error"
-], function(View, modelFactory, Context, error) {
+  "tests/pentaho/util/errorMatch"
+], function(View, modelFactory, Context, errorMatch) {
   "use strict";
 
   describe("pentaho/visual/base/View", function() {
@@ -38,11 +38,11 @@ define([
       it("should throw if invoked with less than two arguments", function() {
         expect(function() {
           return new View();
-        }).toThrowError(error.argRequired("element").message);
+        }).toThrow(errorMatch.argRequired("element"));
 
         expect(function() {
           return new View(element);
-        }).toThrowError(error.argRequired("model").message);
+        }).toThrow(errorMatch.argRequired("model"));
 
         expect(function() {
           return new View(element, model);
@@ -55,7 +55,7 @@ define([
         ].forEach(function(elem) {
           expect(function() {
             return new View(elem, model);
-          }).toThrowError(error.argInvalidType("element", "HTMLElement", typeof elem).message);
+          }).toThrow(errorMatch.argInvalidType("element", "HTMLElement", typeof elem));
         });
       });
 

@@ -15,8 +15,8 @@
  */
 define([
   "pentaho/lang/Event",
-  "pentaho/util/error"
-], function(Event, error) {
+  "tests/pentaho/util/errorMatch"
+], function(Event, errorMatch) {
   "use strict";
 
   /* global jasmine:false, describe:false, it:false, expect:false, beforeEach:false, spyOn: false */
@@ -38,13 +38,13 @@ define([
       it("should throw an `argRequired` error if the `type` argument is omitted.", function() {
         expect(function() {
           new Event();
-        }).toThrowError(error.argRequired("type").message);
+        }).toThrow(errorMatch.argRequired("type"));
       });
 
       it("should throw an `argRequired` error if the `source` argument is omitted.", function() {
         expect(function() {
           new Event("foo");
-        }).toThrowError(error.argRequired("source").message);
+        }).toThrow(errorMatch.argRequired("source"));
       });
     });
 

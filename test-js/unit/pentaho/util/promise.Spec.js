@@ -15,8 +15,8 @@
  */
 define([
   "pentaho/util/promise",
-  "pentaho/util/error"
-], function(promiseUtil, error) {
+  "tests/pentaho/util/errorMatch"
+], function(promiseUtil, errorMatch) {
 
   "use strict";
 
@@ -32,7 +32,7 @@ define([
 
             promiseUtil.wrapCall.apply(promiseUtil, args);
 
-          }).toThrowError(error.argRequired("fun").message);
+          }).toThrow(errorMatch.argRequired("fun"));
         }
 
         expectIt([]);
@@ -89,7 +89,7 @@ define([
 
             promiseUtil.require.apply(promiseUtil, args);
 
-          }).toThrowError(error.argRequired("deps").message);
+          }).toThrow(errorMatch.argRequired("deps"));
         }
 
         expectIt([]);
@@ -193,7 +193,7 @@ define([
 
             promiseUtil["finally"].apply(promiseUtil, args);
 
-          }).toThrowError(error.argRequired("promise").message);
+          }).toThrow(errorMatch.argRequired("promise"));
         }
 
         expectIt([]);
@@ -211,7 +211,7 @@ define([
 
             promiseUtil["finally"].apply(promiseUtil, args);
 
-          }).toThrowError(error.argRequired("fun").message);
+          }).toThrow(errorMatch.argRequired("fun"));
         }
 
         expectIt([promise]);

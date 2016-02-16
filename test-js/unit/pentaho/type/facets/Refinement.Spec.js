@@ -15,8 +15,8 @@
  */
 define([
   "pentaho/type/facets/Refinement",
-  "pentaho/util/error"
-], function(RefinementFacet, error) {
+  "tests/pentaho/util/errorMatch"
+], function(RefinementFacet, errorMatch) {
 
   "use strict";
 
@@ -35,7 +35,7 @@ define([
       it("should throw when called", function() {
         expect(function() {
           RefinementFacet.validate({});
-        }).toThrowError(error.notImplemented().message);
+        }).toThrow(errorMatch.notImplemented());
       });
     });
   });

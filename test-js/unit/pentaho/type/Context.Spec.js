@@ -19,16 +19,16 @@ var __global__ = this;
 
 define([
   "pentaho/type/standard",
-  "pentaho/util/error",
-  "pentaho/util/promise",
-  "pentaho/i18n!/pentaho/type/i18n/types"
-], function(standard, error, promiseUtil, bundle) {
+  "tests/pentaho/util/errorMatch",
+  "pentaho/util/promise"
+], function(standard, errorMatch, promiseUtil) {
 
   "use strict";
 
-  /*global describe:false, it:false, expect:false, beforeEach:false, afterEach:false*/
+  /*global describe:false, it:false, expect:false, beforeEach:false, afterEach:false, Promise:false*/
 
-  /*global SESSION_NAME:false, active_theme:false, SESSION_LOCALE:false, Promise:false*/
+  // These should really be writable, i.e. globalVar: true
+  /*global SESSION_NAME:true, active_theme:true, SESSION_LOCALE:true */
 
   // NOTE: can only be used with `it`; does not work in `describe`.
   function withContext(testFun) {
@@ -275,7 +275,7 @@ define([
         var Value   = context.get("pentaho/type/value");
         expect(function() {
           callGet(context, sync, Value.meta.constructor);
-        }).toThrowError(error.argInvalid("typeRef", "Type constructor is not supported.").message);
+        }).toThrow(errorMatch.argInvalid("typeRef"));
       }));
 
       it("should be able to get a standard type given its type instance constructor (Mesa)", testGet(function(sync, Context) {
@@ -304,7 +304,7 @@ define([
 
         expect(function() {
           callGet(context, sync, Value.prototype);
-        }).toThrowError(error.argInvalid("typeRef", "Value instance is not supported.").message);
+        }).toThrow(errorMatch.argInvalid("typeRef"));
       }));
 
       it("should be able to create an anonymous complex type with base complex", testGet(function(sync, Context) {
@@ -377,8 +377,7 @@ define([
 
         expect(function() {
           callGet(context, sync, [123, 234]);
-        }).toThrowError(
-            error.argInvalid("typeSpec", "List type specification should have at most one child element type spec.").message);
+        }).toThrow(errorMatch.argInvalid("typeSpec"));
       }));
 
       it("should be able to create a refinement type using normal notation", testGet(function(sync, Context) {
@@ -400,11 +399,11 @@ define([
         var context = new Context();
         expect(function() {
           callGet(context, sync, 1);
-        }).toThrowError(error.argInvalid("typeRef").message);
+        }).toThrow(errorMatch.argInvalid("typeRef"));
 
         expect(function() {
           callGet(context, sync, true);
-        }).toThrowError(error.argInvalid("typeRef").message);
+        }).toThrow(errorMatch.argInvalid("typeRef"));
       }));
 
       it("should be able to get an already loaded non-standard type given its absolute id", testGet(function(sync, Context) {
@@ -446,7 +445,7 @@ define([
               expect("to throw").toBe(true);
               require.undef(mid);
             }, function(ex) {
-              expect(ex.message).toBe(error.operInvalid("Type factory must return a sub-class of 'pentaho/type/Item'.").message);
+              expect(ex).toEqual(errorMatch.operInvalid());
               require.undef(mid);
             });
       }));
@@ -469,7 +468,7 @@ define([
               expect("to throw").toBe(true);
               require.undef(mid);
             }, function(ex) {
-              expect(ex.message).toBe(error.operInvalid("Type factory must return a sub-class of 'pentaho/type/Item'.").message);
+              expect(ex).toEqual(errorMatch.operInvalid());
               require.undef(mid);
             });
       }));
