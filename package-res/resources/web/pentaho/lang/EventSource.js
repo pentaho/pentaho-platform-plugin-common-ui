@@ -39,7 +39,7 @@ define([
   // ---
 
   return Base.extend("pentaho.lang.EventSource", /** @lends pentaho.lang.EventSource# */{
-    _registry: null,
+    _listeners_registry: null,
 
     /**
      * @classDesc The `EventSource` class is a **mixin** to be
@@ -136,12 +136,12 @@ define([
     },
 
     _getQueueOf: function(type, create) {
-      var registry = this._registry;
+      var registry = this._listeners_registry;
       if(!registry) {
         if(!create) return null;
 
         // 1st event registration being added
-        this._registry = registry = {};
+        this._listeners_registry = registry = {};
         return (registry[type] = []);
       }
 
@@ -176,7 +176,7 @@ define([
     _removeListener: function(type, listener, fromIndex) {
       var index = this._indexOfListener(type, listener, fromIndex);
       if (index !== -1) {
-        var queue = this._registry[type];
+        var queue = this._listeners_registry[type];
         queue.splice(index, 1);
 
         return true;
@@ -256,7 +256,7 @@ define([
      * @protected
      */
     _hasListeners: function(type) {
-      var registry = this._registry;
+      var registry = this._listeners_registry;
       return registry != null && registry[type] != null && registry[type].length > 0;
     },
 
