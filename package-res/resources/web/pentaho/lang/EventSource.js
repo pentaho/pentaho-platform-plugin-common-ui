@@ -104,7 +104,10 @@ define([
           var queue = this._getQueueOf(eventType, /*create:*/true);
 
           for (var i = queue.length - 1; i !== -2; --i) {
-            if (i === -1 || priority >= queue[i].priority) {
+            if (i !== -1 && priority <= queue[i].priority) {
+              queue[i + 1] = queue[i];
+              queue[i + 1].order = i + 1;
+            } else {
               var listenerInfo = {
                 order: i + 1,
                 priority: priority,
@@ -117,9 +120,6 @@ define([
 
               break;
             }
-
-            queue[i + 1] = queue[i];
-            queue[i + 1].order = i + 1;
           }
         }
       }
