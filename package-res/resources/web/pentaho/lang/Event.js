@@ -16,8 +16,9 @@
 
 define([
   "./Base",
+  "../util/object",
   "../util/error"
-], function(Base, error) {
+], function(Base, O, error) {
 
   "use strict";
 
@@ -72,8 +73,8 @@ define([
      * @param {?boolean} [cancelable=false] - Indicates if the event can be canceled.
      */
     constructor: function(type, source, cancelable) {
-      if(!type) throw error.argRequired("type");
-      if(!source) throw error.argRequired("source");
+      if (!type) throw error.argRequired("type");
+      if (!source) throw error.argRequired("source");
 
       this._type = type;
       this._source = source;
@@ -149,8 +150,15 @@ define([
       var proto = Object.getPrototypeOf(this);
 
       var clone = Object.create(proto);
-      proto.constructor.call(clone, this._type, this._source, this._cancelable);
-      clone._canceled = this._canceled;
+      for (var name in this) {
+        if (!Object.prototype[name]) {
+          var desc = O.getPropertyDescriptor(this, name);
+
+          if (!desc.get && !desc.set && clone[name] !== undefined) {
+            clone[name] = desc.value;
+          }
+        }
+      }
 
       return clone;
     }
