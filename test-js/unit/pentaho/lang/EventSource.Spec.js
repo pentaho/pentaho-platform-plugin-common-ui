@@ -16,8 +16,8 @@
 define([
   "pentaho/lang/Event",
   "pentaho/lang/EventSource",
-  "pentaho/util/error"
-], function(Event, EventSource, error) {
+  "tests/pentaho/util/errorMatch"
+], function(Event, EventSource, errorMatch) {
   "use strict";
 
   /* global jasmine:false, describe:false, it:false, expect:false, beforeEach:false, spyOn: false */
@@ -76,29 +76,29 @@ define([
       it("should throw an `argRequired` error when no parameters are provided.", function() {
         expect(function() {
           eventSource.on();
-        }).toThrowError(error.argRequired("type").message);
+        }).toThrow(errorMatch.argRequired("type"));
 
         expect(function() {
           eventSource.on(null);
-        }).toThrowError(error.argRequired("type").message);
+        }).toThrow(errorMatch.argRequired("type"));
 
         expect(function() {
           eventSource.on(undefined);
-        }).toThrowError(error.argRequired("type").message);
+        }).toThrow(errorMatch.argRequired("type"));
       });
 
       it("should throw an `argRequired` error when the `type` argument is set but the `listener` argument is not provided.", function() {
         expect(function() {
           eventSource.on("test");
-        }).toThrowError(error.argRequired("listener").message);
+        }).toThrow(errorMatch.argRequired("listener"));
 
         expect(function() {
           eventSource.on("test", null);
-        }).toThrowError(error.argRequired("listener").message);
+        }).toThrow(errorMatch.argRequired("listener"));
 
         expect(function() {
           eventSource.on("test", undefined);
-        }).toThrowError(error.argRequired("listener").message);
+        }).toThrow(errorMatch.argRequired("listener"));
       });
 
       describe("should return -", function() {
@@ -214,29 +214,29 @@ define([
       it("should throw an error when no parameters provided.", function() {
         expect(function() {
           eventSource.off();
-        }).toThrowError(error.argRequired("typeOrHandle").message);
+        }).toThrow(errorMatch.argRequired("typeOrHandle"));
 
         expect(function() {
           eventSource.off(null);
-        }).toThrowError(error.argRequired("typeOrHandle").message);
+        }).toThrow(errorMatch.argRequired("typeOrHandle"));
 
         expect(function() {
           eventSource.off(undefined);
-        }).toThrowError(error.argRequired("typeOrHandle").message);
+        }).toThrow(errorMatch.argRequired("typeOrHandle"));
       });
 
       it("should throw an error when the typeOrHandle is a string but no listener is provided.", function() {
         expect(function() {
           eventSource.off("test");
-        }).toThrowError(error.argRequired("listener").message);
+        }).toThrow(errorMatch.argRequired("listener"));
 
         expect(function() {
           eventSource.off("test", null);
-        }).toThrowError(error.argRequired("listener").message);
+        }).toThrow(errorMatch.argRequired("listener"));
 
         expect(function() {
           eventSource.off("test", undefined);
-        }).toThrowError(error.argRequired("listener").message);
+        }).toThrow(errorMatch.argRequired("listener"));
       });
 
     }); // #off
@@ -275,21 +275,21 @@ define([
       it("should throw an error when no parameters provided.", function() {
         expect(function() {
           eventSource._emit();
-        }).toThrowError(error.argRequired("event").message);
+        }).toThrow(errorMatch.argRequired("event"));
 
         expect(function() {
           eventSource._emit(null);
-        }).toThrowError(error.argRequired("event").message);
+        }).toThrow(errorMatch.argRequired("event"));
 
         expect(function() {
           eventSource._emit(undefined);
-        }).toThrowError(error.argRequired("event").message);
+        }).toThrow(errorMatch.argRequired("event"));
       });
 
       it("should throw an error when the argument is of an invalid type.", function() {
         expect(function() {
           eventSource._emit({});
-        }).toThrowError(error.argInvalidType("event", "pentaho.type.Event").message);
+        }).toThrow(errorMatch.argInvalidType("event", "pentaho.type.Event"));
       });
 
       it("should notify a listener registered for the same event type as the event being emitted.", function() {

@@ -15,8 +15,8 @@
  */
 define([
   "pentaho/util/arg",
-  "pentaho/util/error"
-], function(arg, error) {
+  "tests/pentaho/util/errorMatch"
+], function(arg, errorMatch) {
 
   "use strict";
 
@@ -44,28 +44,28 @@ define([
       it("should require the testProperty to be present and throw an Argument required error if it is not.", function() {
         expect(function () {
           arg.required({testProp: "value"}, "testProp2", "testArgs");
-        }).toThrowError(error.argRequired("testArgs.testProp2").message);
+        }).toThrow(errorMatch.argRequired("testArgs.testProp2"));
         expect(function () {
           arg.required({testProp: null}, "testProp", "testArgs");
-        }).toThrowError(error.argRequired("testArgs.testProp").message);
+        }).toThrow(errorMatch.argRequired("testArgs.testProp"));
         expect(function () {
           arg.required({testProp: undefined}, "testProp", "testArgs");
-        }).toThrowError(error.argRequired("testArgs.testProp").message);
+        }).toThrow(errorMatch.argRequired("testArgs.testProp"));
         expect(function () {
           arg.required({testProp: "value"}, "testProp2");
-        }).toThrowError(error.argRequired("testProp2").message);
+        }).toThrow(errorMatch.argRequired("testProp2"));
         expect(function () {
           arg.required({testProp: null}, "testProp");
-        }).toThrowError(error.argRequired("testProp").message);
+        }).toThrow(errorMatch.argRequired("testProp"));
         expect(function () {
           arg.required({testProp: undefined}, "testProp");
-        }).toThrowError(error.argRequired("testProp").message);
+        }).toThrow(errorMatch.argRequired("testProp"));
         expect(function () {
           arg.required(undefined, "testProp");
-        }).toThrowError(error.argRequired("testProp").message);
+        }).toThrow(errorMatch.argRequired("testProp"));
         expect(function () {
           arg.required(null, "testProp");
-        }).toThrowError(error.argRequired("testProp").message);
+        }).toThrow(errorMatch.argRequired("testProp"));
       });
     });
 
@@ -146,17 +146,17 @@ define([
       it("should throw an arg required error message when no array provided.", function() {
         expect(function () {
           arg.slice();
-        }).toThrowError(error.argRequired("args").message);
+        }).toThrow(errorMatch.argRequired("args"));
       });
       it("should throw an error when undefined provided.", function() {
         expect(function () {
           arg.slice(undefined);
-        }).toThrowError(error.argRequired("args").message);
+        }).toThrow(errorMatch.argRequired("args"));
       });
       it("should throw an error when null provided.", function() {
         expect(function () {
           arg.slice(null);
-        }).toThrowError(error.argRequired("args").message);
+        }).toThrow(errorMatch.argRequired("args"));
       });
     });
   }); // pentaho.util.arg

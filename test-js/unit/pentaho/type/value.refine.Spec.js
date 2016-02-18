@@ -17,8 +17,8 @@ define([
   "pentaho/type/Context",
   "pentaho/type/Item",
   "pentaho/type/facets/Refinement",
-  "pentaho/util/error"
-], function(Context, Item, RefinementFacet, error) {
+  "tests/pentaho/util/errorMatch"
+], function(Context, Item, RefinementFacet, errorMatch) {
 
   "use strict";
 
@@ -62,21 +62,21 @@ define([
     it("should throw if instSpec is not specified", function() {
       expect(function() {
         Element.refine();
-      }).toThrowError(error.argRequired("instSpec").message);
+      }).toThrow(errorMatch.argRequired("instSpec"));
 
       expect(function() {
         Element.refine("FOO");
-      }).toThrowError(error.argRequired("instSpec").message);
+      }).toThrow(errorMatch.argRequired("instSpec"));
     });
 
     it("should throw if instSpec.meta is not specified", function() {
       expect(function() {
         Element.refine({});
-      }).toThrowError(error.argRequired("instSpec.meta").message);
+      }).toThrow(errorMatch.argRequired("instSpec.meta"));
 
       expect(function() {
         Element.refine("FOO", {});
-      }).toThrowError(error.argRequired("instSpec.meta").message);
+      }).toThrow(errorMatch.argRequired("instSpec.meta"));
     });
   });
 });

@@ -18,9 +18,8 @@ define([
   "pentaho/type/list",
   "pentaho/type/value",
   "pentaho/type/number",
-  "pentaho/util/error",
-  "pentaho/i18n!/pentaho/type/i18n/types"
-], function(Context, listFactory, valueFactory, numberFactory, error, bundle) {
+  "tests/pentaho/util/errorMatch"
+], function(Context, listFactory, valueFactory, numberFactory, errorMatch) {
 
   "use strict";
 
@@ -59,7 +58,7 @@ define([
           List.extend({
             meta: {of: null}
           });
-        }).toThrowError(error.argRequired("of").message);
+        }).toThrow(errorMatch.argRequired("of"));
       });
 
       it("should inherit the base `of` when unspecified or undefined", function() {
@@ -75,7 +74,7 @@ define([
           List.extend({
             meta: {of: null}
           });
-        }).toThrowError(error.argRequired("of").message);
+        }).toThrow(errorMatch.argRequired("of"));
       });
 
       it("should throw if given an `of` property of a type not a subtype of `Element`", function() {
@@ -83,8 +82,7 @@ define([
           List.extend({
             meta: {of: Value}
           });
-        }).toThrowError(
-            error.argInvalid("of", bundle.structured.errors.list.elemTypeNotSubtypeOfBaseElemType).message);
+        }).toThrow(errorMatch.argInvalid("of"));
       });
 
       it("should throw if set to a different value", function() {
@@ -92,7 +90,7 @@ define([
 
         expect(function() {
           SubList.meta.of = Number;
-        }).toThrowError(error.operInvalid("Property 'of' cannot change.").message);
+        }).toThrow(errorMatch.operInvalid());
       });
 
       it("should not throw if set to the same value", function() {

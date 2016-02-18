@@ -17,9 +17,8 @@ define([
   "pentaho/type/Context",
   "pentaho/type/Item",
   "pentaho/type/facets/Refinement",
-  "pentaho/util/error",
-  "pentaho/i18n!/pentaho/type/i18n/types"
-], function(Context, Item, RefinementFacet, error, bundle) {
+  "tests/pentaho/util/errorMatch"
+], function(Context, Item, RefinementFacet, errorMatch) {
 
   "use strict";
 
@@ -51,7 +50,7 @@ define([
       it("should throw if it is a root refinement type and not given an `of`", function() {
         expect(function() {
           Refinement.extend({meta: {facets: [Facet]}});
-        }).toThrowError(error.argRequired("of").message);
+        }).toThrow(errorMatch.argRequired("of"));
       });
 
       it("should throw if it is a root refinement type and the given `of` is from a different context", function() {
@@ -64,7 +63,7 @@ define([
               facets: [Facet]
             }
           });
-        }).toThrowError(error.argInvalid("typeRef", "Type is from a different context.").message);
+        }).toThrow(errorMatch.argInvalid("typeRef"));
       });
 
       it("should throw if given an `of` which is not a representation type", function() {
@@ -75,7 +74,7 @@ define([
               facets: [Facet]
             }
           });
-        }).toThrowError(error.argInvalidType("of", ["pentaho/type/element", "pentaho/type/list"]).message);
+        }).toThrow(errorMatch.argInvalidType("of", ["pentaho/type/element", "pentaho/type/list"]));
       });
 
       it("should not throw if given an `of` which is a representation type", function() {
@@ -117,7 +116,7 @@ define([
               facets: [Facet]
             }
           });
-        }).toThrowError(error.operInvalid(bundle.structured.errors.refinement.cannotExtendInstance).message);
+        }).toThrow(errorMatch.operInvalid());
       });
 
       it("should throw if given any instance attribute", function() {
@@ -129,7 +128,7 @@ define([
               facets: [Facet]
             }
           });
-        }).toThrowError(error.operInvalid(bundle.structured.errors.refinement.cannotExtendInstance).message);
+        }).toThrow(errorMatch.operInvalid());
       });
 
       it("should allow to further extend a refinement type", function() {
@@ -264,8 +263,7 @@ define([
                   facets: facets
                 }
               });
-            }).toThrowError(
-                error.argInvalidType("facets", "pentaho/type/facets/Refinement").message);
+            }).toThrow(errorMatch.argInvalidType("facets", "pentaho/type/facets/Refinement"));
           }
 
           expectIt([{}]); // Not a function
@@ -530,7 +528,7 @@ define([
 
             expect(function() {
               MyRefinement.meta.abstract = !value;
-            }).toThrowError(error.operInvalid("Attribute cannot be changed.").message);
+            }).toThrow(errorMatch.operInvalid());
           }
 
           expectIt(true);
@@ -1500,7 +1498,7 @@ define([
               ]
             }
           });
-        }).toThrowError(error.argInvalid("type", bundle.structured.errors.property.typeNotSubtypeOfBaseType).message);
+        }).toThrow(errorMatch.argInvalid("type"));
       });
 
       it("should allow specifying the value of a property of a refinement type given the primitive value", function() {
@@ -1574,7 +1572,7 @@ define([
 
         expect(function() {
           ComplexList.extend({meta: {of: PositiveNumber}});
-        }).toThrowError(error.argInvalid("of", bundle.structured.errors.list.elemTypeNotSubtypeOfBaseElemType).message);
+        }).toThrow(errorMatch.argInvalid("of"));
       });
 
       it("should allow specifying an element of a refinement type given the primitive value", function() {

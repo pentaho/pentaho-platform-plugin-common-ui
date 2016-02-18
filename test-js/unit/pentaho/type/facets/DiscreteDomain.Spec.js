@@ -16,9 +16,8 @@
 define([
   "pentaho/type/facets/DiscreteDomain",
   "pentaho/type/Context",
-  "pentaho/util/error",
-  "pentaho/i18n!/pentaho/type/i18n/types"
-], function(DiscreteDomainRefinementFacet, Context, error, bundle) {
+  "tests/pentaho/util/errorMatch"
+], function(DiscreteDomainRefinementFacet, Context, errorMatch) {
 
   "use strict";
 
@@ -88,9 +87,7 @@ define([
               domain: [1, 4]
             }
           });
-        }).toThrowError(
-            error.argInvalid("domain", bundle.structured.errors.refinement.domain.notSubsetOfBase)
-                .message);
+        }).toThrow(errorMatch.argInvalid("domain"));
       });
 
       it("should respect a specified domain that is a subset of the base domain", function() {
