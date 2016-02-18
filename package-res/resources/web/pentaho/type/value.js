@@ -237,15 +237,14 @@ define([
          * Creates an instance of this type, given an instance specification.
          *
          * If the specified instance specification contains an inline type reference,
-         * in property `"_"`, the referenced type is used to create the instance,
-         * as long as it is a subtype of this type. Otherwise, if it is not a subtype,
-         * an error is thrown.
+         * in property `"_"`, the referenced type is used to create the instance
+         * (as long as it is a subtype of this type).
          *
          * If the specified instance specification does not contain an inline type reference
          * the type is assumed to be this type.
          *
-         * An error is thrown if the type ultimately used to create the instance
-         * is an [abstract]{@link pentaho.type.Value.Meta#abstract} type.
+         * @see pentaho.type.Item.Meta#isSubtypeOf
+         * @see pentaho.type.Context#get
          *
          * @example
          * <caption>
@@ -327,11 +326,14 @@ define([
          *
          * @return {!pentaho.type.Value} The created instance.
          *
-         * @see pentaho.type.Item.Meta#isSubtypeOf
-         * @see pentaho.type.Context#get
+         * @throws {pentaho.lang.OperationInvalidError} When `instSpec` contains an inline type reference
+         * that refers to a type that is not a subtype of this type.
+         *
+         * @throws {pentaho.lang.OperationInvalidError} When the determined type for the specified `instSpec`
+         * is not an [abstract]{@link pentaho.type.Value.Meta#abstract} type.
          */
         create: function(instSpec) {
-          // All value types have constructors.
+          // All value types have own constructors.
           // So it is safe to override the base method with a constructor-type only version.
 
           var Type = this._getTypeOfInstSpec(instSpec);
@@ -346,6 +348,16 @@ define([
          * @param {any} instSpec A value instance specification.
          *
          * @return {Class.<pentaho.type.Value>} The instance constructor.
+         *
+         * @throws {pentaho.lang.OperationInvalidError} When `instSpec` contains an inline type reference
+         * that refers to a type that is not a subtype of this type.
+         *
+         * @throws {pentaho.lang.OperationInvalidError} When the determined type for the specified `instSpec`
+         * is not an abstract type.
+         *
+         * @throws {Error} When `instSpec` contains an inline type reference that is somehow invalid.
+         * See {@link pentaho.type.Context#get} for a list of all possible errors.
+         *
          * @private
          * @ignore
          */
@@ -375,7 +387,11 @@ define([
          * Asserts that a given type is a subtype of this type.
          *
          * @param {!pentaho.type.Value.Meta} typeMeta The subtype to assert.
+         *
          * @return {!pentaho.type.Value.Meta} The subtype `typeMeta`.
+         *
+         * @throws {pentaho.lang.OperationInvalidError} When `typeMeta` is not a subtype of this.
+         *
          * @private
          * @ignore
          */
@@ -390,6 +406,8 @@ define([
 
         /**
          * Throws an error complaining the type is abstract an cannot create instances.
+         *
+         * @throws {pentaho.lang.OperationInvalidError} When this is not an abstract type.
          *
          * @private
          * @ignore
@@ -542,21 +560,17 @@ define([
       /**
        * Creates a refinement type that refines this one.
        *
-       * An error is thrown if `instSpec.meta` is not specified.
-       *
-       * An error is thrown if `instSpec` contains any property other than `meta`.
-       * The instance interface of refinement types is fixed.
-       *
-       * An error is thrown if `instSpec.meta.facets` specifies no refinement facet classes.
+       * @see pentaho.type.Refinement.Meta#facets
+       * @see pentaho.type.Refinement.Meta#of
        *
        * @param {string} [name] A name of the refinement type used for debugging purposes.
-       * @param {Object} instSpec The refined type instance specification.
-       * The available attributes are those defined by the specified refinement facet classes.
+       * @param {Object} [instSpec] The refined type instance specification.
+       * The available _meta_ attributes are those defined by any specified refinement facet classes.
        *
        * @return {Class.<pentaho.type.Refinement>} The refinement type's instance class.
        *
-       * @see pentaho.type.Refinement.Meta#facets
-       * @see pentaho.type.Refinement.Meta#of
+       * @throws {pentaho.lang.ArgumentInvalidError} When `instSpec` contains any properties other than `meta`.
+       * The instance interface of refinement types cannot be specified.
        */
       refine: function(name, instSpec) {
 
@@ -565,10 +579,13 @@ define([
           name = null;
         }
 
-        if(!instSpec) throw error.argRequired("instSpec");
-        if(!instSpec.meta) throw error.argRequired("instSpec.meta");
-
         // Ugly but effective.
+        if(!instSpec) {
+          instSpec = {meta: {}};
+        } else if(!instSpec.meta) {
+          instSpec.meta = {};
+        }
+
         instSpec.meta.of = this.meta;
 
         // Resolved on first use to break cyclic dependency.

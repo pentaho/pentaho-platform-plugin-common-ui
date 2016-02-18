@@ -28,7 +28,38 @@ define([
   var context = new Context(),
       Value = context.get(valueFactory),
       List = context.get(listFactory),
-      Number = context.get(numberFactory);
+      PentahoNumber = context.get(numberFactory);
+
+  function itShouldLenientMethod(getter, args, lenientResult, error) {
+
+    it("should throw when lenient is unspecified", function() {
+      expect(function() { getter(args); }).toThrow(error);
+    });
+
+    it("should throw when lenient is false", function() {
+      var args2 = args.concat(false);
+
+      expect(function() { getter(args2); }).toThrow(error);
+    });
+
+    it("should throw when lenient is null", function() {
+      var args2 = args.concat(null);
+
+      expect(function() { getter(args2); }).toThrow(error);
+    });
+
+    it("should throw when lenient is undefined", function() {
+      var args2 = args.concat(undefined);
+
+      expect(function() { getter(args2); }).toThrow(error);
+    });
+
+    it("should return `" + lenientResult + "` when lenient is true", function() {
+      var args2 = args.concat(true);
+
+      expect(getter(args2)).toBe(lenientResult);
+    });
+  }
 
   function expectNoChanges(list) {
     expect(list._changes).toBe(null);
@@ -36,7 +67,7 @@ define([
   }
 
   var NumberList = List.extend({
-    meta: {of: Number}
+    meta: {of: PentahoNumber}
   });
 
   describe("pentaho.type.List -", function() {
@@ -50,7 +81,7 @@ define([
       // NOTE: see also refinement.Spec.js, list usage unit tests
 
       it("accepts an `of` property be given a type derived from `Element`", function() {
-        expect(NumberList.meta.of).toBe(Number.meta);
+        expect(NumberList.meta.of).toBe(PentahoNumber.meta);
       });
 
       it("should throw if given a nully `of` property", function() {
@@ -89,7 +120,7 @@ define([
         var SubList = List.extend();
 
         expect(function() {
-          SubList.meta.of = Number;
+          SubList.meta.of = PentahoNumber;
         }).toThrow(errorMatch.operInvalid());
       });
 
@@ -181,9 +212,9 @@ define([
           var list = new NumberList([1, 2, 3]);
           var elems = list._elems;
 
-          expect(elems[1] instanceof Number).toBe(true);
-          expect(elems[0] instanceof Number).toBe(true);
-          expect(elems[2] instanceof Number).toBe(true);
+          expect(elems[1] instanceof PentahoNumber).toBe(true);
+          expect(elems[0] instanceof PentahoNumber).toBe(true);
+          expect(elems[2] instanceof PentahoNumber).toBe(true);
 
           expect(elems[0].value).toBe(1);
           expect(elems[1].value).toBe(2);
@@ -212,9 +243,9 @@ define([
           var list = new NumberList({d: [1, 2, 3]});
           var elems = list._elems;
 
-          expect(elems[1] instanceof Number).toBe(true);
-          expect(elems[0] instanceof Number).toBe(true);
-          expect(elems[2] instanceof Number).toBe(true);
+          expect(elems[1] instanceof PentahoNumber).toBe(true);
+          expect(elems[0] instanceof PentahoNumber).toBe(true);
+          expect(elems[2] instanceof PentahoNumber).toBe(true);
 
           expect(elems[0].value).toBe(1);
           expect(elems[1].value).toBe(2);
@@ -246,9 +277,9 @@ define([
           var list2 = new NumberList(list1);
           var elems = list2._elems;
 
-          expect(elems[1] instanceof Number).toBe(true);
-          expect(elems[0] instanceof Number).toBe(true);
-          expect(elems[2] instanceof Number).toBe(true);
+          expect(elems[1] instanceof PentahoNumber).toBe(true);
+          expect(elems[0] instanceof PentahoNumber).toBe(true);
+          expect(elems[2] instanceof PentahoNumber).toBe(true);
 
           expect(elems[0].value).toBe(1);
           expect(elems[1].value).toBe(2);
@@ -334,20 +365,60 @@ define([
         expect(list.at(2).value).toBe(3);
       });
 
-      it("should return `null` when the index is negative", function() {
+      describe("when the index is negative", function() {
         var list = new NumberList([1, 2, 3]);
 
-        expect(list.at(-10)).toBe(null);
+        function getter(args) {
+          return list.at.apply(list, args);
+        }
+
+        var lenientResult = null;
+        var error = errorMatch.argOutOfRange("index");
+        var index = -10;
+
+        itShouldLenientMethod(getter, [index], lenientResult, error);
       });
 
-      it("should return `null` when the index is not less than the number of elements", function() {
+      describe("when the index is null", function() {
         var list = new NumberList([1, 2, 3]);
 
-        expect(list.at(10)).toBe(null);
+        function getter(args) {
+          return list.at.apply(list, args);
+        }
 
-        list = new NumberList();
+        var lenientResult = null;
+        var error = errorMatch.argRequired("index");
+        var index = null;
 
-        expect(list.at(10)).toBe(null);
+        itShouldLenientMethod(getter, [index], lenientResult, error);
+      });
+
+      describe("when the index is not less than the number of elements", function() {
+        var list = new NumberList([1, 2, 3]);
+
+        function getter(args) {
+          return list.at.apply(list, args);
+        }
+
+        var lenientResult = null;
+        var error = errorMatch.argOutOfRange("index");
+        var index = 10;
+
+        itShouldLenientMethod(getter, [index], lenientResult, error);
+      });
+
+      describe("when the index is positive and there are no elements", function() {
+        var list = new NumberList([]);
+
+        function getter(args) {
+          return list.at.apply(list, args);
+        }
+
+        var lenientResult = null;
+        var error = errorMatch.argOutOfRange("index");
+        var index = 10;
+
+        itShouldLenientMethod(getter, [index], lenientResult, error);
       });
     });
 
@@ -426,12 +497,12 @@ define([
 
       it("should return `false` when a given element is not present", function() {
         var list = new NumberList([1, 2, 3]);
-        expect(list.includes(new Number(4))).toBe(false);
+        expect(list.includes(new PentahoNumber(4))).toBe(false);
       });
 
       it("should return `false` when a given element is not present although it is equal", function() {
         var list = new NumberList([1, 2, 3]);
-        expect(list.includes(new Number(1))).toBe(false);
+        expect(list.includes(new PentahoNumber(1))).toBe(false);
       });
     });
 
@@ -452,12 +523,12 @@ define([
 
       it("should return `-1` when a given element is not present", function() {
         var list = new NumberList([1, 2, 3]);
-        expect(list.indexOf(new Number(4))).toBe(-1);
+        expect(list.indexOf(new PentahoNumber(4))).toBe(-1);
       });
 
       it("should return `-1` when a given element is not present although it is equal", function() {
         var list = new NumberList([1, 2, 3]);
-        expect(list.indexOf(new Number(1))).toBe(-1);
+        expect(list.indexOf(new PentahoNumber(1))).toBe(-1);
       });
     });
     //endregion
@@ -588,7 +659,8 @@ define([
     // insert or update
     describe("#insert(fragment, index) -", function() {
 
-      it("should append a given array of convertible values, to an empty list, when index is not specified", function() {
+      it("should append a given array of convertible values, to an empty list, when index is not specified",
+      function() {
 
         var list = new NumberList();
 
@@ -600,7 +672,8 @@ define([
         expect(list.at(2).value).toBe(3);
       });
 
-      it("should append a given array of convertible values to a non-empty list, when index is not specified", function() {
+      it("should append a given array of convertible values to a non-empty list, when index is not specified",
+      function() {
 
         var list = new NumberList([1, 2, 3]);
 
@@ -618,7 +691,8 @@ define([
         expect(list.at(5).value).toBe(6);
       });
 
-      it("should insert a given array of convertible values to a non-empty list, at the specified existing index", function() {
+      it("should insert a given array of convertible values to a non-empty list, at the specified existing index",
+      function() {
 
         var list = new NumberList([1, 2, 3]);
 
@@ -807,20 +881,21 @@ define([
 
         // ----
 
-        list.remove(new Number(5));
+        list.remove(new PentahoNumber(5));
 
         // ----
 
         expect(list.count).toBe(4);
       });
 
-      it("should ignore a given element that is not present in the list, although it is equal to one that is", function() {
+      it("should ignore a given element that is not present in the list, although it is equal to one that is",
+      function() {
         var list = new NumberList([1, 2, 3, 4]);
         expect(list.count).toBe(4);
 
         // ----
 
-        list.remove(new Number(4));
+        list.remove(new PentahoNumber(4));
 
         // ----
 

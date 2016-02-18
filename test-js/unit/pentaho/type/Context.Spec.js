@@ -440,7 +440,7 @@ define([
         var context = new Context();
 
         return callGet(context, sync, [123, 234]);
-      }, errorMatch.argInvalid("typeSpec")));
+      }, errorMatch.argInvalid("typeRef")));
 
       it("should be able to create a refinement type using normal notation", testGet(function(sync, Context) {
         var context = new Context();
