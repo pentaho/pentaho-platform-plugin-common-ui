@@ -116,6 +116,36 @@ define([
     Base.Array = base_root(Array, [], "Base.Array");
     Base.Array.to = class_array_to;
 
+    // ---
+
+    var baseErrorConstructor = function(message) {
+      this.message = message;
+      this.stack = (new Error()).stack;
+    };
+
+    /**
+     * The `Base.Error` root class is the base class for `Error` classes.
+     *
+     * @name Error
+     * @memberOf pentaho.lang.Base
+     *
+     * @class
+     * @extends Error
+     *
+     * @constructor
+     * @param {string} [message] The error message.
+     *
+     * @borrows pentaho.lang.Base.ancestor as ancestor
+     * @borrows pentaho.lang.Base.extend as extend
+     * @borrows pentaho.lang.Base._extend as _extend
+     * @borrows pentaho.lang.Base.mix as mix
+     * @borrows pentaho.lang.Base.implement as implement
+     * @borrows pentaho.lang.Base.implementStatic as implementStatic
+     * @borrows pentaho.lang.Base#base as #base
+     * @borrows pentaho.lang.Base#extend as #extend
+     */
+    Base.Error = base_root(Error, Object.create(Error.prototype), "Base.Error", baseErrorConstructor);
+
     return Base;
   }
 
@@ -127,10 +157,10 @@ define([
    * @param {Class} NativeBase The native base constructor that this _Base_ root is rooted on.
    * @param {object} bootProto The prototype of the _boot_ constructor.
    * @param {string} baseRootName The name of the _root_ constructor.
-   *
+   * @param {?function} [baseConstructor] The base constructor.
    * @returns {Class.<pentaho.lang.Base>} The new `Base` root class.
    */
-  function base_root(NativeBase, bootProto, baseRootName) {
+  function base_root(NativeBase, bootProto, baseRootName, baseConstructor) {
     // Bootstrapping "Base" class.
     // Does not have the full "Base" class interface,
     // but only enough properties set to trick `class_extend`.
@@ -153,6 +183,15 @@ define([
 
     // Used by BaseBoot.extend, just below
     BaseBoot.prototype.extend = inst_extend;
+
+    // ---
+
+    if(!baseConstructor) {
+      baseConstructor = function() {
+        this.extend(arguments[0]);
+      };
+    }
+
     // ---
 
     var BaseRoot = BaseBoot.extend({
@@ -172,9 +211,7 @@ define([
        * @name Base
        * @memberOf pentaho.lang
        */
-      constructor: function() {
-        this.extend(arguments[0]);
-      },
+      constructor: baseConstructor,
     }, {
       /**
        * This class ancestor.

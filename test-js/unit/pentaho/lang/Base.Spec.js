@@ -1642,6 +1642,42 @@ define([
       });
     });
 
+    describe("Base.Error", function() {
+      it("should extend the JavaScript Error class", function() {
+        expect(Base.Error.prototype instanceof Error).toBe(true);
+
+        var o = new Base.Error();
+        expect(o instanceof Error).toBe(true);
+      });
+
+      describe("instances", function() {
+        it("should have __root_proto__ property", function() {
+          var o = new Base.Error();
+          expect(o.__root_proto__).toBe(Base.Error.prototype);
+        });
+
+        it("should respect the specified message", function() {
+          var o = new Base.Error("foo");
+          expect(o.message).toBe("foo");
+        });
+
+        // support depends on engine...
+        it("should have a stack property of type string or undefined", function() {
+          var o = new Base.Error();
+          expect(typeof o.stack === "string" || o.stack === undefined).toBe(true);
+        });
+      });
+
+      describe("when extended", function() {
+        it("should return a subclass of Base.Error", function() {
+          var Top = Base.Error.extend();
+
+          expect(Top).not.toBe(Base.Error);
+          expect(Top.ancestor).toBe(Base.Error);
+        });
+      });
+    });
+
     describe("instances of literal objects", function() {
       describe("when extended", function() {
         var alien;

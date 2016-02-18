@@ -65,6 +65,9 @@ define([
 
       MyRefinement = Element.refine("FOO");
       expect(MyRefinement.prototype instanceof Refinement).toBe(true);
+
+      MyRefinement = Element.refine({});
+      expect(MyRefinement.prototype instanceof Refinement).toBe(true);
     });
   });
 });
