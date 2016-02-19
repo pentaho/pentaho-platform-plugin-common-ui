@@ -162,7 +162,7 @@ define([
           });
 
           describe("when index is out of range", function() {
-            var error = errorMatch.argOutOfRange("index");
+            var error = errorMatch.argRange("index");
             var index = 1;
             itShouldLenientMethod(getter, [index], lenientResult, error);
           });
@@ -837,7 +837,7 @@ define([
 
         var lenientResult = undefined;
 
-        itShouldLenientMethod(getter, ["x", 2], lenientResult, errorMatch.argOutOfRange("index"));
+        itShouldLenientMethod(getter, ["x", 2], lenientResult, errorMatch.argRange("index"));
       });
 
       it("should return first value if no index provided for a list property", function() {
@@ -875,7 +875,7 @@ define([
 
         var lenientResult = undefined;
 
-        itShouldLenientMethod(getter, ["x", 2], lenientResult, errorMatch.argOutOfRange("index"));
+        itShouldLenientMethod(getter, ["x", 2], lenientResult, errorMatch.argRange("index"));
       });
 
       describe("when name is that of an undefined property", function() {
@@ -942,7 +942,7 @@ define([
 
         var lenientResult = "";
 
-        itShouldLenientMethod(getter, ["x", 2], lenientResult, errorMatch.argOutOfRange("index"));
+        itShouldLenientMethod(getter, ["x", 2], lenientResult, errorMatch.argRange("index"));
       });
 
       describe("when name is that of an existing list property and index is out of range", function() {
@@ -958,7 +958,7 @@ define([
 
         var lenientResult = "";
 
-        itShouldLenientMethod(getter, ["x", 2], lenientResult, errorMatch.argOutOfRange("index"));
+        itShouldLenientMethod(getter, ["x", 2], lenientResult, errorMatch.argRange("index"));
       });
 
       describe("when name is that of an undefined property", function() {
@@ -1267,6 +1267,16 @@ define([
         expect(function() {
           derived.count("y");
         }).toThrow(errorMatch.argInvalid("name"));
+      });
+
+      it("should return 0 when lenient and given the name of an undefined property", function() {
+        var Derived = Complex.extend({
+          meta: {props: [{name: "x"}]}
+        });
+
+        var derived = new Derived();
+
+        expect(derived.count("y", true)).toBe(0);
       });
     }); // end count
 

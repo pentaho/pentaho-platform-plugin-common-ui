@@ -58,7 +58,7 @@ define([
       itShouldHaveMessage("argInvalid", ["foo", "bar"], "Argument foo is invalid. bar.");
     });
 
-    describe("argInvalidType(name, [expectedType], (gotType)) -", function() {
+    describe("argInvalidType(name, [expectedType], (actualType)) -", function() {
       it("should be a function", function() {
         expect(typeof error.argInvalidType).toBe("function");
       });
@@ -85,12 +85,12 @@ define([
           "Argument foo is invalid. Expected type to be one of string, function or Array, but got boolean.");
     });
 
-    describe("argOutOfRange(name) -", function() {
+    describe("argRange(name) -", function() {
       it("should be a function", function() {
-        expect(typeof error.argOutOfRange).toBe("function");
+        expect(typeof error.argRange).toBe("function");
       });
 
-      itShouldHaveMessage("argOutOfRange", ["foo"], "Argument foo is out of range.");
+      itShouldHaveMessage("argRange", ["foo"], "Argument foo is out of range.");
     });
 
     describe("operInvalid((text)) -", function() {

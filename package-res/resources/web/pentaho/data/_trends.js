@@ -73,7 +73,7 @@ define([
         xIndex = +xIndex; // toNumber
         if(isNaN(xIndex)) throw error.argInvalidType("trendArgs.x", "number");
 
-        if(xIndex < 0 || xIndex >= colCount) throw error.argOutOfRange("trendArgs.x");
+        if(xIndex < 0 || xIndex >= colCount) throw error.argRange("trendArgs.x");
 
         // can be numeric or string
 
@@ -84,7 +84,7 @@ define([
         yIndex = +yIndex; // toNumber
         if(isNaN(yIndex)) throw error.argInvalidType("trendArgs.y", "number");
 
-        if(yIndex < 0 || yIndex >= colCount) throw error.argOutOfRange("trendArgs.y");
+        if(yIndex < 0 || yIndex >= colCount) throw error.argRange("trendArgs.y");
 
         if(this.getColumnType(yIndex) !== 'number')
           throw error.argInvalid("trendArgs.y", "Must be a numeric column.");

@@ -16,9 +16,9 @@
 define([
   "pentaho/type/Item",
   "pentaho/type/Context",
-  "pentaho/util/error",
+  "tests/pentaho/util/errorMatch",
   "pentaho/i18n!/pentaho/type/i18n/types"
-], function(Item, Context, error, bundle) {
+], function(Item, Context, errorMatch, bundle) {
 
   "use strict";
 
@@ -204,10 +204,7 @@ define([
 
           expect(function() {
             String.meta.create({_: "pentaho/type/number", v: 1});
-          }).toThrowError(
-              error.operInvalid(
-                  bundle.format(
-                      bundle.structured.errors.value.notOfExpectedBaseType, ["pentaho/type/string"])).message);
+          }).toThrow(errorMatch.operInvalid());
         });
 
         it("should not throw if given a type-annotated value that does extend from the given baseType", function() {
@@ -225,10 +222,7 @@ define([
 
           expect(function() {
             Value.meta.create({_: MyAbstract});
-          }).toThrowError(
-              error.operInvalid(
-                  bundle.format(
-                      bundle.structured.errors.value.cannotCreateInstanceOfAbstractType, ["Complex"])).message);
+          }).toThrow(errorMatch.operInvalid());
         });
 
         it("should throw if given a value and called on an abstract type", function() {
@@ -236,10 +230,7 @@ define([
 
           expect(function() {
             MyAbstract.meta.create({});
-          }).toThrowError(
-              error.operInvalid(
-                  bundle.format(
-                      bundle.structured.errors.value.cannotCreateInstanceOfAbstractType, ["Complex"])).message);
+          }).toThrow(errorMatch.operInvalid());
         });
 
         // ---

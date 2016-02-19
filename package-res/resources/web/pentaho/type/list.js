@@ -167,7 +167,7 @@ define([
        *
        * @return {?pentaho.type.Element} The element value or `null`.
        *
-       * @throws {pentaho.lang.ArgumentOutOfRangeError} When `lenient` is falsy and the specified `index`
+       * @throws {pentaho.lang.ArgumentRangeError} When `lenient` is falsy and the specified `index`
        * is out of range.
        */
       at: function(index, lenient) {
@@ -182,11 +182,11 @@ define([
        * Throws an out of range error for a given index.
        *
        * @param {number} index The index that is out of range.
-       * @throws {pentaho.lang.ArgumentOutOfRangeError} Always.
+       * @throws {pentaho.lang.ArgumentRangeError} Always.
        * @private
        */
       _throwOutOfRange: function(index) {
-        throw error.argOutOfRange("index");
+        throw error.argRange("index");
       },
 
       /**

@@ -13,15 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define(function() {
+define([
+  "pentaho/lang/Base",
+  "pentaho/lang/ArgumentError",
+  "pentaho/lang/ArgumentRequiredError",
+  "pentaho/lang/ArgumentInvalidError",
+  "pentaho/lang/ArgumentInvalidTypeError",
+  "pentaho/lang/ArgumentRangeError",
+  "pentaho/lang/OperationInvalidError",
+  "pentaho/lang/NotImplementedError"
+], function(Base, ArgumentError,
+    ArgumentRequiredError, ArgumentInvalidError, ArgumentInvalidTypeError,
+    ArgumentRangeError, OperationInvalidError, NotImplementedError) {
 
   "use strict";
 
   /**
    * The `errorMatch` namespace contains factory functions
    * that create jasmine _asymmetric match_ objects that can be compared to the
-   * real error objects returned by the same named factory functions of
-   * the {@link pentaho.util.error} namespace.
+   * real error objects of classes of the {@link pentaho.lang} namespace.
    *
    * The match objects can be passed to the jasmine matchers, like `toEqual` and `toThrow`.
    * Note that the `toThrowError` matcher does not accept these match objects.
@@ -29,7 +39,7 @@ define(function() {
    * For more information on this jasmine's feature, see
    * [asymmetric equality testers](http://jasmine.github.io/edge/introduction.html#section-Custom_asymmetric_equality_tester).
    *
-   * Each factory function accepts the same arguments as the corresponding real version,
+   * Each factory function accepts the same arguments as the corresponding error constructor,
    * except that the free, natural text arguments, like `reason` and `text` are ignored.
    *
    * @example
@@ -53,86 +63,59 @@ define(function() {
    *   });
    * });
    *
-   *
    * @namespace
    * @name pentaho.util.errorMatch
    * @amd tests/pentaho/util/errorMatch
    * @ignore
    */
 
-  // Basic class inheritance routine
-  function inherits(Sub, Base, props) {
-    if(Base) {
-      Sub.super = Base.prototype;
-      Sub.prototype = Object.create(Sub.super);
-      Sub.prototype.constructor = Sub;
-    }
+  var ErrorMatcher = Base.extend("Error", {
+    constructor: function() {
+    },
 
-    for(var p in props)
-      if(props.hasOwnProperty(p))
-        Sub.prototype[p] = props[p];
-
-    return Sub;
-  }
-
-  //region Error
-  function ErrorMatcher() {
-  }
-
-  inherits(ErrorMatcher, null, {
-
-    Type: Error,
+    // This trick is because otherwise, functions are seen as overrides...
+    original: {Type: Error},
 
     asymmetricMatch: function(actual) {
-      return (actual instanceof this.Type) &&
-             (actual.name === this.constructor.name);
+      return (actual instanceof this.original.Type);
     }
   });
-  //endregion
 
-  //region ArgumentError
-  function ArgumentError(argName) {
-    this.argument = argName;
-  }
+  var ArgumentErrorMatcher = ErrorMatcher.extend("ArgumentError", {
+    constructor: function(name) {
+      this.argument = name;
+    },
 
-  inherits(ArgumentError, ErrorMatcher, {
+    original: {Type: ArgumentError},
+
     asymmetricMatch: function(actual) {
-      return ArgumentError.super.asymmetricMatch.call(this, actual) &&
-             (actual.argument === this.argument);
+      return this.base(actual) && (actual.argument === this.argument);
     }
   });
-  //endregion
 
-  //region ArgumentRequiredError
-  // The function name is matched against the actual error.name property
-  // Also, this makes jasmine print this nicely as the expected outcome, when unmatched.
-  function ArgumentRequiredError(argName) {
-    this.argument = argName;
-  }
+  var ArgumentRequiredErrorMatcher = ArgumentErrorMatcher.extend("ArgumentRequiredError", {
+    original: {Type: ArgumentRequiredError}
+  });
 
-  inherits(ArgumentRequiredError, ArgumentError);
-  //endregion
+  var ArgumentInvalidErrorMatcher = ArgumentErrorMatcher.extend("ArgumentInvalidError", {
+    original: {Type: ArgumentInvalidError}
+  });
 
-  //region ArgumentInvalidError
-  function ArgumentInvalidError(argName) {
-    this.argument = argName;
-  }
+  var ArgumentRangeErrorMatcher = ArgumentErrorMatcher.extend("ArgumentRangeError", {
+    original: {Type: ArgumentRangeError}
+  });
 
-  inherits(ArgumentInvalidError, ArgumentError);
-  //endregion
+  var ArgumentInvalidTypeErrorMatcher = ArgumentErrorMatcher.extend("ArgumentInvalidTypeError", {
+    constructor: function(name, expectedType, actualType) {
+      this.base(name);
+      this.expectedTypes = Array.isArray(expectedType) ? expectedType : [expectedType];
+      this.actualType = actualType;
+    },
 
-  //region ArgumentInvalidTypeError
-  function ArgumentInvalidTypeError(argName, expectedType, actualType) {
-    this.argument = argName;
-    this.expectedTypes = Array.isArray(expectedType) ? expectedType : [expectedType];
-    this.actualType = actualType;
-  }
-
-  inherits(ArgumentInvalidTypeError, ArgumentError, {
-    Type: TypeError,
+    original: {Type: ArgumentInvalidTypeError},
 
     asymmetricMatch: function(actual) {
-      if(!ArgumentInvalidTypeError.super.asymmetricMatch.call(this, actual)) return false;
+      if(!this.base(actual)) return false;
 
       // Same expected types?
       var i = this.expectedTypes.length;
@@ -145,55 +128,43 @@ define(function() {
       return true;
     }
   });
-  //endregion
 
-  //region ArgumentOutOfRangeError
-  function ArgumentOutOfRangeError(argName) {
-    this.argument = argName;
-  }
-
-  inherits(ArgumentOutOfRangeError, ArgumentError, {
-    Type: RangeError
+  var OperationInvalidErrorMatcher = ErrorMatcher.extend("OperationInvalidError", {
+    original: {Type: OperationInvalidError}
   });
-  //endregion
 
-  //region OperationInvalidError
-  function OperationInvalidError() {
-  }
-
-  inherits(OperationInvalidError, ErrorMatcher);
-  //endregion
-
-  //region NotImplementedError
-  function NotImplementedError() {
-  }
-
-  inherits(NotImplementedError, ErrorMatcher);
-  //endregion
+  var NotImplementedErrorMatcher = ErrorMatcher.extend("NotImplementedError", {
+    original: {Type: NotImplementedError}
+  });
 
   return {
+    // Matches any ArgumentError
+    arg: function(name) {
+      return new ArgumentErrorMatcher(name);
+    },
+
     argRequired: function(name) {
-      return new ArgumentRequiredError(name);
+      return new ArgumentRequiredErrorMatcher(name);
     },
 
     argInvalid: function(name) {
-      return new ArgumentInvalidError(name);
+      return new ArgumentInvalidErrorMatcher(name);
     },
 
     argInvalidType: function(name, expectedType, actualType) {
-      return new ArgumentInvalidTypeError(name, expectedType, actualType);
+      return new ArgumentInvalidTypeErrorMatcher(name, expectedType, actualType);
     },
 
-    argOutOfRange: function(name) {
-      return new ArgumentOutOfRangeError(name);
+    argRange: function(name) {
+      return new ArgumentRangeErrorMatcher(name);
     },
 
     operInvalid: function() {
-      return new OperationInvalidError();
+      return new OperationInvalidErrorMatcher();
     },
 
     notImplemented: function() {
-      return new NotImplementedError();
+      return new NotImplementedErrorMatcher();
     }
   };
 });

@@ -269,7 +269,7 @@ define([
        * @throws {pentaho.lang.ArgumentInvalidError} When `lenient` is `false` and
        * a property with name `name` is not defined.
        *
-       * @throws {pentaho.lang.ArgumentOutOfRangeError} When `lenient` is `false` and
+       * @throws {pentaho.lang.ArgumentRangeError} When `lenient` is `false` and
        * the specified or implied `index` is out of range.
        */
       get1: function(name, index, lenient) {
@@ -288,7 +288,7 @@ define([
           }
 
           if(!lenient) {
-            throw error.argOutOfRange("index");
+            throw error.argRange("index");
           }
         }
         // => lenient
@@ -375,7 +375,7 @@ define([
        * @throws {pentaho.lang.ArgumentInvalidError} When `lenient` is `false` and
        * a property with name `name` is not defined.
        *
-       * @throws {pentaho.lang.ArgumentOutOfRangeError} When `lenient` is `false` and
+       * @throws {pentaho.lang.ArgumentRangeError} When `lenient` is `false` and
        * the specified or implied `index` is out of range.
        */
       getv: function(name, index, lenient) {
@@ -406,7 +406,7 @@ define([
        * @throws {pentaho.lang.ArgumentInvalidError} When `lenient` is `false` and
        * a property with name `name` is not defined.
        *
-       * @throws {pentaho.lang.ArgumentOutOfRangeError} When `lenient` is `false` and
+       * @throws {pentaho.lang.ArgumentRangeError} When `lenient` is `false` and
        * the specified or implied `index` is out of range.
        */
       getf: function(name, index, lenient) {
@@ -566,7 +566,7 @@ define([
          * @return {?pentaho.type.Property.Meta} The property metadata, or `null`.
          *
          * @throws {pentaho.lang.ArgumentRequiredError} When `lenient` is `false` and `index` is not specified.
-         * @throws {pentaho.lang.ArgumentOutOfRangeError} When `lenient` is `false` and
+         * @throws {pentaho.lang.ArgumentRangeError} When `lenient` is `false` and
          *   the specified `index` is out of range.
          */
         at: function(index, lenient) {
@@ -577,7 +577,7 @@ define([
 
           var pMeta = this._getProps()[index] || null;
           if(!pMeta && !lenient)
-            throw error.argOutOfRange("index");
+            throw error.argRange("index");
 
           return pMeta;
         },

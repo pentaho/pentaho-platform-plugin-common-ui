@@ -373,7 +373,7 @@ define([
         }
 
         var lenientResult = null;
-        var error = errorMatch.argOutOfRange("index");
+        var error = errorMatch.argRange("index");
         var index = -10;
 
         itShouldLenientMethod(getter, [index], lenientResult, error);
@@ -401,7 +401,7 @@ define([
         }
 
         var lenientResult = null;
-        var error = errorMatch.argOutOfRange("index");
+        var error = errorMatch.argRange("index");
         var index = 10;
 
         itShouldLenientMethod(getter, [index], lenientResult, error);
@@ -415,7 +415,7 @@ define([
         }
 
         var lenientResult = null;
-        var error = errorMatch.argOutOfRange("index");
+        var error = errorMatch.argRange("index");
         var index = 10;
 
         itShouldLenientMethod(getter, [index], lenientResult, error);
