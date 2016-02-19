@@ -258,6 +258,11 @@ define(function() {
         });
 
       return Class.apply(inst, args || A_empty) || inst;
+    },
+
+    _forTestingPurposesOnly: {
+      setProtoCopy: setProtoCopy,
+      setProtoProp: setProtoProp
     }
   };
 
@@ -281,7 +286,7 @@ define(function() {
    */
   function copyOneDefined(to, from, p) {
     var pd = getPropertyDescriptor(from, p);
-    if(pd && pd.get || pd.set || pd.value !== undefined)
+    if(pd && (pd.get || pd.set || pd.value !== undefined))
       Object.defineProperty(to, p, pd);
     return to;
   }
@@ -298,6 +303,13 @@ define(function() {
   }
 
   function setProtoCopy(o, proto) {
+    if(proto === null){
+      // We can't set the prototype directly, so we need to "overwrite" all of its functionality
+      for(var q in o)
+        if(!o.hasOwnProperty(q))
+          o[q] = undefined;
+    }
+
     for(var p in proto) copyOneDefined(o, proto, p);
     return o;
   }
