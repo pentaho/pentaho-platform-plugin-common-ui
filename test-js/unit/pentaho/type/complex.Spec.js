@@ -30,8 +30,39 @@ define([
   var String = context.get("pentaho/type/string");
   var List = context.get("pentaho/type/list");
 
-  describe("pentaho.type.Complex -", function() {
-    describe("anatomy -", function() {
+  function itShouldLenientMethod(getter, args, lenientResult, error) {
+
+    it("should throw when lenient is unspecified", function() {
+      expect(function() { getter(args); }).toThrow(error);
+    });
+
+    it("should throw when lenient is false", function() {
+      var args2 = args.concat(false);
+
+      expect(function() { getter(args2); }).toThrow(error);
+    });
+
+    it("should throw when lenient is null", function() {
+      var args2 = args.concat(null);
+
+      expect(function() { getter(args2); }).toThrow(error);
+    });
+
+    it("should throw when lenient is undefined", function() {
+      var args2 = args.concat(undefined);
+
+      expect(function() { getter(args2); }).toThrow(error);
+    });
+
+    it("should return `" + lenientResult + "` when lenient is true", function() {
+      var args2 = args.concat(true);
+
+      expect(getter(args2)).toBe(lenientResult);
+    });
+  }
+
+  describe("pentaho.type.Complex", function() {
+    describe("anatomy", function() {
       it("is a function", function() {
         expect(typeof Complex).toBe("function");
       });
@@ -57,7 +88,7 @@ define([
       });
     }); // anatomy
 
-    describe(".extend({...}) - the returned value -", function() {
+    describe(".extend({...}) - the returned value", function() {
       it("should be a function", function() {
         var Derived = Complex.extend({
           meta: {
@@ -80,47 +111,65 @@ define([
         expect(Derived.prototype instanceof Complex).toBe(true);
       });
 
-      it(".Meta should be a function", function() {
-        var Derived = Complex.extend({
-          meta: {
-            label: "Derived"
+      describe(".Meta", function() {
+        describe("anatomy", function() {
+          it("should be a function", function() {
+            var Derived = Complex.extend({
+              meta: {
+                label: "Derived"
+              }
+            });
+
+            expect(typeof Derived.Meta).toBe("function");
+          });
+
+          it("should be a sub-class of Complex", function() {
+            var Derived = Complex.extend({
+              meta: {
+                label: "Derived"
+              }
+            });
+
+            expect(Derived.Meta).not.toBe(Value.Meta);
+            expect(Derived.Meta).not.toBe(Complex.Meta);
+            expect(Derived.meta instanceof Complex.Meta).toBe(true);
+          });
+        });
+
+        describe("#has(name)", function() {
+          it("should return false when called with no arguments", function() {
+            expect(Complex.meta.has()).toBe(false);
+          });
+        });
+
+        describe("#at(index[, lenient])", function() {
+          function getter(args) {
+            return Complex.meta.at.apply(Complex.meta, args);
           }
+
+          var lenientResult = null;
+
+          describe("when index is null", function() {
+            var error = errorMatch.argRequired("index");
+            var index = null;
+            itShouldLenientMethod(getter, [index], lenientResult, error);
+          });
+
+          describe("when index is undefined", function() {
+            var error = errorMatch.argRequired("index");
+            var index = undefined;
+            itShouldLenientMethod(getter, [index], lenientResult, error);
+          });
+
+          describe("when index is out of range", function() {
+            var error = errorMatch.argOutOfRange("index");
+            var index = 1;
+            itShouldLenientMethod(getter, [index], lenientResult, error);
+          });
         });
 
-        expect(typeof Derived.Meta).toBe("function");
-      });
-
-      it(".Meta should be a sub-class of Complex", function() {
-        var Derived = Complex.extend({
-          meta: {
-            label: "Derived"
-          }
-        });
-
-        expect(Derived.Meta).not.toBe(Value.Meta);
-        expect(Derived.Meta).not.toBe(Complex.Meta);
-        expect(Derived.meta instanceof Complex.Meta).toBe(true);
-      });
-
-      describe(".Meta properties -", function() {
-        it("#has() should return false when called with no arguments", function() {
-          expect(Complex.meta.has()).toBe(false);
-        });
-
-        it("#at() should throw when called with no argument", function() {
-          expect(function() { Complex.meta.at(); }).toThrow(errorMatch.argRequired("index"));
-        });
-
-        it("#at() should throw when called with nully argument", function() {
-          expect(function() { Complex.meta.at(null); }).toThrow(errorMatch.argRequired("index"));
-        });
-
-        it("#at() should return null if index doesn't exists", function() {
-          expect(Complex.meta.at(1)).toBe(null);
-        });
-
-        describe("#add -", function() {
-          it("should add new properties", function () {
+        describe("#add", function() {
+          it("should add new properties", function() {
             var Derived = Complex.extend({
               meta: {
                 name: "derived",
@@ -141,7 +190,7 @@ define([
           });
         });
 
-        describe("when not specified or specified empty -", function() {
+        describe("when props is not specified or specified empty", function() {
           it("should have no properties", function() {
             var Derived = Complex.extend({
               meta: {
@@ -202,10 +251,10 @@ define([
           });
         }); // when [#props is] not specified or specified empty
 
-        describe("when specified non-empty -", function() {
+        describe("when props is specified non-empty", function() {
 
           // string
-          describe("with a single 'string' entry -", function() {
+          describe("with a single 'string' entry", function() {
             var Derived = Complex.extend({
               meta: {
                 name: "derived",
@@ -226,7 +275,7 @@ define([
               expect(Derived.meta.has("fooBar2")).toBe(false);
             });
 
-            describe("the single property meta -", function() {
+            describe("the single property meta", function() {
               var propMeta = Derived.meta.at(0);
 
               it("#has() should return true for a defined property", function() {
@@ -279,7 +328,7 @@ define([
             });
           });
 
-          describe("with two entries -", function() {
+          describe("with two entries", function() {
             var Derived = Complex.extend({
               meta: {
                 label: "Derived",
@@ -313,7 +362,7 @@ define([
             });
           });
 
-          describe("with an entry that overrides a base type property -", function() {
+          describe("with an entry that overrides a base type property", function() {
             var A = Complex.extend({
               meta: {
                 label: "A",
@@ -355,7 +404,7 @@ define([
             });
           });
 
-          describe("with an entry that is not a base type property -", function() {
+          describe("with an entry that is not a base type property", function() {
             var A = Complex.extend({
               meta: {
                 label: "A",
@@ -380,7 +429,7 @@ define([
             });
           });
 
-          describe("with a dictionary -", function() {
+          describe("with a dictionary", function() {
             it("should define the defined properties", function() {
               var A = Complex.extend({
                 meta: {
@@ -453,7 +502,7 @@ define([
 
     }); // .extend({...})
 
-    describe("new Complex() -", function() {
+    describe("new Complex()", function() {
       it("should be possible to create an instance with no arguments", function() {
         new Complex();
       });
@@ -468,7 +517,7 @@ define([
       });
     });
 
-    describe("new DerivedComplex() -", function() {
+    describe("new DerivedComplex()", function() {
       var Derived;
 
       beforeEach(function() {
@@ -484,7 +533,7 @@ define([
         });
       });
 
-      describe("when given empty arguments -", function() {
+      describe("when given empty arguments", function() {
         it("should not throw", function() {
           new Derived();
         });
@@ -543,10 +592,9 @@ define([
           expect(derived.get("z").at(0).formatted).toBe("0.0 POUNDS");
         });
       });
-
     });
 
-    describe("#uid -", function() {
+    describe("#uid", function() {
       it("should return a string value", function() {
         var uid = new Complex().uid;
         expect(typeof uid).toBe("string");
@@ -562,14 +610,14 @@ define([
       });
     });
 
-    describe("#key -", function() {
+    describe("#key", function() {
       it("should return the value of #uid", function() {
         var value = new Complex();
         expect(value.uid).toBe(value.key);
       });
     });
 
-    describe("#get(name, lenient)", function() {
+    describe("#get(name[, lenient])", function() {
       it("should return the `Value` of an existing singular property", function() {
         var Derived = Complex.extend({
           meta: {props: [{name: "x", type: "string"}]}
@@ -764,7 +812,7 @@ define([
       });
     });
 
-    describe("#getv(name, index)", function() {
+    describe("#getv(name, index[, lenient])", function() {
       it("should return the value of an existing property", function() {
         var Derived = Complex.extend({
           meta: {props: [{name: "x", type: "string"}]}
@@ -776,15 +824,20 @@ define([
         expect(value).toBe("1");
       });
 
-      it("should return null for a requested index on a non-list property", function() {
+      describe("when name is that of an element property and index is non-zero", function() {
         var Derived = Complex.extend({
           meta: {props: [{name: "x", type: "string"}]}
         });
 
         var derived = new Derived({x: "1"});
 
-        var value = derived.getv("x", 2);
-        expect(value).toBe(undefined);
+        var getter = function(args) {
+          return derived.getv.apply(derived, args);
+        };
+
+        var lenientResult = undefined;
+
+        itShouldLenientMethod(getter, ["x", 2], lenientResult, errorMatch.argOutOfRange("index"));
       });
 
       it("should return first value if no index provided for a list property", function() {
@@ -809,27 +862,36 @@ define([
         expect(value).toBe("2");
       });
 
-      it("should return undefined for an out of range requested index value of an existing list property", function() {
+      describe("when name is that of an existing list property and index is out of range", function() {
         var Derived = Complex.extend({
           meta: {props: [{name: "x", type: ["string"]}]}
         });
 
         var derived = new Derived({"x": ["1", "2"]});
 
-        var value = derived.getv("x", 2);
-        expect(value).toBe(undefined);
+        var getter = function(args) {
+          return derived.getv.apply(derived, args);
+        };
+
+        var lenientResult = undefined;
+
+        itShouldLenientMethod(getter, ["x", 2], lenientResult, errorMatch.argOutOfRange("index"));
       });
 
-      it("should throw when given the name of an undefined property", function() {
+      describe("when name is that of an undefined property", function() {
         var Derived = Complex.extend({
           meta: {props: [{name: "x"}]}
         });
 
         var derived = new Derived();
 
-        expect(function() {
-          derived.getv("y");
-        }).toThrow(errorMatch.argInvalid("name"));
+        var getter = function(args) {
+          return derived.getv.apply(derived, args);
+        };
+
+        var lenientResult = undefined;
+
+        itShouldLenientMethod(getter, ["y", 0], lenientResult, errorMatch.argInvalid("name"));
       });
     });
 
@@ -867,27 +929,52 @@ define([
         expect(value).toBe("2");
       });
 
-      it("should return empty string for an out of range requested index value of an existing list property", function() {
+      describe("when name is that of an element property and index is non-zero", function() {
+        var Derived = Complex.extend({
+          meta: {props: [{name: "x", type: "string"}]}
+        });
+
+        var derived = new Derived({x: "1"});
+
+        var getter = function(args) {
+          return derived.getf.apply(derived, args);
+        };
+
+        var lenientResult = "";
+
+        itShouldLenientMethod(getter, ["x", 2], lenientResult, errorMatch.argOutOfRange("index"));
+      });
+
+      describe("when name is that of an existing list property and index is out of range", function() {
         var Derived = Complex.extend({
           meta: {props: [{name: "x", type: ["string"]}]}
         });
 
         var derived = new Derived({"x": ["1", "2"]});
 
-        var value = derived.getf("x", 2);
-        expect(value).toBe("");
+        var getter = function(args) {
+          return derived.getf.apply(derived, args);
+        };
+
+        var lenientResult = "";
+
+        itShouldLenientMethod(getter, ["x", 2], lenientResult, errorMatch.argOutOfRange("index"));
       });
 
-      it("should throw when given the name of an undefined property", function() {
+      describe("when name is that of an undefined property", function() {
         var Derived = Complex.extend({
           meta: {props: [{name: "x"}]}
         });
 
         var derived = new Derived();
 
-        expect(function() {
-          derived.getf("y");
-        }).toThrow(errorMatch.argInvalid("name"));
+        var getter = function(args) {
+          return derived.getf.apply(derived, args);
+        };
+
+        var lenientResult = "";
+
+        itShouldLenientMethod(getter, ["y", 0], lenientResult, errorMatch.argInvalid("name"));
       });
     });
 
@@ -1278,7 +1365,7 @@ define([
         expect(derived.path("x", "y", 1)).toBe(null);
       });
 
-      it("should throw if a path having multiple steps has an undefined property name along the way", function() {
+      it("should return null if a path having multiple steps has an undefined property name along the way", function() {
         var Derived = Complex.extend({
           meta: {
             props: [
@@ -1296,10 +1383,7 @@ define([
 
         var derived = new Derived({x: {y: [1]}});
 
-        expect(function() {
-          derived.path("x", "z", 1);
-        }).toThrow(errorMatch.argInvalid("name"));
-
+        expect(derived.path("x", "z", 1)).toBe(null);
       });
     }); // end path
 

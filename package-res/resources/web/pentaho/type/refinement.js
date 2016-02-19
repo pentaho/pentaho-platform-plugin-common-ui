@@ -29,9 +29,7 @@ define([
 
   return function(context) {
 
-    var Value   = context.get("pentaho/type/value"),
-        Element = context.get("pentaho/type/element"),
-        List    = context.get("pentaho/type/list"),
+    var Value = context.get("pentaho/type/value"),
         _refinementMeta;
 
     /**

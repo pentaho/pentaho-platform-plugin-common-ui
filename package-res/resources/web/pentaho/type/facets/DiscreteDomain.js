@@ -50,8 +50,7 @@ define([
      * {@link pentaho.type.Refinement.Meta#of}.
      *
      * If the ancestor refinement type has `domain` set,
-     * the specified set of values must be a subset of those,
-     * or an error is thrown.
+     * the specified set of values must be a subset of those.
      *
      * Setting to a {@link Nully} value,
      * clears the local value and inherits the ancestor's domain.
@@ -60,6 +59,9 @@ define([
      *
      * @type {?pentaho.type.List}
      * @readonly
+     *
+     * @throws {pentaho.lang.ArgumentInvalidError} When the specified values are not a subset of those
+     * of the ancestor refinement type.
      */
     get domain() {
       return this._domain;

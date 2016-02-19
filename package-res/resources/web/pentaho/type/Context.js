@@ -248,26 +248,7 @@ define([
      * the asynchronous method version, [getAsync]{@link pentaho.type.Context#getAsync},
      * should be used instead.
      *
-     * An error is thrown when:
-     *
-     * * the argument `typeRef` is of an unsupported JavaScript type: not a string, function, array or object
-     *
-     * * the argument `typeRef` is a value type's constructor (e.g. [Value.Meta]{@link pentaho.type.Value.Meta})
-     *
-     * * the argument `typeRef` is a value instance
-     *
-     * * the id of a type is not defined as a module in the AMD module system
-     *   (specified directly in `typeRef`, or present in an generic type specification)
-     *
-     * * the id of a **non-standard type** is from a module that the AMD module system hasn't loaded yet
-     *   (specified directly in `typeRef`, or present in an generic type specification)
-     *
-     * * the value returned by a factory function is not a instance constructor of a subtype of _Value_
-     *   (specified directly in `typeRef`, or obtained indirectly by loading a type's module given its id)
-     *
-     * * an instance constructor is from a different [context]{@link pentaho.type.Value.Meta#context}
-     *   (directly specified in `typeRef`,
-     *    or obtained indirectly by loading a type's module given its id, or from a factory function)
+     * @see pentaho.type.Context#getAsync
      *
      * @example
      * <caption>
@@ -297,40 +278,46 @@ define([
      *
      * @return {!Class.<pentaho.type.Value>} The instance constructor.
      *
-     * @see pentaho.type.Context#getAsync
+     * @throws {pentaho.lang.ArgumentInvalidError} When `typeRef` is of an unsupported JavaScript type:
+     * not a string, function, array or object.
+     *
+     * @throws {pentaho.lang.ArgumentInvalidError} When `typeRef` is a value type's constructor
+     * (e.g. [Value.Meta]{@link pentaho.type.Value.Meta})
+     *
+     * @throws {pentaho.lang.ArgumentInvalidError} When `typeRef` is a value instance.
+     *
+     * @throws {Error} When the id of a type is not defined as a module in the AMD module system
+     * (specified directly in `typeRef`, or present in an generic type specification).
+     *
+     * @throws {Error} When the id of a **non-standard type** is from a module that the AMD module system
+     * hasn't loaded yet (specified directly in `typeRef`, or present in an generic type specification)
+     *
+     * @throws {pentaho.lang.OperationInvalidError} When the value returned by a factory function is not
+     * an instance constructor of a subtype of _Value_
+     * (specified directly in `typeRef`, or obtained indirectly by loading a type's module given its id).
+     *
+     * @throws {pentaho.lang.ArgumentInvalidError} When an instance constructor is
+     * from a different [context]{@link pentaho.type.Value.Meta#context}
+     * (directly specified in `typeRef`,
+     * or obtained indirectly by loading a type's module given its id, or from a factory function).
+     *
+     * @throws {pentaho.lang.ArgumentInvalidError} When `typeRef` is, or contains, an array-shorthand,
+     * list type specification that has more than one child element type specification.
      */
     get: function(typeRef) {
       return this._get(typeRef, true);
     },
 
     /**
-     * Gets, asynchronously, the **configured instance constructor** instance constructor of a type.
+     * Gets, asynchronously, the **configured instance constructor** of a type.
      *
      * For more information on the `typeRef` argument,
      * please see [UTypeReference]{@link pentaho.type.spec.UTypeReference}.
      *
-     * This method can be used even if a generic type metadata specification references
-     * non-standard types whose modules have not yet been loaded by the AMD module system.
+     * This method can be used even if a generic type metadata specification references non-standard types
+     * whose modules have not yet been loaded by the AMD module system.
      *
-     * The returned promise gets rejected with an error when:
-     *
-     * * the argument `typeRef` is of an unsupported JavaScript type: not a string, function, array or object
-     *
-     * * the argument `typeRef` is a value type's constructor (e.g. [Value.Meta]{@link pentaho.type.Value.Meta})
-     *
-     * * the argument `typeRef` is a value instance.
-     *
-     * * the id of a type is not defined as a module in the AMD module system
-     *   (specified directly in `typeRef`, or present in an generic type specification)
-     *
-     * * the value returned by a factory function is not a instance constructor of a subtype of _Value_
-     *   (specified directly in `typeRef`, or obtained indirectly by loading a type's module given its id)
-     *
-     * * an instance constructor is from a different [context]{@link pentaho.type.Value.Meta#context}
-     *   (directly specified in `typeRef`,
-     *    or obtained indirectly by loading a type's module given its id, or from a factory function)
-     *
-     * * any other, unexpected error occurs.
+     * @see pentaho.type.Context#get
      *
      * @example
      * <caption>
@@ -361,7 +348,30 @@ define([
      *
      * @return {!Promise.<!Class.<pentaho.type.Value>>} A promise for the instance constructor.
      *
-     * @see pentaho.type.Context#get
+     * @rejects {pentaho.lang.ArgumentInvalidError} When `typeRef` is of an unsupported JavaScript type:
+     * not a string, function, array or object.
+     *
+     * @rejects {pentaho.lang.ArgumentInvalidError} When `typeRef` is a value type's constructor
+     * (e.g. [Value.Meta]{@link pentaho.type.Value.Meta})
+     *
+     * @rejects {pentaho.lang.ArgumentInvalidError} When `typeRef` is a value instance.
+     *
+     * @rejects {Error} When the id of a type is not defined as a module in the AMD module system
+     * (specified directly in `typeRef`, or present in an generic type specification).
+     *
+     * @rejects {pentaho.lang.OperationInvalidError} When the value returned by a factory function is not
+     * an instance constructor of a subtype of _Value_
+     * (specified directly in `typeRef`, or obtained indirectly by loading a type's module given its id).
+     *
+     * @rejects {pentaho.lang.ArgumentInvalidError} When an instance constructor is
+     * from a different [context]{@link pentaho.type.Value.Meta#context}
+     * (directly specified in `typeRef`,
+     * or obtained indirectly by loading a type's module given its id, or from a factory function).
+     *
+     * @rejects {pentaho.lang.ArgumentInvalidError} When `typeRef` is, or contains, an array-shorthand,
+     * list type specification that has more than one child element type specification.
+     *
+     * @rejects {Error} Any other, unexpected error occurs.
      */
     getAsync: function(typeRef) {
       try {
@@ -439,12 +449,15 @@ define([
      * Main dispatcher according to the type and class of `typeRef`:
      * string, function or array or object.
      *
-     * @param {?pentaho.type.spec.UTypeReference} [typeRef] A type reference.
+     * @param {?pentaho.type.spec.UTypeReference} typeRef A type reference.
      * Defaults to type `"pentaho/type/string"`.
      *
      * @param {boolean} [sync=false] Whether to perform a synchronous get.
      * @return {!Promise.<!Class.<pentaho.type.Value>>|!Class.<pentaho.type.Value>} When sync,
      *   returns the instance constructor, while, when async, returns a promise for it.
+     *
+     * @throws {pentaho.lang.ArgumentInvalidError} When `typeRef` is of an unsupported JavaScript type:
+     * not a string, function, array or object.
      *
      * @private
      * @ignore
@@ -526,6 +539,12 @@ define([
      * @return {!Promise.<!Class.<pentaho.type.Value>>|!Class.<pentaho.type.Value>} When sync,
      *   returns the instance constructor, while, when async, returns a promise for it.
      *
+     * @throws {pentaho.lang.ArgumentInvalidError} When `fun` is a value type's constructor
+     * (e.g. [Value.Meta]{@link pentaho.type.Value.Meta}).
+     *
+     * @throws {Error} Other errors,
+     * thrown by {@link pentaho.type.Context#_getByType} and {@link pentaho.type.Context#_getByFactory}.
+     *
      * @private
      * @ignore
      */
@@ -546,21 +565,12 @@ define([
      * Gets a configured instance constructor of a type,
      * given the instance constructor of that type.
      *
-     * An error is thrown if, for the given instance constructor,
-     * {@link pentaho.type.Value.Meta#context} is not `this` -
-     * the instance constructor must have been created by a factory called with this context,
-     * and have captured the context as the value of its `context` property,
-     * or, have been extended from a type that had this context.
-     *
      * This method works for anonymous types as well -
      * that have no [id]{@link pentaho.type.Value.Meta#id} -
      * cause it uses the types' [uid]{@link pentaho.type.Value.Meta#uid}
      * to identify types.
      *
      * A map of already configured types is kept in `_byTypeUid`.
-     *
-     * An error is thrown in the pathological case of a different instance constructor,
-     * with the same `uid` is already registered.
      *
      * If the type not yet in the map, and it is not anonymous,
      * configuration is requested for it, and, if any exists,
@@ -576,6 +586,14 @@ define([
      *
      * @return {!Promise.<!Class.<pentaho.type.Value>>|!Class.<pentaho.type.Value>} When sync,
      *   returns the instance constructor, while, when async, returns a promise for it.
+     *
+     * @throws {pentaho.lang.ArgumentInvalidError} When the [context]{@link pentaho.type.Value.Meta#context}
+     * of `Type` is not `this` - the instance constructor must have been created by a factory called with this context,
+     * and have captured the context as the value of its `context` property,
+     * or, have been extended from a type that had this context.
+     *
+     * @throws {pentaho.lang.ArgumentInvalidError} When, pathologically, an instance constructor with
+     * the same `uid` is already registered.
      *
      * @private
      * @ignore
@@ -629,9 +647,6 @@ define([
      *
      * Otherwise the factory function is evaluated being passed this context as argument.
      *
-     * An error is thrown if the factory function does not return an instance constructor
-     * derived from `Value`.
-     *
      * The returned instance constructor is passed to `_getType`,
      * for registration and configuration,
      * and then returned immediately (module sync).
@@ -640,7 +655,10 @@ define([
      * @param {boolean} [sync=false] Whether to perform a synchronous get.
      *
      * @return {!Promise.<!Class.<pentaho.type.Value>>|!Class.<pentaho.type.Value>} When sync,
-     *   returns the instance constructor, while, when async, returns a promise for it.
+     * returns the instance constructor, while, when async, returns a promise for it.
+     *
+     * @throws {pentaho.lang.OperationInvalidError} When the value returned by the factory function
+     * is not a instance constructor of a subtype of _Value_.
      *
      * @private
      * @ignore
@@ -698,7 +716,7 @@ define([
     _getByListSpec: function(typeSpec, sync) {
       if(typeSpec.length > 1)
         return this._error(
-            error.argInvalid("typeSpec", "List type specification should have at most one child element type spec."),
+            error.argInvalid("typeRef", "List type specification should have at most one child element type spec."),
             sync);
 
       // Expand compact list type spec syntax and delegate to the generic handler.

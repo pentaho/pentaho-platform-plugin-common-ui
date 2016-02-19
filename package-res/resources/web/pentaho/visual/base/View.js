@@ -42,8 +42,8 @@ define([
    * @param {HTMLElement} element The DOM element where the visualization should render.
    * An error is thrown if this is not a valid DOM element.
    * @param {pentaho.visual.base.Model} model The base visualization `Model`.
-   * @throws {Error} Argument required. The constructor must be invoked with two arguments.
-   * @throws {Error} Argument invalid. A valid DOM element must be passed to the constructor.
+   *
+   * @throws {pentaho.lang.ArgumentInvalidError} When `element` is not an HTML DOM element.
    */
 
   var View = Base.extend(/** @lends pentaho.visual.base.View# */{
