@@ -21,6 +21,7 @@ module.exports = function (config) {
       // AMD configuration
       "build-res/requireCfg-raw.js",
       "test-js/unit/require-config.js",
+      "test-js/unit/require-test.js",
 
       // TEST files (must be after require-config.js, or it is not included)
       {pattern: "test-js/unit/**", included: false},
