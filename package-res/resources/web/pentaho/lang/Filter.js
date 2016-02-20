@@ -81,6 +81,8 @@ define([
       return null || filter;
     },
     filter: function(rows){
+      var self = this;
+      self.predicate(rows);
       return null || rows;
     }
   });

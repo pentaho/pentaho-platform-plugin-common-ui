@@ -33,14 +33,34 @@ define([
         ]
       };
 
-      filter = new Filter.Root();
+      filter = new Filter.Filter();
     });
 
-    it("", function() {
+    it("should filter ", function() {
       var leaf = new Filter.IsEqual("country", "Portugal");
       filter.insert(leaf);
 
       expect(filter.filter(data)).equals({
+        model: [
+          {name: "country", type: "string", label: "Country"},
+          {name: "sales", type: "number", label: "Sales"}
+        ],
+        rows: [
+          {c: [{v: "Portugal"}, {v: 12000}]}
+        ]
+      });
+    });
+
+    it("should return the intersection of the filters with the data", function() {
+      var leaf = new Filter.IsEqual("country", "Portugal");
+      filter.insert(leaf);
+
+      var filter2 = new Filter.And();
+      var leaf2 = new Filter.IsEqual("sales", 12000);
+      filter2.insert(leaf2);
+      filter.insert(filter2);
+
+      expect(filter.intersection(data)).equals({
         model: [
           {name: "country", type: "string", label: "Country"},
           {name: "sales", type: "number", label: "Sales"}
