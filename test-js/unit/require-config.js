@@ -26,6 +26,9 @@
 
   /*global requireCfg:false, window:false, KARMA_DEBUG:false*/
 
+  // ignore better written in dot notation error
+  /*jshint sub:true*/
+
   // Karma serves files from '/base'
 
   requireCfg.baseUrl = "/base/build-res/module-scripts/";

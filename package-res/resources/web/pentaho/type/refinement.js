@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 define([
+  "require",
   "module",
   "./facets/Refinement",
   "./valueHelper",
@@ -21,7 +22,7 @@ define([
   "../util/error",
   "../util/fun",
   "../i18n!types"
-], function(module, RefinementFacet, valueHelper, O, error, F, bundle) {
+], function(localRequire, module, RefinementFacet, valueHelper, O, error, F, bundle) {
 
   "use strict";
 
@@ -348,7 +349,7 @@ define([
             if(id.indexOf("/") < 0)
               id = _baseFacetsMid + id;
 
-            return require(id);
+            return localRequire(id);
           }
         },
         //endregion

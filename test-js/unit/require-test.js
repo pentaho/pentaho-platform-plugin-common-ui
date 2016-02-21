@@ -29,7 +29,7 @@
    * To apply additional configurations to the context, call the `config` method.
    *
    * To provide module definitions to the context, call the `define` method.
-   * Only non-anonymous methods are supported.
+   * Only non-anonymous modules are supported.
    *
    * To dispose the context, call the `dispose` method.
    *

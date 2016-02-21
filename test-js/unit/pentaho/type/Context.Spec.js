@@ -32,39 +32,35 @@ define([
 
   // NOTE: can only be used with `it`; does not work in `describe`.
   function withContext(testFun) {
+    var localRequire = require.new();
+
     return function(done) {
-      unloadContext();
 
       // load fresh Context class
-      require(["pentaho/type/Context"], function(Context) {
+      localRequire(["pentaho/type/Context"], function(Context) {
         try {
-          var promise = testFun(Context);
+          var promise = testFun(Context, localRequire);
           if(!promise) {
             done();
+            localRequire.dispose();
           } else {
-            promise.then(done, done.fail);
+            promise.then(function() {
+              done();
+              localRequire.dispose();
+            }, function(ex) {
+              done.fail(ex);
+              localRequire.dispose();
+            });
           }
         } catch(ex) {
           done.fail(ex);
+          localRequire.dispose();
         }
-      }, done.fail);
+      }, function(ex) {
+        done.fail(ex);
+        localRequire.dispose();
+      });
     };
-  }
-
-  function unloadContext() {
-    // unload modules
-    var p;
-    for(p in standard)
-      if(standard.hasOwnProperty(p))
-        if(p !== "facets")
-          require.undef("pentaho/type/" + p);
-
-    for(p in standard.facets)
-      if(standard.facets.hasOwnProperty(p))
-        require.undef("pentaho/type/facets/" + p);
-
-    require.undef("pentaho/type/standard");
-    require.undef("pentaho/type/Context");
   }
 
   describe("pentaho.type.Context -", function() {
@@ -296,7 +292,7 @@ define([
         return Promise.resolve(result);
       }
 
-      it("should have preloaded standard primitive types and facets", withContext(function(Context) {
+      it("should have preloaded standard primitive types and facets", withContext(function(Context, localRequire) {
         var context = new Context();
         var p;
 
@@ -307,7 +303,7 @@ define([
 
         for(p in standard.facets)
           if(standard.facets.hasOwnProperty(p))
-            require("pentaho/type/facets/" + p);
+            localRequire("pentaho/type/facets/" + p);
       }));
 
       it("should be able to get a standard type given its relative id", testGet(function(sync, Context) {
@@ -328,9 +324,10 @@ define([
         });
       }));
 
-      it("should be able to get a standard type given its factory function", testGet(function(sync, Context) {
+      it("should be able to get a standard type given its factory function",
+      testGet(function(sync, Context, localRequire) {
         var context = new Context();
-        var valueFactory = require("pentaho/type/value");
+        var valueFactory = localRequire("pentaho/type/value");
         var promise = callGet(context, sync, valueFactory);
 
         return promise.then(function(Type) {
@@ -344,7 +341,8 @@ define([
         return callGet(context, sync, Value.meta.constructor);
       }, errorMatch.argInvalid("typeRef")));
 
-      it("should be able to get a standard type given its type instance constructor (Mesa)", testGet(function(sync, Context) {
+      it("should be able to get a standard type given its type instance constructor (Mesa)",
+      testGet(function(sync, Context) {
         var context = new Context();
         var Value   = context.get("pentaho/type/value");
         var promise = callGet(context, sync, Value);
@@ -364,7 +362,8 @@ define([
         });
       }));
 
-      it("should throw/reject when given a standard type instance prototype (mesa)", testGetError(function(sync, Context) {
+      it("should throw/reject when given a standard type instance prototype (mesa)",
+      testGetError(function(sync, Context) {
         var context = new Context();
         var Value   = context.get("pentaho/type/value");
 
@@ -386,7 +385,8 @@ define([
         });
       }));
 
-      it("should be able to create an anonymous complex type with implied base complex", testGet(function(sync, Context) {
+      it("should be able to create an anonymous complex type with implied base complex",
+      testGet(function(sync, Context) {
         var context = new Context();
         var promise = callGet(context, sync, {props: ["a", "b"]});
 
@@ -419,7 +419,8 @@ define([
         });
       }));
 
-      it("should be able to create a list type using the shorthand list-type notation", testGet(function(sync, Context) {
+      it("should be able to create a list type using the shorthand list-type notation",
+      testGet(function(sync, Context) {
         var context = new Context();
         var promise = callGet(context, sync, [
           {props: ["a", "b"]}
@@ -436,7 +437,8 @@ define([
         });
       }));
 
-      it("should throw/reject if the shorthand list-type notation has two entries", testGetError(function(sync, Context) {
+      it("should throw/reject if the shorthand list-type notation has two entries",
+      testGetError(function(sync, Context) {
         var context = new Context();
 
         return callGet(context, sync, [123, 234]);
@@ -457,91 +459,88 @@ define([
         });
       }));
 
-      it("should throw/reject if given a number (not a string, function or object)", testGetError(function(sync, Context) {
+      it("should throw/reject if given a number (not a string, function or object)",
+      testGetError(function(sync, Context) {
         var context = new Context();
 
         return callGet(context, sync, 1);
 
       }, errorMatch.argInvalid("typeRef")));
 
-      it("should throw/reject if given a boolean (not a string, function or object)", testGetError(function(sync, Context) {
+      it("should throw/reject if given a boolean (not a string, function or object)",
+      testGetError(function(sync, Context) {
         var context = new Context();
 
         return callGet(context, sync, true);
 
       }, errorMatch.argInvalid("typeRef")));
 
-      it("should be able to get an already loaded non-standard type given its absolute id", testGet(function(sync, Context) {
+      it("should be able to get an already loaded non-standard type given its absolute id",
+      testGet(function(sync, Context, localRequire) {
         var mid = "pentaho/foo/bar";
-        require.undef(mid);
-        define(mid,[], function() {
+        localRequire.define(mid,[], function() {
           return function(context) {
             var Simple = context.get("pentaho/type/simple");
             return Simple.extend({meta: {id: mid}});
           };
         });
 
-        return promiseUtil.require(mid)
+        return promiseUtil.require(mid, localRequire)
             .then(function() {
               var context = new Context();
               return callGet(context, sync, mid);
             })
             .then(function(Type) {
               expect(Type.meta.id).toBe(mid);
-              require.undef(mid);
             });
       }));
 
-      it("should throw if type factory does not return a function", testGet(function(sync, Context) {
+      it("should throw if type factory does not return a function", testGet(function(sync, Context, localRequire) {
         var mid = "pentaho/foo/bar2";
-        require.undef(mid);
-        define(mid,[], function() {
+
+        localRequire.define(mid,[], function() {
           return function(context) {
             return "not a function";
           };
         });
 
-        return promiseUtil.require(mid)
+        return promiseUtil.require(mid, localRequire)
             .then(function() {
               var context = new Context();
               return callGet(context, sync, mid);
             })
             .then(function() {
               expect("to throw").toBe(true);
-              require.undef(mid);
             }, function(ex) {
               expect(ex).toEqual(errorMatch.operInvalid());
-              require.undef(mid);
             });
       }));
 
-      it("should throw if type factory does return a function that is not an Item", testGet(function(sync, Context) {
+      it("should throw if type factory does return a function that is not an Item",
+      testGet(function(sync, Context, localRequire) {
         var mid = "pentaho/foo/bar2";
-        require.undef(mid);
-        define(mid,[], function() {
+
+        localRequire.define(mid,[], function() {
           return function(context) {
             return function(){};
           };
         });
 
-        return promiseUtil.require(mid)
+        return promiseUtil.require(mid, localRequire)
             .then(function() {
               var context = new Context();
               return callGet(context, sync, mid);
             })
             .then(function() {
               expect("to throw").toBe(true);
-              require.undef(mid);
             }, function(ex) {
               expect(ex).toEqual(errorMatch.operInvalid());
-              require.undef(mid);
             });
       }));
 
-      it("should collect non-standard type ids in getAsync", withContext(function(Context) {
+      it("should collect non-standard type ids in getAsync", withContext(function(Context, localRequire) {
         function defineTempModule(mid) {
-          require.undef(mid);
-          define(mid, [], function() {
+          localRequire.define(mid, [], function() {
             return function(context) {
               return context.get("pentaho/type/simple").extend({meta: {id: mid}});
             };
@@ -549,8 +548,7 @@ define([
         }
 
         function defineTempFacet(mid) {
-          require.undef(mid);
-          define(mid, ["pentaho/type/facets/Refinement"], function(Refinement) {
+          localRequire.define(mid, ["pentaho/type/facets/Refinement"], function(Refinement) {
             return Refinement.extend();
           });
         }
@@ -560,10 +558,12 @@ define([
         defineTempModule("pentaho/foo/dudu3");
         defineTempFacet("pentaho/foo/facets/Mixin1");
         defineTempFacet("pentaho/foo/facets/Mixin2");
+
         // -----
 
         var context = new Context();
-        var RefinementMixin2 = require("pentaho/type/facets/Refinement").extend();
+        var RefinementMixin2 = localRequire("pentaho/type/facets/Refinement").extend();
+
         var spec = {
           base: "complex",
           props: [
@@ -585,12 +585,6 @@ define([
               expect(Type.meta.get("foo1").type.id).toBe("pentaho/foo/dudu1");
               expect(Type.meta.get("foo2").type.ancestor.id).toBe("pentaho/foo/dudu2");
               expect(Type.meta.get("foo3").type.of.id).toBe("pentaho/foo/dudu3");
-
-              require.undef("pentaho/foo/dudu1");
-              require.undef("pentaho/foo/dudu2");
-              require.undef("pentaho/foo/dudu3");
-              require.undef("pentaho/foo/facets/Mixin1");
-              require.undef("pentaho/foo/facets/Mixin2");
             });
       }));
 
@@ -603,20 +597,15 @@ define([
 
     describe("#getAllAsync(baseTypeId, ka)", function() {
 
-      beforeEach(function() {
-        require.undef("pentaho/service");
-
-        require.undef("exp/foo");
-        require.undef("pentaho/service!exp/foo");
-
+      function configRequire(localRequire) {
         // Reset current service configuration
-        require.config({
+        localRequire.config({
           config: {"pentaho/service": null}
         });
 
         // ---
 
-        define("exp/foo", ["pentaho/type/simple"], function(simpleFactory) {
+        localRequire.define("exp/foo", ["pentaho/type/simple"], function(simpleFactory) {
           return function(context) {
             return context.get(simpleFactory).extend({meta: {id: "exp/foo"}});
           };
@@ -624,10 +613,7 @@ define([
 
         // ---
 
-        require.undef("exp/bar");
-        require.undef("pentaho/service!exp/bar");
-
-        define("exp/bar", ["pentaho/type/simple"], function(simpleFactory) {
+        localRequire.define("exp/bar", ["pentaho/type/simple"], function(simpleFactory) {
           return function(context) {
             return context.get(simpleFactory).extend({meta: {id: "exp/bar", browsable: false}});
           };
@@ -635,10 +621,7 @@ define([
 
         // ---
 
-        require.undef("exp/dude");
-        require.undef("pentaho/service!exp/dude");
-
-        define("exp/dude", ["pentaho/type/simple"], function(simpleFactory) {
+        localRequire.define("exp/dude", ["pentaho/type/simple"], function(simpleFactory) {
           return function(context) {
             return context.get(simpleFactory).extend({meta: {id: "exp/dude"}});
           };
@@ -646,7 +629,7 @@ define([
 
         // ---
 
-        require.config({
+        localRequire.config({
           config: {
             "pentaho/service": {
               "exp/foo": "exp/thing",
@@ -655,15 +638,19 @@ define([
             }
           }
         });
-      });
+      }
 
-      it("should return a promise", withContext(function(Context) {
+      it("should return a promise", withContext(function(Context, localRequire) {
+        configRequire(localRequire);
+
         var context  = new Context();
         var p = context.getAllAsync();
         expect(p instanceof Promise).toBe(true);
       }));
 
-      it("should return all registered Types under 'pentaho/type/value' by default", withContext(function(Context) {
+      it("should return all registered Types under 'pentaho/type/value' by default", withContext(function(Context, localRequire) {
+        configRequire(localRequire);
+
         var context = new Context();
 
         return context
@@ -675,7 +662,9 @@ define([
             });
       }));
 
-      it("should return an empty array when the specified baseType has no registrations", withContext(function(Context) {
+      it("should return an empty array when the specified baseType has no registrations", withContext(function(Context, localRequire) {
+        configRequire(localRequire);
+
         var context  = new Context();
 
         return context
@@ -686,7 +675,9 @@ define([
             });
       }));
 
-      it("should return all registered Types under a given base type id", withContext(function(Context) {
+      it("should return all registered Types under a given base type id", withContext(function(Context, localRequire) {
+        configRequire(localRequire);
+
         var context  = new Context();
 
         return context
@@ -704,7 +695,9 @@ define([
             });
       }));
 
-      it("should return all registered Types that satisfy the browsable filter", withContext(function(Context) {
+      it("should return all registered Types that satisfy the browsable filter", withContext(function(Context, localRequire) {
+        configRequire(localRequire);
+
         var context  = new Context();
 
         return context
