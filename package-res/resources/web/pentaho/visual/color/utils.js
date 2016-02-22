@@ -172,10 +172,6 @@ define([
     "yellowgreen" : "9ACD32"
   };
 
-  /**
-   * @module pentaho.visual.color
-   */
-
   return {
     getRgbColor:  getRgbColor,
     parseColor:   parseColor,
