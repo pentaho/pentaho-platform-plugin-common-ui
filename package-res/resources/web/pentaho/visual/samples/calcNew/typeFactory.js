@@ -44,8 +44,10 @@ define([
           {
             name: "operation",
             type: {
-              base: "string", // "." - inherited property type
-              domain: ["MIN", "MAX", "AVG", "SUM"]
+              base: "refinement",
+              of: "string", // "." - inherited property type
+              facets: "DiscreteDomain",
+              domain: ["min", "max", "avg", "sum"]
             },
             value: "MIN"
           }
