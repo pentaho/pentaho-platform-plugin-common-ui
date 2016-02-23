@@ -26,28 +26,12 @@ define([
     return Refinement.extend({
 
       meta: {
-        id: "pentaho/visual/ccc/abstract/types/displayUnits",
-        of: "string",
+        id: "pentaho/visual/ccc/abstract/types/lineWidth",
+        of: "number",
         facets: ["DiscreteDomain"],
-        domain: ["units_0", "units_2", "units_3", "units_4", "units_5", "units_6"],
-
-        scaleFactorOf: function(displayUnits) {
-          if(displayUnits) {
-            var match = displayUnits.match(/^UNITS_(\d+)$/i);
-            if(match) {
-              // units_0 -> 1
-              // units_1 -> 100
-              // units_2 -> 1000
-              // ...
-              var exponent = +match[1]; // >= 0  // + <=> Number( . )  conversion
-              if(exponent > 0) return Math.pow(10, exponent); // >= 100
-            }
-          }
-
-          return 1;
-        }
+        domain: [1, 2, 3, 4, 5, 6, 7, 8]
       }
     })
-    .implement({meta: bundle.structured["displayUnits"]});
+    .implement({meta: bundle.structured["lineWidth"]});
   };
 });

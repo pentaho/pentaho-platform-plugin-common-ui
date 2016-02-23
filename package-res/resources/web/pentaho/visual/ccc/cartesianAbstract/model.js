@@ -37,7 +37,7 @@ define([
             name: "displayUnits",
             type: displayUnitsFactory,
             required: true,
-            value: "UNITS_0"
+            value: "units_0"
           },
 
           // Secondary axis
@@ -48,7 +48,7 @@ define([
             name: "displayUnitsSecondary",
             type: displayUnitsFactory,
             required: true,
-            value: "UNITS_0"
+            value: "units_0"
           }
         ]
       }

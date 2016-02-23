@@ -24,11 +24,12 @@ define([
     var Refinement = context.get("pentaho/type/refinement");
 
     return Refinement.extend({
+
       meta: {
         id: "pentaho/visual/ccc/abstract/types/sizeByNegativesMode",
         of: "string",
         facets: ["DiscreteDomain"],
-        domain: ["NEG_LOWEST", "USE_ABS"]
+        domain: ["negLowest", "useAbs"]
       }
     })
     .implement({meta: bundle.structured["sizeByNegativesMode"]});

@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ define([
 
   var reRgbColor = /^rgb\((\d+),(\d+),(\d+)\)$/i;
 
-  var reNumColorPattern = /^(\d+)-COLOR$/;
+  var reNumColorPattern = /^(\d+)[_-]COLOR$/i;
 
   // Used by parseColor
   var CSS_Names = {
@@ -298,24 +298,26 @@ define([
 
   // colorSet:     "ryg" | "ryb" | "blue" | "gray"
   //
-  // pattern:      "GRADIENT" | "3-COLOR" | "5-COLOR"
+  // pattern:      "gradient" | "3_color" | "5_color"
   //  =>
   //   scalingType:  "linear" | <--   "discrete"  -->
   //  =>
   //   suffix:       "-5"     | "-3"      | "-5"
   //
-  // paletteName:  "ryg-3", "ryg-5", "ryb-3", "ryb-5", "blue-3", "blue-5", "gray-3", "gray-5"
+  // paletteName:  "ryg_3", "ryg_5", "ryb_3", "ryb_5", "blue_3", "blue_5", "gray_3", "gray_5"
 
   function buildPalette(colorSet, pattern, reversed) {
     var colors = null;
 
     if(colorSet) {
       var suffix;
-      if(pattern === "GRADIENT") {
-        suffix = "-5";
+      pattern = pattern.toLowerCase();
+
+      if(pattern === "gradient") {
+        suffix = "_5";
       } else {
         var m = reNumColorPattern.exec(pattern);
-        suffix = m ? ("-" + m[1]) : pattern;
+        suffix = m ? ("_" + m[1]) : pattern;
       }
 
       var palette = paletteRegistry.get(colorSet + suffix);

@@ -29,7 +29,7 @@ define([
         id: "pentaho/visual/ccc/abstract/types/fontStyle",
         of: "string",
         facets: ["DiscreteDomain"],
-        domain: ["PLAIN", "BOLD", "ITALIC"]
+        domain: ["plain", "bold", "italic"]
       }
     })
     .implement({meta: bundle.structured["fontStyle"]});

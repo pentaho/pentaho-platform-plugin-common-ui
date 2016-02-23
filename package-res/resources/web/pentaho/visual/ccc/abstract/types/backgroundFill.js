@@ -29,7 +29,7 @@ define([
         id: "pentaho/visual/ccc/abstract/types/backgroundFill",
         of: "string",
         facets: ["DiscreteDomain"],
-        domain: ["NONE", "SOLID", "GRADIENT"]
+        domain: ["none", "solid", "gradient"]
       }
     })
     .implement({meta: bundle.structured["backgroundFill"]});

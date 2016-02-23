@@ -29,7 +29,7 @@ define([
         id: "pentaho/visual/ccc/abstract/types/sides",
         of: "string",
         facets: ["DiscreteDomain"],
-        domain: ["TOP", "RIGHT", "BOTTOM", "LEFT"]
+        domain: ["top", "right", "bottom", "left"]
       }
     })
     .implement({meta: bundle.structured["sides"]});

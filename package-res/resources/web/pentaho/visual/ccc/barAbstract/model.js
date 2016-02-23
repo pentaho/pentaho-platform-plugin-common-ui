@@ -32,15 +32,7 @@ define([
 
         //region Data Label
         props: [
-          {
-            id: "labelsOption",
-            type: {
-              base: "refinement",
-              of: "string",
-              facets: "DiscreteDomain",
-              domain: ["none", "center", "inside_end", "inside_base"]
-            }
-          }
+
         ]
 
         //endregion

@@ -1,5 +1,5 @@
 /*!
-* Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
+* Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -30,15 +30,15 @@ define(function() {
         },
 
         readFontModel: function(model, prefix) {
-          var size = model.getf(prefix + "Size");
+          var size = model.getv(prefix + "Size");
           if(size) {
-            var style = model.getf(prefix + "Style");
-            if(style == null || style == "PLAIN")
+            var style = model.getv(prefix + "Style");
+            if(style == null || style === "plain")
               style = "";
             else
               style += " ";
 
-            return style + size + "px " + model.getf(prefix + "FontFamily");
+            return style + size + "px " + model.getv(prefix + "FontFamily");
           }
         }
     };

@@ -25,29 +25,13 @@ define([
 
     return Refinement.extend({
 
-      meta: {
-        id: "pentaho/visual/ccc/abstract/types/displayUnits",
+      meta:  {
+        id: "pentaho/visual/ccc/abstract/types/trendType",
         of: "string",
-        facets: ["DiscreteDomain"],
-        domain: ["units_0", "units_2", "units_3", "units_4", "units_5", "units_6"],
-
-        scaleFactorOf: function(displayUnits) {
-          if(displayUnits) {
-            var match = displayUnits.match(/^UNITS_(\d+)$/i);
-            if(match) {
-              // units_0 -> 1
-              // units_1 -> 100
-              // units_2 -> 1000
-              // ...
-              var exponent = +match[1]; // >= 0  // + <=> Number( . )  conversion
-              if(exponent > 0) return Math.pow(10, exponent); // >= 100
-            }
-          }
-
-          return 1;
-        }
+        facets: "DiscreteDomain",
+        domain: ["none", "linear"]
       }
     })
-    .implement({meta: bundle.structured["displayUnits"]});
+    .implement({meta: bundle.structured["trendType"]});
   };
 });
