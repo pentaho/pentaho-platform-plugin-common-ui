@@ -179,8 +179,12 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
                         style.get(this.domNode, 'borderRightWidth')) +'px';
                   }
                   style.set(this.popup.domNode, 'width', this.width);
-                  style.set(query('.dijitDialogPaneContent',this.popup.domNode),'width', this.width);
-                  style.set(query('.dijitDialogPaneContent',this.domNode),'width', this.width);
+                  if(typeof query('.dijitDialogPaneContent',this.popup.domNode).style != 'undefined') {
+                    style.set(query('.dijitDialogPaneContent',this.popup.domNode),'width', this.width);
+                  }
+                  if(typeof query('.dijitDialogPaneContent',this.domNode).style != 'undefined') {
+                    style.set(query('.dijitDialogPaneContent',this.domNode),'width', this.width);
+                  }
                 }
               } else {
                 if(!this.shown) {
