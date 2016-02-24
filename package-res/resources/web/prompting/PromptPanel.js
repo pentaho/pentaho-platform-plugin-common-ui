@@ -821,7 +821,7 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
          * @param {String} name
          * @param {Object} value
          */
-        parameterChanged: function (param, name, value) {
+        parameterChanged: function (param, name, value, type) {
           if (this.onParameterChanged) {
             var paramCallback = this.onParameterChanged[name] ?
                   this.onParameterChanged[name] :
@@ -835,12 +835,15 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
             }
           }
 
-          if (!value || value == "" || value == "null") {
-            if (!this.nullValueParams) {
-              this.nullValueParams = [];
-            }
+          if(!(value == "" && type == "TextInputComponent"))
+          {
+            if (!value || value == "" || value == "null") {
+              if (!this.nullValueParams) {
+                this.nullValueParams = [];
+              }
 
-            this.nullValueParams.push(param);
+              this.nullValueParams.push(param);
+            }
           }
 
           this._setTimeoutRefreshPrompt();

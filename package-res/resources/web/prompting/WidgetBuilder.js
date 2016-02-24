@@ -112,7 +112,7 @@ define(['./builders/PromptPanelBuilder', './builders/ParameterGroupPanelBuilder'
           var widget = this._findBuilderFor(args, type).build(args);
           if (widget.parameter && widget.param) {
             widget.postChange = function () {
-              args.promptPanel.parameterChanged(this.param, this.parameter, this.getValue());
+              args.promptPanel.parameterChanged(this.param, this.parameter, this.getValue(), this.type);
             }.bind(widget);
           }
           return widget;
