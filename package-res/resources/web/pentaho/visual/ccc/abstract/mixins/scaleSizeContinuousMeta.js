@@ -14,22 +14,21 @@
  * limitations under the License.
  */
 define([
-  "../cartesianAbstract/model",
-  "pentaho/i18n!../abstract/i18n/model"
-], function(cartesianAbstractModelFactory, bundle) {
+  "../types/sizeByNegativesMode",
+], function(sizeByNegativesModeFactory) {
 
   "use strict";
 
-  return function(context) {
-
-    var CartesianAbstract = context.get(cartesianAbstractModelFactory);
-
-    return CartesianAbstract.extend({
-      meta: {
-        id: "pentaho/visual/ccc/categoricalContinuousAbstract",
-        "abstract": true
+  // Used by: HG, Scatter
+  return {
+    props: [
+      {
+        name: "sizeByNegativesMode",
+        type: sizeByNegativesModeFactory,
+        applicable: function() { return this.count("size") > 0; },
+        required: true,
+        value: "negLowest"
       }
-    })
-    .implement({meta: bundle.structured["categoricalContinuousAbstract"]});
+    ]
   };
 });

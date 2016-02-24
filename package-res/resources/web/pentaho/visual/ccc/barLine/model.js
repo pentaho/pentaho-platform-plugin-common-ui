@@ -18,8 +18,10 @@ define([
   "pentaho/i18n!../abstract/i18n/model",
   "../abstract/types/labelsOption",
   "../abstract/types/shape",
-  "../abstract/themes"
-], function(barAbstractModelFactory, bundle, labelsOptionFactory, shapeFactory) {
+  "../abstract/types/lineWidth",
+  "../abstract/mixins/interpolationMeta"
+], function(barAbstractModelFactory, bundle, labelsOptionFactory, shapeFactory, lineWidthFactory,
+    interpolationMeta) {
 
   "use strict";
 
@@ -27,22 +29,49 @@ define([
 
     var BarAbstract = context.get(barAbstractModelFactory);
 
+    function requiredOneMeasure() {
+      /*jshint validthis:true*/
+      return !this.count("measures") && !this.count("measuresLine");
+    }
+
     return BarAbstract.extend({
 
       meta: {
         id: "pentaho/visual/ccc/barLine",
-        v2id: "",
+        v2Id: "ccc_barline",
 
         view: "View",
-        styleClass: "",
+        styleClass: "pentaho-visual-ccc-bar-line",
 
         props: [
+          {
+            name: "measures",
+            required: requiredOneMeasure
+          },
+          {
+            name: "measuresLine",
+            type: ["string"],
+            dataType: "number",
+            isVisualRole: true,
+            required: requiredOneMeasure
+          },
+
+          {
+            name: "lineWidth",
+            type: lineWidthFactory,
+            applicable: function() { return this.count("measuresLine") > 0; },
+            required: true,
+            value: 1
+          },
           {
             name: "labelsOption",
             type: {
               base: labelsOptionFactory,
               domain: ["none", "center", "insideEnd", "insideBase", "outsideEnd"]
-            }
+            },
+            applicable: function() { return this.count("measures") > 0; },
+            required: true,
+            value: "none"
           },
 
           {
@@ -50,19 +79,24 @@ define([
             type: {
               base: labelsOptionFactory,
               domain: ["none", "center", "left", "right", "top", "bottom"]
-            }
+            },
+            applicable: function() { return this.count("measuresLine") > 0; },
+            required: true,
+            value: "none"
           },
 
           {
             name: "shape",
             type: shapeFactory,
             required: true,
-            value: "circle"
+            value: "circle",
+            applicable: function() { return this.count("measuresLine") > 0; }
           }
         ]
       }
-      
     })
+    .implement({meta: interpolationMeta})
+    .implement({meta: bundle.structured["interpolation"]})
     .implement({meta: bundle.structured["barLine"]});
   };
 });

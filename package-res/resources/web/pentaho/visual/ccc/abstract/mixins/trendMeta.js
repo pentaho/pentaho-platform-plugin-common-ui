@@ -14,22 +14,38 @@
  * limitations under the License.
  */
 define([
-  "../cartesianAbstract/model",
-  "pentaho/i18n!../abstract/i18n/model"
-], function(cartesianAbstractModelFactory, bundle) {
+  "../types/trendType",
+  "../types/lineWidth"
+], function(trendTypeFactory, lineWidthFactory) {
 
   "use strict";
 
-  return function(context) {
+  function applicableTrend() {
+    /*jshint validthis:true */
+    return this.getv("trendType") !== "none";
+  }
 
-    var CartesianAbstract = context.get(cartesianAbstractModelFactory);
-
-    return CartesianAbstract.extend({
-      meta: {
-        id: "pentaho/visual/ccc/categoricalContinuousAbstract",
-        "abstract": true
+  // Used by: Line, Bar, Scatter
+  return {
+    props: [
+      {
+        name: "trendType",
+        type: trendTypeFactory,
+        required: true,
+        value: "none"
+      },
+      {
+        name: "trendName",
+        type: "string",
+        applicable: applicableTrend
+      },
+      {
+        name: "trendLineWidth",
+        type: lineWidthFactory,
+        applicable: applicableTrend,
+        required: true,
+        value: 1
       }
-    })
-    .implement({meta: bundle.structured["categoricalContinuousAbstract"]});
+    ]
   };
 });

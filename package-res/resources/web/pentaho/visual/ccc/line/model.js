@@ -18,8 +18,12 @@ define([
   "pentaho/i18n!../abstract/i18n/model",
   "../abstract/types/labelsOption",
   "../abstract/types/shape",
-  "../abstract/themes"
-], function(visualFactory, bundle, labelsOptionFactory, shapeFactory) {
+  "../abstract/types/lineWidth",
+  "../abstract/mixins/trendMeta",
+  "../abstract/mixins/settingsMultiChartMeta",
+  "../abstract/mixins/interpolationMeta"
+], function(visualFactory, bundle, labelsOptionFactory, shapeFactory, lineWidthFactory,
+    trendMeta, settingsMultiChartMeta, interpolationMeta) {
 
   "use strict";
 
@@ -31,26 +35,66 @@ define([
 
         meta: {
           id: "pentaho/visual/ccc/line",
-          v2id: "",
+          v2Id: "ccc_line",
+
+          view: "View",
+          styleClass: "pentaho-visual-ccc-line",
+
           props: [
             {
-              name: "labelsOption",
-              type: {
-                base: labelsOptionFactory,
-                domain: ["none", "center", "left", "right", "top", "bottom"]
-              }
+              name: "columns",
+              type: ["string"],
+              dataType: "string",
+              isVisualRole: true,
+              required: false
+            },
+            {
+              name: "measures",
+              type: ["string"],
+              dataType: "number",
+              isVisualRole: true,
+              required: true
+            },
+            {
+              name: "multi",
+              type: ["string"],
+              dataType: "string",
+              isVisualRole: true,
+              required: false
             },
 
+            {
+              name: "lineWidth",
+              type: lineWidthFactory,
+              applicable: function() { return this.count("measures") > 0; },
+              required: true,
+              value: 1
+            },
             {
               name: "shape",
               type: shapeFactory,
               required: true,
               value: "circle"
+            },
+            {
+              name: "labelsOption",
+              type: {
+                base: labelsOptionFactory,
+                domain: ["none", "center", "left", "right", "top", "bottom"]
+              },
+              required: true,
+              value: "none"
             }
           ]
         }
 
       })
+      .implement({meta: trendMeta})
+      .implement({meta: bundle.structured["trendMeta"]})
+      .implement({meta: settingsMultiChartMeta})
+      .implement({meta: bundle.structured["settingsMultiChart"]})
+      .implement({meta: interpolationMeta})
+      .implement({meta: bundle.structured["interpolation"]})
       .implement({meta: bundle.structured["line"]});
   };
 });

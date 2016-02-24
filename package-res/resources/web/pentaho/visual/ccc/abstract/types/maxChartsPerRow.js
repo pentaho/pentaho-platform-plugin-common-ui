@@ -14,22 +14,23 @@
  * limitations under the License.
  */
 define([
-  "../cartesianAbstract/model",
-  "pentaho/i18n!../abstract/i18n/model"
-], function(cartesianAbstractModelFactory, bundle) {
+  "pentaho/i18n!../i18n/model"
+], function(bundle) {
 
   "use strict";
 
   return function(context) {
 
-    var CartesianAbstract = context.get(cartesianAbstractModelFactory);
+    var Refinement = context.get("pentaho/type/refinement");
 
-    return CartesianAbstract.extend({
+    return Refinement.extend({
       meta: {
-        id: "pentaho/visual/ccc/categoricalContinuousAbstract",
-        "abstract": true
+        id: "pentaho/visual/ccc/abstract/types/maxChartsPerRow",
+        of: "number",
+        facets: ["DiscreteDomain"],
+        domain: [1, 2, 3, 4, 5]
       }
     })
-    .implement({meta: bundle.structured["categoricalContinuousAbstract"]});
+    .implement({meta: bundle.structured["maxChartsPerRow"]});
   };
 });

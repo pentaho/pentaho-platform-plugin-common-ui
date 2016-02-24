@@ -18,8 +18,10 @@ define([
   "pentaho/i18n!../abstract/i18n/model",
   "../abstract/types/displayUnits",
   "../abstract/types/labelsOption",
-  "../abstract/themes"
-], function(abstractModelFactory, bundle, displayUnitsFactory, labelsOptionFactory) {
+  "../abstract/types/sliceOrder",
+  "../abstract/mixins/settingsMultiChartMeta"
+], function(abstractModelFactory, bundle, displayUnitsFactory, labelsOptionFactory, sliceOrderFactory,
+    settingsMultiChartMeta) {
 
   "use strict";
 
@@ -30,31 +32,58 @@ define([
     return Abstract.extend({
       meta: {
         id: "pentaho/visual/ccc/sunburst",
+        v2Id: "ccc_sunburst",
+
+        view: "View",
+        styleClass: "pentaho-visual-ccc-sunburst",
+
         props: [
+          {
+            name: "size",
+            type: "string",
+            dataType: "number",
+            isVisualRole: true
+          },
+          {
+            name: "multi",
+            type: ["string"],
+            dataType: "string",
+            isVisualRole: true,
+            required: false
+          },
+
           {
             name: "displayUnits",
             type: displayUnitsFactory,
             required: true,
             value: "units_0"
           },
-
           {
             name: "labelsOption",
             type: {
               base: labelsOptionFactory,
               domain: ["none", "center"]
-            }
+            },
+            required: true,
+            value: "none"
           },
-
           {
             name: "emptySlicesHidden",
             type: "boolean",
             required: true,
             value: true
+          },
+          {
+            name: "sliceOrder",
+            type: sliceOrderFactory,
+            required: true,
+            value: "bySizeDescending"
           }
         ]
       }
     })
+    .implement({meta: settingsMultiChartMeta})
+    .implement({meta: bundle.structured["settingsMultiChart"]})
     .implement({meta: bundle.structured["sunburst"]});
   };
 });

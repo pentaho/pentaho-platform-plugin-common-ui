@@ -198,6 +198,7 @@
     var theme = (typeof active_theme !== "undefined") ? active_theme : null;
     if(!theme || themes.indexOf(theme) < 0) theme = themes[0];
 
+    // e.g. "/theme" -> "/themes/crystal"
     requireMap["*"][mid + "/theme"] = mid + "/themes/" + theme;
   }
 

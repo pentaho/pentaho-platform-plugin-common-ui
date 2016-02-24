@@ -16,8 +16,7 @@
 define([
   "../barAbstract/model",
   "pentaho/i18n!../abstract/i18n/model",
-  "../abstract/types/labelsOption",
-  "../abstract/themes"
+  "../abstract/types/labelsOption"
 ], function(barAbstractModelFactory, bundle, labelsOptionFactory) {
 
   "use strict";
@@ -29,18 +28,24 @@ define([
     return BarAbstract.extend({
         meta: {
           id: "pentaho/visual/ccc/barStacked",
-          v2id: "",
+          v2Id: "ccc_barstacked",
 
           view: "View",
-          styleClass: "",
+          styleClass: "pentaho-visual-ccc-bar-stacked",
 
           props: [
+            {
+              name: "measures",
+              required: true
+            },
             {
               name: "labelsOption",
               type: {
                 base: labelsOptionFactory,
                 domain: ["none", "center", "insideEnd", "insideBase"]
-              }
+              },
+              required: true,
+              value: "none"
             }
           ]
         }

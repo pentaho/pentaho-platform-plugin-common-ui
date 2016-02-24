@@ -16,8 +16,8 @@
 define([
   "../barAbstract/model",
   "pentaho/i18n!../abstract/i18n/model",
-  "../abstract/themes"
-], function(barAbstractModelFactory, bundle) {
+  "../abstract/types/labelsOption"
+], function(barAbstractModelFactory, bundle, labelsOptionFactory) {
 
   "use strict";
 
@@ -30,8 +30,22 @@ define([
         id: "pentaho/visual/ccc/barNormalizedAbstract",
         "abstract": true,
 
-        view: "View",
-        styleClass: ""
+        props: [
+          {
+            name: "measures",
+            required: true
+          },
+
+          {
+            name: "labelsOption",
+            type: {
+              base: labelsOptionFactory,
+              domain: ["none", "center", "insideEnd", "insideBase"]
+            },
+            required: true,
+            value: "none"
+          }
+        ]
       }
       
     })

@@ -30,9 +30,6 @@ define([
         id: "pentaho/visual/ccc/cartesianAbstract",
         "abstract": true,
 
-        view: "View",
-        styleClass: "",
-
         props: [
           // Primary axis
           {name: "autoRange", type: "boolean", value: true},

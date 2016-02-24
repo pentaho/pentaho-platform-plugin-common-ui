@@ -17,8 +17,8 @@ define([
   "../categoricalContinuousAbstract/model",
   "pentaho/i18n!../abstract/i18n/model",
   "../abstract/types/labelsOption",
-  "../abstract/themes"
-], function(visualFactory, bundle, labelsOptionFactory) {
+  "../abstract/mixins/settingsMultiChartMeta"
+], function(visualFactory, bundle, labelsOptionFactory, settingsMultiChartMeta) {
 
   "use strict";
 
@@ -30,8 +30,26 @@ define([
 
         meta: {
           id: "pentaho/visual/ccc/pie",
-          v2id: "",
+          v2Id: "ccc_pie",
+
+          view: "View",
+          styleClass: "pentaho-visual-ccc-pie",
+
           props: [
+            {
+              name: "columns",
+              type: ["string"],
+              dataType: "string",
+              isVisualRole: true,
+              required: false
+            },
+            {
+              name: "measures",
+              type: ["string"],
+              dataType: "number",
+              isVisualRole: true,
+              required: true
+            },
             {
               name: "labelsOption",
               type: {
@@ -43,8 +61,9 @@ define([
             }
           ]
         }
-
       })
+      .implement({meta: settingsMultiChartMeta})
+      .implement({meta: bundle.structured["settingsMultiChart"]})
       .implement({meta: bundle.structured["pie"]});
   };
 });

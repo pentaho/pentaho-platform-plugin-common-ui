@@ -16,8 +16,8 @@
 define([
   "../categoricalContinuousAbstract/model",
   "pentaho/i18n!../abstract/i18n/model",
-  "../abstract/themes"
-], function(categoricalContinuousAbstractModelFactory, bundle) {
+  "../abstract/mixins/settingsMultiChartMeta"
+], function(categoricalContinuousAbstractModelFactory, bundle, settingsMultiChartMeta) {
 
   "use strict";
 
@@ -30,11 +30,33 @@ define([
         id: "pentaho/visual/ccc/barAbstract",
         "abstract": true,
 
-        view: "View",
-        styleClass: ""
+        props: [
+          {
+            name: "columns",
+            type: ["string"],
+            dataType: "string",
+            isVisualRole: true,
+            required: false
+          },
+          {
+            name: "measures",
+            type: ["string"],
+            dataType: "number",
+            isVisualRole: true
+          },
+          {
+            name: "multi",
+            type: ["string"],
+            dataType: "string",
+            isVisualRole: true,
+            required: false
+          }
+        ]
       }
       
     })
+    .implement({meta: settingsMultiChartMeta})
+    .implement({meta: bundle.structured["settingsMultiChart"]})
     .implement({meta: bundle.structured["barAbstract"]});
   };
 });

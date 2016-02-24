@@ -18,8 +18,10 @@ define([
   "pentaho/i18n!../abstract/i18n/model",
   "../abstract/types/shape",
   "../abstract/types/labelsOption",
-  "../abstract/themes"
-], function(cartesianAbstractModelFactory, bundle, shapeFactory, labelsOptionFactory) {
+  "../abstract/mixins/scaleSizeContinuousMeta",
+  "../abstract/mixins/scaleColorContinuousMeta"
+], function(cartesianAbstractModelFactory, bundle, shapeFactory, labelsOptionFactory,
+    scaleSizeContinuousMeta, scaleColorContinuousMeta) {
 
   "use strict";
 
@@ -27,24 +29,55 @@ define([
 
     var CartesianAbstract = context.get(cartesianAbstractModelFactory);
 
-    return CartesianAbstract.extend({
+    function requiredOneMeasure() {
+      /*jshint validthis:true*/
+      return !this.count("size") && !this.count("color");
+    }
 
+    return CartesianAbstract.extend({
         meta: {
           id: "pentaho/visual/ccc/heatGrid",
-          v2id: "",
+          v2Id: "ccc_heatgrid",
 
           view: "View",
-          styleClass: "",
+          styleClass: "pentaho-visual-ccc-heat-grid",
 
           props: [
+            {
+              name: "rows",
+              required: true
+            },
+            {
+              name: "columns",
+              type: ["string"],
+              dataType: "string",
+              isVisualRole: true,
+              required: false
+            },
+            {
+              name: "size",
+              type: "string",
+              dataType: "number",
+              isVisualRole: true,
+              required: requiredOneMeasure
+            },
+            {
+              name: "color",
+              type: "string",
+              dataType: "number",
+              isVisualRole: true,
+              required: requiredOneMeasure
+            },
+
             {
               name: "labelsOption",
               type: {
                 base: labelsOptionFactory,
                 domain: ["none", "center"]
-              }
+              },
+              required: true,
+              value: "none"
             },
-
             {
               name: "shape",
               type: {
@@ -56,8 +89,11 @@ define([
             }
           ]
         }
-
       })
+      .implement({meta: scaleSizeContinuousMeta})
+      .implement({meta: bundle.structured["scaleSizeContinuous"]})
+      .implement({meta: scaleColorContinuousMeta})
+      .implement({meta: bundle.structured["scaleColorContinuous"]})
       .implement({meta: bundle.structured["heatGrid"]});
   };
 });

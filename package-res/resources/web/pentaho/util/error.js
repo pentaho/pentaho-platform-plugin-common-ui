@@ -116,7 +116,7 @@ define([
      * and is being called.
      *
      * @param {?string} [text] Complementary text.
-     * @return {!Error} The created `Error` object.
+     * @return {!pentaho.lang.NotImplementedError} The created `Error` object.
      */
     notImplemented: function(text) {
       return new NotImplementedError(text);

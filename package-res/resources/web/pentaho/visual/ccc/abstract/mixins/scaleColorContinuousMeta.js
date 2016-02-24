@@ -14,22 +14,30 @@
  * limitations under the License.
  */
 define([
-  "../cartesianAbstract/model",
-  "pentaho/i18n!../abstract/i18n/model"
-], function(cartesianAbstractModelFactory, bundle) {
+  "../types/colorSet",
+  "../types/pattern"
+], function(colorSetFactory, patternFactory) {
 
   "use strict";
 
-  return function(context) {
-
-    var CartesianAbstract = context.get(cartesianAbstractModelFactory);
-
-    return CartesianAbstract.extend({
-      meta: {
-        id: "pentaho/visual/ccc/categoricalContinuousAbstract",
-        "abstract": true
+  // Used by: HG, Scatter
+  return {
+    props: [
+      {
+        name: "pattern",
+        type: patternFactory,
+        required: true
+      },
+      {
+        name: "colorSet",
+        type: colorSetFactory,
+        required: true
+      },
+      {
+        name: "reverseColors",
+        type: "boolean",
+        required: true
       }
-    })
-    .implement({meta: bundle.structured["categoricalContinuousAbstract"]});
+    ]
   };
 });

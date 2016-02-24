@@ -14,22 +14,20 @@
  * limitations under the License.
  */
 define([
-  "../cartesianAbstract/model",
-  "pentaho/i18n!../abstract/i18n/model"
-], function(cartesianAbstractModelFactory, bundle) {
+  "../types/emptyCellMode",
+], function(emptyCellModeFactory) {
 
   "use strict";
 
-  return function(context) {
-
-    var CartesianAbstract = context.get(cartesianAbstractModelFactory);
-
-    return CartesianAbstract.extend({
-      meta: {
-        id: "pentaho/visual/ccc/categoricalContinuousAbstract",
-        "abstract": true
+  // Used by: Line, BarLine e AreaStacked
+  return {
+    props: [
+      {
+        name: "emptyCellMode",
+        type: emptyCellModeFactory,
+        required: true,
+        value: "gap"
       }
-    })
-    .implement({meta: bundle.structured["categoricalContinuousAbstract"]});
+    ]
   };
 });

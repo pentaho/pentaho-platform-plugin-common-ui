@@ -47,10 +47,14 @@ define([
     },
 
     _readUserOptions: function(options) {
+
       this.base.apply(this, arguments);
 
       var eps = options.extensionPoints,
           model = this.model;
+
+      var value = model.getv("sliceOrder");
+      if(value) options.sliceOrder = value;
 
       var emptySlicesHidden = model.getv("emptySlicesHidden");
       this._hideNullMembers = emptySlicesHidden;
@@ -139,7 +143,7 @@ define([
     },
 
     _configureDisplayUnits: function() {
-      var displayUnitsMeta = this.model.meta.get("displayUnits").type;
+      var displayUnitsMeta = this.model.meta.get("displayUnits", true).type;
       var displayUnits = this.model.getv("displayUnits");
       var scaleFactor = displayUnitsMeta.scaleFactorOf(displayUnits);
       if(scaleFactor > 1) {

@@ -166,7 +166,7 @@ define([
     _useLabelColor: true,
     //endregion
 
-    //region IVisual INTERFACE
+    //region VizAPI implementation
     _render: function() {
       this._dataTable = this.model.getv("data");
 
@@ -178,11 +178,11 @@ define([
 
       // ----------
 
-      this._initOptions(drawSpec);
+      this._initOptions();
 
       this._initData();
 
-      this._readUserOptions(this.options, drawSpec);
+      this._readUserOptions(this.options);
 
       this._configure();
 
@@ -191,6 +191,31 @@ define([
       this._renderCore();
     },
 
+    /** @override VizAPI */
+    _resize: function() {
+      // Resize event throttling
+      if(this._lastResizeTimeout != null)
+        clearTimeout(this._lastResizeTimeout);
+
+      this._lastResizeTimeout = setTimeout(function() {
+        this._lastResizeTimeout = null;
+        this._doResize();
+      }.bind(this), 50);
+    },
+
+    /** @override VizAPI */
+    dispose: function() {
+
+      this.base();
+
+      if(this._chart && this._chart.dispose) {
+        this._chart.dispose();
+        this._chart = null;
+      }
+    },
+    //endregion
+
+    //region Helpers
     // Sets the items on the chart that should be highlighted
     setHighlights: function(highlights) {
       this._selections = highlights;
@@ -208,56 +233,11 @@ define([
       }
     },
 
-    // TODO: what's this for? Column/Bar?
-    // Returns the output parameters of the chart.
-    getOutputParameters: function() {
-      var params = [];
-      if(this._cccClass == "PieChart") {
-        params.push([
-          this._dataTable.getColumnId(0),
-          true,
-          this._dataTable.getColumnId(0)
-        ]);
-      } else {
-        for(var j = 0 ; j < this._dataTable.getNumberOfColumns() ; j++) {
-          params.push([
-            this._dataTable.getColumnId(j),
-            true,
-            this._dataTable.getColumnId(j)
-          ]);
-        }
-      }
-
-      return params;
-    },
-
-    resize: function(width, height) {
-      // Resize event throttling
-      if(this._lastResizeTimeout != null)
-        clearTimeout(this._lastResizeTimeout);
-
-      this._lastResizeTimeout = setTimeout(function() {
-        this._lastResizeTimeout = null;
-        this._doResize(width, height);
-      }.bind(this), 50);
-    },
-
-    dispose: function() {
-
-      this.base();
-
-      if(this._chart && this._chart.dispose) {
-        this._chart.dispose();
-        this._chart = null;
-      }
-    },
-    //endregion
-
-    //region Helpers
-    _doResize: function(width, height) {
+    _doResize: function() {
       if(this._chart) {
+        var width  = this.model.getv("width");
+        var height = this.model.getv("height");
         var options = this._chart.options;
-
         def.set(options, "width", width, "height", height);
 
         this._prepareLayout(options);
@@ -299,11 +279,10 @@ define([
       Object.keys(this._roleToCccDimGroup)
           .forEach(function(roleName) {
             if(this[roleName]) {
-              if(model.meta.get(roleName).list) {
-                visualMap[roleName] = model.getv(roleName).toArray().map(function(elem) { return elem.value; });
-              } else {
-                visualMap[roleName] = model.getv(roleName);
-              }
+              var value = model.getv(roleName);
+              visualMap[roleName] = model.meta.get(roleName).list
+                  ? value.toArray(function(elem) { return elem.value; })
+                  : [value];
             }
           }, this._roleToCccDimGroup);
 
@@ -432,10 +411,24 @@ define([
         extPoints.base_fillStyle = fillStyle;
       }
 
+      //region label
       value = model.getv("labelColor");
-      if(value !== undefined) {
+      if(value != null) {
         extPoints.axisLabel_textStyle = extPoints.axisTitleLabel_textStyle = value;
       }
+
+      value = model.getv("labelSize");
+      if(value) {
+        var labelFont = util.readFontModel(model, "label");
+
+        options.axisTitleFont = options.axisFont = labelFont;
+
+        if(this._hasMultiChartColumns) {
+          var labelFontFamily = model.getv("labelFontFamily");
+          options.titleFont = (value + 2) + "px " + labelFontFamily;
+        }
+      }
+      //endregion
 
       options.legend = value = model.getv("showLegend");
       if(value) {
@@ -453,11 +446,12 @@ define([
         if(value) options.legendPosition = value;
 
 
-        if(model.getf("legendSize"))
+        if(model.getv("legendSize"))
           options.legendFont = util.readFontModel(model, "legend");
       }
 
-      value = model.getf("lineWidth");
+
+      value = model.getv("lineWidth", /*sloppy:*/true);
       if(value != null) {
         extPoints.line_lineWidth = value;
         var radius = 3 + 6 * (value / 8); // 1 -> 8 => 3 -> 9,
@@ -467,30 +461,18 @@ define([
         extPoints.plot2Dot_shapeSize  = extPoints.dot_shapeSize;
       }
 
-      value = model.getf("maxChartsPerRow");
+      value = model.getv("maxChartsPerRow", /*sloppy:*/true);
       if(value != null)
         options.multiChartColumnsMax = value;
 
-      value = model.getv("emptyCellMode");
-      if(value) this._setNullInterpolationMode(options, value);
-
-      value = model.getv("multiChartRangeScope");
+      value = model.getv("multiChartRangeScope", /*sloppy:*/true);
       if(value) options.numericAxisDomainScope = value;
 
-      value = model.getv("labelSize");
-      if(value) {
-        var labelFont = util.readFontModel(model, "label");
+      value = model.getv("emptyCellMode", /*sloppy:*/true);
+      if(value) this._setNullInterpolationMode(options, value);
 
-        options.axisTitleFont = options.axisFont = labelFont;
-
-        if(this._hasMultiChartColumns) {
-          var labelFontFamily = model.getv("labelFontFamily");
-          options.titleFont = (value + 2) + "px " + labelFontFamily;
-        }
-      }
-
-      var sizeByNegativesMode = model.getv("sizeByNegativesMode");
-      options.sizeAxisUseAbs = sizeByNegativesMode === "useAbs";
+      value = model.getv("sizeByNegativesMode", /*sloppy:*/true);
+      options.sizeAxisUseAbs = value === "useAbs";
     },
 
     _initData: function() {
@@ -809,7 +791,9 @@ define([
 
       // By default hide overflow, otherwise,
       // resizing the window frequently ends up needlessly showing scrollbars.
-      this._element.parentNode.style.overflow = "hidden"; // Hide overflow
+      if(this._element.parentNode) {
+        this._element.parentNode.style.overflow = "hidden"; // Hide overflow
+      }
 
       var colorScaleKind = this._getColorScaleKind();
       if(colorScaleKind)
@@ -822,7 +806,6 @@ define([
         this._configureMultiChart();
 
       this._configureTrends();
-      this._configureSorts();
       this._configureFormats();
       this._configureLabels(options, model);
 
@@ -856,7 +839,10 @@ define([
 
         case "continuous":
           options.colorScaleType = model.getv("pattern") === "gradient" ? "linear" : "discrete";
-          options.colors = visualColorUtils.buildPalette(model.getv("colorSet"), model.getv("pattern"), model.getv("reverseColors"));
+          options.colors = visualColorUtils.buildPalette(
+              model.getv("colorSet"),
+              model.getv("pattern"),
+              model.getv("reverseColors"));
           break;
       }
     },
@@ -1029,12 +1015,6 @@ define([
       }
     },
 
-    _configureSorts: function() {
-      var value = this.model.getv("sliceOrder");
-
-      if(value) this.options.sliceOrder = value;
-    },
-
     _configureFormats: function() {
       // Top-level format info
       var formatInfo = this._dataTable.model.format;
@@ -1129,9 +1109,11 @@ define([
       var options = this.options;
 
       // Let the vertical scrollbar show up if necessary
-      var containerStyle = this._element.parentNode.style;
-      containerStyle.overflowX = "hidden";
-      containerStyle.overflowY = "auto";
+      if(this._element.parentNode) {
+        var containerStyle = this._element.parentNode.style;
+        containerStyle.overflowX = "hidden";
+        containerStyle.overflowY = "auto";
+      }
 
       // Very small charts can't be dominated by text...
       //options.axisSizeMax = '30%';
