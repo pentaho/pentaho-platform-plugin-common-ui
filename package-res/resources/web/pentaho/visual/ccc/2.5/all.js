@@ -17,19 +17,19 @@
 // Use this AMD module if you want to include
 // all of the CCC Visual charts' files in a single bundle.
 define([
-  "./bar/BarChart",
-  "./barStacked/StackedBarChart",
-  "./barHorizontal/HorizontalBarChart",
-  "./barHorizontalStacked/HorizontalStackedBarChart",
-  "./barNormalized/NormalizedBarChart",
-  "./barHorizontalNormalized/HorizontalNormalizedBarChart",
-  "./line/LineChart",
-  "./areaStacked/StackedAreaChart",
-  "./metricDot/MetricDotChart",
-  "./barLine/BarLineChart",
+  "./bar/View",
+  "./barStacked/View",
+  "./barHorizontal/View",
+  "./barStackedHorizontal/View",
+  "./barNormalized/View",
+  "./barNormalizedHorizontal/View",
+  "./line/View",
+  "./areaStacked/View",
+  "./metricDot/View",
+  "./barLine/View",
 
-  "./pie/PieChart",
-  "./heatGrid/HeatGridChart",
+  "./pie/View",
+  "./heatGrid/View",
 
-  "./sunburst/SunburstChart"
+  "./sunburst/View"
 ], {});

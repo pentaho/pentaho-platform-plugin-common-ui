@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 define([
-  "../barAbstract/model",
+  "../barNormalizedAbstract/model",
   "pentaho/i18n!../abstract/i18n/model",
   "../abstract/types/labelsOption",
   "../abstract/themes"
-], function(barAbstractModelFactory, bundle, labelsOptionFactory) {
+], function(barNormalizedAbstractModelFactory, bundle, labelsOptionFactory) {
 
   "use strict";
 
   return function(context) {
 
-    var BarAbstract = context.get(barAbstractModelFactory);
+    var BarNormalizedAbstract = context.get(barNormalizedAbstractModelFactory);
 
-    return BarAbstract.extend({
+    return BarNormalizedAbstract.extend({
         meta: {
-          id: "pentaho/visual/ccc/barHorizontalStacked",
+          id: "pentaho/visual/ccc/barNormalizedHorizontal",
           v2id: "",
 
           view: "View",
@@ -45,6 +45,6 @@ define([
           ]
         }
     })
-    .implement({meta: bundle.structured["barHorizontalStacked"]});
+    .implement({meta: bundle.structured["barNormalizedHorizontal"]});
   };
 });
