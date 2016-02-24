@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 define([
-  "pentaho/data/Filter",
+  "pentaho/data/filter/IsIn",
   "pentaho/data/Element",
   "pentaho/data/Table"
-], function(Filter, Element, Table) {
+], function(IsIn, Element, Table) {
   "use strict";
 
   describe("pentaho.data.Filter", function() {
@@ -43,13 +43,13 @@ define([
     });
 
     it("should be of type '$in' ", function() {
-      var filter = new Filter.IsIn("sales", [10000, 12000]);
+      var filter = new IsIn("sales", [10000, 12000]);
       expect(filter.type).toBe("$in");
     });
 
     describe("#toSpec()", function() {
       it("should return a JSON matching the state of the filter", function() {
-        var sales12k = new Filter.IsIn("sales", [10000, 12000]);
+        var sales12k = new IsIn("sales", [10000, 12000]);
         expect(sales12k.toSpec()).toEqual({
           "sales": {"$in": [10000, 12000]}
         });
@@ -58,16 +58,16 @@ define([
 
     describe("#filter(pentaho.data.Table object)", function() {
       it("should return the matching entry", function() {
-        var isProductAC = new Filter.IsIn("product", ["A"]);
-        var filteredData = isProductAC.filter(data);
+        var isProductAC = new IsIn("product", ["A"]);
+        var filteredData = isProductAC.apply(data);
 
         expect(filteredData.getNumberOfRows()).toBe(1);
         expect(filteredData.getValue(0, 0)).toBe("A");
       });
 
       it("should return all the entries matching the criterion", function() {
-        var isProductAC = new Filter.IsIn("product", ["A", "C"]);
-        var filteredData = isProductAC.filter(data);
+        var isProductAC = new IsIn("product", ["A", "C"]);
+        var filteredData = isProductAC.apply(data);
 
         expect(filteredData.getNumberOfRows()).toBe(2);
         expect(filteredData.getValue(0, 0)).toBe("A");
@@ -75,8 +75,8 @@ define([
       });
 
       it("should return an empty dataset is no match is found.", function() {
-        var isProductA = new Filter.IsIn("sales", [5000, 7000]);
-        var filteredData = isProductA.filter(data);
+        var isProductA = new IsIn("sales", [5000, 7000]);
+        var filteredData = isProductA.apply(data);
 
         expect(filteredData.getNumberOfRows()).toBe(0);
       });

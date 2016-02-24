@@ -18,14 +18,14 @@ define([
 ], function(Base) {
   "use strict";
 
-  var Entry = Base.extend({
+  var Element = Base.extend({
     constructor: function(dataTable, rowIdx) {
       this.dataTable = dataTable;
       this.rowIdx = rowIdx;
     },
 
     has: function(property) {
-      return null != this.dataTable.model.attributes.get(property);
+      return this.dataTable.model.attributes.get(property) != null;
     },
 
     getValue: function(property) {
@@ -34,6 +34,6 @@ define([
     }
   });
 
-  return Entry;
+  return Element;
 
 });

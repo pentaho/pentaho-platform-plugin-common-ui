@@ -17,45 +17,32 @@ define([
   "../../lang/Base",
   "../Element",
   "../TableView",
-  "require"
-], function(Base, Element, TableView, require) {
+  "../../util/arg",
+  "require",
+  //"./Or",
+  //"./And",
+  //"./Not",
+], function(Base, Element, TableView, arg, require,  Or, And, Not) {
   "use strict";
 
   /**
    * @name AbstractFilter
-   * @memberOf pentaho.data.Filter
+   * @memberOf pentaho.data.filter
    * @class
    * @abstract
-   * @amd pentaho/data/Filter/AbstractFilter
+   * @amd pentaho/data/filter/AbstractFilter
    *
    * @classdesc The `AbstractFilter` class is the abstract base class of
    * classes that represent a filter.
-   *
-   * ### AMD
-   *
-   * To obtain the constructor of this class,
-   * require the module `"pentaho/data/Filter/AbstractFilter"`.
    *
    * ### Remarks
    *
    * The following derived classes are also abstract:
    *
-   * * {@link pentaho.data.Filter.AbstractPropertyFilter}
-   * * {@link pentaho.data.Filter.AbstractTreeFilter}
+   * * {@link pentaho.data.filter.AbstractPropertyFilter}
+   * * {@link pentaho.data.filter.AbstractTreeFilter}
    */
-  var AbstractFilter = Base.extend("pentaho.data.Filter.AbstractFilter", /** @lends pentaho.data.Filter.AbstractFilter# */{
-    constructor: function(value) {
-      this._value = value;
-    },
-
-    /**
-     *
-     * @readonly
-     */
-    get value() {
-      return this._value;
-    },
-
+  var AbstractFilter = Base.extend("pentaho.data.filter.AbstractFilter", /** @lends pentaho.data.filter.AbstractFilter# */{
     /**
      * Outputs a JSON that serializes the operation described by this filter.
      * The syntax loosely follows the query language of MongoDB.
@@ -77,41 +64,46 @@ define([
     },
 
     /**
-     * Returns a filter that negates this filter.
+     * Returns a filter that is the inverse of this filter.
      * @returns {*}
      */
-    negation: function() {
-      return AbstractFilter.negation(this);
+    invert: function() {
+      if(!Not) Not = require("./Not");
+      return new Not(this);
     },
 
     /**
-     * Returns a filter that is the union of this filter with the other.
+     * Returns a filter that is the union of this filter with another.
      * In other words, implements the OR operation between this filter and another.
      * @param {} other -
      * @returns {*}
      */
-    union: function(other) {
-      return AbstractFilter.union(this, other);
+    or: function() {
+      var args = arg.slice(arguments);
+      args.unshift(this);
+      if(!Or) Or = require("./Or");
+      return new Or(args);
     },
 
     /**
-     * Returns a filter that is the intersection of this filter with the other.
+     * Returns a filter that is the intersection of this filter with another.
      * In other words, implements the INTERSECT operation between this filter and another.
      * @param {} other -
      * @returns {*}
      */
-    intersection: function(other) {
-      return AbstractFilter.intersection(this, other);
+    and: function() {
+      var args = arg.slice(arguments);
+      args.unshift(this);
+      if(!And) And = require("./And");
+      return new And(args);
     },
 
-    filter: function(dataTable) {
-      var k, nRows = dataTable.getNumberOfRows();
+    apply: function(dataTable) {
+      var nRows = dataTable.getNumberOfRows();
       var filteredRows = [];
 
-      for(k = 0; k < nRows; k++) {
-        var entry = new Element(dataTable, k);
-        var bool = this.contains(entry);
-        if(bool) {
+      for(var k = 0; k < nRows; k++) {
+        if(this.contains(new Element(dataTable, k))) {
           filteredRows.push(k);
         }
       }
@@ -121,31 +113,22 @@ define([
       return dataView;
     }
   }, {
-    union: function() {
-      var OrFilter = require("./Or");
-      return new OrFilter(argumentsToArray(arguments));
+    or: function() {
+      if(!Or) Or = require("./Or");
+      return new Or(arg.slice(arguments));
     },
 
-    negation: function(a) {
-      var NotFilter = require("./Not");
-      return new NotFilter(a);
+    not: function(a) {
+      if(!Not) Not = require("./Not");
+      return new Not(a);
     },
 
-    intersection: function() {
-      var AndFilter = require("./And");
-      return new AndFilter(argumentsToArray(arguments));
-    },
-
-    filter: function(filter, dataTable) {
-      return filter.filter(dataTable);
+    and: function() {
+      if(!And) And = require("./And");
+      return new And(arg.slice(arguments));
     }
   });
 
   return AbstractFilter;
-
-  function argumentsToArray(args) {
-    return args.length === 1 ? [args[0]] : Array.apply(null, args);
-  }
-
 
 });

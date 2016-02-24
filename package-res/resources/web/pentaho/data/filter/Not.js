@@ -14,24 +14,24 @@
  * limitations under the License.
  */
 define([
-  "./AbstractPropertyFilter",
+  "./AbstractTreeFilter",
   "./_toSpec"
-], function(AbstractPropertyFilter, toSpec) {
+], function(AbstractTreeFilter, _toSpec) {
   "use strict";
 
   /**
-   * @name IsIn
-   * @memberOf pentaho.data.Filter
+   * @name Not
+   * @memberOf pentaho.data.filter
    * @class
    * @abstract
-   * @amd pentaho/data/Filter/IsIn
+   * @amd pentaho/data/filter/Not
    *
-   * @classdesc The `IsIn` class implements a type of AbstractPropertyFilter {@link pentaho.data.Filter.AbstractPropertyFilter}.
+   * @classdesc The `Not` class implements a type of AbstractTreeFilter {@link pentaho.data.filter.AbstractTreeFilter}.
    *
    * @example
-   * <caption> Create a new <code>IsIn</code> filter.
+   * <caption> Create a new <code>Not</code> filter.
    *
-   * require(["pentaho/data/Table", "pentaho/data/Filter/IsIn"], function(Table, IsIn) {
+   * require(["pentaho/data/Table", "pentaho/data/filter/IsIn", "pentaho/data/filter/IsEqual", "pentaho/data/filter/Not"], function(Table, IsIn, IsEqual, Not) {
    *   var data = new Table({
    *     model: [
    *       {name: "product", type: "string", label: "Product"},
@@ -49,37 +49,54 @@ define([
    *     ]
    *   });
    *
-   *   var filter = new IsIn("product", ["A"]);
-   *   var filteredData = filter.filter(data); //filteredData.getValue(0, 0) === "A"
+   *
+   *  var sales12k = new Filter.IsEqual("sales", 12000);
+   *  var filter = new Filter.Not(sales12k);
+   *  var data = filter.apply(data); //data.getValue(0, 0) === ["B", "D", "E", "F", "G"]
    * });
    */
-  var IsIn = AbstractPropertyFilter.extend("pentaho.data.Filter.IsIn", /** @lends pentaho.data.Filter.IsIn# */{
+  var NotFilter = AbstractTreeFilter.extend("pentaho.data.filter.Not", /** @lends pentaho.data.filter.Not# */{
 
     /**
      * @inheritdoc
      * @readonly
      */
-    get type() { return "$in";},
+    get type() { return "$not";},
 
     /**
      * @inheritdoc
      */
-    _method: function(value) {
-      var N = this._value.length;
-      for(var k = 0; k < N; k++) {
-        if(this._value[k] === value)
-          return true;
-      }
-      return false;
+    insert: function(element) {
+      this._children = [element];
+      return this;
     },
 
     /**
      * @inheritdoc
      */
-    toSpec: function() {
-      return toSpec(this._property, toSpec(this.type, this._value.length ? this._value : null));
+    contains: function(entry) {
+      if(this.children && this.children.length === 1) {
+        return !this.children[0].contains(entry);
+      } else {
+        throw Error("Poop");
+      }
+    },
+
+    /**
+     * @inheritdoc
+     */
+    invert: function() {
+      return this.children[0];
+    },
+
+    /**
+     * @inheritdoc
+     */
+    toSpec: function(){
+      return _toSpec(this.type, this._children.length ? this.children[0].toSpec() :  null);
     }
   });
 
-  return IsIn;
+  return NotFilter;
+
 });

@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 define([
-  "pentaho/data/Filter",
+  "pentaho/data/filter/IsEqual",
+  "pentaho/data/filter/Or",
   "pentaho/data/Element",
   "pentaho/data/Table"
-], function(Filter, Element, Table) {
+], function(IsEqual, Or, Element, Table) {
   "use strict";
 
-  describe("pentaho.data.Filter.IsEqual", function() {
+  describe("pentaho.data.filter.IsEqual", function() {
 
     var data;
     beforeEach(function() {
@@ -44,14 +45,14 @@ define([
 
     describe("#type", function() {
       it("should return '$eq'.", function() {
-        var filter = new Filter.IsEqual("sales", 12000);
+        var filter = new IsEqual("sales", 12000);
         expect(filter.type).toBe("$eq");
       });
     });
 
     describe("#toSpec()", function() {
       it("should return a JSON matching the state of the filter.", function() {
-        var sales12k = new Filter.IsEqual("sales", 12000);
+        var sales12k = new IsEqual("sales", 12000);
         expect(sales12k.toSpec()).toEqual({
           "sales": {"$eq": 12000}
         });
@@ -61,16 +62,16 @@ define([
     describe("#filter(pentaho.data.Table object)", function() {
 
       it("should return the matching entry.", function() {
-        var isProductA = new Filter.IsEqual("product", "A");
-        var filteredData = isProductA.filter(data);
+        var isProductA = new IsEqual("product", "A");
+        var filteredData = isProductA.apply(data);
 
         expect(filteredData.getNumberOfRows()).toBe(1);
         expect(filteredData.getValue(0, 0)).toBe("A");
       });
 
       it("should return all the entries matching the criterion.", function() {
-        var sales12k = new Filter.IsEqual("sales", 12000);
-        var filteredData = sales12k.filter(data);
+        var sales12k = new IsEqual("sales", 12000);
+        var filteredData = sales12k.apply(data);
 
         expect(filteredData.getNumberOfRows()).toBe(2);
         expect(filteredData.getValue(0, 0)).toBe("A");
@@ -78,8 +79,8 @@ define([
       });
 
       it("should return an empty dataset is no match is found.", function() {
-        var isProductA = new Filter.IsEqual("sales", 5000);
-        var filteredData = isProductA.filter(data);
+        var isProductA = new IsEqual("sales", 5000);
+        var filteredData = isProductA.apply(data);
 
         expect(filteredData.getNumberOfRows()).toBe(0);
       });
@@ -87,80 +88,50 @@ define([
     });
 
 
-    describe("#intersection ", function() {
+    describe("#and ", function() {
 
       var sales12k, inStock;
 
       beforeEach(function() {
-        sales12k = new Filter.IsEqual("sales", 12000);
-        inStock = new Filter.IsEqual("inStock", true);
+        sales12k = new IsEqual("sales", 12000);
+        inStock = new IsEqual("inStock", true);
       });
 
       it("should return an AND.", function() {
-        var combination = sales12k.intersection(inStock);
+        var combination = sales12k.and(inStock);
         expect(combination.type).toBe("$and");
       });
 
 
     });
 
-    describe("#union ", function() {
+    describe("#or ", function() {
 
-      it("should return the union of the filters with the data.", function() {
-        var sales12k = new Filter.IsEqual("sales", 12000);
-        var inStock = new Filter.IsEqual("inStock", true);
+      it("should return an Or.", function() {
+        var sales12k = new IsEqual("sales", 12000);
+        var inStock = new IsEqual("inStock", true);
 
-        var combination = sales12k.union(inStock);
-        var filteredData = combination.filter(data);
-
-        expect(filteredData.getNumberOfRows()).toBe(3);
-        expect(filteredData.getValue(0, 0)).toBe("A");
-        expect(filteredData.getValue(1, 0)).toBe("B");
-        expect(filteredData.getValue(2, 0)).toBe("C");
+        var combination = sales12k.or(inStock);
+        expect(combination.type).toBe("$or");
       });
 
     });
 
-    describe("#negation ", function() {
-      it("should return the negation of a simple filter.", function() {
-        var sales12k = new Filter.IsEqual("sales", 12000);
+    describe("#invert ", function() {
 
-        var combination = sales12k.negation(sales12k);
-        var filteredData = combination.filter(data);
-
-        expect(filteredData.getNumberOfRows()).toBe(5);
-        [
-          "B", "D", "E", "F", "G"
-        ].forEach(function(product, idx) {
-          expect(filteredData.getValue(idx, 0)).toBe(product);
-        });
-
+      it("should return a Not.", function() {
+        var sales12k = new IsEqual("sales", 12000);
+        var combination = sales12k.invert();
+        expect(combination.type).toBe("$not");
       });
 
-      it("should return the negation of a complex filter.", function() {
-        var filter = new Filter.Or();
-        filter
-          .insert(new Filter.IsEqual("product", "A"))
-          .insert(new Filter.IsEqual("product", "B"))
-          .insert(new Filter.IsEqual("product", "C"));
 
-        var combination = filter.negation();
-        var filteredData = combination.filter(data);
-
-        expect(filteredData.getNumberOfRows()).toBe(4);
-        [
-          "D", "E", "F", "G"
-        ].forEach(function(product, idx) {
-          expect(filteredData.getValue(idx, 0)).toBe(product);
-        });
-
-      });
     });
 
     describe("#contains ", function() {
 
       it("should confirm if a filter with the data", function() {
-        var sales12k = new Filter.IsEqual("sales", 12000);
+        var sales12k = new IsEqual("sales", 12000);
 
         var containsSales12k = sales12k.contains(new Element(data, 0));
 

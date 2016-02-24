@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 define([
-  "pentaho/data/Filter",
+  "pentaho/data/filter/And",
+  "pentaho/data/filter/IsEqual",
+  "pentaho/data/filter/IsIn",
   "pentaho/data/Element",
   "pentaho/data/Table"
-], function(Filter, Element, Table) {
+], function(And, IsEqual, IsIn, Element, Table) {
   "use strict";
 
-  describe("pentaho.data.Filter.And", function() {
+  describe("pentaho.data.filter.And", function() {
 
     var data;
     beforeEach(function() {
@@ -44,18 +46,18 @@ define([
 
 
     it("should be of type '$and' ", function() {
-      var filter = new Filter.And();
+      var filter = new And();
       expect(filter.type).toBe("$and");
     });
 
     it("should be commutative", function() {
-      var sales12k = new Filter.IsIn("sales", [12000]);
-      var inStock = new Filter.IsEqual("inStock", true);
-      var combination1 = new Filter.And([sales12k, inStock]);
-      var data1 = combination1.filter(data);
+      var sales12k = new IsIn("sales", [12000]);
+      var inStock = new IsEqual("inStock", true);
+      var combination1 = new And([sales12k, inStock]);
+      var data1 = combination1.apply(data);
 
-      var combination2 = new Filter.And([inStock, sales12k]);
-      var data2 = combination2.filter(data);
+      var combination2 = new And([inStock, sales12k]);
+      var data2 = combination2.apply(data);
 
       expect(data1.getNumberOfRows()).toBe(1);
       expect(data1.getNumberOfRows()).toBe(data2.getNumberOfRows());
@@ -63,11 +65,11 @@ define([
     });
 
     it("should perform an AND.", function() {
-      var sales12k = new Filter.IsIn("sales", [12000]);
-      var inStock = new Filter.IsEqual("inStock", true);
+      var sales12k = new IsIn("sales", [12000]);
+      var inStock = new IsEqual("inStock", true);
 
-      var combination = new Filter.And([sales12k, inStock]);
-      var filteredData = combination.filter(data);
+      var combination = new And([sales12k, inStock]);
+      var filteredData = combination.apply(data);
 
       expect(filteredData.getNumberOfRows()).toBe(1);
       expect(filteredData.getValue(0, 0)).toBe("A");
@@ -75,10 +77,10 @@ define([
 
     describe("#toSpec", function() {
       it("should return a JSON.", function() {
-        var sales12k = new Filter.IsIn("sales", [12000]);
-        var inStock = new Filter.IsEqual("inStock", true);
+        var sales12k = new IsIn("sales", [12000]);
+        var inStock = new IsEqual("inStock", true);
 
-        var combination = new Filter.And([sales12k, inStock]);
+        var combination = new And([sales12k, inStock]);
         expect(combination.toSpec()).toEqual({
           "$and": [
             {"sales": {"$in": [12000]}},
@@ -88,7 +90,7 @@ define([
       });
 
       it("should return `null` if it has no operands.", function() {
-        var combination = new Filter.And();
+        var combination = new And();
         expect(combination.toSpec()).toBeNull();
       });
     }); // #toSpec
@@ -98,24 +100,24 @@ define([
 
       var sales12k, inStock;
       beforeEach(function() {
-        sales12k = new Filter.IsIn("sales", [12000]);
-        inStock = new Filter.IsEqual("inStock", true);
+        sales12k = new IsIn("sales", [12000]);
+        inStock = new IsEqual("inStock", true);
       });
 
       it("should return `true` if a given `element` belongs to the dataset.", function() {
-        var filter = new Filter.And([sales12k, inStock]);
+        var filter = new And([sales12k, inStock]);
         var element = new Element(data, 0);
         expect(filter.contains(element)).toBe(true);
       });
 
       it("should return `false` if a given `element` does not belong to the dataset.", function() {
-        var filter = new Filter.And([sales12k, inStock]);
+        var filter = new And([sales12k, inStock]);
         var element = new Element(data, 3);
         expect(filter.contains(element)).toBe(false);
       });
 
       it("should return `true` if the filter has no operands.", function() {
-        var filter = new Filter.And();
+        var filter = new And();
         var element = new Element(data, 0);
         expect(filter.contains(element)).toBe(true);
       });
@@ -123,17 +125,17 @@ define([
     }); // #contains
 
 
-    describe("#intersection", function() {
+    describe("#and", function() {
       it("should add elements instead of creating ANDs of ANDs", function() {
-        var sales12k = new Filter.IsIn("sales", [12000]);
-        var inStock = new Filter.IsEqual("inStock", true);
-        var combined1 = new Filter.Or([sales12k, inStock]);
-        var productA = new Filter.IsEqual("product", "A");
+        var sales12k = new IsIn("sales", [12000]);
+        var inStock = new IsEqual("inStock", true);
+        var combined1 = new And([sales12k, inStock]);
+        var productA = new IsEqual("product", "A");
 
-        var intersection = combined1.union(productA);
+        var result = combined1.and(productA);
 
-        expect(intersection).toBe(combined1);
-        expect(intersection.children.length).toBe(3);
+        expect(result).toBe(combined1);
+        expect(result.children.length).toBe(3);
       });
     });
 

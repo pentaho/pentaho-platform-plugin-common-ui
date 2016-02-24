@@ -21,10 +21,10 @@ define([
 
   /**
    * @name AbstractPropertyFilter
-   * @memberOf pentaho.data.Filter
+   * @memberOf pentaho.data.filter
    * @class
    * @abstract
-   * @amd pentaho/data/Filter/AbstractPropertyFilter
+   * @amd pentaho/data/filter/AbstractPropertyFilter
    *
    * @classdesc The `AbstractPropertyFilter` class is the abstract base class of
    * classes that represent a filter.
@@ -32,7 +32,7 @@ define([
    * @example
    * <caption> Create a new class <code>DerivedAbstractPropertyFilter</code> containing...
    *
-   * require(["pentaho/data/Filter/AbstractPropertyFilter"], function(AbstractPropertyFilter) {
+   * require(["pentaho/data/filter/AbstractPropertyFilter"], function(AbstractPropertyFilter) {
    *   var DerivedAbstractPropertyFilter = AbstractPropertyFilter.extend({
    *     get type() { return "$type";},
    *     _method: function(value) {
@@ -59,31 +59,33 @@ define([
    *   });
    *
    *   var filter = new DerivedAbstractPropertyFilter("product", ["A"]);
-   *   var filteredData = filter.filter(data); //filteredData.getValue(0, 0) === "A"
+   *   var filteredData = filter.apply(data); //filteredData.getValue(0, 0) === "A"
    * });
-   *
-   * ### AMD
-   *
-   * To obtain the constructor of this class,
-   * require the module `"pentaho/data/Filter/AbstractPropertyFilter"`.
    *
    * ### Remarks
    *
    * The following derived classes are not abstract and can be used directly:
    *
-   * * {@link pentaho.data.Filter.IsEqual}
-   * * {@link pentaho.data.Filter.IsIn}
+   * * {@link pentaho.data.filter.IsEqual}
+   * * {@link pentaho.data.filter.IsIn}
    *
    * @constructor
    * @param {string} property The name of the property.
    * @param {string|number} value The value of the property.
    */
-  var AbstractPropertyFilter = AbstractFilter.extend("pentaho.data.Filter.AbstractPropertyFilter", /** @lends pentaho.data.Filter.AbstractPropertyFilter# */{
+  var AbstractPropertyFilter = AbstractFilter.extend("pentaho.data.filter.AbstractPropertyFilter", /** @lends pentaho.data.filter.AbstractPropertyFilter# */{
     get type() { return null;},
 
     constructor: function(property, value) {
-      this.base(value);
+      this._value = value;
       this._property = property;
+    },
+    /**
+     *
+     * @readonly
+     */
+    get value() {
+      return this._value;
     },
 
     _method: null,
@@ -92,10 +94,8 @@ define([
      * @inheritdoc
      */
     contains: function(entry) {
-      if(!entry.has(this._property))
-        return false;
-
-      return this._method(entry.getValue(this._property));
+      return entry.has(this._property) &&
+             this._method(entry.getValue(this._property));
     },
 
     /**

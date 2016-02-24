@@ -15,23 +15,24 @@
  */
 define([
   "./AbstractTreeFilter",
-  "./_toSpec"
-], function(AbstractTreeFilter, _toSpec) {
+  "require",
+  "./And",
+], function(AbstractTreeFilter, require, And) {
   "use strict";
 
   /**
-   * @name Not
-   * @memberOf pentaho.data.Filter
+   * @name Or
+   * @memberOf pentaho.data.filter
    * @class
    * @abstract
-   * @amd pentaho/data/Filter/Not
+   * @amd pentaho/data/filter/Or
    *
-   * @classdesc The `Not` class implements a type of AbstractTreeFilter {@link pentaho.data.Filter.AbstractTreeFilter}.
+   * @classdesc The `Or` class implements a type of AbstractTreeFilter {@link pentaho.data.filter.AbstractTreeFilter}.
    *
    * @example
-   * <caption> Create a new <code>Not</code> filter.
+   * <caption> Create a new <code>Or</code> filter.
    *
-   * require(["pentaho/data/Table", "pentaho/data/Filter/IsIn", "pentaho/data/Filter/IsEqual", "pentaho/data/Filter/Not"], function(Table, IsIn, IsEqual, Not) {
+   * require(["pentaho/data/Table", "pentaho/data/filter/IsIn", "pentaho/data/filter/IsEqual", "pentaho/data/filter/Or"], function(Table, IsIn, IsEqual, Or) {
    *   var data = new Table({
    *     model: [
    *       {name: "product", type: "string", label: "Product"},
@@ -50,53 +51,55 @@ define([
    *   });
    *
    *
-   *  var sales12k = new Filter.IsEqual("sales", 12000);
-   *  var filter = new Filter.Not(sales12k);
-   *  var data = filter.filter(data); //data.getValue(0, 0) === ["B", "D", "E", "F", "G"]
+   *  var sales12k = new IsIn("sales", [12000]);
+   *  var inStock = new IsEqual("inStock", true);
+   *  var combination1 = new Or([sales12k, inStock]);
+   *  var data1 = combination1.apply(data); //data1.getValue(0, 0) === ["A", "B", "C"]
    * });
    */
-  var NotFilter = AbstractTreeFilter.extend("pentaho.data.Filter.Not", /** @lends pentaho.data.Filter.Not# */{
+  var OrFilter = AbstractTreeFilter.extend("pentaho.data.filter.Or", /** @lends pentaho.data.filter.Or# */{
 
     /**
      * @inheritdoc
      * @readonly
      */
-    get type() { return "$not";},
+    get type() { return "$or";},
 
     /**
      * @inheritdoc
      */
-    insert: function(element) {
-      this._children = [element];
+    contains: function(entry) {
+      var N = this.children ? this.children.length : 0;
+
+      var memo = false; // false is the neutral element of an OR operation
+      for(var k = 0; k < N && !memo; k++) {
+        memo = memo || this.children[k].contains(entry);
+      }
+      return memo;
+    },
+
+    /**
+     * @inheritdoc
+     */
+    or: function() {
+      for(var k = 0, N = arguments.length; k < N; k++) {
+        this.insert(arguments[k]);
+      }
       return this;
     },
 
     /**
      * @inheritdoc
      */
-    contains: function(entry) {
-      if(this.children && this.children.length === 1) {
-        return !this.children[0].contains(entry);
-      } else {
-        throw Error("Poop");
-      }
-    },
-
-    /**
-     * @inheritdoc
-     */
-    negation: function() {
-      return this.children[0];
-    },
-
-    /**
-     * @inheritdoc
-     */
-    toSpec: function(){
-      return _toSpec(this.type, this._children.length ? this.children[0].toSpec() :  null);
+    invert: function() {
+      var negatedChildren = this.children.map(function(child) {
+        return child.invert();
+      });
+      if(!And) And = require("./And");
+      return new And(negatedChildren);
     }
   });
 
-  return NotFilter;
+  return OrFilter;
 
 });

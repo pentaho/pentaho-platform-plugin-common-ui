@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 define([
-  "./Filter/IsEqual",
-  "./Filter/IsIn",
-  "./Filter/And",
-  "./Filter/Or",
-  "./Filter/Not",
-  "./Filter/AbstractFilter"
-], function(IsEqual, IsIn, AndFilter, OrFilter, NotFilter, AbstractFilter) {
+  "./filter/IsEqual",
+  "./filter/IsIn",
+  "./filter/And",
+  "./filter/Or",
+  "./filter/Not"
+], function(IsEqual, IsIn, AndFilter, OrFilter, NotFilter) {
   "use strict";
 
 
   var RootFilter = OrFilter.extend({
     constructor: function(filterSpec) {
-      this.base();
       if(filterSpec)
-        this.union(fromSpec(filterSpec));
+        this.base(fromSpec(filterSpec));
+      else
+        this.base();
     }
   });
 
@@ -42,15 +42,6 @@ define([
     Not: NotFilter,
     //Root: RootFilter,
     create: function(spec) { return new RootFilter(spec); }
-    // factories
-    //isEqual: function(property, value) { return new IsEqual(property, value); },
-    //isIn: function(property, value) { return new IsIn(property, value); },
-    //union: AbstractFilter.union,
-    //intersection: AbstractFilter.intersection,
-    //negation: AbstractFilter.negation,
-    //or: AbstractFilter.union,
-    //and: AbstractFilter.intersection,
-    //not: AbstractFilter.negation
   };
 
   function fromSpec(filterSpec) {

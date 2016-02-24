@@ -73,7 +73,7 @@ define([
         };
 
         var filter0 = Filter.create(spec);
-        var filter = filter0.negation();
+        var filter = filter0.invert();
         expect(filter.type).toBe("$and");
         expect(filter.children.length).toBe(1);
         expect(filter.children[0].type).toBe("$or");

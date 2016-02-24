@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 define([
-  "pentaho/data/Filter",
+  "pentaho/data/filter/Or",
+  "pentaho/data/filter/IsEqual",
+  "pentaho/data/filter/IsIn",
   "pentaho/data/Element",
   "pentaho/data/Table"
-], function(Filter, Element, Table) {
+], function(Or, IsEqual, IsIn, Element, Table) {
   "use strict";
 
-  describe("pentaho.data.Filter.Or", function() {
+  describe("pentaho.data.filter.Or", function() {
 
     var data;
     beforeEach(function() {
@@ -44,18 +46,18 @@ define([
 
 
     it("should be of type '$or' ", function() {
-      var filter = new Filter.Or();
+      var filter = new Or();
       expect(filter.type).toBe("$or");
     });
 
     it("should be commutative", function() {
-      var sales12k = new Filter.IsIn("sales", [12000]);
-      var inStock = new Filter.IsEqual("inStock", true);
-      var combination1 = new Filter.Or([sales12k, inStock]);
-      var data1 = combination1.filter(data);
+      var sales12k = new IsIn("sales", [12000]);
+      var inStock = new IsEqual("inStock", true);
+      var combination1 = new Or([sales12k, inStock]);
+      var data1 = combination1.apply(data);
 
-      var combination2 = new Filter.Or([inStock, sales12k]);
-      var data2 = combination2.filter(data);
+      var combination2 = new Or([inStock, sales12k]);
+      var data2 = combination2.apply(data);
 
       expect(data1.getNumberOfRows()).toBe(3);
       expect(data1.getNumberOfRows()).toBe(data2.getNumberOfRows());
@@ -63,11 +65,11 @@ define([
     });
 
     it("should perform an OR.", function() {
-      var sales12k = new Filter.IsIn("sales", [12000]);
-      var inStock = new Filter.IsEqual("inStock", true);
+      var sales12k = new IsIn("sales", [12000]);
+      var inStock = new IsEqual("inStock", true);
 
-      var combination = new Filter.Or([sales12k, inStock]);
-      var filteredData = combination.filter(data);
+      var combination = new Or([sales12k, inStock]);
+      var filteredData = combination.apply(data);
 
       expect(filteredData.getNumberOfRows()).toBe(3);
       expect(filteredData.getValue(0, 0)).toBe("A");
@@ -77,10 +79,10 @@ define([
 
     describe("#toSpec", function() {
       it("should return a JSON.", function() {
-        var sales12k = new Filter.IsIn("sales", [12000]);
-        var inStock = new Filter.IsEqual("inStock", true);
+        var sales12k = new IsIn("sales", [12000]);
+        var inStock = new IsEqual("inStock", true);
 
-        var combination = new Filter.Or([sales12k, inStock]);
+        var combination = new Or([sales12k, inStock]);
         expect(combination.toSpec()).toEqual({
           "$or": [
             {"sales": {"$in": [12000]}},
@@ -90,7 +92,7 @@ define([
       });
 
       it("should return `null` if it has no operands.", function() {
-        var combination = new Filter.Or();
+        var combination = new Or();
         expect(combination.toSpec()).toBeNull();
       });
     });
@@ -99,64 +101,64 @@ define([
 
       var sales12k, inStock;
       beforeEach(function() {
-        sales12k = new Filter.IsIn("sales", [12000]);
-        inStock = new Filter.IsEqual("inStock", true);
+        sales12k = new IsIn("sales", [12000]);
+        inStock = new IsEqual("inStock", true);
       });
 
       it("should return `true` if a given `element` belongs to the dataset.", function() {
-        var filter = new Filter.Or([sales12k, inStock]);
+        var filter = new Or([sales12k, inStock]);
         var element = new Element(data, 0);
         expect(filter.contains(element)).toBe(true);
       });
 
       it("should return `false` if a given `element` does not belong to the dataset.", function() {
-        var filter = new Filter.Or([sales12k, inStock]);
+        var filter = new Or([sales12k, inStock]);
         var element = new Element(data, 3);
         expect(filter.contains(element)).toBe(false);
       });
 
       it("should return `false` if the filter has no operands.", function() {
-        var filter = new Filter.Or();
+        var filter = new Or();
         var element = new Element(data, 0);
         expect(filter.contains(element)).toBe(false);
       });
 
     }); // #contains
 
-    describe("#union", function() {
+    describe("#or", function() {
       it("should add elements instead of creating ORs of ORs", function() {
-        var sales12k = new Filter.IsIn("sales", [12000]);
-        var inStock = new Filter.IsEqual("inStock", true);
-        var combined1 = new Filter.Or([sales12k, inStock]);
-        var productA = new Filter.IsEqual("product", "A");
+        var sales12k = new IsIn("sales", [12000]);
+        var inStock = new IsEqual("inStock", true);
+        var combined1 = new Or([sales12k, inStock]);
+        var productA = new IsEqual("product", "A");
 
-        var union = combined1.union(productA);
+        var union = combined1.or(productA);
 
         expect(union).toBe(combined1);
         expect(union.children.length).toBe(3);
       });
     });
 
-    describe("#negation", function() {
-      it("should prevent double negation", function() {
-        var sales12k = new Filter.IsIn("sales", [12000]);
+    describe("#invert", function() {
+      it("should prevent double negation (i.e. replace 'NOT NOT A' with 'A').", function() {
+        var sales12k = new IsIn("sales", [12000]);
 
-        var notSales12k = sales12k.negation();
+        var notSales12k = sales12k.invert();
         expect(notSales12k.type).toBe("$not");
         expect(notSales12k.children.length).toBe(1);
         expect(notSales12k.children[0].type).toBe("$in");
 
-        var notNotSales12k = notSales12k.negation();
+        var notNotSales12k = notSales12k.invert();
         expect(notNotSales12k.type).toBe("$in");
         expect(notNotSales12k).toBe(sales12k);
       });
 
       it("should return a simplified filter, with the negated terms next to the leafs", function() {
-        var sales12k = new Filter.IsIn("sales", [12000]);
-        var inStock = new Filter.IsEqual("inStock", true);
-        var filter0 = new Filter.Or([sales12k, inStock]);
+        var sales12k = new IsIn("sales", [12000]);
+        var inStock = new IsEqual("inStock", true);
+        var filter0 = new Or([sales12k, inStock]);
 
-        var filter = filter0.negation();
+        var filter = filter0.invert();
 
         expect(filter.type).toBe("$and");
         expect(filter.children.length).toBe(2);

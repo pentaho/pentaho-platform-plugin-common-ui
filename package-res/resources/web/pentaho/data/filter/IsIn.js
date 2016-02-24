@@ -14,23 +14,24 @@
  * limitations under the License.
  */
 define([
-  "./AbstractPropertyFilter"
-], function(AbstractPropertyFilter) {
+  "./AbstractPropertyFilter",
+  "./_toSpec"
+], function(AbstractPropertyFilter, toSpec) {
   "use strict";
 
   /**
    * @name IsIn
-   * @memberOf pentaho.data.Filter
+   * @memberOf pentaho.data.filter
    * @class
    * @abstract
-   * @amd pentaho/data/Filter/IsEqual
+   * @amd pentaho/data/filter/IsIn
    *
-   * @classdesc The `IsEqual` class implements a type of AbstractPropertyFilter {@link pentaho.data.Filter.AbstractPropertyFilter}.
+   * @classdesc The `IsIn` class implements a type of AbstractPropertyFilter {@link pentaho.data.filter.AbstractPropertyFilter}.
    *
    * @example
-   * <caption> Create a new <code>IsEqual</code> filter.
+   * <caption> Create a new <code>IsIn</code> filter.
    *
-   * require(["pentaho/data/Table", "pentaho/data/Filter/IsEqual"], function(Table, IsEqual) {
+   * require(["pentaho/data/Table", "pentaho/data/filter/IsIn"], function(Table, IsIn) {
    *   var data = new Table({
    *     model: [
    *       {name: "product", type: "string", label: "Product"},
@@ -48,25 +49,37 @@ define([
    *     ]
    *   });
    *
-   *   var filter = new IsEqual("product", ["A"]);
-   *   var filteredData = filter.filter(data); //filteredData.getValue(0, 0) === "A"
+   *   var filter = new IsIn("product", ["A"]);
+   *   var filteredData = filter.apply(data); //filteredData.getValue(0, 0) === "A"
    * });
    */
-  var IsEqual = AbstractPropertyFilter.extend("pentaho.data.Filter.IsEqual", /** @lends pentaho.data.Filter.IsEqual# */{
+  var IsIn = AbstractPropertyFilter.extend("pentaho.data.filter.IsIn", /** @lends pentaho.data.filter.IsIn# */{
 
     /**
      * @inheritdoc
      * @readonly
      */
-    get type() { return "$eq";},
+    get type() { return "$in";},
 
     /**
      * @inheritdoc
      */
     _method: function(value) {
-      return this._value === value;
+      var N = this._value.length;
+      for(var k = 0; k < N; k++) {
+        if(this._value[k] === value)
+          return true;
+      }
+      return false;
+    },
+
+    /**
+     * @inheritdoc
+     */
+    toSpec: function() {
+      return toSpec(this._property, toSpec(this.type, this._value.length ? this._value : null));
     }
   });
 
-  return IsEqual;
+  return IsIn;
 });
