@@ -19,7 +19,66 @@ define([
 ], function(AbstractFilter, toSpec) {
   "use strict";
 
-  var AbstractPropertyFilter = AbstractFilter.extend({
+  /**
+   * @name AbstractPropertyFilter
+   * @memberOf pentaho.data.Filter
+   * @class
+   * @abstract
+   * @amd pentaho/data/Filter/AbstractPropertyFilter
+   *
+   * @classdesc The `AbstractPropertyFilter` class is the abstract base class of
+   * classes that represent a filter.
+   *
+   * @example
+   * <caption> Create a new class <code>DerivedAbstractPropertyFilter</code> containing...
+   *
+   * require(["pentaho/data/Filter/AbstractPropertyFilter"], function(AbstractPropertyFilter) {
+   *   var DerivedAbstractPropertyFilter = AbstractPropertyFilter.extend({
+   *     get type() { return "$type";},
+   *     _method: function(value) {
+   *        return this._value === value;
+   *     },
+   *     toSpec: function(){}
+   *   });
+   *
+   *   var data = new Table({
+   *     model: [
+   *       {name: "product", type: "string", label: "Product"},
+   *       {name: "sales", type: "number", label: "Sales"},
+   *       {name: "inStock", type: "boolean", label: "In Stock"}
+   *     ],
+   *     rows: [
+   *       {c: [{v: "A"}, {v: 12000}, {v: true}]},
+   *       {c: [{v: "B"}, {v: 6000}, {v: true}]},
+   *       {c: [{v: "C"}, {v: 12000}, {v: false}]},
+   *       {c: [{v: "D"}, {v: 1000}, {v: false}]},
+   *       {c: [{v: "E"}, {v: 2000}, {v: false}]},
+   *       {c: [{v: "F"}, {v: 3000}, {v: false}]},
+   *       {c: [{v: "G"}, {v: 4000}, {v: false}]}
+   *     ]
+   *   });
+   *
+   *   var filter = new DerivedAbstractPropertyFilter("product", ["A"]);
+   *   var filteredData = filter.filter(data); //filteredData.getValue(0, 0) === "A"
+   * });
+   *
+   * ### AMD
+   *
+   * To obtain the constructor of this class,
+   * require the module `"pentaho/data/Filter/AbstractPropertyFilter"`.
+   *
+   * ### Remarks
+   *
+   * The following derived classes are not abstract and can be used directly:
+   *
+   * * {@link pentaho.data.Filter.IsEqual}
+   * * {@link pentaho.data.Filter.IsIn}
+   *
+   * @constructor
+   * @param {string} property The name of the property.
+   * @param {string|number} value The value of the property.
+   */
+  var AbstractPropertyFilter = AbstractFilter.extend("pentaho.data.Filter.AbstractPropertyFilter", /** @lends pentaho.data.Filter.AbstractPropertyFilter# */{
     get type() { return null;},
 
     constructor: function(property, value) {
@@ -29,6 +88,9 @@ define([
 
     _method: null,
 
+    /**
+     * @inheritdoc
+     */
     contains: function(entry) {
       if(!entry.has(this._property))
         return false;

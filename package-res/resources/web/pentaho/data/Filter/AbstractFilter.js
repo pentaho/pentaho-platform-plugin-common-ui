@@ -21,14 +21,29 @@ define([
 ], function(Base, Element, TableView, require) {
   "use strict";
 
-
   /**
-   * @lends pentaho.lang.AbstractFilter
-   *
-   * Base class for representing a filter.
+   * @name AbstractFilter
+   * @memberOf pentaho.data.Filter
+   * @class
    * @abstract
+   * @amd pentaho/data/Filter/AbstractFilter
+   *
+   * @classdesc The `AbstractFilter` class is the abstract base class of
+   * classes that represent a filter.
+   *
+   * ### AMD
+   *
+   * To obtain the constructor of this class,
+   * require the module `"pentaho/data/Filter/AbstractFilter"`.
+   *
+   * ### Remarks
+   *
+   * The following derived classes are also abstract:
+   *
+   * * {@link pentaho.data.Filter.AbstractPropertyFilter}
+   * * {@link pentaho.data.Filter.AbstractTreeFilter}
    */
-  var AbstractFilter = Base.extend({
+  var AbstractFilter = Base.extend("pentaho.data.Filter.AbstractFilter", /** @lends pentaho.data.Filter.AbstractFilter# */{
     constructor: function(value) {
       this._value = value;
     },
@@ -79,6 +94,12 @@ define([
       return AbstractFilter.union(this, other);
     },
 
+    /**
+     * Returns a filter that is the intersection of this filter with the other.
+     * In other words, implements the INTERSECT operation between this filter and another.
+     * @param {} other -
+     * @returns {*}
+     */
     intersection: function(other) {
       return AbstractFilter.intersection(this, other);
     },

@@ -19,14 +19,61 @@ define([
 ], function(AbstractTreeFilter, _toSpec) {
   "use strict";
 
-  var NotFilter = AbstractTreeFilter.extend({
+  /**
+   * @name Not
+   * @memberOf pentaho.data.Filter
+   * @class
+   * @abstract
+   * @amd pentaho/data/Filter/Not
+   *
+   * @classdesc The `Not` class implements a type of AbstractTreeFilter {@link pentaho.data.Filter.AbstractTreeFilter}.
+   *
+   * @example
+   * <caption> Create a new <code>Not</code> filter.
+   *
+   * require(["pentaho/data/Table", "pentaho/data/Filter/IsIn", "pentaho/data/Filter/IsEqual", "pentaho/data/Filter/Not"], function(Table, IsIn, IsEqual, Not) {
+   *   var data = new Table({
+   *     model: [
+   *       {name: "product", type: "string", label: "Product"},
+   *       {name: "sales", type: "number", label: "Sales"},
+   *       {name: "inStock", type: "boolean", label: "In Stock"}
+   *     ],
+   *     rows: [
+   *       {c: [{v: "A"}, {v: 12000}, {v: true}]},
+   *       {c: [{v: "B"}, {v: 6000}, {v: true}]},
+   *       {c: [{v: "C"}, {v: 12000}, {v: false}]},
+   *       {c: [{v: "D"}, {v: 1000}, {v: false}]},
+   *       {c: [{v: "E"}, {v: 2000}, {v: false}]},
+   *       {c: [{v: "F"}, {v: 3000}, {v: false}]},
+   *       {c: [{v: "G"}, {v: 4000}, {v: false}]}
+   *     ]
+   *   });
+   *
+   *
+   *  var sales12k = new Filter.IsEqual("sales", 12000);
+   *  var filter = new Filter.Not(sales12k);
+   *  var data = filter.filter(data); //data.getValue(0, 0) === ["B", "D", "E", "F", "G"]
+   * });
+   */
+  var NotFilter = AbstractTreeFilter.extend("pentaho.data.Filter.Not", /** @lends pentaho.data.Filter.Not# */{
+
+    /**
+     * @inheritdoc
+     * @readonly
+     */
     get type() { return "$not";},
 
+    /**
+     * @inheritdoc
+     */
     insert: function(element) {
       this._children = [element];
       return this;
     },
 
+    /**
+     * @inheritdoc
+     */
     contains: function(entry) {
       if(this.children && this.children.length === 1) {
         return !this.children[0].contains(entry);
@@ -35,10 +82,16 @@ define([
       }
     },
 
+    /**
+     * @inheritdoc
+     */
     negation: function() {
       return this.children[0];
     },
 
+    /**
+     * @inheritdoc
+     */
     toSpec: function(){
       return _toSpec(this.type, this._children.length ? this.children[0].toSpec() :  null);
     }

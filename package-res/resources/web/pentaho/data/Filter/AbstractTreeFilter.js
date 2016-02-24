@@ -19,7 +19,30 @@ define([
 ], function(AbstractFilter, toSpec) {
   "use strict";
 
-  var AbstractTreeFilter = AbstractFilter.extend({
+  /**
+   * @name AbstractTreeFilter
+   * @memberOf pentaho.data.Filter
+   * @class
+   * @abstract
+   * @amd pentaho/data/Filter/AbstractTreeFilter
+   *
+   * @classdesc The `AbstractTreeFilter` class is the abstract base class of
+   * classes that represent a filter.
+   *
+   * ### AMD
+   *
+   * To obtain the constructor of this class,
+   * require the module `"pentaho/data/Filter/AbstractTreeFilter"`.
+   *
+   * ### Remarks
+   *
+   * The following derived classes are not abstract and can be used directly:
+   *
+   * * {@link pentaho.data.Filter.And}
+   * * {@link pentaho.data.Filter.Or}
+   * * {@link pentaho.data.Filter.Not}
+   */
+  var AbstractTreeFilter = AbstractFilter.extend("pentaho.data.Filter.AbstractTreeFilter", /** @lends pentaho.data.Filter.AbstractTreeFilter# */{
     constructor: function(children) {
       //children = (arguments.length === 1 ? [arguments[0]] : Array.apply(null, arguments));
       if(children instanceof Array)
@@ -33,11 +56,21 @@ define([
       return this._children;
     },
 
+    /**
+     * Inserts a filter element child.
+     *
+     * @param {object} [element] The element to insert as a child.
+     *
+     * @return {Object} The abstract tree filter and its children.
+     */
     insert: function(element) {
       this._children.push(element);
       return this;
     },
 
+    /**
+     * @inheritdoc
+     */
     contains: function(entry) {
       return false;
     },
