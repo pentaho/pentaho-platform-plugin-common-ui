@@ -56,11 +56,11 @@ define([
       return this._getRoleDepth("rows") > 0;
     },
 
-    _configureLabels: function(options, drawSpec) {
+    _configureLabels: function(options, model) {
       this.base.apply(this, arguments);
 
       if(options.valuesVisible) {
-        options.valuesLabelStyle = drawSpec.labelsOption;
+        options.valuesLabelStyle = model.getv("labelsOption");
       }
     },
 

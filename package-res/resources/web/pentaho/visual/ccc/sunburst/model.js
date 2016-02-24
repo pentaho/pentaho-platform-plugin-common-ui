@@ -16,8 +16,10 @@
 define([
   "../abstract/model",
   "pentaho/i18n!../abstract/i18n/model",
-  "../abstract/types/displayUnits"
-], function(abstractModelFactory, bundle, displayUnitsFactory) {
+  "../abstract/types/displayUnits",
+  "../abstract/types/labelsOption",
+  "../abstract/themes"
+], function(abstractModelFactory, bundle, displayUnitsFactory, labelsOptionFactory) {
 
   "use strict";
 
@@ -33,7 +35,22 @@ define([
             name: "displayUnits",
             type: displayUnitsFactory,
             required: true,
-            value: "UNITS_0"
+            value: "units_0"
+          },
+
+          {
+            name: "labelsOption",
+            type: {
+              base: labelsOptionFactory,
+              domain: ["none", "center"]
+            }
+          },
+
+          {
+            name: "emptySlicesHidden",
+            type: "boolean",
+            required: true,
+            value: true
           }
         ]
       }

@@ -17,15 +17,22 @@ define([
   "../barAbstract/model",
   "pentaho/i18n!../abstract/i18n/model",
   "../abstract/themes"
-], function(visualFactory, bundle) {
+], function(barAbstractModelFactory, bundle) {
 
   "use strict";
 
   return function(context) {
 
-    var Visual = context.get(visualFactory);
+    var BarAbstract = context.get(barAbstractModelFactory);
 
-    return Visual.extend({
+    return BarAbstract.extend({
+      meta: {
+        id: "pentaho/visual/ccc/barNormalizedAbstract",
+        "abstract": true,
+
+        view: "View",
+        styleClass: ""
+      }
       
     })
     .implement({meta: bundle.structured["barNormalizedAbstract"]});

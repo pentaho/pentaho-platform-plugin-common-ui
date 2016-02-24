@@ -46,14 +46,16 @@ define([
       return sizeVar.label;
     },
 
-    _readUserOptions: function(options, drawSpec) {
-      this.base(options, drawSpec);
+    _readUserOptions: function(options) {
+      this.base.apply(this, arguments);
 
-      var eps = options.extensionPoints;
+      var eps = options.extensionPoints,
+          model = this.model;
 
-      this._hideNullMembers = drawSpec.emptySlicesHidden;
+      var emptySlicesHidden = model.getv("emptySlicesHidden");
+      this._hideNullMembers = emptySlicesHidden;
 
-      if(drawSpec.emptySlicesHidden)
+      if(emptySlicesHidden)
         eps.slice_visible = function(scene) {
           return !util.isNullMember(scene.vars.category.value);
         };
@@ -61,7 +63,7 @@ define([
       eps.label_textStyle = this.model.getv("labelColor");
 
       // Determine whether to show values label
-      if(drawSpec.labelsOption != "none" && this.axes.measure.boundRoles.size) {
+      if(model.getv("labelsOption") !== "none" && this.axes.measure.boundRoles.size) {
         eps.label_textBaseline = "bottom";
         eps.label_textMargin = 2;
 

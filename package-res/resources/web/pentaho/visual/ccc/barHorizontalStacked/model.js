@@ -16,17 +16,34 @@
 define([
   "../barAbstract/model",
   "pentaho/i18n!../abstract/i18n/model",
+  "../abstract/types/labelsOption",
   "../abstract/themes"
-], function(visualFactory, bundle) {
+], function(barAbstractModelFactory, bundle, labelsOptionFactory) {
 
   "use strict";
 
   return function(context) {
 
-    var Visual = context.get(visualFactory);
+    var BarAbstract = context.get(barAbstractModelFactory);
 
-    return Visual.extend({
-      
+    return BarAbstract.extend({
+        meta: {
+          id: "pentaho/visual/ccc/barHorizontalStacked",
+          v2id: "",
+
+          view: "View",
+          styleClass: "",
+
+          props: [
+            {
+              name: "labelsOption",
+              type: {
+                base: labelsOptionFactory,
+                domain: ["none", "center", "insideEnd", "insideBase"]
+              }
+            }
+          ]
+        }
     })
     .implement({meta: bundle.structured["barHorizontalStacked"]});
   };

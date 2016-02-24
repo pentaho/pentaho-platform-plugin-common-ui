@@ -14,27 +14,31 @@
  * limitations under the License.
  */
 define([
-  "../categoricalContinuousAbstract/model",
-  "pentaho/i18n!../abstract/i18n/model",
-  "../abstract/themes"
-], function(categoricalContinuousAbstractModelFactory, bundle) {
+  "pentaho/i18n!../i18n/model"
+], function(bundle) {
 
   "use strict";
 
   return function(context) {
 
-    var CategoricalContinuousAbstract = context.get(categoricalContinuousAbstractModelFactory);
+    var Refinement = context.get("pentaho/type/refinement");
 
-    return CategoricalContinuousAbstract.extend({
+    return Refinement.extend({
+
       meta: {
-        id: "pentaho/visual/ccc/barAbstract",
-        "abstract": true,
+        id: "pentaho/visual/ccc/abstract/types/labelsOption",
+        of: "string",
+        facets: ["DiscreteDomain"],
+        domain: [
+          "none", "center",                 //all (HeatGrid, Sunburst)
+          "insideEnd", "insideBase",        //StackedBar, NormalizedBar (vertical and horizontal)
+          "outsideEnd",                     //Bar, HorizontalBar, BarLine
+          "left", "right", "top", "bottom", //Line, MetricDot, StackedArea
+          "outside", "inside"               //Pie
 
-        view: "View",
-        styleClass: ""
+        ]
       }
-      
     })
-    .implement({meta: bundle.structured["barAbstract"]});
+    .implement({meta: bundle.structured["labelsOption"]});
   };
 });

@@ -23,26 +23,30 @@ define([
   "./types/sides",
   "./types/emptyCellMode",
   "./types/multiChartRangeScope",
+  "./types/multiChartOverflow",
   "./types/sizeByNegativesMode",
   "./types/pattern",
   "./types/lineWidth",
   "./types/trendType",
+  "./types/labelsOption",
   "./types/sliceOrder",
-  "./theme/model"
-], function(visualFactory, bundle, colorFactory, colorSetFactory, backgroundFillFactory, fontStyleFactory,
-    sidesFactory, emptyCellModeFactory, multiChartRangeScopeFactory, sizeByNegativesModeFactory, patternFactory,
-    lineWidthFactory, trendTypeFactory, sliceOrderFactory) {
+  "./themes"
+], function(abstractModelFactory, bundle, colorFactory, colorSetFactory, backgroundFillFactory, fontStyleFactory,
+    sidesFactory, emptyCellModeFactory, multiChartRangeScopeFactory, multiChartOverflowFactory,
+    sizeByNegativesModeFactory, patternFactory, lineWidthFactory, trendTypeFactory, labelsOptionFactory,
+    sliceOrderFactory) {
 
   "use strict";
 
   return function(context) {
 
-    var Visual = context.get(visualFactory);
+    var Abstract = context.get(abstractModelFactory);
 
-    return Visual.extend({
+    return Abstract.extend({
       meta: {
         id: "pentaho/visual/ccc/abstract",
         "abstract": true,
+
         view: "View",
         styleClass: "",
 
@@ -51,21 +55,25 @@ define([
           {
             name: "rows",
             type: ["string"],
+            isVisualRole: true,
             required: false
           },
           {
             name: "columns",
             type: ["string"],
+            isVisualRole: true,
             required: false
           },
           {
             name: "measures",
             type: ["number"],
+            isVisualRole: true,
             required: true
           },
           {
             name: "multi",
             type: ["string"],
+            isVisualRole: true,
             required: false
           },
           //endregion
@@ -75,7 +83,7 @@ define([
             name: "backgroundFill",
             type: backgroundFillFactory,
             required: true,
-            value: "NONE"
+            value: "none"
           },
           {
             name: "backgroundColor",
@@ -188,6 +196,13 @@ define([
             required: true,
             value: "global"
           },
+
+          {
+            name: "multiChartOverflow",
+            type: multiChartOverflowFactory,
+            required: true,
+            value: "grow"
+          },
           //endregion
 
           { // Line and Area only...
@@ -243,15 +258,16 @@ define([
           //endregion
 
           {
+            id: "labelsOption",
+            type: labelsOptionFactory
+          },
+
+          {
             name: "sliceOrder",
             type: sliceOrderFactory,
             required: true
-          },
-          {
-            name: "selectable",
-            type: "boolean",
-            value: true
           }
+
         ]
       }
       

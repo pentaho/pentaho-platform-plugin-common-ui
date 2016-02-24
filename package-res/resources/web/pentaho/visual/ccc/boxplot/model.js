@@ -14,37 +14,28 @@
  * limitations under the License.
  */
 define([
-  "../barNormalizedAbstract/model",
+  "../categoricalContinuousAbstract/model",
   "pentaho/i18n!../abstract/i18n/model",
-  "../abstract/types/labelsOption",
   "../abstract/themes"
-], function(barNormalizedAbstractModelFactory, bundle, labelsOptionFactory) {
+], function(categoricalContinuousAbstractModelFactory, bundle) {
 
   "use strict";
 
   return function(context) {
 
-    var BarNormalizedAbstract = context.get(barNormalizedAbstractModelFactory);
+    var CategoricalContinuousAbstract = context.get(categoricalContinuousAbstractModelFactory);
 
-    return BarNormalizedAbstract.extend({
+    return CategoricalContinuousAbstract.extend({
+
         meta: {
-          id: "pentaho/visual/ccc/barNormalized",
+          id: "pentaho/visual/ccc/boxplot",
           v2id: "",
 
           view: "View",
-          styleClass: "",
-
-          props: [
-            {
-              name: "labelsOption",
-              type: {
-                base: labelsOptionFactory,
-                domain: ["none", "center", "insideEnd", "insideBase"]
-              }
-            }
-          ]
+          styleClass: ""
         }
-    })
-    .implement({meta: bundle.structured["barNormalized"]});
+
+      })
+      .implement({meta: bundle.structured["boxplot"]});
   };
 });

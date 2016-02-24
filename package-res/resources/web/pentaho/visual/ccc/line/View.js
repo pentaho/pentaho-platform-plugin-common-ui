@@ -30,11 +30,10 @@ define([
       tooltipOffset: 15
     },
 
-    _readUserOptions: function(options, drawSpec) {
+    _readUserOptions: function(options) {
+      this.base.apply(this, arguments);
 
-      this.base(options, drawSpec);
-
-      var shape = drawSpec.shape;
+      var shape = this.model.getv("shape");
       if(shape && shape === "none") {
         options.dotsVisible = false;
       } else {

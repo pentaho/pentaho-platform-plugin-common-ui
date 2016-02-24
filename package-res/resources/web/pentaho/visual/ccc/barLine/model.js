@@ -16,16 +16,51 @@
 define([
   "../barAbstract/model",
   "pentaho/i18n!../abstract/i18n/model",
+  "../abstract/types/labelsOption",
+  "../abstract/types/shape",
   "../abstract/themes"
-], function(visualFactory, bundle) {
+], function(barAbstractModelFactory, bundle, labelsOptionFactory, shapeFactory) {
 
   "use strict";
 
   return function(context) {
 
-    var Visual = context.get(visualFactory);
+    var BarAbstract = context.get(barAbstractModelFactory);
 
-    return Visual.extend({
+    return BarAbstract.extend({
+
+      meta: {
+        id: "pentaho/visual/ccc/barLine",
+        v2id: "",
+
+        view: "View",
+        styleClass: "",
+
+        props: [
+          {
+            name: "labelsOption",
+            type: {
+              base: labelsOptionFactory,
+              domain: ["none", "center", "insideEnd", "insideBase", "outsideEnd"]
+            }
+          },
+
+          {
+            name: "lineLabelsOption",
+            type: {
+              base: labelsOptionFactory,
+              domain: ["none", "center", "left", "right", "top", "bottom"]
+            }
+          },
+
+          {
+            name: "shape",
+            type: shapeFactory,
+            required: true,
+            value: "circle"
+          }
+        ]
+      }
       
     })
     .implement({meta: bundle.structured["barLine"]});

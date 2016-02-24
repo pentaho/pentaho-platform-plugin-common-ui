@@ -14,37 +14,43 @@
  * limitations under the License.
  */
 define([
-  "../barNormalizedAbstract/model",
+  "../categoricalContinuousAbstract/model",
   "pentaho/i18n!../abstract/i18n/model",
   "../abstract/types/labelsOption",
+  "../abstract/types/shape",
   "../abstract/themes"
-], function(barNormalizedAbstractModelFactory, bundle, labelsOptionFactory) {
+], function(visualFactory, bundle, labelsOptionFactory, shapeFactory) {
 
   "use strict";
 
   return function(context) {
 
-    var BarNormalizedAbstract = context.get(barNormalizedAbstractModelFactory);
+    var Visual = context.get(visualFactory);
 
-    return BarNormalizedAbstract.extend({
+    return Visual.extend({
+
         meta: {
-          id: "pentaho/visual/ccc/barNormalized",
+          id: "pentaho/visual/ccc/line",
           v2id: "",
-
-          view: "View",
-          styleClass: "",
-
           props: [
             {
               name: "labelsOption",
               type: {
                 base: labelsOptionFactory,
-                domain: ["none", "center", "insideEnd", "insideBase"]
+                domain: ["none", "center", "left", "right", "top", "bottom"]
               }
+            },
+
+            {
+              name: "shape",
+              type: shapeFactory,
+              required: true,
+              value: "circle"
             }
           ]
         }
-    })
-    .implement({meta: bundle.structured["barNormalized"]});
+
+      })
+      .implement({meta: bundle.structured["line"]});
   };
 });

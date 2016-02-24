@@ -14,21 +14,23 @@
  * limitations under the License.
  */
 define([
-  "../barNormalizedAbstract/model",
+  "../cartesianAbstract/model",
   "pentaho/i18n!../abstract/i18n/model",
+  "../abstract/types/shape",
   "../abstract/types/labelsOption",
   "../abstract/themes"
-], function(barNormalizedAbstractModelFactory, bundle, labelsOptionFactory) {
+], function(cartesianAbstractModelFactory, bundle, shapeFactory, labelsOptionFactory) {
 
   "use strict";
 
   return function(context) {
 
-    var BarNormalizedAbstract = context.get(barNormalizedAbstractModelFactory);
+    var CartesianAbstract = context.get(cartesianAbstractModelFactory);
 
-    return BarNormalizedAbstract.extend({
+    return CartesianAbstract.extend({
+
         meta: {
-          id: "pentaho/visual/ccc/barNormalized",
+          id: "pentaho/visual/ccc/heatGrid",
           v2id: "",
 
           view: "View",
@@ -39,12 +41,23 @@ define([
               name: "labelsOption",
               type: {
                 base: labelsOptionFactory,
-                domain: ["none", "center", "insideEnd", "insideBase"]
+                domain: ["none", "center"]
               }
+            },
+
+            {
+              name: "shape",
+              type: {
+                base: shapeFactory,
+                domain: ["none", "circle", "square"]
+              },
+              required: true,
+              value: "square"
             }
           ]
         }
-    })
-    .implement({meta: bundle.structured["barNormalized"]});
+
+      })
+      .implement({meta: bundle.structured["heatGrid"]});
   };
 });

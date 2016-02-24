@@ -266,9 +266,8 @@ define([
       }
     },
 
-    _initOptions: function(drawSpec) {
-      // Make a copy
-      this._drawSpec = def.copy(drawSpec);
+    _initOptions: function() {
+      var model = this.model;
 
       // Store the current selections
       this._selections = null; //drawSpec.highlights; // TODO: hookup model selections?
@@ -278,8 +277,8 @@ define([
       def.set(
           options,
           "canvas",          this._element,
-          "height",          this.model.getv("height") || 400,
-          "width",           this.model.getv("width")  || 400,
+          "height",          model.getv("height") || 400,
+          "width",           model.getv("width")  || 400,
           "dimensionGroups", {},
           "dimensions",      {},
           "visualRoles",     {},
@@ -806,8 +805,7 @@ define([
 
     _configure: function() {
       var options = this.options,
-          model = this.model,
-          drawSpec = this._drawSpec;
+          model = this.model;
 
       // By default hide overflow, otherwise,
       // resizing the window frequently ends up needlessly showing scrollbars.
@@ -826,7 +824,7 @@ define([
       this._configureTrends();
       this._configureSorts();
       this._configureFormats();
-      this._configureLabels(options, drawSpec);
+      this._configureLabels(options, model);
 
       options.axisFont = util.defaultFont(options.axisFont, 12);
       options.axisTitleFont = util.defaultFont(options.axisTitleFont, 12);
@@ -836,13 +834,7 @@ define([
       } else {
         if(options.tooltipEnabled) this._configureTooltip();
 
-        var selectable = options.selectable;
-        if(selectable) {
-          selectable = model.getv("selectable");
-          selectable = (selectable == null || !!selectable);
-        }
-
-        if((options.selectable = selectable)) this._configureSelection();
+        this._configureSelection();
 
         this._configureDoubleClick();
       }
@@ -1105,23 +1097,31 @@ define([
     },
 
     //region LABELS
-    _configureLabels: function(options, drawSpec) {
-      var valuesAnchor  = drawSpec.labelsOption,
+    _configureLabels: function(options, model) {
+      var valuesAnchor  = model.getv("labelsOption"),
           valuesVisible = !!valuesAnchor && valuesAnchor !== "none";
 
       options.valuesVisible = valuesVisible;
       if(valuesVisible) {
-        this._configureLabelsAnchor(options, drawSpec);
+        this._configureLabelsAnchor(options, model);
 
-        options.valuesFont = util.defaultFont(util.readFontModel(this.model, "label"));
+        options.valuesFont = util.defaultFont(util.readFontModel(model, "label"));
 
         if(this._useLabelColor)
-          options.extensionPoints.label_textStyle = this.model.getv("labelColor");
+          options.extensionPoints.label_textStyle = model.getv("labelColor");
       }
     },
 
-    _configureLabelsAnchor: function(options, drawSpec) {
-      options.valuesAnchor = drawSpec.labelsOption;
+    _configureLabelsAnchor: function(options, model) {
+      var valuesAnchor = model.getv("labelsOption"),
+          simpleCamelCase = /(^\w+)([A-Z])(\w+)/;
+
+      var match = simpleCamelCase.exec(valuesAnchor);
+      if(match != null) {
+        valuesAnchor = match[1] + "_" + match[2].toLowerCase() + match[3];
+      }
+
+      options.valuesAnchor = valuesAnchor;
     },
     //endregion
 
@@ -1142,7 +1142,7 @@ define([
 
       options.smallTitleFont = titleFont;
 
-      var multiChartOverflow = this._drawSpec.multiChartOverflow;
+      var multiChartOverflow = this.model.getv("multiChartOverflow");
       if(multiChartOverflow)
         options.multiChartOverflow = multiChartOverflow.toLowerCase();
     },
@@ -1285,12 +1285,10 @@ define([
 
     _doesSharedSeriesSelection: function() {
       // Until analyzer selection logic is moved out we need this auxiliary decoupling argument.
-      return this._drawSpec.sharedSeriesSelection === true;
+      return false;
     },
 
     _onSelectionChanged: function(selectedDatums) {
-
-      if(!this.options.selectable) return;
 
       // Convert to array of analyzer cell or column selection objects
       var selectionExcludesMulti = this._selectionExcludesMultiGems(),
@@ -1368,7 +1366,7 @@ define([
       var selectionsKept = selections;
 
       // limit selection
-      var filterSelectionMaxCount = this._drawSpec["filter.selection.max.count"] || 200,
+      var filterSelectionMaxCount = Infinity, //deselectCount > 0 always false
           L = selections.length,
           deselectCount = L - filterSelectionMaxCount;
       if(deselectCount > 0) {
@@ -1447,7 +1445,6 @@ define([
      * HG totally overrides this and it is the only chart that ignores sharedSeriesSelection.
      */
     _processSelection: function(selectedDatums) {
-      if(!this.options.selectable) return;
 
       /**
        * Selection rules.

@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 define([
-  "../barNormalizedAbstract/model",
+  "../categoricalContinuousAbstract/model",
   "pentaho/i18n!../abstract/i18n/model",
   "../abstract/types/labelsOption",
   "../abstract/themes"
-], function(barNormalizedAbstractModelFactory, bundle, labelsOptionFactory) {
+], function(categoricalContinuousAbstractModelFactory, bundle, labelsOptionFactory) {
 
   "use strict";
 
   return function(context) {
 
-    var BarNormalizedAbstract = context.get(barNormalizedAbstractModelFactory);
+    var CategoricalContinuousAbstract = context.get(categoricalContinuousAbstractModelFactory);
 
-    return BarNormalizedAbstract.extend({
+    return CategoricalContinuousAbstract.extend({
         meta: {
-          id: "pentaho/visual/ccc/barNormalized",
+          id: "pentaho/visual/ccc/areaStacked",
           v2id: "",
 
           view: "View",
@@ -39,12 +39,13 @@ define([
               name: "labelsOption",
               type: {
                 base: labelsOptionFactory,
-                domain: ["none", "center", "insideEnd", "insideBase"]
+                domain: ["none", "center", "left", "right", "top", "bottom"]
               }
             }
           ]
         }
-    })
-    .implement({meta: bundle.structured["barNormalized"]});
+
+      })
+      .implement({meta: bundle.structured["areaStacked"]});
   };
 });

@@ -14,27 +14,24 @@
  * limitations under the License.
  */
 define([
-  "../categoricalContinuousAbstract/model",
-  "pentaho/i18n!../abstract/i18n/model",
-  "../abstract/themes"
-], function(categoricalContinuousAbstractModelFactory, bundle) {
+  "pentaho/i18n!../i18n/model"
+], function(bundle) {
 
   "use strict";
 
   return function(context) {
 
-    var CategoricalContinuousAbstract = context.get(categoricalContinuousAbstractModelFactory);
+    var Refinement = context.get("pentaho/type/refinement");
 
-    return CategoricalContinuousAbstract.extend({
+    return Refinement.extend({
+
       meta: {
-        id: "pentaho/visual/ccc/barAbstract",
-        "abstract": true,
-
-        view: "View",
-        styleClass: ""
+        id: "pentaho/visual/ccc/abstract/types/multiChartOverflow",
+        of: "string",
+        facets: ["DiscreteDomain"],
+        domain: ["grow", "fit", "clip"]
       }
-      
     })
-    .implement({meta: bundle.structured["barAbstract"]});
+    .implement({meta: bundle.structured["multiChartOverflow"]});
   };
 });

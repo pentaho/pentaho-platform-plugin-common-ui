@@ -16,17 +16,34 @@
 define([
   "../barNormalizedAbstract/model",
   "pentaho/i18n!../abstract/i18n/model",
+  "../abstract/types/labelsOption",
   "../abstract/themes"
-], function(visualFactory, bundle) {
+], function(barNormalizedAbstractModelFactory, bundle, labelsOptionFactory) {
 
   "use strict";
 
   return function(context) {
 
-    var Visual = context.get(visualFactory);
+    var BarNormalizedAbstract = context.get(barNormalizedAbstractModelFactory);
 
-    return Visual.extend({
-      
+    return BarNormalizedAbstract.extend({
+        meta: {
+          id: "pentaho/visual/ccc/barHorizontalNormalized",
+          v2id: "",
+
+          view: "View",
+          styleClass: "",
+
+          props: [
+            {
+              name: "labelsOption",
+              type: {
+                base: labelsOptionFactory,
+                domain: ["none", "center", "insideEnd", "insideBase"]
+              }
+            }
+          ]
+        }
     })
     .implement({meta: bundle.structured["barHorizontalNormalized"]});
   };

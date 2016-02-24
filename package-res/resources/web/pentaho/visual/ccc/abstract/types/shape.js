@@ -14,27 +14,24 @@
  * limitations under the License.
  */
 define([
-  "../categoricalContinuousAbstract/model",
-  "pentaho/i18n!../abstract/i18n/model",
-  "../abstract/themes"
-], function(categoricalContinuousAbstractModelFactory, bundle) {
+  "pentaho/i18n!../i18n/model"
+], function(bundle) {
 
   "use strict";
 
   return function(context) {
 
-    var CategoricalContinuousAbstract = context.get(categoricalContinuousAbstractModelFactory);
+    var Refinement = context.get("pentaho/type/refinement");
 
-    return CategoricalContinuousAbstract.extend({
-      meta: {
-        id: "pentaho/visual/ccc/barAbstract",
-        "abstract": true,
+    return Refinement.extend({
 
-        view: "View",
-        styleClass: ""
-      }
-      
-    })
-    .implement({meta: bundle.structured["barAbstract"]});
+        meta: {
+          id: "pentaho/visual/ccc/abstract/types/shape",
+          of: "string",
+          facets: ["DiscreteDomain"],
+          domain:  ["none", "circle", "cross", "diamond", "square", "triangle"]
+        }
+      })
+      .implement({meta: bundle.structured["shape"]});
   };
 });

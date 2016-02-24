@@ -82,10 +82,10 @@ define([
       this.options.calculations.push({names: "dataPart", calculation: calculation});
     },
 
-    _readUserOptions: function(options, drawSpec) {
-      this.base(options, drawSpec);
+    _readUserOptions: function(options) {
+      this.base.apply(this, arguments);
 
-      var shape = drawSpec.shape;
+      var shape = this.model.getv("shape");
       if(shape && shape === "none") {
         options.pointDotsVisible = false;
       } else {
@@ -108,16 +108,16 @@ define([
       // options.color2AxisTransform = null;
     },
 
-    _configureLabels: function(options, drawSpec) {
+    _configureLabels: function(options, model) {
       this.base.apply(this, arguments);
 
       // Plot2
-      var lineLabelsAnchor = drawSpec.lineLabelsOption;
+      var lineLabelsAnchor = model.getv("lineLabelsOption");
       if(lineLabelsAnchor && lineLabelsAnchor !== "none") {
         options.plot2ValuesVisible = true;
         options.plot2ValuesAnchor = lineLabelsAnchor;
-        options.plot2ValuesFont = util.defaultFont(util.readFontModel(this.model, "label"));
-        options.extensionPoints.plot2Label_textStyle = this.model.getv("labelColor");
+        options.plot2ValuesFont = util.defaultFont(util.readFontModel(model, "label"));
+        options.extensionPoints.plot2Label_textStyle = model.getv("labelColor");
       }
     },
 

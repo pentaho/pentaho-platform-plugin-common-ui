@@ -17,16 +17,22 @@ define([
   "../cartesianAbstract/model",
   "pentaho/i18n!../abstract/i18n/model",
   "../abstract/themes"
-], function(visualFactory, bundle) {
+], function(cartesianAbstractModelFactory, bundle) {
 
   "use strict";
 
   return function(context) {
 
-    var Visual = context.get(visualFactory);
+    var CartesianAbstract = context.get(cartesianAbstractModelFactory);
 
-    return Visual.extend({
-      
+    return CartesianAbstract.extend({
+      meta: {
+        id: "pentaho/visual/ccc/categoricalContinuousAbstract",
+        "abstract": true,
+
+        view: "View",
+        styleClass: ""
+      }
     })
     .implement({meta: bundle.structured["categoricalContinuousAbstract"]});
   };
