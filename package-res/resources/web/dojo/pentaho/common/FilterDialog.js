@@ -662,7 +662,7 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
     var values = "";
 
     var aggregation = ' ';
-    if (filter.selectedAggType) {
+    if (filter.selectedAggType && filter.selectedAggType.toLowerCase() != 'none') {
       aggregation = ' (' + pentaho.pda.Column.AGG_TYPES_STRINGS[filter.selectedAggType] + ') ';
     }
 
