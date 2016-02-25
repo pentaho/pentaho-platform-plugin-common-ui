@@ -25,11 +25,12 @@ define([
 
   describe("pentaho.data.filter.Not", function() {
 
-    var data, sales12k;
+    var data, sales12k, filter;
     beforeEach(function() {
       data = new Table(dataSpec);
 
       sales12k = new IsEqual("sales", 12000);
+      filter = new Not(sales12k);
     });
 
     it("should throw an error if no operands are specified.", function() {
@@ -40,12 +41,10 @@ define([
 
     describe("#type ", function() {
       it("should return '$not' ", function() {
-        var filter = new Not(sales12k);
         expect(filter.type).toBe("$not");
       });
 
       it("should be immutable", function() {
-        var filter = new Not(sales12k);
         expect(function() {
           filter.type = "fake";
         }).toThrowError(TypeError);
@@ -54,8 +53,6 @@ define([
 
     describe("#operand ", function() {
       it("should be immutable", function() {
-        var filter = new Not(sales12k);
-
         expect(function() {
           filter.operand = {};
         }).toThrowError(TypeError);
@@ -64,8 +61,7 @@ define([
 
     describe("#and ", function() {
       it("should return an AND.", function() {
-        var inStock = new IsEqual("inStock", true);
-        var combination = sales12k.and(inStock);
+        var combination = filter.and(sales12k);
         expect(combination.type).toBe("$and");
       });
     }); // #and
@@ -73,50 +69,50 @@ define([
     describe("#or ", function() {
       it("should return an Or.", function() {
         var inStock = new IsEqual("inStock", true);
-        var combination = sales12k.or(inStock);
+        var combination = filter.or(inStock);
         expect(combination.type).toBe("$or");
       });
     }); // #or
 
     describe("#invert ", function() {
-      it("should return a Not.", function() {
-        var filter = sales12k.invert();
-        expect(filter.type).toBe("$not");
-      });
-
       it("should prevent double negation (i.e. replace 'NOT NOT A' with 'A').", function() {
-        var notSales12k = new Not(sales12k);
-        expect(notSales12k.type).toBe("$not");
-        expect(notSales12k.operand.type).toBe("$eq");
+        expect(filter.type).toBe("$not");
+        expect(filter.operand.type).toBe("$eq");
 
-        var notNotSales12k = notSales12k.invert();
+        var notNotSales12k = filter.invert();
         expect(notNotSales12k.type).toBe("$eq");
         expect(notNotSales12k).toBe(sales12k);
       });
     }); //#invert
 
     describe("#contains", function() {
-
       it("should return `true` if a given `element` belongs to the dataset.", function() {
-        var filter = new Not(sales12k);
         var element = new Element(data, 0);
         expect(filter.contains(element)).toBe(false);
       });
 
       it("should return `false` if a given `element` does not belong to the dataset.", function() {
-        var filter = new Not(sales12k);
         var element = new Element(data, 3);
         expect(filter.contains(element)).toBe(true);
       });
 
+      it("should perform a NOT.", function(){
+        [1,3,4,5,6].forEach(function(rowIdx){
+          var elementIn = new Element(data, rowIdx);
+          expect(filter.contains(elementIn)).toBe(true);
+        });
+        [0, 2].forEach(function(rowIdx){
+          var elementOut = new Element(data, rowIdx);
+          expect(filter.contains(elementOut)).toBe(false);
+        });
+      });
     }); // #contains
 
 
     describe("#apply", function() {
 
       it("should return the inverse of a simple filter.", function() {
-        var combination = new Not(sales12k);
-        var filteredData = combination.apply(data);
+        var filteredData = filter.apply(data);
 
         expect(filteredData.getNumberOfRows()).toBe(5);
         [

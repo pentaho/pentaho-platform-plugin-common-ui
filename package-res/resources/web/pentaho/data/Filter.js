@@ -41,8 +41,18 @@ define([
     And: AndFilter,
     Not: NotFilter,
     //Root: RootFilter,
-    create: function(spec) { return new RootFilter(spec); }
+
+    /**
+     * Create a filter from a spec
+     * @param {Object} spec - Specification of a Filter
+     * @returns {*}
+     */
+    create: function (spec) {
+      return new RootFilter(spec);
+    }
   };
+
+
 
   function fromSpec(filterSpec) {
     var registeredFilters = {

@@ -69,8 +69,8 @@ define([
      * @inheritdoc
      */
     contains: function(entry) {
-      var N = this.operands ? this.operands.length : 0;
       var memo = true; // true is the neutral element of an AND operation
+      var N = this.operands.length;
       for(var k = 0; k < N && memo; k++) {
         memo = memo && this.operands[k].contains(entry);
       }

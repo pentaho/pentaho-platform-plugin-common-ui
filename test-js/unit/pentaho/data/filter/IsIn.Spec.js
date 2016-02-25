@@ -23,12 +23,23 @@ define([
 
   describe("pentaho.data.filter.IsIn", function() {
 
-    var data, sales12k, inStock;
+    var data, sales12k;
     beforeEach(function() {
       data = new Table(dataSpec);
       sales12k = new IsIn("sales", [10000, 12000]);
-      inStock= new IsIn("inStock", [true]);
     });
+
+    describe("#type", function() {
+      it("should return '$in'.", function() {
+        expect(sales12k.type).toBe("$in");
+      });
+
+      it("should be immutable.", function() {
+        expect(function() {
+          sales12k.type = "fake";
+        }).toThrowError(TypeError);
+      });
+    }); // #type
 
     describe("#value", function() {
       it("should be immutable", function() {
@@ -46,20 +57,9 @@ define([
       });
     }); //#property
 
-    describe("#type", function() {
-      it("should return '$in'.", function() {
-        expect(sales12k.type).toBe("$in");
-      });
-
-      it("should be immutable.", function() {
-        expect(function() {
-          sales12k.type = "fake";
-        }).toThrowError(TypeError);
-      });
-    }); // #type
-
     describe("#and ", function() {
       it("should return an AND.", function() {
+        var inStock= new IsIn("inStock", [true]);
         var combination = sales12k.and(inStock);
         expect(combination.type).toBe("$and");
       });
@@ -67,6 +67,7 @@ define([
 
     describe("#or ", function() {
       it("should return an Or.", function() {
+        var inStock= new IsIn("inStock", [true]);
         var combination = sales12k.or(inStock);
         expect(combination.type).toBe("$or");
       });
@@ -80,9 +81,31 @@ define([
     }); // #invert
 
     describe("#contains ", function() {
-      it("should confirm if a filter with the data", function() {
+      it("should return `true` if a given `element` belongs to the dataset.", function() {
         var containsSales12k = sales12k.contains(new Element(data, 0));
         expect(containsSales12k).toBe(true);
+      });
+
+      it("should return `false` if a given `element` belongs to the dataset.", function() {
+        var containsSales12k = sales12k.contains(new Element(data, 1));
+        expect(containsSales12k).toBe(false);
+      });
+
+      it("should return `false` if the set is empty", function() {
+        var filter = new IsIn("sales", []);
+        var result = filter.contains(new Element(data, 0));
+        expect(result).toBe(false);
+      });
+
+      it("should assert if the value of a given property of the element belongs to a predefined set", function(){
+        [0,2].forEach(function(rowIdx){
+          var element = new Element(data, rowIdx);
+          expect(sales12k.contains(element)).toBe(true);
+        });
+        [1,3,4,5,6].forEach(function(rowIdx){
+          var element = new Element(data, rowIdx);
+          expect(sales12k.contains(element)).toBe(false);
+        });
       });
     }); // #contains
 
@@ -114,10 +137,19 @@ define([
 
     describe("#toSpec()", function() {
       it("should return a JSON matching the state of the filter", function() {
-        var sales12k = new IsIn("sales", [10000, 12000]);
         expect(sales12k.toSpec()).toEqual({
           "sales": {"$in": [10000, 12000]}
         });
+      });
+
+      it("should return `null` if the #property is not defined", function() {
+        var filter = new IsIn(undefined, [10000, 12000]);
+        expect(filter.toSpec()).toBeNull();
+      });
+
+      it("should return `null` if #value is not defined", function() {
+        var filter = new IsIn("sales", undefined);
+        expect(filter.toSpec()).toBeNull();
       });
     }); // #toSpec
 

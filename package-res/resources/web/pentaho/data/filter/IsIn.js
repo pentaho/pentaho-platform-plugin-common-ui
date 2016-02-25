@@ -54,7 +54,9 @@ define([
    * });
    */
   var IsIn = AbstractPropertyFilter.extend("pentaho.data.filter.IsIn", /** @lends pentaho.data.filter.IsIn# */{
-
+    constructor: function(property, value) {
+      this.base(property, value || []);
+    },
     /**
      * @inheritdoc
      * @readonly

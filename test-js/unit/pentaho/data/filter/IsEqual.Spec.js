@@ -24,13 +24,24 @@ define([
 
   describe("pentaho.data.filter.IsEqual", function() {
 
-    var data, sales12k, inStock;
+    var data, sales12k;
     beforeEach(function() {
       data = new Table(dataSpec);
-
       sales12k = new IsEqual("sales", 12000);
-      inStock = new IsEqual("inStock", true);
     });
+
+
+    describe("#type", function() {
+      it("should return '$eq'.", function() {
+        expect(sales12k.type).toBe("$eq");
+      });
+
+      it("should be immutable.", function() {
+        expect(function() {
+          sales12k.type = "fake";
+        }).toThrowError(TypeError);
+      });
+    }); // #type
 
     describe("#property", function() {
       it("should be immutable", function() {
@@ -40,34 +51,18 @@ define([
       });
     }); //#property
 
-    describe("#type", function() {
-      it("should return '$eq'.", function() {
-        expect(sales12k.type).toBe("$eq");
-      });
-
-      it("should be immutable.", function() {
+    describe("#value", function() {
+      it("should be immutable", function() {
         expect(function() {
-          sales12k.type = "fake";
+          sales12k.value = 10000;
         }).toThrowError(TypeError);
       });
-    }); // #type
-
-
-    describe("#type", function() {
-      it("should return '$eq'.", function() {
-        expect(sales12k.type).toBe("$eq");
-      });
-
-      it("should be immutable.", function() {
-        expect(function(){
-          sales12k.type = "fake";
-        }).toThrowError(TypeError);
-      });
-    }); // #type
+    }); //#value
 
 
     describe("#and ", function() {
       it("should return an AND.", function() {
+        var inStock = new IsEqual("inStock", true);
         var combination = sales12k.and(inStock);
         expect(combination.type).toBe("$and");
       });
@@ -75,6 +70,7 @@ define([
 
     describe("#or ", function() {
       it("should return an Or.", function() {
+        var inStock = new IsEqual("inStock", true);
         var combination = sales12k.or(inStock);
         expect(combination.type).toBe("$or");
       });
@@ -88,9 +84,25 @@ define([
     }); // #invert
 
     describe("#contains ", function() {
-      it("should confirm if a filter with the data", function() {
+      it("should return `true` if a given `element` belongs to the dataset.", function() {
         var containsSales12k = sales12k.contains(new Element(data, 0));
         expect(containsSales12k).toBe(true);
+      });
+
+      it("should return `false` if a given `element` belongs to the dataset.", function() {
+        var containsSales12k = sales12k.contains(new Element(data, 1));
+        expect(containsSales12k).toBe(false);
+      });
+
+      it("should assert in a property of an element is equal to a predefined value", function(){
+        [0,2].forEach(function(rowIdx){
+          var element = new Element(data, rowIdx);
+          expect(sales12k.contains(element)).toBe(true);
+        });
+        [1,3,4,5,6].forEach(function(rowIdx){
+          var element = new Element(data, rowIdx);
+          expect(sales12k.contains(element)).toBe(false);
+        });
       });
     }); // #contains
 

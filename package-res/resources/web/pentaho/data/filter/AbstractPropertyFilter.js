@@ -75,7 +75,10 @@ define([
    * @param {string|number} value The value of the property.
    */
   var AbstractPropertyFilter = AbstractFilter.extend("pentaho.data.filter.AbstractPropertyFilter", /** @lends pentaho.data.filter.AbstractPropertyFilter# */{
-    get type() { return null;},
+    get type(){
+      /* istanbul ignore next: placeholder getter */
+      return null;
+    },
 
     constructor: function(property, value) {
       O.setConst(this, "value", value);
@@ -87,7 +90,7 @@ define([
      * @returns {boolean}
      * @protected
      */
-    _operation: function(value){
+    _operation: /* istanbul ignore next: placeholder method */ function(value){
       return false;
     },
 

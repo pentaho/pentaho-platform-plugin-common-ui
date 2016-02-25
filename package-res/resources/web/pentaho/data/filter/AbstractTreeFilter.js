@@ -41,8 +41,6 @@ define([
    */
   var AbstractTreeFilter = AbstractFilter.extend("pentaho.data.filter.AbstractTreeFilter", /** @lends pentaho.data.filter.AbstractTreeFilter# */{
     constructor: function(operands) {
-      //if (!operands) throw new ArgumentRequiredError("operands");
-
       var _operands = (operands instanceof Array) ? operands.slice() : operands ? [operands] : [];
       O.setConst(this, "_operands", _operands);
     },

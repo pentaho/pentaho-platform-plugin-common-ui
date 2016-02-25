@@ -15,39 +15,24 @@
  */
 define([
   "pentaho/data/Filter",
-  "pentaho/data/filter/_Element",
-  "pentaho/data/Table"
-], function(Filter, Element, Table) {
+  "pentaho/data/Table",
+  "./filter/_dataSpecProductSalesInStock"
+], function(Filter, Table, dataSpec) {
   "use strict";
 
   describe("pentaho.data.Filter", function() {
 
     var data;
     beforeEach(function() {
-      data = new Table({
-        model: [
-          {name: "product", type: "string", label: "Product"},
-          {name: "sales", type: "number", label: "Sales"},
-          {name: "inStock", type: "boolean", label: "In Stock"}
-        ],
-        rows: [
-          {c: [{v: "A"}, {v: 12000}, {v: true}]},
-          {c: [{v: "B"}, {v: 6000}, {v: true}]},
-          {c: [{v: "C"}, {v: 12000}, {v: false}]},
-          {c: [{v: "D"}, {v: 1000}, {v: false}]},
-          {c: [{v: "E"}, {v: 2000}, {v: false}]},
-          {c: [{v: "F"}, {v: 3000}, {v: false}]},
-          {c: [{v: "G"}, {v: 4000}, {v: false}]}
-        ]
-      });
+      data = new Table(dataSpec);
     });
 
-     describe("#create ", function() {
+    describe(".create ", function() {
       it("takes in a spec", function() {
         var spec = {
           "$and": [
             {"sales": {"$eq": 12000}},
-            {"$not": {"product": {"$in": ["A", "B"]}} }
+            {"$not": {"product": {"$in": ["A", "B"]}}}
           ]
         };
 
@@ -63,24 +48,31 @@ define([
         expect(filter.operands[0].operands[1].operand.value).toEqual(["A", "B"]);
       });
 
+      it("also accepts no arguments", function() {
+        var filter = Filter.create();
+        expect(filter.type).toBe("$or");
+        expect(filter.operands.length).toBe(0);
+      });
 
-      it("simplifies the filter tree when taking in a spec", function() {
+      it("does not simplify the filter tree when taking in a spec", function() {
         var spec = {
-          "$and": [
-            {"sales": {"$eq": 12000}},
-            {"$not": {"product": {"$in": ["A", "B"]}} }
-          ]
+          "$not": {
+            "$and": [
+              {"sales": 12000},
+              {"$not": {"product": {"$in": ["A", "B"]}}}
+            ]
+          }
         };
 
-        var filter0 = Filter.create(spec);
-        var filter = filter0.invert();
-        expect(filter.type).toBe("$and");
+        var filter = Filter.create(spec);
+        expect(filter.type).toBe("$or");
         expect(filter.operands.length).toBe(1);
-        expect(filter.operands[0].type).toBe("$or");
-        expect(filter.operands[0].operands.length).toBe(2);
-        expect(filter.operands[0].operands[0].type).toBe("$not");
-        expect(filter.operands[0].operands[0].operand.type).toBe("$eq");
-        expect(filter.operands[0].operands[1].type).toBe("$in");
+        expect(filter.operands[0].type).toBe("$not");
+        expect(filter.operands[0].operand.type).toBe("$and");
+        expect(filter.operands[0].operand.operands.length).toBe(2);
+        expect(filter.operands[0].operand.operands[0].type).toBe("$eq");
+        expect(filter.operands[0].operand.operands[1].type).toBe("$not");
+        expect(filter.operands[0].operand.operands[1].operand.type).toBe("$in");
       });
 
     }); // #create

@@ -18,7 +18,7 @@ define([
   "./_Element",
   "../TableView",
   "../../util/arg",
-  "require",
+  "require"
   //"./Or",
   //"./And",
   //"./Not",
@@ -49,7 +49,7 @@ define([
      *
      * @return {Object} Object.
      */
-    toSpec: function() {
+    toSpec: /* istanbul ignore next: placeholder method */ function() {
       return null;
     },
 
@@ -59,7 +59,7 @@ define([
      * @param {pentaho.type.Element} - [dataTable]{@link pentaho.data.Table} entry.
      * @return {boolean}
      */
-    contains: function(entry) {
+    contains: /* istanbul ignore next: placeholder method */ function(entry) {
       return false;
     },
 
@@ -111,21 +111,6 @@ define([
       var dataView = new TableView(dataTable);
       dataView.setSourceRows(filteredRows);
       return dataView;
-    }
-  }, {
-    or: function() {
-      if(!Or) Or = require("./Or");
-      return new Or(arg.slice(arguments));
-    },
-
-    not: function(a) {
-      if(!Not) Not = require("./Not");
-      return new Not(a);
-    },
-
-    and: function() {
-      if(!And) And = require("./And");
-      return new And(arg.slice(arguments));
     }
   });
 

@@ -25,28 +25,21 @@ define([
 
   describe("pentaho.data.filter.Or", function() {
 
-    var data, sales12k, inStock;
+    var data, sales12k, inStock, filter;
     beforeEach(function() {
       data = new Table(dataSpec);
       sales12k = new IsIn("sales", [12000]);
       inStock = new IsEqual("inStock", true);
+      filter = new Or([sales12k, inStock])
     });
 
 
     it("should be of type '$or'.", function() {
-      var filter = new Or(sales12k);
       expect(filter.type).toBe("$or");
     });
 
 
-
     describe("#operands", function() {
-
-      var filter;
-      beforeEach(function(){
-        filter = new Or([sales12k, inStock]);
-      });
-
       it("should be readonly.", function() {
         expect(function() {
           filter.operands = [new IsEqual("product", "A")];
@@ -62,7 +55,6 @@ define([
 
     describe("#or", function() {
       it("should add elements instead of creating ORs of ORs", function() {
-        var filter = new Or([sales12k, inStock]);
         var productA = new IsEqual("product", "A");
 
         var result = filter.or(productA);
@@ -70,7 +62,6 @@ define([
       });
 
       it("should return a new instance", function() {
-        var filter = new Or([sales12k, inStock]);
         var productA = new IsEqual("product", "A");
 
         var result = filter.or(productA);
@@ -78,32 +69,35 @@ define([
       });
     });
 
+    describe("#and ", function() {
+      it("should return an And.", function() {
+        var result = filter.and(inStock);
+        expect(result.type).toBe("$and");
+      });
+    }); // #or
+
     describe("#invert", function() {
 
       it("should return a simplified filter, with the negated terms next to the leafs", function() {
-        var filter0 = new Or([sales12k, inStock]);
+        var result = filter.invert();
 
-        var filter = filter0.invert();
-
-        expect(filter.type).toBe("$and");
-        expect(filter.operands.length).toBe(2);
-        expect(filter.operands[0].type).toBe("$not");
-        expect(filter.operands[0].operand.type).toBe("$in");
-        expect(filter.operands[1].type).toBe("$not");
-        expect(filter.operands[1].operand.type).toBe("$eq");
+        expect(result.type).toBe("$and");
+        expect(result.operands.length).toBe(2);
+        expect(result.operands[0].type).toBe("$not");
+        expect(result.operands[0].operand.type).toBe("$in");
+        expect(result.operands[1].type).toBe("$not");
+        expect(result.operands[1].operand.type).toBe("$eq");
       });
     });
 
     describe("#contains", function() {
 
       it("should return `true` if a given `element` belongs to the dataset.", function() {
-        var filter = new Or([sales12k, inStock]);
         var element = new Element(data, 0);
         expect(filter.contains(element)).toBe(true);
       });
 
       it("should return `false` if a given `element` does not belong to the dataset.", function() {
-        var filter = new Or([sales12k, inStock]);
         var element = new Element(data, 3);
         expect(filter.contains(element)).toBe(false);
       });
@@ -114,12 +108,32 @@ define([
         expect(filter.contains(element)).toBe(false);
       });
 
+      it("should perform an OR.", function() {
+        [0, 1, 2].forEach(function(rowIdx) {
+          var elementIn = new Element(data, rowIdx);
+          expect(filter.contains(elementIn)).toBe(true);
+        });
+
+        [3, 4, 5, 6].forEach(function(rowIdx) {
+          var elementOut = new Element(data, rowIdx);
+          expect(filter.contains(elementOut)).toBe(false);
+        });
+      });
+
+      it("should be commutative.", function() {
+        var filter2 = new Or([inStock, sales12k]);
+
+        for(var k = 0; k < 7; k++) {
+          var element = new Element(data, k);
+          expect(filter.contains(element)).toBe(filter2.contains(element));
+        }
+      });
+
     }); // #contains
 
     describe("#apply", function() {
       it("should perform an OR.", function() {
-        var combination = new Or([sales12k, inStock]);
-        var filteredData = combination.apply(data);
+        var filteredData = filter.apply(data);
 
         expect(filteredData.getNumberOfRows()).toBe(3);
         expect(filteredData.getValue(0, 0)).toBe("A");
@@ -128,21 +142,21 @@ define([
       });
 
       it("should be commutative", function() {
-        var combination1 = new Or([sales12k, inStock]);
-        var data1 = combination1.apply(data);
+        var data1 = filter.apply(data);
 
-        var combination2 = new Or([inStock, sales12k]);
-        var data2 = combination2.apply(data);
+        var filter2 = new Or([inStock, sales12k]);
+        var data2 = filter2.apply(data);
 
         expect(data1.getNumberOfRows()).toBe(3);
         expect(data1.getNumberOfRows()).toBe(data2.getNumberOfRows());
-        expect(data1.getValue(0, 0)).toBe(data2.getValue(0, 0));
+        for(var k = 0; k < 3; k++) {
+          expect(data1.getValue(k, 0)).toBe(data2.getValue(k, 0));
+        }
       });
     }); // #apply
 
     describe("#toSpec", function() {
       it("should return a JSON.", function() {
-        var filter = new Or([sales12k, inStock]);
         expect(filter.toSpec()).toEqual({
           "$or": [
             {"sales": {"$in": [12000]}},
