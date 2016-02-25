@@ -15,7 +15,7 @@
  */
 define([
   "../../lang/Base",
-  "../Element",
+  "./_Element",
   "../TableView",
   "../../util/arg",
   "require",
@@ -44,10 +44,10 @@ define([
    */
   var AbstractFilter = Base.extend("pentaho.data.filter.AbstractFilter", /** @lends pentaho.data.filter.AbstractFilter# */{
     /**
-     * Outputs a JSON that serializes the operation described by this filter.
+     * Outputs a simple object that serializes the operation described by this filter.
      * The syntax loosely follows the query language of MongoDB.
      *
-     * @return {Object} JSON object.
+     * @return {Object} Object.
      */
     toSpec: function() {
       return null;
@@ -56,7 +56,7 @@ define([
     /**
      * Tests if an entry is an element of the set defined by this filter.
      *
-     * @param {pentaho.data.Entry} - [dataTable]{@link pentaho.data.Table} entry.
+     * @param {pentaho.type.Element} - [dataTable]{@link pentaho.data.Table} entry.
      * @return {boolean}
      */
     contains: function(entry) {

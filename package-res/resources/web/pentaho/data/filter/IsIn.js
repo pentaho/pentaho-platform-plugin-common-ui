@@ -64,10 +64,10 @@ define([
     /**
      * @inheritdoc
      */
-    _method: function(value) {
-      var N = this._value.length;
+    _operation: function(value) {
+      var N = this.value.length;
       for(var k = 0; k < N; k++) {
-        if(this._value[k] === value)
+        if(this.value[k] === value)
           return true;
       }
       return false;
@@ -77,7 +77,7 @@ define([
      * @inheritdoc
      */
     toSpec: function() {
-      return toSpec(this._property, toSpec(this.type, this._value.length ? this._value : null));
+      return toSpec(this.property, toSpec(this.type, this.value.length ? this.value : null));
     }
   });
 

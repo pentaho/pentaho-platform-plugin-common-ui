@@ -15,8 +15,9 @@
  */
 define([
   "./AbstractFilter",
+  "../../util/object",
   "./_toSpec"
-], function(AbstractFilter, toSpec) {
+], function(AbstractFilter, O, toSpec) {
   "use strict";
 
   /**
@@ -77,32 +78,32 @@ define([
     get type() { return null;},
 
     constructor: function(property, value) {
-      this._value = value;
-      this._property = property;
+      O.setConst(this, "value", value);
+      O.setConst(this, "property", property);
     },
     /**
      *
-     * @readonly
+     * @param value
+     * @returns {boolean}
+     * @protected
      */
-    get value() {
-      return this._value;
+    _operation: function(value){
+      return false;
     },
-
-    _method: null,
 
     /**
      * @inheritdoc
      */
     contains: function(entry) {
-      return entry.has(this._property) &&
-             this._method(entry.getValue(this._property));
+      return entry.has(this.property) &&
+             this._operation(entry.getValue(this.property));
     },
 
     /**
      * @inheritdoc
      */
     toSpec: function() {
-      return toSpec(this._property, toSpec(this.type, this._value));
+      return toSpec(this.property, toSpec(this.type, this.value));
     }
   });
 

@@ -57,7 +57,7 @@ define([
    *  var data1 = combination1.apply(data); //data1.getValue(0, 0) === "A"
    * });
    */
-  var AndFilter = AbstractTreeFilter.extend("pentaho.data.filter.And", /** @lends pentaho.data.filter.And# */{
+  var And = AbstractTreeFilter.extend("pentaho.data.filter.And", /** @lends pentaho.data.filter.And# */{
 
     /**
      * @inheritdoc
@@ -69,10 +69,10 @@ define([
      * @inheritdoc
      */
     contains: function(entry) {
-      var N = this.children ? this.children.length : 0;
+      var N = this.operands ? this.operands.length : 0;
       var memo = true; // true is the neutral element of an AND operation
       for(var k = 0; k < N && memo; k++) {
-        memo = memo && this.children[k].contains(entry);
+        memo = memo && this.operands[k].contains(entry);
       }
       return memo;
     },
@@ -81,17 +81,18 @@ define([
      * @inheritdoc
      */
     and: function() {
+      var operands = this.operands;
       for(var k = 0, N = arguments.length; k < N; k++) {
-        this.insert(arguments[k]);
+        operands.push(arguments[k]);
       }
-      return this;
+      return new And(operands);
     },
 
     /**
      * @inheritdoc
      */
     invert: function() {
-      var invertedChildren = this.children.map(function(child) {
+      var invertedChildren = this.operands.map(function(child) {
         return child.invert();
       });
       if(!Or) Or = require("./Or");
@@ -99,6 +100,6 @@ define([
     }
   });
 
-  return AndFilter;
+  return And;
 
 });

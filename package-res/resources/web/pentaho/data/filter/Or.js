@@ -16,7 +16,7 @@
 define([
   "./AbstractTreeFilter",
   "require",
-  "./And",
+  "./And"
 ], function(AbstractTreeFilter, require, And) {
   "use strict";
 
@@ -57,7 +57,7 @@ define([
    *  var data1 = combination1.apply(data); //data1.getValue(0, 0) === ["A", "B", "C"]
    * });
    */
-  var OrFilter = AbstractTreeFilter.extend("pentaho.data.filter.Or", /** @lends pentaho.data.filter.Or# */{
+  var Or = AbstractTreeFilter.extend("pentaho.data.filter.Or", /** @lends pentaho.data.filter.Or# */{
 
     /**
      * @inheritdoc
@@ -69,11 +69,11 @@ define([
      * @inheritdoc
      */
     contains: function(entry) {
-      var N = this.children ? this.children.length : 0;
+      var N = this.operands ? this.operands.length : 0;
 
       var memo = false; // false is the neutral element of an OR operation
       for(var k = 0; k < N && !memo; k++) {
-        memo = memo || this.children[k].contains(entry);
+        memo = memo || this.operands[k].contains(entry);
       }
       return memo;
     },
@@ -82,17 +82,18 @@ define([
      * @inheritdoc
      */
     or: function() {
+      var operands = this.operands;
       for(var k = 0, N = arguments.length; k < N; k++) {
-        this.insert(arguments[k]);
+        operands.push(arguments[k]);
       }
-      return this;
+      return new Or(operands);
     },
 
     /**
      * @inheritdoc
      */
     invert: function() {
-      var negatedChildren = this.children.map(function(child) {
+      var negatedChildren = this.operands.map(function(child) {
         return child.invert();
       });
       if(!And) And = require("./And");
@@ -100,6 +101,6 @@ define([
     }
   });
 
-  return OrFilter;
+  return Or;
 
 });

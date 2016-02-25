@@ -15,48 +15,78 @@
  */
 define([
   "pentaho/data/filter/IsIn",
-  "pentaho/data/Element",
-  "pentaho/data/Table"
-], function(IsIn, Element, Table) {
+  "pentaho/data/filter/_Element",
+  "pentaho/data/Table",
+  "./_dataSpecProductSalesInStock"
+], function(IsIn, Element, Table, dataSpec) {
   "use strict";
 
-  describe("pentaho.data.Filter", function() {
+  describe("pentaho.data.filter.IsIn", function() {
 
-    var data;
+    var data, sales12k, inStock;
     beforeEach(function() {
-      data = new Table({
-        model: [
-          {name: "product", type: "string", label: "Product"},
-          {name: "sales", type: "number", label: "Sales"},
-          {name: "inStock", type: "boolean", label: "In Stock"}
-        ],
-        rows: [
-          {c: [{v: "A"}, {v: 12000}, {v: true}]},
-          {c: [{v: "B"}, {v: 6000}, {v: true}]},
-          {c: [{v: "C"}, {v: 12000}, {v: false}]},
-          {c: [{v: "D"}, {v: 1000}, {v: false}]},
-          {c: [{v: "E"}, {v: 2000}, {v: false}]},
-          {c: [{v: "F"}, {v: 3000}, {v: false}]},
-          {c: [{v: "G"}, {v: 4000}, {v: false}]}
-        ]
+      data = new Table(dataSpec);
+      sales12k = new IsIn("sales", [10000, 12000]);
+      inStock= new IsIn("inStock", [true]);
+    });
+
+    describe("#value", function() {
+      it("should be immutable", function() {
+        expect(function() {
+          sales12k.value = [11000, 13000];
+        }).toThrowError(TypeError);
       });
-    });
+    }); //#value
 
-    it("should be of type '$in' ", function() {
-      var filter = new IsIn("sales", [10000, 12000]);
-      expect(filter.type).toBe("$in");
-    });
-
-    describe("#toSpec()", function() {
-      it("should return a JSON matching the state of the filter", function() {
-        var sales12k = new IsIn("sales", [10000, 12000]);
-        expect(sales12k.toSpec()).toEqual({
-          "sales": {"$in": [10000, 12000]}
-        });
+    describe("#property", function() {
+      it("should be immutable", function() {
+        expect(function() {
+          sales12k.property = "inStock";
+        }).toThrowError(TypeError);
       });
-    });
+    }); //#property
 
-    describe("#filter(pentaho.data.Table object)", function() {
+    describe("#type", function() {
+      it("should return '$in'.", function() {
+        expect(sales12k.type).toBe("$in");
+      });
+
+      it("should be immutable.", function() {
+        expect(function() {
+          sales12k.type = "fake";
+        }).toThrowError(TypeError);
+      });
+    }); // #type
+
+    describe("#and ", function() {
+      it("should return an AND.", function() {
+        var combination = sales12k.and(inStock);
+        expect(combination.type).toBe("$and");
+      });
+    }); // #and
+
+    describe("#or ", function() {
+      it("should return an Or.", function() {
+        var combination = sales12k.or(inStock);
+        expect(combination.type).toBe("$or");
+      });
+    }); // #or
+
+    describe("#invert ", function() {
+      it("should return a Not.", function() {
+        var filter = sales12k.invert();
+        expect(filter.type).toBe("$not");
+      });
+    }); // #invert
+
+    describe("#contains ", function() {
+      it("should confirm if a filter with the data", function() {
+        var containsSales12k = sales12k.contains(new Element(data, 0));
+        expect(containsSales12k).toBe(true);
+      });
+    }); // #contains
+
+    describe("#apply(pentaho.data.Table object)", function() {
       it("should return the matching entry", function() {
         var isProductAC = new IsIn("product", ["A"]);
         var filteredData = isProductAC.apply(data);
@@ -80,7 +110,16 @@ define([
 
         expect(filteredData.getNumberOfRows()).toBe(0);
       });
-    });
+    }); // #apply
 
-  });
+    describe("#toSpec()", function() {
+      it("should return a JSON matching the state of the filter", function() {
+        var sales12k = new IsIn("sales", [10000, 12000]);
+        expect(sales12k.toSpec()).toEqual({
+          "sales": {"$in": [10000, 12000]}
+        });
+      });
+    }); // #toSpec
+
+  }); // #pentaho.data.filter.IsIn
 });

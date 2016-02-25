@@ -63,8 +63,8 @@ define([
     /**
      * @inheritdoc
      */
-    _method: function(value) {
-      return this._value === value;
+    _operation: function(value) {
+      return this.value === value;
     }
   });
 

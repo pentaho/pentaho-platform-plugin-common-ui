@@ -15,8 +15,10 @@
  */
 define([
   "./AbstractFilter",
+  "../../util/object",
+  "../../lang/ArgumentRequiredError",
   "./_toSpec"
-], function(AbstractFilter, toSpec) {
+], function(AbstractFilter, O, ArgumentRequiredError, toSpec) {
   "use strict";
 
   /**
@@ -38,36 +40,15 @@ define([
    * * {@link pentaho.data.filter.Not}
    */
   var AbstractTreeFilter = AbstractFilter.extend("pentaho.data.filter.AbstractTreeFilter", /** @lends pentaho.data.filter.AbstractTreeFilter# */{
-    constructor: function(children) {
-      //children = (arguments.length === 1 ? [arguments[0]] : Array.apply(null, arguments));
-      if(children instanceof Array)
-        this._children = children.slice();
-      else
-        this._children = children ? [children] : [];
+    constructor: function(operands) {
+      //if (!operands) throw new ArgumentRequiredError("operands");
+
+      var _operands = (operands instanceof Array) ? operands.slice() : operands ? [operands] : [];
+      O.setConst(this, "_operands", _operands);
     },
 
-    _children: null,
-    get children() {
-      return this._children;
-    },
-
-    /**
-     * Inserts a filter element child.
-     *
-     * @param {object} [element] The element to insert as a child.
-     *
-     * @return {Object} The abstract tree filter and its children.
-     */
-    insert: function(element) {
-      this._children.push(element);
-      return this;
-    },
-
-    /**
-     * @inheritdoc
-     */
-    contains: function(entry) {
-      return false;
+    get operands(){
+      return this._operands.slice();
     },
 
     /**
@@ -75,11 +56,11 @@ define([
      */
     toSpec: function() {
       var operands = [];
-      if(this.children.length) {
-        this.children.forEach(function(child) {
-          var childSpec = child.toSpec();
-          if(childSpec)
-            operands.push(childSpec);
+      if(this.operands.length) {
+        this.operands.forEach(function(operand) {
+          var spec = operand.toSpec();
+          if(spec)
+            operands.push(spec);
         });
       }
       return toSpec(this.type, operands.length ? operands : null);

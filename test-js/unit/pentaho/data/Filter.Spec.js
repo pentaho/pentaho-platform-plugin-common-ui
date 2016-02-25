@@ -15,7 +15,7 @@
  */
 define([
   "pentaho/data/Filter",
-  "pentaho/data/Element",
+  "pentaho/data/filter/_Element",
   "pentaho/data/Table"
 ], function(Filter, Element, Table) {
   "use strict";
@@ -53,14 +53,14 @@ define([
 
         var filter = Filter.create(spec);
         expect(filter.type).toBe("$or");
-        expect(filter.children.length).toBe(1);
-        expect(filter.children[0].type).toBe("$and");
-        expect(filter.children[0].children.length).toBe(2);
-        expect(filter.children[0].children[0].type).toBe("$eq");
-        expect(filter.children[0].children[0].value).toBe(12000);
-        expect(filter.children[0].children[1].type).toBe("$not");
-        expect(filter.children[0].children[1].children[0].type).toBe("$in");
-        expect(filter.children[0].children[1].children[0].value).toEqual(["A", "B"]);
+        expect(filter.operands.length).toBe(1);
+        expect(filter.operands[0].type).toBe("$and");
+        expect(filter.operands[0].operands.length).toBe(2);
+        expect(filter.operands[0].operands[0].type).toBe("$eq");
+        expect(filter.operands[0].operands[0].value).toBe(12000);
+        expect(filter.operands[0].operands[1].type).toBe("$not");
+        expect(filter.operands[0].operands[1].operand.type).toBe("$in");
+        expect(filter.operands[0].operands[1].operand.value).toEqual(["A", "B"]);
       });
 
 
@@ -75,12 +75,12 @@ define([
         var filter0 = Filter.create(spec);
         var filter = filter0.invert();
         expect(filter.type).toBe("$and");
-        expect(filter.children.length).toBe(1);
-        expect(filter.children[0].type).toBe("$or");
-        expect(filter.children[0].children.length).toBe(2);
-        expect(filter.children[0].children[0].type).toBe("$not");
-        expect(filter.children[0].children[0].children[0].type).toBe("$eq");
-        expect(filter.children[0].children[1].type).toBe("$in");
+        expect(filter.operands.length).toBe(1);
+        expect(filter.operands[0].type).toBe("$or");
+        expect(filter.operands[0].operands.length).toBe(2);
+        expect(filter.operands[0].operands[0].type).toBe("$not");
+        expect(filter.operands[0].operands[0].operand.type).toBe("$eq");
+        expect(filter.operands[0].operands[1].type).toBe("$in");
       });
 
     }); // #create

@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 define([
-  "./AbstractTreeFilter",
+  "./AbstractFilter",
+  "../../util/object",
+  "../../lang/ArgumentRequiredError",
   "./_toSpec"
-], function(AbstractTreeFilter, _toSpec) {
+], function(AbstractFilter, O, ArgumentRequiredError, _toSpec) {
   "use strict";
 
   /**
@@ -55,7 +57,13 @@ define([
    *  var data = filter.apply(data); //data.getValue(0, 0) === ["B", "D", "E", "F", "G"]
    * });
    */
-  var NotFilter = AbstractTreeFilter.extend("pentaho.data.filter.Not", /** @lends pentaho.data.filter.Not# */{
+  var NotFilter = AbstractFilter.extend("pentaho.data.filter.Not", /** @lends pentaho.data.filter.Not# */{
+
+    constructor: function(operand) {
+      if(!operand) throw new ArgumentRequiredError("operand");
+
+      O.setConst(this, "operand", operand);
+    },
 
     /**
      * @inheritdoc
@@ -66,34 +74,22 @@ define([
     /**
      * @inheritdoc
      */
-    insert: function(element) {
-      this._children = [element];
-      return this;
-    },
-
-    /**
-     * @inheritdoc
-     */
     contains: function(entry) {
-      if(this.children && this.children.length === 1) {
-        return !this.children[0].contains(entry);
-      } else {
-        throw Error("Poop");
-      }
+      return !this.operand.contains(entry);
     },
 
     /**
      * @inheritdoc
      */
     invert: function() {
-      return this.children[0];
+      return this.operand;
     },
 
     /**
      * @inheritdoc
      */
-    toSpec: function(){
-      return _toSpec(this.type, this._children.length ? this.children[0].toSpec() :  null);
+    toSpec: function() {
+      return _toSpec(this.type, this.operand.toSpec());
     }
   });
 
