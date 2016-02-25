@@ -739,7 +739,7 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
             }
           }
 
-          if (!value || value == "" || value == "null") {
+          if (param.list && (!value || value == "" || value == "null")) {
             if (!this.nullValueParams) {
               this.nullValueParams = [];
             }
