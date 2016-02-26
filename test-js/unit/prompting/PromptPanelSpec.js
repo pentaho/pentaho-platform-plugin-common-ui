@@ -394,7 +394,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
         expect(parameterChangedSpyGeneric).toHaveBeenCalled();
       });
 
-      describe("parameterChanged", function(){
+      describe("parameterChanged", function() {
         var param;
         var name;
         beforeEach(function() {
@@ -403,44 +403,90 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
           spyOn(panel, "_setTimeoutRefreshPrompt");
         });
 
-        it("should not fill nullValueParams for single components (Text Area, Text Box, etc.) with null values", function() {
-          param.list = false; // means that it is single component
+        describe("for single components (Text Area, Text Box, etc.)", function() {
+          beforeEach(function() {
+            param.list = false; // means that it is single component
+          });
 
-          panel.parameterChanged(param, name);
-          expect(panel.nullValueParams).toBeUndefined();
-          expect(panel.parametersChanged).toBeTruthy();
-          expect(panel._setTimeoutRefreshPrompt).toHaveBeenCalled();
+          var assertForSingleComponents = function() {
+            expect(panel.nullValueParams).toBeUndefined();
+            expect(panel.parametersChanged).toBeTruthy();
+            expect(panel._setTimeoutRefreshPrompt).toHaveBeenCalled();
+          };
+
+          it("should not fill nullValueParams with undefined value", function() {
+            panel.parameterChanged(param, name);
+            assertForSingleComponents();
+          });
+
+          it("should not fill nullValueParams with null value", function() {
+            var value = null;
+            panel.parameterChanged(param, name, value);
+            assertForSingleComponents();
+          });
+
+          it("should not fill nullValueParams with \"null\" value", function() {
+            var value = "null";
+            panel.parameterChanged(param, name, value);
+            assertForSingleComponents();
+          });
+
+          it("should not fill nullValueParams with \"\" value", function() {
+            var value = "";
+            panel.parameterChanged(param, name, value);
+            assertForSingleComponents();
+          });
+
+          it("should not fill nullValueParams with not empty value", function() {
+            var value = "value";
+            panel.parameterChanged(param, name, value);
+            assertForSingleComponents();
+          });
         });
 
-        it("should not fill nullValueParams for single components (Text Area, Text Box, etc.) with not null values", function() {
-          param.list = false; // means that it is single component
-          var value = "value"
+        describe("for multi components (Multi Selection Button, Drop Down, etc.)", function() {
+          beforeEach(function() {
+            param.list = true; // means that it is multi component
+          });
 
-          panel.parameterChanged(param, name);
-          expect(panel.nullValueParams).toBeUndefined();
-          expect(panel.parametersChanged).toBeTruthy();
-          expect(panel._setTimeoutRefreshPrompt).toHaveBeenCalled();
-        });
+          var assertForMultiComponents = function() {
+            expect(panel.nullValueParams).toBeDefined();
+            expect(panel.nullValueParams.length).toBe(1);
+            expect(panel.nullValueParams[0]).toBe(param);
+            expect(panel.parametersChanged).toBeTruthy();
+            expect(panel._setTimeoutRefreshPrompt).toHaveBeenCalled();
+          };
 
-        it("should fill nullValueParams for multi components (Multi Selection Button, Drop Down, etc.) with null values", function() {
-          param.list = true; // means that it is multi component
+          it("should fill nullValueParams with undefined value", function() {
+            panel.parameterChanged(param, name);
+            assertForMultiComponents();
+          });
 
-          panel.parameterChanged(param, name);
-          expect(panel.nullValueParams).toBeDefined();
-          expect(panel.nullValueParams.length).toBe(1);
-          expect(panel.nullValueParams[0]).toBe(param);
-          expect(panel.parametersChanged).toBeTruthy();
-          expect(panel._setTimeoutRefreshPrompt).toHaveBeenCalled();
-        });
+          it("should fill nullValueParams with null value", function() {
+            var value = null;
+            panel.parameterChanged(param, name, value);
+            assertForMultiComponents();
+          });
 
-        it("should not fill nullValueParams for multi components (Multi Selection Button, Drop Down, etc.) with not null values", function() {
-          param.list = true; // means that it is multi component
-          var value = "value";
+          it("should fill nullValueParams with \"null\" value", function() {
+            var value = "null";
+            panel.parameterChanged(param, name, value);
+            assertForMultiComponents();
+          });
 
-          panel.parameterChanged(param, name, value);
-          expect(panel.nullValueParams).toBeUndefined();
-          expect(panel.parametersChanged).toBeTruthy();
-          expect(panel._setTimeoutRefreshPrompt).toHaveBeenCalled();
+          it("should fill nullValueParams with \"\" value", function() {
+            var value = "";
+            panel.parameterChanged(param, name, value);
+            assertForMultiComponents();
+          });
+
+          it("should not fill nullValueParams with not empty value", function() {
+            var value = "value";
+            panel.parameterChanged(param, name, value);
+            expect(panel.nullValueParams).toBeUndefined();
+            expect(panel.parametersChanged).toBeTruthy();
+            expect(panel._setTimeoutRefreshPrompt).toHaveBeenCalled();
+          });
         });
       });
 
