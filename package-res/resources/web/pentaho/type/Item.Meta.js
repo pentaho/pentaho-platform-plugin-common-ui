@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 define([
+  "require",
   "../i18n!types",
   "../lang/Base",
   "../lang/_AnnotatableLinked",
@@ -21,7 +22,7 @@ define([
   "../util/arg",
   "../util/object",
   "../util/promise"
-], function(bundle, Base, AnnotatableLinked, error, arg, O, promiseUtil) {
+], function(localRequire, bundle, Base, AnnotatableLinked, error, arg, O, promiseUtil) {
   "use strict";
 
   // Unique item class id exposed through Item.Meta#uid and used by Context instances.
@@ -639,7 +640,7 @@ define([
      */
     get viewClass() {
       var view = this._view;
-      return view && (view.promise || (view.promise = promiseUtil.require(view.value)));
+      return view && (view.promise || (view.promise = promiseUtil.require(view.value, localRequire)));
     },
     //endregion
 

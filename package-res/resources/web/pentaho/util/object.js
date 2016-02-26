@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define(function() {
+define(["pentaho/util/has"], function(has) {
   "use strict";
 
   var O_hasOwn = Object.prototype.hasOwnProperty,
-      A_empty  = [],
-      setProtoOf = Object.setPrototypeOf || ({}.__proto__ ? setProtoProp : setProtoCopy);
+    A_empty  = [],
+    setProtoOf = has["Object.setPrototypeOf"] ? Object.setPrototypeOf : (has["Object.prototype.__proto__"] ? setProtoProp : setProtoCopy);
 
   /**
    * The `object` namespace contains functions for
