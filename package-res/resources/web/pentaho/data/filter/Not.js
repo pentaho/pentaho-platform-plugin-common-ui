@@ -17,23 +17,25 @@ define([
   "./AbstractFilter",
   "../../util/object",
   "../../lang/ArgumentRequiredError",
+  "./_apply",
   "./_toSpec"
-], function(AbstractFilter, O, ArgumentRequiredError, _toSpec) {
+], function(AbstractFilter, O, ArgumentRequiredError, _apply, _toSpec) {
   "use strict";
 
   /**
    * @name Not
    * @memberOf pentaho.data.filter
    * @class
-   * @abstract
+   * @throws {pentaho.lang.ArgumentRequiredError} When `operand` is not specified.
+   * @extends pentaho.data.filter.AbstractFilter
    * @amd pentaho/data/filter/Not
    *
    * @classdesc The `Not` class implements a type of AbstractTreeFilter {@link pentaho.data.filter.AbstractTreeFilter}.
    *
    * @example
-   * <caption> Create a new <code>Not</code> filter.
+   * <caption> Create a new <code>Not</code> filter.</caption>
    *
-   * require(["pentaho/data/Table", "pentaho/data/filter/IsIn", "pentaho/data/filter/IsEqual", "pentaho/data/filter/Not"], function(Table, IsIn, IsEqual, Not) {
+   * require(["pentaho/data/Table", "pentaho/data/filter/IsEqual", "pentaho/data/filter/Not"], function(Table, IsEqual, Not) {
    *   var data = new Table({
    *     model: [
    *       {name: "product", type: "string", label: "Product"},
@@ -52,10 +54,17 @@ define([
    *   });
    *
    *
-   *  var sales12k = new Filter.IsEqual("sales", 12000);
-   *  var filter = new Filter.Not(sales12k);
-   *  var data = filter.apply(data); //data.getValue(0, 0) === ["B", "D", "E", "F", "G"]
+   *  var sales12k = new IsEqual("sales", 12000);
+   *  var inStock = new IsEqual("inStock", true);
+   *  var filter = new Not(sales12k);
+   *  filter.and(inStock);
+   *  var data = filter.apply(data); //data.getValue(0, 0) === "B"
    * });
+   *
+   * @description Creates a `Not` filter given an `AbstractPropertyFilter` {@link pentaho.data.filter.AbstractPropertyFilter}.
+   *
+   * @param {pentaho.data.filter.AbstractPropertyFilter} operand The operand to filter by.
+   *
    */
   var NotFilter = AbstractFilter.extend("pentaho.data.filter.Not", /** @lends pentaho.data.filter.Not# */{
 
@@ -92,6 +101,19 @@ define([
      */
     toSpec: function() {
       return _toSpec(this._op, this.operand.toSpec());
+    },
+
+    /**
+     * Applies the filters to a data table {@link pentaho.data.Table}
+     *
+     * @name pentaho.data.filter.Not#apply
+     * @method
+     * @abstract
+     * @param {pentaho.data.Table} dataTable The data table to filter
+     * @returns {pentaho.data.TableView} The data table view of the restricted data set.
+     */
+    apply: function(dataTable) {
+      return _apply(this, dataTable);
     }
   });
 

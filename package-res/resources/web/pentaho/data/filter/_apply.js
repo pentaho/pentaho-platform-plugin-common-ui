@@ -13,17 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define([], function() {
+define([
+  "./_Element",
+  "../TableView"
+], function(Element, TableView) {
   "use strict";
-  return toSpec;
+  return apply;
 
-  function toSpec(property, value) {
-    if(value == null || property == null)
-      return null;
+  function apply(filter, dataTable) {
+    var nRows = dataTable.getNumberOfRows();
+    var filteredRows = [];
 
-    var spec = {};
-    spec[property] = value;
-    return spec;
+    for(var k = 0; k < nRows; k++) {
+      if(filter.contains(new Element(dataTable, k))) {
+        filteredRows.push(k);
+      }
+    }
+
+    var dataView = new TableView(dataTable);
+    dataView.setSourceRows(filteredRows);
+    return dataView;
   }
 
 });

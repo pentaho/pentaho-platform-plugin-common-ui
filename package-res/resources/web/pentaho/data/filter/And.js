@@ -24,13 +24,13 @@ define([
    * @name And
    * @memberOf pentaho.data.filter
    * @class
-   * @abstract
+   * @extends pentaho.data.filter.AbstractTreeFilter
    * @amd pentaho/data/filter/And
    *
    * @classdesc The `And` class implements a type of AbstractTreeFilter {@link pentaho.data.filter.AbstractTreeFilter}.
    *
    * @example
-   * <caption> Create a new <code>And</code> filter.
+   * <caption> Create a new <code>And</code> filter.</caption>
    *
    * require(["pentaho/data/Table", "pentaho/data/filter/IsIn", "pentaho/data/filter/IsEqual", "pentaho/data/filter/And"], function(Table, IsIn, IsEqual, And) {
    *   var data = new Table({
@@ -53,9 +53,15 @@ define([
    *
    *  var sales12k = new IsIn("sales", [12000]);
    *  var inStock = new IsEqual("inStock", true);
-   *  var combination1 = new And([sales12k, inStock]);
-   *  var data1 = combination1.apply(data); //data1.getValue(0, 0) === "A"
+   *  var filter = new And([sales12k]);
+   *  filter.and(inStock);
+   *  var data = filter.apply(data); //data.getValue(0, 0) === "A"
    * });
+   *
+   * @description Creates an `And` filter that performs the intersection of a list of given `AbstractPropertyFilter`'s {@link pentaho.data.filter.AbstractPropertyFilter}.
+   *
+   * @param {pentaho.data.filter.AbstractPropertyFilter[]} operands The operands to filter by.
+   *
    */
   var And = AbstractTreeFilter.extend("pentaho.data.filter.And", /** @lends pentaho.data.filter.And# */{
 

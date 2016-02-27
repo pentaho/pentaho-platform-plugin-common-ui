@@ -24,13 +24,13 @@ define([
    * @name Or
    * @memberOf pentaho.data.filter
    * @class
-   * @abstract
+   * @extends pentaho.data.filter.AbstractTreeFilter
    * @amd pentaho/data/filter/Or
    *
    * @classdesc The `Or` class implements a type of AbstractTreeFilter {@link pentaho.data.filter.AbstractTreeFilter}.
    *
    * @example
-   * <caption> Create a new <code>Or</code> filter.
+   * <caption> Create a new <code>Or</code> filter.</caption>
    *
    * require(["pentaho/data/Table", "pentaho/data/filter/IsIn", "pentaho/data/filter/IsEqual", "pentaho/data/filter/Or"], function(Table, IsIn, IsEqual, Or) {
    *   var data = new Table({
@@ -50,12 +50,17 @@ define([
    *     ]
    *   });
    *
-   *
-   *  var sales12k = new IsIn("sales", [12000]);
-   *  var inStock = new IsEqual("inStock", true);
-   *  var combination1 = new Or([sales12k, inStock]);
-   *  var data1 = combination1.apply(data); //data1.getValue(0, 0) === ["A", "B", "C"]
+   *   var sales12k = new IsIn("sales", [12000]);
+   *   var inStock = new IsEqual("inStock", true);
+   *   var filter = new Or([sales12k]);
+   *   filter.or(inStock);
+   *   var data = filter.apply(data); //data.getValue(0, 0) === "A", data.getValue(1, 0) === "B", data.getValue(2, 0) === "C"
    * });
+   *
+   * @description Creates an `Or` filter that performs the union of a list of given `AbstractPropertyFilter`'s {@link pentaho.data.filter.AbstractPropertyFilter}.
+   *
+   * @param {pentaho.data.filter.AbstractPropertyFilter[]} operands The operands to filter by.
+   *
    */
   var Or = AbstractTreeFilter.extend("pentaho.data.filter.Or", /** @lends pentaho.data.filter.Or# */{
 

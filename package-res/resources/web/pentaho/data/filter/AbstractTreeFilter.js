@@ -16,19 +16,27 @@
 define([
   "./AbstractFilter",
   "../../lang/ArgumentRequiredError",
+  "./_apply",
   "./_toSpec"
-], function(AbstractFilter, ArgumentRequiredError, toSpec) {
+], function(AbstractFilter, ArgumentRequiredError, _apply, toSpec) {
   "use strict";
 
   /**
    * @name AbstractTreeFilter
    * @memberOf pentaho.data.filter
    * @class
+   * @extends pentaho.data.filter.AbstractFilter
    * @abstract
    * @amd pentaho/data/filter/AbstractTreeFilter
    *
    * @classdesc The `AbstractTreeFilter` class is the abstract base class of
-   * classes that represent a filter.
+   * classes that represent a filter (or a non-leaf node of a tree) that act
+   * upon their operands {@link pentaho.data.filter.AbstractTreeFilter#operands}
+   * and aggregate the outcome of each of those.
+   *
+   * @description The `AbstractTreeFilter` extends the `AbstractFilter`
+   * {@link pentaho.data.filter.AbstractFilter} class to allow creation
+   * of types of filters for a data table.
    *
    * ### Remarks
    *
@@ -37,6 +45,9 @@ define([
    * * {@link pentaho.data.filter.And}
    * * {@link pentaho.data.filter.Or}
    * * {@link pentaho.data.filter.Not}
+   *
+   * @param {pentaho.data.filter.AbstractPropertyFilter[]} operands The operands to to act upon.
+   *
    */
   var AbstractTreeFilter = AbstractFilter.extend("pentaho.data.filter.AbstractTreeFilter", /** @lends pentaho.data.filter.AbstractTreeFilter# */{
     constructor: function(operands) {
@@ -67,6 +78,18 @@ define([
           operands.push(spec);
       }
       return toSpec(this._op, operands.length ? operands : null);
+    },
+
+    /**
+     * Applies the filters to a data table {@link pentaho.data.Table}
+     *
+     * @name pentaho.data.filter.AbstractTreeFilter#apply
+     * @method
+     * @param {pentaho.data.Table} dataTable The data table to filter
+     * @returns {pentaho.data.TableView} The data table view of the restricted data set.
+     */
+    apply: function(dataTable) {
+      return _apply(this, dataTable);
     }
   });
 
