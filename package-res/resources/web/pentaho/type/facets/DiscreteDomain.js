@@ -15,10 +15,12 @@
  */
 define([
   "./Refinement",
-  "../../i18n!types",
+  "../list",
+  "../../i18n!../i18n/types",
   "../../util/error",
-  "../../util/object"
-], function(RefinementFacet, bundle, error, O) {
+  "../../util/object",
+  "../../util/fun"
+], function(RefinementFacet, listFactory, bundle, error, O, fun) {
 
   "use strict";
 
@@ -64,16 +66,148 @@ define([
      * of the ancestor refinement type.
      */
     get domain() {
-      return this._domain;
+      var domain = O.getOwn(this, "_domain");
+      if(domain === undefined) {
+        // assert !O.hasOwn(this, "_isDomainRoot")
+        var baseDomain;
+        if((baseDomain = this.ancestor._domain)) {
+          var ListType = baseDomain.constructor;
+          var clones = baseDomain.toArray(function(elem) { return elem.clone(); });
+          domain = new ListType(clones);
+        } else {
+          domain = null;
+        }
+
+        this._domain = domain;
+      }
+
+      return domain;
     },
 
-    set domain(value) {
-      var isRoot = O.hasOwn(this, "_isDomainRoot"),
-          localDomain;
+    /**
+     * Refines the current domain with the given domain values.
+     */
+    _refineDomain: function(values) {
+      var domain = this._domain;
+      var ListType = domain ? domain.constructor : this.context.get([this.of]);
+      var valuesDomain = new ListType(values);
+
+      // It's the first domain in the type hierarchy?
+      if(!domain) {
+        this._domain = valuesDomain;
+        return;
+      }
+
+      // Already have a domain.
+      // Is it local or inherited?
+      if(O.hasOwn(this, "_domain")) {
+        this._refineDomainLocal(domain, valuesDomain);
+      } else {
+        this._refineDomainInherited(domain, valuesDomain);
+      }
+    },
+
+    _refineDomainInherited: function(domain, valuesDomain) {
+      // Refining is a mixture of:
+      // * ensuring that every element in values exists in base domain
+      // * cloning the base domain elements that exist and configure them with the new one
+      // * respecting the new order
+
+      // Reuse valuesDomain as the new local list
+      // No notifications needed as this is the initial state of the local domain
+      // (and valuesDomain is still private)
+      var i = valuesDomain.count;
+      while(i--) {
+        var v1 = valuesDomain.at(i);
+
+        // Defined at base domain?
+        var v0 = domain.get(v1.key);
+        if(!v0)
+          throw error.argInvalid("domain", bundle.structured.errors.refinement.domain.notSubsetOfBase);
+
+        // If the two instances are different (the normal case),
+        // the base one is cloned, so that all of its properties are the defaults.
+        // Then, it the clone is configured with the just created `v1`.
+        // Finally, the clone takes the position of v1.
+        if(v0 !== v1) {
+          valuesDomain.removeAt(i, /*silent:*/true);
+          valuesDomain.insert(v0.clone().configure(v1), i, /*silent:*/true);
+        }
+      }
+
+      this._domain = valuesDomain;
+    },
+
+    _refineDomainLocal: function(domain, valuesDomain) {
+      // Refining is a mixture of:
+      // * ensuring that every element in values exists in current domain
+      // * configuring the ones that exist with the new elements?
+      //   * preserves old elements even if the user gives an element directly
+      // * removing the elements of current domain that are not in values
+      // * swapping the order of the ones that exist
+      var scope = domain.changeScope();
+      try {
+        // Validate existence and configure existing
+        var i = valuesDomain.count;
+        while(i--) {
+          var v1 = valuesDomain.at(i);
+          var v0 = domain.get(v1.key);
+
+          // Not defined at the current domain?
+          if(!v0)
+            throw error.argInvalid("domain", bundle.structured.errors.refinement.domain.notSubsetOfBase);
+
+          // If the two instances are different (the normal case)
+          if(v1 !== v0) {
+            // v0 is preserved and configured with v1
+            v0.configure(v1);
+          }
+        }
+
+        // Remove ones that are not in valuesDomain
+        // Traversing forward, generates a single change set for contiguous removed elements.
+        var C = domain.count;
+        i = -1;
+        while(++i < C) {
+          if(!valuesDomain.get(domain.at(i).key)) {
+            domain.removeAt(i);
+            i--;
+            C--;
+          }
+        }
+
+        // Reorder
+        // Sort one based on the other...
+        domain.sort(function(a, b) {
+          var va = valuesDomain.get(a.key);
+          var vb = valuesDomain.get(b.key);
+          return fun.compare(valuesDomain.indexOf(va), valuesDomain.indexOf(vb));
+        });
+
+      } finally {
+        scope.dispose();
+      }
+    },
+
+    _configureDomain: function(config) {
+      var domain = this.domain;
+      O.eachOwn(config, function(v, key) {
+        var elem = domain.get(key);
+        if(!elem) throw error.argInvalid("domain", "An element with key '" +  key + "' is not defined.");
+        elem.configure(v);
+      });
+    },
+
+    /**
+     * Sets or configures the domain.
+     * @ignore
+     */
+    set domain(values) {
+      var isRoot = O.hasOwn(this, "_isDomainRoot");
 
       // TODO: Either ancestors should be locked when deriving,
       //  or direct changes to domain should propagate downwards...
-      if(value == null) {
+      if(values == null) {
         if(!isRoot) {
           // Inherit base list.
           delete this._domain;
@@ -82,43 +216,20 @@ define([
         }
 
         // At the root, resetting is setting to null.
-        localDomain = null;
+        this._domain = null;
+
+      } else if(Array.isArray(values) || (values instanceof this.context.get(listFactory))) {
+        // Array.<OfElement> | List.<OfElement>
+        this._refineDomain(values);
+      } else if(values.constructor === Object) {
+        this._configureDomain(values);
       } else {
-        // An Array, a List, ...
-
-        // Convert value to ListType.
-        // A list of the refines type.
-        var ListType = this.context.get([this.of]);
-        localDomain = new ListType(value);
-
-        if(!isRoot) {
-          var baseDomain = this.ancestor._domain;
-          if(baseDomain) {
-            // Validate that all elements exist in the base domain
-            var i = localDomain.count, v0, v1;
-            while(i--) {
-              v1 = localDomain.at(i);
-              v0 = baseDomain.get(v1.key);
-              if(!v0)
-                throw error.argInvalid("domain", bundle.structured.errors.refinement.domain.notSubsetOfBase);
-
-              // Prefer using the base instances.
-              if(v0 !== v1) {
-                // TODO: Should be a single replace operation...
-                localDomain.removeAt(i);
-                localDomain.insert(v0, i);
-              }
-            }
-          }
-        }
+        throw error.argInvalidType("domain", ["Array", "pentaho.type.List", "Object"], typeof values);
       }
-
-      // May be an empty list.
-      this._domain = localDomain;
     }
   }, {
     validate: function(value) {
-      var domain = this.domain;
+      var domain = this._domain;
       if(domain && !domain.has(value.key))
         return new Error(bundle.structured.errors.value.notInDomain);
       return null;

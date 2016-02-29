@@ -198,7 +198,7 @@ define([
      *         label: "Positive number",
      *
      *         // Mixin desired refinement facets
-     *         facets: ["ordinalDomain"],
+     *         facets: ["OrdinalDomain"],
      *
      *         // Configure facet attributes
      *         min: 0,
@@ -240,7 +240,7 @@ define([
      *             type: {
      *               base:   "refinement",
      *               of:     "number",
-     *               facets: ["ordinalDomain"],
+     *               facets: ["OrdinalDomain"],
      *               min:    0
      *             },
      *             required: true
