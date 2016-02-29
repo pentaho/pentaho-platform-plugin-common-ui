@@ -192,23 +192,53 @@
   requirePaths["common-ui/angular-directives"] = basePath + "/angular-directives";
   requireShim ["common-ui/angular-directives"] = ["common-ui/angular-ui-bootstrap"];
 
-  // CCC Theme
-  requireMap["*"]["pentaho/visual/ccc/abstract/themes"] =
-    "pentaho/visual/ccc/abstract/themes/" +
-    (["myfootheme"].indexOf(active_theme) < 0 ? "default" : active_theme);
-
   // Visualizations Packages
-  function registerVizPackage(name) {
-    requireCfg.packages.push({
-      "name": name,
-      "main": "model"
-    });
 
-    requireService[name] = "pentaho/type/base";
+  function mapTheme(mid, themes) {
+    var theme = (typeof active_theme !== "undefined") ? active_theme : null;
+    if(!theme || themes.indexOf(theme) < 0) theme = themes[0];
+
+    requireMap["*"][mid + "/theme"] = mid + "/themes/" + theme;
   }
 
-  registerVizPackage("pentaho/visual/base");
-  registerVizPackage("pentaho/visual/ccc/abstract");
-  registerVizPackage("pentaho/visual/ccc/bar");
+  function registerVizPackage(name) {
+    requireCfg.packages.push({"name": name, "main": "model"});
+
+    requireService[name] = "pentaho/type/value";
+  }
+
+  // CCC Theme
+  mapTheme("pentaho/visual/ccc/abstract", ["default"]);
+
+  // sample/calc theme
+  mapTheme("pentaho/visual/samples/calc", ["crystal"]);
+
+  [
+    // base visual
+    "pentaho/visual/base",
+
+    // calc viz
+    "pentaho/visual/samples/calc",
+
+    // ccc vizs
+    "pentaho/visual/ccc/abstract",
+    "pentaho/visual/ccc/cartesianAbstract",
+    "pentaho/visual/ccc/categoricalContinuousAbstract",
+    "pentaho/visual/ccc/barAbstract",
+    "pentaho/visual/ccc/barNormalizedAbstract",
+    "pentaho/visual/ccc/barHorizontal",
+    "pentaho/visual/ccc/bar",
+    "pentaho/visual/ccc/barStacked",
+    "pentaho/visual/ccc/barStackedHorizontal",
+    "pentaho/visual/ccc/barNormalized",
+    "pentaho/visual/ccc/barNormalizedHorizontal",
+    "pentaho/visual/ccc/barLine",
+    "pentaho/visual/ccc/line",
+    "pentaho/visual/ccc/metricDot",
+    "pentaho/visual/ccc/areaStacked",
+    "pentaho/visual/ccc/pie",
+    "pentaho/visual/ccc/heatGrid",
+    "pentaho/visual/ccc/sunburst"
+  ].forEach(registerVizPackage);
 
 }());
