@@ -558,8 +558,10 @@ define([
         defineTempModule("pentaho/foo/dudu1");
         defineTempModule("pentaho/foo/dudu2");
         defineTempModule("pentaho/foo/dudu3");
+        defineTempModule("pentaho/foo/dudu4");
         defineTempFacet("pentaho/foo/facets/Mixin1");
         defineTempFacet("pentaho/foo/facets/Mixin2");
+        defineTempFacet("pentaho/foo/facets/Mixin3");
         // -----
 
         var context = new Context();
@@ -576,6 +578,15 @@ define([
               base: "refinement",
               of: "pentaho/foo/dudu3",
               facets: ["pentaho/foo/facets/Mixin1", "pentaho/foo/facets/Mixin2", "DiscreteDomain", RefinementMixin2]
+            }},
+            {name: "foo7", type: {props: {
+              a: {type: "pentaho/foo/dudu4"},
+              b: {type: "pentaho/foo/dudu3"}
+            }}},
+            {name: "foo8", type: {
+              base: "refinement",
+              of: "string",
+              facets: "pentaho/foo/facets/Mixin3"
             }}
           ]
         };
@@ -585,12 +596,16 @@ define([
               expect(Type.meta.get("foo1").type.id).toBe("pentaho/foo/dudu1");
               expect(Type.meta.get("foo2").type.ancestor.id).toBe("pentaho/foo/dudu2");
               expect(Type.meta.get("foo3").type.of.id).toBe("pentaho/foo/dudu3");
+              expect(Type.meta.get("foo7").type.get("a").type.id).toBe("pentaho/foo/dudu4");
+              expect(Type.meta.get("foo8").type.facets[0]).toBe(require("pentaho/foo/facets/Mixin3"));
 
               require.undef("pentaho/foo/dudu1");
               require.undef("pentaho/foo/dudu2");
               require.undef("pentaho/foo/dudu3");
+              require.undef("pentaho/foo/dudu4");
               require.undef("pentaho/foo/facets/Mixin1");
               require.undef("pentaho/foo/facets/Mixin2");
+              require.undef("pentaho/foo/facets/Mixin3");
             });
       }));
 
@@ -598,7 +613,6 @@ define([
       // should throw when sync and the requested module is not yet loaded
       // should not throw when async and the requested module is not defined
       // should not throw when async and the requested module is not yet loaded
-      // should get a Type given an arbitrary instance ?
     }); // #get
 
     describe("#getAllAsync(baseTypeId, ka)", function() {
