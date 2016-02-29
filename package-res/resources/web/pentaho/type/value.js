@@ -48,6 +48,7 @@ define([
      * @abstract
      * @class
      * @extends pentaho.type.Item
+     * @implements pentaho.lang.IConfigurable
      * @amd pentaho/type/value
      *
      * @classDesc A Value is an abstract class used as a base implementation and unifying type. </br>
@@ -141,6 +142,32 @@ define([
       validate: function() {
         return valueHelper.normalizeErrors(this.meta._validate(this));
       },
+      //endregion
+
+      //region configuration
+      /**
+       * Configures this value with a given configuration.
+       * @param {?any} config The configuration.
+       * @return {!pentaho.type.Value} This instance.
+       */
+      configure: function(config) {
+        if(config != null) this._configure(config);
+        return this;
+      },
+
+      /**
+       * Configures this value with a given _non-nully_ configuration.
+       *
+       * The default implementation does nothing.
+       *
+       * @param {any} config The configuration.
+       * @protected
+       * @overridable
+       */
+      _configure: function(config) {
+        // Nothing configurable at this level
+      },
+      //endregion
 
       /**
        * Gets the type of this instance.
