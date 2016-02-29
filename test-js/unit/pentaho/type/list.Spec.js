@@ -18,8 +18,9 @@ define([
   "pentaho/type/list",
   "pentaho/type/value",
   "pentaho/type/number",
+  "pentaho/util/fun",
   "tests/pentaho/util/errorMatch"
-], function(Context, listFactory, valueFactory, numberFactory, errorMatch) {
+], function(Context, listFactory, valueFactory, numberFactory, fun, errorMatch) {
 
   "use strict";
 
@@ -903,7 +904,7 @@ define([
       });
     }); // remove
 
-    describe("#removeAt(start, count) -", function() {
+    describe("#removeAt(start, count[, silent]) -", function() {
       it("should remove the element at the given in-range index when count is 1", function() {
         var list = new NumberList([1, 2, 3, 4]);
         expect(list.count).toBe(4);
@@ -1140,6 +1141,23 @@ define([
         expect(array[0]).toBe(list.at(0));
         expect(array[1]).toBe(list.at(1));
         expect(array[2]).toBe(list.at(2));
+      });
+    });
+
+    describe("#sort(comparer[, silent]) -", function() {
+      it("should sort the list", function() {
+        var list = new NumberList([4, 2, 1, 3]);
+
+        list.sort(fun.compare);
+
+        // ----
+
+        expect(list.count).toBe(4);
+
+        expect(list.at(0).value).toBe(1);
+        expect(list.at(1).value).toBe(2);
+        expect(list.at(2).value).toBe(3);
+        expect(list.at(3).value).toBe(4);
       });
     });
     //endregion
