@@ -27,7 +27,7 @@ define([
    * @extends pentaho.data.filter.AbstractTreeFilter
    * @amd pentaho/data/filter/And
    *
-   * @classdesc The `And` class implements a type of AbstractTreeFilter {@link pentaho.data.filter.AbstractTreeFilter}.
+   * @classdesc A filter that implements the intersection of list of filters, each of which defines a set.
    *
    * @example
    * <caption> Create a new <code>And</code> filter.</caption>
@@ -53,8 +53,9 @@ define([
    *
    *  var sales12k = new IsIn("sales", [12000]);
    *  var inStock = new IsEqual("inStock", true);
-   *  var filter = new And([sales12k]);
-   *  filter.and(inStock);
+   *  var product = new IsIn("product", ["A"]);
+   *  var filter = new And([sales12k, inStock]);
+   *  filter.and(product);
    *  var data = filter.apply(data); //data.getValue(0, 0) === "A"
    * });
    *

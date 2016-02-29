@@ -30,7 +30,7 @@ define([
    * @extends pentaho.data.filter.AbstractFilter
    * @amd pentaho/data/filter/Not
    *
-   * @classdesc The `Not` class implements a type of AbstractTreeFilter {@link pentaho.data.filter.AbstractTreeFilter}.
+   * @classdesc A filter that implements the inversion of list of filters, each of which defines a set.
    *
    * @example
    * <caption> Create a new <code>Not</code> filter.</caption>

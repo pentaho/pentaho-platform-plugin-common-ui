@@ -27,7 +27,7 @@ define([
    * @extends pentaho.data.filter.AbstractTreeFilter
    * @amd pentaho/data/filter/Or
    *
-   * @classdesc The `Or` class implements a type of AbstractTreeFilter {@link pentaho.data.filter.AbstractTreeFilter}.
+   * @classdesc A filter that implements the union of list of filters, each of which defines a set.
    *
    * @example
    * <caption> Create a new <code>Or</code> filter.</caption>

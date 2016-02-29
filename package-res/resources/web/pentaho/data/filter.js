@@ -25,15 +25,10 @@ define([
   /**
    * @name RootFilter
    * @memberOf pentaho.data.filter
+   * @extends pentaho.data.filter.Or
    * @class
    * @ignore
-   *
-   * @classdesc The `RootFilter` class implements a type of
-   * `AbstractTreeFilter` {@link pentaho.data.filter.AbstractTreeFilter}. Specifically
-   * the `RootFilter` extends the `RootFilter` {@link pentaho.data.filter.Or} filter.
-   *
-   * @description Creates a `RootFilter` filter that performs the union of a list of given `AbstractPropertyFilter`'s {@link pentaho.data.filter.AbstractPropertyFilter}.
-   *
+   * 
    * @param {Object} filterSpec The specification of a Filter.
    *
    */
@@ -52,14 +47,13 @@ define([
    * @class
    * @amd pentaho/data/Filter
    *
-   * @classdesc The `Filter` class provides factory methods for building the following filters:
+   * @classdesc The `Filter` class exports a static create function that is a factory of filters:
    *
    * * {@link pentaho.data.filter.IsEqual}
    * * {@link pentaho.data.filter.IsIn}
    * * {@link pentaho.data.filter.Or}
    * * {@link pentaho.data.filter.And}
    * * {@link pentaho.data.filter.Not}
-   * * {@link pentaho.data.filter.RootFilter}
    *
    * @example
    * <caption> Use the available `Filter` factories.</caption>
@@ -103,8 +97,6 @@ define([
    *   var filteredDataFromSpec = filterFromSpec.apply(data); //filteredDataFromSpec.getValue(0, 0) === "A", filteredDataFromSpec.getValue(1, 0) === "B", filteredDataFromSpec.getValue(2, 0) === "D", filteredDataFromSpec.getValue(3, 0) === "E", filteredDataFromSpec.getValue(4, 0) === "F", filteredDataFromSpec.getValue(5, 0) === "G"
    * });
    *
-   * @description The `Filter` class is a set of factories for building filters.
-   *
    */
   return {
     // Leaf nodes
@@ -118,7 +110,7 @@ define([
 
     /**
      * Create a filter from a spec
-     * @param {Object} spec - Specification of a Filter
+     * @param {pentaho.data.filter.Or} spec - Specification of a Filter
      * @returns {*}
      */
     create: function (spec) {

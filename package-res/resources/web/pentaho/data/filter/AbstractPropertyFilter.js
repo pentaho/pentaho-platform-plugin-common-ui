@@ -58,8 +58,7 @@ define([
     },
 
     /**
-     * The operation used during the comparison process of the data table's
-     * {@link pentaho.data.Table} candidate value for the given property.
+     * The comparative operation used to filter data at each leaf node.
      *
      * @name pentaho.data.filter.AbstractPropertyFilter#_operation
      * @method
@@ -94,7 +93,7 @@ define([
     },
 
     /**
-     * Applies the filters to a data table {@link pentaho.data.Table}
+     * Returns the subset of data that matches this filter.
      *
      * @name pentaho.data.filter.AbstractPropertyFilter#apply
      * @method

@@ -26,7 +26,7 @@ define([
    * @extends pentaho.data.filter.AbstractPropertyFilter
    * @amd pentaho/data/filter/IsIn
    *
-   * @classdesc The `IsIn` class implements a type of filter for a data table {@link pentaho.data.Table}.
+   * @classdesc A filter that defines the set of items in which the value of a property belongs to a particular set.
    *
    * @example
    * <caption> Create a new <code>IsIn</code> filter.</caption>
@@ -53,7 +53,7 @@ define([
    *   var filteredData = filter.apply(data); //filteredData.getValue(0, 0) === "A"
    * });
    *
-   * @description Creates an IsIn filter given a property name and an array of values to be contained in the set.
+   * @description Creates an `IsIn` filter given a property name and an array of values that define the set of admissible values.
    *
    * @param {string} property The name of the property
    * @param {Object[]} value The array of values that belong to the set

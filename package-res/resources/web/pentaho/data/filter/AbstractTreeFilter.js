@@ -29,22 +29,13 @@ define([
    * @abstract
    * @amd pentaho/data/filter/AbstractTreeFilter
    *
-   * @classdesc The `AbstractTreeFilter` class is the abstract base class of
-   * classes that represent a filter (or a non-leaf node of a tree) that act
-   * upon their operands {@link pentaho.data.filter.AbstractTreeFilter#operands}
-   * and aggregate the outcome of each of those.
-   *
-   * @description The `AbstractTreeFilter` extends the `AbstractFilter`
-   * {@link pentaho.data.filter.AbstractFilter} class to allow creation
-   * of types of filters for a data table.
-   *
-   * ### Remarks
-   *
-   * The following derived classes are not abstract and can be used directly:
+   * @classdesc The abstract base class for filters that aggregate the outcome of other filters.
+   * Example subclasses include:
    *
    * * {@link pentaho.data.filter.And}
    * * {@link pentaho.data.filter.Or}
-   * * {@link pentaho.data.filter.Not}
+   *
+   * @description Creates a filter that combines a list of filters.
    *
    * @param {pentaho.data.filter.AbstractPropertyFilter[]} operands The operands to to act upon.
    *
@@ -81,7 +72,7 @@ define([
     },
 
     /**
-     * Applies the filters to a data table {@link pentaho.data.Table}
+     * Returns the subset of data that matches this filter.
      *
      * @name pentaho.data.filter.AbstractTreeFilter#apply
      * @method

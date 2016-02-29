@@ -15,8 +15,6 @@
  */
 define([
   "../../lang/Base",
-  "./_Element",
-  "../TableView",
   "../../util/arg",
   "require"
   //"./Or",
@@ -33,29 +31,21 @@ define([
    * @abstract
    * @amd pentaho/data/filter/AbstractFilter
    *
-   * @classdesc This tree structure acts as a filter for a data set and is made up of:
+   * @classdesc The (abstract) base class for filters that represent subsets of a particular {@link pentaho.data.Table} object.
+   * A filter is an intensional representation of a subset of items in a collection.
    *
-   * * Non-leaf nodes
-   * * Leaf nodes
-   *
-   * Each non-leaf node can be seen as a filter that acts upon its leaf nodes
-   * (the atomic predicates of the filtering) and aggregates the outcomes of each. In this
-   * way the structure is able to provide an intensional representation of a selection of
-   * the given data set.
-   *
-   * @description The `AbstractFilter` class is the abstract base class of
-   * classes that represent a data set filter.
+   * The hierarchy spawned by this base class allows building filters by composition, in the form of a tree of filters.
+   * When filtering a particular item in a data set, the leaf nodes evaluate the data and return a boolean that signals if the item belongs to the set defined by the filter.
+   * Non-leaf nodes act as aggregators of the outcomes of other nodes (leaf or non-leaf).
    *
    * ### Remarks
    *
    * The following derived classes are also abstract and provide the non-leaf and leaf
    * nodes respectively that override and implement the methods necessary for filtering a
-   * data table {@link pentaho.data.Table}.
+   * data format.
    *
    * * {@link pentaho.data.filter.AbstractPropertyFilter}
    * * {@link pentaho.data.filter.AbstractTreeFilter}
-   *
-   * NOTE: Other derived classes could be implemented in order to support filtering of other data formats.
    *
    * NOTE: A filter does not represent projections.
    *
@@ -76,7 +66,6 @@ define([
      * @method
      * @abstract
      * @ignore
-     *
      *
      * @example
      * <caption> Create a new <code>Or</code> filter.</caption>
@@ -185,7 +174,7 @@ define([
     },
 
     /**
-     * Applies the filters to the data
+     * Returns the subset of data that matches this filter.
      *
      * @name pentaho.data.filter.AbstractFilter#apply
      * @method

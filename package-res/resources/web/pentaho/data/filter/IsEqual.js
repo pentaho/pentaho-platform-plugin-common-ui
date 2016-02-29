@@ -25,7 +25,7 @@ define([
    * @extends pentaho.data.filter.AbstractPropertyFilter
    * @amd pentaho/data/filter/IsEqual
    *
-   * @classdesc The `IsEqual` class implements a type of AbstractPropertyFilter {@link pentaho.data.filter.AbstractPropertyFilter}.
+   * @classdesc A filter that defines the set of items having the value of a property equal to a certain value.
    *
    * @example
    * <caption> Create a new <code>IsEqual</code> filter.</caption>
@@ -52,7 +52,7 @@ define([
    *   var filteredData = filter.apply(data); //filteredData.getValue(0, 0) === "A"
    * });
    *
-   * @description Creates an IsEqual filter given a property name and an array of values to be contained in the set.
+   * @description Creates an IsEqual filter given a property name and corresponding value to be contained in the set.
    *
    * @param {string} property The name of the property
    * @param {Object} value The value that belongs to the set

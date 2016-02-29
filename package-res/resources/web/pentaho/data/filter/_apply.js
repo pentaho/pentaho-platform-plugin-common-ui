@@ -24,8 +24,10 @@ define([
     var nRows = dataTable.getNumberOfRows();
     var filteredRows = [];
 
+    var element = new Element(dataTable, null);
     for(var k = 0; k < nRows; k++) {
-      if(filter.contains(new Element(dataTable, k))) {
+      element.rowIdx = k;
+      if(filter.contains(element)) {
         filteredRows.push(k);
       }
     }
