@@ -1,4 +1,4 @@
 define([
-  "css!./type.css"
+  "css!./model.css"
 ], function() {
 });

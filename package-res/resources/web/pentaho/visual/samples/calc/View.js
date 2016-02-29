@@ -5,7 +5,7 @@ define([
 
   "use strict";
 
-  /*global document:true*/
+  /*global document:false*/
 
   /**
    * @name View
@@ -19,12 +19,6 @@ define([
    * @param {pentaho.visual.samples.calc.Model} model The calculator's visualization `Model`.
    */
   return Visual.extend(/** @lends pentaho.visual.samples.calc.View */{
-    /* Base class constructor
-    constructor: function(element, model) {
-      this.element = element;
-      this.model   = model;
-    },
-    */
 
     /** @override */
     _init: function() {
@@ -37,7 +31,7 @@ define([
       var result = this._calculate();
       // TODO: format result
 
-      this.numSpan.innerHTML = bundle.get("result", [result]);
+      this._numSpan.innerHTML = bundle.get("result", [result]);
 
       this._resize();
     },
@@ -45,24 +39,24 @@ define([
     /** @override */
     _resize: function(width, height) {
       // Center the span
-      this.numSpan.style.left = ((width  - this.numSpan.offsetWidth ) / 2) + "px";
-      this.numSpan.style.top  = ((height - this.numSpan.offsetHeight) / 2) + "px";
+      this._numSpan.style.left = ((width  - this._numSpan.offsetWidth ) / 2) + "px";
+      this._numSpan.style.top  = ((height - this._numSpan.offsetHeight) / 2) + "px";
     },
 
     /** @override */
     dispose: function() {
       this.base();
 
-      this.numSpan = null;
+      this._numSpan = null;
     },
 
     // ---------
 
     _setupHtmlSpan: function() {
-      this.numSpan = document.createElement("span");
-      this.numSpan.style.fontSize = "42px";
-      this.numSpan.style.position = "relative";
-      this.element.appendChild(this.numSpan);
+      this._numSpan = document.createElement("span");
+      this._numSpan.style.fontSize = "42px";
+      this._numSpan.style.position = "relative";
+      this._element.appendChild(this._numSpan);
     },
 
     _calculate: function() {
@@ -77,19 +71,19 @@ define([
 
       var value = null, vi;
       switch(this.model.getv("operation")) {
-        case "MAX":
+        case "max":
           for(i = 0; i < R; i++)
             if((vi = getValue(i)) != null)
               value = value == null ? vi : Math.max(value, vi);
           break;
 
-        case "MIN":
+        case "min":
           for(i = 0; i < R; i++)
             if((vi = getValue(i)) != null)
               value = value == null ? vi : Math.min(value, vi);
           break;
 
-        case "AVG":
+        case "avg":
           var total = value = 0;
           if(R) {
             for(i = 0; i < R; i++)

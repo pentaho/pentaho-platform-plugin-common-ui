@@ -15,8 +15,8 @@
  */
 define([
   "pentaho/type/Context",
-  "pentaho/visual/samples/calcNew/typeFactory",
-  "pentaho/visual/samples/calcNew/View",
+  "pentaho/visual/samples/calc/model",
+  "pentaho/visual/samples/calc/View",
   "pentaho/data/Table"
 ], function(Context, modelFactory, View, Table) {
 
@@ -43,7 +43,7 @@ define([
     interactive: true,
     data: data,
     measure: "sales",
-    operation: "AVG"
+    operation: "avg"
   });
 
   var view = new View(vizElement, model);
