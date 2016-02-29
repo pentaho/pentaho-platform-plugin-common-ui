@@ -35,7 +35,8 @@ module.exports = function (config) {
     exclude: [
       "dev-res/dojo/dojo-release-1.9.2-src/**/tests/**",
       "build-res/module-scripts/common-ui/**",
-      "package-res/resources/web/test/**"
+      "package-res/resources/web/test/**",
+      "test-js/unit/pentaho/visual/2.5/**"
     ],
 
     // auto run tests when files change

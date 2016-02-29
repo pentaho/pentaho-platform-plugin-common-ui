@@ -34,6 +34,7 @@ module.exports = function (config) {
     exclude: [
       "build-res/module-scripts/common-ui/**",
       "package-res/resources/web/test/**",
+      "test-js/unit/pentaho/visual/2.5/**",
 
       // Exclude all unit tests that require dojo
       "test-js/unit/dojo/**",
