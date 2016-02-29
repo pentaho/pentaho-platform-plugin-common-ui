@@ -158,34 +158,14 @@ define([
       },
 
       /**
-       * Gets the element at a specified index.
+       * Gets the element at a specified index, or `null`.
        *
        * @param {number} index The desired index.
-       * @param {boolean} [lenient=false] Indicates if `null` is returned
-       *   when the specified index is unspecified or out of range, or if, instead, an error is thrown.
-       *
        * @return {?pentaho.type.Element} The element value or `null`.
-       *
-       * @throws {pentaho.lang.ArgumentRangeError} When `lenient` is falsy and the specified `index`
-       * is out of range.
        */
-      at: function(index, lenient) {
-        if(index == null) {
-          if(lenient) return null;
-          throw error.argRequired("index");
-        }
-        return this._elems[index] || (lenient ? null : this._throwOutOfRange(index));
-      },
-
-      /**
-       * Throws an out of range error for a given index.
-       *
-       * @param {number} index The index that is out of range.
-       * @throws {pentaho.lang.ArgumentRangeError} Always.
-       * @private
-       */
-      _throwOutOfRange: function(index) {
-        throw error.argRange("index");
+      at: function(index) {
+        if(index == null) throw error.argRequired("index");
+        return this._elems[index] || null;
       },
 
       /**
