@@ -14,10 +14,22 @@
  * limitations under the License.
  */
 define([
-  "../barNormalizedAbstract/View"
-], function(AbstractNormalizedBarChart) {
+  "../categoricalContinuousAbstract/View"
+], function(AbstractCategoricalContinuousChart) {
 
   "use strict";
 
-  return AbstractNormalizedBarChart.extend();
+  return AbstractCategoricalContinuousChart.extend({
+
+    _cccClass: "StackedAreaChart",
+
+    _options: {
+      axisOffset: 0,
+      tooltipOffset: 15
+    },
+
+    _setNullInterpolationMode: function(options, value) {
+      options.nullInterpolationMode = value;
+    }
+  });
 });

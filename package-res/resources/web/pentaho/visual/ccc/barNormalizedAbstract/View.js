@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
+ * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,32 +14,25 @@
  * limitations under the License.
  */
 define([
-  "pentaho/visual/base/View",
-  "pentaho/i18n!view"
-], function(Visual, bundle) {
+  "../barAbstract/View"
+], function(AbstractBarChart) {
 
   "use strict";
 
-  return Visual.extend({
-    
-    /** @override */
-    _init: function() {
-
+  return AbstractBarChart.extend({
+    _options: {
+      valuesNormalized: true,
+      stacked: true
     },
 
-    /** @override */
-    _render: function() {
+    _configure: function() {
+      this.base();
 
-    },
-
-    /** @override */
-    _resize: function(width, height) {
-
-    },
-
-    /** @override */
-    dispose: function() {
-
+      this.options.orthoAxisTickFormatter = formatTickPercent;
     }
   });
+
+  function formatTickPercent(v) {
+    return v + "%";
+  }
 });

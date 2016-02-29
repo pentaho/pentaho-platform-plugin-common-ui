@@ -20,7 +20,6 @@ define([
 ], function(visualFactory, bundle) {
 
   "use strict";
-
   
   return function(context) {
 

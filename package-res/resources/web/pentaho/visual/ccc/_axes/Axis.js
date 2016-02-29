@@ -25,9 +25,9 @@ define([
             var AxisClass;
 
             switch(axisId) {
-                case 'row':     AxisClass = RowAxis;     break;
-                case 'column':  AxisClass = ColumnAxis;  break;
-                case 'measure': AxisClass = MeasureAxis; break;
+                case "row":     AxisClass = RowAxis;     break;
+                case "column":  AxisClass = ColumnAxis;  break;
+                case "measure": AxisClass = MeasureAxis; break;
                 default: throw new Error("Undefined axis value '" + axisId + "'.");
             }
 

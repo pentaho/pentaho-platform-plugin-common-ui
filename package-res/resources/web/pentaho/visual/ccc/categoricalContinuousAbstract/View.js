@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
+ * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,32 +14,52 @@
  * limitations under the License.
  */
 define([
-  "pentaho/visual/base/View",
-  "pentaho/i18n!view"
-], function(Visual, bundle) {
+  "cdf/lib/CCC/def",
+  "../cartesianAbstract/View"
+], function(def, AbstractCartesianChart) {
 
   "use strict";
 
-  return Visual.extend({
-    
-    /** @override */
-    _init: function() {
+  return AbstractCartesianChart.extend({
+    _genericMeasureCccDimName: "value",
 
+    _options: {
+      panelSizeRatio: 0.8
     },
 
-    /** @override */
-    _render: function() {
-
+    _isAxisTitleVisible: function(type) {
+      return !this._hasMultiChartColumns || type === "ortho";
     },
 
-    /** @override */
-    _resize: function(width, height) {
-
+    _getOrthoAxisTitle: function() {
+      var roleNames = def.getOwn(this._getRolesByCccDimGroup(), this._genericMeasureCccDimName);
+      return roleNames ? this._getMeasureRoleTitle(roleNames[0]) : "";
     },
 
-    /** @override */
-    dispose: function() {
+    _getBaseAxisTitle: function() {
+      var roleNames = this._getRolesByCccDimGroup()["category"];
+      return roleNames ? this._getDiscreteRolesTitle(roleNames) : "";
+    },
 
+    _configure: function() {
+      this.base();
+
+      this._configureAxisRange(/*isPrimary*/true, "ortho");
+
+      if(this.options.orientation === "vertical") {
+        var eps = this.options.extensionPoints;
+        eps.xAxisLabel_textAngle    = -Math.PI/4;
+        eps.xAxisLabel_textAlign    = "right";
+        eps.xAxisLabel_textBaseline = "top";
+      } else {
+        this.options.xAxisPosition = "top";
+      }
+    },
+
+    _configureDisplayUnits: function() {
+      this.base();
+
+      this._configureAxisDisplayUnits(/*isPrimary*/true, "ortho");
     }
   });
 });

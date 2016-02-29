@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
+ * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,32 +14,50 @@
  * limitations under the License.
  */
 define([
-  "pentaho/visual/base/View",
-  "pentaho/i18n!view"
-], function(Visual, bundle) {
+  "../categoricalContinuousAbstract/View"
+], function(AbstractCategoricalContinuousChart) {
 
   "use strict";
 
-  return Visual.extend({
-    
-    /** @override */
-    _init: function() {
+  return AbstractCategoricalContinuousChart.extend({
 
+    _cccClass: "BarChart",
+
+    _configure: function() {
+      this.base();
+
+      var options = this.options;
+      if(options.orientation !== "vertical")
+        options.visualRoles.category = {isReversed: true};
     },
 
-    /** @override */
-    _render: function() {
+    _configureLabelsAnchor: function(options, visualSpec) {
 
-    },
+      options.extensionPoints.label_textMargin = 7;
 
-    /** @override */
-    _resize: function(width, height) {
+      switch(visualSpec.labelsOption) {
+        case "center":
+          options.valuesAnchor = "center";
+          break;
 
-    },
+        case "inside_end":
+          options.valuesAnchor = options.orientation === "horizontal" ? "right" : "top";
+          break;
 
-    /** @override */
-    dispose: function() {
+        case "inside_base":
+          options.valuesAnchor = options.orientation === "horizontal" ? "left" : "bottom";
+          break;
 
+        case "outside_end":
+          if(options.orientation === "horizontal") {
+            options.valuesAnchor = "right";
+            options.extensionPoints.label_textAlign ="left";
+          } else {
+            options.valuesAnchor = "top";
+            options.extensionPoints.label_textBaseline = "bottom";
+          }
+          break;
+      }
     }
   });
 });

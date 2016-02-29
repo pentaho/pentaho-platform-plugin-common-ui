@@ -14,12 +14,12 @@
 * limitations under the License.
 */
 define([
-    "./DiscreteAxis"
+  "./DiscreteAxis"
 ], function(DiscreteAxis) {
 
-    return DiscreteAxis.extend({
-        methods: {
-            defaultRole: 'rows'
-        }
-    });
+  "use strict";
+
+  return DiscreteAxis.extend({
+    defaultRole: "rows"
+  });
 });
