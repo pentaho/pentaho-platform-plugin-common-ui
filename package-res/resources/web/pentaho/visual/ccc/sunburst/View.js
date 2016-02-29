@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,9 @@ define([
   "cdf/lib/CCC/protovis",
   "cdf/lib/CCC/def",
   "../abstract/View",
-  "../util"
-], function(pv, def, AbstractChart, util) {
+  "../util",
+  "pentaho/i18n!../abstract/i18n/view"
+], function(pv, def, AbstractChart, util, bundle) {
 
   "use strict";
 
@@ -57,7 +58,7 @@ define([
           return !util.isNullMember(scene.vars.category.value);
         };
 
-      eps.label_textStyle = drawSpec.labelColor;
+      eps.label_textStyle = this.model.getv("labelColor");
 
       // Determine whether to show values label
       if(drawSpec.labelsOption != "none" && this.axes.measure.boundRoles.size) {
@@ -124,21 +125,24 @@ define([
     _configure: function() {
       this.base();
 
-      this.options.rootCategoryLabel = this._message("chartSunburstRootCategoryLabel");
+      this.options.rootCategoryLabel = bundle.get("sunburst.rootCategoryLabel");
 
       this._configureDisplayUnits();
     },
 
-    _configureLabels: function(options, drawSpec) {
+    _configureLabels: function(options) {
       // Sunburst always shows category labels.
-      options.valuesFont = util.defaultFont(util.readFont(drawSpec, "label"));
-      options.extensionPoints.label_textStyle = drawSpec.labelColor;
+      options.valuesFont = util.defaultFont(util.readFontModel(this.model, "label"));
+      options.extensionPoints.label_textStyle = this.model.getv("labelColor");
     },
 
     _configureDisplayUnits: function() {
-      var scaleFactor = this._parseDisplayUnits(this._drawSpec.displayUnits);
+      var displayUnitsMeta = this.model.meta.get("displayUnits").type;
+      var displayUnits = this.model.getv("displayUnits");
+      var scaleFactor = displayUnitsMeta.scaleFactorOf(displayUnits);
       if(scaleFactor > 1) {
-        var dims = this.options.dimensions, dimSize = dims.size || (dims.size = {});
+        var dims = this.options.dimensions,
+            dimSize = dims.size || (dims.size = {});
 
         // Values returned by the server are already divided by scaleFactor.
         // The formatting, however is that of the original value.

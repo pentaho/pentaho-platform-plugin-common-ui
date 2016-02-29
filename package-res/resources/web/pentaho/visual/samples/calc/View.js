@@ -37,8 +37,10 @@ define([
     },
 
     /** @override */
-    _resize: function(width, height) {
+    _resize: function() {
       // Center the span
+      var width  = this.model.getv("width");
+      var height = this.model.getv("height");
       this._numSpan.style.left = ((width  - this._numSpan.offsetWidth ) / 2) + "px";
       this._numSpan.style.top  = ((height - this._numSpan.offsetHeight) / 2) + "px";
     },

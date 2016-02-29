@@ -27,12 +27,11 @@ define([
    * @name modelFactory
    * @memberOf pentaho.visual.base
    * @type pentaho.type.Factory.<pentaho.visual.base.Model>
-   * @amd pentaho/visual/base/modelFactory
+   * @amd pentaho/visual/base/model
    */
   return function(context) {
 
     var Complex = context.get(complexFactory);
-
 
     /**
      * @name Model

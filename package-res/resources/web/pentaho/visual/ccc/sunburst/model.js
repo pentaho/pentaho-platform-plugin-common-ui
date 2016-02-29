@@ -14,14 +14,30 @@
  * limitations under the License.
  */
 define([
-  "../barAbstract/View"
-], function(AbstractBarChart) {
+  "../abstract/model",
+  "pentaho/i18n!../abstract/i18n/model",
+  "../abstract/types/displayUnits"
+], function(abstractModelFactory, bundle, displayUnitsFactory) {
 
   "use strict";
 
-  return AbstractBarChart.extend({
-    _options: {
-      stacked: true
-    }
-  });
+  return function(context) {
+
+    var Abstract = context.get(abstractModelFactory);
+
+    return Abstract.extend({
+      meta: {
+        id: "pentaho/visual/ccc/sunburst",
+        props: [
+          {
+            name: "displayUnits",
+            type: displayUnitsFactory,
+            required: true,
+            value: "UNITS_0"
+          }
+        ]
+      }
+    })
+    .implement({meta: bundle.structured["sunburst"]});
+  };
 });

@@ -14,14 +14,23 @@
  * limitations under the License.
  */
 define([
-  "../barAbstract/View"
-], function(AbstractBarChart) {
+  "pentaho/i18n!../i18n/model"
+], function(bundle) {
 
   "use strict";
 
-  return AbstractBarChart.extend({
-    _options: {
-      stacked: true
-    }
-  });
+  return function(context) {
+
+    var Refinement = context.get("pentaho/type/refinement");
+
+    return Refinement.extend({
+      meta: {
+        id: "pentaho/visual/ccc/abstract/types/emptyCellMode",
+        of: "string",
+        facets: ["DiscreteDomain"],
+        domain: ["GAP", "LINEAR", "ZERO"]
+      }
+    })
+    .implement({meta: bundle.structured["emptyCellMode"]});
+  };
 });

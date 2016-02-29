@@ -14,21 +14,51 @@
  * limitations under the License.
  */
 define([
-  "pentaho/visual/base/modelFactory",
-  "pentaho/i18n!type"
-  //"./theme/type"
+  "../barAbstract/model",
+  "pentaho/i18n!../abstract/i18n/model",
+  "../abstract/themes"
 ], function(visualFactory, bundle) {
 
   "use strict";
 
-  
   return function(context) {
 
     var Visual = context.get(visualFactory);
 
     return Visual.extend({
+      meta: {
+        id: "pentaho/visual/ccc/x-bar",
+        v2id: "pentaho/visual/ccc/bar",
+
+        props: [
+          //region Trends
+          {
+            id: "trendType",
+            type: {
+              base: "refinement",
+              of: "string",
+              facets: "DiscreteDomain",
+              domain: ["none", "linear"]
+            }
+          },
+          {
+            id: "trendName",
+            type: "string"
+          },
+          {
+            id: "trendLineWidth",
+            type: {
+              base: "refinement",
+              of: "string",
+              facets: "DiscreteDomain",
+              domain: ["1", "2", "3", "4", "5", "6", "7", "8"]
+            }
+          }
+          //endregion
+        ]
+      }
       
     })
-    .implement({meta: bundle.structured});
+    .implement({meta: bundle.structured["bar"]});
   };
 });

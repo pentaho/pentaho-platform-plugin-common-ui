@@ -15,7 +15,8 @@
  */
 define([
   "cdf/lib/CCC/def",
-  "./AbstractAxis"
+  "./AbstractAxis",
+  "pentaho/i18n!../abstract/i18n/view"
 ], function(def, AbstractAxis) {
 
   "use strict";
@@ -99,11 +100,11 @@ define([
               .first();
 
           if(complexInterp)
-            suffix = this.chart._message("chartTooltipGemInterp_" + complexInterp.interpolation);
+            suffix = bundle.get("tooltip.dim.interpolation." + complexInterp.interpolation);
 
         } else if(complex.isTrend) {
           suffix = "(" + this.chart.options.trendLabel + ")";
-          //this.chart._message("chartTooltipGemTrend_" + complex.trendType);
+          //bundle.get("tooltip.dim.interpolation." + complex.trendType);
         }
 
         if(suffix) tooltipLine += " " + suffix;

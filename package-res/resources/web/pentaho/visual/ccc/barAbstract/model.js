@@ -14,20 +14,39 @@
  * limitations under the License.
  */
 define([
-  "pentaho/visual/base/modelFactory",
-  "pentaho/i18n!type"
-  //"./theme/type"
+  "../categoricalContinuousAbstract/model",
+  "pentaho/i18n!../abstract/i18n/model",
+  "../abstract/themes"
 ], function(visualFactory, bundle) {
 
   "use strict";
-  
+
   return function(context) {
 
     var Visual = context.get(visualFactory);
 
     return Visual.extend({
+      meta: {
+        id: "pentaho/visual/ccc/barAbstract",
+        "abstract": true,
+
+        //region Data Label
+        props: [
+          {
+            id: "labelsOption",
+            type: {
+              base: "refinement",
+              of: "string",
+              facets: "DiscreteDomain",
+              domain: ["none", "center", "inside_end", "inside_base"]
+            }
+          }
+        ]
+
+        //endregion
+      }
       
     })
-    .implement({meta: bundle.structured});
+    .implement({meta: bundle.structured["barAbstract"]});
   };
 });

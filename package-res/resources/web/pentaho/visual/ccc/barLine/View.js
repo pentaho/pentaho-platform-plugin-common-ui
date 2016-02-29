@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -116,8 +116,8 @@ define([
       if(lineLabelsAnchor && lineLabelsAnchor !== "none") {
         options.plot2ValuesVisible = true;
         options.plot2ValuesAnchor = lineLabelsAnchor;
-        options.plot2ValuesFont = util.defaultFont(util.readFont(drawSpec, "label"));
-        options.extensionPoints.plot2Label_textStyle = drawSpec.labelColor;
+        options.plot2ValuesFont = util.defaultFont(util.readFontModel(this.model, "label"));
+        options.extensionPoints.plot2Label_textStyle = this.model.getv("labelColor");
       }
     },
 

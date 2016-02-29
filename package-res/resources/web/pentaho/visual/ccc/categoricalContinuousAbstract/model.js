@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 define([
-  "pentaho/visual/base/modelFactory",
-  "pentaho/i18n!type"
-  //"./theme/type"
+  "../cartesianAbstract/model",
+  "pentaho/i18n!../abstract/i18n/model",
+  "../abstract/themes"
 ], function(visualFactory, bundle) {
 
   "use strict";
 
-  
   return function(context) {
 
     var Visual = context.get(visualFactory);
@@ -29,6 +28,6 @@ define([
     return Visual.extend({
       
     })
-    .implement({meta: bundle.structured});
+    .implement({meta: bundle.structured["categoricalContinuousAbstract"]});
   };
 });

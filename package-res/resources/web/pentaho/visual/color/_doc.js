@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2016 Pentaho Corporation.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  */
 
 /**
- * This module defines color-related concepts.
+ * The `color` namespace contains color-related classes and utilites.
  *
- * @module pentaho.visual.color
- * @main pentaho.visual.color
+ * @name pentaho.visual.color
+ * @namespace
  */

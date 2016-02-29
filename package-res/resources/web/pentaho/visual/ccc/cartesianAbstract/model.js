@@ -14,21 +14,45 @@
  * limitations under the License.
  */
 define([
-  "pentaho/visual/base/modelFactory",
-  "pentaho/i18n!type"
-  //"./theme/type"
-], function(visualFactory, bundle) {
+  "../abstract/model",
+  "pentaho/i18n!../abstract/i18n/model",
+  "../abstract/types/displayUnits"
+], function(abstractModelFactory, bundle, displayUnitsFactory) {
 
   "use strict";
 
-  
   return function(context) {
 
-    var Visual = context.get(visualFactory);
+    var Abstract = context.get(abstractModelFactory);
 
-    return Visual.extend({
-      
+    return Abstract.extend({
+      meta: {
+        id: "pentaho/visual/ccc/cartesianAbstract",
+        props: [
+          // Primary axis
+          {name: "autoRange", type: "boolean", value: true},
+          {name: "valueAxisLowerLimit", type: "number"},
+          {name: "valueAxisUpperLimit", type: "number"},
+          {
+            name: "displayUnits",
+            type: displayUnitsFactory,
+            required: true,
+            value: "UNITS_0"
+          },
+
+          // Secondary axis
+          {name: "autoRangeSecondary", type: "boolean", value: true},
+          {name: "valueAxisLowerLimitSecondary", type: "number"},
+          {name: "valueAxisUpperLimitSecondary", type: "number"},
+          {
+            name: "displayUnitsSecondary",
+            type: displayUnitsFactory,
+            required: true,
+            value: "UNITS_0"
+          }
+        ]
+      }
     })
-    .implement({meta: bundle.structured});
+    .implement({meta: bundle.structured["cartesianAbstract"]});
   };
 });
