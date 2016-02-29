@@ -15,10 +15,9 @@
  */
 define([
   "./AbstractFilter",
-  "../../util/object",
   "../../lang/ArgumentRequiredError",
   "./_toSpec"
-], function(AbstractFilter, O, ArgumentRequiredError, toSpec) {
+], function(AbstractFilter, ArgumentRequiredError, toSpec) {
   "use strict";
 
   /**
@@ -41,27 +40,27 @@ define([
    */
   var AbstractTreeFilter = AbstractFilter.extend("pentaho.data.filter.AbstractTreeFilter", /** @lends pentaho.data.filter.AbstractTreeFilter# */{
     constructor: function(operands) {
-      var _operands = (operands instanceof Array) ? operands.slice() : operands ? [operands] : [];
-      O.setConst(this, "_operands", _operands);
+      this.operands = (operands instanceof Array) ? operands.slice() : operands ? [operands] : [];
+      Object.freeze(this);
     },
 
-    get operands(){
-      return this._operands.slice();
-    },
+    operands: null,
 
     /**
      * @inheritdoc
      */
     toSpec: function() {
+      var thisOperands = this.operands;
+      var N = thisOperands.length;
+      if(!N) return null;
+
       var operands = [];
-      if(this.operands.length) {
-        this.operands.forEach(function(operand) {
-          var spec = operand.toSpec();
-          if(spec)
-            operands.push(spec);
-        });
+      for(var k = 0; k < N; k++) {
+        var spec = thisOperands[k].toSpec();
+        if(spec)
+          operands.push(spec);
       }
-      return toSpec(this.type, operands.length ? operands : null);
+      return toSpec(this._op, operands.length ? operands : null);
     }
   });
 

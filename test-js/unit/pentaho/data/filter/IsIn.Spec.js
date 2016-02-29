@@ -30,8 +30,8 @@ define([
     });
 
     describe("#type", function() {
-      it("should return '$in'.", function() {
-        expect(sales12k.type).toBe("$in");
+      it("should return 'IsIn'.", function() {
+        expect(sales12k.type).toBe("IsIn");
       });
 
       it("should be immutable.", function() {
@@ -61,7 +61,7 @@ define([
       it("should return an AND.", function() {
         var inStock= new IsIn("inStock", [true]);
         var combination = sales12k.and(inStock);
-        expect(combination.type).toBe("$and");
+        expect(combination.type).toBe("And");
       });
     }); // #and
 
@@ -69,14 +69,14 @@ define([
       it("should return an Or.", function() {
         var inStock= new IsIn("inStock", [true]);
         var combination = sales12k.or(inStock);
-        expect(combination.type).toBe("$or");
+        expect(combination.type).toBe("Or");
       });
     }); // #or
 
     describe("#invert ", function() {
       it("should return a Not.", function() {
         var filter = sales12k.invert();
-        expect(filter.type).toBe("$not");
+        expect(filter.type).toBe("Not");
       });
     }); // #invert
 
@@ -127,7 +127,7 @@ define([
         expect(filteredData.getValue(1, 0)).toBe("C");
       });
 
-      it("should return an empty dataset is no match is found.", function() {
+      it("should return an empty dataset if no match is found.", function() {
         var isProductA = new IsIn("sales", [5000, 7000]);
         var filteredData = isProductA.apply(data);
 

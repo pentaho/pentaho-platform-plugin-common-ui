@@ -18,13 +18,14 @@ define([
   "./_Element",
   "../TableView",
   "../../util/arg",
-  "require"
+  "require",
   //"./Or",
   //"./And",
   //"./Not",
-], function(Base, Element, TableView, arg, require,  Or, And, Not) {
+], function(Base, Element, TableView, arg, require, Or, And, Not) {
   "use strict";
 
+  var Or, And, Not;
   /**
    * @name AbstractFilter
    * @memberOf pentaho.data.filter
@@ -43,6 +44,13 @@ define([
    * * {@link pentaho.data.filter.AbstractTreeFilter}
    */
   var AbstractFilter = Base.extend("pentaho.data.filter.AbstractFilter", /** @lends pentaho.data.filter.AbstractFilter# */{
+    get type() {
+      /* istanbul ignore next: placeholder getter */
+      return null;
+    },
+
+    _op: null,
+
     /**
      * Outputs a simple object that serializes the operation described by this filter.
      * The syntax loosely follows the query language of MongoDB.
@@ -54,12 +62,12 @@ define([
     },
 
     /**
-     * Tests if an entry is an element of the set defined by this filter.
+     * Tests if an element belongs to the set defined by this filter.
      *
      * @param {pentaho.type.Element} - [dataTable]{@link pentaho.data.Table} entry.
      * @return {boolean}
      */
-    contains: /* istanbul ignore next: placeholder method */ function(entry) {
+    contains: /* istanbul ignore next: placeholder method */ function(element) {
       return false;
     },
 
@@ -79,6 +87,7 @@ define([
      * @returns {*}
      */
     or: function() {
+      if(!arguments.length) return this;
       var args = arg.slice(arguments);
       args.unshift(this);
       if(!Or) Or = require("./Or");
@@ -92,6 +101,7 @@ define([
      * @returns {*}
      */
     and: function() {
+      if(!arguments.length) return this;
       var args = arg.slice(arguments);
       args.unshift(this);
       if(!And) And = require("./And");
@@ -102,8 +112,10 @@ define([
       var nRows = dataTable.getNumberOfRows();
       var filteredRows = [];
 
+      var element = new Element(dataTable, null);
       for(var k = 0; k < nRows; k++) {
-        if(this.contains(new Element(dataTable, k))) {
+        element.rowIdx = k;
+        if(this.contains(element)) {
           filteredRows.push(k);
         }
       }

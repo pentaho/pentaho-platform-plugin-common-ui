@@ -37,20 +37,20 @@ define([
         };
 
         var filter = Filter.create(spec);
-        expect(filter.type).toBe("$or");
+        expect(filter.type).toBe("Or");
         expect(filter.operands.length).toBe(1);
-        expect(filter.operands[0].type).toBe("$and");
+        expect(filter.operands[0].type).toBe("And");
         expect(filter.operands[0].operands.length).toBe(2);
-        expect(filter.operands[0].operands[0].type).toBe("$eq");
+        expect(filter.operands[0].operands[0].type).toBe("IsEqual");
         expect(filter.operands[0].operands[0].value).toBe(12000);
-        expect(filter.operands[0].operands[1].type).toBe("$not");
-        expect(filter.operands[0].operands[1].operand.type).toBe("$in");
+        expect(filter.operands[0].operands[1].type).toBe("Not");
+        expect(filter.operands[0].operands[1].operand.type).toBe("IsIn");
         expect(filter.operands[0].operands[1].operand.value).toEqual(["A", "B"]);
       });
 
       it("also accepts no arguments", function() {
         var filter = Filter.create();
-        expect(filter.type).toBe("$or");
+        expect(filter.type).toBe("Or");
         expect(filter.operands.length).toBe(0);
       });
 
@@ -65,14 +65,14 @@ define([
         };
 
         var filter = Filter.create(spec);
-        expect(filter.type).toBe("$or");
+        expect(filter.type).toBe("Or");
         expect(filter.operands.length).toBe(1);
-        expect(filter.operands[0].type).toBe("$not");
-        expect(filter.operands[0].operand.type).toBe("$and");
+        expect(filter.operands[0].type).toBe("Not");
+        expect(filter.operands[0].operand.type).toBe("And");
         expect(filter.operands[0].operand.operands.length).toBe(2);
-        expect(filter.operands[0].operand.operands[0].type).toBe("$eq");
-        expect(filter.operands[0].operand.operands[1].type).toBe("$not");
-        expect(filter.operands[0].operand.operands[1].operand.type).toBe("$in");
+        expect(filter.operands[0].operand.operands[0].type).toBe("IsEqual");
+        expect(filter.operands[0].operand.operands[1].type).toBe("Not");
+        expect(filter.operands[0].operand.operands[1].operand.type).toBe("IsIn");
       });
 
     }); // #create

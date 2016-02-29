@@ -35,8 +35,8 @@ define([
     });
 
     describe("#type", function() {
-      it("should return '$and' ", function() {
-        expect(filter.type).toBe("$and");
+      it("should return 'And' ", function() {
+        expect(filter.type).toBe("And");
       });
 
       it("should be immutable.", function() {
@@ -64,14 +64,19 @@ define([
     describe("#and", function() {
       it("should return an AND.", function() {
         var result = filter.and(inStock);
-        expect(result.type).toBe("$and");
+        expect(result.type).toBe("And");
       });
 
-      it("should return a new instance", function() {
+      it("should return a new instance when adding more operands", function() {
         var productA = new IsEqual("product", "A");
 
         var result = filter.and(productA);
         expect(result).not.toBe(filter);
+      });
+
+      it("should return the same instance if not adding operands", function() {
+        var result = filter.and();
+        expect(result).toBe(filter);
       });
 
       it("should add elements instead of creating ANDs of ANDs", function() {
@@ -85,7 +90,7 @@ define([
     describe("#or ", function() {
       it("should return an Or.", function() {
         var result = filter.or(inStock);
-        expect(result.type).toBe("$or");
+        expect(result.type).toBe("Or");
       });
     }); // #or
 
@@ -93,12 +98,12 @@ define([
       it("should return a simplified filter, with the negated terms next to the leafs", function() {
         var result = filter.invert();
 
-        expect(result.type).toBe("$or");
+        expect(result.type).toBe("Or");
         expect(result.operands.length).toBe(2);
-        expect(result.operands[0].type).toBe("$not");
-        expect(result.operands[0].operand.type).toBe("$in");
-        expect(result.operands[1].type).toBe("$not");
-        expect(result.operands[1].operand.type).toBe("$eq");
+        expect(result.operands[0].type).toBe("Not");
+        expect(result.operands[0].operand.type).toBe("IsIn");
+        expect(result.operands[1].type).toBe("Not");
+        expect(result.operands[1].operand.type).toBe("IsEqual");
       });
     }); // #invert
 

@@ -63,40 +63,45 @@ define([
      * @inheritdoc
      * @readonly
      */
-    get type() { return "$or";},
+    get type() { return "Or";},
+
+    _op: "$or",
 
     /**
      * @inheritdoc
      */
-    contains: function(entry) {
-      var memo = false; // false is the neutral element of an OR operation
-      var N = this.operands.length;
-      for(var k = 0; k < N && !memo; k++) {
-        memo = memo || this.operands[k].contains(entry);
+    contains: function(element) {
+      var thisOperands = this.operands;
+      var N = thisOperands.length;
+      for(var k = 0; k < N; k++) {
+        if(thisOperands[k].contains(element))
+          return true;
       }
-      return memo;
+      return false; // false is the neutral element of an OR operation
     },
 
     /**
      * @inheritdoc
      */
     or: function() {
+      var N = arguments.length;
+      if(!N) return this;
       var operands = this.operands;
-      for(var k = 0, N = arguments.length; k < N; k++) {
+      for(var k = 0; k < N; k++) {
         operands.push(arguments[k]);
       }
-      return new Or(operands);
+      return operands.length === 1 ? operands[0] : new Or(operands);
     },
 
     /**
      * @inheritdoc
      */
     invert: function() {
-      var negatedChildren = this.operands.map(function(child) {
-        return child.invert();
+      var invertedOperands = this.operands.map(function(operand) {
+        return operand.invert();
       });
       if(!And) And = require("./And");
-      return new And(negatedChildren);
+      return new And(invertedOperands);
     }
   });
 

@@ -32,8 +32,8 @@ define([
 
 
     describe("#type", function() {
-      it("should return '$eq'.", function() {
-        expect(sales12k.type).toBe("$eq");
+      it("should return 'IsEqual'.", function() {
+        expect(sales12k.type).toBe("IsEqual");
       });
 
       it("should be immutable.", function() {
@@ -64,7 +64,7 @@ define([
       it("should return an AND.", function() {
         var inStock = new IsEqual("inStock", true);
         var combination = sales12k.and(inStock);
-        expect(combination.type).toBe("$and");
+        expect(combination.type).toBe("And");
       });
     }); // #and
 
@@ -72,14 +72,14 @@ define([
       it("should return an Or.", function() {
         var inStock = new IsEqual("inStock", true);
         var combination = sales12k.or(inStock);
-        expect(combination.type).toBe("$or");
+        expect(combination.type).toBe("Or");
       });
     }); // #or
 
     describe("#invert ", function() {
       it("should return a Not.", function() {
         var filter = sales12k.invert();
-        expect(filter.type).toBe("$not");
+        expect(filter.type).toBe("Not");
       });
     }); // #invert
 
@@ -94,7 +94,7 @@ define([
         expect(containsSales12k).toBe(false);
       });
 
-      it("should assert in a property of an element is equal to a predefined value", function(){
+      it("should assert if a property of an element is equal to a predefined value", function(){
         [0,2].forEach(function(rowIdx){
           var element = new Element(data, rowIdx);
           expect(sales12k.contains(element)).toBe(true);
@@ -123,7 +123,7 @@ define([
         expect(filteredData.getValue(1, 0)).toBe("C");
       });
 
-      it("should return an empty dataset is no match is found.", function() {
+      it("should return an empty dataset if no match is found.", function() {
         var isProductA = new IsEqual("sales", 5000);
         var filteredData = isProductA.apply(data);
 

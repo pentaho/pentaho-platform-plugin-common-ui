@@ -34,8 +34,8 @@ define([
     });
 
 
-    it("should be of type '$or'.", function() {
-      expect(filter.type).toBe("$or");
+    it("should be of type 'Or'.", function() {
+      expect(filter.type).toBe("Or");
     });
 
 
@@ -61,18 +61,24 @@ define([
         expect(result.operands.length).toBe(3);
       });
 
-      it("should return a new instance", function() {
+      it("should return a new instance when adding more operands", function() {
         var productA = new IsEqual("product", "A");
 
         var result = filter.or(productA);
         expect(result).not.toBe(filter);
       });
+
+      it("should return the same instance if not adding operands", function() {
+        var result = filter.or();
+        expect(result).toBe(filter);
+      });
+
     });
 
     describe("#and ", function() {
       it("should return an And.", function() {
         var result = filter.and(inStock);
-        expect(result.type).toBe("$and");
+        expect(result.type).toBe("And");
       });
     }); // #or
 
@@ -81,12 +87,12 @@ define([
       it("should return a simplified filter, with the negated terms next to the leafs", function() {
         var result = filter.invert();
 
-        expect(result.type).toBe("$and");
+        expect(result.type).toBe("And");
         expect(result.operands.length).toBe(2);
-        expect(result.operands[0].type).toBe("$not");
-        expect(result.operands[0].operand.type).toBe("$in");
-        expect(result.operands[1].type).toBe("$not");
-        expect(result.operands[1].operand.type).toBe("$eq");
+        expect(result.operands[0].type).toBe("Not");
+        expect(result.operands[0].operand.type).toBe("IsIn");
+        expect(result.operands[1].type).toBe("Not");
+        expect(result.operands[1].operand.type).toBe("IsEqual");
       });
     });
 

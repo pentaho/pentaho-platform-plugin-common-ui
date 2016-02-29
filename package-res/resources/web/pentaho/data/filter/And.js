@@ -63,29 +63,35 @@ define([
      * @inheritdoc
      * @readonly
      */
-    get type() { return "$and";},
+    get type() { return "And";},
+
+    _op: "$and",
 
     /**
      * @inheritdoc
      */
-    contains: function(entry) {
-      var memo = true; // true is the neutral element of an AND operation
-      var N = this.operands.length;
-      for(var k = 0; k < N && memo; k++) {
-        memo = memo && this.operands[k].contains(entry);
+    contains: function(element) {
+      var thisOperands = this.operands;
+      var N = thisOperands.length;
+      for(var k = 0; k < N; k++) {
+        if(!thisOperands[k].contains(element))
+          return false;
       }
-      return memo;
+      return true;
     },
 
     /**
      * @inheritdoc
      */
     and: function() {
+      var N = arguments.length;
+      if(!N) return this;
+
       var operands = this.operands;
-      for(var k = 0, N = arguments.length; k < N; k++) {
+      for(var k = 0; k < N; k++) {
         operands.push(arguments[k]);
       }
-      return new And(operands);
+      return operands.length === 1 ? operands[0] : new And(operands);
     },
 
     /**

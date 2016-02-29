@@ -58,7 +58,9 @@ define([
      * @inheritdoc
      * @readonly
      */
-    get type() { return "$eq";},
+    get type() { return "IsEqual";},
+
+    _op: "$eq",
 
     /**
      * @inheritdoc

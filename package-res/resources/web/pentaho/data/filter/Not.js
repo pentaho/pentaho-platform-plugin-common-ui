@@ -69,7 +69,9 @@ define([
      * @inheritdoc
      * @readonly
      */
-    get type() { return "$not";},
+    get type() { return "Not";},
+
+    _op: "$not",
 
     /**
      * @inheritdoc
@@ -89,7 +91,7 @@ define([
      * @inheritdoc
      */
     toSpec: function() {
-      return _toSpec(this.type, this.operand.toSpec());
+      return _toSpec(this._op, this.operand.toSpec());
     }
   });
 

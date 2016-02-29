@@ -75,14 +75,10 @@ define([
    * @param {string|number} value The value of the property.
    */
   var AbstractPropertyFilter = AbstractFilter.extend("pentaho.data.filter.AbstractPropertyFilter", /** @lends pentaho.data.filter.AbstractPropertyFilter# */{
-    get type(){
-      /* istanbul ignore next: placeholder getter */
-      return null;
-    },
-
     constructor: function(property, value) {
-      O.setConst(this, "value", value);
-      O.setConst(this, "property", property);
+      this.value =  value;
+      this.property = property;
+      Object.freeze(this);
     },
     /**
      *
@@ -90,23 +86,23 @@ define([
      * @returns {boolean}
      * @protected
      */
-    _operation: /* istanbul ignore next: placeholder method */ function(value){
+    _operation: /* istanbul ignore next: placeholder method */ function(value) {
       return false;
     },
 
     /**
      * @inheritdoc
      */
-    contains: function(entry) {
-      return entry.has(this.property) &&
-             this._operation(entry.getValue(this.property));
+    contains: function(element) {
+      return element.has(this.property) &&
+        this._operation(element.getv(this.property));
     },
 
     /**
      * @inheritdoc
      */
     toSpec: function() {
-      return toSpec(this.property, toSpec(this.type, this.value));
+      return toSpec(this.property, toSpec(this._op, this.value));
     }
   });
 

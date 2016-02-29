@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 define([
-"pentaho/lang/Base"
+  "pentaho/lang/Base"
 ], function(Base) {
   "use strict";
 
@@ -28,7 +28,7 @@ define([
       return this.dataTable.model.attributes.get(property) != null;
     },
 
-    getValue: function(property) {
+    getv: function(property) {
       var prop = this.dataTable.model.attributes.get(property);
       return this.dataTable.getValue(this.rowIdx, prop.ordinal);
     }

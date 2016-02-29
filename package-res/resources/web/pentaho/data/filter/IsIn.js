@@ -61,25 +61,22 @@ define([
      * @inheritdoc
      * @readonly
      */
-    get type() { return "$in";},
+    get type() { return "IsIn";},
+
+    _op: "$in",
 
     /**
      * @inheritdoc
      */
     _operation: function(value) {
-      var N = this.value.length;
-      for(var k = 0; k < N; k++) {
-        if(this.value[k] === value)
-          return true;
-      }
-      return false;
+      return this.value.indexOf(value) > -1;
     },
 
     /**
      * @inheritdoc
      */
     toSpec: function() {
-      return toSpec(this.property, toSpec(this.type, this.value.length ? this.value : null));
+      return toSpec(this.property, toSpec(this._op, this.value.length ? this.value : null));
     }
   });
 

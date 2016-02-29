@@ -40,8 +40,8 @@ define([
     });
 
     describe("#type ", function() {
-      it("should return '$not' ", function() {
-        expect(filter.type).toBe("$not");
+      it("should return 'Not' ", function() {
+        expect(filter.type).toBe("Not");
       });
 
       it("should be immutable", function() {
@@ -62,7 +62,7 @@ define([
     describe("#and ", function() {
       it("should return an AND.", function() {
         var combination = filter.and(sales12k);
-        expect(combination.type).toBe("$and");
+        expect(combination.type).toBe("And");
       });
     }); // #and
 
@@ -70,17 +70,17 @@ define([
       it("should return an Or.", function() {
         var inStock = new IsEqual("inStock", true);
         var combination = filter.or(inStock);
-        expect(combination.type).toBe("$or");
+        expect(combination.type).toBe("Or");
       });
     }); // #or
 
     describe("#invert ", function() {
       it("should prevent double negation (i.e. replace 'NOT NOT A' with 'A').", function() {
-        expect(filter.type).toBe("$not");
-        expect(filter.operand.type).toBe("$eq");
+        expect(filter.type).toBe("Not");
+        expect(filter.operand.type).toBe("IsEqual");
 
         var notNotSales12k = filter.invert();
-        expect(notNotSales12k.type).toBe("$eq");
+        expect(notNotSales12k.type).toBe("IsEqual");
         expect(notNotSales12k).toBe(sales12k);
       });
     }); //#invert
