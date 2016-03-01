@@ -56,8 +56,22 @@ define([
       if(!model)
         throw error.argRequired("model");
 
-      this.element = element;
+      /**
+       * The HTML element where the visualization should render.
+       * @type {HTMLElement}
+       * @protected
+       * @readonly
+       */
+      this._element = element;
+
+      /**
+       * The modelf of the visualization.
+       * @type {pentaho.visual.base.Model}
+       * @public
+       * @readonly
+       */
       this.model = model;
+
       this._init();
     },
 
@@ -93,7 +107,7 @@ define([
      * @overridable
      */
     dispose: function() {
-
+      this._element = null;
     },
 
     /**

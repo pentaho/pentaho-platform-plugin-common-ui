@@ -425,5 +425,46 @@ define([
         expect(va.equals(vb)).toBe(false);
       });
     }); // end #equals
+
+    describe("#configure(config)", function() {
+      it("should call #_configure if config is non-nully", function() {
+        var va = new Value();
+
+        spyOn(va, "_configure");
+
+        va.configure({});
+
+        expect(va._configure).toHaveBeenCalled();
+      });
+
+      it("should call #_configure with the given non-nully config", function() {
+        var va = new Value();
+        var config = {};
+        spyOn(va, "_configure");
+
+        va.configure(config);
+
+        expect(va._configure).toHaveBeenCalledWith(config);
+      });
+
+      it("should not call #_configure if the given config is nully", function() {
+        var va = new Value();
+        spyOn(va, "_configure");
+
+        var config = null;
+        va.configure(config);
+        expect(va._configure).not.toHaveBeenCalled();
+
+        config = undefined;
+        va.configure(config);
+        expect(va._configure).not.toHaveBeenCalled();
+      });
+
+      it("should return this", function() {
+        var va = new Value();
+        expect(va.configure({})).toBe(va);
+        expect(va.configure(null)).toBe(va);
+      });
+    }); // end #configure
   });
 });

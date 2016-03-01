@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,51 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define(function() {
+define([
+  "../../lang/Base",
+  "../../util/object"
+], function(Base, O) {
 
-  var O_hasOwn = Object.prototype.hasOwnProperty;
+  "use strict";
 
   /**
-   * @module pentaho.visual.color
-   */
-
-  /**
-   * A color palette is an ordered list of colors.
+   * @name PaletteRegistry
+   * @memberOf pentaho.visual.color
+   * @extends pentaho.lang.Base
    *
-   * This is a documentation artifact — there is no
-   * `IColorPalette` constructor.
+   * @class
+   * @staticClass
    *
-   * @class IColorPalette
-   * @constructor
-   */
-
-  /**
-   * The name of the color palette.
-   * @property name
-   * @type String
-   */
-
-  /**
-   * The array of colors of the palette.
+   * @amd {pentaho.visual.color.PaletteRegistry} pentaho/visual/color/paletteRegistry
    *
-   * An array of {{#crossLink "String"}}{{/crossLink}},
-   * colors in "#RRGGBB" format.
-   *
-   * @property colors
-   * @type Array
-   */
-
-  /**
-   * A singleton class that manages a set of discrete color palettes
+   * @classDesc A singleton class that manages a set of discrete color palettes
    * available for visuals to consume.
    *
-   * #### AMD
-   *
-   * **Module Id**: `"pentaho/visual/color/paletteRegistry"`
-   *
-   * **Module Type**: {{#crossLink "PaletteRegistry"}}{{/crossLink}}
-   *
-   * #### Standard Color Palettes
+   * ### Standard Color Palettes
    *
    * The registry comes pre-loaded with the following color palettes:
    *
@@ -112,7 +88,7 @@ define(function() {
    * <tr><td style="background-color:#AA6611"></td><td>#AA6611</td></tr>
    * </table>
    *
-   * 4. `"ryg-3"` (3 colors):
+   * 4. `"ryg_3"` (3 colors):
    * <table style="font-family:courier; width:120px;">
    * <colgroup><col width="20px"/><col />
    * <tr><td style="background-color:#FF0000"></td><td>#FF0000</td></tr>
@@ -120,7 +96,7 @@ define(function() {
    * <tr><td style="background-color:#008000"></td><td>#008000</td></tr>
    * </table>
    *
-   * 5. `"ryg-5"` (5 colors):
+   * 5. `"ryg_5"` (5 colors):
    * <table style="font-family:courier; width:120px;">
    * <colgroup><col width="20px"/><col />
    * <tr><td style="background-color:#FF0000"></td><td>#FF0000</td></tr>
@@ -130,7 +106,7 @@ define(function() {
    * <tr><td style="background-color:#008000"></td><td>#008000</td></tr>
    * </table>
    *
-   * 6. `"ryb-3"` (3 colors):
+   * 6. `"ryb_3"` (3 colors):
    * <table style="font-family:courier; width:120px;">
    * <colgroup><col width="20px"/><col />
    * <tr><td style="background-color:#FF0000"></td><td>#FF0000</td></tr>
@@ -138,7 +114,7 @@ define(function() {
    * <tr><td style="background-color:#4BB6E4"></td><td>#4BB6E4</td></tr>
    * </table>
    *
-   * 7. `"ryb-5"` (5 colors):
+   * 7. `"ryb_5"` (5 colors):
    * <table style="font-family:courier; width:120px;">
    * <colgroup><col width="20px"/><col />
    * <tr><td style="background-color:#FF0000"></td><td>#FF0000</td></tr>
@@ -148,7 +124,7 @@ define(function() {
    * <tr><td style="background-color:#4BB6E4"></td><td>#4BB6E4</td></tr>
    * </table>
    *
-   * 8. `"blue-3"` (3 colors):
+   * 8. `"blue_3"` (3 colors):
    * <table style="font-family:courier; width:120px;">
    * <colgroup><col width="20px"/><col />
    * <tr><td style="background-color:#CBE7FF"></td><td>#CBE7FF</td></tr>
@@ -156,7 +132,7 @@ define(function() {
    * <tr><td style="background-color:#0345A9"></td><td>#0345A9</td></tr>
    * </table>
    *
-   * 9. `"blue-5"` (5 colors):
+   * 9. `"blue_5"` (5 colors):
    * <table style="font-family:courier; width:120px;">
    * <colgroup><col width="20px"/><col />
    * <tr><td style="background-color:#CBE7FF"></td><td>#CBE7FF</td></tr>
@@ -166,7 +142,7 @@ define(function() {
    * <tr><td style="background-color:#0345A9"></td><td>#0345A9</td></tr>
    * </table>
    *
-   * 10. `"gray-3"` (3 colors):
+   * 10. `"gray_3"` (3 colors):
    * <table style="font-family:courier; width:120px;">
    * <colgroup><col width="20px"/><col />
    * <tr><td style="background-color:#E6E6E6"></td><td>#E6E6E6</td></tr>
@@ -174,7 +150,7 @@ define(function() {
    * <tr><td style="background-color:#333333"></td><td>#333333</td></tr>
    * </table>
    *
-   * 11. `"gray-5"` (5 colors):
+   * 11. `"gray_5"` (5 colors):
    * <table style="font-family:courier; width:120px;">
    * <colgroup><col width="20px"/><col />
    * <tr><td style="background-color:#E6E6E6"></td><td>#E6E6E6</td></tr>
@@ -184,93 +160,97 @@ define(function() {
    * <tr><td style="background-color:#333333"></td><td>#333333</td></tr>
    * </table>
    *
-   * @class ColorPaletteRegistry
+   * @description Creates the color palette registry singleton instance.
    * @constructor
    */
-  function ColorPaletteRegistry() {
-    this._paletteList = [];
-    this._paletteMap  = {};
-  }
+  var ColorPaletteRegistry = Base.extend("pentaho.visual.color.PaletteRegistry",
+  /** @lends pentaho.visual.color.PaletteRegistry# */{
 
-  /**
-   * Adds a specified color palette.
-   *
-   * @method add
-   * @param {IColorPalette} palette The color palette.
-   * @chainable
-   */
-  ColorPaletteRegistry.prototype.add = function(palette) {
-    if(!palette) throw new Error("Argument required 'palette'.");
+    constructor: function() {
+      this._paletteList = [];
+      this._paletteMap  = {};
+    },
 
-    var name = palette.name,
-        current = O_hasOwn.call(this._paletteMap, name) ? this._paletteMap[name] : null;
+    /**
+     * Adds a specified color palette.
+     *
+     * @param {pentaho.visual.color.IColorPalette} palette The color palette.
+     * @chainable
+     */
+    add: function(palette) {
+      if(!palette) throw new Error("Argument required 'palette'.");
 
-    if(!current)
-      this._paletteList.push(palette);
-    else
-      this._paletteList.splice(this._paletteList.indexOf(current), 1, palette);
+      var name = palette.name,
+          current = O.hasOwn(this._paletteMap, name) ? this._paletteMap[name] : null;
 
-    this._paletteMap[name] = palette;
-    return this;
-  };
+      if(!current)
+        this._paletteList.push(palette);
+      else
+        this._paletteList.splice(this._paletteList.indexOf(current), 1, palette);
 
-  /**
-   * Gets an array with all registered color palettes.
-   *
-   * Do **not** modify the returned array.
-   *
-   * @method getAll
-   * @return {Array} An array of {{#crossLink "IColorPalette"}}{{/crossLink}}.
-   */
-  ColorPaletteRegistry.prototype.getAll = function() {
-    return this._paletteList;
-  };
+      this._paletteMap[name] = palette;
+      return this;
+    },
 
-  /**
-   * Sets the default color palette, given its name.
-   *
-   * If this method is not called,
-   * or if the _name_ argument is not specified,
-   * the default palette becomes the first palette.
-   *
-   * The default palette is obtained by calling the
-   * {{#crossLink "ColorPaletteRegistry/get:method"}}{{/crossLink}}
-   * with no arguments:
-   *
-   * @example
-   *     var defaultPalette = paletteRegistry.get();
-   *
-   * @method setDefault
-   * @param {String} [name] The name of the default palette.
-   * @chainable
-   */
-  ColorPaletteRegistry.prototype.setDefault = function(name) {
-    if(name && !O_hasOwn.call(this._paletteMap, name))
-      throw new Error(
-        "Invalid argument 'name'. " +
-        "A palette with name '" + name + "' is not defined.");
+    /**
+     * Gets an array with all registered color palettes.
+     *
+     * Do **not** modify the returned array.
+     *
+     * @return {Array.<pentaho.visual.color.IColorPalette>} An array of color palettes.
+     */
+    getAll: function() {
+      return this._paletteList;
+    },
 
-    this._defaultName = name || null;
-    return this;
-  };
+    /**
+     * Sets the default color palette, given its name.
+     *
+     * If this method is not called,
+     * or if the _name_ argument is not specified,
+     * the default palette becomes the first palette.
+     *
+     * The default palette is obtained by calling
+     * {@link pentaho.visual.color.PaletteRegistry#get}
+     * with no arguments.
+     *
+     * @example
+     * <caption>
+     *   Obtaining the default color palette.
+     * </caption>
+     *
+     * var defaultPalette = paletteRegistry.get();
+     *
+     * @param {String} [name] The name of the default palette.
+     * @return {pentaho.visual.color.PaletteRegistry} This instance.
+     */
+    setDefault: function(name) {
+      if(name && !O.hasOwn(this._paletteMap, name))
+        throw new Error(
+          "Invalid argument 'name'. " +
+          "A palette with name '" + name + "' is not defined.");
 
-  /**
-   * Gets a specified or default color palette.
-   *
-   * When the name of the color palette is not specified,
-   * the default color palette is returned.
-   *
-   * @method get
-   * @param {String} [name] The name of the desired color palette.
-   * @return {IColorPalette} The color palette.
-   */
-  ColorPaletteRegistry.prototype.get = function(name) {
-    if(!name && !(name = this._defaultName)) {
-      return this._paletteList.length ? this._paletteList[0] : null;
+      this._defaultName = name || null;
+      return this;
+    },
+
+    /**
+     * Gets a specified or default color palette.
+     *
+     * When the name of the color palette is not specified,
+     * the default color palette is returned.
+     *
+     * @param {String} [name] The name of the desired color palette.
+     * @return {pentaho.visual.color.IColorPalette} The color palette.
+     */
+    get: function(name) {
+      if(!name && !(name = this._defaultName)) {
+        return this._paletteList.length ? this._paletteList[0] : null;
+      }
+
+      return O.hasOwn(this._paletteMap, name) ? this._paletteMap[name] : null;
     }
-
-    return O_hasOwn.call(this._paletteMap, name) ? this._paletteMap[name] : null;
-  };
+  });
 
   // ---------------
 
@@ -330,14 +310,14 @@ define(function() {
     ]
   });
 
-  paletteRegistry.add({name: "ryg-3",  colors: ["#FF0000", "#FFFF00", "#008000"]});
-  paletteRegistry.add({name: "ryg-5",  colors: ["#FF0000", "#FFBF3F", "#FFFF00", "#BFDF3F", "#008000"]});
-  paletteRegistry.add({name: "ryb-3",  colors: ["#FF0000", "#FFFF00", "#4BB6E4"]});
-  paletteRegistry.add({name: "ryb-5",  colors: ["#FF0000", "#FFBF3F", "#FFFF00", "#DCDDDE", "#4BB6E4"]});
-  paletteRegistry.add({name: "blue-3", colors: ["#CBE7FF", "#33A1FF", "#0345A9"]});
-  paletteRegistry.add({name: "blue-5", colors: ["#CBE7FF", "#99D0FF", "#33A1FF", "#006ECC", "#0345A9"]});
-  paletteRegistry.add({name: "gray-3", colors: ["#E6E6E6", "#999999", "#333333"]});
-  paletteRegistry.add({name: "gray-5", colors: ["#E6E6E6", "#CCCCCC", "#999999", "#666666", "#333333"]});
+  paletteRegistry.add({name: "ryg_3",  colors: ["#FF0000", "#FFFF00", "#008000"]});
+  paletteRegistry.add({name: "ryg_5",  colors: ["#FF0000", "#FFBF3F", "#FFFF00", "#BFDF3F", "#008000"]});
+  paletteRegistry.add({name: "ryb_3",  colors: ["#FF0000", "#FFFF00", "#4BB6E4"]});
+  paletteRegistry.add({name: "ryb_5",  colors: ["#FF0000", "#FFBF3F", "#FFFF00", "#DCDDDE", "#4BB6E4"]});
+  paletteRegistry.add({name: "blue_3", colors: ["#CBE7FF", "#33A1FF", "#0345A9"]});
+  paletteRegistry.add({name: "blue_5", colors: ["#CBE7FF", "#99D0FF", "#33A1FF", "#006ECC", "#0345A9"]});
+  paletteRegistry.add({name: "gray_3", colors: ["#E6E6E6", "#999999", "#333333"]});
+  paletteRegistry.add({name: "gray_5", colors: ["#E6E6E6", "#CCCCCC", "#999999", "#666666", "#333333"]});
 
   return paletteRegistry;
 });

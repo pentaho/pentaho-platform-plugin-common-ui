@@ -377,6 +377,7 @@ define([
       try {
         return this._get(typeRef, false);
       } catch(ex) {
+        /* istanbul ignore next : really hard to test safeguard */
         return Promise.reject(ex);
       }
     },
@@ -435,6 +436,7 @@ define([
                   : InstCtors;
             });
       } catch(ex) {
+        /* istanbul ignore next : really hard to test safeguard */
         return Promise.reject(ex);
       }
     },
@@ -605,6 +607,7 @@ define([
 
       // Check if already present, by uid.
       var TypeExisting = O.getOwn(this._byTypeUid, meta.uid);
+      /* istanbul ignore else */
       if(!TypeExisting) {
         // Not present yet.
         var id = meta.id;
@@ -612,6 +615,7 @@ define([
           // TODO: configuration may need to subclass Type
           // TODO: configuration is Meta only?
           var config = this._getConfig(id);
+          /* istanbul ignore if : until config is implemented */
           if(config) meta.constructor.implement(config);
 
           this._byTypeId[id] = Type;
@@ -809,19 +813,33 @@ define([
 
         collectTypeIdsRecursive(typeSpec.of, outIds);
 
-        if(typeSpec.props) typeSpec.props.forEach(function(propSpec) {
-          collectTypeIdsRecursive(propSpec && propSpec.type, outIds);
-        });
+        var props = typeSpec.props;
+        if(props) {
+          if(Array.isArray(props))
+            props.forEach(function(propSpec) {
+              collectTypeIdsRecursive(propSpec && propSpec.type, outIds);
+            });
+          else
+            Object.keys(props).forEach(function(propName) {
+              var propSpec = props[propName];
+              collectTypeIdsRecursive(propSpec && propSpec.type, outIds);
+            });
+        }
 
         // These are not ids of types but only of mixin AMD modules.
-        if(typeSpec.facets) typeSpec.facets.forEach(function(facetIdOrClass) {
-          if(typeof facetIdOrClass === "string") {
-            if(facetIdOrClass.indexOf("/") < 0)
-              facetIdOrClass = _baseFacetsMid + facetIdOrClass;
+        var facets = typeSpec.facets;
+        if(facets != null) {
+          if(!(Array.isArray(facets))) facets = [facets];
 
-            collectTypeIdsRecursive(facetIdOrClass, outIds);
-          }
-        });
+          facets.forEach(function(facetIdOrClass) {
+            if(typeof facetIdOrClass === "string") {
+              if(facetIdOrClass.indexOf("/") < 0)
+                facetIdOrClass = _baseFacetsMid + facetIdOrClass;
+
+              collectTypeIdsRecursive(facetIdOrClass, outIds);
+            }
+          });
+        }
         return;
     }
   }

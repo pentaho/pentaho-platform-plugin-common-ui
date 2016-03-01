@@ -427,7 +427,7 @@ define([
       //region validation
 
       /**
-       * Determines if this property is valid in the instance of Complex that owns this property.
+       * Determines if this property is valid in a given complex instance.
        *
        * This method first ensures the value of the property is consistent with its type.
        * Afterwards, the cardinality is verified against the attributes
@@ -439,37 +439,40 @@ define([
        * @see pentaho.type.Complex.Meta#_validate
        */
       validate: function(owner) {
-        var errors = null,
-            addErrors = function(newErrors) {
+        var errors = null;
+
+        if(this.applicableEval(owner)) {
+          var addErrors = function(newErrors) {
               errors = valueHelper.combineErrors(errors, newErrors);
             };
 
-        // Accessing private state in the name of performance.
-        var value = owner._values[this.name];
-        if(value) {
-          // Not null and surely of the type, so validateInstance can be called.
-          // If a list, element validation is done before cardinality validation.
-          // If a complex, its properties validation is done before local cardinality validation.
-          addErrors(this.type.validateInstance(value));
-        }
+          // Accessing private state in the name of performance.
+          var value = owner._values[this.name];
+          if(value) {
+            // Not null and surely of the type, so validateInstance can be called.
+            // If a list, element validation is done before cardinality validation.
+            // If a complex, its properties validation is done before local cardinality validation.
+            addErrors(this.type.validateInstance(value));
+          }
 
-        var range = this.countRangeEval(owner),
-            count = this.list ? value.count : (value ? 1 : 0);
+          var range = this.countRangeEval(owner),
+              count = this.list ? value.count : (value ? 1 : 0);
 
-        if(count < range.min) {
-          if(this.list) {
+          if(count < range.min) {
+            if(this.list) {
+              addErrors(new Error(bundle.format(
+                  bundle.structured.errors.property.countOutOfRange,
+                  [this.label, count, range.min, range.max])));
+            } else {
+              addErrors(new Error(bundle.format(
+                  bundle.structured.errors.property.isRequired,
+                  [this.label])));
+            }
+          } else if(count > range.max) {
             addErrors(new Error(bundle.format(
                 bundle.structured.errors.property.countOutOfRange,
                 [this.label, count, range.min, range.max])));
-          } else {
-            addErrors(new Error(bundle.format(
-                bundle.structured.errors.property.isRequired,
-                [this.label])));
           }
-        } else if(count > range.max) {
-          addErrors(new Error(bundle.format(
-              bundle.structured.errors.property.countOutOfRange,
-              [this.label, count, range.min, range.max])));
         }
 
         return errors;

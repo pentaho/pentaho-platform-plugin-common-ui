@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 (function() {
-  /* global requireCfg:true, CONTEXT_PATH:true, KARMA_RUN:true, SESSION_LOCALE:true */
+  /* global requireCfg:false, CONTEXT_PATH:false, KARMA_RUN:false, SESSION_LOCALE:false, active_theme:false */
   var basePath =
         // production
         (typeof CONTEXT_PATH !== "undefined") ? CONTEXT_PATH + "content/common-ui/resources/web" :
@@ -31,7 +31,7 @@
 
       // TODO: This fallback logic is temporary, and can be removed when the remaining
       //    parts of the system rename the "service" plugin id to "pentaho/service".
-      requireService = requireCfg.config["pentaho/service"] || (requireCfg.config["pentaho/service"] = []);
+      requireService = requireCfg.config["pentaho/service"] || (requireCfg.config["pentaho/service"] = {});
 
   requirePaths["common-ui"  ] = basePath;
   requirePaths["common-repo"] = basePath + "/repo";
@@ -192,19 +192,54 @@
   requirePaths["common-ui/angular-directives"] = basePath + "/angular-directives";
   requireShim ["common-ui/angular-directives"] = ["common-ui/angular-ui-bootstrap"];
 
-  // Visual API
-  requireService["pentaho/visual/config"] = "IVisualApiConfiguration";
+  // Visualizations Packages
 
-  // Visual API - CCC
-  requireService["pentaho/visual/ccc/visualTypeProvider"] = "IVisualTypeProvider";
-  requireService["pentaho/visual/ccc/visualApiConfig"] = "IVisualApiConfiguration";
+  function mapTheme(mid, themes) {
+    var theme = (typeof active_theme !== "undefined") ? active_theme : null;
+    if(!theme || themes.indexOf(theme) < 0) theme = themes[0];
 
-  // Sample visualizations
-  requireService["pentaho/visual/samples/calc/visualTypeProvider"] = "IVisualTypeProvider";
+    // e.g. "/theme" -> "/themes/crystal"
+    requireMap["*"][mid + "/theme"] = mid + "/themes/" + theme;
+  }
 
-  requireCfg.packages.push({
-      "name": "pentaho/visual/base",
-      "main": "modelFactory"
-    });
+  function registerVizPackage(name) {
+    requireCfg.packages.push({"name": name, "main": "model"});
+
+    requireService[name] = "pentaho/type/value";
+  }
+
+  // CCC Theme
+  mapTheme("pentaho/visual/ccc/abstract", ["default"]);
+
+  // sample/calc theme
+  mapTheme("pentaho/visual/samples/calc", ["crystal"]);
+
+  [
+    // base visual
+    "pentaho/visual/base",
+
+    // calc viz
+    "pentaho/visual/samples/calc",
+
+    // ccc vizs
+    "pentaho/visual/ccc/abstract",
+    "pentaho/visual/ccc/cartesianAbstract",
+    "pentaho/visual/ccc/categoricalContinuousAbstract",
+    "pentaho/visual/ccc/barAbstract",
+    "pentaho/visual/ccc/barNormalizedAbstract",
+    "pentaho/visual/ccc/barHorizontal",
+    "pentaho/visual/ccc/bar",
+    "pentaho/visual/ccc/barStacked",
+    "pentaho/visual/ccc/barStackedHorizontal",
+    "pentaho/visual/ccc/barNormalized",
+    "pentaho/visual/ccc/barNormalizedHorizontal",
+    "pentaho/visual/ccc/barLine",
+    "pentaho/visual/ccc/line",
+    "pentaho/visual/ccc/metricDot",
+    "pentaho/visual/ccc/areaStacked",
+    "pentaho/visual/ccc/pie",
+    "pentaho/visual/ccc/heatGrid",
+    "pentaho/visual/ccc/sunburst"
+  ].forEach(registerVizPackage);
 
 }());

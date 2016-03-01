@@ -15,8 +15,9 @@
  */
 define([
   "pentaho/type/Context",
+  "tests/pentaho/util/errorMatch",
   "pentaho/i18n!/pentaho/type/i18n/types"
-], function(Context, bundle) {
+], function(Context, errorMatch, bundle) {
 
   "use strict";
 
@@ -179,14 +180,14 @@ define([
       });
     });
 
-    describe("#valueOf -", function() {
+    describe("#valueOf() -", function() {
       it("Should return the given value in the constructor", function() {
         var simpleType = new Simple(123);
         expect(simpleType.valueOf()).toBe(123);
       });
     });
 
-    describe("#toString -", function() {
+    describe("#toString() -", function() {
       it("Should return the same value as formatted", function() {
         var simpleType = new Simple(constructWithObject(123, "123"));
         expect(simpleType.toString()).toBe(simpleType.formatted);
@@ -200,8 +201,57 @@ define([
 
     describe("#key -", function() {
       it("Should convert the given value to a string", function() {
-        var simpleType = new Simple(123);
-        expect(simpleType.key).toBe(String(123));
+        var simple1 = new Simple(123);
+        expect(simple1.key).toBe(String(123));
+      });
+    });
+
+    describe("#configure(config)", function() {
+      it("should configure the Simple when given a plain object", function() {
+        var simple1 = new Simple(123);
+        expect(simple1.formatted).toBe(null);
+
+        simple1.configure({formatted: "ABC"});
+
+        expect(simple1.formatted).toBe("ABC");
+      });
+
+      it("should configure the Simple when given another Simple of equal value", function() {
+        var simple1 = new Simple(123);
+        var simple2 = new Simple({v: 123, f: "ABC"});
+
+        simple1.configure(simple2);
+
+        expect(simple1.formatted).toBe("ABC");
+      });
+
+      it("should throw when given another Simple of different value", function() {
+        expect(function() {
+          var simple1 = new Simple(123);
+          var simple2 = new Simple({v: 234, f: "ABC"});
+
+          simple1.configure(simple2);
+
+        }).toThrowError(bundle.structured.errors.value.cannotChangeValue);
+      });
+
+      it("should throw when not given a plain object or another Simple", function() {
+        expect(function() {
+          var simple1 = new Simple(123);
+          simple1.configure("foo");
+        }).toThrow(errorMatch.argInvalidType("config", ["Object", "pentaho.type.Simple"], "string"));
+
+        expect(function() {
+          var simple1 = new Simple(123);
+          simple1.configure(new Date());
+        }).toThrow(errorMatch.argInvalidType("config", ["Object", "pentaho.type.Simple"], "object"));
+      });
+
+      it("should do nothing when given itself", function() {
+        // dummy test
+        var simple1 = new Simple(123);
+        simple1.configure(simple1);
+        expect(simple1.value).toBe(123);
       });
     });
 

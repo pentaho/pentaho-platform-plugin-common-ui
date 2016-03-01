@@ -18,8 +18,9 @@ define([
   "pentaho/type/list",
   "pentaho/type/value",
   "pentaho/type/number",
+  "pentaho/util/fun",
   "tests/pentaho/util/errorMatch"
-], function(Context, listFactory, valueFactory, numberFactory, errorMatch) {
+], function(Context, listFactory, valueFactory, numberFactory, fun, errorMatch) {
 
   "use strict";
 
@@ -357,6 +358,18 @@ define([
     });
 
     describe("#at -", function() {
+      it("should throw when the index is nully", function() {
+        var list = new NumberList([1, 2, 3]);
+
+        expect(function() {
+          list.at(null);
+        }).toThrow(errorMatch.argRequired("index"));
+
+        expect(function() {
+          list.at(undefined);
+        }).toThrow(errorMatch.argRequired("index"));
+      });
+
       it("should return the element at a given index when the index is in range", function() {
         var list = new NumberList([1, 2, 3]);
 
@@ -365,60 +378,22 @@ define([
         expect(list.at(2).value).toBe(3);
       });
 
-      describe("when the index is negative", function() {
+      it("should return null when the index is negative", function() {
         var list = new NumberList([1, 2, 3]);
 
-        function getter(args) {
-          return list.at.apply(list, args);
-        }
-
-        var lenientResult = null;
-        var error = errorMatch.argRange("index");
-        var index = -10;
-
-        itShouldLenientMethod(getter, [index], lenientResult, error);
+        expect(list.at(-2)).toBe(null);
       });
 
-      describe("when the index is null", function() {
+      it("should return null when the index is not less than the number of elements", function() {
         var list = new NumberList([1, 2, 3]);
 
-        function getter(args) {
-          return list.at.apply(list, args);
-        }
-
-        var lenientResult = null;
-        var error = errorMatch.argRequired("index");
-        var index = null;
-
-        itShouldLenientMethod(getter, [index], lenientResult, error);
+        expect(list.at(10)).toBe(null);
       });
 
-      describe("when the index is not less than the number of elements", function() {
-        var list = new NumberList([1, 2, 3]);
+      it("should return null when the index is positive and there are no elements", function() {
+        var list = new NumberList();
 
-        function getter(args) {
-          return list.at.apply(list, args);
-        }
-
-        var lenientResult = null;
-        var error = errorMatch.argRange("index");
-        var index = 10;
-
-        itShouldLenientMethod(getter, [index], lenientResult, error);
-      });
-
-      describe("when the index is positive and there are no elements", function() {
-        var list = new NumberList([]);
-
-        function getter(args) {
-          return list.at.apply(list, args);
-        }
-
-        var lenientResult = null;
-        var error = errorMatch.argRange("index");
-        var index = 10;
-
-        itShouldLenientMethod(getter, [index], lenientResult, error);
+        expect(list.at(10)).toBe(null);
       });
     });
 
@@ -903,7 +878,7 @@ define([
       });
     }); // remove
 
-    describe("#removeAt(start, count) -", function() {
+    describe("#removeAt(start, count[, silent]) -", function() {
       it("should remove the element at the given in-range index when count is 1", function() {
         var list = new NumberList([1, 2, 3, 4]);
         expect(list.count).toBe(4);
@@ -1140,6 +1115,23 @@ define([
         expect(array[0]).toBe(list.at(0));
         expect(array[1]).toBe(list.at(1));
         expect(array[2]).toBe(list.at(2));
+      });
+    });
+
+    describe("#sort(comparer[, silent]) -", function() {
+      it("should sort the list", function() {
+        var list = new NumberList([4, 2, 1, 3]);
+
+        list.sort(fun.compare);
+
+        // ----
+
+        expect(list.count).toBe(4);
+
+        expect(list.at(0).value).toBe(1);
+        expect(list.at(1).value).toBe(2);
+        expect(list.at(2).value).toBe(3);
+        expect(list.at(3).value).toBe(4);
       });
     });
     //endregion

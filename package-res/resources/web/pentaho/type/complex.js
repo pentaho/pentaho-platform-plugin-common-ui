@@ -59,8 +59,7 @@ define([
      *
      * Module Id: `pentaho/type/complex`
      *
-     * The AMD module returns the type's factory, a
-     * {@link pentaho.type.Factory<pentaho.type.Complex>}.
+     * The AMD module returns the type's factory, a {@link pentaho.type.Factory<pentaho.type.Complex>}.
      *
      * Example complex type:
      * ```javascript
@@ -72,10 +71,9 @@ define([
      *
      *     return Complex.extend({
      *       meta: {
-     *         // Properties
      *         props: [
      *           {name: "name", type: "string", label: "Name"},
-     *           {name: "category", type: "string", label: "Category", list: true},
+     *           {name: "category", type: ["string"], label: "Category"},
      *           {name: "price", type: "number", label: "Price"}
      *         ]
      *       }
@@ -87,10 +85,8 @@ define([
      *
      * @description Creates a complex instance.
      *
-     * When a derived class overrides the constructor
-     * and creates additional instance properties,
-     * the {@link pentaho.type.Complex#_clone} method should
-     * also be overridden to copy those properties.
+     * When a derived class overrides the constructor and creates additional instance properties,
+     * the {@link pentaho.type.Complex#_clone} method should also be overridden to copy those properties.
      *
      * @constructor
      * @param {object} spec The complex instance specification.
@@ -188,26 +184,153 @@ define([
         return this._uid;
       },
 
+      //region As Raw
       /**
        * Gets the value of a property.
        *
-       * A list property always has a non-null value, possibly an empty list, but never `null`.
+       * If the specified property is not defined and `sloppy` is `true`, `undefined` is returned.
        *
+       * A list property always has a non-null value, possibly an empty list, but never `null`.
        * An element property _can_ have a `null` value.
        *
+       * @see pentaho.type.Complex#getv
+       * @see pentaho.type.Complex#getf
+       * @see pentaho.type.Complex#at
+       * @see pentaho.type.Complex#first
+       *
        * @param {string|!pentaho.type.Property.Meta} [name] The property name or metadata.
-       * @param {boolean} [lenient=false] Indicates if `null` is returned
-       *   if a property with the specified name is not defined, or if, instead, an error is thrown.
+       * @param {boolean} [sloppy=false] Indicates if an error is thrown if the specified property is not defined.
        *
-       * @return {?pentaho.type.Value} The value of the property, or _null_.
+       * @return {pentaho.type.Value|Nully} The value of the property, or a {@link Nully} value.
        *
-       * @throws {pentaho.lang.ArgumentRequiredError} When `lenient` is `false` and `name` is not specified.
-       * @throws {pentaho.lang.ArgumentInvalidError} When `lenient` is `false` and
-       * a property with name `name` is not defined.
+       * @throws {pentaho.lang.ArgumentInvalidError} When `sloppy` is `false` and a property with
+       * name `name` is not defined.
        */
-      get: function(name, lenient) {
-        var pMeta = this.meta.get(name, lenient);
-        return pMeta ? this._values[pMeta.name] : null;
+      get: function(name, sloppy) {
+        var pMeta = this.meta.get(name, sloppy);
+        return pMeta ? this._values[pMeta.name] : undefined;
+      },
+
+      /**
+       * Gets the _primitive value_ of the value of a property.
+       *
+       * This method reads the value of the property by calling [Complex#get]{@link pentaho.type.Complex#get}.
+       *
+       * When the latter does not return a {@link Nully} value,
+       * the result of the value's `valueOf()` method is returned.
+       *
+       * For a [Simple]{@link pentaho.type.Simple} type, this corresponds to returning
+       * its [value]{@link pentaho.type.Simple#value} attribute.
+       * For [Complex]{@link pentaho.type.Complex} and [List]{@link pentaho.type.List} types,
+       * this corresponds to the value itself.
+       *
+       * @param {string|!pentaho.type.Property.Meta} name The property name or metadata.
+       * @param {boolean} [sloppy=false] Indicates if an error is thrown if the specified property is not defined.
+       *
+       * @return {any|pentaho.type.Complex|pentaho.type.List|Nully} The primitive value of a `Simple`,
+       *  the `Complex` or `List` value itself, or a {@link Nully} value.
+       *
+       * @throws {pentaho.lang.ArgumentInvalidError} When `sloppy` is `false` and a property with
+       * name `name` is not defined.
+
+       * @see pentaho.type.Complex#get
+       * @see pentaho.type.Complex#getf
+       */
+      getv: function(name, sloppy) {
+        var v1 = this.get(name, sloppy); // undefined or nully
+        return v1 && v1.valueOf(); // .valueOf() should/must be non-nully
+      },
+
+      /**
+       * Gets the _string representation_ of the value of a property.
+       *
+       * This method reads the value of the property by calling [Complex#get]{@link pentaho.type.Complex#get}.
+       *
+       * When the latter returns a {@link Nully} value, `""` is returned.
+       * Otherwise, the result of the value's `toString()` method is returned.
+       *
+       * For a [Simple]{@link pentaho.type.Simple} type, this corresponds to returning
+       * its [formatted]{@link pentaho.type.Simple#formatted} attribute, when it is not null.
+       * For [Complex]{@link pentaho.type.Complex} and [List]{@link pentaho.type.List} types,
+       * varies with the implementation.
+       *
+       * @param {string|!pentaho.type.Property.Meta} name The property name or metadata.
+       * @param {boolean} [sloppy=false] Indicates if an error is thrown if the specified property is not defined.
+       *
+       * @return {string} The string representation of the value, or `""`.
+       *
+       * @throws {pentaho.lang.ArgumentInvalidError} When `sloppy` is `false` and a property with
+       * name `name` is not defined.
+       *
+       * @see pentaho.type.Complex#get
+       * @see pentaho.type.Complex#getv
+       */
+      getf: function(name, sloppy) {
+        var v1 = this.get(name, sloppy);
+        return v1 ? v1.toString() : "";
+      },
+
+      // TODO: when called with more steps than the structure has, is throwing hard
+      /**
+       * Gets the value of a property/index/key path based on the current complex.
+       *
+       * When called with no arguments, or with an empty `steps` array argument,
+       * this complex value is returned.
+       *
+       * When a step, on a complex value, is not a defined property and `sloppy` is `true`,
+       * `undefined` is returned.
+       *
+       * Value `null` is returned when a step, in `steps`:
+       * 1. on a list value, is an element index that is out of range
+       * 2. on a list value, is an element key that is not present
+       * 3. on a complex value, a property has value `null`.
+       *
+       * This method supports two signatures.
+       * When the first argument is an array, it is the `steps` array,
+       * and the second argument is the optional `sloppy` argument:
+       * ```js
+       * var value;
+       *
+       * // Strict
+       * value = complex.path(["a", "b", 1]);
+       *
+       * // Sloppy
+       * value = complex.path(["a", "b", 1], true);
+       * ```
+       *
+       * Otherwise, the method behaves as if `sloppy` were `false`,
+       * and each argument is a step of the desired path:
+       * ```js
+       * var value;
+       *
+       * value = complex.path(); // -> null
+       *
+       * value = complex.path("a", "b", 1);
+       * ```
+       *
+       * @param {Array.<(string|number|!pentaho.type.Property.Meta)>} steps The property/index/key path steps.
+       * @param {boolean} [sloppy=false] Indicates if an error is thrown if the specified property is not defined.
+       *
+       * @return {pentaho.type.Value|Nully} The requested value, or a {@link Nully} value.
+       *
+       * @throws {pentaho.lang.ArgumentInvalidError} When `sloppy` is `false` and a step, on a complex value,
+       * is not a defined property.
+       */
+      path: function(args, sloppy) {
+        return Array.isArray(args) ? this._path(args, sloppy) : this._path(arguments, false);
+      },
+
+      _path: function(args, sloppy) {
+        var L = args.length,
+            i = -1,
+            v = this,
+            step;
+
+        while(++i < L)
+          if(!(v = (typeof (step = args[i]) === "number") ? v.at(step, sloppy) : v.get(step, sloppy)))
+            break;
+
+        return v;
       },
 
       /**
@@ -216,7 +339,8 @@ define([
        * @param {string|!pentaho.type.Property.Meta} name The property name or metadata.
        * @param {any?} [valueSpec=null] A value specification.
        *
-       * return {pentaho.type.Complex} This object.
+       * @return {pentaho.type.Complex} This object.
+       * @throws {pentaho.lang.ArgumentInvalidError} When a property with name `name` is not defined.
        */
       set: function(name, valueSpec) {
         var pMeta  = this.meta.get(name),
@@ -232,119 +356,88 @@ define([
           }
         }
       },
+      //endregion
 
+      //region As Element
       /**
-       * Gets one `Element` of a property's value.
+       * Gets the first element of the value of a property.
        *
-       * This method allows to use the same syntax for getting a single element from the value of a property,
-       * whether it is a list or an element property. If the property is an element property whose value
-       * is `null`, it is seen like a list property with no elements.
-       * If its value is not `null`, it is seen like a list property with one element.
-       * This behavior is consistent with that of the [count]{@link pentaho.type.Complex#count} property.
-       *
-       * By default, the **first** element of the property's value, if any, is returned.
-       *
-       * Also, by default, the method does **not** behave _leniently_.
-       * If
-       * the a property with the specified name is not defined, or
-       * the specified or implied index is out of range, or
-       * the resulting element is `null`,
-       * an error is thrown.
-       * If, however, argument `lenient` is given the value `true`, `null` is returned, instead.
-       *
-       * @see pentaho.type.Property.Meta#list
-       * @see pentaho.type.Complex#path
-       * @see pentaho.type.Complex#getv
-       * @see pentaho.type.Complex#getf
-       * @see pentaho.type.Complex#count
+       * This method returns the result of calling [Complex#at]{@link pentaho.type.Complex#at} with a `0` index.
        *
        * @param {string|!pentaho.type.Property.Meta} name The property name or metadata.
-       * @param {?number} [index=0] The index of the desired element.
-       * @param {boolean} [lenient=false] Indicates if `null` is returned
-       * when the specified property or index do not exist, or if, instead, an error is thrown.
+       * @param {boolean} [sloppy=false] Indicates if an error is thrown if the specified property is not defined.
        *
-       * @return {?pentaho.type.Element} A single `Element` value or `null`.
+       * @return {pentaho.type.Element|Nully} An element or a {@link Nully} value.
        *
-       * @throws {pentaho.lang.ArgumentRequiredError} When `lenient` is `false` and `name` is not specified.
-       * @throws {pentaho.lang.ArgumentInvalidError} When `lenient` is `false` and
-       * a property with name `name` is not defined.
-       *
-       * @throws {pentaho.lang.ArgumentRangeError} When `lenient` is `false` and
-       * the specified or implied `index` is out of range.
+       * @throws {pentaho.lang.ArgumentInvalidError} When `sloppy` is `false` and a property with
+       * name `name` is not defined.
+
+       * @see pentaho.type.Complex#firstv
+       * @see pentaho.type.Complex#firstf
        */
-      get1: function(name, index, lenient) {
-        var pMeta = this.meta.get(name, lenient);
-        if(pMeta) {
-          var pValue = this._values[pMeta.name];
-
-          if(pMeta.list) {
-            // assert pValue;
-            return pValue.at(index || 0, lenient);
-          }
-
-          // index is 0 or nully (unspecified)
-          if(pValue && !index) {
-            return pValue;
-          }
-
-          if(!lenient) {
-            throw error.argRange("index");
-          }
-        }
-        // => lenient
-        return null;
+      first: function(name, sloppy) {
+        return this.at(name, 0, sloppy);
       },
 
-      // always lenient - no good place to pass the argument (unless first or last position...)
       /**
-       * Gets the value of a property/index/key path based on the current complex.
+       * Gets the _primitive value_ of the first element of the value of a property.
        *
-       * This method behaves _leniently_. Value `null` is returned when a step, in `steps`:
-       * 1. on a list value, is an element index that is out of range
-       * 2. on a list value, is an element key that is not present
-       * 3. on a complex value, a property is not defined
-       * 4. on a complex value, a property has value `null`.
+       * This method returns the result of calling [Complex#atv]{@link pentaho.type.Complex#atv} with a `0` index.
        *
-       * @param {...(string|number|!pentaho.type.Property.Meta)} steps The property/index/key path steps.
+       * @param {string|!pentaho.type.Property.Meta} name The property name or metadata.
+       * @param {boolean} [sloppy=false] Indicates if an error is thrown if the specified property is not defined.
        *
-       * @return {?pentaho.type.Value} The requested value or `null`.
+       * @return {any|pentaho.type.Complex|Nully} The primitive value of the first element, or a {@link Nully} value.
+       *
+       * @throws {pentaho.lang.ArgumentInvalidError} When `sloppy` is `false` and a property with
+       * name `name` is not defined.
+
+       * @see pentaho.type.Complex#first
+       * @see pentaho.type.Complex#firstf
        */
-      path: function() {
-        var L = arguments.length,
-            i = -1,
-            v = this,
-            step;
-
-        while(++i < L)
-          if(!(v = (typeof (step = arguments[i]) === "number")
-               ? v.at (step, /*lenient:*/true)
-               : v.get(step, /*lenient:*/true)))
-            return null;
-
-        return v;
+      firstv: function(name, sloppy) {
+        return this.atv(name, 0, sloppy);
       },
 
+      /**
+       * Gets the _string representation_ of the first element of the value of a property.
+       *
+       * This method returns the result of calling [Complex#atf]{@link pentaho.type.Complex#atf} with a `0` index.
+       *
+       * @param {string|!pentaho.type.Property.Meta} name The property name or metadata.
+       * @param {boolean} [sloppy=false] Indicates if an error is thrown if the specified property is not defined.
+       *
+       * @return {string} The string representation of the first element, or `""`.
+       *
+       * @throws {pentaho.lang.ArgumentInvalidError} When `sloppy` is `false` and a property with
+       * name `name` is not defined.
+
+       * @see pentaho.type.Complex#first
+       * @see pentaho.type.Complex#firstv
+       */
+      firstf: function(name, sloppy) {
+        return this.atf(name, 0, sloppy);
+      },
+      //endregion
+
+      //region As List
       /**
        * Gets the _number of values_ of a given property.
        *
-       * When the specified property is not defined and `lenient` is `true`, `0` is returned.
-       *
-       * When the specified property is a _list_ property, its {@link pentaho.type.List#count} is returned.
+       * When the specified property is a _list_ property, its [count]{@link pentaho.type.List#count} is returned.
        *
        * When the specified property is not a _list_ property, `0` is returned if it is `null` and `1`, otherwise.
        *
        * @param {string|!pentaho.type.Property.Meta} name The property name or property metadata.
-       * @param {boolean} [lenient=false] Indicates if `0` is returned
-       *   when a property with the specified name is not defined, or if, instead, an error is thrown.
+       * @param {boolean} [sloppy=false] Indicates if an error is thrown if the specified property is not defined.
        *
        * @return {number} The number of values.
        *
-       * @throws {pentaho.lang.ArgumentRequiredError} When `lenient` is `false` and `name` is not specified.
-       * @throws {pentaho.lang.ArgumentInvalidError} When `lenient` is `false` and
-       * a property with name `name` is not defined.
+       * @throws {pentaho.lang.ArgumentInvalidError} When `sloppy` is `false` and a property with
+       * name `name` is not defined.
        */
-      count: function(name, lenient) {
-        var pMeta = this.meta.get(name, lenient);
+      count: function(name, sloppy) {
+        var pMeta = this.meta.get(name, sloppy);
         if(!pMeta) return 0;
 
         var value = this._values[pMeta.name];
@@ -353,66 +446,108 @@ define([
       },
 
       /**
-       * Gets the _value of_ one `Element` of a property's value.
+       * Gets one `Element` of a property's value, given the property and the index of the element.
        *
-       * This method returns the result of the `valueOf()` method
-       * on the `Element` returned by {@link pentaho.type.Complex#get1}.
+       * If the specified property is not defined and `sloppy` is `true`, `undefined` is returned.
+       * If the specified index is out of range, `null` is returned.
        *
-       * For a {@link pentaho.type.Simple} type, this corresponds to returning
-       * its {@link pentaho.type.Simple#value} attribute.
-       * For a {@link pentaho.type.Complex} type, this corresponds to itself.
+       * This method allows to use the same syntax for getting a single element from the value of a property,
+       * whether it is a list or an element property. If the property is an element property whose value
+       * is `null`, it is seen like a list property with no elements.
+       * If its value is not `null`, it is seen like a list property with one element.
+       * This behavior is consistent with that of the [count]{@link pentaho.type.Complex#count} property.
        *
-       * When `lenient` is `true` and the specified property or index do not exist, `undefined` is returned.
+       * @see pentaho.type.Property.Meta#list
+       * @see pentaho.type.Complex#path
+       * @see pentaho.type.Complex#atv
+       * @see pentaho.type.Complex#atf
+       * @see pentaho.type.Complex#count
+       * @see pentaho.type.Complex#first
        *
        * @param {string|!pentaho.type.Property.Meta} name The property name or metadata.
-       * @param {?number} [index=0] The index of the element.
-       * @param {boolean} [lenient=false] Indicates if an `undefined` value is returned
-       *   when the specified property or index do not exist, or if, instead, an error is thrown.
+       * @param {number} index The index of the desired element.
+       * @param {boolean} [sloppy=false] Indicates if an error is thrown if the specified property is not defined.
        *
-       * @return {?any} The underlying value of the requested `Element` or `undefined`.
+       * @return {pentaho.type.Element|Nully} A single `Element` value, or a {@link Nully} value.
        *
-       * @throws {pentaho.lang.ArgumentRequiredError} When `lenient` is `false` and `name` is not specified.
-       * @throws {pentaho.lang.ArgumentInvalidError} When `lenient` is `false` and
-       * a property with name `name` is not defined.
-       *
-       * @throws {pentaho.lang.ArgumentRangeError} When `lenient` is `false` and
-       * the specified or implied `index` is out of range.
+       * @throws {pentaho.lang.ArgumentInvalidError} When `sloppy` is `false` and a property with
+       * name `name` is not defined.
        */
-      getv: function(name, index, lenient) {
-        var v1 = this.get1(name, index, lenient);
-        return v1 ? v1.valueOf() : undefined;
+      at: function(name, index, sloppy) {
+        var pMeta = this.meta.get(name, sloppy);
+
+        if(index == null) throw error.argRequired("index");
+
+        if(!pMeta) return undefined;
+
+        var pValue = this._values[pMeta.name];
+
+        if(pMeta.list) return /* assert pValue */pValue.at(index || 0);
+
+        return pValue && !index ? pValue : null;
       },
 
       /**
-       * Gets the _string representation of_ one `Element` of a property's value.
+       * Gets the _primitive value_ of one element of the value of a property,
+       * given the property and the index of the element.
        *
-       * This method returns the result of the `toString()` method
-       * on the `Element` returned by {@link pentaho.type.Complex#get1}.
+       * This method reads the value of the property/index by calling [Complex#at]{@link pentaho.type.Complex#at}.
        *
-       * For a {@link pentaho.type.Simple} type, this corresponds to returning
-       * its {@link pentaho.type.Simple#formatted} attribute when it is not null.
-       * For a {@link pentaho.type.Complex} type, depends totally on the implementation.
+       * When the latter does not return a {@link Nully} value,
+       * the result of the element's `valueOf()` method is returned.
        *
-       * When `lenient` is `true` and the specified property or index do not exist, `""` is returned.
+       * For a [Simple]{@link pentaho.type.Simple} type, this corresponds to returning
+       * its [value]{@link pentaho.type.Simple#value} attribute.
+       * For a [Complex]{@link pentaho.type.Complex} type, this corresponds to the value itself.
        *
        * @param {string|!pentaho.type.Property.Meta} name The property name or metadata.
-       * @param {?number} [index=0] The index of the value.
-       * @param {boolean} [lenient=false] Indicates if an empty string is returned
-       *   when the specified property or index do not exist, or if, instead, an error is thrown.
+       * @param {number} index The index of the element.
+       * @param {boolean} [sloppy=false] Indicates if an error is thrown if the specified property is not defined.
        *
-       * @return {string} The string representation of the requested `Element` or `""`.
+       * @return {any|pentaho.type.Complex|Nully} The primitive value of the requested element,
+       * or a {@link Nully} value.
        *
-       * @throws {pentaho.lang.ArgumentRequiredError} When `lenient` is `false` and `name` is not specified.
-       * @throws {pentaho.lang.ArgumentInvalidError} When `lenient` is `false` and
-       * a property with name `name` is not defined.
-       *
-       * @throws {pentaho.lang.ArgumentRangeError} When `lenient` is `false` and
-       * the specified or implied `index` is out of range.
+       * @throws {pentaho.lang.ArgumentInvalidError} When `sloppy` is `false` and a property with
+       * name `name` is not defined.
+
+       * @see pentaho.type.Complex#at
+       * @see pentaho.type.Complex#atf
        */
-      getf: function(name, index, lenient) {
-        var v1 = this.get1(name, index, lenient);
+      atv: function(name, index, sloppy) {
+        var v1 = this.at(name, index, sloppy); // undefined or nully
+        return v1 && v1.valueOf(); // .valueOf() should/must be non-nully
+      },
+
+      /**
+       * Gets the _string representation_ of one element of the value of a property,
+       * given the property and the index of the element.
+       *
+       * This method reads the value of the property/index by calling [Complex#at]{@link pentaho.type.Complex#at}.
+       *
+       * When the latter returns a {@link Nully} value, `""` is returned.
+       * Otherwise, the result of the element's `toString()` method is returned.
+       *
+       * For a [Simple]{@link pentaho.type.Simple} type, this corresponds to returning
+       * its [formatted]{@link pentaho.type.Simple#formatted} attribute, when it is not null.
+       * For a [Complex]{@link pentaho.type.Complex} type, this varies with the implementation.
+       *
+       * @param {string|!pentaho.type.Property.Meta} name The property name or metadata.
+       * @param {number} index The index of the value.
+       *
+       * @param {boolean} [sloppy=false] Indicates if an error is thrown if the specified property is not defined.
+       * @return {string} The string representation of the requested element, or `""`.
+       *
+       * @throws {pentaho.lang.ArgumentInvalidError} When `sloppy` is `false` and a property with
+       * name `name` is not defined.
+       *
+       * @see pentaho.type.Complex#at
+       * @see pentaho.type.Complex#atv
+       */
+      atf: function(name, index, sloppy) {
+        var v1 = this.at(name, index, sloppy);
         return v1 ? v1.toString() : "";
       },
+      //endregion
 
       //region property attributes
       //region applicable attribute
@@ -504,35 +639,32 @@ define([
         //endregion
 
         /**
-         * Gets the metadata of the property with the given name.
+         * Gets the metadata of the property with the given name,
+         * or `null` if it is not defined.
          *
          * If a metadata instance is specified,
          * it is returned back only if it is _the_ metadata instance of
          * same name in this complex type.
          *
          * @param {string|!pentaho.type.Property.Meta} name The property name or metadata.
-         * @param {boolean} [lenient=false] Indicates if `null` is returned
-         *   when a property with the specified name is not defined, or if, instead, an error is thrown.
+         * @param {boolean} [sloppy=false] Indicates if an error is thrown if the specified property is not defined.
          *
          * @return {?pentaho.type.Property.Meta} The property metadata.
          *
-         * @throws {pentaho.lang.ArgumentRequiredError} When `lenient` is `false` and `name` is not specified.
-         * @throws {pentaho.lang.ArgumentInvalidError} When `lenient` is `false` and
-         *   a property with name `name` is not defined.
+         * @throws {pentaho.lang.ArgumentInvalidError} When `sloppy` is `false` and a property with
+         * name `name` is not defined.
          */
-        get: function(name, lenient) {
-          if(!name && !lenient) {
-            throw error.argRequired("name");
-          }
-
+        get: function(name, sloppy) {
+          if(!name) throw error.argRequired("name");
           var p = this._get(name);
-          if(!p && !lenient)
+          if(!p && !sloppy)
             throw error.argInvalid("name", "A property with the name '" + (name.name || name) + "' is not defined.");
           return p;
         },
 
         _get: function(name) {
           var ps;
+          // !_props could only occur if accessing #get directly on Complex.meta and it had no derived classes yet...
           return (!name || !(ps = this._props)) ? null :
                  (typeof name === "string")     ? ps.get(name) :
                  (ps.get(name.name) === name)   ? name :
@@ -549,6 +681,7 @@ define([
          * @return {boolean} `true` if the property is defined, `false`, otherwise.
          */
         has: function(name) {
+          // !_props could only occur if accessing #has directly on Complex.meta and it had no derived classes yet...
           var ps;
           if(!name || !(ps = this._props)) return false;
           if(typeof name === "string") return ps.has(name);
@@ -557,29 +690,28 @@ define([
         },
 
         /**
-         * Gets the metadata of the property with a given index.
+         * Gets the metadata of the property with a given index,
+         * if in range, or `null` if not.
          *
-         * @param {?number} index The property index.
-         * @param {boolean} [lenient=false] Indicates if `null` is returned
-         *   when the specified index is out of range, or if, instead, an error is thrown.
+         * @param {number} index The property index.
+         * @param {boolean} [sloppy=false] Indicates if an error is thrown if the specified `index` is out of range.
          *
          * @return {?pentaho.type.Property.Meta} The property metadata, or `null`.
          *
-         * @throws {pentaho.lang.ArgumentRequiredError} When `lenient` is `false` and `index` is not specified.
-         * @throws {pentaho.lang.ArgumentRangeError} When `lenient` is `false` and
-         *   the specified `index` is out of range.
+         * @throws {pentaho.lang.ArgumentRangeError} When `sloppy` is `false` and the specified `index` is out of range.
          */
-        at: function(index, lenient) {
-          if(index == null) {
-            if(lenient) return null;
-            throw error.argRequired("index");
-          }
-
-          var pMeta = this._getProps()[index] || null;
-          if(!pMeta && !lenient)
+        at: function(index, sloppy) {
+          if(index == null) throw error.argRequired("index");
+          var pMeta = this._at(index);
+          if(!pMeta && !sloppy)
             throw error.argRange("index");
-
           return pMeta;
+        },
+
+        _at: function(index) {
+          // !_props could only occur if accessing #at directly on Complex.meta and it had no derived classes yet...
+          var ps = this._props;
+          return (ps && ps[index]) || null;
         },
 
         /**
@@ -588,13 +720,16 @@ define([
          * @return {number} The number of properties.
          */
         get count() {
-          return this._props ? this._props.length : 0;
+          // !_props could only occur if accessing #at directly on Complex.meta and it had no derived classes yet...
+          var ps = this._props;
+          return ps ? ps.length : 0;
         },
 
         /**
          * Calls a function for each defined property metadata.
          *
-         * @param {function(pentaho.type.Property.Meta, number, pentaho.type.Complex) : boolean?} f The mapping function.
+         * @param {function(pentaho.type.Property.Meta, number, pentaho.type.Complex) : boolean?} f
+         * The mapping function.
          * @param {Object} [x] The JS context object on which `f` is called.
          *
          * @return {pentaho.type.Complex} This object.

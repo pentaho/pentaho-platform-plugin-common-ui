@@ -6,6 +6,8 @@ define([
 ], function(View, modelFactory, Context, errorMatch) {
   "use strict";
 
+  /*global document:false*/
+
   describe("pentaho/visual/base/View", function() {
     var element, Model, model;
 
