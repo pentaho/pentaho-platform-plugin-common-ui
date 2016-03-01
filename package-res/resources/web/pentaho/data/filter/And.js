@@ -16,7 +16,7 @@
 define([
   "./AbstractTreeFilter",
   "require",
-  "./Or",
+  "./Or"
 ], function(AbstractTreeFilter, require, Or) {
   "use strict";
 
@@ -59,16 +59,15 @@ define([
    *  var data = filter.apply(data); //data.getValue(0, 0) === "A"
    * });
    *
-   * @description Creates an `And` filter that performs the intersection of a list of given `AbstractFilter`'s {@link pentaho.data.filter.AbstractFilter}.
+   * @description Creates an `And` filter that performs the intersection of a list of [filters]{@link pentaho.data.filter.AbstractFilter}.
    *
-   * @param {Array<pentaho.data.filter.AbstractFilter>} operands The operands to filter by.
+   * @param {Array<pentaho.data.filter.AbstractFilter>} operands The list of filters that will be intersected.
    *
    */
   var And = AbstractTreeFilter.extend("pentaho.data.filter.And", /** @lends pentaho.data.filter.And# */{
 
     /**
      * @inheritdoc
-     * @readonly
      */
     get type() { return "and";},
 
@@ -88,7 +87,12 @@ define([
     },
 
     /**
-     * @inheritdoc
+     * Returns the intersection between this filter and a variable number of other filters.
+     * Intersections of intersections of filters (ANDs of ANDs) are avoided.
+     *
+     * @param {...pentaho.data.filter.AbstractFilter} filter - A filter to be added to the intersection operation.
+     * @return {pentaho.data.filter.And} A filter that is the intersection of this filter with a list of other filters.
+     * @override
      */
     and: function() {
       var N = arguments.length;

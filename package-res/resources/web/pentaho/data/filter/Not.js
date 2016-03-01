@@ -30,7 +30,7 @@ define([
    * @extends pentaho.data.filter.AbstractFilter
    * @amd pentaho/data/filter/Not
    *
-   * @classdesc A filter that implements the inversion of a filter that defines a set.
+   * @classdesc A filter that implements the boolean inversion of another filter.
    *
    * @example
    * <caption> Create a new <code>Not</code> filter.</caption>
@@ -61,10 +61,10 @@ define([
    *  var data = filter.apply(data); //data.getValue(0, 0) === "B"
    * });
    *
-   * @description Creates a `Not` filter given an `AbstractFilter` {@link pentaho.data.filter.AbstractFilter}.
    *
-   * @param {pentaho.data.filter.AbstractPropertyFilter} operand The operand to filter by.
+   * @description Creates a `Not` filter given another filter (an instance of a descendant of {@link pentaho.data.filter.AbstractFilter}).
    *
+   * @param {!pentaho.data.filter.AbstractFilter} operand - The filter to be inverted.
    */
   var NotFilter = AbstractFilter.extend("pentaho.data.filter.Not", /** @lends pentaho.data.filter.Not# */{
 
@@ -75,8 +75,16 @@ define([
     },
 
     /**
-     * @inheritdoc
+     * Operand of this filter
+     *
+     * @name operand
+     * @memberOf pentaho.data.filter.Not#
+     * @type {pentaho.data.filter.AbstractFilter}
      * @readonly
+     **/
+
+    /**
+     * @inheritdoc
      */
     get type() { return "not";},
 
@@ -85,12 +93,16 @@ define([
     /**
      * @inheritdoc
      */
-    contains: function(entry) {
-      return !this.operand.contains(entry);
+    contains: function(element) {
+      return !this.operand.contains(element);
     },
 
     /**
-     * @inheritdoc
+     * Return the inverse of this filter.
+     * Double inversion is prevented: the original operand of this filter is returned.
+     *
+     * @return {pentaho.data.filter.AbstractFilter} A filter that is the inverse of this filter.
+     * @override
      */
     invert: function() {
       return this.operand;
@@ -101,20 +113,8 @@ define([
      */
     toSpec: function() {
       return _toSpec(this._op, this.operand.toSpec());
-    },
-
-    /**
-     * Applies the filters to a data table {@link pentaho.data.Table}
-     *
-     * @name pentaho.data.filter.Not#apply
-     * @method
-     * @abstract
-     * @param {pentaho.data.Table} dataTable The data table to filter
-     * @returns {pentaho.data.TableView} The data table view of the restricted data set.
-     */
-    apply: function(dataTable) {
-      return _apply(this, dataTable);
     }
+    
   });
 
   return NotFilter;

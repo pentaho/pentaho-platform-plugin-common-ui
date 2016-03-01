@@ -42,21 +42,16 @@ define([
   });
 
   /**
-   * @name Filter
+   * This namespace contains classes for filters that are used for expressing a data set intensionally.
+   * It also exports a static create function that can be used to generate a filter tree from a spec.
+   *
+   * @name pentaho.data.filter
+   * @namespace
    * @memberOf pentaho.data
-   * @class
-   * @amd pentaho/data/Filter
-   *
-   * @classdesc The `Filter` class exports a static create function that is a factory of filters:
-   *
-   * * {@link pentaho.data.filter.IsEqual}
-   * * {@link pentaho.data.filter.IsIn}
-   * * {@link pentaho.data.filter.Or}
-   * * {@link pentaho.data.filter.And}
-   * * {@link pentaho.data.filter.Not}
+   * @amd pentaho/data/filter
    *
    * @example
-   * <caption> Use the available `Filter` factories.</caption>
+   * <caption> Two methods for creating a filter.</caption>
    *
    * require(["pentaho/data/Table", "pentaho/data/Filter"], function(Table, Filter) {
    *   var data = new Table({
@@ -81,7 +76,13 @@ define([
    *   var notInProductABFilter = new Not(productAB);
    *   var andFilter = new Filter.And([sales12k, notInProductABFilter]);
    *   var filter = new Not(andFilter);
-   *   var filteredData = filter.apply(data); //filteredData.getValue(0, 0) === "A", filteredData.getValue(1, 0) === "B", filteredData.getValue(2, 0) === "D", filteredData.getValue(3, 0) === "E", filteredData.getValue(4, 0) === "F", filteredData.getValue(5, 0) === "G"
+   *   var filteredData = filter.apply(data);
+   *   // filteredData.getValue(0, 0) === "A"
+   *   // filteredData.getValue(1, 0) === "B"
+   *   // filteredData.getValue(2, 0) === "D"
+   *   // filteredData.getValue(3, 0) === "E"
+   *   // filteredData.getValue(4, 0) === "F"
+   *   // filteredData.getValue(5, 0) === "G"
    *
    *   //Or alternatively,
    *   var spec = {
@@ -94,7 +95,13 @@ define([
    *    };
    *
    *   var filterFromSpec = Filter.create(spec);
-   *   var filteredDataFromSpec = filterFromSpec.apply(data); //filteredDataFromSpec.getValue(0, 0) === "A", filteredDataFromSpec.getValue(1, 0) === "B", filteredDataFromSpec.getValue(2, 0) === "D", filteredDataFromSpec.getValue(3, 0) === "E", filteredDataFromSpec.getValue(4, 0) === "F", filteredDataFromSpec.getValue(5, 0) === "G"
+   *   var filteredDataFromSpec = filterFromSpec.apply(data);
+   *   // filteredDataFromSpec.getValue(0, 0) === "A"
+   *   // filteredDataFromSpec.getValue(1, 0) === "B"
+   *   // filteredDataFromSpec.getValue(2, 0) === "D"
+   *   // filteredDataFromSpec.getValue(3, 0) === "E"
+   *   // filteredDataFromSpec.getValue(4, 0) === "F"
+   *   // filteredDataFromSpec.getValue(5, 0) === "G"
    * });
    *
    */
@@ -110,14 +117,17 @@ define([
 
     /**
      * Create a filter from a spec
-     * @param {pentaho.data.filter.Or} spec - Specification of a Filter
-     * @returns {*}
+     *
+     * @memberOf pentaho.data.filter
+     * @method
+     * @static
+     * @param {Object} spec - Specification of a filter
+     * @return {pentaho.data.filter.AbstractFilter} The tree of filter objects that corresponds to the specification
      */
-    create: function (spec) {
+    create: function(spec) {
       return new RootFilter(spec);
     }
   };
-
 
 
   function fromSpec(filterSpec) {

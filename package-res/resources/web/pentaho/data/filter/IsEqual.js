@@ -49,24 +49,34 @@ define([
    *   });
    *
    *   var filter = new IsEqual("product", "A");
-   *   var filteredData = filter.apply(data); //filteredData.getValue(0, 0) === "A"
+   *   var filteredData = filter.apply(data);
+   *   //filteredData.getValue(0, 0) === "A"
    * });
    *
-   * @description Creates an IsEqual filter given a property name and corresponding value to be contained in the set.
    *
-   * @param {string} property The name of the property
-   * @param {Object} value The value that belongs to the set
+   * @description Creates a filter that matches the value of a given property to a specific value.
    *
+   * @param {string} property - The name of the property.
+   * @param {any} value - The value of the property.
    */
   var IsEqual = AbstractPropertyFilter.extend("pentaho.data.filter.IsEqual", /** @lends pentaho.data.filter.IsEqual# */{
 
     /**
      * @inheritdoc
-     * @readonly
      */
     get type() { return "isEqual";},
 
     _op: "$eq",
+
+    /**
+     * Reference value used for testing equality
+     *
+     * @name value
+     * @memberOf pentaho.data.filter.IsEqual#
+     * @override
+     * @type {any}
+     * @readonly
+     */
 
     /**
      * @inheritdoc

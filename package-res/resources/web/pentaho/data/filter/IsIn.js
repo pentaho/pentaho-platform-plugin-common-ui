@@ -26,7 +26,7 @@ define([
    * @extends pentaho.data.filter.AbstractPropertyFilter
    * @amd pentaho/data/filter/IsIn
    *
-   * @classdesc A filter that defines the set of items in which the value of a property belongs to a particular set.
+   * @classdesc A filter that defines the set of items in which the value of a property belongs to a reference set.
    *
    * @example
    * <caption> Create a new <code>IsIn</code> filter.</caption>
@@ -49,14 +49,16 @@ define([
    *     ]
    *   });
    *
-   *   var filter = new IsIn("product", ["A"]);
-   *   var filteredData = filter.apply(data); //filteredData.getValue(0, 0) === "A"
+   *   var filter = new IsIn("product", ["A", "B"]);
+   *   var filteredData = filter.apply(data);
+   *   //filteredData.getValue(0, 0) === "A"
+   *   //filteredData.getValue(1, 0) === "B"
    * });
    *
-   * @description Creates an `IsIn` filter given a property name and an array of values that define the set of admissible values.
+   * @description Creates an `IsIn` filter given a property name and the list of values that define the set of admissible values.
    *
-   * @param {string} property The name of the property
-   * @param {Array<any>} value The array of values that belong to the set
+   * @param {string} property - The name of the property.
+   * @param {Array<any>} value - The (extensive) list of values that belong to the reference set.
    *
    */
   var IsIn = AbstractPropertyFilter.extend("pentaho.data.filter.IsIn", /** @lends pentaho.data.filter.IsIn# */{
@@ -65,8 +67,17 @@ define([
     },
 
     /**
-     * @inheritdoc
+     * Reference set of values used for filtering
+     *
+     * @name value
+     * @memberOf pentaho.data.filter.IsIn#
+     * @override
+     * @type {Array<any>}
      * @readonly
+     */
+
+    /**
+     * @inheritdoc
      */
     get type() { return "isIn";},
 

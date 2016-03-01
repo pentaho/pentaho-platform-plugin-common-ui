@@ -54,19 +54,21 @@ define([
    *   var inStock = new IsEqual("inStock", true);
    *   var filter = new Or([sales12k]);
    *   filter.or(inStock);
-   *   var data = filter.apply(data); //data.getValue(0, 0) === "A", data.getValue(1, 0) === "B", data.getValue(2, 0) === "C"
+   *   var data = filter.apply(data);
+   *   // data.getValue(0, 0) === "A"
+   *   // data.getValue(1, 0) === "B"
+   *   // data.getValue(2, 0) === "C"
    * });
    *
-   * @description Creates an `Or` filter that performs the union of a list of given `AbstractFilter`'s {@link pentaho.data.filter.AbstractFilter}.
+   * @description Creates an `Or` filter that performs the union of a list of [filters]{@link pentaho.data.filter.AbstractFilter}.
    *
-   * @param {pentaho.data.filter.AbstractPropertyFilter[]} operands The operands to filter by.
+   * @param {pentaho.data.filter.AbstractFilter[]} operands - The list of filters that will be subject to the union.
    *
    */
   var Or = AbstractTreeFilter.extend("pentaho.data.filter.Or", /** @lends pentaho.data.filter.Or# */{
 
     /**
      * @inheritdoc
-     * @readonly
      */
     get type() { return "or";},
 
@@ -86,7 +88,12 @@ define([
     },
 
     /**
-     * @inheritdoc
+     * Returns the union between this filter and a variable number of other filters.
+     * Unions of unions of filters (ORs of ORs) are avoided.
+     *
+     * @param {...pentaho.data.filter.AbstractFilter} filter - A filter to be added to the union operation.
+     * @return {pentaho.data.filter.Or} A filter that is the union of this filter with a list of other filters.
+     * @override
      */
     or: function() {
       var N = arguments.length;

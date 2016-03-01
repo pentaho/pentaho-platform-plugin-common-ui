@@ -15,10 +15,8 @@
  */
 define([
   "./AbstractFilter",
-  "../../lang/ArgumentRequiredError",
-  "./_apply",
   "./_toSpec"
-], function(AbstractFilter, ArgumentRequiredError, _apply, toSpec) {
+], function(AbstractFilter, _toSpec) {
   "use strict";
 
   /**
@@ -29,7 +27,8 @@ define([
    * @abstract
    * @amd pentaho/data/filter/AbstractTreeFilter
    *
-   * @classdesc The abstract base class for filters that aggregate the outcome of other filters.
+   * @classdesc A base class for filters that aggregate the outcome of other filters.
+   *
    * Example subclasses include:
    *
    * * {@link pentaho.data.filter.And}
@@ -37,7 +36,7 @@ define([
    *
    * @description Creates a filter that combines a list of filters.
    *
-   * @param {Array<pentaho.data.filter.AbstractFilter>} operands The operands to to act upon.
+   * @param {!Array<pentaho.data.filter.AbstractFilter>} operands - The filters to aggregate.
    *
    */
   var AbstractTreeFilter = AbstractFilter.extend("pentaho.data.filter.AbstractTreeFilter", /** @lends pentaho.data.filter.AbstractTreeFilter# */{
@@ -46,6 +45,11 @@ define([
       Object.freeze(this);
     },
 
+    /**
+     * List of operands in this filter.
+     * @type {pentaho.data.filter.AbstractFilter[]}
+     * @readonly
+     **/
     operands: null,
 
     _invertedOperands: function() {
@@ -68,19 +72,7 @@ define([
         if(spec)
           operands.push(spec);
       }
-      return toSpec(this._op, operands.length ? operands : null);
-    },
-
-    /**
-     * Returns the subset of data that matches this filter.
-     *
-     * @name pentaho.data.filter.AbstractTreeFilter#apply
-     * @method
-     * @param {pentaho.data.Table} dataTable The data table to filter
-     * @returns {pentaho.data.TableView} The data table view of the restricted data set.
-     */
-    apply: function(dataTable) {
-      return _apply(this, dataTable);
+      return _toSpec(this._op, operands.length ? operands : null);
     }
   });
 
