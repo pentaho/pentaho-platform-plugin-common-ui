@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 define([
-  '../data/AbstractTable',
-  '../data/Table',
-  '../data/TableView',
-  './events',
-  './color/paletteRegistry',
-  './color/utils',
-  './type/registry',
-  './type/helper',
-  './spec/helper',
-  '../lang/Base',
-  '../util/arg',
-  '../util/error',
-  '../util/promise'
+  'pentaho/data/AbstractTable',
+  'pentaho/data/Table',
+  'pentaho/data/TableView',
+  'pentaho/visual/events',
+  'pentaho/visual/color/paletteRegistry',
+  'pentaho/visual/color/utils',
+  'pentaho/visual/type/registry',
+  'pentaho/visual/type/helper',
+  'pentaho/visual/spec/helper',
+  'pentaho/lang/Base',
+  'pentaho/util/arg',
+  'pentaho/util/error',
+  'pentaho/util/promise'
 ], function(
       AbstractDataTable, DataTable, DataView, visualEvents, paletteRegistry, colorUtils,
       typeRegistry, typeHelper, specHelper, Base, arg, error, promiseUtil) {
