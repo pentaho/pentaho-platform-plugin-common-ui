@@ -1618,7 +1618,7 @@ define([
 
       // Extend _options property,
       // just like `def.type` does it in its classes.
-      instSpec._options = def.mixin.share(this.prototype._options, instSpec._options || {});
+      instSpec._options = def.mixin.share({}, this.prototype._options, instSpec._options || {});
 
       return this.base(name, instSpec, classSpec, keyArgs);
     }
