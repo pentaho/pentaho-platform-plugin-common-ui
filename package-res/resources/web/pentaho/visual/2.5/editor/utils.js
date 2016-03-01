@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 define([
-  "../type/helper",
-  "../../util/error",
-  "../../util/object"
+  "pentaho/visual/type/helper",
+  "pentaho/util/error",
+  "pentaho/util/object"
 ], function(typeHelper, error, O) {
 
   /**

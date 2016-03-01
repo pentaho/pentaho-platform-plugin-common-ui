@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 define([
-  "../spec/helper",
-  "../../util/promise",
-  "../../util/error"
+  "pentaho/visual/spec/helper",
+  "pentaho/util/promise",
+  "pentaho/util/error"
 ], function(specHelper, promiseUtil, error) {
 
   /**

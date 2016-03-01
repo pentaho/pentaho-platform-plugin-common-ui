@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 define([
-  "../../service!IVisualTypeProvider",
-  "../../service!IVisualApiConfiguration",
-  "../../lang/Base",
-  "../../util/error",
-  "../../util/object",
-  "../../util/fun",
-  "../../shim/es6-promise"
+  "pentaho/service!IVisualTypeProvider",
+  "pentaho/service!IVisualApiConfiguration",
+  "pentaho/lang/Base",
+  "pentaho/util/error",
+  "pentaho/util/object",
+  "pentaho/util/fun",
+  "pentaho/shim/es6-promise"
 ], function(typeProviders, apiConfigs, Base, error, O, fun) {
 
   /*global Promise:true*/

@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 define([
-  "../../util/object",
-  "../../util/error"
+  "pentaho/util/object",
+  "pentaho/util/error"
 ], function(O, error) {
 
   /**
