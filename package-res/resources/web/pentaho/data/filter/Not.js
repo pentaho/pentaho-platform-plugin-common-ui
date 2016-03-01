@@ -101,7 +101,7 @@ define([
      * Return the inverse of this filter.
      * Double inversion is prevented: the original operand of this filter is returned.
      *
-     * @return {pentaho.data.filter.AbstractFilter} A filter that is the inverse of this filter.
+     * @return {!pentaho.data.filter.AbstractFilter} A filter that is the inverse of this filter.
      * @override
      */
     invert: function() {
@@ -114,7 +114,7 @@ define([
     toSpec: function() {
       return _toSpec(this._op, this.operand.toSpec());
     }
-    
+
   });
 
   return NotFilter;

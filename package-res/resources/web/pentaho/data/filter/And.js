@@ -91,7 +91,7 @@ define([
      * Intersections of intersections of filters (ANDs of ANDs) are avoided.
      *
      * @param {...pentaho.data.filter.AbstractFilter} filter - A filter to be added to the intersection operation.
-     * @return {pentaho.data.filter.And} A filter that is the intersection of this filter with a list of other filters.
+     * @return {!pentaho.data.filter.And} A filter that is the intersection of this filter with a list of other filters.
      * @override
      */
     and: function() {

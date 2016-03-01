@@ -42,7 +42,8 @@ define([
   });
 
   /**
-   * This namespace contains classes for filters that are used for expressing a data set intensionally.
+   * This namespace contains classes for filters that are used for expressing a data set
+   * [intensionally]{@link https://en.wikipedia.org/wiki/Intensional_definition}.
    * It also exports a static create function that can be used to generate a filter tree from a spec.
    *
    * @name pentaho.data.filter
@@ -122,7 +123,7 @@ define([
      * @method
      * @static
      * @param {Object} spec - Specification of a filter
-     * @return {pentaho.data.filter.AbstractFilter} The tree of filter objects that corresponds to the specification
+     * @return {!pentaho.data.filter.AbstractFilter} The tree of filter objects that corresponds to the specification
      */
     create: function(spec) {
       return new RootFilter(spec);

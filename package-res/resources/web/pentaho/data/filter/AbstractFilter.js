@@ -33,10 +33,11 @@ define([
    * @abstract
    * @amd pentaho/data/filter/AbstractFilter
    *
-   * @classdesc The (abstract) base class for filters that represent subsets of a particular {@link pentaho.data.Table} object.
+   * @classdesc The (abstract) base class for filters that represent subsets of a particular
+   * {@link pentaho.data.Table} object.
    *
-   * A filter is an intensional representation of a subset of items in a collection.
-   * It does not represent projections.
+   * A filter is an [intensional]{@link https://en.wikipedia.org/wiki/Intensional_definition}
+   * representation of a subset of items in a collection.
    *
    * The hierarchy spawned by this class allows building filters by composition, in the form of a tree of filters.
    * When filtering a particular item in a data set, the leaf nodes evaluate the data
@@ -57,12 +58,15 @@ define([
       return null;
     },
 
+    /**
+     * @ignore
+     */
     _op: null,
 
     /**
      * Returns the inverse of this filter.
      *
-     * @return {pentaho.data.filter.Not} A filter that is the inverse of this filter.
+     * @return {!pentaho.data.filter.Not} A filter that is the inverse of this filter.
      */
     invert: function() {
       if(!Not) Not = require("./Not");
@@ -73,7 +77,7 @@ define([
      * Returns the union between this filter and a variable number of other filters.
      *
      * @param {...pentaho.data.filter.AbstractFilter} filter - A filter to be added to the union operation.
-     * @return {pentaho.data.filter.Or} A filter that is the union of this filter with a list of other filters.
+     * @return {!pentaho.data.filter.Or} A filter that is the union of this filter with a list of other filters.
      */
     or: function() {
       if(!arguments.length) return this;
@@ -87,7 +91,7 @@ define([
      * Returns the intersection between this filter and a variable number of other filters.
      *
      * @param {...pentaho.data.filter.AbstractFilter} filter - A filter to be added to the intersection operation.
-     * @return {pentaho.data.filter.And} A filter that is the intersection of this filter with a list of other filters.
+     * @return {!pentaho.data.filter.And} A filter that is the intersection of this filter with a list of other filters.
      */
     and: function() {
       if(!arguments.length) return this;
@@ -100,7 +104,7 @@ define([
     /**
      * Tests if an element belongs to the set defined by this filter.
      *
-     * @param {!pentaho.data.filter._Element} element - The candidate data set element.
+     * @param {!pentaho.type.Complex} element - The candidate data set element.
      * @return {boolean} `true` if this filter contains `element`, or `false` otherwise.
      * @abstract
      */
@@ -111,12 +115,12 @@ define([
     /**
      * Returns the subset of data that matches this filter.
      *
-     * @param {pentaho.data.Table} dataset - The data set to filter
-     * @returns {pentaho.data.TableView} The data table view of the restricted data set.
+     * @param {pentaho.data.Table} dataSet - The data set to filter
+     * @returns {!pentaho.data.TableView} The data table view of the restricted data set.
      * @override
      */
-    apply: function(dataset) {
-      return _apply(this, dataset);
+    apply: function(dataSet) {
+      return _apply(this, dataSet);
     },
 
     /**
@@ -174,7 +178,7 @@ define([
      * });
      *
      *
-     * @return {Object} Object.
+     * @return {!pentaho.data.filter.AbstractFilter} Object.
      */
     toSpec: /* istanbul ignore next: placeholder method */ function() {
       return null;

@@ -92,7 +92,7 @@ define([
      * Unions of unions of filters (ORs of ORs) are avoided.
      *
      * @param {...pentaho.data.filter.AbstractFilter} filter - A filter to be added to the union operation.
-     * @return {pentaho.data.filter.Or} A filter that is the union of this filter with a list of other filters.
+     * @return {!pentaho.data.filter.Or} A filter that is the union of this filter with a list of other filters.
      * @override
      */
     or: function() {
