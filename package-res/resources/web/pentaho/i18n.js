@@ -35,27 +35,26 @@ define(["./util/MessageBundle", "json"], function(MessageBundle) {
           onLoad(new MessageBundle(bundle));
         });
       }
+    },
+    normalize: function(name, normalize) {
+      return normalize(getBundleID(name));
     }
   };
 
   /**
-   * Gets a bundle info object with the plugin id and bundle name,
-   * for a given bundle module id.
+   * Normalizes the given bundle module id.
    *
    * @param {string} bundlePath The specified bundle path argument.
-   * @return {Object} A bundle info object.
-   *
-   * @throws {Error} If the specified module id cannot be resolved
-   *   to a plugin id and bundle name.
+   * @return {string} The normalized bundle id.
    */
-  function getBundleInfo(require, bundlePath) {
+  function getBundleID(bundlePath) {
     var bundleMid;
     if(!bundlePath) {
-      // "pentaho/messages!"
+      // "pentaho/i18n!"
       // Use the default location and bundle.
       bundleMid = "./messages/messages";
     } else if(bundlePath[0] === "/") {
-      // "pentaho/messages!/pentaho/common/nls/messages"
+      // "pentaho/i18n!/pentaho/common/nls/messages"
       // The path is, directly, an absolute module id of a message bundle (without the /).
       bundleMid = bundlePath.substr(1);
       if(!bundleMid) throw new Error("[pentaho/messages!] Bundle path argument cannot be a single '/'.");
@@ -70,7 +69,20 @@ define(["./util/MessageBundle", "json"], function(MessageBundle) {
       bundleMid = bundlePath;
     }
 
-    var absBundleUrl = require.toUrl(bundleMid);
+    return bundleMid;
+  }
+
+  /**
+   * Gets a bundle info object with the plugin id and bundle name,
+   * for a given bundle module id.
+   *
+   * @param {string} bundlePath The specified bundle path argument.
+   * @return {Object} A bundle info object.
+   *
+   * @throws {Error} If the specified module id cannot be resolved
+   *   to a plugin id and bundle name.
+   */
+  function getBundleInfo(require, bundlePath) {
     // e.g.:
     // bundlePath: pentaho/common/nls/messages
     // bundleMid:  pentaho/common/nls/messages
@@ -79,7 +91,9 @@ define(["./util/MessageBundle", "json"], function(MessageBundle) {
     // pluginId: common-ui
     // bundleName: resources/web/dojo/pentaho/common/nls/messages
 
-    // Split the url into pluginId and bundleName
+    var bundleMid = getBundleID(bundlePath);
+
+    var absBundleUrl = require.toUrl(bundleMid);
 
     // Remove CONTEXT_PATH from bundle url
     if(absBundleUrl.indexOf(CONTEXT_PATH) === 0)
@@ -89,8 +103,7 @@ define(["./util/MessageBundle", "json"], function(MessageBundle) {
     if(absBundleUrl.indexOf("content/") === 0)
       absBundleUrl = absBundleUrl.substr("content/".length);
 
-    //console.log("bundleUrl: " + absBundleUrl);
-
+    // Split the url into pluginId and bundleName
     // "pluginId/...bundleName..."
     var i = absBundleUrl.indexOf("/");
     if(i > 0 || i < absBundleUrl.length - 1)
