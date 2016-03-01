@@ -18,11 +18,11 @@ define([
   "./_Element",
   "../TableView",
   "../../util/arg",
-  "require",
+  "require"
   //"./Or",
   //"./And",
-  //"./Not",
-], function(Base, Element, TableView, arg, require, Or, And, Not) {
+  //"./Not"
+], function(Base, Element, TableView, arg, require) {
   "use strict";
 
   var Or, And, Not;

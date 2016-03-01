@@ -63,7 +63,7 @@ define([
      * @inheritdoc
      * @readonly
      */
-    get type() { return "Or";},
+    get type() { return "or";},
 
     _op: "$or",
 
@@ -86,7 +86,7 @@ define([
     or: function() {
       var N = arguments.length;
       if(!N) return this;
-      var operands = this.operands;
+      var operands = this.operands.slice();
       for(var k = 0; k < N; k++) {
         operands.push(arguments[k]);
       }
@@ -97,11 +97,8 @@ define([
      * @inheritdoc
      */
     invert: function() {
-      var invertedOperands = this.operands.map(function(operand) {
-        return operand.invert();
-      });
       if(!And) And = require("./And");
-      return new And(invertedOperands);
+      return new And(this._invertedOperands());
     }
   });
 

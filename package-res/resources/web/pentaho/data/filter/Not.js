@@ -69,7 +69,7 @@ define([
      * @inheritdoc
      * @readonly
      */
-    get type() { return "Not";},
+    get type() { return "not";},
 
     _op: "$not",
 

@@ -33,7 +33,7 @@ define([
 
     describe("#type", function() {
       it("should return 'IsEqual'.", function() {
-        expect(sales12k.type).toBe("IsEqual");
+        expect(sales12k.type).toBe("isEqual");
       });
 
       it("should be immutable.", function() {
@@ -64,7 +64,7 @@ define([
       it("should return an AND.", function() {
         var inStock = new IsEqual("inStock", true);
         var combination = sales12k.and(inStock);
-        expect(combination.type).toBe("And");
+        expect(combination.type).toBe("and");
       });
     }); // #and
 
@@ -72,14 +72,14 @@ define([
       it("should return an Or.", function() {
         var inStock = new IsEqual("inStock", true);
         var combination = sales12k.or(inStock);
-        expect(combination.type).toBe("Or");
+        expect(combination.type).toBe("or");
       });
     }); // #or
 
     describe("#invert ", function() {
       it("should return a Not.", function() {
         var filter = sales12k.invert();
-        expect(filter.type).toBe("Not");
+        expect(filter.type).toBe("not");
       });
     }); // #invert
 

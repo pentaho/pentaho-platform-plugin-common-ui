@@ -35,7 +35,7 @@ define([
 
 
     it("should be of type 'Or'.", function() {
-      expect(filter.type).toBe("Or");
+      expect(filter.type).toBe("or");
     });
 
 
@@ -78,7 +78,7 @@ define([
     describe("#and ", function() {
       it("should return an And.", function() {
         var result = filter.and(inStock);
-        expect(result.type).toBe("And");
+        expect(result.type).toBe("and");
       });
     }); // #or
 
@@ -87,12 +87,12 @@ define([
       it("should return a simplified filter, with the negated terms next to the leafs", function() {
         var result = filter.invert();
 
-        expect(result.type).toBe("And");
+        expect(result.type).toBe("and");
         expect(result.operands.length).toBe(2);
-        expect(result.operands[0].type).toBe("Not");
-        expect(result.operands[0].operand.type).toBe("IsIn");
-        expect(result.operands[1].type).toBe("Not");
-        expect(result.operands[1].operand.type).toBe("IsEqual");
+        expect(result.operands[0].type).toBe("not");
+        expect(result.operands[0].operand.type).toBe("isIn");
+        expect(result.operands[1].type).toBe("not");
+        expect(result.operands[1].operand.type).toBe("isEqual");
       });
     });
 
@@ -147,18 +147,6 @@ define([
         expect(filteredData.getValue(2, 0)).toBe("C");
       });
 
-      it("should be commutative", function() {
-        var data1 = filter.apply(data);
-
-        var filter2 = new Or([inStock, sales12k]);
-        var data2 = filter2.apply(data);
-
-        expect(data1.getNumberOfRows()).toBe(3);
-        expect(data1.getNumberOfRows()).toBe(data2.getNumberOfRows());
-        for(var k = 0; k < 3; k++) {
-          expect(data1.getValue(k, 0)).toBe(data2.getValue(k, 0));
-        }
-      });
     }); // #apply
 
     describe("#toSpec", function() {

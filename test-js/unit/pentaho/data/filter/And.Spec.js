@@ -36,7 +36,7 @@ define([
 
     describe("#type", function() {
       it("should return 'And' ", function() {
-        expect(filter.type).toBe("And");
+        expect(filter.type).toBe("and");
       });
 
       it("should be immutable.", function() {
@@ -64,7 +64,7 @@ define([
     describe("#and", function() {
       it("should return an AND.", function() {
         var result = filter.and(inStock);
-        expect(result.type).toBe("And");
+        expect(result.type).toBe("and");
       });
 
       it("should return a new instance when adding more operands", function() {
@@ -90,7 +90,7 @@ define([
     describe("#or ", function() {
       it("should return an Or.", function() {
         var result = filter.or(inStock);
-        expect(result.type).toBe("Or");
+        expect(result.type).toBe("or");
       });
     }); // #or
 
@@ -98,12 +98,12 @@ define([
       it("should return a simplified filter, with the negated terms next to the leafs", function() {
         var result = filter.invert();
 
-        expect(result.type).toBe("Or");
+        expect(result.type).toBe("or");
         expect(result.operands.length).toBe(2);
-        expect(result.operands[0].type).toBe("Not");
-        expect(result.operands[0].operand.type).toBe("IsIn");
-        expect(result.operands[1].type).toBe("Not");
-        expect(result.operands[1].operand.type).toBe("IsEqual");
+        expect(result.operands[0].type).toBe("not");
+        expect(result.operands[0].operand.type).toBe("isIn");
+        expect(result.operands[1].type).toBe("not");
+        expect(result.operands[1].operand.type).toBe("isEqual");
       });
     }); // #invert
 
@@ -156,17 +156,6 @@ define([
         expect(filteredData.getValue(0, 0)).toBe("A");
       });
 
-      it("should be commutative", function() {
-        var data1 = filter.apply(data);
-
-        var filter2 = new And([inStock, sales12k]);
-        var data2 = filter2.apply(data);
-
-        expect(data1.getNumberOfRows()).toBe(1);
-        expect(data1.getNumberOfRows()).toBe(data2.getNumberOfRows());
-        expect(data1.getValue(0, 0)).toBe(data2.getValue(0, 0));
-
-      });
     }); // #apply
 
     describe("#toSpec", function() {

@@ -46,6 +46,12 @@ define([
 
     operands: null,
 
+    _invertedOperands: function() {
+      return this.operands.map(function(operand) {
+        return operand.invert();
+      });
+    },
+
     /**
      * @inheritdoc
      */
