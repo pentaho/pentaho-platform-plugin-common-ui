@@ -16,52 +16,28 @@
 define([
   "./AbstractFilter",
   "../../util/object",
+  "./_apply",
   "./_toSpec"
-], function(AbstractFilter, O, toSpec) {
+], function(AbstractFilter, O, _apply, toSpec) {
   "use strict";
 
   /**
    * @name AbstractPropertyFilter
    * @memberOf pentaho.data.filter
    * @class
+   * @extends pentaho.data.filter.AbstractFilter
    * @abstract
    * @amd pentaho/data/filter/AbstractPropertyFilter
    *
    * @classdesc The `AbstractPropertyFilter` class is the abstract base class of
-   * classes that represent a filter.
+   * classes that represent a filter (or leaf node of a tree). This class (and its descendants)
+   * extract a given property from within a data table {@link pentaho.data.Table} and
+   * compares its value(s) to the corresponding given candidate value(s) using
+   * some comparison operation.
    *
-   * @example
-   * <caption> Create a new class <code>DerivedAbstractPropertyFilter</code> containing...
-   *
-   * require(["pentaho/data/filter/AbstractPropertyFilter"], function(AbstractPropertyFilter) {
-   *   var DerivedAbstractPropertyFilter = AbstractPropertyFilter.extend({
-   *     get type() { return "$type";},
-   *     _method: function(value) {
-   *        return this._value === value;
-   *     },
-   *     toSpec: function(){}
-   *   });
-   *
-   *   var data = new Table({
-   *     model: [
-   *       {name: "product", type: "string", label: "Product"},
-   *       {name: "sales", type: "number", label: "Sales"},
-   *       {name: "inStock", type: "boolean", label: "In Stock"}
-   *     ],
-   *     rows: [
-   *       {c: [{v: "A"}, {v: 12000}, {v: true}]},
-   *       {c: [{v: "B"}, {v: 6000}, {v: true}]},
-   *       {c: [{v: "C"}, {v: 12000}, {v: false}]},
-   *       {c: [{v: "D"}, {v: 1000}, {v: false}]},
-   *       {c: [{v: "E"}, {v: 2000}, {v: false}]},
-   *       {c: [{v: "F"}, {v: 3000}, {v: false}]},
-   *       {c: [{v: "G"}, {v: 4000}, {v: false}]}
-   *     ]
-   *   });
-   *
-   *   var filter = new DerivedAbstractPropertyFilter("product", ["A"]);
-   *   var filteredData = filter.apply(data); //filteredData.getValue(0, 0) === "A"
-   * });
+   * @description The `AbstractPropertyFilter` extends the `AbstractFilter`
+   * {@link pentaho.data.filter.AbstractFilter} class to allow creation of
+   * types of filters for a data table {@link pentaho.data.Table}.
    *
    * ### Remarks
    *
@@ -70,9 +46,9 @@ define([
    * * {@link pentaho.data.filter.IsEqual}
    * * {@link pentaho.data.filter.IsIn}
    *
-   * @constructor
-   * @param {string} property The name of the property.
-   * @param {string|number} value The value of the property.
+   * @param {string} property The name of the property
+   * @param {Object} value The value that belongs to the set
+   *
    */
   var AbstractPropertyFilter = AbstractFilter.extend("pentaho.data.filter.AbstractPropertyFilter", /** @lends pentaho.data.filter.AbstractPropertyFilter# */{
     constructor: function(property, value) {
@@ -80,10 +56,15 @@ define([
       this.property = property;
       Object.freeze(this);
     },
+
     /**
+     * The comparative operation used to filter data at each leaf node.
      *
-     * @param value
-     * @returns {boolean}
+     * @name pentaho.data.filter.AbstractPropertyFilter#_operation
+     * @method
+     * @abstract
+     * @param {string} value The current candidate value for the given property
+     * @returns {boolean} True if the current candidate value meets the requirement of the filter.
      * @protected
      */
     _operation: /* istanbul ignore next: placeholder method */ function(value) {
@@ -91,7 +72,13 @@ define([
     },
 
     /**
-     * @inheritdoc
+     * Tests if an entry is an element of the set defined by this filter.
+     *
+     * @name pentaho.data.filter.AbstractPropertyFilter#contains
+     * @method
+     * @abstract
+     * @param {pentaho.data.filter._Element} - [element] The data table {@link pentaho.data.Table} entry to check for.
+     * @return {boolean} True if the entry value is contained by this filter.
      */
     contains: function(element) {
       return element.has(this.property) &&
@@ -103,6 +90,18 @@ define([
      */
     toSpec: function() {
       return toSpec(this.property, toSpec(this._op, this.value));
+    },
+
+    /**
+     * Returns the subset of data that matches this filter.
+     *
+     * @name pentaho.data.filter.AbstractPropertyFilter#apply
+     * @method
+     * @param {pentaho.data.Table} dataTable The data table to filter
+     * @returns {pentaho.data.TableView} The data table view of the restricted data set.
+     */
+    apply: function(dataTable) {
+      return _apply(this, dataTable);
     }
   });
 

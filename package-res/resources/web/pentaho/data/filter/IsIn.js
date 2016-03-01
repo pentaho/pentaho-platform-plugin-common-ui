@@ -23,13 +23,13 @@ define([
    * @name IsIn
    * @memberOf pentaho.data.filter
    * @class
-   * @abstract
+   * @extends pentaho.data.filter.AbstractPropertyFilter
    * @amd pentaho/data/filter/IsIn
    *
-   * @classdesc The `IsIn` class implements a type of AbstractPropertyFilter {@link pentaho.data.filter.AbstractPropertyFilter}.
+   * @classdesc A filter that defines the set of items in which the value of a property belongs to a particular set.
    *
    * @example
-   * <caption> Create a new <code>IsIn</code> filter.
+   * <caption> Create a new <code>IsIn</code> filter.</caption>
    *
    * require(["pentaho/data/Table", "pentaho/data/filter/IsIn"], function(Table, IsIn) {
    *   var data = new Table({
@@ -52,11 +52,18 @@ define([
    *   var filter = new IsIn("product", ["A"]);
    *   var filteredData = filter.apply(data); //filteredData.getValue(0, 0) === "A"
    * });
+   *
+   * @description Creates an `IsIn` filter given a property name and an array of values that define the set of admissible values.
+   *
+   * @param {string} property The name of the property
+   * @param {Array<any>} value The array of values that belong to the set
+   *
    */
   var IsIn = AbstractPropertyFilter.extend("pentaho.data.filter.IsIn", /** @lends pentaho.data.filter.IsIn# */{
     constructor: function(property, value) {
       this.base(property, value || []);
     },
+
     /**
      * @inheritdoc
      * @readonly

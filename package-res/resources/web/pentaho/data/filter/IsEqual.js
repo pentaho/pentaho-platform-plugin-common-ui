@@ -19,16 +19,16 @@ define([
   "use strict";
 
   /**
-   * @name IsIn
+   * @name IsEqual
    * @memberOf pentaho.data.filter
    * @class
-   * @abstract
+   * @extends pentaho.data.filter.AbstractPropertyFilter
    * @amd pentaho/data/filter/IsEqual
    *
-   * @classdesc The `IsEqual` class implements a type of AbstractPropertyFilter {@link pentaho.data.filter.AbstractPropertyFilter}.
+   * @classdesc A filter that defines the set of items having the value of a property equal to a certain value.
    *
    * @example
-   * <caption> Create a new <code>IsEqual</code> filter.
+   * <caption> Create a new <code>IsEqual</code> filter.</caption>
    *
    * require(["pentaho/data/Table", "pentaho/data/filter/IsEqual"], function(Table, IsEqual) {
    *   var data = new Table({
@@ -48,9 +48,15 @@ define([
    *     ]
    *   });
    *
-   *   var filter = new IsEqual("product", ["A"]);
+   *   var filter = new IsEqual("product", "A");
    *   var filteredData = filter.apply(data); //filteredData.getValue(0, 0) === "A"
    * });
+   *
+   * @description Creates an IsEqual filter given a property name and corresponding value to be contained in the set.
+   *
+   * @param {string} property The name of the property
+   * @param {Object} value The value that belongs to the set
+   *
    */
   var IsEqual = AbstractPropertyFilter.extend("pentaho.data.filter.IsEqual", /** @lends pentaho.data.filter.IsEqual# */{
 

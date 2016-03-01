@@ -22,8 +22,17 @@ define([
 ], function(IsEqual, IsIn, AndFilter, OrFilter, NotFilter) {
   "use strict";
 
-
-  var RootFilter = OrFilter.extend({
+  /**
+   * @name RootFilter
+   * @memberOf pentaho.data.filter
+   * @extends pentaho.data.filter.Or
+   * @class
+   * @ignore
+   *
+   * @param {Object} filterSpec The specification of a Filter.
+   *
+   */
+  var RootFilter = OrFilter.extend("pentaho.data.RootFilter", /** @lends pentaho.data.RootFilter# */{
     constructor: function(filterSpec) {
       if(filterSpec)
         this.base(fromSpec(filterSpec));
@@ -32,6 +41,63 @@ define([
     }
   });
 
+  /**
+   * @name Filter
+   * @memberOf pentaho.data
+   * @class
+   * @amd pentaho/data/Filter
+   *
+   * @classdesc The `Filter` class exports a static create function that is a factory of filters:
+   *
+   * * {@link pentaho.data.filter.IsEqual}
+   * * {@link pentaho.data.filter.IsIn}
+   * * {@link pentaho.data.filter.Or}
+   * * {@link pentaho.data.filter.And}
+   * * {@link pentaho.data.filter.Not}
+   *
+   * @example
+   * <caption> Use the available `Filter` factories.</caption>
+   *
+   * require(["pentaho/data/Table", "pentaho/data/Filter"], function(Table, Filter) {
+   *   var data = new Table({
+   *     model: [
+   *       {name: "product", type: "string", label: "Product"},
+   *       {name: "sales", type: "number", label: "Sales"},
+   *       {name: "inStock", type: "boolean", label: "In Stock"}
+   *     ],
+   *     rows: [
+   *       {c: [{v: "A"}, {v: 12000}, {v: true}]},
+   *       {c: [{v: "B"}, {v: 6000}, {v: true}]},
+   *       {c: [{v: "C"}, {v: 12000}, {v: false}]},
+   *       {c: [{v: "D"}, {v: 1000}, {v: false}]},
+   *       {c: [{v: "E"}, {v: 2000}, {v: false}]},
+   *       {c: [{v: "F"}, {v: 3000}, {v: false}]},
+   *       {c: [{v: "G"}, {v: 4000}, {v: false}]}
+   *     ]
+   *   });
+   *
+   *   var sales12k = new Filter.IsEqual("sales", [12000]);
+   *   var productAB = new Filter.IsIn("product", ["A", "B"]);
+   *   var notInProductABFilter = new Not(productAB);
+   *   var andFilter = new Filter.And([sales12k, notInProductABFilter]);
+   *   var filter = new Not(andFilter);
+   *   var filteredData = filter.apply(data); //filteredData.getValue(0, 0) === "A", filteredData.getValue(1, 0) === "B", filteredData.getValue(2, 0) === "D", filteredData.getValue(3, 0) === "E", filteredData.getValue(4, 0) === "F", filteredData.getValue(5, 0) === "G"
+   *
+   *   //Or alternatively,
+   *   var spec = {
+   *      "$not": {
+   *        "$and": [
+   *          {"sales": 12000},
+   *          {"$not": {"product": {"$in": ["A", "B"]}}}
+   *        ]
+   *      }
+   *    };
+   *
+   *   var filterFromSpec = Filter.create(spec);
+   *   var filteredDataFromSpec = filterFromSpec.apply(data); //filteredDataFromSpec.getValue(0, 0) === "A", filteredDataFromSpec.getValue(1, 0) === "B", filteredDataFromSpec.getValue(2, 0) === "D", filteredDataFromSpec.getValue(3, 0) === "E", filteredDataFromSpec.getValue(4, 0) === "F", filteredDataFromSpec.getValue(5, 0) === "G"
+   * });
+   *
+   */
   return {
     // Leaf nodes
     IsEqual: IsEqual,
@@ -44,7 +110,7 @@ define([
 
     /**
      * Create a filter from a spec
-     * @param {Object} spec - Specification of a Filter
+     * @param {pentaho.data.filter.Or} spec - Specification of a Filter
      * @returns {*}
      */
     create: function (spec) {
