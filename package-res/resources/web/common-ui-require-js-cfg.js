@@ -211,6 +211,13 @@
   // CCC Theme
   mapTheme("pentaho/visual/ccc/abstract", ["default"]);
 
+  mapTheme("pentaho/visual/ccc/bar", ["det"]);
+  mapTheme("pentaho/visual/ccc/barHorizontal", ["det"]);
+  mapTheme("pentaho/visual/ccc/barNormalized", ["det"]);
+  mapTheme("pentaho/visual/ccc/barNormalizedHorizontal", ["det"]);
+  mapTheme("pentaho/visual/ccc/barStacked", ["det"]);
+  mapTheme("pentaho/visual/ccc/barStackedHorizontal", ["det"]);
+
   // sample/calc theme
   mapTheme("pentaho/visual/samples/calc", ["crystal"]);
 
