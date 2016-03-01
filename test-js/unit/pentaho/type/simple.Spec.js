@@ -244,7 +244,7 @@ define([
         expect(function() {
           var simple1 = new Simple(123);
           simple1.configure(new Date());
-        }).toThrow(errorMatch.argInvalidType("config", ["Object", "pentaho.type.Simple"], "string"));
+        }).toThrow(errorMatch.argInvalidType("config", ["Object", "pentaho.type.Simple"], "object"));
       });
 
       it("should do nothing when given itself", function() {
