@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2016 Pentaho Corporation.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,16 +16,17 @@
 define(["pentaho/util/MessageBundle", "json"], function(MessageBundle) {
   return {
     load: function(bundlePath, require, onLoad, config) {
-
-      var bundleUrl = getBundleUrl(require, bundlePath);
-
+      var bundleUrl = require.toUrl(bundlePath) + ".properties";
       require(["text!" + bundleUrl], function(bundleText) {
         onLoad(new MessageBundle(parseProperties(bundleText)));
       });
+    },
+    normalize: function(name, normalize) {
+      return normalize(getBundleID(name));
     }
   };
 
-  function getBundleUrl(require, bundlePath) {
+  function getBundleID(bundlePath) {
     var bundleMid;
     if(!bundlePath) {
       // "pentaho/i18n!"
@@ -47,7 +48,7 @@ define(["pentaho/util/MessageBundle", "json"], function(MessageBundle) {
       bundleMid = bundlePath;
     }
 
-    return require.toUrl(bundleMid) + ".properties";
+    return bundleMid;
   }
 
   function parseProperties(text) {
