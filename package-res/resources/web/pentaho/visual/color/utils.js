@@ -304,7 +304,7 @@ define([
   //  =>
   //   suffix:       "-5"     | "-3"      | "-5"
   //
-  // paletteName:  "ryg_3", "ryg_5", "ryb_3", "ryb_5", "blue_3", "blue_5", "gray_3", "gray_5"
+  // paletteName:  "ryg-3", "ryg-5", "ryb-3", "ryb-5", "blue-3", "blue-5", "gray-3", "gray-5"
 
   function buildPalette(colorSet, pattern, reversed) {
     var colors = null;
@@ -314,10 +314,10 @@ define([
       pattern = pattern.toLowerCase();
 
       if(pattern === "gradient") {
-        suffix = "_5";
+        suffix = "-5";
       } else {
         var m = reNumColorPattern.exec(pattern);
-        suffix = m ? ("_" + m[1]) : pattern;
+        suffix = m ? ("-" + m[1]) : pattern;
       }
 
       var palette = paletteRegistry.get(colorSet + suffix);
