@@ -88,7 +88,7 @@ define([
    * <tr><td style="background-color:#AA6611"></td><td>#AA6611</td></tr>
    * </table>
    *
-   * 4. `"ryg_3"` (3 colors):
+   * 4. `"ryg-3"` (3 colors):
    * <table style="font-family:courier; width:120px;">
    * <colgroup><col width="20px"/><col />
    * <tr><td style="background-color:#FF0000"></td><td>#FF0000</td></tr>
@@ -96,7 +96,7 @@ define([
    * <tr><td style="background-color:#008000"></td><td>#008000</td></tr>
    * </table>
    *
-   * 5. `"ryg_5"` (5 colors):
+   * 5. `"ryg-5"` (5 colors):
    * <table style="font-family:courier; width:120px;">
    * <colgroup><col width="20px"/><col />
    * <tr><td style="background-color:#FF0000"></td><td>#FF0000</td></tr>
@@ -106,7 +106,7 @@ define([
    * <tr><td style="background-color:#008000"></td><td>#008000</td></tr>
    * </table>
    *
-   * 6. `"ryb_3"` (3 colors):
+   * 6. `"ryb-3"` (3 colors):
    * <table style="font-family:courier; width:120px;">
    * <colgroup><col width="20px"/><col />
    * <tr><td style="background-color:#FF0000"></td><td>#FF0000</td></tr>
@@ -114,7 +114,7 @@ define([
    * <tr><td style="background-color:#4BB6E4"></td><td>#4BB6E4</td></tr>
    * </table>
    *
-   * 7. `"ryb_5"` (5 colors):
+   * 7. `"ryb-5"` (5 colors):
    * <table style="font-family:courier; width:120px;">
    * <colgroup><col width="20px"/><col />
    * <tr><td style="background-color:#FF0000"></td><td>#FF0000</td></tr>
@@ -124,7 +124,7 @@ define([
    * <tr><td style="background-color:#4BB6E4"></td><td>#4BB6E4</td></tr>
    * </table>
    *
-   * 8. `"blue_3"` (3 colors):
+   * 8. `"blue-3"` (3 colors):
    * <table style="font-family:courier; width:120px;">
    * <colgroup><col width="20px"/><col />
    * <tr><td style="background-color:#CBE7FF"></td><td>#CBE7FF</td></tr>
@@ -132,7 +132,7 @@ define([
    * <tr><td style="background-color:#0345A9"></td><td>#0345A9</td></tr>
    * </table>
    *
-   * 9. `"blue_5"` (5 colors):
+   * 9. `"blue-5"` (5 colors):
    * <table style="font-family:courier; width:120px;">
    * <colgroup><col width="20px"/><col />
    * <tr><td style="background-color:#CBE7FF"></td><td>#CBE7FF</td></tr>
@@ -142,7 +142,7 @@ define([
    * <tr><td style="background-color:#0345A9"></td><td>#0345A9</td></tr>
    * </table>
    *
-   * 10. `"gray_3"` (3 colors):
+   * 10. `"gray-3"` (3 colors):
    * <table style="font-family:courier; width:120px;">
    * <colgroup><col width="20px"/><col />
    * <tr><td style="background-color:#E6E6E6"></td><td>#E6E6E6</td></tr>
@@ -150,7 +150,7 @@ define([
    * <tr><td style="background-color:#333333"></td><td>#333333</td></tr>
    * </table>
    *
-   * 11. `"gray_5"` (5 colors):
+   * 11. `"gray-5"` (5 colors):
    * <table style="font-family:courier; width:120px;">
    * <colgroup><col width="20px"/><col />
    * <tr><td style="background-color:#E6E6E6"></td><td>#E6E6E6</td></tr>
@@ -310,14 +310,14 @@ define([
     ]
   });
 
-  paletteRegistry.add({name: "ryg_3",  colors: ["#FF0000", "#FFFF00", "#008000"]});
-  paletteRegistry.add({name: "ryg_5",  colors: ["#FF0000", "#FFBF3F", "#FFFF00", "#BFDF3F", "#008000"]});
-  paletteRegistry.add({name: "ryb_3",  colors: ["#FF0000", "#FFFF00", "#4BB6E4"]});
-  paletteRegistry.add({name: "ryb_5",  colors: ["#FF0000", "#FFBF3F", "#FFFF00", "#DCDDDE", "#4BB6E4"]});
-  paletteRegistry.add({name: "blue_3", colors: ["#CBE7FF", "#33A1FF", "#0345A9"]});
-  paletteRegistry.add({name: "blue_5", colors: ["#CBE7FF", "#99D0FF", "#33A1FF", "#006ECC", "#0345A9"]});
-  paletteRegistry.add({name: "gray_3", colors: ["#E6E6E6", "#999999", "#333333"]});
-  paletteRegistry.add({name: "gray_5", colors: ["#E6E6E6", "#CCCCCC", "#999999", "#666666", "#333333"]});
+  paletteRegistry.add({name: "ryg-3",  colors: ["#FF0000", "#FFFF00", "#008000"]});
+  paletteRegistry.add({name: "ryg-5",  colors: ["#FF0000", "#FFBF3F", "#FFFF00", "#BFDF3F", "#008000"]});
+  paletteRegistry.add({name: "ryb-3",  colors: ["#FF0000", "#FFFF00", "#4BB6E4"]});
+  paletteRegistry.add({name: "ryb-5",  colors: ["#FF0000", "#FFBF3F", "#FFFF00", "#DCDDDE", "#4BB6E4"]});
+  paletteRegistry.add({name: "blue-3", colors: ["#CBE7FF", "#33A1FF", "#0345A9"]});
+  paletteRegistry.add({name: "blue-5", colors: ["#CBE7FF", "#99D0FF", "#33A1FF", "#006ECC", "#0345A9"]});
+  paletteRegistry.add({name: "gray-3", colors: ["#E6E6E6", "#999999", "#333333"]});
+  paletteRegistry.add({name: "gray-5", colors: ["#E6E6E6", "#CCCCCC", "#999999", "#666666", "#333333"]});
 
   return paletteRegistry;
 });
