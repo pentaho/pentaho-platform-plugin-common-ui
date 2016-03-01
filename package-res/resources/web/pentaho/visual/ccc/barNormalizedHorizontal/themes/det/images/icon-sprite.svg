@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<svg width="40" height="80" xmlns="http://www.w3.org/2000/svg">
+  <style type="text/css">
+    .st0{fill:#005DA6;}
+    .st2{fill:#A8A8A8;}
+  </style>
+  <g>
+    <rect fill="#ff007f" height="1.1" width="12.4" class="st0" y="25.5" x="11.2"/>
+    <rect fill="#ff007f" height="1.1" width="6.1" class="st0" y="14" x="11.2"/>
+    <rect fill="#ff007f" height="1.1" width="10.2" class="st0" y="14" x="18.6"/>
+    <rect fill="#ff007f" height="1.1" width="9.1" class="st0" y="17.8" x="11.2"/>
+    <rect fill="#ff007f" height="1.1" width="7.2" class="st0" y="17.8" x="21.6"/>
+    <rect fill="#ff007f" height="1.1" width="1.8" class="st0" y="21.7" x="11.2"/>
+    <rect fill="#ff007f" height="1.1" width="14.5" class="st0" y="21.7" x="14.3"/>
+    <rect fill="#ff007f" height="1.1" width="3.8" class="st0" y="25.4" x="25"/>
+  </g>
+
+  <g>
+    <rect height="1.1" width="12.4" class="st2" y="65.499999" x="11.200001"/>
+    <rect height="1.1" width="6.1" class="st2" y="53.999999" x="11.200001"/>
+    <rect height="1.1" width="10.2" class="st2" y="53.999999" x="18.600001"/>
+    <rect height="1.1" width="9.1" class="st2" y="57.799999" x="11.200001"/>
+    <rect height="1.1" width="7.2" class="st2" y="57.799999" x="21.600001"/>
+    <rect height="1.1" width="1.8" class="st2" y="61.699999" x="11.200001"/>
+    <rect height="1.1" width="14.5" class="st2" y="61.699999" x="14.300001"/>
+    <rect height="1.1" width="3.8" class="st2" y="65.399999" x="25.000001"/>
+  </g>
+</svg>

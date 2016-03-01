@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<svg width="40" height="80" xmlns="http://www.w3.org/2000/svg">
+  <style type="text/css">
+    .st0{fill:#005DA6;}
+    .st2{fill:#A8A8A8;}
+  </style>
+
+  <g>
+    <rect height="9.1" width="1.1" class="st2" y="57.1" x="14.488322"/>
+    <rect height="4.8" width="1.1" class="st2" y="61.4" x="21.188322"/>
+    <rect height="12.4" width="1.1" class="st2" y="53.8" x="24.588322"/>
+    <rect height="7.1" width="1.1" class="st2" y="59.1" x="27.888322"/>
+    <rect height="3.2" width="1.1" class="st2" y="63" x="11.188322"/>
+    <rect height="7.1" width="1.1" class="st2" y="59.1" x="17.888322"/>
+  </g>
+
+  <g>
+    <rect height="9.1" width="1.1" class="st0" y="17.1" x="14.488322"/>
+    <rect height="4.8" width="1.1" class="st0" y="21.4" x="21.188322"/>
+    <rect height="12.4" width="1.1" class="st0" y="13.8" x="24.588322"/>
+    <rect height="7.1" width="1.1" class="st0" y="19.1" x="27.888322"/>
+    <rect height="3.2" width="1.1" class="st0" y="23" x="11.188322"/>
+    <rect height="7.1" width="1.1" class="st0" y="19.1" x="17.888322"/>
+  </g>
+</svg>

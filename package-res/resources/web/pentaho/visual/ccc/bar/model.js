@@ -17,7 +17,8 @@ define([
   "../barAbstract/model",
   "pentaho/i18n!../abstract/i18n/model",
   "../abstract/types/labelsOption",
-  "../abstract/mixins/trendMeta"
+  "../abstract/mixins/trendMeta",
+  "./theme/model"
 ], function(barAbstractModelFactory, bundle, labelsOptionFactory, trendMeta) {
 
   "use strict";
