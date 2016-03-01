@@ -30,7 +30,7 @@ define([
    * @extends pentaho.data.filter.AbstractFilter
    * @amd pentaho/data/filter/Not
    *
-   * @classdesc A filter that implements the inversion of list of filters, each of which defines a set.
+   * @classdesc A filter that implements the inversion of a filter that defines a set.
    *
    * @example
    * <caption> Create a new <code>Not</code> filter.</caption>
@@ -61,7 +61,7 @@ define([
    *  var data = filter.apply(data); //data.getValue(0, 0) === "B"
    * });
    *
-   * @description Creates a `Not` filter given an `AbstractPropertyFilter` {@link pentaho.data.filter.AbstractPropertyFilter}.
+   * @description Creates a `Not` filter given an `AbstractFilter` {@link pentaho.data.filter.AbstractFilter}.
    *
    * @param {pentaho.data.filter.AbstractPropertyFilter} operand The operand to filter by.
    *

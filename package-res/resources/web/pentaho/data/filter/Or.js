@@ -27,7 +27,7 @@ define([
    * @extends pentaho.data.filter.AbstractTreeFilter
    * @amd pentaho/data/filter/Or
    *
-   * @classdesc A filter that implements the union of list of filters, each of which defines a set.
+   * @classdesc A filter that implements the union of a list of filters, each of which defines a set.
    *
    * @example
    * <caption> Create a new <code>Or</code> filter.</caption>
@@ -57,7 +57,7 @@ define([
    *   var data = filter.apply(data); //data.getValue(0, 0) === "A", data.getValue(1, 0) === "B", data.getValue(2, 0) === "C"
    * });
    *
-   * @description Creates an `Or` filter that performs the union of a list of given `AbstractPropertyFilter`'s {@link pentaho.data.filter.AbstractPropertyFilter}.
+   * @description Creates an `Or` filter that performs the union of a list of given `AbstractFilter`'s {@link pentaho.data.filter.AbstractFilter}.
    *
    * @param {pentaho.data.filter.AbstractPropertyFilter[]} operands The operands to filter by.
    *

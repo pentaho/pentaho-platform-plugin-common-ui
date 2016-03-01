@@ -56,7 +56,7 @@ define([
    * @description Creates an `IsIn` filter given a property name and an array of values that define the set of admissible values.
    *
    * @param {string} property The name of the property
-   * @param {Object[]} value The array of values that belong to the set
+   * @param {Array<any>} value The array of values that belong to the set
    *
    */
   var IsIn = AbstractPropertyFilter.extend("pentaho.data.filter.IsIn", /** @lends pentaho.data.filter.IsIn# */{

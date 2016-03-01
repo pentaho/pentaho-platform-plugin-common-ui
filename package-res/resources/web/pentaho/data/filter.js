@@ -28,7 +28,7 @@ define([
    * @extends pentaho.data.filter.Or
    * @class
    * @ignore
-   * 
+   *
    * @param {Object} filterSpec The specification of a Filter.
    *
    */

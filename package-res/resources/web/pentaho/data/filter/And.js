@@ -27,7 +27,7 @@ define([
    * @extends pentaho.data.filter.AbstractTreeFilter
    * @amd pentaho/data/filter/And
    *
-   * @classdesc A filter that implements the intersection of list of filters, each of which defines a set.
+   * @classdesc A filter that implements the intersection of a list of filters, each of which defines a set.
    *
    * @example
    * <caption> Create a new <code>And</code> filter.</caption>
@@ -59,9 +59,9 @@ define([
    *  var data = filter.apply(data); //data.getValue(0, 0) === "A"
    * });
    *
-   * @description Creates an `And` filter that performs the intersection of a list of given `AbstractPropertyFilter`'s {@link pentaho.data.filter.AbstractPropertyFilter}.
+   * @description Creates an `And` filter that performs the intersection of a list of given `AbstractFilter`'s {@link pentaho.data.filter.AbstractFilter}.
    *
-   * @param {pentaho.data.filter.AbstractPropertyFilter[]} operands The operands to filter by.
+   * @param {Array<pentaho.data.filter.AbstractFilter>} operands The operands to filter by.
    *
    */
   var And = AbstractTreeFilter.extend("pentaho.data.filter.And", /** @lends pentaho.data.filter.And# */{

@@ -77,7 +77,7 @@ define([
      * @name pentaho.data.filter.AbstractPropertyFilter#contains
      * @method
      * @abstract
-     * @param {pentaho.data.filter._Element} - [entry] The data table {@link pentaho.data.Table} entry to check for.
+     * @param {pentaho.data.filter._Element} - [element] The data table {@link pentaho.data.Table} entry to check for.
      * @return {boolean} True if the entry value is contained by this filter.
      */
     contains: function(element) {

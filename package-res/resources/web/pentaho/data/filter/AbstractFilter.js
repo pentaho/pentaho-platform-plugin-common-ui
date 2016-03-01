@@ -121,7 +121,7 @@ define([
      * @name pentaho.data.filter.AbstractFilter#contains
      * @method
      * @abstract
-     * @param {object} - [entry] The candidate data set entry.
+     * @param {object} - [element] The candidate data set entry.
      * @return {boolean} True if the entry value is contained by this filter.
      */
     contains: /* istanbul ignore next: placeholder method */ function(element) {

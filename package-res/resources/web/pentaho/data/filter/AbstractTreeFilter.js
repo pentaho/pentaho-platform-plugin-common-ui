@@ -37,7 +37,7 @@ define([
    *
    * @description Creates a filter that combines a list of filters.
    *
-   * @param {pentaho.data.filter.AbstractPropertyFilter[]} operands The operands to to act upon.
+   * @param {Array<pentaho.data.filter.AbstractFilter>} operands The operands to to act upon.
    *
    */
   var AbstractTreeFilter = AbstractFilter.extend("pentaho.data.filter.AbstractTreeFilter", /** @lends pentaho.data.filter.AbstractTreeFilter# */{
