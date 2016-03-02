@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 define([
-  "./AbstractPropertyFilter"
-], function(AbstractPropertyFilter) {
+  "./AbstractPropertyFilter",
+  "./_toSpec"
+], function(AbstractPropertyFilter, _toSpec) {
   "use strict";
 
   /**
@@ -61,6 +62,12 @@ define([
    */
   var IsEqual = AbstractPropertyFilter.extend("pentaho.data.filter.IsEqual", /** @lends pentaho.data.filter.IsEqual# */{
 
+    constructor: function(property, value) {
+      this.base(property);
+      this.value = value;
+      Object.freeze(this);
+    },
+
     /**
      * @inheritdoc
      */
@@ -71,18 +78,23 @@ define([
     /**
      * Gets the value to test for equality.
      *
-     * @name value
-     * @memberOf pentaho.data.filter.IsEqual#
-     * @override
      * @type {any}
      * @readonly
      */
+    value: null,
 
     /**
      * @inheritdoc
      */
     _operation: function(value) {
       return this.value === value;
+    },
+
+    /**
+     * @inheritdoc
+     */
+    toSpec: function() {
+      return _toSpec(this.property, _toSpec(this._op, this.value));
     }
   });
 

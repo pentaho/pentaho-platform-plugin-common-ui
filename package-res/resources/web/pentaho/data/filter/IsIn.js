@@ -58,23 +58,17 @@ define([
    * @description Creates an `IsIn` filter given a property name and the series of values that define the set of admissible values.
    *
    * @param {string} property - The name of the property.
-   * @param {Array<any>} value - The (extensive) series of values that belong to the reference set.
+   * @param {Array<any>} values - The (extensive) series of values that belong to the reference set.
    *
    */
   var IsIn = AbstractPropertyFilter.extend("pentaho.data.filter.IsIn", /** @lends pentaho.data.filter.IsIn# */{
-    constructor: function(property, value) {
-      this.base(property, value || []);
-    },
 
-    /**
-     * Gets the set of values to test they belong.
-     *
-     * @name value
-     * @memberOf pentaho.data.filter.IsIn#
-     * @override
-     * @type {Array<any>}
-     * @readonly
-     */
+    constructor: function(property, values) {
+      this.base(property);
+      this.values = values || [];
+      Object.freeze(this);
+
+    },
 
     /**
      * @inheritdoc
@@ -84,17 +78,25 @@ define([
     _op: "$in",
 
     /**
+     * Gets the set of values to test they belong.
+     *
+     * @type {Array<any>}
+     * @readonly
+     */
+    values: null,
+
+    /**
      * @inheritdoc
      */
     _operation: function(value) {
-      return this.value.indexOf(value) > -1;
+      return this.values.indexOf(value) > -1;
     },
 
     /**
      * @inheritdoc
      */
     toSpec: function() {
-      return toSpec(this.property, toSpec(this._op, this.value.length ? this.value : null));
+      return toSpec(this.property, toSpec(this._op, this.values.length ? this.values : null));
     }
   });
 

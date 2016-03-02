@@ -20,7 +20,7 @@ define([
 ], function(filter, Table, dataSpec) {
   "use strict";
 
-  describe("pentaho.data.Filter", function() {
+  describe("pentaho.data.filter", function() {
 
     var data;
     beforeEach(function() {
@@ -45,7 +45,7 @@ define([
         expect(foo.operands[0].operands[0].value).toBe(12000);
         expect(foo.operands[0].operands[1].type).toBe("not");
         expect(foo.operands[0].operands[1].operand.type).toBe("isIn");
-        expect(foo.operands[0].operands[1].operand.value).toEqual(["A", "B"]);
+        expect(foo.operands[0].operands[1].operand.values).toEqual(["A", "B"]);
       });
 
       it("also accepts no arguments", function() {

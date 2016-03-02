@@ -15,11 +15,8 @@
  */
 define([
   "./AbstractFilter",
-  "../../util/object",
-  "../../lang/ArgumentRequiredError",
-  "./_apply",
   "./_toSpec"
-], function(AbstractFilter, O, ArgumentRequiredError, _apply, _toSpec) {
+], function(AbstractFilter, _toSpec) {
   "use strict";
 
   /**
@@ -69,9 +66,8 @@ define([
   var NotFilter = AbstractFilter.extend("pentaho.data.filter.Not", /** @lends pentaho.data.filter.Not# */{
 
     constructor: function(operand) {
-      if(!operand) throw new ArgumentRequiredError("operand");
-
-      O.setConst(this, "operand", operand);
+      this.operand = operand;
+      Object.freeze(this);
     },
 
     /**
@@ -106,13 +102,6 @@ define([
      */
     invert: function() {
       return this.operand;
-    },
-
-    /**
-     * @inheritdoc
-     */
-    apply: function(datatable) {
-      return _apply(this, datatable);
     },
 
     /**

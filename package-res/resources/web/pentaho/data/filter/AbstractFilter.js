@@ -18,9 +18,6 @@ define([
   "../../util/arg",
   "./_apply",
   "require"
-  //"./Or",
-  //"./And",
-  //"./Not",
 ], function(Base, arg, _apply, require) {
   "use strict";
 
@@ -40,7 +37,7 @@ define([
    * representation of a subset of items in a collection.
    *
    * The hierarchy spawned by this class allows building filters by composition, in the form of a tree of filters.
-   * When filtering a particular item in a dataset, the leaf nodes evaluate the data
+   * When filtering a particular item in a data set, the leaf nodes evaluate the data
    * and return a boolean that signals if the item belongs to the set defined by the filter.
    * Non-leaf nodes act as aggregators of the outcomes of other nodes (leaf or non-leaf).
    */
@@ -104,7 +101,7 @@ define([
     /**
      * Determines if an element belongs to the set defined by this filter.
      *
-     * @param {!pentaho.type.Element} element - The candidate dataset element.
+     * @param {!pentaho.type.Element} element - The candidate data set element.
      * @return {boolean} `true` if this filter contains `element`, or `false` otherwise.
      * @abstract
      */
@@ -115,12 +112,12 @@ define([
     /**
      * Returns the subset of data that matches this filter.
      *
-     * @param {!pentaho.data.Table} datatable - The data table to filter
-     * @returns {!pentaho.data.TableView} The data table view of the restricted dataset.
+     * @param {!pentaho.data.Table} dataTable - The data table to filter
+     * @returns {!pentaho.data.TableView} The data table view of the restricted data set.
      * @override
      */
-    apply: /* istanbul ignore next: placeholder method */ function(datatable) {
-      return null;
+    apply: function(dataTable) {
+      return _apply(this, dataTable);
     },
 
     /**
@@ -166,7 +163,7 @@ define([
      *
      *   var specFromDataFilter = dataFilter.toSpec();
      *
-     *   // JSON.Stringify(specFromDataFilter) === {
+     *   // JSON.stringify(specFromDataFilter) === {
      *   //   "$not": {
      *   //     "$and": [
      *   //       {"sales": 12000},

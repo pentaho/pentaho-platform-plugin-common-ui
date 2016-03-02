@@ -14,10 +14,8 @@
  * limitations under the License.
  */
 define([
-  "./AbstractFilter",
-  "./_apply",
-  "./_toSpec"
-], function(AbstractFilter, _apply, _toSpec) {
+  "./AbstractFilter"
+], function(AbstractFilter) {
   "use strict";
 
   /**
@@ -28,21 +26,17 @@ define([
    * @abstract
    * @amd pentaho/data/filter/AbstractPropertyFilter
    *
-   * @classdesc A base class for filters that represents a set of elements which contains a given
-   * property and whose value matches against a criteria/condition.
+   * @classdesc A base class that filters elements in a set
+   * by matching the value of a given property against a criteria/condition.
    *
-   * @description Creates an instance that filters a dataset by comparing the value of
+   * @description Creates an instance that filters a data set by comparing the value of
    * a property against a criteria/condition.
    *
    * @param {string} property The name of the property.
-   * @param {any} value - The property value.
-   *
    */
   var AbstractPropertyFilter = AbstractFilter.extend("pentaho.data.filter.AbstractPropertyFilter", /** @lends pentaho.data.filter.AbstractPropertyFilter# */{
-    constructor: function(property, value) {
-      this.value = value;
+    constructor: function(property) {
       this.property = property;
-      Object.freeze(this);
     },
 
     /**
@@ -53,14 +47,7 @@ define([
     property: null,
 
     /**
-     * Gets the value of the [property]{@link pentaho.data.filter.AbstractFilter#property} used for filtering.
-     * @type {any}
-     * @readonly
-     */
-    value: null,
-
-    /**
-     * Asserts if a concrete value in the dataset matches the criteria/condition of this filter.
+     * Asserts if a concrete value in the data set matches the criteria/condition of this filter.
      *
      * @param {any} value - The value to be compared against the criteria/condition of this filter.
      * @returns {boolean} `true` if the value meets the requirement of the filter, or `false` otherwise.
@@ -72,33 +59,19 @@ define([
     },
 
     /**
-     * Tests if a dataset element belongs to the set defined by this filter.
+     * Tests if a data set element belongs to the set defined by this filter.
      *
-     * @param {!pentaho.type.Element} element - The element of the dataset to be tested.
+     * @param {!pentaho.type.Element} element - The element of the data set to be tested.
      * @return {boolean} `true` if `element` matches this filter, or `false` otherwise.
      * @override
      */
     contains: function(element) {
       return element.has(this.property) &&
         this._operation(element.getv(this.property));
-    },
-
-    /**
-     * @inheritdoc
-     */
-    apply: function(datatable) {
-      return _apply(this, datatable);
-    },
-
-    /**
-     * @inheritdoc
-     */
-    toSpec: function() {
-      return _toSpec(this.property, _toSpec(this._op, this.value));
     }
+
   });
 
   return AbstractPropertyFilter;
-
 
 });

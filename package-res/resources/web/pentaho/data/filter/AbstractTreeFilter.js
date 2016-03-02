@@ -15,9 +15,8 @@
  */
 define([
   "./AbstractFilter",
-  "./_apply",
   "./_toSpec"
-], function(AbstractFilter, _apply, _toSpec) {
+], function(AbstractFilter, _toSpec) {
   "use strict";
 
   /**
@@ -57,13 +56,6 @@ define([
       return this.operands.map(function(operand) {
         return operand.invert();
       });
-    },
-
-    /**
-     * @inheritdoc
-     */
-    apply: function(datatable) {
-      return _apply(this, datatable);
     },
 
     /**

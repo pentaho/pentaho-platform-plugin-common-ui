@@ -14,32 +14,16 @@
  * limitations under the License.
  */
 define([
+  "./filter/AbstractFilter",
+  "./filter/AbstractPropertyFilter",
+  "./filter/AbstractTreeFilter",
   "./filter/IsEqual",
   "./filter/IsIn",
   "./filter/And",
   "./filter/Or",
   "./filter/Not"
-], function(IsEqual, IsIn, AndFilter, OrFilter, NotFilter) {
+], function(AbstractFilter, AbstractPropertyFilter, AbstractTreeFilter, IsEqual, IsIn, And, Or, Not) {
   "use strict";
-
-  /**
-   * @name RootFilter
-   * @memberOf pentaho.data.filter
-   * @extends pentaho.data.filter.Or
-   * @class
-   * @ignore
-   *
-   * @param {Object} filterSpec The specification of a Filter.
-   *
-   */
-  var RootFilter = OrFilter.extend("pentaho.data.RootFilter", /** @lends pentaho.data.RootFilter# */{
-    constructor: function(filterSpec) {
-      if(filterSpec)
-        this.base(fromSpec(filterSpec));
-      else
-        this.base();
-    }
-  });
 
   /**
    * This namespace contains classes for filters that are used for expressing a dataset
@@ -132,14 +116,17 @@ define([
    *
    */
   return {
+    //Abstract classes
+    AbstractFilter: AbstractFilter,
+    AbstractPropertyFilter: AbstractPropertyFilter,
+    AbstractTreeFilter: AbstractTreeFilter,
     // Leaf nodes
     IsEqual: IsEqual,
     IsIn: IsIn,
     // Non-leaf nodes
-    Or: OrFilter,
-    And: AndFilter,
-    Not: NotFilter,
-    //Root: RootFilter,
+    Or: Or,
+    And: And,
+    Not: Not,
 
     /**
      * Create a filter from a spec.
@@ -148,19 +135,19 @@ define([
      * @method
      * @static
      * @param {Object} spec - The specification of a filter.
-     * @return {!pentaho.data.filter.AbstractFilter} The filter objects that corresponds to the specification.
+     * @return {!pentaho.data.filter.Or} The filter objects that correspond to the specification.
      */
     create: function(spec) {
-      return new RootFilter(spec);
+      if(spec) return new Or(fromSpec(spec));
+      return new Or();
     }
   };
 
-
   function fromSpec(filterSpec) {
     var registeredFilters = {
-      "$and": AndFilter,
-      "$or": OrFilter,
-      "$not": NotFilter,
+      "$and": And,
+      "$or": Or,
+      "$not": Not,
       "$eq": IsEqual,
       "$in": IsIn
     };

@@ -33,12 +33,6 @@ define([
       filter = new Not(sales12k);
     });
 
-    it("should throw an error if no operands are specified.", function() {
-      expect(function() {
-        return new Not();
-      }).toThrowError();
-    });
-
     describe("#type ", function() {
       it("should return 'Not' ", function() {
         expect(filter.type).toBe("not");
