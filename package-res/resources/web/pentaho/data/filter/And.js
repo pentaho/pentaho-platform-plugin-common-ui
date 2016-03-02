@@ -27,7 +27,7 @@ define([
    * @extends pentaho.data.filter.AbstractTreeFilter
    * @amd pentaho/data/filter/And
    *
-   * @classdesc A filter that implements the intersection of a list of filters, each of which defines a set.
+   * @classdesc A filter that implements the intersection of a series of filters, each of which defines a set.
    *
    * @example
    * <caption> Create a new <code>And</code> filter.</caption>
@@ -59,9 +59,9 @@ define([
    *  var data = filter.apply(data); //data.getValue(0, 0) === "A"
    * });
    *
-   * @description Creates an `And` filter that performs the intersection of a list of [filters]{@link pentaho.data.filter.AbstractFilter}.
+   * @description Creates an `And` filter that performs the intersection of a series of [filters]{@link pentaho.data.filter.AbstractFilter}.
    *
-   * @param {Array<pentaho.data.filter.AbstractFilter>} operands The list of filters that will be intersected.
+   * @param {!Array<pentaho.data.filter.AbstractFilter>} operands The series of filters that will be intersected.
    *
    */
   var And = AbstractTreeFilter.extend("pentaho.data.filter.And", /** @lends pentaho.data.filter.And# */{
@@ -69,7 +69,7 @@ define([
     /**
      * @inheritdoc
      */
-    get type() { return "and";},
+    get type() { return "and"; },
 
     _op: "$and",
 
@@ -87,11 +87,11 @@ define([
     },
 
     /**
-     * Returns the intersection between this filter and a variable number of other filters.
-     * Intersections of intersections of filters (ANDs of ANDs) are avoided.
+     * Returns the intersection between this filter and any number of other filters.
+     * Intersections of intersections of filters (ANDs of ANDs) are flattened.
      *
-     * @param {...pentaho.data.filter.AbstractFilter} filter - A filter to be added to the intersection operation.
-     * @return {!pentaho.data.filter.And} A filter that is the intersection of this filter with a list of other filters.
+     * @param {...pentaho.data.filter.AbstractFilter} filters - One or more filters to be added to the intersection operation.
+     * @return {!pentaho.data.filter.And} A filter that is the intersection of this filter with a series of other filters.
      * @override
      */
     and: function() {

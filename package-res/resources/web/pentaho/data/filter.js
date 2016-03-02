@@ -42,7 +42,7 @@ define([
   });
 
   /**
-   * This namespace contains classes for filters that are used for expressing a data set
+   * This namespace contains classes for filters that are used for expressing a dataset
    * [intensionally]{@link https://en.wikipedia.org/wiki/Intensional_definition}.
    * It also exports a static create function that can be used to generate a filter tree from a spec.
    *
@@ -52,9 +52,9 @@ define([
    * @amd pentaho/data/filter
    *
    * @example
-   * <caption> Two methods for creating a filter.</caption>
+   * <caption> Three methods for creating a filter.</caption>
    *
-   * require(["pentaho/data/Table", "pentaho/data/Filter"], function(Table, Filter) {
+   * require(["pentaho/data/Table", "pentaho/data/filter"], function(Table, filter) {
    *   var data = new Table({
    *     model: [
    *       {name: "product", type: "string", label: "Product"},
@@ -72,12 +72,12 @@ define([
    *     ]
    *   });
    *
-   *   var sales12k = new Filter.IsEqual("sales", [12000]);
-   *   var productAB = new Filter.IsIn("product", ["A", "B"]);
+   *   var sales12k = new IsEqual("sales", [12000]);
+   *   var productAB = new IsIn("product", ["A", "B"]);
    *   var notInProductABFilter = new Not(productAB);
-   *   var andFilter = new Filter.And([sales12k, notInProductABFilter]);
-   *   var filter = new Not(andFilter);
-   *   var filteredData = filter.apply(data);
+   *   var andFilter = new And([sales12k, notInProductABFilter]);
+   *   var dataFilter = new Not(andFilter);
+   *   var filteredData = dataFilter.apply(data);
    *   // filteredData.getValue(0, 0) === "A"
    *   // filteredData.getValue(1, 0) === "B"
    *   // filteredData.getValue(2, 0) === "D"
@@ -85,7 +85,32 @@ define([
    *   // filteredData.getValue(4, 0) === "F"
    *   // filteredData.getValue(5, 0) === "G"
    *
-   *   //Or alternatively,
+   *   //Or alternatively
+   *   var sales12k = new filter.IsEqual("sales", [12000]);
+   *   var productAB = new filter.IsIn("product", ["A", "B"]);
+   *   var notInProductABFilter = new filter.Not(productAB);
+   *   var andFilter = new filter.And([sales12k, notInProductABFilter]);
+   *   var dataFilter = new filter.Not(andFilter);
+   *   var filteredData = dataFilter.apply(data);
+   *   // filteredData.getValue(0, 0) === "A"
+   *   // filteredData.getValue(1, 0) === "B"
+   *   // filteredData.getValue(2, 0) === "D"
+   *   // filteredData.getValue(3, 0) === "E"
+   *   // filteredData.getValue(4, 0) === "F"
+   *   // filteredData.getValue(5, 0) === "G"
+   *
+   *   var specFromDataFilter = dataFilter.toSpec();
+   *
+   *   // JSON.Stringify(specFromDataFilter) === {
+   *   //   "$not": {
+   *   //     "$and": [
+   *   //       {"sales": 12000},
+   *   //       {"$not": {"product": {"$in": ["A", "B"]}}}
+   *   //     ]
+   *   //   }
+   *   // };
+   *
+   *   //Or alternatively
    *   var spec = {
    *      "$not": {
    *        "$and": [
@@ -95,7 +120,7 @@ define([
    *      }
    *    };
    *
-   *   var filterFromSpec = Filter.create(spec);
+   *   var filterFromSpec = filter.create(spec);
    *   var filteredDataFromSpec = filterFromSpec.apply(data);
    *   // filteredDataFromSpec.getValue(0, 0) === "A"
    *   // filteredDataFromSpec.getValue(1, 0) === "B"
@@ -117,13 +142,13 @@ define([
     //Root: RootFilter,
 
     /**
-     * Create a filter from a spec
+     * Create a filter from a spec.
      *
      * @memberOf pentaho.data.filter
      * @method
      * @static
-     * @param {Object} spec - Specification of a filter
-     * @return {!pentaho.data.filter.AbstractFilter} The tree of filter objects that corresponds to the specification
+     * @param {Object} spec - The specification of a filter.
+     * @return {!pentaho.data.filter.AbstractFilter} The filter objects that corresponds to the specification.
      */
     create: function(spec) {
       return new RootFilter(spec);

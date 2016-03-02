@@ -55,10 +55,10 @@ define([
    *   //filteredData.getValue(1, 0) === "B"
    * });
    *
-   * @description Creates an `IsIn` filter given a property name and the list of values that define the set of admissible values.
+   * @description Creates an `IsIn` filter given a property name and the series of values that define the set of admissible values.
    *
    * @param {string} property - The name of the property.
-   * @param {Array<any>} value - The (extensive) list of values that belong to the reference set.
+   * @param {Array<any>} value - The (extensive) series of values that belong to the reference set.
    *
    */
   var IsIn = AbstractPropertyFilter.extend("pentaho.data.filter.IsIn", /** @lends pentaho.data.filter.IsIn# */{
@@ -67,7 +67,7 @@ define([
     },
 
     /**
-     * Reference set of values used for filtering
+     * Gets the set of values to test they belong.
      *
      * @name value
      * @memberOf pentaho.data.filter.IsIn#
@@ -79,7 +79,7 @@ define([
     /**
      * @inheritdoc
      */
-    get type() { return "isIn";},
+    get type() { return "isIn"; },
 
     _op: "$in",
 

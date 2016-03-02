@@ -27,7 +27,7 @@ define([
    * @extends pentaho.data.filter.AbstractTreeFilter
    * @amd pentaho/data/filter/Or
    *
-   * @classdesc A filter that implements the union of a list of filters, each of which defines a set.
+   * @classdesc A filter that implements the union of a series of filters, each of which defines a set.
    *
    * @example
    * <caption> Create a new <code>Or</code> filter.</caption>
@@ -60,9 +60,9 @@ define([
    *   // data.getValue(2, 0) === "C"
    * });
    *
-   * @description Creates an `Or` filter that performs the union of a list of [filters]{@link pentaho.data.filter.AbstractFilter}.
+   * @description Creates an `Or` filter that performs the union of a series of [filters]{@link pentaho.data.filter.AbstractFilter}.
    *
-   * @param {pentaho.data.filter.AbstractFilter[]} operands - The list of filters that will be subject to the union.
+   * @param {!Array<pentaho.data.filter.AbstractFilter>} operands - The filters that will be subject to the union.
    *
    */
   var Or = AbstractTreeFilter.extend("pentaho.data.filter.Or", /** @lends pentaho.data.filter.Or# */{
@@ -70,7 +70,7 @@ define([
     /**
      * @inheritdoc
      */
-    get type() { return "or";},
+    get type() { return "or"; },
 
     _op: "$or",
 
@@ -88,11 +88,11 @@ define([
     },
 
     /**
-     * Returns the union between this filter and a variable number of other filters.
-     * Unions of unions of filters (ORs of ORs) are avoided.
+     * Gets the union between this filter and any number of other filters.
+     * Unions of unions of filters (ORs of ORs) are flattened.
      *
      * @param {...pentaho.data.filter.AbstractFilter} filter - A filter to be added to the union operation.
-     * @return {!pentaho.data.filter.Or} A filter that is the union of this filter with a list of other filters.
+     * @return {!pentaho.data.filter.Or} A filter that is the union of this filter with a series of other filters.
      * @override
      */
     or: function() {
