@@ -15,8 +15,9 @@
  */
 define([
   "./AbstractFilter",
+  "./_apply",
   "./_toSpec"
-], function(AbstractFilter, _toSpec) {
+], function(AbstractFilter, _apply, _toSpec) {
   "use strict";
 
   /**
@@ -34,7 +35,7 @@ define([
    * * {@link pentaho.data.filter.And}
    * * {@link pentaho.data.filter.Or}
    *
-   * @description Creates a filter that combines a list of filters.
+   * @description Creates a filter that combines a series of filters.
    *
    * @param {!Array<pentaho.data.filter.AbstractFilter>} operands - The filters to aggregate.
    *
@@ -46,7 +47,7 @@ define([
     },
 
     /**
-     * List of operands in this filter.
+     * Gets the series of operands in this filter.
      * @type {pentaho.data.filter.AbstractFilter[]}
      * @readonly
      **/
@@ -56,6 +57,13 @@ define([
       return this.operands.map(function(operand) {
         return operand.invert();
       });
+    },
+
+    /**
+     * @inheritdoc
+     */
+    apply: function(datatable) {
+      return _apply(this, datatable);
     },
 
     /**

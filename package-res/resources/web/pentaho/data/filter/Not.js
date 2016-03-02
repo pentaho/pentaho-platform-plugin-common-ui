@@ -26,7 +26,7 @@ define([
    * @name Not
    * @memberOf pentaho.data.filter
    * @class
-   * @throws {pentaho.lang.ArgumentRequiredError} When `operand` is not specified.
+   * @throws When `operand` is not specified.
    * @extends pentaho.data.filter.AbstractFilter
    * @amd pentaho/data/filter/Not
    *
@@ -75,7 +75,7 @@ define([
     },
 
     /**
-     * Operand of this filter
+     * Gets the operand of this filter.
      *
      * @name operand
      * @memberOf pentaho.data.filter.Not#
@@ -86,7 +86,7 @@ define([
     /**
      * @inheritdoc
      */
-    get type() { return "not";},
+    get type() { return "not"; },
 
     _op: "$not",
 
@@ -99,13 +99,20 @@ define([
 
     /**
      * Return the inverse of this filter.
-     * Double inversion is prevented: the original operand of this filter is returned.
+     * Double inversion is prevented:  {@link ...#operand} is returned.
      *
      * @return {!pentaho.data.filter.AbstractFilter} A filter that is the inverse of this filter.
      * @override
      */
     invert: function() {
       return this.operand;
+    },
+
+    /**
+     * @inheritdoc
+     */
+    apply: function(datatable) {
+      return _apply(this, datatable);
     },
 
     /**

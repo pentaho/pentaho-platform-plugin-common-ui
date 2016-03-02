@@ -64,12 +64,12 @@ define([
     /**
      * @inheritdoc
      */
-    get type() { return "isEqual";},
+    get type() { return "isEqual"; },
 
     _op: "$eq",
 
     /**
-     * Reference value used for testing equality
+     * Gets the value to test for equality.
      *
      * @name value
      * @memberOf pentaho.data.filter.IsEqual#

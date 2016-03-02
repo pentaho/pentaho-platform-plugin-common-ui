@@ -40,7 +40,7 @@ define([
    * representation of a subset of items in a collection.
    *
    * The hierarchy spawned by this class allows building filters by composition, in the form of a tree of filters.
-   * When filtering a particular item in a data set, the leaf nodes evaluate the data
+   * When filtering a particular item in a dataset, the leaf nodes evaluate the data
    * and return a boolean that signals if the item belongs to the set defined by the filter.
    * Non-leaf nodes act as aggregators of the outcomes of other nodes (leaf or non-leaf).
    */
@@ -76,8 +76,8 @@ define([
     /**
      * Returns the union between this filter and a variable number of other filters.
      *
-     * @param {...pentaho.data.filter.AbstractFilter} filter - A filter to be added to the union operation.
-     * @return {!pentaho.data.filter.Or} A filter that is the union of this filter with a list of other filters.
+     * @param {...pentaho.data.filter.AbstractFilter} filters - One or more filters to be added to the union operation.
+     * @return {!pentaho.data.filter.Or} A filter that is the union of this filter with a series of other filters.
      */
     or: function() {
       if(!arguments.length) return this;
@@ -90,8 +90,8 @@ define([
     /**
      * Returns the intersection between this filter and a variable number of other filters.
      *
-     * @param {...pentaho.data.filter.AbstractFilter} filter - A filter to be added to the intersection operation.
-     * @return {!pentaho.data.filter.And} A filter that is the intersection of this filter with a list of other filters.
+     * @param {...pentaho.data.filter.AbstractFilter} filters - One or more filters to be added to the intersection operation.
+     * @return {!pentaho.data.filter.And} A filter that is the intersection of this filter with a series of other filters.
      */
     and: function() {
       if(!arguments.length) return this;
@@ -102,9 +102,9 @@ define([
     },
 
     /**
-     * Tests if an element belongs to the set defined by this filter.
+     * Determines if an element belongs to the set defined by this filter.
      *
-     * @param {!pentaho.type.Complex} element - The candidate data set element.
+     * @param {!pentaho.type.Element} element - The candidate dataset element.
      * @return {boolean} `true` if this filter contains `element`, or `false` otherwise.
      * @abstract
      */
@@ -115,12 +115,12 @@ define([
     /**
      * Returns the subset of data that matches this filter.
      *
-     * @param {pentaho.data.Table} dataSet - The data set to filter
-     * @returns {!pentaho.data.TableView} The data table view of the restricted data set.
+     * @param {!pentaho.data.Table} datatable - The data table to filter
+     * @returns {!pentaho.data.TableView} The data table view of the restricted dataset.
      * @override
      */
-    apply: function(dataSet) {
-      return _apply(this, dataSet);
+    apply: /* istanbul ignore next: placeholder method */ function(datatable) {
+      return null;
     },
 
     /**
@@ -133,7 +133,7 @@ define([
      * @example
      * <caption> Create a new <code>Or</code> filter.</caption>
      *
-     * require(["pentaho/data/Table", "pentaho/data/Filter"], function(Table, Filter) {
+     * require(["pentaho/data/Table", "pentaho/data/filter/IsIn", "pentaho/data/filter/IsEqual", "pentaho/data/filter/And", "pentaho/data/filter/Not", "pentaho/data/filter"], function(Table, IsIn, IsEqual, And, Not, filter) {
      *   var data = new Table({
      *     model: [
      *       {name: "product", type: "string", label: "Product"},
@@ -151,14 +151,22 @@ define([
      *     ]
      *   });
      *
-     *   var sales12k = new Filter.IsEqual("sales", [12000]);
-     *   var productAB = new Filter.IsIn("product", ["A", "B"]);
+     *   var sales12k = new IsEqual("sales", [12000]);
+     *   var productAB = new IsIn("product", ["A", "B"]);
      *   var notInProductABFilter = new Not(productAB);
-     *   var andFilter = new Filter.And([sales12k, notInProductABFilter]);
-     *   var filter = new Not(andFilter);
-     *   var specFromFilter = filter.toSpec();
+     *   var andFilter = new And([sales12k, notInProductABFilter]);
+     *   var dataFilter = new Not(andFilter);
+     *   var filteredData = dataFilter.apply(data);
+     *   // filteredData.getValue(0, 0) === "A"
+     *   // filteredData.getValue(1, 0) === "B"
+     *   // filteredData.getValue(2, 0) === "D"
+     *   // filteredData.getValue(3, 0) === "E"
+     *   // filteredData.getValue(4, 0) === "F"
+     *   // filteredData.getValue(5, 0) === "G"
      *
-     *   // JSON.Stringify(specFromFilter) === {
+     *   var specFromDataFilter = dataFilter.toSpec();
+     *
+     *   // JSON.Stringify(specFromDataFilter) === {
      *   //   "$not": {
      *   //     "$and": [
      *   //       {"sales": 12000},
@@ -166,17 +174,7 @@ define([
      *   //     ]
      *   //   }
      *   // };
-     *
-     *   var filterFromSpec = Filter.create(specFromFilter);
-     *   var filteredDataFromSpec = filterFromSpec.apply(data);
-     *   // filteredDataFromSpec.getValue(0, 0) === "A"
-      *  // filteredDataFromSpec.getValue(1, 0) === "B"
-      *  // filteredDataFromSpec.getValue(2, 0) === "D"
-      *  // filteredDataFromSpec.getValue(3, 0) === "E"
-      *  // filteredDataFromSpec.getValue(4, 0) === "F"
-      *  // filteredDataFromSpec.getValue(5, 0) === "G"
      * });
-     *
      *
      * @return {!pentaho.data.filter.AbstractFilter} Object.
      */
