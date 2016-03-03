@@ -16,9 +16,8 @@
 define([
   "pentaho/type/Item",
   "pentaho/type/Context",
-  "tests/pentaho/util/errorMatch",
-  "pentaho/i18n!/pentaho/type/i18n/types"
-], function(Item, Context, errorMatch, bundle) {
+  "tests/pentaho/util/errorMatch"
+], function(Item, Context, errorMatch) {
 
   "use strict";
 

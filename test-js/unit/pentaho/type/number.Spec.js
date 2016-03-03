@@ -16,8 +16,8 @@
 define([
   "pentaho/type/number",
   "pentaho/type/Context",
-  "pentaho/i18n!/pentaho/type/i18n/types"
-], function(numberFactory, Context, bundle) {
+  "tests/pentaho/util/errorMatch"
+], function(numberFactory, Context, errorMatch) {
 
   "use strict";
 
@@ -55,13 +55,13 @@ define([
       it("should throw and not accept a 'non-numeric' argument", function() {
         expect(function() {
           new PentahoNumber('one');
-        }).toThrowError(bundle.format(bundle.structured.errors.value.cannotConvertToType, ['Number']));
+        }).toThrow(errorMatch.argInvalid("value"));
       });
 
       it("should throw and not accept null", function() {
         expect(function() {
           new PentahoNumber(null);
-        }).toThrowError(bundle.structured.errors.value.isNull);
+        }).toThrow(errorMatch.argRequired("value"));
       });
 
     });

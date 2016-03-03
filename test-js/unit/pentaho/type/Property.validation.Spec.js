@@ -14,10 +14,7 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context",
-  "pentaho/type/Property",
-  "pentaho/type/PropertyMetaCollection",
-  "pentaho/util/error"
+  "pentaho/type/Context"
 ], function(Context) {
 
   "use strict";
