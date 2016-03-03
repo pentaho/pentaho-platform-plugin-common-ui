@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 define([
-  "pentaho/data/filter/IsEqual",
-  "pentaho/data/filter/Or",
-  "pentaho/data/filter/_Element",
+  "pentaho/data/filter",
+  "pentaho/data/_filter/_Element",
   "pentaho/data/Table",
   "./_dataSpecProductSalesInStock"
-], function(IsEqual, Or, Element, Table, dataSpec) {
+], function(filter, Element, Table, dataSpec) {
   "use strict";
 
   describe("pentaho.data.filter.IsEqual", function() {
@@ -27,7 +26,7 @@ define([
     var data, sales12k;
     beforeEach(function() {
       data = new Table(dataSpec);
-      sales12k = new IsEqual("sales", 12000);
+      sales12k = new filter.IsEqual("sales", 12000);
     });
 
 
@@ -62,7 +61,7 @@ define([
 
     describe("#and ", function() {
       it("should return an AND.", function() {
-        var inStock = new IsEqual("inStock", true);
+        var inStock = new filter.IsEqual("inStock", true);
         var combination = sales12k.and(inStock);
         expect(combination.type).toBe("and");
       });
@@ -70,7 +69,7 @@ define([
 
     describe("#or ", function() {
       it("should return an Or.", function() {
-        var inStock = new IsEqual("inStock", true);
+        var inStock = new filter.IsEqual("inStock", true);
         var combination = sales12k.or(inStock);
         expect(combination.type).toBe("or");
       });
@@ -78,8 +77,8 @@ define([
 
     describe("#invert ", function() {
       it("should return a Not.", function() {
-        var filter = sales12k.invert();
-        expect(filter.type).toBe("not");
+        var myFilter = sales12k.invert();
+        expect(myFilter.type).toBe("not");
       });
     }); // #invert
 
@@ -108,7 +107,7 @@ define([
 
     describe("#apply(pentaho.data.Table object)", function() {
       it("should return the matching entry.", function() {
-        var isProductA = new IsEqual("product", "A");
+        var isProductA = new filter.IsEqual("product", "A");
         var filteredData = isProductA.apply(data);
 
         expect(filteredData.getNumberOfRows()).toBe(1);
@@ -124,7 +123,7 @@ define([
       });
 
       it("should return an empty dataset if no match is found.", function() {
-        var isProductA = new IsEqual("sales", 5000);
+        var isProductA = new filter.IsEqual("sales", 5000);
         var filteredData = isProductA.apply(data);
 
         expect(filteredData.getNumberOfRows()).toBe(0);

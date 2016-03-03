@@ -8,6 +8,7 @@
       "package-res/resources/web/pentaho/service.js",
       "package-res/resources/web/pentaho/_doc",
       "package-res/resources/web/pentaho/lang",
+      "package-res/resources/web/pentaho/data",
       "package-res/resources/web/pentaho/util",
       "package-res/resources/web/pentaho/type",
       "package-res/resources/web/pentaho/visual/_doc",

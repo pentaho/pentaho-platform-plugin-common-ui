@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 define([
-  "pentaho/data/filter/IsIn",
-  "pentaho/data/filter/_Element",
+  "pentaho/data/filter",
+  "pentaho/data/_filter/_Element",
   "pentaho/data/Table",
   "./_dataSpecProductSalesInStock"
-], function(IsIn, Element, Table, dataSpec) {
+], function(filter, Element, Table, dataSpec) {
   "use strict";
 
   describe("pentaho.data.filter.IsIn", function() {
@@ -26,7 +26,7 @@ define([
     var data, sales12k;
     beforeEach(function() {
       data = new Table(dataSpec);
-      sales12k = new IsIn("sales", [10000, 12000]);
+      sales12k = new filter.IsIn("sales", [10000, 12000]);
     });
 
     describe("#type", function() {
@@ -59,7 +59,7 @@ define([
 
     describe("#and ", function() {
       it("should return an AND.", function() {
-        var inStock= new IsIn("inStock", [true]);
+        var inStock= new filter.IsIn("inStock", [true]);
         var combination = sales12k.and(inStock);
         expect(combination.type).toBe("and");
       });
@@ -67,7 +67,7 @@ define([
 
     describe("#or ", function() {
       it("should return an Or.", function() {
-        var inStock= new IsIn("inStock", [true]);
+        var inStock= new filter.IsIn("inStock", [true]);
         var combination = sales12k.or(inStock);
         expect(combination.type).toBe("or");
       });
@@ -75,8 +75,8 @@ define([
 
     describe("#invert ", function() {
       it("should return a Not.", function() {
-        var filter = sales12k.invert();
-        expect(filter.type).toBe("not");
+        var myFilter = sales12k.invert();
+        expect(myFilter.type).toBe("not");
       });
     }); // #invert
 
@@ -92,8 +92,8 @@ define([
       });
 
       it("should return `false` if the set is empty", function() {
-        var filter = new IsIn("sales", []);
-        var result = filter.contains(new Element(data, 0));
+        var myFilter = new filter.IsIn("sales", []);
+        var result = myFilter.contains(new Element(data, 0));
         expect(result).toBe(false);
       });
 
@@ -111,7 +111,7 @@ define([
 
     describe("#apply(pentaho.data.Table object)", function() {
       it("should return the matching entry", function() {
-        var isProductAC = new IsIn("product", ["A"]);
+        var isProductAC = new filter.IsIn("product", ["A"]);
         var filteredData = isProductAC.apply(data);
 
         expect(filteredData.getNumberOfRows()).toBe(1);
@@ -119,7 +119,7 @@ define([
       });
 
       it("should return all the entries matching the criterion", function() {
-        var isProductAC = new IsIn("product", ["A", "C"]);
+        var isProductAC = new filter.IsIn("product", ["A", "C"]);
         var filteredData = isProductAC.apply(data);
 
         expect(filteredData.getNumberOfRows()).toBe(2);
@@ -128,7 +128,7 @@ define([
       });
 
       it("should return an empty dataset if no match is found.", function() {
-        var isProductA = new IsIn("sales", [5000, 7000]);
+        var isProductA = new filter.IsIn("sales", [5000, 7000]);
         var filteredData = isProductA.apply(data);
 
         expect(filteredData.getNumberOfRows()).toBe(0);
@@ -143,13 +143,13 @@ define([
       });
 
       it("should return `null` if the #property is not defined", function() {
-        var filter = new IsIn(undefined, [10000, 12000]);
-        expect(filter.toSpec()).toBeNull();
+        var myFilter = new filter.IsIn(undefined, [10000, 12000]);
+        expect(myFilter.toSpec()).toBeNull();
       });
 
       it("should return `null` if #value is not defined", function() {
-        var filter = new IsIn("sales", undefined);
-        expect(filter.toSpec()).toBeNull();
+        var myFilter = new filter.IsIn("sales", undefined);
+        expect(myFilter.toSpec()).toBeNull();
       });
     }); // #toSpec
 

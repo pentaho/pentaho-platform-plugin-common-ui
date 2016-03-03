@@ -14,33 +14,31 @@
  * limitations under the License.
  */
 define([
-  "pentaho/data/filter/Not",
-  "pentaho/data/filter/Or",
-  "pentaho/data/filter/IsEqual",
-  "pentaho/data/filter/_Element",
+  "pentaho/data/filter",
+  "pentaho/data/_filter/_Element",
   "pentaho/data/Table",
   "./_dataSpecProductSalesInStock"
-], function(Not, Or, IsEqual, Element, Table, dataSpec) {
+], function(filter, Element, Table, dataSpec) {
   "use strict";
 
   describe("pentaho.data.filter.Not", function() {
 
-    var data, sales12k, filter;
+    var data, sales12k, myFilter;
     beforeEach(function() {
       data = new Table(dataSpec);
 
-      sales12k = new IsEqual("sales", 12000);
-      filter = new Not(sales12k);
+      sales12k = new filter.IsEqual("sales", 12000);
+      myFilter = new filter.Not(sales12k);
     });
 
     describe("#type ", function() {
       it("should return 'Not' ", function() {
-        expect(filter.type).toBe("not");
+        expect(myFilter.type).toBe("not");
       });
 
       it("should be immutable", function() {
         expect(function() {
-          filter.type = "fake";
+          myFilter.type = "fake";
         }).toThrowError(TypeError);
       });
     });
@@ -48,32 +46,32 @@ define([
     describe("#operand ", function() {
       it("should be immutable", function() {
         expect(function() {
-          filter.operand = {};
+          myFilter.operand = {};
         }).toThrowError(TypeError);
       });
     });
 
     describe("#and ", function() {
       it("should return an AND.", function() {
-        var combination = filter.and(sales12k);
+        var combination = myFilter.and(sales12k);
         expect(combination.type).toBe("and");
       });
     }); // #and
 
     describe("#or ", function() {
       it("should return an Or.", function() {
-        var inStock = new IsEqual("inStock", true);
-        var combination = filter.or(inStock);
+        var inStock = new filter.IsEqual("inStock", true);
+        var combination = myFilter.or(inStock);
         expect(combination.type).toBe("or");
       });
     }); // #or
 
     describe("#invert ", function() {
       it("should prevent double negation (i.e. replace 'NOT NOT A' with 'A').", function() {
-        expect(filter.type).toBe("not");
-        expect(filter.operand.type).toBe("isEqual");
+        expect(myFilter.type).toBe("not");
+        expect(myFilter.operand.type).toBe("isEqual");
 
-        var notNotSales12k = filter.invert();
+        var notNotSales12k = myFilter.invert();
         expect(notNotSales12k.type).toBe("isEqual");
         expect(notNotSales12k).toBe(sales12k);
       });
@@ -82,22 +80,22 @@ define([
     describe("#contains", function() {
       it("should return `true` if a given `element` belongs to the dataset.", function() {
         var element = new Element(data, 0);
-        expect(filter.contains(element)).toBe(false);
+        expect(myFilter.contains(element)).toBe(false);
       });
 
       it("should return `false` if a given `element` does not belong to the dataset.", function() {
         var element = new Element(data, 3);
-        expect(filter.contains(element)).toBe(true);
+        expect(myFilter.contains(element)).toBe(true);
       });
 
       it("should perform a NOT.", function(){
         [1,3,4,5,6].forEach(function(rowIdx){
           var elementIn = new Element(data, rowIdx);
-          expect(filter.contains(elementIn)).toBe(true);
+          expect(myFilter.contains(elementIn)).toBe(true);
         });
         [0, 2].forEach(function(rowIdx){
           var elementOut = new Element(data, rowIdx);
-          expect(filter.contains(elementOut)).toBe(false);
+          expect(myFilter.contains(elementOut)).toBe(false);
         });
       });
     }); // #contains
@@ -106,7 +104,7 @@ define([
     describe("#apply", function() {
 
       it("should return the inverse of a simple filter.", function() {
-        var filteredData = filter.apply(data);
+        var filteredData = myFilter.apply(data);
 
         expect(filteredData.getNumberOfRows()).toBe(5);
         [
@@ -118,13 +116,13 @@ define([
       });
 
       it("should return the inverse of a complex filter.", function() {
-        var filter = new Or([
-          new IsEqual("product", "A"),
-          new IsEqual("product", "B"),
-          new IsEqual("product", "C")
+        var isABC = new filter.Or([
+          new filter.IsEqual("product", "A"),
+          new filter.IsEqual("product", "B"),
+          new filter.IsEqual("product", "C")
         ]);
 
-        var combination = new Not(filter);
+        var combination = new filter.Not(isABC);
         var filteredData = combination.apply(data);
 
         expect(filteredData.getNumberOfRows()).toBe(4);
@@ -139,9 +137,9 @@ define([
 
     describe("#toSpec", function() {
       it("should return a JSON.", function() {
-        var filter = new Not(sales12k);
+        var myFilter = new filter.Not(sales12k);
 
-        expect(filter.toSpec()).toEqual({
+        expect(myFilter.toSpec()).toEqual({
           "$not": {"sales": {"$eq": 12000}}
         });
       });

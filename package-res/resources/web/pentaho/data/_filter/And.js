@@ -23,40 +23,41 @@ define([
   /**
    * @name And
    * @memberOf pentaho.data.filter
+   *
    * @class
    * @extends pentaho.data.filter.AbstractTreeFilter
-   * @amd pentaho/data/filter/And
    *
    * @classdesc A filter that implements the intersection of a series of filters, each of which defines a set.
    *
    * @example
    * <caption> Create a new <code>And</code> filter.</caption>
    *
-   * require(["pentaho/data/Table", "pentaho/data/filter/IsIn", "pentaho/data/filter/IsEqual", "pentaho/data/filter/And"], function(Table, IsIn, IsEqual, And) {
+   * require(["pentaho/data/Table", "pentaho/data/filter"], function(Table, filter) {
    *   var data = new Table({
    *     model: [
-   *       {name: "product", type: "string", label: "Product"},
-   *       {name: "sales", type: "number", label: "Sales"},
+   *       {name: "product", type: "string",  label: "Product"},
+   *       {name: "sales",   type: "number",  label: "Sales"},
    *       {name: "inStock", type: "boolean", label: "In Stock"}
    *     ],
    *     rows: [
    *       {c: [{v: "A"}, {v: 12000}, {v: true}]},
-   *       {c: [{v: "B"}, {v: 6000}, {v: true}]},
+   *       {c: [{v: "B"}, {v: 6000},  {v: true}]},
    *       {c: [{v: "C"}, {v: 12000}, {v: false}]},
-   *       {c: [{v: "D"}, {v: 1000}, {v: false}]},
-   *       {c: [{v: "E"}, {v: 2000}, {v: false}]},
-   *       {c: [{v: "F"}, {v: 3000}, {v: false}]},
-   *       {c: [{v: "G"}, {v: 4000}, {v: false}]}
+   *       {c: [{v: "D"}, {v: 1000},  {v: false}]},
+   *       {c: [{v: "E"}, {v: 2000},  {v: false}]},
+   *       {c: [{v: "F"}, {v: 3000},  {v: false}]},
+   *       {c: [{v: "G"}, {v: 4000},  {v: false}]}
    *     ]
    *   });
    *
+   *  var sales12k = new filter.IsIn("sales", [12000]);
+   *  var inStock = new filter.IsEqual("inStock", true);
+   *  var product = new filter.IsIn("product", ["A"]);
+   *  var myFilter = new filter.And([sales12k, inStock]);
+   *  myFilter.and(product);
    *
-   *  var sales12k = new IsIn("sales", [12000]);
-   *  var inStock = new IsEqual("inStock", true);
-   *  var product = new IsIn("product", ["A"]);
-   *  var filter = new And([sales12k, inStock]);
-   *  filter.and(product);
-   *  var data = filter.apply(data); //data.getValue(0, 0) === "A"
+   *  var filteredData = myFilter.apply(data);
+   *  //filteredData.getValue(0, 0) === "A"
    * });
    *
    * @description Creates an `And` filter that performs the intersection of a series of [filters]{@link pentaho.data.filter.AbstractFilter}.
@@ -84,33 +85,6 @@ define([
           return false;
       }
       return true;
-    },
-
-    /**
-     * Returns the intersection between this filter and any number of other filters.
-     * Intersections of intersections of filters (ANDs of ANDs) are flattened.
-     *
-     * @param {...pentaho.data.filter.AbstractFilter} filters - One or more filters to be added to the intersection operation.
-     * @return {!pentaho.data.filter.And} A filter that is the intersection of this filter with a series of other filters.
-     * @override
-     */
-    and: function() {
-      var N = arguments.length;
-      if(!N) return this;
-
-      var operands = this.operands.slice();
-      for(var k = 0; k < N; k++) {
-        operands.push(arguments[k]);
-      }
-      return operands.length === 1 ? operands[0] : new And(operands);
-    },
-
-    /**
-     * @inheritdoc
-     */
-    invert: function() {
-      if(!Or) Or = require("./Or");
-      return new Or(this._invertedOperands());
     }
   });
 
