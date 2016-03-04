@@ -1016,22 +1016,22 @@ define([
 
     describe("Property Attributes", function() {
 
-      describe("#applicable(name)", function() {
+      describe("#isApplicable(name)", function() {
         it("should return the evaluated static value of an existing property", function() {
           var Derived = Complex.extend({
-            meta: {props: [{name: "x", applicable: false}]}
+            meta: {props: [{name: "x", isApplicable: false}]}
           });
 
           var derived = new Derived();
 
-          expect(derived.applicable("x")).toBe(false);
+          expect(derived.isApplicable("x")).toBe(false);
         });
 
         it("should return the evaluated dynamic value of an existing property", function() {
           var Derived = Complex.extend({
             meta: {
               props: [{
-                name: "x", applicable: function() {
+                name: "x", isApplicable: function() {
                   return this.foo;
                 }
               }]
@@ -1042,11 +1042,11 @@ define([
 
           derived.foo = true;
 
-          expect(derived.applicable("x")).toBe(true);
+          expect(derived.isApplicable("x")).toBe(true);
 
           derived.foo = false;
 
-          expect(derived.applicable("x")).toBe(false);
+          expect(derived.isApplicable("x")).toBe(false);
         });
 
         it("should throw when given the name of an undefined property", function() {
@@ -1057,7 +1057,7 @@ define([
           var derived = new Derived();
 
           expect(function() {
-            derived.applicable("y");
+            derived.isApplicable("y");
           }).toThrow(errorMatch.argInvalid("name"));
         });
 
@@ -1071,7 +1071,7 @@ define([
           var derived = new Derived();
 
           expect(function() {
-            derived.applicable(Other.meta.get("x"));
+            derived.isApplicable(Other.meta.get("x"));
           }).toThrow(errorMatch.argInvalid("name"));
         });
       }); // end applicable

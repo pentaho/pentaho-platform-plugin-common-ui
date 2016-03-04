@@ -441,7 +441,7 @@ define([
       validate: function(owner) {
         var errors = null;
 
-        if(this.applicableEval(owner)) {
+        if(this.isApplicableEval(owner)) {
           var addErrors = function(newErrors) {
               errors = valueHelper.combineErrors(errors, newErrors);
             };
@@ -714,13 +714,13 @@ define([
         },
 
         /**
-         * Evaluates the value of the `applicable` attribute of this property
+         * Evaluates the value of the `isApplicable` attribute of this property
          * on a given owner complex value.
          *
          * @name applicableEval
          * @memberOf pentaho.type.Property.Meta#
          * @param {pentaho.type.Complex} owner The complex value that owns the property.
-         * @return {boolean} The evaluated value of the `applicable` attribute.
+         * @return {boolean} The evaluated value of the `isApplicable` attribute.
          * @ignore
          */
 
@@ -733,21 +733,21 @@ define([
          * 3. inheritance takes place only when the attribute is evaluated
          *    in the context of a given complex instance.
          *
-         * The _effective `applicable` attribute value_ is the
+         * The _effective `isApplicable` attribute value_ is the
          * conjunction (_and_) between the locally specified value and
          * the evaluated value inherited from its ancestor.
          *
          * Setting the attribute to `null` or `undefined` clears the local value.
          *
-         * The default, root `applicable` attribute value is `true`.
+         * The default, root `isApplicable` attribute value is `true`.
          *
          * @name applicable
          * @memberOf pentaho.type.Property.Meta#
          *
          * @type null | boolean | pentaho.type.PropertyDynamicAttribute.<boolean>
-         * @see pentaho.type.Complex#applicable
+         * @see pentaho.type.Complex#isApplicable
          */
-        applicable: {
+        isApplicable: {
           value: true,
           cast:  Boolean,
           combine: function(baseEval, localEval) {

@@ -560,8 +560,8 @@ define([
        *
        * @throws {pentaho.lang.ArgumentInvalidError} When a property with name `name` is not defined.
        */
-      applicable: function(name) {
-        return this.meta.get(name).applicableEval(this);
+      isApplicable: function(name) {
+        return this.meta.get(name).isApplicableEval(this);
       },
       //endregion
 

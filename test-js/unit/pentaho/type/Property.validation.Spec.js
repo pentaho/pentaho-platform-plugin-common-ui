@@ -39,7 +39,7 @@ define([
               {name: "x", type: "string", isRequired: true},
               {name: "y", type: ["string"], countMin: 2},
               {name: "z", type: ["string"], countMin: 1, countMax: 2},
-              {name: "w", type: "string", isRequired: true, applicable: false}
+              {name: "w", type: "string", isRequired: true, isApplicable: false}
             ]
           }
         });

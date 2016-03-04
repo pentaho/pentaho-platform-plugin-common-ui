@@ -27,7 +27,7 @@ define([
 
   "use strict";
 
-  function applicableLegend() {
+  function isApplicableLegend() {
     /*jshint validthis:true*/
     return this.getv("showLegend");
   }
@@ -62,7 +62,7 @@ define([
           {
             name: "backgroundColor",
             type: colorFactory,
-            applicable: function() {
+            isApplicable: function() {
               return this.getv("backgroundFill") !== "none";
             },
             isRequired: true
@@ -70,7 +70,7 @@ define([
           {
             name: "backgroundColorEnd",
             type: colorFactory,
-            applicable: function() {
+            isApplicable: function() {
               return this.getv("backgroundFill") === "gradient";
             },
             isRequired: true
@@ -109,38 +109,38 @@ define([
           {
             name: "legendPosition",
             type: sidesFactory,
-            applicable: applicableLegend,
+            isApplicable: isApplicableLegend,
             isRequired: true,
             value: "right"
           },
           {
             name: "legendBackgroundColor",
             type: colorFactory,
-            applicable: applicableLegend
+            isApplicable: isApplicableLegend
           },
 
           // Legend Item Label Font
           {
             name: "legendColor",
             type: colorFactory,
-            applicable: applicableLegend
+            isApplicable: isApplicableLegend
           },
           {
             name: "legendSize",
             type: "number",
-            applicable: applicableLegend
+            isApplicable: isApplicableLegend
           },
           {
             name: "legendStyle",
             type: fontStyleFactory,
-            applicable: applicableLegend,
+            isApplicable: isApplicableLegend,
             isRequired: true,
             value: "plain"
           },
           {
             name: "legendFontFamily",
             type: "string",
-            applicable: applicableLegend
+            isApplicable: isApplicableLegend
           },
           //endregion
 
