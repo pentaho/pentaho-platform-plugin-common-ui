@@ -49,7 +49,7 @@ define([
           meta: {
             id: "pentaho/visual/base",
             view: "View",
-            "abstract": true,
+            isAbstract: true,
             props: [
               {
                 name: "width",

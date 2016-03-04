@@ -27,7 +27,7 @@ define([
     return CartesianAbstract.extend({
       meta: {
         id: "pentaho/visual/ccc/categoricalContinuousAbstract",
-        "abstract": true
+        isAbstract: true
       }
     })
     .implement({meta: bundle.structured["categoricalContinuousAbstract"]});

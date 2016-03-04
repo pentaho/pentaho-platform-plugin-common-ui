@@ -484,17 +484,17 @@ define([
         });
       });
 
-      describe("#abstract -", function() {
+      describe("#isAbstract -", function() {
         it("should have the value of the representation type", function() {
           function expectIt(value) {
-            var MySimple = Simple.extend({meta: {abstract: value}});
+            var MySimple = Simple.extend({meta: {isAbstract: value}});
             var MyRefinement = Refinement.extend({
               meta: {
                 of: MySimple.meta
               }
             });
 
-            expect(MyRefinement.meta.abstract).toBe(value);
+            expect(MyRefinement.meta.isAbstract).toBe(value);
           }
 
           expectIt(true);
@@ -503,14 +503,14 @@ define([
 
         it("should not throw if set to the same value", function() {
           function expectIt(value) {
-            var MySimple = Simple.extend({meta: {abstract: value}});
+            var MySimple = Simple.extend({meta: {isAbstract: value}});
             var MyRefinement = Refinement.extend({
               meta: {
                 of: MySimple.meta
               }
             });
 
-            MyRefinement.meta.abstract = value;
+            MyRefinement.meta.isAbstract = value;
           }
 
           expectIt(true);
@@ -519,7 +519,7 @@ define([
 
         it("should throw if set to a different value", function() {
           function expectIt(value) {
-            var MySimple = Simple.extend({meta: {abstract: value}});
+            var MySimple = Simple.extend({meta: {isAbstract: value}});
             var MyRefinement = Refinement.extend({
               meta: {
                 of: MySimple.meta
@@ -527,7 +527,7 @@ define([
             });
 
             expect(function() {
-              MyRefinement.meta.abstract = !value;
+              MyRefinement.meta.isAbstract = !value;
             }).toThrow(errorMatch.operInvalid());
           }
 

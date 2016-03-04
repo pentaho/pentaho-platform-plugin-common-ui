@@ -28,7 +28,7 @@ define([
     return Abstract.extend({
       meta: {
         id: "pentaho/visual/ccc/cartesianAbstract",
-        "abstract": true,
+        isAbstract: true,
 
         props: [
           // Primary axis

@@ -617,7 +617,7 @@ define([
       meta: /** @lends pentaho.type.Complex.Meta# */{
         id: module.id,
 
-        "abstract": true,
+        isAbstract: true,
 
         styleClass: "pentaho-type-complex",
 

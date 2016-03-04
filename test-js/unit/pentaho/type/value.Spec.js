@@ -78,18 +78,18 @@ define([
         });
       }); // end #list
 
-      describe("#abstract", function() {
-        it("should have default `abstract` equal to `true`", function () {
-          expect(valueMeta.abstract).toBe(true);
+      describe("#isAbstract", function() {
+        it("should have default `isAbstract` equal to `true`", function () {
+          expect(valueMeta.isAbstract).toBe(true);
         });
 
-        it("should allow changing `abstract` value", function () {
-          valueMeta.abstract = false;
-          expect(valueMeta.abstract).toBe(false);
-          valueMeta.abstract = true;
-          expect(valueMeta.abstract).toBe(true);
+        it("should allow changing `isAbstract` value", function () {
+          valueMeta.isAbstract = false;
+          expect(valueMeta.isAbstract).toBe(false);
+          valueMeta.isAbstract = true;
+          expect(valueMeta.isAbstract).toBe(true);
         });
-      }); // end #abstract
+      }); // end #isAbstract
 
       describe("#areEqual(va, vb)", function() {
         it("should return `true` if both values are nully", function() {
@@ -218,7 +218,7 @@ define([
         });
 
         it("should throw if given a type annotated value of an abstract type", function() {
-          var MyAbstract = myContext.get("pentaho/type/complex").extend({meta: {abstract: true}});
+          var MyAbstract = myContext.get("pentaho/type/complex").extend({meta: {isAbstract: true}});
 
           expect(function() {
             Value.meta.create({_: MyAbstract});
@@ -226,7 +226,7 @@ define([
         });
 
         it("should throw if given a value and called on an abstract type", function() {
-          var MyAbstract = myContext.get("pentaho/type/complex").extend({meta: {abstract: true}});
+          var MyAbstract = myContext.get("pentaho/type/complex").extend({meta: {isAbstract: true}});
 
           expect(function() {
             MyAbstract.meta.create({});
@@ -335,52 +335,52 @@ define([
           expect(Derived.meta instanceof Value.Meta).toBe(true);
         });
 
-        describe("#abstract", function() {
+        describe("#isAbstract", function() {
           it("should respect a specified abstract spec value", function() {
-            var Derived = Value.extend({meta: {abstract: true}});
-            expect(Derived.meta.abstract).toBe(true);
+            var Derived = Value.extend({meta: {isAbstract: true}});
+            expect(Derived.meta.isAbstract).toBe(true);
 
-            Derived = Value.extend({meta: {abstract: false}});
-            expect(Derived.meta.abstract).toBe(false);
+            Derived = Value.extend({meta: {isAbstract: false}});
+            expect(Derived.meta.isAbstract).toBe(false);
           });
 
           it("should default to `false` whe spec is unspecified and should not inherit the base value", function() {
             var Derived = Value.extend();
-            expect(Derived.meta.abstract).toBe(false);
+            expect(Derived.meta.isAbstract).toBe(false);
 
-            var Abstract = Value.extend({meta: {abstract: true }});
-            var Concrete = Value.extend({meta: {abstract: false}});
+            var Abstract = Value.extend({meta: {isAbstract: true }});
+            var Concrete = Value.extend({meta: {isAbstract: false}});
 
             var DerivedAbstract = Abstract.extend();
             var DerivedConcrete = Concrete.extend();
 
-            expect(DerivedAbstract.meta.abstract).toBe(false);
-            expect(DerivedConcrete.meta.abstract).toBe(false);
+            expect(DerivedAbstract.meta.isAbstract).toBe(false);
+            expect(DerivedConcrete.meta.isAbstract).toBe(false);
           });
 
           it("should respect a set non-nully value", function() {
             var Derived = Value.extend();
-            expect(Derived.meta.abstract).toBe(false);
+            expect(Derived.meta.isAbstract).toBe(false);
 
-            Derived.meta.abstract = true;
-            expect(Derived.meta.abstract).toBe(true);
+            Derived.meta.isAbstract = true;
+            expect(Derived.meta.isAbstract).toBe(true);
 
-            Derived.meta.abstract = false;
-            expect(Derived.meta.abstract).toBe(false);
+            Derived.meta.isAbstract = false;
+            expect(Derived.meta.isAbstract).toBe(false);
           });
 
           it("should set to the default value false when set to a nully value", function() {
-            var Derived = Value.extend({meta: {abstract: true}});
-            expect(Derived.meta.abstract).toBe(true);
-            Derived.meta.abstract = null;
-            expect(Derived.meta.abstract).toBe(false);
+            var Derived = Value.extend({meta: {isAbstract: true}});
+            expect(Derived.meta.isAbstract).toBe(true);
+            Derived.meta.isAbstract = null;
+            expect(Derived.meta.isAbstract).toBe(false);
 
-            Derived = Value.extend({meta: {abstract: true}});
-            expect(Derived.meta.abstract).toBe(true);
-            Derived.meta.abstract = undefined;
-            expect(Derived.meta.abstract).toBe(false);
+            Derived = Value.extend({meta: {isAbstract: true}});
+            expect(Derived.meta.isAbstract).toBe(true);
+            Derived.meta.isAbstract = undefined;
+            expect(Derived.meta.isAbstract).toBe(false);
           });
-        }); // #abstract
+        }); // #isAbstract
       });
 
     }); // .extend({...})

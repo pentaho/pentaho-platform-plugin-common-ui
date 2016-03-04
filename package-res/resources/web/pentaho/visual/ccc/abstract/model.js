@@ -39,7 +39,7 @@ define([
     return Abstract.extend({
       meta: {
         id: "pentaho/visual/ccc/abstract",
-        "abstract": true,
+        isAbstract: true,
 
         props: [
           //region Visual Roles

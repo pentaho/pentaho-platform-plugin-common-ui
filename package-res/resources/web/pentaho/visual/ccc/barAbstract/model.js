@@ -28,7 +28,7 @@ define([
     return CategoricalContinuousAbstract.extend({
       meta: {
         id: "pentaho/visual/ccc/barAbstract",
-        "abstract": true,
+        isAbstract: true,
 
         props: [
           {

@@ -28,7 +28,7 @@ define([
     return BarAbstract.extend({
       meta: {
         id: "pentaho/visual/ccc/barNormalizedAbstract",
-        "abstract": true,
+        isAbstract: true,
 
         props: [
           {

@@ -120,7 +120,7 @@ define([
      * of the refinement type.
      *
      * Although, conceptually, a refinement type is always abstract,
-     * the refinement type's [abstract]{@link pentaho.type.Value.Meta#abstract} attribute,
+     * the refinement type's [isAbstract]{@link pentaho.type.Value.Meta#isAbstract} attribute,
      * instead, more usefully indicates whether its representation type is abstract or not.
      *
      * ### Defining a refinement type
@@ -379,8 +379,6 @@ define([
         //endregion
 
         //region abstract property
-        // TODO: Rhino probably gives a syntax error on this.
-        // However, cannot use the `get "abstract"()` syntax cause then Phantom JS 1.9.8 starts failing
         /**
          * Gets a value that indicates if this type is abstract.
          *
@@ -391,13 +389,13 @@ define([
          * @readOnly
          * @sealed
          */
-        get abstract() {
-          return this.of["abstract"];
+        get isAbstract() {
+          return this.of.isAbstract;
         },
 
-        set abstract(value) {
+        set isAbstract(value) {
           // nully is reset, which is false, so !! works well.
-          if((!!value) !== this["abstract"])
+          if((!!value) !== this.isAbstract)
             throw error.operInvalid("Attribute cannot be changed.");
         },
         //endregion
