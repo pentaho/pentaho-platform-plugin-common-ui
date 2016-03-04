@@ -370,7 +370,7 @@ define([
 
           // Value returns refinement === undefined...
           var ofMeta = this.context.get(value).meta;
-          if(ofMeta.refinement !== false)
+          if(ofMeta.isRefinement !== false)
             throw error.argInvalidType("of", ["pentaho/type/element", "pentaho/type/list"]);
 
           // Throws when set again with a different value.
@@ -417,7 +417,7 @@ define([
         },
         //endregion
 
-        //region refinement property
+        //region isRefinement property
         /**
          * Gets a value that indicates if this type is a refinement type.
          *
@@ -428,7 +428,7 @@ define([
          * @sealed
          */
           // Providing a default implementation is less code
-        get refinement() {
+        get isRefinement() {
           return true;
         },
         //endregion

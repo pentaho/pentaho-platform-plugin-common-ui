@@ -1171,9 +1171,9 @@ define([
         });
       });
 
-      describe("#refinement -", function() {
+      describe("#isRefinement -", function() {
         it("should return the value `false`", function() {
-          expect(List.meta.refinement).toBe(false);
+          expect(List.meta.isRefinement).toBe(false);
         });
       });
     });

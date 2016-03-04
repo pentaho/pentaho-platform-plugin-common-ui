@@ -203,18 +203,18 @@ define([
         get isList() {},
         //endregion
 
-        //region refinement property
+        //region isRefinement property
         /**
          * Gets a value that indicates if this type is a refinement type.
          *
          * The `Value` class return `undefined`.
          *
-         * @name refinement
+         * @name isRefinement
          * @memberOf pentaho.type.Value.Meta#
          * @type boolean
          * @readOnly
          */
-        get refinement() {},
+        get isRefinement() {},
         //endregion
 
         //region context property

@@ -560,9 +560,9 @@ define([
         });
       });
 
-      describe("#refinement -", function() {
+      describe("#isRefinement -", function() {
         it("should return the value `true`", function() {
-          expect(Refinement.meta.refinement).toBe(true);
+          expect(Refinement.meta.isRefinement).toBe(true);
         });
       });
 

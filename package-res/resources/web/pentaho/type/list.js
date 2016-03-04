@@ -580,9 +580,9 @@ define([
         },
         //endregion
 
-        //region refinement property
+        //region isRefinement property
         /**
-         * Gets a value that indicates if this type is a refinement type.
+         * Gets a value that indicates if this type is a isRefinement type.
          *
          * This implementation is sealed and always returns `false`.
          *
@@ -590,7 +590,7 @@ define([
          * @readOnly
          * @sealed
          */
-        get refinement() {
+        get isRefinement() {
           return false;
         },
         //endregion

@@ -51,9 +51,9 @@ define([
         });
       });
 
-      describe("#refinement -", function() {
+      describe("#isRefinement -", function() {
         it("should return the value `false`", function() {
-          expect(Element.meta.refinement).toBe(false);
+          expect(Element.meta.isRefinement).toBe(false);
         });
       });
 
