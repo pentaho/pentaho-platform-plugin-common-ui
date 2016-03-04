@@ -94,8 +94,8 @@ define([
           expect(propMeta.type).toBe(String.meta);
         });
 
-        it("should have `list=false`", function() {
-          expect(propMeta.list).toBe(false);
+        it("should have `isList=false`", function() {
+          expect(propMeta.isList).toBe(false);
         });
 
         it("should have `index` equal to the specified value", function() {
@@ -355,17 +355,17 @@ define([
         });
       }); // end name
 
-      describe("list - ", function() {
+      describe("isList - ", function() {
         it("should return `true` when the type is a list type", function() {
           var propMeta = createRootPropMeta({name: "foo", type: ["string"]});
-          expect(propMeta.list).toBe(true);
+          expect(propMeta.isList).toBe(true);
         });
 
         it("should return `false` when the type is an element type", function() {
           var propMeta = createRootPropMeta({name: "foo", type: "string"});
-          expect(propMeta.list).toBe(false);
+          expect(propMeta.isList).toBe(false);
         });
-      }); // end list
+      }); // end isList
 
       describe("type - ", function() {
 
@@ -917,18 +917,18 @@ define([
       }); // end readOnly
 
       describe("countRange -", function() {
-        // 1. when !list => min and max <= 1
+        // 1. when !isList => min and max <= 1
         // 2. required => countMin >= 1
         // 3. min <= max
 
-        it("should limit min and max to 1 when list = false", function() {
+        it("should limit min and max to 1 when isList = false", function() {
           var propMeta = createRootPropMeta({name: "foo", countMin: 10, countMax: 10});
           expect(propMeta.countMin).toBe(10);
           expect(propMeta.countMax).toBe(10);
           expect(propMeta.countRangeEval({})).toEqual({min: 1, max: 1});
         });
 
-        it("should not limit min and max to 1 when list = true", function() {
+        it("should not limit min and max to 1 when isList = true", function() {
           var propMeta = createRootPropMeta({name: "foo", countMin: 10, countMax: 10, type: ["string"]});
           expect(propMeta.countMin).toBe(10);
           expect(propMeta.countMax).toBe(10);
@@ -986,21 +986,21 @@ define([
           expect(propMeta.countRangeEval({}).max).toBe(1);
         });
 
-        it("should have max = 10 when countMin = 10, countMax = 5 and list = true", function() {
+        it("should have max = 10 when countMin = 10, countMax = 5 and isList = true", function() {
           var propMeta = createRootPropMeta({name: "foo", countMin: 10, countMax: 5, type: ["string"]});
           expect(propMeta.countMin).toBe(10);
           expect(propMeta.countMax).toBe(5);
           expect(propMeta.countRangeEval({}).max).toBe(10);
         });
 
-        it("should have max = Infinity when countMin = 10 and list = true", function() {
+        it("should have max = Infinity when countMin = 10 and isList = true", function() {
           var propMeta = createRootPropMeta({name: "foo", countMin: 10, type: ["string"]});
           expect(propMeta.countMin).toBe(10);
           expect(propMeta.countMax).toBe(undefined);
           expect(propMeta.countRangeEval({}).max).toBe(Infinity);
         });
 
-        it("should have min = 0 when countMax = 10 and list = true", function() {
+        it("should have min = 0 when countMax = 10 and isList = true", function() {
           var propMeta = createRootPropMeta({name: "foo", countMax: 10, type: []});
           expect(propMeta.countMin).toBe(undefined);
           expect(propMeta.countMax).toBe(10);

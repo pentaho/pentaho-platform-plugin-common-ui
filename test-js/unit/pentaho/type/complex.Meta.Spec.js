@@ -123,8 +123,8 @@ define([
               expect(propMeta.declaringType).toBe(Derived.meta);
             });
 
-            it("should have `list=false`", function() {
-              expect(propMeta.list).toBe(false);
+            it("should have `isList=false`", function() {
+              expect(propMeta.isList).toBe(false);
             });
 
             it("should have `root` equal to itself", function() {

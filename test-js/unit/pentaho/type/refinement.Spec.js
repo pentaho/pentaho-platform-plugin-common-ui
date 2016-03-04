@@ -536,7 +536,7 @@ define([
         });
       });
 
-      describe("#list -", function() {
+      describe("#isList -", function() {
         it("should be false when the representation type is an element type", function() {
           var MySimple = Simple.extend();
           var MyRefinement = Refinement.extend({
@@ -545,7 +545,7 @@ define([
             }
           });
 
-          expect(MyRefinement.meta.list).toBe(false);
+          expect(MyRefinement.meta.isList).toBe(false);
         });
 
         it("should be true when the representation type is a list type", function() {
@@ -556,7 +556,7 @@ define([
             }
           });
 
-          expect(MyRefinement.meta.list).toBe(true);
+          expect(MyRefinement.meta.isList).toBe(true);
         });
       });
 

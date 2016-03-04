@@ -37,7 +37,7 @@ define([
      * @extends pentaho.type.Item.Meta
      *
      * @classDesc The base type class of value types.</br>
-     * Value types can be singular or plural ({@link pentaho.type.Value.Meta#list|list}).</br>
+     * Value types can be singular or plural ({@link pentaho.type.Value.Meta#isList|isList}).</br>
      * A Value type should not be instantiated if it is {@link pentaho.type.Value.Meta#isAbstract|abstract}.
      *
      * For more information see {@link pentaho.type.Value}.
@@ -195,12 +195,12 @@ define([
          *
          * The `Value` class return `undefined`.
          *
-         * @name list
+         * @name isList
          * @memberOf pentaho.type.Value.Meta#
          * @type boolean
          * @readOnly
          */
-        get list() {},
+        get isList() {},
         //endregion
 
         //region refinement property

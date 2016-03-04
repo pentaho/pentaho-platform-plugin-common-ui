@@ -575,7 +575,7 @@ define([
          * @readOnly
          * @sealed
          */
-        get list() {
+        get isList() {
           return true;
         },
         //endregion

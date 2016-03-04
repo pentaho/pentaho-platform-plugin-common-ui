@@ -1165,9 +1165,9 @@ define([
     });
 
     describe("Meta -", function() {
-      describe("#list -", function() {
+      describe("#isList -", function() {
         it("should return the value `true`", function() {
-          expect(List.meta.list).toBe(true);
+          expect(List.meta.isList).toBe(true);
         });
       });
 

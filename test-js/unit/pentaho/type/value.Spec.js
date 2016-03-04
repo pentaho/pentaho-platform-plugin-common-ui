@@ -72,11 +72,11 @@ define([
         });
       }); // end #context
 
-      describe("#list", function() {
-        it("should have default `list` equal to `undefined`", function () {
-          expect(valueMeta.list).toBe(undefined);
+      describe("#isList", function() {
+        it("should have default `isList` equal to `undefined`", function () {
+          expect(valueMeta.isList).toBe(undefined);
         });
-      }); // end #list
+      }); // end #isList
 
       describe("#isAbstract", function() {
         it("should have default `isAbstract` equal to `true`", function () {

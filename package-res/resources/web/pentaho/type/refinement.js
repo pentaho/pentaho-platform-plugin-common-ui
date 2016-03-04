@@ -412,8 +412,8 @@ define([
          * @readOnly
          * @sealed
          */
-        get list() {
-          return this.of.list;
+        get isList() {
+          return this.of.isList;
         },
         //endregion
 

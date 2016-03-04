@@ -248,8 +248,8 @@ define([
        * @type boolean
        * @readonly
        */
-      get list() {
-        return this._typeMeta.list;
+      get isList() {
+        return this._typeMeta.isList;
       },
       //endregion
 
@@ -270,7 +270,7 @@ define([
        */
       get elemType() {
         var type = this._typeMeta;
-        return type.list ? type.of : type;
+        return type.isList ? type.of : type;
       },
       //endregion
 
@@ -398,7 +398,7 @@ define([
       _freshDefaultValue: function() {
         var value = this.value;
         return value     ? value.clone()      :
-               this.list ? this.type.create() :
+               this.isList ? this.type.create() :
                value;
       },
       //endregion
@@ -456,10 +456,10 @@ define([
           }
 
           var range = this.countRangeEval(owner),
-              count = this.list ? value.count : (value ? 1 : 0);
+              count = this.isList ? value.count : (value ? 1 : 0);
 
           if(count < range.min) {
-            if(this.list) {
+            if(this.isList) {
               addErrors(new Error(bundle.format(
                   bundle.structured.errors.property.countOutOfRange,
                   [this.label, count, range.min, range.max])));
@@ -813,7 +813,7 @@ define([
        * The _effective value count range_ is a conciliation
        * of the _effective value_ of the attributes:
        *
-       * * {@link pentaho.type.Property.Meta#list}
+       * * {@link pentaho.type.Property.Meta#isList}
        * * {@link pentaho.type.Property.Meta#required}
        * * {@link pentaho.type.Property.Meta#countMin}
        * * {@link pentaho.type.Property.Meta#countMax}
@@ -837,7 +837,7 @@ define([
        * }
        * ```
        *
-       * When the property is _not_ a {@link pentaho.type.Property#list} property,
+       * When the property is _not_ a {@link pentaho.type.Property#isList} property,
        * the value can only either be zero or one.
        *
        * If the property is _not_ a _list_ property,
@@ -857,7 +857,7 @@ define([
             countMin = this.countMinEval(owner),
             countMax = this.countMaxEval(owner);
 
-        if(!this.list) {
+        if(!this.isList) {
           if(countMin > 1) countMin = 1;
           if(countMax > 1) countMax = 1;
         }

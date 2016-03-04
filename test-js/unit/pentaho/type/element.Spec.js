@@ -45,9 +45,9 @@ define([
         expect(ElemMeta.prototype instanceof Value.Meta).toBe(true);
       });
 
-      describe("#list -", function() {
+      describe("#isList -", function() {
         it("should return the value `false`", function() {
-          expect(Element.meta.list).toBe(false);
+          expect(Element.meta.isList).toBe(false);
         });
       });
 

@@ -145,7 +145,7 @@ define([
         while(i--) {
           pMeta = pMetas[i];
           v = values[pMeta.name];
-          cloneValues[pMeta.name] = v && pMeta.list ? v.clone() : v;
+          cloneValues[pMeta.name] = v && pMeta.isList ? v.clone() : v;
         }
 
         clone._values = cloneValues;
@@ -346,7 +346,7 @@ define([
         var pMeta  = this.meta.get(name),
             value0 = this._values[pMeta.name];
 
-        if(pMeta.list) {
+        if(pMeta.isList) {
           value0.set(valueSpec);
         } else {
           var value1 = pMeta.toValue(valueSpec);
@@ -441,7 +441,7 @@ define([
         if(!pMeta) return 0;
 
         var value = this._values[pMeta.name];
-        return pMeta.list ? value.count :
+        return pMeta.isList ? value.count :
                value      ? 1 : 0;
       },
 
@@ -457,7 +457,7 @@ define([
        * If its value is not `null`, it is seen like a list property with one element.
        * This behavior is consistent with that of the [count]{@link pentaho.type.Complex#count} property.
        *
-       * @see pentaho.type.Property.Meta#list
+       * @see pentaho.type.Property.Meta#isList
        * @see pentaho.type.Complex#path
        * @see pentaho.type.Complex#atv
        * @see pentaho.type.Complex#atf
@@ -482,7 +482,7 @@ define([
 
         var pValue = this._values[pMeta.name];
 
-        if(pMeta.list) return /* assert pValue */pValue.at(index || 0);
+        if(pMeta.isList) return /* assert pValue */pValue.at(index || 0);
 
         return pValue && !index ? pValue : null;
       },

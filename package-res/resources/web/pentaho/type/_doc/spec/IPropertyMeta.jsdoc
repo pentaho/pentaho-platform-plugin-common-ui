@@ -47,7 +47,7 @@
  * When `type` is specified, but `name` isn't,
  * it is _defaulted_ using the type's default property names.
  * If this specification defines a _list_ property,
- * according to {@link pentaho.type.spec.IPropertyMeta#list},
+ * according to {@link pentaho.type.spec.IPropertyMeta#isList},
  * then the default name is {@link pentaho.type.Value#namePlural},
  * and otherwise, it is {@link pentaho.type.Value#name}.
  * It is an error if the resulting name is already the name of an inherited property.
@@ -57,19 +57,19 @@
  * Either `name` or `type` must be specified.
  * See {@link pentaho.type.spec.IPropertyMeta#type} for more information.
  *
- * @property {boolean?} [list=false] Indicates if the property is a list property.
+ * @property {boolean?} [isList=false] Indicates if the property is a list property.
  *   List properties can have more than one value,
  *   which is exposed through the "value" property as an array of values.
  *
- * The properties `list`, `countMin`, `countMax` and `required` are all related,
+ * The properties `isList`, `countMin`, `countMax` and `required` are all related,
  * and the values of one affect the other.
  * When multiple of these are specified,
  * the order of precedence is that just enumerated.
  *
- * When `list` is _specified_ as `false`,
+ * When `isList` is _specified_ as `false`,
  * then `countMin` and `countMax` are both _limited_ to be less than or equal to `1`.
  *
- * When `list` is _not specified_, its default value is `false`,
+ * When `isList` is _not specified_, its default value is `false`,
  * whatever the value of the other related property attributes.
  *
  * When `countMin` is _specified_, then `required` is implied to be `countMin >= 1`.
@@ -78,7 +78,7 @@
  * @property {number} [countMin] The minimum number of values that this property must have
  *   to be considered specified.
  *
- * When `list` is `false`, then this property is limited to be _less than or equal_ to `1`.
+ * When `isList` is `false`, then this property is limited to be _less than or equal_ to `1`.
  *
  * When `countMin`is specified, then `required` is ignored
  * and implied to be `countMin >= 1`.
@@ -92,23 +92,23 @@
  *
  * The value of `countMax` is limited to be greater than or equal to `countMin`.
  *
- * See `list` and `countMax` for more information.
+ * See `isList` and `countMax` for more information.
  *
  *
  * @property {boolean} [required=false] Indicates if the property must be specified.
  *
  * Ignored when `countMin` is specified.
  *
- * See `countMin` and `list` for more information.
+ * See `countMin` and `isList` for more information.
  *
  *
  * @property {number} [countMax] The maximum number of values that properties of this type can have.
  *
  * A value _greater than or equal_ to the greatest between `1` and `countMin`.
  *
- * When `list` is `false`, then this property is limited to be _less than or equal_ to `1`.
+ * When `isList` is `false`, then this property is limited to be _less than or equal_ to `1`.
  *
  * When unspecified, its default value is the _minimum value_ it can take.
  *
- * See `countMin` and `list` for more information.
+ * See `countMin` and `isList` for more information.
  */
