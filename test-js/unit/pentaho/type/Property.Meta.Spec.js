@@ -269,42 +269,42 @@ define([
         });
       }); // end isBrowsable
 
-      describe("advanced - ", function() {
+      describe("isAdvanced - ", function() {
         it("should default to false", function() {
           var propMeta = createRootPropMeta({name: "foo"});
-          expect(propMeta.advanced).toBe(false);
+          expect(propMeta.isAdvanced).toBe(false);
         });
 
         it("should convert undefined to default", function() {
-          var propMeta = createRootPropMeta({name: "foo", advanced: undefined});
-          expect(propMeta.advanced).toBe(false);
+          var propMeta = createRootPropMeta({name: "foo", isAdvanced: undefined});
+          expect(propMeta.isAdvanced).toBe(false);
         });
 
         it("should convert null to default", function() {
-          var propMeta = createRootPropMeta({name: "foo", advanced: null});
-          expect(propMeta.advanced).toBe(false);
+          var propMeta = createRootPropMeta({name: "foo", isAdvanced: null});
+          expect(propMeta.isAdvanced).toBe(false);
         });
 
         it("should cast other values to boolean", function() {
-          var propMeta = createRootPropMeta({name: "foo1", advanced: 1});
-          expect(propMeta.advanced).toBe(true);
+          var propMeta = createRootPropMeta({name: "foo1", isAdvanced: 1});
+          expect(propMeta.isAdvanced).toBe(true);
 
-          propMeta = createRootPropMeta({name: "foo2", advanced: 0});
-          expect(propMeta.advanced).toBe(false);
+          propMeta = createRootPropMeta({name: "foo2", isAdvanced: 0});
+          expect(propMeta.isAdvanced).toBe(false);
 
-          propMeta = createRootPropMeta({name: "foo3", advanced: ""});
-          expect(propMeta.advanced).toBe(false);
+          propMeta = createRootPropMeta({name: "foo3", isAdvanced: ""});
+          expect(propMeta.isAdvanced).toBe(false);
 
-          propMeta = createRootPropMeta({name: "foo4", advanced: true});
-          expect(propMeta.advanced).toBe(true);
+          propMeta = createRootPropMeta({name: "foo4", isAdvanced: true});
+          expect(propMeta.isAdvanced).toBe(true);
 
-          propMeta = createRootPropMeta({name: "foo5", advanced: "yes"});
-          expect(propMeta.advanced).toBe(true);
+          propMeta = createRootPropMeta({name: "foo5", isAdvanced: "yes"});
+          expect(propMeta.isAdvanced).toBe(true);
 
-          propMeta = createRootPropMeta({name: "foo6", advanced: "no"});
-          expect(propMeta.advanced).toBe(true);
+          propMeta = createRootPropMeta({name: "foo6", isAdvanced: "no"});
+          expect(propMeta.isAdvanced).toBe(true);
         });
-      }); // end advanced
+      }); // end isAdvanced
       //endregion
 
       //region Defining Attributes
@@ -1550,115 +1550,115 @@ define([
         });
       }); // end isBrowsable
 
-      describe("advanced -", function() {
+      describe("isAdvanced -", function() {
         it("should inherit the base value, by default", function() {
           var Base = Complex.extend();
 
-          Base.meta.add({name: "foo", advanced: false});
+          Base.meta.add({name: "foo", isAdvanced: false});
 
           var Derived = Base.extend();
 
           var propMeta = extendProp(Derived.meta, "foo", {name: "foo"});
 
-          expect(propMeta.advanced).toBe(false);
+          expect(propMeta.isAdvanced).toBe(false);
 
           // ----
 
           Base = Complex.extend();
 
-          Base.meta.add({name: "foo", advanced: true});
+          Base.meta.add({name: "foo", isAdvanced: true});
 
           Derived = Base.extend();
 
           propMeta = extendProp(Derived.meta, "foo", {name: "foo"});
 
-          expect(propMeta.advanced).toBe(true);
+          expect(propMeta.isAdvanced).toBe(true);
         });
 
         it("should inherit the base value if spec is nully", function() {
           var Base = Complex.extend();
 
-          Base.meta.add({name: "foo", advanced: true});
+          Base.meta.add({name: "foo", isAdvanced: true});
 
           var Derived = Base.extend();
 
-          var propMeta = extendProp(Derived.meta, "foo", {name: "foo", advanced: undefined});
+          var propMeta = extendProp(Derived.meta, "foo", {name: "foo", isAdvanced: undefined});
 
-          expect(propMeta.advanced).toBe(true);
+          expect(propMeta.isAdvanced).toBe(true);
 
           // ---
 
           Base = Complex.extend();
 
-          Base.meta.add({name: "foo", advanced: true});
+          Base.meta.add({name: "foo", isAdvanced: true});
 
           Derived = Base.extend();
 
-          propMeta = extendProp(Derived.meta, "foo", {name: "foo", advanced: null});
+          propMeta = extendProp(Derived.meta, "foo", {name: "foo", isAdvanced: null});
 
-          expect(propMeta.advanced).toBe(true);
+          expect(propMeta.isAdvanced).toBe(true);
         });
 
         it("should respect the spec value if not nully", function() {
           var Base = Complex.extend();
 
-          Base.meta.add({name: "foo", advanced: false});
+          Base.meta.add({name: "foo", isAdvanced: false});
 
           var Derived = Base.extend();
 
-          var propMeta = extendProp(Derived.meta, "foo", {name: "foo", advanced: true});
+          var propMeta = extendProp(Derived.meta, "foo", {name: "foo", isAdvanced: true});
 
-          expect(propMeta.advanced).toBe(true);
+          expect(propMeta.isAdvanced).toBe(true);
         });
 
         it("should respect a set value if not nully", function() {
           var Base = Complex.extend();
 
-          Base.meta.add({name: "foo", advanced: false});
+          Base.meta.add({name: "foo", isAdvanced: false});
 
           var Derived = Base.extend();
 
           var propMeta = extendProp(Derived.meta, "foo", {name: "foo"});
 
-          expect(propMeta.advanced).toBe(false);
+          expect(propMeta.isAdvanced).toBe(false);
 
-          propMeta.advanced = true;
+          propMeta.isAdvanced = true;
 
-          expect(propMeta.advanced).toBe(true);
+          expect(propMeta.isAdvanced).toBe(true);
         });
 
         it("should inherit the base value when set to nully", function() {
           var Base = Complex.extend();
 
-          Base.meta.add({name: "foo", advanced: false});
+          Base.meta.add({name: "foo", isAdvanced: false});
 
           var Derived = Base.extend();
 
-          var propMeta = extendProp(Derived.meta, "foo", {name: "foo", advanced: true});
+          var propMeta = extendProp(Derived.meta, "foo", {name: "foo", isAdvanced: true});
 
-          expect(propMeta.advanced).toBe(true);
+          expect(propMeta.isAdvanced).toBe(true);
 
-          propMeta.advanced = undefined;
+          propMeta.isAdvanced = undefined;
 
-          expect(propMeta.advanced).toBe(false);
+          expect(propMeta.isAdvanced).toBe(false);
 
           // ---
 
           Base = Complex.extend();
 
-          Base.meta.add({name: "foo", advanced: false});
+          Base.meta.add({name: "foo", isAdvanced: false});
 
           Derived = Base.extend();
 
-          propMeta = extendProp(Derived.meta, "foo", {name: "foo", advanced: true});
+          propMeta = extendProp(Derived.meta, "foo", {name: "foo", isAdvanced: true});
 
-          expect(propMeta.advanced).toBe(true);
+          expect(propMeta.isAdvanced).toBe(true);
 
-          propMeta.advanced = null;
+          propMeta.isAdvanced = null;
 
-          expect(propMeta.advanced).toBe(false);
+          expect(propMeta.isAdvanced).toBe(false);
         });
-      }); // end advanced
+      }); // end isAdvanced
       //endregion
 
       //region Defining attributes

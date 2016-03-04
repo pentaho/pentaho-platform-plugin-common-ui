@@ -568,35 +568,35 @@ define([
       });
     }); // #styleClass
 
-    describe("#advanced -", function() {
+    describe("#isAdvanced -", function() {
       it("should preserve the default value", function() {
-        Item.meta.advanced = undefined;
+        Item.meta.isAdvanced = undefined;
         // The default value is still there (did not delete)
-        expect(Item.meta.advanced).toBe(false);
+        expect(Item.meta.isAdvanced).toBe(false);
       });
 
       it("can be set on a derived class", function() {
         [true, false].forEach(function(bool) {
-          var Derived = Item.extend({meta: {"advanced": bool}});
-          expect(Derived.meta.advanced).toBe(bool);
+          var Derived = Item.extend({meta: {"isAdvanced": bool}});
+          expect(Derived.meta.isAdvanced).toBe(bool);
 
           var item = new Derived();
-          expect(item.meta.advanced).toBe(bool);
+          expect(item.meta.isAdvanced).toBe(bool);
         });
       });
 
       it("can be unset by passing a nully, thus delegating to the ancestor class", function() {
         [true, false].forEach(function(bool) {
           [null, undefined].forEach(function(value) {
-            var FirstDerivative  = Item.extend({meta: {"advanced": bool}});
-            var SecondDerivative = FirstDerivative.extend({meta: {"advanced": !bool}});
+            var FirstDerivative  = Item.extend({meta: {"isAdvanced": bool}});
+            var SecondDerivative = FirstDerivative.extend({meta: {"isAdvanced": !bool}});
 
-            SecondDerivative.meta.advanced = value;
-            expect(SecondDerivative.meta.advanced).toBe(FirstDerivative.meta.advanced);
+            SecondDerivative.meta.isAdvanced = value;
+            expect(SecondDerivative.meta.isAdvanced).toBe(FirstDerivative.meta.isAdvanced);
           });
         });
       });
-    }); // #advanced
+    }); // #isAdvanced
 
     describe("#isBrowsable -", function() {
       it("should preserve the default value", function() {

@@ -462,16 +462,16 @@ define([
     },
     //endregion
 
-    //region advanced property
+    //region isAdvanced property
     // @type boolean
     // -> boolean, Optional(false), Inherited, Configurable
     // null || undefined -> reset
-    _advanced: false,
+    _isAdvanced: false,
 
     /**
-     * Gets or sets the `advanced` attribute of this type.
+     * Gets or sets the `isAdvanced` attribute of this type.
      *
-     * Items with `advanced` attributes set to `false` are typically immediately accessible to the user.
+     * Items with `isAdvanced` attributes set to `false` are typically immediately accessible to the user.
      * An advanced item typically escapes the expected flow of utilization, yet it is
      * sufficiently relevant to be shown in a user interface.
      *
@@ -481,21 +481,21 @@ define([
      * @type {boolean}
      * @see pentaho.type.Item.Meta#isBrowsable
      */
-    get advanced() {
-      return this._advanced;
+    get isAdvanced() {
+      return this._isAdvanced;
     },
 
-    set advanced(value) {
+    set isAdvanced(value) {
       if(value == null) {
-        this._resetAdvanced();
+        this._resetIsAdvanced();
       } else {
-        this._advanced = !!value;
+        this._isAdvanced = !!value;
       }
     },
 
-    _resetAdvanced: function() {
+    _resetIsAdvanced: function() {
       if(this !== _itemMeta) {
-        delete this._advanced;
+        delete this._isAdvanced;
       }
     },
     //endregion

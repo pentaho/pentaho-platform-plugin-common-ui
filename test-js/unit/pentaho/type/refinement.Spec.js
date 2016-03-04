@@ -1102,73 +1102,73 @@ define([
         });
       }); // end #isBrowsable
 
-      describe("#advanced -", function() {
+      describe("#isAdvanced -", function() {
         it("should default to the value of the representation type", function() {
-          var MySimple = Simple.extend({meta: {advanced: true}});
+          var MySimple = Simple.extend({meta: {isAdvanced: true}});
           var MyRefinement = Refinement.extend({
             meta: {
               of: MySimple.meta
             }
           });
 
-          expect(MyRefinement.meta.advanced).toBe(MySimple.meta.advanced);
+          expect(MyRefinement.meta.isAdvanced).toBe(MySimple.meta.isAdvanced);
         });
 
         it("should respect a specified value", function() {
-          var MySimple = Simple.extend({meta: {advanced: true}});
+          var MySimple = Simple.extend({meta: {isAdvanced: true}});
           var MyRefinement = Refinement.extend({
             meta: {
-              advanced: false,
+              isAdvanced: false,
               of: MySimple.meta
             }
           });
 
-          expect(MyRefinement.meta.advanced).toBe(false);
+          expect(MyRefinement.meta.isAdvanced).toBe(false);
         });
 
         it("should inherit the value of the base refinement", function() {
-          var MySimple = Simple.extend({meta: {advanced: true}});
+          var MySimple = Simple.extend({meta: {isAdvanced: true}});
           var R1 = Refinement.extend({
             meta: {
-              advanced: false,
+              isAdvanced: false,
               of: MySimple.meta
             }
           });
           var R2 = R1.extend();
 
-          expect(R2.meta.advanced).toBe(false);
+          expect(R2.meta.isAdvanced).toBe(false);
         });
 
         it("should respect a specified value when it also has a base refinement", function() {
-          var MySimple = Simple.extend({meta: {advanced: false}});
+          var MySimple = Simple.extend({meta: {isAdvanced: false}});
           var R1 = Refinement.extend({
             meta: {
-              advanced: false,
+              isAdvanced: false,
               of: MySimple.meta
             }
           });
-          var R2 = R1.extend({meta: {advanced: true}});
+          var R2 = R1.extend({meta: {isAdvanced: true}});
 
-          expect(R2.meta.advanced).toBe(true);
+          expect(R2.meta.isAdvanced).toBe(true);
         });
 
         it("should fallback to the base value when set to nully", function() {
 
           function expectIt(newValue) {
-            var MySimple = Simple.extend({meta: {advanced: false}});
+            var MySimple = Simple.extend({meta: {isAdvanced: false}});
             var R1 = Refinement.extend({
               meta: {
-                advanced: false,
+                isAdvanced: false,
                 of: MySimple.meta
               }
             });
-            var R2 = R1.extend({meta: {advanced: true}});
+            var R2 = R1.extend({meta: {isAdvanced: true}});
 
-            expect(R2.meta.advanced).toBe(true);
+            expect(R2.meta.isAdvanced).toBe(true);
 
-            R2.meta.advanced = newValue;
+            R2.meta.isAdvanced = newValue;
 
-            expect(R2.meta.advanced).toBe(false);
+            expect(R2.meta.isAdvanced).toBe(false);
           }
 
           expectIt(undefined);
@@ -1177,19 +1177,19 @@ define([
 
         it("should fallback to the value of the representation type when set to nully", function() {
           function expectIt(newValue) {
-            var MySimple = Simple.extend({meta: {advanced: true}});
+            var MySimple = Simple.extend({meta: {isAdvanced: true}});
             var R1 = Refinement.extend({
               meta: {
-                advanced: false,
+                isAdvanced: false,
                 of: MySimple.meta
               }
             });
 
-            expect(R1.meta.advanced).toBe(false);
+            expect(R1.meta.isAdvanced).toBe(false);
 
-            R1.meta.advanced = newValue;
+            R1.meta.isAdvanced = newValue;
 
-            expect(R1.meta.advanced).toBe(true);
+            expect(R1.meta.isAdvanced).toBe(true);
           }
 
           expectIt(undefined);
@@ -1197,10 +1197,10 @@ define([
         });
 
         it("should not delete the root value", function() {
-          Refinement.meta.advanced = undefined;
-          expect(Refinement.meta.hasOwnProperty("_advanced"));
+          Refinement.meta.isAdvanced = undefined;
+          expect(Refinement.meta.hasOwnProperty("_isAdvanced"));
         });
-      }); // end #advanced
+      }); // end #isAdvanced
 
       describe("#ordinal -", function() {
         it("should default to the value of the representation type", function() {

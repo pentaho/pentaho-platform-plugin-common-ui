@@ -106,7 +106,7 @@ define([
      * [category]{@link pentaho.type.Item.Meta#category},
      * [helpUrl]{@link pentaho.type.Item.Meta#helpUrl},
      * [isBrowsable]{@link pentaho.type.Item.Meta#isBrowsable},
-     * [advanced]{@link pentaho.type.Item.Meta#advanced},
+     * [isAdvanced]{@link pentaho.type.Item.Meta#isAdvanced},
      * [ordinal]{@link pentaho.type.Item.Meta#ordinal}
      * and
      * [view]{@link pentaho.type.Value.Meta#view},
@@ -522,15 +522,15 @@ define([
         },
         //endregion
 
-        //region advanced property
-        _advanced: undefined, // local Refinement root marker
+        //region isAdvanced property
+        _isAdvanced: undefined, // local Refinement root marker
 
-        get advanced() {
-          var v = this._advanced;
-          return v !== undefined ? v : this.of.advanced;
+        get isAdvanced() {
+          var v = this._isAdvanced;
+          return v !== undefined ? v : this.of.isAdvanced;
         },
 
-        _resetAdvanced: function() {
+        _resetIsAdvanced: function() {
           if(this !== _refinementMeta) {
             this.base();
           }
