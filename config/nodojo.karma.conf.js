@@ -41,7 +41,8 @@ module.exports = function (config) {
       "test-js/unit/prompting/**",
       "test-js/unit/dataapi/**",
       "test-js/unit/util/URLEncoderSpec.js",
-      "test-js/unit/util/TextFormatterSpec.js"
+      "test-js/unit/util/TextFormatterSpec.js",
+      "test-js/unit/pentaho/lang/EventSource.dojo.Spec.js"
     ],
 
     // auto run tests when files change

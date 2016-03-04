@@ -115,12 +115,12 @@ define([
 
         it("an object compliant with pentaho.lang.IEventRegistrationHandle` when registering a single event", function() {
           var output = eventSource.on("foo", function() {});
-          expectIEventRegistrationHandle(output)
+          expectIEventRegistrationHandle(output);
         });
 
         it("an object compliant with pentaho.lang.IEventRegistrationHandle` when registering a multiple event", function() {
           var output = eventSource.on("spam,eggs", function() {});
-          expectIEventRegistrationHandle(output)
+          expectIEventRegistrationHandle(output);
         });
       });
 
@@ -560,5 +560,5 @@ define([
 
     }); // #_emit
 
-  }); // #pentaho.lang.EventListener
+  }); // #pentaho.lang.EventSource
 });
