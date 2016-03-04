@@ -232,42 +232,42 @@ define([
         });
       }); // end helpUrl
 
-      describe("browsable - ", function() {
+      describe("isBrowsable - ", function() {
         it("should default to true", function() {
           var propMeta = createRootPropMeta({name: "foo"});
-          expect(propMeta.browsable).toBe(true);
+          expect(propMeta.isBrowsable).toBe(true);
         });
 
         it("should convert undefined to default", function() {
-          var propMeta = createRootPropMeta({name: "foo", browsable: undefined});
-          expect(propMeta.browsable).toBe(true);
+          var propMeta = createRootPropMeta({name: "foo", isBrowsable: undefined});
+          expect(propMeta.isBrowsable).toBe(true);
         });
 
         it("should convert null to default", function() {
-          var propMeta = createRootPropMeta({name: "foo", browsable: null});
-          expect(propMeta.browsable).toBe(true);
+          var propMeta = createRootPropMeta({name: "foo", isBrowsable: null});
+          expect(propMeta.isBrowsable).toBe(true);
         });
 
         it("should cast other values to boolean", function() {
-          var propMeta = createRootPropMeta({name: "foo1", browsable: 1});
-          expect(propMeta.browsable).toBe(true);
+          var propMeta = createRootPropMeta({name: "foo1", isBrowsable: 1});
+          expect(propMeta.isBrowsable).toBe(true);
 
-          propMeta = createRootPropMeta({name: "foo2", browsable: 0});
-          expect(propMeta.browsable).toBe(false);
+          propMeta = createRootPropMeta({name: "foo2", isBrowsable: 0});
+          expect(propMeta.isBrowsable).toBe(false);
 
-          propMeta = createRootPropMeta({name: "foo3", browsable: ""});
-          expect(propMeta.browsable).toBe(false);
+          propMeta = createRootPropMeta({name: "foo3", isBrowsable: ""});
+          expect(propMeta.isBrowsable).toBe(false);
 
-          propMeta = createRootPropMeta({name: "foo4", browsable: true});
-          expect(propMeta.browsable).toBe(true);
+          propMeta = createRootPropMeta({name: "foo4", isBrowsable: true});
+          expect(propMeta.isBrowsable).toBe(true);
 
-          propMeta = createRootPropMeta({name: "foo5", browsable: "yes"});
-          expect(propMeta.browsable).toBe(true);
+          propMeta = createRootPropMeta({name: "foo5", isBrowsable: "yes"});
+          expect(propMeta.isBrowsable).toBe(true);
 
-          propMeta = createRootPropMeta({name: "foo6", browsable: "no"});
-          expect(propMeta.browsable).toBe(true);
+          propMeta = createRootPropMeta({name: "foo6", isBrowsable: "no"});
+          expect(propMeta.isBrowsable).toBe(true);
         });
-      }); // end browsable
+      }); // end isBrowsable
 
       describe("advanced - ", function() {
         it("should default to false", function() {
@@ -1440,115 +1440,115 @@ define([
         });
       }); // end helpUrl
 
-      describe("browsable -", function() {
+      describe("isBrowsable -", function() {
         it("should inherit the base value, by default", function() {
           var Base = Complex.extend();
 
-          Base.meta.add({name: "foo", browsable: false});
+          Base.meta.add({name: "foo", isBrowsable: false});
 
           var Derived = Base.extend();
 
           var propMeta = extendProp(Derived.meta, "foo", {name: "foo"});
 
-          expect(propMeta.browsable).toBe(false);
+          expect(propMeta.isBrowsable).toBe(false);
 
           // ----
 
           Base = Complex.extend();
 
-          Base.meta.add({name: "foo", browsable: true});
+          Base.meta.add({name: "foo", isBrowsable: true});
 
           Derived = Base.extend();
 
           propMeta = extendProp(Derived.meta, "foo", {name: "foo"});
 
-          expect(propMeta.browsable).toBe(true);
+          expect(propMeta.isBrowsable).toBe(true);
         });
 
         it("should inherit the base value if spec is nully", function() {
           var Base = Complex.extend();
 
-          Base.meta.add({name: "foo", browsable: false});
+          Base.meta.add({name: "foo", isBrowsable: false});
 
           var Derived = Base.extend();
 
-          var propMeta = extendProp(Derived.meta, "foo", {name: "foo", browsable: undefined});
+          var propMeta = extendProp(Derived.meta, "foo", {name: "foo", isBrowsable: undefined});
 
-          expect(propMeta.browsable).toBe(false);
+          expect(propMeta.isBrowsable).toBe(false);
 
           // ---
 
           Base = Complex.extend();
 
-          Base.meta.add({name: "foo", browsable: false});
+          Base.meta.add({name: "foo", isBrowsable: false});
 
           Derived = Base.extend();
 
-          propMeta = extendProp(Derived.meta, "foo", {name: "foo", browsable: null});
+          propMeta = extendProp(Derived.meta, "foo", {name: "foo", isBrowsable: null});
 
-          expect(propMeta.browsable).toBe(false);
+          expect(propMeta.isBrowsable).toBe(false);
         });
 
         it("should respect the spec value if not nully", function() {
           var Base = Complex.extend();
 
-          Base.meta.add({name: "foo", browsable: true});
+          Base.meta.add({name: "foo", isBrowsable: true});
 
           var Derived = Base.extend();
 
-          var propMeta = extendProp(Derived.meta, "foo", {name: "foo", browsable: false});
+          var propMeta = extendProp(Derived.meta, "foo", {name: "foo", isBrowsable: false});
 
-          expect(propMeta.browsable).toBe(false);
+          expect(propMeta.isBrowsable).toBe(false);
         });
 
         it("should respect a set value if not nully", function() {
           var Base = Complex.extend();
 
-          Base.meta.add({name: "foo", browsable: true});
+          Base.meta.add({name: "foo", isBrowsable: true});
 
           var Derived = Base.extend();
 
           var propMeta = extendProp(Derived.meta, "foo", {name: "foo"});
 
-          expect(propMeta.browsable).toBe(true);
+          expect(propMeta.isBrowsable).toBe(true);
 
-          propMeta.browsable = false;
+          propMeta.isBrowsable = false;
 
-          expect(propMeta.browsable).toBe(false);
+          expect(propMeta.isBrowsable).toBe(false);
         });
 
         it("should inherit the base value when set to nully", function() {
           var Base = Complex.extend();
 
-          Base.meta.add({name: "foo", browsable: true});
+          Base.meta.add({name: "foo", isBrowsable: true});
 
           var Derived = Base.extend();
 
-          var propMeta = extendProp(Derived.meta, "foo", {name: "foo", browsable: false});
+          var propMeta = extendProp(Derived.meta, "foo", {name: "foo", isBrowsable: false});
 
-          expect(propMeta.browsable).toBe(false);
+          expect(propMeta.isBrowsable).toBe(false);
 
-          propMeta.browsable = undefined;
+          propMeta.isBrowsable = undefined;
 
-          expect(propMeta.browsable).toBe(true);
+          expect(propMeta.isBrowsable).toBe(true);
 
           // ---
 
           Base = Complex.extend();
 
-          Base.meta.add({name: "foo", browsable: true});
+          Base.meta.add({name: "foo", isBrowsable: true});
 
           Derived = Base.extend();
 
-          propMeta = extendProp(Derived.meta, "foo", {name: "foo", browsable: false});
+          propMeta = extendProp(Derived.meta, "foo", {name: "foo", isBrowsable: false});
 
-          expect(propMeta.browsable).toBe(false);
+          expect(propMeta.isBrowsable).toBe(false);
 
-          propMeta.browsable = null;
+          propMeta.isBrowsable = null;
 
-          expect(propMeta.browsable).toBe(true);
+          expect(propMeta.isBrowsable).toBe(true);
         });
-      }); // end browsable
+      }); // end isBrowsable
 
       describe("advanced -", function() {
         it("should inherit the base value, by default", function() {

@@ -1003,72 +1003,72 @@ define([
         });
       }); // end #helpUrl
 
-      describe("#browsable -", function() {
+      describe("#isBrowsable -", function() {
         it("should default to the value of the representation type", function() {
-          var MySimple = Simple.extend({meta: {browsable: false}});
+          var MySimple = Simple.extend({meta: {isBrowsable: false}});
           var MyRefinement = Refinement.extend({
             meta: {
               of: MySimple.meta
             }
           });
 
-          expect(MyRefinement.meta.browsable).toBe(MySimple.meta.browsable);
+          expect(MyRefinement.meta.isBrowsable).toBe(MySimple.meta.isBrowsable);
         });
 
         it("should respect a specified value", function() {
-          var MySimple = Simple.extend({meta: {browsable: false}});
+          var MySimple = Simple.extend({meta: {isBrowsable: false}});
           var MyRefinement = Refinement.extend({
             meta: {
-              browsable: true,
+              isBrowsable: true,
               of: MySimple.meta
             }
           });
 
-          expect(MyRefinement.meta.browsable).toBe(true);
+          expect(MyRefinement.meta.isBrowsable).toBe(true);
         });
 
         it("should inherit the value of the base refinement", function() {
-          var MySimple = Simple.extend({meta: {browsable: false}});
+          var MySimple = Simple.extend({meta: {isBrowsable: false}});
           var R1 = Refinement.extend({
             meta: {
-              browsable: true,
+              isBrowsable: true,
               of: MySimple.meta
             }
           });
           var R2 = R1.extend();
 
-          expect(R2.meta.browsable).toBe(true);
+          expect(R2.meta.isBrowsable).toBe(true);
         });
 
         it("should respect a specified value when it also has a base refinement", function() {
-          var MySimple = Simple.extend({meta: {browsable: true}});
+          var MySimple = Simple.extend({meta: {isBrowsable: true}});
           var R1 = Refinement.extend({
             meta: {
-              browsable: true,
+              isBrowsable: true,
               of: MySimple.meta
             }
           });
-          var R2 = R1.extend({meta: {browsable: false}});
+          var R2 = R1.extend({meta: {isBrowsable: false}});
 
-          expect(R2.meta.browsable).toBe(false);
+          expect(R2.meta.isBrowsable).toBe(false);
         });
 
         it("should fallback to the base value when set to nully", function() {
           function expectIt(newValue) {
-            var MySimple = Simple.extend({meta: {browsable: true}});
+            var MySimple = Simple.extend({meta: {isBrowsable: true}});
             var R1 = Refinement.extend({
               meta: {
-                browsable: true,
+                isBrowsable: true,
                 of: MySimple.meta
               }
             });
-            var R2 = R1.extend({meta: {browsable: false}});
+            var R2 = R1.extend({meta: {isBrowsable: false}});
 
-            expect(R2.meta.browsable).toBe(false);
+            expect(R2.meta.isBrowsable).toBe(false);
 
-            R2.meta.browsable = newValue;
+            R2.meta.isBrowsable = newValue;
 
-            expect(R2.meta.browsable).toBe(true);
+            expect(R2.meta.isBrowsable).toBe(true);
           }
 
           expectIt(undefined);
@@ -1077,19 +1077,19 @@ define([
 
         it("should fallback to the value of the representation type when set to nully", function() {
           function expectIt(newValue) {
-            var MySimple = Simple.extend({meta: {browsable: false}});
+            var MySimple = Simple.extend({meta: {isBrowsable: false}});
             var R1 = Refinement.extend({
               meta: {
-                browsable: true,
+                isBrowsable: true,
                 of: MySimple.meta
               }
             });
 
-            expect(R1.meta.browsable).toBe(true);
+            expect(R1.meta.isBrowsable).toBe(true);
 
-            R1.meta.browsable = newValue;
+            R1.meta.isBrowsable = newValue;
 
-            expect(R1.meta.browsable).toBe(false);
+            expect(R1.meta.isBrowsable).toBe(false);
           }
 
           expectIt(undefined);
@@ -1097,10 +1097,10 @@ define([
         });
 
         it("should not delete the root value", function() {
-          Refinement.meta.browsable = undefined;
-          expect(Refinement.meta.hasOwnProperty("_browsable"));
+          Refinement.meta.isBrowsable = undefined;
+          expect(Refinement.meta.hasOwnProperty("_isBrowsable"));
         });
-      }); // end #browsable
+      }); // end #isBrowsable
 
       describe("#advanced -", function() {
         it("should default to the value of the representation type", function() {

@@ -598,35 +598,35 @@ define([
       });
     }); // #advanced
 
-    describe("#browsable -", function() {
+    describe("#isBrowsable -", function() {
       it("should preserve the default value", function() {
-        Item.meta.browsable = undefined;
+        Item.meta.isBrowsable = undefined;
         // The default value is still there (did not delete)
-        expect(Item.meta.browsable).toBe(true);
+        expect(Item.meta.isBrowsable).toBe(true);
       });
 
       it("can be set on a derived class", function() {
         [true, false].forEach(function(bool) {
-          var Derived = Item.extend({meta: {"browsable": bool}});
-          expect(Derived.meta.browsable).toBe(bool);
+          var Derived = Item.extend({meta: {"isBrowsable": bool}});
+          expect(Derived.meta.isBrowsable).toBe(bool);
 
           var item = new Derived();
-          expect(item.meta.browsable).toBe(bool);
+          expect(item.meta.isBrowsable).toBe(bool);
         });
       });
 
       it("can be unset by passing a nully, thus delegating to the ancestor class", function() {
         [true, false].forEach(function(bool) {
           [null, undefined].forEach(function(value) {
-            var FirstDerivative  = Item.extend({meta: {"browsable": bool}});
-            var SecondDerivative = FirstDerivative.extend({meta: {"browsable": !bool}});
+            var FirstDerivative  = Item.extend({meta: {"isBrowsable": bool}});
+            var SecondDerivative = FirstDerivative.extend({meta: {"isBrowsable": !bool}});
 
-            SecondDerivative.meta.browsable = value;
-            expect(SecondDerivative.meta.browsable).toBe(FirstDerivative.meta.browsable);
+            SecondDerivative.meta.isBrowsable = value;
+            expect(SecondDerivative.meta.isBrowsable).toBe(FirstDerivative.meta.isBrowsable);
           });
         });
       });
-    }); // #browsable
+    }); // #isBrowsable
 
     describe("#ordinal -", function() {
       it("should preserve the default value", function() {

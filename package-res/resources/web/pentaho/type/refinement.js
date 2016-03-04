@@ -105,7 +105,7 @@ define([
      * [description]{@link pentaho.type.Item.Meta#description},
      * [category]{@link pentaho.type.Item.Meta#category},
      * [helpUrl]{@link pentaho.type.Item.Meta#helpUrl},
-     * [browsable]{@link pentaho.type.Item.Meta#browsable},
+     * [isBrowsable]{@link pentaho.type.Item.Meta#isBrowsable},
      * [advanced]{@link pentaho.type.Item.Meta#advanced},
      * [ordinal]{@link pentaho.type.Item.Meta#ordinal}
      * and
@@ -507,15 +507,15 @@ define([
         },
         //endregion
 
-        //region browsable property
-        _browsable: undefined, // local Refinement root marker
+        //region isBrowsable property
+        _isBrowsable: undefined, // local Refinement root marker
 
-        get browsable() {
-          var v = this._browsable;
-          return v !== undefined ? v : this.of.browsable;
+        get isBrowsable() {
+          var v = this._isBrowsable;
+          return v !== undefined ? v : this.of.isBrowsable;
         },
 
-        _resetBrowsable: function() {
+        _resetIsBrowsable: function() {
           if(this !== _refinementMeta) {
             this.base();
           }
