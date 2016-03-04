@@ -831,77 +831,77 @@ define([
         });
       }); // end applicable
 
-      describe("readOnly - ", function() {
+      describe("isReadOnly - ", function() {
         it("should be immutable", function() {
           var propMeta = Property.meta;
-          var isReadOnly = propMeta.readOnly;
-          propMeta.readOnly = true;
-          expect(propMeta.readOnly).toBe(isReadOnly);
+          var isReadOnly = propMeta.isReadOnly;
+          propMeta.isReadOnly = true;
+          expect(propMeta.isReadOnly).toBe(isReadOnly);
         });
 
         it("should default to an unset local value", function() {
           var propMeta = createRootPropMeta({name: "foo"});
-          expect(propMeta.readOnly).toBe(undefined);
+          expect(propMeta.isReadOnly).toBe(undefined);
         });
 
         it("should convert undefined spec value to default", function() {
-          var propMeta = createRootPropMeta({name: "foo", readOnly: true});
-          expect(propMeta.readOnly).toBe(true);
-          propMeta.readOnly = undefined;
-          expect(propMeta.readOnly).toBe(undefined);
+          var propMeta = createRootPropMeta({name: "foo", isReadOnly: true});
+          expect(propMeta.isReadOnly).toBe(true);
+          propMeta.isReadOnly = undefined;
+          expect(propMeta.isReadOnly).toBe(undefined);
         });
 
         it("should convert null spec to default", function() {
-          var propMeta = createRootPropMeta({name: "foo", readOnly: true});
-          expect(propMeta.readOnly).toBe(true);
-          propMeta.readOnly = null;
-          expect(propMeta.readOnly).toBe(undefined);
+          var propMeta = createRootPropMeta({name: "foo", isReadOnly: true});
+          expect(propMeta.isReadOnly).toBe(true);
+          propMeta.isReadOnly = null;
+          expect(propMeta.isReadOnly).toBe(undefined);
         });
 
         it("should cast other non-function spec values to boolean", function() {
-          var propMeta = createRootPropMeta({name: "foo1", readOnly: 1});
-          expect(propMeta.readOnly).toBe(true);
+          var propMeta = createRootPropMeta({name: "foo1", isReadOnly: 1});
+          expect(propMeta.isReadOnly).toBe(true);
 
-          propMeta = createRootPropMeta({name: "foo2", readOnly: 0});
-          expect(propMeta.readOnly).toBe(false);
+          propMeta = createRootPropMeta({name: "foo2", isReadOnly: 0});
+          expect(propMeta.isReadOnly).toBe(false);
 
-          propMeta = createRootPropMeta({name: "foo3", readOnly: ""});
-          expect(propMeta.readOnly).toBe(false);
+          propMeta = createRootPropMeta({name: "foo3", isReadOnly: ""});
+          expect(propMeta.isReadOnly).toBe(false);
 
-          propMeta = createRootPropMeta({name: "foo4", readOnly: true});
-          expect(propMeta.readOnly).toBe(true);
+          propMeta = createRootPropMeta({name: "foo4", isReadOnly: true});
+          expect(propMeta.isReadOnly).toBe(true);
 
-          propMeta = createRootPropMeta({name: "foo5", readOnly: "yes"});
-          expect(propMeta.readOnly).toBe(true);
+          propMeta = createRootPropMeta({name: "foo5", isReadOnly: "yes"});
+          expect(propMeta.isReadOnly).toBe(true);
 
-          propMeta = createRootPropMeta({name: "foo6", readOnly: "no"});
-          expect(propMeta.readOnly).toBe(true);
+          propMeta = createRootPropMeta({name: "foo6", isReadOnly: "no"});
+          expect(propMeta.isReadOnly).toBe(true);
         });
 
         it("should accept a function spec value", function() {
           var f = function() {};
-          var propMeta = createRootPropMeta({name: "foo1", readOnly: f});
-          expect(propMeta.readOnly).toBe(f);
+          var propMeta = createRootPropMeta({name: "foo1", isReadOnly: f});
+          expect(propMeta.isReadOnly).toBe(f);
         });
 
         it("should evaluate a function spec value and return the default value if it returns nully", function() {
           var owner = {};
           var f = function() { return null; };
-          var propMeta = createRootPropMeta({name: "foo1", readOnly: f});
-          expect(propMeta.readOnlyEval(owner)).toBe(false);
+          var propMeta = createRootPropMeta({name: "foo1", isReadOnly: f});
+          expect(propMeta.isReadOnlyEval(owner)).toBe(false);
 
           // ----
 
           f = function() { return undefined; };
-          propMeta = createRootPropMeta({name: "foo2", readOnly: f});
-          expect(propMeta.readOnlyEval(owner)).toBe(false);
+          propMeta = createRootPropMeta({name: "foo2", isReadOnly: f});
+          expect(propMeta.isReadOnlyEval(owner)).toBe(false);
         });
 
         it("should evaluate a function spec value in the context of the owner value", function() {
           var owner = {};
           var f = jasmine.createSpy();
-          var propMeta = createRootPropMeta({name: "foo1", readOnly: f});
-          propMeta.readOnlyEval(owner);
+          var propMeta = createRootPropMeta({name: "foo1", isReadOnly: f});
+          propMeta.isReadOnlyEval(owner);
           expect(f.calls.count()).toBe(1);
           expect(f.calls.first().object).toBe(owner);
         });
@@ -909,12 +909,12 @@ define([
         it("should evaluate a function spec value without arguments", function() {
           var owner = {};
           var f = jasmine.createSpy();
-          var propMeta = createRootPropMeta({name: "foo1", readOnly: f});
-          propMeta.readOnlyEval(owner);
+          var propMeta = createRootPropMeta({name: "foo1", isReadOnly: f});
+          propMeta.isReadOnlyEval(owner);
           expect(f.calls.count()).toBe(1);
           expect(f.calls.first().args.length).toBe(0);
         });
-      }); // end readOnly
+      }); // end isReadOnly
 
       describe("countRange -", function() {
         // 1. when !isList => min and max <= 1
@@ -2178,7 +2178,7 @@ define([
         });
       }); // end applicable
 
-      describe("readOnly -", function() {
+      describe("isReadOnly -", function() {
         it("should default to an unset local value", function() {
           var Base = Complex.extend();
 
@@ -2188,13 +2188,13 @@ define([
 
           var propMeta = extendProp(Derived.meta, "baseStr", {name: "baseStr"});
 
-          expect(propMeta.readOnly).toBe(undefined);
+          expect(propMeta.isReadOnly).toBe(undefined);
         });
 
         it("should evaluate to the base value by default", function() {
           var Base = Complex.extend();
 
-          Base.meta.add({name: "baseStr", readOnly: true});
+          Base.meta.add({name: "baseStr", isReadOnly: true});
 
           var Derived = Base.extend();
 
@@ -2202,7 +2202,7 @@ define([
 
           var owner = {};
 
-          expect(propMeta.readOnlyEval(owner)).toBe(true);
+          expect(propMeta.isReadOnlyEval(owner)).toBe(true);
         });
 
         it("should respect the specified value", function() {
@@ -2212,9 +2212,9 @@ define([
 
           var Derived = Base.extend();
 
-          var propMeta = extendProp(Derived.meta, "baseStr", {name: "baseStr", readOnly: false});
+          var propMeta = extendProp(Derived.meta, "baseStr", {name: "baseStr", isReadOnly: false});
 
-          expect(propMeta.readOnly).toBe(false);
+          expect(propMeta.isReadOnly).toBe(false);
         });
 
         it("should evaluate a base function and, if false, only then the sub function", function() {
@@ -2225,18 +2225,18 @@ define([
           var baseIndex = -1;
           var baseSpy = jasmine.createSpy().and.callFake(function() { baseIndex = index++; return false; });
 
-          Base.meta.add({name: "baseStr", readOnly: baseSpy});
+          Base.meta.add({name: "baseStr", isReadOnly: baseSpy});
 
           var Derived = Base.extend();
 
           var subIndex = -1;
           var subSpy = jasmine.createSpy().and.callFake(function() { subIndex = index++; return false; });
 
-          var propMeta = extendProp(Derived.meta, "baseStr", {name: "baseStr", readOnly: subSpy});
+          var propMeta = extendProp(Derived.meta, "baseStr", {name: "baseStr", isReadOnly: subSpy});
 
           var owner = {};
 
-          propMeta.readOnlyEval(owner);
+          propMeta.isReadOnlyEval(owner);
           expect(baseIndex).toBe(1);
           expect(subIndex ).toBe(2);
         });
@@ -2246,17 +2246,17 @@ define([
 
           var baseSpy = jasmine.createSpy().and.returnValue(true);
 
-          Base.meta.add({name: "baseStr", readOnly: baseSpy});
+          Base.meta.add({name: "baseStr", isReadOnly: baseSpy});
 
           var Derived = Base.extend();
 
           var subSpy = jasmine.createSpy().and.returnValue(true);
 
-          var propMeta = extendProp(Derived.meta, "baseStr", {name: "baseStr", readOnly: subSpy});
+          var propMeta = extendProp(Derived.meta, "baseStr", {name: "baseStr", isReadOnly: subSpy});
 
           var owner = {};
 
-          expect(propMeta.readOnlyEval(owner)).toBe(true);
+          expect(propMeta.isReadOnlyEval(owner)).toBe(true);
           expect(baseSpy.calls.count()).toBe(1);
           expect(subSpy.calls.count()).toBe(0);
 
@@ -2264,20 +2264,20 @@ define([
 
           Base = Complex.extend();
 
-          Base.meta.add({name: "baseStr", readOnly: true});
+          Base.meta.add({name: "baseStr", isReadOnly: true});
 
           Derived = Base.extend();
 
           subSpy = jasmine.createSpy().and.returnValue(true);
 
-          propMeta = extendProp(Derived.meta, "baseStr", {name: "baseStr", readOnly: subSpy});
+          propMeta = extendProp(Derived.meta, "baseStr", {name: "baseStr", isReadOnly: subSpy});
 
           owner = {};
 
-          expect(propMeta.readOnlyEval(owner)).toBe(true);
+          expect(propMeta.isReadOnlyEval(owner)).toBe(true);
           expect(subSpy.calls.count()).toBe(0);
         });
-      }); // end readOnly
+      }); // end isReadOnly
 
       describe("value -", function(){
         var propMeta;

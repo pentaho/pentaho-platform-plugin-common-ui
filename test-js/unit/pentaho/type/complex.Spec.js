@@ -1076,22 +1076,22 @@ define([
         });
       }); // end applicable
 
-      describe("#readOnly(name)", function() {
+      describe("#isReadOnly(name)", function() {
         it("should return the evaluated static value of an existing property", function() {
           var Derived = Complex.extend({
-            meta: {props: [{name: "x", readOnly: false}]}
+            meta: {props: [{name: "x", isReadOnly: false}]}
           });
 
           var derived = new Derived();
 
-          expect(derived.readOnly("x")).toBe(false);
+          expect(derived.isReadOnly("x")).toBe(false);
         });
 
         it("should return the evaluated dynamic value of an existing property", function() {
           var Derived = Complex.extend({
             meta: {
               props: [{
-                name: "x", readOnly: function() {
+                name: "x", isReadOnly: function() {
                   return this.foo;
                 }
               }]
@@ -1102,11 +1102,11 @@ define([
 
           derived.foo = true;
 
-          expect(derived.readOnly("x")).toBe(true);
+          expect(derived.isReadOnly("x")).toBe(true);
 
           derived.foo = false;
 
-          expect(derived.readOnly("x")).toBe(false);
+          expect(derived.isReadOnly("x")).toBe(false);
         });
 
         it("should throw when given the name of an undefined property", function() {
@@ -1117,7 +1117,7 @@ define([
           var derived = new Derived();
 
           expect(function() {
-            derived.readOnly("y");
+            derived.isReadOnly("y");
           }).toThrow(errorMatch.argInvalid("name"));
         });
 
@@ -1131,10 +1131,10 @@ define([
           var derived = new Derived();
 
           expect(function() {
-            derived.readOnly(Other.meta.get("x"));
+            derived.isReadOnly(Other.meta.get("x"));
           }).toThrow(errorMatch.argInvalid("name"));
         });
-      }); // end readOnly
+      }); // end isReadOnly
 
       describe("#isRequired(name)", function() {
         it("should return the evaluated static value of an existing property", function() {

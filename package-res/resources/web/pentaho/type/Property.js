@@ -759,13 +759,13 @@ define([
         },
 
         /**
-         * Evaluates the value of the `readOnly` attribute of this property
+         * Evaluates the value of the `isReadOnly` attribute of this property
          * on a given owner complex value.
          *
-         * @name readOnlyEval
+         * @name isReadOnlyEval
          * @memberOf pentaho.type.Property.Meta#
          * @param {pentaho.type.Complex} owner The complex value that owns the property.
-         * @return {boolean} The evaluated value of the `readOnly` attribute.
+         * @return {boolean} The evaluated value of the `isReadOnly` attribute.
          * @ignore
          */
 
@@ -781,20 +781,20 @@ define([
          * A property should be considered read-only whenever its value is implied/imposed somehow
          * and thus cannot not be changed, directly, by the user.
          *
-         * The _effective `readOnly` attribute value_ is the
+         * The _effective `isReadOnly` attribute value_ is the
          * disjunction (_or_) between the locally specified value and
          * the evaluated value inherited from its ancestor.
          *
          * Setting the attribute to `null` or `undefined` clears the local value.
          *
-         * The default, root `readOnly` attribute value is `false`.
+         * The default, root `isReadOnly` attribute value is `false`.
          *
-         * @name readOnly
+         * @name isReadOnly
          * @memberOf pentaho.type.Property.Meta#
          * @type null | boolean | pentaho.type.PropertyDynamicAttribute.<boolean>
-         * @see pentaho.type.Complex#readOnly
+         * @see pentaho.type.Complex#isReadOnly
          */
-        readOnly: {
+        isReadOnly: {
           value: false,
           cast:  Boolean,
           combine: function(baseEval, localEval) {

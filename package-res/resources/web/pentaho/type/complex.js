@@ -565,7 +565,7 @@ define([
       },
       //endregion
 
-      //region readOnly attribute
+      //region isReadOnly attribute
       /**
        * Gets a value that indicates if a given property is currently readonly.
        *
@@ -575,8 +575,8 @@ define([
        *
        * @throws {pentaho.lang.ArgumentInvalidError} When a property with name `name` is not defined.
        */
-      readOnly: function(name) {
-        return this.meta.get(name).readOnlyEval(this);
+      isReadOnly: function(name) {
+        return this.meta.get(name).isReadOnlyEval(this);
       },
       //endregion
 
