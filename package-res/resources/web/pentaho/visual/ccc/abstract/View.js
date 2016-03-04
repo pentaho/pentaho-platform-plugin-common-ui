@@ -812,7 +812,7 @@ define([
       options.axisFont = util.defaultFont(options.axisFont, 12);
       options.axisTitleFont = util.defaultFont(options.axisTitleFont, 12);
 
-      if(!model.getv("interactive")) {
+      if(!model.getv("isInteractive")) {
         options.interactive = false;
       } else {
         if(options.tooltipEnabled) this._configureTooltip();

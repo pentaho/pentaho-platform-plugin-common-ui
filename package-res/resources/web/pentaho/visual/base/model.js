@@ -62,7 +62,7 @@ define([
                 isRequired: true
               },
               {
-                name: "interactive",
+                name: "isInteractive",
                 type: "boolean",
                 value: true
               },

@@ -32,7 +32,7 @@ define([
         return new Model({
           width: 1,
           height: 1,
-          interactive: false,
+          isInteractive: false,
           data: dataSpec
         });
       }).not.toThrowError();
@@ -48,17 +48,17 @@ define([
       [{
         width: "nope",
         height: 1,
-        interactive: false,
+        isInteractive: false,
         data: dataSpec
       }, {
         width: 1,
         height: "nope",
-        interactive: false,
+        isInteractive: false,
         data: dataSpec
       }, {
         width: 1,
         height: 1,
-        interactive: false,
+        isInteractive: false,
         data: {}
       }].forEach(function(spec) {
         expect(function() {
@@ -93,7 +93,7 @@ define([
         validSpec({
           width: 1,
           height: 1,
-          interactive: false,
+          isInteractive: false,
           data: dataSpec
         });
       });
@@ -119,7 +119,7 @@ define([
         invalidSpec({
           width: 1,
           height: 1,
-          interactive: true //optional
+          isInteractive: true //optional
         });
       });
 
