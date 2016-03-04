@@ -31,7 +31,7 @@ define([
       {
         name: "trendType",
         type: trendTypeFactory,
-        required: true,
+        isRequired: true,
         value: "none"
       },
       {
@@ -43,7 +43,7 @@ define([
         name: "trendLineWidth",
         type: lineWidthFactory,
         applicable: applicableTrend,
-        required: true,
+        isRequired: true,
         value: 1
       }
     ]

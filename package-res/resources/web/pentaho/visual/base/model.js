@@ -54,12 +54,12 @@ define([
               {
                 name: "width",
                 type: "number",
-                required: true
+                isRequired: true
               },
               {
                 name: "height",
                 type: "number",
-                required: true
+                isRequired: true
               },
               {
                 name: "interactive",
@@ -69,7 +69,7 @@ define([
               {
                 name: "data",
                 type: "object",
-                required: true
+                isRequired: true
               }
             ]
           }

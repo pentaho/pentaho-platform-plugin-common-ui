@@ -569,13 +569,13 @@ define([
     meta: /** @lends pentaho.type.Property.Meta# */{
       attrs: {
         /**
-         * Evaluates the value of the `required` attribute of this property
+         * Evaluates the value of the `isRequired` attribute of this property
          * on a given owner complex value.
          *
-         * @name requiredEval
+         * @name isRequiredEval
          * @memberOf pentaho.type.Property.Meta#
          * @param {pentaho.type.Complex} owner The complex value that owns the property.
-         * @return {boolean} The evaluated value of the `required` attribute.
+         * @return {boolean} The evaluated value of the `isRequired` attribute.
          * @ignore
          */
 
@@ -590,7 +590,7 @@ define([
          *
          * A _required_ property must have at least one value.
          *
-         * The _effective `required` attribute value_ is the
+         * The _effective `isRequired` attribute value_ is the
          * disjunction (_or_) between the locally specified value and
          * the evaluated value inherited from its ancestor.
          *
@@ -599,14 +599,14 @@ define([
          *
          * Setting the attribute to `null` or `undefined` clears the local value.
          *
-         * The default, root `required` attribute value is `false`.
+         * The default, root `isRequired` attribute value is `false`.
          *
-         * @name required
+         * @name isRequired
          * @memberOf pentaho.type.Property.Meta#
          * @type null | boolean | pentaho.type.PropertyDynamicAttribute.<boolean>
-         * @see pentaho.type.Complex#required
+         * @see pentaho.type.Complex#isRequired
          */
-        required: {
+        isRequired: {
           value: false,
           cast:  Boolean,
           combine: function(baseEval, localEval) {
@@ -814,7 +814,7 @@ define([
        * of the _effective value_ of the attributes:
        *
        * * {@link pentaho.type.Property.Meta#isList}
-       * * {@link pentaho.type.Property.Meta#required}
+       * * {@link pentaho.type.Property.Meta#isRequired}
        * * {@link pentaho.type.Property.Meta#countMin}
        * * {@link pentaho.type.Property.Meta#countMax}
        *
@@ -843,7 +843,7 @@ define([
        * If the property is _not_ a _list_ property,
        * both the minimum and the maximum can only be either zero or one.
        *
-       * If `required` is true, then the minimum must be greater than or equal to one.
+       * If `isRequired` is true, then the minimum must be greater than or equal to one.
        *
        * The `countMax` value is constrained to be greater than or equal to the minimum.
        *
@@ -853,7 +853,7 @@ define([
        * @see pentaho.type.Complex#countRange
        */
       countRangeEval: function(owner) {
-        var required = this.requiredEval(owner),
+        var isRequired = this.isRequiredEval(owner),
             countMin = this.countMinEval(owner),
             countMax = this.countMaxEval(owner);
 
@@ -862,7 +862,7 @@ define([
           if(countMax > 1) countMax = 1;
         }
 
-        if(required && countMin < 1) countMin = 1;
+        if(isRequired && countMin < 1) countMin = 1;
 
         if(countMax < countMin) countMax = countMin;
 

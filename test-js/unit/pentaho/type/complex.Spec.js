@@ -1136,22 +1136,22 @@ define([
         });
       }); // end readOnly
 
-      describe("#required(name)", function() {
+      describe("#isRequired(name)", function() {
         it("should return the evaluated static value of an existing property", function() {
           var Derived = Complex.extend({
-            meta: {props: [{name: "x", required: true}]}
+            meta: {props: [{name: "x", isRequired: true}]}
           });
 
           var derived = new Derived();
 
-          expect(derived.required("x")).toBe(true);
+          expect(derived.isRequired("x")).toBe(true);
         });
 
         it("should return the evaluated dynamic value of an existing property", function() {
           var Derived = Complex.extend({
             meta: {
               props: [{
-                name: "x", required: function() {
+                name: "x", isRequired: function() {
                   return this.foo;
                 }
               }]
@@ -1162,11 +1162,11 @@ define([
 
           derived.foo = true;
 
-          expect(derived.required("x")).toBe(true);
+          expect(derived.isRequired("x")).toBe(true);
 
           derived.foo = false;
 
-          expect(derived.required("x")).toBe(false);
+          expect(derived.isRequired("x")).toBe(false);
         });
 
         it("should throw when given the name of an undefined property", function() {
@@ -1177,7 +1177,7 @@ define([
           var derived = new Derived();
 
           expect(function() {
-            derived.required("y");
+            derived.isRequired("y");
           }).toThrow(errorMatch.argInvalid("name"));
         });
 
@@ -1191,7 +1191,7 @@ define([
           var derived = new Derived();
 
           expect(function() {
-            derived.required(Other.meta.get("x"));
+            derived.isRequired(Other.meta.get("x"));
           }).toThrow(errorMatch.argInvalid("name"));
         });
       }); // end required

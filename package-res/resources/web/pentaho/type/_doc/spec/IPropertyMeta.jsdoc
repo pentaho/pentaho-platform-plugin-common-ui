@@ -61,7 +61,7 @@
  *   List properties can have more than one value,
  *   which is exposed through the "value" property as an array of values.
  *
- * The properties `isList`, `countMin`, `countMax` and `required` are all related,
+ * The properties `isList`, `countMin`, `countMax` and `isRequired` are all related,
  * and the values of one affect the other.
  * When multiple of these are specified,
  * the order of precedence is that just enumerated.
@@ -72,7 +72,7 @@
  * When `isList` is _not specified_, its default value is `false`,
  * whatever the value of the other related property attributes.
  *
- * When `countMin` is _specified_, then `required` is implied to be `countMin >= 1`.
+ * When `countMin` is _specified_, then `isRequired` is implied to be `countMin >= 1`.
  *
  *
  * @property {number} [countMin] The minimum number of values that this property must have
@@ -80,22 +80,22 @@
  *
  * When `isList` is `false`, then this property is limited to be _less than or equal_ to `1`.
  *
- * When `countMin`is specified, then `required` is ignored
+ * When `countMin`is specified, then `isRequired` is ignored
  * and implied to be `countMin >= 1`.
  *
- * When `countMin` is unspecified, but `required` is specified, then
- * `countMin` is implied to be `required ? 1 : 0`.
+ * When `countMin` is unspecified, but `isRequired` is specified, then
+ * `countMin` is implied to be `isRequired ? 1 : 0`.
  *
- * When both `countMin` and `required` are unspecified,
+ * When both `countMin` and `isRequired` are unspecified,
  * the property is optional, i.e., `countMin` defaults to `0`,
- * and `required` implied to be `false`.
+ * and `isRequired` implied to be `false`.
  *
  * The value of `countMax` is limited to be greater than or equal to `countMin`.
  *
  * See `isList` and `countMax` for more information.
  *
  *
- * @property {boolean} [required=false] Indicates if the property must be specified.
+ * @property {boolean} [isRequired=false] Indicates if the property must be specified.
  *
  * Ignored when `countMin` is specified.
  *

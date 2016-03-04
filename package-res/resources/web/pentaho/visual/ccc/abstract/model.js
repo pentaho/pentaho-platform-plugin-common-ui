@@ -48,7 +48,7 @@ define([
             type: ["string"],
             dataType: "string",
             isVisualRole: true,
-            required: false
+            isRequired: false
           },
           //endregion
 
@@ -56,7 +56,7 @@ define([
           {
             name: "backgroundFill",
             type: backgroundFillFactory,
-            required: true,
+            isRequired: true,
             value: "none"
           },
           {
@@ -65,7 +65,7 @@ define([
             applicable: function() {
               return this.getv("backgroundFill") !== "none";
             },
-            required: true
+            isRequired: true
           },
           {
             name: "backgroundColorEnd",
@@ -73,7 +73,7 @@ define([
             applicable: function() {
               return this.getv("backgroundFill") === "gradient";
             },
-            required: true
+            isRequired: true
           },
           //endregion
 
@@ -91,7 +91,7 @@ define([
           {
             name: "labelStyle",
             type: fontStyleFactory,
-            required: true,
+            isRequired: true,
             value: "plain"
           },
           {
@@ -110,7 +110,7 @@ define([
             name: "legendPosition",
             type: sidesFactory,
             applicable: applicableLegend,
-            required: true,
+            isRequired: true,
             value: "right"
           },
           {
@@ -134,7 +134,7 @@ define([
             name: "legendStyle",
             type: fontStyleFactory,
             applicable: applicableLegend,
-            required: true,
+            isRequired: true,
             value: "plain"
           },
           {

@@ -436,105 +436,105 @@ define([
       //endregion
 
       //region Dynamic Attributes
-      describe("required - ", function() {
+      describe("isRequired - ", function() {
         it("should be immutable", function() {
           var propMeta = Property.meta;
-          var isRequired = propMeta.required;
-          propMeta.required = true;
-          expect(propMeta.required).toBe(isRequired);
+          var isRequired = propMeta.isRequired;
+          propMeta.isRequired = true;
+          expect(propMeta.isRequired).toBe(isRequired);
         });
 
         it("should default to an unset local value", function() {
           var propMeta = createRootPropMeta({name: "foo"});
-          expect(propMeta.required).toBe(undefined);
+          expect(propMeta.isRequired).toBe(undefined);
         });
 
         it("should convert undefined spec value to default", function() {
-          var propMeta = createRootPropMeta({name: "foo", required: true});
-          expect(propMeta.required).toBe(true);
-          propMeta.required = undefined;
-          expect(propMeta.required).toBe(undefined);
+          var propMeta = createRootPropMeta({name: "foo", isRequired: true});
+          expect(propMeta.isRequired).toBe(true);
+          propMeta.isRequired = undefined;
+          expect(propMeta.isRequired).toBe(undefined);
         });
 
         it("should convert null spec value to default", function() {
-          var propMeta = createRootPropMeta({name: "foo", required: true});
-          expect(propMeta.required).toBe(true);
-          propMeta.required = null;
-          expect(propMeta.required).toBe(undefined);
+          var propMeta = createRootPropMeta({name: "foo", isRequired: true});
+          expect(propMeta.isRequired).toBe(true);
+          propMeta.isRequired = null;
+          expect(propMeta.isRequired).toBe(undefined);
         });
 
         it("should cast other non-function spec values to boolean", function() {
-          var propMeta = createRootPropMeta({name: "foo1", required: 1});
-          expect(propMeta.required).toBe(true);
+          var propMeta = createRootPropMeta({name: "foo1", isRequired: 1});
+          expect(propMeta.isRequired).toBe(true);
 
-          propMeta = createRootPropMeta({name: "foo2", required: 0});
-          expect(propMeta.required).toBe(false);
+          propMeta = createRootPropMeta({name: "foo2", isRequired: 0});
+          expect(propMeta.isRequired).toBe(false);
 
-          propMeta = createRootPropMeta({name: "foo3", required: ""});
-          expect(propMeta.required).toBe(false);
+          propMeta = createRootPropMeta({name: "foo3", isRequired: ""});
+          expect(propMeta.isRequired).toBe(false);
 
-          propMeta = createRootPropMeta({name: "foo4", required: true});
-          expect(propMeta.required).toBe(true);
+          propMeta = createRootPropMeta({name: "foo4", isRequired: true});
+          expect(propMeta.isRequired).toBe(true);
 
-          propMeta = createRootPropMeta({name: "foo5", required: "yes"});
-          expect(propMeta.required).toBe(true);
+          propMeta = createRootPropMeta({name: "foo5", isRequired: "yes"});
+          expect(propMeta.isRequired).toBe(true);
 
-          propMeta = createRootPropMeta({name: "foo6", required: "no"});
-          expect(propMeta.required).toBe(true);
+          propMeta = createRootPropMeta({name: "foo6", isRequired: "no"});
+          expect(propMeta.isRequired).toBe(true);
         });
 
         it("should accept a function spec value", function() {
           var f = function() {};
-          var propMeta = createRootPropMeta({name: "foo1", required: f});
-          expect(propMeta.required).toBe(f);
+          var propMeta = createRootPropMeta({name: "foo1", isRequired: f});
+          expect(propMeta.isRequired).toBe(f);
         });
 
         it("should evaluate a function spec value", function() {
           var f = jasmine.createSpy().and.callFake(function() { return true; });
-          var propMeta = createRootPropMeta({name: "foo1", required: f});
+          var propMeta = createRootPropMeta({name: "foo1", isRequired: f});
 
           var owner = {};
-          expect(propMeta.requiredEval(owner)).toBe(true);
+          expect(propMeta.isRequiredEval(owner)).toBe(true);
           expect(f.calls.count()).toBe(1);
         });
 
         it("should evaluate a function spec value and cast its result", function() {
           var owner = {};
           var f = function() { return 1; };
-          var propMeta = createRootPropMeta({name: "foo1", required: f});
-          expect(propMeta.requiredEval(owner)).toBe(true);
+          var propMeta = createRootPropMeta({name: "foo1", isRequired: f});
+          expect(propMeta.isRequiredEval(owner)).toBe(true);
 
           // ----
 
           f = function() { return 0; };
-          propMeta = createRootPropMeta({name: "foo2", required: f});
-          expect(propMeta.requiredEval(owner)).toBe(false);
+          propMeta = createRootPropMeta({name: "foo2", isRequired: f});
+          expect(propMeta.isRequiredEval(owner)).toBe(false);
 
           // ---
 
           f = function() { return {}; };
-          propMeta = createRootPropMeta({name: "foo2", required: f});
-          expect(propMeta.requiredEval(owner)).toBe(true);
+          propMeta = createRootPropMeta({name: "foo2", isRequired: f});
+          expect(propMeta.isRequiredEval(owner)).toBe(true);
         });
 
         it("should evaluate a function spec value and return the default value if it returns nully", function() {
           var owner = {};
           var f = function() { return null; };
-          var propMeta = createRootPropMeta({name: "foo1", required: f});
-          expect(propMeta.requiredEval(owner)).toBe(false);
+          var propMeta = createRootPropMeta({name: "foo1", isRequired: f});
+          expect(propMeta.isRequiredEval(owner)).toBe(false);
 
           // ----
 
           f = function() { return undefined; };
-          propMeta = createRootPropMeta({name: "foo2", required: f});
-          expect(propMeta.requiredEval(owner)).toBe(false);
+          propMeta = createRootPropMeta({name: "foo2", isRequired: f});
+          expect(propMeta.isRequiredEval(owner)).toBe(false);
         });
 
         it("should evaluate a function spec value in the context of the owner value", function() {
           var owner = {};
           var f = jasmine.createSpy();
-          var propMeta = createRootPropMeta({name: "foo1", required: f});
-          propMeta.requiredEval(owner);
+          var propMeta = createRootPropMeta({name: "foo1", isRequired: f});
+          propMeta.isRequiredEval(owner);
           expect(f.calls.count()).toBe(1);
           expect(f.calls.first().object).toBe(owner);
         });
@@ -542,8 +542,8 @@ define([
         it("should evaluate a function spec value without arguments", function() {
           var owner = {};
           var f = jasmine.createSpy();
-          var propMeta = createRootPropMeta({name: "foo1", required: f});
-          propMeta.requiredEval(owner);
+          var propMeta = createRootPropMeta({name: "foo1", isRequired: f});
+          propMeta.isRequiredEval(owner);
           expect(f.calls.count()).toBe(1);
           expect(f.calls.first().args.length).toBe(0);
         });
@@ -936,36 +936,36 @@ define([
         });
 
         it("should have min = 1 when required", function() {
-          var propMeta = createRootPropMeta({name: "foo", required: true});
+          var propMeta = createRootPropMeta({name: "foo", isRequired: true});
           expect(propMeta.countMin).toBe(undefined);
           expect(propMeta.countMax).toBe(undefined);
           expect(propMeta.countRangeEval({}).min).toBe(1);
         });
 
         it("should have min = 1 when required and countMin = 0", function() {
-          var propMeta = createRootPropMeta({name: "foo", required: true, countMin: 0});
+          var propMeta = createRootPropMeta({name: "foo", isRequired: true, countMin: 0});
           expect(propMeta.countMin).toBe(0);
           expect(propMeta.countMax).toBe(undefined);
           expect(propMeta.countRangeEval({}).min).toBe(1);
         });
 
         it("should have min equal to countMin when countMin >= 1 and any required value", function() {
-          var propMeta = createRootPropMeta({name: "foo1", required: true, countMin: 1});
+          var propMeta = createRootPropMeta({name: "foo1", isRequired: true, countMin: 1});
           expect(propMeta.countMin).toBe(1);
           expect(propMeta.countMax).toBe(undefined);
           expect(propMeta.countRangeEval({}).min).toBe(1);
 
-          propMeta = createRootPropMeta({name: "foo2", required: false, countMin: 1});
+          propMeta = createRootPropMeta({name: "foo2", isRequired: false, countMin: 1});
           expect(propMeta.countMin).toBe(1);
           expect(propMeta.countMax).toBe(undefined);
           expect(propMeta.countRangeEval({}).min).toBe(1);
 
-          propMeta = createRootPropMeta({name: "foo3", required: true, countMin: 3, type: ["string"]});
+          propMeta = createRootPropMeta({name: "foo3", isRequired: true, countMin: 3, type: ["string"]});
           expect(propMeta.countMin).toBe(3);
           expect(propMeta.countMax).toBe(undefined);
           expect(propMeta.countRangeEval({}).min).toBe(3);
 
-          propMeta = createRootPropMeta({name: "foo4", required: false, countMin: 3, type: ["string"]});
+          propMeta = createRootPropMeta({name: "foo4", isRequired: false, countMin: 3, type: ["string"]});
           expect(propMeta.countMin).toBe(3);
           expect(propMeta.countMax).toBe(undefined);
           expect(propMeta.countRangeEval({}).min).toBe(3);
@@ -973,7 +973,7 @@ define([
 
         // required <= max
         it("should have max = 1 when countMax = 0 and required = true", function() {
-          var propMeta = createRootPropMeta({name: "foo", required: true, countMax: 0});
+          var propMeta = createRootPropMeta({name: "foo", isRequired: true, countMax: 0});
           expect(propMeta.countMin).toBe(undefined);
           expect(propMeta.countMax).toBe(0);
           expect(propMeta.countRangeEval({}).max).toBe(1);
@@ -1782,13 +1782,13 @@ define([
 
           var propMeta = extendProp(Derived.meta, "baseStr", {name: "baseStr"});
 
-          expect(propMeta.required).toBe(undefined);
+          expect(propMeta.isRequired).toBe(undefined);
         });
 
         it("should evaluate to the base value by default", function() {
           var Base = Complex.extend();
 
-          Base.meta.add({name: "baseStr", required: true});
+          Base.meta.add({name: "baseStr", isRequired: true});
 
           var Derived = Base.extend();
 
@@ -1796,7 +1796,7 @@ define([
 
           var owner = {};
 
-          expect(propMeta.requiredEval(owner)).toBe(true);
+          expect(propMeta.isRequiredEval(owner)).toBe(true);
         });
 
         it("should respect the specified value", function() {
@@ -1806,9 +1806,9 @@ define([
 
           var Derived = Base.extend();
 
-          var propMeta = extendProp(Derived.meta, "baseStr", {name: "baseStr", required: false});
+          var propMeta = extendProp(Derived.meta, "baseStr", {name: "baseStr", isRequired: false});
 
-          expect(propMeta.required).toBe(false);
+          expect(propMeta.isRequired).toBe(false);
         });
 
         it("should evaluate a base function and, if false, only then the sub function", function() {
@@ -1819,18 +1819,18 @@ define([
           var baseIndex = -1;
           var baseSpy = jasmine.createSpy().and.callFake(function() { baseIndex = index++; return false; });
 
-          Base.meta.add({name: "baseStr", required: baseSpy});
+          Base.meta.add({name: "baseStr", isRequired: baseSpy});
 
           var Derived = Base.extend();
 
           var subIndex = -1;
           var subSpy = jasmine.createSpy().and.callFake(function() { subIndex = index++; return false; });
 
-          var propMeta = extendProp(Derived.meta, "baseStr", {name: "baseStr", required: subSpy});
+          var propMeta = extendProp(Derived.meta, "baseStr", {name: "baseStr", isRequired: subSpy});
 
           var owner = {};
 
-          propMeta.requiredEval(owner);
+          propMeta.isRequiredEval(owner);
           expect(baseIndex).toBe(1);
           expect(subIndex ).toBe(2);
         });
@@ -1840,17 +1840,17 @@ define([
 
           var baseSpy = jasmine.createSpy().and.returnValue(true);
 
-          Base.meta.add({name: "baseStr", required: baseSpy});
+          Base.meta.add({name: "baseStr", isRequired: baseSpy});
 
           var Derived = Base.extend();
 
           var subSpy = jasmine.createSpy().and.returnValue(true);
 
-          var propMeta = extendProp(Derived.meta, "baseStr", {name: "baseStr", required: subSpy});
+          var propMeta = extendProp(Derived.meta, "baseStr", {name: "baseStr", isRequired: subSpy});
 
           var owner = {};
 
-          expect(propMeta.requiredEval(owner)).toBe(true);
+          expect(propMeta.isRequiredEval(owner)).toBe(true);
           expect(baseSpy.calls.count()).toBe(1);
           expect(subSpy.calls.count()).toBe(0);
 
@@ -1858,17 +1858,17 @@ define([
 
           Base = Complex.extend();
 
-          Base.meta.add({name: "baseStr", required: true});
+          Base.meta.add({name: "baseStr", isRequired: true});
 
           Derived = Base.extend();
 
           subSpy = jasmine.createSpy().and.returnValue(true);
 
-          propMeta = extendProp(Derived.meta, "baseStr", {name: "baseStr", required: subSpy});
+          propMeta = extendProp(Derived.meta, "baseStr", {name: "baseStr", isRequired: subSpy});
 
           owner = {};
 
-          expect(propMeta.requiredEval(owner)).toBe(true);
+          expect(propMeta.isRequiredEval(owner)).toBe(true);
           expect(subSpy.calls.count()).toBe(0);
         });
       }); // end required

@@ -595,7 +595,7 @@ define([
       },
       //endregion
 
-      //region required attribute
+      //region isRequired attribute
       /**
        * Gets a value that indicates if a given property is currently required.
        *
@@ -608,7 +608,7 @@ define([
        *
        * @throws {pentaho.lang.ArgumentInvalidError} When a property with name `name` is not defined.
        */
-      required: function(name) {
+      isRequired: function(name) {
         return this.meta.get(name).countRangeEval(this).min > 0;
       },
       //endregion

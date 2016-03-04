@@ -38,7 +38,7 @@ define([
         props: [
           {
             name: "measures",
-            required: true
+            isRequired: true
           },
           {
             name: "labelsOption",
@@ -46,7 +46,7 @@ define([
               base: labelsOptionFactory,
               domain: ["none", "center", "insideEnd", "insideBase", "outsideEnd"]
             },
-            required: true,
+            isRequired: true,
             value: "none"
           }
         ]

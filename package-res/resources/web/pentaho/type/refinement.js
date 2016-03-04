@@ -232,7 +232,7 @@ define([
      *             name:  "id",
      *             label: "Product Id",
      *             type:  "string",
-     *             required: true
+     *             isRequired: true
      *           },
      *           {
      *             name:  "price",
@@ -243,7 +243,7 @@ define([
      *               facets: ["OrdinalDomain"],
      *               min:    0
      *             },
-     *             required: true
+     *             isRequired: true
      *           }
      *         ]
      *       }
