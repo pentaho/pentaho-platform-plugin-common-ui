@@ -17,10 +17,8 @@ define([
   "pentaho/type/Context",
   "pentaho/type/list",
   "pentaho/type/value",
-  "pentaho/type/number",
-  "pentaho/util/error",
-  "pentaho/i18n!/pentaho/type/i18n/types"
-], function(Context, listFactory, valueFactory, numberFactory, error, bundle) {
+  "pentaho/type/number"
+], function(Context, listFactory, valueFactory, numberFactory) {
 
   "use strict";
 

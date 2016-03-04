@@ -126,7 +126,7 @@ define([
           // First set
           this._value = _;
         } else if(this._value !== _) {
-          throw new Error(bundle.structured.errors.value.cannotChangeValue);
+          throw error.argInvalid("value", bundle.structured.errors.value.cannotChangeValue);
         }
       },
 
@@ -318,11 +318,11 @@ define([
      */
     function castTop(value) {
       if(value == null)
-        throw new Error(bundle.structured.errors.value.isNull);
+        throw error.argRequired("value");
 
       value = this._cast(value);
       if(value == null)
-        throw new Error(bundle.format(bundle.structured.errors.value.cannotConvertToType, [this.label]));
+        throw error.argInvalid("value", bundle.format(bundle.structured.errors.value.cannotConvertToType, [this.label]));
 
       return value;
     }

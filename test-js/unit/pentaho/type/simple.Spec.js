@@ -15,9 +15,8 @@
  */
 define([
   "pentaho/type/Context",
-  "tests/pentaho/util/errorMatch",
-  "pentaho/i18n!/pentaho/type/i18n/types"
-], function(Context, errorMatch, bundle) {
+  "tests/pentaho/util/errorMatch"
+], function(Context, errorMatch) {
 
   "use strict";
 
@@ -28,10 +27,10 @@ define([
       Simple  = context.get("pentaho/type/simple");
 
   describe("pentaho.type.Simple -", function() {
-    function expectThrow(spec, errorMessage) {
+    function expectThrow(spec, errorMatch) {
       expect(function() {
         new Simple(spec);
-      }).toThrowError(errorMessage);
+      }).toThrow(errorMatch);
     }
 
     function constructWithValue(spec) {
@@ -39,7 +38,7 @@ define([
         var simpleType = new Simple(spec);
         expect(simpleType.value).toBe(spec);
       } else {
-        expectThrow(spec, bundle.structured.errors.value.isNull);
+        expectThrow(spec, errorMatch.argRequired("value"));
       }
     }
 
@@ -54,7 +53,7 @@ define([
         expect(simpleType.value).toBe(v);
         expect(simpleType.formatted).toBe(f);
       } else {
-        expectThrow(spec, bundle.structured.errors.value.isNull);
+        expectThrow(spec, errorMatch.argRequired("value"));
       }
 
       return spec;
@@ -119,14 +118,14 @@ define([
         simpleType = new Simple(123);
       });
 
-      function setValueExpectedThrow(value, errorMessage) {
+      function setValueExpectedThrow(value, errorMatch) {
         expect(function() {
           simpleType.value = value;
-        }).toThrowError(errorMessage);
+        }).toThrow(errorMatch);
 
         expect(function() {
           simpleType.v = value;
-        }).toThrowError(errorMessage);
+        }).toThrow(errorMatch);
       }
 
       it("Should return the given value in the constructor", function() {
@@ -134,7 +133,7 @@ define([
       });
 
       it("Cannot change the primitive value of a simple value", function() {
-        setValueExpectedThrow(456, bundle.structured.errors.value.cannotChangeValue);
+        setValueExpectedThrow(456, errorMatch.argInvalid("value"));
       });
 
       it("Nothing should happen when setting the underlying primitive value with the same value", function() {
@@ -145,7 +144,7 @@ define([
       });
 
       it("Simple value cannot contain null", function() {
-        setValueExpectedThrow(null, bundle.structured.errors.value.isNull);
+        setValueExpectedThrow(null, errorMatch.argRequired("value"));
       });
     });
 
@@ -232,7 +231,7 @@ define([
 
           simple1.configure(simple2);
 
-        }).toThrowError(bundle.structured.errors.value.cannotChangeValue);
+        }).toThrow(errorMatch.argInvalid("value"));
       });
 
       it("should throw when not given a plain object or another Simple", function() {
@@ -280,10 +279,10 @@ define([
           }});
         });
 
-        function expectCastError(meta, value, message) {
+        function expectCastError(meta, value, errorMatch) {
           expect(function() {
             meta.cast(value);
-          }).toThrowError(message);
+          }).toThrow(errorMatch);
         }
 
         it("Default cast should return the value unchanged", function() {
@@ -294,26 +293,27 @@ define([
         });
 
         it("Cannot cast null values", function() {
-          expectCastError(SimpleMeta, null, bundle.structured.errors.value.isNull)
+          expectCastError(SimpleMeta, null, errorMatch.argRequired("value"));
         });
 
         it("Top cast function should throw an error message when cast function returns nully (null or undefined).", function() {
-          var errorMessage = bundle.format(bundle.structured.errors.value.cannotConvertToType, [SimpleMeta.label]);
-
           SimpleMeta.cast = function(value) {
             return value === 0 ? null : value;
           };
-          expectCastError(SimpleMeta, 0, errorMessage);
+          expectCastError(SimpleMeta, 0, errorMatch.argInvalid("value"));
 
           SimpleMeta.cast = function(value) {
             return value === 0 ? undefined : value;
           };
-          expectCastError(SimpleMeta, 0, errorMessage);
+          expectCastError(SimpleMeta, 0, errorMatch.argInvalid("value"));
         });
 
         it("Should have changed the default cast behaviour and return an error if not a number", function() {
           expect(Derived.meta.cast("1")).toBe(1);
-          expectCastError(Derived.meta, "a", "Invalid value");
+
+          expect(function() {
+            Derived.meta.cast("a");
+          }).toThrowError("Invalid value");
         });
 
         it("Setting cast to a falsy value restores the default cast function (identity)", function() {

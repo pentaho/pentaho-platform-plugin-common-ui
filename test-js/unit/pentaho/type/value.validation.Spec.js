@@ -15,9 +15,8 @@
  */
 define([
   "pentaho/type/Context",
-  "pentaho/util/error",
   "pentaho/i18n!/pentaho/type/i18n/types"
-], function(Context, error, bundle) {
+], function(Context, bundle) {
 
   "use strict";
 

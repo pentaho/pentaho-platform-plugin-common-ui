@@ -16,8 +16,8 @@
 define([
   "pentaho/type/object",
   "pentaho/type/Context",
-  "pentaho/i18n!/pentaho/type/i18n/types"
-], function(objectFactory, Context, bundle) {
+  "tests/pentaho/util/errorMatch"
+], function(objectFactory, Context, errorMatch) {
 
   "use strict";
 
@@ -56,19 +56,19 @@ define([
       it("should not accept empty object literal", function () {
         expect(function () {
           new PentahoObject({});
-        }).toThrowError(bundle.structured.errors.value.isNull);
+        }).toThrow(errorMatch.argRequired("value"));
       });
 
       it("should not accept null", function () {
         expect(function () {
           new PentahoObject(null);
-        }).toThrowError(bundle.structured.errors.value.isNull);
+        }).toThrow(errorMatch.argRequired("value"));
       });
 
       it("should not accept undefined", function () {
         expect(function () {
           new PentahoObject(undefined);
-        }).toThrowError(bundle.structured.errors.value.isNull);
+        }).toThrow(errorMatch.argRequired("value"));
       });
     });
 

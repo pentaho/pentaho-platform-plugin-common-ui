@@ -16,8 +16,8 @@
 define([
   "pentaho/type/boolean",
   "pentaho/type/Context",
-  "pentaho/i18n!/pentaho/type/i18n/types"
-], function(booleanFactory, Context, bundle) {
+  "tests/pentaho/util/errorMatch"
+], function(booleanFactory, Context, errorMatch) {
 
   "use strict";
 
@@ -86,13 +86,13 @@ define([
       it("should not accept null", function() {
         expect(function() {
           new PentahoBoolean(null);
-        }).toThrowError(bundle.structured.errors.value.isNull);
+        }).toThrow(errorMatch.argRequired("value"));
       });
 
       it("should not accept undefined", function() {
         expect(function() {
           new PentahoBoolean(undefined);
-        }).toThrowError(bundle.structured.errors.value.isNull);
+        }).toThrow(errorMatch.argRequired("value"));
       });
     });
   }); // pentaho.type.Boolean

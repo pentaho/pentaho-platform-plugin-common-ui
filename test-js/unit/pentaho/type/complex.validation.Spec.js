@@ -14,10 +14,8 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context",
-  "pentaho/util/error",
-  "pentaho/i18n!/pentaho/type/i18n/types"
-], function(Context, error, bundle) {
+  "pentaho/type/Context"
+], function(Context) {
 
   "use strict";
 
