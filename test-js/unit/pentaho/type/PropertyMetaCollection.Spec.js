@@ -16,19 +16,17 @@
 define([
   "pentaho/type/Context",
   "pentaho/type/Property",
-  "pentaho/type/boolean",
-  "pentaho/type/string",
   "pentaho/type/PropertyMetaCollection",
-  "pentaho/type/complex"
-], function(Context, Property, booleanFactory, stringFactory, PropertyMetaCollection, complexFactory) {
+  "tests/pentaho/util/errorMatch"
+], function(Context, Property, PropertyMetaCollection, errorMatch) {
   "use strict";
 
   /* global describe:false, it:false, expect:false, beforeEach:false */
 
   var context = new Context();
-  var Boolean = context.get(booleanFactory);
-  var String = context.get(stringFactory);
-  var Complex = context.get(complexFactory);
+  var Boolean = context.get("pentaho/type/boolean");
+  var String = context.get("pentaho/type/string");
+  var Complex = context.get("pentaho/type/complex");
   var Derived = Complex.extend({
     meta: {
       label: "Derived",
@@ -52,7 +50,7 @@ define([
       it("should throw if constructor directly called without a declaring complex", function() {
         expect(function() {
           props = new PropertyMetaCollection();
-        }).toThrowError(/required/);
+        }).toThrow(errorMatch.argRequired("declaringMeta"));
       });
 
       it("should return an object", function() {
@@ -94,7 +92,7 @@ define([
           ].forEach(function(name) {
             expect(function() {
               props.add(name);
-            }).toThrowError(/required/);
+            }).toThrow(errorMatch.argRequired("props[i]"));
           });
         });
 
@@ -110,13 +108,13 @@ define([
           props.add({name: "foo", type: "boolean"});
           expect(function() {
             props.replace({name: "bar", type: "string"}, 0);
-          }).toThrowError(/invalid/);
+          }).toThrow(errorMatch.argInvalid("props[i]"));
         });
 
         it("should throw when calling replace with no arguments", function() {
           expect(function() {
             props.replace();
-          }).toThrowError(/required/);
+          }).toThrow(errorMatch.argRequired("props[i]"));
         });
       });
 
@@ -124,7 +122,7 @@ define([
         it("should throw if invoked with no arguments", function() {
           expect(function() {
             props.configure();
-          }).toThrowError(/config/);
+          }).toThrow(errorMatch.argRequired("config"));
         });
 
         it("should accept an array of pentaho.type.UPropertyMeta", function() {
@@ -159,7 +157,7 @@ define([
         it("should throw when attempting to configure with key that does not match its property name", function() {
           expect(function() {
             props.configure({foo: {name: "bar", type: "boolean"}});
-          }).toThrowError(/config/);
+          }).toThrow(errorMatch.argInvalid("config"));
         });
 
         it("should use the key as property name if the property spec does not include a name", function() {
@@ -192,7 +190,7 @@ define([
       });
     });
 
-    describe("property ineritance", function() {
+    describe("property inheritance", function() {
       var MoreDerived = Derived.extend({
         meta: {
           label: "MoreDerived",
@@ -222,7 +220,7 @@ define([
         it("should throw if using List.add() to override a inherited property's 'type' to something that isn't a subtype of the base property's 'type'", function() {
           expect(function() {
             props.add({name: "foo", type: "boolean"});
-          }).toThrowError(/invalid/);
+          }).toThrow(errorMatch.argInvalid("type"));
         });
 
         it("should use List.replace() to override a inherited property with the same name", function() {
@@ -236,7 +234,7 @@ define([
         it("should throw if using List.replace() to override a inherited property's 'type' to something that isn't a subtype of the base property's 'type'", function() {
           expect(function() {
             props.replace({name: "foo", type: "boolean"}, 0);
-          }).toThrowError(/invalid/);
+          }).toThrow(errorMatch.argInvalid("type"));
         });
       });
     });

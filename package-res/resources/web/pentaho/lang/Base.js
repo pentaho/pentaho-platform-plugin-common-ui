@@ -76,7 +76,27 @@ define([
    * @returns {Class.<pentaho.lang.Base>}
    */
   function base_create() {
-    var Base = base_root(Object, {}, "Base.Object");
+    /**
+     * @classdesc `Base` Class for JavaScript Inheritance.
+     * Based on Base.js by Dean Edwards, and later edited by Kenneth Powers.
+     *
+     * @class
+     * @name Base
+     * @memberOf pentaho.lang
+     * @amd pentaho/lang/Base
+     *
+     * @description Creates a new object of `Base` class.
+     *
+     * If provided, extends the created instance with the spec in `source` parameter.
+     *
+     * @constructor
+     * @param {Object} [source] An instance specification.
+     */
+    function BaseObject(source) {
+      this.extend(source);
+    }
+
+    var Base = base_root(Object, {}, "Base.Object", BaseObject);
     Base.version = "2.0";
 
     /**
@@ -97,12 +117,52 @@ define([
     /**
      * The `Base.Array` root class is the base class for `Array` classes.
      *
-     * @name Array
+     * @alias Array
      * @memberOf pentaho.lang.Base
      *
      * @class
      * @extends Array
      *
+     * @borrows pentaho.lang.Base.ancestor as ancestor
+     * @borrows pentaho.lang.Base.extend as extend
+     * @borrows pentaho.lang.Base._extend as _extend
+     * @borrows pentaho.lang.Base.mix as mix
+     * @borrows pentaho.lang.Base.implement as implement
+     * @borrows pentaho.lang.Base.implementStatic as implementStatic
+     * @borrows pentaho.lang.Base#base as #base
+     * @borrows pentaho.lang.Base#extend as #extend
+     *
+     * @description Initializes a new array of `Base.Array` class.
+     *
+     * If provided, extends the created instance with the spec in `source` parameter.
+     *
+     * To "create" an instance of `Base.Array`,
+     * use {@link pentaho.lang.Base.Array.to},
+     * to convert an existing array instance.
+     *
+     * @constructor
+     * @param {Array} [source] An instance specification.
+     */
+    function BaseArray(source) {
+      this.extend(source);
+    }
+
+    Base.Array = base_root(Array, [], "Base.Array", BaseArray);
+    Base.Array.to = class_array_to;
+
+    // ---
+
+    /**
+     * The `Base.Error` root class is the base class for `Error` classes.
+     *
+     * @alias Error
+     * @memberOf pentaho.lang.Base
+     *
+     * @class
+     * @extends Error
+     *
+     * @constructor
+     * @param {string} [message] The error message.
      *
      * @borrows pentaho.lang.Base.ancestor as ancestor
      * @borrows pentaho.lang.Base.extend as extend
@@ -113,8 +173,12 @@ define([
      * @borrows pentaho.lang.Base#base as #base
      * @borrows pentaho.lang.Base#extend as #extend
      */
-    Base.Array = base_root(Array, [], "Base.Array");
-    Base.Array.to = class_array_to;
+    function BaseError(message) {
+      this.message = message;
+      this.stack = (new Error()).stack;
+    }
+
+    Base.Error = base_root(Error, Object.create(Error.prototype), "Base.Error", BaseError);
 
     return Base;
   }
@@ -127,10 +191,10 @@ define([
    * @param {Class} NativeBase The native base constructor that this _Base_ root is rooted on.
    * @param {object} bootProto The prototype of the _boot_ constructor.
    * @param {string} baseRootName The name of the _root_ constructor.
-   *
+   * @param {?function} [baseConstructor] The base constructor.
    * @returns {Class.<pentaho.lang.Base>} The new `Base` root class.
    */
-  function base_root(NativeBase, bootProto, baseRootName) {
+  function base_root(NativeBase, bootProto, baseRootName, baseConstructor) {
     // Bootstrapping "Base" class.
     // Does not have the full "Base" class interface,
     // but only enough properties set to trick `class_extend`.
@@ -153,28 +217,11 @@ define([
 
     // Used by BaseBoot.extend, just below
     BaseBoot.prototype.extend = inst_extend;
+
     // ---
 
     var BaseRoot = BaseBoot.extend({
-      /**
-       * Creates a new object of `Base` class.
-       *
-       * If provided extends the created instance with the spec in `source` parameter.
-       *
-       * @param {Object} [source] A instance spec. Optional parameter.
-       *
-       * @classdesc `Base` Class for JavaScript Inheritance.
-       * Based on Base.js by Dean Edwards, and later edited by Kenneth Powers.
-       *
-       * @amd pentaho/lang/Base
-       *
-       * @class
-       * @name Base
-       * @memberOf pentaho.lang
-       */
-      constructor: function() {
-        this.extend(arguments[0]);
-      },
+      constructor: baseConstructor
     }, {
       /**
        * This class ancestor.

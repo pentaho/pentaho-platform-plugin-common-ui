@@ -17,8 +17,9 @@ define([
   "module",
   "./element",
   "../util/object",
+  "../util/error",
   "../i18n!types"
-], function(module, elemFactory, O, bundle) {
+], function(module, elemFactory, O, error, bundle) {
 
   "use strict";
 
@@ -70,11 +71,9 @@ define([
 
       constructor: function(spec) {
         if(spec instanceof Object) {
-
           // A plain object?
           if(spec.constructor === Object) {
-            // TODO: more efficient implementation?
-            this.extend(spec);
+            this._configureFromObject(spec);
 
             // Required validation
             if(this._value == null) this.value = null;
@@ -83,12 +82,7 @@ define([
 
           // Another Simple? Clone or Downcast.
           if(spec instanceof Simple) {
-            // Shouldn't be spec === this, but not testing...
-
-            // implicit "downcast" of simple values
-            this.value     = spec.value;
-            this.formatted = spec.formatted;
-            // TODO: generic metadata
+            this._configureFromSimple(spec);
             return;
           }
         }
@@ -132,7 +126,7 @@ define([
           // First set
           this._value = _;
         } else if(this._value !== _) {
-          throw new Error(bundle.structured.errors.value.cannotChangeValue);
+          throw error.argInvalid("value", bundle.structured.errors.value.cannotChangeValue);
         }
       },
 
@@ -216,6 +210,62 @@ define([
         return this._value.toString();
       },
 
+      //region configuration
+      /**
+       * Configures this simple value with a given configuration.
+       *
+       *
+       * @name configure
+       * @memberOf pentaho.type.Simple#
+       * @param {?any} config The configuration.
+       * @return {!pentaho.type.Simple} This instance.
+       */
+
+      // TODO: unify constructor, cloning and configuration code somehow?
+
+      /**
+       * Configures this value with a given _non-nully_ configuration.
+       *
+       * The default implementation does nothing.
+       *
+       * @param {any} config The configuration.
+       * @override
+       */
+      _configure: function(config) {
+        // Nothing configurable at this level
+        if(config instanceof Object) {
+          // A plain object?
+          if(config.constructor === Object) {
+            this._configureFromObject(config);
+            return;
+          }
+
+          // Another Simple? Clone or Downcast.
+          if(config instanceof Simple) {
+            this._configureFromSimple(config);
+            return;
+          }
+        }
+
+        throw error.argInvalidType("config", ["Object", "pentaho.type.Simple"], typeof config);
+      },
+
+      _configureFromSimple: function(other) {
+        // TODO: same simple class?
+        if(other !== this) {
+          // implicit "downcast" of simple values
+          this.value     = other.value; // inits or ensures value is the same (and throws otherwise)
+          this.formatted = other.formatted;
+          // TODO: generic metadata
+        }
+      },
+
+      _configureFromObject: function(config) {
+        // TODO: more efficient implementation?
+        this.extend(config);
+      },
+      //endregion
+
       meta: /** pentaho.type.Simple.Meta# */{
         id: module.id,
         "abstract": true,
@@ -268,11 +318,11 @@ define([
      */
     function castTop(value) {
       if(value == null)
-        throw new Error(bundle.structured.errors.value.isNull);
+        throw error.argRequired("value");
 
       value = this._cast(value);
       if(value == null)
-        throw new Error(bundle.format(bundle.structured.errors.value.cannotConvertToType, [this.label]));
+        throw error.argInvalid("value", bundle.format(bundle.structured.errors.value.cannotConvertToType, [this.label]));
 
       return value;
     }

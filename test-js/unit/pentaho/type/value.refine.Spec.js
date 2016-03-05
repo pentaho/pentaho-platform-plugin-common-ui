@@ -59,24 +59,15 @@ define([
       expect(MyRefinement.name || MyRefinement.displayName).toBe("FOOO");
     });
 
-    it("should throw if instSpec is not specified", function() {
-      expect(function() {
-        Element.refine();
-      }).toThrow(errorMatch.argRequired("instSpec"));
+    it("should create a refinement type if instSpec is not specified", function() {
+      var MyRefinement = Element.refine();
+      expect(MyRefinement.prototype instanceof Refinement).toBe(true);
 
-      expect(function() {
-        Element.refine("FOO");
-      }).toThrow(errorMatch.argRequired("instSpec"));
-    });
+      MyRefinement = Element.refine("FOO");
+      expect(MyRefinement.prototype instanceof Refinement).toBe(true);
 
-    it("should throw if instSpec.meta is not specified", function() {
-      expect(function() {
-        Element.refine({});
-      }).toThrow(errorMatch.argRequired("instSpec.meta"));
-
-      expect(function() {
-        Element.refine("FOO", {});
-      }).toThrow(errorMatch.argRequired("instSpec.meta"));
+      MyRefinement = Element.refine({});
+      expect(MyRefinement.prototype instanceof Refinement).toBe(true);
     });
   });
 });

@@ -30,7 +30,6 @@ define([
 
     var Value = context.get(valueFactory),
         Element = context.get(elemFactory),
-        _listMeta = null,
         _listNextUid = 1;
 
     /**
@@ -159,15 +158,13 @@ define([
       },
 
       /**
-       * Gets the element at a specified index.
-       *
-       * If the index is out of range, `null` is returned.
+       * Gets the element at a specified index, or `null`.
        *
        * @param {number} index The desired index.
-       *
        * @return {?pentaho.type.Element} The element value or `null`.
        */
       at: function(index) {
+        if(index == null) throw error.argRequired("index");
         return this._elems[index] || null;
       },
 
@@ -268,9 +265,10 @@ define([
        *
        * @param {any|any[]} fragment Element or elements to add.
        * @param {number} index The index at which to start inserting new elements.
+       * @param {?boolean} [silent=false] Indicates that no events should be emitted.
        */
-      insert: function(fragment, index) {
-        this._set(fragment, /*add:*/true, /*update:*/true, /*remove:*/false, /*index:*/index);
+      insert: function(fragment, index, silent) {
+        this._set(fragment, /*add:*/true, /*update:*/true, /*remove:*/false, /*index:*/index, silent);
       },
 
       /**
@@ -296,18 +294,57 @@ define([
        *
        * @param {number} start Index at which to start removing.
        * @param {number} [count=1] Number of elements to remove.
+       * @param {?boolean} [silent=false] Indicates that no events should be emitted.
        */
-      removeAt: function(start, count) {
-        this._removeAt(start, count);
+      removeAt: function(start, count, silent) {
+        this._removeAt(start, count, silent);
       },
 
       /**
-       * Creates an array with the elements of the list.
+       * Sorts the elements of the list using the given comparer function.
        *
-       * @return {Array.<pentaho.type.Element>} An array of elements.
+       * @param {function(pentaho.type.Element, pentaho.type.Element) : number} comparer The comparer function.
+       * @param {?boolean} [silent=false] Indicates that no events should be emitted.
        */
-      toArray: function() {
-        return this._elems.slice();
+      sort: function(comparer, silent) {
+        this._elems.sort(comparer);
+
+        if(!silent) {
+          // Assuming at least one position changed...
+          this._enterChange();
+          this._getChange("sort");
+          this._exitChange();
+        }
+      },
+
+      /**
+       * Creates an array with the elements of the list or values derived from each element.
+       *
+       * @param {function(pentaho.type.Element):any} [map] A function that converts each element into something else.
+       *
+       * @return {Array.<any>} An array of elements.
+       */
+      toArray: function(map) {
+        return map ? this._elems.map(map) : this._elems.slice();
+      },
+
+      /**
+       * Enters a change scope and returns a disposable object for exiting the scope.
+       *
+       * @return {pentaho.lang.IDisposable} A disposable object.
+       */
+      changeScope: function() {
+        var me = this;
+        this._enterChange();
+        return {
+          dispose: function() {
+            if(me) {
+              var you = me;
+              me = null;
+              you._exitChange();
+            }
+          }
+        };
       },
 
       /**
@@ -361,7 +398,7 @@ define([
         return changes;
       },
 
-      _addChange: function(type, elem, index) {
+      _addChangeElem: function(type, elem, index) {
         this._getChange(type, index).elems.push(elem);
       },
 
@@ -370,10 +407,18 @@ define([
             L = changes.length,
             change = L ? changes[L - 1] : null;
 
-        if(change && change.type === type && change.at + change.elems.length === index)
-          return change;
+        if(change && (change.type === type)) {
+          if(index == null || change.at + change.elems.length === index) {
+            return change;
+          }
+        }
 
-        changes.push((change = {type: type, at: index, elems: []}));
+        if(index == null) {
+          changes.push((change = {type: type}));
+        } else {
+          changes.push((change = {type: type, at: index, elems: []}));
+        }
+
         return change;
       },
       //endregion
@@ -438,18 +483,19 @@ define([
         this._elems.splice(index, 0, elem);
         this._keys[key] = elem;
 
-        if(!silent) this._addChange("add", elem, index);
+        if(!silent) this._addChangeElem("add", elem, index);
       },
 
       _removeOne: function(elem, index, key, silent) {
         this._elems.splice(index, 1);
         delete this._keys[key];
 
-        if(!silent) this._addChange("remove", elem, index);
+        if(!silent) this._addChangeElem("remove", elem, index);
       },
 
       _updateOne: function(elem, other, silent) {
         // TODO
+        elem.configure(other);
       },
 
       _remove: function(fragment, silent) {
@@ -579,8 +625,6 @@ define([
           // Can't use O.setConst cause the configurable: false is inherited
           // and we need to be able to set each local value at least once.
           if(O.hasOwn(this, "_elemMeta")) {
-            // Includes root _listMeta
-
             if(elemMeta !== baseMeta) throw error.operInvalid("Property 'of' cannot change.");
             return;
           }
@@ -631,8 +675,6 @@ define([
     }).implement({
       meta: bundle.structured["list"]
     });
-
-    _listMeta = List.meta;
 
     return List;
   };

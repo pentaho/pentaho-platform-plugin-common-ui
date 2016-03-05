@@ -54,6 +54,30 @@ define(function() {
         return text.firstUpperCase(name).replace(/([a-z\d])([A-Z])/g, "$1 $2");
       }
       return name;
+    },
+
+    /**
+     * Appends a sentence to another,
+     * making sure that the appended sentence ends with a period or is, otherwise,
+     * terminated by a punctuation character.
+     *
+     * @param {string} text The initial sentence.
+     * @param {?string} [sentence] A sentence to append to `text`, that can not be properly terminated.
+     * @return {string} A new, terminated sentence.
+     */
+    andSentence: function(text, sentence) {
+      return text + (sentence ? (" " + this.withPeriod(sentence)) : "");
+    },
+
+    /**
+     * Ensures a sentence is terminated with a period or another punctuation character,
+     * like `;`, `?` or `!`.
+     *
+     * @param {string} sentence A possibly unterminated sentence.
+     * @return {string} A new, terminated sentence.
+     */
+    withPeriod: function(sentence) {
+      return sentence && !/[.;!?]/.test(sentence[sentence.length - 1]) ? (sentence + ".") : sentence;
     }
   };
 

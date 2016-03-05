@@ -16,8 +16,8 @@
 define([
   "pentaho/type/date",
   "pentaho/type/Context",
-  "pentaho/i18n!/pentaho/type/i18n/types"
-], function (dateFactory, Context, bundle) {
+  "tests/pentaho/util/errorMatch"
+], function (dateFactory, Context, errorMatch) {
 
   "use strict";
 
@@ -56,20 +56,20 @@ define([
 
       it("should not accept nothing", function () {
         expect(function () {
-          new PentahoDate()
-        }).toThrowError(bundle.structured.errors.value.isNull);
+          new PentahoDate();
+        }).toThrow(errorMatch.argRequired("value"));
       });
 
       it("should not accept null", function () {
         expect(function () {
-          new PentahoDate(null)
-        }).toThrowError(bundle.structured.errors.value.isNull);
+          new PentahoDate(null);
+        }).toThrow(errorMatch.argRequired("value"));
       });
 
       it("should not accept undefined", function () {
         expect(function () {
-          new PentahoDate(undefined)
-        }).toThrowError(bundle.structured.errors.value.isNull);
+          new PentahoDate(undefined);
+        }).toThrow(errorMatch.argRequired("value"));
       });
     });
   }); // pentaho.type.Date

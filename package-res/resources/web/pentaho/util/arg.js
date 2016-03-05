@@ -21,15 +21,14 @@ define([
   var A_slice = Array.prototype.slice;
 
   /**
+   * The `arg` namespace contains utility methods for handling function arguments.
+   *
    * @name pentaho.util.arg
-   * @class
+   * @namespace
    * @amd pentaho/util/arg
-   *
-   * @classDesc Util methods for keyword args.
-   *
-   * @description Performs actions on keyword args.
+   * @ignore
    */
-  return {
+  return /** @lends pentaho.util.arg */{
     /**
      * Gets the value of an optional property of an object. The property is considered specified when its value is not a {@link Nully} value.
      * When the property is not specified, the value of `defaultValue` is returned. The latter defaults to `undefined`.

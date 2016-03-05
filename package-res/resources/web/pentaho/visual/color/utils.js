@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ define([
 
   var reRgbColor = /^rgb\((\d+),(\d+),(\d+)\)$/i;
 
-  var reNumColorPattern = /^(\d+)-COLOR$/;
+  var reNumColorPattern = /^(\d+)[_-]COLOR$/i;
 
   // Used by parseColor
   var CSS_Names = {
@@ -172,10 +172,6 @@ define([
     "yellowgreen" : "9ACD32"
   };
 
-  /**
-   * @module pentaho.visual.color
-   */
-
   return {
     getRgbColor:  getRgbColor,
     parseColor:   parseColor,
@@ -302,7 +298,7 @@ define([
 
   // colorSet:     "ryg" | "ryb" | "blue" | "gray"
   //
-  // pattern:      "GRADIENT" | "3-COLOR" | "5-COLOR"
+  // pattern:      "gradient" | "3_color" | "5_color"
   //  =>
   //   scalingType:  "linear" | <--   "discrete"  -->
   //  =>
@@ -315,7 +311,9 @@ define([
 
     if(colorSet) {
       var suffix;
-      if(pattern === "GRADIENT") {
+      pattern = pattern.toLowerCase();
+
+      if(pattern === "gradient") {
         suffix = "-5";
       } else {
         var m = reNumColorPattern.exec(pattern);

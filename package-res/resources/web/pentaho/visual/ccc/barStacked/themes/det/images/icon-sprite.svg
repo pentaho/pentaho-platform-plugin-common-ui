@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<svg width="40" height="80" xmlns="http://www.w3.org/2000/svg">
+  <style type="text/css">
+    .st0{fill:#005DA6;}
+    .st2{fill:#A8A8A8;}
+  </style>
+  <g>
+    <rect height="6.1" width="1.1" class="st0" y="20.5" x="14.399999"/>
+    <rect height="3.8" width="1.1" class="st0" y="22.8" x="21.099999"/>
+    <rect height="2.4" width="1.1" class="st0" y="24.2" x="24.499999"/>
+    <rect height="5.1" width="1.1" class="st0" y="21.5" x="27.799999"/>
+    <rect height="3.2" width="1.1" class="st0" y="23.4" x="11.099999"/>
+    <rect height="6.1" width="1.1" class="st0" y="20.5" x="17.799999"/>
+    <rect height="2.1" width="1.1" class="st0" y="20.1" x="11.099999"/>
+    <rect height="3.2" width="1.1" class="st0" y="16" x="14.399999"/>
+    <rect height="5.2" width="1.1" class="st0" y="14" x="17.799999"/>
+    <rect height="2.5" width="1.1" class="st0" y="19" x="21.099999"/>
+    <rect height="4.2" width="1.1" class="st0" y="16" x="27.799999"/>
+  </g>
+
+  <g>
+    <rect height="6.1" width="1.1" class="st2" y="60.500002" x="14.4"/>
+    <rect height="3.8" width="1.1" class="st2" y="62.800002" x="21.1"/>
+    <rect height="2.4" width="1.1" class="st2" y="64.200002" x="24.5"/>
+    <rect height="5.1" width="1.1" class="st2" y="61.500002" x="27.8"/>
+    <rect height="3.2" width="1.1" class="st2" y="63.400002" x="11.1"/>
+    <rect height="6.1" width="1.1" class="st2" y="60.500002" x="17.8"/>
+    <rect height="2.1" width="1.1" class="st2" y="60.100002" x="11.1"/>
+    <rect height="3.2" width="1.1" class="st2" y="56.000002" x="14.4"/>
+    <rect height="5.2" width="1.1" class="st2" y="54.000002" x="17.8"/>
+    <rect height="2.5" width="1.1" class="st2" y="59.000002" x="21.1"/>
+    <rect height="4.2" width="1.1" class="st2" y="56.000002" x="27.8"/>
+  </g>
+</svg>

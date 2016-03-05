@@ -29,9 +29,7 @@ define([
 
   return function(context) {
 
-    var Value   = context.get("pentaho/type/value"),
-        Element = context.get("pentaho/type/element"),
-        List    = context.get("pentaho/type/list"),
+    var Value = context.get("pentaho/type/value"),
         _refinementMeta;
 
     /**
@@ -200,7 +198,7 @@ define([
      *         label: "Positive number",
      *
      *         // Mixin desired refinement facets
-     *         facets: ["ordinalDomain"],
+     *         facets: ["OrdinalDomain"],
      *
      *         // Configure facet attributes
      *         min: 0,
@@ -242,7 +240,7 @@ define([
      *             type: {
      *               base:   "refinement",
      *               of:     "number",
-     *               facets: ["ordinalDomain"],
+     *               facets: ["OrdinalDomain"],
      *               min:    0
      *             },
      *             required: true

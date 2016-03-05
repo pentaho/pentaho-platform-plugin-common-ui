@@ -10,8 +10,9 @@
       "package-res/resources/web/pentaho/lang",
       "package-res/resources/web/pentaho/util",
       "package-res/resources/web/pentaho/type",
-      "package-res/resources/web/pentaho/visual/_doc/_namespace.jsdoc",
-      "package-res/resources/web/pentaho/visual/base"
+      "package-res/resources/web/pentaho/visual/_doc",
+      "package-res/resources/web/pentaho/visual/base",
+      "package-res/resources/web/pentaho/visual/color"
     ],
     "exclude": [],
     "includePattern": ".+\\.js(doc)?$"
