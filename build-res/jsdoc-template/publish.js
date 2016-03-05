@@ -660,11 +660,36 @@ exports.publish = function(taffyData, opts, tutorials) {
     // handle summary, description and class description default values properly
     data().each(function(doclet) {
         if(!doclet.ignore) {
+            var desc;
             if(!doclet.summary && (desc = (doclet.description || doclet.classdesc))) {
-                //Try to split when a "." or a ".</htmlTag>" is found.
-                //TODO: When markdown is present it fails the split and dumps all description in the summary.
-                var split = desc.split(/(\.(<\/?([^<]+)>)?\s*)$/)
-                doclet.summary = split[0] + (split[1] || "");
+                // Try to split when a "." or a ".</htmlTag>" is found.
+                /*
+                    ^              - start of string
+                    \s*            - optional leading space
+                    <tagName>      - optional tag, whose tagName is captured in m[1] and \1
+                    \s*            - optional white space
+                    (.|\n|\r)+?\.  - summary text, that can cross lines, and ends in a period; captured in m[2]
+                    \s*            - optional white space
+                    (
+                      $          - the end of the string, or
+                      \r|\n      - line-break, or
+                      </tagName> - the closing tag from the corresponding to the beginning opening tag
+                    )
+                */
+                var m = (/^\s*(?:<(\w+)>)?\s*((?:.|\n|\r)+?\.)\s*?($|(\r|\n)|(<\/\1>))/i).exec(desc);
+                if(m) {
+                  // MATCHED!
+                  var tagName = m[1];
+                  var summary = m[2];
+                  if(tagName) summary = "<" + tagName + ">" + summary + "</" + tagName + ">";
+
+                  doclet.summary = summary;
+                  //console.log("summary: " + summary);
+                  //console.log("  description: " + desc);
+                  //console.log(" ");
+                } else {
+                  console.warn("Could not determine summary for: " + desc);
+                }
             }
 
             var checkP = function(prop) {
@@ -677,7 +702,7 @@ exports.publish = function(taffyData, opts, tutorials) {
                 } 
 
                 return prop;
-            }
+            };
 
             var replaceCode = function(string) {
                 if(!string) return;
