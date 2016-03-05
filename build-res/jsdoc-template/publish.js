@@ -30,6 +30,77 @@ var github = '' + env.opts.githubConfig.name;
 
 var outdir = path.normalize(env.opts.destination);
 
+registerStandardJsTypes();
+
+function registerStandardJsTypes() {
+
+  var typeNames = [
+    ["string",  "String"],
+    ["number",  "Number"],
+    ["boolean", "Boolean"],
+    ["array",   "Array"],
+    ["object",  "Object"],
+    ["function", "Function"],
+    "null",
+    "undefined",
+    "RegExp",
+    "DataView",
+    "Promise",
+    "Generator",
+    "GeneratorFunction",
+    "Proxy",
+    "JSON",
+    "Error",
+    "EvalError",
+    "TypeError",
+    "SyntaxError",
+    "RangeError",
+    "InternalError",
+    "ReferenceError",
+    "URIError",
+    "Reflect",
+    "Date",
+    "Function",
+    "Object",
+    "Array",
+    "ArrayBuffer",
+    "Float32Array",
+    "Float64Array",
+    "Int8Array",
+    "Int16Array",
+    "Int32Array",
+    "Uint8Array",
+    "Uint8ClampedArray",
+    "Uint16Array",
+    "Uint32Array",
+    "TypedArray",
+    "Boolean",
+    "Number",
+    "String",
+    "Intl",
+    "Map",
+    "WeakMap",
+    "Math",
+    "Set",
+    "WeakSet",
+    "Symbol"
+  ];
+
+  var baseUrl = "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/";
+
+  typeNames.forEach(function(typeNameSpec) {
+    var typeName, urlName;
+    if(Array.isArray(typeNameSpec)) {
+      typeName = typeNameSpec[0];
+      urlName  = typeNameSpec[1];
+    } else {
+      typeName = urlName = typeNameSpec;
+    }
+
+    helper.registerLink(typeName, baseUrl + urlName);
+  });
+}
+
 function trimDoubleQuotes(s) {
     var pattern = /^\"(.+)\"$/;
     var m = pattern.exec(s);
