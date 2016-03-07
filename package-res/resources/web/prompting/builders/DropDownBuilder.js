@@ -70,7 +70,7 @@ define(['cdf/components/SelectComponent', './ValueBasedParameterWidgetBuilder', 
       if (args.promptPanel.paramDefn.ignoreBiServer5538 && !args.param.hasSelection()) {
         // If there is no empty selection, and no value is selected, create one. This way, we can represent
         // the unselected state.
-        widget.valuesArray = [['', '']].concat(widget.valuesArray);
+        widget.valuesArray = widget.valuesArray.concat([['', '']]);
       }
 
       $.extend(widget, {
