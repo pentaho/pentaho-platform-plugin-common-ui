@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2016 Pentaho Corporation.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,8 +42,24 @@
  * @class
  * @extends Base
  */
-define(['cdf/lib/Base', '../components/SubmitPromptComponent'],
-    function (Base, SubmitPromptComponent) {
+define(['cdf/lib/Base', '../components/SubmitPromptComponent', 'pentaho/common/Messages'],
+    function (Base, SubmitPromptComponent, Messages) {
+    
+      /*
+       * Gets a message from the messages bundle.
+       *
+       * @name SubmitComponentBuilder#_getMessage
+       * @method
+       *
+       * @param  {String} key String the key in the bundle which references the desired string.
+       * @param  {Array} substitutionVars Array of String (optional) an array of strings
+       * to substitute into the message string.
+       * @returns {String} The message that corresponds to the key.
+       * @private
+       */  
+      var _getMessage = function(key, substitutionVars) {
+        return Messages.getString(key, substitutionVars);
+      }
 
       return Base.extend({
 
@@ -64,8 +80,8 @@ define(['cdf/lib/Base', '../components/SubmitPromptComponent'],
             type: 'SubmitPromptComponent',
             name: guid,
             htmlObject: guid,
-            label: args.promptPanel.getString('submitButtonLabel', 'Submit'),
-            autoSubmitLabel: args.promptPanel.getString('autoSubmitLabel', 'Auto-Submit'),
+            label: _getMessage('submitButtonLabel', 'Submit'),
+            autoSubmitLabel: _getMessage('autoSubmitLabel', 'Auto-Submit'),
             promptPanel: args.promptPanel,
             paramDefn: args.promptPanel.paramDefn,
             executeAtStart: true

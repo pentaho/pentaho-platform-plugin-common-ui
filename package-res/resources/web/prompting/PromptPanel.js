@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2016 Pentaho Corporation.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,11 @@
  */
 define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/util/util', 'common-ui/util/GUIDHelper', './WidgetBuilder', 'cdf/Dashboard.Clean', './parameters/ParameterDefinitionDiffer', 'common-ui/jquery-clean'],
     function (Base, Logger, DojoNumber, i18n, Utils, GUIDHelper, WidgetBuilder, Dashboard, ParamDiff, $) {
+
+      // Add specific prompting message bundle
+      if (pentaho.common.Messages) {
+        pentaho.common.Messages.addUrlBundle('prompting',CONTEXT_PATH+'i18n?plugin=common-ui&name=resources/web/prompting/messages/messages');
+      }
 
       var _STATE_CONSTANTS = {
         readOnlyProperties: ["promptNeeded", "paginate", "totalPages", "showParameterUI", "allowAutoSubmit"],
@@ -595,20 +600,6 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
          */
         getAutoSubmitSetting: function () {
           return this.autoSubmit;
-        },
-
-        /**
-         * Get a localized string for this prompt panel.
-         *
-         * @name PromptPanel#getString
-         * @method
-         * @param {String} key The key
-         * @param {String} defaultString The default value
-         *
-         * @returns {String} The localized string
-         */
-        getString: function (key, defaultString) {
-          return defaultString || '!' + key + '!';
         },
 
         /**
