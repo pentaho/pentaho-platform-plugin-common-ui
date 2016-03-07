@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2016 Pentaho Corporation.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file expect in compliance with the License.
@@ -67,20 +67,6 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
       it("getAutoSubmitSetting", function() {
         var autoSubmit = panel.getAutoSubmitSetting();
         expect(panel.autoSubmit).toBeTruthy();
-      });
-
-      describe("getString", function() {
-        var defaultStr = "default";
-        var key = "key";
-        it("should return default string", function() {
-          var str = panel.getString(key, defaultStr);
-          expect(str).toBe(defaultStr);
-        });
-
-        it("should return key string", function() {
-          var str = panel.getString(key);
-          expect(str).toBe("!" + key + "!");
-        });
       });
 
       it("getParameterName with parameter object", function() {
