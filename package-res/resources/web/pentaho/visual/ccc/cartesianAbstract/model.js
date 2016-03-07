@@ -28,7 +28,7 @@ define([
     return Abstract.extend({
       meta: {
         id: "pentaho/visual/ccc/cartesianAbstract",
-        "abstract": true,
+        isAbstract: true,
 
         props: [
           // Primary axis
@@ -38,7 +38,7 @@ define([
           {
             name: "displayUnits",
             type: displayUnitsFactory,
-            required: true,
+            isRequired: true,
             value: "units_0"
           },
 
@@ -49,7 +49,7 @@ define([
           {
             name: "displayUnitsSecondary",
             type: displayUnitsFactory,
-            required: true,
+            isRequired: true,
             value: "units_0"
           }
         ]

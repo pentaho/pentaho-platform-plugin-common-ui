@@ -484,17 +484,17 @@ define([
         });
       });
 
-      describe("#abstract -", function() {
+      describe("#isAbstract -", function() {
         it("should have the value of the representation type", function() {
           function expectIt(value) {
-            var MySimple = Simple.extend({meta: {abstract: value}});
+            var MySimple = Simple.extend({meta: {isAbstract: value}});
             var MyRefinement = Refinement.extend({
               meta: {
                 of: MySimple.meta
               }
             });
 
-            expect(MyRefinement.meta.abstract).toBe(value);
+            expect(MyRefinement.meta.isAbstract).toBe(value);
           }
 
           expectIt(true);
@@ -503,14 +503,14 @@ define([
 
         it("should not throw if set to the same value", function() {
           function expectIt(value) {
-            var MySimple = Simple.extend({meta: {abstract: value}});
+            var MySimple = Simple.extend({meta: {isAbstract: value}});
             var MyRefinement = Refinement.extend({
               meta: {
                 of: MySimple.meta
               }
             });
 
-            MyRefinement.meta.abstract = value;
+            MyRefinement.meta.isAbstract = value;
           }
 
           expectIt(true);
@@ -519,7 +519,7 @@ define([
 
         it("should throw if set to a different value", function() {
           function expectIt(value) {
-            var MySimple = Simple.extend({meta: {abstract: value}});
+            var MySimple = Simple.extend({meta: {isAbstract: value}});
             var MyRefinement = Refinement.extend({
               meta: {
                 of: MySimple.meta
@@ -527,7 +527,7 @@ define([
             });
 
             expect(function() {
-              MyRefinement.meta.abstract = !value;
+              MyRefinement.meta.isAbstract = !value;
             }).toThrow(errorMatch.operInvalid());
           }
 
@@ -536,7 +536,7 @@ define([
         });
       });
 
-      describe("#list -", function() {
+      describe("#isList -", function() {
         it("should be false when the representation type is an element type", function() {
           var MySimple = Simple.extend();
           var MyRefinement = Refinement.extend({
@@ -545,7 +545,7 @@ define([
             }
           });
 
-          expect(MyRefinement.meta.list).toBe(false);
+          expect(MyRefinement.meta.isList).toBe(false);
         });
 
         it("should be true when the representation type is a list type", function() {
@@ -556,13 +556,13 @@ define([
             }
           });
 
-          expect(MyRefinement.meta.list).toBe(true);
+          expect(MyRefinement.meta.isList).toBe(true);
         });
       });
 
-      describe("#refinement -", function() {
+      describe("#isRefinement -", function() {
         it("should return the value `true`", function() {
-          expect(Refinement.meta.refinement).toBe(true);
+          expect(Refinement.meta.isRefinement).toBe(true);
         });
       });
 
@@ -1003,72 +1003,72 @@ define([
         });
       }); // end #helpUrl
 
-      describe("#browsable -", function() {
+      describe("#isBrowsable -", function() {
         it("should default to the value of the representation type", function() {
-          var MySimple = Simple.extend({meta: {browsable: false}});
+          var MySimple = Simple.extend({meta: {isBrowsable: false}});
           var MyRefinement = Refinement.extend({
             meta: {
               of: MySimple.meta
             }
           });
 
-          expect(MyRefinement.meta.browsable).toBe(MySimple.meta.browsable);
+          expect(MyRefinement.meta.isBrowsable).toBe(MySimple.meta.isBrowsable);
         });
 
         it("should respect a specified value", function() {
-          var MySimple = Simple.extend({meta: {browsable: false}});
+          var MySimple = Simple.extend({meta: {isBrowsable: false}});
           var MyRefinement = Refinement.extend({
             meta: {
-              browsable: true,
+              isBrowsable: true,
               of: MySimple.meta
             }
           });
 
-          expect(MyRefinement.meta.browsable).toBe(true);
+          expect(MyRefinement.meta.isBrowsable).toBe(true);
         });
 
         it("should inherit the value of the base refinement", function() {
-          var MySimple = Simple.extend({meta: {browsable: false}});
+          var MySimple = Simple.extend({meta: {isBrowsable: false}});
           var R1 = Refinement.extend({
             meta: {
-              browsable: true,
+              isBrowsable: true,
               of: MySimple.meta
             }
           });
           var R2 = R1.extend();
 
-          expect(R2.meta.browsable).toBe(true);
+          expect(R2.meta.isBrowsable).toBe(true);
         });
 
         it("should respect a specified value when it also has a base refinement", function() {
-          var MySimple = Simple.extend({meta: {browsable: true}});
+          var MySimple = Simple.extend({meta: {isBrowsable: true}});
           var R1 = Refinement.extend({
             meta: {
-              browsable: true,
+              isBrowsable: true,
               of: MySimple.meta
             }
           });
-          var R2 = R1.extend({meta: {browsable: false}});
+          var R2 = R1.extend({meta: {isBrowsable: false}});
 
-          expect(R2.meta.browsable).toBe(false);
+          expect(R2.meta.isBrowsable).toBe(false);
         });
 
         it("should fallback to the base value when set to nully", function() {
           function expectIt(newValue) {
-            var MySimple = Simple.extend({meta: {browsable: true}});
+            var MySimple = Simple.extend({meta: {isBrowsable: true}});
             var R1 = Refinement.extend({
               meta: {
-                browsable: true,
+                isBrowsable: true,
                 of: MySimple.meta
               }
             });
-            var R2 = R1.extend({meta: {browsable: false}});
+            var R2 = R1.extend({meta: {isBrowsable: false}});
 
-            expect(R2.meta.browsable).toBe(false);
+            expect(R2.meta.isBrowsable).toBe(false);
 
-            R2.meta.browsable = newValue;
+            R2.meta.isBrowsable = newValue;
 
-            expect(R2.meta.browsable).toBe(true);
+            expect(R2.meta.isBrowsable).toBe(true);
           }
 
           expectIt(undefined);
@@ -1077,19 +1077,19 @@ define([
 
         it("should fallback to the value of the representation type when set to nully", function() {
           function expectIt(newValue) {
-            var MySimple = Simple.extend({meta: {browsable: false}});
+            var MySimple = Simple.extend({meta: {isBrowsable: false}});
             var R1 = Refinement.extend({
               meta: {
-                browsable: true,
+                isBrowsable: true,
                 of: MySimple.meta
               }
             });
 
-            expect(R1.meta.browsable).toBe(true);
+            expect(R1.meta.isBrowsable).toBe(true);
 
-            R1.meta.browsable = newValue;
+            R1.meta.isBrowsable = newValue;
 
-            expect(R1.meta.browsable).toBe(false);
+            expect(R1.meta.isBrowsable).toBe(false);
           }
 
           expectIt(undefined);
@@ -1097,78 +1097,78 @@ define([
         });
 
         it("should not delete the root value", function() {
-          Refinement.meta.browsable = undefined;
-          expect(Refinement.meta.hasOwnProperty("_browsable"));
+          Refinement.meta.isBrowsable = undefined;
+          expect(Refinement.meta.hasOwnProperty("_isBrowsable"));
         });
-      }); // end #browsable
+      }); // end #isBrowsable
 
-      describe("#advanced -", function() {
+      describe("#isAdvanced -", function() {
         it("should default to the value of the representation type", function() {
-          var MySimple = Simple.extend({meta: {advanced: true}});
+          var MySimple = Simple.extend({meta: {isAdvanced: true}});
           var MyRefinement = Refinement.extend({
             meta: {
               of: MySimple.meta
             }
           });
 
-          expect(MyRefinement.meta.advanced).toBe(MySimple.meta.advanced);
+          expect(MyRefinement.meta.isAdvanced).toBe(MySimple.meta.isAdvanced);
         });
 
         it("should respect a specified value", function() {
-          var MySimple = Simple.extend({meta: {advanced: true}});
+          var MySimple = Simple.extend({meta: {isAdvanced: true}});
           var MyRefinement = Refinement.extend({
             meta: {
-              advanced: false,
+              isAdvanced: false,
               of: MySimple.meta
             }
           });
 
-          expect(MyRefinement.meta.advanced).toBe(false);
+          expect(MyRefinement.meta.isAdvanced).toBe(false);
         });
 
         it("should inherit the value of the base refinement", function() {
-          var MySimple = Simple.extend({meta: {advanced: true}});
+          var MySimple = Simple.extend({meta: {isAdvanced: true}});
           var R1 = Refinement.extend({
             meta: {
-              advanced: false,
+              isAdvanced: false,
               of: MySimple.meta
             }
           });
           var R2 = R1.extend();
 
-          expect(R2.meta.advanced).toBe(false);
+          expect(R2.meta.isAdvanced).toBe(false);
         });
 
         it("should respect a specified value when it also has a base refinement", function() {
-          var MySimple = Simple.extend({meta: {advanced: false}});
+          var MySimple = Simple.extend({meta: {isAdvanced: false}});
           var R1 = Refinement.extend({
             meta: {
-              advanced: false,
+              isAdvanced: false,
               of: MySimple.meta
             }
           });
-          var R2 = R1.extend({meta: {advanced: true}});
+          var R2 = R1.extend({meta: {isAdvanced: true}});
 
-          expect(R2.meta.advanced).toBe(true);
+          expect(R2.meta.isAdvanced).toBe(true);
         });
 
         it("should fallback to the base value when set to nully", function() {
 
           function expectIt(newValue) {
-            var MySimple = Simple.extend({meta: {advanced: false}});
+            var MySimple = Simple.extend({meta: {isAdvanced: false}});
             var R1 = Refinement.extend({
               meta: {
-                advanced: false,
+                isAdvanced: false,
                 of: MySimple.meta
               }
             });
-            var R2 = R1.extend({meta: {advanced: true}});
+            var R2 = R1.extend({meta: {isAdvanced: true}});
 
-            expect(R2.meta.advanced).toBe(true);
+            expect(R2.meta.isAdvanced).toBe(true);
 
-            R2.meta.advanced = newValue;
+            R2.meta.isAdvanced = newValue;
 
-            expect(R2.meta.advanced).toBe(false);
+            expect(R2.meta.isAdvanced).toBe(false);
           }
 
           expectIt(undefined);
@@ -1177,19 +1177,19 @@ define([
 
         it("should fallback to the value of the representation type when set to nully", function() {
           function expectIt(newValue) {
-            var MySimple = Simple.extend({meta: {advanced: true}});
+            var MySimple = Simple.extend({meta: {isAdvanced: true}});
             var R1 = Refinement.extend({
               meta: {
-                advanced: false,
+                isAdvanced: false,
                 of: MySimple.meta
               }
             });
 
-            expect(R1.meta.advanced).toBe(false);
+            expect(R1.meta.isAdvanced).toBe(false);
 
-            R1.meta.advanced = newValue;
+            R1.meta.isAdvanced = newValue;
 
-            expect(R1.meta.advanced).toBe(true);
+            expect(R1.meta.isAdvanced).toBe(true);
           }
 
           expectIt(undefined);
@@ -1197,10 +1197,10 @@ define([
         });
 
         it("should not delete the root value", function() {
-          Refinement.meta.advanced = undefined;
-          expect(Refinement.meta.hasOwnProperty("_advanced"));
+          Refinement.meta.isAdvanced = undefined;
+          expect(Refinement.meta.hasOwnProperty("_isAdvanced"));
         });
-      }); // end #advanced
+      }); // end #isAdvanced
 
       describe("#ordinal -", function() {
         it("should default to the value of the representation type", function() {

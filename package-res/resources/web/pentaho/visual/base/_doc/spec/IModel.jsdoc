@@ -23,7 +23,7 @@
  *
  * @property {!number} width - Width of the visualization, in pixels.
  * @property {!number} height - Height of the visualization, in pixels.
- * @property {boolean} [interactive=true] - Specifies the usage intention of the visualization,
+ * @property {boolean} [isInteractive=true] - Specifies the usage intention of the visualization,
  * namely if the interactive mode is enabled or not.
  * @property {!pentaho.data.Table} data - Object containing the data to be displayed.
  *

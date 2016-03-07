@@ -41,21 +41,21 @@ define([
           props: [
             {
               name: "rows",
-              required: true
+              isRequired: true
             },
             {
               name: "x",
               type: "string",
               dataType: "number",
               isVisualRole: true,
-              required: true
+              isRequired: true
             },
             {
               name: "y",
               type: "string",
               dataType: "number",
               isVisualRole: true,
-              required: true
+              isRequired: true
             },
             {
               name: "color",
@@ -75,7 +75,7 @@ define([
               type: ["string"],
               dataType: "string",
               isVisualRole: true,
-              required: false
+              isRequired: false
             },
 
             {
@@ -84,7 +84,7 @@ define([
                 base: labelsOptionFactory,
                 domain: ["none", "center", "left", "right", "top", "bottom"]
               },
-              required: true,
+              isRequired: true,
               value: "none"
             }
           ]

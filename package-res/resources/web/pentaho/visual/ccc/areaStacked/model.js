@@ -42,21 +42,21 @@ define([
               type: ["string"],
               dataType: "string",
               isVisualRole: true,
-              required: false
+              isRequired: false
             },
             {
               name: "measures",
               type: ["string"],
               dataType: "number",
               isVisualRole: true,
-              required: true
+              isRequired: true
             },
             {
               name: "multi",
               type: ["string"],
               dataType: "string",
               isVisualRole: true,
-              required: false
+              isRequired: false
             },
             {
               name: "labelsOption",
@@ -64,7 +64,7 @@ define([
                 base: labelsOptionFactory,
                 domain: ["none", "center", "left", "right", "top", "bottom"]
               },
-              required: true,
+              isRequired: true,
               value: "none"
             }
           ]

@@ -25,7 +25,7 @@ define([
       {
         name: "emptyCellMode",
         type: emptyCellModeFactory,
-        required: true,
+        isRequired: true,
         value: "gap"
       }
     ]

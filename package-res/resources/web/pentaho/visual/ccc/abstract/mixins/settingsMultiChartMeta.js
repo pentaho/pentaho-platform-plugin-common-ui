@@ -28,19 +28,19 @@ define([
       {
         name:  "maxChartsPerRow",
         type:  maxChartsPerRowFactory,
-        required: true,
+        isRequired: true,
         value: 3
       },
       {
         name: "multiChartRangeScope",
         type: multiChartRangeScopeFactory,
-        required: true,
+        isRequired: true,
         value: "global"
       },
       {
         name: "multiChartOverflow",
         type: multiChartOverflowFactory,
-        required: true,
+        isRequired: true,
         value: "grow"
       }
     ]

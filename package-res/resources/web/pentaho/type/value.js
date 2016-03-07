@@ -37,8 +37,8 @@ define([
      * @extends pentaho.type.Item.Meta
      *
      * @classDesc The base type class of value types.</br>
-     * Value types can be singular or plural ({@link pentaho.type.Value.Meta#list|list}).</br>
-     * A Value type should not be instantiated if it is {@link pentaho.type.Value.Meta#abstract|abstract}.
+     * Value types can be singular or plural ({@link pentaho.type.Value.Meta#isList|isList}).</br>
+     * A Value type should not be instantiated if it is {@link pentaho.type.Value.Meta#isAbstract|abstract}.
      *
      * For more information see {@link pentaho.type.Value}.
      */
@@ -182,7 +182,7 @@ define([
           this.base.apply(this, arguments);
 
           // Block inheritance, with default values
-          this._abstract = false;
+          this._isAbstract = false;
         },
 
         id: module.id,
@@ -195,26 +195,26 @@ define([
          *
          * The `Value` class return `undefined`.
          *
-         * @name list
+         * @name isList
          * @memberOf pentaho.type.Value.Meta#
          * @type boolean
          * @readOnly
          */
-        get list() {},
+        get isList() {},
         //endregion
 
-        //region refinement property
+        //region isRefinement property
         /**
          * Gets a value that indicates if this type is a refinement type.
          *
          * The `Value` class return `undefined`.
          *
-         * @name refinement
+         * @name isRefinement
          * @memberOf pentaho.type.Value.Meta#
          * @type boolean
          * @readOnly
          */
-        get refinement() {},
+        get isRefinement() {},
         //endregion
 
         //region context property
@@ -232,13 +232,13 @@ define([
         },
         //endregion
 
-        //region abstract property
+        //region isAbstract property
         // @type boolean
         // -> boolean, Optional(false)
 
         // Default value is for `Value.Meta` only.
         // @see Value.Meta#constructor.
-        _abstract: true,
+        _isAbstract: true,
 
         /**
          * Gets or sets a value that indicates if this type is abstract.
@@ -246,15 +246,13 @@ define([
          * @type {boolean}
          * @default false
          */
-        // TODO: Rhino probably gives a syntax error on this.
-        // However, cannot use the `get "abstract"()` syntax cause then Phantom JS 1.9.8 starts failing
-        get abstract() {
-          return this._abstract;
+        get isAbstract() {
+          return this._isAbstract;
         },
 
-        set abstract(value) {
+        set isAbstract(value) {
           // nully is reset, which is false, so !! works well.
-          this._abstract = !!value;
+          this._isAbstract = !!value;
         },
         //endregion
 
@@ -357,7 +355,7 @@ define([
          * that refers to a type that is not a subtype of this type.
          *
          * @throws {pentaho.lang.OperationInvalidError} When the determined type for the specified `instSpec`
-         * is not an [abstract]{@link pentaho.type.Value.Meta#abstract} type.
+         * is not an [abstract]{@link pentaho.type.Value.Meta#isAbstract} type.
          */
         create: function(instSpec) {
           // All value types have own constructors.
@@ -396,13 +394,13 @@ define([
 
             Type = this.context.get(typeSpec);
 
-            if(this._assertSubtype(Type.meta).abstract) Type.meta._throwAbstractType();
+            if(this._assertSubtype(Type.meta).isAbstract) Type.meta._throwAbstractType();
 
             // ugly but "efficient"
             delete instSpec._;
 
           } else {
-            if(this.abstract) this._throwAbstractType();
+            if(this.isAbstract) this._throwAbstractType();
 
             Type = this.mesa.constructor;
           }

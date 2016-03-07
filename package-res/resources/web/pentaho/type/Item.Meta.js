@@ -363,7 +363,7 @@ define([
      * thus ignoring any inherited value.
      *
      * @type {?nonEmptyString}
-     * @see pentaho.type.Item.Meta#browsable
+     * @see pentaho.type.Item.Meta#isBrowsable
      * @see pentaho.type.Item.Meta#ordinal
      */
     get category() {
@@ -425,15 +425,15 @@ define([
     },
     //endregion
 
-    //region browsable property
+    //region isBrowsable property
     // @type boolean
     // -> boolean, Optional(true), Inherited, Configurable
     // undefined or null -> resets
 
-    _browsable: true,
+    _isBrowsable: true,
 
     /**
-     * Gets or sets the `browsable` attribute of this type.
+     * Gets or sets the `isBrowsable` attribute of this type.
      *
      * Browsable items are exposed to the end user.
      * Set this attribute to `false` to prevent exposing the item in a user interface.
@@ -443,35 +443,35 @@ define([
      *
      * @type {boolean}
      */
-    get browsable() {
-      return this._browsable;
+    get isBrowsable() {
+      return this._isBrowsable;
     },
 
-    set browsable(value) {
+    set isBrowsable(value) {
       if(value == null) {
-        this._resetBrowsable();
+        this._resetIsBrowsable();
       } else {
-        this._browsable = !!value;
+        this._isBrowsable = !!value;
       }
     },
 
-    _resetBrowsable: function() {
+    _resetIsBrowsable: function() {
       if(this !== _itemMeta) {
-        delete this._browsable;
+        delete this._isBrowsable;
       }
     },
     //endregion
 
-    //region advanced property
+    //region isAdvanced property
     // @type boolean
     // -> boolean, Optional(false), Inherited, Configurable
     // null || undefined -> reset
-    _advanced: false,
+    _isAdvanced: false,
 
     /**
-     * Gets or sets the `advanced` attribute of this type.
+     * Gets or sets the `isAdvanced` attribute of this type.
      *
-     * Items with `advanced` attributes set to `false` are typically immediately accessible to the user.
+     * Items with `isAdvanced` attributes set to `false` are typically immediately accessible to the user.
      * An advanced item typically escapes the expected flow of utilization, yet it is
      * sufficiently relevant to be shown in a user interface.
      *
@@ -479,23 +479,23 @@ define([
      * except for the root type _Item_ (which has no ancestor), where the attribute is `false`.
      *
      * @type {boolean}
-     * @see pentaho.type.Item.Meta#browsable
+     * @see pentaho.type.Item.Meta#isBrowsable
      */
-    get advanced() {
-      return this._advanced;
+    get isAdvanced() {
+      return this._isAdvanced;
     },
 
-    set advanced(value) {
+    set isAdvanced(value) {
       if(value == null) {
-        this._resetAdvanced();
+        this._resetIsAdvanced();
       } else {
-        this._advanced = !!value;
+        this._isAdvanced = !!value;
       }
     },
 
-    _resetAdvanced: function() {
+    _resetIsAdvanced: function() {
       if(this !== _itemMeta) {
-        delete this._advanced;
+        delete this._isAdvanced;
       }
     },
     //endregion
@@ -548,7 +548,7 @@ define([
      * except for the root type _Item_ (which has no ancestor), where the attribute is `0`.
      *
      * @type {integer}
-     * @see pentaho.type.Item.Meta#browsable
+     * @see pentaho.type.Item.Meta#isBrowsable
      * @see pentaho.type.Item.Meta#category
      */
     get ordinal() {

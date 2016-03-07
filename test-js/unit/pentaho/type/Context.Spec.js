@@ -643,7 +643,7 @@ define([
 
         define("exp/bar", ["pentaho/type/simple"], function(simpleFactory) {
           return function(context) {
-            return context.get(simpleFactory).extend({meta: {id: "exp/bar", browsable: false}});
+            return context.get(simpleFactory).extend({meta: {id: "exp/bar", isBrowsable: false}});
           };
         });
 
@@ -718,11 +718,11 @@ define([
             });
       }));
 
-      it("should return all registered Types that satisfy the browsable filter", withContext(function(Context) {
+      it("should return all registered Types that satisfy the isBrowsable filter", withContext(function(Context) {
         var context  = new Context();
 
         return context
-            .getAllAsync("exp/thing", {"browsable": true})
+            .getAllAsync("exp/thing", {"isBrowsable": true})
             .then(function(InstCtors) {
               expect(InstCtors instanceof Array).toBe(true);
               expect(InstCtors.length).toBe(1);

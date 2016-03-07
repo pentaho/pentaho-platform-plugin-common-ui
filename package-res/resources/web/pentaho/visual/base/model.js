@@ -49,27 +49,27 @@ define([
           meta: {
             id: "pentaho/visual/base",
             view: "View",
-            "abstract": true,
+            isAbstract: true,
             props: [
               {
                 name: "width",
                 type: "number",
-                required: true
+                isRequired: true
               },
               {
                 name: "height",
                 type: "number",
-                required: true
+                isRequired: true
               },
               {
-                name: "interactive",
+                name: "isInteractive",
                 type: "boolean",
                 value: true
               },
               {
                 name: "data",
                 type: "object",
-                required: true
+                isRequired: true
               }
             ]
           }

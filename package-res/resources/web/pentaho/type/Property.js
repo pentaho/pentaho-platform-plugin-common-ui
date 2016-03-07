@@ -248,8 +248,8 @@ define([
        * @type boolean
        * @readonly
        */
-      get list() {
-        return this._typeMeta.list;
+      get isList() {
+        return this._typeMeta.isList;
       },
       //endregion
 
@@ -270,7 +270,7 @@ define([
        */
       get elemType() {
         var type = this._typeMeta;
-        return type.list ? type.of : type;
+        return type.isList ? type.of : type;
       },
       //endregion
 
@@ -398,7 +398,7 @@ define([
       _freshDefaultValue: function() {
         var value = this.value;
         return value     ? value.clone()      :
-               this.list ? this.type.create() :
+               this.isList ? this.type.create() :
                value;
       },
       //endregion
@@ -441,7 +441,7 @@ define([
       validate: function(owner) {
         var errors = null;
 
-        if(this.applicableEval(owner)) {
+        if(this.isApplicableEval(owner)) {
           var addErrors = function(newErrors) {
               errors = valueHelper.combineErrors(errors, newErrors);
             };
@@ -456,10 +456,10 @@ define([
           }
 
           var range = this.countRangeEval(owner),
-              count = this.list ? value.count : (value ? 1 : 0);
+              count = this.isList ? value.count : (value ? 1 : 0);
 
           if(count < range.min) {
-            if(this.list) {
+            if(this.isList) {
               addErrors(new Error(bundle.format(
                   bundle.structured.errors.property.countOutOfRange,
                   [this.label, count, range.min, range.max])));
@@ -569,13 +569,13 @@ define([
     meta: /** @lends pentaho.type.Property.Meta# */{
       attrs: {
         /**
-         * Evaluates the value of the `required` attribute of this property
+         * Evaluates the value of the `isRequired` attribute of this property
          * on a given owner complex value.
          *
-         * @name requiredEval
+         * @name isRequiredEval
          * @memberOf pentaho.type.Property.Meta#
          * @param {pentaho.type.Complex} owner The complex value that owns the property.
-         * @return {boolean} The evaluated value of the `required` attribute.
+         * @return {boolean} The evaluated value of the `isRequired` attribute.
          * @ignore
          */
 
@@ -590,7 +590,7 @@ define([
          *
          * A _required_ property must have at least one value.
          *
-         * The _effective `required` attribute value_ is the
+         * The _effective `isRequired` attribute value_ is the
          * disjunction (_or_) between the locally specified value and
          * the evaluated value inherited from its ancestor.
          *
@@ -599,14 +599,14 @@ define([
          *
          * Setting the attribute to `null` or `undefined` clears the local value.
          *
-         * The default, root `required` attribute value is `false`.
+         * The default, root `isRequired` attribute value is `false`.
          *
-         * @name required
+         * @name isRequired
          * @memberOf pentaho.type.Property.Meta#
          * @type null | boolean | pentaho.type.PropertyDynamicAttribute.<boolean>
-         * @see pentaho.type.Complex#required
+         * @see pentaho.type.Complex#isRequired
          */
-        required: {
+        isRequired: {
           value: false,
           cast:  Boolean,
           combine: function(baseEval, localEval) {
@@ -714,13 +714,13 @@ define([
         },
 
         /**
-         * Evaluates the value of the `applicable` attribute of this property
+         * Evaluates the value of the `isApplicable` attribute of this property
          * on a given owner complex value.
          *
          * @name applicableEval
          * @memberOf pentaho.type.Property.Meta#
          * @param {pentaho.type.Complex} owner The complex value that owns the property.
-         * @return {boolean} The evaluated value of the `applicable` attribute.
+         * @return {boolean} The evaluated value of the `isApplicable` attribute.
          * @ignore
          */
 
@@ -733,21 +733,21 @@ define([
          * 3. inheritance takes place only when the attribute is evaluated
          *    in the context of a given complex instance.
          *
-         * The _effective `applicable` attribute value_ is the
+         * The _effective `isApplicable` attribute value_ is the
          * conjunction (_and_) between the locally specified value and
          * the evaluated value inherited from its ancestor.
          *
          * Setting the attribute to `null` or `undefined` clears the local value.
          *
-         * The default, root `applicable` attribute value is `true`.
+         * The default, root `isApplicable` attribute value is `true`.
          *
          * @name applicable
          * @memberOf pentaho.type.Property.Meta#
          *
          * @type null | boolean | pentaho.type.PropertyDynamicAttribute.<boolean>
-         * @see pentaho.type.Complex#applicable
+         * @see pentaho.type.Complex#isApplicable
          */
-        applicable: {
+        isApplicable: {
           value: true,
           cast:  Boolean,
           combine: function(baseEval, localEval) {
@@ -759,13 +759,13 @@ define([
         },
 
         /**
-         * Evaluates the value of the `readOnly` attribute of this property
+         * Evaluates the value of the `isReadOnly` attribute of this property
          * on a given owner complex value.
          *
-         * @name readOnlyEval
+         * @name isReadOnlyEval
          * @memberOf pentaho.type.Property.Meta#
          * @param {pentaho.type.Complex} owner The complex value that owns the property.
-         * @return {boolean} The evaluated value of the `readOnly` attribute.
+         * @return {boolean} The evaluated value of the `isReadOnly` attribute.
          * @ignore
          */
 
@@ -781,20 +781,20 @@ define([
          * A property should be considered read-only whenever its value is implied/imposed somehow
          * and thus cannot not be changed, directly, by the user.
          *
-         * The _effective `readOnly` attribute value_ is the
+         * The _effective `isReadOnly` attribute value_ is the
          * disjunction (_or_) between the locally specified value and
          * the evaluated value inherited from its ancestor.
          *
          * Setting the attribute to `null` or `undefined` clears the local value.
          *
-         * The default, root `readOnly` attribute value is `false`.
+         * The default, root `isReadOnly` attribute value is `false`.
          *
-         * @name readOnly
+         * @name isReadOnly
          * @memberOf pentaho.type.Property.Meta#
          * @type null | boolean | pentaho.type.PropertyDynamicAttribute.<boolean>
-         * @see pentaho.type.Complex#readOnly
+         * @see pentaho.type.Complex#isReadOnly
          */
-        readOnly: {
+        isReadOnly: {
           value: false,
           cast:  Boolean,
           combine: function(baseEval, localEval) {
@@ -813,8 +813,8 @@ define([
        * The _effective value count range_ is a conciliation
        * of the _effective value_ of the attributes:
        *
-       * * {@link pentaho.type.Property.Meta#list}
-       * * {@link pentaho.type.Property.Meta#required}
+       * * {@link pentaho.type.Property.Meta#isList}
+       * * {@link pentaho.type.Property.Meta#isRequired}
        * * {@link pentaho.type.Property.Meta#countMin}
        * * {@link pentaho.type.Property.Meta#countMax}
        *
@@ -837,13 +837,13 @@ define([
        * }
        * ```
        *
-       * When the property is _not_ a {@link pentaho.type.Property#list} property,
+       * When the property is _not_ a {@link pentaho.type.Property#isList} property,
        * the value can only either be zero or one.
        *
        * If the property is _not_ a _list_ property,
        * both the minimum and the maximum can only be either zero or one.
        *
-       * If `required` is true, then the minimum must be greater than or equal to one.
+       * If `isRequired` is true, then the minimum must be greater than or equal to one.
        *
        * The `countMax` value is constrained to be greater than or equal to the minimum.
        *
@@ -853,16 +853,16 @@ define([
        * @see pentaho.type.Complex#countRange
        */
       countRangeEval: function(owner) {
-        var required = this.requiredEval(owner),
+        var isRequired = this.isRequiredEval(owner),
             countMin = this.countMinEval(owner),
             countMax = this.countMaxEval(owner);
 
-        if(!this.list) {
+        if(!this.isList) {
           if(countMin > 1) countMin = 1;
           if(countMax > 1) countMax = 1;
         }
 
-        if(required && countMin < 1) countMin = 1;
+        if(isRequired && countMin < 1) countMin = 1;
 
         if(countMax < countMin) countMax = countMin;
 

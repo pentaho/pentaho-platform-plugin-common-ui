@@ -280,7 +280,7 @@ define([
           .forEach(function(roleName) {
             if(this[roleName]) {
               var value = model.getv(roleName);
-              visualMap[roleName] = model.meta.get(roleName).list
+              visualMap[roleName] = model.meta.get(roleName).isList
                   ? value.toArray(function(elem) { return elem.value; })
                   : [value];
             }
@@ -812,7 +812,7 @@ define([
       options.axisFont = util.defaultFont(options.axisFont, 12);
       options.axisTitleFont = util.defaultFont(options.axisTitleFont, 12);
 
-      if(!model.getv("interactive")) {
+      if(!model.getv("isInteractive")) {
         options.interactive = false;
       } else {
         if(options.tooltipEnabled) this._configureTooltip();

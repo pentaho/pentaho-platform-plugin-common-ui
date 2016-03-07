@@ -29,12 +29,12 @@ define([
           {
             name: "levels",
             type: ["string"],
-            required: true,
+            isRequired: true,
             isVisualRole: true
           },
           {
             name: "measure",
-            required: true,
+            isRequired: true,
             isVisualRole: true
           },
           {
