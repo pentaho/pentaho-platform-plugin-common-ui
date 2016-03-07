@@ -15,20 +15,17 @@
  */
 define([
   "../../lang/Base",
-  "../../util/arg",
-  "./_apply",
-  "require"
-], function(Base, arg, _apply, require) {
+  "./_apply"
+], function(Base, _apply) {
   "use strict";
 
-  var Or, And, Not;
   /**
    * @name AbstractFilter
    * @memberOf pentaho.data.filter
+   *
    * @class
    * @extends pentaho.lang.Base
    * @abstract
-   * @amd pentaho/data/filter/AbstractFilter
    *
    * @classdesc The (abstract) base class for filters that represent subsets of a particular
    * {@link pentaho.data.Table} object.
@@ -59,44 +56,6 @@ define([
      * @ignore
      */
     _op: null,
-
-    /**
-     * Returns the inverse of this filter.
-     *
-     * @return {!pentaho.data.filter.Not} A filter that is the inverse of this filter.
-     */
-    invert: function() {
-      if(!Not) Not = require("./Not");
-      return new Not(this);
-    },
-
-    /**
-     * Returns the union between this filter and a variable number of other filters.
-     *
-     * @param {...pentaho.data.filter.AbstractFilter} filters - One or more filters to be added to the union operation.
-     * @return {!pentaho.data.filter.Or} A filter that is the union of this filter with a series of other filters.
-     */
-    or: function() {
-      if(!arguments.length) return this;
-      var args = arg.slice(arguments);
-      args.unshift(this);
-      if(!Or) Or = require("./Or");
-      return new Or(args);
-    },
-
-    /**
-     * Returns the intersection between this filter and a variable number of other filters.
-     *
-     * @param {...pentaho.data.filter.AbstractFilter} filters - One or more filters to be added to the intersection operation.
-     * @return {!pentaho.data.filter.And} A filter that is the intersection of this filter with a series of other filters.
-     */
-    and: function() {
-      if(!arguments.length) return this;
-      var args = arg.slice(arguments);
-      args.unshift(this);
-      if(!And) And = require("./And");
-      return new And(args);
-    },
 
     /**
      * Determines if an element belongs to the set defined by this filter.

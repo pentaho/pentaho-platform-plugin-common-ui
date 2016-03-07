@@ -21,10 +21,10 @@ define([
   /**
    * @name AbstractPropertyFilter
    * @memberOf pentaho.data.filter
+   *
    * @class
    * @extends pentaho.data.filter.AbstractFilter
    * @abstract
-   * @amd pentaho/data/filter/AbstractPropertyFilter
    *
    * @classdesc A base class that filters elements in a set
    * by matching the value of a given property against a criteria/condition.

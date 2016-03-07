@@ -22,44 +22,48 @@ define([
   /**
    * @name Not
    * @memberOf pentaho.data.filter
+   *
    * @class
-   * @throws When `operand` is not specified.
    * @extends pentaho.data.filter.AbstractFilter
-   * @amd pentaho/data/filter/Not
    *
    * @classdesc A filter that implements the boolean inversion of another filter.
    *
    * @example
    * <caption> Create a new <code>Not</code> filter.</caption>
    *
-   * require(["pentaho/data/Table", "pentaho/data/filter/IsEqual", "pentaho/data/filter/Not"], function(Table, IsEqual, Not) {
+   * require(["pentaho/data/Table", "pentaho/data/filter"], function(Table, filter) {
    *   var data = new Table({
    *     model: [
-   *       {name: "product", type: "string", label: "Product"},
-   *       {name: "sales", type: "number", label: "Sales"},
+   *       {name: "product", type: "string",  label: "Product"},
+   *       {name: "sales",   type: "number",  label: "Sales"},
    *       {name: "inStock", type: "boolean", label: "In Stock"}
    *     ],
    *     rows: [
    *       {c: [{v: "A"}, {v: 12000}, {v: true}]},
-   *       {c: [{v: "B"}, {v: 6000}, {v: true}]},
+   *       {c: [{v: "B"}, {v: 6000},  {v: true}]},
    *       {c: [{v: "C"}, {v: 12000}, {v: false}]},
-   *       {c: [{v: "D"}, {v: 1000}, {v: false}]},
-   *       {c: [{v: "E"}, {v: 2000}, {v: false}]},
-   *       {c: [{v: "F"}, {v: 3000}, {v: false}]},
-   *       {c: [{v: "G"}, {v: 4000}, {v: false}]}
+   *       {c: [{v: "D"}, {v: 1000},  {v: false}]},
+   *       {c: [{v: "E"}, {v: 2000},  {v: false}]},
+   *       {c: [{v: "F"}, {v: 3000},  {v: false}]},
+   *       {c: [{v: "G"}, {v: 4000},  {v: false}]}
    *     ]
    *   });
    *
-   *
-   *  var sales12k = new IsEqual("sales", 12000);
-   *  var inStock = new IsEqual("inStock", true);
+   *  var sales12k = new filter.IsEqual("sales", 12000);
    *  var filter = new Not(sales12k);
-   *  filter.and(inStock);
-   *  var data = filter.apply(data); //data.getValue(0, 0) === "B"
+   *
+   *   var filteredData = myFilter.apply(data);
+   *   //filteredData.getValue(0, 0) === "B"
+   *   //filteredData.getValue(1, 0) === "D"
+   *   //filteredData.getValue(2, 0) === "E"
+   *   //filteredData.getValue(3, 0) === "F"
+   *   //filteredData.getValue(4, 0) === "G"
+   *
    * });
    *
    *
-   * @description Creates a `Not` filter given another filter (an instance of a descendant of {@link pentaho.data.filter.AbstractFilter}).
+   * @description Creates a `Not` filter given another filter
+   * (an instance of a descendant of {@link pentaho.data.filter.AbstractFilter}).
    *
    * @param {!pentaho.data.filter.AbstractFilter} operand - The filter to be inverted.
    */

@@ -22,38 +22,37 @@ define([
   /**
    * @name IsEqual
    * @memberOf pentaho.data.filter
+   *
    * @class
    * @extends pentaho.data.filter.AbstractPropertyFilter
-   * @amd pentaho/data/filter/IsEqual
    *
    * @classdesc A filter that defines the set of items having the value of a property equal to a certain value.
    *
    * @example
    * <caption> Create a new <code>IsEqual</code> filter.</caption>
    *
-   * require(["pentaho/data/Table", "pentaho/data/filter/IsEqual"], function(Table, IsEqual) {
+   * require(["pentaho/data/Table", "pentaho/data/filter"], function(Table, filter) {
    *   var data = new Table({
    *     model: [
-   *       {name: "product", type: "string", label: "Product"},
-   *       {name: "sales", type: "number", label: "Sales"},
+   *       {name: "product", type: "string",  label: "Product"},
+   *       {name: "sales",   type: "number",  label: "Sales"},
    *       {name: "inStock", type: "boolean", label: "In Stock"}
    *     ],
    *     rows: [
    *       {c: [{v: "A"}, {v: 12000}, {v: true}]},
-   *       {c: [{v: "B"}, {v: 6000}, {v: true}]},
+   *       {c: [{v: "B"}, {v: 6000},  {v: true}]},
    *       {c: [{v: "C"}, {v: 12000}, {v: false}]},
-   *       {c: [{v: "D"}, {v: 1000}, {v: false}]},
-   *       {c: [{v: "E"}, {v: 2000}, {v: false}]},
-   *       {c: [{v: "F"}, {v: 3000}, {v: false}]},
-   *       {c: [{v: "G"}, {v: 4000}, {v: false}]}
+   *       {c: [{v: "D"}, {v: 1000},  {v: false}]},
+   *       {c: [{v: "E"}, {v: 2000},  {v: false}]},
+   *       {c: [{v: "F"}, {v: 3000},  {v: false}]},
+   *       {c: [{v: "G"}, {v: 4000},  {v: false}]}
    *     ]
    *   });
    *
-   *   var filter = new IsEqual("product", "A");
-   *   var filteredData = filter.apply(data);
+   *   var myFilter = new filter.IsEqual("product", "A");
+   *   var filteredData = myFilter.apply(data);
    *   //filteredData.getValue(0, 0) === "A"
    * });
-   *
    *
    * @description Creates a filter that matches the value of a given property to a specific value.
    *
