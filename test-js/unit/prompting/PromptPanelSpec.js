@@ -509,12 +509,14 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
         });
 
         it("should init also with components and find focused param", function() {
-          var paramDefn = jasmine.createSpyObj("paramDefnSpy", [ "showParameterUI", "allowAutoSubmit" ]);
-          var comp = jasmine.createSpyObj("compSpy", [ "placeholder", "topValue" ]);
-          comp.topValue.and.returnValue(100);
-          comp.param = {
+          var paramDefn = jasmine.createSpyObj("paramDefnSpy", [ "showParameterUI", "allowAutoSubmit", "getParameter" ]);
+          var param = {
             name : "test_param_name"
           };
+          paramDefn.getParameter.and.returnValue(param);
+          var comp = jasmine.createSpyObj("compSpy", [ "placeholder", "topValue" ]);
+          comp.topValue.and.returnValue(100);
+          comp.param = param;
           comp.promptType = "prompt";
           comp.type = "SelectMultiComponent";
           spyOn($.fn, "init").and.returnValue([ {} ]);
@@ -523,7 +525,8 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
           panel.refresh(paramDefn);
           expect(panel.paramDefn).toBe(paramDefn);
           expect(window.setTimeout).not.toHaveBeenCalled();
-          expect(panel._focusedParam).toBe(comp.param.name);
+          expect(paramDefn.getParameter).toHaveBeenCalled();
+          expect(panel._focusedParam).toBe(param.name);
           expect(panel._multiListBoxTopValuesByParam).toBeDefined();
         });
 
@@ -737,8 +740,6 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
             label : "test label"
           };
           panel.paramDefn.errors[param.name] = [ "Error 1" ];
-          spyOn(panel.widgetBuilder.mapping['default'], '_createFormatter').and.returnValue(null);
-          spyOn(panel.widgetBuilder.mapping['default'], '_createDataTransportFormatter').and.returnValue(null);
           var paramPanel = panel._buildPanelForParameter(param);
           expect(paramPanel).toBeDefined();
           expect(panel._initializeParameterValue).toHaveBeenCalledWith(panel.paramDefn, param);
@@ -746,7 +747,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
           expect(paramPanel.components.length).toBe(3);
           expect(paramPanel.components[0].type).toBe("TextComponent");
           expect(paramPanel.components[1].type).toBe("TextComponent");
-          expect(paramPanel.components[2].type).toBe("TextInputComponent");
+          expect(paramPanel.components[2].type).toBe("StaticAutocompleteBoxComponent");
           expect(paramPanel.components[0].promptType).toBe("label");
           expect(paramPanel.components[1].promptType).toBe("label");
           expect(paramPanel.components[2].promptType).toBe("prompt");
@@ -1061,8 +1062,6 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
               };
 
               spyOn(panel, "setParameterValue");
-              spyOn(panel.widgetBuilder.mapping['default'], '_createFormatter').and.returnValue(null);
-              spyOn(panel.widgetBuilder.mapping['default'], '_createDataTransportFormatter').and.returnValue(null);
 
               componentSpy = jasmine.createSpyObj("componentSpy", ["getPanel"]);
               componentSpy.parameter = paramName;
@@ -1084,7 +1083,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
 
               panel._changeComponentsByDiff(change);
 
-              expect(panel.setParameterValue).not.toHaveBeenCalled();
+              expect(panel.setParameterValue).toHaveBeenCalled();
               expect(panel.forceSubmit).toBeDefined();
               expect(panel.forceSubmit).toEqual(true);
             });
@@ -1094,7 +1093,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
               spyOn(panel, "_initializeParameterValue");
               panel.dashboard.getParameterValue.and.returnValue("do");
 
-              var valuesArrayWithDefaults = [ ["", ""], ["test1", "test1"], ["test2", "test2"] ];
+              var valuesArrayWithDefaults = [ ["test1", "test1"], ["test2", "test2"] ];
               componentSpy.valuesArray = valuesArrayWithDefaults;
 
               var valuesArray = [ ["test1", "test1"], ["test2", "test2"] ];

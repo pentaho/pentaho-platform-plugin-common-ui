@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2016 Pentaho Corporation.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,13 +40,11 @@
  *
  * @name StaticAutocompleteBoxBuilder
  * @class
- * @extends FormattedParameterWidgetBuilderBase
+ * @extends ValueBasedParameterWidgetBuilder
  */
-define(['./FormattedParameterWidgetBuilderBase', '../components/StaticAutocompleteBoxComponent', 'common-ui/jquery-clean'],
-    function (FormattedParameterWidgetBuilderBase, StaticAutocompleteBoxComponent, $) {
-
-      return FormattedParameterWidgetBuilderBase.extend({
-
+define(['common-ui/util/formatting', './ValueBasedParameterWidgetBuilder', '../components/StaticAutocompleteBoxComponent', 'common-ui/jquery-clean'],
+    function(FormatUtils, ValueBasedParameterWidgetBuilder, StaticAutocompleteBoxComponent, $) {
+      return ValueBasedParameterWidgetBuilder.extend({
 
         /**
          * Creates and returns a new instance of StaticAutocompleteBoxBuilder.
@@ -59,12 +57,14 @@ define(['./FormattedParameterWidgetBuilderBase', '../components/StaticAutocomple
          * @param {Parameter} args.param - The Parameter instance
          * @returns {StaticAutocompleteBoxComponent} The new instance of StaticAutocompleteBoxComponent
          */
-        build: function (args) {
-          var convertToAutocompleteValues = function (param) {
-            return $.map(param.values, function (v) {
-              var value = this.formatter ? this.formatter.format(this.transportFormatter.parse(v.value)) : v.value;
+        build: function(args) {
+          var formatter = FormatUtils.createFormatter(args.promptPanel.paramDefn, args.param);
+          var transportFormatter = FormatUtils.createDataTransportFormatter(args.promptPanel.paramDefn, args.param);
+          var convertToAutocompleteValues = function(valuesArray) {
+            return $.map(valuesArray, function(v) {
+              var value = formatter ? formatter.format(transportFormatter.parse(v[0])) : v[0];
               // Label is key if it doesn't exist
-              var label = (this.formatter ? this.formatter.format(this.transportFormatter.parse(v.label)) : v.label) || value;
+              var label = (formatter ? formatter.format(transportFormatter.parse(v[1])) : v[1]) || value;
               return {
                 value: value,
                 label: label
@@ -73,13 +73,14 @@ define(['./FormattedParameterWidgetBuilderBase', '../components/StaticAutocomple
           };
 
           var widget = this.base(args);
-
-          $.extend(widget, {
+          widget = $.extend(widget, {
             type: 'StaticAutocompleteBoxComponent',
-            valuesArray: convertToAutocompleteValues(args.param)
+            valuesArray: convertToAutocompleteValues(widget.valuesArray),
+            transportFormatter: transportFormatter,
+            formatter: formatter
           });
 
           return new StaticAutocompleteBoxComponent(widget);
         }
-      });
+      })
     });
