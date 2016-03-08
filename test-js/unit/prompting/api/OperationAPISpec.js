@@ -162,10 +162,11 @@ define(["common-ui/prompting/api/OperationAPI"], function(OperationAPI) {
     });
 
     it("should test submit", function() {
-      operationApi.submit();
+      var options = {isInit: true};
+      operationApi.submit(options);
 
       expect(operationApi._getPromptPanel).toHaveBeenCalled();
-      expect(promptPanelSpy.submit).toHaveBeenCalled();
+      expect(promptPanelSpy.submit).toHaveBeenCalledWith(promptPanelSpy, options);
     });
 
     describe("refreshPrompt tests", function() {

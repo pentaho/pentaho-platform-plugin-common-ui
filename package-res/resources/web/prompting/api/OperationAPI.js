@@ -217,12 +217,16 @@ define(['common-ui/prompting/PromptPanel'], function(PromptPanel) {
      * Executes the prompt panel {@link PromptPanel#submit|submit} function.
      *
      * @name OperationAPI#submit
+     * @param {Object}  [options]        Additional configuration options.
+     * @param {Boolean} [options.isInit] Flag indicating if submit is being executed during initialization.
      * @method
      * @example
-     *     api.operation.submit();
+     *      var options = { 'isInit': true };
+     *      api.operation.submit(options);
      */
-    this.submit = function() {
-      this._getPromptPanel().submit();
+    this.submit = function(options) {
+      var promptPanel = this._getPromptPanel();
+      promptPanel.submit(promptPanel, options);
     };
   };
 });
