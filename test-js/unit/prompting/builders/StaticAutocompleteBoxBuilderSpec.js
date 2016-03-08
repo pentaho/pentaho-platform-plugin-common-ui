@@ -21,9 +21,7 @@ define(['common-ui/prompting/builders/StaticAutocompleteBoxBuilder'], function(S
     var args = {
       promptPanel: {
         generateWidgetGUID: function() { },
-        getParameterName: function() { },
-        createFormatter: function() { },
-        createDataTransportFormatter: function() { }
+        getParameterName: function() { }
       }, 
       param:  {
         values: { },
@@ -35,8 +33,6 @@ define(['common-ui/prompting/builders/StaticAutocompleteBoxBuilder'], function(S
 
     beforeEach(function() {
       staticAutocompleteBoxBuilder = new StaticAutocompleteBoxBuilder();
-      spyOn(staticAutocompleteBoxBuilder, '_createFormatter').and.returnValue(null);
-      spyOn(staticAutocompleteBoxBuilder, '_createDataTransportFormatter').and.returnValue(null);
     });
 
     it("should throw an error building component with no parameters", function() {
