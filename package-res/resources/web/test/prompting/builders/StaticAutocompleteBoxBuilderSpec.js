@@ -21,9 +21,7 @@ define(['common-ui/prompting/builders/StaticAutocompleteBoxBuilder'], function(S
     var args = {
       promptPanel: {
         generateWidgetGUID: function() { },
-        getParameterName: function() { },
-        createFormatter: function() { },
-        createDataTransportFormatter: function() { }
+        getParameterName: function() { }
       }, 
       param:  {
         values: { },

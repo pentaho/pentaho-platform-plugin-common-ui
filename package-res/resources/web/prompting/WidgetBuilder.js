@@ -53,12 +53,12 @@ define(['./builders/PromptPanelBuilder', './builders/ParameterGroupPanelBuilder'
       './builders/ErrorLabelBuilder', './builders/DropDownBuilder', './builders/RadioBuilder', './builders/CheckBuilder',
       './builders/MultiButtonBuilder', './builders/ListBuilder', './builders/DateInputBuilder',
       './builders/ExternalInputBuilder', './builders/TextAreaBuilder',
-      './builders/TextInputBuilder'],
+      './builders/StaticAutocompleteBoxBuilder'],
 
     function (PromptPanelBuilder, ParameterGroupPanelBuilder, ParameterPanelBuilder, SubmitPanelBuilder,
               SubmitComponentBuilder, LabelBuilder, ErrorLabelBuilder, DropDownBuilder, RadioBuilder, CheckBuilder,
               MultiButtonBuilder, ListBuilder, DateInputBuilder, ExternalInputBuilder, TextAreaBuilder,
-              TextInputBuilder) {
+              StaticAutocompleteBoxBuilder) {
 
       return {
         /**
@@ -81,7 +81,7 @@ define(['./builders/PromptPanelBuilder', './builders/ParameterGroupPanelBuilder'
           'filebrowser': new ExternalInputBuilder(),
           'external-input': new ExternalInputBuilder(),
           'multi-line': new TextAreaBuilder(),
-          'default': new TextInputBuilder()
+          'default': new StaticAutocompleteBoxBuilder()
         },
 
         /**

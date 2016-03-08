@@ -1,4 +1,4 @@
-/*!
+  /*!
  * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -57,6 +57,20 @@ define(['common-ui/prompting/builders/DropDownBuilder'], function(DropDownBuilde
       expect(component.valuesArray.length > 0).toBeTruthy();
       expect(component.valuesArray[0][0]).toEqual("");
       expect(component.valuesArray[0][1]).toEqual("");
+    });
+
+    it("should create an empty selection at the end if no value is selected", function() {
+      spyOn(args.param, 'hasSelection').and.returnValue(false);
+
+      args.param.values = [
+        { label: "banana", value: "banana" }
+      ];
+
+      var component = dropDownBuilder.build(args);
+      expect(args.param.hasSelection).toHaveBeenCalled();
+      expect(component.valuesArray.length > 0).toBeTruthy();
+      expect(component.valuesArray[1][0]).toEqual("");
+      expect(component.valuesArray[1][1]).toEqual("");
     });
 
     it ("should set defaultIfEmpty to true for non-multi select on preExecution", function() {
