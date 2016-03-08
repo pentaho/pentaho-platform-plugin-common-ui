@@ -1,19 +1,26 @@
 <?js
 var data = obj || {};
-if (data.description) {
 ?>
-<div class="param-desc">
-    <?js= description ?>
-</div>
-<?js } ?>
+<tr>
+	<td>
+		<?js if (data.nullable) { ?>
+			<?js data.type.names.push("null") ?>
+		<?js } ?>
 
-<?js if (data.type && data.type.names) {?>
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        <?js= this.partial('type.tmpl', data.type.names) ?>
-    </dd>
-</dl>
-<?js } ?>
+		<?js if (data.type && data.type.names) {?>
+			<?js= this.partial('type.tmpl', data.type.names) ?>
+		<?js } ?>
+	</td>
+	<td>
+		<?js if (data.description) { ?>
+			<?js 
+				var description = data.description; 
+				var regex = /array.<(.*)>/; 
+				if(m = regex.exec(description)) {
+					description = m[1];
+				}
+			?>
+			<?js= description ?>
+		<?js } ?>
+	</td>
+</tr>
