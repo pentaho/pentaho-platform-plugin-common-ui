@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2016 Pentaho Corporation.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,7 +70,7 @@ define(['cdf/components/SelectComponent', './ValueBasedParameterWidgetBuilder', 
       if (args.promptPanel.paramDefn.ignoreBiServer5538 && !args.param.hasSelection()) {
         // If there is no empty selection, and no value is selected, create one. This way, we can represent
         // the unselected state.
-        widget.valuesArray = [['', '']].concat(widget.valuesArray);
+        widget.valuesArray = widget.valuesArray.concat([['', '']]);
       }
 
       $.extend(widget, {
