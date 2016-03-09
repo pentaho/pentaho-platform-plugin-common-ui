@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,27 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/complex",
   "pentaho/lang/EventSource",
+  "pentaho/type/complex",
   "pentaho/data/filter",
   "pentaho/util/error",
+  "pentaho/util/object",
   "./types/selectionModes",
-  "./types/events/WillSelect",
-  "./types/events/DidSelect",
-  "./types/events/CanceledSelect",
-  "./types/events/FailedSelect",
+
+  "./events/WillSelect",
+  "./events/DidSelect",
+  "./events/CanceledSelect",
+  "./events/FailedSelect",
+
+  "./events/WillExecute",
+  "./events/DidExecute",
+  "./events/FailedExecute",
+  "./events/CanceledExecute",
+
   "pentaho/i18n!type"
-], function(complexFactory, EventSource, filter, error,
-            selectionModes,
+], function(EventSource, complexFactory, filter, error, O, selectionModes,
             WillSelect, DidSelect, CanceledSelect, FailedSelect,
+            WillExecute, DidExecute, FailedExecute, CanceledExecute,
             bundle) {
 
   "use strict";
@@ -58,6 +66,16 @@ define([
     var Model = Complex.extend({
         constructor: function(modelSpec) {
           this.base(modelSpec);
+        },
+
+        _action: null,
+
+        set action(_) {
+          this._action = _;
+        },
+
+        get action() {
+          return this._action;
         },
 
         select: function(dataFilter, keyArgs) {
@@ -98,6 +116,42 @@ define([
               this._emit(didSelect);
             }
             return true;
+          }
+        },
+
+        execute: function(dataFilter) {
+          var isCanceled = false;
+          var willExecute = null;
+
+          if(this._hasListeners(WillExecute.type)) {
+            willExecute = new WillExecute(this, dataFilter, this.action); //listener can change dataFilter and/or action
+            isCanceled = !!this._emit(willExecute);
+          }
+
+          if(isCanceled && this._hasListeners(CanceledExecute.type)) {
+            var canceledExecute = new CanceledExecute(this, dataFilter);
+            this._emit(canceledExecute);
+            return false;
+          }
+
+          var action = O.getOwn(willExecute, "action", this.action);
+          var mutatedDataFilter = O.getOwn(willExecute, "dataFilter", dataFilter);
+
+          try {
+            action(); //will use mutatedDataFilter
+            if(this._hasListeners(DidExecute.type)) {
+              var didExecute = new DidExecute(this, mutatedDataFilter);
+              this._emit(didExecute);
+            }
+            return true;
+
+          } catch(e) {
+            if(this._hasListeners(FailedExecute.type)) {
+              var failedExecute = new FailedExecute(this, mutatedDataFilter, e.message);
+              this._emit(failedExecute);
+            }
+            return false;
+
           }
         },
 
