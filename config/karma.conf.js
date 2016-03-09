@@ -7,7 +7,8 @@ module.exports = function (config) {
     plugins: [
       'karma-jasmine',
       'karma-requirejs',
-      'karma-chrome-launcher'
+      'karma-chrome-launcher',
+      'karma-mocha-reporter'
     ],
 
     files: [
@@ -42,7 +43,7 @@ module.exports = function (config) {
     autoWatch: true,
 
     browsers:  ["Chrome"],
-    reporters: ["progress"],
+    reporters: ["mocha"], // "progress"
 
     // level of logging
     // possible values: LOG_DISABLE || LOG_ERROR || LOG_WARN || LOG_INFO || LOG_DEBUG
