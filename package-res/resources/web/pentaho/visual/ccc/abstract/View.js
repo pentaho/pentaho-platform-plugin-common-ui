@@ -79,8 +79,8 @@ define([
     // Interaction
     interactive:    true,
     animate:        false,
-    clickable:      false, // NOTE: Disabled until actions are implemented
-    selectable:     false, // NOTE: Disabled until actions are implemented
+    clickable:      !false, // NOTE: Disabled until actions are implemented
+    selectable:     !false, // NOTE: Disabled until actions are implemented
     hoverable:      false,
     ctrlSelectMode: false,
     clearSelectionMode: "manual",
