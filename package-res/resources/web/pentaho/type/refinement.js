@@ -105,8 +105,8 @@ define([
      * [description]{@link pentaho.type.Item.Meta#description},
      * [category]{@link pentaho.type.Item.Meta#category},
      * [helpUrl]{@link pentaho.type.Item.Meta#helpUrl},
-     * [browsable]{@link pentaho.type.Item.Meta#browsable},
-     * [advanced]{@link pentaho.type.Item.Meta#advanced},
+     * [isBrowsable]{@link pentaho.type.Item.Meta#isBrowsable},
+     * [isAdvanced]{@link pentaho.type.Item.Meta#isAdvanced},
      * [ordinal]{@link pentaho.type.Item.Meta#ordinal}
      * and
      * [view]{@link pentaho.type.Value.Meta#view},
@@ -120,7 +120,7 @@ define([
      * of the refinement type.
      *
      * Although, conceptually, a refinement type is always abstract,
-     * the refinement type's [abstract]{@link pentaho.type.Value.Meta#abstract} attribute,
+     * the refinement type's [isAbstract]{@link pentaho.type.Value.Meta#isAbstract} attribute,
      * instead, more usefully indicates whether its representation type is abstract or not.
      *
      * ### Defining a refinement type
@@ -232,7 +232,7 @@ define([
      *             name:  "id",
      *             label: "Product Id",
      *             type:  "string",
-     *             required: true
+     *             isRequired: true
      *           },
      *           {
      *             name:  "price",
@@ -243,7 +243,7 @@ define([
      *               facets: ["OrdinalDomain"],
      *               min:    0
      *             },
-     *             required: true
+     *             isRequired: true
      *           }
      *         ]
      *       }
@@ -370,7 +370,7 @@ define([
 
           // Value returns refinement === undefined...
           var ofMeta = this.context.get(value).meta;
-          if(ofMeta.refinement !== false)
+          if(ofMeta.isRefinement !== false)
             throw error.argInvalidType("of", ["pentaho/type/element", "pentaho/type/list"]);
 
           // Throws when set again with a different value.
@@ -379,8 +379,6 @@ define([
         //endregion
 
         //region abstract property
-        // TODO: Rhino probably gives a syntax error on this.
-        // However, cannot use the `get "abstract"()` syntax cause then Phantom JS 1.9.8 starts failing
         /**
          * Gets a value that indicates if this type is abstract.
          *
@@ -391,13 +389,13 @@ define([
          * @readOnly
          * @sealed
          */
-        get abstract() {
-          return this.of["abstract"];
+        get isAbstract() {
+          return this.of.isAbstract;
         },
 
-        set abstract(value) {
+        set isAbstract(value) {
           // nully is reset, which is false, so !! works well.
-          if((!!value) !== this["abstract"])
+          if((!!value) !== this.isAbstract)
             throw error.operInvalid("Attribute cannot be changed.");
         },
         //endregion
@@ -414,12 +412,12 @@ define([
          * @readOnly
          * @sealed
          */
-        get list() {
-          return this.of.list;
+        get isList() {
+          return this.of.isList;
         },
         //endregion
 
-        //region refinement property
+        //region isRefinement property
         /**
          * Gets a value that indicates if this type is a refinement type.
          *
@@ -430,7 +428,7 @@ define([
          * @sealed
          */
           // Providing a default implementation is less code
-        get refinement() {
+        get isRefinement() {
           return true;
         },
         //endregion
@@ -509,30 +507,30 @@ define([
         },
         //endregion
 
-        //region browsable property
-        _browsable: undefined, // local Refinement root marker
+        //region isBrowsable property
+        _isBrowsable: undefined, // local Refinement root marker
 
-        get browsable() {
-          var v = this._browsable;
-          return v !== undefined ? v : this.of.browsable;
+        get isBrowsable() {
+          var v = this._isBrowsable;
+          return v !== undefined ? v : this.of.isBrowsable;
         },
 
-        _resetBrowsable: function() {
+        _resetIsBrowsable: function() {
           if(this !== _refinementMeta) {
             this.base();
           }
         },
         //endregion
 
-        //region advanced property
-        _advanced: undefined, // local Refinement root marker
+        //region isAdvanced property
+        _isAdvanced: undefined, // local Refinement root marker
 
-        get advanced() {
-          var v = this._advanced;
-          return v !== undefined ? v : this.of.advanced;
+        get isAdvanced() {
+          var v = this._isAdvanced;
+          return v !== undefined ? v : this.of.isAdvanced;
         },
 
-        _resetAdvanced: function() {
+        _resetIsAdvanced: function() {
           if(this !== _refinementMeta) {
             this.base();
           }

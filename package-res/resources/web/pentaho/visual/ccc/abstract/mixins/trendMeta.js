@@ -20,7 +20,7 @@ define([
 
   "use strict";
 
-  function applicableTrend() {
+  function isApplicableTrend() {
     /*jshint validthis:true */
     return this.getv("trendType") !== "none";
   }
@@ -31,19 +31,19 @@ define([
       {
         name: "trendType",
         type: trendTypeFactory,
-        required: true,
+        isRequired: true,
         value: "none"
       },
       {
         name: "trendName",
         type: "string",
-        applicable: applicableTrend
+        isApplicable: isApplicableTrend
       },
       {
         name: "trendLineWidth",
         type: lineWidthFactory,
-        applicable: applicableTrend,
-        required: true,
+        isApplicable: isApplicableTrend,
+        isRequired: true,
         value: 1
       }
     ]

@@ -22,10 +22,10 @@ define([
   /**
    * @name AbstractTreeFilter
    * @memberOf pentaho.data.filter
+   *
    * @class
    * @extends pentaho.data.filter.AbstractFilter
    * @abstract
-   * @amd pentaho/data/filter/AbstractTreeFilter
    *
    * @classdesc A base class for filters that aggregate the outcome of other filters.
    *

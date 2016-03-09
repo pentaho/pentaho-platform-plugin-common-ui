@@ -14,62 +14,56 @@
  * limitations under the License.
  */
 define([
-  "./filter/AbstractFilter",
-  "./filter/AbstractPropertyFilter",
-  "./filter/AbstractTreeFilter",
-  "./filter/IsEqual",
-  "./filter/IsIn",
-  "./filter/And",
-  "./filter/Or",
-  "./filter/Not"
-], function(AbstractFilter, AbstractPropertyFilter, AbstractTreeFilter, IsEqual, IsIn, And, Or, Not) {
+  "./_filter/AbstractFilter", "./_filter/AbstractFilter.IFilter",
+  "./_filter/AbstractPropertyFilter",
+  "./_filter/AbstractTreeFilter",
+  "./_filter/IsEqual",
+  "./_filter/IsIn",
+  "./_filter/And", "./_filter/And.IFilter",
+  "./_filter/Or", "./_filter/Or.IFilter",
+  "./_filter/Not"
+], function(AbstractFilter, AbstractFilterIFilter,
+            AbstractPropertyFilter, AbstractTreeFilter, IsEqual, IsIn,
+            And, AndIFilter,
+            Or, OrIFilter,
+            Not) {
   "use strict";
 
+  AbstractFilter.implement(AbstractFilterIFilter);
+  And.implement(AndIFilter);
+  Or.implement(OrIFilter);
+
   /**
-   * This namespace contains classes for filters that are used for expressing a dataset
+   * This namespace contains classes for filters that are used for expressing a data set
    * [intensionally]{@link https://en.wikipedia.org/wiki/Intensional_definition}.
    * It also exports a static create function that can be used to generate a filter tree from a spec.
    *
-   * @name pentaho.data.filter
    * @namespace
+   * @name pentaho.data.filter
    * @memberOf pentaho.data
    * @amd pentaho/data/filter
    *
    * @example
-   * <caption> Three methods for creating a filter.</caption>
+   * <caption> Two methods for creating a filter.</caption>
    *
    * require(["pentaho/data/Table", "pentaho/data/filter"], function(Table, filter) {
    *   var data = new Table({
    *     model: [
-   *       {name: "product", type: "string", label: "Product"},
-   *       {name: "sales", type: "number", label: "Sales"},
+   *       {name: "product", type: "string",  label: "Product"},
+   *       {name: "sales",   type: "number",  label: "Sales"},
    *       {name: "inStock", type: "boolean", label: "In Stock"}
    *     ],
    *     rows: [
    *       {c: [{v: "A"}, {v: 12000}, {v: true}]},
-   *       {c: [{v: "B"}, {v: 6000}, {v: true}]},
+   *       {c: [{v: "B"}, {v: 6000},  {v: true}]},
    *       {c: [{v: "C"}, {v: 12000}, {v: false}]},
-   *       {c: [{v: "D"}, {v: 1000}, {v: false}]},
-   *       {c: [{v: "E"}, {v: 2000}, {v: false}]},
-   *       {c: [{v: "F"}, {v: 3000}, {v: false}]},
-   *       {c: [{v: "G"}, {v: 4000}, {v: false}]}
+   *       {c: [{v: "D"}, {v: 1000},  {v: false}]},
+   *       {c: [{v: "E"}, {v: 2000},  {v: false}]},
+   *       {c: [{v: "F"}, {v: 3000},  {v: false}]},
+   *       {c: [{v: "G"}, {v: 4000},  {v: false}]}
    *     ]
    *   });
    *
-   *   var sales12k = new IsEqual("sales", [12000]);
-   *   var productAB = new IsIn("product", ["A", "B"]);
-   *   var notInProductABFilter = new Not(productAB);
-   *   var andFilter = new And([sales12k, notInProductABFilter]);
-   *   var dataFilter = new Not(andFilter);
-   *   var filteredData = dataFilter.apply(data);
-   *   // filteredData.getValue(0, 0) === "A"
-   *   // filteredData.getValue(1, 0) === "B"
-   *   // filteredData.getValue(2, 0) === "D"
-   *   // filteredData.getValue(3, 0) === "E"
-   *   // filteredData.getValue(4, 0) === "F"
-   *   // filteredData.getValue(5, 0) === "G"
-   *
-   *   //Or alternatively
    *   var sales12k = new filter.IsEqual("sales", [12000]);
    *   var productAB = new filter.IsIn("product", ["A", "B"]);
    *   var notInProductABFilter = new filter.Not(productAB);
@@ -84,8 +78,7 @@ define([
    *   // filteredData.getValue(5, 0) === "G"
    *
    *   var specFromDataFilter = dataFilter.toSpec();
-   *
-   *   // JSON.Stringify(specFromDataFilter) === {
+   *   // {
    *   //   "$not": {
    *   //     "$and": [
    *   //       {"sales": 12000},
@@ -152,26 +145,23 @@ define([
       "$in": IsIn
     };
 
-    var operator, property, value;
-    for(var arg in filterSpec) {
-      if(arg[0] === "$") {
-        // And, Or, Not: {$and:[...]}, {$or:[...]}, {$not:[...]}
-        operator = arg;
-        if(operator === "$not")
-          return new registeredFilters["$not"](fromSpec(filterSpec[operator]));
-        return new registeredFilters[operator](filterSpec[operator].map(fromSpec));
-      } else if(typeof filterSpec[arg] !== "object") {
-        // shortcut: assume {property: value} is synonym for {property:{"$eq": value}}
-        return new IsEqual(arg, filterSpec[arg]);
-      } else {
+    for(var key in filterSpec) {
+      var value = filterSpec[key];
+      if(key === "$not") {
+        return new registeredFilters["$not"](fromSpec(value));
+      } else if(key[0] === "$") {
+        // And, Or: {$and:[...]}, {$or:[...]}}
+        return new registeredFilters[key](value.map(fromSpec));
+      } else if(typeof value === "object"){
         // IsEqual, IsIn: {property:{"$eq": value}}
-        property = arg;
-        for(operator in filterSpec[property]) {
-          value = filterSpec[property][operator];
-          return new registeredFilters[operator](property, value);
+        for(var operator in value) {
+          var operand = value[operator];
+          return new registeredFilters[operator](key, operand);
         }
+      } else {
+        // shortcut: assume {property: value} is synonym for {property:{"$eq": value}}
+        return new IsEqual(key, value);
       }
-
     }
   }
 

@@ -45,6 +45,12 @@ define(['common-ui/prompting/builders/SubmitComponentBuilder'], function(SubmitC
       expect(component.type).toBe('SubmitPromptComponent');
     });
 
+    it("should return default label values", function() {
+      var component = submitComponentBuilder.build(args);
+      expect(component.label).toEqual('submitButtonLabel');
+      expect(component.autoSubmitLabel).toEqual('autoSubmitLabel');
+    });
+
   });
 
 });

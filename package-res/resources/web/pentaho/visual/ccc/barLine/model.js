@@ -46,21 +46,21 @@ define([
         props: [
           {
             name: "measures",
-            required: requiredOneMeasure
+            isRequired: requiredOneMeasure
           },
           {
             name: "measuresLine",
             type: ["string"],
             dataType: "number",
             isVisualRole: true,
-            required: requiredOneMeasure
+            isRequired: requiredOneMeasure
           },
 
           {
             name: "lineWidth",
             type: lineWidthFactory,
-            applicable: function() { return this.count("measuresLine") > 0; },
-            required: true,
+            isApplicable: function() { return this.count("measuresLine") > 0; },
+            isRequired: true,
             value: 1
           },
           {
@@ -69,8 +69,8 @@ define([
               base: labelsOptionFactory,
               domain: ["none", "center", "insideEnd", "insideBase", "outsideEnd"]
             },
-            applicable: function() { return this.count("measures") > 0; },
-            required: true,
+            isApplicable: function() { return this.count("measures") > 0; },
+            isRequired: true,
             value: "none"
           },
 
@@ -80,17 +80,17 @@ define([
               base: labelsOptionFactory,
               domain: ["none", "center", "left", "right", "top", "bottom"]
             },
-            applicable: function() { return this.count("measuresLine") > 0; },
-            required: true,
+            isApplicable: function() { return this.count("measuresLine") > 0; },
+            isRequired: true,
             value: "none"
           },
 
           {
             name: "shape",
             type: shapeFactory,
-            required: true,
+            isRequired: true,
             value: "circle",
-            applicable: function() { return this.count("measuresLine") > 0; }
+            isApplicable: function() { return this.count("measuresLine") > 0; }
           }
         ]
       }

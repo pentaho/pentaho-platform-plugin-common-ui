@@ -3,21 +3,18 @@
     "allowUnknownTags": true
   },
   "source": {
-    "include": [
-      "package-res/resources/web/pentaho/i18n.js",
-      "package-res/resources/web/pentaho/service.js",
-      "package-res/resources/web/pentaho/_doc",
-      "package-res/resources/web/pentaho/lang",
-      "package-res/resources/web/pentaho/util",
-      "package-res/resources/web/pentaho/type",
-      "package-res/resources/web/pentaho/visual/_doc",
-      "package-res/resources/web/pentaho/visual/base",
-      "package-res/resources/web/pentaho/visual/color"
+    "include": ["package-res/resources/web/pentaho", "package-res/resources/web/pentaho/CONTRIBUTING.md"
     ],
-    "exclude": [],
+    "exclude": [
+      "package-res/resources/web/pentaho/data",
+      "package-res/resources/web/pentaho/shim",
+      "package-res/resources/web/pentaho/visual/2.5",
+      "package-res/resources/web/pentaho/visual/ccc/2.5",
+      "package-res/resources/web/pentaho/visual/samples"
+    ],
     "includePattern": ".+\\.js(doc)?$"
   },
-  "plugins": ["plugins/markdown", "customPlugins/amd"],
+  "plugins": ["plugins/markdown", "customPlugins/defineTags"],
   "templates": {
     "cleverLinks": true,
     "monospaceLinks": false
@@ -26,8 +23,15 @@
     "template": "../build-res/jsdoc-template",
     "encoding": "utf8",
     "destination": "doc-js/vizapi",
+    "outputSourceFiles": false,
     "recurse": true,
     "private": true,
-    "verbose": true
+    "verbose": true,
+
+    "githubConfig": {
+      "branch": "6.1-SNAPSHOT",
+      "name": "Pentaho Common UI" 
+    },
+    "layoutFile": "layout.tmpl"
   }
 }

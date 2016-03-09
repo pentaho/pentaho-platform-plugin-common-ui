@@ -1016,22 +1016,22 @@ define([
 
     describe("Property Attributes", function() {
 
-      describe("#applicable(name)", function() {
+      describe("#isApplicable(name)", function() {
         it("should return the evaluated static value of an existing property", function() {
           var Derived = Complex.extend({
-            meta: {props: [{name: "x", applicable: false}]}
+            meta: {props: [{name: "x", isApplicable: false}]}
           });
 
           var derived = new Derived();
 
-          expect(derived.applicable("x")).toBe(false);
+          expect(derived.isApplicable("x")).toBe(false);
         });
 
         it("should return the evaluated dynamic value of an existing property", function() {
           var Derived = Complex.extend({
             meta: {
               props: [{
-                name: "x", applicable: function() {
+                name: "x", isApplicable: function() {
                   return this.foo;
                 }
               }]
@@ -1042,11 +1042,11 @@ define([
 
           derived.foo = true;
 
-          expect(derived.applicable("x")).toBe(true);
+          expect(derived.isApplicable("x")).toBe(true);
 
           derived.foo = false;
 
-          expect(derived.applicable("x")).toBe(false);
+          expect(derived.isApplicable("x")).toBe(false);
         });
 
         it("should throw when given the name of an undefined property", function() {
@@ -1057,7 +1057,7 @@ define([
           var derived = new Derived();
 
           expect(function() {
-            derived.applicable("y");
+            derived.isApplicable("y");
           }).toThrow(errorMatch.argInvalid("name"));
         });
 
@@ -1071,27 +1071,27 @@ define([
           var derived = new Derived();
 
           expect(function() {
-            derived.applicable(Other.meta.get("x"));
+            derived.isApplicable(Other.meta.get("x"));
           }).toThrow(errorMatch.argInvalid("name"));
         });
       }); // end applicable
 
-      describe("#readOnly(name)", function() {
+      describe("#isReadOnly(name)", function() {
         it("should return the evaluated static value of an existing property", function() {
           var Derived = Complex.extend({
-            meta: {props: [{name: "x", readOnly: false}]}
+            meta: {props: [{name: "x", isReadOnly: false}]}
           });
 
           var derived = new Derived();
 
-          expect(derived.readOnly("x")).toBe(false);
+          expect(derived.isReadOnly("x")).toBe(false);
         });
 
         it("should return the evaluated dynamic value of an existing property", function() {
           var Derived = Complex.extend({
             meta: {
               props: [{
-                name: "x", readOnly: function() {
+                name: "x", isReadOnly: function() {
                   return this.foo;
                 }
               }]
@@ -1102,11 +1102,11 @@ define([
 
           derived.foo = true;
 
-          expect(derived.readOnly("x")).toBe(true);
+          expect(derived.isReadOnly("x")).toBe(true);
 
           derived.foo = false;
 
-          expect(derived.readOnly("x")).toBe(false);
+          expect(derived.isReadOnly("x")).toBe(false);
         });
 
         it("should throw when given the name of an undefined property", function() {
@@ -1117,7 +1117,7 @@ define([
           var derived = new Derived();
 
           expect(function() {
-            derived.readOnly("y");
+            derived.isReadOnly("y");
           }).toThrow(errorMatch.argInvalid("name"));
         });
 
@@ -1131,27 +1131,27 @@ define([
           var derived = new Derived();
 
           expect(function() {
-            derived.readOnly(Other.meta.get("x"));
+            derived.isReadOnly(Other.meta.get("x"));
           }).toThrow(errorMatch.argInvalid("name"));
         });
-      }); // end readOnly
+      }); // end isReadOnly
 
-      describe("#required(name)", function() {
+      describe("#isRequired(name)", function() {
         it("should return the evaluated static value of an existing property", function() {
           var Derived = Complex.extend({
-            meta: {props: [{name: "x", required: true}]}
+            meta: {props: [{name: "x", isRequired: true}]}
           });
 
           var derived = new Derived();
 
-          expect(derived.required("x")).toBe(true);
+          expect(derived.isRequired("x")).toBe(true);
         });
 
         it("should return the evaluated dynamic value of an existing property", function() {
           var Derived = Complex.extend({
             meta: {
               props: [{
-                name: "x", required: function() {
+                name: "x", isRequired: function() {
                   return this.foo;
                 }
               }]
@@ -1162,11 +1162,11 @@ define([
 
           derived.foo = true;
 
-          expect(derived.required("x")).toBe(true);
+          expect(derived.isRequired("x")).toBe(true);
 
           derived.foo = false;
 
-          expect(derived.required("x")).toBe(false);
+          expect(derived.isRequired("x")).toBe(false);
         });
 
         it("should throw when given the name of an undefined property", function() {
@@ -1177,7 +1177,7 @@ define([
           var derived = new Derived();
 
           expect(function() {
-            derived.required("y");
+            derived.isRequired("y");
           }).toThrow(errorMatch.argInvalid("name"));
         });
 
@@ -1191,7 +1191,7 @@ define([
           var derived = new Derived();
 
           expect(function() {
-            derived.required(Other.meta.get("x"));
+            derived.isRequired(Other.meta.get("x"));
           }).toThrow(errorMatch.argInvalid("name"));
         });
       }); // end required

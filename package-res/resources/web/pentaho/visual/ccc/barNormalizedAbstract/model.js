@@ -28,12 +28,12 @@ define([
     return BarAbstract.extend({
       meta: {
         id: "pentaho/visual/ccc/barNormalizedAbstract",
-        "abstract": true,
+        isAbstract: true,
 
         props: [
           {
             name: "measures",
-            required: true
+            isRequired: true
           },
 
           {
@@ -42,7 +42,7 @@ define([
               base: labelsOptionFactory,
               domain: ["none", "center", "insideEnd", "insideBase"]
             },
-            required: true,
+            isRequired: true,
             value: "none"
           }
         ]

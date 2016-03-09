@@ -40,7 +40,7 @@ define([
   var model = new Model({
     width: 0,
     height: 0,
-    interactive: true,
+    isInteractive: true,
     data: data,
     measure: "sales",
     operation: "avg"

@@ -14,50 +14,49 @@
  * limitations under the License.
  */
 define([
-  "./AbstractTreeFilter",
-  "require",
-  "./And"
-], function(AbstractTreeFilter, require, And) {
+  "./AbstractTreeFilter"
+], function(AbstractTreeFilter) {
   "use strict";
 
   /**
    * @name Or
    * @memberOf pentaho.data.filter
+   *
    * @class
    * @extends pentaho.data.filter.AbstractTreeFilter
-   * @amd pentaho/data/filter/Or
    *
    * @classdesc A filter that implements the union of a series of filters, each of which defines a set.
    *
    * @example
    * <caption> Create a new <code>Or</code> filter.</caption>
    *
-   * require(["pentaho/data/Table", "pentaho/data/filter/IsIn", "pentaho/data/filter/IsEqual", "pentaho/data/filter/Or"], function(Table, IsIn, IsEqual, Or) {
+   * require(["pentaho/data/Table", "pentaho/data/filter"], function(Table, filter) {
    *   var data = new Table({
    *     model: [
-   *       {name: "product", type: "string", label: "Product"},
-   *       {name: "sales", type: "number", label: "Sales"},
+   *       {name: "product", type: "string",  label: "Product"},
+   *       {name: "sales",   type: "number",  label: "Sales"},
    *       {name: "inStock", type: "boolean", label: "In Stock"}
    *     ],
    *     rows: [
    *       {c: [{v: "A"}, {v: 12000}, {v: true}]},
-   *       {c: [{v: "B"}, {v: 6000}, {v: true}]},
+   *       {c: [{v: "B"}, {v: 6000},  {v: true}]},
    *       {c: [{v: "C"}, {v: 12000}, {v: false}]},
-   *       {c: [{v: "D"}, {v: 1000}, {v: false}]},
-   *       {c: [{v: "E"}, {v: 2000}, {v: false}]},
-   *       {c: [{v: "F"}, {v: 3000}, {v: false}]},
-   *       {c: [{v: "G"}, {v: 4000}, {v: false}]}
+   *       {c: [{v: "D"}, {v: 1000},  {v: false}]},
+   *       {c: [{v: "E"}, {v: 2000},  {v: false}]},
+   *       {c: [{v: "F"}, {v: 3000},  {v: false}]},
+   *       {c: [{v: "G"}, {v: 4000},  {v: false}]}
    *     ]
    *   });
    *
-   *   var sales12k = new IsIn("sales", [12000]);
-   *   var inStock = new IsEqual("inStock", true);
-   *   var filter = new Or([sales12k]);
-   *   filter.or(inStock);
-   *   var data = filter.apply(data);
-   *   // data.getValue(0, 0) === "A"
-   *   // data.getValue(1, 0) === "B"
-   *   // data.getValue(2, 0) === "C"
+   *   var sales12k = new filter.IsIn("sales", [12000]);
+   *   var inStock = new filter.IsEqual("inStock", true);
+   *   var myFilter = new filter.Or([sales12k]);
+   *   myFilter.or(inStock);
+   *
+   *   var filteredData = myFilter.apply(data);
+   *   // filteredData.getValue(0, 0) === "A"
+   *   // filteredData.getValue(1, 0) === "B"
+   *   // filteredData.getValue(2, 0) === "C"
    * });
    *
    * @description Creates an `Or` filter that performs the union of a series of [filters]{@link pentaho.data.filter.AbstractFilter}.
@@ -85,33 +84,8 @@ define([
           return true;
       }
       return false; // false is the neutral element of an OR operation
-    },
-
-    /**
-     * Gets the union between this filter and any number of other filters.
-     * Unions of unions of filters (ORs of ORs) are flattened.
-     *
-     * @param {...pentaho.data.filter.AbstractFilter} filter - A filter to be added to the union operation.
-     * @return {!pentaho.data.filter.Or} A filter that is the union of this filter with a series of other filters.
-     * @override
-     */
-    or: function() {
-      var N = arguments.length;
-      if(!N) return this;
-      var operands = this.operands.slice();
-      for(var k = 0; k < N; k++) {
-        operands.push(arguments[k]);
-      }
-      return operands.length === 1 ? operands[0] : new Or(operands);
-    },
-
-    /**
-     * @inheritdoc
-     */
-    invert: function() {
-      if(!And) And = require("./And");
-      return new And(this._invertedOperands());
     }
+
   });
 
   return Or;

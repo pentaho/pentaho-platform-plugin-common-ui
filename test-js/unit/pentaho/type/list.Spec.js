@@ -1165,15 +1165,15 @@ define([
     });
 
     describe("Meta -", function() {
-      describe("#list -", function() {
+      describe("#isList -", function() {
         it("should return the value `true`", function() {
-          expect(List.meta.list).toBe(true);
+          expect(List.meta.isList).toBe(true);
         });
       });
 
-      describe("#refinement -", function() {
+      describe("#isRefinement -", function() {
         it("should return the value `false`", function() {
-          expect(List.meta.refinement).toBe(false);
+          expect(List.meta.isRefinement).toBe(false);
         });
       });
     });

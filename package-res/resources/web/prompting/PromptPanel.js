@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2016 Pentaho Corporation.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,11 @@
  */
 define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/util/util', 'common-ui/util/GUIDHelper', './WidgetBuilder', 'cdf/Dashboard.Clean', './parameters/ParameterDefinitionDiffer', 'common-ui/jquery-clean'],
     function (Base, Logger, DojoNumber, i18n, Utils, GUIDHelper, WidgetBuilder, Dashboard, ParamDiff, $) {
+
+      // Add specific prompting message bundle
+      if (pentaho.common.Messages) {
+        pentaho.common.Messages.addUrlBundle('prompting',CONTEXT_PATH+'i18n?plugin=common-ui&name=resources/web/prompting/messages/messages');
+      }
 
       var _STATE_CONSTANTS = {
         readOnlyProperties: ["promptNeeded", "paginate", "totalPages", "showParameterUI", "allowAutoSubmit"],
@@ -598,20 +603,6 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
         },
 
         /**
-         * Get a localized string for this prompt panel.
-         *
-         * @name PromptPanel#getString
-         * @method
-         * @param {String} key The key
-         * @param {String} defaultString The default value
-         *
-         * @returns {String} The localized string
-         */
-        getString: function (key, defaultString) {
-          return defaultString || '!' + key + '!';
-        },
-
-        /**
          * Returns a parameter name unique to this parameter panel.
          *
          * @name PromptPanel#getParameterName
@@ -966,6 +957,10 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
                     };
                   }
                 }
+
+                if(c.param) {
+                  c.param = paramDefn.getParameter(c.param.name);
+                }
               });
 
               this._focusedParam = focusedParam;
@@ -1173,17 +1168,7 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
                   promptPanel: this
                 }, param.attributes["parameter-render-type"]).valuesArray;
 
-                // Compare values array from param (which is formatted into valuesArray) with the current valuesArray
-                // We need to update the components if autoSubmit is off
-                var valArr;
-                if ( component.valuesArray ) {
-                  valArr = component.valuesArray.slice();
-                  if ( "" == component.valuesArray[0][0] && "" == component.valuesArray[0][1] ) {
-                    //no update needed if component.valuesArray equals newValuesArray except first empty(default) value
-                    valArr = component.valuesArray.slice(1);
-                  }
-                }
-                if (JSON.stringify(valArr) !== JSON.stringify(newValuesArray) || param.forceUpdate) {
+                if (JSON.stringify(component.valuesArray) !== JSON.stringify(newValuesArray) || param.forceUpdate) {
                   // Find selected value in param values list and set it. This works, even if the data in valuesArray is different
                   this._initializeParameterValue(null, param);
 
@@ -1204,8 +1189,8 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
                 }
 
                 if (!updateNeeded) {
-                  var paramValue = this.dashboard.getParameterValue(component.parameter);
-                  updateNeeded = _areParamsDifferent(paramValue, paramSelectedValues, paramType);
+                  updateNeeded = _areParamsDifferent(this.dashboard.getParameterValue(component.parameter),
+                      paramSelectedValues, paramType);
                 }
 
                 if (updateNeeded) {

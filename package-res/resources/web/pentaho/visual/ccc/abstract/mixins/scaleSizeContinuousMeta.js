@@ -25,8 +25,8 @@ define([
       {
         name: "sizeByNegativesMode",
         type: sizeByNegativesModeFactory,
-        applicable: function() { return this.count("size") > 0; },
-        required: true,
+        isApplicable: function() { return this.count("size") > 0; },
+        isRequired: true,
         value: "negLowest"
       }
     ]

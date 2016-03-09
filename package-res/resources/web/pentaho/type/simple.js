@@ -268,7 +268,7 @@ define([
 
       meta: /** pentaho.type.Simple.Meta# */{
         id: module.id,
-        "abstract": true,
+        isAbstract: true,
         styleClass: "pentaho-type-simple",
 
         //region cast method

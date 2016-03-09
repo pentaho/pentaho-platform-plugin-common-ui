@@ -398,7 +398,7 @@ define([
      *
      *   var context = new Context({container: "data-explorer-101"});
      *
-     *   context.getAllAsync("my/component", {browsable: true})
+     *   context.getAllAsync("my/component", {isBrowsable: true})
      *     .then(function(ComponentModels) {
      *
      *       ComponentModels.forEach(function(ComponentModel) {
@@ -412,8 +412,8 @@ define([
      *
      * @param {string} [baseTypeId] The id of the base type. Defaults to `"pentaho/type/value"`.
      * @param {object} [keyArgs] Keyword arguments.
-     * @param {?boolean} [keyArgs.browsable=null] Indicates that only types with the specified
-     *   [browsable]{@link pentaho.type.Value.Meta#browsable} value are returned.
+     * @param {?boolean} [keyArgs.isBrowsable=null] Indicates that only types with the specified
+     *   [isBrowsable]{@link pentaho.type.Value.Meta#isBrowsable} value are returned.
      *
      * @return {Promise.<Array.<!Class.<pentaho.type.Value>>>} A promise for instance classes.
      *

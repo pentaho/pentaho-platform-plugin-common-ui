@@ -27,7 +27,7 @@ define([
 
   "use strict";
 
-  function applicableLegend() {
+  function isApplicableLegend() {
     /*jshint validthis:true*/
     return this.getv("showLegend");
   }
@@ -39,7 +39,7 @@ define([
     return Abstract.extend({
       meta: {
         id: "pentaho/visual/ccc/abstract",
-        "abstract": true,
+        isAbstract: true,
 
         props: [
           //region Visual Roles
@@ -48,7 +48,7 @@ define([
             type: ["string"],
             dataType: "string",
             isVisualRole: true,
-            required: false
+            isRequired: false
           },
           //endregion
 
@@ -56,24 +56,24 @@ define([
           {
             name: "backgroundFill",
             type: backgroundFillFactory,
-            required: true,
+            isRequired: true,
             value: "none"
           },
           {
             name: "backgroundColor",
             type: colorFactory,
-            applicable: function() {
+            isApplicable: function() {
               return this.getv("backgroundFill") !== "none";
             },
-            required: true
+            isRequired: true
           },
           {
             name: "backgroundColorEnd",
             type: colorFactory,
-            applicable: function() {
+            isApplicable: function() {
               return this.getv("backgroundFill") === "gradient";
             },
-            required: true
+            isRequired: true
           },
           //endregion
 
@@ -91,7 +91,7 @@ define([
           {
             name: "labelStyle",
             type: fontStyleFactory,
-            required: true,
+            isRequired: true,
             value: "plain"
           },
           {
@@ -109,38 +109,38 @@ define([
           {
             name: "legendPosition",
             type: sidesFactory,
-            applicable: applicableLegend,
-            required: true,
+            isApplicable: isApplicableLegend,
+            isRequired: true,
             value: "right"
           },
           {
             name: "legendBackgroundColor",
             type: colorFactory,
-            applicable: applicableLegend
+            isApplicable: isApplicableLegend
           },
 
           // Legend Item Label Font
           {
             name: "legendColor",
             type: colorFactory,
-            applicable: applicableLegend
+            isApplicable: isApplicableLegend
           },
           {
             name: "legendSize",
             type: "number",
-            applicable: applicableLegend
+            isApplicable: isApplicableLegend
           },
           {
             name: "legendStyle",
             type: fontStyleFactory,
-            applicable: applicableLegend,
-            required: true,
+            isApplicable: isApplicableLegend,
+            isRequired: true,
             value: "plain"
           },
           {
             name: "legendFontFamily",
             type: "string",
-            applicable: applicableLegend
+            isApplicable: isApplicableLegend
           },
           //endregion
 

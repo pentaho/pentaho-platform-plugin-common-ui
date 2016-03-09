@@ -45,28 +45,28 @@ define([
           props: [
             {
               name: "rows",
-              required: true
+              isRequired: true
             },
             {
               name: "columns",
               type: ["string"],
               dataType: "string",
               isVisualRole: true,
-              required: false
+              isRequired: false
             },
             {
               name: "size",
               type: "string",
               dataType: "number",
               isVisualRole: true,
-              required: requiredOneMeasure
+              isRequired: requiredOneMeasure
             },
             {
               name: "color",
               type: "string",
               dataType: "number",
               isVisualRole: true,
-              required: requiredOneMeasure
+              isRequired: requiredOneMeasure
             },
 
             {
@@ -75,7 +75,7 @@ define([
                 base: labelsOptionFactory,
                 domain: ["none", "center"]
               },
-              required: true,
+              isRequired: true,
               value: "none"
             },
             {
@@ -84,7 +84,7 @@ define([
                 base: shapeFactory,
                 domain: ["none", "circle", "square"]
               },
-              required: true,
+              isRequired: true,
               value: "square"
             }
           ]

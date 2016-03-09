@@ -49,13 +49,13 @@ define([
             type: ["string"],
             dataType: "string",
             isVisualRole: true,
-            required: false
+            isRequired: false
           },
 
           {
             name: "displayUnits",
             type: displayUnitsFactory,
-            required: true,
+            isRequired: true,
             value: "units_0"
           },
           {
@@ -64,19 +64,19 @@ define([
               base: labelsOptionFactory,
               domain: ["none", "center"]
             },
-            required: true,
+            isRequired: true,
             value: "none"
           },
           {
             name: "emptySlicesHidden",
             type: "boolean",
-            required: true,
+            isRequired: true,
             value: true
           },
           {
             name: "sliceOrder",
             type: sliceOrderFactory,
-            required: true,
+            isRequired: true,
             value: "bySizeDescending"
           }
         ]

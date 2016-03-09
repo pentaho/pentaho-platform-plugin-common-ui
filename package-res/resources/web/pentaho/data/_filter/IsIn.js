@@ -22,35 +22,35 @@ define([
   /**
    * @name IsIn
    * @memberOf pentaho.data.filter
+   *
    * @class
    * @extends pentaho.data.filter.AbstractPropertyFilter
-   * @amd pentaho/data/filter/IsIn
    *
    * @classdesc A filter that defines the set of items in which the value of a property belongs to a reference set.
    *
    * @example
    * <caption> Create a new <code>IsIn</code> filter.</caption>
    *
-   * require(["pentaho/data/Table", "pentaho/data/filter/IsIn"], function(Table, IsIn) {
+   * require(["pentaho/data/Table", "pentaho/data/filter"], function(Table, filter) {
    *   var data = new Table({
    *     model: [
-   *       {name: "product", type: "string", label: "Product"},
-   *       {name: "sales", type: "number", label: "Sales"},
+   *       {name: "product", type: "string",  label: "Product"},
+   *       {name: "sales",   type: "number",  label: "Sales"},
    *       {name: "inStock", type: "boolean", label: "In Stock"}
    *     ],
    *     rows: [
    *       {c: [{v: "A"}, {v: 12000}, {v: true}]},
-   *       {c: [{v: "B"}, {v: 6000}, {v: true}]},
+   *       {c: [{v: "B"}, {v: 6000},  {v: true}]},
    *       {c: [{v: "C"}, {v: 12000}, {v: false}]},
-   *       {c: [{v: "D"}, {v: 1000}, {v: false}]},
-   *       {c: [{v: "E"}, {v: 2000}, {v: false}]},
-   *       {c: [{v: "F"}, {v: 3000}, {v: false}]},
-   *       {c: [{v: "G"}, {v: 4000}, {v: false}]}
+   *       {c: [{v: "D"}, {v: 1000},  {v: false}]},
+   *       {c: [{v: "E"}, {v: 2000},  {v: false}]},
+   *       {c: [{v: "F"}, {v: 3000},  {v: false}]},
+   *       {c: [{v: "G"}, {v: 4000},  {v: false}]}
    *     ]
    *   });
    *
-   *   var filter = new IsIn("product", ["A", "B"]);
-   *   var filteredData = filter.apply(data);
+   *   var myFilter = new filter.IsIn("product", ["A", "B"]);
+   *   var filteredData = myFilter.apply(data);
    *   //filteredData.getValue(0, 0) === "A"
    *   //filteredData.getValue(1, 0) === "B"
    * });

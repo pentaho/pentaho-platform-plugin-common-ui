@@ -28,7 +28,7 @@ define([
     return CategoricalContinuousAbstract.extend({
       meta: {
         id: "pentaho/visual/ccc/barAbstract",
-        "abstract": true,
+        isAbstract: true,
 
         props: [
           {
@@ -36,7 +36,7 @@ define([
             type: ["string"],
             dataType: "string",
             isVisualRole: true,
-            required: false
+            isRequired: false
           },
           {
             name: "measures",
@@ -49,7 +49,7 @@ define([
             type: ["string"],
             dataType: "string",
             isVisualRole: true,
-            required: false
+            isRequired: false
           }
         ]
       }
