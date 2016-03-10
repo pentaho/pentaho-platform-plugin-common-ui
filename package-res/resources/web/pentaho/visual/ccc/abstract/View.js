@@ -169,7 +169,7 @@ define([
 
     //region VizAPI implementation
 
-    _init: function(){
+    _init: function() {
       this.model.on("did:change:selection", this._selectionChanged.bind(this));
     },
 
@@ -223,25 +223,64 @@ define([
 
     //region Helpers
     // Sets the items on the chart that should be highlighted
-    setHighlights: function(highlights) {
-      this._selections = highlights;
+    //setHighlights: function(highlights) {
+    //  this._selections = highlights;
+    //
+    //  if(!this._ownChange) { // reentry control
+    //    if(!highlights || highlights.length === 0) {
+    //      // will cause selectionChangedAction being called
+    //      this._ownChange = true;
+    //      try {
+    //        this._chart.clearSelections();
+    //      } finally {
+    //        this._ownChange = false;
+    //      }
+    //    }
+    //  }
+    //},
 
-      if(!this._ownChange) { // reentry control
-        if(!highlights || highlights.length === 0) {
-          // will cause selectionChangedAction being called
-          this._ownChange = true;
-          try {
-            this._chart.clearSelections();
-          } finally {
-            this._ownChange = false;
-          }
-        }
+    _selectionChanged: function() {
+      var dataFilter = this.model.getv("selectionFilter");
+      var selectedItems = dataFilter.apply(this.model.getv("data"));
+      var props = [];
+
+      //this._keyAxesIds.map(function(axisId) {
+      //  var result = this.axes[axisId]
+      //    .getSelectionGems()
+      //    .array(function(gem) {
+      //      return {
+      //        ordinal: gem.attr.ordinal,
+      //        cccDimName: gem.cccDimName
+      //      };
+      //    });
+      //  props.push(result);
+      //}, this);
+
+      props = def.query(this._keyAxesIds)
+        .selectMany(function(axisId) {
+          return this.axes[axisId].getSelectionGems();
+        }, this)
+        .select(function(gem) {
+          return {
+            ordinal:    gem.attr.ordinal,
+            cccDimName: gem.cccDimName
+          };
+        })
+        .array();
+
+      //far from optimal, we should eliminate repeated terms
+      var whereSpec = [];
+      for(var k = 0, N = selectedItems.getNumberOfRows(); k < N; k++) {
+        var datumFilter = {};
+        props.forEach(function(prop) {
+          datumFilter[prop.cccDimName] = selectedItems.getValue(k, prop.ordinal);
+        });
+        whereSpec.push(datumFilter);
       }
-    },
 
-    _selectionChanged: function(){
-      var selectedItems = this.model.getv("selectionFilter").apply(this.model.getv("data"));
-
+      this._chart.data.replaceSelected(
+        this._chart.data.datums(whereSpec)
+      );
     },
 
     _doResize: function() {
@@ -1297,9 +1336,7 @@ define([
       if(this._doesSharedSeriesSelection()) {
         selectingDatums.forEach(function(datum) {
           if(!datum.isVirtual) {
-            var selection = {type: "column"};
-
-            this.axes.column.fillCellSelection(selection, datum, selectionExcludesMulti);
+            var operand = this.axes.column.complexToFilter(datum, selectionExcludesMulti);
 
             // Check if there's already a selection with the same key.
             // If not, add a new selection to the selections list.
@@ -1307,16 +1344,19 @@ define([
             // the datums included in each selection must be known (by its index).
             // So, add the datum to the new or existing selection's datums list.
 
-            var key = this._getSelectionKey(selection),
-              existingSelection = selectionsByKey[key];
-            if(!existingSelection) {
-              selection.__cccDatums = [datum];
+            //var key = this._getSelectionKey(selection),
+            //  existingSelection = selectionsByKey[key];
+            //if(!existingSelection) {
+            //  selection.__cccDatums = [datum];
+            //
+            //  selectionsByKey[key] = selection;
+            //  selections.push(selection);
+            //} else {
+            //  existingSelection.__cccDatums.push(datum);
+            //}
 
-              selectionsByKey[key] = selection;
-              selections.push(selection);
-            } else {
-              existingSelection.__cccDatums.push(datum);
-            }
+            if(operand)
+              operands.push(operand);
           }
         }, this);
 
@@ -1327,29 +1367,29 @@ define([
             var operand = this._complexToFilter(datum, selectionExcludesMulti);
 
             /*
-            // Check if there's already a selection with the same key.
-            // If not, add a new selection to the selections list.
-            var key = this._getSelectionKey(selection),
-              existingSelection = selectionsByKey[key];
-            if(!existingSelection) {
-              selection.__cccDatums = datum;
+             // Check if there's already a selection with the same key.
+             // If not, add a new selection to the selections list.
+             var key = this._getSelectionKey(selection),
+             existingSelection = selectionsByKey[key];
+             if(!existingSelection) {
+             selection.__cccDatums = datum;
 
-              selectionsByKey[key] = selection;
-              selections.push(selection);
-            }
-            */
+             selectionsByKey[key] = selection;
+             selections.push(selection);
+             }
+             */
             if(operand)
               operands.push(operand);
           }
         }, this);
       }
       /*
-      selections = this._limitSelection(selections);
+       selections = this._limitSelection(selections);
 
-      var operands = selections.map(function(item) {
-        return new filter.IsEqual(item.rowId[0], item.rowItem[0]);
-      });
-      */
+       var operands = selections.map(function(item) {
+       return new filter.IsEqual(item.rowId[0], item.rowItem[0]);
+       });
+       */
       var selectionFilter = new filter.Or(operands);
       this.model.select(selectionFilter);
       return [];
@@ -1698,23 +1738,25 @@ define([
       }, this);
 
       switch(operands.length) {
-        case 0: return null;
-        case 1: return operands[0];
+        case 0:
+          return null;
+        case 1:
+          return operands[0];
       }
       return new filter.And(operands);
     },
 
-    _complexToCellSelection: function(complex, selectionExcludesMulti) {
-      /* The analyzer cell-selection object */
-      var selection = {type: "cell"};
-
-      /* Add each axis' formulas to the selection */
-      this._axesIds.forEach(function(axisId) {
-        this.axes[axisId].fillCellSelection(selection, complex, selectionExcludesMulti);
-      }, this);
-
-      return selection;
-    }
+    //_complexToCellSelection: function(complex, selectionExcludesMulti) {
+    //  /* The analyzer cell-selection object */
+    //  var selection = {type: "cell"};
+    //
+    //  /* Add each axis' formulas to the selection */
+    //  this._axesIds.forEach(function(axisId) {
+    //    this.axes[axisId].fillCellSelection(selection, complex, selectionExcludesMulti);
+    //  }, this);
+    //
+    //  return selection;
+    //}
     //endregion
   }, /** @lends pentaho.visual.ccc.base.View */{
 
