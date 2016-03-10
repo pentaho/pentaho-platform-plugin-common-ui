@@ -49,11 +49,10 @@ define([
       }
     },
 
-    complexToFilter: function(complex, selectionExcludesMulti) {
+    complexToFilter: function(complex) {
       var operands = [];
 
-      this.getSelectionGems(selectionExcludesMulti)
-        .each(function(gem) {
+      this.getSelectionGems().each(function(gem) {
           var atom = complex.atoms[gem.cccDimName];
           var value = atom.value == null ? atom.rawValue : atom.value;
 
@@ -69,40 +68,9 @@ define([
       return new filter.And(operands);
     },
 
-    ___fillCellSelection: function(selection, complex, selectionExcludesMulti) {
-      var forms = [],
-          values = [],
-          label;
-
-      this.getSelectionGems(selectionExcludesMulti)
-          .each(function(gem) {
-            var atom = complex.atoms[gem.cccDimName];
-            forms.push(gem.name);
-
-            // Translate back null member values to the original member value,
-            // which is accessible in rawValue.
-            values.push(atom.value == null ? atom.rawValue : atom.value);
-            label = atom.label; // TODO is this ok?
-          });
-
-      if(forms.length) {
-        var axisId = this.id;
-        // Dummy property, just to force Analyzer to read the axis info
-        selection[axisId] = true;
-
-        selection[axisId + "Id"] = forms;
-        selection[axisId + "Item"] = values;
-        selection[axisId + "Label"] = label;
-      }
-    },
-
-    getSelectionGems: function(selectionExcludesMulti) {
-      if(selectionExcludesMulti == null) selectionExcludesMulti = true;
-
+    getSelectionGems: function() {
       return def.query(this.gems)
-          .where(function(gem) {
-            return !gem.isMeasureDiscrim && (!selectionExcludesMulti || this._nonMultiGemFilter(gem));
-          }, this);
+          .where(function(gem) { return !gem.isMeasureDiscrim; }, this);
     }
   });
 });

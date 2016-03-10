@@ -22,19 +22,19 @@ define([
   var type = "will:execute";
   return FilterEvent.extend("pentaho.lang.FilterEvent", /** @lends pentaho.visual.base.events.WillExecute# */{
 
-    constructor: function(source, dataFilter, action) {
-      if (!action) throw error.argRequired("action");
+    constructor: function(source, dataFilter, executeAction) {
+      if (!executeAction) throw error.argRequired("executeAction");
 
       this.base(type, source, true, dataFilter);
-      this._action = action;
+      this._executeAction = executeAction;
     },
 
     set action(_) {
-      this._action = _;
+      this._executeAction = _;
     },
 
     get action() {
-      return this._action;
+      return this._executeAction;
     }
   }, {
     type: type

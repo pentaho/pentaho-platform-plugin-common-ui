@@ -70,16 +70,6 @@ define([
           this.base(modelSpec);
         },
 
-        _action: null,
-
-        set action(_) {
-          this._action = _;
-        },
-
-        get action() {
-          return this._action;
-        },
-
         select: function(dataFilter, keyArgs) {
           var isCanceled = false;
           var mutatedDataFilter = dataFilter;
@@ -124,23 +114,23 @@ define([
         execute: function(dataFilter) {
           var isCanceled = false;
           var willExecute = null;
+          var executeAction = this.getv("executeAction");
 
           if(this._hasListeners(WillExecute.type)) {
-            willExecute = new WillExecute(this, dataFilter, this.action); //listener can change dataFilter and/or action
-            isCanceled = !!this._emit(willExecute);
+            willExecute = new WillExecute(this, dataFilter, executeAction); //listener can change dataFilter and/or action
+            isCanceled = !this._emit(willExecute);
           }
 
           if(isCanceled && this._hasListeners(CanceledExecute.type)) {
             var canceledExecute = new CanceledExecute(this, dataFilter);
             this._emit(canceledExecute);
-            return false;
           }
 
-          var action = O.getOwn(willExecute, "action", this.action);
-          var mutatedDataFilter = O.getOwn(willExecute, "dataFilter", dataFilter);
+          executeAction = O.getOwn(willExecute, "executeAction", executeAction).bind(this);
+          var mutatedDataFilter = O.getOwn(willExecute, "_dataFilter", dataFilter);
 
           try {
-            action(); //will use mutatedDataFilter
+            executeAction(mutatedDataFilter, this.getv("data"));
             if(this._hasListeners(DidExecute.type)) {
               var didExecute = new DidExecute(this, mutatedDataFilter);
               this._emit(didExecute);
@@ -207,6 +197,11 @@ define([
               name: "selectionMode",
               type: "function",
               value: selectionModes.REPLACE
+            },
+            {
+              name: "executeAction",
+              type: "function",
+              value: _executeAction
             }
           ]
         }
@@ -215,5 +210,20 @@ define([
       .implement({meta: bundle.structured});
 
     return Model;
+
+    function _executeAction(dataFilter) {
+      var queryValue = "";
+
+      if(dataFilter.type === "isEqual") {
+        queryValue = dataFilter.value;
+      } else {
+        var operands = dataFilter.operands;
+        operands.forEach(function(filter, index) {
+          queryValue += filter.value + (index === operands.length-1 ? "" : "+");
+        });
+      }
+
+      window.open("http://www.google.com/search?as_q=\"" + queryValue + "\"", "_blank");
+    }
   };
 });

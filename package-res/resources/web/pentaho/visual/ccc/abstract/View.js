@@ -1327,16 +1327,18 @@ define([
     _onUserSelection: function(selectingDatums) {
       //return this._onUserSelection(selectingDatums);
       // Convert to array of analyzer cell or column selection objects
+      /*
       var selectionExcludesMulti = this._selectionExcludesMultiGems(),
         selections = [],
         selectionsByKey = {};
+      */
 
       var operands = [];
 
       if(this._doesSharedSeriesSelection()) {
         selectingDatums.forEach(function(datum) {
           if(!datum.isVirtual) {
-            var operand = this.axes.column.complexToFilter(datum, selectionExcludesMulti);
+            var operand = this.axes.column.complexToFilter(datum);
 
             // Check if there's already a selection with the same key.
             // If not, add a new selection to the selections list.
@@ -1364,7 +1366,7 @@ define([
         // Duplicates may occur due to excluded dimensions like the discriminator
         selectingDatums.forEach(function(datum) {
           if(!datum.isVirtual) {
-            var operand = this._complexToFilter(datum, selectionExcludesMulti);
+            var operand = this._complexToFilter(datum);
 
             /*
              // Check if there's already a selection with the same key.
@@ -1613,12 +1615,10 @@ define([
         whereSpec;
 
       if(selectedDatums.length) {
-        var selectionExcludesMulti = this._selectionExcludesMultiGems();
-
         // Include axis="column" dimensions
         // * Excludes measure discrim dimensions
         // * Excludes "multi" role dimensions
-        var colDimNames = this.axes.column.getSelectionGems(selectionExcludesMulti)
+        var colDimNames = this.axes.column.getSelectionGems()
           .select(function(gem) { return gem.cccDimName; })
           .array(),
           rowDimNames;
@@ -1627,7 +1627,7 @@ define([
           // Include axis="row" dimensions
           // * Excludes measure discrim dimensions
           // * Excludes "multi" role dimensions
-          rowDimNames = this.axes.row.getSelectionGems(selectionExcludesMulti)
+          rowDimNames = this.axes.row.getSelectionGems()
             .select(function(gem) { return gem.cccDimName; })
             .array();
         }
@@ -1692,48 +1692,17 @@ define([
     },
 
     _onDoubleClick: function(complex) {
-      var dataFilter = this._complexToFilter(complex, this._selectionExcludesMultiGems());
-      return;
-      visualEvents.trigger(this, "doubleclick", {
-        source: this,
-        selections: [dataFilter]
-        // TODO: Analyzer needs to know whether this double click is coming from a chart data point or an axis.
-        // For axis use case, please identify the gembar and include only those gems that are in this gembar
-        // into the selection.
-        // For chart data point use case, please pass all gems across gembars into the selection
-        // gembar: rows
-      });
-
-      return true;
+      return this.model.execute(this._complexToFilter(complex));
     },
     //endregion
 
     //region UTILITY
-    /**
-     * Converts a complex to an analyzer cell selection.
-     *
-     * An analyzer cell selection has the following structure:
-     * {
-     *    type:     "cell",
-     *
-     *    column:      table column index ??
-     *    columnId:    ["[Time].[Years]", "[Time].[Quarters]"   ], // formulas
-     *    columnItem:  ["[Time].[2003]",  "[Time].[2003].[QTR4]"], // values
-     *    columnLabel: "2003~QTR4~Sales",
-     *
-     *    row:          table row index ??
-     *    rowId:       ["[Markets].[Territory]", "[Order Status].[Type]"    ]  // formulas
-     *    rowItem:     ["[Markets].[EMEA]",      "[Order Status].[Resolved]"], // values
-     *    rowLabel:    "Type",
-     *
-     *    value:       28550.59 // formatted joined by ~ ?
-     * }
-     */
-    _complexToFilter: function(complex, selectionExcludesMulti) {
+
+    _complexToFilter: function(complex) {
       /* Add each axis' formulas to the selection */
       var operands = [];
       this._keyAxesIds.forEach(function(axisId) {
-        var operand = this.axes[axisId].complexToFilter(complex, selectionExcludesMulti);
+        var operand = this.axes[axisId].complexToFilter(complex);
         if(operand) operands.push(operand);
       }, this);
 
@@ -1744,19 +1713,7 @@ define([
           return operands[0];
       }
       return new filter.And(operands);
-    },
-
-    //_complexToCellSelection: function(complex, selectionExcludesMulti) {
-    //  /* The analyzer cell-selection object */
-    //  var selection = {type: "cell"};
-    //
-    //  /* Add each axis' formulas to the selection */
-    //  this._axesIds.forEach(function(axisId) {
-    //    this.axes[axisId].fillCellSelection(selection, complex, selectionExcludesMulti);
-    //  }, this);
-    //
-    //  return selection;
-    //}
+    }
     //endregion
   }, /** @lends pentaho.visual.ccc.base.View */{
 

@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,11 @@
  */
 define([
   "pentaho/lang/Base",
+  "pentaho/lang/Event",
+  "pentaho/data/filter",
   "pentaho/util/error",
   "pentaho/shim/es6-promise"
-], function(Base, error, Promise) {
+], function(Base, Event, filter, error, Promise) {
 
   "use strict";
 
