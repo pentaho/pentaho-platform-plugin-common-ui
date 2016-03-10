@@ -17,6 +17,7 @@
     "karma-jasmine": "^0.3.6",
     "karma-jasmine-html-reporter": "^0.2.0",
     "karma-junit-reporter": "^0.3.8",
+    "karma-mocha-reporter": "^1.1.6",
     "karma-phantomjs-launcher": "^1.0.0",
     "karma-requirejs": "0.2.x",
     "phantomjs-prebuilt": "^2.1.3",
