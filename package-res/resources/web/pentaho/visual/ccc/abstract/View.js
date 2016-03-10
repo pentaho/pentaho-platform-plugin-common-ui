@@ -21,22 +21,23 @@ define([
   "cdf/lib/CCC/protovis",
   "../_axes/Axis",
   "../util",
+  "pentaho/data/filter",
   "pentaho/visual/events",
   "pentaho/visual/color/utils",
   "pentaho/visual/color/paletteRegistry",
   "pentaho/data/TableView",
   "pentaho/i18n!view"
 ], function(View,
-    def, pvc, cdo, pv, Axis,
-    util, visualEvents, visualColorUtils, visualPaletteRegistry,
-    DataView, bundle) {
+            def, pvc, cdo, pv, Axis,
+            util, filter, visualEvents, visualColorUtils, visualPaletteRegistry,
+            DataView, bundle) {
 
   "use strict";
 
   /*global alert:false, cv:false */
 
   var ruleStrokeStyle = "#808285",  // "#D8D8D8",  // #f0f0f0
-      lineStrokeStyle = "#D1D3D4";  // "#D1D3D4"; //"#A0A0A0"; // #D8D8D8",// #f0f0f0
+    lineStrokeStyle = "#D1D3D4";  // "#D1D3D4"; //"#A0A0A0"; // #D8D8D8",// #f0f0f0
 
   function legendShapeColorProp(scene) {
     return scene.isOn() ? scene.color : pvc.toGrayScale(scene.color);
@@ -46,7 +47,7 @@ define([
     // Chart
     compatVersion: 2, // use CCC version 2
 
-    margins:  0,
+    margins: 0,
     paddings: 10,
     plotFrameVisible: false,
 
@@ -58,9 +59,9 @@ define([
     multiChartMax: 50,
 
     // Legend
-    legend:  true,
+    legend: true,
     legendPosition: "right",
-    legendSizeMax:  "60%",
+    legendSizeMax: "60%",
     legendPaddings: 10,
     legendItemPadding: {left: 1, right: 1, top: 2, bottom: 2}, // width: 2, height: 4
     legendClickMode: "toggleSelected",
@@ -68,35 +69,35 @@ define([
     color3AxisLegendClickMode: "toggleSelected", // for trends
 
     // Axes
-    axisSizeMax:      "50%",
+    axisSizeMax: "50%",
     axisTitleSizeMax: "20%",
-    orthoAxisGrid:    true,
+    orthoAxisGrid: true,
     continuousAxisLabelSpacingMin: 1.1, // em
 
     // Title
     titlePosition: "top",
 
     // Interaction
-    interactive:    true,
-    animate:        false,
-    clickable:      !false, // NOTE: Disabled until actions are implemented
-    selectable:     !false, // NOTE: Disabled until actions are implemented
-    hoverable:      false,
+    interactive: true,
+    animate: false,
+    clickable: !false, // NOTE: Disabled until actions are implemented
+    selectable: !false, // NOTE: Disabled until actions are implemented
+    hoverable: false,
     ctrlSelectMode: false,
     clearSelectionMode: "manual",
     tooltipEnabled: true,
     tooltip: {
-      className:    "pentaho-visual-ccc",
-      delayIn:      200,
-      delayOut:     80,
-      offset:       2,
-      html:         true,
-      gravity:      "nw",
-      fade:         false,
-      followMouse:  true,
-      useCorners:   true,
+      className: "pentaho-visual-ccc",
+      delayIn: 200,
+      delayOut: 80,
+      offset: 2,
+      html: true,
+      gravity: "nw",
+      fade: false,
+      followMouse: true,
+      useCorners: true,
       arrowVisible: false,
-      opacity:      1
+      opacity: 1
     },
 
     // Plot
@@ -112,15 +113,15 @@ define([
 
     // TODO: stop using the extension points map
     extensionPoints: {
-      axisRule_strokeStyle:   ruleStrokeStyle,
-      axisTicks_strokeStyle:  lineStrokeStyle,
+      axisRule_strokeStyle: ruleStrokeStyle,
+      axisTicks_strokeStyle: lineStrokeStyle,
       dot_lineWidth: 1.5,
-      legendArea_lineWidth:   1,
+      legendArea_lineWidth: 1,
       legendArea_strokeStyle: "#c0c0c0",
       legendLabel_textDecoration: null,
-      legendDot_fillStyle:    legendShapeColorProp,
-      legendDot_strokeStyle:  legendShapeColorProp,
-      legend2Dot_fillStyle:   legendShapeColorProp,
+      legendDot_fillStyle: legendShapeColorProp,
+      legendDot_strokeStyle: legendShapeColorProp,
+      legend2Dot_fillStyle: legendShapeColorProp,
       legend2Dot_strokeStyle: legendShapeColorProp
     }
   };
@@ -136,9 +137,9 @@ define([
     // Default mapping from gembarId to CCC dimension group.
     // From requirement visual roles to CCC visual roles...
     _roleToCccDimGroup: {
-      "multi":    "multiChart",
-      "columns":  "series",
-      "rows":     "category",
+      "multi": "multiChart",
+      "columns": "series",
+      "rows": "category",
       "measures": "value"
     },
 
@@ -148,7 +149,7 @@ define([
     _genericMeasureCccDimName: null,
 
     _keyAxesIds: ["column", "row"],
-    _axesIds:    ["column", "row", "measure"],
+    _axesIds: ["column", "row", "measure"],
 
     // Measure roles that do not show the role in the tooltip.
     // Essentially, those measures that are represented by cartesian axes...
@@ -167,6 +168,11 @@ define([
     //endregion
 
     //region VizAPI implementation
+
+    _init: function(){
+      this.model.on("did:change:selection", this._selectionChanged.bind(this));
+    },
+
     _render: function() {
       this._dataTable = this.model.getv("data");
 
@@ -233,9 +239,14 @@ define([
       }
     },
 
+    _selectionChanged: function(){
+      var selectedItems = this.model.getv("selectionFilter").apply(this.model.getv("data"));
+
+    },
+
     _doResize: function() {
       if(this._chart) {
-        var width  = this.model.getv("width");
+        var width = this.model.getv("width");
         var height = this.model.getv("height");
         var options = this._chart.options;
         def.set(options, "width", width, "height", height);
@@ -255,15 +266,15 @@ define([
       // Recursively inherit this class' shared options
       var options = this.options = def.create(this._options);
       def.set(
-          options,
-          "canvas",          this._element,
-          "height",          model.getv("height") || 400,
-          "width",           model.getv("width")  || 400,
-          "dimensionGroups", {},
-          "dimensions",      {},
-          "visualRoles",     {},
-          "readers",         [],
-          "calculations",    []);
+        options,
+        "canvas", this._element,
+        "height", model.getv("height") || 400,
+        "width", model.getv("width") || 400,
+        "dimensionGroups", {},
+        "dimensions", {},
+        "visualRoles", {},
+        "readers", [],
+        "calculations", []);
     },
     //endregion
 
@@ -274,17 +285,17 @@ define([
 
     _buildVisualMap: function() {
       var model = this.model,
-          visualMap = {};
+        visualMap = {};
 
       Object.keys(this._roleToCccDimGroup)
-          .forEach(function(roleName) {
-            if(this[roleName]) {
-              var value = model.getv(roleName);
-              visualMap[roleName] = model.meta.get(roleName).isList
-                  ? value.toArray(function(elem) { return elem.value; })
-                  : [value];
-            }
-          }, this._roleToCccDimGroup);
+        .forEach(function(roleName) {
+          if(this[roleName]) {
+            var value = model.getv(roleName);
+            visualMap[roleName] = model.meta.get(roleName).isList
+              ? value.toArray(function(elem) { return elem.value; })
+              : [value];
+          }
+        }, this._roleToCccDimGroup);
 
       return visualMap;
     },
@@ -295,7 +306,7 @@ define([
 
     _buildInverseVisualMap: function() {
       var invVisualMap = {},
-          visualMap = this._getVisualMap();
+        visualMap = this._getVisualMap();
       Object.keys(visualMap).forEach(function(roleName) {
         visualMap[roleName].forEach(function(attrName) {
           def.array.lazy(invVisualMap, attrName).push(roleName);
@@ -321,7 +332,7 @@ define([
 
     _getAttributeInfoByName: function(attrName, assertExists) {
       return def.getOwn(this._gemsMap, attrName) ||
-          (assertExists ? def.assert("Undefined attribute of name: '" + attrName + "'") : null);
+        (assertExists ? def.assert("Undefined attribute of name: '" + attrName + "'") : null);
     },
 
     _getAttributeInfosOfRole: function(roleName) {
@@ -335,12 +346,12 @@ define([
 
     _getRolesByCccDimGroup: function() {
       return this._rolesByCccDimGroup ||
-          (this._rolesByCccDimGroup = this._buildRolesByCccDimGroup());
+        (this._rolesByCccDimGroup = this._buildRolesByCccDimGroup());
     },
 
     _buildRolesByCccDimGroup: function() {
       var rolesByCccDimGroup = def.query(Object.keys(this._roleToCccDimGroup))
-          .multipleIndex(function(roleName) { return this[roleName]; }, this._roleToCccDimGroup);
+        .multipleIndex(function(roleName) { return this[roleName]; }, this._roleToCccDimGroup);
 
       // Must have a stable order for laying out multiple roles that map to a single CCC dimension group.
       Object.keys(rolesByCccDimGroup).forEach(function(cccDimGroup) {
@@ -356,11 +367,11 @@ define([
 
     _getRoleDepth: function(roleName, includeMeasureDiscrim) {
       var depth = 0,
-          ais = this._getAttributeInfosOfRole(roleName);
+        ais = this._getAttributeInfosOfRole(roleName);
       if(ais) {
         depth = ais.length;
         if(!includeMeasureDiscrim && this.measureDiscrimGem &&
-            this.measureDiscrimGem.role === roleName) {
+          this.measureDiscrimGem.role === roleName) {
           depth -= 1;
         }
       }
@@ -393,16 +404,16 @@ define([
             // Use the first color with half of the saturation
             var bgColor = pv.color(model.getv("backgroundColor")).rgb();
             bgColor = pv.rgb(
-                Math.floor((255 + bgColor.r) / 2),
-                Math.floor((255 + bgColor.g) / 2),
-                Math.floor((255 + bgColor.b) / 2),
-                bgColor.a);
+              Math.floor((255 + bgColor.r) / 2),
+              Math.floor((255 + bgColor.g) / 2),
+              Math.floor((255 + bgColor.b) / 2),
+              bgColor.a);
 
             fillStyle = bgColor;
           } else {
             fillStyle = "linear-gradient(to top, " +
-                model.getv("backgroundColor") + ", " +
-                model.getv("backgroundColorEnd") + ")";
+              model.getv("backgroundColor") + ", " +
+              model.getv("backgroundColorEnd") + ")";
           }
         } else {
           fillStyle = model.getv("backgroundColor");
@@ -458,7 +469,7 @@ define([
         extPoints.dot_shapeSize = radius * radius;
 
         extPoints.plot2Line_lineWidth = extPoints.line_lineWidth;
-        extPoints.plot2Dot_shapeSize  = extPoints.dot_shapeSize;
+        extPoints.plot2Dot_shapeSize = extPoints.dot_shapeSize;
       }
 
       value = model.getv("maxChartsPerRow", /*sloppy:*/true);
@@ -479,29 +490,29 @@ define([
       var dataTable = this._dataTable,
 
       // axisId -> AttributeInfo[]
-          axesGemsInfo = {
-            row: [],
-            column: [],
-            measure: []
-          },
+        axesGemsInfo = {
+          row: [],
+          column: [],
+          measure: []
+        },
 
       // attrName -> AttributeInfo
-          gemsMap = {},
+        gemsMap = {},
 
       // roleName -> attr-name[]
-          visualMap = this._getVisualMap(),
+        visualMap = this._getVisualMap(),
 
       // roleName -> AttributeInfo[]
-          visualMapInfo = {},
+        visualMapInfo = {},
 
-          genericMeasuresCount = 0;
+        genericMeasuresCount = 0;
 
       // Create attribute infos for each attribute in the data table.
       if(dataTable.isCrossTable) {
         var crossLayout = dataTable.implem.layout,
-            addStructPos = function(axisId, structPos) {
-              addAxisAttribute.call(this, axisId, structPos.attribute);
-            };
+          addStructPos = function(axisId, structPos) {
+            addAxisAttribute.call(this, axisId, structPos.attribute);
+          };
 
         crossLayout.rows.forEach(addStructPos.bind(this, "row"));
         crossLayout.cols.forEach(addStructPos.bind(this, "column"));
@@ -509,7 +520,7 @@ define([
       } else {
         // Table in plain layout
         var C = dataTable.getNumberOfColumns(),
-            j = -1;
+          j = -1;
         while(++j < C) {
           var attr = dataTable.getColumnAttribute(j);
           addAxisAttribute.call(this, attr.isDiscrete ? "row" : "measure", attr);
@@ -525,25 +536,25 @@ define([
         /*jshint validthis:true*/
 
         var attrName = attr.name,
-            roleName = this._getFirstRoleOfAttribute(attrName);
+          roleName = this._getFirstRoleOfAttribute(attrName);
         if(roleName) {
           var cccDimGroup = this._getCccDimGroupOfRole(roleName),
-              roleAttrNames = visualMap[roleName],
-              roleOrdinal = roleAttrNames.indexOf(attrName),
-              attrInfo = {
-                attr: attr,
+            roleAttrNames = visualMap[roleName],
+            roleOrdinal = roleAttrNames.indexOf(attrName),
+            attrInfo = {
+              attr: attr,
 
-                name: attr.name,
-                label: attr.label,
-                isPercent: !!attr.isPercent,
+              name: attr.name,
+              label: attr.label,
+              isPercent: !!attr.isPercent,
 
-                role: roleName,
-                cccDimGroup: cccDimGroup,
-                cccDimName:  undefined,
-                axis: axisId,
-                isMeasureGeneric: (cccDimGroup === this._genericMeasureCccDimName),
-                isMeasureDiscrim: false
-              };
+              role: roleName,
+              cccDimGroup: cccDimGroup,
+              cccDimName: undefined,
+              axis: axisId,
+              isMeasureGeneric: (cccDimGroup === this._genericMeasureCccDimName),
+              isMeasureDiscrim: false
+            };
 
           if(attrInfo.isMeasureGeneric) genericMeasuresCount++;
 
@@ -557,7 +568,7 @@ define([
            * (see Analyzer's `maxValues` visual type property).
            */
           var roleAttrInfos = visualMapInfo[roleName] ||
-              (visualMapInfo[roleName] = new Array(roleAttrNames.length));
+            (visualMapInfo[roleName] = new Array(roleAttrNames.length));
 
           // We later take care of clearing the gaps caused by missing attributes (i).
           roleAttrInfos[roleOrdinal] = attrInfo;
@@ -603,8 +614,8 @@ define([
       // To the first whose defaultRole is mapped to a ccc dim group.
       // (not all vizs have/use both axis; see Pie chart, for example).
       var roleToCccDimGroup = this._roleToCccDimGroup,
-          attrInfo = tryCreateInAxis("column") || tryCreateInAxis("row") ||
-              def.assert("Need a mapped discrete axis to hold the measure discriminator.");
+        attrInfo = tryCreateInAxis("column") || tryCreateInAxis("row") ||
+          def.assert("Need a mapped discrete axis to hold the measure discriminator.");
 
       this.measureDiscrimGem = attrInfo;
 
@@ -669,7 +680,7 @@ define([
         var mais = this._getAttributeInfosOfRole(this._multiRole);
         if(mais)
           hasMulti = !this.measureDiscrimGem ||
-              mais.some(function(mai) { return !mai.isMeasureDiscrim; });
+            mais.some(function(mai) { return !mai.isMeasureDiscrim; });
       }
       this._hasMultiChartColumns = hasMulti;
     },
@@ -685,10 +696,10 @@ define([
      */
     _transformData: function() {
       var mappedColumnIndexesOther = [],
-          mappedColumnIndexesGeneric = [],
-          C = this._dataView.getNumberOfColumns(),
-          j = -1,
-          filteredOrReordered = false;
+        mappedColumnIndexesGeneric = [],
+        C = this._dataView.getNumberOfColumns(),
+        j = -1,
+        filteredOrReordered = false;
       while(++j < C) {
         var attrInfo = this._getAttributeInfoByName(this._dataView.getColumnAttribute(j).name);
         if(!attrInfo) {
@@ -736,13 +747,13 @@ define([
      */
     _assignCccDimensions: function() {
       var rolesByCccDimGroup = this._getRolesByCccDimGroup(),
-          visualMapInfo = this._visualMapInfo,
-          hasGenericDiscrim = !!this.measureDiscrimGem,
-          genericCccDimName = this._genericMeasureCccDimName;
+        visualMapInfo = this._visualMapInfo,
+        hasGenericDiscrim = !!this.measureDiscrimGem,
+        genericCccDimName = this._genericMeasureCccDimName;
 
       Object.keys(rolesByCccDimGroup).forEach(function(cccDimGroup) {
         var isGenericGroup = hasGenericDiscrim && (cccDimGroup === genericCccDimName),
-            ordinal = 0;
+          ordinal = 0;
 
         rolesByCccDimGroup[cccDimGroup].forEach(function(roleName) {
           // Role may be unbound.
@@ -750,8 +761,8 @@ define([
           if(ais) ais.forEach(function(ai) {
             /*jshint laxbreak:true*/
             ai.cccDimName = isGenericGroup
-                ? cccDimGroup
-                : pvc.buildIndexedId(cccDimGroup, ordinal++);
+              ? cccDimGroup
+              : pvc.buildIndexedId(cccDimGroup, ordinal++);
           });
         });
       });
@@ -764,12 +775,12 @@ define([
      * the CCC mapping is 1-1.
      */
     _configureCccReaders: function() {
-      var readers  = this.options.readers,
-          dataView = this._dataView,
-          C = dataView.getNumberOfColumns(),
-          j = -1,
-          hasGenericReader = false,
-          attrName, ai;
+      var readers = this.options.readers,
+        dataView = this._dataView,
+        C = dataView.getNumberOfColumns(),
+        j = -1,
+        hasGenericReader = false,
+        attrName, ai;
 
       if(this.measureDiscrimGem)
         readers.push(this.measureDiscrimGem.cccDimName);
@@ -787,7 +798,7 @@ define([
 
     _configure: function() {
       var options = this.options,
-          model = this.model;
+        model = this.model;
 
       // By default hide overflow, otherwise,
       // resizing the window frequently ends up needlessly showing scrollbars.
@@ -830,7 +841,7 @@ define([
 
     _configureColor: function(colorScaleKind) {
       var options = this.options,
-          model = this.model;
+        model = this.model;
 
       switch(colorScaleKind) {
         case "discrete":
@@ -840,9 +851,9 @@ define([
         case "continuous":
           options.colorScaleType = model.getv("pattern") === "gradient" ? "linear" : "discrete";
           options.colors = visualColorUtils.buildPalette(
-              model.getv("colorSet"),
-              model.getv("pattern"),
-              model.getv("reverseColors"));
+            model.getv("colorSet"),
+            model.getv("pattern"),
+            model.getv("reverseColors"));
           break;
       }
     },
@@ -856,7 +867,7 @@ define([
       var colorMap = this._getDiscreteColorMap();
       if(colorMap) {
         var defaultScale = pv.colors(this._getDefaultDiscreteColors()),
-            scaleFactory = this._createDiscreteColorMapScaleFactory(colorMap, defaultScale);
+          scaleFactory = this._createDiscreteColorMapScaleFactory(colorMap, defaultScale);
 
         // Make sure the scales returned by scaleFactory
         // "are like" pv.Scale - have all the necessary methods.
@@ -879,9 +890,9 @@ define([
       // 2 - When a measure discrim is used and there is only one measure, the CCC dim name of the discriminator is
       //      not of the "series" group; so in this case, there's no discriminator in the key.
       var colorGems = this._getDiscreteColorGems(),
-          C = colorGems.length,
-          M = this._genericMeasuresCount,
-          colorMap;
+        C = colorGems.length,
+        M = this._genericMeasuresCount,
+        colorMap;
 
       // Possible to create colorMap based on memberPalette?
       if(C || M) {
@@ -905,33 +916,33 @@ define([
       /*jshint laxbreak:true*/
       var colorAttrInfos = this._getVisualMapInfo()[this._discreteColorRole];
       return colorAttrInfos
-          ? colorAttrInfos.filter(function(attrInfo) { return !attrInfo.isMeasureDiscrim; })
-          : [];
+        ? colorAttrInfos.filter(function(attrInfo) { return !attrInfo.isMeasureDiscrim; })
+        : [];
     },
 
     _getMemberPalette: function() {
       /* TEST
        return {
-         "[Markets].[Territory]": {
-           "[Markets].[APAC]":   "rgb(150, 0, 0)",
-           "[Markets].[EMEA]":   "rgb(0, 150, 0)",
-           "[Markets].[Japan]":  "rgb(0, 0, 150)",
-           "[Markets].[NA]":     "pink"
-         },
+       "[Markets].[Territory]": {
+       "[Markets].[APAC]":   "rgb(150, 0, 0)",
+       "[Markets].[EMEA]":   "rgb(0, 150, 0)",
+       "[Markets].[Japan]":  "rgb(0, 0, 150)",
+       "[Markets].[NA]":     "pink"
+       },
 
-         "[Order Status].[Type]": {
-           "[Order Status].[Cancelled]":  "turquoise",
-           "[Order Status].[Disputed]":   "tomato",
-           //"[Order Status].[In Process]": "steelblue",
-           "[Order Status].[Shipped]":    "seagreen"
-           //"[Order Status].[On Hold]":    "",
-           //"[Order Status].[Resolved]":   ""
-         },
+       "[Order Status].[Type]": {
+       "[Order Status].[Cancelled]":  "turquoise",
+       "[Order Status].[Disputed]":   "tomato",
+       //"[Order Status].[In Process]": "steelblue",
+       "[Order Status].[Shipped]":    "seagreen"
+       //"[Order Status].[On Hold]":    "",
+       //"[Order Status].[Resolved]":   ""
+       },
 
-         "[Measures].[MeasuresLevel]": {
-           "[MEASURE:0]": "violet",
-           "[MEASURE:1]": "orange"
-         }
+       "[Measures].[MeasuresLevel]": {
+       "[MEASURE:0]": "violet",
+       "[MEASURE:1]": "orange"
+       }
        };
        */
 
@@ -965,7 +976,7 @@ define([
         return function(compKey) {
           if(compKey) {
             var keys = compKey.split("~"),
-                key  = keys[keys.length - 1];
+              key = keys[keys.length - 1];
             return colorMap[key] || defaultScale(key);
           }
         };
@@ -976,8 +987,10 @@ define([
       if(mapIn) {
         if(!mapOut) mapOut = {};
         for(var key in mapIn) // tolerates nully
+        {
           if(def.hasOwn(mapIn, key))
             mapOut[key] = pv.color(mapIn[key]);
+        }
       }
       return mapOut;
     },
@@ -985,7 +998,7 @@ define([
 
     _configureTrends: function() {
       var options = this.options,
-          model = this.model;
+        model = this.model;
 
       var trendType = (this._supportsTrends ? model.getv("trendType") : null) || "none";
       switch(trendType) {
@@ -1008,7 +1021,7 @@ define([
         if(value != null) {
           var extPoints = options.extensionPoints;
 
-          extPoints.trendLine_lineWidth  = +value;      // + -> to number
+          extPoints.trendLine_lineWidth = +value;      // + -> to number
           var radius = 3 + 6 * ((+value) / 8); // 1 -> 8 => 3 -> 9,
           extPoints.trendDot_shapeSize = radius * radius;
         }
@@ -1044,9 +1057,9 @@ define([
 
       // 1. Handle all mapped, non-generic measure attributes
       def.query(Object.keys(this._gemsMap))
-          .select(function(attrName) { return this._gemsMap[attrName]; }, this)
-          .where(function(ai) { return !!ai.attr && !ai.attr.isDiscrete && !ai.isMeasureGeneric; })
-          .each(setFormatInfo);
+        .select(function(attrName) { return this._gemsMap[attrName]; }, this)
+        .where(function(ai) { return !!ai.attr && !ai.attr.isDiscrete && !ai.isMeasureGeneric; })
+        .each(setFormatInfo);
 
       // 2. Handle generic measure dimension name, if any.
       //    As there are multiple measure attributes in a single CCC dimension,
@@ -1061,9 +1074,9 @@ define([
         //   "measures":     unbound
         //   "measuresLine": "sales", "quantity"
         var genericRoleNames = this._getRolesByCccDimGroup()[this._genericMeasureCccDimName],
-            firstAi = def.query(genericRoleNames)
-                .selectMany(this._getAttributeInfosOfRole, this)
-                .first(def.notNully);
+          firstAi = def.query(genericRoleNames)
+            .selectMany(this._getAttributeInfosOfRole, this)
+            .first(def.notNully);
         if(firstAi) setFormatInfo(firstAi);
       }
 
@@ -1071,15 +1084,15 @@ define([
 
       function setFormatInfo(ai) {
         var format = ai.attr.format,
-            mask = format && format.number && format.number.mask;
+          mask = format && format.number && format.number.mask;
         if(mask) def.lazy(dims, ai.cccDimName).format = mask;
       }
     },
 
     //region LABELS
     _configureLabels: function(options, model) {
-      var valuesAnchor  = model.getv("labelsOption"),
-          valuesVisible = !!valuesAnchor && valuesAnchor !== "none";
+      var valuesAnchor = model.getv("labelsOption"),
+        valuesVisible = !!valuesAnchor && valuesAnchor !== "none";
 
       options.valuesVisible = valuesVisible;
       if(valuesVisible) {
@@ -1094,7 +1107,7 @@ define([
 
     _configureLabelsAnchor: function(options, model) {
       var valuesAnchor = model.getv("labelsOption"),
-          simpleCamelCase = /(^\w+)([A-Z])(\w+)/;
+        simpleCamelCase = /(^\w+)([A-Z])(\w+)/;
 
       var match = simpleCamelCase.exec(valuesAnchor);
       if(match != null) {
@@ -1154,7 +1167,7 @@ define([
       // Not the data point count, but the selection count (a single column selection may select many data points).
       //var selectedCount = this._chart && this._chart.data.selectedCount();
       var selections = this._selections,
-          selectedCount = selections && selections.length;
+        selectedCount = selections && selections.length;
       if(selectedCount) {
         var msgId = selectedCount === 1 ? "tooltip.footer.selectedOne" : "tooltip.footer.selectedMany";
 
@@ -1179,10 +1192,10 @@ define([
       options.legendFont = util.defaultFont(options.legendFont, 10);
 
       var legendPosition = options.legendPosition,
-          isTopOrBottom = legendPosition === "top" || legendPosition === "bottom";
+        isTopOrBottom = legendPosition === "top" || legendPosition === "bottom";
 
       if(this._hasMultiChartColumns && !isTopOrBottom) {
-        options.legendAlignTo  = "page-middle";
+        options.legendAlignTo = "page-middle";
         options.legendKeepInBounds = true; // ensure it is not placed off-page
 
         // Ensure that legend margins is an object.
@@ -1217,15 +1230,16 @@ define([
     },
 
     _renderCore: function() {
-      while(this._element.firstChild)
+      while(this._element.firstChild) {
         this._element.removeChild(this._element.firstChild);
+      }
 
       var ChartClass = pvc[this._cccClass];
 
       this._chart = new ChartClass(this.options);
       this._chart
-          .setData(this._dataView.toJsonCda())
-          .render();
+        .setData(this._dataView.toJsonCda())
+        .render();
     },
 
     //region SELECTION
@@ -1239,7 +1253,7 @@ define([
       };
     },
 
-    _onUserSelection: function(selectingDatums) {
+    _onUserSelection0: function(selectingDatums) {
       return this._processSelection(selectingDatums);
     },
 
@@ -1270,12 +1284,88 @@ define([
       return false;
     },
 
+
+    _onUserSelection: function(selectingDatums) {
+      //return this._onUserSelection(selectingDatums);
+      // Convert to array of analyzer cell or column selection objects
+      var selectionExcludesMulti = this._selectionExcludesMultiGems(),
+        selections = [],
+        selectionsByKey = {};
+
+      var operands = [];
+
+      if(this._doesSharedSeriesSelection()) {
+        selectingDatums.forEach(function(datum) {
+          if(!datum.isVirtual) {
+            var selection = {type: "column"};
+
+            this.axes.column.fillCellSelection(selection, datum, selectionExcludesMulti);
+
+            // Check if there's already a selection with the same key.
+            // If not, add a new selection to the selections list.
+            // In the case where the selection max count limit is reached,
+            // the datums included in each selection must be known (by its index).
+            // So, add the datum to the new or existing selection's datums list.
+
+            var key = this._getSelectionKey(selection),
+              existingSelection = selectionsByKey[key];
+            if(!existingSelection) {
+              selection.__cccDatums = [datum];
+
+              selectionsByKey[key] = selection;
+              selections.push(selection);
+            } else {
+              existingSelection.__cccDatums.push(datum);
+            }
+          }
+        }, this);
+
+      } else {
+        // Duplicates may occur due to excluded dimensions like the discriminator
+        selectingDatums.forEach(function(datum) {
+          if(!datum.isVirtual) {
+            var operand = this._complexToFilter(datum, selectionExcludesMulti);
+
+            /*
+            // Check if there's already a selection with the same key.
+            // If not, add a new selection to the selections list.
+            var key = this._getSelectionKey(selection),
+              existingSelection = selectionsByKey[key];
+            if(!existingSelection) {
+              selection.__cccDatums = datum;
+
+              selectionsByKey[key] = selection;
+              selections.push(selection);
+            }
+            */
+            if(operand)
+              operands.push(operand);
+          }
+        }, this);
+      }
+      /*
+      selections = this._limitSelection(selections);
+
+      var operands = selections.map(function(item) {
+        return new filter.IsEqual(item.rowId[0], item.rowItem[0]);
+      });
+      */
+      var selectionFilter = new filter.Or(operands);
+      this.model.select(selectionFilter);
+      return [];
+
+    },
+
     _onSelectionChanged: function(selectedDatums) {
+      return;
+    },
+
+    _onSelectionChanged0: function(selectedDatums) {
 
       // Convert to array of analyzer cell or column selection objects
       var selectionExcludesMulti = this._selectionExcludesMultiGems(),
-          selections = [],
-          selectionsByKey = {};
+        selections = [],
+        selectionsByKey = {};
 
       if(this._doesSharedSeriesSelection()) {
         selectedDatums.forEach(function(datum) {
@@ -1291,7 +1381,7 @@ define([
             // So, add the datum to the new or existing selection's datums list.
 
             var key = this._getSelectionKey(selection),
-                existingSelection = selectionsByKey[key];
+              existingSelection = selectionsByKey[key];
             if(!existingSelection) {
               selection.__cccDatums = [datum];
 
@@ -1312,7 +1402,7 @@ define([
             // Check if there's already a selection with the same key.
             // If not, add a new selection to the selections list.
             var key = this._getSelectionKey(selection),
-                existingSelection = selectionsByKey[key];
+              existingSelection = selectionsByKey[key];
             if(!existingSelection) {
               selection.__cccDatums = datum;
 
@@ -1334,11 +1424,21 @@ define([
       this._ownChange = true;
       try {
         // Launch analyzer select event, even if selection is empty (to clear it)
+
+
+        var operands = selections.map(function(item) {
+          return new filter.IsEqual(item.rowId[0], item.rowItem[0]);
+        });
+        var selectionFilter = new filter.Or(operands);
+        this.model.select(selectionFilter);
+
+
         visualEvents.trigger(this, "select", {
-          source:        this,
-          selections:    selections,
+          source: this,
+          selections: selections,
           selectionMode: "REPLACE"
         });
+
       } finally {
         this._ownChange = false;
       }
@@ -1349,16 +1449,16 @@ define([
 
       // limit selection
       var filterSelectionMaxCount = Infinity, //deselectCount > 0 always false
-          L = selections.length,
-          deselectCount = L - filterSelectionMaxCount;
+        L = selections.length,
+        deselectCount = L - filterSelectionMaxCount;
       if(deselectCount > 0) {
         // Build a list of datums to deselect
         var deselectDatums = [];
         selectionsKept = [];
 
-        for(var i = 0 ; i < L ; i++) {
+        for(var i = 0; i < L; i++) {
           var selection = selections[i],
-              keep = true;
+            keep = true;
           if(deselectCount) {
             if(this._previousSelectionKeys) {
               var key = this._getSelectionKey(selection);
@@ -1390,21 +1490,21 @@ define([
 
         if(typeof alert !== "undefined") {
           alert([
-                "infoExceededMaxSelectionItems",
-                filterSelectionMaxCount,
-                "SELECT_ITEM_LIMIT_REACHED"
-              ]);
+            "infoExceededMaxSelectionItems",
+            filterSelectionMaxCount,
+            "SELECT_ITEM_LIMIT_REACHED"
+          ]);
         }
       }
 
       // Index with the keys of previous selections
       this._previousSelectionKeys =
-          def.query(selectionsKept)
-              .object({
-                name:    function(selection) { return this._getSelectionKey(selection); },
-                value:   def.retTrue,
-                context: this
-              });
+        def.query(selectionsKept)
+          .object({
+            name: function(selection) { return this._getSelectionKey(selection); },
+            value: def.retTrue,
+            context: this
+          });
 
       return selectionsKept;
     },
@@ -1470,7 +1570,7 @@ define([
        * </pre>
        */
       var outDatums = [],
-          whereSpec;
+        whereSpec;
 
       if(selectedDatums.length) {
         var selectionExcludesMulti = this._selectionExcludesMultiGems();
@@ -1479,18 +1579,19 @@ define([
         // * Excludes measure discrim dimensions
         // * Excludes "multi" role dimensions
         var colDimNames = this.axes.column.getSelectionGems(selectionExcludesMulti)
-            .select(function(gem) { return gem.cccDimName; })
-            .array(),
-            rowDimNames;
+          .select(function(gem) { return gem.cccDimName; })
+          .array(),
+          rowDimNames;
 
         if(!this._doesSharedSeriesSelection()) {
           // Include axis="row" dimensions
           // * Excludes measure discrim dimensions
           // * Excludes "multi" role dimensions
           rowDimNames = this.axes.row.getSelectionGems(selectionExcludesMulti)
-              .select(function(gem) { return gem.cccDimName; })
-              .array();
+            .select(function(gem) { return gem.cccDimName; })
+            .array();
         }
+
 
         if(!colDimNames.length && (!rowDimNames || !rowDimNames.length)) {
           selectedDatums = [];
@@ -1500,10 +1601,10 @@ define([
           selectedDatums.forEach(addDatum);
 
           this._chart.data
-              .datums(whereSpec, {visible: true})
-              .each(function(datum) {
-                outDatums.push(datum);
-              });
+            .datums(whereSpec, {visible: true})
+            .each(function(datum) {
+              outDatums.push(datum);
+            });
 
           // Replace
           selectedDatums = outDatums;
@@ -1519,7 +1620,7 @@ define([
           if(datum.isTrend) outDatums.push(datum);
 
           var datumFilter = {},
-              datoms = datum.atoms;
+            datoms = datum.atoms;
 
           if(colDimNames) colDimNames.forEach(addDim);
           if(rowDimNames) rowDimNames.forEach(addDim);
@@ -1551,10 +1652,11 @@ define([
     },
 
     _onDoubleClick: function(complex) {
-      var selection = this._complexToCellSelection(complex, this._selectionExcludesMultiGems());
+      var dataFilter = this._complexToFilter(complex, this._selectionExcludesMultiGems());
+      return;
       visualEvents.trigger(this, "doubleclick", {
-        source:        this,
-        selections:    [selection]
+        source: this,
+        selections: [dataFilter]
         // TODO: Analyzer needs to know whether this double click is coming from a chart data point or an axis.
         // For axis use case, please identify the gembar and include only those gems that are in this gembar
         // into the selection.
@@ -1587,6 +1689,21 @@ define([
      *    value:       28550.59 // formatted joined by ~ ?
      * }
      */
+    _complexToFilter: function(complex, selectionExcludesMulti) {
+      /* Add each axis' formulas to the selection */
+      var operands = [];
+      this._keyAxesIds.forEach(function(axisId) {
+        var operand = this.axes[axisId].complexToFilter(complex, selectionExcludesMulti);
+        if(operand) operands.push(operand);
+      }, this);
+
+      switch(operands.length) {
+        case 0: return null;
+        case 1: return operands[0];
+      }
+      return new filter.And(operands);
+    },
+
     _complexToCellSelection: function(complex, selectionExcludesMulti) {
       /* The analyzer cell-selection object */
       var selection = {type: "cell"};

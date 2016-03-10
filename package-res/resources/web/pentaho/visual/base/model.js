@@ -21,6 +21,7 @@ define([
   "pentaho/util/object",
   "./types/selectionModes",
 
+  "pentaho/lang/Event",
   "./events/WillSelect",
   "./events/DidSelect",
   "./events/CanceledSelect",
@@ -33,6 +34,7 @@ define([
 
   "pentaho/i18n!type"
 ], function(EventSource, complexFactory, filter, error, O, selectionModes,
+            Event,
             WillSelect, DidSelect, CanceledSelect, FailedSelect,
             WillExecute, DidExecute, FailedExecute, CanceledExecute,
             bundle) {
@@ -81,7 +83,7 @@ define([
         select: function(dataFilter, keyArgs) {
           var isCanceled = false;
           var mutatedDataFilter = dataFilter;
-          var selectionMode = keyArgs && keyArgs.selectionMode ? keyArgs.selectionMode : null;
+          var selectionMode = O.getOwn(keyArgs, "selectionMode");
 
           if(this._hasListeners(WillSelect.type)) {
             var willSelect = new WillSelect(this, dataFilter, selectionMode);
@@ -156,11 +158,15 @@ define([
         },
 
         _changeSelection: function(candidateSelection, selectionMode, keyArgs) {
-          var combineSelections = selectionMode || this.get("selectionMode");
+          var combineSelections = selectionMode || this.getv("selectionMode");
           if(typeof combineSelections === "function") {
             var combinedSelection = combineSelections(this, candidateSelection, keyArgs);
             if(combinedSelection) {
               this.set("selectionFilter", combinedSelection);
+              // MOCK emission of an event
+              var didEvent = new Event("did:change:selection", this, false);
+              this._emit(didEvent);
+              // END MOCK
               return true;
             }
           }

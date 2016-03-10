@@ -17,8 +17,9 @@ define([
   "cdf/lib/CCC/def",
   "cdf/lib/CCC/pvc",
   "./AbstractAxis",
-  "../util"
-], function(def, pvc, AbstractAxis, util) {
+  "../util",
+  "pentaho/data/filter"
+], function(def, pvc, AbstractAxis, util, filter) {
 
   "use strict";
 
@@ -48,7 +49,27 @@ define([
       }
     },
 
-    fillCellSelection: function(selection, complex, selectionExcludesMulti) {
+    complexToFilter: function(complex, selectionExcludesMulti) {
+      var operands = [];
+
+      this.getSelectionGems(selectionExcludesMulti)
+        .each(function(gem) {
+          var atom = complex.atoms[gem.cccDimName];
+          var value = atom.value == null ? atom.rawValue : atom.value;
+
+          if(value != null)
+            operands.push(new filter.IsEqual(gem.name, value));
+
+        });
+
+      switch(operands.length) {
+        case 0: return null;
+        case 1: return operands[0];
+      }
+      return new filter.And(operands);
+    },
+
+    ___fillCellSelection: function(selection, complex, selectionExcludesMulti) {
       var forms = [],
           values = [],
           label;
