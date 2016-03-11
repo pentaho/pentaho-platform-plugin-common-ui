@@ -21,3 +21,13 @@
  * @name pentaho.visual.base
  * @namespace
  */
+
+
+/**
+ * The `events` namespace contains event classes for developers to use
+ * to build new visualizations that work with the Visualization API.
+ *
+ * @name pentaho.visual.base.events
+ * @namespace
+ *
+ */

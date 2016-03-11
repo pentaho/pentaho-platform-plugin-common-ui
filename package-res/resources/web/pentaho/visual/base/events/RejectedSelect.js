@@ -21,11 +21,11 @@ define([
 
   var type = "rejected:select";
   return FilterEvent.extend("pentaho.visual.base.events.RejectedSelect", {
-    constructor: function(source, dataFilter, reason) {
-      if (!reason) throw error.argRequired("reason");
+    constructor: function(source, dataFilter, error) {
+      if (!error) throw error.argRequired("error");
 
       this.base(type, source, false, dataFilter);
-      this.reason = reason;
+      this.error = error;
     }
   }, {
     type: type

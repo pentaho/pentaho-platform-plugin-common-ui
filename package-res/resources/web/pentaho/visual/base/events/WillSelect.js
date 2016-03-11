@@ -18,11 +18,25 @@ define([
 ], function(FilterEvent) {
   "use strict";
 
+  /**
+   * @name WillSelect
+   * @memberOf pentaho.visual.base.events
+   * @class
+   * @extends pentaho.visual.base.events.FilterEvent
+   * @abstract
+   * @classDesc This is the base model class for visualizations.
+   *
+   * @constructor
+   * @description Creates a base `Model`.
+   * @param {pentaho.visual.base.spec.IModel} modelSpec A plain object containing the model specification.
+   *
+   * @event "will:select"
+   */
   var type = "will:select";
   return FilterEvent.extend("pentaho.visual.base.events.WillSelect", {
-    constructor: function(source, dataFilter, selectionPolicy) {
+    constructor: function(source, dataFilter, selectionMode) {
       this.base(type, source, true, dataFilter);
-      this.selectionPolicy = selectionPolicy;
+      this.selectionMode = selectionMode;
     }
   }, {
     type: type

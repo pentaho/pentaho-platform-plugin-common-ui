@@ -20,8 +20,9 @@ define([
 
   var type = "did:select";
   return FilterEvent.extend("pentaho.visual.base.events.DidSelect", {
-    constructor: function(source, dataFilter) {
+    constructor: function(source, dataFilter, value) {
       this.base(type, source, false, dataFilter);
+      this.value = value;
     }
   }, {
     type: type

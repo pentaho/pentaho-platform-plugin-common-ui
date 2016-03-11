@@ -23,17 +23,18 @@ define([
   return FilterEvent.extend("pentaho.lang.FilterEvent", /** @lends pentaho.visual.base.events.WillExecute# */{
 
     constructor: function(source, dataFilter, executeAction) {
-      if (!executeAction) throw error.argRequired("executeAction");
+      if(!executeAction) throw error.argRequired("executeAction");
 
       this.base(type, source, true, dataFilter);
       this._executeAction = executeAction;
     },
 
-    set action(_) {
-      this._executeAction = _;
+    set executeAction(f) {
+      if(typeof f === "function")
+        this._executeAction = f;
     },
 
-    get action() {
+    get executeAction() {
       return this._executeAction;
     }
   }, {
