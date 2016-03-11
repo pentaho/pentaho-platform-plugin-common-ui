@@ -125,7 +125,7 @@ define([
      * @readonly
      */
     get cancelReason() {
-      return this._cancelReason;
+      return this.isCanceled ? this._cancelReason : null;
     },
 
 
