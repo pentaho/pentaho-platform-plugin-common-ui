@@ -89,6 +89,13 @@ define([
         expectCancelEvent(event, false, true);
         expectCancelEvent(event, true, true);
       });
+
+      it("should provide a reason for the failure.", function() {
+        expect(event.cancelReason).toBeNull();
+        event.cancel("just because");
+        expect(event.cancelReason.message).toBe("just because");
+      });
+
     }); // #cancel()
 
     describe("#clone -", function() {

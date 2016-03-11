@@ -84,6 +84,7 @@ define([
     _type: null,
     _source: null,
     _cancelable: false,
+    _cancelReason: null,
 
     _canceled: false,
 
@@ -118,6 +119,17 @@ define([
     },
 
     /**
+     * Gets the reason why the event was canceled.
+     *
+     * @type {!Base.Error}
+     * @readonly
+     */
+    get cancelReason() {
+      return this._cancelReason;
+    },
+
+
+    /**
      * Cancels the event.
      *
      * This method has no effect if the event is not cancelable or
@@ -125,8 +137,9 @@ define([
      *
      * @see pentaho.lang.Event#isCanceled
      */
-    cancel: function() {
+    cancel: function(reason) {
       if (this._cancelable) {
+        this._cancelReason = reason instanceof Base.Error ? reason : new Base.Error(reason);
         this._canceled = true;
       }
     },
