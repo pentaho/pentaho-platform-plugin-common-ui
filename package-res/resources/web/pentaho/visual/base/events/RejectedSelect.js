@@ -14,13 +14,16 @@
  * limitations under the License.
  */
 define([
-  "./FilterEvent"
-], function(FilterEvent) {
+  "./FilterEvent",
+  "pentaho/util/error"
+], function(FilterEvent, error) {
   "use strict";
 
-  var type = "failed:select";
-  return FilterEvent.extend("pentaho.visual.base.events.FailedSelect", {
+  var type = "rejected:select";
+  return FilterEvent.extend("pentaho.visual.base.events.RejectedSelect", {
     constructor: function(source, dataFilter, reason) {
+      if (!reason) throw error.argRequired("reason");
+
       this.base(type, source, false, dataFilter);
       this.reason = reason;
     }

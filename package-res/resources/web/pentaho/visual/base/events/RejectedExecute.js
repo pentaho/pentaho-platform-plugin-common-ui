@@ -19,16 +19,13 @@ define([
 ], function(FilterEvent, error) {
   "use strict";
 
-  var type = "failed:execute";
-  return FilterEvent.extend("pentaho.lang.FailedExecute", /** @lends pentaho.visual.base.events.FailedExecute# */{
+  var type = "rejected:execute";
+  return FilterEvent.extend("pentaho.visual.base.events.RejectedExecute", /** @lends pentaho.visual.base.events.RejectedExecute# */{
     constructor: function(source, dataFilter, reason) {
       if (!reason) throw error.argRequired("reason");
 
       this.base(type, source, false, dataFilter);
-      this._reason = reason;
-    },
-    get reason() {
-      return this._reason;
+      this.reason = reason;
     }
   }, {
     type: type

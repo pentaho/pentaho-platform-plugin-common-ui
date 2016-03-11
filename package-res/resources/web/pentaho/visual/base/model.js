@@ -22,21 +22,20 @@ define([
   "./types/selectionModes",
 
   "pentaho/lang/Event",
+
   "./events/WillSelect",
   "./events/DidSelect",
-  "./events/CanceledSelect",
-  "./events/FailedSelect",
+  "./events/RejectedSelect",
 
   "./events/WillExecute",
   "./events/DidExecute",
-  "./events/FailedExecute",
-  "./events/CanceledExecute",
+  "./events/RejectedExecute",
 
   "pentaho/i18n!type"
 ], function(EventSource, complexFactory, filter, error, O, selectionModes,
             Event,
-            WillSelect, DidSelect, CanceledSelect, FailedSelect,
-            WillExecute, DidExecute, FailedExecute, CanceledExecute,
+            WillSelect, DidSelect, RejectedSelect,
+            WillExecute, DidExecute, RejectedExecute,
             bundle) {
 
   "use strict";
@@ -114,16 +113,17 @@ define([
         execute: function(dataFilter) {
           var isCanceled = false;
           var willExecute = null;
+          var rejectedExecute = null;
           var executeAction = this.getv("executeAction");
 
           if(this._hasListeners(WillExecute.type)) {
-            willExecute = new WillExecute(this, dataFilter, executeAction); //listener can change dataFilter and/or action
+            willExecute = new WillExecute(this, dataFilter, executeAction);
             isCanceled = !this._emit(willExecute);
           }
 
-          if(isCanceled && this._hasListeners(CanceledExecute.type)) {
-            var canceledExecute = new CanceledExecute(this, dataFilter);
-            this._emit(canceledExecute);
+          if(isCanceled && this._hasListeners(RejectedExecute.type)) {
+            rejectedExecute = new RejectedExecute(this, dataFilter, willExecute.reason);
+            this._emit(rejectedExecute);
           }
 
           executeAction = O.getOwn(willExecute, "executeAction", executeAction).bind(this);
@@ -134,13 +134,14 @@ define([
             if(this._hasListeners(DidExecute.type)) {
               var didExecute = new DidExecute(this, mutatedDataFilter);
               this._emit(didExecute);
+              //return ActionResult{ value: mutatedFilter, error: undefined }
             }
             return true;
 
           } catch(e) {
-            if(this._hasListeners(FailedExecute.type)) {
-              var failedExecute = new FailedExecute(this, mutatedDataFilter, e.message);
-              this._emit(failedExecute);
+            if(this._hasListeners(RejectedExecute.type)) {
+              rejectedExecute = new RejectedExecute(this, mutatedDataFilter, e);
+              this._emit(rejectedExecute);
             }
             return false;
 
@@ -217,12 +218,12 @@ define([
       if(dataFilter.type === "isEqual") {
         queryValue = dataFilter.value;
       } else {
-        var operands = dataFilter.operands;
+        var operands = O.getOwn(dataFilter, "operands", dataFilter.operand);
         operands.forEach(function(filter, index) {
           queryValue += filter.value + (index === operands.length-1 ? "" : "+");
         });
       }
-
+      //TODO: check why not working inside PDI
       window.open("http://www.google.com/search?as_q=\"" + queryValue + "\"", "_blank");
     }
   };
