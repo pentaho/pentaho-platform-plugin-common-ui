@@ -21,6 +21,10 @@ define([], function() {
       return candidateSelection || null;
     },
 
+    TOGGLE: function(model, candidateSelection) {
+      return candidateSelection ? candidateSelection.invert() : null;
+    },
+
     ADD: function(model, candidateSelection) {
       return candidateSelection ? model.get("selectionFilter").or(candidateSelection) : null;
     },

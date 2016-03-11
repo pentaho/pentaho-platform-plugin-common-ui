@@ -31,11 +31,15 @@ define([
   "./events/DidExecute",
   "./events/RejectedExecute",
 
+  "pentaho/lang/ActionResult",
+  "pentaho/lang/UserError",
+
   "pentaho/i18n!type"
 ], function(EventSource, complexFactory, filter, error, O, selectionModes,
             Event,
             WillSelect, DidSelect, RejectedSelect,
             WillExecute, DidExecute, RejectedExecute,
+            ActionResult, UserError,
             bundle) {
 
   "use strict";
@@ -64,104 +68,163 @@ define([
      * @description Creates a base `Model`.
      * @param {pentaho.visual.base.spec.IModel} modelSpec A plain object containing the model specification.
      */
-    var Model = Complex.extend({
+    var Model = Complex.extend(/** @lends pentaho.visual.base.Model# */{
         constructor: function(modelSpec) {
           this.base(modelSpec);
         },
 
-        select: function(dataFilter, keyArgs) {
+        /**
+         * Modifies the current selection.
+         *
+         * The selection is modified in two phases:
+         * In the first phase, the
+         *
+         * @param {!pentaho.data.filter.AbstractFilter} dataFilter - A filter representing the increment
+         * @param {?object} keyArgs - Keyword arguments.
+         * @param {!function} keyArgs.selectionMode - A function that computes a new selection,
+         * taking into account the current selection and an input `dataFilter`.
+         * @see {pentaho.visual.base.types.selectionModes}
+         * @return {boolean} `true` if the selection was modified, `false` otherwise.
+         *
+         * @fires pentaho.visual.base.events#"will:select"
+         */
+        selectAction: function(dataFilter, keyArgs) {
           var isCanceled = false;
-          var mutatedDataFilter = dataFilter;
+          var processedDataFilter = dataFilter;
           var selectionMode = O.getOwn(keyArgs, "selectionMode");
 
           if(this._hasListeners(WillSelect.type)) {
-            var willSelect = new WillSelect(this, dataFilter, selectionMode);
-            isCanceled = !this._emit(willSelect);
-            mutatedDataFilter = willSelect.dataFilter;
-            if(!isCanceled) {
-              selectionMode = willSelect.selectionMode;
+            var will = new WillSelect(this, dataFilter, selectionMode);
+            isCanceled = !this._emitSafely(will, 'Exception thrown during "will:select" loop');
+
+            processedDataFilter = will.dataFilter;
+            if(isCanceled) {
+              if(this._hasListeners(RejectedSelect.type)) {
+                var canceled = new RejectedSelect(this, processedDataFilter);
+                this._emitSafely(canceled);
+              }
+              return new ActionResult(undefined, will.cancelReason);
             }
+            selectionMode = will.selectionMode;
           }
 
-          if(!isCanceled) {
-            try {
-              isCanceled = !this._changeSelection(mutatedDataFilter, selectionMode, keyArgs);
-            } catch(e) {
-              var failedSelect = new FailedSelect(this, mutatedDataFilter, e.message);
-              this._emit(failedSelect);
-              return false;
-            }
+          var result;
+          try {
+            result = this._changeSelection(processedDataFilter, selectionMode, keyArgs);
+          } catch(e) {
+            result = new ActionResult(undefined, e);
           }
 
-          if(isCanceled) {
-            if(this._hasListeners(CancelSelect.type)) {
-              //var cancelSelect =  new FilterEvent("canceled:select", this, false, mutatedDataFilter);
-              var cancelSelect = new CancelSelect(this, mutatedDataFilter);
-              this._emit(cancelSelect);
+          if(result.error) {
+            if(this._hasListeners(RejectedSelect.type)) {
+              var rejected = new RejectedSelect(this, processedDataFilter);
+              this._emitSafely(rejected);
+              return result;
             }
-            return false;
+
           } else {
             if(this._hasListeners(DidSelect.type)) {
-              //var didSelect =  new FilterEvent("did:select", this, false, mutatedDataFilter);
-              var didSelect = new DidSelect(this, mutatedDataFilter);
-              this._emit(didSelect);
+              var did = new DidSelect(this, processedDataFilter);
+              this._emitSafely(did);
             }
-            return true;
+            return result;
           }
+
         },
 
-        execute: function(dataFilter) {
+        _emitSafely: function(event, message) {
+          var result = null;
+          try {
+            result = this._emit(event);
+          } catch(e) {
+            console.log(message, ":", e);
+          }
+          return result;
+        },
+
+        executeAction: function(dataFilter) {
+          var doExecute = this.getv("doExecute");
+
           var isCanceled = false;
-          var willExecute = null;
-          var rejectedExecute = null;
-          var executeAction = this.getv("executeAction");
+          var processedDataFilter = dataFilter;
 
           if(this._hasListeners(WillExecute.type)) {
-            willExecute = new WillExecute(this, dataFilter, executeAction);
-            isCanceled = !this._emit(willExecute);
-          }
+            var will = new WillExecute(this, dataFilter, doExecute);
+            isCanceled = !this._emitSafely(will, 'Exception thrown during "will:execute" loop');
 
-          if(isCanceled && this._hasListeners(RejectedExecute.type)) {
-            rejectedExecute = new RejectedExecute(this, dataFilter, willExecute.reason);
-            this._emit(rejectedExecute);
-          }
-
-          executeAction = O.getOwn(willExecute, "executeAction", executeAction).bind(this);
-          var mutatedDataFilter = O.getOwn(willExecute, "_dataFilter", dataFilter);
-
-          try {
-            executeAction(mutatedDataFilter, this.getv("data"));
-            if(this._hasListeners(DidExecute.type)) {
-              var didExecute = new DidExecute(this, mutatedDataFilter);
-              this._emit(didExecute);
-              //return ActionResult{ value: mutatedFilter, error: undefined }
+            processedDataFilter = will.dataFilter;
+            if(isCanceled) {
+              if(this._hasListeners(RejectedSelect.type)) {
+                var canceled = new RejectedSelect(this, processedDataFilter);
+                this._emitSafely(canceled);
+              }
+              return new ActionResult(undefined, will.cancelReason);
             }
-            return true;
+            doExecute = will.doExecute;
+          }
 
-          } catch(e) {
+          var result;
+          if(doExecute) {
+            try {
+              doExecute(processedDataFilter);
+            } catch(e) {
+              result = new ActionResult(undefined, e);
+            }
+          } else {
+            result = new ActionResult(undefined, new UserError("No action defined"));
+          }
+          if(result.error) {
             if(this._hasListeners(RejectedExecute.type)) {
-              rejectedExecute = new RejectedExecute(this, mutatedDataFilter, e);
-              this._emit(rejectedExecute);
+              var rejected = new RejectedExecute(this, processedDataFilter, e);
+              this._emitSafely(rejected, 'Exception thrown during "reject:execute" loop');
             }
-            return false;
-
+            return result;
           }
+
+          if(this._hasListeners(DidExecute.type)) {
+            var did = new DidExecute(this, processedDataFilter);
+            this._emitSafely(did, 'Exception thrown during "did:execute" loop');
+          }
+          return new ActionResult(undefined, null);
+
         },
 
+        /**
+         *
+         * @param candidateSelection
+         * @param selectionMode
+         * @param keyArgs
+         * @returns {boolean}
+         * @protected
+         */
         _changeSelection: function(candidateSelection, selectionMode, keyArgs) {
           var combineSelections = selectionMode || this.getv("selectionMode");
-          if(typeof combineSelections === "function") {
-            var combinedSelection = combineSelections(this, candidateSelection, keyArgs);
-            if(combinedSelection) {
-              this.set("selectionFilter", combinedSelection);
-              // MOCK emission of an event
-              var didEvent = new Event("did:change:selection", this, false);
-              this._emit(didEvent);
-              // END MOCK
-              return true;
+          if(!combineSelections)
+            return new ActionResult(undefined, new UserError("No selectionMode defined"));
+
+          var combinedSelection;
+          try {
+            combinedSelection = combineSelections(this, candidateSelection, keyArgs);
+          } catch(e) {
+            if(this._hasListeners("rejected:change:selection")) {
+              var rejectSelect = new RejectedSelect(this, processedDataFilter);
+              this._emit(rejectSelect);
+              return new ActionResult(undefined, e);
             }
           }
-          return false;
+
+
+          if(combinedSelection) {
+            this.set("selectionFilter", combinedSelection);
+            // MOCK emission of an event
+            if(this._hasListeners("did:change:selection")) {
+              var didEvent = new Event("did:change:selection", this, false);
+              this._emit(didEvent);
+            }
+            // END MOCK
+            return new ActionResult(combinedSelection, null);
+          }
+          return new ActionResult(undefined, new TypeError("Nully"));
         },
 
         meta: {
@@ -200,9 +263,8 @@ define([
               value: selectionModes.REPLACE
             },
             {
-              name: "executeAction",
-              type: "function",
-              value: _executeAction
+              name: "doExecute",
+              type: "function"
             }
           ]
         }
@@ -212,19 +274,5 @@ define([
 
     return Model;
 
-    function _executeAction(dataFilter) {
-      var queryValue = "";
-
-      if(dataFilter.type === "isEqual") {
-        queryValue = dataFilter.value;
-      } else {
-        var operands = O.getOwn(dataFilter, "operands", dataFilter.operand);
-        operands.forEach(function(filter, index) {
-          queryValue += filter.value + (index === operands.length-1 ? "" : "+");
-        });
-      }
-      //TODO: check why not working inside PDI
-      window.open("http://www.google.com/search?as_q=\"" + queryValue + "\"", "_blank");
-    }
   };
 });

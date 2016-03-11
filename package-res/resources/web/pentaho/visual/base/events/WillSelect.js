@@ -36,7 +36,16 @@ define([
   return FilterEvent.extend("pentaho.visual.base.events.WillSelect", {
     constructor: function(source, dataFilter, selectionMode) {
       this.base(type, source, true, dataFilter);
-      this.selectionMode = selectionMode;
+      this._selectionMode = selectionMode;
+    },
+
+    set selectionMode(f) {
+      if(typeof f === "function")
+        this._selectionMode = f;
+    },
+
+    get selectionMode() {
+      return this._selectionMode;
     }
   }, {
     type: type

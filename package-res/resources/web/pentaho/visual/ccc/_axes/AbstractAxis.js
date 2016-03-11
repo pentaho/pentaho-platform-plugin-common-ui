@@ -61,7 +61,7 @@ define([
     },
 
     complexToFilter: function() {
-      throw new Error("complexToFilter Not Implemented");
+      throw new Error("Not Implemented");
     }
   });
 

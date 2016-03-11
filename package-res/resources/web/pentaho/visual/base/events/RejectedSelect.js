@@ -20,9 +20,9 @@ define([
   "use strict";
 
   var type = "rejected:select";
-  return FilterEvent.extend("pentaho.visual.base.events.RejectedSelect", {
+  return FilterEvent.extend("pentaho.visual.base.events.RejectedSelect", /** @lends pentaho.visual.base.events.RejectedSelect# */{
     constructor: function(source, dataFilter, error) {
-      if (!error) throw error.argRequired("error");
+      if(!error) throw error.argRequired("error");
 
       this.base(type, source, false, dataFilter);
       this.error = error;

@@ -170,6 +170,29 @@ define([
 
     //region VizAPI implementation
 
+
+    _init: function(){
+      this.base();
+      this.model.set("doExecute", _doExecute);
+
+      function _doExecute(dataFilter) {
+        var queryValue = "";
+
+        if(dataFilter.type === "isEqual") {
+          queryValue = dataFilter.value;
+        } else {
+          var operands = O.getOwn(dataFilter, "operands", dataFilter.operand);
+          operands.forEach(function(filter, index) {
+            queryValue += filter.value + (index === operands.length - 1 ? "" : "+");
+          });
+        }
+        //TODO: check why not working inside PDI
+        window.open("http://www.google.com/search?as_q=\"" + queryValue + "\"", "_blank");
+      }
+
+    },
+
+
     _render: function() {
       this._dataTable = this.model.getv("data");
 
@@ -1286,13 +1309,7 @@ define([
       this.options.userSelectionAction = function(cccSelections) {
         return me._onUserSelection(cccSelections);
       };
-      this.options.selectionChangedAction = function(cccSelections) {
-        me._onSelectionChanged(cccSelections);
-      };
-    },
-
-    _onUserSelection0: function(selectingDatums) {
-      return this._processSelection(selectingDatums);
+      this.options.selectionChangedAction = null;
     },
 
     _getSelectionKey: function(selection) {
@@ -1339,22 +1356,12 @@ define([
           if(!datum.isVirtual) {
             var operand = this.axes.column.complexToFilter(datum);
 
+            // TODO:
             // Check if there's already a selection with the same key.
             // If not, add a new selection to the selections list.
             // In the case where the selection max count limit is reached,
             // the datums included in each selection must be known (by its index).
             // So, add the datum to the new or existing selection's datums list.
-
-            //var key = this._getSelectionKey(selection),
-            //  existingSelection = selectionsByKey[key];
-            //if(!existingSelection) {
-            //  selection.__cccDatums = [datum];
-            //
-            //  selectionsByKey[key] = selection;
-            //  selections.push(selection);
-            //} else {
-            //  existingSelection.__cccDatums.push(datum);
-            //}
 
             if(operand)
               operands.push(operand);
@@ -1367,122 +1374,20 @@ define([
           if(!datum.isVirtual) {
             var operand = this._complexToFilter(datum);
 
-            /*
+             // TODO:
              // Check if there's already a selection with the same key.
              // If not, add a new selection to the selections list.
-             var key = this._getSelectionKey(selection),
-             existingSelection = selectionsByKey[key];
-             if(!existingSelection) {
-             selection.__cccDatums = datum;
 
-             selectionsByKey[key] = selection;
-             selections.push(selection);
-             }
-             */
             if(operand)
               operands.push(operand);
           }
         }, this);
       }
-      /*
-       selections = this._limitSelection(selections);
 
-       var operands = selections.map(function(item) {
-       return new filter.IsEqual(item.rowId[0], item.rowItem[0]);
-       });
-       */
       var selectionFilter = new filter.Or(operands);
-      this.model.select(selectionFilter);
+      this.model.selectAction(selectionFilter);
       return [];
 
-    },
-
-    _onSelectionChanged: function(selectedDatums) {
-      return;
-    },
-
-    _onSelectionChanged0: function(selectedDatums) {
-
-      // Convert to array of analyzer cell or column selection objects
-      var selectionExcludesMulti = this._selectionExcludesMultiGems(),
-        selections = [],
-        selectionsByKey = {};
-
-      if(this._doesSharedSeriesSelection()) {
-        selectedDatums.forEach(function(datum) {
-          if(!datum.isVirtual) {
-            var selection = {type: "column"};
-
-            this.axes.column.fillCellSelection(selection, datum, selectionExcludesMulti);
-
-            // Check if there's already a selection with the same key.
-            // If not, add a new selection to the selections list.
-            // In the case where the selection max count limit is reached,
-            // the datums included in each selection must be known (by its index).
-            // So, add the datum to the new or existing selection's datums list.
-
-            var key = this._getSelectionKey(selection),
-              existingSelection = selectionsByKey[key];
-            if(!existingSelection) {
-              selection.__cccDatums = [datum];
-
-              selectionsByKey[key] = selection;
-              selections.push(selection);
-            } else {
-              existingSelection.__cccDatums.push(datum);
-            }
-          }
-        }, this);
-
-      } else {
-        // Duplicates may occur due to excluded dimensions like the discriminator
-        selectedDatums.forEach(function(datum) {
-          if(!datum.isVirtual) {
-            var selection = this._complexToCellSelection(datum, selectionExcludesMulti);
-
-            // Check if there's already a selection with the same key.
-            // If not, add a new selection to the selections list.
-            var key = this._getSelectionKey(selection),
-              existingSelection = selectionsByKey[key];
-            if(!existingSelection) {
-              selection.__cccDatums = datum;
-
-              selectionsByKey[key] = selection;
-              selections.push(selection);
-            }
-          }
-        }, this);
-      }
-
-      selections = this._limitSelection(selections);
-
-      // Wrap the event trigger with _ownChange=true,
-      // cause otherwise, when the #setHighlights method is called,
-      // in response to selection changing,
-      // and if only interpolated dots had beed selected,
-      // resulting in selections.length === 0,
-      // then the chart selections would be reset...
-      this._ownChange = true;
-      try {
-        // Launch analyzer select event, even if selection is empty (to clear it)
-
-
-        var operands = selections.map(function(item) {
-          return new filter.IsEqual(item.rowId[0], item.rowItem[0]);
-        });
-        var selectionFilter = new filter.Or(operands);
-        this.model.select(selectionFilter);
-
-
-        visualEvents.trigger(this, "select", {
-          source: this,
-          selections: selections,
-          selectionMode: "REPLACE"
-        });
-
-      } finally {
-        this._ownChange = false;
-      }
     },
 
     _limitSelection: function(selections) {
@@ -1691,7 +1596,7 @@ define([
     },
 
     _onDoubleClick: function(complex) {
-      return this.model.execute(this._complexToFilter(complex));
+      return this.model.executeAction(this._complexToFilter(complex));
     },
     //endregion
 
