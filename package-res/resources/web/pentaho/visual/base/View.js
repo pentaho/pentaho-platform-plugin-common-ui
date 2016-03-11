@@ -123,6 +123,7 @@ define([
      * @overridable
      */
     _init: function() {
+      this.model.on("did:change:selection", this._selectionChanged.bind(this));
       //this.model.on("change", this._onChange);
     },
 

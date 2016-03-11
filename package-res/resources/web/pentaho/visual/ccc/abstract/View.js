@@ -21,6 +21,7 @@ define([
   "cdf/lib/CCC/protovis",
   "../_axes/Axis",
   "../util",
+  "pentaho/util/object",
   "pentaho/data/filter",
   "pentaho/visual/events",
   "pentaho/visual/color/utils",
@@ -29,7 +30,7 @@ define([
   "pentaho/i18n!view"
 ], function(View,
             def, pvc, cdo, pv, Axis,
-            util, filter, visualEvents, visualColorUtils, visualPaletteRegistry,
+            util, O, filter, visualEvents, visualColorUtils, visualPaletteRegistry,
             DataView, bundle) {
 
   "use strict";
@@ -169,10 +170,6 @@ define([
 
     //region VizAPI implementation
 
-    _init: function() {
-      this.model.on("did:change:selection", this._selectionChanged.bind(this));
-    },
-
     _render: function() {
       this._dataTable = this.model.getv("data");
 
@@ -242,45 +239,47 @@ define([
     _selectionChanged: function() {
       var dataFilter = this.model.getv("selectionFilter");
       var selectedItems = dataFilter.apply(this.model.getv("data"));
-      var props = [];
 
-      //this._keyAxesIds.map(function(axisId) {
-      //  var result = this.axes[axisId]
-      //    .getSelectionGems()
-      //    .array(function(gem) {
-      //      return {
-      //        ordinal: gem.attr.ordinal,
-      //        cccDimName: gem.cccDimName
-      //      };
-      //    });
-      //  props.push(result);
-      //}, this);
-
-      props = def.query(this._keyAxesIds)
+      var props = def.query(this._keyAxesIds)
         .selectMany(function(axisId) {
           return this.axes[axisId].getSelectionGems();
         }, this)
         .select(function(gem) {
           return {
-            ordinal:    gem.attr.ordinal,
+            ordinal: gem.attr.ordinal,
             cccDimName: gem.cccDimName
           };
         })
         .array();
 
-      //far from optimal, we should eliminate repeated terms
       var whereSpec = [];
+      var alreadyIn = {};
       for(var k = 0, N = selectedItems.getNumberOfRows(); k < N; k++) {
-        var datumFilter = {};
-        props.forEach(function(prop) {
-          datumFilter[prop.cccDimName] = selectedItems.getValue(k, prop.ordinal);
-        });
-        whereSpec.push(datumFilter);
+        var datumFilterSpec = props.reduce(function(datumFilter, prop) {
+          var value = selectedItems.getValue(k, prop.ordinal);
+          datumFilter[prop.cccDimName] = value;
+          return datumFilter;
+        }, {});
+
+        //Prevent having repeated terms
+        var key = specToKey(datumFilterSpec);
+        if(!O.hasOwn(alreadyIn, key)) {
+          alreadyIn[key] = true;
+          whereSpec.push(datumFilterSpec);
+        }
       }
 
       this._chart.data.replaceSelected(
         this._chart.data.datums(whereSpec)
       );
+
+      function specToKey(spec) {
+        var entries = Object.keys(spec).sort();
+        var key = entries.reduce(function(memo, entry) {
+          return memo + entry + ":" + spec[entry] + ",";
+        }, "");
+        return key;
+      }
     },
 
     _doResize: function() {
@@ -1562,7 +1561,7 @@ define([
      * can itself be drilled on.
      */
     _selectionExcludesMultiGems: function() {
-      return true;
+      return false; // was true
     },
 
     /**
