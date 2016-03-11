@@ -10,7 +10,7 @@
 
 .tundra .dijitProgressBarTile {
 	/* inner container for finished portion when in 'tile' (image) mode */
-	background:#f0f0f0 url("images/progressBarFull.png") repeat-x center center;
+	background-color:#dce7ed;
 }
 
 .tundra .dijitProgressBarFull {
