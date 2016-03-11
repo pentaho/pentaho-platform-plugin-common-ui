@@ -18,7 +18,7 @@
 /*
                          pentaho.pda.SvcHandler
 */
-define("common-data/models-svc", ['common-data/oop', 'common-data/controller'], function(){
+define("common-data/models-svc", ['common-data/oop', 'common-data/controller', 'dojo/request'], function(oop, controller, request){
 pentaho.pda.SvcHandler = function svcHandler(sandbox) {
 	pentaho.pda.Handler.call(this, sandbox);
     this.type = pentaho.pda.SOURCE_TYPE_SVC;
@@ -54,8 +54,20 @@ pentaho.pda.SvcHandler.prototype.getSources = function(callback, options) {
             var url = this.SERVICE_URL+'?action=listmodels';
             var contextName = options['context'];
             var query = "domainName=&"+((contextName)? 'context='+contextName : "");
-            var jsonStr = pentahoPost( url, query, null, 'text/text' );
-            var rawModels = eval( '('+jsonStr+')' );
+
+            var rawModels;
+            request.post(url, {
+              query : query,
+              sync: true,
+              handleAs: 'json',
+              headers: {
+                'Content-type': 'application/x-www-form-urlencoded',
+                'Content-length': query.length,
+                'Connection': 'close'
+              }
+            }).then(function(data) {
+              rawModels = data;
+            });
 
             for(var idx=0; idx<rawModels.length; idx++ ) {
                 model = this.addModelInfoFromNode( rawModels[idx] );
@@ -164,7 +176,7 @@ pentaho.pda.model.svc.prototype.createQueryFromJson = function( json ) {
     if( json["class"] ) {
         state = json;
     } else {
-        state = eval( '('+json+')' );
+        state = JSON.parse(json);
     }
 
     query.setSourceId( this.id );

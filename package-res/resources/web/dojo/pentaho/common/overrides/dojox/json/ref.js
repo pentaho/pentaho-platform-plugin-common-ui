@@ -232,7 +232,7 @@ return dojox.json.ref = {
 			return refObject;
 		}
 		try{
-			var root = eval('(' + str + ')'); // do the eval
+			var root = JSON.parse(str); // parse JSON
 		}catch(e){
 			throw new SyntaxError("Invalid JSON string: " + e.message + " parsing: "+ str);
 		}
