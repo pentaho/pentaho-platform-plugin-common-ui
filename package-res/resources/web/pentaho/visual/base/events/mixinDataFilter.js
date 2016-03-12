@@ -13,18 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define([
-  "pentaho/lang/Event",
-  "pentaho/util/error"
-], function(Event, error) {
+define([], function() {
   "use strict";
 
-
   /**
-   * @name FilterEvent
+   * @name mixinDataFilter
    * @memberOf pentaho.visual.base.events
    * @class
-   * @extends pentaho.visual.base.events.FilterEvent
    * @abstract
    * @classDesc This is the base class for events related with [filters]{@link pentaho.data.filter }.
    *
@@ -35,13 +30,11 @@ define([
    * @param {!boolean} isCancelable - Determines if an event listener can cancel the execution of the event.
    * @param {!pentaho.data.filter.AbstractFilter} dataFilter - A filter that represents a subset of the data.
    */
-  return Event.extend("pentaho.visual.base.events.FilterEvent", /** @lends pentaho.visual.base.events.FilterEvent# */{
+  return  /** @lends pentaho.visual.base.events.mixinDataFilter# */{
 
-    constructor: function(type, source, isCancelable, dataFilter) {
-      if (!dataFilter) throw error.argRequired("dataFilter");
-      this.base(type, source, isCancelable);
-      this._dataFilter = dataFilter;
-      this._isMutable = isCancelable;
+    _initFilter: function(dataFilter, isMutable) {
+      this._dataFilter = dataFilter || null;
+      this._isMutable = !!isMutable;
     },
 
     get dataFilter() {
@@ -55,5 +48,5 @@ define([
         throw TypeError();
       }
     }
-  });
+  };
 });

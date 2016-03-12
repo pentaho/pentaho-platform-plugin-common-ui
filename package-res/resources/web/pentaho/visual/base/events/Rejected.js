@@ -14,30 +14,26 @@
  * limitations under the License.
  */
 define([
-  "./will",
-  "./mixinDataFilter",
+  "pentaho/lang/Event",
   "pentaho/util/error"
-], function(will, mixinDataFilter, error) {
+], function(Event, error) {
   "use strict";
 
-  return will("execute").extend("pentaho.visual.base.events.WillExecute",
-    /** @lends pentaho.visual.base.events.WillExecute# */{
-      constructor: function(source, dataFilter, onExecute) {
-        if(!onExecute) throw error.argRequired("onExecute");
-        this.base(source);
-        this._initFilter(dataFilter || null, false);
-        this._onExecute = onExecute || null;
-      },
+  return function rejected(type) {
+    var fullType = "rejected:" + type;
 
-      set executeAction(f) {
-        if(typeof f === "function")
-          this._onExecute = f;
-      },
-
-      get executeAction() {
-        return this._onExecute;
-      }
-    })
-    .implement(mixinDataFilter);
+    return Event.extend("pentaho.visual.base.events.Rejected",
+      /** @lends pentaho.visual.base.events.Rejected# */{
+        constructor: function(source, error) {
+          if(!error) throw error.argRequired("error");
+          this.base(fullType, source, false);
+          this.error = error;
+        }
+      }, {
+        get type() {
+          return fullType;
+        }
+      });
+  };
 
 });

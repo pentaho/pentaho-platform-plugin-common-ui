@@ -174,6 +174,7 @@ define([
     _init: function(){
       this.base();
       this.model.set("doExecute", _doExecute);
+      this.model.on("will:select", this._onWillSelect);
 
       function _doExecute(dataFilter) {
         var queryValue = "";
@@ -190,6 +191,10 @@ define([
         window.open("http://www.google.com/search?as_q=\"" + queryValue + "\"", "_blank");
       }
 
+    },
+
+    _onWillSelect: function(event){
+      console.log(event);
     },
 
 

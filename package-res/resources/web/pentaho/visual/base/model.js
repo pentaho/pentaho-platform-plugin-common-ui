@@ -27,6 +27,10 @@ define([
   "./events/DidSelect",
   "./events/RejectedSelect",
 
+  "./events/WillChangeSelection",
+  "./events/DidChangeSelection",
+  "./events/RejectedChangeSelection",
+
   "./events/WillExecute",
   "./events/DidExecute",
   "./events/RejectedExecute",
@@ -38,6 +42,7 @@ define([
 ], function(EventSource, complexFactory, filter, error, O, selectionModes,
             Event,
             WillSelect, DidSelect, RejectedSelect,
+            WillChangeSelection, DidChangeSelection, RejectedChangeSelection,
             WillExecute, DidExecute, RejectedExecute,
             ActionResult, UserError,
             bundle) {
@@ -68,7 +73,7 @@ define([
      * @description Creates a base `Model`.
      * @param {pentaho.visual.base.spec.IModel} modelSpec A plain object containing the model specification.
      */
-    var Model = Complex.extend(/** @lends pentaho.visual.base.Model# */{
+    var Model = Complex.extend().implement(EventSource).extend(/** @lends pentaho.visual.base.Model# */{
         constructor: function(modelSpec) {
           this.base(modelSpec);
         },
@@ -89,142 +94,137 @@ define([
          * @fires pentaho.visual.base.events#"will:select"
          */
         selectAction: function(dataFilter, keyArgs) {
-          var isCanceled = false;
+          var result;
           var processedDataFilter = dataFilter;
+          var isCanceled = false;
           var selectionMode = O.getOwn(keyArgs, "selectionMode");
 
           if(this._hasListeners(WillSelect.type)) {
             var will = new WillSelect(this, dataFilter, selectionMode);
-            isCanceled = !this._emitSafely(will, 'Exception thrown during "will:select" loop');
+            isCanceled = !this._emit(will);
 
             processedDataFilter = will.dataFilter;
             if(isCanceled) {
+              result = new ActionResult(undefined, will.cancelReason);
               if(this._hasListeners(RejectedSelect.type)) {
-                var canceled = new RejectedSelect(this, processedDataFilter);
-                this._emitSafely(canceled);
+                var canceled = new RejectedSelect(this, result.error, processedDataFilter);
+                this._emit(canceled);
               }
-              return new ActionResult(undefined, will.cancelReason);
+              return result;
             }
             selectionMode = will.selectionMode;
           }
 
-          var result;
           try {
             result = this._changeSelection(processedDataFilter, selectionMode, keyArgs);
           } catch(e) {
             result = new ActionResult(undefined, e);
           }
-
-          if(result.error) {
-            if(this._hasListeners(RejectedSelect.type)) {
-              var rejected = new RejectedSelect(this, processedDataFilter);
-              this._emitSafely(rejected);
-              return result;
-            }
-
-          } else {
-            if(this._hasListeners(DidSelect.type)) {
-              var did = new DidSelect(this, processedDataFilter);
-              this._emitSafely(did);
-            }
-            return result;
-          }
-
+          return this._broadcastResult(result, processedDataFilter, DidSelect, RejectedSelect);
         },
 
-        _emitSafely: function(event, message) {
+        _changeSelection: function(dataFilter, proposedSelectionMode, keyArgs) {
+          var result;
+          var processedDataFilter = dataFilter;
+          var isCanceled = false;
+          var selectionMode = proposedSelectionMode || this.getv("selectionMode");
+
+          if(this._hasListeners(WillChangeSelection.type)) {
+            var will = new WillChangeSelection(this, dataFilter, selectionMode);
+            isCanceled = !this._emit(will);
+
+            processedDataFilter = will.dataFilter;
+            if(isCanceled) {
+              result = new ActionResult(undefined, will.cancelReason);
+              if(this._hasListeners(RejectedChangeSelection.type)) {
+                var canceled = new RejectedChangeSelection(this, result.error, processedDataFilter);
+                this._emit(canceled);
+              }
+              return result;
+            }
+            selectionMode = will.selectionMode;
+          }
+
+          try {
+            var combinedSelection = selectionMode(this, processedDataFilter, keyArgs);
+            if(combinedSelection) {
+              this.set("selectionFilter", combinedSelection);
+              result = new ActionResult(combinedSelection, null);
+            } else {
+              result = new ActionResult(undefined, new UserError("Invalid selection."));
+            }
+          } catch(e) {
+            result = new ActionResult(undefined, e);
+          }
+
+          return this._broadcastResult(result, processedDataFilter, DidChangeSelection, RejectedChangeSelection);
+        },
+
+        /**
+         * Emits an event. All exceptions are caught (and swallowed)
+         * @param event
+         * @returns {*}
+         * @private
+         */
+        _emit: function(event) {
           var result = null;
           try {
-            result = this._emit(event);
+            result = this.base(event);
           } catch(e) {
-            console.log(message, ":", e);
+            console.log("Exception thrown during '", event.type, "' loop:", e);
           }
           return result;
         },
 
         executeAction: function(dataFilter) {
-          var doExecute = this.getv("doExecute");
-
-          var isCanceled = false;
+          var result;
           var processedDataFilter = dataFilter;
+          var isCanceled = false;
+          var doExecute = this.getv("doExecute");
 
           if(this._hasListeners(WillExecute.type)) {
             var will = new WillExecute(this, dataFilter, doExecute);
-            isCanceled = !this._emitSafely(will, 'Exception thrown during "will:execute" loop');
+            isCanceled = !this._emit(will);
 
             processedDataFilter = will.dataFilter;
             if(isCanceled) {
+              result = new ActionResult(undefined, will.cancelReason);
               if(this._hasListeners(RejectedSelect.type)) {
-                var canceled = new RejectedSelect(this, processedDataFilter);
-                this._emitSafely(canceled);
+                var canceled = new RejectedSelect(this, result.error, processedDataFilter);
+                this._emit(canceled);
               }
-              return new ActionResult(undefined, will.cancelReason);
+              return result;
             }
-            doExecute = will.doExecute;
+            doExecute = will.executeAction;
           }
 
-          var result;
           if(doExecute) {
             try {
               doExecute(processedDataFilter);
+              result = new ActionResult(undefined, null);
             } catch(e) {
               result = new ActionResult(undefined, e);
             }
           } else {
             result = new ActionResult(undefined, new UserError("No action defined"));
           }
-          if(result.error) {
-            if(this._hasListeners(RejectedExecute.type)) {
-              var rejected = new RejectedExecute(this, processedDataFilter, e);
-              this._emitSafely(rejected, 'Exception thrown during "reject:execute" loop');
-            }
-            return result;
-          }
-
-          if(this._hasListeners(DidExecute.type)) {
-            var did = new DidExecute(this, processedDataFilter);
-            this._emitSafely(did, 'Exception thrown during "did:execute" loop');
-          }
-          return new ActionResult(undefined, null);
+          return this._broadcastResult(result, processedDataFilter, DidExecute, RejectedExecute);
 
         },
 
-        /**
-         *
-         * @param candidateSelection
-         * @param selectionMode
-         * @param keyArgs
-         * @returns {boolean}
-         * @protected
-         */
-        _changeSelection: function(candidateSelection, selectionMode, keyArgs) {
-          var combineSelections = selectionMode || this.getv("selectionMode");
-          if(!combineSelections)
-            return new ActionResult(undefined, new UserError("No selectionMode defined"));
-
-          var combinedSelection;
-          try {
-            combinedSelection = combineSelections(this, candidateSelection, keyArgs);
-          } catch(e) {
-            if(this._hasListeners("rejected:change:selection")) {
-              var rejectSelect = new RejectedSelect(this, processedDataFilter);
-              this._emit(rejectSelect);
-              return new ActionResult(undefined, e);
+        _broadcastResult: function(result, dataFilter, DidEvent, RejectedEvent) {
+          if(result.error) {
+            if(this._hasListeners(RejectedEvent.type)) {
+              var rejected = new RejectedEvent(this, result.error, dataFilter);
+              this._emit(rejected);
+            }
+          } else {
+            if(this._hasListeners(DidEvent.type)) {
+              var did = new DidEvent(this, result.value, dataFilter);
+              this._emit(did);
             }
           }
-
-
-          if(combinedSelection) {
-            this.set("selectionFilter", combinedSelection);
-            // MOCK emission of an event
-            if(this._hasListeners("did:change:selection")) {
-              var didEvent = new Event("did:change:selection", this, false);
-              this._emit(didEvent);
-            }
-            // END MOCK
-            return new ActionResult(combinedSelection, null);
-          }
-          return new ActionResult(undefined, new TypeError("Nully"));
+          return result;
         },
 
         meta: {
@@ -269,7 +269,6 @@ define([
           ]
         }
       })
-      .implement(EventSource)
       .implement({meta: bundle.structured});
 
     return Model;

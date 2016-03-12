@@ -35,8 +35,8 @@ define([
    */
 
 
-  return will("select").extend("pentaho.visual.base.events.WillSelect",
-    /** @lends pentaho.visual.base.events.WillSelect# */{
+  return will("change:selection").extend("pentaho.visual.base.events.WillChangeSelection",
+    /** @lends pentaho.visual.base.events.WillChangeSelection# */{
       constructor: function(source, dataFilter, selectionMode) {
         this.base(source);
         this._initFilter(dataFilter || null, false);
