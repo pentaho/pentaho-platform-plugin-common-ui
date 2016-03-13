@@ -26,7 +26,7 @@ define([
       /** @lends pentaho.visual.base.events.Rejected# */{
         constructor: function(source, error) {
           if(!error) throw error.argRequired("error");
-          this.base(fullType, source, false);
+          this.base(this.constructor.type, source, false);
           this.error = error;
         }
       }, {

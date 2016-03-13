@@ -25,7 +25,7 @@ define([
     return Event.extend("pentaho.visual.base.events.Did",
       /** @lends pentaho.visual.base.events.Did# */{
         constructor: function(source, value) {
-          this.base(fullType, source, false);
+          this.base(this.constructor.type, source, false);
           this.value = value;
         }
       }, {

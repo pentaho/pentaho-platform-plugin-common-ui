@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 define([
-  "pentaho/lang/EventSource",
   "pentaho/type/complex",
-  "pentaho/data/filter",
-  "pentaho/util/error",
-  "pentaho/util/object",
-  "./types/selectionModes",
-
+  "pentaho/lang/EventSource",
   "pentaho/lang/Event",
+  "pentaho/data/filter",
+  "pentaho/util/object",
+  "pentaho/util/error",
+  "pentaho/lang/UserError",
+  "./types/selectionModes",
 
   "./events/WillSelect",
   "./events/DidSelect",
@@ -36,15 +36,15 @@ define([
   "./events/RejectedExecute",
 
   "pentaho/lang/ActionResult",
-  "pentaho/lang/UserError",
 
   "pentaho/i18n!type"
-], function(EventSource, complexFactory, filter, error, O, selectionModes,
-            Event,
+], function(complexFactory, EventSource, Event, filter, O,
+            error, UserError,
+            selectionModes,
             WillSelect, DidSelect, RejectedSelect,
             WillChangeSelection, DidChangeSelection, RejectedChangeSelection,
             WillExecute, DidExecute, RejectedExecute,
-            ActionResult, UserError,
+            ActionResult,
             bundle) {
 
   "use strict";
@@ -84,7 +84,7 @@ define([
          * The selection is modified in two phases:
          * In the first phase, the
          *
-         * @param {!pentaho.data.filter.AbstractFilter} dataFilter - A filter representing the increment
+         * @param {!pentaho.data.filter.AbstractFilter} proposedDataFilter - A filter representing the increment
          * @param {?object} keyArgs - Keyword arguments.
          * @param {!function} keyArgs.selectionMode - A function that computes a new selection,
          * taking into account the current selection and an input `dataFilter`.
@@ -93,75 +93,78 @@ define([
          *
          * @fires pentaho.visual.base.events#"will:select"
          */
-        selectAction: function(dataFilter, keyArgs) {
-          var result;
-          var processedDataFilter = dataFilter;
-          var isCanceled = false;
+        selectAction: function(proposedDataFilter, keyArgs) {
           var selectionMode = O.getOwn(keyArgs, "selectionMode");
+          var dataFilter = proposedDataFilter;
 
-          if(this._hasListeners(WillSelect.type)) {
-            var will = new WillSelect(this, dataFilter, selectionMode);
-            isCanceled = !this._emit(will);
-
-            processedDataFilter = will.dataFilter;
-            if(isCanceled) {
-              result = new ActionResult(undefined, will.cancelReason);
-              if(this._hasListeners(RejectedSelect.type)) {
-                var canceled = new RejectedSelect(this, result.error, processedDataFilter);
-                this._emit(canceled);
-              }
-              return result;
-            }
-            selectionMode = will.selectionMode;
+          var result = this._runPipeline(dataFilter, selectionMode, WillSelect, RejectedSelect);
+          if(result) {
+            if(result.error) return result;
+            selectionMode = result.value.selectionMode;
+            dataFilter = result.value.dataFilter;
           }
 
           try {
-            result = this._changeSelection(processedDataFilter, selectionMode, keyArgs);
+            result = this._changeSelection(dataFilter, selectionMode);
           } catch(e) {
             result = new ActionResult(undefined, e);
           }
-          return this._broadcastResult(result, processedDataFilter, DidSelect, RejectedSelect);
+          return this._broadcastResult(result, dataFilter, DidSelect, RejectedSelect);
         },
 
-        _changeSelection: function(dataFilter, proposedSelectionMode, keyArgs) {
-          var result;
-          var processedDataFilter = dataFilter;
-          var isCanceled = false;
+        _changeSelection: function(proposedDataFilter, proposedSelectionMode) {
           var selectionMode = proposedSelectionMode || this.getv("selectionMode");
+          var dataFilter = proposedDataFilter;
 
-          if(this._hasListeners(WillChangeSelection.type)) {
-            var will = new WillChangeSelection(this, dataFilter, selectionMode);
-            isCanceled = !this._emit(will);
-
-            processedDataFilter = will.dataFilter;
-            if(isCanceled) {
-              result = new ActionResult(undefined, will.cancelReason);
-              if(this._hasListeners(RejectedChangeSelection.type)) {
-                var canceled = new RejectedChangeSelection(this, result.error, processedDataFilter);
-                this._emit(canceled);
-              }
-              return result;
-            }
-            selectionMode = will.selectionMode;
+          var result = this._runPipeline(dataFilter, selectionMode, WillChangeSelection, RejectedChangeSelection);
+          if(result) {
+            if(result.error) return result;
+            selectionMode = result.value.selectionMode;
+            dataFilter = result.value.dataFilter;
           }
 
           try {
-            var combinedSelection = selectionMode(this, processedDataFilter, keyArgs);
+            var combinedSelection = selectionMode(this, dataFilter);
             if(combinedSelection) {
               this.set("selectionFilter", combinedSelection);
               result = new ActionResult(combinedSelection, null);
             } else {
-              result = new ActionResult(undefined, new UserError("Invalid selection."));
+              result = new ActionResult(undefined, new UserError(bundle.structured.error.selection.invalid));
             }
           } catch(e) {
             result = new ActionResult(undefined, e);
           }
 
-          return this._broadcastResult(result, processedDataFilter, DidChangeSelection, RejectedChangeSelection);
+          return this._broadcastResult(result, dataFilter, DidChangeSelection, RejectedChangeSelection);
+        },
+
+        executeAction: function(proposedDataFilter) {
+          var doExecute = this.getv("doExecute");
+          var dataFilter = proposedDataFilter;
+
+          var result = this._runPipeline(dataFilter, doExecute, WillExecute, RejectedExecute);
+          if(result) {
+            if(result.error) return result;
+            doExecute = result.value.doExecute;
+            dataFilter = result.value.dataFilter;
+          }
+
+          if(doExecute) {
+            try {
+              doExecute(dataFilter);
+              result = new ActionResult(undefined, null);
+            } catch(e) {
+              result = new ActionResult(undefined, e);
+            }
+          } else {
+            result = new ActionResult(undefined, new UserError(bundle.structured.error.action.notDefined));
+          }
+          return this._broadcastResult(result, dataFilter, DidExecute, RejectedExecute);
+
         },
 
         /**
-         * Emits an event. All exceptions are caught (and swallowed)
+         * Emits an event. All exceptions are caught (and swallowed).
          * @param event
          * @returns {*}
          * @private
@@ -176,40 +179,21 @@ define([
           return result;
         },
 
-        executeAction: function(dataFilter) {
-          var result;
-          var processedDataFilter = dataFilter;
-          var isCanceled = false;
-          var doExecute = this.getv("doExecute");
+        _runPipeline: function(dataFilter, otherArg, WillEvent, RejectedEvent) {
+          if(!this._hasListeners(WillEvent.type)) return null;
 
-          if(this._hasListeners(WillExecute.type)) {
-            var will = new WillExecute(this, dataFilter, doExecute);
-            isCanceled = !this._emit(will);
+          var will = new WillEvent(this, dataFilter, otherArg);
+          var isCanceled = !this._emit(will);
 
-            processedDataFilter = will.dataFilter;
-            if(isCanceled) {
-              result = new ActionResult(undefined, will.cancelReason);
-              if(this._hasListeners(RejectedSelect.type)) {
-                var canceled = new RejectedSelect(this, result.error, processedDataFilter);
-                this._emit(canceled);
-              }
-              return result;
+          if(isCanceled) {
+            var result = new ActionResult(undefined, will.cancelReason);
+            if(this._hasListeners(RejectedEvent.type)) {
+              var canceled = new RejectedEvent(this, result.error, will.dataFilter);
+              this._emit(canceled);
             }
-            doExecute = will.executeAction;
+            return result;
           }
-
-          if(doExecute) {
-            try {
-              doExecute(processedDataFilter);
-              result = new ActionResult(undefined, null);
-            } catch(e) {
-              result = new ActionResult(undefined, e);
-            }
-          } else {
-            result = new ActionResult(undefined, new UserError("No action defined"));
-          }
-          return this._broadcastResult(result, processedDataFilter, DidExecute, RejectedExecute);
-
+          return new ActionResult(will, null);
         },
 
         _broadcastResult: function(result, dataFilter, DidEvent, RejectedEvent) {

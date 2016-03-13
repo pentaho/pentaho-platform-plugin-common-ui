@@ -23,9 +23,9 @@ define([
     var fullType = "will:" + type;
 
     return Event.extend("pentaho.visual.base.events.Will",
-      /** @lends pentaho.visual.base.events.RejectedSelect# */{
+      /** @lends pentaho.visual.base.events.Will# */{
         constructor: function(source) {
-          this.base(fullType, source, true);
+          this.base(this.constructor.type, source, true);
         }
       }, {
         get type() {
