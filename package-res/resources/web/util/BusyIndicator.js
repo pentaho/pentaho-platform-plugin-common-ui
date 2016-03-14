@@ -122,8 +122,11 @@ define("common-ui/util/BusyIndicator", ["common-ui/util/Glasspane", "common-ui/u
                         });
                     }
                     if(this.glasspane) {
-                        this.glasspane.hide();
+                      var me = this;
+                      setTimeout(function() {
+                        me.glasspane.hide();
                         this.glasspane = undefined;
+                      }, 2000);
                     }
 
                 }
