@@ -16,25 +16,44 @@
 define([], function() {
   "use strict";
 
-  return {
-    REPLACE: function(model, candidateSelection) {
-      return candidateSelection || null;
+  /**
+   * @name selectionModes
+   * @namespace
+   * @memberOf pentaho.visual.base.types
+   */
+  return /** @lends pentaho.visual.base.types.selectionModes */{
+
+    /**
+     * Returns the candidate filter.
+     *
+     * @param {!pentaho.visual.base.Model} model -
+     * @param {pentaho.data.filter.AbstractFilter} currentFilter - The filter representing the current selection.
+     * @param {pentaho.data.filter.AbstractFilter} candidateFilter - The filter that will replace the current selection.
+     * @return {?pentaho.data.filter.AbstractFilter}
+     * @static
+     */
+    REPLACE: function(currentFilter, candidateFilter) {
+      return candidateFilter;
     },
 
-    TOGGLE: function(model, candidateSelection) {
-      return candidateSelection ? candidateSelection.invert() : null;
+    /**
+     * Returns the candidate filter.
+     *
+     * @param {pentaho.data.filter.AbstractFilter} currentFilter - The filter representing the current selection.
+     * @param {pentaho.data.filter.AbstractFilter} candidateFilter - The filter that will replace the current selection.
+     * @return {?pentaho.data.filter.AbstractFilter}
+     * @static
+     */
+    TOGGLE: function(currentFilter, candidateFilter) {
+      return currentFilter.and(candidateFilter).invert().or(currentFilter);
     },
 
-    ADD: function(model, candidateSelection) {
-      return candidateSelection ? model.get("selectionFilter").or(candidateSelection) : null;
+    ADD: function(currentFilter, candidateFilter) {
+      return  currentFilter.or(candidateFilter);
     },
 
-    REMOVE: function(model, candidateSelection) {
-      return candidateSelection ? model.get("selectionFilter").and(candidateSelection.invert()) : null;
-    },
-
-    INTERSECT: function(model, candidateSelection) {
-      return candidateSelection ? model.get("selectionFilter").and(candidateSelection) : null;
+    REMOVE: function(currentFilter, candidateFilter) {
+      return currentFilter.and(candidateFilter.invert());
     }
   };
 
