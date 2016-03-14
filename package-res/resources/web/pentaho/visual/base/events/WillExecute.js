@@ -25,7 +25,7 @@ define([
       constructor: function(source, dataFilter, onExecute) {
         if(!onExecute) throw error.argRequired("onExecute");
         this.base(source);
-        this._initFilter(dataFilter || null, false);
+        this._initFilter(dataFilter || null, true);
         this._onExecute = onExecute || null;
       },
 

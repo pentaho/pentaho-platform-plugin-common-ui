@@ -39,7 +39,7 @@ define([
     /** @lends pentaho.visual.base.events.WillSelect# */{
       constructor: function(source, dataFilter, selectionMode) {
         this.base(source);
-        this._initFilter(dataFilter || null, false);
+        this._initFilter(dataFilter || null, true);
         this._selectionMode = selectionMode || null;
       },
 

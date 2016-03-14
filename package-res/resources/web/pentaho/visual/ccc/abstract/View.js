@@ -171,10 +171,10 @@ define([
     //region VizAPI implementation
 
 
-    _init: function(){
+    _init: function() {
       this.base();
       this.model.set("doExecute", _doExecute);
-      this.model.on("will:select", this._onWillSelect);
+      this.model.on("will:select", _onWillSelect.bind(this));
 
       function _doExecute(dataFilter) {
         var queryValue = "";
@@ -191,12 +191,27 @@ define([
         window.open("http://www.google.com/search?as_q=\"" + queryValue + "\"", "_blank");
       }
 
-    },
+      function _onWillSelect(event) {
+        var multi = this._getAttributeInfosOfRole(this._multiRole);
+        var properties = multi.reduce(function(memo, m) {
+          memo.push(m.attr.name);
+          return memo;
+        }, []);
 
-    _onWillSelect: function(event){
-      console.log(event);
-    },
+        var dataFilter = event.dataFilter.transform(function(node, children) {
+          if(children !== null && children.length === 0) return null;
+          if(node instanceof filter.AbstractPropertyFilter) {
+            if(properties.indexOf(node.property) > -1) return null;
+            return node;
+          }
+          return children;
+        });
 
+        event.dataFilter = dataFilter;
+        console.log(event);
+      }
+
+    },
 
     _render: function() {
       this._dataTable = this.model.getv("data");
@@ -247,27 +262,12 @@ define([
     //endregion
 
     //region Helpers
-    // Sets the items on the chart that should be highlighted
-    //setHighlights: function(highlights) {
-    //  this._selections = highlights;
-    //
-    //  if(!this._ownChange) { // reentry control
-    //    if(!highlights || highlights.length === 0) {
-    //      // will cause selectionChangedAction being called
-    //      this._ownChange = true;
-    //      try {
-    //        this._chart.clearSelections();
-    //      } finally {
-    //        this._ownChange = false;
-    //      }
-    //    }
-    //  }
-    //},
 
     _selectionChanged: function() {
       var dataFilter = this.model.getv("selectionFilter");
       var selectedItems = dataFilter.apply(this.model.getv("data"));
 
+      // Get information on the axes
       var props = def.query(this._keyAxesIds)
         .selectMany(function(axisId) {
           return this.axes[axisId].getSelectionGems();
@@ -280,6 +280,7 @@ define([
         })
         .array();
 
+      // Build a CCC filter (whereSpec)
       var whereSpec = [];
       var alreadyIn = {};
       for(var k = 0, N = selectedItems.getNumberOfRows(); k < N; k++) {
@@ -1349,10 +1350,10 @@ define([
       //return this._onUserSelection(selectingDatums);
       // Convert to array of analyzer cell or column selection objects
       /*
-      var selectionExcludesMulti = this._selectionExcludesMultiGems(),
-        selections = [],
-        selectionsByKey = {};
-      */
+       var selectionExcludesMulti = this._selectionExcludesMultiGems(),
+       selections = [],
+       selectionsByKey = {};
+       */
 
       var operands = [];
 
@@ -1379,9 +1380,9 @@ define([
           if(!datum.isVirtual) {
             var operand = this._complexToFilter(datum);
 
-             // TODO:
-             // Check if there's already a selection with the same key.
-             // If not, add a new selection to the selections list.
+            // TODO:
+            // Check if there's already a selection with the same key.
+            // If not, add a new selection to the selections list.
 
             if(operand)
               operands.push(operand);

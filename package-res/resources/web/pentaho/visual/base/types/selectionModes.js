@@ -27,33 +27,41 @@ define([], function() {
      * Returns the candidate filter.
      *
      * @param {!pentaho.visual.base.Model} model -
-     * @param {pentaho.data.filter.AbstractFilter} currentFilter - The filter representing the current selection.
-     * @param {pentaho.data.filter.AbstractFilter} candidateFilter - The filter that will replace the current selection.
+     * @param {pentaho.data.filter.AbstractFilter} current - The filter representing the current selection.
+     * @param {pentaho.data.filter.AbstractFilter} candidate - The filter that will replace the current selection.
      * @return {?pentaho.data.filter.AbstractFilter}
      * @static
      */
-    REPLACE: function(currentFilter, candidateFilter) {
-      return candidateFilter;
+    REPLACE: function(current, candidate) {
+      return candidate;
     },
 
     /**
-     * Returns the candidate filter.
+     * Combines the candidate filter with the current .
      *
-     * @param {pentaho.data.filter.AbstractFilter} currentFilter - The filter representing the current selection.
-     * @param {pentaho.data.filter.AbstractFilter} candidateFilter - The filter that will replace the current selection.
+     * @param {pentaho.data.filter.AbstractFilter} current - The filter representing the current selection.
+     * @param {pentaho.data.filter.AbstractFilter} candidate - The filter that will replace the current selection.
      * @return {?pentaho.data.filter.AbstractFilter}
      * @static
      */
-    TOGGLE: function(currentFilter, candidateFilter) {
-      return currentFilter.and(candidateFilter).invert().or(currentFilter);
+    TOGGLE: function(current, candidate) {
+      return current.and(candidate).invert().or(current);
     },
 
-    ADD: function(currentFilter, candidateFilter) {
-      return  currentFilter.or(candidateFilter);
+    /**
+     * Returns a filter that expands the current selection with the items in the candidate filter.
+     *
+     * @param {pentaho.data.filter.AbstractFilter} current - The filter representing the current selection.
+     * @param {pentaho.data.filter.AbstractFilter} candidate - The filter the current selection.
+     * @return {?pentaho.data.filter.AbstractFilter}
+     * @static
+     */
+    ADD: function(current, candidate) {
+      return  current.or(candidate);
     },
 
-    REMOVE: function(currentFilter, candidateFilter) {
-      return currentFilter.and(candidateFilter.invert());
+    REMOVE: function(current, candidate) {
+      return current.and(candidate.invert());
     }
   };
 
