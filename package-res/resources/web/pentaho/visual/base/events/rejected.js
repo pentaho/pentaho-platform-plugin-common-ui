@@ -19,9 +19,23 @@ define([
 ], function(Event, error) {
   "use strict";
 
+  /**
+   * Creates a `rejected` event of a given type.
+   *
+   * @name pentaho.visual.base.events.rejected
+   * @amd {pentaho.type.Factory.<pentaho.visual.base.events.Rejected>} pentaho/visual/base/events/rejected
+   */
   return function rejected(type) {
     var fullType = "rejected:" + type;
 
+    /**
+     * @name pentaho.visual.base.events.Rejected
+     * @class
+     * @abstract
+     * @extends pentaho.lang.Event
+     *
+     * @classDesc The class of `rejected:` events.
+     */
     return Event.extend("pentaho.visual.base.events.Rejected",
       /** @lends pentaho.visual.base.events.Rejected# */{
         constructor: function(source, error) {

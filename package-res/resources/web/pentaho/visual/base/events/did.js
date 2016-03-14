@@ -19,9 +19,23 @@ define([
 ], function(Event) {
   "use strict";
 
+  /**
+   * Creates a `did` event of a given type.
+   *
+   * @name pentaho.visual.base.events.did
+   * @amd {pentaho.type.Factory.<pentaho.visual.base.events.Did>} pentaho/visual/base/events/did
+   */
   return function did(type) {
     var fullType = "did:" + type;
 
+    /**
+     * @name pentaho.visual.base.events.Did
+     * @class
+     * @abstract
+     * @extends pentaho.lang.Event
+     *
+     * @classDesc The class of `did:` events.
+     */
     return Event.extend("pentaho.visual.base.events.Did",
       /** @lends pentaho.visual.base.events.Did# */{
         constructor: function(source, value) {

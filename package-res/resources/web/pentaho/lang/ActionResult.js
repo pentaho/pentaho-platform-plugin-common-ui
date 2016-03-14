@@ -20,6 +20,12 @@ define([
 ], function(Base, UserError) {
   "use strict";
 
+  /**
+   * @name ActionResult
+   * @class
+   * @memberOf pentaho.lang
+   * @extends pentaho.lang.Base
+   */
   return Base.extend("pentaho.lang.ActionResult", /** @lends pentaho.lang.ActionResult# */{
     constructor: function(value, error) {
       this._value = value;

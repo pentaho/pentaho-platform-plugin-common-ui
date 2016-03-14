@@ -15,11 +15,24 @@
  */
 define([
   "./rejected",
-  "./mixinDataFilter",
+  "../mixins/mixinDataFilter",
   "pentaho/util/error"
 ], function(rejected, mixinDataFilter, error) {
   "use strict";
 
+  /**
+   * @name RejectedSelect
+   * @memberOf pentaho.visual.base.events
+   * @description This event is triggered when any failure occurs while inside
+   * the {@link pentaho.visual.base.Model#selectAction|Select Action} flow.
+   *
+   * Those failures can be one of the following:
+   *  - The event {@link pentaho.visual.events.WillSelect|"will:select"} was canceled.
+   *  - The selection mode was invalid.
+   *
+   * @extends pentaho.visual.base.events.Rejected
+   * @event "rejected:select"
+   */
   return rejected("select").extend("pentaho.visual.base.events.RejectedSelect",
     /** @lends pentaho.visual.base.events.RejectedSelect# */{
       constructor: function(source, error, dataFilter) {

@@ -15,27 +15,40 @@
  */
 define([
   "./will",
-  "./mixinDataFilter",
+  "../mixins/mixinDataFilter",
   "pentaho/util/error"
 ], function(will, mixinDataFilter, error) {
   "use strict";
 
+  /**
+   * @name WillExecute
+   * @memberOf pentaho.visual.base.events
+   * @description This event is triggered when
+   * the {@link pentaho.visual.base.Model#executeAction|Execute Action} flow starts.
+   * The listeners of `will:execute` are allowed to:
+   * - cancel the event,
+   * - mutate the input data filter
+   * - change the `doExecute` action.
+   *
+   * @extends pentaho.visual.base.events.Will
+   * @event "will:execute"
+   */
   return will("execute").extend("pentaho.visual.base.events.WillExecute",
     /** @lends pentaho.visual.base.events.WillExecute# */{
-      constructor: function(source, dataFilter, onExecute) {
-        if(!onExecute) throw error.argRequired("onExecute");
+      constructor: function(source, dataFilter, doExecute) {
+        if(!doExecute) throw error.argRequired("onExecute");
         this.base(source);
         this._initFilter(dataFilter || null, true);
-        this._onExecute = onExecute || null;
+        this._doExecute = onExecute || null;
       },
 
-      set executeAction(f) {
+      set doExecute(f) {
         if(typeof f === "function")
-          this._onExecute = f;
+          this._doExecute = f;
       },
 
-      get executeAction() {
-        return this._onExecute;
+      get doExecute() {
+        return this._doExecute;
       }
     })
     .implement(mixinDataFilter);

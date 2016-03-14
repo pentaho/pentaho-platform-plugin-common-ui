@@ -78,6 +78,7 @@ define([
           this.base(modelSpec);
         },
 
+        //region Event Flows Handling
         /**
          * Modifies the current selection based on an input filter and on a selection mode.
          *
@@ -101,8 +102,8 @@ define([
          * and a [result]{@link pentaho.lang.ActionResult} containing
          * the updated current selection in the `value` field is returned.
          *
-         * Any failure (due to an event cancelation, due to listeners throwing exceptions
-         * or due to an invalid selection mode) yields an error [result]{@link pentaho.lang.ActionResult}
+         * Any failure (due to an event cancelation or due to an invalid selection mode)
+         * yields an error [result]{@link pentaho.lang.ActionResult}
          * and lead to the emission (and processing) of the
          * ["rejected:select"]{@link pentaho.visual.base.events.RejectedSelect}.
          * In this case, this method returns a [result]{@link pentaho.lang.ActionResult}
@@ -194,6 +195,37 @@ define([
           return this._broadcastResult(DidChangeSelection, RejectedChangeSelection, result, dataFilter);
         },
 
+        /**
+         * Executes an action when the user interacts with a visual element, normally by double clicking it.
+         *
+         * The flow starts by triggering the event
+         * {@link pentaho.visual.base.events.WillExecute|will:execute}.
+         * Its event listeners can be attributed a _priority_,
+         * and can be regarded as operations in a processing pipeline that are allowed to:
+         * - cancel the event,
+         * - mutate the input data filter
+         * - change the `doExecute` action.
+         *
+         * Any failure (due to an event cancellation or due to an invalid `doExecute` action)
+         * yields an error {@link pentaho.lang.ActionResult|result}
+         * and lead to the emission (and processing) of the
+         * {@link pentaho.visual.base.events.RejectedSelect|rejected:execute}.
+         * In this case, this method returns a {@link pentaho.lang.ActionResult|result}.
+         * with an exception in the `error` field.
+         *
+         * @param {!pentaho.data.filter.AbstractFilter} proposedDataFilter - The filter that represents the visual element which the user interacted with.
+         * @return {pentaho.lang.ActionResult}
+         * If unsuccessful, the `error` field contains the exception that originated the error.
+         * If successful,  the `error` field is `null`.
+         * In both cases no value is returned.
+         *
+         * @fires "will:execute"
+         * @fires "did:execute"
+         * @fires "rejected:execute"
+         *
+         * @see #_runPipeline
+         * @see #_broadcastResult
+         */
         executeAction: function(proposedDataFilter) {
           var doExecute = this.getv("doExecute");
           var dataFilter = proposedDataFilter;
@@ -308,6 +340,7 @@ define([
           }
           return result;
         },
+        //endregion
 
         meta: {
           id: "pentaho/visual/base",

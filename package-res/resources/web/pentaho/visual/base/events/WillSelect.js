@@ -15,26 +15,23 @@
  */
 define([
   "./will",
-  "./mixinDataFilter"
+  "../mixins/mixinDataFilter"
 ], function(will, mixinDataFilter) {
   "use strict";
 
   /**
    * @name WillSelect
    * @memberOf pentaho.visual.base.events
-   * @class
+   * @description This event is triggered when
+   * the {@link pentaho.visual.base.Model#selectAction|Select Action} flow starts.
+   * The listeners of `will:select` are allowed to:
+   * - cancel the event,
+   * - mutate the input data filter
+   * - mutate the selection mode.
+   *
    * @extends pentaho.visual.base.events.Will
-   * @abstract
-   * @classDesc This is the base model class for visualizations.
-   *
-   * @constructor
-   * @description Creates a base `Model`.
-   * @param {pentaho.visual.base.spec.IModel} modelSpec A plain object containing the model specification.
-   *
    * @event "will:select"
    */
-
-
   return will("select").extend("pentaho.visual.base.events.WillSelect",
     /** @lends pentaho.visual.base.events.WillSelect# */{
       constructor: function(source, dataFilter, selectionMode) {

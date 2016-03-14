@@ -15,11 +15,25 @@
  */
 define([
   "./rejected",
-  "./mixinDataFilter",
+  "../mixins/mixinDataFilter",
   "pentaho/util/error"
 ], function(rejected, mixinDataFilter, error) {
   "use strict";
 
+  /**
+   * @name RejectedExecute
+   * @memberOf pentaho.visual.base.events
+   * @description This event is triggered when any failure occurs while inside
+   * the {@link pentaho.visual.base.Model#executeAction|Execute Action} flow.
+   *
+   * Those failures can be one of the following:
+   *  - The event {@link pentaho.visual.events.WillExecute|"will:execute"} was canceled.
+   *  - The `doExecute` action was {@link Nully}.
+   *  - The `doExecute` action failed while executing.
+   *
+   * @extends pentaho.visual.base.events.Rejected
+   * @event "rejected:execute"
+   */
   return rejected("execute").extend("pentaho.visual.base.events.RejectedExecute",
     /** @lends pentaho.visual.base.events.RejectedExecute# */{
       constructor: function(source, error, dataFilter) {

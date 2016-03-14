@@ -19,9 +19,23 @@ define([
 ], function(Event) {
   "use strict";
 
+  /**
+   * Creates a `will` event of a given type.
+   *
+   * @name pentaho.visual.base.events.will
+   * @amd {pentaho.type.Factory.<pentaho.visual.base.events.Will>} pentaho/visual/base/events/will
+   */
   return function will(type) {
     var fullType = "will:" + type;
 
+    /**
+     * @name pentaho.visual.base.events.Will
+     * @class
+     * @abstract
+     * @extends pentaho.lang.Event
+     *
+     * @classDesc The class of `will:` events.
+     */
     return Event.extend("pentaho.visual.base.events.Will",
       /** @lends pentaho.visual.base.events.Will# */{
         constructor: function(source) {

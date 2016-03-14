@@ -15,10 +15,19 @@
  */
 define([
   "./did",
-  "./mixinDataFilter"
+  "../mixins/mixinDataFilter"
 ], function(did, mixinDataFilter) {
   "use strict";
 
+  /**
+   * @name DidSelect
+   * @memberOf pentaho.visual.base.events
+   * @description This event is triggered when
+   * the {@link pentaho.visual.base.Model#selectAction|Select Action} flow ends without any failures.
+   *
+   * @extends pentaho.visual.base.events.Did
+   * @event "did:select"
+   */
   return did("select").extend("pentaho.visual.base.events.DidSelect",
     /** @lends pentaho.visual.base.events.DidSelect# */{
       constructor: function(source, value, dataFilter) {
