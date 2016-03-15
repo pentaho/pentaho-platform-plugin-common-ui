@@ -34,8 +34,8 @@
  * @property {Function} onStateChanged Callback called if defined after state variables have been changed on the prompt panel or parameter definition
  * @property {?Function} onSubmit Callback called when the submit function executes, null if no callback is registered.
  */
-define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/util/util', 'common-ui/util/GUIDHelper', './WidgetBuilder', 'cdf/Dashboard.Clean', './parameters/ParameterDefinitionDiffer', 'common-ui/jquery-clean'],
-    function (Base, Logger, DojoNumber, i18n, Utils, GUIDHelper, WidgetBuilder, Dashboard, ParamDiff, $) {
+define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/util/util', 'common-ui/util/GUIDHelper', './WidgetBuilder', 'cdf/Dashboard.Clean', './parameters/ParameterDefinitionDiffer', 'common-ui/jquery-clean', 'common-ui/underscore'],
+    function (Base, Logger, DojoNumber, i18n, Utils, GUIDHelper, WidgetBuilder, Dashboard, ParamDiff, $, _) {
 
       var _STATE_CONSTANTS = {
         readOnlyProperties: ["promptNeeded", "paginate", "totalPages", "showParameterUI", "allowAutoSubmit"],
@@ -350,6 +350,11 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
             case "java.sql.Date": // Set time to zero to eliminate its influence on the days comparison
               return (new Date(paramValue).setHours(0,0,0,0)) != (new Date(paramSelectedValue).setHours(0,0,0,0));
             default:
+              if(paramType.indexOf("[") == 0) { // Need to compare arrays
+                if(paramValue.length != paramSelectedValue.length)
+                  return true;
+                return !_.isEqual(paramValue.sort(), paramSelectedValue.sort());
+              }
               return paramValue != paramSelectedValue;
           }
         }
@@ -1087,6 +1092,7 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
 
                   // Set new values array
                   component.valuesArray = newValuesArray;
+                  component.valuesArray = newValuesArray;
                   updateNeeded = true;
                 }
 
@@ -1094,16 +1100,16 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
                   this.forceSubmit = true;
                 }
 
-                var paramType = null;
-                var paramSelectedValues = param.getSelectedValuesValue();
-                if (paramSelectedValues.length == 1) {
-                  paramSelectedValues = paramSelectedValues[0];
-                  paramType = param.type;
-                }
-
                 if (!updateNeeded) {
-                  var paramValue = this.dashboard.getParameterValue(component.parameter);
-                  updateNeeded = _areParamsDifferent(paramValue, paramSelectedValues, paramType);
+                  var paramSelectedValues = param.getSelectedValuesValue();
+                  var dashboardParameter = this.dashboard.getParameterValue(component.parameter);
+
+                  // if the dashboardParameter is not an array, paramSelectedValues shouldn't be either
+                  if (!_.isArray(dashboardParameter) && paramSelectedValues.length == 1) {
+                    paramSelectedValues = paramSelectedValues[0];
+                  }
+
+                  updateNeeded = _areParamsDifferent(dashboardParameter, paramSelectedValues, param.type);
                 }
 
                 if (updateNeeded) {
