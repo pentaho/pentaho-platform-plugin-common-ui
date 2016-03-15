@@ -192,8 +192,6 @@ define([
       this._prepareLayout(this.options);
 
       this._renderCore();
-
-      this._hackedRender();
     },
 
     /** @override VizAPI */
@@ -1267,6 +1265,8 @@ define([
       this._chart
         .setData(this._dataView.toJsonCda())
         .render();
+
+      this._hackedRender();
     },
 
     //region SELECTION
