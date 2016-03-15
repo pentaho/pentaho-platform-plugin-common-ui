@@ -133,7 +133,7 @@ define([
 
           var newSelectionFilter;
           try {
-            newSelectionFilter = selectionMode(currentSelectionFilter, will.dataFilter);
+            newSelectionFilter = selectionMode.call(this, currentSelectionFilter, will.dataFilter);
           } catch(e) {
             return ActionResult.reject(e);
           }
