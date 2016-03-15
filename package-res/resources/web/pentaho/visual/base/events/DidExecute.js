@@ -36,7 +36,7 @@ define([
        *
        * @constructor
        * @param {!Object} source - The object where the event will be initially emitted.
-       * @param {?Object} value - The value of a fulfilled {@link pentaho.lang.ActionResult|ActionResult}
+       * @param {?Object} value - The value of a fulfilled {@link pentaho.lang.ActionResult|ActionResult}.
        * @param {!pentaho.data.filter.AbstractFilter} dataFilter - A filter representing the data set of the visual element which the user interacted with.
        */
       constructor: function(source, value, dataFilter) {

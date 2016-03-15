@@ -42,7 +42,7 @@ define([
        * @constructor
        *
        * @param {!Object} source - The object where the event will be initially emitted.
-       * @param {!Error|pentaho.lang.UserError} error - The error of a rejected {@link pentaho.lang.ActionResult|ActionResult}
+       * @param {!Error|pentaho.lang.UserError} error - The error of a rejected {@link pentaho.lang.ActionResult|ActionResult}.
        * @param {!pentaho.data.filter.AbstractFilter} dataFilter - A filter representing the data set of the visual element which the user interacted with.
        */
       constructor: function(source, error, dataFilter) {

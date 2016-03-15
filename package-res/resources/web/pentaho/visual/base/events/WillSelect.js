@@ -28,9 +28,9 @@ define([
    * @description This event is triggered when
    * the {@link pentaho.visual.base.Model#selectAction|Select Action} flow starts.
    * The listeners of `will:select` are allowed to:
-   * - cancel the event,
+   * - cancel the event
    * - replace the input data filter
-   * - replace the selection mode.
+   * - replace the selection mode
    *
    * @extends pentaho.visual.base.events.Will
    * @event "will:select"
@@ -47,7 +47,6 @@ define([
        * @param {!pentaho.data.filter.AbstractFilter} dataFilter - A filter representing the data set of the visual element(s) which the user interacted with.
        * @param {?function} selectionMode - A function that represents how the selection made by the user
        * will be merged with the current selection.
-       * A function representing the way a new {@link pentaho.data.filter.AbstractFilter|Data Filters} with previous selections.
        */
       constructor: function(source, dataFilter, selectionMode) {
         if(!selectionMode) throw error.argRequired("selectionMode");;

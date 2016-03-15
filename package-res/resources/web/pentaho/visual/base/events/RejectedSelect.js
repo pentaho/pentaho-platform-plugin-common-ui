@@ -42,7 +42,7 @@ define([
        * @constructor
        *
        * @param {!Object} source - The object where the event will be initially emitted.
-       * @param {!Error|pentaho.lang.UserError} error - The error of a rejected {@link pentaho.lang.ActionResult|ActionResult}
+       * @param {!Error|pentaho.lang.UserError} error - The error of a rejected {@link pentaho.lang.ActionResult|ActionResult}.
        * @param {?pentaho.visual.base.events.WillSelect} will - The "will:select" event object.
        */
       constructor: function(source, error, will) {

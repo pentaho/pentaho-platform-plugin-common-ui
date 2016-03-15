@@ -26,9 +26,9 @@ define([
    * @description This event is triggered when
    * the {@link pentaho.visual.base.Model#executeAction|Execute Action} flow starts.
    * The listeners of `will:execute` are allowed to:
-   * - cancel the event,
+   * - cancel the event
    * - replace the input data filter
-   * - replace the `doExecute` action.
+   * - replace the `doExecute` action
    *
    * @extends pentaho.visual.base.events.Will
    * @event "will:execute"

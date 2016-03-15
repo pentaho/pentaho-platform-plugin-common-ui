@@ -25,8 +25,8 @@ define([
    * @description This event is triggered by
    * the {@link pentaho.visual.base.Model#selectAction|Select Action} flow.
    * The listeners of `will:change:selectionFilter` are allowed to:
-   * - cancel the event,
-   * - replace the input data filter,
+   * - cancel the event
+   * - replace the input data filter
    *
    * @extends pentaho.visual.base.events.Will
    * @event "will:change:selectionFilter"

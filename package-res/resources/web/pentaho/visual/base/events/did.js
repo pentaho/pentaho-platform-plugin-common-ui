@@ -38,7 +38,7 @@ define([
      * @constructor
      * @description Creates a base `Did` event.
      * @param {!Object} source - The object where the event will be initially emitted.
-     * @param {?Object} value - The value of a fulfilled {@link pentaho.lang.ActionResult|ActionResult}
+     * @param {?Object} value - The value of a fulfilled {@link pentaho.lang.ActionResult|ActionResult}.
      */
     return Event.extend("pentaho.visual.base.events.Did", /** @lends pentaho.visual.base.events.Did# */{
         constructor: function(source, value) {

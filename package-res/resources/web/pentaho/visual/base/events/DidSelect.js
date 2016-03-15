@@ -38,7 +38,7 @@ define([
        * @constructor
        *
        * @param {!Object} source - The object where the event will be initially emitted.
-       * @param {?Object} value - The value of a fulfilled {@link pentaho.lang.ActionResult|ActionResult}
+       * @param {?Object} value - The value of a fulfilled {@link pentaho.lang.ActionResult|ActionResult}.
        * @param {pentaho.visual.base.events.WillSelect} will - The "will:select" event object.
        */
       constructor: function(source, value, will) {

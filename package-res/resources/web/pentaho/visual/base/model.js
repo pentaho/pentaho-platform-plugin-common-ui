@@ -79,7 +79,7 @@ define([
          * Modifies the current selection filter based on an input filter and on a selection mode.
          *
          * This action is the entry point for user-driven modifications of the current selection filter,
-         * e.g. if the user clicked a bar in a bar chart,
+         * for example, if the user clicked a bar in a bar chart,
          * or drew a rectangle over a set of bars in a bar chart.
          *
          * The event ["will:select"]{@link pentaho.visual.base.events.WillSelect}
