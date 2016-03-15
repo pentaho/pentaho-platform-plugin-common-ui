@@ -18,7 +18,7 @@ define([
   "./Base",
   "./UserError",
   "../util/error"
-], function(Base, UserError, error) {
+], function(Base, UserError, utilError) {
   "use strict";
 
   /**
@@ -33,7 +33,7 @@ define([
         if(typeof error === "string") {
           error = new UserError(error);
         } else if(!(error instanceof Error)) {
-          throw error.argInvalidType("error", ["string", "Error"], typeof error);
+          throw utilError.argInvalidType("error", ["string", "Error"], typeof error);
         }
         this._value = undefined;
         this._error  = error;

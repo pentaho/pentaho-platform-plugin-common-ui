@@ -15,8 +15,9 @@
  */
 define([
   "./rejected",
-  "../mixins/mixinDataFilter"
-], function(rejected, mixinDataFilter) {
+  "../mixins/mixinDataFilter",
+  "pentaho/util/error"
+], function(rejected, mixinDataFilter, utilError) {
   "use strict";
 
   /**
@@ -46,6 +47,9 @@ define([
        */
       constructor: function(source, error, will) {
         this.base(source, error);
+
+        if(!will) throw utilError.argRequired("will");
+
         this._initFilter(will.dataFilter, false);
       }
     })

@@ -21,7 +21,7 @@ define([
 
   /* global describe:false, it:false, expect:false, beforeEach:false */
 
-  describe("pentaho.events.did -", function() {
+  describe("pentaho.visual.base.events.did -", function() {
     var type = "Test";
     var DidTestEvent;
 

@@ -43,10 +43,10 @@ define([
       var event;
 
       var value = 123;
-      var filter = {};
+      var will = {dataFilter: {}};
 
       beforeEach(function() {
-        event = new DidSelect({}, value, filter);
+        event = new DidSelect({}, value, will);
       });
 
       it("should extend Event", function() {
@@ -58,7 +58,7 @@ define([
       });
 
       it("dataFilter property should be the same than received in the constructor", function() {
-        expect(event.dataFilter).toBe(filter);
+        expect(event.dataFilter).toBe(will.dataFilter);
       });
 
       it("dataFilter property should be immutable", function() {
@@ -68,10 +68,10 @@ define([
       });
     });
 
-    it("should throw if empty dataFilter parameter", function() {
+    it("should throw if empty will parameter", function() {
       expect(function() {
         return new DidSelect({});
-      }).toThrow(errorMatch.argRequired("dataFilter"));
+      }).toThrow(errorMatch.argRequired("will"));
     });
 
   }); // #pentaho.events.DidSelect

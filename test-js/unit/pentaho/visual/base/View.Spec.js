@@ -78,7 +78,7 @@ define([
       });
 
       it("should call _selectionChanged when did:change:selectionFilter occurs in the model", function() {
-        model._emit(new DidChangeSelection({}, {}, {}));
+        model._emit(new DidChangeSelection({}, {}, {dataFilter: {}}));
 
         expect(view._selectionChanged).toHaveBeenCalled();
       });

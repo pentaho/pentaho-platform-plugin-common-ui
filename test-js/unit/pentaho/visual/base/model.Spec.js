@@ -1,7 +1,8 @@
 define([
   "pentaho/type/Context",
-  "pentaho/visual/base"
-], function(Context, modelFactory) {
+  "pentaho/visual/base",
+  "pentaho/data/filter",
+], function(Context, modelFactory, filter) {
   "use strict";
 
   describe("pentaho/visual/base", function() {
@@ -64,6 +65,18 @@ define([
         expect(function() {
           return new Model(spec);
         }).toThrow();
+      });
+    });
+
+    describe("events - ", function() {
+      var model;
+      beforeEach(function() {
+        model = new Model();
+      });
+
+      it("should have a default selectionFilter", function() {
+        expect(model.selectionFilter).toBeDefined();
+        expect(model.selectionFilter instanceof filter).toBe(true);
       });
     });
 

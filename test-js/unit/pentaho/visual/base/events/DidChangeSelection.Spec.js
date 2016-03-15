@@ -22,7 +22,7 @@ define([
 
   /* global describe:false, it:false, expect:false, beforeEach:false */
 
-  describe("pentaho.events.DidChangeSelection -", function() {
+  describe("pentaho.visual.base.events.DidChangeSelection -", function() {
     var type = "change:selectionFilter";
 
     it("should extend Event", function() {
@@ -43,10 +43,10 @@ define([
       var event;
 
       var value = 123;
-      var filter = {};
+      var will = {dataFilter: {}};
 
       beforeEach(function() {
-        event = new DidChangeSelection({}, value, filter);
+        event = new DidChangeSelection({}, value, will);
       });
 
       it("should extend Event", function() {
@@ -58,7 +58,7 @@ define([
       });
 
       it("dataFilter property should be the same than received in the constructor", function() {
-        expect(event.dataFilter).toBe(filter);
+        expect(event.dataFilter).toBe(will.dataFilter);
       });
 
       it("dataFilter property should be immutable", function() {
@@ -68,10 +68,10 @@ define([
       });
     });
 
-    it("should throw if empty dataFilter parameter", function() {
+    it("should throw if empty will parameter", function() {
       expect(function() {
         return new DidChangeSelection({});
-      }).toThrow(errorMatch.argRequired("dataFilter"));
+      }).toThrow(errorMatch.argRequired("will"));
     });
 
   }); // #pentaho.events.DidChangeSelection

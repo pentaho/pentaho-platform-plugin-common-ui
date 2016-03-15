@@ -41,7 +41,7 @@ define([
 
     describe("TOGGLE -", function() {
       xit("should select elements from input selection and unselect elements from current selection", function() {
-        // TODO 
+        // TODO
       });
     });
 

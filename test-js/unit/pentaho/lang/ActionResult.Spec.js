@@ -61,8 +61,8 @@ define([
         result = new ActionResult(value, new UserError());
       });
 
-      it("value property should be the same than received in the constructor", function() {
-        expect(result.value).toBe(value);
+      it("value property should be undefined", function() {
+        expect(result.value).toBeUndefined();
       });
 
       it("isCanceled should return true", function() {
@@ -81,8 +81,8 @@ define([
         result = new ActionResult(value, new TypeError());
       });
 
-      it("value property should be the same than received in the constructor", function() {
-        expect(result.value).toBe(value);
+      it("value property should be undefined", function() {
+        expect(result.value).toBeUndefined();
       });
 
       it("isCanceled should return false", function() {
