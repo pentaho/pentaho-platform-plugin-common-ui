@@ -46,7 +46,7 @@ define(function() {
      */
     TOGGLE: function(current, input) {
       // Determine if all rows in input are currently selected.
-      var inputData = input.apply(this.model.get("data"));
+      var inputData = input.apply(this.getv("data"));
       var currentInputData = current.apply(inputData);
       var isAllInputSelected = inputData.getNumberOfRows() === currentInputData.getNumberOfRows();
 
