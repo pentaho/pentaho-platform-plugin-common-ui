@@ -21,8 +21,7 @@ define(function() {
    * @namespace
    * @memberOf pentaho.visual.base.types
    */
-  return /** @lends pentaho.visual.base.types.selectionModes */{
-
+  var selectionModes = /** @lends pentaho.visual.base.types.selectionModes */{
     /**
      * Replaces the current selection filter with the provided filter.
      * Returns the input filter.
@@ -46,8 +45,14 @@ define(function() {
      * @static
      */
     TOGGLE: function(current, input) {
-      throw Error("Not Implemented"); // Haven't had time to think about this properly.
-      return current.and(input).invert().or(current);
+      // Determine if all rows in input are currently selected.
+      var inputData = input.apply(this.model.get("data"));
+      var currentInputData = current.apply(inputData);
+      var isAllInputSelected = inputData.getNumberOfRows() === currentInputData.getNumberOfRows();
+
+      var selectionMode = isAllInputSelected ? selectionModes.REMOVE : selectionModes.ADD;
+
+      return selectionMode.call(this, current, input);
     },
 
     /**
@@ -59,7 +64,7 @@ define(function() {
      * @static
      */
     ADD: function(current, input) {
-      return  current.or(input);
+      return current.or(input);
     },
 
     /**
@@ -73,6 +78,7 @@ define(function() {
     REMOVE: function(current, input) {
       return current.and(input.invert());
     }
+  };
 
-  }
+  return selectionModes;
 });
