@@ -13,7 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define([], function() {
+define([
+  "pentaho/util/error"
+], function(error) {
   "use strict";
 
   /**
