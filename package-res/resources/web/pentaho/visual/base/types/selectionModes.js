@@ -29,9 +29,9 @@ define(function() {
     /**
      * Replaces the current selection filter with the provided filter.
      *
-     * @param {pentaho.data.filter.AbstractFilter} current - The filter representing the current selection filter.
-     * @param {pentaho.data.filter.AbstractFilter} input - The filter that will replace the current selection filter.
-     * @return {?pentaho.data.filter.AbstractFilter} The input filter.
+     * @param {pentaho.data.filter.AbstractFilter} current - The current selection filter.
+     * @param {pentaho.data.filter.AbstractFilter} input - The input filter.
+     * @return {!pentaho.data.filter.AbstractFilter} The input filter.
      * @static
      */
     REPLACE: function(current, input) {
@@ -44,10 +44,8 @@ define(function() {
      * Otherwise, removes the input filter from the current selection filter.
      *
      * @param {pentaho.data.filter.AbstractFilter} current - The current selection filter.
-     * @param {pentaho.data.filter.AbstractFilter} input - The filter that will be added to the current selection filter,
-     * removing all of the items previously selected.
-     * @return {?pentaho.data.filter.AbstractFilter} The previous selection filter and the input filters items combined.
-     * Previously selected items unselected.
+     * @param {pentaho.data.filter.AbstractFilter} input - The input filter.
+     * @return {!pentaho.data.filter.AbstractFilter} The toggled selection filter.
      * @static
      */
     TOGGLE: function(current, input) {
@@ -66,7 +64,7 @@ define(function() {
      *
      * @param {pentaho.data.filter.AbstractFilter} current - The current selection filter.
      * @param {pentaho.data.filter.AbstractFilter} input - The filter that will be added the current selection filter.
-     * @return {?pentaho.data.filter.AbstractFilter} The previous selection filter and the input filter items combined.
+     * @return {!pentaho.data.filter.AbstractFilter} The combined selection filter.
      * @static
      */
     ADD: function(current, input) {
@@ -78,7 +76,7 @@ define(function() {
      *
      * @param {pentaho.data.filter.AbstractFilter} current - The current selection filter.
      * @param {pentaho.data.filter.AbstractFilter} input - The filter that will be removed the current selection filter.
-     * @return {?pentaho.data.filter.AbstractFilter} The previous selection filter without the input filter items.
+     * @return {!pentaho.data.filter.AbstractFilter} The current selection filter without the input filter.
      * @static
      */
     REMOVE: function(current, input) {
