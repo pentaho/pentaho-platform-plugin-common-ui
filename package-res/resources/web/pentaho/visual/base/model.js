@@ -283,12 +283,6 @@ define([
             },
             {
               name: "selectionMode",
-              type: "function",
-              value: selectionModes.REPLACE,
-              isRequired: true
-            },
-            {
-              name: "doExecute",
               type: {
                 base: "function",
                 cast: function(f) {
@@ -298,7 +292,13 @@ define([
                   // TODO: must default to eval if string
                   return f;
                 }
-              }
+              },
+              value: selectionModes.REPLACE,
+              isRequired: true
+            },
+            {
+              name: "doExecute",
+              type: "function"
             }
           ]
         }
