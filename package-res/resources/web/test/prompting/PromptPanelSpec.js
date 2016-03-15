@@ -1204,16 +1204,19 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
                 panel.dashboard.updateComponent.calls.reset();
                 panel.dashboard.getParameterValue.and.returnValue(currentValue);
 
-                var paramValue = new ParameterValue();
-                paramValue.value = selectedValue;
-                paramValue.type = type;
-                paramValue.label = 'param'
-                paramValue.selected = true;
+                var selectedParams = [];
+                selectedValue = (type.indexOf("[") === 0 && selectedValue) ? selectedValue : [selectedValue];
+
+                for(var i=0; i < selectedValue.length; i++) {
+                  selectedParams[i] = new ParameterValue();
+                  selectedParams[i].value = selectedValue[i];
+                  selectedParams[i].selected = true;
+                }
 
                 var param = new Parameter();
                 param.name = 'param';
                 param.type = type;
-                param.values = [paramValue];
+                param.values = selectedParams;
 
                 var toChangeDiff = { groupName: { params: [param] } };
                 panel._changeComponentsByDiff(toChangeDiff);
@@ -1256,6 +1259,23 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
                 doTest(undefined, null, dateType, false);
                 doTest(null, undefined, dateType, false);
                 doTest(undefined, undefined, dateType, false);
+              });
+
+              it("cases for arrays", function () {
+                var arrayType = '[arrayType'; // Starting with "[" means its an array
+
+                doTest(["a","b"], ["a","b"], arrayType, false);
+                doTest(["a","b"], ["b","a"], arrayType, false);
+                doTest(["b","a","c"], ["c","b","a"], arrayType, false);
+
+                doTest(["a","b"], ["a"], arrayType, true);
+                doTest(["a","b"], ["a","c"], arrayType, true);
+                doTest(["a"], ["b","c"], arrayType, true);
+
+                doTest(null, null, arrayType, false);
+                doTest(undefined, null, arrayType, false);
+                doTest(null, undefined, arrayType, false);
+                doTest(undefined, undefined, arrayType, false);
               });
 
               it("cases for other types", function () {
