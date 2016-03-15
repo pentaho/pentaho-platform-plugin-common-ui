@@ -74,10 +74,6 @@ define([
      * @param {pentaho.visual.base.spec.IModel} modelSpec A plain object containing the model specification.
      */
     var Model = Complex.extend(/** @lends pentaho.visual.base.Model# */{
-        constructor: function(modelSpec) {
-          this.base(modelSpec);
-        },
-
         //region Event Flows Handling
         /**
          * Modifies the current selection filter based on an input filter and on a selection mode.
@@ -128,74 +124,73 @@ define([
          * @see pentaho.visual.base.types.selectionModes
          */
         selectAction: function(inputDataFilter, keyArgs) {
-          var selectionMode = O.getOwn(keyArgs, "selectionMode");
-          var dataFilter = inputDataFilter;
-
-          var result = this._runPipeline(WillSelect, dataFilter, selectionMode);
-          var noError = result && !result.error;
-          if(noError) {
-            dataFilter = result.value.dataFilter;
-            selectionMode = result.value.selectionMode;
-          }
-          if(noError || !result) {
-            try {
-              result = this._changeSelection(dataFilter, selectionMode || this.getv("selectionMode"));
-            } catch(e) {
-              result = ActionResult.reject(e);
-            }
-          }
-          return this._broadcastResult(DidSelect, RejectedSelect, result, dataFilter);
+          var selectionMode = O.getOwn(keyArgs, "selectionMode") || this.getv("selectionMode");
+          var will = new WillSelect(this, inputDataFilter, selectionMode);
+          return this._doAction(this._doSelect, will, DidSelect, RejectedSelect);
         },
 
         /**
-         * Updates the current selection filter based on a filter and on a selection mode.
+         * Modifies the current selection.
          *
-         * This method is invoked by [selectAction]{@link pentaho.visual.base.Model#selectAction} once all
-         * listeners of the ["will:select"]{@link pentaho.visual.base.events.WillSelect} event have eventually
-         * replaced the original input filter and the selection mode to be used.
-         *
-         * @param {!pentaho.data.filter.AbstractFilter} inputDataFilter - A filter representing
-         * the data set which will be used to modify the current selection.
-         * @param {!function} selectionMode - A function that represents how the selection made by the user
-         * will be merged with the current selection.
-         *
-         * @return {pentaho.lang.ActionResult}
-         * If unsuccessful, the `error` property describes what originated the error.
-         * If successful,  the `error` property is `null` and the `value` property contains the updated current selection filter.
-         *
-         * @fires "will:change:selectionFilter"
-         * @fires "did:change:selectionFilter"
-         * @fires "rejected:change:selectionFilter"
-         *
-         * @see #selectAction
-         * @see #_runPipeline
-         * @see #_broadcastResult
+         * @param {pentaho.visual.base.events.Will} will - The "will:" event object.
+         * @return {ActionResult} The result object.
          * @protected
          */
-        _changeSelection: function(inputDataFilter, selectionMode) {
-          var dataFilter = inputDataFilter;
-          var result = this._runPipeline(WillChangeSelection, dataFilter,  null);
+        _doSelect: function(will){
+          var currentSelectionFilter = this.get("selectionFilter");
+          var selectionMode = will.selectionMode || this.getv("selectionMode");
 
-          var noError = result && !result.error;
-          if(noError) {
-            dataFilter = result.value.dataFilter;
+          var newSelectionFilter;
+          try {
+            newSelectionFilter = selectionMode(currentSelectionFilter, will.dataFilter);
+          } catch(e) {
+            return ActionResult.reject(e);
           }
-          if(noError || !result) {
-            try {
-              var currentFilter = this.get("selectionFilter");
-              var combinedSelection = selectionMode(currentFilter, dataFilter);
-              if(combinedSelection) {
-                this.set("selectionFilter", combinedSelection);
-                result = ActionResult.fulfill(combinedSelection);
-              } else {
-                result = ActionResult.reject(new UserError(bundle.structured.error.selection.invalid));
-              }
-            } catch(e) {
-              result = ActionResult.reject(e);
+
+          return this._setAction("selectionFilter", newSelectionFilter); //setting to null assigns the default value
+        },
+
+
+        /**
+         * Executes the will/did/rejected event loop associated with a given action.
+         *
+         * @param {function} coreAction - The action to be executed.
+         * @param {pentaho.visual.base.events.Will} will - The "will:" event object.
+         * @param {function} Did - The constructor of the "did:" event.
+         * @param {function} Rejected - The constructor of the "rejected:" event.
+         * @return {ActionResult} The result object.
+         * @protected
+         */
+        _doAction: function(coreAction, will, Did, Rejected){
+          if(this._hasListeners(will.type))
+            this._emitSafe(will);
+
+          var result = will.isCanceled ? ActionResult.reject(will.cancelReason) : coreAction.call(this, will);
+
+          if(result.error) {
+            if(this._hasListeners(Rejected.type)) {
+              this._emitSafe(new Rejected(this, result.error, will));
+            }
+          } else {
+            if(this._hasListeners(Did.type)){
+              this._emitSafe(new Did(this, result.value, will));
             }
           }
+          return result;
+        },
 
-          return this._broadcastResult(DidChangeSelection, RejectedChangeSelection, result, dataFilter);
+        // This method is supposed to set the value of a property, trigger event loops and return a result.
+        _setAction: function(property, value){
+          var result;
+          try {
+            this.set(property, value);
+            result = ActionResult.fulfill(value);
+            // Currently this method is only used for selectionFilter
+            this._emitSafe(new DidChangeSelection(this, result.value, new WillChangeSelection(this, {})));
+          } catch(e) {
+            result = ActionResult.reject(e);
+          }
+          return result;
         },
 
         /**
@@ -233,28 +228,23 @@ define([
          */
         executeAction: function(inputDataFilter) {
           var doExecute = this.getv("doExecute");
-          var dataFilter = inputDataFilter;
-
-          var result = this._runPipeline(WillExecute, dataFilter, doExecute);
-
-          var noError = result && !result.error;
-          if(noError) {
-            doExecute = result.value.doExecute;
-            dataFilter = result.value.dataFilter;
-          }
-          if(doExecute && (noError || !result)) {
-            try {
-              doExecute(dataFilter);
-              result = ActionResult.fulfill();
-            } catch(e) {
-              result = ActionResult.reject(e);
-            }
-          } else {
-            result = ActionResult.reject(new UserError(bundle.structured.error.action.notDefined));
-          }
-          return this._broadcastResult(DidExecute, RejectedExecute, result, dataFilter);
-
+          var will = new WillExecute(this, inputDataFilter, doExecute);
+          return this._doAction(this._doExecute, will, DidExecute, RejectedExecute);
         },
+
+        _doExecute: function(will){
+          if(!will.doExecute)
+            return ActionResult.reject(bundle.structured.error.action.notDefined);
+
+          var result;
+          try {
+            result = will.doExecute.call(this, will.dataFilter);
+          } catch(e) {
+            return ActionResult.reject(e);
+          }
+          return result && result.isRejected ? result : ActionResult.fulfill();
+        },
+
 
         /**
          * Processes a "will:" event and returns a [result]{@link pentaho.lang.ActionResult}
@@ -279,15 +269,6 @@ define([
          *
          * @see #_broadcastResult
          */
-        _runPipeline: function(WillEvent, dataFilter, otherArg) {
-          if(!this._hasListeners(WillEvent.type)) return null;
-
-          var will = new WillEvent(this, dataFilter, otherArg);
-          var success = this._emitSafe(will);
-
-          if(success) return ActionResult.fulfill(will);
-          return ActionResult.reject(will.cancelReason);
-        },
 
         /**
          * Broadcasts the result of an action, via a "did:" event or a "rejected:" event,
@@ -305,20 +286,6 @@ define([
          *
          * @see #_runPipeline
          */
-        _broadcastResult: function(DidEvent, RejectedEvent, result, dataFilter) {
-          if(result.error) {
-            if(this._hasListeners(RejectedEvent.type)) {
-              var rejected = new RejectedEvent(this, result.error, dataFilter);
-              this._emitSafe(rejected);
-            }
-          } else {
-            if(this._hasListeners(DidEvent.type)) {
-              var did = new DidEvent(this, result.value, dataFilter);
-              this._emitSafe(did);
-            }
-          }
-          return result;
-        },
         //endregion
 
         meta: {
@@ -349,12 +316,14 @@ define([
             {
               name: "selectionFilter",
               type: "object",
-              value: new filter.Or()
+              value: new filter.Or(),
+              isRequired: true
             },
             {
               name: "selectionMode",
               type: "function",
-              value: selectionModes.REPLACE
+              value: selectionModes.REPLACE,
+              isRequired: true
             },
             {
               name: "doExecute",

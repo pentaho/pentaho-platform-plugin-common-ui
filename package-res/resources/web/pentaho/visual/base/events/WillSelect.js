@@ -16,8 +16,10 @@
 define([
   "./will",
   "../mixins/mixinDataFilter",
-  "pentaho/util/error"
-], function(will, mixinDataFilter, error) {
+  "pentaho/util/error",
+  "./DidSelect",
+  "./RejectedSelect"
+], function(will, mixinDataFilter, error, Did, Rejected) {
   "use strict";
 
   /**
@@ -48,9 +50,10 @@ define([
        * A function representing the way a new {@link pentaho.data.filter.AbstractFilter|Data Filters} with previous selections.
        */
       constructor: function(source, dataFilter, selectionMode) {
-        this.base(source);
-        this._initFilter(dataFilter || null, true);
+        if(!selectionMode) throw error.argRequired("selectionMode");;
 
+        this.base(source);
+        this._initFilter(dataFilter, true);
         this.selectionMode = selectionMode;
       },
 
@@ -58,13 +61,15 @@ define([
         if(f != null && typeof f !== "function") {
           throw error.argInvalidType("selectionMode", "function", typeof f);
         }
-
         this._selectionMode = f;
       },
 
       get selectionMode() {
         return this._selectionMode;
-      }
+      },
+
+      Did: Did,
+      Rejected: Rejected
     })
     .implement(mixinDataFilter);
 

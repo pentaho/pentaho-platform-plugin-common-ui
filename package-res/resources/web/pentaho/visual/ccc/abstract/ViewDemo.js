@@ -1,6 +1,6 @@
 define([
   "pentaho/util/object",
-  "pentaho/data/filter",
+  "pentaho/data/filter"
 ], function(O, filter) {
   "use strict";
 

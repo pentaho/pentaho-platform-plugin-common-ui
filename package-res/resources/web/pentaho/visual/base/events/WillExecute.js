@@ -50,7 +50,6 @@ define([
 
         this.base(source);
         this._initFilter(dataFilter, true);
-
         this.doExecute = doExecute;
       },
 
