@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 define([
-  "pentaho/util/error"
-], function(error) {
+  "pentaho/util/error",
+  "pentaho/data/filter"
+], function(error, filter) {
   "use strict";
 
   /**
@@ -44,7 +45,7 @@ define([
 
     set dataFilter(f) {
       if(this._isMutable) {
-        this._dataFilter = f;
+        this._dataFilter = f || new filter.Or();
       } else {
         throw TypeError();
       }

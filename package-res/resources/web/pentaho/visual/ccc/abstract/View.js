@@ -255,6 +255,9 @@ define([
         }
       }
 
+      if(!whereSpec.length)
+        return this._chart.clearSelections();
+
       this._chart.data.replaceSelected(
         this._chart.data.datums(whereSpec)
       );
@@ -1270,6 +1273,9 @@ define([
       this.options.userSelectionAction = function(cccSelections) {
         return me._onUserSelection(cccSelections);
       };
+      this.options.base_event = [["click", function(){
+        me._onUserSelection([]);
+      }]];
     },
 
     _getSelectionKey: function(selection) {
