@@ -45,12 +45,12 @@ define([
         }).toThrowError(TypeError);
       });
 
-      it("isCanceled() should return false", function() {
-        expect(result.isCanceled()).toBe(false);
+      it("isCanceled should return false", function() {
+        expect(result.isCanceled).toBe(false);
       });
 
-      it("isFailed() should return false", function() {
-        expect(result.isFailed()).toBe(false);
+      it("isFailed should return false", function() {
+        expect(result.isFailed).toBe(false);
       });
     });
 
@@ -65,12 +65,12 @@ define([
         expect(result.value).toBe(value);
       });
 
-      it("isCanceled() should return true", function() {
-        expect(result.isCanceled()).toBe(true);
+      it("isCanceled should return true", function() {
+        expect(result.isCanceled).toBe(true);
       });
 
-      it("isFailed() should return false", function() {
-        expect(result.isFailed()).toBe(false);
+      it("isFailed should return false", function() {
+        expect(result.isFailed).toBe(false);
       });
     });
 
@@ -85,12 +85,12 @@ define([
         expect(result.value).toBe(value);
       });
 
-      it("isCanceled() should return false", function() {
-        expect(result.isCanceled()).toBe(false);
+      it("isCanceled should return false", function() {
+        expect(result.isCanceled).toBe(false);
       });
 
-      it("isFailed() should return true", function() {
-        expect(result.isFailed()).toBe(true);
+      it("isFailed should return true", function() {
+        expect(result.isFailed).toBe(true);
       });
     });
 

@@ -32,33 +32,31 @@ define([
       this._error = error;
     },
 
-    _value: null,
     get value() {
       return this._value;
     },
 
-    _error: null,
     get error() {
       return this._error;
     },
 
-    isCanceled: function() {
+    get isCanceled() {
       var error = this._error;
       return error != null && error instanceof UserError;
     },
 
-    isFailed: function() {
+    get isFailed() {
       var error = this._error;
       return error != null && !(error instanceof UserError);
     },
 
     //TODO: getters for isFulfilled and isRejected
     get isFulfilled(){
-      throw Error("Not Implemented");
+      return !this._error;
     },
 
     get isRejected(){
-      throw Error("Not Implemented");
+      return !!this._error;
     }
   });
 });
