@@ -289,7 +289,16 @@ define([
             },
             {
               name: "doExecute",
-              type: "function"
+              type: {
+                base: "function",
+                cast: function(f) {
+                  if(typeof f === "string" && selectionModes.hasOwnProperty(f))
+                    return selectionModes[f];
+
+                  // TODO: must default to eval if string
+                  return f;
+                }
+              }
             }
           ]
         }
