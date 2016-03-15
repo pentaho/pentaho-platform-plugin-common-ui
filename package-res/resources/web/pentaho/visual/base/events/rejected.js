@@ -16,7 +16,7 @@
 define([
   "pentaho/lang/Event",
   "pentaho/util/error"
-], function(Event, error) {
+], function(Event, errorUtil) {
   "use strict";
 
   /**
@@ -39,7 +39,7 @@ define([
     return Event.extend("pentaho.visual.base.events.Rejected",
       /** @lends pentaho.visual.base.events.Rejected# */{
         constructor: function(source, error) {
-          if(!error) throw error.argRequired("error");
+          if(!error) throw errorUtil.argRequired("error");
           this.base(this.constructor.type, source, false);
           this.error = error;
         }
