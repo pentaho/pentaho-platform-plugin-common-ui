@@ -22,7 +22,7 @@ define([
 
   /* global describe:false, it:false, expect:false, beforeEach:false */
 
-  describe("pentaho.events.RejectedExecute -", function() {
+  describe("pentaho.visual.base.events.RejectedExecute -", function() {
     var type = "execute";
 
     it("should extend Event", function() {
@@ -80,5 +80,5 @@ define([
       }).toThrow(errorMatch.argRequired("will"));
     });
 
-  }); // #pentaho.events.RejectedExecute
+  }); // #pentaho.visual.base.eventsRejectedExecute
 });

@@ -22,7 +22,7 @@ define([
 
   /* global describe:false, it:false, expect:false, beforeEach:false */
 
-  describe("pentaho.events.WillChangeSelection -", function() {
+  describe("pentaho.visual.base.events.WillChangeSelection -", function() {
     var type = "change:selectionFilter";
 
     it("should extend Event", function() {
@@ -67,5 +67,5 @@ define([
       });
     });
 
-  }); // #pentaho.events.WillChangeSelection
+  }); // #pentaho.visual.base.eventsWillChangeSelection
 });

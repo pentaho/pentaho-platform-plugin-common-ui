@@ -22,7 +22,7 @@ define([
 
   /* global describe:false, it:false, expect:false, beforeEach:false */
 
-  describe("pentaho.events.WillSelect -", function() {
+  describe("pentaho.visual.base.events.WillSelect -", function() {
     var type = "select";
 
     it("should extend Event", function() {
@@ -93,5 +93,5 @@ define([
       }).toThrow(errorMatch.argInvalidType("selectionMode", "function", "string"));
     });
 
-  }); // #pentaho.events.WillSelect
+  }); // #pentaho.visual.base.eventsWillSelect
 });

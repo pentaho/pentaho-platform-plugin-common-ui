@@ -21,7 +21,7 @@ define([
 
   /* global describe:false, it:false, expect:false, beforeEach:false */
 
-  describe("pentaho.events.will -", function() {
+  describe("pentaho.visual.base.events.will -", function() {
     var type = "Test";
     var WillTestEvent;
 
@@ -55,5 +55,5 @@ define([
       });
     });
 
-  }); // #pentaho.events.will
+  }); // #pentaho.visual.base.eventswill
 });

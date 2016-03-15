@@ -22,7 +22,7 @@ define([
 
   /* global describe:false, it:false, expect:false, beforeEach:false */
 
-  describe("pentaho.events.WillExecute -", function() {
+  describe("pentaho.visual.base.events.WillExecute -", function() {
     var type = "execute";
 
     it("should extend Event", function() {
@@ -103,5 +103,5 @@ define([
       }).toThrow(errorMatch.argInvalidType("doExecute", "function", "string"));
     });
 
-  }); // #pentaho.events.WillExecute
+  }); // #pentaho.visual.base.eventsWillExecute
 });

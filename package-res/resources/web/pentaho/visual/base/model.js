@@ -187,7 +187,9 @@ define([
             this.set(property, value);
             result = ActionResult.fulfill(value);
             // Currently this method is only used for selectionFilter
-            this._emitSafe(new DidChangeSelection(this, result.value, new WillChangeSelection(this, {})));
+            if(this._hasListeners(DidChangeSelection.type)) {
+              this._emitSafe(new DidChangeSelection(this, result.value, new WillChangeSelection(this, {})));
+            }
           } catch(e) {
             result = ActionResult.reject(e);
           }
