@@ -30,6 +30,16 @@ define([
    */
   return did("select").extend("pentaho.visual.base.events.DidSelect",
     /** @lends pentaho.visual.base.events.DidSelect# */{
+
+      /**
+       * Creates a `DidSelect` event.
+       *
+       * @constructor
+       *
+       * @param {!Object} source - The object where the event will be initially emitted.
+       * @param {?Object} value - The value of a fulfilled {@link pentaho.lang.ActionResult|ActionResult}
+       * @param {!pentaho.data.filter.AbstractFilter} dataFilter - A filter representing the data set of the visual element(s) which the user interacted with.
+       */
       constructor: function(source, value, dataFilter) {
         this.base(source, value);
         this._initFilter(dataFilter, false);

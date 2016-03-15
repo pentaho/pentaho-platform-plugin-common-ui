@@ -33,11 +33,14 @@ define([
      * @class
      * @abstract
      * @extends pentaho.lang.Event
-     *
      * @classDesc The class of `did:` events.
+     *
+     * @constructor
+     * @description Creates a base `Did` event.
+     * @param {!Object} source - The object where the event will be initially emitted.
+     * @param {?Object} value - The value of a fulfilled {@link pentaho.lang.ActionResult|ActionResult}
      */
-    return Event.extend("pentaho.visual.base.events.Did",
-      /** @lends pentaho.visual.base.events.Did# */{
+    return Event.extend("pentaho.visual.base.events.Did", /** @lends pentaho.visual.base.events.Did# */{
         constructor: function(source, value) {
           this.base(this.constructor.type, source, false);
           this.value = value;

@@ -154,8 +154,11 @@ define([
          * listeners of the ["will:select"]{@link pentaho.visual.base.events.WillSelect} event have eventually
          * replaced the original input filter and the selection mode to be used.
          *
-         * @param {!pentaho.data.filter.AbstractFilter} inputDataFilter -
-         * @param {!function} selectionMode -
+         * @param {!pentaho.data.filter.AbstractFilter} inputDataFilter - A filter representing
+         * the data set which will be used to modify the current selection.
+         * @param {!function} selectionMode - A function that represents how the selection made by the user
+         * will be merged with the current selection.
+         *
          * @return {pentaho.lang.ActionResult}
          * If unsuccessful, the `error` property describes what originated the error.
          * If successful,  the `error` property is `null` and the `value` property contains the updated current selection filter.
@@ -213,7 +216,9 @@ define([
          * In this case, this method returns a {@link pentaho.lang.ActionResult|result}.
          * with an error in the `error` property.
          *
-         * @param {!pentaho.data.filter.AbstractFilter} inputDataFilter - The filter that represents the visual element which the user interacted with.
+         * @param {!pentaho.data.filter.AbstractFilter} inputDataFilter - A filter representing the data set of
+         * the visual element which the user interacted with.
+         *
          * @return {pentaho.lang.ActionResult}
          * If unsuccessful, the `error` property describes what originated the error.
          * If successful,  the `error` property is `null`.

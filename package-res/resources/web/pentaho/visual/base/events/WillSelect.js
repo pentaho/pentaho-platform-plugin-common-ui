@@ -34,6 +34,18 @@ define([
    */
   return will("select").extend("pentaho.visual.base.events.WillSelect",
     /** @lends pentaho.visual.base.events.WillSelect# */{
+
+      /**
+       * Creates a `WillSelect` event.
+       *
+       * @constructor
+       *
+       * @param {!Object} source - The object where the event will be initially emitted.
+       * @param {!pentaho.data.filter.AbstractFilter} dataFilter - A filter representing the data set of the visual element(s) which the user interacted with.
+       * @param {?function} selectionMode - A function that represents how the selection made by the user
+       * will be merged with the current selection.
+       * A function representing the way a new {@link pentaho.data.filter.AbstractFilter|Data Filters} with previous selections.
+       */
       constructor: function(source, dataFilter, selectionMode) {
         this.base(source);
         this._initFilter(dataFilter || null, true);

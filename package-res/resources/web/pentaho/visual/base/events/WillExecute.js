@@ -35,6 +35,16 @@ define([
    */
   return will("execute").extend("pentaho.visual.base.events.WillExecute",
     /** @lends pentaho.visual.base.events.WillExecute# */{
+
+      /**
+       * Creates a `WillExecute` event.
+       *
+       * @constructor
+       *
+       * @param {!Object} source - The object where the event will be initially emitted.
+       * @param {!pentaho.data.filter.AbstractFilter} dataFilter - A filter representing the data set of the visual element which the user interacted with.
+       * @param {!function} doExecute - The action that will be executed in the {@link pentaho.visual.base.model#executeAction|Execute Action} event flow.
+       */
       constructor: function(source, dataFilter, doExecute) {
         if(!doExecute) throw error.argRequired("doExecute");
         if(typeof doExecute !== "function")

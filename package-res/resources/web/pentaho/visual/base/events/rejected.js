@@ -33,8 +33,12 @@ define([
      * @class
      * @abstract
      * @extends pentaho.lang.Event
-     *
      * @classDesc The class of `rejected:` events.
+     *
+     * @constructor
+     * @description Creates a base `Rejected` event.
+     * @param {!Object} source - The object where the event will be initially emitted.
+     * @param {!Error|pentaho.lang.UserError}  error - The error of a rejected {@link pentaho.lang.ActionResult|ActionResult}
      */
     return Event.extend("pentaho.visual.base.events.Rejected",
       /** @lends pentaho.visual.base.events.Rejected# */{

@@ -33,8 +33,11 @@ define([
      * @class
      * @abstract
      * @extends pentaho.lang.Event
-     *
      * @classDesc The class of `will:` events.
+     *
+     * @constructor
+     * @description Creates a base `Will` event.
+     * @param {!Object} source - The object where the event will be initially emitted.
      */
     return Event.extend("pentaho.visual.base.events.Will",
       /** @lends pentaho.visual.base.events.Will# */{
