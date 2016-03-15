@@ -1,13 +1,25 @@
 define([
   "pentaho/util/object",
-  "pentaho/data/filter"
-], function(O, filter) {
+  "pentaho/data/filter",
+  "pentaho/visual/base/types/selectionModes"
+], function(O, filter, selectionModes) {
   "use strict";
 
   return {
     // Temporary. Used for demos of BACKLOG-5985,BACKLOG-5989
     _init: function() {
       this.base();
+      var me = this;
+      window.onkeypress = function(e){
+        var mode = {
+          "KeyA": selectionModes.ADD,
+          "KeyD": selectionModes.REMOVE,
+          "KeyR": selectionModes.REPLACE,
+          "KeyT": selectionModes.TOGGLE
+        };
+        me.model.set("selectionMode", mode[e.code]);
+
+      };
 
       this.model.on("will:select", this._onWillSelect.bind(this));
 
