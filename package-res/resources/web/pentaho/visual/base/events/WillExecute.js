@@ -43,18 +43,16 @@ define([
        *
        * @param {!Object} source - The object where the event will be initially emitted.
        * @param {!pentaho.data.filter.AbstractFilter} dataFilter - A filter representing the data set of the visual element which the user interacted with.
-       * @param {!function} doExecute - The action that will be executed in the {@link pentaho.visual.base.model#executeAction|Execute Action} event flow.
+       * @param {?function} doExecute - The action that will be executed in the {@link pentaho.visual.base.model#executeAction|Execute Action} event flow.
        */
       constructor: function(source, dataFilter, doExecute) {
-        if(!doExecute) throw error.argRequired("doExecute");
-
         this.base(source);
         this._initFilter(dataFilter, true);
         this.doExecute = doExecute;
       },
 
       set doExecute(f) {
-        if(typeof f !== "function") {
+        if(f != null && typeof f !== "function") {
           throw error.argInvalidType("doExecute", "function", typeof f);
         }
 

@@ -72,10 +72,6 @@ define([
       });
 
       it("doExecute property should only accept functions", function() {
-        expect(function() {
-          event.doExecute = null;
-        }).toThrow(errorMatch.argInvalidType("doExecute", "function", "object"));
-
         var newMode = "no function";
 
         expect(function() {
@@ -89,12 +85,6 @@ define([
         expect(event.doExecute).not.toBe(mode);
         expect(event.doExecute).toBe(newMode);
       });
-    });
-
-    it("should throw if empty doExecute parameter", function() {
-      expect(function() {
-        return new WillExecute({}, {});
-      }).toThrow(errorMatch.argRequired("doExecute"));
     });
 
     it("should throw if doExecute parameter is not a function", function() {

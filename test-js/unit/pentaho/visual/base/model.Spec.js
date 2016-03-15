@@ -6,9 +6,13 @@ define([
     "pentaho/lang/UserError",
     "pentaho/visual/base/events/WillSelect",
     "pentaho/visual/base/events/DidSelect",
-    "pentaho/visual/base/events/RejectedSelect"
+    "pentaho/visual/base/events/RejectedSelect",
+    "pentaho/visual/base/events/WillExecute",
+    "pentaho/visual/base/events/DidExecute",
+    "pentaho/visual/base/events/RejectedExecute"
   ], function(Context, modelFactory, filter, selectionModes, UserError,
-              WillSelect, DidSelect, RejectedSelect) {
+              WillSelect, DidSelect, RejectedSelect,
+              WillExecute, DidExecute, RejectedExecute) {
     "use strict";
 
     describe("pentaho/visual/base", function() {
@@ -80,14 +84,18 @@ define([
           model = new Model();
         });
 
-        xit("should have a default selectionFilter", function() {
-          expect(model.selectionFilter).toBeDefined();
-          expect(model.selectionFilter instanceof filter).toBe(true);
+        it("should have a default selectionFilter", function() {
+          var selectionFilter = model.getv("selectionFilter");
+
+          expect(selectionFilter).toBeDefined();
+          expect(selectionFilter instanceof filter.AbstractFilter).toBe(true);
         });
 
-        xit("should have a default selectionMode", function() {
-          expect(model.selectionMode).toBeDefined();
-          expect(typeof model.selectionMode).toBe("function");
+        it("should have a default selectionMode", function() {
+          var selectionMode = model.getv("selectionMode");
+
+          expect(selectionMode).toBeDefined();
+          expect(typeof selectionMode).toBe("function");
         });
 
         describe("selectAction - ", function() {
@@ -108,8 +116,6 @@ define([
 
           describe("default - ", function() {
             beforeEach(function() {
-              spyOn(selectionModes, "REPLACE");
-
               model.on("will:select", listeners.willSelect);
               model.on("did:select", listeners.didSelect);
               model.on("rejected:select", listeners.rejectedSelect);
@@ -117,10 +123,6 @@ define([
               model.on("did:change:selectionFilter", listeners.didChangeSelection);
 
               model.selectAction(newSelection);
-            });
-
-            xit("should call the default selectionMode function", function() {
-              expect(selectionModes.REPLACE).toHaveBeenCalled();
             });
 
             it("should call the will select listener", function() {
@@ -138,23 +140,13 @@ define([
             it("should call the did change selection listener", function() {
               expect(listeners.didChangeSelection).toHaveBeenCalled();
             });
-
-            xit("should call the did change selection listener with the new selection", function() {
-              expect(listeners.didChangeSelection.calls.mostRecent().args[0].dataFilter).toBe(newSelection);
-            });
           });
 
           describe("default - no listeners (performance check) - ", function() {
             beforeEach(function() {
-              spyOn(selectionModes, "REPLACE");
-
               spyOn(model, "_emitSafe");
 
               model.selectAction(newSelection);
-            });
-
-            xit("should call the default selectionMode function", function() {
-              expect(selectionModes.REPLACE).toHaveBeenCalled();
             });
 
             it("should not call _emitSafe function", function() {
@@ -241,10 +233,6 @@ define([
 
             it("should call the did change selection listener", function() {
               expect(listeners.didChangeSelection).toHaveBeenCalled();
-            });
-
-            xit("should call the did change selection listener with the new selection", function() {
-              expect(listeners.didChangeSelection.calls.mostRecent().args[0].dataFilter).toBe(alternativeSelection);
             });
           });
 
@@ -421,6 +409,283 @@ define([
 
             it("should not call the did change selection listener", function() {
               expect(listeners.didChangeSelection).not.toHaveBeenCalled();
+            });
+          });
+        });
+
+        describe("executeAction - ", function() {
+          var newSelection;
+
+          var listeners;
+
+          beforeEach(function() {
+            newSelection = new filter.Or();
+
+            listeners = jasmine.createSpyObj('listeners', [
+              'willExecute', 'willExecuteSecond',
+              'didExecute',
+              'rejectedExecute'
+            ]);
+          });
+
+          describe("default - ", function() {
+            beforeEach(function() {
+              model.on("will:execute", listeners.willExecute);
+              model.on("did:execute", listeners.didExecute);
+              model.on("rejected:execute", listeners.rejectedExecute);
+
+              model.executeAction(newSelection);
+            });
+
+            it("should call the will execute listener", function() {
+              expect(listeners.willExecute).toHaveBeenCalled();
+            });
+
+            it("should not call the did execute listener", function() {
+              expect(listeners.didExecute).not.toHaveBeenCalled();
+            });
+
+            it("should call the rejected execute listener", function() {
+              expect(listeners.rejectedExecute).toHaveBeenCalled();
+
+              var reason = listeners.rejectedExecute.calls.mostRecent().args[0];
+              expect(reason instanceof RejectedExecute).toBe(true);
+              expect(reason.error instanceof UserError).toBe(true);
+              expect(reason.error.message).toBe("Action is not defined");
+            });
+          });
+
+          describe("default - no listeners (performance check) - ", function() {
+            beforeEach(function() {
+              spyOn(model, "_emitSafe");
+
+              model.executeAction(newSelection);
+            });
+
+            it("should not call _emitSafe function", function() {
+              expect(model._emitSafe).not.toHaveBeenCalled();
+            });
+          });
+
+          describe("custom doExecute through keyArgs - ", function() {
+            var doExecute;
+            beforeEach(function() {
+              doExecute = jasmine.createSpy('doExecute');
+
+              model.on("will:execute", listeners.willExecute);
+              model.on("did:execute", listeners.didExecute);
+              model.on("rejected:execute", listeners.rejectedExecute);
+
+              model.executeAction(newSelection, {doExecute: doExecute});
+            });
+
+            it("should call the custom doExecute function", function() {
+              expect(doExecute).toHaveBeenCalled();
+            });
+
+            it("should call the will execute listener", function() {
+              expect(listeners.willExecute).toHaveBeenCalled();
+            });
+
+            it("should call the did execute listener", function() {
+              expect(listeners.didExecute).toHaveBeenCalled();
+            });
+
+            it("should not call the rejected execute listener", function() {
+              expect(listeners.rejectedExecute).not.toHaveBeenCalled();
+            });
+          });
+
+          describe("change selection in will event - ", function() {
+            var alternativeSelection;
+            var doExecute;
+            beforeEach(function() {
+              alternativeSelection = new filter.And();
+
+              doExecute = jasmine.createSpy('doExecute');
+
+              model.on("will:execute", listeners.willExecute.and.callFake(function(willEvent) {
+                willEvent.dataFilter = alternativeSelection;
+              }));
+              model.on("will:execute", listeners.willExecuteSecond);
+              model.on("did:execute", listeners.didExecute);
+              model.on("rejected:execute", listeners.rejectedExecute);
+
+              model.executeAction(newSelection, {doExecute: doExecute});
+            });
+
+            it("should call the custom doExecute function", function() {
+              expect(doExecute).toHaveBeenCalled();
+            });
+
+            it("should call the first will execute listener", function() {
+              expect(listeners.willExecute).toHaveBeenCalled();
+            });
+
+            it("should call the second will execute listener", function() {
+              expect(listeners.willExecuteSecond).toHaveBeenCalled();
+              expect(listeners.willExecuteSecond.calls.mostRecent().args[0].dataFilter).toBe(alternativeSelection);
+            });
+
+            it("should call the did execute listener", function() {
+              expect(listeners.didExecute).toHaveBeenCalled();
+              expect(listeners.didExecute.calls.mostRecent().args[0].dataFilter).toBe(alternativeSelection);
+            });
+
+            it("should not call the rejected execute listener", function() {
+              expect(listeners.rejectedExecute).not.toHaveBeenCalled();
+            });
+          });
+
+          describe("custom doExecute through will event - ", function() {
+            var doExecute;
+            beforeEach(function() {
+              doExecute = jasmine.createSpy('doExecute');
+
+              model.on("will:execute", listeners.willExecute.and.callFake(function(willEvent) {
+                willEvent.doExecute = doExecute;
+              }));
+              model.on("did:execute", listeners.didExecute);
+              model.on("rejected:execute", listeners.rejectedExecute);
+
+              model.executeAction(newSelection);
+            });
+
+            it("should call the custom doExecute function", function() {
+              expect(doExecute).toHaveBeenCalled();
+            });
+
+            it("should call the will execute listener", function() {
+              expect(listeners.willExecute).toHaveBeenCalled();
+            });
+
+            it("should call the did execute listener", function() {
+              expect(listeners.didExecute).toHaveBeenCalled();
+            });
+
+            it("should not call the rejected execute listener", function() {
+              expect(listeners.rejectedExecute).not.toHaveBeenCalled();
+            });
+          });
+
+          [
+            {label: "no reason", reason: undefined, message: "canceled"},
+            {label: "string reason", reason: "Just cancel it!", message: "Just cancel it!"},
+            {label: "User error reason", reason: new UserError("My error"), message: "My error"}
+          ].forEach(function(motive) {
+              describe("canceled on will - " + motive.label, function() {
+                var doExecute;
+                beforeEach(function() {
+                  doExecute = jasmine.createSpy('doExecute');
+
+                  model.on("will:execute", listeners.willExecute.and.callFake(function(willEvent) {
+                    willEvent.cancel(motive.reason);
+                  }));
+                  model.on("will:execute", listeners.willExecuteSecond);
+                  model.on("did:execute", listeners.didExecute);
+                  model.on("rejected:execute", listeners.rejectedExecute);
+
+                  model.executeAction(newSelection, {doExecute: doExecute});
+                });
+
+                it("should not reach the doExecute function", function() {
+                  expect(doExecute).not.toHaveBeenCalled();
+                });
+
+                it("should call the first will execute listener", function() {
+                  expect(listeners.willExecute).toHaveBeenCalled();
+                });
+
+                it("should not call the second will execute listener", function() {
+                  expect(listeners.willExecuteSecond).not.toHaveBeenCalled();
+                });
+
+                it("should not call the did execute listener", function() {
+                  expect(listeners.didExecute).not.toHaveBeenCalled();
+                });
+
+                it("should call the rejected execute listener", function() {
+                  expect(listeners.rejectedExecute).toHaveBeenCalled();
+
+                  var reason = listeners.rejectedExecute.calls.mostRecent().args[0];
+                  expect(reason instanceof RejectedExecute).toBe(true);
+                  expect(reason.error instanceof UserError).toBe(true);
+                  expect(reason.error.message).toBe(motive.message);
+                });
+              });
+            }
+          );
+
+          describe("exception on will - ", function() {
+            var doExecute;
+            beforeEach(function() {
+              doExecute = jasmine.createSpy('doExecute');
+
+              model.on("will:execute", listeners.willExecute.and.callFake(function(willEvent) {
+                throw new Error("non-user error");
+              }));
+              model.on("will:execute", listeners.willExecuteSecond);
+              model.on("did:execute", listeners.didExecute);
+              model.on("rejected:execute", listeners.rejectedExecute);
+
+              model.executeAction(newSelection, {doExecute: doExecute});
+            });
+
+            it("should reach the doExecute function", function() {
+              expect(doExecute).toHaveBeenCalled();
+            });
+
+            it("should call the first will execute listener", function() {
+              expect(listeners.willExecute).toHaveBeenCalled();
+            });
+
+            xit("should call the second will execute listener", function() {
+              expect(listeners.willExecuteSecond).toHaveBeenCalled();
+            });
+
+            it("should call the did execute listener", function() {
+              expect(listeners.didExecute).toHaveBeenCalled();
+            });
+
+            it("should not call the rejected execute listener", function() {
+              expect(listeners.rejectedExecute).not.toHaveBeenCalled();
+            });
+          });
+
+          describe("exception on doExecute - ", function() {
+            var errorMsg = "non-user error";
+            var doExecute;
+            beforeEach(function() {
+              doExecute = jasmine.createSpy('doExecute').and.callFake(function(willEvent) {
+                throw new Error(errorMsg);
+              });
+
+              model.on("will:execute", listeners.willExecute);
+              model.on("did:execute", listeners.didExecute);
+              model.on("rejected:execute", listeners.rejectedExecute);
+
+              model.executeAction(newSelection, {doExecute: doExecute});
+            });
+
+            it("should reach the doExecute function", function() {
+              expect(doExecute).toHaveBeenCalled();
+            });
+
+            it("should call the will execute listener", function() {
+              expect(listeners.willExecute).toHaveBeenCalled();
+            });
+
+            it("should not call the did execute listener", function() {
+              expect(listeners.didExecute).not.toHaveBeenCalled();
+            });
+
+            it("should call the rejected execute listener", function() {
+              expect(listeners.rejectedExecute).toHaveBeenCalled();
+
+              var reason = listeners.rejectedExecute.calls.mostRecent().args[0];
+              expect(reason instanceof RejectedExecute).toBe(true);
+              expect(reason.error instanceof Error).toBe(true);
+              expect(reason.error.message).toBe(errorMsg);
             });
           });
         });

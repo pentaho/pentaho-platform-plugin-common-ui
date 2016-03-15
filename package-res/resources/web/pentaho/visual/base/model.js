@@ -223,8 +223,8 @@ define([
          * @fires "rejected:execute"
          *
          */
-        executeAction: function(inputDataFilter) {
-          var doExecute = this.getv("doExecute");
+        executeAction: function(inputDataFilter, keyArgs) {
+          var doExecute = O.getOwn(keyArgs, "doExecute") || this.getv("doExecute");
           var will = new WillExecute(this, inputDataFilter, doExecute);
           return this._doAction(this._doExecute, will, DidExecute, RejectedExecute);
         },
