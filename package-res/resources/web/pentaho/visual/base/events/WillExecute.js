@@ -47,17 +47,18 @@ define([
        */
       constructor: function(source, dataFilter, doExecute) {
         if(!doExecute) throw error.argRequired("doExecute");
-        if(typeof doExecute !== "function")
-          throw error.argInvalidType("doExecute", "function", typeof doExecute);
 
         this.base(source);
         this._initFilter(dataFilter, true);
-        this._doExecute = doExecute;
+
+        this.doExecute = doExecute;
       },
 
       set doExecute(f) {
-        if(typeof f !== "function")
+        if(typeof f !== "function") {
           throw error.argInvalidType("doExecute", "function", typeof f);
+        }
+
         this._doExecute = f;
       },
 

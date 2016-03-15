@@ -15,8 +15,9 @@
  */
 define([
   "./will",
-  "../mixins/mixinDataFilter"
-], function(will, mixinDataFilter) {
+  "../mixins/mixinDataFilter",
+  "pentaho/util/error"
+], function(will, mixinDataFilter, error) {
   "use strict";
 
   /**
@@ -49,12 +50,16 @@ define([
       constructor: function(source, dataFilter, selectionMode) {
         this.base(source);
         this._initFilter(dataFilter || null, true);
-        this._selectionMode = selectionMode || null;
+
+        this.selectionMode = selectionMode;
       },
 
       set selectionMode(f) {
-        if(typeof f === "function")
-          this._selectionMode = f;
+        if(f != null && typeof f !== "function") {
+          throw error.argInvalidType("selectionMode", "function", typeof f);
+        }
+
+        this._selectionMode = f;
       },
 
       get selectionMode() {
