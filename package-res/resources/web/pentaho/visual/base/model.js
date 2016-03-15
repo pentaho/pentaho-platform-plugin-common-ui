@@ -109,7 +109,7 @@ define([
          * In this case, this method returns a [result]{@link pentaho.lang.ActionResult}
          * with an error in the `error` property.
          *
-         * @param {!pentaho.data.filter.AbstractFilter} dataFilter - A filter representing
+         * @param {!pentaho.data.filter.AbstractFilter} inputDataFilter - A filter representing
          * the data set which will be used to modify the current selection filter.
          * @param {?object} keyArgs - Keyword arguments.
          * @param {!function} keyArgs.selectionMode - A function that computes a new selection,
@@ -127,9 +127,9 @@ define([
          * @see #_broadcastResult
          * @see pentaho.visual.base.types.selectionModes
          */
-        selectAction: function(proposedDataFilter, keyArgs) {
+        selectAction: function(inputDataFilter, keyArgs) {
           var selectionMode = O.getOwn(keyArgs, "selectionMode");
-          var dataFilter = proposedDataFilter;
+          var dataFilter = inputDataFilter;
 
           var result = this._runPipeline(WillSelect, dataFilter, selectionMode);
           var noError = result && !result.error;
@@ -139,9 +139,9 @@ define([
           }
           if(noError || !result) {
             try {
-              result = this._changeSelection(dataFilter, selectionMode);
+              result = this._changeSelection(dataFilter, selectionMode || this.getv("selectionMode"));
             } catch(e) {
-              result = new ActionResult(undefined, e);
+              result = ActionResult.reject(e);
             }
           }
           return this._broadcastResult(DidSelect, RejectedSelect, result, dataFilter);
@@ -154,30 +154,27 @@ define([
          * listeners of the ["will:select"]{@link pentaho.visual.base.events.WillSelect} event have eventually
          * replaced the original input filter and the selection mode to be used.
          *
-         * @param {!pentaho.data.filter.AbstractFilter} dataFilter -
+         * @param {!pentaho.data.filter.AbstractFilter} inputDataFilter -
          * @param {!function} selectionMode -
          * @return {pentaho.lang.ActionResult}
          * If unsuccessful, the `error` property describes what originated the error.
          * If successful,  the `error` property is `null` and the `value` property contains the updated current selection filter.
          *
-         * @fires "will:change:select"
-         * @fires "did:change:select"
-         * @fires "rejected:change:select"
+         * @fires "will:change:selectionFilter"
+         * @fires "did:change:selectionFilter"
+         * @fires "rejected:change:selectionFilter"
          *
          * @see #selectAction
          * @see #_runPipeline
          * @see #_broadcastResult
          * @protected
          */
-        _changeSelection: function(proposedDataFilter, proposedSelectionMode) {
-          var selectionMode = proposedSelectionMode || this.getv("selectionMode");
-          var dataFilter = proposedDataFilter;
-
-          var result = this._runPipeline(WillChangeSelection, dataFilter, selectionMode);
+        _changeSelection: function(inputDataFilter, selectionMode) {
+          var dataFilter = inputDataFilter;
+          var result = this._runPipeline(WillChangeSelection, dataFilter,  null);
 
           var noError = result && !result.error;
           if(noError) {
-            selectionMode = result.value.selectionMode;
             dataFilter = result.value.dataFilter;
           }
           if(noError || !result) {
@@ -186,12 +183,12 @@ define([
               var combinedSelection = selectionMode(currentFilter, dataFilter);
               if(combinedSelection) {
                 this.set("selectionFilter", combinedSelection);
-                result = new ActionResult(combinedSelection, null);
+                result = ActionResult.fulfill(combinedSelection);
               } else {
-                result = new ActionResult(undefined, new UserError(bundle.structured.error.selection.invalid));
+                result = ActionResult.reject(new UserError(bundle.structured.error.selection.invalid));
               }
             } catch(e) {
-              result = new ActionResult(undefined, e);
+              result = ActionResult.reject(e);
             }
           }
 
@@ -216,7 +213,7 @@ define([
          * In this case, this method returns a {@link pentaho.lang.ActionResult|result}.
          * with an error in the `error` property.
          *
-         * @param {!pentaho.data.filter.AbstractFilter} dataFilter - The filter that represents the visual element which the user interacted with.
+         * @param {!pentaho.data.filter.AbstractFilter} inputDataFilter - The filter that represents the visual element which the user interacted with.
          * @return {pentaho.lang.ActionResult}
          * If unsuccessful, the `error` property describes what originated the error.
          * If successful,  the `error` property is `null`.
@@ -229,9 +226,9 @@ define([
          * @see #_runPipeline
          * @see #_broadcastResult
          */
-        executeAction: function(proposedDataFilter) {
+        executeAction: function(inputDataFilter) {
           var doExecute = this.getv("doExecute");
-          var dataFilter = proposedDataFilter;
+          var dataFilter = inputDataFilter;
 
           var result = this._runPipeline(WillExecute, dataFilter, doExecute);
 
@@ -243,13 +240,12 @@ define([
           if(doExecute && (noError || !result)) {
             try {
               doExecute(dataFilter);
-              result = new ActionResult(undefined, null);
+              result = ActionResult.fulfill();
             } catch(e) {
-              result = new ActionResult(undefined, e);
-              result = new ActionResult(undefined, e);
+              result = ActionResult.reject(e);
             }
           } else {
-            result = new ActionResult(undefined, new UserError(bundle.structured.error.action.notDefined));
+            result = ActionResult.reject(new UserError(bundle.structured.error.action.notDefined));
           }
           return this._broadcastResult(DidExecute, RejectedExecute, result, dataFilter);
 
@@ -284,8 +280,8 @@ define([
           var will = new WillEvent(this, dataFilter, otherArg);
           var success = this._emitSafe(will);
 
-          if(success) return new ActionResult(will, null);
-          return new ActionResult(undefined, will.cancelReason);
+          if(success) return ActionResult.fulfill(will);
+          return ActionResult.reject(will.cancelReason);
         },
 
         /**

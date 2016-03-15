@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 define([
-  "./WillSelect"
-], function(WillSelect) {
+  "./will",
+  "../mixins/mixinDataFilter"
+], function(will, mixinDataFilter) {
   "use strict";
 
   /**
@@ -26,17 +27,18 @@ define([
    * The listeners of `will:change:selectionFilter` are allowed to:
    * - cancel the event,
    * - replace the input data filter,
-   * - replace the `selectionMode` action.
    *
    * @extends pentaho.visual.base.events.Will
    * @event "will:change:selectionFilter"
    */
 
-  return WillSelect.extend("pentaho.visual.base.events.WillChangeSelection",
-    /** @lends pentaho.visual.base.events.WillChangeSelection# */{}, {
-      get type(){
-        return "will:change:selectionFilter";
+  return will("change:selectionFilter").extend("pentaho.visual.base.events.WillChangeSelection",
+    /** @lends pentaho.visual.base.events.WillChangeSelection# */{
+      constructor: function(source, dataFilter) {
+        this.base(source);
+        this._initFilter(dataFilter || null, true);
       }
-    });
+    })
+    .implement(mixinDataFilter);
 
 });

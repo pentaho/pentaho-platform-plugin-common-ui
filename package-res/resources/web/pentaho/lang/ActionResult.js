@@ -16,8 +16,9 @@
 
 define([
   "./Base",
-  "./UserError"
-], function(Base, UserError) {
+  "./UserError",
+  "../util/error"
+], function(Base, UserError, error) {
   "use strict";
 
   /**
@@ -26,10 +27,20 @@ define([
    * @memberOf pentaho.lang
    * @extends pentaho.lang.Base
    */
-  return Base.extend("pentaho.lang.ActionResult", /** @lends pentaho.lang.ActionResult# */{
+  var ActionResult = Base.extend("pentaho.lang.ActionResult", /** @lends pentaho.lang.ActionResult# */{
     constructor: function(value, error) {
-      this._value = value;
-      this._error = error;
+      if(error) {
+        if(typeof error === "string") {
+          error = new UserError(error);
+        } else if(!(error instanceof Error)) {
+          throw error.argInvalidType("error", ["string", "Error"], typeof error);
+        }
+        this._value = undefined;
+        this._error  = error;
+      } else {
+        this._value = value;
+        this._error = null;
+      }
     },
 
     get value() {
@@ -58,5 +69,14 @@ define([
     get isRejected(){
       return !!this._error;
     }
+  }, {
+    fulfill: function(value) {
+      return new ActionResult(value);
+    },
+    reject: function(error) {
+      return new ActionResult(null, error || new Error("failed"));
+    }
   });
+
+  return ActionResult;
 });
