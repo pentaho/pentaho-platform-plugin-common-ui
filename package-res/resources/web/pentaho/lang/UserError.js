@@ -41,6 +41,8 @@ define([
      * @readonly
      * @default "UserError"
      */
-    name: "UserError"
+    get name() {
+      return "UserError";
+    }
   });
 });
