@@ -137,7 +137,7 @@ define([
          * @protected
          */
         _doSelect: function(will){
-          var currentSelectionFilter = this.get("selectionFilter");
+          var currentSelectionFilter = this.getv("selectionFilter");
           var selectionMode = will.selectionMode || this.getv("selectionMode");
 
           var newSelectionFilter;
