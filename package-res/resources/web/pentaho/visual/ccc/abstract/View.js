@@ -192,6 +192,8 @@ define([
       this._prepareLayout(this.options);
 
       this._renderCore();
+
+      this._hackedRender();
     },
 
     /** @override VizAPI */

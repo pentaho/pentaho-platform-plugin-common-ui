@@ -76,6 +76,11 @@ define([
       window.open(url, "_blank");
 
       console.log("Google Search:" + url);
+    },
+
+    _hackedRender: function(){
+      this._selectionChanged();
+      this._chart.renderInteractive();
     }
   }
 
