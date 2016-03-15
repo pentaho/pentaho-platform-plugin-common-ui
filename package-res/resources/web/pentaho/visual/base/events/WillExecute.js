@@ -27,8 +27,8 @@ define([
    * the {@link pentaho.visual.base.Model#executeAction|Execute Action} flow starts.
    * The listeners of `will:execute` are allowed to:
    * - cancel the event,
-   * - mutate the input data filter
-   * - change the `doExecute` action.
+   * - replace the input data filter
+   * - replace the `doExecute` action.
    *
    * @extends pentaho.visual.base.events.Will
    * @event "will:execute"
@@ -36,15 +36,19 @@ define([
   return will("execute").extend("pentaho.visual.base.events.WillExecute",
     /** @lends pentaho.visual.base.events.WillExecute# */{
       constructor: function(source, dataFilter, doExecute) {
-        if(!doExecute) throw error.argRequired("onExecute");
+        if(!doExecute) throw error.argRequired("doExecute");
+        if(typeof doExecute !== "function")
+          throw error.argInvalidType("doExecute", "function", typeof doExecute);
+
         this.base(source);
-        this._initFilter(dataFilter || null, true);
-        this._doExecute = onExecute || null;
+        this._initFilter(dataFilter, true);
+        this._doExecute = doExecute;
       },
 
       set doExecute(f) {
-        if(typeof f === "function")
-          this._doExecute = f;
+        if(typeof f !== "function")
+          throw error.argInvalidType("doExecute", "function", typeof f);
+        this._doExecute = f;
       },
 
       get doExecute() {

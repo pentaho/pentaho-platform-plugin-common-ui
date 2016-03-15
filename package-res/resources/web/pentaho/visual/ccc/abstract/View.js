@@ -23,15 +23,15 @@ define([
   "../util",
   "pentaho/util/object",
   "pentaho/data/filter",
-  "pentaho/visual/events",
   "pentaho/visual/color/utils",
   "pentaho/visual/color/paletteRegistry",
   "pentaho/data/TableView",
+  "./ViewDemo",
   "pentaho/i18n!view"
 ], function(View,
             def, pvc, cdo, pv, Axis,
-            util, O, filter, visualEvents, visualColorUtils, visualPaletteRegistry,
-            DataView, bundle) {
+            util, O, filter, visualColorUtils, visualPaletteRegistry,
+            DataView, ViewDemo, bundle) {
 
   "use strict";
 
@@ -170,61 +170,6 @@ define([
 
     //region VizAPI implementation
 
-
-    _init: function() {
-      this.base();
-
-      this.model.on("will:select", this._onWillSelect.bind(this));
-
-      this.model.set("doExecute", this._googleSearch);
-      this.model.on("will:execute", this._onWillExecute);
-    },
-
-    _onWillSelect: function(event) {
-      var multi = this._getAttributeInfosOfRole(this._multiRole);
-      var properties = multi.reduce(function(memo, m) {
-        memo.push(m.attr.name);
-        return memo;
-      }, []);
-
-      var dataFilter = event.dataFilter.transform(function(node, children) {
-        if(children !== null && children.length === 0) return null;
-
-        if(node instanceof filter.AbstractPropertyFilter) {
-          if(properties.indexOf(node.property) > -1) return null;
-            return node;
-        }
-
-        return children;
-      });
-
-      event.dataFilter = dataFilter;
-      console.log("Event:", event);
-    },
-
-    _onWillExecute: function(event) {
-      console.log("Event:", event);
-    },
-
-    _googleSearch: function(dataFilter) {
-      var queryValue = "";
-
-      if(dataFilter.type === "isEqual") {
-        queryValue = dataFilter.value;
-      } else {
-        var operands = O.getOwn(dataFilter, "operands", dataFilter.operand);
-        operands.forEach(function(filter, index) {
-          queryValue += filter.value + (index === operands.length - 1 ? "" : "+");
-        });
-      }
-
-      //TODO: check why not working inside PDI
-      var url = "http://www.google.com/search?as_q=\"" + queryValue + "\"";
-      window.open(url, "_blank");
-
-      console.log("Google Search:" + url);
-      },
-
     _render: function() {
       this._dataTable = this.model.getv("data");
 
@@ -276,7 +221,7 @@ define([
     //region Helpers
 
     _selectionChanged: function() {
-      var dataFilter = this.model.getv("selectionFilter");
+      var dataFilter = this.model.getv("selectionFilter") || new filter.Or();
       var selectedItems = dataFilter.apply(this.model.getv("data"));
 
       // Get information on the axes
@@ -302,7 +247,7 @@ define([
           return datumFilter;
         }, {});
 
-        //Prevent having repeated terms
+        //Prevent repeated terms
         var key = specToKey(datumFilterSpec);
         if(!O.hasOwn(alreadyIn, key)) {
           alreadyIn[key] = true;
@@ -316,9 +261,9 @@ define([
 
       function specToKey(spec) {
         var entries = Object.keys(spec).sort();
-        var key = entries.reduce(function(memo, entry) {
-          return memo + entry + ":" + spec[entry] + ",";
-        }, "");
+        var key = entries.map(function(entry) {
+          return entry + ":" + spec[entry];
+        }).join(",");
         return key;
       }
     },
@@ -1066,10 +1011,8 @@ define([
       if(mapIn) {
         if(!mapOut) mapOut = {};
         for(var key in mapIn) // tolerates nully
-        {
           if(def.hasOwn(mapIn, key))
             mapOut[key] = pv.color(mapIn[key]);
-        }
       }
       return mapOut;
     },
@@ -1327,7 +1270,6 @@ define([
       this.options.userSelectionAction = function(cccSelections) {
         return me._onUserSelection(cccSelections);
       };
-      this.options.selectionChangedAction = null;
     },
 
     _getSelectionKey: function(selection) {
@@ -1352,60 +1294,27 @@ define([
       return key;
     },
 
-    _doesSharedSeriesSelection: function() {
-      // Until analyzer selection logic is moved out we need this auxiliary decoupling argument.
-      return false;
-    },
-
-
     _onUserSelection: function(selectingDatums) {
-      //return this._onUserSelection(selectingDatums);
-      // Convert to array of analyzer cell or column selection objects
-      /*
-       var selectionExcludesMulti = this._selectionExcludesMultiGems(),
-       selections = [],
-       selectionsByKey = {};
-       */
+       // Duplicates may occur due to excluded dimensions like the discriminator
+      var operands = selectingDatums.reduce(function(memo, datum) {
+        if(!datum.isVirtual) {
+          var operand = this._complexToFilter(datum);
 
-      var operands = [];
+          // TODO:
+          // Check if there's already a selection with the same key.
+          // If not, add a new selection to the selections list.
 
-      if(this._doesSharedSeriesSelection()) {
-        selectingDatums.forEach(function(datum) {
-          if(!datum.isVirtual) {
-            var operand = this.axes.column.complexToFilter(datum);
+          if(operand) memo.push(operand);
+        }
+        return memo;
+      }.bind(this), []);
 
-            // TODO:
-            // Check if there's already a selection with the same key.
-            // If not, add a new selection to the selections list.
-            // In the case where the selection max count limit is reached,
-            // the datums included in each selection must be known (by its index).
-            // So, add the datum to the new or existing selection's datums list.
-
-            if(operand)
-              operands.push(operand);
-          }
-        }, this);
-
-      } else {
-        // Duplicates may occur due to excluded dimensions like the discriminator
-        selectingDatums.forEach(function(datum) {
-          if(!datum.isVirtual) {
-            var operand = this._complexToFilter(datum);
-
-            // TODO:
-            // Check if there's already a selection with the same key.
-            // If not, add a new selection to the selections list.
-
-            if(operand)
-              operands.push(operand);
-          }
-        }, this);
-      }
 
       var selectionFilter = new filter.Or(operands);
       this.model.selectAction(selectionFilter);
-      return [];
 
+      // Explicitly cancel CCC's native selection handling.
+      return [];
     },
 
     _limitSelection: function(selections) {
@@ -1473,131 +1382,6 @@ define([
       return selectionsKept;
     },
 
-    /**
-     * By default, the keep only or the exclude menu operations
-     * do not select level gems playing a multi role.
-     *
-     * The same applies to the the drill down operation,
-     * that, by default, does not KEEP level gems playing
-     * a multi role.
-     * Note that a gem playing a multi role
-     * can itself be drilled on.
-     */
-    _selectionExcludesMultiGems: function() {
-      return false; // was true
-    },
-
-    /**
-     * HG totally overrides this and it is the only chart that ignores sharedSeriesSelection.
-     */
-    _processSelection: function(selectedDatums) {
-
-      /**
-       * Selection rules.
-       *
-       * -> gems with (chart)axis="measure" are excluded
-       *
-       * -> gems playing a "multi" role are excluded (!except in the pie chart!)
-       *    -> this way, points with common category data in
-       *       different small charts are simultaneously selected
-       *
-       * -> measure discriminator gems are excluded
-       *    this way, selection is always expanded to other series of different measures
-       *
-       * this._gemCountColumnReportAxis : (new options: selectable and sharedSeriesSelection)
-       *
-       * -> if there are no gems with reportAxis='column':
-       *    -> that's it. (most granular selection s available)
-       *
-       * -> if there is a single gem with reportAxis='column': (!except in the HG chart!)
-       *    -> gems with (chart)axis="row" are excluded
-       *       (selecting one point selects every other point of the same "series")
-       *
-       * -> if there is more that one gem with reportAxis='column':
-       *    -> selection is disabled as a whole
-       *       (in this case, code doesn't even enter here)
-       *
-       */
-      /**
-       * Example CCC "where" specification:
-       * <pre>
-       * whereSpec = [
-       *     // Datums whose series is "Europe" or "Australia",
-       *     // and whose category is 2001 or 2002
-       *     {series: ["Europe", "Australia"], category: [2001, 2002]},
-       *
-       *     // Union'ed with
-       *
-       *     // Datums whose series is "America"
-       *     {series: "America"},
-       * ];
-       * </pre>
-       */
-      var outDatums = [],
-        whereSpec;
-
-      if(selectedDatums.length) {
-        // Include axis="column" dimensions
-        // * Excludes measure discrim dimensions
-        // * Excludes "multi" role dimensions
-        var colDimNames = this.axes.column.getSelectionGems()
-          .select(function(gem) { return gem.cccDimName; })
-          .array(),
-          rowDimNames;
-
-        if(!this._doesSharedSeriesSelection()) {
-          // Include axis="row" dimensions
-          // * Excludes measure discrim dimensions
-          // * Excludes "multi" role dimensions
-          rowDimNames = this.axes.row.getSelectionGems()
-            .select(function(gem) { return gem.cccDimName; })
-            .array();
-        }
-
-
-        if(!colDimNames.length && (!rowDimNames || !rowDimNames.length)) {
-          selectedDatums = [];
-        } else {
-          whereSpec = [];
-
-          selectedDatums.forEach(addDatum);
-
-          this._chart.data
-            .datums(whereSpec, {visible: true})
-            .each(function(datum) {
-              outDatums.push(datum);
-            });
-
-          // Replace
-          selectedDatums = outDatums;
-        }
-      }
-
-      function addDatum(datum) {
-        if(!datum.isNull) {
-
-          // Some trend datums, like those of the scatter plot,
-          // don't have anything distinguishing between them,
-          // so we need to explicitly add them to the output.
-          if(datum.isTrend) outDatums.push(datum);
-
-          var datumFilter = {},
-            datoms = datum.atoms;
-
-          if(colDimNames) colDimNames.forEach(addDim);
-          if(rowDimNames) rowDimNames.forEach(addDim);
-
-          whereSpec.push(datumFilter);
-        }
-
-        function addDim(dimName) {
-          // The atom itself may be used as a value condition
-          datumFilter[dimName] = datoms[dimName];
-        }
-      }
-
-      return selectedDatums;
-    },
     //endregion
 
     //region DOUBLE-CLICK
@@ -1660,5 +1444,6 @@ define([
 
       return this.base(name, instSpec, classSpec, keyArgs);
     }
-  });
+  })
+    .implement(ViewDemo);
 });

@@ -26,8 +26,8 @@ define([
    * the {@link pentaho.visual.base.Model#selectAction|Select Action} flow starts.
    * The listeners of `will:select` are allowed to:
    * - cancel the event,
-   * - mutate the input data filter
-   * - mutate the selection mode.
+   * - replace the input data filter
+   * - replace the selection mode.
    *
    * @extends pentaho.visual.base.events.Will
    * @event "will:select"

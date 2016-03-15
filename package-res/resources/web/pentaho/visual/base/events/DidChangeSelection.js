@@ -21,7 +21,7 @@ define([
   return DidSelect.extend("pentaho.visual.base.events.DidChangeSelection",
     /** @lends pentaho.visual.base.events.DidChangeSelection# */{}, {
       get type(){
-        return "did:change:selection";
+        return "did:change:selectionFilter";
       }
     });
 

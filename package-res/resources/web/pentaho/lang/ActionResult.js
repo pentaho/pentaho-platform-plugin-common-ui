@@ -50,6 +50,15 @@ define([
     isFailed: function() {
       var error = this._error;
       return error != null && !(error instanceof UserError);
+    },
+
+    //TODO: getters for isFulfilled and isRejected
+    get isFulfilled(){
+      throw Error("Not Implemented");
+    },
+
+    get isRejected(){
+      throw Error("Not Implemented");
     }
   });
 });

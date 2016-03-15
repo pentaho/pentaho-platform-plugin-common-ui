@@ -21,23 +21,21 @@ define([
   /**
    * @name WillChangeSelection
    * @memberOf pentaho.visual.base.events
-   * @class
+   * @description This event is triggered by
+   * the {@link pentaho.visual.base.Model#selectAction|Select Action} flow.
+   * The listeners of `will:change:selectionFilter` are allowed to:
+   * - cancel the event,
+   * - replace the input data filter,
+   * - replace the `selectionMode` action.
+   *
    * @extends pentaho.visual.base.events.Will
-   * @abstract
-   * @classDesc This is the base model class for visualizations.
-   *
-   * @constructor
-   * @description Creates a base `Model`.
-   * @param {pentaho.visual.base.spec.IModel} modelSpec A plain object containing the model specification.
-   *
-   * @event "will:select"
+   * @event "will:change:selectionFilter"
    */
-
 
   return WillSelect.extend("pentaho.visual.base.events.WillChangeSelection",
     /** @lends pentaho.visual.base.events.WillChangeSelection# */{}, {
       get type(){
-        return "will:change:selection";
+        return "will:change:selectionFilter";
       }
     });
 

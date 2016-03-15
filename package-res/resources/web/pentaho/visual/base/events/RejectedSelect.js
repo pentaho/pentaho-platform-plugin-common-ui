@@ -36,9 +36,6 @@ define([
   return rejected("select").extend("pentaho.visual.base.events.RejectedSelect",
     /** @lends pentaho.visual.base.events.RejectedSelect# */{
       constructor: function(source, error, dataFilter) {
-        if(!error) throw error.argRequired("error");
-        if(!dataFilter) throw error.argRequired("dataFilter");
-
         this.base(source, error);
         this._initFilter(dataFilter, false);
       }

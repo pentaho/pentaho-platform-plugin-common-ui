@@ -107,7 +107,7 @@ define([
 
       options.xAxisSize = xAxisSize;
       options.yAxisSize = yAxisSize;
-    },
+    }
 
     // TODO: not true anymore...
     // Ortho axis title is not available on the server, so never show
@@ -117,96 +117,5 @@ define([
     // _getBaseAxisTitle: function(){
     // },
 
-    _doesSharedSeriesSelection: function() {
-      return false;
-    },
-
-    _processSelection: function(selectedDatums) {
-
-      if(!selectedDatums.length) return selectedDatums;
-
-      // Select Cols OR Rows
-
-      var data = this._chart.data, // columns are optional in the HG
-          colDimNames = this._getCccDimNamesOfRole("columns"),
-          rowDimNames = this._getCccDimNamesOfRole("rows"),
-          nonAdditive = selectedDatums.length === 1 && selectedDatums[0].isSelected;
-
-      return nonAdditive ? getSelectedDatumsNonAdditive() : getSelectedDatumsAdditive();
-
-      function getSelectedDatumsNonAdditive() {
-        // The only clicked datum is selected and
-        //  thus the user pretends to de-select it.
-        // Expand to the selected datums that have the same series or
-        // the same categories as the clicked one
-        // (a cross whose center is the clicked one).
-        // The result is that all of these will be de-selected.
-        var whereSpec = [
-          buildDatumFilter(selectedDatums[0], colDimNames), // OR
-          buildDatumFilter(selectedDatums[0], rowDimNames)
-        ];
-
-        return data
-            .datums(whereSpec, {visible: true, selected: true})
-            .array();
-      }
-
-      function getSelectedDatumsAdditive() {
-        // Now-selecting datums + Already selected datums
-        var selectDatumsById = def.query(selectedDatums)
-                .union(data.selectedDatums())
-                .uniqueIndex(function(datum) { return datum.id; }),
-
-            isSelectingDatum = function(datum) {
-                return def.hasOwn(selectDatumsById, datum.id);
-              },
-
-            rowGrouping = cdo.GroupingSpec.parse(rowDimNames, data.type),
-            rowGroupedData = data.groupBy(rowGrouping, {
-                visible: true,
-                where: isSelectingDatum,
-                whereKey: null // prevent caching of groupedData
-              }),
-
-            datumFilters = rowGroupedData
-                .leafs()
-                .select(function(leafData) {
-                  return buildDatumFilter(leafData, rowDimNames);
-                });
-
-        if(colDimNames.length) {
-          // Make all combinations of row leafs with col leafs
-
-          var colGrouping = cdo.GroupingSpec.parse(colDimNames, data.type),
-
-              colGroupedData = data.groupBy(colGrouping, {
-                visible: true,
-                where: isSelectingDatum,
-                whereKey: null // prevent caching of groupedData
-              });
-
-          datumFilters = datumFilters
-              .selectMany(function(rowDatumFilter) {
-                return colGroupedData
-                    .leafs()
-                    .select(function(leafData) {
-                      // Share the rowDatumFilter object by inheriting from it.
-                      // combined datumFilter
-                      return def.copyProps(Object.create(rowDatumFilter), leafData.atoms, colDimNames);
-                    });
-              });
-        }
-
-        var whereSpec = datumFilters.array();
-
-        return data
-            .datums(whereSpec, {visible: true})
-            .array();
-      }
-
-      function buildDatumFilter(complex, dimNames) {
-        return def.copyProps(complex.atoms, dimNames);
-      }
-    }
   });
 });

@@ -304,6 +304,29 @@ define([
       }
 
       return event;
+    },
+
+    /**
+     * Variation of {@link #_emit} in which all exceptions are caught (and swallowed).
+     *
+     * TODO: This method is temporary. We must decide if this method is to be kept.
+     * TODO: Error logging should be per failed listener.
+     *
+     * @memberOf pentaho.lang.EventSource#
+     *
+     * @param {!pentaho.lang.Event} event The event object emit.
+     * @return {?pentaho.lang.Event} The emitted event object or `null`, when canceled.
+     *
+     * @protected
+     */
+    _emitSafe: function(event) {
+      var result = null;
+      try {
+        result = this._emit(event);
+      } catch(e) {
+        console.log("Exception thrown during '", event.type, "' loop:", e);
+      }
+      return result;
     }
   });
 

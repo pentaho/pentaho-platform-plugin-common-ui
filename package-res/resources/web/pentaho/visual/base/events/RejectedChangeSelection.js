@@ -21,7 +21,7 @@ define([
   return RejectedSelect.extend("pentaho.visual.base.events.RejectedChangeSelection",
     /** @lends pentaho.visual.base.events.RejectedChangeSelection# */{}, {
       get type(){
-        return "rejected:change:selection";
+        return "rejected:change:selectionFilter";
       }
     });
 

@@ -73,50 +73,50 @@ define([
      * @description Creates a base `Model`.
      * @param {pentaho.visual.base.spec.IModel} modelSpec A plain object containing the model specification.
      */
-    var Model = Complex.extend().implement(EventSource).extend(/** @lends pentaho.visual.base.Model# */{
+    var Model = Complex.extend(/** @lends pentaho.visual.base.Model# */{
         constructor: function(modelSpec) {
           this.base(modelSpec);
         },
 
         //region Event Flows Handling
         /**
-         * Modifies the current selection based on an input filter and on a selection mode.
+         * Modifies the current selection filter based on an input filter and on a selection mode.
          *
-         * This action is the entry point for user-driven modifications of the current selection,
+         * This action is the entry point for user-driven modifications of the current selection filter,
          * e.g. if the user clicked a bar in a bar chart,
          * or drew a rectangle over a set of bars in a bar chart.
          *
          * The event ["will:select"]{@link pentaho.visual.base.events.WillSelect}
-         * is first emitted and processed.
+         * is first emitted.
          * Its event listeners can be attributed a _priority_,
          * and can be regarded as operations in a processing pipeline that are allowed to:
          * - cancel the event,
-         * - mutate the input filter
-         * - mutate the selection mode.
+         * - replace the input filter
+         * - replace the selection mode.
          *
          * Afterwards, [_changeSelection]{@link pentaho.visual.base.Model#_changeSelection}
-         * is invoked to compute and update the current selection.
+         * is invoked to compute and update the current selection filter.
          *
-         * If the modification of the current selection is successful, the event
-         * ["did:select"]{@link pentaho.visual.base.events.DidSelect} is emitted and processed,
+         * If the modification of the current selection filter is successful, the event
+         * ["did:select"]{@link pentaho.visual.base.events.DidSelect} is emitted,
          * and a [result]{@link pentaho.lang.ActionResult} containing
-         * the updated current selection in the `value` field is returned.
+         * the updated current selection filter in the `value` property is returned.
          *
          * Any failure (due to an event cancelation or due to an invalid selection mode)
          * yields an error [result]{@link pentaho.lang.ActionResult}
-         * and lead to the emission (and processing) of the
+         * and lead to the emission of the
          * ["rejected:select"]{@link pentaho.visual.base.events.RejectedSelect}.
          * In this case, this method returns a [result]{@link pentaho.lang.ActionResult}
-         * with an exception in the `error` field.
+         * with an error in the `error` property.
          *
-         * @param {!pentaho.data.filter.AbstractFilter} proposedDataFilter - A filter representing
-         * the data set which will be used to modify the current selection.
+         * @param {!pentaho.data.filter.AbstractFilter} dataFilter - A filter representing
+         * the data set which will be used to modify the current selection filter.
          * @param {?object} keyArgs - Keyword arguments.
          * @param {!function} keyArgs.selectionMode - A function that computes a new selection,
-         * taking into account the current selection and an input `dataFilter`.
+         * taking into account the current selection filter and an input `dataFilter`.
          * @return {pentaho.lang.ActionResult}
-         * If unsuccessful, the `error` field contains the exception that originated the error.
-         * If successful,  the `error` field is `null` and the `value` field contains the updated current selection.
+         * If unsuccessful, the `error` property describes what originated the error.
+         * If successful,  the `error` property is `null` and the `value` property contains the updated current selection filter.
          *
          * @fires "will:select"
          * @fires "did:select"
@@ -131,33 +131,34 @@ define([
           var selectionMode = O.getOwn(keyArgs, "selectionMode");
           var dataFilter = proposedDataFilter;
 
-          var result = this._runPipeline(WillSelect, RejectedSelect, dataFilter, selectionMode);
-          if(result) {
-            if(result.error) return result;
-            selectionMode = result.value.selectionMode;
+          var result = this._runPipeline(WillSelect, dataFilter, selectionMode);
+          var noError = result && !result.error;
+          if(noError) {
             dataFilter = result.value.dataFilter;
+            selectionMode = result.value.selectionMode;
           }
-
-          try {
-            result = this._changeSelection(dataFilter, selectionMode);
-          } catch(e) {
-            result = new ActionResult(undefined, e);
+          if(noError || !result) {
+            try {
+              result = this._changeSelection(dataFilter, selectionMode);
+            } catch(e) {
+              result = new ActionResult(undefined, e);
+            }
           }
           return this._broadcastResult(DidSelect, RejectedSelect, result, dataFilter);
         },
 
         /**
-         * Updates the current selection based on a filter and on a selection mode.
+         * Updates the current selection filter based on a filter and on a selection mode.
          *
          * This method is invoked by [selectAction]{@link pentaho.visual.base.Model#selectAction} once all
          * listeners of the ["will:select"]{@link pentaho.visual.base.events.WillSelect} event have eventually
-         * mutated the original input filter and the selection mode to be used.
+         * replaced the original input filter and the selection mode to be used.
          *
-         * @param {!pentaho.data.filter.AbstractFilter} proposedDataFilter -
-         * @param {!function} proposedSelectionMode -
+         * @param {!pentaho.data.filter.AbstractFilter} dataFilter -
+         * @param {!function} selectionMode -
          * @return {pentaho.lang.ActionResult}
-         * If unsuccessful, the `error` field contains the exception that originated the error.
-         * If successful,  the `error` field is `null` and the `value` field contains the updated current selection.
+         * If unsuccessful, the `error` property describes what originated the error.
+         * If successful,  the `error` property is `null` and the `value` property contains the updated current selection filter.
          *
          * @fires "will:change:select"
          * @fires "did:change:select"
@@ -172,24 +173,26 @@ define([
           var selectionMode = proposedSelectionMode || this.getv("selectionMode");
           var dataFilter = proposedDataFilter;
 
-          var result = this._runPipeline(WillChangeSelection, RejectedChangeSelection, dataFilter, selectionMode);
-          if(result) {
-            if(result.error) return result;
+          var result = this._runPipeline(WillChangeSelection, dataFilter, selectionMode);
+
+          var noError = result && !result.error;
+          if(noError) {
             selectionMode = result.value.selectionMode;
             dataFilter = result.value.dataFilter;
           }
-
-          try {
-            var currentFilter = this.get("selectionFilter");
-            var combinedSelection = selectionMode(currentFilter, dataFilter);
-            if(combinedSelection) {
-              this.set("selectionFilter", combinedSelection);
-              result = new ActionResult(combinedSelection, null);
-            } else {
-              result = new ActionResult(undefined, new UserError(bundle.structured.error.selection.invalid));
+          if(noError || !result) {
+            try {
+              var currentFilter = this.get("selectionFilter");
+              var combinedSelection = selectionMode(currentFilter, dataFilter);
+              if(combinedSelection) {
+                this.set("selectionFilter", combinedSelection);
+                result = new ActionResult(combinedSelection, null);
+              } else {
+                result = new ActionResult(undefined, new UserError(bundle.structured.error.selection.invalid));
+              }
+            } catch(e) {
+              result = new ActionResult(undefined, e);
             }
-          } catch(e) {
-            result = new ActionResult(undefined, e);
           }
 
           return this._broadcastResult(DidChangeSelection, RejectedChangeSelection, result, dataFilter);
@@ -203,7 +206,7 @@ define([
          * Its event listeners can be attributed a _priority_,
          * and can be regarded as operations in a processing pipeline that are allowed to:
          * - cancel the event,
-         * - mutate the input data filter
+         * - replace the input data filter
          * - change the `doExecute` action.
          *
          * Any failure (due to an event cancellation or due to an invalid `doExecute` action)
@@ -211,12 +214,12 @@ define([
          * and lead to the emission (and processing) of the
          * {@link pentaho.visual.base.events.RejectedSelect|rejected:execute}.
          * In this case, this method returns a {@link pentaho.lang.ActionResult|result}.
-         * with an exception in the `error` field.
+         * with an error in the `error` property.
          *
-         * @param {!pentaho.data.filter.AbstractFilter} proposedDataFilter - The filter that represents the visual element which the user interacted with.
+         * @param {!pentaho.data.filter.AbstractFilter} dataFilter - The filter that represents the visual element which the user interacted with.
          * @return {pentaho.lang.ActionResult}
-         * If unsuccessful, the `error` field contains the exception that originated the error.
-         * If successful,  the `error` field is `null`.
+         * If unsuccessful, the `error` property describes what originated the error.
+         * If successful,  the `error` property is `null`.
          * In both cases no value is returned.
          *
          * @fires "will:execute"
@@ -230,18 +233,19 @@ define([
           var doExecute = this.getv("doExecute");
           var dataFilter = proposedDataFilter;
 
-          var result = this._runPipeline(WillExecute, RejectedExecute, dataFilter, doExecute);
-          if(result) {
-            if(result.error) return result;
+          var result = this._runPipeline(WillExecute, dataFilter, doExecute);
+
+          var noError = result && !result.error;
+          if(noError) {
             doExecute = result.value.doExecute;
             dataFilter = result.value.dataFilter;
           }
-
-          if(doExecute) {
+          if(doExecute && (noError || !result)) {
             try {
               doExecute(dataFilter);
               result = new ActionResult(undefined, null);
             } catch(e) {
+              result = new ActionResult(undefined, e);
               result = new ActionResult(undefined, e);
             }
           } else {
@@ -249,24 +253,6 @@ define([
           }
           return this._broadcastResult(DidExecute, RejectedExecute, result, dataFilter);
 
-        },
-
-        /**
-         * Emits an event. All exceptions are caught (and swallowed).
-         * @param {!pentaho.lang.Event} event - The event to be emitted.
-         * @returns {pentaho.lang.Event} If successful returns `event`, otherwise returns `null`.
-         *
-         * @override
-         * @protected
-         */
-        _emit: function(event) {
-          var result = null;
-          try {
-            result = this.base(event);
-          } catch(e) {
-            console.log("Exception thrown during '", event.type, "' loop:", e);
-          }
-          return result;
         },
 
         /**
@@ -281,33 +267,25 @@ define([
          * set of events associated with an action.
          *
          * @param {pentaho.visual.base.Will} WillEvent - The constructor of the "will:*" event to be processed.
-         * @param RejectedEvent - The constructor of the "rejected:" event associated with `WillEvent`.
          * @param {pentaho.data.filter.AbstractFilter} dataFilter - The filter describing the data being processed.
          * @param {*} otherArg - The third argument to be passed to the constructor of `WillEvent`.
          * @return {pentaho.lang.ActionResult}
          * If no listener for the "will:" event was registered, `null` is returned.
-         * If unsuccessful, the `error` field contains the exception that originated the error.
-         * If successful, the `error` field is `null` and the `value` field contains the `WillEvent` instance.
+         * If unsuccessful, the `error` property describes what originated the error.
+         * If successful, the `error` property is `null` and the `value` property contains the `WillEvent` instance.
          *
          * @protected
          *
          * @see #_broadcastResult
          */
-        _runPipeline: function(WillEvent, RejectedEvent, dataFilter, otherArg) {
+        _runPipeline: function(WillEvent, dataFilter, otherArg) {
           if(!this._hasListeners(WillEvent.type)) return null;
 
           var will = new WillEvent(this, dataFilter, otherArg);
-          var isCanceled = !this._emit(will);
+          var success = this._emitSafe(will);
 
-          if(isCanceled) {
-            var result = new ActionResult(undefined, will.cancelReason);
-            if(this._hasListeners(RejectedEvent.type)) {
-              var canceled = new RejectedEvent(this, result.error, will.dataFilter);
-              this._emit(canceled);
-            }
-            return result;
-          }
-          return new ActionResult(will, null);
+          if(success) return new ActionResult(will, null);
+          return new ActionResult(undefined, will.cancelReason);
         },
 
         /**
@@ -330,12 +308,12 @@ define([
           if(result.error) {
             if(this._hasListeners(RejectedEvent.type)) {
               var rejected = new RejectedEvent(this, result.error, dataFilter);
-              this._emit(rejected);
+              this._emitSafe(rejected);
             }
           } else {
             if(this._hasListeners(DidEvent.type)) {
               var did = new DidEvent(this, result.value, dataFilter);
-              this._emit(did);
+              this._emitSafe(did);
             }
           }
           return result;
@@ -384,6 +362,7 @@ define([
           ]
         }
       })
+      .implement(EventSource)
       .implement({meta: bundle.structured});
 
     return Model;

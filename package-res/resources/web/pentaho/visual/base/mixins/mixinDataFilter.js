@@ -19,21 +19,20 @@ define([], function() {
   /**
    * @name mixinDataFilter
    * @memberOf pentaho.visual.base.events
-   * @class
-   * @abstract
-   * @classDesc This is the base class for events related with [filters]{@link pentaho.data.filter }.
-   *
-   * @constructor
-   * @description Creates an event object.
-   * @param {!string} type - The identifier for this event.
-   * @param {!pentaho.lang.EventSource} source - The object that will emit this event.
-   * @param {!boolean} isCancelable - Determines if an event listener can cancel the execution of the event.
-   * @param {!pentaho.data.filter.AbstractFilter} dataFilter - A filter that represents a subset of the data.
+   * @mixin
    */
   return  /** @lends pentaho.visual.base.events.mixinDataFilter# */{
 
+    /**
+     * Initializes the mixin.
+     *
+     * @param {!pentaho.data.filter.AbstractFilter} dataFilter - A filter that represents a subset of the data.
+     * @param {boolean} [isMutable=false] - Determines if an event listener can modify the [dataFilter]{@link #dataFilter} property.
+     * @protected
+     */
     _initFilter: function(dataFilter, isMutable) {
-      this._dataFilter = dataFilter || null;
+      if(!dataFilter) throw error.argRequired("dataFilter");
+      this._dataFilter = dataFilter;
       this._isMutable = !!isMutable;
     },
 
