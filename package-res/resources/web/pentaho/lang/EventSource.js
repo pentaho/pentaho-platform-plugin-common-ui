@@ -324,7 +324,11 @@ define([
       try {
         result = this._emit(event);
       } catch(e) {
-        console.log("Exception thrown during '", event.type, "' loop:", e);
+        if (event) {
+          console.log("Exception thrown during '", (event.type || "NO_TYPE"), "' loop:", e);
+        } else {
+          console.log("Exception thrown because of invalid event loop:", e);
+        }
       }
       return result;
     }
