@@ -49,7 +49,7 @@ define([
        * will be merged with the current selection.
        */
       constructor: function(source, dataFilter, selectionMode) {
-        if(!selectionMode) throw error.argRequired("selectionMode");;
+        if(!selectionMode) throw error.argRequired("selectionMode");
 
         this.base(source);
         this._initFilter(dataFilter, true);

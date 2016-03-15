@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,10 +43,10 @@ define([
       var event;
 
       var value = 123;
-      var filter = {};
+      var will = {dataFilter: {}};
 
       beforeEach(function() {
-        event = new DidExecute({}, value, filter);
+        event = new DidExecute({}, value, will);
       });
 
       it("should extend Event", function() {
@@ -58,7 +58,7 @@ define([
       });
 
       it("dataFilter property should be the same than received in the constructor", function() {
-        expect(event.dataFilter).toBe(filter);
+        expect(event.dataFilter).toBe(will.dataFilter);
       });
 
       it("dataFilter property should be immutable", function() {
@@ -71,7 +71,7 @@ define([
     it("should throw if empty dataFilter parameter", function() {
       expect(function() {
         return new DidExecute({});
-      }).toThrow(errorMatch.argRequired("dataFilter"));
+      }).toThrow(errorMatch.argRequired("will"));
     });
 
   }); // #pentaho.events.DidExecute

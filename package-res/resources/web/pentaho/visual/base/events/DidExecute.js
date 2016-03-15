@@ -15,8 +15,9 @@
  */
 define([
   "./did",
-  "../mixins/mixinDataFilter"
-], function(did, mixinDataFilter) {
+  "../mixins/mixinDataFilter",
+    "pentaho/util/error"
+], function(did, mixinDataFilter, error) {
   "use strict";
 
   /**
@@ -37,11 +38,13 @@ define([
        * @constructor
        * @param {!Object} source - The object where the event will be initially emitted.
        * @param {?Object} value - The value of a fulfilled {@link pentaho.lang.ActionResult|ActionResult}.
-       * @param {!pentaho.data.filter.AbstractFilter} dataFilter - A filter representing the data set of the visual element which the user interacted with.
+       * @param {pentaho.visual.base.events.WillSelect} will - The "will:execute" event object.
        */
-      constructor: function(source, value, dataFilter) {
+      constructor: function(source, value, will) {
+        if(!will) throw error.argRequired("will");
+
         this.base(source, value);
-        this._initFilter(dataFilter, false);
+        this._initFilter(will.dataFilter, false);
       }
     })
     .implement(mixinDataFilter);
