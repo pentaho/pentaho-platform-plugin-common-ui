@@ -50,7 +50,7 @@ define([
         this.base(source, error);
 
         if(!will) throw utilError.argRequired("will");
-q
+
         this._initFilter(will.dataFilter, false);
       }
     })

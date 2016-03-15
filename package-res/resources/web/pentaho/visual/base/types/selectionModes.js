@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,10 @@ define(function() {
   "use strict";
 
   /**
+   * The `selectionModes` namespace contains a collection of methods that represent different ways
+   * to combine the current selection filter with the selection filter that was created by the user
+   * interaction with a visualization.
+   *
    * @name selectionModes
    * @namespace
    * @memberOf pentaho.visual.base.types
@@ -24,11 +28,10 @@ define(function() {
   var selectionModes = /** @lends pentaho.visual.base.types.selectionModes */{
     /**
      * Replaces the current selection filter with the provided filter.
-     * Returns the input filter.
      *
      * @param {pentaho.data.filter.AbstractFilter} current - The filter representing the current selection filter.
      * @param {pentaho.data.filter.AbstractFilter} input - The filter that will replace the current selection filter.
-     * @return {?pentaho.data.filter.AbstractFilter}
+     * @return {?pentaho.data.filter.AbstractFilter} The input filter.
      * @static
      */
     REPLACE: function(current, input) {
@@ -36,12 +39,15 @@ define(function() {
     },
 
     /**
-     * Adds the input filter to the current selection filter, but
-     * previously selected items will be unselected.
+     * Adds the input filter to the current selection filter if
+     * it is not already fully contained in the current selection filter.
+     * Otherwise, removes the input filter from the current selection filter.
      *
      * @param {pentaho.data.filter.AbstractFilter} current - The current selection filter.
-     * @param {pentaho.data.filter.AbstractFilter} input -
-     * @return {?pentaho.data.filter.AbstractFilter}
+     * @param {pentaho.data.filter.AbstractFilter} input - The filter that will be added to the current selection filter,
+     * removing all of the items previously selected.
+     * @return {?pentaho.data.filter.AbstractFilter} The previous selection filter and the input filters items combined.
+     * Previously selected items unselected.
      * @static
      */
     TOGGLE: function(current, input) {
@@ -59,8 +65,8 @@ define(function() {
      * Adds the input filter to the current selection filter.
      *
      * @param {pentaho.data.filter.AbstractFilter} current - The current selection filter.
-     * @param {pentaho.data.filter.AbstractFilter} input -
-     * @return {?pentaho.data.filter.AbstractFilter}
+     * @param {pentaho.data.filter.AbstractFilter} input - The filter that will be added the current selection filter.
+     * @return {?pentaho.data.filter.AbstractFilter} The previous selection filter and the input filter items combined.
      * @static
      */
     ADD: function(current, input) {
@@ -71,8 +77,8 @@ define(function() {
      * Removes the input filter from the current selection filter.
      *
      * @param {pentaho.data.filter.AbstractFilter} current - The current selection filter.
-     * @param {pentaho.data.filter.AbstractFilter} input -
-     * @return {?pentaho.data.filter.AbstractFilter}
+     * @param {pentaho.data.filter.AbstractFilter} input - The filter that will be removed the current selection filter.
+     * @return {?pentaho.data.filter.AbstractFilter} The previous selection filter without the input filter items.
      * @static
      */
     REMOVE: function(current, input) {

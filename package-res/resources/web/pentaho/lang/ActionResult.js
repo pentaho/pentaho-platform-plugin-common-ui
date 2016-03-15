@@ -26,16 +26,16 @@ define([
    * 
    * ### `ActionResult` Value
    * 
-   * When successful an _action_ can return a value that represents its final state or `undefined`, for example,
+   * When successful, an _action_ can return a value that represents its final state or `undefined`. For example,
    * if you do a google search using an {@link pentaho.visual.base.model#executeAction|executeAction}, there is
    * no value to be returned.
    *
    * ### `ActionResult` Error
    *
-   * When an _action_ is unsuccessful it will return an error or a string with the reason why it was rejected.
+   * When an _action_ is unsuccessful, it will return an error or a string with the reason why it was rejected.
    * This can happen when an event is canceled, or the core components of that _action_ were invalid.
    *
-   * Also when unsuccessful the value is always `undefined`.
+   * If unsuccessful, the value is always `undefined`.
    *
    * @name ActionResult
    * @memberOf pentaho.lang
@@ -83,7 +83,7 @@ define([
     },
 
     /**
-     * Gets the error of the `ActionResult`
+     * Gets the error of the `ActionResult`.
      *
      * @type {?Error|pentaho.lang.UserError}
      * @readonly
