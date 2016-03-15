@@ -275,7 +275,7 @@ define([
      *
      * @memberOf pentaho.lang.EventSource#
      *
-     * @param {!pentaho.lang.Event} event The event object emit.
+     * @param {!pentaho.lang.Event} event The event object to emit.
      * @return {?pentaho.lang.Event} The emitted event object or `null`, when canceled.
      *
      * @protected
@@ -304,6 +304,33 @@ define([
       }
 
       return event;
+    },
+
+    /**
+     * Variation of the [_emit]{@link pentaho.lang.EventSource#_emit} method in which all exceptions are caught (and swallowed).
+     *
+     * TODO: This method is temporary. We must decide if this method is to be kept.
+     * TODO: Error logging should be per failed listener.
+     *
+     * @memberOf pentaho.lang.EventSource#
+     *
+     * @param {!pentaho.lang.Event} event The event object to emit.
+     * @return {?pentaho.lang.Event} The emitted event object or `null`, when canceled.
+     *
+     * @protected
+     */
+    _emitSafe: function(event) {
+      var result = null;
+      try {
+        result = this._emit(event);
+      } catch(e) {
+        if (event) {
+          console.log("Exception thrown during '", (event.type || "NO_TYPE"), "' loop:", e);
+        } else {
+          console.log("Exception thrown due to an invalid event:", e);
+        }
+      }
+      return result;
     }
   });
 

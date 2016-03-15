@@ -3,7 +3,9 @@
     "allowUnknownTags": true
   },
   "source": {
-    "include": ["package-res/resources/web/pentaho", "package-res/resources/web/pentaho/CONTRIBUTING.md"
+    "include": [
+      "package-res/resources/web/pentaho",
+      "package-res/resources/web/pentaho/CONTRIBUTING.md"
     ],
     "exclude": [
       "package-res/resources/web/pentaho/data",

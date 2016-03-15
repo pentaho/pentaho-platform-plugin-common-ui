@@ -97,6 +97,15 @@ define([
       return !this.operand.contains(element);
     },
 
+    transform: function(iteratee){
+      var operand = this.operand.transform(iteratee);
+      var output = iteratee(this, [operand]);
+      if (output instanceof Array){
+        return operand.invert();
+      }
+      return output;
+    },
+
     /**
      * Return the inverse of this filter.
      * Double inversion is prevented:  {@link ...#operand} is returned.

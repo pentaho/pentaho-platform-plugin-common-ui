@@ -26,6 +26,13 @@
  * @property {boolean} [isInteractive=true] - Specifies the usage intention of the visualization,
  * namely if the interactive mode is enabled or not.
  * @property {!pentaho.data.Table} data - Object containing the data to be displayed.
+ * @property {?pentaho.lang.filter.AbstractFilter} selectionFilter - The current selection filter.
+ * @property {!function} selectionMode - Function to be used as default
+ * [when computing]{@link pentaho.visual.base.Model#selectAction} a selection filter from
+ * the current selection filter and an input filter.
+ * @property {!function} doExecute - Function to be associated with the
+ * [executeAction]{@link pentaho.visual.base.Model#executeAction},
+ * which is typically called when the user double clicks on an item.
  *
  * @see pentaho.visual.base.Model
  */

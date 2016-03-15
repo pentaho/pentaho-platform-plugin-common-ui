@@ -17,8 +17,9 @@ define([
   "cdf/lib/CCC/def",
   "cdf/lib/CCC/pvc",
   "./AbstractAxis",
-  "../util"
-], function(def, pvc, AbstractAxis, util) {
+  "../util",
+  "pentaho/data/filter"
+], function(def, pvc, AbstractAxis, util, filter) {
 
   "use strict";
 
@@ -48,40 +49,28 @@ define([
       }
     },
 
-    fillCellSelection: function(selection, complex, selectionExcludesMulti) {
-      var forms = [],
-          values = [],
-          label;
+    complexToFilter: function(complex) {
+      var operands = [];
 
-      this.getSelectionGems(selectionExcludesMulti)
-          .each(function(gem) {
-            var atom = complex.atoms[gem.cccDimName];
-            forms.push(gem.name);
+      this.getSelectionGems().each(function(gem) {
+          var atom = complex.atoms[gem.cccDimName];
+          var value = atom.value == null ? atom.rawValue : atom.value;
 
-            // Translate back null member values to the original member value,
-            // which is accessible in rawValue.
-            values.push(atom.value == null ? atom.rawValue : atom.value);
-            label = atom.label; // TODO is this ok?
-          });
+          if(value != null)
+            operands.push(new filter.IsEqual(gem.name, value));
 
-      if(forms.length) {
-        var axisId = this.id;
-        // Dummy property, just to force Analyzer to read the axis info
-        selection[axisId] = true;
+        });
 
-        selection[axisId + "Id"] = forms;
-        selection[axisId + "Item"] = values;
-        selection[axisId + "Label"] = label;
+      switch(operands.length) {
+        case 0: return null;
+        case 1: return operands[0];
       }
+      return new filter.And(operands);
     },
 
-    getSelectionGems: function(selectionExcludesMulti) {
-      if(selectionExcludesMulti == null) selectionExcludesMulti = true;
-
+    getSelectionGems: function() {
       return def.query(this.gems)
-          .where(function(gem) {
-            return !gem.isMeasureDiscrim && (!selectionExcludesMulti || this._nonMultiGemFilter(gem));
-          }, this);
+          .where(function(gem) { return !gem.isMeasureDiscrim; }, this);
     }
   });
 });
