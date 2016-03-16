@@ -79,13 +79,12 @@ define([
         /**
          * Modifies the current selection filter based on an input filter and on a selection mode.
          *
-         * This action is the entry point for user-driven modifications of the current selection filter,
-         * for example, if the user clicked a bar in a bar chart,
-         * or drew a rectangle over a set of bars in a bar chart.
+         * This action is the entry point for user-driven modifications of the current selection filter.
+         * For example, if the user clicked a bar in a bar chart or drew a rectangle over a set of bars in a bar chart.
          *
          * The event ["will:select"]{@link pentaho.visual.base.events.WillSelect}
          * is first emitted.
-         * Its event listeners can be attributed a _priority_,
+         * Its event listeners can be attributed a _priority_
          * and can be regarded as operations in a processing pipeline that are allowed to:
          * - cancel the event
          * - replace the input filter
@@ -199,13 +198,12 @@ define([
         /**
          * Executes an action when the user interacts with a visual element, normally by double clicking it.
          *
-         * The flow starts by triggering the event
-         * {@link pentaho.visual.base.events.WillExecute|will:execute}.
-         * Its event listeners can be attributed a _priority_,
+         * The flow starts by triggering the event {@link pentaho.visual.base.events.WillExecute|will:execute}.
+         * Its event listeners can be attributed a _priority_
          * and can be regarded as operations in a processing pipeline that are allowed to:
-         * - cancel the event,
+         * - cancel the event
          * - replace the input data filter
-         * - change the [doExecute]{@link pentaho.visual.base.Model.Meta} action.
+         * - change the [doExecute]{@link pentaho.visual.base.Model.Meta} action
          *
          * Any failure (due to an event cancellation or due to an invalid `doExecute` action)
          * triggers the event {@link pentaho.visual.base.events.RejectedSelect|rejected:execute}.

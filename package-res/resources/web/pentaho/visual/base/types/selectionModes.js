@@ -39,8 +39,7 @@ define(function() {
     },
 
     /**
-     * Adds the input filter to the current selection filter if
-     * it is not already fully contained in the current selection filter.
+     * Adds the input filter to the current selection filter, if it is not already fully contained within the selection filter.
      * Otherwise, removes the input filter from the current selection filter.
      *
      * @param {pentaho.data.filter.AbstractFilter} current - The current selection filter.
@@ -63,7 +62,7 @@ define(function() {
      * Adds the input filter to the current selection filter.
      *
      * @param {pentaho.data.filter.AbstractFilter} current - The current selection filter.
-     * @param {pentaho.data.filter.AbstractFilter} input - The filter that will be added the current selection filter.
+     * @param {pentaho.data.filter.AbstractFilter} input - The filter that will be added to the current selection filter.
      * @return {!pentaho.data.filter.AbstractFilter} The combined selection filter.
      * @static
      */
@@ -75,7 +74,7 @@ define(function() {
      * Removes the input filter from the current selection filter.
      *
      * @param {pentaho.data.filter.AbstractFilter} current - The current selection filter.
-     * @param {pentaho.data.filter.AbstractFilter} input - The filter that will be removed the current selection filter.
+     * @param {pentaho.data.filter.AbstractFilter} input - The filter that will be removed from the current selection filter.
      * @return {!pentaho.data.filter.AbstractFilter} The current selection filter without the input filter.
      * @static
      */
