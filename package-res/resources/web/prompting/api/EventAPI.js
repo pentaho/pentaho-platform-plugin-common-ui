@@ -100,7 +100,7 @@ define([], function() {
           api.operation._getPromptPanel().onParameterChanged = {};
         }
         paramName = (typeof paramName === "string" && paramName) || '';
-        api.operation._getPromptPanel().onParameterChanged[paramName] = callback; 
+        api.operation._getPromptPanel().onParameterChanged[paramName] = callback;
       } else {
         api.operation._getPromptPanel().onParameterChanged = null;
       }
@@ -183,7 +183,7 @@ define([], function() {
      * @param {Function} callback The function to be executed when the event is triggered.
      *                            Passing anything other than a function will unbind this event.
      * @example
-     *  api.event.submit(function(promptPanel, options) {
+     *  api.event.submit(function(options) {
      *    // Process options.isInit flag if needed.
      *    // Execute event-based code.
      *  })

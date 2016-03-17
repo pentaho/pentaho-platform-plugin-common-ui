@@ -48,7 +48,8 @@ module.exports = function (config) {
     reporters: ["progress", "junit", "coverage"],
 
     junitReporter: {
-      outputFile: "bin/reports/test/js/test-results.xml",
+      useBrowserName: false,
+      outputFile: "bin/reports/test-results.xml",
       suite: "unit"
     },
 
