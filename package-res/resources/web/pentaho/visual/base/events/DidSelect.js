@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 define([
-  "./did",
+  "pentaho/lang/Event",
   "../mixins/mixinDataFilter",
   "pentaho/util/error"
-], function(did, mixinDataFilter, error) {
+], function(Event, mixinDataFilter, error) {
   "use strict";
 
   /**
@@ -26,10 +26,10 @@ define([
    * @description This event is triggered when
    * the {@link pentaho.visual.base.Model#selectAction|Select Action} flow ends without any failures.
    *
-   * @extends pentaho.visual.base.events.Did
+   * @extends pentaho.lang.Event
    * @event "did:select"
    */
-  return did("select").extend("pentaho.visual.base.events.DidSelect",
+  return Event.extend("pentaho.visual.base.events.DidSelect",
     /** @lends pentaho.visual.base.events.DidSelect# */{
 
       /**
@@ -44,9 +44,15 @@ define([
       constructor: function(source, value, will) {
         if(!will) throw error.argRequired("will");
 
-        this.base(source, value);
+        this.base("did:select", source, false);
+        this.value = value;
         this._initFilter(will.dataFilter, false);
+      }
+    }, {
+      get type() {
+        return "did:select";
       }
     })
     .implement(mixinDataFilter);
+
 });

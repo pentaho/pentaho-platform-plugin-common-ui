@@ -310,13 +310,13 @@ define([
     /**
      * Variation of the [_emit]{@link pentaho.lang.EventSource#_emit} method in which all exceptions are caught (and swallowed).
      *
-     * TODO: This method is temporary. We must decide if this method is to be kept.
-     * TODO: Error logging should be per failed listener.
+     * If an event listener throws an exception, the following event listeners are not processed
+     * and this method returns `null`.
      *
      * @memberOf pentaho.lang.EventSource#
      *
      * @param {!pentaho.lang.Event} event The event object to emit.
-     * @return {?pentaho.lang.Event} The emitted event object or `null`, when canceled.
+     * @return {?pentaho.lang.Event} The emitted event object or `null`, when canceled or when an exception is thrown.
      *
      * @protected
      */

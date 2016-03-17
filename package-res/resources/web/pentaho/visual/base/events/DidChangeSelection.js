@@ -14,15 +14,26 @@
  * limitations under the License.
  */
 define([
-  "./DidSelect"
-], function(DidSelect) {
+  "pentaho/lang/Event",
+  "../mixins/mixinDataFilter",
+  "pentaho/util/error"
+], function(Event, mixinDataFilter, utilError) {
   "use strict";
 
-  return DidSelect.extend("pentaho.visual.base.events.DidChangeSelection",
-    /** @lends pentaho.visual.base.events.DidChangeSelection# */{}, {
-      get type(){
+  return Event.extend("pentaho.visual.base.events.DidChangeSelection",
+    /** @lends pentaho.visual.base.events.DidChangeSelection# */{
+      constructor: function(source, value, will) {
+        if(!will) throw utilError.argRequired("will");
+
+        this.base("did:change:selectionFilter", source, false);
+        this.value = value;
+        this._initFilter(will.dataFilter, false);
+      }
+    },{
+      get type() {
         return "did:change:selectionFilter";
       }
-    });
+    })
+    .implement(mixinDataFilter);
 
 });

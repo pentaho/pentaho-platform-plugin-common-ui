@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 define([
-  "./rejected",
+  "pentaho/lang/Event",
   "../mixins/mixinDataFilter",
-    "pentaho/util/error"
-], function(rejected, mixinDataFilter, utilError) {
+  "pentaho/util/error"
+], function(Event, mixinDataFilter, utilError) {
   "use strict";
 
   /**
@@ -31,10 +31,10 @@ define([
    *  - The `doExecute` action was {@link Nully}.
    *  - The `doExecute` action failed while executing.
    *
-   * @extends pentaho.visual.base.events.Rejected
+   * @extends pentaho.lang.Event
    * @event "rejected:execute"
    */
-  return rejected("execute").extend("pentaho.visual.base.events.RejectedExecute",
+  return Event.extend("pentaho.visual.base.events.RejectedExecute",
     /** @lends pentaho.visual.base.events.RejectedExecute# */{
 
       /**
@@ -47,11 +47,17 @@ define([
        * @param {?pentaho.visual.base.events.WillSelect} will - The "will:execute" event object.
        */
       constructor: function(source, error, will) {
-        this.base(source, error);
-
+        if(!error) throw utilError.argRequired("error");
         if(!will) throw utilError.argRequired("will");
 
+        this.base("rejected:execute", source, false);
+        this.error = error;
+
         this._initFilter(will.dataFilter, false);
+      }
+    },{
+      get type() {
+        return "rejected:execute";
       }
     })
     .implement(mixinDataFilter);
