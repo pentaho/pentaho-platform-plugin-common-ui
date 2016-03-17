@@ -59,6 +59,47 @@ define([
       });
     }); // #operands
 
+    describe("#walk", function() {
+      it("when `iteratee` returns a filter, that filter is returned", function() {
+        var result = myFilter.walk(function(node, children) {
+          return inStock;
+        });
+        expect(result).toBe(inStock);
+      });
+
+      it("when `iteratee` returns `null`, `null` is returned", function() {
+        var result = myFilter.walk(function(node, children) {
+          return null;
+        });
+        expect(result).toBeNull();
+      });
+
+      it("when `iteratee` returns an array with more than one element, a new And filter is returned", function() {
+        var result = myFilter.walk(function(node, children) {
+          return [inStock, sales12k];
+        });
+        expect(result).not.toBe(myFilter);
+        expect(result.operands.length).toBe(2);
+        expect(result.type).toBe("and");
+      });
+
+      it("when `iteratee` returns an array with a single element, that element is returned", function() {
+        var result = myFilter.walk(function(node, children) {
+          return [inStock];
+        });
+        expect(result).not.toBe(myFilter);
+        expect(result).toBe(inStock);
+      });
+
+      it("when `iteratee` returns an empty array, `null` is returned", function() {
+        var result = myFilter.walk(function(node, children) {
+          return [];
+        });
+        expect(result).toBeNull();
+      });
+
+    });
+
     describe("#and", function() {
       it("should return an AND.", function() {
         var result = myFilter.and(inStock);

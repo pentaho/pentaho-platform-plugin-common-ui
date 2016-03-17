@@ -51,6 +51,31 @@ define([
       });
     });
 
+    describe("#walk", function() {
+      it("when `iteratee` returns a filter, that filter is returned", function() {
+        var inStock = new filter.IsIn("inStock", [true]);
+        var result = myFilter.walk(function(node) {
+          return inStock;
+        });
+        expect(result).toBe(inStock);
+      });
+
+      it("when `iteratee` returns `null`, `null` is returned", function() {
+        var result = myFilter.walk(function(node) {
+          return null;
+        });
+        expect(result).toBeNull();
+      });
+
+      it("when `iteratee` returns an empty array, `null` is returned", function() {
+        var result = myFilter.walk(function(node) {
+          return [];
+        });
+        expect(result).toBeNull();
+      });
+
+    }); // #walk
+
     describe("#and ", function() {
       it("should return an AND.", function() {
         var combination = myFilter.and(sales12k);
