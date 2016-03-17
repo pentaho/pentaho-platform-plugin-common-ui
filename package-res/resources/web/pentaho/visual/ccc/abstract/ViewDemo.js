@@ -1,8 +1,9 @@
 define([
   "pentaho/util/object",
+  "pentaho/util/logger",
   "pentaho/data/filter",
   "pentaho/visual/base/types/selectionModes"
-], function(O, filter, selectionModes) {
+], function(O, logger, filter, selectionModes) {
   "use strict";
 
   return {
@@ -50,12 +51,12 @@ define([
       });
 
       event.dataFilter = dataFilter;
-      console.log("Event:", event);
+      logger.log(event);
     },
 
     // Temporary. Used for demo of BACKLOG-5989
     _onWillExecute: function(event) {
-      console.log("Event:", event);
+      logger.log(event);
     },
 
     // Temporary. Used for demo of BACKLOG-5989
@@ -75,7 +76,7 @@ define([
       var url = "http://www.google.com/search?as_q=\"" + queryValue + "\"";
       window.open(url, "_blank");
 
-      console.log("Google Search:" + url);
+      logger.log("Google Search: " + url);
     },
 
     _hackedRender: function(){
