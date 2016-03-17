@@ -15,64 +15,70 @@
  */
 define([
   "pentaho/lang/Event",
-  "pentaho/visual/base/events/DidChangeSelection",
+  "pentaho/visual/base/events/RejectedChange",
   "tests/pentaho/util/errorMatch"
-], function(Event, DidChangeSelection, errorMatch) {
+], function(Event, RejectedChange, errorMatch) {
   "use strict";
 
   /* global describe:false, it:false, expect:false, beforeEach:false */
 
-  describe("pentaho.visual.base.events.DidChangeSelection -", function() {
-    var type = "change:selectionFilter";
+  describe("pentaho.events.RejectedChange -", function() {
+    var type = "change";
 
     it("should extend Event", function() {
-      expect(DidChangeSelection.prototype instanceof Event).toBe(true);
+      expect(RejectedChange.prototype instanceof Event).toBe(true);
     });
 
     it("static property type should return full type name", function() {
-      expect(DidChangeSelection.type).toBe("did:" + type);
+      expect(RejectedChange.type).toBe("rejected:" + type);
     });
 
     it("static property type should be read-only", function() {
       expect(function() {
-        DidChangeSelection.type = "New Name";
+        RejectedChange.type = "New Name";
       }).toThrowError(TypeError);
     });
 
     describe("instances -", function() {
       var event;
 
-      var value = 123;
+      var error = "no go!";
       var will = {dataFilter: {}};
 
       beforeEach(function() {
-        event = new DidChangeSelection({}, value, will);
+        event = new RejectedChange({}, error, will);
       });
 
       it("should extend Event", function() {
         expect(event instanceof Event).toBe(true);
       });
 
-      it("value property should be the same than received in the constructor", function() {
-        expect(event.value).toBe(value);
+      it("error property should be the same as that received in the constructor", function() {
+        expect(event.error).toBe(error);
       });
 
-      it("dataFilter property should be the same than received in the constructor", function() {
-        expect(event.dataFilter).toBe(will.dataFilter);
+      it("property property should be the same as that received in the constructor", function() {
+        expect(event.property).toBe(will.property);
       });
 
-      it("dataFilter property should be immutable", function() {
+      it("error property should be immutable", function() {
         expect(function() {
-          event.dataFilter = "other";
+          event.error = new Error("other");
         }).toThrowError(TypeError);
       });
     });
 
+    it("should throw if empty error parameter", function() {
+      expect(function() {
+        return new RejectedChange({});
+      }).toThrow(errorMatch.argRequired("error"));
+    });
+
     it("should throw if empty will parameter", function() {
       expect(function() {
-        return new DidChangeSelection({});
+        return new RejectedChange({}, "no go!");
       }).toThrow(errorMatch.argRequired("will"));
     });
 
-  }); // #pentaho.events.DidChangeSelection
+  }); // #pentaho.events.RejectedChangeSelection
 });

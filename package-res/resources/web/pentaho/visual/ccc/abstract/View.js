@@ -220,8 +220,8 @@ define([
 
     //region Helpers
 
-    _selectionChanged: function() {
-      var dataFilter = this.model.getv("selectionFilter") || new filter.Or();
+    _selectionChanged: function(newSelectionFilter, previousSelectionFilter) {
+      var dataFilter = newSelectionFilter || this.model.getv("selectionFilter") || new filter.Or();
       var selectedItems = dataFilter.apply(this.model.getv("data"));
 
       // Get information on the axes

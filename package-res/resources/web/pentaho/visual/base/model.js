@@ -15,7 +15,6 @@
  */
 define([
   "pentaho/type/complex",
-  "pentaho/lang/EventSource",
   "pentaho/lang/Event",
   "pentaho/data/filter",
   "pentaho/util/object",
@@ -27,23 +26,23 @@ define([
   "./events/DidSelect",
   "./events/RejectedSelect",
 
-  "./events/WillChangeSelection",
-  "./events/DidChangeSelection",
-  "./events/RejectedChangeSelection",
-
   "./events/WillExecute",
   "./events/DidExecute",
   "./events/RejectedExecute",
 
+  "./events/WillChange",
+  "./events/DidChange",
+  "./events/RejectedChange",
+
   "pentaho/lang/ActionResult",
 
   "pentaho/i18n!type"
-], function(complexFactory, EventSource, Event, filter, O,
+], function(complexFactory, Event, filter, O,
             error, UserError,
             selectionModes,
             WillSelect, DidSelect, RejectedSelect,
-            WillChangeSelection, DidChangeSelection, RejectedChangeSelection,
             WillExecute, DidExecute, RejectedExecute,
+            WillChange, DidChange, RejectedChange,
             ActionResult,
             bundle) {
 
@@ -132,7 +131,7 @@ define([
             return ActionResult.reject(e);
           }
 
-          return this._setAction("selectionFilter", newSelectionFilter); //setting to null assigns the default value
+          return this.change("selectionFilter", newSelectionFilter || new filter.Or()); //setting to null assigns the default value
         },
 
 
@@ -165,26 +164,29 @@ define([
         },
 
         /**
-         * Sets the value of a property and returns a [result]{@link pentaho.lang.ActionResult} object.
+         * Changes the value of a property and returns a [result]{@link pentaho.lang.ActionResult} object.
          *
          * This method is supposed to set the value of a property, trigger event loops and return a result.
-         * Currently, the "did:change:selectionFilter" is always triggered.
          *
          * @param {nonEmptyString} property - Name of the property to set.
          * @param {*} value - Value to assign to the property.
          * @return {pentaho.lang.ActionResult} The result object.
          * @private
+         * @fires "will:change"
+         * @fires "did:change"
+         * @fires "rejected:change"
          */
-        _setAction: function(property, value){
+        change: function(property, value){
+          var will = new WillChange(this, property, value, this.getv(property));
+          return this._doAction(this._setWithResult, will, DidChange, RejectedChange);
+        },
+
+         _setWithResult: function(will){
           var result;
           try {
-            this.set(property, value);
-            result = ActionResult.fulfill(value);
-            // Currently this method is only used for selectionFilter
-            if(this._hasListeners(DidChangeSelection.type)) {
-              this._emitSafe(new DidChangeSelection(this, result.value, new WillChangeSelection(this, {})));
-            }
-          } catch(e) {
+            this.set(will.property, will.value);
+            result = ActionResult.fulfill(will.value);
+           } catch(e) {
             result = ActionResult.reject(e);
           }
           return result;
@@ -296,7 +298,6 @@ define([
           ]
         }
       })
-      .implement(EventSource)
       .implement({type: bundle.structured});
 
     return Model;

@@ -308,30 +308,45 @@ define([
     },
 
     /**
-     * Variation of the [_emit]{@link pentaho.lang.EventSource#_emit} method in which all exceptions are caught (and swallowed).
+     * Variation of the [_emit]{@link pentaho.lang.EventSource#_emit} method in which
+     * all exceptions are caught (and logged).
      *
-     * If an event listener throws an exception, the following event listeners are not processed
-     * and this method returns `null`.
+     * If an event listener throws an exception, the following event listeners are still processed.
      *
      * @memberOf pentaho.lang.EventSource#
      *
      * @param {!pentaho.lang.Event} event The event object to emit.
-     * @return {?pentaho.lang.Event} The emitted event object or `null`, when canceled or when an exception is thrown.
+     * @return {?pentaho.lang.Event} The emitted event object or `null`, when canceled.
      *
      * @protected
      */
     _emitSafe: function(event) {
-      var result = null;
-      try {
-        result = this._emit(event);
-      } catch(e) {
-        if (event) {
-          console.log("Exception thrown during '", (event.type || "NO_TYPE"), "' loop:", e);
-        } else {
-          console.log("Exception thrown due to an invalid event:", e);
+      if(!event) throw error.argRequired("event");
+      if(!(event instanceof Event)) throw error.argInvalidType("event", "pentaho.type.Event");
+
+      if (event.isCanceled) {
+        return null;
+      }
+
+      var queue = this._getQueueOf(event.type, /*create:*/false);
+      if(queue) {
+        queue = queue.slice();
+
+        var i = queue.length;
+        while (i-- && !event.isCanceled) {
+          try {
+            queue[i].listener.call(this, event);
+          } catch(e) {
+            console.log("Exception thrown during '", event.type, "' loop:", e);
+          }
+        }
+
+        if (event.isCanceled) {
+          return null;
         }
       }
-      return result;
+
+      return event;
     }
   });
 

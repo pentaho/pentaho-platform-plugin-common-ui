@@ -15,25 +15,30 @@
  */
 define([
   "pentaho/lang/Event",
-  "../mixins/mixinDataFilter",
   "pentaho/util/error"
-], function(Event, mixinDataFilter, utilError) {
+], function(Event, utilError) {
   "use strict";
 
-  return Event.extend("pentaho.visual.base.events.DidChangeSelection",
-    /** @lends pentaho.visual.base.events.DidChangeSelection# */{
-      constructor: function(source, value, will) {
+  return Event.extend("pentaho.visual.base.events.RejectChange",
+    /** @lends pentaho.visual.base.events.RejectChange# */{
+      constructor: function(source, error, will) {
+        if(!error) throw utilError.argRequired("error");
         if(!will) throw utilError.argRequired("will");
 
-        this.base("did:change:selectionFilter", source, false);
-        this.value = value;
-        this._initFilter(will.dataFilter, false);
+        this.base("rejected:change", source, false);
+        this._error = error;
+        this._previousValue = will.previousValue;
+      },
+      get previousValue(){
+        return this._previousValue;
+      },
+      get error() {
+        return this._error;
       }
     },{
       get type() {
-        return "did:change:selectionFilter";
+        return "rejected:change";
       }
-    })
-    .implement(mixinDataFilter);
+    });
 
 });

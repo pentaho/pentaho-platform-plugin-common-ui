@@ -79,7 +79,7 @@ define([
     },
 
     _hackedRender: function(){
-      this._selectionChanged();
+      this._selectionChanged(this.model.getv("selectionFilter"), new filter.Or());
       this._chart.renderInteractive();
     }
   }

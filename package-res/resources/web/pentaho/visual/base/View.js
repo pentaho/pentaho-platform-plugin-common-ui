@@ -125,8 +125,7 @@ define([
      * @overridable
      */
     _init: function() {
-      this.model.on("did:change:selectionFilter", this._selectionChanged.bind(this));
-      //this.model.on("change", this._onChange);
+      this.model.on("did:change", this._onChange.bind(this));
     },
 
     /**
@@ -197,7 +196,7 @@ define([
      * @protected
      * @overridable
      */
-    _selectionChanged: function() {
+    _selectionChanged: function(newSelectionFilter, previousSelectionFilter) {
       this._render();
     },
 
@@ -221,8 +220,18 @@ define([
      * @protected
      * @overridable
      */
-    _onChange: function(changeMap) {
-      this._render();
+    _onChange: function(event) {
+      var propertyName = typeof event.property === "string" ? event.property : this.model.type.get(event.property).name;
+      switch(propertyName) {
+        case "selectionFilter":
+          this._selectionChanged(event.value, event.previousValue);
+          break;
+        case "width":
+        case "height":
+          this._resize();
+          break;
+      }
+      this.render();
     }
   });
 
