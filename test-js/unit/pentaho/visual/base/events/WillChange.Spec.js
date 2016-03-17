@@ -15,57 +15,57 @@
  */
 define([
   "pentaho/lang/Event",
-  "pentaho/visual/base/events/WillChangeSelection",
+  "pentaho/visual/base/events/WillChange",
   "tests/pentaho/util/errorMatch"
-], function(Event, WillChangeSelection, errorMatch) {
+], function(Event, WillChange, errorMatch) {
   "use strict";
 
   /* global describe:false, it:false, expect:false, beforeEach:false */
 
-  describe("pentaho.visual.base.events.WillChangeSelection -", function() {
-    var type = "change:selectionFilter";
+  describe("pentaho.visual.base.events.WillChange -", function() {
+    var type = "change";
 
     it("should extend Event", function() {
-      expect(WillChangeSelection.prototype instanceof Event).toBe(true);
+      expect(WillChange.prototype instanceof Event).toBe(true);
     });
 
     it("static property type should return full type name", function() {
-      expect(WillChangeSelection.type).toBe("will:" + type);
+      expect(WillChange.type).toBe("will:" + type);
     });
 
     it("static property type should be read-only", function() {
       expect(function() {
-        WillChangeSelection.type = "New Name";
+        WillChange.type = "New Name";
       }).toThrowError(TypeError);
     });
 
     describe("instances -", function() {
       var event;
 
-      var filter = {};
+      var value = {};
 
       beforeEach(function() {
-        event = new WillChangeSelection({}, filter);
+        event = new WillChange({}, "foo", value);
       });
 
       it("should extend Event", function() {
         expect(event instanceof Event).toBe(true);
       });
 
-      it("dataFilter property should be the same than received in the constructor", function() {
-        expect(event.dataFilter).toBe(filter);
+      it("value property should be the same than received in the constructor", function() {
+        expect(event.value).toBe(value);
       });
 
-      it("dataFilter property should not be immutable", function() {
+      it("value property should not be immutable", function() {
         var newFilter = "other";
 
         expect(function() {
-          event.dataFilter = newFilter;
+          event.value = newFilter;
         }).not.toThrow();
 
-        expect(event.dataFilter).toBe(newFilter);
+        expect(event.value).toBe(newFilter);
       });
     });
 
-  }); // #pentaho.visual.base.eventsWillChangeSelection
+  }); // #pentaho.visual.base.eventsWillChange
 });

@@ -34,15 +34,21 @@ define([
 
   return Event.extend("pentaho.visual.base.events.WillChangeSelection",
     /** @lends pentaho.visual.base.events.WillChangeSelection# */{
-      constructor: function(source, dataFilter) {
-        this.base("will:change:selectionFilter", source, true);
-        this._initFilter(dataFilter, true);
+      constructor: function(source, property, value, previousValue) {
+        this.base("will:change", source, true);
+        //this._initFilter(dataFilter, true);
+        this.property = property;
+        this.value = value;
+        this._previousValue = previousValue;
+      },
+      get previousValue(){
+        return this._previousValue;
       }
     },{
       get type() {
-        return "will:change:selectionFilter";
+        return "will:change";
       }
-    })
-    .implement(mixinDataFilter);
+    });
+    //.implement(mixinDataFilter);
 
 });

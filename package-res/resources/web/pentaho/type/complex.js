@@ -18,10 +18,11 @@ define([
   "./element",
   "./PropertyTypeCollection",
   "./valueHelper",
+  "../lang/EventSource",
   "../i18n!types",
   "../util/object",
   "../util/error"
-], function(module, elemFactory, PropertyTypeCollection, valueHelper, bundle, O, error) {
+], function(module, elemFactory, PropertyTypeCollection, valueHelper, EventSource, bundle, O, error) {
 
   "use strict";
 
@@ -840,7 +841,9 @@ define([
         }
         //endregion
       }
-    }).implement({
+    })
+    .implement(EventSource)
+    .implement({
       type: bundle.structured.complex
     });
 
