@@ -74,7 +74,7 @@ define([
       });
 
       it("should subscribe to model's did:change:selectionFilter event", function() {
-        expect(model.on.calls.mostRecent().args[0]).toBe("did:change:selectionFilter");
+        expect(model._hasListeners("did:change:selectionFilter")).toBe(true);
       });
 
       it("should call _selectionChanged when did:change:selectionFilter occurs in the model", function() {

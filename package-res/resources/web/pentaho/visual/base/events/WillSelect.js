@@ -14,12 +14,10 @@
  * limitations under the License.
  */
 define([
-  "./will",
+  "pentaho/lang/Event",
   "../mixins/mixinDataFilter",
-  "pentaho/util/error",
-  "./DidSelect",
-  "./RejectedSelect"
-], function(will, mixinDataFilter, error, Did, Rejected) {
+  "pentaho/util/error"
+], function(Event, mixinDataFilter, error) {
   "use strict";
 
   /**
@@ -35,7 +33,7 @@ define([
    * @extends pentaho.visual.base.events.Will
    * @event "will:select"
    */
-  return will("select").extend("pentaho.visual.base.events.WillSelect",
+  return Event.extend("pentaho.visual.base.events.WillSelect",
     /** @lends pentaho.visual.base.events.WillSelect# */{
 
       /**
@@ -51,7 +49,7 @@ define([
       constructor: function(source, dataFilter, selectionMode) {
         if(!selectionMode) throw error.argRequired("selectionMode");
 
-        this.base(source);
+        this.base("will:select", source, true);
         this._initFilter(dataFilter, true);
         this.selectionMode = selectionMode;
       },
@@ -65,10 +63,11 @@ define([
 
       get selectionMode() {
         return this._selectionMode;
-      },
-
-      Did: Did,
-      Rejected: Rejected
+      }
+    },{
+      get type() {
+        return "will:select";
+      }
     })
     .implement(mixinDataFilter);
 

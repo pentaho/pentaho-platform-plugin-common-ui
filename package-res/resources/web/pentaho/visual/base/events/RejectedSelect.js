@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 define([
-  "./rejected",
+  "pentaho/lang/Event",
   "../mixins/mixinDataFilter",
   "pentaho/util/error"
-], function(rejected, mixinDataFilter, utilError) {
+], function(Event, mixinDataFilter, utilError) {
   "use strict";
 
   /**
@@ -30,10 +30,10 @@ define([
    *  - The event {@link pentaho.visual.events.WillSelect|"will:select"} was canceled.
    *  - The selection mode was invalid.
    *
-   * @extends pentaho.visual.base.events.Rejected
+   * @extends pentaho.lang.Event
    * @event "rejected:select"
    */
-  return rejected("select").extend("pentaho.visual.base.events.RejectedSelect",
+  return Event.extend("pentaho.visual.base.events.RejectedSelect",
     /** @lends pentaho.visual.base.events.RejectedSelect# */{
 
       /**
@@ -46,11 +46,17 @@ define([
        * @param {?pentaho.visual.base.events.WillSelect} will - The "will:select" event object.
        */
       constructor: function(source, error, will) {
-        this.base(source, error);
-
+        if(!error) throw utilError.argRequired("error");
         if(!will) throw utilError.argRequired("will");
 
+        this.base("rejected:select", source, false);
+        this.error = error;
+
         this._initFilter(will.dataFilter, false);
+      }
+    },{
+      get type() {
+        return "rejected:select";
       }
     })
     .implement(mixinDataFilter);

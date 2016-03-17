@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 define([
-  "./will",
+  "pentaho/lang/Event",
   "../mixins/mixinDataFilter",
   "pentaho/util/error"
-], function(will, mixinDataFilter, error) {
+], function(Event, mixinDataFilter, error) {
   "use strict";
 
   /**
@@ -33,7 +33,7 @@ define([
    * @extends pentaho.visual.base.events.Will
    * @event "will:execute"
    */
-  return will("execute").extend("pentaho.visual.base.events.WillExecute",
+  return Event.extend("pentaho.visual.base.events.WillExecute",
     /** @lends pentaho.visual.base.events.WillExecute# */{
 
       /**
@@ -46,7 +46,7 @@ define([
        * @param {?function} doExecute - The action that will be executed in the {@link pentaho.visual.base.model#executeAction|Execute Action} event flow.
        */
       constructor: function(source, dataFilter, doExecute) {
-        this.base(source);
+        this.base("will:execute", source, true);
         this._initFilter(dataFilter, true);
         this.doExecute = doExecute;
       },
@@ -55,12 +55,15 @@ define([
         if(f != null && typeof f !== "function") {
           throw error.argInvalidType("doExecute", "function", typeof f);
         }
-
         this._doExecute = f;
       },
 
       get doExecute() {
         return this._doExecute;
+      }
+    },{
+      get type() {
+        return "will:execute";
       }
     })
     .implement(mixinDataFilter);
