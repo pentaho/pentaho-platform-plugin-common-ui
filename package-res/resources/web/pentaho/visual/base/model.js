@@ -49,14 +49,6 @@ define([
 
   "use strict";
 
-  /**
-   * Creates the `Model` type of a given context.
-   *
-   * @name modelFactory
-   * @memberOf pentaho.visual.base
-   * @type pentaho.type.Factory.<pentaho.visual.base.Model>
-   * @amd pentaho/visual/base/model
-   */
   return function(context) {
 
     var Complex = context.get(complexFactory);
@@ -68,6 +60,9 @@ define([
      * @extends pentaho.type.Complex
      * @mixes pentaho.lang.EventSource
      * @abstract
+     *
+     * @amd {pentaho.type.Factory<pentaho.visual.base.Model>} pentaho/visual/base/model
+     *
      * @classDesc This is the base model class for visualizations.
      *
      * @constructor

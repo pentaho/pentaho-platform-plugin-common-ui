@@ -47,7 +47,7 @@ define([
     // instance members could ever be used...
     /**
      * @name pentaho.type.Refinement
-     * @amd pentaho/type/refinement
+     * @amd {pentaho.type.Factory<pentaho.type.Refinement>} pentaho/type/refinement
      * @class
      *
      * @classDesc A refinement type represents a _refinement_ of a representation type.

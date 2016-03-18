@@ -58,6 +58,8 @@ define([
   /**
    * @name pentaho.type.Context
    * @class
+   * @amd pentaho/type/Context
+   *
    * @classDesc A `Context` object holds instance constructors of **configured** _Value_ types.
    *
    * When a component, like a visualization, is being assembled,

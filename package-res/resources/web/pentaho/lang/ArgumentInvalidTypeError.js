@@ -69,6 +69,7 @@ define([
      * @memberOf pentaho.lang
      * @class
      * @extends pentaho.lang.ArgumentError
+     * @amd pentaho/lang/ArgumentInvalidTypeError
      *
      * @description Creates an invalid argument type error object.
      * @constructor

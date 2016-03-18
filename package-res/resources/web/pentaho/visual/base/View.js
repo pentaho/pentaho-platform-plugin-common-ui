@@ -29,6 +29,8 @@ define([
    * @class
    * @extends pentaho.lang.Base
    * @abstract
+   * @amd pentaho/visual/base/View
+   *
    * @classDesc This is the base class for visualizations.
    *
    * A container is expected to instantiate a `View` with a reference to a `Model` instance,
