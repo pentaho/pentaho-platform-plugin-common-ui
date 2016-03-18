@@ -277,39 +277,42 @@ define([
     //endregion
 
     //region label property
-    // @type !nonEmptyString
-    // -> nonEmptyString, Optional, Inherited, Configurable, Localized
-    // null or "" -> undefined conversion
-
-    _label: null,
+    // must have some non-null value to inherit
+    _label: "instance",
 
     /**
      * Gets or sets the label of this type.
      *
-     * Attempting to set to a non-string value type implicitly converts the value to a string before assignment.
+     * When set to a non-{@link Nully} and non-{@link String} value,
+     * the value is first replaced by the result of calling its `toString` method.
      *
-     * Setting to an empty string
-     * or to a {@link Nully} value causes the attribute to use the inherited value,
-     * except for the root type, `Instance.type` (which has no ancestor), where the label is `null`.
+     * When set to an empty string or a _nully_ value, the attribute value is _reset_.
      *
-     * @type {String | any}
+     * When reset, the attribute assumes its _default value_
+     * (except on the top-root type, `Instance.type`, in which case it has no effect).
+     *
+     * The _default value_ is the _inherited value_.
+     *
+     * The _initial value_ of the attribute on the top-root type is `"instance"`.
+     *
+     * @type {!nonEmptyString}
      */
-    _resetLabel: function() {
-      if(this !== _type) {
-        delete this._label;
-      }
-    },
-
     get label() {
       return this._label;
     },
 
     set label(value) {
-      // null or "" -> undefined conversion
-      if(value == null || value === "") {
+      value = nonEmptyString(value);
+      if(value === null) {
         this._resetLabel();
       } else {
-        this._label = String(value);
+        this._label = value;
+      }
+    },
+
+    _resetLabel: function() {
+      if(this !== _type) {
+        delete this._label;
       }
     },
     //endregion

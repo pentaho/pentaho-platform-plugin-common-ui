@@ -321,6 +321,20 @@ define([
     describe("#label -", function() {
 
       describe("when `label` is falsy -", function() {
+        it("should have a top-root label", function() {
+          var label = Instance.type.label;
+          expect(typeof label).toBe("string");
+          expect(label.length > 0).toBe(true);
+        });
+
+        it("should not reset the top-root label", function() {
+          var topRootLabel = Instance.type.label;
+
+          Instance.type.label = undefined;
+
+          expect(Instance.type.label).toBe(topRootLabel);
+        });
+
         it("should inherit `label`", function() {
           function expectIt(derivedSpec) {
             var Derived = Instance.extend({type: derivedSpec});
@@ -331,12 +345,6 @@ define([
           expectIt({label: undefined});
           expectIt({label: null});
           expectIt({label: ""});
-        });
-
-        it("should preserve the default value", function() {
-          Instance.type.label = undefined;
-          // The default value is still there (did not delete)
-          expect(Instance.type.label).toBe(null);
         });
 
         it("subclasses should preserve the default value", function() {
