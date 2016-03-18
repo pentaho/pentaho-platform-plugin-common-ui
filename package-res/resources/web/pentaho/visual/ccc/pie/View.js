@@ -93,8 +93,6 @@ define([
       }
     },
 
-    _selectionExcludesMultiGems: def.fun.constant(false),
-
     _getDiscreteColorMap: function() {
       var memberPalette = this._getMemberPalette();
       if(memberPalette) {

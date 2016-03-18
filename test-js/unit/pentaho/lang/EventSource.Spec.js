@@ -322,7 +322,7 @@ define([
         var listeners = {
           foo: function() {}
         };
-        
+
         spyOn(listeners, "foo").and.callThrough();
         eventSource.on("foo", listeners.foo);
 
@@ -556,6 +556,53 @@ define([
           eventSource._emit(event);
           expect(state).toBe("original first");
         });
+      });
+
+    }); // #_emit
+
+    describe("#_emitSafe(event) -", function() {
+      var event;
+
+      beforeEach(function() {
+        event = new Event("foo", eventSource, true);
+        spyOn(console, 'log');
+      });
+
+      it("should return null when no parameters provided.", function() {
+        expect(eventSource._emitSafe()).toBe(null);
+
+        expect(eventSource._emitSafe(null)).toBe(null);
+
+        expect(eventSource._emitSafe(undefined)).toBe(null);
+
+        expect(console.log).toHaveBeenCalledTimes(3);
+      });
+
+      it("should return null when the argument is of an invalid type.", function() {
+        expect(eventSource._emitSafe({})).toBe(null);
+
+        expect(console.log).toHaveBeenCalledTimes(1);
+      });
+
+      it("should interrupt the event being processed and return null if a listener throws an exception.", function() {
+        var listeners = {
+          firstAndThrow: function() {
+            throw new Error("Stirb!");
+          },
+          second: function() {}
+        };
+
+        spyOn(listeners, "firstAndThrow").and.callThrough();
+        spyOn(listeners, "second").and.callThrough();
+
+        eventSource.on("foo", listeners.firstAndThrow);
+        eventSource.on("foo", listeners.second);
+
+        expect(eventSource._emitSafe(event)).toBe(null);
+
+        expect(listeners.second).not.toHaveBeenCalled();
+
+        expect(console.log).toHaveBeenCalledTimes(1);
       });
 
     }); // #_emit

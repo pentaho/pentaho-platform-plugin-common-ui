@@ -58,6 +58,30 @@ define([
       });
     },
 
+    transform: function(iteratee) {
+      var operands = this.operands
+        .map(function(op) {
+          return op.transform(iteratee);
+        })
+        .filter(function(op) {
+          return op;
+        });
+
+      var output = iteratee(this, operands);
+
+      if(output instanceof Array) {
+        switch(output.length) {
+          case 0:
+            return null;
+          case 1:
+            return output[0];
+        }
+        return new this.constructor(output);
+      }
+
+      return output;
+    },
+
     /**
      * @inheritdoc
      */

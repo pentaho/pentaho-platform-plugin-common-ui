@@ -2,8 +2,9 @@ define([
   "pentaho/visual/base/View",
   "pentaho/visual/base",
   "pentaho/type/Context",
+  "pentaho/visual/base/events/DidChangeSelection",
   "tests/pentaho/util/errorMatch"
-], function(View, modelFactory, Context, errorMatch) {
+], function(View, modelFactory, Context, DidChangeSelection, errorMatch) {
   "use strict";
 
   /*global document:false*/
@@ -63,7 +64,25 @@ define([
 
     });
 
+    describe("events -", function() {
+      var view;
+      beforeEach(function() {
+        spyOn(model, "on").and.callThrough();
+        spyOn(View.prototype, "_selectionChanged");
 
+        view = new View(element, model);
+      });
+
+      it("should subscribe to model's did:change:selectionFilter event", function() {
+        expect(model.on.calls.mostRecent().args[0]).toBe("did:change:selectionFilter");
+      });
+
+      it("should call _selectionChanged when did:change:selectionFilter occurs in the model", function() {
+        model._emit(new DidChangeSelection({}, {}, {dataFilter: {}}));
+
+        expect(view._selectionChanged).toHaveBeenCalled();
+      });
+    });
 
     describe("validation: ", function() {
 

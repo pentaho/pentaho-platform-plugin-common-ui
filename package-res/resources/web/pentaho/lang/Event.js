@@ -17,8 +17,9 @@
 define([
   "./Base",
   "../util/object",
-  "../util/error"
-], function(Base, O, error) {
+  "../util/error",
+  "./UserError"
+], function(Base, O, error, UserError) {
 
   "use strict";
 
@@ -73,18 +74,15 @@ define([
      * @param {?boolean} [cancelable=false] - Indicates if the event can be canceled.
      */
     constructor: function(type, source, cancelable) {
-      if (!type) throw error.argRequired("type");
-      if (!source) throw error.argRequired("source");
+      if(!type) throw error.argRequired("type");
+      if(!source) throw error.argRequired("source");
 
       this._type = type;
       this._source = source;
       this._cancelable = !!cancelable;
     },
 
-    _type: null,
-    _source: null,
-    _cancelable: false,
-
+    _cancelReason: null,
     _canceled: false,
 
     /**
@@ -110,7 +108,7 @@ define([
     /**
      * Gets a value that indicates if the event can be canceled.
      *
-     * @type {!boolean}
+     * @type {boolean}
      * @readonly
      */
     get isCancelable() {
@@ -118,15 +116,35 @@ define([
     },
 
     /**
+     * Gets the reason why the event was canceled.
+     *
+     * @type {!pentaho.lang.UserError}
+     * @readonly
+     */
+    get cancelReason() {
+      return this._cancelReason;
+    },
+
+
+    /**
      * Cancels the event.
      *
      * This method has no effect if the event is not cancelable or
      * has already been canceled.
+     * @param {string|pentaho.lang.UserError} [reason="canceled"] - The reason why the event is being canceled.
      *
      * @see pentaho.lang.Event#isCanceled
      */
-    cancel: function() {
-      if (this._cancelable) {
+    cancel: function(reason) {
+      if(this._cancelable) {
+        if(!reason) reason = "canceled";
+
+        if(typeof reason === "string") {
+          reason = new UserError(reason);
+        } else if(!(reason instanceof UserError)) {
+          throw error.argInvalidType("reason", ["string", "pentaho/lang/UserError"], typeof reason);
+        }
+        this._cancelReason = reason;
         this._canceled = true;
       }
     },
@@ -150,8 +168,8 @@ define([
       var proto = Object.getPrototypeOf(this);
 
       var clone = Object.create(proto);
-      for (var name in this) {
-        if (this.hasOwnProperty(name)) {
+      for(var name in this) {
+        if(this.hasOwnProperty(name)) {
           var desc = O.getPropertyDescriptor(this, name);
           Object.defineProperty(clone, name, desc);
         }

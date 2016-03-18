@@ -69,7 +69,6 @@ define([
       return element.has(this.property) &&
         this._operation(element.getv(this.property));
     }
-
   });
 
   return AbstractPropertyFilter;

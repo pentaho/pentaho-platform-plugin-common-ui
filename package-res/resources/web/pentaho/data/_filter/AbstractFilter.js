@@ -79,6 +79,9 @@ define([
       return _apply(this, dataTable);
     },
 
+    transform: function(iteratee){
+      return iteratee(this, null);
+    },
     /**
      * Outputs a simple object that serializes the operation described by this filter.
      * The syntax loosely follows the query language of MongoDB.

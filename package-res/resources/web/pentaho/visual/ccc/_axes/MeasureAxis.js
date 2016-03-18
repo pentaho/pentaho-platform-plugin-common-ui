@@ -142,16 +142,6 @@ define([
         }
       }
     },
-
-    fillCellSelection: function(selection, complex/*, selectionExcludesMulti*/) {
-      // Add a description of the selected values.
-      // At the time of writing, analyzer discards selection.value.
-      selection.value = def.query(this.gems)
-          .select(function(gem) { return complex.atoms[gem.cccDimName].label; })
-          .where(def.truthy)
-          .array()
-          .join(" ~ ");
-    }
   });
 
 });

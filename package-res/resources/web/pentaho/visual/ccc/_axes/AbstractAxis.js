@@ -60,7 +60,7 @@ define([
      }
     },
 
-    fillCellSelection: function() {
+    complexToFilter: function() {
       throw new Error("Not Implemented");
     }
   });
