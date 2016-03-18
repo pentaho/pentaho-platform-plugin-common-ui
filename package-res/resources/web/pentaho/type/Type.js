@@ -598,25 +598,28 @@ define([
    /**
     * Gets or sets the default view for instances of this type.
     *
-    *
-    * Setting to a string defines the id of the view's module.
-    * If the string starts with `/`, `xyz:` or ends with `.js`,
+    * When a string,
+    * it is the id of the view's AMD module.
+    * If the string starts with `/` or `xyz:`, or ends with `.js`,
     * the id is considered to be absolute,
-    * otherwise it is considered to be relative to the type's id folder.
-
+    * otherwise,
+    * it is relative to this type's id folder, and converted to an absolute id.
+    *
     * Setting to `undefined` causes the view to be inherited from the ancestor type,
     * except for the root type, `Instance.type` (which has no ancestor), where the attribute is `null`.
     *
     * Setting to a _falsy_ value (like `null` or an empty string),
     * clears the value of the attribute and sets it to `null`, ignoring any inherited value.
     *
-    * Attempting to set to some other value is interpreted as the intention to set
-    * the class or factory of the view.
-    * It will normally be a function, but this is not ensured.
+    * When a function,
+    * it is the class or factory of the view.
     *
-    * @type string | function | object
-    * @readOnly
     * @see pentaho.type.Type#viewClass
+    *
+    * @type {string | function}
+
+    * @throws {pentaho.lang.ArgumentInvalidTypeError} When the set value is not
+    * a string, a function or {@link Nully}.
     */
     get view() {
       return this._view && this._view.value;
@@ -632,11 +635,13 @@ define([
         if(!this._view || this._view.value !== value) {
           this._view = {value: value, promise: null};
         }
-      } else {
+      } else if(typeof value === "function") {
         // Assume it is the View class itself, already fulfilled.
         if(!this._view || this._view.value !== value) {
           this._view = {value: value, promise: Promise.resolve(value)};
         }
+      } else {
+        throw error.argInvalidType("view", ["nully", "string", "function"], typeof value);
       }
     },
 
@@ -647,16 +652,21 @@ define([
     },
 
     /**
-     * Gets a promise for the default view class, or `null` if no view is defined.
+     * Gets a promise for the default view class or factory, if any, or `null`.
      *
-     * @type ?Promise.<!(function|object)>
+     * A default view exists if property {@link pentaho.type.Type#view}
+     * has a non-null value.
+     *
+     * @type Promise.<?function>
      * @readOnly
      * @see pentaho.type.Type#view
      */
     get viewClass() {
       /*jshint laxbreak:true*/
       var view = this._view;
-      return view && (view.promise || (view.promise = promiseUtil.require(view.value)));
+      return view
+          ? (view.promise || (view.promise = promiseUtil.require(view.value)))
+          : Promise.resolve(null);
     },
     //endregion
 

@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Instance"
-], function(Instance) {
+  "pentaho/type/Instance",
+  "tests/pentaho/util/errorMatch"
+], function(Instance, errorMatch) {
 
   "use strict";
 
@@ -167,6 +168,12 @@ define([
         // The default value is still there (did not delete)
         expect(Instance.type.view).toBe(null);
       });
+
+      it("should throw when view is not a string, nully or a function", function() {
+        expect(function() {
+          Instance.extend({type: {view: {}}});
+        }).toThrow(errorMatch.argInvalidType("view", ["nully", "string", "function"], "object"));
+      });
     }); // end #view
 
     describe("#viewClass -", function() {
@@ -176,28 +183,21 @@ define([
         require.undef("foo/dude");
       });
 
-      it("should return null, when view is null", function() {
+      it("should return a Promise, when view is null, and resolve to null", function(done) {
         var A = Instance.extend();
+        var p = A.type.viewClass;
 
-        expect(A.type.viewClass).toBe(null);
+        expect(p instanceof Promise).toBe(true);
+
+        p.then(function(V) {
+          expect(V).toBe(null);
+          done();
+        });
       });
 
       it("should return a Promise, when view is a function, and resolve to it", function(done) {
         var View = function() {
         };
-        var A    = Instance.extend({type: {view: View}});
-        var p    = A.type.viewClass;
-
-        expect(p instanceof Promise).toBe(true);
-
-        p.then(function(V) {
-          expect(V).toBe(View);
-          done();
-        });
-      });
-
-      it("should return a Promise, when view is an object, and resolve to it", function(done) {
-        var View = {};
         var A    = Instance.extend({type: {view: View}});
         var p    = A.type.viewClass;
 
