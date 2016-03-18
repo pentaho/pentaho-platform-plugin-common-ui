@@ -14,18 +14,19 @@
  * limitations under the License.
  */
 define([
-  "./Item.Meta",
+  "./Type",
   "../lang/Base",
   "../util/error",
   "../util/object"
-], function(ItemMeta, Base, error, O) {
+], function(Type, Base, error, O) {
 
   "use strict";
 
   /**
-   * @name pentaho.type.Item
+   * @name pentaho.type.Instance
    * @class
    * @abstract
+   * @amd pentaho/type/Instance
    *
    * @classDesc The base **instance class** of types in the Pentaho Client Metadata Model.
    *
@@ -37,106 +38,106 @@ define([
    * is shared by all instances of the type,
    * and, essentially, holds its metadata.
    *
-   * The **type class** of the _Item_ type is {@link pentaho.type.Item.Meta}.
+   * The **type class** of the _Instance_ type is {@link pentaho.type.Type}.
    *
-   * When creating a subclass `Foo` of [Item]{@link pentaho.type.Item},
-   * the corresponding type metadata class is implicitly generated
-   * (a subclass of [Item.Meta]{@link pentaho.type.Item.Meta}),
+   * When creating a subclass `Foo` of [Instance]{@link pentaho.type.Instance},
+   * the corresponding type class is implicitly generated
+   * (a subclass of [Type]{@link pentaho.type.Type}),
    * and its singleton object is placed in the static property
-   * [Foo.meta]{@link pentaho.type.Item.meta}.
+   * [Foo.type]{@link pentaho.type.Instance.type}.
    *
    * Instances of the type `Foo` can also conveniently access the type's singleton object
-   * through the instance property [this.meta]{@link pentaho.type.Item#meta}.
+   * through the instance property [this.type]{@link pentaho.type.Instance#type}.
    *
    * The instance and type classes of a type are closely bound and
    * must naturally reference each other.
    * The type singleton object references back the prototype of the instance class,
-   * in a property named [mesa]{@link pentaho.type.Item.Meta#mesa}.
+   * in a property named [instance]{@link pentaho.type.Type#instance}.
    *
    * @example
-   * <caption> Create a new class <code>DerivedItem</code> containing
+   * <caption> Create a new class <code>Derived</code> containing
    * an attribute <code>greeting</code> and a method <code>doSomething</code> </caption>
    *
-   * require(["pentaho/type/Item"], function(Item) {
-   *   var DerivedItem = Item.extend({
+   * require(["pentaho/type/Instance"], function(Instance) {
+   *   var Derived = Instance.extend({
    *     constructor: function(label) {
    *       this.label = label;
    *     },
-   *     meta: { // metadata spec
+   *     type: { // type specification
    *       greeting: "Hello, ",
    *       veryLongString: "..."
    *     },
    *     saySomething: function() {
-   *       console.log(this.meta.greeting + this.label + "!");
+   *       console.log(this.type.greeting + this.label + "!");
    *     }
    *   });
    *
-   *   var a = new DerivedItem("Alice");
+   *   var a = new Derived("Alice");
    *   a.saySomething(); // "Hello, Alice!"
    *
-   *   var b = new DerivedItem("Bob");
+   *   var b = new Derived("Bob");
    *   b.saySomething(); // "Hello, Bob!"
    *
-   *   // All instances share the same _meta_:
-   *   b.meta.greeting ===  a.meta.greeting // true
+   *   // All instances share the same _type_:
+   *   b.type.greeting ===  a.type.greeting // true
    * });
    *
    * @description Creates an instance of this type.
    */
-  var Item = Base.extend("pentaho.type.Item", /** @lends pentaho.type.Item# */{
+  var Instance = Base.extend("pentaho.type.Instance", /** @lends pentaho.type.Instance# */{
     // NOTE: not calling base to block default Base.js from copying 1st argument into `this`.
     constructor: function() {
     },
 
-    //region meta property
-    _meta: null, // Set on Item.Meta#_init
+    //region type property
+    _type: null, // Set on Type#_init
 
     /**
      * Gets the type of this instance.
      *
-     * @type pentaho.type.Item.Meta
+     * @type pentaho.type.Type
      * @readonly
-     * @see pentaho.type.Item.meta
-     * @see pentaho.type.Item.Meta#mesa
+     * @see pentaho.type.Instance.type
+     * @see pentaho.type.Type#instance
      */
-    get meta() {
-      return this._meta;
+    get type() {
+      return this._type;
     },
 
-    // Supports Meta instance-level configuration only. Can only be called on the prototype,
-    //  through Item#implement!
-    // Not documented on purpose, to avoid users trying to configure an item
+    // Supports Type instance-level configuration only. Can only be called on the prototype,
+    //  through Instance#implement!
+    // Not documented on purpose, to avoid users trying to configure a type
     //  when they already have an instance of it, which is not supported...
     // However, this is the simplest and cleanest way to implement:
-    //   Item.implement({meta: {.}})
+    //   Instance.implement({type: {.}})
     // to mean
-    //   Item.Meta.implement({.}).mesa.constructor
-    set meta(config) {
+    //   Type.implement({.}).instance.constructor
+    set type(config) {
       // Class.implement essentially just calls Class#extend.
-      if(config) this.meta.extend(config);
+      if(config) this.type.extend(config);
     }
     //endregion
-  }, /** @lends pentaho.type.Item */{
+  }, /** @lends pentaho.type.Instance */{
 
-    //region meta property
+    //region type property
     /**
      * Gets the type of this instance constructor.
      *
-     * @type pentaho.type.Item.Meta
+     * @type pentaho.type.Type
      * @readonly
      */
-    get meta() {
-      return this.prototype.meta;
+    get type() {
+      return this.prototype.type;
     },
 
-    // Supports Meta class-level configuration only.
+    // Supports Type class-level configuration only.
     // Not documented on purpose.
     // Allows writing;
-    //   Item.implementStatic({meta: .})
+    //   Instance.implementStatic({type: .})
     // to mean:
-    //   Item.Meta#implementStatic(.).mesa.constructor
-    set meta(config) {
-      if(config) this.meta.constructor.implementStatic(config);
+    //   Type#implementStatic(.).instance.constructor
+    set type(config) {
+      if(config) this.type.constructor.implementStatic(config);
     },
     //endregion
 
@@ -150,30 +151,30 @@ define([
      * extend from the base constructor instead,
      * by calling its `extend` method.
      *
-     * @param {pentaho.type.Item} [baseInstProto] The base instances' prototype.
+     * @param {pentaho.type.Instance} [baseInstProto] The base instances' prototype.
      *   When nully, defaults to the prototype of this instance constructor.
      *
      * @param {object} [instSpec] The new type specification.
      * @param {object} [keyArgs] Keyword arguments.
      *
-     * @return {pentaho.type.Item} The instances' prototype of the created subtype.
+     * @return {pentaho.type.Instance} The instances' prototype of the created subtype.
      */
     extendProto: function(baseInstProto, instSpec, keyArgs) {
       if(!instSpec) instSpec = {};
       if(!baseInstProto) baseInstProto = this.prototype;
 
-      // MESA I
+      // INSTANCE I
       var subInstProto = Object.create(baseInstProto);
 
-      // META
-      var metaInstSpec = O["delete"](instSpec, "meta");
+      // TYPE
+      var typeInstSpec = O["delete"](instSpec, "type");
 
       var ka  = keyArgs ? Object.create(keyArgs) : {};
-      ka.mesa = subInstProto;
+      ka.instance = subInstProto;
 
-      baseInstProto.meta._extendProto(metaInstSpec, ka);
+      baseInstProto.type._extendProto(typeInstSpec, ka);
 
-      // MESA II
+      // INSTANCE II
       return subInstProto.extend(instSpec);
     },
 
@@ -183,25 +184,25 @@ define([
      * @ignore
      */
     _subClassed: function(SubInstCtor, instSpec, classSpec, keyArgs) {
-      // 1. `instSpec` may override property accessors only defined by `Complex.Meta`
+      // 1. `instSpec` may override property accessors only defined by `Complex.Type`
       // 2. So, the Type class must be created *before* applying instSpec and classSpec to SubInstCtor
       // 3. The Type class requires InstCtor to already exist, to be able to define accessors
-      var metaInstSpec  = O["delete"](instSpec, "meta"),
-          metaClassSpec = O["delete"](classSpec, "meta"),
+      var typeInstSpec  = O["delete"](instSpec, "type"),
+          typeClassSpec = O["delete"](classSpec, "type"),
           // Setting a function's name is failing on PhantomJS 1.9.8...
-          mesaName      = SubInstCtor.name || SubInstCtor.displayName,
-          metaName      = mesaName && (mesaName + ".Meta");
+          instName      = SubInstCtor.name || SubInstCtor.displayName,
+          typeName      = instName && (instName + ".Type");
 
       var ka  = keyArgs ? Object.create(keyArgs) : {};
-      ka.mesa = SubInstCtor.prototype;
+      ka.instance = SubInstCtor.prototype;
 
-      this.Meta.extend(metaName, metaInstSpec, metaClassSpec, ka);
+      this.Type.extend(typeName, typeInstSpec, typeClassSpec, ka);
 
       SubInstCtor.mix(instSpec, classSpec);
     }
   });
 
-  ItemMeta._initInstCtor(Item);
+  Type._initInstCtor(Instance);
 
-  return Item;
+  return Instance;
 });

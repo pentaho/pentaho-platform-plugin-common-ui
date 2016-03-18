@@ -17,10 +17,10 @@ define([
   "../categoricalContinuousAbstract/model",
   "pentaho/i18n!../abstract/i18n/model",
   "../abstract/types/labelsOption",
-  "../abstract/mixins/settingsMultiChartMeta",
-  "../abstract/mixins/interpolationMeta"
+  "../abstract/mixins/settingsMultiChartType",
+  "../abstract/mixins/interpolationType"
 ], function(categoricalContinuousAbstractModelFactory, bundle, labelsOptionFactory,
-    settingsMultiChartMeta, interpolationMeta) {
+    settingsMultiChartType, interpolationType) {
 
   "use strict";
 
@@ -29,7 +29,7 @@ define([
     var CategoricalContinuousAbstract = context.get(categoricalContinuousAbstractModelFactory);
 
     return CategoricalContinuousAbstract.extend({
-        meta: {
+        type: {
           id: "pentaho/visual/ccc/areaStacked",
           v2Id: "ccc_area",
 
@@ -70,10 +70,10 @@ define([
           ]
         }
       })
-      .implement({meta: settingsMultiChartMeta})
-      .implement({meta: bundle.structured["settingsMultiChart"]})
-      .implement({meta: interpolationMeta})
-      .implement({meta: bundle.structured["interpolation"]})
-      .implement({meta: bundle.structured["areaStacked"]});
+      .implement({type: settingsMultiChartType})
+      .implement({type: bundle.structured["settingsMultiChart"]})
+      .implement({type: interpolationType})
+      .implement({type: bundle.structured["interpolation"]})
+      .implement({type: bundle.structured["areaStacked"]});
   };
 });

@@ -25,12 +25,12 @@ define([
 
   return function(context) {
 
-    var _elemMeta = null;
+    var _elemType = null;
 
     /**
-     * @name pentaho.type.Element.Meta
+     * @name pentaho.type.Element.Type
      * @class
-     * @extends pentaho.type.Value.Meta
+     * @extends pentaho.type.Value.Type
      *
      * @classDesc The base type class of *singular* value types.
      *
@@ -57,7 +57,7 @@ define([
      * @description Creates an element instance.
      */
     var Element = Value.extend("pentaho.type.Element", {
-      meta: /** @lends pentaho.type.Element.Meta# */{
+      type: /** @lends pentaho.type.Element.Type# */{
 
         id: module.id,
 
@@ -107,7 +107,7 @@ define([
 
         set format(value) {
           if(value == null) {
-            if(this !== _elemMeta) {
+            if(this !== _elemType) {
               delete this._format;
             }
           } else {
@@ -141,10 +141,10 @@ define([
         //endregion
       }
     }).implement({
-      meta: bundle.structured.element
+      type: bundle.structured.element
     });
 
-    _elemMeta = Element.meta;
+    _elemType = Element.type;
 
     return Element;
   };

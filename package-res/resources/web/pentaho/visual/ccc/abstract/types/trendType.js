@@ -25,13 +25,13 @@ define([
 
     return Refinement.extend({
 
-      meta:  {
+      type:  {
         id: "pentaho/visual/ccc/abstract/types/trendType",
         of: "string",
         facets: "DiscreteDomain",
         domain: ["none", "linear"]
       }
     })
-    .implement({meta: bundle.structured["trendType"]});
+    .implement({type: bundle.structured["trendType"]});
   };
 });

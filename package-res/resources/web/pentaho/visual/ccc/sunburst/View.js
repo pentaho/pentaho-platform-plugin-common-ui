@@ -143,9 +143,9 @@ define([
     },
 
     _configureDisplayUnits: function() {
-      var displayUnitsMeta = this.model.meta.get("displayUnits", true).type;
+      var displayUnitsType = this.model.type.get("displayUnits", true).type;
       var displayUnits = this.model.getv("displayUnits");
-      var scaleFactor = displayUnitsMeta.scaleFactorOf(displayUnits);
+      var scaleFactor = displayUnitsType.scaleFactorOf(displayUnits);
       if(scaleFactor > 1) {
         var dims = this.options.dimensions,
             dimSize = dims.size || (dims.size = {});

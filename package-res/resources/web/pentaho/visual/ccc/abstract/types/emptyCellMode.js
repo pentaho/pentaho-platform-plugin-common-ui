@@ -25,13 +25,13 @@ define([
 
     return Refinement.extend({
 
-      meta: {
+      type: {
         id: "pentaho/visual/ccc/abstract/types/emptyCellMode",
         of: "string",
         facets: ["DiscreteDomain"],
         domain: ["gap", "linear", "zero"]
       }
     })
-    .implement({meta: bundle.structured["emptyCellMode"]});
+    .implement({type: bundle.structured["emptyCellMode"]});
   };
 });

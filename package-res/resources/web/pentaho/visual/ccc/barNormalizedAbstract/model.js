@@ -26,7 +26,7 @@ define([
     var BarAbstract = context.get(barAbstractModelFactory);
 
     return BarAbstract.extend({
-      meta: {
+      type: {
         id: "pentaho/visual/ccc/barNormalizedAbstract",
         isAbstract: true,
 
@@ -49,6 +49,6 @@ define([
       }
       
     })
-    .implement({meta: bundle.structured["barNormalizedAbstract"]});
+    .implement({type: bundle.structured["barNormalizedAbstract"]});
   };
 });

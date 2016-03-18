@@ -25,13 +25,13 @@ define([
 
     return Refinement.extend({
 
-      meta: {
+      type: {
         id: "pentaho/visual/ccc/abstract/types/multiChartRangeScope",
         of: "string",
         facets: ["DiscreteDomain"],
         domain: ["global", "cell"]
       }
     })
-    .implement({meta: bundle.structured["multiChartRangeScope"]});
+    .implement({type: bundle.structured["multiChartRangeScope"]});
   };
 });

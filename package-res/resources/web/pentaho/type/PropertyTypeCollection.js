@@ -24,7 +24,7 @@ define([
   "use strict";
 
   /**
-   * @name PropertyMetaCollection
+   * @name PropertyTypeCollection
    * @memberOf pentaho.type
    * @class
    * @extends pentaho.lang.Collection
@@ -38,27 +38,27 @@ define([
    * @see pentaho.type.Property
    * @ignore
    */
-  return Collection.extend("pentaho.type.PropertyMetaCollection",
-      /** @lends pentaho.type.PropertyMetaCollection# */{
+  return Collection.extend("pentaho.type.PropertyTypeCollection",
+      /** @lends pentaho.type.PropertyTypeCollection# */{
 
     /**
      * Initializes a property collection.
      *
-     * @param {pentaho.type.Complex.Meta} declaringMeta The metadata of the declaring complex type.
+     * @param {pentaho.type.Complex.Type} declaringType The declaring complex type.
      * @ignore
      */
-    constructor: function(declaringMeta) {
-      if(!declaringMeta) throw error.argRequired("declaringMeta");
+    constructor: function(declaringType) {
+      if(!declaringType) throw error.argRequired("declaringType");
 
       this._cachedKeyArgs = {
-        declaringMeta: declaringMeta,
+        declaringType: declaringType,
         index:  -1,
         isRoot: false
       };
 
       // Copy the declaring complex type's ancestor's properties.
-      var ancestorMeta = declaringMeta.ancestor,
-          colBase = ancestorMeta && ancestorMeta._getProps && ancestorMeta._getProps();
+      var ancestorType = declaringType.ancestor,
+          colBase = ancestorType && ancestorType._getProps && ancestorType._getProps();
 
       if(colBase) {
         // Backup any provided specs.
@@ -82,10 +82,10 @@ define([
     },
 
     //region List implementation
-    elemClass: Property.Meta,
+    elemClass: Property.Type,
 
     /**
-     * Add a pentaho.type.UPropertyMeta to the properties collection.
+     * Add a pentaho.type.UPropertyType to the properties collection.
      *
      * This method allows adding elements to the collection using custom options (keyword arguments).
      *
@@ -102,7 +102,7 @@ define([
         // An object spec? Otherwise it's a noop - nothing to configure or override.
         // Configure existing local property or override inherited one.
         if(spec !== name) {
-          if(existing.declaringType === this._cachedKeyArgs.declaringMeta)
+          if(existing.declaringType === this._cachedKeyArgs.declaringType)
             existing.extend(spec);
           else
             this.replace(spec, this.indexOf(existing));
@@ -116,7 +116,7 @@ define([
     },
 
     /**
-     * Replace a pentaho.type.UPropertyMeta in the properties collection.
+     * Replace a pentaho.type.UPropertyType in the properties collection.
      *
      * This method allows replacing elements in the collection using custom options (keyword arguments).
      *
@@ -134,7 +134,7 @@ define([
 
       var ka = this._cachedKeyArgs;
 
-      if(existing.declaringType === ka.declaringMeta) {
+      if(existing.declaringType === ka.declaringType) {
         // Configure existing local property and cancel replace.
         // If spec is not an object, then it's a noop.
         if(spec !== name) existing.extend(spec);
@@ -142,13 +142,13 @@ define([
       }
 
       // Replace with overridden property.
-      return Property.extendProto(existing.mesa, {meta: spec}, ka).meta;
+      return Property.extendProto(existing.instance, {type: spec}, ka).type;
     },
 
     /**
      * Cast a property from the collection.
      *
-     * The cast is called to convert specs of properties which are new (not an override) into a Property.Meta instance
+     * The cast is called to convert specs of properties which are new (not an override) into a Property.Type instance
      *
      * @param {string} spec The name of the property.
      * @param {string} index The location of the property in the collection.
@@ -164,7 +164,7 @@ define([
       ka.index = index;
       ka.isRoot = true;
 
-      var pm = Property.extendProto(null, {meta: spec}, ka).meta;
+      var pm = Property.extendProto(null, {type: spec}, ka).type;
 
       ka.index = -1;
       ka.isRoot = false;
@@ -178,8 +178,8 @@ define([
      * Configures the properties collection.
      *
      * The configuration can be:
-     * 1. an array of {@link pentaho.type.UPropertyMeta}, or
-     * 2. an object whose keys are the property names and the values are {@link pentaho.type.UPropertyMeta},
+     * 1. an array of {@link pentaho.type.UPropertyType}, or
+     * 2. an object whose keys are the property names and the values are {@link pentaho.type.UPropertyType},
      *    having no name or a name equal to the key.
      *
      * @param {Object} config The properties configuration.

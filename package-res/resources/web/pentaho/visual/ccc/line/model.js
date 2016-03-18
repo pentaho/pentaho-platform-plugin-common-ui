@@ -19,11 +19,11 @@ define([
   "../abstract/types/labelsOption",
   "../abstract/types/shape",
   "../abstract/types/lineWidth",
-  "../abstract/mixins/trendMeta",
-  "../abstract/mixins/settingsMultiChartMeta",
-  "../abstract/mixins/interpolationMeta"
+  "../abstract/mixins/trendType",
+  "../abstract/mixins/settingsMultiChartType",
+  "../abstract/mixins/interpolationType"
 ], function(visualFactory, bundle, labelsOptionFactory, shapeFactory, lineWidthFactory,
-    trendMeta, settingsMultiChartMeta, interpolationMeta) {
+    trendType, settingsMultiChartType, interpolationType) {
 
   "use strict";
 
@@ -33,7 +33,7 @@ define([
 
     return Visual.extend({
 
-        meta: {
+        type: {
           id: "pentaho/visual/ccc/line",
           v2Id: "ccc_line",
 
@@ -89,12 +89,12 @@ define([
         }
 
       })
-      .implement({meta: trendMeta})
-      .implement({meta: bundle.structured["trendMeta"]})
-      .implement({meta: settingsMultiChartMeta})
-      .implement({meta: bundle.structured["settingsMultiChart"]})
-      .implement({meta: interpolationMeta})
-      .implement({meta: bundle.structured["interpolation"]})
-      .implement({meta: bundle.structured["line"]});
+      .implement({type: trendType})
+      .implement({type: bundle.structured["trendType"]})
+      .implement({type: settingsMultiChartType})
+      .implement({type: bundle.structured["settingsMultiChart"]})
+      .implement({type: interpolationType})
+      .implement({type: bundle.structured["interpolation"]})
+      .implement({type: bundle.structured["line"]});
   };
 });

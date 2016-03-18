@@ -49,13 +49,14 @@ define([
        * @type boolean
        * @readonly
        */
-      meta: {
+
+      type: {
         id: module.id,
         styleClass: "pentaho-type-boolean",
         cast: Boolean
       }
     }).implement({
-      meta: bundle.structured["boolean"]
+      type: bundle.structured["boolean"]
     });
   };
 });

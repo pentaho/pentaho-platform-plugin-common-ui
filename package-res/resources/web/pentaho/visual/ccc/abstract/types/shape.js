@@ -25,13 +25,13 @@ define([
 
     return Refinement.extend({
 
-        meta: {
+        type: {
           id: "pentaho/visual/ccc/abstract/types/shape",
           of: "string",
           facets: ["DiscreteDomain"],
           domain:  ["none", "circle", "cross", "diamond", "square", "triangle"]
         }
       })
-      .implement({meta: bundle.structured["shape"]});
+      .implement({type: bundle.structured["shape"]});
   };
 });

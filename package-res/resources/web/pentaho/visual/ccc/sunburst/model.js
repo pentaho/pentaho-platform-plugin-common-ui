@@ -19,9 +19,9 @@ define([
   "../abstract/types/displayUnits",
   "../abstract/types/labelsOption",
   "../abstract/types/sliceOrder",
-  "../abstract/mixins/settingsMultiChartMeta"
+  "../abstract/mixins/settingsMultiChartType"
 ], function(abstractModelFactory, bundle, displayUnitsFactory, labelsOptionFactory, sliceOrderFactory,
-    settingsMultiChartMeta) {
+    settingsMultiChartType) {
 
   "use strict";
 
@@ -30,7 +30,7 @@ define([
     var Abstract = context.get(abstractModelFactory);
 
     return Abstract.extend({
-      meta: {
+      type: {
         id: "pentaho/visual/ccc/sunburst",
         v2Id: "ccc_sunburst",
 
@@ -82,8 +82,8 @@ define([
         ]
       }
     })
-    .implement({meta: settingsMultiChartMeta})
-    .implement({meta: bundle.structured["settingsMultiChart"]})
-    .implement({meta: bundle.structured["sunburst"]});
+    .implement({type: settingsMultiChartType})
+    .implement({type: bundle.structured["settingsMultiChart"]})
+    .implement({type: bundle.structured["sunburst"]});
   };
 });

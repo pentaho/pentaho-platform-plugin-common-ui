@@ -22,7 +22,7 @@
  *
  * ##### A _type id_ string
  *
- * A type's [id]{@link pentaho.type.Value.Meta#id},
+ * A type's [id]{@link pentaho.type.Type#id},
  * that must the id of a defined module in the AMD module system.
  *
  * If the id does not contain any "/" character,
@@ -60,7 +60,7 @@
  * The functions that create instance constructors of value types,
  * each time they are called,
  * for a given [context]{@link pentaho.type.Context}.
- * They have the signature {@link pentaho.type.Factory.<pentaho.type.Value>}.
+ * They have the signature {@link pentaho.type.Factory.<pentaho.type.Instance>}.
  *
  * The AMD module under the id of a value type _must_ return a type factory function.
  * A type factory can thus be obtained by requiring the AMD module that has the type's id:
@@ -90,7 +90,7 @@
  *
  *     // Derive and return the derived type constructor
  *     return MyBaseType.extend({
- *        meta: {
+ *        type: {
  *          id: "my/derived/type"
  *          // ...
  *        }
@@ -103,8 +103,8 @@
  *
  * ##### A _type_ object
  *
- * A type's metadata singleton object,
- * like `Number.meta`, where _Number_ is [Number]{@link pentaho.type.Number}.
+ * A type's singleton object,
+ * like `Number.type`, where _Number_ is [Number]{@link pentaho.type.Number}.
  *
  * Example:
  * ```js
@@ -112,10 +112,10 @@
  *   var context = new Context();
  *
  *   var PentahoNumber = context.get("pentaho/type/number");
- *   var numberMeta = PentahoNumber.meta;
+ *   var numberType = PentahoNumber.type;
  *
  *   // Get a number list type
- *   var NumberList = context.get([numberMeta]);
+ *   var NumberList = context.get([numberType]);
  *
  *   var numbers = new NumberList([1, 2, 3]);
  *
@@ -123,16 +123,15 @@
  * });
  * ```
  *
- * ##### A _generic type metadata specification_ object
+ * ##### A _generic type specification_ object
  *
- * A plain {@link Object} specification used to generically
- * describe the metadata of a type.
- * Satisfies the interface [spec.ITypeMeta]{@link pentaho.type.spec.ITypeMeta}.
+ * A plain {@link Object} specification used to generically describe a type.
+ * Satisfies the interface [spec.IType]{@link pentaho.type.spec.IType}.
  *
  * The special `base` attribute allows specifying the base type
  * and defaults to `"pentaho/type/complex"`.
- * Additional supported attributes are determined and processed by
- * the base value type's {@link pentaho.type.Value.Meta.extend} method.
+ * Any additional attributes are determined and processed by
+ * each type's {@link pentaho.type.Type.extend} method.
  *
  * Example:
  *
@@ -159,7 +158,7 @@
  * ##### A _list type shorthand specification_ array
  *
  * A shorter specification syntax to reference the _List_ type, or
- * derived list types of varied [element types]{@link pentaho.type.List.Meta#of}.
+ * derived list types of varied [element types]{@link pentaho.type.List.Type#of}.
  *
  * Example:
  *
@@ -179,7 +178,7 @@
  *   // Obtain a derived List type instance constructor
  *   // with Number as the element type
  *
- *   // Using the generic type metadata specification syntax
+ *   // Using the generic type specification syntax
  *   var NumberListA = context.get({base: "list", of: "number"});
  *
  *   // Using the shorthand syntax
@@ -202,10 +201,10 @@
  *
  * @typedef {string|
  *           pentaho.type.Factory|
- *           pentaho.type.Value.Meta|
  *           Class.<pentaho.type.Value>|
+ *           pentaho.type.Type|
  *           Array.<pentaho.type.spec.UTypeReference>|
- *           pentaho.type.spec.ITypeMeta} pentaho.type.spec.UTypeReference
+ *           pentaho.type.spec.IType} pentaho.type.spec.UTypeReference
  */
 
 

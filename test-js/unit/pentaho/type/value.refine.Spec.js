@@ -15,10 +15,9 @@
  */
 define([
   "pentaho/type/Context",
-  "pentaho/type/Item",
-  "pentaho/type/facets/Refinement",
-  "tests/pentaho/util/errorMatch"
-], function(Context, Item, RefinementFacet, errorMatch) {
+  "pentaho/type/Instance",
+  "pentaho/type/facets/Refinement"
+], function(Context, Instance, RefinementFacet) {
 
   "use strict";
 
@@ -35,22 +34,22 @@ define([
 
     it("should create a refinement type that extends Refinement", function() {
       var Facet = RefinementFacet.extend();
-      var RefinementType = Element.refine({meta: {facets: [Facet]}});
+      var RefinementType = Element.refine({type: {facets: [Facet]}});
 
       expect(RefinementType.prototype instanceof Refinement).toBe(true);
     });
 
     it("should create a refinement type that has this as `of`", function() {
       var Facet = RefinementFacet.extend();
-      var RefinementType = Element.refine({meta: {facets: [Facet]}});
+      var RefinementType = Element.refine({type: {facets: [Facet]}});
 
-      expect(RefinementType.meta.of).toBe(Element.meta);
+      expect(RefinementType.type.of).toBe(Element.type);
     });
 
     it("should create a refinement type that has the specified name", function() {
       var Facet = RefinementFacet.extend();
       var MyRefinement = Element.refine("FOOO", {
-        meta: {
+        type: {
           facets: [Facet]
         }
       });

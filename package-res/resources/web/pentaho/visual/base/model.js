@@ -248,7 +248,7 @@ define([
         },
         //endregion
 
-        meta:  /** @lends pentaho.visual.base.Model.Meta# */{
+        type:  /** @lends pentaho.visual.base.Model.Meta# */{
           id: "pentaho/visual/base",
           view: "View",
           isAbstract: true,
@@ -302,7 +302,7 @@ define([
         }
       })
       .implement(EventSource)
-      .implement({meta: bundle.structured});
+      .implement({type: bundle.structured});
 
     return Model;
 

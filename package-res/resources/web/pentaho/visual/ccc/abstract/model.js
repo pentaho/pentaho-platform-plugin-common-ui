@@ -37,7 +37,7 @@ define([
     var Abstract = context.get(abstractModelFactory);
 
     return Abstract.extend({
-      meta: {
+      type: {
         id: "pentaho/visual/ccc/abstract",
         isAbstract: true,
 
@@ -152,6 +152,6 @@ define([
       }
       
     })
-    .implement({meta: bundle.structured["abstract"]});
+    .implement({type: bundle.structured["abstract"]});
   };
 });

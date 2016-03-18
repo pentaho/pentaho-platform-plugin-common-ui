@@ -49,7 +49,7 @@ define([
      *
      * The domain attribute refines a type to a set of discrete values
      * whose type is that of the representation type,
-     * {@link pentaho.type.Refinement.Meta#of}.
+     * {@link pentaho.type.Refinement.Type#of}.
      *
      * If the ancestor refinement type has `domain` set,
      * the specified set of values must be a subset of those.

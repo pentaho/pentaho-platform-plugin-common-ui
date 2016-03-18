@@ -30,12 +30,12 @@ define([
   return function(context) {
 
     var Value = context.get("pentaho/type/value"),
-        _refinementMeta;
+        _refinementType;
 
     /**
-     * @name pentaho.type.Refinement.Meta
+     * @name pentaho.type.Refinement.Type
      * @class
-     * @extends pentaho.type.Value.Meta
+     * @extends pentaho.type.Value.Type
      *
      * @classDesc The type class of refinement types.
      *
@@ -74,8 +74,8 @@ define([
      *
      * A refinement type can be used wherever its representation type can be:
      *
-     * 1. as the [value type]{@link pentaho.type.Property.Meta#type} of a property, or
-     * 2. as the [element type]{@link pentaho.type.List.Meta#of} of a list.
+     * 1. as the [value type]{@link pentaho.type.Property.Type#type} of a property, or
+     * 2. as the [element type]{@link pentaho.type.List.Type#of} of a list.
      *
      * Besides supporting refined validation,
      * refinement types are also useful to enable more refined type configuration.
@@ -91,9 +91,9 @@ define([
      * actually calls the representation type's instance constructor under the hood,
      * and returns a direct instance of it instead.
      *
-     * ### Refinement type metadata
+     * ### Attributes of refinement types
      *
-     * A refinement type is a [Value]{@link pentaho.type.Value.Meta} type,
+     * A refinement type is a [Value]{@link pentaho.type.Value.Type} type,
      * and, as such, metadata can be specified for it.
      *
      * Conveniently,
@@ -101,26 +101,26 @@ define([
      * the value of the same attributes of its representation type.
      *
      * The inheritable metadata attributes are
-     * [label]{@link pentaho.type.Item.Meta#label},
-     * [description]{@link pentaho.type.Item.Meta#description},
-     * [category]{@link pentaho.type.Item.Meta#category},
-     * [helpUrl]{@link pentaho.type.Item.Meta#helpUrl},
-     * [isBrowsable]{@link pentaho.type.Item.Meta#isBrowsable},
-     * [isAdvanced]{@link pentaho.type.Item.Meta#isAdvanced},
-     * [ordinal]{@link pentaho.type.Item.Meta#ordinal}
+     * [label]{@link pentaho.type.Type#label},
+     * [description]{@link pentaho.type.Type#description},
+     * [category]{@link pentaho.type.Type#category},
+     * [helpUrl]{@link pentaho.type.Type#helpUrl},
+     * [isBrowsable]{@link pentaho.type.Type#isBrowsable},
+     * [isAdvanced]{@link pentaho.type.Type#isAdvanced},
+     * [ordinal]{@link pentaho.type.Type#ordinal}
      * and
-     * [view]{@link pentaho.type.Value.Meta#view},
+     * [view]{@link pentaho.type.Value.Type#view},
      *
-     * Although the [styleClass]{@link pentaho.type.Item.Meta#styleClass} attribute
+     * Although the [styleClass]{@link pentaho.type.Type#styleClass} attribute
      * isn't inheritable,
-     * the value of [inheritedStyleClasses]{@link pentaho.type.Item.Meta#inheritedStyleClasses}
+     * the value of [inheritedStyleClasses]{@link pentaho.type.Type#inheritedStyleClasses}
      * of the representation type
      * is included in
      * the value of `inheritedStyleClasses`
      * of the refinement type.
      *
      * Although, conceptually, a refinement type is always abstract,
-     * the refinement type's [isAbstract]{@link pentaho.type.Value.Meta#isAbstract} attribute,
+     * the refinement type's [isAbstract]{@link pentaho.type.Value.Type#isAbstract} attribute,
      * instead, more usefully indicates whether its representation type is abstract or not.
      *
      * ### Defining a refinement type
@@ -133,10 +133,10 @@ define([
      *
      * There are two ways to specify the additional validation constraints of a refinement type:
      *
-     * 1. Override the [_validate]{@link pentaho.type.Refinement.Meta#_validate} method
+     * 1. Override the [_validate]{@link pentaho.type.Refinement.Type#_validate} method
      *    and perform arbitrary validation
      * 2. Mix any number of **refinement facets** into the refinement type,
-     *    using property [facets]{@link pentaho.type.Refinement.Meta#facets},
+     *    using property [facets]{@link pentaho.type.Refinement.Type#facets},
      *    and specify the configuration attributes these define.
      *
      * The latter is the preferred method as the configuration attributes
@@ -160,7 +160,7 @@ define([
      *     // Call its refine method and return the
      *     // newly created refinement type's instance constructor
      *     return Number.refine("my.PositiveNumber", {
-     *       meta: {
+     *       type: {
      *         id: module.id,
      *         label: "Positive number",
      *
@@ -193,7 +193,7 @@ define([
      *     // Call its refine method and return the
      *     // newly created refinement type's instance constructor
      *     return Number.refine("my.PositiveNumber", {
-     *       meta: {
+     *       type: {
      *         id: module.id,
      *         label: "Positive number",
      *
@@ -223,7 +223,7 @@ define([
      *
      *     // Define a complex type
      *     return Complex.extend("my.Product", {
-     *       meta: {
+     *       type: {
      *         id: module.id,
      *         label: "My Product",
      *
@@ -259,18 +259,18 @@ define([
      */
     var Refinement = Value.extend("pentaho.type.Refinement", {
 
-      // Constructor always returns a mesa instance of `of`.
+      // Constructor always returns an instance Instance of type `of`.
       constructor: function() {
-        var refinedMeta = this.meta.of;
-        return refinedMeta.create.apply(refinedMeta, arguments);
+        var refinedType = this.type.of;
+        return refinedType.create.apply(refinedType, arguments);
       },
 
       // TODO: implement inheritedStyleClasses
 
-      meta: /** @lends pentaho.type.Refinement.Meta# */{
+      type: /** @lends pentaho.type.Refinement.Type# */{
 
-        // Note: constructor/_init only called on sub-classes of Refinement.Meta,
-        // and not on Refinement.Meta itself.
+        // Note: constructor/_init only called on sub-classes of Refinement.Type,
+        // and not on Refinement.Type itself.
         _init: function(instSpec) {
           this.base.apply(this, arguments);
 
@@ -357,7 +357,7 @@ define([
         /**
          * Gets the representation type refined by this refinement type.
          *
-         * @type {!(pentaho.type.Element.Meta|pentaho.type.List.Meta)}
+         * @type {!(pentaho.type.Element.Type|pentaho.type.List.Type)}
          * @readonly
          */
         get of() {
@@ -369,12 +369,12 @@ define([
           if(value == null) throw error.argRequired("of");
 
           // Value returns refinement === undefined...
-          var ofMeta = this.context.get(value).meta;
-          if(ofMeta.isRefinement !== false)
+          var ofType = this.context.get(value).type;
+          if(ofType.isRefinement !== false)
             throw error.argInvalidType("of", ["pentaho/type/element", "pentaho/type/list"]);
 
           // Throws when set again with a different value.
-          O.setConst(this, "_of", ofMeta);
+          O.setConst(this, "_of", ofType);
         },
         //endregion
 
@@ -438,9 +438,9 @@ define([
          *
          * A type is considered a subtype of itself.
          *
-         * A refinement type is a subtype of its representation type, [of]{@link pentaho.type.Refinement.Meta#of}.
+         * A refinement type is a subtype of its representation type, [of]{@link pentaho.type.Refinement.Type#of}.
          *
-         * @param {?pentaho.type.Item.Meta} superType The candidate super-type.
+         * @param {?pentaho.type.Type} superType The candidate super-type.
          * @return {boolean} `true` if this is a subtype of `superType` type, `false` otherwise.
          */
         isSubtypeOf: function(superType) {
@@ -456,7 +456,7 @@ define([
         },
 
         _resetLabel: function() {
-          if(this !== _refinementMeta) {
+          if(this !== _refinementType) {
             this.base();
           }
         },
@@ -471,7 +471,7 @@ define([
         },
 
         _resetDescription: function() {
-          if(this !== _refinementMeta) {
+          if(this !== _refinementType) {
             this.base();
           }
         },
@@ -486,7 +486,7 @@ define([
         },
 
         _resetCategory: function() {
-          if(this !== _refinementMeta) {
+          if(this !== _refinementType) {
             this.base();
           }
         },
@@ -501,7 +501,7 @@ define([
         },
 
         _resetHelpUrl: function() {
-          if(this !== _refinementMeta) {
+          if(this !== _refinementType) {
             this.base();
           }
         },
@@ -516,7 +516,7 @@ define([
         },
 
         _resetIsBrowsable: function() {
-          if(this !== _refinementMeta) {
+          if(this !== _refinementType) {
             this.base();
           }
         },
@@ -531,7 +531,7 @@ define([
         },
 
         _resetIsAdvanced: function() {
-          if(this !== _refinementMeta) {
+          if(this !== _refinementType) {
             this.base();
           }
         },
@@ -551,7 +551,7 @@ define([
         },
 
         _resetOrdinal: function() {
-          if(this !== _refinementMeta) {
+          if(this !== _refinementType) {
             this.base();
           }
         },
@@ -566,7 +566,7 @@ define([
         },
 
         _resetView: function() {
-          if(this !== _refinementMeta) {
+          if(this !== _refinementType) {
             this.base();
           }
         },
@@ -595,7 +595,7 @@ define([
          * The default implementation calls `value.validate()` and,
          * if the latter returns no errors,
          * additionally validates the value against this type's refinement conditions,
-         * by calling [_validate]{@link pentaho.type.Refinement.Meta#_validate}.
+         * by calling [_validate]{@link pentaho.type.Refinement.Type#_validate}.
          *
          * @param {!pentaho.type.Value} value The value to validate.
          *
@@ -604,8 +604,8 @@ define([
          * @overridable
          *
          * @see pentaho.type.Value#validate
-         * @see pentaho.type.Value.Meta#validate
-         * @see pentaho.type.Refinement.Meta#_validate
+         * @see pentaho.type.Value.Type#validate
+         * @see pentaho.type.Refinement.Type#_validate
          */
         validateInstance: function(value) {
           var errors = this.base(value);
@@ -621,7 +621,7 @@ define([
          * _a valid instance of its actual type_
          * is also a **valid instance** of this refinement type.
          *
-         * Thus, `this.is(value)` and `value.meta.isValid(value)` must be true.
+         * Thus, `this.is(value)` and `value.type.isValid(value)` must be true.
          *
          * The default implementation validates `value` against
          * registered refinement facets.
@@ -633,8 +633,8 @@ define([
          * @protected
          * @overridable
          *
-         * @see pentaho.type.Value.Meta#validate
-         * @see pentaho.type.Refinement.Meta#validateInstance
+         * @see pentaho.type.Value.Type#validate
+         * @see pentaho.type.Refinement.Type#validateInstance
          */
         _validate: function(value) {
           return this._validateFacets(value);
@@ -652,7 +652,7 @@ define([
          * is called and any reported errors collected.
          *
          * This method is called by the default implementation of
-         * [_validate]{@link pentaho.type.Refinement.Meta#_validate}.
+         * [_validate]{@link pentaho.type.Refinement.Type#_validate}.
          * It is provided just in case you need to override the latter implementation.
          *
          * @param {!pentaho.type.Value} value The value to validate.
@@ -674,7 +674,7 @@ define([
 
         // Refinement types cannot specify any instance property.
         for(var p in instSpec) // nully tolerant
-          if(p !== "meta")
+          if(p !== "type")
             throw error.operInvalid(bundle.structured.errors.refinement.cannotExtendInstance);
 
         return this.base.apply(this, arguments);
@@ -684,7 +684,7 @@ define([
       isRoot: true
     });
 
-    _refinementMeta = Refinement.meta;
+    _refinementType = Refinement.type;
 
     return Refinement;
   };

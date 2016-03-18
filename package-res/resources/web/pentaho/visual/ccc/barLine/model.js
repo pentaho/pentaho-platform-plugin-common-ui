@@ -19,9 +19,9 @@ define([
   "../abstract/types/labelsOption",
   "../abstract/types/shape",
   "../abstract/types/lineWidth",
-  "../abstract/mixins/interpolationMeta"
+  "../abstract/mixins/interpolationType"
 ], function(barAbstractModelFactory, bundle, labelsOptionFactory, shapeFactory, lineWidthFactory,
-    interpolationMeta) {
+    interpolationType) {
 
   "use strict";
 
@@ -36,7 +36,7 @@ define([
 
     return BarAbstract.extend({
 
-      meta: {
+      type: {
         id: "pentaho/visual/ccc/barLine",
         v2Id: "ccc_barline",
 
@@ -95,8 +95,8 @@ define([
         ]
       }
     })
-    .implement({meta: interpolationMeta})
-    .implement({meta: bundle.structured["interpolation"]})
-    .implement({meta: bundle.structured["barLine"]});
+    .implement({type: interpolationType})
+    .implement({type: bundle.structured["interpolation"]})
+    .implement({type: bundle.structured["barLine"]});
   };
 });

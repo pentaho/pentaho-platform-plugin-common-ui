@@ -26,7 +26,7 @@ define([
     var Abstract = context.get(abstractModelFactory);
 
     return Abstract.extend({
-      meta: {
+      type: {
         id: "pentaho/visual/ccc/cartesianAbstract",
         isAbstract: true,
 
@@ -55,6 +55,6 @@ define([
         ]
       }
     })
-    .implement({meta: bundle.structured["cartesianAbstract"]});
+    .implement({type: bundle.structured["cartesianAbstract"]});
   };
 });

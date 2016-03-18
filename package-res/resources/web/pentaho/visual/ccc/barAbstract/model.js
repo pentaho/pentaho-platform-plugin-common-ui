@@ -16,8 +16,8 @@
 define([
   "../categoricalContinuousAbstract/model",
   "pentaho/i18n!../abstract/i18n/model",
-  "../abstract/mixins/settingsMultiChartMeta"
-], function(categoricalContinuousAbstractModelFactory, bundle, settingsMultiChartMeta) {
+  "../abstract/mixins/settingsMultiChartType"
+], function(categoricalContinuousAbstractModelFactory, bundle, settingsMultiChartType) {
 
   "use strict";
 
@@ -26,7 +26,7 @@ define([
     var CategoricalContinuousAbstract = context.get(categoricalContinuousAbstractModelFactory);
 
     return CategoricalContinuousAbstract.extend({
-      meta: {
+      type: {
         id: "pentaho/visual/ccc/barAbstract",
         isAbstract: true,
 
@@ -55,8 +55,8 @@ define([
       }
       
     })
-    .implement({meta: settingsMultiChartMeta})
-    .implement({meta: bundle.structured["settingsMultiChart"]})
-    .implement({meta: bundle.structured["barAbstract"]});
+    .implement({type: settingsMultiChartType})
+    .implement({type: bundle.structured["settingsMultiChart"]})
+    .implement({type: bundle.structured["barAbstract"]});
   };
 });

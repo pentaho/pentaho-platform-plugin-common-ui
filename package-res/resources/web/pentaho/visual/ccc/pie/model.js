@@ -17,8 +17,8 @@ define([
   "../categoricalContinuousAbstract/model",
   "pentaho/i18n!../abstract/i18n/model",
   "../abstract/types/labelsOption",
-  "../abstract/mixins/settingsMultiChartMeta"
-], function(visualFactory, bundle, labelsOptionFactory, settingsMultiChartMeta) {
+  "../abstract/mixins/settingsMultiChartType"
+], function(visualFactory, bundle, labelsOptionFactory, settingsMultiChartType) {
 
   "use strict";
 
@@ -28,7 +28,7 @@ define([
 
     return Visual.extend({
 
-        meta: {
+        type: {
           id: "pentaho/visual/ccc/pie",
           v2Id: "ccc_pie",
 
@@ -62,8 +62,8 @@ define([
           ]
         }
       })
-      .implement({meta: settingsMultiChartMeta})
-      .implement({meta: bundle.structured["settingsMultiChart"]})
-      .implement({meta: bundle.structured["pie"]});
+      .implement({type: settingsMultiChartType})
+      .implement({type: bundle.structured["settingsMultiChart"]})
+      .implement({type: bundle.structured["pie"]});
   };
 });

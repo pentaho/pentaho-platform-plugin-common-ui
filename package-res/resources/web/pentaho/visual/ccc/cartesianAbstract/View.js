@@ -108,8 +108,8 @@ define([
 
       var propName = "displayUnits" + (primary ? "" : "Secondary"),
           displayUnitsElem = this.model.get(propName),
-          displayUnitsMeta = this.model.meta.get(propName).type,
-          scaleFactor = displayUnitsMeta.scaleFactorOf(displayUnitsElem.value);
+          displayUnitsType = this.model.type.get(propName).type,
+          scaleFactor = displayUnitsType.scaleFactorOf(displayUnitsElem.value);
 
       this._cartesianAxesDisplayUnitsText[axisType] = scaleFactor > 1 ? displayUnitsElem.toString() : "";
     }

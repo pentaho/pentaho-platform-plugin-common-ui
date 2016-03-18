@@ -49,13 +49,14 @@ define([
        * @type number
        * @readonly
        */
-      meta: {
+
+      type: {
         id: module.id,
         styleClass: "pentaho-type-number",
         cast: toNumber
       }
     }).implement({
-      meta: bundle.structured["number"]
+      type: bundle.structured["number"]
     });
 
     function toNumber(v) {

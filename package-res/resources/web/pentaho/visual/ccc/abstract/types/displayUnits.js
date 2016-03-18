@@ -25,7 +25,7 @@ define([
 
     return Refinement.extend({
 
-      meta: {
+      type: {
         id: "pentaho/visual/ccc/abstract/types/displayUnits",
         of: "string",
         facets: ["DiscreteDomain"],
@@ -48,6 +48,6 @@ define([
         }
       }
     })
-    .implement({meta: bundle.structured["displayUnits"]});
+    .implement({type: bundle.structured["displayUnits"]});
   };
 });

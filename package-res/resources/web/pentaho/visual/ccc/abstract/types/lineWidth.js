@@ -25,13 +25,13 @@ define([
 
     return Refinement.extend({
 
-      meta: {
+      type: {
         id: "pentaho/visual/ccc/abstract/types/lineWidth",
         of: "number",
         facets: ["DiscreteDomain"],
         domain: [1, 2, 3, 4, 5, 6, 7, 8]
       }
     })
-    .implement({meta: bundle.structured["lineWidth"]});
+    .implement({type: bundle.structured["lineWidth"]});
   };
 });

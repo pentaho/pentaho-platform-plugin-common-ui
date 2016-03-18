@@ -15,12 +15,14 @@
  */
 
 /**
- * The `spec.ITypeMeta` interface represents the metadata used to
- * define a type.
+ * A `spec.UPropertyType` represents the union of JS types that can be used to
+ * define a property of a complex type.
  *
- * @name pentaho.type.spec.ITypeMeta
+ * When the value is a string,
+ * it's taken to represent a property
+ * whose {@link pentaho.type.spec.IPropertyType#name} is that string
+ * and
+ * whose {@link pentaho.type.spec.IPropertyType#type} is {@link pentaho.type.string}.
  *
- * @interface
- *
- * @property {string} [id] The id of the corresponding AMD module, if any.
+ * @typedef {string|pentaho.type.spec.IPropertyType} pentaho.type.spec.UPropertyType
  */

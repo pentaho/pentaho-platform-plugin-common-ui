@@ -15,9 +15,9 @@
  */
 define([
   "pentaho/type/Context",
-  "pentaho/type/Item",
+  "pentaho/type/Instance",
   "pentaho/type/facets/Refinement"
-], function(Context, Item, RefinementFacet) {
+], function(Context, Instance, RefinementFacet) {
 
   "use strict";
 
@@ -27,29 +27,29 @@ define([
       Simple  = context.get("pentaho/type/simple"),
       Refinement = context.get("pentaho/type/refinement");
 
-  describe("pentaho.type.Refinement.Meta -", function() {
+  describe("pentaho.type.Refinement.Type -", function() {
 
     var MySimple = Simple.extend();
 
     describe("#validate(value) -", function() {
-      it("should call #is(value) and value.meta._validate(value)", function() {
+      it("should call #is(value) and value.type._validate(value)", function() {
         var MyRefinement = Refinement.extend({
-          meta: {
-            of: MySimple.meta
+          type: {
+            of: MySimple.type
           }
         });
 
         var value = new MySimple(123);
 
-        spyOn(MyRefinement.meta, "is").and.callThrough();
-        spyOn(MyRefinement.meta, "validateInstance").and.callThrough();
+        spyOn(MyRefinement.type, "is").and.callThrough();
+        spyOn(MyRefinement.type, "validateInstance").and.callThrough();
 
-        spyOn(MySimple.meta, "_validate").and.callThrough();
+        spyOn(MySimple.type, "_validate").and.callThrough();
 
-        MyRefinement.meta.validate(value);
+        MyRefinement.type.validate(value);
 
-        expect(MyRefinement.meta.is.calls.count()).toBe(1);
-        expect(MySimple.meta._validate.calls.count()).toBe(1);
+        expect(MyRefinement.type.is.calls.count()).toBe(1);
+        expect(MySimple.type._validate.calls.count()).toBe(1);
       });
 
       it("should return immediately if base validation fails", function() {
@@ -58,24 +58,24 @@ define([
         });
 
         var MyRefinement = Refinement.extend({
-          meta: {
-            of: MySimple.meta,
+          type: {
+            of: MySimple.type,
             facets: [Facet]
           }
         });
 
         var value = new MySimple(123);
 
-        spyOn(Refinement.meta, "_validateFacets").and.callThrough();
-        spyOn(MySimple.meta, "_validate").and.returnValue(new Error());
+        spyOn(Refinement.type, "_validateFacets").and.callThrough();
+        spyOn(MySimple.type, "_validate").and.returnValue(new Error());
         spyOn(Facet, "validate").and.callThrough();
 
-        var result = MyRefinement.meta.validate(value);
+        var result = MyRefinement.type.validate(value);
 
         expect(result instanceof Array).toBe(true);
         expect(result.length).toBe(1);
-        expect(MySimple.meta._validate).toHaveBeenCalled();
-        expect(Refinement.meta._validateFacets).not.toHaveBeenCalled();
+        expect(MySimple.type._validate).toHaveBeenCalled();
+        expect(Refinement.type._validateFacets).not.toHaveBeenCalled();
         expect(Facet.validate).not.toHaveBeenCalled();
       });
 
@@ -89,8 +89,8 @@ define([
         });
 
         var MyRefinement = Refinement.extend({
-          meta: {
-            of: MySimple.meta,
+          type: {
+            of: MySimple.type,
             facets: [Facet1, Facet2]
           }
         });
@@ -100,7 +100,7 @@ define([
         spyOn(Facet1, "validate").and.callThrough();
         spyOn(Facet2, "validate").and.callThrough();
 
-        var result = MyRefinement.meta.validate(value);
+        var result = MyRefinement.type.validate(value);
 
         expect(result).toBe(null);
         expect(Facet1.validate.calls.count()).toBe(1);
@@ -127,14 +127,14 @@ define([
         });
 
         var MyRefinement = Refinement.extend({
-          meta: {
-            of: MySimple.meta,
+          type: {
+            of: MySimple.type,
             facets: [Facet1, Facet2, Facet3]
           }
         });
 
         var value = new MySimple(123);
-        var result = MyRefinement.meta.validate(value);
+        var result = MyRefinement.type.validate(value);
 
         expect(result instanceof Array).toBe(true);
         expect(result.length).toBe(5);

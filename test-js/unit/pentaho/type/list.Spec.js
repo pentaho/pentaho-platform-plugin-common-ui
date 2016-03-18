@@ -68,7 +68,7 @@ define([
   }
 
   var NumberList = List.extend({
-    meta: {of: PentahoNumber}
+    type: {of: PentahoNumber}
   });
 
   describe("pentaho.type.List -", function() {
@@ -82,29 +82,29 @@ define([
       // NOTE: see also refinement.Spec.js, list usage unit tests
 
       it("accepts an `of` property be given a type derived from `Element`", function() {
-        expect(NumberList.meta.of).toBe(PentahoNumber.meta);
+        expect(NumberList.type.of).toBe(PentahoNumber.type);
       });
 
       it("should throw if given a nully `of` property", function() {
         expect(function() {
           List.extend({
-            meta: {of: null}
+            type: {of: null}
           });
         }).toThrow(errorMatch.argRequired("of"));
       });
 
       it("should inherit the base `of` when unspecified or undefined", function() {
         var DerivedList = List.extend();
-        expect(DerivedList.meta.of).toBe(List.meta.of);
+        expect(DerivedList.type.of).toBe(List.type.of);
 
-        DerivedList = List.extend({meta: {of: undefined}});
-        expect(DerivedList.meta.of).toBe(List.meta.of);
+        DerivedList = List.extend({type: {of: undefined}});
+        expect(DerivedList.type.of).toBe(List.type.of);
       });
 
       it("should throw if given a null `of` property", function() {
         expect(function() {
           List.extend({
-            meta: {of: null}
+            type: {of: null}
           });
         }).toThrow(errorMatch.argRequired("of"));
       });
@@ -112,7 +112,7 @@ define([
       it("should throw if given an `of` property of a type not a subtype of `Element`", function() {
         expect(function() {
           List.extend({
-            meta: {of: Value}
+            type: {of: Value}
           });
         }).toThrow(errorMatch.argInvalid("of"));
       });
@@ -121,16 +121,16 @@ define([
         var SubList = List.extend();
 
         expect(function() {
-          SubList.meta.of = PentahoNumber;
+          SubList.type.of = PentahoNumber;
         }).toThrow(errorMatch.operInvalid());
       });
 
       it("should not throw if set to the same value", function() {
         var SubList = List.extend();
 
-        var elemMeta = SubList.meta.of;
-        SubList.meta.of = elemMeta;
-        expect(SubList.meta.of).toBe(elemMeta);
+        var elemType = SubList.type.of;
+        SubList.type.of = elemType;
+        expect(SubList.type.of).toBe(elemType);
       });
     });
 
@@ -1164,16 +1164,16 @@ define([
       });
     });
 
-    describe("Meta -", function() {
+    describe("Type -", function() {
       describe("#isList -", function() {
         it("should return the value `true`", function() {
-          expect(List.meta.isList).toBe(true);
+          expect(List.type.isList).toBe(true);
         });
       });
 
       describe("#isRefinement -", function() {
         it("should return the value `false`", function() {
-          expect(List.meta.isRefinement).toBe(false);
+          expect(List.type.isRefinement).toBe(false);
         });
       });
     });

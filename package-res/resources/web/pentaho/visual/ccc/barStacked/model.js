@@ -27,7 +27,7 @@ define([
     var BarAbstract = context.get(barAbstractModelFactory);
 
     return BarAbstract.extend({
-        meta: {
+        type: {
           id: "pentaho/visual/ccc/barStacked",
           v2Id: "ccc_barstacked",
 
@@ -51,6 +51,6 @@ define([
           ]
         }
     })
-    .implement({meta: bundle.structured["barStacked"]});
+    .implement({type: bundle.structured["barStacked"]});
   };
 });

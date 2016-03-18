@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 define([
-  "./Item",
+  "./Instance",
   "./valueHelper",
   "../i18n!types",
   "../lang/_AnnotatableLinked",
@@ -23,16 +23,16 @@ define([
   "../util/object",
   "../util/text",
   "../util/fun"
-], function(Item, valueHelper, bundle, AnnotatableLinked, arg, error, O, text, F) {
+], function(Instance, valueHelper, bundle, AnnotatableLinked, arg, error, O, text, F) {
 
   "use strict";
 
-  var _propertyMeta;
+  var _propType;
   /**
    * @name pentaho.type.Property
    *
    * @class
-   * @extends pentaho.type.Item
+   * @extends pentaho.type.Instance
    *
    * @classdesc A property of a complex value.
    *
@@ -42,42 +42,41 @@ define([
    */
 
   /**
-   * @name pentaho.type.Property.Meta
+   * @name pentaho.type.Property.Type
    *
    * @class
-   * @extends pentaho.type.Item.Meta
+   * @extends pentaho.type.Type
    *
    * @implements pentaho.lang.IWithKey
    * @implements pentaho.lang.IListElement
    * @implements pentaho.lang.ICollectionElement
    *
-   * @classdesc The metadata of a property of a complex type.
+   * @classdesc The type of a property of a complex type.
    *
-   * A _Property_ only exists within a _complex_ item.
+   * A _property type_ only exists within a _complex type_.
    *
-   * @description Creates a property metadata instance.
+   * @description Creates a property type object.
    *
    * This constructor is used internally by the `pentaho/type` package and
    * should not be used directly.
    *
    * @see pentaho.type.Complex
    */
-  var Property = Item.extend("pentaho.type.Property", /** @lends pentaho.type.Property# */{
+  var Property = Instance.extend("pentaho.type.Property", /** @lends pentaho.type.Property# */{
 
     // TODO: value, members?
     // TODO: p -> AnnotatableLinked.configure(this, config);
 
-    meta: /** @lends pentaho.type.Property.Meta# */{
-      // Note: constructor/_init is only called on sub-classes of Property.Meta,
-      // and not on Property.Meta itself.
+    type: /** @lends pentaho.type.Property.Type# */{
+      // Note: constructor/_init is only called on sub-classes of Property.Type,
+      // and not on Property.Type itself.
 
       /**
-       * Initializes a property metadata instance, given a property specification.
+       * Initializes a property type object, given a property type specification.
        *
-       * @param {pentaho.type.spec.UPropertyMeta} spec A property name or specification object.
+       * @param {pentaho.type.spec.UPropertyType} spec A property name or type specification.
        * @param {!Object} keyArgs Keyword arguments.
-       * @param {!pentaho.type.Complex.Meta} keyArgs.declaringMeta The metadata class of the complex type
-       *    that declares the property.
+       * @param {!pentaho.type.Complex.Type} keyArgs.declaringType The complex type that declares the property.
        * @param {number} keyArgs.index The index of the property within its complex type.
        * @ignore
        */
@@ -92,10 +91,9 @@ define([
        * Performs initialization tasks that take place before the instance is
        * extended with its spec.
        *
-       * @param {pentaho.type.spec.UPropertyMeta} spec A property name or specification object.
+       * @param {pentaho.type.spec.UPropertyType} spec A property name or specification object.
        * @param {!Object} keyArgs Keyword arguments.
-       * @param {!pentaho.type.Complex.Meta} keyArgs.declaringMeta The metadata class of the complex type
-       *    that declares the property.
+       * @param {!pentaho.type.Complex.Type} keyArgs.declaringType The complex type that declares the property.
        * @param {number} keyArgs.index The index of the property within its complex type.
        * @protected
        * @ignore
@@ -106,7 +104,7 @@ define([
 
         // TODO: Validate same context as base?
 
-        O.setConst(this, "_declaringMeta", arg.required(keyArgs, "declaringMeta", "keyArgs"));
+        O.setConst(this, "_declaringType", arg.required(keyArgs, "declaringType", "keyArgs"));
 
         if(this.isRoot) O.setConst(this, "_index", keyArgs.index || 0);
       },
@@ -120,14 +118,14 @@ define([
           if(!this._name) this.name = null; // throws...
 
           // Force assuming default values
-          if(!this._typeMeta) this.type = null;
+          if(!this._type) this.type = null;
           if(!this._label)    this._resetLabel();
         }
       },
 
       //region IListElement
       /**
-       * Gets the singular name of `Property.Meta` list-elements.
+       * Gets the singular name of `Property.Type` list-elements.
        * @type string
        * @readonly
        * @default "property"
@@ -137,7 +135,7 @@ define([
 
       //region IWithKey implementation
       /**
-       * Gets the singular name of `Property.Meta` keys.
+       * Gets the singular name of `Property.Type` keys.
        * @type string
        * @readonly
        * @default "name"
@@ -170,19 +168,19 @@ define([
        * @readonly
        */
       get context() {
-        return this._declaringMeta.context;
+        return this._declaringType.context;
       },
       //endregion
 
       //region declaringType attribute
       /**
-       * Gets the metadata of the complex type that declares this property.
+       * Gets the complex type that declares this property type.
        *
-       * @type pentaho.type.Complex.Meta
+       * @type pentaho.type.Complex.Type
        * @readonly
        */
       get declaringType() {
-        return this._declaringMeta;
+        return this._declaringType;
       },
       //endregion
 
@@ -242,14 +240,14 @@ define([
        * Gets a value that indicates if the property is a _list_.
        *
        * A property is a _list_ property if its value type,
-       * {@link pentaho.type.Property.Meta#type}, is a list type,
+       * {@link pentaho.type.Property.Type#type}, is a list type,
        * i.e., if it is or extends {@link pentaho.type.List}.
        *
        * @type boolean
        * @readonly
        */
       get isList() {
-        return this._typeMeta.isList;
+        return this._type.isList;
       },
       //endregion
 
@@ -259,17 +257,17 @@ define([
        *
        * When the property is a list property,
        * that list type's element type,
-       * {@link pentaho.type.List.Meta#of},
+       * {@link pentaho.type.List.Type#of},
        * is returned.
        *
        * Otherwise,
        * {@link pentaho.type.Property.type} is returned.
        *
-       * @type !pentaho.type.Element.Meta
+       * @type !pentaho.type.Element.Type
        * @readonly
        */
       get elemType() {
-        var type = this._typeMeta;
+        var type = this._type;
         return type.isList ? type.of : type;
       },
       //endregion
@@ -278,11 +276,11 @@ define([
       /**
        * Gets the base type of the value that the property can hold.
        *
-       * @type !pentaho.type.Value.Meta
+       * @type !pentaho.type.Value.Type
        * @readonly
        */
       get type() {
-        return this._typeMeta;
+        return this._type;
       },
 
       /**
@@ -294,26 +292,26 @@ define([
       set type(value) {
         // Resolves types synchronously.
         if(this.isRoot) {
-          this._typeMeta = this.context.get(value).meta;
+          this._type = this.context.get(value).type;
         } else {
           // Can be changed
 
           // Delete any inherited value.
-          delete this._typeMeta;
+          delete this._type;
 
           if(value != null) {
-            var typeMeta = this.context.get(value).meta,
-                baseMeta = this._typeMeta;
+            var type = this.context.get(value).type,
+                baseType = this._type;
 
             // Hierarchy/PreviousValue consistency
             // Validate that it is a sub-type of the base property's type
             // or a refinement type whose `of` is the base type.
-            // (which can only happen if baseMeta itself is not a refinement type).
-            if(typeMeta !== baseMeta) {
-              if(!typeMeta.isSubtypeOf(baseMeta))
+            // (which can only happen if baseType itself is not a refinement type).
+            if(type !== baseType) {
+              if(!type.isSubtypeOf(baseType))
                 throw error.argInvalid("type", bundle.structured.errors.property.typeNotSubtypeOfBaseType);
 
-              this._typeMeta = typeMeta;
+              this._type = type;
             }
           }
         }
@@ -333,7 +331,7 @@ define([
        * and forces not having a _default value_.
        *
        * Any other set values must be _convertible_ to
-       * the property's value type, {@link pentaho.type.Property.Meta#type}.
+       * the property's value type, {@link pentaho.type.Property.Type#type}.
        *
        * The default _default value_ of a property is
        * that of its ancestor property,
@@ -352,7 +350,7 @@ define([
       // or PhantomJS 1.9.8 will throw a syntax error...
       set value(_) {
         if(_ === undefined) {
-          if(this !== _propertyMeta) {
+          if(this !== _propType) {
             // Clear local value. Inherit base value.
             delete this._value;
           }
@@ -370,7 +368,7 @@ define([
        *
        * By default, a {@link Nully} value is converted to
        * (a clone of) the property's default value,
-       * {@link pentaho.type.Property.Meta#value}.
+       * {@link pentaho.type.Property.Type#value}.
        *
        * @param {?any} valueSpec A value or value specification.
        * @param {boolean} [noDefault=false] Indicates if {@link Nully} values
@@ -431,12 +429,12 @@ define([
        *
        * This method first ensures the value of the property is consistent with its type.
        * Afterwards, the cardinality is verified against the attributes
-       * {@link pentaho.type.Property.Meta#countMin} and {@link pentaho.type.Property.Meta#countMax}.
+       * {@link pentaho.type.Property.Type#countMin} and {@link pentaho.type.Property.Type#countMax}.
        *
        * @param {pentaho.type.Complex} owner The complex value that owns the property.
        * @return {?Array.<!Error>} A non-empty array of `Error` or `null`.
        *
-       * @see pentaho.type.Complex.Meta#_validate
+       * @see pentaho.type.Complex.Type#_validate
        */
       validate: function(owner) {
         var errors = null;
@@ -486,7 +484,7 @@ define([
        *
        * This setter is used when the developer is extending Property to support new attributes.
        *
-       * @type pentaho.type.spec.IPropertyMeta
+       * @type pentaho.type.spec.IPropertyType
        * @ignore
        */
       set attrs(attrSpecs) {
@@ -499,7 +497,7 @@ define([
        * Dynamically defines an attribute and corresponding setter and getter methods.
        *
        * This method is an implementation detail,
-       * ans is invoked by {pentaho.type.Property.Meta#attrs}
+       * ans is invoked by {pentaho.type.Property.Type#attrs}
        *
        * @param {String} name
        * @param {} spec
@@ -564,16 +562,16 @@ define([
         };
       }
       //endregion
-    } // end instance meta:
+    } // end instance type:
   }).implement({
-    meta: /** @lends pentaho.type.Property.Meta# */{
+    type: /** @lends pentaho.type.Property.Type# */{
       attrs: {
         /**
          * Evaluates the value of the `isRequired` attribute of this property
          * on a given owner complex value.
          *
          * @name isRequiredEval
-         * @memberOf pentaho.type.Property.Meta#
+         * @memberOf pentaho.type.Property.Type#
          * @param {pentaho.type.Complex} owner The complex value that owns the property.
          * @return {boolean} The evaluated value of the `isRequired` attribute.
          * @ignore
@@ -584,7 +582,7 @@ define([
          *
          * This attribute is *dynamic*:
          * 1. when a function is specified, it is dynamically evaluated for each complex instance
-         * 2. affects only the _local_ value of the attribute metadata
+         * 2. affects only the _local_ attribute value
          * 3. inheritance takes place only when the attribute is evaluated
          *    in the context of a given complex instance.
          *
@@ -595,14 +593,14 @@ define([
          * the evaluated value inherited from its ancestor.
          *
          * This and other attributes are combined to evaluate the resulting _effective value count range_.
-         * See {@link pentaho.type.Property.Meta#countRangeEval}.
+         * See {@link pentaho.type.Property.Type#countRangeEval}.
          *
          * Setting the attribute to `null` or `undefined` clears the local value.
          *
          * The default, root `isRequired` attribute value is `false`.
          *
          * @name isRequired
-         * @memberOf pentaho.type.Property.Meta#
+         * @memberOf pentaho.type.Property.Type#
          * @type null | boolean | pentaho.type.PropertyDynamicAttribute.<boolean>
          * @see pentaho.type.Complex#isRequired
          */
@@ -622,7 +620,7 @@ define([
          * on a given owner complex value.
          *
          * @name countMinEval
-         * @memberOf pentaho.type.Property.Meta#
+         * @memberOf pentaho.type.Property.Type#
          * @param {pentaho.type.Complex} owner The complex value that owns the property.
          * @return {number} The evaluated value of the `countMin` attribute.
          * @ignore
@@ -635,7 +633,7 @@ define([
          *
          * This attribute is *dynamic*:
          * 1. when a function is specified, it is dynamically evaluated for each complex instance
-         * 2. affects only the _local_ value of the attribute metadata
+         * 2. affects only the _local_ attribute value
          * 3. inheritance takes place only when the attribute is evaluated
          *    in the context of a given complex instance.
          *
@@ -644,14 +642,14 @@ define([
          * the evaluated value inherited from its ancestor.
          *
          * This and other attributes are combined to evaluate the resulting _effective value count range_.
-         * See {@link pentaho.type.Property.Meta#countRangeEval}.
+         * See {@link pentaho.type.Property.Type#countRangeEval}.
          *
          * Setting the attribute to `null` or `undefined` clears the local value.
          *
          * The default, root `countMin` attribute value is `0`.
          *
          * @name countMin
-         * @memberOf pentaho.type.Property.Meta#
+         * @memberOf pentaho.type.Property.Type#
          * @type number | pentaho.type.PropertyDynamicAttribute.<number>
          * @see pentaho.type.Complex#countRange
          */
@@ -670,7 +668,7 @@ define([
          * on a given owner complex value.
          *
          * @name countMaxEval
-         * @memberOf pentaho.type.Property.Meta#
+         * @memberOf pentaho.type.Property.Type#
          * @param {pentaho.type.Complex} owner The complex value that owns the property.
          * @return {number} The evaluated value of the `countMax` attribute.
          * @ignore
@@ -683,7 +681,7 @@ define([
          *
          * This attribute is *dynamic*:
          * 1. when a function is specified, it is dynamically evaluated for each complex instance
-         * 2. affects only the _local_ value of the attribute metadata
+         * 2. affects only the _local_ attribute value
          * 3. inheritance takes place only when the attribute is evaluated
          *    in the context of a given complex instance.
          *
@@ -692,14 +690,14 @@ define([
          * the evaluated value inherited from its ancestor.
          *
          * This and other attributes are combined to evaluate the resulting _effective value count range_.
-         * See {@link pentaho.type.Property.Meta#countRangeEval}.
+         * See {@link pentaho.type.Property.Type#countRangeEval}.
          *
          * Setting the attribute to `null` or `undefined` clears the local value.
          *
          * The default, root `countMax` attribute value is `Infinity`.
          *
          * @name countMax
-         * @memberOf pentaho.type.Property.Meta#
+         * @memberOf pentaho.type.Property.Type#
          * @type number | pentaho.type.PropertyDynamicAttribute.<number>
          * @see pentaho.type.Complex#countRange
          */
@@ -718,7 +716,7 @@ define([
          * on a given owner complex value.
          *
          * @name applicableEval
-         * @memberOf pentaho.type.Property.Meta#
+         * @memberOf pentaho.type.Property.Type#
          * @param {pentaho.type.Complex} owner The complex value that owns the property.
          * @return {boolean} The evaluated value of the `isApplicable` attribute.
          * @ignore
@@ -729,7 +727,7 @@ define([
          *
          * This attribute is *dynamic*:
          * 1. when a function is specified, it is dynamically evaluated for each complex instance
-         * 2. affects only the _local_ value of the attribute metadata
+         * 2. affects only the _local_ attribute value
          * 3. inheritance takes place only when the attribute is evaluated
          *    in the context of a given complex instance.
          *
@@ -742,7 +740,7 @@ define([
          * The default, root `isApplicable` attribute value is `true`.
          *
          * @name applicable
-         * @memberOf pentaho.type.Property.Meta#
+         * @memberOf pentaho.type.Property.Type#
          *
          * @type null | boolean | pentaho.type.PropertyDynamicAttribute.<boolean>
          * @see pentaho.type.Complex#isApplicable
@@ -763,7 +761,7 @@ define([
          * on a given owner complex value.
          *
          * @name isReadOnlyEval
-         * @memberOf pentaho.type.Property.Meta#
+         * @memberOf pentaho.type.Property.Type#
          * @param {pentaho.type.Complex} owner The complex value that owns the property.
          * @return {boolean} The evaluated value of the `isReadOnly` attribute.
          * @ignore
@@ -774,7 +772,7 @@ define([
          *
          * This attribute is *dynamic*:
          * 1. when a function is specified, it is dynamically evaluated for each complex instance
-         * 2. affects only the _local_ value of the attribute metadata
+         * 2. affects only the _local_ attribute value
          * 3. inheritance takes place only when the attribute is evaluated
          *    in the context of a given complex instance.
          *
@@ -790,7 +788,7 @@ define([
          * The default, root `isReadOnly` attribute value is `false`.
          *
          * @name isReadOnly
-         * @memberOf pentaho.type.Property.Meta#
+         * @memberOf pentaho.type.Property.Type#
          * @type null | boolean | pentaho.type.PropertyDynamicAttribute.<boolean>
          * @see pentaho.type.Complex#isReadOnly
          */
@@ -813,10 +811,10 @@ define([
        * The _effective value count range_ is a conciliation
        * of the _effective value_ of the attributes:
        *
-       * * {@link pentaho.type.Property.Meta#isList}
-       * * {@link pentaho.type.Property.Meta#isRequired}
-       * * {@link pentaho.type.Property.Meta#countMin}
-       * * {@link pentaho.type.Property.Meta#countMax}
+       * * {@link pentaho.type.Property.Type#isList}
+       * * {@link pentaho.type.Property.Type#isRequired}
+       * * {@link pentaho.type.Property.Type#countMin}
+       * * {@link pentaho.type.Property.Type#countMax}
        *
        * The logic can be best explained by the following
        * simple example function:
@@ -868,10 +866,10 @@ define([
 
         return {min: countMin, max: countMax};
       }
-    } // end meta:
+    } // end type:
   });
 
-  _propertyMeta = Property.prototype;
+  _propType = Property.prototype;
 
   return Property;
 

@@ -28,7 +28,7 @@ define([
    * with attributes which, when specified, refine the representation type in some way.
    *
    * Refinement facets are mixed into a {@link pentaho.type.Refinement} type,
-   * by specifying its {@link pentaho.type.Refinement.Meta#facets} property,
+   * by specifying its {@link pentaho.type.Refinement.Type#facets} property,
    * when defining it, either
    * through {@link pentaho.type.Value.refine} or, directly,
    * through {@link pentaho.type.Refinement.extend}.
@@ -38,12 +38,12 @@ define([
    * you must implement the static {@link pentaho.type.facets.RefinementFacet.validate} method
    * that will perform the actual validation of instances of the representation class.
    * Note that this method is invoked on the mixed into refinement type,
-   * an instance of {@link pentaho.type.Refinement.Meta}.
+   * an instance of {@link pentaho.type.Refinement.Type}.
    *
    * @description The constructor is not used, as a mixin.
    * @abstract
    * @see pentaho.type.Refinement
-   * @see pentaho.type.Refinement.Meta#facets
+   * @see pentaho.type.Refinement.Type#facets
    */
   return Base.extend("pentaho.type.facets.RefinementFacet", {
     /* prototype mixin stuff */
@@ -52,7 +52,7 @@ define([
      * Performs validation of a given value of the representation type.
      *
      * This method is invoked **on** the refinement type,
-     *  an instance of {@link pentaho.type.Refinement.Meta}.
+     *  an instance of {@link pentaho.type.Refinement.Type}.
      *
      * The default implementation throws an error.
      *
