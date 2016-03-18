@@ -32,6 +32,10 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
             closeIcon: undefined,
             _onCancelCallback: undefined,
 
+            constructor: function() {
+              Dialog._DialogLevelManager._beginZIndex = 1051;
+            },
+
             setLocalizationLookupFunction: function(f) {
               this.getLocaleString = f;
               this._localize();
@@ -179,19 +183,19 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
                         style.get(this.domNode, 'borderRightWidth')) +'px';
                   }
                   style.set(this.popup.domNode, 'width', this.width);
-                  style.set(query('.dijitDialogPaneContent',this.popup.domNode),'width', this.width);
-                  style.set(query('.dijitDialogPaneContent',this.domNode),'width', this.width);
+                  query('.dijitDialogPaneContent', this.popup.domNode).forEach(function(node) {style.set(node, 'width', this.width);});
+                  query('.dijitDialogPaneContent', this.domNode).forEach(function(node) {style.set(node, 'width', this.width);});
                 }
               } else {
                 if(!this.shown) {
                   style.set(this.domNode, 'width', this.width);
                   style.set(this.popup.domNode, 'width', this.width);
-                  style.set(query('.dijitDialogPaneContent',this.popup.domNode),'width', this.width);
-                  style.set(query('.dijitDialogPaneContent',this.domNode),'width', this.width);
+                  query('.dijitDialogPaneContent', this.popup.domNode).forEach(function(node) {style.set(node, 'width', this.width);});
+                  query('.dijitDialogPaneContent', this.domNode).forEach(function(node) {style.set(node, 'width', this.width);});
                   style.set(this.domNode, 'height', this.height);
                   style.set(this.popup.domNode, 'height', this.height);
-                  style.set(query('.dijitDialogPaneContent',this.popup.domNode),'height', this.height);
-                  style.set(query('.dijitDialogPaneContent',this.domNode),'height', this.height);
+                  query('.dijitDialogPaneContent', this.popup.domNode).forEach(function(node) {style.set(node, 'height', this.height);});
+                  query('.dijitDialogPaneContent', this.domNode).forEach(function(node) {style.set(node, 'height', this.height);});
                 }
               }
 
