@@ -64,8 +64,8 @@ define(function() {
      *
      * When the created list is empty, will return `null`.
      *
-     * @param {?Object} attrs Instance's meta.
-     * @return {?Function} Instance's predicate function.
+     * @param {Object} [attrs] Attribute names and values to test for.
+     * @return {?function} A predicate function, or `null`.
      */
     predicate: function(attrs) {
       var attrValues = [];
@@ -84,8 +84,9 @@ define(function() {
   /**
    * Auxiliary function of {@link pentaho.util.fun.predicate}
    *
-   * @param {Array} attrValues Processed instance meta.
-   * @return {Function} Instance's predicate function.
+   * @param {Array} attrValues Processed attribute names and values, as an array of arrays,
+   * each with the name and the value to test for.
+   * @return {function} The predicate function.
    */
   function buildPredicate(attrValues) {
     return function instancePredicate(inst) {
