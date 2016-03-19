@@ -1,0 +1,56 @@
+/*!
+ * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * A `spec.UComplex` represents the union of JS types that can be used to describe a complex value,
+ * or the absence of one.
+ *
+ * Like with all other value types, complex values can be described using the general **object form**.
+ * The _object form_ conforms to {@link pentaho.type.spec.IComplex}.
+ *
+ * Complex values support an additional form of value specification, the **array form**:
+ * an array of {@link pentaho.type.spec.UInstance},
+ * each the specification of the value of one of a complex's properties,
+ * in property definition order,
+ * according to [Property.Type#index]{@link pentaho.type.Property.Type#index}.
+ *
+ * Take the following _object form_ example:
+ *
+ * ```js
+ * {
+ *   product: "boeing-737",
+ *   price:   1500
+ * }
+ * ```
+ *
+ * Assuming that the two properties where defined in the order `"product"` then `"price"`,
+ * it could be written in _array form_, like this:
+ *
+ * ```js
+ * ["boeing-737", 1500]
+ * ```
+ *
+ * However, note that _array form_ can only be used if
+ * the [inline type]{@link pentaho.type.spec.IInstance#_} property can, in fact, be omitted.
+ *
+ * When a complex value is absent, it can be described with a {@link Nully} JavaScript value:
+ *
+ * ```js
+ * null
+ * ```
+ *
+ * @typedef {pentaho.type.spec.IComplex|Array.<pentaho.type.spec.UInstance>|Nully} pentaho.type.spec.UComplex
+ */

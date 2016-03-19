@@ -1,0 +1,59 @@
+/*!
+ * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * The `spec.IDate` interface describes a date value in _object_ form.
+ *
+ * @name pentaho.type.spec.IDate
+ *
+ * @interface
+ * @extends pentaho.type.spec.ISimple
+ */
+
+/**
+ * The underlying date value.
+ *
+ * Property [v]{@link pentaho.type.spec.IDate#v} is an alias for this one.
+ *
+ * One and only one of `v` or `value` must be specified, non-{@link Nully}.
+ *
+ * The value can either be a native JavaScript {@link Date} or a
+ * string in a format based upon a simplification of the ISO-8601 Extended Format,
+ * as defined by [ECMA-262]{@link http://www.ecma-international.org/ecma-262/5.1/#sec-15.9.1.15}.
+ *
+ * Examples of dates in this format include:
+ *
+ * ```js
+ * "2016-03-11" // Date only
+ *
+ * "2016-03-11T17:28:10Z" // Date plus time in UTC zero offset
+ * ```
+ *
+ * When serialized as JSON, the canonical form is a string in ISO-8601 format,
+ * with all fields defined, and with time in UTC.
+ *
+ * @name value
+ * @memberOf pentaho.type.spec.IDate#
+ * @type {?Date|string}
+ */
+
+/**
+ * An alias for [value]{@link pentaho.type.spec.IDate#value}.
+ *
+ * @name v
+ * @memberOf pentaho.type.spec.IDate#
+ * @type {?Date|string}
+ */

@@ -89,7 +89,7 @@ define([
      * the {@link pentaho.type.Complex#_clone} method should also be overridden to copy those properties.
      *
      * @constructor
-     * @param {object} spec The complex instance specification.
+     * @param {pentaho.type.spec.UComplex} [spec] A complex specification.
      */
     var Complex = Element.extend("pentaho.type.Complex", /** @lends pentaho.type.Complex# */{
 
@@ -614,6 +614,57 @@ define([
       //endregion
       //endregion
 
+      //region serialization
+      /**
+       * @inheritdoc
+       */
+      toSpecInScope: function(scope, requireType, keyArgs) {
+        var spec;
+
+        var useArray = !requireType && keyArgs.preferPropertyArray;
+        if(useArray) {
+          spec = [];
+        } else {
+          spec = {};
+          if(requireType) spec._ = this.type.toReference(scope, keyArgs);
+        }
+
+        var includeDefaults = keyArgs.includeDefaults;
+        var areEqual = this.type.areEqual;
+
+        this.type.each(propToSpec, this);
+
+        return spec;
+
+        function propToSpec(propType) {
+
+          /*jshint validthis:true*/
+
+          var name = propType.name;
+          var value = this._values[name];
+          if(includeDefaults || !areEqual(propType.value, value)) {
+            // Determine if value spec must contain the type inline
+            var valueSpec;
+            if(value) {
+              var valueType = propType.type;
+              var valueRequireType = value.type !== (valueType.isRefinement ? valueType.of : valueType);
+              valueSpec = value.toSpecInScope(scope, valueRequireType, keyArgs);
+            } else {
+              valueSpec = null;
+            }
+
+            if(useArray) {
+              spec.push(valueSpec);
+            } else {
+              spec[name] = valueSpec;
+            }
+          } else if(useArray) {
+            spec.push(null);
+          }
+        }
+      },
+      //endregion
+
       type: /** @lends pentaho.type.Complex.Type# */{
         id: module.id,
 
@@ -627,7 +678,7 @@ define([
         // Used for configuration only.
         set props(propSpecs) {
           this._getProps().configure(propSpecs);
-        },
+        }, // jshint -W078
 
         _getProps: function() {
           // Always get/create from/on the class' prototype.

@@ -59,7 +59,7 @@ define([
      * also be overridden to copy those properties.
      *
      * @constructor
-     * @param {Object} [spec] The list specification or another compatible list instance.
+     * @param {pentaho.type.spec.UList} [spec] The list specification or another, compatible list instance.
      */
     var List = Value.extend("pentaho.type.List", /** @lends pentaho.type.List# */{
 
@@ -547,6 +547,29 @@ define([
         }
 
         if(!silent) this._exitChange();
+      },
+      //endregion
+
+      //region serialization
+      /**
+       * @inheritdoc
+       */
+      toSpecInScope: function(scope, requireType, keyArgs) {
+        var elemType = this.type.of;
+        if(elemType.isRefinement) elemType = elemType.of;
+
+        var elemSpecs = this._elems.map(function(elem) {
+          var elemRequireType = elem.type !== elemType;
+          return elem.toSpecInScope(scope, elemRequireType, keyArgs);
+        });
+
+        if(requireType)
+          return {
+            _: this.type.toReference(scope, keyArgs),
+            d: elemSpecs
+          };
+
+        return elemSpecs;
       },
       //endregion
 

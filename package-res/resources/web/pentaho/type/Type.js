@@ -721,6 +721,14 @@ define([
       return value == null   ? null  :
              this.is(value)  ? value :
              this.create(value);
+    },
+
+    toSpec: function() {
+      return {id: this.id};
+    },
+
+    toReference: function() {
+      return this.id;
     }
   }, /** @lends pentaho.type.Type */{
     //@override
