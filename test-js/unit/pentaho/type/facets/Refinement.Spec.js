@@ -27,7 +27,6 @@ define([
       expect(typeof RefinementFacet).toBe("function");
     });
 
-    describe("validate(value)", function() {
     describe(".id", function() {
 
       it("should be defined", function() {
@@ -54,6 +53,26 @@ define([
       });
     });
 
+    describe(".shortId", function() {
+
+      it("should be equal to #id when it is not a standard, single-level facet id", function() {
+        var Derived = RefinementFacet.extend(null, {id: "my/foo"});
+        expect(Derived.shortId).toBe(Derived.id);
+      });
+
+      it("should be equal to the last sub-module of #id when it is of a standard, single-level facet id", function() {
+        var Derived = RefinementFacet.extend(null, {id: "pentaho/type/facets/foo"});
+        expect(Derived.shortId).toBe("foo");
+        expect(Derived.id).not.toBe("foo");
+      });
+
+      it("should be equal to #id when it is of a standard, multiple-level facet id", function() {
+        var Derived = RefinementFacet.extend(null, {id: "pentaho/type/facets/bar/foo"});
+        expect(Derived.shortId).toBe(Derived.id);
+      });
+    });
+
+    describe(".validate(value)", function() {
       it("should be defined", function() {
         expect(typeof RefinementFacet.validate).toBe("function");
       });
