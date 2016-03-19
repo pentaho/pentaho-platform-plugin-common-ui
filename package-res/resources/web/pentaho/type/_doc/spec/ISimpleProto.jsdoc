@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,18 +15,19 @@
  */
 
 /**
- * The `spec.IInstance` interface describes an instance using a generic, _object_ form.
+ * The `spec.ISimpleProto` interface represents the specification of the prototype of a simple type's instance class.
  *
- * @name pentaho.type.spec.IInstance
- *
+ * @name pentaho.type.spec.ISimpleProto
  * @interface
- *
- * @see pentaho.type.spec.UInstance
+ * @extends pentaho.type.spec.IValueProto
  */
 
 /**
- * An inline type reference of the value's type.
- * @name _
- * @memberOf pentaho.type.spec.IInstance#
- * @type {pentaho.type.spec.UTypeReference}
+ * The extensible/configurable members of the prototype of simple type classes.
+ *
+ * @name type
+ * @memberOf pentaho.type.spec.ISimpleProto#
+ * @type {pentaho.type.spec.ISimpleTypeProto}
+ *
+ * @see pentaho.type.spec.ISimpleTypeProto#instance
  */

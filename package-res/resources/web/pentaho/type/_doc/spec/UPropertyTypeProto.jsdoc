@@ -15,14 +15,14 @@
  */
 
 /**
- * A `spec.UPropertyType` represents the union of JS types that can be used to
+ * A `spec.UPropertyTypeProto` represents the union of JS types that can be used to
  * define a property of a complex type.
  *
  * When the value is a string,
  * it's taken to represent a property
- * whose {@link pentaho.type.spec.IPropertyType#name} is that string
+ * whose {@link pentaho.type.spec.IPropertyTypeProto#name} is that string
  * and
- * whose {@link pentaho.type.spec.IPropertyType#type} is {@link pentaho.type.string}.
+ * whose {@link pentaho.type.spec.IPropertyTypeProto#type} is {@link pentaho.type.String}.
  *
- * @typedef {string|pentaho.type.spec.IPropertyType} pentaho.type.spec.UPropertyType
+ * @typedef {string|pentaho.type.spec.IPropertyTypeProto} pentaho.type.spec.UPropertyTypeProto
  */

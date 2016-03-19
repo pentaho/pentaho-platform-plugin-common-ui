@@ -69,9 +69,8 @@ define([
       this._element = element;
 
       /**
-       * The modelf of the visualization.
+       * The model of the visualization.
        * @type {pentaho.visual.base.Model}
-       * @public
        * @readonly
        */
       this.model = model;

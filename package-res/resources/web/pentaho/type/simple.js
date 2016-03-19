@@ -46,6 +46,10 @@ define([
      * @description Creates a simple instance.
      * @constructor
      * @param {pentaho.type.spec.USimple} [spec] A simple specification.
+     *
+     * @see pentaho.type.spec.ISimple
+     * @see pentaho.type.spec.ISimpleProto
+     * @see pentaho.type.spec.ISimpleTypeProto
      */
     var Simple = Element.extend("pentaho.type.Simple", /** @lends pentaho.type.Simple# */{
 
@@ -306,7 +310,7 @@ define([
          * Converts a non-{@link Nully} external value to the type stored by the simple type,
          * in its [value]{@link pentaho.type.Simple#value} property.
          *
-         * The given value **cannot** be a {@link Nully} value.
+         * The given value is never a {@link Nully} value.
          *
          * When `null` is returned, it is considered that the conversion is not possible.
          * For inform on the actual reason why the conversion is not possible,
@@ -328,6 +332,26 @@ define([
     }).implement({
       type: bundle.structured.simple
     });
+
+    // override the documentation to specialize the argument types.
+    /**
+     * Creates a subtype of this one.
+     *
+     * For more information on class extension, in general,
+     * see {@link pentaho.lang.Base.extend}.
+     *
+     * @name extend
+     * @memberOf pentaho.type.Simple
+     *
+     * @param {string} [name] The name of the created class. Used for debugging purposes.
+     * @param {pentaho.type.spec.ISimpleProto} [instSpec] The instance specification.
+     * @param {Object} [classSpec] The static specification.
+     * @param {Object} [keyArgs] The keyword arguments.
+     *
+     * @return {!Class.<pentaho.type.Simple>} The new simple instance subclass.
+     *
+     * @see pentaho.type.Value.extend
+     */
 
     return Simple;
 

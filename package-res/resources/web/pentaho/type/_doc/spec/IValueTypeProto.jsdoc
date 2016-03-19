@@ -1,0 +1,103 @@
+/*!
+ * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * The `spec.IValueTypeProto` interface represents the specification of a value type.
+ *
+ * @name pentaho.type.spec.IValueTypeProto
+ * @interface
+ * @extends pentaho.type.spec.ITypeProto
+ */
+
+/**
+ * The extensible/configurable members of the prototype of value instance classes.
+ *
+ * @name instance
+ * @memberOf pentaho.type.spec.IValueTypeProto#
+ * @type {pentaho.type.spec.IValueProto}
+ *
+ * @see pentaho.type.spec.IValueProto#type
+ */
+
+
+/**
+ * The id of the value type's AMD module, a _temporary id_, or `null`.
+ *
+ * An empty string or `undefined` value is interpreted as `null`.
+ *
+ * For serialization purposes,
+ * a **temporary id** can be assigned to an anonymous type.
+ * An id is _temporary_ if it starts with an `_` character.
+ *
+ * Temporary ids are ignored after type construction.
+ *
+ * @name id
+ * @memberOf pentaho.type.spec.IValueTypeProto#
+ * @type {?string}
+ */
+
+/**
+ * A reference to the value type's base type, if any.
+ *
+ * When `null`, it has no base type.
+ *
+ * When absent or `undefined`, it defaults to `"complex`.
+ *
+ * @name base
+ * @memberOf pentaho.type.spec.IValueTypeProto#
+ * @type {?pentaho.type.spec.UTypeReference}
+ */
+
+/**
+ * Indicates if the type is abstract.
+ *
+ * An abstract type cannot be used directly to create a value instance,
+ * and, as such, isn't usually exposed to users in a user interface.
+ *
+ * When not a boolean,
+ * it is taken instead to be the result of passing it to the `Boolean` function.
+ *
+ * @name isAbstract
+ * @memberOf pentaho.type.spec.IValueTypeProto#
+ * @type {?boolean | any}
+ * @default false
+ * @see pentaho.type.spec.ITypeProto#isBrowsable
+ */
+
+/**
+ * Determines if a value of the type is **valid**.
+ *
+ * Although not limited to,
+ * this method is used mostly for
+ * [refinement types]{@link pentaho.type.Refinement},
+ * to perform additional validations on values,
+ * besides that which is performed by their
+ * type's instance-side validate method.
+ *
+ * If you override this method,
+ * be sure to call the base implementation,
+ * and return any errors it reports.
+ *
+ * @name validateInstance
+ * @memberOf pentaho.type.spec.IValueTypeProto#
+ * @method
+ *
+ * @param {!pentaho.type.Value} value The value to validate.
+ *
+ * @return {?Array.<!Error>} A non-empty array of `Error` or `null`.
+ *
+ * @see pentaho.type.Value.Type#validateInstance
+ */

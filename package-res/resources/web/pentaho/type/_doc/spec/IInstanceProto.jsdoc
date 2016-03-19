@@ -15,18 +15,19 @@
  */
 
 /**
- * The `spec.IInstance` interface describes an instance using a generic, _object_ form.
+ * The `spec.IInstanceProto` interface describes the extensible/configurable members of the
+ * prototype of instance classes.
  *
- * @name pentaho.type.spec.IInstance
- *
+ * @name pentaho.type.spec.IInstanceProto
  * @interface
- *
- * @see pentaho.type.spec.UInstance
  */
 
 /**
- * An inline type reference of the value's type.
- * @name _
- * @memberOf pentaho.type.spec.IInstance#
- * @type {pentaho.type.spec.UTypeReference}
+ * The extensible/configurable members of the prototype of type classes.
+ *
+ * @name type
+ * @memberOf pentaho.type.spec.IInstanceProto#
+ * @type {pentaho.type.spec.ITypeProto}
+ *
+ * @see pentaho.type.spec.ITypeProto#instance
  */

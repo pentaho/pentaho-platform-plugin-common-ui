@@ -60,6 +60,10 @@ define([
      *
      * @constructor
      * @param {pentaho.type.spec.UList} [spec] The list specification or another, compatible list instance.
+     *
+     * @see pentaho.type.spec.IList
+     * @see pentaho.type.spec.IListProto
+     * @see pentaho.type.spec.IListTypeProto
      */
     var List = Value.extend("pentaho.type.List", /** @lends pentaho.type.List# */{
 
@@ -645,10 +649,25 @@ define([
         _elemType: Element.type,
 
         /**
-         * Gets the type of the elements that this list can contain.
+         * Gets or sets the type of the elements that this type of list can contain.
+         *
+         * Must and can only be specified upon definition.
+         *
+         * Must be a subtype of the ancestor type's `of` type.
+         *
+         * When set to `undefined`, the operation is ignored.
+         *
+         * When set to `null`, an error is thrown.
          *
          * @type {pentaho.type.Element.Type}
-         * @readonly
+         *
+         * @throws {pentaho.lang.OperationInvalidError} When set to a type that is different from
+         *   the current local type.
+         *
+         * @throws {pentaho.lang.ArgumentInvalidError} When set to a type that is not a subtype of the
+         *   ancestor list type's `of` type.
+         *
+         * @see pentaho.type.spec.IListTypeProto#of
          */
         get of() {
           return this._elemType;
@@ -690,6 +709,26 @@ define([
     }).implement({
       type: bundle.structured.list
     });
+
+    // override the documentation to specialize the argument types.
+    /**
+     * Creates a subtype of this one.
+     *
+     * For more information on class extension, in general,
+     * see {@link pentaho.lang.Base.extend}.
+     *
+     * @name extend
+     * @memberOf pentaho.type.List
+     *
+     * @param {string} [name] The name of the created class. Used for debugging purposes.
+     * @param {pentaho.type.spec.IListProto} [instSpec] The instance specification.
+     * @param {Object} [classSpec] The static specification.
+     * @param {Object} [keyArgs] The keyword arguments.
+     *
+     * @return {!Class.<pentaho.type.List>} The new list instance subclass.
+     *
+     * @see pentaho.type.Value.extend
+     */
 
     return List;
   };

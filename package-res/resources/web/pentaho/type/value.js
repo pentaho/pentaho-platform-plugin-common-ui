@@ -37,8 +37,9 @@ define([
      * @extends pentaho.type.Type
      * @implements pentaho.lang.ISpecifiable
      *
-     * @classDesc The base type class of value types.</br>
-     * Value types can be singular or plural ({@link pentaho.type.Value.Type#isList|isList}).</br>
+     * @classDesc The base type class of value types.
+     *
+     * Value types can be singular or plural ({@link pentaho.type.Value.Type#isList|isList}).
      * A Value type should not be instantiated if it is {@link pentaho.type.Value.Type#isAbstract|abstract}.
      *
      * For more information see {@link pentaho.type.Value}.
@@ -60,7 +61,11 @@ define([
      *
      * @description Creates a value instance.
      * @constructor
-     * @param {pentaho.type.spec.UInstance} [spec] A value specification.
+     * @param {pentaho.type.spec.UValue} [spec] A value specification.
+     *
+     * @see pentaho.type.spec.IValue
+     * @see pentaho.type.spec.IValueProto
+     * @see pentaho.type.spec.IValueTypeProto
      */
     var Value = Instance.extend("pentaho.type.Value", /** @lends pentaho.type.Value# */{
 
@@ -279,6 +284,8 @@ define([
 
         /**
          * Gets or sets a value that indicates if this type is abstract.
+         *
+         * This attribute can only be set once, upon the type definition.
          *
          * @type {boolean}
          * @default false
@@ -579,6 +586,7 @@ define([
          *
          * @see pentaho.type.Value#validate
          * @see pentaho.type.Value.Type#validate
+         * @see pentaho.type.spec.IValueTypeProto#validateInstance
          */
         validateInstance: function(value) {
           return value.validate();
@@ -587,6 +595,26 @@ define([
       }
     }, /** @lends pentaho.type.Value */{
 
+      // override the documentation to specialize the argument types.
+      /**
+       * Creates a subtype of this one.
+       *
+       * For more information on class extension, in general,
+       * see {@link pentaho.lang.Base.extend}.
+       *
+       * @name extend
+       * @memberOf pentaho.type.Value
+       *
+       * @param {string} [name] The name of the created class. Used for debugging purposes.
+       * @param {pentaho.type.spec.IValueProto} [instSpec] The instance specification.
+       * @param {Object} [classSpec] The static specification.
+       * @param {Object} [keyArgs] The keyword arguments.
+       *
+       * @return {!Class.<pentaho.type.Value>} The new value instance subclass.
+       *
+       * @see pentaho.type.Instance.extend
+       */
+
       /**
        * Creates a refinement type that refines this one.
        *
@@ -594,7 +622,7 @@ define([
        * @see pentaho.type.Refinement.Type#of
        *
        * @param {string} [name] A name of the refinement type used for debugging purposes.
-       * @param {Object} [instSpec] The refined type instance specification.
+       * @param {{type: pentaho.type.IRefinementTypeProto}} [instSpec] The refined type instance specification.
        * The available _type_ attributes are those defined by any specified refinement facet classes.
        *
        * @return {Class.<pentaho.type.Refinement>} The refinement type's instance class.

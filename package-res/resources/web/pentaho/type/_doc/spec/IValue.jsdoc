@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,18 +15,12 @@
  */
 
 /**
- * The `spec.IInstance` interface describes an instance using a generic, _object_ form.
+ * The `spec.IValue` interface describes a value instance using a generic, _object_ form.
  *
- * @name pentaho.type.spec.IInstance
+ * @name pentaho.type.spec.IValue
  *
  * @interface
+ * @extends pentaho.type.spec.IInstance
  *
- * @see pentaho.type.spec.UInstance
- */
-
-/**
- * An inline type reference of the value's type.
- * @name _
- * @memberOf pentaho.type.spec.IInstance#
- * @type {pentaho.type.spec.UTypeReference}
+ * @see pentaho.type.spec.UValue
  */

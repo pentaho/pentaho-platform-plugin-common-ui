@@ -86,6 +86,10 @@ define([
    * });
    *
    * @description Creates an instance of this type.
+   *
+   * @see pentaho.type.spec.IInstance
+   * @see pentaho.type.spec.IInstanceProto
+   * @see pentaho.type.spec.ITypeProto
    */
   var Instance = Base.extend("pentaho.type.Instance", /** @lends pentaho.type.Instance# */{
     // NOTE: not calling base to block default Base.js from copying 1st argument into `this`.
@@ -234,6 +238,26 @@ define([
       // Don't process `instSpec.type` twice, during construction.
       return subInstProto.extend(instSpec, _keyArgsExcludeInstance);
     },
+
+    // override the documentation to specialize the argument types.
+    /**
+     * Creates a subtype of this one.
+     *
+     * For more information on class extension, in general,
+     * see {@link pentaho.lang.Base.extend}.
+     *
+     * @name extend
+     * @memberOf pentaho.type.Instance
+     *
+     * @param {string} [name] The name of the created class. Used for debugging purposes.
+     * @param {pentaho.type.spec.IInstanceProto} [instSpec] The instance specification.
+     * @param {Object} [classSpec] The static specification.
+     * @param {Object} [keyArgs] The keyword arguments.
+     *
+     * @return {!Class.<pentaho.type.Value>} The new value subclass.
+     *
+     * @see pentaho.lang.Base.extend
+     */
 
     //@override
     /**

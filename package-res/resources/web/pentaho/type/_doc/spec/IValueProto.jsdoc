@@ -1,0 +1,53 @@
+/*!
+ * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * The `spec.IValueProto` interface represents the specification of the prototype of a value type's instance class.
+ *
+ * @name pentaho.type.spec.IValueProto
+ * @interface
+ * @extends pentaho.type.spec.IInstanceProto
+ */
+
+/**
+ * The extensible/configurable members of the prototype of value type classes.
+ *
+ * @name type
+ * @memberOf pentaho.type.spec.IValueProto#
+ * @type {pentaho.type.spec.IValueTypeProto}
+ *
+ * @see pentaho.type.spec.IValueTypeProto#instance
+ */
+
+/**
+ * Determines if a value is **valid**.
+ *
+   * If you override this method,
+   * be sure to call the base implementation,
+ * and return any errors it reports.
+ *
+ * You can use the error utilities in {@link pentaho.type.valueHelper} to
+ * help in the implementation.
+ *
+ * @name validate
+ * @memberOf pentaho.type.spec.IValueProto#
+ * @method
+ *
+ * @return {?Array.<!Error>} A non-empty array of `Error` or `null`.
+ *
+ * @see pentaho.type.spec.IValueTypeProto#validateInstance
+ * @see pentaho.type.Value#validate
+ */
