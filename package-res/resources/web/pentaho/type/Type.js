@@ -259,8 +259,13 @@ define([
     },
 
     set id(value) {
+      value = nonEmptyString(value);
+
+      // Is it a temporary id? If so, ignore it.
+      if(value && value[0] === "_") value = null;
+
       // Can only be set once or throws.
-      O.setConst(this, "_id", nonEmptyString(value));
+      O.setConst(this, "_id", value);
     },
 
     _buildRelativeId: function(value) {
