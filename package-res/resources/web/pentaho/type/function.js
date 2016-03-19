@@ -16,8 +16,9 @@
 define([
   "module",
   "./simple",
+  "../util/fun",
   "../i18n!types"
-], function(module, simpleFactory, bundle) {
+], function(module, simpleFactory, F, bundle) {
 
   // Cannot use strict here because of the evil eval, below...
 
@@ -50,17 +51,10 @@ define([
       type: {
         id: module.id,
         styleClass: "pentaho-type-function",
-        cast: castFun
+        cast: F.as
       }
     }).implement({
       type: bundle.structured["object"]
     });
   };
-
-  function castFun(f) {
-    switch(typeof f) {
-      case "function": return f;
-      case "string"  : return eval("(" + f + ")");
-    }
-  }
 });
