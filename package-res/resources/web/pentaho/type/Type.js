@@ -27,6 +27,7 @@ define([
 
   // Unique type class id exposed through Type#uid and used by Context instances.
   var _nextUid = 1,
+      _extractShortId = /^pentaho\/type\/(\w+)$/i,
       _type = null,
       O_isProtoOf = Object.prototype.isPrototypeOf;
 
@@ -85,6 +86,7 @@ define([
 
       // Block inheritance, with default values
       this._id         = null;
+      this._shortId    = undefined;
       this._styleClass = null;
       this._hasDescendants = false;
     },
@@ -268,6 +270,34 @@ define([
 
       // Can only be set once or throws.
       O.setConst(this, "_id", value);
+    },
+
+    /**
+     * Gets the short id of this type.
+     *
+     * When a type is one of the standard types,
+     * and, thus, it is a direct sub-module of the `pentaho/type` module,
+     * its short id is its _local module id_,
+     * like `"string"` or `"boolean"`.
+     *
+     * Otherwise, the short id is equal to the id.
+     *
+     * @type {?nonEmptyString}
+     * @readOnly
+     * @see pentaho.type.Type#id
+     */
+    get shortId() {
+      var shortId = this._shortId, id, m;
+      if(shortId === undefined) {
+        if((id = this._id) && (m = _extractShortId.exec(id))) {
+          shortId = m[1];
+        } else {
+          shortId = id;
+        }
+        this._shortId = shortId;
+      }
+
+      return shortId;
     },
 
     _buildRelativeId: function(value) {
