@@ -85,7 +85,7 @@ define([
       _value: undefined,
 
       /**
-       * Gets the underlying primitive value of the _simple_ value.
+       * Gets the underlying JavaScript value represented by the _simple_ value.
        *
        * @type !any
        * @readonly
@@ -94,13 +94,11 @@ define([
         return this._value;
       },
 
-      // NOTE: the argument cannot have the same name as the property setter
-      // or PhantomJS 1.9.8 will throw a syntax error...
       set value(_) {
         // Value is immutable. Can only be set once.
 
         // Throws if nully.
-        _ = this.type.cast(_);
+        _ = this.type.toValue(_);
 
         if(this._value == null) {
           // First set
@@ -273,38 +271,62 @@ define([
         styleClass: "pentaho-type-simple",
 
         //region cast method
-        // Configurable in a special way.
-        // Setting always sets the core.
-        // Getting always gets the wrapper.
+        /**
+         * Converts an external value to the type stored by the simple type
+         * in its [value]{@link pentaho.type.Simple#value} property.
+         *
+         * This method validates that the given value is not {@link Nully}.
+         * Then, it delegates the actual conversion to the [cast]{@link pentaho.type.Simple#cast} method.
+         * Any user errors thrown by the `cast` method itself are thrown back to this method's caller.
+         * If, however, the `cast` method returns a {@link Nully} value,
+         * this method then throws an error, in its behalf,
+         * informing that the given value cannot be converted to this type.
+         *
+         * @param {!any} value The value to convert.
+         * @return {!any} The converted value.
+         *
+         * @throws {pentaho.lang.ArgumentRequiredError} When the given value is {@link Nully}.
+         *
+         * @throws {pentaho.lang.ArgumentInvalidTypeError} When the given value cannot be converted
+         *  to the internal value type supported by the simple type.
+         *
+         * @throws {pentaho.lang.UserError} When the value cannot be converted for some reason.
+         * Thrown by the [cast]{@link pentaho.type.Simple#cast} method.
+         *
+         * @sealed
+         */
+        toValue: function(value) {
+          if(value == null) throw error.argRequired("value");
+
+          value = this.cast(value);
+          if(value == null)
+            throw error.argInvalid("value",
+                bundle.format(bundle.structured.errors.value.cannotConvertToType, [this.label]));
+
+          return value;
+        },
 
         /**
-         * Gets or sets the casting function used to convert external values
-         * into the value stored in a simple's {@link pentaho.type.Simple#value}
-         * property.
+         * Converts a non-{@link Nully} external value to the type stored by the simple type,
+         * in its [value]{@link pentaho.type.Simple#value} property.
          *
-         * The casting function is never given a {@link Nully} value.
+         * The given value **cannot** be a {@link Nully} value.
          *
-         * If the casting function returns `null`,
-         * an error is then thrown, in its behalf,
-         * indicating that it cannot be converted to the type.
+         * When `null` is returned, it is considered that the conversion is not possible.
+         * For inform on the actual reason why the conversion is not possible,
+         * throw an [UserError]{@link pentaho.lang.UserError} should be used instead.
          *
-         * Set to a {@link Nully} value to reset to the default cast function.
+         * The default implementation is the identity function.
          *
-         * The default cast function is the identity function.
+         * @param {!any} value The value to convert.
          *
-         * @type {function(any) : ?any}
+         * @return {?any} The converted value or `null`, when not possible to convert.
+         *
+         * @throws {pentaho.lang.UserError} When the value cannot be converted for some reason.
          */
-        get cast() {
-          return castTop;
-        },
-
-        // NOTE: the argument cannot have the same name as the property setter
-        // or PhantomJS 1.9.8 will throw a syntax error...
-        set cast(_) {
-          this._cast = _ || castCore;
-        },
-
-        _cast: castCore
+        cast: function(value) {
+          return value;
+        }
         //endregion
       }
     }).implement({
@@ -312,32 +334,6 @@ define([
     });
 
     return Simple;
-
-    //region cast private methods
-    /**
-     * Wrapper cast function {@link pentaho.type.Simple.Type#cast}
-     */
-    function castTop(value) {
-      /*jshint validthis:true*/
-
-      if(value == null)
-        throw error.argRequired("value");
-
-      value = this._cast(value);
-      if(value == null)
-        throw error.argInvalid("value",
-            bundle.format(bundle.structured.errors.value.cannotConvertToType, [this.label]));
-
-      return value;
-    }
-
-    /**
-     * Default identity cast function
-     */
-    function castCore(value) {
-      return value;
-    }
-    //endregion
 
     /**
      * Returns `null` when given a {@link Nully} value and a String otherwise
