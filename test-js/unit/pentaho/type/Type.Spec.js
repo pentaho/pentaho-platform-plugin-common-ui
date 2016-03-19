@@ -394,6 +394,22 @@ define([
 
           expect(Derived.type.id).toBe("foo/bar");
         });
+
+        it("should convert it to a string", function() {
+          var Derived = Instance.extend({
+            type: {id: {toString: function() { return "foo/bar"; }}}
+          });
+
+          expect(Derived.type.id).toBe("foo/bar");
+        });
+
+        it("should ignore it, if it is a temporary id", function() {
+          var Derived = Instance.extend({
+            type: {id: "_id"}
+          });
+
+          expect(Derived.type.id).toBe(null);
+        });
       });
     }); // #id
 
