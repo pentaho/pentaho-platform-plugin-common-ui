@@ -21,6 +21,8 @@ define([
 
   "use strict";
 
+  var _extractShortId = /^pentaho\/type\/facets\/(\w+)$/i;
+
   /**
    * @name pentaho.type.facets.RefinementFacet
    * @amd pentaho/type/facets/Refinement
@@ -64,6 +66,26 @@ define([
      * @readOnly
      */
     id: module.id,
+
+    /**
+     * Gets the short id of the refinement facet.
+     *
+     * When a refinement facet is one of the standard facets,
+     * and, thus, it is a direct sub-module of the `pentaho/type/facets` module,
+     * its short id is its _local module id_,
+     * like `"DiscreteDomain"` or `"OrdinalDomain"`.
+     *
+     * Otherwise, the short id is equal to the id.
+     *
+     * @type {!nonEmptyString}
+     * @readOnly
+     * @see pentaho.type.facets.RefinementFacet.id
+     */
+    get shortId() {
+      var id = this.id;
+      var m = _extractShortId.exec(id);
+      return m ? m[1] : id;
+    },
 
     /**
      * Performs validation of a given value of the representation type.
