@@ -22,12 +22,38 @@ define([
 
   /*global describe:true, it:true, expect:true, beforeEach:true*/
 
-  describe("pentaho.type.facets.RefinementFacet -", function() {
+  describe("pentaho.type.facets.RefinementFacet", function() {
     it("should be a function", function() {
       expect(typeof RefinementFacet).toBe("function");
     });
 
     describe("validate(value)", function() {
+    describe(".id", function() {
+
+      it("should be defined", function() {
+        expect(typeof RefinementFacet.id).toBe("string");
+      });
+
+      it("should be respected when specified", function() {
+        var DerivedFacet = RefinementFacet.extend(null, {id: "foo"});
+        expect(DerivedFacet.id).toBe("foo");
+      });
+
+      it("should throw if classSpec.id is not specified when extending", function() {
+        expect(function() {
+          RefinementFacet.extend();
+        }).toThrow(errorMatch.argRequired("classSpec.id"));
+
+        expect(function() {
+          RefinementFacet.extend({}, {});
+        }).toThrow(errorMatch.argRequired("classSpec.id"));
+
+        expect(function() {
+          RefinementFacet.extend({}, {id: ""});
+        }).toThrow(errorMatch.argRequired("classSpec.id"));
+      });
+    });
+
       it("should be defined", function() {
         expect(typeof RefinementFacet.validate).toBe("function");
       });

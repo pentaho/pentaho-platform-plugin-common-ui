@@ -589,7 +589,7 @@ define([
 
         function defineTempFacet(mid) {
           localRequire.define(mid, ["pentaho/type/facets/Refinement"], function(Refinement) {
-            return Refinement.extend();
+            return Refinement.extend(null, {id: mid});
           });
         }
 
@@ -603,7 +603,7 @@ define([
         // -----
 
         var context = new Context();
-        var RefinementMixin2 = localRequire("pentaho/type/facets/Refinement").extend();
+        var RefinementMixin2 = localRequire("pentaho/type/facets/Refinement").extend(null, {id: "my/facets/foo"});
         var spec = {
           base: "complex",
           props: [

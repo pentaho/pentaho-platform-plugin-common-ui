@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 define([
+  "module",
   "../../lang/Base",
   "../../util/error"
-], function(Base, error) {
+], function(module, Base, error) {
 
   "use strict";
 
@@ -48,6 +49,22 @@ define([
   return Base.extend("pentaho.type.facets.RefinementFacet", {
     /* prototype mixin stuff */
   }, /** @lends pentaho.type.facets.RefinementFacet */{
+
+    _extend: function(name, instSpec, classSpec) {
+
+      if(!classSpec || !classSpec.id) throw error.argRequired("classSpec.id");
+
+      return this.base.apply(this, arguments);
+    },
+
+    /**
+     * Gets the id of the refinement facet AMD module.
+     *
+     * @type {!nonEmptyString}
+     * @readOnly
+     */
+    id: module.id,
+
     /**
      * Performs validation of a given value of the representation type.
      *

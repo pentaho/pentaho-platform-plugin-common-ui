@@ -33,21 +33,21 @@ define([
     // and Value is not...
 
     it("should create a refinement type that extends Refinement", function() {
-      var Facet = RefinementFacet.extend();
+      var Facet = RefinementFacet.extend(null, {id: "my/foo"});
       var RefinementType = Element.refine({type: {facets: [Facet]}});
 
       expect(RefinementType.prototype instanceof Refinement).toBe(true);
     });
 
     it("should create a refinement type that has this as `of`", function() {
-      var Facet = RefinementFacet.extend();
+      var Facet = RefinementFacet.extend(null, {id: "my/foo"});
       var RefinementType = Element.refine({type: {facets: [Facet]}});
 
       expect(RefinementType.type.of).toBe(Element.type);
     });
 
     it("should create a refinement type that has the specified name", function() {
-      var Facet = RefinementFacet.extend();
+      var Facet = RefinementFacet.extend(null, {id: "my/foo"});
       var MyRefinement = Element.refine("FOOO", {
         type: {
           facets: [Facet]

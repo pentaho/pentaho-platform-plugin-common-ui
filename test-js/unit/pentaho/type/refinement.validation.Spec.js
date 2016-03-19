@@ -53,6 +53,7 @@ define([
 
       it("should return immediately if base validation fails", function() {
         var Facet = RefinementFacet.extend({}, {
+          id: "my/foo",
           validate: function() {}
         });
 
@@ -80,10 +81,12 @@ define([
 
       it("should call every facet's validate method if base validation succeeds", function() {
         var Facet1 = RefinementFacet.extend({}, {
+          id: "my/foo",
           validate: function() {}
         });
 
         var Facet2 = RefinementFacet.extend({}, {
+          id: "my/bar",
           validate: function() {}
         });
 
@@ -114,14 +117,17 @@ define([
             e5 = new Error();
 
         var Facet1 = RefinementFacet.extend({}, {
+          id: "my/foo",
           validate: function() { return [e1, e2]; }
         });
 
         var Facet2 = RefinementFacet.extend({}, {
+          id: "my/bar",
           validate: function() { return e3; }
         });
 
         var Facet3 = RefinementFacet.extend({}, {
+          id: "my/dud",
           validate: function() { return [e4, e5]; }
         });
 
