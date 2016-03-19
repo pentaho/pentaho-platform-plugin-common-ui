@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 define([
+  "module",
   "./Refinement",
   "../list",
   "../../i18n!../i18n/types",
   "../../util/error",
   "../../util/object",
   "../../util/fun"
-], function(RefinementFacet, listFactory, bundle, error, O, fun) {
+], function(module, RefinementFacet, listFactory, bundle, error, O, fun) {
 
   "use strict";
 
@@ -228,6 +229,8 @@ define([
       }
     }
   }, {
+    id: module.id,
+
     validate: function(value) {
       var domain = this._domain;
       if(domain && !domain.has(value.key))
