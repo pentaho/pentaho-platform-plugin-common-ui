@@ -86,6 +86,15 @@ define([
             "test": 123
           };
 
+      it("should return null when attrs is nully", function() {
+        expect(fun.predicate(null)).toBe(null);
+        expect(fun.predicate(undefined)).toBe(null);
+      });
+
+      it("should return null when attrs is an empty object", function() {
+        expect(fun.predicate({})).toBe(null);
+      });
+
       it("should return a function", function() {
         predicate = fun.predicate(attrs);
         expect(typeof predicate).toBe("function");
