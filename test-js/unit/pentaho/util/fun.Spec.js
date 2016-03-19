@@ -39,14 +39,43 @@ define([
         expectIsFunction([null, 123, "string", true, {}], false);
       });
     });
-    
+
+    describe(".as(value)", function() {
+
+      it("should return the value, if it is a function", function() {
+        var f = function() {};
+
+        expect(fun.as(f)).toBe(f);
+      });
+
+      it("should eval the value and return it, if it is a string", function() {
+        var f = fun.as("function() { return 1; }");
+
+        expect(typeof f).toBe("function");
+        expect(f()).toBe(1);
+      });
+
+      it("should throw SyntaxError if the value is a string, but not a valid function", function() {
+        expect(function() {
+          fun.as("function() { return 1;");
+        }).toThrowError(SyntaxError);
+      });
+
+      it("should return null, if value is of a different type", function() {
+        expect(fun.as(1)).toBe(null);
+        expect(fun.as(null)).toBe(null);
+        expect(fun.as(undefined)).toBe(null);
+        expect(fun.as({})).toBe(null);
+      });
+    });
+
     describe(".constant(value)", function() {
 
       it("should convert any value to a function that returns that same value", function() {
         [function() {}, null, 123, "string", true, {}].forEach(function(elem) {
-            var constant = fun.constant(elem);
-            expect(typeof constant).toBe("function");
-            expect(constant()).toBe(elem);
+          var constant = fun.constant(elem);
+          expect(typeof constant).toBe("function");
+          expect(constant()).toBe(elem);
         });
       });
     });
