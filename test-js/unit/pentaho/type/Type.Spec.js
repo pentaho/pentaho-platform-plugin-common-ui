@@ -413,6 +413,30 @@ define([
       });
     }); // #id
 
+    describe("#shortId -", function() {
+
+      it("should be `null` when id is `null`", function() {
+        var Derived = Instance.extend();
+        expect(Derived.type.shortId).toBe(null);
+      });
+
+      it("should be equal to #id when it is not a standard, single-level id", function() {
+        var Derived = Instance.extend({type: {id: "my/foo"}});
+        expect(Derived.type.shortId).toBe(Derived.type.id);
+      });
+
+      it("should be equal to the last sub-module of #id when it is of a standard, single-level id", function() {
+        var Derived = Instance.extend({type: {id: "pentaho/type/foo"}});
+        expect(Derived.type.shortId).toBe("foo");
+        expect(Derived.type.id).not.toBe("foo");
+      });
+
+      it("should be equal to #id when it is of a standard, multiple-level id", function() {
+        var Derived = Instance.extend({type: {id: "pentaho/type/foo/bar"}});
+        expect(Derived.type.shortId).toBe(Derived.type.id);
+      });
+    }); // #shortId
+
     describe("#description -", function() {
 
       it("should preserve the default value", function() {
