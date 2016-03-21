@@ -96,16 +96,16 @@ define([
       var handles = [];
 
       var eventTypes = parseEventTypes(type);
-      if (eventTypes) {
+      if(eventTypes) {
         var priority = !!keyArgs && !!keyArgs.priority ? keyArgs.priority : 0;
 
-        for (var events_i = 0, events_len = eventTypes.length; events_i !== events_len; ++events_i) {
+        for(var events_i = 0, events_len = eventTypes.length; events_i !== events_len; ++events_i) {
           var eventType = eventTypes[events_i];
-          
+
           var queue = this._getQueueOf(eventType, /*create:*/true);
 
-          for (var i = queue.length - 1; i !== -2; --i) {
-            if (i !== -1 && priority <= queue[i].priority) {
+          for(var i = queue.length - 1; i !== -2; --i) {
+            if(i !== -1 && priority <= queue[i].priority) {
               queue[i + 1] = queue[i];
               queue[i + 1].order = i + 1;
             } else {
@@ -125,11 +125,11 @@ define([
         }
       }
 
-      if (handles.length === 1) {
+      if(handles.length === 1) {
         return handles[0];
       }
 
-      if (handles.length > 1) {
+      if(handles.length > 1) {
         return new EventRegistrationHandle(removeMultipleHandles.bind(this, handles));
       }
 
@@ -160,12 +160,12 @@ define([
     _indexOfListener: function(type, listener, fromIndex) {
       var queue = this._getQueueOf(type, /*create:*/false);
       if(queue) {
-        if (fromIndex == null) {
+        if(fromIndex == null) {
           fromIndex = 0;
         }
 
-        for (var i = fromIndex, len = queue.length; i < len; ++i) {
-          if (queue[i].listener === listener) {
+        for(var i = fromIndex, len = queue.length; i < len; ++i) {
+          if(queue[i].listener === listener) {
             return i;
           }
         }
@@ -176,7 +176,7 @@ define([
 
     _removeListener: function(type, listener, fromIndex) {
       var index = this._indexOfListener(type, listener, fromIndex);
-      if (index !== -1) {
+      if(index !== -1) {
         var queue = this._listeners_registry[type];
         queue.splice(index, 1);
 
@@ -226,9 +226,9 @@ define([
       if(!listener) throw error.argRequired("listener");
 
       var eventTypes = parseEventTypes(typeOrHandle);
-      if (eventTypes) {
-        for (var events_i = 0, events_len = eventTypes.length; events_i !== events_len; ++events_i) {
-          while (this._removeListener(eventTypes[events_i], listener)) {
+      if(eventTypes) {
+        for(var events_i = 0, events_len = eventTypes.length; events_i !== events_len; ++events_i) {
+          while(this._removeListener(eventTypes[events_i], listener)) {
           }
         }
       }
@@ -283,28 +283,7 @@ define([
      * @sealed
      */
     _emit: function(event) {
-      if(!event) throw error.argRequired("event");
-      if(!(event instanceof Event)) throw error.argInvalidType("event", "pentaho.type.Event");
-
-      if (event.isCanceled) {
-        return null;
-      }
-
-      var queue = this._getQueueOf(event.type, /*create:*/false);
-      if(queue) {
-        queue = queue.slice();
-
-        var i = queue.length;
-        while (i-- && !event.isCanceled) {
-          queue[i].listener.call(this, event);
-        }
-
-        if (event.isCanceled) {
-          return null;
-        }
-      }
-
-      return event;
+      return emit.call(this, event, false);
     },
 
     /**
@@ -321,32 +300,7 @@ define([
      * @protected
      */
     _emitSafe: function(event) {
-      if(!event) throw error.argRequired("event");
-      if(!(event instanceof Event)) throw error.argInvalidType("event", "pentaho.type.Event");
-
-      if (event.isCanceled) {
-        return null;
-      }
-
-      var queue = this._getQueueOf(event.type, /*create:*/false);
-      if(queue) {
-        queue = queue.slice();
-
-        var i = queue.length;
-        while (i-- && !event.isCanceled) {
-          try {
-            queue[i].listener.call(this, event);
-          } catch(e) {
-            console.log("Exception thrown during '", event.type, "' loop:", e);
-          }
-        }
-
-        if (event.isCanceled) {
-          return null;
-        }
-      }
-
-      return event;
+      return emit.call(this, event, true);
     }
   });
 
@@ -364,13 +318,13 @@ define([
     var fromIndex = info.order;
 
     var r = this._removeListener(type, info.listener, fromIndex);
-    if (!r && fromIndex > 0) {
+    if(!r && fromIndex > 0) {
       this._removeListener(type, info.listener, 0);
     }
   }
 
   function removeMultipleHandles(handles) {
-    for (var i = 0, L = handles.length; i !== L; ++i) {
+    for(var i = 0, L = handles.length; i !== L; ++i) {
       handles[i].dispose();
     }
   }
@@ -389,4 +343,48 @@ define([
 
     return [type];
   }
+
+  /**
+   * Emits an event, optionally ignoring the exceptions thrown by event listeners
+   *
+   * @param {!pentaho.lang.Event} event - The event object to emit.
+   * @param {boolean} ignoreExceptions - Determines if exceptions triggered by event listeners are ignored.
+   * @return {?pentaho.lang.Event} The emitted event object or `null`, when canceled.
+   * @private
+   */
+  function emit(event, ignoreExceptions) {
+    if(!event) throw error.argRequired("event");
+    if(!(event instanceof Event)) throw error.argInvalidType("event", "pentaho.type.Event");
+
+    if(event.isCanceled) {
+      return null;
+    }
+
+    var queue = this._getQueueOf(event.type, /*create:*/false);
+    if(!queue) return event;
+
+    queue = queue.slice();
+
+    var i = queue.length;
+    if(ignoreExceptions) {
+      while(i-- && !event.isCanceled) {
+        try {
+          queue[i].listener.call(this, event);
+        } catch(e) {
+          console.log("Exception thrown during '", event.type, "' loop:", e);
+        }
+      }
+    } else {
+      while(i-- && !event.isCanceled) {
+        queue[i].listener.call(this, event);
+      }
+    }
+
+    if(event.isCanceled) {
+      return null;
+    }
+
+    return event;
+  }
+
 });
