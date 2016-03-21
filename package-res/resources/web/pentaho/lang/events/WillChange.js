@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 define([
-  "pentaho/lang/Event",
-  "../mixins/mixinDataFilter"
-], function(Event, mixinDataFilter) {
+  "../Event"
+], function(Event) {
   "use strict";
 
   /**
@@ -36,7 +35,6 @@ define([
     /** @lends pentaho.visual.base.events.WillChangeSelection# */{
       constructor: function(source, property, value, previousValue) {
         this.base("will:change", source, true);
-        //this._initFilter(dataFilter, true);
         this.property = property;
         this.value = value;
         this._previousValue = previousValue;
@@ -66,6 +64,5 @@ define([
         return "will:change";
       }
     });
-    //.implement(mixinDataFilter);
 
 });

@@ -15,14 +15,14 @@
  */
 define([
   "pentaho/lang/Event",
-  "pentaho/visual/base/events/DidChange",
+  "pentaho/lang/events/DidChange",
   "tests/pentaho/util/errorMatch"
 ], function(Event, DidChange, errorMatch) {
   "use strict";
 
   /* global describe:false, it:false, expect:false, beforeEach:false */
 
-  describe("pentaho.visual.base.events.DidChange -", function() {
+  describe("pentaho.lang.events.DidChange -", function() {
     var type = "change";
 
     it("should extend Event", function() {
@@ -74,5 +74,5 @@ define([
       }).toThrow(errorMatch.argRequired("will"));
     });
 
-  }); // #pentaho.events.DidChangeSelection
+  }); // #pentaho.lang.events.DidChange
 });

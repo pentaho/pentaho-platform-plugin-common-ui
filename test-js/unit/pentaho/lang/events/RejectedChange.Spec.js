@@ -15,14 +15,14 @@
  */
 define([
   "pentaho/lang/Event",
-  "pentaho/visual/base/events/RejectedChange",
+  "pentaho/lang/events/RejectedChange",
   "tests/pentaho/util/errorMatch"
 ], function(Event, RejectedChange, errorMatch) {
   "use strict";
 
   /* global describe:false, it:false, expect:false, beforeEach:false */
 
-  describe("pentaho.events.RejectedChange -", function() {
+  describe("pentaho.lang.events.RejectedChange -", function() {
     var type = "change";
 
     it("should extend Event", function() {
@@ -80,5 +80,5 @@ define([
       }).toThrow(errorMatch.argRequired("will"));
     });
 
-  }); // #pentaho.events.RejectedChangeSelection
+  }); // #pentaho.lang.events.RejectedChange
 });

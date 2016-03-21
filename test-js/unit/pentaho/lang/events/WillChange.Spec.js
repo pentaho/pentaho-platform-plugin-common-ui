@@ -15,14 +15,14 @@
  */
 define([
   "pentaho/lang/Event",
-  "pentaho/visual/base/events/WillChange",
+  "pentaho/lang/events/WillChange",
   "tests/pentaho/util/errorMatch"
 ], function(Event, WillChange, errorMatch) {
   "use strict";
 
   /* global describe:false, it:false, expect:false, beforeEach:false */
 
-  describe("pentaho.visual.base.events.WillChange -", function() {
+  describe("pentaho.lang.events.WillChange -", function() {
     var type = "change";
 
     it("should extend Event", function() {
@@ -67,5 +67,5 @@ define([
       });
     });
 
-  }); // #pentaho.visual.base.eventsWillChange
+  }); // #pentaho.lang.events.WillChange
 });

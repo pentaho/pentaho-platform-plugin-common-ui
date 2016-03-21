@@ -14,30 +14,33 @@
  * limitations under the License.
  */
 define([
-  "pentaho/lang/Event",
-  "pentaho/util/error"
+  "../Event",
+  "../../util/error"
 ], function(Event, utilError) {
   "use strict";
 
-  return Event.extend("pentaho.visual.base.events.RejectChange",
-    /** @lends pentaho.visual.base.events.RejectChange# */{
-      constructor: function(source, error, will) {
-        if(!error) throw utilError.argRequired("error");
+  return Event.extend("pentaho.lang.events.DidChange",
+    /** @lends pentaho.lang.events.DidChange# */{
+      constructor: function(source, value, will) {
         if(!will) throw utilError.argRequired("will");
 
-        this.base("rejected:change", source, false);
-        this._error = error;
+        this.base("did:change", source, false);
+        this._property = will.property;
+        this._value = value;
         this._previousValue = will.previousValue;
+      },
+      get property(){
+        return this._property;
+      },
+      get value(){
+        return this._value;
       },
       get previousValue(){
         return this._previousValue;
-      },
-      get error() {
-        return this._error;
       }
     },{
       get type() {
-        return "rejected:change";
+        return "did:change";
       }
     });
 

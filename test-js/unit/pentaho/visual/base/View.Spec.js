@@ -2,7 +2,7 @@ define([
   "pentaho/visual/base/View",
   "pentaho/visual/base",
   "pentaho/type/Context",
-  "pentaho/visual/base/events/DidChange",
+  "pentaho/lang/events/DidChange",
   "tests/pentaho/util/errorMatch"
 ], function(View, modelFactory, Context, DidChange, errorMatch) {
   "use strict";
