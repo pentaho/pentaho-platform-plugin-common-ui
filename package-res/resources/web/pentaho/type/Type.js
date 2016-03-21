@@ -85,6 +85,7 @@ define([
       // Block inheritance, with default values
       this._id         = null;
       this._styleClass = null;
+      this._hasDescendants = false;
     },
 
     /**
@@ -192,9 +193,23 @@ define([
      * @type ?pentaho.type.Type
      * @readonly
      * @see pentaho.type.Type#root
+     * @see pentaho.type.Type#hasDescendants
      */
     get ancestor() {
       return this.isRoot ? null : Object.getPrototypeOf(this);
+    },
+    //endregion
+
+    //region hasDescendants property
+    /**
+     * Gets a value that indicates if this type has any descendant types.
+     *
+     * @type {boolean}
+     * @readonly
+     * @see pentaho.type.Type#ancestor
+     */
+    get hasDescendants() {
+      return this._hasDescendants;
     },
     //endregion
 
@@ -659,6 +674,9 @@ define([
      * @ignore
      */
     _extendProto: function(instSpec, keyArgs) {
+
+      O.setConst(this, "_hasDescendants", true);
+
       var subType = Object.create(this);
 
       // NOTE: `subType.constructor` is still the "base" constructor.
@@ -739,6 +757,9 @@ define([
      * @ignore
      */
     _subclassed: function(SubTypeCtor, instSpec, classSpec, keyArgs) {
+
+      O.setConst(this.prototype, "_hasDescendants", true);
+
       var SubInstCtor = keyArgs.instance.constructor;
 
       // Links SubTypeCtor and SubInstCtor and "implements" instSpec.

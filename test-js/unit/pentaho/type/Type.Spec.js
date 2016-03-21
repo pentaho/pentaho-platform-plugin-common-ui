@@ -717,6 +717,28 @@ define([
       });
     }); // #ancestor
 
+    describe("#hasDescendants -", function() {
+      it("returns false if the type has not been extended", function() {
+        var Derived = Instance.extend();
+
+        expect(Derived.type.hasDescendants).toBe(false);
+      });
+
+      it("returns true if the type has been extended using .extend(...)", function() {
+        var Derived = Instance.extend();
+
+        Derived.extend();
+        expect(Derived.type.hasDescendants).toBe(true);
+      });
+
+      it("returns true if the type has been extended using .type.extendProto(...)", function() {
+        var Derived = Instance.extend();
+
+        Derived.extendProto();
+        expect(Derived.type.hasDescendants).toBe(true);
+      });
+    }); // #hasDescendants
+
     describe("#create -", function() {
       it("returns a new instance of `pentaho.type.Instance`", function() {
         expect(Instance.type.create() instanceof Instance).toBe(true);
