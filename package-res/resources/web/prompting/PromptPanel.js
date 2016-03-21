@@ -781,7 +781,7 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
           this.forceAutoSubmit = false;
           if (this.onSubmit) {
             if (typeof this.onSubmit === "function") {
-              this.onSubmit(promptPanel, options);
+              this.onSubmit(options);
             } else {
               Logger.warn("The onSubmit event callback is not a function");
             }

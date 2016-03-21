@@ -310,7 +310,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
         spyOn(panel, "onSubmit");
         panel.submit(promptPanel, options);
         expect(panel.forceAutoSubmit).toBeFalsy();
-        expect(panel.onSubmit).toHaveBeenCalledWith(promptPanel, options);
+        expect(panel.onSubmit).toHaveBeenCalledWith(options);
       });
 
       it("submit doesn't execute the onSubmit callback if the latter isn't a function", function() {
@@ -1568,7 +1568,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
         it ("should register a postIinit function to the dashboard", function() {
           var callbackSpy = jasmine.createSpy("functionSpy");
           spyOn(panel, "getDashboard").and.callThrough();
-          
+
           panel.onPostInit(callbackSpy);
 
 
