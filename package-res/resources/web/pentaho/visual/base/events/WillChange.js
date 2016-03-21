@@ -41,9 +41,26 @@ define([
         this.value = value;
         this._previousValue = previousValue;
       },
-      get previousValue(){
+      get previousValue() {
         return this._previousValue;
       }
+
+      /*
+       constructor: function(source, property, value, previousValue) {
+       this.base("will:change", source, true);
+       //this._initFilter(dataFilter, true);
+       //this.property = property;
+       this._previousValues = {}[property] = previousValue;
+       this._newValues = {}[property] = value;
+       },
+       previousValue: function(property) {
+       return this._previousValues[property];
+       },
+
+       value: function(property) {
+       return this._newValues[property];
+       }
+      */
     },{
       get type() {
         return "will:change";
