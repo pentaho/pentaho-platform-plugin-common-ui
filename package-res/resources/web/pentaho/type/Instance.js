@@ -23,6 +23,8 @@ define([
 
   "use strict";
 
+  var _keyArgsExcludeInstance = {exclude: {type: 1}};
+
   /**
    * @name pentaho.type.Instance
    * @class
@@ -89,6 +91,9 @@ define([
     // NOTE: not calling base to block default Base.js from copying 1st argument into `this`.
     constructor: function() {
     },
+
+    // Properties to ignore within extend
+    extend_exclude: {_: 1},
 
     //region type property
     _type: null, // Set on Type#_init
@@ -220,15 +225,14 @@ define([
       var subInstProto = Object.create(baseInstProto);
 
       // TYPE
-      var typeInstSpec = O["delete"](instSpec, "type");
-
-      var ka  = keyArgs ? Object.create(keyArgs) : {};
+      var ka = keyArgs ? Object.create(keyArgs) : {};
       ka.instance = subInstProto;
 
-      baseInstProto.type._extendProto(typeInstSpec, ka);
+      baseInstProto.type._extendProto(instSpec && instSpec.type, ka);
 
       // INSTANCE II
-      return subInstProto.extend(instSpec);
+      // Don't process `instSpec.type` twice, during construction.
+      return subInstProto.extend(instSpec, _keyArgsExcludeInstance);
     },
 
     //@override
@@ -240,18 +244,18 @@ define([
       // 1. `instSpec` may override property accessors only defined by `Complex.Type`
       // 2. So, the Type class must be created *before* applying instSpec and classSpec to SubInstCtor
       // 3. The Type class requires InstCtor to already exist, to be able to define accessors
-      var typeInstSpec  = O["delete"](instSpec, "type"),
-          typeClassSpec = O["delete"](classSpec, "type"),
-          // Setting a function's name is failing on PhantomJS 1.9.8...
-          instName      = SubInstCtor.name || SubInstCtor.displayName,
-          typeName      = instName && (instName + ".Type");
 
-      var ka  = keyArgs ? Object.create(keyArgs) : {};
+      // Setting a function's name is failing on PhantomJS 1.9.8...
+      var instName = SubInstCtor.name || SubInstCtor.displayName,
+          typeName = instName && (instName + ".Type");
+
+      var ka = keyArgs ? Object.create(keyArgs) : {};
       ka.instance = SubInstCtor.prototype;
 
-      this.Type.extend(typeName, typeInstSpec, typeClassSpec, ka);
+      this.Type.extend(typeName, instSpec && instSpec.type, classSpec && classSpec.type, ka);
 
-      SubInstCtor.mix(instSpec, classSpec);
+      // Don't process `instSpec.type` and `classSpec.type` twice, during construction.
+      SubInstCtor.mix(instSpec, classSpec, _keyArgsExcludeInstance);
     }
   });
 
