@@ -20,9 +20,9 @@ define([
   "./valueHelper",
   "../lang/EventSource",
   "../lang/ActionResult",
-  "pentaho/visual/base/events/WillChange",
-  "pentaho/visual/base/events/RejectedChange",
-  "pentaho/visual/base/events/DidChange",
+  "../lang/events/WillChange",
+  "../lang/events/RejectedChange",
+  "../lang/events/DidChange",
   "../i18n!types",
   "../util/object",
   "../util/error"

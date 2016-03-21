@@ -30,9 +30,9 @@ define([
   "./events/DidExecute",
   "./events/RejectedExecute",
 
-  "./events/WillChange",
-  "./events/DidChange",
-  "./events/RejectedChange",
+  "pentaho/lang/events/WillChange",
+  "pentaho/lang/events/DidChange",
+  "pentaho/lang/events/RejectedChange",
 
   "pentaho/lang/ActionResult",
 
