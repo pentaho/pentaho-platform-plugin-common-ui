@@ -469,8 +469,8 @@ define([
          * @ignore
          */
         _throwAbstractType: function() {
-          throw error.operInvalid(
-              bundle.format(bundle.structured.errors.value.cannotCreateInstanceOfAbstractType, [this._getErrorLabel()]));
+          throw error.operInvalid(bundle.format(
+              bundle.structured.errors.value.cannotCreateInstanceOfAbstractType, [this._getErrorLabel()]));
         },
 
         /**

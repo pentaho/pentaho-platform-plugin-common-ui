@@ -85,13 +85,13 @@ define([
 
       it("should not accept null", function() {
         expect(function() {
-          new PentahoBoolean(null);
+          var foo = new PentahoBoolean(null);
         }).toThrow(errorMatch.argRequired("value"));
       });
 
       it("should not accept undefined", function() {
         expect(function() {
-          new PentahoBoolean(undefined);
+          var foo = new PentahoBoolean(undefined);
         }).toThrow(errorMatch.argRequired("value"));
       });
     });

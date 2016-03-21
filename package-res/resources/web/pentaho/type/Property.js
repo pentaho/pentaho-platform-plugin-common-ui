@@ -118,8 +118,8 @@ define([
           if(!this._name) this.name = null; // throws...
 
           // Force assuming default values
-          if(!this._type) this.type = null;
-          if(!this._label)    this._resetLabel();
+          if(!this._type)  this.type = null;
+          if(!this._label) this._resetLabel();
         }
       },
 
@@ -395,7 +395,7 @@ define([
        */
       _freshDefaultValue: function() {
         var value = this.value;
-        return value     ? value.clone()      :
+        return value       ? value.clone()      :
                this.isList ? this.type.create() :
                value;
       },
@@ -491,7 +491,7 @@ define([
         Object.keys(attrSpecs).forEach(function(name) {
           this._dynamicAttribute(name, attrSpecs[name]);
         }, this);
-      },
+      }, // jshint -W078
 
       /**
        * Dynamically defines an attribute and corresponding setter and getter methods.

@@ -435,6 +435,7 @@ define([
         if(index == null) {
           index = elems.length;
         } else {
+          /*jshint laxbreak:true*/
           index = index < 0
               ? Math.max(0, elems.length + index)
               : Math.min(index, elems.length);
@@ -696,7 +697,7 @@ define([
         //endregion
       }
     }).implement({
-      type: bundle.structured["list"]
+      type: bundle.structured.list
     });
 
     return List;

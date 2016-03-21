@@ -31,37 +31,6 @@ define([
       List = context.get(listFactory),
       PentahoNumber = context.get(numberFactory);
 
-  function itShouldLenientMethod(getter, args, lenientResult, error) {
-
-    it("should throw when lenient is unspecified", function() {
-      expect(function() { getter(args); }).toThrow(error);
-    });
-
-    it("should throw when lenient is false", function() {
-      var args2 = args.concat(false);
-
-      expect(function() { getter(args2); }).toThrow(error);
-    });
-
-    it("should throw when lenient is null", function() {
-      var args2 = args.concat(null);
-
-      expect(function() { getter(args2); }).toThrow(error);
-    });
-
-    it("should throw when lenient is undefined", function() {
-      var args2 = args.concat(undefined);
-
-      expect(function() { getter(args2); }).toThrow(error);
-    });
-
-    it("should return `" + lenientResult + "` when lenient is true", function() {
-      var args2 = args.concat(true);
-
-      expect(getter(args2)).toBe(lenientResult);
-    });
-  }
-
   function expectNoChanges(list) {
     expect(list._changes).toBe(null);
     expect(list._changeLevel).toBe(0);

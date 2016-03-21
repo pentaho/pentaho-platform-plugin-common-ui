@@ -118,7 +118,7 @@ define([
        */
       set v(value) {
         this.value = value;
-      },
+      }, // jshint -W078
       //endregion
 
       //region formatted attribute
@@ -145,7 +145,7 @@ define([
        */
       set f(value) {
         this.formatted = value;
-      },
+      }, // jshint -W078
       //endregion
 
       /**
@@ -257,6 +257,7 @@ define([
           return this._value;
 
         // Need one. Ensure _ is the first property
+        /*jshint laxbreak:true*/
         var spec = requireType
             ? {_: this.type.toReference(scope, keyArgs), v: this._value}
             : {v: this._value};
@@ -317,12 +318,15 @@ define([
      * Wrapper cast function {@link pentaho.type.Simple.Type#cast}
      */
     function castTop(value) {
+      /*jshint validthis:true*/
+
       if(value == null)
         throw error.argRequired("value");
 
       value = this._cast(value);
       if(value == null)
-        throw error.argInvalid("value", bundle.format(bundle.structured.errors.value.cannotConvertToType, [this.label]));
+        throw error.argInvalid("value",
+            bundle.format(bundle.structured.errors.value.cannotConvertToType, [this.label]));
 
       return value;
     }

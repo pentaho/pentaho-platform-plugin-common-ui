@@ -29,7 +29,7 @@ define([
   describe("pentaho.type.Simple -", function() {
     function expectThrow(spec, errorMatch) {
       expect(function() {
-        new Simple(spec);
+        var foo = new Simple(spec);
       }).toThrow(errorMatch);
     }
 

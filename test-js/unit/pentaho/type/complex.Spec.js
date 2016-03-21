@@ -27,8 +27,7 @@ define([
   var context = new Context();
   var Value = context.get("pentaho/type/value");
   var Complex = context.get("pentaho/type/complex");
-  var Number = context.get("pentaho/type/number");
-  var String = context.get("pentaho/type/string");
+  var PentahoString = context.get("pentaho/type/string");
   var List = context.get("pentaho/type/list");
 
   describe("pentaho.type.Complex", function() {
@@ -76,11 +75,11 @@ define([
 
     describe("new Complex()", function() {
       it("should be possible to create an instance with no arguments", function() {
-        new Complex();
+        var foo = new Complex();
       });
 
       it("should be possible to create an instance with empty arguments", function() {
-        new Complex({});
+        var foo = new Complex({});
       });
 
       it("should have type.count = 0", function() {
@@ -107,7 +106,7 @@ define([
 
       describe("when given empty arguments", function() {
         it("should not throw", function() {
-          new Derived();
+          var foo = new Derived();
         });
 
         it("should have every property with its default value", function() {
@@ -269,7 +268,7 @@ define([
             return derived.get.apply(derived, args);
           };
 
-          var sloppyResult = undefined;
+          var sloppyResult;// = undefined;
           var strictError  = errorMatch.argInvalid("name");
 
           sloppyModeUtil.itShouldBehaveStrictlyUnlessSloppyIsTrue(getter, ["y"], sloppyResult, strictError);
@@ -465,7 +464,7 @@ define([
             var Derived = Complex.extend({
               type: {props: [{name: "x", type: "string"}]}
             });
-            var simple  = new String(1);
+            var simple  = new PentahoString(1);
             var derived = new Derived({x: simple});
             var getter  = buildGetter(derived);
 
@@ -477,8 +476,8 @@ define([
             var Derived = Complex.extend({
               type: {props: [{name: "x", type: ["string"]}]}
             });
-            var simple1 = new String(1);
-            var simple2 = new String(2);
+            var simple1 = new PentahoString(1);
+            var simple2 = new PentahoString(2);
             var derived = new Derived({x: [simple1, simple2]});
             var getter  = buildGetter(derived);
 
@@ -493,8 +492,8 @@ define([
             var Derived = Complex.extend({
               type: {props: [{name: "x", type: ["string"]}]}
             });
-            var simple1 = new String(1);
-            var simple2 = new String(2);
+            var simple1 = new PentahoString(1);
+            var simple2 = new PentahoString(2);
             var derived = new Derived({x: [simple1, simple2]});
             var getter  = buildGetter(derived);
 
@@ -521,8 +520,8 @@ define([
                 ]
               }
             });
-            var simple1 = new String(1);
-            var simple2 = new String(2);
+            var simple1 = new PentahoString(1);
+            var simple2 = new PentahoString(2);
             var derived = new Derived({x: [{y: [simple1, simple2]}]});
             var getter  = buildGetter(derived);
             var result  = simple2;
@@ -591,7 +590,7 @@ define([
 
             var derived = new Derived({x: {y: [1]}});
             var getter  = buildGetter(derived);
-            var sloppyResult = undefined;
+            var sloppyResult;// = undefined;
             var strictError = errorMatch.argInvalid("name");
             sloppyModeUtil.itShouldBehaveStrictlyUnlessSloppyIsTrue(getter, [["x", "z", 1]], sloppyResult, strictError);
           });
@@ -638,7 +637,7 @@ define([
             return derived.at.apply(derived, args);
           };
 
-          var sloppyResult = undefined;
+          var sloppyResult;// = undefined;
           var strictError = errorMatch.argInvalid("name");
           sloppyModeUtil.itShouldBehaveStrictlyUnlessSloppyIsTrue(getter, ["y", 0], sloppyResult, strictError);
         });
