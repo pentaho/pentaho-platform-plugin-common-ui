@@ -236,7 +236,7 @@ define([
      * See Base.js
      * @ignore
      */
-    _subClassed: function(SubInstCtor, instSpec, classSpec, keyArgs) {
+    _subclassed: function(SubInstCtor, instSpec, classSpec, keyArgs) {
       // 1. `instSpec` may override property accessors only defined by `Complex.Type`
       // 2. So, the Type class must be created *before* applying instSpec and classSpec to SubInstCtor
       // 3. The Type class requires InstCtor to already exist, to be able to define accessors

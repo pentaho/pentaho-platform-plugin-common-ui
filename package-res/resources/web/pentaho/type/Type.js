@@ -738,7 +738,7 @@ define([
      * See Base.js
      * @ignore
      */
-    _subClassed: function(SubTypeCtor, instSpec, classSpec, keyArgs) {
+    _subclassed: function(SubTypeCtor, instSpec, classSpec, keyArgs) {
       var SubInstCtor = keyArgs.instance.constructor;
 
       // Links SubTypeCtor and SubInstCtor and "implements" instSpec.
@@ -754,7 +754,7 @@ define([
     // The static interface is not touched.
     //
     // NOTE: optionally receiving `keyArgs` as an optimization.
-    // `_subClassed` is given a _derived_ `keyArgs`
+    // `_subclassed` is given a _derived_ `keyArgs`
     // that can/should be passed to `this`(constructor).
     _initInstCtor: function(InstCtor, instSpec, keyArgs) {
 
