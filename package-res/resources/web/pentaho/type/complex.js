@@ -19,10 +19,16 @@ define([
   "./PropertyTypeCollection",
   "./valueHelper",
   "../lang/EventSource",
+  "../lang/ActionResult",
+  "pentaho/visual/base/events/WillChange",
+  "pentaho/visual/base/events/RejectedChange",
+  "pentaho/visual/base/events/DidChange",
   "../i18n!types",
   "../util/object",
   "../util/error"
-], function(module, elemFactory, PropertyTypeCollection, valueHelper, EventSource, bundle, O, error) {
+], function(module, elemFactory, PropertyTypeCollection, valueHelper,
+            EventSource, ActionResult, WillChange, RejectedChange, DidChange,
+            bundle, O, error) {
 
   "use strict";
 
@@ -347,9 +353,44 @@ define([
           var value1 = pType.toValue(valueSpec);
           if(!pType.type.areEqual(value0, value1)) {
             // TODO: change event
-            this._values[pType.name] = value1;
+            //this._values[pType.name] = value1;
+            var will = new WillChange(this, pType.name, value1, value0);
+            return this._doAction(this._setAction, will, DidChange, RejectedChange);
           }
         }
+      },
+      
+      _setAction: function(will) {
+        this._values[will.property] = will.value;
+        return ActionResult.fulfill(will.value);
+      },
+
+      /**
+       * Executes the will/did/rejected event loop associated with a given action.
+       *
+       * @param {function} coreAction - The action to be executed.
+       * @param {pentaho.visual.base.events.Will} will - The "will:" event object.
+       * @param {function} Did - The constructor of the "did:" event.
+       * @param {function} Rejected - The constructor of the "rejected:" event.
+       * @return {pentaho.lang.ActionResult} The result object.
+       * @protected
+       */
+      _doAction: function(coreAction, will, Did, Rejected){
+        if(this._hasListeners(will.type))
+          this._emitSafe(will);
+
+        var result = will.isCanceled ? ActionResult.reject(will.cancelReason) : coreAction.call(this, will);
+
+        if(result.error) {
+          if(this._hasListeners(Rejected.type)) {
+            this._emitSafe(new Rejected(this, result.error, will));
+          }
+        } else {
+          if(this._hasListeners(Did.type)){
+            this._emitSafe(new Did(this, result.value, will));
+          }
+        }
+        return result;
       },
       //endregion
 

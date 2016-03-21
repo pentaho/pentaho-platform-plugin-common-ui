@@ -145,7 +145,7 @@ define([
          * @return {pentaho.lang.ActionResult} The result object.
          * @protected
          */
-        _doAction: function(coreAction, will, Did, Rejected){
+        /*_doAction: function(coreAction, will, Did, Rejected){
           if(this._hasListeners(will.type))
             this._emitSafe(will);
 
@@ -161,7 +161,7 @@ define([
             }
           }
           return result;
-        },
+        },*/
 
         /**
          * Changes the value of a property and returns a [result]{@link pentaho.lang.ActionResult} object.

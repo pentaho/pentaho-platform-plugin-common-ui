@@ -25,6 +25,7 @@ define([
 
       this.model.set("doExecute", this._googleSearch);
       this.model.on("will:execute", this._onWillExecute);
+      this.model.on("will:change", this._onWillChange);
     },
 
     // Temporary. Used for demo of BACKLOG-5985
@@ -81,6 +82,16 @@ define([
     _hackedRender: function(){
       this._selectionChanged(this.model.getv("selectionFilter"), new filter.Or());
       this._chart.renderInteractive();
+    },
+
+    _onWillChange: function(event) {
+      var property = event.property;
+      if(property === "width" || property === "height") {
+        var result = window.confirm("Do you really want to resize?");
+
+        if(result === false) event.cancel("User canceled");
+        console.log(event.property, event.previousValue, event.value);
+      }
     }
   }
 
