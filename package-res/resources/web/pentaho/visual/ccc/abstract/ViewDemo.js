@@ -79,19 +79,22 @@ define([
       console.log("Google Search:" + url);
     },
 
-    _hackedRender: function(){
+    _hackedRender: function() {
       this._selectionChanged(this.model.getv("selectionFilter"), new filter.Or());
       this._chart.renderInteractive();
     },
 
     _onWillChange: function(event) {
-      var property = event.property;
-      if(property === "width" || property === "height") {
-        var result = window.confirm("Do you really want to resize?");
-
-        if(result === false) event.cancel("User canceled");
-        console.log(event.property, event.previousValue, event.value);
-      }
+      //var property = event.property;
+      var changeSet = event.changeSet;
+      changeSet.changedProperties.forEach(function(prop) {
+        var result = true;
+        if(prop === "width" || prop === "height") {
+          result = window.confirm(prop + " changed. Do you really want to resize?");
+          if(result === false) event.cancel("User canceled");
+        }
+        console.log(prop + (result ? " changed!" : " did not change!"), changeSet.getPreviousValue(prop), changeSet.getValue(prop));
+      });
     }
   }
 

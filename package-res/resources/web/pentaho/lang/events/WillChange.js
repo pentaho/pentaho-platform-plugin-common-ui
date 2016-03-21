@@ -19,7 +19,7 @@ define([
   "use strict";
 
   /**
-   * @name WillChangeSelection
+   * @name WillChange
    * @memberOf pentaho.visual.base.events
    * @description This event is triggered by
    * the {@link pentaho.visual.base.Model#selectAction|Select Action} flow.
@@ -28,37 +28,25 @@ define([
    * - replace the input data filter
    *
    * @extends pentaho.lang.Event
-   * @event "will:change:selectionFilter"
+   * @event "will:change"
    */
 
-  return Event.extend("pentaho.visual.base.events.WillChangeSelection",
-    /** @lends pentaho.visual.base.events.WillChangeSelection# */{
-      constructor: function(source, property, value, previousValue) {
+  return Event.extend("pentaho.visual.base.events.WillChange",
+    /** @lends pentaho.visual.base.events.WillChange# */{
+
+      constructor: function(source, changeSet) {
         this.base("will:change", source, true);
-        this.property = property;
-        this.value = value;
-        this._previousValue = previousValue;
+        this._changeSets = [changeSet];
       },
-      get previousValue() {
-        return this._previousValue;
+
+      get changeSet() {
+        return this._changeSets[0];
+      },
+
+      get changeSets() {
+        return this._changeSets;
       }
-
-      /*
-       constructor: function(source, property, value, previousValue) {
-       this.base("will:change", source, true);
-       //this._initFilter(dataFilter, true);
-       //this.property = property;
-       this._previousValues = {}[property] = previousValue;
-       this._newValues = {}[property] = value;
-       },
-       previousValue: function(property) {
-       return this._previousValues[property];
-       },
-
-       value: function(property) {
-       return this._newValues[property];
-       }
-      */
+      
     },{
       get type() {
         return "will:change";
