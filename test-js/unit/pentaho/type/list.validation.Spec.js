@@ -27,33 +27,33 @@ define([
   var context = new Context();
   var Value = context.get(valueFactory);
   var List = context.get(listFactory);
-  var Number = context.get(numberFactory);
+  var PentahoNumber = context.get(numberFactory);
 
-  describe("pentaho.type.List.Meta -", function() {
+  describe("pentaho.type.List.Type -", function() {
     var NumberList = List.extend({
-      meta: {of: Number}
+      type: {of: PentahoNumber}
     });
 
     describe("#validate(value) -", function() {
       it("should call validateInstance(.) of the list element type with each of its members", function() {
-        spyOn(Number.meta, "validateInstance");
+        spyOn(PentahoNumber.type, "validateInstance");
 
         var list = new NumberList([1, 2, 3]);
 
-        list.meta.validate(list);
+        list.type.validate(list);
 
-        expect(Number.meta.validateInstance).toHaveBeenCalledWith(list.at(0));
-        expect(Number.meta.validateInstance).toHaveBeenCalledWith(list.at(1));
-        expect(Number.meta.validateInstance).toHaveBeenCalledWith(list.at(2));
+        expect(PentahoNumber.type.validateInstance).toHaveBeenCalledWith(list.at(0));
+        expect(PentahoNumber.type.validateInstance).toHaveBeenCalledWith(list.at(1));
+        expect(PentahoNumber.type.validateInstance).toHaveBeenCalledWith(list.at(2));
       });
 
       it("should return errors when given an invalid `Value`", function() {
-        expect(List.meta.validate(new Value())).not.toBe(null);
+        expect(List.type.validate(new Value())).not.toBe(null);
       });
 
       it("should return `null` when given a valid instance of a subtype", function() {
-        expect(List.meta.validate(new List())).toBe(null);
-        expect(List.meta.validate(new NumberList())).toBe(null);
+        expect(List.type.validate(new List())).toBe(null);
+        expect(List.type.validate(new NumberList())).toBe(null);
       });
     });// end #validate(value)
   });

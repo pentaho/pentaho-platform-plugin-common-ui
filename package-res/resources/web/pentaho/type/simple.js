@@ -28,11 +28,11 @@ define([
     var Element = context.get(elemFactory);
 
     /**
-     * @name pentaho.type.Simple.Meta
+     * @name pentaho.type.Simple.Type
      * @class
-     * @extends pentaho.type.Element.Meta
+     * @extends pentaho.type.Element.Type
      *
-     * @classDesc The metadata class of {@link pentaho.type.Simple}.
+     * @classDesc The type class of {@link pentaho.type.Simple}.
      */
 
     /**
@@ -120,7 +120,7 @@ define([
         // Value is immutable. Can only be set once.
 
         // Throws if nully.
-        _ = this.meta.cast(_);
+        _ = this.type.cast(_);
 
         if(this._value == null) {
           // First set
@@ -194,11 +194,11 @@ define([
        *
        * If two values have the same concrete type and their
        * keys are equal, then it must also be the case that
-       * {@link pentaho.type.Value.Meta#areEqual}
+       * {@link pentaho.type.Value.Type#areEqual}
        * returns `true` when given the two values.
        * The opposite should be true as well.
        * If two values of the same concrete type have distinct keys,
-       * then {@link pentaho.type.Value.Meta#areEqual} should return `false`.
+       * then {@link pentaho.type.Value.Type#areEqual} should return `false`.
        *
        * The default simple value implementation, returns the result of calling
        * `toString()` on {@link pentaho.type.Simple#value}.
@@ -266,7 +266,7 @@ define([
       },
       //endregion
 
-      meta: /** pentaho.type.Simple.Meta# */{
+      type: /** pentaho.type.Simple.Type# */{
         id: module.id,
         isAbstract: true,
         styleClass: "pentaho-type-simple",
@@ -307,14 +307,14 @@ define([
         //endregion
       }
     }).implement({
-      meta: bundle.structured.simple
+      type: bundle.structured.simple
     });
 
     return Simple;
 
     //region cast private methods
     /**
-     * Wrapper cast function {@link pentaho.type.Simple.Meta#cast}
+     * Wrapper cast function {@link pentaho.type.Simple.Type#cast}
      */
     function castTop(value) {
       if(value == null)

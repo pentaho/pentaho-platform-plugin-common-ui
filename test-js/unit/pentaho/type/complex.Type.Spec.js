@@ -16,35 +16,35 @@
 define([
   "pentaho/type/Context",
   "pentaho/type/Property",
-  "pentaho/type/PropertyMetaCollection",
+  "pentaho/type/PropertyTypeCollection",
   "tests/pentaho/util/errorMatch",
   "./sloppyModeUtil"
-], function(Context, Property, PropertyMetaCollection, errorMatch, sloppyModeUtil) {
+], function(Context, Property, PropertyTypeCollection, errorMatch, sloppyModeUtil) {
   "use strict";
 
   /* global describe:false, it:false, expect:false, beforeEach:false */
 
   var context = new Context();
-  var PropertyMeta = Property.Meta;
+  var PropertyType = Property.Type;
   var Value = context.get("pentaho/type/value");
   var Complex = context.get("pentaho/type/complex");
-  var String = context.get("pentaho/type/string");
+  var PentahoString = context.get("pentaho/type/string");
 
-  describe("pentaho.type.Complex.Meta", function() {
+  describe("pentaho.type.Complex.Type", function() {
 
     describe("anatomy", function() {
       it("should be a function", function() {
         var Derived = Complex.extend();
 
-        expect(typeof Derived.Meta).toBe("function");
+        expect(typeof Derived.Type).toBe("function");
       });
 
       it("should be a sub-class of Complex", function() {
         var Derived = Complex.extend();
 
-        expect(Derived.Meta).not.toBe(Value.Meta);
-        expect(Derived.Meta).not.toBe(Complex.Meta);
-        expect(Derived.meta instanceof Complex.Meta).toBe(true);
+        expect(Derived.Type).not.toBe(Value.Type);
+        expect(Derived.Type).not.toBe(Complex.Type);
+        expect(Derived.type instanceof Complex.Type).toBe(true);
       });
     });
 
@@ -54,26 +54,26 @@ define([
           it("should have no properties", function() {
             var Derived = Complex.extend();
 
-            expect(Derived.meta.count).toBe(0);
+            expect(Derived.type.count).toBe(0);
 
             Derived = Complex.extend({
-              meta: {
+              type: {
                 props: []
               }
             });
 
-            expect(Derived.meta.count).toBe(0);
+            expect(Derived.type.count).toBe(0);
           });
 
           it("#each should never call the mapping function", function() {
             var Derived = Complex.extend({
-              meta: {
+              type: {
                 props: []
               }
             });
 
             var count = 0;
-            Derived.meta.each(function() {
+            Derived.type.each(function() {
               ++count;
             });
 
@@ -82,77 +82,77 @@ define([
 
           it("should inherit the base class' properties", function() {
             var A = Complex.extend({
-              meta: {
+              type: {
                 props: ["fooBar", "guru"]
               }
             });
 
             var B = A.extend();
 
-            expect(A.meta.count).toBe(2);
-            expect(B.meta.count).toBe(2);
+            expect(A.type.count).toBe(2);
+            expect(B.type.count).toBe(2);
 
-            expect(A.meta.at(0)).toBe(B.meta.at(0));
-            expect(A.meta.at(1)).toBe(B.meta.at(1));
+            expect(A.type.at(0)).toBe(B.type.at(0));
+            expect(A.type.at(1)).toBe(B.type.at(1));
           });
         }); // when not specified or specified empty
 
         describe("when specified with a single 'string' entry", function() {
           var Derived = Complex.extend({
-            meta: {
+            type: {
               props: ["fooBar"]
             }
           });
 
           it("should result in a single property", function() {
-            expect(Derived.meta.count).toBe(1);
+            expect(Derived.type.count).toBe(1);
           });
 
-          describe("the single property meta", function() {
-            var propMeta = Derived.meta.at(0);
+          describe("the single property type", function() {
+            var propType = Derived.type.at(0);
 
             it("should have `label` derived by 'capitalization' of name", function() {
-              expect(propMeta.label).toBe("Foo Bar");
+              expect(propType.label).toBe("Foo Bar");
             });
 
             it("should have `type` string", function() {
-              expect(propMeta.type).toBe(String.meta);
+              expect(propType.type).toBe(PentahoString.type);
             });
 
-            it("should have `declaringType` equal to containing ComplexMeta class", function() {
-              expect(propMeta.declaringType).toBe(Derived.meta);
+            it("should have `declaringType` equal to containing ComplexType class", function() {
+              expect(propType.declaringType).toBe(Derived.type);
             });
 
             it("should have `isList=false`", function() {
-              expect(propMeta.isList).toBe(false);
+              expect(propType.isList).toBe(false);
             });
 
             it("should have `root` equal to itself", function() {
-              expect(propMeta.root).toBe(propMeta);
+              expect(propType.root).toBe(propType);
             });
 
             it("should have `ancestor` equal to `null`", function() {
-              expect(propMeta.ancestor).toBe(null);
+              expect(propType.ancestor).toBe(null);
             });
           });
         });
 
         describe("when specified with two entries", function() {
           var Derived = Complex.extend({
-            meta: {
+            type: {
               props: ["fooBar", "guru"]
             }
           });
 
           it("should result in 2 properties", function() {
-            expect(Derived.meta.count).toBe(2);
-            expect(Derived.meta.at(0).name).toBe("fooBar");
-            expect(Derived.meta.at(1).name).toBe("guru");
+            expect(Derived.type.count).toBe(2);
+            expect(Derived.type.at(0).name).toBe("fooBar");
+            expect(Derived.type.at(1).name).toBe("guru");
           });
 
           it("#each should iterate through the 2 properties", function() {
             var count = 0;
-            Derived.meta.each(function() {
+            Derived.type.each(function() {
               ++count;
             });
 
@@ -161,7 +161,7 @@ define([
 
           it("#each should allow to break out", function() {
             var count = 0;
-            Derived.meta.each(function() {
+            Derived.type.each(function() {
               ++count;
               return false;
             });
@@ -172,25 +172,25 @@ define([
 
         describe("when specified with with an entry that overrides a base type property", function() {
           var A = Complex.extend({
-            meta: {
+            type: {
               label: "A",
               props: ["fooBar", "guru"]
             }
           });
 
           var B = A.extend({
-            meta: {
+            type: {
               label: "B",
               props: [{name: "guru", label: "HELLO"}]
             }
           });
 
           it("should create a sub-property", function() {
-            expect(A.meta.count).toBe(2);
-            expect(B.meta.count).toBe(2);
+            expect(A.type.count).toBe(2);
+            expect(B.type.count).toBe(2);
 
-            var baseProp = A.meta.at(1);
-            var subProp = B.meta.at(1);
+            var baseProp = A.type.at(1);
+            var subProp = B.type.at(1);
 
             expect(subProp).not.toBe(baseProp);
 
@@ -206,43 +206,43 @@ define([
 
         describe("when specified with with an entry that is not a base type property", function() {
           var A = Complex.extend({
-            meta: {
+            type: {
               label: "A",
               props: ["fooBar", "guru"]
             }
           });
 
           var B = A.extend({
-            meta: {
+            type: {
               label: "B",
               props: [{name: "guru", label: "HELLO"}, {name: "babah"}]
             }
           });
 
           it("should append a new property", function() {
-            expect(A.meta.count).toBe(2);
-            expect(B.meta.count).toBe(3);
+            expect(A.type.count).toBe(2);
+            expect(B.type.count).toBe(3);
 
-            expect(B.meta.at(0).name).toBe("fooBar");
-            expect(B.meta.at(1).name).toBe("guru");
-            expect(B.meta.at(2).name).toBe("babah");
+            expect(B.type.at(0).name).toBe("fooBar");
+            expect(B.type.at(1).name).toBe("guru");
+            expect(B.type.at(2).name).toBe("babah");
           });
         });
 
         describe("when specified with with a dictionary", function() {
           it("should define the defined properties", function() {
             var A = Complex.extend({
-              meta: {
+              type: {
                 label: "A",
                 props: {"fooBar": {}, "guru": {}}
               }
             });
 
-            expect(A.meta.count).toBe(2);
-            expect(A.meta.at(0)).not.toBe(A.meta.at(1));
+            expect(A.type.count).toBe(2);
+            expect(A.type.at(0)).not.toBe(A.type.at(1));
 
-            var iName0 = ["fooBar", "guru"].indexOf(A.meta.at(0).name);
-            var iName1 = ["fooBar", "guru"].indexOf(A.meta.at(1).name);
+            var iName0 = ["fooBar", "guru"].indexOf(A.type.at(0).name);
+            var iName1 = ["fooBar", "guru"].indexOf(A.type.at(1).name);
 
             expect(iName0).not.toBe(-1);
             expect(iName1).not.toBe(-1);
@@ -252,23 +252,23 @@ define([
 
           it("should ignore undefined properties", function() {
             var A = Complex.extend({
-              meta: {
+              type: {
                 label: "A",
                 props: {"fooBar": {}, "guru": {}, "dada": null, "babah": undefined}
               }
             });
 
-            expect(A.meta.count).toBe(2);
-            expect(A.meta.get("fooBar", true) instanceof PropertyMeta).toBe(true);
-            expect(A.meta.get("guru",   true) instanceof PropertyMeta).toBe(true);
-            expect(A.meta.get("dada",   true)).toBe(null);
-            expect(A.meta.get("babah",  true)).toBe(null);
+            expect(A.type.count).toBe(2);
+            expect(A.type.get("fooBar", true) instanceof PropertyType).toBe(true);
+            expect(A.type.get("guru",   true) instanceof PropertyType).toBe(true);
+            expect(A.type.get("dada",   true)).toBe(null);
+            expect(A.type.get("babah",  true)).toBe(null);
           });
 
           it("should throw if a property specifies a name different from the key", function() {
             expect(function() {
               Complex.extend({
-                meta: {
+                type: {
                   label: "A",
                   props: {"fooBar": {name: "babah"}}
                 }
@@ -282,14 +282,14 @@ define([
     describe(".implement(...)", function() {
       it("should be possible to configure existing properties with a dictionary", function() {
         var A = Complex.extend({
-          meta: {
+          type: {
             label: "A",
             props: ["x", "y"]
           }
         });
 
         A.implement({
-          meta: {
+          type: {
             props: {
               "x": {label: "labelX"},
               "y": {label: "labelY"}
@@ -297,69 +297,69 @@ define([
           }
         });
 
-        expect(A.meta.at(0).label).toBe("labelX");
-        expect(A.meta.at(1).label).toBe("labelY");
+        expect(A.type.at(0).label).toBe("labelX");
+        expect(A.type.at(1).label).toBe("labelY");
       });
     });
 
     describe("#has(name)", function() {
-      var Derived = Complex.extend({meta: {
+      var Derived = Complex.extend({type: {
         props: ["foo", "bar"]
       }});
 
-      var DerivedB = Derived.extend({meta: {
+      var DerivedB = Derived.extend({type: {
         props: [{name: "bar", label: "HELLO"}]
       }});
 
       it("should return false when given no arguments", function() {
-        expect(Complex.meta.has()).toBe(false);
-        expect(Derived.meta.has()).toBe(false);
+        expect(Complex.type.has()).toBe(false);
+        expect(Derived.type.has()).toBe(false);
       });
 
       it("should return true when given the name of a defined property", function() {
-        expect(Derived.meta.has("foo")).toBe(true);
+        expect(Derived.type.has("foo")).toBe(true);
       });
 
       it("should return false when given the name of an undefined property", function() {
-        expect(Derived.meta.has("foo2")).toBe(false);
+        expect(Derived.type.has("foo2")).toBe(false);
       });
 
-      it("should return true when given the metadata of one of its properties", function() {
-        var propMeta = Derived.meta.at(0);
-        expect(Derived.meta.has(propMeta)).toBe(true);
+      it("should return true when given the type object of one of its properties", function() {
+        var propType = Derived.type.at(0);
+        expect(Derived.type.has(propType)).toBe(true);
       });
 
-      it("should return false when given the metadata of a property from a different complex type", function() {
+      it("should return false when given the type object of a property from a different complex type", function() {
         var OtherDerived = Complex.extend({
-          meta: {
+          type: {
             props: ["fooBar"]
           }
         });
 
-        var otherPropMeta = OtherDerived.meta.at(0);
+        var otherPropType = OtherDerived.type.at(0);
 
-        expect(Derived.meta.has(otherPropMeta)).toBe(false);
+        expect(Derived.type.has(otherPropType)).toBe(false);
       });
 
       it("should return true for an inherited named property", function() {
-        expect(DerivedB.meta.has("foo")).toBe(true);
+        expect(DerivedB.type.has("foo")).toBe(true);
       });
 
       it("should return true for an overridden named property", function() {
-        expect(DerivedB.meta.has("bar")).toBe(true);
+        expect(DerivedB.type.has("bar")).toBe(true);
       });
     });
 
     describe("#at(index[, sloppy])", function() {
 
-      var Derived = Complex.extend({meta: {
+      var Derived = Complex.extend({type: {
         props: ["foo", "bar"]
       }});
 
       describe("when index is nully", function() {
 
         function getter(args) {
-          return Complex.meta.at.apply(Complex.meta, args);
+          return Complex.type.at.apply(Complex.type, args);
         }
 
         var strictError = errorMatch.argRequired("index");
@@ -371,7 +371,7 @@ define([
       describe("when index is out of range", function() {
 
         function getter(args) {
-          return Complex.meta.at.apply(Complex.meta, args);
+          return Complex.type.at.apply(Complex.type, args);
         }
 
         var sloppyResult = null;
@@ -380,27 +380,27 @@ define([
         sloppyModeUtil.itShouldBehaveStrictlyUnlessSloppyIsTrue(getter, [1], sloppyResult, strictError);
       });
 
-      it("should return a property metadata instance", function() {
-        var propMeta = Derived.meta.at(0);
-        expect(propMeta instanceof PropertyMeta).toBe(true);
+      it("should return a property type object", function() {
+        var propType = Derived.type.at(0);
+        expect(propType instanceof PropertyType).toBe(true);
       });
 
-      it("should return the property metadata instance of the specified index", function() {
-        var propMeta = Derived.meta.at(0);
-        expect(propMeta.name).toBe("foo");
+      it("should return the property type object of the specified index", function() {
+        var propType = Derived.type.at(0);
+        expect(propType.name).toBe("foo");
 
-        propMeta = Derived.meta.at(1);
-        expect(propMeta.name).toBe("bar");
+        propType = Derived.type.at(1);
+        expect(propType.name).toBe("bar");
       });
     });
 
     describe("#get(name[, sloppy])", function() {
-      var Derived = Complex.extend({meta: {
+      var Derived = Complex.extend({type: {
         props: ["foo", "bar"]
       }});
 
       function getter(args) {
-        return Derived.meta.get.apply(Derived.meta, args);
+        return Derived.type.get.apply(Derived.type, args);
       }
 
       describe("when name is not specified or is nully", function() {
@@ -438,7 +438,7 @@ define([
         var Derived = Complex.extend();
 
         function getter(args) {
-          return Derived.meta.get.apply(Derived.meta, args);
+          return Derived.type.get.apply(Derived.type, args);
         }
 
         var strictError = errorMatch.argInvalid("name");
@@ -447,60 +447,60 @@ define([
         sloppyModeUtil.itShouldBehaveStrictlyUnlessSloppyIsTrue(getter, ["gugu"], sloppyResult, strictError);
       });
 
-      describe("when given a property metadata that it contains", function() {
-        var propMeta = Derived.meta.at(0);
-        var result = propMeta;
+      describe("when given a property type object that it contains", function() {
+        var propType = Derived.type.at(0);
+        var result = propType;
 
-        sloppyModeUtil.itShouldReturnValueWhateverTheSloppyValue(getter, [propMeta], result);
+        sloppyModeUtil.itShouldReturnValueWhateverTheSloppyValue(getter, [propType], result);
       });
 
-      describe("when given a property metadata from a different complex type", function() {
+      describe("when given a property type object from a different complex type", function() {
         var OtherDerived = Complex.extend({
-          meta: {
+          type: {
             props: ["fooBar"]
           }
         });
 
-        var otherPropMeta = OtherDerived.meta.at(0);
+        var otherPropType = OtherDerived.type.at(0);
         var strictError = errorMatch.argInvalid("name");
         var sloppyResult = null;
 
-        sloppyModeUtil.itShouldBehaveStrictlyUnlessSloppyIsTrue(getter, [otherPropMeta], sloppyResult, strictError);
+        sloppyModeUtil.itShouldBehaveStrictlyUnlessSloppyIsTrue(getter, [otherPropType], sloppyResult, strictError);
       });
     });
 
     describe("#count", function() {
       it("should return the number of properties of a type with properties", function() {
-        var Derived = Complex.extend({meta: {
+        var Derived = Complex.extend({type: {
           props: ["foo", "bar"]
         }});
-        expect(Derived.meta.count).toBe(2);
+        expect(Derived.type.count).toBe(2);
       });
 
       it("should return 0 for a a type with no properties", function() {
         var Derived = Complex.extend();
-        expect(Derived.meta.count).toBe(0);
+        expect(Derived.type.count).toBe(0);
       });
     });
 
     describe("#add", function() {
       it("should add new properties", function() {
         var Derived = Complex.extend({
-          meta: {
+          type: {
             props: []
           }
         });
 
-        expect(Derived.meta.count).toBe(0);
+        expect(Derived.type.count).toBe(0);
 
-        Derived.meta.add("guru");
+        Derived.type.add("guru");
 
-        expect(Derived.meta.count).toBe(1);
+        expect(Derived.type.count).toBe(1);
 
-        Derived.meta.add(["fooBar", "barFoo"]);
+        Derived.type.add(["fooBar", "barFoo"]);
 
-        expect(Derived.meta.count).toBe(3);
+        expect(Derived.type.count).toBe(3);
       });
     });
-  }); // pentaho.type.Complex.Meta
+  }); // pentaho.type.Complex.Type
 });

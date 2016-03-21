@@ -25,11 +25,11 @@ define([
     var CartesianAbstract = context.get(cartesianAbstractModelFactory);
 
     return CartesianAbstract.extend({
-      meta: {
+      type: {
         id: "pentaho/visual/ccc/categoricalContinuousAbstract",
         isAbstract: true
       }
     })
-    .implement({meta: bundle.structured["categoricalContinuousAbstract"]});
+    .implement({type: bundle.structured["categoricalContinuousAbstract"]});
   };
 });

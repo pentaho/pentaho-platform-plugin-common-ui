@@ -24,11 +24,11 @@ define([
     var Refinement = context.get("pentaho/type/refinement");
 
     return Refinement.extend({
-      meta: {
+      type: {
         id: "pentaho/visual/ccc/abstract/types/color",
         of: "string"
       }
     })
-    .implement({meta: bundle.structured["color"]});
+    .implement({type: bundle.structured["color"]});
   };
 });

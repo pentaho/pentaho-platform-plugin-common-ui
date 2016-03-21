@@ -15,7 +15,7 @@
  */
 define([
   "module",
-  "./Item",
+  "./Instance",
   "../i18n!types",
   "./standard",
   "../lang/Base",
@@ -24,7 +24,7 @@ define([
   "../util/error",
   "../util/object",
   "../util/fun"
-], function(module, Item, bundle, standard, Base, promiseUtil, arg, error, O, F) {
+], function(module, Instance, bundle, standard, Base, promiseUtil, arg, error, O, F) {
 
   "use strict";
 
@@ -43,7 +43,9 @@ define([
       _defaultBaseTypeMid = "complex",
 
       // Standard types which can be assumed to already be loaded.
-      _standardTypeMids = {};
+      _standardTypeMids = {},
+
+      Type = Instance.Type;
 
   Object.keys(standard).forEach(function(name) {
     if(name !== "facets") _standardTypeMids[_baseMid + name] = 1;
@@ -91,7 +93,7 @@ define([
    *
    * To better understand how a context provides configured types,
    * assume that an non-anonymous type,
-   * with the [id]{@link pentaho.type.Value.Meta#id} `"my/own/type"`,
+   * with the [id]{@link pentaho.type.Value.Type#id} `"my/own/type"`,
    * is requested from a context object, `context`:
    *
    * ```js
@@ -128,7 +130,7 @@ define([
    *
    * 5. The configured instance constructor is stored under its id:
    *    ```js
-   *    store(context, InstanceCtor.meta.id, InstanceCtor);
+   *    store(context, InstanceCtor.type.id, InstanceCtor);
    *    ```
    *
    * 6. Finally, it is returned to the caller:
@@ -265,7 +267,7 @@ define([
      *   var model = new VizChordModel({outerRadius: 200});
      *
      *   // Render the model using the default view
-     *   model.meta.viewClass.then(function(View) {
+     *   model.type.viewClass.then(function(View) {
      *     var view = new View(document.getElementById("container"), model);
      *
      *     // ...
@@ -282,7 +284,7 @@ define([
      * not a string, function, array or object.
      *
      * @throws {pentaho.lang.ArgumentInvalidError} When `typeRef` is a value type's constructor
-     * (e.g. [Value.Meta]{@link pentaho.type.Value.Meta})
+     * (e.g. [Value.Type]{@link pentaho.type.Value.Type})
      *
      * @throws {pentaho.lang.ArgumentInvalidError} When `typeRef` is a value instance.
      *
@@ -297,7 +299,7 @@ define([
      * (specified directly in `typeRef`, or obtained indirectly by loading a type's module given its id).
      *
      * @throws {pentaho.lang.ArgumentInvalidError} When an instance constructor is
-     * from a different [context]{@link pentaho.type.Value.Meta#context}
+     * from a different [context]{@link pentaho.type.Value.Type#context}
      * (directly specified in `typeRef`,
      * or obtained indirectly by loading a type's module given its id, or from a factory function).
      *
@@ -314,7 +316,7 @@ define([
      * For more information on the `typeRef` argument,
      * please see [UTypeReference]{@link pentaho.type.spec.UTypeReference}.
      *
-     * This method can be used even if a generic type metadata specification references non-standard types
+     * This method can be used even if a generic type specification references non-standard types
      * whose modules have not yet been loaded by the AMD module system.
      *
      * @see pentaho.type.Context#get
@@ -334,7 +336,7 @@ define([
      *       var model = new VizChordModel({outerRadius: 200});
      *
      *       // Render the model using the default view
-     *       model.meta.viewClass.then(function(View) {
+     *       model.type.viewClass.then(function(View) {
      *         var view = new View(document.getElementById("container"), model);
      *
      *         // ...
@@ -352,7 +354,7 @@ define([
      * not a string, function, array or object.
      *
      * @rejects {pentaho.lang.ArgumentInvalidError} When `typeRef` is a value type's constructor
-     * (e.g. [Value.Meta]{@link pentaho.type.Value.Meta})
+     * (e.g. [Value.Type]{@link pentaho.type.Value.Type})
      *
      * @rejects {pentaho.lang.ArgumentInvalidError} When `typeRef` is a value instance.
      *
@@ -364,7 +366,7 @@ define([
      * (specified directly in `typeRef`, or obtained indirectly by loading a type's module given its id).
      *
      * @rejects {pentaho.lang.ArgumentInvalidError} When an instance constructor is
-     * from a different [context]{@link pentaho.type.Value.Meta#context}
+     * from a different [context]{@link pentaho.type.Value.Type#context}
      * (directly specified in `typeRef`,
      * or obtained indirectly by loading a type's module given its id, or from a factory function).
      *
@@ -403,7 +405,7 @@ define([
      *
      *       ComponentModels.forEach(function(ComponentModel) {
      *
-     *         console.log("will display menu entry for: " + ComponentModel.meta.label);
+     *         console.log("will display menu entry for: " + ComponentModel.type.label);
      *
      *       });
      *     });
@@ -413,7 +415,7 @@ define([
      * @param {string} [baseTypeId] The id of the base type. Defaults to `"pentaho/type/value"`.
      * @param {object} [keyArgs] Keyword arguments.
      * @param {?boolean} [keyArgs.isBrowsable=null] Indicates that only types with the specified
-     *   [isBrowsable]{@link pentaho.type.Value.Meta#isBrowsable} value are returned.
+     *   [isBrowsable]{@link pentaho.type.Value.Type#isBrowsable} value are returned.
      *
      * @return {Promise.<Array.<!Class.<pentaho.type.Value>>>} A promise for instance classes.
      *
@@ -432,7 +434,7 @@ define([
             })
             .then(function(InstCtors) {
               return predicate
-                  ? InstCtors.filter(function(InstCtor) { return predicate(InstCtor.meta); })
+                  ? InstCtors.filter(function(InstCtor) { return predicate(InstCtor.type); })
                   : InstCtors;
             });
       } catch(ex) {
@@ -511,8 +513,8 @@ define([
       id = toAbsTypeId(id);
 
       // Check if id is already present.
-      var Type = O.getOwn(this._byTypeId, id);
-      if(Type) return this._return(Type, sync);
+      var InstCtor = O.getOwn(this._byTypeId, id);
+      if(InstCtor) return this._return(InstCtor, sync);
 
       return sync
           // `require` fails if a module with the id in the `typeSpec` var
@@ -526,8 +528,8 @@ define([
      *
      * The function can be:
      *
-     * 1. An instance constructor (Mesa)
-     * 2. A type constructor (Meta)
+     * 1. An instance constructor
+     * 2. A type constructor
      * 3. Any other function, which is assumed to be a factory function.
      *
      * In the first two cases, the operation is delegated to `getByType`,
@@ -542,10 +544,10 @@ define([
      *   returns the instance constructor, while, when async, returns a promise for it.
      *
      * @throws {pentaho.lang.ArgumentInvalidError} When `fun` is a value type's constructor
-     * (e.g. [Value.Meta]{@link pentaho.type.Value.Meta}).
+     * (e.g. [Value.Type]{@link pentaho.type.Value.Type}).
      *
      * @throws {Error} Other errors,
-     * thrown by {@link pentaho.type.Context#_getByType} and {@link pentaho.type.Context#_getByFactory}.
+     * thrown by {@link pentaho.type.Context#_getByInstCtor} and {@link pentaho.type.Context#_getByFactory}.
      *
      * @private
      * @ignore
@@ -553,10 +555,10 @@ define([
     _getByFun: function(fun, sync) {
       var proto = fun.prototype;
 
-      if(proto instanceof Item)
-        return this._getByType(fun, sync);
+      if(proto instanceof Instance)
+        return this._getByInstCtor(fun, sync);
 
-      if(proto instanceof Item.Meta)
+      if(proto instanceof Type)
         return this._error(error.argInvalid("typeRef", "Type constructor is not supported."), sync);
 
       // Assume it's a factory function.
@@ -564,12 +566,12 @@ define([
     },
 
     /**
-     * Gets a configured instance constructor of a type,
+     * Gets a _configured_ instance constructor of a type,
      * given the instance constructor of that type.
      *
      * This method works for anonymous types as well -
-     * that have no [id]{@link pentaho.type.Value.Meta#id} -
-     * cause it uses the types' [uid]{@link pentaho.type.Value.Meta#uid}
+     * that have no [id]{@link pentaho.type.Value.Type#id} -
+     * cause it uses the types' [uid]{@link pentaho.type.Value.Type#uid}
      * to identify types.
      *
      * A map of already configured types is kept in `_byTypeUid`.
@@ -582,14 +584,14 @@ define([
      * and `factoryUid` (when specified) in corresponding maps,
      * and is returned immediately (modulo sync).
      *
-     * @param {!Class.<pentaho.type.Value>} Type An instance constructor.
+     * @param {!Class.<pentaho.type.Value>} InstCtor An instance constructor.
      * @param {boolean} [sync=false] Whether to perform a synchronous get.
      * @param {?number} [factoryUid] The factory unique id, when `Type` was created by one.
      *
      * @return {!Promise.<!Class.<pentaho.type.Value>>|!Class.<pentaho.type.Value>} When sync,
      *   returns the instance constructor, while, when async, returns a promise for it.
      *
-     * @throws {pentaho.lang.ArgumentInvalidError} When the [context]{@link pentaho.type.Value.Meta#context}
+     * @throws {pentaho.lang.ArgumentInvalidError} When the [context]{@link pentaho.type.Value.Type#context}
      * of `Type` is not `this` - the instance constructor must have been created by a factory called with this context,
      * and have captured the context as the value of its `context` property,
      * or, have been extended from a type that had this context.
@@ -600,39 +602,39 @@ define([
      * @private
      * @ignore
      */
-    _getByType: function(Type, sync, factoryUid) {
-      var meta = Type.meta;
-      if(meta.context !== this)
+    _getByInstCtor: function(InstCtor, sync, factoryUid) {
+      var type = InstCtor.type;
+      if(type.context !== this)
         return this._error(error.argInvalid("typeRef", "Type is from a different context."), sync);
 
       // Check if already present, by uid.
-      var TypeExisting = O.getOwn(this._byTypeUid, meta.uid);
+      var InstCtorExisting = O.getOwn(this._byTypeUid, type.uid);
       /* istanbul ignore else */
-      if(!TypeExisting) {
+      if(!InstCtorExisting) {
         // Not present yet.
-        var id = meta.id;
+        var id = type.id;
         if(id) {
           // TODO: configuration may need to subclass Type
-          // TODO: configuration is Meta only?
+          // TODO: configuration is Type only?
           var config = this._getConfig(id);
           /* istanbul ignore if : until config is implemented */
-          if(config) meta.constructor.implement(config);
+          if(config) type.constructor.implement(config);
 
-          this._byTypeId[id] = Type;
+          this._byTypeId[id] = InstCtor;
         }
 
-        this._byTypeUid[meta.uid] = Type;
+        this._byTypeUid[type.uid] = InstCtor;
 
-      } else if(Type !== TypeExisting) {
+      } else if(InstCtor !== InstCtorExisting) {
         // Pathological case, only possible if the result of an exploit.
         return this._error(error.argInvalid("typeRef", "Duplicate type class uid."), sync);
       }
 
       if(factoryUid != null) {
-        this._byFactoryUid[factoryUid] = Type;
+        this._byFactoryUid[factoryUid] = InstCtor;
       }
 
-      return this._return(Type, sync);
+      return this._return(InstCtor, sync);
     },
 
     /**
@@ -670,30 +672,30 @@ define([
     _getByFactory: function(typeFactory, sync) {
       var factoryUid = getFactoryUid(typeFactory);
 
-      var Type = O.getOwn(this._byFactoryUid, factoryUid);
-      if(Type)
-        return this._return(Type, sync);
+      var InstCtor = O.getOwn(this._byFactoryUid, factoryUid);
+      if(InstCtor)
+        return this._return(InstCtor, sync);
 
-      Type = typeFactory(this);
-      if(!F.is(Type) || !(Type.prototype instanceof Item))
-        return this._error(error.operInvalid("Type factory must return a sub-class of 'pentaho/type/Item'."), sync);
+      InstCtor = typeFactory(this);
+      if(!F.is(InstCtor) || !(InstCtor.prototype instanceof Instance))
+        return this._error(error.operInvalid("Type factory must return a sub-class of 'pentaho/type/Instance'."), sync);
 
-      return this._getByType(Type, sync, factoryUid);
+      return this._getByInstCtor(InstCtor, sync, factoryUid);
     },
 
     // Inline type spec: {[base: "complex", ] ... }
     _getByObjectSpec: function(typeSpec, sync) {
-      if(typeSpec instanceof Item.Meta)
-        return this._getByType(typeSpec.mesa.constructor, sync);
+      if(typeSpec instanceof Type)
+        return this._getByInstCtor(typeSpec.instance.constructor, sync);
 
-      if(typeSpec instanceof Item)
+      if(typeSpec instanceof Instance)
         return this._error(error.argInvalid("typeRef", "Value instance is not supported."), sync);
 
       var baseTypeSpec = typeSpec.base || _defaultBaseTypeMid,
           resolveSync = (function() {
-              var BaseType = this._get(baseTypeSpec, /*sync:*/true),
-                  Type = BaseType.extend({meta: typeSpec});
-              return this._getByType(Type, /*sync:*/true);
+              var BaseInstCtor = this._get(baseTypeSpec, /*sync:*/true),
+                  InstCtor = BaseInstCtor.extend({type: typeSpec});
+              return this._getByInstCtor(InstCtor, /*sync:*/true);
             }).bind(this);
 
       // When sync, it should be the case that every referenced id is already loaded,
@@ -703,7 +705,7 @@ define([
       // Collect the module ids of all custom types used within typeSpec.
       var customTypeIds = collectTypeIds(typeSpec);
       return customTypeIds.length
-          // Require them all and only then invoke the synchronous BaseMeta.extend method.
+          // Require them all and only then invoke the synchronous BaseType.extend method.
           ? promiseUtil.require(customTypeIds).then(resolveSync)
           // All types are standard and can be assumed to be already loaded.
           // However, we should behave asynchronously as requested.
@@ -734,8 +736,8 @@ define([
     },
     //endregion
 
-    _return: function(Type, sync) {
-      return sync ? Type : Promise.resolve(Type);
+    _return: function(InstCtor, sync) {
+      return sync ? InstCtor : Promise.resolve(InstCtor);
     },
 
     _error: function(ex, sync) {

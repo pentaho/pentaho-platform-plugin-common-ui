@@ -25,13 +25,13 @@ define([
 
     return Refinement.extend({
 
-      meta: {
+      type: {
         id: "pentaho/visual/ccc/abstract/types/backgroundFill",
         of: "string",
         facets: ["DiscreteDomain"],
         domain: ["none", "solid", "gradient"]
       }
     })
-    .implement({meta: bundle.structured["backgroundFill"]});
+    .implement({type: bundle.structured["backgroundFill"]});
   };
 });

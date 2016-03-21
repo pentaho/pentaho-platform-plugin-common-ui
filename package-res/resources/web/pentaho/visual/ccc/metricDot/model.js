@@ -17,11 +17,11 @@ define([
   "../cartesianAbstract/model",
   "pentaho/i18n!../abstract/i18n/model",
   "../abstract/types/labelsOption",
-  "../abstract/mixins/scaleSizeContinuousMeta",
-  "../abstract/mixins/scaleColorContinuousMeta",
-  "../abstract/mixins/settingsMultiChartMeta"
+  "../abstract/mixins/scaleSizeContinuousType",
+  "../abstract/mixins/scaleColorContinuousType",
+  "../abstract/mixins/settingsMultiChartType"
 ], function(cartesianAbstractModelFactory, bundle, labelsOptionFactory,
-    scaleSizeContinuousMeta, scaleColorContinuousMeta, settingsMultiChartMeta) {
+    scaleSizeContinuousType, scaleColorContinuousType, settingsMultiChartType) {
 
   "use strict";
 
@@ -31,7 +31,7 @@ define([
 
     return CartesianAbstractModel.extend({
 
-        meta: {
+        type: {
           id: "pentaho/visual/ccc/metricDot",
           v2Id: "ccc_scatter",
 
@@ -91,13 +91,13 @@ define([
         }
       })
 
-      .implement({meta: scaleSizeContinuousMeta})
-      .implement({meta: bundle.structured["scaleSizeContinuous"]})
+      .implement({type: scaleSizeContinuousType})
+      .implement({type: bundle.structured["scaleSizeContinuous"]})
       // TODO: should only be applicable when color is continuous
-      .implement({meta: scaleColorContinuousMeta})
-      .implement({meta: bundle.structured["scaleColorContinuous"]})
-      .implement({meta: settingsMultiChartMeta})
-      .implement({meta: bundle.structured["settingsMultiChart"]})
-      .implement({meta: bundle.structured["metricDot"]});
+      .implement({type: scaleColorContinuousType})
+      .implement({type: bundle.structured["scaleColorContinuous"]})
+      .implement({type: settingsMultiChartType})
+      .implement({type: bundle.structured["settingsMultiChart"]})
+      .implement({type: bundle.structured["metricDot"]});
   };
 });

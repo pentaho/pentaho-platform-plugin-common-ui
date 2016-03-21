@@ -25,13 +25,13 @@ define([
 
     return Refinement.extend({
 
-      meta: {
+      type: {
         id: "pentaho/visual/ccc/abstract/types/fontStyle",
         of: "string",
         facets: ["DiscreteDomain"],
         domain: ["plain", "bold", "italic"]
       }
     })
-    .implement({meta: bundle.structured["fontStyle"]});
+    .implement({type: bundle.structured["fontStyle"]});
   };
 });

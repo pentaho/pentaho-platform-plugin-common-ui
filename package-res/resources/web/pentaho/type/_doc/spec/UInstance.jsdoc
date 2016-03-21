@@ -15,18 +15,17 @@
  */
 
 /**
- * The signature of a function of a dynamic attribute of a property.
+ * A `spec.UInstance` represents the union of JS types that can be used to describe an instance,
+ * or the absence of one.
  *
- * Examples of dynamic property attributes:
+ * When an instance is described using _object form_,
+ * its specification is of type [spec.IInstance]{@link pentaho.type.spec.IInstance}.
  *
- * * {@link pentaho.type.Property.Type#isApplicable}
- * * {@link pentaho.type.Property.Type#isReadOnly}
- * * {@link pentaho.type.Property.Type#isRequired}
- * * {@link pentaho.type.Property.Type#countMin}
- * * {@link pentaho.type.Property.Type#countMax}
+ * To describe an absent instance, use a {@link Nully} JavaScript value.
  *
- * @callback pentaho.type.PropertyDynamicAttribute
- * @template T
- * @this pentaho.type.Complex
- * @return {T} The calculated attribute's value.
+ * @typedef {pentaho.type.spec.IInstance|
+ *           pentaho.type.spec.UComplex|
+ *           pentaho.type.spec.USimple|
+ *           pentaho.type.spec.UList|
+ *           Nully} pentaho.type.spec.UInstance
  */

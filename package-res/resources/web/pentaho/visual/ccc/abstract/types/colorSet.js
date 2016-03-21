@@ -25,13 +25,13 @@ define([
 
     return Refinement.extend({
 
-      meta: {
+      type: {
         id: "pentaho/visual/ccc/abstract/types/colorSet",
         of: "string",
         facets: ["DiscreteDomain"],
         domain: ["ryg", "ryb", "blue", "gray"]
       }
     })
-    .implement({meta: bundle.structured["colorSet"]});
+    .implement({type: bundle.structured["colorSet"]});
   };
 });

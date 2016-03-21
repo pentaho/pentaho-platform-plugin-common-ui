@@ -26,7 +26,7 @@ define([
     var BarNormalizedAbstract = context.get(barNormalizedAbstractModelFactory);
 
     return BarNormalizedAbstract.extend({
-        meta: {
+        type: {
           id: "pentaho/visual/ccc/barNormalizedHorizontal",
           v2Id: "ccc_horzbarnormalized",
 
@@ -34,6 +34,6 @@ define([
           styleClass: "pentaho-visual-ccc-bar-normalized-horizontal"
         }
     })
-    .implement({meta: bundle.structured["barNormalizedHorizontal"]});
+    .implement({type: bundle.structured["barNormalizedHorizontal"]});
   };
 });

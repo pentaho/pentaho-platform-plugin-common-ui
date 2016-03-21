@@ -34,26 +34,26 @@ define([
       expect(Element.prototype instanceof Value).toBe(true);
     });
 
-    describe("Meta -", function() {
-      var ElemMeta = Element.Meta;
+    describe("Type -", function() {
+      var ElemType = Element.Type;
 
       it("should be a function", function() {
-        expect(typeof ElemMeta).toBe("function");
+        expect(typeof ElemType).toBe("function");
       });
 
-      it("should be a sub-class of `Value.Meta`", function() {
-        expect(ElemMeta.prototype instanceof Value.Meta).toBe(true);
+      it("should be a sub-class of `Value.Type`", function() {
+        expect(ElemType.prototype instanceof Value.Type).toBe(true);
       });
 
       describe("#isList -", function() {
         it("should return the value `false`", function() {
-          expect(Element.meta.isList).toBe(false);
+          expect(Element.type.isList).toBe(false);
         });
       });
 
       describe("#isRefinement -", function() {
         it("should return the value `false`", function() {
-          expect(Element.meta.isRefinement).toBe(false);
+          expect(Element.type.isRefinement).toBe(false);
         });
       });
 

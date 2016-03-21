@@ -24,13 +24,13 @@ define([
     var Refinement = context.get("pentaho/type/refinement");
 
     return Refinement.extend({
-      meta: {
+      type: {
         id: "pentaho/visual/ccc/abstract/types/maxChartsPerRow",
         of: "number",
         facets: ["DiscreteDomain"],
         domain: [1, 2, 3, 4, 5]
       }
     })
-    .implement({meta: bundle.structured["maxChartsPerRow"]});
+    .implement({type: bundle.structured["maxChartsPerRow"]});
   };
 });

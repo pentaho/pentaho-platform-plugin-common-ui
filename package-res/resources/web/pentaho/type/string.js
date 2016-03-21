@@ -49,13 +49,14 @@ define([
        * @type string
        * @readonly
        */
-      meta: {
+
+      type: {
         id: module.id,
         styleClass: "pentaho-type-string",
         cast: String
       }
     }).implement({
-      meta: bundle.structured["string"]
+      type: bundle.structured["string"]
     });
   };
 });

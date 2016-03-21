@@ -302,7 +302,7 @@ define([
 
         for(p in standard)
           if(standard.hasOwnProperty(p))
-            if(p !== "facets" && p !== "Item")
+            if(p !== "facets" && p !== "Instance")
               expect(!!context.get("pentaho/type/" + p)).toBe(true);
 
         for(p in standard.facets)
@@ -314,8 +314,8 @@ define([
         var context = new Context();
         var promise = callGet(context, sync, "string");
 
-        return promise.then(function(Type) {
-          expect(Type.meta.id).toBe("pentaho/type/string");
+        return promise.then(function(InstCtor) {
+          expect(InstCtor.type.id).toBe("pentaho/type/string");
         });
       }));
 
@@ -323,8 +323,8 @@ define([
         var context = new Context();
         var promise = callGet(context, sync, "pentaho/type/string");
 
-        return promise.then(function(Type) {
-          expect(Type.meta.id).toBe("pentaho/type/string");
+        return promise.then(function(InstCtor) {
+          expect(InstCtor.type.id).toBe("pentaho/type/string");
         });
       }));
 
@@ -333,38 +333,40 @@ define([
         var valueFactory = require("pentaho/type/value");
         var promise = callGet(context, sync, valueFactory);
 
-        return promise.then(function(Type) {
-          expect(Type.meta.id).toBe("pentaho/type/value");
+        return promise.then(function(InstCtor) {
+          expect(InstCtor.type.id).toBe("pentaho/type/value");
         });
       }));
 
-      it("should throw/reject when given a type metadata constructor (Meta)", testGetError(function(sync, Context) {
+      it("should throw/reject when given a type constructor (Type)", testGetError(function(sync, Context) {
         var context = new Context();
         var Value   = context.get("pentaho/type/value");
-        return callGet(context, sync, Value.meta.constructor);
+        return callGet(context, sync, Value.type.constructor);
       }, errorMatch.argInvalid("typeRef")));
 
-      it("should be able to get a standard type given its type instance constructor (Mesa)", testGet(function(sync, Context) {
+      it("should be able to get a standard type given its type instance constructor",
+         testGet(function(sync, Context) {
         var context = new Context();
         var Value   = context.get("pentaho/type/value");
         var promise = callGet(context, sync, Value);
 
-        return promise.then(function(Type) {
-          expect(Type.meta.id).toBe("pentaho/type/value");
+        return promise.then(function(InstCtor) {
+          expect(InstCtor.type.id).toBe("pentaho/type/value");
         });
       }));
 
-      it("should be able to get a standard type given its type instance (meta)", testGet(function(sync, Context) {
+      it("should be able to get a standard type given its type object", testGet(function(sync, Context) {
         var context = new Context();
         var Value   = context.get("pentaho/type/value");
-        var promise = callGet(context, sync, Value.meta);
+        var promise = callGet(context, sync, Value.type);
 
-        return promise.then(function(Type) {
-          expect(Type.meta.id).toBe("pentaho/type/value");
+        return promise.then(function(InstCtor) {
+          expect(InstCtor.type.id).toBe("pentaho/type/value");
         });
       }));
 
-      it("should throw/reject when given a standard type instance prototype (mesa)", testGetError(function(sync, Context) {
+      it("should throw/reject when given a standard type instance prototype",
+         testGetError(function(sync, Context) {
         var context = new Context();
         var Value   = context.get("pentaho/type/value");
 
@@ -375,29 +377,30 @@ define([
         var context = new Context();
         var promise = callGet(context, sync, {base: "complex", props: ["a", "b"]});
 
-        return promise.then(function(Type) {
+        return promise.then(function(InstCtor) {
           var Complex = context.get("pentaho/type/complex");
 
-          expect(Type.meta.isSubtypeOf(Complex.meta)).toBe(true);
+          expect(InstCtor.type.isSubtypeOf(Complex.type)).toBe(true);
 
-          expect(Type.ancestor).toBe(Complex);
-          expect(Type.meta.has("a")).toBe(true);
-          expect(Type.meta.has("b")).toBe(true);
+          expect(InstCtor.ancestor).toBe(Complex);
+          expect(InstCtor.type.has("a")).toBe(true);
+          expect(InstCtor.type.has("b")).toBe(true);
         });
       }));
 
-      it("should be able to create an anonymous complex type with implied base complex", testGet(function(sync, Context) {
+      it("should be able to create an anonymous complex type with implied base complex",
+         testGet(function(sync, Context) {
         var context = new Context();
         var promise = callGet(context, sync, {props: ["a", "b"]});
 
-        return promise.then(function(Type) {
+        return promise.then(function(InstCtor) {
           var Complex = context.get("pentaho/type/complex");
 
-          expect(Type.meta.isSubtypeOf(Complex.meta)).toBe(true);
+          expect(InstCtor.type.isSubtypeOf(Complex.type)).toBe(true);
 
-          expect(Type.ancestor).toBe(Complex);
-          expect(Type.meta.has("a")).toBe(true);
-          expect(Type.meta.has("b")).toBe(true);
+          expect(InstCtor.ancestor).toBe(Complex);
+          expect(InstCtor.type.has("a")).toBe(true);
+          expect(InstCtor.type.has("b")).toBe(true);
         });
       }));
 
@@ -408,35 +411,37 @@ define([
             of:   {props: ["a", "b"]}
           });
 
-        return promise.then(function(Type) {
-          expect(Type.prototype instanceof context.get("list")).toBe(true);
+        return promise.then(function(InstCtor) {
+          expect(InstCtor.prototype instanceof context.get("list")).toBe(true);
 
-          var ofMeta = Type.meta.of;
-          expect(ofMeta.mesa instanceof context.get("complex")).toBe(true);
-          expect(ofMeta.count).toBe(2);
-          expect(ofMeta.has("a")).toBe(true);
-          expect(ofMeta.has("b")).toBe(true);
+          var ofType = InstCtor.type.of;
+          expect(ofType.instance instanceof context.get("complex")).toBe(true);
+          expect(ofType.count).toBe(2);
+          expect(ofType.has("a")).toBe(true);
+          expect(ofType.has("b")).toBe(true);
         });
       }));
 
-      it("should be able to create a list type using the shorthand list-type notation", testGet(function(sync, Context) {
+      it("should be able to create a list type using the shorthand list-type notation",
+         testGet(function(sync, Context) {
         var context = new Context();
         var promise = callGet(context, sync, [
           {props: ["a", "b"]}
         ]);
 
-        return promise.then(function(Type) {
-          expect(Type.prototype instanceof context.get("list")).toBe(true);
+        return promise.then(function(InstCtor) {
+          expect(InstCtor.prototype instanceof context.get("list")).toBe(true);
 
-          var ofMeta = Type.meta.of;
-          expect(ofMeta.mesa instanceof context.get("complex")).toBe(true);
-          expect(ofMeta.count).toBe(2);
-          expect(ofMeta.has("a")).toBe(true);
-          expect(ofMeta.has("b")).toBe(true);
+          var ofType = InstCtor.type.of;
+          expect(ofType.instance instanceof context.get("complex")).toBe(true);
+          expect(ofType.count).toBe(2);
+          expect(ofType.has("a")).toBe(true);
+          expect(ofType.has("b")).toBe(true);
         });
       }));
 
-      it("should throw/reject if the shorthand list-type notation has two entries", testGetError(function(sync, Context) {
+      it("should throw/reject if the shorthand list-type notation has two entries",
+         testGetError(function(sync, Context) {
         var context = new Context();
 
         return callGet(context, sync, [123, 234]);
@@ -449,35 +454,38 @@ define([
           of:   "number"
         });
 
-        return promise.then(function(Type) {
+        return promise.then(function(InstCtor) {
           var Refinement = context.get("refinement");
-          expect(Type.meta.isSubtypeOf(Refinement.meta)).toBe(true);
+          expect(InstCtor.type.isSubtypeOf(Refinement.type)).toBe(true);
 
-          expect(Type.ancestor).toBe(Refinement);
+          expect(InstCtor.ancestor).toBe(Refinement);
         });
       }));
 
-      it("should throw/reject if given a number (not a string, function or object)", testGetError(function(sync, Context) {
+      it("should throw/reject if given a number (not a string, function or object)",
+         testGetError(function(sync, Context) {
         var context = new Context();
 
         return callGet(context, sync, 1);
 
       }, errorMatch.argInvalid("typeRef")));
 
-      it("should throw/reject if given a boolean (not a string, function or object)", testGetError(function(sync, Context) {
+      it("should throw/reject if given a boolean (not a string, function or object)",
+         testGetError(function(sync, Context) {
         var context = new Context();
 
         return callGet(context, sync, true);
 
       }, errorMatch.argInvalid("typeRef")));
 
-      it("should be able to get an already loaded non-standard type given its absolute id", testGet(function(sync, Context) {
+      it("should be able to get an already loaded non-standard type given its absolute id",
+         testGet(function(sync, Context) {
         var mid = "pentaho/foo/bar";
         require.undef(mid);
         define(mid,[], function() {
           return function(context) {
             var Simple = context.get("pentaho/type/simple");
-            return Simple.extend({meta: {id: mid}});
+            return Simple.extend({type: {id: mid}});
           };
         });
 
@@ -486,8 +494,8 @@ define([
               var context = new Context();
               return callGet(context, sync, mid);
             })
-            .then(function(Type) {
-              expect(Type.meta.id).toBe(mid);
+            .then(function(InstCtor) {
+              expect(InstCtor.type.id).toBe(mid);
               require.undef(mid);
             });
       }));
@@ -515,7 +523,8 @@ define([
             });
       }));
 
-      it("should throw if type factory does return a function that is not an Item", testGet(function(sync, Context) {
+      it("should throw if type factory does return a function that is not an Instance",
+         testGet(function(sync, Context) {
         var mid = "pentaho/foo/bar2";
         require.undef(mid);
         define(mid,[], function() {
@@ -543,7 +552,7 @@ define([
           require.undef(mid);
           define(mid, [], function() {
             return function(context) {
-              return context.get("pentaho/type/simple").extend({meta: {id: mid}});
+              return context.get("pentaho/type/simple").extend({type: {id: mid}});
             };
           });
         }
@@ -592,12 +601,12 @@ define([
         };
 
         return context.getAsync(spec)
-            .then(function(Type) {
-              expect(Type.meta.get("foo1").type.id).toBe("pentaho/foo/dudu1");
-              expect(Type.meta.get("foo2").type.ancestor.id).toBe("pentaho/foo/dudu2");
-              expect(Type.meta.get("foo3").type.of.id).toBe("pentaho/foo/dudu3");
-              expect(Type.meta.get("foo7").type.get("a").type.id).toBe("pentaho/foo/dudu4");
-              expect(Type.meta.get("foo8").type.facets[0]).toBe(require("pentaho/foo/facets/Mixin3"));
+            .then(function(InstCtor) {
+              expect(InstCtor.type.get("foo1").type.id).toBe("pentaho/foo/dudu1");
+              expect(InstCtor.type.get("foo2").type.ancestor.id).toBe("pentaho/foo/dudu2");
+              expect(InstCtor.type.get("foo3").type.of.id).toBe("pentaho/foo/dudu3");
+              expect(InstCtor.type.get("foo7").type.get("a").type.id).toBe("pentaho/foo/dudu4");
+              expect(InstCtor.type.get("foo8").type.facets[0]).toBe(require("pentaho/foo/facets/Mixin3"));
 
               require.undef("pentaho/foo/dudu1");
               require.undef("pentaho/foo/dudu2");
@@ -632,7 +641,7 @@ define([
 
         define("exp/foo", ["pentaho/type/simple"], function(simpleFactory) {
           return function(context) {
-            return context.get(simpleFactory).extend({meta: {id: "exp/foo"}});
+            return context.get(simpleFactory).extend({type: {id: "exp/foo"}});
           };
         });
 
@@ -643,7 +652,7 @@ define([
 
         define("exp/bar", ["pentaho/type/simple"], function(simpleFactory) {
           return function(context) {
-            return context.get(simpleFactory).extend({meta: {id: "exp/bar", isBrowsable: false}});
+            return context.get(simpleFactory).extend({type: {id: "exp/bar", isBrowsable: false}});
           };
         });
 
@@ -654,7 +663,7 @@ define([
 
         define("exp/dude", ["pentaho/type/simple"], function(simpleFactory) {
           return function(context) {
-            return context.get(simpleFactory).extend({meta: {id: "exp/dude"}});
+            return context.get(simpleFactory).extend({type: {id: "exp/dude"}});
           };
         });
 
@@ -685,11 +694,12 @@ define([
             .then(function(InstCtors) {
               expect(InstCtors instanceof Array).toBe(true);
               expect(InstCtors.length).toBe(1);
-              expect(InstCtors[0].meta.id).toBe("exp/dude");
+              expect(InstCtors[0].type.id).toBe("exp/dude");
             });
       }));
 
-      it("should return an empty array when the specified baseType has no registrations", withContext(function(Context) {
+      it("should return an empty array when the specified baseType has no registrations",
+         withContext(function(Context) {
         var context  = new Context();
 
         return context
@@ -709,9 +719,9 @@ define([
               expect(InstCtors instanceof Array).toBe(true);
               expect(InstCtors.length).toBe(2);
 
-              var metaIds = InstCtors.map(function(InstCtor) { return InstCtor.meta.id; });
-              var iFoo = metaIds.indexOf("exp/foo");
-              var iBar = metaIds.indexOf("exp/bar");
+              var typeIds = InstCtors.map(function(InstCtor) { return InstCtor.type.id; });
+              var iFoo = typeIds.indexOf("exp/foo");
+              var iBar = typeIds.indexOf("exp/bar");
               expect(iFoo).not.toBeLessThan(0);
               expect(iBar).not.toBeLessThan(0);
               expect(iFoo).not.toBe(iBar);
@@ -726,7 +736,7 @@ define([
             .then(function(InstCtors) {
               expect(InstCtors instanceof Array).toBe(true);
               expect(InstCtors.length).toBe(1);
-              expect(InstCtors[0].meta.id).toBe("exp/foo");
+              expect(InstCtors[0].type.id).toBe("exp/foo");
             });
       }));
     }); // #getAll

@@ -25,13 +25,13 @@ define([
 
     return Refinement.extend({
 
-      meta: {
+      type: {
         id: "pentaho/visual/ccc/abstract/types/multiChartOverflow",
         of: "string",
         facets: ["DiscreteDomain"],
         domain: ["grow", "fit", "clip"]
       }
     })
-    .implement({meta: bundle.structured["multiChartOverflow"]});
+    .implement({type: bundle.structured["multiChartOverflow"]});
   };
 });

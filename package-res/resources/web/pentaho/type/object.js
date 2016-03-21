@@ -69,13 +69,14 @@ define([
        * @type object
        * @readonly
        */
-      meta: {
+
+      type: {
         id: module.id,
         styleClass: "pentaho-type-object",
         cast: Object
       }
     }).implement({
-      meta: bundle.structured["object"]
+      type: bundle.structured["object"]
     });
   };
 });

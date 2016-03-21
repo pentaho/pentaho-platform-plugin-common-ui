@@ -16,12 +16,12 @@
 define([
   "module",
   "./element",
-  "./PropertyMetaCollection",
+  "./PropertyTypeCollection",
   "./valueHelper",
   "../i18n!types",
   "../util/object",
   "../util/error"
-], function(module, elemFactory, PropertyMetaCollection, valueHelper, bundle, O, error) {
+], function(module, elemFactory, PropertyTypeCollection, valueHelper, bundle, O, error) {
 
   "use strict";
 
@@ -38,9 +38,9 @@ define([
     var Element = context.get(elemFactory);
 
     /**
-     * @name pentaho.type.Complex.Meta
+     * @name pentaho.type.Complex.Type
      * @class
-     * @extends pentaho.type.Element.Meta
+     * @extends pentaho.type.Element.Type
      *
      * @classDesc The base type class of complex types.
      *
@@ -70,7 +70,7 @@ define([
      *     var Complex = context.get(complexFactory);
      *
      *     return Complex.extend({
-     *       meta: {
+     *       type: {
      *         props: [
      *           {name: "name", type: "string", label: "Name"},
      *           {name: "category", type: ["string"], label: "Category"},
@@ -93,21 +93,21 @@ define([
      */
     var Complex = Element.extend("pentaho.type.Complex", /** @lends pentaho.type.Complex# */{
 
-      // NOTE 1: neither `Value` or `Item` do anything in their constructor,
+      // NOTE 1: neither `Value` or `Instance` do anything in their constructor,
       // so, in the name of performance, we're purposely not calling base.
 
       // NOTE 2: keep the constructor code synced with #clone !
       constructor: function(spec) {
         // Create `Property` instances.
-        var pMetas = this.meta._getProps(),
-            i = pMetas.length,
+        var pTypes = this.type._getProps(),
+            i = pTypes.length,
             nameProp = !spec ? undefined : (Array.isArray(spec) ? "index" : "name"),
-            pMeta,
+            pType,
             values = {};
 
         while(i--) {
-          pMeta = pMetas[i];
-          values[pMeta.name] = pMeta.toValue( nameProp && spec[pMeta[nameProp]] );
+          pType = pTypes[i];
+          values[pType.name] = pType.toValue( nameProp && spec[pType[nameProp]] );
         }
 
         this._values = values;
@@ -136,16 +136,16 @@ define([
        */
       _clone: function(clone) {
         // All properties are copied except lists, which are shallow cloned.
-        var pMetas = this.meta._getProps(),
-            i = pMetas.length,
+        var pTypes = this.type._getProps(),
+            i = pTypes.length,
             values = this._values,
             cloneValues = {},
-            pMeta, v;
+            pType, v;
 
         while(i--) {
-          pMeta = pMetas[i];
-          v = values[pMeta.name];
-          cloneValues[pMeta.name] = v && pMeta.isList ? v.clone() : v;
+          pType = pTypes[i];
+          v = values[pType.name];
+          cloneValues[pType.name] = v && pType.isList ? v.clone() : v;
         }
 
         clone._values = cloneValues;
@@ -168,11 +168,11 @@ define([
        *
        * If two values have the same concrete type and their
        * keys are equal, then it must also be the case that
-       * {@link pentaho.type.Value.Meta#areEqual}
+       * {@link pentaho.type.Value.Type#areEqual}
        * returns `true` when given the two values.
        * The opposite should be true as well.
        * If two values of the same concrete type have distinct keys,
-       * then {@link pentaho.type.Value.Meta#areEqual} should return `false`.
+       * then {@link pentaho.type.Value.Type#areEqual} should return `false`.
        *
        * The default complex implementation, returns the value of the
        * complex instance's {@link pentaho.type.Complex#uid}.
@@ -198,7 +198,7 @@ define([
        * @see pentaho.type.Complex#at
        * @see pentaho.type.Complex#first
        *
-       * @param {string|!pentaho.type.Property.Meta} [name] The property name or metadata.
+       * @param {string|!pentaho.type.Property.Type} [name] The property name or type object.
        * @param {boolean} [sloppy=false] Indicates if an error is thrown if the specified property is not defined.
        *
        * @return {pentaho.type.Value|Nully} The value of the property, or a {@link Nully} value.
@@ -207,8 +207,8 @@ define([
        * name `name` is not defined.
        */
       get: function(name, sloppy) {
-        var pMeta = this.meta.get(name, sloppy);
-        return pMeta ? this._values[pMeta.name] : undefined;
+        var pType = this.type.get(name, sloppy);
+        return pType ? this._values[pType.name] : undefined;
       },
 
       /**
@@ -224,7 +224,7 @@ define([
        * For [Complex]{@link pentaho.type.Complex} and [List]{@link pentaho.type.List} types,
        * this corresponds to the value itself.
        *
-       * @param {string|!pentaho.type.Property.Meta} name The property name or metadata.
+       * @param {string|!pentaho.type.Property.Type} name The property name or type object.
        * @param {boolean} [sloppy=false] Indicates if an error is thrown if the specified property is not defined.
        *
        * @return {any|pentaho.type.Complex|pentaho.type.List|Nully} The primitive value of a `Simple`,
@@ -254,7 +254,7 @@ define([
        * For [Complex]{@link pentaho.type.Complex} and [List]{@link pentaho.type.List} types,
        * varies with the implementation.
        *
-       * @param {string|!pentaho.type.Property.Meta} name The property name or metadata.
+       * @param {string|!pentaho.type.Property.Type} name The property name or type object.
        * @param {boolean} [sloppy=false] Indicates if an error is thrown if the specified property is not defined.
        *
        * @return {string} The string representation of the value, or `""`.
@@ -308,7 +308,7 @@ define([
        * value = complex.path("a", "b", 1);
        * ```
        *
-       * @param {Array.<(string|number|!pentaho.type.Property.Meta)>} steps The property/index/key path steps.
+       * @param {Array.<(string|number|!pentaho.type.Property.Type)>} steps The property/index/key path steps.
        * @param {boolean} [sloppy=false] Indicates if an error is thrown if the specified property is not defined.
        *
        * @return {pentaho.type.Value|Nully} The requested value, or a {@link Nully} value.
@@ -336,23 +336,23 @@ define([
       /**
        * Sets the value of a property.
        *
-       * @param {string|!pentaho.type.Property.Meta} name The property name or metadata.
+       * @param {string|!pentaho.type.Property.Type} name The property name or type object.
        * @param {any?} [valueSpec=null] A value specification.
        *
        * @return {pentaho.type.Complex} This object.
        * @throws {pentaho.lang.ArgumentInvalidError} When a property with name `name` is not defined.
        */
       set: function(name, valueSpec) {
-        var pMeta  = this.meta.get(name),
-            value0 = this._values[pMeta.name];
+        var pType  = this.type.get(name),
+            value0 = this._values[pType.name];
 
-        if(pMeta.isList) {
+        if(pType.isList) {
           value0.set(valueSpec);
         } else {
-          var value1 = pMeta.toValue(valueSpec);
-          if(!pMeta.type.areEqual(value0, value1)) {
+          var value1 = pType.toValue(valueSpec);
+          if(!pType.type.areEqual(value0, value1)) {
             // TODO: change event
-            this._values[pMeta.name] = value1;
+            this._values[pType.name] = value1;
           }
         }
       },
@@ -364,7 +364,7 @@ define([
        *
        * This method returns the result of calling [Complex#at]{@link pentaho.type.Complex#at} with a `0` index.
        *
-       * @param {string|!pentaho.type.Property.Meta} name The property name or metadata.
+       * @param {string|!pentaho.type.Property.Type} name The property name or type object.
        * @param {boolean} [sloppy=false] Indicates if an error is thrown if the specified property is not defined.
        *
        * @return {pentaho.type.Element|Nully} An element or a {@link Nully} value.
@@ -384,7 +384,7 @@ define([
        *
        * This method returns the result of calling [Complex#atv]{@link pentaho.type.Complex#atv} with a `0` index.
        *
-       * @param {string|!pentaho.type.Property.Meta} name The property name or metadata.
+       * @param {string|!pentaho.type.Property.Type} name The property name or type object.
        * @param {boolean} [sloppy=false] Indicates if an error is thrown if the specified property is not defined.
        *
        * @return {any|pentaho.type.Complex|Nully} The primitive value of the first element, or a {@link Nully} value.
@@ -404,7 +404,7 @@ define([
        *
        * This method returns the result of calling [Complex#atf]{@link pentaho.type.Complex#atf} with a `0` index.
        *
-       * @param {string|!pentaho.type.Property.Meta} name The property name or metadata.
+       * @param {string|!pentaho.type.Property.Type} name The property name or type object.
        * @param {boolean} [sloppy=false] Indicates if an error is thrown if the specified property is not defined.
        *
        * @return {string} The string representation of the first element, or `""`.
@@ -428,7 +428,7 @@ define([
        *
        * When the specified property is not a _list_ property, `0` is returned if it is `null` and `1`, otherwise.
        *
-       * @param {string|!pentaho.type.Property.Meta} name The property name or property metadata.
+       * @param {string|!pentaho.type.Property.Type} name The property name or type object.
        * @param {boolean} [sloppy=false] Indicates if an error is thrown if the specified property is not defined.
        *
        * @return {number} The number of values.
@@ -437,11 +437,11 @@ define([
        * name `name` is not defined.
        */
       count: function(name, sloppy) {
-        var pMeta = this.meta.get(name, sloppy);
-        if(!pMeta) return 0;
+        var pType = this.type.get(name, sloppy);
+        if(!pType) return 0;
 
-        var value = this._values[pMeta.name];
-        return pMeta.isList ? value.count :
+        var value = this._values[pType.name];
+        return pType.isList ? value.count :
                value      ? 1 : 0;
       },
 
@@ -457,14 +457,14 @@ define([
        * If its value is not `null`, it is seen like a list property with one element.
        * This behavior is consistent with that of the [count]{@link pentaho.type.Complex#count} property.
        *
-       * @see pentaho.type.Property.Meta#isList
+       * @see pentaho.type.Property.Type#isList
        * @see pentaho.type.Complex#path
        * @see pentaho.type.Complex#atv
        * @see pentaho.type.Complex#atf
        * @see pentaho.type.Complex#count
        * @see pentaho.type.Complex#first
        *
-       * @param {string|!pentaho.type.Property.Meta} name The property name or metadata.
+       * @param {string|!pentaho.type.Property.Type} name The property name or type object.
        * @param {number} index The index of the desired element.
        * @param {boolean} [sloppy=false] Indicates if an error is thrown if the specified property is not defined.
        *
@@ -474,15 +474,15 @@ define([
        * name `name` is not defined.
        */
       at: function(name, index, sloppy) {
-        var pMeta = this.meta.get(name, sloppy);
+        var pType = this.type.get(name, sloppy);
 
         if(index == null) throw error.argRequired("index");
 
-        if(!pMeta) return undefined;
+        if(!pType) return undefined;
 
-        var pValue = this._values[pMeta.name];
+        var pValue = this._values[pType.name];
 
-        if(pMeta.isList) return /* assert pValue */pValue.at(index || 0);
+        if(pType.isList) return /* assert pValue */pValue.at(index || 0);
 
         return pValue && !index ? pValue : null;
       },
@@ -500,7 +500,7 @@ define([
        * its [value]{@link pentaho.type.Simple#value} attribute.
        * For a [Complex]{@link pentaho.type.Complex} type, this corresponds to the value itself.
        *
-       * @param {string|!pentaho.type.Property.Meta} name The property name or metadata.
+       * @param {string|!pentaho.type.Property.Type} name The property name or type object.
        * @param {number} index The index of the element.
        * @param {boolean} [sloppy=false] Indicates if an error is thrown if the specified property is not defined.
        *
@@ -531,7 +531,7 @@ define([
        * its [formatted]{@link pentaho.type.Simple#formatted} attribute, when it is not null.
        * For a [Complex]{@link pentaho.type.Complex} type, this varies with the implementation.
        *
-       * @param {string|!pentaho.type.Property.Meta} name The property name or metadata.
+       * @param {string|!pentaho.type.Property.Type} name The property name or type object.
        * @param {number} index The index of the value.
        *
        * @param {boolean} [sloppy=false] Indicates if an error is thrown if the specified property is not defined.
@@ -554,14 +554,14 @@ define([
       /**
        * Gets a value that indicates if a given property is currently applicable.
        *
-       * @param {string|!pentaho.type.Property.Meta} name The property name or metadata.
+       * @param {string|!pentaho.type.Property.Type} name The property name or type object.
        *
        * @return {boolean} `true` if the property is applicable, `false`, otherwise.
        *
        * @throws {pentaho.lang.ArgumentInvalidError} When a property with name `name` is not defined.
        */
       isApplicable: function(name) {
-        return this.meta.get(name).isApplicableEval(this);
+        return this.type.get(name).isApplicableEval(this);
       },
       //endregion
 
@@ -569,14 +569,14 @@ define([
       /**
        * Gets a value that indicates if a given property is currently readonly.
        *
-       * @param {string|pentaho.type.Property.Meta} name The property name or property metadata.
+       * @param {string|pentaho.type.Property.Type} name The property name or property type object.
        *
        * @return {boolean} Returns `true` if the property is read-only, `false` if the value is other.
        *
        * @throws {pentaho.lang.ArgumentInvalidError} When a property with name `name` is not defined.
        */
       isReadOnly: function(name) {
-        return this.meta.get(name).isReadOnlyEval(this);
+        return this.type.get(name).isReadOnlyEval(this);
       },
       //endregion
 
@@ -584,14 +584,14 @@ define([
       /**
        * Gets the current valid count range of values of a given property.
        *
-       * @param {string|pentaho.type.Property.Meta} name The property name or metadata.
+       * @param {string|pentaho.type.Property.Type} name The property name or type object.
        *
        * @return {pentaho.IRange} The range of the property.
        *
        * @throws {pentaho.lang.ArgumentInvalidError} When a property with name `name` is not defined.
        */
       countRange: function(name) {
-        return this.meta.get(name).countRangeEval(this);
+        return this.type.get(name).countRangeEval(this);
       },
       //endregion
 
@@ -602,19 +602,19 @@ define([
        * A property is currently required if
        * its current {@link pentaho.type.Complex#countRange} minimum is at least 1.
        *
-       * @param {string|pentaho.type.Property.Meta} [name] The property name or metadata.
+       * @param {string|pentaho.type.Property.Type} [name] The property name or type object.
        *
        * @return {boolean} `true` if the property is required, `false`, otherwise.
        *
        * @throws {pentaho.lang.ArgumentInvalidError} When a property with name `name` is not defined.
        */
       isRequired: function(name) {
-        return this.meta.get(name).countRangeEval(this).min > 0;
+        return this.type.get(name).countRangeEval(this).min > 0;
       },
       //endregion
       //endregion
 
-      meta: /** @lends pentaho.type.Complex.Meta# */{
+      type: /** @lends pentaho.type.Complex.Type# */{
         id: module.id,
 
         isAbstract: true,
@@ -634,22 +634,22 @@ define([
           // Lazy creation.
           var proto = this.constructor.prototype;
           return O.getOwn(proto, "_props") ||
-              (proto._props = PropertyMetaCollection.to([], /*declaringMeta:*/this));
+              (proto._props = PropertyTypeCollection.to([], /*declaringType:*/this));
         },
         //endregion
 
         /**
-         * Gets the metadata of the property with the given name,
+         * Gets the type object of the property with the given name,
          * or `null` if it is not defined.
          *
-         * If a metadata instance is specified,
-         * it is returned back only if it is _the_ metadata instance of
+         * If a property type object is specified,
+         * it is returned back only if it is _the_ property type object of
          * same name in this complex type.
          *
-         * @param {string|!pentaho.type.Property.Meta} name The property name or metadata.
+         * @param {string|!pentaho.type.Property.Type} name The property name or type object.
          * @param {boolean} [sloppy=false] Indicates if an error is thrown if the specified property is not defined.
          *
-         * @return {?pentaho.type.Property.Meta} The property metadata.
+         * @return {?pentaho.type.Property.Type} The property type object.
          *
          * @throws {pentaho.lang.ArgumentInvalidError} When `sloppy` is `false` and a property with
          * name `name` is not defined.
@@ -664,7 +664,7 @@ define([
 
         _get: function(name) {
           var ps;
-          // !_props could only occur if accessing #get directly on Complex.meta and it had no derived classes yet...
+          // !_props could only occur if accessing #get directly on Complex.type and it had no derived classes yet...
           return (!name || !(ps = this._props)) ? null :
                  (typeof name === "string")     ? ps.get(name) :
                  (ps.get(name.name) === name)   ? name :
@@ -674,42 +674,43 @@ define([
         /**
          * Gets a value that indicates if a given property is defined.
          *
-         * If a _metadata_ instance is specified,
+         * If a property type object is specified,
+         * this method tests whether it is the same property type object that exists under that name, if any.
          *
-         * @param {string|pentaho.type.Property.Meta} name The property name or metadata.
+         * @param {string|pentaho.type.Property.Type} name The property name or type object.
          *
          * @return {boolean} `true` if the property is defined, `false`, otherwise.
          */
         has: function(name) {
-          // !_props could only occur if accessing #has directly on Complex.meta and it had no derived classes yet...
+          // !_props could only occur if accessing #has directly on Complex.type and it had no derived classes yet...
           var ps;
           if(!name || !(ps = this._props)) return false;
           if(typeof name === "string") return ps.has(name);
-          // Name is a metadata
+          // Name is a type object
           return ps.get(name.name) === name;
         },
 
         /**
-         * Gets the metadata of the property with a given index,
+         * Gets the property type object of the property with a given index,
          * if in range, or `null` if not.
          *
          * @param {number} index The property index.
          * @param {boolean} [sloppy=false] Indicates if an error is thrown if the specified `index` is out of range.
          *
-         * @return {?pentaho.type.Property.Meta} The property metadata, or `null`.
+         * @return {?pentaho.type.Property.Type} The property type object, or `null`.
          *
          * @throws {pentaho.lang.ArgumentRangeError} When `sloppy` is `false` and the specified `index` is out of range.
          */
         at: function(index, sloppy) {
           if(index == null) throw error.argRequired("index");
-          var pMeta = this._at(index);
-          if(!pMeta && !sloppy)
+          var pType = this._at(index);
+          if(!pType && !sloppy)
             throw error.argRange("index");
-          return pMeta;
+          return pType;
         },
 
         _at: function(index) {
-          // !_props could only occur if accessing #at directly on Complex.meta and it had no derived classes yet...
+          // !_props could only occur if accessing #at directly on Complex.type and it had no derived classes yet...
           var ps = this._props;
           return (ps && ps[index]) || null;
         },
@@ -720,15 +721,15 @@ define([
          * @return {number} The number of properties.
          */
         get count() {
-          // !_props could only occur if accessing #at directly on Complex.meta and it had no derived classes yet...
+          // !_props could only occur if accessing #at directly on Complex.type and it had no derived classes yet...
           var ps = this._props;
           return ps ? ps.length : 0;
         },
 
         /**
-         * Calls a function for each defined property metadata.
+         * Calls a function for each defined property type.
          *
-         * @param {function(pentaho.type.Property.Meta, number, pentaho.type.Complex) : boolean?} f
+         * @param {function(pentaho.type.Property.Type, number, pentaho.type.Complex) : boolean?} f
          * The mapping function.
          * @param {Object} [x] The JS context object on which `f` is called.
          *
@@ -748,14 +749,14 @@ define([
         /**
          * Adds, overrides or configures properties to/of the complex type.
          *
-         * @param {pentaho.type.spec.IPropertyMeta|pentaho.type.spec.IPropertyMeta[]} metaSpec A property meta
+         * @param {pentaho.type.spec.IPropertyType|pentaho.type.spec.IPropertyType[]} propTypeSpec A property type
          *   specification or an array of.
          *
          * @return {pentaho.type.Complex} This object.
          */
-        add: function(metaSpec) {
-          if(!Array.isArray(metaSpec)) metaSpec = [metaSpec];
-          this._getProps().configure(metaSpec);
+        add: function(propTypeSpec) {
+          if(!Array.isArray(propTypeSpec)) propTypeSpec = [propTypeSpec];
+          this._getProps().configure(propTypeSpec);
           return this;
         },
 
@@ -770,11 +771,11 @@ define([
          *
          * The default implementation
          * validates each property's value against
-         * the property's [type]{@link pentaho.type.Property.Meta#type}
+         * the property's [type]{@link pentaho.type.Property.Type#type}
          * and collects and returns any reported errors.
          *
-         * @see pentaho.type.Value.Meta#validate
-         * @see pentaho.type.Value.Meta#validateInstance
+         * @see pentaho.type.Value.Type#validate
+         * @see pentaho.type.Value.Type#validateInstance
          *
          * @param {!pentaho.type.Complex} value The complex value to validate.
          *
@@ -786,8 +787,8 @@ define([
         _validate: function(value) {
           var errors = null;
 
-          this.each(function(pMeta) {
-            errors = valueHelper.combineErrors(errors, pMeta.validate(value));
+          this.each(function(pType) {
+            errors = valueHelper.combineErrors(errors, pType.validate(value));
           }, this);
 
           return errors;
@@ -795,7 +796,7 @@ define([
         //endregion
       }
     }).implement({
-      meta: bundle.structured.complex
+      type: bundle.structured.complex
     });
 
     return Complex;

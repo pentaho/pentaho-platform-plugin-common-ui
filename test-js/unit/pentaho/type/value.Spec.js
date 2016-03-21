@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Item",
+  "pentaho/type/Instance",
   "pentaho/type/Context",
   "tests/pentaho/util/errorMatch"
-], function(Item, Context, errorMatch) {
+], function(Instance, Context, errorMatch) {
 
   "use strict";
 
@@ -25,7 +25,8 @@ define([
 
   var context = new Context(),
       Value = context.get("pentaho/type/value"),
-      Number = context.get("pentaho/type/number");
+      PentahoNumber = context.get("pentaho/type/number"),
+      Type = Instance.Type;
 
   describe("pentaho/type/value -", function() {
 
@@ -33,12 +34,12 @@ define([
       expect(typeof Value).toBe("function");
     });
 
-    it("should be a sub-class of `Item`", function() {
-      expect(Value.prototype instanceof Item).toBe(true);
+    it("should be a sub-class of `Instance`", function() {
+      expect(Value.prototype instanceof Instance).toBe(true);
     });
 
-    describe(".Meta -", function() {
-      var valueMeta;
+    describe(".Type -", function() {
+      var valueType;
       var Value;
       var myContext;
 
@@ -46,65 +47,65 @@ define([
         // making sure that we have a new Value definition for each test
         myContext = new Context();
         Value = myContext.get("pentaho/type/value");
-        valueMeta = Value.meta;
+        valueType = Value.type;
       });
 
       it("should be a function", function() {
-        expect(typeof Value.Meta).toBe("function");
+        expect(typeof Value.Type).toBe("function");
       });
 
-      it("should be a sub-class of `Item.Meta`", function() {
-        expect(valueMeta instanceof Item.Meta).toBe(true);
+      it("should be a sub-class of `Type`", function() {
+        expect(valueType instanceof Type).toBe(true);
       });
 
       it("should have an `uid`", function() {
-        expect(valueMeta.uid != null).toBe(true);
-        expect(typeof valueMeta.uid).toBe("number");
+        expect(valueType.uid != null).toBe(true);
+        expect(typeof valueType.uid).toBe("number");
       });
 
       describe("#context()", function() {
-        it("the Value meta has the context in which it was defined", function() {
+        it("the Value type has the context in which it was defined", function() {
           var myContext = new Context();
           var Value = myContext.get("pentaho/type/value");
 
-          expect(Value.meta.context).toBe(myContext);
+          expect(Value.type.context).toBe(myContext);
         });
       }); // end #context
 
       describe("#isList", function() {
         it("should have default `isList` equal to `undefined`", function () {
-          expect(valueMeta.isList).toBe(undefined);
+          expect(valueType.isList).toBe(undefined);
         });
       }); // end #isList
 
       describe("#isAbstract", function() {
         it("should have default `isAbstract` equal to `true`", function () {
-          expect(valueMeta.isAbstract).toBe(true);
+          expect(valueType.isAbstract).toBe(true);
         });
 
         it("should allow changing `isAbstract` value", function () {
-          valueMeta.isAbstract = false;
-          expect(valueMeta.isAbstract).toBe(false);
-          valueMeta.isAbstract = true;
-          expect(valueMeta.isAbstract).toBe(true);
+          valueType.isAbstract = false;
+          expect(valueType.isAbstract).toBe(false);
+          valueType.isAbstract = true;
+          expect(valueType.isAbstract).toBe(true);
         });
       }); // end #isAbstract
 
       describe("#areEqual(va, vb)", function() {
         it("should return `true` if both values are nully", function() {
-          expect(Value.meta.areEqual(null, null)).toBe(true);
-          expect(Value.meta.areEqual(undefined, undefined)).toBe(true);
-          expect(Value.meta.areEqual(null, undefined)).toBe(true);
-          expect(Value.meta.areEqual(undefined, null)).toBe(true);
+          expect(Value.type.areEqual(null, null)).toBe(true);
+          expect(Value.type.areEqual(undefined, undefined)).toBe(true);
+          expect(Value.type.areEqual(null, undefined)).toBe(true);
+          expect(Value.type.areEqual(undefined, null)).toBe(true);
         });
 
         it("should return `false` if only one of the values is nully", function() {
           var va = new Value();
 
-          expect(Value.meta.areEqual(null, va)).toBe(false);
-          expect(Value.meta.areEqual(undefined, va)).toBe(false);
-          expect(Value.meta.areEqual(va, undefined)).toBe(false);
-          expect(Value.meta.areEqual(va, null)).toBe(false);
+          expect(Value.type.areEqual(null, va)).toBe(false);
+          expect(Value.type.areEqual(undefined, va)).toBe(false);
+          expect(Value.type.areEqual(va, undefined)).toBe(false);
+          expect(Value.type.areEqual(va, null)).toBe(false);
         });
 
         it("should return `true` when given the same value instances and not call its #equals method", function() {
@@ -112,19 +113,19 @@ define([
 
           spyOn(va, "equals").and.callThrough();
 
-          expect(Value.meta.areEqual(va, va)).toBe(true);
+          expect(Value.type.areEqual(va, va)).toBe(true);
           expect(va.equals).not.toHaveBeenCalled();
         });
 
         it("should return `false` when given values with different constructors and not call their #equals methods",
         function() {
           var va = new Value();
-          var vb = new Number(1);
+          var vb = new PentahoNumber(1);
 
           spyOn(va, "equals").and.callThrough();
           spyOn(vb, "equals").and.callThrough();
 
-          expect(Value.meta.areEqual(va, vb)).toBe(false);
+          expect(Value.type.areEqual(va, vb)).toBe(false);
 
           expect(va.equals).not.toHaveBeenCalled();
           expect(vb.equals).not.toHaveBeenCalled();
@@ -138,7 +139,7 @@ define([
           spyOn(va, "equals").and.callFake(function() { return false; });
           spyOn(vb, "equals").and.callFake(function() { return false; });
 
-          expect(Value.meta.areEqual(va, vb)).toBe(false);
+          expect(Value.type.areEqual(va, vb)).toBe(false);
 
           expect(va.equals).toHaveBeenCalled();
           expect(vb.equals).not.toHaveBeenCalled();
@@ -150,16 +151,16 @@ define([
         it("should return an instance when given nully", function() {
           var Complex = myContext.get("pentaho/type/complex");
           var MyComplex = Complex.extend();
-          var inst = MyComplex.meta.create(null);
+          var inst = MyComplex.type.create(null);
           expect(inst instanceof MyComplex).toBe(true);
 
-          inst = MyComplex.meta.create(undefined);
+          inst = MyComplex.type.create(undefined);
           expect(inst instanceof MyComplex).toBe(true);
         });
 
         it("should create an instance given a number value when called on a Number type", function() {
           var Number = myContext.get("pentaho/type/number");
-          var number = Number.meta.create(1);
+          var number = Number.type.create(1);
 
           expect(number instanceof Number).toBe(true);
           expect(number.value).toBe(1);
@@ -167,7 +168,7 @@ define([
 
         it("should create an instance given a number value when called on Number", function() {
           var Number = myContext.get("pentaho/type/number");
-          var number = Number.meta.create(1);
+          var number = Number.type.create(1);
 
           expect(number instanceof Number).toBe(true);
           expect(number.value).toBe(1);
@@ -175,7 +176,7 @@ define([
 
         it("should create an instance given a boolean value when called on Boolean", function() {
           var Boolean = myContext.get("pentaho/type/boolean");
-          var value = Boolean.meta.create(true);
+          var value = Boolean.type.create(true);
 
           expect(value instanceof Boolean).toBe(true);
           expect(value.value).toBe(true);
@@ -184,14 +185,14 @@ define([
         it("should create an instance given an object value when called on Object", function() {
           var Object = myContext.get("pentaho/type/object");
           var primitive = {};
-          var value = Object.meta.create({v: primitive});
+          var value = Object.type.create({v: primitive});
 
           expect(value instanceof Object).toBe(true);
           expect(value.value).toBe(primitive);
         });
 
         it("should create an instance given an object with a type annotation, '_'", function() {
-          var value = Value.meta.create({_: "pentaho/type/number", v: 1});
+          var value = Value.type.create({_: "pentaho/type/number", v: 1});
 
           var Number = myContext.get("pentaho/type/number");
           expect(value instanceof Number).toBe(true);
@@ -202,7 +203,7 @@ define([
           var String = myContext.get("pentaho/type/string");
 
           expect(function() {
-            String.meta.create({_: "pentaho/type/number", v: 1});
+            String.type.create({_: "pentaho/type/number", v: 1});
           }).toThrow(errorMatch.operInvalid());
         });
 
@@ -210,25 +211,25 @@ define([
           var Simple = myContext.get("pentaho/type/simple");
           var Number = myContext.get("pentaho/type/number");
 
-          var value = Simple.meta.create({_: "pentaho/type/number", v: 1});
+          var value = Simple.type.create({_: "pentaho/type/number", v: 1});
 
           expect(value instanceof Number).toBe(true);
           expect(value.value).toBe(1);
         });
 
         it("should throw if given a type annotated value of an abstract type", function() {
-          var MyAbstract = myContext.get("pentaho/type/complex").extend({meta: {isAbstract: true}});
+          var MyAbstract = myContext.get("pentaho/type/complex").extend({type: {isAbstract: true}});
 
           expect(function() {
-            Value.meta.create({_: MyAbstract});
+            Value.type.create({_: MyAbstract});
           }).toThrow(errorMatch.operInvalid());
         });
 
         it("should throw if given a value and called on an abstract type", function() {
-          var MyAbstract = myContext.get("pentaho/type/complex").extend({meta: {isAbstract: true}});
+          var MyAbstract = myContext.get("pentaho/type/complex").extend({type: {isAbstract: true}});
 
           expect(function() {
-            MyAbstract.meta.create({});
+            MyAbstract.type.create({});
           }).toThrow(errorMatch.operInvalid());
         });
 
@@ -237,7 +238,7 @@ define([
         it("should be able to create a type-annotated value of a list type", function() {
           var NumberList = myContext.get({base: "list", of: "number"});
 
-          var value = Value.meta.create({_: NumberList, d: [1, 2]});
+          var value = Value.type.create({_: NumberList, d: [1, 2]});
 
           expect(value instanceof NumberList).toBe(true);
           expect(value.count).toBe(2);
@@ -246,7 +247,7 @@ define([
         });
 
         it("should be able to create a type-annotated value of an inline list type", function() {
-          var value = Value.meta.create({
+          var value = Value.type.create({
             _: {base: "list", of: "number"},
             d: [1, 2]
           });
@@ -258,7 +259,7 @@ define([
         });
 
         it("should be able to create a type-annotated value of an inline complex type", function() {
-          var value = Value.meta.create({
+          var value = Value.type.create({
             _: {
               props: ["a", "b"]
             },
@@ -272,7 +273,7 @@ define([
         });
 
         it("should be able to create a type-annotated value of an inline list complex type", function() {
-          var value = Value.meta.create({
+          var value = Value.type.create({
             _: [
               {
                 props: [
@@ -291,7 +292,7 @@ define([
         });
 
         it("should be able to create a type-annotated value of an inline list complex type in array form", function() {
-          var value = Value.meta.create({
+          var value = Value.type.create({
             _: [{
               props: ["a", "b"]
             }],
@@ -306,7 +307,7 @@ define([
         });
 
       }); // #create
-    }); // "Meta"
+    }); // "Type"
 
     describe(".extend({...}) returns a value that -", function() {
 
@@ -321,63 +322,63 @@ define([
         expect(Derived.prototype instanceof Value).toBe(true);
       });
 
-      describe("has a .Meta property that -", function() {
+      describe("has a .Type property that -", function() {
 
         it("should be a function", function() {
           var Derived = Value.extend();
-          expect(typeof Derived.Meta).toBe("function");
+          expect(typeof Derived.Type).toBe("function");
         });
 
-        it("should be a sub-class of Value.Meta", function() {
+        it("should be a sub-class of Value.Type", function() {
           var Derived = Value.extend();
-          expect(Derived.Meta).not.toBe(Value.Meta);
-          expect(Derived.meta instanceof Value.Meta).toBe(true);
+          expect(Derived.Type).not.toBe(Value.Type);
+          expect(Derived.type instanceof Value.Type).toBe(true);
         });
 
         describe("#isAbstract", function() {
           it("should respect a specified abstract spec value", function() {
-            var Derived = Value.extend({meta: {isAbstract: true}});
-            expect(Derived.meta.isAbstract).toBe(true);
+            var Derived = Value.extend({type: {isAbstract: true}});
+            expect(Derived.type.isAbstract).toBe(true);
 
-            Derived = Value.extend({meta: {isAbstract: false}});
-            expect(Derived.meta.isAbstract).toBe(false);
+            Derived = Value.extend({type: {isAbstract: false}});
+            expect(Derived.type.isAbstract).toBe(false);
           });
 
           it("should default to `false` whe spec is unspecified and should not inherit the base value", function() {
             var Derived = Value.extend();
-            expect(Derived.meta.isAbstract).toBe(false);
+            expect(Derived.type.isAbstract).toBe(false);
 
-            var Abstract = Value.extend({meta: {isAbstract: true }});
-            var Concrete = Value.extend({meta: {isAbstract: false}});
+            var Abstract = Value.extend({type: {isAbstract: true }});
+            var Concrete = Value.extend({type: {isAbstract: false}});
 
             var DerivedAbstract = Abstract.extend();
             var DerivedConcrete = Concrete.extend();
 
-            expect(DerivedAbstract.meta.isAbstract).toBe(false);
-            expect(DerivedConcrete.meta.isAbstract).toBe(false);
+            expect(DerivedAbstract.type.isAbstract).toBe(false);
+            expect(DerivedConcrete.type.isAbstract).toBe(false);
           });
 
           it("should respect a set non-nully value", function() {
             var Derived = Value.extend();
-            expect(Derived.meta.isAbstract).toBe(false);
+            expect(Derived.type.isAbstract).toBe(false);
 
-            Derived.meta.isAbstract = true;
-            expect(Derived.meta.isAbstract).toBe(true);
+            Derived.type.isAbstract = true;
+            expect(Derived.type.isAbstract).toBe(true);
 
-            Derived.meta.isAbstract = false;
-            expect(Derived.meta.isAbstract).toBe(false);
+            Derived.type.isAbstract = false;
+            expect(Derived.type.isAbstract).toBe(false);
           });
 
           it("should set to the default value false when set to a nully value", function() {
-            var Derived = Value.extend({meta: {isAbstract: true}});
-            expect(Derived.meta.isAbstract).toBe(true);
-            Derived.meta.isAbstract = null;
-            expect(Derived.meta.isAbstract).toBe(false);
+            var Derived = Value.extend({type: {isAbstract: true}});
+            expect(Derived.type.isAbstract).toBe(true);
+            Derived.type.isAbstract = null;
+            expect(Derived.type.isAbstract).toBe(false);
 
-            Derived = Value.extend({meta: {isAbstract: true}});
-            expect(Derived.meta.isAbstract).toBe(true);
-            Derived.meta.isAbstract = undefined;
-            expect(Derived.meta.isAbstract).toBe(false);
+            Derived = Value.extend({type: {isAbstract: true}});
+            expect(Derived.type.isAbstract).toBe(true);
+            Derived.type.isAbstract = undefined;
+            expect(Derived.type.isAbstract).toBe(false);
           });
         }); // #isAbstract
       });

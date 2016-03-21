@@ -19,7 +19,7 @@ define([
     var Visual = context.get(visualFactory);
 
     return Visual.extend({
-      meta: {
+      type: {
         id: "pentaho/visual/samples/calc",
         v2Id: "sample_calc",
 
@@ -50,6 +50,6 @@ define([
         ]
       }
     })
-    .implement({meta: bundle.structured});
+    .implement({type: bundle.structured});
   };
 });

@@ -18,10 +18,10 @@ define([
   "pentaho/i18n!../abstract/i18n/model",
   "../abstract/types/shape",
   "../abstract/types/labelsOption",
-  "../abstract/mixins/scaleSizeContinuousMeta",
-  "../abstract/mixins/scaleColorContinuousMeta"
+  "../abstract/mixins/scaleSizeContinuousType",
+  "../abstract/mixins/scaleColorContinuousType"
 ], function(cartesianAbstractModelFactory, bundle, shapeFactory, labelsOptionFactory,
-    scaleSizeContinuousMeta, scaleColorContinuousMeta) {
+    scaleSizeContinuousType, scaleColorContinuousType) {
 
   "use strict";
 
@@ -35,7 +35,7 @@ define([
     }
 
     return CartesianAbstract.extend({
-        meta: {
+        type: {
           id: "pentaho/visual/ccc/heatGrid",
           v2Id: "ccc_heatgrid",
 
@@ -90,10 +90,10 @@ define([
           ]
         }
       })
-      .implement({meta: scaleSizeContinuousMeta})
-      .implement({meta: bundle.structured["scaleSizeContinuous"]})
-      .implement({meta: scaleColorContinuousMeta})
-      .implement({meta: bundle.structured["scaleColorContinuous"]})
-      .implement({meta: bundle.structured["heatGrid"]});
+      .implement({type: scaleSizeContinuousType})
+      .implement({type: bundle.structured["scaleSizeContinuous"]})
+      .implement({type: scaleColorContinuousType})
+      .implement({type: bundle.structured["scaleColorContinuous"]})
+      .implement({type: bundle.structured["heatGrid"]});
   };
 });

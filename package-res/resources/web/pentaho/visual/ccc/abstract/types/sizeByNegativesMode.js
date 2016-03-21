@@ -25,13 +25,13 @@ define([
 
     return Refinement.extend({
 
-      meta: {
+      type: {
         id: "pentaho/visual/ccc/abstract/types/sizeByNegativesMode",
         of: "string",
         facets: ["DiscreteDomain"],
         domain: ["negLowest", "useAbs"]
       }
     })
-    .implement({meta: bundle.structured["sizeByNegativesMode"]});
+    .implement({type: bundle.structured["sizeByNegativesMode"]});
   };
 });

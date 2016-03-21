@@ -24,13 +24,13 @@ define([
   var context = new Context();
   var Complex = context.get("pentaho/type/complex");
 
-  describe("pentaho.type.Property.Meta -", function() {
+  describe("pentaho.type.Property.Type -", function() {
     describe("#validate(owner) -", function() {
       var Derived;
 
       beforeEach(function() {
         Derived = Complex.extend({
-          meta: {
+          type: {
             label: "Derived",
             props: [
               {name: "x", type: "string", isRequired: true},
@@ -44,14 +44,14 @@ define([
 
       it("should return null", function() {
         var derived = new Derived({x: "1", y: ["1", "2", "3"], z: ["1", "2"]});
-        expect(Derived.meta.validate(derived)).toBe(null);
+        expect(Derived.type.validate(derived)).toBe(null);
       });
 
       it("should return three errors", function() {
         var derived = new Derived({y: ["1"], z: ["1", "2", "3"]});
 
-        expect(Derived.meta.validate(derived).length).toBe(3);
+        expect(Derived.type.validate(derived).length).toBe(3);
       });
     });// end #validate(owner)
-  }); // pentaho.type.Property.Meta
+  }); // pentaho.type.Property.Type
 });

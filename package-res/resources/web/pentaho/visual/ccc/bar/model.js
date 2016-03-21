@@ -17,9 +17,9 @@ define([
   "../barAbstract/model",
   "pentaho/i18n!../abstract/i18n/model",
   "../abstract/types/labelsOption",
-  "../abstract/mixins/trendMeta",
+  "../abstract/mixins/trendType",
   "./theme/model"
-], function(barAbstractModelFactory, bundle, labelsOptionFactory, trendMeta) {
+], function(barAbstractModelFactory, bundle, labelsOptionFactory, trendType) {
 
   "use strict";
 
@@ -28,7 +28,7 @@ define([
     var BarAbstract = context.get(barAbstractModelFactory);
 
     return BarAbstract.extend({
-      meta: {
+      type: {
         id: "pentaho/visual/ccc/bar",
         v2Id: "ccc_bar",
 
@@ -52,8 +52,8 @@ define([
         ]
       }
     })
-    .implement({meta: trendMeta})
-    .implement({meta: bundle.structured["trendMeta"]})
-    .implement({meta: bundle.structured["bar"]});
+    .implement({type: trendType})
+    .implement({type: bundle.structured["trendType"]})
+    .implement({type: bundle.structured["bar"]});
   };
 });

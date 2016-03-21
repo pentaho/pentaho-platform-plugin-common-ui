@@ -25,7 +25,7 @@ define([
 
     return Refinement.extend({
 
-      meta: {
+      type: {
         id: "pentaho/visual/ccc/abstract/types/labelsOption",
         of: "string",
         facets: ["DiscreteDomain"],
@@ -39,6 +39,6 @@ define([
         ]
       }
     })
-    .implement({meta: bundle.structured["labelsOption"]});
+    .implement({type: bundle.structured["labelsOption"]});
   };
 });
