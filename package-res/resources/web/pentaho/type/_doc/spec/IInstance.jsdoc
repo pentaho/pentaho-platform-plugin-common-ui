@@ -15,11 +15,18 @@
  */
 
 /**
- * The `spec.IType` interface represents the specification of a type.
+ * The `spec.IInstance` interface describes an instance with a generic, _object_ form.
  *
- * @name pentaho.type.spec.IType
+ * @name pentaho.type.spec.IInstance
  *
  * @interface
  *
- * @property {string} [id] The id of the corresponding AMD module, if any.
+ * @see pentaho.type.spec.UInstance
+ */
+
+/**
+ * An inline type reference of the value's type.
+ * @name _
+ * @memberOf pentaho.type.spec.IInstance#
+ * @type {pentaho.type.spec.UTypeReference}
  */

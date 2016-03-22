@@ -15,11 +15,33 @@
  */
 
 /**
- * The `spec.IType` interface represents the specification of a type.
+ * The `spec.IList` interface describes a list value in _object_ form.
  *
- * @name pentaho.type.spec.IType
+ * @example
+ * <caption>
+ *   A list value description in object form
+ * </caption>
+ *
+ * {
+ *   _: ["my/product"],
+ *   d: [
+ *     {product: "boeing-737",  price: 1500}
+ *     {product: "airbus-A320", price: 1000}
+ *   ]
+ * }
+ *
+ * @name pentaho.type.spec.IList
  *
  * @interface
+ * @extends pentaho.type.spec.IInstance
  *
- * @property {string} [id] The id of the corresponding AMD module, if any.
+ * @see pentaho.type.spec.UList
+ */
+
+/**
+ * The list's _data_, or elements, array.
+ *
+ * @name d
+ * @memberOf pentaho.type.spec.IList#
+ * @type {Array.<!pentaho.type.spec.UInstance>}
  */

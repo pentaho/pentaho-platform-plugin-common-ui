@@ -75,7 +75,7 @@
  * ```
  *
  * In practice, a type factory _reference_ is seldom needed,
- * and is only used for getting the base type of a type being defined:
+ * and is only used for obtaining the base type of a type being defined:
  *
  * ```js
  * // In a file accessible through module id "my/derived/type"
@@ -199,10 +199,10 @@
  * });
  * ```
  *
- * @typedef {string|
- *           pentaho.type.Factory|
- *           Class.<pentaho.type.Value>|
+ * @typedef {nonEmptyString|
+ *           pentaho.type.Factory<pentaho.type.Instance>|
  *           pentaho.type.Type|
+ *           Class.<pentaho.type.Instance>|
  *           Array.<pentaho.type.spec.UTypeReference>|
  *           pentaho.type.spec.IType} pentaho.type.spec.UTypeReference
  */

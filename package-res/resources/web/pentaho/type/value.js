@@ -35,6 +35,7 @@ define([
      * @name pentaho.type.Value.Type
      * @class
      * @extends pentaho.type.Type
+     * @implements pentaho.lang.ISpecifiable
      *
      * @classDesc The base type class of value types.</br>
      * Value types can be singular or plural ({@link pentaho.type.Value.Type#isList|isList}).</br>
@@ -51,7 +52,8 @@ define([
      * @implements pentaho.lang.IConfigurable
      * @amd pentaho/type/value
      *
-     * @classDesc A Value is an abstract class used as a base implementation and unifying type. </br>
+     * @classDesc A Value is an abstract class used as a base implementation and unifying type.
+     *
      * A Value has a key that uniquely identifies the entity it represents.
      *
      * ### AMD
@@ -61,6 +63,9 @@ define([
      * The AMD module returns the type's factory, a
      * {@link pentaho.type.Factory<pentaho.type.Value>}.
      *
+     * @description Creates a value instance.
+     * @constructor
+     * @param {pentaho.type.spec.UInstance} [spec] A value specification.
      */
     var Value = Instance.extend("pentaho.type.Value", /** @lends pentaho.type.Value# */{
 
@@ -167,6 +172,37 @@ define([
       _configure: function(config) {
         // Nothing configurable at this level
       },
+      //endregion
+
+      //region serialization
+      /**
+       * Creates a top-level specification that describes this value.
+       *
+       * This method creates a new {@link pentaho.type.SpecificationScope} for describing
+       * this value, and others it references,
+       * and then delegates the actual work to {@link pentaho.type.Instance#toSpecInScope}.
+       *
+       * @name pentaho.type.Value#toSpec
+       * @method
+       *
+       * @param {Object} [keyArgs] - The keyword arguments object.
+       * Passed to every value and type serialized within this scope.
+       *
+       * Please see the documentation of value subclasses for information on additional, supported keyword arguments.
+       *
+       * @param {boolean} [keyArgs.omitFormatted=false] - Omits the formatted value
+       * on [Simple]{@link pentaho.type.Simple} values' specifications.
+       *
+       * @param {boolean} [keyArgs.includeDefaults=false] - Includes the value of all properties of
+       * [Complex]{@link pentaho.type.Complex} values, even when equal to their default values.
+       *
+       * @param {boolean} [keyArgs.preferPropertyArray=false] - Indicates that, if possible,
+       * array form is used for [Complex]{@link pentaho.type.Complex} values' specifications.
+       *
+       * The array form of a complex value cannot be used when its type must be inlined.
+       *
+       * @return {!pentaho.type.spec.UInstance} A specification of this value.
+       */
       //endregion
 
       /**
@@ -347,12 +383,12 @@ define([
          *
          * });
          *
-         * @param {?any} [instSpec] A value instance specification.
+         * @param {pentaho.type.spec.UInstance} [instSpec] An instance specification.
          *
          * @return {!pentaho.type.Value} The created instance.
          *
          * @throws {pentaho.lang.OperationInvalidError} When `instSpec` contains an inline type reference
-         * that refers to a type that is not a subtype of this type.
+         * that refers to a type that is not a subtype of this one.
          *
          * @throws {pentaho.lang.OperationInvalidError} When the determined type for the specified `instSpec`
          * is an [abstract]{@link pentaho.type.Value.Type#isAbstract} type.
@@ -370,9 +406,9 @@ define([
          * Determines the instance constructor that should be used to build the specified
          * instance specification.
          *
-         * @param {any} instSpec A value instance specification.
+         * @param {pentaho.type.spec.UInstance} instSpec An instance specification.
          *
-         * @return {Class.<pentaho.type.Value>} The instance constructor.
+         * @return {!Class.<pentaho.type.Value>} The instance constructor.
          *
          * @throws {pentaho.lang.OperationInvalidError} When `instSpec` contains an inline type reference
          * that refers to a type that is not a subtype of this type.

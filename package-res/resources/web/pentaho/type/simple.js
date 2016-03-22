@@ -66,6 +66,8 @@ define([
      * ```
      *
      * @description Creates a simple instance.
+     * @constructor
+     * @param {pentaho.type.spec.USimple} [spec] A simple specification.
      */
     var Simple = Element.extend("pentaho.type.Simple", /** @lends pentaho.type.Simple# */{
 
@@ -265,6 +267,26 @@ define([
         this.extend(config);
       },
       //endregion
+
+      /**
+       * @inheritdoc
+       */
+      toSpecInScope: function(scope, requireType, keyArgs) {
+        var addFormatted = !keyArgs.omitFormatted && !!this._formatted;
+
+        // Don't need a cell/object spec?
+        if(!(addFormatted || requireType))
+          return this._value;
+
+        // Need one. Ensure _ is the first property
+        var spec = requireType
+            ? {_: this.type.toReference(scope, keyArgs), v: this._value}
+            : {v: this._value};
+
+        if(addFormatted) spec.f = this._formatted;
+
+        return spec;
+      },
 
       type: /** pentaho.type.Simple.Type# */{
         id: module.id,

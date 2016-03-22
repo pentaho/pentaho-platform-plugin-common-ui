@@ -15,10 +15,11 @@
  */
 define([
   "./Type",
+  "./SpecificationScope",
   "../lang/Base",
   "../util/error",
   "../util/object"
-], function(Type, Base, error, O) {
+], function(Type, SpecificationScope, Base, error, O) {
 
   "use strict";
 
@@ -115,6 +116,58 @@ define([
     set type(config) {
       // Class.implement essentially just calls Class#extend.
       if(config) this.type.extend(config);
+    },
+    //endregion
+
+    //region serialization
+    /**
+     * Creates a top-level specification that describes this instance.
+     *
+     * This method creates a new {@link pentaho.type.SpecificationScope} for describing
+     * this instance, and any other instances and types it references,
+     * delegating the actual work to {@link pentaho.type.Instance#toSpecInScope}.
+     *
+     * @param {Object} [keyArgs] - The keyword arguments object.
+     * Passed to every instance and type serialized within this scope.
+     *
+     * Please see the documentation of subclasses for information on additional, supported keyword arguments.
+     *
+     * @param {boolean} [keyArgs.omitRootType=false] - Omits the inline type property, `_`,
+     * on the root (`this`) value specification.
+     *
+     * @return {!any} A specification of this instance.
+     */
+    toSpec: function(keyArgs) {
+      if(!keyArgs) keyArgs = {};
+
+      var scope = new SpecificationScope();
+      var requireType = !keyArgs.omitRootType;
+      var spec = this.toSpecInScope(scope, requireType, keyArgs);
+
+      scope.dispose();
+
+      return spec;
+    },
+
+    /**
+     * Creates a specification that describes this instance under a given scope.
+     *
+     * @param {!pentaho.type.SpecificationScope} scope - The specification scope.
+     * @param {boolean} requireType - Requires inlining the type of this instance in the specification.
+     * @param {!Object} keyArgs - The keyword arguments object.
+     * Passed to every instance serialized within this scope.
+     *
+     * Please see the documentation of subclasses for information on additional, supported keyword arguments.
+     *
+     * @return {!any} A specification of this instance.
+     *
+     * @abstract
+     *
+     * @see pentaho.type.Instance#toSpec
+     */
+    toSpecInScope: function(scope, requireType, keyArgs) {
+      /* istanbul ignore next : abstract method */
+      throw error.notImplemented();
     }
     //endregion
   }, /** @lends pentaho.type.Instance */{

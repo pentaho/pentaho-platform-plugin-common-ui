@@ -1,0 +1,72 @@
+/*!
+ * Copyright 2010 - 2016 Pentaho Corporation.  All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * A `spec.USimple` represents the union of JS types that can be used to describe a simple value,
+ * or the absence of one.
+ *
+ * Like with all other value types, simple values can be described using the general **object form**.
+ * The _object form_ conforms to {@link pentaho.type.spec.ISimple}.
+ *
+ * The following is an example of an _object form_ specification:
+ *
+ * ```js
+ * {v: 1, f: "1.0"}
+ * ```
+ *
+ * If the formatted is not defined, it can be written more concisely as:
+ *
+ * ```js
+ * {v: 1}
+ * ```
+ *
+ * or, simply, as:
+ *
+ * ```js
+ * 1
+ * ```
+ *
+ * Note that, when the underlying JavaScript value is a _plain object_,
+ * it must always be described using the generic object form, [spec.ISimple]{@link pentaho.type.spec.ISimple},
+ * as in:
+ *
+ * ```js
+ * {v: {}}
+ * ```
+ *
+ * When a simple value is absent, it can be described with a {@link Nully} JavaScript value:
+ *
+ * ```js
+ * null
+ * ```
+ *
+ * Note, also, that a simple value **cannot** have a {@link Nully} as its underlying JavaScript value,
+ * and, as such, the following example would not be valid:
+ *
+ * ```js
+ * {v: null} // throws if given to a Simple, derived constructor
+ * ```
+ *
+ * A [Simple]{@link pentaho.type.Simple} instance can also be used as a simple value specification,
+ * in which case it is used as a source of its
+ * [value]{@link pentaho.type.Simple#value} and
+ * [formatted]{@link pentaho.type.Simple#formatted} properties.
+ *
+ * To know, exactly, which types of JavaScript values are accepted as specifications of
+ * a specific {@link pentaho.type.spec.ISimple} subtype, see the subtype's documentation.
+ *
+ * @typedef {pentaho.type.spec.ISimple|pentaho.type.Simple|any} pentaho.type.spec.USimple
+ */

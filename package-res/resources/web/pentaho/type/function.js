@@ -43,6 +43,8 @@ define([
      * {@link pentaho.type.Factory<pentaho.type.Function>}.
      *
      * @description Creates a function instance.
+     * @constructor
+     * @param {pentaho.type.spec.IFunction|function|string} [spec] A function specification.
      */
     return Simple.extend("pentaho.type.Function", {
       /**
