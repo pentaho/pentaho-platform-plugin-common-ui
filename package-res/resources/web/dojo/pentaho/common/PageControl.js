@@ -130,7 +130,7 @@
       },
 
       _changePageNumber: function() {
-        if (!this.pageNumberInput.isValid()) {
+        if (!this.pageNumberInput.isValid() || isNaN(this.pageNumberInput.get("value"))) {
           this._resetPageNumber();
           return;
         }
