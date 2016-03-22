@@ -1304,13 +1304,17 @@ define([
 
     _onUserSelection: function(selectingDatums) {
        // Duplicates may occur due to excluded dimensions like the discriminator
+
+      var alreadyIn = {};
       var operands = selectingDatums.reduce(function(memo, datum) {
         if(!datum.isVirtual) {
           var operand = this._complexToFilter(datum);
 
-          // TODO:
           // Check if there's already a selection with the same key.
           // If not, add a new selection to the selections list.
+          var key = JSON.stringify(operand.toSpec()); // TODO: improve key
+          if(alreadyIn[key]) return memo;
+          alreadyIn[key] = true;
 
           if(operand) memo.push(operand);
         }
