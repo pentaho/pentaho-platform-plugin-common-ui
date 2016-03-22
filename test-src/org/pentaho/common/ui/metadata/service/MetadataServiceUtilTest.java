@@ -12,7 +12,7 @@
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU Lesser General Public License for more details.
  *
- * Copyright (c) 2002-2015 Pentaho Corporation..  All rights reserved.
+ * Copyright (c) 2002-2016 Pentaho Corporation..  All rights reserved.
  */
 
 package org.pentaho.common.ui.metadata.service;
@@ -21,6 +21,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -29,7 +30,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -117,9 +120,21 @@ public class MetadataServiceUtilTest {
 
     result = spyMetadataServiceUtil.createCdaJson( mockResultSet, DEFAULT_LOCALE );
     assertNotNull( result );
-    assertEquals(
-        "{\"resultset\":[[\"val_00\",\"val_01\"],[\"val_10\",\"val_11\"]],\"metadata\":[{\"colLabel\":\"name_0\",\"colIndex\":0,\"colType\":\"STRING\",\"colName\":\"Header_0\"},{\"colLabel\":\"name_1\",\"colIndex\":1,\"colType\":\"BOOLEAN\",\"colName\":\"Header_1\"}]}",
-        result );
+    JSONObject resultObj = new JSONObject( result );
+    assertTrue( resultObj.has( "metadata" ) );
+    assertTrue( resultObj.has( "resultset" ) );
+    JSONArray resultset = resultObj.getJSONArray( "resultset" );
+    assertEquals( "[[\"val_00\",\"val_01\"],[\"val_10\",\"val_11\"]]", resultset.toString() );
+    JSONArray metadata = resultObj.getJSONArray( "metadata" );
+    makeMetadataObjectAssertions( metadata.getJSONObject( 0 ), 0, "STRING" );
+    makeMetadataObjectAssertions( metadata.getJSONObject( 1 ), 1, "BOOLEAN" );
+  }
+
+  private void makeMetadataObjectAssertions( JSONObject obj, int idx, String type ) throws JSONException {
+    assertEquals( "name_" + idx, obj.getString( "colLabel" ) );
+    assertEquals( idx, obj.getInt( "colIndex" ) );
+    assertEquals( type, obj.getString( "colType" ) );
+    assertEquals( "Header_" + idx, obj.getString( "colName" ) );
   }
 
   @Test
