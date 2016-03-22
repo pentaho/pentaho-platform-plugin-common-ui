@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,9 @@
 define([
   "./Base",
   "./Event",
-  "../util/error"
-], function(Base, Event, error) {
+  "../util/error",
+  "../util/logger"
+], function(Base, Event, error, logger) {
 
   "use strict";
 
@@ -324,11 +325,12 @@ define([
       try {
         result = this._emit(event);
       } catch(e) {
-        if (event) {
-          console.log("Exception thrown during '", (event.type || "NO_TYPE"), "' loop:", e);
+        if(event) {
+          logger.warn("Exception thrown during '" + (event.type || "NO_TYPE") + "' loop");
         } else {
-          console.log("Exception thrown due to an invalid event:", e);
+          logger.warn("Exception thrown due to an invalid event");
         }
+        logger.warn(e);
       }
       return result;
     }

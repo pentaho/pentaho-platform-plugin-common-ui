@@ -16,8 +16,9 @@
 define([
   "pentaho/lang/Event",
   "pentaho/lang/EventSource",
-  "tests/pentaho/util/errorMatch"
-], function(Event, EventSource, errorMatch) {
+  "tests/pentaho/util/errorMatch",
+  "pentaho/util/logger"
+], function(Event, EventSource, errorMatch, logger) {
   "use strict";
 
   /* global jasmine:false, describe:false, it:false, expect:false, beforeEach:false, spyOn: false */
@@ -565,7 +566,7 @@ define([
 
       beforeEach(function() {
         event = new Event("foo", eventSource, true);
-        spyOn(console, 'log');
+        spyOn(logger, "warn");
       });
 
       it("should return null when no parameters provided.", function() {
@@ -575,13 +576,13 @@ define([
 
         expect(eventSource._emitSafe(undefined)).toBe(null);
 
-        expect(console.log).toHaveBeenCalledTimes(3);
+        expect(logger.warn).toHaveBeenCalledTimes(6);
       });
 
       it("should return null when the argument is of an invalid type.", function() {
         expect(eventSource._emitSafe({})).toBe(null);
 
-        expect(console.log).toHaveBeenCalledTimes(1);
+        expect(logger.warn).toHaveBeenCalledTimes(2);
       });
 
       it("should interrupt the event being processed and return null if a listener throws an exception.", function() {
@@ -602,7 +603,7 @@ define([
 
         expect(listeners.second).not.toHaveBeenCalled();
 
-        expect(console.log).toHaveBeenCalledTimes(1);
+        expect(logger.warn).toHaveBeenCalledTimes(2);
       });
 
     }); // #_emit
