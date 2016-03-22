@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2016 Pentaho Corporation.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@
  * }
  * ```
  *
- * Assuming that the two properties where defined in the order `"product"` then `"price"`,
+ * Assuming that the two properties were defined in the order `"product"` then `"price"`,
  * it could be written in _array form_, like this:
  *
  * ```js

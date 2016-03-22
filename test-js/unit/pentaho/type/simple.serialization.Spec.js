@@ -44,8 +44,7 @@ define([
 
               expect(spec.v).toBe(originalSpec.v);
               expect(spec.f).toBe(originalSpec.f);
-              expect(spec._).toBeDefined();
-              expect(spec._).toBe(PentahoBoolean.type.toSpec().id);
+              expect(spec._).toEqual(PentahoBoolean.type.toReference());
             });
           });
 
@@ -55,8 +54,7 @@ define([
 
               expect(spec.v).toBe(originalSpec.v);
               expect(spec.f).toBeUndefined();
-              expect(spec._).toBeDefined();
-              expect(spec._).toBe(PentahoBoolean.type.toSpec().id);
+              expect(spec._).toEqual(PentahoBoolean.type.toReference());
             });
           });
 
@@ -105,8 +103,7 @@ define([
 
               expect(spec.v).toBe(originalSpec.v);
               expect(spec.f).toBeUndefined();
-              expect(spec._).toBeDefined();
-              expect(spec._).toBe(PentahoBoolean.type.toSpec().id);
+              expect(spec._).toEqual(PentahoBoolean.type.toReference());
             });
           });
 
@@ -166,8 +163,7 @@ define([
               expect(spec.v).toBeDefined();
               expect(typeof spec.v).toBe(simple.name);
               expect(spec.v).toBe(simple.value);
-              expect(spec._).toBeDefined();
-              expect(spec._).toBe(SimpleClass.type.toSpec().id);
+              expect(spec._).toEqual(SimpleClass.type.toReference());
             });
           });
         });
@@ -188,8 +184,7 @@ define([
             var spec = value.toSpec();
 
             expect(typeof spec).toBe("object");
-            expect(spec._).toBeDefined();
-            expect(spec._).toBe(SimpleClass.type.toSpec().id);
+            expect(spec._).toEqual(SimpleClass.type.toReference());
             expect(spec.f).toBeUndefined();
           });
         });
@@ -215,8 +210,7 @@ define([
             expect(spec.v).toBeDefined();
             expect(spec.v instanceof Date).toBe(true);
             expect(spec.v).toBe(originalValue);
-            expect(spec._).toBeDefined();
-            expect(spec._).toBe(SimpleClass.type.toSpec().id);
+            expect(spec._).toEqual(SimpleClass.type.toReference());
             expect(spec.f).toBeUndefined();
           });
         });
@@ -227,8 +221,7 @@ define([
 
             expect(spec.v instanceof Date).toBe(true);
             expect(spec.v).toBe(originalValue);
-            expect(spec._).toBeDefined();
-            expect(spec._).toBe(SimpleClass.type.toSpec().id);
+            expect(spec._).toEqual(SimpleClass.type.toReference());
           });
         });
       });
