@@ -71,7 +71,7 @@ define([
     /**
      * Returns the subset of data that matches this filter.
      *
-     * @param {!pentaho.data.Table} dataTable - The data table to filter
+     * @param {!pentaho.data.Table} dataTable - The data table to filter.
      * @returns {!pentaho.data.TableView} The data table view of the restricted data set.
      * @override
      */
@@ -79,9 +79,20 @@ define([
       return _apply(this, dataTable);
     },
 
-    transform: function(iteratee){
+    /**
+     * Returns a transformed version of this filter.
+     *
+     * Note: The `iteratee` callback is invoked with this filter as a single argument.
+     *
+     * @param {?pentaho.data.filter~transformIteratee} iteratee - Function which will transform this filter.
+     * @return {!pentaho.data.filter.AbstractFilter} Transformed filter.
+     *
+     * @see pentaho.data.filter.AbstractTreeFilter#visit
+     */
+    visit: function(iteratee) {
       return iteratee(this, null);
     },
+
     /**
      * Outputs a simple object that serializes the operation described by this filter.
      * The syntax loosely follows the query language of MongoDB.
@@ -143,5 +154,17 @@ define([
   });
 
   return AbstractFilter;
+
+  /**
+   * Function to be called at each node in a tree of filters.
+   *
+   * @callback pentaho.data.filter~transformIteratee
+   * @param {?pentaho.data.filter.AbstractFilter} filter - The filter to be transformed.
+   * @param {?pentaho.data.filter.AbstractFilter[]} [filterOperands] - List of filter operands.
+   * @return {!pentaho.data.filter.AbstractFilter[]|pentaho.data.filter.AbstractFilter}
+   * 
+   * @see pentaho.data.filter.AbstractFilter#visit
+   * @see pentaho.data.filter.AbstractTreeFilter#visit
+   */
 
 });

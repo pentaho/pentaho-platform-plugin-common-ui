@@ -97,11 +97,22 @@ define([
       return !this.operand.contains(element);
     },
 
-    transform: function(iteratee){
-      var operand = this.operand.transform(iteratee);
+    /**
+     * Returns a transformed version of this filter.
+     *
+     * This method outputs the result of `iteratee` as long as it is a [filter]{@link pentaho.data.filter.AbstractFilter}.
+     * If `iteratee` returns an array, then:
+     * - if the array has at least one element, this method returns a filter that inverts the first element
+     * - if the array is empty, this is interpreted as the intention of deleting this filter, and `null` is returned
+     *
+     * @param {pentaho.data.filter~transformIteratee} iteratee - Function which will transform this filter.
+     * @return {pentaho.data.filter.AbstractFilter} Transformed filter.
+     */
+    visit: function(iteratee){
+      var operand = this.operand.visit(iteratee);
       var output = iteratee(this, [operand]);
       if (output instanceof Array){
-        return operand.invert();
+        return output.length ? output[0].invert(): null;
       }
       return output;
     },
@@ -110,7 +121,7 @@ define([
      * Return the inverse of this filter.
      * Double inversion is prevented:  {@link ...#operand} is returned.
      *
-     * @return {!pentaho.data.filter.AbstractFilter} A filter that is the inverse of this filter.
+     * @return {pentaho.data.filter.AbstractFilter} A filter that is the inverse of this filter.
      * @override
      */
     invert: function() {
