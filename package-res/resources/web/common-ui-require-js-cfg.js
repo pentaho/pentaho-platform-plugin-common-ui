@@ -108,7 +108,7 @@
     init: function() {
       return $.noConflict(true);
     }
-  } 
+  }
 
   requirePaths["common-ui/handlebars"] = basePath + "/handlebars/handlebars";
   requireShim ["common-ui/handlebars"] = ["common-ui/jquery"];
@@ -124,7 +124,8 @@
   requireShim ["common-ui/ring"] = {deps: ["common-ui/underscore"], exports: "ring"};
 
   requirePaths["common-ui/underscore"] = basePath + "/underscore/underscore" + minSuffix;
-  requirePaths["underscore"] = basePath + "/underscore/underscore" + minSuffix;
+  // underscore should be required using the module ID above, creating a map entry to guarantee backwards compatibility
+  requireMap["*"]["underscore"] = "common-ui/underscore"; // deprecated
 
   // Intended for private use of "pentaho/shim/es6-promise" only!
   if(minSuffix) {
