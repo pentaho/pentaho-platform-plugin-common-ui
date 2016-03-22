@@ -26,7 +26,7 @@ define([
      * Intersections of intersections of filters (ANDs of ANDs) are flattened.
      *
      * @param {...pentaho.data.filter.AbstractFilter} filters - One or more filters to be added to the intersection operation.
-     * @return {!pentaho.data.filter.And} A filter that is the intersection of this filter with a series of other filters.
+     * @return {pentaho.data.filter.And} A filter that is the intersection of this filter with a series of other filters.
      * @override
      */
     and: function() {

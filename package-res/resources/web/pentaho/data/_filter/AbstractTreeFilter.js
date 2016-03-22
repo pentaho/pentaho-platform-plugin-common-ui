@@ -52,6 +52,12 @@ define([
      **/
     operands: null,
 
+    /**
+     * Inverts the operands in this filters.
+     *
+     * @return {pentaho.data.filter.AbstractFilter}
+     * @private
+     */
     _invertedOperands: function() {
       return this.operands.map(function(operand) {
         return operand.invert();
@@ -61,9 +67,15 @@ define([
     /**
      * Returns a transformed version of this filter, walking the filter tree spawned by this node if need be.
      *
+     * Coarsely, leaf nodes are transformed first using the `iteratee` function.
+     * The outcome of those transformations is then successively
+     * aggregated by their ancestors nodes, using the same `iteratee` function,
+     * until the root node is eventually transformed.
+     *
      * In filters that contain any other filters as operands,
      * (see e.g. {@link pentaho.data.filter.Or} or {@link pentaho.data.filter.And})
      * then the second argument of `iteratee` function is the list of operands transformed by the same `iteratee` function.
+     * In other words, `iteratee` passed along to any descendant node, and the
      *
      * This method outputs the result of `iteratee` as long as it is a [filter]{@link pentaho.data.filter.AbstractFilter}.
      *
@@ -75,10 +87,10 @@ define([
      * @param {?pentaho.data.filter~transformIteratee} iteratee - Function which will transform this filter.
      * @return {!pentaho.data.filter.AbstractFilter} Transformed filter.
      */
-    walk: function(iteratee) {
+    visit: function(iteratee) {
       var operands = this.operands.reduce(function(memo, op) {
           if(op){
-            var transformedOp = op.walk(iteratee);
+            var transformedOp = op.visit(iteratee);
             if(transformedOp)
               memo.push(transformedOp);
           }

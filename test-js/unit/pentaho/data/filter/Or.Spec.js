@@ -52,23 +52,23 @@ define([
     }); // #operands
 
 
-    describe("#walk", function(){
+    describe("#visit", function(){
       it("when `iteratee` returns a filter, that filter is returned", function(){
-        var result = myFilter.walk(function(node, children){
+        var result = myFilter.visit(function(node, children){
           return inStock;
         });
         expect(result).toBe(inStock);
       });
 
       it("when `iteratee` returns `null`, `null` is returned", function(){
-        var result = myFilter.walk(function(node, children){
+        var result = myFilter.visit(function(node, children){
           return null;
         });
         expect(result).toBeNull();
       });
 
       it("when `iteratee` returns an array with more than one element, a new Or filter is returned", function(){
-        var result = myFilter.walk(function(node, children){
+        var result = myFilter.visit(function(node, children){
           return [inStock, sales12k];
         });
         expect(result).not.toBe(myFilter);
@@ -77,7 +77,7 @@ define([
       });
 
       it("when `iteratee` returns an array with a single element, that element is returned", function(){
-        var result = myFilter.walk(function(node, children){
+        var result = myFilter.visit(function(node, children){
           return [inStock];
         });
         expect(result).not.toBe(myFilter);
@@ -85,13 +85,13 @@ define([
       });
 
       it("when `iteratee` returns an empty array, `null` is returned", function(){
-        var result = myFilter.walk(function(node, children){
+        var result = myFilter.visit(function(node, children){
           return [];
         });
         expect(result).toBeNull();
       });
 
-    }); // #walk
+    }); // #visit
 
     describe("#or", function() {
       it("should add elements instead of creating ORs of ORs", function() {

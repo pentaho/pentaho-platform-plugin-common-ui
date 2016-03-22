@@ -108,8 +108,8 @@ define([
      * @param {pentaho.data.filter~transformIteratee} iteratee - Function which will transform this filter.
      * @return {pentaho.data.filter.AbstractFilter} Transformed filter.
      */
-    walk: function(iteratee){
-      var operand = this.operand.walk(iteratee);
+    visit: function(iteratee){
+      var operand = this.operand.visit(iteratee);
       var output = iteratee(this, [operand]);
       if (output instanceof Array){
         return output.length ? output[0].invert(): null;
@@ -121,7 +121,7 @@ define([
      * Return the inverse of this filter.
      * Double inversion is prevented:  {@link ...#operand} is returned.
      *
-     * @return {!pentaho.data.filter.AbstractFilter} A filter that is the inverse of this filter.
+     * @return {pentaho.data.filter.AbstractFilter} A filter that is the inverse of this filter.
      * @override
      */
     invert: function() {

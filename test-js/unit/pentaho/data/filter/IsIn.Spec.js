@@ -57,7 +57,7 @@ define([
       });
     }); //#property
 
-    describe("#walk", function() {
+    describe("#visit", function() {
       var myFilter;
       beforeEach(function(){
         myFilter = new filter.IsIn("sales", [12000]);
@@ -65,19 +65,19 @@ define([
 
       it("when `iteratee` returns a filter, that filter is returned", function() {
         var inStock = new filter.IsIn("inStock", [true]);
-        var result = myFilter.walk(function(node) {
+        var result = myFilter.visit(function(node) {
           return inStock;
         });
         expect(result).toBe(inStock);
       });
 
       it("when `iteratee` returns `null`, `null` is returned", function() {
-        var result = myFilter.walk(function(node) {
+        var result = myFilter.visit(function(node) {
           return null;
         });
         expect(result).toBeNull();
       });
-    }); // #walk
+    }); // #visit
 
     describe("#and ", function() {
       it("should return an AND.", function() {

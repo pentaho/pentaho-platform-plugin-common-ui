@@ -87,9 +87,9 @@ define([
      * @param {?pentaho.data.filter~transformIteratee} iteratee - Function which will transform this filter.
      * @return {!pentaho.data.filter.AbstractFilter} Transformed filter.
      *
-     * @see pentaho.data.filter.AbstractTreeFilter#walk
+     * @see pentaho.data.filter.AbstractTreeFilter#visit
      */
-    walk: function(iteratee) {
+    visit: function(iteratee) {
       return iteratee(this, null);
     },
 
@@ -156,12 +156,15 @@ define([
   return AbstractFilter;
 
   /**
-   * Iteratee
+   * Function to be called at each node in a tree of filters.
    *
    * @callback pentaho.data.filter~transformIteratee
    * @param {?pentaho.data.filter.AbstractFilter} filter - The filter to be transformed.
-   * @param {!pentaho.data.filter.AbstractFilter[]} [filterOperands] - List of filter operands.
-   * @return {!pentaho.data.filter.AbstractFilter[]}
+   * @param {?pentaho.data.filter.AbstractFilter[]} [filterOperands] - List of filter operands.
+   * @return {!pentaho.data.filter.AbstractFilter[]|pentaho.data.filter.AbstractFilter}
+   * 
+   * @see pentaho.data.filter.AbstractFilter#visit
+   * @see pentaho.data.filter.AbstractTreeFilter#visit
    */
 
 });
