@@ -221,17 +221,28 @@ define([
      * @overridable
      */
     _onChange: function(event) {
-      var propertyName = typeof event.property === "string" ? event.property : this.model.type.get(event.property).name;
-      switch(propertyName) {
-        case "selectionFilter":
-          this._selectionChanged(event.value, event.previousValue);
-          break;
-        case "width":
-        case "height":
-          this._resize();
-          break;
+      var changeSet = event.changeSet;
+
+      var updateSize = changeSet.has("width") || changeSet.has("height");
+      var updateSelection =  changeSet.has("selectionFilter");
+
+      var exclusionList = {
+        width: true,
+        height: true,
+        selectionFilter: true
+      };
+      var fullUpdate = changeSet.properties.reduce(function(memo, prop){
+        return memo || !exclusionList[prop];
+      }, false);
+
+      if(fullUpdate) return this.render();
+
+      if(updateSelection){
+        var selectionFilter = changeSet.getValue("selectionFilter").valueOf();
+        var previousSelectionFilter = changeSet.getPreviousValue("selectionFilter").valueOf();
+        this._selectionChanged(selectionFilter, previousSelectionFilter);
       }
-      this.render();
+      if(updateSize) this._resize();
     }
   });
 

@@ -131,36 +131,7 @@ define([
             return ActionResult.reject(e);
           }
 
-          return this.change("selectionFilter", newSelectionFilter || new filter.Or()); //setting to null assigns the default value
-        },
-
-        /**
-         * Changes the value of a property and returns a [result]{@link pentaho.lang.ActionResult} object.
-         *
-         * This method is supposed to set the value of a property, trigger event loops and return a result.
-         *
-         * @param {nonEmptyString} property - Name of the property to set.
-         * @param {*} value - Value to assign to the property.
-         * @return {pentaho.lang.ActionResult} The result object.
-         * @private
-         * @fires "will:change"
-         * @fires "did:change"
-         * @fires "rejected:change"
-         */
-        change: function(property, value){
-          var will = new WillChange(this, property, value, this.getv(property));
-          return this._doAction(this._setWithResult, will, DidChange, RejectedChange);
-        },
-
-         _setWithResult: function(will){
-          var result;
-          try {
-            this.set(will.property, will.value);
-            result = ActionResult.fulfill(will.value);
-           } catch(e) {
-            result = ActionResult.reject(e);
-          }
-          return result;
+          return this.set("selectionFilter", newSelectionFilter || new filter.Or()); //setting to null assigns the default value
         },
 
         /**

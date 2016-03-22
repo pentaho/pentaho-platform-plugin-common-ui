@@ -28,6 +28,7 @@ define([
         this.base("rejected:change", source, false);
         this._error = error;
         this._previousValue = will.previousValue;
+        this.changeSet = will.changeSet;
       },
       get previousValue(){
         return this._previousValue;

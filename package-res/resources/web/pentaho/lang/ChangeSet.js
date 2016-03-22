@@ -15,26 +15,25 @@
  */
 
 define([
-  "./Base"
-], function(Base) {
+  "./Base",
+  "../util/object"
+], function(Base, O) {
   
   return Base.extend("pentaho.lang.ChangeSet", {
 
     constructor: function(property, value, previousValue) {
-      this._properties = this._properties || [];
-      this._previousValues = this._previousValues || {};
-      this._values = this._values || {};
+      this._previousValues = {};
+      this._values = {};
 
       this._newEntry(property, previousValue, value);
     },
 
-    hasPropertyChanged: function(property) {
-      return this._properties.includes(property)
+    has: function(property) {
+      return O.hasOwn(this._previousValues, property);
     },
 
     _newEntry: function(property, previousValue, value) {
-      if(!this.hasPropertyChanged(property)) {
-        this._properties.push(property);
+      if(!this.has(property)) {
         this._previousValues[property] = previousValue;
       }
       this._values[property] = value;
@@ -48,8 +47,8 @@ define([
       return this._values;
     },
     
-    get changedProperties() {
-      return this._properties;
+    get properties() {
+      return Object.keys(this._previousValues);
     },
 
     getPreviousValue: function(property) {

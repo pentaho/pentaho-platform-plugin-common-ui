@@ -78,8 +78,16 @@ define([
       });
 
       it("should call _selectionChanged when did:change/selectionFilter occurs in the model", function() {
-        var will = {property: "selectionFilter", value: {}};
-        model._emit(new DidChange({}, {}, will));
+        var will = {
+          //property: "selectionFilter",
+          //value: {},
+          changeSet: {
+            properties:["selectionFilter"],
+            has: function(p){return p==="selectionFilter"},
+            getValue: function(p){ return {};},
+            getPreviousValue: function(p){ return {};}
+          } };
+        model._emit(new DidChange(model, {}, will));
 
         expect(view._selectionChanged).toHaveBeenCalled();
       });

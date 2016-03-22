@@ -371,7 +371,7 @@ define([
         try {
           queue[i].listener.call(this, event);
         } catch(e) {
-          console.log("Exception thrown during '", event.type, "' loop:", e);
+          console && console.log("Exception thrown during '", event.type, "' loop:", e);
         }
       }
     } else {
