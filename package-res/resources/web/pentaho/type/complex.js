@@ -338,11 +338,16 @@ define([
       /**
        * Sets the value of a property.
        *
-       * @param {string|!pentaho.type.Property.Type} name The property name or type object.
+       *
+       *
+       * @param {nonEmptyString|!pentaho.type.Property.Type} name - The property name or type object.
        * @param {any?} [valueSpec=null] A value specification.
        *
-       * @return {pentaho.type.Complex} This object.
+       * @return {pentaho.lang.ActionResult} The result object.
        * @throws {pentaho.lang.ArgumentInvalidError} When a property with name `name` is not defined.
+       * @fires "will:change"
+       * @fires "did:change"
+       * @fires "rejected:change"
        */
       set: function(name, valueSpec) {
         var pType  = this.type.get(name),
@@ -350,23 +355,31 @@ define([
 
         if(pType.isList) {
           value0.set(valueSpec);
+          return ActionResult.fulfill(value0);
         } else {
           var value1 = pType.toValue(valueSpec);
           if(!pType.type.areEqual(value0, value1)) {
             var changeSet = new ChangeSet(pType.name, value1, value0);
-            var will = new WillChange(this, changeSet);
+            var will = new WillChange(this, pType.name, value1, value0);
             return this._doAction(this._setAction, will, DidChange, RejectedChange);
           }
         }
       },
-      
-      _setAction: function(will) {
-        var changeSet = will.changeSet,
-          me = this;
 
-        changeSet.changedProperties.forEach(function(prop) {
-          me._values[prop] = changeSet.getValue(prop);
-        });
+      /**
+       * Applies a set of changes to this object.
+       *
+       * @param {pentaho.lang.events.WillChange} will - The "will" event containing the set of changes.
+       * @return {pentaho.lang.ActionResult}
+       * @private
+       * @ignore
+       */
+      _setAction: function(will) {
+        var changeSet = will.changeSet;
+
+        changeSet.properties.forEach(function(prop) {
+          this._values[prop] = changeSet.getValue(prop);
+        }, this);
         
         return ActionResult.fulfill(will.changeSet);
       },

@@ -28,6 +28,7 @@ define([
         this._property = will.property;
         this._value = value;
         this._previousValue = will.previousValue;
+        this.changeSet = will.changeSet;
       },
       get property(){
         return this._property;

@@ -23,9 +23,9 @@ define([
 
       this.model.on("will:select", this._onWillSelect.bind(this));
 
-      this.model.set("doExecute", this._googleSearch);
-      this.model.on("will:execute", this._onWillExecute);
-      this.model.on("will:change", this._onWillChange);
+      this.model.set("doExecute", this._googleSearch.bind(this));
+      this.model.on("will:execute", this._onWillExecute.bind(this));
+      this.model.on("will:change", this._onWillChange.bind(this));
     },
 
     // Temporary. Used for demo of BACKLOG-5985
@@ -51,12 +51,12 @@ define([
       });
 
       event.dataFilter = dataFilter;
-      console.log("Event:", event);
+      console && console.log("Event:", event);
     },
 
     // Temporary. Used for demo of BACKLOG-5989
     _onWillExecute: function(event) {
-      console.log("Event:", event);
+      console && console.log("Event:", event);
     },
 
     // Temporary. Used for demo of BACKLOG-5989
@@ -76,7 +76,7 @@ define([
       var url = "http://www.google.com/search?as_q=\"" + queryValue + "\"";
       window.open(url, "_blank");
 
-      console.log("Google Search:" + url);
+      console && console.log("Google Search:" + url);
     },
 
     _hackedRender: function() {
@@ -87,13 +87,13 @@ define([
     _onWillChange: function(event) {
       //var property = event.property;
       var changeSet = event.changeSet;
-      changeSet.changedProperties.forEach(function(prop) {
+      changeSet.properties.forEach(function(prop) {
         var result = true;
         if(prop === "width" || prop === "height") {
           result = window.confirm(prop + " changed. Do you really want to resize?");
           if(result === false) event.cancel("User canceled");
         }
-        console.log(prop + (result ? " changed!" : " did not change!"), changeSet.getPreviousValue(prop), changeSet.getValue(prop));
+        console && console.log(prop + (result ? " changed!" : " did not change!"), changeSet.getPreviousValue(prop).valueOf(), changeSet.getValue(prop).valueOf());
       });
     }
   }
