@@ -30,6 +30,7 @@ define([
      * @memberOf pentaho.lang
      * @class
      * @extends pentaho.lang.Base.Error
+     * @amd pentaho/lang/ArgumentError
      *
      * @description Creates an argument error object.
      * @constructor

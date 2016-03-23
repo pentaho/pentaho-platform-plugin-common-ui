@@ -47,11 +47,11 @@ define([
      * @memberOf pentaho.type
      * @class
      * @extends pentaho.type.Value
-     * @amd pentaho/type/list
+     * @amd {pentaho.type.Factory<pentaho.type.List>} pentaho/type/list
      *
      * @classdesc A list of `Element` instances of some _common base_ type.
      *
-     * @description Creates a list with the given elements.
+     * @description Creates a list instance.
      *
      * When a derived class overrides the constructor
      * and creates additional instance properties,
@@ -435,6 +435,7 @@ define([
         if(index == null) {
           index = elems.length;
         } else {
+          /*jshint laxbreak:true*/
           index = index < 0
               ? Math.max(0, elems.length + index)
               : Math.min(index, elems.length);
@@ -696,7 +697,7 @@ define([
         //endregion
       }
     }).implement({
-      type: bundle.structured["list"]
+      type: bundle.structured.list
     });
 
     return List;

@@ -636,6 +636,7 @@ define([
      * @see pentaho.type.Type#view
      */
     get viewClass() {
+      /*jshint laxbreak:true*/
       var view = this._view;
       return view && (view.promise || (view.promise = promiseUtil.require(view.value)));
     },
@@ -731,6 +732,7 @@ define([
       return this.id;
     }
   }, /** @lends pentaho.type.Type */{
+
     //@override
     /**
      * See Base.js

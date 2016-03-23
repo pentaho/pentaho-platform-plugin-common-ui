@@ -50,18 +50,13 @@ define([
      * @class
      * @extends pentaho.type.Instance
      * @implements pentaho.lang.IConfigurable
-     * @amd pentaho/type/value
+     * @implements pentaho.lang.ISpecifiable
+     * @amd {pentaho.type.Factory<pentaho.type.Value>} pentaho/type/value
      *
      * @classDesc A Value is an abstract class used as a base implementation and unifying type.
      *
      * A Value has a key that uniquely identifies the entity it represents.
      *
-     * ### AMD
-     *
-     * Module Id: `pentaho/type/value`
-     *
-     * The AMD module returns the type's factory, a
-     * {@link pentaho.type.Factory<pentaho.type.Value>}.
      *
      * @description Creates a value instance.
      * @constructor
@@ -474,8 +469,8 @@ define([
          * @ignore
          */
         _throwAbstractType: function() {
-          throw error.operInvalid(
-              bundle.format(bundle.structured.errors.value.cannotCreateInstanceOfAbstractType, [this._getErrorLabel()]));
+          throw error.operInvalid(bundle.format(
+              bundle.structured.errors.value.cannotCreateInstanceOfAbstractType, [this._getErrorLabel()]));
         },
 
         /**

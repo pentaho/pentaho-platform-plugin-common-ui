@@ -55,19 +55,19 @@ define([
 
       it("should not accept empty object literal", function () {
         expect(function () {
-          new PentahoObject({});
+          var foo = new PentahoObject({});
         }).toThrow(errorMatch.argRequired("value"));
       });
 
       it("should not accept null", function () {
         expect(function () {
-          new PentahoObject(null);
+          var foo = new PentahoObject(null);
         }).toThrow(errorMatch.argRequired("value"));
       });
 
       it("should not accept undefined", function () {
         expect(function () {
-          new PentahoObject(undefined);
+          var foo = new PentahoObject(undefined);
         }).toThrow(errorMatch.argRequired("value"));
       });
     });

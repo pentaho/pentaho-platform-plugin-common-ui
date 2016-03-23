@@ -58,6 +58,8 @@ define([
   /**
    * @name pentaho.type.Context
    * @class
+   * @amd pentaho/type/Context
+   *
    * @classDesc A `Context` object holds instance constructors of **configured** _Value_ types.
    *
    * When a component, like a visualization, is being assembled,
@@ -433,6 +435,7 @@ define([
               return Promise.all(factories.map(me.getAsync, me));
             })
             .then(function(InstCtors) {
+              /*jshint laxbreak:true*/
               return predicate
                   ? InstCtors.filter(function(InstCtor) { return predicate(InstCtor.type); })
                   : InstCtors;
@@ -469,7 +472,7 @@ define([
     _get: function(typeRef, sync) {
       // Default property type is "string".
       if(!typeRef) typeRef = _defaultTypeMid;
-
+      /*jshint laxbreak:true*/
       switch(typeof typeRef) {
         case "string":   return this._getById (typeRef, sync);
         case "function": return this._getByFun(typeRef, sync);
@@ -516,6 +519,7 @@ define([
       var InstCtor = O.getOwn(this._byTypeId, id);
       if(InstCtor) return this._return(InstCtor, sync);
 
+      /*jshint laxbreak:true*/
       return sync
           // `require` fails if a module with the id in the `typeSpec` var
           // is not already _loaded_.
@@ -704,6 +708,7 @@ define([
 
       // Collect the module ids of all custom types used within typeSpec.
       var customTypeIds = collectTypeIds(typeSpec);
+      /*jshint laxbreak:true*/
       return customTypeIds.length
           // Require them all and only then invoke the synchronous BaseType.extend method.
           ? promiseUtil.require(customTypeIds).then(resolveSync)

@@ -50,6 +50,7 @@ define([
      * @memberOf pentaho.lang
      * @class
      * @extends pentaho.lang.ArgumentError
+     * @amd pentaho/lang/ArgumentRangeError
      *
      * @description Creates an out of range argument error object.
      * @constructor

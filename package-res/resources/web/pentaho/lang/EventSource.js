@@ -51,6 +51,7 @@ define([
      * @name EventSource
      * @memberOf pentaho.lang
      * @class
+     * @amd pentaho/lang/EventSource
      */
 
     /**

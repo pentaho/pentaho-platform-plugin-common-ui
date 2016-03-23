@@ -265,7 +265,7 @@ define([
   //region Class methods
 
   /**
-   * Subclass a `Base` class.
+   * Creates a subclass of this one.
    *
    * All classes inherit the `extend` method, so they can also be subclassed.
    *
@@ -275,10 +275,10 @@ define([
    * @name extend
    * @memberOf pentaho.lang.Base
    *
-   * @param {string} [name] The name of the created class. Optional parameter.
-   * @param {?Object} instSpec The instance spec.
-   * @param {?Object} [classSpec] The static spec. Optional parameter.
-   * @param {?Object} [keyArgs] Keyword arguments. Optional parameter.
+   * @param {string} [name] The name of the created class. Used for debugging purposes.
+   * @param {Object} [instSpec] The instance specification.
+   * @param {Object} [classSpec] The static specification.
+   * @param {Object} [keyArgs] Keyword arguments.
    *
    * @returns {Class.<pentaho.lang.Base>} The new subclass.
    */

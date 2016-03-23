@@ -29,16 +29,9 @@ define([
      * @name pentaho.type.Date
      * @class
      * @extends pentaho.type.Simple
-     * @amd pentaho/type/date
+     * @amd {pentaho.type.Factory<pentaho.type.Date>} pentaho/type/date
      *
      * @classDesc The class of a date value.
-     *
-     * ### AMD
-     *
-     * Module Id: `pentaho/type/date`
-     *
-     * The AMD module returns the type's factory, a
-     * {@link pentaho.type.Factory<pentaho.type.Date>}.
      *
      * @description Creates a date instance.
      * @constructor

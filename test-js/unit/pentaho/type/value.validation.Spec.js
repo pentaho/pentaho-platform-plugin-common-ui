@@ -31,7 +31,7 @@ define([
       it("should call #validate()", function() {
         var va = new Value();
         spyOn(va, "validate").and.returnValue(null);
-        va.isValid;
+        var isValid = va.isValid;
         expect(va.validate).toHaveBeenCalled();
       });
 

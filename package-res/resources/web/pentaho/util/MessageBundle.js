@@ -22,6 +22,7 @@ define([
   /**
    * @name pentaho.util.MessageBundle
    * @class
+   * @amd pentaho/util/MessageBundle
    *
    * @classdesc The `MessageBundle` class is a container of localized messages.
    *

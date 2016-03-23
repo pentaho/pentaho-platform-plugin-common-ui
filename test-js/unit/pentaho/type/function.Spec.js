@@ -59,13 +59,13 @@ define([
 
       it("should not accept null", function() {
         expect(function() {
-          new PentahoFunction(null);
+          var foo = new PentahoFunction(null);
         }).toThrow(errorMatch.argRequired("value"));
       });
 
       it("should not accept undefined", function() {
         expect(function() {
-          new PentahoFunction(undefined);
+          var foo = new PentahoFunction(undefined);
         }).toThrow(errorMatch.argRequired("value"));
       });
     });

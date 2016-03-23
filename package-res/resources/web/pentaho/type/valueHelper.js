@@ -22,15 +22,7 @@ define(function() {
    *
    * @name pentaho.type.ValueHelper
    * @class
-   * @static
-   */
-
-  /**
-   * The value helper singleton.
-   *
-   * @name pentaho.type.valueHelper
-   * @type pentaho.type.ValueHelper
-   * @amd pentaho/type/valueHelper
+   * @amd {pentaho.type.ValueHelper} pentaho/type/valueHelper
    */
 
   return /** @lends pentaho.type.ValueHelper# */{
@@ -70,7 +62,7 @@ define(function() {
   /**
    * Converts to array.
    *
-   * @param {Array|Object} The value to convert to array.
+   * @param {Array|Object} v The value to convert to array.
    * @return {Array} The given array or an array with the given value.
    * @ignore
    */

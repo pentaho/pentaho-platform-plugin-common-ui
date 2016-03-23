@@ -26,7 +26,6 @@ define([
    * @extends pentaho.lang.Base
    *
    * @class
-   * @staticClass
    *
    * @amd {pentaho.visual.color.PaletteRegistry} pentaho/visual/color/paletteRegistry
    *

@@ -21,7 +21,7 @@
  * @description
  *
  * The `type` namespace contains the classes and interfaces
- * that support the Pentaho platform's type metadata.
+ * that support the Pentaho Client Metadata Model.
  *
  * ## Web Component Convention
  *

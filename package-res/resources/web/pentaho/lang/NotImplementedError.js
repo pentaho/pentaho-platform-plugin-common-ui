@@ -33,6 +33,7 @@ define([
      * @memberOf pentaho.lang
      * @class
      * @extends pentaho.lang.Base.Error
+     * @amd pentaho/lang/NotImplementedError
      *
      * @description Creates a not implemented error object.
      * @constructor

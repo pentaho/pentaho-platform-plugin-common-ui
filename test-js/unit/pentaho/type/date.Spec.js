@@ -56,19 +56,19 @@ define([
 
       it("should not accept nothing", function () {
         expect(function () {
-          new PentahoDate();
+          var foo = new PentahoDate();
         }).toThrow(errorMatch.argRequired("value"));
       });
 
       it("should not accept null", function () {
         expect(function () {
-          new PentahoDate(null);
+          var foo = new PentahoDate(null);
         }).toThrow(errorMatch.argRequired("value"));
       });
 
       it("should not accept undefined", function () {
         expect(function () {
-          new PentahoDate(undefined);
+          var foo = new PentahoDate(undefined);
         }).toThrow(errorMatch.argRequired("value"));
       });
     });

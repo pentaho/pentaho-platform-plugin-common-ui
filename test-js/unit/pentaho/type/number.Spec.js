@@ -54,13 +54,13 @@ define([
 
       it("should throw and not accept a 'non-numeric' argument", function() {
         expect(function() {
-          new PentahoNumber('one');
+          var foo = new PentahoNumber('one');
         }).toThrow(errorMatch.argInvalid("value"));
       });
 
       it("should throw and not accept null", function() {
         expect(function() {
-          new PentahoNumber(null);
+          var foo = new PentahoNumber(null);
         }).toThrow(errorMatch.argRequired("value"));
       });
 

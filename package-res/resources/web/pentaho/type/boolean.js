@@ -29,16 +29,9 @@ define([
      * @name pentaho.type.Boolean
      * @class
      * @extends pentaho.type.Simple
-     * @amd pentaho/type/boolean
+     * @amd {pentaho.type.Factory<pentaho.type.Boolean>} pentaho/type/boolean
      *
      * @classDesc The class of boolean values.
-     *
-     * ### AMD
-     *
-     * Module Id: `pentaho/type/boolean`
-     *
-     * The AMD module returns the type's factory, a
-     * {@link pentaho.type.Factory<pentaho.type.Boolean>}.
      *
      * @description Creates a boolean instance.
      */

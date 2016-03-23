@@ -18,7 +18,6 @@
  * The `spec.IType` interface represents the specification of a type.
  *
  * @name pentaho.type.spec.IType
- *
  * @interface
  *
  * @property {string} [id] The id of the corresponding AMD module, if any.

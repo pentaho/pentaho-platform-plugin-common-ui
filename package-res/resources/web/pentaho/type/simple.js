@@ -39,31 +39,9 @@ define([
      * @name pentaho.type.Simple
      * @class
      * @extends pentaho.type.Element
-     * @amd pentaho/type/simple
+     * @amd {pentaho.type.Factory<pentaho.type.Simple>} pentaho/type/simple
      *
      * @classDesc The base abstract class of un-structured, indivisible values.
-     *
-     * ### AMD
-     *
-     * The AMD module returns the type's factory, a
-     * {@link pentaho.type.Factory<pentaho.type.Simple>}.
-     *
-     * Module Id: `pentaho/type/simple`
-     *
-     * Simple type example:
-     * ```javascript
-     * define(["pentaho/type/simple"], function(simpleFactory) {
-     *
-     *   return function(context) {
-     *
-     *     var Simple = context.get(simpleFactory);
-     *
-     *     return Simple.extend({
-     *
-     *     });
-     *   };
-     * });
-     * ```
      *
      * @description Creates a simple instance.
      * @constructor
@@ -140,7 +118,7 @@ define([
        */
       set v(value) {
         this.value = value;
-      },
+      }, // jshint -W078
       //endregion
 
       //region formatted attribute
@@ -167,7 +145,7 @@ define([
        */
       set f(value) {
         this.formatted = value;
-      },
+      }, // jshint -W078
       //endregion
 
       /**
@@ -279,6 +257,7 @@ define([
           return this._value;
 
         // Need one. Ensure _ is the first property
+        /*jshint laxbreak:true*/
         var spec = requireType
             ? {_: this.type.toReference(scope, keyArgs), v: this._value}
             : {v: this._value};
@@ -339,12 +318,15 @@ define([
      * Wrapper cast function {@link pentaho.type.Simple.Type#cast}
      */
     function castTop(value) {
+      /*jshint validthis:true*/
+
       if(value == null)
         throw error.argRequired("value");
 
       value = this._cast(value);
       if(value == null)
-        throw error.argInvalid("value", bundle.format(bundle.structured.errors.value.cannotConvertToType, [this.label]));
+        throw error.argInvalid("value",
+            bundle.format(bundle.structured.errors.value.cannotConvertToType, [this.label]));
 
       return value;
     }

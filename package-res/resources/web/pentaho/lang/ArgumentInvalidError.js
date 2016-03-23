@@ -45,6 +45,7 @@ define([
      * @memberOf pentaho.lang
      * @class
      * @extends pentaho.lang.ArgumentError
+     * @amd pentaho/lang/ArgumentInvalidError
      *
      * @description Creates an invalid argument error object.
      * @constructor

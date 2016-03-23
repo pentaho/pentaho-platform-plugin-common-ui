@@ -58,6 +58,7 @@ define([
      * @memberOf pentaho.lang
      * @class
      * @extends pentaho.lang.ArgumentError
+     * @amd pentaho/lang/ArgumentRequiredError
      *
      * @description Creates a required argument error object.
      * @constructor

@@ -66,6 +66,7 @@ define([
      * @memberOf pentaho.lang
      * @class
      * @extends pentaho.lang.Base.Error
+     * @amd pentaho/lang/OperationInvalidError
      *
      * @description Creates an invalid operation error object.
      * @constructor
