@@ -27,9 +27,9 @@ define([
   var PentahoBoolean = context.get("pentaho/type/boolean");
   var PentahoString = context.get("pentaho/type/string");
   var Complex = context.get("pentaho/type/complex");
+  var PostalCode = PentahoString.extend();
   var Derived = Complex.extend({
     type: {
-      label: "Derived",
       props: ["foo", "guru"]
     }
   });
@@ -80,11 +80,13 @@ define([
 
         it("should use List.add() to replace an object with the same name in the collection with updated type, etc.",
             function() {
-          props.add({name: "foo", type: "boolean"});
+
+          var DerivedBoolean = PentahoBoolean.extend();
+          props.add({name: "foo",  type: "boolean"});
           props.add({name: "foo2", type: "string"});
-          props.add({name: "foo", type: "string"});
+          props.add({name: "foo",  type: DerivedBoolean});
           expect(props.length).toBe(2);
-          expect(props[0].type).toBe(PentahoString.type);
+          expect(props[0].type).toBe(DerivedBoolean.type);
         });
 
         it("should throw when attempting to add a property with a falsy name", function() {
@@ -171,16 +173,25 @@ define([
 
         it("should replace any existing configurations of the same name and update its type", function() {
           props.configure(["foo", "bar"]);
+
           expect(props.length).toBe(2);
+
           expect(props[0].name).toBe("foo");
           expect(props[0].type).toBe(PentahoString.type);
+
           expect(props[1].name).toBe("bar");
           expect(props[1].type).toBe(PentahoString.type);
-          props.configure({foo: {name: "foo", type: "boolean"}, guru: {name: "guru", type: "boolean"}});
+
+          props.configure({
+            foo:  {name: "foo",  type: PostalCode.type},
+            guru: {name: "guru", type: PostalCode.type}
+          });
           expect(props.length).toBe(3);
-          expect(props[0].type).toBe(PentahoBoolean.type);
+
+          expect(props[0].type).toBe(PostalCode.type);
+
           expect(props[2].name).toBe("guru");
-          expect(props[2].type).toBe(PentahoBoolean.type);
+          expect(props[2].type).toBe(PostalCode.type);
         });
 
         it("should preserve the type when reconfiguring the property without specifying the type", function() {

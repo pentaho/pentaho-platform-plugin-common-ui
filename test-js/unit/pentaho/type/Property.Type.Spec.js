@@ -21,7 +21,7 @@ define([
 
   "use strict";
 
-  /*global describe:true, it:true, expect:true, beforeEach:true, jasmine:true*/
+  /*global describe:false, it:false, expect:false, beforeEach:false, jasmine:false*/
 
   var context = new Context(),
       PropertyType = Property.Type,
@@ -49,7 +49,6 @@ define([
             {
               declaringType: Derived.type,
               index: 1,
-              instance: Derived.prototype,
               isRoot: true
             }).type;
       }
@@ -86,7 +85,6 @@ define([
         });
 
         it("should have `label` be a capitalization of `name`", function() {
-          // only resolved after type is instantiated and, possibly, configured.
           expect(propType.label).toBe("Foo Bar Guru");
         });
 
@@ -323,6 +321,13 @@ define([
           expectIt(undefined);
           expectIt(null);
           expectIt("");
+
+          // name is absent
+          expect(function() {
+            createRootPropType({
+              type: "string"
+            });
+          }).toThrow(errorMatch.argRequired("name"));
         });
 
         it("should respect a truthy spec value -", function() {
@@ -367,6 +372,7 @@ define([
         });
       }); // end isList
 
+      // Monotonic
       describe("type - ", function() {
 
         // NOTE: tests of Context#get test type resolution more thoroughly.
@@ -374,6 +380,34 @@ define([
         it("should default to String", function() {
           var propType = createRootPropType({name: "foo"});
           expect(propType.type).toBe(PentahoString.type);
+        });
+
+        it("ignore a nully value specification and assume the default", function() {
+          var propType = createRootPropType({name: "foo", type: null});
+
+          expect(propType.type).toBe(PentahoString.type);
+
+          propType = createRootPropType({name: "foo", type: undefined});
+
+          expect(propType.type).toBe(PentahoString.type);
+        });
+
+        it("should throw when set and property already has descendant properties", function() {
+          var propType = createRootPropType({name: "foo1", type: "string"});
+
+          var Derived2 = Derived.extend();
+
+          // Create a descendant property
+          Property.extendProto(
+              propType.instance,
+              {type: {name: "foo1"}}, // spec
+              {declaringType: Derived2.type}); // keyArgs
+
+          var PostalCode = PentahoString.extend();
+
+          expect(function() {
+            propType.type = PostalCode.type;
+          }).toThrow(errorMatch.operInvalid());
         });
 
         it("should resolve the specified spec value", function() {
@@ -390,16 +424,49 @@ define([
           }).toThrowError(/bar\/oof/);
         });
 
-        // A root property does not have a base type to respect...
-        it("should respect change to any type", function() {
+        it("should allow changing to a subtype of the previous type", function() {
           var propType = createRootPropType({name: "foo1", type: "number"});
 
           var Integer = PentahoNumber.extend();
           propType.type = Integer.type;
           expect(propType.type).toBe(Integer.type);
+        });
 
-          propType.type = PentahoString.type;
-          expect(propType.type).toBe(PentahoString.type);
+        it("should throw when changing to a type that is not a subtype of the previous type", function() {
+          var propType = createRootPropType({name: "foo1", type: "number"});
+
+          expect(function() {
+            propType.type = PentahoString.type;
+          }).toThrow(errorMatch.argInvalid("type"));
+
+        });
+
+        it("should preserve a local default value " +
+           "when changing to a subtype of the previous type, if it is an instance of the new type", function() {
+
+          var Integer = PentahoNumber.extend();
+          var dv = new Integer(1);
+          var propType = createRootPropType({name: "foo1", type: "number", value: dv});
+
+          expect(propType.value).toBe(dv);
+
+          propType.type = Integer.type;
+
+          expect(propType.value).toBe(dv);
+        });
+
+        it("should set a local default value to null " +
+            "when changing to a subtype of the previous type, if it is not an instance of the new type", function() {
+
+          var Integer = PentahoNumber.extend();
+          var dv = new PentahoNumber(1);
+          var propType = createRootPropType({name: "foo1", type: "number", value: dv});
+
+          expect(propType.value).toBe(dv);
+
+          propType.type = Integer.type;
+
+          expect(propType.value).toBe(null);
         });
       }); // end type
 
@@ -420,18 +487,63 @@ define([
 
       }); // end elemType
 
-      describe("value - ", function(){
+      describe("value - ", function() {
 
-        var propType;
-        beforeEach(function(){
-          propType = createRootPropType({name: "foo", type: "string",  value: "Foo"});
+        it("should default to `null`, when unspecified", function() {
+          var propType = createRootPropType({name: "foo", type: "string"});
+          expect(propType.value).toBe(null);
         });
 
-        it("should honor the default value", function(){
-          expect(propType.value.value).toBe("Foo");
-          expect(propType.value.formatted).toBe(null);
+        it("should default to `null`, when specified as `undefined`", function() {
+          var propType = createRootPropType({name: "foo", type: "string", value: undefined});
+          expect(propType.value).toBe(null);
         });
 
+        it("should get `null`, when specified as `null`", function() {
+          var propType = createRootPropType({name: "foo", type: "string", value: null});
+          expect(propType.value).toBe(null);
+        });
+
+        it("should get a non-nully, specified default value", function() {
+          var propType = createRootPropType({name: "foo", type: "string", value: "Foo"});
+          var value = propType.value;
+          expect(value.value).toBe("Foo");
+          expect(value.formatted).toBe(null);
+        });
+
+        it("should allow setting to a different value", function() {
+          var propType = createRootPropType({name: "foo", type: "string", value: "Foo"});
+
+          propType.value = "Bar";
+
+          var value = propType.value;
+          expect(value.value).toBe("Bar");
+          expect(value.formatted).toBe(null);
+        });
+
+        it("should allow setting to null after having a non-null value", function() {
+          var propType = createRootPropType({name: "foo", type: "string", value: "Foo"});
+
+          propType.value = null;
+
+          expect(propType.value).toBe(null);
+        });
+
+        it("should throw when set and property already has descendant properties", function() {
+          var propType = createRootPropType({name: "foo1", type: "string"});
+
+          // Create a descendant property
+          var Derived2 = Derived.extend();
+
+          Property.extendProto(
+              propType.instance,
+              {type: {name: "foo1"}}, // spec
+              {declaringType: Derived2.type}); // keyArgs
+
+          expect(function() {
+            propType.value = null;
+          }).toThrow(errorMatch.operInvalid());
+        });
       }); //end value
       //endregion
 
@@ -1041,7 +1153,7 @@ define([
 
         expect(function() {
           extendProp(Derived.type, "baseStr", {name: "baseStr2"});
-        }).toThrow(errorMatch.argInvalid("name"));
+        }).toThrowError(TypeError);
       });
 
       describe("basic characteristics -", function() {
@@ -1662,6 +1774,7 @@ define([
       //endregion
 
       //region Defining attributes
+      // Cannot change.
       describe("name - ", function() {
         var propType;
 
@@ -1682,7 +1795,7 @@ define([
         it("should throw when changed", function() {
           expect(function() {
             propType.name = "baseStrXYZ";
-          }).toThrow(errorMatch.argInvalid("name"));
+          }).toThrowError(TypeError);
         });
 
         it("should not throw when set but not changed", function() {
@@ -1690,9 +1803,7 @@ define([
         });
       }); // end name
 
-      // mutable, but must always inherit from the base type.
-      // should not change after the complex class has been sub-classed or has any instances of it (not enforced).
-      // NOTE: see also refinement.Spec.js, property usage unit tests
+      // Monotonic. Cannot change if has descendants.
       describe("type - ", function() {
         it("should inherit base type value by default", function() {
           var Base = Complex.extend();
@@ -1704,6 +1815,46 @@ define([
           var propType = extendProp(Derived.type, "baseNum", {name: "baseNum"});
 
           expect(propType.type).toBe(PentahoNumber.type);
+        });
+
+        it("should ignore a nully value specification and assume the default", function() {
+          var Base = Complex.extend();
+          Base.type.add({name: "postalCode", type: PentahoString});
+
+          var Derived = Base.extend();
+
+          var propType = extendProp(Derived.type, "postalCode", {name: "postalCode", type: null});
+
+          expect(propType.type).toBe(PentahoString.type);
+
+          // ---
+
+          Derived = Base.extend();
+
+          propType = extendProp(Derived.type, "postalCode", {name: "postalCode", type: undefined});
+
+          expect(propType.type).toBe(PentahoString.type);
+        });
+
+        it("should ignore setting to a nully value", function() {
+          var Base = Complex.extend();
+          Base.type.add({name: "postalCode", type: PentahoString});
+
+          var Derived = Base.extend();
+
+          var propType = extendProp(Derived.type, "postalCode", {name: "postalCode"});
+
+          expect(propType.type).toBe(PentahoString.type);
+
+          propType.type = null;
+
+          expect(propType.type).toBe(PentahoString.type);
+
+          // ---
+
+          propType.type = undefined;
+
+          expect(propType.type).toBe(PentahoString.type);
         });
 
         it("should accept a spec type that is a sub-type of the base property's type", function() {
@@ -1720,9 +1871,9 @@ define([
           expect(propType.type).toBe(PostalCode.type);
         });
 
-        it("should accept a _set_ type that is a sub-type of the base property's type", function() {
+        it("should allow a _set_ type that is a sub-type of the property's **previous** type", function() {
           var PostalCode1 = PentahoString.extend();
-          var PostalCode2 = PentahoString.extend();
+          var PostalCode2 = PostalCode1.extend();
 
           // ----
 
@@ -1754,19 +1905,146 @@ define([
           }).toThrow(errorMatch.argInvalid("type"));
         });
 
-        it("should throw on a set type that is not a sub-type of the base property's type", function() {
+        it("should throw on a set type that is not a sub-type of the property's previous type", function() {
 
           var Base = Complex.extend();
 
           Base.type.add({name: "num", type: PentahoString});
 
+          var PostalCode1 = PentahoString.extend();
+
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.type, "num", {name: "num"});
+          var propType = extendProp(Derived.type, "num", {name: "num", type: PostalCode1});
 
           expect(function() {
             propType.type = PentahoNumber;
           }).toThrow(errorMatch.argInvalid("type"));
+        });
+      });
+
+      // Cannot change if has descendants.
+      describe("value -", function() {
+        it("should get null if an inherited default value is not an instance of the local value type", function() {
+          var Integer = PentahoNumber.extend();
+
+          var dv = new PentahoNumber(1);
+
+          var Base = Complex.extend();
+          Base.type.add({name: "baseNum", type: PentahoNumber, value: dv});
+
+          expect(Base.type.get("baseNum").value).toBe(dv);
+
+          var Derived = Base.extend();
+          var propType = extendProp(Derived.type, "baseNum", {name: "baseNum", type: Integer.type});
+
+          expect(propType.value).toBe(null);
+        });
+
+        it("should get null if an inherited default value is not an instance of the inherited value type", function() {
+          var Integer = PentahoNumber.extend();
+
+          var dv = new PentahoNumber(1);
+
+          var Base = Complex.extend();
+          Base.type.add({name: "baseNum", type: PentahoNumber, value: dv});
+
+          var Derived1 = Base.extend();
+          Derived1.type.add({name: "baseNum", type: Integer.type});
+
+          var Derived2 = Derived1.extend();
+          var propType2 = extendProp(Derived2.type, "baseNum", {name: "baseNum"});
+
+          expect(propType2.value).toBe(null);
+        });
+
+        describe("test group", function() {
+          var Derived;
+
+          beforeEach(function(){
+            var Base = Complex.extend();
+
+            Base.type.add({name: "baseNum", type: PentahoNumber});
+            Base.type.add({name: "baseStr", type: PentahoString, value: "a"});
+
+            Derived = Base.extend();
+          });
+
+          // ----
+
+          it("should inherit the base default value when unspecified", function() {
+            var propType = extendProp(Derived.type, "baseNum", {name: "baseNum"});
+            expect(propType.value).toBe(null);
+
+            propType = extendProp(Derived.type, "baseStr", {name: "baseStr"});
+            expect(propType.value.value).toBe("a");
+          });
+
+          it("should inherit the base default value when specified as undefined", function() {
+            var propType = extendProp(Derived.type, "baseNum", {name: "baseNum", value: undefined});
+            expect(propType.value).toBe(null);
+
+            propType = extendProp(Derived.type, "baseStr", {name: "baseStr", value: undefined});
+            expect(propType.value.value).toBe("a");
+          });
+
+          it("should shadow the base value when specified as null", function() {
+            var propType = extendProp(Derived.type, "baseNum", {name: "baseNum", value: null});
+            expect(propType.value).toBe(null);
+
+            propType = extendProp(Derived.type, "baseStr", {name: "baseStr", value: null});
+            expect(propType.value).toBe(null);
+          });
+
+          it("should shadow the base value when specified", function() {
+            var propType = extendProp(Derived.type, "baseNum", {name: "baseNum", value: 1});
+            expect(propType.value.value).toBe(1);
+
+            propType = extendProp(Derived.type, "baseStr", {name: "baseStr", value: "b"});
+            expect(propType.value.value).toBe("b");
+          });
+
+          it("should be settable to a non-nully value", function() {
+            var propType = extendProp(Derived.type, "baseNum", {name: "baseNum"});
+            propType.value = 1;
+
+            expect(propType.value.value).toBe(1);
+
+            // ---
+
+            propType = extendProp(Derived.type, "baseStr", {name: "baseStr"});
+            propType.value = "b";
+
+            expect(propType.value.value).toBe("b");
+          });
+
+          it("should be settable to value `null`", function() {
+            var propType = extendProp(Derived.type, "baseNum", {name: "baseNum", value: 1});
+            propType.value = null;
+
+            expect(propType.value).toBe(null);
+
+            // ---
+
+            propType = extendProp(Derived.type, "baseStr", {name: "baseStr", value: "b"});
+            propType.value = null;
+
+            expect(propType.value).toBe(null);
+          });
+
+          it("should be reset to the inherited value when set to undefined", function() {
+            var propType = extendProp(Derived.type, "baseNum", {name: "baseNum", value: 1});
+            propType.value = undefined;
+
+            expect(propType.value).toBe(null);
+
+            // ---
+
+            propType = extendProp(Derived.type, "baseStr", {name: "baseStr", value: "b"});
+            propType.value = undefined;
+
+            expect(propType.value.value).toBe("a");
+          });
         });
       });
       //endregion
@@ -2278,41 +2556,8 @@ define([
           expect(subSpy.calls.count()).toBe(0);
         });
       }); // end isReadOnly
-
-      describe("value -", function(){
-        var propType;
-        beforeEach(function(){
-          var Base = Complex.extend();
-          Base.type.add({name: "baseNum", type: PentahoNumber});
-          var Derived = Base.extend();
-
-          propType = extendProp(Derived.type, "baseNum", {name: "baseNum"});
-        });
-
-        it("should be null by default", function() {
-          expect(propType.value).toBeNull();
-        });
-
-        it("should inherit base type value by default", function() {
-          propType.value = 42;
-          expect(propType.value.value).toBe(42);
-        });
-        it("should inherit base type value by default", function() {
-          propType.value = {value: 42, formatted: "Forty-two"};
-          expect(propType.value.value).toBe(42);
-        });
-
-        it("should be resettable to the default value", function() {
-          propType.value = 42;
-          propType.value = undefined;
-          expect(propType.value).toBeNull();
-        });
-
-      }); // end value
       //endregion
     }); // end override a property
-
-    // TODO: toValue
 
   }); // pentaho.type.Property.Type
 });

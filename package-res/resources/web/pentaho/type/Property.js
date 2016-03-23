@@ -88,10 +88,27 @@ define([
       },
 
       /**
+       * Setting name and label first allows describing the property in subsequent error messages.
+       *
+       * Setting label after name ensures that label defaults that are derived from name work the first time.
+       *
+       * Setting type before value (not included here, so it is processed after type) avoids:
+       * 1. checking the new value against the old type (and then again, against the new type)
+       * 2. ensures error messages are given in a predicatable order,
+       *    independently of the order of properties in an instSpec:
+       *   1. is new type a subtype of old type?
+       *   2. is new value an instance of the new type?
+       *
+       * @type string[]
+       * @ignore
+       */
+      extend_order: ["name", "label", "type"],
+
+      /**
        * Performs initialization tasks that take place before the instance is
        * extended with its spec.
        *
-       * @param {pentaho.type.spec.UPropertyType} spec A property name or specification object.
+       * @param {!pentaho.type.spec.UPropertyType} spec A property name or specification object.
        * @param {!Object} keyArgs Keyword arguments.
        * @param {!pentaho.type.Complex.Type} keyArgs.declaringType The complex type that declares the property.
        * @param {number} keyArgs.index The index of the property within its complex type.
@@ -106,7 +123,16 @@ define([
 
         O.setConst(this, "_declaringType", arg.required(keyArgs, "declaringType", "keyArgs"));
 
-        if(this.isRoot) O.setConst(this, "_index", keyArgs.index || 0);
+        if(this.isRoot) {
+          O.setConst(this, "_index", keyArgs.index || 0);
+
+          // Required stuff
+          if(!("name" in spec)) this.name = null; // throws
+
+          // Assume the _default_ type _before_ extend, to make sure `value` can be validated against it.
+          var type = spec.type;
+          if(type == null || type === "") this.type = "string";
+        }
       },
 
       _postInit: function() {
@@ -114,12 +140,8 @@ define([
         this.base.apply(this, arguments);
 
         if(this.isRoot) {
-          // Required validation
-          if(!this._name) this.name = null; // throws...
-
-          // Force assuming default values
-          if(!this._type)  this.type = null;
-          if(!this._label) this._resetLabel();
+          // Assuming default values
+          if(!O.hasOwn(this, "_label")) this._resetLabel();
         }
       },
 
@@ -197,40 +219,42 @@ define([
       //endregion
 
       //region name attribute
-
-      // -> nonEmptyString, Required, Immutable, Root-only.
       _name: undefined,
 
       /**
-       * Gets the name of the property.
+       * Gets or sets the name of the _property type_.
        *
-       * @type string
-       * @readonly
+       * The name of a _property type_ identifies it within
+       * its [declaring type]{@link pentaho.type.Property.Type#declaringType}.
+       *
+       * This attribute must be set when defining a new _property type_,
+       * and cannot change afterwards.
+       *
+       * When set to a non-{@link Nully} and non-{@link String} value,
+       * the value is first replaced by the result of calling its `toString` method.
+       *
+       * @type {!nonEmptyString}
+       *
+       * @throws {pentaho.lang.ArgumentRequiredError} When set to an empty string or a _nully_ value.
+       * @throws {TypeError} When set to a value different from the current one.
        */
       get name() {
         return this._name;
       },
 
-      /**
-       * The `name` attribute can only be set once.
-       * The setter is used internally when extending Property, e.g.:
-       *
-       * var derivedProp = Property.extendProto({name: "xpto"});
-       *
-       * @ignore
-       */
       set name(value) {
         value = nonEmptyString(value);
 
         if(!value) throw error.argRequired("name");
 
+        // Only stored at the root property type.
         if(this.isRoot) {
-          // Can only be set-once or cannot change, or throws.
+          // Cannot change, or throws.
           O.setConst(this, "_name", value);
         } else {
           // Hierarchy consistency
           if(value && value !== this._name)
-            throw error.argInvalid("name", "Sub-properties cannot change the 'name' attribute.");
+            throw new TypeError("Sub-properties cannot change the 'name' attribute.");
         }
       },
       //endregion
@@ -239,9 +263,9 @@ define([
       /**
        * Gets a value that indicates if the property is a _list_.
        *
-       * A property is a _list_ property if its value type,
-       * {@link pentaho.type.Property.Type#type}, is a list type,
-       * i.e., if it is or extends {@link pentaho.type.List}.
+       * A property is a _list_ property if
+       * its [value type]{@link pentaho.type.Property.Type#type} is a list type,
+       * i.e., if it is or extends [List]{@link pentaho.type.List}.
        *
        * @type boolean
        * @readonly
@@ -273,82 +297,118 @@ define([
       //endregion
 
       //region (value) type attribute
+      _type: undefined,
+
       /**
-       * Gets the base type of the value that the property can hold.
+       * Gets or sets the type of value that properties of this type can hold.
        *
-       * @type !pentaho.type.Value.Type
-       * @readonly
+       * When set and the property already has [descendant]{@link pentaho.type.Type#hasDescendants} properties,
+       * an error is thrown.
+       *
+       * When set to a {@link Nully} value, the set operation is ignored.
+       *
+       * Otherwise, the set value is assumed to be an [spec.UTypeReference]{@link pentaho.type.spec.UTypeReference}
+       * and is first resolved using [this.context.get]{@link pentaho.type.Context#get}.
+       *
+       * When set to a _value type_ that is _not_ a
+       * [subtype]{@link pentaho.type.Type#isSubtypeOf} of the attribute's current _value type_,
+       * an error is thrown.
+       *
+       * When set and the [value]{@link pentaho.type.Property.Type#value} attribute
+       * is _locally_ set, it is checked against the new _value type_,
+       * and set to `null`, if it not an instance of it.
+       *
+       * The default value type is the inherited value type.
+       * A root _property type_ has a default _value type_ of [string]{@link pentaho.type.String}.
+       *
+       * @type {!pentaho.type.Value.Type}
+       *
+       * @throws {pentaho.lang.OperationInvalidError} When setting and the property already has
+       * [descendant]{@link pentaho.type.Type#hasDescendants} properties.
+       * @throws {pentaho.lang.ArgumentInvalidError} When setting to a _value type_ that is not a subtype
+       * of the current _value type_.
        */
       get type() {
         return this._type;
       },
 
-      /**
-       * Sets the type of the value that the property can hold.
-       * Note that changing the type does not implicitly enforce a cast of the value to the new type.
-       * TODO: review this setter.
-       * @ignore
-       */
       set type(value) {
-        // Resolves types synchronously.
-        if(this.isRoot) {
-          this._type = this.context.get(value).type;
-        } else {
-          // Can be changed
+        if(this.hasDescendants)
+          throw error.operInvalid("Cannot change the value type of a property type that has descendants.");
 
-          // Delete any inherited value.
-          delete this._type;
+        if(value == null) return;
 
-          if(value != null) {
-            var type = this.context.get(value).type,
-                baseType = this._type;
+        var oldType = this._type;
+        var newType = this.context.get(value).type;
+        if(newType !== oldType) {
+          // Hierarchy/PreviousValue consistency
+          if(oldType && !newType.isSubtypeOf(oldType))
+            throw error.argInvalid("type", bundle.structured.errors.property.typeNotSubtypeOfBaseType);
 
-            // Hierarchy/PreviousValue consistency
-            // Validate that it is a sub-type of the base property's type
-            // or a refinement type whose `of` is the base type.
-            // (which can only happen if baseType itself is not a refinement type).
-            if(type !== baseType) {
-              if(!type.isSubtypeOf(baseType))
-                throw error.argInvalid("type", bundle.structured.errors.property.typeNotSubtypeOfBaseType);
+          this._type = newType;
 
-              this._type = type;
-            }
+          // Set local value to null, if it is not an instance of the new type.
+          // Not really needed as the value getter tests the if value is of type.
+          // However, this improves performance.
+          var dv;
+          if(O.hasOwn(this, "_value") && (dv = this._value) && !newType.is(dv)) {
+            this._value = null;
           }
         }
       },
       //endregion
 
-      //region value attribute and methods
+      //region value attribute and related methods
       _value: null,
 
       /**
-       * Gets or sets the _default value_ of the property.
+       * Gets or sets the _default value_ of the _property type_.
        *
-       * Setting to `undefined` clears the local value and
-       * inherits any base default value.
+       * The _default value_ is the prototype value that properties of this type take,
+       * on complex instances,
+       * when the property is unspecified or specified as a {@link Nully} value.
+       * A [cloned]{@link pentaho.type.Value#clone} value is used each time.
        *
-       * Setting to `null` breaks inheritance
-       * and forces not having a _default value_.
+       * The value `null` is a valid _default value_.
        *
-       * Any other set values must be _convertible_ to
-       * the property's value type, {@link pentaho.type.Property.Type#type}.
+       * When got and the _default value_ (local or inherited)
+       * is not an instance of the _value type_ (local or inherited),
+       * `null` is returned.
        *
-       * The default _default value_ of a property is
-       * that of its ancestor property,
-       * as long as it is an instance of the local value type,
-       * or `null` in any other case.
+       * When set and the property already has [descendant]{@link pentaho.type.Type#hasDescendants} properties,
+       * an error is thrown.
        *
-       * @type ?pentaho.type.Value
+       * When set to `null`, it is respected.
+       *
+       * When set to the _control value_ `undefined`, the attribute value is reset,
+       * causing it to assume its _default value_:
+       *
+       * * for [root]{@link pentaho.type.Type#root} _property types_, the _default value_ is `null`
+       * * for non-root _property types_, the _default value_ is the _inherited value_,
+       *   if it is an instance of the _property type_'s [value type]{@link pentaho.type.Property.Type#type},
+       *   or, `null`, otherwise.
+       *
+       * When set to any other value,
+       * it is first converted to the _property type_'s
+       * [value type]{@link pentaho.type.Property.Type#type},
+       * using its [Value.Type#to]{@link pentaho.type.Value.Type#to} method.
+       * The conversion may be impossible and thus an error may be thrown.
+       *
+       * @type {pentaho.type.Value}
+       * @throws {pentaho.lang.OperationInvalidError} When setting and the property already has
+       * [descendant]{@link pentaho.type.Type#hasDescendants} properties.
+       * @throws {Error} When setting to a _default value_ that cannot be converted to the
+       * property type's current _value type.
        */
       get value() {
-        return this._value;
+        var value = this._value;
+        return value && this._type.is(value) ? value : null;
       },
 
-      // TODO: implement safe default value inheritance
-
-      // NOTE: the argument cannot have the same name as the property setter
-      // or PhantomJS 1.9.8 will throw a syntax error...
       set value(_) {
+        if(this.hasDescendants)
+          throw error.operInvalid("Cannot change the default value of a property type that has descendants.");
+
         if(_ === undefined) {
           if(this !== _propType) {
             // Clear local value. Inherit base value.
@@ -388,10 +448,10 @@ define([
        * Gets a fresh default value for use in a new `Complex` instance.
        *
        * Ensures that default values are _cloned_ (specially important for lists and complexes).
-       * Ensures that list properties always have a non-null default.
+       * Ensures that list properties always have a non-null default value.
        *
-       * @return {pentaho.type.Value} The fresh default value.
-       * @ignore
+       * @return {pentaho.type.Value} A fresh default value.
+       * @private
        */
       _freshDefaultValue: function() {
         var value = this.value;
@@ -408,7 +468,6 @@ define([
        * The label of a root property is reset to a capitalization of the `name` attribute.
        * A non-root property inherits the label of its closest ancestor.
        *
-       * @return {nonEmptyString}
        * @ignore
        */
       _resetLabel: function() {
@@ -480,11 +539,11 @@ define([
       //region dynamic attributes
       // Configuration support
       /**
-       * Sets the attributes of the property.
+       * Defines "dynamic" attributes of the property type.
        *
        * This setter is used when the developer is extending Property to support new attributes.
        *
-       * @type pentaho.type.spec.IPropertyType
+       * @type {Object}
        * @ignore
        */
       set attrs(attrSpecs) {
@@ -494,13 +553,13 @@ define([
       }, // jshint -W078
 
       /**
-       * Dynamically defines an attribute and corresponding setter and getter methods.
+       * Defines a "dynamic" attribute and corresponding setter and getter methods.
        *
        * This method is an implementation detail,
        * ans is invoked by {pentaho.type.Property.Type#attrs}
        *
        * @param {String} name
-       * @param {} spec
+       * @param {Object} spec
        * @private
        * @ignore
        */
@@ -595,7 +654,7 @@ define([
          * This and other attributes are combined to evaluate the resulting _effective value count range_.
          * See {@link pentaho.type.Property.Type#countRangeEval}.
          *
-         * Setting the attribute to `null` or `undefined` clears the local value.
+         * When set to a {@link Nully} value, the local attribute value is cleared.
          *
          * The default, root `isRequired` attribute value is `false`.
          *
@@ -644,7 +703,7 @@ define([
          * This and other attributes are combined to evaluate the resulting _effective value count range_.
          * See {@link pentaho.type.Property.Type#countRangeEval}.
          *
-         * Setting the attribute to `null` or `undefined` clears the local value.
+         * When set to a {@link Nully} value, the local attribute value is cleared.
          *
          * The default, root `countMin` attribute value is `0`.
          *
@@ -692,7 +751,7 @@ define([
          * This and other attributes are combined to evaluate the resulting _effective value count range_.
          * See {@link pentaho.type.Property.Type#countRangeEval}.
          *
-         * Setting the attribute to `null` or `undefined` clears the local value.
+         * When set to a {@link Nully} value, the local attribute value is cleared.
          *
          * The default, root `countMax` attribute value is `Infinity`.
          *
@@ -735,7 +794,7 @@ define([
          * conjunction (_and_) between the locally specified value and
          * the evaluated value inherited from its ancestor.
          *
-         * Setting the attribute to `null` or `undefined` clears the local value.
+         * When set to a {@link Nully} value, the local attribute value is cleared.
          *
          * The default, root `isApplicable` attribute value is `true`.
          *
@@ -768,7 +827,11 @@ define([
          */
 
         /**
-         * Gets or sets a value or function that indicates if a property cannot be written to.
+         * Gets or sets a value or function that indicates if a property
+         * cannot be changed by the user in a user interface.
+         *
+         * A property should be considered read-only whenever its value is implied/imposed somehow
+         * and thus cannot not be changed, directly, by the user in a user interface.
          *
          * This attribute is *dynamic*:
          * 1. when a function is specified, it is dynamically evaluated for each complex instance
@@ -776,14 +839,11 @@ define([
          * 3. inheritance takes place only when the attribute is evaluated
          *    in the context of a given complex instance.
          *
-         * A property should be considered read-only whenever its value is implied/imposed somehow
-         * and thus cannot not be changed, directly, by the user.
-         *
          * The _effective `isReadOnly` attribute value_ is the
          * disjunction (_or_) between the locally specified value and
          * the evaluated value inherited from its ancestor.
          *
-         * Setting the attribute to `null` or `undefined` clears the local value.
+         * When set to a {@link Nully} value, the local attribute value is cleared.
          *
          * The default, root `isReadOnly` attribute value is `false`.
          *
