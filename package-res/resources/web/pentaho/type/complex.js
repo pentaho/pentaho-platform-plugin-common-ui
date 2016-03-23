@@ -23,13 +23,13 @@ define([
   "../lang/events/WillChange",
   "../lang/events/RejectedChange",
   "../lang/events/DidChange",
-  "../lang/ChangeSet",
+  "../lang/ComplexChange",
   "../i18n!types",
   "../util/object",
   "../util/error"
 ], function(module, elemFactory, PropertyTypeCollection, valueHelper,
             EventSource, ActionResult, WillChange, RejectedChange, DidChange,
-            ChangeSet, bundle, O, error) {
+            ComplexChange, bundle, O, error) {
 
   "use strict";
 
@@ -359,8 +359,10 @@ define([
         } else {
           var value1 = pType.toValue(valueSpec);
           if(!pType.type.areEqual(value0, value1)) {
-            var changeSet = new ChangeSet(pType.name, value1, value0);
-            var will = new WillChange(this, pType.name, value1, value0);
+            var changeSet = new ComplexChange(this);
+            //changeSet.set(name, {type: "set", newValue: value1, oldValue: value0});
+            changeSet.set(name, value1);
+            var will = new WillChange(this, changeSet);
             return this._doAction(this._setAction, will, DidChange, RejectedChange);
           }
         }
