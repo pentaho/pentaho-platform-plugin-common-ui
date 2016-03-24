@@ -64,35 +64,6 @@ define([
 
     });
 
-    describe("events -", function() {
-      var view;
-      beforeEach(function() {
-        spyOn(model, "on").and.callThrough();
-        spyOn(View.prototype, "_selectionChanged");
-
-        view = new View(element, model);
-      });
-
-      it("should subscribe to model's did:change event", function() {
-        expect(model._hasListeners("did:change")).toBe(true);
-      });
-
-      it("should call _selectionChanged when did:change/selectionFilter occurs in the model", function() {
-        var will = {
-          //property: "selectionFilter",
-          //value: {},
-          changeSet: {
-            properties:["selectionFilter"],
-            has: function(p){return p==="selectionFilter"},
-            getValue: function(p){ return {};},
-            getPreviousValue: function(p){ return {};}
-          } };
-        model._emit(new DidChange(model, {}, will));
-
-        expect(view._selectionChanged).toHaveBeenCalled();
-      });
-    });
-
     describe("validation: ", function() {
 
       it("should be valid if the model is valid", function(){

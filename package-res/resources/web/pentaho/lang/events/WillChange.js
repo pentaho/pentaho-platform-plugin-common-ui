@@ -37,11 +37,6 @@ define([
       constructor: function(source, changeset) {
         this.base("will:change", source, true);
 
-        this.property = "prop"; // temp
-        this.value = "v";
-        this.previousValue = "o";
-
-        //var changeSet = property instanceof ChangeSet ? property : new ChangeSet(property, value, previousValue);
         this._changeset = changeset;
       },
 

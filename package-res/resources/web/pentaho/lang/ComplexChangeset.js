@@ -21,7 +21,7 @@ define([
 
   "use strict";
 
-  return Base.extend("pentaho.lang.ComplexChange", {
+  return Base.extend("pentaho.lang.ComplexChangeset", {
 
     constructor: function(source) {
       this._source = source;

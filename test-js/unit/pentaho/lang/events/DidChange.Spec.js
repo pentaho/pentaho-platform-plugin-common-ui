@@ -42,36 +42,29 @@ define([
     describe("instances -", function() {
       var event;
 
-      var value = 123;
-      var will = {dataFilter: {}};
+      var changeset = { mock: "I am a mock" };
 
       beforeEach(function() {
-        event = new DidChange({}, value, will);
+        event = new DidChange({}, changeset);
       });
 
       it("should extend Event", function() {
         expect(event instanceof Event).toBe(true);
       });
 
-      it("value property should be the same than received in the constructor", function() {
-        expect(event.value).toBe(value);
+      it("changeset property should be the same than received in the constructor", function() {
+        expect(event.changeset).toBe(changeset);
       });
 
-      it("property property should be the same than received in the constructor", function() {
-        expect(event.property).toBe(will.property);
+      it("DidChange events should not be cancelable", function() {
+        expect(event.isCancelable).toBe(false);
       });
 
-      it("value property should be immutable", function() {
+      it("changeset property should be immutable", function() {
         expect(function() {
-          event.value = "other";
+          event.changeset = "other";
         }).toThrowError(TypeError);
       });
-    });
-
-    it("should throw if empty will parameter", function() {
-      expect(function() {
-        return new DidChange({});
-      }).toThrow(errorMatch.argRequired("will"));
     });
 
   }); // #pentaho.lang.events.DidChange
