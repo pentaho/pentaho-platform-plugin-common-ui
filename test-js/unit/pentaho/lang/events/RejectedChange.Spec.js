@@ -43,7 +43,7 @@ define([
       var event;
 
       var error = "no go!";
-      var will = {dataFilter: {}};
+      var will = {changeset: {}};
 
       beforeEach(function() {
         event = new RejectedChange({}, error, will);
@@ -70,7 +70,7 @@ define([
 
     it("should throw if empty error parameter", function() {
       expect(function() {
-        return new RejectedChange({});
+        return new RejectedChange({}, undefined, {changeset: {}});
       }).toThrow(errorMatch.argRequired("error"));
     });
 

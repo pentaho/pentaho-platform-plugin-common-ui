@@ -46,8 +46,6 @@ define([
        * @param {?function} doExecute - The action that will be executed in the {@link pentaho.visual.base.model#executeAction|Execute Action} event flow.
        */
       constructor: function(source, dataFilter, doExecute) {
-        if(!doExecute) throw error.argRequired("doExecute");
-        
         this.base("will:execute", source, true);
         this._initFilter(dataFilter, true);
         this.doExecute = doExecute;

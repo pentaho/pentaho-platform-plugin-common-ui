@@ -450,7 +450,7 @@ define([
             ]);
 
             listeners.will.and.callFake(function(event) {
-              if(event.changeset.get("x").newValue === THREE) event.cancel();
+              if(event.changeset.get("x").newValue.valueOf() === THREE) event.cancel();
             });
 
             complex = new Derived({x: 0});
