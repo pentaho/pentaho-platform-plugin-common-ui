@@ -547,9 +547,9 @@ define([
       }); //end value
       //endregion
 
-      //region Dynamic Attributes
+      //region Dynamic & Monotonic Attributes
       describe("isRequired - ", function() {
-        it("should be immutable", function() {
+        it("should not allow changing the Property.type attribute value", function() {
           var propType = Property.type;
           var isRequired = propType.isRequired;
           propType.isRequired = true;
@@ -561,18 +561,34 @@ define([
           expect(propType.isRequired).toBe(undefined);
         });
 
-        it("should convert undefined spec value to default", function() {
+        it("should ignore setting to undefined", function() {
           var propType = createRootPropType({name: "foo", isRequired: true});
           expect(propType.isRequired).toBe(true);
           propType.isRequired = undefined;
-          expect(propType.isRequired).toBe(undefined);
+          expect(propType.isRequired).toBe(true);
         });
 
-        it("should convert null spec value to default", function() {
+        it("should ignore setting to null", function() {
           var propType = createRootPropType({name: "foo", isRequired: true});
           expect(propType.isRequired).toBe(true);
           propType.isRequired = null;
-          expect(propType.isRequired).toBe(undefined);
+          expect(propType.isRequired).toBe(true);
+        });
+
+        it("should throw when set and property already has descendant properties", function() {
+          var propType = createRootPropType({name: "foo"});
+
+          var Derived2 = Derived.extend();
+
+          // Create a descendant property
+          Property.extendProto(
+              propType.instance,
+              {type: {name: "foo"}}, // spec
+              {declaringType: Derived2.type}); // keyArgs
+
+          expect(function() {
+            propType.isRequired = true;
+          }).toThrow(errorMatch.operInvalid());
         });
 
         it("should cast other non-function spec values to boolean", function() {
@@ -659,10 +675,10 @@ define([
           expect(f.calls.count()).toBe(1);
           expect(f.calls.first().args.length).toBe(0);
         });
-      }); // end required
+      }); // end isRequired
 
       describe("countMin - ", function() {
-        it("should be immutable", function() {
+        it("should not allow changing the Property.type attribute value", function() {
           var propType = Property.type;
           var countMin = propType.countMin;
           propType.countMin = 42;
@@ -674,18 +690,18 @@ define([
           expect(propType.countMin).toBe(undefined);
         });
 
-        it("should convert undefined spec value to an unset local value", function() {
+        it("should ignore setting to undefined", function() {
           var propType = createRootPropType({name: "foo", countMin: 1});
           expect(propType.countMin).toBe(1);
           propType.countMin = undefined;
-          expect(propType.countMin).toBe(undefined);
+          expect(propType.countMin).toBe(1);
         });
 
-        it("should convert null spec value to an unset local value", function() {
+        it("should ignore setting to null", function() {
           var propType = createRootPropType({name: "foo", countMin: 1});
           expect(propType.countMin).toBe(1);
           propType.countMin = null;
-          expect(propType.countMin).toBe(undefined);
+          expect(propType.countMin).toBe(1);
         });
 
         it("should convert negative spec values to an unset local value", function() {
@@ -755,10 +771,26 @@ define([
           expect(f.calls.count()).toBe(1);
           expect(f.calls.first().args.length).toBe(0);
         });
+
+        it("should throw when set and property already has descendant properties", function() {
+          var propType = createRootPropType({name: "foo"});
+
+          var Derived2 = Derived.extend();
+
+          // Create a descendant property
+          Property.extendProto(
+              propType.instance,
+              {type: {name: "foo"}}, // spec
+              {declaringType: Derived2.type}); // keyArgs
+
+          expect(function() {
+            propType.countMin = 2;
+          }).toThrow(errorMatch.operInvalid());
+        });
       }); // end countMin
 
       describe("countMax - ", function() {
-        it("should be immutable", function() {
+        it("should not allow changing the Property.type attribute value", function() {
           var propType = Property.type;
           var countMax = propType.countMax;
           propType.countMax = 42;
@@ -770,18 +802,18 @@ define([
           expect(propType.countMax).toBe(undefined);
         });
 
-        it("should convert undefined spec value to an unset local value", function() {
+        it("should ignore setting to undefined", function() {
           var propType = createRootPropType({name: "foo", countMax: 1});
           expect(propType.countMax).toBe(1);
           propType.countMax = undefined;
-          expect(propType.countMax).toBe(undefined);
+          expect(propType.countMax).toBe(1);
         });
 
-        it("should convert null spec value to an unset local value", function() {
+        it("should ignore setting to null", function() {
           var propType = createRootPropType({name: "foo", countMax: 1});
           expect(propType.countMax).toBe(1);
           propType.countMax = null;
-          expect(propType.countMax).toBe(undefined);
+          expect(propType.countMax).toBe(1);
         });
 
         it("should convert negative spec value to an unset local value", function() {
@@ -856,10 +888,26 @@ define([
           expect(f.calls.count()).toBe(1);
           expect(f.calls.first().args.length).toBe(0);
         });
+
+        it("should throw when set and property already has descendant properties", function() {
+          var propType = createRootPropType({name: "foo"});
+
+          var Derived2 = Derived.extend();
+
+          // Create a descendant property
+          Property.extendProto(
+              propType.instance,
+              {type: {name: "foo"}}, // spec
+              {declaringType: Derived2.type}); // keyArgs
+
+          expect(function() {
+            propType.countMax = 2;
+          }).toThrow(errorMatch.operInvalid());
+        });
       }); // end countMax
 
       describe("isApplicable - ", function() {
-        it("should be immutable", function() {
+        it("should not allow changing the Property.type attribute value", function() {
           var propType = Property.type;
           var isApplicable = propType.isApplicable;
           propType.isApplicable = false;
@@ -871,18 +919,18 @@ define([
           expect(propType.isApplicable).toBe(undefined);
         });
 
-        it("should convert undefined spec value to an unset local value", function() {
+        it("should ignore setting to undefined", function() {
           var propType = createRootPropType({name: "foo", isApplicable: false});
           expect(propType.isApplicable).toBe(false);
           propType.isApplicable = undefined;
-          expect(propType.isApplicable).toBe(undefined);
+          expect(propType.isApplicable).toBe(false);
         });
 
-        it("should convert null spec value to an unset local value", function() {
+        it("should ignore setting to null", function() {
           var propType = createRootPropType({name: "foo", isApplicable: false});
           expect(propType.isApplicable).toBe(false);
           propType.isApplicable = null;
-          expect(propType.isApplicable).toBe(undefined);
+          expect(propType.isApplicable).toBe(false);
         });
 
         it("should cast other non-function spec values to boolean", function() {
@@ -941,10 +989,26 @@ define([
           expect(f.calls.count()).toBe(1);
           expect(f.calls.first().args.length).toBe(0);
         });
-      }); // end applicable
+
+        it("should throw when set and property already has descendant properties", function() {
+          var propType = createRootPropType({name: "foo"});
+
+          var Derived2 = Derived.extend();
+
+          // Create a descendant property
+          Property.extendProto(
+              propType.instance,
+              {type: {name: "foo"}}, // spec
+              {declaringType: Derived2.type}); // keyArgs
+
+          expect(function() {
+            propType.isApplicable = false;
+          }).toThrow(errorMatch.operInvalid());
+        });
+      }); // end isApplicable
 
       describe("isReadOnly - ", function() {
-        it("should be immutable", function() {
+        it("should not allow changing the Property.type attribute value", function() {
           var propType = Property.type;
           var isReadOnly = propType.isReadOnly;
           propType.isReadOnly = true;
@@ -956,18 +1020,18 @@ define([
           expect(propType.isReadOnly).toBe(undefined);
         });
 
-        it("should convert undefined spec value to default", function() {
+        it("should ignore setting to undefined", function() {
           var propType = createRootPropType({name: "foo", isReadOnly: true});
           expect(propType.isReadOnly).toBe(true);
           propType.isReadOnly = undefined;
-          expect(propType.isReadOnly).toBe(undefined);
+          expect(propType.isReadOnly).toBe(true);
         });
 
-        it("should convert null spec to default", function() {
+        it("should ignore setting to null", function() {
           var propType = createRootPropType({name: "foo", isReadOnly: true});
           expect(propType.isReadOnly).toBe(true);
           propType.isReadOnly = null;
-          expect(propType.isReadOnly).toBe(undefined);
+          expect(propType.isReadOnly).toBe(true);
         });
 
         it("should cast other non-function spec values to boolean", function() {
@@ -1025,6 +1089,22 @@ define([
           propType.isReadOnlyEval(owner);
           expect(f.calls.count()).toBe(1);
           expect(f.calls.first().args.length).toBe(0);
+        });
+
+        it("should throw when set and property already has descendant properties", function() {
+          var propType = createRootPropType({name: "foo"});
+
+          var Derived2 = Derived.extend();
+
+          // Create a descendant property
+          Property.extendProto(
+              propType.instance,
+              {type: {name: "foo"}}, // spec
+              {declaringType: Derived2.type}); // keyArgs
+
+          expect(function() {
+            propType.isReadOnly = true;
+          }).toThrow(errorMatch.operInvalid());
         });
       }); // end isReadOnly
 
@@ -2049,8 +2129,10 @@ define([
       });
       //endregion
 
-      //region Dynamic attributes
-      describe("required -", function() {
+      //region Dynamic & Monotonic attributes
+      // Dynamic. Monotonic. Cannot change if has descendants.
+
+      describe("isRequired -", function() {
         it("should default to an unset local value", function() {
           var Base = Complex.extend();
 
@@ -2077,7 +2159,7 @@ define([
           expect(propType.isRequiredEval(owner)).toBe(true);
         });
 
-        it("should respect the specified value", function() {
+        it("should get the specification value", function() {
           var Base = Complex.extend();
 
           Base.type.add({name: "baseStr"});
@@ -2087,6 +2169,47 @@ define([
           var propType = extendProp(Derived.type, "baseStr", {name: "baseStr", isRequired: false});
 
           expect(propType.isRequired).toBe(false);
+        });
+
+        it("should get the last set non-nully value", function() {
+          var Base = Complex.extend();
+
+          Base.type.add({name: "baseStr"});
+
+          var Derived = Base.extend();
+
+          var propType = extendProp(Derived.type, "baseStr", {name: "baseStr", isRequired: false});
+
+          expect(propType.isRequired).toBe(false);
+
+          propType.isRequired = true;
+
+          expect(propType.isRequired).toBe(true);
+
+          propType.isRequired = false;
+
+          expect(propType.isRequired).toBe(false);
+        });
+
+        it("should let change the local value, but all sets are combined monotonically " +
+           "to later evaluate the effective value", function() {
+          var Base = Complex.extend();
+
+          Base.type.add({name: "baseStr"});
+
+          var Derived = Base.extend();
+
+          var propType = extendProp(Derived.type, "baseStr", {name: "baseStr", isRequired: false});
+
+          propType.isRequired = true;
+
+          // non-monotonic change
+          propType.isRequired = false;
+
+          var owner = {};
+
+          var isRequired = propType.isRequiredEval(owner);
+          expect(isRequired).toBe(true);
         });
 
         it("should evaluate a base function and, if false, only then the sub function", function() {
@@ -2149,7 +2272,7 @@ define([
           expect(propType.isRequiredEval(owner)).toBe(true);
           expect(subSpy.calls.count()).toBe(0);
         });
-      }); // end required
+      }); // end isRequired
 
       describe("countMin -", function() {
         it("should default to an unset local value", function() {
@@ -2178,7 +2301,19 @@ define([
           expect(propType.countMinEval(owner)).toBe(1);
         });
 
-        it("should respect the specified value", function() {
+        it("should get the specification value", function() {
+          var Base = Complex.extend();
+
+          Base.type.add({name: "baseStr"});
+
+          var Derived = Base.extend();
+
+          var propType = extendProp(Derived.type, "baseStr", {name: "baseStr", countMin: 2});
+
+          expect(propType.countMin).toBe(2);
+        });
+
+        it("should evaluate to the specified value", function() {
           var Base = Complex.extend();
 
           Base.type.add({name: "baseStr"});
@@ -2190,6 +2325,34 @@ define([
           var owner = {};
 
           expect(propType.countMinEval(owner)).toBe(2);
+        });
+
+        it("should allow changing the local value multiple times, but can never change non-monotonically", function() {
+          var Base = Complex.extend();
+
+          Base.type.add({name: "baseStr"});
+
+          var Derived = Base.extend();
+
+          var propType = extendProp(Derived.type, "baseStr", {name: "baseStr", countMin: 2});
+
+          propType.countMin = 0;
+
+          var owner = {};
+
+          expect(propType.countMinEval(owner)).toBe(2);
+
+          propType.countMin = 4;
+          expect(propType.countMin).toBe(4); // last set static value
+          expect(propType.countMinEval(owner)).toBe(4);
+
+          propType.countMin = 6;
+          expect(propType.countMin).toBe(6); // last set static value
+          expect(propType.countMinEval(owner)).toBe(6);
+
+          propType.countMin = 2;
+          expect(propType.countMin).toBe(2); // last set static value
+          expect(propType.countMinEval(owner)).toBe(6);
         });
 
         it("should evaluate the base function and then, always, the sub function", function() {
@@ -2280,7 +2443,19 @@ define([
           expect(propType.countMaxEval(owner)).toBe(5);
         });
 
-        it("should respect the specified value", function() {
+        it("should get the specification value", function() {
+          var Base = Complex.extend();
+
+          Base.type.add({name: "baseStr"});
+
+          var Derived = Base.extend();
+
+          var propType = extendProp(Derived.type, "baseStr", {name: "baseStr", countMax: 2});
+
+          expect(propType.countMax).toBe(2);
+        });
+
+        it("should evaluate to the specified value", function() {
           var Base = Complex.extend();
 
           Base.type.add({name: "baseStr"});
@@ -2291,6 +2466,34 @@ define([
 
           var owner = {};
 
+          expect(propType.countMaxEval(owner)).toBe(2);
+        });
+
+        it("should allow changing the local value multiple times, but can never change non-monotonically", function() {
+          var Base = Complex.extend();
+
+          Base.type.add({name: "baseStr"});
+
+          var Derived = Base.extend();
+
+          var propType = extendProp(Derived.type, "baseStr", {name: "baseStr", countMax: 5});
+
+          propType.countMax = 7;
+
+          var owner = {};
+
+          expect(propType.countMaxEval(owner)).toBe(5);
+
+          propType.countMax = 4;
+          expect(propType.countMax).toBe(4); // last set static value
+          expect(propType.countMaxEval(owner)).toBe(4);
+
+          propType.countMax = 2;
+          expect(propType.countMax).toBe(2); // last set static value
+          expect(propType.countMaxEval(owner)).toBe(2);
+
+          propType.countMax = 3;
+          expect(propType.countMax).toBe(3); // last set static value
           expect(propType.countMaxEval(owner)).toBe(2);
         });
 
@@ -2382,7 +2585,7 @@ define([
           expect(propType.isApplicableEval(owner)).toBe(false);
         });
 
-        it("should respect the specified value", function() {
+        it("should get the specification value", function() {
           var Base = Complex.extend();
 
           Base.type.add({name: "baseStr"});
@@ -2392,6 +2595,47 @@ define([
           var propType = extendProp(Derived.type, "baseStr", {name: "baseStr", isApplicable: false});
 
           expect(propType.isApplicable).toBe(false);
+        });
+
+        it("should get the last set non-nully value", function() {
+          var Base = Complex.extend();
+
+          Base.type.add({name: "baseStr"});
+
+          var Derived = Base.extend();
+
+          var propType = extendProp(Derived.type, "baseStr", {name: "baseStr", isApplicable: true});
+
+          expect(propType.isApplicable).toBe(true);
+
+          propType.isApplicable = false;
+
+          expect(propType.isApplicable).toBe(false);
+
+          propType.isApplicable = true;
+
+          expect(propType.isApplicable).toBe(true);
+        });
+
+        it("should let change the local value, but all sets are combined monotonically " +
+            "to later evaluate the effective value", function() {
+          var Base = Complex.extend();
+
+          Base.type.add({name: "baseStr"});
+
+          var Derived = Base.extend();
+
+          var propType = extendProp(Derived.type, "baseStr", {name: "baseStr", isApplicable: true});
+
+          propType.isApplicable = false;
+
+          // non-monotonic change
+          propType.isApplicable = true;
+
+          var owner = {};
+
+          var isApplicable = propType.isApplicableEval(owner);
+          expect(isApplicable).toBe(false);
         });
 
         it("should evaluate a base function and, if true, only then the sub function", function() {
@@ -2454,7 +2698,7 @@ define([
           expect(propType.isApplicableEval(owner)).toBe(false);
           expect(subSpy.calls.count()).toBe(0);
         });
-      }); // end applicable
+      }); // end isApplicable
 
       describe("isReadOnly -", function() {
         it("should default to an unset local value", function() {
@@ -2483,7 +2727,7 @@ define([
           expect(propType.isReadOnlyEval(owner)).toBe(true);
         });
 
-        it("should respect the specified value", function() {
+        it("should get the specification value", function() {
           var Base = Complex.extend();
 
           Base.type.add({name: "baseStr"});
@@ -2493,6 +2737,47 @@ define([
           var propType = extendProp(Derived.type, "baseStr", {name: "baseStr", isReadOnly: false});
 
           expect(propType.isReadOnly).toBe(false);
+        });
+
+        it("should get the last set non-nully value", function() {
+          var Base = Complex.extend();
+
+          Base.type.add({name: "baseStr"});
+
+          var Derived = Base.extend();
+
+          var propType = extendProp(Derived.type, "baseStr", {name: "baseStr", isReadOnly: false});
+
+          expect(propType.isReadOnly).toBe(false);
+
+          propType.isReadOnly = true;
+
+          expect(propType.isReadOnly).toBe(true);
+
+          propType.isReadOnly = false;
+
+          expect(propType.isReadOnly).toBe(false);
+        });
+
+        it("should let change the local value, but all sets are combined monotonically " +
+            "to later evaluate the effective value", function() {
+          var Base = Complex.extend();
+
+          Base.type.add({name: "baseStr"});
+
+          var Derived = Base.extend();
+
+          var propType = extendProp(Derived.type, "baseStr", {name: "baseStr", isReadOnly: false});
+
+          propType.isReadOnly = true;
+
+          // non-monotonic change
+          propType.isReadOnly = false;
+
+          var owner = {};
+
+          var isReadOnly = propType.isReadOnlyEval(owner);
+          expect(isReadOnly).toBe(true);
         });
 
         it("should evaluate a base function and, if false, only then the sub function", function() {
