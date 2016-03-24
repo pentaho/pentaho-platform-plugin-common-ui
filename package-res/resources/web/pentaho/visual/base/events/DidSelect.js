@@ -49,6 +49,15 @@ define([
         this._initFilter(will.dataFilter, false);
       }
     }, {
+
+      /**
+       * Gets the event type.
+       *
+       * @type !string
+       * @readonly
+       *
+       * @static
+       */
       get type() {
         return "did:select";
       }

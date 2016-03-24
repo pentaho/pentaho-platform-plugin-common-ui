@@ -16,8 +16,9 @@
 define([
   "pentaho/lang/Event",
   "../mixins/mixinDataFilter",
+  "../mixins/mixinError",
   "pentaho/util/error"
-], function(Event, mixinDataFilter, utilError) {
+], function(Event, mixinDataFilter, mixinError, utilError) {
   "use strict";
 
   /**
@@ -47,19 +48,26 @@ define([
        * @param {?pentaho.visual.base.events.WillSelect} will - The "will:execute" event object.
        */
       constructor: function(source, error, will) {
-        if(!error) throw utilError.argRequired("error");
         if(!will) throw utilError.argRequired("will");
 
         this.base("rejected:execute", source, false);
-        this.error = error;
-
         this._initFilter(will.dataFilter, false);
+        this._initError(error);
       }
     },{
+
+      /**
+       * Gets the event type.
+       *
+       * @type !string
+       * @readonly
+       *
+       * @static
+       */
       get type() {
         return "rejected:execute";
       }
-    })
-    .implement(mixinDataFilter);
+    }).implement(mixinDataFilter)
+      .implement(mixinError);
 
 });

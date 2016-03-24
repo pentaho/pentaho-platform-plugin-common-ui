@@ -46,22 +46,40 @@ define([
        * @param {?function} doExecute - The action that will be executed in the {@link pentaho.visual.base.model#executeAction|Execute Action} event flow.
        */
       constructor: function(source, dataFilter, doExecute) {
+        if(!doExecute) throw error.argRequired("doExecute");
+        
         this.base("will:execute", source, true);
         this._initFilter(dataFilter, true);
         this.doExecute = doExecute;
       },
 
-      set doExecute(f) {
-        if(f != null && typeof f !== "function") {
-          throw error.argInvalidType("doExecute", "function", typeof f);
+      /**
+       * Gets or sets the core action that will be executed.
+       *
+       * @type ?function
+       *
+       * @throws {pentaho.lang.ArgumentInvalidTypeError} When `exe` is not a `function`.
+       */
+      set doExecute(exe) {
+        if(exe != null && typeof exe !== "function") {
+          throw error.argInvalidType("doExecute", "function", typeof exe);
         }
-        this._doExecute = f;
+        this._doExecute = exe;
       },
 
       get doExecute() {
         return this._doExecute;
       }
     },{
+
+      /**
+       * Gets the event type.
+       *
+       * @type !string
+       * @readonly
+       *
+       * @static
+       */
       get type() {
         return "will:execute";
       }
