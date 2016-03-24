@@ -221,26 +221,25 @@ define([
      * @overridable
      */
     _onChange: function(event) {
-      var changeSet = event.changeSet;
+      var changeset = event.changeset;
 
-      var updateSize = changeSet.has("width") || changeSet.has("height");
-      var updateSelection =  changeSet.has("selectionFilter");
+      var updateSize = changeset.has("width") || changeset.has("height");
+      var updateSelection =  changeset.has("selectionFilter");
 
       var exclusionList = {
         width: true,
         height: true,
         selectionFilter: true
       };
-      var fullUpdate = changeSet.properties.reduce(function(memo, prop){
+      var fullUpdate = changeset.propertyNames.reduce(function(memo, prop){
         return memo || !exclusionList[prop];
       }, false);
 
       if(fullUpdate) return this.render();
 
       if(updateSelection){
-        var selectionFilter = changeSet.getValue("selectionFilter").valueOf();
-        var previousSelectionFilter = changeSet.getPreviousValue("selectionFilter").valueOf();
-        this._selectionChanged(selectionFilter, previousSelectionFilter);
+        var selectionFilter = changeset.get("selectionFilter");
+        this._selectionChanged(selectionFilter.newValue, selectionFilter.oldValue);
       }
       if(updateSize) this._resize();
     }

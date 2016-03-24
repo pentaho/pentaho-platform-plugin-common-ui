@@ -27,16 +27,15 @@ define([
 
         this.base("rejected:change", source, false);
         this._error = error;
-        this._previousValue = will.previousValue;
-        this.changeSet = will.changeSet;
+        this._changeset = will.changeset;
       },
-      get previousValue(){
-        return this._previousValue;
+      get changeset() {
+        return this._changeset;
       },
       get error() {
         return this._error;
       }
-    },{
+    }, {
       get type() {
         return "rejected:change";
       }

@@ -86,14 +86,14 @@ define([
 
     _onWillChange: function(event) {
       //var property = event.property;
-      var changeSet = event.changeSet;
-      changeSet.properties.forEach(function(prop) {
+      var changeSet = event.changeset;
+      changeSet.each(function(prop, propName) {
         var result = true;
-        if(prop === "width" || prop === "height") {
-          result = window.confirm(prop + " changed. Do you really want to resize?");
+        if(propName === "width" || propName === "height") {
+          result = window.confirm(propName + " changed. Do you really want to resize?");
           if(result === false) event.cancel("User canceled");
         }
-        console && console.log(prop + (result ? " changed!" : " did not change!"), changeSet.getPreviousValue(prop).valueOf(), changeSet.getValue(prop).valueOf());
+        console && console.log(propName + (result ? " changed!" : " did not change!"), prop.oldValue, prop.newValue);
       });
     }
   }
