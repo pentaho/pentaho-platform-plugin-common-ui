@@ -15,9 +15,8 @@
  */
 define([
   "pentaho/lang/Event",
-  "pentaho/lang/events/WillChange",
-  "tests/pentaho/util/errorMatch"
-], function(Event, WillChange, errorMatch) {
+  "pentaho/lang/events/WillChange"
+], function(Event, WillChange) {
   "use strict";
 
   /* global describe:false, it:false, expect:false, beforeEach:false */
@@ -42,28 +41,26 @@ define([
     describe("instances -", function() {
       var event;
 
-      var value = {};
+      var changeset = { mock: "I am a mock" };
 
       beforeEach(function() {
-        event = new WillChange({}, "foo", value);
+        event = new WillChange({}, changeset);
       });
 
       it("should extend Event", function() {
         expect(event instanceof Event).toBe(true);
       });
 
-      it("value property should be the same than received in the constructor", function() {
-        expect(event.value).toBe(value);
+      it("changeset should be the same than received in the constructor", function() {
+        expect(event.changeset).toBe(changeset);
       });
 
-      it("value property should not be immutable", function() {
-        var newFilter = "other";
-
+      it("changeset property should be immutable", function() {
         expect(function() {
-          event.value = newFilter;
-        }).not.toThrow();
+          event.changeset = {};
+        }).toThrowError(TypeError);
 
-        expect(event.value).toBe(newFilter);
+        expect(event.changeset).toBe(changeset);
       });
     });
 
