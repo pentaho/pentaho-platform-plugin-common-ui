@@ -36,14 +36,27 @@ define([
       return O.hasOwn(this._properties, property);
     },
 
-    set: function(property, change) {
-      var source = this._source;
-      var pType = source.type.get(property);
+    set: function(propertyName, valueSpec) {
+      var pType = this.source.type.get(propertyName);
+      if(pType.isList) {
 
-      var propertyChange = pType.isList ? createListChange(source, property, change) : createValueChange(source, property, change);
+      } else {
+        this._setValueChange(propertyName, pType.toValue(valueSpec));
+      }
+    },
 
-      this._properties[property] = propertyChange;
-      //TODO: decide if this should be chainable
+    _setValueChange: function(property, newValue, oldValue) {
+      var prop = this._properties[property];
+
+      if(!prop) {
+        prop = this._properties[property] = {};
+        O.setConst(prop, "type", "set");
+
+        var v0 = arguments.length > 2 ? oldValue : this.source.get(property);
+        O.setConst(prop, "oldValue", v0);
+      }
+
+      prop.newValue = newValue;
     },
 
     get: function(property) {
@@ -56,26 +69,13 @@ define([
       return Object.keys(this._properties);
     },
 
-    each: function(iterator, context){
+    each: function(iterator, context) {
       var iteratorContext = context || this;
-      this.propertyNames.forEach(function(name){
+      this.propertyNames.forEach(function(name) {
         iterator.call(iteratorContext, this.get(name), name);
       }, this);
       //TODO: decide if this should be chainable
     }
   });
-
-
-  function createValueChange(source, property, value) {
-    return {
-      get type() { return "set"; },
-      get oldValue() { return source.get(property); },
-      newValue: value
-    };
-  }
-
-  function createListChange(source, property, change) {
-    return {};
-  }
 
 });

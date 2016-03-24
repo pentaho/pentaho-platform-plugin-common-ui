@@ -229,6 +229,7 @@ define([
       var exclusionList = {
         width: true,
         height: true,
+        selectionMode: true, // never has a direct visual impact
         selectionFilter: true
       };
       var fullUpdate = changeset.propertyNames.reduce(function(memo, prop){
@@ -239,7 +240,7 @@ define([
 
       if(updateSelection){
         var selectionFilter = changeset.get("selectionFilter");
-        this._selectionChanged(selectionFilter.newValue, selectionFilter.oldValue);
+        this._selectionChanged(selectionFilter.newValue.value, selectionFilter.oldValue.value);
       }
       if(updateSize) this._resize();
     }
