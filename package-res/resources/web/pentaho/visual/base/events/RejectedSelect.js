@@ -16,7 +16,7 @@
 define([
   "pentaho/lang/Event",
   "../mixins/mixinDataFilter",
-  "../mixins/mixinError",
+  "pentaho/lang/mixins/mixinError",
   "pentaho/util/error"
 ], function(Event, mixinDataFilter, mixinError, utilError) {
   "use strict";

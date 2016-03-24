@@ -34,8 +34,8 @@ define([
    * @extends pentaho.lang.Event
    * @event "rejected:change"
    */
-  return Event.extend("pentaho.lang.events.RejectChange",
-    /** @lends pentaho.lang.events.RejectChange# */{
+  return Event.extend("pentaho.lang.events.RejectedChange",
+    /** @lends pentaho.lang.events.RejectedChange# */{
 
       /**
        * Creates a `RejectedChange` event.
