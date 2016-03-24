@@ -355,17 +355,24 @@ define([
           var pType = this.type.get(name),
             value0 = this._values[pType.name];
 
+          var changeset;
           if(pType.isList) {
             value0.set(valueSpec);
-            return ActionResult.fulfill(value0);
+            changeset = new ComplexChangeset(this);
+            //TODO: add operation to changeset
           } else {
             var value1 = pType.toValue(valueSpec);
             if(!pType.type.areEqual(value0, value1)) {
-              var changeset = new ComplexChangeset(this);
-              changeset.set(name, valueSpec);
-              var will = new WillChange(this, changeset);
-              return this._doAction(this._setAction, will, DidChange, RejectedChange);
+              changeset = new ComplexChangeset(this);
+              changeset._setValueChange(name, value1, value0);
             }
+          }
+
+          if(changeset){
+            var will = new WillChange(this, changeset);
+            return this._doAction(this._setAction, will, DidChange, RejectedChange);
+          } else {
+            return ActionResult.reject(new UserError("Nothing to do"));
           }
         },
 
@@ -388,20 +395,29 @@ define([
             var name = propertyNames[k];
             var pType = this.type.get(name);
 
-            var currentValue = this._values[name];
-            var oldValue = changeset.get(name).oldValue;
-            if(!pType.isList && !pType.type.areEqual(currentValue, oldValue))
-              return ActionResult.reject(new UserError("Mismatching values"));
+            if(pType.isList) {
+              //TODO: look for reasons why a property that is a list could cancel the whole changeset
+            } else {
+              var currentValue = this._values[name];
+              var oldValue = changeset.get(name).oldValue;
+              if(!pType.type.areEqual(currentValue, oldValue))
+                return ActionResult.reject(new UserError("Mismatching values"));
+            }
           }
 
           // Second sweep: modify the values
           changeset.each(function(prop, name) {
-            var pType = this.type.get(name),
-              value0 = this._values[pType.name],
-              value1 = pType.toValue(prop.newValue);
-            //TODO: confirm if it's worth having this if
-            if(!pType.type.areEqual(value0, value1)) {
-              this._values[name] = value1;
+            var pType = this.type.get(name);
+
+            if(pType.isList) {
+              //TODO: handle the changes on a list property in a later story
+            } else {
+              var value0 = this._values[pType.name];
+              var value1 = pType.toValue(prop.newValue);
+              //TODO: confirm if it's worth having this if (setting a property isn't that expensive)
+              if(!pType.type.areEqual(value0, value1)) {
+                this._values[name] = value1;
+              }
             }
           }, this);
 

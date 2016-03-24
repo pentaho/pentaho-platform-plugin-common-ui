@@ -26,6 +26,8 @@ define([
       this.model.set("doExecute", this._googleSearch.bind(this));
       this.model.on("will:execute", this._onWillExecute.bind(this));
       this.model.on("will:change", this._onWillChange.bind(this));
+
+      this._renderCounter = 0;
     },
 
     // Temporary. Used for demo of BACKLOG-5985
@@ -82,6 +84,7 @@ define([
     _hackedRender: function() {
       this._selectionChanged(this.model.getv("selectionFilter"), new filter.Or());
       this._chart.renderInteractive();
+      this._renderCounter++;
     },
 
     _onWillChange: function(event) {
