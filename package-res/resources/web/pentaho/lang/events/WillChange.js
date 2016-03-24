@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 define([
-  "../Event",
-  "../ChangeSet"
-], function(Event, ChangeSet) {
+  "../Event"
+], function(Event) {
   "use strict";
 
   /**
@@ -35,25 +34,20 @@ define([
   return Event.extend("pentaho.visual.base.events.WillChange",
     /** @lends pentaho.visual.base.events.WillChange# */{
 
-      constructor: function(source, property, value, previousValue) {
+      constructor: function(source, changeset) {
         this.base("will:change", source, true);
 
-        this.property = property; // temp
-        this.value = value;
-        this.previousValue = previousValue;
+        this.property = "prop"; // temp
+        this.value = "v";
+        this.previousValue = "o";
 
-        var changeSet = property instanceof ChangeSet ? property : new ChangeSet(property, value, previousValue);
-        this._changeSets = [changeSet];
+        //var changeSet = property instanceof ChangeSet ? property : new ChangeSet(property, value, previousValue);
+        this._changeset = changeset;
       },
 
-      get changeSet() {
-        return this._changeSets[0];
-      },
-
-      get changeSets() {
-        return this._changeSets;
+      get changeset() {
+        return this._changeset;
       }
-      
     },{
       get type() {
         return "will:change";

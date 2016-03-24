@@ -16,12 +16,11 @@
 
 define([
   "./Base",
-  "../type/Context",
   "../util/object"
-], function(Base, context, O) {
+], function(Base, O) {
 
-  var Complex = context.get("pentaho/type/complex");
-  
+  "use strict";
+
   return Base.extend("pentaho.lang.ComplexChange", {
 
     constructor: function(source) {
@@ -39,27 +38,44 @@ define([
 
     set: function(property, change) {
       var source = this._source;
+      var pType = source.type.get(property);
 
-      if(source instanceof Complex) {
-        var ptype = source.type.get(property);
+      var propertyChange = pType.isList ? createListChange(source, property, change) : createValueChange(source, property, change);
 
-        if(!ptype.isList)
-          change = {type: "set", oldValue: source.getv(property), newValue: change};
-
-      }
-      
-      this._properties[property] = change;
+      this._properties[property] = propertyChange;
+      //TODO: decide if this should be chainable
     },
-    
+
     get: function(property) {
       if(!this.has(property)) return null;
 
       return this._properties[property];
     },
 
-    propertyNames: function() {
+    get propertyNames() {
       return Object.keys(this._properties);
+    },
+
+    each: function(iterator, context){
+      var iteratorContext = context || this;
+      this.propertyNames.forEach(function(name){
+        iterator.call(iteratorContext, this.get(name), name);
+      }, this);
+      //TODO: decide if this should be chainable
     }
   });
+
+
+  function createValueChange(source, property, value) {
+    return {
+      get type() { return "set"; },
+      get oldValue() { return source.get(property); },
+      newValue: value
+    };
+  }
+
+  function createListChange(source, property, change) {
+    return {};
+  }
 
 });

@@ -21,25 +21,14 @@ define([
 
   return Event.extend("pentaho.lang.events.DidChange",
     /** @lends pentaho.lang.events.DidChange# */{
-      constructor: function(source, value, will) {
-        if(!will) throw utilError.argRequired("will");
-
+      constructor: function(source, changeset) {
         this.base("did:change", source, false);
-        this._property = will.property;
-        this._value = value;
-        this._previousValue = will.previousValue;
-        this.changeSet = will.changeSet;
+        this._changeset = changeset;
       },
-      get property(){
-        return this._property;
-      },
-      get value(){
-        return this._value;
-      },
-      get previousValue(){
-        return this._previousValue;
+      get changeset() {
+        return this._changeset;
       }
-    },{
+    }, {
       get type() {
         return "did:change";
       }
