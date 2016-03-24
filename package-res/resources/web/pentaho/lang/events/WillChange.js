@@ -14,39 +14,50 @@
  * limitations under the License.
  */
 define([
-  "../Event"
-], function(Event) {
+  "../Event",
+  "../mixins/mixinChangeset"
+], function(Event, mixinChangeset) {
   "use strict";
 
   /**
    * @name WillChange
-   * @memberOf pentaho.visual.base.events
-   * @description This event is triggered by
-   * the {@link pentaho.visual.base.Model#selectAction|Select Action} flow.
-   * The listeners of `will:change:selectionFilter` are allowed to:
+   * @memberOf pentaho.lang.events
+   * @description This event is triggered when a property value is changed in the model.
+   * The listeners of `will:change` are allowed to:
    * - cancel the event
-   * - replace the input data filter
+   * - make changes to the changeset
    *
    * @extends pentaho.lang.Event
    * @event "will:change"
    */
+  return Event.extend("pentaho.lang.events.WillChange",
+    /** @lends pentaho.lang.events.WillChange# */{
 
-  return Event.extend("pentaho.visual.base.events.WillChange",
-    /** @lends pentaho.visual.base.events.WillChange# */{
-
+      /**
+       * Creates a `WillExecute` event.
+       *
+       * @constructor
+       *
+       * @param {!Object} source - The object where the event will be initially emitted.
+       * @param {!pentaho.lang.ComplexChangeset|*} changeset - A changeset representing the changes made to the properties values.
+       */
       constructor: function(source, changeset) {
         this.base("will:change", source, true);
-
-        this._changeset = changeset;
-      },
-
-      get changeset() {
-        return this._changeset;
+        this._initChangeset(changeset);
       }
     },{
+
+      /**
+       * Gets the event type.
+       *
+       * @type !string
+       * @readonly
+       *
+       * @static
+       */
       get type() {
         return "will:change";
       }
-    });
+    }).implement(mixinChangeset);
 
 });

@@ -54,17 +54,33 @@ define([
         this.selectionMode = selectionMode;
       },
 
-      set selectionMode(f) {
-        if(f != null && typeof f !== "function") {
-          throw error.argInvalidType("selectionMode", "function", typeof f);
+      /**
+       * Gets or sets the selection mode that will be used to handle the user selection.
+       *
+       * @type ?function
+       *
+       * @throws {pentaho.lang.ArgumentInvalidTypeError} When `mode` is not a `function`.
+       */
+      set selectionMode(mode) {
+        if(mode != null && typeof mode !== "function") {
+          throw error.argInvalidType("selectionMode", "function", typeof mode);
         }
-        this._selectionMode = f;
+        this._selectionMode = mode;
       },
 
       get selectionMode() {
         return this._selectionMode;
       }
     },{
+
+      /**
+       * Gets the event type.
+       *
+       * @type !string
+       * @readonly
+       *
+       * @static
+       */
       get type() {
         return "will:select";
       }

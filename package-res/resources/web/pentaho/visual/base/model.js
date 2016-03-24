@@ -137,7 +137,7 @@ define([
         /**
          * Executes an action when the user interacts with a visual element, normally by double clicking it.
          *
-         * The flow starts by triggering the event {@link pentaho.visual.base.events.WillExecute|will:execute}.
+         * The flow starts by triggering the event {@link pentaho.visual.base.events.WillExecute|"will:execute"}.
          * Its event listeners can be attributed a _priority_
          * and can be regarded as operations in a processing pipeline that are allowed to:
          * - cancel the event
@@ -145,7 +145,7 @@ define([
          * - change the [doExecute]{@link pentaho.visual.base.Model.Meta} action
          *
          * Any failure (due to an event cancellation or due to an invalid `doExecute` action)
-         * triggers the event {@link pentaho.visual.base.events.RejectedSelect|rejected:execute}.
+         * triggers the event {@link pentaho.visual.base.events.RejectedSelect|"rejected:execute"}.
          *
          * @param {!pentaho.data.filter.AbstractFilter} inputDataFilter - A filter representing the data set of
          * the visual element which the user interacted with.

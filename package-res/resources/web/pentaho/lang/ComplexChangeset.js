@@ -16,35 +16,130 @@
 
 define([
   "./Base",
-  "../util/object"
-], function(Base, O) {
-
+  "../util/object",
+  "../util/error"
+], function(Base, O, error) {
   "use strict";
 
-  return Base.extend("pentaho.lang.ComplexChangeset", {
+  /**
+   * @classDesc An `ComplexChangeset` represents a collection of `property` to `change` pairs.
+   *
+   * ### `ComplexChangeset` Property Key
+   * A `ComplexChangeset` property key is the name of a complex's `property` that had its value changed.
+   *
+   * ### `ComplexChangeset` Change Object
+   * A `ComplexChangeset` `change` object is the object representing the change made to a `property`.
+   *
+   * @name ComplexChangeset
+   * @memberOf pentaho.lang
+   *
+   * @amd pentaho/lang/ComplexChangeset
+   * @class
+   * @extends pentaho.lang.Base
+   */
+  return Base.extend("pentaho.lang.ComplexChangeset", /** @lend pentaho.lang.ComplexChangeset#*/{
 
+    /**
+     * Creates a `ComplexChangeset` with a given source.
+     *
+     * @constructor
+     *
+     * @param {!pentaho.type.complex} source - The complex where the change occurred.
+     */
     constructor: function(source) {
+      if(!source) throw error.argRequired("source");
+
       this._source = source;
       this._properties = {};
     },
 
+    /**
+     * Gets the complex where the change occurred.
+     *
+     * @type !pentaho.lang.ComplexChangeset
+     * @readonly
+     */
     get source() {
       return this._source;
     },
 
+    /**
+     * Determines if the `ComplexChangeset` contains the specified property.
+     *
+     * @param {string} property - The property name.
+     *
+     * @returns {!boolean} True if the `property` exists, false otherwise.
+     */
     has: function(property) {
       return O.hasOwn(this._properties, property);
     },
 
-    set: function(propertyName, valueSpec) {
-      var pType = this.source.type.get(propertyName);
-      if(pType.isList) {
+    /**
+     * Sets a new `property` to `change` pair if none exists,
+     * otherwise updates it.
+     *
+     * @param {!string} property - The property name.
+     * @param {any?} valueSpec - A object representing a property change.
+     */
+    set: function(property, valueSpec) {
+      if(!property) throw error.argRequired("property");
 
+      var pType = this.source.type.get(property);
+      if(pType.isList) {
+        //does nothing for now
       } else {
-        this._setValueChange(propertyName, pType.toValue(valueSpec));
+        this._setValueChange(property, pType.toValue(valueSpec));
       }
     },
 
+    /**
+     * Gets the change object mapped to the specified property.
+     *
+     * @param {string} property - The property name.
+     *
+     * @returns {?ComplexChangeset|*} The change object,
+     * or null when the `ComplexChangeset` does not contain the given `property`.
+     */
+    get: function(property) {
+      if(!this.has(property)) return null;
+
+      return this._properties[property];
+    },
+
+    /**
+     * Gets an array with all the property names contained in the `ComplexChangeset`.
+     *
+     * @type !Array
+     * @readonly
+     */
+    get propertyNames() {
+      return Object.keys(this._properties);
+    },
+
+    /**
+     * Executes a provided function once per `ComplexChangeset` property.
+     *
+     * @param {!function} iterator - Function to execute for each `ComplexChangeset` property, that takes two arguments:
+     *  - _change_: The change object of a property
+     *  - _propertyName_: The property name
+     * @param {any?} [context=this] - The object to use as this when executing the `iterator`.
+     */
+    each: function(iterator, context) {
+      var iteratorContext = context || this;
+      this.propertyNames.forEach(function(name) {
+        iterator.call(iteratorContext, this.get(name), name);
+      }, this);
+      //TODO: decide if this should be chainable
+    },
+
+    /**
+     * Sets a new `change` that represents a property which changed value.
+     *
+     * @param {!string} property - The property name.
+     * @param {any?} newValue - The change candidate value.
+     * @param {any?} [oldValue] - The original value.
+     * @private
+     */
     _setValueChange: function(property, newValue, oldValue) {
       var prop = this._properties[property];
 
@@ -57,24 +152,6 @@ define([
       }
 
       prop.newValue = newValue;
-    },
-
-    get: function(property) {
-      if(!this.has(property)) return null;
-
-      return this._properties[property];
-    },
-
-    get propertyNames() {
-      return Object.keys(this._properties);
-    },
-
-    each: function(iterator, context) {
-      var iteratorContext = context || this;
-      this.propertyNames.forEach(function(name) {
-        iterator.call(iteratorContext, this.get(name), name);
-      }, this);
-      //TODO: decide if this should be chainable
     }
   });
 

@@ -15,30 +15,59 @@
  */
 define([
   "../Event",
+  "../mixins/mixinChangeset",
+  "../mixins/mixinError",
   "../../util/error"
-], function(Event, utilError) {
+], function(Event, mixinChangeset, mixinError, utilError) {
   "use strict";
 
-  return Event.extend("pentaho.visual.base.events.RejectChange",
-    /** @lends pentaho.visual.base.events.RejectChange# */{
+  /**
+   * @name RejectedChange
+   * @memberOf pentaho.lang.events
+   * @description This event is triggered when any failure occurs while changing
+   * properties values with {@link pentaho.type.complex#set|complex.set}.
+   *
+   * Those failures can be one of the following:
+   *  - The event {@link pentaho.lang.events.WillChange|"will:change"} was canceled.
+   *  - A property value changes while processing the listeners of {@link pentaho.lang.events.WillChange|"will:change"}.
+   *
+   * @extends pentaho.lang.Event
+   * @event "rejected:change"
+   */
+  return Event.extend("pentaho.lang.events.RejectChange",
+    /** @lends pentaho.lang.events.RejectChange# */{
+
+      /**
+       * Creates a `RejectedChange` event.
+       *
+       * @constructor
+       *
+       * @param {!Object} source - The object where the event will be initially emitted.
+       * @param {!Error|pentaho.lang.UserError} error - The error of a rejected {@link pentaho.lang.ActionResult|ActionResult}.
+       * @param {?pentaho.visual.base.events.WillSelect} will - The "will:change" event object.
+       */
       constructor: function(source, error, will) {
-        if(!error) throw utilError.argRequired("error");
         if(!will) throw utilError.argRequired("will");
 
         this.base("rejected:change", source, false);
-        this._error = error;
-        this._changeset = will.changeset;
-      },
-      get changeset() {
-        return this._changeset;
-      },
-      get error() {
-        return this._error;
+        this._initChangeset(will.changeset);
+        this._initError(error);
       }
     }, {
+
+      /**
+       * Gets the event type.
+       *
+       * @type !string
+       * @readonly
+       *
+       * @static
+       */
       get type() {
         return "rejected:change";
       }
-    });
+
+    }).implement(mixinChangeset)
+      .implement(mixinError);
 
 });
