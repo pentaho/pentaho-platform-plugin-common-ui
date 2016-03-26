@@ -131,6 +131,18 @@ define([
         }).toThrow(errorMatch.operInvalid());
       });
 
+      it("should throw if given a type embedded instance spec", function() {
+        expect(function() {
+          Refinement.extend({
+            type: {
+              of: MySimple.type,
+              facets: [Facet],
+              instance: {}
+            }
+          });
+        }).toThrow(errorMatch.operInvalid());
+      });
+
       it("should allow to further extend a refinement type", function() {
         var R1 = Refinement.extend({
           type: {

@@ -32,7 +32,7 @@ define([
     var MySimple = Simple.extend();
 
     describe("#validate(value) -", function() {
-      it("should call #is(value) and value.type._validate(value)", function() {
+      it("should call #is(value) and value.validate()", function() {
         var MyRefinement = Refinement.extend({
           type: {
             of: MySimple.type
@@ -43,13 +43,12 @@ define([
 
         spyOn(MyRefinement.type, "is").and.callThrough();
         spyOn(MyRefinement.type, "validateInstance").and.callThrough();
-
-        spyOn(MySimple.type, "_validate").and.callThrough();
+        spyOn(value, "validate").and.callThrough();
 
         MyRefinement.type.validate(value);
 
         expect(MyRefinement.type.is.calls.count()).toBe(1);
-        expect(MySimple.type._validate.calls.count()).toBe(1);
+        expect(value.validate.calls.count()).toBe(1);
       });
 
       it("should return immediately if base validation fails", function() {
@@ -67,14 +66,14 @@ define([
         var value = new MySimple(123);
 
         spyOn(Refinement.type, "_validateFacets").and.callThrough();
-        spyOn(MySimple.type, "_validate").and.returnValue(new Error());
+        spyOn(value, "validate").and.returnValue([new Error()]);
         spyOn(Facet, "validate").and.callThrough();
 
         var result = MyRefinement.type.validate(value);
 
         expect(result instanceof Array).toBe(true);
         expect(result.length).toBe(1);
-        expect(MySimple.type._validate).toHaveBeenCalled();
+        expect(value.validate).toHaveBeenCalled();
         expect(Refinement.type._validateFacets).not.toHaveBeenCalled();
         expect(Facet.validate).not.toHaveBeenCalled();
       });

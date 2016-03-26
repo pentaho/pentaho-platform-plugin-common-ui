@@ -551,6 +551,33 @@ define([
       },
       //endregion
 
+
+      //region validation
+      //@override
+      /**
+       * Determines if this list value is a **valid instance** of its type.
+       *
+       * The default implementation validates each element against the
+       * list's [element type]{@link pentaho.type.List.Type#of}
+       * and collects and returns any reported errors.
+       * Override to complement with a type's specific validation logic.
+       *
+       * You can use the error utilities in {@link pentaho.type.valueHelper} to
+       * help in the implementation.
+       *
+       * @return {?Array.<!Error>} A non-empty array of `Error` or `null`.
+       *
+       * @see pentaho.type.Value#isValid
+       */
+      validate: function() {
+        var elemType = this.type.of;
+
+        return this._elems.reduce(function(errors, elem) {
+          return valueHelper.combineErrors(errors, elemType.validateInstance(elem));
+        }, null);
+      },
+      //endregion
+
       //region serialization
       /**
        * @inheritdoc
@@ -661,38 +688,7 @@ define([
 
           // Mark set locally even if it is the same...
           this._elemType = elemType;
-        },
-        //endregion
 
-        //region validation
-        //@override
-        /**
-         * Determines if a list value that
-         * _is an instance of this type_
-         * is also a **valid instance** of _this_ type.
-         *
-         * Thus, `this.is(value)` must be true.
-         *
-         * The default implementation validates each element against the
-         * list's [element type]{@link pentaho.type.List.Type#of}
-         * and collects and returns any reported errors.
-         *
-         * @param {!pentaho.type.List} value The list value to validate.
-         *
-         * @return {Nully|Error|Array.<!Error>} An `Error`, a non-empty array of `Error` or a `Nully` value.
-         *
-         * @protected
-         * @overridable
-         *
-         * @see pentaho.type.Value.Type#validate
-         * @see pentaho.type.Value.Type#validateInstance
-         */
-        _validate: function(value) {
-          var elemType = this.of;
-
-          return value._elems.reduce(function(errors, elem) {
-            return valueHelper.combineErrors(errors, elemType.validateInstance(elem));
-          }.bind(this), null);
         }
         //endregion
       }

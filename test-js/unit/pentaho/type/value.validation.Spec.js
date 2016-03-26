@@ -27,6 +27,28 @@ define([
       PentahoNumber = context.get("pentaho/type/number");
 
   describe("pentaho.type.Value -", function() {
+    describe("#validate()", function() {
+      it("should return null", function() {
+        var va = new Value();
+        expect(va.validate()).toBe(null);
+      });
+
+      it("should be overridable using {type: {instance: {}}", function() {
+        var Derived = Value.extend({
+          type: {
+            instance: {
+              validate: function() {
+                return [new Error("Foo")];
+              }
+            }
+          }
+        });
+
+        var d = new Derived();
+        expect(d.validate()[0].message).toBe("Foo");
+      });
+    }); // #validate
+
     describe("#isValid -", function() {
       it("should call #validate()", function() {
         var va = new Value();
@@ -107,7 +129,7 @@ define([
           .toBe(bundle.format(bundle.structured.errors.value.notOfType, [PentahoNumber.type.label]));
       });
 
-      it("should call the validateInstance method with the value when it is an instance of the exact same type",
+      it("should call the validateInstance method with the value when it is an instance of the type",
           function() {
         spyOn(Value.type, "validateInstance").and.callThrough();
 
@@ -117,29 +139,7 @@ define([
         expect(Value.type.validateInstance).toHaveBeenCalledWith(value);
       });
 
-      it("should call the value type's _validate method with the value when it is an instance of the type", function() {
-        var value = new PentahoNumber(1);
-
-        spyOn(Value.type, "validateInstance").and.callThrough();
-        spyOn(value, "validate").and.callThrough();
-        spyOn(PentahoNumber.type, "_validate").and.callThrough();
-
-        Value.type.validate(value);
-
-        expect(Value.type.validateInstance).toHaveBeenCalledWith(value);
-        expect(value.validate).toHaveBeenCalled();
-        expect(PentahoNumber.type._validate).toHaveBeenCalledWith(value);
-      });
-
-      it("should convert an error returned by the _validate method to an array of errors", function() {
-        var value = new Value();
-        var error = new Error();
-        spyOn(Value.type, "_validate").and.returnValue(error);
-        var errors = Value.type.validate(value);
-        expect(errors).toEqual([error]);
-      });
-
-      it("should return an error array returned by the validate method", function() {
+      it("should return an error array returned by the validateInstance method", function() {
         var value = new Value();
         var errors = [new Error()];
         spyOn(Value.type, "validateInstance").and.returnValue(errors);
