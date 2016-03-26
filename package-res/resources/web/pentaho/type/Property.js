@@ -493,7 +493,7 @@ define([
        * @param {pentaho.type.Complex} owner The complex value that owns the property.
        * @return {?Array.<!Error>} A non-empty array of `Error` or `null`.
        *
-       * @see pentaho.type.Complex.Type#_validate
+       * @see pentaho.type.Complex#validate
        */
       validate: function(owner) {
         var errors = null;

@@ -133,8 +133,8 @@ define([
      *
      * There are two ways to specify the additional validation constraints of a refinement type:
      *
-     * 1. Override the [_validate]{@link pentaho.type.Refinement.Type#_validate} method
-     *    and perform arbitrary validation
+     * 1. Override the [validateInstance]{@link pentaho.type.Refinement.Type#validateInstance} method
+     *    and perform arbitrary validation.
      * 2. Mix any number of **refinement facets** into the refinement type,
      *    using property [facets]{@link pentaho.type.Refinement.Type#facets},
      *    and specify the configuration attributes these define.
@@ -146,7 +146,7 @@ define([
      * ### Examples
      *
      * In the following example,
-     * the refinement type `PositiveNumber` is defined using the `_validate` method:
+     * the refinement type `PositiveNumber` is defined using the `validateInstance` method:
      *
      * ```js
      * define(["module"], function(module) {
@@ -164,9 +164,12 @@ define([
      *         id: module.id,
      *         label: "Positive number",
      *
-     *         _validate: function(num) {
-     *           if(num <= 0)
-     *             return [new Error("Not a positive number.")];
+     *         validateInstance: function(num) {
+     *           var errors = this.base(num);
+     *           if(!errors) {
+     *             if(num <= 0) errors = [new Error("Not a positive number.")];
+     *           }
+     *           return errors;
      *         }
      *       }
      *     });
@@ -572,8 +575,6 @@ define([
         },
 
         //region validation
-
-        //@override
         /**
          * Determines if a value,
          * that _is an instance of this type_,
@@ -583,49 +584,20 @@ define([
          *
          * The default implementation calls `value.validate()` and,
          * if the latter returns no errors,
-         * additionally validates the value against this type's refinement conditions,
-         * by calling [_validate]{@link pentaho.type.Refinement.Type#_validate}.
+         * additionally validates the value against this type's refinement facets,
+         * by calling [_validateFacets]{@link pentaho.type.Refinement.Type#_validateFacets}.
          *
          * @param {!pentaho.type.Value} value The value to validate.
          *
          * @return {?Array.<!Error>} A non-empty array of `Error` or `null`.
          *
-         * @overridable
-         *
          * @see pentaho.type.Value#validate
-         * @see pentaho.type.Value.Type#validate
-         * @see pentaho.type.Refinement.Type#_validate
+         * @see pentaho.type.Refinement.Type#_validateFacets
          */
         validateInstance: function(value) {
           var errors = this.base(value);
           if(errors) return errors;
 
-          return valueHelper.normalizeErrors(this._validate(value));
-        },
-
-        //@override
-        /**
-         * Determines if a value that
-         * _is an instance of this type_ and
-         * _a valid instance of its actual type_
-         * is also a **valid instance** of this refinement type.
-         *
-         * Thus, `this.is(value)` and `value.type.isValid(value)` must be true.
-         *
-         * The default implementation validates `value` against
-         * registered refinement facets.
-         *
-         * @param {!pentaho.type.Value} value The value to validate.
-         *
-         * @return {Nully|Error|Array.<!Error>} An `Error`, a non-empty array of `Error` or a `Nully` value.
-         *
-         * @protected
-         * @overridable
-         *
-         * @see pentaho.type.Value.Type#validate
-         * @see pentaho.type.Refinement.Type#validateInstance
-         */
-        _validate: function(value) {
           return this._validateFacets(value);
         },
 
@@ -641,7 +613,7 @@ define([
          * is called and any reported errors collected.
          *
          * This method is called by the default implementation of
-         * [_validate]{@link pentaho.type.Refinement.Type#_validate}.
+         * [validateInstance]{@link pentaho.type.Refinement.Type#validateInstance}.
          * It is provided just in case you need to override the latter implementation.
          *
          * @param {!pentaho.type.Value} value The value to validate.
@@ -649,7 +621,6 @@ define([
          * @return {?Array.<!Error>} An array of `Error` or `null`.
          *
          * @protected
-         * @ignore
          */
         _validateFacets: function(value) {
           return this.facets.reduce(function(errors, Facet) {
@@ -662,9 +633,16 @@ define([
       _extend: function(name, instSpec) {
 
         // Refinement types cannot specify any instance property.
-        for(var p in instSpec) // nully tolerant
-          if(p !== "type")
+        if(instSpec) {
+          for(var p in instSpec)
+            if(p !== "type")
+              throw error.operInvalid(bundle.structured.errors.refinement.cannotExtendInstance);
+
+          var typeSpec = instSpec.type;
+          if(typeSpec && typeSpec.instance)
             throw error.operInvalid(bundle.structured.errors.refinement.cannotExtendInstance);
+
+        }
 
         return this.base.apply(this, arguments);
       }

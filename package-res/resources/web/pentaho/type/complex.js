@@ -760,6 +760,35 @@ define([
       //endregion
       //endregion
 
+      //region validation
+      // @override
+      /**
+       * Determines if this complex value is a **valid instance** of its type.
+       *
+       * The default implementation
+       * validates each property's value against
+       * the property's [type]{@link pentaho.type.Property.Type#type}
+       * and collects and returns any reported errors.
+       * Override to complement with a type's specific validation logic.
+       *
+       * You can use the error utilities in {@link pentaho.type.valueHelper} to
+       * help in the implementation.
+       *
+       * @return {?Array.<!Error>} A non-empty array of `Error` or `null`.
+       *
+       * @see pentaho.type.Value#isValid
+       */
+      validate: function() {
+        var errors = null;
+
+        this.type.each(function(pType) {
+          errors = valueHelper.combineErrors(errors, pType.validate(this));
+        }, this);
+
+        return errors;
+      },
+      //endregion
+
       //region serialization
       /**
        * @inheritdoc
@@ -956,42 +985,7 @@ define([
           if(!Array.isArray(propTypeSpec)) propTypeSpec = [propTypeSpec];
           this._getProps().configure(propTypeSpec);
           return this;
-        },
-
-        //region validation
-        // @override
-        /**
-         * Determines if a complex value,
-         * that _is an instance of this type_,
-         * is also a **valid instance** of _this_ type.
-         *
-         * Thus, `this.is(value)` must be true.
-         *
-         * The default implementation
-         * validates each property's value against
-         * the property's [type]{@link pentaho.type.Property.Type#type}
-         * and collects and returns any reported errors.
-         *
-         * @see pentaho.type.Value.Type#validate
-         * @see pentaho.type.Value.Type#validateInstance
-         *
-         * @param {!pentaho.type.Complex} value The complex value to validate.
-         *
-         * @return {Nully|Error|Array.<!Error>} An `Error`, a non-empty array of `Error` or a `Nully` value.
-         *
-         * @protected
-         * @overridable
-         */
-        _validate: function(value) {
-          var errors = null;
-
-          this.each(function(pType) {
-            errors = valueHelper.combineErrors(errors, pType.validate(value));
-          }, this);
-
-          return errors;
         }
-        //endregion
       }
     })
     .implement(EventSource)

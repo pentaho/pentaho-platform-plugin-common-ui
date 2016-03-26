@@ -77,7 +77,7 @@ define([
       // Bind
       var instance = arg.required(keyArgs, "instance", "keyArgs");
       O.setConst(instance, "_type", this);
-      O.setConst(this, "instance",  instance);
+      O.setConst(this, "_instance", instance);
 
       if(arg.optional(keyArgs, "isRoot"))
         O.setConst(this, "root", this);
@@ -214,16 +214,24 @@ define([
     //endregion
 
     //region instance property
-    // Set on `Instance._extend`
     /**
      * Gets the _prototype_ of the instances of this type.
      *
-     * @name instance
-     * @memberOf pentaho.type.Type#
      * @type pentaho.type.Instance
      * @readOnly
-     * @see pentaho.type.Instance#type
      */
+    get instance() {
+      return this._instance;
+    },
+
+    // Supports Instance configuration only, from the type side.
+    // To be used in type specifications, to change the instance side.
+    // Not documented on purpose.
+    set instance(config) {
+      // Class.implement essentially just calls Class#extend.
+      if(config) this.instance.extend(config);
+    }, //jshint -W078
+    //endregion
     //endregion
 
     //region id property

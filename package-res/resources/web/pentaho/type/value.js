@@ -135,12 +135,18 @@ define([
       /**
        * Determines if this value is a **valid instance** of its type.
        *
+       * The default implementation does nothing and considers the instance valid.
+       * Override to implement a type's specific validation logic.
+       *
+       * You can use the error utilities in {@link pentaho.type.valueHelper} to
+       * help in the implementation.
+       *
        * @return {?Array.<!Error>} A non-empty array of `Error` or `null`.
        *
        * @see pentaho.type.Value#isValid
        */
       validate: function() {
-        return valueHelper.normalizeErrors(this.type._validate(this));
+        return null;
       },
       //endregion
 
@@ -562,13 +568,10 @@ define([
          * This method ensures that the value's actual type, `value.type`,
          * is called to validate it,
          * whatever the relation that this type has with the actual type.
+         * Specifically, [refinement types]{@link pentaho.type.Refinement}
+         * perform additional validations on values.
          *
-         * When this type is not a base type of the value's actual type,
-         * this type's `_validate` method should also be called to validate it.
-         * This is the case with [refinement types]{@link pentaho.type.Refinement}.
-         *
-         * The default implementation calls `value.validate()`
-         * (which in turns calls [_validate]{@link pentaho.type.Value.Type#_validate}).
+         * The default implementation calls `value.validate()`.
          *
          * @param {!pentaho.type.Value} value The value to validate.
          *
@@ -578,33 +581,9 @@ define([
          *
          * @see pentaho.type.Value#validate
          * @see pentaho.type.Value.Type#validate
-         * @see pentaho.type.Value.Type#_validate
          */
         validateInstance: function(value) {
           return value.validate();
-        },
-
-        /**
-         * Determines if a value,
-         * that _is an instance of this type_,
-         * is also a **valid instance** of _this_ type.
-         *
-         * Thus, `this.is(value)` must be true.
-         *
-         * The default implementation does nothing.
-         * Override to implement a type's specific validation logic.
-         *
-         * @param {!pentaho.type.Value} value The value to validate.
-         *
-         * @return {Nully|Error|Array.<!Error>} An `Error`, a non-empty array of `Error` or a `Nully` value.
-         *
-         * @protected
-         * @overridable
-         *
-         * @see pentaho.type.Value.Type#validate
-         * @see pentaho.type.Value.Type#validateInstance
-         */
-        _validate: function(value) {
         }
         //endregion
       }
