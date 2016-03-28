@@ -67,6 +67,26 @@ define(["pentaho/util/has"], function(has) {
     },
 
     /**
+     * Calls a function that uses a disposable resource.
+     *
+     * Returns the function result.
+     * The disposable resource is disposed before returning.
+     *
+     * @param {!pentaho.lang.IDisposable} disposable The disposable resource.
+     * @param {function(pentaho.lang.IDisposable):any} fun The function to call with the given resource.
+     * @param {Object} [context] The context in which to call `fun`.
+     *
+     * @return {any} The value returned by `fun`.
+     */
+    using: function(disposable, fun, context) {
+      try {
+        return fun.call(context, disposable);
+      } finally {
+        disposable.dispose();
+      }
+    },
+
+    /**
      * Determines if a property is a direct property of an object.
      *
      * This method does not check down the object's prototype chain.

@@ -566,5 +566,73 @@ define([
 
     }); //applyClass
 
+    describe("using(disposable, fun, context) -", function() {
+
+      it("should call the given function", function() {
+        var disposable = {dispose: function() {}};
+        var fun = jasmine.createSpy("funUsing");
+
+        O.using(disposable, fun);
+
+        expect(fun.calls.count()).toBe(1);
+      });
+
+      it("should call the given function with the given disposable object", function() {
+        var disposable = {dispose: function() {}};
+        var fun = jasmine.createSpy("funUsing");
+
+        O.using(disposable, fun);
+
+        expect(fun.calls.first().args[0]).toBe(disposable);
+      });
+
+      it("should call the given function with the given context object", function() {
+        var disposable = {dispose: function() {}};
+        var fun = jasmine.createSpy("funUsing");
+        var ctx = {};
+        O.using(disposable, fun, ctx);
+
+        expect(fun.calls.first().object).toBe(ctx);
+      });
+
+      it("should return the result of the given function", function() {
+        var result = {};
+        var disposable = {dispose: function() { }};
+        var fun = jasmine.createSpy("funUsing").and.returnValue(result);
+        var actual = O.using(disposable, fun);
+
+        expect(actual).toBe(result);
+      });
+
+      it("should call the dispose method of the given disposable", function() {
+        var disposable = {dispose: jasmine.createSpy("funDispose")};
+        var fun = function() {};
+        O.using(disposable, fun);
+
+        expect(disposable.dispose.calls.count()).toBe(1);
+      });
+
+      it("should call the dispose method of the given disposable when the given function throws", function() {
+        var disposable = {dispose: jasmine.createSpy("funDispose")};
+        var fun = function() { throw new Error(); };
+
+        try {
+          O.using(disposable, fun);
+        } catch(ex) {}
+
+        expect(disposable.dispose.calls.count()).toBe(1);
+      });
+
+      it("should throw the error thrown by the given function", function() {
+        var disposable = {dispose: jasmine.createSpy("funDispose")};
+        var error = new Error();
+        var fun = function() { throw error; };
+
+        expect(function() {
+          O.using(disposable, fun);
+        }).toThrow(error);
+      });
+    }); //using
+
   }); // pentaho.util.object
 });
