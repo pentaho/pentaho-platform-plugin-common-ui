@@ -240,6 +240,24 @@ define([
       if(domain && !domain.has(value.key))
         return new Error(bundle.structured.errors.value.notInDomain);
       return null;
+    },
+
+    fillSpecInContext: function(spec, keyArgs) {
+      if(!keyArgs) keyArgs = {};
+
+      // TODO: because _domain is created locally through the getter
+      // this code cannot detect whether there are actual changes locally
+      // and this will be serializing unchanged domain values.
+      // Guess doing it right would require maintaining a flag to indicate local change.
+      var any = false;
+      var domain = O.getOwn(this, "_domain");
+      if(domain) {
+        any = true;
+        keyArgs.includeType = false;
+        spec.domain = domain.toSpecInContext(keyArgs);
+      }
+
+      return any;
     }
   });
 });

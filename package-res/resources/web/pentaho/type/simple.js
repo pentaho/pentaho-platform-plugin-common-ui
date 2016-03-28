@@ -16,10 +16,12 @@
 define([
   "module",
   "./element",
+  "./valueHelper",
   "../util/object",
   "../util/error",
+  "../util/fun",
   "../i18n!types"
-], function(module, elemFactory, O, error, bundle) {
+], function(module, elemFactory, valueHelper, O, error, F, bundle) {
 
   "use strict";
 
@@ -247,17 +249,20 @@ define([
       },
       //endregion
 
-      toSpecInScope: function(scope, requireType, keyArgs) {
+      toSpecInContext: function(keyArgs) {
+        if(!keyArgs) keyArgs = {};
+
         var addFormatted = !keyArgs.omitFormatted && !!this._formatted;
+        var includeType = keyArgs.includeType;
 
         // Don't need a cell/object spec?
-        if(!(addFormatted || requireType))
+        if(!(addFormatted || includeType))
           return this._value;
 
         // Need one. Ensure _ is the first property
         /*jshint laxbreak:true*/
-        var spec = requireType
-            ? {_: this.type.toReference(scope, keyArgs), v: this._value}
+        var spec = includeType
+            ? {_: this.type.toRefInContext(keyArgs), v: this._value}
             : {v: this._value};
 
         if(addFormatted) spec.f = this._formatted;
@@ -326,6 +331,19 @@ define([
          */
         cast: function(value) {
           return value;
+        },
+        //endregion
+
+        //region serialization
+        _fillSpecInContext: function(spec, keyArgs) {
+
+          var any = this.base(spec, keyArgs);
+
+          if(!keyArgs.isJson) {
+            any = valueHelper.fillSpecMethodInContext(spec, this, "cast") || any;
+          }
+
+          return any;
         }
         //endregion
       }

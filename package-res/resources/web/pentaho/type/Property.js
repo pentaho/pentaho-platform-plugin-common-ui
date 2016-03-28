@@ -27,7 +27,9 @@ define([
 
   "use strict";
 
-  var _propType;
+  var _propType,
+      _dynamicAttrNames = ["isRequired", "countMin", "countMax", "isApplicable", "isReadOnly"];
+
   /**
    * @name pentaho.type.Property
    *
@@ -670,6 +672,65 @@ define([
         this[name + "Eval"] = function(owner) {
           return this[namePrivEval].call(owner);
         };
+      },
+      //endregion
+
+      //region serialization
+      toSpecInContext: function(keyArgs) {
+        // no id and no base
+        var valueTypeRef = this.type.toRefInContext(keyArgs);
+        var spec = {
+          name: this._name,
+          type: valueTypeRef
+        };
+
+        // If there are no attributes and it's of type "string",
+        // return only the name of the property type.
+        if(!this._fillSpecInContext(spec, keyArgs) && valueTypeRef === "string") {
+          return this._name;
+        }
+
+        return spec;
+      },
+
+      _fillSpecInContext: function(spec, keyArgs) {
+        var isJson = keyArgs.isJson;
+
+        var any = this.base(spec, keyArgs);
+
+        // Dynamic attributes
+        _dynamicAttrNames.forEach(function(name) {
+          var namePriv = "_" + name;
+
+          if(O.hasOwn(this, namePriv)) {
+            var value = this[namePriv];
+            if(F.is(value)) {
+              if(!isJson) {
+                any = true;
+                spec[name] = value.valueOf();
+              }
+            } else {
+              any = true;
+              spec[name] = value;
+            }
+          }
+        }, this);
+
+        // Custom attributes
+        var defaultValue = O.getOwn(this, "_value");
+        if(defaultValue !== undefined) {
+          any = true;
+          if(defaultValue) {
+            var valueType = this.type;
+            keyArgs.includeType = defaultValue.type !== (valueType.isRefinement ? valueType.of : valueType);
+
+            spec.value = defaultValue.toSpecInContext(keyArgs);
+          } else {
+            spec.value = null;
+          }
+        }
+
+        return any;
       }
       //endregion
     } // end instance type:

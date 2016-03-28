@@ -688,7 +688,7 @@ define([
       return this._getByInstCtor(InstCtor, sync, factoryUid);
     },
 
-    // Inline type spec: {[base: "complex", ] ... }
+    // Inline type spec: {[base: "complex"], [id: ]}
     _getByObjectSpec: function(typeSpec, sync) {
       if(typeSpec instanceof Type)
         return this._getByInstCtor(typeSpec.instance.constructor, sync);
@@ -696,10 +696,52 @@ define([
       if(typeSpec instanceof Instance)
         return this._error(error.argInvalid("typeRef", "Value instance is not supported."), sync);
 
-      var baseTypeSpec = typeSpec.base || _defaultBaseTypeMid,
-          resolveSync = (function() {
-              var BaseInstCtor = this._get(baseTypeSpec, /*sync:*/true),
-                  InstCtor = BaseInstCtor.extend({type: typeSpec});
+      // Because a base type is required (when null, it is defaulted)
+      // this means that the generic object spec cannot represent the root of type hierarchies:
+      // Instance, Value or Property...
+      var id = typeSpec.id;
+      if(id) id = toAbsTypeId(id);
+
+      /*
+       *  id      | base       | Result
+       *  --------+------------+--------------------
+       *  "value" | falsy      : base <- null
+       *  "value" | "anything" : throw error
+       *  falsy   | null       : id   <- "value"
+       *  "foo"   | falsy      : base <- "complex"
+       *  "foo"   | "anything" : ok
+       */
+      var baseTypeSpec = typeSpec.base;
+      if(baseTypeSpec === null) {
+        // must have no id or be "value"
+        if(id && id !== (_baseMid + "value"))
+          return this._error(
+              error.argInvalid("typeRef", "A type with a `null` base must be the root type `Value`."), sync);
+
+        id = "value";
+        // Already loaded, in constructor.
+      } else if(!baseTypeSpec) {
+        baseTypeSpec = _defaultBaseTypeMid;
+      }
+
+      var InstCtor;
+      // Already loaded?
+      if(id && (InstCtor = O.getOwn(this._byTypeId, id))) {
+        // TODO: Is this the best approach?
+        // Even for standard types?
+        InstCtor.implement(typeSpec);
+
+        return this._return(InstCtor, sync);
+      }
+
+      // assert baseTypeSpec
+
+      // if id and not loaded, the id is used later to register the new type under that id.
+
+      var resolveSync = (function() {
+              var BaseInstCtor = this._get(baseTypeSpec, /*sync:*/true);
+              var InstCtor = BaseInstCtor.extend({type: typeSpec});
+
               return this._getByInstCtor(InstCtor, /*sync:*/true);
             }).bind(this);
 

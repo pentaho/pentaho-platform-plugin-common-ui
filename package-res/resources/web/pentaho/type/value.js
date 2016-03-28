@@ -17,9 +17,10 @@ define([
   "module",
   "./Instance",
   "./valueHelper",
+  "./SpecificationContext",
   "../i18n!types",
   "../util/error"
-], function(module, Instance, valueHelper, bundle, error) {
+], function(module, Instance, valueHelper, SpecificationContext, bundle, error) {
 
   "use strict";
 
@@ -182,11 +183,12 @@ define([
 
       //region serialization
       /**
-       * Creates a top-level specification that describes this value.
+       * Creates a specification that describes this value.
        *
-       * This method creates a new {@link pentaho.type.SpecificationScope} for describing
-       * this value, and others it references,
-       * and then delegates the actual work to {@link pentaho.type.Instance#toSpecInScope}.
+       * If an [ambient specification context]{@link pentaho.type.SpecificationContext.current},
+       * currently exists, it is used to manage the serialization process.
+       * Otherwise, one is created and set as current.
+       * Then, the actual work is delegated to {@link pentaho.type.Instance#toSpecInContext}.
        *
        * @name pentaho.type.Value#toSpec
        * @method
@@ -572,13 +574,10 @@ define([
          *
          * Thus, `this.is(value)` must be true.
          *
-         * This method ensures that the value's actual type, `value.type`,
-         * is called to validate it,
-         * whatever the relation that this type has with the actual type.
-         * Specifically, [refinement types]{@link pentaho.type.Refinement}
-         * perform additional validations on values.
+         * The default implementation simply calls `value.validate()`.
          *
-         * The default implementation calls `value.validate()`.
+         * Special types, like [refinement types]{@link pentaho.type.Refinement},
+         * perform additional validations on values.
          *
          * @param {!pentaho.type.Value} value The value to validate.
          *
@@ -590,6 +589,57 @@ define([
          */
         validateInstance: function(value) {
           return value.validate();
+        },
+        //endregion
+
+        //region serialization
+        toSpecInContext: function(keyArgs) {
+          if(!keyArgs) keyArgs = {};
+
+          // The type's id or the temporary id in this scope.
+          var spec = {id: this.shortId || SpecificationContext.current.add(this)};
+
+          // The base type in the current type hierarchy.
+          // The default base type is "pentaho/type/complex".
+          var baseType = this.ancestor;
+          if(baseType) {
+            var baseRef = baseType.toRefInContext(keyArgs);
+            if(baseRef && baseRef !== "complex")
+              spec.base = baseRef;
+          } else {
+            // Value type itself
+            spec.base = null;
+          }
+
+          this._fillSpecInContext(spec, keyArgs);
+
+          return spec;
+        },
+
+        // Serializes the isAbstract attribute for non-refinement types
+        _fillSpecInContext: function(spec, keyArgs) {
+          var any = false;
+
+          if(!this.isRefinement && this.isAbstract) {
+            any = true;
+            spec.isAbstract = true;
+          }
+
+          if(!keyArgs.isJson) {
+            any = valueHelper.fillSpecMethodInContext(spec, this, "validateInstance") || any;
+
+            // Instance methods
+            var instSpec = {};
+            var instance = this.instance;
+            var instAny = valueHelper.fillSpecMethodInContext(instSpec, instance, "validate");
+
+            if(instAny) {
+              spec.instance = instSpec;
+              any = true;
+            }
+          }
+
+          return this.base(spec, keyArgs) || any;
         }
         //endregion
       }
