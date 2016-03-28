@@ -207,7 +207,6 @@ define([
        * The default implementation does nothing.
        *
        * @param {any} config The configuration.
-       * @override
        */
       _configure: function(config) {
         // Nothing configurable at this level
@@ -244,9 +243,6 @@ define([
       },
       //endregion
 
-      /**
-       * @inheritdoc
-       */
       toSpecInScope: function(scope, requireType, keyArgs) {
         var addFormatted = !keyArgs.omitFormatted && !!this._formatted;
 

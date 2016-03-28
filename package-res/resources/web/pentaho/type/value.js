@@ -577,8 +577,6 @@ define([
          *
          * @return {?Array.<!Error>} A non-empty array of `Error` or `null`.
          *
-         * @overridable
-         *
          * @see pentaho.type.Value#validate
          * @see pentaho.type.Value.Type#validate
          */

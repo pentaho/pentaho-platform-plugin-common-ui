@@ -410,6 +410,7 @@ define([
           throw error.operInvalid("Cannot change the default value of a property type that has descendants.");
 
         if(_ === undefined) {
+          /* istanbul ignore else : hard to test */
           if(this !== _propType) {
             // Clear local value. Inherit base value.
             delete this._value;

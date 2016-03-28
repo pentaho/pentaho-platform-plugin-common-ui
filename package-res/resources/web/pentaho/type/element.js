@@ -95,10 +95,13 @@ define([
         _format: undefined,
 
         get format() {
+          /* istanbul ignore next : not implemented method */
           return this._format;
         },
 
         set format(value) {
+          /* istanbul ignore next : not implemented method */
+
           if(value == null) {
             if(this !== _elemType) {
               delete this._format;
@@ -121,12 +124,12 @@ define([
         // Setting always sets the core.
         // Getting always gets the wrapper.
         get compare() {
+          /* istanbul ignore next : not implemented method */
           return compareTop;
         },
 
-        // NOTE: the argument cannot have the same name as the property setter
-        // or PhantomJS 1.9.8 will throw a syntax error...
         set compare(_) {
+          /* istanbul ignore next : not implemented method */
           this._compare = _ || compareCore;
         },
 
@@ -144,17 +147,21 @@ define([
 
   //region compare private methods
   // consistent with isEmpty and areEqual
+  /* istanbul ignore next : not implemented method */
   function compareTop(va, vb) {
     // Quick bailout test
     if(va ===  vb) return 0;
     if(va == null) return vb == null ? 0 : 1;
     if(vb == null) return -1;
+    /*jshint laxbreak:true*/
+    /*jshint validthis:true*/
     return (va.constructor === vb.constructor && va.equals(vb))
         ? 0
         : this._compare(va, vb);
   }
 
   // natural ascending comparer of non-equal, non-empty values
+  /* istanbul ignore next : not implemented method */
   function compareCore(va, vb) {
     return fun.compare(va, vb);
   }

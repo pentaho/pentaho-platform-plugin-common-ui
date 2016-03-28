@@ -790,9 +790,6 @@ define([
       //endregion
 
       //region serialization
-      /**
-       * @inheritdoc
-       */
       toSpecInScope: function(scope, requireType, keyArgs) {
         var spec;
 

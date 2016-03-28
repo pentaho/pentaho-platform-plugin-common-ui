@@ -377,7 +377,7 @@ define([
      * @rejects {pentaho.lang.ArgumentInvalidError} When `typeRef` is, or contains, an array-shorthand,
      * list type specification that has more than one child element type specification.
      *
-     * @rejects {Error} Any other, unexpected error occurs.
+     * @rejects {Error} When any other, unexpected error occurs.
      */
     getAsync: function(typeRef) {
       try {

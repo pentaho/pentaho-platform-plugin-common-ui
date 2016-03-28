@@ -55,6 +55,7 @@ define([
         }
       }
     }).implement({
+      //jshint -W069
       type: bundle.structured["date"]
     });
   };

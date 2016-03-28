@@ -229,6 +229,7 @@ define([
     // Not documented on purpose.
     set instance(config) {
       // Class.implement essentially just calls Class#extend.
+      /* istanbul ignore else: no comments */
       if(config) this.instance.extend(config);
     }, //jshint -W078
     //endregion
@@ -553,6 +554,7 @@ define([
      * @readonly
      */
     get inheritedStyleClasses() {
+      /* istanbul ignore next: not implemented yet */
       throw error.notImplemented("Implement me!");
     },
     //endregion

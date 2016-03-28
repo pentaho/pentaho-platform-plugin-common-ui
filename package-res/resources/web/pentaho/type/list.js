@@ -553,7 +553,6 @@ define([
 
 
       //region validation
-      //@override
       /**
        * Determines if this list value is a **valid instance** of its type.
        *
@@ -579,9 +578,6 @@ define([
       //endregion
 
       //region serialization
-      /**
-       * @inheritdoc
-       */
       toSpecInScope: function(scope, requireType, keyArgs) {
         var elemType = this.type.of;
         if(elemType.isRefinement) elemType = elemType.of;
@@ -616,7 +612,6 @@ define([
         styleClass: "pentaho-type-list",
 
         //region list property
-        //@override
         /**
          * Gets a value that indicates if this type is a list type.
          *
