@@ -15,18 +15,17 @@
  */
 
 /**
- * The `spec.IInstance` interface describes an instance using a generic, _object_ form.
+ * A `spec.UValue` represents the union of JS types that can be used to describe a value instance,
+ * or the absence of one.
  *
- * @name pentaho.type.spec.IInstance
+ * When a value instance is described using _object form_,
+ * its specification is of type [spec.IValue]{@link pentaho.type.spec.IValue}.
  *
- * @interface
+ * To describe an absent instance, use a {@link Nully} JavaScript value.
  *
- * @see pentaho.type.spec.UInstance
- */
-
-/**
- * An inline type reference of the value's type.
- * @name _
- * @memberOf pentaho.type.spec.IInstance#
- * @type {pentaho.type.spec.UTypeReference}
+ * @typedef {pentaho.type.spec.IValue|
+ *           pentaho.type.spec.UComplex|
+ *           pentaho.type.spec.USimple|
+ *           pentaho.type.spec.UList|
+ *           Nully} pentaho.type.spec.UValue
  */

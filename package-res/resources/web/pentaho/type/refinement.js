@@ -294,10 +294,18 @@ define([
         _facets: [],
 
         /**
-         * Gets the refinement facet classes that are mixed in this refinement type.
+         * Gets or sets the refinement facet classes
+         * that are mixed in this refinement type.
+         *
+         * Can be set to either refinement facet ids or classes,
+         * to add facets to the refinement type.
+         *
+         * The attributes defined by the added refinement facets become available for
+         * extension/configuration on the refinement type.
          *
          * @type Array.<pentaho.type.RefinementFacet>
-         * @readonly
+         *
+         * @see pentaho.type.spec.IRefinementTypeProto#facets
          */
         get facets() {
           return this._facets;
@@ -347,10 +355,15 @@ define([
         _of: null,
 
         /**
-         * Gets the representation type refined by this refinement type.
+         * Gets or sets the representation type refined by this refinement type.
+         *
+         * When set to a {@link Nully} value, an error is thrown.
+         *
+         * Must and can only be specified at a top-refinement type, upon definition.
          *
          * @type {!(pentaho.type.Element.Type|pentaho.type.List.Type)}
-         * @readonly
+         *
+         * @see pentaho.type.spec.IRefinementTypeProto#of
          */
         get of() {
           return this._of;
@@ -631,6 +644,26 @@ define([
         //endregion
       }
     }, /** @lends pentaho.type.Refinement */{
+      // override the documentation to specialize the argument types.
+      /**
+       * Creates a subtype of this one.
+       *
+       * For more information on class extension, in general,
+       * see {@link pentaho.lang.Base.extend}.
+       *
+       * @name extend
+       * @memberOf pentaho.type.Refinement
+       *
+       * @param {string} [name] The name of the created class. Used for debugging purposes.
+       * @param {{type: pentaho.type.spec.IRefinementTypeProto}} [instSpec] The refinement type specification.
+       * @param {Object} [classSpec] The static specification.
+       * @param {Object} [keyArgs] The keyword arguments.
+       *
+       * @return {!Class.<pentaho.type.Refinement>} The new refinement instance subclass.
+       *
+       * @see pentaho.lang.Value.extend
+       */
+
       _extend: function(name, instSpec) {
 
         // Refinement types cannot specify any instance property.

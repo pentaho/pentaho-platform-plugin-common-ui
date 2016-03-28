@@ -93,6 +93,10 @@ define([
      *
      * @constructor
      * @param {pentaho.type.spec.UComplex} [spec] A complex specification.
+     *
+     * @see pentaho.type.spec.IComplex
+     * @see pentaho.type.spec.IComplexProto
+     * @see pentaho.type.spec.IComplexTypeProto
      */
     var Complex = Element.extend("pentaho.type.Complex", /** @lends pentaho.type.Complex# */{
 
@@ -973,7 +977,7 @@ define([
         /**
          * Adds, overrides or configures properties to/of the complex type.
          *
-         * @param {pentaho.type.spec.IPropertyType|pentaho.type.spec.IPropertyType[]} propTypeSpec A property type
+         * @param {pentaho.type.spec.IPropertyTypeProto|pentaho.type.spec.IPropertyTypeProto[]} propTypeSpec A property type
          *   specification or an array of.
          *
          * @return {pentaho.type.Complex} This object.
@@ -989,6 +993,25 @@ define([
     .implement({
       type: bundle.structured.complex
     });
+
+    /**
+     * Creates a subtype of this one.
+     *
+     * For more information on class extension, in general,
+     * see {@link pentaho.lang.Base.extend}.
+     *
+     * @name extend
+     * @memberOf pentaho.type.Complex
+     *
+     * @param {string} [name] The name of the created class. Used for debugging purposes.
+     * @param {pentaho.type.spec.IComplexProto} [instSpec] The instance specification.
+     * @param {Object} [classSpec] The static specification.
+     * @param {Object} [keyArgs] The keyword arguments.
+     *
+     * @return {!Class.<pentaho.type.Complex>} The new complex instance subclass.
+     *
+     * @see pentaho.type.Value.extend
+     */
 
     return Complex;
   };

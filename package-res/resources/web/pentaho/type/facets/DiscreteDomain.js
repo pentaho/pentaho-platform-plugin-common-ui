@@ -34,6 +34,8 @@ define([
    * to a discrete set of its instances.
    *
    * @description The constructor is not used, as a mixin.
+   *
+   * @see pentaho.type.facets.spec.IDiscreteDomainTypeProto
    */
   return RefinementFacet.extend("pentaho.type.facets.DiscreteDomain", /** @lends pentaho.type.facets.DiscreteDomain# */{
 
@@ -46,7 +48,7 @@ define([
     _isDomainRoot: true,
 
     /**
-     * Gets the fixed domain of the type, if any, or `null`.
+     * Gets or sets the fixed domain of the type, if any, or `null`.
      *
      * The domain attribute refines a type to a set of discrete values
      * whose type is that of the representation type,
@@ -65,6 +67,8 @@ define([
      *
      * @throws {pentaho.lang.ArgumentInvalidError} When the specified values are not a subset of those
      * of the ancestor refinement type.
+     *
+     * @see pentaho.type.facets.spec.IDiscreteDomainTypeProto#domain
      */
     get domain() {
       var domain = O.getOwn(this, "_domain");

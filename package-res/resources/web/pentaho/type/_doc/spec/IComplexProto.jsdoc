@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,19 @@
  */
 
 /**
- * The `spec.IType` interface represents the specification of a type.
+ * The `spec.IComplexProto` interface represents the specification of the prototype of a complex type's instance class.
  *
- * @name pentaho.type.spec.IType
+ * @name pentaho.type.spec.IComplexProto
  * @interface
+ * @extends pentaho.type.spec.IValueProto
+ */
+
+/**
+ * The extensible/configurable members of the prototype of complex type classes.
  *
- * @property {string} [id] The id of the corresponding AMD module, if any.
+ * @name type
+ * @memberOf pentaho.type.spec.IComplexProto#
+ * @type {pentaho.type.spec.IComplexTypeProto}
+ *
+ * @see pentaho.type.spec.IComplexTypeProto#instance
  */
