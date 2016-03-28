@@ -40,16 +40,16 @@ define([
   return Base.extend("pentaho.lang.ComplexChangeset", /** @lend pentaho.lang.ComplexChangeset#*/{
 
     /**
-     * Creates a `ComplexChangeset` with a given source.
+     * Creates a `ComplexChangeset` with a given owner.
      *
      * @constructor
      *
-     * @param {!pentaho.type.complex} source - The complex where the change occurred.
+     * @param {!pentaho.type.complex} owner - The complex where the change occurred.
      */
-    constructor: function(source) {
-      if(!source) throw error.argRequired("source");
+    constructor: function(owner) {
+      if(!owner) throw error.argRequired("owner");
 
-      this._source = source;
+      this._owner = owner;
       this._properties = {};
     },
 
@@ -59,8 +59,8 @@ define([
      * @type !pentaho.lang.ComplexChangeset
      * @readonly
      */
-    get source() {
-      return this._source;
+    get owner() {
+      return this._owner;
     },
 
     /**
@@ -84,7 +84,7 @@ define([
     set: function(property, valueSpec) {
       if(!property) throw error.argRequired("property");
 
-      var pType = this.source.type.get(property);
+      var pType = this.owner.type.get(property);
       if(pType.isList) {
         //does nothing for now
       } else {
@@ -135,19 +135,19 @@ define([
     /**
      * Sets a new `change` that represents a property which changed value.
      *
-     * @param {!string} property - The property name.
+     * @param {!string} propertyName - The property name.
      * @param {any?} newValue - The change candidate value.
      * @param {any?} [oldValue] - The original value.
      * @private
      */
-    _setValueChange: function(property, newValue, oldValue) {
-      var prop = this._properties[property];
+    _setValueChange: function(propertyName, newValue, oldValue) {
+      var prop = this._properties[propertyName];
 
       if(!prop) {
-        prop = this._properties[property] = {};
+        prop = this._properties[propertyName] = {};
         O.setConst(prop, "type", "set");
 
-        var v0 = arguments.length > 2 ? oldValue : this.source.get(property);
+        var v0 = arguments.length > 2 ? oldValue : this.owner.get(propertyName);
         O.setConst(prop, "oldValue", v0);
       }
 

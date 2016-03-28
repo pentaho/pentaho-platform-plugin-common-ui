@@ -43,14 +43,14 @@ define([
        * @constructor
        *
        * @param {!Object} source - The object where the event will be initially emitted.
-       * @param {!Error|pentaho.lang.UserError} error - The error of a rejected {@link pentaho.lang.ActionResult|ActionResult}.
        * @param {?pentaho.visual.base.events.WillSelect} will - The "will:change" event object.
+       * @param {!Error|pentaho.lang.UserError} error - The error of a rejected {@link pentaho.lang.ActionResult|ActionResult}.
        */
-      constructor: function(source, error, will) {
-        if(!will) throw utilError.argRequired("will");
+      constructor: function(source, changeset, error) {
+        if(!changeset) throw utilError.argRequired("changeset");
 
         this.base("rejected:change", source, false);
-        this._initChangeset(will.changeset);
+        this._initChangeset(changeset);
         this._initError(error);
       }
     }, {

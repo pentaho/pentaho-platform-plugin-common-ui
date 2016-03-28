@@ -340,8 +340,6 @@ define([
         /**
          * Sets the value of a property.
          *
-         *
-         *
          * @param {nonEmptyString|!pentaho.type.Property.Type} name - The property name or type object.
          * @param {any?} [valueSpec=null] A value specification.
          *
@@ -358,8 +356,10 @@ define([
           var changeset;
           if(pType.isList) {
             value0.set(valueSpec);
-            changeset = new ComplexChangeset(this);
             //TODO: add operation to changeset
+            changeset = new ComplexChangeset(this);
+            //changeset._setListChange(name, value0, valueSpec);
+
           } else {
             var value1 = pType.toValue(valueSpec);
             if(!pType.type.areEqual(value0, value1)) {
@@ -368,24 +368,53 @@ define([
             }
           }
 
-          if(changeset){
-            var will = new WillChange(this, changeset);
-            return this._doAction(this._setAction, will, DidChange, RejectedChange);
-          } else {
-            return ActionResult.reject(new UserError("Nothing to do"));
+          if(changeset) {
+            var executionError = this._change(changeset);
+            if(executionError) return ActionResult.reject(executionError);
+            return ActionResult.fulfill(changeset);
           }
+          return ActionResult.reject(new UserError("Nothing to do"));
+
+        },
+
+        /**
+         * Orchestrates the will/did/rejected event loop around property changes.
+         *
+         * @param {pentaho.lang.ComplexChangeset} changeset - The set of changes.
+         *
+         * @return {?pentaho.lang.Base.Error} An error if the change loop was canceled or invalid,
+         * or `undefined` otherwise.
+         *
+         * @private
+         * @ignore
+         */
+        _change: function(changeset) {
+          var executionError = this._changeWill(changeset);
+          if(executionError) {
+            this._changeRejected(changeset, executionError);
+            return executionError;
+          }
+
+          executionError = this._changeDo(changeset);
+          if(executionError) {
+            this._changeRejected(changeset, executionError);
+            return executionError;
+          }
+          this._changeDid(changeset);
         },
 
         /**
          * Applies a set of changes to this object.
          *
-         * @param {pentaho.lang.events.WillChange} will - The "will" event containing the set of changes.
-         * @return {pentaho.lang.ActionResult}
+         * @param {pentaho.lang.ComplexChangeset} changeset - The set of changes.
+         *
+         * @return {?pentaho.lang.UserError} An error if the values of the properties to be changed
+         * do not match those declared in the `changeset` object, or `undefined` otherwise.
+         *
          * @private
          * @ignore
          */
-        _setAction: function(will) {
-          var changeset = will.changeset;
+        _changeDo: function(changeset) {
           Object.freeze(changeset);
 
           var propertyNames = changeset.propertyNames;
@@ -401,7 +430,7 @@ define([
               var currentValue = this._values[name];
               var oldValue = changeset.get(name).oldValue;
               if(!pType.type.areEqual(currentValue, oldValue))
-                return ActionResult.reject(new UserError("Mismatching values"));
+                return error.argRange("changeset"); //Mismatching values
             }
           }
 
@@ -420,36 +449,57 @@ define([
               }
             }
           }, this);
-
-          return ActionResult.fulfill(changeset);
         },
 
         /**
-         * Executes the will/did/rejected event loop associated with a given action.
+         * Emits the "will:change" event, if need be.
          *
-         * @param {function} coreAction - The action to be executed.
-         * @param {pentaho.visual.base.events.Will} will - The "will:" event object.
-         * @param {function} Did - The constructor of the "did:" event.
-         * @param {function} Rejected - The constructor of the "rejected:" event.
-         * @return {pentaho.lang.ActionResult} The result object.
-         * @protected
+         * @param {pentaho.lang.ComplexChangeset} changeset - The set of changes.
+         *
+         * @return {?pentaho.lang.Base.Error} An error if the change loop was canceled or invalid,
+         * or `undefined` otherwise.
+         *
+         * @private
+         * @ignore
          */
-        _doAction: function(coreAction, will, Did, Rejected) {
-          if(this._hasListeners(will.type))
-            this._emitSafe(will);
+        _changeWill: function(changeset) {
+          if(!this._hasListeners(WillChange.type)) return;
 
-          var result = will.isCanceled ? ActionResult.reject(will.cancelReason) : coreAction.call(this, will);
-
-          if(result.error) {
-            if(this._hasListeners(Rejected.type)) {
-              this._emitSafe(new Rejected(this, result.error, will));
-            }
-          } else {
-            if(this._hasListeners(Did.type)) {
-              this._emitSafe(new Did(this, result.value, will));
-            }
+          var will = new WillChange(this, changeset);
+          if(!this._emitSafe(will)) {
+            return will.cancelReason;
           }
-          return result;
+        },
+
+        /**
+         * Emits the "did:change" event, if need be.
+         *
+         * @param {pentaho.lang.ComplexChangeset} changeset - The set of changes.
+         *
+         * @private
+         * @ignore
+         */
+        _changeDid: function(changeset) {
+          if(!this._hasListeners(DidChange.type)) return;
+
+          var event = new DidChange(this, changeset);
+          this._emitSafe(event);
+        },
+
+        /**
+         * Emits the "will:change" event, if need be.
+         *
+         * @param {pentaho.lang.ComplexChangeset} changeset - The set of changes.
+         * @param {pentaho.lang.Base.Error} reason - The reason why the change loop was rejected.
+         *
+         * @private
+         * @ignore
+         */
+        _changeRejected: function(changeset, reason) {
+          if(!this._hasListeners(RejectedChange.type)) return;
+
+          var event = new RejectedChange(this, changeset, reason);
+          this._emitSafe(event);
         },
         //endregion
 

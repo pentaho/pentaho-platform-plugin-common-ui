@@ -32,7 +32,7 @@ define([
       var changeset,
         properties = ["foo", "bar"];
 
-      var source = {
+      var owner = {
         type: {
           get: function() {
             return {
@@ -45,19 +45,19 @@ define([
       };
 
       beforeEach(function() {
-        changeset = new ComplexChangeset(source);
+        changeset = new ComplexChangeset(owner);
         properties.forEach(function(prop, i) {
           changeset._setValueChange(prop, 10 + i, 5 + i);
         });
       });
 
-      describe("#source -", function() {
-        it("should return the same source that was passed to the constructor", function() {
-          expect(changeset.source).toBe(source);
+      describe("#owner -", function() {
+        it("should return the same owner that was passed to the constructor", function() {
+          expect(changeset.owner).toBe(owner);
         });
 
-        it("changeset source should be immutable", function() {
-          expect(function() { changeset.source = "foo"; }).toThrowError(TypeError);
+        it("changeset owner should be immutable", function() {
+          expect(function() { changeset.owner = "foo"; }).toThrowError(TypeError);
         })
       });
 

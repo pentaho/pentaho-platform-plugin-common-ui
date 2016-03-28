@@ -43,10 +43,10 @@ define([
       var event;
 
       var error = "no go!";
-      var will = {changeset: {}};
+      var changeset = {};
 
       beforeEach(function() {
-        event = new RejectedChange({}, error, will);
+        event = new RejectedChange({}, changeset, error);
       });
 
       it("should extend Event", function() {
@@ -57,8 +57,8 @@ define([
         expect(event.error).toBe(error);
       });
 
-      it("property property should be the same as that received in the constructor", function() {
-        expect(event.property).toBe(will.property);
+      it("changeset property should be the same as that received in the constructor", function() {
+        expect(event.changeset).toBe(changeset);
       });
 
       it("error property should be immutable", function() {
@@ -70,14 +70,14 @@ define([
 
     it("should throw if empty error parameter", function() {
       expect(function() {
-        return new RejectedChange({}, undefined, {changeset: {}});
+        return new RejectedChange({}, {});
       }).toThrow(errorMatch.argRequired("error"));
     });
 
-    it("should throw if empty will parameter", function() {
+    it("should throw if empty changeset parameter", function() {
       expect(function() {
-        return new RejectedChange({}, "no go!");
-      }).toThrow(errorMatch.argRequired("will"));
+        return new RejectedChange({});
+      }).toThrow(errorMatch.argRequired("changeset"));
     });
 
   }); // #pentaho.lang.events.RejectedChange
