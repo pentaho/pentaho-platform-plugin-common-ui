@@ -194,7 +194,7 @@ define([
       this._renderCore();
     },
 
-    /** @override VizAPI */
+    /** @inheritdoc */
     _resize: function() {
       // Resize event throttling
       if(this._lastResizeTimeout != null)
@@ -206,7 +206,7 @@ define([
       }.bind(this), 50);
     },
 
-    /** @override VizAPI */
+    /** @inheritdoc */
     dispose: function() {
 
       this.base();
@@ -220,8 +220,9 @@ define([
 
     //region Helpers
 
+    /** @inheritdoc */
     _selectionChanged: function(newSelectionFilter, previousSelectionFilter) {
-      var dataFilter = newSelectionFilter || this.model.getv("selectionFilter") || new filter.Or();
+      var dataFilter = newSelectionFilter; // || this.model.getv("selectionFilter") || new filter.Or();
       var selectedItems = dataFilter.apply(this.model.getv("data"));
 
       // Get information on the axes

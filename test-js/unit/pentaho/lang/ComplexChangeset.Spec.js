@@ -126,17 +126,6 @@ define([
         });
       }); //end #propertyNames
 
-      describe("#each", function() {
-        it("should iterate throw all properties in the changeset", function() {
-          var index = 0;
-          changeset.each(function(prop, name) {
-            expect(name).toBe(properties[index++]);
-          }, changeset);
-
-          expect(changeset.propertyNames.length).toBe(index);
-        });
-      }); //end #each
-
     }); //end instance
 
   }); //end pentaho.lang.ComplexChangeset

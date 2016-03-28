@@ -19,16 +19,18 @@ define([
   "use strict";
 
   /**
-   * @name mixinChangeset
-   * @memberOf pentaho.lang.mixins.mixinChangeset
+   * @name _mixinChangeset
+   * @memberOf pentaho.lang.mixins
    * @mixin
+   * @private
    */
-  return  /** @lends pentaho.lang.mixins.mixinChangeset# */{
+  return  /** @lends pentaho.lang.mixins._mixinChangeset */{
 
     /**
      * Initializes the mixin.
      *
-     * @param {!pentaho.lang.ComplexChangeset|*} changeset - A changeset representing the changes made to the properties values.
+     * @param {!pentaho.lang.ComplexChangeset} changeset - An object that describes the changes
+     * to be made to a set of properties.
      * @protected
      */
     _initChangeset: function(changeset) {
@@ -37,7 +39,7 @@ define([
     },
 
     /**
-     * Gets the changeset representing the changes made to the properties values.
+     * Gets the object with the changes to the set of properties.
      *
      * @type !pentaho.lang.ComplexChangeset
      * @readonly

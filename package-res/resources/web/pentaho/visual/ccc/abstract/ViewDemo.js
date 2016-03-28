@@ -1,8 +1,9 @@
 define([
   "pentaho/util/object",
+  "pentaho/util/logger",
   "pentaho/data/filter",
   "pentaho/visual/base/types/selectionModes"
-], function(O, filter, selectionModes) {
+], function(O, logger, filter, selectionModes) {
   "use strict";
 
   return {
@@ -21,11 +22,12 @@ define([
 
       };
 
-      this.model.on("will:select", this._onWillSelect.bind(this));
+      this.model.on("will:select",  this._onWillSelect.bind(this));
 
-      this.model.set("doExecute", this._googleSearch.bind(this));
+      this.model.set("doExecute",   this._googleSearch.bind(this));
       this.model.on("will:execute", this._onWillExecute.bind(this));
-      this.model.on("will:change", this._onWillChange.bind(this));
+
+      this.model.on("will:change",  this._onWillChange.bind(this));
 
       this._renderCounter = 0;
     },
@@ -53,12 +55,12 @@ define([
       });
 
       event.dataFilter = dataFilter;
-      console && console.log("Event:", event);
+      logger.log("Event:" + event.type);
     },
 
     // Temporary. Used for demo of BACKLOG-5989
     _onWillExecute: function(event) {
-      console && console.log("Event:", event);
+      logger.log("Event:" + event.type);
     },
 
     // Temporary. Used for demo of BACKLOG-5989
@@ -78,27 +80,27 @@ define([
       var url = "http://www.google.com/search?as_q=\"" + queryValue + "\"";
       window.open(url, "_blank");
 
-      console && console.log("Google Search:" + url);
+      logger.log("Google Search:" + url);
     },
 
     _hackedRender: function() {
       this._selectionChanged(this.model.getv("selectionFilter"), new filter.Or());
       this._chart.renderInteractive();
-      this._renderCounter++;
+      this._renderCounter++; //BACKLOG-6739
     },
 
     _onWillChange: function(event) {
-      //var property = event.property;
-      var changeSet = event.changeset;
-      changeSet.each(function(prop, propName) {
+      var changeset = event.changeset;
+      changeset.propertyNames.forEach(function(propName) {
         var result = true;
         if(propName === "width" || propName === "height") {
           result = window.confirm(propName + " changed. Do you really want to resize?");
           if(result === false) event.cancel("User canceled");
         }
-        console && console.log(propName + (result ? " changed!" : " did not change!"), prop.oldValue, prop.newValue);
+        var prop = changeset.get(propName);
+        logger.log(propName + (result ? " changed!" : " did not change!") + JSON.stringify(prop.oldValue) + " , " +  JSON.stringify(prop.newValue));
       });
     }
-  }
+  };
 
 });

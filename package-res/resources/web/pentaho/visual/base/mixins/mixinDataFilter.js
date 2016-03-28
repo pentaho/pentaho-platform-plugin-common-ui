@@ -20,10 +20,10 @@ define([
 
   /**
    * @name mixinDataFilter
-   * @memberOf pentaho.visual.base.mixins.mixinDataFilter
+   * @memberOf pentaho.visual.base.mixins
    * @mixin
    */
-  return  /** @lends pentaho.visual.base.mixins.mixinDataFilter# */{
+  return  /** @lends pentaho.visual.base.mixins.mixinDataFilter */{
 
     /**
      * Initializes the mixin.
@@ -41,7 +41,7 @@ define([
     /**
      * Gets or sets the filter that represents a subset of the data.
      *
-     * @type ?pentaho.data.filter.AbstractFilter
+     * @type pentaho.data.filter.AbstractFilter
      *
      * @throws {TypeError} When `dataFilter` is not mutable.
      */

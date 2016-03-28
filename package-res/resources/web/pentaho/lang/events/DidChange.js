@@ -15,48 +15,36 @@
  */
 define([
   "../Event",
-  "../mixins/mixinChangeset"
+  "../mixins/_mixinChangeset"
 ], function(Event, mixinChangeset) {
   "use strict";
 
+  //TODO: move to pentaho/type/events. Mixin also moves.
   /**
    * @name DidChange
    * @memberOf pentaho.lang.events
-   * @description This event is triggered when changing properties values
-   * with {@link pentaho.type.complex#set|complex.set} occurs without any failures.
-   *
+   * @class
    * @extends pentaho.lang.Event
-   * @event "did:change"
+   * @mixes pentaho.lang.mixins._mixinChangeset
+   *
+   * @classDesc This event is emitted when changing properties values
+   * with {@link pentaho.type.Complex#set|Complex#set} occurs without any failures.
+   *
+   * @constructor
+   * @description Creates a `DidChange` event.
+   *
+   * @param {!pentaho.type.Complex} source - The object which is emitting the event.
+   * @param {!pentaho.lang.ComplexChangeset} changeset - The changes to be made to the values of the properties.
    */
   return Event.extend("pentaho.lang.events.DidChange",
     /** @lends pentaho.lang.events.DidChange# */{
 
-      /**
-       * Creates a `DidChange` event.
-       *
-       * @constructor
-       *
-       * @param {!Object} source - The object where the event will be initially emitted.
-       * @param {!pentaho.lang.ComplexChangeset|*} changeset - A changeset representing the changes made to the properties values.
-       */
       constructor: function(source, changeset) {
         this.base("did:change", source, false);
         this._initChangeset(changeset);
       }
-    }, {
 
-      /**
-       * Gets the event type.
-       *
-       * @type !string
-       * @readonly
-       *
-       * @static
-       */
-      get type() {
-        return "did:change";
-      }
-
-    }).implement(mixinChangeset);
+    })
+    .implement(mixinChangeset);
 
 });

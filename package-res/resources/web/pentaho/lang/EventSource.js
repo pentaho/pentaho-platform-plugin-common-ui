@@ -17,8 +17,9 @@
 define([
   "./Base",
   "./Event",
-  "../util/error"
-], function(Base, Event, error) {
+  "../util/error",
+  "../util/logger"
+], function(Base, Event, error, logger) {
 
   "use strict";
 
@@ -371,7 +372,7 @@ define([
         try {
           queue[i].listener.call(this, event);
         } catch(e) {
-          console && console.log("Exception thrown during '", event.type, "' loop:", e);
+          logger.log("Exception thrown during '" + event.type + "' loop:" + e.stack);
         }
       }
     } else {
