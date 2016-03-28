@@ -22,13 +22,13 @@ define([
   "use strict";
 
   /**
-   * @classDesc An `ComplexChangeset` represents a collection of `property` to `change` pairs.
+   * @classDesc A 'ComplexChangeset' represents a collection of changes in a set of properties.
    *
    * ### `ComplexChangeset` Property Key
    * A `ComplexChangeset` property key is the name of a complex's `property` that had its value changed.
    *
    * ### `ComplexChangeset` Change Object
-   * A `ComplexChangeset` `change` object is the object representing the change made to a `property`.
+   * A `ComplexChangeset` `change` object describes the changes to be made to a `property`.
    *
    * @name ComplexChangeset
    * @memberOf pentaho.lang
@@ -37,14 +37,14 @@ define([
    * @class
    * @extends pentaho.lang.Base
    */
-  return Base.extend("pentaho.lang.ComplexChangeset", /** @lend pentaho.lang.ComplexChangeset#*/{
+  return Base.extend("pentaho.lang.ComplexChangeset", /** @lends pentaho.lang.ComplexChangeset#*/{
 
     /**
      * Creates a `ComplexChangeset` with a given owner.
      *
      * @constructor
      *
-     * @param {!pentaho.type.complex} owner - The complex where the change occurred.
+     * @param {!pentaho.type.Complex} owner - The complex where the change occurred.
      */
     constructor: function(owner) {
       if(!owner) throw error.argRequired("owner");
@@ -66,71 +66,61 @@ define([
     /**
      * Determines if the `ComplexChangeset` contains the specified property.
      *
-     * @param {string} property - The property name.
+     * @param {nonEmptyString|!pentaho.type.Property.Type} name - The property name or type object.
      *
-     * @returns {!boolean} True if the `property` exists, false otherwise.
+     * @return {boolean} `true` if the property exists, `false` otherwise.
      */
-    has: function(property) {
-      return O.hasOwn(this._properties, property);
+    has: function(name) {
+      var pType = this.owner.type.get(name);
+      if(pType.isList) {
+        //does nothing for now
+        return false;
+      } else {
+        return O.hasOwn(this._properties, name);
+      }
     },
 
     /**
-     * Sets a new `property` to `change` pair if none exists,
-     * otherwise updates it.
+     * Sets the value of a property.
      *
-     * @param {!string} property - The property name.
-     * @param {any?} valueSpec - A object representing a property change.
+     * @param {nonEmptyString|!pentaho.type.Property.Type} name - The property name or type object.
+     * @param {any?} [valueSpec=null] A value specification.
      */
-    set: function(property, valueSpec) {
-      if(!property) throw error.argRequired("property");
+    set: function(name, valueSpec) {
+      if(!name) throw error.argRequired("property");
 
-      var pType = this.owner.type.get(property);
+      var pType = this.owner.type.get(name);
       if(pType.isList) {
-        //does nothing for now
+        //TODO: does nothing for now
       } else {
-        this._setValueChange(property, pType.toValue(valueSpec));
+        this._setValueChange(name, pType.toValue(valueSpec));
       }
     },
 
     /**
      * Gets the change object mapped to the specified property.
      *
-     * @param {string} property - The property name.
+     * @param {nonEmptyString|!pentaho.type.Property.Type} name - The property name or type object.
      *
-     * @returns {?ComplexChangeset|*} The change object,
-     * or null when the `ComplexChangeset` does not contain the given `property`.
+     * @return {?pentaho.lang.ValueChange} An object containing the changes to be operated
+     * in the given property, or `null` if the property is not defined in this changeset.
      */
-    get: function(property) {
-      if(!this.has(property)) return null;
-
-      return this._properties[property];
+    get: function(name) {
+      if(!this.has(name)) return null;
+      var propertyName = typeof name === "string" ? name : this.owner.type.get(name).name;
+      return this._properties[propertyName];
     },
 
     /**
-     * Gets an array with all the property names contained in the `ComplexChangeset`.
+     * Gets an array with all of the property names contained in this changeset.
      *
-     * @type !Array
+     * @type !string[]
      * @readonly
      */
     get propertyNames() {
       return Object.keys(this._properties);
     },
 
-    /**
-     * Executes a provided function once per `ComplexChangeset` property.
-     *
-     * @param {!function} iterator - Function to execute for each `ComplexChangeset` property, that takes two arguments:
-     *  - _change_: The change object of a property
-     *  - _propertyName_: The property name
-     * @param {any?} [context=this] - The object to use as this when executing the `iterator`.
-     */
-    each: function(iterator, context) {
-      var iteratorContext = context || this;
-      this.propertyNames.forEach(function(name) {
-        iterator.call(iteratorContext, this.get(name), name);
-      }, this);
-      //TODO: decide if this should be chainable
-    },
 
     /**
      * Sets a new `change` that represents a property which changed value.
@@ -141,18 +131,25 @@ define([
      * @private
      */
     _setValueChange: function(propertyName, newValue, oldValue) {
-      var prop = this._properties[propertyName];
-
-      if(!prop) {
-        prop = this._properties[propertyName] = {};
-        O.setConst(prop, "type", "set");
+      var propChange = this._properties[propertyName];
+      if(!propChange) {
+        propChange = this._properties[propertyName] = {};
+        O.setConst(propChange, "type", "set");
 
         var v0 = arguments.length > 2 ? oldValue : this.owner.get(propertyName);
-        O.setConst(prop, "oldValue", v0);
+        O.setConst(propChange, "oldValue", v0);
       }
 
-      prop.newValue = newValue;
+      propChange.newValue = newValue;
     }
   });
+
+  /**
+   * @typedef pentaho.lang.ValueChange
+   * @property {!string} [type="set"] - The type of operation.
+   * @property {*} oldValue - The previous value of the property.
+   * @property {*} newValue - The new value of the property.
+   *
+   */
 
 });

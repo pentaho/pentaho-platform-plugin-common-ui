@@ -23,20 +23,9 @@ define([
   /* global describe:false, it:false, expect:false, beforeEach:false */
 
   describe("pentaho.lang.events.DidChange -", function() {
-    var type = "change";
 
     it("should extend Event", function() {
       expect(DidChange.prototype instanceof Event).toBe(true);
-    });
-
-    it("static property type should return full type name", function() {
-      expect(DidChange.type).toBe("did:" + type);
-    });
-
-    it("static property type should be read-only", function() {
-      expect(function() {
-        DidChange.type = "New Name";
-      }).toThrowError(TypeError);
     });
 
     describe("instances -", function() {

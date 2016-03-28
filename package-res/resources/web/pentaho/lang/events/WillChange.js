@@ -15,49 +15,37 @@
  */
 define([
   "../Event",
-  "../mixins/mixinChangeset"
+  "../mixins/_mixinChangeset"
 ], function(Event, mixinChangeset) {
   "use strict";
 
   /**
    * @name WillChange
    * @memberOf pentaho.lang.events
-   * @description This event is triggered when a property value is changed in the model.
+   * @class
+   * @extends pentaho.lang.Event
+   * @mixes pentaho.lang.mixins._mixinChangeset
+   *
+   * @classDesc This event is emitted when a property value is changed.
    * The listeners of `will:change` are allowed to:
    * - cancel the event
-   * - make changes to the changeset
+   * - modify the changeset
    *
-   * @extends pentaho.lang.Event
-   * @event "will:change"
+   * @constructor
+   * @description Creates a `WillExecute` event.
+   *
+   * @param {!pentaho.type.Complex} source - The object which is emitting the event.
+   * @param {!pentaho.lang.ComplexChangeset} changeset -  The changes to be made to the values of the properties.
    */
   return Event.extend("pentaho.lang.events.WillChange",
     /** @lends pentaho.lang.events.WillChange# */{
 
-      /**
-       * Creates a `WillExecute` event.
-       *
-       * @constructor
-       *
-       * @param {!Object} source - The object where the event will be initially emitted.
-       * @param {!pentaho.lang.ComplexChangeset|*} changeset - A changeset representing the changes made to the properties values.
-       */
       constructor: function(source, changeset) {
         this.base("will:change", source, true);
         this._initChangeset(changeset);
       }
-    },{
 
-      /**
-       * Gets the event type.
-       *
-       * @type !string
-       * @readonly
-       *
-       * @static
-       */
-      get type() {
-        return "will:change";
-      }
-    }).implement(mixinChangeset);
+    })
+    .implement(mixinChangeset);
 
 });

@@ -23,20 +23,9 @@ define([
   /* global describe:false, it:false, expect:false, beforeEach:false */
 
   describe("pentaho.lang.events.RejectedChange -", function() {
-    var type = "change";
-
+    
     it("should extend Event", function() {
       expect(RejectedChange.prototype instanceof Event).toBe(true);
-    });
-
-    it("static property type should return full type name", function() {
-      expect(RejectedChange.type).toBe("rejected:" + type);
-    });
-
-    it("static property type should be read-only", function() {
-      expect(function() {
-        RejectedChange.type = "New Name";
-      }).toThrowError(TypeError);
     });
 
     describe("instances -", function() {

@@ -107,8 +107,6 @@ define([
 
     /**
      * Called before the visualization is discarded.
-     *
-     * @overridable
      */
     dispose: function() {
       this._element = null;
@@ -122,10 +120,14 @@ define([
      * such as setting up event listeners.
      *
      * @protected
-     * @overridable
      */
     _init: function() {
-      this.model.on("did:change", (function(event){ this._onChange(event.changeset);}).bind(this));
+      this.model.on("did:change", (
+          function(event){
+            this._onChange(event.changeset);
+          }
+        ).bind(this)
+      );
     },
 
     /**
@@ -136,7 +138,6 @@ define([
      *
      * @return {?Array.<!Error>} A non-empty array of `Error` or `null`.
      * @protected
-     * @overridable
      */
     _validate: function() {
       var validationErrors = this.model.validate();
@@ -159,11 +160,11 @@ define([
     /**
      * Renders the visualization.
      *
-     * Subclasses of `pentaho.visual.base.View` should override this method
+     * Subclasses of `pentaho.visual.base.View` must override this method
      * and implement a complete rendering of the visualization.
      *
      * @protected
-     * @overridable
+     * @abstract
      */
     _render: /* istanbul ignore next: placeholder method */ function() {
       throw error.notImplemented("_render");
@@ -178,7 +179,6 @@ define([
      * By default, this method invokes [_render]{@link pentaho.visual.base.View#_render}.
      *
      * @protected
-     * @overridable
      */
     _resize: /* istanbul ignore next: placeholder method */ function() {
       this._render();
@@ -194,7 +194,6 @@ define([
      * By default, this method invokes [_render]{@link pentaho.visual.base.View#_render}.
      *
      * @protected
-     * @overridable
      */
     _selectionChanged: /* istanbul ignore next: placeholder method */ function(newSelectionFilter, previousSelectionFilter) {
       this._render();
@@ -221,8 +220,8 @@ define([
      * @see pentaho.visual.base.View#_render
      *
      * @param {!pentaho.lang.Changeset} changeset - Map of the properties that have changed.
+     *
      * @protected
-     * @overridable
      */
     _onChange: function(changeset) {
       var exclusionList = {
@@ -231,13 +230,12 @@ define([
         selectionMode: true, // never has a direct visual impact
         selectionFilter: true
       };
-      var fullUpdate = changeset.propertyNames.reduce(function(memo, prop){
-        return memo || !exclusionList[prop];
-      }, false);
-
+      var fullUpdate = changeset.propertyNames.some(function(prop){
+        return !exclusionList[prop];
+      });
       if(fullUpdate) return this.render();
 
-      var updateSelection =  changeset.has("selectionFilter");
+      var updateSelection = changeset.has("selectionFilter");
       if(updateSelection){
         var selectionFilter = changeset.get("selectionFilter");
         this._selectionChanged(selectionFilter.newValue.value, selectionFilter.oldValue.value);

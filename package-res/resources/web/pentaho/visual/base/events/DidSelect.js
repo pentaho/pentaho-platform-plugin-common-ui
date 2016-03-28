@@ -23,24 +23,23 @@ define([
   /**
    * @name DidSelect
    * @memberOf pentaho.visual.base.events
-   * @description This event is triggered when
+   * @class
+   * @extends pentaho.lang.Event
+   * @mixes pentaho.visual.base.mixins.mixinDataFilter
+   *
+   * @classDesc This event is triggered when
    * the {@link pentaho.visual.base.Model#selectAction|Select Action} flow ends without any failures.
    *
-   * @extends pentaho.lang.Event
-   * @event "did:select"
+   * @constructor
+   * @description Creates a `DidSelect` event.
+   *
+   * @param {!pentaho.visual.base.Model} source - The model object which is emitting the event.
+   * @param {?Object} value - The value of a fulfilled {@link pentaho.lang.ActionResult|ActionResult}.
+   * @param {pentaho.visual.base.events.WillSelect} will - The "will:select" event object.
    */
   return Event.extend("pentaho.visual.base.events.DidSelect",
     /** @lends pentaho.visual.base.events.DidSelect# */{
 
-      /**
-       * Creates a `DidSelect` event.
-       *
-       * @constructor
-       *
-       * @param {!Object} source - The object where the event will be initially emitted.
-       * @param {?Object} value - The value of a fulfilled {@link pentaho.lang.ActionResult|ActionResult}.
-       * @param {pentaho.visual.base.events.WillSelect} will - The "will:select" event object.
-       */
       constructor: function(source, value, will) {
         if(!will) throw error.argRequired("will");
 
@@ -48,15 +47,13 @@ define([
         this.value = value;
         this._initFilter(will.dataFilter, false);
       }
-    }, {
+    }, /** @lends pentaho.visual.base.events.DidSelect */{
 
       /**
        * Gets the event type.
        *
-       * @type !string
+       * @type string
        * @readonly
-       *
-       * @static
        */
       get type() {
         return "did:select";

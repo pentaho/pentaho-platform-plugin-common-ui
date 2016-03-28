@@ -15,59 +15,45 @@
  */
 define([
   "../Event",
-  "../mixins/mixinChangeset",
-  "../mixins/mixinError",
-  "../../util/error"
-], function(Event, mixinChangeset, mixinError, utilError) {
+  "../mixins/_mixinChangeset",
+  "../mixins/mixinError"
+], function(Event, mixinChangeset, mixinError) {
   "use strict";
 
   /**
    * @name RejectedChange
    * @memberOf pentaho.lang.events
-   * @description This event is triggered when any failure occurs while changing
-   * properties values with {@link pentaho.type.complex#set|complex.set}.
-   *
-   * Those failures can be one of the following:
-   *  - The event {@link pentaho.lang.events.WillChange|"will:change"} was canceled.
-   *  - A property value changes while processing the listeners of {@link pentaho.lang.events.WillChange|"will:change"}.
-   *
+   * @class
    * @extends pentaho.lang.Event
-   * @event "rejected:change"
+   * @mixes pentaho.lang.mixins.mixinError
+   * @mixes pentaho.lang.mixins._mixinChangeset
+   *
+   * @classDesc This event is emitted when any rejection occurs while changing
+   * properties values with {@link pentaho.type.Complex#set|Complex#set}.
+   *
+   * A rejection can be one of the following:
+   *  - the event {@link pentaho.lang.events.WillChange|"will:change"} was canceled
+   *  - the value of a property in changeset was not consistent with the current value of the property,
+   *  which indicates that some change took place during the processing of the {@link pentaho.lang.events.WillChange|"will:change"} event listeners.
+   *
+   * @constructor
+   * @description Creates a `RejectedChange` event.
+   *
+   * @param {!pentaho.type.Complex} source - The object which is emitting the event.
+   * @param {!pentaho.lang.ComplexChangeset} changeset - The changes to be made to the values of the properties.
+   * @param {!Error|pentaho.lang.UserError} error - The error of a rejected {@link pentaho.lang.ActionResult|ActionResult}.
    */
   return Event.extend("pentaho.lang.events.RejectedChange",
     /** @lends pentaho.lang.events.RejectedChange# */{
 
-      /**
-       * Creates a `RejectedChange` event.
-       *
-       * @constructor
-       *
-       * @param {!Object} source - The object where the event will be initially emitted.
-       * @param {?pentaho.visual.base.events.WillSelect} will - The "will:change" event object.
-       * @param {!Error|pentaho.lang.UserError} error - The error of a rejected {@link pentaho.lang.ActionResult|ActionResult}.
-       */
       constructor: function(source, changeset, error) {
-        if(!changeset) throw utilError.argRequired("changeset");
-
         this.base("rejected:change", source, false);
         this._initChangeset(changeset);
         this._initError(error);
       }
-    }, {
 
-      /**
-       * Gets the event type.
-       *
-       * @type !string
-       * @readonly
-       *
-       * @static
-       */
-      get type() {
-        return "rejected:change";
-      }
-
-    }).implement(mixinChangeset)
-      .implement(mixinError);
+    })
+    .implement(mixinChangeset)
+    .implement(mixinError);
 
 });

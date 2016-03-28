@@ -435,14 +435,14 @@ define([
           }
 
           // Second sweep: modify the values
-          changeset.each(function(prop, name) {
+          changeset.propertyNames.forEach(function(name) {
             var pType = this.type.get(name);
 
             if(pType.isList) {
               //TODO: handle the changes on a list property in a later story
             } else {
               var value0 = this._values[pType.name];
-              var value1 = pType.toValue(prop.newValue);
+              var value1 = pType.toValue(changeset.get(name).newValue);
               //TODO: confirm if it's worth having this if (setting a property isn't that expensive)
               if(!pType.type.areEqual(value0, value1)) {
                 this._values[name] = value1;
@@ -463,7 +463,7 @@ define([
          * @ignore
          */
         _changeWill: function(changeset) {
-          if(!this._hasListeners(WillChange.type)) return;
+          if(!this._hasListeners("will:change")) return;
 
           var will = new WillChange(this, changeset);
           if(!this._emitSafe(will)) {
@@ -480,7 +480,7 @@ define([
          * @ignore
          */
         _changeDid: function(changeset) {
-          if(!this._hasListeners(DidChange.type)) return;
+          if(!this._hasListeners("did:change")) return;
 
           var event = new DidChange(this, changeset);
           this._emitSafe(event);
@@ -496,7 +496,7 @@ define([
          * @ignore
          */
         _changeRejected: function(changeset, reason) {
-          if(!this._hasListeners(RejectedChange.type)) return;
+          if(!this._hasListeners("rejected:change")) return;
 
           var event = new RejectedChange(this, changeset, reason);
           this._emitSafe(event);

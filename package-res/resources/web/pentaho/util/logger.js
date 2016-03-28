@@ -15,13 +15,15 @@
  */
 define(function () {
 
+  "use strict";
+
   /**
    * The `logger` namespace contains functions used to log messages in the console.
    *
    * @name logger
-   * @memberOf pentaho.util
    * @namespace
-   * @amd pentaho/util/Logger
+   * @memberOf pentaho.util
+   * @amd pentaho/util/logger
    */
   var logger =/** @lends pentaho.util.logger */{
 
@@ -29,7 +31,8 @@ define(function () {
      *  Property enumerating the various log levels.
      *
      *  @property logLevels
-     *  @type Array
+     *  @type string[]
+     *  @static
      */
     logLevels: ["debug", "log", "info", "warn", "error"],
 
@@ -39,6 +42,7 @@ define(function () {
      *
      *  @property logLevel
      *  @type string
+     *  @static
      */
     logLevel: "log",
 
@@ -46,6 +50,7 @@ define(function () {
      * Logs a message at debug level.
      *
      * @param {string} m - Message to log.
+     * @static
      */
     debug: function (m) {
       return _log(m, "debug");
@@ -55,6 +60,7 @@ define(function () {
      * Logs a message at log level.
      *
      * @param {string} m - Message to log.
+     * @static
      */
     log: function (m) {
       return _log(m, "log");
@@ -64,6 +70,7 @@ define(function () {
      * Logs a message at info level.
      *
      * @param {string} m - Message to log.
+     * @static
      */
     info: function (m) {
       return _log(m, "info");
@@ -73,6 +80,7 @@ define(function () {
      * Logs a message at warn level.
      *
      * @param {string} m - Message to log.
+     * @static
      */
     warn: function (m) {
       return _log(m, "warn");
@@ -82,6 +90,7 @@ define(function () {
      * Logs a message at error level.
      *
      * @param {string} m - Message to log.
+     * @static
      */
     error: function (m) {
       return _log(m, "error");

@@ -15,25 +15,25 @@
  */
 define([
   "pentaho/util/error"
-], function(utilError) {
+], function(error) {
   "use strict";
 
   /**
-   * @name mixinDataFilter
-   * @memberOf pentaho.lang.mixins.mixinDataFilter
+   * @name mixinError
+   * @memberOf pentaho.lang.mixins
    * @mixin
    */
-  return  /** @lends pentaho.lang.mixins.mixinError# */{
+  return  /** @lends pentaho.lang.mixins.mixinError */{
 
     /**
      * Initializes the mixin.
      *
-     * @param {!Error|pentaho.lang.UserError} error - The error of a rejected {@link pentaho.lang.ActionResult|ActionResult}.
+     * @param {!Error|pentaho.lang.UserError} errorObj - The error of a rejected {@link pentaho.lang.ActionResult|ActionResult}.
      * @protected
      */
-    _initError: function(error) {
-      if(!error) throw utilError.argRequired("error");
-      this._error = error;
+    _initError: function(errorObj) {
+      if(!errorObj) throw error.argRequired("error");
+      this._error = errorObj;
     },
 
     /**
