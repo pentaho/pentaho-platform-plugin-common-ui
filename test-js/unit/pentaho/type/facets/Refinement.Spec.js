@@ -83,5 +83,15 @@ define([
         }).toThrow(errorMatch.notImplemented());
       });
     });
+
+    describe(".fillSpecInContext(spec, keyArgs)", function() {
+      it("should be defined", function() {
+        expect(typeof RefinementFacet.fillSpecInContext).toBe("function");
+      });
+
+      it("should return false", function() {
+        expect(RefinementFacet.fillSpecInContext({})).toBe(false);
+      });
+    });
   });
 });
