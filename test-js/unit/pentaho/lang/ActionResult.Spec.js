@@ -22,76 +22,135 @@ define([
   /* global describe:false, it:false, expect:false, beforeEach:false */
 
   describe("pentaho.lang.ActionResult -", function() {
-    var value = 123;
+    var value = 123, result;
 
     it("should be defined.", function() {
       expect(typeof ActionResult).toBeDefined();
     });
 
-    describe("no error -", function() {
-      var result;
+    describe("when constructed with no error -", function() {
 
       beforeEach(function() {
         result = new ActionResult(value);
       });
 
-      it("value property should be the same than received in the constructor", function() {
+      it("#value should be the same than received in the constructor", function() {
         expect(result.value).toBe(value);
       });
 
-      it("value property should be read-only", function() {
+      it("#value should be read-only", function() {
         expect(function() {
           result.value = 456;
         }).toThrowError(TypeError);
       });
 
-      it("isCanceled should return false", function() {
+      it("#isCanceled should return false", function() {
         expect(result.isCanceled).toBe(false);
       });
 
-      it("isFailed should return false", function() {
+      it("#isFailed should return false", function() {
         expect(result.isFailed).toBe(false);
+      });
+
+      it("ActionResult.fulfill outputs an ActionResult with a result", function() {
+        var result = ActionResult.fulfill(value);
+        expect(result.isFulfilled).toBe(true);
+        expect(result.isRejected).toBe(false);
+        expect(result.value).toBe(value);
       });
     });
 
-    describe("with user error -", function() {
-      var result;
 
-      beforeEach(function() {
-        result = new ActionResult(value, new UserError());
-      });
-
-      it("value property should be undefined", function() {
+    function expectErrorResult(){
+      it("#value should be undefined", function() {
         expect(result.value).toBeUndefined();
       });
 
-      it("isCanceled should return true", function() {
+      it("#isFulfilled should return false", function() {
+        expect(result.isFulfilled).toBe(false);
+      });
+
+      it("#isRejected should return true", function() {
+        expect(result.isRejected).toBe(true);
+      });
+    }
+
+    describe("when constructed with a user error -", function() {
+      var error;
+
+      beforeEach(function() {
+        error = new UserError("Some error");
+        result = new ActionResult(value, error);
+      });
+
+      it("#isCanceled should return true", function() {
         expect(result.isCanceled).toBe(true);
       });
 
-      it("isFailed should return false", function() {
+      it("#isFailed should return false", function() {
         expect(result.isFailed).toBe(false);
+      });
+
+      expectErrorResult();
+
+      it("#error should return the user error", function() {
+        expect(result.error).toBe(error);
+      });
+
+      it("ActionResult.reject outputs an ActionResult with an error result", function() {
+        var result = ActionResult.reject(error);
+        expect(result.isRejected).toBe(true);
+        expect(result.error).toBe(error);
+      });
+
+    });
+
+    describe("when constructed with a string as error -", function() {
+      beforeEach(function() {
+        result = new ActionResult(value, "Some error");
+      });
+
+      expectErrorResult();
+
+      it("#error should be pentaho.lang.UserError", function() {
+        expect(result.error instanceof UserError).toBe(true);
+      });
+
+      it("#error should return the user error", function() {
+        expect(result.error.message).toBe("Some error");
+      });
+
+      it("ActionResult.reject outputs an ActionResult with an error result", function() {
+        var result = ActionResult.reject("Some error");
+        expect(result.isRejected).toBe(true);
+        expect(result.error.message).toBe("Some error");
       });
     });
 
-    describe("with non-user error -", function() {
-      var result;
+    describe("when constructed with a non-user error -", function() {
+      var error;
 
       beforeEach(function() {
-        result = new ActionResult(value, new TypeError());
+        error = new TypeError();
+        result = new ActionResult(value, error);
       });
 
-      it("value property should be undefined", function() {
-        expect(result.value).toBeUndefined();
-      });
+      expectErrorResult();
 
-      it("isCanceled should return false", function() {
+      it("#isCanceled should return false", function() {
         expect(result.isCanceled).toBe(false);
       });
 
-      it("isFailed should return true", function() {
+      it("#isFailed should return true", function() {
         expect(result.isFailed).toBe(true);
       });
+
+      it("ActionResult.reject outputs an ActionResult with an error result", function() {
+        var result = ActionResult.reject(error);
+        expect(result.isRejected).toBe(true);
+        expect(result.error).toBe(error);
+      });
+
     });
 
   }); // #pentaho.lang.ActionResult

@@ -30,10 +30,6 @@ define([
   "./events/DidExecute",
   "./events/RejectedExecute",
 
-  "pentaho/lang/events/WillChange",
-  "pentaho/lang/events/DidChange",
-  "pentaho/lang/events/RejectedChange",
-
   "pentaho/lang/ActionResult",
 
   "pentaho/i18n!type"
@@ -42,7 +38,6 @@ define([
             selectionModes,
             WillSelect, DidSelect, RejectedSelect,
             WillExecute, DidExecute, RejectedExecute,
-            WillChange, DidChange, RejectedChange,
             ActionResult,
             bundle) {
 
@@ -184,6 +179,34 @@ define([
             return ActionResult.reject(e);
           }
           return result && result.isRejected ? result : ActionResult.fulfill();
+        },
+
+        /**
+         * Executes the will/did/rejected event loop associated with a given action.
+         *
+         * @param {function} coreAction - The action to be executed.
+         * @param {pentaho.visual.base.events.Will} will - The "will:" event object.
+         * @param {function} Did - The constructor of the "did:" event.
+         * @param {function} Rejected - The constructor of the "rejected:" event.
+         * @return {pentaho.lang.ActionResult} The result object.
+         * @protected
+         */
+        _doAction: function(coreAction, will, Did, Rejected) {
+          if(this._hasListeners(will.type))
+            this._emitSafe(will);
+
+          var result = will.isCanceled ? ActionResult.reject(will.cancelReason) : coreAction.call(this, will);
+
+          if(result.error) {
+            if(this._hasListeners(Rejected.type)) {
+              this._emitSafe(new Rejected(this, result.error, will));
+            }
+          } else {
+            if(this._hasListeners(Did.type)) {
+              this._emitSafe(new Did(this, result.value, will));
+            }
+          }
+          return result;
         },
         //endregion
 
