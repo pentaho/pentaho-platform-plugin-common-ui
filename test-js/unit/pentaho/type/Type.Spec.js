@@ -22,8 +22,7 @@ define([
 
   /*global describe:true, it:true, expect:true, beforeEach:true, afterEach:true, spyOn: true, jasmine: true*/
 
-
-  describe("pentaho/type/Type", function() {
+  describe("pentaho.type.Type", function() {
 
     describe("#view -", function() {
       it("should default to `null`", function() {

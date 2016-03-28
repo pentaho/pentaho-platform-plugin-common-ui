@@ -20,233 +20,165 @@ define([
 
   /*global describe:false, it:false, expect:false, beforeEach:false, Date:false */
 
-  describe("instance serialization -", function() {
-    var context = new Context();
+  var context = new Context();
 
-    describe("pentaho/type/simple -", function() {
+  describe("pentaho.type.Simple", function() {
 
-      // Using pentaho/type/boolean because pentaho/type/simple is abstract
-      var PentahoBoolean = context.get("pentaho/type/boolean");
-      var originalSpec = {v: false, f: "I'm a simple value"};
+    // Using pentaho/type/boolean because pentaho/type/simple is abstract
+    var PentahoBoolean = context.get("pentaho/type/boolean");
+    var originalSpec = {v: false, f: "I'm a simple value"};
 
-      describe("values", function() {
+    describe("values", function() {
 
-        describe("value with formatted info", function() {
-          var value;
+      describe("value with formatted info", function() {
+        var value;
 
-          beforeEach(function() {
-            value = new PentahoBoolean(originalSpec);
-          });
+        beforeEach(function() {
+          value = new PentahoBoolean(originalSpec);
+        });
 
-          describe("default", function() {
-            it("should return primitive value, formatted value, and inline type", function() {
-              var spec = value.toSpec();
+        describe("default", function() {
+          it("should return primitive value and formatted value", function() {
+            var spec = value.toSpec();
 
-              expect(spec.v).toBe(originalSpec.v);
-              expect(spec.f).toBe(originalSpec.f);
-              expect(spec._).toEqual(PentahoBoolean.type.toReference());
-            });
-          });
-
-          describe("omitFormatted: true and omitRootType: false", function() {
-            it("should return primitive value and inline type ", function() {
-              var spec = value.toSpec({omitFormatted: true});
-
-              expect(spec.v).toBe(originalSpec.v);
-              expect(spec.f).toBeUndefined();
-              expect(spec._).toEqual(PentahoBoolean.type.toReference());
-            });
-          });
-
-          describe("omitFormatted: true and omitRootType: true", function() {
-            it("should return primitive value, undefined formatted value, and undefined inline type", function() {
-              var spec = value.toSpec({omitFormatted: true, omitRootType: true});
-
-              expect(spec).toBe(originalSpec.v);
-              expect(spec.f).toBeUndefined();
-              expect(spec._).toBeUndefined();
-            });
-          });
-
-          describe("omitFormatted: false and omitRootType: true", function() {
-            it("should return primitive value, formatted value, and undefined inline type", function() {
-              var spec = value.toSpec({omitRootType: true});
-
-              expect(spec.v).toBe(originalSpec.v);
-              expect(spec.f).toBe(originalSpec.f);
-              expect(spec._).toBeUndefined();
-            });
+            expect(spec.v).toBe(originalSpec.v);
+            expect(spec.f).toBe(originalSpec.f);
+            expect(spec._).toBeUndefined();
           });
         });
 
-        describe("value without formatted info", function() {
-          var value;
+        describe("omitFormatted: true and includeType: true", function() {
+          it("should return primitive value and inline type ", function() {
+            var spec = value.toSpec({omitFormatted: true, includeType: true});
 
-          beforeEach(function() {
-            value = new PentahoBoolean(originalSpec.v);
+            expect(spec.v).toBe(originalSpec.v);
+            expect(spec.f).toBeUndefined();
+            expect(spec._).toEqual(PentahoBoolean.type.toRefInContext());
           });
+        });
 
-          describe("default", function() {
-            it("should return primitive value, null formatted value, and inline type", function() {
-              var spec = value.toSpec();
+        describe("omitFormatted: true and includeType: false", function() {
+          it("should return primitive value, undefined formatted value, and undefined inline type", function() {
+            var spec = value.toSpec({omitFormatted: true, includeType: false});
 
-              expect(spec.v).toBe(originalSpec.v);
-              expect(spec.f).toBeUndefined();
-              expect(spec._).toBeDefined();
-              expect(spec._).toBe(PentahoBoolean.type.toSpec().id);
-            });
+            expect(spec).toBe(originalSpec.v);
+            expect(spec.f).toBeUndefined();
+            expect(spec._).toBeUndefined();
           });
+        });
 
-          describe("omitFormatted: true and omitRootType: false", function() {
-            it("should return primitive value and undefined formatted value", function() {
-              var spec = value.toSpec({omitFormatted: true});
+        describe("omitFormatted: false and includeType: false", function() {
+          it("should return primitive value, formatted value, and undefined inline type", function() {
+            var spec = value.toSpec({includeType: false});
 
-              expect(spec.v).toBe(originalSpec.v);
-              expect(spec.f).toBeUndefined();
-              expect(spec._).toEqual(PentahoBoolean.type.toReference());
-            });
-          });
-
-          describe("omitFormatted: true and omitRootType: true", function() {
-            it("should return primitive value, undefined formatted value, and undefined inline type", function() {
-              var spec = value.toSpec({omitFormatted: true, omitRootType: true});
-
-              expect(spec).toBe(originalSpec.v);
-              expect(spec.f).toBeUndefined();
-              expect(spec._).toBeUndefined();
-            });
-          });
-
-          describe("omitFormatted: false and omitRootType: true", function() {
-            it("should return primitive value", function() {
-              var spec = value.toSpec({omitRootType: true});
-
-              expect(spec).toBe(originalSpec.v);
-            });
+            expect(spec.v).toBe(originalSpec.v);
+            expect(spec.f).toBe(originalSpec.f);
+            expect(spec._).toBeUndefined();
           });
         });
       });
-    }); // pentaho.type.Simple
 
-    var simplerTypes = [
-      {name: "boolean", value: true},
-      {name: "number", value: 10},
-      {name: "string", value: "hello"},
-      {name: "object", value: {foo: "bar"}},
-      {name: "function", value: function() {}}
-    ];
-
-    simplerTypes.forEach(function(simple) {
-      describe("pentaho/type/" + simple.name + " -", function() {
-        var SimpleClass = context.get("pentaho/type/" + simple.name);
-
+      describe("value without formatted info", function() {
         var value;
+
         beforeEach(function() {
-          value = new SimpleClass(simple);
+          value = new PentahoBoolean(originalSpec.v);
         });
 
-        describe("values", function() {
-          describe("primitive format (omitFormatted: true)", function() {
-            it("should return the primitive value", function() {
-              var spec = value.toSpec({omitFormatted: true, omitRootType: true});
-
-              expect(typeof spec).toBe(simple.name);
-              expect(spec).toBe(simple.value);
-            });
-          });
-
-          describe("object format (omitFormatted: false)", function() {
-            it("spec.v should contain the primitive value", function() {
-              var spec = value.toSpec({omitFormatted: true});
-
-              expect(typeof spec).toBe("object");
-              expect(spec.v).toBeDefined();
-              expect(typeof spec.v).toBe(simple.name);
-              expect(spec.v).toBe(simple.value);
-              expect(spec._).toEqual(SimpleClass.type.toReference());
-            });
-          });
-        });
-
-        describe("inline type spec", function() {
-          it("should inline pentaho/type/" + simple.name + " type spec", function() {
-            var spec = value.toSpec({omitRootType: true});
-
-            expect(typeof spec).toBe(simple.name);
-            expect(spec).toBe(simple.value);
-            expect(spec._).toBeUndefined();
-            expect(spec.f).toBeUndefined();
-          });
-        });
-
-        describe("inline type spec", function() {
-          it("should inline pentaho/type/" + simple.name + " type spec", function() {
+        describe("default", function() {
+          it("should return primitive value", function() {
             var spec = value.toSpec();
 
-            expect(typeof spec).toBe("object");
-            expect(spec._).toEqual(SimpleClass.type.toReference());
+            expect(spec).toBe(originalSpec.v);
+          });
+        });
+
+        describe("omitFormatted: true and includeType: true", function() {
+          it("should return primitive value and undefined formatted value", function() {
+            var spec = value.toSpec({omitFormatted: true, includeType: true});
+
+            expect(spec.v).toBe(originalSpec.v);
             expect(spec.f).toBeUndefined();
+            expect(spec._).toEqual(PentahoBoolean.type.toRefInContext());
+          });
+        });
+
+        describe("omitFormatted: true and includeType: false", function() {
+          it("should return primitive value, undefined formatted value, and undefined inline type", function() {
+            var spec = value.toSpec({omitFormatted: true, includeType: false});
+
+            expect(spec).toBe(originalSpec.v);
+            expect(spec.f).toBeUndefined();
+            expect(spec._).toBeUndefined();
+          });
+        });
+
+        describe("omitFormatted: false and includeType: false", function() {
+          it("should return primitive value", function() {
+            var spec = value.toSpec({includeType: false});
+
+            expect(spec).toBe(originalSpec.v);
           });
         });
       });
     });
+  }); // pentaho.type.Simple
 
-    describe("pentaho/type/date -", function() {
-      var SimpleClass = context.get("pentaho/type/date");
+  var simplerTypes = [
+    {name: "boolean",  value: true},
+    {name: "number",   value: 10},
+    {name: "string",   value: "hello"},
+    {name: "object",   value: {foo: "bar"}},
+    {name: "function", value: function() {}},
+    {name: "date",     value: new Date()}
+  ];
 
-      var originalValue = new Date();
+  simplerTypes.forEach(function(simpleSpec) {
+    describe("pentaho.type." + simpleSpec.name, function() {
+      var SimpleClass = context.get("pentaho/type/" + simpleSpec.name);
 
       var value;
       beforeEach(function() {
-        value = new SimpleClass(originalValue);
+        value = new SimpleClass(simpleSpec);
       });
 
       describe("values", function() {
-        describe("omitFormatted: false", function() {
-          it("should return the primitive value, null formatted value, and the inline type", function() {
-            var spec = value.toSpec();
+        describe("primitive format (omitFormatted: true)", function() {
+          it("should return the primitive value", function() {
+            var spec = value.toSpec({omitFormatted: true, includeType: false});
+
+            expect(spec).toBe(simpleSpec.value);
+          });
+        });
+
+        describe("object format (omitFormatted: false)", function() {
+          it("spec.v should contain the primitive value", function() {
+            var spec = value.toSpec({omitFormatted: true, includeType: true});
 
             expect(typeof spec).toBe("object");
-            expect(spec.v).toBeDefined();
-            expect(spec.v instanceof Date).toBe(true);
-            expect(spec.v).toBe(originalValue);
-            expect(spec._).toEqual(SimpleClass.type.toReference());
-            expect(spec.f).toBeUndefined();
-          });
-        });
-
-        describe("omitFormatted: true", function() {
-          it("should return the primitive value and the inline type", function() {
-            var spec = value.toSpec({omitFormatted: true});
-
-            expect(spec.v instanceof Date).toBe(true);
-            expect(spec.v).toBe(originalValue);
-            expect(spec._).toEqual(SimpleClass.type.toReference());
+            expect(spec.v).toBe(simpleSpec.value);
+            expect(spec._).toEqual(SimpleClass.type.toRefInContext());
           });
         });
       });
 
-      describe("inline type spec", function() {
-        it("should return the primitive value", function() {
-          var spec = value.toSpec({omitRootType: true});
+      describe("inline type spec includeType: false", function() {
+        it("should not inline type spec", function() {
+          var spec = value.toSpec({includeType: false});
 
-          expect(spec instanceof Date).toBe(true);
-          expect(spec._).toBeUndefined();
-          expect(spec.f).toBeUndefined();
-          expect(spec.v).toBeUndefined();
+          expect(spec).toBe(simpleSpec.value);
         });
       });
 
-      describe("inline type spec", function() {
-        it("should return the primitive value", function() {
-          var spec = value.toSpec({omitFormatted: true, omitRootType: true});
+      describe("inline type spec includeType: true", function() {
+        it("should inline pentaho/type/" + simpleSpec.name + " type spec", function() {
+          var spec = value.toSpec({includeType: true});
 
-          expect(spec instanceof Date).toBe(true);
-          expect(spec._).toBeUndefined();
+          expect(typeof spec).toBe("object");
+          expect(spec._).toEqual(SimpleClass.type.toRefInContext());
           expect(spec.f).toBeUndefined();
-          expect(spec.v).toBeUndefined();
         });
       });
-    }); // pentaho.type.Date
+    });
   });
 });

@@ -17,7 +17,7 @@ define([
   "pentaho/type/facets/DiscreteDomain",
   "pentaho/type/Context",
   "tests/pentaho/util/errorMatch"
-], function(DiscreteDomainRefinementFacet, Context, errorMatch) {
+], function(DiscreteDomainFacet, Context, errorMatch) {
 
   "use strict";
 
@@ -27,16 +27,16 @@ define([
       List = context.get("pentaho/type/list"),
       PentahoNumber = context.get("pentaho/type/number");
 
-  describe("pentaho.type.DiscreteDomainRefinementFacet -", function() {
+  describe("pentaho.type.facets.DiscreteDomain", function() {
     it("should be a function", function() {
-      expect(typeof DiscreteDomainRefinementFacet).toBe("function");
+      expect(typeof DiscreteDomainFacet).toBe("function");
     });
 
     describe("#domain -", function() {
       describe("when refinement is the discrete domain root", function() {
         it("should have a default null domain", function() {
           var DomainNumber = PentahoNumber.refine({type: {
-            facets: DiscreteDomainRefinementFacet
+            facets: DiscreteDomainFacet
           }});
 
           expect(DomainNumber.type.domain).toBe(null);
@@ -44,7 +44,7 @@ define([
 
         it("should respect a specified root/base domain", function() {
           var DomainNumber = PentahoNumber.refine({type: {
-            facets: DiscreteDomainRefinementFacet,
+            facets: DiscreteDomainFacet,
             domain: [1, 2, 3]
           }});
 
@@ -67,7 +67,7 @@ define([
         describe("when no local domain yet and base domain is null", function() {
 
           var RootRefinement = PentahoNumber.refine({type: {
-            facets: DiscreteDomainRefinementFacet
+            facets: DiscreteDomainFacet
           }});
 
           it("should return null", function() {
@@ -92,7 +92,7 @@ define([
         describe("when no local domain yet and base domain is not null", function() {
           it("should return cloned base domain elements when read", function() {
             var DomainNumber = PentahoNumber.refine({type: {
-              facets: DiscreteDomainRefinementFacet,
+              facets: DiscreteDomainFacet,
               domain: [1, 2, 3]
             }});
 
@@ -117,7 +117,7 @@ define([
 
           it("should throw if set to a value that is not an Array, List or Object", function() {
             var DomainNumber = PentahoNumber.refine({type: {
-              facets: DiscreteDomainRefinementFacet,
+              facets: DiscreteDomainFacet,
               domain: [1, 2, 3]
             }});
 
@@ -130,7 +130,7 @@ define([
 
           it("should throw if set to values which are not in the base domain", function() {
             var DomainNumber = PentahoNumber.refine({type: {
-              facets: DiscreteDomainRefinementFacet,
+              facets: DiscreteDomainFacet,
               domain: [1, 2, 3]
             }});
 
@@ -143,7 +143,7 @@ define([
 
           it("should respect a specified domain that is a subset of the base domain", function() {
             var DomainNumber = PentahoNumber.refine({type: {
-              facets: DiscreteDomainRefinementFacet,
+              facets: DiscreteDomainFacet,
               domain: [1, 2, 3]
             }});
 
@@ -162,7 +162,7 @@ define([
           it("should inherit the base domain and configure it when given a plain object", function() {
 
             var DomainNumber = PentahoNumber.refine({type: {
-              facets: DiscreteDomainRefinementFacet,
+              facets: DiscreteDomainFacet,
               domain: [1, 2, 3]
             }});
 
@@ -179,7 +179,7 @@ define([
 
           it("should allow specifying an element instance of the base domain, and not clone it", function() {
             var DomainNumber = PentahoNumber.refine({type: {
-              facets: DiscreteDomainRefinementFacet,
+              facets: DiscreteDomainFacet,
               domain: [1, 2, 3]
             }});
             var number2 = DomainNumber.type.domain.at(1);
@@ -199,7 +199,7 @@ define([
           describe("when given a plain object", function() {
             it("should configure the existing keys", function() {
               var DomainNumber = PentahoNumber.refine({type: {
-                facets: DiscreteDomainRefinementFacet,
+                facets: DiscreteDomainFacet,
                 domain: [1, 2, 3]
               }});
 
@@ -215,7 +215,7 @@ define([
             it("should throw when a key does not exist", function() {
 
               var DomainNumber = PentahoNumber.refine({type: {
-                facets: DiscreteDomainRefinementFacet,
+                facets: DiscreteDomainFacet,
                 domain: [1, 2, 3]
               }});
 
@@ -231,7 +231,7 @@ define([
 
             it("should configure existing elements", function() {
               var DomainNumber = PentahoNumber.refine({type: {
-                facets: DiscreteDomainRefinementFacet,
+                facets: DiscreteDomainFacet,
                 domain: [1, 2, 3]
               }});
 
@@ -245,7 +245,7 @@ define([
 
             it("should accept be given a base element, and not clone it", function() {
               var DomainNumber = PentahoNumber.refine({type: {
-                facets: DiscreteDomainRefinementFacet,
+                facets: DiscreteDomainFacet,
                 domain: [1, 2, 3]
               }});
               var number2 = DomainNumber.type.domain.at(1);
@@ -260,7 +260,7 @@ define([
 
             it("should remove unspecified elements", function() {
               var DomainNumber = PentahoNumber.refine({type: {
-                facets: DiscreteDomainRefinementFacet,
+                facets: DiscreteDomainFacet,
                 domain: [1, 2, 3]
               }});
 
@@ -274,7 +274,7 @@ define([
 
             it("should throw if given an undefined element", function() {
               var DomainNumber = PentahoNumber.refine({type: {
-                facets: DiscreteDomainRefinementFacet,
+                facets: DiscreteDomainFacet,
                 domain: [1, 2, 3]
               }});
 
@@ -292,7 +292,7 @@ define([
 
         function expectIt(newDomain) {
           var DomainNumber = PentahoNumber.refine({type: {
-            facets: DiscreteDomainRefinementFacet,
+            facets: DiscreteDomainFacet,
             domain: [1, 2, 3]
           }});
 
@@ -313,7 +313,7 @@ define([
 
         function expectIt(newDomain) {
           var DomainNumber = PentahoNumber.refine({type: {
-            facets: DiscreteDomainRefinementFacet,
+            facets: DiscreteDomainFacet,
             domain: [1, 2, 3]
           }});
 
@@ -339,29 +339,60 @@ define([
 
     describe(".validate(value)", function() {
       it("should be defined", function() {
-        expect(typeof DiscreteDomainRefinementFacet.validate).toBe("function");
+        expect(typeof DiscreteDomainFacet.validate).toBe("function");
       });
 
       it("should return null on a value that is equal to one of the domain values", function() {
         var DomainNumber = PentahoNumber.refine({type: {
-          facets: DiscreteDomainRefinementFacet,
+          facets: DiscreteDomainFacet,
           domain: [1, 2, 3]
         }});
 
         var v = new PentahoNumber(1);
 
-        expect(DiscreteDomainRefinementFacet.validate.call(DomainNumber.type, v)).toBe(null);
+        expect(DiscreteDomainFacet.validate.call(DomainNumber.type, v)).toBe(null);
       });
 
       it("should return an Error on a value that is not equal to one of the domain values", function() {
         var DomainNumber = PentahoNumber.refine({type: {
-          facets: DiscreteDomainRefinementFacet,
+          facets: DiscreteDomainFacet,
           domain: [1, 2, 3]
         }});
 
         var v = new PentahoNumber(4);
 
-        expect(DiscreteDomainRefinementFacet.validate.call(DomainNumber.type, v) instanceof Error).toBe(true);
+        expect(DiscreteDomainFacet.validate.call(DomainNumber.type, v) instanceof Error).toBe(true);
+      });
+    });
+
+    describe(".fillSpecInContext(spec, keyArgs)", function() {
+      it("should be defined", function() {
+        expect(typeof DiscreteDomainFacet.fillSpecInContext).toBe("function");
+      });
+
+      it("should serialize a local domain using array form", function() {
+        var DomainNumber = PentahoNumber.refine({type: {
+          facets: DiscreteDomainFacet,
+          domain: [1, 2, 3]
+        }});
+
+        var spec = {};
+        var result = DiscreteDomainFacet.fillSpecInContext.call(DomainNumber.type, spec, {});
+
+        expect(result).toBe(true);
+        expect(spec.domain).toEqual([1, 2, 3]);
+      });
+
+      it("should not serialize a non-existing domain", function() {
+        var DomainNumber = PentahoNumber.refine({type: {
+          facets: DiscreteDomainFacet
+        }});
+
+        var spec = {};
+        var result = DiscreteDomainFacet.fillSpecInContext.call(DomainNumber.type, spec, {});
+
+        expect(result).toBe(false);
+        expect("domain" in spec).toBe(false);
       });
     });
   });

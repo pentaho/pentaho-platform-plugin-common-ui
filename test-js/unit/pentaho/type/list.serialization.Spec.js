@@ -26,36 +26,36 @@ define([
 
   describe("pentaho.type.List#toSpec()", function() {
 
-    describe("when omitRootType is true", function() {
+    describe("when includeType is false", function() {
 
       it("should return an empty array for an empty list", function() {
         var list = new List();
-        var spec = list.toSpec({omitRootType: true});
+        var spec = list.toSpec({includeType: false});
 
         expect(spec).toEqual([]);
       });
 
       it("should return an array of serialized elements for a list of elements", function() {
         var list = new NumberList([1, 2, 3]);
-        var spec = list.toSpec({omitRootType: true});
+        var spec = list.toSpec({includeType: false});
 
         expect(spec).toEqual([1, 2, 3]);
       });
 
     });
 
-    describe("when omitRootType is false", function() {
+    describe("when includeType is true", function() {
 
       it("should return a spec with an empty d property, for an empty list", function() {
         var list = new List();
-        var spec = list.toSpec({omitRootType: false});
+        var spec = list.toSpec({includeType: true});
 
         expect(spec).toEqual({_: jasmine.any(String), d: []});
       });
 
       it("should return an array of serialized elements for a list of elements", function() {
         var list = new NumberList([1, 2, 3]);
-        var spec = list.toSpec({omitRootType: false});
+        var spec = list.toSpec({includeType: true});
 
         expect(spec).toEqual({_: jasmine.any(Object), d: [1, 2, 3]});
       });
