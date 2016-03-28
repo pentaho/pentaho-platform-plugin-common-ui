@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 define([
+  "require",
   "./SpecificationScope",
   "./SpecificationContext",
   "../i18n!types",
@@ -24,7 +25,9 @@ define([
   "../util/object",
   "../util/fun",
   "../util/promise"
-], function(SpecificationScope, SpecificationContext, bundle, Base, AnnotatableLinked, error, arg, O, F, promiseUtil) {
+], function(localRequire, SpecificationScope, SpecificationContext, bundle, Base, AnnotatableLinked,
+    error, arg, O, F, promiseUtil) {
+
   "use strict";
 
   // Unique type class id exposed through Type#uid and used by Context instances.
@@ -719,7 +722,7 @@ define([
       /*jshint laxbreak:true*/
       var view = this._view;
       return view
-          ? (view.promise || (view.promise = promiseUtil.require(view.value)))
+          ? (view.promise || (view.promise = promiseUtil.require(view.value, localRequire)))
           : Promise.resolve(null);
     },
     //endregion
