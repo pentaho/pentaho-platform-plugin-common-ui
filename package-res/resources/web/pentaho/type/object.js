@@ -69,6 +69,7 @@ define([
         cast: Object
       }
     }).implement({
+      //jshint -W069
       type: bundle.structured["object"]
     });
   };

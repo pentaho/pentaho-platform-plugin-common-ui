@@ -54,7 +54,8 @@ define([
         cast: F.as
       }
     }).implement({
-      type: bundle.structured["object"]
+      //jshint -W069
+      type: bundle.structured["function"]
     });
   };
 });

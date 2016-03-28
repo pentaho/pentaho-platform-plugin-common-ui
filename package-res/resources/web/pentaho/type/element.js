@@ -149,6 +149,7 @@ define([
     if(va ===  vb) return 0;
     if(va == null) return vb == null ? 0 : 1;
     if(vb == null) return -1;
+    /*jshint laxbreak:true*/
     return (va.constructor === vb.constructor && va.equals(vb))
         ? 0
         : this._compare(va, vb);
