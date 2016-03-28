@@ -15,8 +15,9 @@
  */
 define([
   "pentaho/type/Context",
+  "pentaho/lang/UserError",
   "tests/pentaho/util/errorMatch"
-], function(Context, errorMatch) {
+], function(Context, UserError, errorMatch) {
 
   "use strict";
 
@@ -265,63 +266,98 @@ define([
         expect(ElemType.prototype instanceof Element.Type).toBe(true);
       });
 
-      describe("#cast -", function() {
-        var SimpleType, Derived;
+      describe("#cast", function() {
 
-        beforeEach(function() {
-          SimpleType = Simple.type;
-          Derived = Simple.extend({type: {
-            cast: function (value) {
-              var n = parseFloat(value);
-              if (isNaN(n)) throw new Error("Invalid value");
-              return n;
-            }
-          }});
+        it("should default to an identity method", function() {
+          var value = {};
+          var Derived = Simple.extend();
+
+          expect(Derived.type.cast(value)).toBe(value);
         });
 
+        it("should be overridable", function() {
+          var Derived = Simple.extend({type: {
+            cast: function(v) {
+              return v * 2;
+            }
+          }});
+
+          expect(Derived.type.cast(3)).toBe(6);
+        });
+
+        it("should be possible to call base", function() {
+          var Derived1 = Simple.extend({type: {
+            cast: function(v) {
+              return v * 2;
+            }
+          }});
+
+          var Derived2 = Derived1.extend({type: {
+            cast: function(v) {
+              return this.base(v) * 5;
+            }
+          }});
+
+          expect(Derived2.type.cast(3)).toBe(3 * 2 * 5);
+        });
+      });
+
+      describe("#toValue(value)", function() {
         function expectCastError(type, value, errorMatch) {
           expect(function() {
-            type.cast(value);
+            type.toValue(value);
           }).toThrow(errorMatch);
         }
 
-        it("Default cast should return the value unchanged", function() {
-          var original = 123;
-          var final = SimpleType.cast(original);
+        it("should call the cast method with the given value, if it is non-nully", function() {
+          var original = {};
 
-          expect(original).toBe(final);
+          var Derived = Simple.extend();
+          spyOn(Derived.type, "cast").and.returnValue(original);
+
+          Derived.type.toValue(original);
+
+          expect(Derived.type.cast.calls.count()).toBe(1);
+          expect(Derived.type.cast.calls.first().args).toEqual([original]);
         });
 
-        it("Cannot cast null values", function() {
-          expectCastError(SimpleType, null, errorMatch.argRequired("value"));
+        it("should return a non-nully value returned by the cast method", function() {
+          var original = {};
+          var Derived = Simple.extend();
+
+          spyOn(Derived.type, "cast").and.returnValue(original);
+
+          expect(Derived.type.toValue({})).toBe(original);
         });
 
-        it("Top cast function should throw an error message when cast function returns nully (null or undefined).",
-            function() {
-          SimpleType.cast = function(value) {
-            return value === 0 ? null : value;
-          };
-          expectCastError(SimpleType, 0, errorMatch.argInvalid("value"));
+        it("should throw when given a nully value", function() {
+          var Derived = Simple.extend();
 
-          SimpleType.cast = function(value) {
-            return value === 0 ? undefined : value;
-          };
-          expectCastError(SimpleType, 0, errorMatch.argInvalid("value"));
+          expectCastError(Derived.type, null, errorMatch.argRequired("value"));
+
+          expectCastError(Derived.type, undefined, errorMatch.argRequired("value"));
         });
 
-        it("Should have changed the default cast behaviour and return an error if not a number", function() {
-          expect(Derived.type.cast("1")).toBe(1);
+        it("should throw an error, when the cast method returns nully", function() {
+          var value;
+          var Derived = Simple.extend();
+          spyOn(Derived.type, "cast").and.callFake(function() { return value; });
+
+          value = null;
+          expectCastError(Derived.type, 0, errorMatch.argInvalid("value"));
+
+          value = undefined;
+          expectCastError(Derived.type, 0, errorMatch.argInvalid("value"));
+        });
+
+        it("should throw user errors thrown by the cast method", function() {
+          var error = new UserError("Invalid!");
+          var Derived = Simple.extend();
+          spyOn(Derived.type, "cast").and.callFake(function() { throw error; });
 
           expect(function() {
-            Derived.type.cast("a");
-          }).toThrowError("Invalid value");
-        });
-
-        it("Setting cast to a falsy value restores the default cast function (identity)", function() {
-          var value = "123";
-          expect(Derived.type.cast(value)).toBe(123);
-          Derived.type.cast = null;
-          expect(Derived.type.cast(value)).toBe(value);
+            Derived.type.toValue({});
+          }).toThrow(error);
         });
       });
     });

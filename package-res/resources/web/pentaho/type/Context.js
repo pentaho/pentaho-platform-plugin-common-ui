@@ -277,10 +277,11 @@ define([
      *
      * });
      *
-     * @param {?pentaho.type.spec.UTypeReference} [typeRef] A type reference.
-     * Defaults to type `"pentaho/type/string"`.
+     * @param {!pentaho.type.spec.UTypeReference} typeRef A type reference.
      *
      * @return {!Class.<pentaho.type.Value>} The instance constructor.
+     *
+     * @throws {pentaho.lang.ArgumentRequiredError} When `typeRef` is an empty string or {@link Nully}.
      *
      * @throws {pentaho.lang.ArgumentInvalidError} When `typeRef` is of an unsupported JavaScript type:
      * not a string, function, array or object.
@@ -347,10 +348,11 @@ define([
      *
      * });
      *
-     * @param {?pentaho.type.spec.UTypeReference} [typeRef] A type reference.
-     * Defaults to type `"pentaho/type/string"`.
+     * @param {!pentaho.type.spec.UTypeReference} typeRef A type reference.
      *
      * @return {!Promise.<!Class.<pentaho.type.Value>>} A promise for the instance constructor.
+     *
+     * @rejects {pentaho.lang.ArgumentRequiredError} When `typeRef` is an empty string or {@link Nully}.
      *
      * @rejects {pentaho.lang.ArgumentInvalidError} When `typeRef` is of an unsupported JavaScript type:
      * not a string, function, array or object.
@@ -456,9 +458,7 @@ define([
      * Main dispatcher according to the type and class of `typeRef`:
      * string, function or array or object.
      *
-     * @param {?pentaho.type.spec.UTypeReference} typeRef A type reference.
-     * Defaults to type `"pentaho/type/string"`.
-     *
+     * @param {pentaho.type.spec.UTypeReference} typeRef A type reference.
      * @param {boolean} [sync=false] Whether to perform a synchronous get.
      * @return {!Promise.<!Class.<pentaho.type.Value>>|!Class.<pentaho.type.Value>} When sync,
      *   returns the instance constructor, while, when async, returns a promise for it.
@@ -470,8 +470,9 @@ define([
      * @ignore
      */
     _get: function(typeRef, sync) {
-      // Default property type is "string".
-      if(!typeRef) typeRef = _defaultTypeMid;
+      if(typeRef == null || typeRef === "")
+        return this._error(error.argRequired("typeRef"), sync);
+
       /*jshint laxbreak:true*/
       switch(typeof typeRef) {
         case "string":   return this._getById (typeRef, sync);

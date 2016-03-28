@@ -269,32 +269,18 @@ define([
 
       type: /** @lends pentaho.type.Refinement.Type# */{
 
+        // Antecipate extend of these properties
+        extend_order: ["of", "facets"],
+
         // Note: constructor/_init only called on sub-classes of Refinement.Type,
         // and not on Refinement.Type itself.
         _init: function(instSpec) {
           this.base.apply(this, arguments);
 
-          // Anticipate application of the refined type
-          var of = instSpec.of;
-          if(of) {
-            // Ugly but effective in not processing the property twice...
-            delete instSpec.of;
-
-            this.of = of;
-
-          } else if(!this._of) {
+          // Anticipate `of` validation
+          if(!instSpec.of && !this._of) {
             // Required validation
             this.of = null; // throws...
-          }
-
-          // Anticipate application of the refinement facet types
-          // so that other instSpec properties can use attributes these mix in.
-          var facets = instSpec.facets;
-          if(facets) {
-            // Ugly but effective in not processing the property twice...
-            delete instSpec.facets;
-
-            this.facets = facets;
           }
         },
 

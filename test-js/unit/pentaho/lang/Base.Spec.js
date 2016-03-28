@@ -86,12 +86,18 @@ define([
           });
         });
 
-        it("have __root_proto__ property", function() {
+        it("should have a __root_proto__ property", function() {
           var o = new Base();
           expect(o.__root_proto__).toBe(Base.prototype);
 
           o = Base.to({});
           expect(o.__root_proto__).toBe(Base.prototype);
+        });
+
+        it("should have an __extend_exclude__ property", function() {
+          var o = new Base();
+          var exc = o.__extend_exclude__;
+          expect(exc instanceof Object).toBe(true);
         });
 
         describe("when extended", function() {
@@ -125,13 +131,6 @@ define([
               expect(o.c).toBe(5);
             });
 
-            it("instance extension support single property syntax", function() {
-              var o = new Base();
-              o.extend("b", 10);
-
-              expect(o.b).toBe(10);
-            });
-
             it("instance extension supports functions", function() {
               var o = new Base();
               o.extend({
@@ -147,16 +146,14 @@ define([
 
             it("instance extension supports getters and setters", function() {
               var o = new Base();
-              o.extend(
-                {
-                  get e() {
-                    return this.param;
-                  },
-                  set e(param) {
-                    this.param = param;
-                  }
+              o.extend({
+                get e() {
+                  return this.param;
+                },
+                set e(param) {
+                  this.param = param;
                 }
-              );
+              });
 
               o.e = "hello world";
               expect(o.e).toBe("hello world");
@@ -167,6 +164,39 @@ define([
               o.extend({base: "hello"});
 
               expect(o.base).not.toBe("hello");
+            });
+
+            it("shouldn't be able to define this.constructor", function() {
+              var o = new Base();
+              var f = function(){};
+              o.extend({constructor: f});
+
+              expect(o.constructor).toBe(Base);
+            });
+
+            it("shouldn't be able to define this.extend_exclude", function() {
+              var o = new Base();
+              o.extend({extend_exclude: {"foo": 1}});
+
+              expect(o.extend_exclude).toBe(undefined);
+            });
+
+            it("shouldn't be able to define this.extend_exclude", function() {
+              var o = new Base();
+              o.extend({extend_order: ["foo"]});
+
+              expect(o.extend_order).toBe(undefined);
+            });
+
+            describe("keyArgs.exclude", function() {
+
+              it("should ignore the specified properties of the given specification", function() {
+                var o = new Base();
+                o.extend({a: 1, b: 2}, {exclude: {a: true}});
+
+                expect(o.a).toBe(undefined);
+                expect(o.b).toBe(2);
+              });
             });
           });
         });
@@ -303,6 +333,7 @@ define([
               return this._bathPerDay;
             },
 
+            // jshint -W078
             set bathsPerWeek(b) {
               this._bathPerDay = b / 7;
             },
@@ -411,6 +442,7 @@ define([
             get weight() {
               return this._weight * 2;
             },
+            // jshint -W078
             set height(h) {
               this._height = h - 20;
             }
@@ -431,7 +463,7 @@ define([
             },
             set prince(p) {
               p = "symbol";
-            },
+            },// jshint -W078
             get mememe() {
               return Animal;
             }
@@ -467,7 +499,7 @@ define([
             },
             set height(h) {
               this._height = h - 20;
-            },
+            }, // jshint -W078
 
             get color() {
               return this.base() + "ish";
@@ -539,16 +571,13 @@ define([
         });
 
         describe("when extended", function() {
-          it("should call _subClassed, if present", function() {
-            spyOn(Cat, "_extend").and.callThrough();
-            Cat._subClassed = jasmine.createSpy("_subClassed");
+          it("should delegate to _subclassed, if overridden", function() {
+            Cat._subclassed = jasmine.createSpy("_subclassed");
 
             var keyArgs = {a: 'hello'};
             Cat.extend("CatWithArgs", {}, {}, keyArgs);
 
-            expect(Cat._extend).toHaveBeenCalledWith("CatWithArgs", {}, {}, keyArgs);
-            expect(Cat._subClassed).toHaveBeenCalled();
-            expect(Cat._subClassed.calls.mostRecent().args[3]).toBe(keyArgs);
+            expect(Cat._subclassed).toHaveBeenCalledWith(jasmine.any(Function), {}, {}, keyArgs);
           });
 
           it("should delegate to _extended, if overridden", function() {
@@ -620,13 +649,11 @@ define([
           describe("should be able to override", function() {
             describe("class level", function() {
               it("constructor", function() {
-                var Persa = Cat.extend(
-                  {
+                var Persa = Cat.extend({
                     constructor: function(name) {
                       this.base("Bald " + name);
                     }
-                  }
-                );
+                  });
 
                 var persa = new Persa("Felix");
 
@@ -789,6 +816,189 @@ define([
               });
             });
           });
+
+          describe("instSpec.extend_exclude", function() {
+
+            it("should take effect in #extend calls of instances of the new class", function() {
+              var Derived = Base.extend({extend_exclude: {a: true}});
+              var inst = new Derived({a: 1});
+              expect(inst.a).toBe(undefined);
+
+              inst.extend({a: 3});
+              expect(inst.a).toBe(undefined);
+            });
+
+            it("should take effect in the extend call that defines the new class", function() {
+              var Derived = Base.extend({extend_exclude: {a: true}, a: 1});
+
+              expect(Derived.prototype.a).toBe(undefined);
+            });
+
+            it("should take effect in implement calls of the new class", function() {
+              var Derived = Base.extend({extend_exclude: {a: true}});
+
+              Derived.implement({a: 1});
+
+              expect(Derived.prototype.a).toBe(undefined);
+            });
+
+            it("should add to the exclusions of the base class", function() {
+              var Derived1 = Base.extend({extend_exclude: {a: true}});
+              var Derived2 = Derived1.extend({extend_exclude: {b: true}});
+
+              var inst1 = new Derived1({a: 1, b: 2});
+
+              expect(inst1.a).toBe(undefined);
+              expect(inst1.b).toBe(2);
+
+              var inst2 = new Derived2({a: 1, b: 2});
+
+              expect(inst2.a).toBe(undefined);
+              expect(inst2.b).toBe(undefined);
+            });
+          });
+
+          describe("instSpec.extend_order", function() {
+
+            it("should take effect in #extend calls of instances of the new class", function() {
+              var index, aIndex, bIndex;
+
+              var Derived = Base.extend({
+                extend_order: ["a", "b"],
+
+                get a()  { return this._a; },
+                set a(v) {
+                  aIndex = index++;
+                  this._a = v;
+                },
+
+                get b()  { return this._b; },
+                set b(v) {
+                  bIndex = index++;
+                  this._b = v;
+                }
+              });
+
+
+              function expectIt(spec) {
+                index = 1;
+                aIndex = bIndex = null;
+
+                var inst = new Derived(spec);
+
+                expect(inst.a).toBe(1);
+                expect(inst.b).toBe(2);
+
+                expect(aIndex).toBe(1);
+                expect(bIndex).toBe(2);
+              }
+
+              expectIt({a: 1, b: 2});
+              expectIt({b: 2, a: 1});
+            });
+
+            it("should take effect in implement calls of the new class", function() {
+
+              function expectIt(spec) {
+                var index = 1, aIndex, bIndex;
+
+                var Derived = Base.extend({
+                  extend_order: ["a", "b"],
+                  get a()  { return this._a; },
+                  set a(v) {
+                    aIndex = index++;
+                    this._a = v;
+                  },
+
+                  get b()  { return this._b; },
+                  set b(v) {
+                    bIndex = index++;
+                    this._b = v;
+                  }
+                });
+
+                Derived.implement(spec);
+
+                expect(Derived.prototype.a).toBe(1);
+                expect(Derived.prototype.b).toBe(2);
+
+                expect(aIndex).toBe(1);
+                expect(bIndex).toBe(2);
+              }
+
+              expectIt({a: 1, b: 2});
+              expectIt({b: 2, a: 1});
+            });
+
+            it("should add to the ordered props of the base class", function() {
+
+              function expectIt(spec) {
+                var index = 1, aIndex, bIndex, cIndex;
+
+                var Derived1 = Base.extend({
+                  extend_order: ["c", "b"],
+
+                  get b()  { return this._b; },
+                  set b(v) {
+                    bIndex = index++;
+                    this._b = v;
+                  },
+
+                  get c()  { return this._c; },
+                  set c(v) {
+                    cIndex = index++;
+                    this._c = v;
+                  }
+                });
+
+                var Derived2 = Derived1.extend({
+                  extend_order: ["a"],
+
+                  get a()  { return this._a; },
+                  set a(v) {
+                    aIndex = index++;
+                    this._a = v;
+                  },
+                });
+
+                var inst1 = new Derived2(spec);
+
+                expect(inst1.c).toBe(1);
+                expect(inst1.b).toBe(2);
+                expect(inst1.a).toBe(3);
+                expect(cIndex).toBe(1);
+                expect(bIndex).toBe(2);
+                expect(aIndex).toBe(3);
+              }
+
+              expectIt({c: 1, b: 2, a: 3});
+              expectIt({b: 2, a: 3, c: 1});
+              expectIt({a: 3, c: 1, b: 2});
+              expectIt({a: 3, b: 2, c: 1});
+            });
+          });
+
+          describe("keyArgs.exclude", function() {
+
+            it("should ignore the specified properties of the given instance specification", function() {
+              var Derived = Base.extend({
+                      a: 1,
+                      b: 2
+                    },
+                    {},
+                    {exclude: {a: true}});
+
+              expect(Derived.prototype.a).toBe(undefined);
+              expect(Derived.prototype.b).toBe(2);
+            });
+
+            it("should ignore the specified properties of the given class specification", function() {
+              var Derived = Base.extend({}, {a: 1, b: 2}, {exclude: {a: true}});
+
+              expect(Derived.a).toBe(undefined);
+              expect(Derived.b).toBe(2);
+            });
+          });
         });
 
         describe("when implementing interfaces", function() {
@@ -799,7 +1009,7 @@ define([
           });
 
           describe("using mixins", function() {
-            describe("mixing class", function() {
+            describe("mixing class, without keyArgs", function() {
               var DomesticMixIn;
 
               beforeEach(function() {
@@ -978,181 +1188,34 @@ define([
               });
             });
 
-            describe("mixing class and literal object static spec", function() {
-              var DomesticMixIn;
+            describe("mixing class, with keyArgs", function() {
 
-              beforeEach(function() {
-                DomesticMixIn = Base.extend(level3_instance_spec);
+              describe("keyArgs.exclude", function() {
 
-                Persa.mix(DomesticMixIn, level3_static_spec);
-              });
+                it("should ignore the specified instance properties of the given class", function() {
+                  var Derived = Base.extend();
 
-              it("should mix instance level members", function() {
-                expect(Persa.prototype.properName).toBeDefined();
-                expect(Persa.prototype.eat).toBeDefined();
-              });
+                  var F = function() {};
+                  F.prototype.a = 1;
+                  F.prototype.b = 2;
 
-              it("should mix class level members", function() {
-                expect(Persa.human).toBe("friend");
-              });
+                  Derived.mix(F, {exclude: {a: true}});
 
-              describe("instances", function() {
-                var persa_cat;
-
-                beforeEach(function() {
-                  persa_cat = new Persa();
+                  expect(Derived.prototype.a).toBe(undefined);
+                  expect(Derived.prototype.b).toBe(2);
                 });
 
-                it("should have mixed members", function() {
-                  expect(persa_cat.properName).toBeDefined();
-                  expect(persa_cat.eat).toBeDefined();
-                });
+                it("should ignore the specified static properties of the given class", function() {
+                  var Derived = Base.extend();
 
-                it("should be instances of base class but not of MixIn class", function() {
-                  expect(persa_cat instanceof Persa).toBe(true);
-                  expect(persa_cat instanceof Cat).toBe(true);
-                  expect(persa_cat instanceof Animal).toBe(true);
-                  expect(persa_cat instanceof Base).toBe(true);
+                  var F = function() {};
+                  F.a = 1;
+                  F.b = 2;
 
-                  expect(persa_cat instanceof DomesticMixIn).toBe(false);
-                });
-              });
+                  Derived.mix(F, {exclude: {a: true}});
 
-              describe("should be able to override", function() {
-                describe("class level", function() {
-                  it("functions", function() {
-                    expect(Persa.reproduce).not.toBe(Cat.reproduce);
-                  });
-
-                  it("getters and setters", function() {
-                    var persa_descriptor = O.getPropertyDescriptor(Persa, "queen");
-                    var cat_descriptor = O.getPropertyDescriptor(Cat, "queen");
-
-                    expect(persa_descriptor.get).not.toBe(cat_descriptor.get);
-                    expect(persa_descriptor.set).not.toBe(cat_descriptor.set);
-                  });
-
-                  it("only getter", function() {
-                    var persa_descriptor = O.getPropertyDescriptor(Persa, "mememe");
-                    var cat_descriptor = O.getPropertyDescriptor(Cat, "mememe");
-
-                    expect(persa_descriptor.get).not.toBe(cat_descriptor.get);
-                    expect(persa_descriptor.set).toBe(cat_descriptor.set);
-                  });
-
-                  it("only setter", function() {
-                    var persa_descriptor = O.getPropertyDescriptor(Persa, "prince");
-                    var cat_descriptor = O.getPropertyDescriptor(Cat, "prince");
-
-                    expect(persa_descriptor.get).toBe(cat_descriptor.get);
-                    expect(persa_descriptor.set).not.toBe(cat_descriptor.set);
-                  });
-                });
-
-                describe("instance level", function() {
-                  it("properties", function() {
-                    expect(Persa.prototype.sleepPerDay).not.toBe(Cat.prototype.sleepPerDay);
-                  });
-
-                  it("functions", function() {
-                    expect(Persa.prototype.eat).not.toBe(Cat.prototype.eat);
-                  });
-
-                  it("getters and setters", function() {
-                    var persa_descriptor = O.getPropertyDescriptor(Persa.prototype, "weight");
-                    var cat_descriptor = O.getPropertyDescriptor(Cat.prototype, "weight");
-
-                    expect(persa_descriptor.get).not.toBe(cat_descriptor.get);
-                    expect(persa_descriptor.set).not.toBe(cat_descriptor.set);
-                  });
-
-                  it("only getter", function() {
-                    var persa_descriptor = O.getPropertyDescriptor(Persa.prototype, "size");
-                    var cat_descriptor = O.getPropertyDescriptor(Cat.prototype, "size");
-
-                    expect(persa_descriptor.get).not.toBe(cat_descriptor.get);
-                    expect(persa_descriptor.set).toBe(cat_descriptor.set);
-                  });
-
-                  it("only setter", function() {
-                    var persa_descriptor = O.getPropertyDescriptor(Persa.prototype, "height");
-                    var cat_descriptor = O.getPropertyDescriptor(Cat.prototype, "height");
-
-                    expect(persa_descriptor.get).toBe(cat_descriptor.get);
-                    expect(persa_descriptor.set).not.toBe(cat_descriptor.set);
-                  });
-                });
-              });
-
-              describe("overridden methods", function() {
-                describe("instance level", function() {
-                  var persa_cat;
-
-                  beforeEach(function() {
-                    persa_cat = new Persa();
-                  });
-
-                  it("should be able to call its base method", function() {
-                    persa_cat.drink("orange juice");
-
-                    expect(persa_cat.drank.length).toBe(1);
-                    expect(persa_cat.drank[0]).toBe("orange juice with sugar");
-                  });
-
-                  it("getters/setters should be able to call its base method", function() {
-                    persa_cat.color = "black";
-
-                    expect(persa_cat.color).toBe("bald blackish");
-                  });
-
-                  it("should be able to call its base method even if there isn't one", function() {
-                    expect(persa_cat.run()).toBeUndefined();
-                  });
-
-                  it("method shouldn't be wrapped if not calling this.base()", function() {
-                    expect(persa_cat.smell).toBe(level3_instance_spec.smell);
-                    expect(persa_cat.smell.valueOf()).toBe(level3_instance_spec.smell);
-                  });
-
-                  it("method should be wrapped if calling this.base()", function() {
-                    expect(persa_cat.drink).not.toBe(level3_instance_spec.drink);
-                  });
-
-                  it("valueOf should return unwrapped method", function() {
-                    expect(persa_cat.drink.valueOf()).toBe(level3_instance_spec.drink);
-                  });
-
-                  it("toString should return string representation of unwrapped method", function() {
-                    expect(persa_cat.drink.toString()).toBe(level3_instance_spec.drink.toString());
-                  });
-                });
-
-                describe("class level", function() {
-                  it("should be able to call its base method", function() {
-                    expect(Persa.reproduce()).toBe(20);
-                    expect(Persa.queen).toBe("beeboo");
-                  });
-
-                  it("should be able to call its base method even if there isn't one", function() {
-                    expect(Persa.walk()).toBeUndefined();
-                  });
-
-                  it("method shouldn't be wrapped if not calling this.base()", function() {
-                    expect(Persa.destroy).toBe(level3_static_spec.destroy);
-                    expect(Persa.destroy.valueOf()).toBe(level3_static_spec.destroy);
-                  });
-
-                  it("method should be wrapped if calling this.base()", function() {
-                    expect(Persa.reproduce).not.toBe(level3_static_spec.reproduce);
-                  });
-
-                  it("valueOf should return unwrapped method", function() {
-                    expect(Persa.reproduce.valueOf()).toBe(level3_static_spec.reproduce);
-                  });
-
-                  it("toString should return string representation of unwrapped method", function() {
-                    expect(Persa.reproduce.toString()).toBe(level3_static_spec.reproduce.toString());
-                  });
+                  expect(Derived.a).toBe(undefined);
+                  expect(Derived.b).toBe(2);
                 });
               });
             });
@@ -1319,6 +1382,44 @@ define([
                   it("toString should return string representation of unwrapped method", function() {
                     expect(Persa.reproduce.toString()).toBe(level3_static_spec.reproduce.toString());
                   });
+                });
+              });
+            });
+
+            describe("mixing object literals specs, with keyArgs", function() {
+
+              describe("keyArgs.exclude", function() {
+
+                it("should ignore the specified properties of the given instance specification", function() {
+                  var Derived = Base.extend();
+
+                  Derived.mix({a: 1, b: 2}, {}, {exclude: {a: true}});
+
+                  expect(Derived.prototype.a).toBe(undefined);
+                  expect(Derived.prototype.b).toBe(2);
+
+                  Derived = Base.extend();
+
+                  Derived.mix({a: 1, b: 2}, null, {exclude: {a: true}});
+
+                  expect(Derived.prototype.a).toBe(undefined);
+                  expect(Derived.prototype.b).toBe(2);
+                });
+
+                it("should ignore the specified properties of the given class specification", function() {
+                  var Derived = Base.extend();
+
+                  Derived.mix({}, {a: 1, b: 2}, {exclude: {a: true}});
+
+                  expect(Derived.a).toBe(undefined);
+                  expect(Derived.b).toBe(2);
+
+                  Derived = Base.extend();
+
+                  Derived.mix(null, {a: 1, b: 2}, {exclude: {a: true}});
+
+                  expect(Derived.a).toBe(undefined);
+                  expect(Derived.b).toBe(2);
                 });
               });
             });

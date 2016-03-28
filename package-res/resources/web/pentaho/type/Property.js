@@ -88,10 +88,27 @@ define([
       },
 
       /**
+       * Setting name and label first allows describing the property in subsequent error messages.
+       *
+       * Setting label after name ensures that label defaults that are derived from name work the first time.
+       *
+       * Setting type before value (not included here, so it is processed after type) avoids:
+       * 1. checking the new value against the old type (and then again, against the new type)
+       * 2. ensures error messages are given in a predicatable order,
+       *    independently of the order of properties in an instSpec:
+       *   1. is new type a subtype of old type?
+       *   2. is new value an instance of the new type?
+       *
+       * @type string[]
+       * @ignore
+       */
+      extend_order: ["name", "label", "type"],
+
+      /**
        * Performs initialization tasks that take place before the instance is
        * extended with its spec.
        *
-       * @param {pentaho.type.spec.UPropertyType} spec A property name or specification object.
+       * @param {!pentaho.type.spec.UPropertyType} spec A property name or specification object.
        * @param {!Object} keyArgs Keyword arguments.
        * @param {!pentaho.type.Complex.Type} keyArgs.declaringType The complex type that declares the property.
        * @param {number} keyArgs.index The index of the property within its complex type.
@@ -106,7 +123,16 @@ define([
 
         O.setConst(this, "_declaringType", arg.required(keyArgs, "declaringType", "keyArgs"));
 
-        if(this.isRoot) O.setConst(this, "_index", keyArgs.index || 0);
+        if(this.isRoot) {
+          O.setConst(this, "_index", keyArgs.index || 0);
+
+          // Required stuff
+          if(!("name" in spec)) this.name = null; // throws
+
+          // Assume the _default_ type _before_ extend, to make sure `value` can be validated against it.
+          var type = spec.type;
+          if(type == null || type === "") this.type = "string";
+        }
       },
 
       _postInit: function() {
@@ -114,12 +140,8 @@ define([
         this.base.apply(this, arguments);
 
         if(this.isRoot) {
-          // Required validation
-          if(!this._name) this.name = null; // throws...
-
-          // Force assuming default values
-          if(!this._type)  this.type = null;
-          if(!this._label) this._resetLabel();
+          // Assuming default values
+          if(!O.hasOwn(this, "_label")) this._resetLabel();
         }
       },
 
@@ -197,40 +219,42 @@ define([
       //endregion
 
       //region name attribute
-
-      // -> nonEmptyString, Required, Immutable, Root-only.
       _name: undefined,
 
       /**
-       * Gets the name of the property.
+       * Gets or sets the name of the _property type_.
        *
-       * @type string
-       * @readonly
+       * The name of a _property type_ identifies it within
+       * its [declaring type]{@link pentaho.type.Property.Type#declaringType}.
+       *
+       * This attribute must be set when defining a new _property type_,
+       * and cannot change afterwards.
+       *
+       * When set to a non-{@link Nully} and non-{@link String} value,
+       * the value is first replaced by the result of calling its `toString` method.
+       *
+       * @type {!nonEmptyString}
+       *
+       * @throws {pentaho.lang.ArgumentRequiredError} When set to an empty string or a _nully_ value.
+       * @throws {TypeError} When set to a value different from the current one.
        */
       get name() {
         return this._name;
       },
 
-      /**
-       * The `name` attribute can only be set once.
-       * The setter is used internally when extending Property, e.g.:
-       *
-       * var derivedProp = Property.extendProto({name: "xpto"});
-       *
-       * @ignore
-       */
       set name(value) {
         value = nonEmptyString(value);
 
         if(!value) throw error.argRequired("name");
 
+        // Only stored at the root property type.
         if(this.isRoot) {
-          // Can only be set-once or cannot change, or throws.
+          // Cannot change, or throws.
           O.setConst(this, "_name", value);
         } else {
           // Hierarchy consistency
           if(value && value !== this._name)
-            throw error.argInvalid("name", "Sub-properties cannot change the 'name' attribute.");
+            throw new TypeError("Sub-properties cannot change the 'name' attribute.");
         }
       },
       //endregion
@@ -239,9 +263,9 @@ define([
       /**
        * Gets a value that indicates if the property is a _list_.
        *
-       * A property is a _list_ property if its value type,
-       * {@link pentaho.type.Property.Type#type}, is a list type,
-       * i.e., if it is or extends {@link pentaho.type.List}.
+       * A property is a _list_ property if
+       * its [value type]{@link pentaho.type.Property.Type#type} is a list type,
+       * i.e., if it is or extends [List]{@link pentaho.type.List}.
        *
        * @type boolean
        * @readonly
@@ -273,82 +297,118 @@ define([
       //endregion
 
       //region (value) type attribute
+      _type: undefined,
+
       /**
-       * Gets the base type of the value that the property can hold.
+       * Gets or sets the type of value that properties of this type can hold.
        *
-       * @type !pentaho.type.Value.Type
-       * @readonly
+       * When set and the property already has [descendant]{@link pentaho.type.Type#hasDescendants} properties,
+       * an error is thrown.
+       *
+       * When set to a {@link Nully} value, the set operation is ignored.
+       *
+       * Otherwise, the set value is assumed to be an [spec.UTypeReference]{@link pentaho.type.spec.UTypeReference}
+       * and is first resolved using [this.context.get]{@link pentaho.type.Context#get}.
+       *
+       * When set to a _value type_ that is _not_ a
+       * [subtype]{@link pentaho.type.Type#isSubtypeOf} of the attribute's current _value type_,
+       * an error is thrown.
+       *
+       * When set and the [value]{@link pentaho.type.Property.Type#value} attribute
+       * is _locally_ set, it is checked against the new _value type_,
+       * and set to `null`, if it not an instance of it.
+       *
+       * The default value type is the inherited value type.
+       * A root _property type_ has a default _value type_ of [string]{@link pentaho.type.String}.
+       *
+       * @type {!pentaho.type.Value.Type}
+       *
+       * @throws {pentaho.lang.OperationInvalidError} When setting and the property already has
+       * [descendant]{@link pentaho.type.Type#hasDescendants} properties.
+       * @throws {pentaho.lang.ArgumentInvalidError} When setting to a _value type_ that is not a subtype
+       * of the current _value type_.
        */
       get type() {
         return this._type;
       },
 
-      /**
-       * Sets the type of the value that the property can hold.
-       * Note that changing the type does not implicitly enforce a cast of the value to the new type.
-       * TODO: review this setter.
-       * @ignore
-       */
       set type(value) {
-        // Resolves types synchronously.
-        if(this.isRoot) {
-          this._type = this.context.get(value).type;
-        } else {
-          // Can be changed
+        if(this.hasDescendants)
+          throw error.operInvalid("Cannot change the value type of a property type that has descendants.");
 
-          // Delete any inherited value.
-          delete this._type;
+        if(value == null) return;
 
-          if(value != null) {
-            var type = this.context.get(value).type,
-                baseType = this._type;
+        var oldType = this._type;
+        var newType = this.context.get(value).type;
+        if(newType !== oldType) {
+          // Hierarchy/PreviousValue consistency
+          if(oldType && !newType.isSubtypeOf(oldType))
+            throw error.argInvalid("type", bundle.structured.errors.property.typeNotSubtypeOfBaseType);
 
-            // Hierarchy/PreviousValue consistency
-            // Validate that it is a sub-type of the base property's type
-            // or a refinement type whose `of` is the base type.
-            // (which can only happen if baseType itself is not a refinement type).
-            if(type !== baseType) {
-              if(!type.isSubtypeOf(baseType))
-                throw error.argInvalid("type", bundle.structured.errors.property.typeNotSubtypeOfBaseType);
+          this._type = newType;
 
-              this._type = type;
-            }
+          // Set local value to null, if it is not an instance of the new type.
+          // Not really needed as the value getter tests the if value is of type.
+          // However, this improves performance.
+          var dv;
+          if(O.hasOwn(this, "_value") && (dv = this._value) && !newType.is(dv)) {
+            this._value = null;
           }
         }
       },
       //endregion
 
-      //region value attribute and methods
+      //region value attribute and related methods
       _value: null,
 
       /**
-       * Gets or sets the _default value_ of the property.
+       * Gets or sets the _default value_ of the _property type_.
        *
-       * Setting to `undefined` clears the local value and
-       * inherits any base default value.
+       * The _default value_ is the prototype value that properties of this type take,
+       * on complex instances,
+       * when the property is unspecified or specified as a {@link Nully} value.
+       * A [cloned]{@link pentaho.type.Value#clone} value is used each time.
        *
-       * Setting to `null` breaks inheritance
-       * and forces not having a _default value_.
+       * The value `null` is a valid _default value_.
        *
-       * Any other set values must be _convertible_ to
-       * the property's value type, {@link pentaho.type.Property.Type#type}.
+       * When got and the _default value_ (local or inherited)
+       * is not an instance of the _value type_ (local or inherited),
+       * `null` is returned.
        *
-       * The default _default value_ of a property is
-       * that of its ancestor property,
-       * as long as it is an instance of the local value type,
-       * or `null` in any other case.
+       * When set and the property already has [descendant]{@link pentaho.type.Type#hasDescendants} properties,
+       * an error is thrown.
        *
-       * @type ?pentaho.type.Value
+       * When set to `null`, it is respected.
+       *
+       * When set to the _control value_ `undefined`, the attribute value is reset,
+       * causing it to assume its _default value_:
+       *
+       * * for [root]{@link pentaho.type.Type#root} _property types_, the _default value_ is `null`
+       * * for non-root _property types_, the _default value_ is the _inherited value_,
+       *   if it is an instance of the _property type_'s [value type]{@link pentaho.type.Property.Type#type},
+       *   or, `null`, otherwise.
+       *
+       * When set to any other value,
+       * it is first converted to the _property type_'s
+       * [value type]{@link pentaho.type.Property.Type#type},
+       * using its [Value.Type#to]{@link pentaho.type.Value.Type#to} method.
+       * The conversion may be impossible and thus an error may be thrown.
+       *
+       * @type {pentaho.type.Value}
+       * @throws {pentaho.lang.OperationInvalidError} When setting and the property already has
+       * [descendant]{@link pentaho.type.Type#hasDescendants} properties.
+       * @throws {Error} When setting to a _default value_ that cannot be converted to the
+       * property type's current _value type.
        */
       get value() {
-        return this._value;
+        var value = this._value;
+        return value && this._type.is(value) ? value : null;
       },
 
-      // TODO: implement safe default value inheritance
-
-      // NOTE: the argument cannot have the same name as the property setter
-      // or PhantomJS 1.9.8 will throw a syntax error...
       set value(_) {
+        if(this.hasDescendants)
+          throw error.operInvalid("Cannot change the default value of a property type that has descendants.");
+
         if(_ === undefined) {
           if(this !== _propType) {
             // Clear local value. Inherit base value.
@@ -388,10 +448,10 @@ define([
        * Gets a fresh default value for use in a new `Complex` instance.
        *
        * Ensures that default values are _cloned_ (specially important for lists and complexes).
-       * Ensures that list properties always have a non-null default.
+       * Ensures that list properties always have a non-null default value.
        *
-       * @return {pentaho.type.Value} The fresh default value.
-       * @ignore
+       * @return {pentaho.type.Value} A fresh default value.
+       * @private
        */
       _freshDefaultValue: function() {
         var value = this.value;
@@ -408,7 +468,6 @@ define([
        * The label of a root property is reset to a capitalization of the `name` attribute.
        * A non-root property inherits the label of its closest ancestor.
        *
-       * @return {nonEmptyString}
        * @ignore
        */
       _resetLabel: function() {
@@ -477,86 +536,112 @@ define([
       },
       //endregion
 
-      //region dynamic attributes
+      //region dynamic & monotonic attributes
       // Configuration support
       /**
-       * Sets the attributes of the property.
+       * Defines dynamic, monotonic, inherited attributes of the property type.
        *
        * This setter is used when the developer is extending Property to support new attributes.
        *
-       * @type pentaho.type.spec.IPropertyType
+       * @type {Object}
        * @ignore
        */
-      set attrs(attrSpecs) {
+      set _attrs(attrSpecs) {
         Object.keys(attrSpecs).forEach(function(name) {
-          this._dynamicAttribute(name, attrSpecs[name]);
+          this._dynamicMonotonicInheritedAttribute(name, attrSpecs[name]);
         }, this);
       }, // jshint -W078
 
       /**
-       * Dynamically defines an attribute and corresponding setter and getter methods.
+       * Defines a "dynamic" attribute and corresponding setter and getter methods.
        *
        * This method is an implementation detail,
        * ans is invoked by {pentaho.type.Property.Type#attrs}
        *
        * @param {String} name
-       * @param {} spec
+       * @param {Object} spec
        * @private
        * @ignore
        */
-      _dynamicAttribute: function(name, spec) {
+      _dynamicMonotonicInheritedAttribute: function(name, spec) {
         var cast = spec.cast,
-            // default/neutral value
+            // Monotonicity
+            // * minimum/default/neutral value
             dv = castAndNormalize(spec.value, cast, null),
-            combine = spec.combine,
+            // * effective/monotone value function
+            monotoneCombineEvals = spec.combine,
+
             namePriv = "_" + name,
             namePrivEval = namePriv + "Eval",
             root = this;
 
-        this[namePriv] = dv;
-        this[namePrivEval] = F.constant(dv);
+        // Default value can be null.
+        root[namePriv] = dv;
+        root[namePrivEval] = F.constant(dv);
 
-        Object.defineProperty(this, name, {
+        Object.defineProperty(root, name, {
+          /**
+           * Gets the _last_ set local value, or `undefined` if there hasn't been one.
+           * Only at eval time does inheritance and combination come into play and
+           * evaluate into an _effective_ value.
+           *
+           * @ignore
+           */
           get: function() {
             return O.getOwn(this, namePriv);
           },
+
+          /**
+           * Combines a given value to the current local or inherited value.
+           * Note that getting the value of the attribute always returns just the last set local value.
+           *
+           * When given a {@link Nully} value, it has no effect.
+           *
+           * @ignore
+           */
           set: function(value) {
-            // Cannot change the root value
+            // Cannot change the root value.
+            // Letting this here instead of after the descendants test,
+            // as otherwise would be very hard to test...
             if(this === root) return;
 
-            if(value == null) {
-              // Reset local values
-              delete this[namePriv];
-              delete this[namePrivEval];
-              return;
-            }
+            if(this.hasDescendants)
+              throw error.operInvalid(
+                  "Cannot change the '" + name + "' attribute of a property type that has descendants.");
+
+            // Cannot reset, using null or undefined (but can have a null default),
+            //  cause it would break **monotonicity**.
+            if(value == null) return;
 
             var fValue;
             if(F.is(value)) {
               fValue = value;
               if(cast) fValue = wrapWithCast(fValue, cast, dv);
             } else {
-              // If the cast failure is found at static time, we opt to inherit.
-              // Only at runtime (above wrapWithCast) we turn cast failure into default/neutral value.
+              // When cast failure is found at static time, we ignore the local value.
               value = castAndNormalize(value, cast, null);
-              if(value == null) {
-                // Reset local values
-                delete this[namePriv];
-                delete this[namePrivEval];
-                return;
-              }
+              if(value == null) return;
 
               fValue = F.constant(value);
             }
 
+            // Store the set value, so that get works consistently with set.
+            // When combining with a previous local value, what should be stored in
+            // this field? None is correct as the local value.
+            // We just store the last set value, but be warned.
             this[namePriv] = value;
-            this[namePrivEval] = combine.call(
-                this,
-                Object.getPrototypeOf(this)[namePrivEval], // "Escape" local value, if any.
-                fValue);
+
+            // Create the private evaluate method.
+            // Monotonicity requires using the inherited or previous value.
+            // `this` is not root, so an ancestor exists.
+            // Initially, there's no local namePrivEval,
+            //  so this[namePrivEval] evaluates to the ancestor namePrivEval.
+            // When ancestor is root, note that its namePrivEval is never null.
+            this[namePrivEval] = monotoneCombineEvals(this[namePrivEval], fValue);
           }
         });
 
+        // Handles passing the `owner` argument to the `this` context of the private eval method.
         this[name + "Eval"] = function(owner) {
           return this[namePrivEval].call(owner);
         };
@@ -565,43 +650,82 @@ define([
     } // end instance type:
   }).implement({
     type: /** @lends pentaho.type.Property.Type# */{
-      attrs: {
+      _attrs: {
         /**
-         * Evaluates the value of the `isRequired` attribute of this property
-         * on a given owner complex value.
+         * Evaluates the value of the `isRequired` attribute of a property of this type
+         * on a given complex value.
+         *
+         * This method is used to determine the effective
+         * [element count range]{@link pentaho.type.Property.Type#countRangeEval} and
+         * is not intended to be used directly.
          *
          * @name isRequiredEval
          * @memberOf pentaho.type.Property.Type#
-         * @param {pentaho.type.Complex} owner The complex value that owns the property.
+         * @param {pentaho.type.Complex} owner The complex value that owns a property of this type.
          * @return {boolean} The evaluated value of the `isRequired` attribute.
+         *
          * @ignore
          */
 
         /**
-         * Gets or sets a value that indicates if a property is required.
+         * Gets or sets a value that indicates if properties of this type are required.
          *
-         * This attribute is *dynamic*:
-         * 1. when a function is specified, it is dynamically evaluated for each complex instance
-         * 2. affects only the _local_ attribute value
-         * 3. inheritance takes place only when the attribute is evaluated
-         *    in the context of a given complex instance.
+         * When a property is of a required _property type_,
+         * it is considered **invalid** if its value (in a complex instance) is `null` or,
+         * in the case of a [list]{@link pentaho.type.Property.Type#isList} _property type_,
+         * it has zero elements.
          *
-         * A _required_ property must have at least one value.
+         * Note that this attribute is taken together with
+         * the [countMin]{@link pentaho.type.Property.Type#countMin} attribute
+         * to determine the effective [element count range]{@link pentaho.type.Property.Type#countRangeEval}
+         * of a _property type_.
          *
-         * The _effective `isRequired` attribute value_ is the
-         * disjunction (_or_) between the locally specified value and
-         * the evaluated value inherited from its ancestor.
+         * ### This attribute is *Dynamic*
          *
-         * This and other attributes are combined to evaluate the resulting _effective value count range_.
-         * See {@link pentaho.type.Property.Type#countRangeEval}.
+         * When a _dynamic_ attribute is set to a function,
+         * it can evaluate to a different value for each complex instance.
          *
-         * Setting the attribute to `null` or `undefined` clears the local value.
+         * When a dynamic attribute is set to a value other than a function or a {@link Nully} value,
+         * its value is the same for every complex instance.
          *
-         * The default, root `isRequired` attribute value is `false`.
+         * ### This attribute is *Monotonic*
+         *
+         * The value of a _monotonic_ attribute can change, but only in some, predetermined _monotonic_ direction.
+         *
+         * In this case, a _property type_ marked as _not required_ can later be marked as _required_.
+         * However, a _property type_ marked as _required_ can no longer go back to being _not required_.
+         *
+         * Because this attribute is also _dynamic_,
+         * the actual required values are only known
+         * when evaluated for specific complex instances.
+         * As such, ensuring monotonic changes is deferred until evaluation.
+         * No errors are thrown; non-monotonic changes simply don't take any effect.
+         *
+         * ### This attribute is *Inherited*
+         *
+         * When there is no _local value_, the _effective value_ of the attribute is the _inherited effective value_.
+         *
+         * The first set local value must respect the _monotonicity_ property with the inherited value.
+         *
+         * ### Other characteristics
+         *
+         * The value got by the attribute is the **last set local, value**, if any -
+         * a function, a constant value or `undefined`, when unset.
+         *
+         * When set to a {@link Nully} value, the set operation is ignored.
+         *
+         * When set and the property already has [descendant]{@link pentaho.type.Type#hasDescendants} properties,
+         * an error is thrown.
+         *
+         * The default (root) `isRequired` attribute value is `false`.
          *
          * @name isRequired
          * @memberOf pentaho.type.Property.Type#
-         * @type null | boolean | pentaho.type.PropertyDynamicAttribute.<boolean>
+         * @type undefined | boolean | pentaho.type.PropertyDynamicAttribute.<boolean>
+         *
+         * @throws {pentaho.lang.OperationInvalidError} When setting and the property already has
+         * [descendant]{@link pentaho.type.Type#hasDescendants} properties.
+         *
          * @see pentaho.type.Complex#isRequired
          */
         isRequired: {
@@ -616,41 +740,77 @@ define([
         },
 
         /**
-         * Evaluates the value of the `countMin` attribute of this property
-         * on a given owner complex value.
+         * Evaluates the value of the `countMin` attribute of a property of this type
+         * on a given complex value.
+         *
+         * This method is used to determine the effective
+         * [element count range]{@link pentaho.type.Property.Type#countRangeEval} and
+         * is not intended to be used directly.
          *
          * @name countMinEval
          * @memberOf pentaho.type.Property.Type#
-         * @param {pentaho.type.Complex} owner The complex value that owns the property.
+         * @param {pentaho.type.Complex} owner The complex value that owns a property of this type.
          * @return {number} The evaluated value of the `countMin` attribute.
+         *
          * @ignore
          */
 
         /**
-         * Gets or sets the minimum number of values that a property of this type can have.
+         * Gets or sets the minimum number of elements that properties of this type must have.
          *
          * A non-negative integer.
          *
-         * This attribute is *dynamic*:
-         * 1. when a function is specified, it is dynamically evaluated for each complex instance
-         * 2. affects only the _local_ attribute value
-         * 3. inheritance takes place only when the attribute is evaluated
-         *    in the context of a given complex instance.
+         * Note that this attribute is taken together with
+         * the [isRequired]{@link pentaho.type.Property.Type#isRequired} attribute
+         * to determine the effective [element count range]{@link pentaho.type.Property.Type#countRangeEval}
+         * of a _property type_.
          *
-         * The _effective `countMin` attribute value_ is the
-         * maximum of the locally specified value and
-         * the evaluated value inherited from its ancestor.
+         * ### This attribute is *Dynamic*
          *
-         * This and other attributes are combined to evaluate the resulting _effective value count range_.
-         * See {@link pentaho.type.Property.Type#countRangeEval}.
+         * When a _dynamic_ attribute is set to a function,
+         * it can evaluate to a different value for each complex instance.
          *
-         * Setting the attribute to `null` or `undefined` clears the local value.
+         * When a dynamic attribute is set to a value other than a function or a {@link Nully} value,
+         * its value is the same for every complex instance.
          *
-         * The default, root `countMin` attribute value is `0`.
+         * ### This attribute is *Monotonic*
+         *
+         * The value of a _monotonic_ attribute can change, but only in some, predetermined _monotonic_ direction.
+         *
+         * In this case, a _property type_ having a `countMin` of `1` can later be
+         * changed to have a `countMin` of `2`.
+         * However, a _property type_ having a `countMin` of `2` can no longer go back to
+         * have a lower `countMin`, like `0`.
+         * The `countMin` attribute can only change to a greater value.
+         *
+         * Because this attribute is also _dynamic_,
+         * the actual `countMin` values are only known
+         * when evaluated for specific complex instances.
+         * As such, ensuring monotonic changes is deferred until evaluation.
+         * No errors are thrown; non-monotonic changes simply don't take any effect.
+         *
+         * ### This attribute is *Inherited*
+         *
+         * When there is no _local value_, the _effective value_ of the attribute is the _inherited effective value_.
+         *
+         * The first set local value must respect the _monotonicity_ property with the inherited value.
+         *
+         * ### Other characteristics
+         *
+         * The value got by the attribute is the **last set local, value**, if any -
+         * a function, a constant value or `undefined`, when unset.
+         *
+         * When set to a {@link Nully} value, the set operation is ignored.
+         *
+         * When set and the property already has [descendant]{@link pentaho.type.Type#hasDescendants} properties,
+         * an error is thrown.
+         *
+         * The default (root) `countMin` attribute value is `0`.
          *
          * @name countMin
          * @memberOf pentaho.type.Property.Type#
-         * @type number | pentaho.type.PropertyDynamicAttribute.<number>
+         * @type undefined | number | pentaho.type.PropertyDynamicAttribute.<number>
+         *
          * @see pentaho.type.Complex#countRange
          */
         countMin: {
@@ -664,41 +824,78 @@ define([
         },
 
         /**
-         * Evaluates the value of the `countMax` attribute of this property
-         * on a given owner complex value.
+         * Evaluates the value of the `countMax` attribute of a property of this type
+         * on a given complex value.
+         *
+         * This method is used to determine the effective
+         * [element count range]{@link pentaho.type.Property.Type#countRangeEval} and
+         * is not intended to be used directly.
          *
          * @name countMaxEval
          * @memberOf pentaho.type.Property.Type#
-         * @param {pentaho.type.Complex} owner The complex value that owns the property.
+         * @param {pentaho.type.Complex} owner The complex value that owns a property of this type.
          * @return {number} The evaluated value of the `countMax` attribute.
+         *
          * @ignore
          */
 
         /**
-         * Gets or sets the maximum number of values that a property of this type must have.
+         * Gets or sets the maximum number of elements that properties of this type can have.
          *
          * A non-negative integer.
          *
-         * This attribute is *dynamic*:
-         * 1. when a function is specified, it is dynamically evaluated for each complex instance
-         * 2. affects only the _local_ attribute value
-         * 3. inheritance takes place only when the attribute is evaluated
-         *    in the context of a given complex instance.
+         * Note that this attribute is taken together with
+         * the [isRequired]{@link pentaho.type.Property.Type#isRequired}
+         * and the [countMin]{@link pentaho.type.Property.Type#countMin} attributes
+         * to determine the effective [element count range]{@link pentaho.type.Property.Type#countRangeEval}
+         * of a _property type_.
          *
-         * The _effective `countMax` attribute value_ is the
-         * minimum of the locally specified value and
-         * the evaluated value inherited from its ancestor.
+         * ### This attribute is *Dynamic*
          *
-         * This and other attributes are combined to evaluate the resulting _effective value count range_.
-         * See {@link pentaho.type.Property.Type#countRangeEval}.
+         * When a _dynamic_ attribute is set to a function,
+         * it can evaluate to a different value for each complex instance.
          *
-         * Setting the attribute to `null` or `undefined` clears the local value.
+         * When a dynamic attribute is set to a value other than a function or a {@link Nully} value,
+         * its value is the same for every complex instance.
          *
-         * The default, root `countMax` attribute value is `Infinity`.
+         * ### This attribute is *Monotonic*
+         *
+         * The value of a _monotonic_ attribute can change, but only in some, predetermined _monotonic_ direction.
+         *
+         * In this case, a _property type_ having a `countMax` of `5` can later be
+         * changed to have a `countMax` of `3`.
+         * However, a _property type_ having a `countMax` of `5` can no longer "go back" to
+         * have a greater `countMax`, like `7`.
+         * The `countMax` attribute can only change to a lower value.
+         *
+         * Because this attribute is also _dynamic_,
+         * the actual `countMax` values are only known
+         * when evaluated for specific complex instances.
+         * As such, ensuring monotonic changes is deferred until evaluation.
+         * No errors are thrown; non-monotonic changes simply don't take any effect.
+         *
+         * ### This attribute is *Inherited*
+         *
+         * When there is no _local value_, the _effective value_ of the attribute is the _inherited effective value_.
+         *
+         * The first set local value must respect the _monotonicity_ property with the inherited value.
+         *
+         * ### Other characteristics
+         *
+         * The value got by the attribute is the **last set local, value**, if any -
+         * a function, a constant value or `undefined`, when unset.
+         *
+         * When set to a {@link Nully} value, the set operation is ignored.
+         *
+         * When set and the property already has [descendant]{@link pentaho.type.Type#hasDescendants} properties,
+         * an error is thrown.
+         *
+         * The default (root) `countMax` attribute value is `Infinity`.
          *
          * @name countMax
          * @memberOf pentaho.type.Property.Type#
-         * @type number | pentaho.type.PropertyDynamicAttribute.<number>
+         * @type undefined | number | pentaho.type.PropertyDynamicAttribute.<number>
+         *
          * @see pentaho.type.Complex#countRange
          */
         countMax: {
@@ -712,37 +909,71 @@ define([
         },
 
         /**
-         * Evaluates the value of the `isApplicable` attribute of this property
+         * Evaluates the value of the `isApplicable` attribute of a property of this type
          * on a given owner complex value.
          *
          * @name applicableEval
          * @memberOf pentaho.type.Property.Type#
-         * @param {pentaho.type.Complex} owner The complex value that owns the property.
+         * @param {pentaho.type.Complex} owner The complex value that owns a property of this type.
          * @return {boolean} The evaluated value of the `isApplicable` attribute.
+         *
          * @ignore
          */
 
         /**
-         * Gets or sets a value or function that indicates if a property is applicable.
+         * Gets or sets a value or function that indicates if properties of this type are applicable.
          *
-         * This attribute is *dynamic*:
-         * 1. when a function is specified, it is dynamically evaluated for each complex instance
-         * 2. affects only the _local_ attribute value
-         * 3. inheritance takes place only when the attribute is evaluated
-         *    in the context of a given complex instance.
+         * When a property is not (currently) applicable, then it does not apply,
+         * it does not make sense in a certain situation.
+         * It may only be applicable when another property of the complex type has a specific value, for example.
          *
-         * The _effective `isApplicable` attribute value_ is the
-         * conjunction (_and_) between the locally specified value and
-         * the evaluated value inherited from its ancestor.
+         * When a property is not currently applicable, its value is not significant,
+         * and, as such, any validations concerning it are not performed.
          *
-         * Setting the attribute to `null` or `undefined` clears the local value.
+         * ### This attribute is *Dynamic*
          *
-         * The default, root `isApplicable` attribute value is `true`.
+         * When a _dynamic_ attribute is set to a function,
+         * it can evaluate to a different value for each complex instance.
          *
-         * @name applicable
+         * When a dynamic attribute is set to a value other than a function or a {@link Nully} value,
+         * its value is the same for every complex instance.
+         *
+         * ### This attribute is *Monotonic*
+         *
+         * The value of a _monotonic_ attribute can change, but only in some, predetermined _monotonic_ direction.
+         *
+         * In this case, a _property type_ marked as _applicable_ can later be marked as _not applicable_.
+         * However, a _property type_ marked as _not applicable_ can no longer go back to being _applicable_.
+         *
+         * Because this attribute is also _dynamic_,
+         * the actual `isApplicable` values are only known
+         * when evaluated for specific complex instances.
+         * As such, ensuring monotonic changes is deferred until evaluation.
+         * No errors are thrown; non-monotonic changes simply don't take any effect.
+         *
+         * ### This attribute is *Inherited*
+         *
+         * When there is no _local value_, the _effective value_ of the attribute is the _inherited effective value_.
+         *
+         * The first set local value must respect the _monotonicity_ property with the inherited value.
+         *
+         * ### Other characteristics
+         *
+         * The value got by the attribute is the **last set local, value**, if any -
+         * a function, a constant value or `undefined`, when unset.
+         *
+         * When set to a {@link Nully} value, the set operation is ignored.
+         *
+         * When set and the property already has [descendant]{@link pentaho.type.Type#hasDescendants} properties,
+         * an error is thrown.
+         *
+         * The default (root) `isApplicable` attribute value is `true`.
+         *
+         * @name isApplicable
          * @memberOf pentaho.type.Property.Type#
+         * @type undefined | boolean | pentaho.type.PropertyDynamicAttribute.<boolean>
          *
-         * @type null | boolean | pentaho.type.PropertyDynamicAttribute.<boolean>
+         * @see pentaho.type.Property.Type#isRequired
          * @see pentaho.type.Complex#isApplicable
          */
         isApplicable: {
@@ -757,44 +988,72 @@ define([
         },
 
         /**
-         * Evaluates the value of the `isReadOnly` attribute of this property
+         * Evaluates the value of the `isReadOnly` attribute of a property of this type
          * on a given owner complex value.
          *
          * @name isReadOnlyEval
          * @memberOf pentaho.type.Property.Type#
-         * @param {pentaho.type.Complex} owner The complex value that owns the property.
+         * @param {pentaho.type.Complex} owner The complex value that owns a property of this type.
          * @return {boolean} The evaluated value of the `isReadOnly` attribute.
+         *
          * @ignore
          */
 
         /**
-         * Gets or sets a value or function that indicates if a property cannot be written to.
+         * Gets or sets a value, or function, that indicates if properties of this type
+         * _cannot_ be changed by a user, in a user interface.
          *
-         * This attribute is *dynamic*:
-         * 1. when a function is specified, it is dynamically evaluated for each complex instance
-         * 2. affects only the _local_ attribute value
-         * 3. inheritance takes place only when the attribute is evaluated
-         *    in the context of a given complex instance.
+         * A property should be set read-only whenever its value is implied/imposed somehow,
+         * and thus cannot not be changed, directly, by the user, in a user interface.
          *
-         * A property should be considered read-only whenever its value is implied/imposed somehow
-         * and thus cannot not be changed, directly, by the user.
+         * ### This attribute is *Dynamic*
          *
-         * The _effective `isReadOnly` attribute value_ is the
-         * disjunction (_or_) between the locally specified value and
-         * the evaluated value inherited from its ancestor.
+         * When a _dynamic_ attribute is set to a function,
+         * it can evaluate to a different value for each complex instance.
          *
-         * Setting the attribute to `null` or `undefined` clears the local value.
+         * When a dynamic attribute is set to a value other than a function or a {@link Nully} value,
+         * its value is the same for every complex instance.
          *
-         * The default, root `isReadOnly` attribute value is `false`.
+         * ### This attribute is *Monotonic*
+         *
+         * The value of a _monotonic_ attribute can change, but only in some, predetermined _monotonic_ direction.
+         *
+         * In this case, a _property type_ marked as _not read-only_ can later be marked as _read-only_.
+         * However, a _property type_ marked as _read-only_ can no longer go back to being _not read-only_.
+         *
+         * Because this attribute is also _dynamic_,
+         * the actual `isReadOnly` values are only known
+         * when evaluated for specific complex instances.
+         * As such, ensuring monotonic changes is deferred until evaluation.
+         * No errors are thrown; non-monotonic changes simply don't take any effect.
+         *
+         * ### This attribute is *Inherited*
+         *
+         * When there is no _local value_, the _effective value_ of the attribute is the _inherited effective value_.
+         *
+         * The first set local value must respect the _monotonicity_ property with the inherited value.
+         *
+         * ### Other characteristics
+         *
+         * The value got by the attribute is the **last set local, value**, if any -
+         * a function, a constant value or `undefined`, when unset.
+         *
+         * When set to a {@link Nully} value, the set operation is ignored.
+         *
+         * When set and the property already has [descendant]{@link pentaho.type.Type#hasDescendants} properties,
+         * an error is thrown.
+         *
+         * The default (root) `isReadOnly` attribute value is `false`.
          *
          * @name isReadOnly
          * @memberOf pentaho.type.Property.Type#
-         * @type null | boolean | pentaho.type.PropertyDynamicAttribute.<boolean>
+         * @type undefined | boolean | pentaho.type.PropertyDynamicAttribute.<boolean>
+         *
          * @see pentaho.type.Complex#isReadOnly
          */
         isReadOnly: {
           value: false,
-          cast:  Boolean,
+          cast: Boolean,
           combine: function(baseEval, localEval) {
             return function() {
               // localEval is skipped if base is true.
@@ -805,49 +1064,46 @@ define([
       }, // end attrs:
 
       /**
-       * Evaluates the _effective value count range_ of this property
-       * on a given owner complex value.
+       * Evaluates the _element count range_ of a property of this type
+       * on a given complex value.
        *
-       * The _effective value count range_ is a conciliation
-       * of the _effective value_ of the attributes:
+       * The _element count range_ is a conciliation of the _effective value_ of
+       * the following attributes:
        *
        * * {@link pentaho.type.Property.Type#isList}
        * * {@link pentaho.type.Property.Type#isRequired}
        * * {@link pentaho.type.Property.Type#countMin}
        * * {@link pentaho.type.Property.Type#countMax}
        *
-       * The logic can be best explained by the following
-       * simple example function:
+       * The logic can be best explained by the following simple example function:
        *
        * ```js
-       * function evaluateRange(list, isRequiredEf, countMinEf, countMaxEf) {
-       *    var min = countMinEf;
-       *    var max = countMaxEf;
+       * function evaluateRange(isList, isRequiredEf, countMinEf, countMaxEf) {
+       *   var min = countMinEf;
+       *   var max = countMaxEf;
        *
-       *    if(list && min > 1) min = 1;
-       *    if(list && max > 1) max = 1;
+       *   if(!isList && min > 1) min = 1;
+       *   if(!isList && max > 1) max = 1;
        *
-       *    if(isRequiredEf && min < 1) min = 1;
+       *   if(isRequiredEf && min < 1) min = 1;
        *
-       *    if(max < min) max = min;
+       *   if(max < min) max = min;
        *
-       *    return {min: min, max};
+       *   return {min: min, max};
        * }
        * ```
        *
-       * When the property is _not_ a {@link pentaho.type.Property#isList} property,
-       * the value can only either be zero or one.
-       *
-       * If the property is _not_ a _list_ property,
-       * both the minimum and the maximum can only be either zero or one.
+       * When the property is _not_ a [list]{@link pentaho.type.Property#isList} property,
+       * then both the minimum and maximum values can only be either zero or one.
        *
        * If `isRequired` is true, then the minimum must be greater than or equal to one.
        *
        * The `countMax` value is constrained to be greater than or equal to the minimum.
        *
-       * @param {pentaho.type.Complex} owner The complex value that owns the property.
+       * @param {pentaho.type.Complex} owner The complex value that owns a property of this type.
        *
-       * @return {pentaho.IRange<number>} The evaluated value of the values count range.
+       * @return {pentaho.IRange<number>} The evaluated element count range.
+       *
        * @see pentaho.type.Complex#countRange
        */
       countRangeEval: function(owner) {

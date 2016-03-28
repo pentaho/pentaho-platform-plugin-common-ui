@@ -344,6 +344,21 @@ define([
         return callGet(context, sync, Value.type.constructor);
       }, errorMatch.argInvalid("typeRef")));
 
+      it("should throw/reject when given null", testGetError(function(sync, Context) {
+        var context = new Context();
+        return callGet(context, sync, null);
+      }, errorMatch.argRequired("typeRef")));
+
+      it("should throw/reject when given undefined", testGetError(function(sync, Context) {
+        var context = new Context();
+        return callGet(context, sync, undefined);
+      }, errorMatch.argRequired("typeRef")));
+
+      it("should throw/reject when given an empty string", testGetError(function(sync, Context) {
+        var context = new Context();
+        return callGet(context, sync, "");
+      }, errorMatch.argRequired("typeRef")));
+
       it("should be able to get a standard type given its type instance constructor",
          testGet(function(sync, Context) {
         var context = new Context();

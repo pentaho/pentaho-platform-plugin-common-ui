@@ -85,6 +85,7 @@ define([
       // Block inheritance, with default values
       this._id         = null;
       this._styleClass = null;
+      this._hasDescendants = false;
     },
 
     /**
@@ -192,9 +193,23 @@ define([
      * @type ?pentaho.type.Type
      * @readonly
      * @see pentaho.type.Type#root
+     * @see pentaho.type.Type#hasDescendants
      */
     get ancestor() {
       return this.isRoot ? null : Object.getPrototypeOf(this);
+    },
+    //endregion
+
+    //region hasDescendants property
+    /**
+     * Gets a value that indicates if this type has any descendant types.
+     *
+     * @type {boolean}
+     * @readonly
+     * @see pentaho.type.Type#ancestor
+     */
+    get hasDescendants() {
+      return this._hasDescendants;
     },
     //endregion
 
@@ -262,39 +277,42 @@ define([
     //endregion
 
     //region label property
-    // @type !nonEmptyString
-    // -> nonEmptyString, Optional, Inherited, Configurable, Localized
-    // null or "" -> undefined conversion
-
-    _label: null,
+    // must have some non-null value to inherit
+    _label: "instance",
 
     /**
      * Gets or sets the label of this type.
      *
-     * Attempting to set to a non-string value type implicitly converts the value to a string before assignment.
+     * When set to a non-{@link Nully} and non-{@link String} value,
+     * the value is first replaced by the result of calling its `toString` method.
      *
-     * Setting to an empty string
-     * or to a {@link Nully} value causes the attribute to use the inherited value,
-     * except for the root type, `Instance.type` (which has no ancestor), where the label is `null`.
+     * When set to an empty string or a _nully_ value, the attribute value is _reset_.
      *
-     * @type {String | any}
+     * When reset, the attribute assumes its _default value_
+     * (except on the top-root type, `Instance.type`, in which case it has no effect).
+     *
+     * The _default value_ is the _inherited value_.
+     *
+     * The _initial value_ of the attribute on the top-root type is `"instance"`.
+     *
+     * @type {!nonEmptyString}
      */
-    _resetLabel: function() {
-      if(this !== _type) {
-        delete this._label;
-      }
-    },
-
     get label() {
       return this._label;
     },
 
     set label(value) {
-      // null or "" -> undefined conversion
-      if(value == null || value === "") {
+      value = nonEmptyString(value);
+      if(value === null) {
         this._resetLabel();
       } else {
-        this._label = String(value);
+        this._label = value;
+      }
+    },
+
+    _resetLabel: function() {
+      if(this !== _type) {
+        delete this._label;
       }
     },
     //endregion
@@ -580,25 +598,28 @@ define([
    /**
     * Gets or sets the default view for instances of this type.
     *
-    *
-    * Setting to a string defines the id of the view's module.
-    * If the string starts with `/`, `xyz:` or ends with `.js`,
+    * When a string,
+    * it is the id of the view's AMD module.
+    * If the string starts with `/` or `xyz:`, or ends with `.js`,
     * the id is considered to be absolute,
-    * otherwise it is considered to be relative to the type's id folder.
-
+    * otherwise,
+    * it is relative to this type's id folder, and converted to an absolute id.
+    *
     * Setting to `undefined` causes the view to be inherited from the ancestor type,
     * except for the root type, `Instance.type` (which has no ancestor), where the attribute is `null`.
     *
     * Setting to a _falsy_ value (like `null` or an empty string),
     * clears the value of the attribute and sets it to `null`, ignoring any inherited value.
     *
-    * Attempting to set to some other value is interpreted as the intention to set
-    * the class or factory of the view.
-    * It will normally be a function, but this is not ensured.
+    * When a function,
+    * it is the class or factory of the view.
     *
-    * @type string | function | object
-    * @readOnly
     * @see pentaho.type.Type#viewClass
+    *
+    * @type {string | function}
+
+    * @throws {pentaho.lang.ArgumentInvalidTypeError} When the set value is not
+    * a string, a function or {@link Nully}.
     */
     get view() {
       return this._view && this._view.value;
@@ -614,11 +635,13 @@ define([
         if(!this._view || this._view.value !== value) {
           this._view = {value: value, promise: null};
         }
-      } else {
+      } else if(typeof value === "function") {
         // Assume it is the View class itself, already fulfilled.
         if(!this._view || this._view.value !== value) {
           this._view = {value: value, promise: Promise.resolve(value)};
         }
+      } else {
+        throw error.argInvalidType("view", ["nully", "string", "function"], typeof value);
       }
     },
 
@@ -629,16 +652,21 @@ define([
     },
 
     /**
-     * Gets a promise for the default view class, or `null` if no view is defined.
+     * Gets a promise for the default view class or factory, if any, or `null`.
      *
-     * @type ?Promise.<!(function|object)>
+     * A default view exists if property {@link pentaho.type.Type#view}
+     * has a non-null value.
+     *
+     * @type Promise.<?function>
      * @readOnly
      * @see pentaho.type.Type#view
      */
     get viewClass() {
       /*jshint laxbreak:true*/
       var view = this._view;
-      return view && (view.promise || (view.promise = promiseUtil.require(view.value)));
+      return view
+          ? (view.promise || (view.promise = promiseUtil.require(view.value)))
+          : Promise.resolve(null);
     },
     //endregion
 
@@ -659,6 +687,9 @@ define([
      * @ignore
      */
     _extendProto: function(instSpec, keyArgs) {
+
+      O.setConst(this, "_hasDescendants", true);
+
       var subType = Object.create(this);
 
       // NOTE: `subType.constructor` is still the "base" constructor.
@@ -738,7 +769,10 @@ define([
      * See Base.js
      * @ignore
      */
-    _subClassed: function(SubTypeCtor, instSpec, classSpec, keyArgs) {
+    _subclassed: function(SubTypeCtor, instSpec, classSpec, keyArgs) {
+
+      O.setConst(this.prototype, "_hasDescendants", true);
+
       var SubInstCtor = keyArgs.instance.constructor;
 
       // Links SubTypeCtor and SubInstCtor and "implements" instSpec.
@@ -754,7 +788,7 @@ define([
     // The static interface is not touched.
     //
     // NOTE: optionally receiving `keyArgs` as an optimization.
-    // `_subClassed` is given a _derived_ `keyArgs`
+    // `_subclassed` is given a _derived_ `keyArgs`
     // that can/should be passed to `this`(constructor).
     _initInstCtor: function(InstCtor, instSpec, keyArgs) {
 

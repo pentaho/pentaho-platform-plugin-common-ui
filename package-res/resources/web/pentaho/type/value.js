@@ -427,9 +427,6 @@ define([
 
             if(this._assertSubtype(Instance.type).isAbstract) Instance.type._throwAbstractType();
 
-            // ugly but "efficient"
-            delete instSpec._;
-
           } else {
             if(this.isAbstract) this._throwAbstractType();
 
