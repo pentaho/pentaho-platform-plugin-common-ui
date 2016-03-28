@@ -620,10 +620,8 @@ define([
         // Not present yet.
         var id = type.id;
         if(id) {
-          // TODO: configuration may need to subclass Type
-          // TODO: configuration is Type only?
+          // Configuration is for the type-constructor.
           var config = this._getConfig(id);
-          /* istanbul ignore if : until config is implemented */
           if(config) type.constructor.implement(config);
 
           this._byTypeId[id] = InstCtor;
@@ -689,7 +687,7 @@ define([
       return this._getByInstCtor(InstCtor, sync, factoryUid);
     },
 
-    // Inline type spec: {[base: "complex", ] ... }
+    // Inline type spec: {[base: "complex"], [id: ]}
     _getByObjectSpec: function(typeSpec, sync) {
       if(typeSpec instanceof Type)
         return this._getByInstCtor(typeSpec.instance.constructor, sync);
@@ -697,10 +695,61 @@ define([
       if(typeSpec instanceof Instance)
         return this._error(error.argInvalid("typeRef", "Value instance is not supported."), sync);
 
-      var baseTypeSpec = typeSpec.base || _defaultBaseTypeMid,
-          resolveSync = (function() {
-              var BaseInstCtor = this._get(baseTypeSpec, /*sync:*/true),
-                  InstCtor = BaseInstCtor.extend({type: typeSpec});
+      // Because a base type is required (when null, it is defaulted)
+      // this means that the generic object spec cannot represent the root of type hierarchies:
+      // Type, Value.Type or Property.Type
+
+      /*
+       *  id      | base       | result
+       *  --------+------------+------------------
+       *  "value" | null       :
+       *  "foo"   | -          : base <- "complex"
+       *  "foo"   | "notnull"  : ok
+       */
+      var id = typeSpec.id;
+      if(id) id = toAbsTypeId(id);
+
+      var baseTypeSpec = typeSpec.base;
+
+      if(id && id === (_baseMid + "value")) {
+        // The "value" type is already loaded.
+        // Will return in the first if below.
+
+        if(baseTypeSpec) {
+          return this._error(
+              error.argInvalid("typeRef", "The root type `Value` must have a `null` base."),
+              sync);
+        }
+
+        baseTypeSpec = null;
+
+      } else if(!baseTypeSpec) {
+        if(baseTypeSpec === null) {
+          return this._error(
+              error.argInvalid("typeRef", "Only the root type `Value` can have a `null` base."),
+              sync);
+        }
+
+        baseTypeSpec = _defaultBaseTypeMid;
+      }
+
+      var InstCtor;
+
+      // Already loaded?
+      // id ~ "value" goes here.
+      if(id && (InstCtor = O.getOwn(this._byTypeId, id))) {
+        // Keep initial specification. Ignore new one.
+        return this._return(InstCtor, sync);
+      }
+
+      // assert baseTypeSpec
+
+      // if id and not loaded, the id is used later to register the new type under that id.
+
+      var resolveSync = (function() {
+              var BaseInstCtor = this._get(baseTypeSpec, /*sync:*/true);
+              var InstCtor = BaseInstCtor.extend({type: typeSpec});
+
               return this._getByInstCtor(InstCtor, /*sync:*/true);
             }).bind(this);
 

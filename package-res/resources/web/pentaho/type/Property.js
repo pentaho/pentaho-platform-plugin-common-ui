@@ -27,7 +27,9 @@ define([
 
   "use strict";
 
-  var _propType;
+  var _propType,
+      _dynamicAttrNames = ["isRequired", "countMin", "countMax", "isApplicable", "isReadOnly"];
+
   /**
    * @name pentaho.type.Property
    *
@@ -434,7 +436,7 @@ define([
         if(this.hasDescendants)
           throw error.operInvalid("Cannot change the default value of a property type that has descendants.");
 
-        if(_ === undefined) {
+        if(_ === undefined || (_ === null && this.isRoot)) {
           /* istanbul ignore else : hard to test */
           if(this !== _propType) {
             // Clear local value. Inherit base value.
@@ -497,6 +499,8 @@ define([
        * @ignore
        */
       _resetLabel: function() {
+        this._labelSet = false;
+
         if(this.isRoot) {
           this._label = text.titleFromName(this.name);
         } else {
@@ -671,6 +675,67 @@ define([
         this[name + "Eval"] = function(owner) {
           return this[namePrivEval].call(owner);
         };
+      },
+      //endregion
+
+      //region serialization
+      toSpecInContext: function(keyArgs) {
+        if(!keyArgs) keyArgs = {};
+
+        // no id and no base
+        var valueTypeRef = this.type.toRefInContext(keyArgs);
+        var spec = {
+          name: this._name,
+          type: valueTypeRef
+        };
+
+        // If there are no attributes and it's of type "string",
+        // return only the name of the property type.
+        if(!this._fillSpecInContext(spec, keyArgs) && valueTypeRef === "string") {
+          return this._name;
+        }
+
+        return spec;
+      },
+
+      _fillSpecInContext: function(spec, keyArgs) {
+        var isJson = keyArgs.isJson;
+
+        var any = this.base(spec, keyArgs);
+
+        // Dynamic attributes
+        _dynamicAttrNames.forEach(function(name) {
+          var namePriv = "_" + name;
+
+          if(O.hasOwn(this, namePriv)) {
+            var value = this[namePriv];
+            if(F.is(value)) {
+              if(!isJson) {
+                any = true;
+                spec[name] = value.valueOf();
+              }
+            } else {
+              any = true;
+              spec[name] = value;
+            }
+          }
+        }, this);
+
+        // Custom attributes
+        var defaultValue = O.getOwn(this, "_value");
+        if(defaultValue !== undefined) {
+          any = true;
+          if(defaultValue) {
+            var valueType = this.type;
+            keyArgs.includeType = defaultValue.type !== (valueType.isRefinement ? valueType.of : valueType);
+
+            spec.value = defaultValue.toSpecInContext(keyArgs);
+          } else {
+            spec.value = null;
+          }
+        }
+
+        return any;
       }
       //endregion
     } // end instance type:

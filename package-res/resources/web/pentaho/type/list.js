@@ -18,11 +18,12 @@ define([
   "./value",
   "./element",
   "./valueHelper",
+  "./SpecificationContext",
   "../i18n!types",
   "../util/arg",
   "../util/error",
   "../util/object"
-], function(module, valueFactory, elemFactory, valueHelper, bundle, arg, error, O) {
+], function(module, valueFactory, elemFactory, valueHelper, SpecificationContext, bundle, arg, error, O) {
 
   "use strict";
 
@@ -582,18 +583,22 @@ define([
       //endregion
 
       //region serialization
-      toSpecInScope: function(scope, requireType, keyArgs) {
+      toSpecInContext: function(keyArgs) {
+        if(!keyArgs) keyArgs = {};
+
+        var includeType = keyArgs.includeType;
+
         var elemType = this.type.of;
         if(elemType.isRefinement) elemType = elemType.of;
 
         var elemSpecs = this._elems.map(function(elem) {
-          var elemRequireType = elem.type !== elemType;
-          return elem.toSpecInScope(scope, elemRequireType, keyArgs);
+          keyArgs.includeType = elem.type !== elemType;
+          return elem.toSpecInContext(keyArgs);
         });
 
-        if(requireType)
+        if(includeType)
           return {
-            _: this.type.toReference(scope, keyArgs),
+            _: this.type.toRefInContext(keyArgs),
             d: elemSpecs
           };
 
@@ -703,6 +708,45 @@ define([
           // Mark set locally even if it is the same...
           this._elemType = elemType;
 
+        },
+        //endregion
+
+        //region serialization
+        // * "list" has an id and toRefInContext immediately returns that
+        // * ["string"] -> anonymous list type, equivalent to {base: "list", of: "string"}
+        //   toRefInContext calls the toSpecInContext, cause it has no id and because a temporary id is also
+        //   never generated to it, in scope
+        //   toSpecInContext only can return this form if there are no other local list class attributes
+        toSpecInContext: function(keyArgs) {
+          if(!keyArgs) keyArgs = {};
+
+          // The type's id or the temporary id in this scope.
+          var baseType = this.ancestor;
+          var spec = {
+              id:   this.shortId,
+              base: baseType.toRefInContext(keyArgs)
+            };
+
+          // Add "of" if we're `List` or the base `of` is different.
+          var baseElemType = baseType.isSubtypeOf(List.type) ? baseType._elemType : null;
+          if(!baseElemType || this._elemType !== baseElemType) {
+            spec.of = this._elemType.toRefInContext(keyArgs);
+          }
+
+          // No other attributes, no id and base is "list"?
+          if(!this._fillSpecInContext(spec, keyArgs) && !spec.id && spec.base === "list") {
+            // Can use the shorthand [ofType] syntax.
+            // Default ofType in [] syntax is "string" -> [] <=> ["string"]
+            // surely "element" ...
+            if(!spec.of) spec.of = this._elemType.toRefInContext(keyArgs);
+
+            return spec.of === "string" ? [] : [spec.of];
+          }
+
+          // Need id
+          if(!spec.id) spec.id = SpecificationContext.current.add(this);
+
+          return spec;
         }
         //endregion
       }

@@ -609,7 +609,7 @@ define([
          * @see pentaho.type.Refinement.Type#_validateFacets
          */
         validateInstance: function(value) {
-          var errors = this.base(value);
+          var errors = value.validate();
           if(errors) return errors;
 
           return this._validateFacets(value);
@@ -640,6 +640,42 @@ define([
           return this.facets.reduce(function(errors, Facet) {
             return valueHelper.combineErrors(errors, Facet.validate.call(this, value));
           }.bind(this), null);
+        },
+        //endregion
+
+        //region serialization
+        _fillSpecInContext: function(spec, keyArgs) {
+          var any = false;
+
+          var ofType = O.getOwn(this, "_of");
+          if(ofType) {
+            any = true;
+            spec.of = ofType.toRefInContext(keyArgs);
+          }
+
+          // "facets" attribute
+          var facets = this.facets;
+          var L = facets.length;
+          var i;
+
+          // Include only "facets" added locally, not inherited ones.
+          // Local facets are placed after inherited facets.
+          if(this !== _refinementType && (i = this.ancestor._facets.length) < L) {
+            any = true;
+            var localFacetIds = spec.facets = [];
+            do { localFacetIds.push(facets[i].shortId); } while(++i < L);
+          }
+
+          // Base attributes
+          any = this.base(spec, keyArgs) || any;
+
+          // All facets' local attributes
+          i = -1;
+          while(++i < L)
+            any = facets[i].fillSpecInContext.call(this, spec, keyArgs) || any;
+
+          //validateInstance
+          return any;
         }
         //endregion
       }

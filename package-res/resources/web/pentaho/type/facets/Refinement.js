@@ -101,6 +101,27 @@ define([
      */
     validate: function(value) {
       throw error.notImplemented();
+    },
+
+    /**
+     * Fills the given specification with the local values of
+     * the attributes that this refinement facet adds to a refinement type
+     * and returns whether any attribute was actually added.
+     *
+     * This method requires that there currently exists an
+     * [ambient specification context]{@link pentaho.type.SpecificationContext.current}.
+     *
+     * This method is invoked **on** the refinement type,
+     * an instance of {@link pentaho.type.Refinement.Type}.
+     *
+     * @param {Object} spec - The specification to be filled.
+     * @param {Object} [keyArgs] - The keyword arguments object.
+     * Passed to every type and instance serialized within this scope.
+     *
+     * @return {boolean} `true` if any attribute was added, `false`, otherwise.
+     */
+    fillSpecInContext: function(spec, keyArgs) {
+      return false;
     }
   });
 });

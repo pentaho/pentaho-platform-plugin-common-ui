@@ -794,15 +794,17 @@ define([
       //endregion
 
       //region serialization
-      toSpecInScope: function(scope, requireType, keyArgs) {
-        var spec;
+      toSpecInContext: function(keyArgs) {
+        if(!keyArgs) keyArgs = {};
 
-        var useArray = !requireType && keyArgs.preferPropertyArray;
+        var spec;
+        var includeType = !!keyArgs.includeType;
+        var useArray = !includeType && keyArgs.preferPropertyArray;
         if(useArray) {
           spec = [];
         } else {
           spec = {};
-          if(requireType) spec._ = this.type.toReference(scope, keyArgs);
+          if(includeType) spec._ = this.type.toRefInContext(keyArgs);
         }
 
         var includeDefaults = keyArgs.includeDefaults;
@@ -823,8 +825,8 @@ define([
             var valueSpec;
             if(value) {
               var valueType = propType.type;
-              var valueRequireType = value.type !== (valueType.isRefinement ? valueType.of : valueType);
-              valueSpec = value.toSpecInScope(scope, valueRequireType, keyArgs);
+              keyArgs.includeType = value.type !== (valueType.isRefinement ? valueType.of : valueType);
+              valueSpec = value.toSpecInContext(keyArgs);
             } else {
               valueSpec = null;
             }
@@ -986,7 +988,31 @@ define([
           if(!Array.isArray(propTypeSpec)) propTypeSpec = [propTypeSpec];
           this._getProps().configure(propTypeSpec);
           return this;
+        },
+
+        //region serialization
+        _fillSpecInContext: function(spec, keyArgs) {
+
+          var any = this.base(spec, keyArgs);
+
+          if(this.count) {
+            var props;
+
+            this.each(function(propType) {
+              // Root or overridden property type. Exclude simply inherited.
+              if(propType.declaringType === this) {
+                if(!props) {
+                  any = true;
+                  props = spec.props = [];
+                }
+                props.push(propType.toSpecInContext(keyArgs));
+              }
+            }, this);
+          }
+
+          return any;
         }
+        //endregion
       }
     })
     .implement(EventSource)

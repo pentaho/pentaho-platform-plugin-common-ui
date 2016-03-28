@@ -15,20 +15,26 @@
  */
 define([
   "require",
+  "./SpecificationScope",
+  "./SpecificationContext",
   "../i18n!types",
   "../lang/Base",
   "../lang/_AnnotatableLinked",
   "../util/error",
   "../util/arg",
   "../util/object",
+  "../util/fun",
   "../util/promise"
-], function(localRequire, bundle, Base, AnnotatableLinked, error, arg, O, promiseUtil) {
+], function(localRequire, SpecificationScope, SpecificationContext, bundle, Base, AnnotatableLinked, error, arg, O, F, promiseUtil) {
   "use strict";
 
   // Unique type class id exposed through Type#uid and used by Context instances.
   var _nextUid = 1,
       _extractShortId = /^pentaho\/type\/(\w+)$/i,
       _type = null,
+      _normalAttrNames = [
+        "description", "category", "helpUrl", "isBrowsable", "isAdvanced", "ordinal"
+      ],
       O_isProtoOf = Object.prototype.isPrototypeOf;
 
   /**
@@ -324,6 +330,7 @@ define([
     //region label property
     // must have some non-null value to inherit
     _label: "instance",
+    _labelSet: false,
 
     /**
      * Gets or sets the label of this type.
@@ -351,11 +358,14 @@ define([
       if(value === null) {
         this._resetLabel();
       } else {
+        this._labelSet = true;
         this._label = value;
       }
     },
 
     _resetLabel: function() {
+      this._labelSet = false;
+
       if(this !== _type) {
         delete this._label;
       }
@@ -808,11 +818,15 @@ define([
 
     //region serialization
     /**
-     * Creates a top-level specification that describes this type.
+     * Creates a specification that describes this type.
+     *
+     * If an [ambient specification context]{@link pentaho.type.SpecificationContext.current},
+     * currently exists, it is used to manage the serialization process.
+     * Otherwise, one is created and set as current.
      *
      * This method creates a new {@link pentaho.type.SpecificationScope} for describing
      * this type, and any other instances and types it references,
-     * and then delegates the actual work to {@link pentaho.type.Type#toSpecInScope}.
+     * and then delegates the actual work to {@link pentaho.type.Type#toSpecInContext}.
      *
      * @param {Object} [keyArgs] - The keyword arguments object.
      * Passed to every type and instance serialized within this scope.
@@ -821,18 +835,24 @@ define([
      *
      * @return {!pentaho.type.spec.ITypeProto} A specification of this type.
      *
-     * @see pentaho.type.Type#toSpecInScope
-     * @see pentaho.type.Type#_fillSpecInScope
+     * @see pentaho.type.Type#toSpecInContext
+     * @see pentaho.type.Type#_fillSpecInContext
      */
     toSpec: function(keyArgs) {
-      return {id: this.id};
+      return O.using(new SpecificationScope(), this.toSpecInContext.bind(this, keyArgs || {}));
     },
 
     /**
-     * Creates a specification that describes this type under a given scope.
+     * Creates a specification that describes this type.
      *
-     * @param {!pentaho.type.SpecificationScope} scope - The specification scope.
-     * @param {!Object} keyArgs - The keyword arguments object.
+     * This method requires that there currently exists an
+     * [ambient specification context]{@link pentaho.type.SpecificationContext.current}.
+     *
+     * The default implementation returns a plain object with the id of the type and
+     * any other specified attributes
+     * (like [label]{@link pentaho.type.Type#label} or [description]{@link pentaho.type.Type#description}).
+     *
+     * @param {Object} [keyArgs] - The keyword arguments object.
      * Passed to every type and instance serialized within this scope.
      *
      * Please see the documentation of subclasses for information on additional, supported keyword arguments.
@@ -841,20 +861,26 @@ define([
      *
      * @see pentaho.type.Type#toSpec
      */
-    toSpecInScope: function(scope, keyArgs) {
-      return {id: this.id};
+    toSpecInContext: function(keyArgs) {
+
+      var spec = {id: this.shortId || SpecificationContext.current.add(this)};
+
+      this._fillSpecInContext(spec, keyArgs || {});
+
+      return spec;
     },
 
     /**
-     * Fills the given specification with this type's attributes local values,
-     * under a given scope,
+     * Fills the given specification with this type's attributes' local values,
      * and returns whether any attribute was actually added.
+     *
+     * This method requires that there currently exists an
+     * [ambient specification context]{@link pentaho.type.SpecificationContext.current}.
      *
      * This method does _not_ add the special `id` and `base` attributes to the specification.
      *
-     * @param {Object} spec - The specification to be filled.
-     * @param {!pentaho.type.SpecificationScope} scope - The specification scope.
-     * @param {!Object} keyArgs - The keyword arguments object.
+     * @param {!Object} spec - The specification to be filled.
+     * @param {Object} [keyArgs] - The keyword arguments object.
      * Passed to every type and instance serialized within this scope.
      *
      * Please see the documentation of subclasses for information on additional, supported keyword arguments.
@@ -863,10 +889,42 @@ define([
      *
      * @protected
      *
-     * @see pentaho.type.Instance#toSpecInScope
+     * @see pentaho.type.Instance#toSpecInContext
      */
-    _fillSpecInScope: function(spec, scope, keyArgs) {
+    _fillSpecInContext: function(spec, keyArgs) {
+      var any = false;
+      //var isJson = keyArgs.isJson;
 
+      if(this._labelSet && O.hasOwn(this, "_label")) {
+        any = true;
+        spec.label = this._label;
+      }
+
+      // Normal attributes
+      _normalAttrNames.forEach(function(name) {
+        var _name = "_" + name, v;
+        // !== undefined ensures refinement fields are well handled as well
+        if(O.hasOwn(this, _name) && (v = this[_name]) !== undefined) {
+          any = true;
+          spec[name] = v;
+        }
+      }, this);
+
+      // Custom attributes
+      var styleClass = this._styleClass;
+      if(styleClass) {
+        any = true;
+        spec.styleClass = styleClass;
+      }
+
+      var viewInfo = O.getOwn(this, "_view");
+      if(viewInfo !== undefined) { // can be null
+        any = true;
+        var view = viewInfo && viewInfo.value;
+        spec.view = view; // view && isJson ? String(view) : view;
+      }
+
+      return any;
     },
 
     /**
@@ -876,30 +934,52 @@ define([
      * to be the value of an [inline type]{@link pentaho.type.spec.IInstance#_} property
      * that is included on a specification of an instance of this type.
      *
+     * If an [ambient specification context]{@link pentaho.type.SpecificationContext.current},
+     * currently exists, it is used to manage the serialization process.
+     * Otherwise, one is created and set as current.
+     *
      * When a type is not anonymous, the cheapest reference,
      * the [id]{@link pentaho.type.Type#id}, is returned.
      *
      * For anonymous types, a temporary, serialization-only id is generated.
      * In the first occurrence in the given scope,
      * that id is returned, within a full specification of the type,
-     * obtained by calling [toSpecInScope]{@link pentaho.type.Type#toSpecInScope}.
+     * obtained by calling [toSpecInContext]{@link pentaho.type.Type#toSpecInContext}.
      * In following occurrences, only the previously used temporary id is returned.
      *
      * Some standard types have a special reference syntax,
-     * e.g. [List.Type#toReference]{@link pentaho.type.List.Type#toReference}.
+     * e.g. [List.Type#toRef]{@link pentaho.type.List.Type#toRef}.
      *
      * @see pentaho.type.Type#toSpec
      *
-     * @param {!pentaho.type.SpecificationScope} scope - The specification scope.
-     * @param {!Object} keyArgs - The keyword arguments object.
+     * @param {Object} [keyArgs] - The keyword arguments object.
      * Passed to every type and instance serialized within this scope.
      *
      * Please see the documentation of subclasses for information on additional, supported keyword arguments.
      *
      * @return {!pentaho.type.spec.UTypeReference} A reference to this type.
      */
-    toReference: function(scope, keyArgs) {
-      return this.id;
+    toRef: function(keyArgs) {
+      return this.shortId || O.using(new SpecificationScope(), this.toRefInContext.bind(this, keyArgs || {}));
+    },
+
+    /**
+     * Returns a _reference_ to this type under a given specification context.
+     *
+     * This method requires that there currently exists an
+     * [ambient specification context]{@link pentaho.type.SpecificationContext.current}.
+     *
+     * @see pentaho.type.Type#toRef
+     *
+     * @param {Object} [keyArgs] - The keyword arguments object.
+     * Passed to every type and instance serialized within this scope.
+     *
+     * Please see the documentation of subclasses for information on additional, supported keyword arguments.
+     *
+     * @return {!pentaho.type.spec.UTypeReference} A reference to this type.
+     */
+    toRefInContext: function(keyArgs) {
+      return this.shortId || SpecificationContext.current.getIdOf(this) || this.toSpecInContext(keyArgs);
     }
     //endregion
   }, /** @lends pentaho.type.Type */{
