@@ -1,0 +1,51 @@
+/*!
+ * Copyright 2010 - 2016 Pentaho Corporation.  All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * The `spec.IRefinementTypeProto` interface represents the specification of a refinement type.
+ *
+ * @name pentaho.type.spec.IRefinementTypeProto
+ * @interface
+ * @extends pentaho.type.spec.IValueTypeProto
+ */
+
+/**
+ * The refinement facet ids or classes.
+ *
+ * The specified facet ids are added to the refinement type,
+ * adding to any already present.
+ *
+ * The attributes defined by the added refinement facets become available for
+ * extension/configuration on the refinement type.
+ *
+ * @name facets
+ * @memberOf pentaho.type.spec.IRefinementTypeProto#
+ * @type {Array.<string|Class.<pentaho.type.facets.Refinement>>}
+ *
+ * @see pentaho.type.Refinement.Type#facets
+ */
+
+/**
+ * The representation type refined by this refinement type.
+ *
+ * Must and can only be specified at a top-refinement type, upon definition.
+ *
+ * @name of
+ * @memberOf pentaho.type.spec.IRefinementTypeProto#
+ * @type {!(pentaho.type.Element.Type|pentaho.type.List.Type)}
+ *
+ * @see pentaho.type.Refinement.Type#of
+ */

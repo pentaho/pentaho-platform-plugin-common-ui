@@ -13,7 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define(function() {
+define([
+  "../util/object"
+], function(O) {
 
   "use strict";
 
@@ -56,6 +58,36 @@ define(function() {
       }
 
       return errors || null;
+    },
+
+    /**
+     * Fills the given specification with the specification of a method attribute of a given object,
+     * and returns whether it was actually added.
+     *
+     * This method requires that there currently exists an
+     * [ambient specification context]{@link pentaho.type.SpecificationContext.current}.
+     *
+     * @param {!Object} spec - The specification to be filled.
+     * @param {!Object} obj - The object where the method is defined.
+     * @param {string} name - The name of the method.
+     *
+     * @return {boolean} `true` if the attribute was added, `false`, otherwise.
+     */
+    fillSpecMethodInContext: function(spec, obj, name) {
+      var any = false;
+      var method;
+
+      if(O.hasOwn(obj, name) && (method = obj[name])) {
+        any = true;
+
+        // Unwrap to original, overriding method.
+        // Otherwise, we get the wrapper method.
+        // This has the limitation of only allowing to output the first
+        // override. If this is overridden twice locally, we only output the last one...
+        spec[name] = method.valueOf();
+      }
+
+      return any;
     }
   };
 

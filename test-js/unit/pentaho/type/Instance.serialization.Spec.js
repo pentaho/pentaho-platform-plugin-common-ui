@@ -15,8 +15,8 @@
  */
 define([
   "pentaho/type/Instance",
-  "pentaho/type/SpecificationScope"
-], function(Instance, SpecificationScope) {
+  "pentaho/type/SpecificationContext"
+], function(Instance, SpecificationContext) {
   "use strict";
 
   /* global describe:false, it:false, expect:false, beforeEach:false, spyOn:false */
@@ -30,66 +30,36 @@ define([
         value = new Instance();
       });
 
-      it("should call #toSpecInScope", function() {
-        spyOn(value, "toSpecInScope");
+      it("should call #toSpecInContext", function() {
+        spyOn(value, "toSpecInContext");
 
         value.toSpec();
 
-        expect(value.toSpecInScope.calls.count()).toBe(1);
+        expect(value.toSpecInContext.calls.count()).toBe(1);
       });
 
-      it("should call #toSpecInScope with a new scope instance each time", function() {
-        spyOn(value, "toSpecInScope");
+      it("should call #toSpecInContext with a keyArgs object", function() {
+        spyOn(value, "toSpecInContext");
 
         value.toSpec();
 
-        var scope1 = value.toSpecInScope.calls.mostRecent().args[0];
-        expect(scope1 instanceof SpecificationScope).toBe(true);
+        var keyArgs = value.toSpecInContext.calls.first().args[0];
+        expect(keyArgs instanceof Object).toBe(true);
+      });
+
+      it("should call #toSpecInContext with an ambient specification context", function() {
+        var context = null;
+
+        spyOn(value, "toSpecInContext").and.callFake(function() {
+          context = SpecificationContext.current;
+        });
+
+        SpecificationContext.current = null;
 
         value.toSpec();
 
-        var scope2 = value.toSpecInScope.calls.mostRecent().args[0];
-        expect(scope2 instanceof SpecificationScope).toBe(true);
-
-        expect(scope1).not.toBe(scope2);
+        expect(context instanceof SpecificationContext).toBe(true);
       });
-
-      describe("keyArgs.omitRootType", function() {
-
-        describe("unspecified", function() {
-
-          it("should call #toSpecInScope with requireType=true", function() {
-            spyOn(value, "toSpecInScope");
-
-            value.toSpec();
-
-            expect(value.toSpecInScope.calls.first().args[1]).toBe(true);
-          });
-        });
-
-        describe("= true", function() {
-          it("should call #toSpecInScope with requireType=false", function() {
-            spyOn(value, "toSpecInScope");
-
-            value.toSpec({omitRootType: true});
-
-            expect(value.toSpecInScope.calls.first().args[1]).toBe(false);
-          });
-        });
-
-        describe("= false", function() {
-          it("should call #toSpecInScope with requireType=true", function() {
-            spyOn(value, "toSpecInScope");
-
-            value.toSpec({omitRootType: false});
-
-            expect(value.toSpecInScope.calls.first().args[1]).toBe(true);
-          });
-        });
-      });
-
-
     }); // toSpec
   });
-
 });

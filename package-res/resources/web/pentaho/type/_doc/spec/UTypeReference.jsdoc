@@ -15,8 +15,7 @@
  */
 
 /**
- * The `spec.UTypeReference` union represents the set of JS types that can be used
- * to reference a type.
+ * The `spec.UTypeReference` union represents the set of JS types that can be used to reference a type.
  *
  * It can be one of the following:
  *
@@ -126,7 +125,7 @@
  * ##### A _generic type specification_ object
  *
  * A plain {@link Object} specification used to generically describe a type.
- * Satisfies the interface [spec.IType]{@link pentaho.type.spec.IType}.
+ * Satisfies the interface [spec.ITypeProto]{@link pentaho.type.spec.ITypeProto}.
  *
  * The special `base` attribute allows specifying the base type
  * and defaults to `"pentaho/type/complex"`.
@@ -204,7 +203,7 @@
  *           pentaho.type.Type|
  *           Class.<pentaho.type.Instance>|
  *           Array.<pentaho.type.spec.UTypeReference>|
- *           pentaho.type.spec.IType} pentaho.type.spec.UTypeReference
+ *           pentaho.type.spec.ITypeProto} pentaho.type.spec.UTypeReference
  */
 
 

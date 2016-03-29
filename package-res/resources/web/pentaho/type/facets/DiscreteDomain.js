@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 define([
+  "module",
   "./Refinement",
   "../list",
   "../../i18n!../i18n/types",
   "../../util/error",
   "../../util/object",
   "../../util/fun"
-], function(RefinementFacet, listFactory, bundle, error, O, fun) {
+], function(module, RefinementFacet, listFactory, bundle, error, O, fun) {
 
   "use strict";
 
@@ -33,6 +34,8 @@ define([
    * to a discrete set of its instances.
    *
    * @description The constructor is not used, as a mixin.
+   *
+   * @see pentaho.type.facets.spec.IDiscreteDomainTypeProto
    */
   return RefinementFacet.extend("pentaho.type.facets.DiscreteDomain", /** @lends pentaho.type.facets.DiscreteDomain# */{
 
@@ -45,7 +48,7 @@ define([
     _isDomainRoot: true,
 
     /**
-     * Gets the fixed domain of the type, if any, or `null`.
+     * Gets or sets the fixed domain of the type, if any, or `null`.
      *
      * The domain attribute refines a type to a set of discrete values
      * whose type is that of the representation type,
@@ -64,6 +67,8 @@ define([
      *
      * @throws {pentaho.lang.ArgumentInvalidError} When the specified values are not a subset of those
      * of the ancestor refinement type.
+     *
+     * @see pentaho.type.facets.spec.IDiscreteDomainTypeProto#domain
      */
     get domain() {
       var domain = O.getOwn(this, "_domain");
@@ -228,11 +233,31 @@ define([
       }
     }
   }, {
+    id: module.id,
+
     validate: function(value) {
       var domain = this._domain;
       if(domain && !domain.has(value.key))
         return new Error(bundle.structured.errors.value.notInDomain);
       return null;
+    },
+
+    fillSpecInContext: function(spec, keyArgs) {
+      if(!keyArgs) keyArgs = {};
+
+      // TODO: because _domain is created locally through the getter
+      // this code cannot detect whether there are actual changes locally
+      // and this will be serializing unchanged domain values.
+      // Guess doing it right would require maintaining a flag to indicate local change.
+      var any = false;
+      var domain = O.getOwn(this, "_domain");
+      if(domain) {
+        any = true;
+        keyArgs.includeType = false;
+        spec.domain = domain.toSpecInContext(keyArgs);
+      }
+
+      return any;
     }
   });
 });

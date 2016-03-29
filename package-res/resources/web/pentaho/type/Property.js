@@ -27,7 +27,9 @@ define([
 
   "use strict";
 
-  var _propType;
+  var _propType,
+      _dynamicAttrNames = ["isRequired", "countMin", "countMax", "isApplicable", "isReadOnly"];
+
   /**
    * @name pentaho.type.Property
    *
@@ -74,7 +76,7 @@ define([
       /**
        * Initializes a property type object, given a property type specification.
        *
-       * @param {pentaho.type.spec.UPropertyType} spec A property name or type specification.
+       * @param {!pentaho.type.spec.UPropertyTypeProto} spec A property name or type specification.
        * @param {!Object} keyArgs Keyword arguments.
        * @param {!pentaho.type.Complex.Type} keyArgs.declaringType The complex type that declares the property.
        * @param {number} keyArgs.index The index of the property within its complex type.
@@ -108,7 +110,7 @@ define([
        * Performs initialization tasks that take place before the instance is
        * extended with its spec.
        *
-       * @param {!pentaho.type.spec.UPropertyType} spec A property name or specification object.
+       * @param {!pentaho.type.spec.UPropertyTypeProto} spec A property name or specification object.
        * @param {!Object} keyArgs Keyword arguments.
        * @param {!pentaho.type.Complex.Type} keyArgs.declaringType The complex type that declares the property.
        * @param {number} keyArgs.index The index of the property within its complex type.
@@ -227,8 +229,10 @@ define([
        * The name of a _property type_ identifies it within
        * its [declaring type]{@link pentaho.type.Property.Type#declaringType}.
        *
+       * ### Set
+       *
        * This attribute must be set when defining a new _property type_,
-       * and cannot change afterwards.
+       * and cannot be changed afterwards.
        *
        * When set to a non-{@link Nully} and non-{@link String} value,
        * the value is first replaced by the result of calling its `toString` method.
@@ -237,6 +241,8 @@ define([
        *
        * @throws {pentaho.lang.ArgumentRequiredError} When set to an empty string or a _nully_ value.
        * @throws {TypeError} When set to a value different from the current one.
+       *
+       * @see pentaho.type.spec.IPropertyTypeProto#name
        */
       get name() {
         return this._name;
@@ -302,6 +308,18 @@ define([
       /**
        * Gets or sets the type of value that properties of this type can hold.
        *
+       * If the _value type_ is a [list]{@link pentaho.type.Value.Type#isList} type,
+       * then this property will be a _list_ (or multiple-elements) property,
+       * otherwise, this property will be an _element_ (or single-element) property.
+       *
+       * ### Get
+       *
+       * The _default value type_ is the _inherited value type_.
+       *
+       * A root _property type_ has a default _value type_ of [string]{@link pentaho.type.String}.
+       *
+       * ### Set
+       *
        * When set and the property already has [descendant]{@link pentaho.type.Type#hasDescendants} properties,
        * an error is thrown.
        *
@@ -314,12 +332,11 @@ define([
        * [subtype]{@link pentaho.type.Type#isSubtypeOf} of the attribute's current _value type_,
        * an error is thrown.
        *
+       * ### Relation to `value` attribute
+       *
        * When set and the [value]{@link pentaho.type.Property.Type#value} attribute
        * is _locally_ set, it is checked against the new _value type_,
        * and set to `null`, if it not an instance of it.
-       *
-       * The default value type is the inherited value type.
-       * A root _property type_ has a default _value type_ of [string]{@link pentaho.type.String}.
        *
        * @type {!pentaho.type.Value.Type}
        *
@@ -327,6 +344,8 @@ define([
        * [descendant]{@link pentaho.type.Type#hasDescendants} properties.
        * @throws {pentaho.lang.ArgumentInvalidError} When setting to a _value type_ that is not a subtype
        * of the current _value type_.
+       *
+       * @see pentaho.type.spec.IPropertyTypeProto#type
        */
       get type() {
         return this._type;
@@ -362,18 +381,22 @@ define([
       _value: null,
 
       /**
-       * Gets or sets the _default value_ of the _property type_.
+       * Gets or sets the _default value_ of properties of this type.
        *
-       * The _default value_ is the prototype value that properties of this type take,
+       * The _default value_ is the "prototype" value that properties of this type take,
        * on complex instances,
        * when the property is unspecified or specified as a {@link Nully} value.
        * A [cloned]{@link pentaho.type.Value#clone} value is used each time.
        *
        * The value `null` is a valid _default value_.
        *
+       * ### Get
+       *
        * When got and the _default value_ (local or inherited)
        * is not an instance of the _value type_ (local or inherited),
        * `null` is returned.
+       *
+       * ### Set
        *
        * When set and the property already has [descendant]{@link pentaho.type.Type#hasDescendants} properties,
        * an error is thrown.
@@ -381,10 +404,10 @@ define([
        * When set to `null`, it is respected.
        *
        * When set to the _control value_ `undefined`, the attribute value is reset,
-       * causing it to assume its _default value_:
+       * causing it to assume its default value (yes, the default value of the _default value_ attribute...):
        *
-       * * for [root]{@link pentaho.type.Type#root} _property types_, the _default value_ is `null`
-       * * for non-root _property types_, the _default value_ is the _inherited value_,
+       * * for [root]{@link pentaho.type.Type#root} _property types_, the default value is `null`
+       * * for non-root _property types_, the default value is the _inherited value_,
        *   if it is an instance of the _property type_'s [value type]{@link pentaho.type.Property.Type#type},
        *   or, `null`, otherwise.
        *
@@ -395,10 +418,14 @@ define([
        * The conversion may be impossible and thus an error may be thrown.
        *
        * @type {pentaho.type.Value}
+       *
        * @throws {pentaho.lang.OperationInvalidError} When setting and the property already has
        * [descendant]{@link pentaho.type.Type#hasDescendants} properties.
+       *
        * @throws {Error} When setting to a _default value_ that cannot be converted to the
-       * property type's current _value type.
+       * property type's current _value type_.
+       *
+       * @see pentaho.type.spec.IPropertyTypeProto#value
        */
       get value() {
         var value = this._value;
@@ -409,7 +436,8 @@ define([
         if(this.hasDescendants)
           throw error.operInvalid("Cannot change the default value of a property type that has descendants.");
 
-        if(_ === undefined) {
+        if(_ === undefined || (_ === null && this.isRoot)) {
+          /* istanbul ignore else : hard to test */
           if(this !== _propType) {
             // Clear local value. Inherit base value.
             delete this._value;
@@ -471,6 +499,8 @@ define([
        * @ignore
        */
       _resetLabel: function() {
+        this._labelSet = false;
+
         if(this.isRoot) {
           this._label = text.titleFromName(this.name);
         } else {
@@ -493,7 +523,7 @@ define([
        * @param {pentaho.type.Complex} owner The complex value that owns the property.
        * @return {?Array.<!Error>} A non-empty array of `Error` or `null`.
        *
-       * @see pentaho.type.Complex.Type#_validate
+       * @see pentaho.type.Complex#validate
        */
       validate: function(owner) {
         var errors = null;
@@ -556,7 +586,7 @@ define([
        * Defines a "dynamic" attribute and corresponding setter and getter methods.
        *
        * This method is an implementation detail,
-       * ans is invoked by {pentaho.type.Property.Type#attrs}
+       * ans is invoked by {@link pentaho.type.Property.Type#_attrs}
        *
        * @param {String} name
        * @param {Object} spec
@@ -645,6 +675,67 @@ define([
         this[name + "Eval"] = function(owner) {
           return this[namePrivEval].call(owner);
         };
+      },
+      //endregion
+
+      //region serialization
+      toSpecInContext: function(keyArgs) {
+        if(!keyArgs) keyArgs = {};
+
+        // no id and no base
+        var valueTypeRef = this.type.toRefInContext(keyArgs);
+        var spec = {
+          name: this._name,
+          type: valueTypeRef
+        };
+
+        // If there are no attributes and it's of type "string",
+        // return only the name of the property type.
+        if(!this._fillSpecInContext(spec, keyArgs) && valueTypeRef === "string") {
+          return this._name;
+        }
+
+        return spec;
+      },
+
+      _fillSpecInContext: function(spec, keyArgs) {
+        var isJson = keyArgs.isJson;
+
+        var any = this.base(spec, keyArgs);
+
+        // Dynamic attributes
+        _dynamicAttrNames.forEach(function(name) {
+          var namePriv = "_" + name;
+
+          if(O.hasOwn(this, namePriv)) {
+            var value = this[namePriv];
+            if(F.is(value)) {
+              if(!isJson) {
+                any = true;
+                spec[name] = value.valueOf();
+              }
+            } else {
+              any = true;
+              spec[name] = value;
+            }
+          }
+        }, this);
+
+        // Custom attributes
+        var defaultValue = O.getOwn(this, "_value");
+        if(defaultValue !== undefined) {
+          any = true;
+          if(defaultValue) {
+            var valueType = this.type;
+            keyArgs.includeType = defaultValue.type !== (valueType.isRefinement ? valueType.of : valueType);
+
+            spec.value = defaultValue.toSpecInContext(keyArgs);
+          } else {
+            spec.value = null;
+          }
+        }
+
+        return any;
       }
       //endregion
     } // end instance type:
@@ -685,7 +776,7 @@ define([
          * When a _dynamic_ attribute is set to a function,
          * it can evaluate to a different value for each complex instance.
          *
-         * When a dynamic attribute is set to a value other than a function or a {@link Nully} value,
+         * When a _dynamic_ attribute is set to a value other than a function or a {@link Nully} value,
          * its value is the same for every complex instance.
          *
          * ### This attribute is *Monotonic*
@@ -727,6 +818,7 @@ define([
          * [descendant]{@link pentaho.type.Type#hasDescendants} properties.
          *
          * @see pentaho.type.Complex#isRequired
+         * @see pentaho.type.spec.IPropertyTypeProto#isRequired
          */
         isRequired: {
           value: false,
@@ -770,7 +862,7 @@ define([
          * When a _dynamic_ attribute is set to a function,
          * it can evaluate to a different value for each complex instance.
          *
-         * When a dynamic attribute is set to a value other than a function or a {@link Nully} value,
+         * When a _dynamic_ attribute is set to a value other than a function or a {@link Nully} value,
          * its value is the same for every complex instance.
          *
          * ### This attribute is *Monotonic*
@@ -812,6 +904,8 @@ define([
          * @type undefined | number | pentaho.type.PropertyDynamicAttribute.<number>
          *
          * @see pentaho.type.Complex#countRange
+         *
+         * @see pentaho.type.spec.IPropertyTypeProto#countMin
          */
         countMin: {
           value: 0,
@@ -855,7 +949,7 @@ define([
          * When a _dynamic_ attribute is set to a function,
          * it can evaluate to a different value for each complex instance.
          *
-         * When a dynamic attribute is set to a value other than a function or a {@link Nully} value,
+         * When a _dynamic_ attribute is set to a value other than a function or a {@link Nully} value,
          * its value is the same for every complex instance.
          *
          * ### This attribute is *Monotonic*
@@ -897,6 +991,7 @@ define([
          * @type undefined | number | pentaho.type.PropertyDynamicAttribute.<number>
          *
          * @see pentaho.type.Complex#countRange
+         * @see pentaho.type.spec.IPropertyTypeProto#countMax
          */
         countMax: {
           value: Infinity,
@@ -935,7 +1030,7 @@ define([
          * When a _dynamic_ attribute is set to a function,
          * it can evaluate to a different value for each complex instance.
          *
-         * When a dynamic attribute is set to a value other than a function or a {@link Nully} value,
+         * When a _dynamic_ attribute is set to a value other than a function or a {@link Nully} value,
          * its value is the same for every complex instance.
          *
          * ### This attribute is *Monotonic*
@@ -975,6 +1070,7 @@ define([
          *
          * @see pentaho.type.Property.Type#isRequired
          * @see pentaho.type.Complex#isApplicable
+         * @see pentaho.type.spec.IPropertyTypeProto#isApplicable
          */
         isApplicable: {
           value: true,
@@ -1011,7 +1107,7 @@ define([
          * When a _dynamic_ attribute is set to a function,
          * it can evaluate to a different value for each complex instance.
          *
-         * When a dynamic attribute is set to a value other than a function or a {@link Nully} value,
+         * When a _dynamic_ attribute is set to a value other than a function or a {@link Nully} value,
          * its value is the same for every complex instance.
          *
          * ### This attribute is *Monotonic*
@@ -1050,6 +1146,7 @@ define([
          * @type undefined | boolean | pentaho.type.PropertyDynamicAttribute.<boolean>
          *
          * @see pentaho.type.Complex#isReadOnly
+         * @see pentaho.type.spec.IPropertyTypeProto#isReadOnly
          */
         isReadOnly: {
           value: false,

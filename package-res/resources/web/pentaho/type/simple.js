@@ -16,10 +16,12 @@
 define([
   "module",
   "./element",
+  "./valueHelper",
   "../util/object",
   "../util/error",
+  "../util/fun",
   "../i18n!types"
-], function(module, elemFactory, O, error, bundle) {
+], function(module, elemFactory, valueHelper, O, error, F, bundle) {
 
   "use strict";
 
@@ -46,6 +48,10 @@ define([
      * @description Creates a simple instance.
      * @constructor
      * @param {pentaho.type.spec.USimple} [spec] A simple specification.
+     *
+     * @see pentaho.type.spec.ISimple
+     * @see pentaho.type.spec.ISimpleProto
+     * @see pentaho.type.spec.ISimpleTypeProto
      */
     var Simple = Element.extend("pentaho.type.Simple", /** @lends pentaho.type.Simple# */{
 
@@ -207,7 +213,6 @@ define([
        * The default implementation does nothing.
        *
        * @param {any} config The configuration.
-       * @override
        */
       _configure: function(config) {
         // Nothing configurable at this level
@@ -244,20 +249,20 @@ define([
       },
       //endregion
 
-      /**
-       * @inheritdoc
-       */
-      toSpecInScope: function(scope, requireType, keyArgs) {
+      toSpecInContext: function(keyArgs) {
+        if(!keyArgs) keyArgs = {};
+
         var addFormatted = !keyArgs.omitFormatted && !!this._formatted;
+        var includeType = keyArgs.includeType;
 
         // Don't need a cell/object spec?
-        if(!(addFormatted || requireType))
+        if(!(addFormatted || includeType))
           return this._value;
 
         // Need one. Ensure _ is the first property
         /*jshint laxbreak:true*/
-        var spec = requireType
-            ? {_: this.type.toReference(scope, keyArgs), v: this._value}
+        var spec = includeType
+            ? {_: this.type.toRefInContext(keyArgs), v: this._value}
             : {v: this._value};
 
         if(addFormatted) spec.f = this._formatted;
@@ -310,7 +315,7 @@ define([
          * Converts a non-{@link Nully} external value to the type stored by the simple type,
          * in its [value]{@link pentaho.type.Simple#value} property.
          *
-         * The given value **cannot** be a {@link Nully} value.
+         * The given value is never a {@link Nully} value.
          *
          * When `null` is returned, it is considered that the conversion is not possible.
          * For inform on the actual reason why the conversion is not possible,
@@ -326,12 +331,45 @@ define([
          */
         cast: function(value) {
           return value;
+        },
+        //endregion
+
+        //region serialization
+        _fillSpecInContext: function(spec, keyArgs) {
+
+          var any = this.base(spec, keyArgs);
+
+          if(!keyArgs.isJson) {
+            any = valueHelper.fillSpecMethodInContext(spec, this, "cast") || any;
+          }
+
+          return any;
         }
         //endregion
       }
     }).implement({
       type: bundle.structured.simple
     });
+
+    // override the documentation to specialize the argument types.
+    /**
+     * Creates a subtype of this one.
+     *
+     * For more information on class extension, in general,
+     * see {@link pentaho.lang.Base.extend}.
+     *
+     * @name extend
+     * @memberOf pentaho.type.Simple
+     *
+     * @param {string} [name] The name of the created class. Used for debugging purposes.
+     * @param {pentaho.type.spec.ISimpleProto} [instSpec] The instance specification.
+     * @param {Object} [classSpec] The static specification.
+     * @param {Object} [keyArgs] The keyword arguments.
+     *
+     * @return {!Class.<pentaho.type.Simple>} The new simple instance subclass.
+     *
+     * @see pentaho.type.Value.extend
+     */
 
     return Simple;
 

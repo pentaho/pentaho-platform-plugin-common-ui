@@ -43,7 +43,7 @@ define([
 
     describe(".extend(...) -", function() {
 
-      var Facet = RefinementFacet.extend();
+      var Facet = RefinementFacet.extend(null, {id: "my/foo"});
 
       var MySimple = Simple.extend();
 
@@ -131,6 +131,18 @@ define([
         }).toThrow(errorMatch.operInvalid());
       });
 
+      it("should throw if given a type embedded instance spec", function() {
+        expect(function() {
+          Refinement.extend({
+            type: {
+              of: MySimple.type,
+              facets: [Facet],
+              instance: {}
+            }
+          });
+        }).toThrow(errorMatch.operInvalid());
+      });
+
       it("should allow to further extend a refinement type", function() {
         var R1 = Refinement.extend({
           type: {
@@ -163,8 +175,8 @@ define([
 
     describe(".Type -", function() {
 
-      var Facet1 = RefinementFacet.extend(),
-          Facet2 = RefinementFacet.extend(),
+      var Facet1 = RefinementFacet.extend(null, {id: "my/foo"}),
+          Facet2 = RefinementFacet.extend(null, {id: "my/bar"}),
           Facet  = Facet1;
 
       var MySimple = Simple.extend();
@@ -341,13 +353,17 @@ define([
         });
 
         it("should create a refinement type with the specified Refinement facet classes' prototypes mixed in",
-           function() {
+        function() {
           var Facet1 = RefinementFacet.extend({
             attribute1: {}
+          }, {
+            id: "my/foo"
           });
 
           var Facet2 = RefinementFacet.extend({
             attribute2: {}
+          }, {
+            id: "my/bar"
           });
 
           var MyRefinement = Refinement.extend({
@@ -363,6 +379,7 @@ define([
 
         it("should not mixin the Refinement classes' static interface", function() {
           var Facet = RefinementFacet.extend({}, {
+            id: "my/foo",
             attribute1: {},
             attribute2: function() {}
           });
@@ -388,12 +405,16 @@ define([
             set attribute1(v) {
               this._attribute1 = v;
             }
+          }, {
+            id: "my/foo"
           });
 
           var Facet2 = RefinementFacet.extend({
             set attribute2(v) {
               this._attribute2 = v;
             }
+          }, {
+            id: "my/bar"
           });
 
           var v1 = {}, v2 = {};
@@ -425,7 +446,7 @@ define([
         });
 
         it("should create a new array with all base facets array when specified locally", function() {
-          var Facet3 = RefinementFacet.extend();
+          var Facet3 = RefinementFacet.extend(null, {id: "my/dud"});
 
           var R1 = Refinement.extend({
             type: {
@@ -642,7 +663,7 @@ define([
         });
 
         it("should fallback to the value of the representation type when set to a nully or empty string value",
-            function() {
+        function() {
           function expectIt(newLabel) {
             var MySimple = Simple.extend({type: {label: "FOO"}});
             var R1 = Refinement.extend({
@@ -1447,6 +1468,7 @@ define([
 
     describe("property usage -", function() {
       var PositiveRefinement = RefinementFacet.extend({}, {
+          id: "my/foo",
           validate: function(value) {
             return value.value > 0;
           }
@@ -1551,6 +1573,7 @@ define([
 
     describe("list usage -", function() {
       var PositiveRefinement = RefinementFacet.extend({}, {
+        id: "my/foo",
         validate: function(value) {
           return value.value > 0;
         }

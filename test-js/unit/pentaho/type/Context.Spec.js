@@ -30,42 +30,40 @@ define([
   // These should really be writable, i.e. globalVar: true
   /*global SESSION_NAME:true, active_theme:true, SESSION_LOCALE:true */
 
+  //region test helpers
   // NOTE: can only be used with `it`; does not work in `describe`.
   function withContext(testFun) {
+    var localRequire = require.new();
+
     return function(done) {
-      unloadContext();
 
       // load fresh Context class
-      require(["pentaho/type/Context"], function(Context) {
+      localRequire(["pentaho/type/Context", "tests/pentaho/util/errorMatch"], function(Context, errorMatch) {
         try {
-          var promise = testFun(Context);
+          var promise = testFun(Context, localRequire, errorMatch);
           if(!promise) {
             done();
+            localRequire.dispose();
           } else {
-            promise.then(done, done.fail);
+            promise.then(function() {
+              done();
+              localRequire.dispose();
+            }, function(ex) {
+              done.fail(ex);
+              localRequire.dispose();
+            });
           }
         } catch(ex) {
           done.fail(ex);
+          localRequire.dispose();
         }
-      }, done.fail);
+      }, function(ex) {
+        done.fail(ex);
+        localRequire.dispose();
+      });
     };
   }
-
-  function unloadContext() {
-    // unload modules
-    var p;
-    for(p in standard)
-      if(standard.hasOwnProperty(p))
-        if(p !== "facets")
-          require.undef("pentaho/type/" + p);
-
-    for(p in standard.facets)
-      if(standard.facets.hasOwnProperty(p))
-        require.undef("pentaho/type/facets/" + p);
-
-    require.undef("pentaho/type/standard");
-    require.undef("pentaho/type/Context");
-  }
+  //endregion
 
   describe("pentaho.type.Context -", function() {
 
@@ -200,6 +198,7 @@ define([
 
     describe("#get|getAsync(type)", function() {
 
+      //region test helpers
       /**
        * Each of the following tests is performed both synchronously and asynchronously
        * using a single tester function.
@@ -250,19 +249,19 @@ define([
        *
        * In both cases, the error should be `exExpected`.
        */
-      function testGetError(tester, exExpected) {
+      function testGetError(tester, funCreateExpectedError) {
 
         return function testStub(overallDone) {
 
           var syncDone = function() {
             // Async test
-            withContext(function(Context) {
+            withContext(function(Context, localRequire, errorMatch) {
 
-              var promise = tester(false, Context);
+              var promise = tester(false, Context, localRequire);
               expect(promise instanceof Promise);
               return promise
                   .then(overallDone.fail, function(ex) {
-                    expect(ex).toEqual(exExpected);
+                    expect(ex).toEqual(funCreateExpectedError(errorMatch));
                   });
 
             })(overallDone);
@@ -271,11 +270,11 @@ define([
           syncDone.fail = overallDone.fail;
 
           // Sync test
-          withContext(function(Context) {
+          withContext(function(Context, localRequire, errorMatch) {
 
             expect(function() {
-              tester(true, Context);
-            }).toThrow(exExpected);
+              tester(true, Context, localRequire);
+            }).toThrow(funCreateExpectedError(errorMatch));
 
           })(syncDone);
         };
@@ -295,8 +294,9 @@ define([
 
         return Promise.resolve(result);
       }
+      //endregion
 
-      it("should have preloaded standard primitive types and facets", withContext(function(Context) {
+      it("should have preloaded standard primitive types and facets", withContext(function(Context, localRequire) {
         var context = new Context();
         var p;
 
@@ -307,265 +307,364 @@ define([
 
         for(p in standard.facets)
           if(standard.facets.hasOwnProperty(p))
-            require("pentaho/type/facets/" + p);
+            localRequire("pentaho/type/facets/" + p);
       }));
 
-      it("should be able to get a standard type given its relative id", testGet(function(sync, Context) {
-        var context = new Context();
-        var promise = callGet(context, sync, "string");
+      describe("by id", function() {
+        it("should be able to get a standard type given its relative id", testGet(function(sync, Context) {
+          var context = new Context();
+          var promise = callGet(context, sync, "string");
 
-        return promise.then(function(InstCtor) {
-          expect(InstCtor.type.id).toBe("pentaho/type/string");
-        });
-      }));
+          return promise.then(function(InstCtor) {
+            expect(InstCtor.type.id).toBe("pentaho/type/string");
+          });
+        }));
 
-      it("should be able to get a standard type given its absolute id", testGet(function(sync, Context) {
-        var context = new Context();
-        var promise = callGet(context, sync, "pentaho/type/string");
+        it("should be able to get a standard type given its absolute id", testGet(function(sync, Context) {
+          var context = new Context();
+          var promise = callGet(context, sync, "pentaho/type/string");
 
-        return promise.then(function(InstCtor) {
-          expect(InstCtor.type.id).toBe("pentaho/type/string");
-        });
-      }));
+          return promise.then(function(InstCtor) {
+            expect(InstCtor.type.id).toBe("pentaho/type/string");
+          });
+        }));
 
-      it("should be able to get a standard type given its factory function", testGet(function(sync, Context) {
-        var context = new Context();
-        var valueFactory = require("pentaho/type/value");
-        var promise = callGet(context, sync, valueFactory);
-
-        return promise.then(function(InstCtor) {
-          expect(InstCtor.type.id).toBe("pentaho/type/value");
-        });
-      }));
-
-      it("should throw/reject when given a type constructor (Type)", testGetError(function(sync, Context) {
-        var context = new Context();
-        var Value   = context.get("pentaho/type/value");
-        return callGet(context, sync, Value.type.constructor);
-      }, errorMatch.argInvalid("typeRef")));
-
-      it("should throw/reject when given null", testGetError(function(sync, Context) {
-        var context = new Context();
-        return callGet(context, sync, null);
-      }, errorMatch.argRequired("typeRef")));
-
-      it("should throw/reject when given undefined", testGetError(function(sync, Context) {
-        var context = new Context();
-        return callGet(context, sync, undefined);
-      }, errorMatch.argRequired("typeRef")));
-
-      it("should throw/reject when given an empty string", testGetError(function(sync, Context) {
-        var context = new Context();
-        return callGet(context, sync, "");
-      }, errorMatch.argRequired("typeRef")));
-
-      it("should be able to get a standard type given its type instance constructor",
-         testGet(function(sync, Context) {
-        var context = new Context();
-        var Value   = context.get("pentaho/type/value");
-        var promise = callGet(context, sync, Value);
-
-        return promise.then(function(InstCtor) {
-          expect(InstCtor.type.id).toBe("pentaho/type/value");
-        });
-      }));
-
-      it("should be able to get a standard type given its type object", testGet(function(sync, Context) {
-        var context = new Context();
-        var Value   = context.get("pentaho/type/value");
-        var promise = callGet(context, sync, Value.type);
-
-        return promise.then(function(InstCtor) {
-          expect(InstCtor.type.id).toBe("pentaho/type/value");
-        });
-      }));
-
-      it("should throw/reject when given a standard type instance prototype",
-         testGetError(function(sync, Context) {
-        var context = new Context();
-        var Value   = context.get("pentaho/type/value");
-
-        return callGet(context, sync, Value.prototype);
-      }, errorMatch.argInvalid("typeRef")));
-
-      it("should be able to create an anonymous complex type with base complex", testGet(function(sync, Context) {
-        var context = new Context();
-        var promise = callGet(context, sync, {base: "complex", props: ["a", "b"]});
-
-        return promise.then(function(InstCtor) {
-          var Complex = context.get("pentaho/type/complex");
-
-          expect(InstCtor.type.isSubtypeOf(Complex.type)).toBe(true);
-
-          expect(InstCtor.ancestor).toBe(Complex);
-          expect(InstCtor.type.has("a")).toBe(true);
-          expect(InstCtor.type.has("b")).toBe(true);
-        });
-      }));
-
-      it("should be able to create an anonymous complex type with implied base complex",
-         testGet(function(sync, Context) {
-        var context = new Context();
-        var promise = callGet(context, sync, {props: ["a", "b"]});
-
-        return promise.then(function(InstCtor) {
-          var Complex = context.get("pentaho/type/complex");
-
-          expect(InstCtor.type.isSubtypeOf(Complex.type)).toBe(true);
-
-          expect(InstCtor.ancestor).toBe(Complex);
-          expect(InstCtor.type.has("a")).toBe(true);
-          expect(InstCtor.type.has("b")).toBe(true);
-        });
-      }));
-
-      it("should be able to create a list type using normal notation", testGet(function(sync, Context) {
-        var context = new Context();
-        var promise = callGet(context, sync, {
-            base: "list",
-            of:   {props: ["a", "b"]}
+        it("should be able to get an already loaded non-standard type given its absolute id",
+        testGet(function(sync, Context, localRequire) {
+          var mid = "pentaho/foo/bar";
+          localRequire.define(mid,[], function() {
+            return function(context) {
+              var Simple = context.get("pentaho/type/simple");
+              return Simple.extend({type: {id: mid}});
+            };
           });
 
-        return promise.then(function(InstCtor) {
-          expect(InstCtor.prototype instanceof context.get("list")).toBe(true);
+          return promiseUtil.require(mid, localRequire)
+              .then(function() {
+                var context = new Context();
+                return callGet(context, sync, mid);
+              })
+              .then(function(InstCtor) {
+                expect(InstCtor.type.id).toBe(mid);
+              });
+        }));
+      });
 
-          var ofType = InstCtor.type.of;
-          expect(ofType.instance instanceof context.get("complex")).toBe(true);
-          expect(ofType.count).toBe(2);
-          expect(ofType.has("a")).toBe(true);
-          expect(ofType.has("b")).toBe(true);
-        });
-      }));
+      describe("by type factory function", function() {
+        it("should be able to get a standard type",
+        testGet(function(sync, Context, localRequire) {
+          var context = new Context();
+          var valueFactory = localRequire("pentaho/type/value");
+          var promise = callGet(context, sync, valueFactory);
 
-      it("should be able to create a list type using the shorthand list-type notation",
-         testGet(function(sync, Context) {
-        var context = new Context();
-        var promise = callGet(context, sync, [
-          {props: ["a", "b"]}
-        ]);
+          return promise.then(function(InstCtor) {
+            expect(InstCtor.type.id).toBe("pentaho/type/value");
+          });
+        }));
+      });
 
-        return promise.then(function(InstCtor) {
-          expect(InstCtor.prototype instanceof context.get("list")).toBe(true);
+      describe("by type instance constructor (Instance)", function() {
+        it("should be able to get a standard type", testGet(function(sync, Context) {
+          var context = new Context();
+          var Value   = context.get("pentaho/type/value");
+          var promise = callGet(context, sync, Value);
 
-          var ofType = InstCtor.type.of;
-          expect(ofType.instance instanceof context.get("complex")).toBe(true);
-          expect(ofType.count).toBe(2);
-          expect(ofType.has("a")).toBe(true);
-          expect(ofType.has("b")).toBe(true);
-        });
-      }));
+          return promise.then(function(InstCtor) {
+            expect(InstCtor.type.id).toBe("pentaho/type/value");
+          });
+        }));
 
-      it("should throw/reject if the shorthand list-type notation has two entries",
-         testGetError(function(sync, Context) {
-        var context = new Context();
+        it("should throw/reject if given a type from a different context", testGetError(function(sync, Context) {
+          var context1 = new Context();
+          var context2 = new Context();
+          var Value    = context2.get("pentaho/type/value");
 
-        return callGet(context, sync, [123, 234]);
-      }, errorMatch.argInvalid("typeRef")));
+          return callGet(context1, sync, Value);
 
-      it("should be able to create a refinement type using normal notation", testGet(function(sync, Context) {
-        var context = new Context();
-        var promise = callGet(context, sync, {
-          base: "refinement",
-          of:   "number"
-        });
+        }, function(errorMatch) { return errorMatch.argInvalid("typeRef"); }));
 
-        return promise.then(function(InstCtor) {
-          var Refinement = context.get("refinement");
-          expect(InstCtor.type.isSubtypeOf(Refinement.type)).toBe(true);
+        it("should configure a type", testGet(function(sync, Context) {
+          // "value" is configured on the Context constructor, so need to wire the prototype...
 
-          expect(InstCtor.ancestor).toBe(Refinement);
-        });
-      }));
+          spyOn(Context.prototype, "_getConfig").and.callFake(function(id) {
+            if(id === "pentaho/type/value") {
+              return {foo: "bar", instance: {bar: "foo"}};
+            }
+          });
 
-      it("should throw/reject if given a number (not a string, function or object)",
-         testGetError(function(sync, Context) {
-        var context = new Context();
+          var context = new Context();
 
-        return callGet(context, sync, 1);
+          var promise = callGet(context, sync, "pentaho/type/value");
 
-      }, errorMatch.argInvalid("typeRef")));
+          return promise.then(function(InstCtor) {
+            expect(Context.prototype._getConfig).toHaveBeenCalledWith("pentaho/type/value");
 
-      it("should throw/reject if given a boolean (not a string, function or object)",
-         testGetError(function(sync, Context) {
-        var context = new Context();
+            expect(InstCtor.prototype.bar).toBe("foo");
+            expect(InstCtor.type.foo).toBe("bar");
+          });
+        }));
+      });
 
-        return callGet(context, sync, true);
+      describe("by type (object)", function() {
+        it("should be able to get a standard type given its type object", testGet(function(sync, Context) {
+          var context = new Context();
+          var Value   = context.get("pentaho/type/value");
+          var promise = callGet(context, sync, Value.type);
 
-      }, errorMatch.argInvalid("typeRef")));
+          return promise.then(function(InstCtor) {
+            expect(InstCtor.type.id).toBe("pentaho/type/value");
+          });
+        }));
+      });
 
-      it("should be able to get an already loaded non-standard type given its absolute id",
-         testGet(function(sync, Context) {
-        var mid = "pentaho/foo/bar";
-        require.undef(mid);
-        define(mid,[], function() {
-          return function(context) {
-            var Simple = context.get("pentaho/type/simple");
-            return Simple.extend({type: {id: mid}});
-          };
-        });
+      describe("by others, invalid", function() {
+        it("should throw/reject when given the type-constructor (Type)", testGetError(function(sync, Context) {
+          var context = new Context();
+          var Value   = context.get("pentaho/type/value");
+          return callGet(context, sync, Value.type.constructor);
+        }, function(errorMatch) { return errorMatch.argInvalid("typeRef"); }));
 
-        return promiseUtil.require(mid)
-            .then(function() {
+        it("should throw/reject when given null", testGetError(function(sync, Context) {
+          var context = new Context();
+          return callGet(context, sync, null);
+        }, function(errorMatch) { return errorMatch.argRequired("typeRef"); }));
+
+        it("should throw/reject when given undefined", testGetError(function(sync, Context) {
+          var context = new Context();
+          return callGet(context, sync, undefined);
+        }, function(errorMatch) { return errorMatch.argRequired("typeRef"); }));
+
+        it("should throw/reject when given an empty string", testGetError(function(sync, Context) {
+          var context = new Context();
+          return callGet(context, sync, "");
+        }, function(errorMatch) { return errorMatch.argRequired("typeRef"); }));
+
+        it("should throw/reject when given a standard type instance prototype",
+        testGetError(function(sync, Context) {
+          var context = new Context();
+          var Value   = context.get("pentaho/type/value");
+
+          return callGet(context, sync, Value.prototype);
+        }, function(errorMatch) { return errorMatch.argInvalid("typeRef"); }));
+
+        it("should throw/reject if given a number (not a string, function or object)",
+        testGetError(function(sync, Context) {
+          var context = new Context();
+
+          return callGet(context, sync, 1);
+
+        }, function(errorMatch) { return errorMatch.argInvalid("typeRef"); }));
+
+        it("should throw/reject if given a boolean (not a string, function or object)",
+        testGetError(function(sync, Context) {
+          var context = new Context();
+
+          return callGet(context, sync, true);
+
+        }, function(errorMatch) { return errorMatch.argInvalid("typeRef"); }));
+      });
+
+      describe("by generic or specialized type specification syntax", function() {
+        // Generic type specification syntax:
+        // {id: "foo", base: "complex", ...}
+
+        describe("`base` and `id`", function() {
+          describe("when `base` is not specified", function() {
+
+            it("should default `base` to `null` when `id` is 'value'", testGet(function(sync, Context) {
               var context = new Context();
-              return callGet(context, sync, mid);
-            })
-            .then(function(InstCtor) {
-              expect(InstCtor.type.id).toBe(mid);
-              require.undef(mid);
-            });
-      }));
+              var promise = callGet(context, sync, {id: 'value'});
 
-      it("should throw if type factory does not return a function", testGet(function(sync, Context) {
-        var mid = "pentaho/foo/bar2";
-        require.undef(mid);
-        define(mid,[], function() {
-          return function(context) {
-            return "not a function";
-          };
+              return promise.then(function(InstCtor) {
+                var Value = context.get("pentaho/type/value");
+
+                expect(InstCtor).toBe(Value);
+              });
+            }));
+
+            it("should default `base` to 'complex' when `id` is not specified", testGet(function(sync, Context) {
+              var context = new Context();
+              var promise = callGet(context, sync, {props: ["a", "b"]});
+
+              return promise.then(function(InstCtor) {
+                var Complex = context.get("pentaho/type/complex");
+
+                expect(InstCtor.type.isSubtypeOf(Complex.type)).toBe(true);
+
+                expect(InstCtor.ancestor).toBe(Complex);
+                expect(InstCtor.type.has("a")).toBe(true);
+                expect(InstCtor.type.has("b")).toBe(true);
+              });
+            }));
+          });
+
+          describe("when `base` is `undefined`", function() {
+
+            it("should default `base` to 'complex'",
+            testGet(function(sync, Context) {
+              var context = new Context();
+              var promise = callGet(context, sync, {base: undefined, props: ["a", "b"]});
+
+              return promise.then(function(InstCtor) {
+                var Complex = context.get("pentaho/type/complex");
+
+                expect(InstCtor.type.isSubtypeOf(Complex.type)).toBe(true);
+
+                expect(InstCtor.ancestor).toBe(Complex);
+                expect(InstCtor.type.has("a")).toBe(true);
+                expect(InstCtor.type.has("b")).toBe(true);
+              });
+            }));
+          });
+
+          describe("when `base` is `null`", function() {
+            it("should throw/reject when `id` is not 'value'",
+            testGetError(function(sync, Context) {
+              var context = new Context();
+
+              return callGet(context, sync, {id: "foo", base: null});
+            }, function(errorMatch) { return errorMatch.argInvalid("typeRef"); }));
+          });
+
+          describe("when `base` is specified non-nully", function() {
+            it("should throw/reject when `id` is 'value'",
+            testGetError(function(sync, Context) {
+              var context = new Context();
+
+              return callGet(context, sync, {id: "value", base: "foo"});
+            }, function(errorMatch) { return errorMatch.argInvalid("typeRef"); }));
+          });
         });
 
-        return promiseUtil.require(mid)
-            .then(function() {
-              var context = new Context();
-              return callGet(context, sync, mid);
-            })
-            .then(function() {
-              expect("to throw").toBe(true);
-              require.undef(mid);
-            }, function(ex) {
-              expect(ex).toEqual(errorMatch.operInvalid());
-              require.undef(mid);
+        //region complex
+        it("should be able to create an anonymous complex type with base complex", testGet(function(sync, Context) {
+          var context = new Context();
+          var promise = callGet(context, sync, {base: "complex", props: ["a", "b"]});
+
+          return promise.then(function(InstCtor) {
+            var Complex = context.get("pentaho/type/complex");
+
+            expect(InstCtor.type.isSubtypeOf(Complex.type)).toBe(true);
+
+            expect(InstCtor.ancestor).toBe(Complex);
+            expect(InstCtor.type.has("a")).toBe(true);
+            expect(InstCtor.type.has("b")).toBe(true);
+          });
+        }));
+        //endregion
+
+        //region list
+        it("should be able to create a list type using generic notation", testGet(function(sync, Context) {
+          var context = new Context();
+          var promise = callGet(context, sync, {
+              base: "list",
+              of:   {props: ["a", "b"]}
             });
-      }));
 
-      it("should throw if type factory does return a function that is not an Instance",
-         testGet(function(sync, Context) {
-        var mid = "pentaho/foo/bar2";
-        require.undef(mid);
-        define(mid,[], function() {
-          return function(context) {
-            return function(){};
-          };
-        });
+          return promise.then(function(InstCtor) {
+            expect(InstCtor.prototype instanceof context.get("list")).toBe(true);
 
-        return promiseUtil.require(mid)
-            .then(function() {
-              var context = new Context();
-              return callGet(context, sync, mid);
-            })
-            .then(function() {
-              expect("to throw").toBe(true);
-              require.undef(mid);
-            }, function(ex) {
-              expect(ex).toEqual(errorMatch.operInvalid());
-              require.undef(mid);
-            });
-      }));
+            var ofType = InstCtor.type.of;
+            expect(ofType.instance instanceof context.get("complex")).toBe(true);
+            expect(ofType.count).toBe(2);
+            expect(ofType.has("a")).toBe(true);
+            expect(ofType.has("b")).toBe(true);
+          });
+        }));
 
-      it("should collect non-standard type ids in getAsync", withContext(function(Context) {
+        it("should be able to create a list type using the shorthand list-type notation",
+        testGet(function(sync, Context) {
+          var context = new Context();
+          var promise = callGet(context, sync, [
+            {props: ["a", "b"]}
+          ]);
+
+          return promise.then(function(InstCtor) {
+            expect(InstCtor.prototype instanceof context.get("list")).toBe(true);
+
+            var ofType = InstCtor.type.of;
+            expect(ofType.instance instanceof context.get("complex")).toBe(true);
+            expect(ofType.count).toBe(2);
+            expect(ofType.has("a")).toBe(true);
+            expect(ofType.has("b")).toBe(true);
+          });
+        }));
+
+        it("should throw/reject if the shorthand list-type notation has two entries",
+        testGetError(function(sync, Context) {
+          var context = new Context();
+
+          return callGet(context, sync, [123, 234]);
+        }, function(errorMatch) { return errorMatch.argInvalid("typeRef"); }));
+        //endregion
+
+        //region refinement
+        it("should be able to create a refinement type using generic notation", testGet(function(sync, Context) {
+          var context = new Context();
+          var promise = callGet(context, sync, {
+            base: "refinement",
+            of:   "number"
+          });
+
+          return promise.then(function(InstCtor) {
+            var Refinement = context.get("refinement");
+            expect(InstCtor.type.isSubtypeOf(Refinement.type)).toBe(true);
+
+            expect(InstCtor.ancestor).toBe(Refinement);
+          });
+        }));
+        //endregion
+      });
+
+      describe("type factory function", function() {
+        it("should throw if it does not return a function",
+        testGet(function(sync, Context, localRequire, errorMatch) {
+          var mid = "pentaho/foo/bar2";
+
+          localRequire.define(mid,[], function() {
+            return function(context) {
+              return "not a function";
+            };
+          });
+
+          return promiseUtil.require(mid, localRequire)
+              .then(function() {
+                var context = new Context();
+                return callGet(context, sync, mid);
+              })
+              .then(function() {
+                expect("to throw").toBe(true);
+              }, function(ex) {
+                expect(ex).toEqual(errorMatch.operInvalid());
+              });
+        }));
+
+        it("should throw if it does return a function that is not an Instance",
+        testGet(function(sync, Context, localRequire, errorMatch) {
+          var mid = "pentaho/foo/bar2";
+
+          localRequire.define(mid,[], function() {
+            return function(context) {
+              return function(){};
+            };
+          });
+
+          return promiseUtil.require(mid, localRequire)
+              .then(function() {
+                var context = new Context();
+                return callGet(context, sync, mid);
+              })
+              .then(function() {
+                expect("to throw").toBe(true);
+              }, function(ex) {
+                expect(ex).toEqual(errorMatch.operInvalid());
+              });
+        }));
+      });
+
+      it("should collect non-standard type ids in getAsync", withContext(function(Context, localRequire) {
         function defineTempModule(mid) {
-          require.undef(mid);
-          define(mid, [], function() {
+          localRequire.define(mid, [], function() {
             return function(context) {
               return context.get("pentaho/type/simple").extend({type: {id: mid}});
             };
@@ -573,9 +672,8 @@ define([
         }
 
         function defineTempFacet(mid) {
-          require.undef(mid);
-          define(mid, ["pentaho/type/facets/Refinement"], function(Refinement) {
-            return Refinement.extend();
+          localRequire.define(mid, ["pentaho/type/facets/Refinement"], function(Refinement) {
+            return Refinement.extend(null, {id: mid});
           });
         }
 
@@ -589,7 +687,7 @@ define([
         // -----
 
         var context = new Context();
-        var RefinementMixin2 = require("pentaho/type/facets/Refinement").extend();
+        var RefinementMixin2 = localRequire("pentaho/type/facets/Refinement").extend(null, {id: "my/facets/foo"});
         var spec = {
           base: "complex",
           props: [
@@ -621,15 +719,7 @@ define([
               expect(InstCtor.type.get("foo2").type.ancestor.id).toBe("pentaho/foo/dudu2");
               expect(InstCtor.type.get("foo3").type.of.id).toBe("pentaho/foo/dudu3");
               expect(InstCtor.type.get("foo7").type.get("a").type.id).toBe("pentaho/foo/dudu4");
-              expect(InstCtor.type.get("foo8").type.facets[0]).toBe(require("pentaho/foo/facets/Mixin3"));
-
-              require.undef("pentaho/foo/dudu1");
-              require.undef("pentaho/foo/dudu2");
-              require.undef("pentaho/foo/dudu3");
-              require.undef("pentaho/foo/dudu4");
-              require.undef("pentaho/foo/facets/Mixin1");
-              require.undef("pentaho/foo/facets/Mixin2");
-              require.undef("pentaho/foo/facets/Mixin3");
+              expect(InstCtor.type.get("foo8").type.facets[0]).toBe(localRequire("pentaho/foo/facets/Mixin3"));
             });
       }));
 
@@ -637,24 +727,19 @@ define([
       // should throw when sync and the requested module is not yet loaded
       // should not throw when async and the requested module is not defined
       // should not throw when async and the requested module is not yet loaded
-    }); // #get
+    }); // #get|getAsync
 
     describe("#getAllAsync(baseTypeId, ka)", function() {
 
-      beforeEach(function() {
-        require.undef("pentaho/service");
-
-        require.undef("exp/foo");
-        require.undef("pentaho/service!exp/foo");
-
+      function configRequire(localRequire) {
         // Reset current service configuration
-        require.config({
+        localRequire.config({
           config: {"pentaho/service": null}
         });
 
         // ---
 
-        define("exp/foo", ["pentaho/type/simple"], function(simpleFactory) {
+        localRequire.define("exp/foo", ["pentaho/type/simple"], function(simpleFactory) {
           return function(context) {
             return context.get(simpleFactory).extend({type: {id: "exp/foo"}});
           };
@@ -662,10 +747,7 @@ define([
 
         // ---
 
-        require.undef("exp/bar");
-        require.undef("pentaho/service!exp/bar");
-
-        define("exp/bar", ["pentaho/type/simple"], function(simpleFactory) {
+        localRequire.define("exp/bar", ["pentaho/type/simple"], function(simpleFactory) {
           return function(context) {
             return context.get(simpleFactory).extend({type: {id: "exp/bar", isBrowsable: false}});
           };
@@ -673,10 +755,7 @@ define([
 
         // ---
 
-        require.undef("exp/dude");
-        require.undef("pentaho/service!exp/dude");
-
-        define("exp/dude", ["pentaho/type/simple"], function(simpleFactory) {
+        localRequire.define("exp/dude", ["pentaho/type/simple"], function(simpleFactory) {
           return function(context) {
             return context.get(simpleFactory).extend({type: {id: "exp/dude"}});
           };
@@ -684,7 +763,7 @@ define([
 
         // ---
 
-        require.config({
+        localRequire.config({
           config: {
             "pentaho/service": {
               "exp/foo": "exp/thing",
@@ -693,15 +772,20 @@ define([
             }
           }
         });
-      });
+      }
 
-      it("should return a promise", withContext(function(Context) {
+      it("should return a promise", withContext(function(Context, localRequire) {
+        configRequire(localRequire);
+
         var context  = new Context();
         var p = context.getAllAsync();
         expect(p instanceof Promise).toBe(true);
       }));
 
-      it("should return all registered Types under 'pentaho/type/value' by default", withContext(function(Context) {
+      it("should return all registered Types under 'pentaho/type/value' by default",
+      withContext(function(Context, localRequire) {
+        configRequire(localRequire);
+
         var context = new Context();
 
         return context
@@ -714,7 +798,9 @@ define([
       }));
 
       it("should return an empty array when the specified baseType has no registrations",
-         withContext(function(Context) {
+      withContext(function(Context, localRequire) {
+        configRequire(localRequire);
+
         var context  = new Context();
 
         return context
@@ -725,7 +811,10 @@ define([
             });
       }));
 
-      it("should return all registered Types under a given base type id", withContext(function(Context) {
+      it("should return all registered Types under a given base type id",
+      withContext(function(Context, localRequire) {
+        configRequire(localRequire);
+
         var context  = new Context();
 
         return context
@@ -743,7 +832,9 @@ define([
             });
       }));
 
-      it("should return all registered Types that satisfy the isBrowsable filter", withContext(function(Context) {
+      it("should return all registered Types that satisfy the isBrowsable filter",
+      withContext(function(Context, localRequire) {
+        configRequire(localRequire);
         var context  = new Context();
 
         return context
@@ -754,6 +845,6 @@ define([
               expect(InstCtors[0].type.id).toBe("exp/foo");
             });
       }));
-    }); // #getAll
+    }); // #getAllAsync
   }); // pentaho.type.Context
 });

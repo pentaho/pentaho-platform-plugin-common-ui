@@ -15,7 +15,8 @@
  */
 define([
   "pentaho/type/valueHelper",
-], function(valueHelper) {
+  "pentaho/lang/Base"
+], function(valueHelper, Base) {
 
   "use strict";
 
@@ -24,7 +25,7 @@ define([
 
   describe("pentaho/type/valueHelper -", function() {
 
-    describe("#normalizeErrors", function () {
+    describe("#normalizeErrors", function() {
       it("normalizing null is null", function() {
         expect(valueHelper.normalizeErrors(null)).toBe(null);
       });
@@ -41,16 +42,16 @@ define([
 
     });
 
-    describe("#combineErrors", function () {
+    describe("#combineErrors", function() {
       it("combining an Error array with nothing returns the array", function() {
-        var errors = [ new Error() ];
+        var errors = [new Error()];
         expect(valueHelper.combineErrors(errors)).toBe(errors);
       });
 
       it("combining an Error array with an error returns the combined Error array", function() {
         var errorA = new Error();
         var errorB = new Error();
-        var errorsBase = [ errorA ];
+        var errorsBase = [errorA];
         var combinedErrors = valueHelper.combineErrors(errorsBase, errorB);
         expect(combinedErrors).toContain(errorA);
         expect(combinedErrors).toContain(errorB);
@@ -60,7 +61,7 @@ define([
       it("combining a null Error array with an error returns the combined Error array", function() {
         var errorsBase = null;
         var error = new Error();
-        var errorsAdd = [ error ];
+        var errorsAdd = [error];
         var combinedErrors = valueHelper.combineErrors(errorsBase, errorsAdd);
         expect(combinedErrors).toContain(error);
         expect(combinedErrors.length).toBe(1);
@@ -74,16 +75,63 @@ define([
       it("combining two Error arrays returns the combined Error array", function() {
         var errorA = new Error();
         var errorB = new Error();
-        var errorsBase = [ errorA ];
-        var errorsAdd = [ errorB ];
+        var errorsBase = [errorA];
+        var errorsAdd = [errorB];
         var combinedErrors = valueHelper.combineErrors(errorsBase, errorsAdd);
         expect(combinedErrors).toContain(errorA);
         expect(combinedErrors).toContain(errorB);
         expect(combinedErrors.length).toBe(2);
       });
-
-
     });
 
+    describe("#fillSpecMethodInContext(spec, obj, name)", function() {
+
+      it("should return false when the method is not overridden locally", function() {
+        var Derived = Base.extend({
+          foo: function() {}
+        });
+        var Derived2 = Derived.extend();
+
+        var spec = {};
+        var result = valueHelper.fillSpecMethodInContext(spec, Derived2.prototype,  "foo");
+
+        expect(result).toBe(false);
+        expect("foo" in spec).toBe(false);
+      });
+
+      it("should return true and output the method when it is overridden locally", function() {
+        var Derived = Base.extend({
+          foo: function() {}
+        });
+
+        var f = function() {};
+        var Derived2 = Derived.extend({
+          foo: f
+        });
+
+        var spec = {};
+        var result = valueHelper.fillSpecMethodInContext(spec, Derived2.prototype, "foo");
+
+        expect(result).toBe(true);
+        expect(spec.foo).toBe(f);
+      });
+
+      it("should return true and output the method when it is overridden locally and calls base", function() {
+        var Derived = Base.extend({
+          foo: function() {}
+        });
+
+        var f = function() { return this.base(); };
+        var Derived2 = Derived.extend({
+          foo: f
+        });
+
+        var spec = {};
+        var result = valueHelper.fillSpecMethodInContext(spec, Derived2.prototype, "foo");
+
+        expect(result).toBe(true);
+        expect(spec.foo).toBe(f);
+      });
+    });
   });
 });

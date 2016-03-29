@@ -47,8 +47,9 @@
  * @name pentaho.type.spec.IComplex
  *
  * @interface
- * @extends pentaho.type.spec.IInstance
+ * @extends pentaho.type.spec.IValue
  *
  * @see pentaho.type.spec.UComplex
+ * @see pentaho.type.spec.UValue
  * @see pentaho.type.spec.UInstance
  */

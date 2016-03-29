@@ -1,0 +1,188 @@
+/*!
+ * Copyright 2010 - 2016 Pentaho Corporation.  All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * The `spec.ITypeProto` interface represents the specification of a type.
+ *
+ * @name pentaho.type.spec.ITypeProto
+ * @interface
+ */
+
+/**
+ * The extensible/configurable members of the prototype of instance classes.
+ *
+ * @name instance
+ * @memberOf pentaho.type.spec.ITypeProto#
+ * @type {pentaho.type.spec.ITypeProto}
+ *
+ * @see pentaho.type.spec.IInstanceProto#type
+ */
+
+/**
+ * The label of the type.
+ *
+ * When non-{@link Nully} and not a string,
+ * it is taken instead to be the result of calling its `toString` method.
+ *
+ * When an empty string or {@link Nully},
+ * the label is inherited from the base type.
+ *
+ * The _initial value_ of this attribute, on the top-root type, is `"instance"`.
+ *
+ * @name label
+ * @memberOf pentaho.type.spec.ITypeProto#
+ * @type {?nonEmptyString | any}
+ */
+
+/**
+ * The description of the type.
+ *
+ * When non-{@link Nully} and not a string,
+ * it is taken instead to be the result of calling its `toString` method.
+ *
+ * When `undefined`,
+ * the description is inherited from the base type.
+ *
+ * When an empty string or `null`,
+ * the description is forced to be `null`,
+ * ignoring any inherited value.
+ *
+ * @name description
+ * @memberOf pentaho.type.spec.ITypeProto#
+ * @type {?nonEmptyString | any}
+ */
+
+/**
+ * The category associated with the type.
+ *
+ * The category is used primarily to group similar types (or instances of) in a user interface.
+ *
+ * When non-{@link Nully} and not a string,
+ * it is taken instead to be the result of calling its `toString` method.
+ *
+ * When `undefined`,
+ * the category is inherited from the base type.
+ *
+ * When an empty string or `null`,
+ * the category is forced to be `null`,
+ * ignoring any inherited value.
+ *
+ * @name category
+ * @memberOf pentaho.type.spec.ITypeProto#
+ * @type {?nonEmptyString | any}
+ * @see pentaho.type.spec.ITypeProto#isBrowsable
+ * @see pentaho.type.spec.ITypeProto#ordinal
+ */
+
+/**
+ * An URL pointing to documentation associated with the type.
+ *
+ * When non-{@link Nully} and not a string,
+ * it is taken instead to be the result of calling its `toString` method.
+ *
+ * When `undefined`,
+ * the help url is inherited from the base type.
+ *
+ * When an empty string or `null`,
+ * the help url is forced to be `null`,
+ * ignoring any inherited value.
+ *
+ * @name helpUrl
+ * @memberOf pentaho.type.spec.ITypeProto#
+ * @type {?nonEmptyString | any}
+ */
+
+/**
+ * Indicates if the type should be exposed to users in a user interface.
+ *
+ * When non-{@link Nully} and not a boolean,
+ * it is taken instead to be the result of passing it to the `Boolean` function.
+ *
+ * When {@link Nully},
+ * the attribute value is inherited from the base type, if any.
+ * The root value is `true`.
+ *
+ * @name isBrowsable
+ * @memberOf pentaho.type.spec.ITypeProto#
+ * @type {?boolean | any}
+ */
+
+/**
+ * Indicates if the type should be exposed only to advanced users in a user interface.
+ *
+ * When non-{@link Nully} and not a boolean,
+ * it is taken instead to be the result of passing it to the `Boolean` function.
+ *
+ * When {@link Nully},
+ * the attribute value is inherited from the base type, if any.
+ * The root value is `false`.
+ *
+ * @name isAdvanced
+ * @memberOf pentaho.type.spec.ITypeProto#
+ * @type {?boolean | any}
+ */
+
+/**
+ * The CSS class associated with the type.
+ *
+ * This attribute is typically used to associate an icon with a type.
+ *
+ * @name styleClass
+ * @memberOf pentaho.type.spec.ITypeProto#
+ * @type {?nonEmptyString | any}
+ */
+
+/**
+ * The ordinal associated with the type.
+ *
+ * The ordinal is used to disambiguate the order with which a type (or an instance of it) is shown in a user interface.
+ *
+ * When {@link Nully},
+ * the ordinal is inherited from the base type, if any.
+ * The root value is `0`.
+ *
+ * @name ordinal
+ * @memberOf pentaho.type.spec.ITypeProto#
+ * @type {?number | any}
+ *
+ * @see pentaho.type.spec.ITypeProto#isBrowsable
+ * @see pentaho.type.spec.ITypeProto#category
+ */
+
+/**
+ * The default view for instances of the type.
+ *
+ * When a string,
+ * it is the id of the view's AMD module.
+ * If the string starts with `/` or `xyz:`, or ends with `.js`,
+ * the id is considered to be absolute,
+ * otherwise, it is relative to the type's id folder.
+ *
+ * When `undefined`,
+ * the view is inherited from the base type, if any.
+ * The root view is `null`.
+ *
+ * When _falsy_ (like if `null` or an empty string),
+ * the value is forced to be `null`,
+ * ignoring any inherited value.
+ *
+ * When a function,
+ * it is the class or factory of the view.
+ *
+ * @name view
+ * @memberOf pentaho.type.spec.ITypeProto#
+ * @type {?string | function}
+ */

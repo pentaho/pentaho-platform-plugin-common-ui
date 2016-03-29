@@ -18,11 +18,12 @@ define([
   "./value",
   "./element",
   "./valueHelper",
+  "./SpecificationContext",
   "../i18n!types",
   "../util/arg",
   "../util/error",
   "../util/object"
-], function(module, valueFactory, elemFactory, valueHelper, bundle, arg, error, O) {
+], function(module, valueFactory, elemFactory, valueHelper, SpecificationContext, bundle, arg, error, O) {
 
   "use strict";
 
@@ -60,6 +61,10 @@ define([
      *
      * @constructor
      * @param {pentaho.type.spec.UList} [spec] The list specification or another, compatible list instance.
+     *
+     * @see pentaho.type.spec.IList
+     * @see pentaho.type.spec.IListProto
+     * @see pentaho.type.spec.IListTypeProto
      */
     var List = Value.extend("pentaho.type.List", /** @lends pentaho.type.List# */{
 
@@ -551,22 +556,49 @@ define([
       },
       //endregion
 
-      //region serialization
+
+      //region validation
       /**
-       * @inheritdoc
+       * Determines if this list value is a **valid instance** of its type.
+       *
+       * The default implementation validates each element against the
+       * list's [element type]{@link pentaho.type.List.Type#of}
+       * and collects and returns any reported errors.
+       * Override to complement with a type's specific validation logic.
+       *
+       * You can use the error utilities in {@link pentaho.type.valueHelper} to
+       * help in the implementation.
+       *
+       * @return {?Array.<!Error>} A non-empty array of `Error` or `null`.
+       *
+       * @see pentaho.type.Value#isValid
        */
-      toSpecInScope: function(scope, requireType, keyArgs) {
+      validate: function() {
+        var elemType = this.type.of;
+
+        return this._elems.reduce(function(errors, elem) {
+          return valueHelper.combineErrors(errors, elemType.validateInstance(elem));
+        }, null);
+      },
+      //endregion
+
+      //region serialization
+      toSpecInContext: function(keyArgs) {
+        if(!keyArgs) keyArgs = {};
+
+        var includeType = keyArgs.includeType;
+
         var elemType = this.type.of;
         if(elemType.isRefinement) elemType = elemType.of;
 
         var elemSpecs = this._elems.map(function(elem) {
-          var elemRequireType = elem.type !== elemType;
-          return elem.toSpecInScope(scope, elemRequireType, keyArgs);
+          keyArgs.includeType = elem.type !== elemType;
+          return elem.toSpecInContext(keyArgs);
         });
 
-        if(requireType)
+        if(includeType)
           return {
-            _: this.type.toReference(scope, keyArgs),
+            _: this.type.toRefInContext(keyArgs),
             d: elemSpecs
           };
 
@@ -589,7 +621,6 @@ define([
         styleClass: "pentaho-type-list",
 
         //region list property
-        //@override
         /**
          * Gets a value that indicates if this type is a list type.
          *
@@ -623,10 +654,25 @@ define([
         _elemType: Element.type,
 
         /**
-         * Gets the type of the elements that this list can contain.
+         * Gets or sets the type of the elements that this type of list can contain.
+         *
+         * Must and can only be specified upon definition.
+         *
+         * Must be a subtype of the ancestor type's `of` type.
+         *
+         * When set to `undefined`, the operation is ignored.
+         *
+         * When set to `null`, an error is thrown.
          *
          * @type {pentaho.type.Element.Type}
-         * @readonly
+         *
+         * @throws {pentaho.lang.OperationInvalidError} When set to a type that is different from
+         *   the current local type.
+         *
+         * @throws {pentaho.lang.ArgumentInvalidError} When set to a type that is not a subtype of the
+         *   ancestor list type's `of` type.
+         *
+         * @see pentaho.type.spec.IListTypeProto#of
          */
         get of() {
           return this._elemType;
@@ -661,44 +707,72 @@ define([
 
           // Mark set locally even if it is the same...
           this._elemType = elemType;
+
         },
         //endregion
 
-        //region validation
-        //@override
-        /**
-         * Determines if a list value that
-         * _is an instance of this type_
-         * is also a **valid instance** of _this_ type.
-         *
-         * Thus, `this.is(value)` must be true.
-         *
-         * The default implementation validates each element against the
-         * list's [element type]{@link pentaho.type.List.Type#of}
-         * and collects and returns any reported errors.
-         *
-         * @param {!pentaho.type.List} value The list value to validate.
-         *
-         * @return {Nully|Error|Array.<!Error>} An `Error`, a non-empty array of `Error` or a `Nully` value.
-         *
-         * @protected
-         * @overridable
-         *
-         * @see pentaho.type.Value.Type#validate
-         * @see pentaho.type.Value.Type#validateInstance
-         */
-        _validate: function(value) {
-          var elemType = this.of;
+        //region serialization
+        // * "list" has an id and toRefInContext immediately returns that
+        // * ["string"] -> anonymous list type, equivalent to {base: "list", of: "string"}
+        //   toRefInContext calls the toSpecInContext, cause it has no id and because a temporary id is also
+        //   never generated to it, in scope
+        //   toSpecInContext only can return this form if there are no other local list class attributes
+        toSpecInContext: function(keyArgs) {
+          if(!keyArgs) keyArgs = {};
 
-          return value._elems.reduce(function(errors, elem) {
-            return valueHelper.combineErrors(errors, elemType.validateInstance(elem));
-          }.bind(this), null);
+          // The type's id or the temporary id in this scope.
+          var baseType = this.ancestor;
+          var spec = {
+              id:   this.shortId,
+              base: baseType.toRefInContext(keyArgs)
+            };
+
+          // Add "of" if we're `List` or the base `of` is different.
+          var baseElemType = baseType.isSubtypeOf(List.type) ? baseType._elemType : null;
+          if(!baseElemType || this._elemType !== baseElemType) {
+            spec.of = this._elemType.toRefInContext(keyArgs);
+          }
+
+          // No other attributes, no id and base is "list"?
+          if(!this._fillSpecInContext(spec, keyArgs) && !spec.id && spec.base === "list") {
+            // Can use the shorthand [ofType] syntax.
+            // Default ofType in [] syntax is "string" -> [] <=> ["string"]
+            // surely "element" ...
+            if(!spec.of) spec.of = this._elemType.toRefInContext(keyArgs);
+
+            return spec.of === "string" ? [] : [spec.of];
+          }
+
+          // Need id
+          if(!spec.id) spec.id = SpecificationContext.current.add(this);
+
+          return spec;
         }
         //endregion
       }
     }).implement({
       type: bundle.structured.list
     });
+
+    // override the documentation to specialize the argument types.
+    /**
+     * Creates a subtype of this one.
+     *
+     * For more information on class extension, in general,
+     * see {@link pentaho.lang.Base.extend}.
+     *
+     * @name extend
+     * @memberOf pentaho.type.List
+     *
+     * @param {string} [name] The name of the created class. Used for debugging purposes.
+     * @param {pentaho.type.spec.IListProto} [instSpec] The instance specification.
+     * @param {Object} [classSpec] The static specification.
+     * @param {Object} [keyArgs] The keyword arguments.
+     *
+     * @return {!Class.<pentaho.type.List>} The new list instance subclass.
+     *
+     * @see pentaho.type.Value.extend
+     */
 
     return List;
   };

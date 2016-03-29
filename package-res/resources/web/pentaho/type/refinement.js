@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 define([
+  "require",
   "module",
   "./facets/Refinement",
   "./valueHelper",
@@ -21,7 +22,7 @@ define([
   "../util/error",
   "../util/fun",
   "../i18n!types"
-], function(module, RefinementFacet, valueHelper, O, error, F, bundle) {
+], function(localRequire, module, RefinementFacet, valueHelper, O, error, F, bundle) {
 
   "use strict";
 
@@ -133,8 +134,8 @@ define([
      *
      * There are two ways to specify the additional validation constraints of a refinement type:
      *
-     * 1. Override the [_validate]{@link pentaho.type.Refinement.Type#_validate} method
-     *    and perform arbitrary validation
+     * 1. Override the [validateInstance]{@link pentaho.type.Refinement.Type#validateInstance} method
+     *    and perform arbitrary validation.
      * 2. Mix any number of **refinement facets** into the refinement type,
      *    using property [facets]{@link pentaho.type.Refinement.Type#facets},
      *    and specify the configuration attributes these define.
@@ -146,7 +147,7 @@ define([
      * ### Examples
      *
      * In the following example,
-     * the refinement type `PositiveNumber` is defined using the `_validate` method:
+     * the refinement type `PositiveNumber` is defined using the `validateInstance` method:
      *
      * ```js
      * define(["module"], function(module) {
@@ -164,9 +165,12 @@ define([
      *         id: module.id,
      *         label: "Positive number",
      *
-     *         _validate: function(num) {
-     *           if(num <= 0)
-     *             return [new Error("Not a positive number.")];
+     *         validateInstance: function(num) {
+     *           var errors = this.base(num);
+     *           if(!errors) {
+     *             if(num <= 0) errors = [new Error("Not a positive number.")];
+     *           }
+     *           return errors;
      *         }
      *       }
      *     });
@@ -290,10 +294,18 @@ define([
         _facets: [],
 
         /**
-         * Gets the refinement facet classes that are mixed in this refinement type.
+         * Gets or sets the refinement facet classes
+         * that are mixed in this refinement type.
+         *
+         * Can be set to either refinement facet ids or classes,
+         * to add facets to the refinement type.
+         *
+         * The attributes defined by the added refinement facets become available for
+         * extension/configuration on the refinement type.
          *
          * @type Array.<pentaho.type.RefinementFacet>
-         * @readonly
+         *
+         * @see pentaho.type.spec.IRefinementTypeProto#facets
          */
         get facets() {
           return this._facets;
@@ -334,7 +346,7 @@ define([
             if(id.indexOf("/") < 0)
               id = _baseFacetsMid + id;
 
-            return require(id);
+            return localRequire(id);
           }
         },
         //endregion
@@ -343,10 +355,15 @@ define([
         _of: null,
 
         /**
-         * Gets the representation type refined by this refinement type.
+         * Gets or sets the representation type refined by this refinement type.
+         *
+         * When set to a {@link Nully} value, an error is thrown.
+         *
+         * Must and can only be specified at a top-refinement type, upon definition.
          *
          * @type {!(pentaho.type.Element.Type|pentaho.type.List.Type)}
-         * @readonly
+         *
+         * @see pentaho.type.spec.IRefinementTypeProto#of
          */
         get of() {
           return this._of;
@@ -572,8 +589,6 @@ define([
         },
 
         //region validation
-
-        //@override
         /**
          * Determines if a value,
          * that _is an instance of this type_,
@@ -583,49 +598,20 @@ define([
          *
          * The default implementation calls `value.validate()` and,
          * if the latter returns no errors,
-         * additionally validates the value against this type's refinement conditions,
-         * by calling [_validate]{@link pentaho.type.Refinement.Type#_validate}.
+         * additionally validates the value against this type's refinement facets,
+         * by calling [_validateFacets]{@link pentaho.type.Refinement.Type#_validateFacets}.
          *
          * @param {!pentaho.type.Value} value The value to validate.
          *
          * @return {?Array.<!Error>} A non-empty array of `Error` or `null`.
          *
-         * @overridable
-         *
          * @see pentaho.type.Value#validate
-         * @see pentaho.type.Value.Type#validate
-         * @see pentaho.type.Refinement.Type#_validate
+         * @see pentaho.type.Refinement.Type#_validateFacets
          */
         validateInstance: function(value) {
-          var errors = this.base(value);
+          var errors = value.validate();
           if(errors) return errors;
 
-          return valueHelper.normalizeErrors(this._validate(value));
-        },
-
-        //@override
-        /**
-         * Determines if a value that
-         * _is an instance of this type_ and
-         * _a valid instance of its actual type_
-         * is also a **valid instance** of this refinement type.
-         *
-         * Thus, `this.is(value)` and `value.type.isValid(value)` must be true.
-         *
-         * The default implementation validates `value` against
-         * registered refinement facets.
-         *
-         * @param {!pentaho.type.Value} value The value to validate.
-         *
-         * @return {Nully|Error|Array.<!Error>} An `Error`, a non-empty array of `Error` or a `Nully` value.
-         *
-         * @protected
-         * @overridable
-         *
-         * @see pentaho.type.Value.Type#validate
-         * @see pentaho.type.Refinement.Type#validateInstance
-         */
-        _validate: function(value) {
           return this._validateFacets(value);
         },
 
@@ -641,7 +627,7 @@ define([
          * is called and any reported errors collected.
          *
          * This method is called by the default implementation of
-         * [_validate]{@link pentaho.type.Refinement.Type#_validate}.
+         * [validateInstance]{@link pentaho.type.Refinement.Type#validateInstance}.
          * It is provided just in case you need to override the latter implementation.
          *
          * @param {!pentaho.type.Value} value The value to validate.
@@ -649,22 +635,84 @@ define([
          * @return {?Array.<!Error>} An array of `Error` or `null`.
          *
          * @protected
-         * @ignore
          */
         _validateFacets: function(value) {
           return this.facets.reduce(function(errors, Facet) {
             return valueHelper.combineErrors(errors, Facet.validate.call(this, value));
           }.bind(this), null);
+        },
+        //endregion
+
+        //region serialization
+        _fillSpecInContext: function(spec, keyArgs) {
+          var any = false;
+
+          var ofType = O.getOwn(this, "_of");
+          if(ofType) {
+            any = true;
+            spec.of = ofType.toRefInContext(keyArgs);
+          }
+
+          // "facets" attribute
+          var facets = this.facets;
+          var L = facets.length;
+          var i;
+
+          // Include only "facets" added locally, not inherited ones.
+          // Local facets are placed after inherited facets.
+          if(this !== _refinementType && (i = this.ancestor._facets.length) < L) {
+            any = true;
+            var localFacetIds = spec.facets = [];
+            do { localFacetIds.push(facets[i].shortId); } while(++i < L);
+          }
+
+          // Base attributes
+          any = this.base(spec, keyArgs) || any;
+
+          // All facets' local attributes
+          i = -1;
+          while(++i < L)
+            any = facets[i].fillSpecInContext.call(this, spec, keyArgs) || any;
+
+          //validateInstance
+          return any;
         }
         //endregion
       }
     }, /** @lends pentaho.type.Refinement */{
+      // override the documentation to specialize the argument types.
+      /**
+       * Creates a subtype of this one.
+       *
+       * For more information on class extension, in general,
+       * see {@link pentaho.lang.Base.extend}.
+       *
+       * @name extend
+       * @memberOf pentaho.type.Refinement
+       *
+       * @param {string} [name] The name of the created class. Used for debugging purposes.
+       * @param {{type: pentaho.type.spec.IRefinementTypeProto}} [instSpec] The refinement type specification.
+       * @param {Object} [classSpec] The static specification.
+       * @param {Object} [keyArgs] The keyword arguments.
+       *
+       * @return {!Class.<pentaho.type.Refinement>} The new refinement instance subclass.
+       *
+       * @see pentaho.lang.Value.extend
+       */
+
       _extend: function(name, instSpec) {
 
         // Refinement types cannot specify any instance property.
-        for(var p in instSpec) // nully tolerant
-          if(p !== "type")
+        if(instSpec) {
+          for(var p in instSpec)
+            if(p !== "type")
+              throw error.operInvalid(bundle.structured.errors.refinement.cannotExtendInstance);
+
+          var typeSpec = instSpec.type;
+          if(typeSpec && typeSpec.instance)
             throw error.operInvalid(bundle.structured.errors.refinement.cannotExtendInstance);
+
+        }
 
         return this.base.apply(this, arguments);
       }

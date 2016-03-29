@@ -85,7 +85,7 @@ define([
     elemClass: Property.Type,
 
     /**
-     * Add a pentaho.type.UPropertyType to the properties collection.
+     * Add a {@link pentaho.type.UPropertyTypeProto} to the properties collection.
      *
      * This method allows adding elements to the collection using custom options (keyword arguments).
      *
@@ -116,7 +116,7 @@ define([
     },
 
     /**
-     * Replace a pentaho.type.UPropertyType in the properties collection.
+     * Replace a {@link pentaho.type.UPropertyTypeProto} in the properties collection.
      *
      * This method allows replacing elements in the collection using custom options (keyword arguments).
      *
@@ -178,8 +178,8 @@ define([
      * Configures the properties collection.
      *
      * The configuration can be:
-     * 1. an array of {@link pentaho.type.UPropertyType}, or
-     * 2. an object whose keys are the property names and the values are {@link pentaho.type.UPropertyType},
+     * 1. an array of {@link pentaho.type.UPropertyTypeProto}, or
+     * 2. an object whose keys are the property names and the values are {@link pentaho.type.UPropertyTypeProto},
      *    having no name or a name equal to the key.
      *
      * @param {Object} config The properties configuration.

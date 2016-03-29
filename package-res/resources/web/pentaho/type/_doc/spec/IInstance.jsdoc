@@ -15,7 +15,7 @@
  */
 
 /**
- * The `spec.IInstance` interface describes an instance with a generic, _object_ form.
+ * The `spec.IInstance` interface describes an instance using a generic, _object_ form.
  *
  * @name pentaho.type.spec.IInstance
  *

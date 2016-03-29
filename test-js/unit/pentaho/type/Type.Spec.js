@@ -22,8 +22,15 @@ define([
 
   /*global describe:true, it:true, expect:true, beforeEach:true, afterEach:true, spyOn: true, jasmine: true*/
 
+  describe("pentaho.type.Type", function() {
 
-  describe("pentaho/type/Type", function() {
+    describe("construction", function() {
+      it("should allow specifying static type members", function() {
+        var Derived = Instance.extend({}, {type: {foo: "bar"}});
+
+        expect(Derived.Type.foo).toBe("bar");
+      });
+    });
 
     describe("#view -", function() {
       it("should default to `null`", function() {
@@ -137,6 +144,19 @@ define([
         expect(B.type.view).toBe("baba/dudu/bar");
       });
 
+      // coverage
+      it("should allow setting to the same string value", function() {
+        var A = Instance.extend({type: {view: "foo"}});
+
+        expect(A.type.view).toBe("foo");
+
+        var B = A.extend({type: {id: "baba/dudu", view: "bar"}});
+
+        B.type.view = "bar";
+
+        expect(B.type.view).toBe("baba/dudu/bar");
+      });
+
       it("should inherit a base function", function() {
         var FA = function() {
         };
@@ -159,6 +179,23 @@ define([
         var FB = function() {
         };
         var B  = A.extend({type: {id: "baba/dudu", view: FB}});
+
+        expect(B.type.view).toBe(FB);
+      });
+
+      // coverage
+      it("should allow setting to the same function", function() {
+        var FA = function() {
+        };
+        var A  = Instance.extend({type: {view: FA}});
+
+        expect(A.type.view).toBe(FA);
+
+        var FB = function() {
+        };
+        var B  = A.extend({type: {id: "baba/dudu", view: FB}});
+
+        B.type.view = FB;
 
         expect(B.type.view).toBe(FB);
       });
@@ -394,8 +431,48 @@ define([
 
           expect(Derived.type.id).toBe("foo/bar");
         });
+
+        it("should convert it to a string", function() {
+          var Derived = Instance.extend({
+            type: {id: {toString: function() { return "foo/bar"; }}}
+          });
+
+          expect(Derived.type.id).toBe("foo/bar");
+        });
+
+        it("should ignore it, if it is a temporary id", function() {
+          var Derived = Instance.extend({
+            type: {id: "_id"}
+          });
+
+          expect(Derived.type.id).toBe(null);
+        });
       });
     }); // #id
+
+    describe("#shortId -", function() {
+
+      it("should be `null` when id is `null`", function() {
+        var Derived = Instance.extend();
+        expect(Derived.type.shortId).toBe(null);
+      });
+
+      it("should be equal to #id when it is not a standard, single-level id", function() {
+        var Derived = Instance.extend({type: {id: "my/foo"}});
+        expect(Derived.type.shortId).toBe(Derived.type.id);
+      });
+
+      it("should be equal to the last sub-module of #id when it is of a standard, single-level id", function() {
+        var Derived = Instance.extend({type: {id: "pentaho/type/foo"}});
+        expect(Derived.type.shortId).toBe("foo");
+        expect(Derived.type.id).not.toBe("foo");
+      });
+
+      it("should be equal to #id when it is of a standard, multiple-level id", function() {
+        var Derived = Instance.extend({type: {id: "pentaho/type/foo/bar"}});
+        expect(Derived.type.shortId).toBe(Derived.type.id);
+      });
+    }); // #shortId
 
     describe("#description -", function() {
 

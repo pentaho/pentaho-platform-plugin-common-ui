@@ -93,6 +93,10 @@ define([
      *
      * @constructor
      * @param {pentaho.type.spec.UComplex} [spec] A complex specification.
+     *
+     * @see pentaho.type.spec.IComplex
+     * @see pentaho.type.spec.IComplexProto
+     * @see pentaho.type.spec.IComplexTypeProto
      */
     var Complex = Element.extend("pentaho.type.Complex", /** @lends pentaho.type.Complex# */{
 
@@ -760,19 +764,47 @@ define([
       //endregion
       //endregion
 
-      //region serialization
+      //region validation
+      // @override
       /**
-       * @inheritdoc
+       * Determines if this complex value is a **valid instance** of its type.
+       *
+       * The default implementation
+       * validates each property's value against
+       * the property's [type]{@link pentaho.type.Property.Type#type}
+       * and collects and returns any reported errors.
+       * Override to complement with a type's specific validation logic.
+       *
+       * You can use the error utilities in {@link pentaho.type.valueHelper} to
+       * help in the implementation.
+       *
+       * @return {?Array.<!Error>} A non-empty array of `Error` or `null`.
+       *
+       * @see pentaho.type.Value#isValid
        */
-      toSpecInScope: function(scope, requireType, keyArgs) {
-        var spec;
+      validate: function() {
+        var errors = null;
 
-        var useArray = !requireType && keyArgs.preferPropertyArray;
+        this.type.each(function(pType) {
+          errors = valueHelper.combineErrors(errors, pType.validate(this));
+        }, this);
+
+        return errors;
+      },
+      //endregion
+
+      //region serialization
+      toSpecInContext: function(keyArgs) {
+        if(!keyArgs) keyArgs = {};
+
+        var spec;
+        var includeType = !!keyArgs.includeType;
+        var useArray = !includeType && keyArgs.preferPropertyArray;
         if(useArray) {
           spec = [];
         } else {
           spec = {};
-          if(requireType) spec._ = this.type.toReference(scope, keyArgs);
+          if(includeType) spec._ = this.type.toRefInContext(keyArgs);
         }
 
         var includeDefaults = keyArgs.includeDefaults;
@@ -793,8 +825,8 @@ define([
             var valueSpec;
             if(value) {
               var valueType = propType.type;
-              var valueRequireType = value.type !== (valueType.isRefinement ? valueType.of : valueType);
-              valueSpec = value.toSpecInScope(scope, valueRequireType, keyArgs);
+              keyArgs.includeType = value.type !== (valueType.isRefinement ? valueType.of : valueType);
+              valueSpec = value.toSpecInContext(keyArgs);
             } else {
               valueSpec = null;
             }
@@ -947,7 +979,7 @@ define([
         /**
          * Adds, overrides or configures properties to/of the complex type.
          *
-         * @param {pentaho.type.spec.IPropertyType|pentaho.type.spec.IPropertyType[]} propTypeSpec A property type
+         * @param {pentaho.type.spec.IPropertyTypeProto|pentaho.type.spec.IPropertyTypeProto[]} propTypeSpec A property type
          *   specification or an array of.
          *
          * @return {pentaho.type.Complex} This object.
@@ -958,38 +990,27 @@ define([
           return this;
         },
 
-        //region validation
-        // @override
-        /**
-         * Determines if a complex value,
-         * that _is an instance of this type_,
-         * is also a **valid instance** of _this_ type.
-         *
-         * Thus, `this.is(value)` must be true.
-         *
-         * The default implementation
-         * validates each property's value against
-         * the property's [type]{@link pentaho.type.Property.Type#type}
-         * and collects and returns any reported errors.
-         *
-         * @see pentaho.type.Value.Type#validate
-         * @see pentaho.type.Value.Type#validateInstance
-         *
-         * @param {!pentaho.type.Complex} value The complex value to validate.
-         *
-         * @return {Nully|Error|Array.<!Error>} An `Error`, a non-empty array of `Error` or a `Nully` value.
-         *
-         * @protected
-         * @overridable
-         */
-        _validate: function(value) {
-          var errors = null;
+        //region serialization
+        _fillSpecInContext: function(spec, keyArgs) {
 
-          this.each(function(pType) {
-            errors = valueHelper.combineErrors(errors, pType.validate(value));
-          }, this);
+          var any = this.base(spec, keyArgs);
 
-          return errors;
+          if(this.count) {
+            var props;
+
+            this.each(function(propType) {
+              // Root or overridden property type. Exclude simply inherited.
+              if(propType.declaringType === this) {
+                if(!props) {
+                  any = true;
+                  props = spec.props = [];
+                }
+                props.push(propType.toSpecInContext(keyArgs));
+              }
+            }, this);
+          }
+
+          return any;
         }
         //endregion
       }
@@ -998,6 +1019,25 @@ define([
     .implement({
       type: bundle.structured.complex
     });
+
+    /**
+     * Creates a subtype of this one.
+     *
+     * For more information on class extension, in general,
+     * see {@link pentaho.lang.Base.extend}.
+     *
+     * @name extend
+     * @memberOf pentaho.type.Complex
+     *
+     * @param {string} [name] The name of the created class. Used for debugging purposes.
+     * @param {pentaho.type.spec.IComplexProto} [instSpec] The instance specification.
+     * @param {Object} [classSpec] The static specification.
+     * @param {Object} [keyArgs] The keyword arguments.
+     *
+     * @return {!Class.<pentaho.type.Complex>} The new complex instance subclass.
+     *
+     * @see pentaho.type.Value.extend
+     */
 
     return Complex;
   };

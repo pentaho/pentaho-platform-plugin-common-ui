@@ -1,0 +1,41 @@
+/*!
+ * Copyright 2010 - 2016 Pentaho Corporation.  All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * The `spec.IDiscreteDomainTypeProto` interface represents the
+ * specification made available to a refinement type
+ * by a discrete domain refinement facet.
+ *
+ * @name pentaho.type.facets.spec.IDiscreteDomainTypeProto
+ * @interface
+ */
+
+/**
+ * The discrete domain of the type.
+ *
+ * The domain attribute refines a type to a set of discrete values
+ * whose type is that of the representation type,
+ * {@link pentaho.type.Refinement.Type#of}.
+ *
+ * If the ancestor refinement type has `domain` set,
+ * the specified set of values must be a subset of those.
+ *
+ * @name domain
+ * @memberOf pentaho.type.facets.spec.IDiscreteDomainTypeProto#
+ * @type {?pentaho.type.List}
+ *
+ * @see pentaho.type.facets.DiscreteDomain#domain
+ */

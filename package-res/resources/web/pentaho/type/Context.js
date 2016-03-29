@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 define([
+  "require",
   "module",
   "./Instance",
   "../i18n!types",
@@ -24,7 +25,7 @@ define([
   "../util/error",
   "../util/object",
   "../util/fun"
-], function(module, Instance, bundle, standard, Base, promiseUtil, arg, error, O, F) {
+], function(localRequire, module, Instance, bundle, standard, Base, promiseUtil, arg, error, O, F) {
 
   "use strict";
 
@@ -377,7 +378,7 @@ define([
      * @rejects {pentaho.lang.ArgumentInvalidError} When `typeRef` is, or contains, an array-shorthand,
      * list type specification that has more than one child element type specification.
      *
-     * @rejects {Error} Any other, unexpected error occurs.
+     * @rejects {Error} When any other, unexpected error occurs.
      */
     getAsync: function(typeRef) {
       try {
@@ -432,7 +433,7 @@ define([
 
         var predicate = F.predicate(keyArgs);
         var me = this;
-        return promiseUtil.require("pentaho/service!" + baseTypeId)
+        return promiseUtil.require("pentaho/service!" + baseTypeId, localRequire)
             .then(function(factories) {
               return Promise.all(factories.map(me.getAsync, me));
             })
@@ -524,8 +525,8 @@ define([
       return sync
           // `require` fails if a module with the id in the `typeSpec` var
           // is not already _loaded_.
-          ? this._get(require(id), true)
-          : promiseUtil.require(id).then(this._get.bind(this));
+          ? this._get(localRequire(id), true)
+          : promiseUtil.require(id, localRequire).then(this._get.bind(this));
     },
 
     /**
@@ -619,10 +620,8 @@ define([
         // Not present yet.
         var id = type.id;
         if(id) {
-          // TODO: configuration may need to subclass Type
-          // TODO: configuration is Type only?
+          // Configuration is for the type-constructor.
           var config = this._getConfig(id);
-          /* istanbul ignore if : until config is implemented */
           if(config) type.constructor.implement(config);
 
           this._byTypeId[id] = InstCtor;
@@ -688,7 +687,7 @@ define([
       return this._getByInstCtor(InstCtor, sync, factoryUid);
     },
 
-    // Inline type spec: {[base: "complex", ] ... }
+    // Inline type spec: {[base: "complex"], [id: ]}
     _getByObjectSpec: function(typeSpec, sync) {
       if(typeSpec instanceof Type)
         return this._getByInstCtor(typeSpec.instance.constructor, sync);
@@ -696,10 +695,61 @@ define([
       if(typeSpec instanceof Instance)
         return this._error(error.argInvalid("typeRef", "Value instance is not supported."), sync);
 
-      var baseTypeSpec = typeSpec.base || _defaultBaseTypeMid,
-          resolveSync = (function() {
-              var BaseInstCtor = this._get(baseTypeSpec, /*sync:*/true),
-                  InstCtor = BaseInstCtor.extend({type: typeSpec});
+      // Because a base type is required (when null, it is defaulted)
+      // this means that the generic object spec cannot represent the root of type hierarchies:
+      // Type, Value.Type or Property.Type
+
+      /*
+       *  id      | base       | result
+       *  --------+------------+------------------
+       *  "value" | null       :
+       *  "foo"   | -          : base <- "complex"
+       *  "foo"   | "notnull"  : ok
+       */
+      var id = typeSpec.id;
+      if(id) id = toAbsTypeId(id);
+
+      var baseTypeSpec = typeSpec.base;
+
+      if(id && id === (_baseMid + "value")) {
+        // The "value" type is already loaded.
+        // Will return in the first if below.
+
+        if(baseTypeSpec) {
+          return this._error(
+              error.argInvalid("typeRef", "The root type `Value` must have a `null` base."),
+              sync);
+        }
+
+        baseTypeSpec = null;
+
+      } else if(!baseTypeSpec) {
+        if(baseTypeSpec === null) {
+          return this._error(
+              error.argInvalid("typeRef", "Only the root type `Value` can have a `null` base."),
+              sync);
+        }
+
+        baseTypeSpec = _defaultBaseTypeMid;
+      }
+
+      var InstCtor;
+
+      // Already loaded?
+      // id ~ "value" goes here.
+      if(id && (InstCtor = O.getOwn(this._byTypeId, id))) {
+        // Keep initial specification. Ignore new one.
+        return this._return(InstCtor, sync);
+      }
+
+      // assert baseTypeSpec
+
+      // if id and not loaded, the id is used later to register the new type under that id.
+
+      var resolveSync = (function() {
+              var BaseInstCtor = this._get(baseTypeSpec, /*sync:*/true);
+              var InstCtor = BaseInstCtor.extend({type: typeSpec});
+
               return this._getByInstCtor(InstCtor, /*sync:*/true);
             }).bind(this);
 
@@ -712,7 +762,7 @@ define([
       /*jshint laxbreak:true*/
       return customTypeIds.length
           // Require them all and only then invoke the synchronous BaseType.extend method.
-          ? promiseUtil.require(customTypeIds).then(resolveSync)
+          ? promiseUtil.require(customTypeIds, localRequire).then(resolveSync)
           // All types are standard and can be assumed to be already loaded.
           // However, we should behave asynchronously as requested.
           : promiseUtil.wrapCall(resolveSync);

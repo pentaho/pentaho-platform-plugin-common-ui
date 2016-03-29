@@ -17,9 +17,10 @@ define([
   "module",
   "./Instance",
   "./valueHelper",
+  "./SpecificationContext",
   "../i18n!types",
   "../util/error"
-], function(module, Instance, valueHelper, bundle, error) {
+], function(module, Instance, valueHelper, SpecificationContext, bundle, error) {
 
   "use strict";
 
@@ -37,8 +38,9 @@ define([
      * @extends pentaho.type.Type
      * @implements pentaho.lang.ISpecifiable
      *
-     * @classDesc The base type class of value types.</br>
-     * Value types can be singular or plural ({@link pentaho.type.Value.Type#isList|isList}).</br>
+     * @classDesc The base type class of value types.
+     *
+     * Value types can be singular or plural ({@link pentaho.type.Value.Type#isList|isList}).
      * A Value type should not be instantiated if it is {@link pentaho.type.Value.Type#isAbstract|abstract}.
      *
      * For more information see {@link pentaho.type.Value}.
@@ -60,7 +62,11 @@ define([
      *
      * @description Creates a value instance.
      * @constructor
-     * @param {pentaho.type.spec.UInstance} [spec] A value specification.
+     * @param {pentaho.type.spec.UValue} [spec] A value specification.
+     *
+     * @see pentaho.type.spec.IValue
+     * @see pentaho.type.spec.IValueProto
+     * @see pentaho.type.spec.IValueTypeProto
      */
     var Value = Instance.extend("pentaho.type.Value", /** @lends pentaho.type.Value# */{
 
@@ -135,12 +141,18 @@ define([
       /**
        * Determines if this value is a **valid instance** of its type.
        *
+       * The default implementation does nothing and considers the instance valid.
+       * Override to implement a type's specific validation logic.
+       *
+       * You can use the error utilities in {@link pentaho.type.valueHelper} to
+       * help in the implementation.
+       *
        * @return {?Array.<!Error>} A non-empty array of `Error` or `null`.
        *
        * @see pentaho.type.Value#isValid
        */
       validate: function() {
-        return valueHelper.normalizeErrors(this.type._validate(this));
+        return null;
       },
       //endregion
 
@@ -171,11 +183,12 @@ define([
 
       //region serialization
       /**
-       * Creates a top-level specification that describes this value.
+       * Creates a specification that describes this value.
        *
-       * This method creates a new {@link pentaho.type.SpecificationScope} for describing
-       * this value, and others it references,
-       * and then delegates the actual work to {@link pentaho.type.Instance#toSpecInScope}.
+       * If an [ambient specification context]{@link pentaho.type.SpecificationContext.current},
+       * currently exists, it is used to manage the serialization process.
+       * Otherwise, one is created and set as current.
+       * Then, the actual work is delegated to {@link pentaho.type.Instance#toSpecInContext}.
        *
        * @name pentaho.type.Value#toSpec
        * @method
@@ -273,6 +286,8 @@ define([
 
         /**
          * Gets or sets a value that indicates if this type is abstract.
+         *
+         * This attribute can only be set once, upon the type definition.
          *
          * @type {boolean}
          * @default false
@@ -559,56 +574,96 @@ define([
          *
          * Thus, `this.is(value)` must be true.
          *
-         * This method ensures that the value's actual type, `value.type`,
-         * is called to validate it,
-         * whatever the relation that this type has with the actual type.
+         * The default implementation simply calls `value.validate()`.
          *
-         * When this type is not a base type of the value's actual type,
-         * this type's `_validate` method should also be called to validate it.
-         * This is the case with [refinement types]{@link pentaho.type.Refinement}.
-         *
-         * The default implementation calls `value.validate()`
-         * (which in turns calls [_validate]{@link pentaho.type.Value.Type#_validate}).
+         * Special types, like [refinement types]{@link pentaho.type.Refinement},
+         * perform additional validations on values.
          *
          * @param {!pentaho.type.Value} value The value to validate.
          *
          * @return {?Array.<!Error>} A non-empty array of `Error` or `null`.
          *
-         * @overridable
-         *
          * @see pentaho.type.Value#validate
          * @see pentaho.type.Value.Type#validate
-         * @see pentaho.type.Value.Type#_validate
+         * @see pentaho.type.spec.IValueTypeProto#validateInstance
          */
         validateInstance: function(value) {
           return value.validate();
         },
+        //endregion
 
-        /**
-         * Determines if a value,
-         * that _is an instance of this type_,
-         * is also a **valid instance** of _this_ type.
-         *
-         * Thus, `this.is(value)` must be true.
-         *
-         * The default implementation does nothing.
-         * Override to implement a type's specific validation logic.
-         *
-         * @param {!pentaho.type.Value} value The value to validate.
-         *
-         * @return {Nully|Error|Array.<!Error>} An `Error`, a non-empty array of `Error` or a `Nully` value.
-         *
-         * @protected
-         * @overridable
-         *
-         * @see pentaho.type.Value.Type#validate
-         * @see pentaho.type.Value.Type#validateInstance
-         */
-        _validate: function(value) {
+        //region serialization
+        toSpecInContext: function(keyArgs) {
+          if(!keyArgs) keyArgs = {};
+
+          // The type's id or the temporary id in this scope.
+          var spec = {id: this.shortId || SpecificationContext.current.add(this)};
+
+          // The base type in the current type hierarchy.
+          // The default base type is "pentaho/type/complex".
+          var baseType = this.ancestor;
+          if(baseType) {
+            var baseRef = baseType.toRefInContext(keyArgs);
+            if(baseRef && baseRef !== "complex")
+              spec.base = baseRef;
+          } else {
+            // Value type itself
+            spec.base = null;
+          }
+
+          this._fillSpecInContext(spec, keyArgs);
+
+          return spec;
+        },
+
+        // Serializes the isAbstract attribute for non-refinement types
+        _fillSpecInContext: function(spec, keyArgs) {
+          var any = false;
+
+          if(!this.isRefinement && this.isAbstract) {
+            any = true;
+            spec.isAbstract = true;
+          }
+
+          if(!keyArgs.isJson) {
+            any = valueHelper.fillSpecMethodInContext(spec, this, "validateInstance") || any;
+
+            // Instance methods
+            var instSpec = {};
+            var instance = this.instance;
+            var instAny = valueHelper.fillSpecMethodInContext(instSpec, instance, "validate");
+
+            if(instAny) {
+              spec.instance = instSpec;
+              any = true;
+            }
+          }
+
+          return this.base(spec, keyArgs) || any;
         }
         //endregion
       }
     }, /** @lends pentaho.type.Value */{
+
+      // override the documentation to specialize the argument types.
+      /**
+       * Creates a subtype of this one.
+       *
+       * For more information on class extension, in general,
+       * see {@link pentaho.lang.Base.extend}.
+       *
+       * @name extend
+       * @memberOf pentaho.type.Value
+       *
+       * @param {string} [name] The name of the created class. Used for debugging purposes.
+       * @param {pentaho.type.spec.IValueProto} [instSpec] The instance specification.
+       * @param {Object} [classSpec] The static specification.
+       * @param {Object} [keyArgs] The keyword arguments.
+       *
+       * @return {!Class.<pentaho.type.Value>} The new value instance subclass.
+       *
+       * @see pentaho.type.Instance.extend
+       */
 
       /**
        * Creates a refinement type that refines this one.
@@ -617,7 +672,7 @@ define([
        * @see pentaho.type.Refinement.Type#of
        *
        * @param {string} [name] A name of the refinement type used for debugging purposes.
-       * @param {Object} [instSpec] The refined type instance specification.
+       * @param {{type: pentaho.type.IRefinementTypeProto}} [instSpec] The refined type instance specification.
        * The available _type_ attributes are those defined by any specified refinement facet classes.
        *
        * @return {Class.<pentaho.type.Refinement>} The refinement type's instance class.

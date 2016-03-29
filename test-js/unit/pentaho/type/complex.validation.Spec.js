@@ -24,10 +24,10 @@ define([
   var context = new Context();
   var Complex = context.get("pentaho/type/complex");
 
-  describe("pentaho.type.Complex.Type -", function() {
+  describe("pentaho.type.Complex", function() {
 
-    describe("#validate(value) -", function() {
-      it("should call each property's validate with the owner complex", function() {
+    describe("#validate()", function() {
+      it("should call each property's validate with the owner complex instance", function() {
         var Derived = Complex.extend({
           type: {
             props: [
@@ -48,14 +48,13 @@ define([
         spyOn(yPropType, "validate");
         spyOn(zPropType, "validate");
 
-        Derived.type.validate(derived);
+        derived.validate();
 
         expect(xPropType.validate).toHaveBeenCalledWith(derived);
         expect(yPropType.validate).toHaveBeenCalledWith(derived);
         expect(zPropType.validate).toHaveBeenCalledWith(derived);
       });
 
-    });// end #validate(value)
-
-  }); // pentaho.type.Complex.Type
+    });
+  }); // pentaho.type.Complex
 });

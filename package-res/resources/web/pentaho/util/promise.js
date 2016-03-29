@@ -31,7 +31,7 @@ define([
    * @name pentaho.util.promise
    * @namespace
    * @amd pentaho/util/promise
-   * @ignore
+   * @private
    */
   return /** @lends pentaho.util.promise */{
     /**

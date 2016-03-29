@@ -14,19 +14,27 @@
  * limitations under the License.
  */
 define([
+  "require",
+  "./SpecificationScope",
+  "./SpecificationContext",
   "../i18n!types",
   "../lang/Base",
   "../lang/_AnnotatableLinked",
   "../util/error",
   "../util/arg",
   "../util/object",
+  "../util/fun",
   "../util/promise"
-], function(bundle, Base, AnnotatableLinked, error, arg, O, promiseUtil) {
+], function(localRequire, SpecificationScope, SpecificationContext, bundle, Base, AnnotatableLinked, error, arg, O, F, promiseUtil) {
   "use strict";
 
   // Unique type class id exposed through Type#uid and used by Context instances.
   var _nextUid = 1,
+      _extractShortId = /^pentaho\/type\/(\w+)$/i,
       _type = null,
+      _normalAttrNames = [
+        "description", "category", "helpUrl", "isBrowsable", "isAdvanced", "ordinal"
+      ],
       O_isProtoOf = Object.prototype.isPrototypeOf;
 
   /**
@@ -38,7 +46,7 @@ define([
    * For additional information, see the class of _instances_, {@link pentaho.type.Instance}.
    *
    * @description _Initializes_ the type's singleton object.
-   * @param {Object} instSpec The specification of this type.
+   * @param {Object} spec The specification of this type.
    * @param {!Object} keyArgs Keyword arguments.
    * @param {!pentaho.type.Instance} keyArgs.instance The _prototype_ of the `Instance` class associated with
    * this type.
@@ -47,14 +55,14 @@ define([
    */
   var Type = Base.extend("pentaho.type.Type", /** @lends pentaho.type.Type# */{
 
-    constructor: function(instSpec, keyArgs) {
-      if(!instSpec) instSpec = {};
+    constructor: function(spec, keyArgs) {
+      if(!spec) spec = {};
 
-      this._init(instSpec, keyArgs);
+      this._init(spec, keyArgs);
 
-      this.extend(instSpec);
+      this.extend(spec);
 
-      this._postInit(instSpec, keyArgs);
+      this._postInit(spec, keyArgs);
     },
 
     /**
@@ -62,7 +70,7 @@ define([
      *
      * This method is typically overridden to block the inheritance of certain attributes.
      *
-     * @param {!Object} instSpec The specification of this type.
+     * @param {!Object} spec The specification of this type.
      * @param {!Object} keyArgs Keyword arguments.
      * @param {!pentaho.type.Instance} keyArgs.instance The _prototype_ of the `Instance` class associated with
      * this type.
@@ -70,20 +78,21 @@ define([
      * @protected
      * @overridable
      */
-    _init: function(instSpec, keyArgs) {
+    _init: function(spec, keyArgs) {
 
       O.setConst(this, "uid", _nextUid++);
 
       // Bind
       var instance = arg.required(keyArgs, "instance", "keyArgs");
       O.setConst(instance, "_type", this);
-      O.setConst(this, "instance",  instance);
+      O.setConst(this, "_instance", instance);
 
       if(arg.optional(keyArgs, "isRoot"))
         O.setConst(this, "root", this);
 
       // Block inheritance, with default values
       this._id         = null;
+      this._shortId    = undefined;
       this._styleClass = null;
       this._hasDescendants = false;
     },
@@ -95,12 +104,12 @@ define([
      *
      * The default implementation does nothing.
      *
-     * @param {!Object} instSpec The specification of this type.
+     * @param {!Object} spec The specification of this type.
      * @param {!Object} keyArgs Keyword arguments.
      * @protected
      * @overridable
      */
-    _postInit: function(instSpec, keyArgs) {
+    _postInit: function(spec, keyArgs) {
     },
 
     //region uid property
@@ -214,16 +223,25 @@ define([
     //endregion
 
     //region instance property
-    // Set on `Instance._extend`
     /**
      * Gets the _prototype_ of the instances of this type.
      *
-     * @name instance
-     * @memberOf pentaho.type.Type#
      * @type pentaho.type.Instance
      * @readOnly
-     * @see pentaho.type.Instance#type
      */
+    get instance() {
+      return this._instance;
+    },
+
+    // Supports Instance configuration only, from the type side.
+    // To be used in type specifications, to change the instance side.
+    // Not documented on purpose.
+    set instance(config) {
+      // Class.implement essentially just calls Class#extend.
+      /* istanbul ignore else: no comments */
+      if(config) this.instance.extend(config);
+    }, //jshint -W078
+    //endregion
     //endregion
 
     //region id property
@@ -251,8 +269,41 @@ define([
     },
 
     set id(value) {
+      value = nonEmptyString(value);
+
+      // Is it a temporary id? If so, ignore it.
+      if(value && value[0] === "_") value = null;
+
       // Can only be set once or throws.
-      O.setConst(this, "_id", nonEmptyString(value));
+      O.setConst(this, "_id", value);
+    },
+
+    /**
+     * Gets the short id of this type.
+     *
+     * When a type is one of the standard types,
+     * and, thus, it is a direct sub-module of the `pentaho/type` module,
+     * its short id is its _local module id_,
+     * like `"string"` or `"boolean"`.
+     *
+     * Otherwise, the short id is equal to the id.
+     *
+     * @type {?nonEmptyString}
+     * @readOnly
+     * @see pentaho.type.Type#id
+     */
+    get shortId() {
+      var shortId = this._shortId, id, m;
+      if(shortId === undefined) {
+        if((id = this._id) && (m = _extractShortId.exec(id))) {
+          shortId = m[1];
+        } else {
+          shortId = id;
+        }
+        this._shortId = shortId;
+      }
+
+      return shortId;
     },
 
     _buildRelativeId: function(value) {
@@ -279,6 +330,7 @@ define([
     //region label property
     // must have some non-null value to inherit
     _label: "instance",
+    _labelSet: false,
 
     /**
      * Gets or sets the label of this type.
@@ -306,11 +358,14 @@ define([
       if(value === null) {
         this._resetLabel();
       } else {
+        this._labelSet = true;
         this._label = value;
       }
     },
 
     _resetLabel: function() {
+      this._labelSet = false;
+
       if(this !== _type) {
         delete this._label;
       }
@@ -526,7 +581,12 @@ define([
      *
      * This attribute is typically used to associate an icon with a type.
      *
-     * @type {nonEmptyString}
+     * Attempting to set to a non-string value type implicitly
+     * converts the value to a string before assignment.
+     *
+     * An empty string or `undefined` value is interpreted as `null`.
+     *
+     * @type {?nonEmptyString}
      */
     get styleClass() {
       return this._styleClass;
@@ -545,6 +605,7 @@ define([
      * @readonly
      */
     get inheritedStyleClasses() {
+      /* istanbul ignore next: not implemented yet */
       throw error.notImplemented("Implement me!");
     },
     //endregion
@@ -665,7 +726,7 @@ define([
       /*jshint laxbreak:true*/
       var view = this._view;
       return view
-          ? (view.promise || (view.promise = promiseUtil.require(view.value)))
+          ? (view.promise || (view.promise = promiseUtil.require(view.value, localRequire)))
           : Promise.resolve(null);
     },
     //endregion
@@ -679,21 +740,21 @@ define([
      * Do not use this method directly.
      * Use {@link pentaho.type.Instance#extendProto} instead.
      *
-     * @param {object} instSpec The type specification.
+     * @param {object} spec The type specification.
      * @param {object} keyArgs Keyword arguments.
      * @param {pentaho.type.Instance} keyArgs.instance The prototype of instances of the type.
      *
      * @return {pentaho.type.Type} The new type.
      * @ignore
      */
-    _extendProto: function(instSpec, keyArgs) {
+    _extendProto: function(spec, keyArgs) {
 
       O.setConst(this, "_hasDescendants", true);
 
       var subType = Object.create(this);
 
       // NOTE: `subType.constructor` is still the "base" constructor.
-      subType.constructor(instSpec, keyArgs);
+      subType.constructor(spec, keyArgs);
 
       return subType;
     },
@@ -755,13 +816,172 @@ define([
              this.create(value);
     },
 
-    toSpec: function() {
-      return {id: this.id};
+    //region serialization
+    /**
+     * Creates a specification that describes this type.
+     *
+     * If an [ambient specification context]{@link pentaho.type.SpecificationContext.current},
+     * currently exists, it is used to manage the serialization process.
+     * Otherwise, one is created and set as current.
+     *
+     * This method creates a new {@link pentaho.type.SpecificationScope} for describing
+     * this type, and any other instances and types it references,
+     * and then delegates the actual work to {@link pentaho.type.Type#toSpecInContext}.
+     *
+     * @param {Object} [keyArgs] - The keyword arguments object.
+     * Passed to every type and instance serialized within this scope.
+     *
+     * Please see the documentation of subclasses for information on additional, supported keyword arguments.
+     *
+     * @return {!pentaho.type.spec.ITypeProto} A specification of this type.
+     *
+     * @see pentaho.type.Type#toSpecInContext
+     * @see pentaho.type.Type#_fillSpecInContext
+     */
+    toSpec: function(keyArgs) {
+      return O.using(new SpecificationScope(), this.toSpecInContext.bind(this, keyArgs || {}));
     },
 
-    toReference: function() {
-      return this.id;
+    /**
+     * Creates a specification that describes this type.
+     *
+     * This method requires that there currently exists an
+     * [ambient specification context]{@link pentaho.type.SpecificationContext.current}.
+     *
+     * The default implementation returns a plain object with the id of the type and
+     * any other specified attributes
+     * (like [label]{@link pentaho.type.Type#label} or [description]{@link pentaho.type.Type#description}).
+     *
+     * @param {Object} [keyArgs] - The keyword arguments object.
+     * Passed to every type and instance serialized within this scope.
+     *
+     * Please see the documentation of subclasses for information on additional, supported keyword arguments.
+     *
+     * @return {!pentaho.type.spec.ITypeProto} A specification of this type.
+     *
+     * @see pentaho.type.Type#toSpec
+     */
+    toSpecInContext: function(keyArgs) {
+
+      var spec = {id: this.shortId || SpecificationContext.current.add(this)};
+
+      this._fillSpecInContext(spec, keyArgs || {});
+
+      return spec;
+    },
+
+    /**
+     * Fills the given specification with this type's attributes' local values,
+     * and returns whether any attribute was actually added.
+     *
+     * This method requires that there currently exists an
+     * [ambient specification context]{@link pentaho.type.SpecificationContext.current}.
+     *
+     * This method does _not_ add the special `id` and `base` attributes to the specification.
+     *
+     * @param {!Object} spec - The specification to be filled.
+     * @param {Object} [keyArgs] - The keyword arguments object.
+     * Passed to every type and instance serialized within this scope.
+     *
+     * Please see the documentation of subclasses for information on additional, supported keyword arguments.
+     *
+     * @return {boolean} Returns `true` if any attribute was added, `false`, otherwise.
+     *
+     * @protected
+     *
+     * @see pentaho.type.Instance#toSpecInContext
+     */
+    _fillSpecInContext: function(spec, keyArgs) {
+      var any = false;
+      //var isJson = keyArgs.isJson;
+
+      if(this._labelSet && O.hasOwn(this, "_label")) {
+        any = true;
+        spec.label = this._label;
+      }
+
+      // Normal attributes
+      _normalAttrNames.forEach(function(name) {
+        var _name = "_" + name, v;
+        // !== undefined ensures refinement fields are well handled as well
+        if(O.hasOwn(this, _name) && (v = this[_name]) !== undefined) {
+          any = true;
+          spec[name] = v;
+        }
+      }, this);
+
+      // Custom attributes
+      var styleClass = this._styleClass;
+      if(styleClass) {
+        any = true;
+        spec.styleClass = styleClass;
+      }
+
+      var viewInfo = O.getOwn(this, "_view");
+      if(viewInfo !== undefined) { // can be null
+        any = true;
+        var view = viewInfo && viewInfo.value;
+        spec.view = view; // view && isJson ? String(view) : view;
+      }
+
+      return any;
+    },
+
+    /**
+     * Returns a _reference_ to this type.
+     *
+     * This method returns a reference to this type that is appropriate
+     * to be the value of an [inline type]{@link pentaho.type.spec.IInstance#_} property
+     * that is included on a specification of an instance of this type.
+     *
+     * If an [ambient specification context]{@link pentaho.type.SpecificationContext.current},
+     * currently exists, it is used to manage the serialization process.
+     * Otherwise, one is created and set as current.
+     *
+     * When a type is not anonymous, the cheapest reference,
+     * the [id]{@link pentaho.type.Type#id}, is returned.
+     *
+     * For anonymous types, a temporary, serialization-only id is generated.
+     * In the first occurrence in the given scope,
+     * that id is returned, within a full specification of the type,
+     * obtained by calling [toSpecInContext]{@link pentaho.type.Type#toSpecInContext}.
+     * In following occurrences, only the previously used temporary id is returned.
+     *
+     * Some standard types have a special reference syntax,
+     * e.g. [List.Type#toRef]{@link pentaho.type.List.Type#toRef}.
+     *
+     * @see pentaho.type.Type#toSpec
+     *
+     * @param {Object} [keyArgs] - The keyword arguments object.
+     * Passed to every type and instance serialized within this scope.
+     *
+     * Please see the documentation of subclasses for information on additional, supported keyword arguments.
+     *
+     * @return {!pentaho.type.spec.UTypeReference} A reference to this type.
+     */
+    toRef: function(keyArgs) {
+      return this.shortId || O.using(new SpecificationScope(), this.toRefInContext.bind(this, keyArgs || {}));
+    },
+
+    /**
+     * Returns a _reference_ to this type under a given specification context.
+     *
+     * This method requires that there currently exists an
+     * [ambient specification context]{@link pentaho.type.SpecificationContext.current}.
+     *
+     * @see pentaho.type.Type#toRef
+     *
+     * @param {Object} [keyArgs] - The keyword arguments object.
+     * Passed to every type and instance serialized within this scope.
+     *
+     * Please see the documentation of subclasses for information on additional, supported keyword arguments.
+     *
+     * @return {!pentaho.type.spec.UTypeReference} A reference to this type.
+     */
+    toRefInContext: function(keyArgs) {
+      return this.shortId || SpecificationContext.current.getIdOf(this) || this.toSpecInContext(keyArgs);
     }
+    //endregion
   }, /** @lends pentaho.type.Type */{
 
     //@override

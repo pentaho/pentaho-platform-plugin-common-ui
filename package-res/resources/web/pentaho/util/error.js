@@ -34,7 +34,7 @@ define([
    * @memberOf pentaho.util
    * @namespace
    * @amd pentaho/util/error
-   * @ignore
+   * @private
    */
   return /** @lends pentaho.util.error */ {
     /**

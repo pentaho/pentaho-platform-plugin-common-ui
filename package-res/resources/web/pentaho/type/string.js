@@ -49,6 +49,7 @@ define([
         cast: String
       }
     }).implement({
+      //jshint -W069
       type: bundle.structured["string"]
     });
   };

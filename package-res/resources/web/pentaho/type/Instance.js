@@ -86,6 +86,10 @@ define([
    * });
    *
    * @description Creates an instance of this type.
+   *
+   * @see pentaho.type.spec.IInstance
+   * @see pentaho.type.spec.IInstanceProto
+   * @see pentaho.type.spec.ITypeProto
    */
   var Instance = Base.extend("pentaho.type.Instance", /** @lends pentaho.type.Instance# */{
     // NOTE: not calling base to block default Base.js from copying 1st argument into `this`.
@@ -128,39 +132,29 @@ define([
     /**
      * Creates a top-level specification that describes this instance.
      *
-     * This method creates a new {@link pentaho.type.SpecificationScope} for describing
-     * this instance, and any other instances and types it references,
-     * delegating the actual work to {@link pentaho.type.Instance#toSpecInScope}.
+     * If an [ambient specification context]{@link pentaho.type.SpecificationContext.current},
+     * currently exists, it is used to manage the serialization process.
+     * Otherwise, one is created and set as current.
+     * Then, the actual work is delegated to {@link pentaho.type.Instance#toSpecInContext}.
      *
      * @param {Object} [keyArgs] - The keyword arguments object.
      * Passed to every instance and type serialized within this scope.
      *
      * Please see the documentation of subclasses for information on additional, supported keyword arguments.
      *
-     * @param {boolean} [keyArgs.omitRootType=false] - Omits the inline type property, `_`,
-     * on the root (`this`) value specification.
+     * @param {?boolean} [keyArgs.includeType=false] - Includes the inline type property, `_`, in the specification.
      *
      * @return {!any} A specification of this instance.
      */
     toSpec: function(keyArgs) {
-      if(!keyArgs) keyArgs = {};
-
-      var scope = new SpecificationScope();
-      var requireType = !keyArgs.omitRootType;
-      var spec = this.toSpecInScope(scope, requireType, keyArgs);
-
-      scope.dispose();
-
-      return spec;
+      return O.using(new SpecificationScope(), this.toSpecInContext.bind(this, keyArgs || {}));
     },
 
     /**
-     * Creates a specification that describes this instance under a given scope.
+     * Creates a specification that describes this instance.
      *
-     * @param {!pentaho.type.SpecificationScope} scope - The specification scope.
-     * @param {boolean} requireType - Requires inlining the type of this instance in the specification.
-     * @param {!Object} keyArgs - The keyword arguments object.
-     * Passed to every instance serialized within this scope.
+     * @param {Object} [keyArgs] - The keyword arguments object.
+     * Passed to every instance and type serialized within this scope.
      *
      * Please see the documentation of subclasses for information on additional, supported keyword arguments.
      *
@@ -170,7 +164,7 @@ define([
      *
      * @see pentaho.type.Instance#toSpec
      */
-    toSpecInScope: function(scope, requireType, keyArgs) {
+    toSpecInContext: function(keyArgs) {
       /* istanbul ignore next : abstract method */
       throw error.notImplemented();
     }
@@ -234,6 +228,26 @@ define([
       // Don't process `instSpec.type` twice, during construction.
       return subInstProto.extend(instSpec, _keyArgsExcludeInstance);
     },
+
+    // override the documentation to specialize the argument types.
+    /**
+     * Creates a subtype of this one.
+     *
+     * For more information on class extension, in general,
+     * see {@link pentaho.lang.Base.extend}.
+     *
+     * @name extend
+     * @memberOf pentaho.type.Instance
+     *
+     * @param {string} [name] The name of the created class. Used for debugging purposes.
+     * @param {pentaho.type.spec.IInstanceProto} [instSpec] The instance specification.
+     * @param {Object} [classSpec] The static specification.
+     * @param {Object} [keyArgs] The keyword arguments.
+     *
+     * @return {!Class.<pentaho.type.Value>} The new value subclass.
+     *
+     * @see pentaho.lang.Base.extend
+     */
 
     //@override
     /**

@@ -22,12 +22,57 @@ define([
 
   /*global describe:true, it:true, expect:true, beforeEach:true*/
 
-  describe("pentaho.type.facets.RefinementFacet -", function() {
+  describe("pentaho.type.facets.RefinementFacet", function() {
     it("should be a function", function() {
       expect(typeof RefinementFacet).toBe("function");
     });
 
-    describe("validate(value)", function() {
+    describe(".id", function() {
+
+      it("should be defined", function() {
+        expect(typeof RefinementFacet.id).toBe("string");
+      });
+
+      it("should be respected when specified", function() {
+        var DerivedFacet = RefinementFacet.extend(null, {id: "foo"});
+        expect(DerivedFacet.id).toBe("foo");
+      });
+
+      it("should throw if classSpec.id is not specified when extending", function() {
+        expect(function() {
+          RefinementFacet.extend();
+        }).toThrow(errorMatch.argRequired("classSpec.id"));
+
+        expect(function() {
+          RefinementFacet.extend({}, {});
+        }).toThrow(errorMatch.argRequired("classSpec.id"));
+
+        expect(function() {
+          RefinementFacet.extend({}, {id: ""});
+        }).toThrow(errorMatch.argRequired("classSpec.id"));
+      });
+    });
+
+    describe(".shortId", function() {
+
+      it("should be equal to #id when it is not a standard, single-level facet id", function() {
+        var Derived = RefinementFacet.extend(null, {id: "my/foo"});
+        expect(Derived.shortId).toBe(Derived.id);
+      });
+
+      it("should be equal to the last sub-module of #id when it is of a standard, single-level facet id", function() {
+        var Derived = RefinementFacet.extend(null, {id: "pentaho/type/facets/foo"});
+        expect(Derived.shortId).toBe("foo");
+        expect(Derived.id).not.toBe("foo");
+      });
+
+      it("should be equal to #id when it is of a standard, multiple-level facet id", function() {
+        var Derived = RefinementFacet.extend(null, {id: "pentaho/type/facets/bar/foo"});
+        expect(Derived.shortId).toBe(Derived.id);
+      });
+    });
+
+    describe(".validate(value)", function() {
       it("should be defined", function() {
         expect(typeof RefinementFacet.validate).toBe("function");
       });
@@ -36,6 +81,16 @@ define([
         expect(function() {
           RefinementFacet.validate({});
         }).toThrow(errorMatch.notImplemented());
+      });
+    });
+
+    describe(".fillSpecInContext(spec, keyArgs)", function() {
+      it("should be defined", function() {
+        expect(typeof RefinementFacet.fillSpecInContext).toBe("function");
+      });
+
+      it("should return false", function() {
+        expect(RefinementFacet.fillSpecInContext({})).toBe(false);
       });
     });
   });

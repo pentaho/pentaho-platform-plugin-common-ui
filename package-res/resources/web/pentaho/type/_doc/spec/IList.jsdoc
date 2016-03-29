@@ -33,7 +33,7 @@
  * @name pentaho.type.spec.IList
  *
  * @interface
- * @extends pentaho.type.spec.IInstance
+ * @extends pentaho.type.spec.IValue
  *
  * @see pentaho.type.spec.UList
  */
