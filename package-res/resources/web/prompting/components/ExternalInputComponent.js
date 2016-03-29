@@ -45,7 +45,7 @@
  *
  * where 'args' is an object that contains the parameters necessary for base CDF component and special options:
  * <ul>
- *   <li>promptPanel - {@link PromptPanel} used to check 'autoSubmit' and 'forceAutoSubmit' properties</li>
+ *   <li>promptPanel - {@link PromptPanel} used to check 'autoSubmit' property</li>
  *   <li>paramDefn - {@link ParameterDefinition} used to check 'autoSubmit' property</li>
  *   <li>param - {@link Parameter} The parameter with the properties needed to build the component</li>
  *   <li>parameter - {@link PromptPanel#getParameterName} parameter name unique to this parameter panel</li>

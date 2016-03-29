@@ -77,15 +77,6 @@ define([ 'common-ui/prompting/components/SubmitPromptComponent', 'common-ui/jque
         expect(spyElem.bind).toHaveBeenCalledWith('click', jasmine.any(Function));
         expect(comp.expression).toHaveBeenCalled();
       });
-
-      it("should not create auto submit elements but force auto submit", function() {
-        comp.paramDefn.autoSubmit = true;
-        comp.promptPanel.forceAutoSubmit = true;
-        comp.update();
-        expect(spyElem.appendTo).not.toHaveBeenCalled();
-        expect(spyElem.bind).not.toHaveBeenCalled();
-        expect(comp.expression).toHaveBeenCalled();
-      });
     });
   });
 });
