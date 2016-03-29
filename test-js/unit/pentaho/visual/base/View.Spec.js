@@ -2,9 +2,9 @@ define([
   "pentaho/visual/base/View",
   "pentaho/visual/base",
   "pentaho/type/Context",
-  "pentaho/visual/base/events/DidChangeSelection",
+  "pentaho/type/events/DidChange",
   "tests/pentaho/util/errorMatch"
-], function(View, modelFactory, Context, DidChangeSelection, errorMatch) {
+], function(View, modelFactory, Context, DidChange, errorMatch) {
   "use strict";
 
   /*global document:false*/
@@ -64,26 +64,6 @@ define([
 
     });
 
-    describe("events -", function() {
-      var view;
-      beforeEach(function() {
-        spyOn(model, "on").and.callThrough();
-        spyOn(View.prototype, "_selectionChanged");
-
-        view = new View(element, model);
-      });
-
-      it("should subscribe to model's did:change:selectionFilter event", function() {
-        expect(model.on.calls.mostRecent().args[0]).toBe("did:change:selectionFilter");
-      });
-
-      it("should call _selectionChanged when did:change:selectionFilter occurs in the model", function() {
-        model._emit(new DidChangeSelection({}, {}, {dataFilter: {}}));
-
-        expect(view._selectionChanged).toHaveBeenCalled();
-      });
-    });
-
     describe("validation: ", function() {
 
       it("should be valid if the model is valid", function(){
@@ -134,8 +114,78 @@ define([
 
       });
 
+      it("`render()` should not invoke `_render` if `_validate` throws", function(done) {
+        var DerivedView = View.extend({
+          _validate: function(){ throw new Error("Some error"); },
+          _render: function(){ return "Rendered"; }
+        });
+        var view = new DerivedView(element, model);
+
+        spyOn(view, '_render').and.callThrough();
+
+        view.render().then(function resolved() {
+          done.fail();
+        }, function rejected(reason) {
+          expect(reason).toBe("Some error");
+          expect(view._render).not.toHaveBeenCalled();
+          done();
+        });
+
+      });
+
 
     });
+
+    describe("#_onChange", function(){
+      var view, _resize, _render, _selectionChanged;
+      beforeEach(function(){
+        view = new View(element, model);
+        _resize = spyOn(view, "_resize");
+        _selectionChanged = spyOn(view, "_selectionChanged");
+        _render = spyOn(view, "_render");
+      });
+
+      it("triggers #_resize when only 'height' changes", function(){
+        model.set("height", 100);
+
+        expect(_resize).toHaveBeenCalled();
+        expect(_selectionChanged).not.toHaveBeenCalled();
+        expect(_render).not.toHaveBeenCalled();
+      });
+
+      it("triggers #_resize when only 'width' changes", function(){
+        model.set("width", 100);
+
+        expect(_resize).toHaveBeenCalled();
+        expect(_selectionChanged).not.toHaveBeenCalled();
+        expect(_render).not.toHaveBeenCalled();
+      });
+
+      it("triggers #_selectionChanged when 'selectionFilter' changes", function(){
+        model.set("selectionFilter", null);
+
+        expect(_resize).not.toHaveBeenCalled();
+        expect(_selectionChanged).toHaveBeenCalled();
+        expect(_render).not.toHaveBeenCalled();
+      });
+
+      it("does not trigger any render method when 'selectionMode' changes", function(){
+        model.set("selectionMode", null);
+
+        expect(_resize).not.toHaveBeenCalled();
+        expect(_selectionChanged).not.toHaveBeenCalled();
+        expect(_render).not.toHaveBeenCalled();
+      });
+
+      it("triggers #_render when a property other than 'height', 'width' or 'selectionFilter' changes", function(){
+        model.set("isInteractive", false);
+
+        expect(_resize).not.toHaveBeenCalled();
+        expect(_selectionChanged).not.toHaveBeenCalled();
+        expect(_render).toHaveBeenCalled();
+      });
+
+    }); // #_onChange
   });
 
 });

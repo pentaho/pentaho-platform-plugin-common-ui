@@ -70,7 +70,7 @@ define([
 
     it("should throw if empty error parameter", function() {
       expect(function() {
-        return new RejectedExecute({});
+        return new RejectedExecute({}, undefined, {dataFilter: {}});
       }).toThrow(errorMatch.argRequired("error"));
     });
 

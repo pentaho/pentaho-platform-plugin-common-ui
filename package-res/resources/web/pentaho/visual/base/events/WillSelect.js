@@ -14,61 +14,72 @@
  * limitations under the License.
  */
 define([
-  "./will",
+  "pentaho/lang/Event",
   "../mixins/mixinDataFilter",
   "pentaho/util/error",
-  "./DidSelect",
-  "./RejectedSelect"
-], function(will, mixinDataFilter, error, Did, Rejected) {
+  "pentaho/util/fun"
+], function(Event, mixinDataFilter, error, F) {
   "use strict";
 
   /**
    * @name WillSelect
    * @memberOf pentaho.visual.base.events
-   * @description This event is triggered when
+   * @class
+   * @extends pentaho.visual.base.events.Will
+   * @mixes pentaho.visual.base.mixins.mixinDataFilter
+   *
+   * @classDesc This event is triggered when
    * the {@link pentaho.visual.base.Model#selectAction|Select Action} flow starts.
    * The listeners of `will:select` are allowed to:
    * - cancel the event
    * - replace the input data filter
    * - replace the selection mode
    *
-   * @extends pentaho.visual.base.events.Will
-   * @event "will:select"
+   * @constructor
+   * @description Creates a `WillSelect` event.
+   *
+   * @param {!pentaho.visual.base.Model} source - The model object which is emitting the event.
+   * @param {!pentaho.data.filter.AbstractFilter} dataFilter - A filter representing the data set of the visual element(s) which the user interacted with.
+   * @param {?function} selectionMode - A function that represents how the selection made by the user
+   * will be merged with the current selection.
    */
-  return will("select").extend("pentaho.visual.base.events.WillSelect",
+  return Event.extend("pentaho.visual.base.events.WillSelect",
     /** @lends pentaho.visual.base.events.WillSelect# */{
 
-      /**
-       * Creates a `WillSelect` event.
-       *
-       * @constructor
-       *
-       * @param {!Object} source - The object where the event will be initially emitted.
-       * @param {!pentaho.data.filter.AbstractFilter} dataFilter - A filter representing the data set of the visual element(s) which the user interacted with.
-       * @param {?function} selectionMode - A function that represents how the selection made by the user
-       * will be merged with the current selection.
-       */
       constructor: function(source, dataFilter, selectionMode) {
-        if(!selectionMode) throw error.argRequired("selectionMode");
-
-        this.base(source);
+        this.base("will:select", source, true);
         this._initFilter(dataFilter, true);
         this.selectionMode = selectionMode;
       },
 
-      set selectionMode(f) {
-        if(f != null && typeof f !== "function") {
-          throw error.argInvalidType("selectionMode", "function", typeof f);
+      /**
+       * Gets or sets the selection mode that will be used to handle the user selection.
+       *
+       * @type ?function
+       *
+       * @throws {pentaho.lang.ArgumentInvalidTypeError} When `mode` is not a `function`.
+       */
+      set selectionMode(mode) {
+        if(mode != null && !F.is(mode)) {
+          throw error.argInvalidType("selectionMode", "function", typeof mode);
         }
-        this._selectionMode = f;
+        this._selectionMode = mode;
       },
 
       get selectionMode() {
         return this._selectionMode;
-      },
+      }
+    }, /** @lends pentaho.visual.base.events.WillSelect */{
 
-      Did: Did,
-      Rejected: Rejected
+      /**
+       * Gets the event type.
+       *
+       * @type string
+       * @readonly
+       */
+      get type() {
+        return "will:select";
+      }
     })
     .implement(mixinDataFilter);
 

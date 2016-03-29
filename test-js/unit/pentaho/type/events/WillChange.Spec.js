@@ -15,51 +15,43 @@
  */
 define([
   "pentaho/lang/Event",
-  "pentaho/visual/base/events/did"
-], function(Event, did) {
+  "pentaho/type/events/WillChange"
+], function(Event, WillChange) {
   "use strict";
 
   /* global describe:false, it:false, expect:false, beforeEach:false */
 
-  describe("pentaho.visual.base.events.did -", function() {
-    var type = "Test";
-    var DidTestEvent;
-
-    beforeEach(function() {
-      DidTestEvent = did(type);
-    });
+  describe("pentaho.type.events.WillChange -", function() {
 
     it("should extend Event", function() {
-      expect(DidTestEvent.prototype instanceof Event).toBe(true);
-    });
-
-    it("static property type should return full type name", function() {
-      expect(DidTestEvent.type).toBe("did:" + type);
-    });
-
-    it("static property type should be read-only", function() {
-      expect(function() {
-        DidTestEvent.type = "New Name";
-      }).toThrowError(TypeError);
+      expect(WillChange.prototype instanceof Event).toBe(true);
     });
 
     describe("instances -", function() {
       var event;
 
-      var value = 123;
+      var changeset = { mock: "I am a mock" };
 
       beforeEach(function() {
-        event = new DidTestEvent({}, value);
+        event = new WillChange({}, changeset);
       });
 
       it("should extend Event", function() {
         expect(event instanceof Event).toBe(true);
       });
 
-      it("value property should be the same than received in the constructor", function() {
-        expect(event.value).toBe(value);
+      it("changeset should be the same than received in the constructor", function() {
+        expect(event.changeset).toBe(changeset);
+      });
+
+      it("changeset property should be immutable", function() {
+        expect(function() {
+          event.changeset = {};
+        }).toThrowError(TypeError);
+
+        expect(event.changeset).toBe(changeset);
       });
     });
 
-  }); // #pentaho.events.did
+  }); // #pentaho.lang.events.WillChange
 });

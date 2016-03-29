@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 define([
-  "pentaho/util/error",
-  "pentaho/data/filter"
-], function(error, filter) {
+  "pentaho/util/error"
+], function(error) {
   "use strict";
 
   /**
    * @name mixinDataFilter
-   * @memberOf pentaho.visual.base.events
+   * @memberOf pentaho.visual.base.mixins
    * @mixin
    */
-  return  /** @lends pentaho.visual.base.events.mixinDataFilter# */{
+  return  /** @lends pentaho.visual.base.mixins.mixinDataFilter */{
 
     /**
      * Initializes the mixin.
@@ -39,13 +38,20 @@ define([
       this._isMutable = !!isMutable;
     },
 
+    /**
+     * Gets or sets the filter that represents a subset of the data.
+     *
+     * @type pentaho.data.filter.AbstractFilter
+     *
+     * @throws {TypeError} When `dataFilter` is not mutable.
+     */
     get dataFilter() {
       return this._dataFilter;
     },
 
-    set dataFilter(f) {
+    set dataFilter(filter) {
       if(this._isMutable) {
-        this._dataFilter = f || new filter.Or();
+        this._dataFilter = filter;
       } else {
         throw TypeError();
       }

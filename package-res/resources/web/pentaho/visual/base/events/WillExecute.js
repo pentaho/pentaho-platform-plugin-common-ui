@@ -14,53 +14,71 @@
  * limitations under the License.
  */
 define([
-  "./will",
+  "pentaho/lang/Event",
   "../mixins/mixinDataFilter",
-  "pentaho/util/error"
-], function(will, mixinDataFilter, error) {
+  "pentaho/util/error",
+  "pentaho/util/fun"
+], function(Event, mixinDataFilter, error, F) {
   "use strict";
 
   /**
    * @name WillExecute
    * @memberOf pentaho.visual.base.events
-   * @description This event is triggered when
+   * @class
+   * @extends pentaho.lang.Event
+   * @extends pentaho.visual.base.mixins.mixinDataFilter
+   *
+   * @classDesc This event is triggered when
    * the {@link pentaho.visual.base.Model#executeAction|Execute Action} flow starts.
    * The listeners of `will:execute` are allowed to:
    * - cancel the event
    * - replace the input data filter
    * - replace the `doExecute` action
    *
-   * @extends pentaho.visual.base.events.Will
-   * @event "will:execute"
+   * @constructor
+   * @description Creates a `WillExecute` event.
+   *
+   * @param {!pentaho.visual.base.Model} source - The model object which is emitting the event.
+   * @param {!pentaho.data.filter.AbstractFilter} dataFilter - A filter representing the data set of the visual element which the user interacted with.
+   * @param {?function} doExecute - The action that will be executed in the {@link pentaho.visual.base.model#executeAction|Execute Action} event flow.
    */
-  return will("execute").extend("pentaho.visual.base.events.WillExecute",
+  return Event.extend("pentaho.visual.base.events.WillExecute",
     /** @lends pentaho.visual.base.events.WillExecute# */{
 
-      /**
-       * Creates a `WillExecute` event.
-       *
-       * @constructor
-       *
-       * @param {!Object} source - The object where the event will be initially emitted.
-       * @param {!pentaho.data.filter.AbstractFilter} dataFilter - A filter representing the data set of the visual element which the user interacted with.
-       * @param {?function} doExecute - The action that will be executed in the {@link pentaho.visual.base.model#executeAction|Execute Action} event flow.
-       */
       constructor: function(source, dataFilter, doExecute) {
-        this.base(source);
+        this.base("will:execute", source, true);
         this._initFilter(dataFilter, true);
         this.doExecute = doExecute;
       },
 
-      set doExecute(f) {
-        if(f != null && typeof f !== "function") {
-          throw error.argInvalidType("doExecute", "function", typeof f);
+      /**
+       * Gets or sets the callback associated with the execute action.
+       *
+       * @type ?function
+       * @see pentaho.visual.base.Model#executeAction
+       *
+       * @throws {pentaho.lang.ArgumentInvalidTypeError} When `exe` is not a `function`.
+       */
+      set doExecute(exe) {
+        if(exe != null && !F.is(exe)) {
+          throw error.argInvalidType("doExecute", "function", typeof exe);
         }
-
-        this._doExecute = f;
+        this._doExecute = exe;
       },
 
       get doExecute() {
         return this._doExecute;
+      }
+    }, /** @lends pentaho.visual.base.events.WillExecute */{
+
+      /**
+       * Gets the event type.
+       *
+       * @type string
+       * @readonly
+       */
+      get type() {
+        return "will:execute";
       }
     })
     .implement(mixinDataFilter);

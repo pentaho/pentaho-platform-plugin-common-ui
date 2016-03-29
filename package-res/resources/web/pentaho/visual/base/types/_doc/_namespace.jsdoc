@@ -13,16 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define([
-  "./DidSelect"
-], function(DidSelect) {
-  "use strict";
 
-  return DidSelect.extend("pentaho.visual.base.events.DidChangeSelection",
-    /** @lends pentaho.visual.base.events.DidChangeSelection# */{}, {
-      get type(){
-        return "did:change:selectionFilter";
-      }
-    });
-
-});
+/**
+ * The `types` namespace contains data types for developers to use
+ * to build new visualizations that work with the Visualization API.
+ *
+ * @name pentaho.visual.base.types
+ * @namespace
+ *
+ */

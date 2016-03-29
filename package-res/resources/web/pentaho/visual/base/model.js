@@ -15,7 +15,6 @@
  */
 define([
   "pentaho/type/complex",
-  "pentaho/lang/EventSource",
   "pentaho/lang/Event",
   "pentaho/data/filter",
   "pentaho/util/object",
@@ -27,10 +26,6 @@ define([
   "./events/DidSelect",
   "./events/RejectedSelect",
 
-  "./events/WillChangeSelection",
-  "./events/DidChangeSelection",
-  "./events/RejectedChangeSelection",
-
   "./events/WillExecute",
   "./events/DidExecute",
   "./events/RejectedExecute",
@@ -38,11 +33,10 @@ define([
   "pentaho/lang/ActionResult",
 
   "pentaho/i18n!type"
-], function(complexFactory, EventSource, Event, filter, O,
+], function(complexFactory, Event, filter, O,
             error, UserError,
             selectionModes,
             WillSelect, DidSelect, RejectedSelect,
-            WillChangeSelection, DidChangeSelection, RejectedChangeSelection,
             WillExecute, DidExecute, RejectedExecute,
             ActionResult,
             bundle) {
@@ -89,7 +83,7 @@ define([
          * If the modification of the current selection filter is successful, the event
          * ["did:select"]{@link pentaho.visual.base.events.DidSelect} is emitted.
          *
-         * Any failure (due to an event cancelation or due to an invalid selection mode)
+         * Any rejection (due to an event cancelation or due to an invalid selection mode)
          * leads to the emission of the
          * ["rejected:select"]{@link pentaho.visual.base.events.RejectedSelect}.
          *
@@ -98,6 +92,7 @@ define([
          * @param {?object} keyArgs - Keyword arguments.
          * @param {!function} keyArgs.selectionMode - A function that computes a new selection filter,
          * taking into account the current selection filter and an input `dataFilter`.
+         *
          * @return {pentaho.lang.ActionResult}
          * If unsuccessful, the `error` property describes what originated the error.
          * If successful,  the `error` property is `null` and the `value` property contains the updated current selection filter.
@@ -132,76 +127,21 @@ define([
             return ActionResult.reject(e);
           }
 
-          return this._setAction("selectionFilter", newSelectionFilter); //setting to null assigns the default value
-        },
-
-
-        /**
-         * Executes the will/did/rejected event loop associated with a given action.
-         *
-         * @param {function} coreAction - The action to be executed.
-         * @param {pentaho.visual.base.events.Will} will - The "will:" event object.
-         * @param {function} Did - The constructor of the "did:" event.
-         * @param {function} Rejected - The constructor of the "rejected:" event.
-         * @return {pentaho.lang.ActionResult} The result object.
-         * @protected
-         */
-        _doAction: function(coreAction, will, Did, Rejected){
-          if(this._hasListeners(will.type))
-            this._emitSafe(will);
-
-          var result = will.isCanceled ? ActionResult.reject(will.cancelReason) : coreAction.call(this, will);
-
-          if(result.error) {
-            if(this._hasListeners(Rejected.type)) {
-              this._emitSafe(new Rejected(this, result.error, will));
-            }
-          } else {
-            if(this._hasListeners(Did.type)){
-              this._emitSafe(new Did(this, result.value, will));
-            }
-          }
-          return result;
-        },
-
-        /**
-         * Sets the value of a property and returns a [result]{@link pentaho.lang.ActionResult} object.
-         *
-         * This method is supposed to set the value of a property, trigger event loops and return a result.
-         * Currently, the "did:change:selectionFilter" is always triggered.
-         *
-         * @param {nonEmptyString} property - Name of the property to set.
-         * @param {*} value - Value to assign to the property.
-         * @return {pentaho.lang.ActionResult} The result object.
-         * @private
-         */
-        _setAction: function(property, value){
-          var result;
-          try {
-            this.set(property, value);
-            result = ActionResult.fulfill(value);
-            // Currently this method is only used for selectionFilter
-            if(this._hasListeners(DidChangeSelection.type)) {
-              this._emitSafe(new DidChangeSelection(this, result.value, new WillChangeSelection(this, {})));
-            }
-          } catch(e) {
-            result = ActionResult.reject(e);
-          }
-          return result;
+          return this.set("selectionFilter", newSelectionFilter); //setting to null assigns the default value
         },
 
         /**
          * Executes an action when the user interacts with a visual element, normally by double clicking it.
          *
-         * The flow starts by triggering the event {@link pentaho.visual.base.events.WillExecute|will:execute}.
+         * The flow starts by emitting the event {@link pentaho.visual.base.events.WillExecute|"will:execute"}.
          * Its event listeners can be attributed a _priority_
          * and can be regarded as operations in a processing pipeline that are allowed to:
          * - cancel the event
          * - replace the input data filter
          * - change the [doExecute]{@link pentaho.visual.base.Model.Meta} action
          *
-         * Any failure (due to an event cancellation or due to an invalid `doExecute` action)
-         * triggers the event {@link pentaho.visual.base.events.RejectedSelect|rejected:execute}.
+         * Any rejection (due to an event cancellation or due to an invalid `doExecute` action)
+         * emits the event {@link pentaho.visual.base.events.RejectedSelect|"rejected:execute"}.
          *
          * @param {!pentaho.data.filter.AbstractFilter} inputDataFilter - A filter representing the data set of
          * the visual element which the user interacted with.
@@ -240,6 +180,34 @@ define([
             return ActionResult.reject(e);
           }
           return result && result.isRejected ? result : ActionResult.fulfill();
+        },
+
+        /**
+         * Executes the will/did/rejected event loop associated with a given action.
+         *
+         * @param {function} coreAction - The action to be executed.
+         * @param {pentaho.visual.base.events.Will} willEvent - The "will:" event object.
+         * @param {function} DidEvent - The constructor of the "did:" event.
+         * @param {function} RejectedEvent - The constructor of the "rejected:" event.
+         * @return {pentaho.lang.ActionResult} The result object.
+         * @protected
+         */
+        _doAction: function(coreAction, willEvent, DidEvent, RejectedEvent) {
+          if(this._hasListeners(willEvent.type))
+            this._emitSafe(willEvent);
+
+          var result = willEvent.isCanceled ? ActionResult.reject(willEvent.cancelReason) : coreAction.call(this, willEvent);
+
+          if(result.error) {
+            if(this._hasListeners(RejectedEvent.type)) {
+              this._emitSafe(new RejectedEvent(this, result.error, willEvent));
+            }
+          } else {
+            if(this._hasListeners(DidEvent.type)) {
+              this._emitSafe(new DidEvent(this, result.value, willEvent));
+            }
+          }
+          return result;
         },
         //endregion
 
@@ -296,7 +264,6 @@ define([
           ]
         }
       })
-      .implement(EventSource)
       .implement({type: bundle.structured});
 
     return Model;

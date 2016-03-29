@@ -14,37 +14,49 @@
  * limitations under the License.
  */
 define([
-  "./did",
+  "pentaho/lang/Event",
   "../mixins/mixinDataFilter",
-    "pentaho/util/error"
-], function(did, mixinDataFilter, error) {
+  "pentaho/util/error"
+], function(Event, mixinDataFilter, error) {
   "use strict";
 
   /**
    * @name DidExecute
    * @memberOf pentaho.visual.base.events
-   * @description This event is triggered when
+   * @class
+   * @extends pentaho.lang.Event
+   * @mixes pentaho.visual.base.mixins.mixinDataFilter
+   *
+   * @classDesc This event is triggered when
    * the {@link pentaho.visual.base.Model#executeAction|Execute Action} flow ends without any failures.
    *
-   * @extends pentaho.visual.base.events.Did
-   * @event "did:execute"
+   * @constructor
+   * @description Creates a `DidExecute` event.
+   *
+   * @param {!pentaho.visual.base.Model} source - The model object which is emitting the event.
+   * @param {?Object} value - The value of a fulfilled {@link pentaho.lang.ActionResult|ActionResult}.
+   * @param {pentaho.visual.base.events.WillSelect} will - The "will:execute" event object.
    */
-  return did("execute").extend("pentaho.visual.base.events.DidExecute",
-      /** @lends pentaho.visual.base.events.DidExecute# */{
+  return Event.extend("pentaho.visual.base.events.DidExecute",
+    /** @lends pentaho.visual.base.events.DidExecute# */{
 
-      /**
-       * Creates a `DidExecute` event.
-       *
-       * @constructor
-       * @param {!Object} source - The object where the event will be initially emitted.
-       * @param {?Object} value - The value of a fulfilled {@link pentaho.lang.ActionResult|ActionResult}.
-       * @param {pentaho.visual.base.events.WillSelect} will - The "will:execute" event object.
-       */
       constructor: function(source, value, will) {
         if(!will) throw error.argRequired("will");
 
-        this.base(source, value);
+        this.base("did:execute", source, false);
+        this.value = value;
         this._initFilter(will.dataFilter, false);
+      }
+    }, /** @lends pentaho.visual.base.events.DidExecute */{
+
+      /**
+       * Gets the event type.
+       *
+       * @type string
+       * @readonly
+       */
+      get type() {
+        return "did:execute";
       }
     })
     .implement(mixinDataFilter);

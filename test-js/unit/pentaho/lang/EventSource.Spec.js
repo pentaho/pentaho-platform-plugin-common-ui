@@ -568,23 +568,27 @@ define([
         spyOn(console, 'log');
       });
 
-      it("should return null when no parameters provided.", function() {
-        expect(eventSource._emitSafe()).toBe(null);
+      it("should throw an error when no parameters provided.", function() {
+        expect(function() {
+          eventSource._emitSafe();
+        }).toThrow(errorMatch.argRequired("event"));
 
-        expect(eventSource._emitSafe(null)).toBe(null);
+        expect(function() {
+          eventSource._emitSafe(null);
+        }).toThrow(errorMatch.argRequired("event"));
 
-        expect(eventSource._emitSafe(undefined)).toBe(null);
-
-        expect(console.log).toHaveBeenCalledTimes(3);
+        expect(function() {
+          eventSource._emitSafe(undefined);
+        }).toThrow(errorMatch.argRequired("event"));
       });
 
-      it("should return null when the argument is of an invalid type.", function() {
-        expect(eventSource._emitSafe({})).toBe(null);
-
-        expect(console.log).toHaveBeenCalledTimes(1);
+      it("should throw an error when the argument is of an invalid type.", function() {
+        expect(function() {
+          eventSource._emitSafe({});
+        }).toThrow(errorMatch.argInvalidType("event", "pentaho.type.Event"));
       });
 
-      it("should interrupt the event being processed and return null if a listener throws an exception.", function() {
+      it("should not interrupt the event being processed nor return null if a listener throws an exception.", function() {
         var listeners = {
           firstAndThrow: function() {
             throw new Error("Stirb!");
@@ -598,14 +602,14 @@ define([
         eventSource.on("foo", listeners.firstAndThrow);
         eventSource.on("foo", listeners.second);
 
-        expect(eventSource._emitSafe(event)).toBe(null);
+        expect(eventSource._emitSafe(event)).not.toBeNull();
 
-        expect(listeners.second).not.toHaveBeenCalled();
+        expect(listeners.second).toHaveBeenCalled();
 
         expect(console.log).toHaveBeenCalledTimes(1);
       });
 
-    }); // #_emit
+    }); // #_emitSafe
 
   }); // #pentaho.lang.EventSource
 });

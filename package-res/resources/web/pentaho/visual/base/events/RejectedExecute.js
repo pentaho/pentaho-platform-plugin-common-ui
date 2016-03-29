@@ -14,46 +14,60 @@
  * limitations under the License.
  */
 define([
-  "./rejected",
+  "pentaho/lang/Event",
   "../mixins/mixinDataFilter",
-    "pentaho/util/error"
-], function(rejected, mixinDataFilter, utilError) {
+  "pentaho/type/mixins/mixinError",
+  "pentaho/util/error"
+], function(Event, mixinDataFilter, mixinError, utilError) {
   "use strict";
 
   /**
    * @name RejectedExecute
    * @memberOf pentaho.visual.base.events
-   * @description This event is triggered when any failure occurs while inside
+   * @class
+   * @extends pentaho.lang.Event
+   * @mixes pentaho.type.mixins.mixinError
+   *
+   * @classDesc This event is triggered when any rejection occurs while inside
    * the {@link pentaho.visual.base.Model#executeAction|Execute Action} flow.
    *
-   * Those failures can be one of the following:
+   * That rejection can be one of the following:
    *  - The event {@link pentaho.visual.events.WillExecute|"will:execute"} was canceled.
    *  - The `doExecute` action was {@link Nully}.
    *  - The `doExecute` action failed while executing.
    *
-   * @extends pentaho.visual.base.events.Rejected
-   * @event "rejected:execute"
+   *
+   * @constructor
+   * @description Creates a `RejectedExecute` event.
+   *
+   * @param {!pentaho.visual.base.Model} source - The model object which is emitting the event.
+   * @param {!Error|pentaho.lang.UserError} error - The error of a rejected {@link pentaho.lang.ActionResult|ActionResult}.
+   * @param {?pentaho.visual.base.events.WillSelect} will - The "will:execute" event object.
    */
-  return rejected("execute").extend("pentaho.visual.base.events.RejectedExecute",
+  return Event.extend("pentaho.visual.base.events.RejectedExecute",
     /** @lends pentaho.visual.base.events.RejectedExecute# */{
 
       /**
-       * Creates a `RejectedExecute` event.
-       *
-       * @constructor
-       *
-       * @param {!Object} source - The object where the event will be initially emitted.
-       * @param {!Error|pentaho.lang.UserError} error - The error of a rejected {@link pentaho.lang.ActionResult|ActionResult}.
-       * @param {?pentaho.visual.base.events.WillSelect} will - The "will:execute" event object.
        */
       constructor: function(source, error, will) {
-        this.base(source, error);
-
         if(!will) throw utilError.argRequired("will");
 
+        this.base("rejected:execute", source, false);
         this._initFilter(will.dataFilter, false);
+        this._initError(error);
       }
-    })
-    .implement(mixinDataFilter);
+    }, /** @lends pentaho.visual.base.events.RejectedExecute */{
+
+      /**
+       * Gets the event type.
+       *
+       * @type string
+       * @readonly
+       */
+      get type() {
+        return "rejected:execute";
+      }
+    }).implement(mixinDataFilter)
+      .implement(mixinError);
 
 });

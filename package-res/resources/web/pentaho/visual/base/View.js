@@ -107,8 +107,6 @@ define([
 
     /**
      * Called before the visualization is discarded.
-     *
-     * @overridable
      */
     dispose: function() {
       this._element = null;
@@ -122,11 +120,14 @@ define([
      * such as setting up event listeners.
      *
      * @protected
-     * @overridable
      */
     _init: function() {
-      this.model.on("did:change:selectionFilter", this._selectionChanged.bind(this));
-      //this.model.on("change", this._onChange);
+      this.model.on("did:change", (
+          function(event){
+            this._onChange(event.changeset);
+          }
+        ).bind(this)
+      );
     },
 
     /**
@@ -137,7 +138,6 @@ define([
      *
      * @return {?Array.<!Error>} A non-empty array of `Error` or `null`.
      * @protected
-     * @overridable
      */
     _validate: function() {
       var validationErrors = this.model.validate();
@@ -160,13 +160,13 @@ define([
     /**
      * Renders the visualization.
      *
-     * Subclasses of `pentaho.visual.base.View` should override this method
+     * Subclasses of `pentaho.visual.base.View` must override this method
      * and implement a complete rendering of the visualization.
      *
      * @protected
-     * @overridable
+     * @abstract
      */
-    _render: function() {
+    _render: /* istanbul ignore next: placeholder method */ function() {
       throw error.notImplemented("_render");
     },
 
@@ -179,9 +179,8 @@ define([
      * By default, this method invokes [_render]{@link pentaho.visual.base.View#_render}.
      *
      * @protected
-     * @overridable
      */
-    _resize: function() {
+    _resize: /* istanbul ignore next: placeholder method */ function() {
       this._render();
     },
 
@@ -195,9 +194,8 @@ define([
      * By default, this method invokes [_render]{@link pentaho.visual.base.View#_render}.
      *
      * @protected
-     * @overridable
      */
-    _selectionChanged: function() {
+    _selectionChanged: /* istanbul ignore next: placeholder method */ function(newSelectionFilter, previousSelectionFilter) {
       this._render();
     },
 
@@ -205,24 +203,46 @@ define([
      * Decides how the visualization should react
      * to a modification of its properties.
      *
-     * Subclasses of `pentaho.visual.base.View` are expected to override this method
-     * with an implementation that
-     * selects the cheapest reaction to a generic change of properties.
-     * By default, this method invokes [_render]{@link pentaho.visual.base.View#_render},
-     * but the developer should also consider invoking
-     * [_resize]{@link pentaho.visual.base.View#_resize} or
-     * [_selectionChanged]{@link pentaho.visual.base.View#_selectionChanged}.
+     * By default, this method selects the cheapest reaction to a change of properties.
+     * It invokes:
+     * - [_resize]{@link pentaho.visual.base.View#_resize} when either of the properties
+     * [width]{@link pentaho.visual.base.Model.Type#width} or
+     * [height]{@link pentaho.visual.base.Model.Type#height} change,
+     * - [_selectionChanged]{@link pentaho.visual.base.View#_selectionChanged} when the property
+     * [selectionFilter]{@link pentaho.visual.base.Model.Type#selectionFilter} changes
+     * - [_render]{@link pentaho.visual.base.View#_render} when any other property changes.
      *
-     * @see pentaho.visual.base.View#_render
+     * Subclasses of `pentaho.visual.base.View` can override this method to
+     * extend the set of fast render methods.
+     *
      * @see pentaho.visual.base.View#_resize
      * @see pentaho.visual.base.View#_selectionChanged
+     * @see pentaho.visual.base.View#_render
      *
-     * @param {Object} changeMap - Map of the properties that have changed.
+     * @param {!pentaho.type.Changeset} changeset - Map of the properties that have changed.
+     *
      * @protected
-     * @overridable
      */
-    _onChange: function(changeMap) {
-      this._render();
+    _onChange: function(changeset) {
+      var exclusionList = {
+        width: true,
+        height: true,
+        selectionMode: true, // never has a direct visual impact
+        selectionFilter: true
+      };
+      var fullUpdate = changeset.propertyNames.some(function(prop){
+        return !exclusionList[prop];
+      });
+      if(fullUpdate) return this.render();
+
+      var updateSelection = changeset.has("selectionFilter");
+      if(updateSelection){
+        var selectionFilterChange = changeset.getChange("selectionFilter");
+        this._selectionChanged(selectionFilterChange.newValue.value, selectionFilterChange.oldValue.value);
+      }
+
+      var updateSize = changeset.has("width") || changeset.has("height");
+      if(updateSize) this._resize();
     }
   });
 

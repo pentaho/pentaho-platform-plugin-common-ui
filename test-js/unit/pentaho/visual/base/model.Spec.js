@@ -120,7 +120,7 @@ define([
               model.on("did:select", listeners.didSelect);
               model.on("rejected:select", listeners.rejectedSelect);
 
-              model.on("did:change:selectionFilter", listeners.didChangeSelection);
+              model.on("did:change", listeners.didChangeSelection);
 
               model.selectAction(newSelection);
             });
@@ -163,7 +163,7 @@ define([
               model.on("did:select", listeners.didSelect);
               model.on("rejected:select", listeners.rejectedSelect);
 
-              model.on("did:change:selectionFilter", listeners.didChangeSelection);
+              model.on("did:change", listeners.didChangeSelection);
 
               model.selectAction(newSelection, {selectionMode: selectionMode});
             });
@@ -204,7 +204,7 @@ define([
               model.on("did:select", listeners.didSelect);
               model.on("rejected:select", listeners.rejectedSelect);
 
-              model.on("did:change:selectionFilter", listeners.didChangeSelection);
+              model.on("did:change", listeners.didChangeSelection);
 
               model.selectAction(newSelection, {selectionMode: selectionMode});
             });
@@ -247,7 +247,7 @@ define([
               model.on("did:select", listeners.didSelect);
               model.on("rejected:select", listeners.rejectedSelect);
 
-              model.on("did:change:selectionFilter", listeners.didChangeSelection);
+              model.on("did:change", listeners.didChangeSelection);
 
               model.selectAction(newSelection);
             });
@@ -290,7 +290,7 @@ define([
                   model.on("did:select", listeners.didSelect);
                   model.on("rejected:select", listeners.rejectedSelect);
 
-                  model.on("did:change:selectionFilter", listeners.didChangeSelection);
+                  model.on("did:change", listeners.didChangeSelection);
 
                   model.selectAction(newSelection, {selectionMode: selectionMode});
                 });
@@ -339,7 +339,7 @@ define([
               model.on("did:select", listeners.didSelect);
               model.on("rejected:select", listeners.rejectedSelect);
 
-              model.on("did:change:selectionFilter", listeners.didChangeSelection);
+              model.on("did:change", listeners.didChangeSelection);
 
               model.selectAction(newSelection, {selectionMode: selectionMode});
             });
@@ -348,11 +348,11 @@ define([
               expect(selectionMode).toHaveBeenCalled();
             });
 
-            it("should call the first will select listener", function() {
+            it("should call the first will:select listener", function() {
               expect(listeners.willSelect).toHaveBeenCalled();
             });
 
-            xit("should call the second will select listener", function() {
+            it("should call the second will:select listener", function() {
               expect(listeners.willSelectSecond).toHaveBeenCalled();
             });
 
@@ -381,7 +381,7 @@ define([
               model.on("did:select", listeners.didSelect);
               model.on("rejected:select", listeners.rejectedSelect);
 
-              model.on("did:change:selectionFilter", listeners.didChangeSelection);
+              model.on("did:change", listeners.didChangeSelection);
 
               model.selectAction(newSelection, {selectionMode: selectionMode});
             });
@@ -635,19 +635,19 @@ define([
               expect(doExecute).toHaveBeenCalled();
             });
 
-            it("should call the first will execute listener", function() {
+            it("should call the first 'will:execute' listener", function() {
               expect(listeners.willExecute).toHaveBeenCalled();
             });
 
-            xit("should call the second will execute listener", function() {
+            it("should call the second 'will:execute' listener", function() {
               expect(listeners.willExecuteSecond).toHaveBeenCalled();
             });
 
-            it("should call the did execute listener", function() {
+            it("should call the 'did:execute' listener", function() {
               expect(listeners.didExecute).toHaveBeenCalled();
             });
 
-            it("should not call the rejected execute listener", function() {
+            it("should not call the 'rejected:execute' listener", function() {
               expect(listeners.rejectedExecute).not.toHaveBeenCalled();
             });
           });

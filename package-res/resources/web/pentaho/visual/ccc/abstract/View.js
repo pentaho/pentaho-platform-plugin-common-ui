@@ -194,7 +194,7 @@ define([
       this._renderCore();
     },
 
-    /** @override VizAPI */
+    /** @inheritdoc */
     _resize: function() {
       // Resize event throttling
       if(this._lastResizeTimeout != null)
@@ -206,7 +206,7 @@ define([
       }.bind(this), 50);
     },
 
-    /** @override VizAPI */
+    /** @inheritdoc */
     dispose: function() {
 
       this.base();
@@ -220,8 +220,9 @@ define([
 
     //region Helpers
 
-    _selectionChanged: function() {
-      var dataFilter = this.model.getv("selectionFilter") || new filter.Or();
+    /** @inheritdoc */
+    _selectionChanged: function(newSelectionFilter, previousSelectionFilter) {
+      var dataFilter = newSelectionFilter; // || this.model.getv("selectionFilter") || new filter.Or();
       var selectedItems = dataFilter.apply(this.model.getv("data"));
 
       // Get information on the axes
@@ -1304,13 +1305,17 @@ define([
 
     _onUserSelection: function(selectingDatums) {
        // Duplicates may occur due to excluded dimensions like the discriminator
+
+      var alreadyIn = {};
       var operands = selectingDatums.reduce(function(memo, datum) {
         if(!datum.isVirtual) {
           var operand = this._complexToFilter(datum);
 
-          // TODO:
           // Check if there's already a selection with the same key.
           // If not, add a new selection to the selections list.
+          var key = JSON.stringify(operand.toSpec()); // TODO: improve key
+          if(alreadyIn[key]) return memo;
+          alreadyIn[key] = true;
 
           if(operand) memo.push(operand);
         }

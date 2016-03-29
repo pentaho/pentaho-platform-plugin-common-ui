@@ -14,45 +14,59 @@
  * limitations under the License.
  */
 define([
-  "./rejected",
+  "pentaho/lang/Event",
   "../mixins/mixinDataFilter",
+  "pentaho/type/mixins/mixinError",
   "pentaho/util/error"
-], function(rejected, mixinDataFilter, utilError) {
+], function(Event, mixinDataFilter, mixinError, utilError) {
   "use strict";
 
   /**
    * @name RejectedSelect
    * @memberOf pentaho.visual.base.events
-   * @description This event is triggered when any failure occurs while inside
+   * @class
+   * @extends pentaho.lang.Event
+   * @mixes pentaho.type.mixins.mixinError
+   * @mixes pentaho.visual.base.mixins.mixinDataFilter
+   *
+   * @classDesc This event is triggered when a rejection occurs while inside
    * the {@link pentaho.visual.base.Model#selectAction|Select Action} flow.
    *
-   * Those failures can be one of the following:
+   * That rejection can be one of the following:
    *  - The event {@link pentaho.visual.events.WillSelect|"will:select"} was canceled.
    *  - The selection mode was invalid.
    *
-   * @extends pentaho.visual.base.events.Rejected
-   * @event "rejected:select"
+   * @constructor
+   * @description Creates a `RejectedSelect` event.
+   *
+   * @param {!pentaho.visual.base.Model} source - The model object which is emitting the event.
+   * @param {!Error|pentaho.lang.UserError} error - The error of a rejected {@link pentaho.lang.ActionResult|ActionResult}.
+   * @param {?pentaho.visual.base.events.WillSelect} will - The "will:select" event object.
    */
-  return rejected("select").extend("pentaho.visual.base.events.RejectedSelect",
+  return Event.extend("pentaho.visual.base.events.RejectedSelect",
     /** @lends pentaho.visual.base.events.RejectedSelect# */{
 
       /**
-       * Creates a base `RejectedSelection` event.
-       *
-       * @constructor
-       *
-       * @param {!Object} source - The object where the event will be initially emitted.
-       * @param {!Error|pentaho.lang.UserError} error - The error of a rejected {@link pentaho.lang.ActionResult|ActionResult}.
-       * @param {?pentaho.visual.base.events.WillSelect} will - The "will:select" event object.
-       */
+        */
       constructor: function(source, error, will) {
-        this.base(source, error);
-
         if(!will) throw utilError.argRequired("will");
 
+        this.base("rejected:select", source, false);
         this._initFilter(will.dataFilter, false);
+        this._initError(error);
       }
-    })
-    .implement(mixinDataFilter);
+    }, /** @lends pentaho.visual.base.events.RejectedSelect */{
+
+      /**
+       * Gets the event type.
+       *
+       * @type string
+       * @readonly
+       */
+      get type() {
+        return "rejected:select";
+      }
+    }).implement(mixinDataFilter)
+      .implement(mixinError);
 
 });

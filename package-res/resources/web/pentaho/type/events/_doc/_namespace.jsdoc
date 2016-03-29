@@ -13,16 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define([
-  "./RejectedSelect"
-], function(RejectedSelect) {
-  "use strict";
 
-  return RejectedSelect.extend("pentaho.visual.base.events.RejectedChangeSelection",
-    /** @lends pentaho.visual.base.events.RejectedChangeSelection# */{}, {
-      get type(){
-        return "rejected:change:selectionFilter";
-      }
-    });
-
-});
+/**
+ * The `event` namespace contains classes for events.
+ *
+ * @name pentaho.type.events
+ * @namespace
+ */

@@ -15,45 +15,46 @@
  */
 define([
   "pentaho/lang/Event",
-  "pentaho/visual/base/events/will"
-], function(Event, will) {
+  "pentaho/type/events/DidChange",
+  "tests/pentaho/util/errorMatch"
+], function(Event, DidChange, errorMatch) {
   "use strict";
 
   /* global describe:false, it:false, expect:false, beforeEach:false */
 
-  describe("pentaho.visual.base.events.will -", function() {
-    var type = "Test";
-    var WillTestEvent;
-
-    beforeEach(function() {
-      WillTestEvent = will(type);
-    });
+  describe("pentaho.type.events.DidChange -", function() {
 
     it("should extend Event", function() {
-      expect(WillTestEvent.prototype instanceof Event).toBe(true);
-    });
-
-    it("static property type should return full type name", function() {
-      expect(WillTestEvent.type).toBe("will:" + type);
-    });
-
-    it("static property type should be read-only", function() {
-      expect(function() {
-        WillTestEvent.type = "New Name";
-      }).toThrowError(TypeError);
+      expect(DidChange.prototype instanceof Event).toBe(true);
     });
 
     describe("instances -", function() {
       var event;
 
+      var changeset = { mock: "I am a mock" };
+
       beforeEach(function() {
-        event = new WillTestEvent({});
+        event = new DidChange({}, changeset);
       });
 
       it("should extend Event", function() {
         expect(event instanceof Event).toBe(true);
       });
+
+      it("changeset property should be the same than received in the constructor", function() {
+        expect(event.changeset).toBe(changeset);
+      });
+
+      it("DidChange events should not be cancelable", function() {
+        expect(event.isCancelable).toBe(false);
+      });
+
+      it("changeset property should be immutable", function() {
+        expect(function() {
+          event.changeset = "other";
+        }).toThrowError(TypeError);
+      });
     });
 
-  }); // #pentaho.visual.base.eventswill
+  }); // #pentaho.lang.events.DidChange
 });

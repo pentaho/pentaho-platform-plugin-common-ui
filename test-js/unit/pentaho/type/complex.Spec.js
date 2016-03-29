@@ -437,6 +437,84 @@ define([
             derived.set("y", "1");
           }).toThrow(errorMatch.argInvalid("name"));
         });
+
+        describe("events -", function() {
+          var listeners, complex;
+          var THREE = 3,
+            Derived = Complex.extend({
+              type: {props: [{name: "x", type: "number"}]}
+            });
+          beforeEach(function() {
+            listeners = jasmine.createSpyObj("listeners", [
+              "will", "did", "rejected"
+            ]);
+
+            listeners.will.and.callFake(function(event) {
+              if(event.changeset.getChange("x").newValue.valueOf() === THREE) event.cancel();
+            });
+
+            complex = new Derived({x: 0});
+          });
+
+
+          describe("Without listeners -", function() {
+            it("should not call _emitSafe.", function() {
+              spyOn(complex, "_emitSafe");
+
+              complex.set("x", 1);
+              expect(complex._emitSafe).not.toHaveBeenCalled();
+            });
+          }); //end without listeners
+
+          describe("With listeners -", function() {
+            beforeEach(function() {
+              complex.on("will:change", listeners.will);
+              complex.on("rejected:change", listeners.rejected);
+              complex.on("did:change", listeners.did);
+            });
+
+            it("should call the will change listener", function() {
+              complex.set("x", 1);
+              expect(listeners.will).toHaveBeenCalled();
+            });
+
+            it("when successful, should call the did change listener", function() {
+              complex.set("x", 1);
+              expect(listeners.did).toHaveBeenCalled();
+              expect(listeners.rejected).not.toHaveBeenCalled();
+              expect(complex.getv("x")).toBe(1);
+            });
+
+            it("when unsuccessful, should call the rejected change listener", function() {
+              complex.set("x", THREE);
+              expect(listeners.did).not.toHaveBeenCalled();
+              expect(listeners.rejected).toHaveBeenCalled();
+              expect(complex.getv("x")).toBe(0);
+            });
+
+            it("changeset should be frozen on the `did:change` event", function() {
+              listeners.did.and.callFake(function(event) {
+                expect(event.changeset).toBeDefined();
+
+                event.changeset.set("x", 2);
+                expect(event.changeset.getChange("x").newValue.value).toBe(1);
+              });
+
+              complex.set("x", 1);
+            });
+
+            it("changeset should be frozen on the `rejected:change` event", function() {
+              listeners.rejected.and.callFake(function(event) {
+                expect(event.changeset).toBeDefined();
+
+                event.changeset.set("x", 2);
+                expect(event.changeset.getChange("x").newValue.value).toBe(1);
+              });
+
+              complex.set("x", 3);
+            });
+          }); //end with listeners
+        });
       }); // end set
 
       describe("#path(steps[, sloppy])", function() {

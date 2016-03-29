@@ -14,39 +14,51 @@
  * limitations under the License.
  */
 define([
-  "./did",
+  "pentaho/lang/Event",
   "../mixins/mixinDataFilter",
   "pentaho/util/error"
-], function(did, mixinDataFilter, error) {
+], function(Event, mixinDataFilter, error) {
   "use strict";
 
   /**
    * @name DidSelect
    * @memberOf pentaho.visual.base.events
-   * @description This event is triggered when
+   * @class
+   * @extends pentaho.lang.Event
+   * @mixes pentaho.visual.base.mixins.mixinDataFilter
+   *
+   * @classDesc This event is triggered when
    * the {@link pentaho.visual.base.Model#selectAction|Select Action} flow ends without any failures.
    *
-   * @extends pentaho.visual.base.events.Did
-   * @event "did:select"
+   * @constructor
+   * @description Creates a `DidSelect` event.
+   *
+   * @param {!pentaho.visual.base.Model} source - The model object which is emitting the event.
+   * @param {?Object} value - The value of a fulfilled {@link pentaho.lang.ActionResult|ActionResult}.
+   * @param {pentaho.visual.base.events.WillSelect} will - The "will:select" event object.
    */
-  return did("select").extend("pentaho.visual.base.events.DidSelect",
+  return Event.extend("pentaho.visual.base.events.DidSelect",
     /** @lends pentaho.visual.base.events.DidSelect# */{
 
-      /**
-       * Creates a `DidSelect` event.
-       *
-       * @constructor
-       *
-       * @param {!Object} source - The object where the event will be initially emitted.
-       * @param {?Object} value - The value of a fulfilled {@link pentaho.lang.ActionResult|ActionResult}.
-       * @param {pentaho.visual.base.events.WillSelect} will - The "will:select" event object.
-       */
       constructor: function(source, value, will) {
         if(!will) throw error.argRequired("will");
 
-        this.base(source, value);
+        this.base("did:select", source, false);
+        this.value = value;
         this._initFilter(will.dataFilter, false);
+      }
+    }, /** @lends pentaho.visual.base.events.DidSelect */{
+
+      /**
+       * Gets the event type.
+       *
+       * @type string
+       * @readonly
+       */
+      get type() {
+        return "did:select";
       }
     })
     .implement(mixinDataFilter);
+
 });
