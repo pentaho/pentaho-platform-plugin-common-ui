@@ -359,6 +359,7 @@ define([
             //TODO: add operation to changeset
             changeset = new ComplexChangeset(this);
             //changeset._setListChange(name, value0, valueSpec);
+            changeset.set(name, null); // TODO: remove. Added for demo purposes of BACKLOG-6739
 
           } else {
             var value1 = pType.toValue(valueSpec);
@@ -390,6 +391,7 @@ define([
          */
         _change: function(changeset) {
           var executionError = this._changeWill(changeset);
+          changeset.freeze();
           if(executionError) {
             this._changeRejected(changeset, executionError);
             return executionError;
@@ -415,7 +417,6 @@ define([
          * @ignore
          */
         _changeDo: function(changeset) {
-          Object.freeze(changeset);
 
           var propertyNames = changeset.propertyNames;
 
@@ -428,7 +429,7 @@ define([
               //TODO: look for reasons why a property that is a list could cancel the whole changeset
             } else {
               var currentValue = this._values[name];
-              var oldValue = changeset.get(name).oldValue;
+              var oldValue = changeset.getChange(name).oldValue;
               if(!pType.type.areEqual(currentValue, oldValue))
                 return error.argRange("changeset"); //Mismatching values
             }
@@ -442,7 +443,7 @@ define([
               //TODO: handle the changes on a list property in a later story
             } else {
               var value0 = this._values[pType.name];
-              var value1 = pType.toValue(changeset.get(name).newValue);
+              var value1 = pType.toValue(changeset.getChange(name).newValue);
               //TODO: confirm if it's worth having this if (setting a property isn't that expensive)
               if(!pType.type.areEqual(value0, value1)) {
                 this._values[name] = value1;

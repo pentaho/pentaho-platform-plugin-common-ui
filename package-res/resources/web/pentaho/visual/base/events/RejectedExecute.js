@@ -31,7 +31,7 @@ define([
    * @classDesc This event is triggered when any rejection occurs while inside
    * the {@link pentaho.visual.base.Model#executeAction|Execute Action} flow.
    *
-   * Thatrejection can be one of the following:
+   * That rejection can be one of the following:
    *  - The event {@link pentaho.visual.events.WillExecute|"will:execute"} was canceled.
    *  - The `doExecute` action was {@link Nully}.
    *  - The `doExecute` action failed while executing.

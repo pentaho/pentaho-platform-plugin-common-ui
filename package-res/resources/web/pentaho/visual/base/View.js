@@ -206,10 +206,10 @@ define([
      * By default, this method selects the cheapest reaction to a change of properties.
      * It invokes:
      * - [_resize]{@link pentaho.visual.base.View#_resize} when either of the properties
-     * [width]{{@link pentaho.visual.base.Model.Type#width} or
-     * [height]{{@link pentaho.visual.base.Model.Type#height} change,
+     * [width]{@link pentaho.visual.base.Model.Type#width} or
+     * [height]{@link pentaho.visual.base.Model.Type#height} change,
      * - [_selectionChanged]{@link pentaho.visual.base.View#_selectionChanged} when the property
-     * [selectionFilter]{{@link pentaho.visual.base.Model.Type#selectionFilter} changes
+     * [selectionFilter]{@link pentaho.visual.base.Model.Type#selectionFilter} changes
      * - [_render]{@link pentaho.visual.base.View#_render} when any other property changes.
      *
      * Subclasses of `pentaho.visual.base.View` can override this method to
@@ -237,8 +237,8 @@ define([
 
       var updateSelection = changeset.has("selectionFilter");
       if(updateSelection){
-        var selectionFilter = changeset.get("selectionFilter");
-        this._selectionChanged(selectionFilter.newValue.value, selectionFilter.oldValue.value);
+        var selectionFilterChange = changeset.getChange("selectionFilter");
+        this._selectionChanged(selectionFilterChange.newValue.value, selectionFilterChange.oldValue.value);
       }
 
       var updateSize = changeset.has("width") || changeset.has("height");
