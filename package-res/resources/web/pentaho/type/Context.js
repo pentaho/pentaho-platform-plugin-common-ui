@@ -378,7 +378,7 @@ define([
      * @rejects {pentaho.lang.ArgumentInvalidError} When `typeRef` is, or contains, an array-shorthand,
      * list type specification that has more than one child element type specification.
      *
-     * @rejects {Error} Any other, unexpected error occurs.
+     * @rejects {Error} When any other, unexpected error occurs.
      */
     getAsync: function(typeRef) {
       try {
@@ -620,10 +620,8 @@ define([
         // Not present yet.
         var id = type.id;
         if(id) {
-          // TODO: configuration may need to subclass Type
-          // TODO: configuration is Type only?
+          // Configuration is for the type-constructor.
           var config = this._getConfig(id);
-          /* istanbul ignore if : until config is implemented */
           if(config) type.constructor.implement(config);
 
           this._byTypeId[id] = InstCtor;
@@ -699,39 +697,48 @@ define([
 
       // Because a base type is required (when null, it is defaulted)
       // this means that the generic object spec cannot represent the root of type hierarchies:
-      // Instance, Value or Property...
+      // Type, Value.Type or Property.Type
+
+      /*
+       *  id      | base       | result
+       *  --------+------------+------------------
+       *  "value" | null       :
+       *  "foo"   | -          : base <- "complex"
+       *  "foo"   | "notnull"  : ok
+       */
       var id = typeSpec.id;
       if(id) id = toAbsTypeId(id);
 
-      /*
-       *  id      | base       | Result
-       *  --------+------------+--------------------
-       *  "value" | falsy      : base <- null
-       *  "value" | "anything" : throw error
-       *  falsy   | null       : id   <- "value"
-       *  "foo"   | falsy      : base <- "complex"
-       *  "foo"   | "anything" : ok
-       */
       var baseTypeSpec = typeSpec.base;
-      if(baseTypeSpec === null) {
-        // must have no id or be "value"
-        if(id && id !== (_baseMid + "value"))
-          return this._error(
-              error.argInvalid("typeRef", "A type with a `null` base must be the root type `Value`."), sync);
 
-        id = "value";
-        // Already loaded, in constructor.
+      if(id && id === (_baseMid + "value")) {
+        // The "value" type is already loaded.
+        // Will return in the first if below.
+
+        if(baseTypeSpec) {
+          return this._error(
+              error.argInvalid("typeRef", "The root type `Value` must have a `null` base."),
+              sync);
+        }
+
+        baseTypeSpec = null;
+
       } else if(!baseTypeSpec) {
+        if(baseTypeSpec === null) {
+          return this._error(
+              error.argInvalid("typeRef", "Only the root type `Value` can have a `null` base."),
+              sync);
+        }
+
         baseTypeSpec = _defaultBaseTypeMid;
       }
 
       var InstCtor;
-      // Already loaded?
-      if(id && (InstCtor = O.getOwn(this._byTypeId, id))) {
-        // TODO: Is this the best approach?
-        // Even for standard types?
-        InstCtor.implement(typeSpec);
 
+      // Already loaded?
+      // id ~ "value" goes here.
+      if(id && (InstCtor = O.getOwn(this._byTypeId, id))) {
+        // Keep initial specification. Ignore new one.
         return this._return(InstCtor, sync);
       }
 

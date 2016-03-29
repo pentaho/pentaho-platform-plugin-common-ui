@@ -26,11 +26,12 @@ define([
    * @name pentaho.util.arg
    * @namespace
    * @amd pentaho/util/arg
-   * @ignore
+   * @private
    */
   return /** @lends pentaho.util.arg */{
     /**
-     * Gets the value of an optional property of an object. The property is considered specified when its value is not a {@link Nully} value.
+     * Gets the value of an optional property of an object.
+     * The property is considered specified when its value is not a {@link Nully} value.
      * When the property is not specified, the value of `defaultValue` is returned. The latter defaults to `undefined`.
      *
      * @param {?object} obj The object from which to get a property.
@@ -45,7 +46,8 @@ define([
     },
 
     /**
-     * Gets the value of an defined property of an object. The property is considered specified when its value is not `undefined`.
+     * Gets the value of an defined property of an object.
+     * The property is considered specified when its value is not `undefined`.
      * When the property is not specified, the value of `defaultValue` is returned. The latter defaults to `undefined`.
      *
      * @param {?object} obj The object from which to get a property.
@@ -60,7 +62,8 @@ define([
     },
 
     /**
-     * Gets the value of an required property of an object. The property is considered specified when its value is not a {@link Nully} value.
+     * Gets the value of an required property of an object.
+     * The property is considered specified when its value is not a {@link Nully} value.
      *
      * @param {?object} obj The object from which to get a property.
      * @param {string} propName The name of the property.

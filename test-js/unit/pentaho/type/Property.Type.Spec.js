@@ -16,8 +16,9 @@
 define([
   "pentaho/type/Context",
   "pentaho/type/Property",
+  "./propertyTypeUtil",
   "tests/pentaho/util/errorMatch"
-], function(Context, Property, errorMatch) {
+], function(Context, Property, propertyTypeUtil, errorMatch) {
 
   "use strict";
 
@@ -40,19 +41,6 @@ define([
 
       var Derived;
 
-      function createRootPropType(typeSpec) {
-        return Property.extendProto(
-            null,
-            {
-              type: typeSpec
-            },
-            {
-              declaringType: Derived.type,
-              index: 1,
-              isRoot: true
-            }).type;
-      }
-
       beforeEach(function() {
         Derived = Complex.extend();
       });
@@ -61,7 +49,7 @@ define([
         var propType;
 
         beforeEach(function() {
-          propType = createRootPropType("fooBarGuru");
+          propType = propertyTypeUtil.createRoot(Derived.type, "fooBarGuru");
         });
 
         it("should build a property type object", function() {
@@ -106,7 +94,7 @@ define([
         var propType;
 
         beforeEach(function() {
-          propType = createRootPropType({name: "foo"});
+          propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo"});
         });
 
         it("should build a property type object", function() {
@@ -130,176 +118,176 @@ define([
       // TODO: unify with value tests
       describe("label - ", function() {
         it("should default to the capitalization of `name`", function() {
-          var propType = createRootPropType({name: "foo"});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo"});
           expect(propType.label).toBe("Foo");
         });
 
         it("should convert empty to default", function() {
-          var propType = createRootPropType({name: "foo", label: ""});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", label: ""});
           expect(propType.label).toBe("Foo");
         });
 
         it("should convert null to default", function() {
-          var propType = createRootPropType({name: "foo", label: null});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", label: null});
           expect(propType.label).toBe("Foo");
         });
 
         it("should convert undefined to default", function() {
-          var propType = createRootPropType({name: "foo", label: undefined});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", label: undefined});
           expect(propType.label).toBe("Foo");
         });
 
         it("should respect the specified value", function() {
-          var propType = createRootPropType({name: "foo", label: "MyFoo"});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", label: "MyFoo"});
           expect(propType.label).toBe("MyFoo");
         });
       }); // end label
 
       describe("description - ", function() {
         it("should default to null", function() {
-          var propType = createRootPropType({name: "foo1"});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo1"});
           expect(propType.description).toBe(null);
 
-          propType = createRootPropType({name: "foo2", description: undefined});
+          propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo2", description: undefined});
           expect(propType.description).toBe(null);
         });
 
         it("should convert empty to null", function() {
-          var propType = createRootPropType({name: "foo", description: ""});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", description: ""});
           expect(propType.description).toBe(null);
         });
 
         it("should respect null", function() {
-          var propType = createRootPropType({name: "foo", description: null});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", description: null});
           expect(propType.description).toBe(null);
         });
 
         it("should respect the specified value", function() {
-          var propType = createRootPropType({name: "foo", description: "MyFoo"});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", description: "MyFoo"});
           expect(propType.description).toBe("MyFoo");
         });
       }); // end description
 
       describe("category - ", function() {
         it("should default to null", function() {
-          var propType = createRootPropType({name: "foo1"});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo1"});
           expect(propType.category).toBe(null);
 
-          propType = createRootPropType({name: "foo2", category: undefined});
+          propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo2", category: undefined});
           expect(propType.category).toBe(null);
         });
 
         it("should convert empty to null", function() {
-          var propType = createRootPropType({name: "foo", category: ""});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", category: ""});
           expect(propType.category).toBe(null);
         });
 
         it("should respect null", function() {
-          var propType = createRootPropType({name: "foo", category: null});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", category: null});
           expect(propType.category).toBe(null);
         });
 
         it("should respect the specified value", function() {
-          var propType = createRootPropType({name: "foo", category: "MyFoo"});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", category: "MyFoo"});
           expect(propType.category).toBe("MyFoo");
         });
       }); // end category
 
       describe("helpUrl - ", function() {
         it("should default to null", function() {
-          var propType = createRootPropType({name: "foo1"});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo1"});
           expect(propType.helpUrl).toBe(null);
 
-          propType = createRootPropType({name: "foo2", helpUrl: undefined});
+          propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo2", helpUrl: undefined});
           expect(propType.helpUrl).toBe(null);
         });
 
         it("should convert empty to null", function() {
-          var propType = createRootPropType({name: "foo", helpUrl: ""});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", helpUrl: ""});
           expect(propType.helpUrl).toBe(null);
         });
 
         it("should respect null", function() {
-          var propType = createRootPropType({name: "foo", helpUrl: null});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", helpUrl: null});
           expect(propType.helpUrl).toBe(null);
         });
 
         it("should respect the specified value", function() {
-          var propType = createRootPropType({name: "foo", helpUrl: "MyFoo"});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", helpUrl: "MyFoo"});
           expect(propType.helpUrl).toBe("MyFoo");
         });
       }); // end helpUrl
 
       describe("isBrowsable - ", function() {
         it("should default to true", function() {
-          var propType = createRootPropType({name: "foo"});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo"});
           expect(propType.isBrowsable).toBe(true);
         });
 
         it("should convert undefined to default", function() {
-          var propType = createRootPropType({name: "foo", isBrowsable: undefined});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", isBrowsable: undefined});
           expect(propType.isBrowsable).toBe(true);
         });
 
         it("should convert null to default", function() {
-          var propType = createRootPropType({name: "foo", isBrowsable: null});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", isBrowsable: null});
           expect(propType.isBrowsable).toBe(true);
         });
 
         it("should cast other values to boolean", function() {
-          var propType = createRootPropType({name: "foo1", isBrowsable: 1});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo1", isBrowsable: 1});
           expect(propType.isBrowsable).toBe(true);
 
-          propType = createRootPropType({name: "foo2", isBrowsable: 0});
+          propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo2", isBrowsable: 0});
           expect(propType.isBrowsable).toBe(false);
 
-          propType = createRootPropType({name: "foo3", isBrowsable: ""});
+          propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo3", isBrowsable: ""});
           expect(propType.isBrowsable).toBe(false);
 
-          propType = createRootPropType({name: "foo4", isBrowsable: true});
+          propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo4", isBrowsable: true});
           expect(propType.isBrowsable).toBe(true);
 
-          propType = createRootPropType({name: "foo5", isBrowsable: "yes"});
+          propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo5", isBrowsable: "yes"});
           expect(propType.isBrowsable).toBe(true);
 
-          propType = createRootPropType({name: "foo6", isBrowsable: "no"});
+          propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo6", isBrowsable: "no"});
           expect(propType.isBrowsable).toBe(true);
         });
       }); // end isBrowsable
 
       describe("isAdvanced - ", function() {
         it("should default to false", function() {
-          var propType = createRootPropType({name: "foo"});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo"});
           expect(propType.isAdvanced).toBe(false);
         });
 
         it("should convert undefined to default", function() {
-          var propType = createRootPropType({name: "foo", isAdvanced: undefined});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", isAdvanced: undefined});
           expect(propType.isAdvanced).toBe(false);
         });
 
         it("should convert null to default", function() {
-          var propType = createRootPropType({name: "foo", isAdvanced: null});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", isAdvanced: null});
           expect(propType.isAdvanced).toBe(false);
         });
 
         it("should cast other values to boolean", function() {
-          var propType = createRootPropType({name: "foo1", isAdvanced: 1});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo1", isAdvanced: 1});
           expect(propType.isAdvanced).toBe(true);
 
-          propType = createRootPropType({name: "foo2", isAdvanced: 0});
+          propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo2", isAdvanced: 0});
           expect(propType.isAdvanced).toBe(false);
 
-          propType = createRootPropType({name: "foo3", isAdvanced: ""});
+          propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo3", isAdvanced: ""});
           expect(propType.isAdvanced).toBe(false);
 
-          propType = createRootPropType({name: "foo4", isAdvanced: true});
+          propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo4", isAdvanced: true});
           expect(propType.isAdvanced).toBe(true);
 
-          propType = createRootPropType({name: "foo5", isAdvanced: "yes"});
+          propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo5", isAdvanced: "yes"});
           expect(propType.isAdvanced).toBe(true);
 
-          propType = createRootPropType({name: "foo6", isAdvanced: "no"});
+          propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo6", isAdvanced: "no"});
           expect(propType.isAdvanced).toBe(true);
         });
       }); // end isAdvanced
@@ -311,7 +299,7 @@ define([
         it("should throw when spec is falsy", function() {
           function expectIt(name) {
             expect(function() {
-              createRootPropType({
+              propertyTypeUtil.createRoot(Derived.type, {
                 name: name,
                 type: "string"
               });
@@ -324,14 +312,14 @@ define([
 
           // name is absent
           expect(function() {
-            createRootPropType({
+            propertyTypeUtil.createRoot(Derived.type, {
               type: "string"
             });
           }).toThrow(errorMatch.argRequired("name"));
         });
 
         it("should respect a truthy spec value -", function() {
-          var propType = createRootPropType({
+          var propType = propertyTypeUtil.createRoot(Derived.type, {
             name: "fooBar",
             type: "string"
           });
@@ -340,7 +328,7 @@ define([
         });
 
         it("should throw when changed", function() {
-          var propType = createRootPropType({
+          var propType = propertyTypeUtil.createRoot(Derived.type, {
             name: "fooBar",
             type: "string"
           });
@@ -351,7 +339,7 @@ define([
         });
 
         it("should not throw when set but not changed", function() {
-          var propType = createRootPropType({
+          var propType = propertyTypeUtil.createRoot(Derived.type, {
             name: "fooBar",
             type: "string"
           });
@@ -362,12 +350,12 @@ define([
 
       describe("isList - ", function() {
         it("should return `true` when the type is a list type", function() {
-          var propType = createRootPropType({name: "foo", type: ["string"]});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", type: ["string"]});
           expect(propType.isList).toBe(true);
         });
 
         it("should return `false` when the type is an element type", function() {
-          var propType = createRootPropType({name: "foo", type: "string"});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", type: "string"});
           expect(propType.isList).toBe(false);
         });
       }); // end isList
@@ -378,22 +366,22 @@ define([
         // NOTE: tests of Context#get test type resolution more thoroughly.
 
         it("should default to String", function() {
-          var propType = createRootPropType({name: "foo"});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo"});
           expect(propType.type).toBe(PentahoString.type);
         });
 
         it("ignore a nully value specification and assume the default", function() {
-          var propType = createRootPropType({name: "foo", type: null});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", type: null});
 
           expect(propType.type).toBe(PentahoString.type);
 
-          propType = createRootPropType({name: "foo", type: undefined});
+          propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", type: undefined});
 
           expect(propType.type).toBe(PentahoString.type);
         });
 
         it("should throw when set and property already has descendant properties", function() {
-          var propType = createRootPropType({name: "foo1", type: "string"});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo1", type: "string"});
 
           var Derived2 = Derived.extend();
 
@@ -411,21 +399,21 @@ define([
         });
 
         it("should resolve the specified spec value", function() {
-          var propType = createRootPropType({name: "foo1", type: "string"});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo1", type: "string"});
           expect(propType.type).toBe(PentahoString.type);
 
-          propType = createRootPropType({name: "foo2", type: "boolean"});
+          propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo2", type: "boolean"});
           expect(propType.type).toBe(PentahoBoolean.type);
         });
 
         it("should throw if the specified spec value is the id of an unloaded module", function() {
           expect(function() {
-            createRootPropType({name: "foo", type: "bar/oof"});
+            propertyTypeUtil.createRoot(Derived.type, {name: "foo", type: "bar/oof"});
           }).toThrowError(/bar\/oof/);
         });
 
         it("should allow changing to a subtype of the previous type", function() {
-          var propType = createRootPropType({name: "foo1", type: "number"});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo1", type: "number"});
 
           var Integer = PentahoNumber.extend();
           propType.type = Integer.type;
@@ -433,7 +421,7 @@ define([
         });
 
         it("should throw when changing to a type that is not a subtype of the previous type", function() {
-          var propType = createRootPropType({name: "foo1", type: "number"});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo1", type: "number"});
 
           expect(function() {
             propType.type = PentahoString.type;
@@ -446,7 +434,7 @@ define([
 
           var Integer = PentahoNumber.extend();
           var dv = new Integer(1);
-          var propType = createRootPropType({name: "foo1", type: "number", value: dv});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo1", type: "number", value: dv});
 
           expect(propType.value).toBe(dv);
 
@@ -460,7 +448,7 @@ define([
 
           var Integer = PentahoNumber.extend();
           var dv = new PentahoNumber(1);
-          var propType = createRootPropType({name: "foo1", type: "number", value: dv});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo1", type: "number", value: dv});
 
           expect(propType.value).toBe(dv);
 
@@ -473,14 +461,14 @@ define([
       describe("elemType - ", function() {
         it("for singular values, should provide same output as `type`", function() {
           ["string", "number", "boolean", "date", "complex"].forEach(function(type) {
-            var propType = createRootPropType({name: "foo1", type: type});
+            var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo1", type: type});
             expect(propType.elemType).toBe(propType.type);
           });
         });
 
         it("for list values, should return the type of its elements (base/of syntax)", function() {
           ["string", "number", "boolean", "date", "complex"].forEach(function(type) {
-            var propType = createRootPropType({name: "foo1", type: {base: "list", of: type}});
+            var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo1", type: {base: "list", of: type}});
             expect(propType.elemType).toBe(propType.type.of);
           });
         });
@@ -490,29 +478,29 @@ define([
       describe("value - ", function() {
 
         it("should default to `null`, when unspecified", function() {
-          var propType = createRootPropType({name: "foo", type: "string"});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", type: "string"});
           expect(propType.value).toBe(null);
         });
 
         it("should default to `null`, when specified as `undefined`", function() {
-          var propType = createRootPropType({name: "foo", type: "string", value: undefined});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", type: "string", value: undefined});
           expect(propType.value).toBe(null);
         });
 
         it("should get `null`, when specified as `null`", function() {
-          var propType = createRootPropType({name: "foo", type: "string", value: null});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", type: "string", value: null});
           expect(propType.value).toBe(null);
         });
 
         it("should get a non-nully, specified default value", function() {
-          var propType = createRootPropType({name: "foo", type: "string", value: "Foo"});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", type: "string", value: "Foo"});
           var value = propType.value;
           expect(value.value).toBe("Foo");
           expect(value.formatted).toBe(null);
         });
 
         it("should allow setting to a different value", function() {
-          var propType = createRootPropType({name: "foo", type: "string", value: "Foo"});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", type: "string", value: "Foo"});
 
           propType.value = "Bar";
 
@@ -522,7 +510,7 @@ define([
         });
 
         it("should allow setting to null after having a non-null value", function() {
-          var propType = createRootPropType({name: "foo", type: "string", value: "Foo"});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", type: "string", value: "Foo"});
 
           propType.value = null;
 
@@ -530,7 +518,7 @@ define([
         });
 
         it("should throw when set and property already has descendant properties", function() {
-          var propType = createRootPropType({name: "foo1", type: "string"});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo1", type: "string"});
 
           // Create a descendant property
           var Derived2 = Derived.extend();
@@ -557,26 +545,26 @@ define([
         });
 
         it("should default to an unset local value", function() {
-          var propType = createRootPropType({name: "foo"});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo"});
           expect(propType.isRequired).toBe(undefined);
         });
 
         it("should ignore setting to undefined", function() {
-          var propType = createRootPropType({name: "foo", isRequired: true});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", isRequired: true});
           expect(propType.isRequired).toBe(true);
           propType.isRequired = undefined;
           expect(propType.isRequired).toBe(true);
         });
 
         it("should ignore setting to null", function() {
-          var propType = createRootPropType({name: "foo", isRequired: true});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", isRequired: true});
           expect(propType.isRequired).toBe(true);
           propType.isRequired = null;
           expect(propType.isRequired).toBe(true);
         });
 
         it("should throw when set and property already has descendant properties", function() {
-          var propType = createRootPropType({name: "foo"});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo"});
 
           var Derived2 = Derived.extend();
 
@@ -592,34 +580,34 @@ define([
         });
 
         it("should cast other non-function spec values to boolean", function() {
-          var propType = createRootPropType({name: "foo1", isRequired: 1});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo1", isRequired: 1});
           expect(propType.isRequired).toBe(true);
 
-          propType = createRootPropType({name: "foo2", isRequired: 0});
+          propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo2", isRequired: 0});
           expect(propType.isRequired).toBe(false);
 
-          propType = createRootPropType({name: "foo3", isRequired: ""});
+          propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo3", isRequired: ""});
           expect(propType.isRequired).toBe(false);
 
-          propType = createRootPropType({name: "foo4", isRequired: true});
+          propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo4", isRequired: true});
           expect(propType.isRequired).toBe(true);
 
-          propType = createRootPropType({name: "foo5", isRequired: "yes"});
+          propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo5", isRequired: "yes"});
           expect(propType.isRequired).toBe(true);
 
-          propType = createRootPropType({name: "foo6", isRequired: "no"});
+          propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo6", isRequired: "no"});
           expect(propType.isRequired).toBe(true);
         });
 
         it("should accept a function spec value", function() {
           var f = function() {};
-          var propType = createRootPropType({name: "foo1", isRequired: f});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo1", isRequired: f});
           expect(propType.isRequired).toBe(f);
         });
 
         it("should evaluate a function spec value", function() {
           var f = jasmine.createSpy().and.callFake(function() { return true; });
-          var propType = createRootPropType({name: "foo1", isRequired: f});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo1", isRequired: f});
 
           var owner = {};
           expect(propType.isRequiredEval(owner)).toBe(true);
@@ -629,39 +617,39 @@ define([
         it("should evaluate a function spec value and cast its result", function() {
           var owner = {};
           var f = function() { return 1; };
-          var propType = createRootPropType({name: "foo1", isRequired: f});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo1", isRequired: f});
           expect(propType.isRequiredEval(owner)).toBe(true);
 
           // ----
 
           f = function() { return 0; };
-          propType = createRootPropType({name: "foo2", isRequired: f});
+          propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo2", isRequired: f});
           expect(propType.isRequiredEval(owner)).toBe(false);
 
           // ---
 
           f = function() { return {}; };
-          propType = createRootPropType({name: "foo2", isRequired: f});
+          propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo2", isRequired: f});
           expect(propType.isRequiredEval(owner)).toBe(true);
         });
 
         it("should evaluate a function spec value and return the default value if it returns nully", function() {
           var owner = {};
           var f = function() { return null; };
-          var propType = createRootPropType({name: "foo1", isRequired: f});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo1", isRequired: f});
           expect(propType.isRequiredEval(owner)).toBe(false);
 
           // ----
 
           f = function() { return undefined; };
-          propType = createRootPropType({name: "foo2", isRequired: f});
+          propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo2", isRequired: f});
           expect(propType.isRequiredEval(owner)).toBe(false);
         });
 
         it("should evaluate a function spec value in the context of the owner value", function() {
           var owner = {};
           var f = jasmine.createSpy();
-          var propType = createRootPropType({name: "foo1", isRequired: f});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo1", isRequired: f});
           propType.isRequiredEval(owner);
           expect(f.calls.count()).toBe(1);
           expect(f.calls.first().object).toBe(owner);
@@ -670,7 +658,7 @@ define([
         it("should evaluate a function spec value without arguments", function() {
           var owner = {};
           var f = jasmine.createSpy();
-          var propType = createRootPropType({name: "foo1", isRequired: f});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo1", isRequired: f});
           propType.isRequiredEval(owner);
           expect(f.calls.count()).toBe(1);
           expect(f.calls.first().args.length).toBe(0);
@@ -686,78 +674,78 @@ define([
         });
 
         it("should default to an unset local value", function() {
-          var propType = createRootPropType({name: "foo"});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo"});
           expect(propType.countMin).toBe(undefined);
         });
 
         it("should ignore setting to undefined", function() {
-          var propType = createRootPropType({name: "foo", countMin: 1});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", countMin: 1});
           expect(propType.countMin).toBe(1);
           propType.countMin = undefined;
           expect(propType.countMin).toBe(1);
         });
 
         it("should ignore setting to null", function() {
-          var propType = createRootPropType({name: "foo", countMin: 1});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", countMin: 1});
           expect(propType.countMin).toBe(1);
           propType.countMin = null;
           expect(propType.countMin).toBe(1);
         });
 
         it("should convert negative spec values to an unset local value", function() {
-          var propType = createRootPropType({name: "foo1", countMin: -1});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo1", countMin: -1});
           expect(propType.countMin).toBe(undefined);
         });
 
         it("should convert NaN spec values to an unset local value", function() {
-          var propType = createRootPropType({name: "foo1", countMin: NaN});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo1", countMin: NaN});
           expect(propType.countMin).toBe(undefined);
         });
 
         it("should convert positive float spec values to its floored integer", function() {
-          var propType = createRootPropType({name: "foo1", countMin: 1.1});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo1", countMin: 1.1});
           expect(propType.countMin).toBe(1);
         });
 
         it("should parse string spec values", function() {
-          var propType = createRootPropType({name: "foo1", countMin: "1"});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo1", countMin: "1"});
           expect(propType.countMin).toBe(1);
 
-          propType = createRootPropType({name: "foo2", countMin: "+1"});
+          propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo2", countMin: "+1"});
           expect(propType.countMin).toBe(1);
         });
 
         it("should convert an invalid spec value to an unset local value", function() {
-          var propType = createRootPropType({name: "foo1", countMin: "foo"});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo1", countMin: "foo"});
           expect(propType.countMin).toBe(undefined);
 
-          propType = createRootPropType({name: "foo2", countMin: "-1"});
+          propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo2", countMin: "-1"});
           expect(propType.countMin).toBe(undefined);
         });
 
         it("should accept a function spec value", function() {
           var f = function() {};
-          var propType = createRootPropType({name: "foo1", countMin: f});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo1", countMin: f});
           expect(propType.countMin).toBe(f);
         });
 
         it("should evaluate a function spec value and return the default value if it returns nully", function() {
           var owner = {};
           var f = function() { return null; };
-          var propType = createRootPropType({name: "foo1", countMin: f});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo1", countMin: f});
           expect(propType.countMinEval(owner)).toBe(0);
 
           // ----
 
           f = function() { return undefined; };
-          propType = createRootPropType({name: "foo2", countMin: f});
+          propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo2", countMin: f});
           expect(propType.countMinEval(owner)).toBe(0);
         });
 
         it("should evaluate a function spec value in the context of the owner value", function() {
           var owner = {};
           var f = jasmine.createSpy();
-          var propType = createRootPropType({name: "foo1", countMin: f});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo1", countMin: f});
           propType.countMinEval(owner);
           expect(f.calls.count()).toBe(1);
           expect(f.calls.first().object).toBe(owner);
@@ -766,14 +754,14 @@ define([
         it("should evaluate a function spec value without arguments", function() {
           var owner = {};
           var f = jasmine.createSpy();
-          var propType = createRootPropType({name: "foo1", countMin: f});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo1", countMin: f});
           propType.countMinEval(owner);
           expect(f.calls.count()).toBe(1);
           expect(f.calls.first().args.length).toBe(0);
         });
 
         it("should throw when set and property already has descendant properties", function() {
-          var propType = createRootPropType({name: "foo"});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo"});
 
           var Derived2 = Derived.extend();
 
@@ -798,83 +786,83 @@ define([
         });
 
         it("should default to an unset local value", function() {
-          var propType = createRootPropType({name: "foo"});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo"});
           expect(propType.countMax).toBe(undefined);
         });
 
         it("should ignore setting to undefined", function() {
-          var propType = createRootPropType({name: "foo", countMax: 1});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", countMax: 1});
           expect(propType.countMax).toBe(1);
           propType.countMax = undefined;
           expect(propType.countMax).toBe(1);
         });
 
         it("should ignore setting to null", function() {
-          var propType = createRootPropType({name: "foo", countMax: 1});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", countMax: 1});
           expect(propType.countMax).toBe(1);
           propType.countMax = null;
           expect(propType.countMax).toBe(1);
         });
 
         it("should convert negative spec value to an unset local value", function() {
-          var propType = createRootPropType({name: "foo1", countMax: -1});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo1", countMax: -1});
           expect(propType.countMax).toBe(undefined);
         });
 
         it("should convert NaN spec values to an unset local value", function() {
-          var propType = createRootPropType({name: "foo1", countMax: NaN});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo1", countMax: NaN});
           expect(propType.countMax).toBe(undefined);
         });
 
         it("should convert positive float spec values to its floored integer", function() {
-          var propType = createRootPropType({name: "foo1", countMax: 1.1});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo1", countMax: 1.1});
           expect(propType.countMax).toBe(1);
         });
 
         it("should parse string spec values", function() {
-          var propType = createRootPropType({name: "foo1", countMax: "1"});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo1", countMax: "1"});
           expect(propType.countMax).toBe(1);
 
-          propType = createRootPropType({name: "foo2", countMax: "+1"});
+          propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo2", countMax: "+1"});
           expect(propType.countMax).toBe(1);
         });
 
         it("should parse an 'Infinity' string spec value", function() {
-          var propType = createRootPropType({name: "foo1", countMax: "Infinity"});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo1", countMax: "Infinity"});
           expect(propType.countMax).toBe(Infinity);
         });
 
         it("should convert invalid string spec values to an unset local value", function() {
-          var propType = createRootPropType({name: "foo1", countMax: "foo"});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo1", countMax: "foo"});
           expect(propType.countMax).toBe(undefined);
 
-          propType = createRootPropType({name: "foo2", countMax: "-1"});
+          propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo2", countMax: "-1"});
           expect(propType.countMax).toBe(undefined);
         });
 
         it("should accept a function spec value", function() {
           var f = function() {};
-          var propType = createRootPropType({name: "foo1", countMax: f});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo1", countMax: f});
           expect(propType.countMax).toBe(f);
         });
 
         it("should evaluate a function spec value and return the default value if it returns nully", function() {
           var owner = {};
           var f = function() { return null; };
-          var propType = createRootPropType({name: "foo1", countMax: f});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo1", countMax: f});
           expect(propType.countMaxEval(owner)).toBe(Infinity);
 
           // ----
 
           f = function() { return undefined; };
-          propType = createRootPropType({name: "foo2", countMax: f});
+          propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo2", countMax: f});
           expect(propType.countMaxEval(owner)).toBe(Infinity);
         });
 
         it("should evaluate a function spec value in the context of the owner value", function() {
           var owner = {};
           var f = jasmine.createSpy();
-          var propType = createRootPropType({name: "foo1", countMax: f});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo1", countMax: f});
           propType.countMaxEval(owner);
           expect(f.calls.count()).toBe(1);
           expect(f.calls.first().object).toBe(owner);
@@ -883,14 +871,14 @@ define([
         it("should evaluate a function spec value without arguments", function() {
           var owner = {};
           var f = jasmine.createSpy();
-          var propType = createRootPropType({name: "foo1", countMax: f});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo1", countMax: f});
           propType.countMaxEval(owner);
           expect(f.calls.count()).toBe(1);
           expect(f.calls.first().args.length).toBe(0);
         });
 
         it("should throw when set and property already has descendant properties", function() {
-          var propType = createRootPropType({name: "foo"});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo"});
 
           var Derived2 = Derived.extend();
 
@@ -915,67 +903,67 @@ define([
         });
 
         it("should default to an unset local value", function() {
-          var propType = createRootPropType({name: "foo"});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo"});
           expect(propType.isApplicable).toBe(undefined);
         });
 
         it("should ignore setting to undefined", function() {
-          var propType = createRootPropType({name: "foo", isApplicable: false});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", isApplicable: false});
           expect(propType.isApplicable).toBe(false);
           propType.isApplicable = undefined;
           expect(propType.isApplicable).toBe(false);
         });
 
         it("should ignore setting to null", function() {
-          var propType = createRootPropType({name: "foo", isApplicable: false});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", isApplicable: false});
           expect(propType.isApplicable).toBe(false);
           propType.isApplicable = null;
           expect(propType.isApplicable).toBe(false);
         });
 
         it("should cast other non-function spec values to boolean", function() {
-          var propType = createRootPropType({name: "foo1", isApplicable: 1});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo1", isApplicable: 1});
           expect(propType.isApplicable).toBe(true);
 
-          propType = createRootPropType({name: "foo2", isApplicable: 0});
+          propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo2", isApplicable: 0});
           expect(propType.isApplicable).toBe(false);
 
-          propType = createRootPropType({name: "foo3", isApplicable: ""});
+          propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo3", isApplicable: ""});
           expect(propType.isApplicable).toBe(false);
 
-          propType = createRootPropType({name: "foo4", isApplicable: true});
+          propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo4", isApplicable: true});
           expect(propType.isApplicable).toBe(true);
 
-          propType = createRootPropType({name: "foo5", isApplicable: "yes"});
+          propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo5", isApplicable: "yes"});
           expect(propType.isApplicable).toBe(true);
 
-          propType = createRootPropType({name: "foo6", isApplicable: "no"});
+          propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo6", isApplicable: "no"});
           expect(propType.isApplicable).toBe(true);
         });
 
         it("should accept a function spec value", function() {
           var f = function() {};
-          var propType = createRootPropType({name: "foo1", isApplicable: f});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo1", isApplicable: f});
           expect(propType.isApplicable).toBe(f);
         });
 
         it("should evaluate a function spec value and return the default value if it returns nully", function() {
           var owner = {};
           var f = function() { return null; };
-          var propType = createRootPropType({name: "foo1", isApplicable: f});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo1", isApplicable: f});
           expect(propType.isApplicableEval(owner)).toBe(true);
 
           // ----
 
           f = function() { return undefined; };
-          propType = createRootPropType({name: "foo2", isApplicable: f});
+          propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo2", isApplicable: f});
           expect(propType.isApplicableEval(owner)).toBe(true);
         });
 
         it("should evaluate a function spec value in the context of the owner value", function() {
           var owner = {};
           var f = jasmine.createSpy();
-          var propType = createRootPropType({name: "foo1", isApplicable: f});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo1", isApplicable: f});
           propType.isApplicableEval(owner);
           expect(f.calls.count()).toBe(1);
           expect(f.calls.first().object).toBe(owner);
@@ -984,14 +972,14 @@ define([
         it("should evaluate a function spec value without arguments", function() {
           var owner = {};
           var f = jasmine.createSpy();
-          var propType = createRootPropType({name: "foo1", isApplicable: f});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo1", isApplicable: f});
           propType.isApplicableEval(owner);
           expect(f.calls.count()).toBe(1);
           expect(f.calls.first().args.length).toBe(0);
         });
 
         it("should throw when set and property already has descendant properties", function() {
-          var propType = createRootPropType({name: "foo"});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo"});
 
           var Derived2 = Derived.extend();
 
@@ -1016,67 +1004,67 @@ define([
         });
 
         it("should default to an unset local value", function() {
-          var propType = createRootPropType({name: "foo"});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo"});
           expect(propType.isReadOnly).toBe(undefined);
         });
 
         it("should ignore setting to undefined", function() {
-          var propType = createRootPropType({name: "foo", isReadOnly: true});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", isReadOnly: true});
           expect(propType.isReadOnly).toBe(true);
           propType.isReadOnly = undefined;
           expect(propType.isReadOnly).toBe(true);
         });
 
         it("should ignore setting to null", function() {
-          var propType = createRootPropType({name: "foo", isReadOnly: true});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", isReadOnly: true});
           expect(propType.isReadOnly).toBe(true);
           propType.isReadOnly = null;
           expect(propType.isReadOnly).toBe(true);
         });
 
         it("should cast other non-function spec values to boolean", function() {
-          var propType = createRootPropType({name: "foo1", isReadOnly: 1});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo1", isReadOnly: 1});
           expect(propType.isReadOnly).toBe(true);
 
-          propType = createRootPropType({name: "foo2", isReadOnly: 0});
+          propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo2", isReadOnly: 0});
           expect(propType.isReadOnly).toBe(false);
 
-          propType = createRootPropType({name: "foo3", isReadOnly: ""});
+          propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo3", isReadOnly: ""});
           expect(propType.isReadOnly).toBe(false);
 
-          propType = createRootPropType({name: "foo4", isReadOnly: true});
+          propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo4", isReadOnly: true});
           expect(propType.isReadOnly).toBe(true);
 
-          propType = createRootPropType({name: "foo5", isReadOnly: "yes"});
+          propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo5", isReadOnly: "yes"});
           expect(propType.isReadOnly).toBe(true);
 
-          propType = createRootPropType({name: "foo6", isReadOnly: "no"});
+          propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo6", isReadOnly: "no"});
           expect(propType.isReadOnly).toBe(true);
         });
 
         it("should accept a function spec value", function() {
           var f = function() {};
-          var propType = createRootPropType({name: "foo1", isReadOnly: f});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo1", isReadOnly: f});
           expect(propType.isReadOnly).toBe(f);
         });
 
         it("should evaluate a function spec value and return the default value if it returns nully", function() {
           var owner = {};
           var f = function() { return null; };
-          var propType = createRootPropType({name: "foo1", isReadOnly: f});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo1", isReadOnly: f});
           expect(propType.isReadOnlyEval(owner)).toBe(false);
 
           // ----
 
           f = function() { return undefined; };
-          propType = createRootPropType({name: "foo2", isReadOnly: f});
+          propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo2", isReadOnly: f});
           expect(propType.isReadOnlyEval(owner)).toBe(false);
         });
 
         it("should evaluate a function spec value in the context of the owner value", function() {
           var owner = {};
           var f = jasmine.createSpy();
-          var propType = createRootPropType({name: "foo1", isReadOnly: f});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo1", isReadOnly: f});
           propType.isReadOnlyEval(owner);
           expect(f.calls.count()).toBe(1);
           expect(f.calls.first().object).toBe(owner);
@@ -1085,14 +1073,14 @@ define([
         it("should evaluate a function spec value without arguments", function() {
           var owner = {};
           var f = jasmine.createSpy();
-          var propType = createRootPropType({name: "foo1", isReadOnly: f});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo1", isReadOnly: f});
           propType.isReadOnlyEval(owner);
           expect(f.calls.count()).toBe(1);
           expect(f.calls.first().args.length).toBe(0);
         });
 
         it("should throw when set and property already has descendant properties", function() {
-          var propType = createRootPropType({name: "foo"});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo"});
 
           var Derived2 = Derived.extend();
 
@@ -1114,50 +1102,65 @@ define([
         // 3. min <= max
 
         it("should limit min and max to 1 when isList = false", function() {
-          var propType = createRootPropType({name: "foo", countMin: 10, countMax: 10});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", countMin: 10, countMax: 10});
           expect(propType.countMin).toBe(10);
           expect(propType.countMax).toBe(10);
           expect(propType.countRangeEval({})).toEqual({min: 1, max: 1});
         });
 
         it("should not limit min and max to 1 when isList = true", function() {
-          var propType = createRootPropType({name: "foo", countMin: 10, countMax: 10, type: ["string"]});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {
+            name: "foo",
+            countMin: 10,
+            countMax: 10,
+            type: ["string"]
+          });
           expect(propType.countMin).toBe(10);
           expect(propType.countMax).toBe(10);
           expect(propType.countRangeEval({})).toEqual({min: 10, max: 10});
         });
 
         it("should have min = 1 when required", function() {
-          var propType = createRootPropType({name: "foo", isRequired: true});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", isRequired: true});
           expect(propType.countMin).toBe(undefined);
           expect(propType.countMax).toBe(undefined);
           expect(propType.countRangeEval({}).min).toBe(1);
         });
 
         it("should have min = 1 when required and countMin = 0", function() {
-          var propType = createRootPropType({name: "foo", isRequired: true, countMin: 0});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", isRequired: true, countMin: 0});
           expect(propType.countMin).toBe(0);
           expect(propType.countMax).toBe(undefined);
           expect(propType.countRangeEval({}).min).toBe(1);
         });
 
         it("should have min equal to countMin when countMin >= 1 and any required value", function() {
-          var propType = createRootPropType({name: "foo1", isRequired: true, countMin: 1});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo1", isRequired: true, countMin: 1});
           expect(propType.countMin).toBe(1);
           expect(propType.countMax).toBe(undefined);
           expect(propType.countRangeEval({}).min).toBe(1);
 
-          propType = createRootPropType({name: "foo2", isRequired: false, countMin: 1});
+          propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo2", isRequired: false, countMin: 1});
           expect(propType.countMin).toBe(1);
           expect(propType.countMax).toBe(undefined);
           expect(propType.countRangeEval({}).min).toBe(1);
 
-          propType = createRootPropType({name: "foo3", isRequired: true, countMin: 3, type: ["string"]});
+          propType = propertyTypeUtil.createRoot(Derived.type, {
+            name: "foo3",
+            isRequired: true,
+            countMin: 3,
+            type: ["string"]
+          });
           expect(propType.countMin).toBe(3);
           expect(propType.countMax).toBe(undefined);
           expect(propType.countRangeEval({}).min).toBe(3);
 
-          propType = createRootPropType({name: "foo4", isRequired: false, countMin: 3, type: ["string"]});
+          propType = propertyTypeUtil.createRoot(Derived.type, {
+            name: "foo4",
+            isRequired: false,
+            countMin: 3,
+            type: ["string"]
+          });
           expect(propType.countMin).toBe(3);
           expect(propType.countMax).toBe(undefined);
           expect(propType.countRangeEval({}).min).toBe(3);
@@ -1165,42 +1168,47 @@ define([
 
         // required <= max
         it("should have max = 1 when countMax = 0 and required = true", function() {
-          var propType = createRootPropType({name: "foo", isRequired: true, countMax: 0});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", isRequired: true, countMax: 0});
           expect(propType.countMin).toBe(undefined);
           expect(propType.countMax).toBe(0);
           expect(propType.countRangeEval({}).max).toBe(1);
         });
 
         it("should have max = 1 when countMax is 0 and countMin = 1", function() {
-          var propType = createRootPropType({name: "foo", countMin: 1, countMax: 0});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", countMin: 1, countMax: 0});
           expect(propType.countMin).toBe(1);
           expect(propType.countMax).toBe(0);
           expect(propType.countRangeEval({}).max).toBe(1);
         });
 
         it("should have max = 10 when countMin = 10, countMax = 5 and isList = true", function() {
-          var propType = createRootPropType({name: "foo", countMin: 10, countMax: 5, type: ["string"]});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {
+            name: "foo",
+            countMin: 10,
+            countMax: 5,
+            type: ["string"]
+          });
           expect(propType.countMin).toBe(10);
           expect(propType.countMax).toBe(5);
           expect(propType.countRangeEval({}).max).toBe(10);
         });
 
         it("should have max = Infinity when countMin = 10 and isList = true", function() {
-          var propType = createRootPropType({name: "foo", countMin: 10, type: ["string"]});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", countMin: 10, type: ["string"]});
           expect(propType.countMin).toBe(10);
           expect(propType.countMax).toBe(undefined);
           expect(propType.countRangeEval({}).max).toBe(Infinity);
         });
 
         it("should have min = 0 when countMax = 10 and isList = true", function() {
-          var propType = createRootPropType({name: "foo", countMax: 10, type: []});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", countMax: 10, type: []});
           expect(propType.countMin).toBe(undefined);
           expect(propType.countMax).toBe(10);
           expect(propType.countRangeEval({}).min).toBe(0);
         });
 
         it("should have min = 0 when countMax = 1", function() {
-          var propType = createRootPropType({name: "foo", countMax: 1});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", countMax: 1});
           expect(propType.countMin).toBe(undefined);
           expect(propType.countMax).toBe(1);
           expect(propType.countRangeEval({}).min).toBe(0);
@@ -1211,19 +1219,6 @@ define([
 
     describe("override a property -", function() {
 
-      function extendProp(declaringType, propName, subPropTypeSpec) {
-        var basePropType = declaringType.ancestor.get(propName);
-
-        return Property.extendProto(
-            basePropType.instance, {
-              type: subPropTypeSpec
-            },
-            {
-              declaringType: declaringType,
-              instance: declaringType.instance
-            }).type;
-      }
-
       it("should throw if spec.name is not the name of the base property", function() {
         var Base = Complex.extend();
 
@@ -1232,7 +1227,7 @@ define([
         var Derived = Base.extend();
 
         expect(function() {
-          extendProp(Derived.type, "baseStr", {name: "baseStr2"});
+          propertyTypeUtil.extend(Derived.type, "baseStr", {name: "baseStr2"});
         }).toThrowError(TypeError);
       });
 
@@ -1248,7 +1243,7 @@ define([
 
           basePropType = Base.type.get("baseStr");
 
-          propType = extendProp(Derived.type, "baseStr", {name: "baseStr"});
+          propType = propertyTypeUtil.extend(Derived.type, "baseStr", {name: "baseStr"});
         });
 
         it("should be an instance of `PropertyType`", function() {
@@ -1278,7 +1273,7 @@ define([
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.type, "foo", {name: "foo"});
+          var propType = propertyTypeUtil.extend(Derived.type, "foo", {name: "foo"});
 
           expect(propType.label).toBe("FooABC");
         });
@@ -1290,7 +1285,7 @@ define([
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.type, "foo", {name: "foo", label: "XYZ"});
+          var propType = propertyTypeUtil.extend(Derived.type, "foo", {name: "foo", label: "XYZ"});
 
           expect(propType.label).toBe("XYZ");
         });
@@ -1302,7 +1297,7 @@ define([
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.type, "foo", {name: "foo", label: "XYZ"});
+          var propType = propertyTypeUtil.extend(Derived.type, "foo", {name: "foo", label: "XYZ"});
 
           expect(propType.label).toBe("XYZ");
 
@@ -1319,7 +1314,7 @@ define([
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.type, "foo", {name: "foo", label: "XYZ"});
+          var propType = propertyTypeUtil.extend(Derived.type, "foo", {name: "foo", label: "XYZ"});
 
           expect(propType.label).toBe("XYZ");
           propType.label = null;
@@ -1349,7 +1344,7 @@ define([
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.type, "foo", {name: "foo"});
+          var propType = propertyTypeUtil.extend(Derived.type, "foo", {name: "foo"});
 
           expect(propType.description).toBe("FooABC");
         });
@@ -1361,7 +1356,7 @@ define([
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.type, "foo", {name: "foo", description: undefined});
+          var propType = propertyTypeUtil.extend(Derived.type, "foo", {name: "foo", description: undefined});
 
           expect(propType.description).toBe("FooABC");
         });
@@ -1373,7 +1368,7 @@ define([
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.type, "foo", {name: "foo", description: null});
+          var propType = propertyTypeUtil.extend(Derived.type, "foo", {name: "foo", description: null});
 
           expect(propType.description).toBe(null);
         });
@@ -1385,7 +1380,7 @@ define([
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.type, "foo", {name: "foo", description: "XYZ"});
+          var propType = propertyTypeUtil.extend(Derived.type, "foo", {name: "foo", description: "XYZ"});
 
           expect(propType.description).toBe("XYZ");
         });
@@ -1397,7 +1392,7 @@ define([
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.type, "foo", {name: "foo", description: "XYZ"});
+          var propType = propertyTypeUtil.extend(Derived.type, "foo", {name: "foo", description: "XYZ"});
 
           propType.description = null;
 
@@ -1411,7 +1406,7 @@ define([
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.type, "foo", {name: "foo", description: "XYZ"});
+          var propType = propertyTypeUtil.extend(Derived.type, "foo", {name: "foo", description: "XYZ"});
 
           expect(propType.description).toBe("XYZ");
 
@@ -1428,7 +1423,7 @@ define([
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.type, "foo", {name: "foo", description: "XYZ"});
+          var propType = propertyTypeUtil.extend(Derived.type, "foo", {name: "foo", description: "XYZ"});
 
           expect(propType.description).toBe("XYZ");
 
@@ -1446,7 +1441,7 @@ define([
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.type, "foo", {name: "foo"});
+          var propType = propertyTypeUtil.extend(Derived.type, "foo", {name: "foo"});
 
           expect(propType.category).toBe("FooABC");
         });
@@ -1458,7 +1453,7 @@ define([
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.type, "foo", {name: "foo", category: undefined});
+          var propType = propertyTypeUtil.extend(Derived.type, "foo", {name: "foo", category: undefined});
 
           expect(propType.category).toBe("FooABC");
         });
@@ -1470,7 +1465,7 @@ define([
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.type, "foo", {name: "foo", category: null});
+          var propType = propertyTypeUtil.extend(Derived.type, "foo", {name: "foo", category: null});
 
           expect(propType.category).toBe(null);
         });
@@ -1482,7 +1477,7 @@ define([
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.type, "foo", {name: "foo", category: "XYZ"});
+          var propType = propertyTypeUtil.extend(Derived.type, "foo", {name: "foo", category: "XYZ"});
 
           expect(propType.category).toBe("XYZ");
         });
@@ -1494,7 +1489,7 @@ define([
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.type, "foo", {name: "foo", category: "XYZ"});
+          var propType = propertyTypeUtil.extend(Derived.type, "foo", {name: "foo", category: "XYZ"});
 
           propType.category = null;
 
@@ -1508,7 +1503,7 @@ define([
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.type, "foo", {name: "foo", category: "XYZ"});
+          var propType = propertyTypeUtil.extend(Derived.type, "foo", {name: "foo", category: "XYZ"});
 
           expect(propType.category).toBe("XYZ");
 
@@ -1525,7 +1520,7 @@ define([
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.type, "foo", {name: "foo", category: "XYZ"});
+          var propType = propertyTypeUtil.extend(Derived.type, "foo", {name: "foo", category: "XYZ"});
 
           expect(propType.category).toBe("XYZ");
 
@@ -1543,7 +1538,7 @@ define([
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.type, "foo", {name: "foo"});
+          var propType = propertyTypeUtil.extend(Derived.type, "foo", {name: "foo"});
 
           expect(propType.helpUrl).toBe("FooABC");
         });
@@ -1555,7 +1550,7 @@ define([
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.type, "foo", {name: "foo", helpUrl: undefined});
+          var propType = propertyTypeUtil.extend(Derived.type, "foo", {name: "foo", helpUrl: undefined});
 
           expect(propType.helpUrl).toBe("FooABC");
         });
@@ -1567,7 +1562,7 @@ define([
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.type, "foo", {name: "foo", helpUrl: null});
+          var propType = propertyTypeUtil.extend(Derived.type, "foo", {name: "foo", helpUrl: null});
 
           expect(propType.helpUrl).toBe(null);
         });
@@ -1579,7 +1574,7 @@ define([
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.type, "foo", {name: "foo", helpUrl: "XYZ"});
+          var propType = propertyTypeUtil.extend(Derived.type, "foo", {name: "foo", helpUrl: "XYZ"});
 
           expect(propType.helpUrl).toBe("XYZ");
         });
@@ -1591,7 +1586,7 @@ define([
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.type, "foo", {name: "foo", helpUrl: "XYZ"});
+          var propType = propertyTypeUtil.extend(Derived.type, "foo", {name: "foo", helpUrl: "XYZ"});
 
           propType.helpUrl = null;
 
@@ -1605,7 +1600,7 @@ define([
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.type, "foo", {name: "foo", helpUrl: "XYZ"});
+          var propType = propertyTypeUtil.extend(Derived.type, "foo", {name: "foo", helpUrl: "XYZ"});
 
           expect(propType.helpUrl).toBe("XYZ");
 
@@ -1622,7 +1617,7 @@ define([
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.type, "foo", {name: "foo", helpUrl: "XYZ"});
+          var propType = propertyTypeUtil.extend(Derived.type, "foo", {name: "foo", helpUrl: "XYZ"});
 
           expect(propType.helpUrl).toBe("XYZ");
 
@@ -1640,7 +1635,7 @@ define([
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.type, "foo", {name: "foo"});
+          var propType = propertyTypeUtil.extend(Derived.type, "foo", {name: "foo"});
 
           expect(propType.isBrowsable).toBe(false);
 
@@ -1652,7 +1647,7 @@ define([
 
           Derived = Base.extend();
 
-          propType = extendProp(Derived.type, "foo", {name: "foo"});
+          propType = propertyTypeUtil.extend(Derived.type, "foo", {name: "foo"});
 
           expect(propType.isBrowsable).toBe(true);
         });
@@ -1664,7 +1659,7 @@ define([
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.type, "foo", {name: "foo", isBrowsable: undefined});
+          var propType = propertyTypeUtil.extend(Derived.type, "foo", {name: "foo", isBrowsable: undefined});
 
           expect(propType.isBrowsable).toBe(false);
 
@@ -1676,7 +1671,7 @@ define([
 
           Derived = Base.extend();
 
-          propType = extendProp(Derived.type, "foo", {name: "foo", isBrowsable: null});
+          propType = propertyTypeUtil.extend(Derived.type, "foo", {name: "foo", isBrowsable: null});
 
           expect(propType.isBrowsable).toBe(false);
         });
@@ -1688,7 +1683,7 @@ define([
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.type, "foo", {name: "foo", isBrowsable: false});
+          var propType = propertyTypeUtil.extend(Derived.type, "foo", {name: "foo", isBrowsable: false});
 
           expect(propType.isBrowsable).toBe(false);
         });
@@ -1700,7 +1695,7 @@ define([
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.type, "foo", {name: "foo"});
+          var propType = propertyTypeUtil.extend(Derived.type, "foo", {name: "foo"});
 
           expect(propType.isBrowsable).toBe(true);
 
@@ -1716,7 +1711,7 @@ define([
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.type, "foo", {name: "foo", isBrowsable: false});
+          var propType = propertyTypeUtil.extend(Derived.type, "foo", {name: "foo", isBrowsable: false});
 
           expect(propType.isBrowsable).toBe(false);
 
@@ -1732,7 +1727,7 @@ define([
 
           Derived = Base.extend();
 
-          propType = extendProp(Derived.type, "foo", {name: "foo", isBrowsable: false});
+          propType = propertyTypeUtil.extend(Derived.type, "foo", {name: "foo", isBrowsable: false});
 
           expect(propType.isBrowsable).toBe(false);
 
@@ -1750,7 +1745,7 @@ define([
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.type, "foo", {name: "foo"});
+          var propType = propertyTypeUtil.extend(Derived.type, "foo", {name: "foo"});
 
           expect(propType.isAdvanced).toBe(false);
 
@@ -1762,7 +1757,7 @@ define([
 
           Derived = Base.extend();
 
-          propType = extendProp(Derived.type, "foo", {name: "foo"});
+          propType = propertyTypeUtil.extend(Derived.type, "foo", {name: "foo"});
 
           expect(propType.isAdvanced).toBe(true);
         });
@@ -1774,7 +1769,7 @@ define([
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.type, "foo", {name: "foo", isAdvanced: undefined});
+          var propType = propertyTypeUtil.extend(Derived.type, "foo", {name: "foo", isAdvanced: undefined});
 
           expect(propType.isAdvanced).toBe(true);
 
@@ -1786,7 +1781,7 @@ define([
 
           Derived = Base.extend();
 
-          propType = extendProp(Derived.type, "foo", {name: "foo", isAdvanced: null});
+          propType = propertyTypeUtil.extend(Derived.type, "foo", {name: "foo", isAdvanced: null});
 
           expect(propType.isAdvanced).toBe(true);
         });
@@ -1798,7 +1793,7 @@ define([
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.type, "foo", {name: "foo", isAdvanced: true});
+          var propType = propertyTypeUtil.extend(Derived.type, "foo", {name: "foo", isAdvanced: true});
 
           expect(propType.isAdvanced).toBe(true);
         });
@@ -1810,7 +1805,7 @@ define([
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.type, "foo", {name: "foo"});
+          var propType = propertyTypeUtil.extend(Derived.type, "foo", {name: "foo"});
 
           expect(propType.isAdvanced).toBe(false);
 
@@ -1826,7 +1821,7 @@ define([
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.type, "foo", {name: "foo", isAdvanced: true});
+          var propType = propertyTypeUtil.extend(Derived.type, "foo", {name: "foo", isAdvanced: true});
 
           expect(propType.isAdvanced).toBe(true);
 
@@ -1842,7 +1837,7 @@ define([
 
           Derived = Base.extend();
 
-          propType = extendProp(Derived.type, "foo", {name: "foo", isAdvanced: true});
+          propType = propertyTypeUtil.extend(Derived.type, "foo", {name: "foo", isAdvanced: true});
 
           expect(propType.isAdvanced).toBe(true);
 
@@ -1865,7 +1860,7 @@ define([
 
           var Derived = Base.extend();
 
-          propType = extendProp(Derived.type, "baseStr", {name: "baseStr"});
+          propType = propertyTypeUtil.extend(Derived.type, "baseStr", {name: "baseStr"});
         });
 
         it("should have the same name", function() {
@@ -1892,7 +1887,7 @@ define([
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.type, "baseNum", {name: "baseNum"});
+          var propType = propertyTypeUtil.extend(Derived.type, "baseNum", {name: "baseNum"});
 
           expect(propType.type).toBe(PentahoNumber.type);
         });
@@ -1903,7 +1898,7 @@ define([
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.type, "postalCode", {name: "postalCode", type: null});
+          var propType = propertyTypeUtil.extend(Derived.type, "postalCode", {name: "postalCode", type: null});
 
           expect(propType.type).toBe(PentahoString.type);
 
@@ -1911,7 +1906,7 @@ define([
 
           Derived = Base.extend();
 
-          propType = extendProp(Derived.type, "postalCode", {name: "postalCode", type: undefined});
+          propType = propertyTypeUtil.extend(Derived.type, "postalCode", {name: "postalCode", type: undefined});
 
           expect(propType.type).toBe(PentahoString.type);
         });
@@ -1922,7 +1917,7 @@ define([
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.type, "postalCode", {name: "postalCode"});
+          var propType = propertyTypeUtil.extend(Derived.type, "postalCode", {name: "postalCode"});
 
           expect(propType.type).toBe(PentahoString.type);
 
@@ -1946,7 +1941,7 @@ define([
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.type, "postalCode", {name: "postalCode", type: PostalCode});
+          var propType = propertyTypeUtil.extend(Derived.type, "postalCode", {name: "postalCode", type: PostalCode});
 
           expect(propType.type).toBe(PostalCode.type);
         });
@@ -1963,7 +1958,7 @@ define([
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.type, "postalCode", {name: "postalCode"});
+          var propType = propertyTypeUtil.extend(Derived.type, "postalCode", {name: "postalCode"});
 
           propType.type = PostalCode1;
           expect(propType.type).toBe(PostalCode1.type);
@@ -1981,7 +1976,7 @@ define([
           var Derived = Base.extend();
 
           expect(function() {
-            extendProp(Derived.type, "num", {name: "num", type: PentahoNumber});
+            propertyTypeUtil.extend(Derived.type, "num", {name: "num", type: PentahoNumber});
           }).toThrow(errorMatch.argInvalid("type"));
         });
 
@@ -1995,7 +1990,7 @@ define([
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.type, "num", {name: "num", type: PostalCode1});
+          var propType = propertyTypeUtil.extend(Derived.type, "num", {name: "num", type: PostalCode1});
 
           expect(function() {
             propType.type = PentahoNumber;
@@ -2016,7 +2011,7 @@ define([
           expect(Base.type.get("baseNum").value).toBe(dv);
 
           var Derived = Base.extend();
-          var propType = extendProp(Derived.type, "baseNum", {name: "baseNum", type: Integer.type});
+          var propType = propertyTypeUtil.extend(Derived.type, "baseNum", {name: "baseNum", type: Integer.type});
 
           expect(propType.value).toBe(null);
         });
@@ -2033,7 +2028,7 @@ define([
           Derived1.type.add({name: "baseNum", type: Integer.type});
 
           var Derived2 = Derived1.extend();
-          var propType2 = extendProp(Derived2.type, "baseNum", {name: "baseNum"});
+          var propType2 = propertyTypeUtil.extend(Derived2.type, "baseNum", {name: "baseNum"});
 
           expect(propType2.value).toBe(null);
         });
@@ -2053,74 +2048,74 @@ define([
           // ----
 
           it("should inherit the base default value when unspecified", function() {
-            var propType = extendProp(Derived.type, "baseNum", {name: "baseNum"});
+            var propType = propertyTypeUtil.extend(Derived.type, "baseNum", {name: "baseNum"});
             expect(propType.value).toBe(null);
 
-            propType = extendProp(Derived.type, "baseStr", {name: "baseStr"});
+            propType = propertyTypeUtil.extend(Derived.type, "baseStr", {name: "baseStr"});
             expect(propType.value.value).toBe("a");
           });
 
           it("should inherit the base default value when specified as undefined", function() {
-            var propType = extendProp(Derived.type, "baseNum", {name: "baseNum", value: undefined});
+            var propType = propertyTypeUtil.extend(Derived.type, "baseNum", {name: "baseNum", value: undefined});
             expect(propType.value).toBe(null);
 
-            propType = extendProp(Derived.type, "baseStr", {name: "baseStr", value: undefined});
+            propType = propertyTypeUtil.extend(Derived.type, "baseStr", {name: "baseStr", value: undefined});
             expect(propType.value.value).toBe("a");
           });
 
           it("should shadow the base value when specified as null", function() {
-            var propType = extendProp(Derived.type, "baseNum", {name: "baseNum", value: null});
+            var propType = propertyTypeUtil.extend(Derived.type, "baseNum", {name: "baseNum", value: null});
             expect(propType.value).toBe(null);
 
-            propType = extendProp(Derived.type, "baseStr", {name: "baseStr", value: null});
+            propType = propertyTypeUtil.extend(Derived.type, "baseStr", {name: "baseStr", value: null});
             expect(propType.value).toBe(null);
           });
 
           it("should shadow the base value when specified", function() {
-            var propType = extendProp(Derived.type, "baseNum", {name: "baseNum", value: 1});
+            var propType = propertyTypeUtil.extend(Derived.type, "baseNum", {name: "baseNum", value: 1});
             expect(propType.value.value).toBe(1);
 
-            propType = extendProp(Derived.type, "baseStr", {name: "baseStr", value: "b"});
+            propType = propertyTypeUtil.extend(Derived.type, "baseStr", {name: "baseStr", value: "b"});
             expect(propType.value.value).toBe("b");
           });
 
           it("should be settable to a non-nully value", function() {
-            var propType = extendProp(Derived.type, "baseNum", {name: "baseNum"});
+            var propType = propertyTypeUtil.extend(Derived.type, "baseNum", {name: "baseNum"});
             propType.value = 1;
 
             expect(propType.value.value).toBe(1);
 
             // ---
 
-            propType = extendProp(Derived.type, "baseStr", {name: "baseStr"});
+            propType = propertyTypeUtil.extend(Derived.type, "baseStr", {name: "baseStr"});
             propType.value = "b";
 
             expect(propType.value.value).toBe("b");
           });
 
           it("should be settable to value `null`", function() {
-            var propType = extendProp(Derived.type, "baseNum", {name: "baseNum", value: 1});
+            var propType = propertyTypeUtil.extend(Derived.type, "baseNum", {name: "baseNum", value: 1});
             propType.value = null;
 
             expect(propType.value).toBe(null);
 
             // ---
 
-            propType = extendProp(Derived.type, "baseStr", {name: "baseStr", value: "b"});
+            propType = propertyTypeUtil.extend(Derived.type, "baseStr", {name: "baseStr", value: "b"});
             propType.value = null;
 
             expect(propType.value).toBe(null);
           });
 
           it("should be reset to the inherited value when set to undefined", function() {
-            var propType = extendProp(Derived.type, "baseNum", {name: "baseNum", value: 1});
+            var propType = propertyTypeUtil.extend(Derived.type, "baseNum", {name: "baseNum", value: 1});
             propType.value = undefined;
 
             expect(propType.value).toBe(null);
 
             // ---
 
-            propType = extendProp(Derived.type, "baseStr", {name: "baseStr", value: "b"});
+            propType = propertyTypeUtil.extend(Derived.type, "baseStr", {name: "baseStr", value: "b"});
             propType.value = undefined;
 
             expect(propType.value.value).toBe("a");
@@ -2140,7 +2135,7 @@ define([
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.type, "baseStr", {name: "baseStr"});
+          var propType = propertyTypeUtil.extend(Derived.type, "baseStr", {name: "baseStr"});
 
           expect(propType.isRequired).toBe(undefined);
         });
@@ -2152,7 +2147,7 @@ define([
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.type, "baseStr", {name: "baseStr"});
+          var propType = propertyTypeUtil.extend(Derived.type, "baseStr", {name: "baseStr"});
 
           var owner = {};
 
@@ -2166,7 +2161,7 @@ define([
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.type, "baseStr", {name: "baseStr", isRequired: false});
+          var propType = propertyTypeUtil.extend(Derived.type, "baseStr", {name: "baseStr", isRequired: false});
 
           expect(propType.isRequired).toBe(false);
         });
@@ -2178,7 +2173,7 @@ define([
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.type, "baseStr", {name: "baseStr", isRequired: false});
+          var propType = propertyTypeUtil.extend(Derived.type, "baseStr", {name: "baseStr", isRequired: false});
 
           expect(propType.isRequired).toBe(false);
 
@@ -2199,7 +2194,7 @@ define([
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.type, "baseStr", {name: "baseStr", isRequired: false});
+          var propType = propertyTypeUtil.extend(Derived.type, "baseStr", {name: "baseStr", isRequired: false});
 
           propType.isRequired = true;
 
@@ -2227,7 +2222,7 @@ define([
           var subIndex = -1;
           var subSpy = jasmine.createSpy().and.callFake(function() { subIndex = index++; return false; });
 
-          var propType = extendProp(Derived.type, "baseStr", {name: "baseStr", isRequired: subSpy});
+          var propType = propertyTypeUtil.extend(Derived.type, "baseStr", {name: "baseStr", isRequired: subSpy});
 
           var owner = {};
 
@@ -2247,7 +2242,7 @@ define([
 
           var subSpy = jasmine.createSpy().and.returnValue(true);
 
-          var propType = extendProp(Derived.type, "baseStr", {name: "baseStr", isRequired: subSpy});
+          var propType = propertyTypeUtil.extend(Derived.type, "baseStr", {name: "baseStr", isRequired: subSpy});
 
           var owner = {};
 
@@ -2265,7 +2260,7 @@ define([
 
           subSpy = jasmine.createSpy().and.returnValue(true);
 
-          propType = extendProp(Derived.type, "baseStr", {name: "baseStr", isRequired: subSpy});
+          propType = propertyTypeUtil.extend(Derived.type, "baseStr", {name: "baseStr", isRequired: subSpy});
 
           owner = {};
 
@@ -2282,7 +2277,7 @@ define([
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.type, "baseStr", {name: "baseStr"});
+          var propType = propertyTypeUtil.extend(Derived.type, "baseStr", {name: "baseStr"});
 
           expect(propType.countMin).toBe(undefined);
         });
@@ -2294,7 +2289,7 @@ define([
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.type, "baseStr", {name: "baseStr"});
+          var propType = propertyTypeUtil.extend(Derived.type, "baseStr", {name: "baseStr"});
 
           var owner = {};
 
@@ -2308,7 +2303,7 @@ define([
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.type, "baseStr", {name: "baseStr", countMin: 2});
+          var propType = propertyTypeUtil.extend(Derived.type, "baseStr", {name: "baseStr", countMin: 2});
 
           expect(propType.countMin).toBe(2);
         });
@@ -2320,7 +2315,7 @@ define([
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.type, "baseStr", {name: "baseStr", countMin: 2});
+          var propType = propertyTypeUtil.extend(Derived.type, "baseStr", {name: "baseStr", countMin: 2});
 
           var owner = {};
 
@@ -2334,7 +2329,7 @@ define([
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.type, "baseStr", {name: "baseStr", countMin: 2});
+          var propType = propertyTypeUtil.extend(Derived.type, "baseStr", {name: "baseStr", countMin: 2});
 
           propType.countMin = 0;
 
@@ -2370,7 +2365,7 @@ define([
           var subIndex = -1;
           var subSpy = jasmine.createSpy().and.callFake(function() { subIndex = index++; return 1; });
 
-          var propType = extendProp(Derived.type, "baseStr", {name: "baseStr", countMin: subSpy});
+          var propType = propertyTypeUtil.extend(Derived.type, "baseStr", {name: "baseStr", countMin: subSpy});
 
           var owner = {};
 
@@ -2390,7 +2385,7 @@ define([
 
           var subSpy = jasmine.createSpy().and.returnValue(3);
 
-          var propType = extendProp(Derived.type, "baseStr", {name: "baseStr", countMin: subSpy});
+          var propType = propertyTypeUtil.extend(Derived.type, "baseStr", {name: "baseStr", countMin: subSpy});
 
           var owner = {};
 
@@ -2408,7 +2403,7 @@ define([
 
           subSpy = function() { return 1; };
 
-          propType = extendProp(Derived.type, "baseStr", {name: "baseStr", countMin: subSpy});
+          propType = propertyTypeUtil.extend(Derived.type, "baseStr", {name: "baseStr", countMin: subSpy});
 
           owner = {};
 
@@ -2424,7 +2419,7 @@ define([
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.type, "baseStr", {name: "baseStr"});
+          var propType = propertyTypeUtil.extend(Derived.type, "baseStr", {name: "baseStr"});
 
           expect(propType.countMax).toBe(undefined);
         });
@@ -2436,7 +2431,7 @@ define([
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.type, "baseStr", {name: "baseStr"});
+          var propType = propertyTypeUtil.extend(Derived.type, "baseStr", {name: "baseStr"});
 
           var owner = {};
 
@@ -2450,7 +2445,7 @@ define([
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.type, "baseStr", {name: "baseStr", countMax: 2});
+          var propType = propertyTypeUtil.extend(Derived.type, "baseStr", {name: "baseStr", countMax: 2});
 
           expect(propType.countMax).toBe(2);
         });
@@ -2462,7 +2457,7 @@ define([
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.type, "baseStr", {name: "baseStr", countMax: 2});
+          var propType = propertyTypeUtil.extend(Derived.type, "baseStr", {name: "baseStr", countMax: 2});
 
           var owner = {};
 
@@ -2476,7 +2471,7 @@ define([
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.type, "baseStr", {name: "baseStr", countMax: 5});
+          var propType = propertyTypeUtil.extend(Derived.type, "baseStr", {name: "baseStr", countMax: 5});
 
           propType.countMax = 7;
 
@@ -2512,7 +2507,7 @@ define([
           var subIndex = -1;
           var subSpy = jasmine.createSpy().and.callFake(function() { subIndex = index++; return 1; });
 
-          var propType = extendProp(Derived.type, "baseStr", {name: "baseStr", countMax: subSpy});
+          var propType = propertyTypeUtil.extend(Derived.type, "baseStr", {name: "baseStr", countMax: subSpy});
 
           var owner = {};
 
@@ -2532,7 +2527,7 @@ define([
 
           var subSpy = jasmine.createSpy().and.returnValue(3);
 
-          var propType = extendProp(Derived.type, "baseStr", {name: "baseStr", countMax: subSpy});
+          var propType = propertyTypeUtil.extend(Derived.type, "baseStr", {name: "baseStr", countMax: subSpy});
 
           var owner = {};
 
@@ -2550,7 +2545,7 @@ define([
 
           subSpy = function() { return 1; };
 
-          propType = extendProp(Derived.type, "baseStr", {name: "baseStr", countMax: subSpy});
+          propType = propertyTypeUtil.extend(Derived.type, "baseStr", {name: "baseStr", countMax: subSpy});
 
           owner = {};
 
@@ -2566,7 +2561,7 @@ define([
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.type, "baseStr", {name: "baseStr"});
+          var propType = propertyTypeUtil.extend(Derived.type, "baseStr", {name: "baseStr"});
 
           expect(propType.isApplicable).toBe(undefined);
         });
@@ -2578,7 +2573,7 @@ define([
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.type, "baseStr", {name: "baseStr"});
+          var propType = propertyTypeUtil.extend(Derived.type, "baseStr", {name: "baseStr"});
 
           var owner = {};
 
@@ -2592,7 +2587,7 @@ define([
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.type, "baseStr", {name: "baseStr", isApplicable: false});
+          var propType = propertyTypeUtil.extend(Derived.type, "baseStr", {name: "baseStr", isApplicable: false});
 
           expect(propType.isApplicable).toBe(false);
         });
@@ -2604,7 +2599,7 @@ define([
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.type, "baseStr", {name: "baseStr", isApplicable: true});
+          var propType = propertyTypeUtil.extend(Derived.type, "baseStr", {name: "baseStr", isApplicable: true});
 
           expect(propType.isApplicable).toBe(true);
 
@@ -2625,7 +2620,7 @@ define([
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.type, "baseStr", {name: "baseStr", isApplicable: true});
+          var propType = propertyTypeUtil.extend(Derived.type, "baseStr", {name: "baseStr", isApplicable: true});
 
           propType.isApplicable = false;
 
@@ -2653,7 +2648,7 @@ define([
           var subIndex = -1;
           var subSpy = jasmine.createSpy().and.callFake(function() { subIndex = index++; return true; });
 
-          var propType = extendProp(Derived.type, "baseStr", {name: "baseStr", isApplicable: subSpy});
+          var propType = propertyTypeUtil.extend(Derived.type, "baseStr", {name: "baseStr", isApplicable: subSpy});
 
           var owner = {};
 
@@ -2673,7 +2668,7 @@ define([
 
           var subSpy = jasmine.createSpy().and.returnValue(true);
 
-          var propType = extendProp(Derived.type, "baseStr", {name: "baseStr", isApplicable: subSpy});
+          var propType = propertyTypeUtil.extend(Derived.type, "baseStr", {name: "baseStr", isApplicable: subSpy});
 
           var owner = {};
 
@@ -2691,7 +2686,7 @@ define([
 
           subSpy = jasmine.createSpy().and.returnValue(true);
 
-          propType = extendProp(Derived.type, "baseStr", {name: "baseStr", isApplicable: subSpy});
+          propType = propertyTypeUtil.extend(Derived.type, "baseStr", {name: "baseStr", isApplicable: subSpy});
 
           owner = {};
 
@@ -2708,7 +2703,7 @@ define([
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.type, "baseStr", {name: "baseStr"});
+          var propType = propertyTypeUtil.extend(Derived.type, "baseStr", {name: "baseStr"});
 
           expect(propType.isReadOnly).toBe(undefined);
         });
@@ -2720,7 +2715,7 @@ define([
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.type, "baseStr", {name: "baseStr"});
+          var propType = propertyTypeUtil.extend(Derived.type, "baseStr", {name: "baseStr"});
 
           var owner = {};
 
@@ -2734,7 +2729,7 @@ define([
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.type, "baseStr", {name: "baseStr", isReadOnly: false});
+          var propType = propertyTypeUtil.extend(Derived.type, "baseStr", {name: "baseStr", isReadOnly: false});
 
           expect(propType.isReadOnly).toBe(false);
         });
@@ -2746,7 +2741,7 @@ define([
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.type, "baseStr", {name: "baseStr", isReadOnly: false});
+          var propType = propertyTypeUtil.extend(Derived.type, "baseStr", {name: "baseStr", isReadOnly: false});
 
           expect(propType.isReadOnly).toBe(false);
 
@@ -2767,7 +2762,7 @@ define([
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.type, "baseStr", {name: "baseStr", isReadOnly: false});
+          var propType = propertyTypeUtil.extend(Derived.type, "baseStr", {name: "baseStr", isReadOnly: false});
 
           propType.isReadOnly = true;
 
@@ -2795,7 +2790,7 @@ define([
           var subIndex = -1;
           var subSpy = jasmine.createSpy().and.callFake(function() { subIndex = index++; return false; });
 
-          var propType = extendProp(Derived.type, "baseStr", {name: "baseStr", isReadOnly: subSpy});
+          var propType = propertyTypeUtil.extend(Derived.type, "baseStr", {name: "baseStr", isReadOnly: subSpy});
 
           var owner = {};
 
@@ -2815,7 +2810,7 @@ define([
 
           var subSpy = jasmine.createSpy().and.returnValue(true);
 
-          var propType = extendProp(Derived.type, "baseStr", {name: "baseStr", isReadOnly: subSpy});
+          var propType = propertyTypeUtil.extend(Derived.type, "baseStr", {name: "baseStr", isReadOnly: subSpy});
 
           var owner = {};
 
@@ -2833,7 +2828,7 @@ define([
 
           subSpy = jasmine.createSpy().and.returnValue(true);
 
-          propType = extendProp(Derived.type, "baseStr", {name: "baseStr", isReadOnly: subSpy});
+          propType = propertyTypeUtil.extend(Derived.type, "baseStr", {name: "baseStr", isReadOnly: subSpy});
 
           owner = {};
 

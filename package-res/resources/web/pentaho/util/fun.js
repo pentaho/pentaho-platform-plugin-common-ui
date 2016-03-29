@@ -21,6 +21,7 @@ define(function() {
    *
    * @name pentaho.util.fun
    * @namespace
+   * @private
    * @amd pentaho/util/fun
    */
   return (function() {

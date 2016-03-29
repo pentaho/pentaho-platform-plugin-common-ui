@@ -28,7 +28,7 @@ define(["pentaho/util/has"], function(has) {
    * @namespace
    * @memberOf pentaho.util
    * @amd pentaho/util/object
-   *
+   * @private
    */
   return /** @lends pentaho.util.object */{
     /**

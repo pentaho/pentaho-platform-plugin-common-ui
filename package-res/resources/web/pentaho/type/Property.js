@@ -436,7 +436,8 @@ define([
         if(this.hasDescendants)
           throw error.operInvalid("Cannot change the default value of a property type that has descendants.");
 
-        if(_ === undefined) {
+        if(_ === undefined || (_ === null && this.isRoot)) {
+          /* istanbul ignore else : hard to test */
           if(this !== _propType) {
             // Clear local value. Inherit base value.
             delete this._value;
@@ -498,6 +499,8 @@ define([
        * @ignore
        */
       _resetLabel: function() {
+        this._labelSet = false;
+
         if(this.isRoot) {
           this._label = text.titleFromName(this.name);
         } else {
@@ -677,6 +680,8 @@ define([
 
       //region serialization
       toSpecInContext: function(keyArgs) {
+        if(!keyArgs) keyArgs = {};
+
         // no id and no base
         var valueTypeRef = this.type.toRefInContext(keyArgs);
         var spec = {
@@ -698,7 +703,7 @@ define([
 
         var any = this.base(spec, keyArgs);
 
-        // Dynamic attributes
+        // Dynamic attributes.
         _dynamicAttrNames.forEach(function(name) {
           var namePriv = "_" + name;
 

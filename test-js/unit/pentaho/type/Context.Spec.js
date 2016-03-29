@@ -364,14 +364,43 @@ define([
       });
 
       describe("by type instance constructor (Instance)", function() {
-        it("should be able to get a standard type",
-        testGet(function(sync, Context) {
+        it("should be able to get a standard type", testGet(function(sync, Context) {
           var context = new Context();
           var Value   = context.get("pentaho/type/value");
           var promise = callGet(context, sync, Value);
 
           return promise.then(function(InstCtor) {
             expect(InstCtor.type.id).toBe("pentaho/type/value");
+          });
+        }));
+
+        it("should throw/reject if given a type from a different context", testGetError(function(sync, Context) {
+          var context1 = new Context();
+          var context2 = new Context();
+          var Value    = context2.get("pentaho/type/value");
+
+          return callGet(context1, sync, Value);
+
+        }, function(errorMatch) { return errorMatch.argInvalid("typeRef"); }));
+
+        it("should configure a type", testGet(function(sync, Context) {
+          // "value" is configured on the Context constructor, so need to wire the prototype...
+
+          spyOn(Context.prototype, "_getConfig").and.callFake(function(id) {
+            if(id === "pentaho/type/value") {
+              return {foo: "bar", instance: {bar: "foo"}};
+            }
+          });
+
+          var context = new Context();
+
+          var promise = callGet(context, sync, "pentaho/type/value");
+
+          return promise.then(function(InstCtor) {
+            expect(Context.prototype._getConfig).toHaveBeenCalledWith("pentaho/type/value");
+
+            expect(InstCtor.prototype.bar).toBe("foo");
+            expect(InstCtor.type.foo).toBe("bar");
           });
         }));
       });
@@ -435,27 +464,82 @@ define([
         }, function(errorMatch) { return errorMatch.argInvalid("typeRef"); }));
       });
 
-      describe("by generic or specialized type syntax", function() {
+      describe("by generic or specialized type specification syntax", function() {
+        // Generic type specification syntax:
+        // {id: "foo", base: "complex", ...}
+
+        describe("`base` and `id`", function() {
+          describe("when `base` is not specified", function() {
+
+            it("should default `base` to `null` when `id` is 'value'", testGet(function(sync, Context) {
+              var context = new Context();
+              var promise = callGet(context, sync, {id: 'value'});
+
+              return promise.then(function(InstCtor) {
+                var Value = context.get("pentaho/type/value");
+
+                expect(InstCtor).toBe(Value);
+              });
+            }));
+
+            it("should default `base` to 'complex' when `id` is not specified", testGet(function(sync, Context) {
+              var context = new Context();
+              var promise = callGet(context, sync, {props: ["a", "b"]});
+
+              return promise.then(function(InstCtor) {
+                var Complex = context.get("pentaho/type/complex");
+
+                expect(InstCtor.type.isSubtypeOf(Complex.type)).toBe(true);
+
+                expect(InstCtor.ancestor).toBe(Complex);
+                expect(InstCtor.type.has("a")).toBe(true);
+                expect(InstCtor.type.has("b")).toBe(true);
+              });
+            }));
+          });
+
+          describe("when `base` is `undefined`", function() {
+
+            it("should default `base` to 'complex'",
+            testGet(function(sync, Context) {
+              var context = new Context();
+              var promise = callGet(context, sync, {base: undefined, props: ["a", "b"]});
+
+              return promise.then(function(InstCtor) {
+                var Complex = context.get("pentaho/type/complex");
+
+                expect(InstCtor.type.isSubtypeOf(Complex.type)).toBe(true);
+
+                expect(InstCtor.ancestor).toBe(Complex);
+                expect(InstCtor.type.has("a")).toBe(true);
+                expect(InstCtor.type.has("b")).toBe(true);
+              });
+            }));
+          });
+
+          describe("when `base` is `null`", function() {
+            it("should throw/reject when `id` is not 'value'",
+            testGetError(function(sync, Context) {
+              var context = new Context();
+
+              return callGet(context, sync, {id: "foo", base: null});
+            }, function(errorMatch) { return errorMatch.argInvalid("typeRef"); }));
+          });
+
+          describe("when `base` is specified non-nully", function() {
+            it("should throw/reject when `id` is 'value'",
+            testGetError(function(sync, Context) {
+              var context = new Context();
+
+              return callGet(context, sync, {id: "value", base: "foo"});
+            }, function(errorMatch) { return errorMatch.argInvalid("typeRef"); }));
+          });
+        });
+
         //region complex
         it("should be able to create an anonymous complex type with base complex", testGet(function(sync, Context) {
           var context = new Context();
           var promise = callGet(context, sync, {base: "complex", props: ["a", "b"]});
-
-          return promise.then(function(InstCtor) {
-            var Complex = context.get("pentaho/type/complex");
-
-            expect(InstCtor.type.isSubtypeOf(Complex.type)).toBe(true);
-
-            expect(InstCtor.ancestor).toBe(Complex);
-            expect(InstCtor.type.has("a")).toBe(true);
-            expect(InstCtor.type.has("b")).toBe(true);
-          });
-        }));
-
-        it("should be able to create an anonymous complex type with implied base complex",
-        testGet(function(sync, Context) {
-          var context = new Context();
-          var promise = callGet(context, sync, {props: ["a", "b"]});
 
           return promise.then(function(InstCtor) {
             var Complex = context.get("pentaho/type/complex");

@@ -40,6 +40,8 @@
  * When an empty string or {@link Nully},
  * the label is inherited from the base type.
  *
+ * The _initial value_ of this attribute, on the top-root type, is `"instance"`.
+ *
  * @name label
  * @memberOf pentaho.type.spec.ITypeProto#
  * @type {?nonEmptyString | any}

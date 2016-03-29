@@ -370,6 +370,16 @@ define([
         expect(typeof DiscreteDomainFacet.fillSpecInContext).toBe("function");
       });
 
+      it("should allow not specifying keyArgs", function() {
+        var DomainNumber = PentahoNumber.refine({type: {
+          facets: DiscreteDomainFacet,
+          domain: [1, 2, 3]
+        }});
+
+        var spec = {};
+        DiscreteDomainFacet.fillSpecInContext.call(DomainNumber.type, spec);
+      });
+
       it("should serialize a local domain using array form", function() {
         var DomainNumber = PentahoNumber.refine({type: {
           facets: DiscreteDomainFacet,

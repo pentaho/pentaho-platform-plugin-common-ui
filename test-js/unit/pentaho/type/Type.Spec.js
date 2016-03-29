@@ -24,6 +24,14 @@ define([
 
   describe("pentaho.type.Type", function() {
 
+    describe("construction", function() {
+      it("should allow specifying static type members", function() {
+        var Derived = Instance.extend({}, {type: {foo: "bar"}});
+
+        expect(Derived.Type.foo).toBe("bar");
+      });
+    });
+
     describe("#view -", function() {
       it("should default to `null`", function() {
         var Derived = Instance.extend({type: {id: "fake/id"}});
@@ -136,6 +144,19 @@ define([
         expect(B.type.view).toBe("baba/dudu/bar");
       });
 
+      // coverage
+      it("should allow setting to the same string value", function() {
+        var A = Instance.extend({type: {view: "foo"}});
+
+        expect(A.type.view).toBe("foo");
+
+        var B = A.extend({type: {id: "baba/dudu", view: "bar"}});
+
+        B.type.view = "bar";
+
+        expect(B.type.view).toBe("baba/dudu/bar");
+      });
+
       it("should inherit a base function", function() {
         var FA = function() {
         };
@@ -158,6 +179,23 @@ define([
         var FB = function() {
         };
         var B  = A.extend({type: {id: "baba/dudu", view: FB}});
+
+        expect(B.type.view).toBe(FB);
+      });
+
+      // coverage
+      it("should allow setting to the same function", function() {
+        var FA = function() {
+        };
+        var A  = Instance.extend({type: {view: FA}});
+
+        expect(A.type.view).toBe(FA);
+
+        var FB = function() {
+        };
+        var B  = A.extend({type: {id: "baba/dudu", view: FB}});
+
+        B.type.view = FB;
 
         expect(B.type.view).toBe(FB);
       });

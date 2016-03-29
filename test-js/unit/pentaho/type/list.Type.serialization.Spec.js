@@ -183,6 +183,17 @@ define([
           expect("of" in spec).toBe(false);
         });
       });
+
+      // coverage
+      it("should serialize the List type", function() {
+        var derivedType = List.type;
+        var scope = new SpecificationScope();
+        var keyArgs = {};
+
+        derivedType.toSpecInContext(keyArgs);
+
+        scope.dispose();
+      });
     });
   });
 });

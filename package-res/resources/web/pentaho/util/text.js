@@ -23,7 +23,7 @@ define(function() {
    * @namespace
    * @memberOf pentaho.util
    * @amd pentaho/util/text
-   * @ignore
+   * @private
    */
   var text = {
     /**

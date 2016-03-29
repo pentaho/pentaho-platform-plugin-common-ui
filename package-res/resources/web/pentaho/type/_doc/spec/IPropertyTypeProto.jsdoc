@@ -49,6 +49,23 @@
  */
 
 /**
+ * The label of the property type.
+ *
+ * When non-{@link Nully} and not a string,
+ * it is taken instead to be the result of calling its `toString` method.
+ *
+ * When an empty string or {@link Nully},
+ * the label is inherited from the base type.
+ *
+ * The default label of a root property type is a capitalization of
+ * its [name]{@link pentaho.type.spec.IPropertyTypeProto#name}.
+ *
+ * @name label
+ * @memberOf pentaho.type.spec.IPropertyTypeProto#
+ * @type {?nonEmptyString | any}
+ */
+
+/**
  * The type of value that properties of this type can hold.
  *
  * If the _value type_ is a [list]{@link pentaho.type.Value.Type#isList} type,

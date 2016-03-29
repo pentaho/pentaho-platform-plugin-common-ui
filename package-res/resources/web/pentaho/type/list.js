@@ -728,7 +728,7 @@ define([
             };
 
           // Add "of" if we're `List` or the base `of` is different.
-          var baseElemType = List.type.isSubtypeOf(baseType) ? baseType._elemType : null;
+          var baseElemType = baseType.isSubtypeOf(List.type) ? baseType._elemType : null;
           if(!baseElemType || this._elemType !== baseElemType) {
             spec.of = this._elemType.toRefInContext(keyArgs);
           }

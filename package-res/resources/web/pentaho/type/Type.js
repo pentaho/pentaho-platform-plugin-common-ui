@@ -35,7 +35,7 @@ define([
       _extractShortId = /^pentaho\/type\/(\w+)$/i,
       _type = null,
       _normalAttrNames = [
-        "label", "description", "category", "helpUrl", "isBrowsable", "isAdvanced", "ordinal"
+        "description", "category", "helpUrl", "isBrowsable", "isAdvanced", "ordinal"
       ],
       O_isProtoOf = Object.prototype.isPrototypeOf;
 
@@ -240,6 +240,7 @@ define([
     // Not documented on purpose.
     set instance(config) {
       // Class.implement essentially just calls Class#extend.
+      /* istanbul ignore else: no comments */
       if(config) this.instance.extend(config);
     }, //jshint -W078
     //endregion
@@ -331,6 +332,7 @@ define([
     //region label property
     // must have some non-null value to inherit
     _label: "instance",
+    _labelSet: false,
 
     /**
      * Gets or sets the label of this type.
@@ -358,11 +360,14 @@ define([
       if(value === null) {
         this._resetLabel();
       } else {
+        this._labelSet = true;
         this._label = value;
       }
     },
 
     _resetLabel: function() {
+      this._labelSet = false;
+
       if(this !== _type) {
         delete this._label;
       }
@@ -602,6 +607,7 @@ define([
      * @readonly
      */
     get inheritedStyleClasses() {
+      /* istanbul ignore next: not implemented yet */
       throw error.notImplemented("Implement me!");
     },
     //endregion
@@ -889,7 +895,12 @@ define([
      */
     _fillSpecInContext: function(spec, keyArgs) {
       var any = false;
-      var isJson = keyArgs.isJson;
+      //var isJson = keyArgs.isJson;
+
+      if(this._labelSet && O.hasOwn(this, "_label")) {
+        any = true;
+        spec.label = this._label;
+      }
 
       // Normal attributes
       _normalAttrNames.forEach(function(name) {
@@ -912,7 +923,7 @@ define([
       if(viewInfo !== undefined) { // can be null
         any = true;
         var view = viewInfo && viewInfo.value;
-        spec.view = view && isJson ? String(view) : view;
+        spec.view = view; // view && isJson ? String(view) : view;
       }
 
       return any;

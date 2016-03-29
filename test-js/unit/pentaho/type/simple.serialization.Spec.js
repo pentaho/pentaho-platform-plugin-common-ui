@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context"
-], function(Context) {
+  "pentaho/type/Context",
+  "pentaho/type/SpecificationScope"
+], function(Context, SpecificationScope) {
   "use strict";
 
   /*global describe:false, it:false, expect:false, beforeEach:false, Date:false */
@@ -120,6 +121,19 @@ define([
             expect(spec).toBe(originalSpec.v);
           });
         });
+      });
+    });
+
+    describe("#toSpecInContext(keyArgs)", function() {
+      // coverage
+      it("should allow not specifying keyArgs", function() {
+        var scope = new SpecificationScope();
+
+        var value = new PentahoBoolean(true);
+
+        value.toSpecInContext();
+
+        scope.dispose();
       });
     });
   }); // pentaho.type.Simple
