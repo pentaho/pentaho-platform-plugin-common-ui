@@ -47,7 +47,7 @@
  * <ul>
  *   <li>label - the title for submit button</li>
  *   <li>autoSubmitLabel - the title for auto-submit checkbox label</li>
- *   <li>promptPanel - {@link PromptPanel} used to check 'autoSubmit' and 'forceAutoSubmit' properties</li>
+ *   <li>promptPanel - {@link PromptPanel} used to check 'autoSubmit' property</li>
  *   <li>paramDefn - {@link ParameterDefinition} used to check 'autoSubmit' property</li>
  * </ul>
  *
@@ -88,7 +88,7 @@ define(['./ScopedPentahoButtonComponent', 'common-ui/jquery-clean'], function(Sc
       }
 
       // BISERVER-6915 Should not request pagination when auto-submit is set to false
-      if (promptPanel.forceAutoSubmit || promptPanel.getAutoSubmitSetting()) {
+      if (promptPanel.getAutoSubmitSetting()) {
         this.expression(/*isInit*/true);
       }
     },

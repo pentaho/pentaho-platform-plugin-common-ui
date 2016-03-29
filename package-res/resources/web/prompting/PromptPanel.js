@@ -783,7 +783,6 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
          * @param {Boolean} [options.isInit] Flag indicating if submit is being executed during initialization.
          */
         submit: function (promptPanel, options) {
-          this.forceAutoSubmit = false;
           if (this.onSubmit) {
             if (typeof this.onSubmit === "function") {
               this.onSubmit(options);
