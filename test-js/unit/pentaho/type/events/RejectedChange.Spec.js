@@ -15,43 +15,59 @@
  */
 define([
   "pentaho/lang/Event",
-  "pentaho/lang/events/WillChange"
-], function(Event, WillChange) {
+  "pentaho/type/events/RejectedChange",
+  "tests/pentaho/util/errorMatch"
+], function(Event, RejectedChange, errorMatch) {
   "use strict";
 
   /* global describe:false, it:false, expect:false, beforeEach:false */
 
-  describe("pentaho.lang.events.WillChange -", function() {
-
+  describe("pentaho.type.events.RejectedChange -", function() {
+    
     it("should extend Event", function() {
-      expect(WillChange.prototype instanceof Event).toBe(true);
+      expect(RejectedChange.prototype instanceof Event).toBe(true);
     });
 
     describe("instances -", function() {
       var event;
 
-      var changeset = { mock: "I am a mock" };
+      var error = "no go!";
+      var changeset = {};
 
       beforeEach(function() {
-        event = new WillChange({}, changeset);
+        event = new RejectedChange({}, changeset, error);
       });
 
       it("should extend Event", function() {
         expect(event instanceof Event).toBe(true);
       });
 
-      it("changeset should be the same than received in the constructor", function() {
+      it("error property should be the same as that received in the constructor", function() {
+        expect(event.error).toBe(error);
+      });
+
+      it("changeset property should be the same as that received in the constructor", function() {
         expect(event.changeset).toBe(changeset);
       });
 
-      it("changeset property should be immutable", function() {
+      it("error property should be immutable", function() {
         expect(function() {
-          event.changeset = {};
+          event.error = new Error("other");
         }).toThrowError(TypeError);
-
-        expect(event.changeset).toBe(changeset);
       });
     });
 
-  }); // #pentaho.lang.events.WillChange
+    it("should throw if empty error parameter", function() {
+      expect(function() {
+        return new RejectedChange({}, {});
+      }).toThrow(errorMatch.argRequired("error"));
+    });
+
+    it("should throw if empty changeset parameter", function() {
+      expect(function() {
+        return new RejectedChange({});
+      }).toThrow(errorMatch.argRequired("changeset"));
+    });
+
+  }); // #pentaho.lang.events.RejectedChange
 });

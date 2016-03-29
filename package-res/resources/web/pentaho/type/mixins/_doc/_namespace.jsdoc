@@ -15,10 +15,8 @@
  */
 
 /**
- * The `lang` namespace contains classes and interfaces used as
- * type system building blocks to form other classes and interfaces
- * of the Pentaho Web Platform.
+ * The `mixins` namespace contains mixins for classes.
  *
- * @name pentaho.lang
+ * @name pentaho.type.mixins
  * @namespace
  */

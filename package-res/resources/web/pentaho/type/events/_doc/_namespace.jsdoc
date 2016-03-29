@@ -15,10 +15,8 @@
  */
 
 /**
- * The `lang` namespace contains classes and interfaces used as
- * type system building blocks to form other classes and interfaces
- * of the Pentaho Web Platform.
+ * The `event` namespace contains classes for events.
  *
- * @name pentaho.lang
+ * @name pentaho.type.events
  * @namespace
  */

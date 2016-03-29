@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 define([
-  "../Event",
+  "../../lang/Event",
   "../mixins/_mixinChangeset",
   "../mixins/mixinError"
 ], function(Event, mixinChangeset, mixinError) {
@@ -22,7 +22,7 @@ define([
 
   /**
    * @name RejectedChange
-   * @memberOf pentaho.lang.events
+   * @memberOf pentaho.type.events
    * @class
    * @extends pentaho.lang.Event
    * @mixes pentaho.lang.mixins.mixinError
@@ -32,19 +32,19 @@ define([
    * properties values with {@link pentaho.type.Complex#set|Complex#set}.
    *
    * A rejection can be one of the following:
-   *  - the event {@link pentaho.lang.events.WillChange|"will:change"} was canceled
+   *  - the event {@link pentaho.type.events.WillChange|"will:change"} was canceled
    *  - the value of a property in changeset was not consistent with the current value of the property,
-   *  which indicates that some change took place during the processing of the {@link pentaho.lang.events.WillChange|"will:change"} event listeners.
+   *  which indicates that some change took place during the processing of the {@link pentaho.type.events.WillChange|"will:change"} event listeners.
    *
    * @constructor
    * @description Creates a `RejectedChange` event.
    *
    * @param {!pentaho.type.Complex} source - The object which is emitting the event.
-   * @param {!pentaho.lang.ComplexChangeset} changeset - The changes to be made to the values of the properties.
+   * @param {!pentaho.type.ComplexChangeset} changeset - The changes to be made to the values of the properties.
    * @param {!Error|pentaho.lang.UserError} error - The error of a rejected {@link pentaho.lang.ActionResult|ActionResult}.
    */
-  return Event.extend("pentaho.lang.events.RejectedChange",
-    /** @lends pentaho.lang.events.RejectedChange# */{
+  return Event.extend("pentaho.type.events.RejectedChange",
+    /** @lends pentaho.type.events.RejectedChange# */{
 
       constructor: function(source, changeset, error) {
         this.base("rejected:change", source, false);

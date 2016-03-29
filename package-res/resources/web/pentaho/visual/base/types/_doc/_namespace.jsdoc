@@ -15,10 +15,10 @@
  */
 
 /**
- * The `lang` namespace contains classes and interfaces used as
- * type system building blocks to form other classes and interfaces
- * of the Pentaho Web Platform.
+ * The `types` namespace contains data types for developers to use
+ * to build new visualizations that work with the Visualization API.
  *
- * @name pentaho.lang
+ * @name pentaho.visual.base.types
  * @namespace
+ *
  */

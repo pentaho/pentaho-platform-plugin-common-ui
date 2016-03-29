@@ -19,31 +19,33 @@ define([
   "use strict";
 
   /**
-   * @name mixinError
-   * @memberOf pentaho.lang.mixins
+   * @name _mixinChangeset
+   * @memberOf pentaho.type.mixins
    * @mixin
+   * @private
    */
-  return  /** @lends pentaho.lang.mixins.mixinError */{
+  return  /** @lends pentaho.type.mixins._mixinChangeset */{
 
     /**
      * Initializes the mixin.
      *
-     * @param {!Error|pentaho.lang.UserError} errorObj - The error of a rejected {@link pentaho.lang.ActionResult|ActionResult}.
+     * @param {!pentaho.type.ComplexChangeset} changeset - An object that describes the changes
+     * to be made to a set of properties.
      * @protected
      */
-    _initError: function(errorObj) {
-      if(!errorObj) throw error.argRequired("error");
-      this._error = errorObj;
+    _initChangeset: function(changeset) {
+      if(!changeset) throw error.argRequired("changeset");
+      this._changeset = changeset;
     },
 
     /**
-     * Gets the error that caused the {@link pentaho.lang.ActionResult|ActionResult} to be rejected.
+     * Gets the object with the changes to the set of properties.
      *
-     * @type !Error|pentaho.lang.UserError
+     * @type !pentaho.type.ComplexChangeset
      * @readonly
      */
-    get error() {
-      return this._error;
+    get changeset() {
+      return this._changeset;
     }
   };
 });

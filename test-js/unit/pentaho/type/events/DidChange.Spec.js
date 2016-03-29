@@ -15,14 +15,14 @@
  */
 define([
   "pentaho/lang/Event",
-  "pentaho/lang/events/DidChange",
+  "pentaho/type/events/DidChange",
   "tests/pentaho/util/errorMatch"
 ], function(Event, DidChange, errorMatch) {
   "use strict";
 
   /* global describe:false, it:false, expect:false, beforeEach:false */
 
-  describe("pentaho.lang.events.DidChange -", function() {
+  describe("pentaho.type.events.DidChange -", function() {
 
     it("should extend Event", function() {
       expect(DidChange.prototype instanceof Event).toBe(true);
