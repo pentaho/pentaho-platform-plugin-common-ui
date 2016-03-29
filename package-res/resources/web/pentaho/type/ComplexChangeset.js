@@ -15,7 +15,7 @@
  */
 
 define([
-  "./Base",
+  "../lang/Base",
   "../util/object",
   "../util/error"
 ], function(Base, O, error) {
@@ -37,7 +37,7 @@ define([
    * @class
    * @extends pentaho.lang.Base
    */
-  return Base.extend("pentaho.lang.ComplexChangeset", /** @lends pentaho.lang.ComplexChangeset#*/{
+  return Base.extend("pentaho.type.ComplexChangeset", /** @lends pentaho.type.ComplexChangeset#*/{
 
     /**
      * Creates a `ComplexChangeset` with a given owner.
@@ -56,7 +56,7 @@ define([
     /**
      * Gets the complex where the change occurred.
      *
-     * @type !pentaho.lang.ComplexChangeset
+     * @type !pentaho.type.ComplexChangeset
      * @readonly
      */
     get owner() {

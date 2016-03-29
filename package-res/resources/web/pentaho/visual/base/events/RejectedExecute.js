@@ -16,7 +16,7 @@
 define([
   "pentaho/lang/Event",
   "../mixins/mixinDataFilter",
-  "pentaho/lang/mixins/mixinError",
+  "pentaho/type/mixins/mixinError",
   "pentaho/util/error"
 ], function(Event, mixinDataFilter, mixinError, utilError) {
   "use strict";
@@ -26,7 +26,7 @@ define([
    * @memberOf pentaho.visual.base.events
    * @class
    * @extends pentaho.lang.Event
-   * @mixes pentaho.lang.mixins.mixinError
+   * @mixes pentaho.type.mixins.mixinError
    *
    * @classDesc This event is triggered when any rejection occurs while inside
    * the {@link pentaho.visual.base.Model#executeAction|Execute Action} flow.

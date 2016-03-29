@@ -21,10 +21,10 @@ define([
   "../lang/EventSource",
   "../lang/ActionResult",
   "../lang/UserError",
-  "../lang/events/WillChange",
-  "../lang/events/RejectedChange",
-  "../lang/events/DidChange",
-  "../lang/ComplexChangeset",
+  "./events/WillChange",
+  "./events/RejectedChange",
+  "./events/DidChange",
+  "./ComplexChangeset",
   "../i18n!types",
   "../util/object",
   "../util/error"
@@ -380,7 +380,7 @@ define([
         /**
          * Orchestrates the will/did/rejected event loop around property changes.
          *
-         * @param {pentaho.lang.ComplexChangeset} changeset - The set of changes.
+         * @param {pentaho.type.ComplexChangeset} changeset - The set of changes.
          *
          * @return {?pentaho.lang.Base.Error} An error if the change loop was canceled or invalid,
          * or `undefined` otherwise.
@@ -406,7 +406,7 @@ define([
         /**
          * Applies a set of changes to this object.
          *
-         * @param {pentaho.lang.ComplexChangeset} changeset - The set of changes.
+         * @param {pentaho.type.ComplexChangeset} changeset - The set of changes.
          *
          * @return {?pentaho.lang.UserError} An error if the values of the properties to be changed
          * do not match those declared in the `changeset` object, or `undefined` otherwise.
@@ -454,7 +454,7 @@ define([
         /**
          * Emits the "will:change" event, if need be.
          *
-         * @param {pentaho.lang.ComplexChangeset} changeset - The set of changes.
+         * @param {pentaho.type.ComplexChangeset} changeset - The set of changes.
          *
          * @return {?pentaho.lang.Base.Error} An error if the change loop was canceled or invalid,
          * or `undefined` otherwise.
@@ -474,7 +474,7 @@ define([
         /**
          * Emits the "did:change" event, if need be.
          *
-         * @param {pentaho.lang.ComplexChangeset} changeset - The set of changes.
+         * @param {pentaho.type.ComplexChangeset} changeset - The set of changes.
          *
          * @private
          * @ignore
@@ -489,7 +489,7 @@ define([
         /**
          * Emits the "will:change" event, if need be.
          *
-         * @param {pentaho.lang.ComplexChangeset} changeset - The set of changes.
+         * @param {pentaho.type.ComplexChangeset} changeset - The set of changes.
          * @param {pentaho.lang.Base.Error} reason - The reason why the change loop was rejected.
          *
          * @private

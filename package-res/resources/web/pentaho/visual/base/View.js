@@ -219,7 +219,7 @@ define([
      * @see pentaho.visual.base.View#_selectionChanged
      * @see pentaho.visual.base.View#_render
      *
-     * @param {!pentaho.lang.Changeset} changeset - Map of the properties that have changed.
+     * @param {!pentaho.type.Changeset} changeset - Map of the properties that have changed.
      *
      * @protected
      */

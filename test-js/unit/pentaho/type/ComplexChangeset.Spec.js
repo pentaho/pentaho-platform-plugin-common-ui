@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 define([
-  "pentaho/lang/ComplexChangeset",
+  "pentaho/type/ComplexChangeset",
   "pentaho/lang/Base",
   "pentaho/util/error"
 ], function(ComplexChangeset, Base, error) {
@@ -22,7 +22,7 @@ define([
 
   /* global describe:false, it:false, expect:false, beforeEach:false */
 
-  describe("pentaho.lang.ComplexChangeset -", function() {
+  describe("pentaho.type.ComplexChangeset -", function() {
 
     it("should be defined.", function () {
       expect(typeof ComplexChangeset).toBeDefined();
