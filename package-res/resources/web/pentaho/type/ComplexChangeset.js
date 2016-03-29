@@ -122,7 +122,7 @@ define([
      */
     freeze: function(){
       O.eachOwn(this._properties, function(change){
-        Object.freeze(change);
+        if(change) Object.freeze(change);
       });
       Object.freeze(this._properties);
     },
