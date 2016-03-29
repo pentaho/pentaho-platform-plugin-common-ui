@@ -450,7 +450,7 @@ define([
             ]);
 
             listeners.will.and.callFake(function(event) {
-              if(event.changeset.get("x").newValue.valueOf() === THREE) event.cancel();
+              if(event.changeset.getChange("x").newValue.valueOf() === THREE) event.cancel();
             });
 
             complex = new Derived({x: 0});
@@ -496,9 +496,8 @@ define([
               listeners.did.and.callFake(function(event) {
                 expect(event.changeset).toBeDefined();
 
-                expect(function() {
-                  event.changeset.add("foo", "bar");
-                }).toThrowError(TypeError);
+                event.changeset.set("x", 2);
+                expect(event.changeset.getChange("x").newValue.value).toBe(1);
               });
 
               complex.set("x", 1);
@@ -508,13 +507,12 @@ define([
               listeners.rejected.and.callFake(function(event) {
                 expect(event.changeset).toBeDefined();
 
-                expect(function() {
-                  event.changeset.add("foo", "bar");
-                }).toThrowError(TypeError);
+                event.changeset.set("x", 2);
+                expect(event.changeset.getChange("x").newValue.value).toBe(1);
               });
 
-              complex.set("x", 1);
-            })
+              complex.set("x", 3);
+            });
           }); //end with listeners
         });
       }); // end set

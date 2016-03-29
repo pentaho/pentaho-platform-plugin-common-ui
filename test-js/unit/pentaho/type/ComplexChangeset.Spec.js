@@ -16,8 +16,8 @@
 define([
   "pentaho/type/ComplexChangeset",
   "pentaho/lang/Base",
-  "pentaho/util/error"
-], function(ComplexChangeset, Base, error) {
+  "tests/pentaho/util/errorMatch"
+], function(ComplexChangeset, Base, errorMatch) {
   "use strict";
 
   /* global describe:false, it:false, expect:false, beforeEach:false */
@@ -34,9 +34,10 @@ define([
 
       var owner = {
         type: {
-          get: function() {
+          get: function(name) {
             return {
               get isList() { return false; },
+              get name(){ return name;},
               toValue: function(value) { return value; }
             };
           }
@@ -58,7 +59,7 @@ define([
 
         it("changeset owner should be immutable", function() {
           expect(function() { changeset.owner = "foo"; }).toThrowError(TypeError);
-        })
+        });
       });
 
       describe("#has -", function() {
@@ -71,15 +72,15 @@ define([
         });
       }); //end #has
 
-      describe("#get -", function() {
+      describe("#getChange -", function() {
         it("should return `null` if the property does not exist", function() {
           expect(changeset.has("baz")).toBe(false);
-          expect(changeset.get("baz")).toBe(null);
+          expect(changeset.getChange("baz")).toBe(null);
         });
 
         it("should return the change object for the given property if it exists", function() {
           expect(changeset.has("foo")).toBe(true);
-          expect(changeset.get("foo")).not.toBe(null);
+          expect(changeset.getChange("foo")).not.toBe(null);
         });
       }); //end #get
 
@@ -96,18 +97,20 @@ define([
           expect(changeset.has("baz")).toBe(true);
         });
 
-        it("should updated a property `change` if it already exists in the ComplexChangeset", function() {
-          expect(changeset.get("foo").oldValue).toBe(5);
-          expect(changeset.get("foo").newValue).toBe(10);
+        it("should update a property `change` if it already exists in the ComplexChangeset", function() {
+          expect(changeset.getChange("foo").oldValue).toBe(5);
+          expect(changeset.getChange("foo").newValue).toBe(10);
 
           changeset.set("foo", 1);
 
-          expect(changeset.get("foo").oldValue).toBe(5);
-          expect(changeset.get("foo").newValue).toBe(1);
+          expect(changeset.getChange("foo").oldValue).toBe(5);
+          expect(changeset.getChange("foo").newValue).toBe(1);
         });
 
         function _setShouldThrow(context, property, value) {
-          expect(function() { context.set(property, value); }).toThrow(error.argRequired("property"));
+          expect(function() {
+            context.set(property, value);
+          }).toThrow(errorMatch.argRequired("name"));
         }
       }); //end #set
 

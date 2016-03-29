@@ -237,8 +237,8 @@ define([
 
       var updateSelection = changeset.has("selectionFilter");
       if(updateSelection){
-        var selectionFilter = changeset.get("selectionFilter");
-        this._selectionChanged(selectionFilter.newValue.value, selectionFilter.oldValue.value);
+        var selectionFilterChange = changeset.getChange("selectionFilter");
+        this._selectionChanged(selectionFilterChange.newValue.value, selectionFilterChange.oldValue.value);
       }
 
       var updateSize = changeset.has("width") || changeset.has("height");
