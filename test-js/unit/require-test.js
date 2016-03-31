@@ -20,6 +20,7 @@
   /*global require:false */
 
   var _nextUid = 1;
+  var A_slice = Array.prototype.slice;
 
   /**
    * Creates a new RequireJS context and returns its `require` function.
@@ -53,7 +54,9 @@
      */
     contextRequire.contextName = name;
 
-    contextRequire.new = require.newContext;
+    contextRequire.new     = require.new;
+    contextRequire.promise = require.promise;
+    contextRequire.using   = require.using;
 
     /**
      * Configures the context.
@@ -111,6 +114,53 @@
     };
 
     return contextRequire;
+  };
+
+  require.promise = function(deps) {
+    var localRequire = this;
+
+    return new Promise(function(resolve, reject) {
+      localRequire(deps, function() {
+        resolve(A_slice.call(arguments));
+      }, reject);
+    });
+  };
+
+  require.using = function(deps, scopedFun) {
+    // Identify the special "require" argument.
+    // Copy the array, remove "require", and add `localRequire` in its place, later.
+    var requireIndex = deps.indexOf("require");
+    if(requireIndex >= 0)
+      (deps = deps.slice()).splice(requireIndex, 1);
+
+    var localRequire = this.new();
+
+    return localRequire.promise(deps)
+        .then(processDeps)
+        .then(callScoped)
+        .then(function() {
+          disposeContext();
+        }, function(reason) {
+          disposeContext();
+          return Promise.reject(reason);
+        });
+
+    function processDeps(values) {
+
+      if(requireIndex >= 0) values.splice(requireIndex, 0, localRequire);
+
+      return values;
+    }
+
+    function callScoped(values) {
+      /*jshint validthis:true*/
+      // forward `this`
+      return scopedFun.apply(this, values);
+    }
+
+    function disposeContext() {
+      localRequire.dispose();
+    }
   };
 
   // ---
