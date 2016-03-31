@@ -11,7 +11,7 @@ define([
     _init: function() {
       this.base();
       var me = this;
-      window.onkeypress = function(e){
+      window.addEventListener("keypress", function(e) {
         var ignoreTags = ["TEXTAREA", "INPUT"];
 
         if(ignoreTags.includes(e.target.tagName)) return;
@@ -22,9 +22,9 @@ define([
           "KeyR": selectionModes.REPLACE,
           "KeyT": selectionModes.TOGGLE
         };
-        me.model.set("selectionMode", mode[e.code]);
 
-      };
+        me.model.set("selectionMode", mode[e.code]);
+      }, false);
 
       this.model.on("will:select",  this._onWillSelect.bind(this));
 
@@ -48,7 +48,7 @@ define([
       }, []);
 
       // Remove restrictions on the properties that span multiple charts.
-      var dataFilter = event.dataFilter.walk(function(node, children) {
+      var dataFilter = event.dataFilter.visit(function(node, children) {
         if(children !== null && children.length === 0) return null;
 
         if(node instanceof filter.AbstractPropertyFilter) {
