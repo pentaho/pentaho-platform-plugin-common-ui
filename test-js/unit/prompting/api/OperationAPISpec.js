@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2016 Pentaho Corporation.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file expect in compliance with the License.
@@ -27,7 +27,7 @@ define(["common-ui/prompting/api/OperationAPI"], function(OperationAPI) {
 
       apiSpy.log.error.and.callFake(function(msg, throwErr) {
         if (throwErr) {
-          throw msg;
+          throw (msg instanceof Error) ? msg : new Error(msg);
         }
       });
 
@@ -53,7 +53,7 @@ define(["common-ui/prompting/api/OperationAPI"], function(OperationAPI) {
       it("should test render with null getParameterDefinitionCallback callback", function() {
         expect(function() {
           operationApi.render(null);
-        }).toThrow(operationApi._msgs.NO_PARAM_DEFN_FUNC);
+        }).toThrowError(operationApi._msgs.NO_PARAM_DEFN_FUNC);
 
         expect(operationApi._promptPanel).toBeDefined();
         expect(apiSpy.log.error).toHaveBeenCalledWith(operationApi._msgs.NO_PARAM_DEFN_FUNC, true);
@@ -67,7 +67,7 @@ define(["common-ui/prompting/api/OperationAPI"], function(OperationAPI) {
 
         expect(function() {
           operationApi.render(getParameterDefinitionCallback);
-        }).toThrow(operationApi._msgs.NO_PARAM_DEFN);
+        }).toThrowError(operationApi._msgs.NO_PARAM_DEFN);
 
         expect(apiSpy.log.error).toHaveBeenCalledWith(operationApi._msgs.NO_PARAM_DEFN, true);
       });
@@ -143,15 +143,31 @@ define(["common-ui/prompting/api/OperationAPI"], function(OperationAPI) {
 
         expect(operationApi._getPromptPanel).toHaveBeenCalled();
         expect(promptPanelSpy.init).toHaveBeenCalled();
-        expect(operationApi.init).toThrow();
+        expect(operationApi.init).toThrowError();
       });
     });
 
-    it("should test getParameterValues", function() {
-      operationApi.getParameterValues();
+    describe("should test getParameterValues", function() {
+      it("should return getParameterValues", function() {
+        var fakeValues = jasmine.createSpy("parameterValues");
+        promptPanelSpy.getParameterValues.and.returnValue(fakeValues);
+        var values = operationApi.getParameterValues();
 
-      expect(operationApi._getPromptPanel).toHaveBeenCalled();
-      expect(promptPanelSpy.getParameterValues).toHaveBeenCalled();
+        expect(operationApi._getPromptPanel).toHaveBeenCalled();
+        expect(promptPanelSpy.getParameterValues).toHaveBeenCalled();
+        expect(values).toBe(fakeValues);
+      });
+
+      it("should return empty result if thrown an exception", function() {
+        var errorMsg = "test error";
+        promptPanelSpy.getParameterValues.and.throwError(errorMsg);
+        var values = operationApi.getParameterValues();
+
+        expect(operationApi._getPromptPanel).toHaveBeenCalled();
+        expect(promptPanelSpy.getParameterValues).toHaveBeenCalled();
+        expect(values).toEqual({});
+        expect(apiSpy.log.error).toHaveBeenCalledWith(new Error(errorMsg));
+      });
     });
 
     it("should test setParameterValue", function() {
@@ -205,6 +221,32 @@ define(["common-ui/prompting/api/OperationAPI"], function(OperationAPI) {
         };
         var result = operationApi.state(state);
         expect(result).toBe(fakeState);
+        expect(promptPanelSpy.setState).toHaveBeenCalledWith(state);
+        expect(promptPanelSpy.getState).toHaveBeenCalled();
+      });
+
+      it("should return current state if happened an exception during setting state", function() {
+        var state = {
+          "parametersChanged": false
+        };
+        var errorMsg = "test error";
+        promptPanelSpy.setState.and.throwError(errorMsg);
+        var result = operationApi.state(state);
+        expect(result).toBe(fakeState);
+        expect(apiSpy.log.error).toHaveBeenCalledWith(new Error(errorMsg));
+        expect(promptPanelSpy.setState).toHaveBeenCalledWith(state);
+        expect(promptPanelSpy.getState).toHaveBeenCalled();
+      });
+
+      it("should return empty JSON if happened an exception during getting state", function() {
+        var state = {
+          "parametersChanged": false
+        };
+        var errorMsg = "test error";
+        promptPanelSpy.getState.and.throwError(errorMsg);
+        var result = operationApi.state(state);
+        expect(result).toEqual({});
+        expect(apiSpy.log.error).toHaveBeenCalledWith(new Error(errorMsg));
         expect(promptPanelSpy.setState).toHaveBeenCalledWith(state);
         expect(promptPanelSpy.getState).toHaveBeenCalled();
       });

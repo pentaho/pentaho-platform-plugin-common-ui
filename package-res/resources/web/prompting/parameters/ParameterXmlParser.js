@@ -187,7 +187,7 @@ define(['cdf/lib/Base', 'common-ui/util/base64', 'common-ui/util/formatting',  '
        * @param {String} name The name to extract from the xml node
        * @param {Boolean} error Flag that indicates empty values should throw an error
        * @returns {String} The value retrieved from the xml node
-       * @throws {String} Exception if the error flag is true
+       * @throws {Error} Exception if the error flag is true
        * @private
        */
       var _getAttributeFromXmlNode = function(node, name, error) {
@@ -195,7 +195,7 @@ define(['cdf/lib/Base', 'common-ui/util/base64', 'common-ui/util/formatting',  '
         if (!attr) {
           var message = "ParameterDefinition: no attribute '" + name + "' found";
           if(error) {
-            throw message;
+            throw new Error(message);
           }
           Logger.warn(message);
         }
@@ -230,20 +230,20 @@ define(['cdf/lib/Base', 'common-ui/util/base64', 'common-ui/util/formatting',  '
          * @method
          * @param {String} xmlString String with the xml
          * @returns {ParameterDefinition} Parameter Definition instance
-         * @throws {String} Exception if the xml string is not a valid xml with the error
+         * @throws {Error} Exception if the xml string is not a valid xml with the error
          */
         parseParameterXml: function (xmlString) {
           if (typeof xmlString !== 'string') {
-            throw "parseParameterXml argument is not a string, parser expects a xml string";
+            throw new Error("parseParameterXml argument is not a string, parser expects a xml string");
           } else if (xmlString == "") {
-            throw "parseParameterXml argument is an empty string, parser expects a valid xml string";
+            throw new Error("parseParameterXml argument is an empty string, parser expects a valid xml string");
           }
 
           var xml = $(_parseXML(xmlString));
 
           var parseError = xml.find('parsererror');
           if (parseError.length > 0) {
-            throw "parseParameterXml error parsing xml string: " + parseError.find('div').html();
+            throw new Error("parseParameterXml error parsing xml string: " + parseError.find('div').html());
           }
 
           var paramDefn = new ParameterDefinition();

@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2016 Pentaho Corporation.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -81,15 +81,15 @@ define(['common-ui/prompting/parameters/ParameterXmlParser', 'cdf/Logger'], func
       it("fails parse if invalid xml string is used", function () {
         expect(function(){
           parameterXmlParser.parseParameterXml();
-        }).toThrow();
+        }).toThrowError();
         expect(function(){
           parameterXmlParser.parseParameterXml("");
-        }).toThrow();
+        }).toThrowError();
         expect(function(){
           parameterXmlParser.parseParameterXml(
               "<parameters autoSubmitUI='false' autoSubmit='false' paginate='false' accepted-page='1' page-count='2' ignore-biserver-5538='false' is-prompt-needed='false' layout='test-layout'>" +
               "</parameters");
-        }).toThrow();
+        }).toThrowError();
       });
 
       it("should throw error if no attribute: _getAttributeFromXmlNode", function() {
@@ -101,7 +101,7 @@ define(['common-ui/prompting/parameters/ParameterXmlParser', 'cdf/Logger'], func
                         "</parameter>" +
                       "</parameters>";
           var paramDefn = parameterXmlParser.parseParameterXml(xml);
-        }).toThrow("ParameterDefinition: no attribute 'name' found");
+        }).toThrowError("ParameterDefinition: no attribute 'name' found");
 
         expect(function() {
           var xml = "<parameters autoSubmitUI='false' autoSubmit='false' paginate='false' accepted-page='1' page-count='2' ignore-biserver-5538='false' is-prompt-needed='false' layout='test-layout'>" +
@@ -111,7 +111,7 @@ define(['common-ui/prompting/parameters/ParameterXmlParser', 'cdf/Logger'], func
                         "</parameter>" +
                       "</parameters>";
           var paramDefn = parameterXmlParser.parseParameterXml(xml);
-        }).toThrow("ParameterDefinition: no attribute 'type' found");
+        }).toThrowError("ParameterDefinition: no attribute 'type' found");
       });
 
       it("should log warning if no attrs: _getAttributeFromXmlNode", function() {
