@@ -22,6 +22,8 @@ define([
   "use strict";
 
   var ambientSpecContext = null;
+  var idTemporaryPrefix = "_:";
+  var reIdTemporaryPrefix = /^_:/;
 
   /**
    * @name pentaho.type.SpecificationContext
@@ -57,12 +59,22 @@ define([
 
     constructor: function() {
       /**
-       * The type specifications already described in the context.
+       * The type infos of anonymous types already described in the context,
+       * indexed by type unique id.
        *
        * @type {Object.<string, Object>}
        * @private
        */
-      this._typeSpecsByUid = {};
+      this._typeInfosByUid = {};
+
+      /**
+       * The type infos of anonymous types already described in the context,
+       * indexed by temporary id.
+       *
+       * @type {Object.<string, Object>}
+       * @private
+       */
+      this._typeInfosByTid = {};
 
       /**
        * The next number that will be used to build a temporary id.
@@ -83,7 +95,24 @@ define([
      * @return {?nonEmptyString} The id of the type within this context, or `null`.
      */
     getIdOf: function(type) {
-      return type.id || O.getOwn(this._typeSpecsByUid, type.uid) || null;
+      var id = type.id;
+      if(!id) {
+        var typeInfo = O.getOwn(this._typeInfosByUid, type.uid);
+        if(typeInfo) id = typeInfo.id;
+      }
+      return id;
+    },
+
+    /**
+     * Gets a type given its temporary id in this specification context.
+     *
+     * @param {nonEmptyString} tid The temporary id.
+     *
+     * @return {pentaho.type.Type} The type with the given temporary id, if any, or `null`.
+     */
+    get: function(tid) {
+      var typeInfo = O.getOwn(this._typeInfosByTid, tid);
+      return typeInfo ? typeInfo.type : null;
     },
 
     /**
@@ -93,20 +122,43 @@ define([
      * Else, if the anonymous type had already been added to the context,
      * its temporary id is returned.
      * Else, the anonymous type is added to the context
-     * and a temporary id is generated for it and returned.
+     * and a temporary id is either given or automatically generated and returned.
      *
      * @param {pentaho.type.Type} type The type to add.
+     * @param {?nonEmptyString} [tid] The temporary id to use when adding.
      *
      * @return {nonEmptyString} The id of the type within this context.
+     *
+     * @throws {pentaho.lang.ArgumentInvalidError} When `type` is being added and
+     * `tid` is already the temporary id assigned to another type.
      */
-    add: function(type) {
-      var id = type.id, uid;
-      if(!id && !(id = O.getOwn(this._typeSpecsByUid, (uid = type.uid)))) {
-        id = "_" + (this._nextId++);
-        this._typeSpecsByUid[uid] = id;
+    add: function(type, tid) {
+      var id = type.id;
+      if(id) return id;
+
+      var uid = type.uid;
+      var typeInfo = O.getOwn(this._typeInfosByUid, uid);
+      if(typeInfo) return typeInfo.id;
+
+      // Get a temporary id.
+      if(tid) {
+        if(O.hasOwn(this._typeInfosByTid, tid)) {
+          throw error.argInvalid("tid", "The temporary id is already being used by another type.");
+        }
+      } else {
+        // Get the first available temporary id.
+        // The loop is only needed to make the code robust,
+        // due to tids also being provided from the outside...
+        // In practice, the spec context is either used for serialization,
+        // where all ids are generated, or for deserialization, where all ids are given...
+        do {
+          tid = idTemporaryPrefix + (this._nextId++);
+        } while(O.hasOwn(this._typeInfosByTid, tid));
       }
 
-      return id;
+      this._typeInfosByUid[uid] = this._typeInfosByTid[tid] = {type: type, id: tid};
+
+      return tid;
     },
 
     /**
@@ -135,7 +187,29 @@ define([
         throw error.argInvalidType("current", "pentaho.type.SpecificationContext", typeof specContext);
 
       ambientSpecContext = specContext || null;
-    }
+    },
+
+    /**
+     * Determines if a given type id is temporary.
+     *
+     * @param {string} id The id to check.
+     * @return {boolean} `true` if the id is temporary, `false, otherwise.
+     *
+     * @see pentaho.type.SpecificationContext.idTemporaryPrefix
+     */
+    isIdTemporary: function(id) {
+      return !!id && reIdTemporaryPrefix.test(id);
+    },
+
+    /**
+     * The prefix of temporary ids.
+     *
+     * @type {nonEmptyString}
+     * @readOnly
+     * @see pentaho.type.SpecificationContext.isIdTemporary
+     * @default "_:"
+     */
+    get idTemporaryPrefix() { return idTemporaryPrefix; }
   });
 
   return SpecificationContext;

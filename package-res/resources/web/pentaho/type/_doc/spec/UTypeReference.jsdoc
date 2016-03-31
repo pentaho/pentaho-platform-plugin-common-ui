@@ -21,18 +21,25 @@
  *
  * ##### A _type id_ string
  *
- * A type's [id]{@link pentaho.type.Type#id},
- * that must the id of a defined module in the AMD module system.
+ * A type's permanent [id]{@link pentaho.type.Type#id} —
+ * the id of a defined module in the AMD module system —,
+ * or a [temporary]{@link pentaho.type.SpecificationContext.isIdTemporary},
+ * serialization-only id.
  *
- * If the id does not contain any "/" character,
+ * If the id is permanent and does not contain any "/" character,
  * it is considered a standard type, and, thus,
  * is taken relative to Pentaho's `"pentaho/type"` module.
  *
  * Note that relative AMD module ids, like, for example, `"./foo"`, are not supported.
  *
- * Example:
+ * Example absolute, permanent id:
  * ```js
  * "pentaho/type/string"
+ * ```
+ *
+ * Example temporary id:
+ * ```js
+ * "_:1"
  * ```
  *
  * ##### An _instance constructor_ function

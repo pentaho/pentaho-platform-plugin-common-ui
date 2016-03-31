@@ -687,6 +687,128 @@ define([
           });
         });
         //endregion
+
+        //region temporary ids
+        it("should allow creating a type that contains a temporary type id", function() {
+
+          return testGet(function(sync, Context) {
+            var typeSpec = {
+              props: [
+                {name: "a", type: {id: "_:ab1", base: "number", label: "My Number"}},
+                {name: "b", type: "_:ab1"}
+              ]
+            };
+            var context = new Context();
+            var promise = callGet(context, sync, typeSpec);
+
+            return promise.then(function(InstCtor) {
+              var type = InstCtor.type;
+              var myNumberType = type.get("a").type;
+
+              expect(myNumberType.ancestor.shortId).toBe("number");
+              expect(myNumberType.label).toBe("My Number");
+
+              expect(type.get("b").type).toBe(myNumberType);
+            });
+          });
+        });
+
+        it("should use the same type instance for all temporary type id references", function() {
+
+          return testGet(function(sync, Context) {
+            var typeSpec = {
+              props: [
+                {name: "a", type: {id: "_:1", base: "number", label: "My Number"}},
+                {name: "b", type: "_:1"}
+              ]
+            };
+            var context = new Context();
+            var promise = callGet(context, sync, typeSpec);
+
+            return promise.then(function(InstCtor) {
+              var type = InstCtor.type;
+
+              expect(type.get("a").type).toBe(type.get("b").type);
+            });
+          });
+        });
+
+        // coverage
+        // although, because we do not yet support recursive types, this is not useful
+        it("should allow a top-level temporary type id", function() {
+
+          return testGet(function(sync, Context) {
+            var typeSpec = {
+              id: "_:1",
+              props: [
+                {name: "a", type: "string"},
+                {name: "b", type: "string"}
+              ]
+            };
+            var context = new Context();
+
+            return callGet(context, sync, typeSpec);
+          });
+        });
+
+        it("should allow two generic type specifications with the same temporary id " +
+           "but only the second spec is ignored", function() {
+
+          return testGet(function(sync, Context) {
+            var typeSpec = {
+              props: [
+                {name: "a", type: {id: "_:1", base: "string"}},
+                {name: "b", type: {id: "_:1", base: "number"}}
+              ]
+            };
+            var context = new Context();
+
+            var promise = callGet(context, sync, typeSpec);
+
+            return promise.then(function(InstCtor) {
+              var type = InstCtor.type;
+
+              expect(type.get("a").type).toBe(type.get("b").type);
+
+              expect(type.get("a").type.ancestor.shortId).toBe("string");
+            });
+          });
+        });
+
+        it("should throw if trying to get a temporary id, directly, " +
+           "and there is no ambient specification context", function() {
+
+          return testGet(function(sync, Context, localRequire, errorMatch) {
+            var context = new Context();
+
+            return expectToRejectWith(
+                function() { return callGet(context, sync, "_:1"); },
+                errorMatch.argInvalid("typeRef"));
+          });
+        });
+
+        // The async case is not testable.
+        it("should throw if trying to get a temporary id, directly, and it does not exist " +
+           "in the ambient specification context", function() {
+
+          return require.using([
+            "pentaho/type/Context",
+            "pentaho/type/SpecificationScope",
+            "tests/pentaho/util/errorMatch"
+          ], function(Context, SpecificationScope, errorMatch) {
+
+            var context = new Context();
+            var scope = new SpecificationScope();
+
+            expect(function() {
+              context.get("_:1");
+            }).toThrow(errorMatch.argInvalid("typeRef"));
+
+            scope.dispose();
+          });
+        });
+
+        //endregion
       });
 
       describe("type factory function", function() {

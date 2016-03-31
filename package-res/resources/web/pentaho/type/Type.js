@@ -25,7 +25,9 @@ define([
   "../util/object",
   "../util/fun",
   "../util/promise"
-], function(localRequire, SpecificationScope, SpecificationContext, bundle, Base, AnnotatableLinked, error, arg, O, F, promiseUtil) {
+], function(localRequire, SpecificationScope, SpecificationContext, bundle, Base,
+    AnnotatableLinked, error, arg, O, F, promiseUtil) {
+
   "use strict";
 
   // Unique type class id exposed through Type#uid and used by Context instances.
@@ -272,7 +274,7 @@ define([
       value = nonEmptyString(value);
 
       // Is it a temporary id? If so, ignore it.
-      if(value && value[0] === "_") value = null;
+      if(SpecificationContext.isIdTemporary(value)) value = null;
 
       // Can only be set once or throws.
       O.setConst(this, "_id", value);
@@ -941,7 +943,8 @@ define([
      * When a type is not anonymous, the cheapest reference,
      * the [id]{@link pentaho.type.Type#id}, is returned.
      *
-     * For anonymous types, a temporary, serialization-only id is generated.
+     * For anonymous types, a [temporary]{@link pentaho.type.SpecificationContext.isIdTemporary},
+     * serialization-only id is generated.
      * In the first occurrence in the given scope,
      * that id is returned, within a full specification of the type,
      * obtained by calling [toSpecInContext]{@link pentaho.type.Type#toSpecInContext}.

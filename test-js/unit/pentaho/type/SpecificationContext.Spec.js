@@ -118,7 +118,27 @@ define([
       });
     });
 
-    describe("#add(type)", function() {
+    describe("#get(tid)", function() {
+
+      it("should return null if given an unregistered temporary id", function() {
+        var context = new SpecificationContext();
+        var result = context.get("foo");
+
+        expect(result).toBe(null);
+      });
+
+      it("should return a type when given its registered temporary id", function() {
+        var Derived = Instance.extend();
+        var context = new SpecificationContext();
+        var tid = context.add(Derived.type);
+
+        var result = context.get(tid);
+
+        expect(result).toBe(Derived.type);
+      });
+    });
+
+    describe("#add(type[, tid])", function() {
 
       it("should add a type that has an id and return its id", function() {
         var id = "foo";
@@ -142,7 +162,7 @@ define([
         expect(result2).toBe(id);
       });
 
-      it("should add a type that has no id and return a temporary id", function() {
+      it("should add a type that has no id and return a new temporary id", function() {
         var Derived = Instance.extend();
         var context = new SpecificationContext();
 
@@ -192,6 +212,42 @@ define([
         var result2 = context.getIdOf(Derived.type);
 
         expect(result1).toBe(result2);
+      });
+
+      it("should accept the given tid as long as it is not yet used by other registered type", function() {
+        var tid = SpecificationContext.idTemporaryPrefix + "123";
+
+        var Derived = Instance.extend();
+        var context = new SpecificationContext();
+        var result1 = context.add(Derived.type, tid);
+
+        expect(result1).toBe(tid);
+
+        var result2 = context.getIdOf(Derived.type);
+
+        expect(result2).toBe(tid);
+      });
+
+      it("should throw if the given tid is used by other registered type", function() {
+        var Derived1 = Instance.extend();
+        var Derived2 = Instance.extend();
+
+        var context = new SpecificationContext();
+        var tid1 = context.add(Derived1.type);
+
+        expect(function() {
+          context.add(Derived2.type, tid1);
+        }).toThrow(errorMatch.argInvalid("tid"));
+      });
+
+      it("should not throw if the given tid is used by given type", function() {
+        var Derived = Instance.extend();
+        var context = new SpecificationContext();
+        var tid = context.add(Derived.type);
+
+        var result = context.add(Derived.type, tid);
+
+        expect(result).toBe(tid);
       });
     });
 
@@ -253,6 +309,37 @@ define([
         expect(function() {
           SpecificationContext.current = {};
         }).toThrow(errorMatch.argInvalidType("current", "pentaho.type.SpecificationContext", "object"));
+      });
+    });
+
+    describe(".idTemporaryPrefix", function() {
+
+      it("should get a non-empty string", function() {
+        expect(typeof SpecificationContext.idTemporaryPrefix).toBe("string");
+        expect(SpecificationContext.idTemporaryPrefix.length).toBeGreaterThan(0);
+      });
+    });
+
+    describe(".isIdTemporary(id)", function() {
+
+      it("should return false when given a falsy value", function() {
+        expect(SpecificationContext.isIdTemporary("")).toBe(false);
+        expect(SpecificationContext.isIdTemporary(null)).toBe(false);
+        expect(SpecificationContext.isIdTemporary(undefined)).toBe(false);
+      });
+
+      it("should return false when given a standard type id", function() {
+        expect(SpecificationContext.isIdTemporary("string")).toBe(false);
+        expect(SpecificationContext.isIdTemporary("boolean")).toBe(false);
+        expect(SpecificationContext.isIdTemporary("pentaho/type/boolean")).toBe(false);
+      });
+
+      it("should return true when given the temporary prefix", function() {
+        expect(SpecificationContext.isIdTemporary(SpecificationContext.idTemporaryPrefix)).toBe(true);
+      });
+
+      it("should return true when given the temporary prefix followed by some other string", function() {
+        expect(SpecificationContext.isIdTemporary(SpecificationContext.idTemporaryPrefix + "1a")).toBe(true);
       });
     });
   });
