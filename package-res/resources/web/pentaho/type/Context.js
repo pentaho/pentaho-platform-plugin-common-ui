@@ -19,13 +19,16 @@ define([
   "./Instance",
   "../i18n!types",
   "./standard",
+  "./SpecificationContext",
+  "./SpecificationScope",
   "../lang/Base",
   "../util/promise",
   "../util/arg",
   "../util/error",
   "../util/object",
   "../util/fun"
-], function(localRequire, module, Instance, bundle, standard, Base, promiseUtil, arg, error, O, F) {
+], function(localRequire, module, Instance, bundle, standard, SpecificationContext, SpecificationScope,
+    Base, promiseUtil, arg, error, O, F) {
 
   "use strict";
 
@@ -461,6 +464,7 @@ define([
      *
      * @param {pentaho.type.spec.UTypeReference} typeRef A type reference.
      * @param {boolean} [sync=false] Whether to perform a synchronous get.
+     *
      * @return {!Promise.<!Class.<pentaho.type.Value>>|!Class.<pentaho.type.Value>} When sync,
      *   returns the instance constructor, while, when async, returns a promise for it.
      *
@@ -468,7 +472,6 @@ define([
      * not a string, function, array or object.
      *
      * @private
-     * @ignore
      */
     _get: function(typeRef, sync) {
       if(typeRef == null || typeRef === "")
@@ -489,6 +492,10 @@ define([
     /**
      * Gets the instance constructor of a type given its id.
      *
+     * If the id is a temporary id,
+     * it must have already been loaded in the ambient specification context.
+     *
+     * Otherwise, the id is permanent.
      * If the id does not contain any "/" character,
      * it is considered relative to pentaho's `pentaho/type` module.
      *
@@ -505,16 +512,47 @@ define([
      * The usual is to return a factory function. Honestly, haven't thought much about
      * whether it makes total sense for a module to return the other formats.
      *
-     * @param {string} id A type reference.
+     * ### Ambient specification context
+     *
+     * This method uses the ambient specification context to support deserialization of
+     * generic type specifications containing temporary ids, for referencing anonymous types.
+     *
+     * When a temporary id is specified and
+     * there is no ambient specification context or
+     * it does not contain a definition for it,
+     * an error is thrown.
+     *
+     * @param {string} id The id of a type. It can be a temporary or permanent id.
+     * In the latter case, it can be relative or absolute.
+     *
      * @param {boolean} [sync=false] Whether to perform a synchronous get.
      *
      * @return {!Promise.<!Class.<pentaho.type.Value>>|!Class.<pentaho.type.Value>} When sync,
      *   returns the instance constructor, while, when async, returns a promise for it.
      *
      * @private
-     * @ignore
      */
     _getById: function(id, sync) {
+      // Is it a temporary id?
+      if(SpecificationContext.isIdTemporary(id)) {
+        var specContext = SpecificationContext.current;
+        if(!specContext) {
+          return this._error(
+              error.argInvalid("typeRef", "Temporary ids cannot occur outside of a generic type specification."),
+              sync);
+        }
+
+        // id must exist at the specification context, or it's invalid.
+        var type = specContext.get(id);
+        if(!type) {
+          return this._error(
+              error.argInvalid("typeRef", "Temporary id does not correspond to an existing type."),
+              sync);
+        }
+
+        return this._return(type.instance.constructor, sync);
+      }
+
       id = toAbsTypeId(id);
 
       // Check if id is already present.
@@ -556,7 +594,6 @@ define([
      * thrown by {@link pentaho.type.Context#_getByInstCtor} and {@link pentaho.type.Context#_getByFactory}.
      *
      * @private
-     * @ignore
      */
     _getByFun: function(fun, sync) {
       var proto = fun.prototype;
@@ -606,7 +643,6 @@ define([
      * the same `uid` is already registered.
      *
      * @private
-     * @ignore
      */
     _getByInstCtor: function(InstCtor, sync, factoryUid) {
       var type = InstCtor.type;
@@ -671,7 +707,6 @@ define([
      * is not a instance constructor of a subtype of _Value_.
      *
      * @private
-     * @ignore
      */
     _getByFactory: function(typeFactory, sync) {
       var factoryUid = getFactoryUid(typeFactory);
@@ -695,9 +730,10 @@ define([
       if(typeSpec instanceof Instance)
         return this._error(error.argInvalid("typeRef", "Value instance is not supported."), sync);
 
-      // Because a base type is required (when null, it is defaulted)
+      // Because a base type is required (when null, it is defaulted to Value.Type)
       // this means that the generic object spec cannot represent the root of type hierarchies:
-      // Type, Value.Type or Property.Type
+      // Type, or even Property.Type.
+      // Currently, it only allows expressing the full Value.Type hierarchy.
 
       /*
        *  id      | base       | result
@@ -707,9 +743,12 @@ define([
        *  "foo"   | "notnull"  : ok
        */
       var id = typeSpec.id;
-      if(id) id = toAbsTypeId(id);
-
       var baseTypeSpec = typeSpec.base;
+
+      var isIdTemporary = SpecificationContext.isIdTemporary(id);
+
+      if(id && !isIdTemporary)
+        id = toAbsTypeId(id);
 
       if(id && id === (_baseMid + "value")) {
         // The "value" type is already loaded.
@@ -733,39 +772,78 @@ define([
         baseTypeSpec = _defaultBaseTypeMid;
       }
 
-      var InstCtor;
-
       // Already loaded?
-      // id ~ "value" goes here.
-      if(id && (InstCtor = O.getOwn(this._byTypeId, id))) {
-        // Keep initial specification. Ignore new one.
-        return this._return(InstCtor, sync);
+      if(id) {
+        var InstCtor;
+
+        if(isIdTemporary) {
+          var specContext = SpecificationContext.current;
+          if(specContext) {
+            var type = specContext.get(id);
+            if(type) InstCtor = type.instance.constructor;
+          }
+        } else {
+          // id ~ "value" goes here.
+          InstCtor = O.getOwn(this._byTypeId, id);
+        }
+
+        // If so, keep initial specification. Ignore the new one.
+        if(InstCtor) return this._return(InstCtor, sync);
       }
 
       // assert baseTypeSpec
 
-      // if id and not loaded, the id is used later to register the new type under that id.
+      return this._getByObjectSpecCore(id, baseTypeSpec, typeSpec, sync);
+    },
 
-      var resolveSync = (function() {
-              var BaseInstCtor = this._get(baseTypeSpec, /*sync:*/true);
-              var InstCtor = BaseInstCtor.extend({type: typeSpec});
+    // Actually gets an object specification, given its already processed _base type spec_ and id.
+    // Also, this method assumes that the type is not yet registered either in the context or in the
+    // specification context.
+    _getByObjectSpecCore: function(id, baseTypeSpec, typeSpec, sync) {
+      // if id and not loaded, the id is used later to register the new type under that id and configure it.
 
-              return this._getByInstCtor(InstCtor, /*sync:*/true);
-            }).bind(this);
+      // A root generic type spec initiates a specification context.
+      // Each root generic type spec has a separate specification context.
+      var resolveSync = function() {
+        /*jshint validthis:true*/
+
+        return O.using(new SpecificationScope(), function resolveSyncInContext(specScope) {
+          /*jshint validthis:true*/
+
+          // Note the switch to sync mode here, whatever the outer `sync` value.
+          // Only the outermost _getByObjectSpec call will be async.
+          // All following "reentries" will be sync.
+          // So, it works to use the above ambient specification context to handle all contained temporary ids.
+
+          // 1. Resolve the base type
+          var BaseInstCtor = this._get(baseTypeSpec, /*sync:*/true);
+
+          // 2. Extend the base type
+          var InstCtor = BaseInstCtor.extend({type: typeSpec});
+
+          // 3. Register and configure the new type
+          if(SpecificationContext.isIdTemporary(id)) {
+            // Register also in the specification context, under the temporary id.
+            specScope.specContext.add(InstCtor.type, id);
+          }
+
+          return this._getByInstCtor(InstCtor, /*sync:*/true);
+        }, this);
+      };
 
       // When sync, it should be the case that every referenced id is already loaded,
       // or an error will be thrown when requiring these.
-      if(sync) return resolveSync();
+      if(sync) return resolveSync.call(this);
 
       // Collect the module ids of all custom types used within typeSpec.
       var customTypeIds = collectTypeIds(typeSpec);
       /*jshint laxbreak:true*/
       return customTypeIds.length
           // Require them all and only then invoke the synchronous BaseType.extend method.
-          ? promiseUtil.require(customTypeIds, localRequire).then(resolveSync)
+          ? promiseUtil.require(customTypeIds, localRequire).then(resolveSync.bind(this))
           // All types are standard and can be assumed to be already loaded.
           // However, we should behave asynchronously as requested.
-          : promiseUtil.wrapCall(resolveSync);
+          : promiseUtil.wrapCall(resolveSync, this);
     },
 
     /*
@@ -843,6 +921,8 @@ define([
 
     switch(typeof typeSpec) {
       case "string":
+        if(SpecificationContext.isIdTemporary(typeSpec)) return;
+
         // It's considered an AMD id only if it has at least one "/".
         // Otherwise, append pentaho's base amd id.
         if(typeSpec.indexOf("/") < 0) typeSpec = _baseMid + typeSpec;

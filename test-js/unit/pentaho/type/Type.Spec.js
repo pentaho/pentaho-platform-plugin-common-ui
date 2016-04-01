@@ -15,8 +15,9 @@
  */
 define([
   "pentaho/type/Instance",
+  "pentaho/type/SpecificationContext",
   "tests/pentaho/util/errorMatch"
-], function(Instance, errorMatch) {
+], function(Instance, SpecificationContext, errorMatch) {
 
   "use strict";
 
@@ -442,7 +443,7 @@ define([
 
         it("should ignore it, if it is a temporary id", function() {
           var Derived = Instance.extend({
-            type: {id: "_id"}
+            type: {id: SpecificationContext.idTemporaryPrefix + "id"}
           });
 
           expect(Derived.type.id).toBe(null);
