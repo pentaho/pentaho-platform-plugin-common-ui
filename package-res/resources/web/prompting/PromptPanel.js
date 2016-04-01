@@ -374,14 +374,14 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
        * @method
        * @private
        * @param  {Object} state The set of properties
-       * @throws {String}       Exception if input state parameter contains read only properties
+       * @throws {Error}        Exception if input state parameter contains read only properties
        */
       var _validateReadOnlyState = function(state) {
         var cantModify = _STATE_CONSTANTS.readOnlyProperties.some(function(item) {
           return state.hasOwnProperty(item);
         });
         if (cantModify) {
-          throw _STATE_CONSTANTS.msgs.notChangeReadonlyProp(_STATE_CONSTANTS.readOnlyProperties);
+          throw new Error(_STATE_CONSTANTS.msgs.notChangeReadonlyProp(_STATE_CONSTANTS.readOnlyProperties));
         }
       };
 
@@ -393,11 +393,11 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
        * @private
        * @param  {String} name  The name of the state property
        * @param  {Object} value The value of the state property
-       * @throws {String}       Exception if input value is not a boolean type
+       * @throws {Error}        Exception if input value is not a boolean type
        */
       var _validateBooleanState = function(name, value) {
         if (value != null && typeof value !== "boolean") {
-          throw _STATE_CONSTANTS.msgs.incorrectBooleanType(name, value);
+          throw new Error(_STATE_CONSTANTS.msgs.incorrectBooleanType(name, value));
         }
       };
 
@@ -409,12 +409,12 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
        * @private
        * @param  {Boolean} autoSubmit      The value of the 'autoSubmit' property
        * @param  {Boolean} allowAutoSubmit The whether auto-submit is allowed
-       * @throws {String}                  Exception if type of 'autoSubmit' is incorrect or setting autoSubmit is not allowed
+       * @throws {Error}                   Exception if type of 'autoSubmit' is incorrect or setting autoSubmit is not allowed
        */
       var _validateAutoSubmit = function(autoSubmit, allowAutoSubmit) {
         _validateBooleanState("autoSubmit", autoSubmit);
         if (autoSubmit != null && !allowAutoSubmit) {
-          throw _STATE_CONSTANTS.msgs.notAllowedAutoSubmit;
+          throw new Error(_STATE_CONSTANTS.msgs.notAllowedAutoSubmit);
         }
       };
 
@@ -427,18 +427,18 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
        * @param {Number} page       The value of page
        * @param {Boolean} paginate  The whether pagination is active
        * @param {Number} totalPages The value of total pages
-       * @throws {String}           Exception if type of 'page' is incorrect or pagination is not activated or 'page' has incorrect value
+       * @throws {Error}            Exception if type of 'page' is incorrect or pagination is not activated or 'page' has incorrect value
        */
       var _validateStatePage = function(page, paginate, totalPages) {
         if (page != null) {
           if (typeof page !== "number") {
-            throw _STATE_CONSTANTS.msgs.incorrectNumberType(page);
+            throw new Error(_STATE_CONSTANTS.msgs.incorrectNumberType(page));
           }
           if (!paginate) {
-            throw _STATE_CONSTANTS.msgs.paginationNotActivated(page);
+            throw new Error(_STATE_CONSTANTS.msgs.paginationNotActivated(page));
           }
           if (page < 0 || page >= totalPages) {
-            throw _STATE_CONSTANTS.msgs.incorrectPageValue(page, totalPages - 1);
+            throw new Error(_STATE_CONSTANTS.msgs.incorrectPageValue(page, totalPages - 1));
           }
         }
       };
@@ -451,11 +451,11 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
        * @private
        * @param  {Object} state                  The set of properties
        * @param  {ParameterDefinition} paramDefn The parameter definition instance
-       * @throws {String}                        Exception if input 'state' parameter is invalid
+       * @throws {Error}                         Exception if input 'state' parameter is invalid
        */
       var _validateState = function(state, paramDefn) {
         if (!state || typeof state !== 'object') {
-          throw _STATE_CONSTANTS.msgs.incorrectStateObjType;
+          throw new Error(_STATE_CONSTANTS.msgs.incorrectStateObjType);
         }
         _validateReadOnlyState(state);
         _validateBooleanState("parametersChanged", state.parametersChanged);
@@ -491,7 +491,7 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
          */
         constructor: function (destinationId, paramDefn) {
           if (!destinationId) {
-            throw 'destinationId is required';
+            throw new Error('destinationId is required');
           }
 
           /**
@@ -532,9 +532,8 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
          */
         getParamDefn: function() {
           if (!this.paramDefn) {
-            throw 'paramDefn is required. Call setParameterDefn';
+            throw new Error('paramDefn is required. Call PromptPanel#setParamDefn');
           }
-
           return this.paramDefn;
         },
 
@@ -1630,7 +1629,7 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
          * @param {Boolean} [state.parametersChanged] True if the parameters have changed, False otherwise
          * @param {Boolean} [state.autoSubmit]        True is the prompt is in auto submit mode, False otherwise. It's limited by the 'allowAutoSubmit' flag
          * @param {Number} [state.page]               The number of the current page. It's limited in range by the 'totalPages' and 'paginate' flags
-         * @throws {String} Exception if input 'state' parameter is invalid
+         * @throws {Error} Exception if input 'state' parameter is invalid
          * @example
          * var state = {
          *   "parametersChanged":true,

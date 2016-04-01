@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2016 Pentaho Corporation.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,8 +38,8 @@ define(["./OperationAPI", "./EventAPI", "./UiAPI", "./UtilAPI"], function(Operat
         console.warn(msg)
       },
       error: function(msg, throwException) {
-        if(throwException) {
-          throw msg;
+        if (throwException) {
+          throw (msg instanceof Error) ? msg : new Error(msg);
         }
         console.error(msg);
       }

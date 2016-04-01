@@ -28,7 +28,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
         var fn = function() {
           new PromptPanel();
         };
-        expect(fn).toThrow('destinationId is required');
+        expect(fn).toThrowError('destinationId is required');
       });
 
       it("should create prompt panel", function() {
@@ -1459,11 +1459,11 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
         it("should throw exception if state incorrect", function() {
           expect(function() {
             panel.setState();
-          }).toThrow("The input parameter 'state' is incorrect. It should be an object.");
+          }).toThrowError("The input parameter 'state' is incorrect. It should be an object.");
 
           expect(function() {
             panel.setState("incorrect param");
-          }).toThrow("The input parameter 'state' is incorrect. It should be an object.");
+          }).toThrowError("The input parameter 'state' is incorrect. It should be an object.");
         });
 
         it("should throw exception if try modify read only properties", function() {
@@ -1473,7 +1473,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
               var state = {};
               state[prop] = true;
               panel.setState(state);
-            }).toThrow("Not possible to change the following read-only properties: " + readOnlyProps + ".");
+            }).toThrowError("Not possible to change the following read-only properties: " + readOnlyProps + ".");
           });
         });
 
@@ -1483,14 +1483,14 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
               parametersChanged: "str"
             };
             panel.setState(state);
-          }).toThrow("Unexpected value 'str' for 'parametersChanged'. Must be boolean type.");
+          }).toThrowError("Unexpected value 'str' for 'parametersChanged'. Must be boolean type.");
 
           expect(function() {
             var state = {
               autoSubmit: "str"
             };
             panel.setState(state);
-          }).toThrow("Unexpected value 'str' for 'autoSubmit'. Must be boolean type.");
+          }).toThrowError("Unexpected value 'str' for 'autoSubmit'. Must be boolean type.");
         });
 
         it("should throw exception if try set not allowed autoSubmit flag", function() {
@@ -1501,7 +1501,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
               autoSubmit: true
             };
             panel.setState(state);
-          }).toThrow("Not possible to set 'autoSubmit'. It's limited by the 'allowAutoSubmit' flag.");
+          }).toThrowError("Not possible to set 'autoSubmit'. It's limited by the 'allowAutoSubmit' flag.");
         });
 
         it("should throw exception if try set incorrect page property", function() {
@@ -1510,7 +1510,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
               page: "str"
             };
             panel.setState(state);
-          }).toThrow("Unexpected value 'str' for 'page'. Must be a number type.");
+          }).toThrowError("Unexpected value 'str' for 'page'. Must be a number type.");
 
           expect(function() {
             paramDefn.paginate = false;
@@ -1518,7 +1518,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
               page: 1
             };
             panel.setState(state);
-          }).toThrow("Not possible to set page '1'. The pagination should be activated.");
+          }).toThrowError("Not possible to set page '1'. The pagination should be activated.");
 
           expect(function() {
             paramDefn.paginate = true;
@@ -1526,7 +1526,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
               page: 10
             };
             panel.setState(state);
-          }).toThrow("Not possible to set page '10'. The correct value should be between 0 and " + (paramDefn.totalPages - 1) + ".");
+          }).toThrowError("Not possible to set page '10'. The correct value should be between 0 and " + (paramDefn.totalPages - 1) + ".");
         });
 
         it("should set state correctly", function() {

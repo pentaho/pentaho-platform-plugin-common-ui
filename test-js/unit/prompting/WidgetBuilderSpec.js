@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2016 Pentaho Corporation.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,12 +18,12 @@ define(['common-ui/prompting/WidgetBuilder', 'common-ui/prompting/builders/Promp
 
   describe("WidgetBuilder", function() {
 
-    it("should have mappings array", function() {       
+    it("should have mappings array", function() {
       expect(WidgetBuilder.mapping).toBeDefined();
     });
 
     it("should throw an error trying to build a prompt-panel with no arguments", function() {
-      expect(WidgetBuilder.build).toThrow();
+      expect(WidgetBuilder.build).toThrowError();
     });
 
     it("should successfully build a prompt panel", function() {

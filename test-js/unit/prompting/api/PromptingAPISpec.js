@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2016 Pentaho Corporation.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file expect in compliance with the License.
@@ -23,7 +23,7 @@ define(["common-ui/prompting/api/PromptingAPI"], function (PromptingAPI) {
     it("should fail creating a Prompting API", function() {
       expect(function() {
         new PromptingAPI();
-      }).toThrow(PromptingAPI._msgs.NO_ID);
+      }).toThrowError(PromptingAPI._msgs.NO_ID);
     });
 
     describe("successfully create a Prompting API", function () {
@@ -62,7 +62,11 @@ define(["common-ui/prompting/api/PromptingAPI"], function (PromptingAPI) {
       it("should test log error and throw and exception", function () {
         expect(function () {
           api.log.error(testLogMsg, true);
-        }).toThrow(testLogMsg);
+        }).toThrowError(testLogMsg);
+
+        expect(function () {
+          api.log.error(new Error(testLogMsg), true);
+        }).toThrowError(testLogMsg);
       });
     });
   });

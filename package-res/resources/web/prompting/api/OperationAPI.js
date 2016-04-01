@@ -116,7 +116,14 @@ define(['common-ui/prompting/PromptPanel'], function(PromptPanel) {
      * @returns {JSON} parameter values
      */
     this.getParameterValues = function() {
-      return this._getPromptPanel().getParameterValues();
+      var values;
+      try {
+        values = this._getPromptPanel().getParameterValues();
+      } catch(e) {
+        api.log.error(e);
+        values = {};
+      }
+      return values;
     };
 
     /**
@@ -172,7 +179,6 @@ define(['common-ui/prompting/PromptPanel'], function(PromptPanel) {
      *                                              <li>'autoSubmit' &lt;Boolean&gt; - True if the prompt is in auto submit mode. Otherwise, false.</li>
      *                                              <li>'page' &lt;Number&gt; - The number of the page.</li>
      *                                            </ul>
-     * @throws {String} Exception if the 'state' parameter is invalid.
      * @example
      * // Read state
      * var currentState = api.operation.state();
@@ -208,9 +214,20 @@ define(['common-ui/prompting/PromptPanel'], function(PromptPanel) {
      */
     this.state = function(state) {
       if (state) {
-        this._getPromptPanel().setState(state);
+        try {
+          this._getPromptPanel().setState(state);
+        } catch(e) {
+          api.log.error(e);
+        }
       }
-      return this._getPromptPanel().getState();
+      var result;
+      try {
+        result = this._getPromptPanel().getState();
+      } catch(e) {
+        api.log.error(e);
+        result = {};
+      }
+      return result;
     };
 
     /**
