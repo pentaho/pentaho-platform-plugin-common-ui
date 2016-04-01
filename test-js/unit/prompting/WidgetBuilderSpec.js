@@ -14,9 +14,9 @@
  * limitations under the License.
  *
  */
-define(['common-ui/prompting/WidgetBuilder', 'common-ui/prompting/builders/PromptPanelBuilder'],  function (WidgetBuilder, PromptPanelBuilder) {
+define(['common-ui/prompting/WidgetBuilder', 'common-ui/prompting/parameters/Parameter'],  function (WidgetBuilder, Parameter) {
 
-  describe("WidgetBuilder", function() {
+  fdescribe("WidgetBuilder", function() {
 
     it("should have mappings array", function() {
       expect(WidgetBuilder.mapping).toBeDefined();
@@ -36,6 +36,30 @@ define(['common-ui/prompting/WidgetBuilder', 'common-ui/prompting/builders/Promp
       expect(panel.type).toEqual('ScrollingPromptPanelLayoutComponent');
       expect(buildPanelComponentsFn).toHaveBeenCalled();
       expect(panel.promptPanel).toBeDefined();
+    });
+
+    it("distinguishes textbox and autocompletebox properly", function() {
+      var promptPanel = jasmine.createSpyObj('promptPanel', ['generateWidgetGUID', 'getParameterName']);
+
+      var param = new Parameter(),
+          type = "textbox";
+      param.type = type;
+      param.list = false;
+      var args = {
+        param: param,
+        promptPanel: promptPanel
+      };
+      var panel = WidgetBuilder.build(args, type);
+      expect(panel.type).toEqual("TextInputComponent");
+
+      args.param.list = true;
+      panel = WidgetBuilder.build(args, type);
+      expect(panel.type).toEqual("StaticAutocompleteBoxComponent");
+
+      args.param.type = "";
+      type = "";
+      panel = WidgetBuilder.build(args, type);
+      expect(panel.type).toEqual("StaticAutocompleteBoxComponent");
     });
 
   });
