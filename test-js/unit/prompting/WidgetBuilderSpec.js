@@ -16,7 +16,7 @@
  */
 define(['common-ui/prompting/WidgetBuilder', 'common-ui/prompting/parameters/Parameter'],  function (WidgetBuilder, Parameter) {
 
-  fdescribe("WidgetBuilder", function() {
+  describe("WidgetBuilder", function() {
 
     it("should have mappings array", function() {
       expect(WidgetBuilder.mapping).toBeDefined();
