@@ -52,12 +52,12 @@ define(['./builders/PromptPanelBuilder', './builders/ParameterGroupPanelBuilder'
       './builders/SubmitPanelBuilder', './builders/SubmitComponentBuilder', './builders/LabelBuilder',
       './builders/ErrorLabelBuilder', './builders/DropDownBuilder', './builders/RadioBuilder', './builders/CheckBuilder',
       './builders/MultiButtonBuilder', './builders/ListBuilder', './builders/DateInputBuilder',
-      './builders/ExternalInputBuilder', './builders/TextAreaBuilder',
+      './builders/ExternalInputBuilder', './builders/TextAreaBuilder', './builders/TextInputBuilder',
       './builders/StaticAutocompleteBoxBuilder'],
 
     function (PromptPanelBuilder, ParameterGroupPanelBuilder, ParameterPanelBuilder, SubmitPanelBuilder,
               SubmitComponentBuilder, LabelBuilder, ErrorLabelBuilder, DropDownBuilder, RadioBuilder, CheckBuilder,
-              MultiButtonBuilder, ListBuilder, DateInputBuilder, ExternalInputBuilder, TextAreaBuilder,
+              MultiButtonBuilder, ListBuilder, DateInputBuilder, ExternalInputBuilder, TextAreaBuilder, TextInputBuilder,
               StaticAutocompleteBoxBuilder) {
 
       return {
@@ -81,6 +81,8 @@ define(['./builders/PromptPanelBuilder', './builders/ParameterGroupPanelBuilder'
           'filebrowser': new ExternalInputBuilder(),
           'external-input': new ExternalInputBuilder(),
           'multi-line': new TextAreaBuilder(),
+          'autocompletebox': new StaticAutocompleteBoxBuilder(),
+          'textbox': new TextInputBuilder(),
           'default': new StaticAutocompleteBoxBuilder()
         },
 
@@ -96,7 +98,14 @@ define(['./builders/PromptPanelBuilder', './builders/ParameterGroupPanelBuilder'
          */
         _findBuilderFor: function (args, type) {
           type = type || (args.param && args.param.attributes ? args.param.attributes['parameter-render-type'] : null);
-          return this.mapping.hasOwnProperty(type) ? this.mapping[type] : this.mapping['default'];
+          if (this.mapping.hasOwnProperty(type)) {
+            if (type == "textbox" && args.param.list) {
+              type = "autocompletebox";
+            }
+            return this.mapping[type];
+          } else {
+            return this.mapping["default"];
+          }
         },
 
         /**
