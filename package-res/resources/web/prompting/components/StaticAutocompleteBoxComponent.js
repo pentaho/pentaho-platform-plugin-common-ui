@@ -97,10 +97,17 @@ define([ 'common-ui/util/util', 'cdf/components/BaseComponent',  'amd!cdf/lib/jq
       var input = $('input', ph);
       input.autocomplete({
         delay : 0,
+        create: function () {
+          $(this).data('ui-autocomplete')._renderItem = function (ul, item) {
+            // [BISERVER-11863] represent special characters correctly (for example &#39; &amp; &lt; &gt)
+            return $("<li></li>").append(myself._createLabelTag(item.label)).appendTo(ul);
+          };
+        },
         source : function(request, response) {
           var term = request.term.toUpperCase();
           var matches = $.map(this.valuesArray, function(tag) {
-            if (tag.label.toUpperCase().indexOf(term) >= 0) { // PRD-3745
+            // we need unescape label before matching (fix for special characters like as &#39; &amp; &lt; &gt)
+            if (myself._createLabelTag(tag.label).text().toUpperCase().indexOf(term) >= 0) { // PRD-3745
               return tag;
             }
           });
@@ -173,6 +180,10 @@ define([ 'common-ui/util/util', 'cdf/components/BaseComponent',  'amd!cdf/lib/jq
       } else {
         return val;
       }
+    },
+
+    _createLabelTag: function(source) {
+      return $("<a></a>").html(source);
     }
   });
 });
