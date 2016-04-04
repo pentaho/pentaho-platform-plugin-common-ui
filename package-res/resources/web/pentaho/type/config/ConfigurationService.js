@@ -52,7 +52,7 @@ define([
       }, this);
     },
 
-    select: function(typeId, context) {
+    select: function(typeId, criteria) {
       // TODO Select the apropriate rules, merge them and return
 
       // Temporary placeholder mock implementation
@@ -64,7 +64,7 @@ define([
         });
       }
 
-      return rules.length == 0 ? null : rules[0];
+      return rules.length === 0 ? null : rules[0];
     }
   });
 

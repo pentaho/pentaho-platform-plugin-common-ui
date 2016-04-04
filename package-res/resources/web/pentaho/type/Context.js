@@ -22,6 +22,7 @@ define([
   "./SpecificationContext",
   "./SpecificationScope",
   "../GlobalContextVars",
+  "./configurationService",
   "../lang/Base",
   "../util/promise",
   "../util/arg",
@@ -29,7 +30,7 @@ define([
   "../util/object",
   "../util/fun"
 ], function(localRequire, module, Instance, bundle, standard, SpecificationContext, SpecificationScope,
-    GlobalContextVars, Base, promiseUtil, arg, error, O, F) {
+    GlobalContextVars, configurationService, Base, promiseUtil, arg, error, O, F) {
 
   "use strict";
 
@@ -827,8 +828,7 @@ define([
     },
 
     _getConfig: function(id) {
-      // TODO: link to configuration service, passing this._vars
-      return null;
+      return configurationService.select(id, this._vars);
     },
     //endregion
 
