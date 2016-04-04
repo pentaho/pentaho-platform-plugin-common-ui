@@ -25,14 +25,12 @@ define(function () {
    * @memberOf pentaho.util
    * @amd pentaho/util/logger
    */
-  var logger =/** @lends pentaho.util.logger */{
+  var logger = /** @lends pentaho.util.logger */{
 
     /**
      *  Property enumerating the various log levels.
      *
-     *  @property logLevels
-     *  @type string[]
-     *  @static
+     *  @type {string[]}
      */
     logLevels: ["debug", "log", "info", "warn", "error"],
 
@@ -40,9 +38,7 @@ define(function () {
     /**
      *  Current log level. Assign a new value to this property to change the log level.
      *
-     *  @property logLevel
-     *  @type string
-     *  @static
+     *  @type {string}
      */
     logLevel: "log",
 
@@ -50,7 +46,6 @@ define(function () {
      * Logs a message at debug level.
      *
      * @param {string} m - Message to log.
-     * @static
      */
     debug: function (m) {
       return _log(m, "debug");
@@ -60,7 +55,6 @@ define(function () {
      * Logs a message at log level.
      *
      * @param {string} m - Message to log.
-     * @static
      */
     log: function (m) {
       return _log(m, "log");
@@ -70,7 +64,6 @@ define(function () {
      * Logs a message at info level.
      *
      * @param {string} m - Message to log.
-     * @static
      */
     info: function (m) {
       return _log(m, "info");
@@ -80,7 +73,6 @@ define(function () {
      * Logs a message at warn level.
      *
      * @param {string} m - Message to log.
-     * @static
      */
     warn: function (m) {
       return _log(m, "warn");
@@ -90,7 +82,6 @@ define(function () {
      * Logs a message at error level.
      *
      * @param {string} m - Message to log.
-     * @static
      */
     error: function (m) {
       return _log(m, "error");
