@@ -14,9 +14,6 @@
  * limitations under the License.
  */
 
-// Must be executed out of strict scope
-var __global__ = this;
-
 define([
   "pentaho/type/standard",
   "tests/test-utils"
@@ -25,9 +22,6 @@ define([
   "use strict";
 
   /*global describe:false, it:false, expect:false, beforeEach:false, afterEach:false, Promise:false, spyOn:false*/
-
-  // These should really be writable, i.e. globalVar: true
-  /*global SESSION_NAME:true, active_theme:true, SESSION_LOCALE:true */
 
   // Use alternate, promise-aware version of `it`.
   var it = testUtils.itAsync;
@@ -49,169 +43,6 @@ define([
         return require.using(["pentaho/type/Context"], function(Context) {
           var context = new Context();
           expect(context instanceof Context).toBe(true);
-        });
-      });
-
-      describe("container -", function() {
-
-        it("should have a null value when unspecified and there is no current one", function() {
-
-          return require.using(["pentaho/type/Context"], function(Context) {
-            var context = new Context();
-            expect(context.container).toBe(null);
-          });
-        });
-
-        it("should have a null value when specified empty", function() {
-
-          return require.using(["pentaho/type/Context"], function(Context) {
-            var context = new Context({container: ""});
-            expect(context.container).toBe(null);
-          });
-        });
-
-        it("should respect a specified non-empty value", function() {
-
-          return require.using(["pentaho/type/Context"], function(Context) {
-            var context = new Context({container: "FOO"});
-            expect(context.container).toBe("FOO");
-          });
-        });
-      });
-
-      describe("user -", function() {
-        var _SESSION_NAME;
-
-        beforeEach(function() {
-          _SESSION_NAME = __global__.SESSION_NAME;
-          __global__.SESSION_NAME = undefined;
-        });
-
-        afterEach(function() {
-          __global__.SESSION_NAME = _SESSION_NAME;
-        });
-
-        it("should have a null value when unspecified and there is no current one", function() {
-
-          return require.using(["pentaho/type/Context"], function(Context) {
-            var context = new Context();
-            expect(context.user).toBe(null);
-          });
-        });
-
-        it("should have a null value when specified empty", function() {
-
-          return require.using(["pentaho/type/Context"], function(Context) {
-            var context = new Context({user: ""});
-            expect(context.user).toBe(null);
-          });
-        });
-
-        it("should respect a specified non-empty value", function() {
-
-          return require.using(["pentaho/type/Context"], function(Context) {
-            var context = new Context({user: "FOO"});
-            expect(context.user).toBe("FOO");
-          });
-        });
-
-        it("should default to the existing current one", function() {
-
-          return require.using(["pentaho/type/Context"], function(Context) {
-            __global__.SESSION_NAME = "ABC";
-            var context = new Context();
-            expect(context.user).toBe("ABC");
-          });
-        });
-      });
-
-      describe("theme -", function() {
-        var _active_theme;
-        beforeEach(function() {
-          _active_theme = __global__.active_theme;
-          __global__.active_theme = undefined;
-        });
-
-        afterEach(function() {
-          __global__.active_theme = _active_theme;
-        });
-
-        it("should have a null value when unspecified and there is no current one", function() {
-
-          return require.using(["pentaho/type/Context"], function(Context) {
-            var context = new Context();
-            expect(context.theme).toBe(null);
-          });
-        });
-
-        it("should have a null value when specified empty", function() {
-
-          return require.using(["pentaho/type/Context"], function(Context) {
-            var context = new Context({theme: ""});
-            expect(context.theme).toBe(null);
-          });
-        });
-
-        it("should respect a specified non-empty value", function() {
-
-          return require.using(["pentaho/type/Context"], function(Context) {
-            var context = new Context({theme: "FOO"});
-            expect(context.theme).toBe("FOO");
-          });
-        });
-
-        it("should default to the existing current one", function() {
-
-          return require.using(["pentaho/type/Context"], function(Context) {
-            __global__.active_theme = "ABC";
-            var context = new Context();
-            expect(context.theme).toBe("ABC");
-          });
-        });
-      });
-
-      describe("locale -", function() {
-        var _SESSION_LOCALE;
-        beforeEach(function() {
-          _SESSION_LOCALE = __global__.SESSION_LOCALE;
-          __global__.SESSION_LOCALE = undefined;
-        });
-
-        afterEach(function() {
-          SESSION_LOCALE = _SESSION_LOCALE;
-        });
-
-        it("should have a null value when unspecified and there is no current one", function() {
-
-          return require.using(["pentaho/type/Context"], function(Context) {
-            var context = new Context();
-            expect(context.locale).toBe(null);
-          });
-        });
-
-        it("should have a null value when specified empty", function() {
-
-          return require.using(["pentaho/type/Context"], function(Context) {
-            var context = new Context({locale: ""});
-            expect(context.locale).toBe(null);
-          });
-        });
-
-        it("should respect a specified non-empty value", function() {
-
-          return require.using(["pentaho/type/Context"], function(Context) {
-            var context = new Context({locale: "FOO"});
-            expect(context.locale).toBe("FOO");
-          });
-        });
-
-        it("should default to the existing current one", function() {
-
-          return require.using(["pentaho/type/Context"], function(Context) {
-            __global__.SESSION_LOCALE = "ABC";
-            var context = new Context();
-            expect(context.locale).toBe("ABC");
-          });
         });
       });
     });

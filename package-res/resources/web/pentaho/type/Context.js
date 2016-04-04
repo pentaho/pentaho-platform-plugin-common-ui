@@ -21,6 +21,7 @@ define([
   "./standard",
   "./SpecificationContext",
   "./SpecificationScope",
+  "../GlobalContextVars",
   "../lang/Base",
   "../util/promise",
   "../util/arg",
@@ -28,7 +29,7 @@ define([
   "../util/object",
   "../util/fun"
 ], function(localRequire, module, Instance, bundle, standard, SpecificationContext, SpecificationScope,
-    Base, promiseUtil, arg, error, O, F) {
+    GlobalContextVars, Base, promiseUtil, arg, error, O, F) {
 
   "use strict";
 
@@ -149,19 +150,13 @@ define([
    *
    * @constructor
    * @description Creates a `Context` whose variables default to the Pentaho thin-client state variables.
-   * @param {object} [keyArgs] Keyword arguments.
-   * @param {string?} [keyArgs.container] The id of the container application.
-   * @param {string?} [keyArgs.user] The id of the user. Defaults to the current user.
-   * @param {string?} [keyArgs.theme] The id of the theme. Defaults to the current theme.
-   * @param {string?} [keyArgs.locale] The id of the locale. Defaults to the current locale.
+   * @param {pentaho.spec.IContextVars} [contextVars] The context variables' specification.
+   * When unspecified, it defaults to an instance of {@link pentaho.GlobalContextVars}.
    */
   var Context = Base.extend(/** @lends pentaho.type.Context# */{
 
-    constructor: function(keyArgs) {
-      this._container = arg.optional(keyArgs, "container") || getCurrentContainer();
-      this._user      = arg.optional(keyArgs, "user")      || getCurrentUser();
-      this._theme     = arg.optional(keyArgs, "theme")     || getCurrentTheme();
-      this._locale    = arg.optional(keyArgs, "locale")    || getCurrentLocale();
+    constructor: function(contextVars) {
+      this._vars = contextVars || new GlobalContextVars();
 
       // factory uid : Class.<pentaho.type.Value>
       this._byFactoryUid = {};
@@ -181,48 +176,15 @@ define([
       }, this);
     },
 
-    //region context variables
-
     /**
-     * Gets the id of the context's container application, if any.
+     * The context's variables.
      *
-     * @type {?string}
-     * @readonly
+     * @type {!pentaho.type.IContextVars}
+     * @readOnly
      */
-    get container() {
-      return this._container;
+    get vars() {
+      return this._vars;
     },
-
-    /**
-     * Gets the id of the context's user, if any.
-     *
-     * @type {?string}
-     * @readonly
-     */
-    get user() {
-      return this._user;
-    },
-
-    /**
-     * Gets the id of the context's theme, if any.
-     *
-     * @type {?string}
-     * @readonly
-     */
-    get theme() {
-      return this._theme;
-    },
-
-    /**
-     * Gets the id of the context's locale, if any.
-     *
-     * @type {?string}
-     * @readonly
-     */
-    get locale() {
-      return this._locale;
-    },
-    //endregion
 
     /**
      * Gets the **configured instance constructor** of a value type.
@@ -865,7 +827,7 @@ define([
     },
 
     _getConfig: function(id) {
-      // TODO: link to configuration service
+      // TODO: link to configuration service, passing this._vars
       return null;
     },
     //endregion
@@ -881,23 +843,6 @@ define([
   });
 
   return Context;
-
-  function getCurrentContainer() {
-    // TODO: should try to find webcontext.js in scripts collection?
-    return null;
-  }
-
-  function getCurrentUser() {
-    return typeof SESSION_NAME !== "undefined" ? SESSION_NAME : null;
-  }
-
-  function getCurrentTheme() {
-    return typeof active_theme !== "undefined" ? active_theme : null;
-  }
-
-  function getCurrentLocale() {
-    return typeof SESSION_LOCALE !== "undefined" ? SESSION_LOCALE : null;
-  }
 
   function getFactoryUid(factory) {
     return factory._fuid_ || (factory._fuid_ = _nextUid++);
