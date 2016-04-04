@@ -1,0 +1,101 @@
+/*!
+ * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * The `spec.ITypeConfiguration` interface describes
+ * a list of [configuration rules]{@link pentaho.type.spec.ITypeConfiguration#rules}
+ * used to configure one or more [value types]{@link pentaho.type.Value.Type} of
+ * the Pentaho Client Metadata Model.
+ *
+ * The following example is a hypothetical configuration,
+ * where a developer (John) states that only he should see the visualization
+ * he is currently developing (my/radial/bar) and
+ * only then when working in Pentaho Analyzer:
+ *
+ * ```js
+ * var myTypeConfig = {
+ *   rules: [
+ *     // Disable a still experimental Viz.
+ *     {
+ *       select: {
+ *         type: "my/radial/bar"
+ *       },
+ *       apply: {
+ *         isBrowsable: false
+ *       }
+ *     },
+ *
+ *     // Enable it, only for the dev user, "john", when in Analyzer
+ *     {
+ *       select: {
+ *         type:        "my/radial/bar",
+ *         user:        "john",
+ *         application: "pentaho.analyzer"
+ *       },
+ *       apply: {
+ *         isBrowsable: true
+ *       }
+ *     }
+ *   ]
+ * };
+ * ```
+ *
+ * ### Rule Selection
+ *
+ * A rule is selected by a given type and context variables,
+ * if the type and variables match the rule's
+ * [selection variables]{@link pentaho.type.spec.ITypeConfigurationRule#select}.
+ *
+ * ### Rule Specificity
+ *
+ * Rule specificity is a measure of the relevance of a rule.
+ *
+ * When two or more _selected_ rules configure the same specification attribute,
+ * it is the value used by the most specific rule that wins.
+ * When configured values are structural and are instead merged,
+ * like with an {@link Object} value,
+ * specificity determines the order in the merge operation
+ * (most specific is merged over less specific).
+ *
+ * A rule is more specific than another if it:
+ *
+ * 1. has a greater [priority]{@link pentaho.type.spec.ITypeConfigurationRule#priority};
+ *    this is the attribute that most affects specificity, and can be used to easily
+ *    surpass every other affecting factors,
+ * 2. selects a user (and the other doesn't),
+ * 3. selects a theme (and the other doesn't),
+ * 4. selects a locale (and the other doesn't),
+ * 5. selects an application (and the other doesn't),
+ * 6. belongs to a type configuration that was added later, or
+ * 7. it is at a greater index in the type configuration rules list.
+ *
+ * @name pentaho.type.spec.ITypeConfiguration
+ * @interface
+ *
+ * @see pentaho.type.IConfigurationService
+ */
+
+/**
+ * The list of configuration rules.
+ *
+ * Within a type configuration,
+ * if all other rule ordering criteria are equal,
+ * the later configuration rules override the former configuration rules.
+ *
+ * @name rules
+ * @memberOf pentaho.type.spec.ITypeConfiguration#
+ * @type {pentaho.type.spec.ITypeConfigurationRule}
+ */

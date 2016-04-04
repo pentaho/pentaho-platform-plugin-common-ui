@@ -118,7 +118,7 @@ define([
     },
 
     /**
-     * Prevents further changes to this changeset
+     * Prevents further changes to this changeset.
      */
     freeze: function(){
       O.eachOwn(this._properties, function(change){

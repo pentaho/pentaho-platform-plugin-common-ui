@@ -21,3 +21,11 @@
  * @name pentaho
  * @namespace
  */
+
+/**
+ * The pentaho `spec` namespace contains specification interfaces
+ * used by the Pentaho Web Platform's classes and interfaces.
+ *
+ * @name pentaho.spec
+ * @namespace
+ */
