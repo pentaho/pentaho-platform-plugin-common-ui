@@ -986,9 +986,7 @@ define([
 
       it("should return a promise", function() {
 
-        return require.using(["require", "pentaho/type/Context"], function(localRequire, Context) {
-
-          configRequire(localRequire);
+        return require.using(["require", "pentaho/type/Context"], configRequire, function(localRequire, Context) {
 
           var context = new Context();
           var p = context.getAllAsync();
@@ -998,9 +996,7 @@ define([
 
       it("should return all registered Types under 'pentaho/type/value' by default", function() {
 
-        return require.using(["require", "pentaho/type/Context"], function(localRequire, Context) {
-
-          configRequire(localRequire);
+        return require.using(["require", "pentaho/type/Context"], configRequire, function(localRequire, Context) {
 
           var context = new Context();
 
@@ -1016,9 +1012,7 @@ define([
 
       it("should return an empty array when the specified baseType has no registrations", function() {
 
-        return require.using(["require", "pentaho/type/Context"], function(localRequire, Context) {
-
-          configRequire(localRequire);
+        return require.using(["require", "pentaho/type/Context"], configRequire, function(localRequire, Context) {
 
           var context = new Context();
 
@@ -1033,9 +1027,7 @@ define([
 
       it("should return all registered Types under a given base type id", function() {
 
-        return require.using(["require", "pentaho/type/Context"], function(localRequire, Context) {
-
-          configRequire(localRequire);
+        return require.using(["require", "pentaho/type/Context"], configRequire, function(localRequire, Context) {
 
           var context  = new Context();
 
@@ -1057,9 +1049,7 @@ define([
 
       it("should return all registered Types that satisfy the isBrowsable filter", function() {
 
-        return require.using(["require", "pentaho/type/Context"], function(localRequire, Context) {
-
-          configRequire(localRequire);
+        return require.using(["require", "pentaho/type/Context"], configRequire, function(localRequire, Context) {
 
           var context  = new Context();
 
