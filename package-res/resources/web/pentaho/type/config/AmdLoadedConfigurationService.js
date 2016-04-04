@@ -23,7 +23,7 @@ define([
     return a.moduleId.localeCompare(b.moduleId);
   });
 
-  var AmdLoadedConfigurationService = ConfigurationService.extend("pentaho.type.config.AmdLoadedConfigurationService", /** @lends pentaho.type.config.AmdLoadedConfigurationService#*/{
+  var AmdLoadedConfigurationService = ConfigurationService.extend("pentaho.type.config.AmdLoadedConfigurationService", {
     constructor: function() {
       this.base();
 

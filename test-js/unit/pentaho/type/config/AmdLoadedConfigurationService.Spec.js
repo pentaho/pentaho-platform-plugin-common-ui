@@ -102,7 +102,7 @@ define([], function() {
       it("should add loaded rules", function(done) {
         localRequire(["pentaho/type/config/AmdLoadedConfigurationService"], function(LocalConfigService) {
           var cf = new LocalConfigService();
-          expect(cf.ruleStore["pentaho/type/Instance"].length).toBe(6);
+          expect(cf._ruleStore["pentaho/type/value"].length).toBe(6);
           done();
         });
       });
@@ -111,7 +111,7 @@ define([], function() {
         localRequire(["pentaho/type/config/AmdLoadedConfigurationService"], function(LocalConfigService) {
           var cf = new LocalConfigService();
 
-          var Ids = cf.ruleStore["pentaho/type/Instance"].map(function(rule) {
+          var Ids = cf._ruleStore["pentaho/type/value"].map(function(rule) {
             return rule.apply.testId;
           });
 

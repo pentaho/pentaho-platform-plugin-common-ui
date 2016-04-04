@@ -67,6 +67,10 @@ define([
       it("should return config if rule applies", function() {
         expect(configurationService.select("A").testId).toEqual("A");
       });
+
+      it("should convert from short IDs to full IDs", function() {
+        expect(configurationService.select("A").testId).toEqual(configurationService.select("pentaho/type/A").testId);
+      });
     });
 
   });

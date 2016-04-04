@@ -18,11 +18,11 @@ define([
 ], function(Base) {
   "use strict";
 
-  var ConfigurationService = Base.extend("pentaho.type.config.ConfigurationService", /** @lends pentaho.type.config.ConfigurationService#*/{
+  var ConfigurationService = Base.extend("pentaho.type.config.ConfigurationService", {
     /**
      * @private
      */
-    ruleStore: {},
+    _ruleStore: {},
 
     constructor: function() {
     },
@@ -37,36 +37,44 @@ define([
 
     addRule: function(rule) {
       var select = rule.select || {};
-      var typeIds = select.type || ["pentaho/type/Instance"];
+      var typeIds = select.type || ["pentaho/type/value"];
       if (!Array.isArray(typeIds)) {
         typeIds = [typeIds];
       }
 
       typeIds.forEach(function(typeId) {
+        var type = toAbsTypeId(typeId);
+
         // TODO Replace with custom collection with ordered insert
-        if (!this.ruleStore[typeId]) {
-          this.ruleStore[typeId] = [];
+        if (!this._ruleStore[type]) {
+          this._ruleStore[type] = [];
         }
 
-        this.ruleStore[typeId].push(rule);
+        this._ruleStore[type].push(rule);
       }, this);
     },
 
     select: function(typeId, criteria) {
+      var type = toAbsTypeId(typeId);
+
       // TODO Select the apropriate rules, merge them and return
 
       // Temporary placeholder mock implementation
       // always return first configuration (or empty, if none)
-      var rules = [];
-      if (this.ruleStore[typeId]) {
-        rules = this.ruleStore[typeId].map(function(rule) {
+      var configs = [];
+      if (this._ruleStore[type]) {
+        configs = this._ruleStore[type].map(function(rule) {
           return rule.apply;
         });
       }
 
-      return rules.length === 0 ? null : rules[0];
+      return configs.length === 0 ? null : configs[0];
     }
   });
 
   return ConfigurationService;
+
+  function toAbsTypeId(id) {
+    return id.indexOf("/") < 0 ? ("pentaho/type/" + id) : id;
+  }
 });

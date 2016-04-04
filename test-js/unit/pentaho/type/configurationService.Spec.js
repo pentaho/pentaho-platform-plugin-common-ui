@@ -14,9 +14,6 @@
  * limitations under the License.
  */
 
-// Must be executed out of strict scope
-var __global__ = this;
-
 define([
   "tests/test-utils"
 ], function(testUtils) {
