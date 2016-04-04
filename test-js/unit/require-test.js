@@ -126,7 +126,12 @@
     });
   };
 
-  require.using = function(deps, scopedFun) {
+  require.using = function(deps, config, scopedFun) {
+    if(!scopedFun && typeof config === "function") {
+      scopedFun = config;
+      config = null;
+    }
+
     // Identify the special "require" argument.
     // Copy the array, remove "require", and add `localRequire` in its place, later.
     var requireIndex = deps.indexOf("require");
@@ -134,6 +139,11 @@
       (deps = deps.slice()).splice(requireIndex, 1);
 
     var localRequire = this.new();
+    if(typeof config === "function") {
+      config.call(config, localRequire);
+    } else if(config !== null) {
+      localRequire.config(config);
+    }
 
     return localRequire.promise(deps)
         .then(processDeps)
