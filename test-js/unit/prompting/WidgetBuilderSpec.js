@@ -57,9 +57,10 @@ define(['common-ui/prompting/WidgetBuilder', 'common-ui/prompting/parameters/Par
       expect(panel.type).toEqual("StaticAutocompleteBoxComponent");
 
       args.param.type = "";
+      args.param.list = false;
       type = "";
       panel = WidgetBuilder.build(args, type);
-      expect(panel.type).toEqual("StaticAutocompleteBoxComponent");
+      expect(panel.type).toEqual("TextInputComponent");
     });
 
   });

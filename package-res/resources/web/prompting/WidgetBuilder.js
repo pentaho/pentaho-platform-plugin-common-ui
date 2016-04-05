@@ -82,8 +82,7 @@ define(['./builders/PromptPanelBuilder', './builders/ParameterGroupPanelBuilder'
           'external-input': new ExternalInputBuilder(),
           'multi-line': new TextAreaBuilder(),
           'autocompletebox': new StaticAutocompleteBoxBuilder(),
-          'textbox': new TextInputBuilder(),
-          'default': new StaticAutocompleteBoxBuilder()
+          'textbox': new TextInputBuilder()
         },
 
         /**
@@ -102,10 +101,10 @@ define(['./builders/PromptPanelBuilder', './builders/ParameterGroupPanelBuilder'
             if (type == "textbox" && args.param.list) {
               type = "autocompletebox";
             }
-            return this.mapping[type];
           } else {
-            return this.mapping["default"];
+            type = args.param.list ? "autocompletebox" : "textbox";
           }
+          return this.mapping[type];
         },
 
         /**
