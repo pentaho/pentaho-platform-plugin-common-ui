@@ -32,6 +32,7 @@ define([
       PentahoNumber = context.get(numberFactory);
 
   function expectNoChanges(list) {
+    return; // TODO: move the tests that use this to ListChange.Spec.js
     expect(list._changes).toBe(null);
     expect(list._changeLevel).toBe(0);
   }

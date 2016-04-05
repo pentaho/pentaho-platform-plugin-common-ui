@@ -110,11 +110,13 @@ define([
           i = pTypes.length,
           nameProp = !spec ? undefined : (Array.isArray(spec) ? "index" : "name"),
           pType,
+          value,
           values = {};
 
         while(i--) {
           pType = pTypes[i];
-          values[pType.name] = pType.toValue(nameProp && spec[pType[nameProp]]);
+          values[pType.name] = value = pType.toValue(nameProp && spec[pType[nameProp]]);
+          if(pType.isList) value.setOwnership(this, pType);
         }
 
         this._values = values;
@@ -402,6 +404,12 @@ define([
         this._changeDid(changeset);
       },
 
+      _onListChange: function(propType, changeset) {
+        var complexChangeset = new ComplexChangeset(this);
+        complexChangeset._setListChange(propType, changeset);
+        this._change(complexChangeset);
+      },
+
       /**
        * Applies a set of changes to this object.
        *
@@ -414,7 +422,7 @@ define([
        * @ignore
        */
       _changeDo: function(changeset) {
-        changeset.apply();
+        changeset.commit();
       },
 
       /**

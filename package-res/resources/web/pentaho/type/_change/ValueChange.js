@@ -21,36 +21,41 @@ define([
 
   return PrimitiveChange.extend("pentaho.type.ValueChange", {
 
-    constructor: function(changeset, property, valueSpec) {
-      this.base(changeset);
-      
-      this._property = property;
-      
-      this._oldValue = null;
-      this._newValue = valueSpec;
+    constructor: function(owner, propertyName, valueSpec) {
+      this.base(owner);
+
+      this._propertyName = propertyName;
+      this._oldValue = owner.get(propertyName);
+
+      if(valueSpec) this.newValue = valueSpec;
+    },
+
+    type: "set",
+
+    set: function(valueSpec){
+      this.newValue = valueSpec;
     },
 
     set newValue(valueSpec) {
-      this._newValue = valueSpec;
+      this._newValue = this._oldValue ? this._oldValue.type.toValue(valueSpec) : valueSpec;
     },
 
     get newValue() {
       return this._newValue;
     },
 
-    capture: function() {
-      this._oldValue = this.owner._values[this.property];
-    },
-
     get oldValue() {
       return this._oldValue;
     },
-    
-    apply: function() {
+
+    simulate: function(/* propertyValue */) {
+      return this.newValue;
+    },
+
+    _commit: function() {
       var complex = this.owner;
-      
-      complex._values[this._property] = this.newValue;
+      complex._values[this._propertyName] = this.newValue;
     }
-    
+
   });
 });

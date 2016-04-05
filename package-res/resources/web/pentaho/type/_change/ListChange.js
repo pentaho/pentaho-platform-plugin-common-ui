@@ -15,28 +15,12 @@
  */
 
 define([
-  "./ListChange"
-], function(ListChange) {
+  "./Change"
+], function(Change) {
   "use strict";
 
-  return ListChange.extend("pentaho.type.AddChange", {
-
-    constructor: function(owner, elem, index) {
-      this.base(owner);
-
-      this.at = index;
-      this.elems = [elem];
-    },
-
-    type: "add",
-    
-    simulate: function(list) {
-      var index = this.at;
-      var elem = this.elems[0];
-
-      list._elems.splice(index, 0, elem);
-      list._keys[elem.key] = elem;
-      return list;
-    }
+  return Change.extend("pentaho.type.ListChange", {
+    simulate: null
   });
 });
+

@@ -20,9 +20,18 @@ define([
   "use strict";
 
   return Change.extend("pentaho.type.PrimitiveChange", {
-    constructor: function(owner) {
+    constructor: function(owner, property) {
       this.base(owner);
-    }
+      this._property = property; //pType
+    },
+
+    
+    _cloneOldValue: function(){
+      return this.oldValue.clone();
+    },
+
+    _capture: null //returns reference to old value
+
   });
 
 });

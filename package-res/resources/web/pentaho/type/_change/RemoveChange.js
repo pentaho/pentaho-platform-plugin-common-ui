@@ -15,48 +15,33 @@
  */
 
 define([
-  "./PrimitiveChange"
-], function(PrimitiveChange) {
+  "./ListChange"
+], function(ListChange) {
   "use strict";
 
-  return PrimitiveChange.extend("pentaho.type.RemoveChange", {
+  return ListChange.extend("pentaho.type.RemoveChange", {
 
-    constructor: function(changeset, elem, index) {
-      this.base(changeset);
+    constructor: function(owner, elem, index) {
+      this.base(owner);
 
-      this._index = index;
-      this._element = elem;
-
-      this._oldValue = null;
+      this.at = index;
+      this.elems = elem instanceof Array ? elem : [elem];
     },
 
-    get newValue() {
-      if(this._newValue) return this._newValue;
+    type: "remove",
 
-      this._newValue = this._apply(this.capture().clone());
+    simulate: function(list) {
+      var index = this.at;
+      var elem = this.elems[0];
 
-      return this._newValue;
-    },
+      list._elems.splice(index, 1);
+      delete list._keys[elem.key];
 
-    get oldValue() {
-      return this._oldValue;
-    },
-
-    capture: function() {
-      var owner = this.owner;
-
-      this._oldValue = owner.applyUpTo(owner.oldValue.clone(), this);
-
-      return this._oldValue;
-    },
-
-    apply: function() {
-      this._apply(this.owner.list);
-    },
-    
-    _apply: function(list) {
-      list._elems.splice(this.index, 1);
-      delete list._keys[this.key];
+      // list._elems.splice(index, elems.length);
+      // elems.forEach(function(elem){
+      //   delete list._keys[elem.key];
+      // });
+      return list;
     }
   });
 });
