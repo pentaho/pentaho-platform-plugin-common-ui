@@ -23,6 +23,7 @@ define([
   "../_axes/Axis",
   "../util",
   "pentaho/util/object",
+  "pentaho/util/logger",
   "pentaho/data/filter",
   "pentaho/visual/color/utils",
   "pentaho/visual/color/paletteRegistry",
@@ -31,7 +32,7 @@ define([
   "pentaho/i18n!view"
 ], function(View, selectionModes,
             def, pvc, cdo, pv, Axis,
-            util, O, filter, visualColorUtils, visualPaletteRegistry,
+            util, O, logger, filter, visualColorUtils, visualPaletteRegistry,
             DataView, ViewDemo, bundle) {
 
   "use strict";
@@ -1273,7 +1274,11 @@ define([
 
     _updateSelections: function() {
       this._selectionChanged(this.model.getv("selectionFilter"));
-      this._chart.updateSelections();
+      try {
+        this._chart.updateSelections();
+      } catch(e){
+        logger.log("Error while calling _chart.updateSelections: " + e.message);
+      }
     },
 
     //region SELECTION
