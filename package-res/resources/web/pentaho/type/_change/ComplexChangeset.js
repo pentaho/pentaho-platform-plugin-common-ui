@@ -15,10 +15,13 @@
  */
 
 define([
-  "../lang/Base",
-  "../util/object",
-  "../util/error"
-], function(Base, O, error) {
+  "./Changeset",
+  "./ListChangeset",
+  "./ValueChange",
+  "../../util/object",
+  "../../util/error"
+], function(Changeset, ListChangeset, ValueChange,
+            O, error) {
   "use strict";
 
   /**
@@ -37,7 +40,7 @@ define([
    * @class
    * @extends pentaho.lang.Base
    */
-  return Base.extend("pentaho.type.ComplexChangeset", /** @lends pentaho.type.ComplexChangeset#*/{
+  return Changeset.extend("pentaho.type.ComplexChangeset", /** @lends pentaho.type.ComplexChangeset#*/{
 
     /**
      * Creates a `ComplexChangeset` with a given owner.
@@ -46,21 +49,12 @@ define([
      *
      * @param {!pentaho.type.Complex} owner - The complex where the change occurred.
      */
-    constructor: function(owner) {
+    constructor: function(complex) {
       if(!owner) throw error.argRequired("owner");
+      
+      this.base(complex);
 
-      this._owner = owner;
       this._properties = {};
-    },
-
-    /**
-     * Gets the complex where the change occurred.
-     *
-     * @type !pentaho.type.ComplexChangeset
-     * @readonly
-     */
-    get owner() {
-      return this._owner;
     },
 
     /**
@@ -75,6 +69,10 @@ define([
       return pName && O.hasOwn(this._properties, pName);
     },
 
+    hasChanges: function() {
+      return this.propertyNames.length > 0;
+    },
+
     /**
      * Sets the value of a property.
      *
@@ -82,15 +80,20 @@ define([
      * @param {any?} [valueSpec=null] A value specification.
      */
     set: function(name, valueSpec) {
-      var pType = this.owner.type.get(name);
+      if(!name) throw error.argRequired("name");
+
+      var owner = this.owner;
+      var pType = owner.type.get(name);
       var pName = pType.name;
-      if(!pName) throw error.argRequired("name");
+      var value0 = owner._values[pType.name];
 
       if(pType.isList) {
-        //TODO: does nothing for now except populate the list of properties that have changed
-        this._properties[pName] = null;
+        this._setListChange(pName, value0, valueSpec);
       } else {
-        this._setValueChange(pName, pType.toValue(valueSpec));
+        var value1 = pType.toValue(valueSpec);
+        if(!pType.type.areEqual(value0, value1)) {
+          this._setValueChange(pName, value1);
+        }
       }
     },
 
@@ -132,28 +135,55 @@ define([
      *
      * @param {!string} propertyName - The property name.
      * @param {any?} newValue - The change candidate value.
-     * @param {any?} [oldValue] - The original value.
      * @private
      */
-    _setValueChange: function(propertyName, newValue, oldValue) {
-      var propChange = this._properties[propertyName];
-      if(!propChange) {
-        propChange = this._properties[propertyName] = {};
-        O.setConst(propChange, "type", "set");
+    _setValueChange: function(propertyName, newValue) {
+      this._properties[propertyName] = new ValueChange(propertyName, newValue);
+    },
 
-        var v0 = arguments.length > 2 ? oldValue : this.owner.get(propertyName);
-        O.setConst(propChange, "oldValue", v0);
-      }
+    _setListChange: function(propertyName, oldValue, valueSpec) {
+      //set Old Value - making assumption that will create a list change set
+      oldValue.set(valueSpec);
 
-      propChange.newValue = newValue;
+      var listChangeset = oldValue.changeset;
+
+      //TODO: 'true' is temporary
+      if(true || listChangeset != null)
+        this._properties[propertyName] = listChangeset;
+    },
+    
+    //-------------------------------------------
+
+    apply: function() {
+      this.propertyNames.forEach(function(property) {
+        var change = this.getChange(property);
+        if(change != null) //TODO: temporary
+          change.apply(this.owner);
+        
+      }, this);
+
+    },
+
+    get: function(property) {
+      if(!this.has(property)) return null;
+
+      return this.getChange(property).newValue();
+    },
+
+    //region Old Value
+    capture: function(key) {
+      if(!this.has(key)) return null;
+
+      return this.getChange(key).capture(key);
+    },
+
+    getOld: function(key) {
+      if(!this.has(key)) return null;
+
+      return this.getChange(key).oldValue();
     }
+    //endregion
+    
   });
 
-  /**
-   * @typedef pentaho.type.ValueChange
-   * @property {!string} [type="set"] - The type of operation.
-   * @property {*} oldValue - The previous value of the property.
-   * @property {*} newValue - The new value of the property.
-   *
-   */
 });

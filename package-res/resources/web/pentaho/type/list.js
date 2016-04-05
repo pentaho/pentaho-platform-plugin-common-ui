@@ -74,6 +74,7 @@ define([
         this._uid = String(_listNextUid++);
         this._changes = null;
         this._changeLevel = 0;
+        this._changeset = null;
 
         if(spec != null) {
           // An array of element specs?
@@ -118,6 +119,10 @@ define([
         clone._uid = String(_listNextUid++);
         clone._changes = null;
         clone._changeLevel = 0;
+      },
+
+      get changeset() {
+        return this._changeset;
       },
 
       /**
@@ -486,6 +491,7 @@ define([
       },
 
       _insertOne: function(elem, index, key, silent) {
+        
         this._elems.splice(index, 0, elem);
         this._keys[key] = elem;
 
@@ -538,6 +544,7 @@ define([
 
         var removed = this._elems.splice(start, count),
             i = removed.length;
+
         if(i) {
           // Remove from key index
           while(i--) {
