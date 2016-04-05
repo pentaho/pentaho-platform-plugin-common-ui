@@ -101,9 +101,9 @@ define([
           result = window.confirm(propName + " changed. Do you really want to resize?");
           if(result === false) event.cancel("User canceled");
         }
-        var propChange = changeset.getChange(propName);
-        if(propChange)
-          logger.log(propName + (result ? " changed!" : " did not change!") + JSON.stringify(propChange.oldValue) + " , " +  JSON.stringify(propChange.newValue));
+        //var propChange = changeset.getChange(propName);
+        //if(propChange)
+        //  logger.log(propName + (result ? " changed!" : " did not change!") + JSON.stringify(propChange.oldValue) + " , " +  JSON.stringify(propChange.newValue));
       }, this);
     }
   };
