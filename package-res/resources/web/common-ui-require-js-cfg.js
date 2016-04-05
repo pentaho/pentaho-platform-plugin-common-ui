@@ -199,6 +199,8 @@
 
   // Visualizations Packages
 
+  requireService["pentaho/type/config/AmdLoadedConfigurationService"] = "pentaho.type.IConfigurationService";
+
   function mapTheme(mid, themes) {
     var theme = (typeof active_theme !== "undefined") ? active_theme : null;
     if(!theme || themes.indexOf(theme) < 0) theme = themes[0];
