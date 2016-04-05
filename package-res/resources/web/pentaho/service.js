@@ -21,10 +21,11 @@
  * 
  * **Module Id**: `"service"`
  * 
- * **Plugin Usage**: `"pentaho/service!{logical-module-name}[?meta]"`
+ * **Plugin Usage**: `"pentaho/service!{logical-module-name}?meta&single"`
  *
  *   * `{logical-module-name}` — the name of a required logical module.
- *   * `?meta` — if present provides the loaded module Ids, encapsulating it with the module value.
+ *   * `meta` — if present provides the loaded module Ids, encapsulating it with the module value.
+ *   * `single` — if present returns only the first declared dependency.
  *
  * #### A Plugin mechanism
  * 
@@ -162,6 +163,17 @@ define([
       var nameAndOptions = parseNameAndOptions(name);
       var modules = getLogicalModule(nameAndOptions.name);
 
+      var modules_num = modules.length;
+      var single = nameAndOptions.options.single === 'true';
+
+      if(single) {
+        if(modules_num > 1) {
+          modules = [modules[0]];
+        } else if(modules_num === 0) {
+          onLoad(null);
+        }
+      }
+
       // `require` is ok with resolving empty arrays as empty arrays.
       // Create any requested logical module, even if it has no registrations.
       // Empty name included, just to make the code simpler
@@ -169,17 +181,19 @@ define([
       require(modules, function() {
         var values = A_slice.call(arguments);
 
-        if(nameAndOptions.options.meta === 'true') {
+        var with_meta = nameAndOptions.options.meta === 'true';
+
+        if(with_meta) {
           var toReturn = [];
           for(var i = 0, ic = modules.length; i !== ic; ++i) {
             toReturn.push({moduleId: modules[i], value: values[i]});
           }
 
-          onLoad(toReturn);
+          onLoad(single ? toReturn[0] : toReturn);
         } else {
           // Pass the resolved modules to the original onLoad function,
           // as a single array argument.
-          onLoad(values);
+          onLoad(single ? values[0] : values);
         }
       });
     }

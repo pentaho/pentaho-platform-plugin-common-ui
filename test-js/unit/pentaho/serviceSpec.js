@@ -29,11 +29,11 @@ define(["pentaho/service"], function(singletonService) {
       expect(typeof singletonService.normalize).toBe("function");
     });
 
-    describe("foo", function() {
-      // Foo1, Foo2 and Bar test modules.
-      // IFoo and IBar are test services.
-      var foo1 = {name: "Foo 1"}, foo2 = {name: "Foo 2"}, bar = {name: "Bar 1"};
+    // Foo1, Foo2 and Bar test modules.
+    // IFoo and IBar are test services.
+    var foo1 = "Foo 1", foo2 = "Foo 2", bar = "Bar 1";
 
+    describe("foo", function() {
       beforeEach(function() {
         require.undef("Foo1"); define("Foo1", foo1);
         require.undef("Foo2"); define("Foo2", foo2);
@@ -167,10 +167,6 @@ define(["pentaho/service"], function(singletonService) {
     });
 
     describe("with meta information", function() {
-      // Foo1, Foo2 and Bar test modules.
-      // IFoo and IBar are test services.
-      var foo1 = {name: "Foo 1"}, foo2 = {name: "Foo 2"}, bar = {name: "Bar 1"};
-
       beforeEach(function() {
         require.undef("Foo1"); define("Foo1", foo1);
         require.undef("Foo2"); define("Foo2", foo2);
@@ -287,6 +283,69 @@ define(["pentaho/service"], function(singletonService) {
           expect(bars.length).toBe(1);
           expect(bars[0]).toBe(bar);
 
+          done();
+        });
+      });
+    });
+
+    describe("with single option", function() {
+      beforeEach(function() {
+        require.undef("Foo1"); define("Foo1", foo1);
+        require.undef("Foo2"); define("Foo2", foo2);
+        require.undef("Bar" ); define("Bar",  bar );
+
+        require.undef("pentaho/service");
+        require.undef("pentaho/service!IFoo?single=true");
+        require.undef("pentaho/service!IBar?single=true");
+
+        // Reset current service configuration
+        require.config({
+          config: {"pentaho/service": null}
+        });
+      });
+
+      it("should resolve a service with no registered providers as null", function(done) {
+        require.config({
+          config: {
+            "pentaho/service": {
+              "Foo1": "IFoo"
+            }
+          }
+        });
+
+        require(["pentaho/service!IGugu?single"], function(gugus) {
+          expect(gugus).toBeNull();
+          done();
+        });
+      });
+
+      it("should resolve a service with one registered provider with that registered module", function(done) {
+        require.config({
+          config: {
+            "pentaho/service": {
+              "Foo1": "IFoo"
+            }
+          }
+        });
+
+        require(["pentaho/service!IFoo?single"], function(foo) {
+          expect(foo).toBe(foo1);
+          done();
+        });
+      });
+
+      it("should resolve a service with two registered providers with one of those two registered modules", function(done) {
+        require.config({
+          config: {
+            "pentaho/service": {
+              "Foo1": "IFoo",
+              "Foo2": "IFoo"
+            }
+          }
+        });
+
+        require(["pentaho/service!IFoo?single"], function(foo) {
+          expect([foo1, foo2]).toContain(foo1);
           done();
         });
       });
