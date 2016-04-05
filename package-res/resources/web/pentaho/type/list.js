@@ -33,6 +33,8 @@ define([
         Element = context.get(elemFactory),
         _listNextUid = 1;
 
+
+
     /**
      * @name pentaho.type.List.Type
      * @class
@@ -74,7 +76,6 @@ define([
         this._uid = String(_listNextUid++);
         this._changes = null;
         this._changeLevel = 0;
-        this._changeset = null;
 
         if(spec != null) {
           // An array of element specs?
@@ -95,6 +96,11 @@ define([
                 /*silent:*/true);
           }
         }
+      },
+
+      setOwnership: function(owner, propType){
+        O.setConst(this, "_ownedBy", owner);
+        O.setConst(this, "_ownedAs", propType);
       },
 
       /**
@@ -119,10 +125,6 @@ define([
         clone._uid = String(_listNextUid++);
         clone._changes = null;
         clone._changeLevel = 0;
-      },
-
-      get changeset() {
-        return this._changeset;
       },
 
       /**
@@ -414,8 +416,8 @@ define([
 
       _getChange: function(type, index) {
         var changes = this._changes,
-            L = changes.length,
-            change = L ? changes[L - 1] : null;
+          L = changes.length,
+          change = L ? changes[L - 1] : null;
 
         if(change && (change.type === type)) {
           if(index == null || change.at + change.elems.length === index) {
@@ -436,8 +438,8 @@ define([
       //region Core change methods
       _set: function(fragment, add, update, remove, index, silent) {
         var elems = this._elems,
-            keys  = this._keys,
-            existing, elem, key;
+          keys  = this._keys,
+          existing, elem, key;
 
         if(!silent) this._enterChange();
 
@@ -491,7 +493,6 @@ define([
       },
 
       _insertOne: function(elem, index, key, silent) {
-        
         this._elems.splice(index, 0, elem);
         this._keys[key] = elem;
 
@@ -543,8 +544,7 @@ define([
         if(!silent) this._enterChange();
 
         var removed = this._elems.splice(start, count),
-            i = removed.length;
-
+          i = removed.length;
         if(i) {
           // Remove from key index
           while(i--) {

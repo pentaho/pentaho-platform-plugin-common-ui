@@ -20,12 +20,19 @@ define([
   "use strict";
 
   return Base.extend("pentaho.type.Change", {
-
+    /**
+     * Abstract class for all changes.
+     *
+     * @constructor
+     *
+     * @param {!pentaho.type.Complex} owner - The complex where the change occurred.
+     */
     constructor: function(owner) {
       this._owner = owner;
     },
 
-
+    type: null,
+    
     get owner() {
       return this._owner;
     }

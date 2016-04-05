@@ -23,56 +23,68 @@ define([
 
   return Changeset.extend("pentaho.type.ListChangeset", {
     
-    constructor: function(owner, list) {
+    constructor: function(owner, propertyName, valueSpec) {
       this.base(owner);
 
+      this._propertyName = propertyName;
+      this._oldValue = this.owner.get(propertyName);
+
       this._changes = [];
-      this._list = list;
-
-      this._oldValue = list.clone();
-      
-    },
-
-    get list() {
-      return this._list;
+      if(valueSpec) this.set(valueSpec);
     },
 
     get changes() {
       return this._changes;
     },
-    
+
+    //region public interface
+    set newValue(valueSpec) {
+      this.set(valueSpec);
+    },
+
+    /**
+     * Computes the new value.
+     * The value of the original property is not modified.
+     *
+     * @returns {*}
+     */
+    get newValue() {
+      var newValue = this._newValue;
+      if(newValue) return newValue;
+
+      this._newValue = newValue = this.simulate(this.oldValue.clone());
+      return newValue;
+    },
+
     get oldValue() {
       return this._oldValue;
     },
-    
-    capture: function(index) {
-      var change = this.changes[index];
-      
-      if(change) 
-        return change.capture();
-      else 
-        return this.oldValue;
-    },
+    //endregion
 
-    get newValue() {
-      var changes = this.changes;
-      var index = changes.length - 1;
 
-      return changes[index].newValue;
-    },
-    
     set: function(valueSpec) {
       //do list logic
     },
+    
+    simulate: function(propertyValue) {
+      var changes = this.changes.slice();
 
-    apply: function() {
-      this.changes.forEach(function(change) {
-        change.apply();
+      // Ignore changes until the last clear
+      var idxLastClear = changes.reduce(function(memo, change, idx) {
+        return change.type === "clear" ? idx : memo;
+      }, undefined);
+      changes = changes.slice(idxLastClear);
+
+      // mutate list
+      changes.forEach(function(change) {
+        change.simulate(propertyValue);
       });
+
+      return propertyValue;
     },
 
-    applyUpTo: function() {
-
+    _commit: function(){
+      this.simulate(this._oldValue);
     }
   });
 });
