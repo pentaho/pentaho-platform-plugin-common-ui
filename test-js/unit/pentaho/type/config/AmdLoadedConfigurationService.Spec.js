@@ -89,9 +89,9 @@ define([], function() {
         localRequire.config({
           config: {
             "pentaho/service": {
-              "test/config/3": "pentaho.type.ITypeConfiguration",
-              "test/config/2": "pentaho.type.ITypeConfiguration",
-              "test/config/1": "pentaho.type.ITypeConfiguration"
+              "test/config/3": "pentaho.type.spec.ITypeConfiguration",
+              "test/config/2": "pentaho.type.spec.ITypeConfiguration",
+              "test/config/1": "pentaho.type.spec.ITypeConfiguration"
             }
           }
         });

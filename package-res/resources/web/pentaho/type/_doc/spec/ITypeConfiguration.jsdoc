@@ -82,6 +82,45 @@
  * 6. belongs to a type configuration that was added later, or
  * 7. it is at a greater index in the type configuration rules list.
  *
+ * ### Rule's Configuration Merging
+ *
+ * Type configuration rules specify a _configuration_
+ * in its [apply]{@link pentaho.type.spec.ITypeConfigurationRule#apply} property.
+ *
+ * When merging two configurations, the default behavior works this way:
+ * 1. If both configurations contain a plain JavaScript object,
+ *    in the same property, the two are deeply merged
+ * 2. All other values, such as arrays, `null`, `undefined` or objects of custom classes, are replaced.
+ *
+ * To allow overriding the default merge behavior,
+ * the following object syntax is supported in the place where any value would be:
+ *
+ * ```js
+ * {
+ *   fruits: {
+ *     $op:   "add"
+ *     value: ["banana", apple""]
+ *   }
+ * }
+ * ```
+ *
+ * In the previous example, the "add" operation is used to append new elements to an existing array
+ * configuration value, instead of replacing it, as is the default.
+ *
+ * In the following example, the "replace" operation is used to replace an object configuration
+ * value, instead of merging it, as is the default:
+ *
+ * ```js
+ * {
+ *   score: {
+ *     $op:   "replace"
+ *     value: {"banana": 1, "apple": 3, "orange": 2}
+ *   }
+ * }
+ * ```
+ *
+ * Note that replacing with a {@link Nully} value effectively clears existing configurations.
+ *
  * @name pentaho.type.spec.ITypeConfiguration
  * @interface
  *

@@ -15,7 +15,7 @@
  */
 define([
   "./ConfigurationService",
-  "pentaho/service!pentaho.type.ITypeConfiguration?meta"
+  "pentaho/service!pentaho.type.spec.ITypeConfiguration?meta"
 ], function(ConfigurationService, configurations) {
   "use strict";
 
@@ -23,6 +23,26 @@ define([
     return a.moduleId.localeCompare(b.moduleId);
   });
 
+  /**
+   * @classDesc The `AmdLoadedConfigurationService` class is an implementation of
+   * the {@link pentaho.type.IConfigurationService} interface.
+   * This class contains (preloaded) all of the value type configurations that
+   * are registered as providing the service {@link pentaho.type.spec.ITypeConfiguration}
+   * (see {@link pentaho.service}).
+   *
+   * The registered AMD modules are first sorted by their module id, and only then added as configurations,
+   * so that the rules' specificity documented in {@link pentaho.type.spec.ITypeConfiguration} is respected.
+   *
+   * @class
+   * @alias AmdLoadedConfigurationService
+   * @memberOf pentaho.type.config
+   * @amd pentaho/type/config/AmdLoadedConfigurationService
+   *
+   * @extends pentaho.type.config.ConfigurationService
+   *
+   * @description Creates a configuration service instance that is preloaded with registered
+   * value type configuration modules.
+   */
   var AmdLoadedConfigurationService = ConfigurationService.extend("pentaho.type.config.AmdLoadedConfigurationService", {
     constructor: function() {
       this.base();

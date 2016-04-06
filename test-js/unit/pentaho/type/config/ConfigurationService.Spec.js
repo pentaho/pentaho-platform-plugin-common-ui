@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/config/ConfigurationService"
-], function(ConfigurationService) {
+  "pentaho/type/config/ConfigurationService",
+  "tests/pentaho/util/errorMatch"
+], function(ConfigurationService, errorMatch) {
   "use strict";
 
   /* global describe:false, it:false, expect:false, beforeEach:false, beforeAll:false */
@@ -203,47 +204,47 @@ define([
 
     describe("selecting", function() {
       describe("types", function() {
-      var configurationService;
+        var configurationService;
 
-      beforeEach(function() {
-        configurationService = new ConfigurationService();
+        beforeEach(function() {
+          configurationService = new ConfigurationService();
 
-        configurationService.add(
-          {
-            rules: [
-              {
-                select: {
-                  type: "A"
+          configurationService.add(
+            {
+              rules: [
+                {
+                  select: {
+                    type: "A"
+                  },
+                  apply: {
+                    testId: "A"
+                  }
                 },
-                apply: {
-                  testId: "A"
+                {
+                  select: {
+                    type: "B"
+                  },
+                  apply: {
+                    testId: "B"
+                  }
                 }
-              },
-              {
-                select: {
-                  type: "B"
-                },
-                apply: {
-                  testId: "B"
-                }
-              }
-            ]
-          }
-        );
-      });
+              ]
+            }
+          );
+        });
 
         it("should return null if no rule applies to type", function() {
-        expect(configurationService.select("C")).toBeNull();
-      });
+          expect(configurationService.select("C")).toBeNull();
+        });
 
         it("should return config if rule applies to type", function() {
-        expect(configurationService.select("A").testId).toEqual("A");
-      });
+          expect(configurationService.select("A").testId).toEqual("A");
+        });
 
-      it("should convert from short IDs to full IDs", function() {
-        expect(configurationService.select("A").testId).toEqual(configurationService.select("pentaho/type/A").testId);
+        it("should convert from short IDs to full IDs", function() {
+          expect(configurationService.select("A").testId).toEqual(configurationService.select("pentaho/type/A").testId);
+        });
       });
-    });
 
       describe("filtering", function() {
         var configurationService;
@@ -318,6 +319,1160 @@ define([
       });
     });
 
-  });
+    describe("merging", function() {
+      var configurationService;
 
+      var baseRule;
+
+      beforeEach(function() {
+        baseRule = {
+          select: {
+            type: "test/type"
+          },
+          apply: {
+            simpleValue: "S1",
+            arraySimpleValue: [
+              "AS1",
+              "AS2"
+            ],
+            complexValue: {
+              id: "C1",
+              otherProp: "OC1"
+            },
+            arrayComplexValue: [
+              {
+                id: "AC1",
+                otherProp: "OAC1"
+              },
+              {
+                id: "AC2",
+                otherProp: "OAC2"
+              }
+            ]
+          }
+        };
+
+        configurationService = new ConfigurationService();
+
+        configurationService.add(
+          {
+            rules: [
+              baseRule
+            ]
+          }
+        );
+      });
+
+      describe("default merge handlers", function() {
+        var otherRule;
+
+        var config;
+
+        beforeEach(function() {
+          otherRule = {
+            select: {
+              type: "test/type"
+            },
+            apply: {
+              simpleValue: "ALT_S1",
+              arraySimpleValue: [
+                "ALT_AS1"
+              ],
+              complexValue: {
+                id: "ALT_C1"
+              },
+              arrayComplexValue: [
+                {
+                  id: "ALT_AC1"
+                }
+              ]
+            }
+          };
+
+          configurationService.add(
+            {
+              rules: [
+                otherRule
+              ]
+            }
+          );
+
+          config = configurationService.select("test/type");
+        });
+
+        it("should replace the value of the simple value property", function() {
+          expect(config.simpleValue).toBe("ALT_S1");
+        });
+
+        it("should replace the value of the array of simple values property", function() {
+          expect(config.arraySimpleValue.length).toBe(1);
+          expect(config.arraySimpleValue[0]).toBe("ALT_AS1");
+        });
+
+        it("should merge the value of the complex value property", function() {
+          expect(config.complexValue.id).toBe("ALT_C1");
+          expect(config.complexValue.otherProp).toBe("OC1");
+        });
+
+        it("should replace the value of the array of complex values property", function() {
+          expect(config.arrayComplexValue.length).toBe(1);
+          expect(config.arrayComplexValue[0].id).toBe("ALT_AC1");
+          expect(config.arrayComplexValue[0].otherProp).toBeUndefined();
+        });
+
+      });
+
+      describe("replace merge handler", function() {
+        var otherRule;
+
+        var config;
+
+        beforeEach(function() {
+          otherRule = {
+            select: {
+              type: "test/type"
+            },
+            apply: {
+              simpleValue: {
+                "$op": "replace",
+                value: "ALT_S1"
+              },
+              arraySimpleValue: {
+                "$op": "replace",
+                value: [
+                  "ALT_AS1"
+                ]
+              },
+              complexValue: {
+                "$op": "replace",
+                value: {
+                  id: "ALT_C1"
+                }
+              },
+              arrayComplexValue: {
+                "$op": "replace",
+                value: [
+                  {
+                    id: "ALT_AC1"
+                  }
+                ]
+              }
+            }
+          };
+
+          configurationService.add(
+            {
+              rules: [
+                otherRule
+              ]
+            }
+          );
+
+          config = configurationService.select("test/type");
+        });
+
+        it("should replace the value of the simple value property", function() {
+          expect(config.simpleValue).toBe("ALT_S1");
+        });
+
+        it("should replace the value of the array of simple values property", function() {
+          expect(config.arraySimpleValue.length).toBe(1);
+          expect(config.arraySimpleValue[0]).toBe("ALT_AS1");
+        });
+
+        it("should replace the value of the complex value property", function() {
+          expect(config.complexValue.id).toBe("ALT_C1");
+          expect(config.complexValue.otherProp).toBeUndefined();
+        });
+
+        it("should replace the value of the array of complex values property", function() {
+          expect(config.arrayComplexValue.length).toBe(1);
+          expect(config.arrayComplexValue[0].id).toBe("ALT_AC1");
+          expect(config.arrayComplexValue[0].otherProp).toBeUndefined();
+        });
+
+      });
+
+      describe("merge merge handler", function() {
+        var otherRule;
+
+        var config;
+
+        beforeEach(function() {
+          otherRule = {
+            select: {
+              type: "test/type"
+            },
+            apply: {
+              simpleValue: {
+                "$op": "merge",
+                value: "ALT_S1"
+              },
+              arraySimpleValue: {
+                "$op": "merge",
+                value: [
+                  "ALT_AS1"
+                ]
+              },
+              complexValue: {
+                "$op": "merge",
+                value: {
+                  id: "ALT_C1"
+                }
+              },
+              arrayComplexValue: {
+                "$op": "merge",
+                value: [
+                  {
+                    id: "ALT_AC1"
+                  }
+                ]
+              }
+            }
+          };
+
+          configurationService.add(
+            {
+              rules: [
+                otherRule
+              ]
+            }
+          );
+
+          config = configurationService.select("test/type");
+        });
+
+        it("should replace the value of the simple value property", function() {
+          expect(config.simpleValue).toBe("ALT_S1");
+        });
+
+        it("should replace the value of the array of simple values property", function() {
+          expect(config.arraySimpleValue.length).toBe(1);
+          expect(config.arraySimpleValue[0]).toBe("ALT_AS1");
+        });
+
+        it("should merge the value of the complex value property", function() {
+          expect(config.complexValue.id).toBe("ALT_C1");
+          expect(config.complexValue.otherProp).toBe("OC1");
+        });
+
+        it("should replace the value of the array of complex values property", function() {
+          expect(config.arrayComplexValue.length).toBe(1);
+          expect(config.arrayComplexValue[0].id).toBe("ALT_AC1");
+          expect(config.arrayComplexValue[0].otherProp).toBeUndefined();
+        });
+
+      });
+
+      describe("add merge handler", function() {
+        var otherRule;
+
+        var config;
+
+        beforeEach(function() {
+          otherRule = {
+            select: {
+              type: "test/type"
+            },
+            apply: {
+              simpleValue: {
+                "$op": "add",
+                value: "ALT_S1"
+              },
+              arraySimpleValue: {
+                "$op": "add",
+                value: [
+                  "ALT_AS1"
+                ]
+              },
+              complexValue: {
+                "$op": "add",
+                value: {
+                  id: "ALT_C1"
+                }
+              },
+              arrayComplexValue: {
+                "$op": "add",
+                value: [
+                  {
+                    id: "ALT_AC1"
+                  }
+                ]
+              }
+            }
+          };
+
+          configurationService.add(
+            {
+              rules: [
+                otherRule
+              ]
+            }
+          );
+
+          config = configurationService.select("test/type");
+        });
+
+        it("should replace the value of the simple value property", function() {
+          expect(config.simpleValue).toBe("ALT_S1");
+        });
+
+        it("should append values to the array of simple values property", function() {
+          expect(config.arraySimpleValue.length).toBe(3);
+
+          expect(config.arraySimpleValue[0]).toBe("AS1");
+          expect(config.arraySimpleValue[1]).toBe("AS2");
+          expect(config.arraySimpleValue[2]).toBe("ALT_AS1");
+        });
+
+        it("should replace the value of the complex value property", function() {
+          expect(config.complexValue.id).toBe("ALT_C1");
+          expect(config.complexValue.otherProp).toBeUndefined();
+        });
+
+        it("should append values to the array of complex values property", function() {
+          expect(config.arrayComplexValue.length).toBe(3);
+
+          expect(config.arrayComplexValue[0].id).toBe("AC1");
+          expect(config.arrayComplexValue[0].otherProp).toBe("OAC1");
+
+          expect(config.arrayComplexValue[1].id).toBe("AC2");
+          expect(config.arrayComplexValue[1].otherProp).toBe("OAC2");
+
+          expect(config.arrayComplexValue[2].id).toBe("ALT_AC1");
+          expect(config.arrayComplexValue[2].otherProp).toBeUndefined();
+        });
+
+      });
+
+      describe("invalid merge handler", function() {
+        var otherRule;
+
+        var config;
+
+        beforeEach(function() {
+          otherRule = {
+            select: {
+              type: "test/type"
+            },
+            apply: {
+              simpleValue: {
+                "$op": "INVALID",
+                value: "ALT_S1"
+              }
+            }
+          };
+
+          configurationService.add(
+            {
+              rules: [
+                otherRule
+              ]
+            }
+          );
+        });
+
+        it("should throw when merge operation is invalid", function() {
+          expect(function() {
+            config = configurationService.select("test/type");
+          }).toThrow(errorMatch.operInvalid());
+        });
+
+      });
+
+      describe("handling inconsistent types", function() {
+        describe("default merge handlers", function() {
+          describe("with simple", function() {
+            var otherRule;
+
+            var config;
+
+            beforeEach(function() {
+              otherRule = {
+                select: {
+                  type: "test/type"
+                },
+                apply: {
+                  arraySimpleValue: "ALT_AS1",
+                  complexValue: "ALT_C1",
+                  arrayComplexValue: "ALT_AC1"
+                }
+              };
+
+              configurationService.add(
+                {
+                  rules: [
+                    otherRule
+                  ]
+                }
+              );
+
+              config = configurationService.select("test/type");
+            });
+
+            it("should replace the value of the array of simple values property", function() {
+              expect(config.arraySimpleValue).toBe("ALT_AS1");
+            });
+
+            it("should replace the value of the complex value property", function() {
+              expect(config.complexValue).toBe("ALT_C1");
+            });
+
+            it("should replace the value of the array of complex values property", function() {
+              expect(config.arrayComplexValue).toBe("ALT_AC1");
+            });
+          });
+
+          describe("with array of simple", function() {
+            var otherRule;
+
+            var config;
+
+            beforeEach(function() {
+              otherRule = {
+                select: {
+                  type: "test/type"
+                },
+                apply: {
+                  simpleValue: ["ALT_S1"],
+                  complexValue: ["ALT_C1"],
+                  arrayComplexValue: ["ALT_AC1"]
+                }
+              };
+
+              configurationService.add(
+                {
+                  rules: [
+                    otherRule
+                  ]
+                }
+              );
+
+              config = configurationService.select("test/type");
+            });
+
+            it("should replace the value of the simple value property", function() {
+              expect(config.simpleValue[0]).toBe("ALT_S1");
+            });
+
+            it("should replace the value of the complex value property", function() {
+              expect(config.complexValue[0]).toBe("ALT_C1");
+            });
+
+            it("should replace the value of the array of complex values property", function() {
+              expect(config.arrayComplexValue[0]).toBe("ALT_AC1");
+            });
+          });
+
+          describe("with complex", function() {
+            var otherRule;
+
+            var config;
+
+            beforeEach(function() {
+              otherRule = {
+                select: {
+                  type: "test/type"
+                },
+                apply: {
+                  simpleValue: {id: "ALT_S1"},
+                  arraySimpleValue: {id: "ALT_AS1"},
+                  arrayComplexValue: {id: "ALT_AC1"}
+                }
+              };
+
+              configurationService.add(
+                {
+                  rules: [
+                    otherRule
+                  ]
+                }
+              );
+
+              config = configurationService.select("test/type");
+            });
+
+            it("should replace the value of the simple value property", function() {
+              expect(config.simpleValue.id).toBe("ALT_S1");
+            });
+
+            it("should replace the value of the array of simple values property", function() {
+              expect(config.arraySimpleValue.id).toBe("ALT_AS1");
+            });
+
+            it("should replace the value of the array of complex values property", function() {
+              expect(config.arrayComplexValue.id).toBe("ALT_AC1");
+            });
+          });
+
+          describe("with array of complex", function() {
+            var otherRule;
+
+            var config;
+
+            beforeEach(function() {
+              otherRule = {
+                select: {
+                  type: "test/type"
+                },
+                apply: {
+                  simpleValue: [{id: "ALT_S1"}],
+                  arraySimpleValue: [{id: "ALT_AS1"}],
+                  complexValue: [{id: "ALT_C1"}]
+                }
+              };
+
+              configurationService.add(
+                {
+                  rules: [
+                    otherRule
+                  ]
+                }
+              );
+
+              config = configurationService.select("test/type");
+            });
+
+            it("should replace the value of the simple value property", function() {
+              expect(config.simpleValue[0].id).toBe("ALT_S1");
+            });
+
+            it("should replace the value of the array of simple values property", function() {
+              expect(config.arraySimpleValue[0].id).toBe("ALT_AS1");
+            });
+
+            it("should replace the value of the complex value property", function() {
+              expect(config.complexValue[0].id).toBe("ALT_C1");
+            });
+          });
+
+        });
+
+        describe("replace merge handler", function() {
+          describe("with simple", function() {
+            var otherRule;
+
+            var config;
+
+            beforeEach(function() {
+              otherRule = {
+                select: {
+                  type: "test/type"
+                },
+                apply: {
+                  arraySimpleValue: {
+                    "$op": "replace",
+                    value: "ALT_AS1"
+                  },
+                  complexValue: {
+                    "$op": "replace",
+                    value: "ALT_C1"
+                  },
+                  arrayComplexValue: {
+                    "$op": "replace",
+                    value: "ALT_AC1"
+                  }
+                }
+              };
+
+              configurationService.add(
+                {
+                  rules: [
+                    otherRule
+                  ]
+                }
+              );
+
+              config = configurationService.select("test/type");
+            });
+
+            it("should replace the value of the array of simple values property", function() {
+              expect(config.arraySimpleValue).toBe("ALT_AS1");
+            });
+
+            it("should replace the value of the complex value property", function() {
+              expect(config.complexValue).toBe("ALT_C1");
+            });
+
+            it("should replace the value of the array of complex values property", function() {
+              expect(config.arrayComplexValue).toBe("ALT_AC1");
+            });
+          });
+
+          describe("with array of simple", function() {
+            var otherRule;
+
+            var config;
+
+            beforeEach(function() {
+              otherRule = {
+                select: {
+                  type: "test/type"
+                },
+                apply: {
+                  simpleValue: {
+                    "$op": "replace",
+                    value: ["ALT_S1"]
+                  },
+                  complexValue: {
+                    "$op": "replace",
+                    value: ["ALT_C1"]
+                  },
+                  arrayComplexValue: {
+                    "$op": "replace",
+                    value: ["ALT_AC1"]
+                  }
+                }
+              };
+
+              configurationService.add(
+                {
+                  rules: [
+                    otherRule
+                  ]
+                }
+              );
+
+              config = configurationService.select("test/type");
+            });
+
+            it("should replace the value of the simple value property", function() {
+              expect(config.simpleValue[0]).toBe("ALT_S1");
+            });
+
+            it("should replace the value of the complex value property", function() {
+              expect(config.complexValue[0]).toBe("ALT_C1");
+            });
+
+            it("should replace the value of the array of complex values property", function() {
+              expect(config.arrayComplexValue[0]).toBe("ALT_AC1");
+            });
+          });
+
+          describe("with complex", function() {
+            var otherRule;
+
+            var config;
+
+            beforeEach(function() {
+              otherRule = {
+                select: {
+                  type: "test/type"
+                },
+                apply: {
+                  simpleValue: {
+                    "$op": "replace",
+                    value: {id: "ALT_S1"}
+                  },
+                  arraySimpleValue: {
+                    "$op": "replace",
+                    value: {id: "ALT_AS1"}
+                  },
+                  arrayComplexValue: {
+                    "$op": "replace",
+                    value: {id: "ALT_AC1"}
+                  }
+                }
+              };
+
+              configurationService.add(
+                {
+                  rules: [
+                    otherRule
+                  ]
+                }
+              );
+
+              config = configurationService.select("test/type");
+            });
+
+            it("should replace the value of the simple value property", function() {
+              expect(config.simpleValue.id).toBe("ALT_S1");
+            });
+
+            it("should replace the value of the array of simple values property", function() {
+              expect(config.arraySimpleValue.id).toBe("ALT_AS1");
+            });
+
+            it("should replace the value of the array of complex values property", function() {
+              expect(config.arrayComplexValue.id).toBe("ALT_AC1");
+            });
+          });
+
+          describe("with array of complex", function() {
+            var otherRule;
+
+            var config;
+
+            beforeEach(function() {
+              otherRule = {
+                select: {
+                  type: "test/type"
+                },
+                apply: {
+                  simpleValue: {
+                    "$op": "replace",
+                    value: [{id: "ALT_S1"}]
+                  },
+                  arraySimpleValue: {
+                    "$op": "replace",
+                    value: [{id: "ALT_AS1"}]
+                  },
+                  complexValue: {
+                    "$op": "replace",
+                    value: [{id: "ALT_C1"}]
+                  }
+                }
+              };
+
+              configurationService.add(
+                {
+                  rules: [
+                    otherRule
+                  ]
+                }
+              );
+
+              config = configurationService.select("test/type");
+            });
+
+            it("should replace the value of the simple value property", function() {
+              expect(config.simpleValue[0].id).toBe("ALT_S1");
+            });
+
+            it("should replace the value of the array of simple values property", function() {
+              expect(config.arraySimpleValue[0].id).toBe("ALT_AS1");
+            });
+
+            it("should replace the value of the complex value property", function() {
+              expect(config.complexValue[0].id).toBe("ALT_C1");
+            });
+          });
+
+        });
+
+        describe("merge merge handler", function() {
+          describe("with simple", function() {
+            var otherRule;
+
+            var config;
+
+            beforeEach(function() {
+              otherRule = {
+                select: {
+                  type: "test/type"
+                },
+                apply: {
+                  arraySimpleValue: {
+                    "$op": "merge",
+                    value: "ALT_AS1"
+                  },
+                  complexValue: {
+                    "$op": "merge",
+                    value: "ALT_C1"
+                  },
+                  arrayComplexValue: {
+                    "$op": "merge",
+                    value: "ALT_AC1"
+                  }
+                }
+              };
+
+              configurationService.add(
+                {
+                  rules: [
+                    otherRule
+                  ]
+                }
+              );
+
+              config = configurationService.select("test/type");
+            });
+
+            it("should replace the value of the array of simple values property", function() {
+              expect(config.arraySimpleValue).toBe("ALT_AS1");
+            });
+
+            it("should replace the value of the complex value property", function() {
+              expect(config.complexValue).toBe("ALT_C1");
+            });
+
+            it("should replace the value of the array of complex values property", function() {
+              expect(config.arrayComplexValue).toBe("ALT_AC1");
+            });
+          });
+
+          describe("with array of simple", function() {
+            var otherRule;
+
+            var config;
+
+            beforeEach(function() {
+              otherRule = {
+                select: {
+                  type: "test/type"
+                },
+                apply: {
+                  simpleValue: {
+                    "$op": "merge",
+                    value: ["ALT_S1"]
+                  },
+                  complexValue: {
+                    "$op": "merge",
+                    value: ["ALT_C1"]
+                  },
+                  arrayComplexValue: {
+                    "$op": "merge",
+                    value: ["ALT_AC1"]
+                  }
+                }
+              };
+
+              configurationService.add(
+                {
+                  rules: [
+                    otherRule
+                  ]
+                }
+              );
+
+              config = configurationService.select("test/type");
+            });
+
+            it("should replace the value of the simple value property", function() {
+              expect(config.simpleValue[0]).toBe("ALT_S1");
+            });
+
+            it("should replace the value of the complex value property", function() {
+              expect(config.complexValue[0]).toBe("ALT_C1");
+            });
+
+            it("should replace the value of the array of complex values property", function() {
+              expect(config.arrayComplexValue[0]).toBe("ALT_AC1");
+            });
+          });
+
+          describe("with complex", function() {
+            var otherRule;
+
+            var config;
+
+            beforeEach(function() {
+              otherRule = {
+                select: {
+                  type: "test/type"
+                },
+                apply: {
+                  simpleValue: {
+                    "$op": "merge",
+                    value: {id: "ALT_S1"}
+                  },
+                  arraySimpleValue: {
+                    "$op": "merge",
+                    value: {id: "ALT_AS1"}
+                  },
+                  arrayComplexValue: {
+                    "$op": "merge",
+                    value: {id: "ALT_AC1"}
+                  }
+                }
+              };
+
+              configurationService.add(
+                {
+                  rules: [
+                    otherRule
+                  ]
+                }
+              );
+
+              config = configurationService.select("test/type");
+            });
+
+            it("should replace the value of the simple value property", function() {
+              expect(config.simpleValue.id).toBe("ALT_S1");
+            });
+
+            it("should replace the value of the array of simple values property", function() {
+              expect(config.arraySimpleValue.id).toBe("ALT_AS1");
+            });
+
+            it("should replace the value of the array of complex values property", function() {
+              expect(config.arrayComplexValue.id).toBe("ALT_AC1");
+            });
+          });
+
+          describe("with array of complex", function() {
+            var otherRule;
+
+            var config;
+
+            beforeEach(function() {
+              otherRule = {
+                select: {
+                  type: "test/type"
+                },
+                apply: {
+                  simpleValue: {
+                    "$op": "merge",
+                    value: [{id: "ALT_S1"}]
+                  },
+                  arraySimpleValue: {
+                    "$op": "merge",
+                    value: [{id: "ALT_AS1"}]
+                  },
+                  complexValue: {
+                    "$op": "merge",
+                    value: [{id: "ALT_C1"}]
+                  }
+                }
+              };
+
+              configurationService.add(
+                {
+                  rules: [
+                    otherRule
+                  ]
+                }
+              );
+
+              config = configurationService.select("test/type");
+            });
+
+            it("should replace the value of the simple value property", function() {
+              expect(config.simpleValue[0].id).toBe("ALT_S1");
+            });
+
+            it("should replace the value of the array of simple values property", function() {
+              expect(config.arraySimpleValue[0].id).toBe("ALT_AS1");
+            });
+
+            it("should replace the value of the complex value property", function() {
+              expect(config.complexValue[0].id).toBe("ALT_C1");
+            });
+          });
+
+        });
+
+        describe("add merge handler", function() {
+          describe("with simple", function() {
+            var otherRule;
+
+            var config;
+
+            beforeEach(function() {
+              otherRule = {
+                select: {
+                  type: "test/type"
+                },
+                apply: {
+                  arraySimpleValue: {
+                    "$op": "add",
+                    value: "ALT_AS1"
+                  },
+                  complexValue: {
+                    "$op": "add",
+                    value: "ALT_C1"
+                  },
+                  arrayComplexValue: {
+                    "$op": "add",
+                    value: "ALT_AC1"
+                  }
+                }
+              };
+
+              configurationService.add(
+                {
+                  rules: [
+                    otherRule
+                  ]
+                }
+              );
+
+              config = configurationService.select("test/type");
+            });
+
+            it("should replace the value of the array of simple values property", function() {
+              expect(config.arraySimpleValue).toBe("ALT_AS1");
+            });
+
+            it("should replace the value of the complex value property", function() {
+              expect(config.complexValue).toBe("ALT_C1");
+            });
+
+            it("should replace the value of the array of complex values property", function() {
+              expect(config.arrayComplexValue).toBe("ALT_AC1");
+            });
+          });
+
+          describe("with array of simple", function() {
+            var otherRule;
+
+            var config;
+
+            beforeEach(function() {
+              otherRule = {
+                select: {
+                  type: "test/type"
+                },
+                apply: {
+                  simpleValue: {
+                    "$op": "add",
+                    value: ["ALT_S1"]
+                  },
+                  complexValue: {
+                    "$op": "add",
+                    value: ["ALT_C1"]
+                  },
+                  arrayComplexValue: {
+                    "$op": "add",
+                    value: ["ALT_AC1"]
+                  }
+                }
+              };
+
+              configurationService.add(
+                {
+                  rules: [
+                    otherRule
+                  ]
+                }
+              );
+
+              config = configurationService.select("test/type");
+            });
+
+            it("should replace the value of the simple value property", function() {
+              expect(config.simpleValue[0]).toBe("ALT_S1");
+            });
+
+            it("should replace the value of the complex value property", function() {
+              expect(config.complexValue[0]).toBe("ALT_C1");
+            });
+
+            it("should append values to the array of complex values property", function() {
+              expect(config.arrayComplexValue.length).toBe(3);
+
+              expect(config.arrayComplexValue[0].id).toBe("AC1");
+              expect(config.arrayComplexValue[0].otherProp).toBe("OAC1");
+
+              expect(config.arrayComplexValue[1].id).toBe("AC2");
+              expect(config.arrayComplexValue[1].otherProp).toBe("OAC2");
+
+              expect(typeof config.arrayComplexValue[2]).not.toBe("object");
+              expect(config.arrayComplexValue[2]).toBe("ALT_AC1");
+            });
+          });
+
+          describe("with complex", function() {
+            var otherRule;
+
+            var config;
+
+            beforeEach(function() {
+              otherRule = {
+                select: {
+                  type: "test/type"
+                },
+                apply: {
+                  simpleValue: {
+                    "$op": "add",
+                    value: {id: "ALT_S1"}
+                  },
+                  arraySimpleValue: {
+                    "$op": "add",
+                    value: {id: "ALT_AS1"}
+                  },
+                  arrayComplexValue: {
+                    "$op": "add",
+                    value: {id: "ALT_AC1"}
+                  }
+                }
+              };
+
+              configurationService.add(
+                {
+                  rules: [
+                    otherRule
+                  ]
+                }
+              );
+
+              config = configurationService.select("test/type");
+            });
+
+            it("should replace the value of the simple value property", function() {
+              expect(config.simpleValue.id).toBe("ALT_S1");
+            });
+
+            it("should replace the value of the array of simple values property", function() {
+              expect(config.arraySimpleValue.id).toBe("ALT_AS1");
+            });
+
+            it("should replace the value of the array of complex values property", function() {
+              expect(config.arrayComplexValue.id).toBe("ALT_AC1");
+            });
+          });
+
+          describe("with array of complex", function() {
+            var otherRule;
+
+            var config;
+
+            beforeEach(function() {
+              otherRule = {
+                select: {
+                  type: "test/type"
+                },
+                apply: {
+                  simpleValue: {
+                    "$op": "add",
+                    value: [{id: "ALT_S1"}]
+                  },
+                  arraySimpleValue: {
+                    "$op": "add",
+                    value: [{id: "ALT_AS1"}]
+                  },
+                  complexValue: {
+                    "$op": "add",
+                    value: [{id: "ALT_C1"}]
+                  }
+                }
+              };
+
+              configurationService.add(
+                {
+                  rules: [
+                    otherRule
+                  ]
+                }
+              );
+
+              config = configurationService.select("test/type");
+            });
+
+            it("should replace the value of the simple value property", function() {
+              expect(config.simpleValue[0].id).toBe("ALT_S1");
+            });
+
+            it("should append values to the array of simple values property", function() {
+              expect(config.arraySimpleValue.length).toBe(3);
+
+              expect(config.arraySimpleValue[0]).toBe("AS1");
+              expect(config.arraySimpleValue[1]).toBe("AS2");
+
+              expect(typeof config.arraySimpleValue[2]).toBe("object");
+              expect(config.arraySimpleValue[2].id).toBe("ALT_AS1");
+            });
+
+            it("should replace the value of the complex value property", function() {
+              expect(config.complexValue[0].id).toBe("ALT_C1");
+            });
+          });
+
+        });
+      });
+    });
+
+  });
 });
