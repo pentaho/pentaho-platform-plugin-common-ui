@@ -151,7 +151,7 @@ define([
           var list;
 
           beforeEach(function() {
-            list = SortedList.to(unsortedValues, null, reverseSort);
+            list = SortedList.to(unsortedValues, {"comparer": reverseSort});
           });
 
           it("should be sorted", function() {
@@ -163,7 +163,7 @@ define([
           var list;
 
           beforeEach(function() {
-            list = new SortedList(null, reverseSort);
+            list = new SortedList({"comparer": reverseSort});
           });
 
           it("should sort on push", function() {
@@ -347,7 +347,7 @@ define([
           var list;
 
           beforeEach(function() {
-            list = SortedElements.to(unsortedValues, null, elementSort);
+            list = SortedElements.to(unsortedValues, {"comparer": elementSort});
           });
 
           it("should be sorted", function() {
@@ -359,7 +359,7 @@ define([
           var list;
 
           beforeEach(function() {
-            list = new SortedElements(null, elementSort);
+            list = new SortedElements({"comparer": elementSort});
           });
 
           it("should sort on push", function() {
@@ -380,62 +380,62 @@ define([
         var list = new SortedList();
         spyOn(list, 'sort');
 
-        list.compare = customSortFunction;
+        list.comparer = customSortFunction;
 
         expect(list.sort).toHaveBeenCalledTimes(1);
 
-        list.compare = null;
+        list.comparer = null;
 
         expect(list.sort).toHaveBeenCalledTimes(2);
       });
 
       it("should not call sort when not changing", function() {
-        var list = new SortedList(null, customSortFunction);
+        var list = new SortedList({"comparer": customSortFunction});
         spyOn(list, 'sort');
 
-        list.compare = customSortFunction;
+        list.comparer = customSortFunction;
 
         expect(list.sort).not.toHaveBeenCalled();
       });
 
       it("should return to the default function when setting null", function() {
-        var list = new SortedList(null, customSortFunction);
+        var list = new SortedList({"comparer": customSortFunction});
 
-        expect(list.compare).not.toEqual(SortedList.prototype.compare);
+        expect(list.comparer).not.toEqual(SortedList.prototype.comparer);
 
-        list.compare = null;
+        list.comparer = null;
 
-        expect(list.compare).toEqual(SortedList.prototype.compare);
+        expect(list.comparer).toEqual(SortedList.prototype.comparer);
       });
 
       it("should return to default function when setting undefined", function() {
-        var list = new SortedList(null, customSortFunction);
+        var list = new SortedList({"comparer": customSortFunction});
 
-        expect(list.compare).not.toEqual(SortedList.prototype.compare);
+        expect(list.comparer).not.toEqual(SortedList.prototype.comparer);
 
-        list.compare = undefined;
+        list.comparer = undefined;
 
-        expect(list.compare).toEqual(SortedList.prototype.compare);
+        expect(list.comparer).toEqual(SortedList.prototype.comparer);
       });
 
       it("should keep default function when setting null", function() {
         var list = new SortedList();
 
-        expect(list.compare).toEqual(SortedList.prototype.compare);
+        expect(list.comparer).toEqual(SortedList.prototype.comparer);
 
-        list.compare = null;
+        list.comparer = null;
 
-        expect(list.compare).toEqual(SortedList.prototype.compare);
+        expect(list.comparer).toEqual(SortedList.prototype.comparer);
       });
 
       it("should keep default function when setting undefined", function() {
         var list = new SortedList();
 
-        expect(list.compare).toEqual(SortedList.prototype.compare);
+        expect(list.comparer).toEqual(SortedList.prototype.comparer);
 
-        list.compare = undefined;
+        list.comparer = undefined;
 
-        expect(list.compare).toEqual(SortedList.prototype.compare);
+        expect(list.comparer).toEqual(SortedList.prototype.comparer);
       });
     });
 
@@ -447,7 +447,7 @@ define([
       var list;
 
       beforeEach(function() {
-        list = new SortedList(null, sortingFunction);
+        list = new SortedList({"comparer": sortingFunction});
       });
 
       it("should throw if calling insert", function() {

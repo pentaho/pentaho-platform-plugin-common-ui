@@ -57,21 +57,20 @@ define([
      * to help in their construction.
      *
      * @param {Object}   [keyArgs]         The keyword arguments.
-     * @param {Function} [compareFunction] Specifies a function that defines the sort order.
+     * @param {?Function} [keyArgs.comparer] Specifies a function that defines the sort order.
      *
-     * `keyArgs` is not used directly by the `SortedList` class
-     * but is passed-through to the methods that handle
+     * `keyArgs` is also passed-through to the methods that handle
      * the initialization of each list element.
      */
-    constructor: function(keyArgs, compareFunction) {
-      if (compareFunction) {
-        this.compare = compareFunction;
+    constructor: function(keyArgs) {
+      if (keyArgs != null && typeof keyArgs.comparer === "function") {
+        this.comparer = keyArgs.comparer;
       }
 
       this.base(keyArgs);
     },
 
-    _compareFunction: function(e1, e2) {
+    _comparer: function(e1, e2) {
       if (e1 == null || e2 == null) {
         if (e1 != null) {
           return 1;
@@ -90,29 +89,29 @@ define([
       return v1 === v2 ? 0 : (v1 > v2 ? 1 : -1);
     },
 
-    get compare() {
-      return this._compareFunction;
+    get comparer() {
+      return this._comparer;
     },
 
-    set compare(compareFunction) {
-      var hasOwn = O.hasOwn(this, '_compareFunction');
-      if (hasOwn && this._compareFunction !== compareFunction || !hasOwn && compareFunction != null) {
-        if (compareFunction == null) {
-          O.delete(this, '_compareFunction');
+    set comparer(comparer) {
+      var hasOwn = O.hasOwn(this, '_comparer');
+      if (hasOwn && this._comparer !== comparer || !hasOwn && comparer != null) {
+        if (comparer == null) {
+          delete this._comparer;
         } else {
-          this._compareFunction = compareFunction;
+          this._comparer = comparer;
         }
 
         this.sort();
       }
     },
 
-    sort: function(compareFunction) {
-      if (compareFunction != null && compareFunction !== this.compare) {
+    sort: function(comparer) {
+      if (comparer != null && comparer !== this.comparer) {
         throw new Error("Can't specify a different sorting function in a sorted list.");
       }
 
-      this.base(this.compare);
+      this.base(this.comparer);
     },
 
     /**
@@ -132,7 +131,7 @@ define([
         // x | 0 is equivalent to Math.floor(x)
         var i = (left + right) / 2 | 0;
 
-        var comparison = this.compare(this[i], elem);
+        var comparison = this.comparer(this[i], elem);
 
         if (comparison < 0) {
           left = i + 1;
