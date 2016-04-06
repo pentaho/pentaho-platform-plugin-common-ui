@@ -267,6 +267,7 @@ define([
      * @memberOf pentaho.lang.Base#
      * @type {function}
      * @readonly
+     * @protected
      */
     Object.defineProperty(BaseRoot.prototype, "base", {
       configurable: true,

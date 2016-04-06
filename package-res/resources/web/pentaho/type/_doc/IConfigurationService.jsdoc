@@ -1,0 +1,140 @@
+/*!
+ * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * The `IConfigurationService` interface describes a service
+ * that manages configurations of [value types]{@link pentaho.type.Value.Type}
+ * of the Pentaho Client Metadata Model.
+ *
+ * The [add]{@link pentaho.type.IConfigurationService#add} method
+ * is used to register a [spec.ITypeConfiguration]{@link pentaho.type.spec.ITypeConfiguration}
+ * to the service.
+ *
+ * The [select]{@link pentaho.type.IConfigurationService#select} method
+ * selects the rules of added type configurations that apply to
+ * a given type and context variables,
+ * sorts these by specificity,
+ * then merges the rules' [type specifications]{@link pentaho.type.spec.ITypeConfigurationRule#apply}
+ * and returns the result.
+ * For more information on the specificity of rules,
+ * see [spec.ITypeConfiguration]{@link pentaho.type.spec.ITypeConfiguration}.
+ *
+ * The merged type configuration specification can then be used to configure a value type,
+ * by calling its [pentaho.type.Type.implement]{@link pentaho.lang.Base.implement} method.
+ *
+ * Normally, you won't call these operations directly.
+ *
+ * The singleton configuration service, {@link pentaho.type.configurationService},
+ * already handles loading of all type configurations registered
+ * with the [pentaho/service]{@link pentaho.service} module,
+ * under the service id `pentaho.type.spec.ITypeConfiguration`.
+ *
+ * Then, the [Context]{@link pentaho.type.Context} class
+ * already handles obtaining configurations from its configuration service,
+ * and applying these to the requested value types.
+ *
+ * The following example illustrates how an implementation of this service would be used:
+ *
+ * ```js
+ * var myTypeConfig = {
+ *   rules: [
+ *     // Disable a still experimental Viz.
+ *     {
+ *       select: {
+ *         type: "my/radial/bar"
+ *       },
+ *       apply: {
+ *         isBrowsable: false
+ *       }
+ *     },
+ *
+ *     // Enable it, only for the dev user, "john", when in Analyzer
+ *     {
+ *       select: {
+ *         type:      "my/radial/bar",
+ *         user:      "john",
+ *         container: "pentaho.analyzer"
+ *       },
+ *       apply: {
+ *         isBrowsable: true
+ *       }
+ *     }
+ *   ]
+ * };
+ *
+ * var configService = new SomeConfigurationService();
+ *
+ * configService.add(myTypeConfig);
+ *
+ * var mergedTypeConfigSpec = configService.select("pentaho/visual/ccc/bar", {
+ *      user:      "john",
+ *      container: "pentaho.cdf"
+ *    });
+ *
+ * // Results in a specification like:
+ * // {
+ * //   isBrowsable: false
+ * // }
+ * ```
+ *
+ * @name pentaho.type.IConfigurationService
+ * @interface
+ *
+ * @see pentaho.type.Context
+ * @see pentaho.type.spec.ITypeConfiguration
+ */
+
+/**
+ * Obtains the merged configuration specification of
+ * the selection of configuration rules that apply to a given type and context variables.
+ *
+ * @name select
+ * @memberOf pentaho.type.IConfigurationService#
+ * @method
+ *
+ * @param {string} typeId The [id]{@link pentaho.type.Type#id} of the type whose
+ * configuration specification is desired.
+ *
+ * @param {pentaho.type.IContextVars} [contextVars] The context variables that are used to select rules.
+ *
+ * A {@link Nully} variable value is equivalent to a variable that is not present.
+ * It matches only configuration rules that do not select that variable.
+ *
+ * When the map is unspecified,
+ * every variable will appear as though it had been specified with a `null` value.
+ *
+ * Variable values are matched against each value specified by a rule in its selection variables,
+ * using JavaScript's strict equality operator, `===`.
+ *
+ * @return {pentaho.type.spec.ITypeProto} The merged configuration specification,
+ * if any rule was selected, or `null`, if no rule was selected.
+ */
+
+/**
+ * Adds a configuration.
+ *
+ * An added configuration overrides previously added configurations,
+ * if all other rule-ordering criteria are equal.
+ * For more information on the specificity of rules,
+ * see [spec.ITypeConfiguration]{@link pentaho.type.spec.ITypeConfiguration}.
+ *
+ *
+ * @name add
+ * @memberOf pentaho.type.IConfigurationService#
+ * @method
+ *
+ * @param {!pentaho.type.ITypeConfiguration} config A type configuration to add.
+ */
