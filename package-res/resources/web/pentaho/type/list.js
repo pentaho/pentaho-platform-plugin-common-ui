@@ -19,11 +19,13 @@ define([
   "./element",
   "./valueHelper",
   "./SpecificationContext",
+  "./_change/ListChangeset",
   "../i18n!types",
   "../util/arg",
   "../util/error",
   "../util/object"
-], function(module, valueFactory, elemFactory, valueHelper, SpecificationContext, bundle, arg, error, O) {
+], function(module, valueFactory, elemFactory, valueHelper, SpecificationContext, ListChangeset,
+            bundle, arg, error, O) {
 
   "use strict";
 
@@ -318,15 +320,8 @@ define([
        * @param {function(pentaho.type.Element, pentaho.type.Element) : number} comparer The comparer function.
        * @param {?boolean} [silent=false] Indicates that no events should be emitted.
        */
-      sort: function(comparer, silent) {
-        this._elems.sort(comparer);
-
-        if(!silent) {
-          // Assuming at least one position changed...
-          this._enterChange();
-          this._getChange("sort");
-          this._exitChange();
-        }
+      sort: function(comparer) {
+        this._sort(comparer);
       },
 
       /**
@@ -409,160 +404,33 @@ define([
 
         return changes;
       },
-
-      _addChangeElem: function(type, elem, index) {
-        this._getChange(type, index).elems.push(elem);
-      },
-
-      _getChange: function(type, index) {
-        var changes = this._changes,
-          L = changes.length,
-          change = L ? changes[L - 1] : null;
-
-        if(change && (change.type === type)) {
-          if(index == null || change.at + change.elems.length === index) {
-            return change;
-          }
-        }
-
-        if(index == null) {
-          changes.push((change = {type: type}));
-        } else {
-          changes.push((change = {type: type, at: index, elems: []}));
-        }
-
-        return change;
-      },
       //endregion
 
       //region Core change methods
-      _set: function(fragment, add, update, remove, index, silent) {
-        var elems = this._elems,
-          keys  = this._keys,
-          existing, elem, key;
-
-        if(!silent) this._enterChange();
-
-        // Next insert index.
-        if(index == null) {
-          index = elems.length;
-        } else {
-          /*jshint laxbreak:true*/
-          index = index < 0
-              ? Math.max(0, elems.length + index)
-              : Math.min(index, elems.length);
-        }
-
-        var setElems = Array.isArray(fragment) ? fragment : [fragment];
-        // Index of elements in setElems, by key.
-        // In the end, this is used to efficiently lookup which elems _not_ to remove.
-        var setKeys = remove ? {} : null;
-
-        // I - Add/Update Cycle
-        var i = -1, L = setElems.length;
-        while(++i < L) if((elem = this._cast(setElems[i])) != null) {
-          key = elem.key;
-
-          // Store input keys for removal loop, below.
-          if(remove) setKeys[key] = 1;
-
-          if((existing = O.getOwn(keys, key))) {
-            if(update && existing !== elem) {
-              // This may trigger change events, that, in turn, may
-              // perform further list changes and reenter `List#_set`.
-              this._updateOne(existing, elem, silent);
-            }
-          } else if(add) {
-            this._insertOne(elem, index++, key, silent);
-          }
-        }
-
-        // II - Remove Cycle
-        if(remove) {
-          elems = this._elems;
-          i = elems.length;
-          while(i) {
-            --i;
-            elem = elems[i];
-            key  = elem.key;
-            if(!O.hasOwn(setKeys, key)) this._removeOne(elem, i, key, silent);
-          }
-        }
-
-        if(!silent) this._exitChange();
+      _set: function(fragment, add, update, remove, index) {
+        var changeset = new ListChangeset(this._ownedBy, this);
+        changeset._set(fragment, add, update, remove, index);
+        if(!this._ownedBy) changeset._commit();
       },
 
-      _insertOne: function(elem, index, key, silent) {
-        this._elems.splice(index, 0, elem);
-        this._keys[key] = elem;
-
-        if(!silent) this._addChangeElem("add", elem, index);
+      _remove: function(fragment) {
+        var changeset = new ListChangeset(this._ownedBy, this);
+        changeset._remove(fragment);
+        if(!this._ownedBy) changeset._commit();
       },
 
-      _removeOne: function(elem, index, key, silent) {
-        this._elems.splice(index, 1);
-        delete this._keys[key];
-
-        if(!silent) this._addChangeElem("remove", elem, index);
+      _removeAt: function(start, count) {
+        var changeset = new ListChangeset(this._ownedBy, this);
+        changeset._removeAt(start, count);
+        if(!this._ownedBy) changeset._commit();
       },
 
-      _updateOne: function(elem, other, silent) {
-        // TODO
-        elem.configure(other);
-      },
-
-      _remove: function(fragment, silent) {
-        if(!silent) this._enterChange();
-
-        var remElems = Array.isArray(fragment) ? fragment : [fragment],
-            L = remElems.length,
-            i = -1,
-            index, key, elem;
-
-        // traversing in forward order, instead of backward, to make it more probable that changes are
-        // registered in a single change statement.
-        while(++i < L) {
-          if((elem = remElems[i]) && this.has((key = elem.key)) && (index = this._elems.indexOf(elem)) > -1) {
-            this._removeOne(elem, index, key, silent);
-          }
-        }
-
-        if(!silent) this._exitChange();
-      },
-
-      _removeAt: function(start, count, silent) {
-        if(count < 0) return; // noop
-
-        if(count == null) count = 1;
-
-        var L = this._elems.length;
-
-        if(start >= L) return; // noop
-
-        if(start < 0) start = Math.max(0, L + start);
-
-        if(!silent) this._enterChange();
-
-        var removed = this._elems.splice(start, count),
-          i = removed.length;
-        if(i) {
-          // Remove from key index
-          while(i--) {
-            var elem = removed[i];
-            delete this._keys[elem.key];
-          }
-
-          // Append to the elems
-          if(!silent) {
-            var changeElems = this._getChange("remove", start).elems;
-            changeElems.push.apply(changeElems, removed);
-          }
-        }
-
-        if(!silent) this._exitChange();
+      _sort: function(comparer) {
+        var changeset = new ListChangeset(this._ownedBy, this);
+        changeset._sort(comparer);
+        if(!this._ownedBy) changeset._commit();
       },
       //endregion
-
 
       //region validation
       /**

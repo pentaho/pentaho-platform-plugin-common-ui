@@ -88,13 +88,12 @@ define([
       var value0 = owner._values[pType.name];
 
       if(pType.isList) {
-        value0.set(valueSpec); //apply change immediately
-        this._setListChange(pName, valueSpec);
+        this._properties[pName] = new ListChangeset(this.owner, value0, valueSpec);
       } else {
         var value1 = pType.toValue(valueSpec);
         
         if(!pType.type.areEqual(value0, value1)) {
-          this._setValueChange(pName, value1);
+          this._properties[pName] = new ValueChange(this.owner, pName, value1);
         }
       }
     },
@@ -131,46 +130,9 @@ define([
       });
       Object.freeze(this._properties);
     },
-
-    /**
-     * Sets a new `change` that represents a property which changed value.
-     *
-     * @param {!string} propertyName - The property name.
-     * @param {any?} valueSpec - The change candidate value.
-     * @private
-     */
-    _setValueChange: function(propertyName, valueSpec) {
-      var change = new ValueChange(this.owner, propertyName, valueSpec);
-      //change.set(newValue);
-
-      this._properties[propertyName] = change;
-    },
-
-    _setListChange: function(propertyName, valueSpec) {
-      var change = new ListChangeset(this.owner, propertyName, valueSpec);
-      //change.set(valueSpec);
-
-      this._properties[propertyName] = change;
-      return;
-
-      // //set Old Value - making assumption that will create a list change set
-      // oldValue.set(valueSpec);
-      //
-      // var listChangeset = oldValue.changeset;
-      //
-      // //TODO: 'true' is temporary
-      // if(true || listChangeset != null)
-      //   this._properties[propertyName] = listChangeset;
-    },
     
     //-------------------------------------------
 
-    // _simulate: function(complex) {
-    //   this.propertyNames.forEach(function(property) {
-    //     var change = this.getChange(property);
-    //     change.simulate(complex.get(property));
-    //   }, this);
-    // },
 
     commit: function(){
       this.propertyNames.forEach(function(property) {

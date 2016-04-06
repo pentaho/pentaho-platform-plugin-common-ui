@@ -344,14 +344,6 @@ define([
         return v;
       },
 
-      get changeset() {
-        var changeset = this._changeset;
-
-        if(changeset == null) changeset = new ComplexChangeset(this);
-        
-        return changeset;
-      },
-
       /**
        * Sets the value of a property.
        *
@@ -365,7 +357,7 @@ define([
        * @fires "rejected:change"
        */
       set: function(name, valueSpec) {
-        var changeset = this.changeset;
+        var changeset = new ComplexChangeset(this);
         
         changeset.set(name, valueSpec);
         

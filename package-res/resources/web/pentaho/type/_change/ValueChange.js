@@ -32,7 +32,7 @@ define([
 
     type: "set",
 
-    set: function(valueSpec){
+    set: function(valueSpec) {
       this.newValue = valueSpec;
     },
 
