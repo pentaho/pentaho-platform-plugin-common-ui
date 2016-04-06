@@ -20,14 +20,14 @@ define([
 ], function(SortedList, List, Base) {
   "use strict";
 
-  /* global describe:false, it:false, expect:false, beforeEach:false */
+  /* global describe:false, it:false, expect:false, beforeEach:false, spyOn:false */
 
   describe("pentaho.lang.SortedList -", function() {
     it("should be defined", function() {
       expect(SortedList).toBeDefined();
     });
 
-    describe("direct use", function() {
+    describe("untyped use", function() {
       var reverseSort = function(e1, e2) {
         var v1 = e1.valueOf();
         var v2 = e2.valueOf();
@@ -177,7 +177,7 @@ define([
       });
     });
 
-    describe("extended use", function() {
+    describe("typed use", function() {
       var elementSort = function(e1, e2) {
         if (e1 == null || e2 == null) {
           if (e1 != null) {
@@ -373,11 +373,81 @@ define([
       });
     });
 
+    describe("changing sort function", function() {
+      var customSortFunction = function() {};
+
+      it("should call sort when changing", function() {
+        var list = new SortedList();
+        spyOn(list, 'sort');
+
+        list.compare = customSortFunction;
+
+        expect(list.sort).toHaveBeenCalledTimes(1);
+
+        list.compare = null;
+
+        expect(list.sort).toHaveBeenCalledTimes(2);
+      });
+
+      it("should not call sort when not changing", function() {
+        var list = new SortedList(null, customSortFunction);
+        spyOn(list, 'sort');
+
+        list.compare = customSortFunction;
+
+        expect(list.sort).not.toHaveBeenCalled();
+      });
+
+      it("should return to the default function when setting null", function() {
+        var list = new SortedList(null, customSortFunction);
+
+        expect(list.compare).not.toEqual(SortedList.prototype.compare);
+
+        list.compare = null;
+
+        expect(list.compare).toEqual(SortedList.prototype.compare);
+      });
+
+      it("should return to default function when setting undefined", function() {
+        var list = new SortedList(null, customSortFunction);
+
+        expect(list.compare).not.toEqual(SortedList.prototype.compare);
+
+        list.compare = undefined;
+
+        expect(list.compare).toEqual(SortedList.prototype.compare);
+      });
+
+      it("should keep default function when setting null", function() {
+        var list = new SortedList();
+
+        expect(list.compare).toEqual(SortedList.prototype.compare);
+
+        list.compare = null;
+
+        expect(list.compare).toEqual(SortedList.prototype.compare);
+      });
+
+      it("should keep default function when setting undefined", function() {
+        var list = new SortedList();
+
+        expect(list.compare).toEqual(SortedList.prototype.compare);
+
+        list.compare = undefined;
+
+        expect(list.compare).toEqual(SortedList.prototype.compare);
+      });
+    });
+
     describe("restrictions", function() {
+      var sortingFunction = function() {
+        return -1;
+      };
+
       var list;
 
       beforeEach(function() {
-        list = new SortedList();
+        list = new SortedList(null, sortingFunction);
       });
 
       it("should throw if calling insert", function() {
@@ -401,6 +471,21 @@ define([
       it("should not throw if calling splice without adding elements", function() {
         expect(function() {
           list.splice(0, 0);
+        }).not.toThrowError();
+      });
+
+      it("should throw calling sort with a different sorting function", function() {
+        expect(function() {
+          list.sort(function() {
+            return 0;
+          });
+        }).toThrowError();
+      });
+
+      it("should not throw if sort without a different sorting function", function() {
+        expect(function() {
+          list.sort();
+          list.sort(sortingFunction);
         }).not.toThrowError();
       });
 

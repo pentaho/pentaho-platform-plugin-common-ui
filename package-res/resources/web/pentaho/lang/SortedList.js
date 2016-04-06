@@ -15,8 +15,10 @@
  */
 define([
   "./List",
-  "./Base"
-], function(List, Base) {
+  "./Base",
+  "../util/object"
+], function(List, Base, O) {
+  "use strict";
 
   var baseProto = Base.Array.prototype;
 
@@ -57,8 +59,8 @@ define([
      * @param {Object}   [keyArgs]         The keyword arguments.
      * @param {Function} [compareFunction] Specifies a function that defines the sort order.
      *
-     * These are not used directly by the `SortedList` class
-     * but are passed-through to the methods that handle
+     * `keyArgs` is not used directly by the `SortedList` class
+     * but is passed-through to the methods that handle
      * the initialization of each list element.
      */
     constructor: function(keyArgs, compareFunction) {
@@ -93,11 +95,24 @@ define([
     },
 
     set compare(compareFunction) {
-      this._compareFunction = compareFunction;
+      var hasOwn = O.hasOwn(this, '_compareFunction');
+      if (hasOwn && this._compareFunction !== compareFunction || !hasOwn && compareFunction != null) {
+        if (compareFunction == null) {
+          O.delete(this, '_compareFunction');
+        } else {
+          this._compareFunction = compareFunction;
+        }
+
+        this.sort();
+      }
     },
 
     sort: function(compareFunction) {
-      baseProto.sort.call(this, compareFunction || this._compareFunction);
+      if (compareFunction != null && compareFunction !== this.compare) {
+        throw new Error("Can't specify a different sorting function in a sorted list.");
+      }
+
+      this.base(this.compare);
     },
 
     /**
@@ -105,7 +120,7 @@ define([
      *
      * @param {*} elem The item to search for.
      *
-     * @return {Number} The index of the element;
+     * @return {number} The index of the element;
      *                  when not found returns the negative
      *                  index of the closest element.
      */
@@ -114,6 +129,7 @@ define([
       var right = this.length - 1;
 
       while (left <= right) {
+        // x | 0 is equivalent to Math.floor(x)
         var i = (left + right) / 2 | 0;
 
         var comparison = this.compare(this[i], elem);
@@ -127,6 +143,8 @@ define([
         }
       }
 
+      // two's complement operation being used to
+      // return (x+1)*-1 in a hackish way
       return ~right;
     },
 
@@ -159,7 +177,7 @@ define([
         throw new Error("Can't do a indexed insert in a sorted list.");
       }
 
-      baseProto.splice.apply(this, arguments);
+      this.base(arguments);
     },
 
     _insertInOrder: function(elem, keyArgs) {
@@ -167,6 +185,7 @@ define([
 
       if (elem2 !== undefined) {
         var index = Math.abs(this.search(elem2));
+        // Direct call base proto splice to avoid sorted list restrictions
         baseProto.splice.call(this, index, 0, elem2);
 
         if (this._added) {
@@ -195,7 +214,7 @@ define([
           if (elem2 === undefined) {
             // Not added afterall
             // Remove from the array
-            baseProto.splice.call(this, i, 1);
+            this.splice(i, 1);
 
             LE--;
             continue;
