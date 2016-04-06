@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2016 Pentaho Corporation.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,8 +54,7 @@
  * @class
  * @extends BaseComponent
  */
-define([ 'common-ui/util/util', 'cdf/components/BaseComponent', 'dojo/number', 'amd!cdf/lib/jquery.ui' ], function(Utils, BaseComponent, DojoNumber,
-  $) {
+define([ 'common-ui/util/util', 'cdf/components/BaseComponent',  'amd!cdf/lib/jquery.ui' ], function(Utils, BaseComponent,  $) {
 
   return BaseComponent.extend({
 
@@ -84,27 +83,7 @@ define([ 'common-ui/util/util', 'cdf/components/BaseComponent', 'dojo/number', '
         var initialValue;
         $.each(this.param.values, function(i, v) {
           if (v.selected) {
-            initialValue = this.formatter ? this.formatter.format(this.transportFormatter.parse(v.label)) : v.label;
-
-            try {
-              if (isNaN(v.label) || Math.abs(v.label) == Infinity) {
-                var valueParsed = null;
-              } else {
-                if (Utils.isNumberType(v.type)) {
-                  valueParsed = DojoNumber.format(v.label, {
-                    locale : SESSION_LOCALE.toLowerCase()
-                  });
-                } else {
-                  valueParsed = v.label;
-                }
-              }
-            } catch (e) {
-              valueParsed = v.label;
-            }
-
-            if (valueParsed != null) {
-              initialValue = v.label = v.value = valueParsed;
-            }
+        	initialValue = this.formatter ? this.formatter.format(this.transportFormatter.parse(v.label)) : v.label;
           }
         }.bind(this));
 
