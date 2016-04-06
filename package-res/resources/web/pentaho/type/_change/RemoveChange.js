@@ -21,8 +21,8 @@ define([
 
   return ListChange.extend("pentaho.type.RemoveChange", {
 
-    constructor: function(owner, elem, index) {
-      this.base(owner);
+    constructor: function(elem, index) {
+      this.base(null);
 
       this.at = index;
       this.elems = elem instanceof Array ? elem : [elem];
@@ -32,15 +32,13 @@ define([
 
     simulate: function(list) {
       var index = this.at;
-      var elem = this.elems[0];
+      var elems = this.elems;
 
-      list._elems.splice(index, 1);
-      delete list._keys[elem.key];
+      list._elems.splice(index, elems.length);
+      elems.forEach(function(elem){
+        delete list._keys[elem.key];
+      });
 
-      // list._elems.splice(index, elems.length);
-      // elems.forEach(function(elem){
-      //   delete list._keys[elem.key];
-      // });
       return list;
     }
   });

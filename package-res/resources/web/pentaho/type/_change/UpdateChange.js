@@ -19,24 +19,20 @@ define([
 ], function(ListChange) {
   "use strict";
 
-  return ListChange.extend("pentaho.type.AddChange", {
+  return ListChange.extend("pentaho.type.UpdateChange", {
 
-    constructor: function(elem, index) {
+    constructor: function(elem, other) {
       this.base(null);
 
-      this.at = index;
-      this.elems = [elem];
+      this.elem = elem;
+      this.other = other;
     },
 
-    type: "add",
-    
-    simulate: function(list) {
-      var index = this.at;
-      var elem = this.elems[0];
+    type: "update",
 
-      list._elems.splice(index, 0, elem);
-      list._keys[elem.key] = elem;
-      return list;
+    simulate: function(list) {
+      // TODO
+      this.elem.configure(this.other);
     }
   });
 });

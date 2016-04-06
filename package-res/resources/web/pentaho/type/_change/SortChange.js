@@ -19,24 +19,18 @@ define([
 ], function(ListChange) {
   "use strict";
 
-  return ListChange.extend("pentaho.type.AddChange", {
+  return ListChange.extend("pentaho.type.SortChange", {
 
-    constructor: function(elem, index) {
+    constructor: function(comparer) {
       this.base(null);
 
-      this.at = index;
-      this.elems = [elem];
+      this.comparer = comparer;
     },
 
-    type: "add",
-    
-    simulate: function(list) {
-      var index = this.at;
-      var elem = this.elems[0];
+    type: "sort",
 
-      list._elems.splice(index, 0, elem);
-      list._keys[elem.key] = elem;
-      return list;
+    simulate: function(list) {
+      list._elems.sort(this.comparer);
     }
   });
 });
