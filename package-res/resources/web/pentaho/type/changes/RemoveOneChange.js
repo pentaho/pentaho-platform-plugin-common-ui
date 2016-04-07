@@ -19,31 +19,28 @@ define([
 ], function(BaseChange) {
   "use strict";
 
-  return BaseChange.extend("pentaho.type.changes.RemoveChange", /** @lends pentaho.type.changes.RemoveChange# */{
+  return BaseChange.extend("pentaho.type.RemoveOneChange", {
 
-    constructor: function(elem, index) {
-      this.at = index;
-      this.elems = elem instanceof Array ? elem : [elem];
+    constructor: function(elem, key) {
+      this.key = key;
+      this.elem = elem;
     },
 
     /**
      * @inheritdoc
      */
     get type() {
-      return "remove";
+      return "removeOne";
     },
 
     simulate: function(list) {
-      var index = this.at;
-      var elems = this.elems;
+      var key = this.key;
+      var index = list._elems.indexOf(this.elem);
 
-      list._elems.splice(index, elems.length);
-      elems.forEach(function(elem) {
-        delete list._keys[elem.key];
-      });
+      list._elems.splice(index, 1);
+      delete list._keys[key];
 
       return list;
     }
   });
 });
-
