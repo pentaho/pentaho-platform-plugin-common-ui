@@ -17,12 +17,14 @@
 define([
   "./PropertyChange",
   "./AddChange",
-  "./RemoveChange",
+  "./RemoveOneChange",
+  "./RemoveAtChange",
   "./UpdateChange",
   "./SortChange",
   "../../util/arg",
   "../../util/object"
-], function(PropertyChange, AddChange, RemoveChange, UpdateChange, SortChange,
+], function(PropertyChange, AddChange, RemoveOneChange,
+            RemoveAtChange, UpdateChange, SortChange,
             arg, O) {
   "use strict";
 
@@ -32,6 +34,8 @@ define([
       this.base(owner);
 
       this._oldValue = oldValue;
+      this._addKeys = {};
+      this._removeKeys = {};
 
       this._changes = [];
       if(valueSpec !== undefined) this.set(valueSpec);
@@ -100,6 +104,7 @@ define([
       var list = this.oldValue,
         elems = list._elems,
         keys = list._keys,
+        addKeys = this._addKeys,
         existing, elem, key;
 
       // Next insert index.
@@ -126,14 +131,14 @@ define([
           // Store input keys for removal loop, below.
           if(remove) setKeys[key] = 1;
 
-          if((existing = O.getOwn(keys, key))) {
+          if((existing = O.getOwn(keys, key) || O.getOwn(addKeys, key))) {
             if(update && existing !== elem) {
               // This may trigger change events, that, in turn, may
               // perform further list changes and reenter `List#_set`.
-              this._updateOne(existing, elem); // list._updateOne(existing, elem, true);
+              this._updateOne(existing, elem);
             }
           } else if(add) {
-            this._insertOne(elem, index++); // list._insertOne(elem, index++, key, true);
+            this._insertOne(elem, index++, key);
           }
         }
       }
@@ -146,24 +151,24 @@ define([
           --i;
           elem = elems[i];
           key = elem.key;
-          if(!O.hasOwn(setKeys, key)) this._removeOne(elem, i); // list._removeOne(elem, i, key, true);
+          if(!O.hasOwn(setKeys, key)) this._removeOne(elem, i, key);
         }
       }
-
     },
 
     _remove: function(fragment) {
       var list = this.oldValue,
         remElems = Array.isArray(fragment) ? fragment : [fragment],
+        removeKeys = this._removeKeys,
         L = remElems.length,
         i = -1,
-        index, elem;
+        key, elem;
 
       // traversing in forward order, instead of backward, to make it more probable that changes are
       // registered in a single change statement.
       while(++i < L) {
-        if((elem = remElems[i]) && list.has(elem.key) && (index = list._elems.indexOf(elem)) > -1) {
-          this._removeOne(elem, index);
+        if((elem = remElems[i]) && list.has((key = elem.key)) && !O.getOwn(removeKeys, key) && list._elems.indexOf(elem) > -1) {
+          this._removeOne(elem, key);
         }
       }
     },
@@ -183,19 +188,25 @@ define([
 
       var removed = list._elems.slice(start, start + count);
 
-      this.changes.push(new RemoveChange(removed, start));
+      removed.forEach(function(elem) {
+        this._removeKeys[elem.key] = elem;
+      }, this);
+
+      this.changes.push(new RemoveAtChange(removed, start));
     },
 
     _sort: function(comparer) {
       this.changes.push(new SortChange(comparer));
     },
 
-    _insertOne: function(elem, index) {
-      this.changes.push(new AddChange(elem, index));
+    _insertOne: function(elem, index, key) {
+      this._addKeys[key] = elem;
+      this.changes.push(new AddChange(elem, index, key));
     },
 
-    _removeOne: function(elem, index) {
-      this.changes.push(new RemoveChange(elem, index));
+    _removeOne: function(elem, key) {
+      this._removeKeys[key] = elem;
+      this.changes.push(new RemoveOneChange(elem, key));
     },
 
     _updateOne: function(elem, other) {
