@@ -15,23 +15,25 @@
  */
 
 define([
-  "./Change"
-], function(Change) {
+  "./BaseChange"
+], function(BaseChange) {
   "use strict";
 
-  return Change.extend("pentaho.type.PrimitiveChange", {
-    constructor: function(owner, property) {
-      this.base(owner);
-      this._property = property; //pType
+  return BaseChange.extend("pentaho.type.changes.SortChange", /** @lends pentaho.type.changes.SortChange# */{
+
+    constructor: function(comparer) {
+      this.comparer = comparer;
     },
 
-    
-    _cloneOldValue: function(){
-      return this.oldValue.clone();
+    /**
+     * @inheritdoc
+     */
+    get type() {
+      return "sort";
     },
 
-    _capture: null //returns reference to old value
-
+    simulate: function(list) {
+      list._elems.sort(this.comparer);
+    }
   });
-
 });

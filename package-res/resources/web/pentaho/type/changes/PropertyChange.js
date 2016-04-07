@@ -19,8 +19,25 @@ define([
 ], function(Change) {
   "use strict";
 
-  return Change.extend("pentaho.type.ListChange", {
-    simulate: null
-  });
-});
+  return Change.extend("pentaho.type.changes.PropertyChange", /** @lends pentaho.type.changes.PropertyChange# */{
+    constructor: function(owner) {
+      this.base(owner);
+      this._newValue = undefined;
+      this._oldValue = undefined;
+    },
 
+    set newValue(valueSpec) {
+      this.set(valueSpec);
+    },
+
+    get newValue() {
+      return this._newValue;
+    },
+
+    get oldValue() {
+      return this._oldValue;
+    }
+
+  });
+
+});

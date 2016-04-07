@@ -15,37 +15,30 @@
  */
 
 define([
-  "./PrimitiveChange"
-], function(PrimitiveChange) {
+  "./PropertyChange"
+], function(PropertyChange) {
   "use strict";
 
-  return PrimitiveChange.extend("pentaho.type.ValueChange", {
+  return PropertyChange.extend("pentaho.type.changes.ValueChange", /** @lends pentaho.type.changes.ValueChange# */{
 
     constructor: function(owner, propertyName, valueSpec) {
       this.base(owner);
-
       this._propertyName = propertyName;
       this._oldValue = owner.get(propertyName);
+      this._pType = owner.type.get(propertyName);
 
-      if(valueSpec) this.newValue = valueSpec;
+      if(valueSpec !== undefined) this.set(valueSpec);
     },
 
-    type: "set",
+    /**
+     * @inheritdoc
+     */
+    get type() {
+      return "set";
+    },
 
     set: function(valueSpec) {
-      this.newValue = valueSpec;
-    },
-
-    set newValue(valueSpec) {
-      this._newValue = this._oldValue ? this._oldValue.type.toValue(valueSpec) : valueSpec;
-    },
-
-    get newValue() {
-      return this._newValue;
-    },
-
-    get oldValue() {
-      return this._oldValue;
+      this._newValue = this._pType.toValue(valueSpec);
     },
 
     simulate: function(/* propertyValue */) {
@@ -53,8 +46,7 @@ define([
     },
 
     _commit: function() {
-      var complex = this.owner;
-      complex._values[this._propertyName] = this.newValue;
+      this.owner._values[this._propertyName] = this.newValue;
     }
 
   });

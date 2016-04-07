@@ -24,13 +24,13 @@ define([
   "./events/WillChange",
   "./events/RejectedChange",
   "./events/DidChange",
-  "./_change/ComplexChangeset",
+  "./changes/Changeset",
   "../i18n!types",
   "../util/object",
   "../util/error"
 ], function(module, elemFactory, PropertyTypeCollection, valueHelper,
             EventSource, ActionResult, UserError, WillChange, RejectedChange, DidChange,
-            ComplexChangeset, bundle, O, error) {
+            Changeset, bundle, O, error) {
 
   "use strict";
 
@@ -357,7 +357,7 @@ define([
        * @fires "rejected:change"
        */
       set: function(name, valueSpec) {
-        var changeset = new ComplexChangeset(this);
+        var changeset = new Changeset(this);
         
         changeset.set(name, valueSpec);
         
@@ -382,7 +382,7 @@ define([
        */
       _change: function(changeset) {
         var executionError = this._changeWill(changeset);
-        changeset.freeze();
+        changeset._freeze();
         if(executionError) {
           this._changeRejected(changeset, executionError);
           return executionError;
@@ -397,7 +397,7 @@ define([
       },
 
       _onListChange: function(propType, changeset) {
-        var complexChangeset = new ComplexChangeset(this);
+        var complexChangeset = new Changeset(this);
         complexChangeset._setListChange(propType, changeset);
         this._change(complexChangeset);
       },

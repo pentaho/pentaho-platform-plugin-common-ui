@@ -15,22 +15,27 @@
  */
 
 define([
-  "./ListChange"
-], function(ListChange) {
+  "./BaseChange"
+], function(BaseChange) {
   "use strict";
 
-  return ListChange.extend("pentaho.type.SortChange", {
+  return BaseChange.extend("pentaho.type.changes.UpdateChange", /** @lends pentaho.type.changes.UpdateChange# */{
 
-    constructor: function(comparer) {
-      this.base(null);
-
-      this.comparer = comparer;
+    constructor: function(elem, other) {
+      this.elem = elem;
+      this.other = other;
     },
 
-    type: "sort",
+    /**
+     * @inheritdoc
+     */
+    get type() {
+      return "update";
+    },
 
     simulate: function(list) {
-      list._elems.sort(this.comparer);
+      // TODO
+      this.elem.configure(this.other);
     }
   });
 });
