@@ -15,28 +15,35 @@
  */
 
 define([
-  "./ListChange"
-], function(ListChange) {
+  "./BaseChange"
+], function(BaseChange) {
   "use strict";
 
-  return ListChange.extend("pentaho.type.AddChange", {
+  return BaseChange.extend("pentaho.type.changes.RemoveChange", /** @lends pentaho.type.changes.RemoveChange# */{
 
     constructor: function(elem, index) {
-      this.base(null);
-
       this.at = index;
-      this.elems = [elem];
+      this.elems = elem instanceof Array ? elem : [elem];
     },
 
-    type: "add",
-    
+    /**
+     * @inheritdoc
+     */
+    get type() {
+      return "remove";
+    },
+
     simulate: function(list) {
       var index = this.at;
-      var elem = this.elems[0];
+      var elems = this.elems;
 
-      list._elems.splice(index, 0, elem);
-      list._keys[elem.key] = elem;
+      list._elems.splice(index, elems.length);
+      elems.forEach(function(elem) {
+        delete list._keys[elem.key];
+      });
+
       return list;
     }
   });
 });
+

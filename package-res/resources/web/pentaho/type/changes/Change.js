@@ -15,15 +15,31 @@
  */
 
 define([
-  "./Change"
-], function(Change) {
+  "./BaseChange"
+], function(BaseChange) {
   "use strict";
 
-  return Change.extend("pentaho.type.Changeset", {
-
+  return BaseChange.extend("pentaho.type.changes.Change", /** @lends pentaho.type.changes.Change# */{
+    /**
+     * Abstract class for all changes.
+     *
+     * @constructor
+     *
+     * @param {!pentaho.type.Complex} owner - The complex where the change occurred.
+     */
     constructor: function(owner) {
-      this.base(owner);
-    }
+      this._owner = owner;
+    },
+
+    get owner() {
+      return this._owner;
+    },
+
+    set: null,
+
+    _commit: null
+
   });
 
 });
+

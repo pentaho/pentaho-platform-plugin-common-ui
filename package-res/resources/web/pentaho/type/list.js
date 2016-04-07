@@ -19,12 +19,12 @@ define([
   "./element",
   "./valueHelper",
   "./SpecificationContext",
-  "./_change/ListChangeset",
+  "./changes/ListChange",
   "../i18n!types",
   "../util/arg",
   "../util/error",
   "../util/object"
-], function(module, valueFactory, elemFactory, valueHelper, SpecificationContext, ListChangeset,
+], function(module, valueFactory, elemFactory, valueHelper, SpecificationContext, ListChange,
             bundle, arg, error, O) {
 
   "use strict";
@@ -34,8 +34,6 @@ define([
     var Value = context.get(valueFactory),
         Element = context.get(elemFactory),
         _listNextUid = 1;
-
-
 
     /**
      * @name pentaho.type.List.Type
@@ -408,25 +406,25 @@ define([
 
       //region Core change methods
       _set: function(fragment, add, update, remove, index) {
-        var changeset = new ListChangeset(this._ownedBy, this);
+        var changeset = new ListChange(this._ownedBy, this);
         changeset._set(fragment, add, update, remove, index);
         if(!this._ownedBy) changeset._commit();
       },
 
       _remove: function(fragment) {
-        var changeset = new ListChangeset(this._ownedBy, this);
+        var changeset = new ListChange(this._ownedBy, this);
         changeset._remove(fragment);
         if(!this._ownedBy) changeset._commit();
       },
 
       _removeAt: function(start, count) {
-        var changeset = new ListChangeset(this._ownedBy, this);
+        var changeset = new ListChange(this._ownedBy, this);
         changeset._removeAt(start, count);
         if(!this._ownedBy) changeset._commit();
       },
 
       _sort: function(comparer) {
-        var changeset = new ListChangeset(this._ownedBy, this);
+        var changeset = new ListChange(this._ownedBy, this);
         changeset._sort(comparer);
         if(!this._ownedBy) changeset._commit();
       },

@@ -15,19 +15,19 @@
  */
 
 define([
-  "./Changeset",
+  "./PropertyChange",
   "./AddChange",
   "./RemoveChange",
   "./UpdateChange",
   "./SortChange",
   "../../util/arg",
   "../../util/object"
-], function(Changeset, AddChange, RemoveChange, UpdateChange, SortChange,
+], function(PropertyChange, AddChange, RemoveChange, UpdateChange, SortChange,
             arg, O) {
   "use strict";
 
-  return Changeset.extend("pentaho.type.ListChangeset", {
-    
+  return PropertyChange.extend("pentaho.type.changes.ListChange", /** @lends pentaho.type.changes.ListChange# */{
+
     constructor: function(owner, oldValue, valueSpec) {
       this.base(owner);
 
@@ -37,13 +37,16 @@ define([
       if(valueSpec !== undefined) this.set(valueSpec);
     },
 
-    get changes() {
-      return this._changes;
+    //region public interface
+    /**
+     * @inheritdoc
+     */
+    get type() {
+      return "listChange";
     },
 
-    //region public interface
-    set newValue(valueSpec) {
-      this.set(valueSpec);
+    get changes() {
+      return this._changes;
     },
 
     /**
@@ -60,12 +63,6 @@ define([
       return newValue;
     },
 
-    get oldValue() {
-      return this._oldValue;
-    },
-    //endregion
-
-
     set: function(fragment, keyArgs) {
       this._set(
         fragment,
@@ -76,10 +73,33 @@ define([
       );
     },
 
+    simulate: function(propertyValue) {
+      var changes = this.changes.slice();
+
+      // Ignore changes until the last clear
+      var idxLastClear = changes.reduce(function(memo, change, idx) {
+        return change.type === "clear" ? idx : memo;
+      }, undefined);
+      changes = changes.slice(idxLastClear);
+
+      // mutate list
+      changes.forEach(function(change) {
+        change.simulate(propertyValue);
+      });
+
+      return propertyValue;
+    },
+    //endregion
+
+    //region protected methods
+    _commit: function() {
+      this.simulate(this._oldValue);
+    },
+
     _set: function(fragment, add, update, remove, index) {
       var list = this.oldValue,
         elems = list._elems,
-        keys  = list._keys,
+        keys = list._keys,
         existing, elem, key;
 
       // Next insert index.
@@ -99,20 +119,22 @@ define([
 
       // I - Add/Update Cycle
       var i = -1, L = setElems.length;
-      while(++i < L) if((elem = list._cast(setElems[i])) != null) {
-        key = elem.key;
+      while(++i < L) {
+        if((elem = list._cast(setElems[i])) != null) {
+          key = elem.key;
 
-        // Store input keys for removal loop, below.
-        if(remove) setKeys[key] = 1;
+          // Store input keys for removal loop, below.
+          if(remove) setKeys[key] = 1;
 
-        if((existing = O.getOwn(keys, key))) {
-          if(update && existing !== elem) {
-            // This may trigger change events, that, in turn, may
-            // perform further list changes and reenter `List#_set`.
-            this._updateOne(existing, elem); // list._updateOne(existing, elem, true);
+          if((existing = O.getOwn(keys, key))) {
+            if(update && existing !== elem) {
+              // This may trigger change events, that, in turn, may
+              // perform further list changes and reenter `List#_set`.
+              this._updateOne(existing, elem); // list._updateOne(existing, elem, true);
+            }
+          } else if(add) {
+            this._insertOne(elem, index++); // list._insertOne(elem, index++, key, true);
           }
-        } else if(add) {
-          this._insertOne(elem, index++); // list._insertOne(elem, index++, key, true);
         }
       }
 
@@ -123,7 +145,7 @@ define([
         while(i) {
           --i;
           elem = elems[i];
-          key  = elem.key;
+          key = elem.key;
           if(!O.hasOwn(setKeys, key)) this._removeOne(elem, i); // list._removeOne(elem, i, key, true);
         }
       }
@@ -145,10 +167,10 @@ define([
         }
       }
     },
-    
+
     _removeAt: function(start, count) {
       if(count < 0) return; // noop
-      
+
       var list = this.oldValue;
 
       if(count == null) count = 1;
@@ -160,10 +182,10 @@ define([
       if(start < 0) start = Math.max(0, L + start);
 
       var removed = list._elems.slice(start, start + count);
-      
+
       this.changes.push(new RemoveChange(removed, start));
     },
-    
+
     _sort: function(comparer) {
       this.changes.push(new SortChange(comparer));
     },
@@ -178,29 +200,8 @@ define([
 
     _updateOne: function(elem, other) {
       this.changes.push(new UpdateChange(elem, other));
-    },
-
-    //--------------------------------------- commit -----------------------------------
-    
-    simulate: function(propertyValue) {
-      var changes = this.changes.slice();
-
-      // Ignore changes until the last clear
-      var idxLastClear = changes.reduce(function(memo, change, idx) {
-        return change.type === "clear" ? idx : memo;
-      }, undefined);
-      changes = changes.slice(idxLastClear);
-
-      // mutate list
-      changes.forEach(function(change) {
-        change.simulate(propertyValue);
-      });
-
-      return propertyValue;
-    },
-
-    _commit: function() {
-      this.simulate(this._oldValue);
     }
+    //endregion
+
   });
 });

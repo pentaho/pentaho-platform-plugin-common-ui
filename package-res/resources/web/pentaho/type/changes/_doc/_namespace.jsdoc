@@ -14,25 +14,9 @@
  * limitations under the License.
  */
 
-define([
-  "./ListChange"
-], function(ListChange) {
-  "use strict";
-
-  return ListChange.extend("pentaho.type.UpdateChange", {
-
-    constructor: function(elem, other) {
-      this.base(null);
-
-      this.elem = elem;
-      this.other = other;
-    },
-
-    type: "update",
-
-    simulate: function(list) {
-      // TODO
-      this.elem.configure(this.other);
-    }
-  });
-});
+/**
+ * The `changes` namespace contains classes for describing changes on proeprty values.
+ *
+ * @name pentaho.type.changes
+ * @namespace
+ */

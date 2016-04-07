@@ -15,35 +15,34 @@
  */
 
 define([
-  "./Changeset",
-  "./ListChangeset",
+  "./Change",
+  "./ListChange",
   "./ValueChange",
   "../../util/object",
   "../../util/error"
-], function(Changeset, ListChangeset, ValueChange,
-            O, error) {
+], function(Change, ListChange, ValueChange, O, error) {
   "use strict";
 
   /**
-   * @classDesc A 'ComplexChangeset' represents a collection of changes in a set of properties.
+   * @classDesc A 'Changeset' represents a collection of changes in a set of properties.
    *
-   * ### `ComplexChangeset` Property Key
-   * A `ComplexChangeset` property key is the name of a complex's `property` that had its value changed.
+   * ### `Changeset` Property Key
+   * A `Changeset` property key is the name of a complex's `property` that had its value changed.
    *
-   * ### `ComplexChangeset` Change Object
-   * A `ComplexChangeset` `change` object describes the changes to be made to a `property`.
+   * ### `Changeset` Change Object
+   * A `Changeset` `change` object describes the changes to be made to a `property`.
    *
-   * @name ComplexChangeset
+   * @name Changeset
    * @memberOf pentaho.type
    *
-   * @amd pentaho/type/ComplexChangeset
+   * @amd pentaho/type/Changeset
    * @class
    * @extends pentaho.lang.Base
    */
-  return Changeset.extend("pentaho.type.ComplexChangeset", /** @lends pentaho.type.ComplexChangeset#*/{
+  return Change.extend("pentaho.type.changes.Changeset", /** @lends pentaho.type.changes.Changeset#*/{
 
     /**
-     * Creates a `ComplexChangeset` with a given owner.
+     * Creates a `Changeset` with a given owner.
      *
      * @constructor
      *
@@ -51,14 +50,21 @@ define([
      */
     constructor: function(owner) {
       if(!owner) throw error.argRequired("owner");
-      
       this.base(owner);
 
       this._properties = {};
     },
 
+    //region public interface
     /**
-     * Determines if the `ComplexChangeset` contains the specified property.
+     * @inheritdoc
+     */
+    get type() {
+      return "changeset";
+    },
+
+    /**
+     * Determines if the `Changeset` contains the specified property.
      *
      * @param {nonEmptyString|!pentaho.type.Property.Type} name - The property name or type object.
      *
@@ -69,8 +75,31 @@ define([
       return pName && O.hasOwn(this._properties, pName);
     },
 
+    /**
+     * Gets an array with all of the property names contained in this changeset.
+     *
+     * @type !string[]
+     * @readonly
+     */
+    get propertyNames() {
+      return Object.keys(this._properties);
+    },
+
     hasChanges: function() {
       return this.propertyNames.length > 0;
+    },
+
+    /**
+     * Gets the change object mapped to the specified property.
+     *
+     * @param {nonEmptyString|!pentaho.type.Property.Type} name - The property name or type object.
+     *
+     * @return {?pentaho.type.ValueChange} An object containing the changes to be operated
+     * in the given property, or `null` if the property is not defined in this changeset.
+     */
+    getChange: function(name) {
+      var pName = this.owner.type.get(name).name;
+      return pName ? this._properties[pName] || null : null;
     },
 
     /**
@@ -88,57 +117,14 @@ define([
       var value0 = owner._values[pType.name];
 
       if(pType.isList) {
-        this._properties[pName] = new ListChangeset(this.owner, value0, valueSpec);
+        this._properties[pName] = new ListChange(this.owner, value0, valueSpec);
       } else {
         var value1 = pType.toValue(valueSpec);
-        
+
         if(!pType.type.areEqual(value0, value1)) {
           this._properties[pName] = new ValueChange(this.owner, pName, value1);
         }
       }
-    },
-
-    /**
-     * Gets the change object mapped to the specified property.
-     *
-     * @param {nonEmptyString|!pentaho.type.Property.Type} name - The property name or type object.
-     *
-     * @return {?pentaho.type.ValueChange} An object containing the changes to be operated
-     * in the given property, or `null` if the property is not defined in this changeset.
-     */
-    getChange: function(name) {
-      var pName = this.owner.type.get(name).name;
-      return pName ? this._properties[pName] || null : null;
-    },
-
-    /**
-     * Gets an array with all of the property names contained in this changeset.
-     *
-     * @type !string[]
-     * @readonly
-     */
-    get propertyNames() {
-      return Object.keys(this._properties);
-    },
-
-    /**
-     * Prevents further changes to this changeset.
-     */
-    freeze: function(){
-      O.eachOwn(this._properties, function(change){
-        if(change) Object.freeze(change);
-      });
-      Object.freeze(this._properties);
-    },
-    
-    //-------------------------------------------
-
-
-    commit: function(){
-      this.propertyNames.forEach(function(property) {
-        var change = this.getChange(property);
-        change._commit();
-      }, this);
     },
 
     get: function(property) {
@@ -147,14 +133,36 @@ define([
       return this.getChange(property).newValue;
     },
 
-    //region Old Value
     getOld: function(key) {
       if(!this.has(key)) return null;
 
       return this.getChange(key).oldValue;
+    },
+
+    commit: function() {
+      this._commit();
+    },
+    //endregion
+
+    //region protected methods
+    /**
+     * Prevents further changes to this changeset.
+     */
+    _freeze: function() {
+      O.eachOwn(this._properties, function(change) {
+        if(change) Object.freeze(change);
+      });
+      Object.freeze(this._properties);
+    },
+
+    _commit: function() {
+      this.propertyNames.forEach(function(property) {
+        var change = this.getChange(property);
+        change._commit();
+      }, this);
     }
     //endregion
-    
+
   });
 
 });

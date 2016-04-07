@@ -19,23 +19,35 @@ define([
 ], function(Base) {
   "use strict";
 
-  return Base.extend("pentaho.type.Change", {
+  /**
+   * @name BaseChange
+   * @memberOf pentaho.type.changes
+   * @class
+   *
+   * @classDesc Base class for changes.
+   *
+   * @extends pentaho.lang.Base
+   * @amd pentaho/type/_change/BaseChange
+   */
+  return Base.extend("pentaho.type.changes.BaseChange", /** @lends pentaho.type.changes.BaseChange# */{
     /**
-     * Abstract class for all changes.
-     *
-     * @constructor
-     *
-     * @param {!pentaho.type.Complex} owner - The complex where the change occurred.
+     * Identifies the operation implemented by this change.
+     * @type {string}
+     * @readonly
+     * @abstract
      */
-    constructor: function(owner) {
-      this._owner = owner;
-    },
-
     type: null,
-    
-    get owner() {
-      return this._owner;
-    }
-  });
 
+    /**
+     * Implements an operation on an object.
+     *
+     * @method
+     * @param {!pentaho.type.Value} obj - The object to which he
+     * @return {!pentaho.type.Value} Returns an object that
+     * @abstract
+     *
+     */
+    simulate: null
+  });
 });
+
