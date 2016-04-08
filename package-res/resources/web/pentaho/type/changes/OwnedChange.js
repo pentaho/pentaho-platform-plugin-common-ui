@@ -15,27 +15,28 @@
  */
 
 define([
-  "./BaseChange"
-], function(BaseChange) {
+  "./Change"
+], function(Change) {
   "use strict";
 
-  return BaseChange.extend("pentaho.type.changes.UpdateChange", /** @lends pentaho.type.changes.UpdateChange# */{
-
-    constructor: function(elem, other) {
-      this.elem = elem;
-      this.other = other;
-    },
-
+  /**
+   * @name OwnedChange
+   * @memberOf pentaho.type.changes
+   * @class
+   * @abstract
+   * @extends pentaho/type/changes/OwnedChange
+   * @amd pentaho/type/changes/OwnedChange
+   *
+   * @classDesc Base class for describing modifications to an object.
+   */
+  return Change.extend("pentaho.type.changes.OwnedChange", /** @lends pentaho.type.changes.OwnedChange# */{
     /**
-     * @inheritdoc
+     * Modifies the provided element.
+     *
+     * @method
+     * @param {!pentaho.type.Element} element - The object to be modified.
+     * @abstract
      */
-    get type() {
-      return "update";
-    },
-
-    simulate: function(list) {
-      // TODO
-      this.elem.configure(this.other);
-    }
+    apply: null
   });
 });

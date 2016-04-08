@@ -22,8 +22,8 @@ define([
           "KeyR": selectionModes.REPLACE,
           "KeyT": selectionModes.TOGGLE
         };
-
-        me.model.set("selectionMode", mode[e.code]);
+        var selectionMode = mode[e.code];
+        if(selectionMode) me.model.set("selectionMode", selectionMode);
       }, false);
 
       this.model.on("will:select",  this._onWillSelect.bind(this));
@@ -34,7 +34,7 @@ define([
       this.model.on("will:change",  this._onWillChange.bind(this));
 
       this._renderCounter = 0;
-      this._verifyChange = true;
+      this._verifyChange = !true;
     },
 
     // Temporary. Used for demo of BACKLOG-5985
@@ -89,7 +89,6 @@ define([
 
     _renderCore: function() {
       this.base();
-
       this._renderCounter++; //BACKLOG-6739
     },
 

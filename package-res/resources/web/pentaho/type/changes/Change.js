@@ -15,29 +15,39 @@
  */
 
 define([
-  "./BaseChange"
-], function(BaseChange) {
+  "../../lang/Base"
+], function(Base) {
   "use strict";
 
-  return BaseChange.extend("pentaho.type.changes.Change", /** @lends pentaho.type.changes.Change# */{
+  /**
+   * @name Change
+   * @memberOf pentaho.type.changes
+   * @class
+   * @extends pentaho.lang.Base
+   * @amd pentaho/type/changes/Change
+   * @abstract
+   *
+   * @classDesc Base class for describing changes.
+   */
+  return Base.extend("pentaho.type.changes.Change", /** @lends pentaho.type.changes.Change# */{
+
     /**
-     * Abstract class for all changes.
+     * Identifies the type of change implemented by this object.
      *
-     * @constructor
-     *
-     * @param {!pentaho.type.Complex} owner - The complex where the change occurred.
+     * @type {string}
+     * @readonly
+     * @abstract
      */
-    constructor: function(owner) {
-      this._owner = owner;
+    get type(){
+      return "change";
     },
 
-    get owner() {
-      return this._owner;
-    },
-
-    set: null,
-
-    _commit: null
+    /**
+     * Prevents further modifications to this object.
+     */
+    freeze: function() {
+      Object.freeze(this);
+    }
 
   });
 

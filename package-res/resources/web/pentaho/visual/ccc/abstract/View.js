@@ -1273,7 +1273,11 @@ define([
 
     _updateSelections: function() {
       this._selectionChanged(this.model.getv("selectionFilter"));
-      this._chart.updateSelections();
+      try {
+        this._chart.updateSelections();
+      } catch(e){
+        logger.log("Error while calling _chart.updateSelections: " + e.message);
+      }
     },
 
     //region SELECTION

@@ -15,11 +15,26 @@
  */
 
 define([
-  "./BaseChange"
-], function(BaseChange) {
+  "./OwnedChange"
+], function(OwnedChange) {
   "use strict";
 
-  return BaseChange.extend("pentaho.type.RemoveAtChange", {
+  /**
+   * @name RemoveAt
+   * @memberOf pentaho.type.changes
+   * @class
+   * @extends pentaho.type.changes.OwnedChange
+   * @amd pentaho/type/changes/RemoveAt
+   *
+   * @classDesc Describes an operation that removes a set of elements from a list.
+   *
+   * @constructor
+   * @description Creates an instance.
+   *
+   * @param {!pentaho.type.Element[]} elements - The objects to be removed from the list.
+   * @param {number} start - The position in the list of the first element to be removed.
+   */
+  return OwnedChange.extend("pentaho.type.RemoveAt", {
 
     constructor: function(elements, start) {
       this.at = start;
@@ -33,7 +48,10 @@ define([
       return "removeAt";
     },
 
-    simulate: function(list) {
+    /**
+     * @inheritdoc
+     */
+    apply: function(list) {
       var toRemove = this.toRemove;
       var start = this.at;
 

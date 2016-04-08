@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/changes/Changeset",
-  "pentaho/type/changes/ValueChange",
+  "pentaho/type/changes/ComplexChangeset",
+  "pentaho/type/changes/Replace",
   "pentaho/lang/Base",
   "tests/pentaho/util/errorMatch"
-], function(Changeset, ValueChange, Base, errorMatch) {
+], function(ComplexChangeset, Replace, Base, errorMatch) {
   "use strict";
 
   /* global describe:false, it:false, expect:false, beforeEach:false */
@@ -26,7 +26,7 @@ define([
   describe("pentaho.type.ComplexChangeset -", function() {
 
     it("should be defined.", function () {
-      expect(typeof Changeset).toBeDefined();
+      expect(typeof ComplexChangeset).toBeDefined();
     });
 
     describe("instance -", function() {
@@ -56,10 +56,10 @@ define([
       };
 
       beforeEach(function() { 
-        changeset = new Changeset(owner);
-        changeset._properties = {
-          "foo": new ValueChange(owner, "foo", 10),
-          "bar": new ValueChange(owner, "bar", 11)
+        changeset = new ComplexChangeset(owner);
+        changeset._changes = {
+          "foo": new Replace("foo", 10),
+          "bar": new Replace("bar", 11)
         };
       });
 
@@ -111,13 +111,13 @@ define([
         });
 
         it("should update a property `change` if it already exists in the ComplexChangeset", function() {
-          expect(changeset.getChange("foo").oldValue).toBe(5);
-          expect(changeset.getChange("foo").newValue).toBe(10);
+          expect(changeset.getOld("foo").valueOf()).toBe(5);
+          expect(changeset.get("foo").valueOf()).toBe(10);
 
           changeset.set("foo", 1);
 
-          expect(changeset.getChange("foo").oldValue).toBe(5);
-          expect(changeset.getChange("foo").newValue).toBe(1);
+          expect(changeset.getOld("foo").valueOf()).toBe(5);
+          expect(changeset.get("foo").valueOf()).toBe(1);
         });
 
         function _setShouldThrow(context, property, value) {

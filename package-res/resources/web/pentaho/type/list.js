@@ -19,12 +19,12 @@ define([
   "./element",
   "./valueHelper",
   "./SpecificationContext",
-  "./changes/ListChange",
+  "./changes/ListChangeset",
   "../i18n!types",
   "../util/arg",
   "../util/error",
   "../util/object"
-], function(module, valueFactory, elemFactory, valueHelper, SpecificationContext, ListChange,
+], function(module, valueFactory, elemFactory, valueHelper, SpecificationContext, ListChangeset,
             bundle, arg, error, O) {
 
   "use strict";
@@ -405,28 +405,29 @@ define([
       //endregion
 
       //region Core change methods
+      
       _set: function(fragment, add, update, remove, index) {
-        var changeset = new ListChange(this._ownedBy, this);
+        var changeset = new ListChangeset(this);
         changeset._set(fragment, add, update, remove, index);
-        if(!this._ownedBy) changeset._commit();
+        if(!this._ownedBy) changeset.apply();
       },
 
       _remove: function(fragment) {
-        var changeset = new ListChange(this._ownedBy, this);
+        var changeset = new ListChangeset(this);
         changeset._remove(fragment);
-        if(!this._ownedBy) changeset._commit();
+        if(!this._ownedBy) changeset.apply();
       },
 
       _removeAt: function(start, count) {
-        var changeset = new ListChange(this._ownedBy, this);
+        var changeset = new ListChangeset(this);
         changeset._removeAt(start, count);
-        if(!this._ownedBy) changeset._commit();
+        if(!this._ownedBy) changeset.apply();
       },
 
       _sort: function(comparer) {
-        var changeset = new ListChange(this._ownedBy, this);
+        var changeset = new ListChangeset(this);
         changeset._sort(comparer);
-        if(!this._ownedBy) changeset._commit();
+        if(!this._ownedBy) changeset.apply();
       },
       //endregion
 

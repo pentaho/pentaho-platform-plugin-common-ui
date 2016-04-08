@@ -15,7 +15,7 @@
  */
 
 /**
- * The `changes` namespace contains classes for describing changes on proeprty values.
+ * The `changes` namespace contains classes that describe changes on the values of properties.
  *
  * @name pentaho.type.changes
  * @namespace

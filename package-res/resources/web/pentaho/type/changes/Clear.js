@@ -15,31 +15,41 @@
  */
 
 define([
-  "./BaseChange"
-], function(BaseChange) {
+  "./OwnedChange"
+], function(OwnedChange) {
   "use strict";
 
-  return BaseChange.extend("pentaho.type.RemoveOneChange", {
+  /**
+   * @name Clear
+   * @memberOf pentaho.type.changes
+   * @class
+   * @extends pentaho.type.changes.OwnedChange
+   * @amd pentaho/type/changes/Clear
+   *
+   * @classDesc Describes an operation that clears the elements of a list.
+   *
+   * @constructor
+   * @description Creates an instance.
+   *
+   */
+  return OwnedChange.extend("pentaho.type.changes.Clear", /** @lends pentaho.type.changes.Clear# */{
 
-    constructor: function(elem, key) {
-      this.key = key;
-      this.elem = elem;
+    constructor: function() {
     },
 
     /**
      * @inheritdoc
      */
     get type() {
-      return "removeOne";
+      return "clear";
     },
 
-    simulate: function(list) {
-      var key = this.key;
-      var index = list._elems.indexOf(this.elem);
-
-      list._elems.splice(index, 1);
-      delete list._keys[key];
-
+    /**
+     * @inheritdoc
+     */
+    apply: function(list) {
+      list._elems = [];
+      list._keys = {};
       return list;
     }
   });
