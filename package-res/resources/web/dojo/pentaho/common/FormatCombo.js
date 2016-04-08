@@ -1,8 +1,7 @@
 define( [ "dojo/_base/declare",
     "dijit/form/ComboBox",
     "dojo/store/Memory",
-    "dojo/_base/lang",
-    "dojo/domReady!" ],
+    "dojo/_base/lang" ],
   function( declare, ComboBox, Memory, lang ) {
 
     var defaultFormats = [
