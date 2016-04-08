@@ -15,11 +15,25 @@
  */
 
 define([
-  "./BaseChange"
-], function(BaseChange) {
+  "./Operation"
+], function(Operation) {
   "use strict";
-
-  return BaseChange.extend("pentaho.type.changes.SortChange", /** @lends pentaho.type.changes.SortChange# */{
+  /**
+   * @name Sort
+   * @memberOf pentaho.type.changes
+   * @class
+   * @extends pentaho.type.changes.Operation
+   * @amd pentaho/type/changes/sort
+   *
+   * @classDesc Describes an operation that sorts the element in a list.
+   *
+   * @constructor
+   * @description Creates an instance.
+   *
+   * @param {function(pentaho.type.Element, pentaho.type.Element) : number} comparer - The
+   * function used for comparing elements in the list.
+   */
+  return Operation.extend("pentaho.type.changes.Sort", /** @lends pentaho.type.changes.Sort# */{
 
     constructor: function(comparer) {
       this.comparer = comparer;
@@ -32,7 +46,10 @@ define([
       return "sort";
     },
 
-    simulate: function(list) {
+    /**
+     * @inheritdoc
+     */
+    apply: function(list) {
       list._elems.sort(this.comparer);
     }
   });

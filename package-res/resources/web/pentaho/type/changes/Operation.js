@@ -20,18 +20,19 @@ define([
   "use strict";
 
   /**
-   * @name BaseChange
+   * @name Operation
    * @memberOf pentaho.type.changes
    * @class
-   *
-   * @classDesc Base class for changes.
-   *
+   * @abstract
    * @extends pentaho.lang.Base
-   * @amd pentaho/type/_change/BaseChange
+   * @amd pentaho/type/changes/Operation
+   *
+   * @classDesc Base class for describing an operation on a property.
    */
-  return Base.extend("pentaho.type.changes.BaseChange", /** @lends pentaho.type.changes.BaseChange# */{
+  return Base.extend("pentaho.type.changes.Operation", /** @lends pentaho.type.changes.Operation# */{
     /**
-     * Identifies the operation implemented by this change.
+     * Identifies the type of operation implemented by this object.
+     *
      * @type {string}
      * @readonly
      * @abstract
@@ -39,15 +40,14 @@ define([
     type: null,
 
     /**
-     * Implements an operation on an object.
+     * Modifies the provided property.
      *
      * @method
-     * @param {!pentaho.type.Value} obj - The object to which he
-     * @return {!pentaho.type.Value} Returns an object that
+     * @param {!pentaho.type.Value} property - The property to be changed.
+     * @return {!pentaho.type.Value} Returns the modified property.
      * @abstract
-     *
      */
-    simulate: null
+    apply: null
   });
 });
 

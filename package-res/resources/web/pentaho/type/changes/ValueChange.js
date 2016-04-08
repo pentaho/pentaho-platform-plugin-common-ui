@@ -15,39 +15,55 @@
  */
 
 define([
-  "./PropertyChange"
-], function(PropertyChange) {
+  "./Change"
+], function(Change) {
   "use strict";
 
-  return PropertyChange.extend("pentaho.type.changes.ValueChange", /** @lends pentaho.type.changes.ValueChange# */{
-
-    constructor: function(owner, propertyName, valueSpec) {
+  /**
+   * @name ValueChange
+   * @memberOf pentaho.type.changes
+   * @class
+   * @extends pentaho.type.changes.Change
+   * @amd pentaho/type/changes/ValueChange
+   * @abstract
+   *
+   * @classDesc Class that describes a modification of the [value]{@link pentaho.type.Value} in a property.
+   *
+   * @constructor
+   * @description Creates an instance.
+   *
+   * @param {!pentaho.type.Complex} owner - The [complex]{@link pentaho.type.Complex} associated with this change.
+   */
+  return Change.extend("pentaho.type.changes.ValueChange", /** @lends pentaho.type.changes.ValueChange# */{
+    constructor: function(owner) {
       this.base(owner);
-      this._propertyName = propertyName;
-      this._oldValue = owner.get(propertyName);
-      this._pType = owner.type.get(propertyName);
-
-      if(valueSpec !== undefined) this.set(valueSpec);
+      this._newValue = undefined;
+      this._oldValue = undefined;
     },
 
     /**
-     * @inheritdoc
+     * The value of the property after the change is made.
+     *
+     * @type {!pentaho.type.Value}
      */
-    get type() {
-      return "set";
+    set newValue(valueSpec) {
+      this.set(valueSpec);
     },
 
-    set: function(valueSpec) {
-      this._newValue = this._pType.toValue(valueSpec);
+    get newValue() {
+      return this._newValue;
     },
 
-    simulate: function(/* propertyValue */) {
-      return this.newValue;
-    },
-
-    _commit: function() {
-      this.owner._values[this._propertyName] = this.newValue;
+    /**
+     * The value of the property before the change is made.
+     *
+     * @type {!pentaho.type.Value}
+     * @readonly
+     */
+    get oldValue() {
+      return this._oldValue;
     }
 
   });
+
 });

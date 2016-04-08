@@ -15,28 +15,57 @@
  */
 
 define([
-  "./BaseChange"
-], function(BaseChange) {
+  "./Operation",
+  "../../util/error"
+], function(Operation, error) {
   "use strict";
 
-  return BaseChange.extend("pentaho.type.changes.Change", /** @lends pentaho.type.changes.Change# */{
-    /**
-     * Abstract class for all changes.
-     *
-     * @constructor
-     *
-     * @param {!pentaho.type.Complex} owner - The complex where the change occurred.
-     */
+  /**
+   * @name Change
+   * @memberOf pentaho.type.changes
+   * @class
+   * @extends pentaho.type.changes.Operation
+   * @amd pentaho/type/changes/Change
+   * @abstract
+   *
+   * @classDesc Base class for describing changes on the values of properties.
+   *
+   * @constructor
+   * @description Creates an instance.
+   *
+   * @param {!pentaho.type.Complex} owner - The [complex]{@linkplain pentaho.type.Complex} associated with this change.
+   */
+  return Operation.extend("pentaho.type.changes.Change", /** @lends pentaho.type.changes.Change# */{
+
     constructor: function(owner) {
       this._owner = owner;
     },
 
+    /**
+     * The [complex]{@linkplain pentaho.type.Complex} associated with this change.
+     *
+     * @type {!pentaho.type.Complex}
+     * @readonly
+     */
     get owner() {
       return this._owner;
     },
 
+    /**
+     * Assigns a value to this change.
+     *
+     * @method
+     * @abstract
+     */
     set: null,
 
+    /**
+     * Updates the owning [complex]{@linkplain pentaho.type.Complex} with this change.
+     *
+     * @method
+     * @protected
+     * @abstract
+     */
     _commit: null
 
   });

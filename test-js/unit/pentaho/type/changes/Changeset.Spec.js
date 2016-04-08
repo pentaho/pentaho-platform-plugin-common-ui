@@ -15,15 +15,15 @@
  */
 define([
   "pentaho/type/changes/Changeset",
-  "pentaho/type/changes/ValueChange",
+  "pentaho/type/changes/SimpleChange",
   "pentaho/lang/Base",
   "tests/pentaho/util/errorMatch"
-], function(Changeset, ValueChange, Base, errorMatch) {
+], function(Changeset, SimpleChange, Base, errorMatch) {
   "use strict";
 
   /* global describe:false, it:false, expect:false, beforeEach:false */
 
-  describe("pentaho.type.ComplexChangeset -", function() {
+  describe("pentaho.type.Changeset -", function() {
 
     it("should be defined.", function () {
       expect(typeof Changeset).toBeDefined();
@@ -58,8 +58,8 @@ define([
       beforeEach(function() { 
         changeset = new Changeset(owner);
         changeset._properties = {
-          "foo": new ValueChange(owner, "foo", 10),
-          "bar": new ValueChange(owner, "bar", 11)
+          "foo": new SimpleChange(owner, "foo", 10),
+          "bar": new SimpleChange(owner, "bar", 11)
         };
       });
 

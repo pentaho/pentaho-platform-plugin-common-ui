@@ -15,11 +15,26 @@
  */
 
 define([
-  "./BaseChange"
-], function(BaseChange) {
+  "./Operation"
+], function(Operation) {
   "use strict";
 
-  return BaseChange.extend("pentaho.type.RemoveOneChange", {
+  /**
+   * @name RemoveOne
+   * @memberOf pentaho.type.changes
+   * @class
+   * @extends pentaho.type.changes.Operation
+   * @amd pentaho/type/changes/RemoveOne
+   *
+   * @classDesc Describes an operation that removes an element from a list.
+   *
+   * @constructor
+   * @description Creates an instance.
+   *
+   * @param {!pentaho.type.Element} elem - The object to be removed from the list.
+   * @param {string} key - The key that is being used for identifying the object in the list.
+   */
+  return Operation.extend("pentaho.type.RemoveOne", {
 
     constructor: function(elem, key) {
       this.key = key;
@@ -33,7 +48,10 @@ define([
       return "removeOne";
     },
 
-    simulate: function(list) {
+    /**
+     * @inheritdoc
+     */
+    apply: function(list) {
       var key = this.key;
       var index = list._elems.indexOf(this.elem);
 

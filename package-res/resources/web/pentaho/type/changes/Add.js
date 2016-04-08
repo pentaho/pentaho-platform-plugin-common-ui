@@ -15,11 +15,27 @@
  */
 
 define([
-  "./BaseChange"
-], function(BaseChange) {
+  "./Operation"
+], function(Operation) {
   "use strict";
 
-  return BaseChange.extend("pentaho.type.changes.AddChange", /** @lends pentaho.type.changes.AddChange# */{
+  /**
+   * @name Add
+   * @memberOf pentaho.type.changes
+   * @class
+   * @extends pentaho.type.changes.Operation
+   * @amd pentaho/type/changes/Add
+   *
+   * @classDesc Describes an operation that adds an element to a list.
+   *
+   * @constructor
+   * @description Creates an instance.
+   *
+   * @param {!pentaho.type.Element} elem - The object to be added to the list.
+   * @param {number} index - The position in the list at which the element should to be inserted.
+   * @param {string} key - The key that should be used for identifying the object to be added.
+   */
+  return Operation.extend("pentaho.type.changes.Add", /** @lends pentaho.type.changes.Add# */{
 
     constructor: function(elem, index, key) {
       this.at = index;
@@ -34,7 +50,10 @@ define([
       return "add";
     },
 
-    simulate: function(list) {
+    /**
+     * @inheritdoc
+     */
+    apply: function(list) {
       var elem = this.elem;
 
       list._elems.splice(this.at, 0, elem);

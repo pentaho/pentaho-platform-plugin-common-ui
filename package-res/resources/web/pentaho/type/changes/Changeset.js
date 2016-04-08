@@ -17,37 +17,29 @@
 define([
   "./Change",
   "./ListChange",
-  "./ValueChange",
+  "./SimpleChange",
   "../../util/object",
   "../../util/error"
-], function(Change, ListChange, ValueChange, O, error) {
+], function(Change, ListChange, SimpleChange, O, error) {
   "use strict";
 
   /**
-   * @classDesc A 'Changeset' represents a collection of changes in a set of properties.
-   *
-   * ### `Changeset` Property Key
-   * A `Changeset` property key is the name of a complex's `property` that had its value changed.
-   *
-   * ### `Changeset` Change Object
-   * A `Changeset` `change` object describes the changes to be made to a `property`.
-   *
    * @name Changeset
-   * @memberOf pentaho.type
-   *
-   * @amd pentaho/type/Changeset
+   * @memberOf pentaho.type.changes
    * @class
-   * @extends pentaho.lang.Base
+   * @extends pentaho.type.changes.Change
+   * @amd pentaho/type/changes/Changeset
+   *
+   * @classDesc Class that represents a collection of changes in a set of properties
+   * in a [complex]{@linkplain pentaho.type.Complex} object.
+   *
+   * @constructor
+   * @description Creates a new instance.
+   *
+   * @param {!pentaho.type.Complex} owner - The [complex]{@linkplain pentaho.type.Complex} associated with this change.
    */
   return Change.extend("pentaho.type.changes.Changeset", /** @lends pentaho.type.changes.Changeset#*/{
 
-    /**
-     * Creates a `Changeset` with a given owner.
-     *
-     * @constructor
-     *
-     * @param {!pentaho.type.Complex} owner - The complex where the change occurred.
-     */
     constructor: function(owner) {
       if(!owner) throw error.argRequired("owner");
       this.base(owner);
@@ -64,11 +56,11 @@ define([
     },
 
     /**
-     * Determines if the `Changeset` contains the specified property.
+     * Determines if this changeset contains the specified property.
      *
      * @param {nonEmptyString|!pentaho.type.Property.Type} name - The property name or type object.
      *
-     * @return {boolean} `true` if the property exists, `false` otherwise.
+     * @return {boolean} `true` if the property exists and is referenced in this changeset, `false` otherwise.
      */
     has: function(name) {
       var pName = this.owner.type.get(name).name;
@@ -85,16 +77,21 @@ define([
       return Object.keys(this._properties);
     },
 
+    /**
+     * Asserts if this changesets contains any defined changes.
+     *
+     * @returns {boolean} `true` if at least one property change is defined, `false` otherwise.
+     */
     hasChanges: function() {
       return this.propertyNames.length > 0;
     },
 
     /**
-     * Gets the change object mapped to the specified property.
+     * Gets the [change]{@link pentaho.type.changes.ValueChange} object associated with the specified property.
      *
      * @param {nonEmptyString|!pentaho.type.Property.Type} name - The property name or type object.
      *
-     * @return {?pentaho.type.ValueChange} An object containing the changes to be operated
+     * @return {?pentaho.type.ValueChange} An object describing the changes to be operated
      * in the given property, or `null` if the property is not defined in this changeset.
      */
     getChange: function(name) {
@@ -106,7 +103,7 @@ define([
      * Sets the value of a property.
      *
      * @param {nonEmptyString|!pentaho.type.Property.Type} name - The property name or type object.
-     * @param {any?} [valueSpec=null] A value specification.
+     * @param {(pentaho.type.Value?|pentaho.type.spec.IValue?)} [valueSpec=null] A value specification.
      */
     set: function(name, valueSpec) {
       if(!name) throw error.argRequired("name");
@@ -122,23 +119,40 @@ define([
         var value1 = pType.toValue(valueSpec);
 
         if(!pType.type.areEqual(value0, value1)) {
-          this._properties[pName] = new ValueChange(this.owner, pName, value1);
+          this._properties[pName] = new SimpleChange(this.owner, pName, value1);
         }
       }
     },
 
+    /**
+     * Gets the proposed value of a property.
+     *
+     * @param {nonEmptyString|!pentaho.type.Property.Type} name - The property name or type object.
+     *
+     * @return {pentaho.type.Value} The value of the property.
+     */
     get: function(property) {
       if(!this.has(property)) return null;
 
       return this.getChange(property).newValue;
     },
 
+    /**
+     * Gets the original value of a property.
+     *
+     * @param {nonEmptyString|!pentaho.type.Property.Type} name - The property name or type object.
+     *
+     * @return {pentaho.type.Value} The original value of the property (before the change).
+     */
     getOld: function(key) {
       if(!this.has(key)) return null;
 
       return this.getChange(key).oldValue;
     },
 
+    /**
+     * Updates the owning [complex]{@linkplain pentaho.type.Complex} with this changes in this changeset.
+     */
     commit: function() {
       this._commit();
     },
@@ -147,6 +161,7 @@ define([
     //region protected methods
     /**
      * Prevents further changes to this changeset.
+     * @protected
      */
     _freeze: function() {
       O.eachOwn(this._properties, function(change) {
@@ -155,6 +170,10 @@ define([
       Object.freeze(this._properties);
     },
 
+    /**
+     * Updates the owning [complex]{@linkplain pentaho.type.Complex} with this changes in this changeset.
+     * @override
+     */
     _commit: function() {
       this.propertyNames.forEach(function(property) {
         var change = this.getChange(property);

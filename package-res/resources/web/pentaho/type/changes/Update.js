@@ -15,11 +15,27 @@
  */
 
 define([
-  "./BaseChange"
-], function(BaseChange) {
+  "./Operation"
+], function(Operation) {
   "use strict";
-
-  return BaseChange.extend("pentaho.type.changes.UpdateChange", /** @lends pentaho.type.changes.UpdateChange# */{
+  
+  /**
+   * @name Update
+   * @memberOf pentaho.type.changes
+   * @class
+   * @extends pentaho.type.changes.Operation
+   * @amd pentaho/type/changes/Update
+   *
+   * @classDesc Describes an operation that updates an element in a list.
+   * In an `update` operation, the reference to the element does not change, but its contents does.
+   *
+   * @constructor
+   * @description Creates an instance.
+   *
+   * @param {!pentaho.type.Element} elem - The object (already in the list) that will be updated.
+   * @param {!pentaho.type.Element} other - The object with the content will be used for updating the list.
+   */
+  return Operation.extend("pentaho.type.changes.Update", /** @lends pentaho.type.changes.Update# */{
 
     constructor: function(elem, other) {
       this.elem = elem;
@@ -33,7 +49,10 @@ define([
       return "update";
     },
 
-    simulate: function(list) {
+    /**
+     * @inheritdoc
+     */
+    apply: function(list) {
       // TODO
       this.elem.configure(this.other);
     }
