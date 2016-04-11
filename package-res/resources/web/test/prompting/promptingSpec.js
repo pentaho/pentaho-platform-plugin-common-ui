@@ -15,10 +15,12 @@
  * Copyright 2015 Pentaho Corporation. All rights reserved.
  */
 
-define(["common-ui/prompting/pentaho-prompting-components", "dojo/number"], function(promptingComponents, dojoNumber) {
+define(["common-ui/prompting/pentaho-prompting-components"], function(promptingComponents) {
 
   describe("StaticAutocompleteBoxComponent.update()", function() {
 
+    var testInteger = "123456";
+    var testStringWithNumber = "123456 String";
     createCommonParameters = function(parameter, values) {
       return {
         parameter: parameter,
@@ -31,59 +33,48 @@ define(["common-ui/prompting/pentaho-prompting-components", "dojo/number"], func
     };
 
     it("should not try to parse a string", function() {
-      spyOn(dojoNumber, "format");
-
       var comp =  new promptingComponents.StaticAutocompleteBoxComponent();
-      $.extend(comp, createCommonParameters("1234String", {
+      $.extend(comp, createCommonParameters("StringParameter", {
         type: "java.lang.String",
-        label: "123456",
-        value: "123456"
+        label: testInteger,
+        value: testInteger
       }));
 
       comp.update();
 
-      expect(dojoNumber.format).not.toHaveBeenCalled();
-      expect(comp.param.values[0].label).toBe("123456");
-      expect(comp.param.values[0].value).toBe("123456");
+      expect(comp.param.values[0].label).toBe(testInteger);
+      expect(comp.param.values[0].value).toBe(testInteger);
     });
 
-    it("should try to parse a number", function() {
-      spyOn(dojoNumber, "format").andCallFake(function(p) {
-        // just make a returned value different from the parameter
-        return '_' + p;
-      });
-
+    it("should not try to parse a number", function() {
       var comp = new promptingComponents.StaticAutocompleteBoxComponent();
-      $.extend(comp, createCommonParameters("1234Integer", {
+      $.extend(comp, createCommonParameters("IntegerParameter", {
         type: "java.lang.Integer",
-        label: "123456",
-        value: "123456",
+        label: testInteger,
+        value: testInteger,
         selected: true
       }));
-      
+
       comp.update();
 
-      expect(dojoNumber.format).toHaveBeenCalled();
-      expect(comp.param.values[0].label).not.toBe("123456");
-      expect(comp.param.values[0].value).not.toBe('123456');
+      expect(comp.param.values[0].label).toBe(testInteger);
+      expect(comp.param.values[0].value).toBe(testInteger);
     });
 
     it("should keep string if failed to to parse a number", function() {
-      spyOn(dojoNumber, 'format').andThrow();
-
       var comp = new promptingComponents.StaticAutocompleteBoxComponent();
       $.extend(comp, createCommonParameters("1234Integer", {
         type: "java.lang.Integer",
-        label: "12qw",
-        value: "12qw",
+        label: testStringWithNumber,
+        value: testStringWithNumber,
         selected: true
       }));
 
       comp.update();
 
-      expect(comp.param.values[0].label).toBe("12qw");
-      expect(comp.param.values[0].label).toBe("12qw");
+      expect(comp.param.values[0].label).toBe(testStringWithNumber);
+      expect(comp.param.values[0].value).toBe(testStringWithNumber);
     });
 
-  })
+  });
 })

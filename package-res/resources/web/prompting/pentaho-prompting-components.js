@@ -16,8 +16,8 @@
 */
 
 define("common-ui/prompting/pentaho-prompting-components", ['common-ui/prompting/pentaho-prompting-bind', 'common-ui/prompting/pentaho-prompting-builders', 'cdf/cdf-module', "pentaho/common/TextButtonCombo", "dijit/registry", "dojo/on", "dojo/_base/lang",
-  "pentaho/common/Calendar","pentaho/common/DateTextBox", "dojo/number"],
-    function(_promptBind, _promptBuilders, _cdfModule, _TextButtonCombo, registry, on, lang, Calendar, DateTextBox, DojoNumber) {
+  "pentaho/common/Calendar","pentaho/common/DateTextBox"],
+    function(_promptBind, _promptBuilders, _cdfModule, _TextButtonCombo, registry, on, lang, Calendar, DateTextBox) {
   // Executes button.expression() in the scope of the button component (instead of the button)
   window.ScopedPentahoButtonComponent = BaseComponent.extend({
     viewReportButtonRegistered: false,
@@ -406,24 +406,6 @@ define("common-ui/prompting/pentaho-prompting-components", ['common-ui/prompting
         $.each(this.param.values, function(i, v) {
           if (v.selected) {
             initialValue = this.formatter ? this.formatter.format(this.transportFormatter.parse(v.label)) : v.label;
-
-            try {
-              if(isNaN(v.label) || Math.abs(v.label) == Infinity) {
-                valueParsed =  null;
-              } else {             
-                if (isNumberType(v.type)) {
-                  valueParsed = DojoNumber.format(v.label, {locale: SESSION_LOCALE.toLowerCase()});
-                } else {
-                  valueParsed = v.label;
-                }
-              }
-            } catch(e) {
-              valueParsed = v.label;
-            }
-
-            if(valueParsed != null){
-              initialValue = v.label = v.value = valueParsed;
-            } 
           }
         }.bind(this));
 
