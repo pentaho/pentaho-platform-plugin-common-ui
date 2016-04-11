@@ -25,10 +25,9 @@
  * <pre><code>
  *   require([ 'common-ui/prompting/components/StaticAutocompleteBoxComponent' ],
  *     function(StaticAutocompleteBoxComponent) {
- *       var paramDefn = ...;
  *       var param = ...;
- *       var formatter = createFormatter(paramDefn, param);
- *       var transportFormatter = createDataTransportFormatter(paramDefn, param);
+ *       var formatter = createFormatter(param);
+ *       var transportFormatter = createDataTransportFormatter(param);
  *       var args = {
  *         type: 'StaticAutocompleteBoxBuilder',
  *         name: 'component_name',
@@ -45,7 +44,6 @@
  * where 'args' is an object that contains the parameters necessary for base CDF component and special options:
  * <ul>
  *   <li>param - {@link Parameter} the parameter info about this widget</li>
- *   <li>paramDefn - {@link ParameterDefinition} the parameter definition used to create the formatter</li>
  *   <li>formatter - {@link formatting} utility to format values</li>
  *   <li>transportFormatter - {@link formatting} utility to format values</li>
  * </ul>

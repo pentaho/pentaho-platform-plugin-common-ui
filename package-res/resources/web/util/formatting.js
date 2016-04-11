@@ -1,5 +1,5 @@
 /*!
-* Copyright 2010 - 2013 Pentaho Corporation.  All rights reserved.
+* Copyright 2010 - 2016 Pentaho Corporation.  All rights reserved.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ define("common-ui/util/formatting", ['common-ui/util/timeutil', 'common-ui/util/
      * and the Reporting Engine's expected format for that object type.
      * e.g. "01/01/2003" <-> "2003-01-01T00:00:00.000-0500"
      */
-    createDataTransportFormatter: function(paramDefn, parameter) {
+    createDataTransportFormatter: function(parameter) {
       var formatterType = TextFormatter.getFormatType(parameter.type);
       if (formatterType == 'number') {
         return {
@@ -45,7 +45,7 @@ define("common-ui/util/formatting", ['common-ui/util/timeutil', 'common-ui/util/
      * Create a text formatter that can convert between a parameter's defined format and the transport
      * format the Pentaho Reporting Engine expects.
      */
-    createFormatter: function(paramDefn, parameter, pattern) {
+    createFormatter: function(parameter, pattern) {
       // Create a formatter if a date format was provided and we're not a list parameter type. They are
       // mutually exclusive.
       var dataFormat = pattern || parameter.attributes['data-format'];
