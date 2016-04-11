@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2016 Pentaho Corporation.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,13 +46,12 @@ define(['common-ui/util/formatting', './ParameterWidgetBuilderBase', 'common-ui/
          * @method
          * @name FormattedParameterWidgetBuilderBase#_createDataTransportFormatter
          *
-         * @param {ParameterDefinition} paramDefn - The Parameter Definition with the server response
          * @param {Parameter} param - The parameter instance
          * @returns {*|{format, parse}}
          * @private
          */
-        _createDataTransportFormatter: function(paramDefn, param) {
-          return FormatUtils.createDataTransportFormatter(paramDefn, param);
+        _createDataTransportFormatter: function(param) {
+          return FormatUtils.createDataTransportFormatter(param);
         },
 
         /**
@@ -61,13 +60,12 @@ define(['common-ui/util/formatting', './ParameterWidgetBuilderBase', 'common-ui/
          * @method
          * @name FormattedParameterWidgetBuilderBase#_createFormatter
          *
-         * @param {ParameterDefinition} paramDefn - The Parameter Definition with the server response
          * @param {Parameter} param - The parameter instance
          * @returns {*|{format, parse}}
          * @private
          */
-        _createFormatter: function(paramDefn, param){
-          return FormatUtils.createFormatter(paramDefn, param);
+        _createFormatter: function(param) {
+          return FormatUtils.createFormatter(param);
         },
 
         /**
@@ -78,15 +76,13 @@ define(['common-ui/util/formatting', './ParameterWidgetBuilderBase', 'common-ui/
          *
          * @param {Object} args - The object with the properties to build the component
          * @param {Parameter} args.param - The parameter with the properties needed to build the component
-         * @param {PromptPanel} args.promptPanel - The PromptPanel instance used to get the parameter name, the component name and the html object, where the component will be attached
-         * @param {ParameterDefinition} args.promptPanel.paramDefn - The parameter definition
          * @returns {Object} The object extended with the formatting utils
          */
         build: function (args) {
           var widget = this.base(args);
           return $.extend(widget, {
-            transportFormatter: this._createDataTransportFormatter(args.promptPanel.paramDefn, args.param),
-            formatter: this._createFormatter(args.promptPanel.paramDefn, args.param)
+            transportFormatter: this._createDataTransportFormatter(args.param),
+            formatter: this._createFormatter(args.param)
           });
         }
       });

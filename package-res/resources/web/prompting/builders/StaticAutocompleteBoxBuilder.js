@@ -52,14 +52,12 @@ define(['common-ui/util/formatting', './ValueBasedParameterWidgetBuilder', '../c
          * @method
          * @name StaticAutocompleteBoxBuilder#build
          * @param {Object} args - The arguments to build the widget in accordance with {@link SubmitPromptComponent}
-         * @param {PromptPanel} args.promptPanel - The instance of PromptPanel
-         * @param {ParameterDefinition} args.promptPanel.paramDefn - The parameter definition
          * @param {Parameter} args.param - The Parameter instance
          * @returns {StaticAutocompleteBoxComponent} The new instance of StaticAutocompleteBoxComponent
          */
         build: function(args) {
-          var formatter = FormatUtils.createFormatter(args.promptPanel.paramDefn, args.param);
-          var transportFormatter = FormatUtils.createDataTransportFormatter(args.promptPanel.paramDefn, args.param);
+          var formatter = FormatUtils.createFormatter(args.param);
+          var transportFormatter = FormatUtils.createDataTransportFormatter(args.param);
           var convertToAutocompleteValues = function(valuesArray) {
             return $.map(valuesArray, function(v) {
               var value = formatter ? formatter.format(transportFormatter.parse(v[0])) : v[0];

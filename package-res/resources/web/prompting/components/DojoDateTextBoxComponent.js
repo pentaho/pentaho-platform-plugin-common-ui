@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2016 Pentaho Corporation.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,10 +25,9 @@
  * <pre><code>
  *   require([ 'common-ui/prompting/components/DojoDateTextBoxComponent' ],
  *     function(DojoDateTextBoxComponent) {
- *       var paramDefn = ...;
  *       var param = ...;
- *       var formatter = createFormatter(paramDefn, param);
- *       var transportFormatter = createDataTransportFormatter(paramDefn, param);
+ *       var formatter = createFormatter(param);
+ *       var transportFormatter = createDataTransportFormatter(param);
  *       var args = {
  *         type: 'StaticAutocompleteBoxBuilder',
  *         name: 'component_name',
@@ -45,7 +44,6 @@
  * where 'args' is an object that contains the parameters necessary for base CDF component and special options:
  * <ul>
  *   <li>param - {@link Parameter} the parameter info about this widget</li>
- *   <li>paramDefn - {@link ParameterDefinition} the parameter definition used to create the formatter</li>
  *   <li>formatter - {@link formatting} utility to format values</li>
  *   <li>transportFormatter - {@link formatting} utility to format values</li>
  * </ul>
@@ -66,7 +64,7 @@ define(['cdf/components/BaseComponent', "dojo/date/locale", 'dijit/form/DateText
          * @method
          * @name DojoDateTextBoxComponent#clear
          */
-        clear: function () { 
+        clear: function () {
           if(this.onChangeHandle) {
             this.onChangeHandle.remove();
           }
@@ -99,7 +97,7 @@ define(['cdf/components/BaseComponent', "dojo/date/locale", 'dijit/form/DateText
          */
         update: function () {
           if(this.dijitId == undefined) {
-            this.dijitId = this.htmlObject + '_input'; 
+            this.dijitId = this.htmlObject + '_input';
           }
 
           this.clear();
