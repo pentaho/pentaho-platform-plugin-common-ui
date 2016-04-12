@@ -14,18 +14,19 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/ComplexChangeset",
+  "pentaho/type/changes/Changeset",
+  "pentaho/type/changes/SimpleChange",
   "pentaho/lang/Base",
   "tests/pentaho/util/errorMatch"
-], function(ComplexChangeset, Base, errorMatch) {
+], function(Changeset, SimpleChange, Base, errorMatch) {
   "use strict";
 
   /* global describe:false, it:false, expect:false, beforeEach:false */
 
-  describe("pentaho.type.ComplexChangeset -", function() {
+  describe("pentaho.type.Changeset -", function() {
 
     it("should be defined.", function () {
-      expect(typeof ComplexChangeset).toBeDefined();
+      expect(typeof Changeset).toBeDefined();
     });
 
     describe("instance -", function() {
@@ -33,23 +34,33 @@ define([
         properties = ["foo", "bar"];
 
       var owner = {
+        _values: {
+          "foo": 5,
+          "bar": 6
+        },
         type: {
           get: function(name) {
             return {
               get isList() { return false; },
               get name(){ return name;},
+              type: {
+                areEqual: function(v0, v1) {
+                  return v0 === v1;
+                }
+              },
               toValue: function(value) { return value; }
             };
           }
         },
-        get: function() {}
+        get: function(prop) { return this._values[prop]; }
       };
 
-      beforeEach(function() {
-        changeset = new ComplexChangeset(owner);
-        properties.forEach(function(prop, i) {
-          changeset._setValueChange(prop, 10 + i, 5 + i);
-        });
+      beforeEach(function() { 
+        changeset = new Changeset(owner);
+        changeset._properties = {
+          "foo": new SimpleChange(owner, "foo", 10),
+          "bar": new SimpleChange(owner, "bar", 11)
+        };
       });
 
       describe("#owner -", function() {
@@ -58,7 +69,9 @@ define([
         });
 
         it("changeset owner should be immutable", function() {
-          expect(function() { changeset.owner = "foo"; }).toThrowError(TypeError);
+          expect(function() {
+            changeset.owner = "foo";
+          }).toThrowError(TypeError);
         });
       });
 
@@ -82,7 +95,7 @@ define([
           expect(changeset.has("foo")).toBe(true);
           expect(changeset.getChange("foo")).not.toBe(null);
         });
-      }); //end #get
+      }); //end #getChange
 
       describe("#set -", function() {
         it("should throw an error if property name is `nully`", function() {
@@ -125,7 +138,9 @@ define([
         });
 
         it("changeset propertyNames should be immutable", function() {
-          expect(function() { changeset.propertyNames = "foo"; }).toThrowError(TypeError);
+          expect(function() {
+            changeset.propertyNames = "foo";
+          }).toThrowError(TypeError);
         });
       }); //end #propertyNames
 

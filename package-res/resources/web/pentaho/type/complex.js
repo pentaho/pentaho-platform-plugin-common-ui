@@ -24,13 +24,13 @@ define([
   "./events/WillChange",
   "./events/RejectedChange",
   "./events/DidChange",
-  "./ComplexChangeset",
+  "./changes/Changeset",
   "../i18n!types",
   "../util/object",
   "../util/error"
 ], function(module, elemFactory, PropertyTypeCollection, valueHelper,
             EventSource, ActionResult, UserError, WillChange, RejectedChange, DidChange,
-            ComplexChangeset, bundle, O, error) {
+            Changeset, bundle, O, error) {
 
   "use strict";
 
@@ -110,15 +110,18 @@ define([
           i = pTypes.length,
           nameProp = !spec ? undefined : (Array.isArray(spec) ? "index" : "name"),
           pType,
+          value,
           values = {};
 
         while(i--) {
           pType = pTypes[i];
-          values[pType.name] = pType.toValue(nameProp && spec[pType[nameProp]]);
+          values[pType.name] = value = pType.toValue(nameProp && spec[pType[nameProp]]);
+          if(pType.isList) value.setOwnership(this, pType);
         }
 
         this._values = values;
         this._uid = String(_complexNextUid++);
+        this._changeset = null;
       },
 
       /**
@@ -354,32 +357,16 @@ define([
        * @fires "rejected:change"
        */
       set: function(name, valueSpec) {
-        var pType = this.type.get(name),
-          value0 = this._values[pType.name];
-
-        var changeset;
-        if(pType.isList) {
-          value0.set(valueSpec);
-          //TODO: add operation to changeset
-          changeset = new ComplexChangeset(this);
-          //changeset._setListChange(name, value0, valueSpec);
-          changeset.set(name, null); // TODO: remove. Added for demo purposes of BACKLOG-6739
-
-        } else {
-          var value1 = pType.toValue(valueSpec);
-          if(!pType.type.areEqual(value0, value1)) {
-            changeset = new ComplexChangeset(this);
-            changeset._setValueChange(name, value1, value0);
-          }
-        }
-
-        if(changeset) {
+        var changeset = new Changeset(this);
+        
+        changeset.set(name, valueSpec);
+        
+        if(changeset.hasChanges()) {
           var executionError = this._change(changeset);
           if(executionError) return ActionResult.reject(executionError);
           return ActionResult.fulfill(changeset);
         }
         return ActionResult.reject(new UserError("Nothing to do"));
-
       },
 
       /**
@@ -395,7 +382,7 @@ define([
        */
       _change: function(changeset) {
         var executionError = this._changeWill(changeset);
-        changeset.freeze();
+        changeset._freeze();
         if(executionError) {
           this._changeRejected(changeset, executionError);
           return executionError;
@@ -407,6 +394,12 @@ define([
           return executionError;
         }
         this._changeDid(changeset);
+      },
+
+      _onListChange: function(propType, changeset) {
+        var complexChangeset = new Changeset(this);
+        complexChangeset._setListChange(propType, changeset);
+        this._change(complexChangeset);
       },
 
       /**
@@ -421,39 +414,7 @@ define([
        * @ignore
        */
       _changeDo: function(changeset) {
-
-        var propertyNames = changeset.propertyNames;
-
-        // First sweep: ensure values haven't changed
-        for(var k = 0, N = propertyNames.length; k < N; k++) {
-          var name = propertyNames[k];
-          var pType = this.type.get(name);
-
-          if(pType.isList) {
-            //TODO: look for reasons why a property that is a list could cancel the whole changeset
-          } else {
-            var currentValue = this._values[name];
-            var oldValue = changeset.getChange(name).oldValue;
-            if(!pType.type.areEqual(currentValue, oldValue))
-              return error.argRange("changeset"); //Mismatching values
-          }
-        }
-
-        // Second sweep: modify the values
-        changeset.propertyNames.forEach(function(name) {
-          var pType = this.type.get(name);
-
-          if(pType.isList) {
-            //TODO: handle the changes on a list property in a later story
-          } else {
-            var value0 = this._values[pType.name];
-            var value1 = pType.toValue(changeset.getChange(name).newValue);
-            //TODO: confirm if it's worth having this if (setting a property isn't that expensive)
-            if(!pType.type.areEqual(value0, value1)) {
-              this._values[name] = value1;
-            }
-          }
-        }, this);
+        changeset.commit();
       },
 
       /**
