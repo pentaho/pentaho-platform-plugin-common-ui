@@ -324,7 +324,7 @@ define([
          *
          * require(["pentaho/type/Context"], function(Context) {
          *
-         *   var context = new Context({container: "data-explorer-101"});
+         *   var context = new Context({application: "data-explorer-101"});
          *   var Value   = context.get("value");
          *
          *   var product = Value.type.create({
@@ -348,7 +348,7 @@ define([
          *
          * require(["pentaho/type/Context"], function(Context) {
          *
-         *   var context = new Context({container: "data-explorer-101"});
+         *   var context = new Context({application: "data-explorer-101"});
          *   var Value   = context.get("value");
          *
          *   var productList = Value.type.create({
@@ -373,7 +373,7 @@ define([
          *
          * require(["pentaho/type/Context"], function(Context) {
          *
-         *   var context = new Context({container: "data-explorer-101"});
+         *   var context = new Context({application: "data-explorer-101"});
          *   var ProductList = context.get([{
          *           props: [
          *             "id",
@@ -672,7 +672,7 @@ define([
        * @see pentaho.type.Refinement.Type#of
        *
        * @param {string} [name] A name of the refinement type used for debugging purposes.
-       * @param {{type: pentaho.type.IRefinementTypeProto}} [instSpec] The refined type instance specification.
+       * @param {{type: pentaho.type.spec.IRefinementTypeProto}} [instSpec] The refined type instance specification.
        * The available _type_ attributes are those defined by any specified refinement facet classes.
        *
        * @return {Class.<pentaho.type.Refinement>} The refinement type's instance class.

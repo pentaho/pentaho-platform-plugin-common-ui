@@ -64,9 +64,9 @@
  *     // Enable it, only for the dev user, "john", when in Analyzer
  *     {
  *       select: {
- *         type:      "my/radial/bar",
- *         user:      "john",
- *         container: "pentaho.analyzer"
+ *         type:        "my/radial/bar",
+ *         user:        "john",
+ *         application: "pentaho.analyzer"
  *       },
  *       apply: {
  *         isBrowsable: true
@@ -80,8 +80,8 @@
  * configService.add(myTypeConfig);
  *
  * var mergedTypeConfigSpec = configService.select("pentaho/visual/ccc/bar", {
- *      user:      "john",
- *      container: "pentaho.cdf"
+ *      user:        "john",
+ *      application: "pentaho.cdf"
  *    });
  *
  * // Results in a specification like:
@@ -108,7 +108,7 @@
  * @param {string} typeId The [id]{@link pentaho.type.Type#id} of the type whose
  * configuration specification is desired.
  *
- * @param {pentaho.type.IContextVars} [contextVars] The context variables that are used to select rules.
+ * @param {pentaho.spec.IContextVars} [contextVars] The context variables that are used to select rules.
  *
  * A {@link Nully} variable value is equivalent to a variable that is not present.
  * It matches only configuration rules that do not select that variable.
@@ -124,17 +124,19 @@
  */
 
 /**
- * Adds a configuration.
+ * Adds a type configuration.
  *
  * An added configuration overrides previously added configurations,
  * if all other rule-ordering criteria are equal.
  * For more information on the specificity of rules,
  * see [spec.ITypeConfiguration]{@link pentaho.type.spec.ITypeConfiguration}.
  *
+ * Note that the specified configuration object **may** be modified to serve
+ * the service's internal needs.
  *
  * @name add
  * @memberOf pentaho.type.IConfigurationService#
  * @method
  *
- * @param {!pentaho.type.ITypeConfiguration} config A type configuration to add.
+ * @param {!pentaho.type.spec.ITypeConfiguration} config A type configuration to add.
  */

@@ -20,6 +20,8 @@ define([], function() {
 
   describe("pentaho.type.config.AmdLoadedConfigurationService -", function() {
 
+    // Should we refactor the tests so they don't depend on the "private" property _ruleStore?
+
     describe("configuration loading", function() {
       var localRequire;
       var config1;
@@ -87,9 +89,9 @@ define([], function() {
         localRequire.config({
           config: {
             "pentaho/service": {
-              "test/config/3": "pentaho.type.ITypeConfiguration",
-              "test/config/2": "pentaho.type.ITypeConfiguration",
-              "test/config/1": "pentaho.type.ITypeConfiguration"
+              "test/config/3": "pentaho.type.spec.ITypeConfiguration",
+              "test/config/2": "pentaho.type.spec.ITypeConfiguration",
+              "test/config/1": "pentaho.type.spec.ITypeConfiguration"
             }
           }
         });

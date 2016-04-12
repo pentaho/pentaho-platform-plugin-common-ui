@@ -92,10 +92,10 @@ define([
    *
    * The following properties are specified at construction time and
    * constitute the environmental information held by a context:
-   * [container]{@link pentaho.type.Context#container},
-   * [user]{@link pentaho.type.Context#user},
-   * [theme]{@link pentaho.type.Context#theme} and
-   * [locale]{@link pentaho.type.Context#locale}.
+   * [application]{@link pentaho.spec.IContextVars#application},
+   * [user]{@link pentaho.spec.IContextVars#user},
+   * [theme]{@link pentaho.spec.IContextVars#theme} and
+   * [locale]{@link pentaho.spec.IContextVars#locale}.
    * Their values determine (or "select") the _type configuration rules_ that
    * apply and are used to configure the constructors provided by the context.
    *
@@ -180,7 +180,7 @@ define([
     /**
      * The context's variables.
      *
-     * @type {!pentaho.type.IContextVars}
+     * @type {!pentaho.spec.IContextVars}
      * @readOnly
      */
     get vars() {
@@ -223,12 +223,12 @@ define([
      *
      * @example
      * <caption>
-     *   Getting a <b>configured</b> type instance constructor <b>synchronously</b> for a specific container.
+     *   Getting a <b>configured</b> type instance constructor <b>synchronously</b> for a specific application.
      * </caption>
      *
      * require(["pentaho/type/Context", "my/viz/chord"], function(Context) {
      *
-     *   var context = new Context({container: "data-explorer-101"})
+     *   var context = new Context({application: "data-explorer-101"})
      *
      *   // Request synchronously cause it was already loaded in the above `require`
      *   var VizChordModel = context.get("my/viz/chord");
@@ -293,12 +293,12 @@ define([
      *
      * @example
      * <caption>
-     *   Getting a <b>configured</b> type instance constructor <b>asynchronously</b> for a specific container.
+     *   Getting a <b>configured</b> type instance constructor <b>asynchronously</b> for a specific application.
      * </caption>
      *
      * require(["pentaho/type/Context"], function(Context) {
      *
-     *   var context = new Context({container: "data-explorer-101"})
+     *   var context = new Context({application: "data-explorer-101"})
      *
      *   context.getAsync("my/viz/chord")
      *     .then(function(VizChordModel) {
@@ -364,12 +364,12 @@ define([
      * @example
      * <caption>
      *   Getting all <code>"my/component"</code> sub-types browsable
-     *   in the container <code>"data-explorer-101"</code>.
+     *   in the application <code>"data-explorer-101"</code>.
      * </caption>
      *
      * require(["pentaho/type/Context"], function(Context) {
      *
-     *   var context = new Context({container: "data-explorer-101"});
+     *   var context = new Context({application: "data-explorer-101"});
      *
      *   context.getAllAsync("my/component", {isBrowsable: true})
      *     .then(function(ComponentModels) {

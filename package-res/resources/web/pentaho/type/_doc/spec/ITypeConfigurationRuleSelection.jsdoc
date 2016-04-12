@@ -19,7 +19,7 @@
  * the criteria map that determines when a rule is selected for a
  * given type and context variables.
  *
- * It is the type of the [select]{@link pentaho.type.ITypeConfigurationRule#select} attribute
+ * It is the type of the [select]{@link pentaho.type.spec.ITypeConfigurationRule#select} attribute
  * of a type configuration rule.
  *
  * Besides the [type]{@link pentaho.type.spec.ITypeConfigurationRuleSelection#type} property,

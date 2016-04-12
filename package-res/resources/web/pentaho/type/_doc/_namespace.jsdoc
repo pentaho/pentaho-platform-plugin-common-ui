@@ -50,7 +50,7 @@
  * * Leverage the identification naturally provided by the AMD/requireJS module system,
  *   and drop the use of local framework component type ids
  * * Establish the common metadata required to describe component types
- * * Provide centralized configuration of component types, per context/container,
+ * * Provide centralized configuration of component types, per context/application,
  *   for easily changing things like labels or default values
  * * Enable the existence of framework-agnostic component editors
  * * Enable the existence platform component directory service

@@ -19,5 +19,21 @@ define([
 ], function(LoadedConfigurationService, ConfigurationService) {
   "use strict";
 
+  /**
+   * The singleton type configuration service.
+   *
+   * This singleton exposes an instance of the first class module
+   * that is registered as implementing the service {@link pentaho.type.IConfigurationService}
+   * (see {@link pentaho.service}).
+   *
+   * The default system AMD registration registers the class
+   * {@link pentaho.type.config.AmdLoadedConfigurationService}.
+   *
+   * @name pentaho.type.configurationService
+   * @type {pentaho.type.IConfigurationService}
+   * @amd pentaho/type/configurationService
+   *
+   * @see pentaho.service
+   */
   return LoadedConfigurationService != null ? new LoadedConfigurationService() : new ConfigurationService();
 });
