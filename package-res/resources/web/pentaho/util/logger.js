@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define(function () {
+define(function() {
 
   "use strict";
 
@@ -47,7 +47,7 @@ define(function () {
      *
      * @param {string} m - Message to log.
      */
-    debug: function (m) {
+    debug: function(m) {
       return _log(m, "debug");
     },
 
@@ -56,7 +56,7 @@ define(function () {
      *
      * @param {string} m - Message to log.
      */
-    log: function (m) {
+    log: function(m) {
       return _log(m, "log");
     },
 
@@ -65,7 +65,7 @@ define(function () {
      *
      * @param {string} m - Message to log.
      */
-    info: function (m) {
+    info: function(m) {
       return _log(m, "info");
     },
 
@@ -74,7 +74,7 @@ define(function () {
      *
      * @param {string} m - Message to log.
      */
-    warn: function (m) {
+    warn: function(m) {
       return _log(m, "warn");
     },
 
@@ -83,7 +83,7 @@ define(function () {
      *
      * @param {string} m - Message to log.
      */
-    error: function (m) {
+    error: function(m) {
       return _log(m, "error");
     }
   };
@@ -92,7 +92,7 @@ define(function () {
     type = type || "info";
 
     if(logger.logLevels.indexOf(type) < logger.logLevels.indexOf(logger.logLevel)) return;
-    
+
     if(typeof console !== "undefined") {
       if(!console[type]) type = "log";
 
@@ -100,7 +100,7 @@ define(function () {
         try {
           console[type]("%c" + m, css);
           return;
-        } catch (e) {
+        } catch(e) {
           //styling is not supported
         }
       }
