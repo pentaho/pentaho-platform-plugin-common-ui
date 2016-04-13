@@ -255,16 +255,20 @@ define([
           : Math.min(index, elems.length);
       }
 
-      var setElems = Array.isArray(fragment) ? fragment : [fragment];
+      var setElems = Array.isArray(fragment) ? fragment.splice() : [fragment];
 
       // Index of elements in setElems, by key.
-      // In the end, this is used to efficiently lookup
-      // which elems _not_ to remove and to update.
+      // This is used to detect duplicate values and to efficiently
+      // lookup which elems _not_ to remove or to update.
+      //
+      // Possible values are:
       // undefined: Existing element, removed
       // 1: Existing element, not updated
       // 2: Existing element, updated
+      // 3: Non-existing element, added
       var setKeys = {};
 
+      var stripped_input = [];
       var computed = [];
 
       var newElements = [];
@@ -272,25 +276,36 @@ define([
       var relativeIndex = 0;
 
       // I - Pre-process setElems array
-      var i = -1, L = setElems.length;
+      var i = -1;
+      var L = setElems.length;
       while(++i < L) {
         if((elem = list._cast(setElems[i])) != null) {
           key = elem.key;
 
-          if((existing = O.getOwn(keys, key) || O.getOwn(addKeys, key))) {
+          var repeated = O.hasOwn(setKeys, key);
+
+          if((existing = O.getOwn(keys, key)) {
             if(update && existing !== elem) {
               setKeys[key] = 2;
             } else {
               setKeys[key] = 1;
             }
 
-            if(!newElements.length) {
-              ++baseIndex;
-            } else {
-              relativeIndex++;
+            if(!repeated) {
+              if(!newElements.length) {
+                ++baseIndex;
+              } else {
+                relativeIndex++;
+              }
             }
-          } else if(add) {
+          } else if(!repeated && add) {
+            setKeys[key] = 3;
             newElements.push({type: "add", value: elem, to: relativeIndex++});
+          } else {
+            // Remove duplicates from setElems
+            setElems.splice(i, 1);
+            --L;
+            --i;
           }
         }
       }
@@ -298,7 +313,10 @@ define([
       // II - Process removes and build computed array
       var realBaseIndex = baseIndex;
 
-      i = -1; L = elems.length;
+      var removeCount = 0;
+
+      i = -1;
+      L = elems.length;
       while(++i < L) {
         elem = elems[i];
         key = elem.key;
@@ -309,7 +327,9 @@ define([
               --realBaseIndex;
             }
 
-            this._removeOne(elem, i);
+            this._removeOne(elem, i - removeCount);
+
+            ++removeCount;
           } else {
             computed.push(key);
           }
@@ -320,7 +340,8 @@ define([
 
       // III - Process adds
       if(add) {
-        i = -1; L = newElements.length;
+        i = -1;
+        L = newElements.length;
         while (++i < L) {
           var action = newElements[i];
 
@@ -338,7 +359,8 @@ define([
 
       // IV - Process moves and updates
       if(move || update) {
-        i = -1; L = setElems.length;
+        i = -1;
+        L = setElems.length;
         while(++i < L) {
           if((elem = list._cast(setElems[i])) != null) {
             if(move) {
