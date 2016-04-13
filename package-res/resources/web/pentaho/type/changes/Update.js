@@ -37,9 +37,8 @@ define([
      * @description Creates an instance.
      *
      * @param {!pentaho.type.Element} elem - The object (already in the list) that will be updated.
-    constructor: function(elem, other) {
-     * @param {!pentaho.type.Element} other - The object with the content that will be used for updating the list.
      * @param {number} index - The position of `elem` in the list.
+     * @param {!pentaho.type.Element} other - The object with the content that will be used for updating the list.
      */
     constructor: function(elem, index, other) {
       this.elem = elem;
@@ -64,10 +63,7 @@ define([
      * @param {!pentaho.type.List} target - The list to apply the change on.
      */
     apply: function(list) {
-      if(this.at != null)
-        list.at(this.at).configure(this.other);
-      else
-        list.get(this.elem.key).configure(this.other);
+      list.at(this.at).configure(this.other);
     }
   });
 });
