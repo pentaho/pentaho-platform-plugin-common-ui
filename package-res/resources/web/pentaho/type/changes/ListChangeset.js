@@ -293,7 +293,7 @@ define([
             if(!repeated) {
               if(!newElements.length) {
                 ++baseIndex;
-              } else {
+              } else if(move) {
                 relativeIndex++;
               }
             }
@@ -362,21 +362,23 @@ define([
         L = setElems.length;
         while(++i < L) {
           if((elem = list._cast(setElems[i])) != null) {
+            var currentIndex = computed.indexOf(elem.key, i);
             if(move) {
-              var currentIndex = computed.indexOf(elem.key, i);
               if (currentIndex !== i) {
                 this._moveOne(elem, currentIndex, i);
 
                 computed.splice(i, 0, computed.splice(currentIndex, 1)[0]);
+
+                currentIndex = i;
               }
             }
 
             if(update && setKeys[elem.key] === 2) {
-              existing = O.getOwn(keys, elem.key) || O.getOwn(addKeys, elem.key);
+              existing = O.getOwn(keys, elem.key);
 
               // This may trigger change events, that, in turn, may
               // perform further list changes and reenter `List#_set`.
-              this._updateOne(existing, elem, i);
+              this._updateOne(existing, currentIndex, elem);
             }
           }
         }
@@ -393,24 +395,49 @@ define([
      * @private
      */
     _remove: function(fragment) {
+      var list = this.newValue, // calculate relative the last change
+        elems = list._elems,
+        keys = list._keys,
+        existing, elem, key;
 
-      var list = this.newValue,
-          remElems = Array.isArray(fragment) ? fragment : [fragment],
-          removeKeys = this._removeKeys,
-          L = remElems.length,
-          i = -1,
-          index, key, elem;
+      var removeElems = Array.isArray(fragment) ? fragment.slice() : [fragment];
 
-      // elem0 -> index0
-      // elem1 -> index1 > index0
+      // Index of elements in removeElems, by key.
+      //
+      // Possible values are:
+      // 1: Existing element, removed
+      var removeKeys = {};
+
+      var removedElements = [];
+
+      // I - Pre-process removeElems array
+      var i = -1;
+      var L = removeElems.length;
       while(++i < L) {
-        if((elem = remElems[i]) &&
-           list.has((key = elem.key)) && // includes removed elements...
-           !O.getOwn(removeKeys, key) &&
-           (index = list._elems.indexOf(elem)) > -1) {
-          this._removeOne(elem, index);  // TODO: index is wrong!! Would need to call newValue on every iteration...
+        if((elem = list._cast(removeElems[i])) != null) {
+          key = elem.key;
+
+          var repeated = O.hasOwn(removedElements, key);
+
+          if((existing = O.getOwn(keys, key))) {
+            removeKeys[key] = 1;
+
+            if(!repeated) {
+              removedElements.push({type: "remove", value: elem, from: elems.indexOf(elem)});
+            }
+          }
         }
       }
+
+      // II - Order descending so indexes keep valid
+      removedElements.sort(function(v1, v2) {
+        return v2.from - v1.from;
+      });
+
+      // III - Process the removes
+      removedElements.forEach(function(v) {
+        this._removeOne(v.value, v.from);
+      }, this);
     },
 
     _removeAt: function(start, count) {
@@ -507,7 +534,7 @@ define([
      * @see pentaho.type.changes.Update
      * @private
      */
-    _updateOne: function(elem, other, index) {
+    _updateOne: function(elem, index, other) {
       this._addChange(new Update(elem, index, other));
     },
 

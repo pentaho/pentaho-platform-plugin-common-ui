@@ -772,20 +772,6 @@ define([
         expect(list.count).toBe(4);
       });
 
-      it("should ignore a given element that is not present in the list, although it is equal to one that is",
-      function() {
-        var list = new NumberList([1, 2, 3, 4]);
-        expect(list.count).toBe(4);
-
-        // ----
-
-        list.remove(new PentahoNumber(4));
-
-        // ----
-
-        expect(list.count).toBe(4);
-      });
-      
       xit("new remove case - NEW-UNIT", function() {
         
         var list = new NumberList([1, 5, 10, 11, 40]);
@@ -980,7 +966,7 @@ define([
         // ---
 
 
-        _expectEqualValueAt(list, [1, 3, 5]);
+        _expectEqualValueAt(list, [5, 1, 3]);
       });
 
       it("should empty the list when given an empty array", function() {
