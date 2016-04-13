@@ -27,29 +27,35 @@ define([
    * @amd pentaho/type/changes/Change
    * @abstract
    *
-   * @classDesc Base class for describing changes.
+   * @classDesc The `Change` class is the abstract base class of classes that
+   * describe changes in [structured value instances]{@link pentaho.type.UStructuredValue}.
    */
   return Base.extend("pentaho.type.changes.Change", /** @lends pentaho.type.changes.Change# */{
 
+    // Block default Base.js constructor
+    constructor: function() {
+    },
+
     /**
-     * Identifies the type of change implemented by this object.
+     * Gets the type of change.
      *
+     * @name type
+     * @memberOf pentaho.type.changes.Change#
      * @type {string}
      * @readonly
      * @abstract
      */
-    get type(){
-      return "change";
-    },
-
+    
     /**
-     * Prevents further modifications to this object.
+     * Prevents further changes to this changeset.
+     *
+     * The default implementation freezes the change object using `Object.freeze`.
+     *
+     * @protected
      */
-    freeze: function() {
+    _freeze: function() {
       Object.freeze(this);
     }
-
   });
-
 });
 

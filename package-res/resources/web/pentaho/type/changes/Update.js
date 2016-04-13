@@ -15,27 +15,31 @@
  */
 
 define([
-  "./OwnedChange"
-], function(OwnedChange) {
+  "./PrimitiveChange"
+], function(PrimitiveChange) {
   "use strict";
 
-  return OwnedChange.extend("pentaho.type.changes.Update", /** @lends pentaho.type.changes.Update# */{
+  return PrimitiveChange.extend("pentaho.type.changes.Update", /** @lends pentaho.type.changes.Update# */{
+
     /**
-     * @name Update
+     * @alias Update
      * @memberOf pentaho.type.changes
      * @class
-     * @extends pentaho.type.changes.OwnedChange
+     * @extends pentaho.type.changes.PrimitiveChange
      * @amd pentaho/type/changes/Update
      *
      * @classDesc Describes an operation that updates an element in a list.
      * In an `update` operation, the reference to the element does not change, but its content does.
      *
+     * This type of change is always part of a {@link pentaho.type.changes.ListChangeset}.
+     *
      * @constructor
      * @description Creates an instance.
      *
      * @param {!pentaho.type.Element} elem - The object (already in the list) that will be updated.
-     * @param {number} index - The position of `elem` in the list.
+    constructor: function(elem, other) {
      * @param {!pentaho.type.Element} other - The object with the content that will be used for updating the list.
+     * @param {number} index - The position of `elem` in the list.
      */
     constructor: function(elem, index, other) {
       this.elem = elem;
@@ -44,14 +48,20 @@ define([
     },
 
     /**
-     * @inheritdoc
+     * Gets the type of change.
+     *
+     * @type {string}
+     * @readonly
+     * @default "update"
      */
     get type() {
       return "update";
     },
 
     /**
-     * @inheritdoc
+     * Applies the change to a list value.
+     *
+     * @param {!pentaho.type.List} target - The list to apply the change on.
      */
     apply: function(list) {
       if(this.at != null)

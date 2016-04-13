@@ -19,36 +19,37 @@ define([
 ], function(PrimitiveChange) {
   "use strict";
 
-  return PrimitiveChange.extend("pentaho.type.changes.Add", /** @lends pentaho.type.changes.Add# */{
+  return PrimitiveChange.extend("pentaho.type.Remove", /** @lends pentaho.type.changes.Remove# */{
 
     /**
-     * @alias Add
+     * @name Remove
      * @memberOf pentaho.type.changes
      * @class
      * @extends pentaho.type.changes.PrimitiveChange
-     * @amd pentaho/type/changes/Add
+     * @amd pentaho/type/changes/Remove
      *
-     * @classDesc The `Add` class describes the primitive operation of adding a new element to a list at a given index.
+     * @classDesc The `Remove` class describes the primitive operation that
+     * removes a set of contiguous elements from a list.
      *
      * This type of change is always part of a {@link pentaho.type.changes.ListChangeset}.
      *
      * @constructor
      * @description Creates an instance.
      *
-     * @param {!pentaho.type.Element} elem - The element to be added to the list.
-     * @param {number} index - The list index at which the element should to be inserted.
+     * @param {!Array.<pentaho.type.Element>} elems - The elements to be removed from the list.
+     * @param {number} index - The starting index of the elements in the list.
      */
-    constructor: function(elem, index) {
+    constructor: function(elems, index) {
       /**
-       * Gets the element that is added to the list.
+       * Gets the elements that are removed from the list.
        *
-       * @type {!pentaho.type.Element}
+       * @type {!Array.<pentaho.type.Element>}
        * @readOnly
        */
-      this.element = elem;
+      this.elements = elems;
 
       /**
-       * Gets the list index at which the element is inserted.
+       * Gets the index of the element in the list.
        *
        * @type {number}
        * @readOnly
@@ -61,10 +62,10 @@ define([
      *
      * @type {string}
      * @readonly
-     * @default "add"
+     * @default "remove"
      */
     get type() {
-      return "add";
+      return "remove";
     },
 
     /**
@@ -73,10 +74,14 @@ define([
      * @param {!pentaho.type.List} target - The list value to apply the change to.
      */
     apply: function(target) {
-      var elem = this.element;
 
-      target._elems.splice(this.index, 0, elem);
-      target._keys[elem.key] = elem;
+      var elems = this.elements;
+
+      target._elems.splice(this.index, elems.length);
+
+      elems.forEach(function(elem) {
+        delete target._keys[elem.key];
+      });
     }
   });
 });

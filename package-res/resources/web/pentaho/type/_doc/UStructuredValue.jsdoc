@@ -14,29 +14,8 @@
  * limitations under the License.
  */
 
-define([
-  "./Change"
-], function(Change) {
-  "use strict";
-
-  /**
-   * @name OwnedChange
-   * @memberOf pentaho.type.changes
-   * @class
-   * @abstract
-   * @extends pentaho/type/changes/OwnedChange
-   * @amd pentaho/type/changes/OwnedChange
-   *
-   * @classDesc Base class for describing modifications to an object.
-   */
-  return Change.extend("pentaho.type.changes.OwnedChange", /** @lends pentaho.type.changes.OwnedChange# */{
-    /**
-     * Modifies the provided element.
-     *
-     * @method
-     * @param {!pentaho.type.Element} element - The object to be modified.
-     * @abstract
-     */
-    apply: null
-  });
-});
+/**
+ * A `UStructuredValue` is the union of value types that have an internal structure.
+ *
+ * @typedef {pentaho.type.List|pentaho.type.Complex} pentaho.type.UStructuredValue
+ */

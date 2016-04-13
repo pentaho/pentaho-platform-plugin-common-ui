@@ -15,42 +15,45 @@
  */
 
 define([
-  "./OwnedChange"
-], function(OwnedChange) {
+  "./PrimitiveChange"
+], function(PrimitiveChange) {
   "use strict";
 
   /**
    * @name Clear
    * @memberOf pentaho.type.changes
    * @class
-   * @extends pentaho.type.changes.OwnedChange
+   * @extends pentaho.type.changes.PrimitiveChange
    * @amd pentaho/type/changes/Clear
    *
-   * @classDesc Describes an operation that clears the elements of a list.
+   * @classDesc The `Clear` class describes the primitive operation that clears every element of a list.
+   *
+   * This type of change is always part of a {@link pentaho.type.changes.ListChangeset}.
    *
    * @constructor
    * @description Creates an instance.
-   *
    */
-  return OwnedChange.extend("pentaho.type.changes.Clear", /** @lends pentaho.type.changes.Clear# */{
-
-    constructor: function() {
-    },
+  return PrimitiveChange.extend("pentaho.type.changes.Clear", /** @lends pentaho.type.changes.Clear# */{
 
     /**
-     * @inheritdoc
+     * Gets the type of change.
+     *
+     * @type {string}
+     * @readonly
+     * @default "clear"
      */
     get type() {
       return "clear";
     },
 
     /**
-     * @inheritdoc
+     * Applies the change to a list value.
+     *
+     * @param {!pentaho.type.List} target - The list value to apply the change to.
      */
-    apply: function(list) {
-      list._elems = [];
-      list._keys = {};
-      return list;
+    apply: function(target) {
+      target._elems = [];
+      target._keys  = {};
     }
   });
 });

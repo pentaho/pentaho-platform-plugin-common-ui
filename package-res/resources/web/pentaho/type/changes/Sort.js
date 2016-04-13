@@ -15,17 +15,20 @@
  */
 
 define([
-  "./OwnedChange"
-], function(OwnedChange) {
+  "./PrimitiveChange"
+], function(PrimitiveChange) {
   "use strict";
+
   /**
    * @name Sort
    * @memberOf pentaho.type.changes
    * @class
-   * @extends pentaho.type.changes.OwnedChange
+   * @extends pentaho.type.changes.PrimitiveChange
    * @amd pentaho/type/changes/sort
    *
    * @classDesc Describes an operation that sorts the element in a list.
+   *
+   * This type of change is always part of a {@link pentaho.type.changes.ListChangeset}.
    *
    * @constructor
    * @description Creates an instance.
@@ -33,24 +36,30 @@ define([
    * @param {function(pentaho.type.Element, pentaho.type.Element) : number} comparer - The
    * function used for comparing elements in the list.
    */
-  return OwnedChange.extend("pentaho.type.changes.Sort", /** @lends pentaho.type.changes.Sort# */{
+  return PrimitiveChange.extend("pentaho.type.changes.Sort", /** @lends pentaho.type.changes.Sort# */{
 
     constructor: function(comparer) {
       this.comparer = comparer;
     },
 
     /**
-     * @inheritdoc
+     * Gets the type of change.
+     *
+     * @type {string}
+     * @readonly
+     * @default "sort"
      */
     get type() {
       return "sort";
     },
 
     /**
-     * @inheritdoc
+     * Applies the change to a list value.
+     *
+     * @param {!pentaho.type.List} target - The list value to apply the change to.
      */
-    apply: function(list) {
-      list._elems.sort(this.comparer);
+    apply: function(target) {
+      target._elems.sort(this.comparer);
     }
   });
 });

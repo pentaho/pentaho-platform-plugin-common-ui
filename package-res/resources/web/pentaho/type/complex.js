@@ -351,7 +351,9 @@ define([
        * @param {any?} [valueSpec=null] A value specification.
        *
        * @return {pentaho.lang.ActionResult} The result object.
+       *
        * @throws {pentaho.lang.ArgumentInvalidError} When a property with name `name` is not defined.
+       *
        * @fires "will:change"
        * @fires "did:change"
        * @fires "rejected:change"
@@ -361,11 +363,11 @@ define([
         
         changeset.set(name, valueSpec);
         
-        if(changeset.hasChanges()) {
+        if(changeset.hasChanges) {
           var executionError = this._change(changeset);
-          if(executionError) return ActionResult.reject(executionError);
-          return ActionResult.fulfill(changeset);
+          return executionError ? ActionResult.reject(executionError) : ActionResult.fulfill(changeset);
         }
+
         return ActionResult.reject(new UserError("Nothing to do"));
       },
 
@@ -378,21 +380,19 @@ define([
        * or `undefined` otherwise.
        *
        * @private
-       * @ignore
        */
       _change: function(changeset) {
         var executionError = this._changeWill(changeset);
-        changeset.freeze();
+
+        changeset._freeze();
+
+        if(!executionError) executionError = this._changeDo(changeset);
+
         if(executionError) {
           this._changeRejected(changeset, executionError);
           return executionError;
         }
 
-        executionError = this._changeDo(changeset);
-        if(executionError) {
-          this._changeRejected(changeset, executionError);
-          return executionError;
-        }
         this._changeDid(changeset);
       },
 

@@ -41,28 +41,45 @@ define([
   return Changeset.extend("pentaho.type.changes.ComplexChangeset", /** @lends pentaho.type.changes.ComplexChangeset#*/{
 
     constructor: function(owner) {
-      if(!owner) throw error.argRequired("owner");
+
       this.base(owner);
 
       this._changes = {};
     },
 
+    /**
+     * Gets the complex value where the changes take place.
+     *
+     * @name pentaho.type.changes.ComplexChangeset#owner
+     * @type {!pentaho.type.Complex}
+     * @readonly
+     */
+
     //region public interface
     /**
-     * @inheritdoc
+     * Gets the type of change.
+     *
+     * @type {string}
+     * @readonly
+     * @default "complex"
      */
     get type() {
-      return "complexChangeset";
+      return "complex";
     },
 
     /**
-     * Asserts if this changeset contains any defined changes.
+     * Gets a value that indicates if this changeset contains any changes.
      *
-     * @return {boolean} `true` if at least one property change is defined,
-     * `false` if no property changes are defined.
+     * @type {boolean}
      */
-    hasChanges: function() {
-      return this.propertyNames.length > 0;
+    get hasChanges() {
+      // Avoid creating an array to know if there are any properties.
+      // Could also add this as an utility method to O.hasAnyOwn(o).
+      for(var p in this._changes)
+        if(O.hasOwn(this._changes, p))
+          return true;
+
+      return false;
     },
 
     /**
@@ -70,31 +87,37 @@ define([
      *
      * @param {nonEmptyString|!pentaho.type.Property.Type} name - The property name or type object.
      *
-     * @return {?pentaho.type.ValueChange} An object describing the changes to be operated
-     * in the given property, or `null` if the property is not defined in this changeset.
+     * @return {?pentaho.type.ValueChange} An object describing the changes to be performed
+     * in the given property, or `null` if the property has not changed.
+     *
+     * @throws {pentaho.lang.ArgumentInvalidError} When a property with name `name` is not defined.
      */
     getChange: function(name) {
       var pName = this.owner.type.get(name).name;
-      return pName ? O.getOwn(this._changes, pName, null) : null;
+      return O.getOwn(this._changes, pName, null);
     },
 
+    // TODO: Doesn't this method break the symmetry with Complex#has ?
+    // Shouldn't it be called `hasChange(name)` ?
+
     /**
-     * Determines if this changeset contains the specified property.
+     * Determines if the given property has changed.
      *
      * @param {nonEmptyString|!pentaho.type.Property.Type} name - The property name or type object.
      *
-     * @return {boolean} `true` if the property exists and is referenced in this changeset,
-     * `false` if the property does not exist or is not referenced.
+     * @return {boolean} `true` if the property has changed, `false` otherwise.
+     *
+     * @throws {pentaho.lang.ArgumentInvalidError} When a property with name `name` is not defined.
      */
     has: function(name) {
       var pName = this.owner.type.get(name).name;
-      return pName && O.hasOwn(this._changes, pName);
+      return O.hasOwn(this._changes, pName);
     },
 
     /**
      * Gets an array with all of the property names contained in this changeset.
      *
-     * @type !string[]
+     * @type {!string[]}
      * @readonly
      */
     get propertyNames() {
@@ -103,10 +126,12 @@ define([
 
 
     /**
-     * Sets the value of a property.
+     * Sets the proposed value of a property.
      *
      * @param {nonEmptyString|!pentaho.type.Property.Type} name - The property name or type object.
-     * @param {(pentaho.type.Value?|pentaho.type.spec.IValue?)} [valueSpec=null] A value specification.
+     * @param {(pentaho.type.Value|pentaho.type.spec.IValue)} valueSpec A value or value specification.
+     *
+     * @throws {pentaho.lang.ArgumentInvalidError} When a property with name `name` is not defined.
      */
     set: function(name, valueSpec) {
       if(!name) throw error.argRequired("name");
@@ -127,71 +152,78 @@ define([
       }
     },
 
+    // TODO: Doesn't this method break the symmetry with Complex#get ?
+    // Should it not return the current value when there are no changes ?
+
     /**
      * Gets the proposed value of a property.
      *
      * @param {nonEmptyString|!pentaho.type.Property.Type} name - The property name or type object.
      *
-     * @return {pentaho.type.Value} The value of the property.
+     * @return {pentaho.type.Value} The value of the property, possibly `null`.
+     *
+     * @throws {pentaho.lang.ArgumentInvalidError} When a property with name `name` is not defined.
      */
     get: function(name) {
-      if(!this.has(name)) return null;
-
       var change = this.getChange(name);
-      if(change.type === "replace")
-        return change._value;
-      else
-        return change.newValue;
+      if(!change) return null;
+
+      return change.type === "replace" ? change._value : change.newValue;
     },
 
+    // TODO: idem. Should it not return the current value when not changed?
     /**
      * Gets the original value of a property.
      *
      * @param {nonEmptyString|!pentaho.type.Property.Type} name - The property name or type object.
      *
      * @return {pentaho.type.Value} The original value of the property (before the change).
+     *
+     * @throws {pentaho.lang.ArgumentInvalidError} When a property with name `name` is not defined.
      */
     getOld: function(name) {
-      if(!this.has(name)) return null;
-
       var change = this.getChange(name);
-      if(change.type === "replace")
-        return this.owner.get(name);
-      else
-        return change.oldValue;
+      if(!change) return null;
+
+      return change.type === "replace" ? this.owner.get(name) : change.owner;
     },
 
     /**
-     * Updates the provided [complex]{@linkplain pentaho.type.Complex} with the changes in this changeset.
-     * If the argument is omitted, the changeset is applying in the owning complex.
+     * Applies the contained changes to the owner complex value or, alternatively, to a given complex value.
      *
-     *  @param {!pentaho.type.Complex} [complex=this.owner] - The [complex]{@linkplain pentaho.type.Complex} object associated with this change.
+     * @param {pentaho.type.Complex} [target] - The value to which changes are applied.
+     *
+     * When unspecified, defaults to {@link pentaho.type.changes.ComplexChangeset#owner}.
      */
-    apply: function(complex) {
-      if(!complex) complex = this.owner;
+    apply: function(target) {
+
+      var isAlternateTarget = !!target && target !== this.owner;
+
+      if(!target) target = this.owner;
 
       this.propertyNames.forEach(function(property) {
-        var change = this.getChange(property);
-        var subject = change.type === "replace" ? complex : complex._values[property];
+        var change = this._changes[property];
+
+        var subject;
+
+        if(change instanceof Changeset) {
+          // Get the corresponding changeset owner in the alternate target.
+          if(isAlternateTarget) subject = target._values[property];
+
+        } else {
+          // PrimitiveChanges require a target to be specified.
+          subject = target;
+        }
+
         change.apply(subject);
       }, this);
     },
     //endregion
 
-    //region protected methods
-    /**
-     * Prevents further changes to this changeset.
-     * @protected
-     */
-    freeze: function() {
-      O.eachOwn(this._changes, function(change) {
-        if(change) change.freeze();
-      });
+    _freeze: function() {
+      O.eachOwn(this._changes, function(change) { change._freeze(); });
       Object.freeze(this._changes);
     }
-
-    //endregion
-
   });
 
 });

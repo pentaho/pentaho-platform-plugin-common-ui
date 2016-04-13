@@ -15,44 +15,53 @@
  */
 
 define([
-  "./OwnedChange"
-], function(OwnedChange) {
+  "./PrimitiveChange"
+], function(PrimitiveChange) {
   "use strict";
 
   /**
    * @name Replace
    * @memberOf pentaho.type.changes
    * @class
-   * @extends pentaho.type.changes.OwnedChange
+   * @extends pentaho.type.changes.PrimitiveChange
    * @amd pentaho/type/changes/Replace
    * @abstract
    *
    * @classDesc Class that describes the replacement of the value in a [single-valued, simple property]{@linkplain pentaho.type.Simple}.
    *
+   * This type of change is always part of a {@link pentaho.type.changes.ComplexChangeset}.
+   *
    * @constructor
    * @description Creates an instance.
-   *
    */
-  return OwnedChange.extend("pentaho.type.changes.Replace", /** @lends pentaho.type.changes.Replace# */{
+  return PrimitiveChange.extend("pentaho.type.changes.Replace", /** @lends pentaho.type.changes.Replace# */{
 
     constructor: function(propertyName, valueSpec) {
       this._propertyName = propertyName;
       this._value = valueSpec;
     },
 
-    get type(){
+    /**
+     * Gets the type of change.
+     *
+     * @type {string}
+     * @readonly
+     * @default "replace"
+     */
+    get type() {
       return "replace";
     },
 
-    /**
-     * Modifies the value of a property in a complex.
-     *
-     * @param {!pentaho.type.Complex} complex - The [complex]{@linkplain pentaho.type.Complex} associated with this change.
-     */
-    apply: function(complex) {
-      var propertyName = this._propertyName;
-      complex._values[propertyName] = complex.type.get(propertyName).toValue(this._value);
-    }
+    // TODO: why doesn't this class expose the value and property name?
 
+    /**
+     * Applies the change to a complex value.
+     *
+     * @param {!pentaho.type.Complex} target - The complex value to apply the change to.
+     */
+    apply: function(target) {
+      var propertyName = this._propertyName;
+      target._values[propertyName] = target.type.get(propertyName).toValue(this._value);
+    }
   });
 });
