@@ -14,53 +14,35 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/changes/ComplexChangeset",
-  "pentaho/type/changes/Replace",
-  "pentaho/lang/Base",
+  "pentaho/type/changes/Changeset",
   "tests/pentaho/util/errorMatch"
-], function(ComplexChangeset, Replace, Base, errorMatch) {
+], function(Changeset, errorMatch) {
   "use strict";
 
   /* global describe:false, it:false, expect:false, beforeEach:false */
 
-  describe("pentaho.type.ComplexChangeset -", function() {
-
-    it("should be defined.", function () {
-      expect(typeof ComplexChangeset).toBeDefined();
+  describe("pentaho.type.changes.Changeset -", function() {
+    it("should be defined", function () {
+      expect(typeof Changeset).toBeDefined();
     });
 
     describe("instance -", function() {
-      var changeset,
-        properties = ["foo", "bar"];
+      function errorOnCreate(value) {
+        expect(function() {
+          new Changeset(value);
+        }).toThrow(errorMatch.argRequired("owner"));
+      }
 
-      var owner = {
-        _values: {
-          "foo": 5,
-          "bar": 6
-        },
-        type: {
-          get: function(name) {
-            return {
-              get isList() { return false; },
-              get name(){ return name;},
-              type: {
-                areEqual: function(v0, v1) {
-                  return v0 === v1;
-                }
-              },
-              toValue: function(value) { return value; }
-            };
-          }
-        },
-        get: function(prop) { return this._values[prop]; }
-      };
+      var owner, changeset;
+      beforeEach(function() {
+        owner = {"foo":"bar"};
+        changeset = new Changeset(owner);
+      });
 
-      beforeEach(function() { 
-        changeset = new ComplexChangeset(owner);
-        changeset._changes = {
-          "foo": new Replace("foo", 10),
-          "bar": new Replace("bar", 11)
-        };
+      it("should throw error when a owner isn't specified", function() {
+        errorOnCreate();
+        errorOnCreate(null);
+        errorOnCreate(undefined);
       });
 
       describe("#owner -", function() {
@@ -75,77 +57,28 @@ define([
         });
       });
 
-      describe("#hasChange -", function() {
-        it("should return `true` if the property exists in the ComplexChangeset", function() {
-          expect(changeset.hasChange("foo")).toBe(true);
+      describe("#newValue -", function() {
+        it("should return undefined", function() {
+          expect(changeset.newValue).not.toBeDefined();
         });
+      });
 
-        it("should return `false` if the property does not exist in the ComplexChangeset", function() {
-          expect(changeset.hasChange("baz")).toBe(false);
+      describe("#oldValue -", function() {
+        it("should return undefined", function() {
+          expect(changeset.oldValue).not.toBeDefined();
         });
-      }); //end #hasChange
+      });
 
-      describe("#getChange -", function() {
-        it("should return `null` if the property does not exist", function() {
-          expect(changeset.hasChange("baz")).toBe(false);
-          expect(changeset.getChange("baz")).toBe(null);
-        });
-
-        it("should return the change object for the given property if it exists", function() {
-          expect(changeset.hasChange("foo")).toBe(true);
-          expect(changeset.getChange("foo")).not.toBe(null);
-        });
-      }); //end #getChange
-
-      describe("#set -", function() {
-        it("should throw an error if property name is `nully`", function() {
-          _setShouldThrow(changeset, undefined, 1);
-          _setShouldThrow(changeset, null, 1);
-          _setShouldThrow(changeset);
-        });
-
-        it("should add a new property to the ComplexChangeset", function() {
-          expect(changeset.hasChange("baz")).toBe(false);
-          changeset.set("baz", 1);
-          expect(changeset.hasChange("baz")).toBe(true);
-        });
-
-        it("should update a property `change` if it already exists in the ComplexChangeset", function() {
-          expect(changeset.getOld("foo").valueOf()).toBe(5);
-          expect(changeset.get("foo").valueOf()).toBe(10);
-
-          changeset.set("foo", 1);
-
-          expect(changeset.getOld("foo").valueOf()).toBe(5);
-          expect(changeset.get("foo").valueOf()).toBe(1);
-        });
-
-        function _setShouldThrow(context, property, value) {
+      describe("#apply -", function() {
+        it("Should throw a `Not Implemented` error", function() {
           expect(function() {
-            context.set(property, value);
-          }).toThrow(errorMatch.argRequired("name"));
-        }
-      }); //end #set
-
-      describe("#propertyNames -", function() {
-        it("should return an array with all property names of the changeset", function() {
-          var propertyNames = changeset.propertyNames;
-          expect(propertyNames.length).toBe(properties.length);
-
-          propertyNames.forEach(function(prop, index) {
-            expect(prop).toBe(properties[index]);
-          });
+            changeset.apply();
+          }).toThrow(errorMatch.notImplemented());
         });
+      });
 
-        it("changeset propertyNames should be immutable", function() {
-          expect(function() {
-            changeset.propertyNames = "foo";
-          }).toThrowError(TypeError);
-        });
-      }); //end #propertyNames
+    });
 
-    }); //end instance
-
-  }); //end pentaho.lang.ComplexChangeset
+  });
 
 });

@@ -235,7 +235,7 @@ define([
      * @param {boolean} update
      * @param {boolean} remove
      * @param {boolean} move
-     * @param {boolean} index
+     * @param {number} index
      * @private
      */
     _set: function(fragment, add, update, remove, move, index) {
@@ -284,7 +284,7 @@ define([
 
           var repeated = O.hasOwn(setKeys, key);
 
-          if((existing = O.getOwn(keys, key)) {
+          if((existing = O.getOwn(keys, key))) {
             if(update && existing !== elem) {
               setKeys[key] = 2;
             } else {

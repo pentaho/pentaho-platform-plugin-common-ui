@@ -282,8 +282,8 @@ define([
        * @param {number} index The index at which to start inserting new elements.
        * @param {?boolean} [silent=false] Indicates that no events should be emitted.
        */
-      insert: function(fragment, index, silent) {
-        this._set(fragment, /*add:*/true, /*update:*/true, /*remove:*/false, /*move:*/false, /*index:*/index, silent);
+      insert: function(fragment, index) {
+        this._set(fragment, /*add:*/true, /*update:*/true, /*remove:*/false, /*move:*/false, /*index:*/index);
       },
 
       /**
@@ -309,17 +309,15 @@ define([
        *
        * @param {number} start Index at which to start removing.
        * @param {number} [count=1] Number of elements to remove.
-       * @param {?boolean} [silent=false] Indicates that no events should be emitted.
        */
-      removeAt: function(start, count, silent) {
-        this._removeAt(start, count, silent);
+      removeAt: function(start, count) {
+        this._removeAt(start, count);
       },
 
       /**
        * Sorts the elements of the list using the given comparer function.
        *
        * @param {function(pentaho.type.Element, pentaho.type.Element) : number} comparer The comparer function.
-       * @param {?boolean} [silent=false] Indicates that no events should be emitted.
        */
       sort: function(comparer) {
         this._sort(comparer);
@@ -409,9 +407,9 @@ define([
 
       //region Core change methods
 
-      _set: function(fragment, add, update, remove, index) {
+      _set: function(fragment, add, update, remove, move, index) {
         var changeset = new ListChangeset(this);
-        changeset._set(fragment, add, update, remove, index);
+        changeset._set(fragment, add, update, remove, move, index);
         if(!this._ownedBy) changeset.apply();
       },
 

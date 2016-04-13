@@ -71,6 +71,7 @@ define([
      * Removes all changes.
      */
     clearChanges: function() {
+      throw error.notImplemented("clearChanges");
     },
 
     /**
@@ -82,7 +83,9 @@ define([
      *
      * @abstract
      */
+
     apply: function(target) {
+      throw error.notImplemented("apply");
     }
   });
 });
