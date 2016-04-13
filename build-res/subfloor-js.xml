@@ -84,8 +84,30 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   <!-- List of comma-separated paths to jsdoc configuration files -->
   <property name="jsdoc.json" value=""/>
 
-  <property environment="env"/>
-
+  <!-- prepare environment.path -->
+  <target name="prepare.environment.path" depends="install-antcontrib">
+	<property environment="env"/>
+	<if>
+	  <not>
+	    <contains string="${env.Path}" substring="env.Path"/>
+	  </not>
+      <then>
+	    <property name="environment.path" value="${env.Path}" />
+      </then>
+      <elseif>
+	    <not>
+          <contains string="${env.PATH}" substring="env.PATH"/>
+		</not>
+        <then>
+           <property name="environment.path" value="${env.PATH}" />
+        </then>
+      </elseif>
+      <else>
+         <fail>The environment Path was not found.</fail>
+      </else>
+    </if>
+  </target>
+  
   <target name="js.clean"
           description="Cleans all the files generated from a build with the exception of IVY-downloaded jars (see clean-all)">
     <delete dir="${js.module.script.agg.dir}"/>
@@ -176,7 +198,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     </if>
   </target>
 
-  <target name="build-js" depends="extract-source-and-build-require-js-profile">
+  <target name="build-js" depends="extract-source-and-build-require-js-profile, prepare.environment.path">
     <echo message="js.module.script.agg.dir: ${js.module.script.agg.dir}"/>
 
     <delete dir="${js.build.output.dir}"/>
@@ -190,14 +212,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
     <mkdir dir="${js.build.output.dir}"/>
 
-    <property environment="env"/>
     <if>
       <isset property="isWindows"/>
       <then>
-        <available file="node.exe" filepath="${env.PATH}" property="node-is-available"/>
+        <available file="node.exe" filepath="${environment.path}" property="node-is-available"/>
       </then>
       <else>
-        <available file="node" filepath="${env.PATH}" property="node-is-available"/>
+        <available file="node" filepath="${environment.path}" property="node-is-available"/>
       </else>
     </if>
 
@@ -400,11 +421,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     </if>
   </target>
 
-  <!-- Check to see if karma is on the PATH -->
-  <available file="karma.cmd" filepath="${env.PATH}" property="karma-for-windows-is-available"/>
-
-  <target name="test-js" depends="install-antcontrib, npm-install, extract-source-and-build-require-js-profile">
-    <if>
+  <target name="test-js" depends="install-antcontrib, prepare.environment.path, npm-install, extract-source-and-build-require-js-profile">
+     <!-- Check to see if karma is on the PATH -->
+    <available file="karma.cmd" filepath="${environment.path}" property="karma-for-windows-is-available"/>
+	<if>
       <available file="${js.karma.ci.config}"/>
       <then>
         <!-- we have karma available, use it to run the tests -->
@@ -416,7 +436,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                   <isset property="karma-for-windows-is-available"/>
                 </not>
                 <then>
-                  <fail>Run 'npm install -g karma-cli' [adds karma.cmd to the command line]</fail>
+                  <fail>Run "npm install karma --save-dev" from project folder ( prepare karma modules in project folder )</fail>
                 </then>
               </if>
               <exec executable="karma.cmd" failonerror="${js.karma.failonerror}">
@@ -442,8 +462,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     </if>
   </target>
 
-  <target name="karma-server" depends="install-antcontrib, npm-install, extract-source-and-build-require-js-profile">
-    <if>
+  <target name="karma-server" depends="install-antcontrib, prepare.environment.path, npm-install, extract-source-and-build-require-js-profile">
+    <!-- Check to see if karma is on the PATH -->
+    <available file="karma.cmd" filepath="${environment.path}" property="karma-for-windows-is-available"/>
+	<if>
       <not>
         <available file="${js.karma.config}"/>
       </not>
@@ -459,7 +481,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                 <isset property="karma-for-windows-is-available"/>
               </not>
               <then>
-                <fail>Run 'npm install -g karma-cli' [adds karma.cmd to the command line]</fail>
+                <fail>Run "npm install karma --save-dev" from project folder ( prepare karma modules in project folder )</fail>
               </then>
             </if>
             <exec executable="karma.cmd">
@@ -479,10 +501,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
   </target>
 
-  <!-- Property to check if the jsdoc command is available for windows -->
-  <available file="jsdoc.cmd" filepath="${env.Path}" property="jsdoc-for-windows-is-available"/>
-
-	<!-- Top-level JS Documentation target for default template output -->
+  <!-- Top-level JS Documentation target for default template output -->
   <target name="doc-js">
     <antcall target="doc-many-js" />
   </target>
@@ -502,7 +521,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   </target>
 
   <!-- Target to execute jsdoc -->
-  <target name="doc-one-js">
+  <target name="doc-one-js" depends="prepare.environment.path" >
+    <!-- Property to check if the jsdoc command is available for windows -->
+    <available file="jsdoc.cmd" filepath="${environment.path}" property="jsdoc-for-windows-is-available"/>
     <if>
       <available file="${jsdoc-one.json}" />
       <then>
