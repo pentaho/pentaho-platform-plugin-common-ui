@@ -92,6 +92,7 @@ define([
                 /*add:*/true,
                 /*update:*/false,
                 /*remove:*/false,
+                /*move:*/false,
                 /*index:*/0,
                 /*silent:*/true);
           }
@@ -237,6 +238,7 @@ define([
        *
        * @param {boolean} [keyArgs.noAdd=false] Prevents adding new elements to the list.
        * @param {boolean} [keyArgs.noRemove=false] Prevents removing elements not present in `fragment` from the list.
+       * @param {boolean} [keyArgs.noMove=false] Prevents moving elements inside the list.
        * @param {boolean} [keyArgs.noUpdate=false] Prevents updating elements already present in the list.
        *
        * @param {number} [keyArgs.index] The index at which to add new elements.
@@ -249,6 +251,7 @@ define([
             !arg.optional(keyArgs, "noAdd"),
             !arg.optional(keyArgs, "noUpdate"),
             !arg.optional(keyArgs, "noRemove"),
+            !arg.optional(keyArgs, "noMove"),
             arg.optional(keyArgs, "index"));
       },
 
@@ -263,7 +266,7 @@ define([
        * @return {pentaho.type.List} The added list element.
        */
       add: function(fragment) {
-        this._set(fragment, /*add:*/true, /*update:*/true, /*remove:*/false);
+        this._set(fragment, /*add:*/true, /*update:*/true, /*remove:*/false, /*move:*/false);
       },
 
       /**
@@ -280,7 +283,7 @@ define([
        * @param {?boolean} [silent=false] Indicates that no events should be emitted.
        */
       insert: function(fragment, index, silent) {
-        this._set(fragment, /*add:*/true, /*update:*/true, /*remove:*/false, /*index:*/index, silent);
+        this._set(fragment, /*add:*/true, /*update:*/true, /*remove:*/false, /*move:*/false, /*index:*/index, silent);
       },
 
       /**
@@ -405,7 +408,7 @@ define([
       //endregion
 
       //region Core change methods
-      
+
       _set: function(fragment, add, update, remove, index) {
         var changeset = new ListChangeset(this);
         changeset._set(fragment, add, update, remove, index);

@@ -75,9 +75,13 @@ define([
     get hasChanges() {
       // Avoid creating an array to know if there are any properties.
       // Could also add this as an utility method to O.hasAnyOwn(o).
-      for(var p in this._changes)
-        if(O.hasOwn(this._changes, p))
-          return true;
+      var changes = this._changes;
+      for(var p in changes)
+        if(O.hasOwn(changes, p)){
+          var change = changes[p];
+          if(!(change instanceof Changeset) || change.hasChanges)
+            return true;
+        }
 
       return false;
     },

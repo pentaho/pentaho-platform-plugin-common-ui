@@ -18,14 +18,14 @@ define([
   "./Changeset",
   "./Add",
   "./Remove",
-  "./Remove",
+  "./Move",
   "./Update",
   "./Sort",
   "./Clear",
   "../../util/arg",
   "../../util/object"
 ], function(Changeset,
-            Add, RemoveOne, Remove, Update, Sort, Clear,
+            Add, Remove, Move, Update, Sort, Clear,
             arg, O) {
   "use strict";
 
@@ -160,6 +160,7 @@ define([
      *
      * @param {boolean} [keyArgs.noAdd=false] Prevents adding new elements to the list.
      * @param {boolean} [keyArgs.noRemove=false] Prevents removing elements not present in `fragment` from the list.
+     * @param {boolean} [keyArgs.noMove=false] Prevents moving elements inside the list.
      * @param {boolean} [keyArgs.noUpdate=false] Prevents updating elements already present in the list.
      *
      * @param {number} [keyArgs.index] The index at which to add new elements.
@@ -172,6 +173,7 @@ define([
         !arg.optional(keyArgs, "noAdd"),
         !arg.optional(keyArgs, "noUpdate"),
         !arg.optional(keyArgs, "noRemove"),
+        !arg.optional(keyArgs, "noMove"),
         arg.optional(keyArgs, "index")
       );
     },
@@ -232,10 +234,11 @@ define([
      * @param {boolean} add
      * @param {boolean} update
      * @param {boolean} remove
+     * @param {boolean} move
      * @param {boolean} index
      * @private
      */
-    _set: function(fragment, add, update, remove, index) {
+    _set: function(fragment, add, update, remove, move, index) {
       var list = this.newValue, // calculate relative the last change
         elems = list._elems,
         keys = list._keys,
@@ -253,39 +256,108 @@ define([
       }
 
       var setElems = Array.isArray(fragment) ? fragment : [fragment];
-      // Index of elements in setElems, by key.
-      // In the end, this is used to efficiently lookup which elems _not_ to remove.
-      var setKeys = remove ? {} : null;
 
-      // I - Add/Update Cycle
+      // Index of elements in setElems, by key.
+      // In the end, this is used to efficiently lookup
+      // which elems _not_ to remove and to update.
+      // undefined: Existing element, removed
+      // 1: Existing element, not updated
+      // 2: Existing element, updated
+      var setKeys = {};
+
+      var computed = [];
+
+      var newElements = [];
+      var baseIndex = index;
+      var relativeIndex = 0;
+
+      // I - Pre-process setElems array
       var i = -1, L = setElems.length;
       while(++i < L) {
         if((elem = list._cast(setElems[i])) != null) {
           key = elem.key;
 
-          // Store input keys for removal loop, below.
-          if(remove) setKeys[key] = 1;
-
           if((existing = O.getOwn(keys, key) || O.getOwn(addKeys, key))) {
             if(update && existing !== elem) {
-              // This may trigger change events, that, in turn, may
-              // perform further list changes and reenter `List#_set`.
-              this._updateOne(existing, elem);
+              setKeys[key] = 2;
+            } else {
+              setKeys[key] = 1;
+            }
+
+            if(!newElements.length) {
+              ++baseIndex;
+            } else {
+              relativeIndex++;
             }
           } else if(add) {
-            this._insertOne(elem, index++);
+            newElements.push({type: "add", value: elem, to: relativeIndex++});
           }
         }
       }
 
-      // II - Remove Cycle
-      if(remove) {
-        elems = list._elems;
-        i = elems.length;
-        while(i) {
-          --i;
-          elem = elems[i];
-          if(!O.hasOwn(setKeys, elem.key)) this._removeOne(elem, i); // TODO: <<-- index is wrong...
+      // II - Process removes and build computed array
+      var realBaseIndex = baseIndex;
+
+      i = -1, L = elems.length;
+      while(++i < L) {
+        elem = elems[i];
+        key = elem.key;
+
+        if(!O.hasOwn(setKeys, key)) {
+          if(remove) {
+            if(i < baseIndex) {
+              --realBaseIndex;
+            }
+
+            this._removeOne(elem, i);
+          } else {
+            computed.push(key);
+          }
+        } else {
+          computed.push(key);
+        }
+      }
+
+      // III - Process adds
+      if(add) {
+        i = -1, L = newElements.length;
+        while (++i < L) {
+          var action = newElements[i];
+
+          var newIndex = realBaseIndex + action.to;
+          if (action.type === "add") {
+            this._insertOne(action.value, newIndex);
+
+            computed.splice(newIndex, 0, action.value.key);
+          }
+        }
+      }
+
+      // Moves only make sense on a proper set()
+      move = move && computed.length === setElems.length;
+
+      // IV - Process moves and updates
+      if(move || update) {
+        i = -1, L = setElems.length;
+        while(++i < L) {
+          if((elem = list._cast(setElems[i])) != null) {
+            if(move) {
+              var currentIndex = computed.indexOf(elem.key, i);
+              if (currentIndex !== i) {
+                this._moveOne(elem, currentIndex, i);
+
+                computed.splice(i, 0, computed.splice(currentIndex, 1)[0]);
+              }
+            }
+
+            if(update && setKeys[elem.key] === 2) {
+              existing = O.getOwn(keys, elem.key) || O.getOwn(addKeys, elem.key);
+
+              // This may trigger change events, that, in turn, may
+              // perform further list changes and reenter `List#_set`.
+              this._updateOne(existing, elem, i);
+            }
+          }
         }
       }
     },
@@ -383,6 +455,22 @@ define([
     _removeOne: function(elem, index) {
       this._removeKeys[elem.key] = elem;
       this._addChange(new Remove([elem], index));
+    },
+
+    /**
+     * Creates an operation that moves an element inside the list,
+     * and appends that operation to the list of changes.
+     *
+     * @param {!pentaho.type.Element} elem - The object to be moved in the list.
+     * @param {number} fromIndex - The index of the element in the list.
+     * @param {number} toIndex - The new index of the element in the list.
+     *
+     * @see pentaho.type.changes.Move
+     * @private
+     */
+    _moveOne: function(elem, fromIndex, toIndex) {
+      this._removeKeys[elem.key] = elem;
+      this._addChange(new Move([elem], fromIndex, toIndex));
     },
 
     /**
