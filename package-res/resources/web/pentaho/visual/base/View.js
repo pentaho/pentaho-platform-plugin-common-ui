@@ -223,6 +223,7 @@ define([
      * @protected
      */
     _onChange: function(changeset) {
+      console.log(changeset);
       if(!changeset.hasChanges) return;
 
       var exclusionList = {
@@ -236,15 +237,15 @@ define([
       });
       if(fullUpdate) return this.render();
 
-      var updateSelection = changeset.has("selectionFilter");
+      var updateSelection = changeset.hasChange("selectionFilter");
       if(updateSelection){
-        var selectionFilterChange = changeset.getChange("selectionFilter");
-        var newValue = changeset.get("selectionFilter"); //selectionFilterChange.newValue;
-        var oldValue = changeset.getOld("selectionFilter"); //selectionFilterChange.oldValue;
+
+        var newValue = changeset.get("selectionFilter");
+        var oldValue = changeset.getOld("selectionFilter");
         this._selectionChanged(newValue.value, oldValue != null ? oldValue.value : null );
       }
 
-      var updateSize = changeset.has("width") || changeset.has("height");
+      var updateSize = changeset.hasChange("width") || changeset.hasChange("height");
       if(updateSize) this._resize();
     }
   });

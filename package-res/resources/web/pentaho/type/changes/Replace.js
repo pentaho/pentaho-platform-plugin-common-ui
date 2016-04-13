@@ -37,8 +37,8 @@ define([
   return PrimitiveChange.extend("pentaho.type.changes.Replace", /** @lends pentaho.type.changes.Replace# */{
 
     constructor: function(propertyName, valueSpec) {
-      this._propertyName = propertyName;
-      this._value = valueSpec;
+      this.propertyName = propertyName;
+      this.value = valueSpec;
     },
 
     /**
@@ -52,16 +52,14 @@ define([
       return "replace";
     },
 
-    // TODO: why doesn't this class expose the value and property name?
-
     /**
      * Applies the change to a complex value.
      *
      * @param {!pentaho.type.Complex} target - The complex value to apply the change to.
      */
     apply: function(target) {
-      var propertyName = this._propertyName;
-      target._values[propertyName] = target.type.get(propertyName).toValue(this._value);
+      var propertyName = this.propertyName;
+      target._values[propertyName] = target.type.get(propertyName).toValue(this.value);
     }
   });
 });

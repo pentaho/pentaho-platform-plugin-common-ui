@@ -73,17 +73,16 @@ define([
      * @type {boolean}
      */
     get hasChanges() {
-      // Avoid creating an array to know if there are any properties.
-      // Could also add this as an utility method to O.hasAnyOwn(o).
-      var changes = this._changes;
-      for(var p in changes)
-        if(O.hasOwn(changes, p)){
-          var change = changes[p];
-          if(!(change instanceof Changeset) || change.hasChanges)
-            return true;
-        }
+      var hasChanges = false;
 
-      return false;
+      O.eachOwn(this._changes, function(change){
+        if(!(change instanceof Changeset) || change.hasChanges){
+          hasChanges = true;
+          return false;
+        }
+      });
+
+      return hasChanges;
     },
 
     /**
@@ -101,9 +100,6 @@ define([
       return O.getOwn(this._changes, pName, null);
     },
 
-    // TODO: Doesn't this method break the symmetry with Complex#has ?
-    // Shouldn't it be called `hasChange(name)` ?
-
     /**
      * Determines if the given property has changed.
      *
@@ -113,7 +109,7 @@ define([
      *
      * @throws {pentaho.lang.ArgumentInvalidError} When a property with name `name` is not defined.
      */
-    has: function(name) {
+    hasChange: function(name) {
       var pName = this.owner.type.get(name).name;
       return O.hasOwn(this._changes, pName);
     },
@@ -156,9 +152,6 @@ define([
       }
     },
 
-    // TODO: Doesn't this method break the symmetry with Complex#get ?
-    // Should it not return the current value when there are no changes ?
-
     /**
      * Gets the proposed value of a property.
      *
@@ -170,12 +163,11 @@ define([
      */
     get: function(name) {
       var change = this.getChange(name);
-      if(!change) return null;
+      if(!change) return this.owner.get(name); //returns the current value when there are no changes
 
-      return change.type === "replace" ? change._value : change.newValue;
+      return change.type === "replace" ? change.value : change.newValue;
     },
 
-    // TODO: idem. Should it not return the current value when not changed?
     /**
      * Gets the original value of a property.
      *
@@ -187,9 +179,9 @@ define([
      */
     getOld: function(name) {
       var change = this.getChange(name);
-      if(!change) return null;
+      if(!change) return this.owner.get(name); // returns the current value when not changed
 
-      return change.type === "replace" ? this.owner.get(name) : change.owner;
+      return change instanceof Changeset ? change.owner : this.owner.get(name);
     },
 
     /**

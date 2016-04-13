@@ -75,24 +75,24 @@ define([
         });
       });
 
-      describe("#has -", function() {
+      describe("#hasChange -", function() {
         it("should return `true` if the property exists in the ComplexChangeset", function() {
-          expect(changeset.has("foo")).toBe(true);
+          expect(changeset.hasChange("foo")).toBe(true);
         });
 
         it("should return `false` if the property does not exist in the ComplexChangeset", function() {
-          expect(changeset.has("baz")).toBe(false);
+          expect(changeset.hasChange("baz")).toBe(false);
         });
-      }); //end #has
+      }); //end #hasChange
 
       describe("#getChange -", function() {
         it("should return `null` if the property does not exist", function() {
-          expect(changeset.has("baz")).toBe(false);
+          expect(changeset.hasChange("baz")).toBe(false);
           expect(changeset.getChange("baz")).toBe(null);
         });
 
         it("should return the change object for the given property if it exists", function() {
-          expect(changeset.has("foo")).toBe(true);
+          expect(changeset.hasChange("foo")).toBe(true);
           expect(changeset.getChange("foo")).not.toBe(null);
         });
       }); //end #getChange
@@ -105,9 +105,9 @@ define([
         });
 
         it("should add a new property to the ComplexChangeset", function() {
-          expect(changeset.has("baz")).toBe(false);
+          expect(changeset.hasChange("baz")).toBe(false);
           changeset.set("baz", 1);
-          expect(changeset.has("baz")).toBe(true);
+          expect(changeset.hasChange("baz")).toBe(true);
         });
 
         it("should update a property `change` if it already exists in the ComplexChangeset", function() {

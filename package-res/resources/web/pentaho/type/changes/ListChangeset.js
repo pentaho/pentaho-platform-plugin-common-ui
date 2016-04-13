@@ -186,14 +186,14 @@ define([
      * When unspecified, defaults to {@link pentaho.type.changes.ListChangeset#owner}.
      */
     apply: function(target) {
-      this._apply(target || this.owner, 0);
-      return;
-      // TODO: When list is owner and _newValue is (partially?) calculated
-      // should we not be swapping their internal data structures instead of applying again?
+      if(!target) target = this.owner;
       if(target === this.owner && this._newValue){
-        this.owner.configure(this.newValue);
+        var newValue = this.newValue;
+        this.owner._elems = newValue._elems;
+        this.owner._keys = newValue._keys;
+        this._newValue = null;
       } else {
-        this._apply(target || this.owner, 0);
+        this._apply(target, 0);
       }
     },
 
@@ -298,7 +298,7 @@ define([
       // II - Process removes and build computed array
       var realBaseIndex = baseIndex;
 
-      i = -1, L = elems.length;
+      i = -1; L = elems.length;
       while(++i < L) {
         elem = elems[i];
         key = elem.key;
@@ -320,7 +320,7 @@ define([
 
       // III - Process adds
       if(add) {
-        i = -1, L = newElements.length;
+        i = -1; L = newElements.length;
         while (++i < L) {
           var action = newElements[i];
 
@@ -338,7 +338,7 @@ define([
 
       // IV - Process moves and updates
       if(move || update) {
-        i = -1, L = setElems.length;
+        i = -1; L = setElems.length;
         while(++i < L) {
           if((elem = list._cast(setElems[i])) != null) {
             if(move) {
