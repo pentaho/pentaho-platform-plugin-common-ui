@@ -255,7 +255,7 @@ define([
           : Math.min(index, elems.length);
       }
 
-      var setElems = Array.isArray(fragment) ? fragment.splice() : [fragment];
+      var setElems = Array.isArray(fragment) ? fragment.slice() : [fragment];
 
       // Index of elements in setElems, by key.
       // This is used to detect duplicate values and to efficiently
@@ -268,7 +268,6 @@ define([
       // 3: Non-existing element, added
       var setKeys = {};
 
-      var stripped_input = [];
       var computed = [];
 
       var newElements = [];
