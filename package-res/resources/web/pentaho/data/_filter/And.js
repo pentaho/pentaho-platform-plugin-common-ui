@@ -14,10 +14,8 @@
  * limitations under the License.
  */
 define([
-  "./AbstractTreeFilter",
-  "require",
-  "./Or"
-], function(AbstractTreeFilter, require, Or) {
+  "./AbstractTreeFilter"
+], function(AbstractTreeFilter) {
   "use strict";
 
   /**

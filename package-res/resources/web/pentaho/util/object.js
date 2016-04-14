@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define(["pentaho/util/has"], function(has) {
+define(["./has"], function(has) {
   "use strict";
 
   var O_hasOwn = Object.prototype.hasOwnProperty,

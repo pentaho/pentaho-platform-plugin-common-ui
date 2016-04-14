@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 define([
-  "pentaho/lang/Base"
+  "../../lang/Base"
 ], function(Base) {
   "use strict";
 
