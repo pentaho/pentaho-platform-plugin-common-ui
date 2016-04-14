@@ -17,43 +17,46 @@ define([
   "pentaho/type/Context",
   "pentaho/type/list",
   "pentaho/type/number",
-  "pentaho/type/changes/Add"
-], function(Context, listFactory, numberFactory, Add) {
+  "pentaho/type/changes/Move"
+], function(Context, listFactory, numberFactory, Move) {
   "use strict";
 
   /* global describe:false, it:false, expect:false, beforeEach:false */
 
   var context = new Context(),
-      List = context.get(listFactory),
-      PentahoNumber = context.get(numberFactory);
+    List = context.get(listFactory),
+    PentahoNumber = context.get(numberFactory);
 
   var NumberList = List.extend({
     type: {of: PentahoNumber}
   });
 
-  describe("pentaho.type.changes.Add -", function() {
+  describe("pentaho.type.changes.Move -", function() {
     it("should be defined", function () {
-      expect(typeof Add).toBeDefined();
+      expect(typeof Move).toBeDefined();
     });
 
     describe("instance -", function() {
       describe("#type -", function() {
-        it("should return a string with the value `add`", function() {
-          var change = new Add({}, 0, "key");
-          expect(change.type).toBe("add");
+        it("should return a string with the value `move`", function() {
+          var change = new Move();
+          expect(change.type).toBe("move");
         });
       });
 
-      describe("#_apply -", function() {
-        it("should add a new element", function() {
-          var list = new NumberList([]);
-          var elem = list._cast(0);
-          var change = new Add(elem, elem.key, 0);
+      describe("#apply -", function() {
+        //TODO: change test
+        it("should move a element from the original position to the destination", function() {
+          var list = new NumberList([1, 2, 3]);
+          var elem = list.at(3);
+          var change = new Move(elem, 2, 1);
 
-          change._apply(list);
+          change.apply(list);
 
-          expect(list.count).toBe(1);
-          expect(list.at(0)).toBe(elem);
+          expect(list.count).toBe(3);
+          expect(list.at(0).value).toBe(1);
+          expect(list.at(1).value).toBe(3);
+          expect(list.at(2).value).toBe(2);
         });
       });
 

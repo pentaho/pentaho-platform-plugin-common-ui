@@ -41,7 +41,6 @@ define([
   return Changeset.extend("pentaho.type.changes.ComplexChangeset", /** @lends pentaho.type.changes.ComplexChangeset#*/{
 
     constructor: function(owner) {
-
       this.base(owner);
 
       this._changes = {};
@@ -123,7 +122,6 @@ define([
     get propertyNames() {
       return Object.keys(this._changes);
     },
-
 
     /**
      * Sets the proposed value of a property.

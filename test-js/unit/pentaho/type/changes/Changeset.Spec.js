@@ -45,6 +45,7 @@ define([
         errorOnCreate(undefined);
       });
 
+      //region #owner
       describe("#owner -", function() {
         it("should return the same owner that was passed to the constructor", function() {
           expect(changeset.owner).toBe(owner);
@@ -55,27 +56,50 @@ define([
             changeset.owner = "foo";
           }).toThrowError(TypeError);
         });
-      });
+      }); //endregion #owner
 
+      //region #hasChanges
+      describe("#hasChanges -", function() {
+        it("Should always return `false`", function() {
+            changeset.hasChanges;
+        });
+      }); //endregion #hasChanges
+
+      //region #newValue
       describe("#newValue -", function() {
         it("should return undefined", function() {
           expect(changeset.newValue).not.toBeDefined();
         });
-      });
+      }); //endregion #newValue
 
+      //region #oldValue
       describe("#oldValue -", function() {
         it("should return undefined", function() {
           expect(changeset.oldValue).not.toBeDefined();
         });
-      });
+      }); //endregion #oldValue
 
+      //region #apply
       describe("#apply -", function() {
+        //TODO: change test
         it("Should throw a `Not Implemented` error", function() {
           expect(function() {
             changeset.apply();
           }).toThrow(errorMatch.notImplemented());
         });
-      });
+      }); //endregion #apply
+
+      //region #clearChanges
+      describe("#clearChanges -", function() {
+        it("Should throw a `Not Implemented` error", function() {
+          expect(function() {
+            changeset.clearChanges();
+          }).toThrow(errorMatch.notImplemented());
+        });
+      }); //endregion #clearChanges
+
     });
+  
   });
+
 });

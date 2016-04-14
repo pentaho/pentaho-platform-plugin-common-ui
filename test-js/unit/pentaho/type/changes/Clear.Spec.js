@@ -17,43 +17,43 @@ define([
   "pentaho/type/Context",
   "pentaho/type/list",
   "pentaho/type/number",
-  "pentaho/type/changes/Add"
-], function(Context, listFactory, numberFactory, Add) {
+  "pentaho/type/changes/Clear"
+], function(Context, listFactory, numberFactory, Clear) {
   "use strict";
 
   /* global describe:false, it:false, expect:false, beforeEach:false */
 
   var context = new Context(),
-      List = context.get(listFactory),
-      PentahoNumber = context.get(numberFactory);
+    List = context.get(listFactory),
+    PentahoNumber = context.get(numberFactory);
 
   var NumberList = List.extend({
     type: {of: PentahoNumber}
   });
 
-  describe("pentaho.type.changes.Add -", function() {
+  describe("pentaho.type.changes.Clear -", function() {
     it("should be defined", function () {
-      expect(typeof Add).toBeDefined();
+      expect(typeof Clear).toBeDefined();
     });
 
     describe("instance -", function() {
       describe("#type -", function() {
-        it("should return a string with the value `add`", function() {
-          var change = new Add({}, 0, "key");
-          expect(change.type).toBe("add");
+        it("should return a string with the value `clear`", function() {
+          var change = new Clear();
+          expect(change.type).toBe("clear");
         });
       });
 
-      describe("#_apply -", function() {
-        it("should add a new element", function() {
-          var list = new NumberList([]);
-          var elem = list._cast(0);
-          var change = new Add(elem, elem.key, 0);
+      describe("#apply -", function() {
+        //TODO: change test
+        it("should remove all elements from a list", function() {
+          var list = new NumberList([1, 2, 3]);
+          var change = new Clear();
+          expect(list.count).toBe(3);
 
-          change._apply(list);
+          change.apply(list);
 
-          expect(list.count).toBe(1);
-          expect(list.at(0)).toBe(elem);
+          expect(list.count).toBe(0);
         });
       });
 
