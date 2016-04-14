@@ -17,22 +17,22 @@ define([
   "pentaho/type/changes/ComplexChangeset",
   "pentaho/type/changes/ListChangeset",
   "pentaho/type/changes/Replace",
+  "pentaho/type/changes/Add",
   "pentaho/type/Context",
   "pentaho/type/complex",
   "pentaho/type/list",
   "pentaho/type/number",
   "pentaho/lang/Base",
   "tests/pentaho/util/errorMatch"
-], function(ComplexChangeset, ListChangeset, Replace,
+], function(ComplexChangeset, ListChangeset, Replace, Add,
             Context, complexFactory, listFactory, numberFactory, Base, errorMatch) {
   "use strict";
 
   /* global describe:false, it:false, expect:false, beforeEach:false */
 
   var context = new Context(),
-    Complex = context.get(complexFactory),
-    List = context.get(listFactory),
-    PentahoNumber = context.get(numberFactory);
+      List = context.get(listFactory),
+      PentahoNumber = context.get(numberFactory);
 
   var NumberList = List.extend({
     type: {of: PentahoNumber}
@@ -45,13 +45,13 @@ define([
     });
 
     describe("instance -", function() {
-      var changeset, owner, listChangeset,
-        myList = new NumberList([1]),
-        properties = ["foo", "bar", "myList"];
+      var changeset, owner, listChangeset, myList,
+          properties = ["foo", "bar", "myList"];
 
       beforeEach(function() {
+        myList = new NumberList([1]);
         listChangeset = new ListChangeset(myList);
-        listChangeset._insertOne(new PentahoNumber(3), 1);
+        listChangeset._addChange(new Add(new PentahoNumber(3), 1));
 
         owner = {
           _values: {
@@ -240,20 +240,7 @@ define([
           };
         });
 
-        it("should apply changes to the complex provided and don't change its own", function() {
-          var Derived = Complex.extend({
-            type: {props: [{name: "foo", type: "number"}]}
-          });
-          var complex = new Derived({foo: 10});
-
-          expect(complex.get("foo").valueOf()).toBe(10);
-          changeset.apply(complex);
-
-          expect(complex.get("foo").valueOf()).toBe(12);
-          expect(changeset.owner.get("foo").valueOf()).toBe(5);
-        });
-
-        it("should apply changes to its own complex when none is provided", function() {
+        it("should apply changes to its own complex", function() {
           var complex = changeset.owner;
 
           expect(complex.get("foo").valueOf()).toBe(5);
@@ -262,7 +249,7 @@ define([
           expect(complex.get("foo").valueOf()).toBe(12);
         });
 
-        it("Should apply all changes inside a ListChangeset by applying all the changes present in the ComplexChangeset",
+        it("should apply all changes inside a ListChangeset by applying all the changes present in the ComplexChangeset",
           function() {
             changeset._changes["myList"] = listChangeset;
 
@@ -276,16 +263,6 @@ define([
             expect(myList.at(1).value).toBe(3);
         });
       }); //endregion #apply
-
-      //region #_freeze
-      describe("#_freeze -", function() {
-        it("should freeze it self and call the freeze method for all changes", function() {
-          spyOn(Object, "freeze");
-          
-          changeset._freeze();
-          expect(Object.freeze.calls.count() > 1).toBe(true);
-        });
-      }); //endregion #_freeze
     }); //end instance
 
   }); //end pentaho.lang.ComplexChangeset

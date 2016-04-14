@@ -45,17 +45,16 @@ define([
      * @readonly
      * @abstract
      */
-    
+
     /**
-     * Prevents further changes to this changeset.
+     * Applies the contained changes to a given structured value.
      *
-     * The default implementation freezes the change object using `Object.freeze`.
-     *
-     * @protected
+     * @name _apply
+     * @memberOf pentaho.type.changes.Change#
+     * @method
+     * @param {!pentaho.type.UStructuredValue} target - The structured value to which changes are applied.
+     * @abstract
      */
-    _freeze: function() {
-      Object.freeze(this);
-    }
   });
 });
 

@@ -52,12 +52,7 @@ define([
       return "replace";
     },
 
-    /**
-     * Applies the change to a complex value.
-     *
-     * @param {!pentaho.type.Complex} target - The complex value to apply the change to.
-     */
-    apply: function(target) {
+    _apply: function(target) {
       var propertyName = this.propertyName;
       target._values[propertyName] = target.type.get(propertyName).toValue(this.value);
     }

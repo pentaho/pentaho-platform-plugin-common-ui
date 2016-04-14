@@ -75,8 +75,8 @@ define([
     get hasChanges() {
       var hasChanges = false;
 
-      O.eachOwn(this._changes, function(change){
-        if(!(change instanceof Changeset) || change.hasChanges){
+      O.eachOwn(this._changes, function(change) {
+        if(!(change instanceof Changeset) || change.hasChanges) {
           hasChanges = true;
           return false;
         }
@@ -132,9 +132,13 @@ define([
      * @param {(pentaho.type.Value|pentaho.type.spec.IValue)} valueSpec A value or value specification.
      *
      * @throws {pentaho.lang.ArgumentInvalidError} When a property with name `name` is not defined.
+     *
+     * @throws {pentaho.lang.OperationInvalid} When the changeset has already been applied or rejected.
      */
     set: function(name, valueSpec) {
       if(!name) throw error.argRequired("name");
+
+      this._assertMutable();
 
       var owner = this.owner;
       var pType = owner.type.get(name);
@@ -142,7 +146,8 @@ define([
       var value0 = owner._values[pType.name];
 
       if(pType.isList) {
-        this._changes[pName] = new ListChangeset(value0, valueSpec);
+        // Enlists back a list changeset!
+        value0.set(valueSpec);
       } else {
         var value1 = pType.toValue(valueSpec);
 
@@ -184,42 +189,32 @@ define([
       return change instanceof Changeset ? change.owner : this.owner.get(name);
     },
 
-    /**
-     * Applies the contained changes to the owner complex value or, alternatively, to a given complex value.
-     *
-     * @param {pentaho.type.Complex} [target] - The value to which changes are applied.
-     *
-     * When unspecified, defaults to {@link pentaho.type.changes.ComplexChangeset#owner}.
-     */
-    apply: function(target) {
+    _apply: function(target) {
 
-      var isAlternateTarget = !!target && target !== this.owner;
-
-      if(!target) target = this.owner;
+      var isAlternateTarget = target !== this.owner;
 
       this.propertyNames.forEach(function(property) {
-        var change = this._changes[property];
-
-        var subject;
-
+        var change = this[property];
         if(change instanceof Changeset) {
           // Get the corresponding changeset owner in the alternate target.
-          if(isAlternateTarget) subject = target._values[property];
+          if(isAlternateTarget)
+            change._apply(target._values[property]);
+          else
+            change.apply();
 
         } else {
-          // PrimitiveChanges require a target to be specified.
-          subject = target;
+          change._apply(target);
         }
-
-        change.apply(subject);
-      }, this);
+      }, this._changes);
     },
-    //endregion
 
-    _freeze: function() {
-      O.eachOwn(this._changes, function(change) { change._freeze(); });
-      Object.freeze(this._changes);
+    _reject: function() {
+      this.propertyNames.forEach(function(property) {
+        var change = this[property];
+        if(change instanceof Changeset) change.reject();
+      }, this._changes);
     }
+    //endregion
   });
 
 });

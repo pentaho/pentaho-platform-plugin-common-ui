@@ -53,12 +53,7 @@ define([
       return "sort";
     },
 
-    /**
-     * Applies the change to a list value.
-     *
-     * @param {!pentaho.type.List} target - The list value to apply the change to.
-     */
-    apply: function(target) {
+    _apply: function(target) {
       target._elems.sort(this.comparer);
     }
   });

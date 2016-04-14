@@ -20,11 +20,12 @@ define([
   "./valueHelper",
   "./SpecificationContext",
   "./changes/ListChangeset",
+  "./changes/ComplexChangeset",
   "../i18n!types",
   "../util/arg",
   "../util/error",
   "../util/object"
-], function(module, valueFactory, elemFactory, valueHelper, SpecificationContext, ListChangeset,
+], function(module, valueFactory, elemFactory, valueHelper, SpecificationContext, ListChangeset, ComplexChangeset,
             bundle, arg, error, O) {
 
   "use strict";
@@ -74,8 +75,7 @@ define([
         this._elems = [];
         this._keys  = {};
         this._uid = String(_listNextUid++);
-        this._changes = null;
-        this._changeLevel = 0;
+        this._ownedBy = this._ownedAs = this._changeset = null;
 
         if(spec != null) {
           // An array of element specs?
@@ -93,21 +93,64 @@ define([
                 /*update:*/false,
                 /*remove:*/false,
                 /*move:*/false,
-                /*index:*/0,
-                /*silent:*/true);
+                /*index:*/0);
           }
         }
       },
 
-      setOwnership: function(owner, propType){
+      /**
+       * Sets the complex that owns this list value.
+       *
+       * Ownership cannot change.
+       *
+       * @param {!pentaho.type.Complex} owner - The owner complex value.
+       * @param {!pentaho.type.Property} propType - The property type of `owner` whose value is this instance.
+       *
+       * @throws {TypeError} When called with argument values that are different from those of the first call.
+       *
+       * @see pentaho.type.List#owner
+       * @see pentaho.type.List#ownerProperty
+       */
+      setOwnership: function(owner, propType) {
+        if(!owner) throw error.argRequired("owner");
+        if(!propType) throw error.argRequired("propType");
+
         O.setConst(this, "_ownedBy", owner);
         O.setConst(this, "_ownedAs", propType);
       },
 
       /**
+       * The complex value that owns this list value.
+       *
+       * @type {pentaho.type.Complex}
+       *
+       * @see pentaho.type.List#setOwnership
+       */
+      get owner() {
+        return this._ownedBy;
+      },
+
+      /**
+       * The complex value that owns this list value.
+       *
+       * @type {pentaho.type.Complex}
+       *
+       * @see pentaho.type.List#setOwnership
+       */
+      get ownerProperty() {
+        return this._ownedAs;
+      },
+
+      /**
        * Creates a shallow clone of this list value.
        *
+       * All elements are shared with the clone.
+       *
+       * Ownership is not preserved.
+       *
        * @return {!pentaho.type.List} The list value clone.
+       *
+       * @see pentaho.type.List#setOwnership
        */
       clone: function() {
         var clone = Object.create(Object.getPrototypeOf(this));
@@ -124,8 +167,6 @@ define([
         clone._elems = this._elems.slice();
         clone._keys  = O.assignOwnDefined({}, this._keys);
         clone._uid = String(_listNextUid++);
-        clone._changes = null;
-        clone._changeLevel = 0;
       },
 
       /**
@@ -227,7 +268,7 @@ define([
       },
 
       /**
-       * Adds, removes and/or updates elements to the element list.
+       * Adds, removes, moves and/or updates elements to the element list.
        *
        * The element or elements specified in argument `fragment`
        * are converted to the list's element class.
@@ -270,7 +311,7 @@ define([
       },
 
       /**
-       * Inserts or updates one or more elements, starting at the given index.
+       * Inserts and/or updates one or more elements, starting at the given index.
        *
        * If `index` is negative,
        * it means the position at that many elements from the end (`index' = count - index`).
@@ -280,7 +321,6 @@ define([
        *
        * @param {any|any[]} fragment Element or elements to add.
        * @param {number} index The index at which to start inserting new elements.
-       * @param {?boolean} [silent=false] Indicates that no events should be emitted.
        */
       insert: function(fragment, index) {
         this._set(fragment, /*add:*/true, /*update:*/true, /*remove:*/false, /*move:*/false, /*index:*/index);
@@ -294,7 +334,9 @@ define([
        * @param {pentaho.type.Element|Array.<pentaho.type.Element>} fragment Element or elements to remove.
        */
       remove: function(fragment) {
-        this._remove(fragment);
+        this._usingChangeset(function(changeset) {
+          changeset._remove(fragment);
+        });
       },
 
       /**
@@ -311,7 +353,9 @@ define([
        * @param {number} [count=1] Number of elements to remove.
        */
       removeAt: function(start, count) {
-        this._removeAt(start, count);
+        this._usingChangeset(function(changeset) {
+          changeset._removeAt(start, count);
+        });
       },
 
       /**
@@ -320,7 +364,9 @@ define([
        * @param {function(pentaho.type.Element, pentaho.type.Element) : number} comparer The comparer function.
        */
       sort: function(comparer) {
-        this._sort(comparer);
+        this._usingChangeset(function(changeset) {
+          changeset._sort(comparer);
+        });
       },
 
       /**
@@ -334,22 +380,15 @@ define([
         return map ? this._elems.map(map) : this._elems.slice();
       },
 
+      // TODO: Replace this use by transaction scopes, when they're implemented.
       /**
        * Enters a change scope and returns a disposable object for exiting the scope.
        *
        * @return {pentaho.lang.IDisposable} A disposable object.
        */
       changeScope: function() {
-        var me = this;
-        this._enterChange();
-        return {
-          dispose: function() {
-            if(me) {
-              var you = me;
-              me = null;
-              you._exitChange();
-            }
-          }
+        return /** @type pentaho.lang.IDisposable */{
+          dispose: function() {}
         };
       },
 
@@ -379,56 +418,49 @@ define([
         return this.type._elemType.to(valueSpec);
       },
 
-      //region Change tracking
-      _changes: null,
-      _changeLevel: 0,
+      //region Core change methods
+      /**
+       * Calls a given local method with a changeset.
+       *
+       * @param {function(pentaho.type.changes.ListChangeset)} fun The method to call.
+       */
+      _usingChangeset: function(fun) {
 
-      _enterChange: function() {
-        if(!this._changes) this._changes = [];
-        this._changeLevel++;
-      },
+        // TODO: Howly... this is UGLY code! However, it's expected to become much cleaner
+        // when transactions are implemented, so there's no real gain in making it prettier now.
 
-      _exitChange: function(silent) {
-        var changes = null;
-
-        if(!(--this._changeLevel)) {
-          changes = this._changes;
-          this._changes = null;
-          if(!silent && changes.length) {
-            // TODO: fire list change event
-            // Rollback if cancelled?
-            // Apply changes only at the end?
+        var owner = this._ownedBy,
+            createdOwnerChangeset = false,
+            ownerChangeset,
+            changeset;
+        if(owner) {
+          // Enlist in the owner's changeset
+          if(!(ownerChangeset = owner._changeset)) {
+            // Operation was initiated by a list method call.
+            ownerChangeset = new ComplexChangeset(owner);
+            createdOwnerChangeset = true;
           }
+
+          // Get or create list changeset
+          changeset = ownerChangeset._changes[this._ownedAs.name] ||
+              (ownerChangeset._changes[this._ownedAs.name] = new ListChangeset(this));
+        } else {
+          changeset = new ListChangeset(this);
         }
 
-        return changes;
-      },
-      //endregion
+        fun.call(this, changeset);
 
-      //region Core change methods
+        if(owner) {
+          if(createdOwnerChangeset) owner._applyChanges();
+        } else {
+          changeset.apply();
+        }
+      },
 
       _set: function(fragment, add, update, remove, move, index) {
-        var changeset = new ListChangeset(this);
-        changeset._set(fragment, add, update, remove, move, index);
-        if(!this._ownedBy) changeset.apply();
-      },
-
-      _remove: function(fragment) {
-        var changeset = new ListChangeset(this);
-        changeset._remove(fragment);
-        if(!this._ownedBy) changeset.apply();
-      },
-
-      _removeAt: function(start, count) {
-        var changeset = new ListChangeset(this);
-        changeset._removeAt(start, count);
-        if(!this._ownedBy) changeset.apply();
-      },
-
-      _sort: function(comparer) {
-        var changeset = new ListChangeset(this);
-        changeset._sort(comparer);
-        if(!this._ownedBy) changeset.apply();
+        this._usingChangeset(function(changeset) {
+          changeset._set(fragment, add, update, remove, move, index);
+        });
       },
       //endregion
 

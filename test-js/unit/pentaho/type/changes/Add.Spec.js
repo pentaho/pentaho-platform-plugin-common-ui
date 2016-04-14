@@ -24,8 +24,8 @@ define([
   /* global describe:false, it:false, expect:false, beforeEach:false */
 
   var context = new Context(),
-    List = context.get(listFactory),
-    PentahoNumber = context.get(numberFactory);
+      List = context.get(listFactory),
+      PentahoNumber = context.get(numberFactory);
 
   var NumberList = List.extend({
     type: {of: PentahoNumber}
@@ -44,29 +44,18 @@ define([
         });
       });
 
-      describe("#apply -", function() {
+      describe("#_apply -", function() {
         it("should add a new element", function() {
           var list = new NumberList([]);
           var elem = list._cast(0);
           var change = new Add(elem, elem.key, 0);
 
-          change.apply(list);
+          change._apply(list);
 
           expect(list.count).toBe(1);
           expect(list.at(0)).toBe(elem);
         });
       });
-      
-      // describe("#freeze", function() {
-      //   it("should call Object `freeze` method", function() {
-      //     spyOn(Object, "freeze");
-      //
-      //     var change = new Add({}, 0, "key");
-      //     change._freeze();
-      //     expect(Object.freeze).toHaveBeenCalled();
-      //   })
-      // });
-
     });
   });
 });

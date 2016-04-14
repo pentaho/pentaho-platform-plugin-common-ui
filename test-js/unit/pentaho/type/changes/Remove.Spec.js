@@ -45,7 +45,7 @@ define([
         });
       });
 
-      describe("#apply -", function() {
+      describe("#_apply -", function() {
         it("Should remove the first element", function() {
           var list = new NumberList([1]);
           var elem = list.at(0);
@@ -53,7 +53,7 @@ define([
           
           expect(list.count).toBe(1);
 
-          change.apply(list);
+          change._apply(list);
 
           expect(list.count).toBe(0);
         });

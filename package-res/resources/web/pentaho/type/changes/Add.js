@@ -67,12 +67,7 @@ define([
       return "add";
     },
 
-    /**
-     * Applies the change to a list value.
-     *
-     * @param {!pentaho.type.List} target - The list value to apply the change to.
-     */
-    apply: function(target) {
+    _apply: function(target) {
       var elem = this.element;
 
       target._elems.splice(this.index, 0, elem);

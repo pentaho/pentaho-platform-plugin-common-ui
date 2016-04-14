@@ -98,9 +98,7 @@ define([
 
       this._newValue = null;
       this._cachedCount = 0;
-
-      this._addKeys = {};
-      this._removeKeys = {};
+      this._lastClearIndex = -1;
     },
 
     // /**
@@ -137,7 +135,7 @@ define([
       }
 
       if(cachedCount < n) {
-        this._apply(cachedValue, cachedCount);
+        this._applyFrom(cachedValue, cachedCount);
         this._cachedCount = n;
       }
 
@@ -166,6 +164,8 @@ define([
      * @param {number} [keyArgs.index] The index at which to add new elements.
      * When unspecified, new elements are appended to the list.
      * This argument is ignored when `noAdd` is `true`.
+     *
+     * @throws {pentaho.lang.OperationInvalid} When the changeset has already been applied or rejected.
      */
     set: function(fragment, keyArgs) {
       this._set(
@@ -178,22 +178,19 @@ define([
       );
     },
 
-    /**
-     * Applies the contained changes to the owner list value or, alternatively, to a given list value.
-     *
-     * @param {pentaho.type.List} [target] - The value to which changes are applied.
-     *
-     * When unspecified, defaults to {@link pentaho.type.changes.ListChangeset#owner}.
-     */
-    apply: function(target) {
-      if(!target) target = this.owner;
-      if(target === this.owner && this._newValue){
+    _apply: function(target) {
+      if(target === this.owner && this._newValue) {
+
+        // Reuse `_newValue` copy's internal fields and discard it afterwards.
+        // Ensure up to date with every change.
         var newValue = this.newValue;
-        this.owner._elems = newValue._elems;
-        this.owner._keys = newValue._keys;
+        target._elems = newValue._elems;
+        target._keys  = newValue._keys;
+
+        // Avoid problems with shared data structures.
         this._newValue = null;
       } else {
-        this._apply(target, 0);
+        this._applyFrom(target, 0);
       }
     },
 
@@ -208,18 +205,18 @@ define([
      *
      * @see pentaho.type.changes.ListChangeset#newValue
      */
-    _apply: function(list, startingFromIdx) {
+    _applyFrom: function(list, startingFromIdx) {
+      // assert startingFromIdx >= 0
+
       var changes = this._changes;
+      var N = changes.length;
 
-      // Ignore changes until the last clear
-      var k, N = changes.length;
-      for(k = N - 1; k > startingFromIdx; k--) {
-        if(changes[k].type === "clear") break;
-      }
+      // Ignore changes before the last clear.
+      //var k = N - 1;
+      //while(k > startingFromIdx && changes[k].type !== "clear") k--;
+      var k = Math.max(this._lastClearIndex, startingFromIdx);
 
-      for(k = k > 0 ? k : 0; k < N; k++) {
-        changes[k].apply(list);
-      }
+      while(k < N) changes[k++]._apply(list);
     },
     //endregion
 
@@ -236,14 +233,19 @@ define([
      * @param {boolean} remove
      * @param {boolean} move
      * @param {number} index
+     *
+     * @throws {pentaho.lang.OperationInvalid} When the changeset has already been applied or rejected.
+     *
      * @private
      */
     _set: function(fragment, add, update, remove, move, index) {
+
+      this._assertMutable();
+
       var list = this.newValue, // calculate relative the last change
-        elems = list._elems,
-        keys = list._keys,
-        addKeys = this._addKeys,
-        existing, elem, key;
+          elems = list._elems,
+          keys = list._keys,
+          existing, elem, key;
 
       // Next insert index.
       if(index == null) {
@@ -326,7 +328,7 @@ define([
               --realBaseIndex;
             }
 
-            this._removeOne(elem, i - removeCount);
+            this._addChange(new Remove([elem], i - removeCount));
 
             ++removeCount;
           } else {
@@ -346,7 +348,7 @@ define([
 
           var newIndex = realBaseIndex + action.to;
           if (action.type === "add") {
-            this._insertOne(action.value, newIndex);
+            this._addChange(new Add(action.value, newIndex));
 
             computed.splice(newIndex, 0, action.value.key);
           }
@@ -365,7 +367,7 @@ define([
             var currentIndex = computed.indexOf(elem.key, i);
             if(move) {
               if (currentIndex !== i) {
-                this._moveOne(elem, currentIndex, i);
+                this._addChange(new Move([elem], currentIndex, i));
 
                 computed.splice(i, 0, computed.splice(currentIndex, 1)[0]);
 
@@ -378,7 +380,7 @@ define([
 
               // This may trigger change events, that, in turn, may
               // perform further list changes and reenter `List#_set`.
-              this._updateOne(existing, currentIndex, elem);
+              this._addChange(new Update(existing, currentIndex, elem));
             }
           }
         }
@@ -391,56 +393,81 @@ define([
      *
      * @param {pentaho.type.Element|pentaho.type.Element[]} fragment - The element or elements to remove.
      *
+     * @throws {pentaho.lang.OperationInvalid} When the changeset has already been applied or rejected.
+     *
      * @see pentaho.type.changes.Remove
      * @private
      */
     _remove: function(fragment) {
-      var list = this.newValue, // calculate relative the last change
-        elems = list._elems,
-        keys = list._keys,
-        existing, elem, key;
 
-      var removeElems = Array.isArray(fragment) ? fragment.slice() : [fragment];
+      this._assertMutable();
+
+      var list  = this.newValue, // calculate relative to the last change
+          elems = list._elems,
+          keys  = list._keys,
+          elem, key;
+
+      var removeElems = Array.isArray(fragment) ? fragment : [fragment];
 
       // Index of elements in removeElems, by key.
+      // For removing duplicates in removeElems.
       //
       // Possible values are:
       // 1: Existing element, removed
       var removeKeys = {};
 
-      var removedElements = [];
+      /** @type Array.<{value: pentaho.type.Element, from: number}> */
+      var removedInfos = [];
 
       // I - Pre-process removeElems array
       var i = -1;
       var L = removeElems.length;
       while(++i < L) {
-        if((elem = list._cast(removeElems[i])) != null) {
+        if((elem = list._cast(removeElems[i]))) {
           key = elem.key;
 
-          var repeated = O.hasOwn(removedElements, key);
-
-          if((existing = O.getOwn(keys, key))) {
+          if(!O.hasOwn(removeKeys, key) && O.hasOwn(keys, key)) {
             removeKeys[key] = 1;
-
-            if(!repeated) {
-              removedElements.push({type: "remove", value: elem, from: elems.indexOf(elem)});
-            }
+            removedInfos.push({value: elem, from: elems.indexOf(elem)});
           }
         }
       }
 
-      // II - Order descending so indexes keep valid
-      removedElements.sort(function(v1, v2) {
-        return v2.from - v1.from;
-      });
+      if((L = removedInfos.length)) {
 
-      // III - Process the removes
-      removedElements.forEach(function(v) {
-        this._removeOne(v.value, v.from);
-      }, this);
+        // II - Order descending so indexes keep valid
+        removedInfos.sort(function(info1, info2) {
+          return info2.from - info1.from;
+        });
+
+        // III - Process the removes
+
+        // Add 1 `Remove` change per contiguous group of removed elements.
+        var batchElems, batchIndex;
+
+        i = 0;
+        do {
+          var info = removedInfos[i];
+
+          if(!batchElems || (info.from !== batchIndex - 1)) {
+            // End existing batch and create a new one.
+            if(batchElems) this._addChange(new Remove(batchElems, batchIndex));
+
+            batchElems = [];
+          }
+
+          batchElems.unshift(info.value);
+          batchIndex = info.from;
+        } while(++i < L);
+
+        if(batchElems) this._addChange(new Remove(batchElems, batchIndex));
+      }
     },
 
     _removeAt: function(start, count) {
+
+      this._assertMutable();
+
       if(count < 0) return; // noop
 
       var list = this.newValue;
@@ -455,10 +482,6 @@ define([
 
       var removed = list._elems.slice(start, start + count);
 
-      removed.forEach(function(elem) {
-        this[elem.key] = elem;
-      }, this._removeKeys);
-
       this._addChange(new Remove(removed, start));
     },
 
@@ -468,84 +491,32 @@ define([
      * @param {function(pentaho.type.Element, pentaho.type.Element) : number} comparer - The
      * function used for comparing elements in the list.
      *
+     * @throws {pentaho.lang.OperationInvalid} When the changeset has already been applied or rejected.
+     *
      * @see pentaho.type.changes.Sort
      * @private
      */
     _sort: function(comparer) {
+
+      this._assertMutable();
+
       this._addChange(new Sort(comparer));
-    },
-
-    /**
-     * Creates an operation that inserts an element into the list at a specific position,
-     * and appends that operation to the list of changes.
-     *
-     * @param {!pentaho.type.Element} elem - The object to be added to the list.
-     * @param {number} index - The position in the list at which the element should be inserted.
-     *
-     * @see pentaho.type.changes.Add
-     * @private
-     */
-    _insertOne: function(elem, index) {
-      this._addKeys[elem.key] = elem;
-      this._addChange(new Add(elem, index));
-    },
-
-    /**
-     * Creates an operation that removes an element from the list,
-     * and appends that operation to the list of changes.
-     *
-     * @param {!pentaho.type.Element} elem - The object to be added to the list.
-     * @param {number} index - The index of the element in the list.
-     *
-     * @see pentaho.type.changes.Remove
-     * @private
-     */
-    _removeOne: function(elem, index) {
-      this._removeKeys[elem.key] = elem;
-      this._addChange(new Remove([elem], index));
-    },
-
-    /**
-     * Creates an operation that moves an element inside the list,
-     * and appends that operation to the list of changes.
-     *
-     * @param {!pentaho.type.Element} elem - The object to be moved in the list.
-     * @param {number} fromIndex - The index of the element in the list.
-     * @param {number} toIndex - The new index of the element in the list.
-     *
-     * @see pentaho.type.changes.Move
-     * @private
-     */
-    _moveOne: function(elem, fromIndex, toIndex) {
-      this._removeKeys[elem.key] = elem;
-      this._addChange(new Move([elem], fromIndex, toIndex));
-    },
-
-    /**
-     * Creates an operation that updates an element in the list,
-     * and appends that operation to the list of changes.
-     *
-     * In an `update` operation, the reference to the element does not change, but its content does.
-     *
-     * @param {!pentaho.type.Element} elem - The object (already in the list) that will be updated.
-     * @param {!pentaho.type.Element} other - The object with the content that will be used for updating the list.
-     * @param {number} index - The position of `elem` in the list.
-     *
-     * @see pentaho.type.changes.Update
-     * @private
-     */
-    _updateOne: function(elem, index, other) {
-      this._addChange(new Update(elem, index, other));
     },
 
     /**
      * Creates an operation that removes all elements in the list,
      * and appends that operation to the list of changes.
      *
+     * @throws {pentaho.lang.OperationInvalid} When the changeset has already been applied or rejected.
+     *
      * @see pentaho.type.changes.Clear
      * @private
      */
     _clear: function() {
+
+      this._assertMutable();
+
+      this._lastClearIndex = this._changes.length;
       this._addChange(new Clear());
     },
 

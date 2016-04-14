@@ -43,14 +43,14 @@ define([
 
       });
 
-      describe("#apply -", function() {
+      describe("#_apply -", function() {
         it("should add a new element", function() {
           var derived = new Derived({x: "0"});
           var change = new Replace("x", "1");
 
           expect(derived.getv("x")).toBe("0");
 
-          change.apply(derived);
+          change._apply(derived);
 
           expect(derived.getv("x")).toBe("1");
         });

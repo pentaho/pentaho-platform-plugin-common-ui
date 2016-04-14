@@ -18,9 +18,10 @@ define([
   "pentaho/type/list",
   "pentaho/type/value",
   "pentaho/type/number",
+  "pentaho/type/complex",
   "pentaho/util/fun",
   "tests/pentaho/util/errorMatch"
-], function(Context, listFactory, valueFactory, numberFactory, fun, errorMatch) {
+], function(Context, listFactory, valueFactory, numberFactory, complexFactory, fun, errorMatch) {
 
   "use strict";
 
@@ -29,12 +30,13 @@ define([
   var context = new Context(),
       Value = context.get(valueFactory),
       List = context.get(listFactory),
+      Complex = context.get(complexFactory),
       PentahoNumber = context.get(numberFactory);
 
   function expectNoChanges(list) {
-    return; // TODO: move the tests that use this to ListChangeset.Spec.js
-    expect(list._changes).toBe(null);
-    expect(list._changeLevel).toBe(0);
+    // TODO: move the tests that use this to ListChangeset.Spec.js
+    //expect(list._changes).toBe(null);
+    //expect(list._changeLevel).toBe(0);
   }
 
   var NumberList = List.extend({
@@ -590,13 +592,27 @@ define([
     // insert or update
     //region #insert(fragment, index)
     describe("#insert(fragment, index) -", function() {
-      it("should not apply changes when owned by other object", function() {
-        var list = new NumberList();
-        list.setOwnership({}, list);
+      it("should apply changes on the owner object when owned", function() {
+
+        var Derived = Complex.extend({
+          type: {
+            props: {
+              foo: {type: NumberList}
+            }
+          }
+        });
+
+        var derived = new Derived();
+        spyOn(derived, "_applyChanges").and.callThrough();
+
+        var list = derived.get("foo");
 
         list.insert([1, 2, 3]);
 
-        _expectEqualValueAt(list, []);
+        // ----
+        expect(derived._applyChanges).toHaveBeenCalled();
+
+        _expectEqualValueAt(list, [1, 2, 3]);
       });
 
       it("should append a given array of convertible values, to an empty list, when index is not specified",
@@ -713,17 +729,29 @@ define([
 
     //region #remove(fragment)
     describe("#remove(fragment) -", function() {
-      it("should not apply changes when owned by other object", function() {
-        var list = new NumberList([1, 2, 3]);
-        var elem = list.at(0);
-        list.setOwnership({}, list);
+      it("should apply changes on the owner object when owned", function() {
+
+        var Derived = Complex.extend({
+          type: {
+            props: {
+              foo: {type: NumberList, value: [1, 2, 3]}
+            }
+          }
+        });
+
+        var derived = new Derived();
+        spyOn(derived, "_applyChanges").and.callThrough();
+
+        var list = derived.get("foo");
+        var elem = list.at(0); // 1
 
         expect(list.count).toBe(3);
 
         list.remove(elem);
 
-        expect(list.has("1")).toBe(true);
-        _expectEqualValueAt(list, [1, 2, 3]);
+        // ----
+        expect(derived._applyChanges).toHaveBeenCalled();
+        _expectEqualValueAt(list, [2, 3]);
       });
 
       it("should remove a given element that is present in the list", function() {
@@ -790,15 +818,27 @@ define([
 
     //region #removeAt(start, count[, silent])
     describe("#removeAt(start, count[, silent]) -", function() {
-      it("should not apply changes when owned by other object", function() {
-        var list = new NumberList([1, 2, 3, 4]);
-        list.setOwnership({}, list);
+      it("should apply changes on the owner object when owned", function() {
 
-        expect(list.count).toBe(4);
+        var Derived = Complex.extend({
+          type: {
+            props: {
+              foo: {type: NumberList, value: [1, 2, 3, 4]}
+            }
+          }
+        });
+
+        var derived = new Derived();
+        spyOn(derived, "_applyChanges").and.callThrough();
+
+        var list = derived.get("foo");
 
         list.removeAt(1, 1);
 
-        _expectEqualValueAt(list, [1, 2, 3, 4]);
+        // ----
+        expect(derived._applyChanges).toHaveBeenCalled();
+
+        _expectEqualValueAt(list, [1, 3, 4]);
       });
 
       it("should remove the element at the given in-range index when count is 1", function() {
@@ -1016,15 +1056,28 @@ define([
 
     //region #sort(comparer[, silent])
     describe("#sort(comparer[, silent]) -", function() {
-      it("should not apply changes when owned by other object", function() {
-        var list = new NumberList([4, 2, 1, 3]);
-        list.setOwnership({}, list);
+      it("should apply changes on the owner object when owned", function() {
+
+        var Derived = Complex.extend({
+          type: {
+            props: {
+              foo: {type: NumberList, value: [4, 2, 1, 3]}
+            }
+          }
+        });
+
+        var derived = new Derived();
+        spyOn(derived, "_applyChanges").and.callThrough();
+
+        var list = derived.get("foo");
+
+        expect(list.at(0).value).toBe(4);
 
         list.sort(fun.compare);
 
         // ----
-
-        _expectEqualValueAt(list, [4, 2, 1, 3]);
+        expect(derived._applyChanges).toHaveBeenCalled();
+        _expectEqualValueAt(list, [1, 2, 3, 4]);
       });
 
       it("should sort the list", function() {

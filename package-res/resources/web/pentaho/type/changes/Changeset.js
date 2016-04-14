@@ -20,6 +20,10 @@ define([
 ], function(Change, error) {
   "use strict";
 
+  var PhaseWill = 0,
+      PhaseDid  = 1,
+      PhaseRejected = 2;
+
   return Change.extend("pentaho.type.changes.Changeset", /** @lends pentaho.type.changes.Changeset# */{
 
     /**
@@ -45,6 +49,33 @@ define([
       if(!owner) throw error.argRequired("owner");
 
       this._owner = owner;
+
+      // TODO: Temporary. Remove when transactions allow multiple changesets per owner.
+      owner._changeset = this;
+
+      /**
+       * The current phase of the changeset.
+       *
+       * * `0` - will - unapplied - mutable.
+       * * `1` - did  - applied.
+       * * `2` - rejected - rejected.
+       *
+       * @private
+       * @type {number}
+       * @default 0
+       */
+      this._phase = PhaseWill;
+    },
+
+    /**
+     * Throws an error if the changeset is not in a mutable state.
+     *
+     * @throws {pentaho.lang.OperationInvalid} When the changeset has already been applied or rejected.
+     *
+     * @protected
+     */
+    _assertMutable: function() {
+      if(this._phase !== PhaseWill) throw error.operInvalid("Changeset is readonly.");
     },
 
     /**
@@ -75,17 +106,51 @@ define([
     },
 
     /**
-     * Applies the contained changes to the owner value or, alternatively, to a given value.
+     * Applies the contained changes to the owner value.
      *
-     * @param {pentaho.type.UStructuredValue} [target] - The value to which changes are applied.
-     *
-     * When unspecified, defaults to {@link pentaho.type.changes.Changeset#owner}.
-     *
-     * @abstract
+     * @throws {pentaho.lang.OperationInvalid} When the changeset has already been applied or rejected.
      */
+    apply: function() {
 
-    apply: function(target) {
-      throw error.notImplemented("apply");
+      this._assertMutable();
+
+      // Mark as applied.
+      this._phase = PhaseDid;
+
+      // Clear the owner's current changeset.
+      // TODO: Temporary. Remove when transactions allow multiple changesets per owner.
+      // NOTE: Can only clear at the end of Will so that changes during the Will event use the same changeset.
+      // Must clear at the end of Will so that any changes in later events initiate new changesets.
+      this._owner._changeset = null;
+
+      this._apply(this._owner);
+    },
+
+    /**
+     * Rejects the changes in the changeset.
+     *
+     * @throws {pentaho.lang.OperationInvalid} When the changeset has already been applied or rejected.
+     */
+    reject: function() {
+
+      this._assertMutable();
+
+      // Mark as rejected.
+      this._phase = PhaseRejected;
+
+      // Clear the owner's current changeset.
+      // TODO: Temporary. Remove when transactions allow multiple changesets per owner.
+      this._owner._changeset = null;
+
+      this._reject();
+    },
+
+    /**
+     * Actually rejects the changes in the changeset.
+     *
+     * Override to reject any contained changesets.
+     */
+    _reject: function() {
     }
   });
 });

@@ -112,7 +112,7 @@ define([
         });
       });
 
-      describe("#apply -", function() {
+      describe("#_apply -", function() {
         it("should update a list element", function() {
           var list = new NumberList([2, 1]);
           var elem = list.at(0);
@@ -121,7 +121,7 @@ define([
           spyOn(elem, "configure");
           var change = new Update(elem, 0, other);
 
-          change.apply(list);
+          change._apply(list);
 
           expect(list.count).toBe(2);
           expect(elem.configure).toHaveBeenCalledWith(other);

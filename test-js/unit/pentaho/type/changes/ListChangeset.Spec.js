@@ -17,8 +17,9 @@ define([
   "pentaho/type/Context",
   "pentaho/type/list",
   "pentaho/type/number",
-  "pentaho/type/changes/ListChangeset"
-], function(Context, listFactory, numberFactory, ListChangeset) {
+  "pentaho/type/changes/ListChangeset",
+  "pentaho/type/changes/Add"
+], function(Context, listFactory, numberFactory, ListChangeset, Add) {
   "use strict";
 
   /* global describe:false, it:false, expect:false, beforeEach:false */
@@ -73,7 +74,7 @@ define([
 
         it("should store changes that are created", function() {
           var elem = {"foo": "bar"};
-          changeset._insertOne(elem, 0); //create add change
+          changeset._addChange(new Add(elem, 0)); //create add change
 
           var changes = changeset.changes;
           expect(changes).toBeDefined();
@@ -116,7 +117,7 @@ define([
           var listElems = list._elems;
 
           changeset = new ListChangeset(list);
-          changeset._insertOne(list._cast(4), 0);
+          changeset._addChange(new Add(list._cast(4), 0));
           
           var newValue = changeset.newValue._elems;
           expect(newValue[0].value).toBe(4);

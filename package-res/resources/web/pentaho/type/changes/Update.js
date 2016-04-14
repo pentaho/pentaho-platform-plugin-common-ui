@@ -57,12 +57,7 @@ define([
       return "update";
     },
 
-    /**
-     * Applies the change to a list value.
-     *
-     * @param {!pentaho.type.List} target - The list to apply the change on.
-     */
-    apply: function(list) {
+    _apply: function(list) {
       list.at(this.at).configure(this.other);
     }
   });

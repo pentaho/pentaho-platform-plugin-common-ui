@@ -223,7 +223,6 @@ define([
      * @protected
      */
     _onChange: function(changeset) {
-      console.log(changeset);
       if(!changeset.hasChanges) return;
 
       var exclusionList = {

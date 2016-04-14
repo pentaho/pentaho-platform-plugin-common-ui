@@ -46,12 +46,12 @@ define([
         });
       });
 
-      describe("#type -", function() {
+      describe("#_type -", function() {
         it("should sort the list values", function() {
           var list = new NumberList([2, 1]);
           var change = new Sort(fun.compare);
 
-          change.apply(list);
+          change._apply(list);
 
           expect(list.count).toBe(2);
           expect(list._elems[0].value).toBe(1);

@@ -37,10 +37,10 @@ define([
      * @description Creates an instance.
      *
      * @param {!Array.<pentaho.type.Element>} elem - The element to be moved in the list.
-     * @param {number} fromIndex - The index of the element in the list.
-     * @param {number} toIndex - The new index of the element in the list.
+     * @param {number} oldIndex - The index of the element in the list.
+     * @param {number} newIndex - The new index of the element in the list.
      */
-    constructor: function(elem, fromIndex, toIndex) {
+    constructor: function(elem, oldIndex, newIndex) {
       /**
        * Gets the element that is about to be moved in the list.
        *
@@ -50,12 +50,12 @@ define([
       this.element = elem;
 
       /**
-       * Gets the index of the element in the list.
+       * Gets the old index of the element in the list.
        *
        * @type {number}
        * @readOnly
        */
-      this.fromIndex = fromIndex;
+      this.oldIndex = oldIndex;
 
       /**
        * Gets the new index of the element in the list.
@@ -63,7 +63,7 @@ define([
        * @type {number}
        * @readOnly
        */
-      this.toIndex = toIndex;
+      this.newIndex = newIndex;
     },
 
     /**
@@ -77,13 +77,8 @@ define([
       return "move";
     },
 
-    /**
-     * Applies the change to a list value.
-     *
-     * @param {!pentaho.type.List} target - The list value to apply the change to.
-     */
-    apply: function(target) {
-      target._elems.splice(this.toIndex, 0, target._elems.splice(this.fromIndex, 1)[0]);
+    _apply: function(target) {
+      target._elems.splice(this.newIndex, 0, target._elems.splice(this.oldIndex, 1)[0]);
     }
   });
 });

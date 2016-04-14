@@ -76,9 +76,6 @@ define([
           }).toThrow(errorMatch.notImplemented());
         });
       });
-
     });
-
   });
-
 });
