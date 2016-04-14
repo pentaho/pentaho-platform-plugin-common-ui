@@ -75,7 +75,18 @@ define([
      * @protected
      */
     _assertMutable: function() {
-      if(this._phase !== PhaseWill) throw error.operInvalid("Changeset is readonly.");
+      if(!this.isProposed) throw error.operInvalid("Changeset is readonly.");
+    },
+
+    /**
+     * Gets a value that indicates if the changeset is in a proposed state,
+     * i.e., it has not been applied or rejected.
+     *
+     * @type {boolean}
+     * @readOnly
+     */
+    get isProposed() {
+      return this._phase === PhaseWill;
     },
 
     /**
@@ -100,9 +111,16 @@ define([
 
     /**
      * Removes all changes.
+     *
+     * Contained changesets are rejected.
+     *
+     * @throws {pentaho.lang.OperationInvalid} When the changeset has already been applied or rejected.
      */
     clearChanges: function() {
-      throw error.notImplemented("clearChanges");
+
+      this._assertMutable();
+
+      this._clearChanges();
     },
 
     /**
@@ -151,6 +169,14 @@ define([
      * Override to reject any contained changesets.
      */
     _reject: function() {
+    },
+
+    /**
+     * Actually removes all changes in the changeset.
+     *
+     * Override to **reject** any contained changesets and remove all local changes.
+     */
+    _clearChanges: function() {
     }
   });
 });

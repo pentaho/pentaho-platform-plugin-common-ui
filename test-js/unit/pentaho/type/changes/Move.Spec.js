@@ -44,14 +44,13 @@ define([
         });
       });
 
-      describe("#apply -", function() {
-        //TODO: change test
+      describe("#_apply -", function() {
         it("should move a element from the original position to the destination", function() {
           var list = new NumberList([1, 2, 3]);
           var elem = list.at(3);
           var change = new Move(elem, 2, 1);
 
-          change.apply(list);
+          change._apply(list);
 
           expect(list.count).toBe(3);
           expect(list.at(0).value).toBe(1);

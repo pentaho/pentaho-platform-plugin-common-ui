@@ -45,13 +45,12 @@ define([
       });
 
       describe("#apply -", function() {
-        //TODO: change test
         it("should remove all elements from a list", function() {
           var list = new NumberList([1, 2, 3]);
           var change = new Clear();
           expect(list.count).toBe(3);
 
-          change.apply(list);
+          change._apply(list);
 
           expect(list.count).toBe(0);
         });

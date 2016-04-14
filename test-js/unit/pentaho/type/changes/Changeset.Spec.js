@@ -14,12 +14,18 @@
  * limitations under the License.
  */
 define([
+  "pentaho/type/Context",
+  "pentaho/type/complex",
   "pentaho/type/changes/Changeset",
   "tests/pentaho/util/errorMatch"
-], function(Changeset, errorMatch) {
+], function(Context, complexFactory, Changeset, errorMatch) {
+
   "use strict";
 
   /* global describe:false, it:false, expect:false, beforeEach:false */
+
+  var context = new Context(),
+      Complex = context.get(complexFactory);
 
   describe("pentaho.type.changes.Changeset -", function() {
     it("should be defined", function () {
@@ -27,19 +33,26 @@ define([
     });
 
     describe("instance -", function() {
-      function errorOnCreate(value) {
-        expect(function() {
-          new Changeset(value);
-        }).toThrow(errorMatch.argRequired("owner"));
-      }
 
       var owner, changeset;
+
       beforeEach(function() {
-        owner = {"foo":"bar"};
+        var Derived = Complex.extend({type: {props: [
+                {name: "foo", value: "bar"}
+              ]}});
+
+        owner = new Derived();
         changeset = new Changeset(owner);
       });
 
       it("should throw error when a owner isn't specified", function() {
+
+        function errorOnCreate(value) {
+          expect(function() {
+            var changeset2 = new Changeset(value);
+          }).toThrow(errorMatch.argRequired("owner"));
+        }
+
         errorOnCreate();
         errorOnCreate(null);
         errorOnCreate(undefined);
@@ -51,55 +64,110 @@ define([
           expect(changeset.owner).toBe(owner);
         });
 
-        it("changeset owner should be immutable", function() {
+        it("should not allow changing the owner", function() {
           expect(function() {
             changeset.owner = "foo";
           }).toThrowError(TypeError);
+        });
+
+        it("should set owner._changeset to the the changeset", function() {
+          expect(owner._changeset).toBe(changeset);
         });
       }); //endregion #owner
 
       //region #hasChanges
       describe("#hasChanges -", function() {
-        it("Should always return `false`", function() {
-            changeset.hasChanges;
+        it("should always return `false`", function() {
+          expect(changeset.hasChanges).toBe(false);
         });
       }); //endregion #hasChanges
 
-      //region #newValue
-      describe("#newValue -", function() {
-        it("should return undefined", function() {
-          expect(changeset.newValue).not.toBeDefined();
-        });
-      }); //endregion #newValue
-
-      //region #oldValue
-      describe("#oldValue -", function() {
-        it("should return undefined", function() {
-          expect(changeset.oldValue).not.toBeDefined();
-        });
-      }); //endregion #oldValue
-
       //region #apply
       describe("#apply -", function() {
-        //TODO: change test
-        it("Should throw a `Not Implemented` error", function() {
+
+        it("should call _apply", function() {
+          changeset._apply = jasmine.createSpy();
+
+          changeset.apply();
+
+          expect(changeset._apply).toHaveBeenCalled();
+        });
+
+        it("should call _apply with the owner", function() {
+          changeset._apply = jasmine.createSpy();
+
+          changeset.apply();
+
+          expect(changeset._apply).toHaveBeenCalledWith(owner);
+        });
+
+        it("should throw when already applied or rejected", function() {
+          changeset.reject();
+
           expect(function() {
             changeset.apply();
-          }).toThrow(errorMatch.notImplemented());
+          }).toThrow(errorMatch.operInvalid());
+        });
+
+        it("should clear the owner's current changeset", function() {
+          changeset._apply = jasmine.createSpy();
+
+          expect(owner._changeset).toBe(changeset);
+
+          changeset.apply();
+
+          expect(owner._changeset).toBe(null);
         });
       }); //endregion #apply
 
+      //region #reject
+      describe("#reject -", function() {
+
+        it("should call _reject", function() {
+          spyOn(changeset, "_reject").and.callThrough();
+
+          changeset.reject();
+
+          expect(changeset._reject).toHaveBeenCalled();
+        });
+
+        it("should throw when already applied or rejected", function() {
+          changeset.reject();
+
+          expect(function() {
+            changeset.reject();
+          }).toThrow(errorMatch.operInvalid());
+        });
+
+        it("should clear the owner's current changeset", function() {
+
+          expect(owner._changeset).toBe(changeset);
+
+          changeset.reject();
+
+          expect(owner._changeset).toBe(null);
+        });
+      }); //endregion #reject
+
       //region #clearChanges
       describe("#clearChanges -", function() {
-        it("Should throw a `Not Implemented` error", function() {
+
+        it("should call _clearChanges", function() {
+          spyOn(changeset, "_clearChanges").and.callThrough();
+
+          changeset.clearChanges();
+
+          expect(changeset._clearChanges).toHaveBeenCalled();
+        });
+
+        it("should throw when already applied or rejected", function() {
+          changeset.reject();
+
           expect(function() {
             changeset.clearChanges();
-          }).toThrow(errorMatch.notImplemented());
+          }).toThrow(errorMatch.operInvalid());
         });
       }); //endregion #clearChanges
-
     });
-  
   });
-
 });

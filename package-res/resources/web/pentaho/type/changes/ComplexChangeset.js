@@ -84,6 +84,15 @@ define([
       return hasChanges;
     },
 
+    _clearChanges: function() {
+
+      O.eachOwn(this._changes, function(change) {
+        if(change instanceof Changeset) change.reject();
+      });
+
+      this._changes = {};
+    },
+
     /**
      * Gets the [change]{@link pentaho.type.changes.ValueChange} object associated with the specified property.
      *
@@ -196,6 +205,7 @@ define([
         if(change instanceof Changeset) {
           // Get the corresponding changeset owner in the alternate target.
           if(isAlternateTarget)
+            /* istanbul ignore next : does not happen atm as only lists are simulated/projected */
             change._apply(target._values[property]);
           else
             change.apply();

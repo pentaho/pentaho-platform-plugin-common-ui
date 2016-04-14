@@ -51,7 +51,7 @@ define([
 
       this.base(owner);
 
-      this.clearChanges();
+      this._clearChanges();
 
       if(valueSpec !== undefined) this.set(valueSpec);
     },
@@ -93,7 +93,7 @@ define([
       return N === 0 ? false : (this._changes[N - 1].type !== "clear");
     },
 
-    clearChanges: function() {
+    _clearChanges: function() {
       this._changes = [];
 
       this._newValue = null;

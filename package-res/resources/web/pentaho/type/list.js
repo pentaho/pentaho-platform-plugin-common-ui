@@ -436,7 +436,7 @@ define([
         if(owner) {
           // Enlist in the owner's changeset
           if(!(ownerChangeset = owner._changeset)) {
-            // Operation was initiated by a list method call.
+            // Operation was initiated by a direct call to a list method.
             ownerChangeset = new ComplexChangeset(owner);
             createdOwnerChangeset = true;
           }

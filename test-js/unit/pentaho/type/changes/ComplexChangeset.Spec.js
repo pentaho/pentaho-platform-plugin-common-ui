@@ -31,22 +31,22 @@ define([
   /* global describe:false, it:false, expect:false, beforeEach:false */
 
   var context = new Context(),
-    Complex = context.get(complexFactory),
-    List = context.get(listFactory),
-    PentahoNumber = context.get(numberFactory);
+      Complex = context.get(complexFactory),
+      List = context.get(listFactory),
+      PentahoNumber = context.get(numberFactory);
+
+  var NumberList = List.extend({
+    type: {of: PentahoNumber}
+  });
 
   var Derived = Complex.extend({
     type: {
       props: [
-        { name: "foo", type: "number" },
-        { name: "bar", type: "number" },
-        { name: "myList", type: ["number"] }
+        {name: "foo", type: "number"},
+        {name: "bar", type: "number"},
+        {name: "myList", type: NumberList}
       ]
     }
-  });
-
-  var NumberList = List.extend({
-    type: {of: PentahoNumber}
   });
 
   describe("pentaho.type.ComplexChangeset -", function() {
@@ -57,18 +57,19 @@ define([
 
     describe("instance -", function() {
       var changeset, owner, listChangeset, myList,
-        properties = ["foo", "myList"];
+          properties = ["foo", "myList"];
 
       beforeEach(function() {
-        myList = new NumberList([1]);
+        owner = new Derived({ "foo": 5, "bar": 6, "myList": [1] });
+
+        myList = owner.get("myList");
+
         listChangeset = new ListChangeset(myList);
         listChangeset._addChange(new Add(new PentahoNumber(3), 1));
 
-        owner = new Derived({ "foo": 5, "bar": 6, "myList": myList });
-
         changeset = new ComplexChangeset(owner);
         changeset._changes = {
-          "foo": new Replace("foo", 10),
+          "foo":    new Replace("foo", 10),
           "myList": listChangeset
         };
       });
@@ -214,6 +215,24 @@ define([
 
           expect(changeset.getChange("myList").type).toBe("list");
         });
+
+        it("should redirect Complex#set on owner to its current changeset", function() {
+          var Derived = Complex.extend({type: {props: ["foo"]}});
+          var derived = new Derived({foo: "bar"});
+          var changeset = new ComplexChangeset(derived);
+
+          expect(changeset.hasChanges).toBe(false);
+          expect(changeset.owner).toBe(derived);
+          expect(derived._changeset).toBe(changeset);
+
+          // ---
+
+          derived.set("foo", "guru");
+
+          // ---
+
+          expect(changeset.hasChange("foo")).toBe(true);
+        });
       }); //endregion #set
 
       //region #propertyNames
@@ -244,49 +263,61 @@ define([
 
       //region #apply
       describe("#apply -", function() {
-        beforeEach(function() {
-          changeset._changes =  {
-            "foo": new Replace("foo", 12)
-          };
-        });
-
-        it("should apply changes to its own complex", function() {
-          var complex = new Derived({foo: 10});
-
-          expect(complex.get("foo").valueOf()).toBe(10);
-          changeset.apply(complex);
-
-          expect(complex.get("foo").valueOf()).toBe(12);
-          expect(changeset.owner.get("foo").valueOf()).toBe(5);
-        });
-
-        it("should apply changes to its own complex when none is provided", function() {
+        it("should apply changes to its owner", function() {
           var complex = changeset.owner;
 
           expect(complex.get("foo").valueOf()).toBe(5);
+
           changeset.apply();
 
-          expect(complex.get("foo").valueOf()).toBe(12);
+          expect(complex.get("foo").valueOf()).toBe(10);
         });
 
-        it("should apply all changes inside a ListChangeset by applying all the changes present in the ComplexChangeset",
-          function() {
-            var complex = new Derived({myList: myList});
-            changeset._changes["myList"] = listChangeset;
+        it("should apply all changes of a contained ListChangeset", function() {
+          expect(myList.count).toBe(1);
+          expect(myList.at(0).value).toBe(1);
 
-            var _list = complex.get("myList");
-            expect(_list.count).toBe(1);
-            expect(_list.at(0).value).toBe(1);
+          changeset.apply();
 
-            changeset.apply(complex);
-
-            expect(_list.count).toBe(2);
-            expect(_list.at(0).value).toBe(1);
-            expect(_list.at(1).value).toBe(3);
+          expect(myList.count).toBe(2);
+          expect(myList.at(0).value).toBe(1);
+          expect(myList.at(1).value).toBe(3);
         });
-
       }); //endregion #apply
-      
+
+      //region #reject
+      describe("#reject", function() {
+        it("should reject contained changesets", function() {
+          expect(changeset.isProposed).toBe(true);
+          expect(listChangeset.isProposed).toBe(true);
+
+          changeset.reject();
+
+          expect(changeset.isProposed).toBe(false);
+          expect(listChangeset.isProposed).toBe(false);
+        });
+      }); //endregion #reject
+
+      //region #_clearChanges
+      describe("#_clearChanges", function() {
+        it("should retain no changes", function() {
+          expect(changeset.hasChanges).toBe(true);
+          expect(listChangeset.hasChanges).toBe(true);
+
+          changeset.clearChanges();
+
+          expect(changeset.hasChanges).toBe(false);
+        });
+
+        it("should reject contained changesets", function() {
+          expect(changeset.hasChanges).toBe(true);
+          expect(listChangeset.isProposed).toBe(true);
+
+          changeset.clearChanges();
+
+          expect(listChangeset.isProposed).toBe(false);
+        });
+      }); //endregion #reject
     }); //end instance
 
   }); //end pentaho.lang.ComplexChangeset
