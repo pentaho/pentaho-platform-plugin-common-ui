@@ -126,17 +126,8 @@ define([
             expect(listElems[i].value).toBe(newValue[i + 1].value);
           }
         });
-        
       }); //endregion #newValue
-
-      describe("#apply -", function() {
-        it("should apply all changes to the list I specify", function() {
-          
-        });
-      });
-      
     }); //end instance
-
   }); //end pentaho.lang.ComplexChangeset
 
 });
