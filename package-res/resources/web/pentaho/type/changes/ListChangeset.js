@@ -24,9 +24,8 @@ define([
   "./Clear",
   "../../util/arg",
   "../../util/object"
-], function(Changeset,
-            Add, Remove, Move, Update, Sort, Clear,
-            arg, O) {
+], function(Changeset, Add, Remove, Move, Update, Sort, Clear, arg, O) {
+
   "use strict";
 
   /**
@@ -36,24 +35,20 @@ define([
    * @extends pentaho.type.changes.Changeset
    * @amd pentaho/type/changes/ListChangeset
    *
-   * @classDesc Class that represents changes in a multi-valued property
-   * in a [complex]{@linkplain pentaho.type.Complex} object.
+   * @classDesc The class `ListChangeset` describes a log of changes in a [list]{@linkplain pentaho.type.List} value.
    *
    * @constructor
    * @description Creates a new instance.
    *
-   * @param {!pentaho.type.List} owner - The [multi-valued property]{@linkplain pentaho.type.List} associated with this change.
-   * @param {!pentaho.type.Element[]|!pentaho.type.spec.IElement[]} [valueSpec] - The [multi-valued property]{@linkplain pentaho.type.List} associated with this change.
+   * @param {!pentaho.type.List} owner - The list value where the changes take place.
    */
   return Changeset.extend("pentaho.type.changes.ListChangeset", /** @lends pentaho.type.changes.ListChangeset# */{
 
-    constructor: function(owner, valueSpec) {
+    constructor: function(owner) {
 
       this.base(owner);
 
       this._clearChanges();
-
-      if(valueSpec !== undefined) this.set(valueSpec);
     },
 
     //region public interface
