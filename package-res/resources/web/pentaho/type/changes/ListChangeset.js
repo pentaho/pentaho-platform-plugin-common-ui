@@ -84,8 +84,7 @@ define([
     },
 
     get hasChanges() {
-      var N = this._changes.length;
-      return N === 0 ? false : (this._changes[N - 1].type !== "clear");
+      return this._changes.length > 0;
     },
 
     _clearChanges: function() {
@@ -143,8 +142,10 @@ define([
       if(target === this.owner && this._newValue) {
 
         // Reuse `_newValue` copy's internal fields and discard it afterwards.
+
         // Ensure up to date with every change.
         var newValue = this.newValue;
+
         target._elems = newValue._elems;
         target._keys  = newValue._keys;
 
@@ -496,7 +497,9 @@ define([
 
       this._assertProposed();
 
+      // See #_applyFrom
       this._lastClearIndex = this._changes.length;
+
       this._addChange(new Clear());
     },
 

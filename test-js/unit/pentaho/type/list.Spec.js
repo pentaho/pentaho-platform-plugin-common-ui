@@ -816,6 +816,48 @@ define([
       
     }); //endregion #remove
 
+    //region #clear()
+    describe("#clear() -", function() {
+      it("should apply changes on the owner object when owned", function() {
+        var Derived = Complex.extend({
+          type: {
+            props: {
+              foo: {type: NumberList, value: [1, 2, 3]}
+            }
+          }
+        });
+
+        var derived = new Derived();
+        spyOn(derived, "_applyChanges").and.callThrough();
+
+        expect(derived.count("foo")).toBe(3);
+
+        // ----
+
+        derived.get("foo").clear();
+
+        // ----
+
+        expect(derived._applyChanges).toHaveBeenCalled();
+
+        expect(derived.count("foo")).toBe(0);
+      });
+
+      it("should clear all elements of the list", function() {
+        var list = new NumberList([1, 2, 3]);
+
+        expect(list.count).toBe(3);
+
+        // ----
+
+        list.clear();
+
+        // ----
+
+        expect(list.count).toBe(0);
+      });
+    }); //endregion #remove
+
     //region #removeAt(start, count[, silent])
     describe("#removeAt(start, count[, silent]) -", function() {
       it("should apply changes on the owner object when owned", function() {

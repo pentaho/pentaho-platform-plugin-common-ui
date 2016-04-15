@@ -370,6 +370,15 @@ define([
       },
 
       /**
+       * Removes all elements from the list.
+       */
+      clear: function() {
+        this._usingChangeset(function(changeset) {
+          changeset._clear();
+        });
+      },
+
+      /**
        * Creates an array with the elements of the list or values derived from each element.
        *
        * @param {function(pentaho.type.Element):any} [map] A function that converts each element into something else.
@@ -426,7 +435,7 @@ define([
        */
       _usingChangeset: function(fun) {
 
-        // TODO: Howly... this is UGLY code! However, it's expected to become much cleaner
+        // TODO: Holy... this is UGLY code! However, it's expected to become much cleaner
         // when transactions are implemented, so there's no real gain in making it prettier now.
 
         var owner = this._ownedBy,
@@ -519,7 +528,7 @@ define([
 
           this.base.apply(this, arguments);
 
-          // Force base value inheritance. Cannot change after set locally...
+          // Force base value inheritance. Cannot change after being set locally...
           if(!O.hasOwn(this, "_elemType")) this._elemType = this._elemType;
         },
 
