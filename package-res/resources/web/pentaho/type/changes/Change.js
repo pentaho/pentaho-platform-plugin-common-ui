@@ -33,8 +33,7 @@ define([
   return Base.extend("pentaho.type.changes.Change", /** @lends pentaho.type.changes.Change# */{
 
     // Block default Base.js constructor
-    constructor: function() {
-    },
+    constructor: function() {}
 
     /**
      * Gets the type of change.

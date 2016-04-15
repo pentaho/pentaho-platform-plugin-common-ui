@@ -88,7 +88,7 @@ define([
     _clearChanges: function() {
 
       O.eachOwn(this._changes, function(change) {
-        if(change instanceof Changeset) change.reject();
+        if(change instanceof Changeset) change.cancel();
       });
 
       this._changes = {};
@@ -141,7 +141,7 @@ define([
      *
      * @throws {pentaho.lang.ArgumentInvalidError} When a property with name `name` is not defined.
      *
-     * @throws {pentaho.lang.OperationInvalidError} When the changeset has already been applied or rejected.
+     * @throws {pentaho.lang.OperationInvalidError} When the changeset has already been applied or canceled.
      *
      * @private
      * @friend pentaho.type.Complex
@@ -149,7 +149,7 @@ define([
     _set: function(name, valueSpec) {
       if(!name) throw error.argRequired("name");
 
-      this._assertMutable();
+      this._assertProposed();
 
       var owner = this.owner;
       var pType = owner.type.get(name);
@@ -220,10 +220,10 @@ define([
       }, this._changes);
     },
 
-    _reject: function() {
+    _cancel: function() {
       this.propertyNames.forEach(function(property) {
         var change = this[property];
-        if(change instanceof Changeset) change.reject();
+        if(change instanceof Changeset) change.cancel();
       }, this._changes);
     }
     //endregion

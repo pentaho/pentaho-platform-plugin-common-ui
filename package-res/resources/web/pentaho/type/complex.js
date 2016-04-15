@@ -393,7 +393,7 @@ define([
             this._changeDid(changeset);
 
         } else {
-          if(changeset) changeset.reject();
+          if(changeset) changeset.cancel();
 
           error = new UserError("Nothing to do");
         }
@@ -404,7 +404,7 @@ define([
       /**
        * Emits the "will:change" event, if need be.
        *
-       * If the event is emitted and rejected, this method rejects the changeset as well.
+       * If the event is emitted and rejected, this method cancels the changeset as well.
        *
        * @param {!pentaho.type.ComplexChangeset} changeset - The set of changes.
        *
@@ -418,7 +418,7 @@ define([
           var event = new WillChange(this, changeset);
           if(!this._emitSafe(event)) {
 
-            changeset.reject();
+            changeset.cancel();
 
             return event.cancelReason;
           }

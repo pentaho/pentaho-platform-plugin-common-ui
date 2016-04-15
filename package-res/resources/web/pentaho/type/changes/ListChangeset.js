@@ -197,14 +197,14 @@ define([
      * When unspecified, new elements are appended to the list.
      * This argument is ignored when `add` is `false`.
      *
-     * @throws {pentaho.lang.OperationInvalidError} When the changeset has already been applied or rejected.
+     * @throws {pentaho.lang.OperationInvalidError} When the changeset has already been applied or canceled.
      *
      * @private
      * @friend pentaho.type.List
      */
     _set: function(fragment, add, update, remove, move, index) {
 
-      this._assertMutable();
+      this._assertProposed();
 
       var list = this.newValue, // calculate relative the last change
           elems = list._elems,
@@ -357,7 +357,7 @@ define([
      *
      * @param {any|Array} fragment - The element or elements to remove.
      *
-     * @throws {pentaho.lang.OperationInvalidError} When the changeset has already been applied or rejected.
+     * @throws {pentaho.lang.OperationInvalidError} When the changeset has already been applied or canceled.
      *
      * @see pentaho.type.changes.Remove
      * @private
@@ -365,7 +365,7 @@ define([
      */
     _remove: function(fragment) {
 
-      this._assertMutable();
+      this._assertProposed();
 
       var list  = this.newValue, // calculate relative to the last change
           elems = list._elems,
@@ -436,7 +436,7 @@ define([
      * @param {number} start The index at which to start removing.
      * @param {number} [count=1] The number of elements to remove.
      *
-     * @throws {pentaho.lang.OperationInvalidError} When the changeset has already been applied or rejected.
+     * @throws {pentaho.lang.OperationInvalidError} When the changeset has already been applied or canceled.
      *
      * @see pentaho.type.changes.Remove
      * @private
@@ -444,7 +444,7 @@ define([
      */
     _removeAt: function(start, count) {
 
-      this._assertMutable();
+      this._assertProposed();
 
       if(count < 0) return; // noop
 
@@ -469,7 +469,7 @@ define([
      * @param {function(pentaho.type.Element, pentaho.type.Element) : number} comparer - The
      * function used for comparing elements in the list.
      *
-     * @throws {pentaho.lang.OperationInvalidError} When the changeset has already been applied or rejected.
+     * @throws {pentaho.lang.OperationInvalidError} When the changeset has already been applied or canceled.
      *
      * @see pentaho.type.changes.Sort
      * @private
@@ -477,7 +477,7 @@ define([
      */
     _sort: function(comparer) {
 
-      this._assertMutable();
+      this._assertProposed();
 
       this._addChange(new Sort(comparer));
     },
@@ -486,7 +486,7 @@ define([
      * Creates an operation that removes all elements in the list,
      * and appends that operation to the list of changes.
      *
-     * @throws {pentaho.lang.OperationInvalidError} When the changeset has already been applied or rejected.
+     * @throws {pentaho.lang.OperationInvalidError} When the changeset has already been applied or canceled.
      *
      * @see pentaho.type.changes.Clear
      * @private
@@ -494,7 +494,7 @@ define([
      */
     _clear: function() {
 
-      this._assertMutable();
+      this._assertProposed();
 
       this._lastClearIndex = this._changes.length;
       this._addChange(new Clear());

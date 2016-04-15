@@ -285,18 +285,18 @@ define([
         });
       }); //endregion #apply
 
-      //region #reject
-      describe("#reject", function() {
-        it("should reject contained changesets", function() {
+      //region #cancel
+      describe("#cancel", function() {
+        it("should cancel contained changesets", function() {
           expect(changeset.isProposed).toBe(true);
           expect(listChangeset.isProposed).toBe(true);
 
-          changeset.reject();
+          changeset.cancel();
 
-          expect(changeset.isProposed).toBe(false);
-          expect(listChangeset.isProposed).toBe(false);
+          expect(changeset.isCanceled).toBe(true);
+          expect(listChangeset.isCanceled).toBe(true);
         });
-      }); //endregion #reject
+      }); //endregion #cancel
 
       //region #_clearChanges
       describe("#_clearChanges", function() {
@@ -309,15 +309,16 @@ define([
           expect(changeset.hasChanges).toBe(false);
         });
 
-        it("should reject contained changesets", function() {
+        it("should cancel contained changesets", function() {
           expect(changeset.hasChanges).toBe(true);
           expect(listChangeset.isProposed).toBe(true);
 
           changeset.clearChanges();
 
-          expect(listChangeset.isProposed).toBe(false);
+          expect(changeset.isProposed).toBe(true);
+          expect(listChangeset.isCanceled).toBe(true);
         });
-      }); //endregion #reject
+      }); //endregion #cancel
     }); //end instance
 
   }); //end pentaho.lang.ComplexChangeset

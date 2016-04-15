@@ -22,7 +22,7 @@ define([
 
   var PhaseWill = 0,
       PhaseDid  = 1,
-      PhaseRejected = 2;
+      PhaseCanceled = 2;
 
   return Change.extend("pentaho.type.changes.Changeset", /** @lends pentaho.type.changes.Changeset# */{
 
@@ -56,37 +56,64 @@ define([
       /**
        * The current phase of the changeset.
        *
-       * * `0` - will - unapplied - mutable.
-       * * `1` - did  - applied.
-       * * `2` - rejected - rejected.
+       * PhaseWill/Did/Canceled
        *
        * @private
        * @type {number}
-       * @default 0
+       * @default PhaseWill
        */
       this._phase = PhaseWill;
     },
 
     /**
-     * Throws an error if the changeset is not in a mutable state.
+     * Throws an error if the changeset is not in a proposed state.
      *
-     * @throws {pentaho.lang.OperationInvalid} When the changeset has already been applied or rejected.
+     * @throws {pentaho.lang.OperationInvalidError} When the changeset has already been applied or canceled.
      *
      * @protected
      */
-    _assertMutable: function() {
+    _assertProposed: function() {
       if(!this.isProposed) throw error.operInvalid("Changeset is readonly.");
     },
 
     /**
      * Gets a value that indicates if the changeset is in a proposed state,
-     * i.e., it has not been applied or rejected.
+     * i.e., it has not been applied or canceled.
      *
      * @type {boolean}
      * @readOnly
+     *
+     * @see pentaho.type.changes.Changeset#isCanceled
+     * @see pentaho.type.changes.Changeset#isApplied
      */
     get isProposed() {
       return this._phase === PhaseWill;
+    },
+
+    /**
+     * Gets a value that indicates if the changeset has been canceled.
+     *
+     * @type {boolean}
+     * @readOnly
+     *
+     * @see pentaho.type.changes.Changeset#isProposed
+     * @see pentaho.type.changes.Changeset#isApplied
+     */
+    get isCanceled() {
+      return this._phase === PhaseCanceled;
+    },
+
+    /**
+     * Gets a value that indicates if the changeset has been applied.
+     *
+     * @type {boolean}
+     * @readOnly
+     *
+     * @see pentaho.type.changes.Changeset#isProposed
+     * @see pentaho.type.changes.Changeset#isApplied
+     */
+    get isApplied() {
+      return this._phase === PhaseDid;
     },
 
     /**
@@ -112,13 +139,13 @@ define([
     /**
      * Removes all changes.
      *
-     * Contained changesets are rejected.
+     * Contained changesets are canceled.
      *
-     * @throws {pentaho.lang.OperationInvalid} When the changeset has already been applied or rejected.
+     * @throws {pentaho.lang.OperationInvalid} When the changeset has already been applied or canceled.
      */
     clearChanges: function() {
 
-      this._assertMutable();
+      this._assertProposed();
 
       this._clearChanges();
     },
@@ -126,11 +153,11 @@ define([
     /**
      * Applies the contained changes to the owner value.
      *
-     * @throws {pentaho.lang.OperationInvalid} When the changeset has already been applied or rejected.
+     * @throws {pentaho.lang.OperationInvalidError} When the changeset has already been applied or canceled.
      */
     apply: function() {
 
-      this._assertMutable();
+      this._assertProposed();
 
       // Mark as applied.
       this._phase = PhaseDid;
@@ -145,36 +172,36 @@ define([
     },
 
     /**
-     * Rejects the changes in the changeset.
+     * Cancels the changes in the changeset.
      *
-     * @throws {pentaho.lang.OperationInvalid} When the changeset has already been applied or rejected.
+     * @throws {pentaho.lang.OperationInvalidError} When the changeset has already been applied or canceled.
      */
-    reject: function() {
+    cancel: function() {
 
-      this._assertMutable();
+      this._assertProposed();
 
-      // Mark as rejected.
-      this._phase = PhaseRejected;
+      // Mark as canceled.
+      this._phase = PhaseCanceled;
 
       // Clear the owner's current changeset.
       // TODO: Temporary. Remove when transactions allow multiple changesets per owner.
       this._owner._changeset = null;
 
-      this._reject();
+      this._cancel();
     },
 
     /**
-     * Actually rejects the changes in the changeset.
+     * Actually cancels the changes in the changeset.
      *
-     * Override to reject any contained changesets.
+     * Override to canceled any contained changesets.
      */
-    _reject: function() {
+    _cancel: function() {
     },
 
     /**
      * Actually removes all changes in the changeset.
      *
-     * Override to **reject** any contained changesets and remove all local changes.
+     * Override to **cancel** any contained changesets and remove all local changes.
      */
     _clearChanges: function() {
     }

@@ -45,7 +45,7 @@ define([
         changeset = new Changeset(owner);
       });
 
-      it("should throw error when a owner isn't specified", function() {
+      it("should throw error when an owner isn't specified", function() {
 
         function errorOnCreate(value) {
           expect(function() {
@@ -56,6 +56,13 @@ define([
         errorOnCreate();
         errorOnCreate(null);
         errorOnCreate(undefined);
+      });
+
+      it("should initially have isProposed=true", function() {
+
+        expect(changeset.isProposed).toBe(true);
+        expect(changeset.isCanceled).toBe(false);
+        expect(changeset.isApplied ).toBe(false);
       });
 
       //region #owner
@@ -101,8 +108,8 @@ define([
           expect(changeset._apply).toHaveBeenCalledWith(owner);
         });
 
-        it("should throw when already applied or rejected", function() {
-          changeset.reject();
+        it("should throw when already applied or canceled", function() {
+          changeset.cancel();
 
           expect(function() {
             changeset.apply();
@@ -118,24 +125,34 @@ define([
 
           expect(owner._changeset).toBe(null);
         });
+
+        it("should result in isApplied=true", function() {
+          changeset._apply = jasmine.createSpy();
+
+          changeset.apply();
+
+          expect(changeset.isApplied).toBe(true);
+          expect(changeset.isProposed).toBe(false);
+          expect(changeset.isCanceled).toBe(false);
+        });
       }); //endregion #apply
 
-      //region #reject
-      describe("#reject -", function() {
+      //region #cancel
+      describe("#cancel -", function() {
 
-        it("should call _reject", function() {
-          spyOn(changeset, "_reject").and.callThrough();
+        it("should call _cancel", function() {
+          spyOn(changeset, "_cancel").and.callThrough();
 
-          changeset.reject();
+          changeset.cancel();
 
-          expect(changeset._reject).toHaveBeenCalled();
+          expect(changeset._cancel).toHaveBeenCalled();
         });
 
-        it("should throw when already applied or rejected", function() {
-          changeset.reject();
+        it("should throw when already applied or canceled", function() {
+          changeset.cancel();
 
           expect(function() {
-            changeset.reject();
+            changeset.cancel();
           }).toThrow(errorMatch.operInvalid());
         });
 
@@ -143,11 +160,20 @@ define([
 
           expect(owner._changeset).toBe(changeset);
 
-          changeset.reject();
+          changeset.cancel();
 
           expect(owner._changeset).toBe(null);
         });
-      }); //endregion #reject
+
+        it("should result in isCanceled=true", function() {
+
+          changeset.cancel();
+
+          expect(changeset.isCanceled).toBe(true);
+          expect(changeset.isProposed).toBe(false);
+          expect(changeset.isApplied).toBe(false);
+        });
+      }); //endregion #cancel
 
       //region #clearChanges
       describe("#clearChanges -", function() {
@@ -160,12 +186,18 @@ define([
           expect(changeset._clearChanges).toHaveBeenCalled();
         });
 
-        it("should throw when already applied or rejected", function() {
-          changeset.reject();
+        it("should throw when already applied or canceled", function() {
+          changeset.cancel();
 
           expect(function() {
             changeset.clearChanges();
           }).toThrow(errorMatch.operInvalid());
+        });
+
+        it("should remain isProposed=true", function() {
+          changeset.clearChanges();
+
+          expect(changeset.isProposed).toBe(true);
         });
       }); //endregion #clearChanges
     });
