@@ -172,11 +172,11 @@ define([
         });
       }); //endregion #getOld
 
-      //region #set
-      describe("#set -", function() {
+      //region #_set
+      describe("#_set -", function() {
         function _setShouldThrow(context, property, value) {
           expect(function() {
-            context.set(property, value);
+            context._set(property, value);
           }).toThrow(errorMatch.argRequired("name"));
         }
 
@@ -188,7 +188,7 @@ define([
 
         it("should add a new property to the ComplexChangeset", function() {
           expect(changeset.hasChange("bar")).toBe(false);
-          changeset.set("bar", 1);
+          changeset._set("bar", 1);
           expect(changeset.hasChange("bar")).toBe(true);
         });
 
@@ -196,7 +196,7 @@ define([
           expect(changeset.getOld("foo").valueOf()).toBe(5);
           expect(changeset.get("foo").valueOf()).toBe(10);
 
-          changeset.set("foo", 1);
+          changeset._set("foo", 1);
 
           expect(changeset.getOld("foo").valueOf()).toBe(5);
           expect(changeset.get("foo").valueOf()).toBe(1);
@@ -205,13 +205,13 @@ define([
         it("should not create a change, when the value is the same", function() {
           expect(changeset.getChange("bar")).toBeNull();
 
-          changeset.set("bar", 6);
+          changeset._set("bar", 6);
 
           expect(changeset.getChange("bar")).toBeNull();
         });
 
         it("should create a `ListChangeset` when the value is a list", function() {
-          changeset.set("myList", [2,3]);
+          changeset._set("myList", [2,3]);
 
           expect(changeset.getChange("myList").type).toBe("list");
         });
@@ -233,7 +233,7 @@ define([
 
           expect(changeset.hasChange("foo")).toBe(true);
         });
-      }); //endregion #set
+      }); //endregion #_set
 
       //region #propertyNames
       describe("#propertyNames -", function() {

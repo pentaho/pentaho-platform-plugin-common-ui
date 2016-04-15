@@ -142,7 +142,7 @@ define([
      *
      * @throws {pentaho.lang.OperationInvalid} When the changeset has already been applied or rejected.
      */
-    set: function(name, valueSpec) {
+    _set: function(name, valueSpec) {
       if(!name) throw error.argRequired("name");
 
       this._assertMutable();

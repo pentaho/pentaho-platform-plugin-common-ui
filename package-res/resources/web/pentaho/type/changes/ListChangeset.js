@@ -112,13 +112,15 @@ define([
     // },
 
     /**
-     * Gets or sets the new value.
+     * Gets a projection of the new list value.
      *
-     * The value of the original property is not modified.
+     * When there are no changes, the owner list returned.
+     * Otherwise, a projected list is created and returned.
      *
-     * Do **NOT** modify the returned object in any way.
+     * Do **NOT** modify the returned list value in any way.
      *
-     * @type {!pentaho.type.Value}
+     * @type {!pentaho.type.List}
+     * @readOnly
      */
     get newValue() {
       var n = this._changes.length;
@@ -140,42 +142,6 @@ define([
       }
 
       return cachedValue;
-    },
-
-    set newValue(valueSpec) {
-      this.set(valueSpec);
-    },
-
-    /**
-     * Adds, removes, and/or updates elements to the element list.
-     *
-     * The element or elements specified in argument `fragment`
-     * are converted to the list's element class.
-     *
-     * @param {pentaho.type.Element|pentaho.type.Element[]} fragment - The element or elements to set.
-     *
-     * @param {Object} [keyArgs] - The keyword arguments.
-     *
-     * @param {boolean} [keyArgs.noAdd=false] Prevents adding new elements to the list.
-     * @param {boolean} [keyArgs.noRemove=false] Prevents removing elements not present in `fragment` from the list.
-     * @param {boolean} [keyArgs.noMove=false] Prevents moving elements inside the list.
-     * @param {boolean} [keyArgs.noUpdate=false] Prevents updating elements already present in the list.
-     *
-     * @param {number} [keyArgs.index] The index at which to add new elements.
-     * When unspecified, new elements are appended to the list.
-     * This argument is ignored when `noAdd` is `true`.
-     *
-     * @throws {pentaho.lang.OperationInvalid} When the changeset has already been applied or rejected.
-     */
-    set: function(fragment, keyArgs) {
-      this._set(
-        fragment,
-        !arg.optional(keyArgs, "noAdd"),
-        !arg.optional(keyArgs, "noUpdate"),
-        !arg.optional(keyArgs, "noRemove"),
-        !arg.optional(keyArgs, "noMove"),
-        arg.optional(keyArgs, "index")
-      );
     },
 
     _apply: function(target) {

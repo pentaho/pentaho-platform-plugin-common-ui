@@ -361,7 +361,7 @@ define([
         var changeset = this._changeset;
         if((created = !changeset)) changeset = new ComplexChangeset(this);
 
-        changeset.set(name, valueSpec);
+        changeset._set(name, valueSpec);
 
         if(created) return this._applyChanges();
         // else keeps the changeset and returns undefined, for now

@@ -507,21 +507,6 @@ define([
               expect(complex.getv("x")).toBe(0);
             });
 
-            it("should allow changing an element property, using changeset.set, from within the `will:change` event",
-            function() {
-
-              listeners.will.and.callFake(function(event) {
-                expect(function() {
-                  event.changeset.set("x", 2);
-                }).not.toThrow(); // listeners errors are swallowed
-              });
-
-              complex.set("x", 1);
-
-              expect(listeners.will).toHaveBeenCalled();
-              expect(complex.getv("x")).toBe(2);
-            });
-
             it("should allow changing an element property value, directly on the complex, " +
                "from within the `will:change` event", function() {
 
@@ -538,11 +523,51 @@ define([
               expect(complex.getv("x")).toBe(2);
             });
 
-            it("should throw when calling changeset#set in a `did:change` event", function() {
+            it("should initiate a new, nested changeset when calling owner.set from a `did:change` event", function() {
+              var entryCount = 0;
+
+              listeners.did.and.callFake(function(event) {
+                entryCount++;
+
+                if(entryCount === 1) {
+                  // Starts a nested change.
+                  var owner = event.changeset.owner;
+                  owner.set("x", 2);
+                }
+              });
+
+              complex.set("x", 1);
+
+              expect(complex.getv("x")).toBe(2);
+
+              expect(entryCount).toBe(2);
+            });
+
+            it("should initiate a new, nested changeset when calling owner.set from a `rejected:change` event",
+            function() {
+              var entryCount = 0;
+
+              listeners.rejected.and.callFake(function(event) {
+                entryCount++;
+                if(entryCount === 1) {
+                  // Starts a nested change.
+                  var owner = event.changeset.owner;
+                  owner.set("x", 2);
+                }
+              });
+
+              // First set gets rejected, but the second doesn't.
+              complex.set("x", THREE);
+
+              expect(complex.getv("x")).toBe(2);
+            });
+
+            // NOTE: consider removing this test as the _set method became "package private".
+            it("should throw when calling changeset#_set in a `did:change` event", function() {
               listeners.did.and.callFake(function(event) {
 
                 expect(function() {
-                  event.changeset.set("x", 2);
+                  event.changeset._set("x", 2);
                 }).toThrow(errorMatch.operInvalid());
 
                 expect(event.changeset.getChange("x").newValue.value).toBe(1);
@@ -551,11 +576,12 @@ define([
               complex.set("x", 1);
             });
 
-            it("should throw when calling changeset#set in a `rejected:change` event", function() {
+            // NOTE: consider removing this test as the _set method became "package private".
+            it("should throw when calling changeset#_set in a `rejected:change` event", function() {
               listeners.rejected.and.callFake(function(event) {
 
                 expect(function() {
-                  event.changeset.set("x", 2);
+                  event.changeset._set("x", 2);
                 }).toThrow(errorMatch.operInvalid());
 
                 expect(event.changeset.getChange("x").newValue.value).toBe(1);
@@ -567,22 +593,6 @@ define([
             it("should emit the `will:change` event when setting a list property to a different value", function() {
 
               complex.set("y", [1, 2]);
-
-              expect(listeners.will).toHaveBeenCalled();
-
-              expect(complex.atv("y", 0)).toBe(1);
-              expect(complex.atv("y", 1)).toBe(2);
-            });
-
-            it("should allow changing a list property from within the `will:change` event", function() {
-
-              listeners.will.and.callFake(function(event) {
-                expect(function() {
-                  event.changeset.set("y", [1, 2]);
-                }).not.toThrow(); // listeners errors are swallowed
-              });
-
-              complex.set("y", [1]);
 
               expect(listeners.will).toHaveBeenCalled();
 
