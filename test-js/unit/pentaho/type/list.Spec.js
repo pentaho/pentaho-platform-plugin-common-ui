@@ -25,7 +25,8 @@ define([
 
   "use strict";
 
-  /*global describe:true, it:true, expect:true, beforeEach:true, afterEach:true, jasmine:true, spyOn:true*/
+  /*global describe:true, it:true, expect:true, beforeEach:true, afterEach:true, jasmine:true, spyOn:true,
+    TypeError:true */
 
   var context = new Context(),
       Value = context.get(valueFactory),
@@ -300,6 +301,92 @@ define([
         });
       });
     }); //endregion constructor
+
+    //region ownership
+    describe("#owner", function() {
+      it("should be null after construction", function() {
+        var list = new List();
+        expect(list.owner).toBe(null);
+      });
+    });
+
+    describe("#ownerProperty", function() {
+      it("should be null after construction", function() {
+        var list = new List();
+        expect(list.ownerProperty).toBe(null);
+      });
+    });
+
+    describe("#setOwnership(owner, ownerProperty)", function() {
+      var Derived = Complex.extend({type: {
+        props: [
+          {name: "foo", type: ["string"]},
+          {name: "bar", type: ["string"]}
+        ]
+      }});
+
+      it("should throw if owner is not provided", function() {
+        var list = new List();
+        var propType = Derived.type.get("foo");
+
+        expect(function() {
+          list.setOwnership(null, propType);
+        }).toThrow(errorMatch.argRequired("owner"));
+      });
+
+      it("should throw if ownerProperty is not provided", function() {
+        var list = new List();
+        var derived = new Derived();
+
+        expect(function() {
+          list.setOwnership(derived, null);
+        }).toThrow(errorMatch.argRequired("propType"));
+      });
+
+      it("should not throw if both owner and ownerProperty are provided", function() {
+        var list = new List();
+        var derived = new Derived();
+        var propType = Derived.type.get("foo");
+
+        expect(function() {
+          list.setOwnership(derived, propType);
+        }).not.toThrow();
+      });
+
+      it("should have #owner return the specified owner", function() {
+        var list = new List();
+        var derived = new Derived();
+        var propType = Derived.type.get("foo");
+
+        list.setOwnership(derived, propType);
+        expect(list.owner).toBe(derived);
+      });
+
+      it("should have #ownerProperty return the specified ownerProperty", function() {
+        var list = new List();
+        var derived = new Derived();
+        var propType = Derived.type.get("foo");
+
+        list.setOwnership(derived, propType);
+        expect(list.ownerProperty).toBe(propType);
+      });
+
+      it("should throw if ownership is already taken", function() {
+        var list = new List();
+        var derived  = new Derived();
+        var propType = Derived.type.get("foo");
+
+        list.setOwnership(derived, propType);
+
+        var derived2  = new Derived();
+        var propType2 = Derived.type.get("bar");
+
+        expect(function() {
+          list.setOwnership(derived2, propType2);
+        }).toThrowError(TypeError);
+      });
+    });
+    //endregion
 
     //region read methods
     describe("#uid -", function() {
