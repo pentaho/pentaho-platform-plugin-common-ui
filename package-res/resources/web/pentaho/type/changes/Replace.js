@@ -27,7 +27,8 @@ define([
    * @amd pentaho/type/changes/Replace
    * @abstract
    *
-   * @classDesc Class that describes the replacement of the value in a [single-valued, simple property]{@linkplain pentaho.type.Simple}.
+   * @classDesc The `Replace` class describes the primitive operation that replaces the value of
+   * an [element property]{@link pentaho.type.Property#isList}.
    *
    * This type of change is always part of a {@link pentaho.type.changes.ComplexChangeset}.
    *

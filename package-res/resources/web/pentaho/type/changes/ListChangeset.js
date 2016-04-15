@@ -193,16 +193,19 @@ define([
      * populates [#changes]{@link pentaho.type.changes.ListChangeset#_changes} with the relevant
      * [PrimitiveChange]{@link pentaho.type.changes.PrimitiveChange} objects.
      *
-     * @param {any|Array} fragment - The element or elements to set.
-     * @param {boolean} add
-     * @param {boolean} update
-     * @param {boolean} remove
-     * @param {boolean} move
-     * @param {number} index
+     * @param {any|Array} fragment The element or elements to set.
+     * @param {?boolean} [add=false] Adds new elements to the list.
+     * @param {?boolean} [update=false] Updates elements already present in the list.
+     * @param {?boolean} [remove=false] Removes elements not present in `fragment` from the list.
+     * @param {?boolean} [move=false] Moves elements inside the list.
+     * @param {?number}  [index] The index at which to add new elements.
+     * When unspecified, new elements are appended to the list.
+     * This argument is ignored when `add` is `false`.
      *
-     * @throws {pentaho.lang.OperationInvalid} When the changeset has already been applied or rejected.
+     * @throws {pentaho.lang.OperationInvalidError} When the changeset has already been applied or rejected.
      *
      * @private
+     * @friend pentaho.type.List
      */
     _set: function(fragment, add, update, remove, move, index) {
 
@@ -357,12 +360,13 @@ define([
      * Creates a set of variable number of operations that remove elements from a list,
      * and appends that set to the list of changes.
      *
-     * @param {pentaho.type.Element|pentaho.type.Element[]} fragment - The element or elements to remove.
+     * @param {any|Array} fragment - The element or elements to remove.
      *
-     * @throws {pentaho.lang.OperationInvalid} When the changeset has already been applied or rejected.
+     * @throws {pentaho.lang.OperationInvalidError} When the changeset has already been applied or rejected.
      *
      * @see pentaho.type.changes.Remove
      * @private
+     * @friend pentaho.type.List
      */
     _remove: function(fragment) {
 
@@ -430,6 +434,19 @@ define([
       }
     },
 
+    /**
+     * Creates an operation that removes a section of elements from a list,
+     * and appends that change to the list of changes.
+     *
+     * @param {number} start The index at which to start removing.
+     * @param {number} [count=1] The number of elements to remove.
+     *
+     * @throws {pentaho.lang.OperationInvalidError} When the changeset has already been applied or rejected.
+     *
+     * @see pentaho.type.changes.Remove
+     * @private
+     * @friend pentaho.type.List
+     */
     _removeAt: function(start, count) {
 
       this._assertMutable();
@@ -457,10 +474,11 @@ define([
      * @param {function(pentaho.type.Element, pentaho.type.Element) : number} comparer - The
      * function used for comparing elements in the list.
      *
-     * @throws {pentaho.lang.OperationInvalid} When the changeset has already been applied or rejected.
+     * @throws {pentaho.lang.OperationInvalidError} When the changeset has already been applied or rejected.
      *
      * @see pentaho.type.changes.Sort
      * @private
+     * @friend pentaho.type.List
      */
     _sort: function(comparer) {
 
@@ -473,10 +491,11 @@ define([
      * Creates an operation that removes all elements in the list,
      * and appends that operation to the list of changes.
      *
-     * @throws {pentaho.lang.OperationInvalid} When the changeset has already been applied or rejected.
+     * @throws {pentaho.lang.OperationInvalidError} When the changeset has already been applied or rejected.
      *
      * @see pentaho.type.changes.Clear
      * @private
+     * @friend pentaho.type.List
      */
     _clear: function() {
 

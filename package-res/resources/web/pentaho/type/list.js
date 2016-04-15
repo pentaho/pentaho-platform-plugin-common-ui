@@ -319,7 +319,7 @@ define([
        * When the index is greater than or equal to the length of the list,
        * the element or elements are appended to the list.
        *
-       * @param {any|any[]} fragment Element or elements to add.
+       * @param {any|Array} fragment Element or elements to add.
        * @param {number} index The index at which to start inserting new elements.
        */
       insert: function(fragment, index) {
@@ -331,7 +331,7 @@ define([
        *
        * Specified elements that are not present in the list are ignored.
        *
-       * @param {pentaho.type.Element|Array.<pentaho.type.Element>} fragment Element or elements to remove.
+       * @param {any|Array} fragment Element or elements to remove.
        */
       remove: function(fragment) {
         this._usingChangeset(function(changeset) {
@@ -343,14 +343,14 @@ define([
        * Removes one or more elements from the list,
        * given the start index and the number of elements to remove.
        *
-       * If `count` is less than `1`, nothing is removed.
        * If `count` is {@link Nully} or omitted, it defaults to `1`.
+       * If `count` is less than `1`, nothing is removed.
        * If `start` is not less than the number of elements in the list, nothing is removed.
        * If `start` is negative,
        * it means to start removing that many elements from the end (`start' = length - start`).
        *
-       * @param {number} start Index at which to start removing.
-       * @param {number} [count=1] Number of elements to remove.
+       * @param {number} start The index at which to start removing.
+       * @param {number} [count=1] The number of elements to remove.
        */
       removeAt: function(start, count) {
         this._usingChangeset(function(changeset) {

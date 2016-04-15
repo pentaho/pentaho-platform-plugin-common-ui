@@ -21,6 +21,7 @@ define([
   "../../util/object",
   "../../util/error"
 ], function(Changeset, ListChangeset, Replace, O, error) {
+
   "use strict";
 
   /**
@@ -30,13 +31,13 @@ define([
    * @extends pentaho.type.changes.Changeset
    * @amd pentaho/type/changes/ComplexChangeset
    *
-   * @classDesc Describes a set of changes in a collection of properties
-   * in a [complex]{@linkplain pentaho.type.Complex} object.
+   * @classDesc The class `ComplexChangeset` describes a set of changes to the values of properties
+   * in a [complex]{@linkplain pentaho.type.Complex} value.
    *
    * @constructor
    * @description Creates a new instance.
    *
-   * @param {!pentaho.type.Complex} owner - The [complex object]{@linkplain pentaho.type.Complex} associated with this changeset.
+   * @param {!pentaho.type.Complex} owner - The complex value where the changes take place.
    */
   return Changeset.extend("pentaho.type.changes.ComplexChangeset", /** @lends pentaho.type.changes.ComplexChangeset#*/{
 
@@ -140,7 +141,10 @@ define([
      *
      * @throws {pentaho.lang.ArgumentInvalidError} When a property with name `name` is not defined.
      *
-     * @throws {pentaho.lang.OperationInvalid} When the changeset has already been applied or rejected.
+     * @throws {pentaho.lang.OperationInvalidError} When the changeset has already been applied or rejected.
+     *
+     * @private
+     * @friend pentaho.type.Complex
      */
     _set: function(name, valueSpec) {
       if(!name) throw error.argRequired("name");
@@ -224,5 +228,4 @@ define([
     }
     //endregion
   });
-
 });

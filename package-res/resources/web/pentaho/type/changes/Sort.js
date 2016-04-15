@@ -26,7 +26,7 @@ define([
    * @extends pentaho.type.changes.PrimitiveChange
    * @amd pentaho/type/changes/sort
    *
-   * @classDesc Describes an operation that sorts the element in a list.
+   * @classDesc The `Sort` class describes the primitive operation that sorts the element in a list.
    *
    * This type of change is always part of a {@link pentaho.type.changes.ListChangeset}.
    *

@@ -19,6 +19,9 @@ define([
 ], function(PrimitiveChange) {
   "use strict";
 
+  // TODO: This class will be replaced by direct ComplexChangesets, when transactions are implemented,
+  // so there's no great care on naming, docs, etc, here.
+
   return PrimitiveChange.extend("pentaho.type.changes.Update", /** @lends pentaho.type.changes.Update# */{
 
     /**
@@ -28,7 +31,7 @@ define([
      * @extends pentaho.type.changes.PrimitiveChange
      * @amd pentaho/type/changes/Update
      *
-     * @classDesc Describes an operation that updates an element in a list.
+     * @classDesc The `Update` class describes the primitive operation that updates an element in a list.
      * In an `update` operation, the reference to the element does not change, but its content does.
      *
      * This type of change is always part of a {@link pentaho.type.changes.ListChangeset}.
