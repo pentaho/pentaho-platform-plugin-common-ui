@@ -26,4 +26,5 @@ package org.pentaho.common.ui;
 public class Const {
 
   public static final String PLUGIN_ID = "common-ui"; //$NON-NLS-1$
+  // Just a test
 }
