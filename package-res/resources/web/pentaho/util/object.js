@@ -17,8 +17,9 @@ define(["./has"], function(has) {
   "use strict";
 
   var O_hasOwn = Object.prototype.hasOwnProperty,
-    A_empty  = [],
-    setProtoOf = has("Object.setPrototypeOf") ? Object.setPrototypeOf : (has("Object.prototype.__proto__") ? setProtoProp : setProtoCopy);
+      A_empty  = [],
+      setProtoOf = has("Object.setPrototypeOf") ? Object.setPrototypeOf : (has("Object.prototype.__proto__") ? setProtoProp : setProtoCopy),
+      constPropDesc = {value: undefined, writable: false, configurable: false, enumerable: false};
 
   /**
    * The `object` namespace contains functions for
@@ -121,14 +122,21 @@ define(["./has"], function(has) {
     /**
      * Sets a property in an object to a value and makes it constant (immutable).
      *
-     * The created property can neither be overwritten nor deleted.
+     * The created property cannot be overwritten, deleted, enumerated or configured.
      *
      * @param {!Object} object - The object whose property is to be set.
      * @param {string} property - The name of the property.
      * @param {any} value - The value.
      */
     setConst: function(o, p, v) {
-      Object.defineProperty(o, p, {value: v});
+      // Specifying writable ensures overriding previous writable value.
+      // Otherwise, only new properties receive a default of false...
+      constPropDesc.value = v;
+
+      // Leaks `v` if the following throws, but its an acceptable risk, being an error condition.
+      Object.defineProperty(o, p, constPropDesc);
+
+      constPropDesc.value = undefined;
     },
 
     /**

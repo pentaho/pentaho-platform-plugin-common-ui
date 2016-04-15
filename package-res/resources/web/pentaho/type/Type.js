@@ -92,11 +92,17 @@ define([
       if(arg.optional(keyArgs, "isRoot"))
         O.setConst(this, "root", this);
 
+      // ----
       // Block inheritance, with default values
-      this._id         = null;
+
+      // Don't use inherited property definition which may be writable false
+      Object.defineProperty(this, "_id", {value: null, writable: true});
+
       this._shortId    = undefined;
       this._styleClass = null;
-      this._hasDescendants = false;
+
+      // Don't use inherited property definition which may be writable false
+      Object.defineProperty(this, "_hasDescendants", {value: false, writable: true});
     },
 
     /**
