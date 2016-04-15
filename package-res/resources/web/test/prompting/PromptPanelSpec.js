@@ -336,16 +336,100 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
         expect(panel.onParameterChanged).toHaveBeenCalledWith(name, value);
       });
 
-      it("parameterChanged", function() {
-        var param = {};
-        var name = "name";
-        spyOn(panel, "_setTimeoutRefreshPrompt");
-        panel.parameterChanged(param, name);
-        expect(panel.parametersChanged).toBeTruthy();
-        expect(panel._setTimeoutRefreshPrompt).toHaveBeenCalled();
-        expect(panel.nullValueParams).toBeDefined();
-        expect(panel.nullValueParams.length).toBe(1);
-        expect(panel.nullValueParams[0]).toBe(param);
+      describe("parameterChanged", function() {
+        var param;
+        var name;
+        beforeEach(function() {
+          param = {};
+          name = "name";
+          spyOn(panel, "_setTimeoutRefreshPrompt");
+        });
+
+        describe("for single components (Text Area, Text Box, etc.)", function() {
+          beforeEach(function() {
+            param.list = false; // means that it is single component
+          });
+
+          var assertForSingleComponents = function() {
+            expect(panel.nullValueParams).toBeUndefined();
+            expect(panel.parametersChanged).toBeTruthy();
+            expect(panel._setTimeoutRefreshPrompt).toHaveBeenCalled();
+          };
+
+          it("should not fill nullValueParams with undefined value", function() {
+            panel.parameterChanged(param, name);
+            assertForSingleComponents();
+          });
+
+          it("should not fill nullValueParams with null value", function() {
+            var value = null;
+            panel.parameterChanged(param, name, value);
+            assertForSingleComponents();
+          });
+
+          it("should not fill nullValueParams with \"null\" value", function() {
+            var value = "null";
+            panel.parameterChanged(param, name, value);
+            assertForSingleComponents();
+          });
+
+          it("should not fill nullValueParams with \"\" value", function() {
+            var value = "";
+            panel.parameterChanged(param, name, value);
+            assertForSingleComponents();
+          });
+
+          it("should not fill nullValueParams with not empty value", function() {
+            var value = "value";
+            panel.parameterChanged(param, name, value);
+            assertForSingleComponents();
+          });
+        });
+
+        describe("for multi components (Multi Selection Button, Drop Down, etc.)", function() {
+          beforeEach(function() {
+            param.list = true; // means that it is multi component
+          });
+
+          var assertForMultiComponents = function() {
+            expect(panel.nullValueParams).toBeDefined();
+            expect(panel.nullValueParams.length).toBe(1);
+            expect(panel.nullValueParams[0]).toBe(param);
+            expect(panel.parametersChanged).toBeTruthy();
+            expect(panel._setTimeoutRefreshPrompt).toHaveBeenCalled();
+          };
+
+          it("should fill nullValueParams with undefined value", function() {
+            panel.parameterChanged(param, name);
+            assertForMultiComponents();
+          });
+
+          it("should fill nullValueParams with null value", function() {
+            var value = null;
+            panel.parameterChanged(param, name, value);
+            assertForMultiComponents();
+          });
+
+          it("should fill nullValueParams with \"null\" value", function() {
+            var value = "null";
+            panel.parameterChanged(param, name, value);
+            assertForMultiComponents();
+          });
+
+          it("should fill nullValueParams with \"\" value", function() {
+            var value = "";
+            panel.parameterChanged(param, name, value);
+            assertForMultiComponents();
+          });
+
+          it("should not fill nullValueParams with not empty value", function() {
+            var value = "value";
+            panel.parameterChanged(param, name, value);
+            expect(panel.nullValueParams).toBeUndefined();
+            expect(panel.parametersChanged).toBeTruthy();
+            expect(panel._setTimeoutRefreshPrompt).toHaveBeenCalled();
+          });
+        });
       });
 
       it("getParameterDefinition", function() {
@@ -665,7 +749,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
           expect(paramPanel.components.length).toBe(3);
           expect(paramPanel.components[0].type).toBe("TextComponent");
           expect(paramPanel.components[1].type).toBe("TextComponent");
-          expect(paramPanel.components[2].type).toBe("StaticAutocompleteBoxComponent");
+          expect(paramPanel.components[2].type).toBe("TextInputComponent");
           expect(paramPanel.components[0].promptType).toBe("label");
           expect(paramPanel.components[1].promptType).toBe("label");
           expect(paramPanel.components[2].promptType).toBe("prompt");
@@ -962,6 +1046,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
               // create a parameter
               originalParam = new Parameter();
               originalParam.type = "java.lang.String";
+              originalParam.list = true;
               originalParam.name = paramName;
               originalParam.multiSelect = true;
               originalParam.values = [ value1, value2 ];
@@ -1013,18 +1098,18 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
               spyOn(panel, "_initializeParameterValue");
               panel.dashboard.getParameterValue.and.returnValue("do");
 
-              var valuesArrayWithDefaultEmtyStrings = [["test1", "test1"],["test2", "test2"]];
-              componentSpy.valuesArray = valuesArrayWithDefaultEmtyStrings;
+              var valuesArrayWithDefaults = [ ["", ""], ["test1", "test1"], ["test2", "test2"] ];
+              componentSpy.valuesArray = valuesArrayWithDefaults;
+
+              var valuesArray = [ ["test1", "test1"], ["test2", "test2"] ];
+              spyOn(panel.widgetBuilder, "build").and.callFake(function(obj, type) {
+                return { "valuesArray": valuesArray };
+              });
 
               changedParam = new Parameter();
               changedParam.type = "java.lang.String";
               changedParam.name = paramName;
               changedParam.values = [ value1, value2 ];
-              var valuesArray = [["test1", "test1"],["test2", "test2"]];
-              spyOn(panel.widgetBuilder, "build").and.callFake(function(obj, type) {
-                return { "valuesArray": valuesArray };
-              });
-
               change = {};
               change[groupName] = {
                 params: [changedParam]
@@ -1032,7 +1117,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
 
               panel._changeComponentsByDiff(change);
 
-              expect(componentSpy.valuesArray).toBe(valuesArrayWithDefaultEmtyStrings);
+              expect(componentSpy.valuesArray).toBe(valuesArrayWithDefaults);
               expect(panel.widgetBuilder.build).toHaveBeenCalled();
               expect(panel._initializeParameterValue).not.toHaveBeenCalled();
               expect(panel.dashboard.updateComponent).not.toHaveBeenCalled();
@@ -1100,6 +1185,109 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
               panel.dashboard.updateComponent.calls.reset();
               panel._changeComponentsByDiff(change);
               expect(panel.dashboard.updateComponent).toHaveBeenCalledWith(componentSpy);
+            });
+
+
+            describe("PromptPanel's update components behaviour in _changeComponentsByDiff()", function() {
+
+              beforeEach(function() {
+                spyOn(panel, "_initializeParameterValue");
+
+                var valuesArray = [ ['qwerty', 'qwerty'] ];
+                componentSpy.valuesArray = valuesArray;
+                spyOn(panel.widgetBuilder, "build").and.callFake(function(obj, type) {
+                  return { "valuesArray": valuesArray };
+                });
+              });
+
+
+              var doTest = function(currentValue, selectedValue, type, updateIsExpected) {
+                panel.dashboard.updateComponent.calls.reset();
+                panel.dashboard.getParameterValue.and.returnValue(currentValue);
+
+                var selectedParams = [];
+                selectedValue = (type.indexOf("[") === 0 && selectedValue) ? selectedValue : [selectedValue];
+
+                for(var i=0; i < selectedValue.length; i++) {
+                  selectedParams[i] = new ParameterValue();
+                  selectedParams[i].value = selectedValue[i];
+                  selectedParams[i].selected = true;
+                }
+
+                var param = new Parameter();
+                param.name = 'param';
+                param.type = type;
+                param.values = selectedParams;
+
+                var toChangeDiff = { groupName: { params: [param] } };
+                panel._changeComponentsByDiff(toChangeDiff);
+
+                // should never be called in this test set
+                expect(panel._initializeParameterValue).not.toHaveBeenCalled();
+                if (updateIsExpected) {
+                  expect(panel.dashboard.updateComponent).toHaveBeenCalled();
+                } else {
+                  expect(panel.dashboard.updateComponent).not.toHaveBeenCalled();
+                }
+              };
+
+              it("cases for string", function () {
+                var stringType = 'java.lang.String';
+
+                doTest('a', 'a', stringType, false);
+                doTest('a', 'A', stringType, false);
+                doTest('A', 'a', stringType, false);
+
+                doTest('a', 'a ', stringType, true);
+                doTest('a', '1', stringType, true);
+
+                doTest(null, null, stringType, false);
+                doTest(undefined, null, stringType, false);
+                doTest(null, undefined, stringType, false);
+                doTest(undefined, undefined, stringType, false);
+              });
+
+              it("cases for date", function () {
+                var dateType = 'java.sql.Date';
+
+                doTest(new Date(2000, 0, 1), new Date(2000, 0, 1), dateType, false);
+                doTest(new Date(2000, 0, 1, 0, 1), new Date(2000, 0, 1, 2, 3), dateType, false);
+
+                doTest(new Date(2000, 0, 1), new Date(2000, 0, 2), dateType, true);
+                doTest(new Date(2000, 0, 1, 0, 1), new Date(2000, 0, 2, 2, 3), dateType, true);
+
+                doTest(null, null, dateType, false);
+                doTest(undefined, null, dateType, false);
+                doTest(null, undefined, dateType, false);
+                doTest(undefined, undefined, dateType, false);
+              });
+
+              it("cases for arrays", function () {
+                var arrayType = '[arrayType'; // Starting with "[" means its an array
+
+                doTest(["a","b"], ["a","b"], arrayType, false);
+                doTest(["a","b"], ["b","a"], arrayType, false);
+                doTest(["b","a","c"], ["c","b","a"], arrayType, false);
+
+                doTest(["a","b"], ["a"], arrayType, true);
+                doTest(["a","b"], ["a","c"], arrayType, true);
+                doTest(["a"], ["b","c"], arrayType, true);
+
+                doTest(null, null, arrayType, false);
+                doTest(undefined, null, arrayType, false);
+                doTest(null, undefined, arrayType, false);
+                doTest(undefined, undefined, arrayType, false);
+              });
+
+              it("cases for other types", function () {
+                var someType  = 'some-type';
+
+                doTest(0, 0, someType, false);
+                doTest(0, '0', someType, false);
+
+                doTest('null', null, someType, true);
+              });
+
             });
 
           });

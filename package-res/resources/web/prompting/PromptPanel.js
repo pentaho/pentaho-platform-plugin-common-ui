@@ -27,8 +27,8 @@
  * @property {Dashboard} dashboard The dashboard object assigned to the prompt
  * @property {Boolean} parametersChanged True if the parameters have changed, False otherwise
  */
-define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/util/util', 'common-ui/util/GUIDHelper', './WidgetBuilder', 'cdf/Dashboard.Clean', './parameters/ParameterDefinitionDiffer'],
-    function (Base, Logger, DojoNumber, i18n, Utils, GUIDHelper, WidgetBuilder, Dashboard, ParamDiff) {
+define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/util/util', 'common-ui/util/GUIDHelper', './WidgetBuilder', 'cdf/Dashboard.Clean', './parameters/ParameterDefinitionDiffer', 'common-ui/jquery-clean', 'common-ui/underscore'],
+    function (Base, Logger, DojoNumber, i18n, Utils, GUIDHelper, WidgetBuilder, Dashboard, ParamDiff, $, _) {
       /**
        * Creates a Widget calling the widget builder factory
        *
@@ -299,6 +299,36 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
         if (index > -1) {
           parent.components.splice(index, 1);
         }
+      };
+
+      /**
+       * Compares the parameter value to its stored value
+       * @name _areParamsDifferent
+       * @method
+       * @private
+       * @param {String|Date|Number} paramValue The stored parameter value
+       * @param {String|Date|Number} paramSelectedValue The value of the selected parameter
+       * @param {String} paramType The parameter type
+       * @returns {bool} The result of comparison
+       */
+      var _areParamsDifferent = function(paramValue, paramSelectedValue, paramType) {
+        if (paramValue && paramSelectedValue) {
+          switch (paramType) {
+            case "java.lang.String": // Used upper case to eliminate UPPER() post-process formula influence on the strings comparison
+              return paramValue.toUpperCase() != paramSelectedValue.toUpperCase();
+            case "java.sql.Date": // Set time to zero to eliminate its influence on the days comparison
+              return (new Date(paramValue).setHours(0,0,0,0)) != (new Date(paramSelectedValue).setHours(0,0,0,0));
+            default:
+              if(paramType.indexOf("[") == 0) { // Need to compare arrays
+                if(paramValue.length != paramSelectedValue.length)
+                  return true;
+                return !_.isEqual(paramValue.sort(), paramSelectedValue.sort());
+              }
+              return paramValue != paramSelectedValue;
+          }
+        }
+
+        return paramValue != paramSelectedValue;
       };
 
       var PromptPanel = Base.extend({
@@ -624,7 +654,7 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
             this.onParameterChanged(name, value);
           }
 
-          if (!value || value == "" || value == "null") {
+          if (param.list && (!value || value == "" || value == "null")) {
             if (!this.nullValueParams) {
               this.nullValueParams = [];
             }
@@ -940,7 +970,7 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
          *
          * @name PromptPanel#_changeComponentsByDiff
          * @method
-         * @param {JSON} toChangeDiff The group of paramters which need to be have their data changed
+         * @param {JSON} toChangeDiff The group of parameters which need to be have their data changed
          */
         _changeComponentsByDiff: function(toChangeDiff) {
           for (var groupName in toChangeDiff) {
@@ -975,13 +1005,19 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
                   this.forceSubmit = true;
                 }
 
-                var paramSelectedValues = param.getSelectedValuesValue();
-                if (paramSelectedValues.length == 1) {
-                  paramSelectedValues = paramSelectedValues[0];
-                }
-                var paramValue = this.dashboard.getParameterValue(component.parameter);
+                if (!updateNeeded) {
+                  var paramSelectedValues = param.getSelectedValuesValue();
+                  var dashboardParameter = this.dashboard.getParameterValue(component.parameter);
 
-                if (paramValue != paramSelectedValues || updateNeeded) {
+                  // if the dashboardParameter is not an array, paramSelectedValues shouldn't be either
+                  if (!_.isArray(dashboardParameter) && paramSelectedValues.length == 1) {
+                    paramSelectedValues = paramSelectedValues[0];
+                  }
+
+                  updateNeeded = _areParamsDifferent(dashboardParameter, paramSelectedValues, param.type);
+                }
+
+                if (updateNeeded) {
                   var groupPanel = this.dashboard.getComponentByName(groupName);
                   _mapComponents(groupPanel, function (component) {
                     this.dashboard.updateComponent(component);
