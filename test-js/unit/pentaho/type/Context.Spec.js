@@ -36,13 +36,40 @@ define([
       });
     });
 
-    describe("new Context(spec) -", function() {
+    describe("new Context([contextVars]) -", function() {
 
       it("should return a context instance", function() {
 
         return require.using(["pentaho/type/Context"], function(Context) {
           var context = new Context();
           expect(context instanceof Context).toBe(true);
+        });
+      });
+
+      it("should create a context that has a ContextVars in #vars", function() {
+
+        return require.using(["pentaho/type/Context"], function(Context) {
+          var context = new Context();
+          expect(context.vars instanceof Object).toBe(true);
+        });
+      });
+
+      it("should create a context that has a GlobalContextVars by default", function() {
+
+        return require.using(["pentaho/type/Context", "pentaho/GlobalContextVars"],
+        function(Context, GlobalContextVars) {
+          var context = new Context();
+          expect(context.vars instanceof GlobalContextVars).toBe(true);
+        });
+      });
+
+      it("should respect a given contextVars instance", function() {
+
+        return require.using(["pentaho/type/Context", "pentaho/GlobalContextVars"],
+        function(Context, GlobalContextVars) {
+          var vars = new GlobalContextVars();
+          var context = new Context(vars);
+          expect(context.vars).toBe(vars);
         });
       });
     });
