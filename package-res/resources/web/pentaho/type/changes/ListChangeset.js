@@ -213,6 +213,8 @@ define([
           existing, elem, key;
 
       // Next insert index.
+      // It will be corrected with the removes
+      // that occur before it
       if(index == null) {
         index = elems.length;
       } else {
@@ -237,11 +239,9 @@ define([
 
       var computed = [];
 
-      var newElements = [];
-      var baseIndex = index;
-      var relativeIndex = 0;
-
       // I - Pre-process setElems array
+      var newElements = [];
+
       var i = -1;
       var L = setElems.length;
       while(++i < L) {
@@ -256,17 +256,9 @@ define([
             } else {
               setKeys[key] = 1;
             }
-
-            if(!repeated) {
-              if(!newElements.length) {
-                ++baseIndex;
-              } else if(move) {
-                relativeIndex++;
-              }
-            }
           } else if(!repeated && add) {
             setKeys[key] = 3;
-            newElements.push({type: "add", value: elem, to: relativeIndex++});
+            newElements.push({value: elem, to: newElements.length});
           } else {
             // Remove duplicates from setElems
             setElems.splice(i, 1);
@@ -277,7 +269,11 @@ define([
       }
 
       // II - Process removes and build computed array
-      var realBaseIndex = baseIndex;
+
+      // baseIndex represents the lowest index
+      // of an already existing element on the
+      // current array
+      var baseIndex;
 
       var removeCount = 0;
 
@@ -289,8 +285,8 @@ define([
 
         if(!O.hasOwn(setKeys, key)) {
           if(remove) {
-            if(i < baseIndex) {
-              --realBaseIndex;
+            if(i < index) {
+              --index;
             }
 
             this._addChange(new Remove([elem], i - removeCount));
@@ -300,8 +296,20 @@ define([
             computed.push(key);
           }
         } else {
+          // baseIndex value is the lowest index
+          // of an already existing element
+          if(baseIndex == null) {
+            baseIndex = i - removeCount;
+          }
+
           computed.push(key);
         }
+      }
+
+      // if not set above and adding elements, baseIndex
+      // value is the current corrected insertion index
+      if(baseIndex == null && newElements.length > 0) {
+        baseIndex = index;
       }
 
       // III - Process adds
@@ -311,33 +319,38 @@ define([
         while (++i < L) {
           var action = newElements[i];
 
-          var newIndex = realBaseIndex + action.to;
-          if (action.type === "add") {
-            this._addChange(new Add(action.value, newIndex));
+          var newIndex = index + action.to;
 
-            computed.splice(newIndex, 0, action.value.key);
-          }
+          this._addChange(new Add(action.value, newIndex));
+
+          computed.splice(newIndex, 0, action.value.key);
         }
       }
 
-      // Moves only make sense on a proper set()
-      move = move && computed.length === setElems.length;
-
       // IV - Process moves and updates
+      var lastDestinationIndex = 0;
       if(move || update) {
         i = -1;
         L = setElems.length;
         while(++i < L) {
           if((elem = list._cast(setElems[i])) != null) {
-            var currentIndex = computed.indexOf(elem.key, i);
+            var currentIndex = computed.indexOf(elem.key);
             if(move) {
-              if (currentIndex !== i) {
-                this._addChange(new Move([elem], currentIndex, i));
-
-                computed.splice(i, 0, computed.splice(currentIndex, 1)[0]);
-
-                currentIndex = i;
+              if(currentIndex < baseIndex) {
+                --baseIndex;
               }
+
+              if (currentIndex < baseIndex + i || currentIndex < lastDestinationIndex) {
+                var destinationIndex = Math.max(baseIndex + i, lastDestinationIndex);
+
+                this._addChange(new Move([elem], currentIndex, destinationIndex));
+
+                computed.splice(destinationIndex, 0, computed.splice(currentIndex, 1)[0]);
+
+                currentIndex = destinationIndex;
+              }
+
+              lastDestinationIndex = currentIndex;
             }
 
             if(update && setKeys[elem.key] === 2) {
