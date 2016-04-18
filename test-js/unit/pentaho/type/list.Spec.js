@@ -588,8 +588,6 @@ define([
         var list = new NumberList();
 
         list.add([1, 2, 3]);
-
-        //editing test
         _expectEqualValueAt(list, [1, 2, 3]);
       });
 
@@ -665,14 +663,14 @@ define([
         expect(list.get("4").value).toBe(4);
       });
       
-      xit("new add case - NEW-UNIT", function() {
+      it("should only append the values not present in the list and update the values already present", function() {
         
         var list = new NumberList([1, 5, 10, 11, 40]);
 
         expect(list.count).toBe(5);
+
         list.add([5, 11, 2, 3, 1, 10]);
         _expectEqualValueAt(list, [1, 5, 10, 11, 40, 2, 3]);
-        
       });
     }); //endregion #add
 
@@ -812,6 +810,15 @@ define([
         expect(list.count).toBe(4);
         expect(list.get("4").value).toBe(4);
       });
+
+      it("should only insert the values not present in the list, at the specified existing index and update the values already present", function() {
+        var list = new NumberList([1, 5, 10, 11, 40]);
+
+        expect(list.count).toBe(5);
+
+        list.insert([5, 11, 2, 3, 1, 10], 1);
+        _expectEqualValueAt(list, [1, 2, 3, 5, 10, 11, 40]);
+      });
     }); //endregion #insert
 
     //region #remove(fragment)
@@ -885,20 +892,6 @@ define([
         // ----
 
         expect(list.count).toBe(4);
-      });
-
-      xit("new remove case - NEW-UNIT", function() {
-        
-        var list = new NumberList([1, 5, 10, 11, 40]);
-        expect(list.count).toBe(4);
-
-        // ----
-
-        list.remove([5, 11, 2, 3, 1, 10]);
-
-        // ----
-        
-        _expectEqualValueAt(list, [1, 5, 10, 11]);
       });
       
     }); //endregion #remove
@@ -1081,21 +1074,20 @@ define([
       });
     }); //endregion #removeAt
 
-    //region #set(fragment, {noAdd, noUpdate, noRemove, index})
-    describe("#set(fragment, {noAdd, noUpdate, noRemove, index}) -", function() {
+    //region #set(fragment, {noAdd, noUpdate, noRemove, noMove, index})
+    describe("#set(fragment, {noAdd, noUpdate, noRemove, noMove, index}) -", function() {
       // TODO: test update on complexes
-      it("should append, update and remove, when no options are specified", function() {
-        var list = new NumberList([1, 2, 3, 4]);
-
-        expect(list.count).toBe(4);
-
-        // ---
-
-        list.set([1, 3, 5]);
+      it("should append, update, remove and move, when no options are specified", function() {
+        var list = new NumberList([1, 5, 10, 11, 40]);
+        expect(list.count).toBe(5);
 
         // ---
 
-        _expectEqualValueAt(list, [1, 3, 5]);
+        list.set([5, 11, 2, 3, 1, 10]);
+
+        // ---
+
+        _expectEqualValueAt(list, [5, 11, 2, 3, 1, 10]);
       });
 
       it("should append and update but not remove when {noRemove: true}", function() {
@@ -1150,19 +1142,6 @@ define([
         // ---
 
         expect(list.count).toBe(0);
-      });
-      
-      xit("new set case - NEW-UNIT", function() {
-        
-        var list = new NumberList([1, 5, 10, 11, 40]);
-
-        // ---
-
-        list.set([5, 11, 2, 3, 1, 10]);
-
-        // ---
-
-        _expectEqualValueAt(list, [5, 11, 2, 3, 1, 10]);
       });
     }); //endregion set
 
