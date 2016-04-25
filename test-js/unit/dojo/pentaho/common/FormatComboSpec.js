@@ -16,7 +16,7 @@ define( ["pentaho/common/FormatCombo"], function( FormatCombo ) {
       expect( fc.query ).toEqual( { type: "date" } )
     } );
 
-    it( "should set accept formats as part of the construcotr that override defaults", function() {
+    it( "should set accept formats as part of the constructor that override defaults", function() {
       var fc = new FormatCombo( { name: "test name", dataType: "numeric", formats: [ { name: "one", type: "numeric" } ] } );
       expect( fc.dataType).toEqual( "numeric" );
       expect( fc.baseClass).toContain( "pentahoFormatCombo" );
