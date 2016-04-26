@@ -15,6 +15,7 @@
  */
 define([
   "pentaho/visual/base/View",
+  "pentaho/visual/base/types/selectionModes",
   "cdf/lib/CCC/def",
   "cdf/lib/CCC/pvc",
   "cdf/lib/CCC/cdo",
@@ -28,7 +29,7 @@ define([
   "pentaho/data/TableView",
   "./ViewDemo",
   "pentaho/i18n!view"
-], function(View,
+], function(View, selectionModes,
             def, pvc, cdo, pv, Axis,
             util, O, filter, visualColorUtils, visualPaletteRegistry,
             DataView, ViewDemo, bundle) {
@@ -1324,7 +1325,10 @@ define([
 
 
       var selectionFilter = new filter.Or(operands);
-      this.model.selectAction(selectionFilter);
+      var keyArgs = {};
+
+      if(operands && operands.length === 0) keyArgs.selectionMode = selectionModes.REPLACE;
+      this.model.selectAction(selectionFilter, keyArgs);
 
       // Explicitly cancel CCC's native selection handling.
       return [];
