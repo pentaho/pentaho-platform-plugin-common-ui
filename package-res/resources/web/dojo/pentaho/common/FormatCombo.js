@@ -28,12 +28,12 @@ define( [ "dojo/_base/declare",
 
       { name: "m/d", type: "date", category: "date" },
       { name: "m/d/yy", type: "date", category: "date" },
-      { name: "mm/dd/yy", type: "date", category: "date" },
+      { name: "MM/dd/yy", type: "date", category: "date" },
       { name: "d-mmm", type: "date", category: "date" },
       { name: "d-mmm-yy", type: "date", category: "date" },
       { name: "mmm-yy", type: "date", category: "date" },
-      { name: "mmmm-yy", type: "date", category: "date" },
-      { name: "mmmm d, yyyy", type: "date", category: "date" },
+      { name: "MMMMM-yy", type: "date", category: "date" },
+      { name: "MMMMM d, yyyy", type: "date", category: "date" },
       { name: "m/d/yy h:mm AM/PM", type: "date", category: "date" },
       { name: "m/d/yy h:mm", type: "date", category: "date" },
       { name: "m/d/yyyy", type: "date", category: "date" },
@@ -57,6 +57,7 @@ define( [ "dojo/_base/declare",
       labelAttr: "label",
       labelType: "html",
       orient: ["below-centered", "below", "before"],
+      ignoreCase: false,
 
       constructor: function( args ) {
         lang.mixin( this, args );
