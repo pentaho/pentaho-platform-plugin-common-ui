@@ -27,12 +27,12 @@ define([
     itFillSpecMethodAttribute: itFillSpecMethodAttribute
   };
 
-  function fillSpec(BaseInstCtor, spec, typeSpec) {
+  function fillSpec(BaseInstCtor, spec, typeSpec, keyArgs) {
     var derivedType = BaseInstCtor.extend({type: typeSpec}).type;
 
     var scope = new SpecificationScope();
 
-    var result = derivedType._fillSpecInContext(spec, {});
+    var result = derivedType._fillSpecInContext(spec, keyArgs || {});
 
     scope.dispose();
 

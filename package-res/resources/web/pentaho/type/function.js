@@ -20,11 +20,9 @@ define([
   "../i18n!types"
 ], function(module, simpleFactory, F, bundle) {
 
-  // Cannot use strict here because of the evil eval, below...
+  "use strict";
 
   return function(context) {
-
-    "use strict";
 
     var Simple = context.get(simpleFactory);
 
@@ -47,6 +45,12 @@ define([
        * @type function
        * @readonly
        */
+
+      //region serialization
+      _toJSONValue: function(keyArgs) {
+        return String(this._value);
+      },
+      //endregion
 
       type: {
         id: module.id,

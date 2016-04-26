@@ -43,6 +43,14 @@ define([
 
       describe("#cast", function() {
         serializationUtil.itFillSpecMethodAttribute(Simple, "cast");
+
+        it("should not serialize when value is local and isJson: true", function() {
+          var spec = {};
+          var typeSpec = {cast: function() {}};
+          var result = serializationUtil.fillSpec(Simple, spec, typeSpec, {isJson: true});
+
+          expect(result).toBe(false);
+        });
       });
     });
   });

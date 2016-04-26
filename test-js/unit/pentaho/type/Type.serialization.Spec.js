@@ -216,6 +216,23 @@ define([
         serializationUtil.itFillSpecAttribute(Instance, "view", "/my/view", true);
         serializationUtil.itFillSpecAttribute(Instance, "view", null, true);
         serializationUtil.itFillSpecAttribute(Instance, "view", undefined, false);
+
+        it("should not output a local view constructor when isJson: true", function() {
+          var spec = {};
+          var typeSpec = {view: f};
+          var result = serializationUtil.fillSpec(Instance, spec, typeSpec, {isJson: true});
+
+          expect(result).toBe(false);
+        });
+
+        it("should output a local view id when isJson: true", function() {
+          var spec = {};
+          var typeSpec = {view: "/my/view/"};
+          var result = serializationUtil.fillSpec(Instance, spec, typeSpec, {isJson: true});
+
+          expect(result).toBe(true);
+          expect(spec.view).toBe("/my/view/");
+        });
       });
     });
 
@@ -353,5 +370,37 @@ define([
         expect(typeRef2).toBe(typeRef1.id);
       });
     });
+
+    describe("#toJSON()", function() {
+
+      var derivedType;
+
+      beforeEach(function() {
+        derivedType = Instance.extend({type: {id: "pentaho/type/test"}}).type;
+      });
+
+      it("should call #toSpec({isJson: true})", function() {
+
+        spyOn(derivedType, "toSpec");
+
+        derivedType.toJSON();
+
+        expect(derivedType.toSpec.calls.count()).toBe(1);
+
+        var args = derivedType.toSpec.calls.first().args;
+        expect(args.length).toBe(1);
+        expect(args[0].constructor).toBe(Object);
+        expect(args[0].isJson).toBe(true);
+      });
+
+      it("should return the result of calling #toSpec", function() {
+
+        var result = {};
+
+        spyOn(derivedType, "toSpec").and.returnValue(result);
+
+        expect(derivedType.toJSON()).toBe(result);
+      });
+    }); // toJSON
   });
 });

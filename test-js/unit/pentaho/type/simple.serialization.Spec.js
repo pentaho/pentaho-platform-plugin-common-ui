@@ -135,6 +135,72 @@ define([
 
         scope.dispose();
       });
+
+      it("should call _toJSONValue when keyArgs.isJson: true", function() {
+        var scope = new SpecificationScope();
+
+        var value = new PentahoBoolean(true);
+
+        spyOn(value, "_toJSONValue").and.callThrough();
+
+        value.toSpecInContext({isJson: true});
+
+        scope.dispose();
+
+        expect(value._toJSONValue).toHaveBeenCalled();
+      });
+
+      it("should not call _toJSONValue when keyArgs.isJson: false", function() {
+        var scope = new SpecificationScope();
+
+        var value = new PentahoBoolean(true);
+
+        spyOn(value, "_toJSONValue");
+
+        value.toSpecInContext({isJson: false});
+
+        scope.dispose();
+
+        expect(value._toJSONValue).not.toHaveBeenCalled();
+      });
+
+      it("should return cell format when _toJSONValue returns a plain object and keyArgs.isJson: true", function() {
+        var scope = new SpecificationScope();
+
+        var value = new PentahoBoolean(true);
+        var valueResult = {};
+
+        spyOn(value, "_toJSONValue").and.returnValue(valueResult);
+
+        var cellResult = value.toSpecInContext({isJson: true});
+
+        scope.dispose();
+
+        expect(cellResult instanceof Object).toBe(true);
+        expect(cellResult.v).toBe(valueResult);
+      });
+    });
+
+    describe("#_toJSONValue", function() {
+      it("should return the value property", function() {
+        var scope = new SpecificationScope();
+
+        var value = new PentahoBoolean(true);
+
+        expect(value._toJSONValue()).toBe(true);
+
+        scope.dispose();
+
+        // ---
+
+        scope = new SpecificationScope();
+
+        value = new PentahoBoolean(false);
+
+        expect(value._toJSONValue()).toBe(false);
+
+        scope.dispose();
+      });
     });
   }); // pentaho.type.Simple
 
@@ -158,10 +224,13 @@ define([
 
       describe("values", function() {
         describe("primitive format (omitFormatted: true)", function() {
-          it("should return the primitive value", function() {
+          it("should return the primitive value when it is not a plain object or wrap it otherwise", function() {
             var spec = value.toSpec({omitFormatted: true, includeType: false});
-
-            expect(spec).toBe(simpleSpec.value);
+            if(simpleSpec.value instanceof Object && simpleSpec.value.constructor === Object) {
+              expect(spec.v).toBe(simpleSpec.value);
+            } else {
+              expect(spec).toBe(simpleSpec.value);
+            }
           });
         });
 
@@ -177,10 +246,14 @@ define([
       });
 
       describe("inline type spec includeType: false", function() {
-        it("should not inline type spec", function() {
+        it("should not inline type spec when primitive value is not an object, and should wrap otherwise", function() {
           var spec = value.toSpec({includeType: false});
 
-          expect(spec).toBe(simpleSpec.value);
+          if(simpleSpec.value instanceof Object && simpleSpec.value.constructor === Object) {
+            expect(spec.v).toBe(simpleSpec.value);
+          } else {
+            expect(spec).toBe(simpleSpec.value);
+          }
         });
       });
 
