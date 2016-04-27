@@ -349,18 +349,20 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
        */
       var _areParamsDifferent = function(paramValue, paramSelectedValue, paramType) {
         if (paramValue && paramSelectedValue) {
-          switch (paramType) {
-            case "java.lang.String": // Used upper case to eliminate UPPER() post-process formula influence on the strings comparison
-              return paramValue.toUpperCase() != paramSelectedValue.toUpperCase();
-            case "java.sql.Date": // Set time to zero to eliminate its influence on the days comparison
-              return (new Date(paramValue).setHours(0,0,0,0)) != (new Date(paramSelectedValue).setHours(0,0,0,0));
-            default:
-              if(paramType.indexOf("[") == 0) { // Need to compare arrays
-                if(paramValue.length != paramSelectedValue.length)
-                  return true;
-                return !_.isEqual(paramValue.sort(), paramSelectedValue.sort());
-              }
-              return paramValue != paramSelectedValue;
+          if (_.isArray( paramValue) && _.isArray(paramSelectedValue)) {
+            if(paramValue.length != paramSelectedValue.length) {
+              return true;
+            }
+            return !_.isEqual(paramValue.sort(), paramSelectedValue.sort());
+          } else {
+            switch (paramType) {
+              case "java.lang.String": // Used upper case to eliminate UPPER() post-process formula influence on the strings comparison
+                return paramValue.toUpperCase() != paramSelectedValue.toUpperCase();
+              case "java.sql.Date": // Set time to zero to eliminate its influence on the days comparison
+                return (new Date(paramValue).setHours(0,0,0,0)) != (new Date(paramSelectedValue).setHours(0,0,0,0));
+              default:
+                return paramValue != paramSelectedValue;
+            }
           }
         }
 
