@@ -81,16 +81,15 @@ define([
         });
       }
 
-      //TODO: check why not working inside PDI
       var url = "http://www.google.com/search?as_q=\"" + queryValue + "\"";
       window.open(url, "_blank");
 
       logger.log("Google Search:" + url);
     },
 
-    _hackedRender: function() {
-      this._selectionChanged(this.model.getv("selectionFilter"), new filter.Or());
-      this._chart.renderInteractive();
+    _renderCore: function() {
+      this.base();
+
       this._renderCounter++; //BACKLOG-6739
     },
 

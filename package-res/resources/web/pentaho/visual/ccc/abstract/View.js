@@ -222,8 +222,8 @@ define([
     //region Helpers
 
     /** @inheritdoc */
-    _selectionChanged: function(newSelectionFilter, previousSelectionFilter) {
-      var dataFilter = newSelectionFilter; // || this.model.getv("selectionFilter") || new filter.Or();
+    _selectionChanged: function(newSelectionFilter) {
+      var dataFilter = newSelectionFilter;
       var selectedItems = dataFilter.apply(this.model.getv("data"));
 
       // Get information on the axes
@@ -1268,7 +1268,12 @@ define([
         .setData(this._dataView.toJsonCda())
         .render();
 
-      this._hackedRender();
+      this._updateSelections();
+    },
+
+    _updateSelections: function() {
+      this._selectionChanged(this.model.getv("selectionFilter"));
+      this._chart.updateSelections();
     },
 
     //region SELECTION
