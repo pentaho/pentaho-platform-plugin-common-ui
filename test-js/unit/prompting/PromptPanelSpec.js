@@ -17,8 +17,8 @@
 
 define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
   'common-ui/prompting/parameters/ParameterDefinition', 'common-ui/prompting/parameters/ParameterGroup',
-  'common-ui/prompting/parameters/Parameter', 'common-ui/prompting/parameters/ParameterValue', 'common-ui/jquery-clean' ], function(DojoNumber,
-  i18n, PromptPanel, ParameterDefinition, ParameterGroup, Parameter, ParameterValue, $) {
+  'common-ui/prompting/parameters/Parameter', 'common-ui/prompting/parameters/ParameterValue', 'common-ui/jquery-clean', 'common-ui/underscore' ], function(DojoNumber,
+  i18n, PromptPanel, ParameterDefinition, ParameterGroup, Parameter, ParameterValue, $, _) {
 
   describe("PromptPanel", function() {
 
@@ -1272,7 +1272,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
                 panel.dashboard.getParameterValue.and.returnValue(currentValue);
 
                 var selectedParams = [];
-                selectedValue = (type.indexOf("[") === 0 && selectedValue) ? selectedValue : [selectedValue];
+                selectedValue = ((type.indexOf("[") === 0 || _.isArray(selectedValue)) && selectedValue) ? selectedValue : [selectedValue];
 
                 for(var i=0; i < selectedValue.length; i++) {
                   selectedParams[i] = new ParameterValue();
@@ -1311,6 +1311,10 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
                 doTest(undefined, null, stringType, false);
                 doTest(null, undefined, stringType, false);
                 doTest(undefined, undefined, stringType, false);
+
+                doTest(["a","b"], ["a","b"], stringType, false);
+                doTest(["a","b"], ["a"], stringType, true);
+                doTest(["b"], ["c","b","a"], stringType, true);
               });
 
               it("cases for date", function () {
