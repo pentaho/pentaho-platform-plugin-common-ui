@@ -401,6 +401,18 @@ define([
 
         expect(derivedType.toJSON()).toBe(result);
       });
+
+      it("should really be called when JSON.stringify(.) is used", function() {
+
+        var result = {};
+
+        spyOn(derivedType, "toJSON").and.returnValue(result);
+
+        JSON.stringify(derivedType);
+
+        expect(derivedType.toJSON).toHaveBeenCalled();
+        expect(derivedType.toJSON.calls.first().object).toBe(derivedType);
+      });
     }); // toJSON
   });
 });

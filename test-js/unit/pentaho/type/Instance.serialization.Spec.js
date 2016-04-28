@@ -85,6 +85,17 @@ define([
 
         expect(value.toJSON()).toBe(result);
       });
+
+      it("should really be called when JSON.stringify(.) is used", function() {
+        var value = new Instance();
+        var result = {};
+        spyOn(value, "toJSON").and.returnValue(result);
+
+        JSON.stringify(value);
+
+        expect(value.toJSON).toHaveBeenCalled();
+        expect(value.toJSON.calls.first().object).toBe(value);
+      });
     }); // toJSON
   });
 });
