@@ -135,64 +135,182 @@ define([
 
         scope.dispose();
       });
+
+      it("should call _toJSONValue when keyArgs.isJson: true", function() {
+        var scope = new SpecificationScope();
+
+        var value = new PentahoBoolean(true);
+
+        spyOn(value, "_toJSONValue").and.callThrough();
+
+        value.toSpecInContext({isJson: true});
+
+        scope.dispose();
+
+        expect(value._toJSONValue).toHaveBeenCalled();
+      });
+
+      it("should not call _toJSONValue when keyArgs.isJson: false", function() {
+        var scope = new SpecificationScope();
+
+        var value = new PentahoBoolean(true);
+
+        spyOn(value, "_toJSONValue");
+
+        value.toSpecInContext({isJson: false});
+
+        scope.dispose();
+
+        expect(value._toJSONValue).not.toHaveBeenCalled();
+      });
+
+      it("should return cell format when _toJSONValue returns a plain object and keyArgs.isJson: true", function() {
+        var scope = new SpecificationScope();
+
+        var value = new PentahoBoolean(true);
+        var valueResult = {};
+
+        spyOn(value, "_toJSONValue").and.returnValue(valueResult);
+
+        var cellResult = value.toSpecInContext({isJson: true});
+
+        scope.dispose();
+
+        expect(cellResult instanceof Object).toBe(true);
+        expect(cellResult.v).toBe(valueResult);
+      });
+    });
+
+    describe("#_toJSONValue", function() {
+      it("should return the value property", function() {
+        var scope = new SpecificationScope();
+
+        var value = new PentahoBoolean(true);
+
+        expect(value._toJSONValue()).toBe(true);
+
+        scope.dispose();
+
+        // ---
+
+        scope = new SpecificationScope();
+
+        value = new PentahoBoolean(false);
+
+        expect(value._toJSONValue()).toBe(false);
+
+        scope.dispose();
+      });
     });
   }); // pentaho.type.Simple
 
-  var simplerTypes = [
-    {name: "boolean",  value: true},
-    {name: "number",   value: 10},
-    {name: "string",   value: "hello"},
-    {name: "object",   value: {foo: "bar"}},
-    {name: "function", value: function() {}},
-    {name: "date",     value: new Date()}
-  ];
+  //region Other Simple Types Test Helpers
 
-  simplerTypes.forEach(function(simpleSpec) {
-    describe("pentaho.type." + simpleSpec.name, function() {
-      var SimpleClass = context.get("pentaho/type/" + simpleSpec.name);
+  function testSimpleCommon(SimpleClass, primitiveValue) {
 
-      var value;
-      beforeEach(function() {
-        value = new SimpleClass(simpleSpec);
-      });
+    it("should output a cell with the '_' inline type reference when includeType: true", function() {
+      var value = new SimpleClass({v: primitiveValue});
+      var spec = value.toSpec({includeType: true});
 
-      describe("values", function() {
-        describe("primitive format (omitFormatted: true)", function() {
-          it("should return the primitive value", function() {
-            var spec = value.toSpec({omitFormatted: true, includeType: false});
-
-            expect(spec).toBe(simpleSpec.value);
-          });
-        });
-
-        describe("object format (omitFormatted: false)", function() {
-          it("spec.v should contain the primitive value", function() {
-            var spec = value.toSpec({omitFormatted: true, includeType: true});
-
-            expect(typeof spec).toBe("object");
-            expect(spec.v).toBe(simpleSpec.value);
-            expect(spec._).toEqual(SimpleClass.type.toRefInContext());
-          });
-        });
-      });
-
-      describe("inline type spec includeType: false", function() {
-        it("should not inline type spec", function() {
-          var spec = value.toSpec({includeType: false});
-
-          expect(spec).toBe(simpleSpec.value);
-        });
-      });
-
-      describe("inline type spec includeType: true", function() {
-        it("should inline pentaho/type/" + simpleSpec.name + " type spec", function() {
-          var spec = value.toSpec({includeType: true});
-
-          expect(typeof spec).toBe("object");
-          expect(spec._).toEqual(SimpleClass.type.toRefInContext());
-          expect(spec.f).toBeUndefined();
-        });
-      });
+      expect(typeof spec).toBe("object");
+      expect(spec._).toEqual(SimpleClass.type.toRefInContext());
     });
+
+    it("should output the primitive value in the 'v' property when in cell mode", function() {
+      var value = new SimpleClass({v: primitiveValue});
+      var spec = value.toSpec({includeType: true});
+
+      expect(spec.v).toBe(primitiveValue);
+    });
+  }
+
+  function testSimplePlainObject(SimpleClass, primitiveValue) {
+
+    it("should return a cell with a 'v' property when omitFormatted: true, includeType: false and " +
+       "the primitive value is a plain object", function() {
+
+      expect(primitiveValue instanceof Object && primitiveValue.constructor === Object).toBe(true);
+
+      var value = new SimpleClass({v: primitiveValue});
+
+      var spec = value.toSpec({omitFormatted: true, includeType: false});
+
+      expect(spec instanceof Object).toBe(true);
+      expect(spec).not.toBe(primitiveValue);
+      expect(spec.v).toBe(primitiveValue);
+    });
+  }
+
+  function testSimpleNonPlainObject(SimpleClass, primitiveValue) {
+
+    it("should return the primitive value when omitFormatted: true, includeType: false and " +
+       "the primitive value is not a plain object", function() {
+
+      expect(primitiveValue instanceof Object && primitiveValue.constructor === Object).toBe(false);
+
+      var value = new SimpleClass({v: primitiveValue});
+
+      var spec = value.toSpec({omitFormatted: true, includeType: false});
+
+      expect(spec).toBe(primitiveValue);
+    });
+  }
+  //endregion
+
+  describe("pentaho.type.Boolean", function() {
+    var SimpleClass = context.get("pentaho/type/boolean");
+    var primitiveValue = true;
+
+    testSimpleCommon(SimpleClass, primitiveValue);
+    testSimpleNonPlainObject(SimpleClass, primitiveValue);
+  });
+
+  describe("pentaho.type.Number", function() {
+    var SimpleClass = context.get("pentaho/type/number");
+    var primitiveValue = 10;
+
+    testSimpleCommon(SimpleClass, primitiveValue);
+    testSimpleNonPlainObject(SimpleClass, primitiveValue);
+  });
+
+  describe("pentaho.type.String", function() {
+    var SimpleClass = context.get("pentaho/type/string");
+    var primitiveValue = "hello";
+
+    testSimpleCommon(SimpleClass, primitiveValue);
+    testSimpleNonPlainObject(SimpleClass, primitiveValue);
+  });
+
+  describe("pentaho.type.Function", function() {
+    var SimpleClass = context.get("pentaho/type/function");
+    var primitiveValue = function() {};
+
+    testSimpleCommon(SimpleClass, primitiveValue);
+    testSimpleNonPlainObject(SimpleClass, primitiveValue);
+  });
+
+  describe("pentaho.type.Date", function() {
+    var SimpleClass = context.get("pentaho/type/date");
+    var primitiveValue = new Date();
+
+    testSimpleCommon(SimpleClass, primitiveValue);
+    testSimpleNonPlainObject(SimpleClass, primitiveValue);
+  });
+
+  describe("pentaho.type.Object", function() {
+    var SimpleClass = context.get("pentaho/type/object");
+    var primitiveValue = {foo: "bar"};
+
+    testSimpleCommon(SimpleClass, primitiveValue);
+    testSimplePlainObject(SimpleClass, primitiveValue);
+
+    // ----
+
+    function NonPlainClass() {}
+
+    primitiveValue = new NonPlainClass();
+
+    testSimpleCommon(SimpleClass, primitiveValue);
+    testSimpleNonPlainObject(SimpleClass, primitiveValue);
   });
 });

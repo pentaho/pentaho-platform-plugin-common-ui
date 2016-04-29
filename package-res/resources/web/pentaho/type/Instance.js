@@ -142,6 +142,9 @@ define([
      *
      * Please see the documentation of subclasses for information on additional, supported keyword arguments.
      *
+     * @param {?boolean} [keyArgs.isJson=false] - Generates a JSON-compatible specification.
+     * Attributes which don't have a JSON-compatible specification are omitted.
+     *
      * @param {?boolean} [keyArgs.includeType=false] - Includes the inline type property, `_`, in the specification.
      *
      * @return {!any} A specification of this instance.
@@ -167,6 +170,25 @@ define([
     toSpecInContext: function(keyArgs) {
       /* istanbul ignore next : abstract method */
       throw error.notImplemented();
+    },
+
+    /**
+     * Creates a top-level JSON specification that describes this instance.
+     *
+     * Attributes which don't have a JSON-compatible specification are omitted.
+     * Specifically, for inline types, attributes with a function value are not supported.
+     *
+     * This method simply calls {@link @see pentaho.type.Instance#toSpec} with argument `keyArgs.isJson` as `true`
+     * and exists for seamless integrations with JavaScript's
+     * [JSON.stringify](https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify)
+     * method.
+     *
+     * @see pentaho.type.Instance#toSpec
+     *
+     * @return {UJsonValue} A JSON-compatible specification.
+     */
+    toJSON: function() {
+      return this.toSpec({isJson: true});
     }
     //endregion
   }, /** @lends pentaho.type.Instance */{

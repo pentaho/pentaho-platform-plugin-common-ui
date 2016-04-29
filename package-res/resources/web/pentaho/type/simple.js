@@ -249,26 +249,51 @@ define([
       },
       //endregion
 
+      //region serialization
       toSpecInContext: function(keyArgs) {
         if(!keyArgs) keyArgs = {};
 
         var addFormatted = !keyArgs.omitFormatted && !!this._formatted;
         var includeType = keyArgs.includeType;
+        var value = keyArgs.isJson ? this._toJSONValue(keyArgs) : this._value;
+
+        // Plain objects cannot be output without cell format or would not be recognized
+        // properly by the constructor code.
+        var isPlainObject = (value instanceof Object) && (value.constructor === Object);
 
         // Don't need a cell/object spec?
-        if(!(addFormatted || includeType))
-          return this._value;
+        if(!(isPlainObject || addFormatted || includeType))
+          return value;
 
         // Need one. Ensure _ is the first property
         /*jshint laxbreak:true*/
         var spec = includeType
-            ? {_: this.type.toRefInContext(keyArgs), v: this._value}
-            : {v: this._value};
+            ? {_: this.type.toRefInContext(keyArgs), v: value}
+            : {v: value};
 
         if(addFormatted) spec.f = this._formatted;
 
         return spec;
       },
+
+      /**
+       * Converts the [value]{@link pentaho.type.Simple#value} of the simple instance
+       * to a JSON-compatible representation.
+       *
+       * The default implementation returns [value]{@link pentaho.type.Simple#value} itself.
+       * Override to implement a custom JSON format for this simple value type.
+       *
+       * @param {!Object} keyArgs - The keyword arguments object.
+       * Please see the documentation of subclasses for information on additional, supported keyword arguments.
+       *
+       * @return {UJsonValue} A JSON-compatible representation of value.
+       *
+       * @protected
+       */
+      _toJSONValue: function(keyArgs) {
+        return this._value;
+      },
+      //endregion
 
       type: /** pentaho.type.Simple.Type# */{
         id: module.id,

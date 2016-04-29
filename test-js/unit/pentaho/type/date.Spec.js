@@ -72,5 +72,19 @@ define([
         }).toThrow(errorMatch.argRequired("value"));
       });
     });
+
+    describe("#toJSON()", function() {
+      var PentahoDate;
+
+      beforeEach(function () {
+        PentahoDate = dateFactory(new Context());
+      });
+
+      it("should return the date's ISO string", function() {
+        var testDate = new Date("1960-01-25");
+        var date = new PentahoDate(testDate);
+        expect(date.toJSON()).toBe(date.value.toISOString());
+      });
+    });
   }); // pentaho.type.Date
 });

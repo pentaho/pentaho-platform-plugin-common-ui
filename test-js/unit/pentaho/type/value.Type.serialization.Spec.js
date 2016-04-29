@@ -216,12 +216,26 @@ define([
 
         serializationUtil.itFillSpecMethodAttribute(Value, "validateInstance");
 
+        it("should not serialize when value is local and isJson: true", function() {
+          var spec = {};
+          var typeSpec = {validateInstance: function() {}};
+          var result = serializationUtil.fillSpec(Value, spec, typeSpec, {isJson: true});
+
+          expect(result).toBe(false);
+        });
       });
 
       describe("#instance.validate", function() {
 
         serializationUtil.itFillSpecMethodAttribute(Value, "instance.validate");
 
+        it("should not serialize when value is local and isJson: true", function() {
+          var spec = {};
+          var typeSpec = {instance: {validate: function() {}}};
+          var result = serializationUtil.fillSpec(Value, spec, typeSpec, {isJson: true});
+
+          expect(result).toBe(false);
+        });
       });
     });
   });

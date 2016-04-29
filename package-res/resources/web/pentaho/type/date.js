@@ -45,6 +45,14 @@ define([
        * @readonly
        */
 
+      //region serialization
+      _toJSONValue: function(keyArgs) {
+        // A string in a format based upon a simplification of the ISO-8601 Extended Format,
+        // as defined by [ECMA-262]{@link http://www.ecma-international.org/ecma-262/5.1/#sec-15.9.1.15}.
+        return this._value.toJSON();
+      },
+      //endregion
+
       type: {
         id: module.id,
 

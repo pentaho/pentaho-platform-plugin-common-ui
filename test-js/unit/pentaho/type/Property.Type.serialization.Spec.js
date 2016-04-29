@@ -326,7 +326,7 @@ define([
           expect(spec[name]).toBe(value);
         });
 
-        it("should serialize when specified as a function value", function() {
+        it("should serialize when specified as a function value and isJson: false", function() {
           var Derived = Complex.extend();
           var scope = new SpecificationScope();
           var propTypeSpec = {name: "foo"};
@@ -343,6 +343,24 @@ define([
 
           expect(result).toBe(true);
           expect(spec[name]).toBe(fValue);
+        });
+
+        it("should not serialize when specified as a function value and isJson: true", function() {
+          var Derived = Complex.extend();
+          var scope = new SpecificationScope();
+          var propTypeSpec = {name: "foo"};
+          var fValue = function() { return value; };
+          propTypeSpec[name] = fValue;
+
+          var propType = propertyTypeUtil.createRoot(Derived.type, propTypeSpec);
+
+          var spec = {};
+          var keyArgs = {isJson: true};
+          var result = propType._fillSpecInContext(spec, keyArgs);
+
+          scope.dispose();
+
+          expect(result).toBe(false);
         });
 
         it("should not serialize when inherited", function() {

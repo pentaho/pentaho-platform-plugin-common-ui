@@ -21,7 +21,7 @@ define([
 
   /* global describe:false, it:false, expect:false, beforeEach:false, spyOn:false */
 
-  describe("pentaho.type.Complex", function() {
+  describe("pentaho.type.Instance", function() {
 
     describe("#toSpec(keyArgs)", function() {
       var value;
@@ -61,5 +61,41 @@ define([
         expect(context instanceof SpecificationContext).toBe(true);
       });
     }); // toSpec
+
+    describe("#toJSON()", function() {
+
+      it("should call #toSpec({isJson: true})", function() {
+        var value = new Instance();
+        spyOn(value, "toSpec");
+
+        value.toJSON();
+
+        expect(value.toSpec.calls.count()).toBe(1);
+
+        var args = value.toSpec.calls.first().args;
+        expect(args.length).toBe(1);
+        expect(args[0].constructor).toBe(Object);
+        expect(args[0].isJson).toBe(true);
+      });
+
+      it("should return the result of calling #toSpec", function() {
+        var value = new Instance();
+        var result = {};
+        spyOn(value, "toSpec").and.returnValue(result);
+
+        expect(value.toJSON()).toBe(result);
+      });
+
+      it("should really be called when JSON.stringify(.) is used", function() {
+        var value = new Instance();
+        var result = {};
+        spyOn(value, "toJSON").and.returnValue(result);
+
+        JSON.stringify(value);
+
+        expect(value.toJSON).toHaveBeenCalled();
+        expect(value.toJSON.calls.first().object).toBe(value);
+      });
+    }); // toJSON
   });
 });

@@ -198,6 +198,11 @@ define([
        *
        * Please see the documentation of value subclasses for information on additional, supported keyword arguments.
        *
+       * @param {?boolean} [keyArgs.isJson=false] - Generates a JSON-compatible specification.
+       * Attributes which don't have a JSON-compatible specification are omitted.
+       *
+       * @param {?boolean} [keyArgs.includeType=false] - Includes the inline type property, `_`, in the specification.
+       *
        * @param {boolean} [keyArgs.omitFormatted=false] - Omits the formatted value
        * on [Simple]{@link pentaho.type.Simple} values' specifications.
        *
