@@ -865,7 +865,7 @@ define([
       });
 
       it("should remove two elements, given in an array, that are present in the list", function() {
-        var list = new NumberList([1, 2, 3, 4]);
+        var list = new NumberList([0, 1, 2, 3]);
         var elem1 = list.at(1);
         var elem2 = list.at(2);
         expect(list.count).toBe(4);
@@ -876,9 +876,31 @@ define([
 
         // ----
 
+        expect(list.has("1")).toBe(false);
         expect(list.has("2")).toBe(false);
-        expect(list.has("3")).toBe(false);
-        _expectEqualValueAt(list, [1, 4]);
+        _expectEqualValueAt(list, [0, 3]);
+      });
+
+      it("should remove two blocks of two elements, given in an array, that are present in the list", function() {
+        var list = new NumberList([1, 2, 3, 4, 5]);
+        var elem0 = list.at(0);
+        var elem1 = list.at(1);
+        var elem3 = list.at(3);
+        var elem4 = list.at(4);
+        expect(list.count).toBe(5);
+
+        // ----
+
+        list.remove([elem0, elem1, elem3, elem4]);
+
+        // ----
+
+        expect(list.has("1")).toBe(false);
+        expect(list.has("2")).toBe(false);
+        expect(list.has("3")).toBe(true);
+        expect(list.has("4")).toBe(false);
+        expect(list.has("5")).toBe(false);
+        _expectEqualValueAt(list, [3]);
       });
 
       it("should ignore a given element that is not present in the list", function() {
@@ -1128,6 +1150,22 @@ define([
 
 
         _expectEqualValueAt(list, [5, 1, 3]);
+      });
+
+      it("should modify the ordering of the elements", function() {
+        var list = new NumberList([1, 2, 3, 4]);
+
+        list.set([1, 3, 2, 4]);
+
+        _expectEqualValueAt(list, [1, 3, 2, 4]);
+      });
+
+      it("should modify the ordering of the elements when {noRemove: true}", function() {
+        var list = new NumberList([1, 2, 3, 4]);
+
+        list.set([3, 2], {noRemove: true});
+
+        _expectEqualValueAt(list, [1, 3, 2, 4]);
       });
 
       it("should empty the list when given an empty array", function() {

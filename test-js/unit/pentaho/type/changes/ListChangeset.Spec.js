@@ -162,7 +162,7 @@ define([
 
       //region #_clear
       describe("#_clear -", function() {
-        it("should add append a `clear` change to the changeset", function() {
+        it("should append a `clear` change to the changeset", function() {
           changeset._clear(); //create clear change
 
           expect(changeset.changes.length).toBe(1);
@@ -178,10 +178,139 @@ define([
         });
       }); //endregion #_clear
 
+
+      //region #_set
+      describe("#_set -", function() {
+        it("should throw when called after the 'will' phase", function() {
+          changeset._phase = 1; // get out of the will phase
+
+          expect(function() {
+            changeset._set([1], true);
+          }).toThrow(errorMatch.operInvalid("Changeset is readonly."));
+        });
+
+        it("for a single element, and the second argument set to `true`, should append a `Add` change to the changeset", function() {
+          changeset._set([1], true);
+
+          expect(changeset.changes.length).toBe(1);
+          expect(changeset.changes[0].type).toBe("add");
+        });
+
+        it("should prevent the creation of duplicates when the second argument set to `true`", function() {
+          var list = new NumberList([1, 2, 3, 4]);
+          changeset = new ListChangeset(list);
+          changeset._set([9, 9, 9, 9], true);
+
+          expect(changeset.changes.length).toBe(1);
+          expect(changeset.changes[0].type).toBe("add");
+        });
+
+        it("for a single element, and the third argument set to `true`, should append N -1 `Remove` changes to the changeset", function() {
+          var list = new NumberList([1, 2, 3, 4]);
+          changeset = new ListChangeset(list);
+
+          changeset._set([2], false, false, true);
+
+          expect(changeset.changes.length).toBe(3);
+          expect(changeset.changes[0].type).toBe("remove");
+          expect(changeset.changes[1].type).toBe("remove");
+          expect(changeset.changes[2].type).toBe("remove");
+        });
+
+        it("for two existing elements, and the fourth argument set to `true`, should append a `Move` change to the changeset", function() {
+          var list = new NumberList([1, 2, 3, 4]);
+          changeset = new ListChangeset(list);
+
+          changeset._set([3, 2], false, false, false, true);
+
+          expect(changeset.changes.length).toBe(1);
+          expect(changeset.changes[0].type).toBe("move");
+        });
+
+        it("for two existing elements, a non-existent element (with the first, second and fourth arguments set to `true`), should append an `Add`, a `Move` and an `Update` to the changeset", function() {
+          var list = new NumberList([1, 2, 3, 4]);
+          changeset = new ListChangeset(list);
+
+          changeset._set([5, 2], true, true, false, true);
+
+          expect(changeset.changes.length).toBe(3);
+          expect(changeset.changes[0].type).toBe("add");
+          expect(changeset.changes[1].type).toBe("move");
+          expect(changeset.changes[2].type).toBe("update");
+        });
+
+      }); //endregion #_removeAt
+
+      // region #_remove
+      describe("#_remove -", function() {
+        it("for a single element, should append a `Remove` change to the changeset", function() {
+          var list = new NumberList([1, 2, 3, 4]);
+          changeset = new ListChangeset(list);
+          changeset._remove(2);
+
+          expect(changeset.changes.length).toBe(1);
+          expect(changeset.changes[0].type).toBe("remove");
+        });
+
+        it("for an array of elements, should append a `Remove` change to the changeset per element", function() {
+          var list = new NumberList([1, 2, 3, 4]);
+          changeset = new ListChangeset(list);
+          changeset._remove([2, 3]);
+
+          expect(changeset.changes.length).toBe(2);
+          expect(changeset.changes[0].type).toBe("remove");
+          expect(changeset.changes[1].type).toBe("remove");
+        });
+
+        it("should throw when called after the 'will' phase", function() {
+          var list = new NumberList([1, 2, 3, 4]);
+          changeset = new ListChangeset(list);
+          changeset._phase = 1; // get out of the will phase
+
+          expect(function() {
+            changeset._remove(2);
+          }).toThrow(errorMatch.operInvalid("Changeset is readonly."));
+        });
+      }); //endregion #_removeAt
+
+      // region #_removeAt
+      describe("#_removeAt -", function() {
+
+        beforeEach(function(){
+          list = new NumberList([1, 2, 3, 4]);
+          changeset = new ListChangeset(list);
+        });
+
+        it("should do nothing if the number of elements to remove is negative", function() {
+          changeset._removeAt(1, -1);
+          expect(changeset.hasChanges).toBe(false);
+        });
+
+        it("should do nothing if the starting index exceeds the number of elements", function() {
+          changeset._removeAt(5, 1);
+          expect(changeset.hasChanges).toBe(false);
+        });
+
+        it("should append a `Remove` change to the changeset", function() {
+          changeset._removeAt(1, 2); //remove two consecutive elements
+
+          expect(changeset.changes.length).toBe(1);
+          expect(changeset.changes[0].type).toBe("remove");
+        });
+
+        it("should throw when called after the 'will' phase", function() {
+          changeset._phase = 1; // get out of the will phase
+
+          expect(function() {
+            changeset._removeAt(1);
+          }).toThrow(errorMatch.operInvalid("Changeset is readonly."));
+        });
+      }); //endregion #_removeAt
+
       //region #_sort
       describe("#_sort -", function() {
         it("should add append a `sort` change to the changeset", function() {
-          changeset._sort(function(x){ return x;}); //create sort change
+          changeset._sort(function(x) { return x;}); //create sort change
 
           expect(changeset.changes.length).toBe(1);
           expect(changeset.changes[0].type).toBe("sort");
@@ -190,9 +319,45 @@ define([
           changeset._phase = 1; // get out of the will phase
 
           expect(function() {
-            changeset._sort(function(x){ return x;});
+            changeset._sort(function(x) { return x;});
           }).toThrow(errorMatch.operInvalid("Changeset is readonly."));
         });
+      }); //endregion #_sort
+
+      // region #_apply
+      describe("#_apply -", function() {
+        it("should modify the owning object", function() {
+
+          var list = new NumberList([1, 2, 3, 4]);
+          changeset = new ListChangeset(list);
+          changeset._set([5], true); //append an element
+
+          changeset._apply(list); // apply to owning list
+          expectEqualValueAt(list, [1, 2, 3, 4, 5]);
+        });
+
+        it("should recycle a previously calculated value when modifying the owning object", function() {
+
+          var list = new NumberList([1, 2, 3, 4]);
+          changeset = new ListChangeset(list);
+          changeset._set([5], true); //append an element
+
+          var proposedList = changeset.newValue; //preview the future state of the list
+          var _elems = proposedList._elems;
+          var _keys = proposedList._keys;
+
+          expect(list._elems).not.toBe(_elems);
+          expect(list._keys).not.toBe(_keys);
+
+          changeset._apply(list); // apply to target list
+
+          expectEqualValueAt(list, [1, 2, 3, 4, 5]);
+          expect(list._elems).toBe(_elems);
+          expect(list._keys).toBe(_keys);
+
+        });
+
+
       }); //endregion #_sort
 
     }); //end instance

@@ -46,7 +46,7 @@ define([
       });
 
       describe("#_apply -", function() {
-        it("Should remove the first element", function() {
+        it("should remove an element", function() {
           var list = new NumberList([1]);
           var elem = list.at(0);
           var change = new Remove([elem], 0);
