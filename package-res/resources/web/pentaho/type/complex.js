@@ -357,16 +357,38 @@ define([
        * @fires "rejected:change"
        */
       set: function(name, valueSpec) {
-        var created;
+
+        var pType = this.type.get(name);
+        var pName = pType.name;
+        var value0 = this._values[pName];
+        var value1;
+
+        // Detect if any changes are actually being made
+        if(pType.isList) {
+          // Delegate the act of creation of a changeset to the list.
+          // The list will create the ComplexChangeset instance and eventually invoke #_applyChanges
+          return value0.set(valueSpec);
+        } else {
+          value1 = pType.toValue(valueSpec);
+          if(pType.type.areEqual(value0, value1)) {
+            return ActionResult.reject(new UserError("Nothing to do"));
+          }
+        }
+
+        // If we are still here, the value of a Simple is about to change
+
+        // Recycle an existing _current_ changeset, if it exists.
+        var createdChangeset;
         var changeset = this._changeset;
-        if((created = !changeset)) changeset = new ComplexChangeset(this);
+        if((createdChangeset = !changeset)) changeset = new ComplexChangeset(this);
 
-        changeset._set(name, valueSpec);
+        // Add or edit the change
+        changeset._changeSimpleValue(pName, value1);
 
-        if(created) return this._applyChanges();
+        if(createdChangeset) return this._applyChanges();
         // else keeps the changeset and returns undefined, for now
       },
-
+      
       /**
        * Applies any current changes.
        *

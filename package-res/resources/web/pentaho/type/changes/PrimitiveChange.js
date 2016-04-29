@@ -39,15 +39,5 @@ define([
    * [List]{@link pentaho.type.List} value.
    */
 
-  /**
-   * Applies the change to an owner value.
-   *
-   * @name apply
-   * @memberOf pentaho.type.changes.PrimitiveChange#
-   * @method
-   * @param {!pentaho.type.UStructuredValue} target - The value to apply the change to.
-   * @abstract
-   */
-
   return Change.extend("pentaho.type.changes.PrimitiveChange");
 });

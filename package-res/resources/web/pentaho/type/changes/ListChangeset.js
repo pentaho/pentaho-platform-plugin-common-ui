@@ -174,8 +174,6 @@ define([
       var N = changes.length;
 
       // Ignore changes before the last clear.
-      //var k = N - 1;
-      //while(k > startingFromIdx && changes[k].type !== "clear") k--;
       var k = Math.max(this._lastClearIndex, startingFromIdx);
 
       while(k < N) changes[k++]._apply(list);

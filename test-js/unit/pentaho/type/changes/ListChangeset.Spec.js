@@ -14,31 +14,26 @@
  * limitations under the License.
  */
 define([
+  "tests/pentaho/util/errorMatch",
   "pentaho/type/Context",
   "pentaho/type/list",
   "pentaho/type/number",
   "pentaho/type/changes/ListChangeset",
   "pentaho/type/changes/Add"
-], function(Context, listFactory, numberFactory, ListChangeset, Add) {
+], function(errorMatch, Context, listFactory, numberFactory, ListChangeset, Add) {
   "use strict";
 
   /* global describe:false, it:false, expect:false, beforeEach:false */
-  
+
   var context = new Context(),
-      List = context.get(listFactory),
-      PentahoNumber = context.get(numberFactory);
+    List = context.get(listFactory),
+    PentahoNumber = context.get(numberFactory);
 
   var NumberList = List.extend({
     type: {of: PentahoNumber}
   });
 
   describe("pentaho.type.changes.ListChangeset -", function() {
-    function createAndCommit(current, input, keyArgs) {
-      var change = new ListChangeset({}, current);
-      change.set(input, keyArgs);
-      change._commit();
-    }
-
     function expectEqualValueAt(list, checkValues) {
       var L = checkValues.length;
       expect(list.count).toBe(L);
@@ -49,7 +44,7 @@ define([
     }
 
 
-    it("should be defined.", function () {
+    it("should be defined.", function() {
       expect(typeof ListChangeset).toBeDefined();
     });
 
@@ -65,10 +60,10 @@ define([
           expect(changeset.type).toBe("list");
         });
       }); //endregion #type
-      
+
       //region #changes
       describe("#changes -", function() {
-        it("should return `zero` when a new ListChangeset is created", function() {
+        it("should be an empty array when a new ListChangeset is created", function() {
           expect(changeset.changes.length).toBe(0);
         });
 
@@ -82,10 +77,25 @@ define([
         });
       }); //endregion #changes
 
+      //region #hasChanges
+      describe("#hasChanges -", function() {
+        it("should be `false` when a new ListChangeset is created", function() {
+          expect(changeset.hasChanges).toBe(false);
+        });
+
+        it("should be `true` when changes are created", function() {
+          var elem = {"foo": "bar"};
+          changeset._addChange(new Add(elem, 0)); //create add change
+
+          expect(changeset.hasChanges).toBe(true);
+        });
+      }); //endregion #hasChanges
+
+
       //region #newValue
       describe("#newValue -", function() {
         it("should return the original list, because any change was applied", function() {
-          var list = new NumberList([1,2,3]);
+          var list = new NumberList([1, 2, 3]);
           var listElems = list._elems;
 
           changeset = new ListChangeset(list);
@@ -96,29 +106,30 @@ define([
           }
         });
 
-        xit("should not try to calculate the new value multiple times", function() {
+        it("should not try to calculate the new value multiple times", function() {
           //TODO: Behaviour changed, redo tests
-          var list = new NumberList([1,2,3]);
+          var list = new NumberList([1, 2, 3]);
           changeset = new ListChangeset(list);
+          changeset._addChange(new Add(list._cast(4), 0));
 
-          spyOn(changeset, "apply").and.callThrough();
-          
+          spyOn(changeset, "_applyFrom").and.callThrough();
+
           var firstNew = changeset.newValue._elems;
           var secondNew = changeset.newValue._elems;
 
-          expect(changeset.apply.calls.count()).toBe(1);
+          expect(changeset._applyFrom.calls.count()).toBe(1);
           for(var i = 0; i < firstNew.length; i++) {
             expect(firstNew[i].value).toBe(secondNew[i].value);
           }
         });
 
         it("should return the new value with all changes applied", function() {
-          var list = new NumberList([1,2,3]);
+          var list = new NumberList([1, 2, 3]);
           var listElems = list._elems;
 
           changeset = new ListChangeset(list);
           changeset._addChange(new Add(list._cast(4), 0));
-          
+
           var newValue = changeset.newValue._elems;
           expect(newValue[0].value).toBe(4);
 
@@ -127,6 +138,63 @@ define([
           }
         });
       }); //endregion #newValue
+
+      //region #clearChanges
+      describe("#clearChanges -", function() {
+        it("should remove any created changes from the changeset during the 'will' phase", function() {
+          var elem = {"foo": "bar"};
+          changeset._addChange(new Add(elem, 0)); //create add change
+          changeset.clearChanges();
+
+          expect(changeset.hasChanges).toBe(false);
+        });
+
+        it("should throw when attempting to clear the changes from the changeset after the 'will' phase", function() {
+          var elem = {"foo": "bar"};
+          changeset._addChange(new Add(elem, 0)); //create add change
+          changeset._phase = 1; // get out of the will phase
+
+          expect(function() {
+            changeset.clearChanges();
+          }).toThrow(errorMatch.operInvalid("Changeset is readonly."));
+        });
+      }); //endregion #clearChanges
+
+      //region #_clear
+      describe("#_clear -", function() {
+        it("should add append a `clear` change to the changeset", function() {
+          changeset._clear(); //create clear change
+
+          expect(changeset.changes.length).toBe(1);
+          expect(changeset.changes[0].type).toBe("clear");
+        });
+
+        it("should throw when called after the 'will' phase", function() {
+          changeset._phase = 1; // get out of the will phase
+
+          expect(function() {
+            changeset._clear();
+          }).toThrow(errorMatch.operInvalid("Changeset is readonly."));
+        });
+      }); //endregion #_clear
+
+      //region #_sort
+      describe("#_sort -", function() {
+        it("should add append a `sort` change to the changeset", function() {
+          changeset._sort(function(x){ return x;}); //create sort change
+
+          expect(changeset.changes.length).toBe(1);
+          expect(changeset.changes[0].type).toBe("sort");
+        });
+        it("should throw when called after the 'will' phase", function() {
+          changeset._phase = 1; // get out of the will phase
+
+          expect(function() {
+            changeset._sort(function(x){ return x;});
+          }).toThrow(errorMatch.operInvalid("Changeset is readonly."));
+        });
+      }); //endregion #_sort
+
     }); //end instance
   }); //end pentaho.lang.ComplexChangeset
 

@@ -163,9 +163,25 @@ define([
         var value1 = pType.toValue(valueSpec);
 
         if(!pType.type.areEqual(value0, value1)) {
-          this._changes[pName] = new Replace(pName, value1);
+          this._changeSimpleValue(pName, value1);
         }
       }
+    },
+
+    /**
+     * Registers a change to the value of a single-valued property.
+     *
+     * @param {string} pName - The name of the property.
+     * @param {pentaho.type.Simple} newValue - The proposed value of the property.
+     *
+     * @private
+     */
+    _changeSimpleValue: function(pName, newValue) {
+      var simpleChange = this._changes[pName];
+      if(simpleChange)
+        simpleChange.value = newValue;
+      else
+        this._changes[pName] = new Replace(pName, newValue);
     },
 
     /**
