@@ -206,13 +206,27 @@ define([
        * @param {boolean} [keyArgs.omitFormatted=false] - Omits the formatted value
        * on [Simple]{@link pentaho.type.Simple} values' specifications.
        *
-       * @param {boolean} [keyArgs.includeDefaults=false] - Includes the value of all properties of
-       * [Complex]{@link pentaho.type.Complex} values, even when equal to their default values.
-       *
        * @param {boolean} [keyArgs.preferPropertyArray=false] - Indicates that, if possible,
        * array form is used for [Complex]{@link pentaho.type.Complex} values' specifications.
        *
        * The array form of a complex value cannot be used when its type must be inlined.
+       *
+       * @param {boolean} [keyArgs.includeDefaults=false] - When `true`, all of the properties of
+       * [Complex]{@link pentaho.type.Complex} values are serialized.
+       * When `false`, the default, only properties whose value is different from their default value
+       * are serialized.
+       *
+       * Only applies to complex values that are serialized in object form.
+       * In array form, all of the properties of complex values are serialized independently of their value.
+       *
+       * @param {Object} [keyArgs.omitProps] - An object whose _own_ property names are the names of
+       * the properties of the current complex type to omit from the serialization.
+       *
+       * Only applies when a complex is output in object form.
+       * In array form, all properties are output whatever their value.
+       *
+       * This argument only applies to complex values and
+       * is not passed through to the values of their properties.
        *
        * @return {!pentaho.type.spec.UInstance} A specification of this value.
        */
