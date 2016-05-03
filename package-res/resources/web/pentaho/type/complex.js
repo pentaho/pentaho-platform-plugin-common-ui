@@ -795,16 +795,22 @@ define([
 
       //region serialization
       toSpecInContext: function(keyArgs) {
-        if(!keyArgs) keyArgs = {};
+
+        keyArgs = keyArgs ? Object.create(keyArgs) : {};
 
         var spec;
         var includeType = !!keyArgs.includeType;
         var useArray = !includeType && keyArgs.preferPropertyArray;
+        var omitProps;
         if(useArray) {
           spec = [];
         } else {
           spec = {};
           if(includeType) spec._ = this.type.toRefInContext(keyArgs);
+          omitProps = keyArgs.omitProps;
+
+          // Do not propagate to child values
+          keyArgs.omitProps = null;
         }
 
         var includeDefaults = keyArgs.includeDefaults;
@@ -819,6 +825,9 @@ define([
           /*jshint validthis:true*/
 
           var name = propType.name;
+
+          if(omitProps && O.hasOwn(omitProps, name)) return;
+
           var value = this._values[name];
           if(includeDefaults || !areEqual(propType.value, value)) {
             // Determine if value spec must contain the type inline
