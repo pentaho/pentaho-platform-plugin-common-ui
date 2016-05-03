@@ -174,7 +174,7 @@ define([
 
       describe("when calling properties values' #toSpecInContext", function() {
 
-        it("should pass through all options of `keyArgs`", function() {
+        it("should pass-through all options of `keyArgs`", function() {
           var keyArgs = {
             includeDefaults: true,
             includeType: false,
@@ -232,7 +232,7 @@ define([
           expectProperty("anything");
         });
 
-        it("should pass includeType=false when the value is of the same type of the property", function() {
+        it("should pass keyArgs.includeType: false when the value is of the same type of the property", function() {
           var includeType;
 
           function expectProperty(name) {
@@ -256,6 +256,43 @@ define([
           expectProperty("noFormat");
         });
 
+        it("should omit a property if its name is in keyArgs.omitProps", function() {
+          var spec = value.toSpecInContext({omitProps: {type: 0}});
+
+          scope.dispose();
+
+          expect("type" in spec).toBe(false);
+        });
+
+        it("should omit a property if its value's toSpecInContext returns null", function() {
+          spyProperty("type", function() { return null; });
+
+          var spec = value.toSpecInContext({includeType: false});
+
+          scope.dispose();
+
+          expect("type" in spec).toBe(false);
+        });
+
+        it("should include a property as null if its value's toSpecInContext returns null and array form is used", function() {
+          spyProperty("type", function() { return null; });
+
+          var spec = value.toSpecInContext({includeType: false, preferPropertyArray: true});
+
+          scope.dispose();
+
+          expect(spec[1]).toBe(null);
+        });
+
+        it("should include a property as null if its value's toSpecInContext returns null and defaults are included", function() {
+          spyProperty("type", function() { return null; });
+
+          var spec = value.toSpecInContext({includeType: false, includeDefaults: true});
+
+          scope.dispose();
+
+          expect(spec.type).toBe(null);
+        });
       });
 
       describe("when returning a complex in array form", function() {

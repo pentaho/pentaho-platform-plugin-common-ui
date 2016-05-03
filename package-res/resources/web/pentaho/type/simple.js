@@ -255,7 +255,15 @@ define([
 
         var addFormatted = !keyArgs.omitFormatted && !!this._formatted;
         var includeType = keyArgs.includeType;
-        var value = keyArgs.isJson ? this._toJSONValue(keyArgs) : this._value;
+        var value;
+        if(keyArgs.isJson) {
+          value = this._toJSONValue(keyArgs);
+          // Failed?
+          if(value == null) return null;
+
+        } else {
+          value = this._value;
+        }
 
         // Plain objects cannot be output without cell format or would not be recognized
         // properly by the constructor code.

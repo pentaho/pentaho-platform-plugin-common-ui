@@ -82,6 +82,11 @@ define([
         var fun = new PentahoFun(testFun);
         expect(fun.toJSON()).toBe(testFun.toString());
       });
+
+      it("should return `null` if the function is native", function() {
+        var fun = new PentahoFun(String);
+        expect(fun.toJSON()).toBe(null);
+      });
     });
   }); // pentaho.type.Function
 });
