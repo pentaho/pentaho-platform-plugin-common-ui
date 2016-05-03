@@ -35,7 +35,7 @@
  * @property {?Function} onSubmit Callback called when the submit function executes, null if no callback is registered.
  */
 define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/util/util', 'common-ui/util/GUIDHelper', './WidgetBuilder', 'cdf/Dashboard.Clean', './parameters/ParameterDefinitionDiffer', 'common-ui/jquery-clean', 'common-ui/underscore'],
-    function (Base, Logger, DojoNumber, i18n, Utils, GUIDHelper, WidgetBuilder, Dashboard, ParamDiff, $, _) {
+    function (Base, Logger, DojoNumber, i18n, Utils, GUIDHelper, WidgetBuilder, Dashboard, ParamDiff, $, _under) {
 
       var _STATE_CONSTANTS = {
         readOnlyProperties: ["promptNeeded", "paginate", "totalPages", "showParameterUI", "allowAutoSubmit"],
@@ -353,7 +353,7 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
               if(paramType.indexOf("[") == 0) { // Need to compare arrays
                 if(paramValue.length != paramSelectedValue.length)
                   return true;
-                return !_.isEqual(paramValue.sort(), paramSelectedValue.sort());
+                return !_under.isEqual(paramValue.sort(), paramSelectedValue.sort());
               }
               return paramValue != paramSelectedValue;
           }
@@ -1201,7 +1201,7 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
                   var dashboardParameter = this.dashboard.getParameterValue(component.parameter);
 
                   // if the dashboardParameter is not an array, paramSelectedValues shouldn't be either
-                  if (!_.isArray(dashboardParameter) && paramSelectedValues.length == 1) {
+                  if (!_under.isArray(dashboardParameter) && paramSelectedValues.length == 1) {
                     paramSelectedValues = paramSelectedValues[0];
                   }
 
