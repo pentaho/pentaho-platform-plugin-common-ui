@@ -194,6 +194,24 @@ define([
         return this._value.toString();
       },
 
+      /**
+       * Determines if a given value, of the same type, represents the same entity with the same content.
+       *
+       * The given value **must** be of the same concrete type (or the result is undefined).
+       *
+       * If two values are equal, they must have an equal [key]{@link pentaho.type.Simple#key},
+       * [value]{@link pentaho.type.Simple#value}, [formatted value]{@link pentaho.type.Simple#formatted}.
+       *
+       * @param {!pentaho.type.Simple} other - A simple value to test for equality.
+       * @return {boolean} `true` if the given simple value is equal to this one, `false`, otherwise.
+       */
+      equalsContent: function(other) {
+        if(!this.equals(other)) return false;
+
+        // TODO: generic metadata
+        return this._value === other._value && this._formatted === other._formatted;
+      },
+
       //region configuration
       /**
        * Configures this simple value with a given configuration.

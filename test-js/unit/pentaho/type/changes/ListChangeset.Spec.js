@@ -231,18 +231,17 @@ define([
 
         it("for two existing elements, a non-existent element " +
            "(with the first, second and fourth arguments set to `true`), " +
-           " should append an `Add`, a `Move` and an `Update` to the changeset", function() {
+           " should only append an `Add` and a `Move` to the changeset " +
+           "when the list is composed of simple values", function() {
           var list = new NumberList([1, 2, 3, 4]);
           changeset = new ListChangeset(list);
 
           changeset._set([5, 2], true, true, false, true);
 
-          expect(changeset.changes.length).toBe(3);
+          expect(changeset.changes.length).toBe(2);
           expect(changeset.changes[0].type).toBe("add");
           expect(changeset.changes[1].type).toBe("move");
-          expect(changeset.changes[2].type).toBe("update");
         });
-
       }); //endregion #_removeAt
 
       // region #_remove
