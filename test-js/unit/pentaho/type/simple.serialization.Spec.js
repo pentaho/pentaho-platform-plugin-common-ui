@@ -179,6 +179,20 @@ define([
         expect(cellResult instanceof Object).toBe(true);
         expect(cellResult.v).toBe(valueResult);
       });
+
+      it("should return null when _toJSONValue returns null and keyArgs.isJson: true", function() {
+        var scope = new SpecificationScope();
+
+        var value = new PentahoBoolean(true);
+
+        spyOn(value, "_toJSONValue").and.returnValue(null);
+
+        var cellResult = value.toSpecInContext({isJson: true});
+
+        scope.dispose();
+
+        expect(cellResult).toBe(null);
+      });
     });
 
     describe("#_toJSONValue", function() {

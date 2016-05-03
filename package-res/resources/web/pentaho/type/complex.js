@@ -830,12 +830,31 @@ define([
 
           var value = this._values[name];
           if(includeDefaults || !areEqual(propType.value, value)) {
-            // Determine if value spec must contain the type inline
             var valueSpec;
             if(value) {
+              // Determine if value spec must contain the type inline
               var valueType = propType.type;
               keyArgs.includeType = value.type !== (valueType.isRefinement ? valueType.of : valueType);
+
               valueSpec = value.toSpecInContext(keyArgs);
+
+              // If a value ends up not being serializable (see ./function)
+              // it may return `null` as a sign of failure.
+              // In this case, we must check again if the value should be included,
+              // like if it were originally `null`.
+              if(valueSpec == null) {
+                if(includeDefaults) {
+                  // The default value is better than a `null` that is the result of
+                  // a serialization failure...
+                  valueSpec = propType.value;
+                } else {
+                  // Defaults can be omitted as long as complex form is used.
+                  // Same value as default?
+                  if(!useArray && valueSpec == propType.value) return;
+
+                  valueSpec = null;
+                }
+              }
             } else {
               valueSpec = null;
             }

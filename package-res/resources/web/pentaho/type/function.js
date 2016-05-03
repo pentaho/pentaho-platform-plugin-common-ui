@@ -17,10 +17,13 @@ define([
   "module",
   "./simple",
   "../util/fun",
+  "../util/logger",
   "../i18n!types"
-], function(module, simpleFactory, F, bundle) {
+], function(module, simpleFactory, F, logger, bundle) {
 
   "use strict";
+
+  var NATIVE_CODE = "[native code]";
 
   return function(context) {
 
@@ -48,7 +51,15 @@ define([
 
       //region serialization
       _toJSONValue: function(keyArgs) {
-        return String(this._value);
+        var code = String(this._value);
+        if(code.indexOf(NATIVE_CODE) > 0) {
+          logger.warn(bundle.structured.errors.json.cannotSerializeNativeFunction);
+
+          // Indicate serialization failure.
+          code = null;
+        }
+
+        return code;
       },
       //endregion
 
