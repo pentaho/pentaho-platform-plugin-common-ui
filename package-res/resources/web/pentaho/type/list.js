@@ -15,15 +15,21 @@
  */
 define([
   "module",
+  "../lang/ActionResult",
   "./value",
   "./element",
   "./valueHelper",
   "./SpecificationContext",
+  "./changes/ListChangeset",
+  "./changes/ComplexChangeset",
   "../i18n!types",
   "../util/arg",
   "../util/error",
   "../util/object"
-], function(module, valueFactory, elemFactory, valueHelper, SpecificationContext, bundle, arg, error, O) {
+], function(module, ActionResult,
+            valueFactory, elemFactory, valueHelper, SpecificationContext,
+            ListChangeset, ComplexChangeset,
+            bundle, arg, error, O) {
 
   "use strict";
 
@@ -72,8 +78,7 @@ define([
         this._elems = [];
         this._keys  = {};
         this._uid = String(_listNextUid++);
-        this._changes = null;
-        this._changeLevel = 0;
+        this._ownedBy = this._ownedAs = this._changeset = null;
 
         if(spec != null) {
           // An array of element specs?
@@ -90,16 +95,65 @@ define([
                 /*add:*/true,
                 /*update:*/false,
                 /*remove:*/false,
-                /*index:*/0,
-                /*silent:*/true);
+                /*move:*/false,
+                /*index:*/0);
           }
         }
       },
 
       /**
+       * Sets the complex that owns this list value.
+       *
+       * Ownership cannot change.
+       *
+       * @param {!pentaho.type.Complex} owner - The owner complex value.
+       * @param {!pentaho.type.Property} propType - The property type of `owner` whose value is this instance.
+       *
+       * @throws {TypeError} When called with argument values that are different from those of the first call.
+       *
+       * @see pentaho.type.List#owner
+       * @see pentaho.type.List#ownerProperty
+       */
+      setOwnership: function(owner, propType) {
+        if(!owner) throw error.argRequired("owner");
+        if(!propType) throw error.argRequired("propType");
+
+        O.setConst(this, "_ownedBy", owner);
+        O.setConst(this, "_ownedAs", propType);
+      },
+
+      /**
+       * The complex value that owns this list value.
+       *
+       * @type {pentaho.type.Complex}
+       *
+       * @see pentaho.type.List#setOwnership
+       */
+      get owner() {
+        return this._ownedBy;
+      },
+
+      /**
+       * The complex value that owns this list value.
+       *
+       * @type {pentaho.type.Complex}
+       *
+       * @see pentaho.type.List#setOwnership
+       */
+      get ownerProperty() {
+        return this._ownedAs;
+      },
+
+      /**
        * Creates a shallow clone of this list value.
        *
+       * All elements are shared with the clone.
+       *
+       * Ownership is not preserved.
+       *
        * @return {!pentaho.type.List} The list value clone.
+       *
+       * @see pentaho.type.List#setOwnership
        */
       clone: function() {
         var clone = Object.create(Object.getPrototypeOf(this));
@@ -116,8 +170,6 @@ define([
         clone._elems = this._elems.slice();
         clone._keys  = O.assignOwnDefined({}, this._keys);
         clone._uid = String(_listNextUid++);
-        clone._changes = null;
-        clone._changeLevel = 0;
       },
 
       /**
@@ -219,29 +271,37 @@ define([
       },
 
       /**
-       * Adds, removes and/or updates elements to the element list.
+       * Adds, removes, moves and/or updates elements to the element list.
        *
        * The element or elements specified in argument `fragment`
        * are converted to the list's element class.
        *
-       * @param {any|Array} fragment The element or elements to set.
+       * @param {any|Array} fragment - The element or elements to set.
        *
        * @param {Object} [keyArgs] The keyword arguments.
        *
        * @param {boolean} [keyArgs.noAdd=false] Prevents adding new elements to the list.
        * @param {boolean} [keyArgs.noRemove=false] Prevents removing elements not present in `fragment` from the list.
+       * @param {boolean} [keyArgs.noMove=false] Prevents moving elements inside the list.
        * @param {boolean} [keyArgs.noUpdate=false] Prevents updating elements already present in the list.
        *
        * @param {number} [keyArgs.index] The index at which to add new elements.
        * When unspecified, new elements are appended to the list.
        * This argument is ignored when `noAdd` is `true`.
+       *
+       * @return {pentaho.lang.ActionResult} The result object.
        */
       set: function(fragment, keyArgs) {
-        this._set(
+
+        // TODO: returning ActionResult is a temporary measure until transactions exist,
+        // and then provide an overall result upon commit.
+
+        return this._set(
             fragment,
             !arg.optional(keyArgs, "noAdd"),
             !arg.optional(keyArgs, "noUpdate"),
             !arg.optional(keyArgs, "noRemove"),
+            !arg.optional(keyArgs, "noMove"),
             arg.optional(keyArgs, "index"));
       },
 
@@ -251,16 +311,14 @@ define([
        * The element or elements specified in argument `fragment`
        * are converted to the list's element class.
        *
-       * @param {any|Array} fragment Value or values to add.
-       *
-       * @return {pentaho.type.List} The added list element.
+       * @param {any|Array} fragment - Value or values to add.
        */
       add: function(fragment) {
-        this._set(fragment, /*add:*/true, /*update:*/true, /*remove:*/false);
+        this._set(fragment, /*add:*/true, /*update:*/true, /*remove:*/false, /*move:*/false);
       },
 
       /**
-       * Inserts or updates one or more elements, starting at the given index.
+       * Inserts and/or updates one or more elements, starting at the given index.
        *
        * If `index` is negative,
        * it means the position at that many elements from the end (`index' = count - index`).
@@ -268,12 +326,11 @@ define([
        * When the index is greater than or equal to the length of the list,
        * the element or elements are appended to the list.
        *
-       * @param {any|any[]} fragment Element or elements to add.
-       * @param {number} index The index at which to start inserting new elements.
-       * @param {?boolean} [silent=false] Indicates that no events should be emitted.
+       * @param {any|Array} fragment - Element or elements to add.
+       * @param {number} index - The index at which to start inserting new elements.
        */
-      insert: function(fragment, index, silent) {
-        this._set(fragment, /*add:*/true, /*update:*/true, /*remove:*/false, /*index:*/index, silent);
+      insert: function(fragment, index) {
+        this._set(fragment, /*add:*/true, /*update:*/true, /*remove:*/false, /*move:*/false, /*index:*/index);
       },
 
       /**
@@ -281,45 +338,51 @@ define([
        *
        * Specified elements that are not present in the list are ignored.
        *
-       * @param {pentaho.type.Element|Array.<pentaho.type.Element>} fragment Element or elements to remove.
+       * @param {any|Array} fragment - Element or elements to remove.
        */
       remove: function(fragment) {
-        this._remove(fragment);
+        this._usingChangeset(function(changeset) {
+          changeset._remove(fragment);
+        });
       },
 
       /**
        * Removes one or more elements from the list,
        * given the start index and the number of elements to remove.
        *
-       * If `count` is less than `1`, nothing is removed.
        * If `count` is {@link Nully} or omitted, it defaults to `1`.
+       * If `count` is less than `1`, nothing is removed.
        * If `start` is not less than the number of elements in the list, nothing is removed.
        * If `start` is negative,
        * it means to start removing that many elements from the end (`start' = length - start`).
        *
-       * @param {number} start Index at which to start removing.
-       * @param {number} [count=1] Number of elements to remove.
-       * @param {?boolean} [silent=false] Indicates that no events should be emitted.
+       * @param {number} start - The index at which to start removing.
+       * @param {number} [count=1] The number of elements to remove.
        */
-      removeAt: function(start, count, silent) {
-        this._removeAt(start, count, silent);
+      removeAt: function(start, count) {
+        this._usingChangeset(function(changeset) {
+          changeset._removeAt(start, count);
+        });
       },
 
       /**
        * Sorts the elements of the list using the given comparer function.
        *
-       * @param {function(pentaho.type.Element, pentaho.type.Element) : number} comparer The comparer function.
-       * @param {?boolean} [silent=false] Indicates that no events should be emitted.
+       * @param {function(pentaho.type.Element, pentaho.type.Element) : number} comparer - The comparer function.
        */
-      sort: function(comparer, silent) {
-        this._elems.sort(comparer);
+      sort: function(comparer) {
+        this._usingChangeset(function(changeset) {
+          changeset._sort(comparer);
+        });
+      },
 
-        if(!silent) {
-          // Assuming at least one position changed...
-          this._enterChange();
-          this._getChange("sort");
-          this._exitChange();
-        }
+      /**
+       * Removes all elements from the list.
+       */
+      clear: function() {
+        this._usingChangeset(function(changeset) {
+          changeset._clear();
+        });
       },
 
       /**
@@ -333,22 +396,15 @@ define([
         return map ? this._elems.map(map) : this._elems.slice();
       },
 
+      // TODO: Replace this use by transaction scopes, when they're implemented.
       /**
        * Enters a change scope and returns a disposable object for exiting the scope.
        *
        * @return {pentaho.lang.IDisposable} A disposable object.
        */
       changeScope: function() {
-        var me = this;
-        this._enterChange();
-        return {
-          dispose: function() {
-            if(me) {
-              var you = me;
-              me = null;
-              you._exitChange();
-            }
-          }
+        return /** @type pentaho.lang.IDisposable */{
+          dispose: function() {}
         };
       },
 
@@ -378,184 +434,54 @@ define([
         return this.type._elemType.to(valueSpec);
       },
 
-      //region Change tracking
-      _changes: null,
-      _changeLevel: 0,
-
-      _enterChange: function() {
-        if(!this._changes) this._changes = [];
-        this._changeLevel++;
-      },
-
-      _exitChange: function(silent) {
-        var changes = null;
-
-        if(!(--this._changeLevel)) {
-          changes = this._changes;
-          this._changes = null;
-          if(!silent && changes.length) {
-            // TODO: fire list change event
-            // Rollback if cancelled?
-            // Apply changes only at the end?
-          }
-        }
-
-        return changes;
-      },
-
-      _addChangeElem: function(type, elem, index) {
-        this._getChange(type, index).elems.push(elem);
-      },
-
-      _getChange: function(type, index) {
-        var changes = this._changes,
-            L = changes.length,
-            change = L ? changes[L - 1] : null;
-
-        if(change && (change.type === type)) {
-          if(index == null || change.at + change.elems.length === index) {
-            return change;
-          }
-        }
-
-        if(index == null) {
-          changes.push((change = {type: type}));
-        } else {
-          changes.push((change = {type: type, at: index, elems: []}));
-        }
-
-        return change;
-      },
-      //endregion
-
       //region Core change methods
-      _set: function(fragment, add, update, remove, index, silent) {
-        var elems = this._elems,
-            keys  = this._keys,
-            existing, elem, key;
+      /**
+       * Calls a given local method with a changeset.
+       *
+       * @param {function(pentaho.type.changes.ListChangeset)} fun - The method to call.
+       * @private
+       */
+      _usingChangeset: function(fun) {
 
-        if(!silent) this._enterChange();
+        // TODO: Holy... this is UGLY code! However, it's expected to become much cleaner
+        // when transactions are implemented, so there's no real gain in making it prettier now.
 
-        // Next insert index.
-        if(index == null) {
-          index = elems.length;
+        var owner = this._ownedBy,
+            createdOwnerChangeset = false,
+            ownerChangeset,
+            changeset;
+        if(owner) {
+          // Enlist in the owner's changeset
+          if(!(ownerChangeset = owner._changeset)) {
+            // Operation was initiated by a direct call to a list method.
+            ownerChangeset = new ComplexChangeset(owner);
+            createdOwnerChangeset = true;
+          }
+
+          // Get or create list changeset
+          changeset = ownerChangeset._changes[this._ownedAs.name] ||
+              (ownerChangeset._changes[this._ownedAs.name] = new ListChangeset(this));
         } else {
-          /*jshint laxbreak:true*/
-          index = index < 0
-              ? Math.max(0, elems.length + index)
-              : Math.min(index, elems.length);
+          changeset = new ListChangeset(this);
         }
 
-        var setElems = Array.isArray(fragment) ? fragment : [fragment];
-        // Index of elements in setElems, by key.
-        // In the end, this is used to efficiently lookup which elems _not_ to remove.
-        var setKeys = remove ? {} : null;
+        fun.call(this, changeset);
 
-        // I - Add/Update Cycle
-        var i = -1, L = setElems.length;
-        while(++i < L) if((elem = this._cast(setElems[i])) != null) {
-          key = elem.key;
-
-          // Store input keys for removal loop, below.
-          if(remove) setKeys[key] = 1;
-
-          if((existing = O.getOwn(keys, key))) {
-            if(update && existing !== elem) {
-              // This may trigger change events, that, in turn, may
-              // perform further list changes and reenter `List#_set`.
-              this._updateOne(existing, elem, silent);
-            }
-          } else if(add) {
-            this._insertOne(elem, index++, key, silent);
-          }
+        if(owner) {
+          if(createdOwnerChangeset)
+            return owner._applyChanges();
+        } else {
+          changeset.apply();
+          return ActionResult.fulfill();
         }
-
-        // II - Remove Cycle
-        if(remove) {
-          elems = this._elems;
-          i = elems.length;
-          while(i) {
-            --i;
-            elem = elems[i];
-            key  = elem.key;
-            if(!O.hasOwn(setKeys, key)) this._removeOne(elem, i, key, silent);
-          }
-        }
-
-        if(!silent) this._exitChange();
       },
 
-      _insertOne: function(elem, index, key, silent) {
-        this._elems.splice(index, 0, elem);
-        this._keys[key] = elem;
-
-        if(!silent) this._addChangeElem("add", elem, index);
-      },
-
-      _removeOne: function(elem, index, key, silent) {
-        this._elems.splice(index, 1);
-        delete this._keys[key];
-
-        if(!silent) this._addChangeElem("remove", elem, index);
-      },
-
-      _updateOne: function(elem, other, silent) {
-        // TODO
-        elem.configure(other);
-      },
-
-      _remove: function(fragment, silent) {
-        if(!silent) this._enterChange();
-
-        var remElems = Array.isArray(fragment) ? fragment : [fragment],
-            L = remElems.length,
-            i = -1,
-            index, key, elem;
-
-        // traversing in forward order, instead of backward, to make it more probable that changes are
-        // registered in a single change statement.
-        while(++i < L) {
-          if((elem = remElems[i]) && this.has((key = elem.key)) && (index = this._elems.indexOf(elem)) > -1) {
-            this._removeOne(elem, index, key, silent);
-          }
-        }
-
-        if(!silent) this._exitChange();
-      },
-
-      _removeAt: function(start, count, silent) {
-        if(count < 0) return; // noop
-
-        if(count == null) count = 1;
-
-        var L = this._elems.length;
-
-        if(start >= L) return; // noop
-
-        if(start < 0) start = Math.max(0, L + start);
-
-        if(!silent) this._enterChange();
-
-        var removed = this._elems.splice(start, count),
-            i = removed.length;
-        if(i) {
-          // Remove from key index
-          while(i--) {
-            var elem = removed[i];
-            delete this._keys[elem.key];
-          }
-
-          // Append to the elems
-          if(!silent) {
-            var changeElems = this._getChange("remove", start).elems;
-            changeElems.push.apply(changeElems, removed);
-          }
-        }
-
-        if(!silent) this._exitChange();
+      _set: function(fragment, add, update, remove, move, index) {
+        return this._usingChangeset(function(changeset) {
+          changeset._set(fragment, add, update, remove, move, index);
+        });
       },
       //endregion
-
 
       //region validation
       /**
@@ -612,7 +538,7 @@ define([
 
           this.base.apply(this, arguments);
 
-          // Force base value inheritance. Cannot change after set locally...
+          // Force base value inheritance. Cannot change after being set locally...
           if(!O.hasOwn(this, "_elemType")) this._elemType = this._elemType;
         },
 

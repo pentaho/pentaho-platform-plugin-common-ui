@@ -25,10 +25,11 @@ define([
   /* global describe:false, it:false, expect:false, beforeEach:false */
 
   var context = new Context();
-  var Value = context.get("pentaho/type/value");
-  var Complex = context.get("pentaho/type/complex");
-  var PentahoString = context.get("pentaho/type/string");
-  var List = context.get("pentaho/type/list");
+  var Value = context.get("value");
+  var Complex = context.get("complex");
+  var PentahoString = context.get("string");
+  var List = context.get("list");
+  var NumberList = context.get(["number"]);
 
   describe("pentaho.type.Complex", function() {
     describe("anatomy", function() {
@@ -441,16 +442,20 @@ define([
         describe("events -", function() {
           var listeners, complex;
           var THREE = 3,
-            Derived = Complex.extend({
-              type: {props: [{name: "x", type: "number"}]}
-            });
+              Derived = Complex.extend({
+                type: {props: [
+                  {name: "x", type: "number"},
+                  {name: "y", type: ["number"]}
+                ]}
+              });
+
           beforeEach(function() {
             listeners = jasmine.createSpyObj("listeners", [
               "will", "did", "rejected"
             ]);
 
             listeners.will.and.callFake(function(event) {
-              if(event.changeset.getChange("x").newValue.valueOf() === THREE) event.cancel();
+              if(event.changeset.get("x").valueOf() === THREE) event.cancel();
             });
 
             complex = new Derived({x: 0});
@@ -478,44 +483,154 @@ define([
               expect(listeners.will).toHaveBeenCalled();
             });
 
-            it("when successful, should call the did change listener", function() {
+            it("should call the did change listener when successful", function() {
               complex.set("x", 1);
               expect(listeners.did).toHaveBeenCalled();
               expect(listeners.rejected).not.toHaveBeenCalled();
               expect(complex.getv("x")).toBe(1);
             });
 
-            it("when unsuccessful, should call the rejected change listener", function() {
+            it("should call the rejected change listener when unsuccessful", function() {
               complex.set("x", THREE);
               expect(listeners.did).not.toHaveBeenCalled();
               expect(listeners.rejected).toHaveBeenCalled();
               expect(complex.getv("x")).toBe(0);
             });
 
-            it("changeset should be frozen on the `did:change` event", function() {
-              listeners.did.and.callFake(function(event) {
-                expect(event.changeset).toBeDefined();
+            // coverage
+            it("should support having no rejected change listener when unsuccessful", function() {
+              complex.off("rejected:change", listeners.rejected);
 
-                event.changeset.set("x", 2);
+              complex.set("x", THREE);
+              expect(listeners.did).not.toHaveBeenCalled();
+              expect(listeners.rejected).not.toHaveBeenCalled();
+              expect(complex.getv("x")).toBe(0);
+            });
+
+            it("should allow changing an element property value, directly on the complex, " +
+               "from within the `will:change` event", function() {
+
+              listeners.will.and.callFake(function(event) {
+                expect(function() {
+                  event.changeset.owner.set("x", 2);
+                }).not.toThrow(); // listeners errors are swallowed
+              });
+
+              complex.set("x", 1);
+
+              expect(listeners.will).toHaveBeenCalled();
+
+              expect(complex.getv("x")).toBe(2);
+            });
+
+            it("should initiate a new, nested changeset when calling owner.set from a `did:change` event", function() {
+              var entryCount = 0;
+
+              listeners.did.and.callFake(function(event) {
+                entryCount++;
+
+                if(entryCount === 1) {
+                  // Starts a nested change.
+                  var owner = event.changeset.owner;
+                  owner.set("x", 2);
+                }
+              });
+
+              complex.set("x", 1);
+
+              expect(complex.getv("x")).toBe(2);
+
+              expect(entryCount).toBe(2);
+            });
+
+            it("should initiate a new, nested changeset when calling owner.set from a `rejected:change` event",
+            function() {
+              var entryCount = 0;
+
+              listeners.rejected.and.callFake(function(event) {
+                entryCount++;
+                if(entryCount === 1) {
+                  // Starts a nested change.
+                  var owner = event.changeset.owner;
+                  owner.set("x", 2);
+                }
+              });
+
+              // First set gets rejected, but the second doesn't.
+              complex.set("x", THREE);
+
+              expect(complex.getv("x")).toBe(2);
+            });
+
+            // NOTE: consider removing this test as the _set method became "package private".
+            it("should throw when calling changeset#_set in a `did:change` event", function() {
+              listeners.did.and.callFake(function(event) {
+
+                expect(function() {
+                  event.changeset._set("x", 2);
+                }).toThrow(errorMatch.operInvalid());
+
                 expect(event.changeset.getChange("x").newValue.value).toBe(1);
               });
 
               complex.set("x", 1);
             });
 
-            it("changeset should be frozen on the `rejected:change` event", function() {
+            // NOTE: consider removing this test as the _set method became "package private".
+            it("should throw when calling changeset#_set in a `rejected:change` event", function() {
               listeners.rejected.and.callFake(function(event) {
-                expect(event.changeset).toBeDefined();
 
-                event.changeset.set("x", 2);
+                expect(function() {
+                  event.changeset._set("x", 2);
+                }).toThrow(errorMatch.operInvalid());
+
                 expect(event.changeset.getChange("x").newValue.value).toBe(1);
               });
 
-              complex.set("x", 3);
+              complex.set("x", THREE);
+            });
+
+            it("should emit the `will:change` event when setting a list property to a different value", function() {
+
+              complex.set("y", [1, 2]);
+
+              expect(listeners.will).toHaveBeenCalled();
+
+              expect(complex.atv("y", 0)).toBe(1);
+              expect(complex.atv("y", 1)).toBe(2);
+            });
+
+            it("should allow changing directly the list value from within the `will:change` event", function() {
+
+              listeners.will.and.callFake(function(event) {
+                expect(function() {
+                  event.changeset.owner.get("y").add(2);
+                }).not.toThrow(); // listeners errors are swallowed
+              });
+
+              complex.set("y", [1]);
+
+              expect(listeners.will).toHaveBeenCalled();
+
+              expect(complex.atv("y", 0)).toBe(1);
+              expect(complex.atv("y", 1)).toBe(2);
             });
           }); //end with listeners
         });
       }); // end set
+
+      describe("#_applyChanges()", function() {
+        // coverage
+        it("should return a canceled action result when there are no changes (null _changeset)", function() {
+          var Derived = Complex.extend({
+            type: {props: [{name: "x", type: "string"}]}
+          });
+
+          var derived = new Derived();
+          var result = derived._applyChanges(); // protected
+          expect(result.isCanceled).toBe(true);
+        });
+      });
 
       describe("#path(steps[, sloppy])", function() {
 
