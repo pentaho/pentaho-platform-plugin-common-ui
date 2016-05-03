@@ -24,7 +24,7 @@ define([
   "./events/WillChange",
   "./events/RejectedChange",
   "./events/DidChange",
-  "./ComplexChangeset",
+  "./changes/ComplexChangeset",
   "../i18n!types",
   "../util/object",
   "../util/error"
@@ -107,25 +107,26 @@ define([
       constructor: function(spec) {
         // Create `Property` instances.
         var pTypes = this.type._getProps(),
-          i = pTypes.length,
-          nameProp = !spec ? undefined : (Array.isArray(spec) ? "index" : "name"),
-          pType,
-          values = {};
+            i = pTypes.length,
+            nameProp = !spec ? undefined : (Array.isArray(spec) ? "index" : "name"),
+            values = {},
+            pType, value;
 
         while(i--) {
           pType = pTypes[i];
-          values[pType.name] = pType.toValue(nameProp && spec[pType[nameProp]]);
+          values[pType.name] = value = pType.toValue(nameProp && spec[pType[nameProp]]);
+          if(pType.isList) value.setOwnership(this, pType);
         }
 
         this._values = values;
         this._uid = String(_complexNextUid++);
+        this._changeset = null;
       },
 
       /**
        * Creates a shallow clone of this complex value.
        *
-       * All property values are shared with the clone,
-       * except list values themselves, which are shallow-cloned.
+       * All property values are shared with the clone.
        *
        * @return {!pentaho.type.Complex} The complex value clone.
        */
@@ -144,10 +145,10 @@ define([
       _clone: function(clone) {
         // All properties are copied except lists, which are shallow cloned.
         var pTypes = this.type._getProps(),
-          i = pTypes.length,
-          values = this._values,
-          cloneValues = {},
-          pType, v;
+            i = pTypes.length,
+            values = this._values,
+            cloneValues = {},
+            pType, v;
 
         while(i--) {
           pType = pTypes[i];
@@ -329,9 +330,9 @@ define([
 
       _path: function(args, sloppy) {
         var L = args.length,
-          i = -1,
-          v = this,
-          step;
+            i = -1,
+            v = this,
+            step;
 
         while(++i < L) {
           if(!(v = (typeof (step = args[i]) === "number") ? v.at(step, sloppy) : v.get(step, sloppy)))
@@ -348,163 +349,132 @@ define([
        * @param {any?} [valueSpec=null] A value specification.
        *
        * @return {pentaho.lang.ActionResult} The result object.
+       *
        * @throws {pentaho.lang.ArgumentInvalidError} When a property with name `name` is not defined.
+       *
        * @fires "will:change"
        * @fires "did:change"
        * @fires "rejected:change"
        */
       set: function(name, valueSpec) {
-        var pType = this.type.get(name),
-          value0 = this._values[pType.name];
 
-        var changeset;
+        // TODO: returning ActionResult is a temporary measure until transactions exist,
+        // and then provide an overall result upon commit.
+
+        var pType = this.type.get(name);
+        var pName = pType.name;
+        var value0 = this._values[pName];
+        var value1;
+
+        // Detect if any changes are actually being made
         if(pType.isList) {
-          value0.set(valueSpec);
-          //TODO: add operation to changeset
-          changeset = new ComplexChangeset(this);
-          //changeset._setListChange(name, value0, valueSpec);
-          changeset.set(name, null); // TODO: remove. Added for demo purposes of BACKLOG-6739
-
+          // Delegate the act of creation of a changeset to the list.
+          // The list will create the ComplexChangeset instance and eventually invoke #_applyChanges
+          return value0.set(valueSpec);
         } else {
-          var value1 = pType.toValue(valueSpec);
-          if(!pType.type.areEqual(value0, value1)) {
-            changeset = new ComplexChangeset(this);
-            changeset._setValueChange(name, value1, value0);
+          value1 = pType.toValue(valueSpec);
+          if(pType.type.areEqual(value0, value1)) {
+            return ActionResult.reject(new UserError("Nothing to do"));
           }
         }
 
-        if(changeset) {
-          var executionError = this._change(changeset);
-          if(executionError) return ActionResult.reject(executionError);
-          return ActionResult.fulfill(changeset);
-        }
-        return ActionResult.reject(new UserError("Nothing to do"));
+        // If we are still here, the value of a Simple is about to change
 
+        // Recycle an existing _current_ changeset, if it exists.
+        var createdChangeset;
+        var changeset = this._changeset;
+        if((createdChangeset = !changeset)) changeset = new ComplexChangeset(this);
+
+        // Add or edit the change
+        changeset._changeSimpleValue(pName, value1);
+
+        if(createdChangeset) return this._applyChanges();
+        // else keeps the changeset and returns undefined, for now
       },
-
+      
       /**
+       * Applies any current changes.
+       *
        * Orchestrates the will/did/rejected event loop around property changes.
        *
-       * @param {pentaho.type.ComplexChangeset} changeset - The set of changes.
-       *
-       * @return {?pentaho.lang.Base.Error} An error if the change loop was canceled or invalid,
-       * or `undefined` otherwise.
-       *
-       * @private
-       * @ignore
-       */
-      _change: function(changeset) {
-        var executionError = this._changeWill(changeset);
-        changeset.freeze();
-        if(executionError) {
-          this._changeRejected(changeset, executionError);
-          return executionError;
-        }
-
-        executionError = this._changeDo(changeset);
-        if(executionError) {
-          this._changeRejected(changeset, executionError);
-          return executionError;
-        }
-        this._changeDid(changeset);
-      },
-
-      /**
-       * Applies a set of changes to this object.
-       *
-       * @param {pentaho.type.ComplexChangeset} changeset - The set of changes.
-       *
-       * @return {?pentaho.lang.UserError} An error if the values of the properties to be changed
-       * do not match those declared in the `changeset` object, or `undefined` otherwise.
+       * @return {!pentaho.lang.ActionResult} The result object,
+       * that is rejected if the changeset has no changes,
+       * if the change loop was canceled or invalid,
+       * or is fulfilled otherwise.
        *
        * @private
-       * @ignore
        */
-      _changeDo: function(changeset) {
+      _applyChanges: function() {
+        var changeset = this._changeset;
+        var error;
 
-        var propertyNames = changeset.propertyNames;
+        if(changeset && changeset.hasChanges) {
+          error = this._changeWill(changeset);
 
-        // First sweep: ensure values haven't changed
-        for(var k = 0, N = propertyNames.length; k < N; k++) {
-          var name = propertyNames[k];
-          var pType = this.type.get(name);
+          // NOTE: see note on Changeset#apply, about clearing the complex's current changeset.
+          if(error || (error = changeset.apply()))
+            this._changeRejected(changeset, error);
+          else
+            this._changeDid(changeset);
 
-          if(pType.isList) {
-            //TODO: look for reasons why a property that is a list could cancel the whole changeset
-          } else {
-            var currentValue = this._values[name];
-            var oldValue = changeset.getChange(name).oldValue;
-            if(!pType.type.areEqual(currentValue, oldValue))
-              return error.argRange("changeset"); //Mismatching values
-          }
+        } else {
+          if(changeset) changeset.cancel();
+
+          error = new UserError("Nothing to do");
         }
 
-        // Second sweep: modify the values
-        changeset.propertyNames.forEach(function(name) {
-          var pType = this.type.get(name);
-
-          if(pType.isList) {
-            //TODO: handle the changes on a list property in a later story
-          } else {
-            var value0 = this._values[pType.name];
-            var value1 = pType.toValue(changeset.getChange(name).newValue);
-            //TODO: confirm if it's worth having this if (setting a property isn't that expensive)
-            if(!pType.type.areEqual(value0, value1)) {
-              this._values[name] = value1;
-            }
-          }
-        }, this);
+        return error ? ActionResult.reject(error) : ActionResult.fulfill(changeset);
       },
 
       /**
        * Emits the "will:change" event, if need be.
        *
-       * @param {pentaho.type.ComplexChangeset} changeset - The set of changes.
+       * If the event is emitted and rejected, this method cancels the changeset as well.
        *
-       * @return {?pentaho.lang.Base.Error} An error if the change loop was canceled or invalid,
+       * @param {!pentaho.type.ComplexChangeset} changeset - The set of changes.
+       *
+       * @return {pentaho.lang.Base.Error|undefined} An error if the change loop was canceled or invalid,
        * or `undefined` otherwise.
        *
        * @private
-       * @ignore
        */
       _changeWill: function(changeset) {
-        if(!this._hasListeners("will:change")) return;
+        if(this._hasListeners("will:change")) {
+          var event = new WillChange(this, changeset);
+          if(!this._emitSafe(event)) {
 
-        var will = new WillChange(this, changeset);
-        if(!this._emitSafe(will)) {
-          return will.cancelReason;
+            changeset.cancel();
+
+            return event.cancelReason;
+          }
         }
       },
 
       /**
        * Emits the "did:change" event, if need be.
        *
-       * @param {pentaho.type.ComplexChangeset} changeset - The set of changes.
+       * @param {!pentaho.type.ComplexChangeset} changeset - The set of changes.
        *
        * @private
-       * @ignore
        */
       _changeDid: function(changeset) {
-        if(!this._hasListeners("did:change")) return;
-
-        var event = new DidChange(this, changeset);
-        this._emitSafe(event);
+        if(this._hasListeners("did:change")) {
+          this._emitSafe(new DidChange(this, changeset));
+        }
       },
 
       /**
        * Emits the "will:change" event, if need be.
        *
-       * @param {pentaho.type.ComplexChangeset} changeset - The set of changes.
-       * @param {pentaho.lang.Base.Error} reason - The reason why the change loop was rejected.
+       * @param {!pentaho.type.ComplexChangeset} changeset - The set of changes.
+       * @param {!pentaho.lang.Base.Error} reason - The reason why the change loop was rejected.
        *
        * @private
-       * @ignore
        */
       _changeRejected: function(changeset, reason) {
-        if(!this._hasListeners("rejected:change")) return;
-
-        var event = new RejectedChange(this, changeset, reason);
-        this._emitSafe(event);
+        if(this._hasListeners("rejected:change")) {
+          this._emitSafe(new RejectedChange(this, changeset, reason));
+        }
       },
       //endregion
 
@@ -904,9 +874,9 @@ define([
           var ps;
           // !_props could only occur if accessing #get directly on Complex.type and it had no derived classes yet...
           return (!name || !(ps = this._props)) ? null :
-            (typeof name === "string") ? ps.get(name) :
-              (ps.get(name.name) === name) ? name :
-                null;
+                 (typeof name === "string")     ? ps.get(name) :
+                 (ps.get(name.name) === name)   ? name :
+                 null;
         },
 
         /**
@@ -988,8 +958,8 @@ define([
         /**
          * Adds, overrides or configures properties to/of the complex type.
          *
-         * @param {pentaho.type.spec.IPropertyTypeProto|pentaho.type.spec.IPropertyTypeProto[]} propTypeSpec A property type
-         *   specification or an array of.
+         * @param {pentaho.type.spec.IPropertyTypeProto|pentaho.type.spec.IPropertyTypeProto[]} propTypeSpec
+         * A property type specification or an array of them.
          *
          * @return {pentaho.type.Complex} This object.
          */

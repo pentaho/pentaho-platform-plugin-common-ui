@@ -192,14 +192,55 @@ define([
       it("a property created with `setConst` should be readable", function() {
         expect(foo.bar).toBe("bar");
       });
+
+      it("a property created with `setConst` should be non-writable, non-configurable, non-enumerable", function() {
+        expect(Object.getOwnPropertyDescriptor(foo, "bar")).toEqual(jasmine.objectContaining({
+          writable: false,
+          configurable: false,
+          enumerable: false
+        }));
+      });
+
       it("attempting to write over a property created with `setConst` throws a TypeError", function() {
         expect(function() {
           foo.bar = "twit";
         }).toThrowError(TypeError);
       });
+
       it("attempting to delete a property created with `setConst` throws a TypeError", function() {
         expect(function() {
           delete foo.bar;
+        }).toThrowError(TypeError);
+      });
+
+      it("calling setConst on the same property with a different value fails", function() {
+        expect(function() {
+          O.setConst(foo, "bar", "dude");
+        }).toThrowError(TypeError);
+      });
+
+      it("calling setConst on a property previously set with dot syntax makes it " +
+         "non-writable, non-configurable, non-enumerable", function() {
+        foo.dude = "abc";
+
+        O.setConst(foo, "dude", "abc");
+
+        expect(Object.getOwnPropertyDescriptor(foo, "dude")).toEqual(jasmine.objectContaining({
+          writable: false,
+          configurable: false,
+          enumerable: false
+        }));
+      });
+
+      it("calling setConst twice on a property previously set with dot syntax throws", function() {
+        foo.dude = "abc";
+
+        O.setConst(foo, "dude", "abc");
+
+        // should not be able to call setConst again with a different value.
+
+        expect(function() {
+          O.setConst(foo, "dude", "cde");
         }).toThrowError(TypeError);
       });
     }); //setConst
