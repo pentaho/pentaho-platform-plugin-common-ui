@@ -107,7 +107,6 @@ define([
         });
 
         it("should not try to calculate the new value multiple times", function() {
-          //TODO: Behaviour changed, redo tests
           var list = new NumberList([1, 2, 3]);
           changeset = new ListChangeset(list);
           changeset._addChange(new Add(list._cast(4), 0));
