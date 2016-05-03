@@ -85,7 +85,14 @@ define([
       return hasChanges;
     },
 
+    /**
+     * Removes all changes from this changeset.
+     *
+     * @private
+     */
     _clearChanges: function() {
+
+      this._assertProposed();
 
       O.eachOwn(this._changes, function(change) {
         if(change instanceof Changeset) change.cancel();
@@ -137,7 +144,7 @@ define([
      * Sets the proposed value of a property.
      *
      * @param {nonEmptyString|!pentaho.type.Property.Type} name - The property name or type object.
-     * @param {(pentaho.type.Value|pentaho.type.spec.IValue)} valueSpec A value or value specification.
+     * @param {(pentaho.type.Value|pentaho.type.spec.IValue)} valueSpec - A value or value specification.
      *
      * @throws {pentaho.lang.ArgumentInvalidError} When a property with name `name` is not defined.
      *

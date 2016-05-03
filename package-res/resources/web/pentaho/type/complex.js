@@ -950,7 +950,7 @@ define([
          * Adds, overrides or configures properties to/of the complex type.
          *
          * @param {pentaho.type.spec.IPropertyTypeProto|pentaho.type.spec.IPropertyTypeProto[]} propTypeSpec
-         * A property type specification or an array of.
+         * A property type specification or an array of them.
          *
          * @return {pentaho.type.Complex} This object.
          */

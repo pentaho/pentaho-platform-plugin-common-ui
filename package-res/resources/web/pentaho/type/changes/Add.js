@@ -36,7 +36,7 @@ define([
      * @description Creates an instance.
      *
      * @param {!pentaho.type.Element} elem - The element to be added to the list.
-     * @param {number} index - The list index at which the element should to be inserted.
+     * @param {number} index - The list index at which the element should be inserted.
      */
     constructor: function(elem, index) {
       /**

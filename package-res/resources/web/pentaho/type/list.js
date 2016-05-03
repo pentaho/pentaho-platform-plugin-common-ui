@@ -276,7 +276,7 @@ define([
        * The element or elements specified in argument `fragment`
        * are converted to the list's element class.
        *
-       * @param {any|Array} fragment The element or elements to set.
+       * @param {any|Array} fragment - The element or elements to set.
        *
        * @param {Object} [keyArgs] The keyword arguments.
        *
@@ -311,7 +311,7 @@ define([
        * The element or elements specified in argument `fragment`
        * are converted to the list's element class.
        *
-       * @param {any|Array} fragment Value or values to add.
+       * @param {any|Array} fragment - Value or values to add.
        */
       add: function(fragment) {
         this._set(fragment, /*add:*/true, /*update:*/true, /*remove:*/false, /*move:*/false);
@@ -326,8 +326,8 @@ define([
        * When the index is greater than or equal to the length of the list,
        * the element or elements are appended to the list.
        *
-       * @param {any|Array} fragment Element or elements to add.
-       * @param {number} index The index at which to start inserting new elements.
+       * @param {any|Array} fragment - Element or elements to add.
+       * @param {number} index - The index at which to start inserting new elements.
        */
       insert: function(fragment, index) {
         this._set(fragment, /*add:*/true, /*update:*/true, /*remove:*/false, /*move:*/false, /*index:*/index);
@@ -338,7 +338,7 @@ define([
        *
        * Specified elements that are not present in the list are ignored.
        *
-       * @param {any|Array} fragment Element or elements to remove.
+       * @param {any|Array} fragment - Element or elements to remove.
        */
       remove: function(fragment) {
         this._usingChangeset(function(changeset) {
@@ -356,7 +356,7 @@ define([
        * If `start` is negative,
        * it means to start removing that many elements from the end (`start' = length - start`).
        *
-       * @param {number} start The index at which to start removing.
+       * @param {number} start - The index at which to start removing.
        * @param {number} [count=1] The number of elements to remove.
        */
       removeAt: function(start, count) {
@@ -368,7 +368,7 @@ define([
       /**
        * Sorts the elements of the list using the given comparer function.
        *
-       * @param {function(pentaho.type.Element, pentaho.type.Element) : number} comparer The comparer function.
+       * @param {function(pentaho.type.Element, pentaho.type.Element) : number} comparer - The comparer function.
        */
       sort: function(comparer) {
         this._usingChangeset(function(changeset) {
@@ -438,7 +438,8 @@ define([
       /**
        * Calls a given local method with a changeset.
        *
-       * @param {function(pentaho.type.changes.ListChangeset)} fun The method to call.
+       * @param {function(pentaho.type.changes.ListChangeset)} fun - The method to call.
+       * @private
        */
       _usingChangeset: function(fun) {
 

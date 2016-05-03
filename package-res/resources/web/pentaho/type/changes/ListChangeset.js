@@ -187,7 +187,7 @@ define([
      * populates [#changes]{@link pentaho.type.changes.ListChangeset#_changes} with the relevant
      * [PrimitiveChange]{@link pentaho.type.changes.PrimitiveChange} objects.
      *
-     * @param {any|Array} fragment The element or elements to set.
+     * @param {any|Array} fragment - The element or elements to set.
      * @param {?boolean} [add=false] Adds new elements to the list.
      * @param {?boolean} [update=false] Updates elements already present in the list.
      * @param {?boolean} [remove=false] Removes elements not present in `fragment` from the list.
@@ -445,7 +445,7 @@ define([
      * Creates an operation that removes a section of elements from a list,
      * and appends that change to the list of changes.
      *
-     * @param {number} start The index at which to start removing.
+     * @param {number} start - The index at which to start removing.
      * @param {number} [count=1] The number of elements to remove.
      *
      * @throws {pentaho.lang.OperationInvalidError} When the changeset has already been applied or canceled.

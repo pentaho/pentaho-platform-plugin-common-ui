@@ -126,7 +126,7 @@ define(["./has"], function(has) {
      *
      * @param {!Object} object - The object whose property is to be set.
      * @param {string} property - The name of the property.
-     * @param {any} value - The value.
+     * @param {any} value - The value of the property.
      */
     setConst: function(o, p, v) {
       // Specifying writable ensures overriding previous writable value.
