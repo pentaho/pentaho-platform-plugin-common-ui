@@ -358,6 +358,9 @@ define([
        */
       set: function(name, valueSpec) {
 
+        // TODO: returning ActionResult is a temporary measure until transactions exist,
+        // and then provide an overall result upon commit.
+
         var pType = this.type.get(name);
         var pName = pType.name;
         var value0 = this._values[pName];

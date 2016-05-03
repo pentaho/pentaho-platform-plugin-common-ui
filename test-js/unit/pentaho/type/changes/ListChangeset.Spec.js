@@ -189,7 +189,8 @@ define([
           }).toThrow(errorMatch.operInvalid("Changeset is readonly."));
         });
 
-        it("for a single element, and the second argument set to `true`, should append a `Add` change to the changeset", function() {
+        it("for a single element, and the second argument set to `true`, should append a `Add` change to the changeset",
+        function() {
           changeset._set([1], true);
 
           expect(changeset.changes.length).toBe(1);
@@ -205,7 +206,8 @@ define([
           expect(changeset.changes[0].type).toBe("add");
         });
 
-        it("for a single element, and the third argument set to `true`, should append N -1 `Remove` changes to the changeset", function() {
+        it("for a single element, and the third argument set to `true`, " +
+           " should append N -1 `Remove` changes to the changeset", function() {
           var list = new NumberList([1, 2, 3, 4]);
           changeset = new ListChangeset(list);
 
@@ -217,7 +219,8 @@ define([
           expect(changeset.changes[2].type).toBe("remove");
         });
 
-        it("for two existing elements, and the fourth argument set to `true`, should append a `Move` change to the changeset", function() {
+        it("for two existing elements, and the fourth argument set to `true`, " +
+           " should append a `Move` change to the changeset", function() {
           var list = new NumberList([1, 2, 3, 4]);
           changeset = new ListChangeset(list);
 
@@ -227,7 +230,9 @@ define([
           expect(changeset.changes[0].type).toBe("move");
         });
 
-        it("for two existing elements, a non-existent element (with the first, second and fourth arguments set to `true`), should append an `Add`, a `Move` and an `Update` to the changeset", function() {
+        it("for two existing elements, a non-existent element " +
+           "(with the first, second and fourth arguments set to `true`), " +
+           " should append an `Add`, a `Move` and an `Update` to the changeset", function() {
           var list = new NumberList([1, 2, 3, 4]);
           changeset = new ListChangeset(list);
 
@@ -275,6 +280,7 @@ define([
 
       // region #_removeAt
       describe("#_removeAt -", function() {
+        var list;
 
         beforeEach(function(){
           list = new NumberList([1, 2, 3, 4]);

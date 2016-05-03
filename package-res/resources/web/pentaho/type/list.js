@@ -288,8 +288,14 @@ define([
        * @param {number} [keyArgs.index] The index at which to add new elements.
        * When unspecified, new elements are appended to the list.
        * This argument is ignored when `noAdd` is `true`.
+       *
+       * @return {pentaho.lang.ActionResult} The result object.
        */
       set: function(fragment, keyArgs) {
+
+        // TODO: returning ActionResult is a temporary measure until transactions exist,
+        // and then provide an overall result upon commit.
+
         return this._set(
             fragment,
             !arg.optional(keyArgs, "noAdd"),
@@ -306,11 +312,9 @@ define([
        * are converted to the list's element class.
        *
        * @param {any|Array} fragment Value or values to add.
-       *
-       * @return {pentaho.type.List} The added list element.
        */
       add: function(fragment) {
-        return this._set(fragment, /*add:*/true, /*update:*/true, /*remove:*/false, /*move:*/false);
+        this._set(fragment, /*add:*/true, /*update:*/true, /*remove:*/false, /*move:*/false);
       },
 
       /**
@@ -326,7 +330,7 @@ define([
        * @param {number} index The index at which to start inserting new elements.
        */
       insert: function(fragment, index) {
-        return this._set(fragment, /*add:*/true, /*update:*/true, /*remove:*/false, /*move:*/false, /*index:*/index);
+        this._set(fragment, /*add:*/true, /*update:*/true, /*remove:*/false, /*move:*/false, /*index:*/index);
       },
 
       /**
@@ -337,7 +341,7 @@ define([
        * @param {any|Array} fragment Element or elements to remove.
        */
       remove: function(fragment) {
-        return this._usingChangeset(function(changeset) {
+        this._usingChangeset(function(changeset) {
           changeset._remove(fragment);
         });
       },
@@ -356,7 +360,7 @@ define([
        * @param {number} [count=1] The number of elements to remove.
        */
       removeAt: function(start, count) {
-        return this._usingChangeset(function(changeset) {
+        this._usingChangeset(function(changeset) {
           changeset._removeAt(start, count);
         });
       },
@@ -367,7 +371,7 @@ define([
        * @param {function(pentaho.type.Element, pentaho.type.Element) : number} comparer The comparer function.
        */
       sort: function(comparer) {
-        return this._usingChangeset(function(changeset) {
+        this._usingChangeset(function(changeset) {
           changeset._sort(comparer);
         });
       },
@@ -376,7 +380,7 @@ define([
        * Removes all elements from the list.
        */
       clear: function() {
-        return this._usingChangeset(function(changeset) {
+        this._usingChangeset(function(changeset) {
           changeset._clear();
         });
       },
