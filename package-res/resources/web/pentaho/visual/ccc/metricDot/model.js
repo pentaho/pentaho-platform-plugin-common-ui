@@ -19,9 +19,10 @@ define([
   "../abstract/types/labelsOption",
   "../abstract/mixins/scaleSizeContinuousType",
   "../abstract/mixins/scaleColorContinuousType",
-  "../abstract/mixins/settingsMultiChartType"
+  "../abstract/mixins/settingsMultiChartType",
+  "../abstract/mixins/trendType"
 ], function(cartesianAbstractModelFactory, bundle, labelsOptionFactory,
-    scaleSizeContinuousType, scaleColorContinuousType, settingsMultiChartType) {
+    scaleSizeContinuousType, scaleColorContinuousType, settingsMultiChartType, trendType) {
 
   "use strict";
 
@@ -109,6 +110,8 @@ define([
       .implement({type: bundle.structured["scaleColorContinuous"]})
       .implement({type: settingsMultiChartType})
       .implement({type: bundle.structured["settingsMultiChart"]})
+      .implement({type: trendType})
+      .implement({type: bundle.structured["trendType"]})
       .implement({type: bundle.structured["metricDot"]});
   };
 });
