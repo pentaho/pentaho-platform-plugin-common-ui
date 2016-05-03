@@ -50,6 +50,17 @@ define([
      * @description Creates an element instance.
      */
     var Element = Value.extend("pentaho.type.Element", {
+
+      //@override
+      /**
+       * Determines if a given value, of the same type, represents the same entity with the same content.
+       *
+       * @param {!pentaho.type.Value} other - A value to test for equality.
+       */
+      equalsContent: function(other) {
+        return false;
+      },
+
       type: /** @lends pentaho.type.Element.Type# */{
 
         id: module.id,

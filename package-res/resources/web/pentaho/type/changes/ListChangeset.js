@@ -249,7 +249,7 @@ define([
           var repeated = O.hasOwn(setKeys, key);
 
           if((existing = O.getOwn(keys, key))) {
-            if(update && existing !== elem) {
+            if(update && existing !== elem && !existing.equalsContent(elem)) {
               setKeys[key] = 2;
             } else {
               setKeys[key] = 1;
