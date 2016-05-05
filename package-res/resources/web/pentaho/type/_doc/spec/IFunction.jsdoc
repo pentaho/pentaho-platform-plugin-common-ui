@@ -38,6 +38,13 @@
  *
  * When serialized as JSON, the result of calling its `toString()` method is used.
  *
+ * **Attention**: Native functions are serialized as if they were a `null` value
+ * (e.g. {@link String}, or resulting from {@link Function#bind}.
+ *
+ * Also, note that any functions that capture variables from their surrounding scopes
+ * (other than the global scope) cannot be properly de-serialized back.
+ * Only stateless functions can be properly serialized and de-serialized.
+ *
  * @name value
  * @memberOf pentaho.type.spec.IFunction#
  * @type {?function|string}
