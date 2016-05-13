@@ -42,9 +42,6 @@ define([
 
       _baseFacetsMid = _baseMid + "facets/",
 
-      // Default type, in a type specification.
-      _defaultTypeMid = "string",
-
       // Default `base` type in a type specification.
       _defaultBaseTypeMid = "complex",
 
@@ -85,8 +82,9 @@ define([
    * **must** be obtained from a context object,
    * using one of the provided methods:
    * [get]{@link pentaho.type.Context#get},
-   * [getAsync]{@link pentaho.type.Context#getAsync} or
-   * [getAllAsync]{@link pentaho.type.Context#getAllAsync},
+   * [getAsync]{@link pentaho.type.Context#getAsync},
+   * [getAllAsync]{@link pentaho.type.Context#getAllAsync}, or
+   * [inject]{@link pentaho.type.Context#inject},
    * so that these are configured before being used.
    * This applies whether an instance constructor is used for creating an instance or to derive a subtype.
    *
@@ -817,13 +815,13 @@ define([
      *  {base: "list", of: {props: { ...}}}
      */
     _getByListSpec: function(typeSpec, sync) {
-      if(typeSpec.length > 1)
+      var elemTypeSpec;
+      if(typeSpec.length !== 1 || !(elemTypeSpec = typeSpec[0]))
         return this._error(
-            error.argInvalid("typeRef", "List type specification should have at most one child element type spec."),
+            error.argInvalid("typeRef", "List type specification must have a single child element type spec."),
             sync);
 
       // Expand compact list type spec syntax and delegate to the generic handler.
-      var elemTypeSpec = (typeSpec.length && typeSpec[0]) || _defaultTypeMid;
       return this._getByObjectSpec({base: "list", of: elemTypeSpec}, sync);
     },
 

@@ -15,10 +15,9 @@
  */
 define([
   "pentaho/type/Context",
-  "pentaho/type/Property",
   "pentaho/type/PropertyTypeCollection",
   "tests/pentaho/util/errorMatch"
-], function(Context, Property, PropertyTypeCollection, errorMatch) {
+], function(Context, PropertyTypeCollection, errorMatch) {
   "use strict";
 
   /* global describe:false, it:false, expect:false, beforeEach:false */
@@ -138,7 +137,8 @@ define([
           expect(props[1].type).toBe(PentahoString.type);
         });
 
-        it("should accept an array of pentaho.type.UPropertyTypeProto whose elements were previously defined", function() {
+        it("should accept an array of pentaho.type.UPropertyTypeProto whose elements were previously defined",
+        function() {
           var props = PropertyTypeCollection.to(["foo", {name: "eggs", type: "boolean"}], Derived.type);
           props.configure(["foo", "bar"]);
           expect(props.length).toBe(3);
@@ -150,8 +150,8 @@ define([
           expect(props[2].type).toBe(PentahoString.type);
         });
 
-        it("should accept an object whose keys are the property names and the values are pentaho.type.UPropertyTypeProto",
-            function() {
+        it("should accept an object whose keys are the property names and the values are " +
+           "pentaho.type.UPropertyTypeProto", function() {
           props.configure({foo: {name: "foo", type: "boolean"}, guru: {name: "guru", type: "boolean"}});
           expect(props.length).toBe(2);
           expect(props[0].type).toBe(PentahoBoolean.type);

@@ -26,10 +26,11 @@ define([
   "./date",
   "./object",
   "./function",
+  "./property",
   "./facets/DiscreteDomain"
 ], function(valueFactory, elementFactory, listFactory, refinementFactory,
     simpleFactory, complexFactory, stringFactory, numberFactory, booleanFactory,
-    dateFactory, objectFactory, functionFactory,
+    dateFactory, objectFactory, functionFactory, propertyFactory,
     DiscreteDomain) {
 
   "use strict";
@@ -48,7 +49,7 @@ define([
     "complex":  complexFactory,
     "object":   objectFactory,
     "function": functionFactory,
-
+    "property": propertyFactory,
     "facets": {
       "DiscreteDomain": DiscreteDomain
     }

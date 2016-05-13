@@ -15,16 +15,16 @@
  */
 define([
   "pentaho/type/Context",
-  "pentaho/type/Property",
   "./propertyTypeUtil",
   "tests/pentaho/util/errorMatch"
-], function(Context, Property, propertyTypeUtil, errorMatch) {
+], function(Context, propertyTypeUtil, errorMatch) {
 
   "use strict";
 
   /*global describe:false, it:false, expect:false, beforeEach:false, jasmine:false*/
 
   var context = new Context(),
+      Property = context.get("property"),
       PropertyType = Property.Type,
       PentahoBoolean = context.get("pentaho/type/boolean"),
       Complex = context.get("pentaho/type/complex"),
@@ -1201,7 +1201,7 @@ define([
         });
 
         it("should have min = 0 when countMax = 10 and isList = true", function() {
-          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", countMax: 10, type: []});
+          var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", countMax: 10, type: ["string"]});
           expect(propType.countMin).toBe(undefined);
           expect(propType.countMax).toBe(10);
           expect(propType.countRangeEval({}).min).toBe(0);

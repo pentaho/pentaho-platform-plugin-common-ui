@@ -661,12 +661,10 @@ define([
 
           // No other attributes, no id and base is "list"?
           if(!this._fillSpecInContext(spec, keyArgs) && !spec.id && spec.base === "list") {
-            // Can use the shorthand [ofType] syntax.
-            // Default ofType in [] syntax is "string" -> [] <=> ["string"]
-            // surely "element" ...
+
             if(!spec.of) spec.of = this._elemType.toRefInContext(keyArgs);
 
-            return spec.of === "string" ? [] : [spec.of];
+            return [spec.of];
           }
 
           // Need id

@@ -176,10 +176,6 @@
  *   // Using the id
  *   var ListA = context.get("list");
  *
- *   // Using the shorthand syntax
- *   var ListB = context.get([]);
- *
- *
  *   // Obtain a derived List type instance constructor
  *   // with Number as the element type
  *

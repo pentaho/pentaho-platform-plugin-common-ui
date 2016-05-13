@@ -13,9 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define([
-  "pentaho/type/Property"
-], function(Property) {
+define(function() {
 
   "use strict";
 
@@ -27,6 +25,9 @@ define([
   };
 
   function createRoot(declaringType, typeSpec) {
+
+    var Property = declaringType.context.get("property");
+
     return Property.extendProto(
         null,
         {
@@ -40,6 +41,9 @@ define([
   }
 
   function extend(declaringType, baseProperty, subPropTypeSpec) {
+
+    var Property = declaringType.context.get("property");
+
     var basePropType = declaringType.ancestor.get(baseProperty);
 
     return Property.extendProto(

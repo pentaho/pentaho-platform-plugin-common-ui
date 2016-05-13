@@ -757,7 +757,7 @@ define([
               {name: "foo2", type: {base: "pentaho/foo/dudu2"}},
               {name: "foo3", type: {base: "list", of: "pentaho/foo/dudu3"}},
               {name: "foo4", type: ["pentaho/foo/dudu3"]},
-              {name: "foo5", type: []},
+              //{name: "foo5", type: ["string"]},
               {name: "foo6", type: {
                 base: "refinement",
                 of: "pentaho/foo/dudu3",

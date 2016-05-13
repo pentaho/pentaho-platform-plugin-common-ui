@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 define([
-  "./Property",
+  "./property",
   "../lang/Collection",
   "../util/arg",
   "../util/error",
   "../util/object"
-], function(Property, Collection, arg, error, O) {
+], function(propertyFactory, Collection, arg, error, O) {
 
   "use strict";
 
@@ -82,7 +82,7 @@ define([
     },
 
     //region List implementation
-    elemClass: Property.Type,
+    //elemClass: Property.Type,
 
     /**
      * Add a {@link pentaho.type.UPropertyTypeProto} to the properties collection.
@@ -142,6 +142,7 @@ define([
       }
 
       // Replace with overridden property.
+      var Property = ka.declaringType.context.get(propertyFactory);
       return Property.extendProto(existing.instance, {type: spec}, ka).type;
     },
 
@@ -163,6 +164,8 @@ define([
       var ka = this._cachedKeyArgs;
       ka.index = index;
       ka.isRoot = true;
+
+      var Property = ka.declaringType.context.get(propertyFactory);
 
       var pm = Property.extendProto(null, {type: spec}, ka).type;
 

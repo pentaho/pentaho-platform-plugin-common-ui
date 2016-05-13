@@ -15,16 +15,16 @@
  */
 define([
   "pentaho/type/Context",
-  "pentaho/type/Property",
   "./propertyTypeUtil",
   "pentaho/type/SpecificationScope"
-], function(Context, Property, propertyTypeUtil, SpecificationScope) {
+], function(Context, propertyTypeUtil, SpecificationScope) {
 
   "use strict";
 
   /*global describe:false, it:false, expect:false, beforeEach:false, spyOn:false, jasmine:false*/
 
   var context = new Context();
+  var Property = context.get("property");
   var Complex = context.get("pentaho/type/complex");
   var PentahoString = context.get("pentaho/type/string");
 
