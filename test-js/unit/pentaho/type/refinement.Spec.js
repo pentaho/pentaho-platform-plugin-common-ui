@@ -67,10 +67,22 @@ define([
       });
 
       it("should throw if given an `of` which is not a representation type", function() {
+        // TODO: when Instance is already in the context, uncomment this test
+        /*
         expect(function() {
           Refinement.extend({
             type: {
-              of:     context.get("pentaho/type/value").extend().type,
+              of:     context.get("pentaho/type/instance").extend().type,
+              facets: [Facet]
+            }
+          });
+        }).toThrow(errorMatch.argInvalidType("of", ["pentaho/type/element", "pentaho/type/list"]));
+        */
+
+        expect(function() {
+          Refinement.extend({
+            type: {
+              of:     context.get("pentaho/type/refinement").type,
               facets: [Facet]
             }
           });
@@ -580,6 +592,56 @@ define([
           });
 
           expect(MyRefinement.type.isList).toBe(true);
+        });
+      });
+
+      describe("#isElement -", function() {
+        it("should be true when the representation type is an element type", function() {
+          var MySimple = Simple.extend();
+          var MyRefinement = Refinement.extend({
+            type: {
+              of: MySimple.type
+            }
+          });
+
+          expect(MyRefinement.type.isElement).toBe(true);
+        });
+
+        it("should be false when the representation type is a list type", function() {
+          var MyList = List.extend();
+          var MyRefinement = Refinement.extend({
+            type: {
+              of: MyList.type
+            }
+          });
+
+          expect(MyRefinement.type.isElement).toBe(false);
+        });
+      });
+
+      describe("#isComplex -", function() {
+        it("should be true when the representation type is a complex type", function() {
+          var MyComplex = Complex.extend();
+          var MyRefinement = Refinement.extend({
+            type: {
+              of: MyComplex.type
+            }
+          });
+
+          expect(MyRefinement.type.isComplex).toBe(true);
+        });
+      });
+
+      describe("#isSimple -", function() {
+        it("should be true when the representation type is a simple type", function() {
+          var MySimple = Simple.extend();
+          var MyRefinement = Refinement.extend({
+            type: {
+              of: MySimple.type
+            }
+          });
+
+          expect(MyRefinement.type.isSimple).toBe(true);
         });
       });
 

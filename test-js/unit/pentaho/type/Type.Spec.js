@@ -825,6 +825,48 @@ define([
       });
     }); // #hasDescendants
 
+    describe("#isList", function() {
+      it("should have default `isList` equal to `false`", function () {
+        expect(Instance.type.isList).toBe(false);
+      });
+    });
+
+    describe("#isRefinement", function() {
+      it("should have default `isRefinement` equal to `false`", function () {
+        expect(Instance.type.isRefinement).toBe(false);
+      });
+    });
+
+    describe("#isValue", function() {
+      it("should have default `isValue` equal to `false`", function () {
+        expect(Instance.type.isValue).toBe(false);
+      });
+    });
+
+    describe("#isProperty", function() {
+      it("should have default `isProperty` equal to `false`", function () {
+        expect(Instance.type.isProperty).toBe(false);
+      });
+    });
+
+    describe("#isElement", function() {
+      it("should have default `isElement` equal to `false`", function () {
+        expect(Instance.type.isElement).toBe(false);
+      });
+    });
+
+    describe("#isComplex", function() {
+      it("should have default `isComplex` equal to `false`", function () {
+        expect(Instance.type.isComplex).toBe(false);
+      });
+    });
+
+    describe("#isSimple", function() {
+      it("should have default `isSimple` equal to `false`", function () {
+        expect(Instance.type.isSimple).toBe(false);
+      });
+    });
+
     describe("#create -", function() {
       it("returns a new instance of `pentaho.type.Instance`", function() {
         expect(Instance.type.create() instanceof Instance).toBe(true);

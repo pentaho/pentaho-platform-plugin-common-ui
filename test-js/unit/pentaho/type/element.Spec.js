@@ -45,15 +45,9 @@ define([
         expect(ElemType.prototype instanceof Value.Type).toBe(true);
       });
 
-      describe("#isList -", function() {
-        it("should return the value `false`", function() {
-          expect(Element.type.isList).toBe(false);
-        });
-      });
-
-      describe("#isRefinement -", function() {
-        it("should return the value `false`", function() {
-          expect(Element.type.isRefinement).toBe(false);
+      describe("#isElement -", function() {
+        it("should return the value `true`", function() {
+          expect(Element.type.isElement).toBe(true);
         });
       });
 

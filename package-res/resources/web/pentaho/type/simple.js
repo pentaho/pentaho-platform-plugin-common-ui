@@ -326,6 +326,8 @@ define([
         isAbstract: true,
         styleClass: "pentaho-type-simple",
 
+        get isSimple() { return true; },
+
         //region cast method
         /**
          * Converts an external value to the type stored by the simple type

@@ -848,6 +848,8 @@ define([
 
         styleClass: "pentaho-type-complex",
 
+        get isComplex() { return true; },
+
         //region properties property
         _props: null,
 

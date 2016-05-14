@@ -252,33 +252,7 @@ define([
 
         styleClass: "pentaho-type-value",
 
-        //region list property
-        /**
-         * Gets a value that indicates if this type is a list type.
-         *
-         * The `Value` class return `undefined`.
-         *
-         * @name isList
-         * @memberOf pentaho.type.Value.Type#
-         * @type boolean
-         * @readOnly
-         */
-        get isList() {},
-        //endregion
-
-        //region isRefinement property
-        /**
-         * Gets a value that indicates if this type is a refinement type.
-         *
-         * The `Value` class return `undefined`.
-         *
-         * @name isRefinement
-         * @memberOf pentaho.type.Value.Type#
-         * @type boolean
-         * @readOnly
-         */
-        get isRefinement() {},
-        //endregion
+        get isValue() { return true; },
 
         //region context property
 
@@ -618,15 +592,16 @@ define([
           // The type's id or the temporary id in this scope.
           var spec = {id: this.shortId || SpecificationContext.current.add(this)};
 
-          // The base type in the current type hierarchy.
-          // The default base type is "pentaho/type/complex".
+          // The base type in the **current type hierarchy** (root, ancestor, isRoot).
           var baseType = this.ancestor;
           if(baseType) {
+            // Cannot be Value, cause Value has no ancestor.
             var baseRef = baseType.toRefInContext(keyArgs);
-            if(baseRef && baseRef !== "complex")
+            if(baseRef !== "complex")
               spec.base = baseRef;
+            // else, the default base type of a type other than Value is Complex
           } else {
-            // Value type itself
+            // The Value type.
             spec.base = null;
           }
 
@@ -635,7 +610,7 @@ define([
           return spec;
         },
 
-        // Serializes the isAbstract attribute for non-refinement types
+        // For non-refinement types, serializes the isAbstract attribute
         _fillSpecInContext: function(spec, keyArgs) {
           var any = false;
 

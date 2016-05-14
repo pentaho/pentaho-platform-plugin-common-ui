@@ -127,21 +127,25 @@ define([
 
           // TODO: Validate same context as base?
 
-          var declaringType = arg.required(keyArgs, "declaringType", "keyArgs");
-          if(declaringType.context !== context)
-            throw error.argInvalid("declaringType", "Invalid context");
+          // Abstract Property types don't yet have an associated declaringType.
+          // e.g. Property.extend()
+          var declaringType = keyArgs && keyArgs.declaringType;
+          if(declaringType) {
+            if(declaringType.context !== context)
+              throw error.argInvalid("declaringType", "Invalid context");
 
-          O.setConst(this, "_declaringType", declaringType);
+            O.setConst(this, "_declaringType", declaringType);
 
-          if(this.isRoot) {
-            O.setConst(this, "_index", keyArgs.index || 0);
+            if(this.isRoot) {
+              O.setConst(this, "_index", keyArgs.index || 0);
 
-            // Required stuff
-            if(!("name" in spec)) this.name = null; // throws
+              // Required stuff
+              if(!("name" in spec)) this.name = null; // throws
 
-            // Assume the _default_ type _before_ extend, to make sure `value` can be validated against it.
-            var type = spec.type;
-            if(type == null || type === "") this.type = _defaultTypeMid;
+              // Assume the _default_ type _before_ extend, to make sure `value` can be validated against it.
+              var type = spec.type;
+              if(type == null || type === "") this.type = _defaultTypeMid;
+            }
           }
         },
 
@@ -186,6 +190,8 @@ define([
         }, //endregion
 
         //region attributes
+
+        get isProperty() { return true; },
 
         //region context property
         /**
@@ -616,8 +622,8 @@ define([
              */
             set: function(value) {
               // Cannot change the root value.
-              // Letting this here instead of after the descendants test,
-              // as otherwise would be very hard to test...
+              // Testing this here, instead of after the descendants test,
+              // because, otherwise, it would be very hard to test.
               if(this === root) return;
 
               if(this.hasDescendants)
@@ -668,9 +674,15 @@ define([
 
           // no id and no base
           var valueTypeRef = this.type.toRefInContext(keyArgs);
-          var spec = {
-            name: this._name, type: valueTypeRef
-          };
+          var spec = {};
+
+          // The default base property type is Property.
+          //var baseType = Object.getPrototypeOf(this);
+
+          // The default base type is Property
+
+          spec.name = this._name;
+          spec.type = valueTypeRef;
 
           // If there are no attributes and it's of type "string",
           // return only the name of the property type.

@@ -266,6 +266,12 @@ define([
         expect(ElemType.prototype instanceof Element.Type).toBe(true);
       });
 
+      describe("#isSimple", function() {
+        it("should have `isSimple` equal to `true`", function () {
+          expect(Simple.type.isSimple).toBe(true);
+        });
+      });
+
       describe("#cast", function() {
 
         it("should default to an identity method", function() {

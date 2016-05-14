@@ -60,9 +60,8 @@ define([
       this._propType = null;
 
       // Copy the declaring complex type's ancestor's properties.
-      var ancestorType = declaringType.ancestor,
-          colBase = ancestorType && ancestorType._getProps && ancestorType._getProps();
-
+      var ancestorType = declaringType.ancestor;
+      var colBase = ancestorType.isComplex ? ancestorType._getProps() : null;
       if(colBase) {
         // Backup any provided specs.
         var newProps;

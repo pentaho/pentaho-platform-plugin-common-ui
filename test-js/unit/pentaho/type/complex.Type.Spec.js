@@ -302,6 +302,12 @@ define([
       });
     });
 
+    describe("#isComplex", function() {
+      it("should have `isComplex` equal to `true`", function () {
+        expect(Complex.type.isComplex).toBe(true);
+      });
+    });
+
     describe("#has(name)", function() {
       var Derived = Complex.extend({type: {
         props: ["foo", "bar"]

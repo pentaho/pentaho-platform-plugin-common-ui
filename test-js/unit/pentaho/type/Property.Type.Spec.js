@@ -37,6 +37,12 @@ define([
       expect(typeof PropertyType).toBe("function");
     });
 
+    describe("#isProperty", function() {
+      it("should have `isProperty` equal to `true`", function () {
+        expect(Property.type.isProperty).toBe(true);
+      });
+    });
+
     describe("define a root property -", function() {
 
       var Derived;

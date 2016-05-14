@@ -63,6 +63,12 @@ define([
         expect(typeof valueType.uid).toBe("number");
       });
 
+      describe("#isValue", function() {
+        it("should have `isValue` equal to `true`", function () {
+          expect(valueType.isValue).toBe(true);
+        });
+      });
+
       describe("#context()", function() {
         it("the Value type has the context in which it was defined", function() {
           var myContext = new Context();
@@ -71,12 +77,6 @@ define([
           expect(Value.type.context).toBe(myContext);
         });
       }); // end #context
-
-      describe("#isList", function() {
-        it("should have default `isList` equal to `undefined`", function () {
-          expect(valueType.isList).toBe(undefined);
-        });
-      }); // end #isList
 
       describe("#isAbstract", function() {
         it("should have default `isAbstract` equal to `true`", function () {

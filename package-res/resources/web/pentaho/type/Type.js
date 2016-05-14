@@ -252,6 +252,93 @@ define([
     //endregion
     //endregion
 
+    //region Type Kinds
+    //region isValue property
+    /**
+     * Gets a value that indicates if this type
+     * [is]{@link pentaho.type.Type#isSubtypeOf} a
+     * [value]{@link pentaho.type.Value.Type} type.
+     *
+     * @type boolean
+     * @readOnly
+     */
+    get isValue() { return false; },
+    //endregion
+
+    //region isProperty property
+    /**
+     * Gets a value that indicates if this type
+     * [is]{@link pentaho.type.Type#isSubtypeOf} a
+     * [property]{@link pentaho.type.Property.Type} type.
+     *
+     * @type boolean
+     * @readOnly
+     */
+    get isProperty() { return false; },
+    //endregion
+
+    //region isList property
+    /**
+     * Gets a value that indicates if this type
+     * [is]{@link pentaho.type.Type#isSubtypeOf} a
+     * [list]{@link pentaho.type.List.Type} type.
+     *
+     * @type boolean
+     * @readOnly
+     */
+    get isList() { return false; },
+    //endregion
+
+    //region isElement property
+    /**
+     * Gets a value that indicates if this type
+     * [is]{@link pentaho.type.Type#isSubtypeOf} an
+     * [element]{@link pentaho.type.Element.Type} type.
+     *
+     * @type boolean
+     * @readOnly
+     */
+    get isElement() { return false; },
+    //endregion
+
+    //region isRefinement property
+    /**
+     * Gets a value that indicates if this type
+     * [is]{@link pentaho.type.Type#isSubtypeOf} a
+     * [refinement]{@link pentaho.type.Refinement.Type} type.
+     *
+     * @type boolean
+     * @readOnly
+     */
+    get isRefinement() { return false; },
+    //endregion
+
+    //region isComplex property
+    /**
+     * Gets a value that indicates if this type
+     * [is]{@link pentaho.type.Type#isSubtypeOf} an
+     * [complex]{@link pentaho.type.Complex.Type} type.
+     *
+     * @type boolean
+     * @readOnly
+     */
+    get isComplex() { return false; },
+    //endregion
+
+    //region isSimple property
+    /**
+     * Gets a value that indicates if this type
+     * [is]{@link pentaho.type.Type#isSubtypeOf} an
+     * [simple]{@link pentaho.type.Simple.Type} type.
+     *
+     * @type boolean
+     * @readOnly
+     */
+    get isSimple() { return false; },
+    //endregion
+
+    //endregion
+
     //region id property
 
     // -> nonEmptyString, Optional(null), Immutable, Shared (note: not Inherited)

@@ -1274,12 +1274,6 @@ define([
           expect(List.type.isList).toBe(true);
         });
       });
-
-      describe("#isRefinement -", function() {
-        it("should return the value `false`", function() {
-          expect(List.type.isRefinement).toBe(false);
-        });
-      });
     }); //endregion Type
     
   });

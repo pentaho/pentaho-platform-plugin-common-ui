@@ -373,9 +373,10 @@ define([
         set of(value) {
           if(value == null) throw error.argRequired("of");
 
-          // Value returns refinement === undefined...
+          // Must be a non-refinement, Value strict subtype.
           var ofType = this.context.get(value).type;
-          if(ofType.isRefinement !== false)
+          var isValid = ofType !== Value.type && ofType.isSubtypeOf(Value.type) && !ofType.isRefinement;
+          if(!isValid)
             throw error.argInvalidType("of", ["pentaho/type/element", "pentaho/type/list"]);
 
           // Throws when set again with a different value.
@@ -406,38 +407,15 @@ define([
         },
         //endregion
 
-        //region list property
-        //@override
-        /**
-         * Gets a value that indicates if this type is a list type.
-         *
-         * This implementation is sealed and always returns
-         * the value of the representation type.
-         *
-         * @type boolean
-         * @readOnly
-         * @sealed
-         */
-        get isList() {
-          return this.of.isList;
-        },
-        //endregion
+        get isRefinement() { return true; },
 
-        //region isRefinement property
-        /**
-         * Gets a value that indicates if this type is a refinement type.
-         *
-         * This implementation is sealed and always returns `true`.
-         *
-         * @type boolean
-         * @readOnly
-         * @sealed
-         */
-          // Providing a default implementation is less code
-        get isRefinement() {
-          return true;
-        },
-        //endregion
+        get isList() { return this.of.isList; },
+
+        get isElement() { return this.of.isElement; },
+
+        get isComplex() { return this.of.isComplex; },
+
+        get isSimple() { return this.of.isSimple; },
 
         /**
          * Determines if this is a subtype of another.
