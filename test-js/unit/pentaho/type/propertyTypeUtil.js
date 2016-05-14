@@ -26,34 +26,27 @@ define(function() {
 
   function createRoot(declaringType, typeSpec) {
 
-    var Property = declaringType.context.get("property");
+    var baseId = typeSpec && typeSpec.base;
+    var Property = declaringType.context.get(baseId || "property");
 
-    return Property.extendProto(
-        null,
-        {
-          type: typeSpec
-        },
+    return Property.type.extendProto(
+        typeSpec,
         {
           declaringType: declaringType,
           index: 1,
           isRoot: true
-        }).type;
+        });
   }
 
   function extend(declaringType, baseProperty, subPropTypeSpec) {
 
-    var Property = declaringType.context.get("property");
-
     var basePropType = declaringType.ancestor.get(baseProperty);
 
-    return Property.extendProto(
-        basePropType.instance, {
-          type: subPropTypeSpec
-        },
+    return basePropType.extendProto(subPropTypeSpec,
         {
           declaringType: declaringType,
           instance: declaringType.instance
-        }).type;
+        });
   }
 });
 

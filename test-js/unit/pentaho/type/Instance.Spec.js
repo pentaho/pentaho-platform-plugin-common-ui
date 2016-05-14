@@ -113,44 +113,5 @@ define([
         expect(inst.type.id).toBe(id);
       });
     });
-
-    describe("#extendProto -", function() {
-      var derivedProto;
-      beforeEach(function() {
-        derivedProto = Instance.extendProto(null, {}, {});
-      });
-
-      it("derived classes have the proper 'ancestor'", function() {
-        expect(derivedProto.type).not.toBe(Instance.type);
-        expect(derivedProto.type.ancestor).toBe(Instance.type);
-        expect(derivedProto.type.is(Instance)).toBe(false);
-      });
-
-      it("can be invoked without arguments", function() {
-        expect(Instance.extendProto().type.ancestor).toBe(Instance.type);
-        expect(Instance.extendProto(null).type.ancestor).toBe(Instance.type);
-        expect(Instance.extendProto(null, {}).type.ancestor).toBe(Instance.type);
-      });
-
-      it("does not return a constructor", function() {
-        expect(typeof derivedProto).not.toBe("function");
-      });
-
-      it("returns an instance whose constructor is the same as the extended class", function() {
-        expect(derivedProto.constructor).toBe(Instance);
-        expect(derivedProto.constructor).toBe(Instance.prototype.constructor);
-        expect(derivedProto instanceof Instance).toBe(true);
-      });
-
-      it("accepts keyArgs", function() {
-        var Derived = Instance.extendProto(null, {}, {
-          isRoot: true
-        });
-        expect(Instance.type.isRoot).toBe(false);
-        expect(Derived.type.isRoot).toBe(true);
-      });
-
-    });
-
   }); // pentaho/type/Instance
 });

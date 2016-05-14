@@ -62,7 +62,7 @@ define([
 
       this._init(spec, keyArgs);
 
-      this.extend(spec);
+      this.extend(spec, keyArgs);
 
       this._postInit(spec, keyArgs);
     },
@@ -742,29 +742,42 @@ define([
     /**
      * Creates a subtype of this one.
      *
-     * This method creates a type which does not have an own constructor.
-     * The base type's constructor is used to _initialize_ the type.
+     * This method creates a subtype which does not have own instance or type constructors.
+     * The base type's instance and type constructors are used to _initialize_ instances and the type.
      *
-     * Do not use this method directly.
-     * Use {@link pentaho.type.Instance#extendProto} instead.
+     * To create a type with own constructors,
+     * extend from the base instance constructor instead,
+     * by calling its `extend` method.
      *
-     * @param {object} spec The type specification.
-     * @param {object} keyArgs Keyword arguments.
-     * @param {pentaho.type.Instance} keyArgs.instance The prototype of instances of the type.
+     * @param {object} [typeSpec] The new type specification.
+     * @param {object} [keyArgs] Keyword arguments.
      *
-     * @return {pentaho.type.Type} The new type.
-     * @ignore
+     * @return {pentaho.type.Type} The created subtype.
      */
-    _extendProto: function(spec, keyArgs) {
+    extendProto: function(typeSpec, keyArgs) {
+      if(!typeSpec) typeSpec = {};
 
+      var baseInstProto = this.instance;
+
+      // INSTANCE I
+      var instProto = Object.create(baseInstProto);
+
+      // TYPE
       O.setConst(this, "_hasDescendants", true);
 
-      var subType = Object.create(this);
+      var type = Object.create(this);
 
-      // NOTE: `subType.constructor` is still the "base" constructor.
-      subType.constructor(spec, keyArgs);
+      var ka = keyArgs ? Object.create(keyArgs) : {};
+      ka.instance = instProto;
+      ka.exclude  = {instance: 1};
 
-      return subType;
+      // NOTE: `type.constructor` is still the "base" constructor.
+      type.constructor(typeSpec, ka);
+
+      // INSTANCE II
+      instProto.extend(typeSpec && typeSpec.instance, {exclude: {type: 1}});
+
+      return type;
     },
 
     // TODO: Now that Property instances are never created,

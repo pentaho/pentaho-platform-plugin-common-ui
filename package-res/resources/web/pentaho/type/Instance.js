@@ -215,42 +215,6 @@ define([
     },
     //endregion
 
-    /**
-     * Creates a subtype of a given one.
-     *
-     * This method creates a subtype which does not have an own instance constructor.
-     * The base type's instance constructor is used to _initialize_ instances.
-     *
-     * To create a type with an own constructor,
-     * extend from the base constructor instead,
-     * by calling its `extend` method.
-     *
-     * @param {pentaho.type.Instance} [baseInstProto] The base instances' prototype.
-     *   When nully, defaults to the prototype of this instance constructor.
-     *
-     * @param {object} [instSpec] The new type specification.
-     * @param {object} [keyArgs] Keyword arguments.
-     *
-     * @return {pentaho.type.Instance} The instances' prototype of the created subtype.
-     */
-    extendProto: function(baseInstProto, instSpec, keyArgs) {
-      if(!instSpec) instSpec = {};
-      if(!baseInstProto) baseInstProto = this.prototype;
-
-      // INSTANCE I
-      var subInstProto = Object.create(baseInstProto);
-
-      // TYPE
-      var ka = keyArgs ? Object.create(keyArgs) : {};
-      ka.instance = subInstProto;
-
-      baseInstProto.type._extendProto(instSpec && instSpec.type, ka);
-
-      // INSTANCE II
-      // Don't process `instSpec.type` twice, during construction.
-      return subInstProto.extend(instSpec, _keyArgsExcludeInstance);
-    },
-
     // override the documentation to specialize the argument types.
     /**
      * Creates a subtype of this one.

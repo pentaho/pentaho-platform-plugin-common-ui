@@ -27,48 +27,47 @@ define([
 
   "use strict";
 
-  var _propType,
-
-      _defaultTypeMid = "string",
+  var _defaultTypeMid = "string",
 
       _dynamicAttrNames = ["isRequired", "countMin", "countMax", "isApplicable", "isReadOnly"];
 
   return function(context) {
 
-    /**
-     * @name pentaho.type.Property
-     *
-     * @class
-     * @extends pentaho.type.Instance
-     *
-     * @classdesc A property of a complex value.
-     *
-     * The developer is not expected to create instances of this type.
-     *
-     * @see pentaho.type.Complex
-     */
+    var _propType;
 
     /**
      * @name pentaho.type.Property.Type
      *
      * @class
      * @extends pentaho.type.Type
+     * @abstract
      *
      * @implements pentaho.lang.IWithKey
      * @implements pentaho.lang.IListElement
      * @implements pentaho.lang.ICollectionElement
      *
-     * @classdesc The type of a property of a complex type.
+     * @classDesc The type of a property of a complex type.
      *
      * A _property type_ only exists within a _complex type_.
      *
      * @description Creates a property type object.
      *
-     * This constructor is used internally by the `pentaho/type` package and
-     * should not be used directly.
+     * @see pentaho.type.Complex
+     */
+
+    /**
+     * @name pentaho.type.Property
+     *
+     * @class
+     * @extends pentaho.type.Instance
+     * @abstract
+     * @amd {pentaho.type.Factory<pentaho.type.Property>} pentaho/type/property
+     *
+     * @classDesc A property of a complex value.
      *
      * @see pentaho.type.Complex
      */
+
     var Property = Instance.extend("pentaho.type.Property", /** @lends pentaho.type.Property# */{
 
       // TODO: value, members?
@@ -722,7 +721,7 @@ define([
           return any;
         }
         //endregion
-      } // end instance type:
+      }
     }).implement({
       type: /** @lends pentaho.type.Property.Type# */{
         _attrs: {
@@ -1192,7 +1191,7 @@ define([
 
           return {min: countMin, max: countMax};
         }
-      } // end type:
+      }
     });
 
     _propType = Property.prototype;
@@ -1213,7 +1212,7 @@ define([
 
   function castCount(v) {
     v = +v;
-    if(isNaN(v) || v < 0) return undefined;
+    if(isNaN(v) || v < 0) return;// undefined;
     return Math.floor(v);
   }
 
@@ -1225,6 +1224,7 @@ define([
       if(v == null)
         v = dv;
     }
+
     return v;
   }
 });

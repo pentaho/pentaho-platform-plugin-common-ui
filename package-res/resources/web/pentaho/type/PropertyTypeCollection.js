@@ -56,6 +56,9 @@ define([
         isRoot: false
       };
 
+      // Caches Property.Type
+      this._propType = null;
+
       // Copy the declaring complex type's ancestor's properties.
       var ancestorType = declaringType.ancestor,
           colBase = ancestorType && ancestorType._getProps && ancestorType._getProps();
@@ -79,6 +82,30 @@ define([
         // Default: calls `addMany` on contained specs.
         this.base();
       }
+    },
+
+    /**
+     * The context of properties of this property collection.
+     *
+     * @type {pentaho.type.Context}
+     * @readOnly
+     * @private
+     */
+    get _context() {
+      return this._cachedKeyArgs.declaringType.context;
+    },
+
+    /**
+     * The property type in this property collection's context.
+     *
+     * @type {pentaho.type.Property.Type}
+     * @readOnly
+     * @private
+     */
+    get _propertyType() {
+      var propertyType = this._propType;
+      if(!propertyType) this._propType = propertyType = this._context.get(propertyFactory).type;
+      return propertyType;
     },
 
     //region List implementation
@@ -142,8 +169,7 @@ define([
       }
 
       // Replace with overridden property.
-      var Property = ka.declaringType.context.get(propertyFactory);
-      return Property.extendProto(existing.instance, {type: spec}, ka).type;
+      return existing.extendProto(spec, ka);
     },
 
     /**
@@ -161,18 +187,27 @@ define([
       // A singular string property with the specified name.
       if(typeof spec === "string") spec = {name: spec};
 
+      // Resolve base Property Type
+      var basePropType;
+      var baseId = spec.base;
+      if(!baseId) {
+        basePropType = this._propertyType;
+      } else {
+        basePropType = this._context.get(baseId).type;
+        if(!basePropType.isSubtypeOf(this._propertyType))
+          throw error.argInvalid("props[i]", "Property base type does not extend Property.");
+      }
+
       var ka = this._cachedKeyArgs;
       ka.index = index;
       ka.isRoot = true;
 
-      var Property = ka.declaringType.context.get(propertyFactory);
-
-      var pm = Property.extendProto(null, {type: spec}, ka).type;
+      var propType = basePropType.extendProto(spec, ka);
 
       ka.index = -1;
       ka.isRoot = false;
 
-      return pm;
+      return propType;
     },
     //endregion
 

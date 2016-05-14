@@ -386,9 +386,8 @@ define([
           var Derived2 = Derived.extend();
 
           // Create a descendant property
-          Property.extendProto(
-              propType.instance,
-              {type: {name: "foo1"}}, // spec
+          propType.extendProto(
+              {name: "foo1"}, // spec
               {declaringType: Derived2.type}); // keyArgs
 
           var PostalCode = PentahoString.extend();
@@ -523,9 +522,8 @@ define([
           // Create a descendant property
           var Derived2 = Derived.extend();
 
-          Property.extendProto(
-              propType.instance,
-              {type: {name: "foo1"}}, // spec
+          propType.extendProto(
+              {name: "foo1"}, // spec
               {declaringType: Derived2.type}); // keyArgs
 
           expect(function() {
@@ -569,9 +567,8 @@ define([
           var Derived2 = Derived.extend();
 
           // Create a descendant property
-          Property.extendProto(
-              propType.instance,
-              {type: {name: "foo"}}, // spec
+          propType.extendProto(
+              {name: "foo"}, // spec
               {declaringType: Derived2.type}); // keyArgs
 
           expect(function() {
@@ -766,9 +763,8 @@ define([
           var Derived2 = Derived.extend();
 
           // Create a descendant property
-          Property.extendProto(
-              propType.instance,
-              {type: {name: "foo"}}, // spec
+          propType.extendProto(
+              {name: "foo"}, // spec
               {declaringType: Derived2.type}); // keyArgs
 
           expect(function() {
@@ -883,9 +879,8 @@ define([
           var Derived2 = Derived.extend();
 
           // Create a descendant property
-          Property.extendProto(
-              propType.instance,
-              {type: {name: "foo"}}, // spec
+          propType.extendProto(
+              {name: "foo"}, // spec
               {declaringType: Derived2.type}); // keyArgs
 
           expect(function() {
@@ -984,9 +979,8 @@ define([
           var Derived2 = Derived.extend();
 
           // Create a descendant property
-          Property.extendProto(
-              propType.instance,
-              {type: {name: "foo"}}, // spec
+          propType.extendProto(
+              {name: "foo"}, // spec
               {declaringType: Derived2.type}); // keyArgs
 
           expect(function() {
@@ -1085,9 +1079,8 @@ define([
           var Derived2 = Derived.extend();
 
           // Create a descendant property
-          Property.extendProto(
-              propType.instance,
-              {type: {name: "foo"}}, // spec
+          propType.extendProto(
+              {name: "foo"}, // spec
               {declaringType: Derived2.type}); // keyArgs
 
           expect(function() {

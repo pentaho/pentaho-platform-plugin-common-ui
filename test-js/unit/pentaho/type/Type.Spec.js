@@ -820,7 +820,7 @@ define([
       it("returns true if the type has been extended using .type.extendProto(...)", function() {
         var Derived = Instance.extend();
 
-        Derived.extendProto();
+        Derived.type.extendProto();
         expect(Derived.type.hasDescendants).toBe(true);
       });
     }); // #hasDescendants
@@ -882,7 +882,7 @@ define([
           }
         });
 
-        var subSubType = SubInstance.extendProto().type;
+        var subSubType = SubInstance.type.extendProto();
         spyOn(subSubType, "create").and.callThrough();
 
         var value = {};
@@ -917,6 +917,40 @@ define([
         var SubType1 = Instance.extend();
         var SubType2 = Instance.extend();
         expect(SubType1.type.isSubtypeOf(SubType2.type)).toBe(false);
+      });
+    });
+
+    describe("#extendProto(typeSpec, keyArgs)", function() {
+      var derivedProto;
+      beforeEach(function() {
+        derivedProto = Instance.type.extendProto({}, {});
+      });
+
+      it("derived classes have the proper 'ancestor'", function() {
+        expect(derivedProto).not.toBe(Instance.type);
+        expect(derivedProto.ancestor).toBe(Instance.type);
+      });
+
+      it("can be invoked without arguments", function() {
+        expect(Instance.type.extendProto().ancestor).toBe(Instance.type);
+        expect(Instance.type.extendProto(null).ancestor).toBe(Instance.type);
+        expect(Instance.type.extendProto(null, {}).ancestor).toBe(Instance.type);
+      });
+
+      it("does not return a constructor", function() {
+        expect(typeof derivedProto).not.toBe("function");
+      });
+
+      it("returns an instance whose constructor is the same as the extended class", function() {
+        expect(derivedProto.constructor).toBe(Instance.type.constructor);
+      });
+
+      it("accepts keyArgs", function() {
+        var derivedType = Instance.type.extendProto({}, {
+          isRoot: true
+        });
+        expect(Instance.type.isRoot).toBe(false);
+        expect(derivedType.isRoot).toBe(true);
       });
     });
   });
