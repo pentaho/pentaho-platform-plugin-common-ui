@@ -22,6 +22,16 @@
  */
 
 /**
+ * A reference to the type's base type, if any.
+ *
+ * See a subtype's documentation for more information on default values.
+ *
+ * @name base
+ * @memberOf pentaho.type.spec.ITypeProto#
+ * @type {?pentaho.type.spec.UTypeReference}
+ */
+
+/**
  * The extensible/configurable members of the prototype of instance classes.
  *
  * @name instance

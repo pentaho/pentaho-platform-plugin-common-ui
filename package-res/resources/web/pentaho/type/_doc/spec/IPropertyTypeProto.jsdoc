@@ -27,6 +27,22 @@
  */
 
 /**
+ * A reference to the property type's base type, if any.
+ *
+ * Can only be specified on a root property of a complex type,
+ * in which case it defaults to {@link pentaho.type.Property}.
+ *
+ * For non-root property types,
+ * their base property type is that with the same name in
+ * the base type of the declaring type.
+ *
+ * @name base
+ * @memberOf pentaho.type.spec.IPropertyTypeProto#
+ * @type {?pentaho.type.spec.UTypeReference}
+ * @see pentaho.type.spec.IPropertyTypeProto#name
+ */
+
+/**
  * The name of the _property type_.
  *
  * The name of a _property type_ identifies it within
