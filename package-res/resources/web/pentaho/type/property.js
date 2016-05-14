@@ -883,7 +883,9 @@ define([
            * @see pentaho.type.spec.IPropertyTypeProto#isRequired
            */
           isRequired: {
-            value: false, cast: Boolean, combine: function(baseEval, localEval) {
+            value: false,
+            cast: Boolean,
+            combine: function(baseEval, localEval) {
               return function() {
                 // localEval is skipped if base is true.
                 return baseEval.call(this) || localEval.call(this);
@@ -968,7 +970,9 @@ define([
            * @see pentaho.type.spec.IPropertyTypeProto#countMin
            */
           countMin: {
-            value: 0, cast: castCount, combine: function(baseEval, localEval) {
+            value: 0,
+            cast: castCount,
+            combine: function(baseEval, localEval) {
               return function() {
                 return Math.max(baseEval.call(this), localEval.call(this));
               };
@@ -1052,7 +1056,9 @@ define([
            * @see pentaho.type.spec.IPropertyTypeProto#countMax
            */
           countMax: {
-            value: Infinity, cast: castCount, combine: function(baseEval, localEval) {
+            value: Infinity,
+            cast: castCount,
+            combine: function(baseEval, localEval) {
               return function() {
                 return Math.min(baseEval.call(this), localEval.call(this));
               };
@@ -1129,7 +1135,9 @@ define([
            * @see pentaho.type.spec.IPropertyTypeProto#isApplicable
            */
           isApplicable: {
-            value: true, cast: Boolean, combine: function(baseEval, localEval) {
+            value: true,
+            cast: Boolean,
+            combine: function(baseEval, localEval) {
               return function() {
                 // localEval is skipped if base is false.
                 return baseEval.call(this) && localEval.call(this);
@@ -1203,7 +1211,9 @@ define([
            * @see pentaho.type.spec.IPropertyTypeProto#isReadOnly
            */
           isReadOnly: {
-            value: false, cast: Boolean, combine: function(baseEval, localEval) {
+            value: false,
+            cast: Boolean,
+            combine: function(baseEval, localEval) {
               return function() {
                 // localEval is skipped if base is true.
                 return baseEval.call(this) || localEval.call(this);

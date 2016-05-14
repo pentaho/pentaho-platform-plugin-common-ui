@@ -118,11 +118,23 @@ define([
         it("should have `ancestor` equal to `null`", function() {
           expect(propType.ancestor).toBe(null);
         });
+
+        it("should throw if `declaringType` is of a different context", function() {
+          var context2 = new Context();
+          var Complex2 = context2.get("complex");
+          expect(function() {
+            Property.type.extendProto({}, {
+              declaringType: Complex2.type,
+              index:  1,
+              isRoot: true
+            });
+          }).toThrow(errorMatch.argInvalid("declaringType"));
+        });
       }); // end when spec is an object
 
       //region Type Attributes
       // TODO: unify with value tests
-      describe("label - ", function() {
+      describe("#label - ", function() {
         it("should default to the capitalization of `name`", function() {
           var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo"});
           expect(propType.label).toBe("Foo");
@@ -147,9 +159,9 @@ define([
           var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", label: "MyFoo"});
           expect(propType.label).toBe("MyFoo");
         });
-      }); // end label
+      }); // end #label
 
-      describe("description - ", function() {
+      describe("#description - ", function() {
         it("should default to null", function() {
           var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo1"});
           expect(propType.description).toBe(null);
@@ -172,9 +184,9 @@ define([
           var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", description: "MyFoo"});
           expect(propType.description).toBe("MyFoo");
         });
-      }); // end description
+      }); // end #description
 
-      describe("category - ", function() {
+      describe("#category - ", function() {
         it("should default to null", function() {
           var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo1"});
           expect(propType.category).toBe(null);
@@ -197,9 +209,9 @@ define([
           var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", category: "MyFoo"});
           expect(propType.category).toBe("MyFoo");
         });
-      }); // end category
+      }); // end #category
 
-      describe("helpUrl - ", function() {
+      describe("#helpUrl - ", function() {
         it("should default to null", function() {
           var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo1"});
           expect(propType.helpUrl).toBe(null);
@@ -222,9 +234,9 @@ define([
           var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", helpUrl: "MyFoo"});
           expect(propType.helpUrl).toBe("MyFoo");
         });
-      }); // end helpUrl
+      }); // end #helpUrl
 
-      describe("isBrowsable - ", function() {
+      describe("#isBrowsable - ", function() {
         it("should default to true", function() {
           var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo"});
           expect(propType.isBrowsable).toBe(true);
@@ -259,9 +271,9 @@ define([
           propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo6", isBrowsable: "no"});
           expect(propType.isBrowsable).toBe(true);
         });
-      }); // end isBrowsable
+      }); // end #isBrowsable
 
-      describe("isAdvanced - ", function() {
+      describe("#isAdvanced - ", function() {
         it("should default to false", function() {
           var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo"});
           expect(propType.isAdvanced).toBe(false);
@@ -296,11 +308,11 @@ define([
           propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo6", isAdvanced: "no"});
           expect(propType.isAdvanced).toBe(true);
         });
-      }); // end isAdvanced
+      }); // end #isAdvanced
       //endregion
 
       //region Defining Attributes
-      describe("name - ", function() {
+      describe("#name - ", function() {
 
         it("should throw when spec is falsy", function() {
           function expectIt(name) {
@@ -352,9 +364,9 @@ define([
 
           propType.name = "fooBar";
         });
-      }); // end name
+      }); // end #name
 
-      describe("isList - ", function() {
+      describe("#isList - ", function() {
         it("should return `true` when the type is a list type", function() {
           var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", type: ["string"]});
           expect(propType.isList).toBe(true);
@@ -364,10 +376,10 @@ define([
           var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", type: "string"});
           expect(propType.isList).toBe(false);
         });
-      }); // end isList
+      }); // end #isList
 
       // Monotonic
-      describe("type - ", function() {
+      describe("#type - ", function() {
 
         // NOTE: tests of Context#get test type resolution more thoroughly.
 
@@ -461,9 +473,9 @@ define([
 
           expect(propType.value).toBe(null);
         });
-      }); // end type
+      }); // end #type
 
-      describe("elemType - ", function() {
+      describe("#elemType - ", function() {
         it("for singular values, should provide same output as `type`", function() {
           ["string", "number", "boolean", "date", "complex"].forEach(function(type) {
             var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo1", type: type});
@@ -478,9 +490,9 @@ define([
           });
         });
 
-      }); // end elemType
+      }); // end #elemType
 
-      describe("value - ", function() {
+      describe("#value - ", function() {
 
         it("should default to `null`, when unspecified", function() {
           var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", type: "string"});
@@ -536,11 +548,21 @@ define([
             propType.value = null;
           }).toThrow(errorMatch.operInvalid());
         });
-      }); //end value
+
+        it("should not delete when set to undefined at Property.type", function() {
+          // Must obtain a fresh Property such that hasDescendants is false.
+          var context2 = new Context();
+          var Property2 = context2.get("property");
+
+          Property2.type.value = undefined;
+
+          expect(Property2.type.hasOwnProperty("_value")).toBe(true);
+        });
+      }); //end #value
       //endregion
 
       //region Dynamic & Monotonic Attributes
-      describe("isRequired - ", function() {
+      describe("#isRequired - ", function() {
         it("should not allow changing the Property.type attribute value", function() {
           var propType = Property.type;
           var isRequired = propType.isRequired;
@@ -666,9 +688,9 @@ define([
           expect(f.calls.count()).toBe(1);
           expect(f.calls.first().args.length).toBe(0);
         });
-      }); // end isRequired
+      }); // end #isRequired
 
-      describe("countMin - ", function() {
+      describe("#countMin - ", function() {
         it("should not allow changing the Property.type attribute value", function() {
           var propType = Property.type;
           var countMin = propType.countMin;
@@ -777,9 +799,9 @@ define([
             propType.countMin = 2;
           }).toThrow(errorMatch.operInvalid());
         });
-      }); // end countMin
+      }); // end #countMin
 
-      describe("countMax - ", function() {
+      describe("#countMax - ", function() {
         it("should not allow changing the Property.type attribute value", function() {
           var propType = Property.type;
           var countMax = propType.countMax;
@@ -893,9 +915,9 @@ define([
             propType.countMax = 2;
           }).toThrow(errorMatch.operInvalid());
         });
-      }); // end countMax
+      }); // end #countMax
 
-      describe("isApplicable - ", function() {
+      describe("#isApplicable - ", function() {
         it("should not allow changing the Property.type attribute value", function() {
           var propType = Property.type;
           var isApplicable = propType.isApplicable;
@@ -993,9 +1015,9 @@ define([
             propType.isApplicable = false;
           }).toThrow(errorMatch.operInvalid());
         });
-      }); // end isApplicable
+      }); // end #isApplicable
 
-      describe("isReadOnly - ", function() {
+      describe("#isReadOnly - ", function() {
         it("should not allow changing the Property.type attribute value", function() {
           var propType = Property.type;
           var isReadOnly = propType.isReadOnly;
@@ -1093,9 +1115,9 @@ define([
             propType.isReadOnly = true;
           }).toThrow(errorMatch.operInvalid());
         });
-      }); // end isReadOnly
+      }); // end #isReadOnly
 
-      describe("countRange -", function() {
+      describe("#countRange -", function() {
         // 1. when !isList => min and max <= 1
         // 2. required => countMin >= 1
         // 3. min <= max
@@ -1212,7 +1234,41 @@ define([
           expect(propType.countMax).toBe(1);
           expect(propType.countRangeEval({}).min).toBe(0);
         });
-      });
+      }); // end #countRange
+
+      describe("dynamic attribute", function() {
+
+        it("should allow defining and setting to a function an attribute that has no cast function", function() {
+
+          var context2 = new Context();
+          var Property2 = context2.get("property")
+                .implement({
+                  type: {
+                    _attrs: {
+                      isFoo: {
+                        value: false,
+                        // cast: null. // <<---- no cast function
+                        combine: function(baseEval, localEval) {
+                          return function() {
+                            // localEval is skipped if base is true.
+                            return baseEval.call(this) || localEval.call(this);
+                          };
+                        }
+                      }
+                    }
+                  }
+                });
+
+          var fValue = function() { return true; };
+          var SubProperty2 = Property2.extend({
+            type: {
+              isFoo: fValue
+            }
+          });
+
+          expect(SubProperty2.type.isFoo).toBe(fValue);
+        });
+      }); // end dynamic attribute
       //endregion
     }); // end define a root property
 

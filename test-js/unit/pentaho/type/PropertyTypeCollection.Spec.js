@@ -140,6 +140,14 @@ define([
 
           expect(props[0] instanceof DerivedProperty.Type).toBe(true);
         });
+
+        it("should throw is the property type specified in the `base` attribute is not a subtype of property", function() {
+
+          expect(function() {
+            props.add({base: Complex, name: "foo", type: "boolean"});
+          }).toThrow(errorMatch.argInvalid("props[i]"));
+
+        });
       });
 
       describe("Configuring the PropertyTypeCollection", function() {
@@ -236,6 +244,17 @@ define([
           expect(props[0].type).toBe(PentahoBoolean.type);
         });
 
+        it("should configure an existing property, but bailout if the spec is solely its name", function() {
+
+          props.configure({foo: {name: "foo", type: "boolean"}});
+          var propType = props[0];
+
+          spyOn(propType, "extend");
+
+          props.replace("foo", 0);
+
+          expect(propType.extend).not.toHaveBeenCalled();
+        });
       });
     });
 
