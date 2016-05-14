@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 define([
+  "module",
   "./Instance",
   "./valueHelper",
   "../i18n!types",
@@ -23,7 +24,7 @@ define([
   "../util/object",
   "../util/text",
   "../util/fun"
-], function(Instance, valueHelper, bundle, AnnotatableLinked, arg, error, O, text, F) {
+], function(module, Instance, valueHelper, bundle, AnnotatableLinked, arg, error, O, text, F) {
 
   "use strict";
 
@@ -76,6 +77,10 @@ define([
       type: /** @lends pentaho.type.Property.Type# */{
         // Note: constructor/_init is only called on sub-classes of Property.Type,
         // and not on Property.Type itself.
+
+        id: module.id,
+
+        isAbstract: true,
 
         /**
          * Initializes a property type object, given a property type specification.
@@ -442,7 +447,6 @@ define([
             throw error.operInvalid("Cannot change the default value of a property type that has descendants.");
 
           if(_ === undefined || (_ === null && this.isRoot)) {
-            /* istanbul ignore else : hard to test */
             if(this !== _propType) {
               // Clear local value. Inherit base value.
               delete this._value;
@@ -673,60 +677,123 @@ define([
           if(!keyArgs) keyArgs = {};
 
           // no id and no base
-          var valueTypeRef = this.type.toRefInContext(keyArgs);
           var spec = {};
+          var baseType;
 
-          // The default base property type is Property.
-          //var baseType = Object.getPrototypeOf(this);
+          var valueTypeRef = this.type.toRefInContext(keyArgs);
 
-          // The default base type is Property
+          // # Abstract Property Types
+          //
+          // Classes like Property or Property.extend() are *abstract*
+          // and are base classes of actual property type roots.
+          //
+          // The base of a subtype of Property is either Property or a subtype of it
+          // and needs to be output, with a type reference.
+          //
+          // If Property itself is serialized, the id needs to be included...
+          //
+          // The default `base` of a root property type is Property
+          // and so, in this case, `base` can be omitted.
+          //
+          var isAbstract = !this._declaringType;
+          if(isAbstract) {
+            // The id, if any, needs to be included.
+            // Property has an id. Subtypes of it may not have.
+            var shortId = this.shortId;
+            if(shortId) spec.id = shortId;
 
-          spec.name = this._name;
-          spec.type = valueTypeRef;
+            // The `base` of Property is not a Property, it is Instance.
+            // TODO: For now, Instance is not serialized, so base is null...
 
-          // If there are no attributes and it's of type "string",
-          // return only the name of the property type.
-          if(!this._fillSpecInContext(spec, keyArgs) && valueTypeRef === "string") {
-            return this._name;
+            if(_propType !== this) {
+              // Some subtype of Property.
+              // Serialize base as a reference, even if it is Property.
+              // `ancestor` only works from root property types downwards.
+              baseType = Object.getPrototypeOf(this);
+              spec.base = baseType.toRefInContext(keyArgs);
+            }
+
+            // Abstract Property classes don't have declaring type or `name`.
+
+            // The default value type of abstract properties is value
+            if(valueTypeRef !== "value") spec.type = valueTypeRef;
+
+            this._fillSpecInContext(spec, keyArgs);
+          } else {
+            // Non-abstract property types are always anonymous and defined as part of the
+            // declaring complex type's definition => no id.
+            var count = 0;
+
+            if(this.isRoot) {
+              // The default `base` of a root property is Property.Type,
+              // and is omitted if this is the case.
+              // Again, the ancestor of a root property is null, and would not work in this case.
+              baseType = Object.getPrototypeOf(this);
+              if(baseType !== _propType) {
+                spec.base = baseType.toRefInContext(keyArgs);
+                count++;
+              }
+            }
+            // else
+            // Non-abstract, non-root property types
+            // have `base` always equal to the _declaring type's base type_ corresponding property type,
+            // so it is never included.
+
+            // Always have a name.
+            spec.name = this._name;
+            count++;
+
+            // The default value type of non-abstract properties is string
+            if(valueTypeRef !== "string") {
+              spec.type = valueTypeRef;
+              count++;
+            }
+
+            // If there are no attributes besides `name`
+            if(!this._fillSpecInContext(spec, keyArgs) && count === 1) {
+              return this._name;
+            }
           }
 
           return spec;
         },
 
         _fillSpecInContext: function(spec, keyArgs) {
-          var isJson = keyArgs.isJson;
-
           var any = this.base(spec, keyArgs);
 
           // Dynamic attributes
-          _dynamicAttrNames.forEach(function(name) {
-            var namePriv = "_" + name;
+          if(this !== _propType) {
+            var isJson = keyArgs.isJson;
 
-            if(O.hasOwn(this, namePriv)) {
-              var value = this[namePriv];
-              if(F.is(value)) {
-                if(!isJson) {
+            _dynamicAttrNames.forEach(function(name) {
+              var namePriv = "_" + name;
+
+              if(O.hasOwn(this, namePriv)) {
+                var value = this[namePriv];
+                if(F.is(value)) {
+                  if(!isJson) {
+                    any = true;
+                    spec[name] = value.valueOf();
+                  }
+                } else {
                   any = true;
-                  spec[name] = value.valueOf();
+                  spec[name] = value;
                 }
-              } else {
-                any = true;
-                spec[name] = value;
               }
-            }
-          }, this);
+            }, this);
 
-          // Custom attributes
-          var defaultValue = O.getOwn(this, "_value");
-          if(defaultValue !== undefined) {
-            any = true;
-            if(defaultValue) {
-              var valueType = this.type;
-              keyArgs.includeType = defaultValue.type !== (valueType.isRefinement ? valueType.of : valueType);
+            // Custom attributes
+            var defaultValue = O.getOwn(this, "_value");
+            if(defaultValue !== undefined) {
+              any = true;
+              if(defaultValue) {
+                var valueType = this.type;
+                keyArgs.includeType = defaultValue.type !== (valueType.isRefinement ? valueType.of : valueType);
 
-              spec.value = defaultValue.toSpecInContext(keyArgs);
-            } else {
-              spec.value = null;
+                spec.value = defaultValue.toSpecInContext(keyArgs);
+              } else {
+                spec.value = null;
+              }
             }
           }
 
@@ -1206,7 +1273,10 @@ define([
       }
     });
 
-    _propType = Property.prototype;
+    _propType = Property.type;
+
+    // Root property value type.
+    _propType.type = "value";
 
     return Property;
   };
