@@ -14,16 +14,19 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Instance",
+  "pentaho/type/Context",
   "pentaho/type/SpecificationContext",
   "tests/pentaho/util/errorMatch"
-], function(Instance, SpecificationContext, errorMatch) {
+], function(Context, SpecificationContext, errorMatch) {
 
   "use strict";
 
   /*global describe:true, it:true, expect:true, beforeEach:true, afterEach:true, spyOn: true, jasmine: true*/
 
   describe("pentaho.type.Type", function() {
+
+    var context = new Context();
+    var Instance = context.get("instance");
 
     describe("construction", function() {
       it("should allow specifying static type members", function() {
@@ -32,6 +35,15 @@ define([
         expect(Derived.Type.foo).toBe("bar");
       });
     });
+
+    describe("#context()", function() {
+      it("should have the context in which it was defined", function() {
+        var myContext = new Context();
+        var Instance2 = myContext.get("pentaho/type/instance");
+
+        expect(Instance2.type.context).toBe(myContext);
+      });
+    }); // end #context
 
     describe("#view -", function() {
       it("should default to `null`", function() {

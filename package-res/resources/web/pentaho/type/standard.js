@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 define([
+  "./instance",
   "./value",
   "./element",
   "./list",
@@ -28,7 +29,7 @@ define([
   "./function",
   "./property",
   "./facets/DiscreteDomain"
-], function(valueFactory, elementFactory, listFactory, refinementFactory,
+], function(instanceFactory, valueFactory, elementFactory, listFactory, refinementFactory,
     simpleFactory, complexFactory, stringFactory, numberFactory, booleanFactory,
     dateFactory, objectFactory, functionFactory, propertyFactory,
     DiscreteDomain) {
@@ -37,6 +38,7 @@ define([
   
   return {
     // types
+    "instance": instanceFactory,
     "value":    valueFactory,
     "element":  elementFactory,
     "list":     listFactory,

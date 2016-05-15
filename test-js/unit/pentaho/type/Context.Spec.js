@@ -222,19 +222,6 @@ define([
           });
         });
 
-        it("should throw/reject if given a type from a different context", function() {
-
-          return testGet(function(sync, Context, localRequire, errorMatch) {
-            var context1 = new Context();
-            var context2 = new Context();
-            var Value    = context2.get("pentaho/type/value");
-
-            return expectToRejectWith(
-                function() { return callGet(context1, sync, Value); },
-                errorMatch.argInvalid("typeRef"));
-          });
-        });
-
         it("should configure a type", function() {
 
           return testGet(function(sync, Context) {

@@ -15,7 +15,7 @@
  */
 define([
   "module",
-  "./Instance",
+  "./instance",
   "./valueHelper",
   "../i18n!types",
   "../lang/_AnnotatableLinked",
@@ -24,15 +24,16 @@ define([
   "../util/object",
   "../util/text",
   "../util/fun"
-], function(module, Instance, valueHelper, bundle, AnnotatableLinked, arg, error, O, text, F) {
+], function(module, instanceFactory, valueHelper, bundle, AnnotatableLinked, arg, error, O, text, F) {
 
   "use strict";
 
   var _defaultTypeMid = "string",
-
       _dynamicAttrNames = ["isRequired", "countMin", "countMax", "isApplicable", "isReadOnly"];
 
   return function(context) {
+
+    var Instance = context.get(instanceFactory);
 
     var _propType;
 
@@ -197,20 +198,6 @@ define([
         //region attributes
 
         get isProperty() { return true; },
-
-        //region context property
-        /**
-         * Gets the context of the property type.
-         *
-         * The context of a property is that of
-         * the complex type that declares it.
-         *
-         * @type pentaho.type.Context
-         * @readonly
-         */
-        get context() {
-          return context;
-        }, //endregion
 
         //region declaringType attribute
         /**

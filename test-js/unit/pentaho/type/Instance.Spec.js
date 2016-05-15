@@ -14,16 +14,19 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Instance"
-], function(Instance) {
+  "pentaho/type/Context"
+], function(Context) {
 
   "use strict";
 
   /*global describe:true, it:true, expect:true, beforeEach:true*/
 
-  var Type = Instance.Type;
-
   describe("pentaho.type.Instance -", function() {
+
+    var context = new Context();
+    var Instance = context.get("instance");
+    var Type = Instance.Type;
+
     it("is a function", function() {
       expect(typeof Instance).toBe("function");
     });
@@ -64,7 +67,6 @@ define([
       });
 
     }); // extend({...})
-
 
     describe("get/set type of a derived class - ", function() {
       var Derived;
@@ -113,5 +115,5 @@ define([
         expect(inst.type.id).toBe(id);
       });
     });
-  }); // pentaho/type/Instance
+  }); // pentaho.type.Instance
 });

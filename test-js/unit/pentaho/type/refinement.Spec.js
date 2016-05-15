@@ -15,23 +15,23 @@
  */
 define([
   "pentaho/type/Context",
-  "pentaho/type/Instance",
   "pentaho/type/facets/Refinement",
   "tests/pentaho/util/errorMatch"
-], function(Context, Instance, RefinementFacet, errorMatch) {
+], function(Context, RefinementFacet, errorMatch) {
 
   "use strict";
 
   /*global describe:true, it:true, expect:true, beforeEach:true*/
 
-  var context = new Context(),
-      Simple  = context.get("pentaho/type/simple"),
-      List    = context.get("pentaho/type/list"),
-      Complex = context.get("pentaho/type/complex"),
-      PentahoNumber = context.get("pentaho/type/number"),
-      Refinement = context.get("pentaho/type/refinement");
-
   describe("pentaho.type.Refinement -", function() {
+
+    var context = new Context(),
+        Instance = context.get("instance"),
+        Simple  = context.get("simple"),
+        List    = context.get("list"),
+        Complex = context.get("complex"),
+        PentahoNumber = context.get("number"),
+        Refinement = context.get("refinement");
 
     it("should be a function", function() {
       expect(typeof Refinement).toBe("function");
@@ -63,7 +63,7 @@ define([
               facets: [Facet]
             }
           });
-        }).toThrow(errorMatch.argInvalid("typeRef"));
+        }).toThrow(errorMatch.operInvalid());
       });
 
       it("should throw if given an `of` which is not a representation type", function() {
@@ -414,6 +414,7 @@ define([
         it("should be able to use the Refinement Facet's members directly in the _refines_ spec", function() {
 
           var Facet1 = RefinementFacet.extend({
+            // jshint -W078
             set attribute1(v) {
               this._attribute1 = v;
             }
@@ -422,6 +423,7 @@ define([
           });
 
           var Facet2 = RefinementFacet.extend({
+            // jshint -W078
             set attribute2(v) {
               this._attribute2 = v;
             }
@@ -504,18 +506,6 @@ define([
 
           expect(MyRefinement.type.facets.length).toBe(1);
           expect(MyRefinement.type.facets[0].prototype instanceof RefinementFacet).toBe(true);
-        });
-      });
-
-      describe("#context -", function() {
-        it("should be that of the representation type", function() {
-          var MyRefinement = Refinement.extend({
-            type: {
-              of: MySimple.type
-            }
-          });
-
-          expect(MyRefinement.type.context).toBe(MySimple.type.context);
         });
       });
 

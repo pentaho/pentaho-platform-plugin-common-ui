@@ -14,48 +14,38 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Instance",
   "pentaho/type/Context",
   "tests/pentaho/util/errorMatch"
-], function(Instance, Context, errorMatch) {
+], function(Context, errorMatch) {
 
   "use strict";
 
   /*global describe:false, it:false, expect:false, beforeEach:false, spyOn:false*/
 
-  var context = new Context(),
-      Value = context.get("pentaho/type/value"),
-      PentahoNumber = context.get("pentaho/type/number"),
-      Type = Instance.Type;
-
   describe("pentaho/type/value -", function() {
+    var context = new Context();
+    var Value = context.get("pentaho/type/value");
 
     it("should be a function", function() {
       expect(typeof Value).toBe("function");
     });
 
     it("should be a sub-class of `Instance`", function() {
+      var Instance = context.get("instance");
+
       expect(Value.prototype instanceof Instance).toBe(true);
     });
 
     describe(".Type -", function() {
-      var valueType;
-      var Value;
-      var myContext;
-
-      beforeEach( function() {
-        // making sure that we have a new Value definition for each test
-        myContext = new Context();
-        Value = myContext.get("pentaho/type/value");
-        valueType = Value.type;
-      });
+      var valueType = Value.type;
 
       it("should be a function", function() {
         expect(typeof Value.Type).toBe("function");
       });
 
       it("should be a sub-class of `Type`", function() {
-        expect(valueType instanceof Type).toBe(true);
+        var Instance = context.get("instance");
+        expect(valueType instanceof Instance.Type).toBe(true);
       });
 
       it("should have an `uid`", function() {
@@ -68,15 +58,6 @@ define([
           expect(valueType.isValue).toBe(true);
         });
       });
-
-      describe("#context()", function() {
-        it("the Value type has the context in which it was defined", function() {
-          var myContext = new Context();
-          var Value = myContext.get("pentaho/type/value");
-
-          expect(Value.type.context).toBe(myContext);
-        });
-      }); // end #context
 
       describe("#isAbstract", function() {
         it("should have default `isAbstract` equal to `true`", function () {
@@ -119,6 +100,7 @@ define([
 
         it("should return `false` when given values with different constructors and not call their #equals methods",
         function() {
+          var PentahoNumber = context.get("pentaho/type/number");
           var va = new Value();
           var vb = new PentahoNumber(1);
 
@@ -149,7 +131,7 @@ define([
       describe("#create(valueSpec, {defaultType: .})", function() {
 
         it("should return an instance when given nully", function() {
-          var Complex = myContext.get("pentaho/type/complex");
+          var Complex = context.get("pentaho/type/complex");
           var MyComplex = Complex.extend();
           var inst = MyComplex.type.create(null);
           expect(inst instanceof MyComplex).toBe(true);
@@ -159,7 +141,7 @@ define([
         });
 
         it("should create an instance given a number value when called on a Number type", function() {
-          var Number = myContext.get("pentaho/type/number");
+          var Number = context.get("pentaho/type/number");
           var number = Number.type.create(1);
 
           expect(number instanceof Number).toBe(true);
@@ -167,7 +149,7 @@ define([
         });
 
         it("should create an instance given a number value when called on Number", function() {
-          var Number = myContext.get("pentaho/type/number");
+          var Number = context.get("pentaho/type/number");
           var number = Number.type.create(1);
 
           expect(number instanceof Number).toBe(true);
@@ -175,7 +157,7 @@ define([
         });
 
         it("should create an instance given a boolean value when called on Boolean", function() {
-          var Boolean = myContext.get("pentaho/type/boolean");
+          var Boolean = context.get("pentaho/type/boolean");
           var value = Boolean.type.create(true);
 
           expect(value instanceof Boolean).toBe(true);
@@ -183,7 +165,7 @@ define([
         });
 
         it("should create an instance given an object value when called on Object", function() {
-          var Object = myContext.get("pentaho/type/object");
+          var Object = context.get("pentaho/type/object");
           var primitive = {};
           var value = Object.type.create({v: primitive});
 
@@ -194,13 +176,13 @@ define([
         it("should create an instance given an object with a type annotation, '_'", function() {
           var value = Value.type.create({_: "pentaho/type/number", v: 1});
 
-          var Number = myContext.get("pentaho/type/number");
+          var Number = context.get("pentaho/type/number");
           expect(value instanceof Number).toBe(true);
           expect(value.value).toBe(1);
         });
 
         it("should throw if given a type-annotated value that does not extend from the this type", function() {
-          var String = myContext.get("pentaho/type/string");
+          var String = context.get("pentaho/type/string");
 
           expect(function() {
             String.type.create({_: "pentaho/type/number", v: 1});
@@ -208,8 +190,8 @@ define([
         });
 
         it("should not throw if given a type-annotated value that does extend from the given baseType", function() {
-          var Simple = myContext.get("pentaho/type/simple");
-          var Number = myContext.get("pentaho/type/number");
+          var Simple = context.get("pentaho/type/simple");
+          var Number = context.get("pentaho/type/number");
 
           var value = Simple.type.create({_: "pentaho/type/number", v: 1});
 
@@ -218,7 +200,7 @@ define([
         });
 
         it("should throw if given a type annotated value of an abstract type", function() {
-          var MyAbstract = myContext.get("pentaho/type/complex").extend({type: {isAbstract: true}});
+          var MyAbstract = context.get("pentaho/type/complex").extend({type: {isAbstract: true}});
 
           expect(function() {
             Value.type.create({_: MyAbstract});
@@ -226,7 +208,7 @@ define([
         });
 
         it("should throw if given a value and called on an abstract type", function() {
-          var MyAbstract = myContext.get("pentaho/type/complex").extend({type: {isAbstract: true}});
+          var MyAbstract = context.get("pentaho/type/complex").extend({type: {isAbstract: true}});
 
           expect(function() {
             MyAbstract.type.create({});
@@ -236,7 +218,7 @@ define([
         // ---
 
         it("should be able to create a type-annotated value of a list type", function() {
-          var NumberList = myContext.get({base: "list", of: "number"});
+          var NumberList = context.get({base: "list", of: "number"});
 
           var value = Value.type.create({_: NumberList, d: [1, 2]});
 
@@ -252,7 +234,7 @@ define([
             d: [1, 2]
           });
 
-          expect(value instanceof myContext.get("list")).toBe(true);
+          expect(value instanceof context.get("list")).toBe(true);
           expect(value.count).toBe(2);
           expect(value.at(0).value).toBe(1);
           expect(value.at(1).value).toBe(2);
@@ -267,7 +249,7 @@ define([
             "b": 2
           });
 
-          expect(value instanceof myContext.get("complex")).toBe(true);
+          expect(value instanceof context.get("complex")).toBe(true);
           expect(value.get("a").value).toBe("1");
           expect(value.get("b").value).toBe("2");
         });
@@ -287,7 +269,7 @@ define([
             ]
           });
 
-          expect(value instanceof myContext.get("list")).toBe(true);
+          expect(value instanceof context.get("list")).toBe(true);
           expect(value.count).toBe(1);
         });
 
@@ -302,7 +284,7 @@ define([
             ]
           });
 
-          expect(value instanceof myContext.get("list")).toBe(true);
+          expect(value instanceof context.get("list")).toBe(true);
           expect(value.count).toBe(2);
         });
 
@@ -310,6 +292,11 @@ define([
     }); // "Type"
 
     describe(".extend({...}) returns a value that -", function() {
+
+      var context = new Context(),
+          Instance = context.get("instance"),
+          Type = Instance.Type,
+          Value = context.get("pentaho/type/value");
 
       it("should be a function", function() {
         var Derived = Value.extend();

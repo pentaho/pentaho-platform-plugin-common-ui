@@ -15,19 +15,18 @@
  */
 define([
   "pentaho/type/Context",
-  "pentaho/type/Instance",
   "pentaho/type/facets/Refinement"
-], function(Context, Instance, RefinementFacet) {
+], function(Context, RefinementFacet) {
 
   "use strict";
 
   /*global describe:true, it:true, expect:true, beforeEach:true*/
 
-  var context = new Context(),
-      Element = context.get("pentaho/type/element"),
-      Refinement = context.get("pentaho/type/refinement");
-
   describe("pentaho.type.Value - refine([name,] instSpec) -", function() {
+
+    var context = new Context(),
+        Element = context.get("pentaho/type/element"),
+        Refinement = context.get("pentaho/type/refinement");
 
     // Must use Element or List to test cause only these are representation types
     // and Value is not...

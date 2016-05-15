@@ -15,18 +15,18 @@
  */
 define([
   "module",
-  "./Instance",
+  "./instance",
   "./valueHelper",
   "./SpecificationContext",
   "../i18n!types",
   "../util/error"
-], function(module, Instance, valueHelper, SpecificationContext, bundle, error) {
+], function(module, instanceFactory, valueHelper, SpecificationContext, bundle, error) {
 
   "use strict";
 
-  // NOTE: PhantomJS does not like this variable to be named context
-  // because it would get into trouble on the context getter, below...
-  return function(theContext) {
+  return function(context) {
+
+    var Instance = context.get(instanceFactory);
 
     // Late bound to break cyclic dependency.
     // Resolved on first use, in pentaho.type.Value.refine.
@@ -254,21 +254,6 @@ define([
 
         get isValue() { return true; },
 
-        //region context property
-
-        // NOTE: any class extended from this one will return the same context...
-        //@override
-        /**
-         * Gets the context that defined this type class.
-         * @type pentaho.type.Context
-         * @readonly
-         */
-        get context() {
-          // NOTE: PhantomJS does not like this variable to be named context...
-          return theContext;
-        },
-        //endregion
-
         //region isAbstract property
         // @type boolean
         // -> boolean, Optional(false)
@@ -431,7 +416,7 @@ define([
           // If it is a plain Object, does it have the inline type property, "_"?
           if(instSpec && typeof instSpec === "object" && (typeSpec = instSpec._) && instSpec.constructor === Object) {
 
-            Instance = this.context.get(typeSpec);
+            Instance = context.get(typeSpec);
 
             if(this._assertSubtype(Instance.type).isAbstract) Instance.type._throwAbstractType();
 
@@ -692,7 +677,7 @@ define([
 
         // Resolved on first use to break cyclic dependency.
         if(!Refinement) {
-          Refinement = theContext.get("pentaho/type/refinement");
+          Refinement = context.get("pentaho/type/refinement");
         }
 
         return Refinement.extend(name || "", instSpec);

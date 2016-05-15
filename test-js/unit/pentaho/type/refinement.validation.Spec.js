@@ -15,21 +15,19 @@
  */
 define([
   "pentaho/type/Context",
-  "pentaho/type/Instance",
   "pentaho/type/facets/Refinement"
-], function(Context, Instance, RefinementFacet) {
+], function(Context, RefinementFacet) {
 
   "use strict";
 
   /*global describe:true, it:true, expect:true, beforeEach:true, spyOn:true*/
 
-  var context = new Context(),
-      Simple  = context.get("pentaho/type/simple"),
-      Refinement = context.get("pentaho/type/refinement");
-
   describe("pentaho.type.Refinement.Type -", function() {
 
-    var MySimple = Simple.extend();
+    var context = new Context(),
+        Simple  = context.get("pentaho/type/simple"),
+        Refinement = context.get("pentaho/type/refinement"),
+        MySimple = Simple.extend();
 
     describe("#validate(value) -", function() {
       it("should call #is(value) and value.validate()", function() {
