@@ -330,18 +330,6 @@ define([
         expect(result).toBe(false);
       });
 
-      it("should return false on Property.type", function() {
-        var scope = new SpecificationScope();
-
-        var spec = {};
-        var keyArgs = {};
-        var result = Property.type._fillSpecInContext(spec, keyArgs);
-
-        scope.dispose();
-
-        expect(result).toBe(false);
-      });
-
       describe("#label", function() {
 
         it("should return true when label is set to the default label", function() {

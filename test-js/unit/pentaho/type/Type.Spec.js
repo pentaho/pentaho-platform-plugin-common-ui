@@ -481,12 +481,64 @@ define([
       });
     }); // #shortId
 
+    describe("#isAbstract", function() {
+      it("should respect a specified abstract spec value", function() {
+        var Derived = Instance.extend({type: {isAbstract: true}});
+        expect(Derived.type.isAbstract).toBe(true);
+
+        Derived = Instance.extend({type: {isAbstract: false}});
+        expect(Derived.type.isAbstract).toBe(false);
+      });
+
+      it("should default to `false` whe spec is unspecified and should not inherit the base value", function() {
+        var Derived = Instance.extend();
+        expect(Derived.type.isAbstract).toBe(false);
+
+        var Abstract = Instance.extend({type: {isAbstract: true }});
+        var Concrete = Instance.extend({type: {isAbstract: false}});
+
+        var DerivedAbstract = Abstract.extend();
+        var DerivedConcrete = Concrete.extend();
+
+        expect(DerivedAbstract.type.isAbstract).toBe(false);
+        expect(DerivedConcrete.type.isAbstract).toBe(false);
+      });
+
+      it("should respect a set non-nully value", function() {
+        var Derived = Instance.extend();
+        expect(Derived.type.isAbstract).toBe(false);
+
+        Derived.type.isAbstract = true;
+        expect(Derived.type.isAbstract).toBe(true);
+
+        Derived.type.isAbstract = false;
+        expect(Derived.type.isAbstract).toBe(false);
+      });
+
+      it("should set to the default value false when set to a nully value", function() {
+        var Derived = Instance.extend({type: {isAbstract: true}});
+        expect(Derived.type.isAbstract).toBe(true);
+        Derived.type.isAbstract = null;
+        expect(Derived.type.isAbstract).toBe(false);
+
+        Derived = Instance.extend({type: {isAbstract: true}});
+        expect(Derived.type.isAbstract).toBe(true);
+        Derived.type.isAbstract = undefined;
+        expect(Derived.type.isAbstract).toBe(false);
+      });
+    }); // #isAbstract
+
     describe("#description -", function() {
 
       it("should preserve the default value", function() {
+        var value = Instance.type.description;
+
+        expect(value).not.toBe(undefined);
+
         Instance.type.description = undefined;
+
         // The default value is still there (did not delete)
-        expect(Instance.type.description).toBe(null);
+        expect(Instance.type.description).toBe(value);
       });
 
       describe("when not specified -", function() {
@@ -873,11 +925,170 @@ define([
       });
     });
 
-    describe("#create -", function() {
+    describe("#create(valueSpec, {defaultType: .}", function() {
       it("returns a new instance of `pentaho.type.Instance`", function() {
         expect(Instance.type.create() instanceof Instance).toBe(true);
       });
-    });
+
+      it("should return an instance when given nully", function() {
+        var Complex = context.get("pentaho/type/complex");
+        var MyComplex = Complex.extend();
+        var inst = MyComplex.type.create(null);
+        expect(inst instanceof MyComplex).toBe(true);
+
+        inst = MyComplex.type.create(undefined);
+        expect(inst instanceof MyComplex).toBe(true);
+      });
+
+      it("should create an instance given a number value when called on a Number type", function() {
+        var Number = context.get("pentaho/type/number");
+        var number = Number.type.create(1);
+
+        expect(number instanceof Number).toBe(true);
+        expect(number.value).toBe(1);
+      });
+
+      it("should create an instance given a number value when called on Number", function() {
+        var Number = context.get("pentaho/type/number");
+        var number = Number.type.create(1);
+
+        expect(number instanceof Number).toBe(true);
+        expect(number.value).toBe(1);
+      });
+
+      it("should create an instance given a boolean value when called on Boolean", function() {
+        var Boolean = context.get("pentaho/type/boolean");
+        var value = Boolean.type.create(true);
+
+        expect(value instanceof Boolean).toBe(true);
+        expect(value.value).toBe(true);
+      });
+
+      it("should create an instance given an object value when called on Object", function() {
+        var Object = context.get("pentaho/type/object");
+        var primitive = {};
+        var value = Object.type.create({v: primitive});
+
+        expect(value instanceof Object).toBe(true);
+        expect(value.value).toBe(primitive);
+      });
+
+      it("should create an instance given an object with a type annotation, '_'", function() {
+        var Value = context.get("pentaho/type/value");
+        var value = Value.type.create({_: "pentaho/type/number", v: 1});
+
+        var Number = context.get("pentaho/type/number");
+        expect(value instanceof Number).toBe(true);
+        expect(value.value).toBe(1);
+      });
+
+      it("should throw if given a type-annotated value that does not extend from the this type", function() {
+        var String = context.get("pentaho/type/string");
+
+        expect(function() {
+          String.type.create({_: "pentaho/type/number", v: 1});
+        }).toThrow(errorMatch.operInvalid());
+      });
+
+      it("should not throw if given a type-annotated value that does extend from the given baseType", function() {
+        var Simple = context.get("pentaho/type/simple");
+        var Number = context.get("pentaho/type/number");
+
+        var value = Simple.type.create({_: "pentaho/type/number", v: 1});
+
+        expect(value instanceof Number).toBe(true);
+        expect(value.value).toBe(1);
+      });
+
+      it("should throw if given a type annotated value of an abstract type", function() {
+        var MyAbstract = context.get("pentaho/type/complex").extend({type: {isAbstract: true}});
+
+        expect(function() {
+          Instance.type.create({_: MyAbstract});
+        }).toThrow(errorMatch.operInvalid());
+      });
+
+      it("should throw if given a value and called on an abstract type", function() {
+        var MyAbstract = context.get("pentaho/type/complex").extend({type: {isAbstract: true}});
+
+        expect(function() {
+          MyAbstract.type.create({});
+        }).toThrow(errorMatch.operInvalid());
+      });
+
+      // ---
+
+      it("should be able to create a type-annotated value of a list type", function() {
+        var NumberList = context.get({base: "list", of: "number"});
+
+        var value = Instance.type.create({_: NumberList, d: [1, 2]});
+
+        expect(value instanceof NumberList).toBe(true);
+        expect(value.count).toBe(2);
+        expect(value.at(0).value).toBe(1);
+        expect(value.at(1).value).toBe(2);
+      });
+
+      it("should be able to create a type-annotated value of an inline list type", function() {
+        var value = Instance.type.create({
+          _: {base: "list", of: "number"},
+          d: [1, 2]
+        });
+
+        expect(value instanceof context.get("list")).toBe(true);
+        expect(value.count).toBe(2);
+        expect(value.at(0).value).toBe(1);
+        expect(value.at(1).value).toBe(2);
+      });
+
+      it("should be able to create a type-annotated value of an inline complex type", function() {
+        var value = Instance.type.create({
+          _: {
+            props: ["a", "b"]
+          },
+          "a": 1,
+          "b": 2
+        });
+
+        expect(value instanceof context.get("complex")).toBe(true);
+        expect(value.get("a").value).toBe("1");
+        expect(value.get("b").value).toBe("2");
+      });
+
+      it("should be able to create a type-annotated value of an inline list complex type", function() {
+        var value = Instance.type.create({
+          _: [
+            {
+              props: [
+                {name: "a"},
+                "b"
+              ]
+            }
+          ],
+          d: [
+            {a: 1, b: 2}
+          ]
+        });
+
+        expect(value instanceof context.get("list")).toBe(true);
+        expect(value.count).toBe(1);
+      });
+
+      it("should be able to create a type-annotated value of an inline list complex type in array form", function() {
+        var value = Instance.type.create({
+          _: [{
+            props: ["a", "b"]
+          }],
+          d: [
+            [1, 2],
+            [3, 4]
+          ]
+        });
+
+        expect(value instanceof context.get("list")).toBe(true);
+        expect(value.count).toBe(2);
+      });
+    }); // #create
 
     describe("#is -", function() {
       it("detects an instance of `pentaho.type.Instance` correctly", function() {

@@ -83,6 +83,10 @@ define([
 
         isAbstract: true,
 
+        // Break inheritance
+        _label: null,
+        _description: null,
+
         /**
          * Initializes a property type object, given a property type specification.
          *
@@ -125,7 +129,6 @@ define([
          * @param {!pentaho.type.Complex.Type} keyArgs.declaringType The complex type that declares the property.
          * @param {number} keyArgs.index The index of the property within its complex type.
          * @protected
-         * @ignore
          */
         _init: function(spec, keyArgs) {
 
@@ -741,10 +744,10 @@ define([
         _fillSpecInContext: function(spec, keyArgs) {
           var any = this.base(spec, keyArgs);
 
-          // Dynamic attributes
           if(this !== _propType) {
             var isJson = keyArgs.isJson;
 
+            // Dynamic attributes
             _dynamicAttrNames.forEach(function(name) {
               var namePriv = "_" + name;
 

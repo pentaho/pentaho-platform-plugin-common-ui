@@ -102,6 +102,7 @@ define([
 
         this._shortId    = undefined;
         this._styleClass = null;
+        this._isAbstract = false;
 
         // Don't use inherited property definition which may be writable false
         Object.defineProperty(this, "_hasDescendants", {value: false, writable: true});
@@ -421,6 +422,32 @@ define([
         }
 
         return value;
+      },
+      //endregion
+
+      //region isAbstract property
+      // @type boolean
+      // -> boolean, Optional(false)
+
+      // Default value is for `Type` only.
+      // @see Type#constructor.
+      _isAbstract: true,
+
+      /**
+       * Gets or sets a value that indicates if this type is abstract.
+       *
+       * This attribute can only be set once, upon the type definition.
+       *
+       * @type {boolean}
+       * @default false
+       */
+      get isAbstract() {
+        return this._isAbstract;
+      },
+
+      set isAbstract(value) {
+        // nully is reset, which is false, so !! works well.
+        this._isAbstract = !!value;
       },
       //endregion
 
@@ -870,19 +897,178 @@ define([
         return type;
       },
 
-      // TODO: Now that Property instances are never created,
-      // only types with constructors get created.
+      //region creation
       /**
-       * Creates an instance of this type, given the construction arguments.
+       * Creates an instance of this type, given an instance specification.
        *
-       * @param {...any} args The construction arguments.
-       * @return {pentaho.type.Instance} The created instance.
+       * If the specified instance specification contains an inline type reference,
+       * in property `"_"`, the referenced type is used to create the instance
+       * (as long as it is a subtype of this type).
+       *
+       * If the specified instance specification does not contain an inline type reference
+       * the type is assumed to be this type.
+       *
+       * @see pentaho.type.Type#isSubtypeOf
+       * @see pentaho.type.Context#get
+       *
+       * @example
+       * <caption>
+       *   Create a complex instance from a specification that contains the type inline.
+       * </caption>
+       *
+       * require(["pentaho/type/Context"], function(Context) {
+       *
+       *   var context = new Context({application: "data-explorer-101"});
+       *   var Value   = context.get("value");
+       *
+       *   var product = Value.type.create({
+       *         _: {
+       *           props: ["id", "name", {name: "price", type: "number"}]
+       *         },
+       *
+       *         id:    "mpma",
+       *         name:  "Principia Mathematica",
+       *         price: 1200
+       *       });
+       *
+       *   // ...
+       *
+       * });
+       *
+       * @example
+       * <caption>
+       *   Create a list instance from a specification that contains the type inline.
+       * </caption>
+       *
+       * require(["pentaho/type/Context"], function(Context) {
+       *
+       *   var context = new Context({application: "data-explorer-101"});
+       *   var Value   = context.get("value");
+       *
+       *   var productList = Value.type.create({
+       *         _: [{
+       *           props: ["id", "name", {name: "price", type: "number"}]
+       *         }],
+       *
+       *         d: [
+       *           {id: "mpma", name: "Principia Mathematica", price: 1200},
+       *           {id: "flot", name: "The Laws of Thought",   price:  500}
+       *         ]
+       *       });
+       *
+       *   // ...
+       *
+       * });
+       *
+       * @example
+       * <caption>
+       *   Create an instance from a specification that <b>does not</b> contain the type inline.
+       * </caption>
+       *
+       * require(["pentaho/type/Context"], function(Context) {
+       *
+       *   var context = new Context({application: "data-explorer-101"});
+       *   var ProductList = context.get([{
+       *           props: [
+       *             "id",
+       *             "name",
+       *             {name: "price", type: "number"}
+       *           ]
+       *         }]);
+       *
+       *   // Provide the default type, in case the instance spec doesn't provide one.
+       *   var productList = ProductList.type.create(
+       *          [
+       *            {id: "mpma", name: "Principia Mathematica", price: 1200},
+       *            {id: "flot", name: "The Laws of Thought",   price:  500}
+       *         ]);
+       *
+       *   // ...
+       *
+       * });
+       *
+       * @param {pentaho.type.spec.UInstance} [instSpec] An instance specification.
+       *
+       * @return {!pentaho.type.Instance} The created instance.
+       *
+       * @throws {pentaho.lang.OperationInvalidError} When `instSpec` contains an inline type reference
+       * that refers to a type that is not a subtype of this one.
+       *
+       * @throws {pentaho.lang.OperationInvalidError} When the determined type for the specified `instSpec`
+       * is an [abstract]{@link pentaho.type.Value.Type#isAbstract} type.
        */
-      create: function() {
-        var inst = Object.create(this.instance);
-        inst.constructor.apply(inst, arguments);
-        return inst;
+      create: function(instSpec) {
+        var Instance, typeSpec;
+
+        // If it is a plain Object, does it have the inline type property, "_"?
+        if(instSpec && typeof instSpec === "object" && (typeSpec = instSpec._) && instSpec.constructor === Object) {
+
+          Instance = context.get(typeSpec);
+
+          if(this._assertSubtype(Instance.type).isAbstract)
+            Instance.type._throwAbstractType();
+
+        } else {
+          if(this.isAbstract) this._throwAbstractType();
+
+          // Does this type have an own constructor?
+          var baseInst = this.instance;
+
+          Instance = baseInst.constructor;
+
+          if(Instance.prototype !== baseInst) {
+            // Type was created through extendProto.
+            var inst = Object.create(baseInst);
+            return Instance.apply(inst, arguments) || inst;
+          }
+        }
+
+        return O.make(Instance, arguments);
       },
+
+      /**
+       * Asserts that a given type is a subtype of this type.
+       *
+       * @param {!pentaho.type.Type} subtype The subtype to assert.
+       *
+       * @return {!pentaho.type.Type} The subtype `subtype`.
+       *
+       * @throws {pentaho.lang.OperationInvalidError} When `subtype` is not a subtype of this.
+       *
+       * @private
+       */
+      _assertSubtype: function(subtype) {
+        if(!subtype.isSubtypeOf(this)) {
+          throw error.operInvalid(
+              bundle.format(bundle.structured.errors.instance.notOfExpectedBaseType, [this._getErrorLabel()]));
+        }
+
+        return subtype;
+      },
+
+      /**
+       * Throws an error complaining the type is abstract an cannot create instances.
+       *
+       * @throws {pentaho.lang.OperationInvalidError} When this is not an abstract type.
+       *
+       * @private
+       */
+      _throwAbstractType: function() {
+        throw error.operInvalid(bundle.format(
+            bundle.structured.errors.instance.cannotCreateInstanceOfAbstractType, [this._getErrorLabel()]));
+      },
+
+      /**
+       * Gets a label suitable to identify this type in an error message.
+       *
+       * @return {string} An error label.
+       *
+       * @private
+       */
+      _getErrorLabel: function() {
+        return this.id || this.label; // Never empty;
+      },
+      //endregion
 
       /**
        * Determines if a value is an instance of this type.
@@ -1044,6 +1230,11 @@ define([
         }, this);
 
         // Custom attributes
+        if(!this.isRefinement && this.isAbstract) {
+          any = true;
+          spec.isAbstract = true;
+        }
+
         var styleClass = this._styleClass;
         if(styleClass) {
           any = true;
@@ -1152,10 +1343,13 @@ define([
 
         this.call(this.prototype, instSpec, keyArgs || {instance: InstCtor.prototype});
       }
-    })
-    .implement(AnnotatableLinked);
+    });
 
     _type = Type.prototype;
+
+    Type
+      .implement(AnnotatableLinked)
+      .implement(bundle.structured.instance);
 
     return Type;
   };
