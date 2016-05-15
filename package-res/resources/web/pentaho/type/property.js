@@ -120,6 +120,9 @@ define([
          */
         extend_order: ["name", "label", "type"],
 
+        // TODO: Not validating property value type must descend from Value.Type.
+        // Could probably solve by assuming a Property.Type default of Value.
+
         /**
          * Performs initialization tasks that take place before the instance is
          * extended with its spec.

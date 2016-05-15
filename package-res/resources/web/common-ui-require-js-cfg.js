@@ -199,8 +199,6 @@
 
   // Visualizations Packages
 
-  requireCfg.packages.push({"name": "pentaho/visual/role", "main": "mapping"});
-
   requireService["pentaho/type/config/AmdLoadedConfigurationService"] = "pentaho.type.IConfigurationService";
 
   function mapTheme(mid, themes) {

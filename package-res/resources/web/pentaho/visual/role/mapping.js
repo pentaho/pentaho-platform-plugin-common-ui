@@ -14,15 +14,17 @@
  * limitations under the License.
  */
 define([
-  "./attribute",
+  "module",
+  "pentaho/i18n!messages",
+  "./mappingAttribute",
   "./level"
-], function() {
+], function(module, bundle) {
 
   "use strict";
 
   return function(context) {
 
-    var Complex = context.get("pentaho/type/complex");
+    var Complex = context.get("complex");
 
     /**
      * @name pentaho.visual.role.Mapping.Type
@@ -38,36 +40,25 @@ define([
      * @extends pentaho.type.Complex
      * @abstract
      *
-     * @amd {pentaho.type.Factory<pentaho.visual.role.Mapping>} pentaho/visual/role
+     * @amd {pentaho.type.Factory<pentaho.visual.role.Mapping>} pentaho/visual/role/mapping
      *
-     * @classDesc The base abstract class of visual role mappings.
+     * @classDesc The `Mapping` class represents the association between
+     * a visual role and the data properties, here named _attributes_,
+     * of a visualization's current dataset.
      *
-     * This type is to be used as the type of _visual role_ properties
-     * of a [visual model]{@link pentaho.visual.base.Model}.
-     * It serves two main purposes:
+     * A mapping holds two pieces of information:
      *
-     * 1. Informing about the capabilities of a visual role of a visualization.
-     * 2. Representing the mapping between a visual role and the data properties - here named "attributes" -
-     *    of a visualization's current dataset.
-     *
-     * The first is achieved when defining a subtype of this one,
-     * by configuring the type properties
-     * [levels]{@link pentaho.visual.role.Mapping.Type#levels} and
-     * [dataType]{@link pentaho.visual.role.Mapping.Type#dataType}.
-     *
-     * The second is achieved by creating a visual role mapping instance,
-     * and specifying its properties
-     * [level]{@link pentaho.visual.role.Mapping.Type#level} and
-     * [attrs]{@link pentaho.visual.role.Mapping.Type#attrs}.
-     *
-     * The related type {@link pentaho.visual.role.MappingAttribute}
-     * represents the association of the visual role with a single data property (or attribute).
+     * 1. a fixed [level of measurement]{@link pentaho.visual.role.Mapping#level}
+     *    in which the visual role should operate
+     * 2. a list of associations to data properties,
+     *    [attrs]{@link pentaho.visual.role.Mapping#attrs},
+     *    each of type {@link pentaho.visual.role.MappingAttribute}.
      *
      * @description Creates a visual role mapping instance.
      * @constructor
      * @param {pentaho.visual.role.spec.UMapping} [spec] A visual role mapping specification.
      */
-    var VisualRoleMapping = Complex.extend({
+    var VisualRoleMapping = Complex.extend("pentaho.visual.role.Mapping", /** @lends pentaho.visual.role.Mapping# */{
 
       /**
        * Gets the level of measurement in which the visual role will effectively be operating on,
@@ -108,6 +99,7 @@ define([
       get level() {
         return this.get("level");
       },
+
       set level(value) {
         this.set("level", value);
       },
@@ -123,6 +115,7 @@ define([
       get attributes() {
         return this.get("attrs");
       },
+
       set attributes(value) {
         this.set("attrs", value);
       },
@@ -149,148 +142,18 @@ define([
         throw new Error("Implement me!");
       },
 
-      type: {
-        // this is the main module of the package
-        id: "pentaho/visual/role",
-
-        isAbstract: true,
+      type: /** @lends pentaho.visual.role.Mapping.Type# */{
+        id: module.id,
 
         props: [
           // TODO: discrete domain refinement
           {name: "level", type: "pentaho/visual/role/level"},
 
-          {name: "attrs", type: ["pentaho/visual/role/attribute"]}
-        ],
-
-        //region levels
-        // NOTE: See facets/DiscreteDomain#domain for a similar implementation.
-        // "nominal", "ordinal", "quantitative"
-        _levels: null,
-
-        /**
-         * Gets or sets the array of measurement levels for which the visual role
-         * has a special mode of operation.
-         *
-         * A visual role that supports more than one measurement level is said to be **modal**.
-         *
-         * A non-abstract visual role needs to support at least one measurement level.
-         *
-         * ### This attribute is *Monotonic*
-         *
-         * The value of a _monotonic_ attribute can change, but only in some, predetermined _monotonic_ direction.
-         *
-         * In this case, a measurement level can be added to a visual role mapping,
-         * but a supported one cannot be removed.
-         *
-         * ### This attribute is *Inherited*
-         *
-         * When there is no _local value_, the _effective value_ of the attribute is the _inherited effective value_.
-         *
-         * The first set local value must respect the _monotonicity_ property with the inherited value.
-         *
-         * ### Other characteristics
-         *
-         * When set to a {@link Nully} value, the set operation is ignored.
-         *
-         * When set and the type already has [subtypes]{@link pentaho.type.Type#hasDescendants},
-         * an error is thrown.
-         *
-         * The root [visual.role.Mapping]{@link pentaho.visual.role.Mapping} has
-         * a `levels` attribute which is an empty list.
-         *
-         * Do **NOT** modify the returned list or its elements in any way.
-         *
-         * @type {pentaho.type.List.<pentaho.visual.role.MeasurementLevel>}
-         *
-         * @throws {pentaho.lang.OperationInvalidError} When setting and the type already has
-         * [subtypes]{@link pentaho.type.Type#hasDescendants}.
-         */
-        get levels() {
-          throw new Error("Implement me!");
-        },
-
-        set levels(value) {
-          throw new Error("Implement me!");
-        },
-        //endregion
-
-        //region dataType
-        _dataType: undefined,
-
-        // NOTE: See Property.Type#type for a similar implementation.
-        /**
-         * Gets or sets the type of data properties required by the visual role.
-         *
-         * ### This attribute is *Monotonic*
-         *
-         * The value of a _monotonic_ attribute can change, but only in some, predetermined _monotonic_ direction.
-         *
-         * In this case, the attribute can only change to a
-         * type that is a [subtype]{@link pentaho.type.Type#isSubtypeOf} of the attribute's current value,
-         * or, otherwise, an error is thrown.
-         *
-         * ### This attribute is *Inherited*
-         *
-         * When there is no _local value_, the _effective value_ of the attribute is the _inherited effective value_.
-         *
-         * The first set local value must respect the _monotonicity_ property with the inherited value.
-         *
-         * ### Other characteristics
-         *
-         * When set and the visual role mapping already has [subtypes]{@link pentaho.type.Type#hasDescendants},
-         * an error is thrown.
-         *
-         * When set to a {@link Nully} value, the set operation is ignored.
-         *
-         * Otherwise, the set value is assumed to be an [spec.UTypeReference]{@link pentaho.type.spec.UTypeReference}
-         * and is first resolved using [this.context.get]{@link pentaho.type.Context#get}.
-         *
-         * The root [visual.role.Mapping]{@link pentaho.visual.role.Mapping} has
-         * a `dataType` attribute of [value]{@link pentaho.type.Value}.
-
-         * @type {!pentaho.type.Value.Type}
-         *
-         * @throws {pentaho.lang.OperationInvalidError} When setting and the visual role mapping
-         * already has [subtypes]{@link pentaho.type.Type#hasDescendants}.
-         *
-         * @throws {pentaho.lang.ArgumentInvalidError} When setting to a _value type_ that is not a subtype
-         * of the current _value type_.
-         */
-        get dataType() {
-          throw new Error("Implement me!");
-        },
-
-        set dataType(value) {
-          throw new Error("Implement me!");
-        },
-        //endregion
-
-        /**
-         * Gets the levels of measurement that are effectively supported by the visual role,
-         * when both
-         * the supported [levels]{@link pentaho.visual.role.Mapping#levels}
-         * and the supported [dataType]{@link pentaho.visual.role.Mapping#dataType}
-         * are considered together.
-         *
-         * Specifically, when the data type is not compatible with a certain level of measurement,
-         * that level of measurement is removed from the result.
-         * This attribute returns a subset of the list returned by the `levels` attribute.
-         *
-         * Do **NOT** modify the returned list or its elements in any way.
-         *
-         * The contents of this list could be displayed to a user for
-         * him to choose one of the possible measurement levels.
-         *
-         * @type {pentaho.type.List.<pentaho.visual.role.MeasurementLevel>}
-         * @readOnly
-         */
-        get levelsEffective() {
-          // Compute and cache the result. Must be local cache, not inherited.
-          // Invalidate local cache on _levels and _dataType change.
-          throw new Error("Implement me!");
-        }
+          {name: "attrs", type: ["pentaho/visual/role/mappingAttribute"]}
+        ]
       }
-    });
+    })
+    .implement({type: bundle.structured.mapping});
 
     return VisualRoleMapping;
   };

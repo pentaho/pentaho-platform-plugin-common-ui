@@ -72,14 +72,14 @@ define([
      *    Only the {@link pentaho.type.Number} and {@link pentaho.type.Date} data types
      *    can be (directly) represented by a quantitative visual role.
      */
-    return Refinement.extend({
-          type: {
-            id: module.id,
-            of: "string",
-            facets: ["DiscreteDomain"],
-            domain: ["nominal", "ordinal", "quantitative"]
-          }
-        })
-        .implement({type: bundle.structured.level});
+    return Refinement.extend("pentaho.visual.role.MeasurementLevel", {
+      type: {
+        id: module.id,
+        of: "string",
+        facets: ["DiscreteDomain"],
+        domain: ["nominal", "ordinal", "quantitative"]
+      }
+    })
+    .implement({type: bundle.structured.level});
   };
 });

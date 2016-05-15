@@ -24,14 +24,31 @@ define([
 
     var Refinement = context.get("refinement");
 
-    return Refinement.extend({
-          type: {
-            id: module.id,
-            of: "string",
-            facets: ["DiscreteDomain"],
-            domain: ["sum", "avg", "min", "max"]
-          }
-        })
-        .implement({type: bundle.structured.aggregation});
+    /**
+     * @name pentaho.visual.role.Aggregation
+     * @class
+     * @extends pentaho.type.String
+     *
+     * @amd {pentaho.type.Factory<pentaho.visual.role.Aggregation>} pentaho/visual/role/aggregation
+     *
+     * @classDesc The `Aggregation` class is **a refinement of** the
+     * [String]{@link pentaho.type.String} simple type that represents an **aggregation** operation.
+     *
+     * Currently, the following aggregations are supported:
+     *
+     * * `sum` - Sum
+     * * `avg` - Average
+     * * `min` - Minimum
+     * * `max` - Maximum
+     */
+    return Refinement.extend("pentaho.visual.role.Aggregation", {
+      type: {
+        id: module.id,
+        of: "string",
+        facets: ["DiscreteDomain"],
+        domain: ["sum", "avg", "min", "max"]
+      }
+    })
+    .implement({type: bundle.structured.aggregation});
   };
 });

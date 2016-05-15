@@ -15,37 +15,39 @@
  */
 define([
   "module",
+  "pentaho/i18n!messages",
   "./aggregation"
-], function(module) {
+], function(module, bundle) {
 
   "use strict";
 
   return function(context) {
 
-    var Complex = context.get("pentaho/type/complex");
+    var Complex = context.get("complex");
 
     /**
      * @name pentaho.visual.role.MappingAttribute
      * @class
      * @extends pentaho.type.Complex
      *
-     * @amd {pentaho.type.Factory<pentaho.visual.role.MappingAttribute>} pentaho/visual/role/mapping
+     * @amd {pentaho.type.Factory<pentaho.visual.role.MappingAttribute>} pentaho/visual/role/mappingAttribute
      *
-     * @classDesc The class that represents an association between
-     * a containing [visual role mapping]{@link pentaho.visual.role.Mapping} and
-     * a single data property (or attribute).
+     * @classDesc The `MappingAttribute` class represents a data property in a
+     * [visual role mapping]{@link pentaho.visual.role.Mapping}.
+     *
+     * @see pentaho.visual.role.Mapping
      *
      * @description Creates a visual role mapping attribute instance.
      * @constructor
      * @param {pentaho.visual.role.spec.UMappingAttribute} [spec] A visual role mapping attribute specification.
      */
-    return Complex.extend({
+    return Complex.extend("pentaho.visual.role.MappingAttribute", /** @lends pentaho.visual.role.MappingAttribute# */{
       // How I wish...
       //get uniqueConstraintKey() {
       //  return [this.getv("aggr"), this.getv("name")];
       //},
 
-      type: {
+      type: /** @lends pentaho.visual.role.MappingAttribute.Type# */{
         id: module.id,
 
         props: [
@@ -57,6 +59,7 @@ define([
           {name: "isReverse", type: "boolean", value: false}
         ]
       }
-    });
+    })
+    .implement({type: bundle.structured.mappingAttribute});
   };
 });
