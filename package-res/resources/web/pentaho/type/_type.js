@@ -253,7 +253,6 @@ define([
         if(config) this.instance.extend(config);
       }, //jshint -W078
       //endregion
-      //endregion
 
       //region Type Kinds
       //region isValue property
@@ -354,7 +353,7 @@ define([
        *
        * Can only be specified when extending a type.
        *
-       * The id only exists for types which have an associated AMD/RequireJS module.
+       * The id is only defined for types which have an associated AMD/RequireJS module.
        * However, note that all have a {@link pentaho.type.Type#uid}.
        *
        * This attribute is not inherited.
@@ -485,7 +484,8 @@ define([
        * Setting to `undefined` causes this attribute to use the inherited value,
        * except for the root type, `Instance.type` (which has no ancestor), where this attribute is `null`.
        *
-       * Setting to `null` or to an empty string clears the attribute and sets it to `null`, ignoring any inherited value.
+       * Setting to `null` or to an empty string clears the attribute and sets it to `null`,
+       * ignoring any inherited value.
        *
        * @type {?nonEmptyString}
        */

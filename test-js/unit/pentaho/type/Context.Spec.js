@@ -412,28 +412,21 @@ define([
 
           describe("when `base` is `null`", function() {
 
-            it("should throw/reject when `id` is not 'value'", function() {
+            it("should default `base` to 'complex'", function() {
 
-              return testGet(function(sync, Context, localRequire, errorMatch) {
+              return testGet(function(sync, Context) {
                 var context = new Context();
+                var promise = callGet(context, sync, {base: null, props: ["a", "b"]});
 
-                return expectToRejectWith(
-                    function() { return callGet(context, sync, {id: "foo", base: null}); },
-                    errorMatch.argInvalid("typeRef"));
-              });
-            });
-          });
+                return promise.then(function(InstCtor) {
+                  var Complex = context.get("pentaho/type/complex");
 
-          describe("when `base` is specified non-nully", function() {
+                  expect(InstCtor.type.isSubtypeOf(Complex.type)).toBe(true);
 
-            it("should throw/reject when `id` is 'value'", function() {
-
-              return testGet(function(sync, Context, localRequire, errorMatch) {
-                var context = new Context();
-
-                return expectToRejectWith(
-                    function() { return callGet(context, sync, {id: "value", base: "foo"}); },
-                    errorMatch.argInvalid("typeRef"));
+                  expect(InstCtor.ancestor).toBe(Complex);
+                  expect(InstCtor.type.has("a")).toBe(true);
+                  expect(InstCtor.type.has("b")).toBe(true);
+                });
               });
             });
           });
@@ -725,6 +718,14 @@ define([
             });
           }
 
+          function defineTempProp(mid) {
+            localRequire.define(mid, [], function() {
+              return function(context) {
+                return context.get("pentaho/type/property").extend({type: {id: mid}});
+              };
+            });
+          }
+
           defineTempModule("pentaho/foo/dudu1");
           defineTempModule("pentaho/foo/dudu2");
           defineTempModule("pentaho/foo/dudu3");
@@ -732,6 +733,7 @@ define([
           defineTempFacet("pentaho/foo/facets/Mixin1");
           defineTempFacet("pentaho/foo/facets/Mixin2");
           defineTempFacet("pentaho/foo/facets/Mixin3");
+          defineTempProp("pentaho/foo/prop1");
 
           // -----
 
@@ -763,7 +765,8 @@ define([
                 base: "refinement",
                 of: "string",
                 facets: "pentaho/foo/facets/Mixin3"
-              }}
+              }},
+              {name: "foo9", base: "pentaho/foo/prop1", type: "string"}
             ]
           };
 
@@ -774,6 +777,7 @@ define([
                 expect(InstCtor.type.get("foo3").type.of.id).toBe("pentaho/foo/dudu3");
                 expect(InstCtor.type.get("foo7").type.get("a").type.id).toBe("pentaho/foo/dudu4");
                 expect(InstCtor.type.get("foo8").type.facets[0]).toBe(localRequire("pentaho/foo/facets/Mixin3"));
+                expect(InstCtor.type.get("foo9").isSubtypeOf(context.get("pentaho/foo/prop1").type)).toBe(true);
               });
         });
       });

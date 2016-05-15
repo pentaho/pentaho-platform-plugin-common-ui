@@ -131,7 +131,7 @@ define([
 
           this.base.apply(this, arguments);
 
-          // TODO: Validate same context as base?
+          // NOTE: Not validating same context as base.
 
           // Abstract Property types don't yet have an associated declaringType.
           // e.g. Property.extend()
@@ -689,16 +689,9 @@ define([
             var shortId = this.shortId;
             if(shortId) spec.id = shortId;
 
-            // The `base` of Property is not a Property, it is Instance.
-            // TODO: For now, Instance is not serialized, so base is null...
-
-            if(_propType !== this) {
-              // Some subtype of Property.
-              // Serialize base as a reference, even if it is Property.
-              // `ancestor` only works from root property types downwards.
-              baseType = Object.getPrototypeOf(this);
-              spec.base = baseType.toRefInContext(keyArgs);
-            }
+            // `ancestor` only works from root property types downwards.
+            baseType = Object.getPrototypeOf(this);
+            spec.base = baseType.toRefInContext(keyArgs);
 
             // Abstract Property classes don't have declaring type or `name`.
 

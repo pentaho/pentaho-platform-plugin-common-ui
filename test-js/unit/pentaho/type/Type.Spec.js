@@ -428,12 +428,6 @@ define([
           expectIt({id: null});
           expectIt({id: null});
         });
-
-        it("should preserve the default value", function() {
-          Instance.type.id = undefined;
-          // The default value is still there (did not delete)
-          expect(Instance.type.id).toBe(null);
-        });
       });
 
       describe("when `id` is truthy -", function() {

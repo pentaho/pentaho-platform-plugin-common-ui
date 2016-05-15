@@ -578,17 +578,10 @@ define([
           var spec = {id: this.shortId || SpecificationContext.current.add(this)};
 
           // The base type in the **current type hierarchy** (root, ancestor, isRoot).
-          var baseType = this.ancestor;
-          if(baseType) {
-            // Cannot be Value, cause Value has no ancestor.
-            var baseRef = baseType.toRefInContext(keyArgs);
-            if(baseRef !== "complex")
-              spec.base = baseRef;
-            // else, the default base type of a type other than Value is Complex
-          } else {
-            // The Value type.
-            spec.base = null;
-          }
+          var baseType = Object.getPrototypeOf(this);
+          var baseRef = baseType.toRefInContext(keyArgs);
+          if(baseRef !== "complex")
+            spec.base = baseRef;
 
           this._fillSpecInContext(spec, keyArgs);
 
@@ -611,7 +604,6 @@ define([
             var instSpec = {};
             var instance = this.instance;
             var instAny = valueHelper.fillSpecMethodInContext(instSpec, instance, "validate");
-
             if(instAny) {
               spec.instance = instSpec;
               any = true;

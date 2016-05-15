@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 define([
+  "module",
   "./_type",
   "./SpecificationScope",
   "../lang/Base",
   "../util/error",
   "../util/object"
-], function(typeFactory, SpecificationScope, Base, error, O) {
+], function(module, typeFactory, SpecificationScope, Base, error, O) {
 
   "use strict";
 
@@ -266,6 +267,7 @@ define([
     });
 
     Type._initInstCtor(Instance);
+    Type.prototype.id = module.id;
 
     return Instance;
   };

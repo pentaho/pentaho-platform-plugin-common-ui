@@ -681,53 +681,14 @@ define([
       if(typeSpec instanceof Instance)
         return this._error(error.argInvalid("typeRef", "Instances are not supported as type references."), sync);
 
-      // Because a base type is required (when null, it is defaulted to Value.Type)
-      // this means that the generic object spec cannot represent the root of type hierarchies:
-      // Type, or even Property.Type.
-      // Currently, it only allows expressing the full Value.Type hierarchy.
-
-      /*
-       *  id      | base       | result
-       *  --------+------------+------------------
-       *  "value" | null       :
-       *  "foo"   | -          : base <- "complex"
-       *  "foo"   | "notnull"  : ok
-       */
+      var baseTypeSpec = typeSpec.base || _defaultBaseTypeMid;
       var id = typeSpec.id;
-      var baseTypeSpec = typeSpec.base;
-
-      var isIdTemporary = SpecificationContext.isIdTemporary(id);
-
-      if(id && !isIdTemporary)
-        id = toAbsTypeId(id);
-
-      if(id && id === (_baseMid + "value")) {
-        // The "value" type is already loaded.
-        // Will return in the first if below.
-
-        if(baseTypeSpec) {
-          return this._error(
-              error.argInvalid("typeRef", "The root type `Value` must have a `null` base."),
-              sync);
-        }
-
-        baseTypeSpec = null;
-
-      } else if(!baseTypeSpec) {
-        if(baseTypeSpec === null) {
-          return this._error(
-              error.argInvalid("typeRef", "Only the root type `Value` can have a `null` base."),
-              sync);
-        }
-
-        baseTypeSpec = _defaultBaseTypeMid;
-      }
-
-      // Already loaded?
       if(id) {
+        // Already loaded?
+
         var InstCtor;
 
-        if(isIdTemporary) {
+        if(SpecificationContext.isIdTemporary(id)) {
           var specContext = SpecificationContext.current;
           if(specContext) {
             var type = specContext.get(id);
@@ -735,6 +696,7 @@ define([
           }
         } else {
           // id ~ "value" goes here.
+          id = toAbsTypeId(id);
           InstCtor = O.getOwn(this._byTypeId, id);
         }
 
@@ -889,11 +851,13 @@ define([
           if(Array.isArray(props))
             props.forEach(function(propSpec) {
               collectTypeIdsRecursive(propSpec && propSpec.type, outIds);
+              collectTypeIdsRecursive(propSpec && propSpec.base, outIds);
             });
           else
             Object.keys(props).forEach(function(propName) {
               var propSpec = props[propName];
               collectTypeIdsRecursive(propSpec && propSpec.type, outIds);
+              collectTypeIdsRecursive(propSpec && propSpec.base, outIds);
             });
         }
 
