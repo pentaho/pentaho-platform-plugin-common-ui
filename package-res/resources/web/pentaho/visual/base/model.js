@@ -57,11 +57,11 @@ define([
      *
      * @amd {pentaho.type.Factory<pentaho.visual.base.Model>} pentaho/visual/base/model
      *
-     * @classDesc This is the base model class for visualizations.
+     * @classDesc The `Model` class is the abstract base class of visualization models.
      *
      * @constructor
-     * @description Creates a base `Model`.
-     * @param {pentaho.visual.base.spec.IModel} modelSpec A plain object containing the model specification.
+     * @description Creates a visual model.
+     * @param {pentaho.visual.base.spec.IModel} [modelSpec] A plain object containing the model specification.
      */
     var Model = Complex.extend(/** @lends pentaho.visual.base.Model# */{
       //region Event Flows Handling
@@ -89,13 +89,14 @@ define([
        *
        * @param {!pentaho.data.filter.AbstractFilter} inputDataFilter - A filter representing
        * the data set which will be used to modify the current selection filter.
-       * @param {?object} keyArgs - Keyword arguments.
-       * @param {!function} keyArgs.selectionMode - A function that computes a new selection filter,
+       * @param {Object} keyArgs - Keyword arguments.
+       * @param {function} keyArgs.selectionMode - A function that computes a new selection filter,
        * taking into account the current selection filter and an input `dataFilter`.
        *
-       * @return {pentaho.lang.ActionResult}
+       * @return {!pentaho.lang.ActionResult}
        * If unsuccessful, the `error` property describes what originated the error.
-       * If successful,  the `error` property is `null` and the `value` property contains the updated current selection filter.
+       * If successful,  the `error` property is `null` and the `value` property contains
+       * the updated current selection filter.
        *
        * @fires "will:select"
        * @fires "did:select"
@@ -193,10 +194,14 @@ define([
        * @protected
        */
       _doAction: function(coreAction, willEvent, DidEvent, RejectedEvent) {
+
         if(this._hasListeners(willEvent.type))
           this._emitSafe(willEvent);
 
-        var result = willEvent.isCanceled ? ActionResult.reject(willEvent.cancelReason) : coreAction.call(this, willEvent);
+        /*jshint laxbreak:true*/
+        var result = willEvent.isCanceled
+            ? ActionResult.reject(willEvent.cancelReason)
+            : coreAction.call(this, willEvent);
 
         if(result.error) {
           if(this._hasListeners(RejectedEvent.type)) {
@@ -207,6 +212,7 @@ define([
             this._emitSafe(new DidEvent(this, result.value, willEvent));
           }
         }
+
         return result;
       },
       //endregion
@@ -288,6 +294,5 @@ define([
     .implement({type: bundle.structured});
 
     return Model;
-
   };
 });

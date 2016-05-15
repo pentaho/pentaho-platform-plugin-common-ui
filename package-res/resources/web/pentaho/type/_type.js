@@ -774,6 +774,8 @@ define([
 
       //region view property
 
+      // TODO: When type is anonymous, is view an absolute path?
+
       // -> nonEmptyString, Optional, Inherited, Configurable, Localized
       // undefined -> inherit
       // null -> clear

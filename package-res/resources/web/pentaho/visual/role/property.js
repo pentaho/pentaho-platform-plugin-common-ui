@@ -82,7 +82,6 @@ define([
     var VisualRoleProperty = Property.extend("pentaho.visual.role.Property", {
 
       type: /** @lends pentaho.visual.role.Property.Type# */{
-        // this is the main module of the package
         id: module.id,
 
         isAbstract: true,
