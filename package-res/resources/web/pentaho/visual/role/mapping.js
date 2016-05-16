@@ -43,10 +43,16 @@ define([
      * @amd {pentaho.type.Factory<pentaho.visual.role.Mapping>} pentaho/visual/role/mapping
      *
      * @classDesc The `Mapping` class represents the association between
-     * a visual role and the data properties, here named _attributes_,
+     * a specific visual role and the data properties, here named _attributes_,
      * of a visualization's current dataset.
      *
-     * A mapping holds two pieces of information:
+     * As a _type_, the mapping defines the capabilities of the visual role it maps to
+     * through the attributes:
+     *
+     * 1. [levels]{@link pentaho.visual.role.Mapping.Type#levels}
+     * 2. [dataType]{@link pentaho.visual.role.Mapping.Type#dataType}.
+     *
+     * As an _instance_, the mapping holds two pieces of information:
      *
      * 1. a fixed [level of measurement]{@link pentaho.visual.role.Mapping#level}
      *    in which the visual role should operate
@@ -78,7 +84,7 @@ define([
        * @readOnly
        */
       get levelEffective() {
-        throw new Error("Implement me!");
+        // TODO: throw new Error("Implement me!");
       },
 
       // TODO: levelAuto can only be determined by accessing the visual model...
@@ -101,7 +107,7 @@ define([
        * @readOnly
        */
       get levelAuto() {
-        throw new Error("Implement me!");
+        // TODO: throw new Error("Implement me!");
       },
 
       /**
@@ -157,7 +163,7 @@ define([
         _levels: null,
 
         /**
-         * Gets or sets the array of measurement levels for which the visual role
+         * Gets or sets the array of measurement levels for which the mapped visual role
          * has a special mode of operation.
          *
          * A visual role that supports more than one measurement level is said to be **modal**.
@@ -184,7 +190,7 @@ define([
          * When set and the type already has [subtypes]{@link pentaho.type.Type#hasDescendants},
          * an error is thrown.
          *
-         * The root [visual.role.Property]{@link pentaho.visual.role.Property} has
+         * The root [visual.role.Mapping]{@link pentaho.visual.role.Mapping} has
          * a `levels` attribute which is an empty list.
          *
          * Do **NOT** modify the returned list or its elements in any way.
@@ -195,11 +201,11 @@ define([
          * [subtypes]{@link pentaho.type.Type#hasDescendants}.
          */
         get levels() {
-          throw new Error("Implement me!");
+          // TODO: throw new Error("Implement me!");
         },
 
         set levels(value) {
-          throw new Error("Implement me!");
+          // TODO: throw new Error("Implement me!");
         },
         //endregion
 
@@ -246,11 +252,11 @@ define([
          * of the current _value type_.
          */
         get dataType() {
-          throw new Error("Implement me!");
+          // TODO: throw new Error("Implement me!");
         },
 
         set dataType(value) {
-          throw new Error("Implement me!");
+          // TODO: throw new Error("Implement me!");
         },
         //endregion
 
@@ -276,7 +282,7 @@ define([
         get levelsEffective() {
           // Compute and cache the result. Must be local cache, not inherited.
           // Invalidate local cache on _levels and _dataType change.
-          throw new Error("Implement me!");
+          // TODO: throw new Error("Implement me!");
         }
       }
     })
