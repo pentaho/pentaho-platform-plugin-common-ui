@@ -168,6 +168,8 @@ define([
           if(this.isRoot) {
             // Assuming default values
             if(!O.hasOwn(this, "_label")) this._resetLabel();
+
+            this._createValueAccessor();
           }
         },
 
@@ -507,6 +509,27 @@ define([
           }
         }, //endregion
 
+        //endregion
+
+        //region property accessor
+        _createValueAccessor: function() {
+          var instance = this._declaringType.instance,
+              name = this._name;
+
+          if(!(name in instance)) {
+            Object.defineProperty(instance, name, {
+              configurable: true,
+
+              get: function() {
+                return this.getv(name);
+              },
+
+              set: function(value) {
+                this.set(name, value);
+              }
+            });
+          }
+        },
         //endregion
 
         //region validation

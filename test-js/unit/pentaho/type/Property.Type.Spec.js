@@ -1270,6 +1270,55 @@ define([
         });
       }); // end dynamic attribute
       //endregion
+
+      describe("property accessors", function() {
+        it("should define the property with both a getter and a setter", function() {
+          propertyTypeUtil.createRoot(Derived.type, {name: "foo", type: "string"});
+          var propDesc = Object.getOwnPropertyDescriptor(Derived.prototype, "foo");
+          expect(propDesc).not.toBe(null);
+          expect(propDesc.get).not.toBe(null);
+          expect(propDesc.set).not.toBe(null);
+        });
+
+        it("should read the valueOf of the value of the property", function() {
+          var Derived2 = Complex.extend({
+            type: {
+              props: [
+                {name: "foo", type: "string"}
+              ]
+            }
+          });
+
+          var derived = new Derived2({foo: "A"});
+          expect(derived.getv("foo")).toBe("A");
+          expect(derived.foo).toBe("A");
+        });
+
+        it("should set the value of the property", function() {
+          var Derived2 = Complex.extend({
+            type: {
+              props: [
+                {name: "foo", type: "string"}
+              ]
+            }
+          });
+
+          var derived = new Derived2({foo: "A"});
+          derived.foo = "B";
+          expect(derived.foo).toBe("B");
+        });
+
+        it("should not create the accessor if the name is already taken in the instance prototype", function() {
+          Derived.prototype.foo = null;
+
+          propertyTypeUtil.createRoot(Derived.type, {name: "foo", type: "string"});
+
+          var propDesc = Object.getOwnPropertyDescriptor(Derived.prototype, "foo");
+          expect(propDesc).not.toBe(null);
+          expect(propDesc.get).toBe(undefined);
+          expect(propDesc.set).toBe(undefined);
+        });
+      });
     }); // end define a root property
 
     describe("override a property -", function() {
