@@ -396,6 +396,24 @@ define([
         return map ? this._elems.map(map) : this._elems.slice();
       },
 
+      /**
+       * Calls a function for each element of the list.
+       *
+       * @param {function(pentaho.type.Element, number, pentaho.type.List) : boolean?} fun
+       * The mapping function. Return `false` to break iteration.
+       *
+       * @param {Object} [ctx] The JS context object on which `fun` is called.
+       */
+      each: function(fun, ctx) {
+        var elems = this._elems;
+        var L = elems.length;
+        var i = -1;
+
+        while(++i < L)
+          if(fun.call(ctx, elems[i], i, this) === false)
+            break;
+      },
+
       // TODO: Replace this use by transaction scopes, when they're implemented.
       /**
        * Enters a change scope and returns a disposable object for exiting the scope.

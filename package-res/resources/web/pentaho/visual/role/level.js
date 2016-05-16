@@ -1,4 +1,3 @@
-
 /*!
  * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
  *
@@ -24,6 +23,7 @@ define([
   return function(context) {
 
     var Refinement = context.get("refinement");
+    var orderedLevels = ["nominal", "ordinal", "quantitative"];
 
     /**
      * @name pentaho.visual.role.MeasurementLevel
@@ -77,7 +77,21 @@ define([
         id: module.id,
         of: "string",
         facets: ["DiscreteDomain"],
-        domain: ["nominal", "ordinal", "quantitative"]
+        domain: ["nominal", "ordinal", "quantitative"],
+
+        isQuantitative: function(level) {
+          level = this.to(level);
+          return level.value === "quantitative";
+        },
+
+        isQualitative: function(level) {
+          level = this.to(level);
+          return level.value === "nominal" || level.value === "ordinal";
+        },
+
+        compare: function(a, b) {
+          return orderedLevels.indexOf(a) - orderedLevels.indexOf(b);
+        }
       }
     })
     .implement({type: bundle.structured.level});
