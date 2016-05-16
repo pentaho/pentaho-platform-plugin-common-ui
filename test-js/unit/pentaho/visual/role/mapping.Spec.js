@@ -1,21 +1,28 @@
-define(["pentaho/type/Context"
-], function( Context ) {
+define([
+  "pentaho/type/Context",
+  "pentaho/visual/role/mapping",
+  "pentaho/visual/role/level",
+  "pentaho/visual/role/mappingAttribute",
+  "tests/pentaho/util/errorMatch"
+], function( Context, mappingFactory, levelFactory, attributeFactory, errorMatch ) {
   "use strict";
 
-  describe("pentaho/visual/role/mapping", function() {
-    var mapping, Mapping;
+  describe("pentaho/visual/role", function() {
+    var Mapping, Attribute;
     var context = new Context();
 
-    function fail() {
-      expect(true).toBe(false);
+    beforeEach(function () {
+      Mapping = context.get(mappingFactory);
+      Attribute = context.get(attributeFactory);
+    });
+
+    function assertIsValid(complex) {
+      expect(complex.validate()).toBeNull();
     }
 
-    beforeEach(function () {
-      /*
-      Mapping = context.get();
-      mapping = new Mapping();
-      */
-    });
+    function assertIsInvalid(complex) {
+      expect(complex.validate().length).toBeGreaterThan(0);
+    }
 
     describe("#levelEffective", function () {
       it("when the level is null, the effective level should be equal to the auto level", function () {
@@ -36,11 +43,41 @@ define(["pentaho/type/Context"
 
     describe("#levelAuto", function () {
       it("when a valid mapping is empty, the auto level is undefined", function() {
-        fail();
+        var ValidMapping = Mapping.extend( {
+          type: {
+            levels: ["nominal"]
+          }
+        });
+        var mapping = new ValidMapping();
+
+        // Assumptions
+        assertIsValid(mapping);
+        expect(mapping.attributes.count).toEqual(0);
+
+        // Test
+        expect(mapping.levelAuto).toBeUndefined();
       });
 
       it("when an non-empty mapping is invalid, the auto level is undefined", function() {
-        fail();
+        var InvalidMapping = Mapping.extend( {
+          type: {
+            levels: ["nominal"],
+            props: [
+              { name: "bananas", isRequired: true }
+            ]
+          }
+        });
+
+        var mapping = new InvalidMapping();
+        var mappingAttribute = new Attribute();
+        mapping.attributes.add(mappingAttribute);
+
+        // Assumptions
+        expect(mapping.attributes.count).toBeGreaterThan(0);
+        assertIsInvalid(mapping);
+
+        // Test
+        expect(mapping.levelAuto).toBeUndefined();
       });
 
       it("when more than one measurement level could be used, the auto level returns the _highest_ measurement level", function() {
@@ -51,8 +88,18 @@ define(["pentaho/type/Context"
 
     describe("validation", function () {
 
-      it("A mapping is invalid when its level is set to a value that does not belong to the effective levels", function () {
-        fail();
+      it("A mapping is invalid when its level is set to a value that does not belong to the levels", function () {
+        var DerivedMapping = Mapping.extend( {
+          type: {
+            levels: ["nominal"]
+          }
+        });
+
+        var mapping = new DerivedMapping();
+        mapping.level = "ordinal";
+
+        // Test
+        assertIsInvalid(mapping);
       });
 
     });
@@ -61,7 +108,11 @@ define(["pentaho/type/Context"
 
       describe("levels", function () {
         it("a non-abstract visual role needs to support at least one measurement level", function () {
-          fail();
+          function defineEmptyLevelsMapping() {
+            Mapping.extend( { type: { levels: [] } });
+          }
+
+          expect(defineEmptyLevelsMapping).toThrow(errorMatch.argInvalid("levels"));
         });
 
         it("a visual role definition can add support for new measurement levels", function () {
