@@ -15,8 +15,9 @@
  */
 define([
   "module",
-  "pentaho/i18n!messages"
-], function(module, bundle) {
+  "pentaho/i18n!messages",
+  "./mapping"
+], function(module, bundle, mappingFactory) {
 
   "use strict";
 
@@ -85,6 +86,21 @@ define([
         id: module.id,
 
         isAbstract: true,
+
+        // value type
+        /**
+         * Gets or sets the type of value that properties of this type can hold.
+         *
+         * This type of property contains visual role mapping instances.
+         *
+         * @type {!pentaho.visual.role.Mapping.Type}
+         *
+         * @throws {pentaho.lang.OperationInvalidError} When setting and the property already has
+         * [descendant]{@link pentaho.type.Type#hasDescendants} properties.
+         * @throws {pentaho.lang.ArgumentInvalidError} When setting to a _value type_ that is not a subtype
+         * of the current _value type_.
+         */
+        type: mappingFactory,
 
         //region levels
         // NOTE: See facets/DiscreteDomain#domain for a similar implementation.

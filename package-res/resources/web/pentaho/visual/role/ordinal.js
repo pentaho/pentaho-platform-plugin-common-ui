@@ -15,29 +15,30 @@
  */
 define([
   "module",
-  "pentaho/i18n!messages"
-], function(module, bundle) {
+  "pentaho/i18n!messages",
+  "./mapping"
+], function(module, bundle, mappingFactory) {
 
   "use strict";
 
   return function(context) {
 
-    var Property = context.get("pentaho/visual/role/property");
+    var Mapping = context.get(mappingFactory);
 
     /**
-     * @name pentaho.visual.role.OrdinalProperty
+     * @name pentaho.visual.role.OrdinalMapping
      * @class
      * @extends pentaho.visual.role.Property
      * @abstract
      *
-     * @amd {pentaho.type.Factory<pentaho.visual.role.OrdinalProperty>} pentaho/visual/role/ordinal
+     * @amd {pentaho.type.Factory<pentaho.visual.role.OrdinalMapping>} pentaho/visual/role/ordinal
      *
-     * @classDesc An optional base class for ordinal visual role properties.
+     * @classDesc An optional base class for ordinal visual role mappings.
      *
-     * This visual role property has a [levels]{@link pentaho.visual.role.Property.Type#levels}
+     * This visual role mapping has a [levels]{@link pentaho.visual.role.Mapping.Type#levels}
      * with a single value, `"ordinal"`.
      */
-    var OrdinalProperty = Property.extend("pentaho.visual.role.OrdinalProperty", {
+    var OrdinalMapping = Mapping.extend("pentaho.visual.role.OrdinalMapping", {
       type: {
         id: module.id,
         levels: ["ordinal"]
@@ -45,6 +46,6 @@ define([
     })
     .implement({type: bundle.structured.ordinal});
 
-    return OrdinalProperty;
+    return OrdinalMapping;
   };
 });

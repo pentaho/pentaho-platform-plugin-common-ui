@@ -28,21 +28,24 @@ define([
         props: [
           {
             name: "levels",
-            type: ["string"],
-            isRequired: true,
-            isVisualRole: true
+            type: {
+              base: "pentaho/visual/role/nominal",
+              props: {attributes: {isRequired: true}}
+            }
           },
           {
             name: "measure",
-            isRequired: true,
-            isVisualRole: true
+            type: {
+              base: "pentaho/visual/role/quantitative",
+              props: {attributes: {countMin: 1, countMax: 1}}
+            }
           },
           {
             name: "operation",
             type: {
               base: "refinement",
               of:   "string",
-              facets: "DiscreteDomain",
+              facets: ["DiscreteDomain"],
               domain: ["min", "max", "avg", "sum"]
             },
             value: "min"

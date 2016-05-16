@@ -15,29 +15,30 @@
  */
 define([
   "module",
-  "pentaho/i18n!messages"
-], function(module, bundle) {
+  "pentaho/i18n!messages",
+  "./mapping"
+], function(module, bundle, mappingFactory) {
 
   "use strict";
 
   return function(context) {
 
-    var Property = context.get("pentaho/visual/role/property");
+    var Mapping = context.get(mappingFactory);
 
     /**
-     * @name pentaho.visual.role.NominalProperty
+     * @name pentaho.visual.role.NominalMapping
      * @class
-     * @extends pentaho.visual.role.Property
+     * @extends pentaho.visual.role.Mapping
      * @abstract
      *
-     * @amd {pentaho.type.Factory<pentaho.visual.role.NominalProperty>} pentaho/visual/role/nominal
+     * @amd {pentaho.type.Factory<pentaho.visual.role.NominalMapping>} pentaho/visual/role/nominal
      *
-     * @classDesc An optional base class for nominal visual role properties.
+     * @classDesc An optional base class for nominal visual role mappings.
      *
-     * This visual role property has a [levels]{@link pentaho.visual.role.Property.Type#levels}
+     * This visual role mapping has a [levels]{@link pentaho.visual.role.Mapping.Type#levels}
      * with a single value, `"nominal"`.
      */
-    var NominalProperty = Property.extend("pentaho.visual.role.NominalProperty", {
+    var NominalMapping = Mapping.extend("pentaho.visual.role.NominalMapping", {
       type: {
         id: module.id,
         levels: ["nominal"]
@@ -45,6 +46,6 @@ define([
     })
     .implement({type: bundle.structured.nominal});
 
-    return NominalProperty;
+    return NominalMapping;
   };
 });

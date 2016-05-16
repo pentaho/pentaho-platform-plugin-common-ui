@@ -25,19 +25,19 @@ define([
     var Property = context.get("pentaho/visual/role/property");
 
     /**
-     * @name pentaho.visual.role.QuantitativeProperty
+     * @name pentaho.visual.role.QuantitativeMapping
      * @class
-     * @extends pentaho.visual.role.Property
+     * @extends pentaho.visual.role.Mapping
      * @abstract
      *
-     * @amd {pentaho.type.Factory<pentaho.visual.role.QuantitativeProperty>} pentaho/visual/role/quantitative
+     * @amd {pentaho.type.Factory<pentaho.visual.role.QuantitativeMapping>} pentaho/visual/role/quantitative
      *
-     * @classDesc An optional base class for quantitative visual role properties.
+     * @classDesc An optional base class for quantitative visual role mappings.
      *
-     * This visual role property has a [levels]{@link pentaho.visual.role.Property.Type#levels}
+     * This visual role mapping type has a [levels]{@link pentaho.visual.role.Mapping.Type#levels}
      * with a single value, `"quantitative"`.
      */
-    var QuantitativeProperty = Property.extend("pentaho.visual.role.QuantitativeProperty", {
+    var QuantitativeMapping = Property.extend("pentaho.visual.role.QuantitativeMapping", {
       type: {
         id: module.id,
         levels: ["quantitative"]
@@ -45,6 +45,6 @@ define([
     })
     .implement({type: bundle.structured.quantitative});
 
-    return QuantitativeProperty;
+    return QuantitativeMapping;
   };
 });

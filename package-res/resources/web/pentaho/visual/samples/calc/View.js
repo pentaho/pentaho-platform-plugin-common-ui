@@ -64,7 +64,9 @@ define([
     _calculate: function() {
       var dataTable = this.model.getv("data"),
           R = dataTable.getNumberOfRows(),
-          jMeasure = dataTable.model.attributes.get(this.model.getv("measure")).ordinal,
+          measureMapping = this.model.get("measure"),
+          measureAttrName = measureMapping.attributes.first().name.value,
+          jMeasure = dataTable.model.attributes.get(measureAttrName).ordinal,
           getValue = function(k) {
             var v = dataTable.getValue(k, jMeasure);
             return !isNaN(v) && v != null ? v : null;

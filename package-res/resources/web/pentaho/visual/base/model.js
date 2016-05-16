@@ -32,7 +32,13 @@ define([
 
   "pentaho/lang/ActionResult",
 
-  "pentaho/i18n!type"
+  "pentaho/i18n!type",
+
+  // pre-load all visual role mapping types
+  "../role/mapping",
+  "../role/nominal",
+  "../role/ordinal",
+  "../role/quantitative"
 ], function(complexFactory, Event, filter, O,
             error, UserError,
             selectionModes,
