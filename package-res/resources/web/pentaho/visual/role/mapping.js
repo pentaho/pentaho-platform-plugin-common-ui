@@ -122,33 +122,21 @@ define([
        * {@link pentaho.visual.role.Mapping.Type#levelsEffective},
        * or, otherwise, the mapping is considered _invalid_.
        *
-       * This JS property is sugar for `this.get("level")` and `this.set("level", value)`.
+       * This JS property is sugar for `this.getv("level")` and `this.set("level", value)`.
        *
+       * @name pentaho.visual.role.Mapping#level
        * @type {pentaho.visual.role.MeasurementLevel}
        */
-      get level() {
-        return this.get("level");
-      },
-
-      set level(value) {
-        this.set("level", value);
-      },
 
       /**
        * Gets or sets the attributes of the visual role mapping.
        *
        * This JS property is sugar for
-       * `this.get("attributes")` and `this.set("attributes", value)`.
+       * `this.getv("attributes")` and `this.set("attributes", value)`.
        *
+       * @name pentaho.visual.role.Mapping#attributes
        * @type pentaho.type.List<pentaho.visual.role.MappingAttribute>
        */
-      get attributes() {
-        return this.get("attributes");
-      },
-
-      set attributes(value) {
-        this.set("attributes", value);
-      },
 
       type: /** @lends pentaho.visual.role.Mapping.Type# */{
         id: module.id,

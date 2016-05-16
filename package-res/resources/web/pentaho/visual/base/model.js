@@ -111,7 +111,7 @@ define([
        * @see pentaho.visual.base.types.selectionModes
        */
       selectAction: function(inputDataFilter, keyArgs) {
-        var selectionMode = O.getOwn(keyArgs, "selectionMode") || this.getv("selectionMode");
+        var selectionMode = O.getOwn(keyArgs, "selectionMode") || this.selectionMode;
         var will = new WillSelect(this, inputDataFilter, selectionMode);
         return this._doAction(this._doSelect, will, DidSelect, RejectedSelect);
       },
@@ -124,8 +124,8 @@ define([
        * @protected
        */
       _doSelect: function(will){
-        var currentSelectionFilter = this.getv("selectionFilter");
-        var selectionMode = will.selectionMode || this.getv("selectionMode");
+        var currentSelectionFilter = this.selectionFilter;
+        var selectionMode = will.selectionMode || this.selectionMode;
 
         var newSelectionFilter;
         try {
@@ -134,7 +134,7 @@ define([
           return ActionResult.reject(e);
         }
 
-        return this.set("selectionFilter", newSelectionFilter); //setting to null assigns the default value
+        return this.selectionFilter = newSelectionFilter; //setting to null assigns the default value
       },
 
       /**
@@ -164,7 +164,7 @@ define([
        *
        */
       executeAction: function(inputDataFilter, keyArgs) {
-        var doExecute = O.getOwn(keyArgs, "doExecute") || this.getv("doExecute");
+        var doExecute = O.getOwn(keyArgs, "doExecute") || this.doExecute;
         var will = new WillExecute(this, inputDataFilter, doExecute);
         return this._doAction(this._doExecute, will, DidExecute, RejectedExecute);
       },

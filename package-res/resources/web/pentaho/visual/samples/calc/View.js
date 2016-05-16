@@ -39,8 +39,8 @@ define([
     /** @override */
     _resize: function() {
       // Center the span
-      var width  = this.model.getv("width");
-      var height = this.model.getv("height");
+      var width  = this.model.width;
+      var height = this.model.height;
       this._numSpan.style.left = ((width  - this._numSpan.offsetWidth ) / 2) + "px";
       this._numSpan.style.top  = ((height - this._numSpan.offsetHeight) / 2) + "px";
     },
@@ -64,8 +64,7 @@ define([
     _calculate: function() {
       var dataTable = this.model.getv("data"),
           R = dataTable.getNumberOfRows(),
-          measureMapping = this.model.get("measure"),
-          measureAttrName = measureMapping.attributes.first().name.value,
+          measureAttrName = this.model.measure.attributes.first().name,
           jMeasure = dataTable.model.attributes.get(measureAttrName).ordinal,
           getValue = function(k) {
             var v = dataTable.getValue(k, jMeasure);
@@ -74,7 +73,7 @@ define([
           i;
 
       var value = null, vi;
-      switch(this.model.getv("operation")) {
+      switch(this.model.operation) {
         case "max":
           for(i = 0; i < R; i++)
             if((vi = getValue(i)) != null)

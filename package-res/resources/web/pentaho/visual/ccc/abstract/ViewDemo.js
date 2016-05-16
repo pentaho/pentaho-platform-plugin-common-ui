@@ -23,12 +23,12 @@ define([
           "KeyT": selectionModes.TOGGLE
         };
         var selectionMode = mode[e.code];
-        if(selectionMode) me.model.set("selectionMode", selectionMode);
+        if(selectionMode) me.model.selectionMode = selectionMode;
       }, false);
 
       this.model.on("will:select",  this._onWillSelect.bind(this));
 
-      this.model.set("doExecute",   this._googleSearch.bind(this));
+      this.model.doExecute = this._googleSearch.bind(this);
       this.model.on("will:execute", this._onWillExecute.bind(this));
 
       this.model.on("will:change",  this._onWillChange.bind(this));

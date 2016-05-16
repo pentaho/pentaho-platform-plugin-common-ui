@@ -173,7 +173,7 @@ define([
     //region VizAPI implementation
 
     _render: function() {
-      this._dataTable = this.model.getv("data");
+      this._dataTable = this.model.data;
 
       // Ensure we have a plain data table
       // TODO: with nulls preserved, because of order...
@@ -225,7 +225,7 @@ define([
     /** @inheritdoc */
     _selectionChanged: function(newSelectionFilter) {
       var dataFilter = newSelectionFilter;
-      var selectedItems = dataFilter.apply(this.model.getv("data"));
+      var selectedItems = dataFilter.apply(this.model.data);
 
       // Get information on the axes
       var props = def.query(this._keyAxesIds)
@@ -276,8 +276,8 @@ define([
 
     _doResize: function() {
       if(this._chart) {
-        var width = this.model.getv("width");
-        var height = this.model.getv("height");
+        var width = this.model.width;
+        var height = this.model.height;
         var options = this._chart.options;
         def.set(options, "width", width, "height", height);
 
@@ -298,8 +298,8 @@ define([
       def.set(
         options,
         "canvas", this._element,
-        "height", model.getv("height") || 400,
-        "width", model.getv("width") || 400,
+        "height", model.height || 400,
+        "width", model.width || 400,
         "dimensionGroups", {},
         "dimensions", {},
         "visualRoles", {},
@@ -426,13 +426,13 @@ define([
       var model = this.model;
       var extPoints = options.extensionPoints;
 
-      var value = model.getv("backgroundFill");
+      var value = model.backgroundFill;
       if(value && value !== "none") {
         var fillStyle;
         if(value === "gradient") {
           if(this._hasMultiChartColumns) {
             // Use the first color with half of the saturation
-            var bgColor = pv.color(model.getv("backgroundColor")).rgb();
+            var bgColor = pv.color(model.backgroundColor).rgb();
             bgColor = pv.rgb(
               Math.floor((255 + bgColor.r) / 2),
               Math.floor((255 + bgColor.g) / 2),
@@ -442,52 +442,52 @@ define([
             fillStyle = bgColor;
           } else {
             fillStyle = "linear-gradient(to top, " +
-              model.getv("backgroundColor") + ", " +
-              model.getv("backgroundColorEnd") + ")";
+              model.backgroundColor + ", " +
+              model.backgroundColorEnd + ")";
           }
         } else {
-          fillStyle = model.getv("backgroundColor");
+          fillStyle = model.backgroundColor;
         }
 
         extPoints.base_fillStyle = fillStyle;
       }
 
       //region label
-      value = model.getv("labelColor");
+      value = model.labelColor;
       if(value != null) {
         extPoints.axisLabel_textStyle = extPoints.axisTitleLabel_textStyle = value;
       }
 
-      value = model.getv("labelSize");
+      value = model.labelSize;
       if(value) {
         var labelFont = util.readFontModel(model, "label");
 
         options.axisTitleFont = options.axisFont = labelFont;
 
         if(this._hasMultiChartColumns) {
-          var labelFontFamily = model.getv("labelFontFamily");
+          var labelFontFamily = model.labelFontFamily;
           options.titleFont = (value + 2) + "px " + labelFontFamily;
         }
       }
       //endregion
 
-      options.legend = value = model.getv("showLegend");
+      options.legend = value = model.showLegend;
       if(value) {
-        value = model.getv("legendColor");
+        value = model.legendColor;
         if(value) extPoints.legendLabel_textStyle = value;
 
         // TODO: ignoring white color cause analyzer has no on-off for the legend bg color
         // and always send white. When the chart bg color is active it
         // would not show through the legend.
-        value = model.getv("legendBackgroundColor");
+        value = model.legendBackgroundColor;
         if(value && value.toLowerCase() !== "#ffffff")
           extPoints.legendArea_fillStyle = value;
 
-        value = model.getv("legendPosition");
+        value = model.legendPosition;
         if(value) options.legendPosition = value;
 
 
-        if(model.getv("legendSize"))
+        if(model.legendSize)
           options.legendFont = util.readFontModel(model, "legend");
       }
 
@@ -853,7 +853,7 @@ define([
       options.axisFont = util.defaultFont(options.axisFont, 12);
       options.axisTitleFont = util.defaultFont(options.axisTitleFont, 12);
 
-      if(!model.getv("isInteractive")) {
+      if(!model.isInteractive) {
         options.interactive = false;
       } else {
         if(options.tooltipEnabled) this._configureTooltip();
@@ -879,11 +879,11 @@ define([
           break;
 
         case "continuous":
-          options.colorScaleType = model.getv("pattern") === "gradient" ? "linear" : "discrete";
+          options.colorScaleType = model.pattern === "gradient" ? "linear" : "discrete";
           options.colors = visualColorUtils.buildPalette(
-            model.getv("colorSet"),
-            model.getv("pattern"),
-            model.getv("reverseColors"));
+            model.colorSet,
+            model.pattern,
+            model.reverseColors);
           break;
       }
     },
@@ -1028,7 +1028,7 @@ define([
       var options = this.options,
         model = this.model;
 
-      var trendType = (this._supportsTrends ? model.getv("trendType") : null) || "none";
+      var trendType = (this._supportsTrends ? model.trendType : null) || "none";
       switch(trendType) {
         case "none":
         case "linear":
@@ -1039,13 +1039,13 @@ define([
 
       options.trendType = trendType;
       if(trendType !== "none") {
-        var trendName = model.getv("trendName");
+        var trendName = model.trendName;
         if(!trendName)
           trendName = bundle.get("trend.name." + trendType.toLowerCase(), trendType);
 
         options.trendLabel = trendName;
 
-        var value = model.getv("trendLineWidth");
+        var value = model.trendLineWidth;
         if(value != null) {
           var extPoints = options.extensionPoints;
 
@@ -1119,7 +1119,7 @@ define([
 
     //region LABELS
     _configureLabels: function(options, model) {
-      var valuesAnchor = model.getv("labelsOption"),
+      var valuesAnchor = model.labelsOption,
         valuesVisible = !!valuesAnchor && valuesAnchor !== "none";
 
       options.valuesVisible = valuesVisible;
@@ -1129,13 +1129,13 @@ define([
         options.valuesFont = util.defaultFont(util.readFontModel(model, "label"));
 
         if(this._useLabelColor)
-          options.extensionPoints.label_textStyle = model.getv("labelColor");
+          options.extensionPoints.label_textStyle = model.labelColor;
       }
     },
 
     _configureLabelsAnchor: function(options, model) {
-      var valuesAnchor = model.getv("labelsOption"),
-        simpleCamelCase = /(^\w+)([A-Z])(\w+)/;
+      var valuesAnchor = model.labelsOption,
+          simpleCamelCase = /(^\w+)([A-Z])(\w+)/;
 
       var match = simpleCamelCase.exec(valuesAnchor);
       if(match != null) {
@@ -1165,7 +1165,7 @@ define([
 
       options.smallTitleFont = titleFont;
 
-      var multiChartOverflow = this.model.getv("multiChartOverflow");
+      var multiChartOverflow = this.model.multiChartOverflow;
       if(multiChartOverflow)
         options.multiChartOverflow = multiChartOverflow.toLowerCase();
     },
@@ -1273,7 +1273,7 @@ define([
     },
 
     _updateSelections: function() {
-      this._selectionChanged(this.model.getv("selectionFilter"));
+      this._selectionChanged(this.model.selectionFilter);
       try {
         this._chart.updateSelections();
       } catch(e){

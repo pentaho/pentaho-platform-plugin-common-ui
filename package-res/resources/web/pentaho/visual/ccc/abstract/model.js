@@ -29,7 +29,7 @@ define([
 
   function isApplicableLegend() {
     /*jshint validthis:true*/
-    return this.getv("showLegend");
+    return this.showLegend;
   }
 
   return function(context) {
@@ -63,7 +63,7 @@ define([
             name: "backgroundColor",
             type: colorFactory,
             isApplicable: function() {
-              return this.getv("backgroundFill") !== "none";
+              return this.backgroundFill !== "none";
             },
             isRequired: true
           },
@@ -71,7 +71,7 @@ define([
             name: "backgroundColorEnd",
             type: colorFactory,
             isApplicable: function() {
-              return this.getv("backgroundFill") === "gradient";
+              return this.backgroundFill === "gradient";
             },
             isRequired: true
           },
@@ -152,6 +152,7 @@ define([
       }
       
     })
+    /*jshint sub:true*/
     .implement({type: bundle.structured["abstract"]});
   };
 });

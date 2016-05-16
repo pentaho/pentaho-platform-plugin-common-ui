@@ -52,10 +52,7 @@ define([
 
         props: [
           {name: "name", type: "string", isRequired: true},
-
-          // TODO: discrete domain refinement
-          {name: "aggr", type: "pentaho/visual/role/aggregation", value: "sum"},
-
+          {name: "aggregation", type: "pentaho/visual/role/aggregation", value: "sum"},
           {name: "isReverse", type: "boolean", value: false}
         ]
       }
