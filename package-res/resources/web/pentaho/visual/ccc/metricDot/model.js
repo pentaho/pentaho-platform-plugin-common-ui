@@ -40,42 +40,51 @@ define([
 
           props: [
             {
-              name: "rows",
-              isRequired: true
+              name: "rows", //VISUAL_ROLE
+              type: {
+                base: "pentaho/visual/role/nominal",
+                props: {attributes: {isRequired: true}}
+              }
             },
             {
-              name: "x",
-              type: "string",
-              dataType: "number",
-              isVisualRole: true,
-              isRequired: true
+              name: "x", //VISUAL_ROLE
+              type: {
+                base: "pentaho/visual/role/quantitative",
+                dataType: "number",
+                props: {attributes: {countMin: 1, countMax: 1, isRequired: true}}
+              }
             },
             {
-              name: "y",
-              type: "string",
-              dataType: "number",
-              isVisualRole: true,
-              isRequired: true
+              name: "y", //VISUAL_ROLE
+              type: {
+                base: "pentaho/visual/role/quantitative",
+                dataType: "number",
+                props: {attributes: {countMin: 1, countMax: 1, isRequired: true}}
+              }
             },
             {
-              name: "color",
-              type: ["string"],
-              dataType: "number",
-              isVisualRole: true
+              name: "color", //VISUAL_ROLE
+              type: {
+                base: "pentaho/visual/role/mapping",
+                levels: ["nominal", "quantitative"],
+                props: {attributes: {isRequired: true}}
+              }
               // TODO: countMin depends on whether data props are discrete or continuous...
             },
             {
-              name: "size",
-              type: "string",
-              dataType: "number",
-              isVisualRole: true
+              name: "size", //VISUAL_ROLE
+              type: {
+                base: "pentaho/visual/role/quantitative",
+                dataType: "number",
+                props: {attributes: {countMin: 1, countMax: 1}}
+              }
             },
             {
-              name: "multi",
-              type: ["string"],
-              dataType: "string",
-              isVisualRole: true,
-              isRequired: false
+              name: "multi", //VISUAL_ROLE
+              type: {
+                base: "pentaho/visual/role/nominal",
+                props: {attributes: {isRequired: false}}
+              }
             },
 
             {

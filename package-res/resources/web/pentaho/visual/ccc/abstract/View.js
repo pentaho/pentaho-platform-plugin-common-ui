@@ -320,10 +320,13 @@ define([
       Object.keys(this._roleToCccDimGroup)
           .forEach(function(roleName) {
             if(this[roleName]) {
-              var value = model.getv(roleName);
-              visualMap[roleName] = model.type.get(roleName).isList
+              var role = model[roleName];
+              
+              visualMap[roleName] = role.toArray();
+              
+              /*visualMap[roleName] = model.type.get(roleName).isList
                   ? value.toArray(function(elem) { return elem.value; })
-                  : [value];
+                  : [value];*/
             }
           }, this._roleToCccDimGroup);
 

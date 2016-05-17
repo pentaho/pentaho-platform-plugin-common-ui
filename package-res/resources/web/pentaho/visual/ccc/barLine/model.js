@@ -45,15 +45,19 @@ define([
 
         props: [
           {
-            name: "measures",
-            isRequired: requiredOneMeasure
+            name: "measures", //VISUAL_ROLE
+            type: {
+              //base: "pentaho/visual/role/quantitative",
+              props: {attributes: {isRequired: requiredOneMeasure}}
+            }
           },
           {
-            name: "measuresLine",
-            type: ["string"],
-            dataType: "number",
-            isVisualRole: true,
-            isRequired: requiredOneMeasure
+            name: "measuresLine", //VISUAL_ROLE
+            type: {
+              base: "pentaho/visual/role/quantitative",
+              dataType: "number",
+              props: {attributes: {isRequired: requiredOneMeasure}}
+            }
           },
 
           {

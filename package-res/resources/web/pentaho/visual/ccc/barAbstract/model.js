@@ -32,24 +32,23 @@ define([
 
         props: [
           {
-            name: "columns",
-            type: ["string"],
-            dataType: "string",
-            isVisualRole: true,
-            isRequired: false
+            name: "columns", //VISUAL_ROLE
+            type: {
+              base: "pentaho/visual/role/nominal"
+            }
           },
           {
-            name: "measures",
-            type: ["string"],
-            dataType: "number",
-            isVisualRole: true
+            name: "measures", //VISUAL_ROLE
+            type: {
+              base: "pentaho/visual/role/quantitative",
+              dataType: "number"
+            }
           },
           {
-            name: "multi",
-            type: ["string"],
-            dataType: "string",
-            isVisualRole: true,
-            isRequired: false
+            name: "multi", //VISUAL_ROLE
+            type: {
+              base: "pentaho/visual/role/nominal"
+            }
           }
         ]
       }

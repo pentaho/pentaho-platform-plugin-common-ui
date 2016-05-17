@@ -44,29 +44,34 @@ define([
 
           props: [
             {
-              name: "rows",
-              isRequired: true
+              name: "rows", //VISUAL_ROLE
+              type: {
+                base: "pentaho/visual/role/nominal",
+                props: {attributes: {isRequired: true}}
+              }
             },
             {
-              name: "columns",
-              type: ["string"],
-              dataType: "string",
-              isVisualRole: true,
-              isRequired: false
+              name: "columns", //VISUAL_ROLE
+              type: {
+                base: "pentaho/visual/role/nominal",
+                props: {attributes: {isRequired: false}}
+              }
             },
             {
-              name: "size",
-              type: "string",
-              dataType: "number",
-              isVisualRole: true,
-              isRequired: requiredOneMeasure
+              name: "size", //VISUAL_ROLE
+              type: {
+                base: "pentaho/visual/role/quantitative",
+                dataType: "number",
+                props: {attributes: {countMin: 1, countMax: 1, isRequired: requiredOneMeasure}}
+              }
             },
             {
-              name: "color",
-              type: "string",
-              dataType: "number",
-              isVisualRole: true,
-              isRequired: requiredOneMeasure
+              name: "color", //VISUAL_ROLE
+              type: {
+                base: "pentaho/visual/role/quantitative",
+                dataType: "number",
+                props: {attributes: {countMin: 1, countMax: 1, isRequired: requiredOneMeasure}}
+              }
             },
 
             {

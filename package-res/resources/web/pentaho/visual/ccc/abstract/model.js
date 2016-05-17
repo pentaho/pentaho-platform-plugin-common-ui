@@ -44,11 +44,10 @@ define([
         props: [
           //region Visual Roles
           {
-            name: "rows",
-            type: ["string"],
-            dataType: "string",
-            isVisualRole: true,
-            isRequired: false
+            name: "rows", //VISUAL_ROLE
+            type: {
+              base: "pentaho/visual/role/nominal"
+            }
           },
           //endregion
 

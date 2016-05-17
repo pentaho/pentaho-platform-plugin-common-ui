@@ -39,17 +39,18 @@ define([
 
         props: [
           {
-            name: "size",
-            type: "string",
-            dataType: "number",
-            isVisualRole: true
+            name: "size", //VISUAL_ROLE
+            type: {
+              base: "pentaho/visual/role/quantitative",
+              dataType: "number",
+              props: {attributes: {countMin: 1, countMax: 1}}
+            }
           },
           {
-            name: "multi",
-            type: ["string"],
-            dataType: "string",
-            isVisualRole: true,
-            isRequired: false
+            name: "multi", //VISUAL_ROLE
+            type: {
+              base: "pentaho/visual/role/nominal"
+            }
           },
 
           {
