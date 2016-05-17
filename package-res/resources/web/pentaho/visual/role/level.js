@@ -90,7 +90,7 @@ define([
         },
 
         compare: function(a, b) {
-          return orderedLevels.indexOf(a) - orderedLevels.indexOf(b);
+          return orderedLevels.indexOf(a.valueOf()) - orderedLevels.indexOf(b.valueOf());
         }
       }
     })

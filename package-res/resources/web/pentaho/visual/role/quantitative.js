@@ -22,7 +22,7 @@ define([
 
   return function(context) {
 
-    var Property = context.get("pentaho/visual/role/property");
+    var Mapping = context.get("pentaho/visual/role/mapping");
 
     /**
      * @name pentaho.visual.role.QuantitativeMapping
@@ -37,7 +37,7 @@ define([
      * This visual role mapping type has a [levels]{@link pentaho.visual.role.Mapping.Type#levels}
      * with a single value, `"quantitative"`.
      */
-    var QuantitativeMapping = Property.extend("pentaho.visual.role.QuantitativeMapping", {
+    var QuantitativeMapping = Mapping.extend("pentaho.visual.role.QuantitativeMapping", {
       type: {
         id: module.id,
         levels: ["quantitative"]

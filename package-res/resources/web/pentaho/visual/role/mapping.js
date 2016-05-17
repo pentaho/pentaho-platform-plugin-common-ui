@@ -120,41 +120,94 @@ define([
        * @readOnly
        */
       get levelAuto() {
+        /* Example 1
+         * ---------
+         *
+         * Attributes:          product|nominal, sales|quantitative
+         * Lowest Attrs Level:  nominal
+         *
+         * Role Levels:         ordinal, quantitative
+         *
+         * Upgrade from nominal to ordinal is possible.
+         * Auto Level:    nominal->ordinal
+         *
+         * Example 2
+         * ---------
+         *
+         * Attributes:          quantity|quantitative, sales|quantitative
+         * Lowest Attrs Level:  quantitative
+         *
+         * Role Levels:         ordinal
+         *
+         * Downgrade from quantitative to any qualitative is possible.
+         * Auto Level:    quantitative->ordinal
+         *
+         */
+        var levelLowest = this._getLowestLevelInAttrs();
+        if(!levelLowest) return;
+
+        var roleLevels = this._getRoleLevelsCompatibleWith();
+
+        // Effective Attributes Role is Incompatible with the role's level of measurement?
+        if(!roleLevels.length) return;
+
+        // Get the highest level from roleLevels
+        return roleLevels[roleLevels.length - 1];
+      },
+
+      _getRoleLevelsCompatibleWith: function(attributeLevel) {
+        var isLowestQuant = MeasurementLevel.type.isQuantitative(attributeLevel);
+
+        // if attributeLevel is Quantitative, any role levels are compatible.
+        // if attributeLevel is Qualitative,  **only qualitative** role levels are compatible.
+
+        var roleLevels = this.type.levels.toArray();
+        if(!isLowestQuant) {
+          roleLevels = roleLevels.filter(function(level) {
+            return !MeasurementLevel.type.isQuantitative(level);
+          });
+        }
+
+        return roleLevels.sort(MeasurementLevel.type.compare);
+      },
+
+      /**
+       * Determines the lowest level of measurement of all the data properties
+       * in mapping attributes.
+       *
+       * When no attributes or any attribute is invalid, `undefined` is returned.
+       * The level of measurement compatibility is not considered for validity at this point.
+       *
+       * @return {!pentaho.visual.role.MeasurementLevel|undefined} The lowest level of measurement.
+       */
+      _getLowestLevelInAttrs: function() {
         var mappingAttrs = this.attributes;
         var data, visualModel, L;
         if(!(L = mappingAttrs.count) || !(visualModel = this.owner) || !(data = visualModel.data))
           return;
 
-        // The lowest of the levels in attributes that are also supported by the visual role
-        var levelAuto;
+        // First, find the lowest level of measurement in the mapped attributes.
+        // The lowest of the levels in attributes that are also supported by the visual role.
+        var levelLowest;
 
         var roleDataType = this.type.dataType;
-        var roleLevels = this.type.levels;
         var dataAttrs = data.model.attributes;
-        var dataAttrsLevelsVisited = new ListLevel();
         var i = -1;
         var name, dataAttr, dataAttrLevel, dataAttrType;
         while(++i < L) {
           var mappingAttr = mappingAttrs.at(i);
           if(!(name = mappingAttr.name) ||
-             !(dataAttr = dataAttrs.get(name)) ||
-             !(dataAttrLevel = dataAttr.level) ||
-             !(dataAttrType = context.get(dataAttr.type)) ||
-             !dataAttrType.isSubtypeOf(roleDataType))
+              !(dataAttr = dataAttrs.get(name)) ||
+              !(dataAttrLevel = dataAttr.level) ||
+              !(dataAttrType = context.get(dataAttr.type)) ||
+              !dataAttrType.isSubtypeOf(roleDataType))
             return; // invalid
 
-          if(!dataAttrsLevelsVisited.has(dataAttrLevel) && roleLevels.has(dataAttrLevel)) {
-            dataAttrsLevelsVisited.add(dataAttrLevel);
-
-            if(!levelAuto || MeasurementLevel.type.compare(dataAttrLevel, levelAuto) < 0) {
-              levelAuto = dataAttrLevel;
-            }
-          }
+          if(!levelLowest || MeasurementLevel.type.compare(dataAttrLevel, levelLowest) < 0)
+            levelLowest = dataAttrLevel;
         }
 
-        // levelAuto may be undefined
-        // convert to simple value
-        return levelAuto && MeasurementLevel.type.domain.get(levelAuto);
+        return levelLowest;
       },
 
       /**

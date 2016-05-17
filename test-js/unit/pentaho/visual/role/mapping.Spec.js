@@ -59,7 +59,7 @@ define([
         expect(mapping.levelAuto).toBeUndefined();
       });
 
-      it("when an non-empty mapping is invalid, the auto level is undefined", function() {
+      it("when a non-empty mapping is invalid, the auto level is undefined", function() {
         var InvalidMapping = Mapping.extend( {
           type: {
             levels: ["nominal"],
