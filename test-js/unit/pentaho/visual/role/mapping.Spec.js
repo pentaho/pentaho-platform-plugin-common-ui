@@ -1,28 +1,32 @@
 define([
+  "tests/pentaho/util/errorMatch",
   "pentaho/type/Context",
+  "pentaho/type/complex",
   "pentaho/visual/role/mapping",
-  "pentaho/visual/role/level",
   "pentaho/visual/role/mappingAttribute",
-  "tests/pentaho/util/errorMatch"
-], function( Context, mappingFactory, levelFactory, attributeFactory, errorMatch ) {
+], function(errorMatch, Context, complexFactory, mappingFactory, attributeFactory) {
   "use strict";
 
   describe("pentaho/visual/role", function() {
-    var Mapping, Attribute, context;
+    var Complex, Mapping, Attribute;
 
     beforeEach(function () {
-      context = new Context();
+      var context = new Context();
+      Complex = context.get(complexFactory);
       Mapping = context.get(mappingFactory);
       Attribute = context.get(attributeFactory);
     });
 
     function assertIsValid(complex) {
-      // this way, errors are shown in the console...
       expect(complex.validate()).toBe(null);
     }
 
     function assertIsInvalid(complex) {
       expect(complex.isValid).toBe(false);
+    }
+
+    function getValue( object ) {
+      return object.value;
     }
 
     describe("#levelEffective", function () {
@@ -113,7 +117,7 @@ define([
           var expectedLevels = ["nominal", "ordinal"];
 
           MyMapping.type.levels = expectedLevels;
-          var actualLevels = MyMapping.type.levels.toArray();
+          var actualLevels = MyMapping.type.levels.toArray(getValue);
 
           expect(actualLevels).toEqual(expectedLevels);
         });
@@ -143,7 +147,7 @@ define([
           var baseLevel = "nominal";
 
           // Assumptions
-          var baseLevels = BaseMapping.type.levels.toArray();
+          var baseLevels = BaseMapping.type.levels.toArray(getValue);
           expect(baseLevels).toContain(baseLevel);
           expect(baseLevels).not.toContain(addLevel);
 
@@ -157,7 +161,13 @@ define([
           expect(extendMapping).toThrow(errorMatch.argInvalid("levels"));
         });
 
+        it("set levels is additive", function() {
+          fail();
+        });
+
         it("a visual role definition cannot remove support for a measurement level supported by its ancestors", function () {
+          fail("Test no longer makes sense. Check...");
+          // TODO: This test stopped making sens. Levels are additive
           var baseLevels = ["nominal", "ordinal"];
           var BaseMapping = Mapping.extend( { type: { levels: baseLevels } });
 
@@ -174,7 +184,7 @@ define([
           var BaseMapping = Mapping.extend( { type: { levels: baseLevels }} );
           var DerivedMapping = BaseMapping.extend();
 
-          var derivedLevels = DerivedMapping.type.levels.toArray();
+          var derivedLevels = DerivedMapping.type.levels.toArray(getValue);
 
           expect(derivedLevels).toEqual(baseLevels);
         });
@@ -190,7 +200,7 @@ define([
             var MyMapping = Mapping.extend( { type: { levels: expectedLevels }} );
 
             MyMapping.type.levels = nullyValue;
-            var actualLevels = MyMapping.type.levels.toArray();
+            var actualLevels = MyMapping.type.levels.toArray(getValue);
 
             expect(actualLevels).toEqual(expectedLevels);
           }
@@ -205,7 +215,7 @@ define([
         });
 
         it("when levels is set and the visual role definition already has descendants, an error is thrown.", function () {
-          var BaseMapping = Mapping.extend();
+          var BaseMapping = Mapping.extend({ type: { levels: ["ordinal"] }});
           var DerivedMapping = BaseMapping.extend();
 
           function setLevels() {
@@ -216,19 +226,29 @@ define([
         });
 
         it("the root visual role definition has no measurement levels defined", function () {
-          fail();
+          expect(Mapping.type.levels.count).toEqual(0);
         });
-
 
       });
 
       describe("dataType", function () {
         it("when the dataType is not a subtype of the dataType of the parent visual role definition, then an error is thrown", function () {
-          /* @throws {pentaho.lang.ArgumentInvalidError} When setting to a _value type_ that is not a subtype
-          * of the current _value type_.
-          */
+          var dataTypeA = Complex.extend().type;
+          var dataTypeB = Complex.extend().type;
+
+          var BaseMapping = Mapping.extend({ type: { dataType: dataTypeA }});
+
+          function deriveToNonSubDataType() {
+            BaseMapping.extend( { type: { dataType: dataTypeB }});
+          }
+
+          expect(deriveToNonSubDataType).toThrow(errorMatch.argInvalid("dataType"));
+        });
+
+        it("a dataType can be a subtype of the dataType of the parent visual role definition", function () {
           fail();
         });
+
 
         it("when a visual role definition does not specify the supported dataType, it inherits the one defined in its parent visual role definition", function () {
           fail();
