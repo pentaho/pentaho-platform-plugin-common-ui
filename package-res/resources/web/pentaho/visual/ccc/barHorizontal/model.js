@@ -38,7 +38,6 @@ define([
           {
             name: "measures", //VISUAL_ROLE
             type: {
-              base: "pentaho/visual/role/quantitative",
               props: {attributes: {isRequired: true}}
             }
           },

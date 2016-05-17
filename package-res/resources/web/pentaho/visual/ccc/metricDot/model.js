@@ -42,7 +42,6 @@ define([
             {
               name: "rows", //VISUAL_ROLE
               type: {
-                base: "pentaho/visual/role/nominal",
                 props: {attributes: {isRequired: true}}
               }
             },
@@ -51,7 +50,7 @@ define([
               type: {
                 base: "pentaho/visual/role/quantitative",
                 dataType: "number",
-                props: {attributes: {countMin: 1, countMax: 1, isRequired: true}}
+                props: {attributes: {countMin: 1, countMax: 1}}
               }
             },
             {
@@ -59,34 +58,38 @@ define([
               type: {
                 base: "pentaho/visual/role/quantitative",
                 dataType: "number",
-                props: {attributes: {countMin: 1, countMax: 1, isRequired: true}}
+                props: {attributes: {countMin: 1, countMax: 1}}
               }
             },
             {
+              // Modal visual role
               name: "color", //VISUAL_ROLE
               type: {
                 base: "pentaho/visual/role/mapping",
                 levels: ["nominal", "quantitative"],
-                props: {attributes: {isRequired: true}}
+                props: {
+                  attributes: {
+                    // TODO: countMax depends on whether data props are discrete or continuous...
+                    countMax: function() {
+                      var level = this.levelEffective;
+                      return level && (level.value === "quantitative") ? 1 : null;
+                    }
+                  }
+                }
               }
-              // TODO: countMin depends on whether data props are discrete or continuous...
             },
             {
               name: "size", //VISUAL_ROLE
               type: {
                 base: "pentaho/visual/role/quantitative",
                 dataType: "number",
-                props: {attributes: {countMin: 1, countMax: 1}}
+                props: {attributes: {countMax: 1}}
               }
             },
             {
               name: "multi", //VISUAL_ROLE
-              type: {
-                base: "pentaho/visual/role/nominal",
-                props: {attributes: {isRequired: false}}
-              }
+              type: "pentaho/visual/role/ordinal"
             },
-
             {
               name: "labelsOption",
               type: {

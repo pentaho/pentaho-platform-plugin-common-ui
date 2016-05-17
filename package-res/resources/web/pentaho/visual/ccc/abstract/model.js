@@ -45,9 +45,7 @@ define([
           //region Visual Roles
           {
             name: "rows", //VISUAL_ROLE
-            type: {
-              base: "pentaho/visual/role/nominal"
-            }
+            type: "pentaho/visual/role/ordinal"
           },
           //endregion
 

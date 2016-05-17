@@ -27,7 +27,17 @@ define([
     return CartesianAbstract.extend({
       type: {
         id: "pentaho/visual/ccc/categoricalContinuousAbstract",
-        isAbstract: true
+        isAbstract: true,
+
+        props: [
+          {
+            name: "measures", //VISUAL_ROLE
+            type: {
+              base: "pentaho/visual/role/quantitative",
+              dataType: "number"
+            }
+          }
+        ]
       }
     })
     .implement({type: bundle.structured["categoricalContinuousAbstract"]});

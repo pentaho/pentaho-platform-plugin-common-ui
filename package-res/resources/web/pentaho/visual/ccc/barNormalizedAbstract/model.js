@@ -34,8 +34,6 @@ define([
           {
             name: "measures", //VISUAL_ROLE
             type: {
-              base: "pentaho/visual/role/nominal",
-              //dataType: "number",
               props: {attributes: {isRequired: true}}
             }
           },

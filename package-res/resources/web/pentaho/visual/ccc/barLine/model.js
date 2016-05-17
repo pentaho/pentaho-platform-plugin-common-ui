@@ -31,7 +31,17 @@ define([
 
     function requiredOneMeasure() {
       /*jshint validthis:true*/
-      return !this.count("measures") && !this.count("measuresLine");
+      return !this.measures.attributes.count && !this.measuresLine.attributes.count;
+    }
+
+    function hasAttributesMeasuresLine() {
+      /*jshint validthis:true*/
+      return this.measuresLine.attributes.count > 0;
+    }
+
+    function hasAttributesMeasures() {
+      /*jshint validthis:true*/
+      return this.measuresLine.attributes.count > 0;
     }
 
     return BarAbstract.extend({
@@ -47,7 +57,6 @@ define([
           {
             name: "measures", //VISUAL_ROLE
             type: {
-              //base: "pentaho/visual/role/quantitative",
               props: {attributes: {isRequired: requiredOneMeasure}}
             }
           },
@@ -63,7 +72,7 @@ define([
           {
             name: "lineWidth",
             type: lineWidthFactory,
-            isApplicable: function() { return this.count("measuresLine") > 0; },
+            isApplicable: hasAttributesMeasuresLine,
             isRequired: true,
             value: 1
           },
@@ -73,7 +82,7 @@ define([
               base: labelsOptionFactory,
               domain: ["none", "center", "insideEnd", "insideBase", "outsideEnd"]
             },
-            isApplicable: function() { return this.count("measures") > 0; },
+            isApplicable: hasAttributesMeasures,
             isRequired: true,
             value: "none"
           },
@@ -84,7 +93,7 @@ define([
               base: labelsOptionFactory,
               domain: ["none", "center", "left", "right", "top", "bottom"]
             },
-            isApplicable: function() { return this.count("measuresLine") > 0; },
+            isApplicable: hasAttributesMeasuresLine,
             isRequired: true,
             value: "none"
           },
@@ -94,7 +103,7 @@ define([
             type: shapeFactory,
             isRequired: true,
             value: "circle",
-            isApplicable: function() { return this.count("measuresLine") > 0; }
+            isApplicable: hasAttributesMeasuresLine
           }
         ]
       }

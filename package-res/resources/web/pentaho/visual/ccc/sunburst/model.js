@@ -43,16 +43,13 @@ define([
             type: {
               base: "pentaho/visual/role/quantitative",
               dataType: "number",
-              props: {attributes: {countMin: 1, countMax: 1}}
+              props: {attributes: {countMax: 1}}
             }
           },
           {
             name: "multi", //VISUAL_ROLE
-            type: {
-              base: "pentaho/visual/role/nominal"
-            }
+            type: "pentaho/visual/role/ordinal"
           },
-
           {
             name: "displayUnits",
             type: displayUnitsFactory,
