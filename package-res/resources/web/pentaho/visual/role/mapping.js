@@ -437,7 +437,7 @@ define([
             continue;
           }
 
-          var dataAttrType = context.get(dataAttr.type);
+          var dataAttrType = context.get(dataAttr.type).type;
           if(!dataAttrType.isSubtypeOf(roleDataType)) {
             addErrors(new Error(
                 bundle.format(
