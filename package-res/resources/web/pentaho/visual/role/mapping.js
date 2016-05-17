@@ -141,27 +141,51 @@ define([
          *
          * Downgrade from quantitative to any qualitative is possible.
          * Auto Level:    quantitative->ordinal
-         *
          */
         var levelLowest = this._getLowestLevelInAttrs();
-        if(!levelLowest) return;
-
-        var roleLevels = this._getRoleLevelsCompatibleWith();
-
-        // Effective Attributes Role is Incompatible with the role's level of measurement?
-        if(!roleLevels.length) return;
-
-        // Get the highest level from roleLevels
-        return roleLevels[roleLevels.length - 1];
+        if(levelLowest) return this._getRoleLevelCompatibleWith(levelLowest);
       },
 
-      _getRoleLevelsCompatibleWith: function(attributeLevel) {
+      /**
+       * Determines the highest role level of measurement that is compatible
+       * with a given data property level of measurement, if any.
+       *
+       * @param {pentaho.visual.role.MeasurementLevel} attributeLevel - The level of measurement of the data property.
+       * @param {pentaho.visual.role.MeasurementLevel[]} [allRoleLevels] - The role's levels of measurement.
+       * Defaults to the visual role's levels.
+       *
+       * @return {pentaho.visual.role.MeasurementLevel|undefined} The highest role level of measurement or
+       * `undefined` if none.
+       * @private
+       */
+      _getRoleLevelCompatibleWith: function(attributeLevel, allRoleLevels) {
+        var roleLevels = this._getRoleLevelsCompatibleWith(attributeLevel, allRoleLevels);
+
+        // Attribute Role is Compatible with the role's level of measurements?
+        // If so, get the highest level from roleLevels.
+        if(roleLevels.length)
+          return roleLevels[roleLevels.length - 1];
+      },
+
+      /**
+       * Chooses from `allRoleLevels` the levels of measurement that are compatible
+       * with a given data property level of measurement.
+       *
+       * @param {pentaho.visual.role.MeasurementLevel} attributeLevel - The level of measurement of the data property.
+       * @param {pentaho.visual.role.MeasurementLevel[]} [allRoleLevels] - The role's levels of measurement.
+       * Defaults to the visual role's levels.
+       *
+       * @return {pentaho.visual.role.MeasurementLevel|undefined} The highest role level of measurement or
+       * `undefined` if none.
+       * @private
+       */
+      _getRoleLevelsCompatibleWith: function(attributeLevel, allRoleLevels) {
         var isLowestQuant = MeasurementLevel.type.isQuantitative(attributeLevel);
 
         // if attributeLevel is Quantitative, any role levels are compatible.
         // if attributeLevel is Qualitative,  **only qualitative** role levels are compatible.
 
-        var roleLevels = this.type.levels.toArray();
+        var roleLevels = allRoleLevels || this.type.levels.toArray();
         if(!isLowestQuant) {
           roleLevels = roleLevels.filter(function(level) {
             return !MeasurementLevel.type.isQuantitative(level);
@@ -180,6 +204,7 @@ define([
        * The level of measurement compatibility is not considered for validity at this point.
        *
        * @return {!pentaho.visual.role.MeasurementLevel|undefined} The lowest level of measurement.
+       * @private
        */
       _getLowestLevelInAttrs: function() {
         var mappingAttrs = this.attributes;
@@ -210,9 +235,6 @@ define([
 
         return levelLowest;
       },
-
-      // TODO: compatible level
-      // TODO: #level when not null is one of possible levels
 
       /**
        * Determines if this visual role mapping is valid.
@@ -253,7 +275,11 @@ define([
           if(!this.owner || !this.ownerProperty) {
             addErrors(new Error(bundle.structured.errors.mapping.noOwnerVisualModel));
           } else {
+            // Data props are defined in data and of a type compatible with the role's dataType.
             this._validateDataProps(addErrors);
+
+            // Validate level is one of the visual role's levels.
+            this._validateLevel(addErrors);
 
             // Duplicate mapped attributes.
             // Only possible to validate when the rest of the stuff is valid.
@@ -265,8 +291,58 @@ define([
       },
 
       /**
+       * Validates the level attribute and that the levels of attributes are compatible with
+       * the visual role's levels.
+       *
+       * @param {function} addErrors - Called to add errors.
+       * @private
+       */
+      _validateLevel: function(addErrors) {
+        var allRoleLevels = this.type.levels;
+        var level = this.level;
+        var roleLevels = null; // defaults to all role levels
+        if(level) {
+          // Fixed level.
+          // Must be one of the role's levels.
+          if(!allRoleLevels.has(level.key)) {
+            addErrors(new Error(bundle.format(
+                bundle.structured.errors.mapping.levelIsNotOneOfRoleLevels,
+                {
+                  role: this.ownerProperty,
+                  level: level,
+                  roleLevels: ("'" + allRoleLevels.toArray().join("', '") + "'")
+                })));
+            return;
+          }
+
+          roleLevels = [level];
+        } else {
+          // Auto level.
+          // Check there is a possible auto-level.
+          roleLevels = allRoleLevels.toArray();
+        }
+
+        // Data Attributes, if any, must be compatible with level.
+        var dataAttrLevel = this._getLowestLevelInAttrs();
+        if(dataAttrLevel) {
+          var roleLevel = this._getRoleLevelCompatibleWith(dataAttrLevel, roleLevels);
+          if(!roleLevel) {
+            addErrors(new Error(
+                bundle.format(
+                    bundle.structured.errors.mapping.attributesLevelNotCompatibleWithRoleLevels,
+                    {
+                      role: this.ownerProperty,
+                      // Try to provide a label for dataAttrLevel.
+                      dataLevel: MeasurementLevel.type.domain.get(dataAttrLevel) || dataAttrLevel,
+                      roleLevels: ("'" + allRoleLevels.toArray().join("', '") + "'")
+                    })));
+          }
+        }
+      },
+
+      /**
        * Validates that every mapped attribute references a defined data property in the
-       * data of the visual model and that this attribute is compatible with the visual role.
+       * data of the visual model and that its type is compatible with the visual role's dataType.
        *
        * @param {function} addErrors - Called to add errors.
        * @private
@@ -276,7 +352,6 @@ define([
         var dataAttrs = data && data.model.attributes;
 
         var roleDataType = this.type.dataType;
-        var roleLevels = this.type.levels;
         var rolePropType = this.ownerProperty;
 
         var i = -1;
@@ -295,7 +370,10 @@ define([
             addErrors(new Error(
                 bundle.format(
                     bundle.structured.errors.mapping.attributeIsNotDefinedInVisualModelData,
-                    [name, rolePropType])));
+                    {
+                      name: name,
+                      role: rolePropType
+                    })));
             continue;
           }
 
@@ -304,21 +382,12 @@ define([
             addErrors(new Error(
                 bundle.format(
                     bundle.structured.errors.mapping.attributeDataTypeNotSubtypeOfRoleType,
-                    [name, dataAttrType, rolePropType, roleDataType])));
-          }
-
-          var dataAttrLevel = dataAttr.level;
-          if(!roleLevels.has(dataAttrLevel)) {
-            addErrors(new Error(
-                bundle.format(
-                    bundle.structured.errors.mapping.attributeLevelNotOneOfRoleLevels,
-                    [
-                      name,
-                      // Try to provide a label for dataAttrLevel
-                      MeasurementLevel.type.domain.get(dataAttrLevel) || dataAttrLevel,
-                      rolePropType,
-                      ("'" + roleLevels.toArray().join("', '") + "'")
-                    ])));
+                    {
+                      name: name,
+                      dataType: dataAttrType,
+                      role: rolePropType,
+                      roleDataType: roleDataType
+                    })));
           }
         }
       },
@@ -355,12 +424,19 @@ define([
             if(isQuant) {
               message = bundle.format(
                   bundle.structured.errors.mapping.attributeAndAggregationDuplicate,
-                  [dataAttr, roleAttr.get("aggregation"), rolePropType]);
+                  {
+                    name: dataAttr,
+                    aggregation: roleAttr.get("aggregation"),
+                    role: rolePropType
+                  });
 
             } else {
               message = bundle.format(
                   bundle.structured.errors.mapping.attributeDuplicate,
-                  [dataAttr, rolePropType]);
+                  {
+                    name: dataAttr,
+                    role: rolePropType
+                  });
             }
 
             addErrors(new Error(message));
@@ -373,6 +449,8 @@ define([
 
       type: /** @lends pentaho.visual.role.Mapping.Type# */{
         id: module.id,
+
+        isAbstract: true,
 
         props: [
           /**
