@@ -445,8 +445,8 @@ define([
          * [subtypes]{@link pentaho.type.Type#hasDescendants}.
          *
          * @throws {pentaho.lang.ArgumentInvalidError} When adding a measurement level that is
-         * qualitative and the visual role's [data type]{@link pentaho.visual.role.Mapping#dataType}
-         * is inherently quantitative.
+         * quantitative and the visual role's [data type]{@link pentaho.visual.role.Mapping#dataType}
+         * is inherently qualitative.
          */
         get levels() {
           return this._levels;
@@ -470,14 +470,16 @@ define([
             // thus performing parsing for us...
             var addLevels = new ListLevel(values);
 
-            // A qualitative measurement level cannot be added if data type is quantitative.
-            if(isDataTypeQuantitative(this.dataType)) {
+            // A quantitative measurement level cannot be added if data type is qualitative.
+            var dataType = this.dataType;
+            if(!dataType.isAbstract && !isDataTypeQuantitative(dataType)) {
               addLevels.each(function(addLevel) {
-                if(!levels.has(addLevel.key) && MeasurementLevel.type.isQualitative(addLevel)) {
+                // New level and quantitative?
+                if(!levels.has(addLevel.key) && MeasurementLevel.type.isQuantitative(addLevel)) {
                   throw error.argInvalid("levels",
                       bundle.format(
-                          bundle.structured.errors.mapping.roleLevelIncompatibleWithDataType,
-                          [addLevel, this.dataType]));
+                          bundle.structured.errors.mapping.dataTypeIncompatibleWithRoleLevel,
+                          [this.dataType, addLevel]));
                 }
               }, this);
             }
@@ -552,7 +554,7 @@ define([
          * of the current _value type_.
          *
          * @throws {pentaho.lang.ArgumentInvalidError} When setting to a _value type_ which is inherently
-         * quantitative and the visual role supports qualitative measurement
+         * qualitative and the visual role supports quantitative measurement
          * [levels]{@link pentaho.visual.role.Mapping#levels}.
          */
         get dataType() {
@@ -570,18 +572,18 @@ define([
           if(newType !== oldType) {
             // Hierarchy/PreviousValue consistency
             if(oldType && !newType.isSubtypeOf(oldType))
-              throw error.argInvalid("type", bundle.structured.errors.mapping.dataTypeNotSubtypeOfBaseType);
+              throw error.argInvalid("dataType", bundle.structured.errors.mapping.dataTypeNotSubtypeOfBaseType);
 
             // Is the new data type incompatible with existing measurement levels?
-            if(isDataTypeQuantitative(newType)) {
+            if(!isDataTypeQuantitative(newType)) {
               // Is there a qualitative measurement level?
               this.levels.each(function(level) {
-                if(MeasurementLevel.type.isQualitative(level))
+                if(!MeasurementLevel.type.isQualitative(level))
                   throw error.argInvalid("dataType",
                       bundle.format(
                         bundle.structured.errors.mapping.dataTypeIncompatibleWithRoleLevel,
                         [this.dataType, level]));
-              });
+              }, this);
             }
 
             this._dataType = newType;

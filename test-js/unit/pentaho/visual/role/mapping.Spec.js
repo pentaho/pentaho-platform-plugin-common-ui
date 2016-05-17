@@ -112,7 +112,7 @@ define([
 
     describe(".Type", function () {
 
-      fdescribe("#levels", function () {
+      describe("#levels", function () {
         it("set levels are set", function() {
           var MyMapping = Mapping.extend();
 
@@ -142,21 +142,28 @@ define([
           expect(ExtendedMapping.type.levels.toArray(getValue)).toEqual(extendedLevels);
         });
 
-        it("when a visual role definition adds support for a measurement level that is not contained in the set implicitly defined by the dataType, then an error is thrown", function () {
-          var BaseMapping = Mapping.extend( { type: { dataType: "string" } });
-          var addLevel = "ordinal";
-          var baseLevel = "nominal";
+        it("should throw when adding a measurement level that is quantitative and " +
+           "the visual role's dataType is inherently qualitative", function() {
 
-          // Assumptions
-          var baseLevels = BaseMapping.type.levels.toArray(getValue);
-          expect(baseLevels).toContain(baseLevel);
-          expect(baseLevels).not.toContain(addLevel);
+          var baseLevels = ["nominal"];
+          var BaseMapping = Mapping.extend({
+            type: {
+              levels:   baseLevels,
+              dataType: "string"
+            }
+          });
+
+          var addLevel = "quantitative";
 
           // Test
-          var extendedLevels = baseLevels.slice(0);
-          extendedLevels.push(addLevel);
+          var extendedLevels = baseLevels.concat(addLevel);
+
           function extendMapping() {
-            BaseMapping.extend( { type: { levels: extendedLevels } } );
+            BaseMapping.extend({
+              type: {
+                levels: extendedLevels
+              }
+            });
           }
 
           expect(extendMapping).toThrow(errorMatch.argInvalid("levels"));
@@ -237,10 +244,10 @@ define([
           var dataTypeA = Complex.extend().type;
           var dataTypeB = Complex.extend().type;
 
-          var BaseMapping = Mapping.extend({ type: { dataType: dataTypeA }});
+          var BaseMapping = Mapping.extend({type: {dataType: dataTypeA}});
 
           function deriveToNonSubDataType() {
-            BaseMapping.extend( { type: { dataType: dataTypeB }});
+            BaseMapping.extend( {type: {dataType: dataTypeB}});
           }
 
           expect(deriveToNonSubDataType).toThrow(errorMatch.argInvalid("dataType"));
@@ -285,6 +292,19 @@ define([
 
         it("when the dataType removes support of a measurement level supported by the visual role definition ancestors, then an error is thrown", function () {
           fail();
+        });
+
+        it("should throw when setting a data type that is inherently qualitative and " +
+            "one of the measurement levels is quantitative", function() {
+
+          var BaseMapping = Mapping.extend({type: {levels: ["quantitative"]}});
+
+          // Test
+          function extendMapping() {
+            BaseMapping.extend({type: {dataType: "string"}});
+          }
+
+          expect(extendMapping).toThrow(errorMatch.argInvalid("dataType"));
         });
 
       });
