@@ -1042,7 +1042,7 @@ define([
       _assertSubtype: function(subtype) {
         if(!subtype.isSubtypeOf(this)) {
           throw error.operInvalid(
-              bundle.format(bundle.structured.errors.instance.notOfExpectedBaseType, [this._getErrorLabel()]));
+              bundle.format(bundle.structured.errors.instance.notOfExpectedBaseType, [this]));
         }
 
         return subtype;
@@ -1057,18 +1057,7 @@ define([
        */
       _throwAbstractType: function() {
         throw error.operInvalid(bundle.format(
-            bundle.structured.errors.instance.cannotCreateInstanceOfAbstractType, [this._getErrorLabel()]));
-      },
-
-      /**
-       * Gets a label suitable to identify this type in an error message.
-       *
-       * @return {string} An error label.
-       *
-       * @private
-       */
-      _getErrorLabel: function() {
-        return this.id || this.label; // Never empty;
+            bundle.structured.errors.instance.cannotCreateInstanceOfAbstractType, [this]));
       },
       //endregion
 
@@ -1309,8 +1298,17 @@ define([
        */
       toRefInContext: function(keyArgs) {
         return this.shortId || SpecificationContext.current.getIdOf(this) || this.toSpecInContext(keyArgs);
-      }
+      },
       //endregion
+
+      /**
+       * Returns a textual representation suitable to identify this type in an error message.
+       *
+       * @return {string} A textual representation.
+       */
+      toString: function() {
+        return this.id || this.label; // Never empty;
+      }
     }, /** @lends pentaho.type.Type */{
 
       //@override

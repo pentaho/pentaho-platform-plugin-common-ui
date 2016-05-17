@@ -134,7 +134,7 @@ define([
           return ActionResult.reject(e);
         }
 
-        return this.selectionFilter = newSelectionFilter; //setting to null assigns the default value
+        return this.set("selectionFilter", newSelectionFilter); //setting to null assigns the default value
       },
 
       /**

@@ -22,10 +22,11 @@ define([
   "pentaho/type/list",
   "pentaho/type/number",
   "pentaho/type/date",
+  "pentaho/type/valueHelper",
   "pentaho/util/object",
   "pentaho/util/error"
 ], function(module, bundle, mappingAttributeFactory, measurementLevelFactory,
-    valueFactory, listFactory, numberFactory, dateFactory, O, error) {
+    valueFactory, listFactory, numberFactory, dateFactory, valueHelper, O, error) {
 
   "use strict";
 
@@ -119,8 +120,6 @@ define([
        * @readOnly
        */
       get levelAuto() {
-        // TODO: levelAuto can only be determined by accessing the visual model...
-        // TODO: dependent on DataTable object model
         var mappingAttrs = this.attributes;
         var data, visualModel, L;
         if(!(L = mappingAttrs.count) || !(visualModel = this.owner) || !(data = visualModel.data))
@@ -153,8 +152,166 @@ define([
           }
         }
 
-        // may be undefined
-        return levelAuto;
+        // levelAuto may be undefined
+        // convert to simple value
+        return levelAuto && MeasurementLevel.type.domain.get(levelAuto);
+      },
+
+      /**
+       * Determines if this visual role mapping is valid.
+       *
+       * Validity is determined as follows:
+       *
+       * 1. if the mapping has no owner visual model it is invalid
+       * 2. if the visual model has a `null` [data]{@link pentaho.visual.base.Model#data},
+       *    then every data property in [attributes]{@link pentaho.visual.role.Mapping#attributes} is
+       *    considered undefined.
+       * 2. otherwise, if the visual model has a non-`null` [data]{@link pentaho.visual.base.Model#data},
+       *    then each data property in [attributes]{@link pentaho.visual.role.Mapping#attributes}:
+       *   1. must be defined in `data`
+       *   2. must be compatible with the visual role, in terms of data type and measurement level
+       * 3. the number of mapped [attributes]{@link pentaho.visual.role.Mapping#attributes} must satisfy
+       *    the usual property cardinality constraints,
+       *    like [isRequired]{@link pentaho.type.Property.Type#isRequired},
+       *    [countMin]{@link pentaho.type.Property.Type#countMin} and
+       *    [countMax]{@link pentaho.type.Property.Type#countMax}.
+       * 4. mapped attributes must not be duplicates:
+       *   1. if the mapping has a quantitative [levelEffective]{@link pentaho.visual.role.Mapping#levelEffective},
+       *      then there can be no two mapping attributes with the same
+       *      [name]{@link pentaho.visual.role.MappingAttribute#name} and
+       *      [aggregation]{@link pentaho.visual.role.MappingAttribute#aggregation}.
+       *   2. otherwise, there can be no two mapping attributes with the same
+       *      [name]{@link pentaho.visual.role.MappingAttribute#name}
+       *
+       * @return {?Array.<pentaho.type.ValidationError>} A non-empty array of `ValidationError` or `null`.
+       */
+      validate: function() {
+        var errors = this.base();
+        if(!errors) {
+          var addErrors = function(newErrors) {
+            errors = valueHelper.combineErrors(errors, newErrors);
+          };
+
+          // No visual model or visual role property?
+          if(!this.owner || !this.ownerProperty) {
+            addErrors(new Error(bundle.structured.errors.mapping.noOwnerVisualModel));
+          } else {
+            this._validateDataProps(addErrors);
+
+            // Duplicate mapped attributes.
+            // Only possible to validate when the rest of the stuff is valid.
+            if(!errors) this._validateDuplMappingAttrs(addErrors);
+          }
+        }
+
+        return errors;
+      },
+
+      /**
+       * Validates that every mapped attribute references a defined data property in the
+       * data of the visual model and that this attribute is compatible with the visual role.
+       *
+       * @param {function} addErrors - Called to add errors.
+       * @private
+       */
+      _validateDataProps: function(addErrors) {
+        var data = this.owner.data;
+        var dataAttrs = data && data.model.attributes;
+
+        var roleDataType = this.type.dataType;
+        var roleLevels = this.type.levels;
+        var rolePropType = this.ownerProperty;
+
+        var i = -1;
+        var roleAttrs = this.attributes;
+        var L = roleAttrs.count;
+        while(++i < L) {
+          var roleAttr = roleAttrs.at(i);
+          var name = roleAttr.name;
+
+          // Invalid attribute mapping? Not our concern.
+          if(!name) continue;
+
+          // Attribute with no definition?
+          var dataAttr = dataAttrs && dataAttrs.get(name);
+          if(!dataAttr) {
+            addErrors(new Error(
+                bundle.format(
+                    bundle.structured.errors.mapping.attributeIsNotDefinedInVisualModelData,
+                    [name, rolePropType])));
+            continue;
+          }
+
+          var dataAttrType = context.get(dataAttr.type);
+          if(!dataAttrType.isSubtypeOf(roleDataType)) {
+            addErrors(new Error(
+                bundle.format(
+                    bundle.structured.errors.mapping.attributeDataTypeNotSubtypeOfRoleType,
+                    [name, dataAttrType, rolePropType, roleDataType])));
+          }
+
+          var dataAttrLevel = dataAttr.level;
+          if(!roleLevels.has(dataAttrLevel)) {
+            addErrors(new Error(
+                bundle.format(
+                    bundle.structured.errors.mapping.attributeLevelNotOneOfRoleLevels,
+                    [
+                      name,
+                      // Try to provide a label for dataAttrLevel
+                      MeasurementLevel.type.domain.get(dataAttrLevel) || dataAttrLevel,
+                      rolePropType,
+                      ("'" + roleLevels.toArray().join("', '") + "'")
+                    ])));
+          }
+        }
+      },
+
+      /**
+       * Validates that mapped attributes are not duplicates.
+       *
+       * @param {function} addErrors - Called to add errors.
+       * @private
+       */
+      _validateDuplMappingAttrs: function(addErrors) {
+        var levelEffective = this.levelEffective;
+        if(!levelEffective) return;
+
+        var roleAttrs = this.attributes;
+        var L = roleAttrs.count;
+        if(L <= 1) return;
+
+        var rolePropType = this.ownerProperty;
+        var data = this.owner.data;
+        var dataAttrs = data && data.model.attributes;
+
+        var isQuant = MeasurementLevel.type.isQuantitative(levelEffective);
+        var keyFun = isQuant ? mappingAttrQuantitativeKey : mappingAttrQualitativeKey;
+
+        var byKey = {};
+        var i = -1;
+        while(++i < L) {
+          var roleAttr = roleAttrs.at(i);
+          var key = keyFun(roleAttr);
+          if(O.hasOwn(byKey, key)) {
+            var dataAttr = dataAttrs.get(roleAttr.name);
+            var message;
+            if(isQuant) {
+              message = bundle.format(
+                  bundle.structured.errors.mapping.attributeAndAggregationDuplicate,
+                  [dataAttr, roleAttr.get("aggregation"), rolePropType]);
+
+            } else {
+              message = bundle.format(
+                  bundle.structured.errors.mapping.attributeDuplicate,
+                  [dataAttr, rolePropType]);
+            }
+
+            addErrors(new Error(message));
+            continue;
+          }
+
+          byKey[key] = roleAttr;
+        }
       },
 
       type: /** @lends pentaho.visual.role.Mapping.Type# */{
@@ -240,7 +397,7 @@ define([
 
         set levels(values) {
           if(this.hasDescendants)
-            throw error.operInvalid("Cannot change the 'levels' attribute of a Mapping that has descendants.");
+            throw error.operInvalid(bundle.structured.errors.mapping.levelsLockedWhenTypeHasDescendants);
 
           // Don't let change the root mapping type.
           // Cannot clear (monotonicity).
@@ -261,10 +418,9 @@ define([
               addLevels.each(function(addLevel) {
                 if(!levels.has(addLevel.key) && MeasurementLevel.type.isQualitative(addLevel)) {
                   throw error.argInvalid("levels",
-                      "Measurement level '" + addLevel +
-                      "' is not compatible with a visual role having a quantitative data type, '" +
-                      this.dataType._getErrorLabel() +
-                      "'.");
+                      bundle.format(
+                          bundle.structured.errors.mapping.roleLevelIncompatibleWithDataType,
+                          [addLevel, this.dataType]));
                 }
               }, this);
             }
@@ -347,7 +503,7 @@ define([
 
         set dataType(value) {
           if(this.hasDescendants)
-            throw error.operInvalid("Cannot change the 'dataType' attribute of a Mapping that has descendants.");
+            throw error.operInvalid(bundle.structured.errors.mapping.dataTypeLockedWhenTypeHasDescendants);
 
           if(value == null) return;
 
@@ -364,8 +520,9 @@ define([
               this.levels.each(function(level) {
                 if(MeasurementLevel.type.isQualitative(level))
                   throw error.argInvalid("dataType",
-                      "Quantitative data type '" + this.dataType._getErrorLabel() + "' is not compatible " +
-                      "with qualitative measurement level '" + level + "'.");
+                      bundle.format(
+                        bundle.structured.errors.mapping.dataTypeIncompatibleWithRoleLevel,
+                        [this.dataType, level]));
               });
             }
 
@@ -383,6 +540,14 @@ define([
 
     function isDataTypeQuantitative(dataType) {
       return dataType.isSubtypeOf(PentahoNumber.type) || dataType.isSubtypeOf(PentahoDate.type);
+    }
+
+    function mappingAttrQuantitativeKey(roleAttr) {
+      return roleAttr.name + "|" + roleAttr.aggregation;
+    }
+
+    function mappingAttrQualitativeKey(roleAttr) {
+      return roleAttr.name;
     }
   };
 });

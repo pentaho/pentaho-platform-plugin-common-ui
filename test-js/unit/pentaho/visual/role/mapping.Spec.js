@@ -8,20 +8,21 @@ define([
   "use strict";
 
   describe("pentaho/visual/role", function() {
-    var Mapping, Attribute;
-    var context = new Context();
+    var Mapping, Attribute, context;
 
     beforeEach(function () {
+      context = new Context();
       Mapping = context.get(mappingFactory);
       Attribute = context.get(attributeFactory);
     });
 
     function assertIsValid(complex) {
-      expect(complex.validate()).toBeNull();
+      // this way, errors are shown in the console...
+      expect(complex.validate()).toBe(null);
     }
 
     function assertIsInvalid(complex) {
-      expect(complex.validate().length).toBeGreaterThan(0);
+      expect(complex.isValid).toBe(false);
     }
 
     describe("#levelEffective", function () {
