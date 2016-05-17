@@ -156,11 +156,9 @@ define([
 
       describe("#levels", function () {
         it("are set when set", function() {
-          var MyMapping = Mapping.extend();
-
           var expectedLevels = ["nominal", "ordinal"];
+          var MyMapping = Mapping.extend({type: {levels: expectedLevels}});
 
-          MyMapping.type.levels = expectedLevels;
           var actualLevels = MyMapping.type.levels.toArray(getValue);
 
           expect(actualLevels).toEqual(expectedLevels);
@@ -171,7 +169,15 @@ define([
             Mapping.extend( { type: { levels: [] } });
           }
 
-          expect(defineEmptyLevelsMapping).toThrow(errorMatch.argInvalid("levels"));
+          expect(defineEmptyLevelsMapping).toThrow(errorMatch.argRequired("levels"));
+        });
+
+        it("should not throw when an abstract mapping does not support any measurement level", function () {
+          function defineAbstractEmptyLevelsMapping() {
+            Mapping.extend({type: {isAbstract: true}});
+          }
+
+          expect(defineAbstractEmptyLevelsMapping).not.toThrow(errorMatch.argRequired("levels"));
         });
 
         it("a visual role definition can add support for new measurement levels", function () {
@@ -348,7 +354,7 @@ define([
         });
 
         it("should throw when dataType is set and the visual role definition already has descendants", function () {
-          var BaseMapping = Mapping.extend({ type: { levels: ["nominal", "ordinal"] }});
+          var BaseMapping = Mapping.extend({type: {levels: ["nominal", "ordinal"]}});
           var DerivedMapping = BaseMapping.extend();
 
           function setDataType() {
@@ -366,13 +372,12 @@ define([
           fail();
         });
 
-        it("is pentaho.type.Value for the root visual role definition", function () {
+        it("should be pentaho.type.Value for the root visual role definition", function () {
           expect(Mapping.type.dataType).toBe(Value.type);
         });
 
         it("should throw when setting a data type that is inherently qualitative and " +
             "one of the measurement levels is quantitative", function() {
-
           var BaseMapping = Mapping.extend({type: {levels: ["quantitative"]}});
 
           // Test

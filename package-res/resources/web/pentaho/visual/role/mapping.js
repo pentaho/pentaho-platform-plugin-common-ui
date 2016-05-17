@@ -99,12 +99,12 @@ define([
       },
 
       /**
-       * Sets the complex that owns this list value.
+       * Sets the visual model that owns this mapping.
        *
        * Ownership cannot change.
        *
        * @param {!pentaho.type.Complex} owner - The owner complex value.
-       * @param {!pentaho.type.Property} propType - The property type of `owner` whose value is this instance.
+       * @param {!pentaho.type.Property.Type} propType - The property type of `owner` whose value is this instance.
        *
        * @throws {TypeError} When called with argument values that are different from those of the first call.
        *
@@ -120,7 +120,7 @@ define([
       },
 
       /**
-       * The complex value that owns this list value.
+       * The visual model that owns this mapping.
        *
        * @type {pentaho.type.Complex}
        *
@@ -543,6 +543,14 @@ define([
            */
           {name: "attributes", type: [mappingAttributeFactory]}
         ],
+
+        _postInit: function(spec, keyArgs) {
+
+          this.base(spec, keyArgs);
+
+          if(!this.isAbstract && !this.levels.count)
+            throw error.argRequired("levels", bundle.structured.errors.mapping.noLevelsInNonAbstract);
+        },
 
         //region levels
         _levels: new ListLevel(),

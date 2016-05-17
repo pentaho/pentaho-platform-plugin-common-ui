@@ -107,7 +107,7 @@ define([
        * Ownership cannot change.
        *
        * @param {!pentaho.type.Complex} owner - The owner complex value.
-       * @param {!pentaho.type.Property} propType - The property type of `owner` whose value is this instance.
+       * @param {!pentaho.type.Property.Type} propType - The property type of `owner` whose value is this instance.
        *
        * @throws {TypeError} When called with argument values that are different from those of the first call.
        *
