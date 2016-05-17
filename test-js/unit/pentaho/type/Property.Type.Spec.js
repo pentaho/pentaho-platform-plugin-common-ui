@@ -2100,6 +2100,27 @@ define([
             propType.type = PentahoNumber;
           }).toThrow(errorMatch.argInvalid("type"));
         });
+
+        it("should allow deriving the base property type without specifying it", function() {
+          var Derived = Complex.extend({
+            type: {
+              props: [
+                {name: "postalCode", type: PentahoString}
+              ]
+            }
+          });
+
+          var Derived2 = Derived.extend({
+            type: {
+              props: [
+                {name: "postalCode", type: {}}
+              ]
+            }
+          });
+
+          var propType = Derived2.type.get("postalCode");
+          expect(propType.type.isSubtypeOf(PentahoString.type)).toBe(true);
+        });
       });
 
       // Cannot change if has descendants.

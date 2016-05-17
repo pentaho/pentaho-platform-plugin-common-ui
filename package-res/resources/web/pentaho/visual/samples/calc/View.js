@@ -64,7 +64,7 @@ define([
     _calculate: function() {
       var dataTable = this.model.getv("data"),
           R = dataTable.getNumberOfRows(),
-          measureAttrName = this.model.measure.attributes.first().name,
+          measureAttrName = this.model.measure.attributes.at(0).name,
           jMeasure = dataTable.model.attributes.get(measureAttrName).ordinal,
           getValue = function(k) {
             var v = dataTable.getValue(k, jMeasure);

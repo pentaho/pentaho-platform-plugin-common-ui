@@ -244,6 +244,9 @@ define([
      * });
      *
      * @param {!pentaho.type.spec.UTypeReference} typeRef A type reference.
+     * @param {Object} [keyArgs] The keyword arguments.
+     * @param {pentaho.type.spec.UTypeReference} [keyArgs.defaultBase] The default base type
+     * of `typeRef` when it is an immediate generic object specification.
      *
      * @return {!Class.<pentaho.type.Instance>} The instance constructor.
      *
@@ -270,8 +273,8 @@ define([
      * @throws {pentaho.lang.ArgumentInvalidError} When `typeRef` is, or contains, an array-shorthand,
      * list type specification that has more than one child element type specification.
      */
-    get: function(typeRef) {
-      return this._get(typeRef, true);
+    get: function(typeRef, keyArgs) {
+      return this._get(typeRef, O.getOwn(keyArgs, "defaultBase"), true);
     },
 
     /**
@@ -310,6 +313,9 @@ define([
      * });
      *
      * @param {!pentaho.type.spec.UTypeReference} typeRef A type reference.
+     * @param {Object} [keyArgs] The keyword arguments.
+     * @param {pentaho.type.spec.UTypeReference} [keyArgs.defaultBase] The default base type
+     * of `typeRef` when it is an immediate generic object specification.
      *
      * @return {!Promise.<!Class.<pentaho.type.Instance>>} A promise for the instance constructor.
      *
@@ -335,9 +341,9 @@ define([
      *
      * @rejects {Error} When any other, unexpected error occurs.
      */
-    getAsync: function(typeRef) {
+    getAsync: function(typeRef, keyArgs) {
       try {
-        return this._get(typeRef, false);
+        return this._get(typeRef, O.getOwn(keyArgs, "defaultBase"), false);
       } catch(ex) {
         /* istanbul ignore next : really hard to test safeguard */
         return Promise.reject(ex);
@@ -425,7 +431,7 @@ define([
      *
      * @private
      */
-    _get: function(typeRef, sync) {
+    _get: function(typeRef, defaultBase, sync) {
       if(typeRef == null || typeRef === "")
         return this._error(error.argRequired("typeRef"), sync);
 
@@ -435,7 +441,7 @@ define([
         case "function": return this._getByFun(typeRef, sync);
         case "object":   return Array.isArray(typeRef)
             ? this._getByListSpec(typeRef, sync)
-            : this._getByObjectSpec(typeRef, sync);
+            : this._getByObjectSpec(typeRef, defaultBase, sync);
       }
 
       return this._error(error.argInvalid("typeRef"), sync);
@@ -515,7 +521,7 @@ define([
       return sync
           // `require` fails if a module with the id in the `typeSpec` var
           // is not already _loaded_.
-          ? this._get(localRequire(id), true)
+          ? this._get(localRequire(id), null, true)
           : promiseUtil.require(id, localRequire).then(this._get.bind(this));
     },
 
@@ -672,7 +678,7 @@ define([
     },
 
     // Inline type spec: {[base: "complex"], [id: ]}
-    _getByObjectSpec: function(typeSpec, sync) {
+    _getByObjectSpec: function(typeSpec, defaultBase, sync) {
       var Instance = this._Instance;
 
       if(typeSpec instanceof Instance.Type)
@@ -681,7 +687,7 @@ define([
       if(typeSpec instanceof Instance)
         return this._error(error.argInvalid("typeRef", "Instances are not supported as type references."), sync);
 
-      var baseTypeSpec = typeSpec.base || _defaultBaseTypeMid;
+      var baseTypeSpec = typeSpec.base || defaultBase || _defaultBaseTypeMid;
       var id = typeSpec.id;
       if(id) {
         // Already loaded?
@@ -729,7 +735,7 @@ define([
           // So, it works to use the above ambient specification context to handle all contained temporary ids.
 
           // 1. Resolve the base type
-          var BaseInstCtor = this._get(baseTypeSpec, /*sync:*/true);
+          var BaseInstCtor = this._get(baseTypeSpec, null, /*sync:*/true);
 
           // 2. Extend the base type
           var InstCtor = BaseInstCtor.extend({type: typeSpec});
@@ -774,7 +780,7 @@ define([
             sync);
 
       // Expand compact list type spec syntax and delegate to the generic handler.
-      return this._getByObjectSpec({base: "list", of: elemTypeSpec}, sync);
+      return this._getByObjectSpec({base: "list", of: elemTypeSpec}, null, sync);
     },
 
     _getConfig: function(id) {

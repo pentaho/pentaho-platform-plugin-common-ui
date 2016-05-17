@@ -364,7 +364,8 @@ define([
           if(value == null) return;
 
           var oldType = this._type;
-          var newType = context.get(value).type;
+          var defaultBaseType = this.isRoot ? null : oldType;
+          var newType = context.get(value, {defaultBase: defaultBaseType}).type;
           if(newType !== oldType) {
             // Hierarchy/PreviousValue consistency
             if(oldType && !newType.isSubtypeOf(oldType))
