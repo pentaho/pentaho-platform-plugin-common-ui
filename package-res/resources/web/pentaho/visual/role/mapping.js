@@ -168,7 +168,8 @@ define([
           });
         }
 
-        return roleLevels.sort(MeasurementLevel.type.compare);
+        // Already sorted from lowest to highest
+        return roleLevels;
       },
 
       /**
@@ -481,7 +482,8 @@ define([
               }, this);
             }
 
-            levels.set(addLevels.toArray(), {noRemove: true});
+            levels.set(addLevels.toArray(), {noRemove: true, noMove: true});
+            levels.sort(MeasurementLevel.type.compare);
           } else {
             throw error.argInvalidType("levels", ["Array", "pentaho.type.List", "Object"], typeof values);
           }

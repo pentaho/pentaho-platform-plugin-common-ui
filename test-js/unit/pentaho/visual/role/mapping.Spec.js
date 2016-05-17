@@ -112,7 +112,7 @@ define([
 
     describe(".Type", function () {
 
-      describe("#levels", function () {
+      fdescribe("#levels", function () {
         it("set levels are set", function() {
           var MyMapping = Mapping.extend();
 
@@ -134,13 +134,12 @@ define([
 
         it("a visual role definition can add support for new measurement levels", function () {
           var baseLevels = ["nominal"];
-          var extendedLevels = baseLevels.slice(0);
-          extendedLevels.push("ordinal");
+          var extendedLevels = baseLevels.concat("ordinal");
 
           var BaseMapping = Mapping.extend( { type: { levels: baseLevels } });
           var ExtendedMapping = BaseMapping.extend( { type: { levels: extendedLevels } } );
 
-          expect(ExtendedMapping.type.levels).toEqual(extendedLevels);
+          expect(ExtendedMapping.type.levels.toArray(getValue)).toEqual(extendedLevels);
         });
 
         it("when a visual role definition adds support for a measurement level that is not contained in the set implicitly defined by the dataType, then an error is thrown", function () {
