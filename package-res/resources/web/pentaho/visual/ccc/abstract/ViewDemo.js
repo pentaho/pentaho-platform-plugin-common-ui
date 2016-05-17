@@ -102,7 +102,8 @@ define([
         }
         //var propChange = changeset.getChange(propName);
         //if(propChange)
-        //  logger.log(propName + (result ? " changed!" : " did not change!") + JSON.stringify(propChange.oldValue) + " , " +  JSON.stringify(propChange.newValue));
+        //  logger.log(propName + (result ? " changed!" : " did not change!") +
+        //       JSON.stringify(propChange.oldValue) + " , " +  JSON.stringify(propChange.newValue));
       }, this);
     }
   };
