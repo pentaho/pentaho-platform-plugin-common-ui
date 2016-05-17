@@ -93,18 +93,14 @@ define([
 
       set: function(name, valueSpec) {
 
-        var result = this.base(name, valueSpec);
-
-        if(!result || result.isFulfilled) {
-          var propType = this.type.get(name);
-          if(propType.type.isSubtypeOf(Mapping.type)) {
-            var mapping = this.get(name);
-            if(mapping)
-              mapping.setOwnership(this, propType);
-          }
+        var propType = this.type.get(name);
+        if(propType.type.isSubtypeOf(Mapping.type)) {
+          valueSpec = propType.toValue(valueSpec);
+          if(valueSpec)
+            valueSpec.setOwnership(this, propType);
         }
 
-        return result;
+        return this.base(name, valueSpec);
       },
 
       //region Event Flows Handling
