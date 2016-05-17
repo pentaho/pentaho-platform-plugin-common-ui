@@ -108,6 +108,16 @@ define([
     describe("type", function () {
 
       describe("levels", function () {
+        it("set levels are set", function() {
+          var MyMapping = Mapping.extend();
+          var expectedLevels = ["nominal", "ordinal"];
+
+          MyMapping.type.levels = expectedLevels;
+          var actualLevels = MyMapping.type.levels.toArray();
+
+          expect(actualLevels).toEqual(expectedLevels);
+        });
+
         it("a non-abstract visual role needs to support at least one measurement level", function () {
           function defineEmptyLevelsMapping() {
             Mapping.extend( { type: { levels: [] } });
@@ -117,19 +127,56 @@ define([
         });
 
         it("a visual role definition can add support for new measurement levels", function () {
-          fail();
+          var baseLevels = ["nominal"];
+          var extendedLevels = baseLevels.slice(0);
+          extendedLevels.push("ordinal");
+
+          var BaseMapping = Mapping.extend( { type: { levels: baseLevels } });
+          var ExtendedMapping = BaseMapping.extend( { type: { levels: extendedLevels } } );
+
+          expect(ExtendedMapping.type.levels).toEqual(extendedLevels);
         });
 
         it("when a visual role definition adds support for a measurement level that is not contained in the set implicitly defined by the dataType, then an error is thrown", function () {
-          fail();
+          var BaseMapping = Mapping.extend( { type: { dataType: "string" } });
+          var addLevel = "ordinal";
+          var baseLevel = "nominal";
+
+          // Assumptions
+          var baseLevels = BaseMapping.type.levels.toArray();
+          expect(baseLevels).toContain(baseLevel);
+          expect(baseLevels).not.toContain(addLevel);
+
+          // Test
+          var extendedLevels = baseLevels.slice(0);
+          extendedLevels.push(addLevel);
+          function extendMapping() {
+            BaseMapping.extend( { type: { levels: extendedLevels } } );
+          }
+
+          expect(extendMapping).toThrow(errorMatch.argInvalid("levels"));
         });
 
         it("a visual role definition cannot remove support for a measurement level supported by its ancestors", function () {
-          fail();
+          var baseLevels = ["nominal", "ordinal"];
+          var BaseMapping = Mapping.extend( { type: { levels: baseLevels } });
+
+          var constrainedLevels = [baseLevels[0]];
+          function extendMapping() {
+            BaseMapping.extend( { type: { levels: constrainedLevels } } );
+          }
+
+          expect(extendMapping).toThrow(errorMatch.argInvalid("levels"));
         });
 
         it("when a visual role definition does not specify the measurement levels, it inherits the ones of its parent visual role definition", function () {
-          fail();
+          var baseLevels = ["nominal", "ordinal"];
+          var BaseMapping = Mapping.extend( { type: { levels: baseLevels }} );
+          var DerivedMapping = BaseMapping.extend();
+
+          var derivedLevels = DerivedMapping.type.levels.toArray();
+
+          expect(derivedLevels).toEqual(baseLevels);
         });
 
         it("???", function () {
@@ -137,15 +184,35 @@ define([
           fail();
         });
 
-        it("when levels is set to a Nully value, the operation is ignored", function () {
-          fail();
+        describe("when levels is set to a Nully value, the operation is ignored", function() {
+          function assertNopOnNullyValue(nullyValue) {
+            var expectedLevels = ["nominal", "ordinal"];
+            var MyMapping = Mapping.extend( { type: { levels: expectedLevels }} );
+
+            MyMapping.type.levels = nullyValue;
+            var actualLevels = MyMapping.type.levels.toArray();
+
+            expect(actualLevels).toEqual(expectedLevels);
+          }
+
+          it("when levels is set to null, the operation is ignored", function () {
+            assertNopOnNullyValue(null);
+          });
+
+          it("when levels is set to undefined, the operation is ignored", function () {
+            assertNopOnNullyValue(undefined);
+          });
         });
 
         it("when levels is set and the visual role definition already has descendants, an error is thrown.", function () {
-          /* @throws {pentaho.lang.OperationInvalidError} When setting and the type already has
-           * [subtypes]{@link pentaho.type.Type#hasDescendants}.
-           */
-          fail();
+          var BaseMapping = Mapping.extend();
+          var DerivedMapping = BaseMapping.extend();
+
+          function setLevels() {
+            BaseMapping.type.levels = ["nominal"];
+          }
+
+          expect(setLevels).toThrow(errorMatch.operInvalid());
         });
 
         it("the root visual role definition has no measurement levels defined", function () {
