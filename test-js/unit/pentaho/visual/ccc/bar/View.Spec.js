@@ -43,7 +43,7 @@ define([
         width:    1,
         height:   1,
         data:     {v: {}},
-        measures: ["foo"]
+        measures: {attributes: [{name: "foo"}]}
       });
 
       var elem = document.createElement("div");
@@ -64,8 +64,8 @@ define([
       var model = new BarModel({
         width:    200,
         height:   200,
-        rows:     ["country"],
-        measures: ["sales"],
+        rows:     {attributes: [{name: "country"}]},
+        measures: {attributes: [{name: "sales"  }]},
         data:     new Table(tableSpec),
         showLegend: true
       });
