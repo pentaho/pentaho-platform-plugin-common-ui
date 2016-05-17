@@ -152,7 +152,7 @@ define([
        * Please see the documentation of subclasses for information on additional, supported keyword arguments.
        *
        * @param {?boolean} [keyArgs.isJson=false] - Generates a JSON-compatible specification.
-       * Attributes which don't have a JSON-compatible specification are omitted.
+       * Attributes that don't have a JSON-compatible specification are omitted.
        *
        * @param {?boolean} [keyArgs.includeType=false] - Includes the inline type property, `_`, in the specification.
        *
@@ -233,7 +233,8 @@ define([
        * @name extend
        * @memberOf pentaho.type.Instance
        *
-       * @param {string} [name] The name of the created class. Used for debugging purposes.
+       * @param {string} [name] The name of the created class.
+       * The name of the created class is used for debugging purposes.
        * @param {pentaho.type.spec.IInstanceProto} [instSpec] The instance specification.
        * @param {Object} [classSpec] The static specification.
        * @param {Object} [keyArgs] The keyword arguments.

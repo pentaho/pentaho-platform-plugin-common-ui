@@ -522,8 +522,8 @@ define([
            *
            * When specified,
            * it must be one of the measurement levels returned by
-           * {@link pentaho.visual.role.Mapping.Type#levels},
-           * or, otherwise, the mapping is considered _invalid_.
+           * {@link pentaho.visual.role.Mapping.Type#levels};
+           * otherwise, the mapping is considered _invalid_.
            *
            * This JS property is syntax sugar for `this.getv("level")` and `this.set("level", value)`.
            *
@@ -669,8 +669,8 @@ define([
          * The value of a _monotonic_ attribute can change, but only in some, predetermined _monotonic_ direction.
          *
          * In this case, the attribute can only change to a
-         * type that is a [subtype]{@link pentaho.type.Type#isSubtypeOf} of the attribute's current value,
-         * or, otherwise, an error is thrown.
+         * type that is a [subtype]{@link pentaho.type.Type#isSubtypeOf} of the attribute's current value;
+         * otherwise, an error is thrown.
          *
          * ### This attribute is *Inherited*
          *

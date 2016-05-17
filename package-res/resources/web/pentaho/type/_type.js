@@ -125,7 +125,7 @@ define([
 
       //region context property
 
-      // NOTE: any class extended from this one will return the same context...
+      // NOTE: Any class extended from this will return the same context.
       /**
        * Gets the context that defined this type class.
        * @type pentaho.type.Context
@@ -140,7 +140,7 @@ define([
       /**
        * Gets the unique id of this type.
        *
-       * Unique type ids are auto-generated, in each session.
+       * Unique type ids are auto-generated in each session.
        *
        * Note that even anonymous types -
        * those whose {@link pentaho.type.Type#id} is `null` -
@@ -352,7 +352,7 @@ define([
       /**
        * Gets the id of this type.
        *
-       * Can only be specified when extending a type.
+       * The id of a type can only be specified when extending the ancestor type.
        *
        * The id is only defined for types which have an associated AMD/RequireJS module.
        * However, note that all have a {@link pentaho.type.Type#uid}.
@@ -380,7 +380,7 @@ define([
        * Gets the short id of this type.
        *
        * When a type is one of the standard types,
-       * and, thus, it is a direct sub-module of the `pentaho/type` module,
+       * and thus a direct sub-module of the `pentaho/type` module,
        * its short id is its _local module id_,
        * like `"string"` or `"boolean"`.
        *
@@ -508,10 +508,10 @@ define([
        *
        * Attempting to set to a non-string value type implicitly converts the value to a string before assignment.
        *
-       * Setting to `undefined` causes this attribute to use the inherited value,
+       * Setting this to `undefined` causes this attribute to use the inherited value,
        * except for the root type, `Instance.type` (which has no ancestor), where this attribute is `null`.
        *
-       * Setting to `null` or to an empty string clears the attribute and sets it to `null`,
+       * Setting this to `null` or to an empty string clears the attribute and sets it to `null`,
        * ignoring any inherited value.
        *
        * @type {?nonEmptyString}
@@ -550,10 +550,10 @@ define([
        * Attempting to set to a non-string value type implicitly
        * converts the value to a string before assignment.
        *
-       * Setting to `undefined` causes this attribute to use the inherited value,
+       * Setting this to `undefined` causes this attribute to use the inherited value,
        * except for the root type, `Instance.type` (which has no ancestor), where the attribute is `null`.
        *
-       * Setting to `null` or to an empty string clears the attribute and sets it to `null`,
+       * Setting this to `null` or to an empty string clears the attribute and sets it to `null`,
        * thus ignoring any inherited value.
        *
        * @type {?nonEmptyString}
@@ -592,10 +592,10 @@ define([
        * Attempting to set to a non-string value type implicitly
        * converts the value to a string before assignment.
        *
-       * Setting to `undefined` causes this attribute to use the inherited value,
+       * Setting this to `undefined` causes this attribute to use the inherited value,
        * except for the root type, `Instance.type` (which has no ancestor), where the attribute is `null`.
        *
-       * Setting to `null` or to an empty string clears the attribute and sets it to `null`,
+       * Setting this to `null` or to an empty string clears the attribute and sets it to `null`,
        * ignoring any inherited value.
        *
        * @type {?nonEmptyString}
@@ -632,7 +632,7 @@ define([
        * Browsable types are exposed to the end user.
        * Set this attribute to `false` to prevent exposing the type in a user interface.
        *
-       * Setting to a {@link Nully} value causes this attribute to use the inherited value,
+       * Setting this to a {@link Nully} value causes this attribute to use the inherited value,
        * except for the root type, `Instance.type` (which has no ancestor), where the attribute is `true`.
        *
        * @type {boolean}
@@ -669,7 +669,7 @@ define([
        * An advanced type typically escapes the expected flow of utilization, yet it is
        * sufficiently relevant to be shown in a user interface.
        *
-       * Setting to a {@link Nully} value causes this attribute to use the inherited value,
+       * Setting this to a {@link Nully} value causes this attribute to use the inherited value,
        * except for the root type, `Instance.type` (which has no ancestor), where the attribute is `false`.
        *
        * @type {boolean}
@@ -746,7 +746,7 @@ define([
        * The ordinal is used to disambiguate the order with which a type (or an instance of it)
        * is shown in a user interface.
        *
-       * Setting to a {@link Nully} value causes this attribute to use the inherited value,
+       * Setting this to a {@link Nully} value causes this attribute to use the inherited value,
        * except for the root type, `Instance.type` (which has no ancestor), where the attribute is `0`.
        *
        * @type {number}
@@ -789,14 +789,14 @@ define([
       * When a string,
       * it is the id of the view's AMD module.
       * If the string starts with `/` or `xyz:`, or ends with `.js`,
-      * the id is considered to be absolute,
+      * the id is considered to be absolute;
       * otherwise,
       * it is relative to this type's id folder, and converted to an absolute id.
       *
-      * Setting to `undefined` causes the view to be inherited from the ancestor type,
+      * Setting this to `undefined` causes the view to be inherited from the ancestor type,
       * except for the root type, `Instance.type` (which has no ancestor), where the attribute is `null`.
       *
-      * Setting to a _falsy_ value (like `null` or an empty string),
+      * Setting this to a _falsy_ value (like `null` or an empty string),
       * clears the value of the attribute and sets it to `null`, ignoring any inherited value.
       *
       * When a function,
@@ -861,7 +861,7 @@ define([
       /**
        * Creates a subtype of this one.
        *
-       * This method creates a subtype which does not have own instance or type constructors.
+       * This method creates a subtype that does not have own instance or type constructors.
        * The base type's instance and type constructors are used to _initialize_ instances and the type.
        *
        * To create a type with own constructors,
@@ -907,7 +907,7 @@ define([
        * in property `"_"`, the referenced type is used to create the instance
        * (as long as it is a subtype of this type).
        *
-       * If the specified instance specification does not contain an inline type reference
+       * If the specified instance specification does not contain an inline type reference,
        * the type is assumed to be this type.
        *
        * @see pentaho.type.Type#isSubtypeOf
@@ -1049,7 +1049,7 @@ define([
       },
 
       /**
-       * Throws an error complaining the type is abstract an cannot create instances.
+       * Throws an error complaining that the type is abstract and cannot create instances.
        *
        * @throws {pentaho.lang.OperationInvalidError} When this is not an abstract type.
        *
@@ -1122,7 +1122,7 @@ define([
        * Please see the documentation of subclasses for information on additional, supported keyword arguments.
        *
        * @param {?boolean} [keyArgs.isJson=false] - Generates a JSON-compatible specification.
-       * Attributes which don't have a JSON-compatible specification are omitted.
+       * Attributes that don't have a JSON-compatible specification are omitted.
        *
        * @return {!pentaho.type.spec.ITypeProto} A specification of this type.
        *
@@ -1330,11 +1330,11 @@ define([
       },
 
       // Links TypeCtor (this) and the given InstCtor together and
-      // applies the TypeCtor constructor to its own prototype, as a way to initialize it.
+      // applies the TypeCtor constructor to its own prototype as a way to initialize it.
       // The constructor receives `instSpec` and ends up extending the prototype with it.
       // The static interface is not touched.
       //
-      // NOTE: optionally receiving `keyArgs` as an optimization.
+      // NOTE: optionally this receives `keyArgs` as an optimization.
       // `_subclassed` is given a _derived_ `keyArgs`
       // that can/should be passed to `this`(constructor).
       _initInstCtor: function(InstCtor, instSpec, keyArgs) {

@@ -315,7 +315,7 @@ define([
          * Gets or sets the type of value that properties of this type can hold.
          *
          * If the _value type_ is a [list]{@link pentaho.type.Value.Type#isList} type,
-         * then this property will be a _list_ (or multiple-elements) property,
+         * then this property will be a _list_ (or multiple-elements) property;
          * otherwise, this property will be an _element_ (or single-element) property.
          *
          * ### Get
@@ -342,7 +342,7 @@ define([
          *
          * When set and the [value]{@link pentaho.type.Property.Type#value} attribute
          * is _locally_ set, it is checked against the new _value type_,
-         * and set to `null`, if it not an instance of it.
+         * and set to `null`, if it's not an instance of it.
          *
          * @type {!pentaho.type.Value.Type}
          *
@@ -602,7 +602,7 @@ define([
          * Defines a "dynamic" attribute and corresponding setter and getter methods.
          *
          * This method is an implementation detail,
-         * ans is invoked by {@link pentaho.type.Property.Type#_attrs}
+         * and is invoked by {@link pentaho.type.Property.Type#_attrs}
          *
          * @param {String} name
          * @param {Object} spec
@@ -1037,7 +1037,7 @@ define([
            * Because this attribute is also _dynamic_,
            * the actual `countMax` values are only known
            * when evaluated for specific complex instances.
-           * As such, ensuring monotonic changes is deferred until evaluation.
+           * This behavior ensures that monotonic changes are deferred until evaluation.
            * No errors are thrown; non-monotonic changes simply don't take any effect.
            *
            * ### This attribute is *Inherited*
@@ -1091,7 +1091,7 @@ define([
            * Gets or sets a value or function that indicates if properties of this type are applicable.
            *
            * When a property is not (currently) applicable, then it does not apply,
-           * it does not make sense in a certain situation.
+           * as it does not make sense in a certain situation.
            * It may only be applicable when another property of the complex type has a specific value, for example.
            *
            * When a property is not currently applicable, its value is not significant,
@@ -1115,7 +1115,7 @@ define([
            * Because this attribute is also _dynamic_,
            * the actual `isApplicable` values are only known
            * when evaluated for specific complex instances.
-           * As such, ensuring monotonic changes is deferred until evaluation.
+           * This behavior ensures that monotonic changes are deferred until evaluation.
            * No errors are thrown; non-monotonic changes simply don't take any effect.
            *
            * ### This attribute is *Inherited*
@@ -1172,7 +1172,7 @@ define([
            * _cannot_ be changed by a user, in a user interface.
            *
            * A property should be set read-only whenever its value is implied/imposed somehow,
-           * and thus cannot not be changed, directly, by the user, in a user interface.
+           * and thus cannot be changed directly by the user through a user interface.
            *
            * ### This attribute is *Dynamic*
            *
@@ -1192,7 +1192,7 @@ define([
            * Because this attribute is also _dynamic_,
            * the actual `isReadOnly` values are only known
            * when evaluated for specific complex instances.
-           * As such, ensuring monotonic changes is deferred until evaluation.
+           * This behavior ensures that monotonic changes are deferred until evaluation.
            * No errors are thrown; non-monotonic changes simply don't take any effect.
            *
            * ### This attribute is *Inherited*

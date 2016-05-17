@@ -29,7 +29,8 @@
 /**
  * A reference to the property type's base type, if any.
  *
- * Can only be specified on a root property of a complex type,
+ * The property type's base type
+ * can only be specified on a root property of a complex type,
  * in which case it defaults to {@link pentaho.type.Property}.
  *
  * For non-root property types,
