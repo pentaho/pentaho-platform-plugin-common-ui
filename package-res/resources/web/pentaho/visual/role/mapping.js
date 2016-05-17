@@ -285,7 +285,7 @@ define([
           if(!(name = mappingAttr.name) ||
               !(dataAttr = dataAttrs.get(name)) ||
               !(dataAttrLevel = dataAttr.level) ||
-              !(dataAttrType = context.get(dataAttr.type)) ||
+              !(dataAttrType = context.get(dataAttr.type).type) ||
               !dataAttrType.isSubtypeOf(roleDataType))
             return; // invalid
 
