@@ -7,7 +7,7 @@ define([
 ], function(errorMatch, Context, complexFactory, mappingFactory, attributeFactory) {
   "use strict";
 
-  describe("pentaho/visual/role", function() {
+  describe("pentaho.visual.role.Mapping", function() {
     var Complex, Mapping, Attribute;
 
     beforeEach(function () {
@@ -18,6 +18,7 @@ define([
     });
 
     function assertIsValid(complex) {
+      // this way, errors are shown in the console...
       expect(complex.validate()).toBe(null);
     }
 
@@ -109,11 +110,12 @@ define([
 
     });
 
-    describe("type", function () {
+    describe(".Type", function () {
 
-      describe("levels", function () {
+      describe("#levels", function () {
         it("set levels are set", function() {
           var MyMapping = Mapping.extend();
+
           var expectedLevels = ["nominal", "ordinal"];
 
           MyMapping.type.levels = expectedLevels;
@@ -297,9 +299,5 @@ define([
 
       });
     });
-
-
-
-
   });
 });

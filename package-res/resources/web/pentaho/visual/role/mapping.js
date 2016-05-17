@@ -210,6 +210,9 @@ define([
         return levelLowest;
       },
 
+      // TODO: compatible level
+      // TODO: #level when not null is one of possible levels
+
       /**
        * Determines if this visual role mapping is valid.
        *
@@ -478,7 +481,7 @@ define([
               }, this);
             }
 
-            levels.set(addLevels, {noRemove: true});
+            levels.set(addLevels.toArray(), {noRemove: true});
           } else {
             throw error.argInvalidType("levels", ["Array", "pentaho.type.List", "Object"], typeof values);
           }
