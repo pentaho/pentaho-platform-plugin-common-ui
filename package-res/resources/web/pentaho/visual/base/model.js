@@ -82,14 +82,29 @@ define([
             // Visual role
             var mapping = this.get(propType);
             if(!mapping) {
-              // Create default instance
-              this.set(propType, {});
-              mapping = this.get(propType);
+              // Create default instance without firing events
+              this._values[propType.name] = mapping = propType.toValue({});
             }
 
             mapping.setOwnership(this, propType);
           }
         }, this);
+      },
+
+      set: function(name, valueSpec) {
+
+        var result = this.base(name, valueSpec);
+
+        if(!result || result.isFulfilled) {
+          var propType = this.type.get(name);
+          if(propType.type.isSubtypeOf(Mapping.type)) {
+            var mapping = this.get(name);
+            if(mapping)
+              mapping.setOwnership(this, propType);
+          }
+        }
+
+        return result;
       },
 
       //region Event Flows Handling
