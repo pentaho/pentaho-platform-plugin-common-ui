@@ -45,13 +45,15 @@ define([
             WillSelect, DidSelect, RejectedSelect,
             WillExecute, DidExecute, RejectedExecute,
             ActionResult,
-            bundle) {
+            bundle,
+            mappingFactory) {
 
   "use strict";
 
   return function(context) {
 
     var Complex = context.get(complexFactory);
+    var Mapping = context.get(mappingFactory);
 
     /**
      * @name Model
@@ -70,6 +72,26 @@ define([
      * @param {pentaho.visual.base.spec.IModel} [modelSpec] A plain object containing the model specification.
      */
     var Model = Complex.extend(/** @lends pentaho.visual.base.Model# */{
+
+      constructor: function() {
+
+        this.base.apply(this, arguments);
+
+        this.type.each(function(propType) {
+          if(propType.type.isSubtypeOf(Mapping.type)) {
+            // Visual role
+            var mapping = this.get(propType);
+            if(!mapping) {
+              // Create default instance
+              this.set(propType, {});
+              mapping = this.get(propType);
+            }
+
+            mapping.setOwnership(this, propType);
+          }
+        }, this);
+      },
+
       //region Event Flows Handling
       /**
        * Modifies the current selection filter based on an input filter and on a selection mode.

@@ -2,19 +2,21 @@ define([
   "tests/pentaho/util/errorMatch",
   "pentaho/type/Context",
   "pentaho/type/complex",
+  "pentaho/visual/base",
   "pentaho/visual/role/mapping",
   "pentaho/visual/role/mappingAttribute",
-], function(errorMatch, Context, complexFactory, mappingFactory, attributeFactory) {
+], function(errorMatch, Context, complexFactory, visualModelFactory, mappingFactory, attributeFactory) {
   "use strict";
 
   describe("pentaho.visual.role.Mapping", function() {
-    var Complex, Mapping, Attribute;
+    var Complex, Mapping, Attribute, VisualModel;
 
     beforeEach(function () {
       var context = new Context();
       Complex = context.get(complexFactory);
       Mapping = context.get(mappingFactory);
       Attribute = context.get(attributeFactory);
+      VisualModel = context.get(visualModelFactory);
     });
 
     function assertIsValid(complex) {
@@ -54,7 +56,13 @@ define([
             levels: ["nominal"]
           }
         });
-        var mapping = new ValidMapping();
+
+        var DerivedVisualModel = VisualModel.extend({type: {
+          props: [{name: "x", type: ValidMapping}]
+        }});
+
+        var visualModel = new DerivedVisualModel();
+        var mapping = visualModel.x;
 
         // Assumptions
         assertIsValid(mapping);
@@ -69,7 +77,7 @@ define([
           type: {
             levels: ["nominal"],
             props: [
-              { name: "bananas", isRequired: true }
+              {name: "bananas", isRequired: true}
             ]
           }
         });

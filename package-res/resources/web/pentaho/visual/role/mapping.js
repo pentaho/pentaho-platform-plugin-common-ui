@@ -81,6 +81,66 @@ define([
      */
     var VisualRoleMapping = Complex.extend("pentaho.visual.role.Mapping", /** @lends pentaho.visual.role.Mapping# */{
 
+      constructor: function() {
+
+        this.base.apply(this, arguments);
+
+        this._ownedBy = this._ownedAs = null;
+      },
+
+      /**
+       * Gets the visual model that owns this visual role mapping.
+       *
+       * @type {pentaho.visual.base.Model}
+       * @readOnly
+       */
+      get model() {
+        return this.owner;
+      },
+
+      /**
+       * Sets the complex that owns this list value.
+       *
+       * Ownership cannot change.
+       *
+       * @param {!pentaho.type.Complex} owner - The owner complex value.
+       * @param {!pentaho.type.Property} propType - The property type of `owner` whose value is this instance.
+       *
+       * @throws {TypeError} When called with argument values that are different from those of the first call.
+       *
+       * @see pentaho.type.List#owner
+       * @see pentaho.type.List#ownerProperty
+       */
+      setOwnership: function(owner, propType) {
+        if(!owner) throw error.argRequired("owner");
+        if(!propType) throw error.argRequired("propType");
+
+        O.setConst(this, "_ownedBy", owner);
+        O.setConst(this, "_ownedAs", propType);
+      },
+
+      /**
+       * The complex value that owns this list value.
+       *
+       * @type {pentaho.type.Complex}
+       *
+       * @see pentaho.type.List#setOwnership
+       */
+      get owner() {
+        return this._ownedBy;
+      },
+
+      /**
+       * The complex value that owns this list value.
+       *
+       * @type {pentaho.type.Complex}
+       *
+       * @see pentaho.type.List#setOwnership
+       */
+      get ownerProperty() {
+        return this._ownedAs;
+      },
+
       /**
        * Gets the level of measurement in which the visual role will effectively be operating on,
        * according to the mapping's current state.
