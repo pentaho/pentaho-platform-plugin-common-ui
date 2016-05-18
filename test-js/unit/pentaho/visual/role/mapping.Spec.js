@@ -157,7 +157,7 @@ define([
         mapping.attributes.add(attribute);
 
         var actualLevel = mapping.levelAuto;
-        expect(actualLevel).toEqual(expectedLevel);
+        expect(actualLevel.valueOf()).toBe(expectedLevel);
       });
 
     });
@@ -219,27 +219,17 @@ define([
 
         var fullMapping = new MyMapping();
 
-        var countryAttribute = new Attribute( { name: "country" });
-        fullMapping.attributes.add( countryAttribute );
-        var productAttribute = new Attribute( {name: "product"});
+        var countryAttribute = new Attribute({name: "country"});
+        fullMapping.attributes.add(countryAttribute);
 
-        var dataSpec = {
-          model: [
-            {name: "country", type: "string", label: "Country"},
-            {name: "product", type: "string", label: "Product"}
-          ],
-          rows: [
-            {c: [{v: "Portugal"}, {v: "fish"} ]},
-            {c: [{v: "Ireland"}, {v: "beer"} ]}
-          ]
-        };
-        model.data = new Table(dataSpec);
+        var productAttribute = new Attribute({name: "product"});
+        fullMapping.attributes.add(productAttribute);
 
         return fullMapping;
       }
 
       it("if the mapping has no owner visual model it is invalid", function() {
-        var mapping = createFullMappingNoOwner(); // TODO: cant create mapping without owner/model
+        var mapping = createFullMappingNoOwner();
         expect(mapping.owner).toBe(null);
 
         assertIsInvalid(mapping);
@@ -286,9 +276,6 @@ define([
 
         assertIsInvalid(mapping);
       });
-
-
-
     });
 
     describe(".Type", function () {
