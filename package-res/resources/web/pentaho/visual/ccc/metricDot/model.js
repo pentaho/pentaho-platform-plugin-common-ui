@@ -71,8 +71,7 @@ define([
                   attributes: {
                     // TODO: countMax depends on whether data props are discrete or continuous...
                     countMax: function() {
-                      var level = this.levelEffective;
-                      return level && (level.value === "quantitative") ? 1 : null;
+                      return this.levelEffective === "quantitative" ? 1 : null;
                     }
                   }
                 }

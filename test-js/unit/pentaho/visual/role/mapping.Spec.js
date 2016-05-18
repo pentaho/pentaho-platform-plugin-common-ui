@@ -69,7 +69,7 @@ define([
         // Test
         var autoLevel = mapping.levelAuto;
         var levelEffective = mapping.levelEffective;
-        expect(levelEffective).toEqual(autoLevel);
+        expect(levelEffective).toBe(autoLevel);
 
       });
 
@@ -83,7 +83,7 @@ define([
 
         // Test
         var actualLevelEffective = mapping.levelEffective;
-        expect(actualLevelEffective).toEqual(expectedEffectiveLevel);
+        expect(actualLevelEffective).toBe(expectedEffectiveLevel);
 
       });
 
@@ -157,7 +157,7 @@ define([
         mapping.attributes.add(attribute);
 
         var actualLevel = mapping.levelAuto;
-        expect(actualLevel.valueOf()).toBe(expectedLevel);
+        expect(actualLevel).toBe(expectedLevel);
       });
 
     });
@@ -262,7 +262,7 @@ define([
       
       it("qualitative mapped attributes must not have duplicate names", function() {
         var mapping = createFullValidMapping();
-        var containedAttribute = mapping.attributes.at(0)
+        var containedAttribute = mapping.attributes.at(0);
         var duplicateAttribute = new Attribute({name: containedAttribute.name});
 
         mapping.attributes.add(duplicateAttribute);

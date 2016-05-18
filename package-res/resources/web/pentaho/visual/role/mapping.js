@@ -154,7 +154,7 @@ define([
        * A visualization should respect the value of this property and actually
        * operate the visual role in the corresponding mode.
        *
-       * @type {!pentaho.visual.role.MeasurementLevel|undefined}
+       * @type {string|undefined}
        * @readOnly
        */
       get levelEffective() {
@@ -176,7 +176,7 @@ define([
        * When more than one measurement level could be used,
        * the _highest_ measurement level is preferred.
        *
-       * @type {!pentaho.visual.role.MeasurementLevel|undefined}
+       * @type {string|undefined}
        * @readOnly
        */
       get levelAuto() {
@@ -210,11 +210,11 @@ define([
        * Determines the highest role level of measurement that is compatible
        * with a given data property level of measurement, if any.
        *
-       * @param {pentaho.visual.role.MeasurementLevel} attributeLevel - The level of measurement of the data property.
+       * @param {string} attributeLevel - The level of measurement of the data property.
        * @param {pentaho.visual.role.MeasurementLevel[]} [allRoleLevels] - The role's levels of measurement.
        * Defaults to the visual role's levels.
        *
-       * @return {pentaho.visual.role.MeasurementLevel|undefined} The highest role level of measurement or
+       * @return {string|undefined} The highest role level of measurement or
        * `undefined` if none.
        * @private
        */
@@ -231,12 +231,11 @@ define([
        * Chooses from `allRoleLevels` the levels of measurement that are compatible
        * with a given data property level of measurement.
        *
-       * @param {pentaho.visual.role.MeasurementLevel} attributeLevel - The level of measurement of the data property.
+       * @param {string} attributeLevel - The level of measurement of the data property.
        * @param {pentaho.visual.role.MeasurementLevel[]} [allRoleLevels] - The role's levels of measurement.
        * Defaults to the visual role's levels.
        *
-       * @return {pentaho.visual.role.MeasurementLevel|undefined} The highest role level of measurement or
-       * `undefined` if none.
+       * @return {string[]} The compatible role's levels of measurement.
        * @private
        */
       _getRoleLevelsCompatibleWith: function(attributeLevel, allRoleLevels) {
@@ -253,7 +252,7 @@ define([
         }
 
         // Already sorted from lowest to highest
-        return roleLevels;
+        return roleLevels.map(function(level) { return level.value; });
       },
 
       /**
@@ -263,7 +262,7 @@ define([
        * When no attributes or any attribute is invalid, `undefined` is returned.
        * The level of measurement compatibility is not considered for validity at this point.
        *
-       * @return {!pentaho.visual.role.MeasurementLevel|undefined} The lowest level of measurement.
+       * @return {string|undefined} The lowest level of measurement.
        * @private
        */
       _getLowestLevelInAttrs: function() {
