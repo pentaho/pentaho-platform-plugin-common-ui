@@ -709,49 +709,36 @@ define([
      *
      * Gets array of _mapped_ column indexes of the plain table to set in a data view.
      *
-     * Reorders by splitting into generic and non-generic attributes,
-     * so that all generic measure attributes are placed last
-     * to _enable_ the measure discriminator scenario.
+     * Column reordering serves two purposes:
+     * 1. All generic measures are placed last, to satisfy the crosstab/generic measure discriminator scenario
+     * 2. All measures are placed last so that CCC doesn't reorder the "logical row", discrete columns first
      */
     _transformData: function() {
-      var mappedColumnIndexesOther = [],
-          mappedColumnIndexesGeneric = [],
+      var mappedColumnIndexesDiscrete = [],
+          mappedColumnIndexesContinuous = [],
           C = this._dataView.getNumberOfColumns(),
-          j = -1,
-          filteredOrReordered = false;
+          j = -1;
+
       while(++j < C) {
-        var attrInfo = this._getAttributeInfoByName(this._dataView.getColumnAttribute(j).name);
-        if(!attrInfo) {
-          // Filter. Not mapped.
-          filteredOrReordered = true;
-        } else {
-          if(this.measureDiscrimGem && attrInfo.isMeasureGeneric) {
-            mappedColumnIndexesGeneric.push(j);
-          } else {
-            mappedColumnIndexesOther.push(j);
-
-            // Going back to non-generic after any generic?
-            // Reordering columns.
-            if(mappedColumnIndexesGeneric.length)
-              filteredOrReordered = true;
-
-          }
+        var ai = this._getAttributeInfoByName(this._dataView.getColumnAttribute(j).name);
+        if(ai) {
+          if(ai.attr.isDiscrete)
+            mappedColumnIndexesDiscrete.push(j);
+          else
+            mappedColumnIndexesContinuous.push(j);
         }
       }
 
-      // Filtered or reordered any of the plain table attributes?
-      if(filteredOrReordered) {
-        this._dataView = new DataView(this._dataView);
-        this._dataView.setSourceColumns(mappedColumnIndexesOther.concat(mappedColumnIndexesGeneric));
-      }
+      this._dataView = new DataView(this._dataView);
+      this._dataView.setSourceColumns(mappedColumnIndexesDiscrete.concat(mappedColumnIndexesContinuous));
 
       // Set CCC cross-tab mode and categories count
       // for proper logical row construction.
       if((this.options.crosstabMode = !!this.measureDiscrimGem)) {
-        this.options.dataCategoriesCount = mappedColumnIndexesOther.length;
+        this.options.dataCategoriesCount = mappedColumnIndexesDiscrete.length;
       } else {
         // Not relevant, as every position is mapped in readers,
-        // and this only server to split discrete columns among
+        // and this only serves to split discrete columns among
         // series and categories.
         this.options.dataCategoriesCount = null;
       }
@@ -808,6 +795,7 @@ define([
         attrName = dataView.getColumnAttribute(j).name;
         ai = this._getAttributeInfoByName(attrName);
         if(ai.isMeasureGeneric) {
+          // All generic measure columns are collapsed into a single measure dimension.
           if(hasGenericReader) continue;
           hasGenericReader = true;
         }
