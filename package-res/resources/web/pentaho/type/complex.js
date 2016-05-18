@@ -799,7 +799,22 @@ define([
           if(omitProps && O.hasOwn(omitProps, name)) return;
 
           var value = this._values[name];
-          if(includeDefaults || !areEqual(propType.value, value)) {
+
+          var includeValue = includeDefaults;
+          if(!includeValue) {
+            var defaultValue = propType.value;
+            // Isn't equal to the default value?
+            if(propType.isList) {
+              // TODO: This is not perfect... In a way lists are always created by us.
+              // If a default list has been specified, this fails to not serialize a default list with count > 0.
+              // However, this prevents serializing an empty list when the default is also empty.
+              includeValue = (defaultValue && defaultValue.count > 0) || (value.count > 0);
+            } else {
+              includeValue = !areEqual(defaultValue, value);
+            }
+          }
+
+          if(includeValue) {
             var valueSpec;
             if(value) {
               // Determine if value spec must contain the type inline
