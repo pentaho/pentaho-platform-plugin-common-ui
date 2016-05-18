@@ -358,7 +358,7 @@ define([
        */
       _validateLevel: function(addErrors) {
         var allRoleLevels = this.type.levels;
-        var level = this.level;
+        var level = this.get("level");
         var roleLevels = null; // defaults to all role levels
         if(level) {
           // Fixed level.

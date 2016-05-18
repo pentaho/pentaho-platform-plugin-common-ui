@@ -189,20 +189,18 @@ define([
         var model = createVisualModelAndMapping(ValidMapping);
         var fullValidMapping = model.visualRole;
 
-        var countryAttribute = new Attribute( { name: "country" });
-        fullValidMapping.attributes.add( countryAttribute );
-        var productAttribute = new Attribute( {name: "product"});
-        fullValidMapping.attributes.add(productAttribute);
+        fullValidMapping.attributes.add({name: "country"});
+        fullValidMapping.attributes.add({name: "product"});
 
         var dataSpec = {
           model: [
             {name: "country", type: "string", label: "Country"},
             {name: "product", type: "string", label: "Product"},
-            {name: "sales",   type: "number", lable: "Sales"}
+            {name: "sales",   type: "number", label: "Sales"}
           ],
           rows: [
             {c: [{v: "Portugal"}, {v: "fish"} ]},
-            {c: [{v: "Ireland"}, {v: "beer"} ]}
+            {c: [{v: "Ireland"},  {v: "beer"} ]}
           ]
         };
         model.data = new Table(dataSpec);
@@ -270,9 +268,16 @@ define([
         assertIsInvalid(mapping);
       });
 
-      it("fixed level", function() {
+      it("should consider valid a fixed level that is one of the visual role's levels", function() {
         var mapping = createFullValidMapping();
         mapping.level = "nominal";
+
+        assertIsValid(mapping);
+      });
+
+      it("should consider invalid a fixed level that is not one of the visual role's levels", function() {
+        var mapping = createFullValidMapping();
+        mapping.level = "quantitative";
 
         assertIsInvalid(mapping);
       });
