@@ -39,6 +39,12 @@ define([
 
         props: [
           {
+            name: "rows", //VISUAL_ROLE
+            type: {
+              props: {attributes: {isRequired: true}}
+            }
+          },
+          {
             name: "size", //VISUAL_ROLE
             type: {
               base: "pentaho/visual/role/quantitative",
