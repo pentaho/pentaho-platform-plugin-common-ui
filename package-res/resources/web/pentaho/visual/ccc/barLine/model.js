@@ -31,7 +31,7 @@ define([
 
     function requiredOneMeasure() {
       /*jshint validthis:true*/
-      return !this.measures.attributes.count && !this.measuresLine.attributes.count;
+      return !this.model.measures.attributes.count && !this.model.measuresLine.attributes.count;
     }
 
     function hasAttributesMeasuresLine() {
