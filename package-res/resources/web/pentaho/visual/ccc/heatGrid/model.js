@@ -31,7 +31,7 @@ define([
 
     function requiredOneMeasure() {
       /*jshint validthis:true*/
-      return !this.size.attributes.count && !this.color.attributes.count;
+      return !this.model.size.attributes.count && !this.model.color.attributes.count;
     }
 
     return CartesianAbstract.extend({
