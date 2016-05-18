@@ -78,8 +78,8 @@ define([
 
           // For multi-charts, Size and Family also used for chart title font
           {
-            name: "labelColor",
-            type: colorFactory
+            name:  "labelColor",
+            type:  colorFactory
           },
           {
             name: "labelSize",

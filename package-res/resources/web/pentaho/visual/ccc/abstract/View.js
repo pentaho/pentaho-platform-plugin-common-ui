@@ -1105,8 +1105,10 @@ define([
 
         options.valuesFont = util.defaultFont(util.readFontModel(model, "label"));
 
-        if(this._useLabelColor)
-          options.extensionPoints.label_textStyle = model.labelColor;
+        if(this._useLabelColor) {
+          var labelColor = model.labelColor;
+          if(labelColor) options.extensionPoints.label_textStyle = model.labelColor;
+        }
       }
     },
 
