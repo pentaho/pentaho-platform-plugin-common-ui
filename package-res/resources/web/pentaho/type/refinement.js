@@ -150,7 +150,7 @@ define([
      * the refinement type `PositiveNumber` is defined using the `validateInstance` method:
      *
      * ```js
-     * define(["module"], function(module) {
+     * define(["module", "pentaho/type/ValidationError"], function(module, ValidationError) {
      *
      *   // return type factory
      *   return function(context) {
@@ -168,7 +168,7 @@ define([
      *         validateInstance: function(num) {
      *           var errors = this.base(num);
      *           if(!errors) {
-     *             if(num <= 0) errors = [new Error("Not a positive number.")];
+     *             if(num <= 0) errors = [new ValidationError("Not a positive number.")];
      *           }
      *           return errors;
      *         }
@@ -581,7 +581,7 @@ define([
          *
          * @param {!pentaho.type.Value} value The value to validate.
          *
-         * @return {?Array.<!Error>} A non-empty array of `Error` or `null`.
+         * @return {?Array.<!pentaho.type.ValidationError>} A non-empty array of errors or `null`.
          *
          * @see pentaho.type.Value#validate
          * @see pentaho.type.Refinement.Type#_validateFacets
@@ -610,7 +610,7 @@ define([
          *
          * @param {!pentaho.type.Value} value The value to validate.
          *
-         * @return {?Array.<!Error>} An array of `Error` or `null`.
+         * @return {?Array.<!pentaho.type.ValidationError>} An array of errors or `null`.
          *
          * @protected
          */

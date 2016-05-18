@@ -371,7 +371,7 @@ define([
          * The given value is never a {@link Nully} value.
          *
          * When `null` is returned, it is considered that the conversion is not possible.
-         * For inform on the actual reason why the conversion is not possible,
+         * For informing on the actual reason why the conversion is not possible,
          * throw an [UserError]{@link pentaho.lang.UserError} should be used instead.
          *
          * The default implementation is the identity function.

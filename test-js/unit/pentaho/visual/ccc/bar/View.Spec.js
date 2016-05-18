@@ -47,7 +47,7 @@ define([
       });
 
       var elem = document.createElement("div");
-      new BarView(elem, model);
+      var view = new BarView(elem, model);
     });
 
     it("should be possible to render an instance", function(done) {

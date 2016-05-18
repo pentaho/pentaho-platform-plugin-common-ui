@@ -513,7 +513,7 @@ define([
        * You can use the error utilities in {@link pentaho.type.valueHelper} to
        * help in the implementation.
        *
-       * @return {?Array.<!Error>} A non-empty array of `Error` or `null`.
+       * @return {?Array.<!pentaho.type.ValidationError>} A non-empty array of errors or `null`.
        *
        * @see pentaho.type.Value#isValid
        */

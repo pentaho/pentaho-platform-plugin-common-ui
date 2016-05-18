@@ -433,7 +433,7 @@ define([
        *
        * @param {!pentaho.type.ComplexChangeset} changeset - The set of changes.
        *
-       * @return {pentaho.lang.Base.Error|undefined} An error if the change loop was canceled or invalid,
+       * @return {Error|undefined} An error if the change loop was canceled or invalid,
        * or `undefined` otherwise.
        *
        * @private
@@ -467,7 +467,7 @@ define([
        * Emits the "will:change" event, if need be.
        *
        * @param {!pentaho.type.ComplexChangeset} changeset - The set of changes.
-       * @param {!pentaho.lang.Base.Error} reason - The reason why the change loop was rejected.
+       * @param {!Error} reason - The reason why the change loop was rejected.
        *
        * @private
        */
@@ -748,7 +748,7 @@ define([
        * You can use the error utilities in {@link pentaho.type.valueHelper} to
        * help in the implementation.
        *
-       * @return {?Array.<!Error>} A non-empty array of `Error` or `null`.
+       * @return {?Array.<!pentaho.type.ValidationError>} A non-empty array of errors or `null`.
        *
        * @see pentaho.type.Value#isValid
        */
@@ -959,7 +959,8 @@ define([
          * Calls a function for each defined property type.
          *
          * @param {function(pentaho.type.Property.Type, number, pentaho.type.Complex) : boolean?} f
-         * The mapping function.
+         * The mapping function. Return `false` to break iteration.
+         *
          * @param {Object} [x] The JS context object on which `f` is called.
          *
          * @return {pentaho.type.Complex} This object.

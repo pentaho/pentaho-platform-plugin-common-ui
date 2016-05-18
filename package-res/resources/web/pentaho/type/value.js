@@ -17,10 +17,11 @@ define([
   "module",
   "./instance",
   "./valueHelper",
+  "./ValidationError",
   "./SpecificationContext",
   "../i18n!types",
   "../util/error"
-], function(module, instanceFactory, valueHelper, SpecificationContext, bundle, error) {
+], function(module, instanceFactory, valueHelper, ValidationError, SpecificationContext, bundle, error) {
 
   "use strict";
 
@@ -147,12 +148,27 @@ define([
        * You can use the error utilities in {@link pentaho.type.valueHelper} to
        * help in the implementation.
        *
-       * @return {?Array.<!Error>} A non-empty array of `Error` or `null`.
+       * @return {?Array.<!pentaho.type.ValidationError>} A non-empty array of errors or `null`.
        *
        * @see pentaho.type.Value#isValid
        */
       validate: function() {
         return null;
+      },
+
+      /**
+       * Ensures that the value is valid,
+       * and throws the first validation error
+       * if it is not.
+       *
+       * This method calls the [validate]{@link pentaho.type.Value#validate} method.
+       *
+       * @throws {pentaho.type.ValidationError} When the value is not valid,
+       * the first error returned by the `validate` method.
+       */
+      assertValid: function() {
+        var errors = this.validate();
+        if(errors) throw errors[0];
       },
       //endregion
 
@@ -301,17 +317,17 @@ define([
          *
          * @param {?any} value The value to validate.
          *
-         * @return {?Array.<!Error>} A non-empty array of `Error` or `null`.
+         * @return {?Array.<!pentaho.type.ValidationError>} A non-empty array of errors or `null`.
          *
          * @see pentaho.type.Value.Type#isValid
          */
         validate: function(value) {
           // 1. Is of type
           if(value == null)
-            return [new Error(bundle.structured.errors.value.cannotBeNull)];
+            return [new ValidationError(bundle.structured.errors.value.cannotBeNull)];
 
           if(!this.is(value))
-            return [new Error(bundle.format(bundle.structured.errors.value.notOfType, [this.label]))];
+            return [new ValidationError(bundle.format(bundle.structured.errors.value.notOfType, [this.label]))];
 
           // 2. Validate further, knowing it is an instance of.
           return this.validateInstance(value);
@@ -331,7 +347,7 @@ define([
          *
          * @param {!pentaho.type.Value} value The value to validate.
          *
-         * @return {?Array.<!Error>} A non-empty array of `Error` or `null`.
+         * @return {?Array.<!pentaho.type.ValidationError>} A non-empty array of errors or `null`.
          *
          * @see pentaho.type.Value#validate
          * @see pentaho.type.Value.Type#validate

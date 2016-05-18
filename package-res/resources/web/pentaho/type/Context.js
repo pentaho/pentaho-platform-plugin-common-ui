@@ -278,6 +278,38 @@ define([
     },
 
     /**
+     * Binds the initial arguments of a function to
+     * the instance constructors corresponding to
+     * given type references.
+     *
+     * The specified type references are each resolved synchonously,
+     * using [get]{@link pentaho.type.Context#get},
+     * when the bound function is first called.
+     * Thus, any resolve errors are only thrown then.
+     *
+     * If a fixed JavaScript context object is specified in `ctx`,
+     * then `fun` gets bound to that object.
+     * Otherwise, the JavaScript context object in which `fun` is called is dynamic (whichever the caller decides).
+     *
+     * @param {!Array.<pentaho.type.spec.UTypeReference>} typeRefs An array of type references.
+     * @param {function} fun The function to bind.
+     * @param {Object} [ctx] The fixed JavaScript context object to use.
+     *
+     * @return {function} The new bound function.
+     */
+    inject: function(typeRefs, fun, ctx) {
+      var InstCtors = null;
+      var me = this;
+
+      return function injected() {
+        // Resolve on first use.
+        if(!InstCtors) InstCtors = typeRefs.map(me.get, me);
+
+        return fun.apply(ctx || this, InstCtors.concat(arg.slice(arguments)));
+      };
+    },
+
+    /**
      * Gets, asynchronously, the **configured instance constructor** of a type.
      *
      * For more information on the `typeRef` argument,

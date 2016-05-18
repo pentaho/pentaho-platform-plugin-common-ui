@@ -74,7 +74,7 @@ define([
       });
     });
 
-    describe("#get|getAsync(type)", function() {
+    describe("#get|getAsync(typeRef)", function() {
 
       //region get test helpers
       /**
@@ -787,6 +787,150 @@ define([
       // should not throw when async and the requested module is not defined
       // should not throw when async and the requested module is not yet loaded
     }); // #get|getAsync
+
+    describe("#inject(typeRefs, fun, ctx)", function() {
+
+      it("should return a new function", function() {
+
+        return require.using(["pentaho/type/Context"], function(Context) {
+          var context = new Context();
+
+          var fun = function() {};
+          var result = context.inject([], fun, {});
+
+          expect(typeof result).toBe("function");
+          expect(typeof result).not.toBe(fun);
+        });
+      });
+
+      it("should return a function that when called for the first time resolves the type refs", function() {
+
+        return require.using(["pentaho/type/Context"], function(Context) {
+          var context = new Context();
+          var F1 = function() {};
+          var F2 = function() {};
+
+          spyOn(context, "get").and.callFake(function(typeRef) {
+            switch(typeRef) {
+              case "f1": return F1;
+              case "f2": return F2;
+            }
+          });
+
+          var fun = function() {};
+          var result = context.inject(["f2", "f1"], fun, {});
+
+          expect(context.get).not.toHaveBeenCalled();
+
+          result();
+
+          expect(context.get.calls.count()).toBe(2);
+
+          // Only on the first time...
+          result();
+
+          expect(context.get.calls.count()).toBe(2);
+        });
+      });
+
+      it("should return a function that when called calls the original with the resolved types", function() {
+
+        return require.using(["pentaho/type/Context"], function(Context) {
+          var context = new Context();
+          var F1 = function() {};
+          var F2 = function() {};
+
+          spyOn(context, "get").and.callFake(function(typeRef) {
+            switch(typeRef) {
+              case "f1": return F1;
+              case "f2": return F2;
+            }
+          });
+
+          var fun = jasmine.createSpy();
+          var result = context.inject(["f2", "f1"], fun, {});
+
+          result();
+
+          expect(fun.calls.count()).toBe(1);
+          expect(fun.calls.first().args.length).toBe(2);
+          expect(fun.calls.first().args[0]).toBe(F2);
+          expect(fun.calls.first().args[1]).toBe(F1);
+        });
+      });
+
+      it("should return a function that when called passes additional arguments to the original", function() {
+
+        return require.using(["pentaho/type/Context"], function(Context) {
+          var context = new Context();
+          var F1 = function() {};
+          var F2 = function() {};
+
+          spyOn(context, "get").and.callFake(function(typeRef) {
+            switch(typeRef) {
+              case "f1": return F1;
+              case "f2": return F2;
+            }
+          });
+
+          var fun = jasmine.createSpy();
+          var result = context.inject(["f2", "f1"], fun, {});
+
+          result(1, 2);
+
+          expect(fun.calls.count()).toBe(1);
+          expect(fun.calls.first().args.length).toBe(4);
+          expect(fun.calls.first().args[2]).toBe(1);
+          expect(fun.calls.first().args[3]).toBe(2);
+        });
+      });
+
+      it("should return a function that calls the original with the given `ctx`", function() {
+
+        return require.using(["pentaho/type/Context"], function(Context) {
+          var context = new Context();
+
+          var fun = jasmine.createSpy();
+          var ctx = {};
+          var result = context.inject([], fun, ctx);
+
+          result();
+
+          expect(fun.calls.count()).toBe(1);
+          expect(fun.calls.first().object).toBe(ctx);
+        });
+      });
+
+      it("should return a function that passes through `this` to the original when no `ctx` is given", function() {
+
+        return require.using(["pentaho/type/Context"], function(Context) {
+          var context = new Context();
+
+          var fun = jasmine.createSpy();
+          var result = context.inject([], fun);
+
+          var ctx = {};
+          result.call(ctx);
+
+          expect(fun.calls.count()).toBe(1);
+          expect(fun.calls.first().object).toBe(ctx);
+        });
+      });
+
+      it("should return a function that returns the original's return value", function() {
+
+        return require.using(["pentaho/type/Context"], function(Context) {
+          var context = new Context();
+          var value = {};
+          var fun = function() { return value; };
+          var fun2 = context.inject([], fun);
+
+          var result = fun2();
+
+          expect(result).toBe(value);
+        });
+      });
+    }); // #inject
 
     describe("#getAllAsync(baseTypeId, ka)", function() {
 
