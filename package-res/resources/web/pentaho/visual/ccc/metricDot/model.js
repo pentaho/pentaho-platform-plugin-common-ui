@@ -82,7 +82,8 @@ define([
               name: "size", //VISUAL_ROLE
               type: {
                 base: "pentaho/visual/role/quantitative",
-                dataType: "number",
+                //TODO: REMOVE THIS AFTER DEMO. For demoing the measurement level incompatibility.
+                //dataType: "number",
                 props: {attributes: {countMax: 1}}
               }
             },
