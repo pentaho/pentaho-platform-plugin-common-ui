@@ -783,7 +783,7 @@ define([
           keyArgs.omitProps = null;
         }
 
-        var includeDefaults = keyArgs.includeDefaults;
+        var includeDefaults = !!keyArgs.includeDefaults;
         var areEqual = this.type.areEqual;
 
         this.type.each(propToSpec, this);

@@ -16,8 +16,9 @@
 define([
   "module",
   "pentaho/i18n!messages",
+  "pentaho/util/object",
   "./aggregation"
-], function(module, bundle) {
+], function(module, bundle, O) {
 
   "use strict";
 
@@ -42,10 +43,35 @@ define([
      * @param {pentaho.visual.role.spec.UMappingAttribute} [spec] A visual role mapping attribute specification.
      */
     return Complex.extend("pentaho.visual.role.MappingAttribute", /** @lends pentaho.visual.role.MappingAttribute# */{
-      // How I wish...
-      //get uniqueConstraintKey() {
-      //  return [this.getv("aggr"), this.getv("name")];
-      //},
+
+      constructor: function(spec, keyArgs) {
+        // The name property?
+        if(typeof spec === "string") spec = {name: spec};
+
+        this.base(spec, keyArgs);
+      },
+
+      toSpecInContext: function(keyArgs) {
+        var spec = this.base(keyArgs);
+        if(spec && spec.constructor === Object) {
+          // If only the name is output, then return it directly.
+          var count = 0;
+          var name = null;
+
+          for(var p in spec) {
+            if(O.hasOwn(spec, p)) {
+              count++;
+              if(count > 1 || p !== "name") break;
+              // count === 0 && p === name
+              name = spec.name;
+            }
+          }
+
+          if(name && count === 1) spec = name;
+        }
+
+        return spec;
+      },
 
       type: /** @lends pentaho.visual.role.MappingAttribute.Type# */{
         id: module.id,
