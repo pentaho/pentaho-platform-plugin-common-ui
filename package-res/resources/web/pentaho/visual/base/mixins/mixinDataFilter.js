@@ -18,6 +18,8 @@ define([
 ], function(error) {
   "use strict";
 
+  /*global TypeError:false*/
+
   /**
    * @name mixinDataFilter
    * @memberOf pentaho.visual.base.mixins
