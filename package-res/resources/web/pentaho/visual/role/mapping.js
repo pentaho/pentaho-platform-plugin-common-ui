@@ -15,31 +15,23 @@
  */
 define([
   "module",
-  "pentaho/i18n!messages",
   "./mappingAttribute",
   "./level",
-  "pentaho/type/value",
-  "pentaho/type/list",
-  "pentaho/type/number",
-  "pentaho/type/date",
+  "pentaho/i18n!messages",
   "pentaho/type/valueHelper",
   "pentaho/util/object",
   "pentaho/util/error"
-], function(module, bundle, mappingAttributeFactory, measurementLevelFactory,
-    valueFactory, listFactory, numberFactory, dateFactory, valueHelper, O, error) {
+], function(module, mappingAttributeFactory, measurementLevelFactory, bundle, valueHelper, O, error) {
 
   "use strict";
 
   return function(context) {
 
-    var Complex = context.get("complex");
-
     var _mappingType;
-    var List = context.get(listFactory);
+
+    var Complex = context.get("complex");
     var MeasurementLevel = context.get(measurementLevelFactory);
     var ListLevel = context.get([measurementLevelFactory]);
-    var PentahoNumber = context.get(numberFactory);
-    var PentahoDate = context.get(dateFactory);
 
     /**
      * @name pentaho.visual.role.Mapping.Type
@@ -69,7 +61,7 @@ define([
      *
      * As an _instance_, the mapping holds two pieces of information:
      *
-     * 1. a fixed [level of measurement]{@link pentaho.visual.role.Mapping#level}
+     * 1. an optional, fixed [level of measurement]{@link pentaho.visual.role.Mapping#level}
      *    in which the visual role should operate
      * 2. a list of associations to data properties,
      *    [attributes]{@link pentaho.visual.role.Mapping#attributes},
@@ -77,7 +69,7 @@ define([
      *
      * @description Creates a visual role mapping instance.
      * @constructor
-     * @param {pentaho.visual.role.spec.UMapping} [spec] A visual role mapping specification.
+     * @param {pentaho.visual.role.spec.IMapping} [spec] A visual role mapping specification.
      */
     var VisualRoleMapping = Complex.extend("pentaho.visual.role.Mapping", /** @lends pentaho.visual.role.Mapping# */{
 
@@ -142,16 +134,25 @@ define([
       },
 
       /**
+       * Gets a value that indicates if the mapping has any attributes.
+       *
+       * @type {boolean}
+       */
+      get isMapped() {
+        return this.attributes.count > 0;
+      },
+
+      /**
        * Gets the level of measurement in which the visual role will effectively be operating on,
        * according to the mapping's current state.
        *
-       * When {@link pentaho.visual.role.Mapping#level} is not `null`,
+       * When [level]{@link pentaho.visual.role.Mapping#level} is not `null`,
        * that measurement level is returned.
-       * Otherwise,
-       * the value of {@link pentaho.visual.role.Mapping#levelAuto},
-       * which can be `undefined`, is returned.
+       * Otherwise, the value of [levelAuto]{@link pentaho.visual.role.Mapping#levelAuto},
+       * which can be `undefined`,
+       * is returned.
        *
-       * A visualization should respect the value of this property and actually
+       * A visualization should respect the value of this property (when defined) and actually
        * operate the visual role in the corresponding mode.
        *
        * @type {string|undefined}
@@ -284,6 +285,7 @@ define([
           if(!(name = mappingAttr.name) ||
               !(dataAttr = dataAttrs.get(name)) ||
               !(dataAttrLevel = dataAttr.level) ||
+              !MeasurementLevel.type.domain.get(dataAttrLevel) ||
               !(dataAttrType = context.get(dataAttr.type).type) ||
               !dataAttrType.isSubtypeOf(roleDataType))
             return; // invalid
@@ -300,10 +302,10 @@ define([
        *
        * Validity is determined as follows:
        *
-       * 1. if the mapping has no owner visual model it is invalid
+       * 1. if the mapping has no owner visual model, it is invalid
        * 2. if the visual model has a `null` [data]{@link pentaho.visual.base.Model#data},
        *    then every data property in [attributes]{@link pentaho.visual.role.Mapping#attributes} is
-       *    considered undefined.
+       *    considered undefined and invalid.
        * 2. otherwise, if the visual model has a non-`null` [data]{@link pentaho.visual.base.Model#data},
        *    then each data property in [attributes]{@link pentaho.visual.role.Mapping#attributes}:
        *   1. must be defined in `data`
@@ -392,7 +394,7 @@ define([
                     {
                       role: this.ownerProperty,
                       // Try to provide a label for dataAttrLevel.
-                      dataLevel: MeasurementLevel.type.domain.get(dataAttrLevel) || dataAttrLevel,
+                      dataLevel: MeasurementLevel.type.domain.get(dataAttrLevel),
                       roleLevels: ("'" + allRoleLevels.toArray().join("', '") + "'")
                     })));
           }
@@ -402,6 +404,8 @@ define([
       /**
        * Validates that every mapped attribute references a defined data property in the
        * data of the visual model and that its type is compatible with the visual role's dataType.
+       *
+       * Assumes the mapping is valid according to the base complex validation.
        *
        * @param {function} addErrors - Called to add errors.
        * @private
@@ -419,9 +423,6 @@ define([
         while(++i < L) {
           var roleAttr = roleAttrs.at(i);
           var name = roleAttr.name;
-
-          // Invalid attribute mapping? Not our concern.
-          if(!name) continue;
 
           // Attribute with no definition?
           var dataAttr = dataAttrs && dataAttrs.get(name);
@@ -470,13 +471,12 @@ define([
         var dataAttrs = data && data.model.attributes;
 
         var isQuant = MeasurementLevel.type.isQuantitative(levelEffective);
-        var keyFun = isQuant ? mappingAttrQuantitativeKey : mappingAttrQualitativeKey;
 
         var byKey = {};
         var i = -1;
         while(++i < L) {
           var roleAttr = roleAttrs.at(i);
-          var key = keyFun(roleAttr);
+          var key = isQuant ? roleAttr.keyQuantitative : roleAttr.keyQualitative;
           if(O.hasOwn(byKey, key)) {
             var dataAttr = dataAttrs.get(roleAttr.name);
             var message;
@@ -513,21 +513,23 @@ define([
 
         props: [
           /**
-           * Gets or sets the fixed measurement level in which the visual role is to operate on.
+           * Gets or sets the fixed measurement level in which the associated visual role is to operate on.
            *
-           * When `null`,
-           * the visual role operates in the automatically determined measurement level,
-           * as returned by {@link pentaho.visual.role.Mapping#levelAuto}.
+           * When `null` or unspecified,
+           * the associated visual role operates in an automatically determined measurement level,
+           * as returned by [levelAuto]{@link pentaho.visual.role.Mapping#levelAuto}.
            *
            * When specified,
-           * it must be one of the measurement levels returned by
-           * {@link pentaho.visual.role.Mapping.Type#levels};
+           * it must be one of the measurement levels supported by the associated visual role,
+           * as defined in [levels]{@link pentaho.visual.role.Mapping.Type#levels};
            * otherwise, the mapping is considered _invalid_.
            *
            * This JS property is syntax sugar for `this.getv("level")` and `this.set("level", value)`.
            *
            * @name pentaho.visual.role.Mapping#level
-           * @type {pentaho.visual.role.MeasurementLevel}
+           * @type {string}
+           *
+           * @see pentaho.visual.role.spec.IMapping#level
            */
           {name: "level", type: MeasurementLevel},
 
@@ -605,35 +607,29 @@ define([
           // Cannot clear (monotonicity).
           if(this === _mappingType || values == null) return;
 
-          if(values.constructor === Object) {
-            this._configureLevels(values);
-          } else if(Array.isArray(values) || (values instanceof List)) {
-            var levels = this._ensureLevelsOwn();
+          var levels = this._ensureLevelsOwn();
 
-            // TODO: Because we don't yet expose independent lists' events,
-            // we need to validate addition by hand and create a levels list to be added,
-            // thus performing parsing for us...
-            var addLevels = new ListLevel(values);
+          // TODO: Because we don't yet expose independent lists' events,
+          // we need to validate addition by hand and create a levels list to be added,
+          // thus performing parsing for us...
+          var addLevels = new ListLevel(values);
 
-            // A quantitative measurement level cannot be added if data type is qualitative.
-            var dataType = this.dataType;
-            if(!dataType.isAbstract && !isDataTypeQuantitative(dataType)) {
-              addLevels.each(function(addLevel) {
-                // New level and quantitative?
-                if(!levels.has(addLevel.key) && MeasurementLevel.type.isQuantitative(addLevel)) {
-                  throw error.argInvalid("levels",
-                      bundle.format(
-                          bundle.structured.errors.mapping.dataTypeIncompatibleWithRoleLevel,
-                          [this.dataType, addLevel]));
-                }
-              }, this);
-            }
-
-            levels.set(addLevels.toArray(), {noRemove: true, noMove: true});
-            levels.sort(MeasurementLevel.type.compare);
-          } else {
-            throw error.argInvalidType("levels", ["Array", "pentaho.type.List", "Object"], typeof values);
+          // A quantitative measurement level cannot be added if data type is qualitative.
+          var dataType = this.dataType;
+          if(!dataType.isAbstract && MeasurementLevel.type.isTypeQualitativeOnly(dataType)) {
+            addLevels.each(function(addLevel) {
+              // New level and quantitative?
+              if(!levels.has(addLevel.key) && MeasurementLevel.type.isQuantitative(addLevel)) {
+                throw error.argInvalid("levels",
+                    bundle.format(
+                        bundle.structured.errors.mapping.dataTypeIncompatibleWithRoleLevel,
+                        [this.dataType, addLevel]));
+              }
+            }, this);
           }
+
+          levels.set(addLevels.toArray(), {noRemove: true, noMove: true});
+          levels.sort(MeasurementLevel.type.compare);
         },
 
         _ensureLevelsOwn: function() {
@@ -646,19 +642,10 @@ define([
           }
           return levels;
         },
-
-        _configureLevels: function(config) {
-          var levels = this._ensureLevelsOwn();
-          O.eachOwn(config, function(v, key) {
-            var elem = levels.get(key);
-            if(!elem) throw error.argInvalid("levels", "A level with key '" +  key + "' is not defined.");
-            elem.configure(v);
-          });
-        },
         //endregion
 
         //region dataType
-        _dataType: context.get(valueFactory).type,
+        _dataType: context.get("value").type,
 
         /**
          * Gets or sets the type of data properties required by the visual role.
@@ -720,7 +707,7 @@ define([
               throw error.argInvalid("dataType", bundle.structured.errors.mapping.dataTypeNotSubtypeOfBaseType);
 
             // Is the new data type incompatible with existing measurement levels?
-            if(!isDataTypeQuantitative(newType)) {
+            if(MeasurementLevel.type.isTypeQualitativeOnly(newType)) {
               // Is there a qualitative measurement level?
               this.levels.each(function(level) {
                 if(!MeasurementLevel.type.isQualitative(level))
@@ -742,17 +729,5 @@ define([
     _mappingType = VisualRoleMapping.type;
 
     return VisualRoleMapping;
-
-    function isDataTypeQuantitative(dataType) {
-      return dataType.isSubtypeOf(PentahoNumber.type) || dataType.isSubtypeOf(PentahoDate.type);
-    }
-
-    function mappingAttrQuantitativeKey(roleAttr) {
-      return roleAttr.name + "|" + roleAttr.aggregation;
-    }
-
-    function mappingAttrQualitativeKey(roleAttr) {
-      return roleAttr.name;
-    }
   };
 });

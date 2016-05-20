@@ -36,17 +36,19 @@ define([
      *
      * Currently, the following aggregations are supported:
      *
-     * * `sum` - Sum
-     * * `avg` - Average
-     * * `min` - Minimum
-     * * `max` - Maximum
+     * * `sum` - Sum (applicable to numeric types)
+     * * `avg` - Average (applicable to numeric types)
+     * * `min` - Minimum (applicable to ordinal types)
+     * * `max` - Maximum (applicable to ordinal types)
+     * * `first` - First (applicable to any type)
+     * * `last` - Last (applicable to any type)
      */
     return Refinement.extend("pentaho.visual.role.Aggregation", {
       type: {
         id: module.id,
         of: "string",
         facets: ["DiscreteDomain"],
-        domain: ["sum", "avg", "min", "max"]
+        domain: ["sum", "avg", "min", "max", "first", "last"]
       }
     })
     .implement({type: bundle.structured.aggregation});

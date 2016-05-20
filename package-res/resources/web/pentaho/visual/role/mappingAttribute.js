@@ -16,9 +16,8 @@
 define([
   "module",
   "pentaho/i18n!messages",
-  "pentaho/util/object",
   "./aggregation"
-], function(module, bundle, O) {
+], function(module, bundle, aggregationFactory) {
 
   "use strict";
 
@@ -52,19 +51,20 @@ define([
       },
 
       toSpecInContext: function(keyArgs) {
+
         var spec = this.base(keyArgs);
-        if(spec && spec.constructor === Object) {
+
+        if(spec.constructor === Object) {
           // If only the name is output, then return it directly.
           var count = 0;
           var name = null;
 
+          //jshint -W089
           for(var p in spec) {
-            if(O.hasOwn(spec, p)) {
-              count++;
-              if(count > 1 || p !== "name") break;
-              // count === 0 && p === name
-              name = spec.name;
-            }
+            count++;
+            if(count > 1 || p !== "name") break;
+            // count === 0 && p === name
+            name = spec.name;
           }
 
           if(name && count === 1) spec = name;
@@ -73,13 +73,78 @@ define([
         return spec;
       },
 
-      type: /** @lends pentaho.visual.role.MappingAttribute.Type# */{
+      /**
+       * Gets a key of this mapping attribute for when
+       * the containing mapping's [levelEffective]{@link pentaho.visual.role.Mapping#levelEffective}
+       * is [qualitative]{@link pentaho.visual.role.MeasurementLevel.Type#isQualitative}.
+       *
+       * This key is composed by the value of the [name]{@link pentaho.visual.role.MappingAttribute#name} property.
+       *
+       * @type {string}
+       * @readOnly
+       */
+      get keyQualitative() {
+        var name = this.get("name");
+        return name ? name.key : "";
+      },
+
+      /**
+       * Gets a key of this mapping attribute for when
+       * the containing mapping's [levelEffective]{@link pentaho.visual.role.Mapping#levelEffective}
+       * is [quantitative]{@link pentaho.visual.role.MeasurementLevel.Type#isQuantitative}.
+       *
+       * This key is composed by the value of the [name]{@link pentaho.visual.role.MappingAttribute#name} and
+       * the [aggregation]{@link pentaho.visual.role.MappingAttribute#aggregation} properties.
+       *
+       * @type {string}
+       * @readOnly
+       */
+      get keyQuantitative() {
+        var aggregation = this.get("aggregation");
+        return this.keyQualitative + "|" + (aggregation ? aggregation.key : "");
+      },
+
+      type: {
         id: module.id,
 
         props: [
+          /**
+           * Gets or sets the name of the data property.
+           *
+           * This property is required.
+           *
+           * @name pentaho.visual.role.MappingAttribute#name
+           * @type {string}
+           * @see pentaho.visual.role.spec.IMappingAttribute#name
+           */
           {name: "name", type: "string", isRequired: true},
-          {name: "aggregation", type: "pentaho/visual/role/aggregation", value: "sum"},
-          {name: "isReverse", type: "boolean", value: false}
+
+          // Not defaulted because only "first" and "last" are compatible with any type.
+          // Applies to quantitative or qualitative mappings.
+          /**
+           * Gets or sets the aggregation that is performed on the data property.
+           *
+           * The value must be one of the supported [Aggregation]{@link pentaho.visual.role.Aggregation} values.
+           *
+           * The aggregation must be compatible with the data type of the data property.
+           *
+           * @name pentaho.visual.role.MappingAttribute#aggregation
+           * @type {string}
+           * @see pentaho.visual.role.spec.IMappingAttribute#aggregation
+           */
+          {name: "aggregation", type: aggregationFactory},
+
+          /**
+           * Gets or sets a value that indicates if the data property contributes to the
+           * default order of an _ordinal_ visual role mapping
+           * by using the **reverse** natural order of the data property.
+           *
+           * @name pentaho.visual.role.MappingAttribute#isReverseOrder
+           * @type {boolean}
+           * @default false
+           * @see pentaho.visual.role.spec.IMappingAttribute#isReverseOrder
+           */
+          {name: "isReverseOrder", type: "boolean", value: false}
         ]
       }
     })

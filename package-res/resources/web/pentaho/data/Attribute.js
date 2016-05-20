@@ -223,11 +223,7 @@ define([
      * @readOnly
      */
     get level() {
-      switch(this.type) {
-        case "number":
-        case "date": return "quantitative";
-      }
-      return "ordinal";
+      return this.isDiscrete ? "ordinal" : "quantitative";
     },
 
     /**
