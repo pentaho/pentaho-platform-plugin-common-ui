@@ -215,6 +215,18 @@ define([
     //endregion
 
     /**
+     * Gets the measurement level of this attribute.
+     *
+     * One of the values: `"nominal"`, `"ordinal"`, `"quantitative"`.
+     *
+     * @type {string}
+     * @readOnly
+     */
+    get level() {
+      return this.isDiscrete ? "ordinal" : "quantitative";
+    },
+
+    /**
      * Converts a member specification to a member of this attribute.
      *
      * @param {!(pentaho.data.spec.IMember|pentaho.data.Atomic)} memberSpec A member specification
