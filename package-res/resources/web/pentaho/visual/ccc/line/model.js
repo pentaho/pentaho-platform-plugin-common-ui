@@ -22,16 +22,16 @@ define([
   "../abstract/mixins/trendType",
   "../abstract/mixins/settingsMultiChartType",
   "../abstract/mixins/interpolationType"
-], function(visualFactory, bundle, labelsOptionFactory, shapeFactory, lineWidthFactory,
+], function(categoricalContinuousAbstractFactory, bundle, labelsOptionFactory, shapeFactory, lineWidthFactory,
     trendType, settingsMultiChartType, interpolationType) {
 
   "use strict";
 
   return function(context) {
 
-    var Visual = context.get(visualFactory);
+    var CategoricalContinuousAbstract = context.get(categoricalContinuousAbstractFactory);
 
-    return Visual.extend({
+    return CategoricalContinuousAbstract.extend({
 
         type: {
           id: "pentaho/visual/ccc/line",
@@ -42,25 +42,18 @@ define([
 
           props: [
             {
-              name: "columns",
-              type: ["string"],
-              dataType: "string",
-              isVisualRole: true,
-              isRequired: false
+              name: "columns", //VISUAL_ROLE
+              type: "pentaho/visual/role/ordinal"
             },
             {
-              name: "measures",
-              type: ["string"],
-              dataType: "number",
-              isVisualRole: true,
-              isRequired: true
+              name: "measures", //VISUAL_ROLE
+              type: {
+                props: {attributes: {isRequired: true}}
+              }
             },
             {
-              name: "multi",
-              type: ["string"],
-              dataType: "string",
-              isVisualRole: true,
-              isRequired: false
+              name: "multi", //VISUAL_ROLE
+              type: "pentaho/visual/role/ordinal"
             },
 
             {

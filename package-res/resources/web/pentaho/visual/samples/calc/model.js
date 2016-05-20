@@ -6,43 +6,46 @@ define([
 
   "use strict";
 
-  /**
-   * Creates the `Calc` type of a given context.
-   *
-   * @name calcFactory
-   * @memberOf pentaho.visual.samples
-   * @type pentaho.type.Factory
-   * @amd pentaho/visual/samples/calc
-   */
   return function(context) {
 
     var Visual = context.get(visualFactory);
 
+    /**
+     * @name pentaho.visual.samples.calc.Model
+     * @class
+     * @extends pentaho.visual.base.Model
+     * @amd {pentaho.type.Factory<pentaho.visual.samples.calc.Model>} pentaho/visual/samples/calc
+     */
     return Visual.extend({
       type: {
-        id: "pentaho/visual/samples/calc",
+        id:   "pentaho/visual/samples/calc",
         v2Id: "sample_calc",
 
-        view: "View", // relative to declaring type's `id` unless prefixed with '/'. When type is anonymous, it's global?
+        view: "View",
+
         styleClass: "pentaho-visual-samples-calculator",
+
         props: [
           {
             name: "levels",
-            type: ["string"],
-            isRequired: true,
-            isVisualRole: true
+            type: {
+              base: "pentaho/visual/role/nominal",
+              props: {attributes: {isRequired: true}}
+            }
           },
           {
             name: "measure",
-            isRequired: true,
-            isVisualRole: true
+            type: {
+              base: "pentaho/visual/role/quantitative",
+              props: {attributes: {countMin: 1, countMax: 1}}
+            }
           },
           {
             name: "operation",
             type: {
               base: "refinement",
               of:   "string",
-              facets: "DiscreteDomain",
+              facets: ["DiscreteDomain"],
               domain: ["min", "max", "avg", "sum"]
             },
             value: "min"

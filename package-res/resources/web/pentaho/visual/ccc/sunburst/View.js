@@ -53,10 +53,10 @@ define([
       var eps = options.extensionPoints,
           model = this.model;
 
-      var value = model.getv("sliceOrder");
+      var value = model.sliceOrder;
       if(value) options.sliceOrder = value;
 
-      var emptySlicesHidden = model.getv("emptySlicesHidden");
+      var emptySlicesHidden = model.emptySlicesHidden;
       this._hideNullMembers = emptySlicesHidden;
 
       if(emptySlicesHidden)
@@ -64,10 +64,10 @@ define([
           return !util.isNullMember(scene.vars.category.value);
         };
 
-      eps.label_textStyle = this.model.getv("labelColor");
+      eps.label_textStyle = this.model.labelColor;
 
       // Determine whether to show values label
-      if(model.getv("labelsOption") !== "none" && this.axes.measure.boundRoles.size) {
+      if(model.labelsOption !== "none" && this.axes.measure.boundRoles.size) {
         eps.label_textBaseline = "bottom";
         eps.label_textMargin = 2;
 
@@ -139,12 +139,12 @@ define([
     _configureLabels: function(options) {
       // Sunburst always shows category labels.
       options.valuesFont = util.defaultFont(util.readFontModel(this.model, "label"));
-      options.extensionPoints.label_textStyle = this.model.getv("labelColor");
+      options.extensionPoints.label_textStyle = this.model.labelColor;
     },
 
     _configureDisplayUnits: function() {
       var displayUnitsType = this.model.type.get("displayUnits", true).type;
-      var displayUnits = this.model.getv("displayUnits");
+      var displayUnits = this.model.displayUnits;
       var scaleFactor = displayUnitsType.scaleFactorOf(displayUnits);
       if(scaleFactor > 1) {
         var dims = this.options.dimensions,

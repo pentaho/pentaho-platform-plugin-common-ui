@@ -15,8 +15,9 @@
  */
 define([
   "../cartesianAbstract/View",
+  "pentaho/visual/role/level",
   "../trends"
-], function(AbstractCartesianChart) {
+], function(AbstractCartesianChart, levelFactory) {
 
   "use strict";
 
@@ -55,8 +56,16 @@ define([
       "measures": false
     },
 
+    _isColorDiscrete: function() {
+      var levelEffective = this.model.color.levelEffective;
+      if(levelEffective) {
+        var MeasurementLevel = this.model.type.context.get(levelFactory);
+        return MeasurementLevel.type.isQualitative(levelEffective);
+      }
+    },
+
     _getColorScaleKind: function() {
-      var isDiscrete = this._getRoleIsDiscrete("color");
+      var isDiscrete = this._isColorDiscrete();
       return isDiscrete == null ? undefined  :
              isDiscrete         ? "discrete" : "continuous";
     },
@@ -87,8 +96,8 @@ define([
     _isLegendVisible: function() {
       // Prevent default behavior that hides the legend when there are no series.
       // Hide the legend even if there is only one "series".
-
-      return this._getRoleIsDiscrete("color") === true &&
+      // TODO: this is not the proper way to do this cause it's tied to Analyzer's data format...
+      return this._isColorDiscrete() === true &&
           this._dataTable.isCrossTable &&
           this._dataTable.implem.cols.length > 1;
     },

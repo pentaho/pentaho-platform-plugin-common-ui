@@ -60,7 +60,7 @@ define([
       this.base.apply(this, arguments);
 
       if(options.valuesVisible) {
-        options.valuesLabelStyle = model.getv("labelsOption");
+        options.valuesLabelStyle = model.labelsOption;
       }
     },
 

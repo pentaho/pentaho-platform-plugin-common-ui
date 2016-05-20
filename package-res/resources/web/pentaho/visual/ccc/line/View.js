@@ -33,7 +33,7 @@ define([
     _readUserOptions: function(options) {
       this.base.apply(this, arguments);
 
-      var shape = this.model.getv("shape");
+      var shape = this.model.shape;
       if(shape && shape === "none") {
         options.dotsVisible = false;
       } else {

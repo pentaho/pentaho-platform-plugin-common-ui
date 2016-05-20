@@ -15,9 +15,10 @@
  */
 define([
   "pentaho/type/Context",
+  "pentaho/data/Table",
   "pentaho/visual/ccc/abstract",
   "pentaho/visual/ccc/bar"
-], function(Context) {
+], function(Context, Table) {
 
   "use strict";
 
@@ -36,21 +37,25 @@ define([
       expect(BarModel.prototype instanceof AbstractModel).toBe(true);
     });
 
-    it("should be possible to create a instance with not arguments", function() {
+    it("should be possible to create a instance with no arguments", function() {
       new BarModel();
     });
 
     it("should create a valid instance", function() {
+      var dataTable = new Table({
+        model: [
+          {name: "foo", type: "number"}
+        ]
+      });
+
       var model = new BarModel({
         width:    1,
         height:   1,
-        data:     {v: {}},
-        measures: ["foo"]
+        data:     {v: dataTable},
+        measures: {attributes: [{name: "foo"}]}
       });
 
-      expect(model.isValid).toBe(true);
-
-      //console.log(model.validate().map(function(err) { return err.message; }));
+      expect(model.validate()).toBe(null);
     });
   });
 });
