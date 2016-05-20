@@ -174,14 +174,14 @@ define([
           expect(spec.base).toBe("value");
         });
 
-        it("should serialize the root Value type with a null base", function() {
+        it("should serialize the root Value type with base 'instance'", function() {
           var scope = new SpecificationScope();
 
           var spec = Value.type.toSpecInContext();
 
           scope.dispose();
 
-          expect(spec.base).toBe(null);
+          expect(spec.base).toBe("instance");
         });
 
         it("should not serialize base when it is Complex", function() {

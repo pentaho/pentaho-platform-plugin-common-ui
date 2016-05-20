@@ -63,7 +63,10 @@ define([
             }
           },
           {name: "sameAsDefault", type: "number", value: 0},
-          {name: "noValue", type: "number"}
+          {name: "noValue", type: "number"},
+          {name: "emptyListEmptyDefault", type: ["number"]},
+          {name: "emptyListWithDefault", type: ["number"], value: [1, 2, 3]},
+          {name: "nonEmptyList", type: ["number"]}
         ]
       }
     });
@@ -79,7 +82,10 @@ define([
         when: whenDate
       },
       sameAsDefault: 0,
-      noValue: null
+      noValue: null,
+      emptyListEmptyDefault: [],
+      emptyListWithDefault: [],
+      nonEmptyList: [1, 2, 3]
     };
 
     var value;
@@ -320,21 +326,53 @@ define([
         describe("keyArgs.includeDefaults", function() {
 
           describe(": false", function() {
+            describe("non-list properties", function() {
+              it("should return an array with nulls where the value is equal to the default value", function() {
 
-            it("should return an array with nulls where the value equal to the default value", function() {
+                var spec = value.toSpecInContext({includeType: false, includeDefaults: false, preferPropertyArray: true});
 
-              var spec = value.toSpecInContext({includeType: false, includeDefaults: false, preferPropertyArray: true});
+                scope.dispose();
 
-              scope.dispose();
+                expect(spec.length).toBe(Derived.type.count);
 
-              expect(spec.length).toBe(Derived.type.count);
+                Derived.type.each(function(pType, index) {
+                  if(!pType.isList) {
+                    if(Derived.type.areEqual(pType.value, value.get(pType))) {
+                      expect(spec[index]).toBe(null);
+                    } else {
+                      expect(spec[index]).not.toBe(null);
+                    }
+                  }
+                });
+              });
+            });
 
-              Derived.type.each(function(pType, index) {
-                if(Derived.type.areEqual(pType.value, value.get(pType))) {
-                  expect(spec[index]).toBe(null);
-                } else {
-                  expect(spec[index]).not.toBe(null);
-                }
+            describe("list properties", function() {
+              it("should not return an empty array for an empty list that has an empty default value", function() {
+                var spec = value.toSpecInContext({
+                  includeType: false, preferPropertyArray: true, includeDefaults: false});
+
+                scope.dispose();
+
+                expect(spec[7]).toBe(null);
+              });
+
+              it("should return an empty array for an empty list that has non-empty default value", function() {
+                var spec = value.toSpecInContext({
+                  includeType: false, preferPropertyArray: true, includeDefaults: false});
+
+                scope.dispose();
+
+                expect(spec[8]).toEqual([]);
+              });
+
+              it("should serialize a non-empty list", function() {
+                var spec = value.toSpecInContext({
+                  includeType: false, preferPropertyArray: true, includeDefaults: false});
+
+                scope.dispose();
+
+                expect(spec[9]).toEqual([1, 2, 3]);
               });
             });
           });
@@ -349,6 +387,35 @@ define([
               scope.dispose();
 
               expect(spec.length).toBe(Derived.type.count);
+            });
+
+            describe("list properties", function() {
+              it("should return an empty array for an empty list that has an empty default value", function() {
+                var spec = value.toSpecInContext({
+                  includeType: false, preferPropertyArray: true, includeDefaults: true});
+
+                scope.dispose();
+
+                expect(spec[7]).toEqual([]);
+              });
+
+              it("should return an empty array for an empty list that has non-empty default value", function() {
+                var spec = value.toSpecInContext({
+                  includeType: false, preferPropertyArray: true, includeDefaults: true});
+
+                scope.dispose();
+
+                expect(spec[8]).toEqual([]);
+              });
+
+              it("should serialize a non-empty list", function() {
+                var spec = value.toSpecInContext({
+                  includeType: false, preferPropertyArray: true, includeDefaults: true});
+
+                scope.dispose();
+
+                expect(spec[9]).toEqual([1, 2, 3]);
+              });
             });
           });
         });
@@ -368,24 +435,54 @@ define([
         describe("keyArgs.includeDefaults", function() {
 
           describe(": false", function() {
+            describe("non-list properties", function() {
+              it("should return a plain object with properties only for each of " +
+                 "the non-default-valued complex type's properties", function() {
 
-            it("should return a plain object with properties only for each of " +
-               "the non-default-valued complex type's properties", function() {
+                var spec = value.toSpecInContext(
+                    {includeType: false, includeDefaults: false, preferPropertyArray: false});
 
-              var spec = value.toSpecInContext(
-                  {includeType: false, includeDefaults: false, preferPropertyArray: false});
+                scope.dispose();
 
-              scope.dispose();
-
-              Derived.type.each(function(pType) {
-                if(Derived.type.areEqual(pType.value, value.get(pType))) {
-                  expect(pType.name in spec).toBe(false);
-                } else {
-                  expect(pType.name in spec).toBe(true);
-                }
+                Derived.type.each(function(pType) {
+                  if(!pType.isList) {
+                    if(Derived.type.areEqual(pType.value, value.get(pType))) {
+                      expect(pType.name in spec).toBe(false);
+                    } else {
+                      expect(pType.name in spec).toBe(true);
+                    }
+                  }
+                });
               });
             });
 
+            describe("list properties", function() {
+              it("should not return an empty array for an empty list that has an empty default value", function() {
+                var spec = value.toSpecInContext({includeType: false, preferPropertyArray: false, includeDefaults: false});
+
+                scope.dispose();
+
+                expect("emptyListEmptyDefault" in spec).toBe(false);
+              });
+
+              it("should return an empty array for an empty list that has non-empty default value", function() {
+                var spec = value.toSpecInContext({includeType: false, preferPropertyArray: false, includeDefaults: false});
+
+                scope.dispose();
+
+                expect("emptyListWithDefault" in spec).toBe(true);
+                expect(spec.emptyListWithDefault).toEqual([]);
+              });
+
+              it("should serialize a non-empty list", function() {
+                var spec = value.toSpecInContext({includeType: false, preferPropertyArray: false, includeDefaults: false});
+
+                scope.dispose();
+
+                expect("nonEmptyList" in spec).toBe(true);
+                expect(spec.nonEmptyList).toEqual([1, 2, 3]);
+              });
+            });
           });
 
           describe(": true", function() {
@@ -402,9 +499,42 @@ define([
                 expect(pType.name in spec).toBe(true);
               });
             });
+
+            describe("list properties", function() {
+              it("should not return an empty array for an empty list that has an empty default value", function() {
+                var spec = value.toSpecInContext({
+                  includeType: false, preferPropertyArray: false, includeDefaults: true});
+
+                scope.dispose();
+
+                expect("emptyListEmptyDefault" in spec).toBe(true);
+                expect(spec.emptyListEmptyDefault).toEqual([]);
+              });
+
+              it("should return an empty array for an empty list that has non-empty default value", function() {
+                var spec = value.toSpecInContext({
+                  includeType: false, preferPropertyArray: false, includeDefaults: true});
+
+                scope.dispose();
+
+                expect("emptyListWithDefault" in spec).toBe(true);
+                expect(spec.emptyListWithDefault).toEqual([]);
+              });
+
+              it("should serialize a non-empty list", function() {
+                var spec = value.toSpecInContext({
+                  includeType: false, preferPropertyArray: false, includeDefaults: true});
+
+                scope.dispose();
+
+                expect("nonEmptyList" in spec).toBe(true);
+                expect(spec.nonEmptyList).toEqual([1, 2, 3]);
+              });
+            });
           });
         });
       });
+
     }); // toSpecInContext
   });
 });

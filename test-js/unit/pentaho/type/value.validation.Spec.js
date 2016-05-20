@@ -15,8 +15,9 @@
  */
 define([
   "pentaho/type/Context",
+  "pentaho/type/ValidationError",
   "pentaho/i18n!/pentaho/type/i18n/types"
-], function(Context, bundle) {
+], function(Context, ValidationError, bundle) {
 
   "use strict";
 
@@ -38,7 +39,7 @@ define([
           type: {
             instance: {
               validate: function() {
-                return [new Error("Foo")];
+                return [new ValidationError("Foo")];
               }
             }
           }
@@ -59,7 +60,7 @@ define([
 
       it("should return `false` if #validate() returns a truthy value", function() {
         var va = new Value();
-        spyOn(va, "validate").and.returnValue([new Error()]);
+        spyOn(va, "validate").and.returnValue([new ValidationError()]);
         expect(va.isValid).toBe(false);
       });
 
@@ -69,6 +70,37 @@ define([
         expect(va.isValid).toBe(true);
       });
     });// end #isValid
+
+    describe("#assertValid() -", function() {
+      it("should not throw an error if the value is valid", function() {
+        var va = new Value();
+        spyOn(va, "validate").and.returnValue(null);
+
+        expect(function() {
+          va.assertValid();
+        }).not.toThrow();
+      });
+
+      it("should throw an error if the value is not valid", function() {
+        var va = new Value();
+        spyOn(va, "validate").and.returnValue([new ValidationError()]);
+
+        expect(function() {
+          va.assertValid();
+        }).toThrow();
+      });
+
+      it("should throw the first error if the value is not valid", function() {
+        var va = new Value();
+        var e1 = new ValidationError();
+        var e2 = new ValidationError();
+        spyOn(va, "validate").and.returnValue([e1, e2]);
+
+        expect(function() {
+          va.assertValid();
+        }).toThrow(e1);
+      });
+    });// end #assertValid()
   });
 
   describe("pentaho.type.Value.Type -", function() {
@@ -83,11 +115,11 @@ define([
 
       it("should return `false` if .validate(.) returns a truthy value", function() {
         var va = new Value();
-        spyOn(Value.type, "validate").and.returnValue([new Error()]);
+        spyOn(Value.type, "validate").and.returnValue([new ValidationError()]);
         expect(Value.type.isValid(va)).toBe(false);
       });
 
-      it("should return `true` if .validate() returns a nully value", function() {
+      it("should return `true` if .validate(.) returns a nully value", function() {
         var va = new Value();
         spyOn(Value.type, "validate").and.returnValue(null);
         expect(Value.type.isValid(va)).toBe(true);
@@ -124,7 +156,7 @@ define([
 
         expect(Array.isArray(errors)).toBe(true);
         expect(errors.length).toBe(1);
-        expect(errors[0] instanceof Error).toBe(true);
+        expect(errors[0] instanceof ValidationError).toBe(true);
         expect(errors[0].message)
           .toBe(bundle.format(bundle.structured.errors.value.notOfType, [PentahoNumber.type.label]));
       });
@@ -141,7 +173,7 @@ define([
 
       it("should return an error array returned by the validateInstance method", function() {
         var value = new Value();
-        var errors = [new Error()];
+        var errors = [new ValidationError()];
         spyOn(Value.type, "validateInstance").and.returnValue(errors);
         var result = Value.type.validate(value);
         expect(result).toBe(errors);

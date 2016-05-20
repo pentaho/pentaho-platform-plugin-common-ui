@@ -15,21 +15,20 @@
  */
 define([
   "pentaho/type/Context",
-  "pentaho/type/Instance",
-  "pentaho/type/facets/Refinement"
-], function(Context, Instance, RefinementFacet) {
+  "pentaho/type/facets/Refinement",
+  "pentaho/type/ValidationError"
+], function(Context, RefinementFacet, ValidationError) {
 
   "use strict";
 
   /*global describe:true, it:true, expect:true, beforeEach:true, spyOn:true*/
 
-  var context = new Context(),
-      Simple  = context.get("pentaho/type/simple"),
-      Refinement = context.get("pentaho/type/refinement");
-
   describe("pentaho.type.Refinement.Type -", function() {
 
-    var MySimple = Simple.extend();
+    var context = new Context(),
+        Simple  = context.get("pentaho/type/simple"),
+        Refinement = context.get("pentaho/type/refinement"),
+        MySimple = Simple.extend();
 
     describe("#validate(value) -", function() {
       it("should call #is(value) and value.validate()", function() {
@@ -67,7 +66,7 @@ define([
         var value = new MySimple(123);
 
         spyOn(Refinement.type, "_validateFacets").and.callThrough();
-        spyOn(value, "validate").and.returnValue([new Error()]);
+        spyOn(value, "validate").and.returnValue([new ValidationError()]);
         spyOn(Facet, "validate").and.callThrough();
 
         var result = MyRefinement.type.validate(value);
@@ -110,11 +109,11 @@ define([
       });
 
       it("should collect errors of every facet if base validation succeeds", function() {
-        var e1 = new Error(),
-            e2 = new Error(),
-            e3 = new Error(),
-            e4 = new Error(),
-            e5 = new Error();
+        var e1 = new ValidationError(),
+            e2 = new ValidationError(),
+            e3 = new ValidationError(),
+            e4 = new ValidationError(),
+            e5 = new ValidationError();
 
         var Facet1 = RefinementFacet.extend({}, {
           id: "my/foo",

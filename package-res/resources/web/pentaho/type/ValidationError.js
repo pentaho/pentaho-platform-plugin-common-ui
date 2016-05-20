@@ -15,35 +15,36 @@
  */
 
 define([
-  "./Base"
-], function(Base) {
+  "../lang/UserError"
+], function(UserError) {
 
   "use strict";
 
   /**
-   * @classDesc The `UserError` class is the base class of error objects associated with
-   * the logic of a given operation.
+   * @classDesc The `ValidationError` class is the base class of error objects associated with
+   * [value]{@link pentaho.type.Value} validation.
    *
-   * @name UserError
-   * @memberOf pentaho.lang
+   * @name ValidationError
+   * @memberOf pentaho.type
    * @class
-   * @extends pentaho.lang.Base.Error
+   * @extends pentaho.lang.UserError
+   * @see pentaho.type.Value#validate
    *
-   * @description Creates a user error object.
+   * @description Creates a validation error object.
    * @constructor
    * @param {string} message The error message.
    */
 
-  return Base.Error.extend("pentaho.lang.UserError", /** @lends pentaho.lang.UserError# */{
+  return UserError.extend("pentaho.type.ValidationError", /** @lends pentaho.type.ValidationError# */{
     /**
      * The name of the type of error.
      *
      * @type {string}
      * @readonly
-     * @default "UserError"
+     * @default "ValidationError"
      */
     get name() {
-      return "UserError";
+      return "ValidationError";
     }
   });
 });

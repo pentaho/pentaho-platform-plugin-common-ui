@@ -433,7 +433,7 @@ define([
        *
        * @param {!pentaho.type.ComplexChangeset} changeset - The set of changes.
        *
-       * @return {pentaho.lang.Base.Error|undefined} An error if the change loop was canceled or invalid,
+       * @return {Error|undefined} An error if the change loop was canceled or invalid,
        * or `undefined` otherwise.
        *
        * @private
@@ -467,7 +467,7 @@ define([
        * Emits the "will:change" event, if need be.
        *
        * @param {!pentaho.type.ComplexChangeset} changeset - The set of changes.
-       * @param {!pentaho.lang.Base.Error} reason - The reason why the change loop was rejected.
+       * @param {!Error} reason - The reason why the change loop was rejected.
        *
        * @private
        */
@@ -748,7 +748,7 @@ define([
        * You can use the error utilities in {@link pentaho.type.valueHelper} to
        * help in the implementation.
        *
-       * @return {?Array.<!Error>} A non-empty array of `Error` or `null`.
+       * @return {?Array.<!pentaho.type.ValidationError>} A non-empty array of errors or `null`.
        *
        * @see pentaho.type.Value#isValid
        */
@@ -783,7 +783,7 @@ define([
           keyArgs.omitProps = null;
         }
 
-        var includeDefaults = keyArgs.includeDefaults;
+        var includeDefaults = !!keyArgs.includeDefaults;
         var areEqual = this.type.areEqual;
 
         this.type.each(propToSpec, this);
@@ -799,7 +799,22 @@ define([
           if(omitProps && O.hasOwn(omitProps, name)) return;
 
           var value = this._values[name];
-          if(includeDefaults || !areEqual(propType.value, value)) {
+
+          var includeValue = includeDefaults;
+          if(!includeValue) {
+            var defaultValue = propType.value;
+            // Isn't equal to the default value?
+            if(propType.isList) {
+              // TODO: This is not perfect... In a way lists are always created by us.
+              // If a default list has been specified, this fails to not serialize a default list with count > 0.
+              // However, this prevents serializing an empty list when the default is also empty.
+              includeValue = (defaultValue && defaultValue.count > 0) || (value.count > 0);
+            } else {
+              includeValue = !areEqual(defaultValue, value);
+            }
+          }
+
+          if(includeValue) {
             var valueSpec;
             if(value) {
               // Determine if value spec must contain the type inline
@@ -847,6 +862,8 @@ define([
         isAbstract: true,
 
         styleClass: "pentaho-type-complex",
+
+        get isComplex() { return true; },
 
         //region properties property
         _props: null,
@@ -957,7 +974,8 @@ define([
          * Calls a function for each defined property type.
          *
          * @param {function(pentaho.type.Property.Type, number, pentaho.type.Complex) : boolean?} f
-         * The mapping function.
+         * The mapping function. Return `false` to break iteration.
+         *
          * @param {Object} [x] The JS context object on which `f` is called.
          *
          * @return {pentaho.type.Complex} This object.

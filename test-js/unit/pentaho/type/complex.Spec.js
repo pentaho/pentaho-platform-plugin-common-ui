@@ -15,11 +15,10 @@
  */
 define([
   "pentaho/type/Context",
-  "pentaho/type/Property",
   "pentaho/type/PropertyTypeCollection",
   "tests/pentaho/util/errorMatch",
   "./sloppyModeUtil"
-], function(Context, Property, PropertyTypeCollection, errorMatch, sloppyModeUtil) {
+], function(Context, PropertyTypeCollection, errorMatch, sloppyModeUtil) {
   "use strict";
 
   /* global describe:false, it:false, expect:false, beforeEach:false */
@@ -27,9 +26,9 @@ define([
   var context = new Context();
   var Value = context.get("value");
   var Complex = context.get("complex");
+  var Property = context.get("property");
   var PentahoString = context.get("string");
   var List = context.get("list");
-  var NumberList = context.get(["number"]);
 
   describe("pentaho.type.Complex", function() {
     describe("anatomy", function() {

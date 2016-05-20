@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Instance",
+  "pentaho/type/Context",
   "pentaho/type/SpecificationScope",
   "pentaho/type/SpecificationContext",
   "./serializationUtil"
-], function(Instance, SpecificationScope, SpecificationContext, serializationUtil) {
+], function(Context, SpecificationScope, SpecificationContext, serializationUtil) {
 
   "use strict";
 
@@ -26,6 +26,9 @@ define([
            JSON:false */
 
   describe("pentaho.type.Type", function() {
+
+    var context = new Context();
+    var Instance = context.get("instance");
 
     describe("#toSpec(keyArgs)", function() {
       var derivedType;

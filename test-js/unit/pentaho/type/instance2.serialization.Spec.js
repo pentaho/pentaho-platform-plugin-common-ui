@@ -14,14 +14,16 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Instance",
+  "pentaho/type/Context",
   "pentaho/type/SpecificationContext"
-], function(Instance, SpecificationContext) {
+], function(Context, SpecificationContext) {
   "use strict";
 
   /* global describe:false, it:false, expect:false, beforeEach:false, spyOn:false */
 
   describe("pentaho.type.Instance", function() {
+    var context = new Context();
+    var Instance = context.get("instance");
 
     describe("#toSpec(keyArgs)", function() {
       var value;

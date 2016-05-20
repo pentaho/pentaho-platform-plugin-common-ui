@@ -575,6 +575,58 @@ define([
         expect(list.indexOf(new PentahoNumber(1))).toBe(-1);
       });
     });
+
+    describe("#each(fun, ctx)", function() {
+
+      it("should call `fun` for every element of the list, in order", function() {
+        var list = new NumberList([10, 20, 30]);
+
+        var fun = jasmine.createSpy();
+
+        list.each(fun);
+
+        var calls = fun.calls.all();
+        expect(calls.length).toBe(3);
+
+        expect(calls[0].args.length).toBe(3);
+        expect(calls[0].args[0].value).toBe(10);
+        expect(calls[0].args[1]).toBe(0);
+        expect(calls[0].args[2]).toBe(list);
+
+        expect(calls[1].args.length).toBe(3);
+        expect(calls[1].args[0].value).toBe(20);
+        expect(calls[1].args[1]).toBe(1);
+        expect(calls[1].args[2]).toBe(list);
+
+        expect(calls[2].args.length).toBe(3);
+        expect(calls[2].args[0].value).toBe(30);
+        expect(calls[2].args[1]).toBe(2);
+        expect(calls[2].args[2]).toBe(list);
+      });
+
+      it("should call `fun` with the specified `ctx`", function() {
+        var list = new NumberList([10]);
+
+        var fun = jasmine.createSpy();
+        var ctx = {};
+        list.each(fun, ctx);
+
+        var calls = fun.calls.all();
+        expect(fun.calls.first().object).toBe(ctx);
+      });
+
+      it("should stop iteration if `fun` returns `false`", function() {
+        var list = new NumberList([10, 20, 30]);
+
+        var fun = jasmine.createSpy().and.callFake(function(v, i) {
+          if(i === 1) return false;
+        });
+
+        list.each(fun);
+
+        expect(fun.calls.count()).toBe(2);
+      });
+    });
     //endregion
 
     //region write methods
@@ -1272,12 +1324,6 @@ define([
       describe("#isList -", function() {
         it("should return the value `true`", function() {
           expect(List.type.isList).toBe(true);
-        });
-      });
-
-      describe("#isRefinement -", function() {
-        it("should return the value `false`", function() {
-          expect(List.type.isRefinement).toBe(false);
         });
       });
     }); //endregion Type

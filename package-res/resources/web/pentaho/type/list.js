@@ -107,7 +107,7 @@ define([
        * Ownership cannot change.
        *
        * @param {!pentaho.type.Complex} owner - The owner complex value.
-       * @param {!pentaho.type.Property} propType - The property type of `owner` whose value is this instance.
+       * @param {!pentaho.type.Property.Type} propType - The property type of `owner` whose value is this instance.
        *
        * @throws {TypeError} When called with argument values that are different from those of the first call.
        *
@@ -396,6 +396,24 @@ define([
         return map ? this._elems.map(map) : this._elems.slice();
       },
 
+      /**
+       * Calls a function for each element of the list.
+       *
+       * @param {function(pentaho.type.Element, number, pentaho.type.List) : boolean?} fun
+       * The mapping function. Return `false` to break iteration.
+       *
+       * @param {Object} [ctx] The JS context object on which `fun` is called.
+       */
+      each: function(fun, ctx) {
+        var elems = this._elems;
+        var L = elems.length;
+        var i = -1;
+
+        while(++i < L)
+          if(fun.call(ctx, elems[i], i, this) === false)
+            break;
+      },
+
       // TODO: Replace this use by transaction scopes, when they're implemented.
       /**
        * Enters a change scope and returns a disposable object for exiting the scope.
@@ -495,7 +513,7 @@ define([
        * You can use the error utilities in {@link pentaho.type.valueHelper} to
        * help in the implementation.
        *
-       * @return {?Array.<!Error>} A non-empty array of `Error` or `null`.
+       * @return {?Array.<!pentaho.type.ValidationError>} A non-empty array of errors or `null`.
        *
        * @see pentaho.type.Value#isValid
        */
@@ -546,35 +564,7 @@ define([
 
         styleClass: "pentaho-type-list",
 
-        //region list property
-        /**
-         * Gets a value that indicates if this type is a list type.
-         *
-         * This implementation is sealed and always returns `true`.
-         *
-         * @type boolean
-         * @readOnly
-         * @sealed
-         */
-        get isList() {
-          return true;
-        },
-        //endregion
-
-        //region isRefinement property
-        /**
-         * Gets a value that indicates if this type is a isRefinement type.
-         *
-         * This implementation is sealed and always returns `false`.
-         *
-         * @type boolean
-         * @readOnly
-         * @sealed
-         */
-        get isRefinement() {
-          return false;
-        },
-        //endregion
+        get isList() { return true; },
 
         //region of
         _elemType: Element.type,
@@ -661,12 +651,10 @@ define([
 
           // No other attributes, no id and base is "list"?
           if(!this._fillSpecInContext(spec, keyArgs) && !spec.id && spec.base === "list") {
-            // Can use the shorthand [ofType] syntax.
-            // Default ofType in [] syntax is "string" -> [] <=> ["string"]
-            // surely "element" ...
+
             if(!spec.of) spec.of = this._elemType.toRefInContext(keyArgs);
 
-            return spec.of === "string" ? [] : [spec.of];
+            return [spec.of];
           }
 
           // Need id

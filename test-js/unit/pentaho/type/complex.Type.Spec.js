@@ -15,20 +15,20 @@
  */
 define([
   "pentaho/type/Context",
-  "pentaho/type/Property",
   "pentaho/type/PropertyTypeCollection",
   "tests/pentaho/util/errorMatch",
   "./sloppyModeUtil"
-], function(Context, Property, PropertyTypeCollection, errorMatch, sloppyModeUtil) {
+], function(Context, PropertyTypeCollection, errorMatch, sloppyModeUtil) {
   "use strict";
 
   /* global describe:false, it:false, expect:false, beforeEach:false */
 
   var context = new Context();
+  var Property = context.get("property");
   var PropertyType = Property.Type;
-  var Value = context.get("pentaho/type/value");
-  var Complex = context.get("pentaho/type/complex");
-  var PentahoString = context.get("pentaho/type/string");
+  var Value = context.get("value");
+  var Complex = context.get("complex");
+  var PentahoString = context.get("string");
 
   describe("pentaho.type.Complex.Type", function() {
 
@@ -299,6 +299,12 @@ define([
 
         expect(A.type.at(0).label).toBe("labelX");
         expect(A.type.at(1).label).toBe("labelY");
+      });
+    });
+
+    describe("#isComplex", function() {
+      it("should have `isComplex` equal to `true`", function () {
+        expect(Complex.type.isComplex).toBe(true);
       });
     });
 
