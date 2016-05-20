@@ -22,7 +22,7 @@ define([
 
   function isApplicableTrend() {
     /*jshint validthis:true */
-    return this.getv("trendType") !== "none";
+    return this.trendType !== "none";
   }
 
   // Used by: Line, Bar, Scatter

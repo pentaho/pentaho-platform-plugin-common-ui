@@ -39,19 +39,23 @@ define([
 
         props: [
           {
-            name: "size",
-            type: "string",
-            dataType: "number",
-            isVisualRole: true
+            name: "rows", //VISUAL_ROLE
+            type: {
+              props: {attributes: {isRequired: true}}
+            }
           },
           {
-            name: "multi",
-            type: ["string"],
-            dataType: "string",
-            isVisualRole: true,
-            isRequired: false
+            name: "size", //VISUAL_ROLE
+            type: {
+              base: "pentaho/visual/role/quantitative",
+              dataType: "number",
+              props: {attributes: {countMax: 1}}
+            }
           },
-
+          {
+            name: "multi", //VISUAL_ROLE
+            type: "pentaho/visual/role/ordinal"
+          },
           {
             name: "displayUnits",
             type: displayUnitsFactory,

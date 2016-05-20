@@ -31,7 +31,17 @@ define([
 
     function requiredOneMeasure() {
       /*jshint validthis:true*/
-      return !this.count("measures") && !this.count("measuresLine");
+      return !this.model.measures.attributes.count && !this.model.measuresLine.attributes.count;
+    }
+
+    function hasAttributesMeasuresLine() {
+      /*jshint validthis:true*/
+      return this.measuresLine.attributes.count > 0;
+    }
+
+    function hasAttributesMeasures() {
+      /*jshint validthis:true*/
+      return this.measuresLine.attributes.count > 0;
     }
 
     return BarAbstract.extend({
@@ -45,21 +55,24 @@ define([
 
         props: [
           {
-            name: "measures",
-            isRequired: requiredOneMeasure
+            name: "measures", //VISUAL_ROLE
+            type: {
+              props: {attributes: {isRequired: requiredOneMeasure}}
+            }
           },
           {
-            name: "measuresLine",
-            type: ["string"],
-            dataType: "number",
-            isVisualRole: true,
-            isRequired: requiredOneMeasure
+            name: "measuresLine", //VISUAL_ROLE
+            type: {
+              base: "pentaho/visual/role/quantitative",
+              dataType: "number",
+              props: {attributes: {isRequired: requiredOneMeasure}}
+            }
           },
 
           {
             name: "lineWidth",
             type: lineWidthFactory,
-            isApplicable: function() { return this.count("measuresLine") > 0; },
+            isApplicable: hasAttributesMeasuresLine,
             isRequired: true,
             value: 1
           },
@@ -69,7 +82,7 @@ define([
               base: labelsOptionFactory,
               domain: ["none", "center", "insideEnd", "insideBase", "outsideEnd"]
             },
-            isApplicable: function() { return this.count("measures") > 0; },
+            isApplicable: hasAttributesMeasures,
             isRequired: true,
             value: "none"
           },
@@ -80,7 +93,7 @@ define([
               base: labelsOptionFactory,
               domain: ["none", "center", "left", "right", "top", "bottom"]
             },
-            isApplicable: function() { return this.count("measuresLine") > 0; },
+            isApplicable: hasAttributesMeasuresLine,
             isRequired: true,
             value: "none"
           },
@@ -90,7 +103,7 @@ define([
             type: shapeFactory,
             isRequired: true,
             value: "circle",
-            isApplicable: function() { return this.count("measuresLine") > 0; }
+            isApplicable: hasAttributesMeasuresLine
           }
         ]
       }

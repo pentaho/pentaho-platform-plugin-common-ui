@@ -67,36 +67,7 @@ define([
 
         styleClass: "pentaho-type-element",
 
-        //region list property
-        //@override
-        /**
-         * Gets a value that indicates if this type is a list type.
-         *
-         * This implementation is sealed and always returns `false`.
-         *
-         * @type boolean
-         * @readOnly
-         * @sealed
-         */
-        get isList() {
-          return false;
-        },
-        //endregion
-
-        //region isRefinement property
-        /**
-         * Gets a value that indicates if this type is a refinement type.
-         *
-         * This implementation is sealed and always returns `false`.
-         *
-         * @type boolean
-         * @readOnly
-         * @sealed
-         */
-        get isRefinement() {
-          return false;
-        },
-        //endregion
+        get isElement() { return true; },
 
         //region format
 

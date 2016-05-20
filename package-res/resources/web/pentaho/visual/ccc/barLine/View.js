@@ -85,7 +85,7 @@ define([
     _readUserOptions: function(options) {
       this.base.apply(this, arguments);
 
-      var shape = this.model.getv("shape");
+      var shape = this.model.shape;
       if(shape && shape === "none") {
         options.pointDotsVisible = false;
       } else {
@@ -112,12 +112,12 @@ define([
       this.base.apply(this, arguments);
 
       // Plot2
-      var lineLabelsAnchor = model.getv("lineLabelsOption");
+      var lineLabelsAnchor = model.lineLabelsOption;
       if(lineLabelsAnchor && lineLabelsAnchor !== "none") {
         options.plot2ValuesVisible = true;
         options.plot2ValuesAnchor = lineLabelsAnchor;
         options.plot2ValuesFont = util.defaultFont(util.readFontModel(model, "label"));
-        options.extensionPoints.plot2Label_textStyle = model.getv("labelColor");
+        options.extensionPoints.plot2Label_textStyle = model.labelColor;
       }
     },
 

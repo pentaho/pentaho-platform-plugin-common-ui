@@ -15,16 +15,16 @@
  */
 define([
   "pentaho/type/Context",
-  "pentaho/type/Property",
   "./propertyTypeUtil",
   "pentaho/type/SpecificationScope"
-], function(Context, Property, propertyTypeUtil, SpecificationScope) {
+], function(Context, propertyTypeUtil, SpecificationScope) {
 
   "use strict";
 
   /*global describe:false, it:false, expect:false, beforeEach:false, spyOn:false, jasmine:false*/
 
   var context = new Context();
+  var Property = context.get("property");
   var Complex = context.get("pentaho/type/complex");
   var PentahoString = context.get("pentaho/type/string");
 
@@ -130,6 +130,185 @@ define([
         scope.dispose();
 
         expect(spec instanceof Object).toBe(true);
+      });
+
+      it("should not include `base` when a root property has Property.Type as base", function() {
+        var scope = new SpecificationScope();
+
+        var propType = propertyTypeUtil.createRoot(Derived.type, {name: "foo", type: "number"});
+
+        spyOn(propType, "_fillSpecInContext").and.returnValue(false);
+
+        var spec = propType.toSpecInContext();
+
+        scope.dispose();
+
+        expect("base" in spec).toBe(false);
+      });
+
+      it("should include `base` when a root property has subtype of Property.Type as base", function() {
+        var scope = new SpecificationScope();
+
+        var SubProperty = Property.extend();
+        var propType = propertyTypeUtil.createRoot(Derived.type, {base: SubProperty, name: "foo", type: "number"});
+
+        expect(propType).not.toBe(SubProperty.type);
+        expect(propType.isSubtypeOf(SubProperty.type)).toBe(true);
+
+        spyOn(propType, "_fillSpecInContext").and.returnValue(false);
+
+        var spec = propType.toSpecInContext();
+
+        scope.dispose();
+
+        expect("base" in spec).toBe(true);
+
+        // console.log(JSON.stringify(spec));
+        /* > {
+               "base": { // SubProperty
+                 "base": "property"
+               },
+               "name": "foo",
+               "type": "number"
+             }
+         */
+      });
+
+      it("should not include `base` on a non-root property", function() {
+        var scope = new SpecificationScope();
+
+        Derived.type.add({name: "foo", type: "number"});
+
+        var Derived2 = Derived.extend();
+
+        var propType = propertyTypeUtil.extend(Derived2.type, "foo", {name: "foo"});
+
+        spyOn(propType, "_fillSpecInContext").and.returnValue(false);
+
+        var spec = propType.toSpecInContext();
+
+        scope.dispose();
+
+        expect("base" in spec).toBe(false);
+      });
+
+      it("should not include `name` when serializing an abstract property", function() {
+        var scope = new SpecificationScope();
+
+        var propType = Property.type;
+        //var SubProperty = Property.extend();
+
+        spyOn(propType, "_fillSpecInContext").and.returnValue(false);
+
+        var spec = propType.toSpecInContext();
+
+        scope.dispose();
+
+        expect("name" in spec).toBe(false);
+
+        // console.log(JSON.stringify(spec));
+        // > {"id": "property"}
+
+        // ---
+        scope = new SpecificationScope();
+
+        var SubProperty = Property.extend();
+        propType = SubProperty.type;
+
+        //spyOn(propType, "_fillSpecInContext").and.returnValue(false);
+
+        spec = propType.toSpecInContext();
+
+        scope.dispose();
+
+        expect("name" in spec).toBe(false);
+
+        // console.log(JSON.stringify(spec));
+        // > {"base":"property"}
+      });
+
+      it("should omit `type` equal to 'value' when serializing an abstract property", function() {
+        var scope = new SpecificationScope();
+
+        var propType = Property.type;
+        //var SubProperty = Property.extend();
+
+        spyOn(propType, "_fillSpecInContext").and.returnValue(false);
+
+        var spec = propType.toSpecInContext();
+
+        scope.dispose();
+
+        expect("value" in spec).toBe(false);
+
+        // console.log(JSON.stringify(spec));
+        // > {"id": "property"}
+
+        // ---
+        scope = new SpecificationScope();
+
+        var SubProperty = Property.extend();
+        propType = SubProperty.type;
+
+        spec = propType.toSpecInContext();
+
+        scope.dispose();
+
+        expect("value" in spec).toBe(false);
+
+        // console.log(JSON.stringify(spec));
+        // > {"base":"property"}
+      });
+
+      it("should include `type` if != from 'value' when serializing an abstract property", function() {
+        var scope = new SpecificationScope();
+
+        var SubProperty = Property.extend({type: {type: "string"}});
+        var propType = SubProperty.type;
+
+        spyOn(propType, "_fillSpecInContext").and.returnValue(false);
+
+        var spec = propType.toSpecInContext();
+
+        scope.dispose();
+
+        expect(spec.type).toBe("string");
+
+        // console.log(JSON.stringify(spec));
+        // > {"base": "property", "type": "string"}
+      });
+
+      it("should include `id` if defined when serializing an abstract property", function() {
+        var scope = new SpecificationScope();
+
+        spyOn(Property.type, "_fillSpecInContext").and.returnValue(false);
+
+        var SubProperty = Property.extend({type: {id: "my/foo"}});
+        var propType = SubProperty.type;
+
+        var spec = propType.toSpecInContext();
+
+        scope.dispose();
+
+        expect(spec.id).toBe("my/foo");
+
+        // console.log(JSON.stringify(spec));
+        // > {"id": "my/foo", "base": "property"}
+
+        // ---
+
+        scope = new SpecificationScope();
+
+        propType = Property.type;
+
+        spec = propType.toSpecInContext();
+
+        scope.dispose();
+
+        expect(spec.id).toBe("property");
+
+        //console.log(JSON.stringify(spec));
+        // > {"id":"property"}
       });
     });
 

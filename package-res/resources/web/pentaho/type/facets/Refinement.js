@@ -97,7 +97,8 @@ define([
      *
      * @param {!pentaho.type.Value} value The value to validate according to this refinement facet.
      *
-     * @return {Error|Array.<!Error>|null} An `Error`, a non-empty array of `Error` or `null`.
+     * @return {pentaho.type.ValidationError|Array.<!pentaho.type.ValidationError>|null} An error,
+     * a non-empty array of errors or `null`.
      */
     validate: function(value) {
       throw error.notImplemented();

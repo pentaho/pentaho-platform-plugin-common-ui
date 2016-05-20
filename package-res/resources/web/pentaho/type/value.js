@@ -15,18 +15,19 @@
  */
 define([
   "module",
-  "./Instance",
+  "./instance",
   "./valueHelper",
+  "./ValidationError",
   "./SpecificationContext",
   "../i18n!types",
   "../util/error"
-], function(module, Instance, valueHelper, SpecificationContext, bundle, error) {
+], function(module, instanceFactory, valueHelper, ValidationError, SpecificationContext, bundle, error) {
 
   "use strict";
 
-  // NOTE: PhantomJS does not like this variable to be named context
-  // because it would get into trouble on the context getter, below...
-  return function(theContext) {
+  return function(context) {
+
+    var Instance = context.get(instanceFactory);
 
     // Late bound to break cyclic dependency.
     // Resolved on first use, in pentaho.type.Value.refine.
@@ -147,12 +148,27 @@ define([
        * You can use the error utilities in {@link pentaho.type.valueHelper} to
        * help in the implementation.
        *
-       * @return {?Array.<!Error>} A non-empty array of `Error` or `null`.
+       * @return {?Array.<!pentaho.type.ValidationError>} A non-empty array of errors or `null`.
        *
        * @see pentaho.type.Value#isValid
        */
       validate: function() {
         return null;
+      },
+
+      /**
+       * Ensures that the value is valid,
+       * and throws the first validation error
+       * if it is not.
+       *
+       * This method calls the [validate]{@link pentaho.type.Value#validate} method.
+       *
+       * @throws {pentaho.type.ValidationError} When the value is not valid,
+       * the first error returned by the `validate` method.
+       */
+      assertValid: function() {
+        var errors = this.validate();
+        if(errors) throw errors[0];
       },
       //endregion
 
@@ -239,282 +255,13 @@ define([
        * @readonly
        */
       type: /** @lends pentaho.type.Value.Type# */{
-        // Note: constructor/_init only called on sub-classes of Value.Type,
-        // and not on Value.Type itself.
-        _init: function() {
-          this.base.apply(this, arguments);
-
-          // Block inheritance, with default values
-          this._isAbstract = false;
-        },
-
         id: module.id,
 
         styleClass: "pentaho-type-value",
 
-        //region list property
-        /**
-         * Gets a value that indicates if this type is a list type.
-         *
-         * The `Value` class return `undefined`.
-         *
-         * @name isList
-         * @memberOf pentaho.type.Value.Type#
-         * @type boolean
-         * @readOnly
-         */
-        get isList() {},
-        //endregion
+        isAbstract: true,
 
-        //region isRefinement property
-        /**
-         * Gets a value that indicates if this type is a refinement type.
-         *
-         * The `Value` class return `undefined`.
-         *
-         * @name isRefinement
-         * @memberOf pentaho.type.Value.Type#
-         * @type boolean
-         * @readOnly
-         */
-        get isRefinement() {},
-        //endregion
-
-        //region context property
-
-        // NOTE: any class extended from this one will return the same context...
-        //@override
-        /**
-         * Gets the context that defined this type class.
-         * @type pentaho.type.Context
-         * @readonly
-         */
-        get context() {
-          // NOTE: PhantomJS does not like this variable to be named context...
-          return theContext;
-        },
-        //endregion
-
-        //region isAbstract property
-        // @type boolean
-        // -> boolean, Optional(false)
-
-        // Default value is for `Value.Type` only.
-        // @see Value.Type#constructor.
-        _isAbstract: true,
-
-        /**
-         * Gets or sets a value that indicates if this type is abstract.
-         *
-         * This attribute can only be set once, upon the type definition.
-         *
-         * @type {boolean}
-         * @default false
-         */
-        get isAbstract() {
-          return this._isAbstract;
-        },
-
-        set isAbstract(value) {
-          // nully is reset, which is false, so !! works well.
-          this._isAbstract = !!value;
-        },
-        //endregion
-
-        //region creation
-        //@override
-        /**
-         * Creates an instance of this type, given an instance specification.
-         *
-         * If the specified instance specification contains an inline type reference,
-         * in property `"_"`, the referenced type is used to create the instance
-         * (as long as it is a subtype of this type).
-         *
-         * If the specified instance specification does not contain an inline type reference
-         * the type is assumed to be this type.
-         *
-         * @see pentaho.type.Type#isSubtypeOf
-         * @see pentaho.type.Context#get
-         *
-         * @example
-         * <caption>
-         *   Create a complex instance from a specification that contains the type inline.
-         * </caption>
-         *
-         * require(["pentaho/type/Context"], function(Context) {
-         *
-         *   var context = new Context({application: "data-explorer-101"});
-         *   var Value   = context.get("value");
-         *
-         *   var product = Value.type.create({
-         *         _: {
-         *           props: ["id", "name", {name: "price", type: "number"}]
-         *         },
-         *
-         *         id:    "mpma",
-         *         name:  "Principia Mathematica",
-         *         price: 1200
-         *       });
-         *
-         *   // ...
-         *
-         * });
-         *
-         * @example
-         * <caption>
-         *   Create a list instance from a specification that contains the type inline.
-         * </caption>
-         *
-         * require(["pentaho/type/Context"], function(Context) {
-         *
-         *   var context = new Context({application: "data-explorer-101"});
-         *   var Value   = context.get("value");
-         *
-         *   var productList = Value.type.create({
-         *         _: [{
-         *           props: ["id", "name", {name: "price", type: "number"}]
-         *         }],
-         *
-         *         d: [
-         *           {id: "mpma", name: "Principia Mathematica", price: 1200},
-         *           {id: "flot", name: "The Laws of Thought",   price:  500}
-         *         ]
-         *       });
-         *
-         *   // ...
-         *
-         * });
-         *
-         * @example
-         * <caption>
-         *   Create an instance from a specification that <b>does not</b> contain the type inline.
-         * </caption>
-         *
-         * require(["pentaho/type/Context"], function(Context) {
-         *
-         *   var context = new Context({application: "data-explorer-101"});
-         *   var ProductList = context.get([{
-         *           props: [
-         *             "id",
-         *             "name",
-         *             {name: "price", type: "number"}
-         *           ]
-         *         }]);
-         *
-         *   // Provide the default type, in case the instance spec doesn't provide one.
-         *   var productList = ProductList.type.create(
-         *          [
-         *            {id: "mpma", name: "Principia Mathematica", price: 1200},
-         *            {id: "flot", name: "The Laws of Thought",   price:  500}
-         *         ]);
-         *
-         *   // ...
-         *
-         * });
-         *
-         * @param {pentaho.type.spec.UInstance} [instSpec] An instance specification.
-         *
-         * @return {!pentaho.type.Value} The created instance.
-         *
-         * @throws {pentaho.lang.OperationInvalidError} When `instSpec` contains an inline type reference
-         * that refers to a type that is not a subtype of this one.
-         *
-         * @throws {pentaho.lang.OperationInvalidError} When the determined type for the specified `instSpec`
-         * is an [abstract]{@link pentaho.type.Value.Type#isAbstract} type.
-         */
-        create: function(instSpec) {
-          // All value types have own constructors.
-          // So it is safe to override the base method with a constructor-type only version.
-
-          var Instance = this._getTypeOfInstSpec(instSpec);
-
-          return new Instance(instSpec);
-        },
-
-        /**
-         * Determines the instance constructor that should be used to build the specified
-         * instance specification.
-         *
-         * @param {pentaho.type.spec.UInstance} instSpec An instance specification.
-         *
-         * @return {!Class.<pentaho.type.Value>} The instance constructor.
-         *
-         * @throws {pentaho.lang.OperationInvalidError} When `instSpec` contains an inline type reference
-         * that refers to a type that is not a subtype of this type.
-         *
-         * @throws {pentaho.lang.OperationInvalidError} When the determined type for the specified `instSpec`
-         * is not an abstract type.
-         *
-         * @throws {Error} When `instSpec` contains an inline type reference that is somehow invalid.
-         * See {@link pentaho.type.Context#get} for a list of all possible errors.
-         *
-         * @private
-         * @ignore
-         */
-        _getTypeOfInstSpec: function(instSpec) {
-          var Instance, typeSpec;
-
-          // If it is a plain Object, does it have the inline type property, "_"?
-          if(instSpec && typeof instSpec === "object" && (typeSpec = instSpec._) && instSpec.constructor === Object) {
-
-            Instance = this.context.get(typeSpec);
-
-            if(this._assertSubtype(Instance.type).isAbstract) Instance.type._throwAbstractType();
-
-          } else {
-            if(this.isAbstract) this._throwAbstractType();
-
-            Instance = this.instance.constructor;
-          }
-
-          return Instance;
-        },
-
-        /**
-         * Asserts that a given type is a subtype of this type.
-         *
-         * @param {!pentaho.type.Value.Type} subtype The subtype to assert.
-         *
-         * @return {!pentaho.type.Value.Type} The subtype `subtype`.
-         *
-         * @throws {pentaho.lang.OperationInvalidError} When `subtype` is not a subtype of this.
-         *
-         * @private
-         * @ignore
-         */
-        _assertSubtype: function(subtype) {
-          if(!subtype.isSubtypeOf(this)) {
-            throw error.operInvalid(
-                bundle.format(bundle.structured.errors.value.notOfExpectedBaseType, [this._getErrorLabel()]));
-          }
-
-          return subtype;
-        },
-
-        /**
-         * Throws an error complaining the type is abstract an cannot create instances.
-         *
-         * @throws {pentaho.lang.OperationInvalidError} When this is not an abstract type.
-         *
-         * @private
-         * @ignore
-         */
-        _throwAbstractType: function() {
-          throw error.operInvalid(bundle.format(
-              bundle.structured.errors.value.cannotCreateInstanceOfAbstractType, [this._getErrorLabel()]));
-        },
-
-        /**
-         * Gets a label suitable to identify this type in an error message.
-         *
-         * @return {string} An error label.
-         * @private
-         * @ignore
-         */
-        _getErrorLabel: function() {
-          return this.id || this.label; // Never empty - inherits from Value;
-        },
-        //endregion
+        get isValue() { return true; },
 
         //region equality
         /**
@@ -570,17 +317,17 @@ define([
          *
          * @param {?any} value The value to validate.
          *
-         * @return {?Array.<!Error>} A non-empty array of `Error` or `null`.
+         * @return {?Array.<!pentaho.type.ValidationError>} A non-empty array of errors or `null`.
          *
          * @see pentaho.type.Value.Type#isValid
          */
         validate: function(value) {
           // 1. Is of type
           if(value == null)
-            return [new Error(bundle.structured.errors.value.cannotBeNull)];
+            return [new ValidationError(bundle.structured.errors.value.cannotBeNull)];
 
           if(!this.is(value))
-            return [new Error(bundle.format(bundle.structured.errors.value.notOfType, [this.label]))];
+            return [new ValidationError(bundle.format(bundle.structured.errors.value.notOfType, [this.label]))];
 
           // 2. Validate further, knowing it is an instance of.
           return this.validateInstance(value);
@@ -600,7 +347,7 @@ define([
          *
          * @param {!pentaho.type.Value} value The value to validate.
          *
-         * @return {?Array.<!Error>} A non-empty array of `Error` or `null`.
+         * @return {?Array.<!pentaho.type.ValidationError>} A non-empty array of errors or `null`.
          *
          * @see pentaho.type.Value#validate
          * @see pentaho.type.Value.Type#validate
@@ -618,31 +365,19 @@ define([
           // The type's id or the temporary id in this scope.
           var spec = {id: this.shortId || SpecificationContext.current.add(this)};
 
-          // The base type in the current type hierarchy.
-          // The default base type is "pentaho/type/complex".
-          var baseType = this.ancestor;
-          if(baseType) {
-            var baseRef = baseType.toRefInContext(keyArgs);
-            if(baseRef && baseRef !== "complex")
-              spec.base = baseRef;
-          } else {
-            // Value type itself
-            spec.base = null;
-          }
+          // The base type in the **current type hierarchy** (root, ancestor, isRoot).
+          var baseType = Object.getPrototypeOf(this);
+          var baseRef = baseType.toRefInContext(keyArgs);
+          if(baseRef !== "complex")
+            spec.base = baseRef;
 
           this._fillSpecInContext(spec, keyArgs);
 
           return spec;
         },
 
-        // Serializes the isAbstract attribute for non-refinement types
         _fillSpecInContext: function(spec, keyArgs) {
           var any = false;
-
-          if(!this.isRefinement && this.isAbstract) {
-            any = true;
-            spec.isAbstract = true;
-          }
 
           if(!keyArgs.isJson) {
             any = valueHelper.fillSpecMethodInContext(spec, this, "validateInstance") || any;
@@ -651,7 +386,6 @@ define([
             var instSpec = {};
             var instance = this.instance;
             var instAny = valueHelper.fillSpecMethodInContext(instSpec, instance, "validate");
-
             if(instAny) {
               spec.instance = instSpec;
               any = true;
@@ -717,7 +451,7 @@ define([
 
         // Resolved on first use to break cyclic dependency.
         if(!Refinement) {
-          Refinement = theContext.get("pentaho/type/refinement");
+          Refinement = context.get("pentaho/type/refinement");
         }
 
         return Refinement.extend(name || "", instSpec);

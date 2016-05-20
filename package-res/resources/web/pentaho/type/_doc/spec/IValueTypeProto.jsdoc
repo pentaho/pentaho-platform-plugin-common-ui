@@ -100,7 +100,7 @@
  *
  * @param {!pentaho.type.Value} value The value to validate.
  *
- * @return {?Array.<!Error>} A non-empty array of `Error` or `null`.
+ * @return {?Array.<!pentaho.type.ValidationError>} A non-empty array of errors or `null`.
  *
  * @see pentaho.type.Value.Type#validateInstance
  */

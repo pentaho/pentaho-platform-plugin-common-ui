@@ -138,20 +138,6 @@ define([
 
           expect(spec).toEqual(["element"]);
         });
-
-        it("should be used when type is anonymous and  has list base and no other attributes and " +
-           "element type is string", function() {
-
-          var derivedType = List.extend({type: {of: "string"}}).type;
-
-          var scope = new SpecificationScope();
-
-          var spec = derivedType.toSpecInContext();
-
-          scope.dispose();
-
-          expect(spec).toEqual([]);
-        });
       });
 
       describe("#of", function() {

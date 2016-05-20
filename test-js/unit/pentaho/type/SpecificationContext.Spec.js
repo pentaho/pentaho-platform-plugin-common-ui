@@ -14,16 +14,18 @@
  * limitations under the License.
  */
 define([
+  "pentaho/type/Context",
   "pentaho/type/SpecificationContext",
-  "pentaho/type/Instance",
   "../util/errorMatch"
-], function(SpecificationContext, Instance, errorMatch) {
+], function(Context, SpecificationContext, errorMatch) {
 
   "use strict";
 
   /*global describe:false, it:false, expect:false, beforeEach:false, afterEach:false, spyOn:false, jasmine:false*/
 
   describe("pentaho.type.SpecificationContext", function() {
+    var context = new Context();
+    var Instance = context.get("instance");
 
     beforeEach(function() {
       // J.I.C.

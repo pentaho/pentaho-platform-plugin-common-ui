@@ -30,22 +30,24 @@ define([
   return /** @lends pentaho.type.ValueHelper# */{
 
     /**
-     * Normalizes an errors result.
+     * Normalizes a validation errors result.
      *
-     * @param {Nully|Error|Array.<!Error>} errors An error, an errors array, or a `Nully` value.
+     * @param {Nully|pentaho.type.ValidationError|Array.<!pentaho.type.ValidationError>} errors An error,
+     * an errors array, or a `Nully` value.
      *
-     * @return {?Array.<!Error>} An array of `Error` or `null`.
+     * @return {?Array.<!pentaho.type.ValidationError>} An array of validation errors or `null`.
      */
     normalizeErrors: function(errors) {
       return errors ? toArray(errors) : null;
     },
 
     /**
-     * Combines two error lists.
+     * Combines two validation error lists.
      *
-     * @param {Nully|Array.<!Error>} errors An errors array, if any.
-     * @param {Nully|Error|Array.<!Error>} errorsAdd The error or errors to add, if any.
-     * @return {?Array.<!Error>} A combined errors array, or `null`.
+     * @param {Nully|Array.<!pentaho.type.ValidationError>} errors An errors array, if any.
+     * @param {Nully|pentaho.type.ValidationError|Array.<!pentaho.type.ValidationError>} errorsAdd The error or
+     * errors to add, if any.
+     * @return {?Array.<!pentaho.type.ValidationError>} A combined errors array, or `null`.
      */
     combineErrors: function(errors, errorsAdd) {
       if(errorsAdd) {

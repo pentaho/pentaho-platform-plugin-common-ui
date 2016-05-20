@@ -20,20 +20,21 @@ define([
 
   "use strict";
 
-  return Base.Error.extend("pentaho.lang.UserError", /** @lends pentaho.lang.UserError# */{
-    /**
-     * @classDesc The `UserError` class is the base class of error objects associated with the logic of a given operation.
-     *
-     * @name UserError
-     * @memberOf pentaho.lang
-     * @class
-     * @extends pentaho.lang.Base.Error
-     *
-     * @description Creates a user error object.
-     * @constructor
-     * @param {string} message The error message.
-     */
+  /**
+   * @classDesc The `UserError` class is the base class of error objects associated with
+   * the logic of a given operation.
+   *
+   * @name UserError
+   * @memberOf pentaho.lang
+   * @class
+   * @extends pentaho.lang.Base.Error
+   *
+   * @description Creates a user error object.
+   * @constructor
+   * @param {string} message The error message.
+   */
 
+  return Base.Error.extend("pentaho.lang.UserError", /** @lends pentaho.lang.UserError# */{
     /**
      * The name of the type of error.
      *
