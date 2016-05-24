@@ -212,7 +212,7 @@
   function registerVizPackage(name) {
     requireCfg.packages.push({"name": name, "main": "model"});
 
-    requireService[name] = "pentaho/type/value";
+    requireService[name] = "pentaho/visual/base";
   }
 
   // CCC Theme

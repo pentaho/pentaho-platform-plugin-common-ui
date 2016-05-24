@@ -310,6 +310,15 @@ define([
     },
 
     /**
+     * Registers a constructor.
+     *
+     * @param {!Class.<pentaho.type.Value>} InstCtor - The instance constructor.
+     */
+    register: function(InstCtor){
+      this._getByInstCtor(InstCtor, /* sync */true);
+    },
+
+    /**
      * Gets, asynchronously, the **configured instance constructor** of a type.
      *
      * For more information on the `typeRef` argument,
@@ -426,21 +435,83 @@ define([
 
         var predicate = F.predicate(keyArgs);
         var me = this;
-        return promiseUtil.require("pentaho/service!" + baseTypeId, localRequire)
-            .then(function(factories) {
-              return Promise.all(factories.map(me.getAsync, me));
-            })
-            .then(function(InstCtors) {
-              /*jshint laxbreak:true*/
-              return predicate
-                  ? InstCtors.filter(function(InstCtor) { return predicate(InstCtor.type); })
-                  : InstCtors;
+        var instCtorsPromise = promiseUtil.require("pentaho/service!" + baseTypeId, localRequire)
+          .then(function(factories) {
+            return Promise.all(factories.map(me.getAsync, me));
+          });
+
+        return Promise.all([this.getAsync(baseTypeId), instCtorsPromise])
+          .then(function(values) {
+            var baseType  = values[0].type;
+            var InstCtors = Object.keys(me._byTypeUid).map(function(typeUid){
+              return me._byTypeUid[typeUid];
             });
+
+            return InstCtors.filter(function(InstCtor) {
+              var type = InstCtor.type;
+              return type.isSubtypeOf(baseType) && (!predicate || predicate(type));
+            });
+          });
+
       } catch(ex) {
         /* istanbul ignore next : really hard to test safeguard */
         return Promise.reject(ex);
       }
     },
+
+    /**
+     * Gets a **configured instance constructors** of
+     * all of the loaded types that are subtypes of a given base type.
+     *
+     * This method is a synchronous version of {@link pentaho.type.Context#getAllAsync}
+     *
+     * @example
+     * <caption>
+     *   Getting all <code>"my/component"</code> sub-types browsable
+     *   in the application <code>"data-explorer-101"</code>.
+     * </caption>
+     *
+     * require(["pentaho/type/Context"], function(Context) {
+     *
+     *   var context = new Context({application: "data-explorer-101"});
+     *
+     *   var ComponentModels = context.getAll("my/component", {isBrowsable: true});
+     *   ComponentModels.forEach(function(ComponentModel) {
+     *
+     *     console.log("will display menu entry for: " + ComponentModel.type.label);
+     *
+     *   });
+     *
+     * });
+     *
+     * @param {string} [baseTypeId] The id of the base type. Defaults to `"pentaho/type/value"`.
+     * @param {object} [keyArgs] Keyword arguments.
+     * @param {?boolean} [keyArgs.isBrowsable=null] Indicates that only types with the specified
+     *   [isBrowsable]{@link pentaho.type.Value.Type#isBrowsable} value are returned.
+     *
+     * @return {<Array.<!Class.<pentaho.type.Value>>} An array of instance classes.
+     *
+     * @see pentaho.type.Context#getAllAsync
+     * @see pentaho.type.Context#get
+     * @see pentaho.type.Context#getAsync
+     */
+    getAll: function(baseTypeId, keyArgs) {
+      if(!baseTypeId) baseTypeId = "pentaho/type/value";
+
+      var predicate = F.predicate(keyArgs);
+      var me = this;
+
+      var baseType  = this.get(baseTypeId).type;
+      var InstCtors = Object.keys(this._byTypeUid).map(function(typeUid){
+        return me._byTypeUid[typeUid];
+      });
+
+      return InstCtors.filter(function(InstCtor) {
+        var type = InstCtor.type;
+        return type.isSubtypeOf(baseType) && (!predicate || predicate(type));
+      });
+    },
+
 
     //region get support
     /**

@@ -428,7 +428,8 @@ define([
          * @return {boolean} `true` if this is a subtype of `superType` type, `false` otherwise.
          */
         isSubtypeOf: function(superType) {
-          return !!superType && (this.base(superType) || this.of.isSubtypeOf(superType));
+          var of;
+          return !!superType && (this.base(superType) || (!!(of = this.of) && of.isSubtypeOf(superType)));
         },
 
         //region label property
