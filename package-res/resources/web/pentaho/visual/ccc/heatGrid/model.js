@@ -38,6 +38,7 @@ define([
         type: {
           id: "pentaho/visual/ccc/heatGrid",
           v2Id: "ccc_heatgrid",
+          category: "heatgrid",
 
           view: "View",
           styleClass: "pentaho-visual-ccc-heat-grid",

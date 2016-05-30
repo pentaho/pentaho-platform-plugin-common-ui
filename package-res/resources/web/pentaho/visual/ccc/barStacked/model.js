@@ -30,6 +30,7 @@ define([
         type: {
           id: "pentaho/visual/ccc/barStacked",
           v2Id: "ccc_barstacked",
+          category: "barchart",
 
           view: "View",
           styleClass: "pentaho-visual-ccc-bar-stacked",

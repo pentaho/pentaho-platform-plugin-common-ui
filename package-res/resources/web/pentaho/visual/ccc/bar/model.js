@@ -31,6 +31,7 @@ define([
       type: {
         id: "pentaho/visual/ccc/bar",
         v2Id: "ccc_bar",
+        category: "barchart",
 
         view: "View",
         styleClass: "pentaho-visual-ccc-bar",

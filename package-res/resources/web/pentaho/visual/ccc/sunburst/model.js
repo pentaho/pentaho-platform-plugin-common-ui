@@ -33,6 +33,7 @@ define([
       type: {
         id: "pentaho/visual/ccc/sunburst",
         v2Id: "ccc_sunburst",
+        category: "treemapchart",
 
         view: "View",
         styleClass: "pentaho-visual-ccc-sunburst",

@@ -36,6 +36,7 @@ define([
         type: {
           id: "pentaho/visual/ccc/line",
           v2Id: "ccc_line",
+          category: "linechart",
 
           view: "View",
           styleClass: "pentaho-visual-ccc-line",
