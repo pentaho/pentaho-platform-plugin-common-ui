@@ -26,7 +26,7 @@ define(["./util/MessageBundle", "json"], function(MessageBundle) {
       if(config.isBuild) {
         // Indicate that the optimizer should not wait for this resource and complete optimization.
         // This resource will be resolved dynamically during run time in the web browser.
-        onload();
+        onLoad();
       } else {
         var bundleInfo = getBundleInfo(require, bundlePath),
             bundleUrl = "json!" + CONTEXT_PATH + "i18n?plugin=" + bundleInfo.pluginId + "&name=" + bundleInfo.name;
