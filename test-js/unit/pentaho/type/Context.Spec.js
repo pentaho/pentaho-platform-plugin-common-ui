@@ -942,17 +942,31 @@ define([
 
         // ---
 
-        localRequire.define("exp/foo", ["pentaho/type/simple"], function(simpleFactory) {
+        localRequire.define("exp/baseWithNoRegistrations", ["pentaho/type/simple"], function(simpleFactory) {
           return function(context) {
-            return context.get(simpleFactory).extend({type: {id: "exp/foo"}});
+            return context.get(simpleFactory).extend({type: {id: "exp/baseWithNoRegistrations"}});
           };
         });
 
         // ---
 
-        localRequire.define("exp/bar", ["pentaho/type/simple"], function(simpleFactory) {
+        localRequire.define("exp/thing", ["pentaho/type/simple"], function(simpleFactory) {
           return function(context) {
-            return context.get(simpleFactory).extend({type: {id: "exp/bar", isBrowsable: false}});
+            return context.get(simpleFactory).extend({type: {id: "exp/thing"}});
+          };
+        });
+
+        localRequire.define("exp/foo", ["exp/thing"], function(thingFactory) {
+          return function(context) {
+            return context.get(thingFactory).extend({type: {id: "exp/foo"}});
+          };
+        });
+
+        // ---
+
+        localRequire.define("exp/bar", ["exp/thing"], function(thingFactory) {
+          return function(context) {
+            return context.get(thingFactory).extend({type: {id: "exp/bar", isBrowsable: false}});
           };
         });
 
@@ -966,12 +980,23 @@ define([
 
         // ---
 
+        localRequire.define("exp/prop", ["pentaho/type/property"], function(propFactory) {
+          return function(context) {
+            return context.get(propFactory).extend({type: {id: "exp/prop"}});
+          };
+        });
+
+        // ---
+
         localRequire.config({
           config: {
             "pentaho/service": {
-              "exp/foo": "exp/thing",
-              "exp/bar": "exp/thing",
-              "exp/dude": "pentaho/type/value"
+              "exp/thing": "exp/thing",
+              "exp/foo":   "exp/thing",
+              "exp/bar":   "exp/thing",
+              "exp/dude":  "pentaho/type/value",
+              "exp/prop":  "pentaho/type/property",
+              "exp/baseWithNoRegistrations": "exp/baseWithNoRegistrations" // but itself...
             }
           }
         });
@@ -987,38 +1012,85 @@ define([
         });
       });
 
-      it("should return all registered Types under 'pentaho/type/value' by default", function() {
+      it("should return all known subtypes of 'pentaho/type/value' by default", function() {
 
         return require.using(["require", "pentaho/type/Context"], configRequire, function(localRequire, Context) {
 
           var context = new Context();
-
+          var valueType = context.get("pentaho/type/value").type;
           return context
               .getAllAsync()
               .then(function(InstCtors) {
                 expect(InstCtors instanceof Array).toBe(true);
-                expect(InstCtors.length).toBe(1);
-                expect(InstCtors[0].type.id).toBe("exp/dude");
+
+                var requiredCount = 0;
+
+                // While all registered but the exp/prop are pentaho/type/value,
+                // We don't know about the existence of the exp/thing...
+                // Then, there are all other standard types in the registry.
+                InstCtors.forEach(function(InstCtor) {
+                  // Must be a value
+                  expect(InstCtor.type.isSubtypeOf(valueType)).toBe(true);
+
+                  switch(InstCtor.type.id) {
+                    case "exp/foo":
+                    case "exp/bar":
+                    case "exp/thing":
+                    case "exp/baseWithNoRegistrations":
+                      fail("Should not have loaded exp/thing or exp/baseWithNoRegistrations");
+                      break;
+                    case "exp/dude":
+                      requiredCount++;
+                  }
+                });
+
+                expect(requiredCount).toBe(1);
               });
         });
       });
 
-      it("should return an empty array when the specified baseType has no registrations", function() {
+      it("should return all known non-abstract subtypes of 'pentaho/type/value' by default, when isAbstract is false",
+      function() {
+
+        return require.using(["require", "pentaho/type/Context"], configRequire, function(localRequire, Context) {
+
+          var context = new Context();
+          var valueType = context.get("pentaho/type/value").type;
+          return context
+              .getAllAsync(null, {isAbstract: false})
+              .then(function(InstCtors) {
+                expect(InstCtors instanceof Array).toBe(true);
+
+                // While all registered but the exp/prop are pentaho/type/value,
+                // We don't know about the existence of the exp/thing...
+                // Then, there are all other standard types in the registry.
+                InstCtors.forEach(function(InstCtor) {
+                  // Must be a value
+                  expect(InstCtor.type.isSubtypeOf(valueType)).toBe(true);
+                  expect(InstCtor.type.isAbstract).toBe(false);
+                });
+              });
+        });
+      });
+
+      it("should return an array with the base type, when the specified baseType has no additional registrations",
+      function() {
 
         return require.using(["require", "pentaho/type/Context"], configRequire, function(localRequire, Context) {
 
           var context = new Context();
 
           return context
-              .getAllAsync("abcdefgh")
+              .getAllAsync("exp/baseWithNoRegistrations")
               .then(function(InstCtors) {
                 expect(InstCtors instanceof Array).toBe(true);
-                expect(InstCtors.length).toBe(0);
+                expect(InstCtors.length).toBe(1);
+                expect(InstCtors[0].type.id).toBe("exp/baseWithNoRegistrations");
               });
         });
       });
 
-      it("should return all registered Types under a given base type id", function() {
+      it("should return all registered Types under a given base type id and the base type itself", function() {
 
         return require.using(["require", "pentaho/type/Context"], configRequire, function(localRequire, Context) {
 
@@ -1028,14 +1100,13 @@ define([
               .getAllAsync("exp/thing")
               .then(function(InstCtors) {
                 expect(InstCtors instanceof Array).toBe(true);
-                expect(InstCtors.length).toBe(2);
+                expect(InstCtors.length).toBe(3);
 
                 var typeIds = InstCtors.map(function(InstCtor) { return InstCtor.type.id; });
-                var iFoo = typeIds.indexOf("exp/foo");
-                var iBar = typeIds.indexOf("exp/bar");
-                expect(iFoo).not.toBeLessThan(0);
-                expect(iBar).not.toBeLessThan(0);
-                expect(iFoo).not.toBe(iBar);
+
+                expect(typeIds.indexOf("exp/thing")).not.toBeLessThan(0);
+                expect(typeIds.indexOf("exp/foo")).not.toBeLessThan(0);
+                expect(typeIds.indexOf("exp/bar")).not.toBeLessThan(0);
               });
         });
       });
@@ -1050,8 +1121,12 @@ define([
               .getAllAsync("exp/thing", {"isBrowsable": true})
               .then(function(InstCtors) {
                 expect(InstCtors instanceof Array).toBe(true);
-                expect(InstCtors.length).toBe(1);
-                expect(InstCtors[0].type.id).toBe("exp/foo");
+                expect(InstCtors.length).toBe(2);
+                var typeIds = InstCtors.map(function(InstCtor) { return InstCtor.type.id; });
+
+                // bar is not browsable
+                expect(typeIds.indexOf("exp/thing")).not.toBeLessThan(0);
+                expect(typeIds.indexOf("exp/foo")).not.toBeLessThan(0);
               });
         });
       });

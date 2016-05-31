@@ -396,7 +396,8 @@ define([
          * @sealed
          */
         get isAbstract() {
-          return this.of.isAbstract;
+          var of = this.of;
+          return !of || of.isAbstract;
         },
 
         set isAbstract(value) {
@@ -409,13 +410,25 @@ define([
 
         get isRefinement() { return true; },
 
-        get isList() { return this.of.isList; },
+        get isList() {
+          var of = this.of;
+          return !!of && of.isList;
+        },
 
-        get isElement() { return this.of.isElement; },
+        get isElement() {
+          var of = this.of;
+          return !!of && of.isElement;
+        },
 
-        get isComplex() { return this.of.isComplex; },
+        get isComplex() {
+          var of = this.of;
+          return !!of && of.isComplex;
+        },
 
-        get isSimple() { return this.of.isSimple; },
+        get isSimple() {
+          var of = this.of;
+          return !!of && of.isSimple;
+        },
 
         /**
          * Determines if this is a subtype of another.
@@ -436,8 +449,9 @@ define([
         _label: undefined, // local Refinement root marker
 
         get label() {
+          var of;
           var v = this._label;
-          return v !== undefined ? v : this.of.label;
+          return v !== undefined || !(of = this.of) ? v : of.label;
         },
 
         _resetLabel: function() {
@@ -451,8 +465,9 @@ define([
         _description: undefined, // local Refinement root marker
 
         get description() {
+          var of;
           var v = this._description;
-          return v !== undefined ? v : this.of.description;
+          return v !== undefined || !(of = this.of) ? v : of.description;
         },
 
         _resetDescription: function() {
@@ -466,8 +481,9 @@ define([
         _category: undefined, // local Refinement root marker
 
         get category() {
+          var of;
           var v = this._category;
-          return v !== undefined ? v : this.of.category;
+          return v !== undefined || !(of = this.of) ? v : of.category;
         },
 
         _resetCategory: function() {
@@ -481,8 +497,9 @@ define([
         _helpUrl: undefined, // local Refinement root marker
 
         get helpUrl() {
+          var of;
           var v = this._helpUrl;
-          return v !== undefined ? v : this.of.helpUrl;
+          return v !== undefined || !(of = this.of) ? v : of.helpUrl;
         },
 
         _resetHelpUrl: function() {
@@ -496,8 +513,9 @@ define([
         _isBrowsable: undefined, // local Refinement root marker
 
         get isBrowsable() {
+          var of;
           var v = this._isBrowsable;
-          return v !== undefined ? v : this.of.isBrowsable;
+          return v !== undefined || !(of = this.of) ? v : of.isBrowsable;
         },
 
         _resetIsBrowsable: function() {
@@ -511,8 +529,9 @@ define([
         _isAdvanced: undefined, // local Refinement root marker
 
         get isAdvanced() {
+          var of;
           var v = this._isAdvanced;
-          return v !== undefined ? v : this.of.isAdvanced;
+          return v !== undefined || !(of = this.of) ? v : of.isAdvanced;
         },
 
         _resetIsAdvanced: function() {
@@ -531,8 +550,9 @@ define([
         _ordinal: undefined, // local Refinement root marker
 
         get ordinal() {
+          var of;
           var v = this._ordinal;
-          return v !== undefined ? v : this.of.ordinal;
+          return v !== undefined || !(of = this.of) ? v : of.ordinal;
         },
 
         _resetOrdinal: function() {
@@ -546,8 +566,9 @@ define([
         _view: undefined, // local Refinement root marker
 
         get view() {
+          var of;
           var v = this._view;
-          return v !== undefined ? (v && v.value) : this.of.view;
+          return v !== undefined || !(of = this.of) ? (v && v.value) : of.view;
         },
 
         _resetView: function() {
@@ -559,12 +580,16 @@ define([
 
         // Redirect to of.
         is: function(value) {
-          return this.of.is(value);
+          var of = this.of;
+          return !!of && of.is(value);
         },
 
         // Redirect to of.
         create: function() {
-          return this.of.create.apply(this.of, arguments);
+          var of = this.of;
+          if(!of) this._throwAbstractType();
+
+          return of.create.apply(of, arguments);
         },
 
         //region validation
