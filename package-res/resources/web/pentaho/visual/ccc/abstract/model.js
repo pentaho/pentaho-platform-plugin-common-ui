@@ -29,7 +29,7 @@ define([
 
   function isApplicableLegend() {
     /*jshint validthis:true*/
-    return this.getv("showLegend");
+    return this.showLegend;
   }
 
   return function(context) {
@@ -44,11 +44,8 @@ define([
         props: [
           //region Visual Roles
           {
-            name: "rows",
-            type: ["string"],
-            dataType: "string",
-            isVisualRole: true,
-            isRequired: false
+            name: "rows", //VISUAL_ROLE
+            type: "pentaho/visual/role/ordinal"
           },
           //endregion
 
@@ -63,7 +60,7 @@ define([
             name: "backgroundColor",
             type: colorFactory,
             isApplicable: function() {
-              return this.getv("backgroundFill") !== "none";
+              return this.backgroundFill !== "none";
             },
             isRequired: true
           },
@@ -71,7 +68,7 @@ define([
             name: "backgroundColorEnd",
             type: colorFactory,
             isApplicable: function() {
-              return this.getv("backgroundFill") === "gradient";
+              return this.backgroundFill === "gradient";
             },
             isRequired: true
           },
@@ -81,8 +78,8 @@ define([
 
           // For multi-charts, Size and Family also used for chart title font
           {
-            name: "labelColor",
-            type: colorFactory
+            name:  "labelColor",
+            type:  colorFactory
           },
           {
             name: "labelSize",
@@ -152,6 +149,7 @@ define([
       }
       
     })
+    /*jshint sub:true*/
     .implement({type: bundle.structured["abstract"]});
   };
 });

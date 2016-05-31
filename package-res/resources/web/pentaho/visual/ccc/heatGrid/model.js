@@ -31,7 +31,7 @@ define([
 
     function requiredOneMeasure() {
       /*jshint validthis:true*/
-      return !this.count("size") && !this.count("color");
+      return !this.model.size.attributes.count && !this.model.color.attributes.count;
     }
 
     return CartesianAbstract.extend({
@@ -44,29 +44,30 @@ define([
 
           props: [
             {
-              name: "rows",
-              isRequired: true
+              name: "rows", //VISUAL_ROLE
+              type: {
+                props: {attributes: {isRequired: true}}
+              }
             },
             {
-              name: "columns",
-              type: ["string"],
-              dataType: "string",
-              isVisualRole: true,
-              isRequired: false
+              name: "columns", //VISUAL_ROLE
+              type: "pentaho/visual/role/ordinal"
             },
             {
-              name: "size",
-              type: "string",
-              dataType: "number",
-              isVisualRole: true,
-              isRequired: requiredOneMeasure
+              name: "size", //VISUAL_ROLE
+              type: {
+                base: "pentaho/visual/role/quantitative",
+                dataType: "number",
+                props: {attributes: {countMax: 1, isRequired: requiredOneMeasure}}
+              }
             },
             {
-              name: "color",
-              type: "string",
-              dataType: "number",
-              isVisualRole: true,
-              isRequired: requiredOneMeasure
+              name: "color", //VISUAL_ROLE
+              type: {
+                base: "pentaho/visual/role/quantitative",
+                dataType: "number",
+                props: {attributes: {countMax: 1, isRequired: requiredOneMeasure}}
+              }
             },
 
             {

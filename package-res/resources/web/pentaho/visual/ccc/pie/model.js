@@ -18,15 +18,15 @@ define([
   "pentaho/i18n!../abstract/i18n/model",
   "../abstract/types/labelsOption",
   "../abstract/mixins/settingsMultiChartType"
-], function(visualFactory, bundle, labelsOptionFactory, settingsMultiChartType) {
+], function(categoricalContinuousAbstractFactory, bundle, labelsOptionFactory, settingsMultiChartType) {
 
   "use strict";
 
   return function(context) {
 
-    var Visual = context.get(visualFactory);
+    var CategoricalContinuousAbstract = context.get(categoricalContinuousAbstractFactory);
 
-    return Visual.extend({
+    return CategoricalContinuousAbstract.extend({
 
         type: {
           id: "pentaho/visual/ccc/pie",
@@ -37,18 +37,14 @@ define([
 
           props: [
             {
-              name: "columns",
-              type: ["string"],
-              dataType: "string",
-              isVisualRole: true,
-              isRequired: false
+              name: "columns", //VISUAL_ROLE
+              type: "pentaho/visual/role/ordinal"
             },
             {
-              name: "measures",
-              type: ["string"],
-              dataType: "number",
-              isVisualRole: true,
-              isRequired: true
+              name: "measures", //VISUAL_ROLE
+              type: {
+                props: {attributes: {isRequired: true}}
+              }
             },
             {
               name: "labelsOption",

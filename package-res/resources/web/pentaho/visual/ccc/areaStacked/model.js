@@ -38,25 +38,18 @@ define([
 
           props: [
             {
-              name: "columns",
-              type: ["string"],
-              dataType: "string",
-              isVisualRole: true,
-              isRequired: false
+              name: "columns", //VISUAL_ROLE
+              type: "pentaho/visual/role/ordinal"
             },
             {
-              name: "measures",
-              type: ["string"],
-              dataType: "number",
-              isVisualRole: true,
-              isRequired: true
+              name: "measures", //VISUAL_ROLE
+              type: {
+                props: {attributes: {isRequired: true}}
+              }
             },
             {
-              name: "multi",
-              type: ["string"],
-              dataType: "string",
-              isVisualRole: true,
-              isRequired: false
+              name: "multi", //VISUAL_ROLE
+              type: "pentaho/visual/role/ordinal"
             },
             {
               name: "labelsOption",

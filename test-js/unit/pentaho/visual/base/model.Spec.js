@@ -15,7 +15,7 @@ define([
             WillExecute, DidExecute, RejectedExecute) {
   "use strict";
 
-  describe("pentaho/visual/base", function() {
+  describe("pentaho.visual.base.Model", function() {
     var context;
     var Model;
     var dataSpec;
@@ -76,6 +76,21 @@ define([
           return new Model(spec);
         }).toThrow();
       });
+    });
+
+    it("should pre-load all standard visual role related modules", function() {
+      function expectIt(lid) {
+        expect(function() {
+          expect(typeof require("pentaho/visual/role/" + lid)).toBe("function");
+        }).not.toThrow();
+      }
+
+      expectIt("mapping");
+      expectIt("quantitative");
+      expectIt("ordinal");
+      expectIt("nominal");
+      expectIt("level");
+      expectIt("aggregation");
     });
 
     describe("events - ", function() {
@@ -691,7 +706,7 @@ define([
       });
     });
 
-    describe("validates a model spec - ", function() {
+    describe("#validate()", function() {
 
       function specValidityShouldBe(spec, bool) {
         if (arguments.length !== 2) {
@@ -749,7 +764,7 @@ define([
 
     });
 
-    describe("toJSON", function() {
+    describe("#toJSON()", function() {
       it("should not serialize the `data` property", function() {
         var model = new Model({
           width: 1,
@@ -783,7 +798,7 @@ define([
       });
     });
 
-    describe("toSpec", function() {
+    describe("#toSpec()", function() {
       it("should serialize the `data` property", function() {
         var model = new Model({
           width:  1,

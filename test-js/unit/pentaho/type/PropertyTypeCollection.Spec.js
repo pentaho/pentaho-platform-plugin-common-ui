@@ -15,18 +15,19 @@
  */
 define([
   "pentaho/type/Context",
-  "pentaho/type/Property",
   "pentaho/type/PropertyTypeCollection",
   "tests/pentaho/util/errorMatch"
-], function(Context, Property, PropertyTypeCollection, errorMatch) {
+], function(Context, PropertyTypeCollection, errorMatch) {
+
   "use strict";
 
   /* global describe:false, it:false, expect:false, beforeEach:false */
 
   var context = new Context();
-  var PentahoBoolean = context.get("pentaho/type/boolean");
-  var PentahoString = context.get("pentaho/type/string");
-  var Complex = context.get("pentaho/type/complex");
+  var Property = context.get("property");
+  var PentahoBoolean = context.get("boolean");
+  var PentahoString = context.get("string");
+  var Complex = context.get("complex");
   var PostalCode = PentahoString.extend();
   var Derived = Complex.extend({
     type: {
@@ -62,7 +63,9 @@ define([
       });
 
       it("should convert an array of pentaho.type.UPropertyTypeProto", function() {
+
         var props = PropertyTypeCollection.to(["foo", "bar"], Derived.type);
+
         expect(props.length).toBe(2);
         expect(props[0].name).toBe("foo");
         expect(props[0].type).toBe(PentahoString.type);
@@ -73,18 +76,22 @@ define([
       describe("Adding, removing, and replacing a PropertyType to the PropertyTypeCollection", function() {
 
         it("should add object to the collection", function() {
+
           props.add({name: "foo1", type: "boolean"});
+
           expect(props.length).toBe(1);
           expect(props[0].type).toBe(PentahoBoolean.type);
         });
 
         it("should use List.add() to replace an object with the same name in the collection with updated type, etc.",
-            function() {
+        function() {
+          props.add({name: "foo", type: "boolean"});
+          props.add({name: "foo2", type: "string"});
 
           var DerivedBoolean = PentahoBoolean.extend();
-          props.add({name: "foo",  type: "boolean"});
-          props.add({name: "foo2", type: "string"});
-          props.add({name: "foo",  type: DerivedBoolean});
+
+          props.add({name: "foo", type: DerivedBoolean});
+
           expect(props.length).toBe(2);
           expect(props[0].type).toBe(DerivedBoolean.type);
         });
@@ -100,16 +107,20 @@ define([
         });
 
         it("should use List.replace() to replace an object with the same name in the collection with updated type, ...",
-            function() {
+        function() {
           props.add({name: "foo", type: "boolean"});
           props.add({name: "foo2", type: "string"});
+
           props.replace({name: "foo", type: "boolean"}, 0);
+
           expect(props.length).toBe(2);
           expect(props[0].type).toBe(PentahoBoolean.type);
         });
 
         it("should throw when attempting to replace a non-existent property", function() {
+
           props.add({name: "foo", type: "boolean"});
+
           expect(function() {
             props.replace({name: "bar", type: "string"}, 0);
           }).toThrow(errorMatch.argInvalid("props[i]"));
@@ -120,9 +131,27 @@ define([
             props.replace();
           }).toThrow(errorMatch.argRequired("props[i]"));
         });
+
+        it("should respect the property type specified in the `base` attribute", function() {
+
+          var DerivedProperty = Property.extend();
+
+          props.add({base: DerivedProperty, name: "foo", type: "boolean"});
+
+          expect(props[0] instanceof DerivedProperty.Type).toBe(true);
+        });
+
+        it("should throw is the property type specified in the `base` attribute is not a subtype of property", function() {
+
+          expect(function() {
+            props.add({base: Complex, name: "foo", type: "boolean"});
+          }).toThrow(errorMatch.argInvalid("props[i]"));
+
+        });
       });
 
       describe("Configuring the PropertyTypeCollection", function() {
+
         it("should throw if invoked with no arguments", function() {
           expect(function() {
             props.configure();
@@ -131,6 +160,7 @@ define([
 
         it("should accept an array of pentaho.type.UPropertyTypeProto", function() {
           props.configure(["foo", "bar"]);
+
           expect(props.length).toBe(2);
           expect(props[0].name).toBe("foo");
           expect(props[0].type).toBe(PentahoString.type);
@@ -138,9 +168,12 @@ define([
           expect(props[1].type).toBe(PentahoString.type);
         });
 
-        it("should accept an array of pentaho.type.UPropertyTypeProto whose elements were previously defined", function() {
+        it("should accept an array of pentaho.type.UPropertyTypeProto whose elements were previously defined",
+        function() {
           var props = PropertyTypeCollection.to(["foo", {name: "eggs", type: "boolean"}], Derived.type);
+
           props.configure(["foo", "bar"]);
+
           expect(props.length).toBe(3);
           expect(props[0].name).toBe("foo");
           expect(props[0].type).toBe(PentahoString.type);
@@ -150,9 +183,14 @@ define([
           expect(props[2].type).toBe(PentahoString.type);
         });
 
-        it("should accept an object whose keys are the property names and the values are pentaho.type.UPropertyTypeProto",
-            function() {
-          props.configure({foo: {name: "foo", type: "boolean"}, guru: {name: "guru", type: "boolean"}});
+        it("should accept an object whose keys are the property names and the values are " +
+           "pentaho.type.UPropertyTypeProto", function() {
+
+          props.configure({
+            foo:  {name: "foo", type: "boolean"},
+            guru: {name: "guru", type: "boolean"}
+          });
+
           expect(props.length).toBe(2);
           expect(props[0].type).toBe(PentahoBoolean.type);
           expect(props[1].name).toBe("guru");
@@ -167,6 +205,7 @@ define([
 
         it("should use the key as property name if the property spec does not include a name", function() {
           props.configure({foo: {type: "boolean"}});
+
           expect(props.length).toBe(1);
           expect(props[0].name).toBe("foo");
         });
@@ -186,6 +225,7 @@ define([
             foo:  {name: "foo",  type: PostalCode.type},
             guru: {name: "guru", type: PostalCode.type}
           });
+
           expect(props.length).toBe(3);
 
           expect(props[0].type).toBe(PostalCode.type);
@@ -195,12 +235,26 @@ define([
         });
 
         it("should preserve the type when reconfiguring the property without specifying the type", function() {
+
           props.configure({foo: {name: "foo", type: "boolean"}});
+
           props.configure(["foo"]);
+
           expect(props.length).toBe(1);
           expect(props[0].type).toBe(PentahoBoolean.type);
         });
 
+        it("should configure an existing property, but bailout if the spec is solely its name", function() {
+
+          props.configure({foo: {name: "foo", type: "boolean"}});
+          var propType = props[0];
+
+          spyOn(propType, "extend");
+
+          props.replace("foo", 0);
+
+          expect(propType.extend).not.toHaveBeenCalled();
+        });
       });
     });
 

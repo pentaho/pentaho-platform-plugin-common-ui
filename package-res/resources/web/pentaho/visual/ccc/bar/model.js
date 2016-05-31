@@ -37,8 +37,10 @@ define([
 
         props: [
           {
-            name: "measures",
-            isRequired: true
+            name: "measures", //VISUAL_ROLE
+            type: {
+              props: {attributes: {isRequired: true}}
+            }
           },
           {
             name: "labelsOption",

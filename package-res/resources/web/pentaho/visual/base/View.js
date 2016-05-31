@@ -51,6 +51,7 @@ define([
    */
 
   var View = Base.extend(/** @lends pentaho.visual.base.View# */{
+
     constructor: function(element, model) {
       if(!element)
         throw error.argRequired("element");
@@ -76,6 +77,17 @@ define([
       this.model = model;
 
       this._init();
+    },
+
+    /**
+     * Gets the context of the view's model.
+     *
+     * This getter is syntax sugar for `this.model.type.context`.
+     *
+     * @type {pentaho.type.Context}
+     */
+    get context() {
+      return this.model.type.context;
     },
 
     /**
@@ -121,12 +133,9 @@ define([
      * @protected
      */
     _init: function() {
-      this.model.on("did:change", (
-          function(event){
-            this._onChange(event.changeset);
-          }
-        ).bind(this)
-      );
+      this.model.on("did:change", function(event) {
+        this._onChange(event.changeset);
+      }.bind(this));
     },
 
     /**
@@ -135,7 +144,7 @@ define([
      * By default, this method simply calls {@link pentaho.visual.base.Model#validate}
      * to validate the model.
      *
-     * @return {?Array.<!Error>} A non-empty array of `Error` or `null`.
+     * @return {?Array.<!pentaho.type.ValidationError>} A non-empty array of errors or `null`.
      * @protected
      */
     _validate: function() {
@@ -194,7 +203,8 @@ define([
      *
      * @protected
      */
-    _selectionChanged: /* istanbul ignore next: placeholder method */ function(newSelectionFilter, previousSelectionFilter) {
+    _selectionChanged:
+    /* istanbul ignore next: placeholder method */function(newSelectionFilter, previousSelectionFilter) {
       this._render();
     },
 

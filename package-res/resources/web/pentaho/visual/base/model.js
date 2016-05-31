@@ -19,6 +19,7 @@ define([
   "pentaho/data/filter",
   "pentaho/util/object",
   "pentaho/util/error",
+  "pentaho/util/fun",
   "pentaho/lang/UserError",
   "./types/selectionModes",
 
@@ -32,20 +33,28 @@ define([
 
   "pentaho/lang/ActionResult",
 
-  "pentaho/i18n!type"
+  "pentaho/i18n!type",
+
+  // pre-load all visual role mapping types
+  "../role/mapping",
+  "../role/nominal",
+  "../role/ordinal",
+  "../role/quantitative"
 ], function(complexFactory, Event, filter, O,
-            error, UserError,
+            error, F, UserError,
             selectionModes,
             WillSelect, DidSelect, RejectedSelect,
             WillExecute, DidExecute, RejectedExecute,
             ActionResult,
-            bundle) {
+            bundle,
+            mappingFactory) {
 
   "use strict";
 
   return function(context) {
 
     var Complex = context.get(complexFactory);
+    var Mapping = context.get(mappingFactory);
 
     /**
      * @name Model
@@ -57,13 +66,44 @@ define([
      *
      * @amd {pentaho.type.Factory<pentaho.visual.base.Model>} pentaho/visual/base/model
      *
-     * @classDesc This is the base model class for visualizations.
+     * @classDesc The `Model` class is the abstract base class of visualization models.
      *
      * @constructor
-     * @description Creates a base `Model`.
-     * @param {pentaho.visual.base.spec.IModel} modelSpec A plain object containing the model specification.
+     * @description Creates a visual model.
+     * @param {pentaho.visual.base.spec.IModel} [modelSpec] A plain object containing the model specification.
      */
     var Model = Complex.extend(/** @lends pentaho.visual.base.Model# */{
+
+      constructor: function() {
+
+        this.base.apply(this, arguments);
+
+        this.type.each(function(propType) {
+          if(propType.type.isSubtypeOf(Mapping.type)) {
+            // Visual role
+            var mapping = this.get(propType);
+            if(!mapping) {
+              // Create default instance without firing events
+              this._values[propType.name] = mapping = propType.toValue({});
+            }
+
+            mapping.setOwnership(this, propType);
+          }
+        }, this);
+      },
+
+      set: function(name, valueSpec) {
+
+        var propType = this.type.get(name);
+        if(propType.type.isSubtypeOf(Mapping.type)) {
+          valueSpec = propType.toValue(valueSpec);
+          if(valueSpec)
+            valueSpec.setOwnership(this, propType);
+        }
+
+        return this.base(name, valueSpec);
+      },
+
       //region Event Flows Handling
       /**
        * Modifies the current selection filter based on an input filter and on a selection mode.
@@ -89,13 +129,14 @@ define([
        *
        * @param {!pentaho.data.filter.AbstractFilter} inputDataFilter - A filter representing
        * the data set which will be used to modify the current selection filter.
-       * @param {?object} keyArgs - Keyword arguments.
-       * @param {!function} keyArgs.selectionMode - A function that computes a new selection filter,
+       * @param {Object} keyArgs - Keyword arguments.
+       * @param {function} keyArgs.selectionMode - A function that computes a new selection filter,
        * taking into account the current selection filter and an input `dataFilter`.
        *
-       * @return {pentaho.lang.ActionResult}
+       * @return {!pentaho.lang.ActionResult}
        * If unsuccessful, the `error` property describes what originated the error.
-       * If successful,  the `error` property is `null` and the `value` property contains the updated current selection filter.
+       * If successful,  the `error` property is `null` and the `value` property contains
+       * the updated current selection filter.
        *
        * @fires "will:select"
        * @fires "did:select"
@@ -104,7 +145,7 @@ define([
        * @see pentaho.visual.base.types.selectionModes
        */
       selectAction: function(inputDataFilter, keyArgs) {
-        var selectionMode = O.getOwn(keyArgs, "selectionMode") || this.getv("selectionMode");
+        var selectionMode = O.getOwn(keyArgs, "selectionMode") || this.selectionMode;
         var will = new WillSelect(this, inputDataFilter, selectionMode);
         return this._doAction(this._doSelect, will, DidSelect, RejectedSelect);
       },
@@ -117,8 +158,8 @@ define([
        * @protected
        */
       _doSelect: function(will){
-        var currentSelectionFilter = this.getv("selectionFilter");
-        var selectionMode = will.selectionMode || this.getv("selectionMode");
+        var currentSelectionFilter = this.selectionFilter;
+        var selectionMode = will.selectionMode || this.selectionMode;
 
         var newSelectionFilter;
         try {
@@ -157,7 +198,7 @@ define([
        *
        */
       executeAction: function(inputDataFilter, keyArgs) {
-        var doExecute = O.getOwn(keyArgs, "doExecute") || this.getv("doExecute");
+        var doExecute = O.getOwn(keyArgs, "doExecute") || this.doExecute;
         var will = new WillExecute(this, inputDataFilter, doExecute);
         return this._doAction(this._doExecute, will, DidExecute, RejectedExecute);
       },
@@ -193,10 +234,14 @@ define([
        * @protected
        */
       _doAction: function(coreAction, willEvent, DidEvent, RejectedEvent) {
+
         if(this._hasListeners(willEvent.type))
           this._emitSafe(willEvent);
 
-        var result = willEvent.isCanceled ? ActionResult.reject(willEvent.cancelReason) : coreAction.call(this, willEvent);
+        /*jshint laxbreak:true*/
+        var result = willEvent.isCanceled
+            ? ActionResult.reject(willEvent.cancelReason)
+            : coreAction.call(this, willEvent);
 
         if(result.error) {
           if(this._hasListeners(RejectedEvent.type)) {
@@ -207,6 +252,7 @@ define([
             this._emitSafe(new DidEvent(this, result.value, willEvent));
           }
         }
+
         return result;
       },
       //endregion
@@ -271,23 +317,21 @@ define([
                 if(typeof f === "string" && selectionModes.hasOwnProperty(f))
                   return selectionModes[f];
 
-                // TODO: must default to eval if string
-                return f;
-              }
+                  return F.as(f);
+                }
+              },
+              value: selectionModes.REPLACE,
+              isRequired: true
             },
-            value: selectionModes.REPLACE,
-            isRequired: true
-          },
-          {
-            name: "doExecute",
-            type: "function"
-          }
-        ]
-      }
-    })
-    .implement({type: bundle.structured});
+            {
+              name: "doExecute",
+              type: "function"
+            }
+          ]
+        }
+      })
+      .implement({type: bundle.structured});
 
     return Model;
-
   };
 });

@@ -7,9 +7,15 @@ define([
   "use strict";
 
   return {
-    // Temporary. Used for demos of BACKLOG-5985,BACKLOG-5989
+    // Temporary. Used for demos
     _init: function() {
       this.base();
+
+      // Temporary. Used for demo of BACKLOG-6739
+      this._renderCounter = 0;
+
+      // Temporary. Used for demo of BACKLOG-5985
+      /*
       var me = this;
       window.addEventListener("keypress", function(e) {
         var ignoreTags = ["TEXTAREA", "INPUT"];
@@ -23,18 +29,29 @@ define([
           "KeyT": selectionModes.TOGGLE
         };
         var selectionMode = mode[e.code];
-        if(selectionMode) me.model.set("selectionMode", selectionMode);
+        if(selectionMode) me.model.selectionMode = selectionMode;
       }, false);
 
       this.model.on("will:select",  this._onWillSelect.bind(this));
+      */
 
-      this.model.set("doExecute",   this._googleSearch.bind(this));
+      // Temporary. Used for demo of BACKLOG-5989
+      /*
+      this.model.doExecute = this._googleSearch.bind(this);
       this.model.on("will:execute", this._onWillExecute.bind(this));
+      */
 
-      this.model.on("will:change",  this._onWillChange.bind(this));
-
-      this._renderCounter = 0;
+      // Temporary. Used for demo
+      /*
       this._verifyChange = !true;
+      this.model.on("will:change",  this._onWillChange.bind(this));
+      */
+    },
+
+    // Temporary. Used for demo of BACKLOG-6739
+    _renderCore: function() {
+      this.base();
+      this._renderCounter++;
     },
 
     // Temporary. Used for demo of BACKLOG-5985
@@ -87,11 +104,7 @@ define([
       logger.log("Google Search:" + url);
     },
 
-    _renderCore: function() {
-      this.base();
-      this._renderCounter++; //BACKLOG-6739
-    },
-
+    // Temporary. Used for demo
     _onWillChange: function(event) {
       var changeset = event.changeset;
       changeset.propertyNames.forEach(function(propName) {
@@ -102,7 +115,8 @@ define([
         }
         //var propChange = changeset.getChange(propName);
         //if(propChange)
-        //  logger.log(propName + (result ? " changed!" : " did not change!") + JSON.stringify(propChange.oldValue) + " , " +  JSON.stringify(propChange.newValue));
+        //  logger.log(propName + (result ? " changed!" : " did not change!") +
+        //       JSON.stringify(propChange.oldValue) + " , " +  JSON.stringify(propChange.newValue));
       }, this);
     }
   };

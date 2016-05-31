@@ -19,9 +19,10 @@ define([
   "../abstract/types/labelsOption",
   "../abstract/mixins/scaleSizeContinuousType",
   "../abstract/mixins/scaleColorContinuousType",
-  "../abstract/mixins/settingsMultiChartType"
+  "../abstract/mixins/settingsMultiChartType",
+  "../abstract/mixins/trendType"
 ], function(cartesianAbstractModelFactory, bundle, labelsOptionFactory,
-    scaleSizeContinuousType, scaleColorContinuousType, settingsMultiChartType) {
+    scaleSizeContinuousType, scaleColorContinuousType, settingsMultiChartType, trendType) {
 
   "use strict";
 
@@ -40,44 +41,56 @@ define([
 
           props: [
             {
-              name: "rows",
-              isRequired: true
+              name: "rows", //VISUAL_ROLE
+              type: {
+                props: {attributes: {isRequired: true}}
+              }
             },
             {
-              name: "x",
-              type: "string",
-              dataType: "number",
-              isVisualRole: true,
-              isRequired: true
+              name: "x", //VISUAL_ROLE
+              type: {
+                base: "pentaho/visual/role/quantitative",
+                dataType: "number",
+                props: {attributes: {countMin: 1, countMax: 1}}
+              }
             },
             {
-              name: "y",
-              type: "string",
-              dataType: "number",
-              isVisualRole: true,
-              isRequired: true
+              name: "y", //VISUAL_ROLE
+              type: {
+                base: "pentaho/visual/role/quantitative",
+                dataType: "number",
+                props: {attributes: {countMin: 1, countMax: 1}}
+              }
             },
             {
-              name: "color",
-              type: ["string"],
-              dataType: "number",
-              isVisualRole: true
-              // TODO: countMin depends on whether data props are discrete or continuous...
+              // Modal visual role
+              name: "color", //VISUAL_ROLE
+              type: {
+                base: "pentaho/visual/role/mapping",
+                levels: ["nominal", "quantitative"],
+                props: {
+                  attributes: {
+                    // TODO: countMax depends on whether data props are discrete or continuous...
+                    countMax: function() {
+                      return this.levelEffective === "quantitative" ? 1 : null;
+                    }
+                  }
+                }
+              }
             },
             {
-              name: "size",
-              type: "string",
-              dataType: "number",
-              isVisualRole: true
+              name: "size", //VISUAL_ROLE
+              type: {
+                base: "pentaho/visual/role/quantitative",
+                //TODO: REMOVE THIS AFTER DEMO. For demoing the measurement level incompatibility.
+                //dataType: "number",
+                props: {attributes: {countMax: 1}}
+              }
             },
             {
-              name: "multi",
-              type: ["string"],
-              dataType: "string",
-              isVisualRole: true,
-              isRequired: false
+              name: "multi", //VISUAL_ROLE
+              type: "pentaho/visual/role/ordinal"
             },
-
             {
               name: "labelsOption",
               type: {
@@ -98,6 +111,8 @@ define([
       .implement({type: bundle.structured["scaleColorContinuous"]})
       .implement({type: settingsMultiChartType})
       .implement({type: bundle.structured["settingsMultiChart"]})
+      .implement({type: trendType})
+      .implement({type: bundle.structured["trendType"]})
       .implement({type: bundle.structured["metricDot"]});
   };
 });

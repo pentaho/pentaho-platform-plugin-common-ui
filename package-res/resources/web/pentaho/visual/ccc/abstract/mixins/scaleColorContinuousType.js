@@ -26,17 +26,20 @@ define([
       {
         name: "pattern",
         type: patternFactory,
-        isRequired: true
+        isRequired: true,
+        value: "3_color"
       },
       {
         name: "colorSet",
         type: colorSetFactory,
-        isRequired: true
+        isRequired: true,
+        value: "ryg"
       },
       {
         name: "reverseColors",
         type: "boolean",
-        isRequired: true
+        isRequired: true,
+        value: false
       }
     ]
   };

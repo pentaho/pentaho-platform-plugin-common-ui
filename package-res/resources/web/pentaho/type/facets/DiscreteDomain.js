@@ -158,7 +158,7 @@ define([
           var v1 = valuesDomain.at(i);
           var v0 = domain.get(v1.key);
 
-          // Not defined at the current domain?
+          // Not defined in the current domain?
           if(!v0)
             throw error.argInvalid("domain", bundle.structured.errors.refinement.domain.notSubsetOfBase);
 

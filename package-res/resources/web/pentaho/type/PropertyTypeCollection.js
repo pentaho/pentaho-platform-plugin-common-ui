@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 define([
-  "./Property",
+  "./property",
   "../lang/Collection",
   "../util/arg",
   "../util/error",
   "../util/object"
-], function(Property, Collection, arg, error, O) {
+], function(propertyFactory, Collection, arg, error, O) {
 
   "use strict";
 
@@ -56,10 +56,12 @@ define([
         isRoot: false
       };
 
-      // Copy the declaring complex type's ancestor's properties.
-      var ancestorType = declaringType.ancestor,
-          colBase = ancestorType && ancestorType._getProps && ancestorType._getProps();
+      // Caches Property.Type
+      this._propType = null;
 
+      // Copy the declaring complex type's ancestor's properties.
+      var ancestorType = declaringType.ancestor;
+      var colBase = ancestorType.isComplex ? ancestorType._getProps() : null;
       if(colBase) {
         // Backup any provided specs.
         var newProps;
@@ -81,8 +83,32 @@ define([
       }
     },
 
+    /**
+     * The context of properties of this property collection.
+     *
+     * @type {pentaho.type.Context}
+     * @readOnly
+     * @private
+     */
+    get _context() {
+      return this._cachedKeyArgs.declaringType.context;
+    },
+
+    /**
+     * The property type in this property collection's context.
+     *
+     * @type {pentaho.type.Property.Type}
+     * @readOnly
+     * @private
+     */
+    get _propertyType() {
+      var propertyType = this._propType;
+      if(!propertyType) this._propType = propertyType = this._context.get(propertyFactory).type;
+      return propertyType;
+    },
+
     //region List implementation
-    elemClass: Property.Type,
+    //elemClass: Property.Type,
 
     /**
      * Add a {@link pentaho.type.UPropertyTypeProto} to the properties collection.
@@ -142,7 +168,7 @@ define([
       }
 
       // Replace with overridden property.
-      return Property.extendProto(existing.instance, {type: spec}, ka).type;
+      return existing.extendProto(spec, ka);
     },
 
     /**
@@ -160,16 +186,27 @@ define([
       // A singular string property with the specified name.
       if(typeof spec === "string") spec = {name: spec};
 
+      // Resolve base Property Type
+      var basePropType;
+      var baseId = spec.base;
+      if(!baseId) {
+        basePropType = this._propertyType;
+      } else {
+        basePropType = this._context.get(baseId).type;
+        if(!basePropType.isSubtypeOf(this._propertyType))
+          throw error.argInvalid("props[i]", "Property base type does not extend Property.");
+      }
+
       var ka = this._cachedKeyArgs;
       ka.index = index;
       ka.isRoot = true;
 
-      var pm = Property.extendProto(null, {type: spec}, ka).type;
+      var propType = basePropType.extendProto(spec, ka);
 
       ka.index = -1;
       ka.isRoot = false;
 
-      return pm;
+      return propType;
     },
     //endregion
 
