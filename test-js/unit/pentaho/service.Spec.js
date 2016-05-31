@@ -351,6 +351,77 @@ define(["pentaho/service"], function(singletonService) {
       });
     });
 
+    describe("with ids option", function() {
+      beforeEach(function() {
+        require.undef("Foo1"); define("Foo1", foo1);
+        require.undef("Foo2"); define("Foo2", foo2);
+        require.undef("Bar" ); define("Bar",  bar );
+
+        require.undef("pentaho/service");
+        require.undef("pentaho/service!IFoo?ids=true");
+        require.undef("pentaho/service!IBar?ids=true");
+        require.undef("pentaho/service!IFoo?ids=true&single=true");
+
+
+        // Reset current service configuration
+        require.config({
+          config: {"pentaho/service": null}
+        });
+      });
+
+      it("should resolve a service with one registered provider with that registered module's id", function(done) {
+        require.config({
+          config: {
+            "pentaho/service": {
+              "Foo1": "IFoo"
+            }
+          }
+        });
+
+        require(["pentaho/service!IFoo?ids"], function(foos) {
+          expect(foos.length).toBe(1);
+          expect(foos[0]).toBe("Foo1");
+          done();
+        });
+      });
+
+      it("should resolve a service with two registered providers with both the registered modules' ids", function(done) {
+        require.config({
+          config: {
+            "pentaho/service": {
+              "Foo1": "IFoo",
+              "Foo2": "IFoo"
+            }
+          }
+        });
+
+        require(["pentaho/service!IFoo?ids"], function(foos) {
+          expect(foos.length).toBe(2);
+          expect(foos).toContain("Foo1");
+          expect(foos).toContain("Foo2");
+          done();
+        });
+      });
+
+      describe("with single", function() {
+        it("should resolve a service with two registered providers with the id of one of those registered modules", function(done) {
+          require.config({
+            config: {
+              "pentaho/service": {
+                "Foo1": "IFoo",
+                "Foo2": "IFoo"
+              }
+            }
+          });
+
+          require(["pentaho/service!IFoo?ids&single"], function(foo) {
+            expect(foo === "Foo1" || foo === "Foo2").toBe(true);
+            done();
+          });
+        });
+      });
+    });
+
     describe("options handling", function() {
       it("should be independent of the order", function() {
         expect(singletonService.normalize("Foo?a=1&b=2&c=3")).toBe(singletonService.normalize("Foo?c=3&b=2&a=1"));
@@ -364,6 +435,79 @@ define(["pentaho/service"], function(singletonService) {
         expect(singletonService.normalize("Foo?")).toBe(singletonService.normalize("Foo"));
 
         expect(singletonService.normalize("Foo?&&&&")).toBe(singletonService.normalize("Foo"));
+      });
+    });
+
+    describe("#getRegisteredIds(name)", function() {
+      it("should be able to use the synchronous require syntax to get just the module ids", function(done) {
+        require.config({
+          config: {
+            "pentaho/service": {
+              "Foo1": "IFoo",
+              "Foo2": "IFoo"
+            }
+          }
+        });
+
+        require(["pentaho/service"], function(service) {
+          var foos = service.getRegisteredIds("IFoo");
+
+          expect(foos.length).toBe(2);
+          expect(foos).toContain("Foo1");
+          expect(foos).toContain("Foo2");
+
+          done();
+        });
+      });
+
+      it("should returned an array copy every time", function(done) {
+        require.config({
+          config: {
+            "pentaho/service": {
+              "Foo1": "IFoo",
+              "Foo2": "IFoo"
+            }
+          }
+        });
+
+        require(["pentaho/service"], function(service) {
+          var foos1 = service.getRegisteredIds("IFoo");
+          var foos2 = service.getRegisteredIds("IFoo");
+
+          expect(foos1).not.toBe(foos2);
+
+          done();
+        });
+      });
+
+      it("should returned an empty array when there are no registrations", function(done) {
+        require.config({
+          config: {
+            "pentaho/service": {
+              "Foo1": "IFoo",
+              "Foo2": "IFoo"
+            }
+          }
+        });
+
+        require(["pentaho/service"], function(service) {
+          var foos = service.getRegisteredIds("IGuGuDaDa");
+          expect(foos).toEqual([]);
+          done();
+        });
+      });
+    });
+
+    describe("build environment", function() {
+      it("should call the onLoad callback synchronously, without args, when load is called in a build", function() {
+        var onLoad = jasmine.createSpy();
+        var config = {isBuild: true};
+
+        singletonService.load("foo", require, onLoad, config);
+
+        expect(onLoad).toHaveBeenCalled();
+
+        expect(onLoad).toHaveBeenCalledWith();
       });
     });
   });

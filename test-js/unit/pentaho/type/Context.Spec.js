@@ -142,6 +142,24 @@ define([
 
       describe("by id", function() {
 
+        it("should throw on get, when the given id exists but hasn't been loaded yet", function() {
+          return require.using(["pentaho/type/Context", "require"], function(Context, localRequire) {
+
+              var context = new Context();
+
+              localRequire.define("my/foo", [], function() {
+                return function(ctx) {
+                  return function() {};
+                };
+              });
+
+              // expect to throw
+              expect(function() {
+                context.get("my/foo")
+              }).toThrow();
+            });
+        });
+
         it("should be able to get a standard type given its relative id", function() {
 
           return testGet(function(sync, Context) {
@@ -1131,5 +1149,188 @@ define([
         });
       });
     }); // #getAllAsync
+
+    describe("#getAll(baseTypeId, ka)", function() {
+
+      it("should return all registered/loaded types derived from Value, by default", function() {
+
+        return require.using(["pentaho/type/Context"], function(Context) {
+          var context = new Context();
+          var valueType = context.get("pentaho/type/value").type;
+
+          var InstCtors = context.getAll();
+
+          // All value standard types. More than Value.
+          expect(InstCtors.length).toBeGreaterThan(1);
+
+          InstCtors.forEach(function(InstCtor) {
+            expect(InstCtor.type.isSubtypeOf(valueType)).toBe(true);
+          });
+        });
+      });
+
+      it("should return only subtypes of the specified baseType", function() {
+
+        return require.using(["pentaho/type/Context"], function(Context) {
+          var context = new Context();
+
+          var simpleType = context.get("pentaho/type/simple").type;
+
+          var InstCtors = context.getAll("pentaho/type/simple");
+
+          // All simple standard types. More than Simple.
+          expect(InstCtors.length).toBeGreaterThan(1);
+
+          InstCtors.forEach(function(InstCtor) {
+            expect(InstCtor.type.isSubtypeOf(simpleType)).toBe(true);
+          });
+        });
+      });
+
+      it("should include types registered using get", function() {
+
+        return require.using(["pentaho/type/Context"], function(Context) {
+
+          var context = new Context();
+
+          var simpleType = context.get("pentaho/type/simple").type;
+
+          var ExpBar = context.get(simpleType).extend({type: {id: "exp/bar", isBrowsable: false}});
+
+          // register
+          context.get(ExpBar);
+
+          var InstCtors = context.getAll(simpleType);
+
+          expect(InstCtors.indexOf(ExpBar) >= 0).toBe(true);
+        });
+      });
+
+      it("should include types with the specified keyArgs.isBrowsable value", function() {
+
+        return require.using(["pentaho/type/Context"], function(Context) {
+          var context = new Context();
+
+          var simpleType = context.get("pentaho/type/simple").type;
+
+          var ExpBar = context.get(simpleType).extend({type: {id: "exp/bar", isBrowsable: false}});
+
+          // register
+          context.get(ExpBar);
+
+          var InstCtors = context.getAll(null, {isBrowsable: false});
+
+          expect(InstCtors.indexOf(ExpBar) >= 0).toBe(true);
+        });
+      });
+
+      it("should not include types without the specified keyArgs.isBrowsable value", function() {
+
+        return require.using(["pentaho/type/Context"], function(Context) {
+          var context = new Context();
+
+          var Simple = context.get("pentaho/type/simple");
+
+          var ExpBar = Simple.extend({type: {id: "exp/bar", isBrowsable: false}});
+
+          // register
+          context.get(ExpBar);
+
+          var InstCtors = context.getAll(null, {isBrowsable: true});
+
+          expect(InstCtors.indexOf(ExpBar) >= 0).toBe(false);
+        });
+      });
+
+      function configRequire(localRequire) {
+
+        // Reset current service configuration
+        localRequire.config({
+          config: {"pentaho/service": null}
+        });
+
+        // ---
+
+        localRequire.define("exp/thing", ["pentaho/type/simple"], function(simpleFactory) {
+          return function(context) {
+            return context.get(simpleFactory).extend({type: {id: "exp/thing"}});
+          };
+        });
+
+        localRequire.define("exp/foo", ["exp/thing"], function(thingFactory) {
+          return function(context) {
+            return context.get(thingFactory).extend({type: {id: "exp/foo"}});
+          };
+        });
+
+        localRequire.define("exp/bar", ["exp/thing"], function(simpleFactory) {
+          return function(context) {
+            return context.get(simpleFactory).extend({type: {id: "exp/bar"}});
+          };
+        });
+
+        localRequire.config({
+          config: {
+            "pentaho/service": {
+              "exp/thing": "exp/thing",
+              "exp/foo":   "exp/thing",
+              "exp/bar":   "exp/thing"
+            }
+          }
+        });
+      }
+
+      it("should throw when the given base id exists but hasn't been loaded yet", function() {
+
+        return require.using(["pentaho/type/Context", "require"], configRequire, function(Context, localRequire) {
+
+          var context = new Context();
+
+          // expect to throw
+          expect(function() {
+          context.getAll("exp/thing");
+          }).toThrow();
+        });
+      });
+
+      it("should throw when the given base id is loaded but the some of the registered service ids are not",
+      function() {
+
+        return require.using(["pentaho/type/Context", "require"], configRequire, function(Context, localRequire) {
+
+          var context = new Context();
+
+          return localRequire.promise(["exp/thing"])
+              .then(function() {
+                // expect to throw
+                expect(function() {
+                  context.getAll("exp/thing");
+                }).toThrow();
+              });
+        });
+      });
+
+      it("should work if given base id and all its service registered ids are loaded", function() {
+
+        return require.using(["pentaho/type/Context", "require"], configRequire, function(Context, localRequire) {
+
+          var context = new Context();
+
+          return localRequire.promise(["exp/thing", "exp/foo", "exp/bar"])
+              .then(function() {
+                // expect to throw
+                var InstCtors = context.getAll("exp/thing");
+                expect(InstCtors.length).toBe(3);
+
+                var typeIds = InstCtors.map(function(InstCtor) { return InstCtor.type.id; });
+
+                expect(typeIds.indexOf("exp/thing")).not.toBeLessThan(0);
+                expect(typeIds.indexOf("exp/foo")).not.toBeLessThan(0);
+                expect(typeIds.indexOf("exp/bar")).not.toBeLessThan(0);
+              });
+        });
+      });
+    }); // #getAll
+
   }); // pentaho.type.Context
 });

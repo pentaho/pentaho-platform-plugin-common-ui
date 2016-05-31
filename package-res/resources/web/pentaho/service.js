@@ -23,9 +23,12 @@
  * 
  * **Plugin Usage**: `"pentaho/service!{logical-module-name}?meta&single"`
  *
- *   * `{logical-module-name}` — the name of a required logical module.
- *   * `meta` — if present provides the loaded module Ids, encapsulating it with the module value.
- *   * `single` — if present returns only the first declared dependency.
+ *   1. `{logical-module-name}` — the name of a required logical module.
+ *   2. `meta` — if present, provides the loaded module Ids, encapsulating it with the module value.
+ *   3. `single` — if present, returns only the first declared dependency.
+ *   4. `ids` - if present, returns only the ids of the registered modules and **does not load them**;
+ *       you can use this module's exported `getRegisteredIds` method,
+ *       to be able to know the registered module ids synchronously.
  *
  * #### A Plugin mechanism
  * 
@@ -134,7 +137,8 @@ define([
 
   return {
     load: loadLogicalModule,
-    normalize: normalizeLogicalModule
+    normalize: normalizeLogicalModule,
+    getRegisteredIds: getRegisteredIds
   };
 
   /**
@@ -164,14 +168,24 @@ define([
       var modules = getLogicalModule(nameAndOptions.name);
 
       var modules_num = modules.length;
-      var single = nameAndOptions.options.single === 'true';
-
-      if(single) {
+      var isSingle = nameAndOptions.options.single === 'true';
+      if(isSingle) {
         if(modules_num > 1) {
           modules = [modules[0]];
         } else if(modules_num === 0) {
           onLoad(null);
+          return;
         }
+      }
+
+      var isIds = nameAndOptions.options.ids === 'true';
+      if(isIds) {
+        if(isSingle) {
+          onLoad(modules[0]);
+        } else {
+          onLoad(modules.slice());
+        }
+        return;
       }
 
       // `require` is ok with resolving empty arrays as empty arrays.
@@ -189,11 +203,11 @@ define([
             toReturn.push({moduleId: modules[i], value: values[i]});
           }
 
-          onLoad(single ? toReturn[0] : toReturn);
+          onLoad(isSingle ? toReturn[0] : toReturn);
         } else {
           // Pass the resolved modules to the original onLoad function,
           // as a single array argument.
-          onLoad(single ? values[0] : values);
+          onLoad(isSingle ? values[0] : values);
         }
       });
     }
@@ -205,7 +219,7 @@ define([
    * Assures that requests with the exact same options are
    * identified as the same and get correctly cached.
    *
-   * @param {String} name The name of the logical module to load.
+   * @param {string} name The name of the logical module to load.
    * @param {function} normalize The original normalize function.
    */
   function normalizeLogicalModule(name, normalize) {
@@ -218,7 +232,7 @@ define([
    * Gets the ids of modules registered as dependencies of a given logical module.
    *
    * @param {string} logicalModuleName The name of the logical module.
-   * @returns {Array} An array of module ids, possibly empty.
+   * @return {Array} An array of module ids, possibly empty.
    */
   function getLogicalModule(logicalModuleName) {
     return O.getOwn(logicalModules, logicalModuleName) ||
@@ -280,6 +294,7 @@ define([
     var options = [];
 
     for (var prop in nameAndOptions.options) {
+      /* istanbul ignore else: almost impossible to test; browser dependent */
       if(nameAndOptions.options.hasOwnProperty(prop)) {
         options.push(encodeURIComponent(prop) + "=" + encodeURIComponent(nameAndOptions.options[prop]));
       }
@@ -288,5 +303,16 @@ define([
     options.sort();
 
     return nameAndOptions.name + (options.length ? "?" + options.join('&') : "");
+  }
+
+  /**
+   * Gets the ids of modules registered as dependencies of a given logical module.
+   *
+   * @param {string} logicalModuleName The name of the logical module.
+   * @return {string[]} An array of ids, possibly empty.
+   */
+  function getRegisteredIds(logicalModuleName) {
+    var ids = O.getOwn(logicalModules, logicalModuleName);
+    return ids ? ids.slice() : [];
   }
 });
