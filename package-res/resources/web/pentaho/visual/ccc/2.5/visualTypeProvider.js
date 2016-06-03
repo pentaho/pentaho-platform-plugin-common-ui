@@ -15,9 +15,9 @@
 */
 define([
   "require",
-  "../../util/arg",
-  "../../util/object",
-  "../../shim/es6-promise"
+  "../../../util/arg",
+  "../../../util/object",
+  "../../../shim/es6-promise"
 ], function(require, arg, O) {
   return /** @type IVisualTypeProvider */{
     getAll: getVisualTypes

@@ -32,6 +32,7 @@ define([
         type: {
           id: "pentaho/visual/ccc/areaStacked",
           v2Id: "ccc_area",
+          category: "areachart",
 
           view: "View",
           styleClass: "pentaho-visual-ccc-area-stacked",

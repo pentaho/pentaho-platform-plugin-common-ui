@@ -35,6 +35,7 @@ define([
         type: {
           id: "pentaho/visual/ccc/metricDot",
           v2Id: "ccc_scatter",
+          category: "scatter",
 
           view: "View",
           styleClass: "pentaho-visual-ccc-metric-dot",

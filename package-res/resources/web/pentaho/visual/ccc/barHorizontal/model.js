@@ -30,6 +30,7 @@ define([
       type: {
         id: "pentaho/visual/ccc/barHorizontal",
         v2Id: "ccc_horzbar",
+        category: "horzbarchart",
 
         view: "View",
         styleClass: "pentaho-visual-ccc-bar-horizontal",

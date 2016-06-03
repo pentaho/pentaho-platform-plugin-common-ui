@@ -29,6 +29,7 @@ define([
         type: {
           id: "pentaho/visual/ccc/barNormalized",
           v2Id: "ccc_barnormalized",
+          category: "barchart",
 
           view: "View",
           styleClass: "pentaho-visual-ccc-bar-normalized"

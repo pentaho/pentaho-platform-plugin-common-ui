@@ -29,6 +29,7 @@ define([
         type: {
           id: "pentaho/visual/ccc/barNormalizedHorizontal",
           v2Id: "ccc_horzbarnormalized",
+          category: "horzbarchart",
 
           view: "View",
           styleClass: "pentaho-visual-ccc-bar-normalized-horizontal"

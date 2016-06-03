@@ -14,4 +14,4 @@
  * limitations under the License.
  */
 /*global analyzerVizPlugins:true */
-analyzerVizPlugins.push("pentaho/visual/samples/calc/analyzer_plugin");
+analyzerVizPlugins.push("pentaho/visual/2.5/samples/calc/analyzer_plugin");

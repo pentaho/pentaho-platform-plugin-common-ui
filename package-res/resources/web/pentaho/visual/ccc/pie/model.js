@@ -31,6 +31,7 @@ define([
         type: {
           id: "pentaho/visual/ccc/pie",
           v2Id: "ccc_pie",
+          category: "piechart",
 
           view: "View",
           styleClass: "pentaho-visual-ccc-pie",

@@ -16,6 +16,7 @@
 define([
   "require",
   "module",
+  "../service",
   "../i18n!types",
   "./standard",
   "./SpecificationContext",
@@ -28,7 +29,7 @@ define([
   "../util/error",
   "../util/object",
   "../util/fun"
-], function(localRequire, module, bundle, standard, SpecificationContext, SpecificationScope,
+], function(localRequire, module, service, bundle, standard, SpecificationContext, SpecificationScope,
     GlobalContextVars, configurationService, Base, promiseUtil, arg, error, O, F) {
 
   "use strict";
@@ -79,6 +80,7 @@ define([
    * using one of the provided methods:
    * [get]{@link pentaho.type.Context#get},
    * [getAsync]{@link pentaho.type.Context#getAsync},
+   * [getAll]{@link pentaho.type.Context#getAll}, or
    * [getAllAsync]{@link pentaho.type.Context#getAllAsync}, or
    * [inject]{@link pentaho.type.Context#inject},
    * so that these are configured before being used.
@@ -264,7 +266,7 @@ define([
      * (specified directly in `typeRef`, or present in an generic type specification).
      *
      * @throws {Error} When the id of a **non-standard type** is from a module that the AMD module system
-     * hasn't loaded yet (specified directly in `typeRef`, or present in an generic type specification)
+     * hasn't loaded yet (specified directly in `typeRef`, or present in an generic type specification).
      *
      * @throws {pentaho.lang.OperationInvalidError} When the value returned by a factory function is not
      * an instance constructor of a subtype of `Instance`
@@ -382,6 +384,80 @@ define([
       }
     },
 
+
+    /**
+     * Gets the **configured instance constructors** of
+     * all of the loaded types that are subtypes of a given base type.
+     *
+     * This method is a synchronous version of {@link pentaho.type.Context#getAllAsync}
+     *
+     * If it is not known whether all known subtypes of `baseTypeId` have already been loaded
+     * (e.g. by a previous call to [getAllAsync]{@link pentaho.type.Context#getAllAsync}),
+     * the asynchronous method version, [getAllAsync]{@link pentaho.type.Context#getAsync},
+     * should be used instead.
+     *
+     * @example
+     * <caption>
+     *   Getting all <code>"my/component"</code> sub-types browsable
+     *   in the application <code>"data-explorer-101"</code>.
+     * </caption>
+     *
+     * require(["pentaho/type/Context"], function(Context) {
+     *
+     *   var context = new Context({application: "data-explorer-101"});
+     *
+     *   var ComponentModels = context.getAll("my/component", {isBrowsable: true});
+     *   ComponentModels.forEach(function(ComponentModel) {
+     *
+     *     console.log("will display menu entry for: " + ComponentModel.type.label);
+     *
+     *   });
+     *
+     * });
+     *
+     * @param {string} [baseTypeId] The id of the base type. Defaults to `"pentaho/type/value"`.
+     * @param {object} [keyArgs] Keyword arguments.
+     * @param {?boolean} [keyArgs.isBrowsable=null] Indicates that only types with the specified
+     *   [isBrowsable]{@link pentaho.type.Value.Type#isBrowsable} value are returned.
+     *
+     * @return {!Array.<Class.<pentaho.type.Value>>} An array of instance contructors.
+     *
+     * @throws {Error} When the id of a type is not defined as a module in the AMD module system.
+     * @throws {Error} When the id of a **non-standard type** is from a module that the AMD module system
+     * hasn't loaded yet.
+     *
+     * @see pentaho.type.Context#getAllAsync
+     * @see pentaho.type.Context#get
+     * @see pentaho.type.Context#getAsync
+     */
+    getAll: function(baseTypeId, keyArgs) {
+      if(!baseTypeId) baseTypeId = "pentaho/type/value";
+
+      var predicate = F.predicate(keyArgs);
+
+      var baseType  = this.get(baseTypeId).type;
+
+      // Ensure that all registered types are loaded.
+      // Throws if one isn't yet.
+      service.getRegisteredIds(baseTypeId).forEach(function(id) { this.get(id); }, this);
+
+      var byTypeUid = this._byTypeUid;
+
+      var output = [];
+      for(var uid in byTypeUid) {
+        /* istanbul ignore else: almost impossible to test; browser dependent */
+        if(O.hasOwn(byTypeUid, uid)) {
+          var InstCtor = byTypeUid[uid];
+          var type = InstCtor.type;
+          if(type.isSubtypeOf(baseType) && (!predicate || predicate(type))) {
+            output.push(InstCtor);
+          }
+        }
+      }
+
+      return output;
+    },
+
     /**
      * Gets a promise for the **configured instance constructors** of
      * all of the types that are subtypes of a given base type.
@@ -426,16 +502,24 @@ define([
 
         var predicate = F.predicate(keyArgs);
         var me = this;
-        return promiseUtil.require("pentaho/service!" + baseTypeId, localRequire)
-            .then(function(factories) {
-              return Promise.all(factories.map(me.getAsync, me));
-            })
-            .then(function(InstCtors) {
-              /*jshint laxbreak:true*/
-              return predicate
-                  ? InstCtors.filter(function(InstCtor) { return predicate(InstCtor.type); })
-                  : InstCtors;
+        var instCtorsPromise = promiseUtil.require("pentaho/service!" + baseTypeId, localRequire)
+          .then(function(factories) {
+            return Promise.all(factories.map(me.getAsync, me));
+          });
+
+        return Promise.all([this.getAsync(baseTypeId), instCtorsPromise])
+          .then(function(values) {
+            var baseType  = values[0].type;
+            var InstCtors = Object.keys(me._byTypeUid).map(function(typeUid){
+              return me._byTypeUid[typeUid];
             });
+
+            return InstCtors.filter(function(InstCtor) {
+              var type = InstCtor.type;
+              return type.isSubtypeOf(baseType) && (!predicate || predicate(type));
+            });
+          });
+
       } catch(ex) {
         /* istanbul ignore next : really hard to test safeguard */
         return Promise.reject(ex);
@@ -687,7 +771,7 @@ define([
      * @return {!Promise.<!Class.<pentaho.type.Instance>>|!Class.<pentaho.type.Instance>} When sync,
      * returns the instance constructor, while, when async, returns a promise for it.
      *
-     * @throws {pentaho.lang.OperationInvalidError} When the value returned by the factory function
+     * @throws {pentaho.lang.ArgumentInvalidError} When the value returned by the factory function
      * is not a instance constructor of a subtype of `Instance`.
      *
      * @private

@@ -49,6 +49,7 @@ define([
       type: {
         id: "pentaho/visual/ccc/barLine",
         v2Id: "ccc_barline",
+        category: "barchart",
 
         view: "View",
         styleClass: "pentaho-visual-ccc-bar-line",
