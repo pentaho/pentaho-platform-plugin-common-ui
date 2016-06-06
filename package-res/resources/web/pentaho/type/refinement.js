@@ -408,7 +408,14 @@ define([
         },
         //endregion
 
-        get isRefinement() { return true; },
+        get isRefinement() { 
+          return true;
+        },
+
+        get isContainer() {
+          var of = this.of;
+          return !!of && of.isContainer;
+        },
 
         get isList() {
           var of = this.of;

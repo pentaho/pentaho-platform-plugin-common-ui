@@ -133,27 +133,24 @@ define([
     get isRejected() {
       return !!this._error;
     }
-  }, {
+  }, /** @lends pentaho.lang.ActionResult */{
 
     /**
-     * Creates an `ActionResult` representing a successful _action_.
+     * Creates an action result that represents a successful action.
      *
-     * @static
-     *
-     * @param {?object} value - The value of a successful _action_.
-     * @returns {ActionResult} An `ActionResult` representing a successful _action_.
+     * @param {Object} [value] - The value of the successful action.
+     * @return {!pentaho.lang.ActionResult} A new  action result.
      */
     fulfill: function(value) {
       return new ActionResult(value);
     },
 
     /**
-     * Creates an `ActionResult` representing an unsuccessful _action_.
+     * Creates an action result that represents an unsuccessful action.
      *
-     * @static
-     *
-     * @param {!string|Error|pentaho.lang.UserError} error - The error that contains the reason why the _action_ was rejected.
-     * @returns {ActionResult} An `ActionResult` representing an unsuccessful _action_.
+     * @param {string|Error|pentaho.lang.UserError} [error] - The error that contains the reason why
+     * the action was rejected.
+     * @return {!pentaho.lang.ActionResult} A new action result.
      */
     reject: function(error) {
       return new ActionResult(undefined, error || new Error("failed"));

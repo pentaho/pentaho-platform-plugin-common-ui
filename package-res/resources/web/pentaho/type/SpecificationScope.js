@@ -15,35 +15,35 @@
  */
 define([
   "./SpecificationContext",
-  "../lang/Base",
-  "../util/object"
-], function(SpecificationContext, Base, O) {
+  "../lang/Base"
+], function(SpecificationContext, Base) {
 
   "use strict";
 
-  /**
-   * @name pentaho.type.SpecificationScope
-   * @class
-   * @implements pentaho.lang.IDisposable
-   *
-   * @amd pentaho/type/SpecificationScope
-   *
-   * @classDesc The `SpecificationScope` class handles management of the
-   * [ambient specification context]{@link pentaho.type.SpecificationContext.current}.
-   *
-   * @constructor
-   * @description Creates a `SpecificationScope`.
-   *
-   * If a specification context is given, it is used and set as the ambient specification context.
-   * Otherwise, if an ambient specification context exists, that context is used.
-   * Otherwise, a new specification context is created and set as
-   * the ambient specification context.
-   * In this case, when the scope is disposed, the created context is disposed as well.
-   *
-   * @param {pentaho.type.SpecificationContext} [context] A specification context to use.
-   */
-  var SpecificationScope = Base.extend(/** @lends pentaho.type.SpecificationScope# */{
+  return Base.extend(/** @lends pentaho.type.SpecificationScope# */{
 
+    /**
+     * @alias SpecificationScope
+     * @memberOf pentaho.type
+     * @class
+     * @implements pentaho.lang.IDisposable
+     *
+     * @amd pentaho/type/SpecificationScope
+     *
+     * @classDesc The `SpecificationScope` class manages the
+     * [ambient specification context]{@link pentaho.type.SpecificationContext.current}.
+     *
+     * @constructor
+     * @description Creates a `SpecificationScope`.
+     *
+     * If a specification context is given, it is used and set as the ambient specification context.
+     * Otherwise, if an ambient specification context exists, that context is used.
+     * Otherwise, a new specification context is created and set as
+     * the ambient specification context.
+     * In this case, when the scope is disposed, the created context is disposed as well.
+     *
+     * @param {pentaho.type.SpecificationContext} [context] A specification context to use.
+     */
     constructor: function(context) {
       var current = SpecificationContext.current;
       var isOwn = false;
@@ -93,6 +93,4 @@ define([
       }
     }
   });
-
-  return SpecificationScope;
 });

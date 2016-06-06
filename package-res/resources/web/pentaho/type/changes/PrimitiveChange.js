@@ -39,5 +39,34 @@ define([
    * [List]{@link pentaho.type.List} value.
    */
 
-  return Change.extend("pentaho.type.changes.PrimitiveChange");
+  return Change.extend("pentaho.type.changes.PrimitiveChange", {
+    /**
+     * Register reference changes caused by the change.
+     *
+     * @param {!pentaho.type.changes.Transaction} transaction - The ambient transaction, provided for performance.
+     * @param {!pentaho.type.ContainerMixin} container - The container instance.
+     *
+     * @private
+     *
+     * @see pentaho.type.changes.ListChangeset._addChange
+     * @see pentaho.type.changes.ComplexChangeset._setElement
+     */
+    _prepareRefs: function(transaction, container) {
+    },
+
+    /**
+     * Unregisters reference changes caused by the change.
+     *
+     * @param {!pentaho.type.changes.Transaction} transaction - The ambient transaction, provided for performance.
+     * @param {!pentaho.type.ContainerMixin} container - The container instance.
+     *
+     * @private
+     *
+     * @see pentaho.type.changes.ListChangeset#_clearChanges
+     * @see pentaho.type.changes.ComplexChangeset#_clearChanges
+     * @see pentaho.type.changes.ComplexChangeset._setElement
+     */
+    _cancelRefs: function(transaction, container) {
+    }
+  });
 });

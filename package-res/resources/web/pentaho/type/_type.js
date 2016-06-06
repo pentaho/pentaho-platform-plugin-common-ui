@@ -280,6 +280,19 @@ define([
       get isProperty() { return false; },
       //endregion
 
+      //region isContainer property
+      /**
+       * Gets a value that indicates if this type
+       * [is]{@link pentaho.type.Type#isSubtypeOf} a
+       * [list]{@link pentaho.type.List.Type} or a
+       * [complex]{@link pentaho.type.Complex.Type} type.
+       *
+       * @type boolean
+       * @readOnly
+       */
+      get isContainer() { return false; },
+      //endregion
+
       //region isList property
       /**
        * Gets a value that indicates if this type

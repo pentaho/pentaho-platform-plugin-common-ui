@@ -21,6 +21,16 @@ define([
 
   return PrimitiveChange.extend("pentaho.type.Move", /** @lends pentaho.type.changes.Move# */{
 
+    // To behind its position
+    //     v-----+
+    // a b c d e F
+    // a b F c d e
+    //
+    // To ahead of its position
+    //     +-----v
+    // a b C d e f
+    // a b d e f C
+
     /**
      * @name Move
      * @memberOf pentaho.type.changes
@@ -37,10 +47,10 @@ define([
      * @description Creates an instance.
      *
      * @param {!Array.<pentaho.type.Element>} elem - The element to be moved in the list.
-     * @param {number} oldIndex - The index of the element in the list.
-     * @param {number} newIndex - The new index of the element in the list.
+     * @param {number} indexOld - The (old) index of the element in the list.
+     * @param {number} indexNew - The new index of the element in the list.
      */
-    constructor: function(elem, oldIndex, newIndex) {
+    constructor: function(elem, indexOld, indexNew) {
       /**
        * Gets the element that is about to be moved in the list.
        *
@@ -55,7 +65,7 @@ define([
        * @type {number}
        * @readOnly
        */
-      this.oldIndex = oldIndex;
+      this.indexOld = indexOld;
 
       /**
        * Gets the new index of the element in the list.
@@ -63,7 +73,7 @@ define([
        * @type {number}
        * @readOnly
        */
-      this.newIndex = newIndex;
+      this.indexNew = indexNew;
     },
 
     /**
@@ -78,7 +88,7 @@ define([
     },
 
     _apply: function(target) {
-      target._elems.splice(this.newIndex, 0, target._elems.splice(this.oldIndex, 1)[0]);
+      target._elems.splice(this.indexNew, 0, target._elems.splice(this.indexOld, 1)[0]);
     }
   });
 });

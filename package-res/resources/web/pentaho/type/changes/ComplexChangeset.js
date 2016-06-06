@@ -18,9 +18,9 @@ define([
   "./Changeset",
   "./ListChangeset",
   "./Replace",
-  "../../util/object",
-  "../../util/error"
-], function(Changeset, ListChangeset, Replace, O, error) {
+  "./Transaction",
+  "../../util/object"
+], function(Changeset, ListChangeset, Replace, Transaction, O) {
 
   "use strict";
 
@@ -29,6 +29,9 @@ define([
    * @memberOf pentaho.type.changes
    * @class
    * @extends pentaho.type.changes.Changeset
+   *
+   * @friend pentaho.type.Complex
+   *
    * @amd pentaho/type/changes/ComplexChangeset
    *
    * @classDesc The class `ComplexChangeset` describes a set of changes to the values of properties
@@ -36,13 +39,13 @@ define([
    *
    * @constructor
    * @description Creates a new instance.
-   *
+   * @param {!pentaho.type.changes.Transaction} transaction - The owning transaction.
    * @param {!pentaho.type.Complex} owner - The complex value where the changes take place.
    */
   return Changeset.extend("pentaho.type.changes.ComplexChangeset", /** @lends pentaho.type.changes.ComplexChangeset#*/{
 
-    constructor: function(owner) {
-      this.base(owner);
+    constructor: function(transaction, owner) {
+      this.base(transaction, owner);
 
       this._changes = {};
     },
@@ -67,53 +70,64 @@ define([
       return "complex";
     },
 
-    /**
-     * Gets a value that indicates if this changeset contains any changes.
-     *
-     * @type {boolean}
-     */
     get hasChanges() {
-      var hasChanges = false;
+      var changes = this._changes;
+      for(var p in changes)
+        if(O.hasOwn(changes, p) && hasChanges(changes[p]))
+          return true;
 
-      O.eachOwn(this._changes, function(change) {
-        if(!(change instanceof Changeset) || change.hasChanges) {
-          hasChanges = true;
-          return false;
-        }
-      });
-
-      return hasChanges;
+      return false;
     },
 
-    /**
-     * Removes all changes from this changeset.
-     *
-     * @private
-     */
     _clearChanges: function() {
+      var changes = this._changes;
+      var complex = this.owner;
 
-      this._assertProposed();
+      for(var name in changes) {
+        if(O.hasOwn(changes, name)) {
+          var change = changes[name];
+          if(change instanceof Changeset) {
+            change.clearChanges();
+          } else {
+            // Primitive changes cannot be cleared; must be removed.
+            // Assuming a Replace change...
+            delete changes[name];
+            change._cancelRefs(this.transaction, complex, /*valueIni:*/complex._getByName(name));
+          }
+        }
+      }
+    },
 
-      O.eachOwn(this._changes, function(change) {
-        if(change instanceof Changeset) change.cancel();
-      });
+    _setNestedChangeset: function(csetNested, propType) {
+      // Cannot set changesets like this over Replace changes, or the latter would be, well... , overwritten.
+      //this._changes[propType.name] = csetNested;
 
-      this._changes = {};
+      // getChange("foo") -> PrimitiveChange or Changeset
+      // Case I - Replace without changes within the new value (apart from ref changes)
+      // Replace
+      //   (new) value : Value .changeset = null
+
+      // Lists, are never changed, and must always be copied.
+      // The asymmetry comes from the fact that complex changesets cannot coexist with replaced values...
+
+      var change = this._changes[propType.name];
+      if(!change)
+        this._changes[propType.name] = csetNested;
     },
 
     /**
-     * Gets the [change]{@link pentaho.type.changes.ValueChange} object associated with the specified property.
+     * Gets the [change]{@link pentaho.type.changes.Change} object associated with the specified property.
      *
      * @param {nonEmptyString|!pentaho.type.Property.Type} name - The property name or type object.
      *
-     * @return {?pentaho.type.ValueChange} An object describing the changes to be performed
+     * @return {pentaho.type.changes.Change} An object describing the changes to be performed
      * in the given property, or `null` if the property has not changed.
      *
      * @throws {pentaho.lang.ArgumentInvalidError} When a property with name `name` is not defined.
      */
     getChange: function(name) {
       var pName = this.owner.type.get(name).name;
-      return O.getOwn(this._changes, pName, null);
+      return O.getOwn(this._changes, pName) || null;
     },
 
     /**
@@ -140,71 +154,13 @@ define([
       return Object.keys(this._changes);
     },
 
-    /**
-     * Sets the proposed value of a property.
-     *
-     * @param {nonEmptyString|!pentaho.type.Property.Type} name - The property name or type object.
-     * @param {(pentaho.type.Value|pentaho.type.spec.IValue)} valueSpec - A value or value specification.
-     *
-     * @throws {pentaho.lang.ArgumentInvalidError} When a property with name `name` is not defined.
-     *
-     * @throws {pentaho.lang.OperationInvalidError} When the changeset has already been applied or canceled.
-     *
-     * @private
-     * @friend pentaho.type.Complex
-     */
-    _set: function(name, valueSpec) {
-      if(!name) throw error.argRequired("name");
+    _getByName: function(name) {
+      // NOTE: Only called for element properties.
+      var change = O.getOwn(this._changes, name);
+      if(!change) return this.owner._getByName(name);
 
-      this._assertProposed();
-
-      var owner = this.owner;
-      var pType = owner.type.get(name);
-      var pName = pType.name;
-      var value0 = owner._values[pType.name];
-
-      if(pType.isList) {
-        // Enlists back a list changeset!
-        value0.set(valueSpec);
-      } else {
-        var value1 = pType.toValue(valueSpec);
-
-        if(!pType.type.areEqual(value0, value1)) {
-          this._changeSimpleValue(pName, value1);
-        }
-      }
-    },
-
-    /**
-     * Registers a change to the value of a single-valued property.
-     *
-     * @param {string} pName - The name of the property.
-     * @param {pentaho.type.Simple} newValue - The proposed value of the property.
-     *
-     * @private
-     */
-    _changeSimpleValue: function(pName, newValue) {
-      var simpleChange = this._changes[pName];
-      if(simpleChange)
-        simpleChange.value = newValue;
-      else
-        this._changes[pName] = new Replace(pName, newValue);
-    },
-
-    /**
-     * Gets the proposed value of a property.
-     *
-     * @param {nonEmptyString|!pentaho.type.Property.Type} name - The property name or type object.
-     *
-     * @return {pentaho.type.Value} The value of the property, possibly `null`.
-     *
-     * @throws {pentaho.lang.ArgumentInvalidError} When a property with name `name` is not defined.
-     */
-    get: function(name) {
-      var change = this.getChange(name);
-      if(!change) return this.owner.get(name); //returns the current value when there are no changes
-
-      return change.type === "replace" ? change.value : change.newValue;
+      // If it's a changeset, it's a ComplexChangeset. Otherwise, it's a `Replace` change.
+      return (change instanceof Changeset) ? change.owner : change.value;
     },
 
     /**
@@ -217,38 +173,79 @@ define([
      * @throws {pentaho.lang.ArgumentInvalidError} When a property with name `name` is not defined.
      */
     getOld: function(name) {
-      var change = this.getChange(name);
-      if(!change) return this.owner.get(name); // returns the current value when not changed
-
-      return change instanceof Changeset ? change.owner : this.owner.get(name);
+      var pName = this.owner.type.get(name).name;
+      return this.owner._getByName(pName);
     },
 
     _apply: function(target) {
-
-      var isAlternateTarget = target !== this.owner;
-
       this.propertyNames.forEach(function(property) {
         var change = this[property];
-        if(change instanceof Changeset) {
-          // Get the corresponding changeset owner in the alternate target.
-          if(isAlternateTarget)
-            /* istanbul ignore next : does not happen atm as only lists are simulated/projected */
-            change._apply(target._values[property]);
-          else
-            change.apply();
-
-        } else {
-          change._apply(target);
-        }
-      }, this._changes);
-    },
-
-    _cancel: function() {
-      this.propertyNames.forEach(function(property) {
-        var change = this[property];
-        if(change instanceof Changeset) change.cancel();
+        if(!(change instanceof Changeset)) change._apply(target);
       }, this._changes);
     }
     //endregion
+  }, {
+    /**
+     * Sets the value of an _element property_.
+     *
+     * @param {!pentaho.type.Complex} complex - The complex instance.
+     * @param {!pentaho.type.Property.Type} propType - The element property type.
+     * @param {any?} [valueSpec=null] The new value specification.
+     *
+     * @private
+     * @see pentaho.type.Complex#set
+     */
+    _setElement: function(complex, propType, valueSpec) {
+
+      // NOTE: For performance reasons, this function inlines code that would otherwise be available from,
+      // for example, ContainerMixin#usingChangeset(.) and TransactionScope.
+      var type = complex.type;
+      var name = propType.name;
+
+      // New value. Cast spec.
+      var valueNew = propType.toValue(valueSpec);
+
+      // Original/Initial value.
+      var valueIni = complex._getByName(name);
+
+      // Ambient value.
+      var cset = complex.changeset;
+      var change;
+      var valueAmb = (cset && (change = O.getOwn(cset._changes, name))) ? change.value : valueIni;
+
+      // Doesn't change the ambient value?
+      if(type.areEqual(valueNew, valueAmb))
+        return;
+
+      if(change) {
+        // Goes back to the initial value?
+        if(type.areEqual(valueNew, valueIni)) {
+          // Remove the change.
+          delete cset._changes[name];
+          change._cancelRefs(cset.transaction, complex, valueIni);
+        } else {
+          // Update its value.
+          change._updateValue(cset.transaction, complex, valueNew);
+        }
+        return;
+      }
+
+      // -- New change.
+
+      var ctx = type.context;
+      var scope = ctx.enterChange();
+      var txn = scope.transaction;
+      if(!cset) cset = complex._createChangeset(txn);
+
+      // Create a change
+      cset._changes[name] = change = new Replace(propType, valueNew);
+      change._prepareRefs(txn, complex, valueIni);
+
+      scope.accept();
+    }
   });
+
+  function hasChanges(change) {
+    return !(change instanceof Changeset) || change.hasChanges;
+  }
 });

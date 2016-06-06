@@ -13,18 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 define([
   "./Changeset",
   "./Add",
   "./Remove",
   "./Move",
-  "./Update",
   "./Sort",
   "./Clear",
   "../../util/arg",
   "../../util/object"
-], function(Changeset, Add, Remove, Move, Update, Sort, Clear, arg, O) {
+], function(Changeset, Add, Remove, Move, Sort, Clear, arg, O) {
 
   "use strict";
 
@@ -33,20 +31,23 @@ define([
    * @memberOf pentaho.type.changes
    * @class
    * @extends pentaho.type.changes.Changeset
+   *
    * @amd pentaho/type/changes/ListChangeset
    *
-   * @classDesc The class `ListChangeset` describes a log of changes in a [list]{@linkplain pentaho.type.List} value.
+   * @classDesc The class `ListChangeset` describes a log of changes in a
+   * [list]{@linkplain pentaho.type.List} value.
    *
    * @constructor
    * @description Creates a new instance.
    *
+   * @param {!pentaho.type.changes.Transaction} transaction - The owning transaction.
    * @param {!pentaho.type.List} owner - The list value where the changes take place.
    */
   return Changeset.extend("pentaho.type.changes.ListChangeset", /** @lends pentaho.type.changes.ListChangeset# */{
 
-    constructor: function(owner) {
+    constructor: function(transaction, owner) {
 
-      this.base(owner);
+      this.base(transaction, owner);
 
       this._clearChanges();
     },
@@ -84,73 +85,93 @@ define([
     },
 
     get hasChanges() {
-      return this._changes.length > 0;
+      if(this._changes.length > 0)
+        return true;
+
+      // NOTE: if an element is to be removed, it is already included above.
+      var changesByKey = this._changesByElemKey;
+      for(var key in changesByKey)
+        if(O.hasOwn(changesByKey, key) && changesByKey[key].hasChanges)
+            return true;
+
+      return false;
+    },
+
+    /**
+     * Gets the nested changeset for an element with the given key, if any.
+     *
+     * @param {string} key The key of the element.
+     *
+     * @return {pentaho.type.changes.ComplexChangeset} The nested changeset or `null`.
+     */
+    getChange: function(key) {
+      // TODO: should not consider changes in elements to be removed?
+      return O.getOwn(this._changesByElemKey, key) || null;
     },
 
     _clearChanges: function() {
-      this._changes = [];
+      // NOTE: called from constructor
 
-      this._newValue = null;
-      this._cachedCount = 0;
+      // Cancel all primitive changes
+      if(this._changes) this._changes.forEach(function(change) {
+        change._cancelRefs(this.transaction, this.owner);
+      }, this);
+
+      // Clear all nested changes
+      var changesByKey = this._changesByElemKey;
+      for(var key in changesByKey) // nully tolerant
+        if(O.hasOwn(changesByKey, key))
+          changesByKey[key].clearChanges();
+
+      this._changes = [];
+      this._changesByElemKey = {};
+
+      this._projMock = null;
       this._lastClearIndex = -1;
     },
 
-    // /**
-    //  * The value of the object before the changes are made.
-    //  *
-    //  * @type {!pentaho.type.Value}
-    //  * @readonly
-    //  */
-    // get oldValue() {
-    //   return this.owner;
-    // },
+    _setNestedChangeset: function(csetNested) {
+      this._changesByElemKey[csetNested.owner.key] = csetNested;
+    },
 
     /**
-     * Gets a projection of the new list value.
+     * Gets a mock projection of the updated list value.
      *
      * When there are no changes, the owner list returned.
-     * Otherwise, a projected list is created and returned.
+     * Otherwise, a projected mock containing only
+     * the elements' data structures is created and returned.
      *
-     * Do **NOT** modify the returned list value in any way.
-     *
-     * @type {!pentaho.type.List}
+     * @type {!Object|!pentaho.type.List}
      * @readOnly
+     * @private
      */
-    get newValue() {
-      var n = this._changes.length;
-      if(!n) return this.owner;
+    get _projectedMock() {
+      var changeCount = this._changes.length;
+      if(!changeCount) return this.owner;
 
-      var cachedValue = this._newValue;
-      var cachedCount;
+      var projMock = this._projMock ||
+          (this._projMock = this.owner._cloneElementData({changeCount: 0}, /*useCommitted:*/true));
 
-      if(cachedValue) {
-        cachedCount = this._cachedCount;
-      } else {
-        this._newValue = cachedValue = this.owner.clone();
-        cachedCount = 0;
+      if(projMock.changeCount < changeCount) {
+        this._applyFrom(projMock, projMock.changeCount);
+        projMock.changeCount = changeCount;
       }
 
-      if(cachedCount < n) {
-        this._applyFrom(cachedValue, cachedCount);
-        this._cachedCount = n;
-      }
-
-      return cachedValue;
+      return projMock;
     },
 
     _apply: function(target) {
-      if(target === this.owner && this._newValue) {
+      if(target === this.owner && this._projMock) {
 
-        // Reuse `_newValue` copy's internal fields and discard it afterwards.
+        // Reuse `_projMock`'s fields and discard it afterwards.
 
         // Ensure up to date with every change.
-        var newValue = this.newValue;
+        var projMock = this._projectedMock;
 
-        target._elems = newValue._elems;
-        target._keys  = newValue._keys;
+        this._projMock = null;
 
-        // Avoid problems with shared data structures.
-        this._newValue = null;
+        target._elems = projMock._elems;
+        target._keys  = projMock._keys;
       } else {
         this._applyFrom(target, 0);
       }
@@ -161,11 +182,9 @@ define([
      *
      * This method is used for computing the future value of the list incrementally.
      *
-     * @param {!pentaho.type.List} list - The list that will be modified.
+     * @param {!Object|!pentaho.type.List} list - The list or list mock to apply changes to.
      * @param {number} startingFromIdx - The index of the first change to be considered.
      * @private
-     *
-     * @see pentaho.type.changes.ListChangeset#newValue
      */
     _applyFrom: function(list, startingFromIdx) {
       // assert startingFromIdx >= 0
@@ -184,8 +203,8 @@ define([
 
     /**
      * Decomposes the modifications into a set of operations and
-     * populates [#changes]{@link pentaho.type.changes.ListChangeset#_changes} with the relevant
-     * [PrimitiveChange]{@link pentaho.type.changes.PrimitiveChange} objects.
+     * populates [#changes]{@link pentaho.type.changes.ListChangeset#_changes} with
+     * the relevant [PrimitiveChange]{@link pentaho.type.changes.PrimitiveChange} objects.
      *
      * @param {any|Array} fragment - The element or elements to set.
      * @param {?boolean} [add=false] Adds new elements to the list.
@@ -203,11 +222,14 @@ define([
      */
     _set: function(fragment, add, update, remove, move, index) {
 
-      this._assertProposed();
+      // TODO: don't convert elements twice (elemType.to)
 
-      var list = this.newValue, // calculate relative the last change
+      this._assertWritable();
+
+      var list = this._projectedMock, // calculate relative the last change
           elems = list._elems,
           keys = list._keys,
+          elemType = this.owner.type.of,
           existing, elem, key;
 
       // Next insert index.
@@ -243,7 +265,7 @@ define([
       var i = -1;
       var L = setElems.length;
       while(++i < L) {
-        if((elem = list._cast(setElems[i])) != null) {
+        if((elem = elemType.to(setElems[i])) != null) {
           key = elem.key;
 
           var repeated = O.hasOwn(setKeys, key);
@@ -331,7 +353,7 @@ define([
         i = -1;
         L = setElems.length;
         while(++i < L) {
-          if((elem = list._cast(setElems[i])) != null) {
+          if((elem = elemType.to(setElems[i])) != null) {
             var currentIndex = computed.indexOf(elem.key);
             if(move) {
               if(currentIndex < baseIndex) {
@@ -354,9 +376,8 @@ define([
             if(update && setKeys[elem.key] === 2) {
               existing = O.getOwn(keys, elem.key);
 
-              // This may trigger change events, that, in turn, may
-              // perform further list changes and reenter `List#_set`.
-              this._addChange(new Update(existing, currentIndex, elem));
+              // This may create a new changeset, that gets hooked up into this.
+              existing.configure(elem);
             }
           }
         }
@@ -377,9 +398,10 @@ define([
      */
     _remove: function(fragment) {
 
-      this._assertProposed();
+      this._assertWritable();
 
-      var list  = this.newValue, // calculate relative to the last change
+      var list  = this._projectedMock, // calculate relative to the last change
+          elemType = this.owner.type.of,
           elems = list._elems,
           keys  = list._keys,
           elem, key;
@@ -400,7 +422,7 @@ define([
       var i = -1;
       var L = removeElems.length;
       while(++i < L) {
-        if((elem = list._cast(removeElems[i]))) {
+        if((elem = elemType.to(removeElems[i]))) {
           key = elem.key;
 
           if(!O.hasOwn(removeKeys, key) && O.hasOwn(keys, key)) {
@@ -446,7 +468,7 @@ define([
      * and appends that change to the list of changes.
      *
      * @param {number} start - The index at which to start removing.
-     * @param {number} [count=1] The number of elements to remove.
+     * @param {number} [count=1] - The number of elements to remove.
      *
      * @throws {pentaho.lang.OperationInvalidError} When the changeset has already been applied or canceled.
      *
@@ -456,11 +478,11 @@ define([
      */
     _removeAt: function(start, count) {
 
-      this._assertProposed();
+      this._assertWritable();
 
       if(count < 0) return; // noop
 
-      var list = this.newValue;
+      var list = this._projectedMock;
 
       if(count == null) count = 1;
 
@@ -473,6 +495,40 @@ define([
       var removed = list._elems.slice(start, start + count);
 
       this._addChange(new Remove(removed, start));
+    },
+
+    /**
+     * Creates an operation that moves an element to a new position,
+     * and appends that change to the list of changes.
+     *
+     * @param {any} elemSpec - An element specification.
+     * @param {number} indexNew - The new index of the element.
+     *
+     * @throws {pentaho.lang.OperationInvalidError} When the changeset has already been applied or canceled.
+     *
+     * @see pentaho.type.changes.Move
+     * @private
+     * @friend pentaho.type.List
+     */
+    _move: function(elemSpec, indexNew) {
+
+      this._assertWritable();
+
+      var owner = this.owner;
+      var elem = owner._cast(elemSpec);
+      var existing = owner.get(elem.key);
+      if(existing) {
+        var indexOld = owner.indexOf(existing);
+
+        // assert indexOld >= 0
+
+        var L = this._projectedMock._elems.length;
+
+        indexNew = indexNew < 0 ? Math.max(0, L + indexNew) : Math.min(indexNew, L);
+
+        if(indexOld !== indexNew)
+          this._addChange(new Move(elem, indexOld, indexNew));
+      }
     },
 
     /**
@@ -489,7 +545,7 @@ define([
      */
     _sort: function(comparer) {
 
-      this._assertProposed();
+      this._assertWritable();
 
       this._addChange(new Sort(comparer));
     },
@@ -506,7 +562,7 @@ define([
      */
     _clear: function() {
 
-      this._assertProposed();
+      this._assertWritable();
 
       // See #_applyFrom
       this._lastClearIndex = this._changes.length;
@@ -522,6 +578,8 @@ define([
      */
     _addChange: function(change) {
       this._changes.push(change);
+
+      change._prepareRefs(this.transaction, this.owner);
     }
     //endregion
   });

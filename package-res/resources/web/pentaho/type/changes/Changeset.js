@@ -16,13 +16,11 @@
 
 define([
   "./Change",
-  "../../util/error"
-], function(Change, error) {
-  "use strict";
+  "../../util/error",
+  "../../util/object"
+], function(Change, error, O) {
 
-  var PhaseWill = 0,
-      PhaseDid  = 1,
-      PhaseCanceled = 2;
+  "use strict";
 
   return Change.extend("pentaho.type.changes.Changeset", /** @lends pentaho.type.changes.Changeset# */{
 
@@ -43,167 +41,167 @@ define([
      * @constructor
      * @description Creates an empty `Changeset` for a given owner value.
      *
-     * @param {!pentaho.type.UStructuredValue} owner - The structured value where the changes take place.
+     * @param {!pentaho.type.changes.Transaction} transaction - The owning transaction.
+     * @param {!pentaho.type.UStructuredValue} owner - The container instance where the changes take place.
      */
-    constructor: function(owner) {
+    constructor: function(transaction, owner) {
+      if(!transaction) throw error.argRequired("transaction");
       if(!owner) throw error.argRequired("owner");
 
-      this._owner = owner;
-
-      // TODO: Temporary. Remove when transactions allow multiple changesets per owner.
-      owner._changeset = this;
+      /**
+       * Gets the owning transaction.
+       *
+       * @name transaction
+       * @memberOf pentaho.type.changes.Changeset#
+       * @type {!pentaho.type.changes.Transaction}
+       * @readOnly
+       */
+      O.setConst(this, "transaction", transaction);
 
       /**
-       * The current phase of the changeset.
+       * Gets the container where the changes take place.
        *
-       * PhaseWill/Did/Canceled
-       *
-       * @private
-       * @type {number}
-       * @default PhaseWill
+       * @name owner
+       * @memberOf pentaho.type.changes.Changeset#
+       * @type {!pentaho.type.ContainerMixin}
+       * @readOnly
        */
-      this._phase = PhaseWill;
+      O.setConst(this, "owner", owner);
+
+      this._isReadOnly = false;
+      this._ownerVersion = owner.$version;
+
+      // The longest path by which this changeset can be reached following the path of changesets
+      // and their owner's references.
+      this._netOrder = 0;
+
+      transaction._addChangeset(this);
     },
 
     /**
-     * Throws an error if the changeset is not in a proposed state.
+     * Updates the order of this changeset to reflect its topological sort order.
      *
-     * @throws {pentaho.lang.OperationInvalidError} When the changeset has already been applied or canceled.
-     *
-     * @protected
+     * @param {number} netOrder - The net order.
+     * @return {boolean} `true` if the order was updated, `false` otherwise.
+     * @private
      */
-    _assertProposed: function() {
-      if(!this.isProposed) throw error.operInvalid("Changeset is readonly.");
-    },
-
-    /**
-     * Gets a value that indicates if the changeset is in a proposed state,
-     * i.e., it has not been applied or canceled.
-     *
-     * @type {boolean}
-     * @readOnly
-     *
-     * @see pentaho.type.changes.Changeset#isCanceled
-     * @see pentaho.type.changes.Changeset#isApplied
-     */
-    get isProposed() {
-      return this._phase === PhaseWill;
-    },
-
-    /**
-     * Gets a value that indicates if the changeset has been canceled.
-     *
-     * @type {boolean}
-     * @readOnly
-     *
-     * @see pentaho.type.changes.Changeset#isProposed
-     * @see pentaho.type.changes.Changeset#isApplied
-     */
-    get isCanceled() {
-      return this._phase === PhaseCanceled;
-    },
-
-    /**
-     * Gets a value that indicates if the changeset has been applied.
-     *
-     * @type {boolean}
-     * @readOnly
-     *
-     * @see pentaho.type.changes.Changeset#isProposed
-     * @see pentaho.type.changes.Changeset#isApplied
-     */
-    get isApplied() {
-      return this._phase === PhaseDid;
-    },
-
-    /**
-     * Gets the structured value where the changes take place.
-     *
-     * @type {!pentaho.type.UStructuredValue}
-     * @readOnly
-     */
-    get owner() {
-      return this._owner;
-    },
-
-    /**
-     * Gets a value that indicates if there are any changes.
-     *
-     * @type {boolean}
-     * @readOnly
-     */
-    get hasChanges() {
+    _updateNetOrder: function(netOrder) {
+      if(this._netOrder < netOrder) {
+        this._netOrder = netOrder;
+        return true;
+      }
       return false;
     },
 
+    // Should be marked protected abstract, but that would show in the docs.
     /**
-     * Removes all changes.
+     * Sets a nested changeset of this changeset.
      *
-     * Contained changesets are canceled.
+     * @name pentaho.type.changes.Changeset#_setNestedChangeset
+     * @param {!pentaho.type.changes.Changeset} csetNested - The nested changeset.
+     * @param {pentaho.type.Property.Type} propType - The property type whose value is the changeset owner.
+     * Only applies when this changeset is a complex changeset.
      *
-     * @throws {pentaho.lang.OperationInvalid} When the changeset has already been applied or canceled.
+     * @private
+     */
+
+    /**
+     * Throws an error if the changeset is readonly.
+     *
+     * @throws {pentaho.lang.OperationInvalidError} When the changeset has been marked
+     * [read-only]{@link pentaho.type.changes.Changeset#isReadOnly}.
+     *
+     * @protected
+     */
+    _assertWritable: function() {
+      if(this.isReadOnly) throw error.operInvalid("Changeset is read-only.");
+    },
+
+    /**
+     * Gets a value that indicates if the changeset is in a readonly state
+     * an can no longer be modified.
+     *
+     * @type {boolean}
+     * @readOnly
+     */
+    get isReadOnly() {
+      return this._isReadOnly;
+    },
+
+    /**
+     * Sets the changeset to a read-only state.
+     *
+     * @private
+     * @friend {pentaho.type.changes.Transaction}
+     */
+    _setReadOnlyInternal: function() {
+      this._isReadOnly = true;
+    },
+
+    /**
+     * Gets the version of the owner at the time when the changeset was created.
+     *
+     * @type {number}
+     * @readOnly
+     */
+    get ownerVersion() {
+      return this._ownerVersion;
+    },
+
+    /**
+     * Gets a value that indicates if this changeset contains any changes,
+     * whether they are primitive or in contained changesets.
+     *
+     * @name pentaho.type.changes.Changeset#hasChanges
+     * @type {boolean}
+     * @readOnly
+     * @abstract
+     */
+
+    /**
+     * Removes all changes from this changeset.
+     *
+     * Primitive changes are removed, while contained changesets are cleared.
+     *
+     * @throws {pentaho.lang.OperationInvalidError} When the changeset or any of its contained changesets
+     * have been marked [read-only]{@link pentaho.type.changes.Changeset#isReadOnly}.
+     *
+     * @see pentaho.type.changes.Changeset#_clearChanges
      */
     clearChanges: function() {
 
-      this._assertProposed();
+      this._assertWritable();
 
       this._clearChanges();
     },
 
     /**
-     * Applies the contained changes to the owner value.
-     *
-     * @throws {pentaho.lang.OperationInvalidError} When the changeset has already been applied or canceled.
-     */
-    apply: function() {
-
-      this._assertProposed();
-
-      // Mark as applied.
-      this._phase = PhaseDid;
-
-      // Clear the owner's current changeset.
-      // TODO: Temporary. Remove when transactions allow multiple changesets per owner.
-      // NOTE: Can only clear at the end of Will so that changes during the Will event use the same changeset.
-      // Must clear at the end of Will so that any changes in later events initiate new changesets.
-      this._owner._changeset = null;
-
-      this._apply(this._owner);
-    },
-
-    /**
-     * Cancels the changes in the changeset.
-     *
-     * @throws {pentaho.lang.OperationInvalidError} When the changeset has already been applied or canceled.
-     */
-    cancel: function() {
-
-      this._assertProposed();
-
-      // Mark as canceled.
-      this._phase = PhaseCanceled;
-
-      // Clear the owner's current changeset.
-      // TODO: Temporary. Remove when transactions allow multiple changesets per owner.
-      this._owner._changeset = null;
-
-      this._cancel();
-    },
-
-    /**
-     * Actually cancels the changes in the changeset.
-     *
-     * Override to canceled any contained changesets.
-     */
-    _cancel: function() {
-    },
-
-    /**
      * Actually removes all changes in the changeset.
      *
-     * Override to **cancel** any contained changesets and remove all local changes.
+     * @name pentaho.type.changes.Changeset#_clearChanges
+     * @method
+     * @abstract
+     * @protected
+     * @see pentaho.type.changes.Changeset#clearChanges
      */
-    _clearChanges: function() {
+
+    /**
+     * Applies the contained changes to the owner value and updates its version
+     * to the given value.
+     *
+     * @param {number} version - The new owner version.
+     *
+     * @private
+     * @friend {pentaho.type.changes.Transaction}
+     */
+    _applyInternal: function(version) {
+
+      var owner = this.owner;
+
+      this._apply(owner);
+
+      // Update version
+      owner._setVersionInternal(version);
     }
   });
 });

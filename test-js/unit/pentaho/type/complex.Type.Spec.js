@@ -303,8 +303,14 @@ define([
     });
 
     describe("#isComplex", function() {
-      it("should have `isComplex` equal to `true`", function () {
+      it("should have value `true`", function () {
         expect(Complex.type.isComplex).toBe(true);
+      });
+    });
+
+    describe("#isContainer", function() {
+      it("should have value `true`", function () {
+        expect(Complex.type.isContainer).toBe(true);
       });
     });
 

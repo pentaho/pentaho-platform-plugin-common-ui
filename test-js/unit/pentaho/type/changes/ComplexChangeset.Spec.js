@@ -30,48 +30,60 @@ define([
 
   /* global describe:false, it:false, expect:false, beforeEach:false */
 
-  var context = new Context(),
-      Complex = context.get(complexFactory),
-      List = context.get(listFactory),
+  describe("pentaho.type.ComplexChangeset -", function() {
+    var context, Complex, List, PentahoNumber, NumberList, Derived;
+
+    beforeEach(function() {
+      context = new Context();
+      Complex = context.get(complexFactory);
+      List = context.get(listFactory);
       PentahoNumber = context.get(numberFactory);
 
-  var NumberList = List.extend({
-    type: {of: PentahoNumber}
-  });
+      NumberList = List.extend({
+        type: {of: PentahoNumber}
+      });
 
-  var Derived = Complex.extend({
-    type: {
-      props: [
-        {name: "foo", type: "number"},
-        {name: "bar", type: "number"},
-        {name: "myList", type: NumberList}
-      ]
-    }
-  });
-
-  describe("pentaho.type.ComplexChangeset -", function() {
+      Derived = Complex.extend({
+        type: {
+          props: [
+            {name: "foo", type: "number"},
+            {name: "bar", type: "number"},
+            {name: "myList", type: NumberList}
+          ]
+        }
+      });
+    });
 
     it("should be defined.", function () {
       expect(typeof ComplexChangeset).toBeDefined();
     });
 
     describe("instance -", function() {
-      var changeset, owner, listChangeset, myList,
+      var changeset, owner, listChangeset, myList, scope,
           properties = ["foo", "myList"];
 
       beforeEach(function() {
-        owner = new Derived({ "foo": 5, "bar": 6, "myList": [1] });
+        owner = new Derived({
+          foo: 5,
+          bar: 6,
+          myList: [1]
+        });
+        myList = owner.myList;
 
-        myList = owner.get("myList");
+        scope = context.enterChange();
 
-        listChangeset = new ListChangeset(myList);
-        listChangeset._addChange(new Add(new PentahoNumber(3), 1));
+        owner.foo = 10;
+        owner.myList.add(3);
 
-        changeset = new ComplexChangeset(owner);
-        changeset._changes = {
-          "foo":    new Replace("foo", 10),
-          "myList": listChangeset
-        };
+        listChangeset = myList.changeset;
+        changeset = owner.changeset;
+      });
+
+      afterEach(function() {
+        if(scope) {
+          scope.dispose();
+          scope = null;
+        }
       });
 
       //region #type
@@ -88,20 +100,25 @@ define([
         });
 
         it("should return `false` if the ComplexChangeset does not have changes", function() {
-          var emptyChangeset = new ComplexChangeset({});
+          var emptyChangeset = new ComplexChangeset(context.transaction, {});
           expect(emptyChangeset.hasChanges).toBe(false);
         });
 
         it("should return `false` if the ComplexChangeset has a ListChangeset that doesn't have changes", function() {
-          var _changeset = new ComplexChangeset({});
-          _changeset._changes = { "myList" : new ListChangeset(myList) };
+          var cset = new ComplexChangeset(context.transaction, {});
+          cset._changes = {"myList" : new ListChangeset(context.transaction, myList)};
 
-          expect(_changeset.hasChanges).toBe(false);
+          expect(cset.hasChanges).toBe(false);
         });
       }); //endregion #hasChanges
 
       //region #getChange
       describe("#getChange -", function() {
+
+        beforeEach(function() {
+          scope.acceptWill();
+        });
+
         it("should throw an error if the property does not exist in the owner of the changeset", function() {
           expect(function() {
             changeset.getChange("baz");
@@ -121,6 +138,11 @@ define([
 
       //region #hasChange
       describe("#hasChange -", function() {
+        beforeEach(function() {
+          // required for connecting changesets
+          scope.acceptWill();
+        });
+
         it("should throw an error if the property does not exist in the owner of the changeset", function() {
           expect(function() {
             changeset.hasChange("baz");
@@ -136,24 +158,16 @@ define([
         });
       }); //endregion #hasChange
 
-      //region #get
-      describe("#get -", function() {
-        it("should throw an error if the property does not exist in the owner of the changeset", function() {
-          expect(function() {
-            changeset.get("baz");
-          }).toThrow(errorMatch.argInvalid("name"));
-        });
-
-        it("should return the property's original value if it hasn't changed", function() {
-          expect(changeset.get("bar").value).toBe(6);
+      //region #owner.get
+      describe("#owner.get()", function() {
+        it("should return the property's original value if it isn't changing", function() {
+          expect(owner.bar).toBe(6);
         });
 
         it("should return the the property's new value if has changed", function() {
-          var list = changeset.get("myList");
-
-          expect(list.count).toBe(2);
-          expect(list.at(0).value).toBe(1);
-          expect(list.at(1).value).toBe(3);
+          expect(myList.count).toBe(2);
+          expect(myList.at(0).value).toBe(1);
+          expect(myList.at(1).value).toBe(3);
         });
       }); //endregion #get
 
@@ -172,58 +186,78 @@ define([
         });
       }); //endregion #getOld
 
-      //region #_set
-      describe("#_set -", function() {
-        function _setShouldThrow(context, property, value) {
-          expect(function() {
-            context._set(property, value);
-          }).toThrow(errorMatch.argRequired("name"));
-        }
-
-        it("should throw an error if property name is `nully`", function() {
-          _setShouldThrow(changeset, undefined, 1);
-          _setShouldThrow(changeset, null, 1);
-          _setShouldThrow(changeset);
+      //region #owner.set()
+      describe("#owner.set() -", function() {
+        beforeEach(function() {
+          if(scope.isCurrent) scope.exit();
         });
 
         it("should add a new property to the ComplexChangeset", function() {
-          expect(changeset.hasChange("bar")).toBe(false);
-          changeset._set("bar", 1);
-          expect(changeset.hasChange("bar")).toBe(true);
+          var Derived = Complex.extend({type: {props: ["foo"]}});
+
+          var derived = new Derived({foo: "a"});
+
+          var txnScope = context.enterChange();
+
+          expect(derived.hasChanges).toBe(false);
+
+          derived.set("foo", "b");
+
+          expect(derived.hasChanges).toBe(true);
+          expect(derived.changeset.hasChange("foo")).toBe(true);
+
+          txnScope.dispose();
         });
 
-        it("should update a property `change` if it already exists in the ComplexChangeset", function() {
-          expect(changeset.getOld("foo").valueOf()).toBe(5);
-          expect(changeset.get("foo").valueOf()).toBe(10);
+        it("should update a Replace change, when it already exists in the changeset", function() {
+          var Derived = Complex.extend({type: {props: ["foo"]}});
 
-          changeset._set("foo", 1);
+          var derived = new Derived({foo: "a"});
 
-          expect(changeset.getOld("foo").valueOf()).toBe(5);
-          expect(changeset.get("foo").valueOf()).toBe(1);
+          var txnScope = context.enterChange();
+
+          derived.set("foo", "b");
+
+          var change0 = derived.changeset.getChange("foo");
+
+          expect(change0.value.valueOf()).toBe("b");
+
+          derived.set("foo", "c");
+
+          var change1 = derived.changeset.getChange("foo");
+
+          expect(change0).toBe(change1);
+          expect(change1.value.valueOf()).toBe("c");
+
+          txnScope.dispose();
         });
 
         it("should not create a change, when the value is the same", function() {
-          expect(changeset.getChange("bar")).toBeNull();
+          var Derived = Complex.extend({type: {props: ["foo"]}});
 
-          changeset._set("bar", 6);
+          var derived = new Derived({foo: "a"});
 
-          expect(changeset.getChange("bar")).toBeNull();
+          var txnScope = context.enterChange();
+
+          expect(derived.hasChanges).toBe(false);
+
+          derived.set("foo", "a");
+
+          expect(derived.hasChanges).toBe(false);
+
+          txnScope.dispose();
         });
 
-        it("should create a `ListChangeset` when the value is a list", function() {
-          changeset._set("myList", [2,3]);
+        it("should redirect Complex#set on owner to its ambient changeset", function() {
 
-          expect(changeset.getChange("myList").type).toBe("list");
-        });
+          var txnScope = context.enterChange();
 
-        it("should redirect Complex#set on owner to its current changeset", function() {
           var Derived = Complex.extend({type: {props: ["foo"]}});
           var derived = new Derived({foo: "bar"});
-          var changeset = new ComplexChangeset(derived);
 
+          var changeset = new ComplexChangeset(txnScope.transaction, derived);
           expect(changeset.hasChanges).toBe(false);
           expect(changeset.owner).toBe(derived);
-          expect(derived._changeset).toBe(changeset);
 
           // ---
 
@@ -232,23 +266,22 @@ define([
           // ---
 
           expect(changeset.hasChange("foo")).toBe(true);
+          txnScope.dispose();
         });
-      }); //endregion #_set
+      }); //endregion #_setElement
 
       //region #propertyNames
       describe("#propertyNames -", function() {
-        it("should return an empty array if it is a newly created changeset", function() {
-          var _changeset = new ComplexChangeset({});
-          var propertyNames = _changeset.propertyNames;
-
-          expect(propertyNames instanceof Array).toBe(true);
-          expect(propertyNames.length).toBe(0);
+        beforeEach(function() {
+          // required for connecting changesets
+          scope.acceptWill();
         });
-        
+
         it("should return an array with all property names of the changeset", function() {
           var propertyNames = changeset.propertyNames;
 
           expect(propertyNames.length).toBe(properties.length);
+
           propertyNames.forEach(function(prop, index) {
             expect(prop).toBe(properties[index]);
           });
@@ -261,64 +294,84 @@ define([
         });
       }); //endregion #propertyNames
 
-      //region #apply
-      describe("#apply -", function() {
+      //region scope.accept()
+      describe("scope.accept()", function() {
         it("should apply changes to its owner", function() {
-          var complex = changeset.owner;
+          expect(owner.foo).toBe(10);
 
-          expect(complex.get("foo").valueOf()).toBe(5);
+          scope.accept();
 
-          changeset.apply();
+          expect(owner.foo).toBe(10);
+        });
 
-          expect(complex.get("foo").valueOf()).toBe(10);
+        it("should update the version of its owner", function() {
+          var version0 = owner.$version;
+
+          scope.accept();
+
+          expect(owner.$version).toBeGreaterThan(version0);
         });
 
         it("should apply all changes of a contained ListChangeset", function() {
-          expect(myList.count).toBe(1);
+          expect(myList.count).toBe(2);
           expect(myList.at(0).value).toBe(1);
+          expect(myList.at(1).value).toBe(3);
 
-          changeset.apply();
+          scope.accept();
 
           expect(myList.count).toBe(2);
           expect(myList.at(0).value).toBe(1);
           expect(myList.at(1).value).toBe(3);
         });
-      }); //endregion #apply
+      }); //endregion scope.accept()
 
-      //region #cancel
-      describe("#cancel", function() {
-        it("should cancel contained changesets", function() {
-          expect(changeset.isProposed).toBe(true);
-          expect(listChangeset.isProposed).toBe(true);
+      //region #_clearChanges()
+      describe("#_clearChanges()", function() {
+        it("cannot be called after acceptWill", function() {
 
-          changeset.cancel();
+          scope.acceptWill();
 
-          expect(changeset.isCanceled).toBe(true);
-          expect(listChangeset.isCanceled).toBe(true);
+          expect(function() {
+            changeset.clearChanges();
+          }).toThrow(errorMatch.operInvalid());
         });
-      }); //endregion #cancel
 
-      //region #_clearChanges
-      describe("#_clearChanges", function() {
         it("should retain no changes", function() {
-          expect(changeset.hasChanges).toBe(true);
-          expect(listChangeset.hasChanges).toBe(true);
 
-          changeset.clearChanges();
+          var willListener = jasmine.createSpy().and.callThrough(function() {
+            expect(changeset.hasChanges).toBe(true);
+            expect(listChangeset.hasChanges).toBe(true);
 
-          expect(changeset.hasChanges).toBe(false);
+            changeset.clearChanges();
+
+            expect(changeset.hasChanges).toBe(false);
+          });
+
+          owner.on("will:change", willListener);
+
+          scope.acceptWill();
+
+          expect(willListener).toHaveBeenCalled();
         });
 
-        it("should cancel contained changesets", function() {
-          expect(changeset.hasChanges).toBe(true);
-          expect(listChangeset.isProposed).toBe(true);
+        it("should clear contained changesets", function() {
+          var willListener = jasmine.createSpy().and.callThrough(function() {
+            expect(changeset.hasChanges).toBe(true);
+            expect(listChangeset.hasChanges).toBe(true);
 
-          changeset.clearChanges();
+            changeset.clearChanges();
 
-          expect(changeset.isProposed).toBe(true);
-          expect(listChangeset.isCanceled).toBe(true);
+            expect(listChangeset.hasChanges).toBe(false);
+          });
+
+          owner.on("will:change", willListener);
+
+          scope.acceptWill();
+
+          expect(willListener).toHaveBeenCalled();
         });
-      }); //endregion #cancel
+      }); //endregion #_clearChanges()
+
     }); //end instance
 
   }); //end pentaho.lang.ComplexChangeset

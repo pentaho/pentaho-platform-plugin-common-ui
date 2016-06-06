@@ -146,7 +146,7 @@ define([
       });
 
       it("triggers #_resize when only 'height' changes", function(){
-        model.set("height", 100);
+        model.height = 100;
 
         expect(_resize).toHaveBeenCalled();
         expect(_selectionChanged).not.toHaveBeenCalled();
@@ -154,7 +154,7 @@ define([
       });
 
       it("triggers #_resize when only 'width' changes", function(){
-        model.set("width", 100);
+        model.width = 100;
 
         expect(_resize).toHaveBeenCalled();
         expect(_selectionChanged).not.toHaveBeenCalled();
@@ -162,7 +162,7 @@ define([
       });
 
       it("triggers #_selectionChanged when 'selectionFilter' changes", function(){
-        model.set("selectionFilter", null);
+        model.selectionFilter = null;
 
         expect(_resize).not.toHaveBeenCalled();
         expect(_selectionChanged).toHaveBeenCalled();
@@ -170,7 +170,7 @@ define([
       });
 
       it("does not trigger any render method when 'selectionMode' changes", function(){
-        model.set("selectionMode", null);
+        model.selectionMode = null;
 
         expect(_resize).not.toHaveBeenCalled();
         expect(_selectionChanged).not.toHaveBeenCalled();
@@ -178,7 +178,7 @@ define([
       });
 
       it("triggers #_render when a property other than 'height', 'width' or 'selectionFilter' changes", function(){
-        model.set("isInteractive", false);
+        model.isInteractive = false;
 
         expect(_resize).not.toHaveBeenCalled();
         expect(_selectionChanged).not.toHaveBeenCalled();

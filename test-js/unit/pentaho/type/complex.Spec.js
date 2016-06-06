@@ -31,6 +31,7 @@ define([
   var List = context.get("list");
 
   describe("pentaho.type.Complex", function() {
+
     describe("anatomy", function() {
       it("is a function", function() {
         expect(typeof Complex).toBe("function");
@@ -165,16 +166,16 @@ define([
       });
     });
 
-    describe("#uid", function() {
+    describe("#$uid", function() {
       it("should return a string value", function() {
-        var uid = new Complex().uid;
+        var uid = new Complex().$uid;
         expect(typeof uid).toBe("string");
       });
 
       it("should have a distinct value for every instance", function() {
-        var uid1 = new Complex().uid,
-          uid2 = new Complex().uid,
-          uid3 = new Complex().uid;
+        var uid1 = new Complex().$uid,
+          uid2 = new Complex().$uid,
+          uid3 = new Complex().$uid;
         expect(uid1).not.toBe(uid2);
         expect(uid2).not.toBe(uid3);
         expect(uid3).not.toBe(uid1);
@@ -184,7 +185,7 @@ define([
     describe("#key", function() {
       it("should return the value of #uid", function() {
         var value = new Complex();
-        expect(value.uid).toBe(value.key);
+        expect(value.$uid).toBe(value.key);
       });
     });
 
@@ -454,7 +455,7 @@ define([
             ]);
 
             listeners.will.and.callFake(function(event) {
-              if(event.changeset.get("x").valueOf() === THREE) event.cancel();
+              if(event.source.x === THREE) event.cancel();
             });
 
             complex = new Derived({x: 0});
@@ -472,38 +473,44 @@ define([
 
           describe("With listeners -", function() {
             beforeEach(function() {
-              complex.on("will:change", listeners.will);
+              complex.on("will:change",     listeners.will);
               complex.on("rejected:change", listeners.rejected);
-              complex.on("did:change", listeners.did);
+              complex.on("did:change",      listeners.did);
             });
 
             it("should call the will change listener", function() {
-              complex.set("x", 1);
+              complex.x = 1;
               expect(listeners.will).toHaveBeenCalled();
             });
 
             it("should call the did change listener when successful", function() {
-              complex.set("x", 1);
+              complex.x = 1;
               expect(listeners.did).toHaveBeenCalled();
               expect(listeners.rejected).not.toHaveBeenCalled();
-              expect(complex.getv("x")).toBe(1);
+              expect(complex.x).toBe(1);
             });
 
             it("should call the rejected change listener when unsuccessful", function() {
-              complex.set("x", THREE);
+              expect(function() {
+                complex.x = THREE;
+              }).toThrow();
+
               expect(listeners.did).not.toHaveBeenCalled();
               expect(listeners.rejected).toHaveBeenCalled();
-              expect(complex.getv("x")).toBe(0);
+              expect(complex.x).toBe(0);
             });
 
             // coverage
             it("should support having no rejected change listener when unsuccessful", function() {
               complex.off("rejected:change", listeners.rejected);
 
-              complex.set("x", THREE);
+              expect(function() {
+                complex.x = THREE;
+              }).toThrow();
+
               expect(listeners.did).not.toHaveBeenCalled();
               expect(listeners.rejected).not.toHaveBeenCalled();
-              expect(complex.getv("x")).toBe(0);
+              expect(complex.x).toBe(0);
             });
 
             it("should allow changing an element property value, directly on the complex, " +
@@ -511,18 +518,18 @@ define([
 
               listeners.will.and.callFake(function(event) {
                 expect(function() {
-                  event.changeset.owner.set("x", 2);
+                  event.source.x = 2;
                 }).not.toThrow(); // listeners errors are swallowed
               });
 
-              complex.set("x", 1);
+              complex.x = 1;
 
               expect(listeners.will).toHaveBeenCalled();
 
-              expect(complex.getv("x")).toBe(2);
+              expect(complex.x).toBe(2);
             });
 
-            it("should initiate a new, nested changeset when calling owner.set from a `did:change` event", function() {
+            it("should initiate a new, nested transaction when setting from a `did:change` event", function() {
               var entryCount = 0;
 
               listeners.did.and.callFake(function(event) {
@@ -530,63 +537,34 @@ define([
 
                 if(entryCount === 1) {
                   // Starts a nested change.
-                  var owner = event.changeset.owner;
-                  owner.set("x", 2);
+                  event.source.x = 2;
                 }
               });
 
-              complex.set("x", 1);
+              complex.x = 1;
 
-              expect(complex.getv("x")).toBe(2);
+              expect(complex.x).toBe(2);
 
               expect(entryCount).toBe(2);
             });
 
-            it("should initiate a new, nested changeset when calling owner.set from a `rejected:change` event",
-            function() {
+            it("should initiate a new, nested transaction when setting from a `rejected:change` event", function() {
               var entryCount = 0;
 
               listeners.rejected.and.callFake(function(event) {
                 entryCount++;
                 if(entryCount === 1) {
                   // Starts a nested change.
-                  var owner = event.changeset.owner;
-                  owner.set("x", 2);
+                  event.source.x = 2;
                 }
               });
 
               // First set gets rejected, but the second doesn't.
-              complex.set("x", THREE);
+              expect(function() {
+                complex.x = THREE;
+              }).toThrow();
 
-              expect(complex.getv("x")).toBe(2);
-            });
-
-            // NOTE: consider removing this test as the _set method became "package private".
-            it("should throw when calling changeset#_set in a `did:change` event", function() {
-              listeners.did.and.callFake(function(event) {
-
-                expect(function() {
-                  event.changeset._set("x", 2);
-                }).toThrow(errorMatch.operInvalid());
-
-                expect(event.changeset.getChange("x").newValue.value).toBe(1);
-              });
-
-              complex.set("x", 1);
-            });
-
-            // NOTE: consider removing this test as the _set method became "package private".
-            it("should throw when calling changeset#_set in a `rejected:change` event", function() {
-              listeners.rejected.and.callFake(function(event) {
-
-                expect(function() {
-                  event.changeset._set("x", 2);
-                }).toThrow(errorMatch.operInvalid());
-
-                expect(event.changeset.getChange("x").newValue.value).toBe(1);
-              });
-
-              complex.set("x", THREE);
+              expect(complex.x).toBe(2);
             });
 
             it("should emit the `will:change` event when setting a list property to a different value", function() {
@@ -603,33 +581,20 @@ define([
 
               listeners.will.and.callFake(function(event) {
                 expect(function() {
-                  event.changeset.owner.get("y").add(2);
+                  event.source.y.add(2);
                 }).not.toThrow(); // listeners errors are swallowed
               });
 
-              complex.set("y", [1]);
+              complex.y = [1];
 
               expect(listeners.will).toHaveBeenCalled();
 
-              expect(complex.atv("y", 0)).toBe(1);
-              expect(complex.atv("y", 1)).toBe(2);
+              expect(complex.y.at(0).value).toBe(1);
+              expect(complex.y.at(1).value).toBe(2);
             });
           }); //end with listeners
         });
       }); // end set
-
-      describe("#_applyChanges()", function() {
-        // coverage
-        it("should return a canceled action result when there are no changes (null _changeset)", function() {
-          var Derived = Complex.extend({
-            type: {props: [{name: "x", type: "string"}]}
-          });
-
-          var derived = new Derived();
-          var result = derived._applyChanges(); // protected
-          expect(result.isCanceled).toBe(true);
-        });
-      });
 
       describe("#path(steps[, sloppy])", function() {
 
@@ -1468,7 +1433,7 @@ define([
         var MyComplex = Complex.extend();
         var a = new MyComplex();
         var b = a.clone();
-        expect(a.uid).not.toBe(b.uid);
+        expect(a.$uid).not.toBe(b.$uid);
       });
 
       it("should create an object of the same complex type", function() {
@@ -1514,6 +1479,191 @@ define([
         expect(aList.at(2)).toBe(bList.at(2));
       });
 
+    });
+
+    describe("#_configure(config)", function() {
+
+      describe("when config is a complex that is not a subtype of it", function() {
+        it("should do nothing, even if properties has the same names and types", function() {
+          var Derived1 = Complex.extend({type: {props: ["a", "b"]}});
+          var Derived2 = Complex.extend({type: {props: ["a", "b"]}});
+
+          var derived1 = new Derived1({a: "a1", b: "b1"});
+          var derived2 = new Derived2({a: "a2", b: "b2"});
+
+          expect(derived1.a).toBe("a1");
+          expect(derived1.b).toBe("b1");
+
+          derived1.configure(derived2);
+
+          expect(derived1.a).toBe("a1");
+          expect(derived1.b).toBe("b1");
+        });
+      });
+
+      describe("when config is a complex from a subtype of it", function() {
+
+        it("should copy all base properties", function() {
+          var Derived1 = Complex.extend({type: {props: ["a", "b"]}});
+          var Derived2 = Derived1.extend();
+
+          var derived1 = new Derived1({a: "a1", b: "b1"});
+          var derived2 = new Derived2({a: "a2", b: "b2"});
+
+          expect(derived1.a).toBe("a1");
+          expect(derived1.b).toBe("b1");
+
+          derived1.configure(derived2);
+
+          expect(derived1.a).toBe("a2");
+          expect(derived1.b).toBe("b2");
+        });
+
+        it("should copy all base properties even when overridden", function() {
+          var Derived1 = Complex.extend({type: {props: ["a"]}});
+          var Derived2 = Derived1.extend({type: {props: [
+            {name: "a", label: "A2"}
+          ]}});
+
+          var derived1 = new Derived1({a: "a1"});
+          var derived2 = new Derived2({a: "a2"});
+
+          expect(derived1.a).toBe("a1");
+
+          derived1.configure(derived2);
+
+          expect(derived1.a).toBe("a2");
+        });
+
+        it("should copy ignore properties of the subtype", function() {
+          var Derived1 = Complex.extend({type: {props: ["a"]}});
+          var Derived2 = Derived1.extend({type: {props: ["c"]}});
+
+          var derived1 = new Derived1({a: "a1"});
+          var derived2 = new Derived2({a: "a2", c: "c2"});
+
+          expect(derived1.a).toBe("a1");
+
+          derived1.configure(derived2);
+
+          expect(derived1.a).toBe("a2");
+        });
+
+        it("should copy when target property is null and config is not", function() {
+          var Derived1 = Complex.extend({type: {props: ["a"]}});
+          var Derived2 = Derived1.extend();
+
+          var derived1 = new Derived1();
+          var derived2 = new Derived2({a: "a2"});
+
+          expect(derived1.a).toBe(null);
+
+          derived1.configure(derived2);
+
+          expect(derived1.a).toBe("a2");
+        });
+
+        it("should copy when config property is null and target is not", function() {
+          var Derived1 = Complex.extend({type: {props: ["a"]}});
+          var Derived2 = Derived1.extend();
+
+          var derived1 = new Derived1({a: "a1"});
+          var derived2 = new Derived2({a: null});
+
+          expect(derived1.a).toBe("a1");
+
+          derived1.configure(derived2);
+
+          expect(derived1.a).toBe(null);
+        });
+      });
+
+      describe("when config is a not a complex", function() {
+
+        it("should copy all own properties", function() {
+          var Derived1 = Complex.extend({type: {props: ["a", "b"]}});
+
+          var derived1 = new Derived1({a: "a1", b: "b1"});
+          var derived2 = {a: "a2", b: "b2"};
+
+          expect(derived1.a).toBe("a1");
+          expect(derived1.b).toBe("b1");
+
+          derived1.configure(derived2);
+
+          expect(derived1.a).toBe("a2");
+          expect(derived1.b).toBe("b2");
+        });
+
+        it("should ignore non-own properties", function() {
+          var Derived1 = Complex.extend({type: {props: ["a", "b"]}});
+
+          var derived1 = new Derived1({a: "a1", b: "b1"});
+          var derived2 = Object.create({a: "a3"});
+          derived2.b = "b2";
+
+          expect(derived1.a).toBe("a1");
+          expect(derived1.b).toBe("b1");
+
+          derived1.configure(derived2);
+
+          expect(derived1.a).toBe("a1");
+          expect(derived1.b).toBe("b2");
+        });
+
+        it("should throw on an undefined property (non-sloppy)", function() {
+          var Derived1 = Complex.extend({type: {props: ["a", "b"]}});
+
+          var derived1 = new Derived1({a: "a1", b: "b1"});
+          var derived2 = {c: "c2"};
+
+          expect(function() {
+            derived1.configure(derived2);
+          }).toThrow(errorMatch.argInvalid("name"));
+        });
+      });
+    });
+
+    describe("#_addReference(container, propType)", function() {
+
+      it("should be called when a complex container is set to this value", function() {
+        var Derived = Complex.extend();
+        var Container = Complex.extend({type: {props: [{name: "a", type: Derived}]}});
+
+        spyOn(Derived.prototype, "_addReference");
+
+        var value = new Derived();
+        var container = new Container({a: value});
+
+        expect(value._addReference).toHaveBeenCalled();
+      });
+
+      it("should be called with the complex container and its property type", function() {
+        var Derived = Complex.extend();
+        var Container = Complex.extend({type: {props: [{name: "a", type: Derived}]}});
+
+        spyOn(Derived.prototype, "_addReference");
+
+        var value = new Derived();
+        var container = new Container({a: value});
+
+        expect(value._addReference).toHaveBeenCalledWith(container, Container.type.get("a"));
+      });
+
+      // TODO: if an when lists are created without a changeset/txn, uncomment this.
+      /*
+      it("should be called when added to a list container", function() {
+        var Derived = Complex.extend();
+        var Container = Complex.extend({type: {props: [{name: "as", type: [Derived]}]}});
+
+        var value = new Derived();
+        var container = new Container({as: [value]});
+
+        spyOn(Derived.prototype, "_addReference");
+
+        expect(value._addReference).toHaveBeenCalledWith(container.as, null);
+      });
+      */
     });
   }); // pentaho.type.Complex
 });

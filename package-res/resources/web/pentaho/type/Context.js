@@ -23,6 +23,9 @@ define([
   "./SpecificationScope",
   "../GlobalContextVars",
   "./configurationService",
+  "./changes/Transaction",
+  "./changes/TransactionScope",
+  "./changes/CommittedScope",
   "../lang/Base",
   "../util/promise",
   "../util/arg",
@@ -30,13 +33,15 @@ define([
   "../util/object",
   "../util/fun"
 ], function(localRequire, module, service, bundle, standard, SpecificationContext, SpecificationScope,
-    GlobalContextVars, configurationService, Base, promiseUtil, arg, error, O, F) {
+    GlobalContextVars, configurationService,
+    Transaction, TransactionScope, CommittedScope,
+    Base, promiseUtil, arg, error, O, F) {
 
   "use strict";
 
   /*global SESSION_NAME:false, SESSION_LOCALE:false, active_theme:false, Promise:false */
 
-  var _nextUid = 1,
+  var _nextFactoryUid = 1,
 
       _baseMid = module.id.replace(/Context$/, ""), // e.g.: "pentaho/type/"
 
@@ -56,116 +61,167 @@ define([
     _standardTypeMids[_baseFacetsMid + name] = 1;
   });
 
-  /**
-   * @name pentaho.type.Context
-   * @class
-   * @amd pentaho/type/Context
-   *
-   * @classDesc A `Context` object holds instance constructors of **configured** types.
-   *
-   * When a component, like a visualization, is being assembled,
-   * it should not necessarily be unaware of the environment where it is going to be used.
-   * A context object gathers information that has a global scope,
-   * such as the current locale or the current theme,
-   * which is likely to have an impact on how a visualization is presented to the user.
-   * For instance, the color palette used in a categorical bar chart might be related to the current theme.
-   * As such, besides holding contextual, environmental information,
-   * a context object should contain the necessary logic to
-   * facilitate the configuration of component types using that information.
-   * The Pentaho Metadata Model embraces this concept by defining types as
-   * _type factories_ that take a context object as their argument.
-   *
-   * The instance constructors of types
-   * **must** be obtained from a context object,
-   * using one of the provided methods:
-   * [get]{@link pentaho.type.Context#get},
-   * [getAsync]{@link pentaho.type.Context#getAsync},
-   * [getAll]{@link pentaho.type.Context#getAll}, or
-   * [getAllAsync]{@link pentaho.type.Context#getAllAsync}, or
-   * [inject]{@link pentaho.type.Context#inject},
-   * so that these are configured before being used.
-   * This applies whether an instance constructor is used for creating an instance or to derive a subtype.
-   *
-   * The following properties are specified at construction time and
-   * constitute the environmental information held by a context:
-   * [application]{@link pentaho.spec.IContextVars#application},
-   * [user]{@link pentaho.spec.IContextVars#user},
-   * [theme]{@link pentaho.spec.IContextVars#theme} and
-   * [locale]{@link pentaho.spec.IContextVars#locale}.
-   * Their values determine (or "select") the _type configuration rules_ that
-   * apply and are used to configure the constructors provided by the context.
-   *
-   * To better understand how a context provides configured types,
-   * assume that an non-anonymous type,
-   * with the [id]{@link pentaho.type.Type#id} `"my/own/type"`,
-   * is requested from a context object, `context`:
-   *
-   * ```js
-   * var MyOwnInstanceCtor = context.get("my/own/type");
-   * ```
-   *
-   * Internally, (it is like if) the following steps are taken:
-   *
-   * 1. If the requested type has been previously created and configured, just return it:
-   *    ```js
-   *    var InstanceCtor = getStored(context, "my/own/type");
-   *    if(InstanceCtor != null) {
-   *      return InstanceCtor;
-   *    }
-   *    ```
-   *
-   * 2. Otherwise, the context requires the type's module from the AMD module system,
-   *    and obtains its [factory function]{@link pentaho.type.Factory} back:
-   *    ```js
-   *    var typeFactory = require("my/own/type");
-   *    ```
-   *
-   * 3. The factory function is called with the context as argument
-   *    and creates and returns an instance constructor for that context:
-   *
-   *    ```js
-   *    InstanceCtor = typeFactory(context);
-   *    ```
-   *
-   * 4. The instance constructor is configured with any applicable rules:
-   *    ```js
-   *    InstanceCtor = configure(context, InstanceCtor);
-   *    ```
-   *
-   * 5. The configured instance constructor is stored under its id:
-   *    ```js
-   *    store(context, InstanceCtor.type.id, InstanceCtor);
-   *    ```
-   *
-   * 6. Finally, it is returned to the caller:
-   *    ```js
-   *    return InstanceCtor;
-   *    ```
-   *
-   * Note that anonymous types cannot be _directly_ configured,
-   * as _type configuration rules_ are targeted at specific, identified types.
-   *
-   * @constructor
-   * @description Creates a `Context` with given variables.
-   * @param {pentaho.spec.IContextVars} [contextVars] The context variables' specification.
-   * When unspecified, it defaults to an instance of {@link pentaho.GlobalContextVars}.
-   */
   var Context = Base.extend(/** @lends pentaho.type.Context# */{
 
+    /**
+     * @alias Context
+     * @memberOf pentaho.type
+     * @class
+     * @amd pentaho/type/Context
+     *
+     * @classDesc A `Context` object holds instance constructors of **configured** types.
+     *
+     * When a component, like a visualization, is being assembled,
+     * it should not necessarily be unaware of the environment where it is going to be used.
+     * A context object gathers information that has a global scope,
+     * such as the current locale or the current theme,
+     * which is likely to have an impact on how a visualization is presented to the user.
+     * For instance, the color palette used in a categorical bar chart might be related to the current theme.
+     * As such, besides holding contextual, environmental information,
+     * a context object should contain the necessary logic to
+     * facilitate the configuration of component types using that information.
+     * The Pentaho Metadata Model embraces this concept by defining types as
+     * _type factories_ that take a context object as their argument.
+     *
+     * The instance constructors of types
+     * **must** be obtained from a context object,
+     * using one of the provided methods:
+     * [get]{@link pentaho.type.Context#get},
+     * [getAsync]{@link pentaho.type.Context#getAsync},
+     * [getAll]{@link pentaho.type.Context#getAll}, or
+     * [getAllAsync]{@link pentaho.type.Context#getAllAsync}, or
+     * [inject]{@link pentaho.type.Context#inject},
+     * so that these are configured before being used.
+     * This applies whether an instance constructor is used for creating an instance or to derive a subtype.
+     *
+     * The following properties are specified at construction time and
+     * constitute the environmental information held by a context:
+     * [application]{@link pentaho.spec.IContextVars#application},
+     * [user]{@link pentaho.spec.IContextVars#user},
+     * [theme]{@link pentaho.spec.IContextVars#theme} and
+     * [locale]{@link pentaho.spec.IContextVars#locale}.
+     * Their values determine (or "select") the _type configuration rules_ that
+     * apply and are used to configure the constructors provided by the context.
+     *
+     * To better understand how a context provides configured types,
+     * assume that an non-anonymous type,
+     * with the [id]{@link pentaho.type.Type#id} `"my/own/type"`,
+     * is requested from a context object, `context`:
+     *
+     * ```js
+     * var MyOwnInstanceCtor = context.get("my/own/type");
+     * ```
+     *
+     * Internally, (it is like if) the following steps are taken:
+     *
+     * 1. If the requested type has been previously created and configured, just return it:
+     *    ```js
+     *    var InstanceCtor = getStored(context, "my/own/type");
+     *    if(InstanceCtor != null) {
+     *      return InstanceCtor;
+     *    }
+     *    ```
+     *
+     * 2. Otherwise, the context requires the type's module from the AMD module system,
+     *    and obtains its [factory function]{@link pentaho.type.Factory} back:
+     *    ```js
+     *    var typeFactory = require("my/own/type");
+     *    ```
+     *
+     * 3. The factory function is called with the context as argument
+     *    and creates and returns an instance constructor for that context:
+     *
+     *    ```js
+     *    InstanceCtor = typeFactory(context);
+     *    ```
+     *
+     * 4. The instance constructor is configured with any applicable rules:
+     *    ```js
+     *    InstanceCtor = configure(context, InstanceCtor);
+     *    ```
+     *
+     * 5. The configured instance constructor is stored under its id:
+     *    ```js
+     *    store(context, InstanceCtor.type.id, InstanceCtor);
+     *    ```
+     *
+     * 6. Finally, it is returned to the caller:
+     *    ```js
+     *    return InstanceCtor;
+     *    ```
+     *
+     * Note that anonymous types cannot be _directly_ configured,
+     * as _type configuration rules_ are targeted at specific, identified types.
+     *
+     * @constructor
+     * @description Creates a `Context` with given variables.
+     * @param {pentaho.spec.IContextVars} [contextVars] The context variables' specification.
+     * When unspecified, it defaults to an instance of {@link pentaho.GlobalContextVars}.
+     */
     constructor: function(contextVars) {
+      /**
+       * The context variables object.
+       *
+       * @type {!pentaho.spec.IContextVars}
+       * @private
+       */
       this._vars = contextVars || new GlobalContextVars();
 
-      // factory uid : Class.<pentaho.type.Instance>
+      /**
+       * The ambient/current transaction, if any, or `null`.
+       *
+       * @type {pentaho.type.changes.Transaction}
+       * @private
+       */
+      this._txnCurrent = null;
+
+      /**
+       * The stack of transaction scopes.
+       *
+       * @type {Array.<pentaho.type.changes.AbstractTransactionScope>}
+       * @private
+       */
+      this._txnScopes = [];
+
+      /**
+       * The version of the next committed/fulfilled transaction.
+       *
+       * @type {number}
+       * @private
+       * @default 1
+       */
+      this._nextVersion = 1;
+
+      /**
+       * Map of instance constructors by factory function _uid_.
+       *
+       * See also `_nextFactoryUid` and `getFactoryUid`.
+       *
+       * @type {!Object.<string, Class.<pentaho.type.Instance>>}
+       */
       this._byFactoryUid = {};
 
-      // type uid : Class.<pentaho.type.Instance>
+      /**
+       * Map of instance constructors by [type uid]{@link pentaho.type.Type#uid}.
+       *
+       * @type {!Object.<string, Class.<pentaho.type.Instance>>}
+       */
       this._byTypeUid = {};
 
       // non-anonymous types
-      // type id : Class.<pentaho.type.Instance>
+      /**
+       * Map of instance constructors by [type id]{@link pentaho.type.Type#id},
+       * for non-anonymous types.
+       *
+       * @type {!Object.<string, Class.<pentaho.type.Instance>>}
+       */
       this._byTypeId = {};
 
-      // Create the context's root Instance/Type type.
+      /**
+       * The root [Instance]{@link pentaho.type.Instance} constructor.
+       *
+       * @type {!Class.<pentaho.type.Instance>}
+       */
       this._Instance = this._getByFactory(standard.instance, /*sync:*/true);
 
       // Register all other standard types
@@ -186,6 +242,7 @@ define([
       return this._vars;
     },
 
+    //region Type Registry
     /**
      * Gets the **configured instance constructor** of a type.
      *
@@ -525,6 +582,139 @@ define([
         return Promise.reject(ex);
       }
     },
+    //endregion
+
+    //region Changes and Transactions
+    /**
+     * Gets the ambient transaction, if any, or `null`.
+     *
+     * @type {pentaho.type.changes.Transaction}
+     * @readOnly
+     */
+    get transaction() {
+      return this._txnCurrent;
+    },
+
+    /**
+     * Enters a scope of change.
+     *
+     * To mark the changes in the scope as error,
+     * call its [reject]{@link pentaho.type.changes.TransactionScope#reject} method.
+     *
+     * To end the scope of change successfully,
+     * dispose the returned transaction scope,
+     * by calling its [dispose]{@link pentaho.type.changes.TransactionScope#scope} method.
+     *
+     * If the scope initiated a transaction,
+     * then that transaction is committed.
+     * Otherwise,
+     * if an ambient transaction already existed when the change scope was created,
+     * that transaction is left uncommitted.
+     *
+     * To end the scope with an error,
+     * call its [reject]{@link pentaho.type.changes.TransactionScope#reject} method.
+     *
+     * @return {!pentaho.type.changes.TransactionScope} The new transaction scope.
+     */
+    enterChange: function() {
+      var txn = this._txnCurrent || new Transaction(this);
+      return txn.enter();
+    },
+
+    /**
+     * Enters a read-committed scope.
+     *
+     * Within this scope there is no current transaction and
+     * reading the properties of instances obtains their committed values.
+     *
+     * @return {!pentaho.type.changes.CommittedScope} The read-committed scope.
+     */
+    enterCommitted: function() {
+      return new CommittedScope(this);
+    },
+
+    get _scopeCurrent() {
+      var scopes = this._txnScopes;
+      return scopes.length ? scopes[scopes.length - 1] : null;
+    },
+
+    /**
+     * Called by a scope to make it become the new ambient scope.
+     *
+     * @param {!pentaho.type.changes.AbstractTransactionScope} scopeEnter - The new ambient scope.
+     *
+     * @private
+     *
+     * @see pentaho.type.changes.AbstractTransactionScope
+     */
+    _scopeEnter: function(scopeEnter) {
+
+      this._txnScopes.push(scopeEnter);
+
+      this._setTransaction(scopeEnter.transaction);
+    },
+
+    /**
+     * Called by a scope to stop being the current scope.
+     *
+     * @private
+     *
+     * @see pentaho.type.changes.AbstractTransactionScope#exit
+     */
+    _scopeExit: function() {
+      this._txnScopes.pop();
+      var scopeResume = this._scopeCurrent;
+
+      this._setTransaction(scopeResume && scopeResume.transaction);
+    },
+
+    /**
+     * Sets the new ambient transaction.
+     *
+     * @param {pentaho.type.changes.Transaction} txnNew The new ambient transaction.
+     *
+     * @private
+     */
+    _setTransaction: function(txnNew) {
+      var txnExit = this._txnCurrent;
+      if(txnExit !== txnNew) {
+        if(txnExit) txnExit._exitingAmbient();
+        this._txnCurrent = txnNew;
+        if(txnNew) txnNew._enteringAmbient();
+      }
+    },
+
+    _transactionExit: function() {
+      // Local-exit all scopes of the exiting transaction.
+      // Null scopes or scopes of other txns remain non-exited.
+      var txnCurrent = this._txnCurrent;
+      this._txnCurrent = null;
+
+      // Initial scope must be a transaction scope.
+      var scopes = this._txnScopes;
+      var i = scopes.length;
+      while(i--) {
+        var scope = scopes[i];
+        if(scope.transaction === txnCurrent) {
+          scopes.pop();
+          scope._exitLocal();
+          if(scope.isRoot)
+            break;
+        }
+      }
+    },
+
+    /**
+     * Increments and returns the next version number for use in the
+     * [commit]{@link pentaho.type.changes.Transaction#_applyChanges} of a transaction.
+     *
+     * @return {number} The next version number.
+     * @private
+     */
+    _takeNextVersion: function() {
+      return ++this._nextVersion;
+    },
+    //endregion
 
     //region get support
     /**
@@ -771,7 +961,7 @@ define([
      * @return {!Promise.<!Class.<pentaho.type.Instance>>|!Class.<pentaho.type.Instance>} When sync,
      * returns the instance constructor, while, when async, returns a promise for it.
      *
-     * @throws {pentaho.lang.ArgumentInvalidError} When the value returned by the factory function
+     * @throws {pentaho.lang.OperationInvalidError} When the value returned by the factory function
      * is not a instance constructor of a subtype of `Instance`.
      *
      * @private
@@ -904,8 +1094,8 @@ define([
     },
     //endregion
 
-    _return: function(InstCtor, sync) {
-      return sync ? InstCtor : Promise.resolve(InstCtor);
+    _return: function(value, sync) {
+      return sync ? value : Promise.resolve(value);
     },
 
     _error: function(ex, sync) {
@@ -916,8 +1106,9 @@ define([
 
   return Context;
 
+  //region type registry
   function getFactoryUid(factory) {
-    return factory._fuid_ || (factory._fuid_ = _nextUid++);
+    return factory._fuid_ || (factory._fuid_ = _nextFactoryUid++);
   }
 
   // It's considered an AMD id only if it has at least one "/".
@@ -1000,4 +1191,5 @@ define([
         return;
     }
   }
+  //endregion
 });

@@ -24,10 +24,10 @@ define([
   }
 
   describe("pentaho.visual.role.Mapping", function() {
-    var Value, Complex, VisualModel, Mapping, MappingAttribute;
+    var Value, Complex, VisualModel, Mapping, MappingAttribute, context;
 
     beforeEach(function () {
-      var context = new Context();
+      context = new Context();
 
       Value = context.get(valueFactory);
       Complex = context.get(complexFactory);
@@ -108,10 +108,6 @@ define([
     function assertIsValid(complex) {
       // this way, errors are shown in the console...
       expect(complex.validate()).toBe(null);
-    }
-
-    function assertIsInvalid(complex) {
-      expect(complex.isValid).toBe(false);
     }
     //endregion
 
@@ -306,241 +302,241 @@ define([
 
     describe("validate()", function() {
 
-      it("should stop validation if base validation returns errors", function() {
-        var MyMapping = Mapping.extend({
-          type: {
-            levels: ["nominal"]
+      function doValidateTests(useTxn) {
+
+        describe(useTxn ? "ambient" : "direct", function() {
+          var txnScope;
+
+          beforeEach(function() {
+            if(useTxn) txnScope = context.enterChange();
+          });
+
+          afterEach(function() {
+            if(txnScope) txnScope.dispose();
+          });
+
+          function assertIsValid(complex) {
+            if(txnScope) txnScope.acceptWill();
+
+            // this way, errors are shown in the console...
+            expect(complex.validate()).toBe(null);
           }
-        });
 
-        // invalidMappingAttribute.name is required
-        var invalidMappingAttribute = new MappingAttribute();
+          function assertIsInvalid(complex) {
+            if(txnScope) txnScope.acceptWill();
 
-        // Assumptions
-        var errors = invalidMappingAttribute.validate();
-        expect(Array.isArray(errors)).toBe(true);
-        expect(errors.length).toBe(1);
-
-        var mapping = new MyMapping({attributes: [invalidMappingAttribute]});
-
-        // Test
-        errors = mapping.validate();
-
-        expect(Array.isArray(errors)).toBe(true);
-        expect(errors.length).toBe(1);
-      });
-
-      it("should be invalid, when it has no owner", function() {
-        var MyMapping = Mapping.extend({
-          type: {
-            levels: ["nominal"]
+            expect(complex.isValid).toBe(false);
           }
+
+          it("should stop validation if base validation returns errors", function() {
+            var MyMapping = Mapping.extend({
+              type: {
+                levels: ["nominal"]
+              }
+            });
+
+            // invalidMappingAttribute.name is required
+            var invalidMappingAttribute = new MappingAttribute();
+
+            // Assumptions
+            var errors = invalidMappingAttribute.validate();
+            expect(Array.isArray(errors)).toBe(true);
+            expect(errors.length).toBe(1);
+
+            var mapping = new MyMapping({attributes: [invalidMappingAttribute]});
+
+            // Test
+            errors = mapping.validate();
+
+            expect(Array.isArray(errors)).toBe(true);
+            expect(errors.length).toBe(1);
+          });
+
+          it("should be invalid, when it has no model", function() {
+            var MyMapping = Mapping.extend({
+              type: {
+                levels: ["nominal"]
+              }
+            });
+
+            var mapping = new MyMapping();
+
+            expect(mapping.model).toBe(null);
+
+            assertIsInvalid(mapping);
+          });
+
+          it("should be invalid, when its level is not one of the role's levels (qualitative)", function() {
+            var mapping = createFullValidQualitativeMapping();
+
+            mapping.level = "quantitative";
+
+            assertIsInvalid(mapping);
+          });
+
+          it("should be invalid, when its level is not one of the role's levels (quantitative)", function() {
+            var mapping = createFullValidQuantitativeMapping();
+
+            mapping.level = "ordinal";
+
+            assertIsInvalid(mapping);
+          });
+
+          it("should be valid, when its level is one of the role's levels", function() {
+            var mapping = createFullValidQualitativeMapping();
+
+            mapping.level = "nominal";
+
+            assertIsValid(mapping);
+
+            mapping.level = "ordinal";
+
+            assertIsValid(mapping);
+          });
+
+          it("should be invalid, when the model has no data", function() {
+            var mapping = createFullValidQualitativeMapping();
+            assertIsValid(mapping);
+            mapping.model.data = null;
+
+            assertIsInvalid(mapping);
+          });
+
+          it("should be invalid, when the name of a mapping attribute is not defined in the model data", function() {
+            var mapping = createFullValidQualitativeMapping();
+            var nonExistingDataAttribute = new MappingAttribute({name: "mugambo"});
+            mapping.attributes.add(nonExistingDataAttribute);
+
+            assertIsInvalid(mapping);
+          });
+
+          it("should be invalid, when the type of the mapped attribute is not a subtype of the role's dataType",
+          function() {
+            var mapping = createFullValidQualitativeMapping();
+
+            // quantitative measurement level would be compatible with the qualitative role.
+            // but this role specifies the data type.
+            var incompatibleDataTypeAttribute = "sales";
+
+            mapping.attributes.add(incompatibleDataTypeAttribute);
+
+            assertIsInvalid(mapping);
+          });
+
+          it("should be invalid, when the attributes level is the same, but its data type is not a subtype",
+          function() {
+
+            // Role with no data type restriction.
+            var DerivedMapping = Mapping.extend({
+              type: {
+                levels:   ["quantitative"],
+                dataType: "date"
+              }
+            });
+
+            var model = createVisualModelWithMapping(DerivedMapping);
+
+            model.data = new Table(getDataSpec1());
+
+            // an existing attribute whose measurement level is compatible with
+            var mapping = model.visualRole;
+
+            mapping.attributes.add("sales");
+
+            assertIsInvalid(mapping);
+          });
+
+          it("should be invalid, when dataType is null and the attributes level is not " +
+             "compatible with the role's levels", function() {
+
+            // Role with no data type restriction.
+            var DerivedMapping = Mapping.extend({
+              type: {
+                levels: ["quantitative"]
+              }
+            });
+
+            var model = createVisualModelWithMapping(DerivedMapping);
+
+            model.data = new Table(getDataSpec1());
+
+            // an existing attribute whose measurement level is compatible with
+            var mapping = model.visualRole;
+
+            mapping.attributes.add("product");
+
+            assertIsInvalid(mapping);
+          });
+
+          it("should be invalid, when a mapping with an effective level of qualitative has duplicate names",
+          function() {
+            var mapping = createFullValidQualitativeMapping();
+
+            var containedAttribute = mapping.attributes.at(0);
+
+            mapping.attributes.add(containedAttribute.clone());
+
+            assertIsInvalid(mapping);
+          });
+
+          it("should be invalid, when a mapping with an effective level of quantitative has " +
+             "duplicate names and aggregation", function() {
+            var mapping = createFullValidQuantitativeMapping();
+
+            var containedAttribute = mapping.attributes.at(0);
+
+            mapping.attributes.add(containedAttribute.clone());
+
+            assertIsInvalid(mapping);
+          });
+
+          it("should be valid, when a mapping with an effective level of quantitative has duplicate names " +
+             "but != aggregations", function() {
+            var mapping = createFullValidQuantitativeMapping();
+
+            var attribute1 = mapping.attributes.at(0);
+            attribute1.aggregation = "sum";
+
+            var attribute2 = attribute1.clone(); // same name
+            attribute2.aggregation = "avg";
+
+            mapping.attributes.add(attribute2);
+
+            assertIsValid(mapping);
+          });
         });
+      }
 
-        var mapping = new MyMapping();
-
-        expect(mapping.owner).toBe(null);
-
-        assertIsInvalid(mapping);
-      });
-
-      it("should be invalid, when its level is not one of the role's levels", function() {
-        var mapping = createFullValidQualitativeMapping();
-
-        mapping.level = "quantitative";
-
-        assertIsInvalid(mapping);
-
-        // ---
-
-        mapping = createFullValidQuantitativeMapping();
-
-        mapping.level = "ordinal";
-
-        assertIsInvalid(mapping);
-      });
-
-      it("should be valid, when its level is one of the role's levels", function() {
-        var mapping = createFullValidQualitativeMapping();
-
-        mapping.level = "nominal";
-
-        assertIsValid(mapping);
-
-        mapping.level = "ordinal";
-
-        assertIsValid(mapping);
-      });
-
-      it("should be invalid, when the model has no data", function() {
-        var mapping = createFullValidQualitativeMapping();
-        assertIsValid(mapping);
-        mapping.model.data = null;
-
-        assertIsInvalid(mapping);
-      });
-
-      it("should be invalid, when the name of a mapping attribute is not defined in the model data", function() {
-        var mapping = createFullValidQualitativeMapping();
-        var nonExistingDataAttribute = new MappingAttribute({name: "mugambo"});
-        mapping.attributes.add(nonExistingDataAttribute);
-
-        assertIsInvalid(mapping);
-      });
-
-      it("should be invalid, when the type of the mapped attribute is not a subtype of the role's dataType",
-      function() {
-        var mapping = createFullValidQualitativeMapping();
-
-        // quantitative measurement level would be compatible with the qualitative role.
-        // but this role specifies the data type.
-        var incompatibleDataTypeAttribute = "sales";
-
-        mapping.attributes.add(incompatibleDataTypeAttribute);
-
-        assertIsInvalid(mapping);
-      });
-
-      it("should be invalid, when the attributes level is the same, but its data type is not a subtype", function() {
-
-        // Role with no data type restriction.
-        var DerivedMapping = Mapping.extend({
-          type: {
-            levels:   ["quantitative"],
-            dataType: "date"
-          }
-        });
-
-        var model = createVisualModelWithMapping(DerivedMapping);
-
-        model.data = new Table(getDataSpec1());
-
-        // an existing attribute whose measurement level is compatible with
-        var mapping = model.visualRole;
-
-        mapping.attributes.add("sales");
-
-        assertIsInvalid(mapping);
-      });
-
-      it("should be invalid, when dataType is null and the attributes level is not compatible with the role's levels",
-      function() {
-
-        // Role with no data type restriction.
-        var DerivedMapping = Mapping.extend({
-          type: {
-            levels: ["quantitative"]
-          }
-        });
-
-        var model = createVisualModelWithMapping(DerivedMapping);
-
-        model.data = new Table(getDataSpec1());
-
-        // an existing attribute whose measurement level is compatible with
-        var mapping = model.visualRole;
-
-        mapping.attributes.add("product");
-
-        assertIsInvalid(mapping);
-      });
-
-      it("should be invalid, when a mapping with an effective level of qualitative has duplicate names", function() {
-        var mapping = createFullValidQualitativeMapping();
-
-        var containedAttribute = mapping.attributes.at(0);
-
-        mapping.attributes.add(containedAttribute.clone());
-
-        assertIsInvalid(mapping);
-      });
-
-      it("should be invalid, when a mapping with an effective level of quantitative has " +
-         "duplicate names and aggregation", function() {
-        var mapping = createFullValidQuantitativeMapping();
-
-        var containedAttribute = mapping.attributes.at(0);
-
-        mapping.attributes.add(containedAttribute.clone());
-
-        assertIsInvalid(mapping);
-      });
-
-      it("should be valid, when a mapping with an effective level of quantitative has duplicate names " +
-         "but != aggregations", function() {
-        var mapping = createFullValidQuantitativeMapping();
-
-        var attribute1 = mapping.attributes.at(0);
-        attribute1.aggregation = "sum";
-
-        var attribute2 = attribute1.clone();
-        attribute2.aggregation = "avg";
-
-        mapping.attributes.add(attribute2);
-
-        assertIsValid(mapping);
-      });
+      doValidateTests(false);
+      doValidateTests(true);
     });
 
-    describe("#setOwnership(owner, ownerProperty)", function() {
+    describe("#model and #modelProperty", function() {
       var derived, Derived, propType, DerivedMapping, mapping;
 
       beforeEach(function() {
+        DerivedMapping = Mapping.extend({type: {levels: ["nominal"]}});
+
         Derived = Complex.extend({type: {
           props: [
-            {name: "foo", type: ["string"]},
-            {name: "bar", type: ["string"]}
+            {name: "foo", type: DerivedMapping}
           ]
         }});
 
-        derived = new Derived();
-
         propType = Derived.type.get("foo");
 
-        DerivedMapping = Mapping.extend({type: {levels: ["nominal"]}});
+        derived = new Derived();
 
-        mapping = new DerivedMapping();
+        derived.foo = mapping = new DerivedMapping();
       });
 
 
-      it("should throw if owner is not provided", function() {
-        expect(function() {
-          mapping.setOwnership(null, propType);
-        }).toThrow(errorMatch.argRequired("owner"));
-      });
-
-      it("should throw if ownerProperty is not provided", function() {
-        expect(function() {
-          mapping.setOwnership(derived, null);
-        }).toThrow(errorMatch.argRequired("propType"));
-      });
-
-      it("should not throw if both owner and ownerProperty are provided", function() {
-        expect(function() {
-          mapping.setOwnership(derived, propType);
-        }).not.toThrow();
-      });
-
-      it("should have #owner and #model return the specified owner", function() {
-        mapping.setOwnership(derived, propType);
-        expect(mapping.owner).toBe(derived);
+      it("should have #model return the container `derived`", function() {
         expect(mapping.model).toBe(derived);
       });
 
-      it("should have #ownerProperty return the specified ownerProperty", function() {
-        mapping.setOwnership(derived, propType);
-        expect(mapping.ownerProperty).toBe(propType);
-      });
-
-      it("should throw if ownership is already taken", function() {
-        mapping.setOwnership(derived, propType);
-
-        var derived2  = new Derived();
-        var propType2 = Derived.type.get("bar");
-
-        expect(function() {
-          mapping.setOwnership(derived2, propType2);
-        }).toThrowError(TypeError);
+      it("should have #modelProperty return the containing property", function() {
+        expect(mapping.modelProperty).toBe(propType);
       });
     });
 

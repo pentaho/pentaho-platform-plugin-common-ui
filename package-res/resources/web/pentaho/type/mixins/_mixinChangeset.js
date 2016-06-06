@@ -35,7 +35,7 @@ define([
      */
     _initChangeset: function(changeset) {
       if(!changeset) throw error.argRequired("changeset");
-      this._changeset = changeset;
+      this._cset = changeset;
     },
 
     /**
@@ -45,7 +45,7 @@ define([
      * @readonly
      */
     get changeset() {
-      return this._changeset;
+      return this._cset;
     }
   };
 });

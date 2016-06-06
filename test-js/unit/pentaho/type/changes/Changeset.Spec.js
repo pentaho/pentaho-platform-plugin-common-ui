@@ -15,26 +15,30 @@
  */
 define([
   "pentaho/type/Context",
-  "pentaho/type/complex",
   "pentaho/type/changes/Changeset",
   "tests/pentaho/util/errorMatch"
-], function(Context, complexFactory, Changeset, errorMatch) {
+], function(Context, Changeset, errorMatch) {
 
   "use strict";
 
-  /* global describe:false, it:false, expect:false, beforeEach:false */
+  /* global describe:false, it:false, expect:false, beforeEach:false, afterEach:false */
 
-  var context = new Context(),
-      Complex = context.get(complexFactory);
+  describe("pentaho.type.changes.Changeset", function() {
 
-  describe("pentaho.type.changes.Changeset -", function() {
+    var context, Complex;
+
+    beforeEach(function() {
+      context = new Context();
+      Complex = context.get("complex");
+    });
+
     it("should be defined", function () {
       expect(typeof Changeset).toBeDefined();
     });
 
     describe("instance -", function() {
 
-      var owner, changeset;
+      var owner, changeset, scope;
 
       beforeEach(function() {
         var Derived = Complex.extend({type: {props: [
@@ -42,14 +46,34 @@ define([
               ]}});
 
         owner = new Derived();
-        changeset = new Changeset(owner);
+
+        scope = context.enterChange();
+
+        changeset = new Changeset(context.transaction, owner);
+      });
+
+      afterEach(function() {
+        if(scope.isCurrent) scope.exit();
+      });
+
+      it("should throw error when a transaction isn't specified", function() {
+
+        function errorOnCreate(value) {
+          expect(function() {
+            var changeset2 = new Changeset(value, owner);
+          }).toThrow(errorMatch.argRequired("transaction"));
+        }
+
+        errorOnCreate();
+        errorOnCreate(null);
+        errorOnCreate(undefined);
       });
 
       it("should throw error when an owner isn't specified", function() {
 
         function errorOnCreate(value) {
           expect(function() {
-            var changeset2 = new Changeset(value);
+            var changeset2 = new Changeset(context.transaction, value);
           }).toThrow(errorMatch.argRequired("owner"));
         }
 
@@ -58,11 +82,9 @@ define([
         errorOnCreate(undefined);
       });
 
-      it("should initially have isProposed=true", function() {
+      it("should initially have isReadOnly=false", function() {
 
-        expect(changeset.isProposed).toBe(true);
-        expect(changeset.isCanceled).toBe(false);
-        expect(changeset.isApplied ).toBe(false);
+        expect(changeset.isReadOnly).toBe(false);
       });
 
       //region #owner
@@ -76,128 +98,71 @@ define([
             changeset.owner = "foo";
           }).toThrowError(TypeError);
         });
-
-        it("should set owner._changeset to the the changeset", function() {
-          expect(owner._changeset).toBe(changeset);
-        });
       }); //endregion #owner
 
-      //region #hasChanges
-      describe("#hasChanges -", function() {
-        it("should always return `false`", function() {
-          expect(changeset.hasChanges).toBe(false);
-        });
-      }); //endregion #hasChanges
+      //region #ownerVersion
+      describe("#ownerVersion -", function() {
+        it("should return the version of the owner at the time it was passed to the constructor", function() {
 
-      //region #apply
-      describe("#apply -", function() {
+          var v = owner.$version;
+
+          expect(changeset.ownerVersion).toBe(v);
+        });
+
+        it("should not allow changing the ownerVersion", function() {
+          expect(function() {
+            changeset.ownerVersion = 200;
+          }).toThrowError(TypeError);
+        });
+      }); //endregion #ownerVersion
+
+      //region #_applyInternal
+      describe("#_applyInternal(version)", function() {
 
         it("should call _apply", function() {
           changeset._apply = jasmine.createSpy();
 
-          changeset.apply();
+          changeset._applyInternal(1);
 
           expect(changeset._apply).toHaveBeenCalled();
+        });
+
+        it("should call owner._setVersionInternal", function() {
+          changeset._apply = jasmine.createSpy();
+
+          spyOn(changeset.owner, "_setVersionInternal");
+
+          changeset._applyInternal(1);
+
+          expect(changeset.owner._setVersionInternal).toHaveBeenCalledWith(1);
         });
 
         it("should call _apply with the owner", function() {
           changeset._apply = jasmine.createSpy();
 
-          changeset.apply();
+          changeset._applyInternal(1);
 
           expect(changeset._apply).toHaveBeenCalledWith(owner);
         });
-
-        it("should throw when already applied or canceled", function() {
-          changeset.cancel();
-
-          expect(function() {
-            changeset.apply();
-          }).toThrow(errorMatch.operInvalid());
-        });
-
-        it("should clear the owner's current changeset", function() {
-          changeset._apply = jasmine.createSpy();
-
-          expect(owner._changeset).toBe(changeset);
-
-          changeset.apply();
-
-          expect(owner._changeset).toBe(null);
-        });
-
-        it("should result in isApplied=true", function() {
-          changeset._apply = jasmine.createSpy();
-
-          changeset.apply();
-
-          expect(changeset.isApplied).toBe(true);
-          expect(changeset.isProposed).toBe(false);
-          expect(changeset.isCanceled).toBe(false);
-        });
-      }); //endregion #apply
-
-      //region #cancel
-      describe("#cancel -", function() {
-
-        it("should call _cancel", function() {
-          spyOn(changeset, "_cancel").and.callThrough();
-
-          changeset.cancel();
-
-          expect(changeset._cancel).toHaveBeenCalled();
-        });
-
-        it("should throw when already applied or canceled", function() {
-          changeset.cancel();
-
-          expect(function() {
-            changeset.cancel();
-          }).toThrow(errorMatch.operInvalid());
-        });
-
-        it("should clear the owner's current changeset", function() {
-
-          expect(owner._changeset).toBe(changeset);
-
-          changeset.cancel();
-
-          expect(owner._changeset).toBe(null);
-        });
-
-        it("should result in isCanceled=true", function() {
-
-          changeset.cancel();
-
-          expect(changeset.isCanceled).toBe(true);
-          expect(changeset.isProposed).toBe(false);
-          expect(changeset.isApplied).toBe(false);
-        });
-      }); //endregion #cancel
+      }); //endregion #_applyInternal
 
       //region #clearChanges
       describe("#clearChanges -", function() {
 
         it("should call _clearChanges", function() {
-          spyOn(changeset, "_clearChanges").and.callThrough();
+          changeset._clearChanges = jasmine.createSpy();
 
           changeset.clearChanges();
 
           expect(changeset._clearChanges).toHaveBeenCalled();
         });
 
-        it("should throw when already applied or canceled", function() {
-          changeset.cancel();
+        it("should throw when read-only", function() {
+          changeset._setReadOnlyInternal();
 
           expect(function() {
             changeset.clearChanges();
           }).toThrow(errorMatch.operInvalid());
-        });
-
-        it("should remain isProposed=true", function() {
-          changeset.clearChanges();
-
-          expect(changeset.isProposed).toBe(true);
         });
       }); //endregion #clearChanges
     });

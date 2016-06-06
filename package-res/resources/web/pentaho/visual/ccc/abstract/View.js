@@ -1248,7 +1248,9 @@ define([
         .setData(this._dataView.toJsonCda())
         .render();
 
-      this._updateSelections();
+      // When render fails, due to required visual roles, for example, there is not chart.data.
+      // Calling clearSelection, ahead, ends up causing an error.
+      if(this._chart.data) this._updateSelections();
     },
 
     _updateSelections: function() {
@@ -1294,20 +1296,25 @@ define([
     },
 
     _onUserSelection: function(selectingDatums) {
-       // Duplicates may occur due to excluded dimensions like the discriminator
+      // Duplicates may occur due to excluded dimensions like the discriminator
+
+      // TODO: improve detection of viz without attributes.
 
       var alreadyIn = {};
       var operands = selectingDatums.reduce(function(memo, datum) {
         if(!datum.isVirtual) {
+          // When there are no attributes (e.g. bar chart with measures alone),
+          // operand is null...
           var operand = this._complexToFilter(datum);
+          if(operand) {
+            // Check if there's already a selection with the same key.
+            // If not, add a new selection to the selections list.
+            var key = JSON.stringify(operand.toSpec()); // TODO: improve key
+            if(alreadyIn[key]) return memo;
+            alreadyIn[key] = true;
 
-          // Check if there's already a selection with the same key.
-          // If not, add a new selection to the selections list.
-          var key = JSON.stringify(operand.toSpec()); // TODO: improve key
-          if(alreadyIn[key]) return memo;
-          alreadyIn[key] = true;
-
-          if(operand) memo.push(operand);
+            memo.push(operand);
+          }
         }
         return memo;
       }.bind(this), []);

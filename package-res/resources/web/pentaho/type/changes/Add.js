@@ -26,6 +26,9 @@ define([
      * @memberOf pentaho.type.changes
      * @class
      * @extends pentaho.type.changes.PrimitiveChange
+     *
+     * @friend pentaho.type.changes.ListChangeset
+     *
      * @amd pentaho/type/changes/Add
      *
      * @classDesc The `Add` class describes the primitive operation of adding a new element to a list at a given index.
@@ -65,6 +68,16 @@ define([
      */
     get type() {
       return "add";
+    },
+
+    _prepareRefs: function(txn, target) {
+      var elem = this.element;
+      if(elem._addReference) txn._ensureChangeRef(elem).addReference(target);
+    },
+
+    _cancelRefs: function(txn, target) {
+      var elem = this.element;
+      if(elem._addReference) txn._ensureChangeRef(elem).removeReference(target);
     },
 
     _apply: function(target) {

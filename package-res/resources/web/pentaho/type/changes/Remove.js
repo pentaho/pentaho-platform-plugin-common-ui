@@ -68,8 +68,25 @@ define([
       return "remove";
     },
 
-    _apply: function(target) {
+    _prepareRefs: function(txn, target) {
+      if(!target.type.of.isSimple) {
+        this.elements.forEach(function(elem) {
+          if(elem._addReference)
+            txn._ensureChangeRef(elem).removeReference(target);
+        });
+      }
+    },
 
+    _cancelRefs: function(txn, target) {
+      if(!target.type.of.isSimple) {
+        this.elements.forEach(function(elem) {
+          if(elem._addReference)
+            txn._ensureChangeRef(elem).addReference(target);
+        });
+      }
+    },
+
+    _apply: function(target) {
       var elems = this.elements;
 
       target._elems.splice(this.index, elems.length);
