@@ -78,6 +78,7 @@ define([
 
         this.base.apply(this, arguments);
 
+        // Create default visual role mappings
         this.type.each(function(propType) {
           if(propType.type.isSubtypeOf(Mapping.type)) {
             // Visual role
@@ -85,23 +86,10 @@ define([
             if(!mapping) {
               // Create default instance without firing events
               this._values[propType.name] = mapping = propType.toValue({});
+              mapping._addReference(this, propType);
             }
-
-            mapping.setOwnership(this, propType);
           }
         }, this);
-      },
-
-      set: function(name, valueSpec) {
-
-        var propType = this.type.get(name);
-        if(propType.type.isSubtypeOf(Mapping.type)) {
-          valueSpec = propType.toValue(valueSpec);
-          if(valueSpec)
-            valueSpec.setOwnership(this, propType);
-        }
-
-        return this.base(name, valueSpec);
       },
 
       //region Event Flows Handling
@@ -157,7 +145,7 @@ define([
        * @return {ActionResult} The result object.
        * @protected
        */
-      _doSelect: function(will){
+      _doSelect: function(will) {
         var currentSelectionFilter = this.selectionFilter;
         var selectionMode = will.selectionMode || this.selectionMode;
 
@@ -168,7 +156,14 @@ define([
           return ActionResult.reject(e);
         }
 
-        return this.set("selectionFilter", newSelectionFilter); //setting to null assigns the default value
+        try {
+          // Note that when setting to null, it actually gets the default value.
+          this.set("selectionFilter", newSelectionFilter);
+        } catch(e) {
+          return ActionResult.reject(e);
+        }
+
+        return ActionResult.fulfill();
       },
 
       /**

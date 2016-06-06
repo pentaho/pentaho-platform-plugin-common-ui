@@ -73,64 +73,42 @@ define([
      */
     var VisualRoleMapping = Complex.extend("pentaho.visual.role.Mapping", /** @lends pentaho.visual.role.Mapping# */{
 
-      constructor: function() {
-
-        this.base.apply(this, arguments);
-
-        this._ownedBy = this._ownedAs = null;
-      },
-
       /**
-       * Gets the visual model that owns this visual role mapping.
+       * Gets the visual model that owns this visual role mapping, if any, or `null`.
        *
        * @type {pentaho.visual.base.Model}
-       * @readOnly
+       *
+       * @see pentaho.type.List#setOwnership
        */
       get model() {
-        return this.owner;
+        return this._getModelFromRefs(this.$references);
       },
 
       /**
-       * Sets the visual model that owns this mapping.
+       * Gets the visual role property type in which the visual model contains this visual role mapping,
+       * if any, or `null`.
        *
-       * Ownership cannot change.
-       *
-       * @param {!pentaho.type.Complex} owner - The owner complex value.
-       * @param {!pentaho.type.Property.Type} propType - The property type of `owner` whose value is this instance.
-       *
-       * @throws {TypeError} When called with argument values that are different from those of the first call.
-       *
-       * @see pentaho.type.List#owner
-       * @see pentaho.type.List#ownerProperty
+       * @type {pentaho.type.Property.Type}
        */
-      setOwnership: function(owner, propType) {
-        if(!owner) throw error.argRequired("owner");
-        if(!propType) throw error.argRequired("propType");
-
-        O.setConst(this, "_ownedBy", owner);
-        O.setConst(this, "_ownedAs", propType);
+      get modelProperty() {
+        var refs = this.$references;
+        var model = this._getModelFromRefs(refs);
+        return model ? refs[0].property : null;
       },
 
       /**
-       * The visual model that owns this mapping.
+       * Gets the visual model from a given references list, if any, or `null`.
        *
-       * @type {pentaho.type.Complex}
+       * @param {!pentaho.type.ReferenceList} refs The references list.
        *
-       * @see pentaho.type.List#setOwnership
+       * @return {pentaho.visual.base.Model} The model or `null`.
        */
-      get owner() {
-        return this._ownedBy;
-      },
-
-      /**
-       * The complex value that owns this list value.
-       *
-       * @type {pentaho.type.Complex}
-       *
-       * @see pentaho.type.List#setOwnership
-       */
-      get ownerProperty() {
-        return this._ownedAs;
+      _getModelFromRefs: function(refs) {
+        if(refs && refs.length) {
+          // TODO: Test it is a visual Model (cyclic dependency)
+          return refs[0].container;
+        }
+        return null;
       },
 
       /**
@@ -269,7 +247,7 @@ define([
       _getLowestLevelInAttrs: function() {
         var mappingAttrs = this.attributes;
         var data, visualModel, L;
-        if(!(L = mappingAttrs.count) || !(visualModel = this.owner) || !(data = visualModel.data))
+        if(!(L = mappingAttrs.count) || !(visualModel = this.model) || !(data = visualModel.data))
           return;
 
         // First, find the lowest level of measurement in the mapped attributes.
@@ -333,7 +311,7 @@ define([
           };
 
           // No visual model or visual role property?
-          if(!this.owner || !this.ownerProperty) {
+          if(!this.model || !this.modelProperty) {
             addErrors(new Error(bundle.structured.errors.mapping.noOwnerVisualModel));
           } else {
             // Data props are defined in data and of a type compatible with the role's dataType.
@@ -360,7 +338,7 @@ define([
        */
       _validateLevel: function(addErrors) {
         var allRoleLevels = this.type.levels;
-        var level = this.get("level");
+        var level = this.get("level"); // want Simple value
         var roleLevels = null; // defaults to all role levels
         if(level) {
           // Fixed level.
@@ -369,7 +347,7 @@ define([
             addErrors(new Error(bundle.format(
                 bundle.structured.errors.mapping.levelIsNotOneOfRoleLevels,
                 {
-                  role: this.ownerProperty,
+                  role: this.modelProperty,
                   level: level,
                   roleLevels: ("'" + allRoleLevels.toArray().join("', '") + "'")
                 })));
@@ -392,7 +370,7 @@ define([
                 bundle.format(
                     bundle.structured.errors.mapping.attributesLevelNotCompatibleWithRoleLevels,
                     {
-                      role: this.ownerProperty,
+                      role: this.modelProperty,
                       // Try to provide a label for dataAttrLevel.
                       dataLevel: MeasurementLevel.type.domain.get(dataAttrLevel),
                       roleLevels: ("'" + allRoleLevels.toArray().join("', '") + "'")
@@ -411,11 +389,11 @@ define([
        * @private
        */
       _validateDataProps: function(addErrors) {
-        var data = this.owner.data;
+        var data = this.model.data;
         var dataAttrs = data && data.model.attributes;
 
         var roleDataType = this.type.dataType;
-        var rolePropType = this.ownerProperty;
+        var rolePropType = this.modelProperty;
 
         var i = -1;
         var roleAttrs = this.attributes;
@@ -466,8 +444,8 @@ define([
         var L = roleAttrs.count;
         if(L <= 1) return;
 
-        var rolePropType = this.ownerProperty;
-        var data = this.owner.data;
+        var rolePropType = this.modelProperty;
+        var data = this.model.data;
         var dataAttrs = data && data.model.attributes;
 
         var isQuant = MeasurementLevel.type.isQuantitative(levelEffective);

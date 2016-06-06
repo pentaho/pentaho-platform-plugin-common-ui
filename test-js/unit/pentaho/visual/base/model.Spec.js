@@ -15,6 +15,8 @@ define([
             WillExecute, DidExecute, RejectedExecute) {
   "use strict";
 
+  /*global jasmine:false, console:false*/
+
   describe("pentaho.visual.base.Model", function() {
     var context;
     var Model;
@@ -299,7 +301,9 @@ define([
                 selectionMode = jasmine.createSpy('selectionMode');
 
                 model.on("will:select", listeners.willSelect.and.callFake(function(willEvent) {
-                  willEvent.cancel(motive.reason);
+                  expect(function() {
+                    willEvent.cancel(motive.reason);
+                  }).not.toThrow(); // listener's errors are swallowed.
                 }));
                 model.on("will:select", listeners.willSelectSecond);
                 model.on("did:select", listeners.didSelect);
@@ -348,7 +352,8 @@ define([
             selectionMode = jasmine.createSpy('selectionMode');
 
             model.on("will:select", listeners.willSelect.and.callFake(function(willEvent) {
-              throw new Error("non-user error");
+              console.log("TEST: expect console error.");
+              throw new Error("will:select listener error");
             }));
             model.on("will:select", listeners.willSelectSecond);
             model.on("did:select", listeners.didSelect);
@@ -385,10 +390,11 @@ define([
         });
 
         describe("exception on selectionMode - ", function() {
-          var errorMsg = "non-user error";
+          var errorMsg = "selectionMode handler error";
           var selectionMode;
+
           beforeEach(function() {
-            selectionMode = jasmine.createSpy('selectionMode').and.callFake(function(willEvent) {
+            selectionMode = jasmine.createSpy('selectionMode').and.callFake(function() {
               throw new Error(errorMsg);
             });
 
@@ -520,7 +526,9 @@ define([
             doExecute = jasmine.createSpy('doExecute');
 
             model.on("will:execute", listeners.willExecute.and.callFake(function(willEvent) {
-              willEvent.dataFilter = alternativeSelection;
+              expect(function() {
+                willEvent.dataFilter = alternativeSelection;
+              }).not.toThrow(); // listener's errors are swallowed.
             }));
             model.on("will:execute", listeners.willExecuteSecond);
             model.on("did:execute", listeners.didExecute);
@@ -558,7 +566,9 @@ define([
             doExecute = jasmine.createSpy('doExecute');
 
             model.on("will:execute", listeners.willExecute.and.callFake(function(willEvent) {
-              willEvent.doExecute = doExecute;
+              expect(function() {
+                willEvent.doExecute = doExecute;
+              }).not.toThrow(); // listener's errors are swallowed.
             }));
             model.on("did:execute", listeners.didExecute);
             model.on("rejected:execute", listeners.rejectedExecute);
@@ -594,7 +604,9 @@ define([
                 doExecute = jasmine.createSpy('doExecute');
 
                 model.on("will:execute", listeners.willExecute.and.callFake(function(willEvent) {
-                  willEvent.cancel(motive.reason);
+                  expect(function() {
+                    willEvent.cancel(motive.reason);
+                  }).not.toThrow(); // listener's errors are swallowed.
                 }));
                 model.on("will:execute", listeners.willExecuteSecond);
                 model.on("did:execute", listeners.didExecute);
@@ -637,7 +649,8 @@ define([
             doExecute = jasmine.createSpy('doExecute');
 
             model.on("will:execute", listeners.willExecute.and.callFake(function(willEvent) {
-              throw new Error("non-user error");
+              console.log("TEST: expect console error.");
+              throw new Error("will:execute listener error");
             }));
             model.on("will:execute", listeners.willExecuteSecond);
             model.on("did:execute", listeners.didExecute);

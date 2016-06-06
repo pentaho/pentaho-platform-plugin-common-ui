@@ -316,14 +316,14 @@ define([
           });
 
           function assertIsValid(complex) {
-            if(txnScope) txnScope.preview();
+            if(txnScope) txnScope.acceptWill();
 
             // this way, errors are shown in the console...
             expect(complex.validate()).toBe(null);
           }
 
           function assertIsInvalid(complex) {
-            if(txnScope) txnScope.preview();
+            if(txnScope) txnScope.acceptWill();
 
             expect(complex.isValid).toBe(false);
           }

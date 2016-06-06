@@ -18,8 +18,9 @@ define([
   "pentaho/lang/Event",
   "pentaho/data/filter",
   "pentaho/util/error",
+  "pentaho/util/logger",
   "pentaho/shim/es6-promise"
-], function(Base, Event, filter, error, Promise) {
+], function(Base, Event, filter, error, logger, Promise) {
 
   "use strict";
 
@@ -241,17 +242,23 @@ define([
         selectionMode: true, // never has a direct visual impact
         selectionFilter: true
       };
-      var fullUpdate = changeset.propertyNames.some(function(prop){
-        return !exclusionList[prop];
-      });
-      if(fullUpdate) return this.render();
+
+      var fullUpdate = changeset.propertyNames.some(function(p) { return !exclusionList[p]; });
+      if(fullUpdate) {
+        this.render().then(function() {
+          logger.info("Auto-update succeeded!");
+        }, function(errors) {
+          logger.warn("Auto-update canceled:\n - " +
+              (Array.isArray(errors) ? errors.join("\n - ") : errors));
+        });
+        return;
+      }
 
       var updateSelection = changeset.hasChange("selectionFilter");
-      if(updateSelection){
-
-        var newValue = changeset.get("selectionFilter");
+      if(updateSelection) {
+        var newFilter = this.model.selectionFilter;
         var oldValue = changeset.getOld("selectionFilter");
-        this._selectionChanged(newValue.value, oldValue != null ? oldValue.value : null );
+        this._selectionChanged(newFilter, oldValue != null ? oldValue.value : null);
       }
 
       var updateSize = changeset.hasChange("width") || changeset.hasChange("height");
