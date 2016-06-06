@@ -17,6 +17,7 @@ define([
   "module",
   "./instance",
   "./valueHelper",
+  "./ValidationError",
   "../i18n!types",
   "../lang/_AnnotatableLinked",
   "../util/arg",
@@ -24,7 +25,7 @@ define([
   "../util/object",
   "../util/text",
   "../util/fun"
-], function(module, instanceFactory, valueHelper, bundle, AnnotatableLinked, arg, error, O, text, F) {
+], function(module, instanceFactory, valueHelper, ValidationError, bundle, AnnotatableLinked, arg, error, O, text, F) {
 
   "use strict";
 
@@ -555,8 +556,7 @@ define([
               errors = valueHelper.combineErrors(errors, newErrors);
             };
 
-            // Accessing private state in the name of performance.
-            var value = owner._values[this.name];
+            var value = owner._getByType(this);
             if(value) {
               // Not null and surely of the type, so validateInstance can be called.
               // If a list, element validation is done before cardinality validation.
@@ -568,14 +568,15 @@ define([
 
             if(count < range.min) {
               if(this.isList) {
-                addErrors(new Error(bundle.format(bundle.structured.errors.property.countOutOfRange,
-                    [this.label, count, range.min, range.max])));
+                addErrors(new ValidationError(
+                  bundle.get("errors.property.countOutOfRange", [this.label, count, range.min, range.max])));
               } else {
-                addErrors(new Error(bundle.format(bundle.structured.errors.property.isRequired, [this.label])));
+                addErrors(new ValidationError(
+                  bundle.get("errors.property.isRequired", [this.label])));
               }
             } else if(count > range.max) {
-              addErrors(new Error(bundle.format(bundle.structured.errors.property.countOutOfRange,
-                  [this.label, count, range.min, range.max])));
+              addErrors(new ValidationError(
+                bundle.get("errors.property.countOutOfRange", [this.label, count, range.min, range.max])));
             }
           }
 

@@ -150,48 +150,49 @@ define([
       //   * preserves old elements even if the user gives an element directly
       // * removing the elements of current domain that are not in values
       // * swapping the order of the ones that exist
-      var scope = domain.changeScope();
-      try {
-        // Validate existence and configure existing
-        var i = valuesDomain.count;
-        while(i--) {
-          var v1 = valuesDomain.at(i);
-          var v0 = domain.get(v1.key);
+      var scope = domain.type.context.enterChange();
 
-          // Not defined in the current domain?
-          if(!v0)
-            throw error.argInvalid("domain", bundle.structured.errors.refinement.domain.notSubsetOfBase);
+      // Validate existence and configure existing
+      var i = valuesDomain.count;
+      while(i--) {
+        var v1 = valuesDomain.at(i);
+        var v0 = domain.get(v1.key);
 
-          // If the two instances are different (the normal case)
-          if(v1 !== v0) {
-            // v0 is preserved and configured with v1
-            v0.configure(v1);
-          }
+        // Not defined in the current domain?
+        if(!v0) {
+          // throws
+          scope.reject(error.argInvalid("domain", bundle.structured.errors.refinement.domain.notSubsetOfBase));
+          return; // make the execution flow clearer
         }
 
-        // Remove ones that are not in valuesDomain
-        // Traversing forward, generates a single change set for contiguous removed elements.
-        var C = domain.count;
-        i = -1;
-        while(++i < C) {
-          if(!valuesDomain.get(domain.at(i).key)) {
-            domain.removeAt(i);
-            i--;
-            C--;
-          }
+        // If the two instances are different (the normal case)
+        if(v1 !== v0) {
+          // v0 is preserved and configured with v1
+          v0.configure(v1);
         }
-
-        // Reorder
-        // Sort one based on the other...
-        domain.sort(function(a, b) {
-          var va = valuesDomain.get(a.key);
-          var vb = valuesDomain.get(b.key);
-          return fun.compare(valuesDomain.indexOf(va), valuesDomain.indexOf(vb));
-        });
-
-      } finally {
-        scope.dispose();
       }
+
+      // Remove ones that are not in valuesDomain
+      // Traversing forward, generates a single change set for contiguous removed elements.
+      var C = domain.count;
+      i = -1;
+      while(++i < C) {
+        if(!valuesDomain.get(domain.at(i).key)) {
+          domain.removeAt(i);
+          i--;
+          C--;
+        }
+      }
+
+      // Reorder
+      // Sort one based on the other...
+      domain.sort(function(a, b) {
+        var va = valuesDomain.get(a.key);
+        var vb = valuesDomain.get(b.key);
+        return fun.compare(valuesDomain.indexOf(va), valuesDomain.indexOf(vb));
+      });
+
+      scope.accept();
     },
 
     _configureDomain: function(config) {

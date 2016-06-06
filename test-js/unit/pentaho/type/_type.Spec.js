@@ -896,32 +896,38 @@ define([
     });
 
     describe("#isValue", function() {
-      it("should have default `isValue` equal to `false`", function () {
+      it("should have default `false`", function () {
         expect(Instance.type.isValue).toBe(false);
       });
     });
 
     describe("#isProperty", function() {
-      it("should have default `isProperty` equal to `false`", function () {
+      it("should have default `false`", function () {
         expect(Instance.type.isProperty).toBe(false);
       });
     });
 
     describe("#isElement", function() {
-      it("should have default `isElement` equal to `false`", function () {
+      it("should have default `false`", function () {
         expect(Instance.type.isElement).toBe(false);
       });
     });
 
     describe("#isComplex", function() {
-      it("should have default `isComplex` equal to `false`", function () {
+      it("should have default `false`", function () {
         expect(Instance.type.isComplex).toBe(false);
       });
     });
 
     describe("#isSimple", function() {
-      it("should have default `isSimple` equal to `false`", function () {
+      it("should have default `false`", function () {
         expect(Instance.type.isSimple).toBe(false);
+      });
+    });
+
+    describe("#isContainer", function() {
+      it("should have default `false`", function () {
+        expect(Instance.type.isContainer).toBe(false);
       });
     });
 

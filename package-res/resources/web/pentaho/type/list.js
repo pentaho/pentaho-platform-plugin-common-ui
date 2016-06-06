@@ -15,20 +15,18 @@
  */
 define([
   "module",
-  "../lang/ActionResult",
+  "./ContainerMixin",
+  "./changes/ListChangeset",
   "./value",
   "./element",
   "./valueHelper",
   "./SpecificationContext",
-  "./changes/ListChangeset",
-  "./changes/ComplexChangeset",
   "../i18n!types",
   "../util/arg",
   "../util/error",
   "../util/object"
-], function(module, ActionResult,
+], function(module, ContainerMixin, ListChangeset,
             valueFactory, elemFactory, valueHelper, SpecificationContext,
-            ListChangeset, ComplexChangeset,
             bundle, arg, error, O) {
 
   "use strict";
@@ -36,8 +34,7 @@ define([
   return function(context) {
 
     var Value = context.get(valueFactory),
-        Element = context.get(elemFactory),
-        _listNextUid = 1;
+        Element = context.get(elemFactory);
 
     /**
      * @name pentaho.type.List.Type
@@ -54,6 +51,8 @@ define([
      * @memberOf pentaho.type
      * @class
      * @extends pentaho.type.Value
+     * @mixes pentaho.type.ContainerMixin
+     *
      * @amd {pentaho.type.Factory<pentaho.type.List>} pentaho/type/list
      *
      * @classdesc A list of `Element` instances of some _common base_ type.
@@ -75,10 +74,12 @@ define([
     var List = Value.extend("pentaho.type.List", /** @lends pentaho.type.List# */{
 
       constructor: function(spec) {
+
+        this._initContainer();
+
         this._elems = [];
         this._keys  = {};
-        this._uid = String(_listNextUid++);
-        this._ownedBy = this._ownedAs = this._changeset = null;
+        this._ownedBy = this._ownedAs = null;
 
         if(spec != null) {
           // An array of element specs?
@@ -89,14 +90,25 @@ define([
               (spec instanceof List) ? spec._elems :
               null;
 
-          if(elemSpecs) {
-            this._set(
-                elemSpecs,
-                /*add:*/true,
-                /*update:*/false,
-                /*remove:*/false,
-                /*move:*/false,
-                /*index:*/0);
+          // TODO: should not be created this way so that any current transaction is ignored.
+          // If and when changed, activate commented ou test "should be called when added to a list container".
+          if(elemSpecs) this._load(elemSpecs);
+        }
+      },
+
+      _load: function(elemSpecs) {
+        var i = -1;
+        var L = elemSpecs.length;
+        var elemType = this.type.of;
+        var elems = this._elems;
+        var keys  = this._keys;
+        var elem, key;
+        while(++i < L) {
+          if((elem = elemType.to(elemSpecs[i])) != null && !O.hasOwn(keys, (key = elem.key))) {
+            elems.push(elem);
+            keys[key] = elem;
+
+            if(elem._addReference) elem._addReference(this);
           }
         }
       },
@@ -161,24 +173,44 @@ define([
         return clone;
       },
 
-      /**
-       * Initializes a clone of this list value.
-       *
-       * @param {!pentaho.type.List} clone The list value clone.
-       */
       _clone: function(clone) {
-        clone._elems = this._elems.slice();
-        clone._keys  = O.assignOwnDefined({}, this._keys);
-        clone._uid = String(_listNextUid++);
+        this._cloneContainer(clone);
+        this._cloneElementData(clone);
       },
 
       /**
-       * Gets the unique id of the list instance.
-       * @type {string}
-       * @readonly
+       * Clones the data structures that store elements.
+       *
+       * @param {!Object} clone - The list clone.
+       * @param {boolean} [useCommitted=false] - Indicates that the committed version is desired.
+       * @return {!Object} The specified clone object.
+       *
+       * @private
+       * @friend {pentaho.type.changes.ListChangeset}
+       * @see pentaho.type.changes.ListChangeset#_projectedMock
        */
-      get uid() {
-        return this._uid;
+      _cloneElementData: function(clone, useCommitted) {
+        var mock = useCommitted ? this : this._projectedMock;
+        clone._elems = mock._elems.slice();
+        clone._keys  = O.assignOwnDefined({}, mock._keys);
+        return clone;
+      },
+
+      /**
+       * Gets a mock projection of the updated list value.
+       *
+       * When there are no changes, the owner list returned.
+       * Otherwise, a projected mock containing only
+       * the elements' data structures is created and returned.
+       *
+       * @type {!Object|!pentaho.type.List}
+       * @readOnly
+       * @private
+       * @see pentaho.type.changes.ListChangeset#_projectedMock
+       */
+      get _projectedMock() {
+        var cset;
+        return (cset = this._cset) ? cset._projectedMock : this;
       },
 
       /**
@@ -195,7 +227,7 @@ define([
        * then {@link pentaho.type.Value.Type#areEqual} should return `false`.
        *
        * The default list implementation, returns the value of the
-       * list instance's {@link pentaho.type.List#uid}.
+       * list instance's {@link pentaho.type.List#$uid}.
        *
        * @type string
        * @readonly
@@ -211,7 +243,7 @@ define([
        * @readonly
        */
       get count() {
-        return this._elems.length;
+        return this._projectedMock._elems.length;
       },
 
       /**
@@ -222,19 +254,20 @@ define([
        */
       at: function(index) {
         if(index == null) throw error.argRequired("index");
-        return this._elems[index] || null;
+        return this._projectedMock._elems[index] || null;
       },
 
       /**
-       * Gets a value that indicates if an element with
-       * a given key is present in the list.
+       * Gets a value that indicates if an element with a given key is present in the list.
        *
        * @param {string|any} key The element's key.
        *
        * @return {boolean} `true` if an element with the given key is present in the list, `false` otherwise.
        */
       has: function(key) {
-        return key != null && (key = this._castKey(key)) != null && O.hasOwn(this._keys, key);
+        return key != null &&
+            (key = this._castKey(key)) != null &&
+            O.hasOwn(this._projectedMock._keys, key);
       },
 
       /**
@@ -256,7 +289,7 @@ define([
        * @return {number} `true` if the element is present in the list, `false` otherwise.
        */
       indexOf: function(elem) {
-        return elem && this.has(elem.key) ? this._elems.indexOf(elem) : -1;
+        return elem && this.has(elem.key) ? this._projectedMock._elems.indexOf(elem) : -1;
       },
 
       /**
@@ -267,7 +300,10 @@ define([
        * @return {?pentaho.type.Element} The corresponding element or `null`.
        */
       get: function(key) {
-        return (key != null && (key = this._castKey(key)) != null) ? O.getOwn(this._keys, key, null) : null;
+        //jshint laxbreak:true
+        return (key != null && (key = this._castKey(key)) != null)
+            ? O.getOwn(this._projectedMock._keys, key, null)
+            : null;
       },
 
       /**
@@ -288,15 +324,10 @@ define([
        * @param {number} [keyArgs.index] The index at which to add new elements.
        * When unspecified, new elements are appended to the list.
        * This argument is ignored when `noAdd` is `true`.
-       *
-       * @return {pentaho.lang.ActionResult} The result object.
        */
       set: function(fragment, keyArgs) {
 
-        // TODO: returning ActionResult is a temporary measure until transactions exist,
-        // and then provide an overall result upon commit.
-
-        return this._set(
+        this._set(
             fragment,
             !arg.optional(keyArgs, "noAdd"),
             !arg.optional(keyArgs, "noUpdate"),
@@ -341,8 +372,20 @@ define([
        * @param {any|Array} fragment - Element or elements to remove.
        */
       remove: function(fragment) {
-        this._usingChangeset(function(changeset) {
-          changeset._remove(fragment);
+        this._usingChangeset(function(cset) {
+          cset._remove(fragment);
+        });
+      },
+
+      /**
+       * Moves an element to a new position.
+       *
+       * @param {any} elemSpec - An element specification.
+       * @param {number} indexNew - The new index of the element.
+       */
+      move: function(elemSpec, indexNew) {
+        this._usingChangeset(function(cset) {
+          cset._move(elemSpec, indexNew);
         });
       },
 
@@ -360,8 +403,8 @@ define([
        * @param {number} [count=1] The number of elements to remove.
        */
       removeAt: function(start, count) {
-        this._usingChangeset(function(changeset) {
-          changeset._removeAt(start, count);
+        this._usingChangeset(function(cset) {
+          cset._removeAt(start, count);
         });
       },
 
@@ -371,8 +414,8 @@ define([
        * @param {function(pentaho.type.Element, pentaho.type.Element) : number} comparer - The comparer function.
        */
       sort: function(comparer) {
-        this._usingChangeset(function(changeset) {
-          changeset._sort(comparer);
+        this._usingChangeset(function(cset) {
+          cset._sort(comparer);
         });
       },
 
@@ -380,8 +423,8 @@ define([
        * Removes all elements from the list.
        */
       clear: function() {
-        this._usingChangeset(function(changeset) {
-          changeset._clear();
+        this._usingChangeset(function(cset) {
+          cset._clear();
         });
       },
 
@@ -393,7 +436,8 @@ define([
        * @return {Array.<any>} An array of elements.
        */
       toArray: function(map) {
-        return map ? this._elems.map(map) : this._elems.slice();
+        var elems = this._projectedMock._elems;
+        return map ? elems.map(map) : elems.slice();
       },
 
       /**
@@ -405,25 +449,13 @@ define([
        * @param {Object} [ctx] The JS context object on which `fun` is called.
        */
       each: function(fun, ctx) {
-        var elems = this._elems;
+        var elems = this._projectedMock._elems;
         var L = elems.length;
         var i = -1;
 
         while(++i < L)
           if(fun.call(ctx, elems[i], i, this) === false)
             break;
-      },
-
-      // TODO: Replace this use by transaction scopes, when they're implemented.
-      /**
-       * Enters a change scope and returns a disposable object for exiting the scope.
-       *
-       * @return {pentaho.lang.IDisposable} A disposable object.
-       */
-      changeScope: function() {
-        return /** @type pentaho.lang.IDisposable */{
-          dispose: function() {}
-        };
       },
 
       /**
@@ -453,50 +485,14 @@ define([
       },
 
       //region Core change methods
-      /**
-       * Calls a given local method with a changeset.
-       *
-       * @param {function(pentaho.type.changes.ListChangeset)} fun - The method to call.
-       * @private
-       */
-      _usingChangeset: function(fun) {
-
-        // TODO: Holy... this is UGLY code! However, it's expected to become much cleaner
-        // when transactions are implemented, so there's no real gain in making it prettier now.
-
-        var owner = this._ownedBy,
-            createdOwnerChangeset = false,
-            ownerChangeset,
-            changeset;
-        if(owner) {
-          // Enlist in the owner's changeset
-          if(!(ownerChangeset = owner._changeset)) {
-            // Operation was initiated by a direct call to a list method.
-            ownerChangeset = new ComplexChangeset(owner);
-            createdOwnerChangeset = true;
-          }
-
-          // Get or create list changeset
-          changeset = ownerChangeset._changes[this._ownedAs.name] ||
-              (ownerChangeset._changes[this._ownedAs.name] = new ListChangeset(this));
-        } else {
-          changeset = new ListChangeset(this);
-        }
-
-        fun.call(this, changeset);
-
-        if(owner) {
-          if(createdOwnerChangeset)
-            return owner._applyChanges();
-        } else {
-          changeset.apply();
-          return ActionResult.fulfill();
-        }
+      // implement abstract pentaho.type.ContainerMixin#_createChangeset
+      _createChangeset: function(txn) {
+        return new ListChangeset(txn, this);
       },
 
       _set: function(fragment, add, update, remove, move, index) {
-        return this._usingChangeset(function(changeset) {
-          changeset._set(fragment, add, update, remove, move, index);
+        this._usingChangeset(function(cset) {
+          cset._set(fragment, add, update, remove, move, index);
         });
       },
       //endregion
@@ -520,7 +516,7 @@ define([
       validate: function() {
         var elemType = this.type.of;
 
-        return this._elems.reduce(function(errors, elem) {
+        return this._projectedMock._elems.reduce(function(errors, elem) {
           return valueHelper.combineErrors(errors, elemType.validateInstance(elem));
         }, null);
       },
@@ -535,7 +531,7 @@ define([
         var elemType = this.type.of;
         if(elemType.isRefinement) elemType = elemType.of;
 
-        var elemSpecs = this._elems.map(function(elem) {
+        var elemSpecs = this.toArray(function(elem) {
           keyArgs.includeType = elem.type !== elemType;
           return elem.toSpecInContext(keyArgs);
         });
@@ -565,6 +561,7 @@ define([
         styleClass: "pentaho-type-list",
 
         get isList() { return true; },
+        get isContainer() { return true; },
 
         //region of
         _elemType: Element.type,
@@ -664,7 +661,9 @@ define([
         }
         //endregion
       }
-    }).implement({
+    })
+    .implement(ContainerMixin)
+    .implement({
       type: bundle.structured.list
     });
 

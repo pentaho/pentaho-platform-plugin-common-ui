@@ -15,47 +15,525 @@
  */
 define([
   "pentaho/type/Context",
-  "pentaho/type/list",
-  "pentaho/type/number",
   "pentaho/type/changes/Clear"
-], function(Context, listFactory, numberFactory, Clear) {
+], function(Context, Clear) {
+
   "use strict";
 
-  /* global describe:false, it:false, expect:false, beforeEach:false */
-
-  var context = new Context(),
-    List = context.get(listFactory),
-    PentahoNumber = context.get(numberFactory);
-
-  var NumberList = List.extend({
-    type: {of: PentahoNumber}
-  });
+  /* global describe:false, it:false, expect:false, beforeEach:false, afterEach:false */
 
   describe("pentaho.type.changes.Clear -", function() {
-    it("should be defined", function () {
+    var context, List, NumberList, DerivedComplex, ComplexList;
+
+    beforeEach(function() {
+      context = new Context();
+      List = context.get(["element"]);
+      NumberList = context.get(["number"]);
+
+      DerivedComplex = context.get({
+        props: [
+          {name: "foo", type: "number"}
+        ]
+      });
+      ComplexList = context.get([DerivedComplex]);
+    });
+
+    it("should be defined", function() {
       expect(typeof Clear).toBeDefined();
     });
 
-    describe("instance -", function() {
-      describe("#type -", function() {
-        it("should return a string with the value `clear`", function() {
-          var change = new Clear();
-          expect(change.type).toBe("clear");
-        });
+    describe("#type -", function() {
+      it("should return a string with the value `clear`", function() {
+        expect(Clear.prototype.type).toBe("clear");
+      });
+    });
+
+    describe("#_apply", function() {
+
+      var scope;
+
+      beforeEach(function() {
+        scope = context.enterChange();
       });
 
-      describe("#apply -", function() {
-        it("should remove all elements from a list", function() {
+      afterEach(function() {
+        scope.dispose();
+      });
+
+      it("should remove all elements and not be there, as ambient values", function() {
+
+        var list = new NumberList([1, 2, 3]);
+
+        // ---
+
+        expect(list.count).toBe(3);
+
+        // ---
+
+        list.clear();
+
+        // ---
+
+        expect(list.count).toBe(0);
+      });
+
+      it("should remove all elements and not be there when txn is committed", function() {
+
+        var list = new NumberList([1, 2, 3]);
+
+        // ---
+
+        expect(list.count).toBe(3);
+
+        // ---
+
+        list.clear();
+
+        // ---
+
+        scope.accept();
+
+        // ---
+
+        expect(list.count).toBe(0);
+      });
+
+      it("should remove all elements but sill be there if txn is rejected", function() {
+
+        var list = new NumberList([1, 2, 3]);
+
+        // ---
+
+        expect(list.count).toBe(3);
+
+        // ---
+
+        list.clear();
+
+        // ---
+
+        try { scope.reject(); } catch(ex) { /* swallow thrown rejection */ }
+
+        // ---
+
+        expect(list.count).toBe(3);
+      });
+
+      it("should remove all elements but still be there if txn is exited", function() {
+
+        var list = new NumberList([1, 2, 3]);
+
+        // ---
+
+        list.clear();
+
+        // ---
+
+        scope.exit();
+
+        // ---
+
+        expect(list.count).toBe(3);
+      });
+
+      it("should remove all elements but still be there as an ambient value if changes are cleared", function() {
+
+        var list = new NumberList([1, 2, 3]);
+
+        // ---
+
+        list.clear();
+
+        // ---
+
+        list.changeset.clearChanges();
+
+        // ---
+
+        expect(list.count).toBe(3);
+      });
+
+      it("should remove all elements and still be there if changes are cleared and the txn committed", function() {
+
+        var list = new NumberList([1, 2, 3]);
+
+        // ---
+
+        list.clear();
+
+        // ---
+
+        list.changeset.clearChanges();
+
+        scope.accept();
+
+        // ---
+
+        expect(list.count).toBe(3);
+      });
+
+      it("should remove all elements and, if added again in different order, " +
+         "these should be there again in the new order, as ambient values", function() {
+
+        var list = new NumberList([1, 2, 3]);
+        var elem1 = list.at(0);
+        var elem2 = list.at(1);
+        var elem3 = list.at(2);
+
+        // ---
+
+        list.clear();
+        list.add(elem2);
+        list.add(elem1);
+        list.add(elem3);
+
+        // ---
+
+        expect(list.count).toBe(3);
+        expect(list.at(0)).toBe(elem2);
+        expect(list.at(1)).toBe(elem1);
+        expect(list.at(2)).toBe(elem3);
+      });
+
+      it("should remove all elements and, if added again in different order, " +
+          "these should be there again in the new order, when committed", function() {
+
+        var list = new NumberList([1, 2, 3]);
+        var elem1 = list.at(0);
+        var elem2 = list.at(1);
+        var elem3 = list.at(2);
+
+        // ---
+
+        list.clear();
+        list.add(elem2);
+        list.add(elem1);
+        list.add(elem3);
+
+        // ---
+
+        scope.accept();
+
+        // ---
+
+        expect(list.count).toBe(3);
+        expect(list.at(0)).toBe(elem2);
+        expect(list.at(1)).toBe(elem1);
+        expect(list.at(2)).toBe(elem3);
+      });
+
+      it("should remove all elements and, if added again, these should still be there when rejected", function() {
+
+        var list = new NumberList([1, 2, 3]);
+        var elem1 = list.at(0);
+        var elem2 = list.at(1);
+        var elem3 = list.at(2);
+
+        // ---
+
+        list.clear();
+        list.add(elem2);
+        list.add(elem1);
+        list.add(elem3);
+
+        // ---
+
+        try { scope.reject(); } catch(ex) { /* swallow thrown rejection */ }
+
+        // ---
+
+        expect(list.count).toBe(3);
+        expect(list.at(0)).toBe(elem1);
+        expect(list.at(1)).toBe(elem2);
+        expect(list.at(2)).toBe(elem3);
+      });
+    });
+
+    describe("references", function() {
+      function expectSingleRefTo(elem, to) {
+        var refs = elem.$references;
+
+        expect(refs.length).toBe(1);
+        expect(refs[0].container).toBe(to);
+        expect(refs[0].property).toBe(null);
+      }
+
+      function expectNoRefs(elem) {
+        var refs = elem.$references;
+
+        expect(!refs || !refs.length).toBe(true);
+      }
+
+      var scope;
+
+      beforeEach(function() {
+        scope = context.enterChange();
+      });
+
+      afterEach(function() {
+        scope.dispose();
+      });
+
+      // coverage
+      describe("when element is simple", function() {
+
+        describe("when list is of non-simple type", function() {
+          it("should not try to remove references", function() {
+
+            var list = new List([1, 2, 3]);
+
+            // ---
+
+            list.clear();
+          });
+
+          it("should not try to cancel removed references when changes are cleared", function() {
+
+            var list = new List([1, 2, 3]);
+
+            // ---
+
+            list.clear();
+
+            // ---
+
+            list.changeset.clearChanges();
+          });
+        });
+
+        it("should not try to remove references", function() {
+
           var list = new NumberList([1, 2, 3]);
-          var change = new Clear();
-          expect(list.count).toBe(3);
 
-          change._apply(list);
+          // ---
 
-          expect(list.count).toBe(0);
+          list.clear();
+        });
+
+        it("should not try to cancel removed references when changes are cleared", function() {
+
+          var list = new NumberList([1, 2, 3]);
+
+          // ---
+
+          list.clear();
+
+          // ---
+
+          list.changeset.clearChanges();
         });
       });
 
+      describe("when element is complex", function() {
+
+        it("should remove references as soon as the change is made", function() {
+
+          var list = new ComplexList([{foo: 123}, {foo: 234}, {foo: 345}]);
+          var elem1 = list.at(0);
+          var elem2 = list.at(1);
+          var elem3 = list.at(2);
+
+          expectSingleRefTo(elem1, list);
+          expectSingleRefTo(elem2, list);
+          expectSingleRefTo(elem3, list);
+
+          // ---
+
+          list.clear();
+
+          // ---
+
+          expectNoRefs(elem1);
+          expectNoRefs(elem2);
+          expectNoRefs(elem3);
+        });
+
+        it("should remove references but should have no effect if rejected", function() {
+
+          var list = new ComplexList([{foo: 123}, {foo: 234}, {foo: 345}]);
+          var elem1 = list.at(0);
+          var elem2 = list.at(1);
+          var elem3 = list.at(2);
+
+          // ---
+
+          list.clear();
+
+          // ---
+
+          try { scope.reject(); } catch(ex) { /* swallow thrown rejection */ }
+
+          // ---
+
+          expectSingleRefTo(elem1, list);
+          expectSingleRefTo(elem2, list);
+          expectSingleRefTo(elem3, list);
+        });
+
+        it("should remove references but should have no effect if exited from", function() {
+
+          var list = new ComplexList([{foo: 123}, {foo: 234}, {foo: 345}]);
+          var elem1 = list.at(0);
+          var elem2 = list.at(1);
+          var elem3 = list.at(2);
+
+          // ---
+
+          list.clear();
+
+          // ---
+
+          scope.exit();
+
+          // ---
+
+          expectSingleRefTo(elem1, list);
+          expectSingleRefTo(elem2, list);
+          expectSingleRefTo(elem3, list);
+        });
+
+        it("should really remove references if committed", function() {
+
+          var list = new ComplexList([{foo: 123}, {foo: 234}, {foo: 345}]);
+          var elem1 = list.at(0);
+          var elem2 = list.at(1);
+          var elem3 = list.at(2);
+
+          // ---
+
+          list.clear();
+
+          // ---
+
+          scope.accept();
+
+          // ---
+
+          expectNoRefs(elem1);
+          expectNoRefs(elem2);
+          expectNoRefs(elem3);
+        });
+
+        it("should cancel removed references when changes are cleared, in ambient values", function() {
+
+          var list = new ComplexList([{foo: 123}, {foo: 234}, {foo: 345}]);
+          var elem1 = list.at(0);
+          var elem2 = list.at(1);
+          var elem3 = list.at(2);
+
+          // ---
+
+          list.clear();
+
+          // ---
+
+          list.changeset.clearChanges();
+
+          // ---
+
+          expectSingleRefTo(elem1, list);
+          expectSingleRefTo(elem2, list);
+          expectSingleRefTo(elem3, list);
+        });
+
+        it("should cancel removed references when changes are cleared, and committed", function() {
+
+          var list = new ComplexList([{foo: 123}, {foo: 234}, {foo: 345}]);
+          var elem1 = list.at(0);
+          var elem2 = list.at(1);
+          var elem3 = list.at(2);
+
+          // ---
+
+          list.clear();
+
+          // ---
+
+          list.changeset.clearChanges();
+
+          scope.accept();
+
+          // ---
+
+          expectSingleRefTo(elem1, list);
+          expectSingleRefTo(elem2, list);
+          expectSingleRefTo(elem3, list);
+        });
+
+        it("should remove references, but if the elements are added again, it should re-add the removed references " +
+           "and become visible again as ambient values", function() {
+
+          var list = new ComplexList([{foo: 123}, {foo: 234}, {foo: 345}]);
+          var elem1 = list.at(0);
+          var elem2 = list.at(1);
+          var elem3 = list.at(2);
+
+          // ---
+
+          list.clear();
+          list.add(elem1);
+          list.add(elem2);
+          list.add(elem3);
+
+          // ---
+
+          expectSingleRefTo(elem1, list);
+          expectSingleRefTo(elem2, list);
+          expectSingleRefTo(elem3, list);
+        });
+
+        it("should remove references, but if the elements are added again, it should re-add the removed references " +
+            "and still be there when committed", function() {
+
+          var list = new ComplexList([{foo: 123}, {foo: 234}, {foo: 345}]);
+          var elem1 = list.at(0);
+          var elem2 = list.at(1);
+          var elem3 = list.at(2);
+
+          // ---
+
+          list.clear();
+          list.add(elem1);
+          list.add(elem2);
+          list.add(elem3);
+
+          // ---
+
+          scope.accept();
+
+          // ---
+
+          expectSingleRefTo(elem1, list);
+          expectSingleRefTo(elem2, list);
+          expectSingleRefTo(elem3, list);
+        });
+
+        it("should remove references, but if the elements are added again, it should re-add the removed references " +
+            "and still be there when rejected", function() {
+
+          var list = new ComplexList([{foo: 123}, {foo: 234}, {foo: 345}]);
+          var elem1 = list.at(0);
+          var elem2 = list.at(1);
+          var elem3 = list.at(2);
+
+          // ---
+
+          list.clear();
+          list.add(elem1);
+          list.add(elem2);
+          list.add(elem3);
+
+          // ---
+
+          try { scope.reject(); } catch(ex) { /* swallow thrown rejection */ }
+
+          // ---
+
+          expectSingleRefTo(elem1, list);
+          expectSingleRefTo(elem2, list);
+          expectSingleRefTo(elem3, list);
+        });
+      });
     });
   });
 });

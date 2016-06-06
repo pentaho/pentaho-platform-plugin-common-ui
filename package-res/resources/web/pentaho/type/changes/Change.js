@@ -46,12 +46,12 @@ define([
      */
 
     /**
-     * Applies the contained changes to a given structured value.
+     * Applies any local primitive changes.
      *
      * @name _apply
      * @memberOf pentaho.type.changes.Change#
      * @method
-     * @param {!pentaho.type.UStructuredValue} target - The structured value to which changes are applied.
+     * @param {!pentaho.type.ContainerMixin} target - The container to which changes are applied.
      * @abstract
      */
   });

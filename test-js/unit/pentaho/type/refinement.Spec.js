@@ -622,6 +622,41 @@ define([
         });
       });
 
+      describe("#isContainer -", function() {
+        it("should be true when the representation type is a complex type", function() {
+          var MyComplex = Complex.extend();
+          var MyRefinement = Refinement.extend({
+            type: {
+              of: MyComplex.type
+            }
+          });
+
+          expect(MyRefinement.type.isContainer).toBe(true);
+        });
+
+        it("should be true when the representation type is a list type", function() {
+          var MyList = List.extend();
+          var MyRefinement = Refinement.extend({
+            type: {
+              of: MyList.type
+            }
+          });
+
+          expect(MyRefinement.type.isContainer).toBe(true);
+        });
+
+        it("should be false when the representation type is a simple type", function() {
+          var MySimple = Simple.extend();
+          var MyRefinement = Refinement.extend({
+            type: {
+              of: MySimple.type
+            }
+          });
+
+          expect(MyRefinement.type.isContainer).toBe(false);
+        });
+      });
+
       describe("#isSimple -", function() {
         it("should be true when the representation type is a simple type", function() {
           var MySimple = Simple.extend();

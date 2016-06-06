@@ -46,6 +46,25 @@ define([
       return "clear";
     },
 
+    _prepareRefs: function(txn, target) {
+      if(!target.type.of.isSimple) {
+        target._elems.forEach(function(elem) {
+          if(elem._addReference)
+            txn._ensureChangeRef(elem).removeReference(target);
+        });
+      }
+    },
+
+    _cancelRefs: function(txn, target) {
+      if(!target.type.of.isSimple) {
+
+        target._elems.forEach(function(elem) {
+          if(elem._addReference)
+            txn._ensureChangeRef(elem).addReference(target);
+        });
+      }
+    },
+
     _apply: function(target) {
       target._elems = [];
       target._keys  = {};

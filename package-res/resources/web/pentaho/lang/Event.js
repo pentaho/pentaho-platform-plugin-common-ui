@@ -84,7 +84,7 @@ define([
     },
 
     _cancelReason: null,
-    _canceled: false,
+    _isCanceled: false,
 
     /**
      * Gets the type of the event.
@@ -137,7 +137,7 @@ define([
      * @see pentaho.lang.Event#isCanceled
      */
     cancel: function(reason) {
-      if(this._cancelable) {
+      if(this._cancelable && !this._isCanceled) {
         if(!reason) reason = "canceled";
 
         if(typeof reason === "string") {
@@ -145,8 +145,9 @@ define([
         } else if(!(reason instanceof UserError)) {
           throw error.argInvalidType("reason", ["string", "pentaho/lang/UserError"], typeof reason);
         }
+
         this._cancelReason = reason;
-        this._canceled = true;
+        this._isCanceled = true;
       }
     },
 
@@ -157,7 +158,7 @@ define([
      * @readonly
      */
     get isCanceled() {
-      return this._canceled;
+      return this._isCanceled;
     },
 
     /**

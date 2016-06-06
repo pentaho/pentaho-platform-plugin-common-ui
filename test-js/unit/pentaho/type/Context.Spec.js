@@ -63,6 +63,15 @@ define([
         });
       });
 
+      it("should create a context that has a null transaction by default", function() {
+
+        return require.using(["pentaho/type/Context"],
+            function(Context) {
+              var context = new Context();
+              expect(context.transaction).toBe(null);
+            });
+      });
+
       it("should respect a given contextVars instance", function() {
 
         return require.using(["pentaho/type/Context", "pentaho/GlobalContextVars"],
@@ -70,6 +79,117 @@ define([
           var vars = new GlobalContextVars();
           var context = new Context(vars);
           expect(context.vars).toBe(vars);
+        });
+      });
+    });
+
+    describe("#transaction", function() {
+      // Read
+    });
+
+    describe("#enterChange()", function() {
+
+      it("should return a TransactionScope instance", function() {
+
+        return require.using(["pentaho/type/Context", "pentaho/type/changes/TransactionScope"],
+            function(Context, TransactionScope) {
+              var context = new Context();
+              var txnScope = context.enterChange();
+
+              expect(txnScope instanceof TransactionScope).toBe(true);
+
+              txnScope.exit();
+            });
+      });
+
+      it("should return a TransactionScope instance whose transaction is now the ambient transaction", function() {
+
+        return require.using(["pentaho/type/Context"],
+            function(Context) {
+              var context = new Context();
+              var txnScope = context.enterChange();
+
+              expect(txnScope.transaction).toBe(context.transaction);
+
+              txnScope.exit();
+            });
+      });
+
+      it("should return a TransactionScope whose context is this one", function() {
+
+        return require.using(["pentaho/type/Context"],
+            function(Context) {
+              var context = new Context();
+              var txnScope = context.enterChange();
+
+              expect(txnScope.context).toBe(context);
+            });
+      });
+
+      it("should return a new TransactionScope instance each time", function() {
+
+        return require.using(["pentaho/type/Context", "pentaho/type/changes/TransactionScope"],
+            function(Context) {
+              var context = new Context();
+              var txnScope1 = context.enterChange();
+              var txnScope2 = context.enterChange();
+
+              expect(txnScope1).not.toBe(txnScope2);
+            });
+      });
+
+      it("should return a new TransactionScope of the same transaction, each time", function() {
+
+        return require.using(["pentaho/type/Context", "pentaho/type/changes/TransactionScope"],
+            function(Context) {
+              var context = new Context();
+              var txnScope1 = context.enterChange();
+              var txnScope2 = context.enterChange();
+
+              expect(txnScope1.transaction).toBe(txnScope2.transaction);
+            });
+      });
+
+      it("should call the new ambient transaction's #_enteringAmbient method", function() {
+
+        return require.using([
+          "pentaho/type/Context",
+          "pentaho/type/changes/Transaction",
+          "pentaho/type/changes/TransactionScope"
+        ], function(Context, Transaction, TransactionScope) {
+          var context = new Context();
+          var txn = new Transaction(context);
+
+          spyOn(txn, "_enteringAmbient");
+
+          var scope = new TransactionScope(context, txn);
+
+          expect(txn._enteringAmbient).toHaveBeenCalled();
+
+          scope.exit();
+        });
+      });
+
+      it("should call the suspending ambient transaction's _exitingAmbient, when a null scope enters", function() {
+
+        return require.using([
+          "pentaho/type/Context",
+          "pentaho/type/changes/Transaction",
+          "pentaho/type/changes/TransactionScope",
+          "pentaho/type/changes/CommittedScope"
+        ], function(Context, Transaction, TransactionScope, CommittedScope) {
+          var context = new Context();
+          var txn = new Transaction(context);
+          var scope = new TransactionScope(context, txn);
+
+          spyOn(txn, "_exitingAmbient");
+
+          var scopeNull = new CommittedScope(context);
+
+          expect(txn._exitingAmbient).toHaveBeenCalled();
+
+          scopeNull.exit();
+          scope.exit();
         });
       });
     });
@@ -155,7 +275,7 @@ define([
 
               // expect to throw
               expect(function() {
-                context.get("my/foo")
+                context.get("my/foo");
               }).toThrow();
             });
         });

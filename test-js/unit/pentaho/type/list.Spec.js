@@ -389,16 +389,16 @@ define([
     //endregion
 
     //region read methods
-    describe("#uid -", function() {
+    describe("#$uid -", function() {
       it("should return a string value", function() {
-        var uid = new List().uid;
+        var uid = new List().$uid;
         expect(typeof uid).toBe("string");
       });
 
       it("should have a distinct value for every instance", function() {
-        var uid1 = new List().uid,
-            uid2 = new List().uid,
-            uid3 = new List().uid;
+        var uid1 = new List().$uid,
+            uid2 = new List().$uid,
+            uid3 = new List().$uid;
         expect(uid1).not.toBe(uid2);
         expect(uid2).not.toBe(uid3);
         expect(uid3).not.toBe(uid1);
@@ -408,7 +408,7 @@ define([
     describe("#key -", function() {
       it("should return the value of #uid", function() {
         var value = new List();
-        expect(value.uid).toBe(value.key);
+        expect(value.$uid).toBe(value.key);
       });
     });
 
@@ -729,7 +729,7 @@ define([
     // insert or update
     //region #insert(fragment, index)
     describe("#insert(fragment, index) -", function() {
-      it("should apply changes on the owner object when owned", function() {
+      it("should emit will and did change events on the containing complex object", function() {
 
         var Derived = Complex.extend({
           type: {
@@ -740,16 +740,21 @@ define([
         });
 
         var derived = new Derived();
-        spyOn(derived, "_applyChanges").and.callThrough();
+
+        var listeners = jasmine.createSpyObj("listeners", ["will", "did", "rejected"]);
+        derived.on("will:change",     listeners.will);
+        derived.on("rejected:change", listeners.rejected);
+        derived.on("did:change",      listeners.did);
 
         var list = derived.get("foo");
 
         list.insert([1, 2, 3]);
 
         // ----
-        expect(derived._applyChanges).toHaveBeenCalled();
 
-        _expectEqualValueAt(list, [1, 2, 3]);
+        expect(listeners.will).toHaveBeenCalled();
+        expect(listeners.did).toHaveBeenCalled();
+        expect(listeners.rejected).not.toHaveBeenCalled();
       });
 
       it("should append a given array of convertible values, to an empty list, when index is not specified",
@@ -875,7 +880,7 @@ define([
 
     //region #remove(fragment)
     describe("#remove(fragment) -", function() {
-      it("should apply changes on the owner object when owned", function() {
+      it("should emit will and did change events on the containing complex object", function() {
 
         var Derived = Complex.extend({
           type: {
@@ -886,18 +891,21 @@ define([
         });
 
         var derived = new Derived();
-        spyOn(derived, "_applyChanges").and.callThrough();
 
-        var list = derived.get("foo");
-        var elem = list.at(0); // 1
+        var listeners = jasmine.createSpyObj("listeners", ["will", "did", "rejected"]);
+        derived.on("will:change",     listeners.will);
+        derived.on("rejected:change", listeners.rejected);
+        derived.on("did:change",      listeners.did);
 
-        expect(list.count).toBe(3);
+        var list = derived.foo;
 
-        list.remove(elem);
+        list.remove(list.at(0));
 
         // ----
-        expect(derived._applyChanges).toHaveBeenCalled();
-        _expectEqualValueAt(list, [2, 3]);
+
+        expect(listeners.will).toHaveBeenCalled();
+        expect(listeners.did).toHaveBeenCalled();
+        expect(listeners.rejected).not.toHaveBeenCalled();
       });
 
       it("should remove a given element that is present in the list", function() {
@@ -972,7 +980,8 @@ define([
 
     //region #clear()
     describe("#clear() -", function() {
-      it("should apply changes on the owner object when owned", function() {
+      it("should emit will and did change events on the containing complex object", function() {
+
         var Derived = Complex.extend({
           type: {
             props: {
@@ -982,19 +991,19 @@ define([
         });
 
         var derived = new Derived();
-        spyOn(derived, "_applyChanges").and.callThrough();
 
-        expect(derived.count("foo")).toBe(3);
+        var listeners = jasmine.createSpyObj("listeners", ["will", "did", "rejected"]);
+        derived.on("will:change",     listeners.will);
+        derived.on("rejected:change", listeners.rejected);
+        derived.on("did:change",      listeners.did);
+
+        derived.foo.clear();
 
         // ----
 
-        derived.get("foo").clear();
-
-        // ----
-
-        expect(derived._applyChanges).toHaveBeenCalled();
-
-        expect(derived.count("foo")).toBe(0);
+        expect(listeners.will).toHaveBeenCalled();
+        expect(listeners.did).toHaveBeenCalled();
+        expect(listeners.rejected).not.toHaveBeenCalled();
       });
 
       it("should clear all elements of the list", function() {
@@ -1014,7 +1023,7 @@ define([
 
     //region #removeAt(start, count[, silent])
     describe("#removeAt(start, count[, silent]) -", function() {
-      it("should apply changes on the owner object when owned", function() {
+      it("should emit will and did change events on the containing complex object", function() {
 
         var Derived = Complex.extend({
           type: {
@@ -1025,16 +1034,19 @@ define([
         });
 
         var derived = new Derived();
-        spyOn(derived, "_applyChanges").and.callThrough();
 
-        var list = derived.get("foo");
+        var listeners = jasmine.createSpyObj("listeners", ["will", "did", "rejected"]);
+        derived.on("will:change",     listeners.will);
+        derived.on("rejected:change", listeners.rejected);
+        derived.on("did:change",      listeners.did);
 
-        list.removeAt(1, 1);
+        derived.foo.removeAt(1, 1);
 
         // ----
-        expect(derived._applyChanges).toHaveBeenCalled();
 
-        _expectEqualValueAt(list, [1, 3, 4]);
+        expect(listeners.will).toHaveBeenCalled();
+        expect(listeners.did).toHaveBeenCalled();
+        expect(listeners.rejected).not.toHaveBeenCalled();
       });
 
       it("should remove the element at the given in-range index when count is 1", function() {
@@ -1254,7 +1266,7 @@ define([
 
     //region #sort(comparer[, silent])
     describe("#sort(comparer[, silent]) -", function() {
-      it("should apply changes on the owner object when owned", function() {
+      it("should emit will and did change events on the containing complex object", function() {
 
         var Derived = Complex.extend({
           type: {
@@ -1265,17 +1277,17 @@ define([
         });
 
         var derived = new Derived();
-        spyOn(derived, "_applyChanges").and.callThrough();
 
-        var list = derived.get("foo");
+        var listeners = jasmine.createSpyObj("listeners", ["will", "did", "rejected"]);
+        derived.on("will:change",     listeners.will);
+        derived.on("rejected:change", listeners.rejected);
+        derived.on("did:change",      listeners.did);
 
-        expect(list.at(0).value).toBe(4);
+        derived.foo.sort(fun.compare);
 
-        list.sort(fun.compare);
-
-        // ----
-        expect(derived._applyChanges).toHaveBeenCalled();
-        _expectEqualValueAt(list, [1, 2, 3, 4]);
+        expect(listeners.will).toHaveBeenCalled();
+        expect(listeners.did).toHaveBeenCalled();
+        expect(listeners.rejected).not.toHaveBeenCalled();
       });
 
       it("should sort the list", function() {
@@ -1324,6 +1336,12 @@ define([
       describe("#isList -", function() {
         it("should return the value `true`", function() {
           expect(List.type.isList).toBe(true);
+        });
+      });
+
+      describe("#isContainer", function() {
+        it("should have value `true`", function () {
+          expect(List.type.isContainer).toBe(true);
         });
       });
     }); //endregion Type

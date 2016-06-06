@@ -41,7 +41,8 @@ define([
    *
    * @param {!pentaho.type.Complex} source - The object which is emitting the event.
    * @param {!pentaho.type.ComplexChangeset} changeset - The changes to be made to the values of the properties.
-   * @param {!Error|pentaho.lang.UserError} error - The error of a rejected {@link pentaho.lang.ActionResult|ActionResult}.
+   * @param {!Error|pentaho.lang.UserError} error - The error of a rejected
+   * {@link pentaho.lang.ActionResult|ActionResult}.
    */
   return Event.extend("pentaho.type.events.RejectedChange",
     /** @lends pentaho.type.events.RejectedChange# */{

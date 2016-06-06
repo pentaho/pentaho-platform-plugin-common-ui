@@ -18,7 +18,7 @@ define([
   "./element",
   "./PropertyTypeCollection",
   "./valueHelper",
-  "../lang/EventSource",
+  "./ContainerMixin",
   "../lang/ActionResult",
   "../lang/UserError",
   "./events/WillChange",
@@ -29,7 +29,7 @@ define([
   "../util/object",
   "../util/error"
 ], function(module, elemFactory, PropertyTypeCollection, valueHelper,
-            EventSource, ActionResult, UserError, WillChange, RejectedChange, DidChange,
+            ContainerMixin, ActionResult, UserError, WillChange, RejectedChange, DidChange,
             ComplexChangeset, bundle, O, error) {
 
   "use strict";
@@ -39,8 +39,6 @@ define([
   // Will cause requiring Component during it's own build procedure...
   // Need to recognize requests for the currently being built _top-level_ complex in a special way -
   // the one that cannot be built and have a module id.
-
-  var _complexNextUid = 1;
 
   return function(context) {
 
@@ -60,6 +58,8 @@ define([
      * @name pentaho.type.Complex
      * @class
      * @extends pentaho.type.Element
+     * @mixes pentaho.type.ContainerMixin
+     *
      * @amd {pentaho.type.Factory<pentaho.type.Complex>} pentaho/type/complex
      *
      * @classDesc The base class of complex types.
@@ -105,22 +105,28 @@ define([
 
       // NOTE 2: keep the constructor code synced with #clone !
       constructor: function(spec) {
+
+        this._initContainer();
+
         // Create `Property` instances.
-        var pTypes = this.type._getProps(),
-            i = pTypes.length,
+        var propTypes = this.type._getProps(),
+            i = propTypes.length,
             nameProp = !spec ? undefined : (Array.isArray(spec) ? "index" : "name"),
             values = {},
-            pType, value;
+            propType, value;
 
         while(i--) {
-          pType = pTypes[i];
-          values[pType.name] = value = pType.toValue(nameProp && spec[pType[nameProp]]);
-          if(pType.isList) value.setOwnership(this, pType);
+          propType = propTypes[i];
+          values[propType.name] = value = propType.toValue(nameProp && spec[propType[nameProp]]);
+
+          // If this instance is being newed up while there is an ambient transaction,
+          // it should not cease to exist if the txn is rejected,
+          // nor should its construction time property values be restored to... what? default values?
+          // So, references added should also not be subject to the ambient transaction.
+          if(value && value._addReference) value._addReference(this, propType);
         }
 
         this._values = values;
-        this._uid = String(_complexNextUid++);
-        this._changeset = null;
       },
 
       /**
@@ -143,30 +149,27 @@ define([
        * @protected
        */
       _clone: function(clone) {
+
+        this._cloneContainer(clone);
+
         // All properties are copied except lists, which are shallow cloned.
-        var pTypes = this.type._getProps(),
-            i = pTypes.length,
-            values = this._values,
+        // List properties are not affected by changesets.
+        var propTypes = this.type._getProps(),
+            source = (this._cset || this),
+            i = propTypes.length,
             cloneValues = {},
-            pType, v;
+            propType, name, value;
 
         while(i--) {
-          pType = pTypes[i];
-          v = values[pType.name];
-          cloneValues[pType.name] = v && pType.isList ? v.clone() : v;
+          propType = propTypes[i];
+          name  = propType.name;
+          cloneValues[name] = value = propType.isList ? this._getByName(name).clone() : source._getByName(name);
+
+          // See note on constructor. The same reasoning applies to a new clone instance.
+          if(value && value._addReference) value._addReference(clone, propType);
         }
 
         clone._values = cloneValues;
-        clone._uid = String(_complexNextUid++);
-      },
-
-      /**
-       * Gets the unique id of the complex instance.
-       * @type {string}
-       * @readonly
-       */
-      get uid() {
-        return this._uid;
       },
 
       /**
@@ -183,7 +186,7 @@ define([
        * then {@link pentaho.type.Value.Type#areEqual} should return `false`.
        *
        * The default complex implementation, returns the value of the
-       * complex instance's {@link pentaho.type.Complex#uid}.
+       * complex instance's {@link pentaho.type.Complex#$uid}.
        *
        * @type string
        * @readonly
@@ -216,7 +219,18 @@ define([
        */
       get: function(name, sloppy) {
         var pType = this.type.get(name, sloppy);
-        return pType ? this._values[pType.name] : undefined;
+        if(pType) return this._getByType(pType);
+      },
+
+      // friend Property.Type
+      _getByType: function(pType) {
+        // List values are never changed directly, only within,
+        // so there's no need to waste time asking the changeset for changes.
+        return (pType.isList ? this : (this._cset || this))._getByName(pType.name);
+      },
+
+      _getByName: function(name) {
+        return this._values[name];
       },
 
       /**
@@ -348,8 +362,6 @@ define([
        * @param {nonEmptyString|!pentaho.type.Property.Type} name - The property name or type object.
        * @param {any?} [valueSpec=null] A value specification.
        *
-       * @return {pentaho.lang.ActionResult} The result object.
-       *
        * @throws {pentaho.lang.ArgumentInvalidError} When a property with name `name` is not defined.
        *
        * @fires "will:change"
@@ -357,124 +369,42 @@ define([
        * @fires "rejected:change"
        */
       set: function(name, valueSpec) {
+        var propType = this.type.get(name);
+        if(propType.isList)
+        // Delegate to List#set.
+          this._values[propType.name].set(valueSpec);
+        else
+          ComplexChangeset._setElement(this, propType, valueSpec);
+      },
 
-        // TODO: returning ActionResult is a temporary measure until transactions exist,
-        // and then provide an overall result upon commit.
+      _configure: function(config) {
+        this._usingChangeset(function() {
 
-        var pType = this.type.get(name);
-        var pName = pType.name;
-        var value0 = this._values[pName];
-        var value1;
+          if(config instanceof Complex) {
 
-        // Detect if any changes are actually being made
-        if(pType.isList) {
-          // Delegate the act of creation of a changeset to the list.
-          // The list will create the ComplexChangeset instance and eventually invoke #_applyChanges
-          return value0.set(valueSpec);
-        } else {
-          value1 = pType.toValue(valueSpec);
-          if(pType.type.areEqual(value0, value1)) {
-            return ActionResult.reject(new UserError("Nothing to do"));
+            // TODO: should copy only the properties of the LCA type?
+
+            // Copy common properties, if it is a subtype of this one.
+            if(config.type.isSubtypeOf(this.type))
+              this.type.each(function(propType) {
+                this.set(propType, config.get(propType.name));
+              }, this);
+
+          } else {
+
+            // TODO: should it be sloppy in this case?
+
+            for(var name in config)
+              if(O.hasOwn(config, name))
+                this.set(name, config[name]);
+
           }
-        }
-
-        // If we are still here, the value of a Simple is about to change
-
-        // Recycle an existing _current_ changeset, if it exists.
-        var createdChangeset;
-        var changeset = this._changeset;
-        if((createdChangeset = !changeset)) changeset = new ComplexChangeset(this);
-
-        // Add or edit the change
-        changeset._changeSimpleValue(pName, value1);
-
-        if(createdChangeset) return this._applyChanges();
-        // else keeps the changeset and returns undefined, for now
-      },
-      
-      /**
-       * Applies any current changes.
-       *
-       * Orchestrates the will/did/rejected event loop around property changes.
-       *
-       * @return {!pentaho.lang.ActionResult} The result object,
-       * that is rejected if the changeset has no changes,
-       * if the change loop was canceled or invalid,
-       * or is fulfilled otherwise.
-       *
-       * @private
-       */
-      _applyChanges: function() {
-        var changeset = this._changeset;
-        var error;
-
-        if(changeset && changeset.hasChanges) {
-          error = this._changeWill(changeset);
-
-          // NOTE: see note on Changeset#apply, about clearing the complex's current changeset.
-          if(error || (error = changeset.apply()))
-            this._changeRejected(changeset, error);
-          else
-            this._changeDid(changeset);
-
-        } else {
-          if(changeset) changeset.cancel();
-
-          error = new UserError("Nothing to do");
-        }
-
-        return error ? ActionResult.reject(error) : ActionResult.fulfill(changeset);
+        });
       },
 
-      /**
-       * Emits the "will:change" event, if need be.
-       *
-       * If the event is emitted and rejected, this method cancels the changeset as well.
-       *
-       * @param {!pentaho.type.ComplexChangeset} changeset - The set of changes.
-       *
-       * @return {Error|undefined} An error if the change loop was canceled or invalid,
-       * or `undefined` otherwise.
-       *
-       * @private
-       */
-      _changeWill: function(changeset) {
-        if(this._hasListeners("will:change")) {
-          var event = new WillChange(this, changeset);
-          if(!this._emitSafe(event)) {
-
-            changeset.cancel();
-
-            return event.cancelReason;
-          }
-        }
-      },
-
-      /**
-       * Emits the "did:change" event, if need be.
-       *
-       * @param {!pentaho.type.ComplexChangeset} changeset - The set of changes.
-       *
-       * @private
-       */
-      _changeDid: function(changeset) {
-        if(this._hasListeners("did:change")) {
-          this._emitSafe(new DidChange(this, changeset));
-        }
-      },
-
-      /**
-       * Emits the "will:change" event, if need be.
-       *
-       * @param {!pentaho.type.ComplexChangeset} changeset - The set of changes.
-       * @param {!Error} reason - The reason why the change loop was rejected.
-       *
-       * @private
-       */
-      _changeRejected: function(changeset, reason) {
-        if(this._hasListeners("rejected:change")) {
-          this._emitSafe(new RejectedChange(this, changeset, reason));
-        }
+      // implement abstract pentaho.type.ContainerMixin#_createChangeset
+      _createChangeset: function(txn) {
+        return new ComplexChangeset(txn, this);
       },
       //endregion
 
@@ -560,9 +490,8 @@ define([
         var pType = this.type.get(name, sloppy);
         if(!pType) return 0;
 
-        var value = this._values[pType.name];
-        return pType.isList ? value.count :
-          value ? 1 : 0;
+        var value = this._getByType(pType);
+        return pType.isList ? value.count : (value ? 1 : 0);
       },
 
       /**
@@ -600,11 +529,11 @@ define([
 
         if(!pType) return undefined;
 
-        var pValue = this._values[pType.name];
+        var value = this._getByType(pType);
 
-        if(pType.isList) return /* assert pValue */pValue.at(index || 0);
+        if(pType.isList) /* assert value */ return value.at(index || 0);
 
-        return pValue && !index ? pValue : null;
+        return value && !index ? value : null;
       },
 
       /**
@@ -798,7 +727,7 @@ define([
 
           if(omitProps && O.hasOwn(omitProps, name)) return;
 
-          var value = this._values[name];
+          var value = this._getByType(propType);
 
           var includeValue = includeDefaults;
           if(!includeValue) {
@@ -864,6 +793,7 @@ define([
         styleClass: "pentaho-type-complex",
 
         get isComplex() { return true; },
+        get isContainer() { return true; },
 
         //region properties property
         _props: null,
@@ -1031,7 +961,7 @@ define([
         //endregion
       }
     })
-    .implement(EventSource)
+    .implement(ContainerMixin)
     .implement({
       type: bundle.structured.complex
     });
