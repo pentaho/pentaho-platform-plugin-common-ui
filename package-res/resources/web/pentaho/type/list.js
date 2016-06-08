@@ -431,13 +431,14 @@ define([
       /**
        * Creates an array with the elements of the list or values derived from each element.
        *
-       * @param {function(pentaho.type.Element):any} [map] A function that converts each element into something else.
+       * @param {function(pentaho.type.Element):any} [map] - A function that converts each element into something else.
+       * @param {Object} [ctx] - The JS context object on which to call `map`.
        *
        * @return {Array.<any>} An array of elements.
        */
-      toArray: function(map) {
+      toArray: function(map, ctx) {
         var elems = this._projectedMock._elems;
-        return map ? elems.map(map) : elems.slice();
+        return map ? elems.map(map, ctx) : elems.slice();
       },
 
       /**

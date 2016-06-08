@@ -694,6 +694,48 @@ define([
         });
       });
 
+      describe("#anyLevelsQuantitative", function() {
+        it("should be true if any level is quantitative", function() {
+          var levels = ["nominal", "ordinal", "quantitative", "foo", "bar"];
+          var MyMapping = Mapping.extend({type: {levels: levels}});
+
+          expect(MyMapping.type.anyLevelsQuantitative).toBe(true);
+        });
+
+        it("should be false if not any level is quantitative", function() {
+          var levels = ["foo", "ordinal", "nominal", "bar"];
+          var MyMapping = Mapping.extend({type: {levels: levels}});
+
+          expect(MyMapping.type.anyLevelsQuantitative).toBe(false);
+        });
+      });
+
+      describe("#anyLevelsQualitative", function() {
+        it("should be true if any level is qualitative", function() {
+          var levels = ["foo", "ordinal", "quantitative", "bar"];
+          var MyMapping = Mapping.extend({type: {levels: levels}});
+
+          expect(MyMapping.type.anyLevelsQualitative).toBe(true);
+
+          levels = ["nominal", "bar"];
+          MyMapping = Mapping.extend({type: {levels: levels}});
+
+          expect(MyMapping.type.anyLevelsQualitative).toBe(true);
+
+          levels = ["nominal", "ordinal"];
+          MyMapping = Mapping.extend({type: {levels: levels}});
+
+          expect(MyMapping.type.anyLevelsQualitative).toBe(true);
+        });
+
+        it("should be false if not any level is qualitative", function() {
+          var levels = ["quantitative", "other", "foo"];
+          var MyMapping = Mapping.extend({type: {levels: levels}});
+
+          expect(MyMapping.type.anyLevelsQualitative).toBe(false);
+        });
+      });
+
       describe("#dataType", function() {
         it("should throw an error, when it is not a subtype of the dataType of the ancestor mapping type", function() {
           var dataTypeA = Complex.extend().type;

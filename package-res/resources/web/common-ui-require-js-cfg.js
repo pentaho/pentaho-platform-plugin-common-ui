@@ -201,12 +201,12 @@
 
   requireService["pentaho/type/config/AmdLoadedConfigurationService"] = "pentaho.type.IConfigurationService";
 
-  function mapTheme(mid, themes) {
+  function mapTheme(mid, themeRoot, themes) {
     var theme = (typeof active_theme !== "undefined") ? active_theme : null;
     if(!theme || themes.indexOf(theme) < 0) theme = themes[0];
 
     // e.g. "/theme" -> "/themes/crystal"
-    requireMap["*"][mid + "/theme"] = mid + "/themes/" + theme;
+    requireMap["*"][mid + "/theme"] = mid + "/" + themeRoot + "/" + theme;
   }
 
   function registerVizPackage(name) {
@@ -215,18 +215,14 @@
     requireService[name] = "pentaho/visual/base";
   }
 
-  // CCC Theme
-  mapTheme("pentaho/visual/ccc/abstract", ["default"]);
+  // Metadata Model Base Theme
+  mapTheme("pentaho/type", "themes", ["crystal"]);
 
-  mapTheme("pentaho/visual/ccc/bar", ["det"]);
-  mapTheme("pentaho/visual/ccc/barHorizontal", ["det"]);
-  mapTheme("pentaho/visual/ccc/barNormalized", ["det"]);
-  mapTheme("pentaho/visual/ccc/barNormalizedHorizontal", ["det"]);
-  mapTheme("pentaho/visual/ccc/barStacked", ["det"]);
-  mapTheme("pentaho/visual/ccc/barStackedHorizontal", ["det"]);
+  // CCC Themes
+  mapTheme("pentaho/visual/ccc", "_themes", ["crystal", "onyx", "det"]);
 
   // sample/calc theme
-  mapTheme("pentaho/visual/samples/calc", ["crystal"]);
+  mapTheme("pentaho/visual/samples/calc", "themes", ["crystal"]);
 
   [
     // base visual

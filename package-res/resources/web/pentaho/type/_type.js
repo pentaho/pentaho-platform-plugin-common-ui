@@ -24,7 +24,8 @@ define([
   "../util/arg",
   "../util/object",
   "../util/fun",
-  "../util/promise"
+  "../util/promise",
+  "./theme/model"
 ], function(localRequire, SpecificationScope, SpecificationContext, bundle, Base,
     AnnotatableLinked, error, arg, O, F, promiseUtil) {
 
@@ -735,16 +736,27 @@ define([
         this._styleClass = nonEmptyString(value);
       },
 
-      // TODO: implement inheritedStyleClasses
       /**
        * Gets the style classes of this and any base types.
+       *
+       * Do **NOT** modify the returned array.
        *
        * @type string[]
        * @readonly
        */
       get inheritedStyleClasses() {
-        /* istanbul ignore next: not implemented yet */
-        throw error.notImplemented("Implement me!");
+        var styleClasses;
+        var styleClass = this._styleClass;
+
+        var baseType = this !== _type ? Object.getPrototypeOf(this) : null;
+        if(baseType) {
+          styleClasses = baseType.inheritedStyleClasses;
+          if(styleClass) styleClasses = styleClasses.concat(styleClass);
+        } else {
+          styleClasses = styleClass ? [styleClass] : [];
+        }
+
+        return styleClasses;
       },
       //endregion
 
@@ -1360,9 +1372,7 @@ define([
 
     _type = Type.prototype;
 
-    Type
-      .implement(AnnotatableLinked)
-      .implement(bundle.structured.instance);
+    Type.implement(AnnotatableLinked);
 
     return Type;
   };

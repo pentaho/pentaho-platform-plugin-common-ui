@@ -17,8 +17,7 @@ define([
   "../barAbstract/model",
   "pentaho/i18n!../abstract/i18n/model",
   "../abstract/types/labelsOption",
-  "../abstract/mixins/trendType",
-  "./theme/model"
+  "../abstract/mixins/trendType"
 ], function(barAbstractModelFactory, bundle, labelsOptionFactory, trendType) {
 
   "use strict";
@@ -41,7 +40,8 @@ define([
             name: "measures", //VISUAL_ROLE
             type: {
               props: {attributes: {isRequired: true}}
-            }
+            },
+            ordinal: 7
           },
           {
             name: "labelsOption",
