@@ -212,7 +212,7 @@ define([
     /**
      * Iterates through all of the changesets.
      *
-     * @param {function(this:pentaho.type.changes.Transaction), pentaho.type.changes.Changeset):boolean} fun - The
+     * @param {function(this:pentaho.type.changes.Transaction, pentaho.type.changes.Changeset):boolean} fun - The
      * iteratee method.
      *
      * @private
