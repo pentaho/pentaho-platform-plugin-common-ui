@@ -93,7 +93,7 @@ define([
     },
 
     /**
-     * Gets the unique id of the instance.
+     * Gets the unique identifier of the instance.
      *
      * @type {string}
      * @readonly

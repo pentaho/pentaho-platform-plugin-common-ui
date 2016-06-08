@@ -219,7 +219,7 @@ define([
        *
        * @name configure
        * @memberOf pentaho.type.Simple#
-       * @param {?any} config The configuration.
+       * @param {?any} config - The configuration.
        * @return {!pentaho.type.Simple} This instance.
        */
 
@@ -230,7 +230,7 @@ define([
        *
        * The default implementation does nothing.
        *
-       * @param {any} config The configuration.
+       * @param {any} config - The configuration.
        */
       _configure: function(config) {
         // Nothing configurable at this level
@@ -336,11 +336,11 @@ define([
          * This method validates that the given value is not {@link Nully}.
          * Then, it delegates the actual conversion to the [cast]{@link pentaho.type.Simple#cast} method.
          * Any user errors thrown by the `cast` method itself are thrown back to this method's caller.
-         * If, however, the `cast` method returns a {@link Nully} value,
+         * However, if the `cast` method returns a {@link Nully} value,
          * this method then throws an error, in its behalf,
          * informing that the given value cannot be converted to this type.
          *
-         * @param {!any} value The value to convert.
+         * @param {!any} value - The value to convert.
          * @return {!any} The converted value.
          *
          * @throws {pentaho.lang.ArgumentRequiredError} When the given value is {@link Nully}.
@@ -376,7 +376,7 @@ define([
          *
          * The default implementation is the identity function.
          *
-         * @param {!any} value The value to convert.
+         * @param {!any} value - The value to convert.
          *
          * @return {?any} The converted value or `null`, when not possible to convert.
          *
@@ -414,7 +414,7 @@ define([
      * @name extend
      * @memberOf pentaho.type.Simple
      *
-     * @param {string} [name] The name of the created class. Used for debugging purposes.
+     * @param {string} [name] The name of the created class; used for debugging purposes.
      * @param {pentaho.type.spec.ISimpleProto} [instSpec] The instance specification.
      * @param {Object} [classSpec] The static specification.
      * @param {Object} [keyArgs] The keyword arguments.

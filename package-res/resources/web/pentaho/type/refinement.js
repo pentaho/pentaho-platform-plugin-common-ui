@@ -94,7 +94,7 @@ define([
      *
      * ### Attributes of refinement types
      *
-     * A refinement type is a [Value]{@link pentaho.type.Value.Type} type,
+     * A refinement type is a [Value]{@link pentaho.type.Value.Type} type 
      * and, as such, metadata can be specified for it.
      *
      * Conveniently,
@@ -126,7 +126,7 @@ define([
      *
      * ### Defining a refinement type
      *
-     * To define a refinement type call the [refine]{@link pentaho.type.Value.refine} method
+     * To define a refinement type, call the [refine]{@link pentaho.type.Value.refine} method
      * of the representation type's instance constructor.
      *
      * An existing refinement type can be further refined simply by
@@ -297,7 +297,7 @@ define([
          * Gets or sets the refinement facet classes
          * that are mixed in this refinement type.
          *
-         * Can be set to either refinement facet ids or classes,
+         * Can be set to either refinement facet identifiers or classes,
          * to add facets to the refinement type.
          *
          * The attributes defined by the added refinement facets become available for
@@ -444,7 +444,7 @@ define([
          *
          * A refinement type is a subtype of its representation type, [of]{@link pentaho.type.Refinement.Type#of}.
          *
-         * @param {?pentaho.type.Type} superType The candidate super-type.
+         * @param {?pentaho.type.Type} superType - The candidate super-type.
          * @return {boolean} `true` if this is a subtype of `superType` type, `false` otherwise.
          */
         isSubtypeOf: function(superType) {
@@ -609,10 +609,10 @@ define([
          *
          * The default implementation calls `value.validate()` and,
          * if the latter returns no errors,
-         * additionally validates the value against this type's refinement facets,
+         * it additionally validates the value against this type's refinement facets,
          * by calling [_validateFacets]{@link pentaho.type.Refinement.Type#_validateFacets}.
          *
-         * @param {!pentaho.type.Value} value The value to validate.
+         * @param {!pentaho.type.Value} value - The value to validate.
          *
          * @return {?Array.<!pentaho.type.ValidationError>} A non-empty array of errors or `null`.
          *
@@ -641,7 +641,7 @@ define([
          * [validateInstance]{@link pentaho.type.Refinement.Type#validateInstance}.
          * It is provided just in case you need to override the latter implementation.
          *
-         * @param {!pentaho.type.Value} value The value to validate.
+         * @param {!pentaho.type.Value} value - The value to validate.
          *
          * @return {?Array.<!pentaho.type.ValidationError>} An array of errors or `null`.
          *
@@ -701,7 +701,7 @@ define([
        * @name extend
        * @memberOf pentaho.type.Refinement
        *
-       * @param {string} [name] The name of the created class. Used for debugging purposes.
+       * @param {string} [name] The name of the created class; used for debugging purposes.
        * @param {{type: pentaho.type.spec.IRefinementTypeProto}} [instSpec] The refinement type specification.
        * @param {Object} [classSpec] The static specification.
        * @param {Object} [keyArgs] The keyword arguments.

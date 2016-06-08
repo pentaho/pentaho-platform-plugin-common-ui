@@ -42,10 +42,10 @@ define(["./util/MessageBundle", "json"], function(MessageBundle) {
   };
 
   /**
-   * Normalizes the given bundle module id.
+   * Normalizes the given bundle module identifier.
    *
-   * @param {string} bundlePath The specified bundle path argument.
-   * @return {string} The normalized bundle id.
+   * @param {string} bundlePath - The specified bundle path argument.
+   * @return {string} The normalized bundle identifier.
    */
   function getBundleID(bundlePath) {
     var bundleMid;
@@ -73,14 +73,14 @@ define(["./util/MessageBundle", "json"], function(MessageBundle) {
   }
 
   /**
-   * Gets a bundle info object with the plugin id and bundle name,
-   * for a given bundle module id.
+   * Gets a bundle info object with the plugin identifier and bundle name,
+   * for a given bundle module identifier.
    *
-   * @param {string} bundlePath The specified bundle path argument.
+   * @param {string} bundlePath - The specified bundle path argument.
    * @return {Object} A bundle info object.
    *
-   * @throws {Error} If the specified module id cannot be resolved
-   *   to a plugin id and bundle name.
+   * @throws {Error} If the specified module identifier cannot be resolved
+   *   to a plugin identifier and bundle name.
    */
   function getBundleInfo(require, bundlePath) {
     // e.g.:
