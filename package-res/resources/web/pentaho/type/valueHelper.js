@@ -32,7 +32,7 @@ define([
     /**
      * Normalizes a validation errors result.
      *
-     * @param {Nully|pentaho.type.ValidationError|Array.<!pentaho.type.ValidationError>} errors An error,
+     * @param {Nully|pentaho.type.ValidationError|Array.<!pentaho.type.ValidationError>} errors - An error,
      * an errors array, or a `Nully` value.
      *
      * @return {?Array.<!pentaho.type.ValidationError>} An array of validation errors or `null`.
@@ -44,8 +44,8 @@ define([
     /**
      * Combines two validation error lists.
      *
-     * @param {Nully|Array.<!pentaho.type.ValidationError>} errors An errors array, if any.
-     * @param {Nully|pentaho.type.ValidationError|Array.<!pentaho.type.ValidationError>} errorsAdd The error or
+     * @param {Nully|Array.<!pentaho.type.ValidationError>} errors - An errors array, if any.
+     * @param {Nully|pentaho.type.ValidationError|Array.<!pentaho.type.ValidationError>} errorsAdd - The error or
      * errors to add, if any.
      * @return {?Array.<!pentaho.type.ValidationError>} A combined errors array, or `null`.
      */
@@ -96,7 +96,7 @@ define([
   /**
    * Converts to array.
    *
-   * @param {Array|Object} v The value to convert to array.
+   * @param {Array|Object} v - The value to convert to array.
    * @return {Array} The given array or an array with the given value.
    * @ignore
    */

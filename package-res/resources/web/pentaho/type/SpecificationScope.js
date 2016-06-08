@@ -71,7 +71,7 @@ define([
     /**
      * Disposes the specification scope.
      *
-     * If this scope created its specification context, it disposes it, as well.
+     * If this scope created its specification context, it disposes of it, as well.
      *
      * If there was a previous specification context before this one,
      * it is restored.

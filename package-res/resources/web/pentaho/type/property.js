@@ -91,10 +91,10 @@ define([
         /**
          * Initializes a property type object, given a property type specification.
          *
-         * @param {!pentaho.type.spec.UPropertyTypeProto} spec A property name or type specification.
+         * @param {!pentaho.type.spec.UPropertyTypeProto} spec - A property name or type specification.
          * @param {!Object} keyArgs Keyword arguments.
-         * @param {!pentaho.type.Complex.Type} keyArgs.declaringType The complex type that declares the property.
-         * @param {number} keyArgs.index The index of the property within its complex type.
+         * @param {!pentaho.type.Complex.Type} keyArgs.declaringType - The complex type that declares the property.
+         * @param {number} keyArgs.index - The index of the property within its complex type.
          * @ignore
          */
         constructor: function(spec, keyArgs) {
@@ -107,7 +107,7 @@ define([
         /**
          * Setting name and label first allows describing the property in subsequent error messages.
          *
-         * Setting label after name ensures that label defaults that are derived from name work the first time.
+         * Setting label after name ensures that label defaults that are derived from name will work the first time.
          *
          * Setting type before value (not included here, so it is processed after type) avoids:
          * 1. checking the new value against the old type (and then again, against the new type)
@@ -128,10 +128,10 @@ define([
          * Performs initialization tasks that take place before the instance is
          * extended with its spec.
          *
-         * @param {!pentaho.type.spec.UPropertyTypeProto} spec A property name or specification object.
-         * @param {!Object} keyArgs Keyword arguments.
-         * @param {!pentaho.type.Complex.Type} keyArgs.declaringType The complex type that declares the property.
-         * @param {number} keyArgs.index The index of the property within its complex type.
+         * @param {!pentaho.type.spec.UPropertyTypeProto} spec - A property name or specification object.
+         * @param {!Object} keyArgs - Keyword arguments.
+         * @param {!pentaho.type.Complex.Type} keyArgs.declaringType - The complex type that declares the property.
+         * @param {number} keyArgs.index - The index of the property within its complex type.
          * @protected
          */
         _init: function(spec, keyArgs) {
@@ -280,7 +280,7 @@ define([
          *
          * A property is a _list_ property if
          * its [value type]{@link pentaho.type.Property.Type#type} is a list type,
-         * i.e., if it is or extends [List]{@link pentaho.type.List}.
+         * that is, if it is or extends [List]{@link pentaho.type.List}.
          *
          * @type boolean
          * @readonly
@@ -415,7 +415,7 @@ define([
          *
          * * for [root]{@link pentaho.type.Type#root} _property types_, the default value is `null`
          * * for non-root _property types_, the default value is the _inherited value_,
-         *   if it is an instance of the _property type_'s [value type]{@link pentaho.type.Property.Type#type},
+         *   if it is an instance of the _property type_'s [value type]{@link pentaho.type.Property.Type#type};
          *   or, `null`, otherwise.
          *
          * When set to any other value,
@@ -464,7 +464,7 @@ define([
          * (a clone of) the property's default value,
          * {@link pentaho.type.Property.Type#value}.
          *
-         * @param {?any} valueSpec A value or value specification.
+         * @param {?any} valueSpec - A value or value specification.
          * @param {boolean} [noDefault=false] Indicates if {@link Nully} values
          *  should _not_ be converted to the property's default value.
          *
@@ -543,7 +543,7 @@ define([
          * Afterwards, the cardinality is verified against the attributes
          * {@link pentaho.type.Property.Type#countMin} and {@link pentaho.type.Property.Type#countMax}.
          *
-         * @param {pentaho.type.Complex} owner The complex value that owns the property.
+         * @param {pentaho.type.Complex} owner - The complex value that owns the property.
          * @return {?Array.<!Error>} A non-empty array of `Error` or `null`.
          *
          * @see pentaho.type.Complex#validate
@@ -825,7 +825,7 @@ define([
            *
            * @name isRequiredEval
            * @memberOf pentaho.type.Property.Type#
-           * @param {pentaho.type.Complex} owner The complex value that owns a property of this type.
+           * @param {pentaho.type.Complex} owner - The complex value that owns a property of this type.
            * @return {boolean} The evaluated value of the `isRequired` attribute.
            *
            * @ignore
@@ -835,7 +835,7 @@ define([
            * Gets or sets a value that indicates if properties of this type are required.
            *
            * When a property is of a required _property type_,
-           * it is considered **invalid** if its value (in a complex instance) is `null` or,
+           * it is considered **invalid** if its value (in a complex instance) is `null`; or,
            * in the case of a [list]{@link pentaho.type.Property.Type#isList} _property type_,
            * it has zero elements.
            *
@@ -861,9 +861,9 @@ define([
            *
            * Because this attribute is also _dynamic_,
            * the actual required values are only known
-           * when evaluated for specific complex instances.
-           * As such, ensuring monotonic changes is deferred until evaluation.
-           * No errors are thrown; non-monotonic changes simply don't take any effect.
+           * when evaluated for specific complex instances. 
+           * This behavior ensures that monotonic changes are deferred until evaluation.
+           * No errors are thrown; non-monotonic changes simply don't take effect.
            *
            * ### This attribute is *Inherited*
            *
@@ -914,7 +914,7 @@ define([
            *
            * @name countMinEval
            * @memberOf pentaho.type.Property.Type#
-           * @param {pentaho.type.Complex} owner The complex value that owns a property of this type.
+           * @param {pentaho.type.Complex} owner - The complex value that owns a property of this type.
            * @return {number} The evaluated value of the `countMin` attribute.
            *
            * @ignore
@@ -951,8 +951,8 @@ define([
            * Because this attribute is also _dynamic_,
            * the actual `countMin` values are only known
            * when evaluated for specific complex instances.
-           * As such, ensuring monotonic changes is deferred until evaluation.
-           * No errors are thrown; non-monotonic changes simply don't take any effect.
+           * This behavior ensures that monotonic changes are deferred until evaluation.
+           * No errors are thrown; non-monotonic changes simply don't take effect.
            *
            * ### This attribute is *Inherited*
            *
@@ -1000,7 +1000,7 @@ define([
            *
            * @name countMaxEval
            * @memberOf pentaho.type.Property.Type#
-           * @param {pentaho.type.Complex} owner The complex value that owns a property of this type.
+           * @param {pentaho.type.Complex} owner - The complex value that owns a property of this type.
            * @return {number} The evaluated value of the `countMax` attribute.
            *
            * @ignore
@@ -1050,7 +1050,7 @@ define([
            * ### Other characteristics
            *
            * The value got by the attribute is the **last set local, value**, if any -
-           * a function, a constant value or `undefined`, when unset.
+           * a function, a constant value; or, `undefined`, when unset.
            *
            * When set to a {@link Nully} value, the set operation is ignored.
            *
@@ -1082,7 +1082,7 @@ define([
            *
            * @name applicableEval
            * @memberOf pentaho.type.Property.Type#
-           * @param {pentaho.type.Complex} owner The complex value that owns a property of this type.
+           * @param {pentaho.type.Complex} owner - The complex value that owns a property of this type.
            * @return {boolean} The evaluated value of the `isApplicable` attribute.
            *
            * @ignore
@@ -1095,7 +1095,7 @@ define([
            * as it does not make sense in a certain situation.
            * It may only be applicable when another property of the complex type has a specific value, for example.
            *
-           * When a property is not currently applicable, its value is not significant,
+           * When a property is not currently applicable, its value is not significant 
            * and, as such, any validations concerning it are not performed.
            *
            * ### This attribute is *Dynamic*
@@ -1128,7 +1128,7 @@ define([
            * ### Other characteristics
            *
            * The value got by the attribute is the **last set local, value**, if any -
-           * a function, a constant value or `undefined`, when unset.
+           * a function, a constant value; or, `undefined`, when unset.
            *
            * When set to a {@link Nully} value, the set operation is ignored.
            *
@@ -1162,7 +1162,7 @@ define([
            *
            * @name isReadOnlyEval
            * @memberOf pentaho.type.Property.Type#
-           * @param {pentaho.type.Complex} owner The complex value that owns a property of this type.
+           * @param {pentaho.type.Complex} owner - The complex value that owns a property of this type.
            * @return {boolean} The evaluated value of the `isReadOnly` attribute.
            *
            * @ignore
@@ -1205,7 +1205,7 @@ define([
            * ### Other characteristics
            *
            * The value got by the attribute is the **last set local, value**, if any -
-           * a function, a constant value or `undefined`, when unset.
+           * a function, a constant value; or, `undefined`, when unset.
            *
            * When set to a {@link Nully} value, the set operation is ignored.
            *
@@ -1270,7 +1270,7 @@ define([
          *
          * The `countMax` value is constrained to be greater than or equal to the minimum.
          *
-         * @param {pentaho.type.Complex} owner The complex value that owns a property of this type.
+         * @param {pentaho.type.Complex} owner - The complex value that owns a property of this type.
          *
          * @return {pentaho.IRange<number>} The evaluated element count range.
          *
