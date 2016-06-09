@@ -145,7 +145,7 @@ define([
       /**
        * Initializes a clone of this complex value.
        *
-       * @param {!pentaho.type.Complex} clone The complex value clone.
+       * @param {!pentaho.type.Complex} clone - The complex value clone.
        * @protected
        */
       _clone: function(clone) {
@@ -246,7 +246,7 @@ define([
        * For [Complex]{@link pentaho.type.Complex} and [List]{@link pentaho.type.List} types,
        * this corresponds to the value itself.
        *
-       * @param {string|!pentaho.type.Property.Type} name The property name or type object.
+       * @param {string|!pentaho.type.Property.Type} name - The property name or type object.
        * @param {boolean} [sloppy=false] Indicates if an error is thrown if the specified property is not defined.
        *
        * @return {any|pentaho.type.Complex|pentaho.type.List|Nully} The primitive value of a `Simple`,
@@ -276,7 +276,7 @@ define([
        * For [Complex]{@link pentaho.type.Complex} and [List]{@link pentaho.type.List} types,
        * varies with the implementation.
        *
-       * @param {string|!pentaho.type.Property.Type} name The property name or type object.
+       * @param {string|!pentaho.type.Property.Type} name - The property name or type object.
        * @param {boolean} [sloppy=false] Indicates if an error is thrown if the specified property is not defined.
        *
        * @return {string} The string representation of the value, or `""`.
@@ -330,7 +330,7 @@ define([
        * value = complex.path("a", "b", 1);
        * ```
        *
-       * @param {Array.<(string|number|!pentaho.type.Property.Type)>} steps The property/index/key path steps.
+       * @param {Array.<(string|number|!pentaho.type.Property.Type)>} steps - The property/index/key path steps.
        * @param {boolean} [sloppy=false] Indicates if an error is thrown if the specified property is not defined.
        *
        * @return {pentaho.type.Value|Nully} The requested value, or a {@link Nully} value.
@@ -414,7 +414,7 @@ define([
        *
        * This method returns the result of calling [Complex#at]{@link pentaho.type.Complex#at} with a `0` index.
        *
-       * @param {string|!pentaho.type.Property.Type} name The property name or type object.
+       * @param {string|!pentaho.type.Property.Type} name - The property name or type object.
        * @param {boolean} [sloppy=false] Indicates if an error is thrown if the specified property is not defined.
        *
        * @return {pentaho.type.Element|Nully} An element or a {@link Nully} value.
@@ -434,7 +434,7 @@ define([
        *
        * This method returns the result of calling [Complex#atv]{@link pentaho.type.Complex#atv} with a `0` index.
        *
-       * @param {string|!pentaho.type.Property.Type} name The property name or type object.
+       * @param {string|!pentaho.type.Property.Type} name - The property name or type object.
        * @param {boolean} [sloppy=false] Indicates if an error is thrown if the specified property is not defined.
        *
        * @return {any|pentaho.type.Complex|Nully} The primitive value of the first element, or a {@link Nully} value.
@@ -454,7 +454,7 @@ define([
        *
        * This method returns the result of calling [Complex#atf]{@link pentaho.type.Complex#atf} with a `0` index.
        *
-       * @param {string|!pentaho.type.Property.Type} name The property name or type object.
+       * @param {string|!pentaho.type.Property.Type} name - The property name or type object.
        * @param {boolean} [sloppy=false] Indicates if an error is thrown if the specified property is not defined.
        *
        * @return {string} The string representation of the first element, or `""`.
@@ -476,9 +476,9 @@ define([
        *
        * When the specified property is a _list_ property, its [count]{@link pentaho.type.List#count} is returned.
        *
-       * When the specified property is not a _list_ property, `0` is returned if it is `null` and `1`, otherwise.
+       * When the specified property is not a _list_ property, `0` is returned if it is `null`; `1`, otherwise.
        *
-       * @param {string|!pentaho.type.Property.Type} name The property name or type object.
+       * @param {string|!pentaho.type.Property.Type} name - The property name or type object.
        * @param {boolean} [sloppy=false] Indicates if an error is thrown if the specified property is not defined.
        *
        * @return {number} The number of values.
@@ -500,7 +500,7 @@ define([
        * If the specified property is not defined and `sloppy` is `true`, `undefined` is returned.
        * If the specified index is out of range, `null` is returned.
        *
-       * This method allows to use the same syntax for getting a single element from the value of a property,
+       * This method allows use of the same syntax for getting a single element from the value of a property,
        * whether it is a list or an element property. If the property is an element property whose value
        * is `null`, it is seen like a list property with no elements.
        * If its value is not `null`, it is seen like a list property with one element.
@@ -513,8 +513,8 @@ define([
        * @see pentaho.type.Complex#count
        * @see pentaho.type.Complex#first
        *
-       * @param {string|!pentaho.type.Property.Type} name The property name or type object.
-       * @param {number} index The index of the desired element.
+       * @param {string|!pentaho.type.Property.Type} name - The property name or type object.
+       * @param {number} index - The index of the desired element.
        * @param {boolean} [sloppy=false] Indicates if an error is thrown if the specified property is not defined.
        *
        * @return {pentaho.type.Element|Nully} A single `Element` value, or a {@link Nully} value.
@@ -549,8 +549,8 @@ define([
        * its [value]{@link pentaho.type.Simple#value} attribute.
        * For a [Complex]{@link pentaho.type.Complex} type, this corresponds to the value itself.
        *
-       * @param {string|!pentaho.type.Property.Type} name The property name or type object.
-       * @param {number} index The index of the element.
+       * @param {string|!pentaho.type.Property.Type} name - The property name or type object.
+       * @param {number} index - The index of the element.
        * @param {boolean} [sloppy=false] Indicates if an error is thrown if the specified property is not defined.
        *
        * @return {any|pentaho.type.Complex|Nully} The primitive value of the requested element,
@@ -580,8 +580,8 @@ define([
        * its [formatted]{@link pentaho.type.Simple#formatted} attribute, when it is not null.
        * For a [Complex]{@link pentaho.type.Complex} type, this varies with the implementation.
        *
-       * @param {string|!pentaho.type.Property.Type} name The property name or type object.
-       * @param {number} index The index of the value.
+       * @param {string|!pentaho.type.Property.Type} name - The property name or type object.
+       * @param {number} index - The index of the value.
        *
        * @param {boolean} [sloppy=false] Indicates if an error is thrown if the specified property is not defined.
        * @return {string} The string representation of the requested element, or `""`.
@@ -603,9 +603,9 @@ define([
       /**
        * Gets a value that indicates if a given property is currently applicable.
        *
-       * @param {string|!pentaho.type.Property.Type} name The property name or type object.
+       * @param {string|!pentaho.type.Property.Type} name - The property name or type object.
        *
-       * @return {boolean} `true` if the property is applicable, `false`, otherwise.
+       * @return {boolean} `true` if the property is applicable; `false`, otherwise.
        *
        * @throws {pentaho.lang.ArgumentInvalidError} When a property with name `name` is not defined.
        */
@@ -616,11 +616,11 @@ define([
 
       //region isReadOnly attribute
       /**
-       * Gets a value that indicates if a given property is currently readonly.
+       * Gets a value that indicates if a given property is currently read-only.
        *
-       * @param {string|pentaho.type.Property.Type} name The property name or property type object.
+       * @param {string|pentaho.type.Property.Type} name - The property name or property type object.
        *
-       * @return {boolean} Returns `true` if the property is read-only, `false` if the value is other.
+       * @return {boolean} Returns `true` if the property is read-only; `false` if the value is other.
        *
        * @throws {pentaho.lang.ArgumentInvalidError} When a property with name `name` is not defined.
        */
@@ -633,7 +633,7 @@ define([
       /**
        * Gets the current valid count range of values of a given property.
        *
-       * @param {string|pentaho.type.Property.Type} name The property name or type object.
+       * @param {string|pentaho.type.Property.Type} name - The property name or type object.
        *
        * @return {pentaho.IRange} The range of the property.
        *
@@ -653,7 +653,7 @@ define([
        *
        * @param {string|pentaho.type.Property.Type} [name] The property name or type object.
        *
-       * @return {boolean} `true` if the property is required, `false`, otherwise.
+       * @return {boolean} `true` if the property is required; `false`, otherwise.
        *
        * @throws {pentaho.lang.ArgumentInvalidError} When a property with name `name` is not defined.
        */
@@ -820,7 +820,7 @@ define([
          * it is returned back only if it is _the_ property type object of
          * same name in this complex type.
          *
-         * @param {string|!pentaho.type.Property.Type} name The property name or type object.
+         * @param {string|!pentaho.type.Property.Type} name - The property name or type object.
          * @param {boolean} [sloppy=false] Indicates if an error is thrown if the specified property is not defined.
          *
          * @return {?pentaho.type.Property.Type} The property type object.
@@ -851,9 +851,9 @@ define([
          * If a property type object is specified,
          * this method tests whether it is the same property type object that exists under that name, if any.
          *
-         * @param {string|pentaho.type.Property.Type} name The property name or type object.
+         * @param {string|pentaho.type.Property.Type} name - The property name or type object.
          *
-         * @return {boolean} `true` if the property is defined, `false`, otherwise.
+         * @return {boolean} `true` if the property is defined; `false`, otherwise.
          */
         has: function(name) {
           // !_props could only occur if accessing #has directly on Complex.type and it had no derived classes yet...
@@ -868,7 +868,7 @@ define([
          * Gets the property type object of the property with a given index,
          * if in range, or `null` if not.
          *
-         * @param {number} index The property index.
+         * @param {number} index - The property index.
          * @param {boolean} [sloppy=false] Indicates if an error is thrown if the specified `index` is out of range.
          *
          * @return {?pentaho.type.Property.Type} The property type object, or `null`.
@@ -975,7 +975,7 @@ define([
      * @name extend
      * @memberOf pentaho.type.Complex
      *
-     * @param {string} [name] The name of the created class. Used for debugging purposes.
+     * @param {string} [name] The name of the created class, used for debugging purposes.
      * @param {pentaho.type.spec.IComplexProto} [instSpec] The instance specification.
      * @param {Object} [classSpec] The static specification.
      * @param {Object} [keyArgs] The keyword arguments.

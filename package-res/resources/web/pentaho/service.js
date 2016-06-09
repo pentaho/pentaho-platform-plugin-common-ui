@@ -24,9 +24,9 @@
  * **Plugin Usage**: `"pentaho/service!{logical-module-name}?meta&single"`
  *
  *   1. `{logical-module-name}` — the name of a required logical module.
- *   2. `meta` — if present, provides the loaded module Ids, encapsulating it with the module value.
+ *   2. `meta` — if present, provides the loaded module identifiers, encapsulating it with the module value.
  *   3. `single` — if present, returns only the first declared dependency.
- *   4. `ids` - if present, returns only the ids of the registered modules and **does not load them**;
+ *   4. `ids` - if present, returns only the identifiers of the registered modules and **does not load them**;
  *       you can use this module's exported `getRegisteredIds` method,
  *       to be able to know the registered module ids synchronously.
  *
@@ -147,13 +147,13 @@ define([
    * An empty logical module name is resolved as an empty array.
    * An unregistered logical module name is resolved as an empty array.
    * 
-   * @param {String} name The name of the logical module to load.
-   * @param {function} require The global require function.
-   * @param {function} onLoad Callback function to call once all of the
+   * @param {String} name - The name of the logical module to load.
+   * @param {function} require - The global require function.
+   * @param {function} onLoad - Callback function to call once all of the
    *   the logical module's dependencies are satisfied.
    *   Receives, as single argument, an array with the 
    *   logical module's dependencies.
-   * @param {Object} config The full require-JS config object.
+   * @param {Object} config - The full require-JS config object.
    */
   function loadLogicalModule(name, require, onLoad, config) {
     if(config.isBuild) {
@@ -219,8 +219,8 @@ define([
    * Assures that requests with the exact same options are
    * identified as the same and get correctly cached.
    *
-   * @param {string} name The name of the logical module to load.
-   * @param {function} normalize The original normalize function.
+   * @param {string} name - The name of the logical module to load.
+   * @param {function} normalize - The original normalize function.
    */
   function normalizeLogicalModule(name, normalize) {
     var nameAndOptions = parseNameAndOptions(name);
@@ -229,9 +229,9 @@ define([
   }
 
   /**
-   * Gets the ids of modules registered as dependencies of a given logical module.
+   * Gets the identifiers of modules registered as dependencies of a given logical module.
    *
-   * @param {string} logicalModuleName The name of the logical module.
+   * @param {string} logicalModuleName - The name of the logical module.
    * @return {Array} An array of module ids, possibly empty.
    */
   function getLogicalModule(logicalModuleName) {
@@ -244,7 +244,7 @@ define([
    * which includes the registration of dependencies of logical modules.
    * 
    * Ignores a _nully_ module configuration value.
-   * Ignores _falsy_ physical and logical module ids.
+   * Ignores _falsy_ physical and logical module identifiers.
    */
   function processConfig() {
     var config = module.config(), logicalModule;
@@ -308,8 +308,8 @@ define([
   /**
    * Gets the ids of modules registered as dependencies of a given logical module.
    *
-   * @param {string} logicalModuleName The name of the logical module.
-   * @return {string[]} An array of ids, possibly empty.
+   * @param {string} logicalModuleName - The name of the logical module.
+   * @return {string[]} An array of identifiers, possibly empty.
    */
   function getRegisteredIds(logicalModuleName) {
     var ids = O.getOwn(logicalModules, logicalModuleName);

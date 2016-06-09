@@ -114,11 +114,11 @@ define([
        * If two values are equal, they must have an equal {@link pentaho.type.Value#key}.
        * Otherwise, if they are different, they must have a different `key`.
        *
-       * The default implementation returns `true` is the two values
-       * have the same `key` and `false` otherwise.
+       * The default implementation returns `true` if the two values
+       * have the same `key`; or, `false`, otherwise.
        *
-       * @param {!pentaho.type.Value} other A value to test for equality.
-       * @return {boolean} `true` if the given value is equal to this one, `false`, otherwise.
+       * @param {!pentaho.type.Value} other - A value to test for equality.
+       * @return {boolean} `true` if the given value is equal to this one; or, `false`, otherwise.
        */
       equals: function(other) {
         return this === other || this.key === other.key;
@@ -175,7 +175,7 @@ define([
       //region configuration
       /**
        * Configures this value with a given configuration.
-       * @param {?any} config The configuration.
+       * @param {?any} config - The configuration.
        * @return {!pentaho.type.Value} This instance.
        */
       configure: function(config) {
@@ -188,7 +188,7 @@ define([
        *
        * The default implementation does nothing.
        *
-       * @param {any} config The configuration.
+       * @param {any} config - The configuration.
        * @protected
        * @overridable
        */
@@ -295,7 +295,7 @@ define([
          * The `isValid` method can be seen as a stronger version
          * of {@link pentaho.type.Value.Type#is}.
          *
-         * @param {any} value The value to validate.
+         * @param {any} value - The value to validate.
          *
          * @return {boolean} `true` if the value is a valid instance of this type, `false` if not.
          */
@@ -315,7 +315,7 @@ define([
          * Otherwise, if you know that a value is an instance of this type,
          * you can call [validateInstance]{@link pentaho.type.Value.Type#validateInstance} instead.
          *
-         * @param {?any} value The value to validate.
+         * @param {?any} value - The value to validate.
          *
          * @return {?Array.<!pentaho.type.ValidationError>} A non-empty array of errors or `null`.
          *
@@ -345,7 +345,7 @@ define([
          * Special types, like [refinement types]{@link pentaho.type.Refinement},
          * perform additional validations on values.
          *
-         * @param {!pentaho.type.Value} value The value to validate.
+         * @param {!pentaho.type.Value} value - The value to validate.
          *
          * @return {?Array.<!pentaho.type.ValidationError>} A non-empty array of errors or `null`.
          *
@@ -408,7 +408,7 @@ define([
        * @name extend
        * @memberOf pentaho.type.Value
        *
-       * @param {string} [name] The name of the created class. Used for debugging purposes.
+       * @param {string} [name] The name of the created class; used for debugging purposes.
        * @param {pentaho.type.spec.IValueProto} [instSpec] The instance specification.
        * @param {Object} [classSpec] The static specification.
        * @param {Object} [keyArgs] The keyword arguments.

@@ -35,7 +35,7 @@ define([
    * @classDesc A `SpecificationContext` object holds information that is
    * shared during the serialization (or conversion to specification) of an instance or type.
    *
-   * Specifically, a specification context tracks the temporary ids assigned to referenced anonymous types.
+   * Specifically, a specification context tracks the temporary identifiers assigned to referenced anonymous types.
    *
    * The **ambient specification context** is accessible through
    * [SpecificationContext.current]{@link pentaho.type.SpecificationContext.current}.
@@ -60,7 +60,7 @@ define([
     constructor: function() {
       /**
        * The type infos of anonymous types already described in the context,
-       * indexed by type unique id.
+       * indexed by type unique identifier.
        *
        * @type {Object.<string, Object>}
        * @private
@@ -69,7 +69,7 @@ define([
 
       /**
        * The type infos of anonymous types already described in the context,
-       * indexed by temporary id.
+       * indexed by temporary identifier.
        *
        * @type {Object.<string, Object>}
        * @private
@@ -77,7 +77,7 @@ define([
       this._typeInfosByTid = {};
 
       /**
-       * The next number that will be used to build a temporary id.
+       * The next number that will be used to build a temporary identifier.
        *
        * @type {number}
        * @private
@@ -86,13 +86,13 @@ define([
     },
 
     /**
-     * Gets the id of a type, if it has one, or its temporary id within this context, if not.
+     * Gets the identifier of a type, if it has one; or, its temporary identifier within this context, if not.
      *
      * If the given type is anonymous and also hasn't been added to this context, `null` is returned.
      *
-     * @param {pentaho.type.Type} type The type.
+     * @param {pentaho.type.Type} type - The type.
      *
-     * @return {?nonEmptyString} The id of the type within this context, or `null`.
+     * @return {?nonEmptyString} The identifier of the type within this context, or `null`.
      */
     getIdOf: function(type) {
       var id = type.id;
@@ -104,11 +104,11 @@ define([
     },
 
     /**
-     * Gets a type given its temporary id in this specification context.
+     * Gets a type given its temporary identifier in this specification context.
      *
-     * @param {nonEmptyString} tid The temporary id.
+     * @param {nonEmptyString} tid - The temporary identifier.
      *
-     * @return {pentaho.type.Type} The type with the given temporary id, if any, or `null`.
+     * @return {pentaho.type.Type} The type with the given temporary identifier, if any; or, `null`.
      */
     get: function(tid) {
       var typeInfo = O.getOwn(this._typeInfosByTid, tid);
@@ -116,21 +116,21 @@ define([
     },
 
     /**
-     * Adds a type to the context and returns its own or temporary id.
+     * Adds a type to the context and returns its own or temporary identifier.
      *
-     * If the given type is not anonymous, its id is returned.
+     * If the given type is not anonymous, its identifier is returned.
      * Else, if the anonymous type had already been added to the context,
-     * its temporary id is returned.
+     * its temporary identifier is returned.
      * Else, the anonymous type is added to the context
-     * and a temporary id is either given or automatically generated and returned.
+     * and a temporary identifier is either given, or automatically generated and returned.
      *
-     * @param {pentaho.type.Type} type The type to add.
-     * @param {?nonEmptyString} [tid] The temporary id to use when adding.
+     * @param {pentaho.type.Type} type - The type to add.
+     * @param {?nonEmptyString} [tid] The temporary identifier to use when adding.
      *
-     * @return {nonEmptyString} The id of the type within this context.
+     * @return {nonEmptyString} The identifier of the type within this context.
      *
      * @throws {pentaho.lang.ArgumentInvalidError} When `type` is being added and
-     * `tid` is already the temporary id assigned to another type.
+     * `tid` is already the temporary identifier assigned to another type.
      */
     add: function(type, tid) {
       var id = type.id;
@@ -190,10 +190,10 @@ define([
     },
 
     /**
-     * Determines if a given type id is temporary.
+     * Determines if a given type identifier is temporary.
      *
-     * @param {string} id The id to check.
-     * @return {boolean} `true` if the id is temporary, `false, otherwise.
+     * @param {string} id - The identifier to check.
+     * @return {boolean} `true` if the identifier is temporary; `false, otherwise.
      *
      * @see pentaho.type.SpecificationContext.idTemporaryPrefix
      */
