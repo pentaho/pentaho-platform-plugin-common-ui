@@ -44,7 +44,7 @@ define([
     /**
      * Initializes a property collection.
      *
-     * @param {pentaho.type.Complex.Type} declaringType The declaring complex type.
+     * @param {pentaho.type.Complex.Type} declaringType - The declaring complex type.
      * @ignore
      */
     constructor: function(declaringType) {
@@ -115,9 +115,9 @@ define([
      *
      * This method allows adding elements to the collection using custom options (keyword arguments).
      *
-     * @param {string} spec The name of the property.
-     * @param {number} index The location of the property in the collection.
-     * @param {Object} ka The keyword arguments.
+     * @param {string} spec - The name of the property.
+     * @param {number} index - The location of the property in the collection.
+     * @param {Object} ka - The keyword arguments.
      * @protected
      */
     _adding: function(spec, index, ka) {
@@ -146,9 +146,9 @@ define([
      *
      * This method allows replacing elements in the collection using custom options (keyword arguments).
      *
-     * @param {string} spec The name of the property.
-     * @param {number} index The location of the property in the collection.
-     * @param {Object} existing The keyword arguments.
+     * @param {string} spec - The name of the property.
+     * @param {number} index - The location of the property in the collection.
+     * @param {Object} existing - The keyword arguments.
      * @protected
      */
     _replacing: function(spec, index, existing) {
@@ -174,10 +174,10 @@ define([
     /**
      * Cast a property from the collection.
      *
-     * The cast is called to convert specs of properties which are new (not an override) into a Property.Type instance
+     * The cast is called to convert specs of properties that are new (not an override) into a Property.Type instance
      *
-     * @param {string} spec The name of the property.
-     * @param {string} index The location of the property in the collection.
+     * @param {string} spec - The name of the property.
+     * @param {string} index - The location of the property in the collection.
      * @protected
      */
     _cast: function(spec, index) {
@@ -219,7 +219,7 @@ define([
      * 2. an object whose keys are the property names and the values are {@link pentaho.type.UPropertyTypeProto},
      *    having no name or a name equal to the key.
      *
-     * @param {Object} config The properties configuration.
+     * @param {Object} config - The properties configuration.
      */
     configure: function(config) {
       if(!config) throw error.argRequired("config");

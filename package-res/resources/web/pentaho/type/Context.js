@@ -271,9 +271,9 @@ define([
      *   * [pentaho/type/property]{@link pentaho.type.Property}
      *
      * For all of these, the `pentaho/type/` or `pentaho/type/facets/` prefix is optional
-     * (when requested to a _context_; the AMD module system requires the full module ids to be specified).
+     * (when requested to a _context_; the AMD module system requires the full module identifiers to be specified).
      *
-     * If it is not known whether all non-standard types that are referenced by id have already been loaded,
+     * If it is not known whether all non-standard types that are referenced by identifier have already been loaded,
      * the asynchronous method version, [getAsync]{@link pentaho.type.Context#getAsync},
      * should be used instead.
      *
@@ -319,15 +319,15 @@ define([
      *
      * @throws {pentaho.lang.ArgumentInvalidError} When `typeRef` is an instance.
      *
-     * @throws {Error} When the id of a type is not defined as a module in the AMD module system
+     * @throws {Error} When the identifier of a type is not defined as a module in the AMD module system
      * (specified directly in `typeRef`, or present in an generic type specification).
      *
-     * @throws {Error} When the id of a **non-standard type** is from a module that the AMD module system
+     * @throws {Error} When the identifier of a **non-standard type** is from a module that the AMD module system
      * hasn't loaded yet (specified directly in `typeRef`, or present in an generic type specification).
      *
      * @throws {pentaho.lang.OperationInvalidError} When the value returned by a factory function is not
      * an instance constructor of a subtype of `Instance`
-     * (specified directly in `typeRef`, or obtained indirectly by loading a type's module given its id).
+     * (specified directly in `typeRef`, or obtained indirectly by loading a type's module given its identiifer).
      *
      * @throws {pentaho.lang.ArgumentInvalidError} When `typeRef` is, or contains, an array-shorthand,
      * list type specification that has more than one child element type specification.
@@ -350,9 +350,9 @@ define([
      * then `fun` gets bound to that object.
      * Otherwise, the JavaScript context object in which `fun` is called is dynamic (whichever the caller decides).
      *
-     * @param {!Array.<pentaho.type.spec.UTypeReference>} typeRefs An array of type references.
-     * @param {function} fun The function to bind.
-     * @param {Object} [ctx] The fixed JavaScript context object to use.
+     * @param {!Array.<pentaho.type.spec.UTypeReference>} typeRefs - An array of type references.
+     * @param {function} fun - The function to bind.
+     * @param {Object} [ctx] - The fixed JavaScript context object to use.
      *
      * @return {function} The new bound function.
      */
@@ -403,9 +403,9 @@ define([
      *
      * });
      *
-     * @param {!pentaho.type.spec.UTypeReference} typeRef A type reference.
-     * @param {Object} [keyArgs] The keyword arguments.
-     * @param {pentaho.type.spec.UTypeReference} [keyArgs.defaultBase] The default base type
+     * @param {!pentaho.type.spec.UTypeReference} typeRef - A type reference.
+     * @param {Object} [keyArgs] - The keyword arguments.
+     * @param {pentaho.type.spec.UTypeReference} [keyArgs.defaultBase] - The default base type
      * of `typeRef` when it is an immediate generic object specification.
      *
      * @return {!Promise.<!Class.<pentaho.type.Instance>>} A promise for the instance constructor.
@@ -420,17 +420,17 @@ define([
      *
      * @rejects {pentaho.lang.ArgumentInvalidError} When `typeRef` is an instance.
      *
-     * @rejects {Error} When the id of a type is not defined as a module in the AMD module system
+     * @rejects {Error} When the identifier of a type is not defined as a module in the AMD module system
      * (specified directly in `typeRef`, or present in an generic type specification).
      *
      * @rejects {pentaho.lang.OperationInvalidError} When the value returned by a factory function is not
      * an instance constructor of a subtype of `Instance`
-     * (specified directly in `typeRef`, or obtained indirectly by loading a type's module given its id).
+     * (specified directly in `typeRef`, or obtained indirectly by loading a type's module given its identifier).
      *
      * @rejects {pentaho.lang.ArgumentInvalidError} When `typeRef` is, or contains, an array-shorthand,
      * list type specification that has more than one child element type specification.
      *
-     * @rejects {Error} When any other, unexpected error occurs.
+     * @rejects {Error} When any other unexpected error occurs.
      */
     getAsync: function(typeRef, keyArgs) {
       try {
@@ -472,15 +472,15 @@ define([
      *
      * });
      *
-     * @param {string} [baseTypeId] The id of the base type. Defaults to `"pentaho/type/value"`.
-     * @param {object} [keyArgs] Keyword arguments.
-     * @param {?boolean} [keyArgs.isBrowsable=null] Indicates that only types with the specified
+     * @param {string} [baseTypeId] - The identifier of the base type. Defaults to `"pentaho/type/value"`.
+     * @param {object} [keyArgs] - Keyword arguments.
+     * @param {?boolean} [keyArgs.isBrowsable=null] - Indicates that only types with the specified
      *   [isBrowsable]{@link pentaho.type.Value.Type#isBrowsable} value are returned.
      *
      * @return {!Array.<Class.<pentaho.type.Value>>} An array of instance contructors.
      *
-     * @throws {Error} When the id of a type is not defined as a module in the AMD module system.
-     * @throws {Error} When the id of a **non-standard type** is from a module that the AMD module system
+     * @throws {Error} When the identifier of a type is not defined as a module in the AMD module system.
+     * @throws {Error} When the identifier of a **non-standard type** is from a module that the AMD module system
      * hasn't loaded yet.
      *
      * @see pentaho.type.Context#getAllAsync
@@ -519,7 +519,7 @@ define([
      * Gets a promise for the **configured instance constructors** of
      * all of the types that are subtypes of a given base type.
      *
-     * Any errors that may occur result in a rejected promise.
+     * Any errors that may occur will result in a rejected promise.
      *
      * @example
      * <caption>
@@ -543,9 +543,9 @@ define([
      *
      * });
      *
-     * @param {string} [baseTypeId] The id of the base type. Defaults to `"pentaho/type/value"`.
-     * @param {object} [keyArgs] Keyword arguments.
-     * @param {?boolean} [keyArgs.isBrowsable=null] Indicates that only types with the specified
+     * @param {string} [baseTypeId] - The identifier of the base type. Defaults to `"pentaho/type/value"`.
+     * @param {object} [keyArgs] - Keyword arguments.
+     * @param {?boolean} [keyArgs.isBrowsable=null] - Indicates that only types with the specified
      *   [isBrowsable]{@link pentaho.type.Type#isBrowsable} value are returned.
      *
      * @return {Promise.<Array.<Class.<pentaho.type.Instance>>>} A promise for an array of instance classes.
@@ -726,11 +726,11 @@ define([
      * Main dispatcher according to the type and class of `typeRef`:
      * string, function or array or object.
      *
-     * @param {pentaho.type.spec.UTypeReference} typeRef A type reference.
+     * @param {pentaho.type.spec.UTypeReference} typeRef - A type reference.
      * @param {boolean} [sync=false] Whether to perform a synchronous get.
      *
      * @return {!Promise.<!Class.<pentaho.type.Instance>>|!Class.<pentaho.type.Instance>} When sync,
-     *   returns the instance constructor, while, when async, returns a promise for it.
+     *   returns the instance constructor; while, when async, returns a promise for it.
      *
      * @throws {pentaho.lang.ArgumentInvalidError} When `typeRef` is of an unsupported JavaScript type:
      * not a string, function, array or object.
@@ -754,21 +754,21 @@ define([
     },
 
     /**
-     * Gets the instance constructor of a type given its id.
+     * Gets the instance constructor of a type given its identifier.
      *
-     * If the id is a temporary id,
+     * If the identifier is a temporary identifier,
      * it must have already been loaded in the ambient specification context.
      *
-     * Otherwise, the id is permanent.
-     * If the id does not contain any "/" character,
-     * it is considered relative to pentaho's `pentaho/type` module.
+     * Otherwise, the identifier is permanent.
+     * If the identifier does not contain any "/" character,
+     * it is considered relative to Pentaho's `pentaho/type` module.
      *
-     * Checks if id is already present in the `_byTypeId` map,
+     * Checks if the identifier is already present in the `_byTypeId` map,
      * returning immediately (modulo sync) if it is.
      *
-     * Otherwise, requires the module, using either the sync or the async AMD form.
+     * Otherwise, it requires the module, using either the sync or the async AMD form.
      *
-     * If sync, AMD throws if a module with the given id is not yet loaded or isn't defined.
+     * If sync, AMD throws if a module with the given identifier is not yet loaded or isn't defined.
      *
      * When the resulting module is returned by AMD,
      * its result is passed on, _recursively_, to `_get`,
@@ -779,20 +779,20 @@ define([
      * ### Ambient specification context
      *
      * This method uses the ambient specification context to support deserialization of
-     * generic type specifications containing temporary ids, for referencing anonymous types.
+     * generic type specifications containing temporary identifiers for referencing anonymous types.
      *
-     * When a temporary id is specified and
+     * When a temporary identifier is specified and
      * there is no ambient specification context or
-     * it does not contain a definition for it,
+     * no definition is contained for it,
      * an error is thrown.
      *
-     * @param {string} id The id of a type. It can be a temporary or permanent id.
+     * @param {string} id - The identifier of a type. It can be a temporary or permanent identifier.
      * In the latter case, it can be relative or absolute.
      *
      * @param {boolean} [sync=false] Whether to perform a synchronous get.
      *
      * @return {!Promise.<!Class.<pentaho.type.Instance>>|!Class.<pentaho.type.Instance>} When sync,
-     *   returns the instance constructor, while, when async, returns a promise for it.
+     *   returns the instance constructor; while, when async, returns a promise for it.
      *
      * @private
      */
@@ -832,7 +832,7 @@ define([
     },
 
     /**
-     * Gets the instance constructor of a type given a function that represents it.
+     * Gets the instance constructor of a type, given a function that represents it.
      *
      * The function can be:
      *
@@ -845,11 +845,11 @@ define([
      *
      * In the latter case, it is delegated to `_getByFactory`.
      *
-     * @param {function} fun A function.
+     * @param {function} fun - A function.
      * @param {boolean} [sync=false] Whether to perform a synchronous get.
      *
      * @return {!Promise.<!Class.<pentaho.type.Instance>>|!Class.<pentaho.type.Instance>} When sync,
-     *   returns the instance constructor, while, when async, returns a promise for it.
+     *   returns the instance constructor; while, when async, returns a promise for it.
      *
      * @throws {pentaho.lang.ArgumentInvalidError} When `fun` is a type constructor
      * (e.g. [Type]{@link pentaho.type.Type}).
@@ -879,12 +879,12 @@ define([
      *
      * This method works for anonymous types as well -
      * that have no [id]{@link pentaho.type.Type#id} -
-     * cause it uses the types' [uid]{@link pentaho.type.Type#uid}
+     * because it uses the types' [uid]{@link pentaho.type.Type#uid}
      * to identify types.
      *
      * A map of already configured types is kept in `_byTypeUid`.
      *
-     * If the type not yet in the map, and it is not anonymous,
+     * If the type is not yet in the map, and it is not anonymous,
      * configuration is requested for it, and, if any exists,
      * it is applied. Configuration may create a sub-classed instance constructor.
      *
@@ -892,12 +892,12 @@ define([
      * and `factoryUid` (when specified) in corresponding maps,
      * and is returned immediately (modulo sync).
      *
-     * @param {!Class.<pentaho.type.Instance>} InstCtor An instance constructor.
+     * @param {!Class.<pentaho.type.Instance>} InstCtor - An instance constructor.
      * @param {boolean} [sync=false] Whether to perform a synchronous get.
-     * @param {?number} [factoryUid] The factory unique id, when `Type` was created by one.
+     * @param {?number} [factoryUid] The factory unique identifier, when `Type` was created by one.
      *
      * @return {!Promise.<!Class.<pentaho.type.Instance>>|!Class.<pentaho.type.Instance>} When sync,
-     *   returns the instance constructor, while, when async, returns a promise for it.
+     *   returns the instance constructor; while, when async, returns a promise for it.
      *
      * @throws {pentaho.lang.ArgumentInvalidError} When, pathologically, an instance constructor with
      * the same `uid` is already registered.
@@ -939,27 +939,27 @@ define([
      * Gets a configured instance constructor of a type,
      * given a factory function that creates it.
      *
-     * Factory functions are tracked by using an unique id property (`_uid_`),
+     * Factory functions are tracked by using an unique identifier property (`_uid_`),
      * which is automatically assigned to them the first time they are given
      * to this function.
      *
      * A map of already evaluated factory functions,
-     * indexed by their unique id, is kept in `_byFactoryUid`.
+     * indexed by their unique identifier, is kept in `_byFactoryUid`.
      *
      * If a factory has already been evaluated before,
      * the type it returned then is now returned immediately (modulo sync).
      *
-     * Otherwise the factory function is evaluated being passed this context as argument.
+     * Otherwise, the factory function is evaluated, being passed this context as argument.
      *
      * The returned instance constructor is passed to `_getType`,
      * for registration and configuration,
      * and then returned immediately (module sync).
      *
-     * @param {!pentaho.type.Factory.<pentaho.type.Instance>} typeFactory A factory of a type's instance constructor.
+     * @param {!pentaho.type.Factory.<pentaho.type.Instance>} typeFactory - A factory of a type's instance constructor.
      * @param {boolean} [sync=false] Whether to perform a synchronous get.
      *
      * @return {!Promise.<!Class.<pentaho.type.Instance>>|!Class.<pentaho.type.Instance>} When sync,
-     * returns the instance constructor, while, when async, returns a promise for it.
+     * returns the instance constructor; while, when async, returns a promise for it.
      *
      * @throws {pentaho.lang.OperationInvalidError} When the value returned by the factory function
      * is not a instance constructor of a subtype of `Instance`.

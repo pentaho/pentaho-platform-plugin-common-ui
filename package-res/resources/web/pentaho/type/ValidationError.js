@@ -32,7 +32,7 @@ define([
    *
    * @description Creates a validation error object.
    * @constructor
-   * @param {string} message The error message.
+   * @param {string} message - The error message.
    */
 
   return UserError.extend("pentaho.type.ValidationError", /** @lends pentaho.type.ValidationError# */{

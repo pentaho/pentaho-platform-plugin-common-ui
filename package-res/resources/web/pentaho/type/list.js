@@ -65,7 +65,7 @@ define([
      * also be overridden to copy those properties.
      *
      * @constructor
-     * @param {pentaho.type.spec.UList} [spec] The list specification or another, compatible list instance.
+     * @param {pentaho.type.spec.UList} [spec] The list specification or another compatible list instance.
      *
      * @see pentaho.type.spec.IList
      * @see pentaho.type.spec.IListProto
@@ -249,7 +249,7 @@ define([
       /**
        * Gets the element at a specified index, or `null`.
        *
-       * @param {number} index The desired index.
+       * @param {number} index - The desired index.
        * @return {?pentaho.type.Element} The element value or `null`.
        */
       at: function(index) {
@@ -260,9 +260,9 @@ define([
       /**
        * Gets a value that indicates if an element with a given key is present in the list.
        *
-       * @param {string|any} key The element's key.
+       * @param {string|any} key - The element's key.
        *
-       * @return {boolean} `true` if an element with the given key is present in the list, `false` otherwise.
+       * @return {boolean} `true` if an element with the given key is present in the list; `false`, otherwise.
        */
       has: function(key) {
         return key != null &&
@@ -273,9 +273,9 @@ define([
       /**
        * Gets a value that indicates if a given element is present in the list.
        *
-       * @param {pentaho.type.Element} elem The element to test.
+       * @param {pentaho.type.Element} elem - The element to test.
        *
-       * @return {boolean} `true` if the element is present in the list, `false` otherwise.
+       * @return {boolean} `true` if the element is present in the list; `false`, otherwise.
        */
       includes: function(elem) {
         return elem != null && this.get(elem.key) === elem;
@@ -284,9 +284,9 @@ define([
       /**
        * Gets the index of a given element in the list.
        *
-       * @param {pentaho.type.Element} elem The element whose index to determine.
+       * @param {pentaho.type.Element} elem - The element whose index to determine.
        *
-       * @return {number} `true` if the element is present in the list, `false` otherwise.
+       * @return {number} `true` if the element is present in the list; `false`, otherwise.
        */
       indexOf: function(elem) {
         return elem && this.has(elem.key) ? this._projectedMock._elems.indexOf(elem) : -1;
@@ -295,7 +295,7 @@ define([
       /**
        * Gets the element having a specified key value, if any, or `null`.
        *
-       * @param {string|any} key The element's key.
+       * @param {string|any} key - The element's key.
        *
        * @return {?pentaho.type.Element} The corresponding element or `null`.
        */
@@ -461,7 +461,7 @@ define([
       /**
        * Casts a value for use as a lookup key and returns it.
        *
-       * @param {any} value The value from which the key is built.
+       * @param {any} value - The value from which the key is built.
        *
        * @return {nonEmptyString} The key.
        *
@@ -474,7 +474,7 @@ define([
       /**
        * Casts a value specification to the element type of the list.
        *
-       * @param {any} valueSpec The value.
+       * @param {any} valueSpec - The value.
        *
        * @return {pentaho.type.Element} An element.
        *
@@ -677,7 +677,7 @@ define([
      * @name extend
      * @memberOf pentaho.type.List
      *
-     * @param {string} [name] The name of the created class. Used for debugging purposes.
+     * @param {string} [name] The name of the created class, used for debugging purposes.
      * @param {pentaho.type.spec.IListProto} [instSpec] The instance specification.
      * @param {Object} [classSpec] The static specification.
      * @param {Object} [keyArgs] The keyword arguments.
