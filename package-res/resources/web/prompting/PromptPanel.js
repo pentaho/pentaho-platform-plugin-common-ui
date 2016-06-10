@@ -632,6 +632,9 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
          * @returns {Object} parameters The parameters name|value pair assigned to the dashboard instance
          */
         getParameterValues: function () {
+          function toDojoCompatibleLocale(locale) {
+            return locale.match(/[a-z]{2}(?:[-_][a-z]{2})?/i) ? locale.replace(/_/, "-").toLowerCase() : "en";
+          }
           var params = {};
           this.getParamDefn().mapParameters(function (param) {
             var value = this.getParameterValue(this.getParameterName(param));
@@ -648,7 +651,7 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
               try {
                 if (value.indexOf(localization ? localization.decimal : defaultLocalization.decimal) > 0) {
                   valueParsed = DojoNumber.parse(value, {
-                    locale: SESSION_LOCALE.toLowerCase()
+                    locale: toDojoCompatibleLocale(SESSION_LOCALE)
                   });
                   if (valueParsed.toString().indexOf(defaultLocalization.decimal) < 0) {
                     valueParsed = DojoNumber.format(valueParsed, {
@@ -658,7 +661,7 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
                     valueParsed = valueParsed.split(defaultLocalization.group).join("");
                   }
                 } else {
-                  valueParsed = DojoNumber.parse(value, {locale: SESSION_LOCALE.toLowerCase()});
+                  valueParsed = DojoNumber.parse(value, {locale: toDojoCompatibleLocale(SESSION_LOCALE)});
                 }
               } catch (e) {
                 valueParsed = value;
