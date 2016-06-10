@@ -207,6 +207,18 @@ define("common-ui/util/util", ["dijit/registry", "dojo/dom"], function(registry,
       var whiteList = ["java.lang.Number", "java.lang.Byte", "java.lang.Double", "java.lang.Float", "java.lang.Integer",
         "java.lang.Long", "java.lang.Short", "java.math.BigDecimal", "java.math.BigInteger"];
       return whiteList.indexOf(type) >= 0;
+    },
+
+    /**
+     * Converts a locale name to the dojo/i18n notion
+     *
+     * @name util#normalizeDojoLocale
+     * @method
+     * @param {String} locale
+     * @return {String} dojo representation of the locale (lowercase, delimited with hyphens) or "en" if conversion's failed.
+     */
+    normalizeDojoLocale: function(locale) {
+      return locale.match(/[a-z]{2}(?:[-_][a-z]{2}){0,2}/i) ? locale.replace(/_/, "-").toLowerCase() : "en";
     }
   }
 });
