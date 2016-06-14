@@ -34,16 +34,16 @@
 
 
 /**
- * The id of the value type's AMD module, a _temporary id_, or `null`.
+ * The identifier of the value type's AMD module, a _temporary identifier_, or `null`.
  *
  * An empty string or `undefined` value is interpreted as `null`.
  *
  * For serialization purposes,
- * a **temporary id** can be assigned to an anonymous type.
- * An id is _temporary_ if it starts with
+ * a **temporary identifier** can be assigned to an anonymous type.
+ * An identifier is _temporary_ if it starts with
  * [idTemporaryPrefix]{@link pentaho.type.SpecificationContext.idTemporaryPrefix}.
  *
- * Temporary ids are ignored after type construction.
+ * Temporary identifiers are ignored after type construction.
  *
  * @name id
  * @memberOf pentaho.type.spec.IValueTypeProto#
@@ -67,7 +67,7 @@
 /**
  * Indicates if the type is abstract.
  *
- * An abstract type cannot be used directly to create a value instance,
+ * An abstract type cannot be used directly to create a value instance 
  * and, as such, it is not usually exposed to users in a user interface.
  *
  * When not a boolean,
@@ -98,7 +98,7 @@
  * @memberOf pentaho.type.spec.IValueTypeProto#
  * @method
  *
- * @param {!pentaho.type.Value} value The value to validate.
+ * @param {!pentaho.type.Value} value - The value to validate.
  *
  * @return {?Array.<!pentaho.type.ValidationError>} A non-empty array of errors or `null`.
  *

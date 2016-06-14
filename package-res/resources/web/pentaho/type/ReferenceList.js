@@ -40,7 +40,7 @@ define([
     /**
      * Adds a reference to the owner of this reference list.
      *
-     * @param {!pentaho.type.ContainerMixin} container The container that references the owner of this reference list.
+     * @param {!pentaho.type.ContainerMixin} container - The container that references the owner of this reference list.
      * @param {pentaho.type.Property.Type} [propType] When `container` is a complex,
      * the property type whose value contains the owner of this reference list.
      *
@@ -53,11 +53,11 @@ define([
     /**
      * Removes a reference to the owner of this reference list.
      *
-     * @param {!pentaho.type.ContainerMixin} container The container that references the owner of this reference list.
+     * @param {!pentaho.type.ContainerMixin} container - The container that references the owner of this reference list.
      * @param {pentaho.type.Property.Type} [propType] When `container` is a complex,
      * the property type whose value used to reference.
      *
-     * @return {boolean} `true` if the reference existed and was removed, `false` otherwise.
+     * @return {boolean} `true` if the reference existed and was removed; `false`, otherwise.
      */
     remove: function(container, propType) {
       // Expecting just a few references; commonly, 1 ref.

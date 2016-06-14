@@ -41,7 +41,7 @@
  *
  * Unless otherwise specified,
  * the JSON serialization of the underlying value is the value itself
- * (a string is a JSON string, a number is a JSON number and boolean is a JSON boolean).
+ * (a string is a JSON string; a number is a JSON number and boolean is a JSON boolean).
  * Other data types naturally need to be serialized to JSON in some custom way
  * and document that format.
  *

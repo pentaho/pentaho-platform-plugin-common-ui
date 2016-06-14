@@ -112,7 +112,7 @@ define([
      * var MyOwnInstanceCtor = context.get("my/own/type");
      * ```
      *
-     * Internally, (it is like if) the following steps are taken:
+     * Internally, (it is as if) the following steps are taken:
      *
      * 1. If the requested type has been previously created and configured, just return it:
      *    ```js
@@ -140,7 +140,7 @@ define([
      *    InstanceCtor = configure(context, InstanceCtor);
      *    ```
      *
-     * 5. The configured instance constructor is stored under its id:
+     * 5. The configured instance constructor is stored under its identifier:
      *    ```js
      *    store(context, InstanceCtor.type.id, InstanceCtor);
      *    ```
@@ -302,7 +302,7 @@ define([
      *
      * });
      *
-     * @param {!pentaho.type.spec.UTypeReference} typeRef A type reference.
+     * @param {!pentaho.type.spec.UTypeReference} typeRef - A type reference.
      * @param {Object} [keyArgs] The keyword arguments.
      * @param {pentaho.type.spec.UTypeReference} [keyArgs.defaultBase] The default base type
      * of `typeRef` when it is an immediate generic object specification.
@@ -352,7 +352,7 @@ define([
      *
      * @param {!Array.<pentaho.type.spec.UTypeReference>} typeRefs - An array of type references.
      * @param {function} fun - The function to bind.
-     * @param {Object} [ctx] - The fixed JavaScript context object to use.
+     * @param {Object} [ctx] The fixed JavaScript context object to use.
      *
      * @return {function} The new bound function.
      */
@@ -404,8 +404,8 @@ define([
      * });
      *
      * @param {!pentaho.type.spec.UTypeReference} typeRef - A type reference.
-     * @param {Object} [keyArgs] - The keyword arguments.
-     * @param {pentaho.type.spec.UTypeReference} [keyArgs.defaultBase] - The default base type
+     * @param {Object} [keyArgs] The keyword arguments.
+     * @param {pentaho.type.spec.UTypeReference} [keyArgs.defaultBase] The default base type
      * of `typeRef` when it is an immediate generic object specification.
      *
      * @return {!Promise.<!Class.<pentaho.type.Instance>>} A promise for the instance constructor.
@@ -449,7 +449,7 @@ define([
      * This method is a synchronous version of {@link pentaho.type.Context#getAllAsync}
      *
      * If it is not known whether all known subtypes of `baseTypeId` have already been loaded
-     * (e.g. by a previous call to [getAllAsync]{@link pentaho.type.Context#getAllAsync}),
+     * (for example, by a previous call to [getAllAsync]{@link pentaho.type.Context#getAllAsync}),
      * the asynchronous method version, [getAllAsync]{@link pentaho.type.Context#getAsync},
      * should be used instead.
      *
@@ -472,9 +472,9 @@ define([
      *
      * });
      *
-     * @param {string} [baseTypeId] - The identifier of the base type. Defaults to `"pentaho/type/value"`.
-     * @param {object} [keyArgs] - Keyword arguments.
-     * @param {?boolean} [keyArgs.isBrowsable=null] - Indicates that only types with the specified
+     * @param {string} [baseTypeId] The identifier of the base type. Defaults to `"pentaho/type/value"`.
+     * @param {object} [keyArgs] Keyword arguments.
+     * @param {?boolean} [keyArgs.isBrowsable=null] Indicates that only types with the specified
      *   [isBrowsable]{@link pentaho.type.Value.Type#isBrowsable} value are returned.
      *
      * @return {!Array.<Class.<pentaho.type.Value>>} An array of instance contructors.
@@ -543,9 +543,9 @@ define([
      *
      * });
      *
-     * @param {string} [baseTypeId] - The identifier of the base type. Defaults to `"pentaho/type/value"`.
-     * @param {object} [keyArgs] - Keyword arguments.
-     * @param {?boolean} [keyArgs.isBrowsable=null] - Indicates that only types with the specified
+     * @param {string} [baseTypeId] The identifier of the base type. Defaults to `"pentaho/type/value"`.
+     * @param {object} [keyArgs] Keyword arguments.
+     * @param {?boolean} [keyArgs.isBrowsable=null] Indicates that only types with the specified
      *   [isBrowsable]{@link pentaho.type.Type#isBrowsable} value are returned.
      *
      * @return {Promise.<Array.<Class.<pentaho.type.Instance>>>} A promise for an array of instance classes.
@@ -671,7 +671,7 @@ define([
     /**
      * Sets the new ambient transaction.
      *
-     * @param {pentaho.type.changes.Transaction} txnNew The new ambient transaction.
+     * @param {pentaho.type.changes.Transaction} txnNew - The new ambient transaction.
      *
      * @private
      */
@@ -773,8 +773,7 @@ define([
      * When the resulting module is returned by AMD,
      * its result is passed on, _recursively_, to `_get`,
      * and, thus, the module can return any of the supported type reference formats.
-     * The usual is to return a factory function. Honestly, haven't thought much about
-     * whether it makes total sense for a module to return the other formats.
+     * The usual is to return a factory function.
      *
      * ### Ambient specification context
      *

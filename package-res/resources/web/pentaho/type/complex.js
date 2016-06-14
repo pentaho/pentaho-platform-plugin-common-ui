@@ -303,9 +303,9 @@ define([
        * `undefined` is returned.
        *
        * Value `null` is returned when a step, in `steps`:
-       * 1. on a list value, is an element index that is out of range
-       * 2. on a list value, is an element key that is not present
-       * 3. on a complex value, a property has value `null`.
+       * 1. On a list value, is an element index that is out of range
+       * 2. On a list value, is an element key that is not present
+       * 3. On a complex value, a property has value `null`.
        *
        * This method supports two signatures.
        * When the first argument is an array, it is the `steps` array,
@@ -926,7 +926,7 @@ define([
          * Adds, overrides or configures properties to/of the complex type.
          *
          * @param {pentaho.type.spec.IPropertyTypeProto|pentaho.type.spec.IPropertyTypeProto[]} propTypeSpec
-         * A property type specification or an array of them.
+         * - A property type specification or an array of them.
          *
          * @return {pentaho.type.Complex} This object.
          */

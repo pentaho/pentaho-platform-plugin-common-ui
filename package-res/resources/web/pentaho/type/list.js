@@ -182,7 +182,7 @@ define([
        * Clones the data structures that store elements.
        *
        * @param {!Object} clone - The list clone.
-       * @param {boolean} [useCommitted=false] - Indicates that the committed version is desired.
+       * @param {boolean} [useCommitted=false] Indicates that the committed version is desired.
        * @return {!Object} The specified clone object.
        *
        * @private
@@ -444,7 +444,7 @@ define([
        * Calls a function for each element of the list.
        *
        * @param {function(pentaho.type.Element, number, pentaho.type.List) : boolean?} fun
-       * The mapping function. Return `false` to break iteration.
+       * - The mapping function. Return `false` to break iteration.
        *
        * @param {Object} [ctx] The JS context object on which `fun` is called.
        */

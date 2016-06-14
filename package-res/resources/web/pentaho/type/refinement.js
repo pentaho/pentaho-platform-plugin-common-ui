@@ -445,7 +445,7 @@ define([
          * A refinement type is a subtype of its representation type, [of]{@link pentaho.type.Refinement.Type#of}.
          *
          * @param {?pentaho.type.Type} superType - The candidate super-type.
-         * @return {boolean} `true` if this is a subtype of `superType` type, `false` otherwise.
+         * @return {boolean} `true` if this is a subtype of `superType` type; `false`, otherwise.
          */
         isSubtypeOf: function(superType) {
           var of;

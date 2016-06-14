@@ -32,19 +32,19 @@
  */
 
 /**
- * The id or [ids]{@link pentaho.type.Type#id} of the value types that the rule applies to.
+ * The identifier or [ids]{@link pentaho.type.Type#id} of the value types that the rule applies to.
  *
  * When {@link Nully} or unspecified, it defaults to the root value type,
  * [value]{@link pentaho.type.Value}.
  *
- * The specified id or ids may be standard
+ * The specified identifier or identifiers may be standard
  * [short ids]{@link pentaho.type.Type#shortId} or absolute.
  *
- * When an id does not contain any "/" character, it is considered a standard type and
+ * When an identifier does not contain any "/" character, it is considered a standard type and
  * is taken relative to Pentaho's `"pentaho/type"` module.
  * Otherwise, it is considered absolute.
  *
- * Note that relative AMD module ids, such as "./foo", are not supported.
+ * Note that relative AMD module identifiers, such as "./foo", are not supported.
  *
  * @name type
  * @memberOf pentaho.type.spec.ITypeConfigurationRuleSelection#
@@ -55,7 +55,7 @@
  */
 
 /**
- * The id or ids of the application that the rule applies to.
+ * The identifier or identifiers of the application that the rule applies to.
  *
  * @name application
  * @memberOf pentaho.type.spec.ITypeConfigurationRuleSelection#
@@ -63,7 +63,7 @@
  */
 
 /**
- * The id or ids of the user that the rule applies to.
+ * The identifier or identifiers of the user that the rule applies to.
  *
  * @name user
  * @memberOf pentaho.type.spec.ITypeConfigurationRuleSelection#
@@ -71,7 +71,7 @@
  */
 
 /**
- * The id or ids of the theme that the rule applies to.
+ * The identifier or identifiers of the theme that the rule applies to.
  *
  * @name theme
  * @memberOf pentaho.type.spec.ITypeConfigurationRuleSelection#
@@ -79,7 +79,7 @@
  */
 
 /**
- * The id or ids of the locale that the rule applies to.
+ * The identifier or identifiers of the locale that the rule applies to.
  *
  * @name locale
  * @memberOf pentaho.type.spec.ITypeConfigurationRuleSelection#

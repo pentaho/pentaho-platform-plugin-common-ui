@@ -44,7 +44,7 @@
  * @memberOf pentaho.type.spec.ISimpleTypeProto#
  * @method
  *
- * @param {!any} value The value to convert.
+ * @param {!any} value - The value to convert.
  *
  * @return {?any} The converted value or `null`, when not possible to convert.
  *
