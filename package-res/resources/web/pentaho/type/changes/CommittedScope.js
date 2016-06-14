@@ -32,7 +32,7 @@ define([
      * @constructor
      * @description Creates a `CommittedScope`.
      *
-     * @param {!pentaho.type.Context} context The associated context.
+     * @param {!pentaho.type.Context} context - The associated context.
      */
     constructor: function(context) {
       this.base(context, null);

@@ -82,7 +82,7 @@ define([
      * Updates the order of this changeset to reflect its topological sort order.
      *
      * @param {number} netOrder - The net order.
-     * @return {boolean} `true` if the order was updated, `false` otherwise.
+     * @return {boolean} `true` if the order was updated; `false`, otherwise.
      * @private
      */
     _updateNetOrder: function(netOrder) {
@@ -106,7 +106,7 @@ define([
      */
 
     /**
-     * Throws an error if the changeset is readonly.
+     * Throws an error if the changeset is read-only.
      *
      * @throws {pentaho.lang.OperationInvalidError} When the changeset has been marked
      * [read-only]{@link pentaho.type.changes.Changeset#isReadOnly}.
@@ -118,8 +118,8 @@ define([
     },
 
     /**
-     * Gets a value that indicates if the changeset is in a readonly state
-     * an can no longer be modified.
+     * Gets a value that indicates if the changeset is in a read-only state
+     * and can no longer be modified.
      *
      * @type {boolean}
      * @readOnly

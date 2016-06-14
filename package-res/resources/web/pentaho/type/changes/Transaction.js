@@ -62,7 +62,7 @@ define([
      *
      * @constructor
      * @description Creates a `Transaction` for a given context.
-     * @param {!pentaho.type.Context} context The context of the transaction.
+     * @param {!pentaho.type.Context} context - The context of the transaction.
      */
     constructor: function(context) {
       if(!context) throw error.argRequired("context");
@@ -103,7 +103,7 @@ define([
     //region State
     /**
      * Gets a value that indicates if the transaction is in a proposed state,
-     * i.e., it has not been committed or rejected.
+     * that is, it has not been committed or rejected.
      *
      * @type {boolean}
      * @readOnly
@@ -127,7 +127,7 @@ define([
     },
 
     /**
-     * Gets an action result of the final state of the transaction, or `null`,
+     * Gets an action result of the final state of the transaction; or `null`,
      * if the transaction is still in a proposed state.
      *
      * @type {pentaho.lang.ActionResult}
@@ -142,11 +142,11 @@ define([
 
     //region Changesets and ChangeRefs
     /**
-     * Gets the changeset of an instance, given its unique id.
+     * Gets the changeset of an instance, given its unique identifier.
      *
      * If no changeset has been added for the specified instance, `null` is returned.
      *
-     * @param {string} uid - The unique id of the instance.
+     * @param {string} uid - The unique identifier of the instance.
      *
      * @return {pentaho.type.changes.Changeset} The changeset, or `null`.
      */
@@ -155,7 +155,7 @@ define([
     },
 
     /**
-     * Gets the `ChangeRef` for the given container, creating one, if necessary.
+     * Gets the `ChangeRef` for the given container, creating one if necessary.
      *
      * @param {pentaho.type.ContainerMixin} container - The container.
      *
@@ -175,9 +175,9 @@ define([
     },
 
     /**
-     * Gets the `ChangeRef` for a container, given its unique id.
+     * Gets the `ChangeRef` for a container, given its unique identifier.
      *
-     * @param {string} container - The container unique id.
+     * @param {string} container - The container unique identifier.
      *
      * @return {pentaho.type.changes.ChangeRef} The corresponding `ChangeRef` or `null`.
      * @private
@@ -463,7 +463,7 @@ define([
     /**
      * Rejects the transaction with a given reason and throws an error.
      *
-     * @param {string|Error|pentaho.lang.UserError} [reason="canceled"] - The reason for rejecting the transaction.
+     * @param {string|Error|pentaho.lang.UserError} [reason="canceled"] The reason for rejecting the transaction.
      *
      * @throws {pentaho.lang.OperationInvalidError} When this method is called while one of
      * [_commitWill]{@link pentaho.type.changes.Transaction#_commitWill} or

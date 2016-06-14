@@ -36,7 +36,7 @@ define([
    *
    * @description Creates a transaction rejected error object given the rejection reason.
    * @constructor
-   * @param {Error} reason The error message.
+   * @param {Error} reason - The error message.
    */
 
   return UserError.extend("pentaho.type.changes.TransactionRejectedError",

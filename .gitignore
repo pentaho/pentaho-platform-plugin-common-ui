@@ -17,6 +17,7 @@ dev-res/dojo/
 node_modules/
 override.properties
 pentaho.log
+package-pom.xml
 .classpath
 .project
 .idea
