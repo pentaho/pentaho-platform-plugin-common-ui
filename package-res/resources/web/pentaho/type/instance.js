@@ -151,10 +151,10 @@ define([
        *
        * Please see the documentation of subclasses for information on additional, supported keyword arguments.
        *
-       * @param {?boolean} [keyArgs.isJson=false] - Generates a JSON-compatible specification.
+       * @param {?boolean} [keyArgs.isJson=false] Generates a JSON-compatible specification.
        * Attributes that don't have a JSON-compatible specification are omitted.
        *
-       * @param {?boolean} [keyArgs.includeType=false] - Includes the inline type property, `_`, in the specification.
+       * @param {?boolean} [keyArgs.includeType=false] Includes the inline type property, `_`, in the specification.
        *
        * @return {!any} A specification of this instance.
        */
@@ -165,7 +165,7 @@ define([
       /**
        * Creates a specification that describes this instance.
        *
-       * @param {Object} [keyArgs] - The keyword arguments object.
+       * @param {Object} [keyArgs] The keyword arguments object.
        * Passed to every instance and type serialized within this scope.
        *
        * Please see the documentation of subclasses for information on additional, supported keyword arguments.

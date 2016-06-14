@@ -20,7 +20,7 @@
  * in the [select]{@link pentaho.type.spec.ITypeConfigurationRule#select} attribute
  * of a type configuration rule.
  *
- * A {@link Nully} filter, is equivalent to not filtering a variable.
+ * A {@link Nully} filter is equivalent to not filtering a variable.
  * When unfiltered, any context variable value is matched.
  *
  * An array filter matches a context variable if any of the values in the array

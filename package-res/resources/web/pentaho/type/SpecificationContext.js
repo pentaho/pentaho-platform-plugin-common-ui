@@ -43,7 +43,7 @@ define([
    * Methods like
    * [Instance#toSpec]{@link pentaho.type.Instance#toSpec},
    * [Type#toSpec]{@link pentaho.type.Type#toSpec} and
-   * [Type#toRef]{@link pentaho.type.Type#toRef},
+   * [Type#toRef]{@link pentaho.type.Type#toRef} 
    * use the ambient specification context, when set,
    * to provide context to the serialization process.
    * When not set, these create a new specification context and
@@ -69,7 +69,7 @@ define([
 
       /**
        * The type infos of anonymous types already described in the context,
-       * indexed by temporary identifier.
+       * indexed by a temporary identifier.
        *
        * @type {Object.<string, Object>}
        * @private
@@ -202,7 +202,7 @@ define([
     },
 
     /**
-     * The prefix of temporary ids.
+     * The prefix of temporary identifiers.
      *
      * @type {nonEmptyString}
      * @readOnly

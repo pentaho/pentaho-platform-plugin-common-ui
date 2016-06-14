@@ -217,12 +217,12 @@ define([
        * @param {?boolean} [keyArgs.isJson=false] - Generates a JSON-compatible specification.
        * Attributes which don't have a JSON-compatible specification are omitted.
        *
-       * @param {?boolean} [keyArgs.includeType=false] - Includes the inline type property, `_`, in the specification.
+       * @param {?boolean} [keyArgs.includeType=false] Includes the inline type property, `_`, in the specification.
        *
-       * @param {boolean} [keyArgs.omitFormatted=false] - Omits the formatted value
+       * @param {boolean} [keyArgs.omitFormatted=false] Omits the formatted value
        * on [Simple]{@link pentaho.type.Simple} values' specifications.
        *
-       * @param {boolean} [keyArgs.preferPropertyArray=false] - Indicates that, if possible,
+       * @param {boolean} [keyArgs.preferPropertyArray=false] Indicates that, if possible,
        * array form is used for [Complex]{@link pentaho.type.Complex} values' specifications.
        *
        * The array form of a complex value cannot be used when its type must be inlined.
@@ -235,7 +235,7 @@ define([
        * Only applies to complex values that are serialized in object form.
        * In array form, all of the properties of complex values are serialized independently of their value.
        *
-       * @param {Object} [keyArgs.omitProps] - An object whose _own_ property names are the names of
+       * @param {Object} [keyArgs.omitProps] An object whose _own_ property names are the names of
        * the properties of the current complex type to omit from the serialization.
        *
        * Only applies when a complex is output in object form.
@@ -276,7 +276,7 @@ define([
          * @param {pentaho.type.Value|Nully} [va] The first value.
          * @param {pentaho.type.Value|Nully} [vb] The second value.
          *
-         * @return {boolean} `true` if two values are equal, `false` otherwise.
+         * @return {boolean} `true` if two values are equal; `false`, otherwise.
          */
         areEqual: function(va, vb) {
           return va === vb || (va == null && vb == null) ||

@@ -50,9 +50,9 @@ define([
      * For additional information, see the class of _instances_, {@link pentaho.type.Instance}.
      *
      * @description _Initializes_ the type's singleton object.
-     * @param {Object} spec The specification of this type.
-     * @param {!Object} keyArgs Keyword arguments.
-     * @param {!pentaho.type.Instance} keyArgs.instance The _prototype_ of the `Instance` class associated with
+     * @param {Object} spec - The specification of this type.
+     * @param {!Object} keyArgs - Keyword arguments.
+     * @param {!pentaho.type.Instance} keyArgs.instance - The _prototype_ of the `Instance` class associated with
      * this type.
      * @param {boolean} [keyArgs.isRoot=false] Indicates if the type is a _root_ type.
      *
@@ -74,9 +74,9 @@ define([
        *
        * This method is typically overridden to block the inheritance of certain attributes.
        *
-       * @param {!Object} spec The specification of this type.
-       * @param {!Object} keyArgs Keyword arguments.
-       * @param {!pentaho.type.Instance} keyArgs.instance The _prototype_ of the `Instance` class associated with
+       * @param {!Object} spec - The specification of this type.
+       * @param {!Object} keyArgs - Keyword arguments.
+       * @param {!pentaho.type.Instance} keyArgs.instance - The _prototype_ of the `Instance` class associated with
        * this type.
        * @param {boolean} [keyArgs.isRoot=false] If `true`, creates a _root_ type.
        * @protected
@@ -115,8 +115,8 @@ define([
        *
        * The default implementation does nothing.
        *
-       * @param {!Object} spec The specification of this type.
-       * @param {!Object} keyArgs Keyword arguments.
+       * @param {!Object} spec - The specification of this type.
+       * @param {!Object} keyArgs - Keyword arguments.
        * @protected
        * @overridable
        */
@@ -138,13 +138,13 @@ define([
 
       //region uid property
       /**
-       * Gets the unique id of this type.
+       * Gets the unique identifier of this type.
        *
-       * Unique type ids are auto-generated in each session.
+       * Unique type identifiers are auto-generated in each session.
        *
        * Note that even anonymous types -
        * those whose {@link pentaho.type.Type#id} is `null` -
-       * have an unique-id.
+       * have a unique identifier.
        *
        * This attribute is _not_ inherited.
        *
@@ -363,11 +363,11 @@ define([
       _id: null,
 
       /**
-       * Gets the id of this type.
+       * Gets the identifier of this type.
        *
-       * The id of a type can only be specified when extending the ancestor type.
+       * The identifier of a type can only be specified when extending the ancestor type.
        *
-       * The id is only defined for types which have an associated AMD/RequireJS module.
+       * The identifier is only defined for types which have an associated AMD/RequireJS module.
        * However, note that all have a {@link pentaho.type.Type#uid}.
        *
        * This attribute is not inherited.
@@ -394,10 +394,10 @@ define([
        *
        * When a type is one of the standard types,
        * and thus a direct sub-module of the `pentaho/type` module,
-       * its short id is its _local module id_,
+       * its short identifier is its _local module id_,
        * like `"string"` or `"boolean"`.
        *
-       * Otherwise, the short id is equal to the id.
+       * Otherwise, the short identifier is equal to the identifier.
        *
        * @type {?nonEmptyString}
        * @readOnly
@@ -600,7 +600,7 @@ define([
       _helpUrl: null,
 
       /**
-       * Gets or sets an URL pointing to documentation associated with this type.
+       * Gets or sets a URL pointing to documentation associated with this type.
        *
        * Attempting to set to a non-string value type implicitly
        * converts the value to a string before assignment.
@@ -800,11 +800,11 @@ define([
       * Gets or sets the default view for instances of this type.
       *
       * When a string,
-      * it is the id of the view's AMD module.
+      * it is the identifier of the view's AMD module.
       * If the string starts with `/` or `xyz:`, or ends with `.js`,
-      * the id is considered to be absolute;
+      * the identifier is considered to be absolute;
       * otherwise,
-      * it is relative to this type's id folder, and converted to an absolute id.
+      * it is relative to this type's identifier folder, and converted to an absolute identifier.
       *
       * Setting this to `undefined` causes the view to be inherited from the ancestor type,
       * except for the root type, `Instance.type` (which has no ancestor), where the attribute is `null`.
@@ -1044,7 +1044,7 @@ define([
       /**
        * Asserts that a given type is a subtype of this type.
        *
-       * @param {!pentaho.type.Type} subtype The subtype to assert.
+       * @param {!pentaho.type.Type} subtype - The subtype to assert.
        *
        * @return {!pentaho.type.Type} The subtype `subtype`.
        *
@@ -1077,8 +1077,8 @@ define([
       /**
        * Determines if a value is an instance of this type.
        *
-       * @param {?any} value The value to test.
-       * @return {boolean} `true` if the value is an instance of this type, `false` otherwise.
+       * @param {?any} value - The value to test.
+       * @return {boolean} `true` if the value is an instance of this type; `false`, otherwise.
        */
       is: function(value) {
         return O_isProtoOf.call(this.instance, value);
@@ -1089,8 +1089,8 @@ define([
        *
        * A type is considered a subtype of itself.
        *
-       * @param {?pentaho.type.Type} superType The candidate super-type.
-       * @return {boolean} `true` if this is a subtype of `superType` type, `false` otherwise.
+       * @param {?pentaho.type.Type} superType - The candidate super-type.
+       * @return {boolean} `true` if this is a subtype of `superType` type; `false`, otherwise.
        */
       isSubtypeOf: function(superType) {
         return !!superType && (superType === this || O_isProtoOf.call(superType, this));
@@ -1108,7 +1108,7 @@ define([
        * this method delegates the creation of an instance to
        * [create]{@link pentaho.type.Type#create}.
        *
-       * @param {?any} value The value to convert.
+       * @param {?any} value - The value to convert.
        * @return {?pentaho.type.Instance} The converted value or `null`.
        */
       to: function(value) {
@@ -1129,12 +1129,12 @@ define([
        * this type, and any other instances and types it references,
        * and then delegates the actual work to {@link pentaho.type.Type#toSpecInContext}.
        *
-       * @param {Object} [keyArgs] - The keyword arguments object.
+       * @param {Object} [keyArgs] The keyword arguments object.
        * Passed to every type and instance serialized within this scope.
        *
        * Please see the documentation of subclasses for information on additional, supported keyword arguments.
        *
-       * @param {?boolean} [keyArgs.isJson=false] - Generates a JSON-compatible specification.
+       * @param {?boolean} [keyArgs.isJson=false] Generates a JSON-compatible specification.
        * Attributes that don't have a JSON-compatible specification are omitted.
        *
        * @return {!pentaho.type.spec.ITypeProto} A specification of this type.
@@ -1152,11 +1152,11 @@ define([
        * This method requires that there currently exists an
        * [ambient specification context]{@link pentaho.type.SpecificationContext.current}.
        *
-       * The default implementation returns a plain object with the id of the type and
+       * The default implementation returns a plain object with the identifier of the type and
        * any other specified attributes
        * (like [label]{@link pentaho.type.Type#label} or [description]{@link pentaho.type.Type#description}).
        *
-       * @param {Object} [keyArgs] - The keyword arguments object.
+       * @param {Object} [keyArgs] The keyword arguments object.
        * Passed to every type and instance serialized within this scope.
        *
        * Please see the documentation of subclasses for information on additional, supported keyword arguments.
@@ -1203,12 +1203,12 @@ define([
        * This method does _not_ add the special `id` and `base` attributes to the specification.
        *
        * @param {!Object} spec - The specification to be filled.
-       * @param {Object} [keyArgs] - The keyword arguments object.
+       * @param {Object} [keyArgs] The keyword arguments object.
        * Passed to every type and instance serialized within this scope.
        *
        * Please see the documentation of subclasses for information on additional, supported keyword arguments.
        *
-       * @return {boolean} Returns `true` if any attribute was added, `false`, otherwise.
+       * @return {boolean} Returns `true` if any attribute was added; `false`, otherwise.
        *
        * @protected
        *
@@ -1272,18 +1272,18 @@ define([
        * the [id]{@link pentaho.type.Type#id}, is returned.
        *
        * For anonymous types, a [temporary]{@link pentaho.type.SpecificationContext.isIdTemporary},
-       * serialization-only id is generated.
+       * serialization-only identifier is generated.
        * In the first occurrence in the given scope,
-       * that id is returned, within a full specification of the type,
+       * that identifier is returned, within a full specification of the type,
        * obtained by calling [toSpecInContext]{@link pentaho.type.Type#toSpecInContext}.
-       * In following occurrences, only the previously used temporary id is returned.
+       * In following occurrences, only the previously used temporary identifier is returned.
        *
        * Some standard types have a special reference syntax,
-       * e.g. [List.Type#toRef]{@link pentaho.type.List.Type#toRef}.
+       * for example, [List.Type#toRef]{@link pentaho.type.List.Type#toRef}.
        *
        * @see pentaho.type.Type#toSpec
        *
-       * @param {Object} [keyArgs] - The keyword arguments object.
+       * @param {Object} [keyArgs] The keyword arguments object.
        * Passed to every type and instance serialized within this scope.
        *
        * Please see the documentation of subclasses for information on additional, supported keyword arguments.
@@ -1302,7 +1302,7 @@ define([
        *
        * @see pentaho.type.Type#toRef
        *
-       * @param {Object} [keyArgs] - The keyword arguments object.
+       * @param {Object} [keyArgs] The keyword arguments object.
        * Passed to every type and instance serialized within this scope.
        *
        * Please see the documentation of subclasses for information on additional, supported keyword arguments.

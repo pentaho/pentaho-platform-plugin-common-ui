@@ -203,7 +203,7 @@ define([
        * [value]{@link pentaho.type.Simple#value}, [formatted value]{@link pentaho.type.Simple#formatted}.
        *
        * @param {!pentaho.type.Simple} other - A simple value to test for equality.
-       * @return {boolean} `true` if the given simple value is equal to this one, `false`, otherwise.
+       * @return {boolean} `true` if the given simple value is equal to this one; `false`, otherwise.
        */
       equalsContent: function(other) {
         if(!this.equals(other)) return false;
@@ -427,7 +427,7 @@ define([
     return Simple;
 
     /**
-     * Returns `null` when given a {@link Nully} value and a String otherwise
+     * Returns `null` when given a {@link Nully} value; or, a String, otherwise.
      *
      * @param value   {*} The value to be verified
      * @return {?String}

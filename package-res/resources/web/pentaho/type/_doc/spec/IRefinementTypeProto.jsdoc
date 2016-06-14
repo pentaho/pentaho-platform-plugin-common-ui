@@ -23,9 +23,9 @@
  */
 
 /**
- * The refinement facet ids or classes.
+ * The refinement facet identifiers or classes.
  *
- * The specified facet ids are added to the refinement type,
+ * The specified facet identifiers are added to the refinement type,
  * adding to any already present.
  *
  * The attributes defined by the added refinement facets become available for

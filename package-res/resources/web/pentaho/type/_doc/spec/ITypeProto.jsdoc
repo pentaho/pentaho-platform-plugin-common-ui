@@ -176,10 +176,10 @@
  * The default view for instances of the type.
  *
  * When a string,
- * it is the id of the view's AMD module.
+ * it is the identifier of the view's AMD module.
  * If the string starts with `/` or `xyz:`, or ends with `.js`,
- * the id is considered to be absolute,
- * otherwise, it is relative to the type's id folder.
+ * the identifier is considered to be absolute,
+ * otherwise, it is relative to the type's identifier folder.
  *
  * When `undefined`,
  * the view is inherited from the base type, if any.

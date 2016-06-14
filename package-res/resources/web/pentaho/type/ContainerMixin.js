@@ -44,13 +44,13 @@ define([
   return Base.extend("pentaho.type.ContainerMixin", /** @lends pentaho.type.ContainerMixin# */{
 
     /**
-     * Initializes a container instance, with a unique id and a version field.
+     * Initializes a container instance, with a unique identifier and a version field.
      *
      * @private
      */
     _initContainer: function() {
       /**
-       * Container unique id.
+       * Container unique identifier.
        *
        * @type {string}
        */
@@ -84,7 +84,7 @@ define([
     /**
      * Initializes a container instance clone.
      *
-     * @param {!pentaho.type.ContainerMixin} clone The cloned container instance.
+     * @param {!pentaho.type.ContainerMixin} clone - The cloned container instance.
      *
      * @private
      */
@@ -127,7 +127,7 @@ define([
      * for when the internal fields are updated directly, for performance and for working
      * outside of any ambient txn. The _removeReference counterpart is not needed.
      *
-     * @param {!pentaho.type.ContainerMixin} container The container that refers this one.
+     * @param {!pentaho.type.ContainerMixin} container - The container that refers this one.
      * @param {pentaho.type.Property.Type} [propType] When `container` is a complex,
      * the property type whose value contains this instance.
      *
@@ -152,7 +152,7 @@ define([
     /**
      * Sets the new version of the instance.
      *
-     * @param {number} version The new container version.
+     * @param {number} version - The new container version.
      *
      * @private
      * @friend {pentaho.type.changes.Changeset}
@@ -215,7 +215,7 @@ define([
      *
      * @param {!pentaho.type.changes.Changeset} changeset - The set of changes.
      *
-     * @return {pentaho.lang.UserError|undefined} An error if the changeset was canceled, or `undefined` otherwise.
+     * @return {pentaho.lang.UserError|undefined} An error if the changeset was canceled; or, `undefined` otherwise.
      *
      * @private
      * @friend {pentaho.type.changes.Transaction}

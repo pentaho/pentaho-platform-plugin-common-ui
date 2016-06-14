@@ -22,21 +22,21 @@
  * ##### A _type id_ string
  *
  * A type's permanent [id]{@link pentaho.type.Type#id} —
- * the id of a defined module in the AMD module system —,
+ * the identifier of a defined module in the AMD module system —,
  * or a [temporary]{@link pentaho.type.SpecificationContext.isIdTemporary},
- * serialization-only id.
+ * serialization-only identifier.
  *
- * When an id is permanent and does not contain any "/" character,
+ * When an identifier is permanent and does not contain any "/" character,
  * it is considered a standard type and is taken relative to Pentaho's `"pentaho/type"` module.
  *
- * Note that relative AMD module ids, such as "./foo", are not supported.
+ * Note that relative AMD module identifiers, such as "./foo", are not supported.
  *
- * Example absolute, permanent id:
+ * Example absolute, permanent identifier:
  * ```js
  * "pentaho/type/string"
  * ```
  *
- * Example temporary id:
+ * Example temporary identifier:
  * ```js
  * "_:1"
  * ```
@@ -47,7 +47,7 @@
  *
  * Usually,
  * a reference to an instance constructor is obtained from a [context]{@link pentaho.type.Context} object
- * (and not used to obtain one...), by providing the type's id.
+ * (and not used to obtain one...) by providing the type's identifier.
  * Nevertheless, it is sometimes useful to be able to use it to identify a type.
  *
  * Example:
@@ -67,8 +67,8 @@
  * for a given [context]{@link pentaho.type.Context}.
  * They have the signature {@link pentaho.type.Factory.<pentaho.type.Instance>}.
  *
- * The AMD module under the id of a value type _must_ return a type factory function.
- * A type factory can thus be obtained by requiring the AMD module that has the type's id:
+ * The AMD module under the identifier of a value type _must_ return a type factory function.
+ * A type factory can thus be obtained by requiring the AMD module that has the type's identifier:
  *
  * ```js
  * require(["pentaho/type/Context", "pentaho/type/string"], function(Context, stringFactory) {

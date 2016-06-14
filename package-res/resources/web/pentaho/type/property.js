@@ -92,7 +92,7 @@ define([
          * Initializes a property type object, given a property type specification.
          *
          * @param {!pentaho.type.spec.UPropertyTypeProto} spec - A property name or type specification.
-         * @param {!Object} keyArgs Keyword arguments.
+         * @param {!Object} keyArgs - Keyword arguments.
          * @param {!pentaho.type.Complex.Type} keyArgs.declaringType - The complex type that declares the property.
          * @param {number} keyArgs.index - The index of the property within its complex type.
          * @ignore
@@ -110,11 +110,11 @@ define([
          * Setting label after name ensures that label defaults that are derived from name will work the first time.
          *
          * Setting type before value (not included here, so it is processed after type) avoids:
-         * 1. checking the new value against the old type (and then again, against the new type)
-         * 2. ensures error messages are given in a predicatable order,
+         * 1. Checking the new value against the old type (and then again, against the new type)
+         * 2. Ensures error messages are given in a predicatable order,
          *    independently of the order of properties in an instSpec:
-         *   1. is new type a subtype of old type?
-         *   2. is new value an instance of the new type?
+         *   a. Is new type a subtype of old type?
+         *   b. Is new value an instance of the new type?
          *
          * @type string[]
          * @ignore

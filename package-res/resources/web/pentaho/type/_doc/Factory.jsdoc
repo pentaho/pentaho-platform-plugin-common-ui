@@ -18,6 +18,6 @@
  * Creates the class of a `Value` type for a given context.
  *
  * @callback pentaho.type.Factory
- * @param {pentaho.type.Context} context The context for which the type's class is being created.
+ * @param {pentaho.type.Context} context - The context for which the type's class is being created.
  * @return {Class.<pentaho.type.Value>} The new type class.
  */

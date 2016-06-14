@@ -40,7 +40,7 @@
  * The singleton configuration service, {@link pentaho.type.configurationService},
  * already handles loading of all type configurations registered
  * with the [pentaho/service]{@link pentaho.service} module,
- * under the service id `pentaho.type.spec.ITypeConfiguration`.
+ * under the service identifier `pentaho.type.spec.ITypeConfiguration`.
  *
  * Then, the [Context]{@link pentaho.type.Context} class
  * already handles obtaining configurations from its configuration service,
@@ -105,7 +105,7 @@
  * @memberOf pentaho.type.IConfigurationService#
  * @method
  *
- * @param {string} typeId The [id]{@link pentaho.type.Type#id} of the type whose
+ * @param {string} typeId - The [id]{@link pentaho.type.Type#id} of the type whose
  * configuration specification is desired.
  *
  * @param {pentaho.spec.IContextVars} [contextVars] The context variables that are used to select rules.
@@ -120,7 +120,7 @@
  * using JavaScript's strict equality operator, `===`.
  *
  * @return {pentaho.type.spec.ITypeProto} The merged configuration specification,
- * if any rule was selected, or `null`, if no rule was selected.
+ * if any rule was selected; or `null`, if no rule was selected.
  */
 
 /**
@@ -138,5 +138,5 @@
  * @memberOf pentaho.type.IConfigurationService#
  * @method
  *
- * @param {!pentaho.type.spec.ITypeConfiguration} config A type configuration to add.
+ * @param {!pentaho.type.spec.ITypeConfiguration} config - A type configuration to add.
  */

@@ -73,7 +73,7 @@ define([
      * @param {!Object} obj - The object where the method is defined.
      * @param {string} name - The name of the method.
      *
-     * @return {boolean} `true` if the attribute was added, `false`, otherwise.
+     * @return {boolean} `true` if the attribute was added; `false`, otherwise.
      */
     fillSpecMethodInContext: function(spec, obj, name) {
       var any = false;
