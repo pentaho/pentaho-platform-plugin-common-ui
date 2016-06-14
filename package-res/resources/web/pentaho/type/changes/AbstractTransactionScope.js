@@ -37,7 +37,7 @@ define([
      * @constructor
      * @description Creates a `CommittedScope`.
      *
-     * @param {!pentaho.type.Context} context The associated context.
+     * @param {!pentaho.type.Context} context - The associated context.
      * @param {pentaho.type.changes.Transaction} [transaction] The associated transaction.
      *
      * @throws {pentaho.lang.OperationInvalidError} When the specified transaction is resolved.
@@ -106,7 +106,7 @@ define([
     },
 
     /**
-     * Creates an error saying the scope has already been exited from.
+     * Creates an error saying the scope has already been exited.
      *
      * @return {pentaho.lang.OperationInvalidError} The new error.
      *
@@ -128,7 +128,7 @@ define([
     },
 
     /**
-     * Gets a value that indicates if this scope has not been exited from.
+     * Gets a value that indicates if this scope has not been exited.
      *
      * @type {boolean}
      * @readOnly
@@ -156,12 +156,12 @@ define([
      * The function is called with the `this` context specified in argument `ctx`.
      * The return value of `fun` is returned back from this method.
      *
-     * @param {Object} [ctx] - The `this` context in which to call `fun`.
+     * @param {Object} [ctx] The `this` context in which to call `fun`.
      * When unspecified, the function will have a `null` this.
      *
      * @return {any} The value returned by `fun`.
      *
-     * @throws {Error} Any error thrown from within`fun`.
+     * @throws {Error} Any error thrown from within `fun`.
      */
     using: function(fun, ctx) {
       try {

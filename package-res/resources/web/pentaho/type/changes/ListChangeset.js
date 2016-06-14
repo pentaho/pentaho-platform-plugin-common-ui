@@ -100,7 +100,7 @@ define([
     /**
      * Gets the nested changeset for an element with the given key, if any.
      *
-     * @param {string} key The key of the element.
+     * @param {string} key - The key of the element.
      *
      * @return {pentaho.type.changes.ComplexChangeset} The nested changeset or `null`.
      */
@@ -182,7 +182,7 @@ define([
      *
      * This method is used for computing the future value of the list incrementally.
      *
-     * @param {!Object|!pentaho.type.List} list - The list or list mock to apply changes to.
+     * @param {!Object|!pentaho.type.List} list - The list or list mock to which to apply changes.
      * @param {number} startingFromIdx - The index of the first change to be considered.
      * @private
      */
@@ -468,7 +468,7 @@ define([
      * and appends that change to the list of changes.
      *
      * @param {number} start - The index at which to start removing.
-     * @param {number} [count=1] - The number of elements to remove.
+     * @param {number} [count=1] The number of elements to remove.
      *
      * @throws {pentaho.lang.OperationInvalidError} When the changeset has already been applied or canceled.
      *

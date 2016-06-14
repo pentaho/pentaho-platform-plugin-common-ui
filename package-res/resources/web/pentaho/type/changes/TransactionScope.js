@@ -83,13 +83,13 @@ define([
      * When the scope can commit its transaction,
      * as determined by [canCommit]{@link pentaho.type.changes.TransactionScope#canCommit},
      * accepting the scope attempts to commit its transaction and exits from the scope.
-     * If committing the transaction fails the rejection error is thrown.
+     * If committing the transaction fails, the rejection error is thrown.
      *
      * Otherwise, if the scope cannot commit its transaction, accepting the scope simply exits from it.
      *
      * @return {!pentaho.type.changes.AbstractTransactionScope} This scope.
      *
-     * @throws {pentaho.lang.OperationInvalidError} When the transaction scope has already been exited from.
+     * @throws {pentaho.lang.OperationInvalidError} When the transaction scope has already been exited.
      * @throws {pentaho.lang.OperationInvalidError} When the transaction scope is not the current scope.
      * @throws {Error} When attempting to commit the transaction fails.
      */
@@ -108,7 +108,7 @@ define([
      * Rejects the associated transaction, exits the scope and
      * throws an error containing the provided rejected reason.
      *
-     * @param {string|Error|pentaho.lang.UserError} [reason="canceled"] - The reason for rejecting the transaction.
+     * @param {string|Error|pentaho.lang.UserError} [reason="canceled"] The reason for rejecting the transaction.
      *
      * @throws {pentaho.lang.OperationInvalidError} When not `sloppy` and the transaction scope has
      * already been exited from.
@@ -135,7 +135,7 @@ define([
      * The function is called with the `this` context specified in argument `ctx`.
      * The return value of `fun` is returned back from this method.
      *
-     * @param {Object} [ctx] - The `this` context in which to call `fun`.
+     * @param {Object} [ctx] The `this` context in which to call `fun`.
      * When unspecified, the function will have a `null` this.
      *
      * @return {any} The value returned by `fun`.

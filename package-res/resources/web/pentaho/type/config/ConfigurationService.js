@@ -79,7 +79,7 @@ define([
 
     constructor: function() {
       /**
-       * A map connecting a value type's absolute id to
+       * A map connecting a value type's absolute identifier to
        * the applicable type configuration rules,
        * ordered from least to most specific.
        *
@@ -108,7 +108,7 @@ define([
      * Note that the specified rule object may be slightly modified to serve
      * the service's internal needs.
      *
-     * @param {!pentaho.type.spec.ITypeConfigurationRule} rule The type configuration rule to add.
+     * @param {!pentaho.type.spec.ITypeConfigurationRule} rule - The type configuration rule to add.
      */
     addRule: function(rule) {
       // Assuming the ConfigurationService takes ownership of
@@ -230,8 +230,8 @@ define([
    * The latter is actually deep-cloned, whenever full-subtrees are set at a target place,
    * to prevent future merges from inadvertently changing the source's internal structures.
    *
-   * @param {!pentaho.type.spec.IValueTypeProto} typeSpecTarget The target specification.
-   * @param {!pentaho.type.spec.IValueTypeProto} typeSpecSource The source specification.
+   * @param {!pentaho.type.spec.IValueTypeProto} typeSpecTarget - The target specification.
+   * @param {!pentaho.type.spec.IValueTypeProto} typeSpecSource - The source specification.
    *
    * @return {pentaho.type.spec.IValueTypeProto} The target specification.
    */
@@ -248,9 +248,9 @@ define([
    * Merges one property into a target object,
    * given the source property name and value.
    *
-   * @param {!Object} target The target object.
-   * @param {string} name The source property name.
-   * @param {any} sourceValue The source property value.
+   * @param {!Object} target - The target object.
+   * @param {string} name - The source property name.
+   * @param {any} sourceValue - The source property value.
    */
   function mergeSpecsOne(target, name, sourceValue) {
     var op;
@@ -284,9 +284,9 @@ define([
    * Performs the merge operation when the target value is also a plain object,
    * or replaces it, if not.
    *
-   * @param {!Object} target The target object.
-   * @param {string} name The source property name.
-   * @param {!Object} sourceValue The source property value.
+   * @param {!Object} target - The target object.
+   * @param {string} name - The source property name.
+   * @param {!Object} sourceValue - The source property value.
    */
   function mergeSpecsOperMerge(target, name, sourceValue) {
     // Is `targetValue` also a plain object?
@@ -300,9 +300,9 @@ define([
   /**
    * Replaces the target value with a deep, own clone of the source value.
    *
-   * @param {!Object} target The target object.
-   * @param {string} name The source property name.
-   * @param {any} sourceValue The source property value.
+   * @param {!Object} target - The target object.
+   * @param {string} name - The source property name.
+   * @param {any} sourceValue - The source property value.
    */
   function mergeSpecsOperReplace(target, name, sourceValue) {
     // Clone source value so that future merges into it don't change it, inadvertently.
@@ -315,9 +315,9 @@ define([
    * Otherwise, replaces the target array with a deep,
    * own clone of the source array.
    *
-   * @param {!Object} target The target object.
-   * @param {string} name The source property name.
-   * @param {any} sourceValue The source property value.
+   * @param {!Object} target - The target object.
+   * @param {string} name - The source property name.
+   * @param {any} sourceValue - The source property value.
    */
   function mergeSpecsOperAdd(target, name, sourceValue) {
     // If both are arrays, append source to target, while cloning source elements.
@@ -339,7 +339,7 @@ define([
    *
    * For plain object values, only their _own_ properties are included.
    *
-   * @param {any} value The value to clone deeply.
+   * @param {any} value - The value to clone deeply.
    *
    * @return {any} The deeply cloned value.
    */
@@ -363,9 +363,9 @@ define([
   /**
    * Checks if a value is a plain JavaScript object.
    *
-   * @param {any} value The value to check.
+   * @param {any} value - The value to check.
    *
-   * @return {boolean} `true` if it is, `false` if not.
+   * @return {boolean} `true` if it is; `false` if is not.
    */
   function isPlainJSObject(value) {
     return (!!value) && (typeof value === "object") && (value.constructor === Object);
@@ -374,7 +374,7 @@ define([
   /**
    * Ensures that standard value type ids are made absolute.
    *
-   * @param {string} id A value type id.
+   * @param {string} id - A value type identifier.
    */
   function toAbsTypeId(id) {
     return id.indexOf("/") < 0 ? ("pentaho/type/" + id) : id;

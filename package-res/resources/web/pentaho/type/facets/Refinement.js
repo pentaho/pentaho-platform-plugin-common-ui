@@ -33,7 +33,7 @@ define([
    * Refinement facets are mixed into a {@link pentaho.type.Refinement} type,
    * by specifying its {@link pentaho.type.Refinement.Type#facets} property,
    * when defining it, either
-   * through {@link pentaho.type.Value.refine} or, directly,
+   * through {@link pentaho.type.Value.refine} or, directly 
    * through {@link pentaho.type.Refinement.extend}.
    *
    * Besides any attributes that you may define in this type's prototype,
@@ -60,7 +60,7 @@ define([
     },
 
     /**
-     * Gets the id of the refinement facet AMD module.
+     * Gets the identifier of the refinement facet AMD module.
      *
      * @type {!nonEmptyString}
      * @readOnly
@@ -68,14 +68,14 @@ define([
     id: module.id,
 
     /**
-     * Gets the short id of the refinement facet.
+     * Gets the short identifier of the refinement facet.
      *
-     * When a refinement facet is one of the standard facets,
+     * When a refinement facet is one of the standard facets 
      * and, thus, it is a direct sub-module of the `pentaho/type/facets` module,
-     * its short id is its _local module id_,
+     * its short identifier is its _local module id_,
      * like `"DiscreteDomain"` or `"OrdinalDomain"`.
      *
-     * Otherwise, the short id is equal to the id.
+     * Otherwise, the short identifier is equal to the identifier.
      *
      * @type {!nonEmptyString}
      * @readOnly
@@ -91,11 +91,11 @@ define([
      * Performs validation of a given value of the representation type.
      *
      * This method is invoked **on** the refinement type,
-     *  an instance of {@link pentaho.type.Refinement.Type}.
+     * an instance of {@link pentaho.type.Refinement.Type}.
      *
      * The default implementation throws an error.
      *
-     * @param {!pentaho.type.Value} value The value to validate according to this refinement facet.
+     * @param {!pentaho.type.Value} value - The value to validate according to this refinement facet.
      *
      * @return {pentaho.type.ValidationError|Array.<!pentaho.type.ValidationError>|null} An error,
      * a non-empty array of errors or `null`.
@@ -116,10 +116,10 @@ define([
      * an instance of {@link pentaho.type.Refinement.Type}.
      *
      * @param {Object} spec - The specification to be filled.
-     * @param {Object} [keyArgs] - The keyword arguments object.
+     * @param {Object} [keyArgs] The keyword arguments object.
      * Passed to every type and instance serialized within this scope.
      *
-     * @return {boolean} `true` if any attribute was added, `false`, otherwise.
+     * @return {boolean} `true` if any attribute was added; `false`, otherwise.
      */
     fillSpecInContext: function(spec, keyArgs) {
       return false;

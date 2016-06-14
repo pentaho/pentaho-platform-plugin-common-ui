@@ -135,7 +135,7 @@ define([
      *
      * @param {nonEmptyString|!pentaho.type.Property.Type} name - The property name or type object.
      *
-     * @return {boolean} `true` if the property has changed, `false` otherwise.
+     * @return {boolean} `true` if the property has changed; `false`, otherwise.
      *
      * @throws {pentaho.lang.ArgumentInvalidError} When a property with name `name` is not defined.
      */
