@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2016 Pentaho Corporation.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,7 +51,9 @@
  */
 define(["common-ui/util/util", 'dojo/number', 'cdf/components/TextInputComponent', './FormattedParameterWidgetBuilderBase', 'common-ui/jquery-clean'],
   function (Util, DojoNumber, TextInputComponent, FormattedParameterWidgetBuilderBase, $) {
-
+    function toDojoCompatibleLocale(locale) {
+      return locale.match(/[a-z]{2}(?:[-_][a-z]{2})?/i) ? locale.replace(/_/, "-").toLowerCase() : "en";
+    }
     return FormattedParameterWidgetBuilderBase.extend({
       /**
        * Builds the widget and returns a TextInputComponent
@@ -72,7 +74,7 @@ define(["common-ui/util/util", 'dojo/number', 'cdf/components/TextInputComponent
           preChange: function(){
             var val = $("#"+this.name).attr('value');
             this.dashboard.setParameter(this.parameter, DojoNumber.parse(val, {
-              locale : SESSION_LOCALE.toLowerCase()
+              locale : toDojoCompatibleLocale(SESSION_LOCALE)
             }));
           },
           postExecution: function(){
@@ -89,7 +91,7 @@ define(["common-ui/util/util", 'dojo/number', 'cdf/components/TextInputComponent
                   } else {
                     if (Util.isNumberType(v.type)) {
                       valueParsed = DojoNumber.format(v.label, {
-                        locale : SESSION_LOCALE.toLowerCase()
+                        locale : toDojoCompatibleLocale(SESSION_LOCALE)
                       });
                     } else {
                       valueParsed = v.label;
