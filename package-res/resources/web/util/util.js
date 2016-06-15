@@ -1,5 +1,5 @@
 /*!
-* Copyright 2010 - 2013 Pentaho Corporation.  All rights reserved.
+* Copyright 2010 - 2016 Pentaho Corporation.  All rights reserved.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -218,7 +218,7 @@ define("common-ui/util/util", ["dijit/registry", "dojo/dom"], function(registry,
      * @return {String} dojo representation of the locale (lowercase, delimited with hyphens) or "en" if conversion's failed.
      */
     normalizeDojoLocale: function(locale) {
-      return locale.match(/[a-z]{2}(?:[-_][a-z]{2}){0,2}/i) ? locale.replace(/_/, "-").toLowerCase() : "en";
+      return locale.match(/^[a-z]{2}(?:[-_][a-z]{2}){0,2}$/i) ? locale.split(/_/).join("-").toLowerCase() : "en";
     }
   }
 });
