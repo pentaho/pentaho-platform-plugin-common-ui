@@ -64,6 +64,20 @@ define(["common-ui/util/util", 'dojo/number', 'cdf/components/TextInputComponent
        * @returns {TextInputComponent} The TextInputComponent built
        */
       build: function (args) {
+        function parseNumber(val){
+          try{
+            return DojoNumber.parse(val, { locale : Util.normalizeDojoLocale(SESSION_LOCALE) });
+          } catch(e) {
+            return DojoNumber.parse(val, { locale : "en" });
+          }
+        }
+        function formatNumber(val){
+          try{
+            return DojoNumber.format(val, { locale : Util.normalizeDojoLocale(SESSION_LOCALE) });
+          } catch(e) {
+            return DojoNumber.format(val, { locale : "en" });
+          }
+        }
         var widget = this.base(args);
         var name = widget.name + "-input";
         $.extend(widget, {
@@ -71,9 +85,7 @@ define(["common-ui/util/util", 'dojo/number', 'cdf/components/TextInputComponent
           type: 'TextInputComponent',
           preChange: function(){
             var val = $("#"+this.name).attr('value');
-            this.dashboard.setParameter(this.parameter, DojoNumber.parse(val, {
-              locale : Util.normalizeDojoLocale(SESSION_LOCALE)
-            }));
+            this.dashboard.setParameter(this.parameter, parseNumber(val));
           },
           postExecution: function(){
             this.base();
@@ -88,9 +100,7 @@ define(["common-ui/util/util", 'dojo/number', 'cdf/components/TextInputComponent
                     var valueParsed = null;
                   } else {
                     if (Util.isNumberType(v.type)) {
-                      valueParsed = DojoNumber.format(v.label, {
-                        locale : Util.normalizeDojoLocale(SESSION_LOCALE)
-                      });
+                      valueParsed = formatNumber(v.label);
                     } else {
                       valueParsed = v.label;
                     }
