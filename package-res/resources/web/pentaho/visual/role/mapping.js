@@ -620,6 +620,42 @@ define([
           }
           return levels;
         },
+
+        /**
+         * Gets a value that indicates if the visual role has
+         * any qualitative levels.
+         *
+         * @type {boolean}
+         * @readOnly
+         */
+        get anyLevelsQualitative() {
+          var any = false;
+          this.levels.each(function(level) {
+            if(MeasurementLevel.type.isQualitative(level)) {
+              any = true;
+              return false;
+            }
+          });
+          return any;
+        },
+
+        /**
+         * Gets a value that indicates if the visual role has
+         * any quantitative levels.
+         *
+         * @type {boolean}
+         * @readOnly
+         */
+        get anyLevelsQuantitative() {
+          var any = false;
+          this.levels.each(function(level) {
+            if(MeasurementLevel.type.isQuantitative(level)) {
+              any = true;
+              return false;
+            }
+          });
+          return any;
+        },
         //endregion
 
         //region dataType

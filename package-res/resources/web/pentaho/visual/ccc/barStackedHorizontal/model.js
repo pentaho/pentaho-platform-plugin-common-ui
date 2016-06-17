@@ -16,8 +16,7 @@
 define([
   "../barAbstract/model",
   "pentaho/i18n!../abstract/i18n/model",
-  "../abstract/types/labelsOption",
-  "./theme/model"
+  "../abstract/types/labelsOption"
 ], function(barAbstractModelFactory, bundle, labelsOptionFactory) {
 
   "use strict";

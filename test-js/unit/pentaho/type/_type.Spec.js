@@ -692,11 +692,12 @@ define([
         });
       });
 
-      it("casts to a string, or to `null` if it is nully or an object", function() {
+      it("casts to a string, or to `null` if it is nully", function() {
         [
           [1 / 0, "Infinity"],
           [0, "0"], [1, "1"],
           [{}, "[object Object]"],
+          [[1, "2", 3], "1,2,3"],
           [undefined, null],
           ["", null],
           [[], null]
@@ -711,6 +712,57 @@ define([
         });
       });
     }); // #styleClass
+
+    describe("#inheritedStyleClasses -", function() {
+      var level1StyleClassName = "Level1StyleClass";
+      var level2StyleClassName = "Level2StyleClass";
+      var level3StyleClassName = "Level3StyleClass";
+
+      var DerivedLevel1;
+      var DerivedLevel2;
+      var DerivedLevel3;
+
+      beforeEach(function() {
+        DerivedLevel1 = Instance.extend();
+        DerivedLevel2 = DerivedLevel1.extend();
+        DerivedLevel3 = DerivedLevel2.extend();
+      });
+
+      it("should return empty array when no styleClass are defined", function() {
+        expect(DerivedLevel3.type.inheritedStyleClasses instanceof Array).toBe(true);
+        expect(DerivedLevel3.type.inheritedStyleClasses.length).toBe(0);
+      });
+
+      it("should return array with all the styleClass", function() {
+        DerivedLevel1.type.styleClass = level1StyleClassName;
+        DerivedLevel2.type.styleClass = level2StyleClassName;
+        DerivedLevel3.type.styleClass = level3StyleClassName;
+
+        expect(DerivedLevel3.type.inheritedStyleClasses instanceof Array).toBe(true);
+        expect(DerivedLevel3.type.inheritedStyleClasses.length).toBe(3);
+
+        expect(DerivedLevel3.type.inheritedStyleClasses).toContain(level1StyleClassName);
+        expect(DerivedLevel3.type.inheritedStyleClasses).toContain(level2StyleClassName);
+        expect(DerivedLevel3.type.inheritedStyleClasses).toContain(level3StyleClassName);
+      });
+
+      it("should ignore nully styleClasses", function() {
+        [
+          undefined, null, "", []
+        ].forEach(function(nullyStyleClass) {
+          DerivedLevel1.type.styleClass = "Level1StyleClass";
+          DerivedLevel2.type.styleClass = nullyStyleClass;
+          DerivedLevel3.type.styleClass = "Level3StyleClass";
+
+          expect(DerivedLevel3.type.inheritedStyleClasses instanceof Array).toBe(true);
+          expect(DerivedLevel3.type.inheritedStyleClasses.length).toBe(2);
+
+          expect(DerivedLevel3.type.inheritedStyleClasses).toContain(level1StyleClassName);
+          expect(DerivedLevel3.type.inheritedStyleClasses).toContain(level3StyleClassName);
+        });
+      });
+
+    }); // #inheritedStyleClasses
 
     describe("#isAdvanced -", function() {
       it("should preserve the default value", function() {

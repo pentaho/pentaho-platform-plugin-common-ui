@@ -17,10 +17,11 @@ define([
   "module",
   "./_type",
   "./SpecificationScope",
+  "../i18n!types",
   "../lang/Base",
   "../util/error",
   "../util/object"
-], function(module, typeFactory, SpecificationScope, Base, error, O) {
+], function(module, typeFactory, SpecificationScope, bundle, Base, error, O) {
 
   "use strict";
 
@@ -268,7 +269,12 @@ define([
     });
 
     Type._initInstCtor(Instance);
-    Type.prototype.id = module.id;
+
+    Type.implement(bundle.structured.instance)
+        .implement({
+          id: module.id,
+          styleClass: "pentaho-type-instance"
+        });
 
     return Instance;
   };

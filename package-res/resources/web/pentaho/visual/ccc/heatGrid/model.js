@@ -48,19 +48,13 @@ define([
               name: "rows", //VISUAL_ROLE
               type: {
                 props: {attributes: {isRequired: true}}
-              }
+              },
+              ordinal: 5
             },
             {
               name: "columns", //VISUAL_ROLE
-              type: "pentaho/visual/role/ordinal"
-            },
-            {
-              name: "size", //VISUAL_ROLE
-              type: {
-                base: "pentaho/visual/role/quantitative",
-                dataType: "number",
-                props: {attributes: {countMax: 1, isRequired: requiredOneMeasure}}
-              }
+              type: "pentaho/visual/role/ordinal",
+              ordinal: 6
             },
             {
               name: "color", //VISUAL_ROLE
@@ -68,9 +62,18 @@ define([
                 base: "pentaho/visual/role/quantitative",
                 dataType: "number",
                 props: {attributes: {countMax: 1, isRequired: requiredOneMeasure}}
-              }
+              },
+              ordinal: 7
             },
-
+            {
+              name: "size", //VISUAL_ROLE
+              type: {
+                base: "pentaho/visual/role/quantitative",
+                dataType: "number",
+                props: {attributes: {countMax: 1, isRequired: requiredOneMeasure}}
+              },
+              ordinal: 8
+            },
             {
               name: "labelsOption",
               type: {

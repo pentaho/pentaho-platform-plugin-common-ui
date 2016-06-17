@@ -32,6 +32,7 @@ define([
         props: [
           {
             name: "measures", //VISUAL_ROLE
+            ordinal: 7,
             type: {
               base: "pentaho/visual/role/quantitative",
               dataType: "number"

@@ -1262,6 +1262,25 @@ define([
         expect(array[1]).toBe(list.at(1));
         expect(array[2]).toBe(list.at(2));
       });
+
+      it("should call the given map function for each element and return an array of its results", function() {
+        var list = new NumberList([1, 2, 3]);
+        var array = list.toArray(function(v) { return v * 2; });
+
+        expect(array.length).toBe(list.count);
+        expect(array[0]).toBe(2);
+        expect(array[1]).toBe(4);
+        expect(array[2]).toBe(6);
+      });
+
+      it("should call the given map function on the specified JS context object", function() {
+        var list = new NumberList([1]);
+        var spy = jasmine.createSpy();
+        var ctx = {};
+        var array = list.toArray(spy, ctx);
+
+        expect(spy.calls.first().object).toBe(ctx);
+      });
     }); //endregion #toArray
 
     //region #sort(comparer[, silent])

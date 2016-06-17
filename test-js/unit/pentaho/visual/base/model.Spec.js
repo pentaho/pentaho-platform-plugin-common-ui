@@ -9,10 +9,11 @@ define([
   "pentaho/visual/base/events/RejectedSelect",
   "pentaho/visual/base/events/WillExecute",
   "pentaho/visual/base/events/DidExecute",
-  "pentaho/visual/base/events/RejectedExecute"
+  "pentaho/visual/base/events/RejectedExecute",
+  "pentaho/visual/role/mapping"
 ], function(Context, modelFactory, filter, selectionModes, UserError,
             WillSelect, DidSelect, RejectedSelect,
-            WillExecute, DidExecute, RejectedExecute) {
+            WillExecute, DidExecute, RejectedExecute, mappingFactory) {
   "use strict";
 
   /*global jasmine:false, console:false*/
@@ -842,6 +843,78 @@ define([
 
         expect(json instanceof Object).toBe(true);
         expect("selectionFilter" in json).toBe(true);
+      });
+    });
+
+    describe("#isVisualRole()", function() {
+      it("should return true if type is a Mapping", function() {
+        var Mapping = context.get(mappingFactory);
+        var SubMapping = Mapping.extend({type: {levels: ["nominal"]}});
+
+        expect(Model.type.isVisualRole(Mapping.type)).toBe(true);
+        expect(Model.type.isVisualRole(SubMapping.type)).toBe(true);
+      });
+
+      it("should return false if type is not a Mapping", function() {
+        var NotMapping = context.get("complex");
+
+        expect(Model.type.isVisualRole(NotMapping.type)).toBe(false);
+      });
+    });
+
+    describe("#eachVisualRole()", function() {
+      var Mapping;
+      var DerivedMapping;
+
+      var DerivedModel;
+
+      var forEachSpy;
+      var forEachContext;
+
+      beforeEach(function() {
+        Mapping = context.get(mappingFactory);
+
+        DerivedMapping = Mapping.extend({type: {levels: ["nominal"]}});
+
+        DerivedModel = Model.extend({type: {
+          props: [
+            {name: "vr1", type: DerivedMapping},
+            {name: "vr2", type: DerivedMapping},
+            {name: "vr3", type: DerivedMapping}
+          ]
+        }});
+
+        forEachSpy = jasmine.createSpy('forEachSpy');
+        forEachContext = {};
+      });
+
+      it("should call function for each defined visual role property", function() {
+        DerivedModel.type.eachVisualRole(forEachSpy);
+
+        expect(forEachSpy).toHaveBeenCalledTimes(3);
+
+        expect(forEachSpy).toHaveBeenCalledWith(DerivedModel.type.get("vr1"), 0, DerivedModel.type);
+        expect(forEachSpy).toHaveBeenCalledWith(DerivedModel.type.get("vr2"), 1, DerivedModel.type);
+        expect(forEachSpy).toHaveBeenCalledWith(DerivedModel.type.get("vr3"), 2, DerivedModel.type);
+      });
+
+      it("should break iteration if function returns false", function() {
+        forEachSpy.and.returnValues(true, false);
+
+        DerivedModel.type.eachVisualRole(forEachSpy);
+
+        expect(forEachSpy).toHaveBeenCalledTimes(2);
+
+        expect(forEachSpy).toHaveBeenCalledWith(DerivedModel.type.get("vr1"), 0, DerivedModel.type);
+        expect(forEachSpy).toHaveBeenCalledWith(DerivedModel.type.get("vr2"), 1, DerivedModel.type);
+      });
+
+      it("should set context object on which the function is called", function() {
+        DerivedModel.type.eachVisualRole(forEachSpy, forEachContext);
+
+        forEachSpy.calls.all().forEach(function(info) {
+          expect(info.object).toBe(forEachContext);
+        });
       });
     });
   });

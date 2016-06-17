@@ -67,7 +67,8 @@ define([
               base: "pentaho/visual/role/quantitative",
               dataType: "number",
               props: {attributes: {isRequired: requiredOneMeasure}}
-            }
+            },
+            ordinal: 7
           },
 
           {

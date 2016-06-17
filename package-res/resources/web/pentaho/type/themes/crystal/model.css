@@ -1,0 +1,30 @@
+
+.pentaho-type-instance.component-icon-small, .pentaho-type-instance.component-icon-medium {
+  background: no-repeat center;
+  background-size: 100%;
+  /*border: solid 1px red;*/
+}
+
+.pentaho-type-instance.component-icon-small {
+  width:  16px;
+  height: 16px;
+  background-image: url("./images/icon-small.png");
+}
+
+.pentaho-type-instance.component-icon-medium {
+  width:  32px;
+  height: 32px;
+  background-image: url("./images/icon-medium.png");
+}
+
+.pentaho-type-instance.component-icon-large {
+  width:  64px;
+  height: 64px;
+  background-image: url("./images/icon-large.png");
+}
+
+.pentaho-type-instance.component-icon-landscape {
+  width:  196px;
+  height: 128px;
+  background-image: url("./images/icon-landscape.png");
+}

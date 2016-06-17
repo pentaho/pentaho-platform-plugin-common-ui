@@ -21,7 +21,7 @@ define([
   "./types/fontStyle",
   "./types/sides",
   "./types/labelsOption",
-  "./theme/model"
+  "../theme/model"
 ], function(abstractModelFactory, bundle, colorFactory, backgroundFillFactory, fontStyleFactory,
     sidesFactory, labelsOptionFactory) {
 
@@ -45,7 +45,8 @@ define([
           //region Visual Roles
           {
             name: "rows", //VISUAL_ROLE
-            type: "pentaho/visual/role/ordinal"
+            type: "pentaho/visual/role/ordinal",
+            ordinal: 5
           },
           //endregion
 

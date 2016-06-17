@@ -15,8 +15,7 @@
  */
 define([
   "../barNormalizedAbstract/model",
-  "pentaho/i18n!../abstract/i18n/model",
-  "./theme/model"
+  "pentaho/i18n!../abstract/i18n/model"
 ], function(barNormalizedAbstractModelFactory, bundle) {
 
   "use strict";
