@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context",
-  "tests/pentaho/util/errorMatch"
-], function(Context, errorMatch) {
+  "pentaho/type/Context"
+], function(Context) {
 
   "use strict";
 

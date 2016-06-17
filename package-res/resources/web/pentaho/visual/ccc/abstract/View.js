@@ -193,6 +193,8 @@ define([
 
       this._prepareLayout(this.options);
 
+      this._applyExtensions();
+
       this._renderCore();
     },
 
@@ -1234,6 +1236,16 @@ define([
       // Account for the width of the *possible* scrollbar
       if(this._hasMultiChartColumns && pv.renderer() !== "batik")
         options.width -= 17;
+    },
+
+    /**
+     * Applies extension properties to the CCC options.
+     */
+    _applyExtensions: function() {
+      var extension = this.model.type.extensionEffective;
+      if(extension) {
+        this.options = def.mixin.share({}, this.options, extension);
+      }
     },
 
     _renderCore: function() {

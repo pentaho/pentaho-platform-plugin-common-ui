@@ -19,14 +19,14 @@ define([
   "./changes/ListChangeset",
   "./value",
   "./element",
-  "./valueHelper",
+  "./util",
   "./SpecificationContext",
   "../i18n!types",
   "../util/arg",
   "../util/error",
   "../util/object"
 ], function(module, ContainerMixin, ListChangeset,
-            valueFactory, elemFactory, valueHelper, SpecificationContext,
+            valueFactory, elemFactory, typeUtil, SpecificationContext,
             bundle, arg, error, O) {
 
   "use strict";
@@ -507,7 +507,7 @@ define([
        * and collects and returns any reported errors.
        * Override to complement with a type's specific validation logic.
        *
-       * You can use the error utilities in {@link pentaho.type.valueHelper} to
+       * You can use the error utilities in {@link pentaho.type.Util} to
        * help in the implementation.
        *
        * @return {?Array.<!pentaho.type.ValidationError>} A non-empty array of errors or `null`.
@@ -518,7 +518,7 @@ define([
         var elemType = this.type.of;
 
         return this._projectedMock._elems.reduce(function(errors, elem) {
-          return valueHelper.combineErrors(errors, elemType.validateInstance(elem));
+          return typeUtil.combineErrors(errors, elemType.validateInstance(elem));
         }, null);
       },
       //endregion

@@ -197,8 +197,8 @@
   requirePaths["common-ui/angular-directives"] = basePath + "/angular-directives";
   requireShim ["common-ui/angular-directives"] = ["common-ui/angular-ui-bootstrap"];
 
-  // Visualizations Packages
-
+  // Metadata Model and Visualizations Packages
+  requireService["pentaho/type/config"] = "pentaho.type.spec.ITypeConfiguration";
   requireService["pentaho/type/config/AmdLoadedConfigurationService"] = "pentaho.type.IConfigurationService";
 
   function mapTheme(mid, themeRoot, themes) {

@@ -16,12 +16,11 @@
 define([
   "module",
   "./instance",
-  "./valueHelper",
+  "./util",
   "./ValidationError",
   "./SpecificationContext",
-  "../i18n!types",
-  "../util/error"
-], function(module, instanceFactory, valueHelper, ValidationError, SpecificationContext, bundle, error) {
+  "../i18n!types"
+], function(module, instanceFactory, typeUtil, ValidationError, SpecificationContext, bundle) {
 
   "use strict";
 
@@ -145,7 +144,7 @@ define([
        * The default implementation does nothing and considers the instance valid.
        * Override to implement a type's specific validation logic.
        *
-       * You can use the error utilities in {@link pentaho.type.valueHelper} to
+       * You can use the error utilities in {@link pentaho.type.Util} to
        * help in the implementation.
        *
        * @return {?Array.<!pentaho.type.ValidationError>} A non-empty array of errors or `null`.
@@ -380,12 +379,12 @@ define([
           var any = false;
 
           if(!keyArgs.isJson) {
-            any = valueHelper.fillSpecMethodInContext(spec, this, "validateInstance") || any;
+            any = typeUtil.fillSpecMethodInContext(spec, this, "validateInstance") || any;
 
             // Instance methods
             var instSpec = {};
             var instance = this.instance;
-            var instAny = valueHelper.fillSpecMethodInContext(instSpec, instance, "validate");
+            var instAny = typeUtil.fillSpecMethodInContext(instSpec, instance, "validate");
             if(instAny) {
               spec.instance = instSpec;
               any = true;

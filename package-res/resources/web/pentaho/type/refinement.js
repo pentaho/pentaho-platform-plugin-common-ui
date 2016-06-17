@@ -17,12 +17,12 @@ define([
   "require",
   "module",
   "./facets/Refinement",
-  "./valueHelper",
+  "./util",
   "../util/object",
   "../util/error",
   "../util/fun",
   "../i18n!types"
-], function(localRequire, module, RefinementFacet, valueHelper, O, error, F, bundle) {
+], function(localRequire, module, RefinementFacet, typeUtil, O, error, F, bundle) {
 
   "use strict";
 
@@ -649,7 +649,7 @@ define([
          */
         _validateFacets: function(value) {
           return this.facets.reduce(function(errors, Facet) {
-            return valueHelper.combineErrors(errors, Facet.validate.call(this, value));
+            return typeUtil.combineErrors(errors, Facet.validate.call(this, value));
           }.bind(this), null);
         },
         //endregion

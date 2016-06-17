@@ -17,6 +17,8 @@ define([
   "pentaho/type/complex",
   "pentaho/lang/Event",
   "pentaho/data/filter",
+  "pentaho/type/util",
+
   "pentaho/util/object",
   "pentaho/util/error",
   "pentaho/util/fun",
@@ -40,7 +42,7 @@ define([
   "../role/nominal",
   "../role/ordinal",
   "../role/quantitative"
-], function(complexFactory, Event, filter, O,
+], function(complexFactory, Event, filter, typeUtil, O,
             error, F, UserError,
             selectionModes,
             WillSelect, DidSelect, RejectedSelect,
@@ -309,7 +311,7 @@ define([
             type: {
               base: "function",
               cast: function(f) {
-                if(typeof f === "string" && selectionModes.hasOwnProperty(f))
+                if(typeof f === "string" && O.hasOwn(selectionModes, f))
                   return selectionModes[f];
 
                 return F.as(f);
@@ -323,6 +325,99 @@ define([
             type: "function"
           }
         ],
+
+        _init: function(spec, keyArgs) {
+
+          this.base.apply(this, arguments);
+
+          // ----
+          // Block inheritance, with default values
+
+          this._extension = null;
+          this._extensionEf = undefined;
+        },
+
+        //region Extension
+        _extension: null,
+        _extensionEf: undefined,
+
+        /**
+         * Gets or sets extension properties that a View handles directly.
+         *
+         * Each visualization type should document the extension properties that
+         * it honors when specified via this attribute.
+         *
+         * When set and the model already has [descendant]{@link pentaho.type.Type#hasDescendants} models,
+         * an error is thrown.
+         *
+         * Returns `null` when there are no local extension properties.
+         *
+         * Note that this attribute is _not_ serialized when serializing a visual model type.
+         * It is expected that this attribute is always specified through configuration.
+         * Also, generally, there would be problems serializing functions and other objects
+         * it can contain.
+         *
+         * @type {Object}
+         *
+         * @throws {pentaho.lang.OperationInvalidError} When setting and the model already has
+         * [descendant]{@link pentaho.type.Type#hasDescendants} models.
+         *
+         * @see pentaho.visual.base.Model.Type#extensionEffective
+         *
+         * @see pentaho.visual.base.spec.IModel#extension
+         */
+        get extension() {
+          return this._extension;
+        },
+
+        set extension(value) {
+          if(this.hasDescendants)
+            throw error.operInvalid("Cannot change the 'extension' of a model type that has descendants.");
+
+          this._extension = value ? Object(value) : null;
+          this._extensionEf = undefined;
+        },
+
+        /**
+         * Gets the effective extension properties,
+         * a merge between the inherited extension properties and the
+         * locally specified extension properties.
+         *
+         * The merging is performed using the rules of the
+         * {@link pentaho.type.Util#mergeSpecs} method.
+         *
+         * Returns `null` when there are no local or inherited extension properties.
+         *
+         * @readOnly
+         * @type {Object}
+         *
+         * @see pentaho.visual.base.Model.Type#extension
+         */
+        get extensionEffective() {
+          var effective = this._extensionEf;
+          if(effective === undefined) {
+            effective = null;
+
+            var ancestor = this.ancestor;
+            if(ancestor.isSubtypeOf(Model.type)) {
+              var ancestorExtEf = ancestor.extensionEffective;
+              if(ancestorExtEf) {
+                effective = {};
+                typeUtil.mergeSpecs(effective, ancestorExtEf);
+              }
+            }
+
+            if(this._extension) {
+              if(!effective) effective = {};
+              typeUtil.mergeSpecs(effective, this._extension);
+            }
+
+            this._extensionEf = effective;
+          }
+
+          return effective;
+        },
+        //endregion
 
         /**
          * Calls a function for each defined visual role property type.

@@ -17,7 +17,7 @@ define([
   "module",
   "./element",
   "./PropertyTypeCollection",
-  "./valueHelper",
+  "./util",
   "./ContainerMixin",
   "../lang/ActionResult",
   "../lang/UserError",
@@ -28,7 +28,7 @@ define([
   "../i18n!types",
   "../util/object",
   "../util/error"
-], function(module, elemFactory, PropertyTypeCollection, valueHelper,
+], function(module, elemFactory, PropertyTypeCollection, typeUtil,
             ContainerMixin, ActionResult, UserError, WillChange, RejectedChange, DidChange,
             ComplexChangeset, bundle, O, error) {
 
@@ -674,7 +674,7 @@ define([
        * and collects and returns any reported errors.
        * Override to complement with a type's specific validation logic.
        *
-       * You can use the error utilities in {@link pentaho.type.valueHelper} to
+       * You can use the error utilities in {@link pentaho.type.Util} to
        * help in the implementation.
        *
        * @return {?Array.<!pentaho.type.ValidationError>} A non-empty array of errors or `null`.
@@ -685,7 +685,7 @@ define([
         var errors = null;
 
         this.type.each(function(pType) {
-          errors = valueHelper.combineErrors(errors, pType.validate(this));
+          errors = typeUtil.combineErrors(errors, pType.validate(this));
         }, this);
 
         return errors;

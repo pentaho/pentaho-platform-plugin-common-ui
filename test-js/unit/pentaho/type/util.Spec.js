@@ -14,30 +14,30 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/valueHelper",
+  "pentaho/type/util",
   "pentaho/lang/Base"
-], function(valueHelper, Base) {
+], function(typeUtil, Base) {
 
   "use strict";
 
   /*global describe:true, it:true, expect:true, beforeEach:true*/
 
 
-  describe("pentaho/type/valueHelper -", function() {
+  describe("pentaho/type/util -", function() {
 
     describe("#normalizeErrors", function() {
       it("normalizing null is null", function() {
-        expect(valueHelper.normalizeErrors(null)).toBe(null);
+        expect(typeUtil.normalizeErrors(null)).toBe(null);
       });
 
       it("normalizing an Error instance returns an Error array with the instance", function() {
         var error = new Error();
-        expect(valueHelper.normalizeErrors(error)).toContain(error);
+        expect(typeUtil.normalizeErrors(error)).toContain(error);
       });
 
       it("normalizing an Error array returns the array", function() {
         var errors = [ new Error() ];
-        expect(valueHelper.normalizeErrors(errors)).toBe(errors);
+        expect(typeUtil.normalizeErrors(errors)).toBe(errors);
       });
 
     });
@@ -45,14 +45,14 @@ define([
     describe("#combineErrors", function() {
       it("combining an Error array with nothing returns the array", function() {
         var errors = [new Error()];
-        expect(valueHelper.combineErrors(errors)).toBe(errors);
+        expect(typeUtil.combineErrors(errors)).toBe(errors);
       });
 
       it("combining an Error array with an error returns the combined Error array", function() {
         var errorA = new Error();
         var errorB = new Error();
         var errorsBase = [errorA];
-        var combinedErrors = valueHelper.combineErrors(errorsBase, errorB);
+        var combinedErrors = typeUtil.combineErrors(errorsBase, errorB);
         expect(combinedErrors).toContain(errorA);
         expect(combinedErrors).toContain(errorB);
         expect(combinedErrors.length).toBe(2);
@@ -62,13 +62,13 @@ define([
         var errorsBase = null;
         var error = new Error();
         var errorsAdd = [error];
-        var combinedErrors = valueHelper.combineErrors(errorsBase, errorsAdd);
+        var combinedErrors = typeUtil.combineErrors(errorsBase, errorsAdd);
         expect(combinedErrors).toContain(error);
         expect(combinedErrors.length).toBe(1);
       });
 
       it("combining nothing (null) with nothing (null) returns nothing (null)", function() {
-        var combinedErrors = valueHelper.combineErrors(null,null);
+        var combinedErrors = typeUtil.combineErrors(null,null);
         expect(combinedErrors).toBe(null);
       });
 
@@ -77,7 +77,7 @@ define([
         var errorB = new Error();
         var errorsBase = [errorA];
         var errorsAdd = [errorB];
-        var combinedErrors = valueHelper.combineErrors(errorsBase, errorsAdd);
+        var combinedErrors = typeUtil.combineErrors(errorsBase, errorsAdd);
         expect(combinedErrors).toContain(errorA);
         expect(combinedErrors).toContain(errorB);
         expect(combinedErrors.length).toBe(2);
@@ -93,7 +93,7 @@ define([
         var Derived2 = Derived.extend();
 
         var spec = {};
-        var result = valueHelper.fillSpecMethodInContext(spec, Derived2.prototype,  "foo");
+        var result = typeUtil.fillSpecMethodInContext(spec, Derived2.prototype,  "foo");
 
         expect(result).toBe(false);
         expect("foo" in spec).toBe(false);
@@ -110,7 +110,7 @@ define([
         });
 
         var spec = {};
-        var result = valueHelper.fillSpecMethodInContext(spec, Derived2.prototype, "foo");
+        var result = typeUtil.fillSpecMethodInContext(spec, Derived2.prototype, "foo");
 
         expect(result).toBe(true);
         expect(spec.foo).toBe(f);
@@ -127,7 +127,7 @@ define([
         });
 
         var spec = {};
-        var result = valueHelper.fillSpecMethodInContext(spec, Derived2.prototype, "foo");
+        var result = typeUtil.fillSpecMethodInContext(spec, Derived2.prototype, "foo");
 
         expect(result).toBe(true);
         expect(spec.foo).toBe(f);

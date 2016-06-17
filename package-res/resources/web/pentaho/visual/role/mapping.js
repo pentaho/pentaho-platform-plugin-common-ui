@@ -18,10 +18,10 @@ define([
   "./mappingAttribute",
   "./level",
   "pentaho/i18n!messages",
-  "pentaho/type/valueHelper",
+  "pentaho/type/util",
   "pentaho/util/object",
   "pentaho/util/error"
-], function(module, mappingAttributeFactory, measurementLevelFactory, bundle, valueHelper, O, error) {
+], function(module, mappingAttributeFactory, measurementLevelFactory, bundle, typeUtil, O, error) {
 
   "use strict";
 
@@ -307,7 +307,7 @@ define([
         var errors = this.base();
         if(!errors) {
           var addErrors = function(newErrors) {
-            errors = valueHelper.combineErrors(errors, newErrors);
+            errors = typeUtil.combineErrors(errors, newErrors);
           };
 
           // No visual model or visual role property?

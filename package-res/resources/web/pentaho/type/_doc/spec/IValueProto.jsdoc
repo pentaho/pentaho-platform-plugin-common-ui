@@ -39,7 +39,7 @@
  * be sure to call the base implementation,
  * and return any errors it reports.
  *
- * You can use the error utilities in {@link pentaho.type.valueHelper} to
+ * You can use the error utilities in {@link pentaho.type.Util} to
  * help in the implementation.
  *
  * @name validate

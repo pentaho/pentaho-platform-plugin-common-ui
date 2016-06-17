@@ -10,13 +10,15 @@ define([
   "pentaho/visual/base/events/WillExecute",
   "pentaho/visual/base/events/DidExecute",
   "pentaho/visual/base/events/RejectedExecute",
-  "pentaho/visual/role/mapping"
+  "pentaho/visual/role/mapping",
+  "tests/pentaho/util/errorMatch"
 ], function(Context, modelFactory, filter, selectionModes, UserError,
             WillSelect, DidSelect, RejectedSelect,
-            WillExecute, DidExecute, RejectedExecute, mappingFactory) {
+            WillExecute, DidExecute, RejectedExecute, mappingFactory,
+            errorMatch) {
   "use strict";
 
-  /*global jasmine:false, console:false*/
+  /*global jasmine:false, console:false, expect:false */
 
   describe("pentaho.visual.base.Model", function() {
     var context;
@@ -846,74 +848,191 @@ define([
       });
     });
 
-    describe("#isVisualRole()", function() {
-      it("should return true if type is a Mapping", function() {
-        var Mapping = context.get(mappingFactory);
-        var SubMapping = Mapping.extend({type: {levels: ["nominal"]}});
+    describe(".Type", function() {
 
-        expect(Model.type.isVisualRole(Mapping.type)).toBe(true);
-        expect(Model.type.isVisualRole(SubMapping.type)).toBe(true);
+      describe("#isVisualRole()", function() {
+        it("should return true if type is a Mapping", function() {
+          var Mapping = context.get(mappingFactory);
+          var SubMapping = Mapping.extend({type: {levels: ["nominal"]}});
+
+          expect(Model.type.isVisualRole(Mapping.type)).toBe(true);
+          expect(Model.type.isVisualRole(SubMapping.type)).toBe(true);
+        });
+
+        it("should return false if type is not a Mapping", function() {
+          var NotMapping = context.get("complex");
+
+          expect(Model.type.isVisualRole(NotMapping.type)).toBe(false);
+        });
       });
 
-      it("should return false if type is not a Mapping", function() {
-        var NotMapping = context.get("complex");
+      describe("#eachVisualRole()", function() {
+        var Mapping;
+        var DerivedMapping;
 
-        expect(Model.type.isVisualRole(NotMapping.type)).toBe(false);
+        var DerivedModel;
+
+        var forEachSpy;
+        var forEachContext;
+
+        beforeEach(function() {
+          Mapping = context.get(mappingFactory);
+
+          DerivedMapping = Mapping.extend({type: {levels: ["nominal"]}});
+
+          DerivedModel = Model.extend({type: {
+            props: [
+              {name: "vr1", type: DerivedMapping},
+              {name: "vr2", type: DerivedMapping},
+              {name: "vr3", type: DerivedMapping}
+            ]
+          }});
+
+          forEachSpy = jasmine.createSpy('forEachSpy');
+          forEachContext = {};
+        });
+
+        it("should call function for each defined visual role property", function() {
+          DerivedModel.type.eachVisualRole(forEachSpy);
+
+          expect(forEachSpy).toHaveBeenCalledTimes(3);
+
+          expect(forEachSpy).toHaveBeenCalledWith(DerivedModel.type.get("vr1"), 0, DerivedModel.type);
+          expect(forEachSpy).toHaveBeenCalledWith(DerivedModel.type.get("vr2"), 1, DerivedModel.type);
+          expect(forEachSpy).toHaveBeenCalledWith(DerivedModel.type.get("vr3"), 2, DerivedModel.type);
+        });
+
+        it("should break iteration if function returns false", function() {
+          forEachSpy.and.returnValues(true, false);
+
+          DerivedModel.type.eachVisualRole(forEachSpy);
+
+          expect(forEachSpy).toHaveBeenCalledTimes(2);
+
+          expect(forEachSpy).toHaveBeenCalledWith(DerivedModel.type.get("vr1"), 0, DerivedModel.type);
+          expect(forEachSpy).toHaveBeenCalledWith(DerivedModel.type.get("vr2"), 1, DerivedModel.type);
+        });
+
+        it("should set context object on which the function is called", function() {
+          DerivedModel.type.eachVisualRole(forEachSpy, forEachContext);
+
+          forEachSpy.calls.all().forEach(function(info) {
+            expect(info.object).toBe(forEachContext);
+          });
+        });
       });
-    });
 
-    describe("#eachVisualRole()", function() {
-      var Mapping;
-      var DerivedMapping;
+      describe("#extension", function() {
 
-      var DerivedModel;
+        it("should respect a specified object value", function() {
+          var ext = {foo: "bar"};
+          var DerivedModel = Model.extend({type: {
+            extension: ext
+          }});
 
-      var forEachSpy;
-      var forEachContext;
+          expect(DerivedModel.type.extension).toEqual(ext);
+        });
 
-      beforeEach(function() {
-        Mapping = context.get(mappingFactory);
+        it("should convert a falsy value to null", function() {
+          var DerivedModel = Model.extend({type: {
+            extension: false
+          }});
 
-        DerivedMapping = Mapping.extend({type: {levels: ["nominal"]}});
+          expect(DerivedModel.type.extension).toBe(null);
+        });
 
-        DerivedModel = Model.extend({type: {
-          props: [
-            {name: "vr1", type: DerivedMapping},
-            {name: "vr2", type: DerivedMapping},
-            {name: "vr3", type: DerivedMapping}
-          ]
-        }});
+        it("should read the local value and not an inherited base value", function() {
+          var ext = {foo: "bar"};
+          var DerivedModel = Model.extend({type: {
+            extension: ext
+          }});
 
-        forEachSpy = jasmine.createSpy('forEachSpy');
-        forEachContext = {};
+          var DerivedModel2 = DerivedModel.extend();
+
+          expect(DerivedModel2.type.extension).toBe(null);
+        });
+
+        it("should throw if set and the type already has descendants", function() {
+
+          var DerivedModel  = Model.extend();
+          var DerivedModel2 = DerivedModel.extend();
+
+          expect(function() {
+            DerivedModel.type.extension = {foo: "bar"};
+          }).toThrow(errorMatch.operInvalid());
+        });
       });
 
-      it("should call function for each defined visual role property", function() {
-        DerivedModel.type.eachVisualRole(forEachSpy);
+      describe("#extensionEffective", function() {
 
-        expect(forEachSpy).toHaveBeenCalledTimes(3);
+        it("should reflect a locally specified object value", function() {
+          var ext = {foo: "bar"};
 
-        expect(forEachSpy).toHaveBeenCalledWith(DerivedModel.type.get("vr1"), 0, DerivedModel.type);
-        expect(forEachSpy).toHaveBeenCalledWith(DerivedModel.type.get("vr2"), 1, DerivedModel.type);
-        expect(forEachSpy).toHaveBeenCalledWith(DerivedModel.type.get("vr3"), 2, DerivedModel.type);
-      });
+          var DerivedModel = Model.extend({
+            type: {
+              extension: ext
+            }
+          });
 
-      it("should break iteration if function returns false", function() {
-        forEachSpy.and.returnValues(true, false);
+          expect(DerivedModel.type.extensionEffective).toEqual(ext);
+        });
 
-        DerivedModel.type.eachVisualRole(forEachSpy);
+        it("should reuse the initially determined object value", function() {
+          var ext = {foo: "bar"};
 
-        expect(forEachSpy).toHaveBeenCalledTimes(2);
+          var DerivedModel = Model.extend({
+            type: {
+              extension: ext
+            }
+          });
 
-        expect(forEachSpy).toHaveBeenCalledWith(DerivedModel.type.get("vr1"), 0, DerivedModel.type);
-        expect(forEachSpy).toHaveBeenCalledWith(DerivedModel.type.get("vr2"), 1, DerivedModel.type);
-      });
+          var result1 = DerivedModel.type.extensionEffective;
+          var result2 = DerivedModel.type.extensionEffective;
 
-      it("should set context object on which the function is called", function() {
-        DerivedModel.type.eachVisualRole(forEachSpy, forEachContext);
+          expect(result1).toBe(result2);
+        });
 
-        forEachSpy.calls.all().forEach(function(info) {
-          expect(info.object).toBe(forEachContext);
+        it("should reflect an inherited object value", function() {
+
+          var ext = {foo: "bar"};
+          var DerivedModel = Model.extend({type: {
+            extension: ext
+          }});
+
+          var DerivedModel2 = DerivedModel.extend();
+
+          expect(DerivedModel2.type.extensionEffective).toEqual(ext);
+        });
+
+        it("should merge local and inherited object values", function() {
+
+          var DerivedModel = Model.extend({type: {
+            extension: {foo: "bar"}
+          }});
+
+          var DerivedModel2 = DerivedModel.extend({type: {
+            extension: {bar: "foo"}
+          }});
+
+          expect(DerivedModel2.type.extensionEffective).toEqual({
+            foo: "bar",
+            bar: "foo"
+          });
+        });
+
+        it("should override inherited properties with local properties", function() {
+
+          var DerivedModel = Model.extend({type: {
+            extension: {foo: "bar"}
+          }});
+
+          var DerivedModel2 = DerivedModel.extend({type: {
+            extension: {foo: "gugu"}
+          }});
+
+          expect(DerivedModel2.type.extensionEffective).toEqual({
+            foo: "gugu"
+          });
         });
       });
     });
