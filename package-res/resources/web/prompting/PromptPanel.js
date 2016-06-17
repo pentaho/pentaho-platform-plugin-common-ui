@@ -648,7 +648,7 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
               try {
                 if (value.indexOf(localization ? localization.decimal : defaultLocalization.decimal) > 0) {
                   valueParsed = DojoNumber.parse(value, {
-                    locale: Utils.normalizeDojoLocale(SESSION_LOCALE)
+                    locale: SESSION_LOCALE.toLowerCase()
                   });
                   if (valueParsed.toString().indexOf(defaultLocalization.decimal) < 0) {
                     valueParsed = DojoNumber.format(valueParsed, {
@@ -658,7 +658,7 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
                     valueParsed = valueParsed.split(defaultLocalization.group).join("");
                   }
                 } else {
-                  valueParsed = DojoNumber.parse(value, {locale: Utils.normalizeDojoLocale(SESSION_LOCALE)});
+                  valueParsed = DojoNumber.parse(value, {locale: SESSION_LOCALE.toLowerCase()});
                 }
               } catch (e) {
                 valueParsed = value;
