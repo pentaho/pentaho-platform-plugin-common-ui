@@ -111,7 +111,7 @@
     }
   }
 
-  requirePaths["common-ui/handlebars"] = basePath + "/handlebars/handlebars";
+  requirePaths["common-ui/handlebars"] = basePath + "/handlebars/handlebars-v4.0.5";
   requireShim ["common-ui/handlebars"] = ["common-ui/jquery"];
 
   requirePaths["common-ui/jquery-i18n"] = basePath + "/jquery/jquery.i18n.properties-min";
