@@ -778,7 +778,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
         var spyElem = jasmine.createSpyObj("spyElem", [ "css" ]);
         spyOn($.fn, "init").and.returnValue(spyElem);
         panel.hide();
-        expect($.fn.init).toHaveBeenCalledWith("#" + panel.destinationId, undefined, jasmine.any(Object));
+        expect($.fn.init).toHaveBeenCalledWith("#" + panel.destinationId, undefined);
         expect(spyElem.css).toHaveBeenCalledWith('display', 'none');
       });
 

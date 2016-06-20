@@ -43,7 +43,7 @@
 
   requireCfg.paths["pentaho/visual/type/registryMock"] = "/base/test-js/unit/pentaho/visual/2.5/type/registryMock";
 
-  requireCfg.paths["common-ui/jquery-clean"] = "/base/package-res/resources/web/jquery/jquery-1.9.1";
+  requireCfg.paths["common-ui/jquery-clean"] = "/base/package-res/resources/web/jquery/jquery-1.12.4";
   requireCfg.shim["common-ui/jquery-clean"] = {
     exports: "$",
     init: function() {

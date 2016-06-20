@@ -100,10 +100,10 @@
   requirePaths["common-ui/AnimatedAngularPlugin"] = basePath + "/plugin-handler/animatedAngularPlugin";
 
   // OTHER LIBS
-  requirePaths["common-ui/jquery"] = basePath + "/jquery/jquery-1.9.1" + minSuffix;
+  requirePaths["common-ui/jquery"] = basePath + "/jquery/jquery-1.12.4" + minSuffix;
   requireShim ["common-ui/jquery"] = {exports: "$"};
 
-  requirePaths["common-ui/jquery-clean"] = basePath + "/jquery/jquery-1.9.1" + minSuffix;
+  requirePaths["common-ui/jquery-clean"] = basePath + "/jquery/jquery-1.12.4" + minSuffix;
   requireShim ["common-ui/jquery-clean"] = {
     exports: "$",
     init: function() {
