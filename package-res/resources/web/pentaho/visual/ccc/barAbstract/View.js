@@ -33,7 +33,7 @@ define([
 
     _configureLabelsAnchor: function(options, visualSpec) {
 
-      options.extensionPoints.label_textMargin = 7;
+      options.label_textMargin = 7;
 
       switch(visualSpec.labelsOption) {
         case "center":
@@ -51,10 +51,10 @@ define([
         case "outside_end":
           if(options.orientation === "horizontal") {
             options.valuesAnchor = "right";
-            options.extensionPoints.label_textAlign ="left";
+            options.label_textAlign ="left";
           } else {
             options.valuesAnchor = "top";
-            options.extensionPoints.label_textBaseline = "bottom";
+            options.label_textBaseline = "bottom";
           }
           break;
       }

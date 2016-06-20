@@ -1,20 +1,10 @@
 
-.pentaho-visual-ccc-area-stacked.component-icon-sprite {
-  background-image: url("../crystal/images/area-stacked-icon-landscape.png");
-  /*background-image: url("./images/area-stacked-icon-sprite.svg");*/
-}
-
 .pentaho-visual-ccc-bar.component-icon-sprite {
   background-image: url("./images/bar-icon-sprite.svg");
 }
 
 .pentaho-visual-ccc-bar-horizontal.component-icon-sprite {
   background-image: url("./images/bar-horizontal-icon-sprite.svg");
-}
-
-.pentaho-visual-ccc-bar-line.component-icon-sprite {
-  background-image: url("../crystal/images/bar-line-icon-landscape.png");
-  /*background-image: url("./images/bar-line-icon-sprite.svg");*/
 }
 
 .pentaho-visual-ccc-bar-normalized.component-icon-sprite {
@@ -33,27 +23,26 @@
   background-image: url("./images/bar-stacked-horizontal-icon-sprite.svg");
 }
 
+/*
+.pentaho-visual-ccc-area-stacked.component-icon-sprite {
+}
+
+.pentaho-visual-ccc-bar-line.component-icon-sprite {
+}
+
 .pentaho-visual-ccc-heat-grid.component-icon-sprite {
-  background-image: url("../crystal/images/heat-grid-icon-landscape.png");
-  /*background-image: url("./images/heat-grid-icon-sprite.svg");*/
+
 }
 
 .pentaho-visual-ccc-line.component-icon-sprite {
-  background-image: url("../crystal/images/line-icon-landscape.png");
-  /*background-image: url("./images/line-icon-sprite.svg");*/
 }
 
 .pentaho-visual-ccc-metric-dot.component-icon-sprite {
-  background-image: url("../crystal/images/metric-dot-icon-landscape.png");
-  /*background-image: url("./images/metric-dot-icon-sprite.svg");*/
 }
 
 .pentaho-visual-ccc-pie.component-icon-sprite {
-  background-image: url("../crystal/images/pie-icon-landscape.png");
-  /*background-image: url("./images/pie-icon-sprite.svg");*/
 }
 
 .pentaho-visual-ccc-sunburst.component-icon-sprite {
-  background-image: url("../crystal/images/sunburst-icon-landscape.png");
-  /*background-image: url("./images/sunburst-icon-sprite.svg");*/
 }
+*/

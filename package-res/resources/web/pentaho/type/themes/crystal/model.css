@@ -1,5 +1,10 @@
 
-.pentaho-type-instance.component-icon-small, .pentaho-type-instance.component-icon-medium {
+.pentaho-type-instance.component-icon-small,
+.pentaho-type-instance.component-icon-medium,
+.pentaho-type-instance.component-icon-sprite,
+.pentaho-type-instance.component-icon-large,
+.pentaho-type-instance.component-icon-landscape
+{
   background: no-repeat center;
   background-size: 100%;
   /*border: solid 1px red;*/
@@ -15,6 +20,17 @@
   width:  32px;
   height: 32px;
   background-image: url("./images/icon-medium.png");
+}
+
+.pentaho-type-instance.component-icon-sprite {
+  width:  40px;
+  height: 40px;
+  background-image: url("./images/icon-sprite.svg");
+  background-position: 0 -40px;
+
+}
+.pentaho-type-instance.component-icon-sprite.active {
+  background-position: 0 0;
 }
 
 .pentaho-type-instance.component-icon-large {

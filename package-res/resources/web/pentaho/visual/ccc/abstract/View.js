@@ -40,7 +40,21 @@ define([
   /*global alert:false, cv:false */
 
   var ruleStrokeStyle = "#808285",  // "#D8D8D8",  // #f0f0f0
-    lineStrokeStyle = "#D1D3D4";  // "#D1D3D4"; //"#A0A0A0"; // #D8D8D8",// #f0f0f0
+      lineStrokeStyle = "#D1D3D4",  // "#D1D3D4"; //"#A0A0A0"; // #D8D8D8",// #f0f0f0
+      extensionBlacklist = {
+        "compatVersion": 1,
+        "interactive": 1,
+        "isMultiValued": 1,
+        "seriesInRows": 1,
+        "crosstabMode": 1,
+        "width": 1,
+        "height": 1,
+        "canvas": 1,
+        "readers": 1,
+        "visualRoles": 1,
+        "extensionPoints": 1,
+        "dataCategoriesCount": 1
+      };
 
   function legendShapeColorProp(scene) {
     return scene.isOn() ? scene.color : pvc.toGrayScale(scene.color);
@@ -114,19 +128,16 @@ define([
     ignoreNulls: false,
     groupedLabelSep: "~",
 
-    // TODO: stop using the extension points map
-    extensionPoints: {
-      axisRule_strokeStyle: ruleStrokeStyle,
-      axisTicks_strokeStyle: lineStrokeStyle,
-      dot_lineWidth: 1.5,
-      legendArea_lineWidth: 1,
-      legendArea_strokeStyle: "#c0c0c0",
-      legendLabel_textDecoration: null,
-      legendDot_fillStyle: legendShapeColorProp,
-      legendDot_strokeStyle: legendShapeColorProp,
-      legend2Dot_fillStyle: legendShapeColorProp,
-      legend2Dot_strokeStyle: legendShapeColorProp
-    }
+    axisRule_strokeStyle: ruleStrokeStyle,
+    axisTicks_strokeStyle: lineStrokeStyle,
+    dot_lineWidth: 1.5,
+    legendArea_lineWidth: 1,
+    legendArea_strokeStyle: "#c0c0c0",
+    legendLabel_textDecoration: null,
+    legendDot_fillStyle: legendShapeColorProp,
+    legendDot_strokeStyle: legendShapeColorProp,
+    legend2Dot_fillStyle: legendShapeColorProp,
+    legend2Dot_strokeStyle: legendShapeColorProp
   };
 
   return View.extend(/** @lends pentaho.visual.ccc.base.View# */{
@@ -415,7 +426,6 @@ define([
 
     _readUserOptions: function(options) {
       var model = this.model;
-      var extPoints = options.extensionPoints;
 
       var value = model.backgroundFill;
       if(value && value !== "none") {
@@ -440,13 +450,13 @@ define([
           fillStyle = model.backgroundColor;
         }
 
-        extPoints.base_fillStyle = fillStyle;
+        options.base_fillStyle = fillStyle;
       }
 
       //region label
       value = model.labelColor;
       if(value != null) {
-        extPoints.axisLabel_textStyle = extPoints.axisTitleLabel_textStyle = value;
+        options.axisLabel_textStyle = options.axisTitleLabel_textStyle = value;
       }
 
       value = model.labelSize;
@@ -465,14 +475,14 @@ define([
       options.legend = value = model.showLegend;
       if(value) {
         value = model.legendColor;
-        if(value) extPoints.legendLabel_textStyle = value;
+        if(value) options.legendLabel_textStyle = value;
 
         // TODO: ignoring white color cause analyzer has no on-off for the legend bg color
         // and always send white. When the chart bg color is active it
         // would not show through the legend.
         value = model.legendBackgroundColor;
         if(value && value.toLowerCase() !== "#ffffff")
-          extPoints.legendArea_fillStyle = value;
+          options.legendArea_fillStyle = value;
 
         value = model.legendPosition;
         if(value) options.legendPosition = value;
@@ -485,12 +495,12 @@ define([
 
       value = model.getv("lineWidth", /*sloppy:*/true);
       if(value != null) {
-        extPoints.line_lineWidth = value;
+        options.line_lineWidth = value;
         var radius = 3 + 6 * (value / 8); // 1 -> 8 => 3 -> 9,
-        extPoints.dot_shapeSize = radius * radius;
+        options.dot_shapeSize = radius * radius;
 
-        extPoints.plot2Line_lineWidth = extPoints.line_lineWidth;
-        extPoints.plot2Dot_shapeSize = extPoints.dot_shapeSize;
+        options.plot2Line_lineWidth = options.line_lineWidth;
+        options.plot2Dot_shapeSize  = options.dot_shapeSize;
       }
 
       value = model.getv("maxChartsPerRow", /*sloppy:*/true);
@@ -1026,11 +1036,9 @@ define([
 
         var value = model.trendLineWidth;
         if(value != null) {
-          var extPoints = options.extensionPoints;
-
-          extPoints.trendLine_lineWidth = +value;      // + -> to number
+          options.trendLine_lineWidth = +value;      // + -> to number
           var radius = 3 + 6 * ((+value) / 8); // 1 -> 8 => 3 -> 9,
-          extPoints.trendDot_shapeSize = radius * radius;
+          options.trendDot_shapeSize = radius * radius;
         }
       }
     },
@@ -1109,7 +1117,7 @@ define([
 
         if(this._useLabelColor) {
           var labelColor = model.labelColor;
-          if(labelColor) options.extensionPoints.label_textStyle = model.labelColor;
+          if(labelColor) options.label_textStyle = model.labelColor;
         }
       }
     },
@@ -1208,7 +1216,7 @@ define([
         options.legendKeepInBounds = true; // ensure it is not placed off-page
 
         // Ensure that legend margins is an object.
-        // Preseve already specifed margins.
+        // Preserve already specified margins.
         // CCC's default adds a left or right 5 px margin,
         // to separate the legend from the content area.
         var legendMargins = options.legendMargins;
@@ -1244,7 +1252,19 @@ define([
     _applyExtensions: function() {
       var extension = this.model.type.extensionEffective;
       if(extension) {
-        this.options = def.mixin.share({}, this.options, extension);
+
+        var valid = null;
+
+        def.each(extension, function(v, p) {
+          if(!def.hasOwn(extensionBlacklist, p)) {
+            if(!valid) valid = {};
+            valid[p] = v;
+          }
+        });
+
+        if(valid) {
+          this.options = def.mixin.copy({}, this.options, valid);
+        }
       }
     },
 
@@ -1280,7 +1300,7 @@ define([
       this.options.userSelectionAction = function(cccSelections) {
         return me._onUserSelection(cccSelections);
       };
-      this.options.base_event = [["click", function(){
+      this.options.base_event = [["click", function() {
         me._onUserSelection([]);
       }]];
     },

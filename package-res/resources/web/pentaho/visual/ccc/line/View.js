@@ -38,7 +38,7 @@ define([
         options.dotsVisible = false;
       } else {
         options.dotsVisible = true;
-        options.extensionPoints.dot_shape = shape;
+        options.dot_shape = shape;
       }
     },
 
@@ -51,8 +51,7 @@ define([
       this.base();
 
       var options = this.options,
-          extPoints = options.extensionPoints,
-          dotSize = extPoints.dot_shapeSize;
+          dotSize = options.dot_shapeSize;
       if(dotSize != null) {
         var dotRadius = Math.sqrt(dotSize);
         options.legendMarkerSize = Math.max(15, 2 * (dotRadius + 3));

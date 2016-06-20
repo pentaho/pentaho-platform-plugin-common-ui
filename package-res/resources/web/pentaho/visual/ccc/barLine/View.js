@@ -90,7 +90,7 @@ define([
         options.pointDotsVisible = false;
       } else {
         options.pointDotsVisible = true;
-        options.extensionPoints.pointDot_shape = shape;
+        options.pointDot_shape = shape;
       }
     },
 
@@ -117,7 +117,7 @@ define([
         options.plot2ValuesVisible = true;
         options.plot2ValuesAnchor = lineLabelsAnchor;
         options.plot2ValuesFont = util.defaultFont(util.readFontModel(model, "label"));
-        options.extensionPoints.plot2Label_textStyle = model.labelColor;
+        options.plot2Label_textStyle = model.labelColor;
       }
     },
 
