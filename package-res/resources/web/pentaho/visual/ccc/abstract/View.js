@@ -623,7 +623,7 @@ define([
     },
 
     /**
-     * Adds a generic measure discriminator attribute info.
+     * Adds generic measure discriminator attribute infomation.
      *
      * When a measure visual role like "measures" or "measuresLine" accepts multiple attributes, and
      * it is desired that each of these displays as if it were a different series
@@ -634,10 +634,10 @@ define([
      * All measures' values end up in a single CCC "value" dimension.
      * The name of the original measure column ends up in the special CCC dimension we call "the measure discriminator".
      *
-     * Has the following restrictions/consequences:
-     * * all measure attributes have to be in the rightmost columns of the data table...
-     * * looses the ability to have different formatting per measure attribute as there is
-     *   a single CCC dimension that holds the values of all measure attributes.
+     * This has the following restrictions/consequences:
+     * * all measure attributes have to be in the rightmost columns of the data table 
+     * * and the ability to have different formatting per measure attribute, as there is
+     *   a single CCC dimension that holds the values of all measure attributes, is lost.
      *   The formatting configuration of the first measure in the measure role is used.
      */
     _addGenericMeasureDiscriminator: function() {
@@ -722,7 +722,7 @@ define([
      * Gets array of _mapped_ column indexes of the plain table to set in a data view.
      *
      * Column reordering serves two purposes:
-     * 1. All generic measures are placed last, to satisfy the crosstab/generic measure discriminator scenario
+     * 1. All generic measures are placed last to satisfy the crosstab/generic measure discriminator scenario
      * 2. All measures are placed last so that CCC doesn't reorder the "logical row", discrete columns first
      */
     _transformData: function() {

@@ -117,8 +117,9 @@ define([
        * leads to the emission of the
        * ["rejected:select"]{@link pentaho.visual.base.events.RejectedSelect}.
        *
-       * @param {!pentaho.data.filter.AbstractFilter} inputDataFilter - A filter representing
-       * the data set which will be used to modify the current selection filter.
+       * @param {!pentaho.data.filter.AbstractFilter} inputDataFilter - A filter representing the dataset of,
+       * the visual element which the user interacted with,
+       * which will be used to modify the current selection filter.
        * @param {Object} keyArgs - Keyword arguments.
        * @param {function} keyArgs.selectionMode - A function that computes a new selection filter,
        * taking into account the current selection filter and an input `dataFilter`.
@@ -181,7 +182,7 @@ define([
        * Any rejection (due to an event cancellation or due to an invalid `doExecute` action)
        * emits the event {@link pentaho.visual.base.events.RejectedSelect|"rejected:execute"}.
        *
-       * @param {!pentaho.data.filter.AbstractFilter} inputDataFilter - A filter representing the data set of
+       * @param {!pentaho.data.filter.AbstractFilter} inputDataFilter - A filter representing the dataset of
        * the visual element which the user interacted with.
        *
        * @return {pentaho.lang.ActionResult}
@@ -426,8 +427,8 @@ define([
          * [value type]{@link pentaho.type.Property.Type#type} is a subtype of
          * [Mapping]{@link pentaho.visual.role.Mapping}.
          *
-         * @param {function(pentaho.type.Property.Type, number, pentaho.type.Complex) : boolean?} f
-         * The mapping function. Return `false` to break iteration.
+         * @param {function(pentaho.type.Property.Type, number, pentaho.type.Complex) : boolean?} f - The mapping
+         * function. Return `false` to break iteration.
          *
          * @param {Object} [x] The JS context object on which `f` is called.
          *

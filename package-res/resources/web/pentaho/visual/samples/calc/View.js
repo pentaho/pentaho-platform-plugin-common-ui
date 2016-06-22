@@ -15,8 +15,8 @@ define([
    *
    * @description Creates a calculator `View`.
    * @constructor
-   * @param {HTMLDOMElement} element The DOM element where the visualization should render.
-   * @param {pentaho.visual.samples.calc.Model} model The calculator's visualization `Model`.
+   * @param {HTMLDOMElement} element - The DOM element where the visualization should render.
+   * @param {pentaho.visual.samples.calc.Model} model - The calculator's visualization `Model`.
    */
   return Visual.extend(/** @lends pentaho.visual.samples.calc.View */{
 

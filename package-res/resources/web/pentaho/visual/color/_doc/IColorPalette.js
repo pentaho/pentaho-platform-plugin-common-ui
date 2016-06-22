@@ -22,6 +22,6 @@
  * @interface
  * @name pentaho.visual.color.IColorPalette
  *
- * @property {string} name The name of the color palette.
- * @property {string[]} colors The array of colors of the palette, in "#RRGGBB" format.
+ * @property {string} name - The name of the color palette.
+ * @property {string[]} colors - The array of colors of the palette, in "#RRGGBB" format.
  */

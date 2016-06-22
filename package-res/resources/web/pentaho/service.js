@@ -128,7 +128,7 @@ define([
 
   var A_slice  = Array.prototype.slice,
       /**
-       * A map from logical module names to ids of dependency modules.
+       * A map from logical module names to identifiers of dependency modules.
        * @type Object.<string, string[]>
        */
       logicalModules = {};
@@ -232,7 +232,7 @@ define([
    * Gets the identifiers of modules registered as dependencies of a given logical module.
    *
    * @param {string} logicalModuleName - The name of the logical module.
-   * @return {Array} An array of module ids, possibly empty.
+   * @return {Array} An array of module identifiers, possibly empty.
    */
   function getLogicalModule(logicalModuleName) {
     return O.getOwn(logicalModules, logicalModuleName) ||
@@ -306,7 +306,7 @@ define([
   }
 
   /**
-   * Gets the ids of modules registered as dependencies of a given logical module.
+   * Gets the identifiers of modules registered as dependencies of a given logical module.
    *
    * @param {string} logicalModuleName - The name of the logical module.
    * @return {string[]} An array of identifiers, possibly empty.

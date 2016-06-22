@@ -44,9 +44,9 @@ define([
    * @description Initializes a `View` instance.
    *
    * @constructor
-   * @param {HTMLElement} element The DOM element where the visualization should render.
+   * @param {HTMLElement} element - The DOM element where the visualization should render.
    * An error is thrown if this is not a valid DOM element.
-   * @param {pentaho.visual.base.Model} model The base visualization `Model`.
+   * @param {pentaho.visual.base.Model} model - The base visualization `Model`.
    *
    * @throws {pentaho.lang.ArgumentInvalidError} When `element` is not an HTML DOM element.
    */
