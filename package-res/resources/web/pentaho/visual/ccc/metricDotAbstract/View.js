@@ -28,12 +28,6 @@ define([
 
     _options: {
       axisGrid: true,
-
-      sizeAxisUseAbs:  false,
-      sizeAxisRatio:   1 / 5,
-      sizeAxisRatioTo: "height", // plot area client height
-      sizeAxisOriginIsZero: true,
-
       autoPaddingByDotSize: false
     },
 
@@ -43,7 +37,6 @@ define([
       "rows": "category",
       "x": "x",
       "y": "y",
-      "size": "size",
       "color": "color"
     },
 
@@ -76,12 +69,6 @@ define([
 
       this._configureAxisRange(/*isPrimary*/true,  "base" );
       this._configureAxisRange(/*isPrimary*/false, "ortho");
-
-      /*jshint laxbreak:true*/
-      // ~ DOT SIZE
-      this.options.axisOffset = this._isRoleBound("size")
-          ? (1.1 * this.options.sizeAxisRatio / 2) // Axis offset like legacy analyzer
-          : 0;
     },
 
     _configureColor: function(colorScaleKind) {

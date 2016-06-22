@@ -17,12 +17,11 @@ define([
   "../cartesianAbstract/model",
   "pentaho/i18n!../abstract/i18n/model",
   "../abstract/types/labelsOption",
-  "../abstract/mixins/scaleSizeContinuousType",
   "../abstract/mixins/scaleColorContinuousType",
   "../abstract/mixins/settingsMultiChartType",
   "../abstract/mixins/trendType"
 ], function(cartesianAbstractModelFactory, bundle, labelsOptionFactory,
-    scaleSizeContinuousType, scaleColorContinuousType, settingsMultiChartType, trendType) {
+    scaleColorContinuousType, settingsMultiChartType, trendType) {
 
   "use strict";
 
@@ -34,10 +33,9 @@ define([
 
         type: {
           id: "pentaho/visual/ccc/metricDot",
-          v2Id: "ccc_scatter",
-          category: "scatter",
+          isAbstract: true,
 
-          view: "View",
+          category: "scatter",
           styleClass: "pentaho-visual-ccc-metric-dot",
 
           props: [
@@ -83,16 +81,6 @@ define([
               ordinal: 6
             },
             {
-              name: "size", //VISUAL_ROLE
-              type: {
-                base: "pentaho/visual/role/quantitative",
-                //TODO: REMOVE THIS AFTER DEMO. For demoing the measurement level incompatibility.
-                //dataType: "number",
-                props: {attributes: {countMax: 1}}
-              },
-              ordinal: 7
-            },
-            {
               name: "multi", //VISUAL_ROLE
               type: "pentaho/visual/role/ordinal",
               ordinal: 10
@@ -109,9 +97,6 @@ define([
           ]
         }
       })
-
-      .implement({type: scaleSizeContinuousType})
-      .implement({type: bundle.structured["scaleSizeContinuous"]})
       // TODO: should only be applicable when color is continuous
       .implement({type: scaleColorContinuousType})
       .implement({type: bundle.structured["scaleColorContinuous"]})
