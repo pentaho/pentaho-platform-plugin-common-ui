@@ -199,7 +199,7 @@ define([
       /**
        * Gets a mock projection of the updated list value.
        *
-       * When there are no changes, the owner list returned.
+       * When there are no changes, the owner list is returned.
        * Otherwise, a projected mock containing only
        * the elements' data structures is created and returned.
        *
@@ -431,8 +431,8 @@ define([
       /**
        * Creates an array with the elements of the list or values derived from each element.
        *
-       * @param {function(pentaho.type.Element):any} [map] - A function that converts each element into something else.
-       * @param {Object} [ctx] - The JS context object on which to call `map`.
+       * @param {function(pentaho.type.Element):any} [map] A function that converts each element into something else.
+       * @param {Object} [ctx] The JS context object on which to call `map`.
        *
        * @return {Array.<any>} An array of elements.
        */
