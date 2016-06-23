@@ -40,10 +40,8 @@ define([
     _options: {
       legendShape: "circle",
       titlePosition: "bottom",
-      extensionPoints: {
-        slice_strokeStyle: "white",
-        slice_lineWidth: 0.8
-      }
+      slice_strokeStyle: "white",
+      slice_lineWidth: 0.8
     },
 
     _configure: function() {

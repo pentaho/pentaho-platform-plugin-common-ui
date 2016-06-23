@@ -13,15 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+define(function() {
 
-/**
- * @classDesc A color palette is an ordered list of colors.
- *
- * @see pentaho.visual.color.PaletteRegistry
- *
- * @interface
- * @name pentaho.visual.color.IColorPalette
- *
- * @property {string} name - The name of the color palette.
- * @property {string[]} colors - The array of colors of the palette, in "#RRGGBB" format.
- */
+  "use strict";
+
+  return {
+    rules: [
+      // Example rules
+      /*
+      {
+        select: {
+          //application: "det-browser",
+          type: "pentaho/visual/ccc/abstract"
+        },
+        apply: {
+          extension: {
+            plotFrameVisible: true
+          }
+        }
+      },
+      {
+        select: {
+          //application: "det-browser",
+          type: "pentaho/visual/ccc/barAbstract"
+        },
+        apply: {
+          extension: {
+            barSizeMax: 10
+          }
+        }
+      }
+      */
+    ]
+  };
+});

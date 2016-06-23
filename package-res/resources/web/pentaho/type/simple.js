@@ -16,12 +16,12 @@
 define([
   "module",
   "./element",
-  "./valueHelper",
+  "./util",
   "../util/object",
   "../util/error",
   "../util/fun",
   "../i18n!types"
-], function(module, elemFactory, valueHelper, O, error, F, bundle) {
+], function(module, elemFactory, typeUtil, O, error, F, bundle) {
 
   "use strict";
 
@@ -393,7 +393,7 @@ define([
           var any = this.base(spec, keyArgs);
 
           if(!keyArgs.isJson) {
-            any = valueHelper.fillSpecMethodInContext(spec, this, "cast") || any;
+            any = typeUtil.fillSpecMethodInContext(spec, this, "cast") || any;
           }
 
           return any;

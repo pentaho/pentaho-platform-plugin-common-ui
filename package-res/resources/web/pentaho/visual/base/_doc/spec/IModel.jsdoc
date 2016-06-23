@@ -34,5 +34,7 @@
  * [executeAction]{@link pentaho.visual.base.Model#executeAction},
  * which is typically called when the user double clicks on an item.
  *
+ * @property {Object} extension - Extension properties that a View handles directly.
+ *
  * @see pentaho.visual.base.Model
  */

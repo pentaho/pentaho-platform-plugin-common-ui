@@ -16,7 +16,7 @@
 define([
   "module",
   "./instance",
-  "./valueHelper",
+  "./util",
   "./ValidationError",
   "../i18n!types",
   "../lang/_AnnotatableLinked",
@@ -25,7 +25,7 @@ define([
   "../util/object",
   "../util/text",
   "../util/fun"
-], function(module, instanceFactory, valueHelper, ValidationError, bundle, AnnotatableLinked, arg, error, O, text, F) {
+], function(module, instanceFactory, typeUtil, ValidationError, bundle, AnnotatableLinked, arg, error, O, text, F) {
 
   "use strict";
 
@@ -553,7 +553,7 @@ define([
 
           if(this.isApplicableEval(owner)) {
             var addErrors = function(newErrors) {
-              errors = valueHelper.combineErrors(errors, newErrors);
+              errors = typeUtil.combineErrors(errors, newErrors);
             };
 
             var value = owner._getByType(this);

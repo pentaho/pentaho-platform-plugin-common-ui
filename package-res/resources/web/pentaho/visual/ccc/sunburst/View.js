@@ -50,8 +50,7 @@ define([
 
       this.base.apply(this, arguments);
 
-      var eps = options.extensionPoints,
-          model = this.model;
+      var model = this.model;
 
       var value = model.sliceOrder;
       if(value) options.sliceOrder = value;
@@ -60,18 +59,18 @@ define([
       this._hideNullMembers = emptySlicesHidden;
 
       if(emptySlicesHidden)
-        eps.slice_visible = function(scene) {
+        options.slice_visible = function(scene) {
           return !util.isNullMember(scene.vars.category.value);
         };
 
-      eps.label_textStyle = this.model.labelColor;
+      options.label_textStyle = this.model.labelColor;
 
       // Determine whether to show values label
       if(model.labelsOption !== "none" && this.axes.measure.boundRoles.size) {
-        eps.label_textBaseline = "bottom";
-        eps.label_textMargin = 2;
+        options.label_textBaseline = "bottom";
+        options.label_textMargin = 2;
 
-        eps.label_visible = function(scene) {
+        options.label_visible = function(scene) {
           // Only show the size label if the size-value label also fits
           var pvLabel = this.pvMark,
               ir = scene.innerRadius,
@@ -110,7 +109,7 @@ define([
         };
 
         var me = this;
-        eps.label_add = function() {
+        options.label_add = function() {
           return new pv.Label()
               .visible(function(scene) {
                 var pvMainLabel = this.proto;
@@ -139,7 +138,7 @@ define([
     _configureLabels: function(options) {
       // Sunburst always shows category labels.
       options.valuesFont = util.defaultFont(util.readFontModel(this.model, "label"));
-      options.extensionPoints.label_textStyle = this.model.labelColor;
+      options.label_textStyle = this.model.labelColor;
     },
 
     _configureDisplayUnits: function() {

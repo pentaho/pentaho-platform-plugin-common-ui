@@ -46,13 +46,13 @@ define([
 
       this._configureAxisRange(/*isPrimary*/true, "ortho");
 
-      if(this.options.orientation === "vertical") {
-        var eps = this.options.extensionPoints;
-        eps.xAxisLabel_textAngle    = -Math.PI/4;
-        eps.xAxisLabel_textAlign    = "right";
-        eps.xAxisLabel_textBaseline = "top";
+      var options = this.options;
+      if(options.orientation === "vertical") {
+        options.xAxisLabel_textAngle    = -Math.PI/4;
+        options.xAxisLabel_textAlign    = "right";
+        options.xAxisLabel_textBaseline = "top";
       } else {
-        this.options.xAxisPosition = "top";
+        options.xAxisPosition = "top";
       }
     },
 

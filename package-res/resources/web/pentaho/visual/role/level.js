@@ -93,7 +93,7 @@ define([
          * The values of the quantitative levels of measurement are:
          * 1. `"quantitative"`.
          *
-         * @param {string|pentaho.type.String} level The measurement level.
+         * @param {string|pentaho.type.String} level - The measurement level.
          *
          * @return {boolean} `true` if it is _quantitative_; `false`, otherwise.
          */
@@ -110,7 +110,7 @@ define([
          * 1. `"nominal"`
          * 2. `"ordinal"`.
          *
-         * @param {string|pentaho.type.String} level The measurement level.
+         * @param {string|pentaho.type.String} level - The measurement level.
          *
          * @return {boolean} `true` if it is _qualitative_; `false`, otherwise.
          */

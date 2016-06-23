@@ -18,10 +18,10 @@ define([
   "./mappingAttribute",
   "./level",
   "pentaho/i18n!messages",
-  "pentaho/type/valueHelper",
+  "pentaho/type/util",
   "pentaho/util/object",
   "pentaho/util/error"
-], function(module, mappingAttributeFactory, measurementLevelFactory, bundle, valueHelper, O, error) {
+], function(module, mappingAttributeFactory, measurementLevelFactory, bundle, typeUtil, O, error) {
 
   "use strict";
 
@@ -99,7 +99,7 @@ define([
       /**
        * Gets the visual model from a given references list, if any, or `null`.
        *
-       * @param {!pentaho.type.ReferenceList} refs The references list.
+       * @param {!pentaho.type.ReferenceList} refs - The references list.
        *
        * @return {pentaho.visual.base.Model} The model or `null`.
        */
@@ -280,25 +280,25 @@ define([
        *
        * Validity is determined as follows:
        *
-       * 1. if the mapping has no owner visual model, it is invalid
-       * 2. if the visual model has a `null` [data]{@link pentaho.visual.base.Model#data},
+       * 1. If the mapping has no owner visual model, it is invalid
+       * 2. If the visual model has a `null` [data]{@link pentaho.visual.base.Model#data},
        *    then every data property in [attributes]{@link pentaho.visual.role.Mapping#attributes} is
        *    considered undefined and invalid
-       * 3. otherwise, if the visual model has a non-`null` [data]{@link pentaho.visual.base.Model#data},
+       * 3. Otherwise, if the visual model has a non-`null` [data]{@link pentaho.visual.base.Model#data},
        *    then each data property in [attributes]{@link pentaho.visual.role.Mapping#attributes}:
-       *   1. must be defined in `data`
-       *   2. must be compatible with the visual role, in terms of data type and measurement level
-       * 4. the number of mapped [attributes]{@link pentaho.visual.role.Mapping#attributes} must satisfy
+       *   1. Must be defined in `data`
+       *   2. Must be compatible with the visual role, in terms of data type and measurement level
+       * 4. The number of mapped [attributes]{@link pentaho.visual.role.Mapping#attributes} must satisfy
        *    the usual property cardinality constraints,
        *    like [isRequired]{@link pentaho.type.Property.Type#isRequired},
        *    [countMin]{@link pentaho.type.Property.Type#countMin} and
        *    [countMax]{@link pentaho.type.Property.Type#countMax}
-       * 5. mapped attributes must not be duplicates:
-       *   1. if the mapping has a quantitative [levelEffective]{@link pentaho.visual.role.Mapping#levelEffective},
+       * 5. Mapped attributes must not be duplicates:
+       *   1. If the mapping has a quantitative [levelEffective]{@link pentaho.visual.role.Mapping#levelEffective},
        *      then there can be no two mapping attributes with the same
        *      [name]{@link pentaho.visual.role.MappingAttribute#name} and
        *      [aggregation]{@link pentaho.visual.role.MappingAttribute#aggregation}
-       *   2. otherwise, there can be no two mapping attributes with the same
+       *   2. Otherwise, there can be no two mapping attributes with the same
        *      [name]{@link pentaho.visual.role.MappingAttribute#name}
        *
        * @return {?Array.<pentaho.type.ValidationError>} A non-empty array of `ValidationError` or `null`.
@@ -307,7 +307,7 @@ define([
         var errors = this.base();
         if(!errors) {
           var addErrors = function(newErrors) {
-            errors = valueHelper.combineErrors(errors, newErrors);
+            errors = typeUtil.combineErrors(errors, newErrors);
           };
 
           // No visual model or visual role property?
