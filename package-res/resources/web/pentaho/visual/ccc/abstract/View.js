@@ -623,7 +623,7 @@ define([
     },
 
     /**
-     * Adds generic measure discriminator attribute infomation.
+     * Adds generic measure discriminator attribute information.
      *
      * When a measure visual role like "measures" or "measuresLine" accepts multiple attributes, and
      * it is desired that each of these displays as if it were a different series
