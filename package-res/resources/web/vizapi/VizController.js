@@ -1,5 +1,5 @@
 /*!
-* Copyright 2010 - 2013 Pentaho Corporation.  All rights reserved.
+* Copyright 2010 - 2016 Pentaho Corporation.  All rights reserved.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -704,29 +704,31 @@ pentaho.VizController.getRgbGradientFromMultiColorHex = function(value, min, max
   var steps = colors.length-1;
   var range = max-min;
 
+  var startColorIndex;
+  var endColorIndex;
   if(range <= 0) {
-    var start = colors.length-1;
-    var end = start;
+    startColorIndex = colors.length-1;
+    endColorIndex = startColorIndex;
   } else {
-    var start = Math.floor(((value-min)/range) * steps);
-    var end = Math.ceil(((value-min)/range) * steps);
+    var stepPrecise = ((value-min)/range) * steps;
+    startColorIndex = Math.floor(stepPrecise);
+    endColorIndex = Math.ceil(stepPrecise);
   }
-  var color1 = pentaho.VizController.convertToRGB(colors[start]);
-  var color2 = pentaho.VizController.convertToRGB(colors[end]);
+  var color1 = pentaho.VizController.convertToRGB(colors[startColorIndex]);
+  var color2 = pentaho.VizController.convertToRGB(colors[endColorIndex]);
 
-  var rangeMin = (start == 0) ? 1 : (start / steps) * max;
-  var rangeMax = (end / steps) * max;
-
-  var inRange
-  if(rangeMin == rangeMax){
-    inRange = 1;
+  var positionInStepRange;
+  if(startColorIndex == endColorIndex){
+    return pentaho.VizController.getRrbColor(color1[0], color1[1], color1[2]);
   } else {
-    inRange = (value-rangeMin)/(rangeMax-rangeMin);
+    var stepRangeMin = ((startColorIndex / steps) * range) + min;
+    var stepRangeMax = ((endColorIndex / steps) * range) + min;
+    positionInStepRange = (value-stepRangeMin)/(stepRangeMax-stepRangeMin);
   }
   var cols = new Array(3);
-  cols[0] = Math.floor( inRange * (color2[0] - color1[0]) + color1[0] );
-  cols[1] = Math.floor( inRange * (color2[1] - color1[1]) + color1[1] );
-  cols[2] = Math.floor( inRange * (color2[2] - color1[2]) + color1[2] );
+  cols[0] = Math.floor( positionInStepRange * (color2[0] - color1[0]) + color1[0] );
+  cols[1] = Math.floor( positionInStepRange * (color2[1] - color1[1]) + color1[1] );
+  cols[2] = Math.floor( positionInStepRange * (color2[2] - color1[2]) + color1[2] );
   return pentaho.VizController.getRrbColor(cols[0], cols[1], cols[2]);
 }
 
