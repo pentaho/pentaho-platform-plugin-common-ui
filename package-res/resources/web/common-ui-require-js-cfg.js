@@ -245,11 +245,14 @@
     "pentaho/visual/ccc/barNormalizedHorizontal",
     "pentaho/visual/ccc/barLine",
     "pentaho/visual/ccc/line",
-    "pentaho/visual/ccc/metricDot",
+    "pentaho/visual/ccc/metricDotAbstract",
     "pentaho/visual/ccc/areaStacked",
     "pentaho/visual/ccc/pie",
     "pentaho/visual/ccc/heatGrid",
-    "pentaho/visual/ccc/sunburst"
+    "pentaho/visual/ccc/sunburst",
+    "pentaho/visual/ccc/donut",
+    "pentaho/visual/ccc/scatter",
+    "pentaho/visual/ccc/bubble"
   ].forEach(registerVizPackage);
 
   requirePaths["pentaho/visual/Wrapper"] = basePath + "/pentaho/visual/2.5/Wrapper";

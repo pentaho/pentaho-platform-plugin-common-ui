@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 define([
-  "../categoricalContinuousAbstract/model",
+  "../abstract/model",
   "pentaho/i18n!../abstract/i18n/model",
   "../abstract/types/labelsOption",
   "../abstract/mixins/settingsMultiChartType"
-], function(categoricalContinuousAbstractFactory, bundle, labelsOptionFactory, settingsMultiChartType) {
+], function(abstractModelFactory, bundle, labelsOptionFactory, settingsMultiChartType) {
 
   "use strict";
 
   return function(context) {
 
-    var CategoricalContinuousAbstract = context.get(categoricalContinuousAbstractFactory);
+    var CategoricalContinuousAbstract = context.get(abstractModelFactory);
 
     return CategoricalContinuousAbstract.extend({
 
@@ -38,21 +38,23 @@ define([
 
           props: [
             {
-              name: "columns", //VISUAL_ROLE
-              type: "pentaho/visual/role/ordinal",
+              name:    "columns", //VISUAL_ROLE
+              type:    "pentaho/visual/role/ordinal",
               ordinal: 6
             },
             {
               name: "measures", //VISUAL_ROLE
               type: {
-                props: {attributes: {isRequired: true}}
+                base:     "pentaho/visual/role/quantitative",
+                dataType: "number",
+                props:    {attributes: {isRequired: true}}
               },
               ordinal: 7
             },
             {
               name: "labelsOption",
               type: {
-                base: labelsOptionFactory,
+                base:   labelsOptionFactory,
                 domain: ["none", "outside", "inside"]
               },
               isRequired: true,

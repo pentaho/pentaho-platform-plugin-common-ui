@@ -576,7 +576,7 @@ define([
                 attr: attr,
 
                 name: attr.name,
-                label: attr.label,
+                label: attr.label || attr.name,
                 isPercent: !!attr.isPercent,
 
                 role: roleName,
