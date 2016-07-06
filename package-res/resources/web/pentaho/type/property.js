@@ -365,7 +365,9 @@ define([
           if(value == null) return;
 
           var oldType = this._type;
-          var defaultBaseType = this.isRoot ? null : oldType;
+          // Prevent using "value", inherited from abstract base classes, as a default base class.
+          // However, allow configuring a root property, by sub.classing its current, own, type.
+          var defaultBaseType = this.isRoot ? O.getOwn(this, "_type") : oldType;
           var newType = context.get(value, {defaultBase: defaultBaseType}).type;
           if(newType !== oldType) {
             // Hierarchy/PreviousValue consistency

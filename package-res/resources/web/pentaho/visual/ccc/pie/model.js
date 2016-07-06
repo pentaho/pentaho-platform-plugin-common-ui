@@ -24,9 +24,9 @@ define([
 
   return function(context) {
 
-    var CategoricalContinuousAbstract = context.get(abstractModelFactory);
+    var Abstract = context.get(abstractModelFactory);
 
-    return CategoricalContinuousAbstract.extend({
+    return Abstract.extend({
 
         type: {
           id: "pentaho/visual/ccc/pie",
