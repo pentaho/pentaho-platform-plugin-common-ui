@@ -51,6 +51,23 @@ define([
         Derived = Complex.extend();
       });
 
+      it("should be able to change the type of a root property", function() {
+        var typeSpec = {
+          name: "a", label: "foo"
+        };
+        
+        var pType = propertyTypeUtil.createRoot(Complex.type, typeSpec);
+
+        var baseType = pType.type;
+
+        pType.type = {
+          name: "a", label: "bar"
+        };
+
+        expect(pType.type).not.toBe(baseType);
+        expect(pType.type.isSubtypeOf(baseType)).toBe(true);
+      });
+
       describe("when spec is a string -", function() {
         var propType;
 
