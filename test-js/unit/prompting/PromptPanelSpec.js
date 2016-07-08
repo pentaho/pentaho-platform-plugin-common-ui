@@ -805,14 +805,14 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
           panel.paramDefn = paramDefn;
         });
 
-        it("should not create panel widget", function() {
+        it("should create panel widget, if there is a strict param without values", function() {
           var param = {};
           param.name = "test_name";
           param.attributes = {};
-          param.values = [];
-          param.strict = true;
+          param.values = []; // no values provided yet
+          param.strict = true; // strict validation
           var paramPanel = panel._buildPanelForParameter(param);
-          expect(paramPanel).not.toBeDefined();
+          expect(paramPanel).toBeDefined();
           expect(panel._initializeParameterValue).toHaveBeenCalledWith(panel.paramDefn, param);
         });
 
