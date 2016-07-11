@@ -92,13 +92,6 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
        * @private
        */
       function _createWidgetForParameter(param) {
-        if (param.strict && param.values.length === 0) {
-          // if the parameter is strict but we have no valid choices for it, it is impossible for the user to give it a
-          // value, so we will hide this parameter it is highly likely that the parameter is driven by another parameter
-          // which doesn't have a value yet, so eventually, we'll show this parameter.. we hope
-          return null;
-        }
-
         return _createWidget.call(this, {
           param: param
         });
