@@ -15,12 +15,18 @@
  */
 define([
   "pentaho/lang/Base",
-  "pentaho/lang/Event",
+  "pentaho/lang/EventSource",
+  "./events/DidCreate",
+  "./events/WillUpdate",
+  "./events/DidUpdate",
+  "./events/RejectedUpdate",
+  "pentaho/lang/ActionResult",
   "pentaho/data/filter",
   "pentaho/util/error",
   "pentaho/util/logger",
   "pentaho/shim/es6-promise"
-], function(Base, Event, filter, error, logger, Promise) {
+], function(Base, EventSource, DidCreate, WillUpdate, DidUpdate, RejectedUpdate, ActionResult,
+            filter, error, logger, Promise) {
 
   "use strict";
 
@@ -44,31 +50,23 @@ define([
    * @description Initializes a `View` instance.
    *
    * @constructor
-   * @param {HTMLElement} element - The DOM element where the visualization should render.
-   * An error is thrown if this is not a valid DOM element.
    * @param {pentaho.visual.base.Model} model - The base visualization `Model`.
-   *
-   * @throws {pentaho.lang.ArgumentInvalidError} When `element` is not an HTML DOM element.
    */
 
   var View = Base.extend(/** @lends pentaho.visual.base.View# */{
 
-    constructor: function(element, model) {
-      if(!element)
-        throw error.argRequired("element");
-      if(!isElement(element))
-        throw error.argInvalidType("element", "HTMLElement", typeof element);
+    constructor: function(model) {
 
       if(!model)
         throw error.argRequired("model");
 
       /**
-       * The HTML element where the visualization should render.
-       * @type {HTMLElement}
+       * The DOM node where the visualization should render.
+       * @type {?(Node|Text|HTMLElement)}
        * @protected
        * @readonly
        */
-      this._element = element;
+      this._domNode = null;
 
       /**
        * The model of the visualization.
@@ -77,7 +75,23 @@ define([
        */
       this.model = model;
 
+      /**
+       * Indicates when an update is in progress.
+       * @type {boolean}
+       * @readonly
+       */
+      this._isUpdating = false;
+
       this._init();
+    },
+
+    /**
+     * Gets the view's DOM node.
+     *
+     * @type {?(Node|Text|HTMLElement)}
+     */
+    get domNode() {
+      return this._domNode;
     },
 
     /**
@@ -92,36 +106,122 @@ define([
     },
 
     /**
-     * Orchestrates the rendering of the visualization.
+     * Gets the value that indicates if an update is in progress.
      *
-     * This method executes [_render]{@link pentaho.visual.base.View#_render}
-     * asynchronously and is meant to be invoked by the container.
+     * @type {!boolean}
+     */
+    get isUpdating() {
+      return this._isUpdating;
+    },
+
+    /**
+     * Orchestrates the rendering of the visualization and is meant to be invoked by the container.
+     *
+     * Executes [_update]{@link pentaho.visual.base.View#_update} asynchronously in
+     * the will/did/rejected event loop associated with an update of a visualization,
+     * and also creates the visualization DOM node the first time it successfully updates.
+     *
+     * In order to get the visualization DOM node,
+     * listen to the {@link pentaho.visual.base.events.DidCreate|"did:create"} event.
      *
      * @return {Promise} A promise that is fulfilled when the visualization
      * is completely rendered. If the visualization is in an invalid state, the promise
      * is immediately rejected.
+     *
+     * @fires "will:update"
+     * @fires "did:update"
+     * @fires "rejected:update"
+     * @fires "did:create"
      */
-    render: function() {
-      var me = this;
-      return new Promise(function(resolve, reject) {
-        try {
-          var validationErrors = me._validate();
-          if(!validationErrors) {
-            Promise.resolve(me._render()).then(resolve, reject);
-          } else {
-            reject(validationErrors);
-          }
-        } catch(e) {
-          reject(e.message);
-        }
-      });
+    update: function() {
+      if(this.isUpdating) return Promise.reject(new Error("Previous update still in progress!"));
+
+      this._isUpdating = true;
+
+      var willUpdate;
+      if(this._hasListeners(WillUpdate.type)) {
+        willUpdate = new WillUpdate(this);
+        this._emitSafe(willUpdate);
+      }
+
+      if(willUpdate && willUpdate.isCanceled) {
+        this._isUpdating = false;
+
+        if(this._hasListeners(RejectedUpdate.type))
+          this._emitSafe(new RejectedUpdate(this, willUpdate.cancelReason));
+
+        return Promise.reject(willUpdate.cancelReason);
+      }
+
+      var me = this, hadDomNode = this.domNode;
+      return Promise.resolve(me._doUpdate()).then(function() {
+          if(!hadDomNode && me.domNode && me._hasListeners(DidCreate.type))
+            me._emitSafe(new DidCreate(me));
+
+          me._isUpdating = false;
+
+          if(me._hasListeners(DidUpdate.type))
+            me._emitSafe(new DidUpdate(me));
+
+        }, function(reason) {
+          me._isUpdating = false;
+
+          if(me._hasListeners(RejectedUpdate.type))
+            me._emitSafe(new RejectedUpdate(me, reason.error));
+
+          return Promise.reject(reason.error);
+        });
+    },
+
+    /**
+     * Updates a visualization.
+     *
+     * If the visualization is valid, the visualization element will be created on the first update
+     * and proceed with the visualization update; otherwise, it will be rejected and prevent the update.
+     *
+     * @return {Promise} A promise that is fulfilled when the visualization
+     * is completely rendered. If the visualization is in an invalid state, the promise
+     * is immediately rejected.
+     * 
+     * @protected
+     */
+    _doUpdate: function() {
+      var validationErrors = this._validate();
+      if(validationErrors) {
+        var error = "View update was rejected:\n - " +
+          (Array.isArray(validationErrors) ? validationErrors.join("\n - ") : validationErrors);
+
+        return Promise.reject(ActionResult.reject(error));
+      }
+
+      try {
+        return Promise.resolve(this._update());
+      } catch(e) {
+        return Promise.reject(ActionResult.reject(e.message));
+      }
+
     },
 
     /**
      * Called before the visualization is discarded.
      */
     dispose: function() {
-      this._element = null;
+      this._domNode = null;
+    },
+
+    /**
+     * Sets the DOM node that the visualization will use to render itself.
+     * 
+     * @param {?(Node|Text|HTMLElement)} domNode - Visualization's DOM node.
+     * @protected
+     */
+    _setDomNode: function(domNode) {
+      if(!domNode)  throw error.argRequired("domNode");
+      
+      if(this._domNode && domNode !== this._domNode)
+        throw new Error("Can't change the visualization dom node once it is set.");
+
+      this._domNode = domNode;
     },
 
     /**
@@ -175,8 +275,8 @@ define([
      * @protected
      * @abstract
      */
-    _render: /* istanbul ignore next: placeholder method */ function() {
-      throw error.notImplemented("_render");
+    _update: /* istanbul ignore next: placeholder method */ function() {
+      throw error.notImplemented("_update");
     },
 
     /**
@@ -185,12 +285,12 @@ define([
      *
      * Subclasses of `pentaho.visual.base.View` are expected to override this method to
      * implement a fast and cheap resizing of the visualization.
-     * By default, this method invokes [_render]{@link pentaho.visual.base.View#_render}.
+     * By default, this method invokes [_update]{@link pentaho.visual.base.View#_update}.
      *
      * @protected
      */
     _resize: /* istanbul ignore next: placeholder method */ function() {
-      this._render();
+      this._update();
     },
 
     /**
@@ -200,13 +300,13 @@ define([
      * Subclasses of `pentaho.visual.base.View` are expected to override this method
      * with an implementation that
      * updates the selection state of the items displayed by this visualization.
-     * By default, this method invokes [_render]{@link pentaho.visual.base.View#_render}.
+     * By default, this method invokes [_update]{@link pentaho.visual.base.View#_update}.
      *
      * @protected
      */
     _selectionChanged:
     /* istanbul ignore next: placeholder method */function(newSelectionFilter, previousSelectionFilter) {
-      this._render();
+      this._update();
     },
 
     /**
@@ -220,14 +320,14 @@ define([
      * [height]{@link pentaho.visual.base.Model.Type#height} change,
      * - [_selectionChanged]{@link pentaho.visual.base.View#_selectionChanged} when the property
      * [selectionFilter]{@link pentaho.visual.base.Model.Type#selectionFilter} changes
-     * - [_render]{@link pentaho.visual.base.View#_render} when any other property changes.
+     * - [_update]{@link pentaho.visual.base.View#_update} when any other property changes.
      *
      * Subclasses of `pentaho.visual.base.View` can override this method to
      * extend the set of fast render methods.
      *
      * @see pentaho.visual.base.View#_resize
      * @see pentaho.visual.base.View#_selectionChanged
-     * @see pentaho.visual.base.View#_render
+     * @see pentaho.visual.base.View#_update
      *
      * @param {!pentaho.type.Changeset} changeset - Map of the properties that have changed.
      *
@@ -245,7 +345,7 @@ define([
 
       var fullUpdate = changeset.propertyNames.some(function(p) { return !exclusionList[p]; });
       if(fullUpdate) {
-        this.render().then(function() {
+        this.update().then(function() {
           logger.info("Auto-update succeeded!");
         }, function(errors) {
           logger.warn("Auto-update canceled:\n - " +
@@ -264,11 +364,8 @@ define([
       var updateSize = changeset.hasChange("width") || changeset.hasChange("height");
       if(updateSize) this._resize();
     }
-  });
+  }).implement(EventSource);
 
   return View;
 
-  function isElement(obj) {
-    return typeof HTMLElement === "object" ? obj instanceof HTMLElement : !!(obj && obj.nodeType === 1);
-  }
 });

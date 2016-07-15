@@ -38,7 +38,7 @@ define([
       expect(BarView.prototype instanceof AbstractView).toBe(true);
     });
 
-    it("should be possible to create an instance given an element and a model", function() {
+    it("should be possible to create an instance given a model", function() {
       var model = new BarModel({
         width:    1,
         height:   1,
@@ -46,8 +46,7 @@ define([
         measures: {attributes: [{name: "foo"}]}
       });
 
-      var elem = document.createElement("div");
-      var view = new BarView(elem, model);
+      var view = new BarView(model);
     });
 
     it("should be possible to render an instance", function(done) {
@@ -69,12 +68,11 @@ define([
         data:     new Table(tableSpec),
         showLegend: true
       });
-      var elem = document.createElement("div");
-      var view = new BarView(elem, model);
+      var view = new BarView(model);
 
       spyOn(view, "_renderCore");
 
-      view.render().then(function() {
+      view.update().then(function() {
         expect(view._renderCore).toHaveBeenCalled();
         done();
       }, done.fail);

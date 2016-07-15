@@ -183,7 +183,7 @@ define([
 
     //region VizAPI implementation
 
-    _render: function() {
+    _update: function() {
       this._dataTable = this.model.data;
 
       // Ensure we have a plain data table
@@ -193,6 +193,8 @@ define([
       this._visualMap = this._invVisualMap = this._dataView = null;
 
       // ----------
+
+      this._setupDomNode();
 
       this._initOptions();
 
@@ -301,6 +303,11 @@ define([
         this._chart.render(true, true, false);
       }
     },
+    
+    _setupDomNode: function() {
+      if(!this.domNode)
+        this._setDomNode(document.createElement("div"));
+    },
 
     _initOptions: function() {
       var model = this.model;
@@ -312,7 +319,7 @@ define([
       var options = this.options = def.create(this._options);
       def.set(
         options,
-        "canvas", this._element,
+        "canvas", this.domNode,
         "height", model.height || 400,
         "width", model.width || 400,
         "dimensionGroups", {},
@@ -817,12 +824,12 @@ define([
 
     _configure: function() {
       var options = this.options,
-          model = this.model;
+          model   = this.model;
 
       // By default hide overflow, otherwise,
       // resizing the window frequently ends up needlessly showing scrollbars.
-      if(this._element.parentNode) {
-        this._element.parentNode.style.overflow = "hidden"; // Hide overflow
+      if(this.domNode.parentNode) {
+        this.domNode.parentNode.style.overflow = "hidden"; // Hide overflow
       }
 
       var colorScaleKind = this._getColorScaleKind();
@@ -1139,8 +1146,8 @@ define([
       var options = this.options;
 
       // Let the vertical scrollbar show up if necessary
-      if(this._element.parentNode) {
-        var containerStyle = this._element.parentNode.style;
+      if(this.domNode.parentNode) {
+        var containerStyle = this.domNode.parentNode.style;
         containerStyle.overflowX = "hidden";
         containerStyle.overflowY = "auto";
       }
@@ -1269,8 +1276,8 @@ define([
     },
 
     _renderCore: function() {
-      while(this._element.firstChild) {
-        this._element.removeChild(this._element.firstChild);
+      while(this.domNode.firstChild) {
+        this.domNode.removeChild(this.domNode.firstChild);
       }
 
       var ChartClass = pvc[this._cccClass];

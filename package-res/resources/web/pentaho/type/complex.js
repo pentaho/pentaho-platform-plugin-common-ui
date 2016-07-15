@@ -21,15 +21,12 @@ define([
   "./ContainerMixin",
   "../lang/ActionResult",
   "../lang/UserError",
-  "./events/WillChange",
-  "./events/RejectedChange",
-  "./events/DidChange",
   "./changes/ComplexChangeset",
   "../i18n!types",
   "../util/object",
   "../util/error"
 ], function(module, elemFactory, PropertyTypeCollection, typeUtil,
-            ContainerMixin, ActionResult, UserError, WillChange, RejectedChange, DidChange,
+            ContainerMixin, ActionResult, UserError,
             ComplexChangeset, bundle, O, error) {
 
   "use strict";

@@ -47,7 +47,7 @@ define([
   });
 
   var view = new View(vizElement, model);
-  view.render().then(function() {
+  view.update().then(function() {
     console.log("render yielded", arguments);
   });
 
