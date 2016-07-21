@@ -7,38 +7,39 @@ define([
 
   /*global document:false*/
 
-  /**
-   * @name View
-   * @memberOf pentaho.visual.samples.calc
-   * @class
-   * @classDesc The `View` of the calculator visualization.
-   *
-   * @description Creates a calculator `View`.
-   * @constructor
-   * @param {pentaho.visual.samples.calc.Model} model - The calculator's visualization `Model`.
-   */
-  return Visual.extend(/** @lends pentaho.visual.samples.calc.View */{
+  return Visual.extend(/** @lends pentaho.visual.samples.calc.View# */{
+    /**
+     * @alias View
+     * @memberOf pentaho.visual.samples.calc
+     * @class
+     * @classDesc The `View` of the calculator visualization.
+     *
+     * @description Creates a calculator `View`.
+     * @constructor
+     * @param {!HTMLElement} domContainer - The container element.
+     * @param {pentaho.visual.samples.calc.Model} model - The calculator's visualization `Model`.
+     */
+    constructor: function(domContainer, model) {
 
-    /** @override */
-    _init: function() {
-      this.base();
+      this.base(domContainer, model);
+
       this._setupHtmlSpan();
     },
 
-    /** @override */
-    _update: function() {
+    _updateAll: function() {
+
       var result = this._calculate();
+
       // TODO: format result
 
-      this.domNode.innerHTML = bundle.get("result", [result]);
+      this.domContainer.firstChild.innerHTML = bundle.get("result", [result]);
 
-      this._resize();
-
+      this._updateSize();
     },
 
-    /** @override */
-    _resize: function() {
-      var element = this.domNode;
+    _updateSize: function() {
+
+      var element = this.domContainer.firstChild;
 
       // Center the span
       var width  = this.model.width;
@@ -54,7 +55,7 @@ define([
       numSpan.style.fontSize = "42px";
       numSpan.style.position = "relative";
 
-      this._setDomNode(numSpan);
+      this.domContainer.appendChild(numSpan);
     },
 
     _calculate: function() {
@@ -92,6 +93,7 @@ define([
           }
           break;
       }
+
       return value;
     }
   });

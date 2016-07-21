@@ -774,7 +774,10 @@ define([
     /*jshint validthis:true*/
     if(source) {
       // Call `this.extend` method instead of this one, if it exists.
-      if(!fun.is(this) && fun.is(this.extend) && this.extend !== inst_extend) {
+      if(!fun.is(this) && !this.__root_proto__ && fun.is(this.extend) && this.extend !== inst_extend) {
+        // If it is inherited from Base (has __root_proto__), don't go this path,
+        // to allow overriding the extend method and still call this.base().
+        //
         // Because in Base.js, Function#extend has a sub-classing semantics,
         // functions are not considered here, by testing `!fun.is(this)`.
         //
@@ -807,6 +810,7 @@ define([
     /*jshint validthis:true*/
 
     // When called, for e.g. on functions, there's no __extend_exclude__
+    var lcaExclude = rootProto && O.lca(source, rootProto);
     var exclude = this.__extend_exclude__ || _excludeExtendInst;
     var l_exclude = keyArgs && keyArgs.exclude;
     var visited = Object.create(null);
@@ -815,7 +819,7 @@ define([
          !O_hasOwn.call(exclude, n) &&
          (!l_exclude || !O_hasOwn.call(l_exclude, n))) {
         visited[n] = 1;
-        inst_extend_propDesc.call(inst, n, source, rootProto);
+        inst_extend_propDesc.call(inst, n, source, rootProto, null, lcaExclude);
       }
     };
 
@@ -841,25 +845,28 @@ define([
    * @param {Object} [rootProto] The root prototype.
    * When unspecified, overriding methods requires using each actual instance to store the special `base` property.
    * @param {?boolean} [funOnly=false] If true, copy only if member is a function.
-   *
+   * @param {Object} [lcaExclude] An object which base of both this and `source` and whose properties should
+   * be excluded from extension.
    * @private
    */
-  function inst_extend_propDesc(name, source, rootProto, funOnly) {
+  function inst_extend_propDesc(name, source, rootProto, funOnly, lcaExclude) {
     /*jshint validthis:true*/
 
-    var desc = O.getPropertyDescriptor(source, name);
-    if(desc.get || desc.set) {
-      // Property getter/setter
-      var baseDesc = O.getPropertyDescriptor(this, name);
-      if(baseDesc) {
-        if(desc.get || baseDesc.get) desc.get = methodOverride(desc.get, baseDesc.get, rootProto);
-        if(desc.set || baseDesc.set) desc.set = methodOverride(desc.set, baseDesc.set, rootProto);
-      }
+    var desc = O.getPropertyDescriptor(source, name, lcaExclude);
+    if(desc) {
+      if(desc.get || desc.set) {
+        // Property getter/setter
+        var baseDesc = O.getPropertyDescriptor(this, name);
+        if(baseDesc) {
+          if(desc.get || baseDesc.get) desc.get = methodOverride(desc.get, baseDesc.get, rootProto);
+          if(desc.set || baseDesc.set) desc.set = methodOverride(desc.set, baseDesc.set, rootProto);
+        }
 
-      Object.defineProperty(this, name, desc);
-    } else {
-      // Property value
-      inst_extend_propAssign.call(this, name, desc.value, rootProto, funOnly);
+        Object.defineProperty(this, name, desc);
+      } else {
+        // Property value
+        inst_extend_propAssign.call(this, name, desc.value, rootProto, funOnly);
+      }
     }
   }
 

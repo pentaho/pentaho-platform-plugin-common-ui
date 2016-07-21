@@ -46,7 +46,7 @@ define([
         measures: {attributes: [{name: "foo"}]}
       });
 
-      var view = new BarView(model);
+      var view = new BarView(document.createElement("div"), model);
     });
 
     it("should be possible to render an instance", function(done) {
@@ -60,6 +60,7 @@ define([
           {c: [{v: "Ireland"}, {v: 6000}]}
         ]
       };
+
       var model = new BarModel({
         width:    200,
         height:   200,
@@ -68,7 +69,8 @@ define([
         data:     new Table(tableSpec),
         showLegend: true
       });
-      var view = new BarView(model);
+
+      var view = new BarView(document.createElement("div"), model);
 
       spyOn(view, "_renderCore");
 

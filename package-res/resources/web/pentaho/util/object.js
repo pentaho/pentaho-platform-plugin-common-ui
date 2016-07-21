@@ -19,7 +19,9 @@ define(["./has"], function(has) {
   var O_hasOwn = Object.prototype.hasOwnProperty,
       A_empty  = [],
       setProtoOf = has("Object.setPrototypeOf") ? Object.setPrototypeOf : (has("Object.prototype.__proto__") ? setProtoProp : setProtoCopy),
-      constPropDesc = {value: undefined, writable: false, configurable: false, enumerable: false};
+      constPropDesc = {value: undefined, writable: false, configurable: false, enumerable: false},
+      O_root = Object.prototype,
+      O_isProtoOf = Object.prototype.isPrototypeOf;
 
   /**
    * The `object` namespace contains functions for
@@ -216,12 +218,35 @@ define(["./has"], function(has) {
      *
      * @param {!Object} object - The object that contains the property.
      * @param {string} property - The name of property.
-     * @return {?Object} The
-     * [property descriptor]{@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty}.
+     * @param {Object} lcaExclude - A lowest-common-ancestor object whose properties inherited from should
+     * not be returned.
+     * @return {?Object} The [property descriptor]{@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty}.
      * @method
      */
     //only used by pentaho.lang.Base
     getPropertyDescriptor: getPropertyDescriptor,
+
+    /**
+     * Obtains the **l**owest **c**ommon **a**ncestor of both of the given objects, if any.
+     *
+     * If one of the objects has a `null` prototype, there is no common ancenstor and `null` is returned.
+     *
+     * @param {Object} o1 - The first object.
+     * @param {Object} o2 - The second object.
+     *
+     * @return {Object} The lowest common ancestor object, if any, or `null`, if none.
+     */
+    lca: function(o1, o2) {
+      if(!o1 || !o2) return null;
+
+      var lca = o2;
+      while(o1 !== lca && (lca !== O_root) && !O_isProtoOf.call(lca, o1) && (lca = Object.getPrototypeOf(lca)));
+
+      // o1 may not descend from O_root, when any of its ancestors has no prototype.
+      if(lca === O_root && !O_isProtoOf.call(lca, o1)) lca = null;
+
+      return lca;
+    },
 
     /**
      * Constructs an instance of a class,
@@ -314,9 +339,10 @@ define(["./has"], function(has) {
     return to;
   }
 
-  function getPropertyDescriptor(o, p) {
+  function getPropertyDescriptor(o, p, lcaExclude) {
     var pd;
-    while(!(pd = Object.getOwnPropertyDescriptor(o, p)) && (o = Object.getPrototypeOf(o)));
+    while(!(pd = Object.getOwnPropertyDescriptor(o, p)) && (o = Object.getPrototypeOf(o)) &&
+          (!lcaExclude || o !== lcaExclude));
     return pd || null;
   }
 

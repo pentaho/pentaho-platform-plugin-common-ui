@@ -445,6 +445,11 @@ define([
             // jshint -W078
             set height(h) {
               this._height = h - 20;
+            },
+
+            // test overriding extend
+            extend: function(source, keyArgs) {
+              return this.base(source, keyArgs);
             }
           };
           level2_class_spec = {
@@ -580,7 +585,7 @@ define([
             expect(Cat._subclassed).toHaveBeenCalledWith(jasmine.any(Function), {}, {}, keyArgs);
           });
 
-          it("should delegate to _extended, if overridden", function() {
+          it("should delegate to _extende, if overridden", function() {
             Cat._extend = jasmine.createSpy("_extend");
 
             var keyArgs = {a: 'hello'};
@@ -1010,10 +1015,12 @@ define([
 
           describe("using mixins", function() {
             describe("mixing class, without keyArgs", function() {
-              var DomesticMixIn;
+              var DomesticMixIn, originalPersaExtend;
 
               beforeEach(function() {
                 DomesticMixIn = Base.extend(level3_instance_spec, level3_static_spec);
+
+                originalPersaExtend = Persa.prototype.extend;
 
                 Persa.mix(DomesticMixIn);
               });
@@ -1021,6 +1028,11 @@ define([
               it("should mix instance level members", function() {
                 expect(Persa.prototype.properName).toBeDefined();
                 expect(Persa.prototype.eat).toBeDefined();
+              });
+
+              it("should not mix members shared by a common base class", function() {
+                expect(Persa.prototype.extend).toBe(originalPersaExtend);
+                expect(originalPersaExtend).not.toBe(DomesticMixIn.prototype.extend);
               });
 
               it("should mix class level members", function() {
