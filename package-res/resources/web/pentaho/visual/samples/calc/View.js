@@ -15,7 +15,6 @@ define([
    *
    * @description Creates a calculator `View`.
    * @constructor
-   * @param {HTMLDOMElement} element - The DOM element where the visualization should render.
    * @param {pentaho.visual.samples.calc.Model} model - The calculator's visualization `Model`.
    */
   return Visual.extend(/** @lends pentaho.visual.samples.calc.View */{
@@ -27,38 +26,35 @@ define([
     },
 
     /** @override */
-    _render: function() {
+    _update: function() {
       var result = this._calculate();
       // TODO: format result
 
-      this._numSpan.innerHTML = bundle.get("result", [result]);
+      this.domNode.innerHTML = bundle.get("result", [result]);
 
       this._resize();
+
     },
 
     /** @override */
     _resize: function() {
+      var element = this.domNode;
+
       // Center the span
       var width  = this.model.width;
       var height = this.model.height;
-      this._numSpan.style.left = ((width  - this._numSpan.offsetWidth ) / 2) + "px";
-      this._numSpan.style.top  = ((height - this._numSpan.offsetHeight) / 2) + "px";
-    },
-
-    /** @override */
-    dispose: function() {
-      this.base();
-
-      this._numSpan = null;
+      element.style.left = ((width  - element.offsetWidth ) / 2) + "px";
+      element.style.top  = ((height - element.offsetHeight) / 2) + "px";
     },
 
     // ---------
 
     _setupHtmlSpan: function() {
-      this._numSpan = document.createElement("span");
-      this._numSpan.style.fontSize = "42px";
-      this._numSpan.style.position = "relative";
-      this._element.appendChild(this._numSpan);
+      var numSpan = document.createElement("span");
+      numSpan.style.fontSize = "42px";
+      numSpan.style.position = "relative";
+
+      this._setDomNode(numSpan);
     },
 
     _calculate: function() {
