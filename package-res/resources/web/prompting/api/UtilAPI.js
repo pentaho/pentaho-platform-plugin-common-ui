@@ -22,9 +22,10 @@
  * @name UtilAPI
  * @class
  */
-define(["common-ui/prompting/parameters/ParameterXmlParser"], function(ParameterXmlParser) {
+define(["common-ui/prompting/parameters/ParameterXmlParser", "common-ui/prompting/parameters/ParameterValidator"], function(ParameterXmlParser, ParameterValidator) {
   return function(api) {
     this._parameterXmlParser = new ParameterXmlParser();
+    this._parameterValidator = new ParameterValidator();
 
     /**
      * Parses the xml string and returns an instance of ParameterDefinition.
@@ -36,6 +37,14 @@ define(["common-ui/prompting/parameters/ParameterXmlParser"], function(Parameter
      */
     this.parseParameterXml = function(xmlString) {
       return this._parameterXmlParser.parseParameterXml(xmlString);
+    };
+
+    this.validateSingleParameter = function(paramDefn, name, untrustedValue) {
+      return this._parameterValidator.validateSingleParameter(paramDefn, name, untrustedValue);
+    };
+
+    this.checkParametersErrors = function(paramDefn) {
+      return this._parameterValidator.checkParametersErrors(paramDefn);
     };
   }
 });
