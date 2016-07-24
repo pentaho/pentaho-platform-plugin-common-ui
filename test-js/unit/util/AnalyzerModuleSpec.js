@@ -36,12 +36,14 @@ define(["dojo/ready","common-ui/util/AnalyzerModule","dojo/dom"],
             var moduleDomContainerId = "analyzer-div-container";
             var moduleCatalog = "models/Model 1.xmi";
             var moduleCube = "Model 1";
+            var moduleDataSource = "DataServiceName";
 
             options = {
                 "url" : moduleUrl,
                 "parentElement" : moduleDomContainerId,
                 "catalog" : moduleCatalog,
                 "cube" : moduleCube,
+                "dataSource" : moduleDataSource,
                 "disableFilterPanel" : "true",
                 "removeFieldLayout" : "true",
                 "removeFieldList" : "true",
@@ -94,6 +96,7 @@ define(["dojo/ready","common-ui/util/AnalyzerModule","dojo/dom"],
 
             it("should return generated URL", function(){
                 expect(analyzerModuleObject.getUrl()).toContain(moduleUrl)
+                expect(analyzerModuleObject.getUrl()).toContain("dataSource=" + moduleDataSource);
             });
 
             it("should hide the module", function(){
