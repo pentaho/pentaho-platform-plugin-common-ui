@@ -41,6 +41,7 @@ define([
         "reportPath" : true,
         "catalog" : true,
         "cube" : true,
+        "dataSource" : true,
         "onAnalyzerReady" : true,
         "mode" : true
     };
@@ -87,6 +88,9 @@ define([
             }
             if (options["catalog"]) {
                 queryObj["catalog"] = options["catalog"];
+            }
+            if (options["dataSource"]) {
+                queryObj["dataSource"] = options["dataSource"];
             }
             queryObj["ts"] = new Date().getTime();
 
@@ -226,6 +230,10 @@ define([
          * @param {string} options.cube
          *    The cube to use when creating a new Analyzer report
          *
+         * @param {string} options.dataSource
+         *    Optional: The name of a data service that supplies data for the report. Use this in conjunction with
+         *              a url value for that "catalog" parameter that supplies the mondrian model
+         *
          * @param {string} options.reportPath
          *    The path which points to an existing Analyzer report to open
          *
@@ -239,8 +247,9 @@ define([
          *    var options = {
          *      "url" : "http://localhost:8080/pentaho",
          *      "parentElement" : "parentElementId",
-         *      "catalog" : "ExampleCatalog",
+         *      "catalog" : "http://localhost:1234/path/to/model",
          *      "cube" : "ExampleCube",
+         *      "dataSource" : "DataServiceName"
          *      "mode" : "editor",
          *      "disableFilterPanel" : "true",
          *      "removeFieldLayout" : "true",
