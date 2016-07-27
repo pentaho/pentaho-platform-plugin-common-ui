@@ -83,6 +83,17 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_Templated", "dojo/on"
             },
 
             imgClick: function (event) {
+              // BACKLOG-9334 - prevent a double-click
+              var me = this;
+              if (!me.clicks) me.clicks = 0;
+              ++me.clicks;
+              if (me.clicks > 1) {
+                return;
+              }
+              setTimeout(function () {
+                me.clicks = 0
+              }, 500);
+
               var idx = parseInt(event.target.getAttribute('idx'));
               var idx = this.pageNo * 6 + idx;
               if (this.templateSelectedCallback) {
