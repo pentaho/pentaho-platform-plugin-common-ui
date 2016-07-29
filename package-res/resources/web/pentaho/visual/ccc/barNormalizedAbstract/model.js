@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 define([
+  "module",
   "../barAbstract/model",
   "pentaho/i18n!../abstract/i18n/model",
   "../abstract/types/labelsOption"
-], function(barAbstractModelFactory, bundle, labelsOptionFactory) {
+], function(module, barAbstractModelFactory, bundle, labelsOptionFactory) {
 
   "use strict";
 
@@ -27,7 +28,8 @@ define([
 
     return BarAbstract.extend({
       type: {
-        id: "pentaho/visual/ccc/barNormalizedAbstract",
+        sourceId: module.id,
+        id: module.id.replace(/.\w+$/, ""),
         isAbstract: true,
 
         props: [

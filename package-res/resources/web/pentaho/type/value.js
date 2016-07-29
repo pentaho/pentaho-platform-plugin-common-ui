@@ -68,7 +68,7 @@ define([
      * @see pentaho.type.spec.IValueProto
      * @see pentaho.type.spec.IValueTypeProto
      */
-    var Value = Instance.extend("pentaho.type.Value", /** @lends pentaho.type.Value# */{
+    var Value = Instance.extend(/** @lends pentaho.type.Value# */{
 
       /**
        * Gets the key of the value.
@@ -255,9 +255,6 @@ define([
        */
       type: /** @lends pentaho.type.Value.Type# */{
         id: module.id,
-
-        styleClass: "pentaho-type-value",
-
         isAbstract: true,
 
         get isValue() { return true; },

@@ -35,7 +35,7 @@ define([
      *
      * @description Creates a string instance.
      */
-    return Simple.extend("pentaho.type.String", {
+    return Simple.extend({
       /**
        * Gets the underlying string primitive value of the value.
        * @name pentaho.type.String#value
@@ -45,7 +45,6 @@ define([
 
       type: {
         id: module.id,
-        styleClass: "pentaho-type-string",
         cast: String
       }
     }).implement({

@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 define([
+  "module",
   "../categoricalContinuousAbstract/model",
   "pentaho/i18n!../abstract/i18n/model",
   "../abstract/types/labelsOption",
   "../abstract/mixins/settingsMultiChartType",
   "../abstract/mixins/interpolationType"
-], function(categoricalContinuousAbstractModelFactory, bundle, labelsOptionFactory,
+], function(module, categoricalContinuousAbstractModelFactory, bundle, labelsOptionFactory,
     settingsMultiChartType, interpolationType) {
 
   "use strict";
@@ -30,12 +31,12 @@ define([
 
     return CategoricalContinuousAbstract.extend({
         type: {
-          id: "pentaho/visual/ccc/areaStacked",
+          sourceId: module.id,
+          id: module.id.replace(/.\w+$/, ""),
           v2Id: "ccc_area",
           category: "areachart",
 
-          view: "View",
-          styleClass: "pentaho-visual-ccc-area-stacked",
+          defaultView: "./View",
 
           props: [
             {

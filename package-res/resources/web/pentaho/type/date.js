@@ -37,7 +37,7 @@ define([
      * @constructor
      * @param {pentaho.type.spec.IDate|Date|string} [spec] A date specification.
      */
-    return Simple.extend("pentaho.type.Date", {
+    return Simple.extend({
       /**
        * Gets the underlying `Date` object of the date value.
        * @name pentaho.type.Date#value
@@ -55,8 +55,6 @@ define([
 
       type: {
         id: module.id,
-
-        styleClass: "pentaho-type-date",
 
         cast: function(v) {
           return (v instanceof Date) ? v : new Date(v);

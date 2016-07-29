@@ -41,7 +41,7 @@ define([
      * @constructor
      * @param {pentaho.type.spec.IFunction|function|string} [spec] A function specification.
      */
-    return Simple.extend("pentaho.type.Function", {
+    return Simple.extend({
       /**
        * Gets the underlying function value of the value.
        * @name pentaho.type.Function#value
@@ -65,7 +65,6 @@ define([
 
       type: {
         id: module.id,
-        styleClass: "pentaho-type-function",
         cast: F.as
       }
     }).implement({

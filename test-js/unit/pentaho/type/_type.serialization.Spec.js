@@ -211,30 +211,30 @@ define([
         serializationUtil.itFillSpecAttribute(Instance, "ordinal", undefined, false);
       });
 
-      describe("#view", function() {
+      describe("#defaultView", function() {
         // view can be null, function or string, or not local.
         var f = function() {};
 
-        serializationUtil.itFillSpecAttribute(Instance, "view", f, true);
-        serializationUtil.itFillSpecAttribute(Instance, "view", "/my/view", true);
-        serializationUtil.itFillSpecAttribute(Instance, "view", null, true);
-        serializationUtil.itFillSpecAttribute(Instance, "view", undefined, false);
+        serializationUtil.itFillSpecAttribute(Instance, "defaultView", f, true);
+        serializationUtil.itFillSpecAttribute(Instance, "defaultView", "/my/view", true);
+        serializationUtil.itFillSpecAttribute(Instance, "defaultView", null, true);
+        serializationUtil.itFillSpecAttribute(Instance, "defaultView", undefined, false);
 
-        it("should not output a local view constructor when isJson: true", function() {
+        it("should not output a local defaultView constructor when isJson: true", function() {
           var spec = {};
-          var typeSpec = {view: f};
+          var typeSpec = {defaultView: f};
           var result = serializationUtil.fillSpec(Instance, spec, typeSpec, {isJson: true});
 
           expect(result).toBe(false);
         });
 
-        it("should output a local view id when isJson: true", function() {
+        it("should output a local defaultView id when isJson: true", function() {
           var spec = {};
-          var typeSpec = {view: "/my/view/"};
+          var typeSpec = {defaultView: "/my/view/"};
           var result = serializationUtil.fillSpec(Instance, spec, typeSpec, {isJson: true});
 
           expect(result).toBe(true);
-          expect(spec.view).toBe("/my/view/");
+          expect(spec.defaultView).toBe("/my/view/");
         });
       });
     });

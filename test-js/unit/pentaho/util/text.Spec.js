@@ -26,37 +26,79 @@ define([
       expect(typeof text).toBe("object");
     });
 
-    it("should ensure the first letter of a string is upper case.", function() {
-      expect(text.firstUpperCase("text")).toBe("Text");
+    describe("firstUpperCase(text)", function() {
+      it("should ensure the first letter of a string is upper case", function() {
+        expect(text.firstUpperCase("text")).toBe("Text");
+      });
+
+      it("should preserve an already uppercase string", function() {
+        expect(text.firstUpperCase("TEXT")).toBe("TEXT");
+      });
+
+      it("should ensure (for multiple words) the first letter of the first string is upper case", function() {
+        expect(text.firstUpperCase("text text")).toBe("Text text");
+      });
     });
 
-    it("should preserve an already uppercase string.", function() {
-      expect(text.firstUpperCase("TEXT")).toBe("TEXT");
+    describe("titleFromName(text)", function() {
+      it("should ensure the first letter of a sentence is upper case", function() {
+        expect(text.titleFromName("productFamilyId")).toBe("Product Family Id");
+      });
+
+      it("should return empty string if given empty string", function() {
+        expect(text.titleFromName("")).toBe("");
+      });
+
+      it("should return null if given null", function() {
+        expect(text.titleFromName(null)).toBe(null);
+      });
+
+      it("should return undefined if given undefined", function() {
+        expect(text.titleFromName(undefined)).toBe(undefined);
+        expect(text.titleFromName()).toBe(undefined);
+      });
     });
 
-    it("should ensure (for multiple words) the first letter of the first string is upper case.", function() {
-      expect(text.firstUpperCase("text text")).toBe("Text text");
-    });
+    describe("toSnakeCase(text)", function() {
+      it("should split when case changes and join with an hyphen", function() {
+        expect(text.toSnakeCase("productFamilyId").toLowerCase()).toBe("product-family-id");
+      });
 
-    it("should ensures the first letter of a sentence is upper case.", function() {
-      expect(text.titleFromName("produtFamilyId")).toBe("Produt Family Id");
-    });
+      it("should convert the result to lower case", function() {
+        expect(text.toSnakeCase("Product")).toBe("product");
+      });
 
-    it("should return empty string if given empty string.", function() {
-      expect(text.titleFromName("")).toBe("");
-    });
+      it("should convert spaces to hyphen", function() {
+        expect(text.toSnakeCase("product family")).toBe("product-family");
+      });
 
-    it("should return null if given null.", function() {
-      expect(text.titleFromName(null)).toBe(null);
-    });
+      it("should convert backward and forward slashes to hyphens", function() {
+        expect(text.toSnakeCase("product/family\\id")).toBe("product-family-id");
+      });
 
-    it("should return undefined if given undefined.", function() {
-      expect(text.titleFromName(undefined)).toBe(undefined);
-    });
+      it("should convert underscores to hyphens", function() {
+        expect(text.toSnakeCase("product_family")).toBe("product-family");
+      });
 
-    it("should return undefined if given undefined.", function() {
-      expect(text.titleFromName()).toBe(undefined);
-    });
+      it("should convert consecutive spaces, underscores or slashes to a single hyphen", function() {
+        expect(text.toSnakeCase("product__family")).toBe("product-family");
+        expect(text.toSnakeCase("product  family")).toBe("product-family");
+        expect(text.toSnakeCase("product//family")).toBe("product-family");
+        expect(text.toSnakeCase("product\\\\family")).toBe("product-family");
+      });
 
+      it("should return empty string if given empty string", function() {
+        expect(text.toSnakeCase("")).toBe("");
+      });
+
+      it("should return null if given null", function() {
+        expect(text.toSnakeCase(null)).toBe(null);
+      });
+
+      it("should return undefined if given undefined", function() {
+        expect(text.toSnakeCase(undefined)).toBe(undefined);
+        expect(text.toSnakeCase()).toBe(undefined);
+      });
+    });
   }); // pentaho.util.text
 });

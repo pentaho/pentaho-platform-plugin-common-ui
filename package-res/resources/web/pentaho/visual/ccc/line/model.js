@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 define([
+  "module",
   "../categoricalContinuousAbstract/model",
   "pentaho/i18n!../abstract/i18n/model",
   "../abstract/types/labelsOption",
@@ -22,7 +23,7 @@ define([
   "../abstract/mixins/trendType",
   "../abstract/mixins/settingsMultiChartType",
   "../abstract/mixins/interpolationType"
-], function(categoricalContinuousAbstractFactory, bundle, labelsOptionFactory, shapeFactory, lineWidthFactory,
+], function(module, categoricalContinuousAbstractFactory, bundle, labelsOptionFactory, shapeFactory, lineWidthFactory,
     trendType, settingsMultiChartType, interpolationType) {
 
   "use strict";
@@ -34,12 +35,11 @@ define([
     return CategoricalContinuousAbstract.extend({
 
         type: {
-          id: "pentaho/visual/ccc/line",
+          sourceId: module.id,
+          id: module.id.replace(/.\w+$/, ""),
           v2Id: "ccc_line",
           category: "linechart",
-
-          view: "View",
-          styleClass: "pentaho-visual-ccc-line",
+          defaultView: "./View",
 
           props: [
             {

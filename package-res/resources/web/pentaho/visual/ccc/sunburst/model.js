@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 define([
+  "module",
   "../abstract/model",
   "pentaho/i18n!../abstract/i18n/model",
   "../abstract/types/displayUnits",
   "../abstract/types/labelsOption",
   "../abstract/types/sliceOrder",
   "../abstract/mixins/settingsMultiChartType"
-], function(abstractModelFactory, bundle, displayUnitsFactory, labelsOptionFactory, sliceOrderFactory,
+], function(module, abstractModelFactory, bundle, displayUnitsFactory, labelsOptionFactory, sliceOrderFactory,
     settingsMultiChartType) {
 
   "use strict";
@@ -31,12 +32,11 @@ define([
 
     return Abstract.extend({
       type: {
-        id: "pentaho/visual/ccc/sunburst",
+        sourceId: module.id,
+        id: module.id.replace(/.\w+$/, ""),
         v2Id: "ccc_sunburst",
         category: "treemapchart",
-
-        view: "View",
-        styleClass: "pentaho-visual-ccc-sunburst",
+        defaultView: "./View",
 
         props: [
           {

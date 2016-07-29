@@ -51,14 +51,14 @@ define([
       it("should throw if invoked with no DOM container", function() {
 
         expect(function() {
-          new View(null, model);
+          var view = new View(null, model);
         }).toThrow(errorMatch.argRequired("domContainer"));
       });
 
       it("should throw if invoked with no model", function() {
 
         expect(function() {
-          new View(document.createElement("div"), null);
+          var view = new View(document.createElement("div"), null);
         }).toThrow(errorMatch.argRequired("model"));
       });
 
@@ -662,7 +662,8 @@ define([
         var view  = createView();
         var spies = createUpdateSpies(view);
 
-        view.__dirtyPropGroups.set(View.PropertyGroups.General | View.PropertyGroups.Size | View.PropertyGroups.Selection);
+        view.__dirtyPropGroups.set(
+            View.PropertyGroups.General | View.PropertyGroups.Size | View.PropertyGroups.Selection);
 
         return view.update().then(function() {
           expect(spies.updateSize).not.toHaveBeenCalled();
@@ -1128,7 +1129,8 @@ define([
         expect(DerivedView.__UpdateMethodsList.length).toBe(count);
       });
       
-      it("should ignore unknown property groups and still register the _updateXyz method under the known mask", function() {
+      it("should ignore unknown property groups and still register the _updateXyz method " +
+         "under the known mask", function() {
 
         var updateSizeAndFoo = function() {};
         var DerivedView = View.extend({
@@ -1161,5 +1163,91 @@ define([
         expect(info2).toBe(info);
       });
     }); // #extend
+
+    describe("createAsync(domContainer, model)", function() {
+      it("should be defined", function() {
+        expect(typeof View.createAsync).toBe("function");
+      });
+
+      it("should be defined in subclasses of View", function() {
+        var SubView = View.extend();
+
+        expect(typeof SubView.createAsync).toBe("function");
+      });
+
+      it("should return a rejected promise when given no dom element", function() {
+
+        return testUtils.expectToRejectWith(View.createAsync(null, model), {
+          asymmetricMatch: function(error) { return error instanceof Error; }
+        });
+      });
+
+      it("should return a rejected promise when given no model", function() {
+
+        return testUtils.expectToRejectWith(View.createAsync(document.createElement("div"), null), {
+          asymmetricMatch: function(error) { return error instanceof Error; }
+        });
+      });
+
+      it("should return a promise", function() {
+        var p = View.createAsync(document.createElement("div"), model);
+
+        expect(p instanceof Promise).toBe(true);
+      });
+
+      it("should return a promise that is rejected when the type of model does not have " +
+         "a registered view type", function() {
+        var SubModel = Model.extend({type: {defaultView: null}});
+
+        var model = new SubModel();
+
+        return testUtils.expectToRejectWith(View.createAsync(document.createElement("div"), model), {
+          asymmetricMatch: function(error) { return error instanceof Error; }
+        });
+      });
+
+      it("should return a promise that is fulfilled with a view of the registered default view type", function() {
+        var SubView  = View.extend();
+        var SubModel = Model.extend({type: {defaultView: SubView}});
+
+        var model = new SubModel();
+
+        return View.createAsync(document.createElement("div"), model)
+            .then(function(view) {
+              expect(view instanceof SubView).toBe(true);
+            });
+      });
+
+      it("should return a promise that is fulfilled with a view that has the given model", function() {
+        var SubView  = View.extend();
+        var SubModel = Model.extend({type: {defaultView: SubView}});
+
+        var model = new SubModel();
+
+        return View.createAsync(document.createElement("div"), model)
+            .then(function(view) {
+              expect(view.model).toBe(model);
+            });
+      });
+
+      it("should pass all given arguments to the view constructor", function() {
+        var viewCtor = jasmine.createSpy();
+        var SubView  = View.extend({
+          constructor: viewCtor
+        });
+
+        var SubModel = Model.extend({type: {defaultView: SubView}});
+
+        var domContainer = document.createElement("div");
+        var model = new SubModel();
+        var arg2  = {};
+        var arg3  = {};
+
+        return View.createAsync(domContainer, model, arg2, arg3)
+            .then(function(view) {
+              expect(viewCtor).toHaveBeenCalledWith(domContainer, model, arg2, arg3);
+            });
+      });
+    });
   });
 });

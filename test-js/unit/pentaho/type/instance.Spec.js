@@ -40,33 +40,77 @@ define([
       expect(Instance.type).toBe(Type.prototype);
     });
 
-    describe("extend({...}) -", function() {
-      var Derived;
-      beforeEach(function() {
-        Derived = Instance.extend();
-      });
+    describe(".extend({...}) -", function() {
 
       it("should return a function", function() {
+        var Derived = Instance.extend();
         expect(typeof Derived).toBe("function");
       });
 
       it("should return a sub-class of Instance", function() {
+        var Derived = Instance.extend();
         expect(Derived.prototype instanceof Instance).toBe(true);
       });
 
       it("should have .Type as a function", function() {
+        var Derived = Instance.extend();
         expect(typeof Derived.Type).toBe("function");
       });
 
       it("should have .Type as a sub-class of Type", function() {
+        var Derived = Instance.extend();
         expect(Derived.Type.prototype instanceof Type).toBe(true);
       });
 
       it("should have .type be Derived.Type#", function() {
+        var Derived = Instance.extend();
         expect(Derived.type).toBe(Derived.Type.prototype);
       });
 
-    }); // extend({...})
+      it("should accept a given name", function() {
+        var Derived = Instance.extend("foo");
+        expect(Derived.name || Derived.displayName).toBe("foo");
+      });
+
+      it("should set the corresponding type constructor name by suffixing '.Type' to the name " +
+         "of the instance constructor", function() {
+        var Derived = Instance.extend("foo");
+        expect(Derived.Type.name || Derived.Type.displayName).toBe("foo.Type");
+      });
+
+      it("should have name receive the type `id` when name is not specified", function() {
+        var Derived = Instance.extend({type: {id: "foo"}});
+        expect(Derived.name || Derived.displayName).toBe("foo");
+      });
+
+      it("should set the corresponding type constructor name by suffixing '.Type' when " +
+          "the name name of the instance constructor is defaulted from the id", function() {
+        var Derived = Instance.extend({type: {id: "foo"}});
+        expect(Derived.Type.name || Derived.Type.displayName).toBe("foo.Type");
+      });
+
+      it("should have name receive the type's `sourceId` when name is not specified", function() {
+        var Derived = Instance.extend({type: {sourceId: "foo"}});
+        expect(Derived.name || Derived.displayName).toBe("foo");
+      });
+
+      it("should respect name when specified and not use the type's `id` or `sourceId`", function() {
+        var Derived = Instance.extend("foo", {type: {id: "bar"}});
+
+        expect(Derived.name || Derived.displayName).toBe("foo");
+
+        // ----
+
+        Derived = Instance.extend("foo", {type: {sourceId: "bar"}});
+
+        expect(Derived.name || Derived.displayName).toBe("foo");
+      });
+
+      it("should allow a type factory module id to default the type name", function() {
+        var Derived = Instance.extend({type: {id: "my/special/model"}});
+        expect(Derived.name || Derived.displayName).toBe("my.special.Model");
+      });
+    }); // .extend({...})
 
     describe("get/set type of a derived class - ", function() {
       var Derived;

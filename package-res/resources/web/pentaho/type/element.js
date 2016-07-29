@@ -49,7 +49,7 @@ define([
      *
      * @description Creates an element instance.
      */
-    var Element = Value.extend("pentaho.type.Element", {
+    var Element = Value.extend({
 
       //@override
       /**
@@ -64,8 +64,6 @@ define([
       type: /** @lends pentaho.type.Element.Type# */{
 
         id: module.id,
-
-        styleClass: "pentaho-type-element",
 
         get isElement() { return true; },
 

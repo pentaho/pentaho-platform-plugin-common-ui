@@ -224,6 +224,24 @@ define([
           expect(Middle.displayName).not.toBe("MyClassName");
         });
 
+        it("should convert '/' in name to '.'", function() {
+          var Top = Base.extend("My/Class/Name");
+
+          expect(Top.name || Top.displayName).toBe("My.Class.Name");
+        });
+
+        it("should convert the last segment in a '/' separated name to upper case", function() {
+          var Top = Base.extend("my/Class/name");
+
+          expect(Top.name || Top.displayName).toBe("my.Class.Name");
+        });
+
+        it("should not convert the last segment in a '.' separated name to upper case", function() {
+          var Top = Base.extend("my.Class.name");
+
+          expect(Top.name || Top.displayName).toBe("my.Class.name");
+        });
+
         it("shouldn't be able to define this.base", function() {
           var Top = Base.extend({base: "hello"});
 
@@ -585,7 +603,7 @@ define([
             expect(Cat._subclassed).toHaveBeenCalledWith(jasmine.any(Function), {}, {}, keyArgs);
           });
 
-          it("should delegate to _extende, if overridden", function() {
+          it("should delegate to _extend, if overridden", function() {
             Cat._extend = jasmine.createSpy("_extend");
 
             var keyArgs = {a: 'hello'};

@@ -53,7 +53,7 @@ define([
      * @see pentaho.type.spec.ISimpleProto
      * @see pentaho.type.spec.ISimpleTypeProto
      */
-    var Simple = Element.extend("pentaho.type.Simple", /** @lends pentaho.type.Simple# */{
+    var Simple = Element.extend(/** @lends pentaho.type.Simple# */{
 
       constructor: function(spec) {
         if(spec instanceof Object) {
@@ -324,7 +324,6 @@ define([
       type: /** pentaho.type.Simple.Type# */{
         id: module.id,
         isAbstract: true,
-        styleClass: "pentaho-type-simple",
 
         get isSimple() { return true; },
 

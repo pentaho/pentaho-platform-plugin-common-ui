@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 define([
+  "module",
   "../barNormalizedAbstract/model",
   "pentaho/i18n!../abstract/i18n/model"
-], function(barNormalizedAbstractModelFactory, bundle) {
+], function(module, barNormalizedAbstractModelFactory, bundle) {
 
   "use strict";
 
@@ -26,12 +27,12 @@ define([
 
     return BarNormalizedAbstract.extend({
         type: {
-          id: "pentaho/visual/ccc/barNormalizedHorizontal",
+          sourceId: module.id,
+          id: module.id.replace(/.\w+$/, ""),
           v2Id: "ccc_horzbarnormalized",
           category: "horzbarchart",
 
-          view: "View",
-          styleClass: "pentaho-visual-ccc-bar-normalized-horizontal"
+          defaultView: "./View"
         }
     })
     .implement({type: bundle.structured["barNormalizedHorizontal"]});

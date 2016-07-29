@@ -40,7 +40,7 @@ define([
 
   var _reUpdateMethodName = /^_update(.+)$/;
 
-  var View = Base.extend(/** @lends pentaho.visual.base.View# */{
+  var View = Base.extend("pentaho.visual.base.View", /** @lends pentaho.visual.base.View# */{
 
     /**
      * @alias View
@@ -720,7 +720,38 @@ define([
       }
     }
   }, /** @lends pentaho.visual.base.View */{
-    // see Base.js
+    /**
+     * Creates a view for the given model, of the registered default type, if any.
+     *
+     * If no default view type is registered
+     * for the given model type,
+     * or for any of its base model types,
+     * the returned promise is rejected.
+     *
+     * @param {!DOMElement} domContainer - The container element.
+     * @param {!pentaho.visual.base.Model} model - The visual model.
+     * @param {...any} other - Other arguments to pass to the registered view constructor.
+     *
+     * @return {!Promise.<pentaho.visual.base.View>} A promise for a view of the given model.
+     *
+     * @rejects {pentaho.lang.ArgumentRequiredError} When `model` is not specified.
+     * @rejects {Error} When there is not a registered default view class for the type of `model`.
+     */
+    createAsync: function(domContainer, model) {
+      if(!domContainer) return Promise.reject(error.argRequired("domContainer"));
+      if(!model) return Promise.reject(error.argRequired("model"));
+      var args = arg.slice(arguments);
+
+      var promise = model.type.defaultViewClass;
+      if(!promise) return Promise.reject(new Error("No registered default view class."));
+
+      return promise.then(function(ViewClass) {
+        return O.make(ViewClass, args);
+      });
+    },
+
+
+        // see Base.js
     _subclassed: function(Subclass, instSpec, classSpec, keyArgs) {
 
       // "Inherit" PropertyGroups, __PropertyGroupOfProperty, __UpdateMethods and __UpdateMethodsList properties

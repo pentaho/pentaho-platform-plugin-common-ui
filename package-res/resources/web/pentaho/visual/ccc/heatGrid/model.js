@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 define([
+  "module",
   "../cartesianAbstract/model",
   "pentaho/i18n!../abstract/i18n/model",
   "../abstract/types/shape",
   "../abstract/types/labelsOption",
   "../abstract/mixins/scaleSizeContinuousType",
   "../abstract/mixins/scaleColorContinuousType"
-], function(cartesianAbstractModelFactory, bundle, shapeFactory, labelsOptionFactory,
+], function(module, cartesianAbstractModelFactory, bundle, shapeFactory, labelsOptionFactory,
     scaleSizeContinuousType, scaleColorContinuousType) {
 
   "use strict";
@@ -36,12 +37,11 @@ define([
 
     return CartesianAbstract.extend({
         type: {
-          id: "pentaho/visual/ccc/heatGrid",
+          sourceId: module.id,
+          id: module.id.replace(/.\w+$/, ""),
           v2Id: "ccc_heatgrid",
           category: "heatgrid",
-
-          view: "View",
-          styleClass: "pentaho-visual-ccc-heat-grid",
+          defaultView: "./View",
 
           props: [
             {

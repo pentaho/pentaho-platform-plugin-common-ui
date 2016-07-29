@@ -35,7 +35,7 @@ define([
      *
      * @description Creates a number instance.
      */
-    return Simple.extend("pentaho.type.Number", {
+    return Simple.extend({
       /**
        * Gets the underlying number primitive of the value.
        * @name pentaho.type.Number#value
@@ -45,7 +45,6 @@ define([
 
       type: {
         id: module.id,
-        styleClass: "pentaho-type-number",
         cast: toNumber
       }
     }).implement({

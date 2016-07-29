@@ -71,7 +71,7 @@ define([
      * @see pentaho.type.Complex
      */
 
-    var Property = Instance.extend("pentaho.type.Property", /** @lends pentaho.type.Property# */{
+    var Property = Instance.extend(/** @lends pentaho.type.Property# */{
 
       // TODO: value, members?
       // TODO: p -> AnnotatableLinked.configure(this, config);
@@ -83,6 +83,8 @@ define([
         id: module.id,
 
         isAbstract: true,
+
+        styleClass: null,
 
         // Break inheritance
         _label: null,

@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 define([
+  "module",
   "../barAbstract/model",
   "pentaho/i18n!../abstract/i18n/model",
   "../abstract/types/labelsOption"
-], function(barAbstractModelFactory, bundle, labelsOptionFactory) {
+], function(module, barAbstractModelFactory, bundle, labelsOptionFactory) {
 
   "use strict";
 
@@ -27,12 +28,12 @@ define([
 
     return BarAbstract.extend({
         type: {
-          id: "pentaho/visual/ccc/barStackedHorizontal",
+          sourceId: module.id,
+          id: module.id.replace(/.\w+$/, ""),
           v2Id: "ccc_horzbarstacked",
           category: "horzbarchart",
 
-          view: "View",
-          styleClass: "pentaho-visual-ccc-bar-stacked-horizontal",
+          defaultView: "./View",
 
           props: [
             {

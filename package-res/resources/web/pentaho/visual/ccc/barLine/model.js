@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 define([
+  "module",
   "../barAbstract/model",
   "pentaho/i18n!../abstract/i18n/model",
   "../abstract/types/labelsOption",
   "../abstract/types/shape",
   "../abstract/types/lineWidth",
   "../abstract/mixins/interpolationType"
-], function(barAbstractModelFactory, bundle, labelsOptionFactory, shapeFactory, lineWidthFactory,
+], function(module, barAbstractModelFactory, bundle, labelsOptionFactory, shapeFactory, lineWidthFactory,
     interpolationType) {
 
   "use strict";
@@ -47,12 +48,12 @@ define([
     return BarAbstract.extend({
 
       type: {
-        id: "pentaho/visual/ccc/barLine",
+        sourceId: module.id,
+        id: module.id.replace(/.\w+$/, ""),
         v2Id: "ccc_barline",
         category: "barchart",
 
-        view: "View",
-        styleClass: "pentaho-visual-ccc-bar-line",
+        defaultView: "./View",
 
         props: [
           {
