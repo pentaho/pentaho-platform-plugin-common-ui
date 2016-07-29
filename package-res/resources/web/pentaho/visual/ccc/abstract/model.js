@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 define([
+  "module",
   "pentaho/visual/base",
   "pentaho/i18n!./i18n/model",
   "./types/color",
@@ -22,7 +23,7 @@ define([
   "./types/sides",
   "./types/labelsOption",
   "../theme/model"
-], function(abstractModelFactory, bundle, colorFactory, backgroundFillFactory, fontStyleFactory,
+], function(module, abstractModelFactory, bundle, colorFactory, backgroundFillFactory, fontStyleFactory,
     sidesFactory, labelsOptionFactory) {
 
   "use strict";
@@ -38,7 +39,9 @@ define([
 
     return Abstract.extend({
       type: {
-        id: "pentaho/visual/ccc/abstract",
+        sourceId: module.id,
+        id: module.id.replace(/.\w+$/, ""),
+
         isAbstract: true,
 
         props: [

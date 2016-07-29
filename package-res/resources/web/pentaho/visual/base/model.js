@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 define([
+  "module",
+
   "pentaho/type/complex",
   "pentaho/lang/Event",
   "pentaho/data/filter",
@@ -42,7 +44,7 @@ define([
   "../role/nominal",
   "../role/ordinal",
   "../role/quantitative"
-], function(complexFactory, Event, filter, typeUtil, O,
+], function(module, complexFactory, Event, filter, typeUtil, O,
             error, F, UserError,
             selectionModes,
             WillSelect, DidSelect, RejectedSelect,
@@ -277,9 +279,11 @@ define([
       //endregion
 
       type:  /** @lends pentaho.visual.base.Model.Meta# */{
-        id: "pentaho/visual/base",
-        view: "View",
+        sourceId: module.id,
+        id: module.id.replace(/.\w+$/, ""),
+        defaultView: "./View",
         isAbstract: true,
+
         props: [
           {
             name: "width",

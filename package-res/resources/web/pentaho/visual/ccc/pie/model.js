@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 define([
+  "module",
   "../abstract/model",
   "pentaho/i18n!../abstract/i18n/model",
   "../abstract/types/labelsOption",
   "../abstract/mixins/settingsMultiChartType"
-], function(abstractModelFactory, bundle, labelsOptionFactory, settingsMultiChartType) {
+], function(module, abstractModelFactory, bundle, labelsOptionFactory, settingsMultiChartType) {
 
   "use strict";
 
@@ -29,12 +30,11 @@ define([
     return Abstract.extend({
 
         type: {
-          id: "pentaho/visual/ccc/pie",
+          sourceId: module.id,
+          id: module.id.replace(/.\w+$/, ""),
           v2Id: "ccc_pie",
           category: "piechart",
-
-          view: "View",
-          styleClass: "pentaho-visual-ccc-pie",
+          defaultView: "./View",
 
           props: [
             {

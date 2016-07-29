@@ -71,7 +71,7 @@ define([
      * @see pentaho.type.spec.IListProto
      * @see pentaho.type.spec.IListTypeProto
      */
-    var List = Value.extend("pentaho.type.List", /** @lends pentaho.type.List# */{
+    var List = Value.extend(/** @lends pentaho.type.List# */{
 
       constructor: function(spec) {
 
@@ -558,8 +558,6 @@ define([
         },
 
         id: module.id,
-
-        styleClass: "pentaho-type-list",
 
         get isList() { return true; },
         get isContainer() { return true; },

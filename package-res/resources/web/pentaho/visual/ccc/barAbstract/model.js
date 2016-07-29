@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 define([
+  "module",
   "../categoricalContinuousAbstract/model",
   "pentaho/i18n!../abstract/i18n/model",
   "../abstract/mixins/settingsMultiChartType"
-], function(categoricalContinuousAbstractModelFactory, bundle, settingsMultiChartType) {
+], function(module, categoricalContinuousAbstractModelFactory, bundle, settingsMultiChartType) {
 
   "use strict";
 
@@ -27,7 +28,8 @@ define([
 
     return CategoricalContinuousAbstract.extend({
       type: {
-        id: "pentaho/visual/ccc/barAbstract",
+        sourceId: module.id,
+        id: module.id.replace(/.\w+$/, ""),
         isAbstract: true,
 
         props: [

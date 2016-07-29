@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 define([
+  "module",
   "../cartesianAbstract/model",
   "pentaho/i18n!../abstract/i18n/model",
   "../abstract/types/labelsOption",
   "../abstract/mixins/scaleColorContinuousType",
   "../abstract/mixins/settingsMultiChartType",
   "../abstract/mixins/trendType"
-], function(cartesianAbstractModelFactory, bundle, labelsOptionFactory,
+], function(module, cartesianAbstractModelFactory, bundle, labelsOptionFactory,
     scaleColorContinuousType, settingsMultiChartType, trendType) {
 
   "use strict";
@@ -32,11 +33,10 @@ define([
     return CartesianAbstractModel.extend({
 
         type: {
-          id: "pentaho/visual/ccc/metricDot",
+          sourceId: module.id,
+          id: module.id.replace(/.\w+$/, ""),
           isAbstract: true,
-
           category: "scatter",
-          styleClass: "pentaho-visual-ccc-metric-dot",
 
           props: [
             {

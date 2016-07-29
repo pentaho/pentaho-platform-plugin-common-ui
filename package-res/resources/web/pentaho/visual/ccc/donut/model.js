@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 define([
+  "module",
   "../pie/model",
   "pentaho/i18n!../abstract/i18n/model"
-], function(pieModelFactory, bundle) {
+], function(module, pieModelFactory, bundle) {
 
   "use strict";
 
@@ -27,10 +28,9 @@ define([
     return PieModel.extend({
 
         type: {
-          id: "pentaho/visual/ccc/donut",
-
-          view: "View",
-          styleClass: "pentaho-visual-ccc-donut"
+          sourceId: module.id,
+          id: module.id.replace(/.\w+$/, ""),
+          defaultView: "./View"
         }
       })
       .implement({type: bundle.structured["donut"]});

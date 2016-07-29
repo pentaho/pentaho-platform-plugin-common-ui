@@ -102,7 +102,7 @@ define([
      * @see pentaho.type.spec.IInstanceProto
      * @see pentaho.type.spec.ITypeProto
      */
-    var Instance = Base.extend("pentaho.type.Instance", /** @lends pentaho.type.Instance# */{
+    var Instance = Base.extend("pentaho.type.instance", /** @lends pentaho.type.Instance# */{
       // NOTE: not calling base to block default Base.js from copying 1st argument into `this`.
       constructor: function() {
       },
@@ -245,6 +245,21 @@ define([
        * @see pentaho.lang.Base.extend
        */
 
+      /**
+       * Defaults `name` from `classSpec.type.id`, if any.
+       *
+       * @ignore
+       */
+      _extend: function(name, instSpec, classSpec, keyArgs) {
+        var typeSpec;
+        if(name == null && (typeSpec = (instSpec && instSpec.type))) {
+          name = typeSpec.id || typeSpec.sourceId || null;
+          if(name) name = name.toString();
+        }
+
+        return this.base(name, instSpec, classSpec, keyArgs);
+      },
+
       //@override
       /**
        * See Base.js
@@ -256,7 +271,8 @@ define([
         // 3. The Type class requires InstCtor to already exist, to be able to define accessors
 
         // Setting a function's name is failing on PhantomJS 1.9.8...
-        var instName = SubInstCtor.name || SubInstCtor.displayName, typeName = instName && (instName + ".Type");
+        var instName = SubInstCtor.name || SubInstCtor.displayName;
+        var typeName = instName && (instName + ".Type");
 
         var ka = keyArgs ? Object.create(keyArgs) : {};
         ka.instance = SubInstCtor.prototype;
@@ -268,13 +284,9 @@ define([
       }
     });
 
-    Type._initInstCtor(Instance);
+    Type._initInstCtor(Instance, {id: module.id});
 
-    Type.implement(bundle.structured.instance)
-        .implement({
-          id: module.id,
-          styleClass: "pentaho-type-instance"
-        });
+    Type.implement(bundle.structured.instance);
 
     return Instance;
   };

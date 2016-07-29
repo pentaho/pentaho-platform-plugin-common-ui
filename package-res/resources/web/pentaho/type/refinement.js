@@ -110,7 +110,7 @@ define([
      * [isAdvanced]{@link pentaho.type.Type#isAdvanced},
      * [ordinal]{@link pentaho.type.Type#ordinal}
      * and
-     * [view]{@link pentaho.type.Value.Type#view},
+     * [defaultView]{@link pentaho.type.Value.Type#defaultView},
      *
      * Although the [styleClass]{@link pentaho.type.Type#styleClass} attribute
      * isn't inheritable,
@@ -226,7 +226,7 @@ define([
      *     var Complex = context.get("complex");
      *
      *     // Define a complex type
-     *     return Complex.extend("my.Product", {
+     *     return Complex.extend({
      *       type: {
      *         id: module.id,
      *         label: "My Product",
@@ -261,7 +261,7 @@ define([
      *
      * @see https://en.wikipedia.org/wiki/Refinement_(computing)#Refinement_types
      */
-    var Refinement = Value.extend("pentaho.type.Refinement", {
+    var Refinement = Value.extend({
 
       // Constructor always returns an instance Instance of type `of`.
       constructor: function() {
@@ -550,7 +550,28 @@ define([
 
         //region styleClass
         // Local property requires no change to implementation.
-        // The function that collects all classes will need to be overridden though.
+
+        get inheritedStyleClasses() {
+          var of;
+          var styleClasses = this.base();
+          // 'pentaho-type-instance',
+          // 'pentaho-type-value',
+          // 'pentaho-type-refinement',
+          // 'foo-refinement'
+
+          if((of = this.of)) {
+            // The first two base types would be repeated with `of`...
+            // 'pentaho-type-instance',
+            // 'pentaho-type-value',
+            // 'pentaho-type-simple',
+            // 'pentaho-type-string',
+            // 'pentaho-type-refinement',
+            // 'foo-refinement'
+            styleClasses = of.inheritedStyleClasses.concat(styleClasses.slice(2));
+          }
+
+          return styleClasses;
+        },
         //endregion
 
         //region ordinal property
@@ -570,15 +591,15 @@ define([
         //endregion
 
         //region view property
-        _view: undefined, // local Refinement root marker
+        _defaultView: undefined, // local Refinement root marker
 
-        get view() {
+        get defaultView() {
           var of;
-          var v = this._view;
-          return v !== undefined || !(of = this.of) ? (v && v.value) : of.view;
+          var v = this._defaultView;
+          return v !== undefined || !(of = this.of) ? (v && v.value) : of.defaultView;
         },
 
-        _resetView: function() {
+        _resetDefaultView: function() {
           if(this !== _refinementType) {
             this.base();
           }

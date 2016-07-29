@@ -25,11 +25,14 @@ define([
   "../util/object",
   "../util/fun",
   "../util/promise",
+  "../util/text",
   "./theme/model"
 ], function(localRequire, SpecificationScope, SpecificationContext, bundle, Base,
-    AnnotatableLinked, error, arg, O, F, promiseUtil) {
+    AnnotatableLinked, error, arg, O, F, promiseUtil, text) {
 
   "use strict";
+
+  /*global Promise:false */
 
   // Unique type class id exposed through Type#uid and used by Context instances.
   var _nextUid = 1,
@@ -70,6 +73,9 @@ define([
         this._postInit(spec, keyArgs);
       },
 
+      // Antecipate extension of these properties, or defaultView can be incorrectly evaluated.
+      extend_order: ["id", "sourceId"],
+
       /**
        * Performs initialization tasks that take place before the instance is extended with its specification.
        *
@@ -99,7 +105,8 @@ define([
         // Block inheritance, with default values
 
         // Don't use inherited property definition which may be writable false
-        Object.defineProperty(this, "_id", {value: null, writable: true});
+        Object.defineProperty(this, "_id",       {value: null, writable: true});
+        Object.defineProperty(this, "_sourceId", {value: null, writable: true});
 
         this._shortId    = undefined;
         this._styleClass = null;
@@ -122,6 +129,13 @@ define([
        * @overridable
        */
       _postInit: function(spec, keyArgs) {
+        var id = this._id;
+        // Lock these properties
+        O.setConst(this, "_id", id);
+        O.setConst(this, "_sourceId", this._sourceId);
+
+        // Default styleClass
+        if(id && spec.styleClass === undefined) this.styleClass = undefined;
       },
 
       //region context property
@@ -373,25 +387,79 @@ define([
        *
        * This attribute is not inherited.
        *
+       * When unspecified, defaults to the value of [sourceId]{@link pentaho.type.Type#sourceId}.
+       *
        * @type {?nonEmptyString}
        * @readonly
+       *
+       * @see pentaho.type.Type#sourceId
        */
       get id() {
         return this._id;
       },
 
       set id(value) {
+
         value = nonEmptyString(value);
+        if(value != null) {
+          // Is it a temporary id? If so, ignore it.
+          if(SpecificationContext.isIdTemporary(value)) return;
 
-        // Is it a temporary id? If so, ignore it.
-        if(SpecificationContext.isIdTemporary(value)) value = null;
+          // Throws if already const.
+          this._id = value;
 
-        // Can only be set once or throws.
-        O.setConst(this, "_id", value);
+          // Default sourceId, if not yet set.
+          if(!this._sourceId) this._sourceId = value;
+        }
+      },
+
+      // -> nonEmptyString, Optional(null), Immutable, Shared (note: not Inherited)
+      // "" -> null conversion
+
+      _sourceId: null,
+
+      /**
+       * Gets the source module identifier of this type.
+       *
+       * The source identifier is the module identifier of the _actual_ AMD/RequireJS module
+       * that provides the type and may be different from the [identifier]{@link pentaho.type.Type#id}
+       * when an AMD package or custom mapping is configured for the module.
+       *
+       * The source identifier is used to resolve module identifiers relative to the source module,
+       * as is the case with the {@link pentaho.type.Type#defaultView} attribute.
+       *
+       * The source identifier of a type can only be specified when extending the ancestor type.
+       *
+       * This attribute is not inherited.
+       *
+       * When unspecified, defaults to the value of [id]{@link pentaho.type.Type#id}.
+       *
+       * @type {?nonEmptyString}
+       * @readonly
+       * @see pentaho.type.Type#id
+       * @see pentaho.type.Type#defaultView
+       */
+      get sourceId() {
+        return this._sourceId;
+      },
+
+      set sourceId(value) {
+
+        value = nonEmptyString(value);
+        if(value != null) {
+          // Is it a temporary id? If so, ignore it.
+          if(SpecificationContext.isIdTemporary(value)) return;
+
+          // Throws if already const.
+          this._sourceId = value;
+
+          // Default id, if not yet set.
+          if(!this._id) this._id = value;
+        }
       },
 
       /**
-       * Gets the short id of this type.
+       * Gets the short identifier of this type.
        *
        * When a type is one of the standard types,
        * and thus a direct sub-module of the `pentaho/type` module,
@@ -418,24 +486,47 @@ define([
         return shortId;
       },
 
-      _buildRelativeId: function(value) {
-        // A module id.
-        // Unless it starts with a "/", it's relative to this Type#id.
+      /**
+       * Builds an absolute module identifier from
+       * one that is relative to the type's [source location]{@link pentaho.type.Type#sourceId}.
+       *
+       * Relative module identifiers start with a `.` and do not end with `".js"`.
+       * For example, `"./View"` and `"../View"`, but not `./View.js`.
+       *
+       * Absolute identifiers are returned without modification.
+       *
+       * @param {string} id - A module identifier.
+       *
+       * @return {string} An absolute module identifier.
+       *
+       * @see pentaho.type.Type#sourceId
+       */
+      buildSourceRelativeId: function(id) {
         // Relative:
-        //   View
         //   ./View
         // Absolute:
+        //   View
         //   foo.js
+        //   ./foo.js
         //   /View
         //   http:
-        if(!/(^\w+:)|(^\/)|(\.js$)/.test(value)) {
+        if(/^\./.test(id) && !/\.js$/.test(id)) {
           // Considered relative.
-          // Also works well if the value has ./ or ../
-          var id = this.id;
-          value = (id ? (id + "/") : "") + value;
+          // ./ and ../ work fine cause RequireJs later normalizes those.
+          var sourceId = this.sourceId;
+          if(sourceId) {
+            // "foo/bar"  -> "foo"
+            // "foo/bar/" -> "foo"
+            // "foo" -> ""
+            // "foo/" -> ""
+            var baseId = sourceId.replace(/\/?([^\/]*)\/?$/, "");
+            if(baseId) {
+              id = baseId + "/" + id;
+            }
+          }
         }
 
-        return value;
+        return id;
       },
       //endregion
 
@@ -723,7 +814,13 @@ define([
        * Attempting to set to a non-string value type implicitly
        * converts the value to a string before assignment.
        *
-       * An empty string or `undefined` value is interpreted as `null`.
+       * An empty string or `null` clears the property value.
+       *
+       * Setting to `undefined`, makes the property assume its default value.
+       *
+       * The default value of a type with an [id]{@link pentaho.type.Type#id} is
+       * the identifier converted to _snake-case_.
+       * The default value of an anonymous type is `null`.
        *
        * @type {?nonEmptyString}
        */
@@ -732,8 +829,11 @@ define([
       },
 
       set styleClass(value) {
-        // undefined or "" -> null conversion
-        this._styleClass = nonEmptyString(value);
+        if(value === undefined) {
+          this._styleClass = this._id ? text.toSnakeCase(this._id) : null;
+        } else {
+          this._styleClass = value === "" ? null : value;
+        }
       },
 
       /**
@@ -797,88 +897,92 @@ define([
       },
       //endregion
 
-      //region view property
-
-      // TODO: When type is anonymous, is view an absolute path?
+      //region defaultView property
 
       // -> nonEmptyString, Optional, Inherited, Configurable, Localized
       // undefined -> inherit
       // null -> clear
       // "" -> null conversion
 
-      _view: null, // {value: any, promise: Promise.<Class.<View>>}
+      _defaultView: null, // {value: any, promise: Promise.<Class.<View>>}
 
      /**
       * Gets or sets the default view for instances of this type.
       *
       * When a string,
       * it is the identifier of the view's AMD module.
-      * If the string starts with `/` or `xyz:`, or ends with `.js`,
-      * the identifier is considered to be absolute;
-      * otherwise,
-      * it is relative to this type's identifier folder, and converted to an absolute identifier.
+      * If the identifier is relative, it is relative to [sourceId]{@link pentaho.type.Type#sourceId}.
       *
-      * Setting this to `undefined` causes the view to be inherited from the ancestor type,
+      * Setting this to `undefined` causes the default view to be inherited from the ancestor type,
       * except for the root type, `Instance.type` (which has no ancestor), where the attribute is `null`.
       *
       * Setting this to a _falsy_ value (like `null` or an empty string),
       * clears the value of the attribute and sets it to `null`, ignoring any inherited value.
       *
       * When a function,
-      * it is the class or factory of the view.
+      * it is the class or factory of the default view.
       *
-      * @see pentaho.type.Type#viewClass
+      * @see pentaho.type.Type#defaultViewClass
+      * @see pentaho.type.Type#buildSourceRelativeId
       *
       * @type {string | function}
 
       * @throws {pentaho.lang.ArgumentInvalidTypeError} When the set value is not
       * a string, a function or {@link Nully}.
       */
-      get view() {
-        return this._view && this._view.value;
+      get defaultView() {
+        return this._defaultView && this._defaultView.value;
       },
 
-      set view(value) {
+      set defaultView(value) {
         if(value === undefined) {
-          this._resetView();
+
+          this._resetDefaultView();
+
         } else if(!value) { // null || ""
-          this._view = null;
+
+          this._defaultView = null;
+
         } else  if(typeof value === "string") {
-          value = this._buildRelativeId(value);
-          if(!this._view || this._view.value !== value) {
-            this._view = {value: value, promise: null};
+
+          var defaultViewInfo = O.getOwn(this, "_defaultView");
+          if(!defaultViewInfo || (defaultViewInfo.value !== value && defaultViewInfo.fullValue !== value)) {
+            this._defaultView = {value: value, promise: null, fullValue: this.buildSourceRelativeId(value)};
           }
         } else if(typeof value === "function") {
+
           // Assume it is the View class itself, already fulfilled.
-          if(!this._view || this._view.value !== value) {
-            this._view = {value: value, promise: Promise.resolve(value)};
+          var defaultViewInfo = O.getOwn(this, "_defaultView");
+          if(!defaultViewInfo || defaultViewInfo.value !== value) {
+            this._defaultView = {value: value, promise: Promise.resolve(value), fullValue: value};
           }
         } else {
-          throw error.argInvalidType("view", ["nully", "string", "function"], typeof value);
+
+          throw error.argInvalidType("defaultView", ["nully", "string", "function"], typeof value);
         }
       },
 
-      _resetView: function() {
+      _resetDefaultView: function() {
         if(this !== _type) {
-          delete this._view;
+          delete this._defaultView;
         }
       },
 
       /**
-       * Gets a promise for the default view class or factory, if any, or `null`.
+       * Gets a promise for the default view class or factory, if any; or `null`.
        *
-       * A default view exists if property {@link pentaho.type.Type#view}
+       * A default view exists if property {@link pentaho.type.Type#defaultView}
        * has a non-null value.
        *
        * @type Promise.<?function>
        * @readOnly
-       * @see pentaho.type.Type#view
+       * @see pentaho.type.Type#defaultView
        */
-      get viewClass() {
+      get defaultViewClass() {
         /*jshint laxbreak:true*/
-        var view = this._view;
-        return view
-            ? (view.promise || (view.promise = promiseUtil.require(view.value, localRequire)))
+        var defaultView = this._defaultView;
+        return defaultView
+            ? (defaultView.promise || (defaultView.promise = promiseUtil.require(defaultView.fullValue, localRequire)))
             : Promise.resolve(null);
       },
       //endregion
@@ -1257,12 +1361,12 @@ define([
           spec.styleClass = styleClass;
         }
 
-        var viewInfo = O.getOwn(this, "_view");
-        if(viewInfo !== undefined) { // can be null
-          var view = viewInfo && viewInfo.value;
-          if(!view || !isJson || !F.is(view)) {
+        var defaultViewInfo = O.getOwn(this, "_defaultView");
+        if(defaultViewInfo !== undefined) { // can be null
+          var defaultView = defaultViewInfo && defaultViewInfo.value;
+          if(!defaultView || !isJson || !F.is(defaultView)) {
             any = true;
-            spec.view = view;
+            spec.defaultView = defaultView;
           }
         }
 

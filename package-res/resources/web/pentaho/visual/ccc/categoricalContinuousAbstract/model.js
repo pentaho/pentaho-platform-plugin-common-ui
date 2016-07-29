@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 define([
+  "module",
   "../cartesianAbstract/model",
   "pentaho/i18n!../abstract/i18n/model"
-], function(cartesianAbstractModelFactory, bundle) {
+], function(module, cartesianAbstractModelFactory, bundle) {
 
   "use strict";
 
@@ -26,7 +27,8 @@ define([
 
     return CartesianAbstract.extend({
       type: {
-        id: "pentaho/visual/ccc/categoricalContinuousAbstract",
+        sourceId: module.id,
+        id: module.id.replace(/.\w+$/, ""),
         isAbstract: true,
 
         props: [

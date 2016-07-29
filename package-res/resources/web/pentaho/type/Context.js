@@ -294,7 +294,7 @@ define([
      *   var model = new VizChordModel({outerRadius: 200});
      *
      *   // Render the model using the default view
-     *   model.type.viewClass.then(function(View) {
+     *   model.type.defaultViewClass.then(function(View) {
      *     var view = new View(document.getElementById("container"), model);
      *
      *     // ...
@@ -394,7 +394,7 @@ define([
      *       var model = new VizChordModel({outerRadius: 200});
      *
      *       // Render the model using the default view
-     *       model.type.viewClass.then(function(View) {
+     *       model.type.defaultViewClass.then(function(View) {
      *         var view = new View(document.getElementById("container"), model);
      *
      *         // ...

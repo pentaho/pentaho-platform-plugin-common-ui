@@ -67,8 +67,7 @@ define([
       });
 
       it("should throw if given an `of` which is not a representation type", function() {
-        // TODO: when Instance is already in the context, uncomment this test
-        /*
+
         expect(function() {
           Refinement.extend({
             type: {
@@ -77,7 +76,6 @@ define([
             }
           });
         }).toThrow(errorMatch.argInvalidType("of", ["pentaho/type/element", "pentaho/type/list"]));
-        */
 
         expect(function() {
           Refinement.extend({
@@ -890,6 +888,42 @@ define([
         });
       }); // end #description
 
+      describe("#inheritedStyleClasses", function() {
+
+        it("should inherit all of the refinement base types when it has no representation type", function() {
+
+          expect(Refinement.type.inheritedStyleClasses).toEqual([
+            'pentaho-type-instance',
+            'pentaho-type-value',
+            'pentaho-type-refinement'
+          ]);
+        });
+
+        it("should inherit the value of the representation type", function() {
+
+          var MySimple = Simple.extend({type: {id: "my/foo", label: "FOO"}});
+
+          var MyRefinement = Refinement.extend({
+            type: {
+              id: "my/foo/refinement",
+              of: MySimple.type
+            }
+          });
+
+          // 'pentaho-type-refinement'
+          expect(MyRefinement.type.inheritedStyleClasses).toEqual([
+            'pentaho-type-instance',
+            'pentaho-type-value',
+            'pentaho-type-element',
+            'pentaho-type-simple',
+            'my-foo',
+            'pentaho-type-refinement',
+            'my-foo-refinement'
+          ]);
+        });
+
+      }); // end #inheritedStyleClasses
+
       describe("#category -", function() {
         it("should default to the value of the representation type", function() {
           var MySimple = Simple.extend({type: {category: "FOO"}});
@@ -1413,90 +1447,90 @@ define([
         });
       }); // end #ordinal
 
-      describe("#view -", function() {
+      describe("#defaultView -", function() {
         it("should default to the value of the representation type", function() {
-          var MySimple = Simple.extend({type: {view: "FOO"}});
+          var MySimple = Simple.extend({type: {defaultView: "FOO"}});
           var MyRefinement = Refinement.extend({
             type: {
               of: MySimple.type
             }
           });
 
-          expect(MyRefinement.type.view).toBe(MySimple.type.view);
+          expect(MyRefinement.type.defaultView).toBe(MySimple.type.defaultView);
         });
 
         it("should respect a specified value", function() {
-          var MySimple = Simple.extend({type: {view: "FOO"}});
+          var MySimple = Simple.extend({type: {defaultView: "FOO"}});
           var MyRefinement = Refinement.extend({
             type: {
-              view: "BAR",
+              defaultView: "BAR",
               of: MySimple.type
             }
           });
 
-          expect(MyRefinement.type.view).toBe("BAR");
+          expect(MyRefinement.type.defaultView).toBe("BAR");
         });
 
         it("should inherit the value of the base refinement", function() {
-          var MySimple = Simple.extend({type: {view: "FOO"}});
+          var MySimple = Simple.extend({type: {defaultView: "FOO"}});
           var R1 = Refinement.extend({
             type: {
-              view: "BAR",
+              defaultView: "BAR",
               of: MySimple.type
             }
           });
           var R2 = R1.extend();
 
-          expect(R2.type.view).toBe("BAR");
+          expect(R2.type.defaultView).toBe("BAR");
         });
 
         it("should respect a specified value when it also has a base refinement", function() {
-          var MySimple = Simple.extend({type: {view: "FOO"}});
+          var MySimple = Simple.extend({type: {defaultView: "FOO"}});
           var R1 = Refinement.extend({
             type: {
-              view: "BAR",
+              defaultView: "BAR",
               of: MySimple.type
             }
           });
-          var R2 = R1.extend({type: {view: "DUDU"}});
+          var R2 = R1.extend({type: {defaultView: "DUDU"}});
 
-          expect(R2.type.view).toBe("DUDU");
+          expect(R2.type.defaultView).toBe("DUDU");
         });
 
         it("should fallback to the base value when set to undefined", function() {
 
-          var MySimple = Simple.extend({type: {view: "FOO"}});
+          var MySimple = Simple.extend({type: {defaultView: "FOO"}});
           var R1 = Refinement.extend({
             type: {
-              view: "BAR",
+              defaultView: "BAR",
               of: MySimple.type
             }
           });
-          var R2 = R1.extend({type: {view: "DUDU"}});
+          var R2 = R1.extend({type: {defaultView: "DUDU"}});
 
-          expect(R2.type.view).toBe("DUDU");
+          expect(R2.type.defaultView).toBe("DUDU");
 
-          R2.type.view = undefined;
+          R2.type.defaultView = undefined;
 
-          expect(R2.type.view).toBe("BAR");
+          expect(R2.type.defaultView).toBe("BAR");
         });
 
         it("should respect the specified null or empty string value", function() {
           function expectIt(newLabel) {
-            var MySimple = Simple.extend({type: {view: "FOO"}});
+            var MySimple = Simple.extend({type: {defaultView: "FOO"}});
             var R1 = Refinement.extend({
               type: {
-                view: "BAR",
+                defaultView: "BAR",
                 of: MySimple.type
               }
             });
-            var R2 = R1.extend({type: {view: "DUDU"}});
+            var R2 = R1.extend({type: {defaultView: "DUDU"}});
 
-            expect(R2.type.view).toBe("DUDU");
+            expect(R2.type.defaultView).toBe("DUDU");
 
-            R2.type.view = newLabel;
+            R2.type.defaultView = newLabel;
 
-            expect(R2.type.view).toBe(null);
+            expect(R2.type.defaultView).toBe(null);
           }
 
           expectIt(null);
@@ -1505,26 +1539,26 @@ define([
 
         it("should fallback to the value of the representation type when set to undefined", function() {
 
-          var MySimple = Simple.extend({type: {view: "FOO"}});
+          var MySimple = Simple.extend({type: {defaultView: "FOO"}});
           var R1 = Refinement.extend({
             type: {
-              view: "BAR",
+              defaultView: "BAR",
               of: MySimple.type
             }
           });
 
-          expect(R1.type.view).toBe("BAR");
+          expect(R1.type.defaultView).toBe("BAR");
 
-          R1.type.view = undefined;
+          R1.type.defaultView = undefined;
 
-          expect(R1.type.view).toBe("FOO");
+          expect(R1.type.defaultView).toBe("FOO");
         });
 
         it("should not delete the root value", function() {
-          Refinement.type.view = undefined;
-          expect(Refinement.type.hasOwnProperty("_view"));
+          Refinement.type.defaultView = undefined;
+          expect(Refinement.type.hasOwnProperty("_defaultView"));
         });
-      }); // end #view
+      }); // end #defaultView
 
       describe("#is(.) -", function() {
         it("should return true for an instance of the representation type", function() {

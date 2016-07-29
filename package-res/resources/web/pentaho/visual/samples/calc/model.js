@@ -1,8 +1,9 @@
 define([
+  "module",
   "pentaho/visual/base/model",
   "pentaho/i18n!model",
   "./theme/model"
-], function(visualFactory, bundle) {
+], function(module, visualFactory, bundle) {
 
   "use strict";
 
@@ -18,12 +19,10 @@ define([
      */
     return Visual.extend({
       type: {
-        id:   "pentaho/visual/samples/calc",
+        sourceId: module.id,
+        id: module.id.replace(/.\w+$/, ""),
         v2Id: "sample_calc",
-
-        view: "View",
-
-        styleClass: "pentaho-visual-samples-calculator",
+        defaultView: "./View",
 
         props: [
           {

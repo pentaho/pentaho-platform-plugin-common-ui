@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 define([
+  "module",
   "../abstract/model",
   "pentaho/i18n!../abstract/i18n/model",
   "../abstract/types/displayUnits"
-], function(abstractModelFactory, bundle, displayUnitsFactory) {
+], function(module, abstractModelFactory, bundle, displayUnitsFactory) {
 
   "use strict";
 
@@ -27,7 +28,8 @@ define([
 
     return Abstract.extend({
       type: {
-        id: "pentaho/visual/ccc/cartesianAbstract",
+        sourceId: module.id,
+        id: module.id.replace(/.\w+$/, ""),
         isAbstract: true,
 
         props: [

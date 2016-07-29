@@ -37,7 +37,8 @@ define([
      *
      * @description Creates an object instance.
      */
-    return Simple.extend("pentaho.type.Object", /** @lends "pentaho.type.Object#" */{
+    return Simple.extend(/** @lends "pentaho.type.Object#" */{
+
       constructor: function(spec) {
         this.base(spec);
 
@@ -65,7 +66,6 @@ define([
 
       type: {
         id: module.id,
-        styleClass: "pentaho-type-object",
         cast: Object
       }
     }).implement({

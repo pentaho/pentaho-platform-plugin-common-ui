@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 define([
+  "module",
   "../metricDotAbstract/model",
   "pentaho/i18n!../abstract/i18n/model",
   "../abstract/mixins/scaleSizeContinuousType"
-], function(metricDotAbstractModelFactory, bundle, scaleSizeContinuousType) {
+], function(module, metricDotAbstractModelFactory, bundle, scaleSizeContinuousType) {
 
   "use strict";
 
@@ -28,10 +29,10 @@ define([
     return MetricDotAbstractModel.extend({
 
         type: {
-          id: "pentaho/visual/ccc/bubble",
+          sourceId: module.id,
+          id: module.id.replace(/.\w+$/, ""),
           v2Id: "ccc_scatter",
-          view: "View",
-          styleClass: "pentaho-visual-ccc-bubble",
+          defaultView: "./View",
 
           props: [
             {

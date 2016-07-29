@@ -45,329 +45,6 @@ define([
       });
     }); // end #context
 
-    describe("#view -", function() {
-      it("should default to `null`", function() {
-        var Derived = Instance.extend({type: {id: "fake/id"}});
-
-        expect(Derived.type.view).toBe(null);
-      });
-
-      it("should leave absolute ids intact", function() {
-        var Derived = Instance.extend({type: {id: "fake/id", view: "/foo"}});
-
-        expect(Derived.type.view).toBe("/foo");
-
-        // ---
-
-        Derived = Instance.extend({type: {view: "foo:"}});
-
-        expect(Derived.type.view).toBe("foo:");
-
-        // ---
-
-        Derived = Instance.extend({type: {view: "bar.js"}});
-
-        expect(Derived.type.view).toBe("bar.js");
-      });
-
-      it("should convert relative ids to absolute", function() {
-        var Derived = Instance.extend({type: {id: "fake/id", view: "foo"}});
-
-        expect(Derived.type.view).toBe("fake/id/foo");
-
-        // ---
-
-        Derived = Instance.extend({type: {id: "fake/id", view: "foo/bar"}});
-
-        expect(Derived.type.view).toBe("fake/id/foo/bar");
-
-        // ---
-
-        Derived = Instance.extend({type: {id: "fake/id", view: "./bar"}});
-
-        expect(Derived.type.view).toBe("fake/id/./bar");
-
-        // ---
-
-        Derived = Instance.extend({type: {id: "fake/id", view: "../bar"}});
-
-        expect(Derived.type.view).toBe("fake/id/../bar");
-
-        // ---
-        // no base folder..
-
-        Derived = Instance.extend({type: {id: "id", view: "../bar"}});
-
-        expect(Derived.type.view).toBe("id/../bar");
-
-        // ---
-
-        Derived = Instance.extend({type: {view: "../bar"}});
-
-        expect(Derived.type.view).toBe("../bar");
-      });
-
-      it("should inherit the base type's view, when unspecified", function() {
-        var A = Instance.extend({type: {view: "foo"}});
-
-        expect(A.type.view).toBe("foo");
-
-        var B = A.extend();
-
-        expect(B.type.view).toBe("foo");
-      });
-
-      it("should inherit the base type's view, when spec is undefined", function() {
-        var A = Instance.extend({type: {view: "foo"}});
-
-        expect(A.type.view).toBe("foo");
-
-        var B = A.extend({type: {view: undefined}});
-
-        expect(B.type.view).toBe("foo");
-      });
-
-      it("should respect a null spec value", function() {
-        var A = Instance.extend({type: {view: "foo"}});
-
-        expect(A.type.view).toBe("foo");
-
-        var B = A.extend({type: {view: null}});
-
-        expect(B.type.view).toBe(null);
-      });
-
-      it("should convert an empty string value to null", function() {
-        var A = Instance.extend({type: {view: "foo"}});
-
-        expect(A.type.view).toBe("foo");
-
-        var B = A.extend({type: {view: ""}});
-
-        expect(B.type.view).toBe(null);
-      });
-
-      it("should respect a specified non-empty string", function() {
-        var A = Instance.extend({type: {view: "foo"}});
-
-        expect(A.type.view).toBe("foo");
-
-        var B = A.extend({type: {id: "baba/dudu", view: "bar"}});
-
-        expect(B.type.view).toBe("baba/dudu/bar");
-      });
-
-      // coverage
-      it("should allow setting to the same string value", function() {
-        var A = Instance.extend({type: {view: "foo"}});
-
-        expect(A.type.view).toBe("foo");
-
-        var B = A.extend({type: {id: "baba/dudu", view: "bar"}});
-
-        B.type.view = "bar";
-
-        expect(B.type.view).toBe("baba/dudu/bar");
-      });
-
-      it("should inherit a base function", function() {
-        var FA = function() {
-        };
-        var A  = Instance.extend({type: {view: FA}});
-
-        expect(A.type.view).toBe(FA);
-
-        var B = A.extend({type: {id: "baba/dudu"}});
-
-        expect(B.type.view).toBe(FA);
-      });
-
-      it("should respect a specified function", function() {
-        var FA = function() {
-        };
-        var A  = Instance.extend({type: {view: FA}});
-
-        expect(A.type.view).toBe(FA);
-
-        var FB = function() {
-        };
-        var B  = A.extend({type: {id: "baba/dudu", view: FB}});
-
-        expect(B.type.view).toBe(FB);
-      });
-
-      // coverage
-      it("should allow setting to the same function", function() {
-        var FA = function() {
-        };
-        var A  = Instance.extend({type: {view: FA}});
-
-        expect(A.type.view).toBe(FA);
-
-        var FB = function() {
-        };
-        var B  = A.extend({type: {id: "baba/dudu", view: FB}});
-
-        B.type.view = FB;
-
-        expect(B.type.view).toBe(FB);
-      });
-
-      it("should preserve the default value", function() {
-        Instance.type.view = undefined;
-        // The default value is still there (did not delete)
-        expect(Instance.type.view).toBe(null);
-      });
-
-      it("should throw when view is not a string, nully or a function", function() {
-        expect(function() {
-          Instance.extend({type: {view: {}}});
-        }).toThrow(errorMatch.argInvalidType("view", ["nully", "string", "function"], "object"));
-      });
-    }); // end #view
-
-    describe("#viewClass -", function() {
-
-      afterEach(function() {
-        require.undef("foo/bar");
-        require.undef("foo/dude");
-      });
-
-      it("should return a Promise, when view is null, and resolve to null", function(done) {
-        var A = Instance.extend();
-        var p = A.type.viewClass;
-
-        expect(p instanceof Promise).toBe(true);
-
-        p.then(function(V) {
-          expect(V).toBe(null);
-          done();
-        });
-      });
-
-      it("should return a Promise, when view is a function, and resolve to it", function(done) {
-        var View = function() {
-        };
-        var A    = Instance.extend({type: {view: View}});
-        var p    = A.type.viewClass;
-
-        expect(p instanceof Promise).toBe(true);
-
-        p.then(function(V) {
-          expect(V).toBe(View);
-          done();
-        });
-      });
-
-      it("should return a Promise, when view is a string, and resolve to that module", function(done) {
-
-        var View = function() {};
-
-        define("foo/bar", function() {
-          return View;
-        });
-
-        var A = Instance.extend({type: {view: "foo/bar"}});
-
-        var p = A.type.viewClass;
-
-        expect(p instanceof Promise).toBe(true);
-
-        p.then(function(V) {
-          expect(V).toBe(View);
-
-          done();
-        });
-      });
-
-      it("should return a Promise even if view is inherited from the base class", function(done) {
-
-        var View = function() {};
-
-        define("foo/bar", function() {
-          return View;
-        });
-
-        var A = Instance.extend({type: {view: "foo/bar"}});
-
-        var B = A.extend();
-
-        var pb = B.type.viewClass;
-
-        var pa = A.type.viewClass;
-
-        expect(pa).toBe(pb);
-        expect(pa instanceof Promise).toBe(true);
-
-        pa.then(function(V) {
-          expect(V).toBe(View);
-
-          done();
-        });
-      });
-
-      it("should return the same Promise multiple times", function(done) {
-
-        var View = function() {};
-
-        define("foo/bar", function() {
-          return View;
-        });
-
-        var A = Instance.extend({type: {view: "foo/bar"}});
-
-        var pa = A.type.viewClass;
-
-        expect(pa).toBe(A.type.viewClass);
-
-        pa.then(function(V) {
-          expect(V).toBe(View);
-          expect(pa).toBe(A.type.viewClass);
-          done();
-        });
-      });
-
-      it("should return an new Promise and resolve to the new View when the view changes", function(done) {
-
-        var ViewBar  = function() {};
-        var ViewDude = function() {};
-
-        define("foo/bar", function() {
-          return ViewBar;
-        });
-        define("foo/dude", function() {
-          return ViewDude;
-        });
-
-        var A = Instance.extend({type: {view: "foo/bar"}});
-
-        var pa = A.type.viewClass;
-
-        A.type.view = "foo/dude";
-
-        var pb = A.type.viewClass;
-
-        expect(pb instanceof Promise).toBe(true);
-
-        expect(pa).not.toBe(pb);
-
-        Promise.all([pa, pb]).then(function(views) {
-
-          expect(views[0]).toBe(ViewBar);
-          expect(views[1]).toBe(ViewDude);
-
-          done();
-        });
-      });
-
-      it("should preserve the default value", function() {
-        Instance.type.view = undefined;
-        // The default value is still there (did not delete)
-        expect(Instance.type.view).toBe(null);
-      });
-
-    }); // end #viewClass
-
     describe("#label -", function() {
 
       describe("when `label` is falsy -", function() {
@@ -415,7 +92,8 @@ define([
       });
     }); // #label
 
-    describe("#id -", function() {
+    describe("#id and #sourceId -", function() {
+
       describe("when `id` is falsy -", function() {
         it("should have `null` as a default `id`", function() {
           function expectIt(spec) {
@@ -426,6 +104,18 @@ define([
           expectIt({});
           expectIt({id: undefined});
           expectIt({id: null});
+        });
+
+        it("should default to `sourceId`, when the latter specified", function() {
+          function expectIt(spec) {
+            spec.sourceId = "foo";
+
+            var Derived = Instance.extend({type: spec});
+            expect(Derived.type.id).toBe("foo");
+          }
+
+          expectIt({});
+          expectIt({id: undefined});
           expectIt({id: null});
         });
       });
@@ -455,7 +145,97 @@ define([
           expect(Derived.type.id).toBe(null);
         });
       });
-    }); // #id
+
+      describe("when `sourceId` is falsy -", function() {
+
+        it("should default to `id`, when the latter is specified", function() {
+          function expectIt(spec) {
+            spec.id = "foo";
+
+            var Derived = Instance.extend({type: spec});
+            expect(Derived.type.sourceId).toBe("foo");
+          }
+
+          expectIt({});
+          expectIt({sourceId: undefined});
+          expectIt({sourceId: null});
+        });
+      });
+
+      describe("when `sourceId` is truthy -", function() {
+        it("should respect it", function() {
+          var Derived = Instance.extend({
+            type: {sourceId: "foo/bar"}
+          });
+
+          expect(Derived.type.sourceId).toBe("foo/bar");
+        });
+
+        it("should convert it to a string", function() {
+          var Derived = Instance.extend({
+            type: {sourceId: {toString: function() { return "foo/bar"; }}}
+          });
+
+          expect(Derived.type.sourceId).toBe("foo/bar");
+        });
+
+        it("should ignore it, if it is a temporary id", function() {
+          var Derived = Instance.extend({
+            type: {sourceId: SpecificationContext.idTemporaryPrefix + "id"}
+          });
+
+          expect(Derived.type.sourceId).toBe(null);
+        });
+      });
+
+      describe("when both `id` and `sourceId` are truthy and different -", function() {
+        it("should respect both", function() {
+          var Derived = Instance.extend({
+            type: {id: "bar/foo", sourceId: "foo/bar"}
+          });
+
+          expect(Derived.type.id).toBe("bar/foo");
+          expect(Derived.type.sourceId).toBe("foo/bar");
+        });
+      });
+
+    }); // #id and #sourceId
+
+    describe("#buildSourceRelativeId -", function() {
+
+      it("should leave absolute ids intact", function() {
+
+        var Derived = Instance.extend({type: {sourceId: "fake/id"}});
+
+        expect(Derived.type.buildSourceRelativeId("/foo")).toBe("/foo");
+        expect(Derived.type.buildSourceRelativeId("foo:")).toBe("foo:");
+        expect(Derived.type.buildSourceRelativeId("bar.js")).toBe("bar.js");
+        expect(Derived.type.buildSourceRelativeId("foo")).toBe("foo");
+        expect(Derived.type.buildSourceRelativeId("./foo.js")).toBe("./foo.js");
+      });
+
+      it("should convert relative ids to absolute", function() {
+
+        var Derived = Instance.extend({type: {sourceId: "fake/id"}});
+
+        expect(Derived.type.buildSourceRelativeId("./foo/bar")).toBe("fake/./foo/bar");
+        expect(Derived.type.buildSourceRelativeId("./bar")).toBe("fake/./bar");
+        expect(Derived.type.buildSourceRelativeId("../bar")).toBe("fake/../bar");
+
+        // ---
+        // no base folder..
+
+        Derived = Instance.extend();
+
+        expect(Derived.type.buildSourceRelativeId("../bar")).toBe("../bar");
+
+        // ---
+
+        Derived = Instance.extend({type: {sourceId: "id"}});
+
+        expect(Derived.type.buildSourceRelativeId("../bar")).toBe("../bar");
+      });
+    });
 
     describe("#shortId -", function() {
 
@@ -480,6 +260,332 @@ define([
         expect(Derived.type.shortId).toBe(Derived.type.id);
       });
     }); // #shortId
+
+    describe("#defaultView -", function() {
+      it("should default to `null`", function() {
+        var Derived = Instance.extend({type: {id: "fake/id"}});
+
+        expect(Derived.type.defaultView).toBe(null);
+      });
+
+      it("should store relative ids as relative ids", function() {
+
+        var Derived = Instance.extend({type: {id: "fake/id", defaultView: "./foo/bar"}});
+
+        expect(Derived.type.defaultView).toBe("./foo/bar");
+      });
+
+      it("should inherit the base type's defaultView, when unspecified", function() {
+        var A = Instance.extend({type: {defaultView: "foo"}});
+
+        expect(A.type.defaultView).toBe("foo");
+
+        var B = A.extend();
+
+        expect(B.type.defaultView).toBe("foo");
+      });
+
+      it("should inherit the base type's defaultView, when spec is undefined", function() {
+        var A = Instance.extend({type: {defaultView: "foo"}});
+
+        expect(A.type.defaultView).toBe("foo");
+
+        var B = A.extend({type: {defaultView: undefined}});
+
+        expect(B.type.defaultView).toBe("foo");
+      });
+
+      it("should respect a null spec value", function() {
+        var A = Instance.extend({type: {defaultView: "foo"}});
+
+        expect(A.type.defaultView).toBe("foo");
+
+        var B = A.extend({type: {defaultView: null}});
+
+        expect(B.type.defaultView).toBe(null);
+      });
+
+      it("should convert an empty string value to null", function() {
+        var A = Instance.extend({type: {defaultView: "foo"}});
+
+        expect(A.type.defaultView).toBe("foo");
+
+        var B = A.extend({type: {defaultView: ""}});
+
+        expect(B.type.defaultView).toBe(null);
+      });
+
+      it("should respect a specified non-empty string", function() {
+        var A = Instance.extend({type: {defaultView: "foo"}});
+
+        expect(A.type.defaultView).toBe("foo");
+
+        var B = A.extend({type: {defaultView: "bar"}});
+
+        expect(B.type.defaultView).toBe("bar");
+      });
+
+      // coverage
+      it("should allow setting to the same string value", function() {
+        var A = Instance.extend({type: {defaultView: "foo"}});
+
+        expect(A.type.defaultView).toBe("foo");
+
+        var B = A.extend({type: {defaultView: "bar"}});
+
+        B.type.defaultView = "bar";
+
+        expect(B.type.defaultView).toBe("bar");
+      });
+
+      it("should inherit a base function", function() {
+        var FA = function() {
+        };
+        var A  = Instance.extend({type: {defaultView: FA}});
+
+        expect(A.type.defaultView).toBe(FA);
+
+        var B = A.extend();
+
+        expect(B.type.defaultView).toBe(FA);
+      });
+
+      it("should respect a specified function", function() {
+        var FA = function() {
+        };
+        var A  = Instance.extend({type: {defaultView: FA}});
+
+        expect(A.type.defaultView).toBe(FA);
+
+        var FB = function() {
+        };
+        var B  = A.extend({type: {defaultView: FB}});
+
+        expect(B.type.defaultView).toBe(FB);
+      });
+
+      // coverage
+      it("should allow setting to the same function", function() {
+        var FA = function() {
+        };
+        var A  = Instance.extend({type: {defaultView: FA}});
+
+        expect(A.type.defaultView).toBe(FA);
+
+        var FB = function() {
+        };
+        var B  = A.extend({type: {defaultView: FB}});
+
+        B.type.defaultView = FB;
+
+        expect(B.type.defaultView).toBe(FB);
+      });
+
+      it("should preserve the default value", function() {
+        Instance.type.defaultView = undefined;
+        // The default value is still there (did not delete)
+        expect(Instance.type.defaultView).toBe(null);
+      });
+
+      it("should throw when defaultView is not a string, nully or a function", function() {
+        expect(function() {
+          Instance.extend({type: {defaultView: {}}});
+        }).toThrow(errorMatch.argInvalidType("defaultView", ["nully", "string", "function"], "object"));
+      });
+    }); // end #defaultView
+
+    describe("#defaultViewClass -", function() {
+
+      afterEach(function() {
+        require.undef("foo/bar");
+        require.undef("foo/barView");
+        require.undef("foo/dude");
+      });
+
+      it("should return a Promise, when defaultView is null, and resolve to null", function(done) {
+        var A = Instance.extend();
+        var p = A.type.defaultViewClass;
+
+        expect(p instanceof Promise).toBe(true);
+
+        p.then(function(V) {
+          expect(V).toBe(null);
+          done();
+        });
+      });
+
+      it("should return a Promise, when defaultView is a function, and resolve to it", function(done) {
+        var View = function() {
+        };
+
+        var A = Instance.extend({type: {defaultView: View}});
+        var p = A.type.defaultViewClass;
+
+        expect(p instanceof Promise).toBe(true);
+
+        p.then(function(V) {
+          expect(V).toBe(View);
+          done();
+        });
+      });
+
+      it("should return a Promise, when defaultView is an absolute string, and resolve to that module", function(done) {
+
+        var View = function() {};
+
+        define("foo/bar", function() {
+          return View;
+        });
+
+        var A = Instance.extend({type: {defaultView: "foo/bar"}});
+
+        var p = A.type.defaultViewClass;
+
+        expect(p instanceof Promise).toBe(true);
+
+        p.then(function(V) {
+          expect(V).toBe(View);
+
+          done();
+        });
+      });
+
+      it("should return a Promise, when defaultView is a source relative string, " +
+         "and resolve to that module", function(done) {
+
+        var View = function() {};
+
+        define("foo/barView", function() {
+          return View;
+        });
+
+        var A = Instance.extend({type: {sourceId: "foo/bar", defaultView: "./barView"}});
+
+        var p = A.type.defaultViewClass;
+
+        expect(p instanceof Promise).toBe(true);
+
+        p.then(function(V) {
+          expect(V).toBe(View);
+
+          done();
+        });
+      });
+
+      it("should return a Promise even if defaultView is inherited from the base class", function(done) {
+
+        var View = function() {};
+
+        define("foo/bar", function() {
+          return View;
+        });
+
+        var A = Instance.extend({type: {defaultView: "foo/bar"}});
+
+        var B = A.extend();
+
+        var pb = B.type.defaultViewClass;
+
+        var pa = A.type.defaultViewClass;
+
+        expect(pa).toBe(pb);
+        expect(pa instanceof Promise).toBe(true);
+
+        pa.then(function(V) {
+          expect(V).toBe(View);
+
+          done();
+        });
+      });
+
+      it("should return a Promise if defaultView is a source relative string inherited from the base class and " +
+         "resolve relative to the base class' source id", function(done) {
+
+        var View = function() {};
+
+        define("foo/barView", function() {
+          return View;
+        });
+
+        var A = Instance.extend({type: {sourceId: "foo/bar", defaultView: "./barView"}});
+
+        var B = A.extend({type: {sourceId: "gugu/dada"}});
+
+        var pb = B.type.defaultViewClass;
+
+        var pa = A.type.defaultViewClass;
+
+        expect(pa).toBe(pb);
+        expect(pa instanceof Promise).toBe(true);
+
+        pa.then(function(V) {
+          expect(V).toBe(View);
+
+          done();
+        });
+      });
+
+      it("should return the same Promise multiple times", function(done) {
+
+        var View = function() {};
+
+        define("foo/bar", function() {
+          return View;
+        });
+
+        var A = Instance.extend({type: {defaultView: "foo/bar"}});
+
+        var pa = A.type.defaultViewClass;
+
+        expect(pa).toBe(A.type.defaultViewClass);
+
+        pa.then(function(V) {
+          expect(V).toBe(View);
+          expect(pa).toBe(A.type.defaultViewClass);
+          done();
+        });
+      });
+
+      it("should return a new Promise and resolve to the new View when the defaultView changes", function(done) {
+
+        var ViewBar  = function() {};
+        var ViewDude = function() {};
+
+        define("foo/bar", function() {
+          return ViewBar;
+        });
+        define("foo/dude", function() {
+          return ViewDude;
+        });
+
+        var A = Instance.extend({type: {defaultView: "foo/bar"}});
+
+        var pa = A.type.defaultViewClass;
+
+        A.type.defaultView = "foo/dude";
+
+        var pb = A.type.defaultViewClass;
+
+        expect(pb instanceof Promise).toBe(true);
+
+        expect(pa).not.toBe(pb);
+
+        Promise.all([pa, pb]).then(function(views) {
+
+          expect(views[0]).toBe(ViewBar);
+          expect(views[1]).toBe(ViewDude);
+
+          done();
+        });
+      });
+
+      it("should preserve the default value", function() {
+        Instance.type.defaultView = undefined;
+        // The default value is still there (did not delete)
+        expect(Instance.type.defaultView).toBe(null);
+      });
+
+    }); // end #defaultViewClass
 
     describe("#isAbstract", function() {
       it("should respect a specified abstract spec value", function() {
@@ -676,40 +782,115 @@ define([
     }); // #uid
 
     describe("#styleClass -", function() {
-      it("should preserve the default value", function() {
-        Instance.type.styleClass = undefined;
-        // The default value is still there (did not delete)
-        expect(Instance.type.styleClass).toBe(null);
+
+      it("should be settable on the root type", function() {
+        var context = new Context();
+        var Instance = context.get("instance");
+        Instance.type.styleClass = "foo";
+        expect(Instance.type.styleClass).toBe("foo");
       });
 
-      it("can be set on a derived class", function() {
-        ["xpto", null].forEach(function(propValue) {
-          var Derived = Instance.extend({type: {"styleClass": propValue}});
-          expect(Derived.type.styleClass).toBe(propValue);
-
-          var inst = new Derived();
-          expect(inst.type.styleClass).toBe(propValue);
-        });
+      it("should be defined on the root type", function() {
+        expect(Instance.type.styleClass).toBe("pentaho-type-instance");
       });
 
-      it("casts to a string, or to `null` if it is nully", function() {
-        [
-          [1 / 0, "Infinity"],
-          [0, "0"], [1, "1"],
-          [{}, "[object Object]"],
-          [[1, "2", 3], "1,2,3"],
-          [undefined, null],
-          ["", null],
-          [[], null]
-        ].forEach(function(candidateAndFinal) {
-          var candidate = candidateAndFinal[0];
-          var final     = candidateAndFinal[1];
-          var Derived = Instance.extend({type: {"styleClass": candidate}});
-          expect(Derived.type.styleClass).toBe(final);
+      it("should default to the id of the type, in snake case, when the type is not anonymous", function() {
+        var Derived = Instance.extend({
+            type: {
+              id: "foo/bar"
+            }
+          });
 
-          var inst = new Derived();
-          expect(inst.type.styleClass).toBe(final);
+        expect(Derived.type.styleClass).toBe("foo-bar");
+      });
+
+      it("should default to `null`, when the type is anonymous", function() {
+        var Derived = Instance.extend();
+
+        expect(Derived.type.styleClass).toBe(null);
+      });
+
+      it("should respect a specified styleClass upon extension", function() {
+        var Derived = Instance.extend({
+          type: {
+            id: "foo/bar",
+            styleClass: "foo-bar-gugu"
+          }
         });
+
+        expect(Derived.type.styleClass).toBe("foo-bar-gugu");
+      });
+
+      it("should respect a specified styleClass equal to `null` upon extension", function() {
+        var Derived = Instance.extend({
+          type: {
+            id: "foo/bar",
+            styleClass: null
+          }
+        });
+
+        expect(Derived.type.styleClass).toBe(null);
+      });
+
+      it("should convert a specified styleClass equal to `''` to `null` upon extension", function() {
+        var Derived = Instance.extend({
+          type: {
+            id: "foo/bar",
+            styleClass: ""
+          }
+        });
+
+        expect(Derived.type.styleClass).toBe(null);
+      });
+
+      it("should default to the id of the type if specified as `undefined` upon extension", function() {
+        var Derived = Instance.extend({
+          type: {
+            id: "foo/bar",
+            styleClass: undefined
+          }
+        });
+
+        expect(Derived.type.styleClass).toBe("foo-bar");
+      });
+
+      it("should clear the value when set to '' after extension", function() {
+        var Derived = Instance.extend({
+          type: {
+            id: "foo/bar",
+            styleClass: "abc"
+          }
+        });
+
+        Derived.type.styleClass = "";
+
+        expect(Derived.type.styleClass).toBe(null);
+      });
+
+      it("should clear the value when set to `null` after extension", function() {
+        var Derived = Instance.extend({
+          type: {
+            id: "foo/bar",
+            styleClass: "abc"
+          }
+        });
+
+        Derived.type.styleClass = null;
+
+        expect(Derived.type.styleClass).toBe(null);
+      });
+
+      it("should default the value when set to `undefined` after extension", function() {
+        var Derived = Instance.extend({
+          type: {
+            id: "foo/bar",
+            styleClass: "abc"
+          }
+        });
+
+        Derived.type.styleClass = undefined;
+
+        expect(Derived.type.styleClass).toBe("foo-bar");
       });
     }); // #styleClass
 
@@ -718,14 +899,19 @@ define([
       var level2StyleClassName = "Level2StyleClass";
       var level3StyleClassName = "Level3StyleClass";
 
+      var Instance;
       var DerivedLevel1;
       var DerivedLevel2;
       var DerivedLevel3;
 
       beforeEach(function() {
-        DerivedLevel1 = Instance.extend();
-        DerivedLevel2 = DerivedLevel1.extend();
-        DerivedLevel3 = DerivedLevel2.extend();
+        var context = new Context();
+        Instance = context.get("instance");
+
+        Instance.type.styleClass = null;
+        DerivedLevel1 = Instance.extend({type: {styleClass: null}});
+        DerivedLevel2 = DerivedLevel1.extend({type: {styleClass: null}});
+        DerivedLevel3 = DerivedLevel2.extend({type: {styleClass: null}});
       });
 
       it("should return empty array when no styleClass are defined", function() {

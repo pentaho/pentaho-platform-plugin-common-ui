@@ -43,7 +43,7 @@ define(function() {
     },
 
     /**
-     * Convert a camel-case string into title/label appropriate string.
+     * Converts a camel-case string into title/label appropriate string.
      *
      * @param {string} name The string to convert to a title.
      * @return {string} The title/label appropriate string.
@@ -52,6 +52,26 @@ define(function() {
     titleFromName: function(name) {
       if(name) {
         return text.firstUpperCase(name).replace(/([a-z\d])([A-Z])/g, "$1 $2");
+      }
+      return name;
+    },
+
+    /**
+     * Converts a string into a snake-like string.
+     *
+     * Slashes and underscores are converted to an hyphen character, `-`.
+     * Camel-case strings are split and joined by an hyphen character as well.
+     *
+     * @param {string} name - The string to convert to snake-case.
+     * @return {string} The snake-case string.
+     * @ignore
+     */
+    toSnakeCase: function(name) {
+      if(name) {
+        return name
+            .replace(/([a-z\d])([A-Z])/g, "$1-$2")
+            .replace(/[\/\\_\s]+/g, "-")
+            .toLowerCase();
       }
       return name;
     },

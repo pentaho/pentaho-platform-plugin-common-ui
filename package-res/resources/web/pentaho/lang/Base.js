@@ -49,8 +49,9 @@
  */
 define([
   "../util/object",
-  "../util/fun"
-], function(O, fun) {
+  "../util/fun",
+  "../util/text"
+], function(O, fun, text) {
   "use strict";
 
   // ## Support variables
@@ -387,6 +388,16 @@ define([
    */
   function class_extend_core(name, instSpec, classSpec, keyArgs) {
     /*jshint validthis:true*/
+
+    // Allow the value of AMD module.id to be passed directly to name
+    if(name && name.indexOf("/") > 0) {
+      var parts = name.split("/");
+      // Also, ensure last segment is upper case, as this is a class...
+      // Module ids sometimes differ in casing due to other reasons.
+      var lastIndex = parts.length - 1;
+      parts[lastIndex] = text.firstUpperCase(parts[lastIndex]);
+      name = parts.join(".");
+    }
 
     var Subclass = class_extend_subclass.call(this, name, instSpec);
 

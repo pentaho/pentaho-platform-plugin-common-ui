@@ -787,8 +787,6 @@ define([
 
         isAbstract: true,
 
-        styleClass: "pentaho-type-complex",
-
         get isComplex() { return true; },
         get isContainer() { return true; },
 

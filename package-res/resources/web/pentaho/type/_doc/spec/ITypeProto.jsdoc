@@ -150,6 +150,13 @@
  *
  * This attribute is typically used to associate an icon with a type.
  *
+ * When `null` or an empty string,
+ * the attribute value is set to `null`.
+ *
+ * When unspecified, or `undefined`,
+ * the attribute value defaults to the type's `id`,
+ * in _snake-case_, if it has one; or, `null`, if not.
+ *
  * @name styleClass
  * @memberOf pentaho.type.spec.ITypeProto#
  * @type {?nonEmptyString | any}
@@ -177,9 +184,8 @@
  *
  * When a string,
  * it is the identifier of the view's AMD module.
- * If the string starts with `/` or `xyz:`, or ends with `.js`,
- * the identifier is considered to be absolute,
- * otherwise, it is relative to the type's identifier folder.
+ * If the identifier is relative,
+ * it is relative to [sourceId]{@link pentaho.type.spec.ITypeProto#sourceId}.
  *
  * When `undefined`,
  * the view is inherited from the base type, if any.
@@ -192,7 +198,7 @@
  * When a function,
  * it is the class or factory of the view.
  *
- * @name view
+ * @name defaultView
  * @memberOf pentaho.type.spec.ITypeProto#
  * @type {?string | function}
  */

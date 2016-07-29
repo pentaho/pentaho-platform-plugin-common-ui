@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 define([
+  "module",
   "../metricDotAbstract/model",
   "pentaho/i18n!../abstract/i18n/model"
-], function(metricDotAbstractModelFactory, bundle) {
+], function(module, metricDotAbstractModelFactory, bundle) {
 
   "use strict";
 
@@ -27,9 +28,9 @@ define([
     return MetricDotAbstractModel.extend({
 
         type: {
-          id: "pentaho/visual/ccc/scatter",
-          view: "View",
-          styleClass: "pentaho-visual-ccc-scatter"
+          sourceId: module.id,
+          id: module.id.replace(/.\w+$/, ""),
+          defaultView: "./View"
         }
       })
       .implement({type: bundle.structured["scatter"]});

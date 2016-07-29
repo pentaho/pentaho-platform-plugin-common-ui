@@ -35,7 +35,7 @@ define([
      *
      * @description Creates a boolean instance.
      */
-    return Simple.extend("pentaho.type.Boolean", {
+    return Simple.extend({
       /**
        * Gets the underlying boolean primitive value of the value.
        * @name pentaho.type.Boolean#value
@@ -45,7 +45,6 @@ define([
 
       type: {
         id: module.id,
-        styleClass: "pentaho-type-boolean",
         cast: Boolean
       }
     }).implement({
