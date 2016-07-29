@@ -183,7 +183,7 @@ define([
 
     //region VizAPI implementation
 
-    _update: function() {
+    _updateAll: function() {
       this._dataTable = this.model.data;
 
       // Ensure we have a plain data table
@@ -193,8 +193,6 @@ define([
       this._visualMap = this._invVisualMap = this._dataView = null;
 
       // ----------
-
-      this._setupDomNode();
 
       this._initOptions();
 
@@ -211,8 +209,7 @@ define([
       this._renderCore();
     },
 
-    /** @inheritdoc */
-    _resize: function() {
+    _updateSize: function() {
       // Resize event throttling
       if(this._lastResizeTimeout != null)
         clearTimeout(this._lastResizeTimeout);
@@ -223,7 +220,6 @@ define([
       }.bind(this), 50);
     },
 
-    /** @inheritdoc */
     dispose: function() {
 
       this.base();
@@ -237,9 +233,8 @@ define([
 
     //region Helpers
 
-    /** @inheritdoc */
-    _selectionChanged: function(newSelectionFilter) {
-      var dataFilter = newSelectionFilter;
+    _updateSelection: function() {
+      var dataFilter = this.model.selectionFilter;
       var selectedItems = dataFilter.apply(this.model.data);
 
       // Get information on the axes
@@ -278,9 +273,9 @@ define([
       if(!whereSpec.length)
         return this._chart.clearSelections();
 
-      this._chart.data.replaceSelected(
-        this._chart.data.datums(whereSpec)
-      );
+      this._chart.data.replaceSelected(this._chart.data.datums(whereSpec));
+
+      this._chart.updateSelections();
 
       function specToKey(spec) {
         var entries = Object.keys(spec).sort();
@@ -304,11 +299,6 @@ define([
       }
     },
     
-    _setupDomNode: function() {
-      if(!this.domNode)
-        this._setDomNode(document.createElement("div"));
-    },
-
     _initOptions: function() {
       var model = this.model;
 
@@ -319,9 +309,9 @@ define([
       var options = this.options = def.create(this._options);
       def.set(
         options,
-        "canvas", this.domNode,
+        "canvas", this.domContainer,
         "height", model.height || 400,
-        "width", model.width || 400,
+        "width",  model.width || 400,
         "dimensionGroups", {},
         "dimensions", {},
         "visualRoles", {},
@@ -826,10 +816,11 @@ define([
       var options = this.options,
           model   = this.model;
 
+      // TODO: hack hack .....
       // By default hide overflow, otherwise,
       // resizing the window frequently ends up needlessly showing scrollbars.
-      if(this.domNode.parentNode) {
-        this.domNode.parentNode.style.overflow = "hidden"; // Hide overflow
+      if(this.domContainer.parentNode) {
+        this.domContainer.parentNode.style.overflow = "hidden"; // Hide overflow
       }
 
       var colorScaleKind = this._getColorScaleKind();
@@ -1145,9 +1136,10 @@ define([
     _configureMultiChart: function() {
       var options = this.options;
 
+      // TODO: hack hack...
       // Let the vertical scrollbar show up if necessary
-      if(this.domNode.parentNode) {
-        var containerStyle = this.domNode.parentNode.style;
+      if(this.domContainer.parentNode) {
+        var containerStyle = this.domContainer.parentNode.style;
         containerStyle.overflowX = "hidden";
         containerStyle.overflowY = "auto";
       }
@@ -1276,8 +1268,9 @@ define([
     },
 
     _renderCore: function() {
-      while(this.domNode.firstChild) {
-        this.domNode.removeChild(this.domNode.firstChild);
+      var domContainer = this.domContainer;
+      while(domContainer.firstChild) {
+        domContainer.removeChild(domContainer.firstChild);
       }
 
       var ChartClass = pvc[this._cccClass];
@@ -1287,18 +1280,9 @@ define([
         .setData(this._dataView.toJsonCda())
         .render();
 
-      // When render fails, due to required visual roles, for example, there is not chart.data.
+      // When render fails, due to required visual roles, for example, there is no chart.data.
       // Calling clearSelection, ahead, ends up causing an error.
-      if(this._chart.data) this._updateSelections();
-    },
-
-    _updateSelections: function() {
-      this._selectionChanged(this.model.selectionFilter);
-      try {
-        this._chart.updateSelections();
-      } catch(e){
-        logger.log("Error while calling _chart.updateSelections: " + e.message);
-      }
+      if(this._chart.data) this._updateSelection();
     },
 
     //region SELECTION

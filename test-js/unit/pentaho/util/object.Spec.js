@@ -675,5 +675,63 @@ define([
       });
     }); //using
 
+    describe("lca(o1, o2)", function() {
+
+      it("should return null when o1 is nully", function() {
+        expect(O.lca(null, {})).toBe(null);
+        expect(O.lca(undefined, {})).toBe(null);
+      });
+
+      it("should return null when o2 is nully", function() {
+        expect(O.lca({}, null)).toBe(null);
+        expect(O.lca({}, undefined)).toBe(null);
+      });
+
+      it("should return o1 when given o1 = o2", function() {
+        var o = {};
+        expect(O.lca(o, o)).toBe(o);
+      });
+
+      it("should return Object.prototype when given to distinct 'object literals'", function() {
+        expect(O.lca({}, {})).toBe(Object.prototype);
+      });
+
+      it("should return null when o1 has no prototype", function() {
+        var o1 = Object.create(null);
+        expect(O.lca(o1, {})).toBe(null);
+      });
+
+      it("should return null when o2 has no prototype", function() {
+        var o2 = Object.create(null);
+        expect(O.lca({}, o2)).toBe(null);
+      });
+
+      it("should return the lowest common ancestor when they share an immediate common prototype", function() {
+        var oa = Object.create(null);
+        var ob = Object.create(oa);
+
+        var o1 = Object.create(ob);
+        var o2 = Object.create(ob);
+
+        expect(O.lca(o1, o2)).toBe(ob);
+      });
+
+      it("should return the lowest common ancestor when they share a common prototype which is " +
+         "at a different distance from both", function() {
+        var oa = Object.create(null);
+
+        var oa_1 = Object.create(oa);
+
+        var oa_1_1 = Object.create(oa_1);
+
+        var oa_2 = Object.create(oa);
+
+        var oa_2_1 = Object.create(oa_2);
+
+        var oa_2_1_1 = Object.create(oa_2_1);
+
+        expect(O.lca(oa_1_1, oa_2_1_1)).toBe(oa);
+      });
+    });
   }); // pentaho.util.object
 });
