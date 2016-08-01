@@ -13,17 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define([], function() {
-  "use strict";
-  return toSpec;
 
-  function toSpec(property, value) {
-    if(value == null || property == null)
-      return null;
+/**
+ * This namespace contains types for expressing
+ * [intensional]{@link https://en.wikipedia.org/wiki/Intensional_definition}.
+ * filters of complex values or lists thereof.
+ *
+ * @name pentaho.type.filter
+ * @namespace
+ */
 
-    var spec = {};
-    spec[property] = value;
-    return spec;
-  }
-
-});
+/**
+ * @name pentaho.type.filter.spec
+ * @namespace
+ *
+ * @description The `filter.spec` namespace contains specification interfaces for filters.
+ */

@@ -39,7 +39,7 @@ define([
    * @description Creates a `WillExecute` event.
    *
    * @param {!pentaho.visual.base.Model} source - The model object which is emitting the event.
-   * @param {!pentaho.data.filter.AbstractFilter} dataFilter - A filter representing the data set of the visual element which the user interacted with.
+   * @param {!pentaho.type.filter.Abstract} dataFilter - A filter representing the dataset of the visual element which the user interacted with.
    * @param {?function} doExecute - The action that will be executed in the {@link pentaho.visual.base.model#executeAction|Execute Action} event flow.
    */
   return Event.extend("pentaho.visual.base.events.WillExecute",

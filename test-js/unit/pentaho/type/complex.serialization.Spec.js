@@ -262,12 +262,28 @@ define([
           expectProperty("noFormat");
         });
 
-        it("should omit a property if its name is in keyArgs.omitProps", function() {
-          var spec = value.toSpecInContext({omitProps: {type: 0}});
+        it("should omit a property if its name is in keyArgs.omitProps with a true value", function() {
+          var spec = value.toSpecInContext({omitProps: {type: 1}});
 
           scope.dispose();
 
           expect("type" in spec).toBe(false);
+        });
+
+        it("should not omit a property if its name is in keyArgs.omitProps with a false value", function() {
+          var spec = value.toSpecInContext({omitProps: {type: 0}});
+
+          scope.dispose();
+
+          expect("type" in spec).toBe(true);
+        });
+
+        it("should not omit a property if its name is in keyArgs.omitProps with a null value", function() {
+          var spec = value.toSpecInContext({omitProps: {type: null}});
+
+          scope.dispose();
+
+          expect("type" in spec).toBe(true);
         });
 
         it("should omit a property if its value's toSpecInContext returns null", function() {

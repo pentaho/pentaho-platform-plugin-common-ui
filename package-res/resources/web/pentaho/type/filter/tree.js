@@ -14,27 +14,15 @@
  * limitations under the License.
  */
 define([
-  "./_Element",
-  "../TableView"
-], function(Element, TableView) {
+  "./abstract"
+], function(abstractFactory) {
+
   "use strict";
-  return apply;
 
-  function apply(filter, dataTable) {
-    var nRows = dataTable.getNumberOfRows();
-    var filteredRows = [];
+  return function(context) {
 
-    var element = new Element(dataTable, null);
-    for(var k = 0; k < nRows; k++) {
-      element.rowIdx = k;
-      if(filter.contains(element)) {
-        filteredRows.push(k);
-      }
-    }
+    var Abstract = context.get(abstractFactory);
 
-    var dataView = new TableView(dataTable);
-    dataView.setSourceRows(filteredRows);
-    return dataView;
-  }
-
+    return Abstract._core.Tree;
+  };
 });

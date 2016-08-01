@@ -243,7 +243,7 @@ define([
       }
       //endregion
 
-      it("should have preloaded standard primitive types and facets", function() {
+      it("should have preloaded standard primitive types, facets and filters", function() {
 
         return require.using(["require", "pentaho/type/Context"], function(localRequire, Context) {
           var context = new Context();
@@ -251,12 +251,16 @@ define([
 
           for(p in standard)
             if(standard.hasOwnProperty(p))
-              if(p !== "facets" && p !== "Instance")
+              if(p !== "facets" && p !== "filter" && p !== "Instance")
                 expect(!!context.get("pentaho/type/" + p)).toBe(true);
 
           for(p in standard.facets)
             if(standard.facets.hasOwnProperty(p))
               localRequire("pentaho/type/facets/" + p);
+
+          for(p in standard.type)
+            if(standard.type.hasOwnProperty(p))
+              localRequire("pentaho/type/filter/" + p);
         });
       });
 

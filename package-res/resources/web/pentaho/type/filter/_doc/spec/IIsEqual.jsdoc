@@ -13,19 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define([
-  "./_AbstractTable",
-  "./_Table",
-  "./_TableView"
-], function(AbstractTable, Table, TableView) {
 
-  "use strict";
+/**
+ * The `spec.IIsEqual` interface describes the information of an equality filter.
+ *
+ * @name pentaho.type.filter.spec.IIsEqual
+ *
+ * @interface
+ * @extends pentaho.type.filter.spec.IProperty
+ *
+ * @see pentaho.type.filter.IsEqual
+ */
 
-  AbstractTable.core = {
-    Abstract:  AbstractTable,
-    Table:     Table,
-    TableView: TableView
-  };
-
-  return AbstractTable;
-});
+/**
+ * The expected value of the property.
+ *
+ * @name value
+ * @memberOf pentaho.type.filter.spec.IIsEqual#
+ * @type pentaho.type.UValue
+ */

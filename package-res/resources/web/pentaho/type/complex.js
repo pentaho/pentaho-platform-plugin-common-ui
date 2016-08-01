@@ -722,7 +722,7 @@ define([
 
           var name = propType.name;
 
-          if(omitProps && O.hasOwn(omitProps, name)) return;
+          if(omitProps && O.getOwn(omitProps, name)) return;
 
           var value = this._getByType(propType);
 

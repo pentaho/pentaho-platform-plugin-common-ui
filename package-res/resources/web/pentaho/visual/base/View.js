@@ -20,7 +20,6 @@ define([
   "./events/DidUpdate",
   "./events/RejectedUpdate",
   "pentaho/lang/UserError",
-  "pentaho/data/filter",
   "pentaho/util/object",
   "pentaho/util/arg",
   "pentaho/util/fun",
@@ -29,7 +28,7 @@ define([
   "pentaho/util/logger",
   "pentaho/util/promise"
 ], function(Base, EventSource, WillUpdate, DidUpdate, RejectedUpdate, UserError,
-            filter, O, arg, F, BitSet, error, logger, promise) {
+            O, arg, F, BitSet, error, logger, promise) {
 
   "use strict";
 

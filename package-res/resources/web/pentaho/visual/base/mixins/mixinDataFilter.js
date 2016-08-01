@@ -30,7 +30,7 @@ define([
     /**
      * Initializes the mixin.
      *
-     * @param {!pentaho.data.filter.AbstractFilter} dataFilter - A filter that represents a subset of the data.
+     * @param {!pentaho.type.filter.Abstract} dataFilter - A filter that represents a subset of the data.
      * @param {boolean} [isMutable=false] - Determines if an event listener can modify the [dataFilter]{@link #dataFilter} property.
      * @protected
      */
@@ -43,7 +43,7 @@ define([
     /**
      * Gets or sets the filter that represents a subset of the data.
      *
-     * @type pentaho.data.filter.AbstractFilter
+     * @type pentaho.type.filter.Abstract
      *
      * @throws {TypeError} When `dataFilter` is not mutable.
      */

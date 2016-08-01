@@ -1,7 +1,9 @@
 define([
   "pentaho/type/Context",
   "pentaho/visual/base",
-  "pentaho/data/filter",
+  "pentaho/type/filter/abstract",
+  "pentaho/type/filter/or",
+  "pentaho/type/filter/and",
   "pentaho/visual/base/types/selectionModes",
   "pentaho/lang/UserError",
   "pentaho/visual/base/events/WillSelect",
@@ -12,7 +14,8 @@ define([
   "pentaho/visual/base/events/RejectedExecute",
   "pentaho/visual/role/mapping",
   "tests/pentaho/util/errorMatch"
-], function(Context, modelFactory, filter, selectionModes, UserError,
+], function(Context, modelFactory, abstractFilterFactory, orFilterFactory, andFilterFactory, 
+            selectionModes, UserError,
             WillSelect, DidSelect, RejectedSelect,
             WillExecute, DidExecute, RejectedExecute, mappingFactory,
             errorMatch) {
@@ -24,10 +27,17 @@ define([
     var context;
     var Model;
     var dataSpec;
+    var AbstractFilter;
+    var OrFilter;
+    var AndFilter;
 
     beforeEach(function() {
       context = new Context();
       Model = context.get(modelFactory);
+      AbstractFilter = context.get(abstractFilterFactory);
+      OrFilter = context.get(orFilterFactory);
+      AndFilter = context.get(andFilterFactory);
+
       var data = {
         model: [
           {name: "country", type: "string", label: "Country"},
@@ -108,7 +118,7 @@ define([
         var selectionFilter = model.getv("selectionFilter");
 
         expect(selectionFilter).toBeDefined();
-        expect(selectionFilter instanceof filter.AbstractFilter).toBe(true);
+        expect(selectionFilter instanceof AbstractFilter).toBe(true);
       });
 
       it("should have a default selectionMode", function() {
@@ -124,7 +134,7 @@ define([
         var listeners;
 
         beforeEach(function() {
-          newSelection = new filter.Or();
+          newSelection = new OrFilter();
 
           listeners = jasmine.createSpyObj('listeners', [
             'willSelect', 'willSelectSecond',
@@ -213,7 +223,7 @@ define([
           var alternativeSelection;
           var selectionMode;
           beforeEach(function() {
-            alternativeSelection = new filter.And();
+            alternativeSelection = new AndFilter();
 
             selectionMode = jasmine.createSpy('selectionMode');
 
@@ -443,7 +453,7 @@ define([
         var listeners;
 
         beforeEach(function() {
-          newSelection = new filter.Or();
+          newSelection = new OrFilter();
 
           listeners = jasmine.createSpyObj('listeners', [
             'willExecute', 'willExecuteSecond',
@@ -524,7 +534,7 @@ define([
           var alternativeSelection;
           var doExecute;
           beforeEach(function() {
-            alternativeSelection = new filter.And();
+            alternativeSelection = new AndFilter();
 
             doExecute = jasmine.createSpy('doExecute');
 
@@ -781,7 +791,7 @@ define([
     });
 
     describe("#toJSON()", function() {
-      it("should not serialize the `data` property", function() {
+      it("should not serialize the `data` property by default", function() {
         var model = new Model({
           width: 1,
           height: 1,
@@ -797,11 +807,11 @@ define([
         expect("data" in json).toBe(false);
       });
 
-      it("should not serialize the `selectionFilter` property", function() {
+      it("should not serialize the `selectionFilter` property by default", function() {
         var model = new Model({
           width: 1,
           height: 1,
-          selectionFilter: {v: {}},
+          selectionFilter: {_: "pentaho/type/filter/and"},
           isInteractive: false
         });
 
@@ -811,6 +821,38 @@ define([
 
         expect(json instanceof Object).toBe(true);
         expect("selectionFilter" in json).toBe(false);
+      });
+
+      it("should serialize the `selectionFilter` property if keyArgs.omitProps.selectionFilter = false", function() {
+        var model = new Model({
+          width: 1,
+          height: 1,
+          selectionFilter: {_: "pentaho/type/filter/and"},
+          isInteractive: false
+        });
+
+        expect(!!model.get("selectionFilter")).toBe(true);
+
+        var json = model.toSpec({isJson: true, omitProps: {selectionFilter: false}});
+
+        expect(json instanceof Object).toBe(true);
+        expect("selectionFilter" in json).toBe(true);
+      });
+
+      it("should serialize the `data` property if keyArgs.omitProps.data = false", function() {
+        var model = new Model({
+          width: 1,
+          height: 1,
+          data: {v: {}},
+          isInteractive: false
+        });
+
+        expect(!!model.get("data")).toBe(true);
+
+        var json = model.toSpec({isJson: true, omitProps: {data: false}});
+
+        expect(json instanceof Object).toBe(true);
+        expect("data" in json).toBe(true);
       });
     });
 
@@ -831,11 +873,11 @@ define([
         expect("data" in json).toBe(true);
       });
 
-      it("should not serialize the `selectionFilter` property", function() {
+      it("should serialize the `selectionFilter` property", function() {
         var model = new Model({
           width: 1,
           height: 1,
-          selectionFilter: {v: {}},
+          selectionFilter: {_: "pentaho/type/filter/and"},
           isInteractive: false
         });
 

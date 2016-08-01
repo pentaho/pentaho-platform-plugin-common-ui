@@ -14,18 +14,26 @@
  * limitations under the License.
  */
 define([
-  "./_AbstractTable",
-  "./_Table",
-  "./_TableView"
-], function(AbstractTable, Table, TableView) {
+  "../lang/Base"
+], function(Base) {
 
   "use strict";
 
-  AbstractTable.core = {
-    Abstract:  AbstractTable,
-    Table:     Table,
-    TableView: TableView
-  };
+  return Base.extend({
+    constructor: function(dataTable, rowIdx) {
+      this.table = dataTable;
+      this.rowIdx = rowIdx;
 
-  return AbstractTable;
+      this.type = {
+        has: function(property) {
+          return dataTable.model.attributes.get(property) != null;
+        }
+      };
+    },
+
+    getv: function(property) {
+      var prop = this.table.model.attributes.get(property);
+      return this.table.getValue(this.rowIdx, prop.ordinal);
+    }
+  });
 });

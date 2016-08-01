@@ -29,9 +29,9 @@ define(function() {
     /**
      * Replaces the current selection filter with the provided filter.
      *
-     * @param {pentaho.data.filter.AbstractFilter} current - The current selection filter.
-     * @param {pentaho.data.filter.AbstractFilter} input - The input filter.
-     * @return {!pentaho.data.filter.AbstractFilter} The input filter.
+     * @param {pentaho.type.filter.Abstract} current - The current selection filter.
+     * @param {pentaho.type.filter.Abstract} input - The input filter.
+     * @return {!pentaho.type.filter.Abstract} The input filter.
      * @static
      */
     REPLACE: function(current, input) {
@@ -39,18 +39,19 @@ define(function() {
     },
 
     /**
-     * Adds the input filter to the current selection filter, if it is not already fully contained within the selection filter.
+     * Adds the input filter to the current selection filter,
+     * if it is not already fully contained within the selection filter.
      * Otherwise, removes the input filter from the current selection filter.
      *
-     * @param {pentaho.data.filter.AbstractFilter} current - The current selection filter.
-     * @param {pentaho.data.filter.AbstractFilter} input - The input filter.
-     * @return {!pentaho.data.filter.AbstractFilter} The toggled selection filter.
+     * @param {pentaho.type.filter.Abstract} current - The current selection filter.
+     * @param {pentaho.type.filter.Abstract} input - The input filter.
+     * @return {!pentaho.type.filter.Abstract} The toggled selection filter.
      * @static
      */
     TOGGLE: function(current, input) {
       // Determine if all rows in input are currently selected.
-      var inputData = input.apply(this.data);
-      var currentInputData = current.apply(inputData);
+      var inputData = this.data.filter(input);
+      var currentInputData = inputData.filter(current);
       var isAllInputSelected = inputData.getNumberOfRows() === currentInputData.getNumberOfRows();
 
       var selectionMode = isAllInputSelected ? selectionModes.REMOVE : selectionModes.ADD;
@@ -61,9 +62,9 @@ define(function() {
     /**
      * Adds the input filter to the current selection filter.
      *
-     * @param {pentaho.data.filter.AbstractFilter} current - The current selection filter.
-     * @param {pentaho.data.filter.AbstractFilter} input - The filter that will be added to the current selection filter.
-     * @return {!pentaho.data.filter.AbstractFilter} The combined selection filter.
+     * @param {pentaho.type.filter.Abstract} current - The current selection filter.
+     * @param {pentaho.type.filter.Abstract} input - The filter that will be added to the current selection filter.
+     * @return {!pentaho.type.filter.Abstract} The combined selection filter.
      * @static
      */
     ADD: function(current, input) {
@@ -73,13 +74,13 @@ define(function() {
     /**
      * Removes the input filter from the current selection filter.
      *
-     * @param {pentaho.data.filter.AbstractFilter} current - The current selection filter.
-     * @param {pentaho.data.filter.AbstractFilter} input - The filter that will be removed from the current selection filter.
-     * @return {!pentaho.data.filter.AbstractFilter} The current selection filter without the input filter.
+     * @param {pentaho.type.filter.Abstract} current - The current selection filter.
+     * @param {pentaho.type.filter.Abstract} input - The filter that will be removed from the current selection filter.
+     * @return {!pentaho.type.filter.Abstract} The current selection filter without the input filter.
      * @static
      */
     REMOVE: function(current, input) {
-      return current.and(input.invert());
+      return current.and(input.negate());
     }
   };
 

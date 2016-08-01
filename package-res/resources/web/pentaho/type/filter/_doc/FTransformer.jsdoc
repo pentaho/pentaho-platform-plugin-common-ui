@@ -13,19 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define([
-  "./_AbstractTable",
-  "./_Table",
-  "./_TableView"
-], function(AbstractTable, Table, TableView) {
 
-  "use strict";
-
-  AbstractTable.core = {
-    Abstract:  AbstractTable,
-    Table:     Table,
-    TableView: TableView
-  };
-
-  return AbstractTable;
-});
+/**
+ * Function that is called for each filter in a filter tree during a
+ * [visit]{@link pentaho.type.filter.Abstract#visit} operation.
+ *
+ * @callback pentaho.type.filter.FTransformer
+ *
+ * @param {!pentaho.type.filter.Abstract} filter - The filter to be transformed.
+ * @param {pentaho.type.filter.Abstract[]} [filterOperands] - The list of filter operands.
+ *
+ * @return {!pentaho.type.filter.Abstract[]|pentaho.type.filter.Abstract}
+ *
+ * @see pentaho.type.filter.Abstract#visit
+ * @see pentaho.type.filter.Tree#visit
+ */

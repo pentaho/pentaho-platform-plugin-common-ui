@@ -54,7 +54,7 @@ define([
       _standardTypeMids = {};
 
   Object.keys(standard).forEach(function(name) {
-    if(name !== "facets") _standardTypeMids[_baseMid + name] = 1;
+    if(name !== "facets" && name !== "filter") _standardTypeMids[_baseMid + name] = 1;
   });
 
   Object.keys(standard.facets).forEach(function(name) {
@@ -228,7 +228,8 @@ define([
       // This mostly helps tests being able to require.undef(.) these at any time
       //  and not cause random failures for assuming all standard types were loaded.
       Object.keys(standard).forEach(function(lid) {
-        if(lid !== "facets" && lid !== "instance") this._getByFactory(standard[lid], /*sync:*/true);
+        if(lid !== "facets" && lid !== "filter" && lid !== "instance")
+          this._getByFactory(standard[lid], /*sync:*/true);
       }, this);
     },
 
@@ -272,6 +273,17 @@ define([
      *
      * For all of these, the `pentaho/type/` or `pentaho/type/facets/` prefix is optional
      * (when requested to a _context_; the AMD module system requires the full module identifiers to be specified).
+     *
+     * The filter types are also preloaded:
+     *
+     *   * [pentaho/type/filter/abstract]{@link pentaho.type.filter.Abstract}
+     *     * [pentaho/type/filter/tree]{@link pentaho.type.filter.Tree}
+     *       * [pentaho/type/filter/and]{@link pentaho.type.filter.And}
+     *       * [pentaho/type/filter/or]{@link pentaho.type.filter.Or}
+     *     * [pentaho/type/filter/not]{@link pentaho.type.filter.Not}
+     *     * [pentaho/type/filter/property]{@link pentaho.type.filter.Property}
+     *       * [pentaho/type/filter/isEqual]{@link pentaho.type.filter.IsEqual}
+     *       * [pentaho/type/filter/isIn]{@link pentaho.type.filter.IsIn}
      *
      * If it is not known whether all non-standard types that are referenced by identifier have already been loaded,
      * the asynchronous method version, [getAsync]{@link pentaho.type.Context#getAsync},

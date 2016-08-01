@@ -17,9 +17,8 @@ define([
   "cdf/lib/CCC/def",
   "cdf/lib/CCC/pvc",
   "./AbstractAxis",
-  "../util",
-  "pentaho/data/filter"
-], function(def, pvc, AbstractAxis, util, filter) {
+  "../util"
+], function(def, pvc, AbstractAxis, util) {
 
   "use strict";
 
@@ -50,22 +49,24 @@ define([
     },
 
     complexToFilter: function(complex) {
-      var operands = [];
+      var filter = null;
+
+      var context = this.chart.context;
+      var IsEqual;
 
       this.getSelectionGems().each(function(gem) {
-          var atom = complex.atoms[gem.cccDimName];
-          var value = atom.value == null ? atom.rawValue : atom.value;
+        var atom = complex.atoms[gem.cccDimName];
+        var value = atom.value == null ? atom.rawValue : atom.value;
 
-          if(value != null)
-            operands.push(new filter.IsEqual(gem.name, value));
+        if(value != null) {
+          if(!IsEqual) IsEqual = context.get("pentaho/type/filter/isEqual");
 
-        });
+          var operand = new IsEqual({property: gem.name, value: {_: "string", v: value}});
+          filter = filter ? filter.and(operand) : operand;
+        }
+      });
 
-      switch(operands.length) {
-        case 0: return null;
-        case 1: return operands[0];
-      }
-      return new filter.And(operands);
+      return filter;
     },
 
     getSelectionGems: function() {

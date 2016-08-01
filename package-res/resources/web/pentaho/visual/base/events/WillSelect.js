@@ -39,7 +39,8 @@ define([
    * @description Creates a `WillSelect` event.
    *
    * @param {!pentaho.visual.base.Model} source - The model object which is emitting the event.
-   * @param {!pentaho.data.filter.AbstractFilter} dataFilter - A filter representing the data set of the visual element(s) which the user interacted with.
+   * @param {!pentaho.type.filter.Abstract} dataFilter - A filter representing the dataset of the visual element(s)
+   * which the user interacted with.
    * @param {?function} selectionMode - A function that represents how the selection made by the user
    * will be merged with the current selection.
    */

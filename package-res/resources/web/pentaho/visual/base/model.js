@@ -18,9 +18,9 @@ define([
 
   "pentaho/type/complex",
   "pentaho/lang/Event",
-  "pentaho/data/filter",
+  "pentaho/type/filter/abstract",
+  "pentaho/type/filter/or",
   "pentaho/type/util",
-
   "pentaho/util/object",
   "pentaho/util/error",
   "pentaho/util/fun",
@@ -44,7 +44,7 @@ define([
   "../role/nominal",
   "../role/ordinal",
   "../role/quantitative"
-], function(module, complexFactory, Event, filter, typeUtil, O,
+], function(module, complexFactory, Event, abstractFilterFactory, orFilterFactory, typeUtil, O,
             error, F, UserError,
             selectionModes,
             WillSelect, DidSelect, RejectedSelect,
@@ -119,9 +119,8 @@ define([
        * leads to the emission of the
        * ["rejected:select"]{@link pentaho.visual.base.events.RejectedSelect}.
        *
-       * @param {!pentaho.data.filter.AbstractFilter} inputDataFilter - A filter representing the dataset of,
-       * the visual element which the user interacted with,
-       * which will be used to modify the current selection filter.
+       * @param {!pentaho.type.filter.Abstract} inputDataFilter - A filter representing
+       * the dataset which will be used to modify the current selection filter.
        * @param {Object} keyArgs - Keyword arguments.
        * @param {function} keyArgs.selectionMode - A function that computes a new selection filter,
        * taking into account the current selection filter and an input `dataFilter`.
@@ -163,7 +162,7 @@ define([
 
         try {
           // Note that when setting to null, it actually gets the default value.
-          this.set("selectionFilter", newSelectionFilter);
+          this.selectionFilter = newSelectionFilter;
         } catch(e) {
           return ActionResult.reject(e);
         }
@@ -184,7 +183,7 @@ define([
        * Any rejection (due to an event cancellation or due to an invalid `doExecute` action)
        * emits the event {@link pentaho.visual.base.events.RejectedSelect|"rejected:execute"}.
        *
-       * @param {!pentaho.data.filter.AbstractFilter} inputDataFilter - A filter representing the dataset of
+       * @param {!pentaho.type.filter.Abstract} inputDataFilter - A filter representing the dataset of
        * the visual element which the user interacted with.
        *
        * @return {pentaho.lang.ActionResult}
@@ -270,8 +269,8 @@ define([
           // Only isJson serialization does not work with the values of these properties
           // due to the circular dependencies they contain.
 
-          omitProps.data = true;
-          omitProps.selectionFilter = true;
+          if(omitProps.data == null) omitProps.data = true;
+          if(omitProps.selectionFilter == null) omitProps.selectionFilter = true;
         }
 
         return this.base(keyArgs);
@@ -307,8 +306,8 @@ define([
           },
           {
             name: "selectionFilter",
-            type: "object",
-            value: new filter.Or(),
+            type: "pentaho/type/filter/abstract",
+            value: {_: "pentaho/type/filter/or"},
             isRequired: true
           },
           {
