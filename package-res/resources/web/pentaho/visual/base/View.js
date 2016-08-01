@@ -104,7 +104,7 @@ define([
       this.__model = model;
 
       /**
-       * The promise for the completion of the current update operation, if any, or `null`.
+       * The promise for the completion of the current update operation, if any; or `null`.
        *
        * @type {Promise}
        * @private
@@ -223,7 +223,7 @@ define([
     /**
      * Gets a value that indicates if the view is in a dirty state.
      *
-     * A view is _dirty_ during the period from when the view's model has changed until the view is updated.
+     * A view is _dirty_ during the period after the view's model has changed to until the time the view is updated.
      *
      * During this period, the view **should not** handle any user interaction events,
      * as the user would be acting on an outdated representation of the model.
@@ -301,7 +301,7 @@ define([
      * Updates the view to match its model's latest state.
      *
      * When [isAutoUpdate]{@link pentaho.visual.base.View#isAutoUpdate} is `true`,
-     * any change to the view's model automatically triggers a view update, by calling this method.
+     * any change to the view's model automatically triggers a view update by calling this method.
      *
      * The update operation is _generally_ asynchronous.
      * Even if the view implementation completes its update synchronously,
@@ -317,7 +317,7 @@ define([
      * returns the same promise that was returned by the initial `update` call.
      *
      * If the view is not currently updating and is also not [dirty]{@link pentaho.visual.base.View#isDirty},
-     * calling `update` _immediately_ returns a fulfilled promise.
+     * then calling `update` _immediately_ returns a fulfilled promise.
      *
      * Otherwise, by this time, [isUpdating]{@link pentaho.visual.base.View#isUpdating} will be `true`,
      * and the update operation proceeds to the **Will phase**.
@@ -333,22 +333,22 @@ define([
      *
      * #### Loop phase
      *
-     * If the update is not canceled, the view enters an **update loop**,
-     * that only ends when either the view is up to date with the model,
-     * in which case surely [isDirty]{@link pentaho.visual.base.View#isDirty} will be `false`,
-     * or some error occurs.
+     * If the update is not canceled, the view enters an **update loop**
+     * that only ends when either the view is up to date with the model
+     * (in which case surely [isDirty]{@link pentaho.visual.base.View#isDirty} will be `false`),
+     * or after some error occurs.
      *
      * On each iteration of the update loop:
-     * 1. If the model is invalid, the update loop ends, with a validation error and
-     *    the update operation proceeds to the **Rejected phase**;
+     * 1. If the model is invalid, the update loop ends with a validation error and
+     *    then the update operation proceeds to the **Rejected phase**;
      * 2. Otherwise, the "best fit" partial update method is selected and called to update the view;
      * 3. If the selected update method throws an error or returns a rejected promise,
      *    the update loop ends and the update operation proceeds to the **Rejected phase**;
      * 4. If the view is not [dirty]{@link pentaho.visual.base.View#isDirty} anymore,
-     *    the update loop ends, with success;
+     *    the update loop ends with success;
      * 5. Repeat.
      *
-     * Over the view's lifetime, the very first "partial" update method that is selected is actually, always, the
+     * Over the view's lifetime, the very first "partial" update method that is selected is always the
      * full update method: [_updateAll]{@link pentaho.visual.base.View#_updateAll}.
      * Subsequent iterations may select _proper_ partial update methods, like
      * [_updateSize]{@link pentaho.visual.base.View#_updateSize} or
@@ -462,11 +462,11 @@ define([
      * Performs the visualization update loop.
      *
      * On each iteration,
-     * if the set of dirty property groups is empty, the update loop ends, successfully.
+     * if the set of dirty property groups is empty, then the update loop ends successfully.
      *
-     * Otherwise, the model is checked for validity, and if it is not valid, the update loop is rejected.
+     * Otherwise, the model is checked for validity; and, if it is not valid, the update loop is rejected.
      * If, on the other hand, the model is valid,
-     * the "best" update method is selected and its completion is awaited for.
+     * the "best" update method is selected and its completion is awaited.
      *
      * If the selected update method is rejected or throws, the update loop is rejected.
      *
@@ -653,8 +653,8 @@ define([
      * The default implementation clears the container DOM element and unregisters from model events.
      *
      * If an implementation has additional properties containing DOM nodes,
-     * it **must** override this method (and call base) and set these to `null`,
-     * to not cause memory-leaks.
+     * then it **must** override this method (and call base) and set these to `null`,
+     * so that memory-leaks are not caused.
      */
     dispose: function() {
 

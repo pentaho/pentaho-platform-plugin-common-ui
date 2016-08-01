@@ -218,7 +218,7 @@ define(["./has"], function(has) {
      *
      * @param {!Object} object - The object that contains the property.
      * @param {string} property - The name of property.
-     * @param {Object} lcaExclude - A lowest-common-ancestor object whose properties inherited from should
+     * @param {Object} lcaExclude - A lowest-common-ancestor object whose inherited properties should
      * not be returned.
      * @return {?Object} The [property descriptor]{@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty}.
      * @method
@@ -229,12 +229,12 @@ define(["./has"], function(has) {
     /**
      * Obtains the **l**owest **c**ommon **a**ncestor of both of the given objects, if any.
      *
-     * If one of the objects has a `null` prototype, there is no common ancenstor and `null` is returned.
+     * If one of the objects has a `null` prototype, then there is no common ancestor and `null` is returned.
      *
      * @param {Object} o1 - The first object.
      * @param {Object} o2 - The second object.
      *
-     * @return {Object} The lowest common ancestor object, if any, or `null`, if none.
+     * @return {Object} The lowest common ancestor object, if any; or `null`, if none.
      */
     lca: function(o1, o2) {
       if(!o1 || !o2) return null;
