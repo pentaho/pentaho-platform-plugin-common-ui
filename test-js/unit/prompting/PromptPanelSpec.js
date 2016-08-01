@@ -1306,6 +1306,8 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
 
                 doTest('a', 'a ', stringType, true);
                 doTest('a', '1', stringType, true);
+                doTest('a', [], stringType, true);
+                doTest('', [], stringType, true);
 
                 doTest(null, null, stringType, false);
                 doTest(undefined, null, stringType, false);

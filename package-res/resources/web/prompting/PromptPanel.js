@@ -350,13 +350,20 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
           } else {
             switch (paramType) {
               case "java.lang.String": // Used upper case to eliminate UPPER() post-process formula influence on the strings comparison
-                return paramValue.toUpperCase() != paramSelectedValue.toUpperCase();
+                if(!_.isArray(paramSelectedValue)) {
+                  return paramValue.toUpperCase() != paramSelectedValue.toUpperCase();
+                } else {
+                  return paramValue != paramSelectedValue;
+                }
               case "java.sql.Date": // Set time to zero to eliminate its influence on the days comparison
                 return (new Date(paramValue).setHours(0,0,0,0)) != (new Date(paramSelectedValue).setHours(0,0,0,0));
               default:
                 return paramValue != paramSelectedValue;
             }
           }
+        }
+        if(_.isArray(paramSelectedValue) && paramSelectedValue.length == 0) {
+          return true;
         }
 
         return paramValue != paramSelectedValue;
