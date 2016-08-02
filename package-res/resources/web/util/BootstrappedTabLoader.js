@@ -37,7 +37,7 @@
 	var demoConfig = {
 		parentSelector: "#some-id",
 		tabContentPattern : "folder1/folder2/this_is_content{{contentNumber}}.html",
-		defaultTabSelector : "#tabId",
+		defaultTabSelector : "tabId",
 		before: function() { },
 		postLoad: function(jHtml, tabSelector) { },
 		postClick: function(tabSelector) { },

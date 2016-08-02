@@ -29,7 +29,7 @@ requirejs.config({
     'common-ui/AngularPlugin': 'plugin-handler/angularPlugin',
     'common-ui/AngularPluginHandler': 'plugin-handler/angularPluginHandler',
     'common-ui/angular-animate': 'angular/angular-animate',
-    'common-ui/jquery': 'jquery/jquery-1.9.1.min',
+    'common-ui/jquery': 'jquery/jquery-1.12.4.min',
     'common-ui/AnimatedAngularPlugin': 'plugin-handler/animatedAngularPlugin',
     'common-ui/AnimatedAngularPluginHandler': 'plugin-handler/animatedAngularPluginHandler'
   },
