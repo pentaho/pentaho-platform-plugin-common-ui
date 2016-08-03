@@ -13,19 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define([
-  "./_AbstractTable",
-  "./_Table",
-  "./_TableView"
-], function(AbstractTable, Table, TableView) {
 
-  "use strict";
+/**
+ * The `spec.ITree` interface describes the information of a tree filter.
+ *
+ * @name pentaho.type.filter.spec.ITree
+ *
+ * @interface
+ * @extends pentaho.type.filter.spec.IAbstract
+ *
+ * @see pentaho.type.filter.Tree
+ */
 
-  AbstractTable.core = {
-    Abstract:  AbstractTable,
-    Table:     Table,
-    TableView: TableView
-  };
-
-  return AbstractTable;
-});
+/**
+ * The operands of the filter.
+ *
+ * @name operands
+ * @memberOf pentaho.type.filter.spec.ITree#
+ * @type Array.<pentaho.type.filter.spec.IAbstract>
+ */

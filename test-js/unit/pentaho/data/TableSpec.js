@@ -14,8 +14,11 @@
  * limitations under the License.
  */
 define([
-  "pentaho/data/Table"
-], function(DataTable) {
+  "pentaho/data/Table",
+  "pentaho/data/TableView",
+  "pentaho/type/filter/abstract",
+  "pentaho/type/Context"
+], function(DataTable, TableView, abstractFilterFactory, Context) {
 
   function getDatasetCDA1() {
     return {
@@ -289,6 +292,82 @@ define([
           expectDataTableContent(dataTable2, getDatasetDT1());
         });
       });
+
+      describe("#filter(filter)", function() {
+
+        var context = new Context();
+        var AbstractFilter = context.get(abstractFilterFactory);
+        var CustomFilter = AbstractFilter.extend({_contains: function() { return false; }});
+
+        var data = new DataTable({
+          model: [
+            {name: "product", type: "string", label: "Product"},
+            {name: "sales", type: "number", label: "Sales"},
+            {name: "inStock", type: "boolean", label: "In Stock"}
+          ],
+          rows: [
+            {c: [{v: "A"}, {v: 12000}, {v: true }]},
+            {c: [{v: "B"}, {v: 6000},  {v: true }]},
+            {c: [{v: "C"}, {v: 12000}, {v: false}]},
+            {c: [{v: "D"}, {v: 1000},  {v: false}]},
+            {c: [{v: "E"}, {v: 2000},  {v: false}]},
+            {c: [{v: "F"}, {v: 3000},  {v: false}]},
+            {c: [{v: "G"}, {v: 4000},  {v: false}]}
+          ]
+        });
+
+        it("should return a view", function() {
+          var filter = new CustomFilter();
+
+          var view = data.filter(filter);
+
+          expect(view instanceof TableView).toBe(true);
+        });
+
+        it("should return an empty view when a filter selects nothing", function() {
+          var filter = new CustomFilter();
+
+          var view = data.filter(filter);
+
+          expect(view.getNumberOfRows()).toBe(0);
+        });
+
+        it("should return a view with a single result", function() {
+          var filter = new CustomFilter();
+
+          spyOn(filter, "_contains").and.callFake(function(elem) {
+            return elem.getv("product") === "A";
+          });
+
+          var view = data.filter(filter);
+
+          expect(view.getNumberOfRows()).toBe(1);
+          expect(view.getValue(0, 0)).toBe("A");
+        });
+
+        it("should return an empty view when the table has no rows", function() {
+          var filter = new CustomFilter();
+          var data = new DataTable();
+
+          var view = data.filter(filter);
+
+          expect(view.getNumberOfRows()).toBe(0);
+        });
+
+        it("should return a view with multiple results", function() {
+          var filter = new CustomFilter();
+
+          spyOn(filter, "_contains").and.callFake(function(elem) {
+            return elem.type.has("sales") && elem.getv("sales") === 12000;
+          });
+
+          var view = data.filter(filter);
+
+          expect(view.getNumberOfRows()).toBe(2);
+          expect(view.getValue(0, 1)).toBe(12000);
+          expect(view.getValue(1, 1)).toBe(12000);
+        });
+      }); // #filter
     });
 
     describe("columns -", function() {

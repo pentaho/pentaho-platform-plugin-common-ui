@@ -14,18 +14,15 @@
  * limitations under the License.
  */
 define([
-  "./_AbstractTable",
-  "./_Table",
-  "./_TableView"
-], function(AbstractTable, Table, TableView) {
+  "./abstract"
+], function(abstractFactory) {
 
   "use strict";
 
-  AbstractTable.core = {
-    Abstract:  AbstractTable,
-    Table:     Table,
-    TableView: TableView
-  };
+  return function(context) {
 
-  return AbstractTable;
+    var Abstract = context.get(abstractFactory);
+
+    return Abstract._core.Not;
+  };
 });

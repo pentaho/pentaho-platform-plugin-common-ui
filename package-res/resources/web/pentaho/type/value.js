@@ -234,8 +234,8 @@ define([
        * Only applies to complex values that are serialized in object form.
        * In array form, all of the properties of complex values are serialized independently of their value.
        *
-       * @param {Object} [keyArgs.omitProps] An object whose _own_ property names are the names of
-       * the properties of the current complex type to omit from the serialization.
+       * @param {Object} [keyArgs.omitProps] An object whose _own_ property names with a _truthy_ value
+       * are the names of the properties of the current complex type to omit from the serialization.
        *
        * Only applies when a complex is output in object form.
        * In array form, all properties are output whatever their value.

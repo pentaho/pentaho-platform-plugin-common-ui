@@ -16,10 +16,15 @@
 define([
   "pentaho/type/Context",
   "pentaho/visual/base",
-  "pentaho/data/filter",
+  "pentaho/type/filter/isIn",
+  "pentaho/type/filter/isEqual",
+  "pentaho/type/filter/and",
+  "pentaho/type/filter/or",
+  "pentaho/type/filter/not",
   "pentaho/data/Table",
   "pentaho/visual/base/types/selectionModes"
-], function(Context, modelFactory, filter, Table, selectionModes) {
+], function(Context, modelFactory, isInFilterFactory, isEqFilterFactory, andFilterFactory, orFilterFactory,
+    notFilterFactory, Table, selectionModes) {
 
   "use strict";
 
@@ -31,15 +36,27 @@ define([
     var countryPt;
     var myFilter;
     var model;
+    var IsEqFilter;
+    var AndFilter;
+    var OrFilter;
+    var NotFilter;
 
     beforeEach(function() {
-      sales12k  = new filter.IsIn("sales", [12000]);
-      countryPt = new filter.IsEqual("country", "Portugal");
-      inStock   = new filter.IsEqual("inStock", "true");
-      myFilter  = new filter.And([sales12k, inStock]);
-
       var context = new Context();
+
       var Model = context.get(modelFactory);
+
+      var IsInFilter = context.get(isInFilterFactory);
+      IsEqFilter = context.get(isEqFilterFactory);
+      AndFilter = context.get(andFilterFactory);
+      OrFilter = context.get(orFilterFactory);
+      NotFilter = context.get(notFilterFactory);
+
+      sales12k  = new IsInFilter({property: "sales",   values: [{_: "number", v: 12000}]});
+      countryPt = new IsEqFilter({property: "country", value: {_: "string", v: "Portugal"}});
+      inStock   = new IsEqFilter({property: "inStock", value: {_: "string", v: "true"}});
+      myFilter  = new AndFilter({operands: [sales12k, inStock]});
+
       var dataSpec = {
         model: [
           {name: "country", type: "string"},
@@ -91,7 +108,7 @@ define([
         expect(args[0]).toBe(sales12k);
         expect(args[1]).toBe(inputFilter);
 
-        expect(result.type).toBe("and");
+        expect(result instanceof AndFilter).toBe(true);
       });
 
       it("should add the input selection from the current selection when " +
@@ -117,7 +134,7 @@ define([
         expect(args[0]).toBe(currentFilter);
         expect(args[1]).toBe(inputFilter);
 
-        expect(result.type).toBe("or");
+        expect(result instanceof OrFilter).toBe(true);
       });
 
       it("should add the input selection from the current selection when " +
@@ -130,7 +147,7 @@ define([
         var inputFilter = inStock;
 
         // Germany
-        var currentFilter = new filter.IsEqual("country", "Germany");
+        var currentFilter = new IsEqFilter({property: "country", value: {_: "string", v: "Germany"}});
 
         var result = selectionModes.TOGGLE.call(model, currentFilter, inputFilter);
 
@@ -143,7 +160,7 @@ define([
         expect(args[0]).toBe(currentFilter);
         expect(args[1]).toBe(inputFilter);
 
-        expect(result.type).toBe("or");
+        expect(result instanceof OrFilter).toBe(true);
       });
     });
 
@@ -151,9 +168,9 @@ define([
       it("should add the input selection to the current selection", function() {
         var result = selectionModes.ADD.call(model, sales12k, inStock);
 
-        expect(result.type).toBe("or");
-        expect(result.operands[0]).toBe(sales12k);
-        expect(result.operands[1]).toBe(inStock);
+        expect(result instanceof OrFilter).toBe(true);
+        expect(result.operands.at(0)).toBe(sales12k);
+        expect(result.operands.at(1)).toBe(inStock);
       });
     });
 
@@ -161,10 +178,10 @@ define([
       it("should remove the input selection from the current selection", function() {
         var result = selectionModes.REMOVE.call(model, sales12k, inStock);
 
-        expect(result.type).toBe("and");
-        expect(result.operands[0]).toBe(sales12k);
-        expect(result.operands[1].type).toBe("not");
-        expect(result.operands[1].operand).toBe(inStock);
+        expect(result instanceof AndFilter).toBe(true);
+        expect(result.operands.at(0)).toBe(sales12k);
+        expect(result.operands.at(1) instanceof NotFilter).toBe(true);
+        expect(result.operands.at(1).operand).toBe(inStock);
       });
     });
 

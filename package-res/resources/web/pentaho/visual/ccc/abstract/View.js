@@ -24,7 +24,6 @@ define([
   "../util",
   "pentaho/util/object",
   "pentaho/util/logger",
-  "pentaho/data/filter",
   "pentaho/visual/color/utils",
   "pentaho/visual/color/paletteRegistry",
   "pentaho/data/TableView",
@@ -32,7 +31,7 @@ define([
   "pentaho/i18n!view"
 ], function(View, selectionModes,
             def, pvc, cdo, pv, Axis,
-            util, O, logger, filter, visualColorUtils, visualPaletteRegistry,
+            util, O, logger, visualColorUtils, visualPaletteRegistry,
             DataView, ViewDemo, bundle) {
 
   "use strict";
@@ -235,20 +234,20 @@ define([
 
     _updateSelection: function() {
       var dataFilter = this.model.selectionFilter;
-      var selectedItems = dataFilter.apply(this.model.data);
+      var selectedItems = this.model.data.filter(dataFilter);
 
       // Get information on the axes
       var props = def.query(this._keyAxesIds)
-        .selectMany(function(axisId) {
-          return this.axes[axisId].getSelectionGems();
-        }, this)
-        .select(function(gem) {
-          return {
-            ordinal: gem.attr.ordinal,
-            cccDimName: gem.cccDimName
-          };
-        })
-        .array();
+            .selectMany(function(axisId) {
+              return this.axes[axisId].getSelectionGems();
+            }, this)
+            .select(function(gem) {
+              return {
+                ordinal: gem.attr.ordinal,
+                cccDimName: gem.cccDimName
+              };
+            })
+            .array();
 
       // Build a CCC filter (whereSpec)
       var whereSpec = [];
@@ -933,8 +932,8 @@ define([
       /*jshint laxbreak:true*/
       var colorAttrInfos = this._getVisualMapInfo()[this._discreteColorRole];
       return colorAttrInfos
-        ? colorAttrInfos.filter(function(attrInfo) { return !attrInfo.isMeasureDiscrim; })
-        : [];
+          ? colorAttrInfos.filter(function(attrInfo) { return !attrInfo.isMeasureDiscrim; })
+          : [];
     },
 
     _getMemberPalette: function() {
@@ -1342,12 +1341,14 @@ define([
         return memo;
       }.bind(this), []);
 
+      var Or = this.context.get("pentaho/type/filter/or");
 
-      var selectionFilter = new filter.Or(operands);
       var keyArgs = {};
 
+      // Replace with empty selection when the user selects nothing.
       if(operands && operands.length === 0) keyArgs.selectionMode = selectionModes.REPLACE;
-      this.model.selectAction(selectionFilter, keyArgs);
+
+      this.model.selectAction(new Or({operands: operands}), keyArgs);
 
       // Explicitly cancel CCC's native selection handling.
       return [];
@@ -1441,20 +1442,16 @@ define([
     //region UTILITY
 
     _complexToFilter: function(complex) {
-      /* Add each axis' formulas to the selection */
-      var operands = [];
+      // Add each axis' formulas to the selection
+      var filter = null;
+
       this._keyAxesIds.forEach(function(axisId) {
         var operand = this.axes[axisId].complexToFilter(complex);
-        if(operand) operands.push(operand);
+        if(operand)
+          filter = filter ? filter.and(operand) : operand;
       }, this);
 
-      switch(operands.length) {
-        case 0:
-          return null;
-        case 1:
-          return operands[0];
-      }
-      return new filter.And(operands);
+      return filter;
     }
     //endregion
   }, /** @lends pentaho.visual.ccc.base.View */{

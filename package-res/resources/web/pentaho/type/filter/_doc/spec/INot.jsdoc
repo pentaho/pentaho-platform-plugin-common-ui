@@ -13,19 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define([
-  "./_AbstractTable",
-  "./_Table",
-  "./_TableView"
-], function(AbstractTable, Table, TableView) {
 
-  "use strict";
+/**
+ * The `spec.INot` interface describes the information of a negation filter.
+ *
+ * @name pentaho.type.filter.spec.INot
+ *
+ * @interface
+ * @extends pentaho.type.filter.spec.IAbstract
+ *
+ * @see pentaho.type.filter.Not
+ */
 
-  AbstractTable.core = {
-    Abstract:  AbstractTable,
-    Table:     Table,
-    TableView: TableView
-  };
-
-  return AbstractTable;
-});
+/**
+ * The operand of the filter.
+ *
+ * @name operand
+ * @memberOf pentaho.type.filter.spec.INot#
+ * @type pentaho.type.filter.spec.IAbstract
+ */

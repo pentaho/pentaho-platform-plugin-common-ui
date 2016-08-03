@@ -14,18 +14,14 @@
  * limitations under the License.
  */
 define([
-  "./_AbstractTable",
-  "./_Table",
-  "./_TableView"
-], function(AbstractTable, Table, TableView) {
+  "./Refinement",
+  "./DiscreteDomain"
+], function(Refinement, DiscreteDomain) {
 
   "use strict";
 
-  AbstractTable.core = {
-    Abstract:  AbstractTable,
-    Table:     Table,
-    TableView: TableView
+  return {
+    //"Refinement": Refinement,
+    "DiscreteDomain": DiscreteDomain
   };
-
-  return AbstractTable;
 });

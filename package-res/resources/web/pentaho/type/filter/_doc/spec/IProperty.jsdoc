@@ -13,19 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define([
-  "./_AbstractTable",
-  "./_Table",
-  "./_TableView"
-], function(AbstractTable, Table, TableView) {
 
-  "use strict";
+/**
+ * The `spec.IProperty` interface describes the information of a property filter.
+ *
+ * @name pentaho.type.filter.spec.IProperty
+ *
+ * @interface
+ * @extends pentaho.type.filter.spec.IAbstract
+ *
+ * @see pentaho.type.filter.Property
+ */
 
-  AbstractTable.core = {
-    Abstract:  AbstractTable,
-    Table:     Table,
-    TableView: TableView
-  };
-
-  return AbstractTable;
-});
+/**
+ * The name of the property.
+ *
+ * @name property
+ * @memberOf pentaho.type.filter.spec.IProperty#
+ * @type string
+ */

@@ -14,26 +14,28 @@
  * limitations under the License.
  */
 define([
-  "../../lang/Base"
-], function(Base) {
+  "./abstract",
+  "./tree",
+  "./property",
+  "./and",
+  "./or",
+  "./not",
+  "./isEqual",
+  "./isIn"
+], function(
+    abstractFactory, treeFactory, propFactory,
+    andFactory, orFactory, notFactory, isEqFactory, isInFactory) {
+
   "use strict";
 
-  var Element = Base.extend({
-    constructor: function(dataTable, rowIdx) {
-      this.dataTable = dataTable;
-      this.rowIdx = rowIdx;
-    },
-
-    has: function(property) {
-      return this.dataTable.model.attributes.get(property) != null;
-    },
-
-    getv: function(property) {
-      var prop = this.dataTable.model.attributes.get(property);
-      return this.dataTable.getValue(this.rowIdx, prop.ordinal);
-    }
-  });
-
-  return Element;
-
+  return {
+    "abstract": abstractFactory,
+    "tree": treeFactory,
+    "property": propFactory,
+    "and": andFactory,
+    "or": orFactory,
+    "not": notFactory,
+    "isEqual": isEqFactory,
+    "isIn": isInFactory
+  };
 });
