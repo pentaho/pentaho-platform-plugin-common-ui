@@ -13,5 +13,5 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*global analyzerVizPlugins:true */
+/* global analyzerVizPlugins:true */
 analyzerVizPlugins.push("pentaho/visual/2.5/samples/calc/analyzer_plugin");

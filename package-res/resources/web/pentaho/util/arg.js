@@ -32,13 +32,13 @@ define([
     /**
      * Gets the value of an optional property of an object.
      * The property is considered specified when its value is not a {@link Nully} value.
-     * When the property is not specified, the value of `defaultValue` is returned. The latter defaults to `undefined`.
+     * When the property is not specified, the value of `dv` is returned. The latter defaults to `undefined`.
      *
-     * @param {?object} obj The object from which to get a property.
-     * @param {string} propName The name of the property.
-     * @param {any} [defaultValue] The default value.
+     * @param {?object} o The object from which to get a property.
+     * @param {string} p The name of the property.
+     * @param {any} [dv] The default value.
      *
-     * @return {any} The value of the property. If the property does not exist, returns `defaultValue`.
+     * @return {any} The value of the property. If the property does not exist, returns `dv`.
      */
     optional: function(o, p, dv) {
       var v;
@@ -48,13 +48,13 @@ define([
     /**
      * Gets the value of an defined property of an object.
      * The property is considered specified when its value is not `undefined`.
-     * When the property is not specified, the value of `defaultValue` is returned. The latter defaults to `undefined`.
+     * When the property is not specified, the value of `dv` is returned. The latter defaults to `undefined`.
      *
-     * @param {?object} obj The object from which to get a property.
-     * @param {string} propName The name of the property.
-     * @param {any} [defaultValue] The default value.
+     * @param {?object} o The object from which to get a property.
+     * @param {string} p The name of the property.
+     * @param {any} [dv] The default value.
      *
-     * @return {any} The value of the property. If the property does not exist, returns `defaultValue`.
+     * @return {any} The value of the property. If the property does not exist, returns `dv`.
      */
     defined: function(o, p, dv) {
       var v;
@@ -65,12 +65,12 @@ define([
      * Gets the value of an required property of an object.
      * The property is considered specified when its value is not a {@link Nully} value.
      *
-     * @param {?object} obj The object from which to get a property.
-     * @param {string} propName The name of the property.
-     * @param {?string} pscope The name of the argument where the `obj` is received in the caller.
+     * @param {?object} o The object from which to get a property.
+     * @param {string} p The name of the property.
+     * @param {?string} pscope The name of the argument where the `o` is received in the caller.
      *
      * @return {any} The found required property value.
-     * @throws {Error} Argument required. The `obj` must contain the `propName`.
+     * @throws {Error} Argument required. The `o` must contain the `p`.
      */
     required: function(o, p, pscope) {
       var v;
@@ -90,6 +90,7 @@ define([
     slice: function(args, start, end) {
       if(!args) throw error.argRequired("args");
 
+      /* eslint default-case: 0 */
       switch(arguments.length) {
         case 1: return A_slice.call(args);
         case 2: return A_slice.call(args, start);

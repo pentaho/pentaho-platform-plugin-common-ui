@@ -246,7 +246,8 @@ define([
        */
       _getLowestLevelInAttrs: function() {
         var mappingAttrs = this.attributes;
-        var data, visualModel, L;
+        var data, visualModel;
+        var L;
         if(!(L = mappingAttrs.count) || !(visualModel = this.model) || !(data = visualModel.data))
           return;
 
@@ -257,7 +258,9 @@ define([
         var roleDataType = this.type.dataType;
         var dataAttrs = data.model.attributes;
         var i = -1;
-        var name, dataAttr, dataAttrLevel, dataAttrType;
+        var name, dataAttr;
+        var dataAttrLevel;
+        var dataAttrType;
         while(++i < L) {
           var mappingAttr = mappingAttrs.at(i);
           if(!(name = mappingAttr.name) ||
@@ -531,7 +534,7 @@ define([
             throw error.argRequired("levels", bundle.structured.errors.mapping.noLevelsInNonAbstract);
         },
 
-        //region levels
+        // region levels
         _levels: new ListLevel(),
 
         /**
@@ -656,9 +659,9 @@ define([
           });
           return any;
         },
-        //endregion
+        // endregion
 
-        //region dataType
+        // region dataType
         _dataType: context.get("value").type,
 
         /**
@@ -735,7 +738,7 @@ define([
             this._dataType = newType;
           }
         }
-        //endregion
+        // endregion
       }
     })
     .implement({type: bundle.structured.mapping});

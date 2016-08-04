@@ -23,7 +23,6 @@
  * @typedef {pentaho.data.spec.IPlainColumn|string} pentaho.data.spec.PlainColumn
  */
 
-
 /**
  * @classdesc The `spec.IPlainColumn` interface
  * describes a plain column's structured specification.

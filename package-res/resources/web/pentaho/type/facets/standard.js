@@ -21,7 +21,7 @@ define([
   "use strict";
 
   return {
-    //"Refinement": Refinement,
+    // "Refinement": Refinement,
     "DiscreteDomain": DiscreteDomain
   };
 });

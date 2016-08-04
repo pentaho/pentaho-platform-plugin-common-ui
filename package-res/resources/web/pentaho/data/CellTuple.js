@@ -26,25 +26,29 @@ define([
       this.base();
 
       // Fill with null valued cells.
-      var i = this.length, SL = this.structure.length;
+      var i = this.length;
+      var SL = this.structure.length;
       while(i++ < SL) this.add(null);
     },
 
-    //region IListElement
+    // region IListElement
     elemName: "CellTuple",
-    //endregion
+    // endregion
 
-    //region IWithKey implementation
+    // region IWithKey implementation
     keyName:  "key",
 
     _key: null,
 
     get key() {
       var key = this._key;
-      if(key == null) key = this._key = this.map(function(cell) { return cell.key; }).join("~");
+      if(key == null)
+        key = this._key = this.map(function(cell) {
+          return cell.key;
+        }).join("~");
       return key;
     },
-    //endregion
+    // endregion
 
     _label: null,
 
@@ -54,7 +58,7 @@ define([
       return label;
     },
 
-    //region List implementation
+    // region List implementation
     elemClass: Cell,
 
     _cast: function(spec, index) {
@@ -62,15 +66,15 @@ define([
       if(!structPos) throw new Error("Cell tuple has out-of-bounds cells.");
       return structPos.attribute.toCellOf(spec);
     },
-    //endregion
+    // endregion
 
-    //region IWithStructure implementation
+    // region IWithStructure implementation
     get structure() {
       throw new Error("abstract");
     },
-    //endregion
+    // endregion
 
-    //region Collection-like methods
+    // region Collection-like methods
     has: function(attrName) {
       return this.get(attrName, false) != null;
     },
@@ -89,7 +93,7 @@ define([
     getExisting: function(attrName) {
       return this.get(attrName, true);
     },
-    //endregion
+    // endregion
 
     _onStructurePositionAdded: function() {
       this.add(null);

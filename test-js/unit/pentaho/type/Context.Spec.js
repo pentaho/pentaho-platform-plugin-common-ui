@@ -21,7 +21,7 @@ define([
 
   "use strict";
 
-  /*global describe:false, it:false, expect:false, beforeEach:false, afterEach:false, Promise:false, spyOn:false*/
+  /* global describe:false, it:false, expect:false, beforeEach:false, afterEach:false, Promise:false, spyOn:false*/
 
   // Use alternate, promise-aware version of `it`.
   var it = testUtils.itAsync;
@@ -196,7 +196,7 @@ define([
 
     describe("#get|getAsync(typeRef)", function() {
 
-      //region get test helpers
+      // region get test helpers
       /**
        * Each of the following tests is performed both synchronously and asynchronously
        * using a single tester function.
@@ -241,7 +241,7 @@ define([
 
         return Promise.resolve(result);
       }
-      //endregion
+      // endregion
 
       it("should have preloaded standard primitive types, facets and filters", function() {
 
@@ -574,7 +574,7 @@ define([
           });
         });
 
-        //region complex
+        // region complex
         it("should be able to create an anonymous complex type with base complex", function() {
 
           return testGet(function(sync, Context) {
@@ -592,9 +592,9 @@ define([
             });
           });
         });
-        //endregion
+        // endregion
 
-        //region list
+        // region list
         it("should be able to create a list type using generic notation", function() {
 
           return testGet(function(sync, Context) {
@@ -646,9 +646,9 @@ define([
                 errorMatch.argInvalid("typeRef"));
           });
         });
-        //endregion
+        // endregion
 
-        //region refinement
+        // region refinement
         it("should be able to create a refinement type using generic notation", function() {
 
           return testGet(function(sync, Context) {
@@ -666,9 +666,9 @@ define([
             });
           });
         });
-        //endregion
+        // endregion
 
-        //region temporary ids
+        // region temporary ids
         it("should allow creating a type that contains a temporary type id", function() {
 
           return testGet(function(sync, Context) {
@@ -788,7 +788,7 @@ define([
           });
         });
 
-        //endregion
+        // endregion
       });
 
       describe("type factory function", function() {

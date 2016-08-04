@@ -27,33 +27,33 @@ define([
       this._ord   = arg.required(keyArgs, "ordinal", "keyArgs");
     },
 
-    //region IListElement
+    // region IListElement
     elemName: "axis position",
-    //endregion
+    // endregion
 
-    //region IWithKey implementation
+    // region IWithKey implementation
     keyName: "key",
 
     get key() {
       return this._cells.key;
     },
-    //endregion
+    // endregion
 
-    //region IWithOrdinal implementation
+    // region IWithOrdinal implementation
     get ordinal() {
       return this._ord;
     },
-    //endregion
+    // endregion
 
     get cells() {
       return this._cells;
     },
-    //endregion
+    // endregion
 
-    //region ISpecifiable implementation
+    // region ISpecifiable implementation
     toSpec: function() {
       return this._cells.toSpec();
     }
-    //endregion
+    // endregion
   });
 });

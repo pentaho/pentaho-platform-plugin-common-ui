@@ -141,7 +141,7 @@ define([
           return dim.type.format().percent()(pct);
         }
       }
-    },
+    }
   });
 
 });

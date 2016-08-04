@@ -52,7 +52,7 @@ define([
       /**
        * Gets the event type.
        *
-       * @type string
+       * @type {string}
        * @readonly
        */
       get type() {

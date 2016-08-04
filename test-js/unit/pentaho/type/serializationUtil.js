@@ -19,7 +19,7 @@ define([
 
   "use strict";
 
-  /*global it:false, expect:false, JSON:false */
+  /* global it:false, expect:false, JSON:false */
 
   return {
     fillSpec: fillSpec,

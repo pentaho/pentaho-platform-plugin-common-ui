@@ -19,7 +19,7 @@ define([
 
   "use strict";
 
-  /*global describe:false, it:false, expect:false, beforeEach:false, spyOn:false*/
+  /* global describe:false, it:false, expect:false, beforeEach:false, spyOn:false*/
 
   var context = new Context();
   var Complex = context.get("pentaho/type/complex");

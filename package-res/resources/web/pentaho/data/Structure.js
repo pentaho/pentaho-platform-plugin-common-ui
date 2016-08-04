@@ -31,7 +31,7 @@ define([
       this.base(keyArgs);
     },
 
-    //region List implementation
+    // region List implementation
     _cachedKeyArgs: null,
 
     elemClass: StructurePosition,
@@ -56,7 +56,7 @@ define([
       ka.ordinal = ordinal;
       return ka;
     },
-    //endregion
+    // endregion
 
     getByOrdinalOrName: function(ordinalOrName, assertExists) {
       return typeof ordinalOrName === "string" ? this.get(ordinalOrName, assertExists) : this[ordinalOrName];
@@ -67,14 +67,14 @@ define([
       return structPos ? structPos.ordinal : -1;
     },
 
-    //region ISpecifiable implementation
+    // region ISpecifiable implementation
     toSpec: function(keyArgs) {
       return this.map(
           arg.optional(keyArgs, "shareModel", false)
               ? structurePositionAttribute
               : structurePositionAttributeName);
     }
-    //endregion
+    // endregion
   });
 
   function structurePositionAttribute(pos) { return pos.attribute; }

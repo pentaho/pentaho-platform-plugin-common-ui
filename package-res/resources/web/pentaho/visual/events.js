@@ -49,8 +49,8 @@ define(function() {
    */
   function events_addListener(object, eventName, func) {
     if(object) {
-      var events   = (object.__events__ || (object.__events__ = {})),
-          handlers = (events[eventName] || (events[eventName] = []));
+      var events   = (object.__events__ || (object.__events__ = {}));
+      var handlers = (events[eventName] || (events[eventName] = []));
       handlers.push(func);
     }
   }

@@ -24,7 +24,7 @@ define([
       sizeAxisUseAbs:  false,
       sizeAxisRatio:   1 / 5,
       sizeAxisRatioTo: "height", // plot area client height
-      sizeAxisOriginIsZero: true,
+      sizeAxisOriginIsZero: true
     },
 
     /* Override Default map */
@@ -41,7 +41,7 @@ define([
 
       this.base();
 
-      /*jshint laxbreak:true*/
+      /* jshint laxbreak:true*/
       // ~ DOT SIZE
       this.options.axisOffset = this._isRoleBound("size")
           ? (1.1 * this.options.sizeAxisRatio / 2) // Axis offset like legacy analyzer

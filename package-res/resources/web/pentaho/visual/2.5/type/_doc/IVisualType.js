@@ -23,7 +23,6 @@
  * * Analyzer's VizHelper#placeholderImageSrc ? Or imageClassName?? Through dynamic css loading?
  */
 
-
 /**
  * The **visual type** interface is a **documentation artifact** that describes
  * the JavaScript structure of the metadata that describes a type of visual.

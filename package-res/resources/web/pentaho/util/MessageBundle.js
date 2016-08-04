@@ -228,13 +228,13 @@ define([
    * @param {string} key    Dictionary message's key.
    */
   function buildPath(value, key) {
-    var path = key.split('.');
+    var path = key.split(".");
     var obj = this;
 
-    for (var i = 0, ic = path.length; i != ic; ++i) {
+    for(var i = 0, ic = path.length; i !== ic; ++i) {
       var p = path[i];
 
-      if(i < ic-1) {
+      if(i < ic - 1) {
         if(!O.hasOwn(obj, p)) {
           obj[p] = {};
         }

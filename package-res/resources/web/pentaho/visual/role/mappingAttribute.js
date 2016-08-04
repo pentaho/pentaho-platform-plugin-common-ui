@@ -59,7 +59,7 @@ define([
           var count = 0;
           var name = null;
 
-          //jshint -W089
+          /* eshint guard-for-in: 0 */
           for(var p in spec) {
             count++;
             if(count > 1 || p !== "name") break;

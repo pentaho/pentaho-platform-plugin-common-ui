@@ -36,7 +36,7 @@ define([
     standardFacets, standardFilters) {
 
   "use strict";
-  
+
   return {
     // types
     "instance": instanceFactory,

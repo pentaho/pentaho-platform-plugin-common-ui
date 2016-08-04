@@ -163,100 +163,100 @@ define([
    * @constructor
    */
   var ColorPaletteRegistry = Base.extend("pentaho.visual.color.PaletteRegistry",
-  /** @lends pentaho.visual.color.PaletteRegistry# */{
+    /** @lends pentaho.visual.color.PaletteRegistry# */{
 
-    constructor: function() {
-      this._paletteList = [];
-      this._paletteMap  = {};
-    },
+      constructor: function() {
+        this._paletteList = [];
+        this._paletteMap  = {};
+      },
 
-    /**
-     * Adds a specified color palette.
-     *
-     * @param {pentaho.visual.color.IColorPalette} palette The color palette.
-     * @chainable
-     */
-    add: function(palette) {
-      if(!palette) throw new Error("Argument required 'palette'.");
+      /**
+       * Adds a specified color palette.
+       *
+       * @param {pentaho.visual.color.IColorPalette} palette The color palette.
+       * @return {!pentaho.visual.color.PaletteRegistry} This instance.
+       */
+      add: function(palette) {
+        if(!palette) throw new Error("Argument required 'palette'.");
 
-      var name = palette.name,
-          current = O.hasOwn(this._paletteMap, name) ? this._paletteMap[name] : null;
+        var name = palette.name;
+        var current = O.hasOwn(this._paletteMap, name) ? this._paletteMap[name] : null;
 
-      if(!current)
-        this._paletteList.push(palette);
-      else
-        this._paletteList.splice(this._paletteList.indexOf(current), 1, palette);
+        if(!current)
+          this._paletteList.push(palette);
+        else
+          this._paletteList.splice(this._paletteList.indexOf(current), 1, palette);
 
-      this._paletteMap[name] = palette;
-      return this;
-    },
+        this._paletteMap[name] = palette;
+        return this;
+      },
 
-    /**
-     * Gets an array with all registered color palettes.
-     *
-     * Do **not** modify the returned array.
-     *
-     * @return {Array.<pentaho.visual.color.IColorPalette>} An array of color palettes.
-     */
-    getAll: function() {
-      return this._paletteList;
-    },
+      /**
+       * Gets an array with all registered color palettes.
+       *
+       * Do **not** modify the returned array.
+       *
+       * @return {Array.<pentaho.visual.color.IColorPalette>} An array of color palettes.
+       */
+      getAll: function() {
+        return this._paletteList;
+      },
 
-    /**
-     * Sets the default color palette, given its name.
-     *
-     * If this method is not called,
-     * or if the _name_ argument is not specified,
-     * the default palette becomes the first palette.
-     *
-     * The default palette is obtained by calling
-     * {@link pentaho.visual.color.PaletteRegistry#get}
-     * with no arguments.
-     *
-     * @example
-     * <caption>
-     *   Obtaining the default color palette.
-     * </caption>
-     *
-     * var defaultPalette = paletteRegistry.get();
-     *
-     * @param {String} [name] The name of the default palette.
-     * @return {pentaho.visual.color.PaletteRegistry} This instance.
-     */
-    setDefault: function(name) {
-      if(name && !O.hasOwn(this._paletteMap, name))
-        throw new Error(
-          "Invalid argument 'name'. " +
-          "A palette with name '" + name + "' is not defined.");
+      /**
+       * Sets the default color palette, given its name.
+       *
+       * If this method is not called,
+       * or if the _name_ argument is not specified,
+       * the default palette becomes the first palette.
+       *
+       * The default palette is obtained by calling
+       * {@link pentaho.visual.color.PaletteRegistry#get}
+       * with no arguments.
+       *
+       * @example
+       * <caption>
+       *   Obtaining the default color palette.
+       * </caption>
+       *
+       * var defaultPalette = paletteRegistry.get();
+       *
+       * @param {String} [name] The name of the default palette.
+       * @return {pentaho.visual.color.PaletteRegistry} This instance.
+       */
+      setDefault: function(name) {
+        if(name && !O.hasOwn(this._paletteMap, name))
+          throw new Error(
+            "Invalid argument 'name'. " +
+            "A palette with name '" + name + "' is not defined.");
 
-      this._defaultName = name || null;
-      return this;
-    },
+        this._defaultName = name || null;
+        return this;
+      },
 
-    /**
-     * Gets a specified or default color palette.
-     *
-     * When the name of the color palette is not specified,
-     * the default color palette is returned.
-     *
-     * @param {String} [name] The name of the desired color palette.
-     * @return {pentaho.visual.color.IColorPalette} The color palette.
-     */
-    get: function(name) {
-      if(!name && !(name = this._defaultName)) {
-        return this._paletteList.length ? this._paletteList[0] : null;
+      /**
+       * Gets a specified or default color palette.
+       *
+       * When the name of the color palette is not specified,
+       * the default color palette is returned.
+       *
+       * @param {String} [name] The name of the desired color palette.
+       * @return {pentaho.visual.color.IColorPalette} The color palette.
+       */
+      get: function(name) {
+        if(!name && !(name = this._defaultName)) {
+          return this._paletteList.length ? this._paletteList[0] : null;
+        }
+
+        return O.hasOwn(this._paletteMap, name) ? this._paletteMap[name] : null;
       }
-
-      return O.hasOwn(this._paletteMap, name) ? this._paletteMap[name] : null;
-    }
-  });
+    });
 
   // ---------------
 
   var paletteRegistry = new ColorPaletteRegistry();
 
   paletteRegistry.add({
-    name: 'palette 1', // TODO: Give this a meaningful name!
+    name: "palette 1", // TODO: Give this a meaningful name!
     colors: [
       "#336699",
       "#99CCFF",
@@ -275,7 +275,7 @@ define([
   });
 
   paletteRegistry.add({
-    name: 'palette 2', // TODO: Give this a meaningful name!
+    name: "palette 2", // TODO: Give this a meaningful name!
     colors: [
       "#880a0f",
       "#b09a6b",
@@ -292,7 +292,7 @@ define([
   });
 
   paletteRegistry.add({
-    name: 'palette 3', // TODO: Give this a meaningful name!
+    name: "palette 3", // TODO: Give this a meaningful name!
     colors: [
       "#387179",
       "#626638",

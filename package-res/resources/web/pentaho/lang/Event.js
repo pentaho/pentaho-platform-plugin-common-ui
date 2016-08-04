@@ -126,7 +126,6 @@ define([
       return this._cancelReason;
     },
 
-
     /**
      * Cancels the event.
      *

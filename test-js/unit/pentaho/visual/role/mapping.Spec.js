@@ -17,7 +17,7 @@ define([
 
   "use strict";
 
-  /*global TypeError:false */
+  /* global TypeError:false */
 
   function getValue(object) {
     return object.value;
@@ -38,7 +38,7 @@ define([
       MappingAttribute = context.get(attributeFactory);
     });
 
-    //region helper methods
+    // region helper methods
     /**
      * Creates a visual model that has a property visualRole with the given mapping of type Mapping
      */
@@ -109,7 +109,7 @@ define([
       // this way, errors are shown in the console...
       expect(complex.validate()).toBe(null);
     }
-    //endregion
+    // endregion
 
     describe("#isMapped", function() {
       var DerivedMapping;

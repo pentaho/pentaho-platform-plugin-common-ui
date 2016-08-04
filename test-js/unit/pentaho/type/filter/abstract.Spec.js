@@ -24,7 +24,7 @@ define([
 
   "use strict";
 
-  /*global describe:false, it:false, expect:false, beforeEach:false, spyOn:false*/
+  /* global describe:false, it:false, expect:false, beforeEach:false, spyOn:false*/
 
   describe("pentaho.type.filter.Abstract", function() {
 

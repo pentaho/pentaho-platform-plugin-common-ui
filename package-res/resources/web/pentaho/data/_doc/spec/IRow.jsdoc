@@ -21,7 +21,6 @@
  * @typedef {pentaho.data.spec.IRow|pentaho.data.spec.Cell[]} pentaho.data.spec.Row
  */
 
-
 /**
  * @classdesc The `spec.IRow` interface
  * describes a row's structured specification.

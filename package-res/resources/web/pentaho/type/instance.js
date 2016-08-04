@@ -110,13 +110,13 @@ define([
       // Properties to ignore within extend
       extend_exclude: {_: 1},
 
-      //region type property
+      // region type property
       _type: null, // Set on Type#_init
 
       /**
        * Gets the type of this instance.
        *
-       * @type pentaho.type.Type
+       * @type {pentaho.type.Type}
        * @readonly
        * @see pentaho.type.Instance.type
        * @see pentaho.type.Type#instance
@@ -136,9 +136,9 @@ define([
       set type(config) {
         // Class.implement essentially just calls Class#extend.
         if(config) this.type.extend(config);
-      }, //endregion
+      }, // endregion
 
-      //region serialization
+      // region serialization
       /**
        * Creates a top-level specification that describes this instance.
        *
@@ -200,14 +200,14 @@ define([
       toJSON: function() {
         return this.toSpec({isJson: true});
       }
-      //endregion
+      // endregion
     }, /** @lends pentaho.type.Instance */{
 
-      //region type property
+      // region type property
       /**
        * Gets the type of this instance constructor.
        *
-       * @type pentaho.type.Type
+       * @type {pentaho.type.Type}
        * @readonly
        */
       get type() {
@@ -222,7 +222,7 @@ define([
       //   Type#implementStatic(.).instance.constructor
       set type(config) {
         if(config) this.type.constructor.implementStatic(config);
-      }, //endregion
+      }, // endregion
 
       // override the documentation to specialize the argument types.
       /**
@@ -260,7 +260,6 @@ define([
         return this.base(name, instSpec, classSpec, keyArgs);
       },
 
-      //@override
       /**
        * See Base.js
        * @ignore

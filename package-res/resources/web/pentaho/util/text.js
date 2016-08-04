@@ -35,8 +35,8 @@ define(function() {
      */
     firstUpperCase: function(s) {
       if(s) {
-        var c  = s.charAt(0),
-            cU = c.toUpperCase();
+        var c = s.charAt(0);
+        var cU = c.toUpperCase();
         if(c !== cU) s = cU + s.substr(1);
       }
       return s;

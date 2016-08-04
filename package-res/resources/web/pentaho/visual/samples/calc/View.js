@@ -5,13 +5,14 @@ define([
 
   "use strict";
 
-  /*global document:false*/
+  /* global document:false*/
 
   return Visual.extend(/** @lends pentaho.visual.samples.calc.View# */{
     /**
      * @alias View
      * @memberOf pentaho.visual.samples.calc
      * @class
+     * @extends pentaho.visual.base.View
      * @classDesc The `View` of the calculator visualization.
      *
      * @description Creates a calculator `View`.
@@ -59,17 +60,19 @@ define([
     },
 
     _calculate: function() {
-      var dataTable = this.model.getv("data"),
-          R = dataTable.getNumberOfRows(),
-          measureAttrName = this.model.measure.attributes.at(0).name,
-          jMeasure = dataTable.model.attributes.get(measureAttrName).ordinal,
-          getValue = function(k) {
+      var dataTable = this.model.getv("data");
+      var R = dataTable.getNumberOfRows();
+      var measureAttrName = this.model.measure.attributes.at(0).name;
+      var jMeasure = dataTable.model.attributes.get(measureAttrName).ordinal;
+      var getValue = function(k) {
             var v = dataTable.getValue(k, jMeasure);
             return !isNaN(v) && v != null ? v : null;
-          },
-          i;
+          };
+      var value = null;
+      var i;
+      var vi;
 
-      var value = null, vi;
+      /* eslint default-case: 0 */
       switch(this.model.operation) {
         case "max":
           for(i = 0; i < R; i++)

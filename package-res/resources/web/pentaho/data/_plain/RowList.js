@@ -30,11 +30,11 @@ define([
       this.base(keyArgs);
     },
 
-    //region IListElement
+    // region IListElement
     elemName: "row",
-    //endregion
+    // endregion
 
-    //region List implementation
+    // region List implementation
     _cachedKeyArgs: null,
 
     elemClass: Row,
@@ -48,7 +48,7 @@ define([
         ? O.setPrototypeOf({rows: this}, keyArgs)
         : (this._cachedKeyArgs || (this._cachedKeyArgs = {rows: this}));
     },
-    //endregion
+    // endregion
 
     _onStructurePositionAdded: function() {
       this.cellTupleBase._onStructurePositionAdded();

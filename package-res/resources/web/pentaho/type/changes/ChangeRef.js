@@ -80,11 +80,11 @@ define([
      * @readOnly
      */
     get projectedReferences() {
-      return this._updateReferences(this.owner._refs, /*mutate:*/false);
+      return this._updateReferences(this.owner._refs, /* mutate: */false);
     },
 
     apply: function() {
-      this.owner._refs = this._updateReferences(this.owner._refs, /*mutate:*/true);
+      this.owner._refs = this._updateReferences(this.owner._refs, /* mutate: */true);
     },
 
     /**
@@ -108,13 +108,17 @@ define([
           refs = ReferenceList.to(refs.slice());
         }
 
-        if(refsRem) refsRem.forEach(function(aref) {
-          refs.remove(aref.container, aref.property);
-        });
+        if(refsRem) {
+          refsRem.forEach(function(aref) {
+            refs.remove(aref.container, aref.property);
+          });
+        }
 
-        if(refsAdd) refsAdd.forEach(function(aref) {
-          refs.add(aref.container, aref.property);
-        });
+        if(refsAdd) {
+          refsAdd.forEach(function(aref) {
+            refs.add(aref.container, aref.property);
+          });
+        }
       }
 
       return refs;

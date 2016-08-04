@@ -17,7 +17,7 @@ define(function() {
 
   "use strict";
 
-  /*global it:false, expect:false, JSON:false */
+  /* global it:false, expect:false, JSON:false */
 
   return {
     createRoot: createRoot,

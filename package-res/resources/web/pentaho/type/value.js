@@ -87,7 +87,7 @@ define([
        *
        * The default implementation returns the result of calling `toString()`.
        *
-       * @type string
+       * @type {string}
        * @readonly
        */
       get key() {
@@ -123,7 +123,7 @@ define([
         return this === other || this.key === other.key;
       },
 
-      //region validation
+      // region validation
 
       /**
        * Determines if this value is a **valid instance** of its type.
@@ -169,9 +169,9 @@ define([
         var errors = this.validate();
         if(errors) throw errors[0];
       },
-      //endregion
+      // endregion
 
-      //region configuration
+      // region configuration
       /**
        * Configures this value with a given configuration.
        * @param {?any} config - The configuration.
@@ -194,9 +194,9 @@ define([
       _configure: function(config) {
         // Nothing configurable at this level
       },
-      //endregion
+      // endregion
 
-      //region serialization
+      // region serialization
       /**
        * Creates a specification that describes this value.
        *
@@ -245,7 +245,7 @@ define([
        *
        * @return {!pentaho.type.spec.UInstance} A specification of this value.
        */
-      //endregion
+      // endregion
 
       /**
        * Gets the type of this instance.
@@ -259,7 +259,7 @@ define([
 
         get isValue() { return true; },
 
-        //region equality
+        // region equality
         /**
          * Gets a value that indicates if two given values are equal.
          *
@@ -279,9 +279,9 @@ define([
                  (va != null && vb != null &&
                   (va.constructor === vb.constructor) && va.equals(vb));
         },
-        //endregion
+        // endregion
 
-        //region validation
+        // region validation
         /**
          * Determines if a value is a **valid instance** of this type.
          *
@@ -352,9 +352,9 @@ define([
         validateInstance: function(value) {
           return value.validate();
         },
-        //endregion
+        // endregion
 
-        //region serialization
+        // region serialization
         toSpecInContext: function(keyArgs) {
           if(!keyArgs) keyArgs = {};
 
@@ -390,7 +390,7 @@ define([
 
           return this.base(spec, keyArgs) || any;
         }
-        //endregion
+        // endregion
       }
     }, /** @lends pentaho.type.Value */{
 
@@ -453,7 +453,7 @@ define([
         return Refinement.extend(name || "", instSpec);
       }
     },
-    /*keyArgs:*/{
+    /* keyArgs: */{
       isRoot: true
     }).implement({
       type: bundle.structured.value

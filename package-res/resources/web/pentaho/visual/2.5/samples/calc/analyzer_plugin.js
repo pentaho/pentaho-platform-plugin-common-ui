@@ -15,7 +15,7 @@
  */
 define(function() {
 
-  /*global analyzerPlugins:true, cv:true, CONTEXT_PATH:true*/
+  /* global analyzerPlugins:true, cv:true, CONTEXT_PATH:true*/
 
   analyzerPlugins = typeof analyzerPlugins == "undefined" ? [] : analyzerPlugins;
 

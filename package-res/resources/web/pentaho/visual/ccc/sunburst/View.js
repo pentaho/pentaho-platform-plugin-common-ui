@@ -116,7 +116,7 @@ define([
                 return pvMainLabel.visible();
               })
               .text(function(scene) {
-                /*jshint laxbreak:true*/
+                /* jshint laxbreak:true*/
                 var pvMainLabel = this.proto;
                 return !pvMainLabel.text()
                     ? ""

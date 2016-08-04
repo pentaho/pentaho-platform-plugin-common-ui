@@ -36,7 +36,7 @@ define([
 
   "use strict";
 
-  /*global alert:false, cv:false */
+  /* global alert:false, cv:false */
 
   var ruleStrokeStyle = "#808285",  // "#D8D8D8",  // #f0f0f0
       lineStrokeStyle = "#D1D3D4",  // "#D1D3D4"; //"#A0A0A0"; // #D8D8D8",// #f0f0f0
@@ -141,7 +141,7 @@ define([
 
   return View.extend(/** @lends pentaho.visual.ccc.base.View# */{
 
-    //region PROPERTIES
+    // region PROPERTIES
     _options: baseOptions,
 
     // Hide discrete null members in tooltip.
@@ -178,9 +178,9 @@ define([
     _discreteColorRole: "columns",
 
     _useLabelColor: true,
-    //endregion
+    // endregion
 
-    //region VizAPI implementation
+    // region VizAPI implementation
 
     _updateAll: function() {
       this._dataTable = this.model.data;
@@ -230,9 +230,9 @@ define([
         this._chart = null;
       }
     },
-    //endregion
+    // endregion
 
-    //region Helpers
+    // region Helpers
 
     _updateSelection: function() {
       var dataFilter = this.model.selectionFilter;
@@ -256,7 +256,7 @@ define([
       var alreadyIn = {};
       for(var k = 0, N = selectedItems.getNumberOfRows(); k < N; k++) {
 
-        //jshint -W083
+        // jshint -W083
         var datumFilterSpec = props.reduce(function(datumFilter, prop) {
           var value = selectedItems.getValue(k, prop.ordinal);
           datumFilter[prop.cccDimName] = value;
@@ -319,9 +319,9 @@ define([
         "readers", [],
         "calculations", []);
     },
-    //endregion
+    // endregion
 
-    //region VISUAL MAP
+    // region VISUAL MAP
     _getVisualMap: function() {
       return this._visualMap || (this._visualMap = this._buildVisualMap());
     },
@@ -335,7 +335,7 @@ define([
             if(this[roleName]) {
               var mapping = model.get(roleName);
 
-              /*jshint laxbreak:true*/
+              /* jshint laxbreak:true*/
               visualMap[roleName] = mapping
                   ? mapping.attributes.toArray(function(mappingAttr) { return mappingAttr.name; })
                   : [];
@@ -417,7 +417,7 @@ define([
     _isRoleBound: function(roleName) {
       return !!this._getAttributeInfosOfRole(roleName);
     },
-    //endregion
+    // endregion
 
     _setNullInterpolationMode: function(options, value) {
     },
@@ -451,7 +451,7 @@ define([
         options.base_fillStyle = fillStyle;
       }
 
-      //region label
+      // region label
       value = model.labelColor;
       if(value != null) {
         options.axisLabel_textStyle = options.axisTitleLabel_textStyle = value;
@@ -468,7 +468,7 @@ define([
           options.titleFont = (value + 2) + "px " + labelFontFamily;
         }
       }
-      //endregion
+      // endregion
 
       options.legend = value = model.showLegend;
       if(value) {
@@ -562,7 +562,7 @@ define([
         //   (e.g.: for a "location" geo role attribute,
         //   Analyzer automatically adds "latitude" and "longitude" attributes)
 
-        /*jshint validthis:true*/
+        /* jshint validthis:true*/
 
         var attrName = attr.name,
             roleName = this._getFirstRoleOfAttribute(attrName);
@@ -775,7 +775,7 @@ define([
           // Role may be unbound.
           var ais = def.getOwn(visualMapInfo, roleName);
           if(ais) ais.forEach(function(ai) {
-            /*jshint laxbreak:true*/
+            /* jshint laxbreak:true*/
             ai.cccDimName = isGenericGroup
               ? cccDimGroup
               : pvc.buildIndexedId(cccDimGroup, ordinal++);
@@ -854,7 +854,7 @@ define([
       }
     },
 
-    //region COLOR SCALE
+    // region COLOR SCALE
     _getColorScaleKind: function() {
       return "discrete";
     },
@@ -933,7 +933,7 @@ define([
     },
 
     _getDiscreteColorGems: function() {
-      /*jshint laxbreak:true*/
+      /* jshint laxbreak:true*/
       var colorAttrInfos = this._getVisualMapInfo()[this._discreteColorRole];
       return colorAttrInfos
           ? colorAttrInfos.filter(function(attrInfo) { return !attrInfo.isMeasureDiscrim; })
@@ -1012,7 +1012,7 @@ define([
       }
       return mapOut;
     },
-    //endregion
+    // endregion
 
     _configureTrends: function() {
       var options = this.options,
@@ -1105,7 +1105,7 @@ define([
       }
     },
 
-    //region LABELS
+    // region LABELS
     _configureLabels: function(options, model) {
       var valuesAnchor = model.labelsOption,
           valuesVisible = !!valuesAnchor && valuesAnchor !== "none";
@@ -1134,7 +1134,7 @@ define([
 
       options.valuesAnchor = valuesAnchor;
     },
-    //endregion
+    // endregion
 
     _configureMultiChart: function() {
       var options = this.options;
@@ -1161,7 +1161,7 @@ define([
         options.multiChartOverflow = multiChartOverflow.toLowerCase();
     },
 
-    //region TOOLTIP
+    // region TOOLTIP
     _configureTooltip: function() {
       var me = this;
       this.options.tooltipFormat = function(scene) {
@@ -1197,9 +1197,9 @@ define([
 
       return tooltipLines.join("<br />");
     },
-    //endregion
+    // endregion
 
-    //region LEGEND
+    // region LEGEND
     _isLegendVisible: function() {
       var colorRole = this._discreteColorRole;
       return !!colorRole && this._getRoleDepth(colorRole, /*includeMeasureDiscrim:*/true) > 0;
@@ -1238,7 +1238,7 @@ define([
       if(!("legendAlign" in options))
         options.legendAlign = isTopOrBottom ? "center" : "middle";
     },
-    //endregion
+    // endregion
 
     // Logic that depends on width and height
     _prepareLayout: function(options) {
@@ -1295,7 +1295,7 @@ define([
       if(this._chart.data) this._updateSelection();
     },
 
-    //region SELECTION
+    // region SELECTION
     _configureSelection: function() {
       var me = this;
       this.options.userSelectionAction = function(cccSelections) {
@@ -1430,9 +1430,9 @@ define([
       return selectionsKept;
     },
 
-    //endregion
+    // endregion
 
-    //region DOUBLE-CLICK
+    // region DOUBLE-CLICK
     _configureDoubleClick: function() {
       var me = this;
       this.options.doubleClickAction = function(scene) {
@@ -1448,9 +1448,9 @@ define([
     _onDoubleClick: function(complex) {
       return this.model.executeAction(this._complexToFilter(complex));
     },
-    //endregion
+    // endregion
 
-    //region UTILITY
+    // region UTILITY
 
     _complexToFilter: function(complex) {
       // Add each axis' formulas to the selection
@@ -1464,7 +1464,7 @@ define([
 
       return filter;
     }
-    //endregion
+    // endregion
   }, /** @lends pentaho.visual.ccc.base.View */{
 
     /**

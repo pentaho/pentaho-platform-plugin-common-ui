@@ -30,8 +30,8 @@ define([
 
   return function(context) {
 
-    var Value = context.get("pentaho/type/value"),
-        _refinementType;
+    var Value = context.get("pentaho/type/value");
+    var _refinementType;
 
     /**
      * @name pentaho.type.Refinement.Type
@@ -94,7 +94,7 @@ define([
      *
      * ### Attributes of refinement types
      *
-     * A refinement type is a [Value]{@link pentaho.type.Value.Type} type 
+     * A refinement type is a [Value]{@link pentaho.type.Value.Type} type
      * and, as such, metadata can be specified for it.
      *
      * Conveniently,
@@ -290,7 +290,7 @@ define([
 
         id: module.id,
 
-        //region facets property
+        // region facets property
         _facets: [],
 
         /**
@@ -324,7 +324,7 @@ define([
             addRefinement.call(this, values);
 
           function addRefinement(Facet) {
-            /*jshint validthis:true*/
+            /* jshint validthis:true*/
 
             if(typeof Facet === "string") {
               Facet = resolveFacet(Facet);
@@ -349,9 +349,9 @@ define([
             return localRequire(id);
           }
         },
-        //endregion
+        // endregion
 
-        //region of property
+        // region of property
         _of: null,
 
         /**
@@ -382,9 +382,9 @@ define([
           // Throws when set again with a different value.
           O.setConst(this, "_of", ofType);
         },
-        //endregion
+        // endregion
 
-        //region abstract property
+        // region abstract property
         /**
          * Gets a value that indicates if this type is abstract.
          *
@@ -406,9 +406,9 @@ define([
           if((!!value) !== this.isAbstract)
             throw error.operInvalid("Attribute cannot be changed.");
         },
-        //endregion
+        // endregion
 
-        get isRefinement() { 
+        get isRefinement() {
           return true;
         },
 
@@ -452,7 +452,7 @@ define([
           return !!superType && (this.base(superType) || (!!(of = this.of) && of.isSubtypeOf(superType)));
         },
 
-        //region label property
+        // region label property
         _label: undefined, // local Refinement root marker
 
         get label() {
@@ -466,9 +466,9 @@ define([
             this.base();
           }
         },
-        //endregion
+        // endregion
 
-        //region description property
+        // region description property
         _description: undefined, // local Refinement root marker
 
         get description() {
@@ -482,9 +482,9 @@ define([
             this.base();
           }
         },
-        //endregion
+        // endregion
 
-        //region category property
+        // region category property
         _category: undefined, // local Refinement root marker
 
         get category() {
@@ -498,9 +498,9 @@ define([
             this.base();
           }
         },
-        //endregion
+        // endregion
 
-        //region helpUrl property
+        // region helpUrl property
         _helpUrl: undefined, // local Refinement root marker
 
         get helpUrl() {
@@ -514,9 +514,9 @@ define([
             this.base();
           }
         },
-        //endregion
+        // endregion
 
-        //region isBrowsable property
+        // region isBrowsable property
         _isBrowsable: undefined, // local Refinement root marker
 
         get isBrowsable() {
@@ -530,9 +530,9 @@ define([
             this.base();
           }
         },
-        //endregion
+        // endregion
 
-        //region isAdvanced property
+        // region isAdvanced property
         _isAdvanced: undefined, // local Refinement root marker
 
         get isAdvanced() {
@@ -546,9 +546,9 @@ define([
             this.base();
           }
         },
-        //endregion
+        // endregion
 
-        //region styleClass
+        // region styleClass
         // Local property requires no change to implementation.
 
         get inheritedStyleClasses() {
@@ -572,9 +572,9 @@ define([
 
           return styleClasses;
         },
-        //endregion
+        // endregion
 
-        //region ordinal property
+        // region ordinal property
         _ordinal: undefined, // local Refinement root marker
 
         get ordinal() {
@@ -588,9 +588,9 @@ define([
             this.base();
           }
         },
-        //endregion
+        // endregion
 
-        //region view property
+        // region view property
         _defaultView: undefined, // local Refinement root marker
 
         get defaultView() {
@@ -604,7 +604,7 @@ define([
             this.base();
           }
         },
-        //endregion
+        // endregion
 
         // Redirect to of.
         is: function(value) {
@@ -620,7 +620,7 @@ define([
           return of.create.apply(of, arguments);
         },
 
-        //region validation
+        // region validation
         /**
          * Determines if a value,
          * that _is an instance of this type_,
@@ -673,9 +673,9 @@ define([
             return typeUtil.combineErrors(errors, Facet.validate.call(this, value));
           }.bind(this), null);
         },
-        //endregion
+        // endregion
 
-        //region serialization
+        // region serialization
         _fillSpecInContext: function(spec, keyArgs) {
           var any = false;
 
@@ -709,7 +709,7 @@ define([
           //validateInstance
           return any;
         }
-        //endregion
+        // endregion
       }
     }, /** @lends pentaho.type.Refinement */{
       // override the documentation to specialize the argument types.

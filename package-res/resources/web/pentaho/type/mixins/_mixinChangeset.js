@@ -41,7 +41,7 @@ define([
     /**
      * Gets the object with the changes to the set of properties.
      *
-     * @type !pentaho.type.ComplexChangeset
+     * @type {!pentaho.type.ComplexChangeset}
      * @readonly
      */
     get changeset() {

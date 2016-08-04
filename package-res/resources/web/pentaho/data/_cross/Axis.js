@@ -31,7 +31,7 @@ define([
       this.base();
     },
 
-    //region List implementation
+    // region List implementation
     _cachedKeyArgs: null,
     _cachedPosSpec: null,
 
@@ -52,15 +52,15 @@ define([
 
       return pos;
     },
-    //endregion
+    // endregion
 
-    //region Collection implementation
+    // region Collection implementation
 
     // Allow get/has by using a positionSpec/cellSpecs
     _castKey: function(key) {
       return (typeof key === "string") ? key : this.toCellTuple(key);
     },
-    //endregion
+    // endregion
 
     intern: function(cellSpecs) {
       var cellTuple = this.toCellTuple(cellSpecs);
@@ -68,11 +68,11 @@ define([
       return this.get(cellTuple.key) || this.add(cellTuple);
     },
 
-    //region ISpecifiable implementation
+    // region ISpecifiable implementation
     toSpec: function() {
       return this.map(function(axisPos) { return axisPos.toSpec(); });
     }
-    //endregion
+    // endregion
   })
   .implement(WithStructure, WithCellTupleBase);
 });

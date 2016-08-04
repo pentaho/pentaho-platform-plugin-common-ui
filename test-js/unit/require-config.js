@@ -24,7 +24,7 @@
 (function() {
   "use strict";
 
-  /*global requireCfg:false, window:false, KARMA_DEBUG:false*/
+  /* global requireCfg:false, window:false, KARMA_DEBUG:false*/
 
   // Karma serves files from '/base'
 
@@ -47,7 +47,7 @@
   requireCfg.shim["common-ui/jquery-clean"] = {
     exports: "$",
     init: function() {
-      /*global $:false*/
+      /* global $:false*/
       return $.noConflict(true);
     }
   };

@@ -79,7 +79,7 @@ define([
       this._columns = this._getSourceColumns();
     },
 
-    //region View Source
+    // region View Source
     /**
      * Gets the view's source table.
      *
@@ -177,14 +177,14 @@ define([
     getSourceRowIndex: function(rowIndex) {
       return this._rows ? this._rows[rowIndex] : rowIndex;
     },
-    //endregion
+    // endregion
 
     /** @inheritdoc */
     getCell: function(rowIndex, colIndex) {
       return this._source.getCell(this.getSourceRowIndex(rowIndex), this.getSourceColumnIndex(colIndex));
     },
 
-    //region ITableReadOnly
+    // region ITableReadOnly
     // table
     /** @inheritdoc */
     getNumberOfColumns: function() {
@@ -232,9 +232,9 @@ define([
     getLabel: function(rowIndex, colIndex) {
       return this._source.getLabel(this.getSourceRowIndex(rowIndex), this.getSourceColumnIndex(colIndex));
     },
-    //endregion
+    // endregion
 
-    //region ITable
+    // region ITable
     /** @inheritdoc */
     addColumn: function(colSpec, keyArgs) {
       var colIndex = this._source.addColumn(colSpec, keyArgs);
@@ -246,7 +246,7 @@ define([
       // TODO: missing addRow implementation?
       throw new Error("Not implemented");
     },
-    //endregion
+    // endregion
 
     /**
      * Gets an array with all of the source column indexes.
@@ -256,8 +256,8 @@ define([
      * @return {number[]} An array of source column indexes.
      */
     _getSourceColumns: function() {
-      var j = this._source.getNumberOfColumns(),
-          cols = new Array(j);
+      var j = this._source.getNumberOfColumns();
+      var cols = new Array(j);
 
       while(j--) cols[j] = j;
 
@@ -275,12 +275,12 @@ define([
     hideColumns: function(columns) {
       var cols = this._columns;
       if(cols.length) {
-        var hideColsMap = {},
-            j;
+        var hideColsMap = {};
+        var j;
 
         // Index the indexes of the specified columns to be hidden.
         j = columns.length;
-        while(j--)  hideColsMap[columns[j]] = 1;
+        while(j--) hideColsMap[columns[j]] = 1;
 
         // Remove those indexes from the current visible columns.
         j = cols.length;
@@ -312,7 +312,7 @@ define([
       return new Table(this.toSpec());
     },
 
-    //region ISpecifiable implementation
+    // region ISpecifiable implementation
     /**
      * Creates a specification of the view, in _plain table_ format.
      *
@@ -326,14 +326,14 @@ define([
      */
     toSpec: function() {
       // For a cross-table, defines as many model attributes as there are distinct col groups...
-      var C = this.getNumberOfColumns(),
-          attrSpecs = new Array(C),
-          j = -1;
+      var C = this.getNumberOfColumns();
+      var attrSpecs = new Array(C);
+      var j = -1;
 
       while(++j < C) {
-        var colId = this.getColumnId(j),
-            colAttr = this.getColumnAttribute(j),
-            attrSpec;
+        var colId = this.getColumnId(j);
+        var colAttr = this.getColumnAttribute(j);
+        var attrSpec;
 
         if(!colAttr) {
           // crossTab with xM === 0
@@ -358,20 +358,20 @@ define([
       var modelSpec = Annotatable.toSpec(this.model, {attrs: attrSpecs});
 
       return {
-          model: modelSpec,
-          rows: this._getJsonRows()
-        };
+        model: modelSpec,
+        rows: this._getJsonRows()
+      };
     },
 
     _getJsonRows: function() {
-      var C = this.getNumberOfColumns(),
-          R = this.getNumberOfRows(),
-          plainRows = new Array(R),
-          i = -1;
+      var C = this.getNumberOfColumns();
+      var R = this.getNumberOfRows();
+      var plainRows = new Array(R);
+      var i = -1;
 
       while(++i < R) {
-        var j = C,
-            cells = new Array(C);
+        var j = C;
+        var cells = new Array(C);
 
         while(j--) cells[j] = this.getCell(i, j).toSpec();
 
@@ -380,7 +380,7 @@ define([
 
       return plainRows;
     }
-    //endregion
+    // endregion
   });
 
   return TableView;

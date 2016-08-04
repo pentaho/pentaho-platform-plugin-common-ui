@@ -23,10 +23,10 @@ define([
       this._structure = arg.required(keyArgs, "structure", "keyArgs");
     },
 
-    //region IWithStructure implementation
+    // region IWithStructure implementation
     get structure() {
       return this._structure;
     }
-    //endregion
+    // endregion
   });
 });

@@ -108,7 +108,7 @@ define([
     mergeSpecs: mergeSpecs
   };
 
-  //region merge
+  // region merge
   /**
    * Merges a specification into another.
    *
@@ -125,8 +125,8 @@ define([
    */
   function mergeSpecs(specTarget, specSource) {
 
-    for (var name in specSource)
-      if (O.hasOwn(specSource, name))
+    for(var name in specSource)
+      if(O.hasOwn(specSource, name))
         mergeSpecsOne(specTarget, name, specSource[name]);
 
     return specTarget;
@@ -145,17 +145,17 @@ define([
   function mergeSpecsOne(target, name, sourceValue) {
     var op;
 
-    if (isPlainJSObject(sourceValue)) {
+    if(isPlainJSObject(sourceValue)) {
       // Is `sourceValue` an operation structure?
       //   {$op: "merge", value: {}}
-      if ((op = sourceValue.$op)) {
+      if((op = sourceValue.$op)) {
         // Always deref source value, whether or not `op` is merge.
         sourceValue = sourceValue.value;
 
         // Merge operation only applies between two plain objects and
         // add operation only applies between two arrays.
         // Otherwise behaves like _replace_.
-        if (op === "merge" && !isPlainJSObject(sourceValue) || op === "add" && !Array.isArray(sourceValue)) {
+        if(op === "merge" && !isPlainJSObject(sourceValue) || op === "add" && !Array.isArray(sourceValue)) {
           op = "replace";
         }
       } else {
@@ -164,7 +164,7 @@ define([
     }
 
     var handler = O.getOwn(_mergeHandlers, op || "replace");
-    if (!handler)
+    if(!handler)
       throw error.operInvalid("Merge operation '" + op + "' is not defined.");
 
     handler(target, name, sourceValue);
@@ -183,7 +183,7 @@ define([
   function mergeSpecsOperMerge(target, name, sourceValue) {
     // Is `targetValue` also a plain object?
     var targetValue = target[name];
-    if (isPlainJSObject(targetValue))
+    if(isPlainJSObject(targetValue))
       mergeSpecs(targetValue, sourceValue);
     else
       mergeSpecsOperReplace(target, name, sourceValue);
@@ -219,10 +219,10 @@ define([
     // If both are arrays, append source to target, while cloning source elements.
     // Else, fallback to replace operation.
     var targetValue;
-    if (Array.isArray(sourceValue) && Array.isArray((targetValue = target[name]))) {
+    if(Array.isArray(sourceValue) && Array.isArray((targetValue = target[name]))) {
       var i = -1;
       var L = sourceValue.length;
-      while (++i < L)
+      while(++i < L)
         targetValue.push(cloneOwnDeep(sourceValue[i]));
 
     } else {
@@ -242,10 +242,10 @@ define([
    * @private
    */
   function cloneOwnDeep(value) {
-    if (value && typeof value === "object") {
-      if (value instanceof Array) {
+    if(value && typeof value === "object") {
+      if(value instanceof Array) {
         value = value.map(cloneOwnDeep);
-      } else if (value.constructor === Object) {
+      } else if(value.constructor === Object) {
         var clone = {};
         O.eachOwn(value, function(vi, p) {
           this[p] = cloneOwnDeep(vi);
@@ -256,7 +256,7 @@ define([
 
     return value;
   }
-  //endregion
+  // endregion
 
   /**
    * Checks if a value is a plain JavaScript object.
@@ -270,7 +270,7 @@ define([
   function isPlainJSObject(value) {
     return (!!value) && (typeof value === "object") && (value.constructor === Object);
   }
-  //endregion
+  // endregion
 
   /**
    * Converts to array.

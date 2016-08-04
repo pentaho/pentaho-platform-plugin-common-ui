@@ -96,7 +96,7 @@ define([
         }, this);
       },
 
-      //region Event Flows Handling
+      // region Event Flows Handling
       /**
        * Modifies the current selection filter based on an input filter and on a selection mode.
        *
@@ -186,6 +186,10 @@ define([
        * @param {!pentaho.type.filter.Abstract} inputDataFilter - A filter representing the dataset of
        * the visual element which the user interacted with.
        *
+       * @param {Object} [keyArgs] - The keywords argument.
+       * @param {function} [keyArgs.doExecute] - A "doExecute" function to use instead of the model's
+       * current [doExecute]{@link pentaho.visual.base.Model#doExecute} function.
+       *
        * @return {pentaho.lang.ActionResult}
        * If unsuccessful, the `error` property describes what originated the error.
        * If successful,  the `error` property is `null`.
@@ -209,7 +213,7 @@ define([
        * @return {ActionResult} The result object.
        * @protected
        */
-      _doExecute: function(will){
+      _doExecute: function(will) {
         if(!will.doExecute)
           return ActionResult.reject(bundle.structured.error.action.notDefined);
 
@@ -237,7 +241,7 @@ define([
         if(this._hasListeners(willEvent.type))
           this._emitSafe(willEvent);
 
-        /*jshint laxbreak:true*/
+        /* jshint laxbreak:true*/
         var result = willEvent.isCanceled
             ? ActionResult.reject(willEvent.cancelReason)
             : coreAction.call(this, willEvent);
@@ -247,6 +251,7 @@ define([
             this._emitSafe(new RejectedEvent(this, result.error, willEvent));
           }
         } else {
+          /* eslint no-lonely-if: 0 */
           if(this._hasListeners(DidEvent.type)) {
             this._emitSafe(new DidEvent(this, result.value, willEvent));
           }
@@ -254,9 +259,9 @@ define([
 
         return result;
       },
-      //endregion
+      // endregion
 
-      //region serialization
+      // region serialization
       toSpecInContext: function(keyArgs) {
 
         if(keyArgs && keyArgs.isJson) {
@@ -275,7 +280,7 @@ define([
 
         return this.base(keyArgs);
       },
-      //endregion
+      // endregion
 
       type:  /** @lends pentaho.visual.base.Model.Meta# */{
         sourceId: module.id,
@@ -341,7 +346,7 @@ define([
           this._extensionEf = undefined;
         },
 
-        //region Extension
+        // region Extension
         _extension: null,
         _extensionEf: undefined,
 
@@ -421,7 +426,7 @@ define([
 
           return effective;
         },
-        //endregion
+        // endregion
 
         /**
          * Calls a function for each defined visual role property type.

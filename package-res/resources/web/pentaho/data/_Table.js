@@ -113,9 +113,9 @@ define([
      * @amd pentaho/data/Table
      */
     constructor: function(table) {
-      var tableSpec = this._readTableArgument(table),
-          modelSpec = tableSpec.model,
-          TableImplemClass = tableSpec.layout ?  CrossTable : PlainTable;
+      var tableSpec = this._readTableArgument(table);
+      var modelSpec = tableSpec.model;
+      var TableImplemClass = tableSpec.layout ? CrossTable : PlainTable;
 
       this.model = Model.to(modelSpec);
       this.implem = new TableImplemClass(tableSpec, {model: this.model});
@@ -126,7 +126,7 @@ define([
       return this.implem.getCell(rowIndex, colIndex);
     },
 
-    //region ITableReadOnly
+    // region ITableReadOnly
     // table
     /** @inheritdoc */
     getNumberOfColumns: function() {
@@ -174,9 +174,9 @@ define([
     getLabel: function(rowIndex, colIndex) {
       return this.implem.getLabel(rowIndex, colIndex);
     },
-    //endregion
+    // endregion
 
-    //region ITable
+    // region ITable
     /** @inheritdoc */
     addColumn: function(colSpec, keyArgs) {
       return this.implem.addColumn(colSpec, keyArgs);
@@ -186,7 +186,7 @@ define([
     addRow: function(rowSpec, keyArgs) {
       return this.implem.addRow(rowSpec, keyArgs);
     },
-    //endregion
+    // endregion
 
     // =====
     // TABLE
@@ -198,7 +198,8 @@ define([
 
       // NOTE: `eval` is used instead of `JSON.parse` to be tolerant of Analyzer's comment headers...
       // This is an undocumented feature. Don't depend on it, cause it may change anytime.
-      if(typeof table === "string") table = eval('(' + table + ')');
+      /* eshint no-eval: 0 */
+      if(typeof table === "string") table = eval("(" + table + ")");
 
       return table.metadata ? Table.convertJsonCdaToTableSpec(table) : table;
     },
@@ -261,7 +262,7 @@ define([
       return this._toSpec(keyArgs, true);
     },
 
-    //region ISpecifiable implementation
+    // region ISpecifiable implementation
     /**
      * Creates a specification of the table.
      *
@@ -275,7 +276,7 @@ define([
     toSpec: function(keyArgs) {
       return this._toSpec(keyArgs, false);
     },
-    //endregion
+    // endregion
 
     _toSpec: function(keyArgs, asPlain) {
       var tableSpec = (!asPlain || this.isPlainTable)
@@ -322,19 +323,19 @@ define([
      * @see pentaho.data.AbstractTable#toJsonCda
      */
     convertJsonCdaToTableSpec: function(cdaTable) {
-      var cdaCols = cdaTable.metadata,
-          cdaRows = cdaTable.resultset,
-          C = cdaCols.length,
-          R = cdaRows.length,
-          attrSpecs = new Array(C),
-          rowSpecs = new Array(R),
-          j;
+      var cdaCols = cdaTable.metadata;
+      var cdaRows = cdaTable.resultset;
+      var C = cdaCols.length;
+      var R = cdaRows.length;
+      var attrSpecs = new Array(C);
+      var rowSpecs = new Array(R);
+      var j;
 
       // Columns
       j = -1;
       while(++j < C) {
-        var cdaCol  = cdaCols[j],
-            colType = String(cdaCol.colType || 'string').toLowerCase();
+        var cdaCol  = cdaCols[j];
+        var colType = String(cdaCol.colType || "string").toLowerCase();
 
         if(COLTYPE_CDA_DT.hasOwnProperty(colType))
           colType = COLTYPE_CDA_DT[colType];
@@ -349,14 +350,15 @@ define([
       // Rows
       var i = -1;
       while(++i < R) {
-        var cdaRow = cdaRows[i], cellSpecs = new Array(C);
+        var cdaRow = cdaRows[i];
+        var cellSpecs = new Array(C);
 
         // Copy cells
         j = C;
         while(j--) {
           var v = cdaRow[j];
           cellSpecs[j] = v == null ? null : // direct null
-              (typeof v === 'object') && ('v' in v) ? v : // direct cell
+              (typeof v === "object") && ("v" in v) ? v : // direct cell
               {v: v, f: null}; // value to cell
         }
 

@@ -52,7 +52,7 @@ define([
       this.base();
     },
 
-    //region List implementation
+    // region List implementation
     /**
      * Gets the class of elements of the list:
      * {@link pentaho.data.Member}.
@@ -61,9 +61,9 @@ define([
      * @readonly
      */
     elemClass: Member,
-    //endregion
+    // endregion
 
-    //region IOfAttribute implementation
+    // region IOfAttribute implementation
     /**
      * Gets the attribute to which the members collection belongs.
      *
@@ -73,7 +73,7 @@ define([
     get attribute() {
       return this._attr;
     },
-    //endregion
+    // endregion
 
     _cachedKeyArgs: null,
 

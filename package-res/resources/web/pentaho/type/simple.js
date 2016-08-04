@@ -87,13 +87,13 @@ define([
         return new SimpleClass(this);
       },
 
-      //region value attribute
+      // region value attribute
       _value: undefined,
 
       /**
        * Gets the underlying JavaScript value represented by the _simple_ value.
        *
-       * @type !any
+       * @type {!any}
        * @readonly
        */
       get value() {
@@ -123,15 +123,15 @@ define([
       set v(value) {
         this.value = value;
       }, // jshint -W078
-      //endregion
+      // endregion
 
-      //region formatted attribute
+      // region formatted attribute
       _formatted: null,
 
       /**
        * Gets or sets the formatted value of the property.
        *
-       * @type ?string
+       * @type {?string}
        */
       get formatted() {
         return this._formatted;
@@ -150,7 +150,7 @@ define([
       set f(value) {
         this.formatted = value;
       }, // jshint -W078
-      //endregion
+      // endregion
 
       /**
        * Gets the underlying primitive value of the _simple_ value.
@@ -187,7 +187,7 @@ define([
        * The default simple value implementation, returns the result of calling
        * `toString()` on {@link pentaho.type.Simple#value}.
        *
-       * @type string
+       * @type {string}
        * @readonly
        */
       get key() {
@@ -212,7 +212,7 @@ define([
         return this._value === other._value && this._formatted === other._formatted;
       },
 
-      //region configuration
+      // region configuration
       /**
        * Configures this simple value with a given configuration.
        *
@@ -265,9 +265,9 @@ define([
         // TODO: more efficient implementation?
         this.extend(config);
       },
-      //endregion
+      // endregion
 
-      //region serialization
+      // region serialization
       toSpecInContext: function(keyArgs) {
         if(!keyArgs) keyArgs = {};
 
@@ -292,7 +292,7 @@ define([
           return value;
 
         // Need one. Ensure _ is the first property
-        /*jshint laxbreak:true*/
+        /* jshint laxbreak:true*/
         var spec = includeType
             ? {_: this.type.toRefInContext(keyArgs), v: value}
             : {v: value};
@@ -319,7 +319,7 @@ define([
       _toJSONValue: function(keyArgs) {
         return this._value;
       },
-      //endregion
+      // endregion
 
       type: /** pentaho.type.Simple.Type# */{
         id: module.id,
@@ -327,7 +327,7 @@ define([
 
         get isSimple() { return true; },
 
-        //region cast method
+        // region cast method
         /**
          * Converts an external value to the type stored by the simple type
          * in its [value]{@link pentaho.type.Simple#value} property.
@@ -384,9 +384,9 @@ define([
         cast: function(value) {
           return value;
         },
-        //endregion
+        // endregion
 
-        //region serialization
+        // region serialization
         _fillSpecInContext: function(spec, keyArgs) {
 
           var any = this.base(spec, keyArgs);
@@ -397,9 +397,9 @@ define([
 
           return any;
         }
-        //endregion
+        // endregion
       }
-    }).implement({
+    }).implement(/** @lends pentaho.type.Simple# */{
       type: bundle.structured.simple
     });
 
@@ -428,8 +428,8 @@ define([
     /**
      * Returns `null` when given a {@link Nully} value; or, a String, otherwise.
      *
-     * @param value   {*} The value to be verified
-     * @return {?String}
+     * @param {*} value The value to be verified
+     * @return {?String} A non-empty string.
      */
     function nonEmptyString(value) {
       return value == null ? null : (String(value) || null);

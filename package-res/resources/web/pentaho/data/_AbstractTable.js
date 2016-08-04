@@ -62,7 +62,7 @@ define([
     isValueEqual: function(a, b) {
       return (a === b) ||
           (a == null && b == null) ||
-          (typeof a === 'number' && isNaN(a) && typeof b === 'number' && isNaN(b));
+          (typeof a === "number" && isNaN(a) && typeof b === "number" && isNaN(b));
     },
 
     /**
@@ -83,7 +83,8 @@ define([
         if(typeof attr === "string") attr = this.model.attributes.get(attr);
 
         if(this.model.attributes.includes(attr)) {
-          var c = -1, C = this.getNumberOfColumns();
+          var c = -1;
+          var C = this.getNumberOfColumns();
           while(++c < C)
             if(this.getColumnAttribute(c) === attr)
               return c;
@@ -109,11 +110,12 @@ define([
      * @return {pentaho.data.Range} A non-null range object.
      */
     getColumnRange: function(colIndex, options) {
-      var set = false,
-          key = options && options.key,
-          i = 0,
-          R = this.getNumberOfRows(),
-          min, max; // = undefined
+      var set = false;
+      var key = options && options.key;
+      var i = 0;
+      var R = this.getNumberOfRows();
+      var min;
+      var max; // = undefined
 
       while(i < R) {
         var value = this.getValue(i++, colIndex);
@@ -151,7 +153,7 @@ define([
      * @return {Array.<pentaho.data.Atomic|null>} A non-null array with the distinct values.
      */
     getDistinctValues: function(colIndex) {
-      return this._getDistinctValuesCore(colIndex, /*formatted:*/false);
+      return this._getDistinctValuesCore(colIndex, /* formatted: */false);
     },
 
     /**
@@ -168,16 +170,17 @@ define([
      * @return {string[]} A non-null array with the distinct formatted values.
      */
     getDistinctFormattedValues: function(colIndex) {
-      return this._getDistinctValuesCore(colIndex, /*formatted:*/true);
+      return this._getDistinctValuesCore(colIndex, /* formatted: */true);
     },
 
     _getDistinctValuesCore: function(colIndex, formatted) {
-      var values = [],
-          keyMap = {},
-          i = 0,
-          R = this.getNumberOfRows(),
-          getValue = formatted ? this.getFormattedValue : this.getValue,
-          value, key;
+      var values = [];
+      var keyMap = {};
+      var i = 0;
+      var R = this.getNumberOfRows();
+      var getValue = formatted ? this.getFormattedValue : this.getValue;
+      var value;
+      var key;
 
       while(i < R) {
         value = getValue.call(this, i++, colIndex);
@@ -211,13 +214,14 @@ define([
      * @return {number[]} An array of the row indexes of the rows that meet the filter requirements.
      */
     getFilteredRows: function(filters) {
-      var rows = [], R = this.getNumberOfRows();
+      var rows = [];
+      var R = this.getNumberOfRows();
 
       // Any data?
       if(R) {
         // Process filters
-        var valuePredicate = buildFilteredRowsPredicate.call(this, filters),
-            i = -1;
+        var valuePredicate = buildFilteredRowsPredicate.call(this, filters);
+        var i = -1;
 
         // Filter
         while(++i < R)
@@ -266,13 +270,16 @@ define([
      * @return {Object} The CDA dataset.
      */
     toJsonCda: function() {
-      var C = this.getNumberOfColumns(),
-          R = this.getNumberOfRows(),
-          metadata = new Array(C),
-          resultset = new Array(R),
-          j = C,
-          i = R,
-          cell, resultRow, v, f;
+      var C = this.getNumberOfColumns();
+      var R = this.getNumberOfRows();
+      var metadata = new Array(C);
+      var resultset = new Array(R);
+      var j = C;
+      var i = R;
+      var cell;
+      var resultRow;
+      var v;
+      var f;
 
       while(j--) {
         metadata[j] = {
@@ -280,7 +287,7 @@ define([
           colName:  this.getColumnId(j),
           colLabel: this.getColumnLabel(j),
           colType:  writeCdaColType(this.getColumnType(j))
-        }
+        };
       }
 
       while(i--) {
@@ -309,8 +316,8 @@ define([
     // (rowIdx: number) -> boolean
     if(F) return function(rowIndex) {
       for(var f = 0; f < F; f++) {
-        var filter = valueFilters[f],
-            v = filter.value;
+        var filter = valueFilters[f];
+        var v = filter.value;
         if(v !== undefined && !this.isValueEqual(this.getValue(rowIndex, filter.column), v))
           return false;
       }
@@ -319,9 +326,10 @@ define([
   }
 
   function writeCdaColType(colType) {
+    /* eshint default-case: 0 */
     switch(colType) {
-      case 'string': return 'STRING';
-      case 'number': return 'NUMERIC';
+      case "string": return "STRING";
+      case "number": return "NUMERIC";
     }
 
     throw new Error("Unsupported data type");

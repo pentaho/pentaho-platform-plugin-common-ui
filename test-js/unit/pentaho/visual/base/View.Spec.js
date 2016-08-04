@@ -9,7 +9,7 @@ define([
 
   "use strict";
 
-  /*global document:false, Promise:false, TypeError:false, spyOn:false, expect:false, jasmine:false */
+  /* global document:false, Promise:false, TypeError:false, spyOn:false, expect:false, jasmine:false */
 
   // Allow ~0
   // jshint -W016

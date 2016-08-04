@@ -23,7 +23,7 @@ define([
   "pentaho/shim/es6-promise"
 ], function(typeProviders, apiConfigs, Base, error, O, fun) {
 
-  /*global Promise:true*/
+  /* global Promise:true*/
 
   var prevConfigId = 0,
 

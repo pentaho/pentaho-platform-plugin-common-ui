@@ -32,7 +32,7 @@ define([
       this._configureDisplayUnits();
 
       if(this._isAxisTitleVisible("base"))
-        this._configureAxisTitle("base",  this._getBaseAxisTitle());
+        this._configureAxisTitle("base", this._getBaseAxisTitle());
 
       if(this._isAxisTitleVisible("ortho"))
         this._configureAxisTitle("ortho", this._getOrthoAxisTitle());

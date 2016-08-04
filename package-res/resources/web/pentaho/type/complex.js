@@ -106,11 +106,12 @@ define([
         this._initContainer();
 
         // Create `Property` instances.
-        var propTypes = this.type._getProps(),
-            i = propTypes.length,
-            nameProp = !spec ? undefined : (Array.isArray(spec) ? "index" : "name"),
-            values = {},
-            propType, value;
+        var propTypes = this.type._getProps();
+        var i = propTypes.length;
+        var nameProp = !spec ? undefined : (Array.isArray(spec) ? "index" : "name");
+        var values = {};
+        var propType;
+        var value;
 
         while(i--) {
           propType = propTypes[i];
@@ -151,11 +152,13 @@ define([
 
         // All properties are copied except lists, which are shallow cloned.
         // List properties are not affected by changesets.
-        var propTypes = this.type._getProps(),
-            source = (this._cset || this),
-            i = propTypes.length,
-            cloneValues = {},
-            propType, name, value;
+        var propTypes = this.type._getProps();
+        var source = (this._cset || this);
+        var i = propTypes.length;
+        var cloneValues = {};
+        var propType;
+        var name;
+        var value;
 
         while(i--) {
           propType = propTypes[i];
@@ -192,7 +195,7 @@ define([
         return this._uid;
       },
 
-      //region As Raw
+      // region As Raw
       /**
        * Gets the value of a property.
        *
@@ -340,10 +343,10 @@ define([
       },
 
       _path: function(args, sloppy) {
-        var L = args.length,
-            i = -1,
-            v = this,
-            step;
+        var L = args.length;
+        var i = -1;
+        var v = this;
+        var step;
 
         while(++i < L) {
           if(!(v = (typeof (step = args[i]) === "number") ? v.at(step, sloppy) : v.get(step, sloppy)))
@@ -403,9 +406,9 @@ define([
       _createChangeset: function(txn) {
         return new ComplexChangeset(txn, this);
       },
-      //endregion
+      // endregion
 
-      //region As Element
+      // region As Element
       /**
        * Gets the first element of the value of a property.
        *
@@ -465,9 +468,9 @@ define([
       firstf: function(name, sloppy) {
         return this.atf(name, 0, sloppy);
       },
-      //endregion
+      // endregion
 
-      //region As List
+      // region As List
       /**
        * Gets the _number of values_ of a given property.
        *
@@ -593,10 +596,10 @@ define([
         var v1 = this.at(name, index, sloppy);
         return v1 ? v1.toString() : "";
       },
-      //endregion
+      // endregion
 
-      //region property attributes
-      //region applicable attribute
+      // region property attributes
+      // region applicable attribute
       /**
        * Gets a value that indicates if a given property is currently applicable.
        *
@@ -609,9 +612,9 @@ define([
       isApplicable: function(name) {
         return this.type.get(name).isApplicableEval(this);
       },
-      //endregion
+      // endregion
 
-      //region isReadOnly attribute
+      // region isReadOnly attribute
       /**
        * Gets a value that indicates if a given property is currently read-only.
        *
@@ -624,9 +627,9 @@ define([
       isReadOnly: function(name) {
         return this.type.get(name).isReadOnlyEval(this);
       },
-      //endregion
+      // endregion
 
-      //region countRange attribute
+      // region countRange attribute
       /**
        * Gets the current valid count range of values of a given property.
        *
@@ -639,9 +642,9 @@ define([
       countRange: function(name) {
         return this.type.get(name).countRangeEval(this);
       },
-      //endregion
+      // endregion
 
-      //region isRequired attribute
+      // region isRequired attribute
       /**
        * Gets a value that indicates if a given property is currently required.
        *
@@ -657,10 +660,10 @@ define([
       isRequired: function(name) {
         return this.type.get(name).countRangeEval(this).min > 0;
       },
-      //endregion
-      //endregion
+      // endregion
+      // endregion
 
-      //region validation
+      // region validation
       // @override
       /**
        * Determines if this complex value is a **valid instance** of its type.
@@ -687,9 +690,9 @@ define([
 
         return errors;
       },
-      //endregion
+      // endregion
 
-      //region serialization
+      // region serialization
       toSpecInContext: function(keyArgs) {
 
         keyArgs = keyArgs ? Object.create(keyArgs) : {};
@@ -718,7 +721,7 @@ define([
 
         function propToSpec(propType) {
 
-          /*jshint validthis:true*/
+          /* jshint validthis:true*/
 
           var name = propType.name;
 
@@ -761,7 +764,7 @@ define([
                 } else {
                   // Defaults can be omitted as long as complex form is used.
                   // Same value as default?
-                  if(!useArray && valueSpec == propType.value) return;
+                  if(!useArray && valueSpec === propType.value) return;
 
                   valueSpec = null;
                 }
@@ -780,7 +783,7 @@ define([
           }
         }
       },
-      //endregion
+      // endregion
 
       type: /** @lends pentaho.type.Complex.Type# */{
         id: module.id,
@@ -790,7 +793,7 @@ define([
         get isComplex() { return true; },
         get isContainer() { return true; },
 
-        //region properties property
+        // region properties property
         _props: null,
 
         // Used for configuration only.
@@ -803,9 +806,9 @@ define([
           // Lazy creation.
           var proto = this.constructor.prototype;
           return O.getOwn(proto, "_props") ||
-            (proto._props = PropertyTypeCollection.to([], /*declaringType:*/this));
+            (proto._props = PropertyTypeCollection.to([], /* declaringType: */this));
         },
-        //endregion
+        // endregion
 
         /**
          * Gets the type object of the property with the given name,
@@ -906,7 +909,8 @@ define([
          * @return {pentaho.type.Complex} This object.
          */
         each: function(f, x) {
-          var ps = this._props, L;
+          var ps = this._props;
+          var L;
           if(ps && (L = ps.length)) {
             var i = -1;
             while(++i < L) {
@@ -931,7 +935,7 @@ define([
           return this;
         },
 
-        //region serialization
+        // region serialization
         _fillSpecInContext: function(spec, keyArgs) {
 
           var any = this.base(spec, keyArgs);
@@ -953,7 +957,7 @@ define([
 
           return any;
         }
-        //endregion
+        // endregion
       }
     })
     .implement(ContainerMixin)

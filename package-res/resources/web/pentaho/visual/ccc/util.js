@@ -13,6 +13,9 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
+
+/* eslint indent: ["error", 4] */
+
 define(function() {
     // Null Members:  {v: "...[#null]", f: "Not Available"}
     // Null Values:   come as a null cell or null cell value ("-" report setting only affects the pivot table view).

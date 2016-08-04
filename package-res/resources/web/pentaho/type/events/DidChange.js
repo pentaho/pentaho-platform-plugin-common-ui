@@ -18,7 +18,7 @@ define([
   "../mixins/_mixinChangeset"
 ], function(Event, mixinChangeset) {
   "use strict";
-  
+
   /**
    * @name DidChange
    * @memberOf pentaho.type.events

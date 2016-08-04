@@ -87,7 +87,7 @@ define([
         expect(changeset.isReadOnly).toBe(false);
       });
 
-      //region #owner
+      // region #owner
       describe("#owner -", function() {
         it("should return the same owner that was passed to the constructor", function() {
           expect(changeset.owner).toBe(owner);
@@ -98,9 +98,9 @@ define([
             changeset.owner = "foo";
           }).toThrowError(TypeError);
         });
-      }); //endregion #owner
+      }); // endregion #owner
 
-      //region #ownerVersion
+      // region #ownerVersion
       describe("#ownerVersion -", function() {
         it("should return the version of the owner at the time it was passed to the constructor", function() {
 
@@ -114,9 +114,9 @@ define([
             changeset.ownerVersion = 200;
           }).toThrowError(TypeError);
         });
-      }); //endregion #ownerVersion
+      }); // endregion #ownerVersion
 
-      //region #_applyInternal
+      // region #_applyInternal
       describe("#_applyInternal(version)", function() {
 
         it("should call _apply", function() {
@@ -144,9 +144,9 @@ define([
 
           expect(changeset._apply).toHaveBeenCalledWith(owner);
         });
-      }); //endregion #_applyInternal
+      }); // endregion #_applyInternal
 
-      //region #clearChanges
+      // region #clearChanges
       describe("#clearChanges -", function() {
 
         it("should call _clearChanges", function() {
@@ -164,7 +164,7 @@ define([
             changeset.clearChanges();
           }).toThrow(errorMatch.operInvalid());
         });
-      }); //endregion #clearChanges
+      }); // endregion #clearChanges
     });
   });
 });

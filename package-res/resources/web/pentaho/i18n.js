@@ -18,7 +18,10 @@
  * RequireJS loader plugin for loading localized messages.
  */
 define(["./util/MessageBundle", "json"], function(MessageBundle) {
+
   "use strict";
+
+  /* global CONTEXT_PATH:false */
 
   return {
     load: function(bundlePath, require, onLoad, config) {
@@ -28,8 +31,8 @@ define(["./util/MessageBundle", "json"], function(MessageBundle) {
         // This resource will be resolved dynamically during run time in the web browser.
         onLoad();
       } else {
-        var bundleInfo = getBundleInfo(require, bundlePath),
-            bundleUrl = "json!" + CONTEXT_PATH + "i18n?plugin=" + bundleInfo.pluginId + "&name=" + bundleInfo.name;
+        var bundleInfo = getBundleInfo(require, bundlePath);
+        var bundleUrl = "json!" + CONTEXT_PATH + "i18n?plugin=" + bundleInfo.pluginId + "&name=" + bundleInfo.name;
 
         require([bundleUrl], function(bundle) {
           onLoad(new MessageBundle(bundle));
@@ -76,6 +79,7 @@ define(["./util/MessageBundle", "json"], function(MessageBundle) {
    * Gets a bundle info object with the plugin identifier and bundle name,
    * for a given bundle module identifier.
    *
+   * @param {function} require - The require-js function.
    * @param {string} bundlePath - The specified bundle path argument.
    * @return {Object} A bundle info object.
    *
@@ -106,11 +110,12 @@ define(["./util/MessageBundle", "json"], function(MessageBundle) {
     // Split the url into pluginId and bundleName
     // "pluginId/...bundleName..."
     var i = absBundleUrl.indexOf("/");
-    if(i > 0 || i < absBundleUrl.length - 1)
+    if(i > 0 || i < absBundleUrl.length - 1) {
       return {
         pluginId: absBundleUrl.substr(0, i),
         name: absBundleUrl.substr(i + 1)
-       };
+      };
+    }
 
     throw new Error("[pentaho/messages!] Bundle path argument is invalid: '" + bundlePath + "'.");
   }

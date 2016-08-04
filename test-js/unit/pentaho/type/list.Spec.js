@@ -25,7 +25,7 @@ define([
 
   "use strict";
 
-  /*global describe:true, it:true, expect:true, beforeEach:true, afterEach:true, jasmine:true, spyOn:true,
+  /* global describe:true, it:true, expect:true, beforeEach:true, afterEach:true, jasmine:true, spyOn:true,
     TypeError:true */
 
   var context = new Context(),
@@ -58,7 +58,7 @@ define([
       expect(typeof List).toBe("function");
     });
 
-    //region #of
+    // region #of
     describe("#of -", function() {
 
       // NOTE: see also refinement.Spec.js, list usage unit tests
@@ -114,9 +114,9 @@ define([
         SubList.type.of = elemType;
         expect(SubList.type.of).toBe(elemType);
       });
-    }); //endregion #of
+    }); // endregion #of
 
-    //region constructor
+    // region constructor
     describe("new (spec) -", function() {
 
       describe("given no arguments", function() {
@@ -300,9 +300,9 @@ define([
           expectNoChanges(new NumberList({d: null}));
         });
       });
-    }); //endregion constructor
+    }); // endregion constructor
 
-    //region ownership
+    // region ownership
     describe("#owner", function() {
       it("should be null after construction", function() {
         var list = new List();
@@ -386,9 +386,9 @@ define([
         }).toThrowError(TypeError);
       });
     });
-    //endregion
+    // endregion
 
-    //region read methods
+    // region read methods
     describe("#$uid -", function() {
       it("should return a string value", function() {
         var uid = new List().$uid;
@@ -627,12 +627,12 @@ define([
         expect(fun.calls.count()).toBe(2);
       });
     });
-    //endregion
+    // endregion
 
-    //region write methods
+    // region write methods
     
     // add or update
-    //region #add(fragment)
+    // region #add(fragment)
     describe("#add(fragment) -", function() {
 
       it("should add a given array of convertible values to an empty list", function() {
@@ -724,10 +724,10 @@ define([
         list.add([5, 11, 2, 3, 1, 10]);
         _expectEqualValueAt(list, [1, 5, 10, 11, 40, 2, 3]);
       });
-    }); //endregion #add
+    }); // endregion #add
 
     // insert or update
-    //region #insert(fragment, index)
+    // region #insert(fragment, index)
     describe("#insert(fragment, index) -", function() {
       it("should emit will and did change events on the containing complex object", function() {
 
@@ -876,9 +876,9 @@ define([
         list.insert([5, 11, 2, 3, 1, 10], 1);
         _expectEqualValueAt(list, [1, 2, 3, 5, 10, 11, 40]);
       });
-    }); //endregion #insert
+    }); // endregion #insert
 
-    //region #remove(fragment)
+    // region #remove(fragment)
     describe("#remove(fragment) -", function() {
       it("should emit will and did change events on the containing complex object", function() {
 
@@ -976,9 +976,9 @@ define([
         expect(list.count).toBe(4);
       });
       
-    }); //endregion #remove
+    }); // endregion #remove
 
-    //region #clear()
+    // region #clear()
     describe("#clear() -", function() {
       it("should emit will and did change events on the containing complex object", function() {
 
@@ -1019,9 +1019,9 @@ define([
 
         expect(list.count).toBe(0);
       });
-    }); //endregion #remove
+    }); // endregion #remove
 
-    //region #removeAt(start, count[, silent])
+    // region #removeAt(start, count[, silent])
     describe("#removeAt(start, count[, silent]) -", function() {
       it("should emit will and did change events on the containing complex object", function() {
 
@@ -1158,9 +1158,9 @@ define([
 
         _expectEqualValueAt(list, [1, 2, 4]);
       });
-    }); //endregion #removeAt
+    }); // endregion #removeAt
 
-    //region #set(fragment, {noAdd, noUpdate, noRemove, noMove, index})
+    // region #set(fragment, {noAdd, noUpdate, noRemove, noMove, index})
     describe("#set(fragment, {noAdd, noUpdate, noRemove, noMove, index}) -", function() {
       // TODO: test update on complexes
       it("should append, update, remove and move, when no options are specified", function() {
@@ -1245,9 +1245,9 @@ define([
 
         expect(list.count).toBe(0);
       });
-    }); //endregion set
+    }); // endregion set
 
-    //region #toArray
+    // region #toArray
     describe("#toArray()", function() {
       it("should return an empty array when the list is empty", function() {
         expect(new NumberList().toArray()).toEqual([]);
@@ -1281,9 +1281,9 @@ define([
 
         expect(spy.calls.first().object).toBe(ctx);
       });
-    }); //endregion #toArray
+    }); // endregion #toArray
 
-    //region #sort(comparer[, silent])
+    // region #sort(comparer[, silent])
     describe("#sort(comparer[, silent]) -", function() {
       it("should emit will and did change events on the containing complex object", function() {
 
@@ -1318,10 +1318,10 @@ define([
 
         _expectEqualValueAt(list, [1, 2, 3, 4]);
       });
-    }); //endregion #sort
-    //endregion
+    }); // endregion #sort
+    // endregion
 
-    //region #clone
+    // region #clone
     describe("#clone()", function() {
       it("should return a different list instance", function() {
         var list = new List();
@@ -1348,9 +1348,9 @@ define([
         expect(clone.at(1)).toBe(list.at(1));
         expect(clone.at(2)).toBe(list.at(2));
       });
-    }); //endregion #clone
+    }); // endregion #clone
 
-    //region Type
+    // region Type
     describe("Type -", function() {
       describe("#isList -", function() {
         it("should return the value `true`", function() {
@@ -1363,7 +1363,7 @@ define([
           expect(List.type.isContainer).toBe(true);
         });
       });
-    }); //endregion Type
+    }); // endregion Type
     
   });
 });

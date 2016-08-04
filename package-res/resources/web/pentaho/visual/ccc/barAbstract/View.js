@@ -35,6 +35,7 @@ define([
 
       options.label_textMargin = 7;
 
+      /* eslint default-case: 0 */
       switch(visualSpec.labelsOption) {
         case "center":
           options.valuesAnchor = "center";
@@ -51,7 +52,7 @@ define([
         case "outside_end":
           if(options.orientation === "horizontal") {
             options.valuesAnchor = "right";
-            options.label_textAlign ="left";
+            options.label_textAlign = "left";
           } else {
             options.valuesAnchor = "top";
             options.label_textBaseline = "bottom";

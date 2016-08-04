@@ -21,7 +21,7 @@ define([
 
   "use strict";
 
-  /*global describe:true, it:true, expect:true, beforeEach:true*/
+  /* global describe:true, it:true, expect:true, beforeEach:true*/
 
   var context = new Context(),
       List = context.get("pentaho/type/list"),

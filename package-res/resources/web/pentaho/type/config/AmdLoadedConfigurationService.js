@@ -30,7 +30,7 @@ define([
    * are registered as providing the service {@link pentaho.type.spec.ITypeConfiguration}
    * (see {@link pentaho.service}).
    *
-   * The registered AMD modules are first sorted by their module identifier, and only then added as configurations 
+   * The registered AMD modules are first sorted by their module identifier, and only then added as configurations
    * so that the rules' specificity documented in {@link pentaho.type.spec.ITypeConfiguration} is respected.
    *
    * @class
@@ -50,7 +50,7 @@ define([
       configurations.forEach(function(configuration) {
         this.add(configuration.value);
       }, this);
-    },
+    }
   });
 
   return AmdLoadedConfigurationService;

@@ -40,7 +40,7 @@ define([
       return this.rows[rowIndex].cells[colIndex];
     },
 
-    //region ITableReadOnly implementation
+    // region ITableReadOnly implementation
     getNumberOfColumns: function() {
       return this.cols.length;
     },
@@ -78,9 +78,9 @@ define([
     getLabel: function(rowIndex, colIndex) {
       return this.getCell(rowIndex, colIndex).label;
     },
-    //endregion
+    // endregion
 
-    //region ITable
+    // region ITable
     addColumn: function(colSpec, keyArgs) {
       var j = this.cols.add(colSpec, keyArgs).ordinal;
 
@@ -96,15 +96,15 @@ define([
 
       return i;
     },
-    //endregion
+    // endregion
 
-    //region ISpecifiable implementation
+    // region ISpecifiable implementation
     toSpec: function(keyArgs) {
       return {
         cols: this.cols.toSpec(keyArgs),
         rows: this.rows.toSpec()
       };
     }
-    //endregion
+    // endregion
   });
 });

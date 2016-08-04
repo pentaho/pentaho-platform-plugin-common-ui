@@ -97,11 +97,11 @@ define([
       }
     },
 
-    //region IListElement
+    // region IListElement
     elemName: "cell",
-    //endregion
+    // endregion
 
-    //region IWithKey implementation
+    // region IWithKey implementation
     keyName:  "value",
 
     /**
@@ -122,9 +122,9 @@ define([
 
       return v.toString();
     },
-    //endregion
+    // endregion
 
-    //region IOfAttribute abstract implementation
+    // region IOfAttribute abstract implementation
     /**
      * Gets the attribute of the cell.
      *
@@ -141,7 +141,7 @@ define([
     get attribute() {
       throw new Error("abstract");
     },
-    //endregion
+    // endregion
 
     /**
      * Gets or sets the value of the cell.
@@ -242,7 +242,8 @@ define([
      * @type string
      */
     get label() {
-      var f, r;
+      var f;
+      var r;
       return ((f = this.f) != null || !(r = this.referent)) ? f : r.label;
     },
 
@@ -264,7 +265,7 @@ define([
       return (f = this.label) != null ? f : (f = this.v) != null ? f.toString() : "";
     },
 
-    //region ISpecifiable implementation
+    // region ISpecifiable implementation
     /**
      * Gets the specification of the cell.
      *
@@ -284,9 +285,9 @@ define([
      */
     toSpec: function() {
       // Don't output a result object if it only has a null value and label.
-      var result = null,
-          v = this.v,
-          f = this.f;
+      var result = null;
+      var v = this.v;
+      var f = this.f;
 
       if(this._annots) {
         result = {};
@@ -303,7 +304,7 @@ define([
 
       return result;
     }
-    //endregion
+    // endregion
   })
   .implement(Annotatable);
 

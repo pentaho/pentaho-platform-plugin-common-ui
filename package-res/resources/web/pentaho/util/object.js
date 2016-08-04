@@ -16,12 +16,14 @@
 define(["./has"], function(has) {
   "use strict";
 
-  var O_hasOwn = Object.prototype.hasOwnProperty,
-      A_empty  = [],
-      setProtoOf = has("Object.setPrototypeOf") ? Object.setPrototypeOf : (has("Object.prototype.__proto__") ? setProtoProp : setProtoCopy),
-      constPropDesc = {value: undefined, writable: false, configurable: false, enumerable: false},
-      O_root = Object.prototype,
-      O_isProtoOf = Object.prototype.isPrototypeOf;
+  var O_hasOwn = Object.prototype.hasOwnProperty;
+  var A_empty = [];
+  var setProtoOf = has("Object.setPrototypeOf")
+        ? Object.setPrototypeOf :
+        (has("Object.prototype.__proto__") ? setProtoProp : setProtoCopy);
+  var constPropDesc = {value: undefined, writable: false, configurable: false, enumerable: false};
+  var O_root = Object.prototype;
+  var O_isProtoOf = Object.prototype.isPrototypeOf;
 
   /**
    * The `object` namespace contains functions for
@@ -42,7 +44,7 @@ define(["./has"], function(has) {
      * If the specified object is a {@link Nully} value,
      * or the specified property does not exist in the object,
      * own or not,
-     * the value of `defaultValue` is returned,
+     * the value of `dv` is returned,
      * or `undefined`, if unspecified.
      *
      * Otherwise, if the specified property exists in the object,
@@ -53,9 +55,9 @@ define(["./has"], function(has) {
      * and is an own property,
      * it is deleted and its _previous_ own value is returned.
      *
-     * @param {?Object} object - The object whose own property is to be deleted.
-     * @param {string} property - The name of the property.
-     * @param {any} [defaultValue] - The default value. Defaults to `undefined`.
+     * @param {?Object} o - The object whose own property is to be deleted.
+     * @param {string} p - The name of the property.
+     * @param {any} [dv] - The default value. Defaults to `undefined`.
      * @return {any} The value of the property before deletion.
      *
      * @throws {TypeError} Cannot delete a constant property.
@@ -96,8 +98,8 @@ define(["./has"], function(has) {
      *
      * If the specified object is a {@link Nully} value, `false` is returned.
      *
-     * @param {?Object} object - The object to be tested.
-     * @param {string} property - The name of the property.
+     * @param {?Object} o - The object to be tested.
+     * @param {string} p - The name of the property.
      * @return {boolean} `true` if this is a direct/own property, or `false` otherwise.
      */
     hasOwn: function(o, p) {
@@ -111,11 +113,11 @@ define(["./has"], function(has) {
      *
      * If the specified object is a {@link Nully} value, the default value is returned.
      *
-     * @param {?Object} object - The object whose property is to be retrieved.
-     * @param {string} property - The name of the property.
-     * @param {any} [defaultValue] - The default value. Defaults to `undefined`.
+     * @param {?Object} o - The object whose property is to be retrieved.
+     * @param {string} p - The name of the property.
+     * @param {any} [dv] - The default value. Defaults to `undefined`.
      * @return {boolean} The value of the property if it exists in the object and is an own property,
-     * otherwise returns `defaultValue`.
+     * otherwise returns `dv`.
      */
     getOwn: function(o, p, dv) {
       return o && O_hasOwn.call(o, p) ? o[p] : dv;
@@ -126,9 +128,9 @@ define(["./has"], function(has) {
      *
      * The created property cannot be overwritten, deleted, enumerated or configured.
      *
-     * @param {!Object} object - The object whose property is to be set.
-     * @param {string} property - The name of the property.
-     * @param {any} value - The value of the property.
+     * @param {!Object} o - The object whose property is to be set.
+     * @param {string} p - The name of the property.
+     * @param {any} v - The value of the property.
      */
     setConst: function(o, p, v) {
       // Specifying writable ensures overriding previous writable value.
@@ -150,18 +152,19 @@ define(["./has"], function(has) {
      * Each invocation of iteratee is called with two arguments: (propertyValue, propertyName).
      * If the iteratee function returns `false`, the iteration loop is broken out.
      *
-     * @param {!Object} object - The object containing the properties to be iterated.
-     * @param {function} iteratee - The function that will be iterated.
-     * @param {?object} [context] - The object which will provide the execution context of the iteratee function.
+     * @param {!Object} o - The object containing the properties to be iterated.
+     * @param {function} fun - The function that will be iterated.
+     * @param {?object} [x] - The object which will provide the execution context of the iteratee function.
      * If nully, the iteratee will run with the context of the iterated object.
      *
      * @return {boolean} `true` when the iteration completed regularly,
      * or `false` if the iteration was forcefully terminated.
      */
-    eachOwn: function(o, fun, ctx) {
-      for(var p in o)
-        if(O_hasOwn.call(o, p) && fun.call(ctx || o, o[p], p) === false)
+    eachOwn: function(o, fun, x) {
+      for(var p in o) {
+        if(O_hasOwn.call(o, p) && fun.call(x || o, o[p], p) === false)
           return false;
+      }
 
       return true;
     },
@@ -174,9 +177,11 @@ define(["./has"], function(has) {
      * @return {!Object} The target object.
      */
     assignOwn: function(to, from) {
-      for(var p in from)
+      for(var p in from) {
         if(O_hasOwn.call(from, p))
           to[p] = from[p];
+      }
+
       return to;
     },
 
@@ -196,10 +201,10 @@ define(["./has"], function(has) {
      * Creates a shallow clone of a plain object or array.
      *
      * Undefined properties are ignored.
-     * If `from` is an instance of a class, or a simple value (e.g. string, number),
+     * If `v` is an instance of a class, or a simple value (e.g. string, number),
      * no clone is created and the original object is returned instead.
      *
-     * @param {Object|Array|any} from - The source object.
+     * @param {Object|Array|any} v - The source object.
      * @return {any} A shallow copy of the object,
      * or the object itself if it is neither a plain object nor an array.
      */
@@ -213,6 +218,7 @@ define(["./has"], function(has) {
       return v;
     },
 
+    // only used by pentaho.lang.Base
     /**
      * Retrieves an object that describes a property, traversing the inheritance chain if necessary.
      *
@@ -223,7 +229,6 @@ define(["./has"], function(has) {
      * @return {?Object} The [property descriptor]{@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty}.
      * @method
      */
-    //only used by pentaho.lang.Base
     getPropertyDescriptor: getPropertyDescriptor,
 
     /**
@@ -248,6 +253,7 @@ define(["./has"], function(has) {
       return lca;
     },
 
+    // only used by pentaho.lang.Base
     /**
      * Constructs an instance of a class,
      * from an array of arguments.
@@ -256,8 +262,8 @@ define(["./has"], function(has) {
      * @param {?Array} [args] - The array of arguments, or arguments object, which will be passed to the constructor.
      * @return {!Object} The constructed instance.
      */
-    //only used by pentaho.lang.Base
     make: function(Ctor, args) {
+      /* eslint default-case: 0 */
       switch(args ? args.length : 0) {
         case 0: return new Ctor();
         case 1: return new Ctor(args[0]);
@@ -284,6 +290,7 @@ define(["./has"], function(has) {
      */
     setPrototypeOf: setProtoOf,
 
+    // only used by pentaho.lang.Base
     /**
      * Mutates an object so that it becomes an instance of a given class, if not already.
      *
@@ -294,7 +301,6 @@ define(["./has"], function(has) {
      * @param {?Array} [args] - The array of arguments to be passed to the constructor of the class.
      * @return {object} The mutated object.
      */
-    //only used by pentaho.lang.Base
     applyClass: function(inst, Class, args) {
       var proto = Class.prototype;
       if(proto === inst || proto.isPrototypeOf(inst))
@@ -302,13 +308,14 @@ define(["./has"], function(has) {
 
       setProtoOf(inst, proto);
 
-      if(inst.constructor !== Class)
+      if(inst.constructor !== Class) {
         Object.defineProperty(inst, "constructor", {
-          //enumerable: false,
+          // enumerable: false,
           configurable: true,
           writable: true,
           value: Class
         });
+      }
 
       return Class.apply(inst, args || A_empty) || inst;
     }
@@ -316,9 +323,11 @@ define(["./has"], function(has) {
 
   function assignOwnDefined(to, from) {
     var v;
-    for(var p in from)
+    for(var p in from) {
       if(O_hasOwn.call(from, p) && (v = from[p]) !== undefined)
         to[p] = v;
+    }
+
     return to;
   }
 
@@ -347,11 +356,13 @@ define(["./has"], function(has) {
   }
 
   function setProtoProp(o, proto) {
+    /* eslint no-proto: 0 */
     o.__proto__ = proto;
     return o;
   }
 
   function setProtoCopy(o, proto) {
+    /* eslint guard-for-in: 0 */
     for(var p in proto) copyOneDefined(o, proto, p);
     return o;
   }

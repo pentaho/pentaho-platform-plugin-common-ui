@@ -47,5 +47,4 @@ define([
 
     })
     .implement(mixinChangeset);
-
 });

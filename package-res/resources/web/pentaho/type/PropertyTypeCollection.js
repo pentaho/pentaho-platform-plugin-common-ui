@@ -107,7 +107,7 @@ define([
       return propertyType;
     },
 
-    //region List implementation
+    // region List implementation
     //elemClass: Property.Type,
 
     /**
@@ -123,7 +123,8 @@ define([
     _adding: function(spec, index, ka) {
       if(!spec) throw error.argRequired("props[i]");
 
-      var name = getSpecName(spec), existing;
+      var name = getSpecName(spec);
+      var existing;
       if(name && (existing = this.get(name))) {
         // An object spec? Otherwise it's a noop - nothing to configure or override.
         // Configure existing local property or override inherited one.
@@ -208,9 +209,9 @@ define([
 
       return propType;
     },
-    //endregion
+    // endregion
 
-    //region IConfigurable implementation
+    // region IConfigurable implementation
     /**
      * Configures the properties collection.
      *
@@ -241,7 +242,7 @@ define([
         }, this);
       }
     }
-    //endregion
+    // endregion
   });
 
   function getSpecName(spec) {

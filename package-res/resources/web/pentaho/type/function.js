@@ -41,7 +41,7 @@ define([
      * @constructor
      * @param {pentaho.type.spec.IFunction|function|string} [spec] A function specification.
      */
-    return Simple.extend({
+    return Simple.extend(/** @lends pentaho.type.Function# */{
       /**
        * Gets the underlying function value of the value.
        * @name pentaho.type.Function#value
@@ -49,7 +49,7 @@ define([
        * @readonly
        */
 
-      //region serialization
+      // region serialization
       _toJSONValue: function(keyArgs) {
         var code = String(this._value);
         if(code.indexOf(NATIVE_CODE) > 0) {
@@ -61,15 +61,14 @@ define([
 
         return code;
       },
-      //endregion
+      // endregion
 
-      type: {
+      type: /** @lends pentaho.type.Function.Type# */{
         id: module.id,
         cast: F.as
       }
-    }).implement({
-      //jshint -W069
-      type: bundle.structured["function"]
+    }).implement(/** @lends pentaho.type.Function# */{
+      type: bundle.structured["function"] // eslint-disable-line dot-notation
     });
   };
 });

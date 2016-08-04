@@ -22,23 +22,23 @@ define([
     return value != null ? (+value) : NaN;  // to Number works for dates as well
   }
 
-  trends.define('linear', {
-    label: 'Linear trend',
+  trends.define("linear", {
+    label: "Linear trend",
     model: function(options) {
-      var rowsQuery = options.rows,
-          getX = options.x,
-          getY = options.y,
-          i = 0,
-          N = 0,
-          sumX  = 0,
-          sumY  = 0,
-          sumXY = 0,
-          sumXX = 0;
+      var rowsQuery = options.rows;
+      var getX = options.x;
+      var getY = options.y;
+      var i = 0;
+      var N = 0;
+      var sumX = 0;
+      var sumY = 0;
+      var sumXY = 0;
+      var sumXX = 0;
 
       while(rowsQuery.next()) {
-        var row = rowsQuery.item,
+        var row = rowsQuery.item;
             // Ignore null && NaN values
-            x = getX ? parseNum(getX(row)) : i; // use the index itself for discrete stuff
+        var x = getX ? parseNum(getX(row)) : i; // use the index itself for discrete stuff
 
         if(!isNaN(x)) {
           var y = parseNum(getY(row));
@@ -57,17 +57,17 @@ define([
 
       // y = alpha + beta * x
       if(N >= 2) {
-        var avgX  = sumX  / N,
-            avgY  = sumY  / N,
-            avgXY = sumXY / N,
-            avgXX = sumXX / N,
+        var avgX  = sumX / N;
+        var avgY  = sumY / N;
+        var avgXY = sumXY / N;
+        var avgXX = sumXX / N;
 
             // When N === 1 => den = 0
-            den = (avgXX - avgX * avgX),
+        var den = (avgXX - avgX * avgX);
 
-            beta = den && ((avgXY - (avgX * avgY)) / den),
+        var beta = den && ((avgXY - (avgX * avgY)) / den);
 
-            alpha = avgY - beta * avgX;
+        var alpha = avgY - beta * avgX;
 
         return {
           alpha: alpha,

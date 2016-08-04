@@ -23,8 +23,8 @@ define([
 
   "use strict";
 
-  /*global describe:false, it:false, expect:false, beforeEach:false*/
-  /*global document:false*/
+  /* global describe:false, it:false, expect:false, beforeEach:false*/
+  /* global document:false*/
 
   var context = new Context(),
       BarModel = context.get("pentaho/visual/ccc/bar");

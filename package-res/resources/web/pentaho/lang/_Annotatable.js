@@ -49,12 +49,12 @@ define([
       }
     },
 
-    //region ISpecifiable implementation helper
+    // region ISpecifiable implementation helper
     toSpec: function(inst, json) {
       if(!json) json = {};
       if(inst._annots) json.p = O.cloneShallow(inst._annots);
       return json;
     }
-    //endregion
+    // endregion
   });
 });

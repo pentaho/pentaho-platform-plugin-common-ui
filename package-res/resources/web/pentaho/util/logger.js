@@ -34,7 +34,6 @@ define(function() {
      */
     logLevels: ["debug", "log", "info", "warn", "error"],
 
-
     /**
      *  Current log level. Assign a new value to this property to change the log level.
      *
@@ -48,7 +47,7 @@ define(function() {
      * @param {string} m - Message to log.
      */
     debug: function(m) {
-      return _log(m, "debug");
+      _log(m, "debug");
     },
 
     /**
@@ -57,7 +56,7 @@ define(function() {
      * @param {string} m - Message to log.
      */
     log: function(m) {
-      return _log(m, "log");
+      _log(m, "log");
     },
 
     /**
@@ -66,7 +65,7 @@ define(function() {
      * @param {string} m - Message to log.
      */
     info: function(m) {
-      return _log(m, "info");
+      _log(m, "info");
     },
 
     /**
@@ -75,7 +74,7 @@ define(function() {
      * @param {string} m - Message to log.
      */
     warn: function(m) {
-      return _log(m, "warn");
+      _log(m, "warn");
     },
 
     /**
@@ -84,7 +83,7 @@ define(function() {
      * @param {string} m - Message to log.
      */
     error: function(m) {
-      return _log(m, "error");
+      _log(m, "error");
     }
   };
 
@@ -101,7 +100,7 @@ define(function() {
           console[type]("%c" + m, css);
           return;
         } catch(e) {
-          //styling is not supported
+          // styling is not supported
         }
       }
       console[type](m);

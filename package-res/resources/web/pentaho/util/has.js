@@ -16,6 +16,8 @@
 define(function() {
   "use strict";
 
+  /* eslint no-proto: 0 */
+
   var O_hasOwn = Object.prototype.hasOwnProperty;
 
   var capabilities = {

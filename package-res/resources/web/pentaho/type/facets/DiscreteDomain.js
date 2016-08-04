@@ -39,7 +39,7 @@ define([
    */
   return RefinementFacet.extend("pentaho.type.facets.DiscreteDomain", /** @lends pentaho.type.facets.DiscreteDomain# */{
 
-    //region domain
+    // region domain
 
     // TODO: Also defines the default natural ordering of the values?
     // When inherited, specified values must be a subset of those in the base class.
@@ -135,8 +135,8 @@ define([
         // Then, it the clone is configured with the just created `v1`.
         // Finally, the clone takes the position of v1.
         if(v0 !== v1) {
-          valuesDomain.removeAt(i, /*silent:*/true);
-          valuesDomain.insert(v0.clone().configure(v1), i, /*silent:*/true);
+          valuesDomain.removeAt(i, /* silent: */true);
+          valuesDomain.insert(v0.clone().configure(v1), i, /* silent: */true);
         }
       }
 
@@ -199,7 +199,7 @@ define([
       var domain = this.domain;
       O.eachOwn(config, function(v, key) {
         var elem = domain.get(key);
-        if(!elem) throw error.argInvalid("domain", "An element with key '" +  key + "' is not defined.");
+        if(!elem) throw error.argInvalid("domain", "An element with key '" + key + "' is not defined.");
         elem.configure(v);
       });
     },

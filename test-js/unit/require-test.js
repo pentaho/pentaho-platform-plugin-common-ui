@@ -17,7 +17,7 @@
 
   "use strict";
 
-  /*global require:false */
+  /* global require:false */
 
   var _nextUid = 1;
   var A_slice = Array.prototype.slice;
@@ -66,7 +66,7 @@
      * @return {function} The `require` function.
      */
     contextRequire.config = function(config) {
-      /*jshint validthis:true*/
+      /* jshint validthis:true*/
 
       context.configure(config);
       return this;
@@ -82,7 +82,7 @@
      * @return {function} The `require` function.
      */
     contextRequire.define = function(id, deps, callback) {
-      /*jshint validthis:true*/
+      /* jshint validthis:true*/
 
       if(typeof id !== "string")
         throw new Error("Argument 'id' is required. Anonymous modules are not supported.");
@@ -163,7 +163,7 @@
     }
 
     function callScoped(values) {
-      /*jshint validthis:true*/
+      /* jshint validthis:true*/
       // forward `this`
       return scopedFun.apply(this, values);
     }

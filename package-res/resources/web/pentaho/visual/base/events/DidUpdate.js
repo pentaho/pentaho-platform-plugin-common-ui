@@ -40,14 +40,14 @@ define([
       }
     }, /** @lends pentaho.visual.base.events.DidUpdate */{
 
-    /**
-     * Gets the event type.
-     *
-     * @type string
-     * @readonly
-     */
-    get type() {
-      return "did:update";
-    }
-  });
+      /**
+       * Gets the event type.
+       *
+       * @type {string}
+       * @readonly
+       */
+      get type() {
+        return "did:update";
+      }
+    });
 });

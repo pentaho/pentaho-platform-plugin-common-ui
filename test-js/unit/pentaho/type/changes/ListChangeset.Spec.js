@@ -67,14 +67,14 @@ define([
         changeset = new ListChangeset(context.transaction, new NumberList([]));
       });
 
-      //region #type
+      // region #type
       describe("#type -", function() {
         it("should return a string with the value `list`", function() {
           expect(changeset.type).toBe("list");
         });
-      }); //endregion #type
+      }); // endregion #type
 
-      //region #changes
+      // region #changes
       describe("#changes -", function() {
         it("should be an empty array when a new ListChangeset is created", function() {
           expect(changeset.changes.length).toBe(0);
@@ -88,9 +88,9 @@ define([
           expect(changes).toBeDefined();
           expect(changes[0].element).toBe(elem);
         });
-      }); //endregion #changes
+      }); // endregion #changes
 
-      //region #hasChanges
+      // region #hasChanges
       describe("#hasChanges -", function() {
         it("should be `false` when a new ListChangeset is created", function() {
           expect(changeset.hasChanges).toBe(false);
@@ -123,9 +123,9 @@ define([
 
           expect(changeset.hasChanges).toBe(false);
         });
-      }); //endregion #hasChanges
+      }); // endregion #hasChanges
 
-      //region #_projectedMock
+      // region #_projectedMock
       describe("#_projectedMock -", function() {
         it("should return the original list when there are no changes", function() {
           var list = new NumberList([1, 2, 3]);
@@ -168,9 +168,9 @@ define([
           expect(mock1).toBe(mock2);
           expect(changeset._applyFrom.calls.count()).toBe(1);
         });
-      }); //endregion #_projectedMock
+      }); // endregion #_projectedMock
 
-      //region #clearChanges
+      // region #clearChanges
       describe("#clearChanges -", function() {
         it("should remove any created changes from the changeset during the 'will' phase", function() {
           var elem = {"foo": "bar"};
@@ -203,9 +203,9 @@ define([
             changeset.clearChanges();
           }).toThrow(errorMatch.operInvalid());
         });
-      }); //endregion #clearChanges
+      }); // endregion #clearChanges
 
-      //region #_clear
+      // region #_clear
       describe("#_clear -", function() {
         it("should append a `clear` change to the changeset", function() {
           changeset._clear(); //create clear change
@@ -221,9 +221,9 @@ define([
             changeset._clear();
           }).toThrow(errorMatch.operInvalid());
         });
-      }); //endregion #_clear
+      }); // endregion #_clear
 
-      //region #_set
+      // region #_set
       describe("#_set(fragment, add, update, remove, move, index)", function() {
 
         it("should throw when called after becoming read-only", function() {
@@ -285,7 +285,7 @@ define([
           expect(changeset.changes[0].type).toBe("add");
           expect(changeset.changes[1].type).toBe("move");
         });
-      }); //endregion #_removeAt
+      }); // endregion #_removeAt
 
       // region #_remove
       describe("#_remove -", function() {
@@ -317,7 +317,7 @@ define([
             changeset._remove(2);
           }).toThrow(errorMatch.operInvalid());
         });
-      }); //endregion #_removeAt
+      }); // endregion #_removeAt
 
       // region #_removeAt
       describe("#_removeAt -", function() {
@@ -352,9 +352,9 @@ define([
             changeset._removeAt(1);
           }).toThrow(errorMatch.operInvalid());
         });
-      }); //endregion #_removeAt
+      }); // endregion #_removeAt
 
-      //region #_sort
+      // region #_sort
       describe("#_sort -", function() {
         it("should add append a `sort` change to the changeset", function() {
           changeset._sort(function(x) { return x;}); //create sort change
@@ -370,7 +370,7 @@ define([
             changeset._sort(function(x) { return x;});
           }).toThrow(errorMatch.operInvalid());
         });
-      }); //endregion #_sort
+      }); // endregion #_sort
 
       // region #_apply
       describe("#_apply -", function() {
@@ -413,7 +413,7 @@ define([
           expect(list._elems).toBe(projElems);
           expect(list._keys).toBe(projKeys);
         });
-      }); //endregion #_sort
+      }); // endregion #_sort
 
     }); //end instance
   }); //end pentaho.lang.ComplexChangeset
