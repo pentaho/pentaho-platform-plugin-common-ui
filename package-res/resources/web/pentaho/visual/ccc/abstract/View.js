@@ -195,6 +195,8 @@ define([
 
       this._initOptions();
 
+      this._processExtensions();
+
       this._initData();
 
       this._readUserOptions(this.options);
@@ -297,12 +299,12 @@ define([
         this._chart.render(true, true, false);
       }
     },
-    
+
     _initOptions: function() {
       var model = this.model;
 
       // Store the current selections
-      this._selections = null; //drawSpec.highlights; // TODO: hookup model selections?
+      this._selections = null; // drawSpec.highlights; // TODO: hookup model selections?
 
       // Recursively inherit this class' shared options
       var options = this.options = def.create(this._options);
@@ -631,7 +633,7 @@ define([
      * The name of the original measure column ends up in the special CCC dimension we call "the measure discriminator".
      *
      * This has the following restrictions/consequences:
-     * * all measure attributes have to be in the rightmost columns of the data table 
+     * * all measure attributes have to be in the rightmost columns of the data table
      * * and the ability to have different formatting per measure attribute, as there is
      *   a single CCC dimension that holds the values of all measure attributes, is lost.
      *   The formatting configuration of the first measure in the measure role is used.
@@ -844,9 +846,11 @@ define([
       } else {
         if(options.tooltipEnabled) this._configureTooltip();
 
-        this._configureSelection();
+        if(def.get(this._validExtensionOptions, "selectable", options.selectable))
+          this._configureSelection();
 
-        this._configureDoubleClick();
+        if(def.get(this._validExtensionOptions, "clickable", options.clickable))
+          this._configureDoubleClick();
       }
     },
 
@@ -1245,24 +1249,31 @@ define([
     },
 
     /**
-     * Applies extension properties to the CCC options.
+     * Processes extension properties and stores the valid ones in `_validExtensionOptions`.
      */
-    _applyExtensions: function() {
+    _processExtensions: function() {
+      var valid = null;
+
       var extension = this.model.type.extensionEffective;
       if(extension) {
-
-        var valid = null;
-
         def.each(extension, function(v, p) {
           if(!def.hasOwn(extensionBlacklist, p)) {
             if(!valid) valid = {};
             valid[p] = v;
           }
         });
+      }
 
-        if(valid) {
-          this.options = def.mixin.copy({}, this.options, valid);
-        }
+      this._validExtensionOptions = valid;
+    },
+
+    /**
+     * Applies extension properties to the CCC options.
+     */
+    _applyExtensions: function() {
+      var extensions = this._validExtensionOptions;
+      if(extensions) {
+        this.options = def.mixin.copy({}, this.options, extensions);
       }
     },
 
