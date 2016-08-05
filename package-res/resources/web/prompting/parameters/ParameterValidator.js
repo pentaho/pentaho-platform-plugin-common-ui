@@ -69,8 +69,8 @@ define(['cdf/lib/Base'],
           }
         } else {
           for(var k=0; k<currentParameter.values.length; k++) {
-            if(untrustedValue == currentParameter.values[k].value) {
-              currentParameter.values[k].selected = true;              
+            if(untrustedValue[0] == currentParameter.values[k].value) {
+              currentParameter.values[k].selected = true;
               break;
             }
           }
@@ -113,7 +113,7 @@ define(['cdf/lib/Base'],
             currentParameter.values[k].selected = false;
           }
           // all validations passed, set values
-          setSelectedValue(paramDefn, currentParameter, untrustedValue);
+          setSelectedValue(paramDefn, currentParameter, values);
         },
 
         checkParametersErrors: function (paramDefn) {
