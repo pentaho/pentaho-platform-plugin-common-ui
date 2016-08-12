@@ -39,8 +39,8 @@ define(["common-ui/prompting/parameters/ParameterXmlParser", "common-ui/promptin
       return this._parameterXmlParser.parseParameterXml(xmlString);
     };
 
-    this.validateSingleParameter = function(paramDefn, name, untrustedValue) {
-      return this._parameterValidator.validateSingleParameter(paramDefn, name, untrustedValue);
+    this.validateSingleParameter = function(paramDefn, name, untrustedValue, defaultValues) {
+      return this._parameterValidator.validateSingleParameter(paramDefn, name, untrustedValue, defaultValues);
     };
 
     this.checkParametersErrors = function(paramDefn) {
