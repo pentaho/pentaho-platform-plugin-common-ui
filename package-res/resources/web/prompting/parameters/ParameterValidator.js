@@ -60,18 +60,39 @@ define(['cdf/lib/Base'],
         return true;
       };
 
-      var setSelectedValue = function (paramDefn, currentParameter, untrustedValue) {
-        if(currentParameter.multiSelect) {
-          for(var k=0; k<currentParameter.values.length; k++) {
-            if(untrustedValue.indexOf(currentParameter.values[k].value) != -1) {
-              currentParameter.values[k].selected = true;
-            }
-          }
+      var setSelectedValue = function (paramDefn, currentParameter, untrustedValue, defaultValues) {
+        if(currentParameter.values.length == 0 || (currentParameter.values.length == 1 && currentParameter.values[0].manuallySet)) {
+          currentParameter.values[0] = {
+            label: untrustedValue[0],
+            selected: true,
+            type: currentParameter.type,
+            value: untrustedValue[0],
+            manuallySet: true
+          };
         } else {
-          for(var k=0; k<currentParameter.values.length; k++) {
-            if(untrustedValue[0] == currentParameter.values[k].value) {
-              currentParameter.values[k].selected = true;
-              break;
+          var parameterValue;
+          if(currentParameter.multiSelect) {
+            if(untrustedValue.length == 1 && "" == untrustedValue[0] && defaultValues[currentParameter.name]) {
+              parameterValue = defaultValues[currentParameter.name].value;
+            } else {
+              parameterValue = untrustedValue;
+            }
+            for(var k=0; k<currentParameter.values.length; k++) {
+              if(parameterValue.indexOf(currentParameter.values[k].value) != -1) {
+                currentParameter.values[k].selected = true;
+              }
+            }
+          } else {
+            if("" == untrustedValue[0] && defaultValues[currentParameter.name]) {
+              parameterValue = defaultValues[currentParameter.name].value[0];
+            } else {
+              parameterValue = untrustedValue[0];
+            }
+            for(var k=0; k<currentParameter.values.length; k++) {
+              if(parameterValue == currentParameter.values[k].value) {
+                currentParameter.values[k].selected = true;
+                break;
+              }
             }
           }
         }
@@ -79,7 +100,7 @@ define(['cdf/lib/Base'],
 
       return Base.extend({
 
-        validateSingleParameter: function (paramDefn, paramName, untrustedValue) {
+        validateSingleParameter: function (paramDefn, paramName, untrustedValue, defaultValues) {
           var currentParameter = paramDefn.getParameter(paramName);
           // remove error, if any
           removeError(paramDefn, currentParameter.name);
@@ -113,7 +134,7 @@ define(['cdf/lib/Base'],
             currentParameter.values[k].selected = false;
           }
           // all validations passed, set values
-          setSelectedValue(paramDefn, currentParameter, values);
+          setSelectedValue(paramDefn, currentParameter, values, defaultValues);
         },
 
         checkParametersErrors: function (paramDefn) {
