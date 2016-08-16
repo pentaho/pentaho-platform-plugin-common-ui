@@ -112,7 +112,7 @@ define([
       var GemClass = Configuration.registeredTypes["gem"];
       var options = {
               id:         "gem-" + sourceNode.id,
-              value:      sourceNode.innerHTML,
+              value:      sourceNode.innerHTML.replace(/'/g, "&#39;"),
               gemBar:     this,
               sourceNode: sourceNode,
               dndType:    sourceNode.getAttribute("dndType")

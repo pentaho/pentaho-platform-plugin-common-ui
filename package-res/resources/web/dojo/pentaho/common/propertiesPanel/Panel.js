@@ -1050,7 +1050,7 @@ define([
       this.menuHandle = query("div.gemMenuHandle", this.domNode)[0];
 
       var gemLabel = query("div.gem-label", this.domNode)[0];
-      gemLabel.appendChild(document.createTextNode(this.model.value));
+      gemLabel.innerHTML = this.model.value;
 
       this.own(
         on(this.domNode, "contextmenu", lang.hitch(this, "onContextMenu")),

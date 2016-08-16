@@ -47,7 +47,7 @@ define(["pentaho/common/propertiesPanel/Panel", "dijit/registry", "dojo/query"],
       expect(gemLabelNode.title).toEqual(value);
     });
 
-    it("should create a text node if html is passed", function() {
+    it("should create a element node if html is passed", function() {
       var value = '<h1>XSS</h1>';
       var instance = new GemUI(createStubOptions(value));
 
@@ -55,11 +55,11 @@ define(["pentaho/common/propertiesPanel/Panel", "dijit/registry", "dojo/query"],
 
       var children = gemLabelNode.childNodes;
       expect(children.length).toEqual(1);
-      expect(children[0].nodeType).toEqual(3);       // nodeType = 3 -> Text node
-      expect(children[0].nodeValue).toEqual(value);
+      expect(children[0].nodeType).toEqual(1);       // nodeType = 1 -> Element node
+      expect(children[0].outerHTML).toEqual(value);
     });
 
-    it("should not create additional nodes if html is passed", function() {
+    it("could create additional nodes if html is passed", function() {
       var value = '<h1>XSS</h1>';
       var instance = new GemUI(createStubOptions(value));
 
@@ -67,7 +67,7 @@ define(["pentaho/common/propertiesPanel/Panel", "dijit/registry", "dojo/query"],
 
       var children = gemLabelNode.childNodes;
       for (var i = 0; i < children.length; i++) {
-        expect(children[i].nodeType).not.toEqual(1); // nodeType = 1 -> Element node
+        expect(children[i].nodeType).toEqual(1); // nodeType = 1 -> Element node
       }
     });
 
