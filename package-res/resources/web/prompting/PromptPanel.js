@@ -1133,6 +1133,7 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
                   var errIndex = panel.components.length - 1;
                   var errorComponent = _createWidgetForErrorLabel.call(this, param, error);
                   this.dashboard.addComponent(errorComponent);
+                  this.dashboard.updateComponent(errorComponent);
                   panel.components.splice(errIndex, 0, errorComponent);
                 }
               }
