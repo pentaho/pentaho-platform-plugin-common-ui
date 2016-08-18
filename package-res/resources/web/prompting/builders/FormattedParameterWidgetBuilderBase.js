@@ -34,12 +34,12 @@
  *
  * @name FormattedParameterWidgetBuilderBase
  * @class
- * @extends ParameterWidgetBuilderBase
+ * @extends ValueBasedParameterWidgetBuilder
  */
-define(['common-ui/util/formatting', './ParameterWidgetBuilderBase', 'common-ui/jquery-clean'],
-    function (FormatUtils, ParameterWidgetBuilderBase, $) {
+define(['common-ui/util/formatting', './ValueBasedParameterWidgetBuilder', 'common-ui/jquery-clean'],
+    function (FormatUtils, ValueBasedParameterWidgetBuilder, $) {
 
-      return ParameterWidgetBuilderBase.extend({
+      return ValueBasedParameterWidgetBuilder.extend({
         /**
          * Creates a data transport formatter from the Format Utils
          *
