@@ -231,7 +231,8 @@
             <fileset file="${lib.dir}/flexjson-*.jar"/>
         </copy>
         <copy todir="${approot.stage.dir}/lib">
-            <fileset file="${lib.dir}/pentaho-modeler-${dependency.pentaho-modeler.revision}.jar"/>
+            <fileset file="${lib.dir}/pentaho-modeler-gwt-${dependency.pentaho-modeler.revision}.jar"/>
+            <fileset file="${lib.dir}/pentaho-modeler-xul-${dependency.pentaho-modeler.revision}.jar"/>
         </copy>
     </target>
 
