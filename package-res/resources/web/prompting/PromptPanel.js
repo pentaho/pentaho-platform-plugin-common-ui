@@ -1201,6 +1201,9 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
                   }
 
                   updateNeeded = _areParamsDifferent(dashboardParameter, paramSelectedValues, param.type);
+                  if (!updateNeeded && param.isErrorChanged) {
+                    updateNeeded = true;
+                  }
                 }
 
                 if (updateNeeded) {

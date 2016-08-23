@@ -42,7 +42,7 @@
  *
  * @name DateInputBuilder
  * @class
- * @extends ValueBasedParameterWidgetBuilder
+ * @extends FormattedParameterWidgetBuilderBase
  */
 define(['./FormattedParameterWidgetBuilderBase', '../components/DojoDateTextBoxComponent', 'common-ui/jquery-clean'],
     function (FormattedParameterWidgetBuilderBase, DojoDateTextBoxComponent, $) {
