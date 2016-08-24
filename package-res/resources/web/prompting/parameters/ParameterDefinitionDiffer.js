@@ -140,9 +140,11 @@ define([], function() {
               // add parameter to remove and add arrays for recreating components
               this._fillWrapObj(result, "toRemove", group, oldParam);
               this._fillWrapObj(result, "toAdd", group, param);
-            } else if (this._isDataChanged(oldParam, param)) {
+            } else {
               param.isErrorChanged = this._isErrorsChanged(param.name, oldParamDefn, newParamDefn);
-              this._fillWrapObj(result, "toChangeData", group, param);
+              if (this._isDataChanged(oldParam, param) || param.isErrorChanged) {
+                this._fillWrapObj(result, "toChangeData", group, param);
+              }
             }
           }
         }, this);
