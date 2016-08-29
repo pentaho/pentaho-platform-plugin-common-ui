@@ -817,13 +817,6 @@ define([
       var options = this.options,
           model   = this.model;
 
-      // TODO: hack hack .....
-      // By default hide overflow, otherwise,
-      // resizing the window frequently ends up needlessly showing scrollbars.
-      if(this.domContainer.parentNode) {
-        this.domContainer.parentNode.style.overflow = "hidden"; // Hide overflow
-      }
-
       var colorScaleKind = this._getColorScaleKind();
       if(colorScaleKind)
         this._configureColor(colorScaleKind);
