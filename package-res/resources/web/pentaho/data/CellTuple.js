@@ -42,10 +42,12 @@ define([
 
     get key() {
       var key = this._key;
-      if(key == null)
+      if(key == null) {
         key = this._key = this.map(function(cell) {
           return cell.key;
         }).join("~");
+      }
+
       return key;
     },
     // endregion
