@@ -87,7 +87,7 @@ define([
     constructor: function(spec) {
       if(spec == null) {
         this.value = null;
-      } else if(typeof spec !== "object") {
+      } else if(typeof spec !== "object" || spec.constructor !== Object) {
         this.value = spec;
       } else {
         this.value = spec.v;
@@ -115,12 +115,7 @@ define([
      * @readonly
      */
     get key() {
-      var v = this.v;
-      if(v == null) return "";
-
-      if(v instanceof Member) return v.key;
-
-      return v.toString();
+      return this._key;
     },
     // endregion
 
@@ -164,14 +159,26 @@ define([
     },
 
     set value(v) {
+      var a = this.attribute;
+      v = a.cast(v);
+
+      var k;
       if(v == null) {
         this.v = null; // undefined to null normalization
+        k = "";
       } else {
         // auto-create member
-        if(this.attribute.isDiscrete)
-          this.attribute.members.getOrAdd(v);
+        if(a.isDiscrete) {
+          var m = a.members.getOrAdd(typeof v === "object" ? {v: v} : v);
+          k = m.key;
+        } else {
+          k = v.toString();
+        }
+
         this.v = v;
       }
+
+      this._key = k;
     },
 
     /**

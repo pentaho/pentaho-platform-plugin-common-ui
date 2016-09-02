@@ -495,6 +495,10 @@ define([
       return this.getCell(rowIndex, colIndex).value;
     },
 
+    getValueKey: function(rowIndex, colIndex) {
+      return this.getCell(rowIndex, colIndex).key;
+    },
+
     getFormattedValue: function(rowIndex, colIndex) {
       return this.getCell(rowIndex, colIndex).toString();
     },

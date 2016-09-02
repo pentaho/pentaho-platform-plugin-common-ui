@@ -19,13 +19,21 @@ define([
   "./Model",
   "./_plain/Table",
   "./_cross/Table",
+  "./AtomicTypeName",
   "../util/arg"
-], function(AbstractTable, Model, PlainTable, CrossTable, arg) {
+], function(AbstractTable, Model, PlainTable, CrossTable, AtomicTypeName, arg) {
 
   // Map of CDA lowercase colType to DataTable type
+  // CDA column types (method AbstractExporter.getColTypes)
+  // github.com/webdetails/cda/blob/master/core/src/main/java/pt/webdetails/cda/exporter/AbstractExporter.java#L47
+
   var COLTYPE_CDA_DT = {
-    "numeric": "number",
-    "integer": "number"
+    "numeric": AtomicTypeName.NUMBER,
+    "integer": AtomicTypeName.NUMBER,
+    "blob":    AtomicTypeName.STRING,
+    "string":  AtomicTypeName.STRING,
+    "boolean": AtomicTypeName.BOOLEAN,
+    "date":    AtomicTypeName.DATE
   };
 
   var Table = AbstractTable.extend("pentaho.data.Table", /** @lends pentaho.data.Table# */{
@@ -163,6 +171,11 @@ define([
     /** @inheritdoc */
     getValue: function(rowIndex, colIndex) {
       return this.implem.getValue(rowIndex, colIndex);
+    },
+
+    /** @inheritdoc */
+    getValueKey: function(rowIndex, colIndex) {
+      return this.implem.getValueKey(rowIndex, colIndex);
     },
 
     /** @inheritdoc */

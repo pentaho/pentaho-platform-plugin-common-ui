@@ -109,6 +109,11 @@ define([
         attr = expectAttribute({name: "test", type: "booLean"});
         expect(attr.type).toBe("boolean");
       });
+
+      it("should convert datetime to date", function() {
+        var attr = expectAttribute({name: "test", type: "DateTime"});
+        expect(attr.type).toBe("date");
+      });
     });
 
     describe("#isDiscrete", function() {

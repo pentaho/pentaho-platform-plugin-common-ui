@@ -16,8 +16,9 @@
 define([
   "module",
   "./simple",
+  "../util/date",
   "../i18n!types"
-], function(module, simpleFactory, bundle) {
+], function(module, simpleFactory, date, bundle) {
 
   "use strict";
 
@@ -57,7 +58,7 @@ define([
         id: module.id,
 
         cast: function(v) {
-          return (v instanceof Date) ? v : new Date(v);
+          return date.parseDateEcma262v7(v);
         }
       }
     }).implement(/** @lends pentaho.type.Date# */{

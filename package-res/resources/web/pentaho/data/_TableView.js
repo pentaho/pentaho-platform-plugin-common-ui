@@ -224,6 +224,11 @@ define([
     },
 
     /** @inheritdoc */
+    getValueKey: function(rowIndex, colIndex) {
+      return this._source.getValueKey(this.getSourceRowIndex(rowIndex), this.getSourceColumnIndex(colIndex));
+    },
+
+    /** @inheritdoc */
     getFormattedValue: function(rowIndex, colIndex) {
       return this._source.getFormattedValue(this.getSourceRowIndex(rowIndex), this.getSourceColumnIndex(colIndex));
     },
