@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 define([
-  "./AbstractTransactionScope",
-  "../../util/object"
-], function(AbstractTransactionScope, O) {
+  "./AbstractTransactionScope"
+], function(AbstractTransactionScope) {
 
   "use strict";
 

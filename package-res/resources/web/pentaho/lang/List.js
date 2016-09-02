@@ -157,8 +157,8 @@ define([
     },
 
     replace: function(elem, at, keyArgs) {
-      var elem0 = this[at],
-          elem2 = this._replacing(elem, at, elem0, keyArgs);
+      var elem0 = this[at];
+      var elem2 = this._replacing(elem, at, elem0, keyArgs);
       if(elem2 !== undefined && (elem0 !== elem2)) {
         this[at] = elem2;
         if(this._replaced) this._replaced(elem2, at, elem0, keyArgs);
@@ -190,16 +190,16 @@ define([
     },
 
     _addMany: function(elems, keyArgs) {
-      var isReplay = elems === this,
-          LE = elems.length;
+      var isReplay = elems === this;
+      var LE = elems.length;
       if(!LE) return this.length;
 
-      var added = this._added,
-          i = 0,
-          at = isReplay ? 0 : this.length;
+      var added = this._added;
+      var i = 0;
+      var at = isReplay ? 0 : this.length;
       while(i < LE) {
-        var elem = elems[i],
-            elem2 = this._adding(elem, at, keyArgs);
+        var elem = elems[i];
+        var elem2 = this._adding(elem, at, keyArgs);
         if(elem2 === undefined) {
           // Not added afterall
           if(isReplay) {
@@ -227,7 +227,7 @@ define([
       baseProto.push.apply(list, this);
     },
 
-    //region ISpecifiable implementation
+    // region ISpecifiable implementation
     /**
      * Creates a specification of this list.
      *
@@ -241,6 +241,6 @@ define([
     toSpec: function() {
       return this.map(function(elem) { return elem.toSpec ? elem.toSpec() : elem; });
     }
-    //endregion
+    // endregion
   });
 });

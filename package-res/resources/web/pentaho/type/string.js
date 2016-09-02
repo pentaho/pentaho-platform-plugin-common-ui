@@ -48,8 +48,7 @@ define([
         cast: String
       }
     }).implement({
-      //jshint -W069
-      type: bundle.structured["string"]
+      type: bundle.structured["string"] // eslint-disable-line dot-notation
     });
   };
 });

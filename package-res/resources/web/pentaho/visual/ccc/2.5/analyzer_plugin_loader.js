@@ -15,6 +15,6 @@
 *
 */
 
-/*global analyzerVizPlugins:true */
+/* global analyzerVizPlugins:true */
 // This script informs Analyzer that it should request the analyzer_plugin.js through RequireJS
 analyzerVizPlugins.push("pentaho/visual/ccc/2.5/analyzer_plugin");

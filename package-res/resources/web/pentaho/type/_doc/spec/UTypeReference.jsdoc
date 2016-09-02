@@ -210,5 +210,3 @@
  *           Array.<pentaho.type.spec.UTypeReference>|
  *           pentaho.type.spec.ITypeProto} pentaho.type.spec.UTypeReference
  */
-
-

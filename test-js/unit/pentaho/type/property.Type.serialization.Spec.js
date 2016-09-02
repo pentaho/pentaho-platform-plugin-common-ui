@@ -21,7 +21,7 @@ define([
 
   "use strict";
 
-  /*global describe:false, it:false, expect:false, beforeEach:false, spyOn:false, jasmine:false*/
+  /* global describe:false, it:false, expect:false, beforeEach:false, spyOn:false, jasmine:false*/
 
   var context = new Context();
   var Property = context.get("property");
@@ -469,7 +469,7 @@ define([
         });
       });
 
-      //region Dynamic Attributes
+      // region Dynamic Attributes
       function itDynamicAttribute(name, value) {
 
         it("should not serialize when not specified", function() {
@@ -596,7 +596,7 @@ define([
         itDynamicAttribute("countMax", 2);
 
       });
-      //endregion
+      // endregion
     });
   });
 });

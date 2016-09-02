@@ -21,33 +21,32 @@ define([
 ], function(Event, mixinDataFilter, mixinError, utilError) {
   "use strict";
 
-  /**
-   * @name RejectedExecute
-   * @memberOf pentaho.visual.base.events
-   * @class
-   * @extends pentaho.lang.Event
-   * @mixes pentaho.type.mixins.mixinError
-   *
-   * @classDesc This event is triggered when any rejection occurs while inside
-   * the {@link pentaho.visual.base.Model#executeAction|Execute Action} flow.
-   *
-   * That rejection can be one of the following:
-   *  - The event {@link pentaho.visual.events.WillExecute|"will:execute"} was canceled.
-   *  - The `doExecute` action was {@link Nully}.
-   *  - The `doExecute` action failed while executing.
-   *
-   *
-   * @constructor
-   * @description Creates a `RejectedExecute` event.
-   *
-   * @param {!pentaho.visual.base.Model} source - The model object which is emitting the event.
-   * @param {!Error|pentaho.lang.UserError} error - The error of a rejected {@link pentaho.lang.ActionResult|ActionResult}.
-   * @param {?pentaho.visual.base.events.WillSelect} will - The "will:execute" event object.
-   */
   return Event.extend("pentaho.visual.base.events.RejectedExecute",
     /** @lends pentaho.visual.base.events.RejectedExecute# */{
 
       /**
+       * @alias RejectedExecute
+       * @memberOf pentaho.visual.base.events
+       * @class
+       * @extends pentaho.lang.Event
+       * @mixes pentaho.type.mixins.mixinError
+       *
+       * @classDesc This event is triggered when any rejection occurs while inside
+       * the {@link pentaho.visual.base.Model#executeAction|Execute Action} flow.
+       *
+       * That rejection can be one of the following:
+       *  - The event {@link pentaho.visual.events.WillExecute|"will:execute"} was canceled.
+       *  - The `doExecute` action was {@link Nully}.
+       *  - The `doExecute` action failed while executing.
+       *
+       *
+       * @constructor
+       * @description Creates a `RejectedExecute` event.
+       *
+       * @param {!pentaho.visual.base.Model} source - The model object which is emitting the event.
+       * @param {!Error|pentaho.lang.UserError} error - The error of a
+       * rejected {@link pentaho.lang.ActionResult|ActionResult}.
+       * @param {?pentaho.visual.base.events.WillSelect} will - The "will:execute" event object.
        */
       constructor: function(source, error, will) {
         if(!will) throw utilError.argRequired("will");
@@ -61,7 +60,7 @@ define([
       /**
        * Gets the event type.
        *
-       * @type string
+       * @type {string}
        * @readonly
        */
       get type() {

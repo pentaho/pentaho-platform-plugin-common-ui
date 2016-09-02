@@ -63,7 +63,7 @@ define([
      * the initialization of each list element.
      */
     constructor: function(keyArgs) {
-      if (keyArgs != null && typeof keyArgs.comparer === "function") {
+      if(keyArgs != null && typeof keyArgs.comparer === "function") {
         this.comparer = keyArgs.comparer;
       }
 
@@ -71,12 +71,12 @@ define([
     },
 
     _comparer: function(e1, e2) {
-      if (e1 == null || e2 == null) {
-        if (e1 != null) {
+      if(e1 == null || e2 == null) {
+        if(e1 != null) {
           return 1;
         }
 
-        if (e2 != null) {
+        if(e2 != null) {
           return -1;
         }
 
@@ -94,9 +94,9 @@ define([
     },
 
     set comparer(comparer) {
-      var hasOwn = O.hasOwn(this, '_comparer');
-      if (hasOwn && this._comparer !== comparer || !hasOwn && comparer != null) {
-        if (comparer == null) {
+      var hasOwn = O.hasOwn(this, "_comparer");
+      if(hasOwn && this._comparer !== comparer || !hasOwn && comparer != null) {
+        if(comparer == null) {
           delete this._comparer;
         } else {
           this._comparer = comparer;
@@ -107,7 +107,7 @@ define([
     },
 
     sort: function(comparer) {
-      if (comparer != null && comparer !== this.comparer) {
+      if(comparer != null && comparer !== this.comparer) {
         throw new Error("Can't specify a different sorting function in a sorted list.");
       }
 
@@ -127,15 +127,15 @@ define([
       var left = 0;
       var right = this.length - 1;
 
-      while (left <= right) {
+      while(left <= right) {
         // x | 0 is equivalent to Math.floor(x)
         var i = (left + right) / 2 | 0;
 
         var comparison = this.comparer(this[i], elem);
 
-        if (comparison < 0) {
+        if(comparison < 0) {
           left = i + 1;
-        } else if (comparison > 0) {
+        } else if(comparison > 0) {
           right = i - 1;
         } else {
           return i;
@@ -172,7 +172,7 @@ define([
     },
 
     splice: function() {
-      if (arguments.length > 2) {
+      if(arguments.length > 2) {
         throw new Error("Can't do a indexed insert in a sorted list.");
       }
 
@@ -182,12 +182,12 @@ define([
     _insertInOrder: function(elem, keyArgs) {
       var elem2 = this._adding(elem, null, keyArgs);
 
-      if (elem2 !== undefined) {
+      if(elem2 !== undefined) {
         var index = Math.abs(this.search(elem2));
         // Direct call base proto splice to avoid sorted list restrictions
         baseProto.splice.call(this, index, 0, elem2);
 
-        if (this._added) {
+        if(this._added) {
           this._added(elem2, index, keyArgs);
         }
       }
@@ -198,19 +198,19 @@ define([
     _addMany: function(elems, keyArgs) {
       var isReplay = elems === this;
       var LE = elems.length;
-      if (!LE) {
+      if(!LE) {
         return this.length;
       }
 
       var i = 0;
 
-      if (isReplay) {
-        while (i < LE) {
+      if(isReplay) {
+        while(i < LE) {
           var elem = elems[i];
 
           var elem2 = this._adding(elem, i, keyArgs);
 
-          if (elem2 === undefined) {
+          if(elem2 === undefined) {
             // Not added afterall
             // Remove from the array
             this.splice(i, 1);
@@ -218,13 +218,11 @@ define([
             LE--;
             continue;
           } else {
-            if (elem !== elem2) {
+            if(elem !== elem2) {
               this[i] = elem2;
             }
 
-            if (this._added) {
-              this._added.call(this, elem2, i, keyArgs);
-            }
+            if(this._added) this._added(elem2, i, keyArgs);
           }
 
           i++;
@@ -233,7 +231,7 @@ define([
         // sort initial array
         this.sort();
       } else {
-        while (i < LE) {
+        while(i < LE) {
           this._insertInOrder(elems[i], keyArgs);
 
           i++;

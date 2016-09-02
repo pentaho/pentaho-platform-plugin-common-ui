@@ -58,7 +58,7 @@ define([
      * @readonly
      */
 
-    //region public interface
+    // region public interface
     /**
      * Gets the type of change.
      *
@@ -92,7 +92,7 @@ define([
             // Primitive changes cannot be cleared; must be removed.
             // Assuming a Replace change...
             delete changes[name];
-            change._cancelRefs(this.transaction, complex, /*valueIni:*/complex._getByName(name));
+            change._cancelRefs(this.transaction, complex, /* valueIni: */complex._getByName(name));
           }
         }
       }
@@ -100,7 +100,7 @@ define([
 
     _setNestedChangeset: function(csetNested, propType) {
       // Cannot set changesets like this over Replace changes, or the latter would be, well... , overwritten.
-      //this._changes[propType.name] = csetNested;
+      // this._changes[propType.name] = csetNested;
 
       // getChange("foo") -> PrimitiveChange or Changeset
       // Case I - Replace without changes within the new value (apart from ref changes)
@@ -183,7 +183,7 @@ define([
         if(!(change instanceof Changeset)) change._apply(target);
       }, this._changes);
     }
-    //endregion
+    // endregion
   }, {
     /**
      * Sets the value of an _element property_.

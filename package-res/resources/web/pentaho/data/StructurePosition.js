@@ -26,31 +26,31 @@ define([
       this._ord = arg.required(keyArgs, "ordinal", "keyArgs");
     },
 
-    //region IListElement
+    // region IListElement
     elemName: "structure position",
-    //endregion
+    // endregion
 
-    //region IWithKey implementation
+    // region IWithKey implementation
     keyName: "name",
 
     get key() {
       return this._attr.key;
     },
-    //endregion
+    // endregion
 
-    //region IWithOrdinal implementation
+    // region IWithOrdinal implementation
     get ordinal() {
       return this._ord;
     },
-    //endregion
+    // endregion
 
-    //region IOfAttribute abstract implementation
+    // region IOfAttribute abstract implementation
     get attribute() {
       throw new Error("abstract");
     },
-    //endregion
+    // endregion
 
-    //region ISpecifiable implementation
+    // region ISpecifiable implementation
     toSpec: function(json) {
       if(this._attr) {
         if(!json) json = {};
@@ -58,7 +58,7 @@ define([
       }
       return json;
     }
-    //endregion
+    // endregion
   });
 
   // --------

@@ -19,7 +19,7 @@ define([
 
   "use strict";
 
-  /*global describe:true, it:true, expect:true, beforeEach:true, Object:true*/
+  /* global describe:true, it:true, expect:true, beforeEach:true, Object:true*/
 
   describe("pentaho.util.object -", function() {
     it("is an object containing the advertised functions", function() {
@@ -254,7 +254,7 @@ define([
 
       it("iterates over all direct enumerable properties of an object", function() {
         foo.xpto = "xpto";
-        Object.defineProperty(foo, "goose", {enumerable: true})
+        Object.defineProperty(foo, "goose", {enumerable: true});
         var ownProps = ["bar", "parrot", "lumberjack", "xpto", "goose"];
         var count = 0;
         O.eachOwn(foo, function(value, key) {

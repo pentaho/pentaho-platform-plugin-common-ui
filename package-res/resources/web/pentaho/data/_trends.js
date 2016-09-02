@@ -38,8 +38,10 @@ define([
      * @param {String} trendArgs.type  The type of trend to create; possible values: 'linear'.
      * @param {Number} trendArgs.x     The index of the "x" value column; can be a numeric or string column.
      * @param {Number} trendArgs.y     The index of the "y" value column; must be of a column of type 'number'.
-     * @param {String} trendArgs.name  The name of the new trend column; defaults to the type of trend plus the suffix "Trend".
-     * @param {String} trendArgs.label The label of the new trend column; defaults to the trend name, when specified, or to the default label of the trend type.
+     * @param {String} trendArgs.name  The name of the new trend column; defaults to the type of trend plus the
+     * suffix "Trend".
+     * @param {String} trendArgs.label The label of the new trend column; defaults to the trend name, when specified,
+     * or to the default label of the trend type.
      * @return {Number} The index of the added trend column.
      */
     createTrend: function(trendArgs) {
@@ -49,106 +51,106 @@ define([
   });
 
   Table.implement({
-      createTrend: function(trendArgs) {
-        // Argument validation
-        // ===================
+    createTrend: function(trendArgs) {
+      // Argument validation
+      // ===================
 
-        if(!(trendArgs instanceof Object)) throw error.argRequired('trendArgs');
+      if(!(trendArgs instanceof Object)) throw error.argRequired("trendArgs");
 
-        // # TrendType
+      // # TrendType
 
-        var trendType = trendArgs.type;
-        if(!trendType) throw error.argRequired('trendArgs.type');
+      var trendType = trendArgs.type;
+      if(!trendType) throw error.argRequired("trendArgs.type");
 
-        trendType = '' + trendType; // toString
+      trendType = "" + trendType; // toString
 
-        var trendInfo = trends_get(trendType, /*assert*/ true);
+      var trendInfo = trends_get(trendType, /* assert */ true);
 
-        // # x
+      // # x
 
-        var colCount = this.getNumberOfColumns();
+      var colCount = this.getNumberOfColumns();
 
-        var xIndex = arg.required(trendArgs, "x", "trendArgs");
+      var xIndex = arg.required(trendArgs, "x", "trendArgs");
 
-        xIndex = +xIndex; // toNumber
-        if(isNaN(xIndex)) throw error.argInvalidType("trendArgs.x", "number");
+      xIndex = +xIndex; // toNumber
+      if(isNaN(xIndex)) throw error.argInvalidType("trendArgs.x", "number");
 
-        if(xIndex < 0 || xIndex >= colCount) throw error.argRange("trendArgs.x");
+      if(xIndex < 0 || xIndex >= colCount) throw error.argRange("trendArgs.x");
 
-        // can be numeric or string
+      // can be numeric or string
 
-        // # y
+      // # y
 
-        var yIndex = arg.required(trendArgs, "y", "trendArgs");
+      var yIndex = arg.required(trendArgs, "y", "trendArgs");
 
-        yIndex = +yIndex; // toNumber
-        if(isNaN(yIndex)) throw error.argInvalidType("trendArgs.y", "number");
+      yIndex = +yIndex; // toNumber
+      if(isNaN(yIndex)) throw error.argInvalidType("trendArgs.y", "number");
 
-        if(yIndex < 0 || yIndex >= colCount) throw error.argRange("trendArgs.y");
+      if(yIndex < 0 || yIndex >= colCount) throw error.argRange("trendArgs.y");
 
-        if(this.getColumnType(yIndex) !== 'number')
-          throw error.argInvalid("trendArgs.y", "Must be a numeric column.");
+      if(this.getColumnType(yIndex) !== "number")
+        throw error.argInvalid("trendArgs.y", "Must be a numeric column.");
 
-        // xIndex may be equal to yIndex...
+      // xIndex may be equal to yIndex...
 
-        // # name and label
+      // # name and label
 
-        var trendName  = trendArgs.name  || (trendType + "Trend");
+      var trendName  = trendArgs.name  || (trendType + "Trend");
 
-        var trendLabel = trendArgs.label || (trendArgs.name ?  trendName : trendInfo.label);
+      var trendLabel = trendArgs.label || (trendArgs.name ?  trendName : trendInfo.label);
 
-        // # custom options
+      // # custom options
 
-        var trendOptions = trendArgs.options || {};
+      var trendOptions = trendArgs.options || {};
 
-        // Create Trend Column
-        // ===================
+      // Create Trend Column
+      // ===================
 
-        // Create the trend column.
-        // Am I a View or a Table?
-        this.model.attributes.add({
-          name: trendName,
-          type: "number",
-          label: trendLabel
-        });
-        var trendIndex = this.addColumn(trendName);
+      // Create the trend column.
+      // Am I a View or a Table?
+      this.model.attributes.add({
+        name: trendName,
+        type: "number",
+        label: trendLabel
+      });
+      var trendIndex = this.addColumn(trendName);
 
-        // ----
+      // ----
 
-        var me = this;
+      var me = this;
 
-        var isXDiscrete = this.getColumnType(xIndex) !== 'number';
+      var isXDiscrete = this.getColumnType(xIndex) !== "number";
 
-        var rowIndexesEnumtor = this.getRowIndexEnumerator();
+      var rowIndexesEnumtor = this.getRowIndexEnumerator();
 
-        var getX = isXDiscrete ?
-            null : // means: "use *index* as X value"
-            function(i) { return me.getValue(i, xIndex); };
+      var getX = isXDiscrete
+            ? null // means: "use *index* as X value"
+            : function(i) { return me.getValue(i, xIndex); };
 
-        var getY = function(i) { return me.getValue(i, yIndex); };
+      var getY = function(i) { return me.getValue(i, yIndex); };
 
-        var options = Object.create(trendOptions);
-        options.rows = rowIndexesEnumtor;
-        options.x = getX;
-        options.y = getY;
+      var options = Object.create(trendOptions);
+      options.rows = rowIndexesEnumtor;
+      options.x = getX;
+      options.y = getY;
 
-        var trendModel = trendInfo.model(options);
+      var trendModel = trendInfo.model(options);
 
-        // Not enough points to interpolate?
-        // Every row's trend column already has the value null.
-        if(!trendModel) return false;
+      // Not enough points to interpolate?
+      // Every row's trend column already has the value null.
+      if(!trendModel) return false;
 
-        var i = -1,
-            R = this.getNumberOfRows();
-        while(++i < R) {
-          var trendX = getX ? getX(i) : i,
-              trendY = trendX != null ? trendModel.sample(trendX, getY(i), i) : null;
+      var i = -1;
+      var R = this.getNumberOfRows();
+      while(++i < R) {
+        var trendX = getX ? getX(i) : i;
+        var trendY = trendX != null ? trendModel.sample(trendX, getY(i), i) : null;
 
-          this.getCell(i, trendIndex).value = trendY;
-        }
-
-        return true;
+        this.getCell(i, trendIndex).value = trendY;
       }
+
+      return true;
+    }
   });
 
   AbstractDataTable.implement({
@@ -158,9 +160,9 @@ define([
      * Obtains an enumerator for the row index of the data table.
      */
     getRowIndexEnumerator: function() {
-      var index = -1,
-          count = this.getNumberOfRows(),
-          enumtor = {
+      var index = -1;
+      var count = this.getNumberOfRows();
+      var enumtor = {
             item: undefined, next: function() {
               if(index < count - 1) {
                 enumtor.item = ++index; // the row index
@@ -191,14 +193,14 @@ define([
   function trends_define(type, spec){
     if(!type) throw error.argRequired("type");
 
-    type = '' + type; // to string
+    type = "" + type; // to string
 
     if(!spec) throw error.argRequired("spec");
 
     // ----
 
     var model = arg.required(spec, "model", "spec");
-    if(typeof model !== 'function') throw error.argInvalidType("spec.model", "function");
+    if(typeof model !== "function") throw error.argInvalidType("spec.model", "function");
 
     // ----
 
@@ -210,7 +212,7 @@ define([
       label: label,
       model: model
     };
-  };
+  }
 
   /* get
    * Obtains the trend info object of a given trend type.
@@ -226,7 +228,7 @@ define([
       throw error.argInvalid("type", "There is no trend type named '" + type + "'.");
 
     return trendInfo;
-  };
+  }
 
   /* types
    * Obtains an array with the names of all defined trend types.

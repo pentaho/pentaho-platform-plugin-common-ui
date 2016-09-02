@@ -34,7 +34,8 @@ define([
    * A rejection can be one of the following:
    *  - the event {@link pentaho.type.events.WillChange|"will:change"} was canceled
    *  - the value of a property in changeset was not consistent with the current value of the property,
-   *  which indicates that some change took place during the processing of the {@link pentaho.type.events.WillChange|"will:change"} event listeners.
+   *  which indicates that some change took place during the processing of the
+   *  {@link pentaho.type.events.WillChange|"will:change"} event listeners.
    *
    * @constructor
    * @description Creates a `RejectedChange` event.

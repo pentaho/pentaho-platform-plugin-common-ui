@@ -37,7 +37,7 @@ define([
     return {
       model: [
         {name: "country", type: "string", label: "Country"},
-        {name: "sales",   type: "number", label: "Sales"  },
+        {name: "sales",   type: "number", label: "Sales"  }
       ],
       rows: [
         {c: [ {v: "Portugal"}, {v: 12000}] },
@@ -50,7 +50,7 @@ define([
     return {
       model: [
         {name: "country", type: "string", label: "Country"},
-        {name: "sales",   type: "number", label: "Sales"  },
+        {name: "sales",   type: "number", label: "Sales"  }
       ],
       rows: [
         {c: [ {v: "Portugal", f: null}, {v: 12000, f: null}] },

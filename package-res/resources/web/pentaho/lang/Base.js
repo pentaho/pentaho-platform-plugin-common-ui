@@ -57,10 +57,10 @@ define([
   // ## Support variables
 
   // Used by `inst_extend_object`
-  var F_toString = Function.prototype.toString,
-      O_hasOwn   = Object.prototype.hasOwnProperty,
-      A_slice    = Array.prototype.slice,
-      _excludeExtendInst = Object.freeze({
+  var F_toString = Function.prototype.toString;
+  var O_hasOwn = Object.prototype.hasOwnProperty;
+  var A_slice = Array.prototype.slice;
+  var _excludeExtendInst = Object.freeze({
         "base": 1,
         "constructor": 1,
         "extend_order": 1,
@@ -69,8 +69,8 @@ define([
         "__root_proto__": 1,
         "__extend_order__": 1,
         "__extend_exclude__": 1
-      }),
-      _excludeExtendStatic = Object.freeze({
+      });
+  var _excludeExtendStatic = Object.freeze({
         "ancestor": 1,
         "prototype": 1,
         "valueOf": 1,
@@ -90,7 +90,7 @@ define([
   /**
    * Defines the Base class.
    *
-   * @return {Class.<pentaho.lang.Base>}
+   * @return {Class.<pentaho.lang.Base>} The created class constructor.
    *
    * @private
    */
@@ -258,7 +258,6 @@ define([
       ancestor: NativeBase // Replaces BaseBoot by NativeBase
     });
 
-
     /**
      * If a method has been overridden then the base method provides access to the overridden method.
      *
@@ -288,7 +287,7 @@ define([
     return BaseRoot;
   }
 
-  //region Class methods
+  // region Class methods
 
   /**
    * Creates a subclass of this one.
@@ -330,16 +329,16 @@ define([
    * @sealed
    */
   function class_extend(name, instSpec, classSpec, keyArgs) {
-    /*jshint validthis:true*/
+    /* jshint validthis:true*/
 
     // extend()
     // extend(instSpec)
     // extend(instSpec, classSpec)
     // extend(instSpec, classSpec, keyArgs)
     if(arguments.length < 4 && typeof name !== "string") {
-      keyArgs   = classSpec;
+      keyArgs = classSpec;
       classSpec = instSpec;
-      instSpec  = name;
+      instSpec = name;
       name = null;
     }
 
@@ -387,7 +386,7 @@ define([
    * @protected
    */
   function class_extend_core(name, instSpec, classSpec, keyArgs) {
-    /*jshint validthis:true*/
+    /* jshint validthis:true*/
 
     // Allow the value of AMD module.id to be passed directly to name
     if(name && name.indexOf("/") > 0) {
@@ -440,18 +439,18 @@ define([
    * @private
    */
   function class_extend_subclass(name, instSpec) {
-    /*jshint validthis:true*/
+    /* jshint validthis:true*/
 
     // Create PROTOTYPE and CONSTRUCTOR
-    var subProto = Object.create(this.prototype),
-        Subclass = class_extend_createCtor(subProto, instSpec);
+    var subProto = Object.create(this.prototype);
+    var Subclass = class_extend_createCtor(subProto, instSpec);
 
     if(name) setFunName(Subclass, name);
 
     // Wire proto and constructor, so that the `instanceof` operator works.
     O.setConst(subProto, "constructor", Subclass);
     Subclass.prototype = subProto;
-    Subclass.ancestor  = this;
+    Subclass.ancestor = this;
 
     // ----
 
@@ -516,7 +515,7 @@ define([
    * @private
    */
   function class_extend_createCtor(proto, instSpec) {
-    /*jshint validthis:true*/
+    /* jshint validthis:true*/
 
     var baseInit = proto.__init__;
     var Class = class_extend_readCtor(instSpec);
@@ -587,7 +586,7 @@ define([
    * @throws {Error} When `value` cannot be converted.
    */
   function class_to(value) {
-    /*jshint validthis:true*/
+    /* jshint validthis:true*/
     return (value instanceof this) ? value : O.make(this, arguments);
   }
 
@@ -618,7 +617,7 @@ define([
    * @throws {Error} When `value` cannot be converted.
    */
   function class_array_to(value) {
-    /*jshint validthis:true*/
+    /* jshint validthis:true*/
 
     // First, convert to an array.
     if(value == null)
@@ -656,7 +655,7 @@ define([
    * @return {Class.<pentaho.lang.Base>} This class.
    */
   function class_mix(instSpec, classSpec, keyArgs) {
-    /*jshint validthis:true*/
+    /* jshint validthis:true*/
 
     if(fun.is(instSpec)) {
       // function, keyArgs
@@ -666,7 +665,7 @@ define([
     }
 
     // Versions of implement and implementStatic, but for a single spec and with keyArgs
-    if(instSpec ) this.prototype.extend(instSpec, keyArgs);
+    if(instSpec)  this.prototype.extend(instSpec, keyArgs);
     if(classSpec) inst_extend_object.call(this, classSpec, null, keyArgs);
 
     return this;
@@ -693,12 +692,12 @@ define([
    * @see pentaho.lang.Base.mix
    */
   function class_implement() {
-    /*jshint validthis:true*/
+    /* jshint validthis:true*/
 
-    var i = -1,
-        L = arguments.length,
-        proto = this.prototype,
-        extend = proto.extend || inst_extend;
+    var i = -1;
+    var L = arguments.length;
+    var proto = this.prototype;
+    var extend = proto.extend || inst_extend;
 
     while(++i < L) {
       var v = arguments[i];
@@ -718,11 +717,11 @@ define([
    * @private
    */
   function class_inherit_static(BaseClass) {
-    /*jshint validthis:true*/
+    /* jshint validthis:true*/
 
     for(var name in BaseClass)
       if(!Object[name] && !O_hasOwn.call(_excludeExtendStatic, name))
-        inst_extend_propDesc.call(this, name, BaseClass, undefined, /*funOnly:*/true);
+        inst_extend_propDesc.call(this, name, BaseClass, undefined, /* funOnly: */true);
   }
 
   /**
@@ -743,10 +742,10 @@ define([
    * @return {!Class.<pentaho.lang.Base>|function} This class.
    */
   function class_implementStatic() {
-    /*jshint validthis:true*/
+    /* jshint validthis:true*/
 
-    var i = -1,
-        L = arguments.length;
+    var i = -1;
+    var L = arguments.length;
     while(++i < L) {
       // Extend the constructor with `classSpec`.
       // (overriding static methods sets the `base` property on the constructor)
@@ -759,7 +758,7 @@ define([
 
   // endregion
 
-  //region Instance methods
+  // region Instance methods
 
   function inst_base() {}
 
@@ -782,7 +781,7 @@ define([
    * @return {!Object} This object.
    */
   function inst_extend(source, keyArgs) {
-    /*jshint validthis:true*/
+    /* jshint validthis:true*/
     if(source) {
       // Call `this.extend` method instead of this one, if it exists.
       if(!fun.is(this) && !this.__root_proto__ && fun.is(this.extend) && this.extend !== inst_extend) {
@@ -818,7 +817,7 @@ define([
    * @private
    */
   function inst_extend_object(source, rootProto, keyArgs) {
-    /*jshint validthis:true*/
+    /* jshint validthis:true*/
 
     // When called, for e.g. on functions, there's no __extend_exclude__
     var lcaExclude = rootProto && O.lca(source, rootProto);
@@ -844,7 +843,7 @@ define([
     }
 
     // All other properties
-    // jshint -W089
+    // eshint guard-for-in: 0
     for(name in source) extendProp(this, name);
   }
 
@@ -861,7 +860,7 @@ define([
    * @private
    */
   function inst_extend_propDesc(name, source, rootProto, funOnly, lcaExclude) {
-    /*jshint validthis:true*/
+    /* jshint validthis:true*/
 
     var desc = O.getPropertyDescriptor(source, name, lcaExclude);
     if(desc) {
@@ -893,7 +892,7 @@ define([
    * @private
    */
   function inst_extend_propAssign(name, value, rootProto, funOnly) {
-    /*jshint validthis:true*/
+    /* jshint validthis:true*/
 
     if(fun.is(value)) {
       this[name] = methodOverride(value, this[name], rootProto);
@@ -902,9 +901,9 @@ define([
     }
   }
 
-  //endregion
+  // endregion
 
-  //region Method Override
+  // region Method Override
 
   /**
    * Evaluates the need to wrap a method for overriding
@@ -938,7 +937,7 @@ define([
 
     if(!baseValue) {
       // if `value` was wrapped, return it
-      if(method != value) {
+      if(method !== value) {
         return value;
       }
 
@@ -1011,9 +1010,9 @@ define([
     };
   }
 
-  //endregion
+  // endregion
 
-  //region Helpers
+  // region Helpers
 
   /**
    * Returns the string representation of this method.
@@ -1026,7 +1025,7 @@ define([
    * @private
    */
   function properFunToString() {
-    /*jshint validthis:true*/
+    /* jshint validthis:true*/
     return F_toString.call(this.valueOf());
   }
 
@@ -1051,5 +1050,5 @@ define([
     }
   }
 
-  //endregion
+  // endregion
 });

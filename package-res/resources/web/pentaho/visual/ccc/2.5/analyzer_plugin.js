@@ -14,18 +14,19 @@
 * limitations under the License.
 */
 
-define([
-    "dojo/_base/declare",
-    "cdf/lib/CCC/def"
-], function(declare, def) {
+/* eslint indent: ["error", 4] */
 
-    /*global analyzerPlugins:true, cv: true, cvCatalog: true, analyzer: true */
+define([
+  "dojo/_base/declare"
+], function(declare) {
+
+    /* global analyzerPlugins:true, cv: true, cvCatalog: true, analyzer: true */
 
     // If necessary, declare **global** variable, initializing it with an array
-    analyzerPlugins = typeof analyzerPlugins == "undefined" ? [] : analyzerPlugins;
+    analyzerPlugins = typeof analyzerPlugins === "undefined" ? [] : analyzerPlugins;
 
     analyzerPlugins.push({
-        init: function () {
+        init: function() {
             declare("analyzer.XCCCVizHelper", null, {
                 // Analyzer hooks.
                 // generateOptionsFromAnalyzerState(report)

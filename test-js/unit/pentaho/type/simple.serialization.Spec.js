@@ -19,7 +19,7 @@ define([
 ], function(Context, SpecificationScope) {
   "use strict";
 
-  /*global describe:false, it:false, expect:false, beforeEach:false, Date:false */
+  /* global describe:false, it:false, expect:false, beforeEach:false, Date:false */
 
   var context = new Context();
 
@@ -218,7 +218,7 @@ define([
     });
   }); // pentaho.type.Simple
 
-  //region Other Simple Types Test Helpers
+  // region Other Simple Types Test Helpers
 
   function testSimpleCommon(SimpleClass, primitiveValue) {
 
@@ -269,7 +269,7 @@ define([
       expect(spec).toBe(primitiveValue);
     });
   }
-  //endregion
+  // endregion
 
   describe("pentaho.type.Boolean", function() {
     var SimpleClass = context.get("pentaho/type/boolean");

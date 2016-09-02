@@ -35,7 +35,7 @@ define([
      *
      * @description Creates a number instance.
      */
-    return Simple.extend({
+    return Simple.extend(/** @lends pentaho.type.Number# */{
       /**
        * Gets the underlying number primitive of the value.
        * @name pentaho.type.Number#value
@@ -43,13 +43,12 @@ define([
        * @readonly
        */
 
-      type: {
+      type: /** @lends pentaho.type.Number.Type# */{
         id: module.id,
         cast: toNumber
       }
-    }).implement({
-      //jshint -W069
-      type: bundle.structured["number"]
+    }).implement(/** @lends pentaho.type.Number# */{
+      type: bundle.structured["number"] // eslint-disable-line dot-notation
     });
 
     function toNumber(v) {

@@ -419,7 +419,7 @@ define([
         expect(position.cells.length).toBe(2);
         expect(position.cells[0].attribute).toBe(model.attributes.get("D1"));
         expect(position.cells[0].value).toBe("d1_1");
-        expect(position.cells[1].attribute).toBe(model.attributes.get("D2"));;
+        expect(position.cells[1].attribute).toBe(model.attributes.get("D2"));
 
         position = axis[1];
         expect(position.ordinal).toBe(1);
@@ -849,7 +849,7 @@ define([
             cols: ["D3"],
             meas: ["N1"]
           },
-          cols: ["D1", "D2", {c: ["d3_1"], attr: "N1"}, {c: ["d3_2"], attr: "N1"}],
+          cols: ["D1", "D2", {c: ["d3_1"], attr: "N1"}, {c: ["d3_2"], attr: "N1"}]
         }, {
           model: model
         });
@@ -884,7 +884,7 @@ define([
             cols: ["D3"],
             meas: ["N1", "N2"]
           },
-          cols: ["D1", "D2", {c: ["d3_1"], attr: "N1"}, {c: ["d3_2"], attr: "N1"}],
+          cols: ["D1", "D2", {c: ["d3_1"], attr: "N1"}, {c: ["d3_2"], attr: "N1"}]
         }, {
           model: model
         });
@@ -922,7 +922,7 @@ define([
             cols: ["D3"],
             meas: ["N1", "N2"]
           },
-          cols: ["D1", "D2", {c: ["d3_1"], attr: "N1"}, {c: ["d3_2"], attr: "N1"}],
+          cols: ["D1", "D2", {c: ["d3_1"], attr: "N1"}, {c: ["d3_2"], attr: "N1"}]
         }, {
           model: model
         });
@@ -947,7 +947,7 @@ define([
             cols: [],
             meas: ["N1", "N2"]
           },
-          cols: ["D1", "D2", {attr: "N1"}],
+          cols: ["D1", "D2", {attr: "N1"}]
         }, {
           model: model
         });
@@ -988,7 +988,7 @@ define([
             cols: [],
             meas: ["N1", "N2"]
           },
-          cols: ["D1", "D2", {attr: "N1"}, {attr: "N2"}],
+          cols: ["D1", "D2", {attr: "N1"}, {attr: "N2"}]
         }, {
           model: model
         });

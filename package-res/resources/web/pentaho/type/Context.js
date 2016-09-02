@@ -39,19 +39,17 @@ define([
 
   "use strict";
 
-  /*global SESSION_NAME:false, SESSION_LOCALE:false, active_theme:false, Promise:false */
+  /* global Promise:false */
 
-  var _nextFactoryUid = 1,
+  var _nextFactoryUid = 1;
+  var _baseMid = module.id.replace(/Context$/, ""); // e.g.: "pentaho/type/"
+  var _baseFacetsMid = _baseMid + "facets/";
 
-      _baseMid = module.id.replace(/Context$/, ""), // e.g.: "pentaho/type/"
+  // Default `base` type in a type specification.
+  var _defaultBaseTypeMid = "complex";
 
-      _baseFacetsMid = _baseMid + "facets/",
-
-      // Default `base` type in a type specification.
-      _defaultBaseTypeMid = "complex",
-
-      // Standard types which can be assumed to already be loaded.
-      _standardTypeMids = {};
+  // Standard types which can be assumed to already be loaded.
+  var _standardTypeMids = {};
 
   Object.keys(standard).forEach(function(name) {
     if(name !== "facets" && name !== "filter") _standardTypeMids[_baseMid + name] = 1;
@@ -222,14 +220,14 @@ define([
        *
        * @type {!Class.<pentaho.type.Instance>}
        */
-      this._Instance = this._getByFactory(standard.instance, /*sync:*/true);
+      this._Instance = this._getByFactory(standard.instance, /* sync: */true);
 
       // Register all other standard types
       // This mostly helps tests being able to require.undef(.) these at any time
       //  and not cause random failures for assuming all standard types were loaded.
       Object.keys(standard).forEach(function(lid) {
         if(lid !== "facets" && lid !== "filter" && lid !== "instance")
-          this._getByFactory(standard[lid], /*sync:*/true);
+          this._getByFactory(standard[lid], /* sync: */true);
       }, this);
     },
 
@@ -243,7 +241,7 @@ define([
       return this._vars;
     },
 
-    //region Type Registry
+    // region Type Registry
     /**
      * Gets the **configured instance constructor** of a type.
      *
@@ -453,7 +451,6 @@ define([
       }
     },
 
-
     /**
      * Gets the **configured instance constructors** of
      * all of the loaded types that are subtypes of a given base type.
@@ -579,7 +576,7 @@ define([
         return Promise.all([this.getAsync(baseTypeId), instCtorsPromise])
           .then(function(values) {
             var baseType  = values[0].type;
-            var InstCtors = Object.keys(me._byTypeUid).map(function(typeUid){
+            var InstCtors = Object.keys(me._byTypeUid).map(function(typeUid) {
               return me._byTypeUid[typeUid];
             });
 
@@ -594,9 +591,9 @@ define([
         return Promise.reject(ex);
       }
     },
-    //endregion
+    // endregion
 
-    //region Changes and Transactions
+    // region Changes and Transactions
     /**
      * Gets the ambient transaction, if any, or `null`.
      *
@@ -726,9 +723,9 @@ define([
     _takeNextVersion: function() {
       return ++this._nextVersion;
     },
-    //endregion
+    // endregion
 
-    //region get support
+    // region get support
     /**
      * Gets the instance constructor of a type.
      *
@@ -753,7 +750,7 @@ define([
       if(typeRef == null || typeRef === "")
         return this._error(error.argRequired("typeRef"), sync);
 
-      /*jshint laxbreak:true*/
+      /* eslint default-case: 0 */
       switch(typeof typeRef) {
         case "string":   return this._getById (typeRef, sync);
         case "function": return this._getByFun(typeRef, sync);
@@ -834,7 +831,7 @@ define([
       var InstCtor = O.getOwn(this._byTypeId, id);
       if(InstCtor) return this._return(InstCtor, sync);
 
-      /*jshint laxbreak:true*/
+      /* jshint laxbreak:true*/
       return sync
           // `require` fails if a module with the id in the `typeSpec` var
           // is not already _loaded_.
@@ -1041,10 +1038,10 @@ define([
       // A root generic type spec initiates a specification context.
       // Each root generic type spec has a separate specification context.
       var resolveSync = function() {
-        /*jshint validthis:true*/
+        /* jshint validthis:true*/
 
         return O.using(new SpecificationScope(), function resolveSyncInContext(specScope) {
-          /*jshint validthis:true*/
+          /* jshint validthis:true*/
 
           // Note the switch to sync mode here, whatever the outer `sync` value.
           // Only the outermost _getByObjectSpec call will be async.
@@ -1073,7 +1070,7 @@ define([
 
       // Collect the module ids of all custom types used within typeSpec.
       var customTypeIds = collectTypeIds(typeSpec);
-      /*jshint laxbreak:true*/
+      /* jshint laxbreak:true*/
       return customTypeIds.length
           // Require them all and only then invoke the synchronous BaseType.extend method.
           ? promiseUtil.require(customTypeIds, localRequire).then(resolveSync.bind(this))
@@ -1103,7 +1100,7 @@ define([
     _getConfig: function(id) {
       return configurationService.select(id, this._vars);
     },
-    //endregion
+    // endregion
 
     _return: function(value, sync) {
       return sync ? value : Promise.resolve(value);
@@ -1117,7 +1114,7 @@ define([
 
   return Context;
 
-  //region type registry
+  // region type registry
   function getFactoryUid(factory) {
     return factory._fuid_ || (factory._fuid_ = _nextFactoryUid++);
   }
@@ -1138,6 +1135,7 @@ define([
   function collectTypeIdsRecursive(typeSpec, outIds) {
     if(!typeSpec) return;
 
+    /* eslint default-case: 0 */
     switch(typeof typeSpec) {
       case "string":
         if(SpecificationContext.isIdTemporary(typeSpec)) return;
@@ -1202,5 +1200,5 @@ define([
         return;
     }
   }
-  //endregion
+  // endregion
 });

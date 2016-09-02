@@ -54,7 +54,9 @@ define(function() {
        * @return {Function} Constant function.
        */
       constant: function(v) {
-        return function() { return v; };
+        return function() {
+          return v;
+        };
       },
 
       /**
@@ -90,7 +92,7 @@ define(function() {
         return attrValues.length ? buildPredicate(attrValues) : null;
       }
     };
-  }());
+  })();
 
   /**
    * Auxiliary function of {@link pentaho.util.fun.predicate}
@@ -105,7 +107,8 @@ define(function() {
     return function instancePredicate(inst) {
       if(!inst) return false;
 
-      var i = attrValues.length, attrValue;
+      var i = attrValues.length;
+      var attrValue;
       while(i--) {
         attrValue = attrValues[i];
         if(inst[attrValue[0]] !== attrValue[1])
@@ -115,11 +118,10 @@ define(function() {
     };
   }
 
-
   function asFun(f) {
-    /*jshint evil:true*/
+    /* eslint no-eval: 0 */
     if(f) {
-      if(typeof f === "string"  ) f = eval("(" + f + ")");
+      if(typeof f === "string") f = eval("(" + f + ")");
       if(typeof f === "function") return f;
     }
     return null;

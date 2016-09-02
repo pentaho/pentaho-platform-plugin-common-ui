@@ -30,13 +30,13 @@ define(function() {
 
   Calc.prototype.draw = function(dataTable, drawSpec) {
 
-    var R = dataTable.getNumberOfRows(),
-        j = dataTable.getNumberOfColumns(),
-        getValue = function(k) {
+    var R = dataTable.getNumberOfRows();
+    var j = dataTable.getNumberOfColumns();
+    var getValue = function(k) {
           var v = dataTable.getValue(k, j);
           return !isNaN(v) && v != null ? v : null;
-        },
-        i;
+        };
+    var i;
 
     // Detect measure column.
     while(j--) if(dataTable.getColumnType(j) === "number") break;

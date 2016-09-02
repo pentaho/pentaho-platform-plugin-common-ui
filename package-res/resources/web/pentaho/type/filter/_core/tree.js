@@ -114,6 +114,7 @@ define([
           }
         }
 
+        /* eslint default-case: 0 */
         switch(ops.length) {
           // Any non-null arguments?
           case OP: return this;

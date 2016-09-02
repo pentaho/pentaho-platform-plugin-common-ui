@@ -21,7 +21,7 @@ define([
 
   "use strict";
 
-  /*global describe:true, it:true, expect:true, beforeEach:true, spyOn:true*/
+  /* global describe:true, it:true, expect:true, beforeEach:true, spyOn:true*/
 
   describe("pentaho.type.Refinement.Type -", function() {
 

@@ -33,7 +33,7 @@ define([
    * Refinement facets are mixed into a {@link pentaho.type.Refinement} type,
    * by specifying its {@link pentaho.type.Refinement.Type#facets} property,
    * when defining it, either
-   * through {@link pentaho.type.Value.refine} or, directly 
+   * through {@link pentaho.type.Value.refine} or, directly
    * through {@link pentaho.type.Refinement.extend}.
    *
    * Besides any attributes that you may define in this type's prototype,
@@ -70,7 +70,7 @@ define([
     /**
      * Gets the short identifier of the refinement facet.
      *
-     * When a refinement facet is one of the standard facets 
+     * When a refinement facet is one of the standard facets
      * and, thus, it is a direct sub-module of the `pentaho/type/facets` module,
      * its short identifier is its _local module id_,
      * like `"DiscreteDomain"` or `"OrdinalDomain"`.

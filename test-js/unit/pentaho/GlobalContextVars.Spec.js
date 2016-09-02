@@ -23,10 +23,10 @@ define([
 
   "use strict";
 
-  /*global describe:false, it:false, expect:false, beforeEach:false, afterEach:false */
+  /* global describe:false, it:false, expect:false, beforeEach:false, afterEach:false */
 
   // These should really be writable, i.e. globalVar: true
-  /*global SESSION_NAME:true, active_theme:true, SESSION_LOCALE:true */
+  /* global SESSION_NAME:true, active_theme:true, SESSION_LOCALE:true */
 
   // Use alternate, promise-aware version of `it`.
 

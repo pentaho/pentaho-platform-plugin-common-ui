@@ -33,8 +33,8 @@ define([
 
   return function(context) {
 
-    var Value = context.get(valueFactory),
-        Element = context.get(elemFactory);
+    var Value = context.get(valueFactory);
+    var Element = context.get(elemFactory);
 
     /**
      * @name pentaho.type.List.Type
@@ -102,7 +102,8 @@ define([
         var elemType = this.type.of;
         var elems = this._elems;
         var keys  = this._keys;
-        var elem, key;
+        var elem;
+        var key;
         while(++i < L) {
           if((elem = elemType.to(elemSpecs[i])) != null && !O.hasOwn(keys, (key = elem.key))) {
             elems.push(elem);
@@ -300,7 +301,7 @@ define([
        * @return {?pentaho.type.Element} The corresponding element or `null`.
        */
       get: function(key) {
-        //jshint laxbreak:true
+        // jshint laxbreak:true
         return (key != null && (key = this._castKey(key)) != null)
             ? O.getOwn(this._projectedMock._keys, key, null)
             : null;
@@ -345,7 +346,7 @@ define([
        * @param {any|Array} fragment - Value or values to add.
        */
       add: function(fragment) {
-        this._set(fragment, /*add:*/true, /*update:*/true, /*remove:*/false, /*move:*/false);
+        this._set(fragment, /* add: */true, /* update: */true, /* remove: */false, /* move: */false);
       },
 
       /**
@@ -485,7 +486,7 @@ define([
         return this.type._elemType.to(valueSpec);
       },
 
-      //region Core change methods
+      // region Core change methods
       // implement abstract pentaho.type.ContainerMixin#_createChangeset
       _createChangeset: function(txn) {
         return new ListChangeset(txn, this);
@@ -496,9 +497,9 @@ define([
           cset._set(fragment, add, update, remove, move, index);
         });
       },
-      //endregion
+      // endregion
 
-      //region validation
+      // region validation
       /**
        * Determines if this list value is a **valid instance** of its type.
        *
@@ -521,9 +522,9 @@ define([
           return typeUtil.combineErrors(errors, elemType.validateInstance(elem));
         }, null);
       },
-      //endregion
+      // endregion
 
-      //region serialization
+      // region serialization
       toSpecInContext: function(keyArgs) {
         if(!keyArgs) keyArgs = {};
 
@@ -545,7 +546,7 @@ define([
 
         return elemSpecs;
       },
-      //endregion
+      // endregion
 
       type: /** @lends pentaho.type.List.Type# */{
 
@@ -562,7 +563,7 @@ define([
         get isList() { return true; },
         get isContainer() { return true; },
 
-        //region of
+        // region of
         _elemType: Element.type,
 
         /**
@@ -600,9 +601,9 @@ define([
           //  structurally equal. Because there isn't an equals test,
           //  it cannot be validated that a set is ok as long as the set value does not change.
 
-          var ElemInstance = this.context.get(value),
-              elemType = ElemInstance.type,
-              baseElemType = this._elemType;
+          var ElemInstance = this.context.get(value);
+          var elemType = ElemInstance.type;
+          var baseElemType = this._elemType;
 
           // Can't use O.setConst cause the configurable: false is inherited
           // and we need to be able to set each local value at least once.
@@ -621,9 +622,9 @@ define([
           this._elemType = elemType;
 
         },
-        //endregion
+        // endregion
 
-        //region serialization
+        // region serialization
         // * "list" has an id and toRefInContext immediately returns that
         // * ["string"] -> anonymous list type, equivalent to {base: "list", of: "string"}
         //   toRefInContext calls the toSpecInContext, cause it has no id and because a temporary id is also
@@ -658,7 +659,7 @@ define([
 
           return spec;
         }
-        //endregion
+        // endregion
       }
     })
     .implement(ContainerMixin)

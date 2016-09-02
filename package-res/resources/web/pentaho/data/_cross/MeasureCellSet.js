@@ -41,11 +41,11 @@ define([
       if(spec) this._load(spec);
     },
 
-    //region IWithStructure implementation
+    // region IWithStructure implementation
     get structure() {
       return this._structure;
     },
-    //endregion
+    // endregion
 
     get: function(r, c, m, preventCreate) {
       var attr = this._structure[m == null ? 0 : m].attribute;
@@ -66,18 +66,18 @@ define([
     },
 
     _load: function(cubeSpec) {
-      var r = -1,
-          R = cubeSpec.length,
-          measAttrs = this._structure.toSpec({shareModel: true});
+      var r = -1;
+      var R = cubeSpec.length;
+      var measAttrs = this._structure.toSpec({shareModel: true});
       while(++r < R) {
-        var rowSpec = cubeSpec[r],
-            c = -1,
-            C = rowSpec.length;
+        var rowSpec = cubeSpec[r];
+        var c = -1;
+        var C = rowSpec.length;
         while(++c < C) {
           var measSpecs = rowSpec[c];
           if(measSpecs instanceof Array) {
-            var k = -1,
-                K = measSpecs.length;
+            var k = -1;
+            var K = measSpecs.length;
             while(++k < K) this.set(r, c, measAttrs[k], measSpecs[k]);
           } else {
             this.set(r, c, measAttrs[0], measSpecs);
@@ -95,7 +95,7 @@ define([
 
   var MeasureCube = Base.extend("pentaho.data._cross.MeasureCube", {
 
-    constructor: function (keyArgs) {
+    constructor: function(keyArgs) {
       // row -> col -> {<meaName>: cell, ...} (multiple measures)
       // row -> col -> cell (single measure)
 
@@ -112,9 +112,9 @@ define([
       this._C++;
 
       // Add one col to every row.
-      var cube = this._cube,
-          r = -1,
-          R = cube.length;
+      var cube = this._cube;
+      var r = -1;
+      var R = cube.length;
       while(++r < R) cube[r].push(null);
     }
   });

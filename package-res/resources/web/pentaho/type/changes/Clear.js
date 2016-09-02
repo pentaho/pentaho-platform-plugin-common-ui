@@ -67,7 +67,7 @@ define([
 
     _apply: function(target) {
       target._elems = [];
-      target._keys  = {};
+      target._keys = {};
     }
   });
 });

@@ -892,7 +892,7 @@ define(["pentaho/visual/type/registry"], function(singletonTypeRegistry) {
         var typeA = {id: "A"},
             typeB = {id: "B"},
             config1 = {id: "A", container: "c1", foo: 1},
-            config2 = {id: "B", container: "c1", foo: 2}
+            config2 = {id: "B", container: "c1", foo: 2},
             fooModule = {
               getAll: function() {
                 return [typeA, typeB];

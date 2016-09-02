@@ -20,7 +20,7 @@ define([
 ], function(arg, error) {
   "use strict";
 
-  /*global Promise:false*/
+  /* global Promise:false*/
 
   /**
    * The `promise` namespace contains utilities for working with the future-standard ES6 `Promise` API,

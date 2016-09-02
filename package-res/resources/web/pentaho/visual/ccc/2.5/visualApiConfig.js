@@ -34,6 +34,7 @@ define(function() {
           (filterPropsList || editorDoc).forEach(function(p) {
               if(!isIgnoredEditorProp(p)) {
                 var value = editorDoc.get(p);
+                // eslint default-case: 0
                 switch(p) {
                   // boolean
                   case "autoRange":

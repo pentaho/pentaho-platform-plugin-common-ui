@@ -80,7 +80,7 @@ define([
       Annotatable.call(this, spec);
     },
 
-    //region IListElement
+    // region IListElement
     /**
      * Gets the singular name of `Member` list-elements.
      * @type string
@@ -88,9 +88,9 @@ define([
      * @default "member"
      */
     elemName: "member",
-    //endregion
+    // endregion
 
-    //region IWithKey implementation
+    // region IWithKey implementation
     /**
      * Gets the singular name of `Member` keys.
      * @type string
@@ -110,9 +110,9 @@ define([
     get key() {
       return this.v.toString();
     },
-    //endregion
+    // endregion
 
-    //region IOfAttribute abstract implementation
+    // region IOfAttribute abstract implementation
     /**
      * Gets the attribute of the member.
      *
@@ -123,9 +123,9 @@ define([
     get attribute() {
       throw new Error("abstract");
     },
-    //endregion
+    // endregion
 
-    //region IWithOrdinal implementation
+    // region IWithOrdinal implementation
     /**
      * Gets the ordinal of the member in its attribute's members collection.
      *
@@ -137,7 +137,7 @@ define([
     get ordinal() {
       return this._ord;
     },
-    //endregion
+    // endregion
 
     /**
      * Gets or sets the value of the member.
@@ -186,7 +186,7 @@ define([
       return (f = this.f) != null ? f : this.v.toString();
     },
 
-    //region ISpecifiable implementation
+    // region ISpecifiable implementation
     /**
      * Creates a specification of the member.
      *
@@ -201,7 +201,7 @@ define([
 
       return memberSpec;
     }
-    //endregion
+    // endregion
   })
   .implement(Annotatable);
 

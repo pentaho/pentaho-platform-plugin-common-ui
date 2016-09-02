@@ -32,7 +32,6 @@
  * @see pentaho.type.spec.IValueProto#type
  */
 
-
 /**
  * The identifier of the value type's AMD module, a _temporary identifier_, or `null`.
  *
@@ -81,7 +80,7 @@
 /**
  * Indicates if the type is abstract.
  *
- * An abstract type cannot be used directly to create a value instance 
+ * An abstract type cannot be used directly to create a value instance
  * and, as such, it is not usually exposed to users in a user interface.
  *
  * When not a boolean,

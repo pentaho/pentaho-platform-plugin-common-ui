@@ -40,7 +40,8 @@ define([
   // ---
 
   return Base.extend("pentaho.lang.EventSource", /** @lends pentaho.lang.EventSource# */{
-    _listeners_registry: null,
+
+    __listenersRegistry: null,
 
     /**
      * @classDesc The `EventSource` class is a **mixin** to be
@@ -103,7 +104,7 @@ define([
         for(var events_i = 0, events_len = eventTypes.length; events_i !== events_len; ++events_i) {
           var eventType = eventTypes[events_i];
 
-          var queue = this._getQueueOf(eventType, /*create:*/true);
+          var queue = this._getQueueOf(eventType, /* create: */true);
 
           for(var i = queue.length - 1; i !== -2; --i) {
             if(i !== -1 && priority <= queue[i].priority) {
@@ -138,12 +139,12 @@ define([
     },
 
     _getQueueOf: function(type, create) {
-      var registry = this._listeners_registry;
+      var registry = this.__listenersRegistry;
       if(!registry) {
         if(!create) return null;
 
         // 1st event registration being added
-        this._listeners_registry = registry = {};
+        this.__listenersRegistry = registry = {};
         return (registry[type] = []);
       }
 
@@ -159,7 +160,7 @@ define([
     },
 
     _indexOfListener: function(type, listener, fromIndex) {
-      var queue = this._getQueueOf(type, /*create:*/false);
+      var queue = this._getQueueOf(type, /* create: */false);
       if(queue) {
         if(fromIndex == null) {
           fromIndex = 0;
@@ -178,7 +179,7 @@ define([
     _removeListener: function(type, listener, fromIndex) {
       var index = this._indexOfListener(type, listener, fromIndex);
       if(index !== -1) {
-        var queue = this._listeners_registry[type];
+        var queue = this.__listenersRegistry[type];
         queue.splice(index, 1);
 
         return true;
@@ -258,7 +259,7 @@ define([
      * @protected
      */
     _hasListeners: function(type) {
-      var registry = this._listeners_registry;
+      var registry = this.__listenersRegistry;
       return registry != null && registry[type] != null && registry[type].length > 0;
     },
 
@@ -361,7 +362,7 @@ define([
       return null;
     }
 
-    var queue = this._getQueueOf(event.type, /*create:*/false);
+    var queue = this._getQueueOf(event.type, /* create: */false);
     if(!queue) return event;
 
     queue = queue.slice();

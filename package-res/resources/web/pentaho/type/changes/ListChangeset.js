@@ -52,7 +52,7 @@ define([
       this._clearChanges();
     },
 
-    //region public interface
+    // region public interface
     /**
      * Gets the list value where the changes take place.
      *
@@ -92,7 +92,7 @@ define([
       var changesByKey = this._changesByElemKey;
       for(var key in changesByKey)
         if(O.hasOwn(changesByKey, key) && changesByKey[key].hasChanges)
-            return true;
+          return true;
 
       return false;
     },
@@ -150,7 +150,7 @@ define([
       if(!changeCount) return this.owner;
 
       var projMock = this._projMock ||
-          (this._projMock = this.owner._cloneElementData({changeCount: 0}, /*useCommitted:*/true));
+          (this._projMock = this.owner._cloneElementData({changeCount: 0}, /* useCommitted: */true));
 
       if(projMock.changeCount < changeCount) {
         this._applyFrom(projMock, projMock.changeCount);
@@ -171,7 +171,7 @@ define([
         this._projMock = null;
 
         target._elems = projMock._elems;
-        target._keys  = projMock._keys;
+        target._keys = projMock._keys;
       } else {
         this._applyFrom(target, 0);
       }
@@ -197,9 +197,9 @@ define([
 
       while(k < N) changes[k++]._apply(list);
     },
-    //endregion
+    // endregion
 
-    //region protected interface
+    // region protected interface
 
     /**
      * Decomposes the modifications into a set of operations and
@@ -226,11 +226,13 @@ define([
 
       this._assertWritable();
 
-      var list = this._projectedMock, // calculate relative the last change
-          elems = list._elems,
-          keys = list._keys,
-          elemType = this.owner.type.of,
-          existing, elem, key;
+      var list = this._projectedMock; // calculate relative the last change
+      var elems = list._elems;
+      var keys = list._keys;
+      var elemType = this.owner.type.of;
+      var existing;
+      var elem;
+      var key;
 
       // Next insert index.
       // It will be corrected with the removes
@@ -238,7 +240,7 @@ define([
       if(index == null) {
         index = elems.length;
       } else {
-        /*jshint laxbreak:true*/
+        /* jshint laxbreak:true*/
         index = index < 0
           ? Math.max(0, elems.length + index)
           : Math.min(index, elems.length);
@@ -336,7 +338,7 @@ define([
       if(add) {
         i = -1;
         L = newElements.length;
-        while (++i < L) {
+        while(++i < L) {
           var action = newElements[i];
 
           var newIndex = index + action.to;
@@ -360,7 +362,7 @@ define([
                 --baseIndex;
               }
 
-              if (currentIndex < baseIndex + i || currentIndex < lastDestinationIndex) {
+              if(currentIndex < baseIndex + i || currentIndex < lastDestinationIndex) {
                 var destinationIndex = Math.max(baseIndex + i, lastDestinationIndex);
 
                 this._addChange(new Move([elem], currentIndex, destinationIndex));
@@ -400,13 +402,13 @@ define([
 
       this._assertWritable();
 
-      var list  = this._projectedMock, // calculate relative to the last change
-          elemType = this.owner.type.of,
-          elems = list._elems,
-          keys  = list._keys,
-          elem, key;
-
+      var list = this._projectedMock; // calculate relative to the last change
+      var elemType = this.owner.type.of;
+      var elems = list._elems;
+      var keys = list._keys;
       var removeElems = Array.isArray(fragment) ? fragment : [fragment];
+      var elem;
+      var key;
 
       // Index of elements in removeElems, by key.
       // For removing duplicates in removeElems.
@@ -442,7 +444,8 @@ define([
         // III - Process the removes
 
         // Add 1 `Remove` change per contiguous group of removed elements.
-        var batchElems, batchIndex;
+        var batchElems;
+        var batchIndex;
 
         i = 0;
         do {
@@ -581,6 +584,6 @@ define([
 
       change._prepareRefs(this.transaction, this.owner);
     }
-    //endregion
+    // endregion
   });
 });

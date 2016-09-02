@@ -102,8 +102,8 @@ define([
       return this._uid;
     },
 
-    //region References
-    //TODO: document IReference...
+    // region References
+    // TODO: document IReference...
     /**
      * Gets the references to this container, or `null`, if none.
      *
@@ -136,9 +136,9 @@ define([
     _addReference: function(container, propType) {
       (this._refs || (this._refs = ReferenceList.to([]))).add(container, propType);
     },
-    //endregion
+    // endregion
 
-    //region version
+    // region version
     /**
      * Gets the current version of the instance.
      *
@@ -160,9 +160,9 @@ define([
     _setVersionInternal: function(version) {
       this._vers = version;
     },
-    //endregion
+    // endregion
 
-    //region Changes
+    // region Changes
     /**
      * Gets the changeset of this instance in the ambient transaction, if any, or `null`.
      *
@@ -257,7 +257,7 @@ define([
         this._emitSafe(new RejectedChange(this, changeset, reason));
       }
     }
-    //endregion
+    // endregion
   })
   .implement(EventSource);
 });

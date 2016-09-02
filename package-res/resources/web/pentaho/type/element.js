@@ -51,7 +51,7 @@ define([
      */
     var Element = Value.extend({
 
-      //@override
+      // @override
       /**
        * Determines if a given value, of the same type, represents the same entity with the same content.
        *
@@ -67,7 +67,7 @@ define([
 
         get isElement() { return true; },
 
-        //region format
+        // region format
 
         // TODO: recursively inherit? clone? merge on set?
 
@@ -90,9 +90,9 @@ define([
             this._format = value || {};
           }
         },
-        //endregion
+        // endregion
 
-        //region compare method
+        // region compare method
 
         // TODO: document equals consistency and 0 result
         // Should be consistent with result of Value#equals
@@ -114,7 +114,7 @@ define([
         },
 
         _compare: compareCore
-        //endregion
+        // endregion
       }
     }).implement({
       type: bundle.structured.element
@@ -125,16 +125,15 @@ define([
     return Element;
   };
 
-  //region compare private methods
+  // region compare private methods
   // consistent with isEmpty and areEqual
   /* istanbul ignore next : not implemented method */
   function compareTop(va, vb) {
     // Quick bailout test
-    if(va ===  vb) return 0;
+    if(va === vb) return 0;
     if(va == null) return vb == null ? 0 : 1;
     if(vb == null) return -1;
-    /*jshint laxbreak:true*/
-    /*jshint validthis:true*/
+
     return (va.constructor === vb.constructor && va.equals(vb))
         ? 0
         : this._compare(va, vb);
@@ -145,5 +144,5 @@ define([
   function compareCore(va, vb) {
     return fun.compare(va, vb);
   }
-  //endregion
+  // endregion
 });

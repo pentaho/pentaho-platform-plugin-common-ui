@@ -21,7 +21,7 @@ define([
   "use strict";
 
   function isApplicableTrend() {
-    /*jshint validthis:true */
+    /* jshint validthis:true */
     return this.trendType !== "none";
   }
 

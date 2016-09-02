@@ -19,7 +19,7 @@ define([
 
   "use strict";
 
-  /*global describe:true, it:true, expect:true, beforeEach:true*/
+  /* global describe:true, it:true, expect:true, beforeEach:true*/
 
   describe("pentaho.util.text -", function() {
     it("is an object", function() {

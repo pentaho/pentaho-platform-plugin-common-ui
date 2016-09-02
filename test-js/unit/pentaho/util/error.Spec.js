@@ -20,7 +20,7 @@ define([
 
   "use strict";
 
-  /*global describe:false, it:false, expect:false, beforeEach:false, afterEach:false, spyOn:false,
+  /* global describe:false, it:false, expect:false, beforeEach:false, afterEach:false, spyOn:false,
            JSON:false, TypeError:false, RangeError:false, jasmine:false*/
 
   describe("pentaho.util.error -", function() {

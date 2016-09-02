@@ -18,36 +18,34 @@ define([
 ], function(Event) {
   "use strict";
 
-  /**
-   * @name WillUpdate
-   * @memberOf pentaho.visual.base.events
-   * @class
-   * @extends pentaho.lang.Event
-   *
-   * @classDesc This event is emitted when the view is about to be updated.
-   * The listeners of `will:update` are allowed to cancel the event.
-   *
-   * @constructor
-   * @description Creates a `WillUpdate` event.
-   *
-   * @param {!pentaho.visual.base.Model} source - The view object that is emitting the event.
-   */
-  return Event.extend("pentaho.visual.base.events.WillUpdate",
-    /** @lends pentaho.visual.base.events.WillUpdate# */{
+  return Event.extend("pentaho.visual.base.events.WillUpdate", /** @lends pentaho.visual.base.events.WillUpdate# */{
+    /**
+     * @alias WillUpdate
+     * @memberOf pentaho.visual.base.events
+     * @class
+     * @extends pentaho.lang.Event
+     *
+     * @classDesc This event is emitted when the view is about to be updated.
+     * The listeners of `will:update` are allowed to cancel the event.
+     *
+     * @constructor
+     * @description Creates a `WillUpdate` event.
+     *
+     * @param {!pentaho.visual.base.Model} source - The view object that is emitting the event.
+     */
+    constructor: function(source) {
+      this.base("will:update", source, true);
+    }
+  }, /** @lends pentaho.visual.base.events.WillUpdate */{
 
-      constructor: function(source) {
-        this.base("will:update", source, true);
-      }
-    }, /** @lends pentaho.visual.base.events.WillUpdate */{
-
-      /**
-       * Gets the event type.
-       *
-       * @type string
-       * @readonly
-       */
-      get type() {
-        return "will:update";
-      }
-    });
+    /**
+     * Gets the event type.
+     *
+     * @type {string}
+     * @readonly
+     */
+    get type() {
+      return "will:update";
+    }
+  });
 });

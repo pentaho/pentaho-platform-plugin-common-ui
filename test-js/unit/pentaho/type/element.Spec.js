@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Context",
+  "pentaho/type/Context"
 ], function(Context) {
 
   "use strict";
 
-  /*global describe:true, it:true, expect:true, beforeEach:true*/
+  /* global describe:true, it:true, expect:true, beforeEach:true*/
 
   var context = new Context(),
       Value   = context.get("pentaho/type/value"),

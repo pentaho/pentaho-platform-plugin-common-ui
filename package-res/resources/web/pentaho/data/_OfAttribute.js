@@ -23,8 +23,8 @@ define([
       this._attr = arg.required(keyArgs, "attribute");
     },
 
-    //region IOfAttribute implementation
+    // region IOfAttribute implementation
     get attribute() { return this._attr; }
-    //endregion
+    // endregion
   });
 });

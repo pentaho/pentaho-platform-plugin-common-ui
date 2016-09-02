@@ -31,7 +31,7 @@ define([
     var CartesianAbstract = context.get(cartesianAbstractModelFactory);
 
     function requiredOneMeasure() {
-      /*jshint validthis:true*/
+      /* jshint validthis:true*/
       return !this.model.size.attributes.count && !this.model.color.attributes.count;
     }
 

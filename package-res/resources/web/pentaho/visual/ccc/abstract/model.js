@@ -29,7 +29,7 @@ define([
   "use strict";
 
   function isApplicableLegend() {
-    /*jshint validthis:true*/
+    /* jshint validthis:true */
     return this.showLegend;
   }
 
@@ -45,15 +45,15 @@ define([
         isAbstract: true,
 
         props: [
-          //region Visual Roles
+          // region Visual Roles
           {
             name: "rows", //VISUAL_ROLE
             type: "pentaho/visual/role/ordinal",
             ordinal: 5
           },
-          //endregion
+          // endregion
 
-          //region background fill
+          // region background fill
           {
             name: "backgroundFill",
             type: backgroundFillFactory,
@@ -76,9 +76,9 @@ define([
             },
             isRequired: true
           },
-          //endregion
+          // endregion
 
-          //region Cartesian Axis Tick Label and Title Label
+          // region Cartesian Axis Tick Label and Title Label
 
           // For multi-charts, Size and Family also used for chart title font
           {
@@ -99,9 +99,9 @@ define([
             name: "labelFontFamily",
             type: "string"
           },
-          //endregion
+          // endregion
 
-          //region Legend
+          // region Legend
           {
             name: "showLegend",
             type: "boolean",
@@ -143,7 +143,7 @@ define([
             type: "string",
             isApplicable: isApplicableLegend
           },
-          //endregion
+          // endregion
 
           { // TODO: do all charts have this?
             name: "labelsOption",
@@ -153,7 +153,7 @@ define([
       }
       
     })
-    /*jshint sub:true*/
+    /* jshint sub:true*/
     .implement({type: bundle.structured["abstract"]});
   };
 });

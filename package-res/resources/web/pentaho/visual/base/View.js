@@ -32,7 +32,7 @@ define([
 
   "use strict";
 
-  /*global Promise:false */
+  /* global Promise:false */
 
   // Allow ~0
   // jshint -W016
@@ -138,7 +138,7 @@ define([
       this.__changeDidHandle = model.on("did:change", this.__onChangeDidOuter.bind(this));
     },
 
-    //region Properties
+    // region Properties
     /**
      * Gets the container DOM element where the view is rendered.
      *
@@ -237,9 +237,9 @@ define([
       // it is needed to use isUpdating to not let that transient non-dirty state show through.
       return this.isUpdating || !this.__dirtyPropGroups.isEmpty;
     },
-    //endregion
+    // endregion
 
-    //region Changes
+    // region Changes
     /**
      * Handles the model's `did:change` event.
      *
@@ -256,6 +256,7 @@ define([
         this.__dirtyPropGroups.set(bitSetNew.get());
 
         if(this.isAutoUpdate) {
+          /* eshint dot-notation: 0 */
           this.update()["catch"](function(error) {
             logger.warn("Auto-update was canceled: " + error);
           });
@@ -293,9 +294,9 @@ define([
 
       }, this.constructor.__PropertyGroupOfProperty);
     },
-    //endregion
+    // endregion
 
-    //region Update
+    // region Update
     /**
      * Updates the view to match its model's latest state.
      *
@@ -406,7 +407,8 @@ define([
         if(this.__dirtyPropGroups.isEmpty) {
           p = Promise.resolve();
         } else {
-          var _resolve = null, _reject = null;
+          var _resolve = null;
+          var _reject = null;
 
           this.__updatingPromise = p = new Promise(function(resolve, reject) {
             // ignore the fulfillment value of returned promises
@@ -547,6 +549,7 @@ define([
             methodInfo = info;
             return true;
           }
+          return false;
         });
 
         // At least the _updateAll method is registered. It is able to handle any dirty bits.
@@ -634,6 +637,8 @@ define([
      * If an implementation throws an error, the error is logged and
      * the update operation is still rejected with the original error.
      *
+     * @param {Error} reason - The reason why the update operation was canceled or has failed.
+     *
      * @protected
      *
      * @fires "rejected:update"
@@ -644,7 +649,7 @@ define([
         this._emitSafe(new RejectedUpdate(this, reason));
     },
 
-    //endregion
+    // endregion
 
     /**
      * Disposes the view by freeing external resources held by the view.
@@ -749,8 +754,7 @@ define([
       });
     },
 
-
-        // see Base.js
+    // see Base.js
     _subclassed: function(Subclass, instSpec, classSpec, keyArgs) {
 
       // "Inherit" PropertyGroups, __PropertyGroupOfProperty, __UpdateMethods and __UpdateMethodsList properties
@@ -763,61 +767,61 @@ define([
     },
 
     PropertyGroups: O.assignOwn(Object.create(null),
-    /**
-     * The `PropertyGroups` enumeration contains the entries for the distinct groups of properties that the
-     * base [View]{@link pentaho.visual.base.View} class recognizes when categorizing model changes.
-     *
-     * @alias pentaho.visual.base.View.PropertyGroups
-     * @enum {number}
-     * @readOnly
-     *
-     * @see pentaho.visual.base.View#_onChangeDid
-     */
-     {
       /**
-       * Includes all properties.
-       */
-      All: ~0,
-
-      /**
-       * The group of properties whose changes are ignored,
-       * because the view does not visually represent these in any way.
+       * The `PropertyGroups` enumeration contains the entries for the distinct groups of properties that the
+       * base [View]{@link pentaho.visual.base.View} class recognizes when categorizing model changes.
        *
-       * By default, the only property of this group is
-       * the [selectionMode]{@link pentaho.visual.base.Model#selectionMode} property.
-       */
-      Ignored: 0,
-
-      /**
-       * The group of properties that don't have an associated property group.
-       */
-      General: 1,
-
-      /**
-       * The group of data-related properties.
+       * @alias pentaho.visual.base.View.PropertyGroups
+       * @enum {number}
+       * @readOnly
        *
-       * By default, the only property of this group is
-       * [data]{@link pentaho.visual.base.Model#data} property.
+       * @see pentaho.visual.base.View#_onChangeDid
        */
-      Data: 2,
+      {
+        /**
+         * Includes all properties.
+         */
+        All: ~0,
 
-      /**
-       * The group of size-related properties.
-       *
-       * By default, the properties of this group are
-       * the [width]{@link pentaho.visual.base.Model#width} and
-       * [height]{@link pentaho.visual.base.Model#height} properties.
-       */
-      Size: 4,
+        /**
+         * The group of properties whose changes are ignored,
+         * because the view does not visually represent these in any way.
+         *
+         * By default, the only property of this group is
+         * the [selectionMode]{@link pentaho.visual.base.Model#selectionMode} property.
+         */
+        Ignored: 0,
 
-      /**
-       * The group of selection-related properties.
-       *
-       * By default, the only property of this group is
-       * the [selectionFilter]{@link pentaho.visual.base.Model#selectionFilter} property.
-       */
-      Selection:  8
-    }),
+        /**
+         * The group of properties that don't have an associated property group.
+         */
+        General: 1,
+
+        /**
+         * The group of data-related properties.
+         *
+         * By default, the only property of this group is
+         * [data]{@link pentaho.visual.base.Model#data} property.
+         */
+        Data: 2,
+
+        /**
+         * The group of size-related properties.
+         *
+         * By default, the properties of this group are
+         * the [width]{@link pentaho.visual.base.Model#width} and
+         * [height]{@link pentaho.visual.base.Model#height} properties.
+         */
+        Size: 4,
+
+        /**
+         * The group of selection-related properties.
+         *
+         * By default, the only property of this group is
+         * the [selectionFilter]{@link pentaho.visual.base.Model#selectionFilter} property.
+         */
+        Selection:  8
+      }),
 
     __PropertyGroupOfProperty: O.assignOwn(Object.create(null), {
       "selectionMode":   "Ignored",
@@ -835,7 +839,7 @@ define([
   })
   .implement(EventSource)
   .implement(/** @lends pentaho.visual.base.View# */{
-    //region _updateXyz Methods
+    // region _updateXyz Methods
     /**
      * Fully renders or updates the view.
      *
@@ -869,7 +873,7 @@ define([
      * @see pentaho.visual.base.View#_onChangeDid
      */
     _updateAll: function() {
-    },
+    }
 
     /**
      * Updates the view, taking into account that
@@ -942,7 +946,7 @@ define([
      * @optional
      * @see pentaho.visual.base.View#_updateAll
      */
-    //endregion
+    // endregion
   });
 
   /**

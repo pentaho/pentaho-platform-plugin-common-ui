@@ -100,7 +100,7 @@ define([
       this._scopeCount = 0;
     },
 
-    //region State
+    // region State
     /**
      * Gets a value that indicates if the transaction is in a proposed state,
      * that is, it has not been committed or rejected.
@@ -138,9 +138,9 @@ define([
     get result() {
       return this._result;
     },
-    //endregion
+    // endregion
 
-    //region Changesets and ChangeRefs
+    // region Changesets and ChangeRefs
     /**
      * Gets the changeset of an instance, given its unique identifier.
      *
@@ -164,7 +164,7 @@ define([
      * @private
      */
     _ensureChangeRef: function(container) {
-      var uid  = container.$uid;
+      var uid = container.$uid;
       var cref = O.getOwn(this._crefByUid, uid);
       if(!cref) {
         this._crefByUid[uid] = cref = new ChangeRef(container);
@@ -177,7 +177,7 @@ define([
     /**
      * Gets the `ChangeRef` for a container, given its unique identifier.
      *
-     * @param {string} container - The container unique identifier.
+     * @param {string} uid - The container unique identifier.
      *
      * @return {pentaho.type.changes.ChangeRef} The corresponding `ChangeRef` or `null`.
      * @private
@@ -308,9 +308,9 @@ define([
         visitedSet[uid] = false;
       }
     },
-    //endregion
+    // endregion
 
-    //region Ambient transaction
+    // region Ambient transaction
     /**
      * Gets a value that indicates if this transaction is the
      * [current transaction]{@link pentaho.type.Context#transaction}.
@@ -415,9 +415,9 @@ define([
         cset.owner._cset = null;
       });
     },
-    //endregion
+    // endregion
 
-    //region Action Lock
+    // region Action Lock
     /**
      * Tries to acquire the _action_ lock, throwing if it is already taken.
      *
@@ -457,9 +457,9 @@ define([
     _releaseActionLock: function() {
       this._actionLockTaken = false;
     },
-    //endregion
+    // endregion
 
-    //region _reject
+    // region _reject
     /**
      * Rejects the transaction with a given reason and throws an error.
      *
@@ -479,9 +479,9 @@ define([
 
       throw this._resolve(ActionResult.reject(reason || "Transaction canceled."));
     },
-    //endregion
+    // endregion
 
-    //region _commitWill
+    // region _commitWill
     /**
      * Previews the result of [committing]{@link pentaho.type.changes.Transaction#_commit}
      * the transaction by performing its _will_ phase.
@@ -554,7 +554,9 @@ define([
       var changesets = this._csets;
       var L = changesets.length;
       var i = -1;
-      var cset, cancelReason, L1;
+      var cset;
+      var cancelReason;
+      var L1;
       while(true) {
         while(++i < L) {
           cset = changesets[i];
@@ -576,9 +578,9 @@ define([
 
       return ActionResult.fulfill();
     },
-    //endregion
+    // endregion
 
-    //region _commit
+    // region _commit
     /**
      * Commits the transaction.
      *
@@ -620,7 +622,7 @@ define([
 
       return ActionResult.fulfill(version);
     },
-    //endregion
+    // endregion
 
     _resolve: function(result) {
 
@@ -640,7 +642,7 @@ define([
       // Any new changes arising from notification create new transactions/changesets.
       var reason = result.error;
 
-      //jshint laxbreak:true
+      // jshint laxbreak:true
       var mapper = reason
           ? function(cset) { cset.owner._notifyChangeRej(cset, reason); }
           : function(cset) { cset.owner._notifyChangeDid(cset); };

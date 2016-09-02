@@ -86,14 +86,14 @@ define([
         }
       });
 
-      //region #type
+      // region #type
       describe("#type", function() {
         it("should return a string with the value `complex`", function() {
           expect(changeset.type).toBe("complex");
         });
-      }); //endregion #type
+      }); // endregion #type
 
-      //region #hasChanges
+      // region #hasChanges
       describe("#hasChanges -", function() {
         it("should return `true` if the ComplexChangeset has changes", function() {
           expect(changeset.hasChanges).toBe(true);
@@ -110,9 +110,9 @@ define([
 
           expect(cset.hasChanges).toBe(false);
         });
-      }); //endregion #hasChanges
+      }); // endregion #hasChanges
 
-      //region #getChange
+      // region #getChange
       describe("#getChange -", function() {
 
         beforeEach(function() {
@@ -134,9 +134,9 @@ define([
           expect(changeset.hasChange("foo")).toBe(true);
           expect(changeset.getChange("foo")).not.toBeNull();
         });
-      }); //endregion #getChange
+      }); // endregion #getChange
 
-      //region #hasChange
+      // region #hasChange
       describe("#hasChange -", function() {
         beforeEach(function() {
           // required for connecting changesets
@@ -156,9 +156,9 @@ define([
         it("should return `false` if the property does not exist in the ComplexChangeset", function() {
           expect(changeset.hasChange("bar")).toBe(false);
         });
-      }); //endregion #hasChange
+      }); // endregion #hasChange
 
-      //region #owner.get
+      // region #owner.get
       describe("#owner.get()", function() {
         it("should return the property's original value if it isn't changing", function() {
           expect(owner.bar).toBe(6);
@@ -169,9 +169,9 @@ define([
           expect(myList.at(0).value).toBe(1);
           expect(myList.at(1).value).toBe(3);
         });
-      }); //endregion #get
+      }); // endregion #get
 
-      //region #getOld
+      // region #getOld
       describe("#getOld -", function() {
         it("should throw an error if the property does not exist in the owner of the changeset", function() {
           expect(function() {
@@ -184,9 +184,9 @@ define([
           expect(changeset.getOld("bar").value).toBe(6);
           expect(changeset.getOld("myList")).toBe(myList);
         });
-      }); //endregion #getOld
+      }); // endregion #getOld
 
-      //region #owner.set()
+      // region #owner.set()
       describe("#owner.set() -", function() {
         beforeEach(function() {
           if(scope.isCurrent) scope.exit();
@@ -268,9 +268,9 @@ define([
           expect(changeset.hasChange("foo")).toBe(true);
           txnScope.dispose();
         });
-      }); //endregion #_setElement
+      }); // endregion #_setElement
 
-      //region #propertyNames
+      // region #propertyNames
       describe("#propertyNames -", function() {
         beforeEach(function() {
           // required for connecting changesets
@@ -292,9 +292,9 @@ define([
             changeset.propertyNames = "foo";
           }).toThrowError(TypeError);
         });
-      }); //endregion #propertyNames
+      }); // endregion #propertyNames
 
-      //region scope.accept()
+      // region scope.accept()
       describe("scope.accept()", function() {
         it("should apply changes to its owner", function() {
           expect(owner.foo).toBe(10);
@@ -323,9 +323,9 @@ define([
           expect(myList.at(0).value).toBe(1);
           expect(myList.at(1).value).toBe(3);
         });
-      }); //endregion scope.accept()
+      }); // endregion scope.accept()
 
-      //region #_clearChanges()
+      // region #_clearChanges()
       describe("#_clearChanges()", function() {
         it("cannot be called after acceptWill", function() {
 
@@ -370,7 +370,7 @@ define([
 
           expect(willListener).toHaveBeenCalled();
         });
-      }); //endregion #_clearChanges()
+      }); // endregion #_clearChanges()
 
     }); //end instance
 

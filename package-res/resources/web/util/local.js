@@ -11,7 +11,7 @@
 
 /*jslint regexp: false, nomen: false, plusplus: true, sloppy: true */
 
-/*global require: false, define: false */
+/* global require: false, define: false */
 
 define( [], function () {
   var local, addCallback, invokeCallbacks, isDefined, registerLocal,

@@ -21,7 +21,7 @@ define([
 
   "use strict";
 
-  /*global SESSION_NAME:false, SESSION_LOCALE:false, active_theme:false */
+  /* global SESSION_NAME:false, SESSION_LOCALE:false, active_theme:false */
 
   return Base.extend("pentaho.GlobalContextVars", {
 

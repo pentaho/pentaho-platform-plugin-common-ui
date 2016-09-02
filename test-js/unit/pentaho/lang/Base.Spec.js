@@ -15,7 +15,7 @@
  */
 define([
     "pentaho/lang/Base",
-    "pentaho/util/object",
+    "pentaho/util/object"
   ],
   function(/** @type {Class.<pentaho.lang.Base>} */ Base, O) {
     "use strict";
@@ -981,7 +981,7 @@ define([
                   set a(v) {
                     aIndex = index++;
                     this._a = v;
-                  },
+                  }
                 });
 
                 var inst1 = new Derived2(spec);

@@ -20,7 +20,7 @@ define([
      *
      * @description Creates a bit set instance.
      * @constructor
-     * @param {?number} [mask] - The bits to be set, initially. Defaults to no bits.
+     * @param {?number} [bits] - The bits to be set, initially. Defaults to no bits.
      */
     constructor: function(bits) {
       this.set(bits || 0);
@@ -39,8 +39,7 @@ define([
     /**
      * Gets an integer number with the bits currently set.
      *
-     * @type {number}
-     * @readOnly
+     * @return {number} The internal bits as a number.
      */
     get: function() {
       return this._bits;

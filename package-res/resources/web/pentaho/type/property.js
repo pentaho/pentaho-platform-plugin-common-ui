@@ -29,8 +29,8 @@ define([
 
   "use strict";
 
-  var _defaultTypeMid = "string",
-      _dynamicAttrNames = ["isRequired", "countMin", "countMax", "isApplicable", "isReadOnly"];
+  var _defaultTypeMid = "string";
+  var _dynamicAttrNames = ["isRequired", "countMin", "countMax", "isApplicable", "isReadOnly"];
 
   return function(context) {
 
@@ -176,19 +176,19 @@ define([
           }
         },
 
-        //region IListElement
+        // region IListElement
         /**
          * Gets the singular name of `Property.Type` list-elements.
          * @type string
          * @readonly
          * @default "property"
          */
-        elemName: "property", //endregion
+        elemName: "property", // endregion
 
-        //region IWithKey implementation
+        // region IWithKey implementation
         /**
          * Gets the singular name of `Property.Type` keys.
-         * @type string
+         * @type {string}
          * @readonly
          * @default "name"
          */
@@ -199,40 +199,40 @@ define([
          *
          * The key of a property is its name.
          *
-         * @type string
+         * @type {string}
          * @readonly
          */
         get key() {
           return this._name;
-        }, //endregion
+        }, // endregion
 
-        //region attributes
+        // region attributes
 
         get isProperty() { return true; },
 
-        //region declaringType attribute
+        // region declaringType attribute
         /**
          * Gets the complex type that declares this property type.
          *
-         * @type pentaho.type.Complex.Type
+         * @type {pentaho.type.Complex.Type}
          * @readonly
          */
         get declaringType() {
           return this._declaringType;
-        }, //endregion
+        }, // endregion
 
-        //region index attribute
+        // region index attribute
         /**
          * Gets the index of the property in the containing complex type.
          *
-         * @type number
+         * @type {number}
          * @readonly
          */
         get index() {
           return this._index;
-        }, //endregion
+        }, // endregion
 
-        //region name attribute
+        // region name attribute
         _name: undefined,
 
         /**
@@ -274,9 +274,9 @@ define([
             if(value && value !== this._name)
               throw new TypeError("Sub-properties cannot change the 'name' attribute.");
           }
-        }, //endregion
+        }, // endregion
 
-        //region list attribute
+        // region list attribute
         /**
          * Gets a value that indicates if the property is a _list_.
          *
@@ -284,14 +284,14 @@ define([
          * its [value type]{@link pentaho.type.Property.Type#type} is a list type,
          * that is, if it is or extends [List]{@link pentaho.type.List}.
          *
-         * @type boolean
+         * @type {boolean}
          * @readonly
          */
         get isList() {
           return this._type.isList;
-        }, //endregion
+        }, // endregion
 
-        //region (value) element type attribute
+        // region (value) element type attribute
         /**
          * The base element type of the _singular_ values that the property can hold.
          *
@@ -303,15 +303,15 @@ define([
          * Otherwise,
          * {@link pentaho.type.Property.type} is returned.
          *
-         * @type !pentaho.type.Element.Type
+         * @type {!pentaho.type.Element.Type}
          * @readonly
          */
         get elemType() {
           var type = this._type;
           return type.isList ? type.of : type;
-        }, //endregion
+        }, // endregion
 
-        //region (value) type attribute
+        // region (value) type attribute
         _type: undefined,
 
         /**
@@ -386,9 +386,9 @@ define([
               this._value = null;
             }
           }
-        }, //endregion
+        }, // endregion
 
-        //region value attribute and related methods
+        // region value attribute and related methods
         _value: null,
 
         /**
@@ -453,7 +453,7 @@ define([
               delete this._value;
             }
           } else {
-            this._value = this.toValue(_, /*noDefault:*/true);
+            this._value = this.toValue(_, /* noDefault: */true);
           }
         },
 
@@ -494,9 +494,9 @@ define([
         _freshDefaultValue: function() {
           var value = this.value;
           return value ? value.clone() : this.isList ? this.type.create() : value;
-        }, //endregion
+        }, // endregion
 
-        //region label attribute
+        // region label attribute
         /**
          * Resets the label of the property.
          *
@@ -513,14 +513,14 @@ define([
           } else {
             delete this._label;
           }
-        }, //endregion
+        }, // endregion
 
-        //endregion
+        // endregion
 
-        //region property accessor
+        // region property accessor
         _createValueAccessor: function() {
-          var instance = this._declaringType.instance,
-              name = this._name;
+          var instance = this._declaringType.instance;
+          var name = this._name;
 
           if(!(name in instance)) {
             Object.defineProperty(instance, name, {
@@ -536,9 +536,9 @@ define([
             });
           }
         },
-        //endregion
+        // endregion
 
-        //region validation
+        // region validation
 
         /**
          * Determines if this property is valid in a given complex instance.
@@ -568,7 +568,8 @@ define([
               addErrors(this.type.validateInstance(value));
             }
 
-            var range = this.countRangeEval(owner), count = this.isList ? value.count : (value ? 1 : 0);
+            var range = this.countRangeEval(owner);
+            var count = this.isList ? value.count : (value ? 1 : 0);
 
             if(count < range.min) {
               if(this.isList) {
@@ -585,9 +586,9 @@ define([
           }
 
           return errors;
-        }, //endregion
+        }, // endregion
 
-        //region dynamic & monotonic attributes
+        // region dynamic & monotonic attributes
         // Configuration support
         /**
          * Defines dynamic, monotonic, inherited attributes of the property type.
@@ -615,12 +616,13 @@ define([
          * @ignore
          */
         _dynamicMonotonicInheritedAttribute: function(name, spec) {
-          var cast = spec.cast, // Monotonicity
+          var cast = spec.cast; // Monotonicity
           // * minimum/default/neutral value
-              dv = castAndNormalize(spec.value, cast, null), // * effective/monotone value function
-              monotoneCombineEvals = spec.combine,
-
-              namePriv = "_" + name, namePrivEval = namePriv + "Eval", root = this;
+          var dv = castAndNormalize(spec.value, cast, null); // * effective/monotone value function
+          var monotoneCombineEvals = spec.combine;
+          var namePriv = "_" + name;
+          var namePrivEval = namePriv + "Eval";
+          var root = this;
 
           // Default value can be null.
           root[namePriv] = dv;
@@ -692,9 +694,9 @@ define([
           this[name + "Eval"] = function(owner) {
             return this[namePrivEval].call(owner);
           };
-        }, //endregion
+        }, // endregion
 
-        //region serialization
+        // region serialization
         toSpecInContext: function(keyArgs) {
           if(!keyArgs) keyArgs = {};
 
@@ -814,7 +816,7 @@ define([
 
           return any;
         }
-        //endregion
+        // endregion
       }
     }).implement({
       type: /** @lends pentaho.type.Property.Type# */{
@@ -865,7 +867,7 @@ define([
            *
            * Because this attribute is also _dynamic_,
            * the actual required values are only known
-           * when evaluated for specific complex instances. 
+           * when evaluated for specific complex instances.
            * This behavior ensures that monotonic changes are deferred until evaluation.
            * No errors are thrown; non-monotonic changes simply don't take effect.
            *
@@ -1099,7 +1101,7 @@ define([
            * as it does not make sense in a certain situation.
            * It may only be applicable when another property of the complex type has a specific value, for example.
            *
-           * When a property is not currently applicable, its value is not significant 
+           * When a property is not currently applicable, its value is not significant
            * and, as such, any validations concerning it are not performed.
            *
            * ### This attribute is *Dynamic*
@@ -1281,8 +1283,9 @@ define([
          * @see pentaho.type.Complex#countRange
          */
         countRangeEval: function(owner) {
-          var isRequired = this.isRequiredEval(owner), countMin = this.countMinEval(
-              owner), countMax = this.countMaxEval(owner);
+          var isRequired = this.isRequiredEval(owner);
+          var countMin = this.countMinEval(owner);
+          var countMax = this.countMaxEval(owner);
 
           if(!this.isList) {
             if(countMin > 1) countMin = 1;

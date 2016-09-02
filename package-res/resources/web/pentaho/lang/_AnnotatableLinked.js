@@ -34,8 +34,8 @@ define([
       var proto = this._getAnnotsParent(this);
       // Very weak test...
       if(proto && proto._getAnnots) {
-        var baseAnnots = proto._getAnnots(true),
-            annots = Object.create(baseAnnots);
+        var baseAnnots = proto._getAnnots(true);
+        var annots = Object.create(baseAnnots);
         return ps ? O.assignOwnDefined(annots, ps) : annots;
       }
 
@@ -66,12 +66,12 @@ define([
       if(ps) inst._annots = inst._createAnnots(ps);
     },
 
-    //region ISpecifiable implementation helper
+    // region ISpecifiable implementation helper
     toSpec: function(inst, json) {
       if(!json) json = {};
 
-      var ps = O.getOwn(inst, "_annots"),
-          ps2;
+      var ps = O.getOwn(inst, "_annots");
+      var ps2;
       for(var name in ps) {
         if(!ps2) json.p = ps2 = {};
         ps2[name] = ps[name];
@@ -79,6 +79,6 @@ define([
 
       return json;
     }
-    //endregion
+    // endregion
   });
 });

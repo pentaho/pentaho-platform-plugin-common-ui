@@ -78,7 +78,7 @@ define([
 
     /** @inheritdoc */
     add: function(config) {
-      if (config.rules) {
+      if(config.rules) {
         config.rules.forEach(function(rule) {
           this.addRule(rule);
         }, this);
@@ -104,14 +104,14 @@ define([
 
       var select = rule.select || {};
       var typeIds = select.type || ["pentaho/type/value"];
-      if (!Array.isArray(typeIds)) {
+      if(!Array.isArray(typeIds)) {
         typeIds = [typeIds];
       }
 
       typeIds.forEach(function(typeId) {
         var type = toAbsTypeId(typeId);
 
-        if (!this._ruleStore[type]) {
+        if(!this._ruleStore[type]) {
           this._ruleStore[type] = new SortedList({"comparer": _ruleComparer});
         }
 
@@ -129,7 +129,7 @@ define([
         return rule.apply;
       });
 
-      if (configs.length === 0) {
+      if(configs.length === 0) {
         return null;
       }
 
@@ -139,7 +139,7 @@ define([
 
   return ConfigurationService;
 
-  //region compare and select
+  // region compare and select
   /**
    * Compares two type-configuration rules according to specificity.
    *
@@ -154,20 +154,20 @@ define([
     var priority1 = r1.priority || 0;
     var priority2 = r2.priority || 0;
 
-    if (priority1 !== priority2) {
+    if(priority1 !== priority2) {
       return priority1 > priority2 ? 1 : -1;
     }
 
     var s1 = r1.select || {};
     var s2 = r2.select || {};
 
-    for (var i = 0, ic = _selectCriteria.length; i !== ic; ++i) {
+    for(var i = 0, ic = _selectCriteria.length; i !== ic; ++i) {
       var key = _selectCriteria[i];
 
       var isDefined1 = s1[key] != null;
       var isDefined2 = s2[key] != null;
 
-      if (isDefined1 !== isDefined2) {
+      if(isDefined1 !== isDefined2) {
         return isDefined1 ? 1 : -1;
       }
     }
@@ -183,19 +183,19 @@ define([
    * @return {boolean} `true` if `rule` is selected, `false`, otherwise.
    */
   function _ruleFilterer(rule) {
-    /*jshint validthis:true*/
+    /* jshint validthis:true*/
 
     var select = rule.select || {};
-    for (var i = 0, ic = _selectCriteria.length; i !== ic; ++i) {
+    for(var i = 0, ic = _selectCriteria.length; i !== ic; ++i) {
       var key = _selectCriteria[i];
 
       var possibleValues = select[key];
 
-      if (possibleValues != null) {
+      if(possibleValues != null) {
         var criteriaValue = this[key];
 
         var multi = Array.isArray(possibleValues);
-        if (!multi && possibleValues !== criteriaValue ||
+        if(!multi && possibleValues !== criteriaValue ||
             multi && possibleValues.indexOf(criteriaValue) === -1) {
           return false;
         }
@@ -204,11 +204,13 @@ define([
 
     return true;
   }
-  //endregion
-/**
-   * Ensures that standard value type ids are made absolute.
+  // endregion
+
+  /**
+   * Ensures that standard type identifiers are made absolute.
    *
-   * @param {string} id - A value type identifier.
+   * @param {string} id - A type identifier.
+   * @return {string} An absolute type identified.
    */
   function toAbsTypeId(id) {
     return id.indexOf("/") < 0 ? ("pentaho/type/" + id) : id;

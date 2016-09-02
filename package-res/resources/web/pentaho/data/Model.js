@@ -82,7 +82,7 @@ define([
       Annotatable.call(this, spec);
     },
 
-    //region ISpecifiable implementation
+    // region ISpecifiable implementation
     /**
      * Creates a specification of the model.
      *
@@ -99,6 +99,6 @@ define([
 
       return Annotatable.toSpec(this, spec);
     }
-    //endregion
+    // endregion
   }).implement(Annotatable);
 });

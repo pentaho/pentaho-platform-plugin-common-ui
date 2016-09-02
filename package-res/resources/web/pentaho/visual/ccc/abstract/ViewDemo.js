@@ -10,7 +10,7 @@ define([
 
   "use strict";
 
-  /*global window:false */
+  /* global window:false */
 
   return {
     // Temporary. Used for demos
@@ -18,33 +18,33 @@ define([
 
       this.base();
 
-      //var model = this.model;
-      //var context = model.type.context;
+      // var model = this.model;
+      // var context = model.type.context;
 
-      //region Demo of BACKLOG-6739
+      // region Demo of BACKLOG-6739
       this._renderCounter = 0;
-      //endregion
+      // endregion
 
-      //region Demo of BACKLOG-5985
+      // region Demo of BACKLOG-5985
       /*
       window.addEventListener("keypress", this._onKeyPress.bind(this), false);
       model.on("will:select",  context.inject([treeFilterFactory, propFilterFactory], this._onWillSelect, this));
       */
-      //endregion
+      // endregion
 
-      //region Demo of BACKLOG-5989
+      // region Demo of BACKLOG-5989
       /*
       model.doExecute = context.inject([isEqualFilterFactory], this._doExecute, this);
       model.on("will:execute", this._onWillExecute.bind(this));
       */
-      //endregion
+      // endregion
 
-      //region Used for demo of ...
+      // region Used for demo of ...
       /*
       this._verifyChange  = !true; // enabled/disabled
       model.on("will:change",  this._onWillChange.bind(this));
       */
-      //endregion
+      // endregion
     },
 
     // Temporary. Used for demo of BACKLOG-5985

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 define([
-  "../types/emptyCellMode",
+  "../types/emptyCellMode"
 ], function(emptyCellModeFactory) {
 
   "use strict";

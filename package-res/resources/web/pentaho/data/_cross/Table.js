@@ -72,10 +72,10 @@ define([
        */
 
       // Create layout/structure.
-      var model = arg.required(keyArgs, "model", "keyArgs"),
-          laySpec = arg.optional(spec, "layout"),
-          ka = {model: model},
-          lay = {
+      var model = arg.required(keyArgs, "model", "keyArgs");
+      var laySpec = arg.optional(spec, "layout");
+      var ka = {model: model};
+      var lay = {
             rows: Structure.to((laySpec && laySpec.rows) || [], ka),
             cols: Structure.to((laySpec && laySpec.cols) || [], ka),
             meas: Structure.to((laySpec && laySpec.meas) || [], ka)
@@ -105,7 +105,7 @@ define([
       else
         this._loadDataMic(spec);
     },
-    //region MIC - Measures In Columns - View
+    // region MIC - Measures In Columns - View
 
     // [
     //   // col tuple ordinal, measure attribute ordinal
@@ -160,12 +160,12 @@ define([
 
     _buildFullMicView: function() {
       // Build a full-mic view.
-      var c = this.cols.length,
-          xM = this._xM;
+      var c = this.cols.length;
+      var xM = this._xM;
 
       if(xM) {
-        var k = c * xM,
-            measStruct = this.layout.meas;
+        var k = c * xM;
+        var measStruct = this.layout.meas;
 
         this._micCols = new Array(k);
 
@@ -179,9 +179,9 @@ define([
         while(c--) this._setMicCol(c, c, null);
       }
     },
-    //endregion
+    // endregion
 
-    //region LOAD Cube Format
+    // region LOAD Cube Format
     _loadDataCube: function(spec) {
       // assert spec.meas
 
@@ -212,9 +212,9 @@ define([
         this._buildFullMicView();
       }
     },
-    //endregion
+    // endregion
 
-    //region LOAD MeasuresInColumns Format
+    // region LOAD MeasuresInColumns Format
     _loadDataMic: function(spec) {
       /* rawTable
        *                (>= xR)
@@ -235,13 +235,13 @@ define([
        * |             |                       |      v
        * +-------------+-----------------------+     ---
        */
-      var rawCols = (spec && spec.cols) || [],
-          rawRows = (spec && spec.rows) || [],
-          rawC = rawCols.length,
-          rawR = rawRows.length,
+      var rawCols = (spec && spec.cols) || [];
+      var rawRows = (spec && spec.rows) || [];
+      var rawC = rawCols.length;
+      var rawR = rawRows.length;
 
-          // Number of CrossColColumns.
-          rawCC = rawC - this._xR;
+      // Number of CrossColColumns.
+      var rawCC = rawC - this._xR;
 
       if(rawCC < 0 && (this._xC || this._xM))
         throw error.argInvalid(
@@ -277,15 +277,15 @@ define([
     },
 
     _processCrossRowColumns: function(rawCols) {
-      var rowsStruct = this.rows.structure,
-          j = Math.min(rawCols.length, this._xR); // rawC, rowsStruct.length
+      var rowsStruct = this.rows.structure;
+      var j = Math.min(rawCols.length, this._xR); // rawC, rowsStruct.length
       while(j--) {
         // colSpec
         // * a string - the attribute name, or
         // * an object with an "attr" property (every other property is ignored)
-        var colSpec = rawCols[j],
-            colAttr = rowsStruct[j].attribute,
-            attrName = (colSpec && typeof colSpec === "object") ? colSpec.attr : colSpec;
+        var colSpec = rawCols[j];
+        var colAttr = rowsStruct[j].attribute;
+        var attrName = (colSpec && typeof colSpec === "object") ? colSpec.attr : colSpec;
 
         // Validate attribute matches, if specified.
         if(attrName != null && attrName !== colAttr.name)
@@ -301,9 +301,9 @@ define([
       // For example, we could intern the column tuple up-front.
       if(colSpec == null) throw error.argRequired("cols[" + j + "]");
 
-      var k = j - this._xR,
-          xC = this._xC,
-          xM = this._xM;
+      var k = j - this._xR;
+      var xC = this._xC;
+      var xM = this._xM;
 
       // Validation, preparation
 
@@ -341,7 +341,8 @@ define([
         meaStructPos = this.layout.meas.getExisting(meaAttrName);
       }
 
-      var colOrdinal, colCellTuple;
+      var colOrdinal;
+      var colCellTuple;
       if(xC) {
         colCellTuple = this.cols.toCellTuple(colSpec.c);
 
@@ -383,7 +384,8 @@ define([
       // assert xR || xM
       if(this._isDegenerateCrossRow) this.rows.intern([]);
 
-      var i = -1, rawR = rawRows.length;
+      var i = -1;
+      var rawR = rawRows.length;
       while(++i < rawR) this._addRow(rawRows[i], i);
     },
 
@@ -394,7 +396,7 @@ define([
       var rawRowCellSpecs;
       if(rowSpec instanceof Array) {
         rawRowCellSpecs = rowSpec;
-        //rowSpec = null;
+        // rowSpec = null;
       } else {
         rawRowCellSpecs = rowSpec.c;
         if(!(rawRowCellSpecs instanceof Array))
@@ -422,10 +424,10 @@ define([
       if(this._xM) {
         var micCols = this._micCols;
         if(micCols.length) { // rawCC
-          var k = -1,
-              K = Math.min(micCols.length, rawRowCellSpecs.length),
-              meas = this.meas,
-              cellSpec;
+          var k = -1;
+          var K = Math.min(micCols.length, rawRowCellSpecs.length);
+          var meas = this.meas;
+          var cellSpec;
 
           while(++k < K)
             if((cellSpec = rawRowCellSpecs[k]) != null)
@@ -438,7 +440,7 @@ define([
         }
       }
     },
-    //endregion
+    // endregion
 
     getCell: function(rowIndex, colIndex) {
       var k = colIndex - this._xR;
@@ -450,7 +452,7 @@ define([
       return this.meas.getByAttribute(rowIndex, micCol.ordinal, micCol.attribute);
     },
 
-    //region ITableReadOnly implementation
+    // region ITableReadOnly implementation
     getNumberOfColumns: function() {
       return this._xR + this._micCols.length;
     },
@@ -500,13 +502,13 @@ define([
     getLabel: function(rowIndex, colIndex) {
       return this.getCell(rowIndex, colIndex).label;
     },
-    //endregion
+    // endregion
 
-    //region ITable
+    // region ITable
     addColumn: function(colSpec) {
-      var colsAxis = this.cols,
-          C0 = colsAxis.length,
-          j = this.getNumberOfColumns();
+      var colsAxis = this.cols;
+      var C0 = colsAxis.length;
+      var j = this.getNumberOfColumns();
 
       this._addCrossCol(colSpec, j);
 
@@ -524,9 +526,9 @@ define([
 
       return i;
     },
-    //endregion
+    // endregion
 
-    //region ISpecifiable implementation
+    // region ISpecifiable implementation
     toSpec: function(keyArgs) {
       var lay = this.layout;
 
@@ -546,38 +548,39 @@ define([
         })
       };
     },
-    //endregion
+    // endregion
 
     toSpecPlain: function(keyArgs) {
       // Assumes model is shared.
 
       // Columns are a linearization of the _cross layout (rows, cols, meas).
-      var rowsAxis = this.rows,
-          colsAxis = this.cols,
-          meas = this.meas,
-          R = rowsAxis.length,
-          C = colsAxis.length,
-          R1 = Math.max(1, R),
-          C1 = Math.max(1, C),
-          xR = this._xR,
-          xC = this._xC,
-          xM = this._xM,
-          RC = xR + xC,
-          P = RC + xM, // === plainColSpecs.length
-          plainRowSpecs = [],
-          plainColSpecs = [].concat(
+      var rowsAxis = this.rows;
+      var colsAxis = this.cols;
+      var meas = this.meas;
+      var R = rowsAxis.length;
+      var C = colsAxis.length;
+      var R1 = Math.max(1, R);
+      var C1 = Math.max(1, C);
+      var xR = this._xR;
+      var xC = this._xC;
+      var xM = this._xM;
+      var RC = xR + xC;
+      var P = RC + xM; // === plainColSpecs.length
+      var plainRowSpecs = [];
+      var plainColSpecs = [].concat(
             rowsAxis.structure.toSpec(keyArgs),
             colsAxis.structure.toSpec(keyArgs),
-            meas.structure.toSpec(keyArgs)),
-          r = -1;
+            meas.structure.toSpec(keyArgs));
+      var r = -1;
 
       while(++r < R1) {
-        var rowPosCells = R ? rowsAxis[r].cells : null,
-            c = -1;
+        var rowPosCells = R ? rowsAxis[r].cells : null;
+        var c = -1;
 
         while(++c < C1) {
-          var plainRowCellSpecs = new Array(P),
-              colPosCells, k;
+          var plainRowCellSpecs = new Array(P);
+          var colPosCells;
+          var k;
 
           if(R) {
             k = xR;

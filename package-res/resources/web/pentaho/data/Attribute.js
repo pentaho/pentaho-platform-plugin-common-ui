@@ -35,7 +35,7 @@ define([
      * @implements pentaho.lang.IListElement
      * @implements pentaho.lang.IWithKey
      *
-     * @classdesc The `Attribute` class represents an attribute that can be
+     * @classDesc The `Attribute` class represents an attribute that can be
      * attributed to entities of a model.
      *
      * Attributes and their values can be attributed to an entity to form a description of it.
@@ -168,7 +168,7 @@ define([
       Annotatable.call(this, spec);
     },
 
-    //region IListElement
+    // region IListElement
     /**
      * Gets the singular name of `Attribute` list-elements.
      * @type string
@@ -176,9 +176,9 @@ define([
      * @default "attribute"
      */
     elemName: "attribute",
-    //endregion
+    // endregion
 
-    //region IWithKey implementation
+    // region IWithKey implementation
     /**
      * Gets the singular name of `Attribute` keys.
      * @type string
@@ -198,9 +198,9 @@ define([
     get key() {
       return this.name;
     },
-    //endregion
+    // endregion
 
-    //region IWithOrdinal implementation
+    // region IWithOrdinal implementation
     /**
      * Gets the ordinal of the attribute in its model's attributes collection.
      *
@@ -212,7 +212,7 @@ define([
     get ordinal() {
       return this._ord;
     },
-    //endregion
+    // endregion
 
     /**
      * Gets the measurement level of this attribute.
@@ -279,7 +279,7 @@ define([
       return structPos;
     },
 
-    //region ISpecifiable implementation
+    // region ISpecifiable implementation
     /**
      * Creates a specification of the attribute.
      *
@@ -302,7 +302,7 @@ define([
 
       return attrSpec;
     },
-    //endregion
+    // endregion
 
     /**
      * Gets the string representation of the attribute.

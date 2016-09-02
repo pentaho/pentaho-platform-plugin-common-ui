@@ -31,17 +31,17 @@ define([
     var BarAbstract = context.get(barAbstractModelFactory);
 
     function requiredOneMeasure() {
-      /*jshint validthis:true*/
+      /* jshint validthis:true*/
       return !this.model.measures.attributes.count && !this.model.measuresLine.attributes.count;
     }
 
     function hasAttributesMeasuresLine() {
-      /*jshint validthis:true*/
+      /* jshint validthis:true*/
       return this.measuresLine.attributes.count > 0;
     }
 
     function hasAttributesMeasures() {
-      /*jshint validthis:true*/
+      /* jshint validthis:true*/
       return this.measuresLine.attributes.count > 0;
     }
 

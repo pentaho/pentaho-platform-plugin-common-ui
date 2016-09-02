@@ -21,7 +21,7 @@ define([
             errorMatch) {
   "use strict";
 
-  /*global jasmine:false, console:false, expect:false */
+  /* global jasmine:false, console:false, expect:false */
 
   describe("pentaho.visual.base.Model", function() {
     var context;

@@ -123,9 +123,7 @@ define([
       while(i--) if(this.expectedTypes[i] !== actual.expectedTypes[i]) return false;
 
       // Same actual type?
-      if((this.actualType || actual.actualType) && (this.actualType !== actual.actualType)) return false;
-
-      return true;
+      return !((this.actualType || actual.actualType) && (this.actualType !== actual.actualType));
     }
   });
 

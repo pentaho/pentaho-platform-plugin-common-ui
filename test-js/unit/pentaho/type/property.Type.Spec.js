@@ -21,7 +21,7 @@ define([
 
   "use strict";
 
-  /*global describe:false, it:false, expect:false, beforeEach:false, jasmine:false*/
+  /* global describe:false, it:false, expect:false, beforeEach:false, jasmine:false*/
 
   var context = new Context(),
       Property = context.get("property"),
@@ -149,7 +149,7 @@ define([
         });
       }); // end when spec is an object
 
-      //region Type Attributes
+      // region Type Attributes
       // TODO: unify with value tests
       describe("#label - ", function() {
         it("should default to the capitalization of `name`", function() {
@@ -326,9 +326,9 @@ define([
           expect(propType.isAdvanced).toBe(true);
         });
       }); // end #isAdvanced
-      //endregion
+      // endregion
 
-      //region Defining Attributes
+      // region Defining Attributes
       describe("#name - ", function() {
 
         it("should throw when spec is falsy", function() {
@@ -576,9 +576,9 @@ define([
           expect(Property2.type.hasOwnProperty("_value")).toBe(true);
         });
       }); //end #value
-      //endregion
+      // endregion
 
-      //region Dynamic & Monotonic Attributes
+      // region Dynamic & Monotonic Attributes
       describe("#isRequired - ", function() {
         it("should not allow changing the Property.type attribute value", function() {
           var propType = Property.type;
@@ -1286,7 +1286,7 @@ define([
           expect(SubProperty2.type.isFoo).toBe(fValue);
         });
       }); // end dynamic attribute
-      //endregion
+      // endregion
 
       describe("property accessors", function() {
         it("should define the property with both a getter and a setter", function() {
@@ -1385,7 +1385,7 @@ define([
         });
       });
 
-      //region Type attributes
+      // region Type attributes
       describe("label -", function() {
         it("should inherit the base value, by default", function() {
           var Base = Complex.extend();
@@ -1967,9 +1967,9 @@ define([
           expect(propType.isAdvanced).toBe(false);
         });
       }); // end isAdvanced
-      //endregion
+      // endregion
 
-      //region Defining attributes
+      // region Defining attributes
       // Cannot change.
       describe("name - ", function() {
         var propType;
@@ -2264,9 +2264,9 @@ define([
           });
         });
       });
-      //endregion
+      // endregion
 
-      //region Dynamic & Monotonic attributes
+      // region Dynamic & Monotonic attributes
       // Dynamic. Monotonic. Cannot change if has descendants.
 
       describe("isRequired -", function() {
@@ -2978,7 +2978,7 @@ define([
           expect(subSpy.calls.count()).toBe(0);
         });
       }); // end isReadOnly
-      //endregion
+      // endregion
     }); // end override a property
 
   }); // pentaho.type.Property.Type

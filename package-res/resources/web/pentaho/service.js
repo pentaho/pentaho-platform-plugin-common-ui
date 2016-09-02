@@ -16,11 +16,11 @@
 
 /**
  * AMD plugin which maintains a collection of _logical modules_ and their _dependencies_.
- * 
+ *
  * #### AMD
- * 
+ *
  * **Module Id**: `"service"`
- * 
+ *
  * **Plugin Usage**: `"pentaho/service!{logical-module-name}?meta&single"`
  *
  *   1. `{logical-module-name}` — the name of a required logical module.
@@ -31,43 +31,43 @@
  *       to be able to know the registered module ids synchronously.
  *
  * #### A Plugin mechanism
- * 
- * The dependency list of logical modules is described in the 
+ *
+ * The dependency list of logical modules is described in the
  * AMD configuration object, under this module's configuration section.
- * 
+ *
  * Scripts require logical modules by _name_ as the argument to this plugin.
  * An array with its dependencies is passed to the loading function.
  *
  * Combined, these capabilities form a simple plugin mechanism.
  *
  * #### Module as a Service
- * 
- * A logical module can be taken 
- * to represent a _service_, having a certain predefined contract or interface type, and, 
- * its dependencies, 
+ *
+ * A logical module can be taken
+ * to represent a _service_, having a certain predefined contract or interface type, and,
+ * its dependencies,
  * to be the AMD modules that _implement_ it (or _provide_ it).
- *  
+ *
  * #### Logical module value type
- * 
- * There are no a priori constraints on the type of value of dependency modules 
+ *
+ * There are no a priori constraints on the type of value of dependency modules
  * of a logical module — or, more loosely, on the type of value(s) of a logical module.
- * 
+ *
  * When a logical module has a certain value type,
  * that should be described in its documentation.
  * More often than not, the value type can be precisely defined as an interface or class.
- * 
- * Currently, the plugin mechanism makes no assurances on the type of value of 
- * a logical module's dependencies. 
- * However, scripts requiring a logical module _should_ trust that 
+ *
+ * Currently, the plugin mechanism makes no assurances on the type of value of
+ * a logical module's dependencies.
+ * However, scripts requiring a logical module _should_ trust that
  * the provided dependencies respect any documented contract.
- * 
+ *
  * #### Configuration
- * 
+ *
  * A module can be the dependency of a single logical module
  * (a module can only provide a single service).
- * 
+ *
  * See the configuration syntax in the accompanying examples.
- * 
+ *
  * @example
  * Load all dependencies of the "IHomeScreen" logical module:
  *
@@ -83,11 +83,11 @@
  *
  *     // Require the dependencies of a logical module
  *     require(["pentaho/service!IHomeScreen"], function(arrayOfHomeScreenModules) {
- * 
+ *
  *  	     arrayOfHomeScreenModules.forEach(function(homeScreen) {
  *            // consume `homeScreen`
  *         });
- * 
+ *
  *     });
  *
  * @example
@@ -126,12 +126,13 @@ define([
 ], function(module, O) {
   "use strict";
 
-  var A_slice  = Array.prototype.slice,
-      /**
-       * A map from logical module names to identifiers of dependency modules.
-       * @type Object.<string, string[]>
-       */
-      logicalModules = {};
+  var A_slice = Array.prototype.slice;
+
+  /**
+   * A map from logical module names to identifiers of dependency modules.
+   * @type Object.<string, string[]>
+   */
+  var logicalModules = {};
 
   processConfig();
 
@@ -143,15 +144,15 @@ define([
 
   /**
    * The `load` function of the AMD plugin.
-   * 
+   *
    * An empty logical module name is resolved as an empty array.
    * An unregistered logical module name is resolved as an empty array.
-   * 
+   *
    * @param {String} name - The name of the logical module to load.
    * @param {function} require - The global require function.
    * @param {function} onLoad - Callback function to call once all of the
    *   the logical module's dependencies are satisfied.
-   *   Receives, as single argument, an array with the 
+   *   Receives, as single argument, an array with the
    *   logical module's dependencies.
    * @param {Object} config - The full require-JS config object.
    */
@@ -167,18 +168,18 @@ define([
       var nameAndOptions = parseNameAndOptions(name);
       var modules = getLogicalModule(nameAndOptions.name);
 
-      var modules_num = modules.length;
-      var isSingle = nameAndOptions.options.single === 'true';
+      var modulesCount = modules.length;
+      var isSingle = nameAndOptions.options.single === "true";
       if(isSingle) {
-        if(modules_num > 1) {
+        if(modulesCount > 1) {
           modules = [modules[0]];
-        } else if(modules_num === 0) {
+        } else if(modulesCount === 0) {
           onLoad(null);
           return;
         }
       }
 
-      var isIds = nameAndOptions.options.ids === 'true';
+      var isIds = nameAndOptions.options.ids === "true";
       if(isIds) {
         if(isSingle) {
           onLoad(modules[0]);
@@ -195,9 +196,8 @@ define([
       require(modules, function() {
         var values = A_slice.call(arguments);
 
-        var with_meta = nameAndOptions.options.meta === 'true';
-
-        if(with_meta) {
+        var withMeta = nameAndOptions.options.meta === "true";
+        if(withMeta) {
           var toReturn = [];
           for(var i = 0, ic = modules.length; i !== ic; ++i) {
             toReturn.push({moduleId: modules[i], value: values[i]});
@@ -221,6 +221,7 @@ define([
    *
    * @param {string} name - The name of the logical module to load.
    * @param {function} normalize - The original normalize function.
+   * @return {string} The normalized module id.
    */
   function normalizeLogicalModule(name, normalize) {
     var nameAndOptions = parseNameAndOptions(name);
@@ -240,17 +241,19 @@ define([
   }
 
   /**
-   * Processes this module's AMD configuration, 
+   * Processes this module's AMD configuration,
    * which includes the registration of dependencies of logical modules.
-   * 
+   *
    * Ignores a _nully_ module configuration value.
    * Ignores _falsy_ physical and logical module identifiers.
    */
   function processConfig() {
-    var config = module.config(), logicalModule;
-    for(var absModuleId in config) // nully tolerant
+    var config = module.config();
+    var logicalModule;
+    for(var absModuleId in config) { // nully tolerant
       if(absModuleId && (logicalModule = O.getOwn(config, absModuleId)))
         getLogicalModule(logicalModule).push(absModuleId);
+    }
   }
 
   /**
@@ -267,15 +270,15 @@ define([
     var logicalModuleName;
     var options = {};
 
-    var parts = name.split('?');
+    var parts = name.split("?");
     logicalModuleName = parts[0];
 
-    parts = parts.length > 1 ? parts[1].split('&') : [];
+    parts = parts.length > 1 ? parts[1].split("&") : [];
     parts.forEach(function(part) {
-      var option = part.split('=');
+      var option = part.split("=");
       if(option[0]) {
         // defaults to 'true' if no value is included
-        options[decodeURIComponent(option[0])] = option.length > 1 ? decodeURIComponent(option[1]) : 'true';
+        options[decodeURIComponent(option[0])] = option.length > 1 ? decodeURIComponent(option[1]) : "true";
       }
     });
 
@@ -293,7 +296,7 @@ define([
   function stringifyNameAndOptions(nameAndOptions) {
     var options = [];
 
-    for (var prop in nameAndOptions.options) {
+    for(var prop in nameAndOptions.options) {
       /* istanbul ignore else: almost impossible to test; browser dependent */
       if(nameAndOptions.options.hasOwnProperty(prop)) {
         options.push(encodeURIComponent(prop) + "=" + encodeURIComponent(nameAndOptions.options[prop]));
@@ -302,7 +305,7 @@ define([
 
     options.sort();
 
-    return nameAndOptions.name + (options.length ? "?" + options.join('&') : "");
+    return nameAndOptions.name + (options.length ? "?" + options.join("&") : "");
   }
 
   /**

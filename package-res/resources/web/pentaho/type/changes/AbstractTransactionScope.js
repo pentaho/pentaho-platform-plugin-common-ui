@@ -194,7 +194,7 @@ define([
     exit: function(keyArgs) {
 
       if(!O.getOwn(keyArgs, "sloppy", false)) {
-        var error = !this._isInside ? this._getErrorNotInside()  :
+        var error = !this._isInside ? this._getErrorNotInside() :
                     !this.isCurrent ? this._getErrorNotCurrent() : null;
 
         if(error) logger.warn(error.message);

@@ -27,13 +27,13 @@ define([
       return this.c;
     },
 
-    //region ISpecifiable implementation
+    // region ISpecifiable implementation
     toSpec: function() {
       return {
         c: this.c.toSpec()
       };
     },
-    //endregion
+    // endregion
 
     _onStructurePositionAdded: function() {
       this.c._onStructurePositionAdded();

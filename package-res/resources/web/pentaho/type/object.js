@@ -37,7 +37,7 @@ define([
      *
      * @description Creates an object instance.
      */
-    return Simple.extend(/** @lends "pentaho.type.Object#" */{
+    return Simple.extend(/** @lends pentaho.type.Object# */{
 
       constructor: function(spec) {
         this.base(spec);
@@ -50,7 +50,7 @@ define([
        *
        * The key of a value identifies it among its _peers_.
        *
-       * @type string
+       * @type {string}
        * @readonly
        */
       get key() {
@@ -64,13 +64,12 @@ define([
        * @readonly
        */
 
-      type: {
+      type: /** @lends pentaho.type.Object.Type# */{
         id: module.id,
         cast: Object
       }
-    }).implement({
-      //jshint -W069
-      type: bundle.structured["object"]
+    }).implement(/** @lends pentaho.type.Object# */{
+      type: bundle.structured["object"] // eslint-disable-line dot-notation
     });
   };
 });

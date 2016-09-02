@@ -43,7 +43,7 @@ define([
    * Methods like
    * [Instance#toSpec]{@link pentaho.type.Instance#toSpec},
    * [Type#toSpec]{@link pentaho.type.Type#toSpec} and
-   * [Type#toRef]{@link pentaho.type.Type#toRef} 
+   * [Type#toRef]{@link pentaho.type.Type#toRef}
    * use the ambient specification context, when set,
    * to provide context to the serialization process.
    * When not set, these create a new specification context and

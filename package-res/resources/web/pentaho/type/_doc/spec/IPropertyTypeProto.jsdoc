@@ -195,7 +195,7 @@
  * it does not make sense in a certain situation.
  * It may only be applicable when another property of the complex type has a specific value, for example.
  *
- * When a property is not currently applicable, its value is not significant 
+ * When a property is not currently applicable, its value is not significant
  * and, as such, any validations concerning it are not performed.
  *
  * ### This attribute is *Dynamic*
@@ -230,7 +230,7 @@
  */
 
 /**
- * Indicates if properties of this type _cannot_ be changed by a user 
+ * Indicates if properties of this type _cannot_ be changed by a user
  * in a user interface.
  *
  * A property should be marked read-only whenever its value is implied/imposed somehow,

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 define([
-  "../types/sizeByNegativesMode",
+  "../types/sizeByNegativesMode"
 ], function(sizeByNegativesModeFactory) {
 
   "use strict";

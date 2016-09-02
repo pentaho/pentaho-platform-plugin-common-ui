@@ -59,7 +59,7 @@ define([
           measureDiscrimCccDimName = this.measureDiscrimGem && this.measureDiscrimGem.cccDimName;
 
       if(measureDiscrimCccDimName) {
-        /*jshint laxbreak:true*/
+        /* jshint laxbreak:true*/
         var barAttrInfos = this._getAttributeInfosOfRole("measures"),
             barAttrInfosByName = barAttrInfos
                 ? def.query(barAttrInfos).uniqueIndex(function(ai) { return ai.name; })

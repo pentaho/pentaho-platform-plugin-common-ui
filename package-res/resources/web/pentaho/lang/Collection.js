@@ -105,11 +105,11 @@ define([
     },
 
     _sayElemWithKey: function(key) {
-      return "A " + this._getElemName()  + " with " + this._getKeyName() + " '" + key + "'";
+      return "A " + this._getElemName() + " with " + this._getKeyName() + " '" + key + "'";
     },
 
     _sayElemCannotHaveNullyKey: function() {
-      return "A " + this._getElemName()  + " cannot have a nully " + this._getKeyName() + " value.";
+      return "A " + this._getElemName() + " cannot have a nully " + this._getKeyName() + " value.";
     },
 
     _adding: function(elem, index, ka) {

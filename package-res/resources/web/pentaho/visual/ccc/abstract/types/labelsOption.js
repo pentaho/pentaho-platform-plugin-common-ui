@@ -30,11 +30,11 @@ define([
         of: "string",
         facets: ["DiscreteDomain"],
         domain: [
-          "none", "center",                 //all (HeatGrid, Sunburst)
-          "insideEnd", "insideBase",        //StackedBar, NormalizedBar (vertical and horizontal)
-          "outsideEnd",                     //Bar, HorizontalBar, BarLine
-          "left", "right", "top", "bottom", //Line, MetricDot, StackedArea
-          "outside", "inside"               //Pie
+          "none", "center",                 // all (HeatGrid, Sunburst)
+          "insideEnd", "insideBase",        // StackedBar, NormalizedBar (vertical and horizontal)
+          "outsideEnd",                     // Bar, HorizontalBar, BarLine
+          "left", "right", "top", "bottom", // Line, MetricDot, StackedArea
+          "outside", "inside"               // Pie
 
         ]
       }

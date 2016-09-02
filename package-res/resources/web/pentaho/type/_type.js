@@ -32,15 +32,15 @@ define([
 
   "use strict";
 
-  /*global Promise:false */
+  /* global Promise:false */
 
   // Unique type class id exposed through Type#uid and used by Context instances.
-  var _nextUid = 1,
-      _extractShortId = /^pentaho\/type\/(\w+)$/i,
-      _normalAttrNames = [
+  var _nextUid = 1;
+  var _extractShortId = /^pentaho\/type\/(\w+)$/i;
+  var _normalAttrNames = [
         "description", "category", "helpUrl", "isBrowsable", "isAdvanced", "ordinal"
-      ],
-      O_isProtoOf = Object.prototype.isPrototypeOf;
+      ];
+  var O_isProtoOf = Object.prototype.isPrototypeOf;
 
   return function(context) {
     var _type = null;
@@ -138,7 +138,7 @@ define([
         if(id && spec.styleClass === undefined) this.styleClass = undefined;
       },
 
-      //region context property
+      // region context property
 
       // NOTE: Any class extended from this will return the same context.
       /**
@@ -149,9 +149,9 @@ define([
       get context() {
         return context;
       },
-      //endregion
+      // endregion
 
-      //region uid property
+      // region uid property
       /**
        * Gets the unique identifier of this type.
        *
@@ -167,9 +167,9 @@ define([
        * @readonly
        */
       uid: -1, // set in _init
-      //endregion
+      // endregion
 
-      //region root property
+      // region root property
       // `root` is generally set on direct sub-classes of Instance.
       // Should be the first meaningful, non-abstract instance class below `Instance` along a given branch.
       /**
@@ -218,9 +218,9 @@ define([
       get isRoot() {
         return this === this.root;
       },
-      //endregion
+      // endregion
 
-      //region ancestor property
+      // region ancestor property
       /**
        * Gets the parent type in the current type hierarchy, if any, or `null`.
        *
@@ -234,9 +234,9 @@ define([
       get ancestor() {
         return this.isRoot ? null : Object.getPrototypeOf(this);
       },
-      //endregion
+      // endregion
 
-      //region hasDescendants property
+      // region hasDescendants property
       /**
        * Gets a value that indicates if this type has any descendant types.
        *
@@ -247,9 +247,9 @@ define([
       get hasDescendants() {
         return this._hasDescendants;
       },
-      //endregion
+      // endregion
 
-      //region instance property
+      // region instance property
       /**
        * Gets the _prototype_ of the instances of this type.
        *
@@ -267,11 +267,11 @@ define([
         // Class.implement essentially just calls Class#extend.
         /* istanbul ignore else: no comments */
         if(config) this.instance.extend(config);
-      }, //jshint -W078
-      //endregion
+      }, // jshint -W078
+      // endregion
 
-      //region Type Kinds
-      //region isValue property
+      // region Type Kinds
+      // region isValue property
       /**
        * Gets a value that indicates if this type
        * [is]{@link pentaho.type.Type#isSubtypeOf} a
@@ -281,9 +281,9 @@ define([
        * @readOnly
        */
       get isValue() { return false; },
-      //endregion
+      // endregion
 
-      //region isProperty property
+      // region isProperty property
       /**
        * Gets a value that indicates if this type
        * [is]{@link pentaho.type.Type#isSubtypeOf} a
@@ -293,9 +293,9 @@ define([
        * @readOnly
        */
       get isProperty() { return false; },
-      //endregion
+      // endregion
 
-      //region isContainer property
+      // region isContainer property
       /**
        * Gets a value that indicates if this type
        * [is]{@link pentaho.type.Type#isSubtypeOf} a
@@ -306,9 +306,9 @@ define([
        * @readOnly
        */
       get isContainer() { return false; },
-      //endregion
+      // endregion
 
-      //region isList property
+      // region isList property
       /**
        * Gets a value that indicates if this type
        * [is]{@link pentaho.type.Type#isSubtypeOf} a
@@ -318,9 +318,9 @@ define([
        * @readOnly
        */
       get isList() { return false; },
-      //endregion
+      // endregion
 
-      //region isElement property
+      // region isElement property
       /**
        * Gets a value that indicates if this type
        * [is]{@link pentaho.type.Type#isSubtypeOf} an
@@ -330,9 +330,9 @@ define([
        * @readOnly
        */
       get isElement() { return false; },
-      //endregion
+      // endregion
 
-      //region isRefinement property
+      // region isRefinement property
       /**
        * Gets a value that indicates if this type
        * [is]{@link pentaho.type.Type#isSubtypeOf} a
@@ -342,9 +342,9 @@ define([
        * @readOnly
        */
       get isRefinement() { return false; },
-      //endregion
+      // endregion
 
-      //region isComplex property
+      // region isComplex property
       /**
        * Gets a value that indicates if this type
        * [is]{@link pentaho.type.Type#isSubtypeOf} an
@@ -354,9 +354,9 @@ define([
        * @readOnly
        */
       get isComplex() { return false; },
-      //endregion
+      // endregion
 
-      //region isSimple property
+      // region isSimple property
       /**
        * Gets a value that indicates if this type
        * [is]{@link pentaho.type.Type#isSubtypeOf} an
@@ -366,11 +366,11 @@ define([
        * @readOnly
        */
       get isSimple() { return false; },
-      //endregion
+      // endregion
 
-      //endregion
+      // endregion
 
-      //region id property
+      // region id property
 
       // -> nonEmptyString, Optional(null), Immutable, Shared (note: not Inherited)
       // "" -> null conversion
@@ -473,7 +473,9 @@ define([
        * @see pentaho.type.Type#id
        */
       get shortId() {
-        var shortId = this._shortId, id, m;
+        var shortId = this._shortId;
+        var id;
+        var m;
         if(shortId === undefined) {
           if((id = this._id) && (m = _extractShortId.exec(id))) {
             shortId = m[1];
@@ -528,9 +530,9 @@ define([
 
         return id;
       },
-      //endregion
+      // endregion
 
-      //region isAbstract property
+      // region isAbstract property
       // @type boolean
       // -> boolean, Optional(false)
 
@@ -554,9 +556,9 @@ define([
         // nully is reset, which is false, so !! works well.
         this._isAbstract = !!value;
       },
-      //endregion
+      // endregion
 
-      //region label property
+      // region label property
       // must have some non-null value to inherit
       _label: "instance",
       _labelSet: false,
@@ -599,9 +601,9 @@ define([
           delete this._label;
         }
       },
-      //endregion
+      // endregion
 
-      //region description property
+      // region description property
 
       // -> nonEmptyString, Optional, Inherited, Configurable, Localized
       // "" -> null conversion
@@ -638,9 +640,9 @@ define([
           delete this._description;
         }
       },
-      //endregion
+      // endregion
 
-      //region category property
+      // region category property
 
       // -> nonEmptyString, Optional, Inherited, Configurable, Localized
       // "" -> null conversion
@@ -682,9 +684,9 @@ define([
           delete this._category;
         }
       },
-      //endregion
+      // endregion
 
-      //region helpUrl property
+      // region helpUrl property
 
       // -> nonEmptyString, Optional, Inherited, Configurable, Localized?
       // "" -> null conversion
@@ -722,9 +724,9 @@ define([
           delete this._helpUrl;
         }
       },
-      //endregion
+      // endregion
 
-      //region isBrowsable property
+      // region isBrowsable property
       // @type boolean
       // -> boolean, Optional(true), Inherited, Configurable
       // undefined or null -> resets
@@ -759,9 +761,9 @@ define([
           delete this._isBrowsable;
         }
       },
-      //endregion
+      // endregion
 
-      //region isAdvanced property
+      // region isAdvanced property
       // @type boolean
       // -> boolean, Optional(false), Inherited, Configurable
       // null || undefined -> reset
@@ -797,9 +799,9 @@ define([
           delete this._isAdvanced;
         }
       },
-      //endregion
+      // endregion
 
-      //region styleClass property
+      // region styleClass property
       // @type nonEmptyString
       // -> nonEmptyString, Optional(null), Configurable, Localized
       // "" or undefined -> null conversion
@@ -858,9 +860,9 @@ define([
 
         return styleClasses;
       },
-      //endregion
+      // endregion
 
-      //region ordinal property
+      // region ordinal property
       // @type integer
       // -> Optional(0), Inherited, Configurable
       _ordinal: 0,
@@ -895,9 +897,9 @@ define([
           delete this._ordinal;
         }
       },
-      //endregion
+      // endregion
 
-      //region defaultView property
+      // region defaultView property
 
       // -> nonEmptyString, Optional, Inherited, Configurable, Localized
       // undefined -> inherit
@@ -935,6 +937,8 @@ define([
       },
 
       set defaultView(value) {
+        var defaultViewInfo;
+
         if(value === undefined) {
 
           this._resetDefaultView();
@@ -943,16 +947,16 @@ define([
 
           this._defaultView = null;
 
-        } else  if(typeof value === "string") {
+        } else if(typeof value === "string") {
 
-          var defaultViewInfo = O.getOwn(this, "_defaultView");
+          defaultViewInfo = O.getOwn(this, "_defaultView");
           if(!defaultViewInfo || (defaultViewInfo.value !== value && defaultViewInfo.fullValue !== value)) {
             this._defaultView = {value: value, promise: null, fullValue: this.buildSourceRelativeId(value)};
           }
         } else if(typeof value === "function") {
 
           // Assume it is the View class itself, already fulfilled.
-          var defaultViewInfo = O.getOwn(this, "_defaultView");
+          defaultViewInfo = O.getOwn(this, "_defaultView");
           if(!defaultViewInfo || defaultViewInfo.value !== value) {
             this._defaultView = {value: value, promise: Promise.resolve(value), fullValue: value};
           }
@@ -974,18 +978,18 @@ define([
        * A default view exists if property {@link pentaho.type.Type#defaultView}
        * has a non-null value.
        *
-       * @type Promise.<?function>
+       * @type {Promise.<?function>}
        * @readOnly
        * @see pentaho.type.Type#defaultView
        */
       get defaultViewClass() {
-        /*jshint laxbreak:true*/
+        /* jshint laxbreak:true*/
         var defaultView = this._defaultView;
         return defaultView
             ? (defaultView.promise || (defaultView.promise = promiseUtil.require(defaultView.fullValue, localRequire)))
             : Promise.resolve(null);
       },
-      //endregion
+      // endregion
 
       /**
        * Creates a subtype of this one.
@@ -1028,7 +1032,7 @@ define([
         return type;
       },
 
-      //region creation
+      // region creation
       /**
        * Creates an instance of this type, given an instance specification.
        *
@@ -1129,7 +1133,8 @@ define([
        * is an [abstract]{@link pentaho.type.Value.Type#isAbstract} type.
        */
       create: function(instSpec) {
-        var Instance, typeSpec;
+        var Instance;
+        var typeSpec;
 
         // If it is a plain Object, does it have the inline type property, "_"?
         if(instSpec && typeof instSpec === "object" && (typeSpec = instSpec._) && instSpec.constructor === Object) {
@@ -1188,7 +1193,7 @@ define([
         throw error.operInvalid(bundle.format(
             bundle.structured.errors.instance.cannotCreateInstanceOfAbstractType, [this]));
       },
-      //endregion
+      // endregion
 
       /**
        * Determines if a value is an instance of this type.
@@ -1233,7 +1238,7 @@ define([
                this.create(value);
       },
 
-      //region serialization
+      // region serialization
       /**
        * Creates a specification that describes this type.
        *
@@ -1341,7 +1346,8 @@ define([
 
         // Normal attributes
         _normalAttrNames.forEach(function(name) {
-          var _name = "_" + name, v;
+          var _name = "_" + name;
+          var v;
           // !== undefined ensures refinement fields are well handled as well
           if(O.hasOwn(this, _name) && (v = this[_name]) !== undefined) {
             any = true;
@@ -1428,7 +1434,7 @@ define([
       toRefInContext: function(keyArgs) {
         return this.shortId || SpecificationContext.current.getIdOf(this) || this.toSpecInContext(keyArgs);
       },
-      //endregion
+      // endregion
 
       /**
        * Returns a textual representation suitable to identify this type in an error message.
@@ -1440,7 +1446,7 @@ define([
       }
     }, /** @lends pentaho.type.Type */{
 
-      //@override
+      // @override
       /**
        * See Base.js
        * @ignore

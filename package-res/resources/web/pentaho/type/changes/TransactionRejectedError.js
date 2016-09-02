@@ -40,7 +40,7 @@ define([
    */
 
   return UserError.extend("pentaho.type.changes.TransactionRejectedError",
-  /** @lends pentaho.type.changes.TransactionRejectedError# */{
+    /** @lends pentaho.type.changes.TransactionRejectedError# */{
 
     constructor: function(reason) {
 

@@ -31,7 +31,7 @@
 (function() {
   "use strict";
 
-  /*global requireCfg:false, KARMA_DEBUG:false, __karma__:false, console:false, DEV_SPEC_FILTER:false*/
+  /* global requireCfg:false, KARMA_DEBUG:false, __karma__:false, console:false, DEV_SPEC_FILTER:false*/
 
   // Karma serves files from '/base'
 

@@ -40,8 +40,8 @@ define([
    * @see pentaho.data.Attribute
    */
   return Collection.extend("pentaho.data.AttributeCollection", /** @lends pentaho.data.AttributeCollection# */{
-    
-    //region List implementation
+
+    // region List implementation
     /**
      * Gets the class of elements of the list:
      * {@link pentaho.data.Attribute}.
@@ -50,7 +50,7 @@ define([
      * @readonly
      */
     elemClass: Attribute,
-    //endregion
+    // endregion
 
     _cachedKeyArgs: null,
 

@@ -23,9 +23,9 @@ define([
 
   /**
    * @classDesc An `ActionResult` represents the result from performing an _action_.
-   * 
+   *
    * ### `ActionResult` Value
-   * 
+   *
    * When successful, an _action_ can return a value that represents its final state or `undefined`. For example,
    * if you do a google search using an {@link pentaho.visual.base.model#executeAction|executeAction}, there is
    * no value to be returned.
@@ -43,7 +43,7 @@ define([
    * @amd pentaho/lang/ActionResult
    * @class
    * @extends pentaho.lang.Base
-   * 
+   *
    * @see pentaho.visual.base.model#executeAction
    * @see pentaho.visual.base.model#selectAction
    */
@@ -55,7 +55,8 @@ define([
      * @constructor
      *
      * @param {?object} value - The value of a successful _action_.
-     * @param {!string|Error|pentaho.lang.UserError} error - The error that contains the reason why the _action_ was rejected.
+     * @param {!string|Error|pentaho.lang.UserError} error - The error that contains the reason why
+     * the _action_ was rejected.
      */
     constructor: function(value, error) {
       if(error) {
@@ -65,7 +66,7 @@ define([
           throw utilError.argInvalidType("error", ["string", "Error"], typeof error);
         }
         this._value = undefined;
-        this._error  = error;
+        this._error = error;
       } else {
         this._value = value;
         this._error = null;
