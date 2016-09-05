@@ -271,6 +271,7 @@ define(['cdf/lib/Base', 'common-ui/util/base64', 'common-ui/util/formatting',  '
           }
 
           paramDefn.autoSubmitUI = _getBooleanFromXmlNode(parameters, 'autoSubmitUI');
+          paramDefn.minimized = _getBooleanFromXmlNode(parameters, 'minimized');
 
           _parseParameters(paramDefn, parameters);
           _parseErrors(paramDefn, xml);
