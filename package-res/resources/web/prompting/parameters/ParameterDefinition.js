@@ -42,6 +42,7 @@ define(['common-ui/jquery-clean'], function ($) {
       'promptNeeded': undefined, // boolean
       'totalPages': undefined, // integer
       'errors': {}, // hash of {paramName, [error1..n]}. "Global" errors are stored as {'null', [error1..n]}.
+      'minimized': undefined,
 
       /**
        * Returns parameter group from a given name
@@ -138,6 +139,22 @@ define(['common-ui/jquery-clean'], function ($) {
         });
 
         return !breaking;
+      },
+
+      /**
+       * Updates value of parameter with new one taken from passed parameter object
+       * @param newParameter - parameter object with new value
+       */
+      updateParameterValue: function (newParameter){
+        if(newParameter && newParameter.name){
+          this.mapParameters( function (oldParam, group) {
+            if(newParameter.name === oldParam.name){
+              var index = group.parameters.indexOf(oldParam);
+              group.parameters[index].values = newParameter.values;
+              return;
+            }
+          }, this );
+        }
       }
     };
   }
