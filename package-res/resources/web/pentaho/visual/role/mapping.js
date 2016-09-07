@@ -181,7 +181,7 @@ define([
          * Downgrade from quantitative to any qualitative is possible.
          * Auto Level:    quantitative->ordinal
          */
-        var levelLowest = this._getLowestLevelInAttrs();
+        var levelLowest = this._getAttributesMaxLevel();
         if(levelLowest) return this._getRoleLevelCompatibleWith(levelLowest);
       },
 
@@ -235,18 +235,21 @@ define([
       },
 
       /**
-       * Determines the lowest level of measurement of all the data properties
+       * Determines the highest level of measurement supported by all of the data properties
        * in mapping attributes.
        *
-       * When no attributes or any attribute is invalid, `undefined` is returned.
-       * The level of measurement compatibility is not considered for validity at this point.
+       * Only attributes that satisfy the visual role's supported data types should be considered.
+       *
+       * When there are no attributes or when all attributes are invalid, `undefined` is returned.
+       * The level of measurement compatibility should not be considered by this method.
        *
        * @return {string|undefined} The lowest level of measurement.
-       * @private
+       * @protected
        */
-      _getLowestLevelInAttrs: function() {
+      _getAttributesMaxLevel: function() {
         var mappingAttrs = this.attributes;
-        var data, visualModel;
+        var data;
+        var visualModel;
         var L;
         if(!(L = mappingAttrs.count) || !(visualModel = this.model) || !(data = visualModel.data))
           return;
@@ -348,12 +351,12 @@ define([
           // Must be one of the role's levels.
           if(!allRoleLevels.has(level.key)) {
             addErrors(new Error(bundle.format(
-                bundle.structured.errors.mapping.levelIsNotOneOfRoleLevels,
-                {
-                  role: this.modelProperty,
-                  level: level,
-                  roleLevels: ("'" + allRoleLevels.toArray().join("', '") + "'")
-                })));
+              bundle.structured.errors.mapping.levelIsNotOneOfRoleLevels,
+              {
+                role: this.modelProperty,
+                level: level,
+                roleLevels: ("'" + allRoleLevels.toArray().join("', '") + "'")
+              })));
             return;
           }
 
@@ -365,19 +368,19 @@ define([
         }
 
         // Data Attributes, if any, must be compatible with level.
-        var dataAttrLevel = this._getLowestLevelInAttrs();
+        var dataAttrLevel = this._getAttributesMaxLevel();
         if(dataAttrLevel) {
           var roleLevel = this._getRoleLevelCompatibleWith(dataAttrLevel, roleLevels);
           if(!roleLevel) {
             addErrors(new Error(
-                bundle.format(
-                    bundle.structured.errors.mapping.attributesLevelNotCompatibleWithRoleLevels,
-                    {
-                      role: this.modelProperty,
-                      // Try to provide a label for dataAttrLevel.
-                      dataLevel: MeasurementLevel.type.domain.get(dataAttrLevel),
-                      roleLevels: ("'" + allRoleLevels.toArray().join("', '") + "'")
-                    })));
+              bundle.format(
+                bundle.structured.errors.mapping.attributesLevelNotCompatibleWithRoleLevels,
+                {
+                  role: this.modelProperty,
+                  // Try to provide a label for dataAttrLevel.
+                  dataLevel: MeasurementLevel.type.domain.get(dataAttrLevel),
+                  roleLevels: ("'" + allRoleLevels.toArray().join("', '") + "'")
+                })));
           }
         }
       },

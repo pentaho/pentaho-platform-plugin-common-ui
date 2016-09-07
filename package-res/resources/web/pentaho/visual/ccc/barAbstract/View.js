@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 define([
+  "cdf/lib/CCC/def",
   "../categoricalContinuousAbstract/View"
-], function(AbstractCategoricalContinuousChart) {
+], function(def, AbstractCategoricalContinuousChart) {
 
   "use strict";
 
@@ -28,7 +29,7 @@ define([
 
       var options = this.options;
       if(options.orientation !== "vertical")
-        options.visualRoles.category = {isReversed: true};
+        def.lazy(options.visualRoles, "category").isReversed = true;
     },
 
     _configureLabelsAnchor: function(options, visualSpec) {

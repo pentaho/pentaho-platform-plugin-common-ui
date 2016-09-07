@@ -21,7 +21,7 @@ define([
   "use strict";
 
   return Base.extend({
-    constructor: function(chart, axisId, gems) {
+    constructor: function(chart, axisId, mais) {
       this.chart = chart;
       this.id = axisId;
 
@@ -30,34 +30,39 @@ define([
       // Only bound roles will have an entry in this set
       this.boundRoles = {}; // roleId -> true
 
-      this.gems = gems;
-      this.depth = gems.length;
-      gems.forEach(function(gem) {
-        // Overwrite axis id with corresponding Axis instance
-        gem.axis = this;
+      /**
+       * @type {MappingAttributeInfo[]}
+       */
+      this.mais = mais;
 
-        this.boundRoles[gem.role] = true;
+      this.depth = mais.length;
+      mais.forEach(function(mai) {
+        // Overwrite axis id with corresponding Axis instance
+        mai.axis = this;
+
+        this.boundRoles[mai.role] = true;
       }, this);
     },
 
     defaultRole: null,
 
     buildHtmlTooltip: function(lines, complex, context) {
-     this.gems.forEach(function(gem, index) {
-       if(gem.cccDimName) this._buildGemHtmlTooltip(lines, complex, context, gem, index);
-     }, this);
+      this.mais.forEach(function(mai, index) {
+        if(mai.cccDimName)
+          this._buildMaiHtmlTooltip(lines, complex, context, mai, index);
+      }, this);
     },
 
-    _buildGemHtmlTooltip: function(lines, complex, context, gem, index) {
-     // Multi-chart formulas are not shown in the tooltip.
-     // They're on the small chart's title.
-     if(gem.role !== this.chart._multiRole) {
-       var atom = complex.atoms[gem.cccDimName];
-       if(!atom.dimension.type.isHidden && (!complex.isTrend || atom.value != null)) {
-         // ex: "Line: Ships"
-         lines.push(def.html.escape(gem.label) + ": " + def.html.escape(atom.label));
-       }
-     }
+    _buildMaiHtmlTooltip: function(lines, complex, context, mai, index) {
+      // Multi-chart formulas are not shown in the tooltip.
+      // They're on the small chart's title.
+      if(mai.role !== this.chart._multiRole) {
+        var atom = complex.atoms[mai.cccDimName];
+        if(!atom.dimension.type.isHidden && (!complex.isTrend || atom.value != null)) {
+          // ex: "Line: Ships"
+          lines.push(def.html.escape(mai.label) + ": " + def.html.escape(atom.label));
+        }
+      }
     },
 
     complexToFilter: function() {

@@ -48,7 +48,10 @@ define([
           // region Visual Roles
           {
             name: "rows", //VISUAL_ROLE
-            type: "pentaho/visual/role/ordinal",
+            type: {
+              base:   "pentaho/visual/role/mapping",
+              levels: ["ordinal"]
+            },
             ordinal: 5
           },
           // endregion
@@ -151,7 +154,7 @@ define([
           }
         ]
       }
-      
+
     })
     /* jshint sub:true*/
     .implement({type: bundle.structured["abstract"]});

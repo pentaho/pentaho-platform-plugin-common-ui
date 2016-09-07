@@ -21,7 +21,7 @@ define([
   "use strict";
 
   return AbstractCartesianChart.extend({
-    _genericMeasureCccDimName: "value",
+    _genericMeasureCccVisualRole: "value",
 
     _options: {
       panelSizeRatio: 0.8
@@ -32,25 +32,32 @@ define([
     },
 
     _getOrthoAxisTitle: function() {
-      var roleNames = def.getOwn(this._getRolesByCccDimGroup(), this._genericMeasureCccDimName);
+      var roleNames = def.getOwn(this._rolesByCccVisualRole, this._genericMeasureCccVisualRole);
       return roleNames ? this._getMeasureRoleTitle(roleNames[0]) : "";
     },
 
     _getBaseAxisTitle: function() {
-      var roleNames = this._getRolesByCccDimGroup()["category"];
+      var roleNames = def.getOwn(this._rolesByCccVisualRole, "category");
       return roleNames ? this._getDiscreteRolesTitle(roleNames) : "";
+    },
+
+    _isBaseAxisQualitative: function() {
+      var roleNames = def.getOwn(this._rolesByCccVisualRole, "category");
+      return !!roleNames && this._isRoleQualitative(roleNames[0]);
     },
 
     _configure: function() {
       this.base();
 
-      this._configureAxisRange(/*isPrimary*/true, "ortho");
+      this._configureAxisRange(/* isPrimary: */true, "ortho");
 
       var options = this.options;
       if(options.orientation === "vertical") {
-        options.xAxisLabel_textAngle    = -Math.PI/4;
-        options.xAxisLabel_textAlign    = "right";
-        options.xAxisLabel_textBaseline = "top";
+        if(this._isBaseAxisQualitative()) {
+          options.xAxisLabel_textAngle = -Math.PI / 4;
+          options.xAxisLabel_textAlign = "right";
+          options.xAxisLabel_textBaseline = "top";
+        }
       } else {
         options.xAxisPosition = "top";
       }
@@ -59,7 +66,7 @@ define([
     _configureDisplayUnits: function() {
       this.base();
 
-      this._configureAxisDisplayUnits(/*isPrimary*/true, "ortho");
+      this._configureAxisDisplayUnits(/* isPrimary: */true, "ortho");
     }
   });
 });

@@ -23,25 +23,26 @@ define([
   return AbstractChart.extend({
     _cccClass: "PieChart",
 
-    _roleToCccDimGroup: {
+    _roleToCccRole: {
       "columns": "multiChart",
       "rows": "category",
       "measures": "value"
     },
 
-    _genericMeasureCccDimName: "value",
+    _genericMeasureCccVisualRole: "value",
 
     _multiRole: "columns",
 
     _discreteColorRole: "rows",
 
-    _tooltipHidePercentageForPercentGems: true,
+    _tooltipHidePercentageForPercentMais: true,
 
     _options: {
       legendShape: "circle",
       titlePosition: "bottom",
       slice_strokeStyle: "white",
-      slice_lineWidth: 0.8
+      slice_lineWidth: 0.8,
+      valuesAnchor: "outer"
     },
 
     _configure: function() {
@@ -58,8 +59,12 @@ define([
       this.base.apply(this, arguments);
 
       if(options.valuesVisible) {
-        options.valuesLabelStyle = model.labelsOption;
+        options.valuesLabelStyle = model.labelsOption === "outside" ? "linked" : model.labelsOption;
       }
+    },
+
+    _configureLabelsAnchor: function(options, model) {
+      // NOOP
     },
 
     _configureMultiChart: function() {
@@ -71,15 +76,19 @@ define([
     _configureValuesMask: function() {
       // Change values mask according to each category's
       // discriminated measure being isPercent or not
-      if(this.measureDiscrimGem) {
-        var gemsMap = this._gemsMap, meaDiscrimName = this.measureDiscrimGem.cccDimName;
+      if(this._isGenericMeasureMode) {
+        var mappingAttrInfoByName = this._mappingAttrInfoByName;
+        var genericMeasureDiscrimName = this.GENERIC_MEASURE_DISCRIM_DIM_NAME;
 
         this.options.pie = {
           scenes: {
             category: {
               sliceLabelMask: function() {
-                var meaAtom = this.atoms[meaDiscrimName], meaGemId, meaGem;
-                if(meaAtom && (meaGemId = meaAtom.value) && (meaGem = gemsMap[meaGemId]) && meaGem.isPercent) {
+                var meaAtom = this.atoms[genericMeasureDiscrimName];
+                var meaMaiId;
+                var meaMai;
+                if(meaAtom && (meaMaiId = meaAtom.value) &&
+                   (meaMai = mappingAttrInfoByName[meaMaiId]) && meaMai.isPercent) {
                   return "{value}"; // the value is the percentage itself;
                 }
 
@@ -94,13 +103,14 @@ define([
     _getDiscreteColorMap: function() {
       var memberPalette = this._getMemberPalette();
       if(memberPalette) {
-        var colorGems = this._getDiscreteColorGems(), C = colorGems.length;
+        var colorMais = this._getDiscreteColorMais();
+        var C = colorMais.length;
         // C >= 0 (color -> "rows" -> is optional)
         // When multiple measures exist, the pie chart shows them as multiple charts
         // and if these would affect color, each small chart would have a single color.
         // => consider M = 0;
         // If C, use the members' colors of the last color attribute.
-        if(C) return this._copyColorMap(null, memberPalette[colorGems[C - 1].name]);
+        if(C) return this._copyColorMap(null, memberPalette[colorMais[C - 1].name]);
       }
     }
   });

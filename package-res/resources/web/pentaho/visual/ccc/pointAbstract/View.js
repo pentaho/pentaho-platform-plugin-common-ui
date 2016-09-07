@@ -14,12 +14,19 @@
  * limitations under the License.
  */
 define([
-  "../pointAbstract/View"
-], function(PointAbstractChart) {
+  "../categoricalContinuousAbstract/View"
+], function(AbstractCategoricalContinuousChart) {
 
   "use strict";
 
-  return PointAbstractChart.extend({
-    _cccClass: "StackedAreaChart"
+  return AbstractCategoricalContinuousChart.extend({
+    _options: {
+      axisOffset: 0,
+      tooltipOffset: 15
+    },
+
+    _setNullInterpolationMode: function(options, value) {
+      options.nullInterpolationMode = value;
+    }
   });
 });
