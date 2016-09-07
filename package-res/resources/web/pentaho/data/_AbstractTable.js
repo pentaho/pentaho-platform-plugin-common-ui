@@ -15,11 +15,22 @@
  */
 define([
   "../lang/Base",
-  "./_ElementMock"
-], function(Base, ElementMock) {
+  "./_ElementMock",
+  "./AtomicTypeName"
+], function(Base, ElementMock, AtomicTypeName) {
 
   // NOTE: most of this class is actually documented in ITableReadOnly.jsdoc and ITable.jsdoc.
   // While the latter shape the implementation, they are not publicized.
+
+  // Map of DataTable types to CDA lowercase colType
+  // CDA column types (method getColTypes)
+  // github.com/webdetails/cda/blob/master/core/src/main/java/pt/webdetails/cda/exporter/AbstractExporter.java#L47
+
+  var COLTYPE_DT_CDA = {};
+  COLTYPE_DT_CDA[AtomicTypeName.NUMBER] = "numeric";
+  COLTYPE_DT_CDA[AtomicTypeName.STRING] = "string";
+  COLTYPE_DT_CDA[AtomicTypeName.DATE] = "date";
+  COLTYPE_DT_CDA[AtomicTypeName.BOOLEAN] = "boolean";
 
   /**
    * @name AbstractTable
@@ -326,12 +337,9 @@ define([
   }
 
   function writeCdaColType(colType) {
-    /* eshint default-case: 0 */
-    switch(colType) {
-      case "string": return "STRING";
-      case "number": return "NUMERIC";
-    }
+    if(!COLTYPE_DT_CDA.hasOwnProperty(colType))
+      throw new Error("Unsupported data type");
 
-    throw new Error("Unsupported data type");
+    return COLTYPE_DT_CDA[colType];
   }
 });

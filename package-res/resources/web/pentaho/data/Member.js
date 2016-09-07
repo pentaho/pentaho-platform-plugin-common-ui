@@ -21,6 +21,8 @@ define([
   "../util/error"
 ], function(OfAttribute, Base, Annotatable, arg, error) {
 
+  var _nextGuid = 1;
+
   var Member = Base.extend("pentaho.data.Member", /** @lends pentaho.data.Member# */{
     /**
      * @alias Member
@@ -102,13 +104,14 @@ define([
     /**
      * Gets the key of the member.
      *
-     * The key of a member is the string representation of its value.
+     * The key of a member is the string representation of its value, or,
+     * when the latter is an object, an automatically generated identifier.
      *
      * @type string
      * @readonly
      */
     get key() {
-      return this.v.toString();
+      return this._key;
     },
     // endregion
 
@@ -153,6 +156,7 @@ define([
     set value(v) {
       if(v == null) throw error.argInvalid("value", "Cannot be nully.");
       this.v = v;
+      this._key = (typeof v === "object") ? ("_mid_" + (_nextGuid++)) : v.toString();
     },
 
     /**

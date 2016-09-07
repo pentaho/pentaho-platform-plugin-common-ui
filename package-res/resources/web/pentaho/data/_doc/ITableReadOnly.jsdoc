@@ -105,6 +105,21 @@
  */
 
 /**
+ * Gets the key of the value of a cell, given its row and column indexes.
+ *
+ * When a cell contains the `null` value, its key is the empty string, `""`.
+ * When a cell is discrete (and is not `null`), its key is that of its referent.
+ * Otherwise, the key is the result of calling its value's `toString` method.
+ *
+ * @name pentaho.data.AbstractTable#getValueKey
+ * @method
+ * @abstract
+ * @param {number} rowIndex The row index (zero-based).
+ * @param {number} colIndex The column index (zero-based).
+ * @return {string} The key of the cell's value.
+ */
+
+/**
  * Gets the formatted value _property_ of a cell, given its row and column indexes.
  *
  * This method returns the string representation of the value of the cell's `f` property,

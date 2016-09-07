@@ -98,7 +98,7 @@ define([
     "numeric": "number",
     "integer": "number"
   };
-  
+
   function expectDataTableContentJsonCda(dataTable, sourceData) {
     var dataTable = new DataTable(sourceData);
 
@@ -129,7 +129,7 @@ define([
       while(j--) expect(dataTable.getValue(i, j)).toBe(cdaRow[j]);
     });
   }
-  
+
   describe("DataTable -", function() {
     it("should be a function", function() {
       expect(typeof DataTable).toBe("function");
@@ -694,7 +694,7 @@ define([
           expect(distinctValues.filter(function(v) { return v === null; }).length).toBe(1);
         });
 
-        it("should return an array containing a single `NaN` value when the specified column contains `NaN` values", function() {
+        it("should return an array containing a single `null` value when the specified column contains `NaN` values", function() {
           var dataTable = new DataTable({
                 metadata: [
                   {colName: "country", colType: "STRING",  colLabel: "Country"},
@@ -709,7 +709,7 @@ define([
               }),
               distinctValues = dataTable.getDistinctValues(1);
 
-          expect(distinctValues.filter(function(v) { return isNaN(v); }).length).toBe(1);
+          expect(distinctValues.filter(function(v) { return v == null; }).length).toBe(1);
         });
 
         it("should support string columns", function() {
@@ -901,7 +901,7 @@ define([
           expect(distinctValues.filter(function(v) { return !v; }).length).toBe(1);
         });
 
-        it("should return an array containing a single `NaN` value when the specified column contains `NaN` values", function() {
+        it("should return an array containing a single `null` value when the specified column contains `NaN` values", function() {
           var dataTable = new DataTable({
                 metadata: [
                   {colName: "country", colType: "STRING",  colLabel: "Country"},
@@ -916,7 +916,7 @@ define([
               }),
               distinctValues = dataTable.getDistinctFormattedValues(1);
 
-          expect(distinctValues.filter(function(v) { return isNaN(v); }).length).toBe(1);
+          expect(distinctValues.filter(function(v) { return v === ""; }).length).toBe(1);
         });
 
         it("should support string columns", function() {
@@ -981,7 +981,8 @@ define([
           model: [
             {name: "country", type: "string",  label: "Country"},
             {name: "sales",   type: "number",  label: "Sales"  },
-            {name: "euro",    type: "boolean", label: "Euro"  }
+            {name: "euro",    type: "boolean", label: "Euro"   },
+            {name: "blob",    type: "some",    label: "things" }
           ],
           rows: [
             {c: ["Ireland",  1]}, // 0
@@ -998,7 +999,7 @@ define([
             {c: ["Ireland",  {v:  undefined, f: "UNDEF"}]}, // 8
             {c: ["Ireland",  {v:  NaN, f: "NAN"}]}, // 9
 
-            {c: ["France",   {v: {foo: 'bar'}, f:  "foo-bar"}]} // 10
+            {c: ["France",   null, null, {v: {foo: 'bar'}, f:  "foo-bar"}]} // 10
           ]
         });
 
@@ -1022,23 +1023,67 @@ define([
           expect(dataTable.getValue(3, 1)).toBe(null);
         });
 
-        it("should return `NaN` if the value of the specified row and column is `NaN`", function() {
-          expect(dataTable.getValue(4, 1)).toBeNaN();
+        it("should return `null` if the value of the specified row and column is `NaN`", function() {
+          expect(dataTable.getValue(4, 1)).toBe(null);
         });
 
         it("should return a `null` value if the 'v' property of the specified row and column is nully", function() {
-          expect(dataTable.getValue(7, 1)).toBeNull();
-          expect(dataTable.getValue(8, 1)).toBeNull();
+          expect(dataTable.getValue(7, 1)).toBe(null);
+          expect(dataTable.getValue(8, 1)).toBe(null);
         });
 
-        it("should return a `NaN` value in the 'v' property of the specified row and column is `NaN`", function() {
-          expect(dataTable.getValue(9, 1)).toBeNaN();
+        it("should return a `null` value in the 'v' property of the specified row and column is `NaN`", function() {
+          expect(dataTable.getValue(9, 1)).toBe(null);
         });
 
-        it("should return an object value in 'v' property of the specified row and columns pass-through ", function() {
-          var v = dataTable.getValue(10, 1);
+        it("should return an object value in 'v' property of the specified row and column when the type is unknown",
+        function() {
+          var v = dataTable.getValue(10, 3);
           expect(v instanceof Object).toBe(true);
           expect(v.foo).toBe("bar");
+        });
+      });
+
+      describe("#getValueKey()", function() {
+        var date1 = new Date(Date.UTC(2016, 0, 1));
+
+        var dataTable = new DataTable({
+          model: [
+            {name: "country", type: "string",  label: "Country"},
+            {name: "sales",   type: "number",  label: "Sales"  },
+            {name: "euro",    type: "boolean", label: "Euro"   },
+            {name: "date",    type: "date",    label: "Date"   },
+            {name: "blob",    type: "some",    label: "Things" }
+          ],
+          rows: [
+            {c: ["Ireland",  1, true, date1, {v: {foo: "bar"}, f:  "foo-bar"}]},
+            {c: []}
+          ]
+        });
+
+        it("should return the string value of the specified row and column", function() {
+          expect(dataTable.getValueKey(0, 0)).toBe("Ireland");
+        });
+
+        it("should return the string representation of a numeric value of the specified row and column", function() {
+          expect(dataTable.getValueKey(0, 1)).toBe("1");
+        });
+
+        it("should return the string representation of a boolean value of the specified row and column", function() {
+          expect(dataTable.getValueKey(0, 2)).toBe(String(true));
+        });
+
+        it("should return `''` if the value of the specified row and column is null", function() {
+          expect(dataTable.getValueKey(1, 0)).toBe("");
+        });
+
+        it("should return the string representation of a date value of the specified row and column", function() {
+          expect(dataTable.getValueKey(0, 3)).toBe(date1.toString());
+        });
+
+        it("should return an auto-generated id when the value is an object", function() {
+          var v = dataTable.getValueKey(0, 4);
+          expect(v.substr(0, "_mid_".length)).toBe("_mid_");
         });
       });
 
@@ -1081,7 +1126,7 @@ define([
           expect(dataTable.getFormattedValue(4, 1)).toBe("5");
           expect(dataTable.getFormattedValue(4, 0)).toBe("Ireland");
           expect(dataTable.getFormattedValue(10, 0)).toBe("Portugal");
-          expect(dataTable.getFormattedValue(7, 1)).toBe("NaN");
+          expect(dataTable.getFormattedValue(7, 1)).toBe("");
           expect(dataTable.getFormattedValue(8, 2)).toBe("true");
           expect(dataTable.getFormattedValue(9, 2)).toBe("false");
         });
@@ -1205,7 +1250,7 @@ define([
 
 
           expectCell(9,  1).toBe(5);
-          expectCell(12, 1).toBeNaN();
+          expectCell(12, 1).toBe(null);
           expectCell(13, 2).toBe(true);
           expectCell(14, 2).toBe(false);
           expectCell(15, 1).toBe(0);
@@ -1321,27 +1366,6 @@ define([
             {column: 1, value: null}
           ])).toEqual([0, 1, 3, 4]);
         });
-
-        it("should filter rows having an `NaN` value on a column", function() {
-          var dataTable = new DataTable({
-            model: [
-              {name: "country", type: "string",  label: "Country"},
-              {name: "sales",   type: "number",  label: "Sales"  }
-            ],
-            rows: [
-              {c: ["Portugal", 1]},
-              {c: ["Portugal", 2]},
-              {c: ["Ireland",  {v: 2}]},
-              {c: ["Portugal", null]},
-              {c: [2,          NaN]}
-            ]
-          });
-
-          expect(dataTable.getFilteredRows([
-            {column: 1, value: NaN}
-          ])).toEqual([4]);
-        });
-
       });
     });
   });

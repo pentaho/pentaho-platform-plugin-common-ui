@@ -21,8 +21,9 @@ define([
   "../lang/_Annotatable",
   "../lang/Base",
   "../util/arg",
-  "../util/error"
-], function(Cell, Member, StructurePosition, MemberCollection, Annotatable, Base, arg, error) {
+  "../util/error",
+  "../util/date"
+], function(Cell, Member, StructurePosition, MemberCollection, Annotatable, Base, arg, error, date) {
 
   var Attribute = Base.extend("pentaho.data.Attribute", /** @lends pentaho.data.Attribute# */{
     /**
@@ -97,6 +98,14 @@ define([
       this.format = spec.format || null;
 
       var type = spec.type;
+      if(!type) {
+        type = "string";
+      } else {
+        type = type.toLowerCase();
+
+        if(type === "datetime")
+          type = "date";
+      }
 
       /**
        * Gets the name of the type of the attribute.
@@ -104,7 +113,7 @@ define([
        * @type !pentaho.data.AtomicTypeName
        * @readonly
        */
-      this.type = type = !type ? "string" : type.toLowerCase();
+      this.type = type;
 
       var isDiscrete = type !== "number" && type !== "date";
       if(!isDiscrete && spec.isDiscrete != null)
@@ -127,6 +136,8 @@ define([
        * @see pentaho.data.Attribute#isPercent
        */
       this.isDiscrete = isDiscrete;
+
+      this._cast = type === "number" ? castToNumber : (type === "date" ? date.parseDateEcma262v7 : identity);
 
       var attrKeyArgs = {attribute: this, ordinal: 0};
 
@@ -224,6 +235,18 @@ define([
      */
     get level() {
       return this.isDiscrete ? "ordinal" : "quantitative";
+    },
+
+    /**
+     * Converts a value to the type of value supported by the attribute.
+     *
+     * If the given value is not supported, `null` is returned.
+     *
+     * @param {any} v - The value to cast.
+     * @return {any} The converted value or `null`, when invalid.
+     */
+    cast: function(v) {
+      return this._cast(v);
     },
 
     /**
@@ -340,5 +363,15 @@ define([
     if(typeof nameOrAttr === "string") return model.attributes.getExisting(nameOrAttr);
     if(nameOrAttr instanceof Attribute) return nameOrAttr;
     return null;
+  }
+
+  function castToNumber(s) {
+    if(s == null) return null;
+    var v = Number(s);
+    return isNaN(v) ? null : v;
+  }
+
+  function identity(v) {
+    return v;
   }
 });
