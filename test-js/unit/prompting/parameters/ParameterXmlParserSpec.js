@@ -28,7 +28,7 @@ define(['common-ui/prompting/parameters/ParameterXmlParser', 'cdf/Logger'], func
     describe("parseParameterXml", function () {
       it("should parse parameter xml", function () {
         var paramDefn = parameterXmlParser.parseParameterXml(
-            "<parameters autoSubmitUI='false' autoSubmit='false' paginate='false' accepted-page='1' page-count='2' ignore-biserver-5538='false' is-prompt-needed='false' layout='test-layout'>" +
+            "<parameters autoSubmitUI='false' autoSubmit='false' paginate='false' accepted-page='1' page-count='2' ignore-biserver-5538='false' is-prompt-needed='false' layout='test-layout' minimized='false'>" +
               "<parameter is-list='true' is-mandatory='false' timezone-hint='timezone-hint' is-multi-select='true' is-strict='false' name='test_parameter_name' type='test type'>" +
                 "<attribute name='test name' namespace='http://corp.name.org/namespaces/parameter-attributes' value='0'/>" +
                 "<values><value encoded='false' label='test label' null='false' selected='true' type='test type' value='test label'/></values>" +
@@ -52,6 +52,7 @@ define(['common-ui/prompting/parameters/ParameterXmlParser', 'cdf/Logger'], func
         expect(paramDefn['ignoreBiServer5538']).toEqual(false);
         expect(paramDefn['promptNeeded']).toEqual(false);
         expect(paramDefn['layout']).toEqual('test-layout');
+        expect(paramDefn['minimized']).toEqual(false);
         expect(paramDefn.parameterGroups.length).toEqual(1);
         expect(paramDefn.parameterGroups[0].parameters.length).toEqual(3);
         expect(paramDefn.parameterGroups[0].parameters[0]['name']).toEqual('test_parameter_name');
