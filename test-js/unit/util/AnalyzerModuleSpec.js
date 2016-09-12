@@ -141,6 +141,19 @@ define(["dojo/ready","common-ui/util/AnalyzerModule","dojo/dom"],
                 analyzerModuleObject.dispose();
                 expect(mockDomElement.removeChild).toHaveBeenCalled();
             });
+
+            describe("Tests AnalyzerModule initialization with useLegacyPath", function() {
+              beforeEach( function() {
+                options.useLegacyPath = "true";
+              } );
+
+              it("Should use 'content/analyzer' in the url rather than 'api/repos'", function() {
+                analyzerModuleObject = new analyzerModule(options);
+                var url = analyzerModuleObject.getUrl();
+                expect(url.indexOf("/content/analyzer/") !== -1);
+                expect(url.indexOf("/api/repos/xanalyzer/") == -1);
+              })
+            });
         });
     }
 );
