@@ -43,7 +43,8 @@ define([
         "cube" : true,
         "dataSource" : true,
         "onAnalyzerReady" : true,
-        "mode" : true
+        "mode" : true,
+        "useLegacyPath": true
     };
 
     // set window.onAnalyzer to only execute ready function for the given module
@@ -109,6 +110,13 @@ define([
         this.url = options["url"];
         this.parentElement = options["parentElement"];
         this.reportPath = options["reportPath"];
+        this.useLegacyPath = options["useLegacyPath"];
+
+        var newReportPath = "/api/repos/xanalyzer/";
+        if ( this.useLegacyPath ) {
+          newReportPath = "/content/analyzer/";
+        }
+
         this.moduleOptions = options;
 
         // if no mode is supplied, default to viewer
@@ -172,8 +180,9 @@ define([
         }
         else {
             // create the url
-            fullUrl = this.url + "/api/repos/xanalyzer/" + this.moduleOptions["mode"] + "?" +
+            fullUrl = this.url + newReportPath + this.moduleOptions["mode"] + "?" +
                 queryString;
+
         }
 
         this.url = fullUrl;
@@ -242,6 +251,12 @@ define([
          *
          * @param {function} options.onAnalyzerReady
          *    Callback function to execute once Analyzer has finished initializing
+         *
+         * @param {string} options.useLegacyPath
+         *    Indicates the decision to use the legacy url path structure when creating a new analyzer report:
+         *      when "true"  --> 'content/analyzer/'
+         *      when "false" --> 'api/repos/xanalyzer/'
+              This has no impact on the url path for opening existing reports, those will all be /api/repos/...
          *
          * @example
          *    var options = {
