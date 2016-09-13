@@ -596,7 +596,7 @@ define([
         expect(Derived.type.isAbstract).toBe(false);
       });
 
-      it("should default to `false` whe spec is unspecified and should not inherit the base value", function() {
+      it("should default to `false` when spec is unspecified and should not inherit the base value", function() {
         var Derived = Instance.extend();
         expect(Derived.type.isAbstract).toBe(false);
 
@@ -633,6 +633,45 @@ define([
         expect(Derived.type.isAbstract).toBe(false);
       });
     }); // #isAbstract
+
+    describe("#application -", function() {
+      it("should have `{}` as the root value", function() {
+        var value = Instance.type.application;
+
+        expect(value).toEqual({});
+      });
+
+      describe("when not specified -", function() {
+        it("should inherit the base application attribute", function() {
+          function expectIt(spec) {
+            var Derived = Instance.extend({type: spec});
+
+            expect(Derived.type.application).toEqual({});
+          }
+
+          expectIt({});
+          expectIt({application: undefined});
+        });
+      });
+
+      describe("when specified -", function() {
+        it("should clone the spec if there is no previous application attribute defined", function() {
+          var spec = {foo: "bar"};
+          var Derived = Instance.extend({type: {application: spec}});
+
+          expect(Derived.type.application).not.toBe(spec);
+          expect(Derived.type.application.foo).toBe(spec.foo);
+        });
+
+        it("should merge the spec if there is a previous application attribute defined", function() {
+          var Derived1 = Instance.extend({type: {application: {foo: "foo"}}});
+          var Derived2 = Instance.extend({type: {application: {foo: "bar", bar: "foo"}}});
+          expect(Derived1.type.application.foo).toBe("foo");
+          expect(Derived2.type.application.foo).toBe("bar");
+          expect(Derived2.type.application.bar).toBe("foo");
+        });
+      });
+    });
 
     describe("#description -", function() {
 
