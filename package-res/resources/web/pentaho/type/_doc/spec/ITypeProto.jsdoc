@@ -58,6 +58,20 @@
  */
 
 /**
+ * The `application` property of the type.
+ *
+ * The application property serves as a bag of properties specific to the _container application_,
+ * that can be modified via the [Configuration Service]{@link pentaho.type.config.ConfigurationService}.
+ *
+ * {@link Nully} values will be ignored by the application property.
+ *
+ * @name application
+ * @memberOf pentaho.type.spec.ITypeProto#
+ * @type object
+ * @see pentaho.type.Type#application
+ */
+
+/**
  * The description of the type.
  *
  * When non-{@link Nully} and not a string,
