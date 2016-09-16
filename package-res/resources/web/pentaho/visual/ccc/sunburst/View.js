@@ -186,11 +186,11 @@ define([
         // The color role, "rows" is required, so necessarily C > 0.
         // Also, there can be at most one measure gem, "size", so M <= 1.
         // Use member colors of all of the color attributes.
-        this._getDiscreteColorMais().forEach(function(colorMai) {
+        this._getDiscreteColorMappingAttrInfos().forEach(function(colorMAInfo) {
           // Copy map values to colorMap.
           // All color maps are joined together and there will be no
           // value collisions because the key is prefixed with the category.
-          var map = memberPalette[colorMai.name];
+          var map = memberPalette[colorMAInfo.name];
           if(map) this._copyColorMap(colorMap, map);
         }, this);
       }

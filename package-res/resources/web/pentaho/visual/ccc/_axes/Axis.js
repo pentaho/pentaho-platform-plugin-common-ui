@@ -24,7 +24,7 @@ define([
 
     return {
         // Axis factory method
-        create: function(chart, axisId, mais, keyArgs) {
+        create: function(chart, axisId, mappingAttrInfos, keyArgs) {
             var AxisClass;
 
             switch(axisId) {
@@ -34,7 +34,7 @@ define([
                 default: throw new Error("Undefined axis value '" + axisId + "'.");
             }
 
-            return new AxisClass(chart, axisId, mais, keyArgs);
+            return new AxisClass(chart, axisId, mappingAttrInfos, keyArgs);
         }
     };
 });

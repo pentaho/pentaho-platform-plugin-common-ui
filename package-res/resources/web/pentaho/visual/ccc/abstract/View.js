@@ -203,8 +203,8 @@ define([
     // Essentially, those measures that are represented by cartesian axes...
     _noRoleInTooltipMeasureRoles: {"measures": true},
 
-    // Do not show percentage value in front of a "percent measure" mai.
-    _tooltipHidePercentageForPercentMais: false,
+    // Do not show percentage value in front of a "percent measure" MappingAttributeInfo.
+    _tooltipHidePercentageOnPercentAttributes: false,
 
     // The name of the role that represents the "multi-chart" concept.
     _multiRole: "multi",
@@ -274,12 +274,12 @@ define([
       // Get information on the axes
       var props = def.query(this._keyAxesIds)
             .selectMany(function(axisId) {
-              return this.axes[axisId].getSelectionMais();
+              return this.axes[axisId].getSelectionMappingAttrInfos();
             }, this)
-            .select(function(mai) {
+            .select(function(maInfo) {
               return {
-                ordinal: mai.attr.ordinal,
-                cccDimName: mai.cccDimName
+                ordinal: maInfo.attr.ordinal,
+                cccDimName: maInfo.cccDimName
               };
             })
             .array();
@@ -361,10 +361,10 @@ define([
 
     _getRoleDepth: function(roleName, includeMeasureDiscrim) {
       var depth = 0;
-      var mais = this._getMappingAttrInfosByRole(roleName);
-      if(mais) {
-        depth = mais.length;
-        if(!includeMeasureDiscrim && this._isGenericMeasureMode && this._genericMeasureDiscrimMai.role === roleName) {
+      var maInfos = this._getMappingAttrInfosByRole(roleName);
+      if(maInfos) {
+        depth = maInfos.length;
+        if(!includeMeasureDiscrim && this._isGenericMeasureMode && this._genericMeasureDiscrimMappingAttrInfo.role === roleName) {
           depth -= 1;
         }
       }
@@ -676,10 +676,10 @@ define([
       // Generic Measure Mode?
       var isGenericMeasureMode = this._isGenericMeasureMode = genericMeasuresCount > 1;
       if(isGenericMeasureMode) {
-        this._genericMeasureDiscrimMai = this._createGenericMeasureDiscriminator();
-        addMappingAttrInfo(this._genericMeasureDiscrimMai);
+        this._genericMeasureDiscrimMappingAttrInfo = this._createGenericMeasureDiscriminator();
+        addMappingAttrInfo(this._genericMeasureDiscrimMappingAttrInfo);
       } else {
-        this._genericMeasureDiscrimMai = null;
+        this._genericMeasureDiscrimMappingAttrInfo = null;
       }
 
       var cccDims = this.options.dimensions;
@@ -696,20 +696,20 @@ define([
 
       // mappingAttrInfos is filled above, in visual role mapping attribute order;
       // this enables its use for configuring the CCC visual roles.
-      mappingAttrInfos.forEach(function(mai) {
+      mappingAttrInfos.forEach(function(maInfo) {
 
         // i) Fix CCC dim names of generic measures if there is more than one.
-        var isMeasureGeneric = isGenericMeasureMode && mai.isMeasureGeneric;
+        var isMeasureGeneric = isGenericMeasureMode && maInfo.isMeasureGeneric;
         if(isMeasureGeneric)
-          mai.cccDimName = this.GENERIC_MEASURE_DIM_NAME;
+          maInfo.cccDimName = this.GENERIC_MEASURE_DIM_NAME;
 
-        if(mai.cccDimName) {
+        if(maInfo.cccDimName) {
           // Exclude measure discriminator
-          if(mai.attr) {
+          if(maInfo.attr) {
             // ii) Configure CCC dimension options.
-            var cccDim = def.lazy(cccDims, mai.cccDimName);
-            cccDim.valueType  = this._getAttributeCccValueType(mai.attr);
-            cccDim.isDiscrete = this._isRoleQualitative(mai.role);
+            var cccDim = def.lazy(cccDims, maInfo.cccDimName);
+            cccDim.valueType  = this._getAttributeCccValueType(maInfo.attr);
+            cccDim.isDiscrete = this._isRoleQualitative(maInfo.role);
             if(cccDim.valueType === Date) {
               // Change the default formatter to use JavaScript's default serialization.
               // Affects tooltips and discrete axes.
@@ -718,7 +718,7 @@ define([
           }
 
           // iii) Add to corresponding CCC visual role
-          if(!isMeasureGeneric) addToCCCVisualRole(mai.cccRole, mai.cccDimName);
+          if(!isMeasureGeneric) addToCCCVisualRole(maInfo.cccRole, maInfo.cccDimName);
         }
       }, this);
 
@@ -823,9 +823,9 @@ define([
       // TODO: refactor this check by using the model directly? Would not need to account for measure discrim...
       var hasMulti = false;
       if(this._multiRole) {
-        var mais = this._getMappingAttrInfosByRole(this._multiRole);
-        if(mais)
-          hasMulti = !this._isGenericMeasureMode || mais.some(function(mai) { return !mai.isMeasureDiscrim; });
+        var maInfos = this._getMappingAttrInfosByRole(this._multiRole);
+        if(maInfos)
+          hasMulti = !this._isGenericMeasureMode || maInfos.some(function(maInfo) { return !maInfo.isMeasureDiscrim; });
       }
       this._hasMultiChartColumns = hasMulti;
     },
@@ -862,13 +862,13 @@ define([
 
         categoriesDimNames.push(this.GENERIC_MEASURE_DISCRIM_DIM_NAME);
 
-        this._mappingAttrInfos.forEach(function(mai) {
-          if(mai.attr) {
-            var sourceIndexes = mai.isMeasureGeneric ? measuresSourceIndexes : categoriesSourceIndexes;
-            sourceIndexes.push(mai.attr.ordinal);
+        this._mappingAttrInfos.forEach(function(maInfo) {
+          if(maInfo.attr) {
+            var sourceIndexes = maInfo.isMeasureGeneric ? measuresSourceIndexes : categoriesSourceIndexes;
+            sourceIndexes.push(maInfo.attr.ordinal);
 
-            if(!mai.isMeasureDiscrim && !mai.isMeasureGeneric) {
-              categoriesDimNames.push(mai.cccDimName);
+            if(!maInfo.isMeasureDiscrim && !maInfo.isMeasureGeneric) {
+              categoriesDimNames.push(maInfo.cccDimName);
             }
           }
         });
@@ -880,12 +880,12 @@ define([
         this.options.crosstabMode = false;
         this.options.isMultiValued = true;
 
-        this._mappingAttrInfos.forEach(function(mai) {
-          if(mai.attr) {
+        this._mappingAttrInfos.forEach(function(maInfo) {
+          if(maInfo.attr) {
             var sourceIndexes;
             var dimNames;
 
-            if(mai.attr.type === "number") {
+            if(maInfo.attr.type === "number") {
               sourceIndexes = measuresSourceIndexes;
               dimNames = measuresDimNames;
             } else {
@@ -893,8 +893,8 @@ define([
               dimNames = categoriesDimNames;
             }
 
-            sourceIndexes.push(mai.attr.ordinal);
-            dimNames.push(mai.cccDimName);
+            sourceIndexes.push(maInfo.attr.ordinal);
+            dimNames.push(maInfo.cccDimName);
           }
         });
 
@@ -1008,8 +1008,8 @@ define([
       //     the color role.
       // 2 - When a measure discrim is used and there is only one measure, the CCC dim name of the discriminator is
       //      not of the "series" group; so in this case, there's no discriminator in the key.
-      var colorMais = this._getDiscreteColorMais();
-      var C = colorMais.length;
+      var colorMAInfos = this._getDiscreteColorMappingAttrInfos();
+      var C = colorMAInfos.length;
       var M = this._genericMeasuresCount;
       var colorMap;
 
@@ -1017,21 +1017,21 @@ define([
       if(C || M) {
         if(!C || M > 1) {
           // Use measure colors.
-          // More than one measure mai or no color mais.
+          // More than one measure MappingAttributeInfo or no color MappingAttributeInfos.
           // var keyIncludesMeasureDiscriminator = M > 1 && C > 0;
-          // When the measure discriminator exists, it is the last mai.
+          // When the measure discriminator exists, it is the last MappingAttributeInfo.
           colorMap = this._copyColorMap(null, memberPalette["[Measures].[MeasuresLevel]"]);
         } else {
           // If C > 0, Pie chart always ends up here...
           // Use the members' colors of the last color attribute.
-          colorMap = this._copyColorMap(null, memberPalette[colorMais[C - 1].attr.name]);
+          colorMap = this._copyColorMap(null, memberPalette[colorMAInfos[C - 1].attr.name]);
         }
       }
 
       return colorMap;
     },
 
-    _getDiscreteColorMais: function() {
+    _getDiscreteColorMappingAttrInfos: function() {
       /* jshint laxbreak:true*/
       var colorAttrInfos = this._getMappingAttrInfosByRole(this._discreteColorRole);
       return colorAttrInfos
@@ -1167,14 +1167,13 @@ define([
       }
 
       // Attribute/dimension-level format info
-      // var mais = this._getMappingAttrInfosByRole(measureRole);
       var dims = this.options.dimensions;
 
       // 1. Handle all mapped, non-generic measure attributes
       def.query(Object.keys(this._mappingAttrInfoByName))
         .select(function(attrName) { return this._mappingAttrInfoByName[attrName]; }, this)
-        .where(function(mai) {
-          return !!mai.attr && !mai.attr.isDiscrete && (!this._isGenericMeasureMode || !mai.isMeasureGeneric);
+        .where(function(maInfo) {
+          return !!maInfo.attr && !maInfo.attr.isDiscrete && (!this._isGenericMeasureMode || !maInfo.isMeasureGeneric);
         }, this)
         .each(setCccDimFormatInfo);
 
@@ -1189,16 +1188,16 @@ define([
         // roles:
         //   "measures":     unbound
         //   "measuresLine": "sales", "quantity"
-        var firstMai = this._selectGenericMeasureMappingAttrInfos().first();
-        if(firstMai) setCccDimFormatInfo(firstMai);
+        var firstMappingAttrInfo = this._selectGenericMeasureMappingAttrInfos().first();
+        if(firstMappingAttrInfo) setCccDimFormatInfo(firstMappingAttrInfo);
       }
 
       // ---
 
-      function setCccDimFormatInfo(mai) {
-        var format = mai.attr.format;
+      function setCccDimFormatInfo(maInfo) {
+        var format = maInfo.attr.format;
         var mask = format && format.number && format.number.mask;
-        if(mask) def.lazy(dims, mai.cccDimName).format = mask;
+        if(mask) def.lazy(dims, maInfo.cccDimName).format = mask;
       }
     },
 

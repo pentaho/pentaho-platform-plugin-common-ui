@@ -35,7 +35,7 @@ define([
 
     _discreteColorRole: "rows",
 
-    _tooltipHidePercentageForPercentMais: true,
+    _tooltipHidePercentageOnPercentAttributes: true,
 
     _options: {
       legendShape: "circle",
@@ -85,10 +85,10 @@ define([
             category: {
               sliceLabelMask: function() {
                 var meaAtom = this.atoms[genericMeasureDiscrimName];
-                var meaMaiId;
-                var meaMai;
-                if(meaAtom && (meaMaiId = meaAtom.value) &&
-                   (meaMai = mappingAttrInfoByName[meaMaiId]) && meaMai.isPercent) {
+                var meaMAInfoId;
+                var meaMAInfo;
+                if(meaAtom && (meaMAInfoId = meaAtom.value) &&
+                   (meaMAInfo = mappingAttrInfoByName[meaMAInfoId]) && meaMAInfo.isPercent) {
                   return "{value}"; // the value is the percentage itself;
                 }
 
@@ -103,14 +103,14 @@ define([
     _getDiscreteColorMap: function() {
       var memberPalette = this._getMemberPalette();
       if(memberPalette) {
-        var colorMais = this._getDiscreteColorMais();
-        var C = colorMais.length;
+        var colorMAInfos = this._getDiscreteColorMappingAttrInfos();
+        var C = colorMAInfos.length;
         // C >= 0 (color -> "rows" -> is optional)
         // When multiple measures exist, the pie chart shows them as multiple charts
         // and if these would affect color, each small chart would have a single color.
         // => consider M = 0;
         // If C, use the members' colors of the last color attribute.
-        if(C) return this._copyColorMap(null, memberPalette[colorMais[C - 1].name]);
+        if(C) return this._copyColorMap(null, memberPalette[colorMAInfos[C - 1].name]);
       }
     }
   });

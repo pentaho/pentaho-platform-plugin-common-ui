@@ -60,7 +60,7 @@ define([
         /* jshint laxbreak:true*/
         var barAttrInfos = this._getMappingAttrInfosByRole("measures");
         var barAttrInfosByName = barAttrInfos
-                ? def.query(barAttrInfos).uniqueIndex(function(mai) { return mai.name; })
+                ? def.query(barAttrInfos).uniqueIndex(function(maInfo) { return maInfo.name; })
                 : {};
         var measureDiscrimCccDimName = this.GENERIC_MEASURE_DISCRIM_DIM_NAME;
 

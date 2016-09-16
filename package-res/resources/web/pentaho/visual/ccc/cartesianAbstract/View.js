@@ -57,8 +57,8 @@ define([
      * of the role, or empty, if the role has more than one attribute.
      */
     _getMeasureRoleTitle: function(measureRole) {
-      var mais = this._getMappingAttrInfosByRole(measureRole);
-      return (mais && mais.length === 1) ? mais[0].label : "";
+      var maInfos = this._getMappingAttrInfosByRole(measureRole);
+      return (maInfos && maInfos.length === 1) ? maInfos[0].label : "";
     },
 
     _getDiscreteRolesTitle: function(roleNames) {
@@ -67,8 +67,8 @@ define([
       if(this._multiRole) q = q.where(function(rn) { return rn !== this._multiRole; }, this);
 
       var labels = q.selectMany(function(rn) { return this._getMappingAttrInfosByRole(rn); }, this)
-          .distinct(function(mai) { return mai.name; })
-          .select(function(mai) { return mai.label; })
+          .distinct(function(maInfo) { return maInfo.name; })
+          .select(function(maInfo) { return maInfo.label; })
           .where(def.truthy)
           .array();
 

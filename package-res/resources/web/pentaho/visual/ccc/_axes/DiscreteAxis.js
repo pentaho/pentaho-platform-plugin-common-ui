@@ -23,16 +23,16 @@ define([
   "use strict";
 
   return AbstractAxis.extend({
-    _nonMultiMaiFilter: function(mai) {
-      return mai.role !== this.chart._multiRole;
+    _nonMultiMappingAttrInfoFilter: function(maInfo) {
+      return maInfo.role !== this.chart._multiRole;
     },
 
-    _isNullMember: function(complex, mai) {
-      var atom = complex.atoms[mai.cccDimName];
+    _isNullMember: function(complex, maInfo) {
+      var atom = complex.atoms[maInfo.cccDimName];
       return util.isNullMember(atom.value);
     },
 
-    _buildMaiHtmlTooltip: function(lines, complex, context, mai, index) {
+    _buildMappingAttrInfoHtmlTooltip: function(lines, complex, context, maInfo, index) {
       /*
        * Multi-chart formulas are not shown in the tooltip
        * They're on the small chart's title.
@@ -42,8 +42,8 @@ define([
        * Using the scene's group, preferably, because the datum (here the complex) may have dimensions
        * that are null in the groups' own atoms.
        */
-      if(this._nonMultiMaiFilter(mai) &&
-         !(this.chart._hideNullMembers && this._isNullMember(context.scene.group || complex, mai))) {
+      if(this._nonMultiMappingAttrInfoFilter(maInfo) &&
+         !(this.chart._hideNullMembers && this._isNullMember(context.scene.group || complex, maInfo))) {
         this.base.apply(this, arguments);
       }
     },
@@ -54,14 +54,14 @@ define([
       var context = this.chart.context;
       var IsEqual;
 
-      this.getSelectionMais().each(function(mai) {
-        var atom = complex.atoms[mai.cccDimName];
+      this.getSelectionMappingAttrInfos().each(function(maInfo) {
+        var atom = complex.atoms[maInfo.cccDimName];
         var value = atom.value == null ? atom.rawValue : atom.value;
 
         if(value != null) {
           if(!IsEqual) IsEqual = context.get("pentaho/type/filter/isEqual");
 
-          var operand = new IsEqual({property: mai.name, value: {_: "string", v: value}});
+          var operand = new IsEqual({property: maInfo.name, value: {_: "string", v: value}});
           filter = filter ? filter.and(operand) : operand;
         }
       });
@@ -69,9 +69,9 @@ define([
       return filter;
     },
 
-    getSelectionMais: function() {
-      return def.query(this.mais)
-          .where(function(mai) { return !mai.isMeasureDiscrim; }, this);
+    getSelectionMappingAttrInfos: function() {
+      return def.query(this.mappingAttrInfos)
+          .where(function(maInfo) { return !maInfo.isMeasureDiscrim; }, this);
     }
   });
 });

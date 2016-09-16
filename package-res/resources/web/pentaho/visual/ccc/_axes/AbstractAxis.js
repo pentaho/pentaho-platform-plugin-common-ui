@@ -21,7 +21,7 @@ define([
   "use strict";
 
   return Base.extend({
-    constructor: function(chart, axisId, mais) {
+    constructor: function(chart, axisId, mappingAttrInfos) {
       this.chart = chart;
       this.id = axisId;
 
@@ -33,34 +33,34 @@ define([
       /**
        * @type {MappingAttributeInfo[]}
        */
-      this.mais = mais;
+      this.mappingAttrInfos = mappingAttrInfos;
 
-      this.depth = mais.length;
-      mais.forEach(function(mai) {
+      this.depth = mappingAttrInfos.length;
+      mappingAttrInfos.forEach(function(maInfo) {
         // Overwrite axis id with corresponding Axis instance
-        mai.axis = this;
+        maInfo.axis = this;
 
-        this.boundRoles[mai.role] = true;
+        this.boundRoles[maInfo.role] = true;
       }, this);
     },
 
     defaultRole: null,
 
     buildHtmlTooltip: function(lines, complex, context) {
-      this.mais.forEach(function(mai, index) {
-        if(mai.cccDimName)
-          this._buildMaiHtmlTooltip(lines, complex, context, mai, index);
+      this.mappingAttrInfos.forEach(function(maInfo, index) {
+        if(maInfo.cccDimName)
+          this._buildMappingAttrInfoHtmlTooltip(lines, complex, context, maInfo, index);
       }, this);
     },
 
-    _buildMaiHtmlTooltip: function(lines, complex, context, mai, index) {
+    _buildMappingAttrInfoHtmlTooltip: function(lines, complex, context, maInfo, index) {
       // Multi-chart formulas are not shown in the tooltip.
       // They're on the small chart's title.
-      if(mai.role !== this.chart._multiRole) {
-        var atom = complex.atoms[mai.cccDimName];
+      if(maInfo.role !== this.chart._multiRole) {
+        var atom = complex.atoms[maInfo.cccDimName];
         if(!atom.dimension.type.isHidden && (!complex.isTrend || atom.value != null)) {
           // ex: "Line: Ships"
-          lines.push(def.html.escape(mai.label) + ": " + def.html.escape(atom.label));
+          lines.push(def.html.escape(maInfo.label) + ": " + def.html.escape(atom.label));
         }
       }
     },

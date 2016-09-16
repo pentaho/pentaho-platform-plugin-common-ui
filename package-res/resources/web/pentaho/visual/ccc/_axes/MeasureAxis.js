@@ -25,32 +25,32 @@ define([
 
     defaultRole: "measures",
 
-    _buildMaiHtmlTooltip: function(lines, complex, context, mai/* , index*/) {
+    _buildMappingAttrInfoHtmlTooltip: function(lines, complex, context, maInfo/* , index*/) {
       /*
        * When using measure discriminator column,
        * only the "active" measure in "complex"
        * is placed in the tooltip.
        */
       if(this.chart._isGenericMeasureMode &&
-         mai.isMeasureGeneric &&
-         mai.name !== complex.atoms[this.chart.GENERIC_MEASURE_DISCRIM_DIM_NAME].value) {
+         maInfo.isMeasureGeneric &&
+         maInfo.name !== complex.atoms[this.chart.GENERIC_MEASURE_DISCRIM_DIM_NAME].value) {
         return;
       }
 
       // Obtain the dimension assigned to the role
-      var cccDimName = mai.cccDimName;
+      var cccDimName = maInfo.cccDimName;
       var atom = complex.atoms[cccDimName];
       if(!atom.dimension.type.isHidden && (!complex.isTrend || atom.value != null)) {
         // ex: "MaiLabel (RoleDesc): 200 (10%)"
-        var tooltipLine = def.html.escape(mai.label);
+        var tooltipLine = def.html.escape(maInfo.label);
 
         // Role description
-        if(this.chart._noRoleInTooltipMeasureRoles[mai.role] !== true)
-          tooltipLine += " (" + def.html.escape(mai.role) + ")";
+        if(this.chart._noRoleInTooltipMeasureRoles[maInfo.role] !== true)
+          tooltipLine += " (" + def.html.escape(maInfo.role) + ")";
 
         tooltipLine += ": " + def.html.escape(this._getAtomLabel(atom, context));
 
-        if(!this.chart._tooltipHidePercentageForPercentMais || !mai.isPercent) {
+        if(!this.chart._tooltipHidePercentageOnPercentAttributes || !maInfo.isPercent) {
           var valuePct = this._getAtomPercent(atom, context);
           if(valuePct != null)
             tooltipLine += " (" + def.html.escape("" + valuePct) + ")";
