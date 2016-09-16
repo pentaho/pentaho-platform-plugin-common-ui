@@ -28,11 +28,14 @@ define([
   "./object",
   "./function",
   "./property",
+  "./model",
+  "./application",
   "./facets/standard",
   "./filter/standard"
 ], function(instanceFactory, valueFactory, elementFactory, listFactory, refinementFactory,
     simpleFactory, complexFactory, stringFactory, numberFactory, booleanFactory,
     dateFactory, objectFactory, functionFactory, propertyFactory,
+    modelFactory, applicationFactory,
     standardFacets, standardFilters) {
 
   "use strict";
@@ -53,6 +56,8 @@ define([
     "object":   objectFactory,
     "function": functionFactory,
     "property": propertyFactory,
+    "model":    modelFactory,
+    "application": applicationFactory,
     "facets":   standardFacets,
     "filter":   standardFilters
   };

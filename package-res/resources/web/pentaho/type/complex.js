@@ -725,7 +725,7 @@ define([
 
           var name = propType.name;
 
-          if(omitProps && O.getOwn(omitProps, name)) return;
+          if(omitProps && omitProps[name] === true) return;
 
           var value = this._getByType(propType);
 

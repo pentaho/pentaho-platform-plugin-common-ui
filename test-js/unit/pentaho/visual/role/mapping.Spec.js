@@ -540,6 +540,82 @@ define([
       });
     });
 
+    describe("#isVisualKey", function() {
+
+      function testItLocal(valueSpec, valueExpected) {
+        var ValidMapping = Mapping.extend({type: {levels: ["nominal"], isVisualKey: valueSpec}});
+
+        var model = createVisualModelWithMapping(ValidMapping);
+
+        model.data = new Table(getDataSpec1());
+
+        var mapping = model.visualRole;
+        mapping.attributes.add(["country"]);
+
+        expect(mapping.isVisualKey).toBe(valueExpected);
+      }
+
+      function testItInherited(value1Spec, value2Spec, valueExpected) {
+        var DerivedMapping1 = Mapping.extend({type: {levels: ["nominal"], isVisualKey: value1Spec}});
+        var DerivedMapping2 = DerivedMapping1.extend({type: {isVisualKey: value2Spec}});
+
+        var model = createVisualModelWithMapping(DerivedMapping2);
+
+        model.data = new Table(getDataSpec1());
+
+        var mapping = model.visualRole;
+        mapping.attributes.add(["country"]);
+
+        expect(mapping.isVisualKey).toBe(valueExpected);
+      }
+
+      it("should be false for an unmapped quantitative visual role", function() {
+        var DerivedMapping = Mapping.extend({type: {levels: ["quantitative"]}});
+        var mapping = new DerivedMapping();
+        expect(mapping.isVisualKey).toBe(false);
+      });
+
+      it("should be false for an unmapped qualitative visual role", function() {
+        var DerivedMapping = Mapping.extend({type: {levels: ["nominal"]}});
+        var mapping = new DerivedMapping();
+        expect(mapping.isVisualKey).toBe(false);
+      });
+
+      it("should be true for a mapped qualitative visual role, when not specified in the type", function() {
+        var mapping = createFullValidQualitativeMapping();
+        expect(mapping.isVisualKey).toBe(true);
+      });
+
+      it("should be false for a mapped quantitative visual role, when not specified in the type", function() {
+        var mapping = createFullValidQuantitativeMapping();
+        expect(mapping.isVisualKey).toBe(false);
+      });
+
+      it("should evaluate to the specified, local, constant type#isVisualKey value", function() {
+        testItLocal(true, true);
+        testItLocal(false, false);
+      });
+
+      it("should evaluate to the specified, local, function type#isVisualKey value", function() {
+        testItLocal(function() { return true;  }, true);
+        testItLocal(function() { return false; }, false);
+      });
+
+      it("should inherit the type#isVisualKey value", function() {
+        testItInherited(true, null, true);
+        testItInherited(false, null, false);
+        testItInherited(function() { return true;  }, null, true);
+        testItInherited(function() { return false; }, null, false);
+      });
+
+      it("should not allow overriding a defined, inherited type#isVisualKey value", function() {
+        testItInherited(true, false, true);
+        testItInherited(false, true, false);
+        testItInherited(function() { return true;  }, false, true);
+        testItInherited(function() { return false; }, function() { return true;  }, false);
+      });
+    });
+
     describe(".Type", function() {
 
       describe("#levels", function() {
@@ -855,6 +931,98 @@ define([
           }
 
           expect(extendMapping).toThrow(errorMatch.argInvalid("dataType"));
+        });
+      });
+
+      describe("#isVisualKey", function() {
+
+        it("should have a root value of null", function() {
+          expect(Mapping.type.isVisualKey).toBe(null);
+        });
+
+        it("should be undefined by default", function() {
+          var DerivedMapping = Mapping.extend({type: {levels: ["quantitative"]}});
+
+          expect(DerivedMapping.type.isVisualKey).toBe(undefined);
+        });
+
+        it("should respect a specified boolean false value", function() {
+          var DerivedMapping = Mapping.extend({type: {levels: ["quantitative"], isVisualKey: false}});
+
+          expect(DerivedMapping.type.isVisualKey).toBe(false);
+        });
+
+        it("should respect a specified boolean true value", function() {
+          var DerivedMapping = Mapping.extend({type: {levels: ["quantitative"], isVisualKey: true}});
+
+          expect(DerivedMapping.type.isVisualKey).toBe(true);
+        });
+
+        it("should consider as true a specified truthy value", function() {
+          var DerivedMapping = Mapping.extend({type: {levels: ["quantitative"], isVisualKey: 1}});
+
+          expect(DerivedMapping.type.isVisualKey).toBe(true);
+        });
+
+        it("should consider as false a specified falsey, non-nully value", function() {
+          var DerivedMapping = Mapping.extend({type: {levels: ["quantitative"], isVisualKey: 0}});
+
+          expect(DerivedMapping.type.isVisualKey).toBe(false);
+        });
+
+        it("should ignore a specified null value", function() {
+          var DerivedMapping = Mapping.extend({type: {levels: ["quantitative"], isVisualKey: null}});
+
+          expect(DerivedMapping.type.isVisualKey).toBe(undefined);
+        });
+
+        it("should ignore a specified undefined value", function() {
+          var DerivedMapping = Mapping.extend({type: {levels: ["quantitative"], isVisualKey: undefined}});
+
+          expect(DerivedMapping.type.isVisualKey).toBe(undefined);
+        });
+
+        it("should ignore setting to an undefined value", function() {
+          var DerivedMapping = Mapping.extend({type: {levels: ["quantitative"], isVisualKey: true}});
+
+          expect(DerivedMapping.type.isVisualKey).toBe(true);
+
+          DerivedMapping.type.isVisualKey = undefined;
+
+          expect(DerivedMapping.type.isVisualKey).toBe(true);
+        });
+
+        it("should ignore setting to a null value", function() {
+          var DerivedMapping = Mapping.extend({type: {levels: ["quantitative"], isVisualKey: true}});
+
+          expect(DerivedMapping.type.isVisualKey).toBe(true);
+
+          DerivedMapping.type.isVisualKey = null;
+
+          expect(DerivedMapping.type.isVisualKey).toBe(true);
+        });
+
+        it("should respect setting to the value true", function() {
+          var DerivedMapping = Mapping.extend({type: {levels: ["quantitative"]}});
+
+          DerivedMapping.type.isVisualKey = true;
+
+          expect(DerivedMapping.type.isVisualKey).toBe(true);
+        });
+
+        it("should respect setting to the value false", function() {
+          var DerivedMapping = Mapping.extend({type: {levels: ["quantitative"]}});
+
+          DerivedMapping.type.isVisualKey = false;
+
+          expect(DerivedMapping.type.isVisualKey).toBe(false);
+        });
+
+        it("should allow specifying a function", function() {
+          var fIsKey = function() { return true; };
+          var DerivedMapping = Mapping.extend({type: {levels: ["quantitative"], isVisualKey: fIsKey}});
+
+          expect(DerivedMapping.type.isVisualKey).toBe(fIsKey);
         });
       });
     });

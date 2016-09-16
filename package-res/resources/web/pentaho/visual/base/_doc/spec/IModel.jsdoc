@@ -19,8 +19,18 @@
  *
  * @name pentaho.visual.base.spec.IModel
  * @interface
+ * @extends pentaho.type.spec.IModel
  *
  * @see pentaho.visual.base.Model
+ */
+
+/**
+ * Represents the relevant state and interface of the visual application in which a
+ * visual model is being used.
+ *
+ * @name application
+ * @memberOf pentaho.visual.base.spec.IModel#
+ * @type {pentaho.visual.base.spec.IApplication}
  */
 
 /**
