@@ -23,64 +23,34 @@ define([
 
   return AbstractAxis.extend({
 
-    constructor: function(chart, axisId, gems) {
-
-      this.base(chart, axisId, gems);
-
-      /* There can be one special CCC dimension into which
-       * the attributes of one or more measure roles are mapped.
-       *
-       * e.g.:
-       *
-       *   visual role  -> CCC dim group/name
-       *   -----------------------------
-       *   "measures"      "value"
-       *   "measuresLine"  "value"
-       *
-       * Each of the visual roles may support more than one attribute.
-       *
-       * In the end, if more than one measure attribute is mapped to the same
-       * CCC dimension group, either multiple CCC dimensions are created,
-       * one for each of the attributes (e.g.: value, value2, value3...)
-       * or a measure discriminator column is added to distinguish
-       * which of the measure attributes is in the single CCC dimension (e.g.: "value").
-       *
-       * To activate the measure discriminator mode, a chart class has to specify the
-       * prototype property `_genericMeasureCccDimName` with the name of the special CCC dimension.
-       *
-       * When multiple dimensions are created and multiple source roles exist,
-       * the source roles are sorted alphabetically and the within role attribute order is preserved.
-       */
-    },
-
     defaultRole: "measures",
 
-    _buildGemHtmlTooltip: function(lines, complex, context, gem/*, index*/) {
+    _buildMappingAttrInfoHtmlTooltip: function(lines, complex, context, maInfo/* , index*/) {
       /*
        * When using measure discriminator column,
        * only the "active" measure in "complex"
        * is placed in the tooltip.
        */
-      var measureDiscrimGem = this.chart.measureDiscrimGem;
-      if(measureDiscrimGem &&
-         gem.isMeasureGeneric &&
-         gem.name !== complex.atoms[measureDiscrimGem.cccDimName].value) {
+      if(this.chart._isGenericMeasureMode &&
+         maInfo.isMeasureGeneric &&
+         maInfo.name !== complex.atoms[this.chart.GENERIC_MEASURE_DISCRIM_DIM_NAME].value) {
         return;
       }
 
       // Obtain the dimension assigned to the role
-      var cccDimName = gem.cccDimName, atom = complex.atoms[cccDimName];
+      var cccDimName = maInfo.cccDimName;
+      var atom = complex.atoms[cccDimName];
       if(!atom.dimension.type.isHidden && (!complex.isTrend || atom.value != null)) {
-        // ex: "GemLabel (RoleDesc): 200 (10%)"
-        var tooltipLine = def.html.escape(gem.label);
+        // ex: "MaiLabel (RoleDesc): 200 (10%)"
+        var tooltipLine = def.html.escape(maInfo.label);
 
         // Role description
-        if(this.chart._noRoleInTooltipMeasureRoles[gem.role] !== true)
-          tooltipLine += " (" + def.html.escape(gem.role) + ")";
+        if(this.chart._noRoleInTooltipMeasureRoles[maInfo.role] !== true)
+          tooltipLine += " (" + def.html.escape(maInfo.role) + ")";
 
         tooltipLine += ": " + def.html.escape(this._getAtomLabel(atom, context));
 
-        if(!this.chart._tooltipHidePercentageForPercentGems || !gem.isPercent) {
+        if(!this.chart._tooltipHidePercentageOnPercentAttributes || !maInfo.isPercent) {
           var valuePct = this._getAtomPercent(atom, context);
           if(valuePct != null)
             tooltipLine += " (" + def.html.escape("" + valuePct) + ")";
@@ -104,7 +74,7 @@ define([
 
         } else if(complex.isTrend) {
           suffix = "(" + this.chart.options.trendLabel + ")";
-          //bundle.get("tooltip.dim.interpolation." + complex.trendType);
+          // bundle.get("tooltip.dim.interpolation." + complex.trendType);
         }
 
         if(suffix) tooltipLine += " " + suffix;
@@ -129,19 +99,19 @@ define([
 
     _getAtomPercent: function(atom, context) {
       if(context) {
-        var cccChart = context.chart,
-            data = cccChart.data,
-            cccDimName = atom.dimension.name,
-            visRoles = context.panel.visualRolesOf(cccDimName, /*includeChart*/true);
+        var cccChart = context.chart;
+        var data = cccChart.data;
+        var cccDimName = atom.dimension.name;
+        var visRoles = context.panel.visualRolesOf(cccDimName, /* includeChart: */true);
 
         if(visRoles && visRoles.some(function(r) { return r.isPercent; })) {
-          var group = context.scene.group, dim = (group || data).dimensions(cccDimName),
-              pct = group ? dim.percentOverParent({visible: true}) : dim.percent(atom.value);
+          var group = context.scene.group;
+          var dim = (group || data).dimensions(cccDimName);
+          var pct = group ? dim.percentOverParent({visible: true}) : dim.percent(atom.value);
 
           return dim.type.format().percent()(pct);
         }
       }
     }
   });
-
 });

@@ -24,7 +24,7 @@ define([
   return AbstractCartesianChart.extend({
     _cccClass: "HeatGridChart",
 
-    _roleToCccDimGroup: {
+    _roleToCccRole: {
       "columns": "series",
       "rows": "category",
       "color": "value",

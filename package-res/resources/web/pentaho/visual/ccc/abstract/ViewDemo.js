@@ -52,7 +52,7 @@ define([
 
       // Remove restrictions on the properties that span multiple charts.
 
-      var multi = this._getAttributeInfosOfRole(this._multiRole);
+      var multi = this._getMappingAttrInfosByRole(this._multiRole);
       if(!multi) return;
 
       var isNotMultiPropertyFilter = function(oper) {
@@ -77,7 +77,7 @@ define([
     },
 
     _isAttributeInRole: function(attrName, roleName) {
-      var roles = O.getOwn(this._getInverseVisualMap(), attrName);
+      var roles = O.getOwn(this._invVisualMap, attrName);
       return roles != null && roles.indexOf(roleName) >= 0;
     },
 

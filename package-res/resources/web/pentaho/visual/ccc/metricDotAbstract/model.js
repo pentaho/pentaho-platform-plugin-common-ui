@@ -49,7 +49,6 @@ define([
               name: "x", //VISUAL_ROLE
               type: {
                 base: "pentaho/visual/role/quantitative",
-                dataType: "number",
                 props: {attributes: {countMin: 1, countMax: 1}}
               },
               ordinal: 1
@@ -58,7 +57,6 @@ define([
               name: "y", //VISUAL_ROLE
               type: {
                 base: "pentaho/visual/role/quantitative",
-                dataType: "number",
                 props: {attributes: {countMin: 1, countMax: 1}}
               },
               ordinal: 2

@@ -23,7 +23,7 @@ define([
 
   return AbstractBarChart.extend({
 
-    _roleToCccDimGroup: {
+    _roleToCccRole: {
       "columns": "series",
       "rows": "category",
       "multi": "multiChart",
@@ -55,15 +55,14 @@ define([
       // 0 -> bars
       // 1 -> lines
 
-      var calculation,
-          measureDiscrimCccDimName = this.measureDiscrimGem && this.measureDiscrimGem.cccDimName;
-
-      if(measureDiscrimCccDimName) {
+      var calculation;
+      if(this._isGenericMeasureMode) {
         /* jshint laxbreak:true*/
-        var barAttrInfos = this._getAttributeInfosOfRole("measures"),
-            barAttrInfosByName = barAttrInfos
-                ? def.query(barAttrInfos).uniqueIndex(function(ai) { return ai.name; })
+        var barAttrInfos = this._getMappingAttrInfosByRole("measures");
+        var barAttrInfosByName = barAttrInfos
+                ? def.query(barAttrInfos).uniqueIndex(function(maInfo) { return maInfo.name; })
                 : {};
+        var measureDiscrimCccDimName = this.GENERIC_MEASURE_DISCRIM_DIM_NAME;
 
         calculation = function(datum, atoms) {
           var meaAttrName = datum.atoms[measureDiscrimCccDimName].value;
@@ -72,7 +71,7 @@ define([
       } else if(this._genericMeasuresCount > 0) {
         // One measure of one of the roles exists.
         // And so, either it is always bar or always line...
-        var constDataPart = this._getAttributeInfosOfRole("measures") ? "0" : "1";
+        var constDataPart = this._getMappingAttrInfosByRole("measures") ? "0" : "1";
         calculation = function(datum, atoms) { atoms.dataPart = constDataPart; };
       } else {
         throw def.error("At least one of the measure roles must be specified");
@@ -83,6 +82,7 @@ define([
     },
 
     _readUserOptions: function(options) {
+
       this.base.apply(this, arguments);
 
       var shape = this.model.shape;
@@ -97,7 +97,7 @@ define([
     _configure: function() {
       this.base();
 
-      this._configureAxisRange(/*isPrimary*/false, "ortho2");
+      this._configureAxisRange(/* isPrimary: */false, "ortho2");
 
       this._configureAxisTitle("ortho2", "");
 
@@ -124,7 +124,7 @@ define([
     _configureDisplayUnits: function() {
       this.base();
 
-      this._configureAxisDisplayUnits(/*isPrimary*/false, "ortho2");
+      this._configureAxisDisplayUnits(/* isPrimary: */false, "ortho2");
     }
   });
 });

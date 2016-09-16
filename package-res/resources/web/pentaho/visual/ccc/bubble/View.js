@@ -28,7 +28,7 @@ define([
     },
 
     /* Override Default map */
-    _roleToCccDimGroup: {
+    _roleToCccRole: {
       "multi": "multiChart",
       "rows": "category",
       "x": "x",

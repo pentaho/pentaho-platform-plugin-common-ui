@@ -21,7 +21,7 @@ define([
   "use strict";
 
   return Base.extend({
-    constructor: function(chart, axisId, gems) {
+    constructor: function(chart, axisId, mappingAttrInfos) {
       this.chart = chart;
       this.id = axisId;
 
@@ -30,34 +30,39 @@ define([
       // Only bound roles will have an entry in this set
       this.boundRoles = {}; // roleId -> true
 
-      this.gems = gems;
-      this.depth = gems.length;
-      gems.forEach(function(gem) {
-        // Overwrite axis id with corresponding Axis instance
-        gem.axis = this;
+      /**
+       * @type {MappingAttributeInfo[]}
+       */
+      this.mappingAttrInfos = mappingAttrInfos;
 
-        this.boundRoles[gem.role] = true;
+      this.depth = mappingAttrInfos.length;
+      mappingAttrInfos.forEach(function(maInfo) {
+        // Overwrite axis id with corresponding Axis instance
+        maInfo.axis = this;
+
+        this.boundRoles[maInfo.role] = true;
       }, this);
     },
 
     defaultRole: null,
 
     buildHtmlTooltip: function(lines, complex, context) {
-     this.gems.forEach(function(gem, index) {
-       if(gem.cccDimName) this._buildGemHtmlTooltip(lines, complex, context, gem, index);
-     }, this);
+      this.mappingAttrInfos.forEach(function(maInfo, index) {
+        if(maInfo.cccDimName)
+          this._buildMappingAttrInfoHtmlTooltip(lines, complex, context, maInfo, index);
+      }, this);
     },
 
-    _buildGemHtmlTooltip: function(lines, complex, context, gem, index) {
-     // Multi-chart formulas are not shown in the tooltip.
-     // They're on the small chart's title.
-     if(gem.role !== this.chart._multiRole) {
-       var atom = complex.atoms[gem.cccDimName];
-       if(!atom.dimension.type.isHidden && (!complex.isTrend || atom.value != null)) {
-         // ex: "Line: Ships"
-         lines.push(def.html.escape(gem.label) + ": " + def.html.escape(atom.label));
-       }
-     }
+    _buildMappingAttrInfoHtmlTooltip: function(lines, complex, context, maInfo, index) {
+      // Multi-chart formulas are not shown in the tooltip.
+      // They're on the small chart's title.
+      if(maInfo.role !== this.chart._multiRole) {
+        var atom = complex.atoms[maInfo.cccDimName];
+        if(!atom.dimension.type.isHidden && (!complex.isTrend || atom.value != null)) {
+          // ex: "Line: Ships"
+          lines.push(def.html.escape(maInfo.label) + ": " + def.html.escape(atom.label));
+        }
+      }
     },
 
     complexToFilter: function() {

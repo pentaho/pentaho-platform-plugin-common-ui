@@ -15,63 +15,25 @@
  */
 define([
   "module",
-  "../categoricalContinuousAbstract/model",
-  "pentaho/i18n!../abstract/i18n/model",
-  "../abstract/types/labelsOption",
-  "../abstract/mixins/settingsMultiChartType",
-  "../abstract/mixins/interpolationType"
-], function(module, categoricalContinuousAbstractModelFactory, bundle, labelsOptionFactory,
-    settingsMultiChartType, interpolationType) {
+  "../pointAbstract/model",
+  "pentaho/i18n!../abstract/i18n/model"
+], function(module, pointAbstractFactory, bundle) {
 
   "use strict";
 
   return function(context) {
 
-    var CategoricalContinuousAbstract = context.get(categoricalContinuousAbstractModelFactory);
+    var PointAbstract = context.get(pointAbstractFactory);
 
-    return CategoricalContinuousAbstract.extend({
-        type: {
-          sourceId: module.id,
-          id: module.id.replace(/.\w+$/, ""),
-          v2Id: "ccc_area",
-          category: "areachart",
-
-          defaultView: "./View",
-
-          props: [
-            {
-              name: "columns", //VISUAL_ROLE
-              type: "pentaho/visual/role/ordinal",
-              ordinal: 6
-            },
-            {
-              name: "measures", //VISUAL_ROLE
-              type: {
-                props: {attributes: {isRequired: true}}
-              },
-              ordinal: 7
-            },
-            {
-              name: "multi", //VISUAL_ROLE
-              type: "pentaho/visual/role/ordinal",
-              ordinal: 10
-            },
-            {
-              name: "labelsOption",
-              type: {
-                base: labelsOptionFactory,
-                domain: ["none", "center", "left", "right", "top", "bottom"]
-              },
-              isRequired: true,
-              value: "none"
-            }
-          ]
-        }
-      })
-      .implement({type: settingsMultiChartType})
-      .implement({type: bundle.structured["settingsMultiChart"]})
-      .implement({type: interpolationType})
-      .implement({type: bundle.structured["interpolation"]})
-      .implement({type: bundle.structured["areaStacked"]});
+    return PointAbstract.extend({
+      type: {
+        sourceId: module.id,
+        id: module.id.replace(/.\w+$/, ""),
+        v2Id: "ccc_area",
+        category: "areachart",
+        defaultView: "./View"
+      }
+    })
+    .implement({type: bundle.structured.areaStacked});
   };
 });

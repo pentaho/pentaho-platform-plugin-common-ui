@@ -26,34 +26,44 @@ define([
   "pentaho/util/logger",
   "pentaho/visual/color/utils",
   "pentaho/visual/color/paletteRegistry",
+  "pentaho/visual/role/level",
   "pentaho/data/TableView",
   "./ViewDemo",
   "pentaho/i18n!view"
 ], function(View, selectionModes,
             def, pvc, cdo, pv, Axis,
             util, O, logger, visualColorUtils, visualPaletteRegistry,
-            DataView, ViewDemo, bundle) {
+            measurementLevelFactory, DataView, ViewDemo, bundle) {
 
   "use strict";
 
   /* global alert:false, cv:false */
 
-  var ruleStrokeStyle = "#808285",  // "#D8D8D8",  // #f0f0f0
-      lineStrokeStyle = "#D1D3D4",  // "#D1D3D4"; //"#A0A0A0"; // #D8D8D8",// #f0f0f0
-      extensionBlacklist = {
-        "compatVersion": 1,
-        "interactive": 1,
-        "isMultiValued": 1,
-        "seriesInRows": 1,
-        "crosstabMode": 1,
-        "width": 1,
-        "height": 1,
-        "canvas": 1,
-        "readers": 1,
-        "visualRoles": 1,
-        "extensionPoints": 1,
-        "dataCategoriesCount": 1
-      };
+  var ruleStrokeStyle = "#808285";  // "#D8D8D8",  // #f0f0f0
+  var lineStrokeStyle = "#D1D3D4";  // "#D1D3D4"; //"#A0A0A0"; // #D8D8D8",// #f0f0f0
+  var extensionBlacklist = {
+    "compatVersion": 1,
+    "interactive": 1,
+    "isMultiValued": 1,
+    "measuresIndexes": 1,
+    "multiChartIndexes": 1,
+    "measuresInColumns": 1,
+    "dataMeasuresInColumns": 1,
+    "ignoreMetadataLabels": 1,
+    "dataIgnoreMetadataLabels": 1,
+    "typeCheckingMode": 1,
+    "dataTypeCheckingMode": 1,
+    "seriesInRows": 1,
+    "crosstabMode": 1,
+    "width": 1,
+    "height": 1,
+    "canvas": 1,
+    "readers": 1,
+    "visualRoles": 1,
+    "extensionPoints": 1,
+    "categoriesCount": 1,
+    "dataCategoriesCount": 1
+  };
 
   function legendShapeColorProp(scene) {
     return scene.isOn() ? scene.color : pvc.toGrayScale(scene.color);
@@ -124,6 +134,7 @@ define([
     seriesInRows: false,
 
     // Data
+    dataTypeCheckingMode: "none",
     ignoreNulls: false,
     groupedLabelSep: "~",
 
@@ -149,17 +160,41 @@ define([
 
     // Default mapping from gembarId to CCC dimension group.
     // From requirement visual roles to CCC visual roles...
-    _roleToCccDimGroup: {
+    _roleToCccRole: {
       "multi": "multiChart",
       "columns": "series",
       "rows": "category",
       "measures": "value"
     },
 
-    // Set to the name of the CCC dimension (group) which should trigger the addition
-    // of a measure discriminator column to distinguish among multiple attributes
-    // mapped to a single CCC dimension.
-    _genericMeasureCccDimName: null,
+    /* There can be one special CCC dimension into which
+     * the attributes of one or more Viz measure roles are mapped.
+     *
+     * e.g.:
+     *
+     *   Viz Visual Role  -> Generic Measure CCC Visual Role
+     *   ---------------------------------------------------
+     *   "measures"          "value"
+     *   "measuresLine"      "value"
+     *
+     * Each of the Viz visual roles may support more than one attribute.
+     *
+     * In the end, if more than one measure attribute were mapped to the same
+     * CCC visual role, either multiple CCC dimensions would be created,
+     * one for each of the attributes (e.g.: value, value2, value3...)
+     * or - the current solution - an auxiliary measure discriminator dimension is added to
+     * distinguish which of the measure attributes is in the CCC visual role (e.g.: "value").
+     *
+     * To activate the measure discriminator mode, a chart class has to specify the
+     * prototype property `_genericMeasureCccVisualRole` with the name of the target CCC visual role.
+     *
+     * When multiple source roles exist,
+     * these are sorted alphabetically and the within role attribute order is preserved.
+     */
+    _genericMeasureCccVisualRole: null,
+
+    GENERIC_MEASURE_DIM_NAME: "__GENERIC_MEASURE__",
+    GENERIC_MEASURE_DISCRIM_DIM_NAME: "__GENERIC_MEASURE_DISCRIM__",
 
     _keyAxesIds: ["column", "row"],
     _axesIds: ["column", "row", "measure"],
@@ -168,8 +203,8 @@ define([
     // Essentially, those measures that are represented by cartesian axes...
     _noRoleInTooltipMeasureRoles: {"measures": true},
 
-    // Do not show percentage value in front of a "percent measure" gem.
-    _tooltipHidePercentageForPercentGems: false,
+    // Do not show percentage value in front of a "percent measure" MappingAttributeInfo.
+    _tooltipHidePercentageOnPercentAttributes: false,
 
     // The name of the role that represents the "multi-chart" concept.
     _multiRole: "multi",
@@ -188,8 +223,6 @@ define([
       // Ensure we have a plain data table
       // TODO: with nulls preserved, because of order...
       this._dataView = this._dataTable.toPlainTable();
-
-      this._visualMap = this._invVisualMap = this._dataView = null;
 
       // ----------
 
@@ -241,12 +274,12 @@ define([
       // Get information on the axes
       var props = def.query(this._keyAxesIds)
             .selectMany(function(axisId) {
-              return this.axes[axisId].getSelectionGems();
+              return this.axes[axisId].getSelectionMappingAttrInfos();
             }, this)
-            .select(function(gem) {
+            .select(function(maInfo) {
               return {
-                ordinal: gem.attr.ordinal,
-                cccDimName: gem.cccDimName
+                ordinal: maInfo.attr.ordinal,
+                cccDimName: maInfo.cccDimName
               };
             })
             .array();
@@ -256,14 +289,14 @@ define([
       var alreadyIn = {};
       for(var k = 0, N = selectedItems.getNumberOfRows(); k < N; k++) {
 
-        // jshint -W083
+        /* eslint no-loop-func: 0 */
         var datumFilterSpec = props.reduce(function(datumFilter, prop) {
           var value = selectedItems.getValue(k, prop.ordinal);
           datumFilter[prop.cccDimName] = value;
           return datumFilter;
         }, {});
 
-        //Prevent repeated terms
+        // Prevent repeated terms.
         var key = specToKey(datumFilterSpec);
         if(!O.hasOwn(alreadyIn, key)) {
           alreadyIn[key] = true;
@@ -283,6 +316,7 @@ define([
         var key = entries.map(function(entry) {
           return entry + ":" + spec[entry];
         }).join(",");
+
         return key;
       }
     },
@@ -304,7 +338,7 @@ define([
       var model = this.model;
 
       // Store the current selections
-      this._selections = null; // drawSpec.highlights; // TODO: hookup model selections?
+      this._selections = null; // TODO: hookup model selections?
 
       // Recursively inherit this class' shared options
       var options = this.options = def.create(this._options);
@@ -312,8 +346,7 @@ define([
         options,
         "canvas", this.domContainer,
         "height", model.height || 400,
-        "width",  model.width || 400,
-        "dimensionGroups", {},
+        "width", model.width || 400,
         "dimensions", {},
         "visualRoles", {},
         "readers", [],
@@ -322,91 +355,16 @@ define([
     // endregion
 
     // region VISUAL MAP
-    _getVisualMap: function() {
-      return this._visualMap || (this._visualMap = this._buildVisualMap());
-    },
-
-    _buildVisualMap: function() {
-      var model = this.model,
-          visualMap = {};
-
-      Object.keys(this._roleToCccDimGroup)
-          .forEach(function(roleName) {
-            if(this[roleName]) {
-              var mapping = model.get(roleName);
-
-              /* jshint laxbreak:true*/
-              visualMap[roleName] = mapping
-                  ? mapping.attributes.toArray(function(mappingAttr) { return mappingAttr.name; })
-                  : [];
-            }
-          }, this._roleToCccDimGroup);
-
-      return visualMap;
-    },
-
-    _getInverseVisualMap: function() {
-      return this._invVisualMap || (this._invVisualMap = this._buildInverseVisualMap());
-    },
-
-    _buildInverseVisualMap: function() {
-      var invVisualMap = {},
-          visualMap = this._getVisualMap();
-      Object.keys(visualMap).forEach(function(roleName) {
-        visualMap[roleName].forEach(function(attrName) {
-          def.array.lazy(invVisualMap, attrName).push(roleName);
-        });
-      });
-      return invVisualMap;
-    },
-
-    _getFirstRoleOfAttribute: function(attrName) {
-      var roles = def.getOwn(this._getInverseVisualMap(), attrName);
-      return roles && roles.length ? roles[0] : null;
-    },
-
-    _getCccDimGroupOfRole: function(roleName) {
-      return (def.getOwn(this._roleToCccDimGroup, roleName) ||
-      def.assert("Role '" + roleName + "' is not defined."));
-    },
-
-    _getAttributeInfoByName: function(attrName, assertExists) {
-      return def.getOwn(this._gemsMap, attrName) ||
-        (assertExists ? def.assert("Undefined attribute of name: '" + attrName + "'") : null);
-    },
-
-    _getAttributeInfosOfRole: function(roleName) {
-      return def.getOwn(this._getVisualMapInfo(), roleName);
-    },
-
-    _getRolesByCccDimGroup: function() {
-      return this._rolesByCccDimGroup ||
-        (this._rolesByCccDimGroup = this._buildRolesByCccDimGroup());
-    },
-
-    _buildRolesByCccDimGroup: function() {
-      var rolesByCccDimGroup = def.query(Object.keys(this._roleToCccDimGroup))
-            .multipleIndex(function(roleName) { return this[roleName]; }, this._roleToCccDimGroup);
-
-      // Must have a stable order for laying out multiple roles that map to a single CCC dimension group.
-      Object.keys(rolesByCccDimGroup).forEach(function(cccDimGroup) {
-        rolesByCccDimGroup[cccDimGroup].sort();
-      });
-
-      return rolesByCccDimGroup;
-    },
-
-    _getVisualMapInfo: function() {
-      return this._visualMapInfo;
+    _getMappingAttrInfosByRole: function(roleName) {
+      return def.getOwn(this._visualMapInfo, roleName);
     },
 
     _getRoleDepth: function(roleName, includeMeasureDiscrim) {
-      var depth = 0,
-          ais = this._getAttributeInfosOfRole(roleName);
-      if(ais) {
-        depth = ais.length;
-        if(!includeMeasureDiscrim && this.measureDiscrimGem &&
-          this.measureDiscrimGem.role === roleName) {
+      var depth = 0;
+      var maInfos = this._getMappingAttrInfosByRole(roleName);
+      if(maInfos) {
+        depth = maInfos.length;
+        if(!includeMeasureDiscrim && this._isGenericMeasureMode && this._genericMeasureDiscrimMappingAttrInfo.role === roleName) {
           depth -= 1;
         }
       }
@@ -415,7 +373,34 @@ define([
     },
 
     _isRoleBound: function(roleName) {
-      return !!this._getAttributeInfosOfRole(roleName);
+      return !!this._getMappingAttrInfosByRole(roleName);
+    },
+
+    _isRoleQualitative: function(roleName) {
+      if(this._isGenericMeasureRole(roleName)) return false;
+
+      var mapping = this.model.get(roleName);
+      if(mapping.attributes.length > 1) return true;
+
+      var MeasurementLevel = this.context.get(measurementLevelFactory);
+      var level = this.model.get(roleName).levelEffective;
+      return !level || MeasurementLevel.type.isQualitative(level);
+    },
+
+    _isGenericMeasureRole: function(roleName) {
+      var cccGenericRoleName = this._genericMeasureCccVisualRole;
+      return !!cccGenericRoleName && def.getOwn(this._roleToCccRole, roleName) === cccGenericRoleName;
+    },
+
+    _getGenericMeasureRoleNames: function() {
+      var cccRole = this._genericMeasureCccVisualRole;
+      return (cccRole && def.getOwn(this._rolesByCccVisualRole, cccRole)) || [];
+    },
+
+    _selectGenericMeasureMappingAttrInfos: function() {
+      return def.query(this._getGenericMeasureRoleNames())
+          .selectMany(this._getMappingAttrInfosByRole, this)
+          .where(def.notNully);
     },
     // endregion
 
@@ -485,13 +470,11 @@ define([
         value = model.legendPosition;
         if(value) options.legendPosition = value;
 
-
         if(model.legendSize)
           options.legendFont = util.readFontModel(model, "legend");
       }
 
-
-      value = model.getv("lineWidth", /*sloppy:*/true);
+      value = model.getv("lineWidth", /* sloppy: */true);
       if(value != null) {
         options.line_lineWidth = value;
         var radius = 3 + 6 * (value / 8); // 1 -> 8 => 3 -> 9,
@@ -501,123 +484,254 @@ define([
         options.plot2Dot_shapeSize  = options.dot_shapeSize;
       }
 
-      value = model.getv("maxChartsPerRow", /*sloppy:*/true);
+      value = model.getv("maxChartsPerRow", /* sloppy: */true);
       if(value != null)
         options.multiChartColumnsMax = value;
 
-      value = model.getv("multiChartRangeScope", /*sloppy:*/true);
+      value = model.getv("multiChartRangeScope", /* sloppy: */true);
       if(value) options.numericAxisDomainScope = value;
 
-      value = model.getv("emptyCellMode", /*sloppy:*/true);
+      value = model.getv("emptyCellMode", /* sloppy: */true);
       if(value) this._setNullInterpolationMode(options, value);
 
-      value = model.getv("sizeByNegativesMode", /*sloppy:*/true);
+      value = model.getv("sizeByNegativesMode", /* sloppy: */true);
       options.sizeAxisUseAbs = value === "useAbs";
     },
 
     _initData: function() {
-      var dataTable = this._dataTable,
+      var dataTable = this._dataTable;
+      var attributes = dataTable.model.attributes;
 
-          // axisId -> AttributeInfo[]
-          axesGemsInfo = {
-            row: [],
-            column: [],
-            measure: []
-          },
+      var genericMeasuresCount = 0;
+      var genericMeasureCccVisualRole = this._genericMeasureCccVisualRole;
 
-          // attrName -> AttributeInfo
-          gemsMap = {},
+      // Multiple ways to store and index MappingAttributeInfo...
+      var mappingAttrInfos = [];
 
-          // roleName -> attr-name[]
-          visualMap = this._getVisualMap(),
+      // axisId -> MappingAttributeInfo[]
+      var mappingAttrInfosByAxisId = {
+        row:     [],
+        column:  [],
+        measure: []
+      };
 
-          // roleName -> AttributeInfo[]
-          visualMapInfo = {},
+      // mappingAttrName -> MappingAttributeInfo
+      var mappingAttrInfosByName = {};
 
-          genericMeasuresCount = 0;
+      // roleName -> MappingAttributeInfo[]
+      var visualMapInfo = {};
 
-      // Create attribute infos for each attribute in the data table.
+      // ----
+
+      // roleName -> attrName[]
+      var visualMap = {};
+
+      // attrName -> roleName[]
+      var invVisualMap = {};
+
+      var rolesByCccVisualRole = {};
+
+      // ----
+
+      /**
+       * Registers a mapping attribute info.
+       *
+       * @param {MappingAttributeInfo} mappingAttrInfo The mapping attribure info to add.
+       * @return {MappingAttributeInfo} The same as `mappingAttrInfo`.
+       */
+      var addMappingAttrInfo = function(mappingAttrInfo) {
+
+        // Complete
+        var isMeasureGeneric = !!genericMeasureCccVisualRole &&
+            (mappingAttrInfo.cccRole === genericMeasureCccVisualRole);
+
+        mappingAttrInfo.isMeasureGeneric = isMeasureGeneric;
+
+        // Not final; see below. When genericMeasuresCount.length > 1,
+        // all isMeasureGeneric mappingAttrInfo will share a single CCC dimension.
+        mappingAttrInfo.cccDimName = mappingAttrInfo.name;
+
+        // Store/Index in multiple ways
+        mappingAttrInfos.push(mappingAttrInfo);
+
+        if(isMeasureGeneric) genericMeasuresCount++;
+
+        mappingAttrInfosByName[mappingAttrInfo.name] = mappingAttrInfo;
+
+        mappingAttrInfosByAxisId[mappingAttrInfo.axis].push(mappingAttrInfo);
+
+        var roleName = mappingAttrInfo.role;
+        def.array.lazy(visualMapInfo, roleName).push(mappingAttrInfo);
+
+        var attr = mappingAttrInfo.attr;
+        if(attr) def.array.lazy(invVisualMap, attr.name).push(roleName);
+
+        return mappingAttrInfo;
+      };
+
+      // ----
+      // Phase 1 - Determine the AxisId of each data table column.
+
+      // An Attribute can only belong to one axis.
+      // attrName -> axisId
+      var axisIdByAttrName = {};
+
+      var indexAttributeByAxis = function(axisId, attr) {
+        var attrName = attr.name;
+        if(!def.hasOwn(axisIdByAttrName, attrName))
+          axisIdByAttrName[attrName] = axisId;
+      };
+
       if(dataTable.isCrossTable) {
-        var crossLayout = dataTable.implem.layout,
-            addStructPos = function(axisId, structPos) {
-              addAxisAttribute.call(this, axisId, structPos.attribute);
-            };
+        // The axis of an attribute is tied to the first cross-tab layout role where the attribute participates
+        // Ideally, an attribute would either be in one of rows, columns or measures...
+        var crossLayout = dataTable.implem.layout;
 
-        crossLayout.rows.forEach(addStructPos.bind(this, "row"));
-        crossLayout.cols.forEach(addStructPos.bind(this, "column"));
-        crossLayout.meas.forEach(addStructPos.bind(this, "measure"));
+        var addStructurePosition = function(axisId, structPos) {
+          indexAttributeByAxis(axisId, structPos.attribute);
+        };
+
+        crossLayout.rows.forEach(addStructurePosition.bind(this, "row"));
+        crossLayout.cols.forEach(addStructurePosition.bind(this, "column"));
+        crossLayout.meas.forEach(addStructurePosition.bind(this, "measure"));
       } else {
         // Table in plain layout
-        var C = dataTable.getNumberOfColumns(),
-            j = -1;
+        var C = dataTable.getNumberOfColumns();
+        var j = -1;
         while(++j < C) {
           var attr = dataTable.getColumnAttribute(j);
-          addAxisAttribute.call(this, attr.isDiscrete ? "row" : "measure", attr);
+          indexAttributeByAxis(/* axisId */attr.type !== "number" ? "row" : "measure", attr);
         }
       }
 
-      function addAxisAttribute(axisId, attr) {
-        // Is this attribute mapped to any role?
-        // Note: it can be an automatically provided property of a mapped attribute
-        //   (e.g.: for a "location" geo role attribute,
-        //   Analyzer automatically adds "latitude" and "longitude" attributes)
+      // ----
+      // Phase 2 - Build MappingAttributeInfo part 1...
 
-        /* jshint validthis:true*/
+      // For each visual role mapping attribute,
+      // build a corresponding "visual role mapping attribute info", pointing to the corresponding
+      // data table attribute.
 
-        var attrName = attr.name,
-            roleName = this._getFirstRoleOfAttribute(attrName);
-        if(roleName) {
-          var cccDimGroup = this._getCccDimGroupOfRole(roleName),
-              roleAttrNames = visualMap[roleName],
-              roleOrdinal = roleAttrNames.indexOf(attrName),
-              attrInfo = {
-                attr: attr,
+      // NOTE: ignoring unmapped attributes like the GEO ones that Analyzer automatically adds:
+      // "latitude" and "longitude". For now this is ok, but when the GeoMap viz gets converted to VizAPI3,
+      // we'll have to see if these columns should be explicitly mapped or be provided as part of
+      // a GEO entity's sub-properties.
 
-                name: attr.name,
-                label: attr.label || attr.name,
-                isPercent: !!attr.isPercent,
+      // NOTE: ignoring the fact that Analyzer sometimes does not send visual role mapped attributes due to
+      // "max rows" configurations. Limiting the number of rows is acceptable, but not the number of columns...
 
-                role: roleName,
-                cccDimGroup: cccDimGroup,
-                cccDimName: undefined,
-                axis: axisId,
-                isMeasureGeneric: (cccDimGroup === this._genericMeasureCccDimName),
-                isMeasureDiscrim: false
-              };
+      // NOTE: an attribute may be consumed by more than one visual role,
+      // and still CCC dimensions are created for each mapping attribute info.
+      // This is because, otherwise, we would not be able to specify valueType and isDiscrete differently
+      // for different visual roles...
 
-          if(attrInfo.isMeasureGeneric) genericMeasuresCount++;
+      this.model.type.eachVisualRole(function(propType) {
+        var roleName = propType.name;
+        var mapping  = this.model.get(roleName);
 
-          gemsMap[attrInfo.name] = attrInfo;
-          axesGemsInfo[axisId].push(attrInfo);
+        if(mapping.isMapped) {
+          var cccRoleName = this._roleToCccRole[roleName];
+          if(cccRoleName)
+            def.array.lazy(rolesByCccVisualRole, cccRoleName).push(roleName);
 
-          /* Note that, in general, and apart from the attrName to AttributeInfo conversion,
-           * `visualMapInfo` is a subset of `visualMap`.
-           * This is because due to row/column number limits,
-           * the data service may, for example, omit some of the requested measures
-           * (see Analyzer's `maxValues` visual type property).
-           */
-          var roleAttrInfos = visualMapInfo[roleName] ||
-                (visualMapInfo[roleName] = new Array(roleAttrNames.length));
+          visualMap[roleName] = mapping.attributes.toArray(function(mappingAttr, mappingAttrIndex) {
+            var attrName = mappingAttr.name;
+            var attr = attributes.get(attrName);
+            var axisId = axisIdByAttrName[attrName];
 
-          // We later take care of clearing the gaps caused by missing attributes (i).
-          roleAttrInfos[roleOrdinal] = attrInfo;
+            // Create an intelligible MappingAttrInfo id.
+            // The "_" prefix prevents CCC auto binding to visual roles.
+            var name = "_" + roleName + "_" + (mappingAttrIndex + 1);
+
+            addMappingAttrInfo({
+              name:  name,
+              label: attr.label || attrName,
+
+              role: roleName,
+              mapping: mapping,
+              mappingAttr: mappingAttr,
+
+              attr: attr,
+
+              isPercent: !!attr.isPercent,
+
+              cccRole: cccRoleName,
+
+              axis: axisId,
+              isMeasureDiscrim: false
+            });
+
+            return attrName;
+          }, this);
         }
-      }
+      }, this);
 
-      // (i) Clear gaps caused by missing attributes.
-      Object.keys(visualMapInfo).forEach(function(roleName) {
-        def.array.removeIf(visualMapInfo[roleName], def.falsy);
+      // ----
+      // Phase 3 - 2nd passage stuff
+
+      // Must have a stable order for laying out multiple roles that map to a single CCC dimension group.
+      Object.keys(rolesByCccVisualRole).forEach(function(cccRoleName) {
+        rolesByCccVisualRole[cccRoleName].sort();
       });
 
-      this._gemsMap = gemsMap;
+      // Generic Measure Mode?
+      var isGenericMeasureMode = this._isGenericMeasureMode = genericMeasuresCount > 1;
+      if(isGenericMeasureMode) {
+        this._genericMeasureDiscrimMappingAttrInfo = this._createGenericMeasureDiscriminator();
+        addMappingAttrInfo(this._genericMeasureDiscrimMappingAttrInfo);
+      } else {
+        this._genericMeasureDiscrimMappingAttrInfo = null;
+      }
+
+      var cccDims = this.options.dimensions;
+      var cccVisualRoles = this.options.visualRoles;
+      var addToCCCVisualRole = function(cccRoleName, cccDimName) {
+        var cccRole = def.lazy(cccVisualRoles, cccRoleName);
+        def.array.lazy(cccRole, "dimensions").push(cccDimName);
+      };
+      var MeasurementLevel = this.context.get(measurementLevelFactory);
+
+      // Configure the generic measure visual role
+      if(isGenericMeasureMode)
+        addToCCCVisualRole(genericMeasureCccVisualRole, this.GENERIC_MEASURE_DIM_NAME);
+
+      // mappingAttrInfos is filled above, in visual role mapping attribute order;
+      // this enables its use for configuring the CCC visual roles.
+      mappingAttrInfos.forEach(function(maInfo) {
+
+        // i) Fix CCC dim names of generic measures if there is more than one.
+        var isMeasureGeneric = isGenericMeasureMode && maInfo.isMeasureGeneric;
+        if(isMeasureGeneric)
+          maInfo.cccDimName = this.GENERIC_MEASURE_DIM_NAME;
+
+        if(maInfo.cccDimName) {
+          // Exclude measure discriminator
+          if(maInfo.attr) {
+            // ii) Configure CCC dimension options.
+            var cccDim = def.lazy(cccDims, maInfo.cccDimName);
+            cccDim.valueType  = this._getAttributeCccValueType(maInfo.attr);
+            cccDim.isDiscrete = this._isRoleQualitative(maInfo.role);
+            if(cccDim.valueType === Date) {
+              // Change the default formatter to use JavaScript's default serialization.
+              // Affects tooltips and discrete axes.
+              cccDim.formatter = function(v) { return v == null ? "" : v.toString(); };
+            }
+          }
+
+          // iii) Add to corresponding CCC visual role
+          if(!isMeasureGeneric) addToCCCVisualRole(maInfo.cccRole, maInfo.cccDimName);
+        }
+      }, this);
+
+      // Publish the created stores/indexes
+      this._mappingAttrInfos = mappingAttrInfos;
+      this._mappingAttrInfoByName = mappingAttrInfosByName;
+      this._visualMap = visualMap;
       this._visualMapInfo = visualMapInfo;
+      this._invVisualMap = invVisualMap;
+      this._rolesByCccVisualRole = rolesByCccVisualRole;
       this._genericMeasuresCount = genericMeasuresCount;
-      this.measureDiscrimGem = null;
 
-      var hasDiscrim = genericMeasuresCount > 1;
-      if(hasDiscrim) this._addGenericMeasureDiscriminator();
-
-      this._initAxes(axesGemsInfo);
+      this._initAxes(mappingAttrInfosByAxisId);
     },
 
     /**
@@ -637,48 +751,56 @@ define([
      * * and the ability to have different formatting per measure attribute, as there is
      *   a single CCC dimension that holds the values of all measure attributes, is lost.
      *   The formatting configuration of the first measure in the measure role is used.
+     *
+     * @return {MappingAttrInfo} The created generic measure discriminator.
+     * @private
      */
-    _addGenericMeasureDiscriminator: function() {
+    _createGenericMeasureDiscriminator: function() {
       // In which of the discrete axes should we add the discriminator to?
       // To the first whose defaultRole is mapped to a ccc dim group.
       // (not all vizs have/use both axis; see Pie chart, for example).
-      var roleToCccDimGroup = this._roleToCccDimGroup,
-          attrInfo = tryCreateInAxis("column") || tryCreateInAxis("row") ||
+      var me = this;
+      var roleToCccVisualRole = this._roleToCccRole;
+      return tryCreateInAxis("column") || tryCreateInAxis("row") ||
             def.assert("Need a mapped discrete axis to hold the measure discriminator.");
-
-      this.measureDiscrimGem = attrInfo;
-
-      def.array.lazy(this._visualMapInfo, attrInfo.role).push(attrInfo);
-
-      this._gemsMap[attrInfo.name] = attrInfo;
 
       // ----
 
       function tryCreateInAxis(axisId) {
         // DefaultRole of axis
         var roleName = axisId + "s";
-
-        var cccDimGroup = def.getOwn(roleToCccDimGroup, roleName);
-        return cccDimGroup && createAttributeInfo(axisId, roleName, cccDimGroup);
+        var cccRoleName = def.getOwn(roleToCccVisualRole, roleName);
+        if(cccRoleName)
+          return createAttributeInfo(axisId, roleName, cccRoleName);
       }
 
-      function createAttributeInfo(axisId, roleName, cccDimGroup) {
-        // Has no data table attribute to map to.
+      function createAttributeInfo(axisId, roleName, cccRoleName) {
         return {
-          attr: null,
-          name: "__MeasureDiscrim__",
-          label: "Measure discriminator",
+          name: me.GENERIC_MEASURE_DISCRIM_DIM_NAME,
+          label: "Generic Measure Discriminator",
           role: roleName,
-          cccDimGroup: cccDimGroup,
-          cccDimName: undefined,
+          mapping: null,
+          mappingAttr: null,
+          attr: null,
+          isPercent: false,
+          cccRole: cccRoleName,
           axis: axisId,
-          isMeasureGeneric: false,
           isMeasureDiscrim: true
         };
       }
     },
 
-    _initAxes: function(axesGemsInfo) {
+    _getAttributeCccValueType: function(attr) {
+      /* eslint default-case: 0 */
+      switch(attr.type) {
+        case "string": return String;
+        case "number": return Number;
+        case "date": return Date;
+      }
+      return null; // any
+    },
+
+    _initAxes: function(mappingAttrInfosByAxisId) {
       // 1. Create axes.
 
       // axisId -> Axis
@@ -686,30 +808,24 @@ define([
 
       // Order is not relevant.
       this._axesIds.forEach(function(axisId) {
-        this.axes[axisId] = Axis.create(this, axisId, axesGemsInfo[axisId]);
+        this.axes[axisId] = Axis.create(this, axisId, mappingAttrInfosByAxisId[axisId]);
       }, this);
 
       // 2. Ensure we have a plain data table
       // TODO: with nulls preserved, because of order...
       this._dataView = this._dataTable.toPlainTable();
 
-      // 3. Remove _unmapped_ attributes and reorder attributes of the plain data table.
+      // 3. Hide columns not bound to visual roles and reorder attributes of the plain data table.
       this._transformData();
 
-      // 4. Assign a CCC dimension name to each attribute info.
-      this._assignCccDimensions();
-
-      // 5. Configure CCC readers
-      this._configureCccReaders();
-
-      // 6. Determine if there are any multi-chart playing roles
+      // 4. Determine if there are any multi-chart playing roles
       // (ignoring the measure discrim, if any)
+      // TODO: refactor this check by using the model directly? Would not need to account for measure discrim...
       var hasMulti = false;
       if(this._multiRole) {
-        var mais = this._getAttributeInfosOfRole(this._multiRole);
-        if(mais)
-          hasMulti = !this.measureDiscrimGem ||
-            mais.some(function(mai) { return !mai.isMeasureDiscrim; });
+        var maInfos = this._getMappingAttrInfosByRole(this._multiRole);
+        if(maInfos)
+          hasMulti = !this._isGenericMeasureMode || maInfos.some(function(maInfo) { return !maInfo.isMeasureDiscrim; });
       }
       this._hasMultiChartColumns = hasMulti;
     },
@@ -720,102 +836,92 @@ define([
      * Gets array of _mapped_ column indexes of the plain table to set in a data view.
      *
      * Column reordering serves two purposes:
-     * 1. All generic measures are placed last to satisfy the crosstab/generic measure discriminator scenario
+     * 1. All generic measures are placed last to satisfy the cross-tab/generic measure discriminator scenario
      * 2. All measures are placed last so that CCC doesn't reorder the "logical row", discrete columns first
-     */
-    _transformData: function() {
-      var mappedColumnIndexesDiscrete = [],
-          mappedColumnIndexesContinuous = [],
-          C = this._dataView.getNumberOfColumns(),
-          j = -1;
-
-      while(++j < C) {
-        var ai = this._getAttributeInfoByName(this._dataView.getColumnAttribute(j).name);
-        if(ai) {
-          if(ai.attr.isDiscrete)
-            mappedColumnIndexesDiscrete.push(j);
-          else
-            mappedColumnIndexesContinuous.push(j);
-        }
-      }
-
-      this._dataView = new DataView(this._dataView);
-      this._dataView.setSourceColumns(mappedColumnIndexesDiscrete.concat(mappedColumnIndexesContinuous));
-
-      // Set CCC cross-tab mode and categories count
-      // for proper logical row construction.
-      if((this.options.crosstabMode = !!this.measureDiscrimGem)) {
-        this.options.dataCategoriesCount = mappedColumnIndexesDiscrete.length;
-      } else {
-        // Not relevant, as every position is mapped in readers,
-        // and this only serves to split discrete columns among
-        // series and categories.
-        this.options.dataCategoriesCount = null;
-      }
-    },
-
-    /**
-     * Assign a CCC dimension name to each attribute info.
      *
-     * (CCC Dim Group)     1-->oo     (Role)     1-->oo    (AttributeInfo)
-     *                       |                     |
-     *               rolesByCccDimGroup       visualMapInfo
-     */
-    _assignCccDimensions: function() {
-      var rolesByCccDimGroup = this._getRolesByCccDimGroup(),
-          visualMapInfo = this._visualMapInfo,
-          hasGenericDiscrim = !!this.measureDiscrimGem,
-          genericCccDimName = this._genericMeasureCccDimName;
-
-      Object.keys(rolesByCccDimGroup).forEach(function(cccDimGroup) {
-        var isGenericGroup = hasGenericDiscrim && (cccDimGroup === genericCccDimName),
-            ordinal = 0;
-
-        rolesByCccDimGroup[cccDimGroup].forEach(function(roleName) {
-          // Role may be unbound.
-          var ais = def.getOwn(visualMapInfo, roleName);
-          if(ais) ais.forEach(function(ai) {
-            /* jshint laxbreak:true*/
-            ai.cccDimName = isGenericGroup
-              ? cccDimGroup
-              : pvc.buildIndexedId(cccDimGroup, ordinal++);
-          });
-        });
-      });
-    },
-
-    /**
+     * Specifies readers (and measuresIndexes and dataCategoriesCount)
+     * because this is the only way to bind specific columns to arbitrary, specific dimensions.
      * With all the plain table transformations in place,
      * and apart from the measure discriminator,
      * which always takes the first position in CCC's logical row,
-     * the CCC mapping is 1-1.
+     * the CCC readers mapping is 1-1.
      */
-    _configureCccReaders: function() {
-      var readers = this.options.readers,
-          dataView = this._dataView,
-          C = dataView.getNumberOfColumns(),
-          j = -1,
-          hasGenericReader = false,
-          attrName, ai;
+    _transformData: function() {
+      // For DataView source columns
+      var categoriesSourceIndexes = [];
+      var measuresSourceIndexes   = [];
 
-      if(this.measureDiscrimGem)
-        readers.push(this.measureDiscrimGem.cccDimName);
+      // For CCC readers
+      var categoriesDimNames = [];
+      var measuresDimNames   = [];
 
-      while(++j < C) {
-        attrName = dataView.getColumnAttribute(j).name;
-        ai = this._getAttributeInfoByName(attrName);
-        if(ai.isMeasureGeneric) {
-          // All generic measure columns are collapsed into a single measure dimension.
-          if(hasGenericReader) continue;
-          hasGenericReader = true;
-        }
-        readers.push(ai.cccDimName);
+      // If there are generic measures, then the cross-tab format is used.
+      if(this._isGenericMeasureMode) {
+        this.options.crosstabMode  = true;
+        this.options.isMultiValued = false;
+
+        categoriesDimNames.push(this.GENERIC_MEASURE_DISCRIM_DIM_NAME);
+
+        this._mappingAttrInfos.forEach(function(maInfo) {
+          if(maInfo.attr) {
+            var sourceIndexes = maInfo.isMeasureGeneric ? measuresSourceIndexes : categoriesSourceIndexes;
+            sourceIndexes.push(maInfo.attr.ordinal);
+
+            if(!maInfo.isMeasureDiscrim && !maInfo.isMeasureGeneric) {
+              categoriesDimNames.push(maInfo.cccDimName);
+            }
+          }
+        });
+
+        measuresDimNames.push(this.GENERIC_MEASURE_DIM_NAME);
+      } else {
+        // The use of the relational translator with the following options
+        // is the most reliable way to "control" the translator code and avoid unexpected shuffling of columns
+        this.options.crosstabMode = false;
+        this.options.isMultiValued = true;
+
+        this._mappingAttrInfos.forEach(function(maInfo) {
+          if(maInfo.attr) {
+            var sourceIndexes;
+            var dimNames;
+
+            if(maInfo.attr.type === "number") {
+              sourceIndexes = measuresSourceIndexes;
+              dimNames = measuresDimNames;
+            } else {
+              sourceIndexes = categoriesSourceIndexes;
+              dimNames = categoriesDimNames;
+            }
+
+            sourceIndexes.push(maInfo.attr.ordinal);
+            dimNames.push(maInfo.cccDimName);
+          }
+        });
+
+        // The already mapped data view indexes of measures.
+        var i = categoriesSourceIndexes.length;
+        var C = measuresSourceIndexes.length;
+        var afterMappingColumnIndexesMeasures = [];
+        while(C--) afterMappingColumnIndexesMeasures.push(i++);
+
+        this.options.measuresIndexes = afterMappingColumnIndexesMeasures;
+
+        // dataCategoriesCount is sort of irrelevant in this case, but it is set anyway, J.I.C.
+        // It is only used to split discrete columns among series and categories
+        // which, because readers are fully specified, does not affect the mapping.
       }
+
+      this._dataView = new DataView(this._dataView);
+      this._dataView.setSourceColumns(categoriesSourceIndexes.concat(measuresSourceIndexes));
+
+      this.options.dataCategoriesCount = categoriesSourceIndexes.length;
+
+      this.options.readers = categoriesDimNames.concat(measuresDimNames);
     },
 
     _configure: function() {
-      var options = this.options,
-          model   = this.model;
+      var options = this.options;
+      var model   = this.model;
 
       var colorScaleKind = this._getColorScaleKind();
       if(colorScaleKind)
@@ -853,8 +959,8 @@ define([
     },
 
     _configureColor: function(colorScaleKind) {
-      var options = this.options,
-          model = this.model;
+      var options = this.options;
+      var model = this.model;
 
       switch(colorScaleKind) {
         case "discrete":
@@ -879,8 +985,8 @@ define([
     _getDiscreteColorsCore: function() {
       var colorMap = this._getDiscreteColorMap();
       if(colorMap) {
-        var defaultScale = pv.colors(this._getDefaultDiscreteColors()),
-            scaleFactory = this._createDiscreteColorMapScaleFactory(colorMap, defaultScale);
+        var defaultScale = pv.colors(this._getDefaultDiscreteColors());
+        var scaleFactory = this._createDiscreteColorMapScaleFactory(colorMap, defaultScale);
 
         // Make sure the scales returned by scaleFactory
         // "are like" pv.Scale - have all the necessary methods.
@@ -902,34 +1008,34 @@ define([
       //     the color role.
       // 2 - When a measure discrim is used and there is only one measure, the CCC dim name of the discriminator is
       //      not of the "series" group; so in this case, there's no discriminator in the key.
-      var colorGems = this._getDiscreteColorGems(),
-          C = colorGems.length,
-          M = this._genericMeasuresCount,
-          colorMap;
+      var colorMAInfos = this._getDiscreteColorMappingAttrInfos();
+      var C = colorMAInfos.length;
+      var M = this._genericMeasuresCount;
+      var colorMap;
 
       // Possible to create colorMap based on memberPalette?
       if(C || M) {
         if(!C || M > 1) {
           // Use measure colors.
-          // More than one measure gem or no color gems.
+          // More than one measure MappingAttributeInfo or no color MappingAttributeInfos.
           // var keyIncludesMeasureDiscriminator = M > 1 && C > 0;
-          // When the measure discriminator exists, it is the last gem.
+          // When the measure discriminator exists, it is the last MappingAttributeInfo.
           colorMap = this._copyColorMap(null, memberPalette["[Measures].[MeasuresLevel]"]);
         } else {
           // If C > 0, Pie chart always ends up here...
           // Use the members' colors of the last color attribute.
-          colorMap = this._copyColorMap(null, memberPalette[colorGems[C - 1].name]);
+          colorMap = this._copyColorMap(null, memberPalette[colorMAInfos[C - 1].attr.name]);
         }
       }
 
       return colorMap;
     },
 
-    _getDiscreteColorGems: function() {
+    _getDiscreteColorMappingAttrInfos: function() {
       /* jshint laxbreak:true*/
-      var colorAttrInfos = this._getVisualMapInfo()[this._discreteColorRole];
+      var colorAttrInfos = this._getMappingAttrInfosByRole(this._discreteColorRole);
       return colorAttrInfos
-          ? colorAttrInfos.filter(function(attrInfo) { return !attrInfo.isMeasureDiscrim; })
+          ? colorAttrInfos.filter(function(mappingAttrInfo) { return !mappingAttrInfo.isMeasureDiscrim; })
           : [];
     },
 
@@ -988,8 +1094,8 @@ define([
       return function scaleFactory() {
         return function(compKey) {
           if(compKey) {
-            var keys = compKey.split("~"),
-              key = keys[keys.length - 1];
+            var keys = compKey.split("~");
+            var key = keys[keys.length - 1];
             return colorMap[key] || defaultScale(key);
           }
         };
@@ -1008,8 +1114,8 @@ define([
     // endregion
 
     _configureTrends: function() {
-      var options = this.options,
-          model = this.model;
+      var options = this.options;
+      var model = this.model;
 
       var trendType = (this._supportsTrends ? model.trendType : null) || "none";
       switch(trendType) {
@@ -1061,14 +1167,15 @@ define([
       }
 
       // Attribute/dimension-level format info
-      // var ais = this._getAttributeInfosOfRole(measureRole);
       var dims = this.options.dimensions;
 
       // 1. Handle all mapped, non-generic measure attributes
-      def.query(Object.keys(this._gemsMap))
-        .select(function(attrName) { return this._gemsMap[attrName]; }, this)
-        .where(function(ai) { return !!ai.attr && !ai.attr.isDiscrete && !ai.isMeasureGeneric; })
-        .each(setFormatInfo);
+      def.query(Object.keys(this._mappingAttrInfoByName))
+        .select(function(attrName) { return this._mappingAttrInfoByName[attrName]; }, this)
+        .where(function(maInfo) {
+          return !!maInfo.attr && !maInfo.attr.isDiscrete && (!this._isGenericMeasureMode || !maInfo.isMeasureGeneric);
+        }, this)
+        .each(setCccDimFormatInfo);
 
       // 2. Handle generic measure dimension name, if any.
       //    As there are multiple measure attributes in a single CCC dimension,
@@ -1076,32 +1183,29 @@ define([
       //    only the format of the first of these can be specified.
       //    Also, note, there may be more than one generic measure role,
       //    so only the first attribute of the first bound generic measure role is used...
-      if(this.measureDiscrimGem) {
+      if(this._isGenericMeasureMode) {
         // e.g.
-        // _genericMeasureCccDimName = "value"
         // roles:
         //   "measures":     unbound
         //   "measuresLine": "sales", "quantity"
-        var genericRoleNames = this._getRolesByCccDimGroup()[this._genericMeasureCccDimName],
-            firstAi = def.query(genericRoleNames)
-              .selectMany(this._getAttributeInfosOfRole, this)
-              .first(def.notNully);
-        if(firstAi) setFormatInfo(firstAi);
+        var firstMappingAttrInfo = this._selectGenericMeasureMappingAttrInfos().first();
+        if(firstMappingAttrInfo) setCccDimFormatInfo(firstMappingAttrInfo);
       }
 
       // ---
 
-      function setFormatInfo(ai) {
-        var format = ai.attr.format,
-            mask = format && format.number && format.number.mask;
-        if(mask) def.lazy(dims, ai.cccDimName).format = mask;
+      function setCccDimFormatInfo(maInfo) {
+        var format = maInfo.attr.format;
+        var mask = format && format.number && format.number.mask;
+        if(mask) def.lazy(dims, maInfo.cccDimName).format = mask;
       }
     },
 
     // region LABELS
     _configureLabels: function(options, model) {
-      var valuesAnchor = model.labelsOption,
-          valuesVisible = !!valuesAnchor && valuesAnchor !== "none";
+      var valuesAnchor = model.labelsOption;
+      var valuesVisible = !!valuesAnchor && valuesAnchor !== "none" &&
+            !!def.get(this._validExtensionOptions, "valuesVisible", true);
 
       options.valuesVisible = valuesVisible;
       if(valuesVisible) {
@@ -1117,8 +1221,8 @@ define([
     },
 
     _configureLabelsAnchor: function(options, model) {
-      var valuesAnchor = model.labelsOption,
-          simpleCamelCase = /(^\w+)([A-Z])(\w+)/;
+      var valuesAnchor = model.labelsOption;
+      var simpleCamelCase = /(^\w+)([A-Z])(\w+)/;
 
       var match = simpleCamelCase.exec(valuesAnchor);
       if(match != null) {
@@ -1141,7 +1245,7 @@ define([
       }
 
       // Very small charts can't be dominated by text...
-      //options.axisSizeMax = '30%';
+      // options.axisSizeMax = '30%';
 
       var titleFont = util.defaultFont(options.titleFont, 12);
       if(titleFont && !(/black|(\bbold\b)/i).test(titleFont))
@@ -1163,7 +1267,8 @@ define([
     },
 
     _getTooltipText: function(complex, context) {
-      var tooltipLines = [], msg;
+      var tooltipLines = [];
+      var msg;
 
       this._axesIds.forEach(function(axisId) {
         this.axes[axisId].buildHtmlTooltip(tooltipLines, complex, context);
@@ -1171,15 +1276,15 @@ define([
 
       if(!complex.isVirtual) {
         // TODO: container double click tooltip
-        //msg = this._vizHelper.getDoubleClickTooltip();
+        // msg = this._vizHelper.getDoubleClickTooltip();
         if(msg) tooltipLines.push(msg);
       }
 
       /* Add selection information */
       // Not the data point count, but the selection count (a single column selection may select many data points).
-      //var selectedCount = this._chart && this._chart.data.selectedCount();
-      var selections = this._selections,
-          selectedCount = selections && selections.length;
+      // var selectedCount = this._chart && this._chart.data.selectedCount();
+      var selections = this._selections;
+      var selectedCount = selections && selections.length;
       if(selectedCount) {
         var msgId = selectedCount === 1 ? "tooltip.footer.selectedOne" : "tooltip.footer.selectedMany";
 
@@ -1195,7 +1300,7 @@ define([
     // region LEGEND
     _isLegendVisible: function() {
       var colorRole = this._discreteColorRole;
-      return !!colorRole && this._getRoleDepth(colorRole, /*includeMeasureDiscrim:*/true) > 0;
+      return !!colorRole && this._getRoleDepth(colorRole, /* includeMeasureDiscrim: */true) > 0;
     },
 
     _configureLegend: function() {
@@ -1203,8 +1308,8 @@ define([
 
       options.legendFont = util.defaultFont(options.legendFont, 10);
 
-      var legendPosition = options.legendPosition,
-          isTopOrBottom = legendPosition === "top" || legendPosition === "bottom";
+      var legendPosition = options.legendPosition;
+      var isTopOrBottom = legendPosition === "top" || legendPosition === "bottom";
 
       if(this._hasMultiChartColumns && !isTopOrBottom) {
         options.legendAlignTo = "page-middle";
@@ -1216,7 +1321,7 @@ define([
         // to separate the legend from the content area.
         var legendMargins = options.legendMargins;
         if(legendMargins) {
-          if(typeof(legendMargins) !== "object")
+          if(typeof legendMargins !== "object")
             legendMargins = options.legendMargins = {all: legendMargins};
         } else {
           legendMargins = options.legendMargins = {};
@@ -1342,6 +1447,7 @@ define([
             memo.push(operand);
           }
         }
+
         return memo;
       }.bind(this), []);
 
@@ -1362,17 +1468,17 @@ define([
       var selectionsKept = selections;
 
       // limit selection
-      var filterSelectionMaxCount = Infinity, //deselectCount > 0 always false
-          L = selections.length,
-          deselectCount = L - filterSelectionMaxCount;
+      var filterSelectionMaxCount = Infinity; // deselectCount > 0 always false
+      var L = selections.length;
+      var deselectCount = L - filterSelectionMaxCount;
       if(deselectCount > 0) {
         // Build a list of datums to deselect
         var deselectDatums = [];
         selectionsKept = [];
 
         for(var i = 0; i < L; i++) {
-          var selection = selections[i],
-              keep = true;
+          var selection = selections[i];
+          var keep = true;
           if(deselectCount) {
             if(this._previousSelectionKeys) {
               var key = this._getSelectionKey(selection);
@@ -1403,6 +1509,7 @@ define([
         this._chart.updateSelections();
 
         if(typeof alert !== "undefined") {
+          /* eslint no-alert: 0 */
           alert([
             "infoExceededMaxSelectionItems",
             filterSelectionMaxCount,
@@ -1482,5 +1589,5 @@ define([
       return this.base(name, instSpec, classSpec, keyArgs);
     }
   })
-    .implement(ViewDemo);
+  .implement(ViewDemo);
 });

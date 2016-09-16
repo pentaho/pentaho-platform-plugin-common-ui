@@ -15,83 +15,46 @@
  */
 define([
   "module",
-  "../categoricalContinuousAbstract/model",
+  "../pointAbstract/model",
   "pentaho/i18n!../abstract/i18n/model",
-  "../abstract/types/labelsOption",
   "../abstract/types/shape",
   "../abstract/types/lineWidth",
-  "../abstract/mixins/trendType",
-  "../abstract/mixins/settingsMultiChartType",
-  "../abstract/mixins/interpolationType"
-], function(module, categoricalContinuousAbstractFactory, bundle, labelsOptionFactory, shapeFactory, lineWidthFactory,
-    trendType, settingsMultiChartType, interpolationType) {
+  "../abstract/mixins/trendType"
+], function(module, pointAbstractFactory, bundle, shapeFactory, lineWidthFactory, trendType) {
 
   "use strict";
 
   return function(context) {
 
-    var CategoricalContinuousAbstract = context.get(categoricalContinuousAbstractFactory);
+    var PointAbstract = context.get(pointAbstractFactory);
 
-    return CategoricalContinuousAbstract.extend({
+    return PointAbstract.extend({
+      type: {
+        sourceId: module.id,
+        id: module.id.replace(/.\w+$/, ""),
+        v2Id: "ccc_line",
+        category: "linechart",
+        defaultView: "./View",
+        props: [
+          {
+            name: "lineWidth",
+            type: lineWidthFactory,
+            isApplicable: function() { return this.count("measures") > 0; },
+            isRequired: true,
+            value: 1
+          },
+          {
+            name: "shape",
+            type: shapeFactory,
+            isRequired: true,
+            value: "circle"
+          }
+        ]
+      }
 
-        type: {
-          sourceId: module.id,
-          id: module.id.replace(/.\w+$/, ""),
-          v2Id: "ccc_line",
-          category: "linechart",
-          defaultView: "./View",
-
-          props: [
-            {
-              name: "columns", //VISUAL_ROLE
-              type: "pentaho/visual/role/ordinal",
-              ordinal: 6
-            },
-            {
-              name: "measures", //VISUAL_ROLE
-              type: {
-                props: {attributes: {isRequired: true}}
-              },
-              ordinal: 7
-            },
-            {
-              name: "multi", //VISUAL_ROLE
-              type: "pentaho/visual/role/ordinal",
-              ordinal: 10
-            },
-
-            {
-              name: "lineWidth",
-              type: lineWidthFactory,
-              isApplicable: function() { return this.count("measures") > 0; },
-              isRequired: true,
-              value: 1
-            },
-            {
-              name: "shape",
-              type: shapeFactory,
-              isRequired: true,
-              value: "circle"
-            },
-            {
-              name: "labelsOption",
-              type: {
-                base: labelsOptionFactory,
-                domain: ["none", "center", "left", "right", "top", "bottom"]
-              },
-              isRequired: true,
-              value: "none"
-            }
-          ]
-        }
-
-      })
-      .implement({type: trendType})
-      .implement({type: bundle.structured["trendType"]})
-      .implement({type: settingsMultiChartType})
-      .implement({type: bundle.structured["settingsMultiChart"]})
-      .implement({type: interpolationType})
-      .implement({type: bundle.structured["interpolation"]})
-      .implement({type: bundle.structured["line"]});
+    })
+    .implement({type: trendType})
+    .implement({type: bundle.structured.trendType})
+    .implement({type: bundle.structured.line});
   };
 });

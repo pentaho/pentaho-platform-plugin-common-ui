@@ -23,16 +23,16 @@ define([
   "use strict";
 
   return AbstractAxis.extend({
-    _nonMultiGemFilter: function(gem) {
-      return gem.role !== this.chart._multiRole;
+    _nonMultiMappingAttrInfoFilter: function(maInfo) {
+      return maInfo.role !== this.chart._multiRole;
     },
 
-    _isNullMember: function(complex, gem) {
-      var atom = complex.atoms[gem.cccDimName];
+    _isNullMember: function(complex, maInfo) {
+      var atom = complex.atoms[maInfo.cccDimName];
       return util.isNullMember(atom.value);
     },
 
-    _buildGemHtmlTooltip: function(lines, complex, context, gem, index) {
+    _buildMappingAttrInfoHtmlTooltip: function(lines, complex, context, maInfo, index) {
       /*
        * Multi-chart formulas are not shown in the tooltip
        * They're on the small chart's title.
@@ -42,8 +42,8 @@ define([
        * Using the scene's group, preferably, because the datum (here the complex) may have dimensions
        * that are null in the groups' own atoms.
        */
-      if(this._nonMultiGemFilter(gem) &&
-         !(this.chart._hideNullMembers && this._isNullMember(context.scene.group || complex, gem))) {
+      if(this._nonMultiMappingAttrInfoFilter(maInfo) &&
+         !(this.chart._hideNullMembers && this._isNullMember(context.scene.group || complex, maInfo))) {
         this.base.apply(this, arguments);
       }
     },
@@ -54,14 +54,14 @@ define([
       var context = this.chart.context;
       var IsEqual;
 
-      this.getSelectionGems().each(function(gem) {
-        var atom = complex.atoms[gem.cccDimName];
+      this.getSelectionMappingAttrInfos().each(function(maInfo) {
+        var atom = complex.atoms[maInfo.cccDimName];
         var value = atom.value == null ? atom.rawValue : atom.value;
 
         if(value != null) {
           if(!IsEqual) IsEqual = context.get("pentaho/type/filter/isEqual");
 
-          var operand = new IsEqual({property: gem.name, value: {_: "string", v: value}});
+          var operand = new IsEqual({property: maInfo.name, value: {_: "string", v: value}});
           filter = filter ? filter.and(operand) : operand;
         }
       });
@@ -69,9 +69,9 @@ define([
       return filter;
     },
 
-    getSelectionGems: function() {
-      return def.query(this.gems)
-          .where(function(gem) { return !gem.isMeasureDiscrim; }, this);
+    getSelectionMappingAttrInfos: function() {
+      return def.query(this.mappingAttrInfos)
+          .where(function(maInfo) { return !maInfo.isMeasureDiscrim; }, this);
     }
   });
 });

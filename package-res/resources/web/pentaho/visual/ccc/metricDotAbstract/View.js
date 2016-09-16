@@ -32,7 +32,7 @@ define([
     },
 
     /* Override Default map */
-    _roleToCccDimGroup: {
+    _roleToCccRole: {
       "multi": "multiChart",
       "rows": "category",
       "x": "x",
@@ -50,11 +50,7 @@ define([
     },
 
     _isColorDiscrete: function() {
-      var levelEffective = this.model.color.levelEffective;
-      if(levelEffective) {
-        var MeasurementLevel = this.model.type.context.get(levelFactory);
-        return MeasurementLevel.type.isQualitative(levelEffective);
-      }
+      if(this.model.color.isMapped) return this._isRoleQualitative("color");
     },
 
     _getColorScaleKind: function() {
@@ -67,17 +63,8 @@ define([
 
       this.base();
 
-      this._configureAxisRange(/*isPrimary*/true,  "base" );
-      this._configureAxisRange(/*isPrimary*/false, "ortho");
-    },
-
-    _configureColor: function(colorScaleKind) {
-      this.base(colorScaleKind);
-
-      if(colorScaleKind === "discrete") {
-        // Must force the discrete type
-        this.options.dimensionGroups.color = {valueType: String};
-      }
+      this._configureAxisRange(/* isPrimary: */true, "base");
+      this._configureAxisRange(/* isPrimary: */false, "ortho");
     },
 
     _isLegendVisible: function() {
@@ -101,8 +88,8 @@ define([
 
       this.base();
 
-      this._configureAxisDisplayUnits(/*isPrimary*/true,  "base",  /*allowFractional*/true);
-      this._configureAxisDisplayUnits(/*isPrimary*/false, "ortho", /*allowFractional*/true);
+      this._configureAxisDisplayUnits(/* isPrimary: */true,  "base",  /* allowFractional: */true);
+      this._configureAxisDisplayUnits(/* isPrimary: */false, "ortho", /* allowFractional: */true);
     }
   });
 });

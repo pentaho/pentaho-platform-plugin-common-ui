@@ -14,21 +14,16 @@
  * limitations under the License.
  */
 define([
-  "../categoricalContinuousAbstract/View",
+  "../pointAbstract/View",
   "../trends"
-], function(AbstractCategoricalContinuousChart) {
+], function(PointAbstractChart) {
 
   "use strict";
 
-  return AbstractCategoricalContinuousChart.extend({
+  return PointAbstractChart.extend({
     _cccClass: "LineChart",
 
     _supportsTrends: true,
-
-    _options: {
-      axisOffset: 0,
-      tooltipOffset: 15
-    },
 
     _readUserOptions: function(options) {
       this.base.apply(this, arguments);
@@ -40,10 +35,6 @@ define([
         options.dotsVisible = true;
         options.dot_shape = shape;
       }
-    },
-
-    _setNullInterpolationMode: function(options, value) {
-      options.nullInterpolationMode = value;
     },
 
     _configureLegend: function() {

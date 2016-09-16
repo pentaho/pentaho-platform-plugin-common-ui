@@ -26,7 +26,7 @@ define([
   return AbstractChart.extend({
     _cccClass: "SunburstChart",
 
-    _roleToCccDimGroup: {
+    _roleToCccRole: {
       "multi": "multiChart",
       "rows": "category",
       "size": "size"
@@ -72,22 +72,23 @@ define([
 
         options.label_visible = function(scene) {
           // Only show the size label if the size-value label also fits
-          var pvLabel = this.pvMark,
-              ir = scene.innerRadius,
-              irmin = ir,
-              or = scene.outerRadius,
-              tm = pvLabel.textMargin(),
-              a = scene.angle, // angle span
-              m = pv.Text.measure(scene.vars.size.label, pvLabel.font()),
-              twMax;
+          var pvLabel = this.pvMark;
+          var ir = scene.innerRadius;
+          var irmin = ir;
+          var or = scene.outerRadius;
+          var tm = pvLabel.textMargin();
+          var a = scene.angle; // angle span
+          var m = pv.Text.measure(scene.vars.size.label, pvLabel.font());
+          var twMax;
 
           if(a < Math.PI) {
-            var th = m.height * 0.85, // tight text bounding box
-                // The effective height of text that must be covered.
-                // one text margin, for the anchor,
-                // half text margin for the anchor's opposite side.
-                // All on only one of the sides of the wedge.
-                thEf = 2 * (th + 3 * tm / 2);
+            var th = m.height * 0.85; // tight text bounding box
+
+            // The effective height of text that must be covered.
+            // one text margin, for the anchor,
+            // half text margin for the anchor's opposite side.
+            // All on only one of the sides of the wedge.
+            var thEf = 2 * (th + 3 * tm / 2);
 
             // Minimum inner radius whose straight-arc has a length `thEf`
             irmin = Math.max(irmin, thEf / (2 * Math.tan(a / 2)));
@@ -146,8 +147,8 @@ define([
       var displayUnits = this.model.displayUnits;
       var scaleFactor = displayUnitsType.scaleFactorOf(displayUnits);
       if(scaleFactor > 1) {
-        var dims = this.options.dimensions,
-            dimSize = dims.size || (dims.size = {});
+        var dims = this.options.dimensions;
+        var dimSize = dims.size || (dims.size = {});
 
         // Values returned by the server are already divided by scaleFactor.
         // The formatting, however is that of the original value.
@@ -179,16 +180,17 @@ define([
     _getDiscreteColorMap: function() {
       // Always return a color map, even if no fixed member colors exist.
       // This leads into creating the general #_createDiscreteColorMapScaleFactory color scale.
-      var colorMap = {}, memberPalette = this._getMemberPalette();
+      var colorMap = {};
+      var memberPalette = this._getMemberPalette();
       if(memberPalette) {
         // The color role, "rows" is required, so necessarily C > 0.
         // Also, there can be at most one measure gem, "size", so M <= 1.
         // Use member colors of all of the color attributes.
-        this._getDiscreteColorGems().forEach(function(colorGem) {
+        this._getDiscreteColorMappingAttrInfos().forEach(function(colorMAInfo) {
           // Copy map values to colorMap.
           // All color maps are joined together and there will be no
           // value collisions because the key is prefixed with the category.
-          var map = memberPalette[colorGem.name];
+          var map = memberPalette[colorMAInfo.name];
           if(map) this._copyColorMap(colorMap, map);
         }, this);
       }
@@ -206,7 +208,9 @@ define([
       return function scaleFactory() {
         return function(compKey) {
           if(compKey) {
-            var keys = compKey.split("~"), level = keys.length - 1, keyLevel = keys[level];
+            var keys = compKey.split("~");
+            var level = keys.length - 1;
+            var keyLevel = keys[level];
 
             // Obtain color for most specific key from color map.
             // If color map has no color and it is the 1st level,

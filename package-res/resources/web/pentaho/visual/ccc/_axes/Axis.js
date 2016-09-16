@@ -24,17 +24,17 @@ define([
 
     return {
         // Axis factory method
-        create: function(chart, axisId, gems, keyArgs) {
+        create: function(chart, axisId, mappingAttrInfos, keyArgs) {
             var AxisClass;
 
             switch(axisId) {
-                case "row":     AxisClass = RowAxis;     break;
-                case "column":  AxisClass = ColumnAxis;  break;
+                case "row": AxisClass = RowAxis; break;
+                case "column": AxisClass = ColumnAxis; break;
                 case "measure": AxisClass = MeasureAxis; break;
                 default: throw new Error("Undefined axis value '" + axisId + "'.");
             }
 
-            return new AxisClass(chart, axisId, gems, keyArgs);
+            return new AxisClass(chart, axisId, mappingAttrInfos, keyArgs);
         }
     };
 });
