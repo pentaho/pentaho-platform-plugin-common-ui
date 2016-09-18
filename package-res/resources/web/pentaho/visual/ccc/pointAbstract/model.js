@@ -35,6 +35,7 @@ define([
       type: {
         sourceId: module.id,
         id: module.id.replace(/.\w+$/, ""),
+        isAbstract: true,
         defaultView: "./View",
         props: [
           {
