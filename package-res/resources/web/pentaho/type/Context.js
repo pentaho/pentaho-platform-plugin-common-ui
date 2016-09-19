@@ -256,6 +256,8 @@ define([
      *     * [pentaho/type/list]{@link pentaho.type.List}
      *     * [pentaho/type/element]{@link pentaho.type.Element}
      *       * [pentaho/type/complex]{@link pentaho.type.Complex}
+     *         * [pentaho/type/application]{@link pentaho.type.Application}
+     *         * [pentaho/type/model]{@link pentaho.type.Model}
      *       * [pentaho/type/simple]{@link pentaho.type.Simple}
      *         * [pentaho/type/string]{@link pentaho.type.String}
      *         * [pentaho/type/number]{@link pentaho.type.Number}
@@ -351,7 +353,7 @@ define([
      * the instance constructors corresponding to
      * given type references.
      *
-     * The specified type references are each resolved synchonously,
+     * The specified type references are each resolved synchronously,
      * using [get]{@link pentaho.type.Context#get},
      * when the bound function is first called.
      * Thus, any resolve errors are only thrown then.

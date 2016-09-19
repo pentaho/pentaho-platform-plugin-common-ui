@@ -263,7 +263,7 @@ define([
         });
 
         it("should omit a property if its name is in keyArgs.omitProps with a true value", function() {
-          var spec = value.toSpecInContext({omitProps: {type: 1}});
+          var spec = value.toSpecInContext({omitProps: {type: true}});
 
           scope.dispose();
 

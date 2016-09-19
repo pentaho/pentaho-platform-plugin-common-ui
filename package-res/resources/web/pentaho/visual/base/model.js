@@ -16,7 +16,8 @@
 define([
   "module",
 
-  "pentaho/type/complex",
+  "pentaho/type/model",
+  "./application",
   "pentaho/lang/Event",
   "pentaho/type/filter/abstract",
   "pentaho/type/filter/or",
@@ -44,7 +45,8 @@ define([
   "../role/nominal",
   "../role/ordinal",
   "../role/quantitative"
-], function(module, complexFactory, Event, abstractFilterFactory, orFilterFactory, typeUtil, O,
+], function(module, modelFactory, visualApplicationFactory,
+            Event, abstractFilterFactory, orFilterFactory, typeUtil, O,
             error, F, UserError,
             selectionModes,
             WillSelect, DidSelect, RejectedSelect,
@@ -57,14 +59,14 @@ define([
 
   return function(context) {
 
-    var Complex = context.get(complexFactory);
+    var Model = context.get(modelFactory);
     var Mapping = context.get(mappingFactory);
 
     /**
      * @name Model
      * @memberOf pentaho.visual.base
      * @class
-     * @extends pentaho.type.Complex
+     * @extends pentaho.type.Model
      * @mixes pentaho.lang.EventSource
      * @abstract
      *
@@ -76,7 +78,7 @@ define([
      * @description Creates a visual model.
      * @param {pentaho.visual.base.spec.IModel} [modelSpec] A plain object containing the model specification.
      */
-    var Model = Complex.extend(/** @lends pentaho.visual.base.Model# */{
+    var VisualModel = Model.extend(/** @lends pentaho.visual.base.Model# */{
 
       constructor: function() {
 
@@ -270,11 +272,10 @@ define([
           var omitProps = keyArgs.omitProps;
           keyArgs.omitProps = omitProps = omitProps ? Object.create(omitProps) : {};
 
-          // TODO: Add keyword arguments to serialize data/interaction when desired.
-          // Only isJson serialization does not work with the values of these properties
-          // due to the circular dependencies they contain.
-
+          // Only isJson serialization does not work with the value of `data`
+          // due to the circular dependencies it contains.
           if(omitProps.data == null) omitProps.data = true;
+
           if(omitProps.selectionFilter == null) omitProps.selectionFilter = true;
         }
 
@@ -282,13 +283,29 @@ define([
       },
       // endregion
 
-      type:  /** @lends pentaho.visual.base.Model.Meta# */{
+      type: /** @lends pentaho.visual.base.Model.Meta# */{
         sourceId: module.id,
         id: module.id.replace(/.\w+$/, ""),
         defaultView: "./View",
         isAbstract: true,
 
         props: [
+          /**
+           * Gets or sets the visual application object.
+           *
+           * The application object represents the relevant state and
+           * interface of the application in which a model is being used.
+           *
+           * This property does not serialize to JSON by default.
+           *
+           * @name application
+           * @memberOf pentaho.type.Model#
+           * @type {pentaho.visual.base.Application}
+           */
+          {
+            name: "application",
+            type: visualApplicationFactory
+          },
           {
             name: "width",
             type: "number",
@@ -408,7 +425,7 @@ define([
             effective = null;
 
             var ancestor = this.ancestor;
-            if(ancestor.isSubtypeOf(Model.type)) {
+            if(ancestor.isSubtypeOf(VisualModel.type)) {
               var ancestorExtEf = ancestor.extensionEffective;
               if(ancestorExtEf) {
                 effective = {};
@@ -464,8 +481,8 @@ define([
         }
       }
     })
-      .implement({type: bundle.structured});
+    .implement({type: bundle.structured});
 
-    return Model;
+    return VisualModel;
   };
 });

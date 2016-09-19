@@ -141,6 +141,61 @@ define([
       },
 
       /**
+       * Gets whether the visual role is considered a visual key according to the mapping's current state.
+       *
+       * If the type does not specify [isVisualKey]{@link pentaho.visual.role.Mapping.Type#isVisualKey} or
+       * its evaluation results in a `null` value,
+       * a default value is determined, by the following rules:
+       *
+       * 1. Return `false` if the mapping is not [mapped]{@link pentaho.visual.role.Mapping#isMapped};
+       * 2. Return `true` if the mapping's [levelEffective]{@link pentaho.visual.role.Mapping#levelEffective}
+       *    is qualitative;
+       * 3. Return `true` if the mapping contains at least one attribute of a non-numeric type (like `date`).
+       * 4. Otherwise, return `false`.
+       *
+       * @type {boolean}
+       * @readOnly
+       */
+      get isVisualKey() {
+        var value = this.type.isVisualKeyEval(this);
+        if(value != null)
+          return value;
+
+        // Is the mapping [mapped]{@link pentaho.visual.role.Mapping#isMapped} and valid?
+        var level = this.levelEffective;
+        if(!level) return false;
+        if(!MeasurementLevel.type.isQuantitative(level)) return true;
+
+        // If a Date typed attribute is mapped, then default to being a visual key as well,
+        // cause date aggregations are harder to make sense of (and only the non-default AVG would apply).
+        return this._isMappedToNonRatioAttributes;
+      },
+
+      /**
+       * Gets a value that indicates if the visual role is mapped to at least one non-ratio measurement-level attribute.
+       *
+       * @type {boolean}
+       * @private
+       */
+      get _isMappedToNonRatioAttributes() {
+        var model = this.model;
+        var data;
+        var any = false;
+
+        if(model && (data = model.data) && this.isMapped) {
+          this.attributes.each(function(mappingAttr) {
+            var attr = data.model.attributes.get(mappingAttr.name);
+            if(attr && attr.type !== "number") {
+              any = true;
+              return false; // break;
+            }
+          });
+        }
+
+        return any;
+      },
+
+      /**
        * Gets the automatic measurement level.
        *
        * The automatic measurement level is determined based on the visual role's
@@ -181,8 +236,8 @@ define([
          * Downgrade from quantitative to any qualitative is possible.
          * Auto Level:    quantitative->ordinal
          */
-        var levelLowest = this._getAttributesMaxLevel();
-        if(levelLowest) return this._getRoleLevelCompatibleWith(levelLowest);
+        var attrsMaxLevel = this._getAttributesMaxLevel();
+        if(attrsMaxLevel) return this._getRoleLevelCompatibleWith(attrsMaxLevel);
       },
 
       /**
@@ -218,13 +273,13 @@ define([
        * @private
        */
       _getRoleLevelsCompatibleWith: function(attributeLevel, allRoleLevels) {
-        var isLowestQuant = MeasurementLevel.type.isQuantitative(attributeLevel);
+        var isMaxQuant = MeasurementLevel.type.isQuantitative(attributeLevel);
 
         // if attributeLevel is Quantitative, any role levels are compatible.
         // if attributeLevel is Qualitative,  **only qualitative** role levels are compatible.
 
         var roleLevels = allRoleLevels || this.type.levels.toArray();
-        if(!isLowestQuant) {
+        if(!isMaxQuant) {
           roleLevels = roleLevels.filter(function(level) {
             return !MeasurementLevel.type.isQuantitative(level);
           });
@@ -238,12 +293,16 @@ define([
        * Determines the highest level of measurement supported by all of the data properties
        * in mapping attributes.
        *
-       * Only attributes that satisfy the visual role's supported data types should be considered.
+       * Any attributes that aren't defined in the visual model's current data should be ignored.
+       * Defined attributes should be considered even if their data type is not compatible with the visual role's
+       * supported data types.
        *
        * When there are no attributes or when all attributes are invalid, `undefined` is returned.
-       * The level of measurement compatibility should not be considered by this method.
        *
-       * @return {string|undefined} The lowest level of measurement.
+       * This method should not care about whether the returned level of measurement
+       * is one of the supported visual role's measurement levels.
+       *
+       * @return {string|undefined} The highest level of measurement.
        * @protected
        */
       _getAttributesMaxLevel: function() {
@@ -258,20 +317,17 @@ define([
         // The lowest of the levels in attributes that are also supported by the visual role.
         var levelLowest;
 
-        var roleDataType = this.type.dataType;
         var dataAttrs = data.model.attributes;
         var i = -1;
-        var name, dataAttr;
+        var name;
+        var dataAttr;
         var dataAttrLevel;
-        var dataAttrType;
         while(++i < L) {
           var mappingAttr = mappingAttrs.at(i);
           if(!(name = mappingAttr.name) ||
-              !(dataAttr = dataAttrs.get(name)) ||
-              !(dataAttrLevel = dataAttr.level) ||
-              !MeasurementLevel.type.domain.get(dataAttrLevel) ||
-              !(dataAttrType = context.get(dataAttr.type).type) ||
-              !dataAttrType.isSubtypeOf(roleDataType))
+             !(dataAttr = dataAttrs.get(name)) ||
+             !(dataAttrLevel = dataAttr.level) ||
+             !MeasurementLevel.type.domain.get(dataAttrLevel))
             return; // invalid
 
           if(!levelLowest || MeasurementLevel.type.compare(dataAttrLevel, levelLowest) < 0)
@@ -336,7 +392,7 @@ define([
       },
 
       /**
-       * Validates the level attribute and that the levels of attributes are compatible with
+       * Validates the level property and that the levels of attributes are compatible with
        * the visual role's levels.
        *
        * @param {function} addErrors - Called to add errors.
@@ -387,7 +443,7 @@ define([
 
       /**
        * Validates that every mapped attribute references a defined data property in the
-       * data of the visual model and that its type is compatible with the visual role's dataType.
+       * data of the visual model and that its type is compatible with the visual role's `dataType`.
        *
        * Assumes the mapping is valid according to the base complex validation.
        *
@@ -412,26 +468,27 @@ define([
           var dataAttr = dataAttrs && dataAttrs.get(name);
           if(!dataAttr) {
             addErrors(new Error(
-                bundle.format(
-                    bundle.structured.errors.mapping.attributeIsNotDefinedInVisualModelData,
-                    {
-                      name: name,
-                      role: rolePropType
-                    })));
+              bundle.format(
+                bundle.structured.errors.mapping.attributeIsNotDefinedInVisualModelData,
+                {
+                  name: name,
+                  role: rolePropType
+                })));
             continue;
           }
 
+          // Attribute of an incompatible data type.
           var dataAttrType = context.get(dataAttr.type).type;
           if(!dataAttrType.isSubtypeOf(roleDataType)) {
             addErrors(new Error(
-                bundle.format(
-                    bundle.structured.errors.mapping.attributeDataTypeNotSubtypeOfRoleType,
-                    {
-                      name: name,
-                      dataType: dataAttrType,
-                      role: rolePropType,
-                      roleDataType: roleDataType
-                    })));
+              bundle.format(
+                bundle.structured.errors.mapping.attributeDataTypeNotSubtypeOfRoleType,
+                {
+                  name: name,
+                  dataType: dataAttrType,
+                  role: rolePropType,
+                  roleDataType: roleDataType
+                })));
           }
         }
       },
@@ -466,20 +523,20 @@ define([
             var message;
             if(isQuant) {
               message = bundle.format(
-                  bundle.structured.errors.mapping.attributeAndAggregationDuplicate,
-                  {
-                    name: dataAttr,
-                    aggregation: roleAttr.get("aggregation"),
-                    role: rolePropType
-                  });
+                bundle.structured.errors.mapping.attributeAndAggregationDuplicate,
+                {
+                  name: dataAttr,
+                  aggregation: roleAttr.get("aggregation"),
+                  role: rolePropType
+                });
 
             } else {
               message = bundle.format(
-                  bundle.structured.errors.mapping.attributeDuplicate,
-                  {
-                    name: dataAttr,
-                    role: rolePropType
-                  });
+                bundle.structured.errors.mapping.attributeDuplicate,
+                {
+                  name: dataAttr,
+                  role: rolePropType
+                });
             }
 
             addErrors(new Error(message));
@@ -740,8 +797,95 @@ define([
 
             this._dataType = newType;
           }
-        }
+        },
         // endregion
+
+        dynamicAttributes: {
+          /**
+           * Evaluates the value of the `isVisualKey` attribute on a given mapping instance of this type.
+           *
+           * This method is used by the instance-level
+           * [isVisualKey]{@link pentaho.visual.role.Mapping#isVisualKey} property and
+           * is not intended to be used directly.
+           *
+           * @name isVisualKeyEval
+           * @memberOf pentaho.visual.role.Mapping.Type#
+           * @param {pentaho.visual.role.Mapping} mapping - The mapping instance.
+           * @return {boolean} The evaluated value of the `isRequired` attribute.
+           *
+           * @ignore
+           */
+
+          /**
+           * Gets or sets a value that indicates if visual roles of this type are visual keys.
+           *
+           * ### This attribute is *Dynamic*
+           *
+           * When a _dynamic_ attribute is set to a function,
+           * it can evaluate to a different value for each mapping instance.
+           *
+           * When a _dynamic_ attribute is set to a value other than a function or a {@link Nully} value,
+           * its value is the same for every mapping instance.
+           *
+           * ### This attribute is *Monotonic*
+           *
+           * The value of a _monotonic_ attribute can change, but only in some, predetermined _monotonic_ direction.
+           *
+           * In this case, while a _visual role_'s `isVisualKey` attribute is `null`,
+           * it can later be marked as being either `true` or `false`.
+           * However, after a _visual role_'s `isVisualKey` is set or evaluates to either `true` or `false`,
+           * its value can no longer change.
+           *
+           * Because this attribute is also _dynamic_,
+           * the actual `isVisualKey` values are only known
+           * when evaluated for specific mapping instances.
+           * This behavior ensures that monotonic changes are deferred until evaluation.
+           * No errors are thrown; non-monotonic changes simply don't take effect.
+           *
+           * ### This attribute is *Inherited*
+           *
+           * When there is no _local value_, the _effective value_ of the attribute is the _inherited effective value_.
+           *
+           * The first set local value must respect the _monotonicity_ property with the inherited value.
+           *
+           * ### Other characteristics
+           *
+           * The value got by the attribute is the **last set local, value**, if any -
+           * a function, a constant value or `undefined`, when unset.
+           *
+           * When set to a {@link Nully} value, the set operation is ignored.
+           *
+           * When set and the property already has [descendant]{@link pentaho.type.Type#hasDescendants} properties,
+           * an error is thrown.
+           *
+           * The default (root) `isVisualKey` attribute value is `null`.
+           *
+           * When the result of evaluation is `null`,
+           * the ultimate `isVisualKey` value is determined
+           * by considering that [mapped]{@link pentaho.visual.role.Mapping#isMapped}
+           * mappings with a _qualitative_ effective measurement level are the visual keys.
+           *
+           * @name isVisualKey
+           * @memberOf pentaho.visual.role.Mapping.Type#
+           * @type undefined | boolean | pentaho.type.DynamicAttribute.<pentaho.visual.role.Mapping, boolean>
+           *
+           * @throws {pentaho.lang.OperationInvalidError} When setting and the type already has
+           * [descendant]{@link pentaho.type.Type#hasDescendants} types.
+           *
+           * @see pentaho.visual.role.Mapping#isVisualKey
+           */
+          isVisualKey: {
+            value: null,
+            cast:  Boolean,
+            combine: function(baseEval, localEval) {
+              return function() {
+                // localEval is skipped if base is true or false (not nully).
+                var value = baseEval.call(this);
+                return value != null ? value : localEval.call(this);
+              };
+            }
+          }
+        }
       }
     })
     .implement({type: bundle.structured.mapping});

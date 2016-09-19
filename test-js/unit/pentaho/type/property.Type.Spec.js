@@ -55,7 +55,7 @@ define([
         var typeSpec = {
           name: "a", label: "foo"
         };
-        
+
         var pType = propertyTypeUtil.createRoot(Complex.type, typeSpec);
 
         var baseType = pType.type;
@@ -566,6 +566,9 @@ define([
           }).toThrow(errorMatch.operInvalid());
         });
 
+        /* Not possible to do anymore since now, the default pre-loaded context
+           has derived complex classes with properties, and has thus already derived the
+           Property class...
         it("should not delete when set to undefined at Property.type", function() {
           // Must obtain a fresh Property such that hasDescendants is false.
           var context2 = new Context();
@@ -575,7 +578,8 @@ define([
 
           expect(Property2.type.hasOwnProperty("_value")).toBe(true);
         });
-      }); //end #value
+        */
+      }); // end #value
       // endregion
 
       // region Dynamic & Monotonic Attributes
@@ -1261,7 +1265,7 @@ define([
           var Property2 = context2.get("property")
                 .implement({
                   type: {
-                    _attrs: {
+                    dynamicAttributes: {
                       isFoo: {
                         value: false,
                         // cast: null. // <<---- no cast function

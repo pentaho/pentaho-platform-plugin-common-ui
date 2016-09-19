@@ -17,57 +17,57 @@ define([
   "pentaho/type/date",
   "pentaho/type/Context",
   "tests/pentaho/util/errorMatch"
-], function (dateFactory, Context, errorMatch) {
+], function(dateFactory, Context, errorMatch) {
 
   "use strict";
 
   /* global describe:true, it:true, expect:true, beforeEach:true*/
 
-  describe("pentaho.type.Date -", function () {
+  describe("pentaho.type.Date -", function() {
 
-    it("is a function", function () {
+    it("is a function", function() {
       expect(typeof dateFactory).toBe("function");
     });
 
-    describe("new Date()", function () {
+    describe("new Date()", function() {
       var PentahoDate;
 
-      beforeEach(function () {
+      beforeEach(function() {
         PentahoDate = dateFactory(new Context());
       });
 
-      it("should be a function", function () {
+      it("should be a function", function() {
         expect(typeof PentahoDate).toBe("function");
       });
 
-      it("should return an object", function () {
+      it("should return an object", function() {
         expect(typeof new PentahoDate(new Date())).toBe("object");
       });
 
-      it("should accept a javascript Date()", function () {
+      it("should accept a javascript Date()", function() {
         var today =  new Date();
         expect(new PentahoDate(today).value).toBe(today);
       });
 
-      it("should accept an ISO string", function () {
+      it("should accept an ISO string", function() {
         var testDate = new Date("1960-01-25");
         expect(new PentahoDate(testDate.toISOString()).value.toString()).toBe(testDate.toString());
       });
 
-      it("should not accept nothing", function () {
-        expect(function () {
+      it("should not accept nothing", function() {
+        expect(function() {
           var foo = new PentahoDate();
         }).toThrow(errorMatch.argRequired("value"));
       });
 
-      it("should not accept null", function () {
-        expect(function () {
+      it("should not accept null", function() {
+        expect(function() {
           var foo = new PentahoDate(null);
         }).toThrow(errorMatch.argRequired("value"));
       });
 
-      it("should not accept undefined", function () {
-        expect(function () {
+      it("should not accept undefined", function() {
+        expect(function() {
           var foo = new PentahoDate(undefined);
         }).toThrow(errorMatch.argRequired("value"));
       });
@@ -76,7 +76,7 @@ define([
     describe("#toJSON()", function() {
       var PentahoDate;
 
-      beforeEach(function () {
+      beforeEach(function() {
         PentahoDate = dateFactory(new Context());
       });
 

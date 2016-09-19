@@ -270,6 +270,7 @@ define([
             // Cannot change, or throws.
             O.setConst(this, "_name", value);
           } else {
+            /* eslint no-lonely-if: 0 */
             // Hierarchy consistency
             if(value && value !== this._name)
               throw new TypeError("Sub-properties cannot change the 'name' attribute.");
@@ -588,114 +589,6 @@ define([
           return errors;
         }, // endregion
 
-        // region dynamic & monotonic attributes
-        // Configuration support
-        /**
-         * Defines dynamic, monotonic, inherited attributes of the property type.
-         *
-         * This setter is used when the developer is extending Property to support new attributes.
-         *
-         * @type {Object}
-         * @ignore
-         */
-        set _attrs(attrSpecs) {
-          Object.keys(attrSpecs).forEach(function(name) {
-            this._dynamicMonotonicInheritedAttribute(name, attrSpecs[name]);
-          }, this);
-        }, // jshint -W078
-
-        /**
-         * Defines a "dynamic" attribute and corresponding setter and getter methods.
-         *
-         * This method is an implementation detail,
-         * and is invoked by {@link pentaho.type.Property.Type#_attrs}
-         *
-         * @param {String} name
-         * @param {Object} spec
-         * @private
-         * @ignore
-         */
-        _dynamicMonotonicInheritedAttribute: function(name, spec) {
-          var cast = spec.cast; // Monotonicity
-          // * minimum/default/neutral value
-          var dv = castAndNormalize(spec.value, cast, null); // * effective/monotone value function
-          var monotoneCombineEvals = spec.combine;
-          var namePriv = "_" + name;
-          var namePrivEval = namePriv + "Eval";
-          var root = this;
-
-          // Default value can be null.
-          root[namePriv] = dv;
-          root[namePrivEval] = F.constant(dv);
-
-          Object.defineProperty(root, name, {
-            /**
-             * Gets the _last_ set local value, or `undefined` if there hasn't been one.
-             * Only at eval time does inheritance and combination come into play and
-             * evaluate into an _effective_ value.
-             *
-             * @ignore
-             */
-            get: function() {
-              return O.getOwn(this, namePriv);
-            },
-
-            /**
-             * Combines a given value to the current local or inherited value.
-             * Note that getting the value of the attribute always returns just the last set local value.
-             *
-             * When given a {@link Nully} value, it has no effect.
-             *
-             * @ignore
-             */
-            set: function(value) {
-              // Cannot change the root value.
-              // Testing this here, instead of after the descendants test,
-              // because, otherwise, it would be very hard to test.
-              if(this === root) return;
-
-              if(this.hasDescendants)
-                throw error.operInvalid(
-                    "Cannot change the '" + name + "' attribute of a property type that has descendants.");
-
-              // Cannot reset, using null or undefined (but can have a null default),
-              //  cause it would break **monotonicity**.
-              if(value == null) return;
-
-              var fValue;
-              if(F.is(value)) {
-                fValue = value;
-                if(cast) fValue = wrapWithCast(fValue, cast, dv);
-              } else {
-                // When cast failure is found at static time, we ignore the local value.
-                value = castAndNormalize(value, cast, null);
-                if(value == null) return;
-
-                fValue = F.constant(value);
-              }
-
-              // Store the set value, so that get works consistently with set.
-              // When combining with a previous local value, what should be stored in
-              // this field? None is correct as the local value.
-              // We just store the last set value, but be warned.
-              this[namePriv] = value;
-
-              // Create the private evaluate method.
-              // Monotonicity requires using the inherited or previous value.
-              // `this` is not root, so an ancestor exists.
-              // Initially, there's no local namePrivEval,
-              //  so this[namePrivEval] evaluates to the ancestor namePrivEval.
-              // When ancestor is root, note that its namePrivEval is never null.
-              this[namePrivEval] = monotoneCombineEvals(this[namePrivEval], fValue);
-            }
-          });
-
-          // Handles passing the `owner` argument to the `this` context of the private eval method.
-          this[name + "Eval"] = function(owner) {
-            return this[namePrivEval].call(owner);
-          };
-        }, // endregion
-
         // region serialization
         toSpecInContext: function(keyArgs) {
           if(!keyArgs) keyArgs = {};
@@ -779,24 +672,10 @@ define([
           var any = this.base(spec, keyArgs);
 
           if(this !== _propType) {
-            var isJson = keyArgs.isJson;
-
             // Dynamic attributes
             _dynamicAttrNames.forEach(function(name) {
-              var namePriv = "_" + name;
-
-              if(O.hasOwn(this, namePriv)) {
-                var value = this[namePriv];
-                if(F.is(value)) {
-                  if(!isJson) {
-                    any = true;
-                    spec[name] = value.valueOf();
-                  }
-                } else {
-                  any = true;
-                  spec[name] = value;
-                }
-              }
+              if(this._fillSpecInContextDynamicAttribute(spec, name, keyArgs))
+                any = true;
             }, this);
 
             // Custom attributes
@@ -820,7 +699,7 @@ define([
       }
     }).implement({
       type: /** @lends pentaho.type.Property.Type# */{
-        _attrs: {
+        dynamicAttributes: {
           /**
            * Evaluates the value of the `isRequired` attribute of a property of this type
            * on a given complex value.
@@ -1313,28 +1192,9 @@ define([
     return value == null ? null : (String(value) || null);
   }
 
-  function wrapWithCast(fun, cast, dv) {
-    return function() {
-      var v = fun.apply(this, arguments);
-      return castAndNormalize(v, cast, dv);
-    };
-  }
-
   function castCount(v) {
     v = +v;
     if(isNaN(v) || v < 0) return;// undefined;
     return Math.floor(v);
-  }
-
-  function castAndNormalize(v, cast, dv) {
-    if(v == null) {
-      v = dv;
-    } else if(cast) {
-      v = cast(v, dv);
-      if(v == null)
-        v = dv;
-    }
-
-    return v;
   }
 });
