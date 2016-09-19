@@ -143,18 +143,56 @@ define([
       /**
        * Gets whether the visual role is considered a visual key according to the mapping's current state.
        *
+       * If the type does not specify [isVisualKey]{@link pentaho.visual.role.Mapping.Type#isVisualKey} or
+       * its evaluation results in a `null` value,
+       * a default value is determined, by the following rules:
+       *
+       * 1. Return `false` if the mapping is not [mapped]{@link pentaho.visual.role.Mapping#isMapped};
+       * 2. Return `true` if the mapping's [levelEffective]{@link pentaho.visual.role.Mapping#levelEffective}
+       *    is qualitative;
+       * 3. Return `true` if the mapping contains at least one attribute of a non-numeric type (like `date`).
+       * 4. Otherwise, return `false`.
+       *
        * @type {boolean}
        * @readOnly
        */
       get isVisualKey() {
         var value = this.type.isVisualKeyEval(this);
-        if(value == null) {
-          // By default, when there mapping is not [mapped]{@link pentaho.visual.role.Mapping#isMapped},
-          // `false` is returned.
-          var level = this.levelEffective;
-          value = !!level && !MeasurementLevel.type.isQuantitative(level);
+        if(value != null)
+          return value;
+
+        // Is the mapping [mapped]{@link pentaho.visual.role.Mapping#isMapped} and valid?
+        var level = this.levelEffective;
+        if(!level) return false;
+        if(!MeasurementLevel.type.isQuantitative(level)) return true;
+
+        // If a Date typed attribute is mapped, then default to being a visual key as well,
+        // cause date aggregations are harder to make sense of (and only the non-default AVG would apply).
+        return this._isMappedToNonRatioAttributes;
+      },
+
+      /**
+       * Gets a value that indicates if the visual role is mapped to at least one non-ratio measurement-level attribute.
+       *
+       * @type {boolean}
+       * @private
+       */
+      get _isMappedToNonRatioAttributes() {
+        var model = this.model;
+        var data;
+        var any = false;
+
+        if(model && (data = model.data) && this.isMapped) {
+          this.attributes.each(function(mappingAttr) {
+            var attr = data.model.attributes.get(mappingAttr.name);
+            if(attr && attr.type !== "number") {
+              any = true;
+              return false; // break;
+            }
+          });
         }
-        return value;
+
+        return any;
       },
 
       /**

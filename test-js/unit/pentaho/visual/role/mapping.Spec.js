@@ -53,13 +53,14 @@ define([
     function getDataSpec1() {
       return {
         model: [
-          {name: "country", type: "string", label: "Country"},
-          {name: "product", type: "string", label: "Product"},
-          {name: "sales",   type: "number", label: "Sales"  }
+          {name: "country",   type: "string", label: "Country"},
+          {name: "product",   type: "string", label: "Product"},
+          {name: "sales",     type: "number", label: "Sales"  },
+          {name: "date",      type: "date",   label: "Date"}
         ],
         rows: [
-          {c: ["Portugal", "fish", 100]},
-          {c: ["Ireland",  "beer", 200]}
+          {c: ["Portugal", "fish", 100, "2016-01-01"]},
+          {c: ["Ireland",  "beer", 200, "2016-01-02"]}
         ]
       };
     }
@@ -586,7 +587,13 @@ define([
         expect(mapping.isVisualKey).toBe(true);
       });
 
-      it("should be false for a mapped quantitative visual role, when not specified in the type", function() {
+      it("should be true for a mapped qualitative visual role with dates, when not specified in the type", function() {
+        var mapping = createFullValidQuantitativeMapping();
+        mapping.attributes.add(["date"]);
+        expect(mapping.isVisualKey).toBe(true);
+      });
+
+      it("should be false for a number-mapped visual role, when not specified in the type", function() {
         var mapping = createFullValidQuantitativeMapping();
         expect(mapping.isVisualKey).toBe(false);
       });
