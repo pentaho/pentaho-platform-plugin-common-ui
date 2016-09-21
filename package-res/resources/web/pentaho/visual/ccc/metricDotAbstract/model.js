@@ -71,7 +71,8 @@ define([
                   attributes: {
                     // TODO: countMax depends on whether data props are discrete or continuous...
                     countMax: function() {
-                      return this.levelEffective === "quantitative" ? 1 : null;
+                      var MeasurementLevel = this.type.context.get("pentaho/visual/role/level");
+                      return MeasurementLevel.type.isQuantitative(this.levelEffective) ? 1 : null;
                     }
                   }
                 }

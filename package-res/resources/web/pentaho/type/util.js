@@ -43,6 +43,32 @@ define([
   return /** @lends pentaho.type.Util# */{
 
     /**
+     * Obtains the container of the first reference, if any, of the given instance.
+     *
+     * @param {pentaho.type.Instance} inst The instance.
+     * @return {pentaho.type.Instance} The container of the first reference.
+     * @private
+     * @internal
+     */
+    _getFirstRefContainer: function(inst) {
+      var refs = inst.$references;
+      return refs && refs.length ? refs[0].container : null;
+    },
+
+    /**
+     * Obtains the property type of the first reference, if any, of the given instance.
+     *
+     * @param {pentaho.type.Instance} inst The instance.
+     * @return {pentaho.type.Property.Type} The property type of the first reference.
+     * @private
+     * @internal
+     */
+    _getFirstRefProperty: function(inst) {
+      var refs = inst.$references;
+      return refs && refs.length ? refs[0].property : null;
+    },
+
+    /**
      * Normalizes a validation errors result.
      *
      * @param {Nully|pentaho.type.ValidationError|Array.<!pentaho.type.ValidationError>} errors - An error,

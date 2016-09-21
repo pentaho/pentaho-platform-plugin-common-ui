@@ -50,14 +50,9 @@ define([
                   // If the mapping contains a single `number` attribute,
                   // consider it ordinal, and not quantitative as the base code does.
                   if(this.attributes.count === 1) {
-                    var model = this.model;
-                    var data;
-                    if(model && (data = model.data)) {
-                      var attrName = this.attributes.at(0).name;
-                      var attr = data.model.attributes.get(attrName);
-                      if(attr && attr.type === "number")
-                        return "ordinal";
-                    }
+                    var dataAttr = this.attributes.at(0).dataAttribute;
+                    if(dataAttr && dataAttr.type === "number")
+                      return "ordinal";
                   }
 
                   return this.base();

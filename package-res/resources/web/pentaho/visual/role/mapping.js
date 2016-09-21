@@ -81,7 +81,8 @@ define([
        * @see pentaho.type.List#setOwnership
        */
       get model() {
-        return this._getModelFromRefs(this.$references);
+        // TODO: Test it is a visual Model (cyclic dependency)
+        return typeUtil._getFirstRefContainer(this);
       },
 
       /**
@@ -91,24 +92,8 @@ define([
        * @type {pentaho.type.Property.Type}
        */
       get modelProperty() {
-        var refs = this.$references;
-        var model = this._getModelFromRefs(refs);
-        return model ? refs[0].property : null;
-      },
-
-      /**
-       * Gets the visual model from a given references list, if any, or `null`.
-       *
-       * @param {!pentaho.type.ReferenceList} refs - The references list.
-       *
-       * @return {pentaho.visual.base.Model} The model or `null`.
-       */
-      _getModelFromRefs: function(refs) {
-        if(refs && refs.length) {
-          // TODO: Test it is a visual Model (cyclic dependency)
-          return refs[0].container;
-        }
-        return null;
+        // TODO: Test it is a visual Model (cyclic dependency)
+        return typeUtil._getFirstRefProperty(this);
       },
 
       /**
