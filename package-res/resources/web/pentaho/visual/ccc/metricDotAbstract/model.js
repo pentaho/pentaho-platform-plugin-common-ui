@@ -75,6 +75,20 @@ define([
                       return MeasurementLevel.type.isQuantitative(this.levelEffective) ? 1 : null;
                     }
                   }
+                },
+                instance: {
+                  _getAttributesMaxLevel: function() {
+                    // If the mapping contains a single `date` attribute,
+                    // consider it ordinal, and not quantitative as the base code does.
+                    // Currently, CCC does not like dates in continuous color scales...
+                    if(this.attributes.count === 1) {
+                      var dataAttr = this.attributes.at(0).dataAttribute;
+                      if(dataAttr && dataAttr.type === "date")
+                        return "ordinal";
+                    }
+
+                    return this.base();
+                  }
                 }
               },
               ordinal: 6
