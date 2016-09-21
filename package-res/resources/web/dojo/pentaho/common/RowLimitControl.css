@@ -1,0 +1,65 @@
+.rl_rowLimitControlContainer {
+  padding: 0px 1px 0px 1px;
+  height: 16px;
+  vertical-align: middle;
+  height: inherit;
+}
+
+.rl_rowLimitLabel {
+  float: left;
+  margin: 5px 5px;
+  height: inherit;
+}
+
+.rl_rowLimitRestrictionsSelect {
+  float: left;
+  margin: 3px 5px;
+  width: 9.5em;
+  height: 23px;
+}
+
+.rl_rowLimitRestrictionsSelect .dijitSelect {
+  border: 1px solid #b3b3b3;
+}
+
+.rl_rowLimitRestrictionsSelect .dijitSelect .dijitButtonContents {
+  width: 7em;
+}
+
+.rl_rowsNumberInput {
+  float: left;
+  width: 5em;
+  height: 24px;
+  margin: 1px 0px;
+}
+
+.rl_rowsNumberInput .dijitTextBox {
+  border: 1px solid #b3b3b3;
+  width: 4.8em;
+  height: 20px;
+  margin: 2px 0px;
+}
+
+.rl_rowsNumberInput .dijitTextBox .dijitInputContainer {
+  margin: -3px 0px;
+}
+
+.rl_rowsNumberInput .dijitTextBox input {
+  height: inherit;
+}
+
+.rl_rowsNumberInput .dijitTextBox input[disabled="true"] {
+  background-color: #f1f1f1 !important;
+}
+
+.limit-reached-area {
+  background-color: #fefde7;
+  border: 1px solid #cccccc;
+  margin: 0px 10px;
+  padding: 10px;
+}
+
+.rl_exceededDialogContent {
+  width: 500px;
+  height: 30px;
+}
