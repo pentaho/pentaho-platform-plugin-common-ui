@@ -273,6 +273,7 @@ define(["dojo/_base/declare", "dijit/form/Select", "dijit/form/TextBox", "dijit/
                     var rowLimitExceededDialogCallbacks = [
                       lang.hitch(this, function (event) {
                         this._hideGlassPane && this._hideGlassPane();
+                        this._onSelect('MAXIMUM');
                         dialog.hide();
                       })];
                     dialog.callbacks = rowLimitExceededDialogCallbacks;
