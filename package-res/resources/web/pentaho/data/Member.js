@@ -71,7 +71,7 @@ define([
      *
      * @param {pentaho.data.spec.IMember} spec A member specification.
      * @param {!Object} keyArgs The keyword arguments.
-     * @oaram {number} keyArgs.ordinal The ordinal of the member in the attribute's member collection.
+     * @param {number} keyArgs.ordinal The ordinal of the member in the attribute's member collection.
      */
     constructor: function(spec, keyArgs) {
       this._ord = arg.required(keyArgs, "ordinal", "keyArgs");
