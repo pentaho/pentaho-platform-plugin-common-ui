@@ -320,7 +320,7 @@ define([ 'common-ui/prompting/parameters/Parameter', 'common-ui/prompting/parame
                 var result = parameterDefinitionDiffer.diff(paramDefnOld, paramDefnNew);
 
                 expect(parameterDefinitionDiffer._isBehavioralAttrsChanged).toHaveBeenCalled();
-                expect(parameterDefinitionDiffer._isErrorsChanged).not.toHaveBeenCalled();
+                expect(parameterDefinitionDiffer._isErrorsChanged).toHaveBeenCalled();
                 expect(parameterDefinitionDiffer._isDataChanged).toHaveBeenCalled();
                 expect(result).toBeDefined();
                 expect(Object.keys(result.toAdd).length).toBe(0);
