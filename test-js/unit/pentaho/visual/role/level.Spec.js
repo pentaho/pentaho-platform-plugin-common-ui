@@ -19,7 +19,7 @@ define([
       });
 
       it("should return false when given undefined", function() {
-        expect(MeasurementLevel.type.isQuantitative(null)).toBe(false);
+        expect(MeasurementLevel.type.isQuantitative(undefined)).toBe(false);
       });
 
       it("should return true for the string 'quantitative'", function() {
@@ -42,7 +42,7 @@ define([
       });
 
       it("should return false when given undefined", function() {
-        expect(MeasurementLevel.type.isQualitative(null)).toBe(false);
+        expect(MeasurementLevel.type.isQualitative(undefined)).toBe(false);
       });
 
       it("should return true for the string 'nominal'", function() {
