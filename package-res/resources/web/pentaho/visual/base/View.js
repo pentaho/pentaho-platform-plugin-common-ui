@@ -135,7 +135,9 @@ define([
        * @readOnly
        * @private
        */
-      this.__changeDidHandle = model.on("did:change", this.__onChangeDidOuter.bind(this));
+      this.__changeDidHandle = model.on("did:change", this.__onChangeDidOuter.bind(this), {
+        priority: 1
+      });
     },
 
     // region Properties
