@@ -1,21 +1,46 @@
 define([
   "pentaho/type/Context",
+  "pentaho/visual/base",
+  "pentaho/visual/role/mapping",
   "pentaho/visual/role/mappingAttribute",
-  "pentaho/type/SpecificationScope"
-], function(Context, mappingAttributeFactory, SpecificationScope) {
+  "pentaho/type/SpecificationScope",
+  "pentaho/data/Table"
+], function(Context, visualFactory, mappingFactory, mappingAttributeFactory, SpecificationScope, Table) {
+
   "use strict";
 
   describe("pentaho.visual.role.MappingAttribute", function() {
 
-    var MappingAttribute, scope;
+    function getDataSpec1() {
+      return {
+        model: [
+          {name: "country", type: "string", label: "Country"},
+          {name: "product", type: "string", label: "Product"},
+          {name: "sales", type: "number", label: "Sales"},
+          {name: "date", type: "date", label: "Date"}
+        ],
+        rows: [
+          {c: ["Portugal", "fish", 100, "2016-01-01"]},
+          {c: ["Ireland", "beer", 200, "2016-01-02"]}
+        ]
+      };
+    }
 
-    beforeEach(function () {
-      scope = new SpecificationScope();
+    var Visual;
+    var Mapping;
+    var MappingAttribute;
+    var specScope;
+
+    beforeEach(function() {
+      specScope = new SpecificationScope();
+
       var context = new Context();
+      Visual = context.get(visualFactory);
+      Mapping = context.get(mappingFactory);
       MappingAttribute = context.get(mappingAttributeFactory);
     });
 
-    describe("constructor(name|spec)", function () {
+    describe("constructor(name|spec)", function() {
       it("should allow creating with a spec object", function() {
         var name = "foo";
         var mapping = new MappingAttribute({name: name});
@@ -35,14 +60,14 @@ define([
 
     describe("#keyQualitative", function() {
       it("should be equal if the names are equal and all other properties different", function() {
-        var a = new MappingAttribute({name: "a", aggregation: "sum", isReversed: true });
+        var a = new MappingAttribute({name: "a", aggregation: "sum", isReversed: true});
         var b = new MappingAttribute({name: "a", aggregation: "avg", isReversed: false});
 
         expect(a.keyQualitative).toBe(b.keyQualitative);
       });
 
       it("should be equal if the names are empty and all other properties different", function() {
-        var a = new MappingAttribute({aggregation: "sum", isReversed: true });
+        var a = new MappingAttribute({aggregation: "sum", isReversed: true});
         var b = new MappingAttribute({aggregation: "avg", isReversed: false});
 
         expect(a.keyQualitative).toBe(b.keyQualitative);
@@ -58,14 +83,14 @@ define([
 
     describe("#keyQuantitative", function() {
       it("should be equal if the names and aggregations are equal and all other properties different", function() {
-        var a = new MappingAttribute({name: "a", aggregation: "sum", isReversed: true });
+        var a = new MappingAttribute({name: "a", aggregation: "sum", isReversed: true});
         var b = new MappingAttribute({name: "a", aggregation: "sum", isReversed: false});
 
         expect(a.keyQuantitative).toBe(b.keyQuantitative);
       });
 
       it("should be equal if the names and aggregations are empty and all other properties different", function() {
-        var a = new MappingAttribute({isReversed: true });
+        var a = new MappingAttribute({isReversed: true});
         var b = new MappingAttribute({isReversed: false});
 
         expect(a.keyQuantitative).toBe(b.keyQuantitative);
@@ -86,36 +111,145 @@ define([
       });
     });
 
-    describe("#toSpecInContext(keyArgs)", function () {
+    describe("#model and #mapping", function() {
+      var Derived;
+      var DerivedMapping;
+      var propType;
+      var derived;
+      var mapping;
 
-      it("should return a string when only the name property is serialized", function () {
+      beforeEach(function() {
+        DerivedMapping = Mapping.extend({type: {levels: ["nominal"]}});
+
+        Derived = Visual.extend({type: {
+          props: [
+            {name: "propFoo", type: DerivedMapping}
+          ]
+        }});
+
+        propType = Derived.type.get("propFoo");
+
+        derived = new Derived();
+
+        derived.propFoo = mapping = new DerivedMapping({
+          attributes: ["a", "b", "c"]
+        });
+      });
+
+      it("should have #mapping return the parent mapping", function() {
+        expect(mapping.attributes.at(0).mapping).toBe(mapping);
+      });
+
+      it("should have #mapping return `null` when there is no parent mapping", function() {
+        expect(new MappingAttribute().mapping).toBe(null);
+      });
+
+      it("should have #model return the parent mapping's model", function() {
+        expect(mapping.attributes.at(0).model).toBe(derived);
+      });
+
+      it("should have #model return `null` when there is no parent mapping", function() {
+        expect(new MappingAttribute().model).toBe(null);
+      });
+
+      it("should have #model return `null` when the parent mapping has no model", function() {
+        var mappingNoModel = new DerivedMapping({attributes: ["a", "b", "c"]});
+
+        expect(mappingNoModel.attributes.at(0).model).toBe(null);
+      });
+    });
+
+    describe("#dataAttribute", function() {
+
+      var Derived;
+      var DerivedMapping;
+      var propType;
+      var derived;
+      var mapping;
+
+      beforeEach(function() {
+        DerivedMapping = Mapping.extend({type: {levels: ["nominal"]}});
+
+        Derived = Visual.extend({type: {
+          props: [
+            {name: "propFoo", type: DerivedMapping}
+          ]
+        }});
+
+        propType = Derived.type.get("propFoo");
+
+        derived = new Derived();
+
+        derived.propFoo = mapping = new DerivedMapping({
+          attributes: ["undefined", "country", "date"]
+        });
+      });
+
+      it("should return null if the mapping attribute has no name", function() {
+        expect(new MappingAttribute().dataAttribute).toBe(null);
+      });
+
+      it("should return null if the mapping attribute has name but no parent mapping", function() {
+        expect(new MappingAttribute({name: "a"}).dataAttribute).toBe(null);
+      });
+
+      it("should return null if the mapping attribute has name, parent mapping, but no model", function() {
+        var mappingWithNoModel = new DerivedMapping({
+          attributes: ["a", "b", "c"]
+        });
+
+        expect(mappingWithNoModel.attributes.at(0).dataAttribute).toBe(null);
+      });
+
+      it("should return null if the mapping attribute has name, parent mapping, model but no data", function() {
+        expect(mapping.attributes.at(0).dataAttribute).toBe(null);
+      });
+
+      it("should return null if the mapping attribute has name, parent mapping, model, data, " +
+         "but attribute is not defined", function() {
+        derived.data = new Table(getDataSpec1());
+
+        expect(mapping.attributes.at(0).dataAttribute).toBe(null);
+      });
+
+      it("should return the data table attribute if the mapping attribute has name, parent mapping, model, data, " +
+          "and exists in the data table", function() {
+        var data = derived.data = new Table(getDataSpec1());
+
+        expect(mapping.attributes.at(1).dataAttribute).toBe(data.model.attributes.get("country"));
+      });
+    });
+
+    describe("#toSpecInContext(keyArgs)", function() {
+
+      it("should return a string when only the name property is serialized", function() {
         var name = "foo";
         var mapping = new MappingAttribute({name: name});
 
         var result = mapping.toSpecInContext({includeDefaults: false});
 
-        scope.dispose();
+        specScope.dispose();
 
         expect(result).toBe(name);
       });
 
-      it("should return an array when the base serialization is an array", function () {
+      it("should return an array when the base serialization is an array", function() {
         var mapping = new MappingAttribute({name: "foo"});
 
         var result = mapping.toSpecInContext({includeDefaults: false, preferPropertyArray: true});
 
-        scope.dispose();
+        specScope.dispose();
 
         expect(Array.isArray(result)).toBe(true);
       });
 
-      it("should return a generic spec object when more than the name property is serialized", function () {
+      it("should return a generic spec object when more than the name property is serialized", function() {
         var name = "foo";
         var mapping = new MappingAttribute({name: name});
 
         var result = mapping.toSpecInContext({includeDefaults: true});
 
-        scope.dispose();
+        specScope.dispose();
 
         expect(result instanceof Object).toBe(true);
         expect(result.name).toBe(name);

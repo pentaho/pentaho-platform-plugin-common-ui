@@ -99,7 +99,7 @@ define([
          */
         isQuantitative: function(level) {
           level = this.to(level);
-          return level.value === "quantitative";
+          return !!level && level.value === "quantitative";
         },
 
         /**
@@ -116,7 +116,7 @@ define([
          */
         isQualitative: function(level) {
           level = this.to(level);
-          return level.value === "nominal" || level.value === "ordinal";
+          return !!level && (level.value === "nominal" || level.value === "ordinal");
         },
 
         /**

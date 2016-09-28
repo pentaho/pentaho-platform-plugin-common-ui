@@ -531,7 +531,6 @@ define([
         derived.foo = mapping = new DerivedMapping();
       });
 
-
       it("should have #model return the container `derived`", function() {
         expect(mapping.model).toBe(derived);
       });

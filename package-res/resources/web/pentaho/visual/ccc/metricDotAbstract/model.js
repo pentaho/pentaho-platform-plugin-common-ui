@@ -71,8 +71,23 @@ define([
                   attributes: {
                     // TODO: countMax depends on whether data props are discrete or continuous...
                     countMax: function() {
-                      return this.levelEffective === "quantitative" ? 1 : null;
+                      var MeasurementLevel = this.type.context.get("pentaho/visual/role/level");
+                      return MeasurementLevel.type.isQuantitative(this.levelEffective) ? 1 : null;
                     }
+                  }
+                },
+                instance: {
+                  _getAttributesMaxLevel: function() {
+                    // If the mapping contains a single `date` attribute,
+                    // consider it ordinal, and not quantitative as the base code does.
+                    // Currently, CCC does not like dates in continuous color scales...
+                    if(this.attributes.count === 1) {
+                      var dataAttr = this.attributes.at(0).dataAttribute;
+                      if(dataAttr && dataAttr.type === "date")
+                        return "ordinal";
+                    }
+
+                    return this.base();
                   }
                 }
               },

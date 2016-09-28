@@ -16,8 +16,9 @@
 define([
   "module",
   "pentaho/i18n!messages",
-  "./aggregation"
-], function(module, bundle, aggregationFactory) {
+  "./aggregation",
+  "pentaho/type/util"
+], function(module, bundle, aggregationFactory, typeUtil) {
 
   "use strict";
 
@@ -48,6 +49,49 @@ define([
         if(typeof spec === "string") spec = {name: spec};
 
         this.base(spec, keyArgs);
+      },
+
+      /**
+       * Gets the visual role mapping that owns this mapping attribute, if any, or `null`.
+       *
+       * @type {pentaho.visual.base.role.Mapping}
+       */
+      get mapping() {
+        // TODO: Test it is an attributes list of a mapping...
+        var attrsList = typeUtil._getFirstRefContainer(this);
+        return attrsList && typeUtil._getFirstRefContainer(attrsList);
+      },
+
+      /**
+       * Gets the visual model that owns this visual role mapping attribute, if any, or `null`.
+       *
+       * @type {pentaho.visual.base.Model}
+       */
+      get model() {
+        var mapping = this.mapping;
+        return mapping && mapping.model;
+      },
+
+      /**
+       * Gets the data attribute referenced by this visual role mapping attribute.
+       *
+       * @type {pentaho.data.Attribute}
+       *
+       * @see pentaho.visual.role.MappingAttribute#name
+       * @see pentaho.visual.role.MappingAttribute#mapping
+       * @see pentaho.visual.role.MappingAttribute#model
+       */
+      get dataAttribute() {
+        var name = this.name;
+        if(name) {
+          var data;
+          var model = this.model;
+          if(model && (data = model.data)) {
+            return data.model.attributes.get(name);
+          }
+        }
+
+        return null;
       },
 
       toSpecInContext: function(keyArgs) {

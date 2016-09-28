@@ -14,6 +14,14 @@ define([
     });
 
     describe("#isQuantitative(level)", function() {
+      it("should return false when given null", function() {
+        expect(MeasurementLevel.type.isQuantitative(null)).toBe(false);
+      });
+
+      it("should return false when given undefined", function() {
+        expect(MeasurementLevel.type.isQuantitative(undefined)).toBe(false);
+      });
+
       it("should return true for the string 'quantitative'", function() {
         expect(MeasurementLevel.type.isQuantitative("quantitative")).toBe(true);
       });
@@ -29,6 +37,14 @@ define([
     });
 
     describe("#isQualitative(level)", function() {
+      it("should return false when given null", function() {
+        expect(MeasurementLevel.type.isQualitative(null)).toBe(false);
+      });
+
+      it("should return false when given undefined", function() {
+        expect(MeasurementLevel.type.isQualitative(undefined)).toBe(false);
+      });
+
       it("should return true for the string 'nominal'", function() {
         expect(MeasurementLevel.type.isQualitative("nominal")).toBe(true);
       });

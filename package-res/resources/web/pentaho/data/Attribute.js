@@ -254,8 +254,8 @@ define([
      *
      * @param {!(pentaho.data.spec.IMember|pentaho.data.Atomic)} memberSpec A member specification
      *     or, directly, a member's atomic value.
-     * @oaram {!Object} keyArgs The keyword arguments.
-     * @oaram {number} keyArgs.ordinal The ordinal of the member in the attribute's member collection.
+     * @param {!Object} keyArgs The keyword arguments.
+     * @param {number} keyArgs.ordinal The ordinal of the member in the attribute's member collection.
      * @return {pentaho.data.Member} A member of this attribute.
      */
     toMemberOf: function(memberSpec, keyArgs) {
@@ -291,8 +291,8 @@ define([
      * method {@link pentaho.data.StructurePosition.to} should
      * be used instead.
      *
-     * @oaram {!Object} keyArgs The keyword arguments.
-     * @oaram {number} keyArgs.ordinal The ordinal of the structure position.
+     * @param {!Object} keyArgs The keyword arguments.
+     * @param {number} keyArgs.ordinal The ordinal of the structure position.
      *
      * @return {pentaho.data.StructurePosition} A structure position of this attribute.
      */

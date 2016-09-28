@@ -364,7 +364,8 @@ define([
       var maInfos = this._getMappingAttrInfosByRole(roleName);
       if(maInfos) {
         depth = maInfos.length;
-        if(!includeMeasureDiscrim && this._isGenericMeasureMode && this._genericMeasureDiscrimMappingAttrInfo.role === roleName) {
+        if(!includeMeasureDiscrim && this._isGenericMeasureMode &&
+           this._genericMeasureDiscrimMappingAttrInfo.role === roleName) {
           depth -= 1;
         }
       }
@@ -380,7 +381,7 @@ define([
       if(this._isGenericMeasureRole(roleName)) return false;
 
       var mapping = this.model.get(roleName);
-      if(mapping.attributes.length > 1) return true;
+      if(mapping.attributes.count > 1) return true;
 
       var MeasurementLevel = this.context.get(measurementLevelFactory);
       var level = this.model.get(roleName).levelEffective;
