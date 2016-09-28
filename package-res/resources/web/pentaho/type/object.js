@@ -16,12 +16,20 @@
 define([
   "module",
   "./simple",
+  "../util/object",
   "../i18n!types"
-], function(module, simpleFactory, bundle) {
+], function(module, simpleFactory, O, bundle) {
 
   "use strict";
 
   var _simpleObjectNextUid = 1;
+  var _OID_PROP = "__pentaho_type_ouid_" + Math.random().toString(32) + "__";
+  var _DEF_OID_PROP = {
+    value: "",
+    configurable: true,
+    writable:     true,
+    enumerable:   false
+  };
 
   return function(context) {
 
@@ -40,9 +48,20 @@ define([
     return Simple.extend(/** @lends pentaho.type.Object# */{
 
       constructor: function(spec) {
+
         this.base(spec);
 
-        this._uid = String(_simpleObjectNextUid++);
+        // Reuse an existing UID mark, so that two Simple instances with the same underlying primitive value
+        // are considered #equal.
+        var uid = O.getOwn(this._value, _OID_PROP);
+        if(uid == null) {
+          // Mark value with a non-enumerable property.
+          // Note that non-enumerable properties are not included by JSON.stringify.
+          _DEF_OID_PROP.value = uid = String(_simpleObjectNextUid++);
+          Object.defineProperty(this._value, _OID_PROP, _DEF_OID_PROP);
+        }
+
+        this._uid = uid;
       },
 
       /**
@@ -65,7 +84,7 @@ define([
        */
 
       type: /** @lends pentaho.type.Object.Type# */{
-        id: module.id,
+        id:   module.id,
         cast: Object
       }
     }).implement(/** @lends pentaho.type.Object# */{
