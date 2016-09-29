@@ -118,15 +118,17 @@ define(["dojo/_base/declare", "dijit/form/Select", "dijit/form/TextBox", "dijit/
             },
 
             _localize: function () {
-              this.rowLimitLabel.innerHTML = this._getLocaleString("RowLimitLabel");
-              this.rowLimitRestrictions.addOption({
-                label: this._getLocaleString("RowLimitNoMoreThanTitle"),
-                value: 'NO_MORE_THAN'
-              });
-              this.rowLimitRestrictions.addOption({
-                label: this._getLocaleString("RowLimitMaximumTitle"),
-                value: 'MAXIMUM'
-              });
+              if(this._getLocaleString) {
+                this.rowLimitLabel.innerHTML = this._getLocaleString("RowLimitLabel");
+                this.rowLimitRestrictions.addOption({
+                  label: this._getLocaleString("RowLimitNoMoreThanTitle"),
+                  value: 'NO_MORE_THAN'
+                });
+                this.rowLimitRestrictions.addOption({
+                  label: this._getLocaleString("RowLimitMaximumTitle"),
+                  value: 'MAXIMUM'
+                });
+              }
             },
 
             _showSystemMessage: function () {
