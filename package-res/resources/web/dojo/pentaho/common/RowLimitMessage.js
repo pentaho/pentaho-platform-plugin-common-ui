@@ -51,10 +51,12 @@ define(["dojo/_base/declare", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dij
             },
 
             _localize: function () {
-              this.limitMessage.innerHTML = this._getLocaleString('UserRowLimitReachedMessage');
-              this.systemMessageInner.innerHTML = this._getLocaleString('SystemRowLimitReachedMessage');
-              this.systemLimitRunNow.innerHTML = this._getLocaleString('RowLimitRunNow');
-              this.systemLimitSchedule.innerHTML = this._getLocaleString('RowLimitSchedule');
+              if(this._getLocaleString) {
+                this.limitMessage.innerHTML = this._getLocaleString('UserRowLimitReachedMessage');
+                this.systemMessageInner.innerHTML = this._getLocaleString('SystemRowLimitReachedMessage');
+                this.systemLimitRunNow.innerHTML = this._getLocaleString('RowLimitRunNow');
+                this.systemLimitSchedule.innerHTML = this._getLocaleString('RowLimitSchedule');
+              }
             },
 
             limitReached: function () {

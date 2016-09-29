@@ -52,8 +52,10 @@ define(["dojo/_base/declare", "dojo/on", "dojo/query", "dojo/_base/lang", 'dijit
             },
 
             _localize: function () {
-              this.setTitle(this._getLocaleString("RowLimitExceededDialogTitle"));
-              this.rowLimitExceededDialogMessage.innerHTML = this._getLocaleString("SystemRowLimitExceededDialogMessage", this._systemRowLimit);
+              if(this._getLocaleString) {
+                this.setTitle(this._getLocaleString("RowLimitExceededDialogTitle"));
+                this.rowLimitExceededDialogMessage.innerHTML = this._getLocaleString("SystemRowLimitExceededDialogMessage", this._systemRowLimit);
+              }
             },
 
             setSystemRowLimit: function (systemRowLimit) {
