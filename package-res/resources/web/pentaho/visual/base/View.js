@@ -257,7 +257,11 @@ define([
 
         this.__dirtyPropGroups.set(bitSetNew.get());
 
-        if(this.isAutoUpdate) {
+        if( this.isAutoUpdate 
+          && !( event._cset && event._cset.propertyNames && event._cset.propertyNames.length == 2 
+            && (event._cset.propertyNames[0]=="width" || event._cset.propertyNames[1]=="width") 
+            && (event._cset.propertyNames[0]=="height" || event._cset.propertyNames[1]=="height") 
+            && event.source.application.type.id && event.source.application.type.id.indexOf("det") > 0 ) ) {
           /* eshint dot-notation: 0 */
           this.update()["catch"](function(error) {
             logger.warn("Auto-update was canceled: " + error);
