@@ -24,49 +24,58 @@ define([
   /* global describe:true, it:true, expect:true, beforeEach:true*/
 
   describe("pentaho.type.Object -", function() {
-    it("is a function", function() {
+
+    it("should be a function", function() {
       expect(typeof objectFactory).toBe("function");
     });
 
     describe("new Object() -", function() {
-      var PentahoObject, emptyObj, dateObj;
+      var PentahoObject;
+      var emptyObj;
+      var dateObj;
 
-      beforeEach(function () {
+      beforeEach(function() {
         PentahoObject = objectFactory(new Context());
         emptyObj = {};
         dateObj = new Date();
       });
 
-      it("should be a function", function () {
+      it("should be a function", function() {
         expect(typeof PentahoObject).toBe("function");
       });
 
-      it("should return an object", function () {
+      it("should return an object", function() {
         expect(typeof new PentahoObject({v: emptyObj})).toBe("object");
       });
 
-      it("should accept an empty object as an object", function () {
+      it("should accept an empty object as an object", function() {
         expect(new PentahoObject({v: emptyObj}).value).toBe(emptyObj);
       });
 
-      it("should accept a date object as an object", function () {
+      it("should accept a date object as an object", function() {
         expect(new PentahoObject({v: dateObj}).value).toBe(dateObj);
       });
 
-      it("should not accept empty object literal", function () {
-        expect(function () {
+      it("should not accept an object literal with a null value", function() {
+        expect(function() {
+          var foo = new PentahoObject({v: null});
+        }).toThrow(errorMatch.argRequired("value"));
+      });
+
+      it("should not accept empty object literal", function() {
+        expect(function() {
           var foo = new PentahoObject({});
         }).toThrow(errorMatch.argRequired("value"));
       });
 
-      it("should not accept null", function () {
-        expect(function () {
+      it("should not accept null", function() {
+        expect(function() {
           var foo = new PentahoObject(null);
         }).toThrow(errorMatch.argRequired("value"));
       });
 
-      it("should not accept undefined", function () {
-        expect(function () {
+      it("should not accept undefined", function() {
+        expect(function() {
           var foo = new PentahoObject(undefined);
         }).toThrow(errorMatch.argRequired("value"));
       });
@@ -75,7 +84,7 @@ define([
     describe("#key -", function() {
       var PentahoObject;
 
-      beforeEach(function () {
+      beforeEach(function() {
         PentahoObject = objectFactory(new Context());
       });
 
@@ -84,14 +93,19 @@ define([
         expect(typeof key).toBe("string");
       });
 
-      it("should have a distinct value for every instance", function() {
-        var emptyObj = {},
-            key1 = new PentahoObject({v: emptyObj}).key,
-            key2 = new PentahoObject({v: emptyObj}).key,
-            key3 = new PentahoObject({v: emptyObj}).key;
-        expect(key1).not.toBe(key2);
-        expect(key2).not.toBe(key3);
-        expect(key3).not.toBe(key1);
+      it("should have distinct values for distinct primitive instances", function() {
+        var emptyObjA = {};
+        var emptyObjB = {};
+        var keyA = new PentahoObject({v: emptyObjA}).key;
+        var keyB = new PentahoObject({v: emptyObjB}).key;
+        expect(keyA).not.toBe(keyB);
+      });
+
+      it("should have the same value for the same primitive instance", function() {
+        var emptyObj = {};
+        var key1 = new PentahoObject({v: emptyObj}).key;
+        var key2 = new PentahoObject({v: emptyObj}).key;
+        expect(key1).toBe(key2);
       });
     });
   }); // pentaho.type.Object

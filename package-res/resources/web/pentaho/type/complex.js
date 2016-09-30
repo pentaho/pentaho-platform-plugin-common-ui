@@ -906,7 +906,7 @@ define([
          *
          * @param {Object} [x] The JS context object on which `f` is called.
          *
-         * @return {pentaho.type.Complex} This object.
+         * @return {!pentaho.type.Complex} This object.
          */
         each: function(f, x) {
           var ps = this._props;
@@ -956,8 +956,48 @@ define([
           }
 
           return any;
-        }
+        },
         // endregion
+
+        /**
+         * Calls a function for each defined property type that this type shares with another given type
+         * and whose value can, in principle, be copied from it.
+         *
+         * This method finds the lowest common ancestor of both types.
+         * If it is a complex type, each of the corresponding local properties is yielded.
+         *
+         * @param {!pentaho.type.Type} otherType - The other type.
+         * @param {function(pentaho.type.Property.Type, number, pentaho.type.Complex) : boolean?} f -
+         * The mapping function. Return `false` to break iteration.
+         *
+         * @param {Object} [x] - The JS context object on which `f` is called.
+         *
+         * @return {!pentaho.type.Complex} This object.
+         */
+        eachCommonWith: function(otherType, f, x) {
+          var lca;
+          if(otherType.isComplex && (lca = O.lca(this, otherType)) && lca.isComplex) {
+
+            lca.each(function(basePropType, i) {
+              var name = basePropType.name;
+              var localPropType = this.get(name);
+
+              /* A property is yielded if the value-type of the other type's property is a subtype of
+               * the value-type of the local property.
+               *
+               *  var otherPropType = otherType.get(name);
+               *
+               * // assert basePropType === O.lca(localPropType, otherPropType)
+               *
+               * if(otherPropType.type.isSubtypeOf(localPropType.type))
+              */
+              if(f.call(x, localPropType, i, this) === false)
+                return false;
+            }, this);
+          }
+
+          return this;
+        }
       }
     })
     .implement(ContainerMixin)

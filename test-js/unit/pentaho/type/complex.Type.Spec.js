@@ -260,9 +260,9 @@ define([
 
             expect(A.type.count).toBe(2);
             expect(A.type.get("fooBar", true) instanceof PropertyType).toBe(true);
-            expect(A.type.get("guru",   true) instanceof PropertyType).toBe(true);
-            expect(A.type.get("dada",   true)).toBe(null);
-            expect(A.type.get("babah",  true)).toBe(null);
+            expect(A.type.get("guru", true) instanceof PropertyType).toBe(true);
+            expect(A.type.get("dada", true)).toBe(null);
+            expect(A.type.get("babah", true)).toBe(null);
           });
 
           it("should throw if a property specifies a name different from the key", function() {
@@ -303,13 +303,13 @@ define([
     });
 
     describe("#isComplex", function() {
-      it("should have value `true`", function () {
+      it("should have value `true`", function() {
         expect(Complex.type.isComplex).toBe(true);
       });
     });
 
     describe("#isContainer", function() {
-      it("should have value `true`", function () {
+      it("should have value `true`", function() {
         expect(Complex.type.isContainer).toBe(true);
       });
     });
@@ -512,6 +512,402 @@ define([
         Derived.type.add(["fooBar", "barFoo"]);
 
         expect(Derived.type.count).toBe(3);
+      });
+    });
+
+    describe("#each(f, x)", function() {
+
+      it("should call f once for each property of the type", function() {
+
+        var SampleType = Complex.extend({
+          type: {
+            props: [
+              {name: "a", type: "string"},
+              {name: "b", type: "string"}
+            ]
+          }
+        });
+
+        var f = jasmine.createSpy();
+
+        SampleType.type.each(f);
+
+        expect(f.calls.argsFor(0)[0]).toBe(SampleType.type.get("a"));
+        expect(f.calls.argsFor(1)[0]).toBe(SampleType.type.get("b"));
+      });
+
+      it("should call f once for each property of the type passing the index as second argument", function() {
+
+        var SampleType = Complex.extend({
+          type: {
+            props: [
+              {name: "a", type: "string"},
+              {name: "b", type: "string"}
+            ]
+          }
+        });
+
+        var f = jasmine.createSpy();
+
+        SampleType.type.each(f);
+
+        expect(f.calls.argsFor(0)[1]).toBe(0);
+        expect(f.calls.argsFor(1)[1]).toBe(1);
+      });
+
+      it("should call f once for each property of the type passing this as the third argument", function() {
+
+        var SampleType = Complex.extend({
+          type: {
+            props: [
+              {name: "a", type: "string"},
+              {name: "b", type: "string"}
+            ]
+          }
+        });
+
+        var f = jasmine.createSpy();
+
+        SampleType.type.each(f);
+
+        expect(f.calls.argsFor(0)[2]).toBe(SampleType.type);
+        expect(f.calls.argsFor(1)[2]).toBe(SampleType.type);
+      });
+
+      it("should call f on the given x", function() {
+
+        var SampleType = Complex.extend({
+          type: {
+            props: [
+              {name: "a", type: "string"}
+            ]
+          }
+        });
+
+        var f = jasmine.createSpy();
+
+        var x = {};
+        SampleType.type.each(f, x);
+
+        expect(f.calls.first().object).toBe(x);
+      });
+
+      it("should return this", function() {
+
+        var SampleType = Complex.extend({
+          type: {
+            props: [
+              {name: "a", type: "string"}
+            ]
+          }
+        });
+
+        var f = jasmine.createSpy();
+
+        var result = SampleType.type.each(f);
+
+        expect(result).toBe(SampleType.type);
+      });
+
+      it("should stop iteration if f returns false", function() {
+
+        var SampleType = Complex.extend({
+          type: {
+            props: [
+              {name: "a", type: "string"},
+              {name: "b", type: "string"}
+            ]
+          }
+        });
+
+        var f = jasmine.createSpy().and.callFake(function() { return false; });
+
+        SampleType.type.each(f);
+
+        expect(f).toHaveBeenCalledTimes(1);
+      });
+
+      it("should call f for inherited properties", function() {
+
+        var RootType = Complex.extend({
+          type: {
+            props: [
+              {name: "a", type: "string"},
+              {name: "b", type: "string"}
+            ]
+          }
+        });
+
+        var SampleType = RootType.extend({
+          type: {
+            props: [
+              {name: "c", type: "string"},
+              {name: "d", type: "string"}
+            ]
+          }
+        });
+
+        var f = jasmine.createSpy();
+
+        SampleType.type.each(f);
+
+        expect(f.calls.argsFor(0)[0]).toBe(SampleType.type.get("a"));
+        expect(f.calls.argsFor(1)[0]).toBe(SampleType.type.get("b"));
+        expect(f.calls.argsFor(2)[0]).toBe(SampleType.type.get("c"));
+        expect(f.calls.argsFor(3)[0]).toBe(SampleType.type.get("d"));
+      });
+    });
+
+    describe("#eachCommonWith(otherType, f, x)", function() {
+
+      it("should call f once for each corresponding property of the common base type", function() {
+
+        var BaseType = Complex.extend({
+          type: {
+            props: [
+              {name: "a", type: "string"},
+              {name: "b", type: "string"}
+            ]
+          }
+        });
+
+        var SubTypeA = BaseType.extend();
+        var SubTypeB = BaseType.extend();
+
+        var f = jasmine.createSpy();
+
+        SubTypeA.type.eachCommonWith(SubTypeB.type, f);
+
+        expect(f.calls.argsFor(0)[0]).toBe(SubTypeA.type.get("a"));
+        expect(f.calls.argsFor(1)[0]).toBe(SubTypeA.type.get("b"));
+      });
+
+      it("should call f once for each corresponding property of the common base type, " +
+         "passing the index as second argument", function() {
+
+        var BaseType = Complex.extend({
+          type: {
+            props: [
+              {name: "a", type: "string"},
+              {name: "b", type: "string"}
+            ]
+          }
+        });
+
+        var SubTypeA = BaseType.extend();
+        var SubTypeB = BaseType.extend();
+
+        var f = jasmine.createSpy();
+
+        SubTypeA.type.eachCommonWith(SubTypeB.type, f);
+
+        expect(f.calls.argsFor(0)[1]).toBe(0);
+        expect(f.calls.argsFor(1)[1]).toBe(1);
+      });
+
+      it("should call f once for each corresponding property of the common base type, " +
+          "passing this as third argument", function() {
+
+        var BaseType = Complex.extend({
+          type: {
+            props: [
+              {name: "a", type: "string"},
+              {name: "b", type: "string"}
+            ]
+          }
+        });
+
+        var SubTypeA = BaseType.extend();
+        var SubTypeB = BaseType.extend();
+
+        var f = jasmine.createSpy();
+
+        SubTypeA.type.eachCommonWith(SubTypeB.type, f);
+
+        expect(f.calls.argsFor(0)[2]).toBe(SubTypeA.type);
+        expect(f.calls.argsFor(1)[2]).toBe(SubTypeA.type);
+      });
+
+      it("should call f on the given x", function() {
+
+        var BaseType = Complex.extend({
+          type: {
+            props: [
+              {name: "a", type: "string"}
+            ]
+          }
+        });
+
+        var SubTypeA = BaseType.extend();
+        var SubTypeB = BaseType.extend();
+
+        var f = jasmine.createSpy();
+
+        var x = {};
+        SubTypeA.type.eachCommonWith(SubTypeB.type, f, x);
+
+        expect(f.calls.first().object).toBe(x);
+      });
+
+      it("should return this", function() {
+
+        var BaseType = Complex.extend({
+          type: {
+            props: [
+              {name: "a", type: "string"}
+            ]
+          }
+        });
+
+        var SubTypeA = BaseType.extend();
+        var SubTypeB = BaseType.extend();
+
+        var f = jasmine.createSpy();
+
+        var result = SubTypeA.type.eachCommonWith(SubTypeB.type, f);
+
+        expect(result).toBe(SubTypeA.type);
+      });
+
+      it("should not call f for non-common properties of different names", function() {
+
+        var BaseType = Complex.extend();
+
+        var SubTypeA = BaseType.extend({
+          type: {
+            props: [
+              {name: "a", type: "string"}
+            ]
+          }
+        });
+
+        var SubTypeB = BaseType.extend({
+          type: {
+            props: [
+              {name: "b", type: "string"}
+            ]
+          }
+        });
+
+        var f = jasmine.createSpy();
+
+        SubTypeA.type.eachCommonWith(SubTypeB.type, f);
+
+        expect(f).not.toHaveBeenCalled();
+      });
+
+      it("should stop iteration if f returns false", function() {
+
+        var BaseType = Complex.extend({
+          type: {
+            props: [
+              {name: "a", type: "string"},
+              {name: "b", type: "string"}
+            ]
+          }
+        });
+
+        var SubTypeA = BaseType.extend();
+        var SubTypeB = BaseType.extend();
+
+        var f = jasmine.createSpy().and.callFake(function() { return false; });
+
+        SubTypeA.type.eachCommonWith(SubTypeB.type, f);
+
+        expect(f).toHaveBeenCalledTimes(1);
+      });
+
+      it("should call f for inherited properties", function() {
+
+        var RootType = Complex.extend({
+          type: {
+            props: [
+              {name: "a", type: "string"},
+              {name: "b", type: "string"}
+            ]
+          }
+        });
+
+        var BaseType = RootType.extend({
+          type: {
+            props: [
+              {name: "c", type: "string"},
+              {name: "d", type: "string"}
+            ]
+          }
+        });
+
+        var SubTypeA = BaseType.extend();
+        var SubTypeB = BaseType.extend();
+
+        var f = jasmine.createSpy();
+
+        SubTypeA.type.eachCommonWith(SubTypeB.type, f);
+
+        expect(f.calls.argsFor(0)[0]).toBe(SubTypeA.type.get("a"));
+        expect(f.calls.argsFor(1)[0]).toBe(SubTypeA.type.get("b"));
+        expect(f.calls.argsFor(2)[0]).toBe(SubTypeA.type.get("c"));
+        expect(f.calls.argsFor(3)[0]).toBe(SubTypeA.type.get("d"));
+      });
+
+      it("should not call f for non-common properties of same names", function() {
+
+        var BaseType = Complex.extend();
+
+        var SubTypeA = BaseType.extend({
+          type: {
+            props: [
+              {name: "a", type: "string"}
+            ]
+          }
+        });
+
+        var SubTypeB = BaseType.extend({
+          type: {
+            props: [
+              {name: "a", type: "string"}
+            ]
+          }
+        });
+
+        var f = jasmine.createSpy();
+
+        SubTypeA.type.eachCommonWith(SubTypeB.type, f);
+
+        expect(f).not.toHaveBeenCalled();
+      });
+
+      it("should call f once for each corresponding property of the common base type, " +
+         "even if their value types have been redefined", function() {
+
+        var BaseType = Complex.extend({
+          type: {
+            props: [
+              {name: "a", type: "string"}
+            ]
+          }
+        });
+
+        var SubTypeA = BaseType.extend({
+          type: {
+            props: [
+              {name: "a", type: {id: "test/StringA"}} // a subtype of string...
+            ]
+          }
+        });
+        var SubTypeB = BaseType.extend({
+          type: {
+            props: [
+              {name: "a", type: {id: "test/StringB"}} // another subtype of string...
+            ]
+          }
+        });
+
+        var f = jasmine.createSpy();
+
+        SubTypeA.type.eachCommonWith(SubTypeB.type, f);
+
+        expect(f.calls.argsFor(0)[0]).toBe(SubTypeA.type.get("a"));
       });
     });
   }); // pentaho.type.Complex.Type

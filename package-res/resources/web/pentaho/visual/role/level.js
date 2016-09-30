@@ -138,7 +138,7 @@ define([
          *
          * A level of measurement that is not one of the
          * {@link pentaho.visual.role.MeasurementLevel} values
-         * it considered lower than these.
+         * is considered lower than these.
          *
          * @param {string|pentaho.type.String} [a] The first level of measurement.
          * @param {string|pentaho.type.String} [b] The second level of measurement.
