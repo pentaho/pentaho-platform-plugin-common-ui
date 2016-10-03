@@ -43,6 +43,7 @@ define([
   var lineStrokeStyle = "#D1D3D4";  // "#D1D3D4"; //"#A0A0A0"; // #D8D8D8",// #f0f0f0
   var extensionBlacklist = {
     "compatVersion": 1,
+    "compatFlags": 1,
     "interactive": 1,
     "isMultiValued": 1,
     "measuresIndexes": 1,
@@ -72,6 +73,9 @@ define([
   var baseOptions = {
     // Chart
     compatVersion: 2, // use CCC version 2
+    compatFlags: {
+      discreteTimeSeriesTickFormat: false
+    },
 
     margins: 0,
     paddings: 10,
