@@ -93,20 +93,20 @@ define(["common-ui/util/util", 'dojo/number', 'cdf/components/TextInputComponent
             var initialValue;
             $.each(this.param.values, function(i, v) {
               if (v.selected) {
-                initialValue = this.formatter ? this.formatter.format(this.transportFormatter.parse(v.label)) : v.label;
+                initialValue = this.formatter ? this.formatter.format(this.transportFormatter.parse(v.value)) : v.value;
 
                 try {
-                  if (isNaN(v.label) || Math.abs(v.label) == Infinity) {
+                  if (isNaN(v.value) || Math.abs(v.value) == Infinity) {
                     var valueParsed = null;
                   } else {
                     if (Util.isNumberType(v.type)) {
-                      valueParsed = formatNumber(v.label);
+                      valueParsed = formatNumber(v.value);
                     } else {
-                      valueParsed = v.label;
+                      valueParsed = v.value;
                     }
                   }
                 } catch (e) {
-                  valueParsed = v.label;
+                  valueParsed = v.value;
                 }
 
                 if (valueParsed != null) {
