@@ -61,21 +61,11 @@ define([
             }
           },
           {
-            name: "columns", // VISUAL_ROLE
-            type: "pentaho/visual/role/ordinal",
-            ordinal: 6
-          },
-          {
             name: "measures", // VISUAL_ROLE
             type: {
               props: {attributes: {isRequired: true}}
             },
             ordinal: 7
-          },
-          {
-            name: "multi", // VISUAL_ROLE
-            type: "pentaho/visual/role/ordinal",
-            ordinal: 10
           },
           {
             name: "labelsOption",

@@ -30,22 +30,9 @@ define([
       type: {
         sourceId: module.id,
         id: module.id.replace(/.\w+$/, ""),
-        isAbstract: true,
-
-        props: [
-          {
-            name: "columns", //VISUAL_ROLE
-            type: "pentaho/visual/role/ordinal",
-            ordinal: 6
-          },
-          {
-            name: "multi", //VISUAL_ROLE
-            type: "pentaho/visual/role/ordinal",
-            ordinal: 10
-          }
-        ]
+        isAbstract: true
       }
-      
+
     })
     .implement({type: settingsMultiChartType})
     .implement({type: bundle.structured["settingsMultiChart"]})
