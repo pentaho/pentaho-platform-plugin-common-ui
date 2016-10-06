@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 define([
+  "module",
   "cdf/lib/CCC/protovis",
   "cdf/lib/CCC/def",
   "../abstract/View",
   "../util",
   "pentaho/i18n!../abstract/i18n/view"
-], function(pv, def, AbstractChart, util, bundle) {
+], function(module, pv, def, AbstractChart, util, bundle) {
 
   "use strict";
 
-  return AbstractChart.extend({
+  return AbstractChart.extend(module.id, {
     _cccClass: "SunburstChart",
 
     _roleToCccRole: {

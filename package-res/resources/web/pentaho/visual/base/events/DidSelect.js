@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 define([
+  "module",
   "pentaho/lang/Event",
   "../mixins/mixinDataFilter",
   "pentaho/util/error"
-], function(Event, mixinDataFilter, error) {
+], function(module, Event, mixinDataFilter, error) {
+
   "use strict";
 
   /**
@@ -37,8 +39,7 @@ define([
    * @param {?Object} value - The value of a fulfilled {@link pentaho.lang.ActionResult|ActionResult}.
    * @param {pentaho.visual.base.events.WillSelect} will - The "will:select" event object.
    */
-  return Event.extend("pentaho.visual.base.events.DidSelect",
-    /** @lends pentaho.visual.base.events.DidSelect# */{
+  return Event.extend(module.id, /** @lends pentaho.visual.base.events.DidSelect# */{
 
       constructor: function(source, value, will) {
         if(!will) throw error.argRequired("will");

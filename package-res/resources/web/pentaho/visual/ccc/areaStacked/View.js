@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 define([
+  "module",
   "../pointAbstract/View"
-], function(PointAbstractChart) {
+], function(module, PointAbstractChart) {
 
   "use strict";
 
-  return PointAbstractChart.extend({
+  return PointAbstractChart.extend(module.id, {
     _cccClass: "StackedAreaChart"
   });
 });

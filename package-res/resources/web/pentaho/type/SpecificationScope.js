@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 define([
+  "module",
   "./SpecificationContext",
   "../lang/Base"
-], function(SpecificationContext, Base) {
+], function(module, SpecificationContext, Base) {
 
   "use strict";
 
-  return Base.extend(/** @lends pentaho.type.SpecificationScope# */{
+  return Base.extend(module.id, /** @lends pentaho.type.SpecificationScope# */{
 
     /**
      * @alias SpecificationScope

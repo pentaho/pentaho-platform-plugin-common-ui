@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 define([
+  "module",
   "cdf/lib/CCC/def",
   "../cartesianAbstract/View"
-], function(def, AbstractCartesianChart) {
+], function(module, def, AbstractCartesianChart) {
 
   "use strict";
 
-  return AbstractCartesianChart.extend({
+  return AbstractCartesianChart.extend(module.id, {
     _genericMeasureCccVisualRole: "value",
 
     _options: {

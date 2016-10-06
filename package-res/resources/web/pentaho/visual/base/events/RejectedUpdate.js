@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 define([
+  "module",
   "pentaho/lang/Event",
   "pentaho/type/mixins/mixinError"
-], function(Event, mixinError) {
+], function(module, Event, mixinError) {
+
   "use strict";
 
   /**
@@ -41,8 +43,7 @@ define([
    * @param {!Error|pentaho.lang.UserError} error - The error of a rejected
    * {@link pentaho.lang.ActionResult|ActionResult}.
    */
-  return Event.extend("pentaho.visual.base.events.RejectedUpdate",
-    /** @lends pentaho.visual.base.events.RejectedUpdate# */{
+  return Event.extend(module.id, /** @lends pentaho.visual.base.events.RejectedUpdate# */{
 
       constructor: function(source, error) {
         this.base("rejected:update", source, false);

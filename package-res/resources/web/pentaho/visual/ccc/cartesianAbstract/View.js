@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 define([
+  "module",
   "cdf/lib/CCC/def",
   "../abstract/View",
   "pentaho/i18n!../abstract/i18n/view"
-], function(def, AbstractChart, bundle) {
+], function(module, def, AbstractChart, bundle) {
 
   "use strict";
 
-  return AbstractChart.extend({
+  return AbstractChart.extend(module.id, {
     _options: {
       orientation: "vertical"
     },
