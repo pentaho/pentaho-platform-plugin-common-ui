@@ -13,12 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+define([
+  "./debug/DebugInfo"
+], function(DebugInfo) {
 
-/**
- * The `util` namespace contains a minimal set of supporting modules
- * used by other Pentaho Client Metadata Model classes.
- *
- * @name pentaho.util
- * @namespace
- * @private
- */
+  "use strict";
+
+  /**
+   * The `debugInfo` singleton provides access to the current maximum information level
+   * and other debugging information.
+   *
+   * @name debugInfo
+   * @namespace
+   * @memberOf pentaho.util
+   * @amd {pentaho.util.debug.DebugInfo} pentaho/util/debugInfo
+   * @private
+   */
+  return new DebugInfo();
+});
