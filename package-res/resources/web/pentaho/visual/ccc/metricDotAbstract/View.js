@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 define([
+  "module",
   "../cartesianAbstract/View",
   "pentaho/visual/role/level",
   "../trends"
-], function(AbstractCartesianChart, levelFactory) {
+], function(module, AbstractCartesianChart, levelFactory) {
 
   "use strict";
 
-  return AbstractCartesianChart.extend({
+  return AbstractCartesianChart.extend(module.id, {
     _cccClass: "MetricDotChart",
 
     _supportsTrends: true,

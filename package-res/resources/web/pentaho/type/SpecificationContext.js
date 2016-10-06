@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 define([
+  "module",
   "../lang/Base",
   "../util/object",
   "../util/error"
-], function(Base, O, error) {
+], function(module, Base, O, error) {
 
   "use strict";
 
@@ -55,7 +56,7 @@ define([
    * @constructor
    * @description Creates a `SpecificationContext`.
    */
-  var SpecificationContext = Base.extend(/** @lends pentaho.type.SpecificationContext# */{
+  var SpecificationContext = Base.extend(module.id, /** @lends pentaho.type.SpecificationContext# */{
 
     constructor: function() {
       /**

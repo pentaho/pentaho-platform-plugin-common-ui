@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 define([
+  "module",
   "../pointAbstract/View",
   "../trends"
-], function(PointAbstractChart) {
+], function(module, PointAbstractChart) {
 
   "use strict";
 
-  return PointAbstractChart.extend({
+  return PointAbstractChart.extend(module.id, {
     _cccClass: "LineChart",
 
     _supportsTrends: true,

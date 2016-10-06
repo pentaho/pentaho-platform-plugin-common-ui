@@ -15,8 +15,9 @@
  */
 
 define([
+  "module",
   "../lang/UserError"
-], function(UserError) {
+], function(module, UserError) {
 
   "use strict";
 
@@ -35,7 +36,7 @@ define([
    * @param {string} message - The error message.
    */
 
-  return UserError.extend("pentaho.type.ValidationError", /** @lends pentaho.type.ValidationError# */{
+  return UserError.extend(module.id, /** @lends pentaho.type.ValidationError# */{
     /**
      * The name of the type of error.
      *

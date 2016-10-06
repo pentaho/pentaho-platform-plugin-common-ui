@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 define([
+  "module",
   "../barNormalizedAbstract/View"
-], function(AbstractNormalizedBarChart) {
+], function(module, AbstractNormalizedBarChart) {
 
   "use strict";
 
-  return AbstractNormalizedBarChart.extend({
+  return AbstractNormalizedBarChart.extend(module.id, {
     _options: {
       orientation: "horizontal"
     }
