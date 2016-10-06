@@ -18,10 +18,11 @@ define([
   "pentaho/type/list",
   "pentaho/type/value",
   "pentaho/type/number",
+  "pentaho/type/string",
   "pentaho/type/complex",
   "pentaho/util/fun",
   "tests/pentaho/util/errorMatch"
-], function(Context, listFactory, valueFactory, numberFactory, complexFactory, fun, errorMatch) {
+], function(Context, listFactory, valueFactory, numberFactory, stringFactory, complexFactory, fun, errorMatch) {
 
   "use strict";
 
@@ -630,7 +631,7 @@ define([
     // endregion
 
     // region write methods
-    
+
     // add or update
     // region #add(fragment)
     describe("#add(fragment) -", function() {
@@ -714,9 +715,9 @@ define([
         expect(list.count).toBe(4);
         expect(list.get("4").value).toBe(4);
       });
-      
+
       it("should only append the values not present in the list and update the values already present", function() {
-        
+
         var list = new NumberList([1, 5, 10, 11, 40]);
 
         expect(list.count).toBe(5);
@@ -975,7 +976,7 @@ define([
 
         expect(list.count).toBe(4);
       });
-      
+
     }); // endregion #remove
 
     // region #clear()
@@ -1162,6 +1163,43 @@ define([
 
     // region #set(fragment, {noAdd, noUpdate, noRemove, noMove, index})
     describe("#set(fragment, {noAdd, noUpdate, noRemove, noMove, index}) -", function() {
+
+      it("preserves the order of new elements when they are simple objects", function(){
+
+        var list = new NumberList();
+        var spec =[1, 2, 3, 4];
+        list.set(spec);
+        expect(list.toSpec()).toEqual(spec);
+      });
+
+      it("preserves the order of new elements when they are complex objects", function(){
+        var MyComplex = Complex.extend({
+          type: {
+            props: [{
+              name: "k",
+              type: "number"
+            }]
+          }
+        });
+
+        var ComplexList = List.extend({
+          type: {of: MyComplex}
+        });
+
+        var list = new ComplexList();
+        var spec =[{
+          k: 1
+        }, {
+          k: 2
+        }, {
+          k: 3
+        }, {
+          k: 4
+        }];
+        list.set(spec);
+        expect(list.toSpec()).toEqual(spec);
+      });
+
       // TODO: test update on complexes
       it("should append, update, remove and move, when no options are specified", function() {
         var list = new NumberList([1, 5, 10, 11, 40]);
@@ -1364,6 +1402,6 @@ define([
         });
       });
     }); // endregion Type
-    
+
   });
 });

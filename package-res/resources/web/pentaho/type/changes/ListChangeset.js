@@ -246,7 +246,9 @@ define([
           : Math.min(index, elems.length);
       }
 
-      var setElems = Array.isArray(fragment) ? fragment.slice() : [fragment];
+      var setElems = Array.isArray(fragment)
+            ? fragment.map(elemType.to, elemType)
+            : [elemType.to(fragment)];
 
       // Index of elements in setElems, by key.
       // This is used to detect duplicate values and to efficiently
@@ -267,7 +269,7 @@ define([
       var i = -1;
       var L = setElems.length;
       while(++i < L) {
-        if((elem = elemType.to(setElems[i])) != null) {
+        if((elem = setElems[i]) != null) {
           key = elem.key;
 
           var repeated = O.hasOwn(setKeys, key);
@@ -355,7 +357,7 @@ define([
         i = -1;
         L = setElems.length;
         while(++i < L) {
-          if((elem = elemType.to(setElems[i])) != null) {
+          if((elem = setElems[i]) != null) {
             var currentIndex = computed.indexOf(elem.key);
             if(move) {
               if(currentIndex < baseIndex) {
@@ -406,7 +408,10 @@ define([
       var elemType = this.owner.type.of;
       var elems = list._elems;
       var keys = list._keys;
-      var removeElems = Array.isArray(fragment) ? fragment : [fragment];
+      var removeElems = Array.isArray(fragment)
+        ? fragment.map(elemType.to, elemType)
+        : [elemType.to(fragment)];
+
       var elem;
       var key;
 
@@ -424,7 +429,7 @@ define([
       var i = -1;
       var L = removeElems.length;
       while(++i < L) {
-        if((elem = elemType.to(removeElems[i]))) {
+        if((elem = removeElems[i])) {
           key = elem.key;
 
           if(!O.hasOwn(removeKeys, key) && O.hasOwn(keys, key)) {
