@@ -13,12 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+define([
+  "./debug/DebugInfoByUrl"
+], function(DebugInfoByUrl) {
 
-/**
- * The `util` namespace contains a minimal set of supporting modules
- * used by other Pentaho Client Metadata Model classes.
- *
- * @name pentaho.util
- * @namespace
- * @private
- */
+  "use strict";
+
+  /**
+   * The `debugInfoByUrl` singleton provides access to the current maximum information level
+   * and other debugging information. The information level is initialized using url parameters.
+   *
+   * @name debugInfoByUrl
+   * @namespace
+   * @memberOf pentaho.util
+   * @amd {pentaho.util.debug.DebugInfoByUrl} pentaho/util/debugInfoByUrl
+   * @private
+   */
+  return new DebugInfoByUrl();
+});
