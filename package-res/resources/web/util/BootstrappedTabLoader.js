@@ -92,7 +92,7 @@
  		}
 
  		// Selects the default element and clicks it
-		$(config.parentSelector + " a[href=" + config.defaultTabSelector + "]").click();
+		$(config.parentSelector + " a[href=\\#" + config.defaultTabSelector + "]").click();
  	}
 
  	/**
