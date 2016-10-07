@@ -329,12 +329,13 @@ define([
       if(this._chart) {
         var width = this.model.width;
         var height = this.model.height;
+
         var options = this._chart.options;
         def.set(options, "width", width, "height", height);
 
         this._prepareLayout(options);
 
-        this._chart.render(true, true, false);
+        this._chart.renderResize(options.width, options.height);
       }
     },
 
