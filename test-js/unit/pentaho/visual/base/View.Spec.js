@@ -1115,7 +1115,7 @@ define([
 
         expect(DerivedView.__UpdateMethodsList.indexOf(info)).toBeGreaterThan(-1);
       });
-      
+
       // TODO: should also test it logs a warning...
       it("should ignore an _updateXyz method which has no known property groups", function() {
 
@@ -1128,7 +1128,7 @@ define([
 
         expect(DerivedView.__UpdateMethodsList.length).toBe(count);
       });
-      
+
       it("should ignore unknown property groups and still register the _updateXyz method " +
          "under the known mask", function() {
 
@@ -1163,6 +1163,50 @@ define([
         expect(info2).toBe(info);
       });
     }); // #extend
+
+    describe("getAsync(modelType)", function() {
+      it("should be defined", function() {
+        expect(typeof View.getAsync).toBe("function");
+      });
+
+      it("should be defined in subclasses of View", function() {
+        var SubView = View.extend();
+
+        expect(typeof SubView.getAsync).toBe("function");
+      });
+
+      it("should return a rejected promise when given no modelType", function() {
+
+        return testUtils.expectToRejectWith(View.getAsync(null), {
+          asymmetricMatch: function(error) { return error instanceof Error; }
+        });
+      });
+
+      it("should return a promise", function() {
+        var p = View.getAsync(model.type);
+
+        expect(p instanceof Promise).toBe(true);
+      });
+
+      it("should return a promise that is rejected when the type of model does not have " +
+          "a registered view type", function() {
+        var SubModel = Model.extend({type: {defaultView: null}});
+
+        return testUtils.expectToRejectWith(View.getAsync(SubModel.type), {
+          asymmetricMatch: function(error) { return error instanceof Error; }
+        });
+      });
+
+      it("should return a promise that is fulfilled with the view constructor of the registered default view type", function() {
+        var SubView  = View.extend();
+        var SubModel = Model.extend({type: {defaultView: SubView}});
+
+        return View.getAsync(SubModel.type)
+            .then(function(ViewCtor) {
+              expect(ViewCtor).toBe(SubView);
+            });
+      });
+    });
 
     describe("createAsync(domContainer, model)", function() {
       it("should be defined", function() {
