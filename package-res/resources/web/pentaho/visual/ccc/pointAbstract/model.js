@@ -49,10 +49,14 @@ define([
                 _getAttributesMaxLevel: function() {
                   // If the mapping contains a single `number` attribute,
                   // consider it ordinal, and not quantitative as the base code does.
-                  if(this.attributes.count === 1) {
+                  var count = this.attributes.count;
+                  if(count === 1) {
                     var dataAttr = this.attributes.at(0).dataAttribute;
-                    if(dataAttr && dataAttr.type === "number")
+                    if(dataAttr && dataAttr.type === "number") {
                       return "ordinal";
+                    }
+                  } else if(count > 1) {
+                    return "ordinal";
                   }
 
                   return this.base();
