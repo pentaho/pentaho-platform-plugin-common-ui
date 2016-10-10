@@ -746,14 +746,36 @@ define([
     createAsync: function(domContainer, model) {
       if(!domContainer) return Promise.reject(error.argRequired("domContainer"));
       if(!model) return Promise.reject(error.argRequired("model"));
+
       var args = arg.slice(arguments);
 
-      var promise = model.type.defaultViewClass;
-      if(!promise) return Promise.reject(new Error("No registered default view class."));
+      return View.getAsync(model.type)
+          .then(function(ViewClass) {
+            return O.make(ViewClass, args);
+          });
+    },
 
-      return promise.then(function(ViewClass) {
-        return O.make(ViewClass, args);
-      });
+    /**
+     * Gets a promise for the view class (constructor), of the registered default type, if any,
+     * for the given model type.
+     *
+     * If no default view type is registered
+     * for the given model type,
+     * or for any of its base model types,
+     * the returned promise is rejected.
+     *
+     * @param {!pentaho.visual.base.Model.Type} modelType - The visual model type.
+     * @return {!Promise.<Class.<pentaho.visual.base.View>>} A promise for a view class of the given model type.
+     *
+     * @rejects {pentaho.lang.ArgumentRequiredError} When `modelType` is not specified.
+     * @rejects {Error} When there is not a registered default view class for `modelType`.
+     */
+    getAsync: function(modelType) {
+      if(!modelType) return Promise.reject(error.argRequired("modelType"));
+
+      var promise = modelType.defaultViewClass;
+      if(!promise) return Promise.reject(new Error("No registered default view class."));
+      return promise;
     },
 
     // see Base.js
