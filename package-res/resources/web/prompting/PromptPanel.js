@@ -1263,7 +1263,7 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
          * in the case the the parameter UI is not shown.
          */
         init: function (noAutoAutoSubmit) {
-          if (this.onBeforeUpdate) {
+          if (this.onBeforeUpdate && this.autoSubmit) {
             this.onBeforeUpdate();
           }
 

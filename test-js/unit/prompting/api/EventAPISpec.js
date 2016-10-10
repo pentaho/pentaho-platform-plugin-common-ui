@@ -188,6 +188,7 @@ define([
 
         it("should call update always and render events if a change is needed", function (done) {
           promptPanel.paramDefn = $.extend(true, {}, initialParameterDefinition);
+          promptPanel.autoSubmit = true;
 
           eventApi.postInit(function(){
             initialParameterDefinition.parameterGroups[0].parameters.splice(1);
@@ -209,6 +210,7 @@ define([
 
         it("should call update, but not render events if a change is not needed", function (done) {
           promptPanel.paramDefn = $.extend(true, {}, initialParameterDefinition);
+          promptPanel.autoSubmit = true;
 
           eventApi.postInit(function(){
             promptPanel.refresh(initialParameterDefinition);
