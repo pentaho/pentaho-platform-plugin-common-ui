@@ -38,12 +38,12 @@ define(["dojo/_base/declare", "dijit/form/Select", "dijit/form/TextBox", "dijit/
             widgetsInTemplate: true,
 
 
-            apply: function (systemRowLimit, reportRowLimit, totalRows, isRowLimitReached) {
+            apply: function (systemRowLimit, reportRowLimit, isRowLimitReached) {
               if (!this._isRowLimitReached === isRowLimitReached) {
                 this._isRowLimitReached = isRowLimitReached;
                 this._refreshMessage();
               }
-              this._init(reportRowLimit, systemRowLimit, totalRows);
+              this._init(reportRowLimit, systemRowLimit);
             },
 
             postCreate: function () {
@@ -80,17 +80,21 @@ define(["dojo/_base/declare", "dijit/form/Select", "dijit/form/TextBox", "dijit/
 
             setRowLimit: function (rowLimit) {
               this._previousRowLimit = this._getRowLimit();
-              this.rowsNumberInput.set("value", rowLimit);
+              this.rowsNumberInput.set("value", rowLimit > 0 && rowLimit !== Infinity ? rowLimit : '');
             },
 
             setRowLimitRestrictions: function (rowLimitRestrictionsValue, fireEvent) {
               this.rowLimitRestrictions.set("value", rowLimitRestrictionsValue, fireEvent === true);
             },
 
-            _init: function (reportRowLimit, systemRowLimit, totalRows) {
+            _init: function (reportRowLimit, systemRowLimit ) {
               if (!this._isInitialized()) {
                 if (this._reportRowLimit === undefined) {
-                  this._reportRowLimit = reportRowLimit;
+                  if (reportRowLimit > 0) {
+                    this._reportRowLimit = reportRowLimit;
+                  } else {
+                    this._reportRowLimit = -1;
+                  }
                 }
                 if (this._systemRowLimit === undefined) {
                   if (systemRowLimit > 0) {
@@ -107,10 +111,8 @@ define(["dojo/_base/declare", "dijit/form/Select", "dijit/form/TextBox", "dijit/
                     this._selectedRowLimit = this._reportRowLimit;
                   }
                 } else {
-                  this._selectedRowLimit = Math.min(totalRows, this._systemRowLimit);
-                  if (this._selectedRowLimit === this._systemRowLimit) {
-                    this.setRowLimitRestrictions('MAXIMUM');
-                  }
+                  this._selectedRowLimit = this._systemRowLimit !== Infinity ? this._systemRowLimit : -1;
+                  this.setRowLimitRestrictions('MAXIMUM');
                 }
                 this._initUI();
               }
@@ -144,10 +146,13 @@ define(["dojo/_base/declare", "dijit/form/Select", "dijit/form/TextBox", "dijit/
             },
 
             _applySystem: function () {
+              var applyReportLimit = this._reportRowLimit > 0 && this._reportRowLimit < this._systemRowLimit;
               this._setRowsNumberInputDisabled(true);
-              this.setRowLimit(this._systemRowLimit);
+              this.setRowLimit(applyReportLimit ? this._reportRowLimit : this._systemRowLimit );
               this.setRowLimitRestrictions('MAXIMUM');
-              this._showSystemMessage();
+              if(!applyReportLimit){
+                this._showSystemMessage();
+              }
             },
 
             _applyUser: function () {
@@ -174,7 +179,7 @@ define(["dojo/_base/declare", "dijit/form/Select", "dijit/form/TextBox", "dijit/
                 } else {
                   //Apply report limit
                   this.setRowLimit(this._reportRowLimit);
-                  this.setRowLimitRestrictions('NO_MORE_THAN');
+                  this.setRowLimitRestrictions('MAXIMUM');
                   this._getMessage && this._getMessage().hide();
                 }
               } else {
@@ -225,7 +230,8 @@ define(["dojo/_base/declare", "dijit/form/Select", "dijit/form/TextBox", "dijit/
             },
 
             _getRowLimit: function () {
-              return this.rowsNumberInput.get('value');
+              var value = this.rowsNumberInput.get('value');
+              return value === '' ? '-1' : value ;
             },
 
             _getRowLimitRestrictions: function () {
