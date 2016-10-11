@@ -22,7 +22,7 @@ define(['common-ui/prompting/builders/TextInputBuilder', 'dojo/number', 'common-
       promptPanel: {
         generateWidgetGUID: function() { return "12345" },
         getParameterName: function() { }
-      }, 
+      },
       param:  {
         values: { },
         attributes: { }
@@ -41,7 +41,7 @@ define(['common-ui/prompting/builders/TextInputBuilder', 'dojo/number', 'common-
       component = textInputBuilder.build(args);
 
       ph = $('<div>').attr('id', component.htmlObject);
-      $('body').append(ph); 
+      $('body').append(ph);
     });
 
     afterEach(function() {
@@ -56,13 +56,13 @@ define(['common-ui/prompting/builders/TextInputBuilder', 'dojo/number', 'common-
       expect(component.type).toBe('TextInputComponent');
     });
 
-    it("should set parameter on prechange", function() {      
+    it("should set parameter on prechange", function() {
       var parameterValue = 'test';
-      component.dashboard = { 
+      component.dashboard = {
         setParameter: function() { },
         getParameterValue: function() { return parameterValue }
       };
-      
+
       component.update();
       spyOn(component.dashboard, 'setParameter');
       spyOn(DojoNumber, 'parse').and.callFake(function() { });
@@ -78,12 +78,12 @@ define(['common-ui/prompting/builders/TextInputBuilder', 'dojo/number', 'common-
         }
       ];
       var parameterValue = 'test';
-      component.dashboard = { 
+      component.dashboard = {
         setParameter: function() { },
         getParameterValue: function() { return parameterValue }
       };
 
-      component.update(); 
+      component.update();
       spyOn($.fn, 'attr').and.callThrough();
       component.postExecution();
       expect($.fn.attr).toHaveBeenCalled();
@@ -93,16 +93,17 @@ define(['common-ui/prompting/builders/TextInputBuilder', 'dojo/number', 'common-
       component.param.values = [
         {
           label: 'param1',
+          value: 'param1',
           selected: false
         }
       ];
       var parameterValue = 'test';
-      component.dashboard = { 
+      component.dashboard = {
         setParameter: function() { },
         getParameterValue: function() { return parameterValue }
       };
 
-      component.update(); 
+      component.update();
       spyOn($.fn, 'attr').and.callThrough();
       component.postExecution();
       expect($.fn.attr).toHaveBeenCalled();
@@ -113,43 +114,45 @@ define(['common-ui/prompting/builders/TextInputBuilder', 'dojo/number', 'common-
       component.param.values = [
         {
           label: parameterLabel,
+          value: parameterLabel,
           selected: true,
           type: 'java.lang.Integer'
         }
       ];
       var parameterValue = 'test';
-      component.dashboard = { 
+      component.dashboard = {
         setParameter: function() { },
         getParameterValue: function() { return parameterValue; }
       };
-     
-      component.update(); 
+
+      component.update();
       spyOn($.fn, 'attr').and.callThrough();
       component.postExecution();
       expect($.fn.attr).toHaveBeenCalled();
       expect($('input', ph).attr('value')).toBe(parameterLabel);
-    });    
+    });
 
     it("should set element value with number parameter and with type not defined", function() {
       parameterLabel = '1234';
       component.param.values = [
         {
           label: parameterLabel,
+          value: parameterLabel,
           selected: true
         }
       ];
       var parameterValue = 'test';
-      component.dashboard = { 
+      component.dashboard = {
         setParameter: function() { },
         getParameterValue: function() { return parameterValue; }
       };
 
-      component.update(); 
+      component.update();
       spyOn($.fn, 'attr').and.callThrough();
       component.postExecution();
       expect($.fn.attr).toHaveBeenCalled();
       expect($('input', ph).attr('value')).toBe(parameterLabel);
-    });    
+    });
 
   });
 
