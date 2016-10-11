@@ -76,49 +76,59 @@ define(["pentaho/common/RowLimitControl", "pentaho/common/RowLimitMessage", "pen
 
 
         it("should apply values on init", function () {
-          ctrl._init(-1, 0, 100);
+          //Both system and report not selected
+          ctrl._init(-1, 0);
           expect(ctrl._reportRowLimit, -1);
           expect(ctrl._systemRowLimit, 0);
           expect(ctrl._selectedRowLimit, 100);
-          expect(ctrl.rowsNumberInput.get('value')).toBe("100");
+          expect(ctrl._getRowLimit()).toBe('-1');
+          expect(ctrl.rowsNumberInput.get('value')).toBe('');
           expect(ctrl.rowLimitRestrictions.get('disabled')).toBe(false);
           expect(ctrl.rowsNumberInput.get('disabled')).toBe(false);
           ctrl.reset();
 
-          ctrl._init(100, 200, 300);
+          //Both provided, report lower
+          ctrl._init(100, 200);
           expect(ctrl._reportRowLimit, 100);
           expect(ctrl._systemRowLimit, 200);
           expect(ctrl._selectedRowLimit, 100);
+          expect(ctrl._getRowLimit()).toBe('100');
           expect(ctrl.rowsNumberInput.get('value')).toBe("100");
           expect(ctrl.rowLimitRestrictions.get('disabled')).toBe(true);
           expect(ctrl.rowsNumberInput.get('disabled')).toBe(true);
           ctrl.reset();
 
-          ctrl._init(500, 200, 300);
+          //Both provided, system lower
+          ctrl._init(500, 200);
           expect(ctrl._reportRowLimit, 500);
           expect(ctrl._systemRowLimit, 200);
           expect(ctrl._selectedRowLimit, 200);
+          expect(ctrl._getRowLimit()).toBe('200');
           expect(ctrl.rowsNumberInput.get('value')).toBe("200");
           expect(ctrl.rowLimitRestrictions.get('disabled')).toBe(true);
           expect(ctrl.rowsNumberInput.get('disabled')).toBe(true);
           ctrl.reset();
 
-          ctrl._init(-1, 500, 300);
+          //Only system provided
+          ctrl._init(-1, 500);
           expect(ctrl._reportRowLimit, -1);
           expect(ctrl._systemRowLimit, 500);
-          expect(ctrl._selectedRowLimit, 300);
-          expect(ctrl.rowsNumberInput.get('value')).toBe("300");
+          expect(ctrl._selectedRowLimit, 500);
+          expect(ctrl._getRowLimit()).toBe('500');
+          expect(ctrl.rowsNumberInput.get('value')).toBe("500");
           expect(ctrl.rowLimitRestrictions.get('disabled')).toBe(false);
           expect(ctrl.rowsNumberInput.get('disabled')).toBe(false);
           ctrl.reset();
 
-          ctrl._init(-1, 300, 500);
-          expect(ctrl._reportRowLimit, -1);
-          expect(ctrl._systemRowLimit, 500);
-          expect(ctrl._selectedRowLimit, 300);
-          expect(ctrl.rowsNumberInput.get('value')).toBe("300");
-          expect(ctrl.rowLimitRestrictions.get('disabled')).toBe(false);
-          expect(ctrl.rowsNumberInput.get('disabled')).toBe(false);
+          //Only report provided
+          ctrl._init(100, 0);
+          expect(ctrl._reportRowLimit, 100);
+          expect(ctrl._systemRowLimit, 0);
+          expect(ctrl._selectedRowLimit, 100);
+          expect(ctrl._getRowLimit()).toBe('100');
+          expect(ctrl.rowsNumberInput.get('value')).toBe("100");
+          expect(ctrl.rowLimitRestrictions.get('disabled')).toBe(true);
+          expect(ctrl.rowsNumberInput.get('disabled')).toBe(true);
         });
 
 
