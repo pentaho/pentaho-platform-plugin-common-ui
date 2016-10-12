@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 define([
+  "module",
   "pentaho/lang/Event"
-], function(Event) {
+], function(module, Event) {
+
   "use strict";
 
-  return Event.extend("pentaho.visual.base.events.WillUpdate", /** @lends pentaho.visual.base.events.WillUpdate# */{
+  return Event.extend(module.id, /** @lends pentaho.visual.base.events.WillUpdate# */{
     /**
      * @alias WillUpdate
      * @memberOf pentaho.visual.base.events

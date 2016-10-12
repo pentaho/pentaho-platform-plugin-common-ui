@@ -14,15 +14,20 @@
  * limitations under the License.
  */
 define([
-  "module",
-  "../barAbstract/View"
-], function(module, AbstractBarChart) {
+  "./debug/DebugInfoByUrl"
+], function(DebugInfoByUrl) {
 
   "use strict";
 
-  return AbstractBarChart.extend(module.id, {
-    _options: {
-      orientation: "horizontal"
-    }
-  });
+  /**
+   * The `debugInfoByUrl` singleton provides access to the current maximum information level
+   * and other debugging information. The information level is initialized using url parameters.
+   *
+   * @name debugInfoByUrl
+   * @namespace
+   * @memberOf pentaho.util
+   * @amd {pentaho.util.debug.DebugInfoByUrl} pentaho/util/debugInfoByUrl
+   * @private
+   */
+  return new DebugInfoByUrl();
 });

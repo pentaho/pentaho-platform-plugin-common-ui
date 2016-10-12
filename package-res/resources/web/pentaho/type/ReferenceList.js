@@ -15,12 +15,13 @@
  */
 
 define([
+  "module",
   "../lang/Base"
-], function(Base) {
+], function(module, Base) {
 
   "use strict";
 
-  return Base.Array.extend("pentaho.type.ReferenceList", /** @lends pentaho.type.ReferenceList# */{
+  return Base.Array.extend(module.id, /** @lends pentaho.type.ReferenceList# */{
 
     /**
      * @alias ReferenceList
