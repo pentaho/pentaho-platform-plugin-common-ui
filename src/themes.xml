@@ -8,6 +8,10 @@
     <file>globalSlate.css</file>
     <file>../themeUtils.js</file>
   </slate>
+  <sapphire display-name="Sapphire" system="true">
+    <file>globalSapphire.css</file>
+    <file>../themeUtils.js</file>
+  </sapphire>
   <sample1 system="true" hidden="true">
     <file>style1.css</file>
   </sample1>
