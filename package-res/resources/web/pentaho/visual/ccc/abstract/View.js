@@ -716,6 +716,7 @@ define([
             var cccDim = def.lazy(cccDims, maInfo.cccDimName);
             cccDim.valueType  = this._getAttributeCccValueType(maInfo.attr);
             cccDim.isDiscrete = this._isRoleQualitative(maInfo.role);
+            cccDim.comparer   = null;
             if(cccDim.valueType === Date) {
               // Change the default formatter to use JavaScript's default serialization.
               // Affects tooltips and discrete axes.
