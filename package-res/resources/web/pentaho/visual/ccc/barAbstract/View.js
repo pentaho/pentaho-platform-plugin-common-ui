@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 define([
-  "module",
   "cdf/lib/CCC/def",
   "../categoricalContinuousAbstract/View"
-], function(module, def, AbstractCategoricalContinuousChart) {
+], function(def, AbstractCategoricalContinuousChart) {
 
   "use strict";
 
-  return AbstractCategoricalContinuousChart.extend(module.id, {
+  return AbstractCategoricalContinuousChart.extend({
 
     _cccClass: "BarChart",
 

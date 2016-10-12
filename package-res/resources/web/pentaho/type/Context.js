@@ -59,7 +59,7 @@ define([
     _standardTypeMids[_baseFacetsMid + name] = 1;
   });
 
-  var Context = Base.extend(module.id, /** @lends pentaho.type.Context# */{
+  var Context = Base.extend(/** @lends pentaho.type.Context# */{
 
     /**
      * @alias Context

@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 define([
-  "module",
   "cdf/lib/CCC/def",
   "../barAbstract/View",
   "../util"
-], function(module, def, AbstractBarChart, util) {
+], function(def, AbstractBarChart, util) {
 
   "use strict";
 
-  return AbstractBarChart.extend(module.id, {
+  return AbstractBarChart.extend({
 
     _roleToCccRole: {
       "columns": "series",

@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 define([
-  "module",
   "../barAbstract/View",
   "../trends"
-], function(module, AbstractBarChart) {
+], function(AbstractBarChart) {
 
   "use strict";
 
-  return AbstractBarChart.extend(module.id, {
+  return AbstractBarChart.extend({
     _supportsTrends: true
   });
 });

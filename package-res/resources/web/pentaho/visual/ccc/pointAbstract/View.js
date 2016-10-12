@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 define([
-  "module",
   "../categoricalContinuousAbstract/View"
-], function(module, AbstractCategoricalContinuousChart) {
+], function(AbstractCategoricalContinuousChart) {
 
   "use strict";
 
-  return AbstractCategoricalContinuousChart.extend(module.id, {
+  return AbstractCategoricalContinuousChart.extend({
     _options: {
       axisOffset: 0,
       tooltipOffset: 15

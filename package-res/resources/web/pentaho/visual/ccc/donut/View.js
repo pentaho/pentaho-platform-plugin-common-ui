@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 define([
-  "module",
   "../pie/View"
-], function(module, PieView) {
+], function(PieView) {
 
   "use strict";
 
-  return PieView.extend(module.id, {
+  return PieView.extend({
     _options: {
       slice_innerRadiusEx: "60%"
     }
