@@ -249,6 +249,8 @@ define(["dojo/_base/declare", "dijit/form/Select", "dijit/form/TextBox", "dijit/
             },
 
             _onSelect: function (event) {
+              this._getMessage().hide()
+              this._isRowLimitReached = false;
               if (event === 'MAXIMUM') {
                 this._applySystem();
                 if (this._callback) {
