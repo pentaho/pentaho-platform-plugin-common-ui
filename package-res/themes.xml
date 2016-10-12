@@ -8,6 +8,10 @@
     <file>globalCrystal.css</file>
     <file>bootstrap/css/bootstrap-namespaced.css</file>
   </crystal>
+  <sapphire display-name="Sapphire" system="true">
+    <file>globalSapphire.css</file>
+    <file>bootstrap/css/bootstrap-namespaced.css</file>
+  </sapphire>
   <slate display-name="Slate" system="true" hidden="true">
     <file>globalSlate.css</file>
   </slate>
