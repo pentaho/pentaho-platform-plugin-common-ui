@@ -29,11 +29,11 @@ define([
    * @implements pentaho.lang.IEventRegistrationHandle
    * @private
    */
-  function pentaho_lang_IEventRegistrationHandle(dispose) {
+  function EventRegistrationHandle(dispose) {
     this.dispose = dispose;
   }
 
-  pentaho_lang_IEventRegistrationHandle.prototype.remove = function() {
+  EventRegistrationHandle.prototype.remove = function() {
     return this.dispose();
   };
 
@@ -119,7 +119,7 @@ define([
 
               queue[i + 1] = listenerInfo;
 
-              handles.push(new pentaho_lang_IEventRegistrationHandle(removeSingleHandle.bind(this, eventType, listenerInfo)));
+              handles.push(new EventRegistrationHandle(removeSingleHandle.bind(this, eventType, listenerInfo)));
 
               break;
             }
@@ -132,7 +132,7 @@ define([
       }
 
       if(handles.length > 1) {
-        return new pentaho_lang_IEventRegistrationHandle(removeMultipleHandles.bind(this, handles));
+        return new EventRegistrationHandle(removeMultipleHandles.bind(this, handles));
       }
 
       return null;
@@ -219,7 +219,7 @@ define([
     off: function(typeOrHandle, listener) {
       if(!typeOrHandle) throw error.argRequired("typeOrHandle");
 
-      if(typeOrHandle instanceof pentaho_lang_IEventRegistrationHandle) {
+      if(typeOrHandle instanceof EventRegistrationHandle) {
         // This is just syntax sugar, so let dispose from any source.
         typeOrHandle.dispose();
         return;

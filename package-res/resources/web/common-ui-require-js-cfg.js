@@ -64,10 +64,7 @@
   if(minSuffix) {
     requirePaths["common-ui/util/require-css/css"] = basePath + "/util/require-css/css" + minSuffix;
   }
-  requireMap["*"]["css"] = "common-ui/util/require-css/css";
-
-  // Use the debugInfoByUrl implementation.
-  requireMap["*"]["pentaho/util/debugInfo"] = "pentaho/util/debugInfoByUrl";
+  requireMap["*"]["css" ] = "common-ui/util/require-css/css";
 
   // DOJO
   requirePaths["dojo" ] = basePath + "/dojo/dojo";

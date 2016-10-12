@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 define([
-  "module",
   "./lang/Base",
   "./util/object",
   "./util/arg"
-], function(module, Base, O, arg) {
+], function(Base, O, arg) {
 
   "use strict";
 
   /* global SESSION_NAME:false, SESSION_LOCALE:false, active_theme:false */
 
-  return Base.extend(module.id, {
+  return Base.extend("pentaho.GlobalContextVars", {
 
     /**
      * @alias GlobalContextVars

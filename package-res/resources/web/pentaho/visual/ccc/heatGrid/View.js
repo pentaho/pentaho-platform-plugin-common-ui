@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 define([
-  "module",
   "cdf/lib/CCC/def",
   "cdf/lib/CCC/cdo",
   "../cartesianAbstract/View"
-], function(module, def, cdo, AbstractCartesianChart) {
+], function(def, cdo, AbstractCartesianChart) {
 
   "use strict";
 
-  return AbstractCartesianChart.extend(module.id, {
+  return AbstractCartesianChart.extend({
     _cccClass: "HeatGridChart",
 
     _roleToCccRole: {

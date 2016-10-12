@@ -1,14 +1,13 @@
 define([
-  "module",
   "pentaho/lang/Base"
-], function(module, Base) {
+], function(Base) {
 
   "use strict";
 
   // Allow ~0
   // jshint -W016
 
-  return Base.extend(module.id, /** @lends pentaho.util.BitSet# */{
+  return Base.extend(/** @lends pentaho.util.BitSet# */{
 
     /**
      * The `BitSet` class represents a set data structure that is

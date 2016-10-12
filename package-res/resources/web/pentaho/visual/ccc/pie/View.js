@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 define([
-  "module",
   "cdf/lib/CCC/def",
   "../abstract/View"
-], function(module, def, AbstractChart) {
+], function(def, AbstractChart) {
 
   "use strict";
 
-  return AbstractChart.extend(module.id, {
+  return AbstractChart.extend({
     _cccClass: "PieChart",
 
     _roleToCccRole: {

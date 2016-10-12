@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 define([
-  "module",
   "../metricDotAbstract/View"
-], function(module, MetricDotAbstractView) {
+], function(MetricDotAbstractView) {
 
   "use strict";
 
-  return MetricDotAbstractView.extend(module.id);
+  return MetricDotAbstractView.extend({});
 });
