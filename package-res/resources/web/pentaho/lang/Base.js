@@ -48,12 +48,10 @@
  *     Specify `extend_order` when sub-classing, e.g. `Base.extend({extend_order: ["b", "a"]});`.
  */
 define([
-  "module",
   "../util/object",
   "../util/fun",
-  "../util/text",
-  "../util/debugInfo"
-], function(module, O, fun, text, debugInfo) {
+  "../util/text"
+], function(O, fun, text) {
   "use strict";
 
   // ## Support variables
@@ -84,8 +82,6 @@ define([
         "extend_order": 1,
         "extend_exclude": 1
       });
-
-  var _isDebugMode = debugInfo.Levels.debug <= debugInfo.getMaxLevel(module);
 
   return base_create();
 
@@ -445,14 +441,11 @@ define([
   function class_extend_subclass(name, instSpec) {
     /* jshint validthis:true*/
 
-    if(!name) {
-      name = this.name || this.displayName || null;
-      if(name) name += "$";
-    }
-
     // Create PROTOTYPE and CONSTRUCTOR
     var subProto = Object.create(this.prototype);
-    var Subclass = class_extend_createCtor(subProto, instSpec, name);
+    var Subclass = class_extend_createCtor(subProto, instSpec);
+
+    if(name) setFunName(Subclass, name);
 
     // Wire proto and constructor, so that the `instanceof` operator works.
     O.setConst(subProto, "constructor", Subclass);
@@ -516,13 +509,12 @@ define([
    *
    * @param {!Object} proto The subclass' prototype.
    * @param {Object} instSpec The instance-side specification.
-   * @param {string} [name] The class name.
    *
    * @return {function} The subclass constructor.
    *
    * @private
    */
-  function class_extend_createCtor(proto, instSpec, name) {
+  function class_extend_createCtor(proto, instSpec) {
     /* jshint validthis:true*/
 
     var baseInit = proto.__init__;
@@ -530,15 +522,13 @@ define([
 
     if(Class) {
       // Maybe override base constructor.
-      Class = methodOverride(Class, baseInit, proto.__root_proto__, name, /* forceOverrideIfDebug: */true);
+      Class = methodOverride(Class, baseInit, proto.__root_proto__);
 
       // Create shared, hidden, constant `__init__` property.
       O.setConst(proto, "__init__", Class);
     } else {
-      Class = class_extend_createCtorInit(baseInit, name);
+      Class = class_extend_createCtorInit(baseInit);
     }
-
-    if(name) setFunName(Class, name);
 
     return Class;
   }
@@ -566,30 +556,15 @@ define([
    * so the fixed `init` argument is actually required.
    *
    * @param {function} init The function to be called by the constructor.
-   * @param {string} [name] The class name.
    *
-   * @return {function} The function that calls `init`.
+   * @return {function} The function that calls init.
    *
    * @private
    */
-  function class_extend_createCtorInit(init, name) {
-    if(!name || !_isDebugMode) {
-      return function() {
-        return init.apply(this, arguments);
-      };
-    }
-
-    var f = new Function(
-        "init",
-        "return function " + sanitizeIdentifier(name) + "() {\n" +
-        "  return init.apply(this, arguments);\n" +
-        "};");
-
-    return f(init);
-  }
-
-  function sanitizeIdentifier(name) {
-    return name.replace(/[^\w0-9$_]/gi, "_");
+  function class_extend_createCtorInit(init) {
+    return function() {
+      return init.apply(this, arguments);
+    };
   }
 
   /**
@@ -920,7 +895,7 @@ define([
     /* jshint validthis:true*/
 
     if(fun.is(value)) {
-      this[name] = methodOverride(value, this[name], rootProto, name);
+      this[name] = methodOverride(value, this[name], rootProto);
     } else if(!funOnly) {
       this[name] = value;
     }
@@ -948,15 +923,13 @@ define([
    * @param {?function} baseValue The method to override.
    * @param {Object} [rootProto] The root prototype.
    * When unspecified, overriding methods requires using each actual instance to store the special `base` property.
-   * @param {string} [name] The name to give to the overriding method.
-   * @param {boolean} [forceOverrideIfDebug=false] Indicates that the method should be overridden, when in debug mode,
-   * even in a case where the base method is not called. Only applies if name is specified non-empty.
+   *
    * @return {?function} The override-ready function,
    * or null if both `value` and `baseValue` are nully.
    *
    * @private
    */
-  function methodOverride(value, baseValue, rootProto, name, forceOverrideIfDebug) {
+  function methodOverride(value, baseValue, rootProto) {
     if(!value) return baseValue;
 
     // Get the unwrapped value.
@@ -975,10 +948,10 @@ define([
     // valueOf() test is to avoid circular references
     if(!method ||
        (baseValue.valueOf && baseValue.valueOf() === method) ||
-       ((!forceOverrideIfDebug || !_isDebugMode) && !methodCallsBase(method)))
+       !methodCallsBase(method))
       return value;
 
-    value = methodOverrideWrapWithName(method, baseValue, rootProto, name);
+    value = methodOverrideWrap(method, baseValue, rootProto);
 
     // Returns the underlying, wrapped method
     value.valueOf = function(type) {
@@ -1035,41 +1008,6 @@ define([
         return method.apply(this, arguments);
       } finally { this.base = previous; }
     };
-  }
-
-  function methodOverrideWrapWithName(method, baseMethod, rootProto, name) {
-
-    if(!name || !_isDebugMode)
-      return methodOverrideWrap(method, baseMethod, rootProto);
-
-    var f;
-
-    if(rootProto) {
-      f = new Function(
-          "_method_",
-          "_baseMethod_",
-          "_rootProto_",
-          "return function " + sanitizeIdentifier(name) + "() {\n" +
-          "  var previous = _rootProto_.base; _rootProto_.base = _baseMethod_;\n" +
-          "  try {\n" +
-          "      return _method_.apply(this, arguments);\n" +
-          "  } finally { _rootProto_.base = previous; }\n" +
-          "};");
-    } else {
-      // float
-      f = new Function(
-          "_method_",
-          "_baseMethod_",
-          "_rootProto_",
-          "return function " + sanitizeIdentifier(name) + "() {\n" +
-          "  var previous = this.base; this.base = _baseMethod_;\n" +
-          "  try {\n" +
-          "     return _method_.apply(this, arguments);\n" +
-          "  } finally { this.base = previous; }\n" +
-          "};");
-    }
-
-    return f(method, baseMethod, rootProto);
   }
 
   // endregion
