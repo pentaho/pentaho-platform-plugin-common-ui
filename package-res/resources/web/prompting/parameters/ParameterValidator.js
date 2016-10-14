@@ -21,8 +21,8 @@
  * @name ParameterValidator
  * @class
  */
-define(['cdf/lib/Base'],
-    function (Base) {
+define(['cdf/lib/Base', 'common-ui/util/TextFormatter', 'common-ui/util/formatting', 'pentaho/common/Messages'],
+    function (Base, TextFormatter, FormatUtils, Messages) {
 
       var addErrorToParameter = function (paramDefn, paramName, message) {
         var errorList = paramDefn.errors[paramName];
@@ -105,11 +105,27 @@ define(['cdf/lib/Base'],
           // remove error, if any
           removeError(paramDefn, currentParameter.name);
 
+          if (typeof untrustedValue != 'undefined') {
+          	var formatterType = TextFormatter.getFormatType(currentParameter.type);
+          	if (formatterType == 'number' && typeof untrustedValue != formatterType) {
+          		addErrorToParameter(paramDefn, paramName, Messages.getString('DefaultReportParameterValidator.ParameterIsInvalidValue'));
+          	}
+
+          	if (formatterType == 'date') {
+          		var dateFormatter = FormatUtils.createFormatter(currentParameter);
+          		var dataTransportFormatter = FormatUtils.createDataTransportFormatter(currentParameter);
+
+          		if (!dataTransportFormatter.parse(untrustedValue) && !dateFormatter.parse(untrustedValue)) {
+          			addErrorToParameter(paramDefn, paramName, Messages.getString('DefaultReportParameterValidator.ParameterIsInvalidValue'));
+          		}
+          	}
+          }
+
           // validate untrusted parameter value
           if(currentParameter.mandatory) {
             if(typeof untrustedValue == 'undefined' || untrustedValue == '') {
               // add error
-              addErrorToParameter(paramDefn, paramName, "This prompt value is of an invalid value");
+              addErrorToParameter(paramDefn, paramName, Messages.getString('DefaultReportParameterValidator.ParameterIsInvalidValue'));
             }
           }
           var values = [];
@@ -120,12 +136,16 @@ define(['cdf/lib/Base'],
               values.push(value);
             });
           } else {
-            values.push(untrustedValue);
+            if (formatterType == 'date' && dateFormatter.parse(untrustedValue)) {
+            	values.push(dataTransportFormatter.format(dateFormatter.parse(untrustedValue)));
+            } else {
+            	values.push(untrustedValue);
+            }
           }
           if(currentParameter.strict) {
             if(!isValidValues(currentParameter.values, values)) {
               // add error
-              addErrorToParameter(paramDefn, paramName, "This prompt value is of an invalid value");
+              addErrorToParameter(paramDefn, paramName, Messages.getString('DefaultReportParameterValidator.ParameterIsInvalidValue'));
             }
           }
 

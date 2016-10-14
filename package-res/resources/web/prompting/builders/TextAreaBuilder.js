@@ -97,7 +97,7 @@ define(['./FormattedParameterWidgetBuilderBase', 'cdf/components/TextareaInputCo
           comp.getValue = function(){
             var val = $('#' + this.name).val();
             if (this.formatter) {
-              return this.transportFormatter.format(this.formatter.parse(val));
+              return this.transportFormatter.format(this.formatter.parse(val)) !== null ? this.transportFormatter.format(this.formatter.parse(val)) : val;
             } else {
               return val;
             }

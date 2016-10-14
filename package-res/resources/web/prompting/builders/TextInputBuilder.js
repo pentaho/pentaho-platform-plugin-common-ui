@@ -93,7 +93,10 @@ define(["common-ui/util/util", 'dojo/number', 'cdf/components/TextInputComponent
             var initialValue;
             $.each(this.param.values, function(i, v) {
               if (v.selected) {
-                initialValue = this.formatter ? this.formatter.format(this.transportFormatter.parse(v.value)) : v.value;
+               	initialValue = v.value;
+              	if (this.formatter) {
+              		initialValue = this.formatter.format(this.transportFormatter.parse(v.value)) !== null ? this.formatter.format(this.transportFormatter.parse(v.value)) : v.value;
+              	}
 
                 try {
                   if (isNaN(v.value) || Math.abs(v.value) == Infinity) {
