@@ -193,6 +193,7 @@ define(["dojo/_base/declare", "dijit/form/Select", "dijit/form/TextBox", "dijit/
                   }
                 } else if (this._systemRowLimit == this._selectedRowLimit) {
                   this.setRowLimit(this._selectedRowLimit);
+                  this.rowLimitNumberLabel.innerHTML = this._systemRowLimit > 0 && this._systemRowLimit !== Infinity ? this._systemRowLimit : '';
                   if (this._getRowLimitRestrictions() === 'MAXIMUM') {
                     this._setRowsNumberInputDisabled(true);
                     this._showSystemMessage();
@@ -241,6 +242,13 @@ define(["dojo/_base/declare", "dijit/form/Select", "dijit/form/TextBox", "dijit/
             _setRowsNumberInputDisabled: function (isDisabled) {
               this.rowsNumberInput.set('disabled', isDisabled);
               this.rowsNumberInput.set('readonly', isDisabled);
+              if(isDisabled) {
+                $(".rl_rowsNumberInput").hide();
+                this.rowLimitNumberLabel.hidden = false;
+              } else {
+                $(".rl_rowsNumberInput").show();
+                this.rowLimitNumberLabel.hidden = true;
+              }
             },
 
             _setRowLimitRestrictionDisabled: function (isDisabled) {
