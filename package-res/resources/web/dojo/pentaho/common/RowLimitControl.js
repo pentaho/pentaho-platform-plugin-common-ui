@@ -80,7 +80,7 @@ define(["dojo/_base/declare", "dijit/form/Select", "dijit/form/TextBox", "dijit/
 
             setRowLimit: function (rowLimit) {
               this._previousRowLimit = this._getRowLimit();
-              this.rowsNumberInput.set("value", rowLimit > 0 && rowLimit !== Infinity ? rowLimit : '');
+              this.rowsNumberInput.set("value", rowLimit > 0  ? rowLimit : '');
             },
 
             setRowLimitRestrictions: function (rowLimitRestrictionsValue, fireEvent) {
@@ -100,7 +100,7 @@ define(["dojo/_base/declare", "dijit/form/Select", "dijit/form/TextBox", "dijit/
                   if (systemRowLimit > 0) {
                     this._systemRowLimit = systemRowLimit;
                   } else {
-                    this._systemRowLimit = Infinity;
+                    this._systemRowLimit = 0;
                   }
                 }
                 this._initialized = true;
@@ -111,7 +111,7 @@ define(["dojo/_base/declare", "dijit/form/Select", "dijit/form/TextBox", "dijit/
                     this._selectedRowLimit = this._reportRowLimit;
                   }
                 } else {
-                  this._selectedRowLimit = this._systemRowLimit !== Infinity ? this._systemRowLimit : -1;
+                  this._selectedRowLimit = this._systemRowLimit;
                   this.setRowLimitRestrictions('MAXIMUM');
                 }
                 this._initUI();
@@ -146,7 +146,7 @@ define(["dojo/_base/declare", "dijit/form/Select", "dijit/form/TextBox", "dijit/
             },
 
             _applySystem: function () {
-              var applyReportLimit = this._reportRowLimit > 0 && this._reportRowLimit < this._systemRowLimit;
+              var applyReportLimit = this._reportRowLimit > 0 && (this._systemRowLimit <= 0 || this._reportRowLimit < this._systemRowLimit);
               this._setRowsNumberInputDisabled(true);
               this.setRowLimit(applyReportLimit ? this._reportRowLimit : this._systemRowLimit );
               this.setRowLimitRestrictions('MAXIMUM');
@@ -171,7 +171,7 @@ define(["dojo/_base/declare", "dijit/form/Select", "dijit/form/TextBox", "dijit/
                 //No doubt - disable controls
                 this._setRowLimitRestrictionDisabled(true);
                 this._setRowsNumberInputDisabled(true);
-                if (this._systemRowLimit < this._reportRowLimit) {
+                if (this._systemRowLimit > 0 && this._systemRowLimit < this._reportRowLimit) {
                   //Apply system limit
                   this.setRowLimit(this._systemRowLimit);
                   this.setRowLimitRestrictions('MAXIMUM');
