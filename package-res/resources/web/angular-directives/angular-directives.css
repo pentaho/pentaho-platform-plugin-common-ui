@@ -122,11 +122,11 @@ treecontrol .treeControlLoading .spin {
 .bootstrap .angular-dojo.dateTimePicker input.dijitValidationIcon {
   margin: 0px 0px 0px 2px;
   border: none !important;
-  background-color: transparent; !important;
+  background-color: transparent !important;
   box-shadow: none;
-  --webkit-box-shadow: none;
+  -webkit-box-shadow: none;
   transition: none;
-  --webkit-transition: none;
+  -webkit-transition: none;
 }
 
 .bootstrap .angular-dojo.dateTimePicker .pentaho-listbox {
@@ -167,7 +167,7 @@ treecontrol .treeControlLoading .spin {
   border: none;
   width: 190px !important;
   box-shadow: none;
-  --webkit-box-shadow: none;
+  -webkit-box-shadow: none;
 }
 
 .bootstrap DIV select {
