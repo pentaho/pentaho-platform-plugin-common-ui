@@ -469,6 +469,7 @@ define([
 				}
 				popup.close(this.dropDown);
 				this._opened = false;
+				$("#queryOptions").removeClass("checked");
 			}
 		}
 
