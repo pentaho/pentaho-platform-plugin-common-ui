@@ -185,8 +185,8 @@ define(["dojo/_base/declare", "dijit/form/Select", "dijit/form/TextBox", "dijit/
               } else {
                 this._setRowLimitRestrictionDisabled(false);
 
-                if (this._systemRowLimit <=0 || this._systemRowLimit > this._selectedRowLimit) {
-                  //User limit is less than system - apply it
+                if ((this._systemRowLimit <= 0 && this._selectedRowLimit > 0) || this._systemRowLimit > this._selectedRowLimit) {
+                  //If we have nothing defined - go to the next clause. If only user - show it. If both - check and show the one which is smaller.
                   this._applyUser();
                   if (this._callback) {
                     this._callback(this._selectedRowLimit);
@@ -270,7 +270,7 @@ define(["dojo/_base/declare", "dijit/form/Select", "dijit/form/TextBox", "dijit/
                 return;
               }
 
-              if (typeof event != 'undefined' && event.type === 'blur') {
+              if (typeof event != 'undefined' && (event.type === 'blur' || event.type === 'focusout')) {
                 if (isNaN(this._getRowLimit()) || this._getRowLimit() < 1) {
                   this.setRowLimit(this._selectedRowLimit);
                   return;
