@@ -185,7 +185,7 @@ define(["dojo/_base/declare", "dijit/form/Select", "dijit/form/TextBox", "dijit/
               } else {
                 this._setRowLimitRestrictionDisabled(false);
 
-                if (this._systemRowLimit > this._selectedRowLimit) {
+                if (this._systemRowLimit <=0 || this._systemRowLimit > this._selectedRowLimit) {
                   //User limit is less than system - apply it
                   this._applyUser();
                   if (this._callback) {
@@ -277,7 +277,7 @@ define(["dojo/_base/declare", "dijit/form/Select", "dijit/form/TextBox", "dijit/
                 }
 
 
-                if (this._getRowLimit() > this._systemRowLimit) {
+                if (this._getRowLimit() > this._systemRowLimit && this._systemRowLimit > 0) {
                   var dialog = this._getDialog && this._getDialog();
                   if (dialog) {
                     var rowLimitExceededDialogCallbacks = [
