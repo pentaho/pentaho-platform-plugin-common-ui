@@ -277,7 +277,7 @@ define(["dojo/_base/declare", "dijit/form/Select", "dijit/form/TextBox", "dijit/
                 }
 
 
-                if (this._getRowLimit() > this._systemRowLimit) {
+                if (this._getRowLimit() > this._systemRowLimit && this._systemRowLimit > 0) {
                   var dialog = this._getDialog && this._getDialog();
                   if (dialog) {
                     var rowLimitExceededDialogCallbacks = [
