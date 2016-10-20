@@ -107,6 +107,24 @@ define([
 
       options.xAxisSize = xAxisSize;
       options.yAxisSize = yAxisSize;
+    },
+
+    _createChart: function(ChartClass, options) {
+
+      var chart = this.base(ChartClass, options);
+
+      var visualElemsCountMax = this._getVisualElementsCountMax();
+      if(visualElemsCountMax > 0) {
+        var me = this;
+        chart.override("_onWillCreatePlotPanelScene", function(plotPanel, data, axisSeriesDatas, axisCategDatas) {
+          var S = axisSeriesDatas.length;
+          var C = axisCategDatas.length;
+          var visualElemsCount = S * C;
+          me._validateVisualElementsCount(visualElemsCount, visualElemsCountMax);
+        });
+      }
+
+      return chart;
     }
 
     // TODO: not true anymore...
@@ -116,6 +134,5 @@ define([
 
     // _getBaseAxisTitle: function(){
     // },
-
   });
 });
