@@ -63,3 +63,7 @@
   width: 500px;
   height: 30px;
 }
+
+.dj_safari .rl_rowsNumberInput .dijitTextBoxDisabled input {
+  color: #333; /* BACKLOG-11740 */
+}
