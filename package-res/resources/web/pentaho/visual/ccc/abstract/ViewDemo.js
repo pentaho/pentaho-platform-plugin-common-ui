@@ -126,8 +126,9 @@ define([
 
     // Temporary. Used for demo of BACKLOG-6739
     _renderCore: function() {
-      this.base();
+      var result = this.base();
       this._renderCounter++;
+      return result;
     },
 
     // Temporary. Used for demo of ...

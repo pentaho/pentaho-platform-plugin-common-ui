@@ -28,16 +28,15 @@ define([
   "pentaho/visual/color/paletteRegistry",
   "pentaho/visual/role/level",
   "pentaho/data/TableView",
-  "./ViewDemo",
   "pentaho/i18n!view"
 ], function(View, selectionModes,
             def, pvc, cdo, pv, Axis,
             util, O, logger, visualColorUtils, visualPaletteRegistry,
-            measurementLevelFactory, DataView, ViewDemo, bundle) {
+            measurementLevelFactory, DataView, bundle) {
 
   "use strict";
 
-  /* global alert:false, cv:false */
+  /* global alert:false, cv:false, Promise:false */
 
   var ruleStrokeStyle = "#808285";  // "#D8D8D8",  // #f0f0f0
   var lineStrokeStyle = "#D1D3D4";  // "#D1D3D4"; //"#A0A0A0"; // #D8D8D8",// #f0f0f0
@@ -244,7 +243,8 @@ define([
 
       this._applyExtensions();
 
-      this._renderCore();
+      // Return any rejection promise.
+      return this._renderCore();
     },
 
     _updateSize: function() {
@@ -1382,21 +1382,58 @@ define([
       }
     },
 
-    _renderCore: function() {
-      var domContainer = this.domContainer;
-      while(domContainer.firstChild) {
-        domContainer.removeChild(domContainer.firstChild);
+    /**
+     * Creates a chart of a given class and with given options.
+     *
+     * @param {!Class.<pvc.BaseChart>} ChartClass The CCC chart constructor.
+     * @param {!object} options The CCC options.
+     * @return {!pvc.BaseChart} The created chart instance.
+     * @protected
+     */
+    _createChart: function(ChartClass, options) {
+      return new ChartClass(options);
+    },
+
+    /**
+     * Gets the current value of maximum number of visual elements.
+     *
+     * @return {number} The maximum number when defined and greater than `0`; `-1`, otherwise.
+     */
+    _getVisualElementsCountMax: function() {
+
+      // TODO: Currently, this is DET dependent...
+
+      var modelTypeApp = this.model.type.application;
+      var cellCountMax = +(modelTypeApp && modelTypeApp.optimalMaxDataSize);
+      return cellCountMax > 0 ? cellCountMax : -1;
+    },
+
+    _validateVisualElementsCount: function(count, countMax) {
+      if(count > countMax) {
+        var msgId = "visual-elems-count-max";
+        var msgParams = {count: count, countMax: countMax};
+        var error = new pvc.InvalidDataException(bundle.get("error.visualElemsCountMax", msgParams), msgId);
+
+        error.messageParams = msgParams;
+
+        throw error;
       }
+    },
 
-      var ChartClass = pvc[this._cccClass];
-
-      this._chart = new ChartClass(this.options);
+    _renderCore: function() {
+      this._chart = this._createChart(pvc[this._cccClass], this.options);
       this._chart
         .setData(this._dataView.toJsonCda())
         .render();
 
-      // When render fails, due to required visual roles, for example, there is no chart.data.
-      // Calling clearSelection, ahead, ends up causing an error.
+      // Render may fail due to required visual roles, invalid data, etc.
+      var error = this._chart.getLastRenderError();
+      if(error) return Promise.reject(error);
+
+      // This test should be needed after the no error check above,
+      // but we're being extra-cautious because the last check was a post-code-freeze change.
+      // Se we're preserving the original check that prevents clearSelection (called from within _updateSelection)
+      // from throwing.
       if(this._chart.data) this._updateSelection();
     },
 
@@ -1595,6 +1632,5 @@ define([
 
       return this.base(name, instSpec, classSpec, keyArgs);
     }
-  })
-  .implement(ViewDemo);
+  });
 });
