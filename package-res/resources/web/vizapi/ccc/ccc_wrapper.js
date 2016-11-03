@@ -2618,15 +2618,8 @@ define([
 
         _configureDoubleClick: function(){
             var me = this;
-            this.options.doubleClickAction = function(scene){
-                me._onDoubleClick(scene.datum);
-            };
-
-            this.options.axisDoubleClickAction = function(scene) {
-                var group = scene.group;
-                if(group){
-                    return me._onDoubleClick(group);
-                }
+            this.options.axisDoubleClickAction = this.options.doubleClickAction = function(scene){
+                me._onDoubleClick(scene);
             };
         },
 
@@ -2734,13 +2727,15 @@ define([
 
         _getTooltipText: function(complex, context){
             var tooltipLines = [];
+            var msg;
 
             this._axesIds.forEach(function(axisId){
                 this.axes[axisId].buildHtmlTooltip(tooltipLines, complex, context);
             }, this);
 
             if(!complex.isVirtual){
-                msg = this._vizHelper.getDoubleClickTooltip();
+                var doubleClickSelection = this._getDoubleClickSelection(context.scene);
+                msg = this._vizHelper.getDoubleClickTooltip(doubleClickSelection);
                 if (msg)
                     tooltipLines.push(msg);
             }
@@ -3071,16 +3066,25 @@ define([
 
         /* INTERACTIVE - DOUBLE-CLICK */
 
+        _getDoubleClickSelection: function(scene) {
+            var complex = scene.group || scene.datum;
+            if(complex) {
+                return this._complexToCellSelection(complex, this._selectionExcludesMultiGems());
+            }
+        },
+
         _onDoubleClick: function(complex){
-            var selection = this._complexToCellSelection(complex, this._selectionExcludesMultiGems());
-            pentaho.events.trigger(this, "doubleclick", {
-                source:        this,
-                selections:    [selection]
-                // TODO: Analyzer needs to know whether this double click is coming from a chart data point or an axis.
-                // For axis use case, please identify the gembar and include only those gems that are in this gembar into the selection.
-                // For chart data point use case, please pass all gems across gembars into the selection
-                // gembar: rows
-            });
+            var selection = this._getDoubleClickSelection(complex);
+            if(selection){
+                pentaho.events.trigger(this, "doubleclick", {
+                    source:        this,
+                    selections:    [selection]
+                    // TODO: Analyzer needs to know whether this double click is coming from a chart data point or an axis.
+                    // For axis use case, please identify the gembar and include only those gems that are in this gembar into the selection.
+                    // For chart data point use case, please pass all gems across gembars into the selection
+                    // gembar: rows
+                });
+            }
             return true;
         },
 

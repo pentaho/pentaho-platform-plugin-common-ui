@@ -66,8 +66,8 @@ define([
                     return msg;
                 },
                 
-                getDoubleClickTooltip: function(){
-                    return cv.getActiveReport().getDoubleClickTooltip();
+                getDoubleClickTooltip: function(doubleClickSelection){
+                    return cv.getActiveReport().getDoubleClickTooltip(doubleClickSelection);
                 },
                 
                 completeAxisGemsMetadata: function(axis, gemsInfoList){
