@@ -132,11 +132,16 @@ define([
 
         // If the two instances are different (the normal case),
         // the base one is cloned, so that all of its properties are the defaults.
-        // Then, it the clone is configured with the just created `v1`.
+        // Then, the clone is configured with the just created `v1`.
         // Finally, the clone takes the position of v1.
         if(v0 !== v1) {
           valuesDomain.removeAt(i, /* silent: */true);
-          valuesDomain.insert(v0.clone().configure(v1), i, /* silent: */true);
+          // TODO: Simple#configure was overwriting a previously set v0.formatted...
+          var v2 = v0.clone();
+          var f1 = v1.formatted;
+          if(f1) v2.formatted = f1;
+
+          valuesDomain.insert(v2, i, /* silent: */true);
         }
       }
 
