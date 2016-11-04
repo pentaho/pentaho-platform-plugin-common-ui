@@ -177,6 +177,40 @@ define([
             expect(SubDomainNumber.type.domain.at(1).toString()).toBe("2");
           });
 
+          it("should inherit the base domain and respect the formatted value when empty, locally", function() {
+
+            var DomainNumber = PentahoNumber.refine({type: {
+              facets: DiscreteDomainFacet,
+              domain: [{v: 1, f: "One Base"}, 2, 3]
+            }});
+
+            var SubDomainNumber = DomainNumber.extend();
+
+            SubDomainNumber.implement({type: {
+              domain: [1, 2, 3]
+            }});
+
+            expect(SubDomainNumber.type.domain.count).toBe(3);
+            expect(SubDomainNumber.type.domain.at(0).toString()).toBe("One Base");
+          });
+
+          it("should inherit the base domain and override the formatted value when not empty, locally", function() {
+
+            var DomainNumber = PentahoNumber.refine({type: {
+              facets: DiscreteDomainFacet,
+              domain: [{v: 1, f: "One Base"}, 2, 3]
+            }});
+
+            var SubDomainNumber = DomainNumber.extend();
+
+            SubDomainNumber.implement({type: {
+              domain: [{v: 1, f: "One Local"}, 2, 3]
+            }});
+
+            expect(SubDomainNumber.type.domain.count).toBe(3);
+            expect(SubDomainNumber.type.domain.at(0).toString()).toBe("One Local");
+          });
+
           it("should allow specifying an element instance of the base domain, and not clone it", function() {
             var DomainNumber = PentahoNumber.refine({type: {
               facets: DiscreteDomainFacet,
@@ -243,7 +277,7 @@ define([
               expect(DomainNumber.type.domain.at(0).toString()).toBe("One");
             });
 
-            it("should accept be given a base element, and not clone it", function() {
+            it("should accept a given base element, and not clone it", function() {
               var DomainNumber = PentahoNumber.refine({type: {
                 facets: DiscreteDomainFacet,
                 domain: [1, 2, 3]
