@@ -65,14 +65,5 @@
 
     <!-- Example Prompting Sample Plugin. Used in prompting/sample.html -->
     <file context="prompting-sample">content/common-ui/resources/web/prompting/pentaho-prompting-sample-component.js</file>
-
-    <!-- Experimental VizAPI version 3 - Analyzer plugins.
-         Uncomment to test.
-         Also, enable VizAPI version 3 visualizations by editing the configuration file:
-         "resources/web/visual/config.js".
-
-    <file context="analyzer">content/common-ui/resources/web/pentaho/visual/ccc/analyzer_plugin_loader.js</file>
-    <file context="analyzer">content/common-ui/resources/web/pentaho/visual/samples/calc/analyzer_plugin_loader.js</file>
-    -->
   </external-resources>
 </plugin>
