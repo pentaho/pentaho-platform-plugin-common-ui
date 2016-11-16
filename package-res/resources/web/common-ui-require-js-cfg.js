@@ -52,7 +52,16 @@
   requirePaths["pentaho/service"] = basePath + "/pentaho/service";
   requirePaths["pentaho/i18n"] = basePath + "/pentaho/i18n";
   requirePaths["pentaho/shim"] = basePath + "/pentaho/shim";
-  requirePaths["pentaho/GlobalContextVars"] = basePath + "/pentaho/GlobalContextVars";
+
+  requirePaths["pentaho/CustomContextVars"] = basePath + "/pentaho/CustomContextVars";
+
+  // TODO: remove this mapping after all Pentaho consumers of GlobalContextVars (DET, Analyzer, CDF) have been changed.
+  requireMap["*"]["pentaho/GlobalContextVars"] = "pentaho/CustomContextVars";
+
+  // TODO: Only used if not defined explicitly by webcontext.js.
+  // When the latter is converted to do so, these 2 paths can be removed as well as the `_globalContextVars` module.
+  requirePaths["pentaho/_globalContextVars"] = basePath + "/pentaho/_globalContextVars";
+  requirePaths["pentaho/contextVars"] = requirePaths["pentaho/_globalContextVars"];
 
   // AMD PLUGINS
   requirePaths["local"  ] = basePath + "/util/local";

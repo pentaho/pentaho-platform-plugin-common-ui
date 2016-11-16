@@ -15,8 +15,9 @@
  */
 define([
   "./object",
-  "./error"
-], function(O, error) {
+  "../lang/ArgumentRequiredError"
+], function(O, ArgumentRequiredError) {
+
   "use strict";
 
   /**
@@ -165,7 +166,7 @@ define([
    */
   MessageBundle.format = function(text, scope) {
     // This is to prevent errors in a wrong message bundle id not being caught!
-    if(text == null) throw error.argRequired("text");
+    if(text == null) throw new ArgumentRequiredError("text");
     var scopeFun;
     if(scope == null)
       scopeFun = function(prop) { return null; };
