@@ -27,20 +27,27 @@ define([
         name: "pattern",
         type: patternFactory,
         isRequired: true,
+        isApplicable: hasQuantitativeAttributesColor,
         value: "3_color"
       },
       {
         name: "colorSet",
         type: colorSetFactory,
         isRequired: true,
+        isApplicable: hasQuantitativeAttributesColor,
         value: "ryg"
       },
       {
         name: "reverseColors",
         type: "boolean",
         isRequired: true,
+        isApplicable: hasQuantitativeAttributesColor,
         value: false
       }
     ]
   };
+
+  function hasQuantitativeAttributesColor(){
+    return this.color.attributes.count > 0 && this.color.levelEffective === "quantitative";
+  }
 });
