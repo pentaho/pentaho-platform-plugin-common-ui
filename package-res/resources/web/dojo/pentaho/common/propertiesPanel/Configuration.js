@@ -177,25 +177,6 @@ define([
     }
   });
 
-  // NOTE: Unfortunately, dojo's declare doesn't support JS get/set props.
-  // so this has to be defined a posteriori.
-  // IVisualRoleRequirement#value : Attribute[]
-  // TODO: Anyway this can get real Attribute instances from the current data table Model?
-  Object.defineProperty(propertiesPanel.GemBar.prototype, "value", {
-    get: function() {
-      if(!this.gems) return;
-
-      return this._value ||
-        (this._value = this.gems.map(function(gem) {
-          return {
-            name:  gem.id,
-            label: gem.value,
-            type:  gem.type === "measure" ? "number" : "string"
-          };
-        }));
-    }
-  });
-
   Configuration.registeredTypes["gemBar"  ] = propertiesPanel.GemBar;
   Configuration.registeredTypes["gem"     ] = Property;
   Configuration.registeredTypes["combo"   ] = Property;
