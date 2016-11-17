@@ -14,15 +14,20 @@
  * limitations under the License.
  */
 define([
-  "module",
-  "../barAbstract/View"
-], function(module, AbstractBarChart) {
+  "./debug/DebugInfo"
+], function(DebugInfo) {
 
   "use strict";
 
-  return AbstractBarChart.extend(module.id, {
-    _options: {
-      orientation: "horizontal"
-    }
-  });
+  /**
+   * The `debugInfo` singleton provides access to the current maximum information level
+   * and other debugging information.
+   *
+   * @name debugInfo
+   * @namespace
+   * @memberOf pentaho.util
+   * @amd {pentaho.util.debug.DebugInfo} pentaho/util/debugInfo
+   * @private
+   */
+  return new DebugInfo();
 });

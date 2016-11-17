@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 define([
+  "module",
   "../barAbstract/View"
-], function(AbstractBarChart) {
+], function(module, AbstractBarChart) {
 
   "use strict";
 
-  return AbstractBarChart.extend({
+  return AbstractBarChart.extend(module.id, {
     _options: {
       stacked: true
     }

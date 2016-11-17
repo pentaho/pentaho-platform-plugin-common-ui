@@ -13,16 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define([
-  "module",
-  "../barAbstract/View"
-], function(module, AbstractBarChart) {
 
-  "use strict";
-
-  return AbstractBarChart.extend(module.id, {
-    _options: {
-      orientation: "horizontal"
-    }
-  });
-});
+/**
+ * The `debug` namespace contains types for helping programs deal with
+ * various debugging information such as debugging level.
+ *
+ * @name pentaho.util.debug
+ * @namespace
+ */

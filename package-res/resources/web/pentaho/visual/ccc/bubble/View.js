@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 define([
+  "module",
   "../metricDotAbstract/View"
-], function(MetricDotAbstractView) {
+], function(module, MetricDotAbstractView) {
 
   "use strict";
 
-  return MetricDotAbstractView.extend({
+  return MetricDotAbstractView.extend(module.id, {
     _options: {
       sizeAxisUseAbs:  false,
       sizeAxisRatio:   1 / 5,

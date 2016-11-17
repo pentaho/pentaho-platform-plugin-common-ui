@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 define([
+  "module",
   "pentaho/visual/base/View",
   "pentaho/visual/base/types/selectionModes",
   "cdf/lib/CCC/def",
@@ -29,7 +30,7 @@ define([
   "pentaho/visual/role/level",
   "pentaho/data/TableView",
   "pentaho/i18n!view"
-], function(View, selectionModes,
+], function(module, View, selectionModes,
             def, pvc, cdo, pv, Axis,
             util, O, logger, visualColorUtils, visualPaletteRegistry,
             measurementLevelFactory, DataView, bundle) {
@@ -153,7 +154,7 @@ define([
     legend2Dot_strokeStyle: legendShapeColorProp
   };
 
-  return View.extend(/** @lends pentaho.visual.ccc.base.View# */{
+  return View.extend(module.id, /** @lends pentaho.visual.ccc.base.View# */{
 
     // region PROPERTIES
     _options: baseOptions,

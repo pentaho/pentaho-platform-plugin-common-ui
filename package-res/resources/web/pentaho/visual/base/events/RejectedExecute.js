@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 define([
+  "module",
   "pentaho/lang/Event",
   "../mixins/mixinDataFilter",
   "pentaho/type/mixins/mixinError",
   "pentaho/util/error"
-], function(Event, mixinDataFilter, mixinError, utilError) {
+], function(module, Event, mixinDataFilter, mixinError, utilError) {
+
   "use strict";
 
-  return Event.extend("pentaho.visual.base.events.RejectedExecute",
-    /** @lends pentaho.visual.base.events.RejectedExecute# */{
+  return Event.extend(module.id, /** @lends pentaho.visual.base.events.RejectedExecute# */{
 
       /**
        * @alias RejectedExecute

@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 define([
+  "module",
   "pentaho/lang/Base",
   "pentaho/lang/EventSource",
   "./events/WillUpdate",
@@ -27,7 +28,7 @@ define([
   "pentaho/util/error",
   "pentaho/util/logger",
   "pentaho/util/promise"
-], function(Base, EventSource, WillUpdate, DidUpdate, RejectedUpdate, UserError,
+], function(module, Base, EventSource, WillUpdate, DidUpdate, RejectedUpdate, UserError,
             O, arg, F, BitSet, error, logger, promise) {
 
   "use strict";
@@ -39,7 +40,7 @@ define([
 
   var _reUpdateMethodName = /^_update(.+)$/;
 
-  var View = Base.extend("pentaho.visual.base.View", /** @lends pentaho.visual.base.View# */{
+  var View = Base.extend(module.id, /** @lends pentaho.visual.base.View# */{
 
     /**
      * @alias View

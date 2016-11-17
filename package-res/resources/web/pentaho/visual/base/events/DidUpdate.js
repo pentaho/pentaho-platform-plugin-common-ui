@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 define([
+  "module",
   "pentaho/lang/Event"
-], function(Event) {
+], function(module, Event) {
+
   "use strict";
 
   /**
@@ -32,8 +34,7 @@ define([
    *
    * @param {!pentaho.visual.base.View} source - The view object that is emitting the event.
    */
-  return Event.extend("pentaho.visual.base.events.DidUpdate",
-    /** @lends pentaho.visual.base.events.DidUpdate# */{
+  return Event.extend(module.id, /** @lends pentaho.visual.base.events.DidUpdate# */{
 
       constructor: function(source) {
         this.base("did:update", source, false);

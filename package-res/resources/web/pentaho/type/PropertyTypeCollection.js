@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 define([
+  "module",
   "./property",
   "../lang/Collection",
   "../util/arg",
   "../util/error",
   "../util/object"
-], function(propertyFactory, Collection, arg, error, O) {
+], function(module, propertyFactory, Collection, arg, error, O) {
 
   "use strict";
 
@@ -38,9 +39,7 @@ define([
    * @see pentaho.type.Property
    * @ignore
    */
-  return Collection.extend("pentaho.type.PropertyTypeCollection",
-      /** @lends pentaho.type.PropertyTypeCollection# */{
-
+  return Collection.extend(module.id, /** @lends pentaho.type.PropertyTypeCollection# */{
     /**
      * Initializes a property collection.
      *
