@@ -67,3 +67,8 @@
 .dj_safari .rl_rowsNumberInput .dijitTextBoxDisabled input {
   color: #333; /* BACKLOG-11740 */
 }
+
+.customTooltip {
+	white-space: pre;
+	min-width: 14em;
+}
