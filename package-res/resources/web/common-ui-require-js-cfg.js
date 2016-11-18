@@ -67,7 +67,7 @@
   requireMap["*"]["css"] = "common-ui/util/require-css/css";
 
   // Use the debugInfoByUrl implementation.
-  requireMap["*"]["pentaho/util/debugInfo"] = "pentaho/util/debugInfoByUrl";
+  requirePaths["pentaho/util/debugInfo"] = basePath + "/pentaho/util/debugInfoByUrl";
 
   // DOJO
   requirePaths["dojo" ] = basePath + "/dojo/dojo";
