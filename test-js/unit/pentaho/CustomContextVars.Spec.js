@@ -76,7 +76,22 @@ define([
             });
           });
 
-          it("should default to the default variable's value, when spec." + varName + " is empty", function() {
+          it("should default to the default variable's value, when spec." + varName + " is undefined", function() {
+
+            return require.using([
+              "pentaho/contextVars",
+              "pentaho/CustomContextVars"
+            ], configDefaultContext, function(defaultContextVars, CustomContextVars) {
+              var spec = {};
+              spec[varName] = undefined;
+
+              var contextVars = new CustomContextVars(spec);
+
+              expect(contextVars[varName]).toBe(defaultContextVars[varName]);
+            });
+          });
+
+          it("should convert to `null`, when spec." + varName + " is empty", function() {
 
             return require.using([
               "pentaho/contextVars",
@@ -87,7 +102,22 @@ define([
 
               var contextVars = new CustomContextVars(spec);
 
-              expect(contextVars[varName]).toBe(defaultContextVars[varName]);
+              expect(contextVars[varName]).toBe(null);
+            });
+          });
+
+          it("should preserve a spec." + varName + " = null", function() {
+
+            return require.using([
+              "pentaho/contextVars",
+              "pentaho/CustomContextVars"
+            ], configDefaultContext, function(defaultContextVars, CustomContextVars) {
+              var spec = {};
+              spec[varName] = null;
+
+              var contextVars = new CustomContextVars(spec);
+
+              expect(contextVars[varName]).toBe(null);
             });
           });
 

@@ -32,20 +32,25 @@ define([
    *
    * @constructor
    * @description Creates a context variables object, optionally fixing some variables to the values
-   * specified in `customContextVars`. Any absent or {@link Nully}-valued properties assume the values
-   * of the Pentaho Platform's corresponding default context variables.
+   * specified in `customContextVars`. Any absent or `undefined`-valued properties assume the values
+   * of the Pentaho Platform's corresponding default context variables. `null` values are respected.
    *
    * @param {pentaho.spec.IContextVars} [customContextVars] The custom context variables' specification.
    */
-  function CustomContextVars(customContextVars) {
+  function pentaho_CustomContextVars(customContextVars) {
 
     if(!customContextVars) customContextVars = {};
 
-    this.application = customContextVars.application || defaultContextVars.application;
-    this.user        = customContextVars.user        || defaultContextVars.user;
-    this.theme       = customContextVars.theme       || defaultContextVars.theme;
-    this.locale      = customContextVars.locale      || defaultContextVars.locale;
+    this.application = readVar(customContextVars, "application");
+    this.user = readVar(customContextVars, "user");
+    this.theme = readVar(customContextVars, "theme");
+    this.locale = readVar(customContextVars, "locale");
   }
 
-  return CustomContextVars;
+  return pentaho_CustomContextVars;
+
+  function readVar(vars, name) {
+    var value = vars[name];
+    return value === undefined ? defaultContextVars[name] : (value || null);
+  }
 });
