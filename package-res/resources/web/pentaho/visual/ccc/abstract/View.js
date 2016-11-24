@@ -1243,14 +1243,6 @@ define([
     _configureMultiChart: function() {
       var options = this.options;
 
-      // TODO: hack hack...
-      // Let the vertical scrollbar show up if necessary
-      if(this.domContainer.parentNode) {
-        var containerStyle = this.domContainer.parentNode.style;
-        containerStyle.overflowX = "hidden";
-        containerStyle.overflowY = "auto";
-      }
-
       // Very small charts can't be dominated by text...
       // options.axisSizeMax = '30%';
 
@@ -1346,12 +1338,7 @@ define([
     // endregion
 
     // Logic that depends on width and height
-    _prepareLayout: function(options) {
-      // TODO: Assumes vertical scrollbar!
-      // Account for the width of the *possible* scrollbar
-      if(this._hasMultiChartColumns && pv.renderer() !== "batik")
-        options.width -= 17;
-    },
+    _prepareLayout: function(options) { /* Default Does Nothing */ },
 
     /**
      * Processes extension properties and stores the valid ones in `_validExtensionOptions`.
