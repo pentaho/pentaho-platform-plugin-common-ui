@@ -28,7 +28,7 @@ define([
         type: patternFactory,
         isRequired: true,
         isApplicable: hasQuantitativeAttributesColor,
-        value: "3_color"
+        value: "gradient"
       },
       {
         name: "colorSet",

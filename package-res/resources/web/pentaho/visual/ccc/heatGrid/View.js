@@ -28,8 +28,8 @@ define([
     _roleToCccRole: {
       "columns": "series",
       "rows": "category",
-      "color": "value",
-      "size": "value2"
+      "color": "color",
+      "size": "size"
     },
 
     _options: {

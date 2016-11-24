@@ -42,7 +42,12 @@ define([
     height: 0,
     isInteractive: true,
     data: data,
-    measure: "sales",
+    levels: {
+      attributes: ["family"]
+    },
+    measure: {
+      attributes: ["sales"]
+    },
     operation: "avg"
   });
 

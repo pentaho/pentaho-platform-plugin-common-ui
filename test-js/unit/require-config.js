@@ -41,8 +41,6 @@
   requireCfg.paths["dojox"] = "/base/dev-res/dojo/dojo-release-1.9.2-src/dojox";
   requireCfg.paths["dijit"] = "/base/dev-res/dojo/dojo-release-1.9.2-src/dijit";
 
-  requireCfg.paths["pentaho/visual/type/registryMock"] = "/base/test-js/unit/pentaho/visual/2.5/type/registryMock";
-
   requireCfg.paths["common-ui/jquery-clean"] = "/base/package-res/resources/web/jquery/jquery-1.12.4";
   requireCfg.shim["common-ui/jquery-clean"] = {
     exports: "$",
