@@ -18,7 +18,7 @@
  * The `spec.IContextVars` interface describes the variables that
  * define a Pentaho client-side context.
  *
- * A {@link Nully} variable value is equivalent to a variable that is not present.
+ * A `null` variable value is possible and means that the variable is not defined or fixed.
  *
  * @name pentaho.spec.IContextVars
  * @interface
@@ -29,7 +29,7 @@
  *
  * @name application
  * @memberOf pentaho.spec.IContextVars#
- * @type {?string}
+ * @type {?nonEmptyString}
  */
 
 /**
@@ -37,7 +37,7 @@
  *
  * @name user
  * @memberOf pentaho.spec.IContextVars#
- * @type {?string}
+ * @type {?nonEmptyString}
  */
 
 /**
@@ -45,7 +45,7 @@
  *
  * @name theme
  * @memberOf pentaho.spec.IContextVars#
- * @type {?string}
+ * @type {?nonEmptyString}
  */
 
 /**
@@ -53,5 +53,5 @@
  *
  * @name locale
  * @memberOf pentaho.spec.IContextVars#
- * @type {?string}
+ * @type {?nonEmptyString}
  */

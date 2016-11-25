@@ -54,12 +54,12 @@ define([
         });
       });
 
-      it("should create a context that has a GlobalContextVars by default", function() {
+      it("should create a context that has a pentaho.contextVars by default", function() {
 
-        return require.using(["pentaho/type/Context", "pentaho/GlobalContextVars"],
-        function(Context, GlobalContextVars) {
+        return require.using(["pentaho/type/Context", "pentaho/contextVars"],
+        function(Context, contextVarsDefault) {
           var context = new Context();
-          expect(context.vars instanceof GlobalContextVars).toBe(true);
+          expect(context.vars).toBe(contextVarsDefault);
         });
       });
 
@@ -74,9 +74,9 @@ define([
 
       it("should respect a given contextVars instance", function() {
 
-        return require.using(["pentaho/type/Context", "pentaho/GlobalContextVars"],
-        function(Context, GlobalContextVars) {
-          var vars = new GlobalContextVars();
+        return require.using(["pentaho/type/Context", "pentaho/CustomContextVars"],
+        function(Context, CustomContextVars) {
+          var vars = new CustomContextVars();
           var context = new Context(vars);
           expect(context.vars).toBe(vars);
         });
@@ -1456,5 +1456,34 @@ define([
       });
     }); // #getAll
 
+    describe("instance", function() {
+
+      it("should return a context instance", function() {
+
+        return require.using(["pentaho/type/Context"], function(Context) {
+          var context = Context.instance;
+          expect(context instanceof Context).toBe(true);
+        });
+      });
+
+      it("should create a context that has as vars the value of pentaho.contextVars", function() {
+
+        return require.using(["pentaho/type/Context", "pentaho/contextVars"], function(Context, contextVarsDefault) {
+          var context = Context.instance;
+          expect(context.vars).toBe(contextVarsDefault);
+        });
+      });
+
+      it("should always return the same context instance", function() {
+
+        return require.using(["pentaho/type/Context"], function(Context) {
+          var context1 = Context.instance;
+
+          expect(Context.instance).toBe(context1);
+          expect(Context.instance).toBe(context1);
+          expect(Context.instance).toBe(context1);
+        });
+      });
+    });
   }); // pentaho.type.Context
 });

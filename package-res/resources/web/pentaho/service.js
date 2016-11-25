@@ -19,7 +19,7 @@
  *
  * #### AMD
  *
- * **Module Id**: `"service"`
+ * **Module Id**: `"pentaho/service"`
  *
  * **Plugin Usage**: `"pentaho/service!{logical-module-name}?meta&single"`
  *

@@ -21,7 +21,7 @@ define([
   "./standard",
   "./SpecificationContext",
   "./SpecificationScope",
-  "../GlobalContextVars",
+  "../contextVars",
   "./configurationService",
   "./changes/Transaction",
   "./changes/TransactionScope",
@@ -33,7 +33,7 @@ define([
   "../util/object",
   "../util/fun"
 ], function(localRequire, module, service, bundle, standard, SpecificationContext, SpecificationScope,
-    GlobalContextVars, configurationService,
+    contextVarsDefault, configurationService,
     Transaction, TransactionScope, CommittedScope,
     Base, promiseUtil, arg, error, O, F) {
 
@@ -42,6 +42,7 @@ define([
   /* global Promise:false */
 
   var _nextFactoryUid = 1;
+  var _singleton = null;
   var _baseMid = module.id.replace(/Context$/, ""); // e.g.: "pentaho/type/"
   var _baseFacetsMid = _baseMid + "facets/";
 
@@ -154,7 +155,7 @@ define([
      * @constructor
      * @description Creates a `Context` with given variables.
      * @param {pentaho.spec.IContextVars} [contextVars] The context variables' specification.
-     * When unspecified, it defaults to an instance of {@link pentaho.GlobalContextVars}.
+     * When unspecified, it defaults to {@link pentaho.contextVars}.
      */
     constructor: function(contextVars) {
       /**
@@ -163,7 +164,7 @@ define([
        * @type {!pentaho.spec.IContextVars}
        * @private
        */
-      this._vars = contextVars || new GlobalContextVars();
+      this._vars = contextVars || contextVarsDefault;
 
       /**
        * The ambient/current transaction, if any, or `null`.
@@ -1111,6 +1112,20 @@ define([
     _error: function(ex, sync) {
       if(sync) throw ex;
       return Promise.reject(ex);
+    }
+  }, /** @lends pentaho.type.Context */{
+
+    /**
+     * Gets the default type context of the Pentaho Web-Client Platform.
+     *
+     * This type context instance is created with the Platform's default context variables,
+     * as given by {@link pentaho.contextVars}.
+     *
+     * @type {!pentaho.type.Context}
+     * @readOnly
+     */
+    get instance() {
+      return _singleton || (_singleton = new Context());
     }
   });
 
