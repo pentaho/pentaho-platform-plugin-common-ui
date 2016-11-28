@@ -6,7 +6,7 @@
 .pentaho-type-instance.component-icon-landscape
 {
   background: no-repeat center;
-  background-size: 100%;
+  background-size: contain;
   /*border: solid 1px red;*/
 }
 
@@ -40,7 +40,7 @@
 }
 
 .pentaho-type-instance.component-icon-landscape {
-  width:  196px;
-  height: 128px;
+  width:  168px;
+  height: 119px;
   background-image: url("./images/icon-landscape.png");
 }
