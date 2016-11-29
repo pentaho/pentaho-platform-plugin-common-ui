@@ -231,7 +231,7 @@
   mapTheme("pentaho/type", "themes", ["crystal"]);
 
   // CCC Themes
-  mapTheme("pentaho/visual/ccc", "_themes", ["crystal", "onyx", "det"]);
+  mapTheme("pentaho/visual/ccc", "_themes", ["crystal", "sapphire", "onyx", "det"]);
 
   // sample/calc theme
   mapTheme("pentaho/visual/samples/calc", "themes", ["crystal"]);
