@@ -12,7 +12,7 @@ build-res/pentaho-js-build.zip
 build-res/module-scripts/
 build-res/requireCfg-raw.js
 build-res/requireCfg.js
-test-res/data/sampledata.log
+impl/server/src/it/resources/data/sampledata.log
 dev-res/dojo/
 node_modules/
 override.properties
@@ -24,3 +24,4 @@ package-pom.xml
 .DS_Store
 *.iml
 .vscode
+target/
