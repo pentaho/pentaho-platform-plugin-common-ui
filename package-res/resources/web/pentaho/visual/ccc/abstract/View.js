@@ -872,7 +872,7 @@ define([
         this._mappingAttrInfos.forEach(function(maInfo) {
           if(maInfo.attr) {
             var sourceIndexes = maInfo.isMeasureGeneric ? measuresSourceIndexes : categoriesSourceIndexes;
-            sourceIndexes.push(maInfo.attr.attrColIndex);
+            sourceIndexes.push(maInfo.attrColIndex);
 
             if(!maInfo.isMeasureDiscrim && !maInfo.isMeasureGeneric) {
               categoriesDimNames.push(maInfo.cccDimName);
