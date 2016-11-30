@@ -21,8 +21,8 @@
  * @name ParameterXmlParser
  * @class
  */
-define(['cdf/lib/Base', 'common-ui/util/base64', 'common-ui/util/formatting',  './Parameter', './ParameterDefinition', './ParameterGroup', './ParameterValue', 'common-ui/jquery-clean', 'cdf/Logger'],
-    function (Base, Base64Util, Formatter, Parameter, ParameterDefinition, ParameterGroup, ParameterValue, $, Logger) {
+define(['cdf/lib/Base', 'common-ui/util/base64', 'common-ui/util/formatting',  './Parameter', './ParameterDefinition', './ParameterGroup', './ParameterValue', 'common-ui/jquery-clean', 'cdf/Logger', 'dojox/html/entities'],
+    function (Base, Base64Util, Formatter, Parameter, ParameterDefinition, ParameterGroup, ParameterValue, $, Logger, entities) {
 
       /**
        * Parses the xml retrieved from the server call
@@ -60,7 +60,7 @@ define(['cdf/lib/Base', 'common-ui/util/base64', 'common-ui/util/formatting',  '
           if (!errorList) {
             errorList = [];
           }
-          errorList.push(message);
+          errorList.push(entities.encode(message));
           paramDefn.errors[paramName] = errorList;
         };
 
