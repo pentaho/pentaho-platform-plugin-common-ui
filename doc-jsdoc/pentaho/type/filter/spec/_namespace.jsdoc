@@ -15,17 +15,8 @@
  */
 
 /**
- * The pentaho namespace contains the
- * Pentaho Web Platform's classes and interfaces.
- *
- * @name pentaho
+ * @name pentaho.type.filter.spec
  * @namespace
- */
-
-/**
- * The pentaho `spec` namespace contains specification interfaces
- * used by the Pentaho Web Platform's classes and interfaces.
  *
- * @name pentaho.spec
- * @namespace
+ * @description The `filter.spec` namespace contains specification interfaces for filters.
  */

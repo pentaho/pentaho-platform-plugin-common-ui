@@ -15,17 +15,9 @@
  */
 
 /**
- * This namespace contains types for expressing
- * [intensional]{@link https://en.wikipedia.org/wiki/Intensional_definition}.
- * filters of complex values or lists thereof.
- *
- * @name pentaho.type.filter
- * @namespace
- */
-
-/**
- * @name pentaho.type.filter.spec
+ * @name pentaho.type.facets.spec
  * @namespace
  *
- * @description The `filter.spec` namespace contains specification interfaces for filters.
+ * @description The `facets.spec` namespace contains specification interfaces for refinement facet
+ * mixin classes.
  */

@@ -15,16 +15,9 @@
  */
 
 /**
- * The `visual.role` namespace contains classes for describing visual roles -
- * an important property type of visualization models in the Visualization API.
+ * The pentaho namespace contains the
+ * Pentaho Web Platform's classes and interfaces.
  *
- * @name pentaho.visual.role
- * @namespace
- */
-
-/**
- * The `visual.role.spec` namespace contains specification classes for describing visual role mappings.
- *
- * @name pentaho.visual.role.spec
+ * @name pentaho
  * @namespace
  */
