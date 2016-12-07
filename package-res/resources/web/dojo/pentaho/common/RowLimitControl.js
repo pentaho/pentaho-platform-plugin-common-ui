@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-define(["dojo/_base/declare", "dijit/form/Select", "dijit/form/ValidationTextBox", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dijit/_WidgetsInTemplateMixin", "dijit/_Templated", "dojo/on", "dojo/keys", "dojo/_base/lang", "dojo/query",
+define(["dojo/_base/declare", "dijit/form/Select", "dijit/form/TextBox", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dijit/_WidgetsInTemplateMixin", "dijit/_Templated", "dojo/on", "dojo/keys", "dojo/_base/lang", "dojo/query",
       "dijit/focus", "dojo/dom-class", "dojo/text!pentaho/common/RowLimitControl.html"],
     function (declare, select, TextBox, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, _Templated, on, keys, lang, query, focusUtil, domClass, templateStr) {
 
@@ -33,8 +33,6 @@ define(["dojo/_base/declare", "dijit/form/Select", "dijit/form/ValidationTextBox
             _showGlassPane: undefined,
             _hideGlassPane: undefined,
             _getLocaleString: undefined,
-            // BACKLOG-11517
-            _maxRowLimit: 2000000000,
 
             templateString: templateStr,
             widgetsInTemplate: true,
@@ -165,7 +163,6 @@ define(["dojo/_base/declare", "dijit/form/Select", "dijit/form/ValidationTextBox
             },
 
             _initUI: function () {
-              var me = this;
               if (!this._isInitialized()) {
                 return;
               }
@@ -215,15 +212,6 @@ define(["dojo/_base/declare", "dijit/form/Select", "dijit/form/ValidationTextBox
                 }
 
               }
-
-              this.rowsNumberInput.validator = function (value, constraints) {
-                if (value && (isNaN(value) || value < 1 || value > me._maxRowLimit)) {
-                  this.set("invalidMessage", "<div class='customTooltip'>" + me._getLocaleString("MaximumRowLimitValueErrorMessage", me._maxRowLimit.toString()) +"</div>");
-                  return false;
-                }
-                return true;
-              }
-
             },
 
             _refreshMessage: function () {
@@ -283,10 +271,11 @@ define(["dojo/_base/declare", "dijit/form/Select", "dijit/form/ValidationTextBox
               }
 
               if (typeof event != 'undefined' && (event.type === 'blur' || event.type === 'focusout')) {
-                if (!this.rowsNumberInput.isValid() || this._getRowLimit() < 1) {
+                if (isNaN(this._getRowLimit()) || this._getRowLimit() < 1) {
                   this.setRowLimit(this._selectedRowLimit);
                   return;
                 }
+
 
                 if (this._getRowLimit() > this._systemRowLimit && this._systemRowLimit > 0) {
                   var dialog = this._getDialog && this._getDialog();
@@ -303,9 +292,6 @@ define(["dojo/_base/declare", "dijit/form/Select", "dijit/form/ValidationTextBox
                     dialog.showDialog();
                   }
                 } else {
-                  if (this._previousRowLimit == this._getRowLimit()) {
-                    return;
-                  }
                   this._previousRowLimit = this._selectedRowLimit;
                   this._selectedRowLimit = this._getRowLimit();
                   if (this._callback) {
