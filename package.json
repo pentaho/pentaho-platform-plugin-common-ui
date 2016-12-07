@@ -8,7 +8,7 @@
   "dependencies": {},
   "devDependencies": {
     "jasmine-core": "^2.4.1",
-    "jsdoc": "^3.4.0",
+    "jsdoc": "^3.4.3",
     "karma": "^0.13.19",
     "karma-chrome-launcher": "^0.2.2",
     "karma-cli": "^0.1.2",
