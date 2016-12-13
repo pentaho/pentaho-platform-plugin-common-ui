@@ -18,6 +18,13 @@
   padding: 5px 0px 0px 2px;
 }
 
+/* begin BACKLOG-8759 ensure some blank space between the label and the icon */
+.pentahoPropertiesPanel .captionIcon {
+  margin-left: 5px;
+}
+/* end BACKLOG-8759 ensure some blank space between the label and the icon */
+
+
 .propPanel-seperator{
   border-top: 1px solid #777;
   margin: 10px 10px 4px;
