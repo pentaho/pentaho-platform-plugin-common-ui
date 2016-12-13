@@ -42,7 +42,7 @@ define([
 
     function hasAttributesMeasures() {
       /* jshint validthis:true*/
-      return this.measuresLine.attributes.count > 0;
+      return this.measures.attributes.count > 0;
     }
 
     return BarAbstract.extend({

@@ -120,9 +120,9 @@ define([
               .text(function(scene) {
                 /* jshint laxbreak:true*/
                 var pvMainLabel = this.proto;
-                return !pvMainLabel.text()
-                    ? ""
-                    : me._formatSize(scene.vars.size, scene.firstAtoms.size.dimension);
+                if (!pvMainLabel.text()) return "";
+                var sizeCccDimName = me._getMappingAttrInfosByRole("size")[0].cccDimName;
+                return me._formatSize(scene.vars.size, scene.firstAtoms[sizeCccDimName].dimension);
               })
               .textBaseline("top");
         };

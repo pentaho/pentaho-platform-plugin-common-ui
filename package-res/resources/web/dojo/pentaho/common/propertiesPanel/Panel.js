@@ -62,7 +62,7 @@ define([
 
   var Panel = declare("pentaho.common.propertiesPanel.Panel", [ContentPane, Evented], {
 
-    captionTemplate: "<div class='caption'><span class='caption-text'>${ui.caption:i18n}&nbsp;&nbsp;</span><i class='captionIcon'></i></div>",
+    captionTemplate: "<div class='caption'><span class='caption-text'>${ui.caption:i18n}</span><i class='captionIcon'></i></div>",
     seperatorTemplate: "<div class='propPanel-seperator'></div>",
     propUIs: null,
     groups:  null,
@@ -126,7 +126,19 @@ define([
         var cap = construct.toDom(string.substitute(this.captionTemplate, item, null,
             {
               i18n: function(value, key) {
-                return Messages.getString(value, value);
+                var s = Messages.getString(value, value);
+
+                // Since BACKLOG-8367 (Pentaho 7.1), the usage of colons has been moved to
+                // stylesheets and are thus theme-dependent.
+                // The following block ensures the captions do not contain a terminal colon :,
+                // as there could have been custom visualizations defining custom properties with
+                // captions containing a terminal colon, which could lead to the weird-looking stituation
+                // that a caption terminates with consecutive two colons.
+                if(s.length && s[s.length - 1] === ":"){
+                  return s.slice(0, -1);
+                }
+
+                return s;
               }
             }));
 

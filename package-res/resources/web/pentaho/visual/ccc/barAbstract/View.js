@@ -43,15 +43,15 @@ define([
           options.valuesAnchor = "center";
           break;
 
-        case "inside_end":
+        case "insideEnd":
           options.valuesAnchor = options.orientation === "horizontal" ? "right" : "top";
           break;
 
-        case "inside_base":
+        case "insideBase":
           options.valuesAnchor = options.orientation === "horizontal" ? "left" : "bottom";
           break;
 
-        case "outside_end":
+        case "outsideEnd":
           if(options.orientation === "horizontal") {
             options.valuesAnchor = "right";
             options.label_textAlign = "left";

@@ -54,7 +54,7 @@ define([
 
     })
     .implement({type: trendType})
-    .implement({type: bundle.structured.trendType})
-    .implement({type: bundle.structured.line});
+    .implement({type: bundle.structured["trend"]})
+    .implement({type: bundle.structured["line"]});
   };
 });

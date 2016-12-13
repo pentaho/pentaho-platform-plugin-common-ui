@@ -1182,107 +1182,19 @@ has no buttons add an addition class to your element, pentaho-dialog-buttonless,
     background: -ms-linear-gradient(top, #e0e0e0 0%, #e6e5e5 51%, #d4d4d4 100%); /* IE10+ */
     background: linear-gradient(top, #e0e0e0 0%, #e6e5e551%, #d4d4d4 100%); /* W3C */
     zoom: 1;
-
-*
-
-/
-
-border:
-
-1
-px solid
-
-rgba
-(
-255
-,
-255
-,
-255
-,
-0.59375
-)
-;
-/* */
--moz-border-radius:
-
-7
-px
-
-;
--webkit-border-radius:
-
-7
-px
-
-;
-border-radius:
-
-7
-px
-
-;
--moz-box-shadow:
-
-2
-px
-
-2
-px
-
-6
-px
-
-1
-px #747474
-
-;
--webkit-box-shadow:
-
-2
-px
-
-2
-px
-
-6
-px
-
-1
-px #747474
-
-;
-box-shadow:
-
-2
-px
-
-2
-px
-
-6
-px
-
-1
-px #747474
-
-;
-padding:
-
-4
-px
-
-4
-px
-
-4
-px
-
-4
-px
-
-;
-    }
+    
+    border: 1px solid rgba (255, 255, 255, 0.59375); /* */
+    
+    -moz-border-radius: 7px;
+    -webkit-border-radius: 7px;
+    border-radius: 7px;
+    
+    -moz-box-shadow: 2px 2px 6px 1px #747474;
+    -webkit-box-shadow: 2px 2px 6px 1px #747474;
+    box-shadow: 2px 2px 6px 1px #747474;
+    
+    padding: 4px 4px 4px 4px;
+}
 
 .pentaho-disclosure-panel-closed {
     width: 100%;
@@ -1304,107 +1216,19 @@ px
     background: -ms-linear-gradient(top, #e0e0e0 0%, #e6e5e5 51%, #d4d4d4 100%); /* IE10+ */
     background: linear-gradient(top, #e0e0e0 0%, #e6e5e551%, #d4d4d4 100%); /* W3C */
     zoom: 1;
-
-*
-
-/
-
-border:
-
-1
-px solid
-
-rgba
-(
-255
-,
-255
-,
-255
-,
-0.59375
-)
-;
-/* */
--moz-border-radius:
-
-7
-px
-
-;
--webkit-border-radius:
-
-7
-px
-
-;
-border-radius:
-
-7
-px
-
-;
--moz-box-shadow:
-
-2
-px
-
-2
-px
-
-6
-px
-
-1
-px #747474
-
-;
--webkit-box-shadow:
-
-2
-px
-
-2
-px
-
-6
-px
-
-1
-px #747474
-
-;
-box-shadow:
-
-2
-px
-
-2
-px
-
-6
-px
-
-1
-px #747474
-
-;
-padding:
-
-4
-px
-
-4
-px
-
-4
-px
-
-4
-px
-
-;
-    }
+    
+    border: 1px solid rgba(255, 255, 255, 0.59375);
+    /* */
+    -moz-border-radius: 7px;
+    -webkit-border-radius: 7px;
+    border-radius: 7px;
+    
+    -moz-box-shadow: 2px 2px 6px 1px #747474;
+    -webkit-box-shadow: 2px 2px 6px 1px #747474;
+    box-shadow: 2px 2px 6px 1px #747474;
+    
+    padding: 4px 4px 4px 4px;
+}
 
 .contrast-color {
     color: #000;
