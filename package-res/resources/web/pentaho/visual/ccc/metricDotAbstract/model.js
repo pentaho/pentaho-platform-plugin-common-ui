@@ -116,7 +116,7 @@ define([
       .implement({type: settingsMultiChartType})
       .implement({type: bundle.structured["settingsMultiChart"]})
       .implement({type: trendType})
-      .implement({type: bundle.structured["trendType"]})
+      .implement({type: bundle.structured["trend"]})
       .implement({type: bundle.structured["metricDot"]});
   };
 });
