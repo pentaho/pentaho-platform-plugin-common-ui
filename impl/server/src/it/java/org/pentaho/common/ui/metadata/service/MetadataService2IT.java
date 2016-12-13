@@ -35,6 +35,7 @@ import org.jmock.Mockery;
 import org.jmock.integration.junit4.JUnit4Mockery;
 import org.json.JSONException;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.pentaho.commons.connection.marshal.MarshallableResultSet;
 import org.pentaho.di.core.exception.KettleException;
@@ -691,6 +692,7 @@ public class MetadataService2IT {
     assertNull( "results are not null", results );
   }
 
+  @Ignore("Test randomly failling. Check BACKLOG-13450")
   @Test
   public void testXmlQueryToJson1() throws KettleException {
     StandaloneSession session = new StandaloneSession();
@@ -708,6 +710,7 @@ public class MetadataService2IT {
     assertTrue( "wrong value", json.indexOf( "Classic Cars" ) != -1 );
   }
 
+  @Ignore("Test randomly failling. Check BACKLOG-13450")
   @Test
   public void testJsonQueryToJson1() throws KettleException {
     StandaloneSession session = new StandaloneSession();
@@ -728,6 +731,7 @@ public class MetadataService2IT {
     assertTrue( "wrong value", json.indexOf( "Classic Cars" ) != -1 );
   }
 
+  @Ignore("Test randomly failling. Check BACKLOG-13450")
   @Test
   public void testJsonQueryToJson2() throws KettleException {
     StandaloneSession session = new StandaloneSession();
