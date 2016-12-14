@@ -17,30 +17,34 @@
 /**
  * RequireJS loader plugin for loading localized messages.
  */
-define(["./util/MessageBundle", "json"], function(MessageBundle) {
+define([
+  "./contextVars",
+  "./util/MessageBundle",
+  "json"
+], function(contextVars, MessageBundle) {
 
   "use strict";
 
-  /* global CONTEXT_PATH:false */
-
   return {
-    load: function(bundlePath, require, onLoad, config) {
+    load: function(bundlePath, localRequire, onLoad, config) {
 
       if(config.isBuild) {
         // Indicate that the optimizer should not wait for this resource and complete optimization.
         // This resource will be resolved dynamically during run time in the web browser.
         onLoad();
       } else {
-        var bundleInfo = getBundleInfo(require, bundlePath);
-        var bundleUrl = "json!" + CONTEXT_PATH + "i18n?plugin=" + bundleInfo.pluginId + "&name=" + bundleInfo.name;
+        var bundleInfo = getBundleInfo(localRequire, bundlePath);
+        var bundleUrl = "json!" + (contextVars.basePath || "") +
+                        "i18n?plugin=" + bundleInfo.pluginId + "&name=" + bundleInfo.name;
 
-        require([bundleUrl], function(bundle) {
+        localRequire([bundleUrl], function(bundle) {
+          //print("bundle: " + JSON.stringify(bundle));
           onLoad(new MessageBundle(bundle));
         });
       }
     },
     normalize: function(name, normalize) {
-      return normalize(getBundleID(name));
+      return normalize(getBundleId(name));
     }
   };
 
@@ -50,14 +54,14 @@ define(["./util/MessageBundle", "json"], function(MessageBundle) {
    * @param {string} bundlePath - The specified bundle path argument.
    * @return {string} The normalized bundle identifier.
    */
-  function getBundleID(bundlePath) {
+  function getBundleId(bundlePath) {
     var bundleMid;
     if(!bundlePath) {
-      // "pentaho/i18n!"
+      // E.g. bundlePath="pentaho/i18n!"
       // Use the default location and bundle.
-      bundleMid = "./messages/messages";
+      bundleMid = "./i18n/messages";
     } else if(bundlePath[0] === "/") {
-      // "pentaho/i18n!/pentaho/common/nls/messages"
+      // E.g. bundlePath="pentaho/i18n!/pentaho/common/nls/messages"
       // The path is, directly, an absolute module id of a message bundle (without the /).
       bundleMid = bundlePath.substr(1);
       if(!bundleMid) throw new Error("[pentaho/messages!] Bundle path argument cannot be a single '/'.");
@@ -79,29 +83,30 @@ define(["./util/MessageBundle", "json"], function(MessageBundle) {
    * Gets a bundle info object with the plugin identifier and bundle name,
    * for a given bundle module identifier.
    *
-   * @param {function} require - The require-js function.
+   * @param {function} localRequire - The require-js function.
    * @param {string} bundlePath - The specified bundle path argument.
    * @return {Object} A bundle info object.
    *
    * @throws {Error} If the specified module identifier cannot be resolved
    *   to a plugin identifier and bundle name.
    */
-  function getBundleInfo(require, bundlePath) {
+  function getBundleInfo(localRequire, bundlePath) {
     // e.g.:
     // bundlePath: pentaho/common/nls/messages
     // bundleMid:  pentaho/common/nls/messages
     // absBundleUrl: /pentaho/content/common-ui/resources/web/dojo/pentaho/common/nls/messages
-    // CONTEXT_PATH: /pentaho/
+    // basePath: /pentaho/
     // pluginId: common-ui
     // bundleName: resources/web/dojo/pentaho/common/nls/messages
 
-    var bundleMid = getBundleID(bundlePath);
+    var bundleMid = getBundleId(bundlePath);
 
-    var absBundleUrl = require.toUrl(bundleMid);
+    var absBundleUrl = localRequire.toUrl(bundleMid);
 
-    // Remove CONTEXT_PATH from bundle url
-    if(absBundleUrl.indexOf(CONTEXT_PATH) === 0)
-      absBundleUrl = absBundleUrl.substr(CONTEXT_PATH.length);
+    // Remove basePath from bundle url
+    var basePath = contextVars.basePath || "";
+    if(absBundleUrl.indexOf(basePath) === 0)
+      absBundleUrl = absBundleUrl.substr(basePath.length);
 
     // The same for content/
     if(absBundleUrl.indexOf("content/") === 0)

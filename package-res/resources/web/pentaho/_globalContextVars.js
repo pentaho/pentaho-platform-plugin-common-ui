@@ -17,7 +17,10 @@ define(function() {
 
   "use strict";
 
-  /* global SESSION_NAME:false, SESSION_LOCALE:false, active_theme:false, PENTAHO_CONTEXT_NAME:false */
+  /* global SESSION_NAME:false, SESSION_LOCALE:false, active_theme:false,
+            PENTAHO_CONTEXT_NAME:false,
+            CONTEXT_PATH:false
+   */
 
   /**
    * A read-only [IContextVars]{@link pentaho.spec.IContextVars} whose variables default to the
@@ -29,9 +32,10 @@ define(function() {
    * @private
    */
   return Object.freeze(/** @type pentaho.spec.IContextVars */{
-    application: typeof PENTAHO_CONTEXT_NAME !== "undefined" ? (PENTAHO_CONTEXT_NAME || null) : null,
-    user:        typeof SESSION_NAME !== "undefined" ? (SESSION_NAME || null) : null,
-    theme:       typeof active_theme !== "undefined" ? (active_theme || null) : null,
-    locale:      typeof SESSION_LOCALE !== "undefined" ? (SESSION_LOCALE || null) : null
+    basePath:     typeof CONTEXT_PATH !== "undefined" ? (CONTEXT_PATH || null) : null,
+    application:  typeof PENTAHO_CONTEXT_NAME !== "undefined" ? (PENTAHO_CONTEXT_NAME || null) : null,
+    user:         typeof SESSION_NAME !== "undefined" ? (SESSION_NAME || null) : null,
+    theme:        typeof active_theme !== "undefined" ? (active_theme || null) : null,
+    locale:       typeof SESSION_LOCALE !== "undefined" ? (SESSION_LOCALE || null) : null
   });
 });

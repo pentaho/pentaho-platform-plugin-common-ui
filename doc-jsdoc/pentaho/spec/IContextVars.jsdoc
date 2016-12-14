@@ -25,6 +25,14 @@
  */
 
 /**
+ * The base path of the Pentaho platform server (e.g. `"/pentaho/"`).
+ *
+ * @name basePath
+ * @memberOf pentaho.spec.IContextVars#
+ * @type {?nonEmptyString}
+ */
+
+/**
  * The identifier of the application.
  *
  * @name application
