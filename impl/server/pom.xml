@@ -37,7 +37,6 @@
     <slf4j-api.version>1.7.3</slf4j-api.version>
     <slf4j-log4j12.version>1.7.3</slf4j-log4j12.version>
     <jcl-over-slf4j.version>1.6.1</jcl-over-slf4j.version>
-    <gwt.version>2.5.1</gwt.version>
     <dojo-release.version>1.9.2</dojo-release.version>
 
     <!-- Integration tests fail if we reuseForks -->
@@ -373,48 +372,13 @@
     </dependency>
 
     <!-- codegen -->
-    <dependency>
-      <groupId>pentaho</groupId>
-      <artifactId>pentaho-gwt-widgets</artifactId>
-      <version>${project.version}</version>
-      <scope>provided</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>*</groupId>
-          <artifactId>*</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>com.google.gwt</groupId>
-      <artifactId>gwt-user</artifactId>
-      <version>${gwt.version}</version>
-      <scope>provided</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>*</groupId>
-          <artifactId>*</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>com.google.gwt</groupId>
-      <artifactId>gwt-dev</artifactId>
-      <version>${gwt.version}</version>
-      <scope>provided</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>*</groupId>
-          <artifactId>*</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
+      <dependency>
       <groupId>org.dojotoolkit.dojo</groupId>
       <artifactId>dojo-release</artifactId>
       <version>${dojo-release.version}</version>
       <classifier>src</classifier>
       <type>zip</type>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>pentaho</groupId>

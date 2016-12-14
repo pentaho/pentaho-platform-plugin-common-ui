@@ -10,10 +10,11 @@
     <version>7.1-SNAPSHOT</version>
   </parent>
 
-  <artifactId>pentaho-platform-plugin-common-ui-assemblies</artifactId>
+  <artifactId>pentaho-common-ui-assemblies</artifactId>
   <packaging>pom</packaging>
 
   <modules>
+    <module>platform-plugin</module>
   </modules>
 
 </project>

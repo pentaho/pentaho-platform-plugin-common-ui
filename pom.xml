@@ -17,9 +17,8 @@
   <url>http://www.pentaho.com</url>
   
   <modules>
-    <!-- <module>impl</module> -->
-    <module>assemblies</module>
     <module>impl</module>
+    <module>assemblies</module>
   </modules>
 
   <scm>
