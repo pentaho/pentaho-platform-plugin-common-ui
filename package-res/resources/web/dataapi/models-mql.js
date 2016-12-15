@@ -1,5 +1,5 @@
 /*!
-* Copyright 2010 - 2013 Pentaho Corporation.  All rights reserved.
+* Copyright 2010 - 2016 Pentaho Corporation.  All rights reserved.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -329,7 +329,7 @@ pentaho.pda.model.mql.prototype.submit = function( jsonString, rowLimit, callbac
   try {
     // get the info about the models from the server
     var url = this.handler.METADATA_SERVICE_URL+'/doJsonQueryToCdaJson';
-    var query = 'json='+escape(jsonString)+'&rowLimit='+rowLimit;
+    var query = 'json='+encodeURIComponent(jsonString)+'&rowLimit='+rowLimit;
 
     var resultXml = pentahoGet( url, query, callback ? handleResultCallback : undefined);
     if (!callback) {
