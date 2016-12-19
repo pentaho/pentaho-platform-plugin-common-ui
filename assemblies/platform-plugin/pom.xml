@@ -10,6 +10,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>pentaho-common-ui-assemblies-platform-plugin</artifactId>
+  <packaging>pom</packaging>
 
   <properties>
     <flexjson.version>2.1</flexjson.version>
@@ -30,31 +31,6 @@
       <type>zip</type>
     </dependency>
 
-    <dependency>
-      <groupId>net.sf.flexjson</groupId>
-      <artifactId>flexjson</artifactId>
-      <version>${flexjson.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>*</groupId>
-          <artifactId>*</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
-    <!--
-    <dependency>
-      <groupId>pentaho</groupId>
-      <artifactId>pentaho-modeler</artifactId>
-      <version>${pentaho-modeler.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>*</groupId>
-          <artifactId>*</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
--->
   </dependencies>
 
   <build>

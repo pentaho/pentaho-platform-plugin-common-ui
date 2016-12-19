@@ -717,6 +717,7 @@ public class MetadataServiceIT {
     assertNull( "results are not null", results );
   }
 
+  @Ignore("Test randomly failling. Check BACKLOG-13450")
   @Test
   public void testXmlQueryToJson1() throws KettleException {
 

@@ -38,12 +38,27 @@
     <slf4j-log4j12.version>1.7.3</slf4j-log4j12.version>
     <jcl-over-slf4j.version>1.6.1</jcl-over-slf4j.version>
     <dojo-release.version>1.9.2</dojo-release.version>
+    <pentaho-modeler.version>${project.version}</pentaho-modeler.version>
+
 
     <!-- Integration tests fail if we reuseForks -->
     <maven-failsafe-plugin.reuseForks>false</maven-failsafe-plugin.reuseForks>
     <maven-failsafe-plugin.forkCount>1</maven-failsafe-plugin.forkCount>
   </properties>
   <dependencies>
+    <!--
+    <dependency>
+      <groupId>pentaho</groupId>
+      <artifactId>pentaho-modeler</artifactId>
+      <version>${pentaho-modeler.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    -->
     <dependency>
       <groupId>commons-lang</groupId>
       <artifactId>commons-lang</artifactId>
@@ -120,7 +135,6 @@
       <groupId>net.sf.flexjson</groupId>
       <artifactId>flexjson</artifactId>
       <version>${flexjson.version}</version>
-      <scope>provided</scope>
       <exclusions>
         <exclusion>
           <groupId>*</groupId>

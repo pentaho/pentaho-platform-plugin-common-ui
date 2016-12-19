@@ -1,0 +1,15 @@
+{
+  "SampleData" : {
+    "[Region].[Region]": {
+      "[Region].[Central]": "#0000cc",
+      "[Region].[Eastern]": "#0d8ecf",
+      "[Region].[Southern]": "#b0de09",
+      "[Region].[Western]": "#fcd202"
+    },
+    "[Measures].[MeasuresLevel]": {
+      "[Measures].[Actual]": "#0000cc",
+      "[Measures].[Budget]": "#0d8ecf",
+      "[Measures].[Variance]": "#b0de09"        
+    }
+  }
+}

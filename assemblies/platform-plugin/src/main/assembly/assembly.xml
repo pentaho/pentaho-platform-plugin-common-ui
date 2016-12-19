@@ -20,6 +20,15 @@
 
   </fileSets>
 -->
+
+  <fileSets>
+    <fileSet>
+      <directory>${basedir}/src/main/resources</directory>
+      <outputDirectory>.</outputDirectory>
+    </fileSet>
+  </fileSets>
+
+
   <dependencySets>
 
     <dependencySet>
@@ -38,7 +47,7 @@
         </include>
       </includes>
       <outputDirectory>/lib</outputDirectory>
-      <useTransitiveDependencies>false</useTransitiveDependencies>
+      <useTransitiveDependencies>true</useTransitiveDependencies>
     </dependencySet>
 
   </dependencySets>
