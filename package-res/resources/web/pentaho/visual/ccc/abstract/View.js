@@ -985,22 +985,24 @@ define([
     },
 
     _getDiscreteColors: function() {
-      var colors = this._discreteColorRole ? this._getDiscreteColorsCore() : null;
-      return colors || this._getDefaultDiscreteColors();
-    },
+      var defaultScale = pv.colors(this._getDefaultDiscreteColors());
 
-    _getDiscreteColorsCore: function() {
-      var colorMap = this._getDiscreteColorMap();
-      if(colorMap) {
-        var defaultScale = pv.colors(this._getDefaultDiscreteColors());
-        var scaleFactory = this._createDiscreteColorMapScaleFactory(colorMap, defaultScale);
+      var scale;
+      if(this._discreteColorRole) {
+        var colorMap = this._getDiscreteColorMap(defaultScale);
+        if(colorMap) {
+          // Final?
+          if(def.fun.is(colorMap)) { return colorMap; }
 
-        // Make sure the scales returned by scaleFactory
-        // "are like" pv.Scale - have all the necessary methods.
-        return function safeScaleFactory() {
-          return def.copy(scaleFactory(), defaultScale);
-        };
+          var colorMapScale = function(key) {
+            return def.getOwn(colorMap, key);
+          };
+
+          scale = this._createDiscreteColorMapScaleFactory(colorMapScale, defaultScale);
+        }
       }
+
+      return scale || defaultScale;
     },
 
     _getDefaultDiscreteColors: function() {
@@ -1009,7 +1011,8 @@ define([
 
     _getDiscreteColorMap: function() {
       var memberPalette = this._getMemberPalette();
-      if(!memberPalette) return;
+      if(!memberPalette)
+        return;
 
       // 1 - The CCC color role is not being explicitly set, so whatever goes to the series role is used by
       //     the color role.
@@ -1023,12 +1026,27 @@ define([
       // Possible to create colorMap based on memberPalette?
       if(C || M) {
         if(!C || M > 1) {
-          // Use measure colors.
+          colorMap = memberPalette["[Measures].[MeasuresLevel]"];
+
+          // Use measure colors
+          // a) C == 0 && M > 0
+          // b) C >  0 && M > 1
+
           // More than one measure MappingAttributeInfo or no color MappingAttributeInfos.
           // var keyIncludesMeasureDiscriminator = M > 1 && C > 0;
           // When the measure discriminator exists, it is the last MappingAttributeInfo.
-          colorMap = this._copyColorMap(null, memberPalette["[Measures].[MeasuresLevel]"]);
+
+          if(M === 1) {
+            // => C == 0
+            // The color key is empty... so need to do it this way.
+            var c = colorMap && colorMap[this.axes.measure.mappingAttrInfos[0].attr.name];
+            return c ? pv.colors([c]) : null;
+          }
+
+          colorMap = this._copyColorMap(null, colorMap);
         } else {
+          // a) C > 0 && M <= 1
+
           // If C > 0, Pie chart always ends up here...
           // Use the members' colors of the last color attribute.
           colorMap = this._copyColorMap(null, memberPalette[colorMAInfos[C - 1].attr.name]);
@@ -1097,16 +1115,23 @@ define([
       return memberPalette;
     },
 
-    _createDiscreteColorMapScaleFactory: function(colorMap, defaultScale) {
-      return function scaleFactory() {
+    _createDiscreteColorMapScaleFactory: function(colorScale, defaultScale) {
+
+      // Make sure the scales returned by scaleFactory
+      // "are like" pv.Scale - have all the necessary methods.
+      return function safeScaleFactory() {
+        return def.copy(scaleFactory(), defaultScale);
+      };
+
+      function scaleFactory() {
         return function(compKey) {
           if(compKey) {
             var keys = compKey.split("~");
             var key = keys[keys.length - 1];
-            return colorMap[key] || defaultScale(key);
+            return colorScale(key) || defaultScale(key);
           }
         };
-      };
+      }
     },
 
     _copyColorMap: function(mapOut, mapIn) {

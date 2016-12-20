@@ -61,7 +61,7 @@ define([
         if(value != null) {
           if(!IsEqual) IsEqual = context.get("pentaho/type/filter/isEqual");
 
-          var operand = new IsEqual({property: maInfo.name, value: {_: "string", v: value}});
+          var operand = new IsEqual({property: maInfo.attr.name, value: {_: "string", v: value}});
           filter = filter ? filter.and(operand) : operand;
         }
       });

@@ -103,6 +103,7 @@ define([
 
     _getDiscreteColorMap: function() {
       var memberPalette = this._getMemberPalette();
+      var colorMap;
       if(memberPalette) {
         var colorMAInfos = this._getDiscreteColorMappingAttrInfos();
         var C = colorMAInfos.length;
@@ -111,8 +112,15 @@ define([
         // and if these would affect color, each small chart would have a single color.
         // => consider M = 0;
         // If C, use the members' colors of the last color attribute.
-        if(C) return this._copyColorMap(null, memberPalette[colorMAInfos[C - 1].name]);
+        if(C) {
+          var maInfo = colorMAInfos[C - 1];
+          if(maInfo && maInfo.attr) {
+            colorMap = this._copyColorMap(null, memberPalette[maInfo.attr.name]);
+          }
+        }
       }
+
+      return colorMap;
     }
   });
 });
