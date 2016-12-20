@@ -715,9 +715,10 @@ define([
 
         if(maInfo.cccDimName) {
           // Exclude measure discriminator
+          var cccDim;
           if(maInfo.attr) {
             // ii) Configure CCC dimension options.
-            var cccDim = def.lazy(cccDims, maInfo.cccDimName);
+            cccDim = def.lazy(cccDims, maInfo.cccDimName);
             cccDim.valueType  = this._getAttributeCccValueType(maInfo.attr);
             cccDim.isDiscrete = this._isRoleQualitative(maInfo.role);
             cccDim.comparer   = null;
@@ -726,6 +727,11 @@ define([
               // Affects tooltips and discrete axes.
               cccDim.formatter = function(v) { return v == null ? "" : v.toString(); };
             }
+          }
+
+          if(maInfo.isMeasureDiscrim) {
+            cccDim = def.lazy(cccDims, maInfo.cccDimName);
+            cccDim.isHidden = true;
           }
 
           // iii) Add to corresponding CCC visual role
