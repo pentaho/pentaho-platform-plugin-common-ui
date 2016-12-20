@@ -26,26 +26,43 @@
       <directory>${basedir}/src/main/resources</directory>
       <outputDirectory>.</outputDirectory>
     </fileSet>
+    <fileSet>
+      <directory>${webjars.target.directory}/jquery/${jquery.version}/dist</directory>
+      <outputDirectory>resources/web/jquery</outputDirectory>
+    </fileSet>
   </fileSets>
 
+  <files>
+    <file>
+      <source>${webjars.target.directory}/jquery-i18n-properties/${jquery-i18n-properties.version}/jquery.i18n.properties-min.js</source>
+      <outputDirectory>resources/web/jquery</outputDirectory>
+    </file>
+  </files>
 
   <dependencySets>
 
+    <!-- GWT -->
     <dependencySet>
       <includes>
         <include>
-          *:*:zip*
+          org.pentaho:pentaho-platform-plugin-common-ui-impl-gwt:zip
         </include>
       </includes>
       <unpack>true</unpack>
     </dependencySet>
 
+    <!-- Server side dependencies with transitives -->
     <dependencySet>
       <includes>
         <include>
           *:*:jar*
         </include>
       </includes>
+      <excludes>
+        <exclude>
+          org.webjars.*:*:jar*
+        </exclude>
+      </excludes>
       <outputDirectory>/lib</outputDirectory>
       <useTransitiveDependencies>true</useTransitiveDependencies>
     </dependencySet>

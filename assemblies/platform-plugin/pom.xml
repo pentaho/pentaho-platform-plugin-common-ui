@@ -15,7 +15,10 @@
   <properties>
     <flexjson.version>2.1</flexjson.version>
     <pentaho-modeler.version>${project.version}</pentaho-modeler.version>
+    <webjars.target.directory>${project.build.directory}/${project.artifactId}-${project.version}/webjars/META-INF/resources/webjars</webjars.target.directory>
 
+    <jquery.version>1.12.4</jquery.version>
+    <jquery-i18n-properties.version>1.0.9</jquery-i18n-properties.version>
   </properties>
 
   <dependencies>
@@ -30,6 +33,16 @@
       <version>${project.version}</version>
       <type>zip</type>
     </dependency>
+    <dependency>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>jquery</artifactId>
+      <version>${jquery.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars.bower</groupId>
+      <artifactId>jquery-i18n-properties</artifactId>
+      <version>${jquery-i18n-properties.version}</version>
+    </dependency>
 
   </dependencies>
 
@@ -39,6 +52,19 @@
         <artifactId>maven-assembly-plugin</artifactId>
         <version>${maven-assembly-plugin.version}</version>
         <executions>
+          <execution>
+            <id>unpack-webjars-dependencies</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <descriptors>
+                <descriptor>src/main/assembly/unpackWebjarsAssembly.xml</descriptor>
+              </descriptors>
+              <appendAssemblyId>false</appendAssemblyId>
+            </configuration>
+          </execution>
           <execution>
             <id>bundle-common-ui-platform-plugin</id>
             <phase>package</phase>
@@ -54,6 +80,30 @@
           </execution>
         </executions>
       </plugin>
+<!--
+      <plugin>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>webjars-unpack</id>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.webjars.npm</groupId>
+                  <artifactId>jquery</artifactId>
+                  <includes>META-INF/resources/webjars/jquery/1.12.4/dist/**</includes>
+                  <outputDirectory>${project.build.directory}/webjars/resources/jquery</outputDirectory>
+
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      -->
     </plugins>
   </build>
 
