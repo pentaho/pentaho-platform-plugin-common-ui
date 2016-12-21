@@ -191,22 +191,31 @@ define([
           // Copy map values to colorMap.
           // All color maps are joined together and there will be no
           // value collisions because the key is prefixed with the category.
-          var map = memberPalette[colorMAInfo.name];
-          if(map) this._copyColorMap(colorMap, map);
+          if(colorMAInfo && colorMAInfo.attr) {
+            var map = memberPalette[colorMAInfo.attr.name];
+            if(map) this._copyColorMap(colorMap, map);
+          }
         }, this);
       }
 
       return colorMap;
     },
 
-    _createDiscreteColorMapScaleFactory: function(colorMap, defaultScale) {
+    _createDiscreteColorMapScaleFactory: function(colorMapScale, defaultScale) {
       // Sunburst Level 1 Wedge Key: "[Department].[VAL]"
       // Sunburst Level 2 Wedge Key: "[Department].[VAL]~[Region].[USA]"
       // colorMap= {
       //   "[Region].[USA]" : "#FF00FF"
       //   "[Department].[USA]" : "#AAFF00"
       // }
-      return function scaleFactory() {
+
+      // Make sure the scales returned by scaleFactory
+      // "are like" pv.Scale - have all the necessary methods.
+      return function safeScaleFactory() {
+        return def.copy(scaleFactory(), defaultScale);
+      };
+
+      function scaleFactory() {
         return function(compKey) {
           if(compKey) {
             var keys = compKey.split("~");
@@ -217,10 +226,10 @@ define([
             // If color map has no color and it is the 1st level,
             //  then reserve a color from the default color scale.
             // Otherwise, return undefined, meaning that a derived color should be used.
-            return def.getOwn(colorMap, keyLevel) || (level ? undefined : defaultScale(keyLevel));
+            return colorMapScale(keyLevel) || (level ? undefined : defaultScale(keyLevel));
           }
         };
-      };
+      }
     }
   });
 });
