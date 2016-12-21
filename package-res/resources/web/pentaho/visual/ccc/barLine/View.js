@@ -60,14 +60,14 @@ define([
       if(this._isGenericMeasureMode) {
         /* jshint laxbreak:true*/
         var barAttrInfos = this._getMappingAttrInfosByRole("measures");
-        var barAttrInfosByName = barAttrInfos
-                ? def.query(barAttrInfos).uniqueIndex(function(maInfo) { return maInfo.name; })
+        var barAttrsByName = barAttrInfos
+                ? def.query(barAttrInfos).uniqueIndex(function(maInfo) { return maInfo.attr.name; })
                 : {};
         var measureDiscrimCccDimName = this.GENERIC_MEASURE_DISCRIM_DIM_NAME;
 
         calculation = function(datum, atoms) {
           var meaAttrName = datum.atoms[measureDiscrimCccDimName].value;
-          atoms.dataPart = def.hasOwn(barAttrInfosByName, meaAttrName) ? "0" : "1";
+          atoms.dataPart = def.hasOwn(barAttrsByName, meaAttrName) ? "0" : "1";
         };
       } else if(this._genericMeasuresCount > 0) {
         // One measure of one of the roles exists.

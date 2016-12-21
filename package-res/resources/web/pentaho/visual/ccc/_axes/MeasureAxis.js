@@ -33,7 +33,7 @@ define([
        */
       if(this.chart._isGenericMeasureMode &&
          maInfo.isMeasureGeneric &&
-         maInfo.name !== complex.atoms[this.chart.GENERIC_MEASURE_DISCRIM_DIM_NAME].value) {
+         maInfo.attr.name !== complex.atoms[this.chart.GENERIC_MEASURE_DISCRIM_DIM_NAME].value) {
         return;
       }
 

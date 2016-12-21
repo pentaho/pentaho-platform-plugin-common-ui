@@ -78,7 +78,9 @@ define([
       // Change values mask according to each category's
       // discriminated measure being isPercent or not
       if(this._isGenericMeasureMode) {
-        var mappingAttrInfoByName = this._mappingAttrInfoByName;
+        var genericMeasureAttrsByName = this._selectGenericMeasureMappingAttrInfos()
+              .uniqueIndex(function(maInfo) { return maInfo.attr.name; });
+
         var genericMeasureDiscrimName = this.GENERIC_MEASURE_DISCRIM_DIM_NAME;
 
         this.options.pie = {
@@ -86,10 +88,10 @@ define([
             category: {
               sliceLabelMask: function() {
                 var meaAtom = this.atoms[genericMeasureDiscrimName];
-                var meaMAInfoId;
+                var meaMAName;
                 var meaMAInfo;
-                if(meaAtom && (meaMAInfoId = meaAtom.value) &&
-                   (meaMAInfo = mappingAttrInfoByName[meaMAInfoId]) && meaMAInfo.isPercent) {
+                if(meaAtom && (meaMAName = meaAtom.value) &&
+                   (meaMAInfo = genericMeasureAttrsByName[meaMAName]) && meaMAInfo.isPercent) {
                   return "{value}"; // the value is the percentage itself;
                 }
 
