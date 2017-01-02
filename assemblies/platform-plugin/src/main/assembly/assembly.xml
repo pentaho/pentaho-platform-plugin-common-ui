@@ -37,6 +37,11 @@
       <source>${webjars.target.directory}/jquery-i18n-properties/${jquery-i18n-properties.version}/jquery.i18n.properties-min.js</source>
       <outputDirectory>resources/web/jquery</outputDirectory>
     </file>
+    <file>
+      <source>${webjars.target.directory}/handlebars/${handlebars.version}/dist/handlebars.js</source>
+      <destName>handlebars-v4.0.5.js</destName>
+      <outputDirectory>resources/web/handlebars</outputDirectory>
+    </file>
   </files>
 
   <dependencySets>
@@ -48,23 +53,23 @@
           org.pentaho:pentaho-platform-plugin-common-ui-impl-gwt:zip
         </include>
       </includes>
+      <useTransitiveDependencies>false</useTransitiveDependencies>
       <unpack>true</unpack>
     </dependencySet>
 
-    <!-- Server side dependencies with transitives -->
+
+    <!-- Server side dependencies -->
     <dependencySet>
       <includes>
         <include>
-          *:*:jar*
+          org.pentaho:pentaho-platform-plugin-common-ui-impl-server
+        </include>
+        <include>
+          net.sf.flexjson:flexjson
         </include>
       </includes>
-      <excludes>
-        <exclude>
-          org.webjars.*:*:jar*
-        </exclude>
-      </excludes>
       <outputDirectory>/lib</outputDirectory>
-      <useTransitiveDependencies>true</useTransitiveDependencies>
+      <useTransitiveDependencies>false</useTransitiveDependencies>
     </dependencySet>
 
   </dependencySets>

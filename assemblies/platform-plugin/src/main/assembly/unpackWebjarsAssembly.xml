@@ -12,9 +12,10 @@
     <dependencySet>
       <includes>
         <include>
-          org.webjars.*:*:*
+          org.webjars.*
         </include>
       </includes>
+      <useTransitiveDependencies>false</useTransitiveDependencies>
       <unpack>true</unpack>
       <outputDirectory>webjars</outputDirectory>
     </dependencySet>

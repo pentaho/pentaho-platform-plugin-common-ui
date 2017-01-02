@@ -19,6 +19,7 @@
 
     <jquery.version>1.12.4</jquery.version>
     <jquery-i18n-properties.version>1.0.9</jquery-i18n-properties.version>
+    <handlebars.version>4.0.5</handlebars.version>
   </properties>
 
   <dependencies>
@@ -26,6 +27,11 @@
       <groupId>org.pentaho</groupId>
       <artifactId>pentaho-platform-plugin-common-ui-impl-server</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>net.sf.flexjson</groupId>
+      <artifactId>flexjson</artifactId>
+      <version>${flexjson.version}</version>
     </dependency>
     <dependency>
       <groupId>org.pentaho</groupId>
@@ -37,6 +43,17 @@
       <groupId>org.webjars.npm</groupId>
       <artifactId>jquery</artifactId>
       <version>${jquery.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>handlebars</artifactId>
+      <version>${handlebars.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.webjars.bower</groupId>
@@ -52,6 +69,7 @@
         <artifactId>maven-assembly-plugin</artifactId>
         <version>${maven-assembly-plugin.version}</version>
         <executions>
+          <!-- First unpack all webjar dependencies locally so that we can pick what to copy and where to copy it for the final assembly -->
           <execution>
             <id>unpack-webjars-dependencies</id>
             <phase>prepare-package</phase>
@@ -65,6 +83,8 @@
               <appendAssemblyId>false</appendAssemblyId>
             </configuration>
           </execution>
+
+          <!-- Create the platform plugin zip artifact -->
           <execution>
             <id>bundle-common-ui-platform-plugin</id>
             <phase>package</phase>
@@ -80,30 +100,7 @@
           </execution>
         </executions>
       </plugin>
-<!--
-      <plugin>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>webjars-unpack</id>
-            <goals>
-              <goal>unpack</goal>
-            </goals>
-            <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.webjars.npm</groupId>
-                  <artifactId>jquery</artifactId>
-                  <includes>META-INF/resources/webjars/jquery/1.12.4/dist/**</includes>
-                  <outputDirectory>${project.build.directory}/webjars/resources/jquery</outputDirectory>
 
-                </artifactItem>
-              </artifactItems>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      -->
     </plugins>
   </build>
 
